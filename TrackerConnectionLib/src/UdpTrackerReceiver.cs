@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace TrackerLib;
+namespace TrackerConnectionLib;
 
 public sealed class UdpTrackerReceiver<TPacket> : IDisposable
     where TPacket : ITrackerPacket

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace TrackerLib;
+namespace TrackerConnectionLib;
 
 public sealed class MultiTrackerManager<TPacket>
     where TPacket : ITrackerPacket

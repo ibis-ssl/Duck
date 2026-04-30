@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="SslProto/SslProto.csproj" />
-  <Project Path="TrackerLib/TrackerLib.csproj" />
-  <Project Path="TrackerLibExample/TrackerLibExample.csproj" />
+  <Project Path="TrackerConnectionLib/TrackerConnectionLib.csproj" />
+  <Project Path="TrackerConnectionLibExample/TrackerConnectionLibExample.csproj" />
 </Solution>

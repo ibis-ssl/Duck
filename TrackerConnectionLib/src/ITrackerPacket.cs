@@ -1,4 +1,4 @@
-namespace TrackerLib;
+namespace TrackerConnectionLib;
 public interface ITrackerPacket
 {
     string Uuid { get; }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\TrackerLib\TrackerLib.csproj" />
+    <ProjectReference Include="..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\SslProto\SslProto.csproj" />
   </ItemGroup>
 

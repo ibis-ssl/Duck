@@ -1,4 +1,4 @@
-namespace TrackerLib;
+namespace TrackerConnectionLib;
 public sealed class TrackerState<TPacket>
 where TPacket : ITrackerPacket
 {
