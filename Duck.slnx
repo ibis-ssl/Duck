@@ -2,4 +2,6 @@
   <Project Path="SslProto/SslProto.csproj" />
   <Project Path="TrackerConnectionLib/TrackerConnectionLib.csproj" />
   <Project Path="TrackerConnectionLibExample/TrackerConnectionLibExample.csproj" />
+  <Project Path="Tracker/Tracker.Core/Tracker.Core.csproj" />
+  <Project Path="Tracker/Tracker.Server/Tracker.Server.csproj" />
 </Solution>
