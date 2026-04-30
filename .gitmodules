@@ -1,0 +1,6 @@
+[submodule "SslProto/src/external/ssl-game-controller"]
+	path = SslProto/src/external/ssl-game-controller
+	url = https://github.com/RoboCup-SSL/ssl-game-controller
+[submodule "SslProto/src/external/ssl-simulation-protocol"]
+	path = SslProto/src/external/ssl-simulation-protocol
+	url = https://github.com/RoboCup-SSL/ssl-simulation-protocol

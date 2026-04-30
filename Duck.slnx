@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SslProto/SslProto.csproj" />
+  <Project Path="TrackerLib/TrackerLib.csproj" />
+  <Project Path="TrackerLibExample/TrackerLibExample.csproj" />
+</Solution>
