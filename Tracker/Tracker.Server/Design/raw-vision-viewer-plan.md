@@ -1,95 +1,205 @@
-# SSL_WrapperPacket Raw Vision Viewer Plan
+# SSL_WrapperPacket Raw Vision Viewer 設計
 
-## Goal
+## 目的
 
-Tracker.Server receives raw SSL-Vision `SSL_WrapperPacket` datagrams directly from `SslProto` generated types and renders the latest detection and geometry data in the root Blazor page.
+`Tracker.Server` が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` datagram を直接受信し、最新の detection / geometry 情報を Blazor UI 上で可視化できるようにする。
 
-## Scope
+## スコープ
 
-- Add a UDP hosted service that binds to the configured vision endpoint.
-- Join the multicast group when the configured address is multicast.
-- Decode packets with `SSL_WrapperPacket.Parser.ParseFrom`.
-- Store the latest packet, detection frame, geometry data, receive metadata, packet count, and error count in a singleton store.
-- Render a field SVG, detection tables, geometry calibration table, and raw packet JSON on `/`.
-- Keep the navigation focused on the raw vision viewer.
-- Support both aggregate multi-camera view and per-camera latest-frame view in the raw vision UI.
+- 設定された vision endpoint に bind する UDP hosted service を追加する
+- multicast address が設定されている場合は multicast join を行う
+- `SSL_WrapperPacket.Parser.ParseFrom` で packet を decode する
+- 最新 packet、最新 detection、最新 geometry、受信メタデータ、packet count、error count を singleton store に保持する
+- `/` に field SVG、detection 情報、geometry calibration、raw packet JSON を表示する
+- navigation は raw vision viewer 中心に保つ
+- aggregate view と camera 別 latest-frame view の両方を raw vision UI で扱う
 
-## Non-Goals
+## 非スコープ
 
-- Do not use `TrackerConnectionLib`.
-- Do not persist packets.
-- Do not add robot tracking, filtering, or world-model interpretation beyond raw detection rendering.
+- `TrackerConnectionLib` は使わない
+- packet の永続化はしない
+- raw detection を超える tracking / filtering / world-model 解釈は入れない
 
-## Configuration
+## 設定
 
-`appsettings.json` contains a `VisionReceiver` section:
+`appsettings.json` の `VisionReceiver` section を使う。
 
-- `MulticastAddress`: default `224.5.23.2`.
-- `Port`: default `10006`.
-- `InterfaceAddress`: optional local interface address used for multicast joins.
+- `MulticastAddress`: 既定値 `224.5.23.2`
+- `Port`: 受信 port
+- `InterfaceAddress`: multicast join に使う local IPv4 address。未設定時は候補 interface を自動解決する
 
-## Receiver Design
+## 受信設計
 
-`VisionReceiverService` runs as a hosted background service. It creates an IPv4 UDP socket, enables address reuse, binds to `IPAddress.Any` on the configured port, and continuously receives datagrams until cancellation.
+`VisionReceiverService` は hosted background service として動作する。
 
-When the configured vision address is multicast, the receiver resolves one or more local IPv4 interfaces for group membership:
+- IPv4 UDP socket を作成する
+- address reuse を有効にする
+- `IPAddress.Any` と設定 port に bind する
+- cancellation まで datagram を継続受信する
 
-- if `InterfaceAddress` is set, only that IPv4 address is used
-- otherwise, the receiver enumerates viable local IPv4 interfaces and attempts multicast join on each one
-- startup succeeds when at least one join succeeds, and partial join failures are logged for diagnosis
+設定された address が multicast の場合、group membership は次の規則で解決する。
 
-Each datagram is decoded into `SSL_WrapperPacket`. Successful decodes update `VisionPacketStore` with cloned packet data and receive metadata. Failed decodes increment the error count and retain the previous successful packet.
+- `InterfaceAddress` が設定されている場合、その IPv4 address のみを使う
+- 未設定の場合、利用可能な local IPv4 interface を列挙して順に join を試行する
+- 少なくとも 1 つ成功すれば受信開始を継続する
+- 一部 interface の失敗は warning log に残す
 
-## Store Design
+decode 成功時は `VisionPacketStore` を更新し、失敗時は error count を増やし、直前の正常 state を保持する。
 
-`VisionPacketStore` owns thread-safe state for UI reads:
+## Store 設計
 
-- latest wrapper packet
-- latest detection frame
-- latest geometry data
+`VisionPacketStore` は UI 参照用の thread-safe state を保持する。
+
+- 最新 wrapper packet
+- 最新 detection frame
+- camera ごとの最新 detection snapshot
+- aggregate 表示用に統合した balls / yellow robots / blue robots
+- 最新 geometry data
 - packet count
 - error count
 - remote endpoint
 - receive timestamp
-- latest parse error message
+- 最新 parse error message
 
-The store exposes immutable snapshots so Blazor components can render without holding locks.
+UI には immutable snapshot を返し、描画中に lock を保持しない。
 
-## Field Projection
+## Proto 入力
 
-`VisionFieldProjection` maps SSL field millimeter coordinates to an SVG viewport. It uses geometry field dimensions when available and falls back to regulation-style defaults before any geometry packet is received. `(0, 0)` maps to the viewport center, `x` increases right, and `y` increases upward in field coordinates.
+raw vision viewer が直接使う主な proto 入力は次の通り。
 
-## UI
+- `SSL_WrapperPacket`
+  - 受信 datagram 全体
+  - `Detection` と `Geometry` を内包する最上位 packet
+- `SSL_DetectionFrame`
+  - camera 単位の raw detection
+  - `FrameNumber`, `CameraId`, `Balls`, `RobotsYellow`, `RobotsBlue` を使う
+- `SSL_DetectionBall`
+  - ball 描画と詳細表示に使う
+  - 主に `X`, `Y`, `Z`, `PixelX`, `PixelY`, `Confidence`
+- `SSL_DetectionRobot`
+  - robot 描画と詳細表示に使う
+  - 主に `RobotId`, `X`, `Y`, `Orientation`, `PixelX`, `PixelY`, `Confidence`
+- `SSL_GeometryData`
+  - field geometry 全体
+  - `Field` と `Calib` を使う
+- `SSL_GeometryFieldSize`
+  - field の寸法と line / arc 情報
+  - 主に `FieldLength`, `FieldWidth`, `GoalWidth`, `GoalDepth`, `BoundaryWidth`, `BoundaryWidthGoalLine`, `PenaltyAreaDepth`, `PenaltyAreaWidth`, `CenterCircleRadius`, `LineThickness`, `FieldLines`, `FieldArcs`
+- `SSL_GeometryCameraCalibration`
+  - calibration table 表示に使う
+  - 主に `CameraId`, `FocalLength`, `PrincipalPointX`, `PrincipalPointY`, `PixelImageWidth`, `PixelImageHeight`
 
-The root page renders:
+## Field 投影
 
-- receiver status and latest receive metadata
-- SVG field with geometry lines/arcs and raw balls/robots
-- tables for balls, yellow robots, blue robots, and camera calibration
-- raw JSON generated with `Google.Protobuf.JsonFormatter`
-- a view selector that switches between aggregate state and individual camera state
-- a field-first presentation inspired by `RoboCup-SSL/ssl-vision-client`, including source selection and interactive zoom/pan on the canvas
+`VisionFieldProjection` は field の millimeter 座標を SVG viewport に写像する。
 
-## Reference UI Direction
+- geometry がある場合はその field dimensions を使う
+- geometry がまだない場合は default の競技場寸法を使う
+- `(0, 0)` は viewport center に対応する
+- field 本体だけでなく、boundary と goal depth が見切れないよう outer margin を加味する
 
-The field presentation follows the public `RoboCup-SSL/ssl-vision-client` frontend in these aspects:
+## コンポーネント構成
 
-- source-first selection above the field canvas
-- field canvas as the primary visualization area
-- boundary-aware green field background
-- interactive wheel zoom and drag pan controls
+raw vision viewer の主要コンポーネントは次の通り。
 
-## Test Plan
+- `Home.razor`
+  - 画面全体の親
+  - `VisionPacketStore.GetSnapshot()` の結果を定期取得し、source selector と左右ペインを構成する
+- `VisionFieldCanvas.razor`
+  - field SVG の親コンポーネント
+  - zoom / pan 状態、boundary 背景、field 本体、子 marker の配置を担当する
+- `VisionFieldLines.razor`
+  - field line / arc / goal の描画を担当する
+  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時は geometry 寸法から fallback 描画する
+- `VisionBallMarker.razor`
+  - `SSL_DetectionBall` 1 件を SVG circle として描く
+- `VisionRobotMarker.razor`
+  - `SSL_DetectionRobot` 1 件を robot shape として描く
+  - team 色、前面 gap、nose marker、label を担当する
+- `VisionDetailsPanel.razor`
+  - JSON / balls / robots / geometry calibration の右ペイン表示を担当する
+- `VisionPalette.cs`
+  - team color と marker stroke color の定義を一箇所に集約する
+- `VisionRenderOptions.cs`
+  - robot radius など、将来設定から変更したい描画パラメータの受け口
 
-- `VisionPacketStore` stores detection-only packets.
-- `VisionPacketStore` stores geometry-only packets.
-- `VisionPacketStore` increments error count after decode failures.
-- `VisionFieldProjection` maps `(0, 0)` to the SVG center.
-- `VisionFieldProjection` keeps field length/width endpoints inside the viewport.
-- `VisionFieldProjection` uses configured defaults when geometry has not been received.
+## コンポーネント入力
 
-## Assumptions
+各コンポーネントが受ける最小入力は次の通り。
 
-- "Raw vision information" means `vision/ssl_vision_wrapper.proto` `SSL_WrapperPacket`.
-- The default SSL-Vision multicast endpoint is `224.5.23.2:10006`.
-- Existing unrelated worktree changes are preserved.
+### Home.razor
+
+- `VisionPacketSnapshot`
+  - store から取得した UI 用 snapshot
+- `selectedViewKey`
+  - aggregate / camera 切替状態
+
+### VisionFieldCanvas.razor
+
+- `SSL_GeometryData? Geometry`
+- `IReadOnlyList<SSL_DetectionBall> Balls`
+- `IReadOnlyList<SSL_DetectionRobot> RobotsYellow`
+- `IReadOnlyList<SSL_DetectionRobot> RobotsBlue`
+- `VisionRenderOptions RenderOptions`
+
+### VisionFieldLines.razor
+
+- `VisionFieldProjection Projection`
+- `SSL_GeometryFieldSize? Field`
+
+### VisionBallMarker.razor
+
+- `VisionFieldProjection Projection`
+- `SSL_DetectionBall Ball`
+
+### VisionRobotMarker.razor
+
+- `VisionFieldProjection Projection`
+- `SSL_DetectionRobot Robot`
+- `string ClassName`
+- `VisionRenderOptions RenderOptions`
+
+### VisionDetailsPanel.razor
+
+- `string ViewLabel`
+- `string FrameLabel`
+- `string CameraLabel`
+- `string SourceLabel`
+- `string RawJson`
+- `SSL_GeometryData? Geometry`
+- `IReadOnlyList<SSL_DetectionBall> Balls`
+- `IReadOnlyList<SSL_DetectionRobot> RobotsYellow`
+- `IReadOnlyList<SSL_DetectionRobot> RobotsBlue`
+
+## UI 方針
+
+root page では次を表示する。
+
+- receiver status と最新 receive metadata
+- source selector
+- field-first の SVG 表示
+- raw JSON
+- balls / robots / geometry calibration の詳細表示
+
+field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲する。
+
+- source-first selection
+- field canvas を主表示にする
+- boundary-aware の field background
+- wheel zoom と drag pan
+
+## テスト方針
+
+- `VisionPacketStore` が detection-only packet を保持できる
+- `VisionPacketStore` が geometry-only packet を保持できる
+- `VisionPacketStore` が camera ごとの latest state と aggregate state を返せる
+- `VisionPacketStore` が decode failure 時に error count を増やす
+- `VisionReceiverService.ResolveMulticastJoinAddresses` が configured address と auto discovery を正しく処理する
+- `VisionFieldProjection` が `(0, 0)` を center に写像する
+- `VisionFieldProjection` が field / boundary / goal depth を含めても viewport 内に収める
+
+## 前提
+
+- raw vision information は `vision/ssl_vision_wrapper.proto` の `SSL_WrapperPacket` を指す
+- default の SSL-Vision multicast endpoint は一般には `224.5.23.2:10006` だが、runtime 設定で変更できる
+- 既存の unrelated worktree change は保護する
