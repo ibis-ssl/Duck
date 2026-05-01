@@ -86,9 +86,9 @@ public class TrackerPacketGeneratorContractTests
 
         Assert.Equal(
             [
-                Capability.CAPABILITY_DETECT_KICKED_BALLS,
-                Capability.CAPABILITY_DETECT_FLYING_BALLS,
-                Capability.CAPABILITY_DETECT_MULTIPLE_BALLS,
+                Capability.DetectKickedBalls,
+                Capability.DetectFlyingBalls,
+                Capability.DetectMultipleBalls,
             ],
             trackedFrame.Capabilities);
     }
@@ -107,7 +107,7 @@ public class TrackerPacketGeneratorContractTests
         var packet = CreateGenerator().Generate(frame);
         var trackedFrame = AssertTrackedFrame(packet);
 
-        Assert.False(trackedFrame.HasKickedBall);
+        Assert.Null(trackedFrame.KickedBall);
     }
 
     private static TrackerPacketGenerator CreateGenerator()
@@ -117,8 +117,7 @@ public class TrackerPacketGeneratorContractTests
 
     private static TrackedFrame AssertTrackedFrame(TrackerWrapperPacket packet)
     {
-        Assert.True(packet.HasTrackedFrame);
-        return packet.TrackedFrame;
+        return Assert.IsType<TrackedFrame>(packet.TrackedFrame);
     }
 
     private static TrackerFrame CreateFrame(

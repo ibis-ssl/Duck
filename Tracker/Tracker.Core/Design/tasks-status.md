@@ -4,14 +4,14 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-004
-- Title: `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する
+- ID: TRACKER-005
+- Title: `TrackerPacketGenerator` を実装する
 - Phase: contracts
 - Status: pending
 - Size: medium
-- Dependencies: TRACKER-002, TRACKER-003
+- Dependencies: TRACKER-004 が完了していること
 - Exit Criteria:
-  - 内部フレーム、state 型、`TrackerUpdateResult`、domain event、observer 契約が存在し、契約テストが参照できる。
+  - official tracker proto 出力、primary/secondary ball 並び、timestamp、`kicked_ball`、capabilities がテストを通過する。
 
 ## タスク一覧
 
@@ -21,7 +21,7 @@
 | TRACKER-001 | `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る | contracts | done | TRACKER-000 approved | `Tracker.Tests` から `Tracker.Core` を参照でき、contract test 用の fixture と test data 基盤が存在する。 |
 | TRACKER-002 | packet generator の契約テストを追加する | contracts | done | TRACKER-001 | 単位変換、primary/secondary ball 並び、capabilities、`kicked_ball` 寿命、timestamp 出力を定義する failing test が存在する。 |
 | TRACKER-003 | engine の時系列契約テストを追加する | contracts | done | TRACKER-001 | reorder、`MergeWindow`、`0..N CommittedFrames`、late packet、geometry reset、profile switch、event publish 順を定義する failing test が存在する。 |
-| TRACKER-004 | `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する | contracts | pending | TRACKER-002, TRACKER-003 | 内部フレーム、state 型、`TrackerUpdateResult`、domain event、observer 契約が存在し、契約テストが参照できる。 |
+| TRACKER-004 | `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する | contracts | done | TRACKER-002, TRACKER-003 | 内部フレーム、state 型、`TrackerUpdateResult`、domain event、observer 契約が存在し、契約テストが参照できる。 |
 | TRACKER-005 | `TrackerPacketGenerator` を実装する | contracts | pending | TRACKER-004 | official tracker proto 出力、primary/secondary ball 並び、timestamp、`kicked_ball`、capabilities がテストを通過する。 |
 | TRACKER-006 | `TrackerEngine` の reorder buffer と flush pipeline を実装する | engine | pending | TRACKER-003, TRACKER-004 | event-time buffer、flush 判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本 pipeline が決定的に動作する。 |
 | TRACKER-007 | `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する | engine | pending | TRACKER-006 | profile switch 要求、pending buffer clear、geometry reset、observer/event publish 順が契約どおりに動作する。 |
