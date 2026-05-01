@@ -1,0 +1,21 @@
+@using System.Globalization
+@using Tracker.Server.Vision
+
+@{
+    var point = Projection.Project(Ball.X, Ball.Y);
+}
+
+<circle class="vision-ball-marker" cx="@N(point.X)" cy="@N(point.Y)" r="7" />
+
+@code {
+    [Parameter, EditorRequired]
+    public VisionFieldProjection Projection { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public SSL_DetectionBall Ball { get; set; } = default!;
+
+    private static string N(double value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+}

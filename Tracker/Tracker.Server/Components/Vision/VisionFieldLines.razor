@@ -1,0 +1,182 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Rendering
+@using Tracker.Server.Vision
+
+@{
+    var hasGeneratedLines = Field?.FieldLines.Count > 0 || Field?.FieldArcs.Count > 0;
+}
+
+@if (Field is not null && hasGeneratedLines)
+{
+    @foreach (var line in Field.FieldLines)
+    {
+        var p1 = Projection.Project(line.P1.X, line.P1.Y);
+        var p2 = Projection.Project(line.P2.X, line.P2.Y);
+        <line class="vision-field-line"
+              style="@LineStyle(Field)"
+              x1="@N(p1.X)"
+              y1="@N(p1.Y)"
+              x2="@N(p2.X)"
+              y2="@N(p2.Y)" />
+    }
+
+    @foreach (var arc in Field.FieldArcs)
+    {
+        <path class="vision-field-line" style="@LineStyle(Field)" d="@ArcPath(Projection, arc)" />
+    }
+}
+else if (Field is not null)
+{
+    @RenderFallbackField(Field)
+}
+
+@if (Field is not null && Field.GoalDepth > 0 && Field.GoalWidth > 0)
+{
+    @RenderGoals(Field)
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public VisionFieldProjection Projection { get; set; } = default!;
+
+    [Parameter]
+    public SSL_GeometryFieldSize? Field { get; set; }
+
+    private static string N(double value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private string LineStyle(SSL_GeometryFieldSize field)
+    {
+        var lineThickness = field.LineThickness > 0 ? field.LineThickness : 10;
+        var projectedThickness = Math.Max(1.2, Projection.ProjectLength(lineThickness));
+        return $"stroke-width:{N(projectedThickness)}";
+    }
+
+    private static string ArcPath(VisionFieldProjection projection, SSL_FieldCircularArc arc)
+    {
+        var start = projection.Project(
+            arc.Center.X + (Math.Cos(arc.A1) * arc.Radius),
+            arc.Center.Y + (Math.Sin(arc.A1) * arc.Radius));
+        var end = projection.Project(
+            arc.Center.X + (Math.Cos(arc.A2) * arc.Radius),
+            arc.Center.Y + (Math.Sin(arc.A2) * arc.Radius));
+        var radius = projection.ProjectLength(arc.Radius);
+        var delta = Math.Abs(arc.A2 - arc.A1);
+        var largeArc = delta > Math.PI ? 1 : 0;
+        var sweep = arc.A2 >= arc.A1 ? 0 : 1;
+
+        return $"M {N(start.X)} {N(start.Y)} A {N(radius)} {N(radius)} 0 {largeArc} {sweep} {N(end.X)} {N(end.Y)}";
+    }
+
+    private RenderFragment RenderFallbackField(SSL_GeometryFieldSize field) => builder =>
+    {
+        var sequence = 0;
+        var fieldMaxX = field.FieldLength / 2d;
+        var fieldMaxY = field.FieldWidth / 2d;
+        var penaltyAreaDepth = field.PenaltyAreaDepth > 0 ? field.PenaltyAreaDepth : 1000;
+        var penaltyAreaWidth = field.PenaltyAreaWidth > 0 ? field.PenaltyAreaWidth : 2000;
+        var centerCircleRadius = field.CenterCircleRadius > 0 ? field.CenterCircleRadius : 500;
+        var penaltyAreaMinX = fieldMaxX - penaltyAreaDepth;
+        var penaltyAreaMaxY = penaltyAreaWidth / 2d;
+        var lineStyle = LineStyle(field);
+
+        AddLine(builder, ref sequence, lineStyle, fieldMaxX, fieldMaxY, fieldMaxX, -fieldMaxY);
+        AddLine(builder, ref sequence, lineStyle, -fieldMaxX, fieldMaxY, -fieldMaxX, -fieldMaxY);
+        AddLine(builder, ref sequence, lineStyle, fieldMaxX, fieldMaxY, -fieldMaxX, fieldMaxY);
+        AddLine(builder, ref sequence, lineStyle, fieldMaxX, -fieldMaxY, -fieldMaxX, -fieldMaxY);
+        AddLine(builder, ref sequence, lineStyle, 0, -fieldMaxY, 0, fieldMaxY);
+
+        builder.OpenElement(sequence++, "circle");
+        builder.AddAttribute(sequence++, "class", "vision-field-line");
+        builder.AddAttribute(sequence++, "style", lineStyle);
+        builder.AddAttribute(sequence++, "cx", N(Projection.Project(0, 0).X));
+        builder.AddAttribute(sequence++, "cy", N(Projection.Project(0, 0).Y));
+        builder.AddAttribute(sequence++, "r", N(Projection.ProjectLength(centerCircleRadius)));
+        builder.CloseElement();
+
+        AddLine(builder, ref sequence, lineStyle, penaltyAreaMinX, penaltyAreaMaxY, penaltyAreaMinX, -penaltyAreaMaxY);
+        AddLine(builder, ref sequence, lineStyle, penaltyAreaMinX, penaltyAreaMaxY, fieldMaxX, penaltyAreaMaxY);
+        AddLine(builder, ref sequence, lineStyle, penaltyAreaMinX, -penaltyAreaMaxY, fieldMaxX, -penaltyAreaMaxY);
+        AddLine(builder, ref sequence, lineStyle, -penaltyAreaMinX, penaltyAreaMaxY, -penaltyAreaMinX, -penaltyAreaMaxY);
+        AddLine(builder, ref sequence, lineStyle, -penaltyAreaMinX, penaltyAreaMaxY, -fieldMaxX, penaltyAreaMaxY);
+        AddLine(builder, ref sequence, lineStyle, -penaltyAreaMinX, -penaltyAreaMaxY, -fieldMaxX, -penaltyAreaMaxY);
+    };
+
+    private RenderFragment RenderGoals(SSL_GeometryFieldSize field) => builder =>
+    {
+        var sequence = 0;
+        var fieldMaxX = field.FieldLength / 2d;
+        var goalDepth = field.GoalDepth;
+        var goalHalfWidth = field.GoalWidth / 2d;
+        var strokeWidth = Math.Max(2.2, Projection.ProjectLength(Math.Max(field.LineThickness, 20)));
+
+        AddGoalPath(
+            builder,
+            ref sequence,
+            "vision-goal vision-goal--blue",
+            VisionPalette.GoalStroke("blue"),
+            strokeWidth,
+            fieldMaxX,
+            goalHalfWidth,
+            fieldMaxX + goalDepth,
+            -goalHalfWidth);
+
+        AddGoalPath(
+            builder,
+            ref sequence,
+            "vision-goal vision-goal--yellow",
+            VisionPalette.GoalStroke("yellow"),
+            strokeWidth,
+            -fieldMaxX,
+            goalHalfWidth,
+            -fieldMaxX - goalDepth,
+            -goalHalfWidth);
+    };
+
+    private void AddLine(RenderTreeBuilder builder, ref int sequence, string lineStyle, double x1, double y1, double x2, double y2)
+    {
+        var p1 = Projection.Project(x1, y1);
+        var p2 = Projection.Project(x2, y2);
+
+        builder.OpenElement(sequence++, "line");
+        builder.AddAttribute(sequence++, "class", "vision-field-line");
+        builder.AddAttribute(sequence++, "style", lineStyle);
+        builder.AddAttribute(sequence++, "x1", N(p1.X));
+        builder.AddAttribute(sequence++, "y1", N(p1.Y));
+        builder.AddAttribute(sequence++, "x2", N(p2.X));
+        builder.AddAttribute(sequence++, "y2", N(p2.Y));
+        builder.CloseElement();
+    }
+
+    private void AddGoalPath(
+        RenderTreeBuilder builder,
+        ref int sequence,
+        string cssClass,
+        string strokeColor,
+        double strokeWidth,
+        double fieldX,
+        double topY,
+        double outerX,
+        double bottomY)
+    {
+        var fieldTop = Projection.Project(fieldX, topY);
+        var outerTop = Projection.Project(outerX, topY);
+        var outerBottom = Projection.Project(outerX, bottomY);
+        var fieldBottom = Projection.Project(fieldX, bottomY);
+        var path =
+            $"M {N(fieldTop.X)} {N(fieldTop.Y)} " +
+            $"L {N(outerTop.X)} {N(outerTop.Y)} " +
+            $"L {N(outerBottom.X)} {N(outerBottom.Y)} " +
+            $"L {N(fieldBottom.X)} {N(fieldBottom.Y)}";
+
+        builder.OpenElement(sequence++, "path");
+        builder.AddAttribute(sequence++, "class", cssClass);
+        builder.AddAttribute(sequence++, "d", path);
+        builder.AddAttribute(sequence++, "fill", "none");
+        builder.AddAttribute(sequence++, "stroke", strokeColor);
+        builder.AddAttribute(sequence++, "style", $"stroke-width:{N(strokeWidth)}");
+        builder.CloseElement();
+    }
+}

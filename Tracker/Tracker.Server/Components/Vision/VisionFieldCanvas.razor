@@ -1,0 +1,182 @@
+@using System.Globalization
+@using Tracker.Server.Vision
+
+<section class="field-card">
+    <div class="field-card__toolbar">
+        <span>Wheel to zoom, drag to pan</span>
+        <button type="button" class="field-card__reset" @onclick="ResetFieldView">Reset View</button>
+    </div>
+    <div class="field-card__canvas">
+        @{
+            var projection = VisionFieldProjection.FromGeometry(Geometry);
+            var field = Geometry?.Field;
+            var (boundaryWidthGoalLine, boundaryWidthTouchLine) = ResolveBoundaryWidths(Geometry);
+            var outerLengthMargin = Math.Max(boundaryWidthGoalLine, field?.GoalDepth ?? 0);
+            var fieldTopLeft = projection.Project(-projection.FieldLength / 2, projection.FieldWidth / 2);
+            var fieldWidth = projection.ProjectLength(projection.FieldLength);
+            var fieldHeight = projection.ProjectLength(projection.FieldWidth);
+            var boundaryTopLeft = projection.Project(
+                -(projection.FieldLength / 2 + outerLengthMargin),
+                projection.FieldWidth / 2 + boundaryWidthTouchLine);
+            var boundaryWidthProjected = projection.ProjectLength(projection.FieldLength + (outerLengthMargin * 2));
+            var boundaryHeightProjected = projection.ProjectLength(projection.FieldWidth + (boundaryWidthTouchLine * 2));
+        }
+
+        <svg class="field-card__svg"
+             viewBox="@ViewBox(projection)"
+             role="img"
+             aria-label="SSL-Vision field"
+             @onwheel="OnFieldWheel"
+             @onmousedown="OnFieldMouseDown"
+             @onmousemove="OnFieldMouseMove"
+             @onmouseup="OnFieldMouseUp"
+             @onmouseleave="OnFieldMouseLeave">
+            <g transform="@FieldTransform(projection)">
+                <rect class="field-card__boundary-background"
+                      x="@N(boundaryTopLeft.X)"
+                      y="@N(boundaryTopLeft.Y)"
+                      width="@N(boundaryWidthProjected)"
+                      height="@N(boundaryHeightProjected)" />
+
+                <rect class="field-card__boundary"
+                      x="@N(fieldTopLeft.X)"
+                      y="@N(fieldTopLeft.Y)"
+                      width="@N(fieldWidth)"
+                      height="@N(fieldHeight)" />
+
+                <VisionFieldLines Projection="projection" Field="field" />
+
+                @foreach (var ball in Balls)
+                {
+                    <VisionBallMarker Projection="projection" Ball="ball" />
+                }
+
+                @foreach (var robot in RobotsYellow)
+                {
+                    <VisionRobotMarker Projection="projection"
+                                       Robot="robot"
+                                       ClassName="robot-yellow"
+                                       RenderOptions="RenderOptions" />
+                }
+
+                @foreach (var robot in RobotsBlue)
+                {
+                    <VisionRobotMarker Projection="projection"
+                                       Robot="robot"
+                                       ClassName="robot-blue"
+                                       RenderOptions="RenderOptions" />
+                }
+            </g>
+        </svg>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public SSL_GeometryData? Geometry { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<SSL_DetectionBall> Balls { get; set; } = Array.Empty<SSL_DetectionBall>();
+
+    [Parameter]
+    public IReadOnlyList<SSL_DetectionRobot> RobotsYellow { get; set; } = Array.Empty<SSL_DetectionRobot>();
+
+    [Parameter]
+    public IReadOnlyList<SSL_DetectionRobot> RobotsBlue { get; set; } = Array.Empty<SSL_DetectionRobot>();
+
+    [Parameter]
+    public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
+
+    private double zoom = 1;
+    private double translationX;
+    private double translationY;
+    private double activeTranslationX;
+    private double activeTranslationY;
+    private SvgPoint? mouseDownPoint;
+
+    private static string ViewBox(VisionFieldProjection projection)
+    {
+        return $"0 0 {N(projection.ViewBoxWidth)} {N(projection.ViewBoxHeight)}";
+    }
+
+    private string FieldTransform(VisionFieldProjection projection)
+    {
+        var centerX = projection.ViewBoxWidth / 2;
+        var centerY = projection.ViewBoxHeight / 2;
+
+        return
+            $"translate({N(translationX + activeTranslationX)} {N(translationY + activeTranslationY)}) " +
+            $"translate({N(centerX)} {N(centerY)}) " +
+            $"scale({N(zoom)}) " +
+            $"translate({N(-centerX)} {N(-centerY)})";
+    }
+
+    private static (double GoalLine, double TouchLine) ResolveBoundaryWidths(SSL_GeometryData? geometry)
+    {
+        var field = geometry?.Field;
+        var touchLine = field?.BoundaryWidth > 0 ? field.BoundaryWidth : 300;
+        var goalLine = field?.BoundaryWidthGoalLine > 0 ? field.BoundaryWidthGoalLine : touchLine;
+        return (goalLine, touchLine);
+    }
+
+    private static string N(double value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private void ResetFieldView()
+    {
+        zoom = 1;
+        translationX = 0;
+        translationY = 0;
+        activeTranslationX = 0;
+        activeTranslationY = 0;
+        mouseDownPoint = null;
+    }
+
+    private void OnFieldWheel(WheelEventArgs eventArgs)
+    {
+        var newZoom = zoom - (eventArgs.DeltaY / 300);
+        zoom = Math.Max(1, newZoom);
+    }
+
+    private void OnFieldMouseDown(MouseEventArgs eventArgs)
+    {
+        mouseDownPoint = new SvgPoint(eventArgs.ClientX, eventArgs.ClientY);
+    }
+
+    private void OnFieldMouseMove(MouseEventArgs eventArgs)
+    {
+        if (mouseDownPoint is null)
+        {
+            return;
+        }
+
+        activeTranslationX = eventArgs.ClientX - mouseDownPoint.Value.X;
+        activeTranslationY = eventArgs.ClientY - mouseDownPoint.Value.Y;
+    }
+
+    private void OnFieldMouseUp(MouseEventArgs _)
+    {
+        CommitFieldTranslation();
+    }
+
+    private void OnFieldMouseLeave(MouseEventArgs _)
+    {
+        CommitFieldTranslation();
+    }
+
+    private void CommitFieldTranslation()
+    {
+        if (mouseDownPoint is null)
+        {
+            return;
+        }
+
+        translationX += activeTranslationX;
+        translationY += activeTranslationY;
+        activeTranslationX = 0;
+        activeTranslationY = 0;
+        mouseDownPoint = null;
+    }
+}

@@ -1,0 +1,62 @@
+@using System.Globalization
+@using Tracker.Server.Vision
+
+@{
+    var center = Projection.Project(Robot.X, Robot.Y);
+    var radius = RenderOptions.RobotRadius;
+    var frontGapAngle = RenderOptions.RobotFrontGapAngle;
+    var startAngle = Robot.Orientation + (frontGapAngle / 2);
+    var endAngle = Robot.Orientation - (frontGapAngle / 2);
+    var bodyStart = PolarPoint(center, radius, startAngle);
+    var bodyEnd = PolarPoint(center, radius, endAngle);
+    var largeArc = 1;
+    var frontCenter = PolarPoint(center, radius * RenderOptions.RobotNoseOffsetFactor, Robot.Orientation);
+    var teamFill = VisionPalette.TeamFill(ClassName);
+}
+
+<g class="@ClassName">
+    <path class="vision-robot__body"
+          fill="@teamFill"
+          stroke="@VisionPalette.MarkerStroke"
+          d="M @N(bodyStart.X) @N(bodyStart.Y) A @N(radius) @N(radius) 0 @largeArc 0 @N(bodyEnd.X) @N(bodyEnd.Y) Z" />
+    <line class="vision-robot__front"
+          stroke="@VisionPalette.MarkerStroke"
+          x1="@N(bodyStart.X)"
+          y1="@N(bodyStart.Y)"
+          x2="@N(bodyEnd.X)"
+          y2="@N(bodyEnd.Y)" />
+    <circle class="vision-robot__nose"
+            fill="@VisionPalette.MarkerStroke"
+            cx="@N(frontCenter.X)"
+            cy="@N(frontCenter.Y)"
+            r="@N(RenderOptions.RobotNoseRadius)" />
+    <text class="vision-robot__label" fill="@VisionPalette.MarkerStroke" x="@N(center.X)" y="@N(center.Y + RenderOptions.RobotLabelYOffset)">
+        @Robot.RobotId.ToString(CultureInfo.InvariantCulture)
+    </text>
+</g>
+
+@code {
+    [Parameter, EditorRequired]
+    public VisionFieldProjection Projection { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public SSL_DetectionRobot Robot { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string ClassName { get; set; } = string.Empty;
+
+    [Parameter]
+    public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
+
+    private static string N(double value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private static SvgPoint PolarPoint(SvgPoint center, double radius, double angle)
+    {
+        return new SvgPoint(
+            center.X + (Math.Cos(angle) * radius),
+            center.Y - (Math.Sin(angle) * radius));
+    }
+}

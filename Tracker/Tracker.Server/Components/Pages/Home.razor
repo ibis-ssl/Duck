@@ -1,7 +1,7 @@
 ﻿@page "/"
 @using System.Globalization
+@using System.Text.Json
 @using Google.Protobuf
-@using Microsoft.AspNetCore.Components.Rendering
 @using Tracker.Server.Vision
 @inject VisionPacketStore Store
 @implements IAsyncDisposable
@@ -39,189 +39,72 @@
         <div class="vision-alert">@snapshot.LastError</div>
     }
 
+    <section class="view-toolbar">
+        <div class="source-selector" role="tablist" aria-label="Vision source selector">
+            <button type="button"
+                    class="@SourceButtonClass(AggregateViewKey)"
+                    @onclick="@(() => SelectView(AggregateViewKey))">
+                Aggregate
+            </button>
+            @foreach (var camera in snapshot.Cameras)
+            {
+                var cameraKey = CameraViewKey(camera.CameraId);
+                <button type="button"
+                        class="@SourceButtonClass(cameraKey)"
+                        @onclick="@(() => SelectView(cameraKey))">
+                    Camera @camera.CameraId
+                </button>
+            }
+        </div>
+    </section>
+
     @{
-        var projection = VisionFieldProjection.FromGeometry(snapshot.Geometry);
-        var field = snapshot.Geometry?.Field;
-        var detection = snapshot.Detection;
-        var fieldTopLeft = projection.Project(-projection.FieldLength / 2, projection.FieldWidth / 2);
-        var fieldWidth = projection.ProjectLength(projection.FieldLength);
-        var fieldHeight = projection.ProjectLength(projection.FieldWidth);
+        var selectedView = ResolveSelectedView(snapshot);
+        var balls = selectedView.Balls;
+        var yellowRobots = selectedView.RobotsYellow;
+        var blueRobots = selectedView.RobotsBlue;
     }
 
     <div class="vision-grid">
-        <section class="field-panel">
-            <svg class="field-svg" viewBox="@ViewBox(projection)" role="img" aria-label="SSL-Vision field">
-                <rect class="field-boundary"
-                      x="@N(fieldTopLeft.X)"
-                      y="@N(fieldTopLeft.Y)"
-                      width="@N(fieldWidth)"
-                      height="@N(fieldHeight)" />
+        <VisionFieldCanvas Geometry="snapshot.Geometry"
+                           Balls="balls"
+                           RobotsYellow="yellowRobots"
+                           RobotsBlue="blueRobots" />
 
-                @if (field?.FieldLines is not null)
-                {
-                    @foreach (var line in field.FieldLines)
-                    {
-                        var p1 = projection.Project(line.P1.X, line.P1.Y);
-                        var p2 = projection.Project(line.P2.X, line.P2.Y);
-                        <line class="field-line"
-                              x1="@N(p1.X)"
-                              y1="@N(p1.Y)"
-                              x2="@N(p2.X)"
-                              y2="@N(p2.Y)" />
-                    }
-                }
-
-                @if (field?.FieldArcs is not null)
-                {
-                    @foreach (var arc in field.FieldArcs)
-                    {
-                        <path class="field-line" d="@ArcPath(projection, arc)" />
-                    }
-                }
-
-                @if (detection?.Balls is not null)
-                {
-                    @foreach (var ball in detection.Balls)
-                    {
-                        var ballPoint = projection.Project(ball.X, ball.Y);
-                        <circle class="vision-ball" cx="@N(ballPoint.X)" cy="@N(ballPoint.Y)" r="7" />
-                    }
-                }
-
-                @if (detection?.RobotsYellow is not null)
-                {
-                    @foreach (var robot in detection.RobotsYellow)
-                    {
-                        @RenderRobot(projection, robot, "robot-yellow")
-                    }
-                }
-
-                @if (detection?.RobotsBlue is not null)
-                {
-                    @foreach (var robot in detection.RobotsBlue)
-                    {
-                        @RenderRobot(projection, robot, "robot-blue")
-                    }
-                }
-            </svg>
-        </section>
-
-        <aside class="packet-panel">
-            <div class="packet-meta">
-                <div>
-                    <span>Frame</span>
-                    <strong>@(detection?.FrameNumber.ToString(CultureInfo.InvariantCulture) ?? "-")</strong>
-                </div>
-                <div>
-                    <span>Camera</span>
-                    <strong>@(detection?.CameraId.ToString(CultureInfo.InvariantCulture) ?? "-")</strong>
-                </div>
-                <div>
-                    <span>Source</span>
-                    <strong>@(snapshot.LatestPacket?.Source.ToString() ?? "-")</strong>
-                </div>
-            </div>
-            <pre class="raw-json">@FormatJson(snapshot.LatestPacket)</pre>
-        </aside>
+        <VisionDetailsPanel ViewLabel="selectedView.Label"
+                            FrameLabel="selectedView.FrameLabel"
+                            CameraLabel="selectedView.CameraLabel"
+                            SourceLabel="selectedView.SourceLabel"
+                            RawJson="selectedView.RawJson"
+                            Geometry="snapshot.Geometry"
+                            Balls="balls"
+                            RobotsYellow="yellowRobots"
+                            RobotsBlue="blueRobots" />
     </div>
-
-    <section class="tables-grid">
-        <div>
-            <h2>Balls</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Conf</th>
-                        <th>X</th>
-                        <th>Y</th>
-                        <th>Z</th>
-                        <th>Pixel</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (detection?.Balls is { Count: > 0 })
-                    {
-                        @foreach (var ball in detection.Balls)
-                        {
-                            <tr>
-                                <td>@N(ball.Confidence)</td>
-                                <td>@N(ball.X)</td>
-                                <td>@N(ball.Y)</td>
-                                <td>@N(ball.Z)</td>
-                                <td>@N(ball.PixelX), @N(ball.PixelY)</td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr><td colspan="5">No balls</td></tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        <div>
-            <h2>Yellow Robots</h2>
-            @RobotTable(detection?.RobotsYellow)
-        </div>
-
-        <div>
-            <h2>Blue Robots</h2>
-            @RobotTable(detection?.RobotsBlue)
-        </div>
-
-        <div>
-            <h2>Geometry Calibration</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Camera</th>
-                        <th>Focal</th>
-                        <th>Principal</th>
-                        <th>Image</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (snapshot.Geometry?.Calib is { Count: > 0 })
-                    {
-                        @foreach (var calib in snapshot.Geometry.Calib)
-                        {
-                            <tr>
-                                <td>@calib.CameraId</td>
-                                <td>@N(calib.FocalLength)</td>
-                                <td>@N(calib.PrincipalPointX), @N(calib.PrincipalPointY)</td>
-                                <td>@calib.PixelImageWidth x @calib.PixelImageHeight</td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr><td colspan="4">No calibration</td></tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </section>
 </section>
 
 @code {
+    private const string AggregateViewKey = "aggregate";
     private readonly CancellationTokenSource disposalTokenSource = new();
-    private VisionPacketSnapshot snapshot = new(null, null, null, 0, 0, null, null, null);
+    private VisionPacketSnapshot snapshot = VisionPacketSnapshot.Empty;
     private Task? refreshTask;
+    private string selectedViewKey = AggregateViewKey;
 
     protected override void OnInitialized()
     {
         snapshot = Store.GetSnapshot();
+        EnsureSelectedViewExists(snapshot);
         refreshTask = RefreshAsync(disposalTokenSource.Token);
     }
 
     private async Task RefreshAsync(CancellationToken cancellationToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(500));
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
 
         while (await timer.WaitForNextTickAsync(cancellationToken))
         {
             snapshot = Store.GetSnapshot();
+            EnsureSelectedViewExists(snapshot);
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -236,98 +119,144 @@
         return message is null ? "{}" : JsonFormatter.Default.Format(message);
     }
 
-    private static string ViewBox(VisionFieldProjection projection)
+    private static string FormatAggregateJson(VisionAggregateDetectionSnapshot aggregate)
     {
-        return $"0 0 {N(projection.ViewBoxWidth)} {N(projection.ViewBoxHeight)}";
-    }
-
-    private static string N(double value)
-    {
-        return value.ToString("0.###", CultureInfo.InvariantCulture);
-    }
-
-    private static string ArcPath(VisionFieldProjection projection, SSL_FieldCircularArc arc)
-    {
-        var start = projection.Project(
-            arc.Center.X + (Math.Cos(arc.A1) * arc.Radius),
-            arc.Center.Y + (Math.Sin(arc.A1) * arc.Radius));
-        var end = projection.Project(
-            arc.Center.X + (Math.Cos(arc.A2) * arc.Radius),
-            arc.Center.Y + (Math.Sin(arc.A2) * arc.Radius));
-        var radius = projection.ProjectLength(arc.Radius);
-        var delta = Math.Abs(arc.A2 - arc.A1);
-        var largeArc = delta > Math.PI ? 1 : 0;
-        var sweep = arc.A2 >= arc.A1 ? 0 : 1;
-
-        return $"M {N(start.X)} {N(start.Y)} A {N(radius)} {N(radius)} 0 {largeArc} {sweep} {N(end.X)} {N(end.Y)}";
-    }
-
-    private static RenderFragment RenderRobot(VisionFieldProjection projection, SSL_DetectionRobot robot, string cssClass) => builder =>
-    {
-        var center = projection.Project(robot.X, robot.Y);
-        var heading = projection.Project(
-            robot.X + (Math.Cos(robot.Orientation) * 190),
-            robot.Y + (Math.Sin(robot.Orientation) * 190));
-
-        builder.OpenElement(0, "g");
-        builder.AddAttribute(1, "class", cssClass);
-        builder.OpenElement(2, "circle");
-        builder.AddAttribute(3, "cx", N(center.X));
-        builder.AddAttribute(4, "cy", N(center.Y));
-        builder.AddAttribute(5, "r", "12");
-        builder.CloseElement();
-        builder.OpenElement(6, "line");
-        builder.AddAttribute(7, "x1", N(center.X));
-        builder.AddAttribute(8, "y1", N(center.Y));
-        builder.AddAttribute(9, "x2", N(heading.X));
-        builder.AddAttribute(10, "y2", N(heading.Y));
-        builder.CloseElement();
-        builder.OpenElement(11, "text");
-        builder.AddAttribute(12, "x", N(center.X + 15));
-        builder.AddAttribute(13, "y", N(center.Y - 15));
-        builder.AddContent(14, robot.RobotId.ToString(CultureInfo.InvariantCulture));
-        builder.CloseElement();
-        builder.CloseElement();
-    };
-
-    private static RenderFragment RobotTable(IEnumerable<SSL_DetectionRobot>? robots) => builder =>
-    {
-        var rows = robots?.ToArray() ?? [];
-        var sequence = 0;
-
-        builder.OpenElement(sequence++, "table");
-        builder.AddMarkupContent(sequence++, "<thead><tr><th>ID</th><th>Conf</th><th>X</th><th>Y</th><th>Ori</th><th>Pixel</th></tr></thead>");
-        builder.OpenElement(sequence++, "tbody");
-
-        if (rows.Length == 0)
+        var payload = new
         {
-            builder.AddMarkupContent(sequence++, "<tr><td colspan=\"6\">No robots</td></tr>");
-        }
-        else
-        {
-            foreach (var robot in rows)
+            view = "aggregate",
+            cameraIds = aggregate.CameraIds,
+            balls = aggregate.Balls.Select(ball => new
             {
-                builder.OpenElement(sequence++, "tr");
-                AddCell(builder, ref sequence, robot.RobotId.ToString(CultureInfo.InvariantCulture));
-                AddCell(builder, ref sequence, N(robot.Confidence));
-                AddCell(builder, ref sequence, N(robot.X));
-                AddCell(builder, ref sequence, N(robot.Y));
-                AddCell(builder, ref sequence, N(robot.Orientation));
-                AddCell(builder, ref sequence, $"{N(robot.PixelX)}, {N(robot.PixelY)}");
-                builder.CloseElement();
+                confidence = ball.Confidence,
+                x = ball.X,
+                y = ball.Y,
+                z = ball.Z,
+                pixelX = ball.PixelX,
+                pixelY = ball.PixelY,
+            }),
+            robotsYellow = aggregate.RobotsYellow.Select(robot => new
+            {
+                confidence = robot.Confidence,
+                robotId = robot.RobotId,
+                x = robot.X,
+                y = robot.Y,
+                orientation = robot.Orientation,
+                pixelX = robot.PixelX,
+                pixelY = robot.PixelY,
+                height = robot.Height,
+            }),
+            robotsBlue = aggregate.RobotsBlue.Select(robot => new
+            {
+                confidence = robot.Confidence,
+                robotId = robot.RobotId,
+                x = robot.X,
+                y = robot.Y,
+                orientation = robot.Orientation,
+                pixelX = robot.PixelX,
+                pixelY = robot.PixelY,
+                height = robot.Height,
+            }),
+        };
+
+        return JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        });
+    }
+
+    private void SelectView(string key)
+    {
+        selectedViewKey = key;
+    }
+
+    private string SourceButtonClass(string key)
+    {
+        return selectedViewKey == key ? "source-button is-active" : "source-button";
+    }
+
+    private void EnsureSelectedViewExists(VisionPacketSnapshot currentSnapshot)
+    {
+        if (selectedViewKey == AggregateViewKey)
+        {
+            return;
+        }
+
+        if (TryGetCameraId(selectedViewKey, out var cameraId) &&
+            currentSnapshot.Cameras.Any(camera => camera.CameraId == cameraId))
+        {
+            return;
+        }
+
+        selectedViewKey = AggregateViewKey;
+    }
+
+    private VisionViewState ResolveSelectedView(VisionPacketSnapshot currentSnapshot)
+    {
+        if (selectedViewKey == AggregateViewKey)
+        {
+            return new VisionViewState(
+                AggregateViewKey,
+                "Aggregate",
+                currentSnapshot.Cameras.Count > 0 ? "aggregate" : "-",
+                currentSnapshot.Cameras.Count > 0 ? string.Join(", ", currentSnapshot.AggregateDetection.CameraIds) : "-",
+                "aggregate",
+                currentSnapshot.AggregateDetection.Balls,
+                currentSnapshot.AggregateDetection.RobotsYellow,
+                currentSnapshot.AggregateDetection.RobotsBlue,
+                FormatAggregateJson(currentSnapshot.AggregateDetection));
+        }
+
+        if (TryGetCameraId(selectedViewKey, out var cameraId))
+        {
+            var camera = currentSnapshot.Cameras.FirstOrDefault(entry => entry.CameraId == cameraId);
+            if (camera is not null)
+            {
+                return new VisionViewState(
+                    CameraViewKey(camera.CameraId),
+                    $"Camera {camera.CameraId}",
+                    camera.Detection.FrameNumber.ToString(CultureInfo.InvariantCulture),
+                    camera.CameraId.ToString(CultureInfo.InvariantCulture),
+                    camera.LatestPacket?.Source.ToString() ?? "-",
+                    camera.Detection.Balls,
+                    camera.Detection.RobotsYellow,
+                    camera.Detection.RobotsBlue,
+                    FormatJson(camera.LatestPacket));
             }
         }
 
-        builder.CloseElement();
-        builder.CloseElement();
-    };
-
-    private static void AddCell(RenderTreeBuilder builder, ref int sequence, string value)
-    {
-        builder.OpenElement(sequence++, "td");
-        builder.AddContent(sequence++, value);
-        builder.CloseElement();
+        selectedViewKey = AggregateViewKey;
+        return ResolveSelectedView(currentSnapshot);
     }
+
+    private static string CameraViewKey(uint cameraId)
+    {
+        return $"camera:{cameraId}";
+    }
+
+    private static bool TryGetCameraId(string key, out uint cameraId)
+    {
+        const string prefix = "camera:";
+
+        if (key.StartsWith(prefix, StringComparison.Ordinal) &&
+            uint.TryParse(key[prefix.Length..], CultureInfo.InvariantCulture, out cameraId))
+        {
+            return true;
+        }
+
+        cameraId = 0;
+        return false;
+    }
+
+    private sealed record VisionViewState(
+        string Key,
+        string Label,
+        string FrameLabel,
+        string CameraLabel,
+        string SourceLabel,
+        IReadOnlyList<SSL_DetectionBall> Balls,
+        IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
+        IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+        string RawJson);
 
     public async ValueTask DisposeAsync()
     {

@@ -7,19 +7,28 @@ public sealed class VisionFieldProjection
     public const double DefaultViewBoxWidth = 1000;
     public const double DefaultViewBoxHeight = 720;
     public const double DefaultMargin = 48;
+    public const double DefaultBoundaryWidth = 300;
 
-    private VisionFieldProjection(double fieldLength, double fieldWidth)
+    private VisionFieldProjection(double fieldLength, double fieldWidth, double outerLengthMargin, double outerWidthMargin)
     {
         FieldLength = fieldLength;
         FieldWidth = fieldWidth;
+        OuterLengthMargin = outerLengthMargin;
+        OuterWidthMargin = outerWidthMargin;
         ViewBoxWidth = DefaultViewBoxWidth;
         ViewBoxHeight = DefaultViewBoxHeight;
-        Scale = Math.Min((ViewBoxWidth - (DefaultMargin * 2)) / FieldLength, (ViewBoxHeight - (DefaultMargin * 2)) / FieldWidth);
+        Scale = Math.Min(
+            (ViewBoxWidth - (DefaultMargin * 2)) / (FieldLength + (OuterLengthMargin * 2)),
+            (ViewBoxHeight - (DefaultMargin * 2)) / (FieldWidth + (OuterWidthMargin * 2)));
     }
 
     public double FieldLength { get; }
 
     public double FieldWidth { get; }
+
+    public double OuterLengthMargin { get; }
+
+    public double OuterWidthMargin { get; }
 
     public double ViewBoxWidth { get; }
 
@@ -32,8 +41,13 @@ public sealed class VisionFieldProjection
         var field = geometry?.Field;
         var fieldLength = field?.FieldLength > 0 ? field.FieldLength : DefaultFieldLength;
         var fieldWidth = field?.FieldWidth > 0 ? field.FieldWidth : DefaultFieldWidth;
+        var boundaryWidth = field?.BoundaryWidth > 0 ? field.BoundaryWidth : DefaultBoundaryWidth;
+        var boundaryWidthGoalLine = field?.BoundaryWidthGoalLine > 0 ? field.BoundaryWidthGoalLine : boundaryWidth;
+        var goalDepth = field?.GoalDepth > 0 ? field.GoalDepth : 0;
+        var outerLengthMargin = Math.Max(boundaryWidthGoalLine, goalDepth);
+        var outerWidthMargin = boundaryWidth;
 
-        return new VisionFieldProjection(fieldLength, fieldWidth);
+        return new VisionFieldProjection(fieldLength, fieldWidth, outerLengthMargin, outerWidthMargin);
     }
 
     public SvgPoint Project(double x, double y)

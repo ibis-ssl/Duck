@@ -1,0 +1,66 @@
+.field-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid #315235;
+    border-radius: 10px;
+    background: #102617;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.field-card__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid #315235;
+    color: #89a38b;
+    font-size: 0.82rem;
+}
+
+.field-card__reset {
+    border: 1px solid #406b43;
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+    background: #17301d;
+    color: #e6f0e0;
+    font-size: 0.82rem;
+    line-height: 1;
+}
+
+.field-card__canvas {
+    flex: 1;
+    min-height: 0;
+}
+
+.field-card__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background: #18813b;
+    cursor: grab;
+}
+
+.field-card__svg:active {
+    cursor: grabbing;
+}
+
+.field-card__boundary-background {
+    fill: #1a8a40;
+}
+
+.field-card__boundary {
+    fill: #1f9448;
+    stroke: #ffffff;
+    stroke-width: 3;
+}
+
+@media (max-width: 760px) {
+    .field-card__toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

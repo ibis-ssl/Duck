@@ -1,0 +1,10 @@
+.vision-field-line {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 3;
+}
+
+.vision-goal {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

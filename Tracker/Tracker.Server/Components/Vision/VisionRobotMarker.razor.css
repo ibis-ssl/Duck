@@ -1,0 +1,19 @@
+.vision-robot__body {
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+}
+
+.vision-robot__front {
+    stroke-width: 2.1;
+    stroke-linecap: round;
+}
+
+.vision-robot__label {
+    font-size: 10px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    paint-order: stroke;
+    stroke: rgba(0, 0, 0, 0.38);
+    stroke-width: 1.2;
+}
