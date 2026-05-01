@@ -12,6 +12,7 @@ Tracker.Server receives raw SSL-Vision `SSL_WrapperPacket` datagrams directly fr
 - Store the latest packet, detection frame, geometry data, receive metadata, packet count, and error count in a singleton store.
 - Render a field SVG, detection tables, geometry calibration table, and raw packet JSON on `/`.
 - Keep the navigation focused on the raw vision viewer.
+- Support both aggregate multi-camera view and per-camera latest-frame view in the raw vision UI.
 
 ## Non-Goals
 
@@ -29,7 +30,13 @@ Tracker.Server receives raw SSL-Vision `SSL_WrapperPacket` datagrams directly fr
 
 ## Receiver Design
 
-`VisionReceiverService` runs as a hosted background service. It creates an IPv4 UDP socket, enables address reuse, binds to `IPAddress.Any` on the configured port, optionally joins the configured multicast group, and continuously receives datagrams until cancellation.
+`VisionReceiverService` runs as a hosted background service. It creates an IPv4 UDP socket, enables address reuse, binds to `IPAddress.Any` on the configured port, and continuously receives datagrams until cancellation.
+
+When the configured vision address is multicast, the receiver resolves one or more local IPv4 interfaces for group membership:
+
+- if `InterfaceAddress` is set, only that IPv4 address is used
+- otherwise, the receiver enumerates viable local IPv4 interfaces and attempts multicast join on each one
+- startup succeeds when at least one join succeeds, and partial join failures are logged for diagnosis
 
 Each datagram is decoded into `SSL_WrapperPacket`. Successful decodes update `VisionPacketStore` with cloned packet data and receive metadata. Failed decodes increment the error count and retain the previous successful packet.
 
@@ -60,6 +67,17 @@ The root page renders:
 - SVG field with geometry lines/arcs and raw balls/robots
 - tables for balls, yellow robots, blue robots, and camera calibration
 - raw JSON generated with `Google.Protobuf.JsonFormatter`
+- a view selector that switches between aggregate state and individual camera state
+- a field-first presentation inspired by `RoboCup-SSL/ssl-vision-client`, including source selection and interactive zoom/pan on the canvas
+
+## Reference UI Direction
+
+The field presentation follows the public `RoboCup-SSL/ssl-vision-client` frontend in these aspects:
+
+- source-first selection above the field canvas
+- field canvas as the primary visualization area
+- boundary-aware green field background
+- interactive wheel zoom and drag pan controls
 
 ## Test Plan
 
