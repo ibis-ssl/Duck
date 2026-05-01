@@ -4,14 +4,14 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-003
-- Title: engine の時系列契約テストを追加する
+- ID: TRACKER-004
+- Title: `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する
 - Phase: contracts
 - Status: pending
 - Size: medium
-- Dependencies: TRACKER-001 が完了していること
+- Dependencies: TRACKER-002, TRACKER-003
 - Exit Criteria:
-  - reorder、`MergeWindow`、`0..N CommittedFrames`、late packet、geometry reset、profile switch、event publish 順を定義する failing test が存在する。
+  - 内部フレーム、state 型、`TrackerUpdateResult`、domain event、observer 契約が存在し、契約テストが参照できる。
 
 ## タスク一覧
 
@@ -20,7 +20,7 @@
 | TRACKER-000 | Tracker の設計書と進捗管理ファイルを作成する | preparation | done | Tracker の事前調査が完了していること | 設計書、task/phase 管理、調査レポート、レビュー報告が揃い、ユーザー承認の上で設計を完了できる。 |
 | TRACKER-001 | `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る | contracts | done | TRACKER-000 approved | `Tracker.Tests` から `Tracker.Core` を参照でき、contract test 用の fixture と test data 基盤が存在する。 |
 | TRACKER-002 | packet generator の契約テストを追加する | contracts | done | TRACKER-001 | 単位変換、primary/secondary ball 並び、capabilities、`kicked_ball` 寿命、timestamp 出力を定義する failing test が存在する。 |
-| TRACKER-003 | engine の時系列契約テストを追加する | contracts | pending | TRACKER-001 | reorder、`MergeWindow`、`0..N CommittedFrames`、late packet、geometry reset、profile switch、event publish 順を定義する failing test が存在する。 |
+| TRACKER-003 | engine の時系列契約テストを追加する | contracts | done | TRACKER-001 | reorder、`MergeWindow`、`0..N CommittedFrames`、late packet、geometry reset、profile switch、event publish 順を定義する failing test が存在する。 |
 | TRACKER-004 | `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する | contracts | pending | TRACKER-002, TRACKER-003 | 内部フレーム、state 型、`TrackerUpdateResult`、domain event、observer 契約が存在し、契約テストが参照できる。 |
 | TRACKER-005 | `TrackerPacketGenerator` を実装する | contracts | pending | TRACKER-004 | official tracker proto 出力、primary/secondary ball 並び、timestamp、`kicked_ball`、capabilities がテストを通過する。 |
 | TRACKER-006 | `TrackerEngine` の reorder buffer と flush pipeline を実装する | engine | pending | TRACKER-003, TRACKER-004 | event-time buffer、flush 判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本 pipeline が決定的に動作する。 |
