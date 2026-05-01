@@ -225,9 +225,16 @@ proto 変換境界でのみ official 単位へ変換する。
 
 最低限の入力:
 
-- `SSL_WrapperPacket`
+- `SSL_WrapperPacket?`
+  - detection / geometry を含む通常入力では必須
+  - control-only reconfigure `Update` では省略可
 - 現在有効な設定セット
 - 必要に応じて設定セット切替要求
+  - `TrackerProfileSwitchRequest`
+    - `RequestVersion`
+    - 適用対象 profile 名
+    - その時点の immutable な resolved base settings snapshot
+    - その時点の `RuntimeOverrides` snapshot
 
 最低限の出力:
 
@@ -260,9 +267,15 @@ proto 変換境界でのみ official 単位へ変換する。
 - detection を含まない入力では `CommittedFrames` が 0 件でもよい
 - `ReorderWindow` をまたいで複数 group が確定した入力では `CommittedFrames` が複数件でもよい
 - `TrackerCoordinator` は `CommittedFrames` を先頭から順に処理し、中間 frame を捨てない
-- `TrackerCoordinator` は `CommittedFrames` が 0 件の入力では packet 配信、UI 更新、`WorldFrameCommitted` 通知を行わない
-- 設定セット切替要求を受けたときの clear、設定差し替え、`ProfileSwitched` emit は `ITrackerEngine` の責務とする
-- `ProfileSwitched` は新設定セットの反映と state clear が完了した後に emit する
+- `TrackerCoordinator` は `CommittedFrames` が 0 件で `ProfileSwitched` / `GeometryReset` も無い入力では packet 配信、frame 表示更新、`WorldFrameCommitted` 通知を行わない
+- `ProfileSwitched` / `GeometryReset` を含む 0-frame 入力では、対応する state clear と UI / store の状態更新だけを行ってよい
+- control-only の入力でも reconfigure request を処理でき、その場合 `CommittedFrames` は 0 件でも `ProfileSwitched` などの event だけを返してよい
+- 設定セット切替要求を受けたときの profile 適用、clear、設定差し替え、`ProfileSwitched` emit は `ITrackerEngine` の責務とする
+- `TrackerCoordinator` は engine state を直接 clear せず、切替要求を次の `Update` 呼び出しへ渡すだけにする
+- `ITrackerEngine` は `Update` の先頭で切替要求を消費し、以後の geometry / detection 処理を新 profile で実行する
+- `ProfileSwitched` は新設定セットの反映と state clear が完了した直後に emit し、同じ `TrackerUpdateResult` に `WorldFrameCommitted` がある場合はそれより前に並べる
+- `ProfileSwitched` と `GeometryReset` が同じ `TrackerUpdateResult` に共存する場合も、`EmittedEvents` の順序を正とし、coordinator はその順に local state 遷移を適用する
+- `TrackerCoordinator` は `Update` 呼び出しごとに `pending request` を最大 1 件だけ `in-flight request` へ昇格させ、その request を result 処理完了まで immutable として扱う
 
 ### `TrackerPacketGenerator`
 
@@ -289,6 +302,7 @@ proto 変換境界でのみ official 単位へ変換する。
 - `TrackerUpdateResult` に含まれる `CommittedFrames` を順に store と observer へ反映する
 - 設定セット変更時に engine へ切替要求を渡す
 - 必要に応じて UDP 配信を行う
+- publisher の配信先切替や UI 表示用の active profile 名更新など、engine 外 state の反映を行う
 
 処理規則:
 
@@ -296,6 +310,18 @@ proto 変換境界でのみ official 単位へ変換する。
 - UI 用 `TrackedSnapshotStore` には最後の `CommittedFrame` を残す
 - official tracker packet は各 `CommittedFrame` ごとに生成する
 - observer 通知は `EmittedEvents` の順序に従う
+- coordinator は同一 `TrackerUpdateResult` の dispatch 中、まず `ProfileSwitched` / `GeometryReset` の local state 遷移を `EmittedEvents` 順に適用し、その完了後に `WorldFrameCommitted` と対応する `CommittedFrame` / official packet を処理する
+- profile 切替要求を受けたら、coordinator は要求内容を保持したまま次の `Update` に 1 回だけ渡す
+- raw packet が来ていなくても pending request がある場合は、coordinator は control-only `Update` を即時呼び出して request を drain しなければならない
+- profile 切替要求に伴う engine state clear や `ProfileSwitched` の発火順制御は coordinator 側で再実装しない
+- coordinator は profile 要求受付、`Update` 呼び出し、`TrackerUpdateResult` 処理を同じ直列化区間で扱い、1 回の `Update` 処理中に `in-flight request` を上書きしない
+- coordinator は profile 切替要求を受け取った時点では publisher 配信先や UI 表示中 profile 名を即時反映しない
+- `ProfileSwitched` を受け取った時点で、その `in-flight request` に対応する `現在適用済み snapshot`、publisher 配信先、active profile 表示、`TrackedSnapshotStore` の現在設定セット名を先に更新し、その後に `TrackedSnapshotStore` の最新 frame と受信時刻を clear する
+- `ProfileSwitched` の observer 通知は、上記 local state 更新と `in-flight request` 解放が完了した後に行う
+- `GeometryReset` を受け取った時点でも `TrackedSnapshotStore` の最新 frame と受信時刻を clear し、その clear 完了後に `OnGeometryReset` を通知する
+- 任意の `Update` 呼び出しの result 処理が完了した直後に pending request がまだ残っていれば、coordinator はその場で次の control-only `Update` を直ちに再実行して `desired target snapshot` まで drain し続ける
+- coordinator は `desired target snapshot`、`pending request`、`in-flight request`、`現在適用済み snapshot` を別に持ち、切替完了前の old state 出力と new state 表示を混在させない
+- これにより、profile 切替後の最初の official packet / `WorldFrameCommitted` は必ず新 publisher 配信先と新 active profile 文脈の下で処理される
 
 ### `TrackedSnapshotStore`
 
@@ -307,6 +333,7 @@ proto 変換境界でのみ official 単位へ変換する。
 - 受信時刻
 - 現在の設定セット名
 - publish 成功回数 / 失敗回数
+- profile 切替直後に frame 未確定であることを表す empty 状態
 
 ## 入出力詳細
 
@@ -318,6 +345,8 @@ proto 変換境界でのみ official 単位へ変換する。
 2. geometry のみを含む packet
 3. detection と geometry の両方を含む packet
 
+これに加えて、coordinator から engine へ reconfigure request だけを渡す control-only `Update` 呼び出しを許可する。
+
 処理規則:
 
 - geometry があれば、まず geometry snapshot を更新する
@@ -328,6 +357,7 @@ proto 変換境界でのみ official 単位へ変換する。
 - detection がない packet では `frame_number` を無理に進めない
 - すでに flush 済みの event time より古い late packet は diagnostics に記録し、状態更新には使わない
 - geometry 大変更 reset が発生した場合、pending buffer に残っている旧 geometry 世代の detection は flush せず破棄する
+- control-only `Update` では detection / geometry を追加せず、pending request の消費と event 生成だけを行う
 
 ### multi-camera の時系列契約
 
@@ -514,6 +544,8 @@ v1 では次の 2 段階で進める。
 - 選択中設定セットの上に一時上書きをかける
 - UI からの微調整はまずここへ入れる
 - 設定セットそのものの保存は別操作に分ける
+- v1 では UI の微調整はまず draft override として coordinator 側に保持し、engine へは明示 apply 時の snapshot だけを渡す
+- pending または in-flight の request に入った override snapshot は immutable とし、その後の UI 編集は次の request 候補にだけ反映する
 
 切替要件:
 
@@ -522,6 +554,34 @@ v1 では次の 2 段階で進める。
 - UI からの切替後は tracker coordinator が新しい設定セットへの切替要求を engine へ渡す
 - 個別値の微調整は選択中の設定セットに対する上書きとして扱えるようにする
 - 設定セットは将来的に追加できる前提にする
+- coordinator は最新のユーザー意図を `desired target snapshot` として保持し、profile 選択や override apply のたびにそれを最新値で置き換える
+- 未適用の切替要求がある間にさらに profile 選択が来た場合、coordinator は pending request を最新要求で上書きし、queue は積まない
+- `ProfileSwitched` は engine へ実際に渡されて適用された `RequestVersion` に対してのみ 1 回 emit される
+- override の明示 apply 要求も v1 では同じ reconfigure request 経路で扱い、profile 名と draft override snapshot を組にして pending request を置き換える
+- すでに `in-flight request` がある間の override 編集はその request を書き換えず、次の pending request 候補だけを更新する
+- 新しいユーザー操作が現在の `desired target snapshot` と同値な場合だけ duplicate とみなし、新たな request を作らない
+- `desired target snapshot` が `現在適用済み snapshot` と同値でも、pending または in-flight が別 snapshot を指しているなら、その差分を打ち消すための request を残す
+
+切替責務の境界:
+
+- `TrackerCoordinator`
+  - UI や設定保存領域から新 profile 選択を受け取る
+  - `desired target snapshot` を保持し、後続の profile 選択または override apply が来たら最新意図で置き換える
+  - pending request を 1 件だけ保持し、後続の profile 選択または override apply が来たら `desired target snapshot` へ収束する内容に上書きする
+  - 新しいユーザー操作が現在の `desired target snapshot` と同値な場合だけ no-op として破棄する
+  - `Update` 呼び出し直前に pending request を `in-flight request` へ昇格させ、result 処理完了まで固定する
+  - `ProfileSwitched` を受けるまでは publisher 配信先や active profile 表示を切り替えない
+  - `ProfileSwitched` を受けた時点で、その `in-flight request` に対応する `現在適用済み snapshot`、publisher 配信先、active profile 表示、`TrackedSnapshotStore` の現在設定セット名を原子的に切り替える
+  - 上記 local state 遷移と store clear を完了してから `OnProfileSwitched` を通知する
+  - 任意の `Update` の result 処理後に pending request が残る場合は、その場で `desired target snapshot` に一致するまで control-only `Update` を繰り返す
+  - `TrackerProfileSwitchRequest` を次の `ITrackerEngine.Update` へ 1 回だけ渡す
+- `ITrackerEngine`
+  - `TrackerProfileSwitchRequest` を受けたら `Update` の先頭で新 profile と `RuntimeOverrides` を確定する
+  - immutable な resolved base settings snapshot と override snapshot を request そのものから読む
+  - coordinator が duplicate request を除外する前提とし、engine は受け取った request を実変更として扱う
+  - camera-local track、kick/contact state、pending buffer、world snapshot を clear する
+  - clear 完了後に `ProfileSwitched` を `EmittedEvents` へ積む
+  - 同じ `Update` 呼び出し内で後続 packet を処理する場合、その flush 結果は新 profile の state だけを使う
 
 runtime identity は設定セットとは分離する。
 
@@ -535,6 +595,9 @@ profile 切替時の state 規則:
 - 最新 geometry snapshot と runtime identity は維持する
 - `frame_number` は単調増加を保つため継続する
 - これにより old profile の filter state を new profile に持ち越さない
+- profile 切替要求を受けた `Update` 呼び出しでは、clear 前に pending buffer を flush しない
+- その入力が detection を含む場合、clear 後に新 profile の空 state へ積み直して処理する
+- これにより `ProfileSwitched` より後に emit される `WorldFrameCommitted` は必ず new profile の state だけから生成される
 
 初期実装では、設定セット切替は `appsettings` と実行時設定保存領域で扱う。
 

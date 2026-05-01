@@ -4,25 +4,21 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-000
-- Title: Tracker の設計書と進捗管理ファイルを作成する
-- Phase: preparation
-- Status: in_progress
+- ID: TRACKER-001
+- Title: `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る
+- Phase: contracts
+- Status: pending
 - Size: medium
-- Dependencies: Tracker の事前調査が完了していること
+- Dependencies: TRACKER-000 が完了していること
 - Exit Criteria:
-  - `Tracker/Tracker.Core/Design/tracker-architecture-plan.md` が存在する。
-  - `reports/TRACKER-000-tigers-investigation-*.md` として調査結果が別ファイルに存在する。
-  - `Tracker.Core` の責務、proto 入力、official 出力、内部モデル、時系列契約、observer/event 連携、設定方針、テスト方針が明記される。
-  - 設計レビュー結果が `reports/task-tracker-000-design-review-*.md` として存在し、既知の blocking 指摘が設計書へ反映済みである。
-  - `TRACKER-001` 以降の作業分割と phase 境界が `tasks-status.md` と `phases-status.md` に反映される。
-  - ユーザーへ設計承認を依頼し、承認待ち状態に移れる。
+- `Tracker.Tests` から `Tracker.Core` を参照できる。
+- contract test 用の fixture と test data 基盤が存在する。
 
 ## タスク一覧
 
 | ID | タスク | フェーズ | 状態 | 依存関係 | 完了条件 |
 | --- | --- | --- | --- | --- | --- |
-| TRACKER-000 | Tracker の設計書と進捗管理ファイルを作成する | preparation | in_progress | Tracker の事前調査が完了していること | 設計書、task/phase 管理、調査レポート、レビュー報告が揃い、設計承認を依頼できる。 |
+| TRACKER-000 | Tracker の設計書と進捗管理ファイルを作成する | preparation | done | Tracker の事前調査が完了していること | 設計書、task/phase 管理、調査レポート、レビュー報告が揃い、ユーザー承認の上で設計を完了できる。 |
 | TRACKER-001 | `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る | contracts | pending | TRACKER-000 approved | `Tracker.Tests` から `Tracker.Core` を参照でき、contract test 用の fixture と test data 基盤が存在する。 |
 | TRACKER-002 | packet generator の契約テストを追加する | contracts | pending | TRACKER-001 | 単位変換、primary/secondary ball 並び、capabilities、`kicked_ball` 寿命、timestamp 出力を定義する failing test が存在する。 |
 | TRACKER-003 | engine の時系列契約テストを追加する | contracts | pending | TRACKER-001 | reorder、`MergeWindow`、`0..N CommittedFrames`、late packet、geometry reset、profile switch、event publish 順を定義する failing test が存在する。 |
