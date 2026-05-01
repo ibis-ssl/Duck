@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Microsoft.Extensions.Options;
 
@@ -14,10 +15,11 @@ public sealed class VisionReceiverService(
         var receiverOptions = options.Value;
         var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
         UdpClient udpClient;
+        MulticastJoinResult joinResult;
 
         try
         {
-            udpClient = CreateUdpClient(receiverOptions);
+            (udpClient, joinResult) = CreateUdpClient(receiverOptions);
         }
         catch (Exception ex)
         {
@@ -28,7 +30,25 @@ public sealed class VisionReceiverService(
 
         using (udpClient)
         {
-            logger.LogInformation("Receiving SSL-Vision packets from {Endpoint}", endpointDescription);
+            if (joinResult.FailedInterfaces.Count > 0)
+            {
+                logger.LogWarning(
+                    "Joined SSL-Vision multicast group on {JoinedInterfaces}; failed on {FailedInterfaces}",
+                    string.Join(", ", joinResult.JoinedInterfaces),
+                    string.Join(", ", joinResult.FailedInterfaces));
+            }
+
+            if (joinResult.JoinedInterfaces.Count > 0)
+            {
+                logger.LogInformation(
+                    "Receiving SSL-Vision packets from {Endpoint} via {JoinedInterfaces}",
+                    endpointDescription,
+                    string.Join(", ", joinResult.JoinedInterfaces));
+            }
+            else
+            {
+                logger.LogInformation("Receiving SSL-Vision packets from {Endpoint}", endpointDescription);
+            }
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -50,7 +70,7 @@ public sealed class VisionReceiverService(
         }
     }
 
-    private static UdpClient CreateUdpClient(VisionReceiverOptions options)
+    private static (UdpClient Client, MulticastJoinResult JoinResult) CreateUdpClient(VisionReceiverOptions options)
     {
         if (!IPAddress.TryParse(options.MulticastAddress, out var groupAddress))
         {
@@ -61,30 +81,107 @@ public sealed class VisionReceiverService(
         udpClient.ExclusiveAddressUse = false;
         udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, options.Port));
+        var joinResult = MulticastJoinResult.None;
 
         if (IsMulticast(groupAddress))
         {
-            if (!string.IsNullOrWhiteSpace(options.InterfaceAddress))
-            {
-                if (!IPAddress.TryParse(options.InterfaceAddress, out var interfaceAddress))
-                {
-                    throw new InvalidOperationException($"Invalid VisionReceiver interface address '{options.InterfaceAddress}'.");
-                }
-
-                udpClient.JoinMulticastGroup(groupAddress, interfaceAddress);
-            }
-            else
-            {
-                udpClient.JoinMulticastGroup(groupAddress);
-            }
+            joinResult = JoinMulticastGroup(udpClient, groupAddress, options.InterfaceAddress);
         }
 
-        return udpClient;
+        return (udpClient, joinResult);
     }
 
     private static bool IsMulticast(IPAddress address)
     {
         var bytes = address.GetAddressBytes();
         return bytes.Length == 4 && bytes[0] >= 224 && bytes[0] <= 239;
+    }
+
+    private static MulticastJoinResult JoinMulticastGroup(
+        UdpClient udpClient,
+        IPAddress groupAddress,
+        string? configuredInterfaceAddress)
+    {
+        var candidateAddresses = ResolveMulticastJoinAddresses(
+            configuredInterfaceAddress,
+            DiscoverMulticastJoinAddresses());
+
+        if (candidateAddresses.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"No IPv4 interface is available to join SSL-Vision multicast group '{groupAddress}'. " +
+                "Set VisionReceiver:InterfaceAddress to a specific local IPv4 address.");
+        }
+
+        var joinedInterfaces = new List<IPAddress>(candidateAddresses.Count);
+        var failedInterfaces = new List<string>();
+        SocketException? firstSocketException = null;
+
+        foreach (var candidateAddress in candidateAddresses)
+        {
+            try
+            {
+                udpClient.JoinMulticastGroup(groupAddress, candidateAddress);
+                joinedInterfaces.Add(candidateAddress);
+            }
+            catch (SocketException ex)
+            {
+                firstSocketException ??= ex;
+                failedInterfaces.Add($"{candidateAddress} ({ex.SocketErrorCode})");
+            }
+        }
+
+        if (joinedInterfaces.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"Failed to join SSL-Vision multicast group '{groupAddress}' on any local IPv4 interface. " +
+                $"Tried: {string.Join(", ", failedInterfaces)}",
+                firstSocketException);
+        }
+
+        return new MulticastJoinResult(joinedInterfaces, failedInterfaces);
+    }
+
+    internal static IReadOnlyList<IPAddress> ResolveMulticastJoinAddresses(
+        string? configuredInterfaceAddress,
+        IEnumerable<IPAddress> discoveredAddresses)
+    {
+        if (!string.IsNullOrWhiteSpace(configuredInterfaceAddress))
+        {
+            if (!IPAddress.TryParse(configuredInterfaceAddress, out var interfaceAddress) ||
+                interfaceAddress.AddressFamily != AddressFamily.InterNetwork)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid VisionReceiver interface address '{configuredInterfaceAddress}'.");
+            }
+
+            return [interfaceAddress];
+        }
+
+        return discoveredAddresses
+            .Where(address => address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.Any.Equals(address))
+            .Distinct()
+            .OrderBy(address => IPAddress.IsLoopback(address) ? 1 : 0)
+            .ToArray();
+    }
+
+    private static IReadOnlyList<IPAddress> DiscoverMulticastJoinAddresses()
+    {
+        return NetworkInterface.GetAllNetworkInterfaces()
+            .Where(networkInterface =>
+                networkInterface.OperationalStatus == OperationalStatus.Up &&
+                (networkInterface.SupportsMulticast ||
+                 networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback))
+            .SelectMany(networkInterface => networkInterface.GetIPProperties().UnicastAddresses)
+            .Select(unicastAddress => unicastAddress.Address)
+            .ToArray();
+    }
+
+    private sealed record MulticastJoinResult(
+        IReadOnlyList<IPAddress> JoinedInterfaces,
+        IReadOnlyList<string> FailedInterfaces)
+    {
+        public static MulticastJoinResult None { get; } =
+            new(Array.Empty<IPAddress>(), Array.Empty<string>());
     }
 }

@@ -93,4 +93,126 @@ public class VisionPacketStoreTests
         Assert.NotNull(snapshot.LastError);
         Assert.Null(snapshot.LatestPacket);
     }
+
+    [Fact]
+    public void StorePacket_WithMultipleCameraFrames_PreservesPerCameraLatestStateAndAggregateView()
+    {
+        var store = new VisionPacketStore();
+
+        store.StorePacket(
+            new SSL_WrapperPacket
+            {
+                Detection = new SSL_DetectionFrame
+                {
+                    FrameNumber = 10,
+                    CameraId = 1,
+                    Balls =
+                    {
+                        new SSL_DetectionBall
+                        {
+                            Confidence = 0.9f,
+                            X = 100,
+                            Y = 200,
+                            PixelX = 300,
+                            PixelY = 400,
+                        },
+                    },
+                    RobotsYellow =
+                    {
+                        new SSL_DetectionRobot
+                        {
+                            Confidence = 0.8f,
+                            RobotId = 2,
+                            X = 500,
+                            Y = 600,
+                            PixelX = 700,
+                            PixelY = 800,
+                        },
+                    },
+                },
+            },
+            new IPEndPoint(IPAddress.Loopback, 10006),
+            DateTimeOffset.UtcNow);
+
+        store.StorePacket(
+            new SSL_WrapperPacket
+            {
+                Detection = new SSL_DetectionFrame
+                {
+                    FrameNumber = 11,
+                    CameraId = 2,
+                    RobotsBlue =
+                    {
+                        new SSL_DetectionRobot
+                        {
+                            Confidence = 0.7f,
+                            RobotId = 5,
+                            X = -500,
+                            Y = -600,
+                            PixelX = 100,
+                            PixelY = 200,
+                        },
+                    },
+                },
+            },
+            new IPEndPoint(IPAddress.Loopback, 10007),
+            DateTimeOffset.UtcNow);
+
+        store.StorePacket(
+            new SSL_WrapperPacket
+            {
+                Detection = new SSL_DetectionFrame
+                {
+                    FrameNumber = 12,
+                    CameraId = 1,
+                    Balls =
+                    {
+                        new SSL_DetectionBall
+                        {
+                            Confidence = 0.95f,
+                            X = 150,
+                            Y = 250,
+                            PixelX = 350,
+                            PixelY = 450,
+                        },
+                    },
+                    RobotsYellow =
+                    {
+                        new SSL_DetectionRobot
+                        {
+                            Confidence = 0.85f,
+                            RobotId = 3,
+                            X = 550,
+                            Y = 650,
+                            PixelX = 750,
+                            PixelY = 850,
+                        },
+                    },
+                },
+            },
+            new IPEndPoint(IPAddress.Loopback, 10006),
+            DateTimeOffset.UtcNow);
+
+        var snapshot = store.GetSnapshot();
+
+        Assert.Equal(2, snapshot.Cameras.Count);
+
+        var camera1 = Assert.Single(snapshot.Cameras, camera => camera.CameraId == 1);
+        var camera2 = Assert.Single(snapshot.Cameras, camera => camera.CameraId == 2);
+
+        Assert.Equal((uint)12, camera1.Detection.FrameNumber);
+        Assert.Single(camera1.Detection.RobotsYellow);
+        Assert.Equal((uint)3, camera1.Detection.RobotsYellow[0].RobotId);
+
+        Assert.Equal((uint)11, camera2.Detection.FrameNumber);
+        Assert.Single(camera2.Detection.RobotsBlue);
+        Assert.Equal((uint)5, camera2.Detection.RobotsBlue[0].RobotId);
+
+        Assert.Equal([1u, 2u], snapshot.AggregateDetection.CameraIds);
+        Assert.Single(snapshot.AggregateDetection.Balls);
+        Assert.Single(snapshot.AggregateDetection.RobotsYellow);
+        Assert.Single(snapshot.AggregateDetection.RobotsBlue);
+        Assert.Equal((uint)3, snapshot.AggregateDetection.RobotsYellow[0].RobotId);
+        Assert.Equal((uint)5, snapshot.AggregateDetection.RobotsBlue[0].RobotId);
+    }
 }

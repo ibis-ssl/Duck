@@ -6,6 +6,7 @@ namespace Tracker.Server.Vision;
 public sealed class VisionPacketStore
 {
     private readonly object gate = new();
+    private readonly Dictionary<uint, CameraState> cameras = [];
     private SSL_WrapperPacket? latestPacket;
     private SSL_DetectionFrame? detection;
     private SSL_GeometryData? geometry;
@@ -19,9 +20,16 @@ public sealed class VisionPacketStore
     {
         lock (gate)
         {
+            var cameraSnapshots = cameras
+                .OrderBy(entry => entry.Key)
+                .Select(entry => entry.Value.ToSnapshot())
+                .ToArray();
+
             return new VisionPacketSnapshot(
                 latestPacket?.Clone(),
                 detection?.Clone(),
+                cameraSnapshots,
+                BuildAggregateDetection(cameraSnapshots),
                 geometry?.Clone(),
                 packetCount,
                 errorCount,
@@ -45,6 +53,8 @@ public sealed class VisionPacketStore
 
     public void StorePacket(SSL_WrapperPacket packet, EndPoint remoteEndpoint, DateTimeOffset receivedAt)
     {
+        var endpointText = remoteEndpoint.ToString();
+
         lock (gate)
         {
             latestPacket = packet.Clone();
@@ -52,6 +62,11 @@ public sealed class VisionPacketStore
             if (packet.Detection is not null)
             {
                 detection = packet.Detection.Clone();
+                cameras[packet.Detection.CameraId] = new CameraState(
+                    latestPacket.Clone(),
+                    detection.Clone(),
+                    endpointText,
+                    receivedAt);
             }
 
             if (packet.Geometry is not null)
@@ -60,7 +75,7 @@ public sealed class VisionPacketStore
             }
 
             packetCount++;
-            this.remoteEndpoint = remoteEndpoint.ToString();
+            this.remoteEndpoint = endpointText;
             this.receivedAt = receivedAt;
             lastError = null;
         }
@@ -72,6 +87,47 @@ public sealed class VisionPacketStore
         {
             errorCount++;
             lastError = exception.Message;
+        }
+    }
+
+    private static VisionAggregateDetectionSnapshot BuildAggregateDetection(
+        IReadOnlyList<VisionCameraSnapshot> cameraSnapshots)
+    {
+        if (cameraSnapshots.Count == 0)
+        {
+            return VisionAggregateDetectionSnapshot.Empty;
+        }
+
+        return new VisionAggregateDetectionSnapshot(
+            cameraSnapshots.Select(camera => camera.CameraId).ToArray(),
+            cameraSnapshots
+                .SelectMany(camera => camera.Detection.Balls)
+                .Select(ball => ball.Clone())
+                .ToArray(),
+            cameraSnapshots
+                .SelectMany(camera => camera.Detection.RobotsYellow)
+                .Select(robot => robot.Clone())
+                .ToArray(),
+            cameraSnapshots
+                .SelectMany(camera => camera.Detection.RobotsBlue)
+                .Select(robot => robot.Clone())
+                .ToArray());
+    }
+
+    private sealed record CameraState(
+        SSL_WrapperPacket LatestPacket,
+        SSL_DetectionFrame Detection,
+        string? RemoteEndpoint,
+        DateTimeOffset? ReceivedAt)
+    {
+        public VisionCameraSnapshot ToSnapshot()
+        {
+            return new VisionCameraSnapshot(
+                Detection.CameraId,
+                LatestPacket.Clone(),
+                Detection.Clone(),
+                RemoteEndpoint,
+                ReceivedAt);
         }
     }
 }
