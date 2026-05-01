@@ -61,6 +61,15 @@ public sealed class VisionFieldProjection
     {
         return length * Scale;
     }
+
+    public FieldPoint Unproject(double svgX, double svgY)
+    {
+        return new FieldPoint(
+            (svgX - (ViewBoxWidth / 2)) / Scale,
+            ((ViewBoxHeight / 2) - svgY) / Scale);
+    }
 }
 
 public readonly record struct SvgPoint(double X, double Y);
+
+public readonly record struct FieldPoint(double X, double Y);

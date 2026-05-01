@@ -1,7 +1,25 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Components.Rendering
+@using Tracker.Server.Vision
 
 <aside class="details-panel">
+    <div class="details-panel__selector" role="tablist" aria-label="Vision source selector">
+        <button type="button"
+                class="@SourceButtonClass("aggregate")"
+                @onclick="@(() => SelectViewAsync("aggregate"))">
+            Aggregate
+        </button>
+        @foreach (var camera in Cameras)
+        {
+            var key = $"camera:{camera.CameraId}";
+            <button type="button"
+                    class="@SourceButtonClass(key)"
+                    @onclick="@(() => SelectViewAsync(key))">
+                Camera @camera.CameraId
+            </button>
+        }
+    </div>
+
     <div class="details-panel__meta">
         <div>
             <span>View</span>
@@ -127,6 +145,15 @@
     public string RawJson { get; set; } = string.Empty;
 
     [Parameter]
+    public IReadOnlyList<VisionCameraSnapshot> Cameras { get; set; } = Array.Empty<VisionCameraSnapshot>();
+
+    [Parameter, EditorRequired]
+    public string SelectedViewKey { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> OnSelectView { get; set; }
+
+    [Parameter]
     public SSL_GeometryData? Geometry { get; set; }
 
     [Parameter]
@@ -162,6 +189,16 @@
     private string TabButtonClass(VisionDetailsTab tab)
     {
         return selectedTab == tab ? "details-panel__tab is-active" : "details-panel__tab";
+    }
+
+    private string SourceButtonClass(string key)
+    {
+        return SelectedViewKey == key ? "details-panel__source-button is-active" : "details-panel__source-button";
+    }
+
+    private Task SelectViewAsync(string key)
+    {
+        return OnSelectView.InvokeAsync(key);
     }
 
     private static RenderFragment RobotTable(IEnumerable<SSL_DetectionRobot> robots) => builder =>

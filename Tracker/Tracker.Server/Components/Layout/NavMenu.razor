@@ -1,6 +1,17 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Tracker.Server</a>
+    <div class="container-fluid nav-topbar">
+        <a class="navbar-brand" href="">
+            @if (!IsCollapsed)
+            {
+                <span class="sidebar-brand-text">Tracker.Server</span>
+            }
+        </a>
+        <button type="button"
+                class="@(IsCollapsed ? "desktop-sidebar-toggle is-collapsed" : "desktop-sidebar-toggle")"
+                title="Toggle sidebar"
+                aria-label="Toggle sidebar"
+                aria-expanded="@(!IsCollapsed)"
+                @onclick="ToggleSidebarAsync"></button>
     </div>
 </div>
 
@@ -10,8 +21,25 @@
     <nav class="nav flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-vision-nav-menu" aria-hidden="true"></span> Vision
+                <span class="bi bi-vision-nav-menu" aria-hidden="true"></span>
+                @if (!IsCollapsed)
+                {
+                    <span class="nav-label">Vision</span>
+                }
             </NavLink>
         </div>
     </nav>
 </div>
+
+@code {
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleSidebar { get; set; }
+
+    private Task ToggleSidebarAsync()
+    {
+        return OnToggleSidebar.InvokeAsync();
+    }
+}

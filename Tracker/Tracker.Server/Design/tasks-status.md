@@ -4,20 +4,18 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 
 ## Current Task
 
-- ID: RAW-VISION-007
-- Title: Add aggregate and per-camera raw vision views
+- ID: RAW-VISION-008
+- Title: Compact field-first raw vision layout and field overlays
 - Phase: review
 - Status: complete
 - Size: medium
-- Dependencies: RAW-VISION-001 implementation complete; live multi-camera input available for runtime confirmation.
+- Dependencies: RAW-VISION-007 complete.
 - Exit Criteria:
-  - `VisionPacketStore` retains latest detection state per camera instead of only the last received frame.
-  - Viewer can switch between aggregate view and individual camera views.
-  - Aggregate view renders combined balls, yellow robots, and blue robots from all known cameras.
-  - Camera view renders the latest frame for the selected camera and exposes that camera's raw JSON.
-  - Field canvas presentation follows `ssl-vision-client` direction with a source selector, boundary-aware field background, and zoom/pan controls.
-  - Tests cover per-camera retention and aggregate snapshot behavior.
-  - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj` passes.
+  - Header text `Raw Vision Viewer` と `SSL_WrapperPacket / SSL-Vision multicast` は省略され、field 表示面積が拡大される。
+  - Aggregate / camera selector は field 上部から移動し、field の縦方向面積を圧迫しない。
+  - Field canvas に +X / +Y 方向が分かる axis overlay が追加される。
+  - Cursor 座標は field 上で確認でき、cursor 位置に応じて上側または下側に表示される。
+  - Desktop の左 sidebar は折りたたみ可能になる。
   - `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes.
 
 ## Tasks
@@ -32,3 +30,4 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 | RAW-VISION-005 | Verify and review | verification | complete | RAW-VISION-003, RAW-VISION-004 | Test/build commands pass; review result is recorded in `reports/raw-vision-viewer-evidence-20260430165645.md`. |
 | RAW-VISION-006 | Harden multicast receiver initialization | verification | complete | RAW-VISION-001 | Receiver attempts multicast join across viable IPv4 interfaces, configured interface validation is explicit, tests/build pass, and review is recorded in `reports/raw-vision-multicast-join-evidence-20260430174124.md`. |
 | RAW-VISION-007 | Add aggregate and per-camera raw vision views | implementation | complete | RAW-VISION-001, RAW-VISION-003 | Store keeps latest frame per camera, aggregate and camera-specific views are available in the UI, field canvas follows `ssl-vision-client` source-selector/canvas behavior, tests/build pass, and review/evidence are recorded in `reports/raw-vision-source-selector-evidence-20260430181252.md`. |
+| RAW-VISION-008 | Compact field-first raw vision layout and field overlays | review | complete | RAW-VISION-007 | Viewer header is compact, source selector moves away from the field top, axis/cursor overlays are added, sidebar can collapse on desktop, `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes, and `reports/raw-vision-008-review-20260501101437.md` records a no-findings sub-agent review. |

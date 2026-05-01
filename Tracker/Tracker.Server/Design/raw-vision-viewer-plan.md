@@ -104,10 +104,10 @@ raw vision viewer の主要コンポーネントは次の通り。
 
 - `Home.razor`
   - 画面全体の親
-  - `VisionPacketStore.GetSnapshot()` の結果を定期取得し、source selector と左右ペインを構成する
+  - `VisionPacketStore.GetSnapshot()` の結果を定期取得し、compact header と左右ペインを構成する
 - `VisionFieldCanvas.razor`
   - field SVG の親コンポーネント
-  - zoom / pan 状態、boundary 背景、field 本体、子 marker の配置を担当する
+  - zoom / pan 状態、boundary 背景、field 本体、子 marker の配置、axis overlay、cursor 座標 overlay を担当する
 - `VisionFieldLines.razor`
   - field line / arc / goal の描画を担当する
   - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時は geometry 寸法から fallback 描画する
@@ -133,6 +133,7 @@ raw vision viewer の主要コンポーネントは次の通り。
   - store から取得した UI 用 snapshot
 - `selectedViewKey`
   - aggregate / camera 切替状態
+- sidebar 折りたたみ状態を前提に field-first の main content を構成する
 
 ### VisionFieldCanvas.razor
 
@@ -141,6 +142,7 @@ raw vision viewer の主要コンポーネントは次の通り。
 - `IReadOnlyList<SSL_DetectionRobot> RobotsYellow`
 - `IReadOnlyList<SSL_DetectionRobot> RobotsBlue`
 - `VisionRenderOptions RenderOptions`
+- cursor 座標表示に必要な hover state と canvas size
 
 ### VisionFieldLines.razor
 
@@ -166,6 +168,9 @@ raw vision viewer の主要コンポーネントは次の通り。
 - `string CameraLabel`
 - `string SourceLabel`
 - `string RawJson`
+- `IReadOnlyList<VisionCameraSnapshot> Cameras`
+- `string SelectedViewKey`
+- `EventCallback<string> OnSelectView`
 - `SSL_GeometryData? Geometry`
 - `IReadOnlyList<SSL_DetectionBall> Balls`
 - `IReadOnlyList<SSL_DetectionRobot> RobotsYellow`
@@ -176,17 +181,27 @@ raw vision viewer の主要コンポーネントは次の通り。
 root page では次を表示する。
 
 - receiver status と最新 receive metadata
-- source selector
 - field-first の SVG 表示
 - raw JSON
 - balls / robots / geometry calibration の詳細表示
 
 field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲する。
 
-- source-first selection
 - field canvas を主表示にする
 - boundary-aware の field background
 - wheel zoom と drag pan
+- field 面積を優先するため、画面 title は省略し、source selector は field 上端から外す
+- +X / +Y 方向が分かる axis overlay を field 上に固定表示する
+- cursor 座標は cursor の上下で表示位置を切り替え、field 視認性を落とさない
+- desktop sidebar は viewer 表示面積確保のため折りたたみ可能にする
+
+## レイアウト追補
+
+- `Home.razor` は大きな title block を持たず、status と main content を優先する
+- source selector は `VisionDetailsPanel.razor` 側へ移し、field の縦方向面積を確保する
+- `VisionFieldCanvas.razor` は field 本体に加えて axis overlay と cursor coordinate overlay を管理する
+- cursor coordinate overlay は proto 由来の field geometry と `VisionFieldProjection` の逆写像から求める
+- sidebar 折りたたみは layout レベルで扱い、viewer 専用コンポーネントへ閉じ込めない
 
 ## テスト方針
 

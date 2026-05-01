@@ -1,12 +1,14 @@
 @using System.Globalization
 @using Tracker.Server.Vision
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <section class="field-card">
     <div class="field-card__toolbar">
         <span>Wheel to zoom, drag to pan</span>
         <button type="button" class="field-card__reset" @onclick="ResetFieldView">Reset View</button>
     </div>
-    <div class="field-card__canvas">
+    <div class="field-card__canvas" @ref="canvasElement">
         @{
             var projection = VisionFieldProjection.FromGeometry(Geometry);
             var field = Geometry?.Field;
@@ -22,6 +24,25 @@
             var boundaryHeightProjected = projection.ProjectLength(projection.FieldWidth + (boundaryWidthTouchLine * 2));
         }
 
+        <div class="field-card__axes" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+                <path d="M12 52H52" />
+                <path d="M44 44L52 52L44 60" />
+                <path d="M12 52V12" />
+                <path d="M4 20L12 12L20 20" />
+                <text x="50" y="38" text-anchor="end">+X</text>
+                <text x="16" y="14">+Y</text>
+            </svg>
+        </div>
+
+        @if (cursorOverlay is not null)
+        {
+            <div class="field-card__cursor"
+                 style="left:@N(cursorOverlay.LeftPx)px; top:@N(cursorOverlay.TopPx)px;">
+                X @N(cursorOverlay.FieldX), Y @N(cursorOverlay.FieldY)
+            </div>
+        }
+
         <svg class="field-card__svg"
              viewBox="@ViewBox(projection)"
              role="img"
@@ -31,7 +52,7 @@
              @onmousemove="OnFieldMouseMove"
              @onmouseup="OnFieldMouseUp"
              @onmouseleave="OnFieldMouseLeave">
-            <g transform="@FieldTransform(projection)">
+            <g transform="@FieldTransform(projection)" pointer-events="none">
                 <rect class="field-card__boundary-background"
                       x="@N(boundaryTopLeft.X)"
                       y="@N(boundaryTopLeft.Y)"
@@ -87,12 +108,30 @@
     [Parameter]
     public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
 
+    private ElementReference canvasElement;
     private double zoom = 1;
     private double translationX;
     private double translationY;
     private double activeTranslationX;
     private double activeTranslationY;
+    private double canvasWidth = VisionFieldProjection.DefaultViewBoxWidth;
+    private double canvasHeight = VisionFieldProjection.DefaultViewBoxHeight;
+    private DotNetObjectReference<VisionFieldCanvas>? dotNetReference;
+    private IJSObjectReference? module;
+    private CursorOverlayState? cursorOverlay;
     private SvgPoint? mouseDownPoint;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Components/Vision/VisionFieldCanvas.razor.js");
+        dotNetReference = DotNetObjectReference.Create(this);
+        await module.InvokeVoidAsync("observeSize", canvasElement, dotNetReference);
+    }
 
     private static string ViewBox(VisionFieldProjection projection)
     {
@@ -147,6 +186,8 @@
 
     private void OnFieldMouseMove(MouseEventArgs eventArgs)
     {
+        UpdateCursorOverlay(eventArgs);
+
         if (mouseDownPoint is null)
         {
             return;
@@ -164,6 +205,44 @@
     private void OnFieldMouseLeave(MouseEventArgs _)
     {
         CommitFieldTranslation();
+        cursorOverlay = null;
+    }
+
+    [JSInvokable]
+    public void UpdateCanvasSize(double width, double height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        canvasWidth = width;
+        canvasHeight = height;
+    }
+
+    private void UpdateCursorOverlay(MouseEventArgs eventArgs)
+    {
+        if (canvasWidth <= 0 || canvasHeight <= 0)
+        {
+            return;
+        }
+
+        var projection = VisionFieldProjection.FromGeometry(Geometry);
+        var svgX = eventArgs.OffsetX * projection.ViewBoxWidth / canvasWidth;
+        var svgY = eventArgs.OffsetY * projection.ViewBoxHeight / canvasHeight;
+        var centerX = projection.ViewBoxWidth / 2;
+        var centerY = projection.ViewBoxHeight / 2;
+        var translatedX = translationX + activeTranslationX;
+        var translatedY = translationY + activeTranslationY;
+        var baseX = ((svgX - centerX - translatedX) / zoom) + centerX;
+        var baseY = ((svgY - centerY - translatedY) / zoom) + centerY;
+        var fieldPoint = projection.Unproject(baseX, baseY);
+        var leftPx = Math.Clamp(eventArgs.OffsetX + 12, 8, Math.Max(8, canvasWidth - 148));
+        var topPx = eventArgs.OffsetY > canvasHeight / 2
+            ? Math.Max(8, eventArgs.OffsetY - 34)
+            : Math.Min(canvasHeight - 28, eventArgs.OffsetY + 14);
+
+        cursorOverlay = new CursorOverlayState(leftPx, topPx, fieldPoint.X, fieldPoint.Y);
     }
 
     private void CommitFieldTranslation()
@@ -179,4 +258,23 @@
         activeTranslationY = 0;
         mouseDownPoint = null;
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try
+            {
+                await module.InvokeVoidAsync("unobserveSize", canvasElement);
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        dotNetReference?.Dispose();
+    }
+
+    private sealed record CursorOverlayState(double LeftPx, double TopPx, double FieldX, double FieldY);
 }

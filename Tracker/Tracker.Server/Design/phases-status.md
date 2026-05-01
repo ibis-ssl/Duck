@@ -5,7 +5,7 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 ## Overall State
 
 - Active Phase: review
-- Active Task: RAW-VISION-007
+- Active Task: RAW-VISION-008
 - Remaining Phases: none
 
 ## Phases
@@ -13,6 +13,6 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 | Phase | Status | Exit Criteria |
 | --- | --- | --- |
 | preparation | complete | Design plan and tracking files exist before implementation. |
-| implementation | complete | Receiver/store keep per-camera latest frames and the UI supports aggregate and per-camera views with `ssl-vision-client`-inspired source selector and field canvas behavior. |
-| verification | complete | `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj` and `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` pass for the aggregate/per-camera follow-up. |
-| review | complete | Task-scoped review is recorded and no actionable findings remain. |
+| implementation | complete | Receiver/store keep per-camera latest frames and the UI supports a compact field-first layout with moved source selector, axis/cursor overlays, and collapsible sidebar behavior. |
+| verification | complete | `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes for the compact layout follow-up. |
+| review | complete | Task-scoped sub-agent review is recorded and no actionable findings remain. |

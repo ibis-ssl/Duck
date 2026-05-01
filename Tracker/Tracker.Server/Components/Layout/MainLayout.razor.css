@@ -56,6 +56,12 @@ main {
         height: 100vh;
         position: sticky;
         top: 0;
+        transition: width 0.18s ease;
+        overflow: hidden;
+    }
+
+    .page--sidebar-collapsed .sidebar {
+        width: 5rem;
     }
 
     .top-row {
@@ -73,6 +79,10 @@ main {
     .top-row, article {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
+    }
+
+    .page--sidebar-collapsed article {
+        padding-left: 1rem !important;
     }
 }
 
