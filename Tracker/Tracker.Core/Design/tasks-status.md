@@ -6,8 +6,8 @@
 
 - ID: TRACKER-006
 - Title: `TrackerEngine` の reorder buffer と flush pipeline を実装する
-- Phase: contracts
-- Status: pending
+- Phase: engine
+- Status: in_progress
 - Size: medium
 - Dependencies: TRACKER-003, TRACKER-004 が完了していること
 - Exit Criteria:
