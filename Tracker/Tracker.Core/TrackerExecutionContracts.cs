@@ -12,12 +12,24 @@ public sealed class TrackerEngine : ITrackerEngine
 {
     private const double BallTrackMatchDistanceMm = 120d;
     private const double BallMergeDistanceMm = 120d;
+    private const double RobotRadiusMm = 90d;
+    private const double BallRadiusMm = 21.5d;
+    private const double ContactMarginMm = 25d;
+    private const double KickDetectionSpeedThresholdMmPerS = 800d;
+    private const double KickStillMovingSpeedThresholdMmPerS = 400d;
+    private const double ChipHeightThresholdMm = 120d;
+    private const int KickStillMovingGraceFrames = 2;
+    private const long RecentContactWindowNs = 200_000_000;
     private readonly List<BufferedDetection> pendingDetections = [];
     private readonly Dictionary<int, BallTrackState> cameraBallTrackStates = [];
+    private readonly Dictionary<int, BallContactState> latestBallContactStates = [];
     private readonly Dictionary<int, MergedBallIdentityState> mergedBallIdentityStates = [];
     private readonly Dictionary<CameraRobotKey, RobotTrackState> cameraRobotTrackStates = [];
     private TrackerGeometrySnapshot? geometrySnapshot;
+    private KickEventState? activeKickState;
+    private TrackedBallState? lastCommittedPrimaryBall;
     private string activeProfileName = "default";
+    private int kickBelowStillMovingThresholdFrameCount;
     private int nextCameraBallTrackId = 1;
     private int nextMergedBallTrackId = 1;
     private uint nextCommittedFrameNumber = 1;
@@ -172,8 +184,12 @@ public sealed class TrackerEngine : ITrackerEngine
         pendingDetections.Clear();
         maxSeenDetectionTimestampNs = null;
         cameraBallTrackStates.Clear();
+        latestBallContactStates.Clear();
         mergedBallIdentityStates.Clear();
         cameraRobotTrackStates.Clear();
+        activeKickState = null;
+        lastCommittedPrimaryBall = null;
+        kickBelowStillMovingThresholdFrameCount = 0;
         nextCameraBallTrackId = 1;
         nextMergedBallTrackId = 1;
     }
@@ -205,6 +221,24 @@ public sealed class TrackerEngine : ITrackerEngine
 
         robots.Sort(TrackedRobotComparer.Instance);
 
+        var primaryBall = balls.FirstOrDefault();
+        var previousPrimaryBall = lastCommittedPrimaryBall;
+        var previousContactState = primaryBall is not null
+            && latestBallContactStates.TryGetValue(primaryBall.InternalTrackId, out var currentPrimaryContactState)
+            ? currentPrimaryContactState
+            : null;
+        var freshRobotKeys = observedCameraRobotKeys
+            .Select(key => new RobotKey(key.Team, key.RobotId))
+            .ToHashSet();
+        var contactState = CreateBallContactState(primaryBall, robots, freshRobotKeys, frameTimestampNs, previousContactState);
+        robots = ApplyBallContactFlags(robots, contactState);
+        UpdateLatestBallContactState(primaryBall, contactState);
+        PruneLatestBallContactStates(balls);
+
+        var kickUpdate = UpdateKickState(primaryBall, previousPrimaryBall, previousContactState, contactState, frameTimestampNs);
+        activeKickState = kickUpdate.KickState;
+        lastCommittedPrimaryBall = primaryBall;
+
         var committedFrame = new TrackerFrame
         {
             FrameNumber = nextCommittedFrameNumber++,
@@ -214,6 +248,8 @@ public sealed class TrackerEngine : ITrackerEngine
             Balls = balls,
             PrimaryBallTrackId = balls.Count > 0 ? balls[0].InternalTrackId : null,
             Robots = robots,
+            KickedBall = activeKickState,
+            LatestContact = contactState,
             Metadata = new TrackerFrameMetadata
             {
                 ProfileName = activeProfileName,
@@ -227,8 +263,279 @@ public sealed class TrackerEngine : ITrackerEngine
             FrameNumber = committedFrame.FrameNumber,
             ProfileName = activeProfileName,
         });
+        if (kickUpdate.KickDetected)
+        {
+            emittedEvents.Add(new TrackerEvent
+            {
+                Kind = TrackerEventKind.KickDetected,
+                FrameNumber = committedFrame.FrameNumber,
+                ProfileName = activeProfileName,
+            });
+        }
+
+        if (DidBallContactChange(previousContactState, contactState))
+        {
+            emittedEvents.Add(new TrackerEvent
+            {
+                Kind = TrackerEventKind.ContactChanged,
+                FrameNumber = committedFrame.FrameNumber,
+                ProfileName = activeProfileName,
+            });
+        }
 
         lastCommittedGroupCloseTimestampNs = group.CloseTimestampNs;
+    }
+
+    private static BallContactState? CreateBallContactState(
+        TrackedBallState? primaryBall,
+        IReadOnlyList<TrackedRobotState> robots,
+        ISet<RobotKey> freshRobotKeys,
+        long frameTimestampNs,
+        BallContactState? previousContactState)
+    {
+        var currentContact = primaryBall is null
+            ? null
+            : robots
+                .Where(robot => freshRobotKeys.Contains(new RobotKey(robot.Team, robot.RobotId)))
+                .Select(
+                    robot => new
+                    {
+                        Robot = robot,
+                        DistanceMm = GetDistanceMm(robot.XMm, robot.YMm, primaryBall.XMm, primaryBall.YMm),
+                    })
+                .Where(candidate => candidate.DistanceMm <= RobotRadiusMm + BallRadiusMm + ContactMarginMm)
+                .OrderBy(candidate => candidate.DistanceMm)
+                .ThenBy(candidate => candidate.Robot.Team)
+                .ThenBy(candidate => candidate.Robot.RobotId)
+                .FirstOrDefault();
+        if (currentContact is not null)
+        {
+            return new BallContactState
+            {
+                IsInContact = true,
+                ContactingRobotId = currentContact.Robot.RobotId,
+                ContactingTeam = currentContact.Robot.Team,
+                LastRobotId = currentContact.Robot.RobotId,
+                LastTeam = currentContact.Robot.Team,
+                LastContactTimestampNs = frameTimestampNs,
+            };
+        }
+
+        if (previousContactState is null)
+        {
+            return null;
+        }
+
+        return new BallContactState
+        {
+            IsInContact = false,
+            ContactingRobotId = null,
+            ContactingTeam = TrackerTeam.Unknown,
+            LastRobotId = previousContactState.LastRobotId,
+            LastTeam = previousContactState.LastTeam,
+            LastContactTimestampNs = previousContactState.LastContactTimestampNs,
+        };
+    }
+
+    private static List<TrackedRobotState> ApplyBallContactFlags(
+        IReadOnlyList<TrackedRobotState> robots,
+        BallContactState? contactState)
+    {
+        return robots
+            .Select(
+                robot => new TrackedRobotState
+                {
+                    Team = robot.Team,
+                    RobotId = robot.RobotId,
+                    XMm = robot.XMm,
+                    YMm = robot.YMm,
+                    OrientationRad = robot.OrientationRad,
+                    VXMmPerS = robot.VXMmPerS,
+                    VYMmPerS = robot.VYMmPerS,
+                    AngularVelocityRadPerS = robot.AngularVelocityRadPerS,
+                    Visibility = robot.Visibility,
+                    Quality = robot.Quality,
+                    HasBallContact = contactState is not null
+                        && contactState.IsInContact
+                        && contactState.ContactingTeam == robot.Team
+                        && contactState.ContactingRobotId == robot.RobotId,
+                })
+            .ToList();
+    }
+
+    private void UpdateLatestBallContactState(
+        TrackedBallState? primaryBall,
+        BallContactState? contactState)
+    {
+        if (primaryBall is null)
+        {
+            return;
+        }
+
+        if (contactState is null)
+        {
+            latestBallContactStates.Remove(primaryBall.InternalTrackId);
+            return;
+        }
+
+        latestBallContactStates[primaryBall.InternalTrackId] = contactState;
+    }
+
+    private void PruneLatestBallContactStates(IReadOnlyList<TrackedBallState> balls)
+    {
+        var activeTrackIds = balls
+            .Select(ball => ball.InternalTrackId)
+            .ToHashSet();
+        foreach (var staleTrackId in latestBallContactStates.Keys.Except(activeTrackIds).ToList())
+        {
+            latestBallContactStates.Remove(staleTrackId);
+        }
+    }
+
+    private (KickEventState? KickState, bool KickDetected) UpdateKickState(
+        TrackedBallState? primaryBall,
+        TrackedBallState? previousPrimaryBall,
+        BallContactState? previousContactState,
+        BallContactState? currentContactState,
+        long frameTimestampNs)
+    {
+        var detectedKick = TryCreateKickEventState(primaryBall, previousPrimaryBall, previousContactState, currentContactState, frameTimestampNs);
+        if (detectedKick is not null)
+        {
+            kickBelowStillMovingThresholdFrameCount = 0;
+            return (detectedKick, true);
+        }
+
+        if (activeKickState is null || primaryBall is null || activeKickState.BallTrackId != primaryBall.InternalTrackId)
+        {
+            kickBelowStillMovingThresholdFrameCount = 0;
+            return (null, false);
+        }
+
+        var planarSpeedMmPerS = GetPlanarSpeedMmPerS(primaryBall);
+        var isStillMoving = planarSpeedMmPerS >= KickStillMovingSpeedThresholdMmPerS;
+        if (!isStillMoving)
+        {
+            kickBelowStillMovingThresholdFrameCount++;
+            if (kickBelowStillMovingThresholdFrameCount < KickStillMovingGraceFrames)
+            {
+                isStillMoving = true;
+            }
+        }
+        else
+        {
+            kickBelowStillMovingThresholdFrameCount = 0;
+        }
+
+        return (new KickEventState
+        {
+            StartXMm = activeKickState.StartXMm,
+            StartYMm = activeKickState.StartYMm,
+            StartTimestampNs = activeKickState.StartTimestampNs,
+            InitialVelocityXMmPerS = activeKickState.InitialVelocityXMmPerS,
+            InitialVelocityYMmPerS = activeKickState.InitialVelocityYMmPerS,
+            InitialVelocityZMmPerS = activeKickState.InitialVelocityZMmPerS,
+            BallTrackId = activeKickState.BallTrackId,
+            LatestSpeedMmPerS = planarSpeedMmPerS,
+            LatestUpdateTimestampNs = frameTimestampNs,
+            StopXMm = isStillMoving ? null : primaryBall.XMm,
+            StopYMm = isStillMoving ? null : primaryBall.YMm,
+            StopTimestampNs = isStillMoving ? null : frameTimestampNs,
+            KickerRobotId = activeKickState.KickerRobotId,
+            KickKind = activeKickState.KickKind,
+            IsStillMoving = isStillMoving,
+        }, false);
+    }
+
+    private static bool DidBallContactChange(
+        BallContactState? previousContactState,
+        BallContactState? currentContactState)
+    {
+        if (previousContactState is null || currentContactState is null)
+        {
+            return previousContactState is not null || currentContactState is not null;
+        }
+
+        return previousContactState.IsInContact != currentContactState.IsInContact
+            || previousContactState.ContactingTeam != currentContactState.ContactingTeam
+            || previousContactState.ContactingRobotId != currentContactState.ContactingRobotId;
+    }
+
+    private static KickEventState? TryCreateKickEventState(
+        TrackedBallState? primaryBall,
+        TrackedBallState? previousPrimaryBall,
+        BallContactState? previousContactState,
+        BallContactState? currentContactState,
+        long frameTimestampNs)
+    {
+        if (primaryBall is null)
+        {
+            return null;
+        }
+
+        var planarSpeedMmPerS = GetPlanarSpeedMmPerS(primaryBall);
+        if (planarSpeedMmPerS < KickDetectionSpeedThresholdMmPerS)
+        {
+            return null;
+        }
+
+        var previousPlanarSpeedMmPerS = previousPrimaryBall is not null
+            && previousPrimaryBall.InternalTrackId == primaryBall.InternalTrackId
+            ? GetPlanarSpeedMmPerS(previousPrimaryBall)
+            : 0d;
+        if (previousPlanarSpeedMmPerS >= KickDetectionSpeedThresholdMmPerS)
+        {
+            return null;
+        }
+
+        var recentContact = SelectRecentContact(previousContactState, currentContactState, frameTimestampNs);
+        if (recentContact?.LastRobotId is null)
+        {
+            return null;
+        }
+
+        var startBall = previousPrimaryBall is not null && previousPrimaryBall.InternalTrackId == primaryBall.InternalTrackId
+            ? previousPrimaryBall
+            : primaryBall;
+
+        return new KickEventState
+        {
+            StartXMm = startBall.XMm,
+            StartYMm = startBall.YMm,
+            StartTimestampNs = startBall.LastVisibleTimestampNs,
+            InitialVelocityXMmPerS = primaryBall.VXMmPerS,
+            InitialVelocityYMmPerS = primaryBall.VYMmPerS,
+            InitialVelocityZMmPerS = primaryBall.VZMmPerS,
+            BallTrackId = primaryBall.InternalTrackId,
+            LatestSpeedMmPerS = planarSpeedMmPerS,
+            LatestUpdateTimestampNs = frameTimestampNs,
+            KickerRobotId = recentContact.LastRobotId,
+            KickKind = IsChipKick(primaryBall) ? "chip" : "flat",
+            IsStillMoving = true,
+        };
+    }
+
+    private static BallContactState? SelectRecentContact(
+        BallContactState? previousContactState,
+        BallContactState? currentContactState,
+        long frameTimestampNs)
+    {
+        return new BallContactState?[] { currentContactState, previousContactState }
+            .Where(state => state?.LastRobotId is not null)
+            .Cast<BallContactState>()
+            .Where(state => frameTimestampNs - state.LastContactTimestampNs <= RecentContactWindowNs)
+            .OrderByDescending(state => state.LastContactTimestampNs)
+            .FirstOrDefault();
+    }
+
+    private static double GetPlanarSpeedMmPerS(TrackedBallState ball)
+    {
+        return Math.Sqrt((ball.VXMmPerS * ball.VXMmPerS) + (ball.VYMmPerS * ball.VYMmPerS));
+    }
+
+    private static bool IsChipKick(TrackedBallState ball)
+    {
+        return ball.ZMm >= ChipHeightThresholdMm || ball.VZMmPerS >= ChipHeightThresholdMm;
     }
 
     private static BufferedDetection CreateBufferedDetection(SSL_DetectionFrame detection)

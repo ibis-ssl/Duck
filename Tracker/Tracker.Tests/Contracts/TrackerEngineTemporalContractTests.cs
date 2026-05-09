@@ -1147,4 +1147,171 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal(100, mergedBall.XMm, precision: 3);
         Assert.Equal([1u, 2u, 3u], mergedBall.SourceCameraIds.OrderBy(id => id));
     }
+
+    [Fact]
+    public void Update_PopulatesCurrentBallContactAndMarksContactingRobot()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var trackedRobot = Assert.Single(committedFrame.Robots);
+        var contact = Assert.IsType<BallContactState>(committedFrame.LatestContact);
+
+        Assert.True(contact.IsInContact);
+        Assert.Equal((uint)4, contact.ContactingRobotId);
+        Assert.Equal(TrackerTeam.Yellow, contact.ContactingTeam);
+        Assert.Equal((uint)4, contact.LastRobotId);
+        Assert.True(trackedRobot.HasBallContact);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.ContactChanged],
+            result.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
+    public void Update_PreservesLastToucherAfterBallContactEnds()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 30, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(secondResult.CommittedFrames);
+        var contact = Assert.IsType<BallContactState>(committedFrame.LatestContact);
+
+        Assert.False(contact.IsInContact);
+        Assert.Null(contact.ContactingRobotId);
+        Assert.Equal((uint)4, contact.LastRobotId);
+        Assert.Equal(TrackerTeam.Yellow, contact.LastTeam);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.ContactChanged],
+            secondResult.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
+    public void Update_DetectsKickFromRecentContactAndPublishesKickBeforeContactChange()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var kickResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 110, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(kickResult.CommittedFrames);
+        var kick = Assert.IsType<KickEventState>(committedFrame.KickedBall);
+        var contact = Assert.IsType<BallContactState>(committedFrame.LatestContact);
+
+        Assert.Equal((uint)4, kick.KickerRobotId);
+        Assert.Equal("flat", kick.KickKind);
+        Assert.True(kick.IsStillMoving);
+        Assert.Equal(committedFrame.PrimaryBallTrackId, kick.BallTrackId);
+        Assert.False(contact.IsInContact);
+        Assert.Equal((uint)4, contact.LastRobotId);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.KickDetected, TrackerEventKind.ContactChanged],
+            kickResult.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
+    public void Update_DoesNotCarryLastToucherToDifferentPrimaryBallTrack()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls:
+                [
+                    TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
+                    TrackerContractTestData.CreateBall(x: 400, y: 0, confidence: 1.0f),
+                ],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var switchedPrimaryResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 500, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(switchedPrimaryResult.CommittedFrames);
+
+        Assert.NotEqual(1, committedFrame.PrimaryBallTrackId);
+        Assert.Null(committedFrame.LatestContact);
+        Assert.Null(committedFrame.KickedBall);
+        Assert.Equal([TrackerEventKind.WorldFrameCommitted], switchedPrimaryResult.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
+    public void Update_DetectsFlatKickWhenVerticalVelocityNoiseIsBelowChipThreshold()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, z: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var kickResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 110, y: 0, z: 1, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(kickResult.CommittedFrames);
+        var kick = Assert.IsType<KickEventState>(committedFrame.KickedBall);
+
+        Assert.Equal("flat", kick.KickKind);
+        Assert.Equal((uint)4, kick.KickerRobotId);
+    }
 }
