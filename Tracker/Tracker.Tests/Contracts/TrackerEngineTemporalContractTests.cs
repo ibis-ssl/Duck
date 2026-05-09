@@ -115,11 +115,14 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
             settings: settings);
 
         Assert.Empty(firstResult.CommittedFrames);
-        Assert.Equal(2, flushResult.CommittedFrames.Count);
+        Assert.Collection(
+            flushResult.CommittedFrames,
+            frame => Assert.Equal(1_000_000_000L, frame.DataTimestampNs),
+            frame => Assert.Equal(2_000_000_000L, frame.DataTimestampNs));
     }
 
     [Fact]
-    public void Update_DropsLatePacketsAndRecordsDiagnostics()
+    public void Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes()
     {
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
@@ -150,6 +153,18 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
 
         Assert.Empty(lateResult.CommittedFrames);
         Assert.Equal(1, lateResult.Diagnostics.LatePacketDropCount);
+
+        var flushResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 300)],
+                captureTimeSeconds: 3.0),
+            settings: settings);
+
+        Assert.Collection(
+            flushResult.CommittedFrames,
+            frame => Assert.Equal(2_000_000_000L, frame.DataTimestampNs));
     }
 
     [Fact]
@@ -189,6 +204,9 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Contains(resetResult.EmittedEvents, emitted => emitted.Kind == TrackerEventKind.GeometryReset);
         Assert.Single(resetResult.CommittedFrames);
         Assert.Equal(2_000_000_000L, resetResult.CommittedFrames[0].DataTimestampNs);
+        Assert.Equal(
+            [TrackerEventKind.GeometryReset, TrackerEventKind.WorldFrameCommitted],
+            resetResult.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
     }
 
     [Fact]
@@ -224,5 +242,37 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal(
             [TrackerEventKind.ProfileSwitched, TrackerEventKind.WorldFrameCommitted],
             result.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
+    }
+
+    [Fact]
+    public void Update_PreservesFrameNumberContinuityAcrossProfileSwitch()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
+
+        var firstResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100)],
+                captureTimeSeconds: 1.0),
+            settings: settings);
+
+        var switchResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 200)],
+                captureTimeSeconds: 2.0),
+            settings: settings,
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(requestVersion: 3, profileName: "fast"));
+
+        var firstCommittedFrame = Assert.Single(firstResult.CommittedFrames);
+        var switchedCommittedFrame = Assert.Single(switchResult.CommittedFrames);
+
+        Assert.Equal(firstCommittedFrame.FrameNumber + 1, switchedCommittedFrame.FrameNumber);
+        Assert.Equal(
+            [TrackerEventKind.ProfileSwitched, TrackerEventKind.WorldFrameCommitted],
+            switchResult.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
     }
 }
