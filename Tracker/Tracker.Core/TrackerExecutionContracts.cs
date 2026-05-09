@@ -23,6 +23,7 @@ public sealed class TrackerEngine : ITrackerEngine
     private readonly List<BufferedDetection> pendingDetections = [];
     private readonly Dictionary<int, BallTrackState> cameraBallTrackStates = [];
     private readonly Dictionary<int, BallContactState> latestBallContactStates = [];
+    private readonly Dictionary<int, BallLeftFieldState> latestBallLeftFieldStates = [];
     private readonly Dictionary<int, MergedBallIdentityState> mergedBallIdentityStates = [];
     private readonly Dictionary<CameraRobotKey, RobotTrackState> cameraRobotTrackStates = [];
     private TrackerGeometrySnapshot? geometrySnapshot;
@@ -185,6 +186,7 @@ public sealed class TrackerEngine : ITrackerEngine
         maxSeenDetectionTimestampNs = null;
         cameraBallTrackStates.Clear();
         latestBallContactStates.Clear();
+        latestBallLeftFieldStates.Clear();
         mergedBallIdentityStates.Clear();
         cameraRobotTrackStates.Clear();
         activeKickState = null;
@@ -227,6 +229,10 @@ public sealed class TrackerEngine : ITrackerEngine
             && latestBallContactStates.TryGetValue(primaryBall.InternalTrackId, out var currentPrimaryContactState)
             ? currentPrimaryContactState
             : null;
+        var previousLeftFieldState = primaryBall is not null
+            && latestBallLeftFieldStates.TryGetValue(primaryBall.InternalTrackId, out var currentPrimaryLeftFieldState)
+            ? currentPrimaryLeftFieldState
+            : null;
         var freshRobotKeys = observedCameraRobotKeys
             .Select(key => new RobotKey(key.Team, key.RobotId))
             .ToHashSet();
@@ -234,6 +240,9 @@ public sealed class TrackerEngine : ITrackerEngine
         robots = ApplyBallContactFlags(robots, contactState);
         UpdateLatestBallContactState(primaryBall, contactState);
         PruneLatestBallContactStates(balls);
+        var ballLeftFieldState = CreateBallLeftFieldState(primaryBall, previousPrimaryBall, geometrySnapshot, previousLeftFieldState);
+        UpdateLatestBallLeftFieldState(primaryBall, ballLeftFieldState);
+        PruneLatestBallLeftFieldStates(balls);
 
         var kickUpdate = UpdateKickState(primaryBall, previousPrimaryBall, previousContactState, contactState, frameTimestampNs);
         activeKickState = kickUpdate.KickState;
@@ -250,6 +259,7 @@ public sealed class TrackerEngine : ITrackerEngine
             Robots = robots,
             KickedBall = activeKickState,
             LatestContact = contactState,
+            BallLeftField = ballLeftFieldState,
             Metadata = new TrackerFrameMetadata
             {
                 ProfileName = activeProfileName,
@@ -278,6 +288,16 @@ public sealed class TrackerEngine : ITrackerEngine
             emittedEvents.Add(new TrackerEvent
             {
                 Kind = TrackerEventKind.ContactChanged,
+                FrameNumber = committedFrame.FrameNumber,
+                ProfileName = activeProfileName,
+            });
+        }
+
+        if (DidBallLeaveField(previousLeftFieldState, ballLeftFieldState))
+        {
+            emittedEvents.Add(new TrackerEvent
+            {
+                Kind = TrackerEventKind.BallLeftField,
                 FrameNumber = committedFrame.FrameNumber,
                 ProfileName = activeProfileName,
             });
@@ -390,6 +410,70 @@ public sealed class TrackerEngine : ITrackerEngine
         {
             latestBallContactStates.Remove(staleTrackId);
         }
+    }
+
+    private static BallLeftFieldState? CreateBallLeftFieldState(
+        TrackedBallState? primaryBall,
+        TrackedBallState? previousPrimaryBall,
+        TrackerGeometrySnapshot? currentGeometrySnapshot,
+        BallLeftFieldState? previousLeftFieldState)
+    {
+        if (primaryBall is null || currentGeometrySnapshot is null || !IsBallOutOfField(primaryBall, currentGeometrySnapshot))
+        {
+            return null;
+        }
+
+        if (previousLeftFieldState?.IsOutOfField == true)
+        {
+            return previousLeftFieldState;
+        }
+
+        var crossing = ProjectBallCrossing(primaryBall, previousPrimaryBall, currentGeometrySnapshot);
+        return new BallLeftFieldState
+        {
+            IsOutOfField = true,
+            BoundaryName = crossing.BoundaryName,
+            CrossingXMm = crossing.CrossingXMm,
+            CrossingYMm = crossing.CrossingYMm,
+            CrossingTimestampNs = crossing.CrossingTimestampNs,
+        };
+    }
+
+    private void UpdateLatestBallLeftFieldState(
+        TrackedBallState? primaryBall,
+        BallLeftFieldState? ballLeftFieldState)
+    {
+        if (primaryBall is null)
+        {
+            return;
+        }
+
+        if (ballLeftFieldState is null)
+        {
+            latestBallLeftFieldStates.Remove(primaryBall.InternalTrackId);
+            return;
+        }
+
+        latestBallLeftFieldStates[primaryBall.InternalTrackId] = ballLeftFieldState;
+    }
+
+    private void PruneLatestBallLeftFieldStates(IReadOnlyList<TrackedBallState> balls)
+    {
+        var activeTrackIds = balls
+            .Select(ball => ball.InternalTrackId)
+            .ToHashSet();
+        foreach (var staleTrackId in latestBallLeftFieldStates.Keys.Except(activeTrackIds).ToList())
+        {
+            latestBallLeftFieldStates.Remove(staleTrackId);
+        }
+    }
+
+    private static bool DidBallLeaveField(
+        BallLeftFieldState? previousLeftFieldState,
+        BallLeftFieldState? currentLeftFieldState)
+    {
+        return currentLeftFieldState?.IsOutOfField == true
+            && previousLeftFieldState?.IsOutOfField != true;
     }
 
     private (KickEventState? KickState, bool KickDetected) UpdateKickState(
@@ -536,6 +620,157 @@ public sealed class TrackerEngine : ITrackerEngine
     private static bool IsChipKick(TrackedBallState ball)
     {
         return ball.ZMm >= ChipHeightThresholdMm || ball.VZMmPerS >= ChipHeightThresholdMm;
+    }
+
+    private static bool IsBallOutOfField(TrackedBallState ball, TrackerGeometrySnapshot geometrySnapshot)
+    {
+        var halfFieldLengthMm = geometrySnapshot.FieldLengthMm / 2d;
+        var halfFieldWidthMm = geometrySnapshot.FieldWidthMm / 2d;
+        return Math.Abs(ball.YMm) > halfFieldWidthMm || Math.Abs(ball.XMm) > halfFieldLengthMm;
+    }
+
+    private static (string BoundaryName, double CrossingXMm, double CrossingYMm, long CrossingTimestampNs) ProjectBallCrossing(
+        TrackedBallState ball,
+        TrackedBallState? previousPrimaryBall,
+        TrackerGeometrySnapshot geometrySnapshot)
+    {
+        var hasPreviousPoint = previousPrimaryBall is not null && previousPrimaryBall.InternalTrackId == ball.InternalTrackId;
+        if (hasPreviousPoint && previousPrimaryBall is not null)
+        {
+            var firstCrossing = TryProjectFirstPerimeterCrossing(ball, previousPrimaryBall, geometrySnapshot);
+            if (firstCrossing is not null)
+            {
+                return firstCrossing.Value;
+            }
+        }
+
+        var fallbackBoundaryName = ClassifyBoundaryNameFromCurrentPosition(ball, geometrySnapshot);
+        return fallbackBoundaryName switch
+        {
+            "touch-line" => ProjectTouchLineCrossing(ball, previousPrimaryBall, geometrySnapshot, hasPreviousPoint),
+            _ => ProjectGoalLineCrossing(ball, previousPrimaryBall, geometrySnapshot, hasPreviousPoint, fallbackBoundaryName),
+        };
+    }
+
+    private static string ClassifyBoundaryNameFromCurrentPosition(TrackedBallState ball, TrackerGeometrySnapshot geometrySnapshot)
+    {
+        var halfGoalWidthMm = geometrySnapshot.GoalWidthMm / 2d;
+        if (Math.Abs(ball.YMm) > geometrySnapshot.FieldWidthMm / 2d)
+        {
+            return "touch-line";
+        }
+
+        return Math.Abs(ball.YMm) <= halfGoalWidthMm
+            ? "goal-interior"
+            : "goal-line";
+    }
+
+    private static (string BoundaryName, double CrossingXMm, double CrossingYMm, long CrossingTimestampNs)? TryProjectFirstPerimeterCrossing(
+        TrackedBallState ball,
+        TrackedBallState previousPrimaryBall,
+        TrackerGeometrySnapshot geometrySnapshot)
+    {
+        var halfFieldLengthMm = geometrySnapshot.FieldLengthMm / 2d;
+        var halfFieldWidthMm = geometrySnapshot.FieldWidthMm / 2d;
+        var halfGoalWidthMm = geometrySnapshot.GoalWidthMm / 2d;
+        var candidates = new List<(double Ratio, string BoundaryName, double CrossingXMm, double CrossingYMm, long CrossingTimestampNs)>();
+
+        if (Math.Abs(ball.XMm) > halfFieldLengthMm && Math.Abs(ball.XMm - previousPrimaryBall.XMm) >= double.Epsilon)
+        {
+            var boundaryXMm = Math.Sign(ball.XMm) * halfFieldLengthMm;
+            var ratio = (boundaryXMm - previousPrimaryBall.XMm) / (ball.XMm - previousPrimaryBall.XMm);
+            if (ratio >= 0d && ratio <= 1d)
+            {
+                var crossingYMm = previousPrimaryBall.YMm + ((ball.YMm - previousPrimaryBall.YMm) * ratio);
+                if (Math.Abs(crossingYMm) <= halfFieldWidthMm)
+                {
+                    candidates.Add((
+                        ratio,
+                        Math.Abs(crossingYMm) <= halfGoalWidthMm ? "goal-interior" : "goal-line",
+                        boundaryXMm,
+                        crossingYMm,
+                        InterpolateTimestamp(previousPrimaryBall.LastVisibleTimestampNs, ball.LastVisibleTimestampNs, ratio)));
+                }
+            }
+        }
+
+        if (Math.Abs(ball.YMm) > halfFieldWidthMm && Math.Abs(ball.YMm - previousPrimaryBall.YMm) >= double.Epsilon)
+        {
+            var boundaryYMm = Math.Sign(ball.YMm) * halfFieldWidthMm;
+            var ratio = (boundaryYMm - previousPrimaryBall.YMm) / (ball.YMm - previousPrimaryBall.YMm);
+            if (ratio >= 0d && ratio <= 1d)
+            {
+                var crossingXMm = previousPrimaryBall.XMm + ((ball.XMm - previousPrimaryBall.XMm) * ratio);
+                if (Math.Abs(crossingXMm) <= halfFieldLengthMm)
+                {
+                    candidates.Add((
+                        ratio,
+                        "touch-line",
+                        crossingXMm,
+                        boundaryYMm,
+                        InterpolateTimestamp(previousPrimaryBall.LastVisibleTimestampNs, ball.LastVisibleTimestampNs, ratio)));
+                }
+            }
+        }
+
+        return candidates.Count == 0
+            ? null
+            : candidates
+                .OrderBy(candidate => candidate.Ratio)
+                .Select(candidate => (candidate.BoundaryName, candidate.CrossingXMm, candidate.CrossingYMm, candidate.CrossingTimestampNs))
+                .First();
+    }
+
+    private static (string BoundaryName, double CrossingXMm, double CrossingYMm, long CrossingTimestampNs) ProjectTouchLineCrossing(
+        TrackedBallState ball,
+        TrackedBallState? previousPrimaryBall,
+        TrackerGeometrySnapshot geometrySnapshot,
+        bool hasPreviousPoint)
+    {
+        var boundaryYMm = Math.Sign(ball.YMm) * (geometrySnapshot.FieldWidthMm / 2d);
+        if (!hasPreviousPoint || previousPrimaryBall is null || Math.Abs(ball.YMm - previousPrimaryBall.YMm) < double.Epsilon)
+        {
+            return ("touch-line", ball.XMm, boundaryYMm, ball.LastVisibleTimestampNs);
+        }
+
+        var ratio = Math.Clamp(
+            (boundaryYMm - previousPrimaryBall.YMm) / (ball.YMm - previousPrimaryBall.YMm),
+            0d,
+            1d);
+        return (
+            "touch-line",
+            previousPrimaryBall.XMm + ((ball.XMm - previousPrimaryBall.XMm) * ratio),
+            boundaryYMm,
+            InterpolateTimestamp(previousPrimaryBall.LastVisibleTimestampNs, ball.LastVisibleTimestampNs, ratio));
+    }
+
+    private static (string BoundaryName, double CrossingXMm, double CrossingYMm, long CrossingTimestampNs) ProjectGoalLineCrossing(
+        TrackedBallState ball,
+        TrackedBallState? previousPrimaryBall,
+        TrackerGeometrySnapshot geometrySnapshot,
+        bool hasPreviousPoint,
+        string boundaryName)
+    {
+        var boundaryXMm = Math.Sign(ball.XMm) * (geometrySnapshot.FieldLengthMm / 2d);
+        if (!hasPreviousPoint || previousPrimaryBall is null || Math.Abs(ball.XMm - previousPrimaryBall.XMm) < double.Epsilon)
+        {
+            return (boundaryName, boundaryXMm, ball.YMm, ball.LastVisibleTimestampNs);
+        }
+
+        var ratio = Math.Clamp(
+            (boundaryXMm - previousPrimaryBall.XMm) / (ball.XMm - previousPrimaryBall.XMm),
+            0d,
+            1d);
+        return (
+            boundaryName,
+            boundaryXMm,
+            previousPrimaryBall.YMm + ((ball.YMm - previousPrimaryBall.YMm) * ratio),
+            InterpolateTimestamp(previousPrimaryBall.LastVisibleTimestampNs, ball.LastVisibleTimestampNs, ratio));
+    }
+
+    private static long InterpolateTimestamp(long startTimestampNs, long endTimestampNs, double ratio)
+    {
+        return startTimestampNs + (long)Math.Round((endTimestampNs - startTimestampNs) * ratio);
     }
 
     private static BufferedDetection CreateBufferedDetection(SSL_DetectionFrame detection)

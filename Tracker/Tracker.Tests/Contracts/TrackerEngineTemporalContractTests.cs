@@ -1314,4 +1314,166 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal("flat", kick.KickKind);
         Assert.Equal((uint)4, kick.KickerRobotId);
     }
+
+    [Fact]
+    public void Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateGeometryPacket(
+                fieldLength: 12000,
+                fieldWidth: 9000,
+                goalWidth: 1800,
+                goalDepth: 180),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 4450, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 120, y: 4550, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var leftField = Assert.IsType<BallLeftFieldState>(committedFrame.BallLeftField);
+
+        Assert.True(leftField.IsOutOfField);
+        Assert.Equal("touch-line", leftField.BoundaryName);
+        Assert.Equal(4500, leftField.CrossingYMm, precision: 3);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.BallLeftField],
+            result.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
+    public void Update_ClassifiesGoalMouthExitAsGoalInterior()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateGeometryPacket(
+                fieldLength: 12000,
+                fieldWidth: 9000,
+                goalWidth: 1800,
+                goalDepth: 180),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 5950, y: 500, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 6050, y: 500, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var leftField = Assert.IsType<BallLeftFieldState>(committedFrame.BallLeftField);
+
+        Assert.True(leftField.IsOutOfField);
+        Assert.Equal("goal-interior", leftField.BoundaryName);
+        Assert.Equal(6000, leftField.CrossingXMm, precision: 3);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.BallLeftField],
+            result.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
+    public void Update_ClassifiesNonGoalMouthExitAsGoalLine()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateGeometryPacket(
+                fieldLength: 12000,
+                fieldWidth: 9000,
+                goalWidth: 1800,
+                goalDepth: 180),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 5950, y: 1400, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 6050, y: 1400, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var leftField = Assert.IsType<BallLeftFieldState>(committedFrame.BallLeftField);
+
+        Assert.True(leftField.IsOutOfField);
+        Assert.Equal("goal-line", leftField.BoundaryName);
+        Assert.Equal(6000, leftField.CrossingXMm, precision: 3);
+    }
+
+    [Fact]
+    public void Update_ClassifiesCornerExitByFirstPerimeterCrossing()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateGeometryPacket(
+                fieldLength: 12000,
+                fieldWidth: 9000,
+                goalWidth: 1800,
+                goalDepth: 180),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 5980, y: 4460, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 6060, y: 4510, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var leftField = Assert.IsType<BallLeftFieldState>(committedFrame.BallLeftField);
+
+        Assert.True(leftField.IsOutOfField);
+        Assert.Equal("goal-line", leftField.BoundaryName);
+        Assert.Equal(6000, leftField.CrossingXMm, precision: 3);
+        Assert.Equal(4472.5, leftField.CrossingYMm, precision: 3);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.BallLeftField],
+            result.EmittedEvents.Select(emitted => emitted.Kind));
+    }
 }
