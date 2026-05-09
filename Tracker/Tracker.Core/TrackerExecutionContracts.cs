@@ -11,6 +11,7 @@ public interface ITrackerEngine
 public sealed class TrackerEngine : ITrackerEngine
 {
     private readonly List<BufferedDetection> pendingDetections = [];
+    private readonly Dictionary<CameraRobotKey, RobotTrackState> cameraRobotTrackStates = [];
     private TrackerGeometrySnapshot? geometrySnapshot;
     private string activeProfileName = "default";
     private uint nextCommittedFrameNumber = 1;
@@ -164,6 +165,7 @@ public sealed class TrackerEngine : ITrackerEngine
 
         pendingDetections.Clear();
         maxSeenDetectionTimestampNs = null;
+        cameraRobotTrackStates.Clear();
     }
 
     private void CommitGroup(
@@ -195,16 +197,12 @@ public sealed class TrackerEngine : ITrackerEngine
                     Quality = ball.Confidence,
                 });
             }
+        }
 
-            foreach (var robot in detection.RobotsYellow)
-            {
-                robots.Add(CreateTrackedRobot(robot, TrackerTeam.Yellow));
-            }
-
-            foreach (var robot in detection.RobotsBlue)
-            {
-                robots.Add(CreateTrackedRobot(robot, TrackerTeam.Blue));
-            }
+        var observedCameraRobotKeys = UpdateCameraRobotTrackStates(orderedDetections, frameTimestampNs);
+        foreach (var robotEntry in CollectMergedRobotStates(observedCameraRobotKeys))
+        {
+            robots.Add(CreateTrackedRobot(robotEntry.Key, robotEntry.Value));
         }
 
         robots.Sort(TrackedRobotComparer.Instance);
@@ -329,18 +327,223 @@ public sealed class TrackerEngine : ITrackerEngine
         };
     }
 
-    private static TrackedRobotState CreateTrackedRobot(SSL_DetectionRobot robot, TrackerTeam team)
+    private HashSet<CameraRobotKey> UpdateCameraRobotTrackStates(
+        IReadOnlyList<BufferedDetection> orderedDetections,
+        long frameTimestampNs)
     {
+        var observations = CollectCameraRobotObservations(orderedDetections);
+        var observedKeys = observations.Keys.ToHashSet();
+
+        foreach (var entry in observations)
+        {
+            cameraRobotTrackStates[entry.Key] = CreateObservedRobotTrackState(entry.Key, entry.Value);
+        }
+
+        foreach (var existingEntry in cameraRobotTrackStates.ToList())
+        {
+            if (observedKeys.Contains(existingEntry.Key))
+            {
+                continue;
+            }
+
+            var predictedState = CreatePredictedRobotTrackState(existingEntry.Value, frameTimestampNs);
+            if (predictedState.Visibility <= 0.01f)
+            {
+                cameraRobotTrackStates.Remove(existingEntry.Key);
+                continue;
+            }
+
+            cameraRobotTrackStates[existingEntry.Key] = predictedState;
+        }
+
+        return observedKeys;
+    }
+
+    private static Dictionary<CameraRobotKey, RobotObservation> CollectCameraRobotObservations(
+        IReadOnlyList<BufferedDetection> orderedDetections)
+    {
+        var observations = new Dictionary<CameraRobotKey, RobotObservation>();
+
+        foreach (var detection in orderedDetections)
+        {
+            foreach (var robot in detection.RobotsYellow)
+            {
+                AddRobotObservation(observations, TrackerTeam.Yellow, robot, detection.CameraId, detection.EventTimestampNs);
+            }
+
+            foreach (var robot in detection.RobotsBlue)
+            {
+                AddRobotObservation(observations, TrackerTeam.Blue, robot, detection.CameraId, detection.EventTimestampNs);
+            }
+        }
+
+        return observations;
+    }
+
+    private static void AddRobotObservation(
+        Dictionary<CameraRobotKey, RobotObservation> observations,
+        TrackerTeam team,
+        SSL_DetectionRobot robot,
+        uint cameraId,
+        long eventTimestampNs)
+    {
+        observations[new CameraRobotKey(cameraId, team, robot.RobotId)] =
+            new RobotObservation(cameraId, robot.X, robot.Y, robot.Orientation, robot.Confidence)
+            {
+                EventTimestampNs = eventTimestampNs,
+            };
+    }
+
+    private RobotTrackState CreateObservedRobotTrackState(
+        CameraRobotKey key,
+        RobotObservation observation)
+    {
+        var previousState = cameraRobotTrackStates.GetValueOrDefault(key);
+        var unwrappedOrientation = UnwrapAngleNearReference(
+            observation.OrientationRad,
+            previousState?.OrientationRad ?? observation.OrientationRad);
+        var vxMmPerS = 0d;
+        var vyMmPerS = 0d;
+        var angularVelocityRadPerS = 0d;
+
+        if (previousState is not null && observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
+        {
+            var deltaSeconds = (observation.EventTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
+            vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
+            vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
+            angularVelocityRadPerS = (unwrappedOrientation - previousState.OrientationRad) / deltaSeconds;
+        }
+
+        return new RobotTrackState(
+            observation.XMm,
+            observation.YMm,
+            unwrappedOrientation,
+            observation.EventTimestampNs,
+            observation.EventTimestampNs,
+            observation.Confidence,
+            observation.Confidence,
+            vxMmPerS,
+            vyMmPerS,
+            angularVelocityRadPerS);
+    }
+
+    private static RobotTrackState CreatePredictedRobotTrackState(
+        RobotTrackState previousState,
+        long frameTimestampNs)
+    {
+        if (frameTimestampNs <= previousState.LastUpdateTimestampNs)
+        {
+            return previousState;
+        }
+
+        var deltaSeconds = (frameTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
+        var decay = Math.Pow(0.5d, deltaSeconds);
+
+        return previousState with
+        {
+            XMm = previousState.XMm + previousState.VXMmPerS * deltaSeconds,
+            YMm = previousState.YMm + previousState.VYMmPerS * deltaSeconds,
+            OrientationRad = previousState.OrientationRad + previousState.AngularVelocityRadPerS * deltaSeconds,
+            LastUpdateTimestampNs = frameTimestampNs,
+            Visibility = (float)(previousState.Visibility * decay),
+            Quality = previousState.Quality * decay,
+        };
+    }
+
+    private Dictionary<RobotKey, List<RobotTrackState>> CollectMergedRobotStates(
+        HashSet<CameraRobotKey> observedCameraRobotKeys)
+    {
+        var mergedStates = new Dictionary<RobotKey, List<RobotTrackState>>();
+
+        foreach (var entry in cameraRobotTrackStates)
+        {
+            var robotKey = new RobotKey(entry.Key.Team, entry.Key.RobotId);
+            if (!mergedStates.TryGetValue(robotKey, out var bucket))
+            {
+                bucket = [];
+                mergedStates[robotKey] = bucket;
+            }
+
+            bucket.Add(entry.Value);
+        }
+
+        foreach (var robotKey in mergedStates.Keys.ToList())
+        {
+            var freshStates = observedCameraRobotKeys
+                .Where(cameraKey => cameraKey.Team == robotKey.Team && cameraKey.RobotId == robotKey.RobotId)
+                .Select(cameraKey => cameraRobotTrackStates[cameraKey])
+                .ToList();
+            if (freshStates.Count > 0)
+            {
+                mergedStates[robotKey] = freshStates;
+            }
+        }
+
+        return mergedStates;
+    }
+
+    private static TrackedRobotState CreateTrackedRobot(
+        RobotKey key,
+        IReadOnlyList<RobotTrackState> states)
+    {
+        var totalWeight = states.Sum(state => Math.Max(0.001d, state.Visibility));
+        var mergedX = states.Sum(state => state.XMm * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var mergedY = states.Sum(state => state.YMm * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var orientationReference = states[0].OrientationRad;
+        var mergedOrientation = states
+            .Sum(state => UnwrapAngleNearReference(state.OrientationRad, orientationReference) * Math.Max(0.001d, state.Visibility))
+            / totalWeight;
+        var mergedVx = states.Sum(state => state.VXMmPerS * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var mergedVy = states.Sum(state => state.VYMmPerS * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var mergedAngularVelocity = states.Sum(state => state.AngularVelocityRadPerS * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var visibility = states.Average(state => state.Visibility);
+        var quality = states.Average(state => state.Quality);
+
         return new TrackedRobotState
         {
-            Team = team,
-            RobotId = robot.RobotId,
-            XMm = robot.X,
-            YMm = robot.Y,
-            OrientationRad = robot.Orientation,
-            Visibility = robot.Confidence,
-            Quality = robot.Confidence,
+            Team = key.Team,
+            RobotId = key.RobotId,
+            XMm = mergedX,
+            YMm = mergedY,
+            OrientationRad = NormalizeAngle(mergedOrientation),
+            VXMmPerS = mergedVx,
+            VYMmPerS = mergedVy,
+            AngularVelocityRadPerS = mergedAngularVelocity,
+            Visibility = visibility,
+            Quality = quality,
         };
+    }
+
+    private static double UnwrapAngleNearReference(double angle, double reference)
+    {
+        var adjusted = angle;
+        while (adjusted - reference > Math.PI)
+        {
+            adjusted -= Math.PI * 2;
+        }
+
+        while (adjusted - reference < -Math.PI)
+        {
+            adjusted += Math.PI * 2;
+        }
+
+        return adjusted;
+    }
+
+    private static double NormalizeAngle(double angle)
+    {
+        var normalized = angle;
+        while (normalized <= -Math.PI)
+        {
+            normalized += Math.PI * 2;
+        }
+
+        while (normalized > Math.PI)
+        {
+            normalized -= Math.PI * 2;
+        }
+
+        return normalized;
     }
 
     private static long ConvertSecondsToNanoseconds(double seconds)
@@ -360,6 +563,32 @@ public sealed class TrackerEngine : ITrackerEngine
         IReadOnlyList<SSL_DetectionBall> Balls,
         IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
         IReadOnlyList<SSL_DetectionRobot> RobotsBlue);
+
+    private sealed record RobotKey(TrackerTeam Team, uint RobotId);
+
+    private sealed record CameraRobotKey(uint CameraId, TrackerTeam Team, uint RobotId);
+
+    private sealed record RobotObservation(
+        uint CameraId,
+        double XMm,
+        double YMm,
+        double OrientationRad,
+        float Confidence)
+    {
+        public long EventTimestampNs { get; init; }
+    }
+
+    private sealed record RobotTrackState(
+        double XMm,
+        double YMm,
+        double OrientationRad,
+        long LastVisibleTimestampNs,
+        long LastUpdateTimestampNs,
+        float Visibility,
+        double Quality,
+        double VXMmPerS,
+        double VYMmPerS,
+        double AngularVelocityRadPerS);
 
     private sealed record BufferedDetectionGroup(
         long AnchorTimestampNs,

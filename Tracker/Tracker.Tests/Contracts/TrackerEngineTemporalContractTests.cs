@@ -595,4 +595,159 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal(2_000_000_000L, committedFrame.DataTimestampNs);
         Assert.Equal("fast", committedFrame.Metadata.ProfileName);
     }
+
+    [Fact]
+    public void Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 100, y: 200, orientation: 0.2f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 11,
+                cameraId: 2,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 140, y: 240, orientation: 0.4f)],
+                captureTimeSeconds: 1.010),
+            settings: settings);
+
+        var flushResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, x: 400, y: 500, orientation: 1.0f)],
+                captureTimeSeconds: 2.000),
+            settings: settings);
+
+        var mergedFrame = flushResult.CommittedFrames[0];
+        var mergedRobot = Assert.Single(mergedFrame.Robots);
+
+        Assert.Equal(TrackerTeam.Yellow, mergedRobot.Team);
+        Assert.Equal((uint)4, mergedRobot.RobotId);
+        Assert.Equal(120, mergedRobot.XMm, precision: 3);
+        Assert.Equal(220, mergedRobot.YMm, precision: 3);
+        Assert.Equal(0.3, mergedRobot.OrientationRad, precision: 3);
+    }
+
+    [Fact]
+    public void Update_TracksRobotVelocityAndUnwrappedAngularVelocityAcrossFrames()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 100, y: 200, orientation: 3.10f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 130, y: 240, orientation: -3.08f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(Assert.Single(secondResult.CommittedFrames).Robots);
+
+        Assert.Equal(300, trackedRobot.VXMmPerS, precision: 3);
+        Assert.Equal(400, trackedRobot.VYMmPerS, precision: 3);
+        Assert.InRange(trackedRobot.AngularVelocityRadPerS, 0.9, 1.2);
+    }
+
+    [Fact]
+    public void Update_KeepsRobotTrackAliveAcrossOneMissingFrameWithDecayedVisibility()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        var firstResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 100, y: 200, orientation: 0.5f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 300)],
+                captureTimeSeconds: 1.200),
+            settings: settings);
+
+        var firstRobot = Assert.Single(Assert.Single(firstResult.CommittedFrames).Robots);
+        var predictedRobot = Assert.Single(Assert.Single(secondResult.CommittedFrames).Robots);
+
+        Assert.Equal((uint)2, predictedRobot.RobotId);
+        Assert.Equal(firstRobot.XMm, predictedRobot.XMm, precision: 3);
+        Assert.Equal(firstRobot.YMm, predictedRobot.YMm, precision: 3);
+        Assert.True(predictedRobot.Visibility < firstRobot.Visibility);
+        Assert.True(predictedRobot.Visibility > 0);
+    }
+
+    [Fact]
+    public void Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 100, y: 200, orientation: 0.2f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 11,
+                cameraId: 2,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 140, y: 240, orientation: 0.4f)],
+                captureTimeSeconds: 1.010),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 8, x: 400, y: 500, orientation: 1.0f)],
+                captureTimeSeconds: 2.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 130, y: 230, orientation: 0.3f)],
+                captureTimeSeconds: 3.000),
+            settings: settings);
+
+        var flushResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 40,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 8, x: 410, y: 510, orientation: 1.1f)],
+                captureTimeSeconds: 4.000),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(
+            Assert.Single(flushResult.CommittedFrames).Robots,
+            robot => robot.Team == TrackerTeam.Yellow && robot.RobotId == 4);
+        Assert.Equal(130, trackedRobot.XMm, precision: 3);
+        Assert.Equal(230, trackedRobot.YMm, precision: 3);
+        Assert.Equal(0.3, trackedRobot.OrientationRad, precision: 3);
+    }
 }
