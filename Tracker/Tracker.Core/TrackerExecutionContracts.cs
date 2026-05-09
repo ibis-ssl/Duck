@@ -24,14 +24,42 @@ public sealed class TrackerEngine : ITrackerEngine
     {
         ArgumentNullException.ThrowIfNull(settings);
 
-        activeProfileName = settings.ProfileName;
-
+        var effectiveSettings = settings;
         var emittedEvents = new List<TrackerEvent>();
         var latePacketDropCount = 0;
+        var forceFlushBufferedGroups = false;
+
+        if (profileSwitchRequest is not null)
+        {
+            effectiveSettings = profileSwitchRequest.ResolvedBaseSettings;
+            activeProfileName = profileSwitchRequest.ProfileName;
+            ClearPendingStateAndAdvanceLateCutoff(settings.MergeWindowNs);
+            emittedEvents.Add(new TrackerEvent
+            {
+                Kind = TrackerEventKind.ProfileSwitched,
+                ProfileName = activeProfileName,
+            });
+        }
+        else
+        {
+            activeProfileName = settings.ProfileName;
+        }
 
         if (packet?.Geometry is not null)
         {
-            geometrySnapshot = CreateGeometrySnapshot(packet.Geometry);
+            var updatedGeometrySnapshot = CreateGeometrySnapshot(packet.Geometry);
+            if (ShouldResetForGeometryChange(updatedGeometrySnapshot, effectiveSettings))
+            {
+                ClearPendingStateAndAdvanceLateCutoff(effectiveSettings.MergeWindowNs);
+                emittedEvents.Add(new TrackerEvent
+                {
+                    Kind = TrackerEventKind.GeometryReset,
+                    ProfileName = activeProfileName,
+                });
+                forceFlushBufferedGroups = true;
+            }
+
+            geometrySnapshot = updatedGeometrySnapshot;
         }
 
         if (packet?.Detection is not null)
@@ -52,7 +80,7 @@ public sealed class TrackerEngine : ITrackerEngine
             }
         }
 
-        var committedFrames = FlushCommittedFrames(settings, emittedEvents);
+        var committedFrames = FlushCommittedFrames(effectiveSettings, emittedEvents, forceFlushBufferedGroups);
 
         return new TrackerUpdateResult
         {
@@ -67,22 +95,10 @@ public sealed class TrackerEngine : ITrackerEngine
 
     private List<TrackerFrame> FlushCommittedFrames(
         TrackerEngineSettings settings,
-        List<TrackerEvent> emittedEvents)
+        List<TrackerEvent> emittedEvents,
+        bool forceFlushBufferedGroups)
     {
-        if (maxSeenDetectionTimestampNs is null)
-        {
-            return [];
-        }
-
-        var flushCutoffTimestampNs = maxSeenDetectionTimestampNs.Value - settings.ReorderWindowNs;
-        var orderedDetections = pendingDetections
-            .Where(detection => detection.EventTimestampNs <= flushCutoffTimestampNs)
-            .OrderBy(detection => detection.EventTimestampNs)
-            .ThenBy(detection => detection.CameraId)
-            .ThenBy(detection => detection.SourceFrameNumber)
-            .ToList();
-
-        if (orderedDetections.Count == 0)
+        if (maxSeenDetectionTimestampNs is null || pendingDetections.Count == 0)
         {
             return [];
         }
@@ -95,11 +111,15 @@ public sealed class TrackerEngine : ITrackerEngine
                 .ToList(),
             settings.MergeWindowNs);
 
-        var flushableGroupCount = 0;
-        while (flushableGroupCount < bufferedGroups.Count
-            && bufferedGroups[flushableGroupCount].CloseTimestampNs <= flushCutoffTimestampNs)
+        var flushableGroupCount = forceFlushBufferedGroups ? bufferedGroups.Count : 0;
+        if (!forceFlushBufferedGroups)
         {
-            flushableGroupCount++;
+            var flushCutoffTimestampNs = maxSeenDetectionTimestampNs.Value - settings.ReorderWindowNs;
+            while (flushableGroupCount < bufferedGroups.Count
+                && bufferedGroups[flushableGroupCount].CloseTimestampNs <= flushCutoffTimestampNs)
+            {
+                flushableGroupCount++;
+            }
         }
 
         if (flushableGroupCount == 0)
@@ -120,6 +140,30 @@ public sealed class TrackerEngine : ITrackerEngine
         }
 
         return committedFrames;
+    }
+
+    private void ClearPendingStateAndAdvanceLateCutoff(long mergeWindowNs)
+    {
+        if (pendingDetections.Count > 0)
+        {
+            var latestBufferedGroupCloseTimestampNs = BuildDetectionGroups(
+                    pendingDetections
+                        .OrderBy(detection => detection.EventTimestampNs)
+                        .ThenBy(detection => detection.CameraId)
+                        .ThenBy(detection => detection.SourceFrameNumber)
+                        .ToList(),
+                    mergeWindowNs)
+                .Select(group => group.CloseTimestampNs)
+                .DefaultIfEmpty()
+                .Max();
+
+            lastCommittedGroupCloseTimestampNs = lastCommittedGroupCloseTimestampNs is null
+                ? latestBufferedGroupCloseTimestampNs
+                : Math.Max(lastCommittedGroupCloseTimestampNs.Value, latestBufferedGroupCloseTimestampNs);
+        }
+
+        pendingDetections.Clear();
+        maxSeenDetectionTimestampNs = null;
     }
 
     private void CommitGroup(
@@ -247,6 +291,23 @@ public sealed class TrackerEngine : ITrackerEngine
         }
 
         return groups;
+    }
+
+    private bool ShouldResetForGeometryChange(
+        TrackerGeometrySnapshot updatedGeometrySnapshot,
+        TrackerEngineSettings settings)
+    {
+        if (geometrySnapshot is null)
+        {
+            return false;
+        }
+
+        return Math.Abs(updatedGeometrySnapshot.FieldLengthMm - geometrySnapshot.FieldLengthMm)
+                >= settings.GeometryResetFieldLengthThresholdMm
+            || Math.Abs(updatedGeometrySnapshot.FieldWidthMm - geometrySnapshot.FieldWidthMm)
+                >= settings.GeometryResetFieldWidthThresholdMm
+            || updatedGeometrySnapshot.GoalWidthMm != geometrySnapshot.GoalWidthMm
+            || updatedGeometrySnapshot.GoalDepthMm != geometrySnapshot.GoalDepthMm;
     }
 
     private static TrackerGeometrySnapshot CreateGeometrySnapshot(SSL_GeometryData geometry)

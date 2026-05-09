@@ -429,18 +429,70 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_EmitsGeometryResetWhenGoalGeometryChanges()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 100_000_000,
+            mergeWindowNs: 20_000_000,
+            geometryResetFieldLengthThresholdMm: 500,
+            geometryResetFieldWidthThresholdMm: 500);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateGeometryPacket(
+                fieldLength: 9000,
+                fieldWidth: 6000,
+                goalWidth: 1800,
+                goalDepth: 180),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100)],
+                captureTimeSeconds: 1.0),
+            settings: settings);
+
+        var resetResult = engine.Update(
+            packet: new SSL_WrapperPacket
+            {
+                Geometry = TrackerContractTestData.CreateGeometryPacket(
+                    fieldLength: 9000,
+                    fieldWidth: 6000,
+                    goalWidth: 2000,
+                    goalDepth: 240).Geometry,
+                Detection = TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: 20,
+                    cameraId: 1,
+                    balls: [TrackerContractTestData.CreateBall(x: 200)],
+                    captureTimeSeconds: 2.0).Detection,
+            },
+            settings: settings);
+
+        Assert.Contains(resetResult.EmittedEvents, emitted => emitted.Kind == TrackerEventKind.GeometryReset);
+        Assert.Single(resetResult.CommittedFrames);
+        Assert.Equal(2_000_000_000L, resetResult.CommittedFrames[0].DataTimestampNs);
+    }
+
+    [Fact]
     public void Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched()
     {
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(profileName: "default");
+        var switchedSettings = fixture.CreateSettings(profileName: "fast");
 
         var result = engine.Update(
             packet: null,
             settings: settings,
-            profileSwitchRequest: fixture.CreateProfileSwitchRequest(requestVersion: 2, profileName: "fast"));
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(
+                requestVersion: 2,
+                profileName: "fast",
+                resolvedBaseSettings: switchedSettings));
 
         Assert.Empty(result.CommittedFrames);
         Assert.Equal([TrackerEventKind.ProfileSwitched], result.EmittedEvents.Select(emitted => emitted.Kind));
+        Assert.Equal("fast", result.EmittedEvents[0].ProfileName);
     }
 
     [Fact]
@@ -448,6 +500,7 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     {
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
+        var switchedSettings = fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0);
 
         var result = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -456,11 +509,15 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
                 balls: [TrackerContractTestData.CreateBall(x: 100)],
                 captureTimeSeconds: 1.0),
             settings: settings,
-            profileSwitchRequest: fixture.CreateProfileSwitchRequest(requestVersion: 3, profileName: "fast"));
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(
+                requestVersion: 3,
+                profileName: "fast",
+                resolvedBaseSettings: switchedSettings));
 
         Assert.Equal(
             [TrackerEventKind.ProfileSwitched, TrackerEventKind.WorldFrameCommitted],
             result.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
+        Assert.Equal("fast", Assert.Single(result.CommittedFrames).Metadata.ProfileName);
     }
 
     [Fact]
@@ -468,6 +525,7 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     {
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
+        var switchedSettings = fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0);
 
         var firstResult = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -484,7 +542,10 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
                 balls: [TrackerContractTestData.CreateBall(x: 200)],
                 captureTimeSeconds: 2.0),
             settings: settings,
-            profileSwitchRequest: fixture.CreateProfileSwitchRequest(requestVersion: 3, profileName: "fast"));
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(
+                requestVersion: 3,
+                profileName: "fast",
+                resolvedBaseSettings: switchedSettings));
 
         var firstCommittedFrame = Assert.Single(firstResult.CommittedFrames);
         var switchedCommittedFrame = Assert.Single(switchResult.CommittedFrames);
@@ -493,5 +554,45 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal(
             [TrackerEventKind.ProfileSwitched, TrackerEventKind.WorldFrameCommitted],
             switchResult.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
+        Assert.Equal("fast", switchedCommittedFrame.Metadata.ProfileName);
+    }
+
+    [Fact]
+    public void Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 1_500_000_000, mergeWindowNs: 20_000_000);
+        var switchedSettings = fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100)],
+                captureTimeSeconds: 1.0),
+            settings: settings);
+
+        var switchResult = engine.Update(
+            packet: null,
+            settings: settings,
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(
+                requestVersion: 4,
+                profileName: "fast",
+                resolvedBaseSettings: switchedSettings));
+
+        Assert.Empty(switchResult.CommittedFrames);
+        Assert.Equal([TrackerEventKind.ProfileSwitched], switchResult.EmittedEvents.Select(emitted => emitted.Kind));
+
+        var frameResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 200)],
+                captureTimeSeconds: 2.0),
+            settings: switchedSettings);
+
+        var committedFrame = Assert.Single(frameResult.CommittedFrames);
+        Assert.Equal(2_000_000_000L, committedFrame.DataTimestampNs);
+        Assert.Equal("fast", committedFrame.Metadata.ProfileName);
     }
 }
