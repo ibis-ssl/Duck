@@ -7,7 +7,7 @@
 - ID: TRACKER-007
 - Title: `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する
 - Phase: engine
-- Status: pending
+- Status: in_progress
 - Size: medium
 - Dependencies: TRACKER-006 が完了していること
 - Exit Criteria:
