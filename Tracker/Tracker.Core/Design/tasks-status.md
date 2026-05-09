@@ -4,14 +4,14 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-008
-- Title: robot tracking と robot merge を実装する
+- ID: TRACKER-010
+- Title: kick と contact metadata を実装する
 - Phase: engine
-- Status: done
+- Status: in_progress
 - Size: medium
-- Dependencies: TRACKER-006 が完了していること
+- Dependencies: TRACKER-007, TRACKER-008, TRACKER-009 が完了していること
 - Exit Criteria:
-  - camera-local robot track、位置/角度の別 filter、robot merge、visibility/quality が raw vision 入力から生成される。
+  - `KickEventState`、`BallContactState`、`KickDetected`、`ContactChanged` が生成され、関連契約テストが通る。
 
 ## タスク一覧
 
@@ -26,8 +26,8 @@
 | TRACKER-006 | `TrackerEngine` の reorder buffer と flush pipeline を実装する | engine | done | TRACKER-003, TRACKER-004 | event-time buffer、flush 判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本 pipeline が決定的に動作する。 |
 | TRACKER-007 | `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する | engine | done | TRACKER-006 | profile switch 要求、pending buffer clear、geometry reset、observer/event publish 順が契約どおりに動作する。 |
 | TRACKER-008 | robot tracking と robot merge を実装する | engine | done | TRACKER-006 | camera-local robot track、位置/角度の別 filter、robot merge、visibility/quality が raw vision 入力から生成される。 |
-| TRACKER-009 | ball tracking と primary/secondary ball 選定を実装する | engine | pending | TRACKER-006 | camera-local ball track、uncertainty-weighted merge、primary ball 選定、secondary ball stable sort が raw vision 入力から生成される。 |
-| TRACKER-010 | kick と contact metadata を実装する | engine | pending | TRACKER-007, TRACKER-008, TRACKER-009 | `KickEventState`、`BallContactState`、`KickDetected`、`ContactChanged` が生成され、関連契約テストが通る。 |
+| TRACKER-009 | ball tracking と primary/secondary ball 選定を実装する | engine | done | TRACKER-006 | camera-local ball track、uncertainty-weighted merge、primary ball 選定、secondary ball stable sort が raw vision 入力から生成される。 |
+| TRACKER-010 | kick と contact metadata を実装する | engine | in_progress | TRACKER-007, TRACKER-008, TRACKER-009 | `KickEventState`、`BallContactState`、`KickDetected`、`ContactChanged` が生成され、関連契約テストが通る。 |
 | TRACKER-011 | ball left field metadata を実装する | engine | pending | TRACKER-007, TRACKER-009 | `BallLeftFieldState` と `BallLeftField` event が生成され、関連契約テストが通る。 |
 | TRACKER-012 | `Tracker.Server` へ engine と packet 配信を統合する | integration | pending | TRACKER-005, TRACKER-007, TRACKER-010, TRACKER-011 | raw vision 入力が engine へ流れ、`TrackerUpdateResult` が snapshot store・observer・official packet 配信へ反映される。 |
 | TRACKER-013 | tracker/network 設定束縛を統合する | integration | pending | TRACKER-012 | tracker/network 設定が外部設定から束縛され、起動時設定が engine と publisher に反映される。 |

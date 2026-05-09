@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: engine
-- 現在のタスク: TRACKER-008
+- 現在のタスク: TRACKER-010
 - 残りフェーズ: engine, integration, ui, verification, review
 
 ## フェーズ一覧

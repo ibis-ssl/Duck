@@ -10,10 +10,16 @@ public interface ITrackerEngine
 
 public sealed class TrackerEngine : ITrackerEngine
 {
+    private const double BallTrackMatchDistanceMm = 120d;
+    private const double BallMergeDistanceMm = 120d;
     private readonly List<BufferedDetection> pendingDetections = [];
+    private readonly Dictionary<int, BallTrackState> cameraBallTrackStates = [];
+    private readonly Dictionary<int, MergedBallIdentityState> mergedBallIdentityStates = [];
     private readonly Dictionary<CameraRobotKey, RobotTrackState> cameraRobotTrackStates = [];
     private TrackerGeometrySnapshot? geometrySnapshot;
     private string activeProfileName = "default";
+    private int nextCameraBallTrackId = 1;
+    private int nextMergedBallTrackId = 1;
     private uint nextCommittedFrameNumber = 1;
     private long? maxSeenDetectionTimestampNs;
     private long? lastCommittedGroupCloseTimestampNs;
@@ -165,7 +171,11 @@ public sealed class TrackerEngine : ITrackerEngine
 
         pendingDetections.Clear();
         maxSeenDetectionTimestampNs = null;
+        cameraBallTrackStates.Clear();
+        mergedBallIdentityStates.Clear();
         cameraRobotTrackStates.Clear();
+        nextCameraBallTrackId = 1;
+        nextMergedBallTrackId = 1;
     }
 
     private void CommitGroup(
@@ -179,25 +189,13 @@ public sealed class TrackerEngine : ITrackerEngine
 
         var balls = new List<TrackedBallState>();
         var robots = new List<TrackedRobotState>();
-        var nextBallTrackId = 1;
-
-        foreach (var detection in orderedDetections)
+        var observedBallTrackIds = UpdateCameraBallTrackStates(orderedDetections, frameTimestampNs);
+        foreach (var ballEntry in AssignMergedBallIdentity(CollectMergedBallStates(observedBallTrackIds)))
         {
-            foreach (var ball in detection.Balls)
-            {
-                balls.Add(new TrackedBallState
-                {
-                    InternalTrackId = nextBallTrackId++,
-                    XMm = ball.X,
-                    YMm = ball.Y,
-                    ZMm = ball.Z,
-                    Visibility = ball.Confidence,
-                    SourceCameraIds = [detection.CameraId],
-                    LastVisibleTimestampNs = detection.EventTimestampNs,
-                    Quality = ball.Confidence,
-                });
-            }
+            balls.Add(CreateTrackedBall(ballEntry));
         }
+
+        balls.Sort(TrackedBallComparer.Instance);
 
         var observedCameraRobotKeys = UpdateCameraRobotTrackStates(orderedDetections, frameTimestampNs);
         foreach (var robotEntry in CollectMergedRobotStates(observedCameraRobotKeys))
@@ -325,6 +323,352 @@ public sealed class TrackerEngine : ITrackerEngine
                 ? field.LineThickness
                 : 10,
         };
+    }
+
+    private HashSet<int> UpdateCameraBallTrackStates(
+        IReadOnlyList<BufferedDetection> orderedDetections,
+        long frameTimestampNs)
+    {
+        var observedTrackIds = new HashSet<int>();
+
+        foreach (var cameraGroup in orderedDetections
+                     .GroupBy(detection => detection.CameraId)
+                     .OrderBy(group => group.Key))
+        {
+            var availableTracks = cameraBallTrackStates.Values
+                .Where(track => track.CameraId == cameraGroup.Key)
+                .ToDictionary(track => track.LocalTrackId);
+
+            foreach (var detection in cameraGroup.OrderBy(detection => detection.EventTimestampNs).ThenBy(detection => detection.SourceFrameNumber))
+            {
+                var claimedTrackIds = new HashSet<int>();
+                var observations = detection.Balls
+                    .Select(
+                        ball => new BallObservation(
+                            detection.CameraId,
+                            detection.EventTimestampNs,
+                            ball.X,
+                            ball.Y,
+                            ball.Z,
+                            ball.Confidence))
+                    .OrderByDescending(observation => observation.Confidence)
+                    .ToList();
+
+                foreach (var observation in observations)
+                {
+                    var matchedTrack = availableTracks.Values
+                        .Where(track => !claimedTrackIds.Contains(track.LocalTrackId))
+                        .Select(
+                            track => new
+                            {
+                                Track = track,
+                                DistanceMm = GetDistanceMm(track.XMm, track.YMm, observation.XMm, observation.YMm),
+                            })
+                        .Where(candidate => candidate.DistanceMm <= BallTrackMatchDistanceMm)
+                        .OrderBy(candidate => candidate.DistanceMm)
+                        .ThenBy(candidate => candidate.Track.LocalTrackId)
+                        .FirstOrDefault();
+
+                    BallTrackState updatedTrackState;
+                    if (matchedTrack is null)
+                    {
+                        updatedTrackState = new BallTrackState(
+                            nextCameraBallTrackId++,
+                            observation.CameraId,
+                            observation.XMm,
+                            observation.YMm,
+                            observation.ZMm,
+                            observation.EventTimestampNs,
+                            observation.EventTimestampNs,
+                            observation.Confidence,
+                            observation.Confidence,
+                            GetObservedBallUncertaintyMm(observation.Confidence),
+                            0d,
+                            0d,
+                            0d);
+                    }
+                    else
+                    {
+                        updatedTrackState = CreateObservedBallTrackState(matchedTrack.Track, observation);
+                    }
+
+                    claimedTrackIds.Add(updatedTrackState.LocalTrackId);
+                    availableTracks[updatedTrackState.LocalTrackId] = updatedTrackState;
+                    cameraBallTrackStates[updatedTrackState.LocalTrackId] = updatedTrackState;
+                    observedTrackIds.Add(updatedTrackState.LocalTrackId);
+                }
+            }
+        }
+
+        foreach (var existingEntry in cameraBallTrackStates.ToList())
+        {
+            if (observedTrackIds.Contains(existingEntry.Key))
+            {
+                continue;
+            }
+
+            var predictedState = CreatePredictedBallTrackState(existingEntry.Value, frameTimestampNs);
+            if (predictedState.Visibility <= 0.01f)
+            {
+                cameraBallTrackStates.Remove(existingEntry.Key);
+                continue;
+            }
+
+            cameraBallTrackStates[existingEntry.Key] = predictedState;
+        }
+
+        return observedTrackIds;
+    }
+
+    private static BallTrackState CreateObservedBallTrackState(
+        BallTrackState previousState,
+        BallObservation observation)
+    {
+        var vxMmPerS = previousState.VXMmPerS;
+        var vyMmPerS = previousState.VYMmPerS;
+        var vzMmPerS = previousState.VZMmPerS;
+
+        if (observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
+        {
+            var deltaSeconds = (observation.EventTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
+            vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
+            vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
+            vzMmPerS = (observation.ZMm - previousState.ZMm) / deltaSeconds;
+        }
+
+        return previousState with
+        {
+            XMm = observation.XMm,
+            YMm = observation.YMm,
+            ZMm = observation.ZMm,
+            LastVisibleTimestampNs = observation.EventTimestampNs,
+            LastUpdateTimestampNs = observation.EventTimestampNs,
+            Visibility = observation.Confidence,
+            Quality = observation.Confidence,
+            PositionUncertaintyMm = GetObservedBallUncertaintyMm(observation.Confidence),
+            VXMmPerS = vxMmPerS,
+            VYMmPerS = vyMmPerS,
+            VZMmPerS = vzMmPerS,
+        };
+    }
+
+    private static BallTrackState CreatePredictedBallTrackState(
+        BallTrackState previousState,
+        long frameTimestampNs)
+    {
+        if (frameTimestampNs <= previousState.LastUpdateTimestampNs)
+        {
+            return previousState;
+        }
+
+        var deltaSeconds = (frameTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
+        var decay = Math.Pow(0.5d, deltaSeconds);
+
+        return previousState with
+        {
+            XMm = previousState.XMm + previousState.VXMmPerS * deltaSeconds,
+            YMm = previousState.YMm + previousState.VYMmPerS * deltaSeconds,
+            ZMm = previousState.ZMm + previousState.VZMmPerS * deltaSeconds,
+            LastUpdateTimestampNs = frameTimestampNs,
+            Visibility = (float)(previousState.Visibility * decay),
+            Quality = previousState.Quality * decay,
+            PositionUncertaintyMm = previousState.PositionUncertaintyMm + (deltaSeconds * 50d),
+        };
+    }
+
+    private List<MergedBallState> CollectMergedBallStates(HashSet<int> observedBallTrackIds)
+    {
+        var freshStates = cameraBallTrackStates.Values
+            .Where(state => observedBallTrackIds.Contains(state.LocalTrackId))
+            .OrderBy(state => state.LocalTrackId)
+            .ToList();
+        var staleStates = cameraBallTrackStates.Values
+            .Where(state => !observedBallTrackIds.Contains(state.LocalTrackId))
+            .OrderBy(state => state.LocalTrackId)
+            .ToList();
+        var clusters = BuildBallClusters(freshStates);
+        var freshClusterCount = clusters.Count;
+
+        foreach (var staleState in staleStates)
+        {
+            var nearbyFreshClusterExists = clusters.Any(
+                cluster => clusters.IndexOf(cluster) < freshClusterCount
+                    && CanAttachBallTrackToCluster(cluster, staleState));
+            if (nearbyFreshClusterExists)
+            {
+                continue;
+            }
+
+            var staleCluster = clusters.FirstOrDefault(
+                cluster => CanAttachBallTrackToCluster(cluster, staleState));
+            if (staleCluster is null)
+            {
+                clusters.Add([staleState]);
+                continue;
+            }
+
+            staleCluster.Add(staleState);
+        }
+
+        var mergedStates = new List<MergedBallState>();
+        foreach (var cluster in clusters)
+        {
+            var totalWeight = cluster.Sum(state => GetBallMergeWeight(state));
+            var mergedX = cluster.Sum(state => state.XMm * GetBallMergeWeight(state)) / totalWeight;
+            var mergedY = cluster.Sum(state => state.YMm * GetBallMergeWeight(state)) / totalWeight;
+            var mergedZ = cluster.Sum(state => state.ZMm * GetBallMergeWeight(state)) / totalWeight;
+            var mergedVx = cluster.Sum(state => state.VXMmPerS * GetBallMergeWeight(state)) / totalWeight;
+            var mergedVy = cluster.Sum(state => state.VYMmPerS * GetBallMergeWeight(state)) / totalWeight;
+            var mergedVz = cluster.Sum(state => state.VZMmPerS * GetBallMergeWeight(state)) / totalWeight;
+
+            mergedStates.Add(
+                new MergedBallState(
+                    0,
+                    mergedX,
+                    mergedY,
+                    mergedZ,
+                    mergedVx,
+                    mergedVy,
+                    mergedVz,
+                    cluster.Average(state => state.Visibility),
+                    cluster.Max(state => state.LastVisibleTimestampNs),
+                    cluster.Average(state => state.Quality),
+                    cluster.Select(state => state.CameraId).Distinct().OrderBy(cameraId => cameraId).ToList()));
+        }
+
+        return mergedStates;
+    }
+
+    private static List<List<BallTrackState>> BuildBallClusters(IEnumerable<BallTrackState> states)
+    {
+        var clusters = new List<List<BallTrackState>>();
+
+        foreach (var state in states)
+        {
+            var matchingClusters = clusters
+                .Where(candidate => CanAttachBallTrackToCluster(candidate, state))
+                .ToList();
+            if (matchingClusters.Count == 0)
+            {
+                clusters.Add([state]);
+                continue;
+            }
+
+            var mergedCluster = matchingClusters[0];
+            mergedCluster.Add(state);
+
+            foreach (var extraCluster in matchingClusters.Skip(1))
+            {
+                mergedCluster.AddRange(extraCluster);
+                clusters.Remove(extraCluster);
+            }
+        }
+
+        return clusters;
+    }
+
+    private static bool CanAttachBallTrackToCluster(
+        IReadOnlyCollection<BallTrackState> cluster,
+        BallTrackState candidate)
+    {
+        return !cluster.Any(existing => existing.CameraId == candidate.CameraId)
+            && cluster.Any(
+                existing => GetDistanceMm(existing.XMm, existing.YMm, candidate.XMm, candidate.YMm) <= BallMergeDistanceMm);
+    }
+
+    private List<MergedBallState> AssignMergedBallIdentity(List<MergedBallState> mergedStates)
+    {
+        var assignedStates = new List<MergedBallState>();
+        var unmatchedPreviousStates = mergedBallIdentityStates.Values.ToDictionary(state => state.InternalTrackId);
+
+        foreach (var mergedState in mergedStates.OrderBy(state => state.XMm).ThenBy(state => state.YMm))
+        {
+            var matchedPreviousState = unmatchedPreviousStates.Values
+                .Select(
+                    previousState => new
+                    {
+                        State = previousState,
+                        DistanceMm = GetDistanceMm(
+                            GetPredictedMergedBallXMm(previousState, mergedState.LastVisibleTimestampNs),
+                            GetPredictedMergedBallYMm(previousState, mergedState.LastVisibleTimestampNs),
+                            mergedState.XMm,
+                            mergedState.YMm),
+                    })
+                .Where(candidate => candidate.DistanceMm <= BallMergeDistanceMm)
+                .OrderBy(candidate => candidate.DistanceMm)
+                .ThenBy(candidate => candidate.State.InternalTrackId)
+                .FirstOrDefault();
+
+            var internalTrackId = matchedPreviousState?.State.InternalTrackId ?? nextMergedBallTrackId++;
+            if (matchedPreviousState is not null)
+            {
+                unmatchedPreviousStates.Remove(matchedPreviousState.State.InternalTrackId);
+            }
+
+            assignedStates.Add(mergedState with { InternalTrackId = internalTrackId });
+        }
+
+        mergedBallIdentityStates.Clear();
+        foreach (var assignedState in assignedStates)
+        {
+            mergedBallIdentityStates[assignedState.InternalTrackId] = new MergedBallIdentityState(
+                assignedState.InternalTrackId,
+                assignedState.XMm,
+                assignedState.YMm,
+                assignedState.VXMmPerS,
+                assignedState.VYMmPerS,
+                assignedState.LastVisibleTimestampNs);
+        }
+
+        return assignedStates;
+    }
+
+    private static double GetPredictedMergedBallXMm(MergedBallIdentityState state, long targetTimestampNs)
+    {
+        return state.XMm + (state.VXMmPerS * GetPredictionDeltaSeconds(state.LastVisibleTimestampNs, targetTimestampNs));
+    }
+
+    private static double GetPredictedMergedBallYMm(MergedBallIdentityState state, long targetTimestampNs)
+    {
+        return state.YMm + (state.VYMmPerS * GetPredictionDeltaSeconds(state.LastVisibleTimestampNs, targetTimestampNs));
+    }
+
+    private static double GetPredictionDeltaSeconds(long sourceTimestampNs, long targetTimestampNs)
+    {
+        if (targetTimestampNs <= sourceTimestampNs)
+        {
+            return 0d;
+        }
+
+        return (targetTimestampNs - sourceTimestampNs) / 1_000_000_000d;
+    }
+
+    private static TrackedBallState CreateTrackedBall(MergedBallState state)
+    {
+        return new TrackedBallState
+        {
+            InternalTrackId = state.InternalTrackId,
+            XMm = state.XMm,
+            YMm = state.YMm,
+            ZMm = state.ZMm,
+            VXMmPerS = state.VXMmPerS,
+            VYMmPerS = state.VYMmPerS,
+            VZMmPerS = state.VZMmPerS,
+            Visibility = state.Visibility,
+            SourceCameraIds = state.SourceCameraIds,
+            LastVisibleTimestampNs = state.LastVisibleTimestampNs,
+            Quality = state.Quality,
+        };
+    }
+
+    private static double GetObservedBallUncertaintyMm(float confidence)
+    {
+        return 1d / Math.Max(0.001d, confidence);
+    }
+
+    private static double GetBallMergeWeight(BallTrackState state)
+    {
+        return 1d / Math.Max(0.001d, state.PositionUncertaintyMm);
     }
 
     private HashSet<CameraRobotKey> UpdateCameraRobotTrackStates(
@@ -546,6 +890,11 @@ public sealed class TrackerEngine : ITrackerEngine
         return normalized;
     }
 
+    private static double GetDistanceMm(double x1, double y1, double x2, double y2)
+    {
+        return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+    }
+
     private static long ConvertSecondsToNanoseconds(double seconds)
     {
         return (long)Math.Round(seconds * 1_000_000_000d, MidpointRounding.AwayFromZero);
@@ -563,6 +912,50 @@ public sealed class TrackerEngine : ITrackerEngine
         IReadOnlyList<SSL_DetectionBall> Balls,
         IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
         IReadOnlyList<SSL_DetectionRobot> RobotsBlue);
+
+    private sealed record BallObservation(
+        uint CameraId,
+        long EventTimestampNs,
+        double XMm,
+        double YMm,
+        double ZMm,
+        float Confidence);
+
+    private sealed record BallTrackState(
+        int LocalTrackId,
+        uint CameraId,
+        double XMm,
+        double YMm,
+        double ZMm,
+        long LastVisibleTimestampNs,
+        long LastUpdateTimestampNs,
+        float Visibility,
+        double Quality,
+        double PositionUncertaintyMm,
+        double VXMmPerS,
+        double VYMmPerS,
+        double VZMmPerS);
+
+    private sealed record MergedBallState(
+        int InternalTrackId,
+        double XMm,
+        double YMm,
+        double ZMm,
+        double VXMmPerS,
+        double VYMmPerS,
+        double VZMmPerS,
+        float Visibility,
+        long LastVisibleTimestampNs,
+        double Quality,
+        IReadOnlyList<uint> SourceCameraIds);
+
+    private sealed record MergedBallIdentityState(
+        int InternalTrackId,
+        double XMm,
+        double YMm,
+        double VXMmPerS,
+        double VYMmPerS,
+        long LastVisibleTimestampNs);
 
     private sealed record RobotKey(TrackerTeam Team, uint RobotId);
 
@@ -594,6 +987,43 @@ public sealed class TrackerEngine : ITrackerEngine
         long AnchorTimestampNs,
         long CloseTimestampNs,
         IReadOnlyList<BufferedDetection> Detections);
+
+    private sealed class TrackedBallComparer : IComparer<TrackedBallState>
+    {
+        public static TrackedBallComparer Instance { get; } = new();
+
+        public int Compare(TrackedBallState? x, TrackedBallState? y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return 0;
+            }
+
+            if (x is null)
+            {
+                return -1;
+            }
+
+            if (y is null)
+            {
+                return 1;
+            }
+
+            var visibilityComparison = y.Visibility.CompareTo(x.Visibility);
+            if (visibilityComparison != 0)
+            {
+                return visibilityComparison;
+            }
+
+            var timestampComparison = y.LastVisibleTimestampNs.CompareTo(x.LastVisibleTimestampNs);
+            if (timestampComparison != 0)
+            {
+                return timestampComparison;
+            }
+
+            return x.InternalTrackId.CompareTo(y.InternalTrackId);
+        }
+    }
 
     private sealed class TrackedRobotComparer : IComparer<TrackedRobotState>
     {
