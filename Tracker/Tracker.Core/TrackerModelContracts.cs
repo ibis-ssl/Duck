@@ -8,7 +8,7 @@ public sealed class TrackerFrame
 
     public long ProcessedAtNs { get; init; }
 
-    public object? GeometrySnapshot { get; init; }
+    public TrackerGeometrySnapshot? GeometrySnapshot { get; init; }
 
     public IReadOnlyList<TrackedBallState> Balls { get; init; } = [];
 
@@ -18,11 +18,28 @@ public sealed class TrackerFrame
 
     public KickEventState? KickedBall { get; init; }
 
-    public object? LatestContact { get; init; }
+    public BallContactState? LatestContact { get; init; }
 
     public BallLeftFieldState? BallLeftField { get; init; }
 
     public TrackerFrameMetadata Metadata { get; init; } = new();
+}
+
+public sealed class TrackerGeometrySnapshot
+{
+    public int FieldLengthMm { get; init; }
+
+    public int FieldWidthMm { get; init; }
+
+    public int GoalWidthMm { get; init; }
+
+    public int GoalDepthMm { get; init; }
+
+    public int BoundaryWidthMm { get; init; }
+
+    public int BoundaryWidthGoalLineMm { get; init; }
+
+    public int LineThicknessMm { get; init; }
 }
 
 public sealed class TrackedBallState
@@ -108,6 +125,21 @@ public sealed class KickEventState
     public string? KickKind { get; init; }
 
     public bool IsStillMoving { get; init; }
+}
+
+public sealed class BallContactState
+{
+    public bool IsInContact { get; init; }
+
+    public uint? ContactingRobotId { get; init; }
+
+    public TrackerTeam ContactingTeam { get; init; }
+
+    public uint? LastRobotId { get; init; }
+
+    public TrackerTeam LastTeam { get; init; }
+
+    public long LastContactTimestampNs { get; init; }
 }
 
 public sealed class BallLeftFieldState

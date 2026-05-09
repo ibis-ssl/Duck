@@ -34,6 +34,57 @@ public sealed class TrackerEngineSettings
 
 public sealed class TrackerRuntimeOverrides
 {
+    public TrackerPublishOverrides Publish { get; init; } = new();
+
+    public TrackerRobotTrackerOverrides RobotTracker { get; init; } = new();
+
+    public TrackerBallTrackerOverrides BallTracker { get; init; } = new();
+
+    public TrackerKickDetectorOverrides KickDetector { get; init; } = new();
+}
+
+public sealed class TrackerPublishOverrides
+{
+    public string? MulticastAddress { get; init; }
+
+    public int? Port { get; init; }
+
+    public string? SourceName { get; init; }
+
+    public string? Uuid { get; init; }
+}
+
+public sealed class TrackerRobotTrackerOverrides
+{
+    public double? ProcessNoise { get; init; }
+
+    public double? MeasurementNoise { get; init; }
+
+    public double? Gate { get; init; }
+
+    public double? OutlierLimitMm { get; init; }
+}
+
+public sealed class TrackerBallTrackerOverrides
+{
+    public double? ProcessNoise { get; init; }
+
+    public double? MeasurementNoise { get; init; }
+
+    public double? Gate { get; init; }
+
+    public double? OutlierLimitMm { get; init; }
+
+    public long? TrackLifetimeNs { get; init; }
+}
+
+public sealed class TrackerKickDetectorOverrides
+{
+    public double? KickSpeedThresholdMmPerS { get; init; }
+
+    public double? ChipHeightThresholdMm { get; init; }
+
+    public double? ContactMarginMm { get; init; }
 }
 
 public sealed class TrackerProfileSwitchRequest
