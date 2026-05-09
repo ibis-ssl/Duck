@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: contracts
-- 現在のタスク: TRACKER-005
+- 現在のタスク: TRACKER-006
 - 残りフェーズ: engine, integration, ui, verification, review
 
 ## フェーズ一覧

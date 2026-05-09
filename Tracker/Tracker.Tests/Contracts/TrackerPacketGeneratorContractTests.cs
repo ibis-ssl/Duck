@@ -119,6 +119,45 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
     }
 
     [Fact]
+    public void Generate_EmitsRobotsInStableTeamAndIdOrder()
+    {
+        var frame = fixture.CreateFrame(
+            robots:
+            [
+                new TrackedRobotState { Team = TrackerTeam.Blue, RobotId = 2, XMm = 200, YMm = 200 },
+                new TrackedRobotState { Team = TrackerTeam.Yellow, RobotId = 5, XMm = 500, YMm = 500 },
+                new TrackedRobotState { Team = TrackerTeam.Blue, RobotId = 1, XMm = 100, YMm = 100 },
+                new TrackedRobotState { Team = TrackerTeam.Yellow, RobotId = 3, XMm = 300, YMm = 300 },
+            ]);
+
+        var packet = fixture.CreatePacketGenerator().Generate(frame);
+        var trackedFrame = AssertTrackedFrame(packet);
+
+        Assert.Collection(
+            trackedFrame.Robots,
+            robot =>
+            {
+                Assert.Equal(Team.Yellow, robot.RobotId.Team);
+                Assert.Equal((uint)3, robot.RobotId.Id);
+            },
+            robot =>
+            {
+                Assert.Equal(Team.Yellow, robot.RobotId.Team);
+                Assert.Equal((uint)5, robot.RobotId.Id);
+            },
+            robot =>
+            {
+                Assert.Equal(Team.Blue, robot.RobotId.Team);
+                Assert.Equal((uint)1, robot.RobotId.Id);
+            },
+            robot =>
+            {
+                Assert.Equal(Team.Blue, robot.RobotId.Team);
+                Assert.Equal((uint)2, robot.RobotId.Id);
+            });
+    }
+
+    [Fact]
     public void Generate_EmitsExpectedCapabilitiesInStableOrder()
     {
         var frame = fixture.CreateFrame(
