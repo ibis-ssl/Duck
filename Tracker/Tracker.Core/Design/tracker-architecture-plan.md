@@ -980,28 +980,41 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 ## タスク分割方針
 
 - `TRACKER-000`: 設計書と進捗管理ファイル作成
-- `TRACKER-001`: `Tracker.Core` の契約テスト追加
-- `TRACKER-002`: `Tracker.Core` の内部モデル、settings 契約、packet generator 実装
-- `TRACKER-003`: `TrackerEngine` の初期実装
-- `TRACKER-004`: `Tracker.Server` への host 統合と settings 外出し
-- `TRACKER-005`: tracked viewer、raw/tracked toggle、設定セット切替と runtime settings UI 下地
-- `TRACKER-006`: 検証とレビュー
+- `TRACKER-001`: `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る
+- `TRACKER-002`: packet generator の契約テストを追加する
+- `TRACKER-003`: engine の時系列契約テストを追加する
+- `TRACKER-004`: `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する
+- `TRACKER-005`: `TrackerPacketGenerator` を実装する
+- `TRACKER-006`: `TrackerEngine` の reorder buffer と flush pipeline を実装する
+- `TRACKER-007`: `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する
+- `TRACKER-008`: robot tracking と robot merge を実装する
+- `TRACKER-009`: ball tracking と primary/secondary ball 選定を実装する
+- `TRACKER-010`: kick と contact metadata を実装する
+- `TRACKER-011`: ball left field metadata を実装する
+- `TRACKER-012`: `Tracker.Server` へ engine と packet 配信を統合する
+- `TRACKER-013`: tracker/network 設定束縛を統合する
+- `TRACKER-014`: profile 切替要求経路を統合する
+- `TRACKER-015`: tracked viewer と raw/tracked toggle を追加する
+- `TRACKER-016`: tracked diagnostics 表示を追加する
+- `TRACKER-017`: runtime profile 表示・操作 UI を追加する
+- `TRACKER-018`: Tracker v1 の build/test 証跡を取得する
+- `TRACKER-019`: Tracker v1 の integration 観点検証を行う
+- `TRACKER-020`: Tracker v1 の最終レビューと追跡ファイル同期を行う
 
-`TRACKER-001` 着手時の順序:
+contracts フェーズの着手順:
 
-1. `Tracker.Tests` に `Tracker.Core` 参照を追加する
-2. packet generator の失敗テストを先に書く
-3. engine の geometry 更新テストを書く
-4. robot 速度推定テストを書く
-5. 複数 ball 保持テストを書く
+1. `TRACKER-001` で `Tracker.Tests` から `Tracker.Core` を参照し、shared fixture と test data 基盤を整える
+2. `TRACKER-002` で packet generator の失敗契約テストを固定する
+3. `TRACKER-003` で engine の時系列契約テストを固定する
+4. `TRACKER-004` で内部モデル・state 型・observer/event 契約を固定する
+5. `TRACKER-005` で packet generator 実装へ進む
 
 ## 承認ゲート
 
-この設計書の承認を得るまでは次に進まない。
+`TRACKER-000` の設計承認は完了済みであり、以後はこの設計書を正本として contracts フェーズ以降を進める。
 
-- `TRACKER-001` 以降の TDD と実装には着手しない
-- 承認後に失敗テストを追加する
-- 仕様変更があれば先にこの設計書を更新する
+- 仕様変更や task 再分割があれば先にこの設計書と tracking files を同期する
+- contracts フェーズでは failing test と契約 surface を先に固定する
 
 ## 前提
 

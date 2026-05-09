@@ -3,13 +3,20 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
-public class TrackerEngineTemporalContractTests
+public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractFixture>
 {
+    private readonly TrackerContractFixture fixture;
+
+    public TrackerEngineTemporalContractTests(TrackerContractFixture fixture)
+    {
+        this.fixture = fixture;
+    }
+
     [Fact]
     public void Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(reorderWindowNs: 100_000_000, mergeWindowNs: 20_000_000);
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 100_000_000, mergeWindowNs: 20_000_000);
 
         _ = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -44,8 +51,8 @@ public class TrackerEngineTemporalContractTests
     [Fact]
     public void Update_SplitsFrames_WhenObservationsExceedMergeWindow()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 10_000_000);
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 10_000_000);
 
         _ = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -80,8 +87,8 @@ public class TrackerEngineTemporalContractTests
     [Fact]
     public void Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(reorderWindowNs: 100_000_000, mergeWindowNs: 20_000_000);
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 100_000_000, mergeWindowNs: 20_000_000);
 
         var firstResult = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -114,8 +121,8 @@ public class TrackerEngineTemporalContractTests
     [Fact]
     public void Update_DropsLatePacketsAndRecordsDiagnostics()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
         _ = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -148,8 +155,8 @@ public class TrackerEngineTemporalContractTests
     [Fact]
     public void Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
             reorderWindowNs: 100_000_000,
             mergeWindowNs: 20_000_000,
             geometryResetFieldLengthThresholdMm: 100,
@@ -187,13 +194,13 @@ public class TrackerEngineTemporalContractTests
     [Fact]
     public void Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(profileName: "default");
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(profileName: "default");
 
         var result = engine.Update(
             packet: null,
             settings: settings,
-            profileSwitchRequest: CreateProfileSwitchRequest(requestVersion: 2, profileName: "fast"));
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(requestVersion: 2, profileName: "fast"));
 
         Assert.Empty(result.CommittedFrames);
         Assert.Equal([TrackerEventKind.ProfileSwitched], result.EmittedEvents.Select(emitted => emitted.Kind));
@@ -202,8 +209,8 @@ public class TrackerEngineTemporalContractTests
     [Fact]
     public void Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult()
     {
-        var engine = CreateEngine();
-        var settings = CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
 
         var result = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -212,43 +219,10 @@ public class TrackerEngineTemporalContractTests
                 balls: [TrackerContractTestData.CreateBall(x: 100)],
                 captureTimeSeconds: 1.0),
             settings: settings,
-            profileSwitchRequest: CreateProfileSwitchRequest(requestVersion: 3, profileName: "fast"));
+            profileSwitchRequest: fixture.CreateProfileSwitchRequest(requestVersion: 3, profileName: "fast"));
 
         Assert.Equal(
             [TrackerEventKind.ProfileSwitched, TrackerEventKind.WorldFrameCommitted],
             result.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
-    }
-
-    private static ITrackerEngine CreateEngine()
-    {
-        return new TrackerEngine();
-    }
-
-    private static TrackerEngineSettings CreateSettings(
-        string profileName = "default",
-        long reorderWindowNs = 100_000_000,
-        long mergeWindowNs = 20_000_000,
-        int geometryResetFieldLengthThresholdMm = 500,
-        int geometryResetFieldWidthThresholdMm = 500)
-    {
-        return new TrackerEngineSettings
-        {
-            ProfileName = profileName,
-            ReorderWindowNs = reorderWindowNs,
-            MergeWindowNs = mergeWindowNs,
-            GeometryResetFieldLengthThresholdMm = geometryResetFieldLengthThresholdMm,
-            GeometryResetFieldWidthThresholdMm = geometryResetFieldWidthThresholdMm,
-        };
-    }
-
-    private static TrackerProfileSwitchRequest CreateProfileSwitchRequest(int requestVersion, string profileName)
-    {
-        return new TrackerProfileSwitchRequest
-        {
-            RequestVersion = requestVersion,
-            ProfileName = profileName,
-            ResolvedBaseSettings = CreateSettings(profileName: profileName),
-            RuntimeOverrides = new TrackerRuntimeOverrides(),
-        };
     }
 }
