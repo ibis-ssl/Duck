@@ -10,12 +10,330 @@ public interface ITrackerEngine
 
 public sealed class TrackerEngine : ITrackerEngine
 {
+    private readonly List<BufferedDetection> pendingDetections = [];
+    private TrackerGeometrySnapshot? geometrySnapshot;
+    private string activeProfileName = "default";
+    private uint nextCommittedFrameNumber = 1;
+    private long? maxSeenDetectionTimestampNs;
+    private long? lastCommittedGroupCloseTimestampNs;
+
     public TrackerUpdateResult Update(
         SSL_WrapperPacket? packet,
         TrackerEngineSettings settings,
         TrackerProfileSwitchRequest? profileSwitchRequest = null)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(settings);
+
+        activeProfileName = settings.ProfileName;
+
+        var emittedEvents = new List<TrackerEvent>();
+        var latePacketDropCount = 0;
+
+        if (packet?.Geometry is not null)
+        {
+            geometrySnapshot = CreateGeometrySnapshot(packet.Geometry);
+        }
+
+        if (packet?.Detection is not null)
+        {
+            var bufferedDetection = CreateBufferedDetection(packet.Detection);
+
+            if (lastCommittedGroupCloseTimestampNs is not null
+                && bufferedDetection.EventTimestampNs <= lastCommittedGroupCloseTimestampNs.Value)
+            {
+                latePacketDropCount++;
+            }
+            else
+            {
+                pendingDetections.Add(bufferedDetection);
+                maxSeenDetectionTimestampNs = maxSeenDetectionTimestampNs is null
+                    ? bufferedDetection.EventTimestampNs
+                    : Math.Max(maxSeenDetectionTimestampNs.Value, bufferedDetection.EventTimestampNs);
+            }
+        }
+
+        var committedFrames = FlushCommittedFrames(settings, emittedEvents);
+
+        return new TrackerUpdateResult
+        {
+            CommittedFrames = committedFrames,
+            EmittedEvents = emittedEvents,
+            Diagnostics = new TrackerEngineDiagnostics
+            {
+                LatePacketDropCount = latePacketDropCount,
+            },
+        };
+    }
+
+    private List<TrackerFrame> FlushCommittedFrames(
+        TrackerEngineSettings settings,
+        List<TrackerEvent> emittedEvents)
+    {
+        if (maxSeenDetectionTimestampNs is null)
+        {
+            return [];
+        }
+
+        var flushCutoffTimestampNs = maxSeenDetectionTimestampNs.Value - settings.ReorderWindowNs;
+        var orderedDetections = pendingDetections
+            .Where(detection => detection.EventTimestampNs <= flushCutoffTimestampNs)
+            .OrderBy(detection => detection.EventTimestampNs)
+            .ThenBy(detection => detection.CameraId)
+            .ThenBy(detection => detection.SourceFrameNumber)
+            .ToList();
+
+        if (orderedDetections.Count == 0)
+        {
+            return [];
+        }
+
+        var bufferedGroups = BuildDetectionGroups(
+            pendingDetections
+                .OrderBy(detection => detection.EventTimestampNs)
+                .ThenBy(detection => detection.CameraId)
+                .ThenBy(detection => detection.SourceFrameNumber)
+                .ToList(),
+            settings.MergeWindowNs);
+
+        var flushableGroupCount = 0;
+        while (flushableGroupCount < bufferedGroups.Count
+            && bufferedGroups[flushableGroupCount].CloseTimestampNs <= flushCutoffTimestampNs)
+        {
+            flushableGroupCount++;
+        }
+
+        if (flushableGroupCount == 0)
+        {
+            return [];
+        }
+
+        pendingDetections.Clear();
+        foreach (var group in bufferedGroups.Skip(flushableGroupCount))
+        {
+            pendingDetections.AddRange(group.Detections);
+        }
+
+        var committedFrames = new List<TrackerFrame>();
+        foreach (var group in bufferedGroups.Take(flushableGroupCount))
+        {
+            CommitGroup(group, committedFrames, emittedEvents);
+        }
+
+        return committedFrames;
+    }
+
+    private void CommitGroup(
+        BufferedDetectionGroup group,
+        List<TrackerFrame> committedFrames,
+        List<TrackerEvent> emittedEvents)
+    {
+        var orderedDetections = group.Detections;
+        var frameTimestampNs = group.AnchorTimestampNs;
+        var processedAtNs = GetCurrentUnixTimeNanoseconds();
+
+        var balls = new List<TrackedBallState>();
+        var robots = new List<TrackedRobotState>();
+        var nextBallTrackId = 1;
+
+        foreach (var detection in orderedDetections)
+        {
+            foreach (var ball in detection.Balls)
+            {
+                balls.Add(new TrackedBallState
+                {
+                    InternalTrackId = nextBallTrackId++,
+                    XMm = ball.X,
+                    YMm = ball.Y,
+                    ZMm = ball.Z,
+                    Visibility = ball.Confidence,
+                    SourceCameraIds = [detection.CameraId],
+                    LastVisibleTimestampNs = detection.EventTimestampNs,
+                    Quality = ball.Confidence,
+                });
+            }
+
+            foreach (var robot in detection.RobotsYellow)
+            {
+                robots.Add(CreateTrackedRobot(robot, TrackerTeam.Yellow));
+            }
+
+            foreach (var robot in detection.RobotsBlue)
+            {
+                robots.Add(CreateTrackedRobot(robot, TrackerTeam.Blue));
+            }
+        }
+
+        robots.Sort(TrackedRobotComparer.Instance);
+
+        var committedFrame = new TrackerFrame
+        {
+            FrameNumber = nextCommittedFrameNumber++,
+            DataTimestampNs = frameTimestampNs,
+            ProcessedAtNs = processedAtNs,
+            GeometrySnapshot = geometrySnapshot,
+            Balls = balls,
+            PrimaryBallTrackId = balls.Count > 0 ? balls[0].InternalTrackId : null,
+            Robots = robots,
+            Metadata = new TrackerFrameMetadata
+            {
+                ProfileName = activeProfileName,
+            },
+        };
+
+        committedFrames.Add(committedFrame);
+        emittedEvents.Add(new TrackerEvent
+        {
+            Kind = TrackerEventKind.WorldFrameCommitted,
+            FrameNumber = committedFrame.FrameNumber,
+            ProfileName = activeProfileName,
+        });
+
+        lastCommittedGroupCloseTimestampNs = group.CloseTimestampNs;
+    }
+
+    private static BufferedDetection CreateBufferedDetection(SSL_DetectionFrame detection)
+    {
+        return new BufferedDetection(
+            detection.FrameNumber,
+            detection.CameraId,
+            ConvertSecondsToNanoseconds(SelectEventTimeSeconds(detection)),
+            detection.Balls.ToList(),
+            detection.RobotsYellow.ToList(),
+            detection.RobotsBlue.ToList());
+    }
+
+    private static double SelectEventTimeSeconds(SSL_DetectionFrame detection)
+    {
+        return detection.TCapture > 0 ? detection.TCapture : detection.TSent;
+    }
+
+    private static List<BufferedDetectionGroup> BuildDetectionGroups(
+        List<BufferedDetection> orderedDetections,
+        long mergeWindowNs)
+    {
+        var groups = new List<BufferedDetectionGroup>();
+        var currentGroup = new List<BufferedDetection>();
+        var currentAnchorTimestampNs = 0L;
+
+        foreach (var detection in orderedDetections)
+        {
+            if (currentGroup.Count == 0)
+            {
+                currentGroup.Add(detection);
+                currentAnchorTimestampNs = detection.EventTimestampNs;
+                continue;
+            }
+
+            if (detection.EventTimestampNs - currentAnchorTimestampNs <= mergeWindowNs)
+            {
+                currentGroup.Add(detection);
+                continue;
+            }
+
+            groups.Add(new BufferedDetectionGroup(
+                currentAnchorTimestampNs,
+                currentAnchorTimestampNs + mergeWindowNs,
+                [.. currentGroup]));
+            currentGroup = [detection];
+            currentAnchorTimestampNs = detection.EventTimestampNs;
+        }
+
+        if (currentGroup.Count > 0)
+        {
+            groups.Add(new BufferedDetectionGroup(
+                currentAnchorTimestampNs,
+                currentAnchorTimestampNs + mergeWindowNs,
+                [.. currentGroup]));
+        }
+
+        return groups;
+    }
+
+    private static TrackerGeometrySnapshot CreateGeometrySnapshot(SSL_GeometryData geometry)
+    {
+        var field = geometry.Field;
+        return new TrackerGeometrySnapshot
+        {
+            FieldLengthMm = field?.FieldLength ?? 0,
+            FieldWidthMm = field?.FieldWidth ?? 0,
+            GoalWidthMm = field?.GoalWidth ?? 0,
+            GoalDepthMm = field?.GoalDepth ?? 0,
+            BoundaryWidthMm = field?.BoundaryWidth ?? 0,
+            BoundaryWidthGoalLineMm = field is not null && field.BoundaryWidthGoalLine > 0
+                ? field.BoundaryWidthGoalLine
+                : field?.BoundaryWidth ?? 0,
+            LineThicknessMm = field is not null && field.LineThickness > 0
+                ? field.LineThickness
+                : 10,
+        };
+    }
+
+    private static TrackedRobotState CreateTrackedRobot(SSL_DetectionRobot robot, TrackerTeam team)
+    {
+        return new TrackedRobotState
+        {
+            Team = team,
+            RobotId = robot.RobotId,
+            XMm = robot.X,
+            YMm = robot.Y,
+            OrientationRad = robot.Orientation,
+            Visibility = robot.Confidence,
+            Quality = robot.Confidence,
+        };
+    }
+
+    private static long ConvertSecondsToNanoseconds(double seconds)
+    {
+        return (long)Math.Round(seconds * 1_000_000_000d, MidpointRounding.AwayFromZero);
+    }
+
+    private static long GetCurrentUnixTimeNanoseconds()
+    {
+        return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 1_000_000L;
+    }
+
+    private sealed record BufferedDetection(
+        uint SourceFrameNumber,
+        uint CameraId,
+        long EventTimestampNs,
+        IReadOnlyList<SSL_DetectionBall> Balls,
+        IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
+        IReadOnlyList<SSL_DetectionRobot> RobotsBlue);
+
+    private sealed record BufferedDetectionGroup(
+        long AnchorTimestampNs,
+        long CloseTimestampNs,
+        IReadOnlyList<BufferedDetection> Detections);
+
+    private sealed class TrackedRobotComparer : IComparer<TrackedRobotState>
+    {
+        public static TrackedRobotComparer Instance { get; } = new();
+
+        public int Compare(TrackedRobotState? x, TrackedRobotState? y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return 0;
+            }
+
+            if (x is null)
+            {
+                return -1;
+            }
+
+            if (y is null)
+            {
+                return 1;
+            }
+
+            var teamComparison = x.Team.CompareTo(y.Team);
+            if (teamComparison != 0)
+            {
+                return teamComparison;
+            }
+
+            return x.RobotId.CompareTo(y.RobotId);
+        }
     }
 }
 

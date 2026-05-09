@@ -77,7 +77,9 @@ public static class TrackerContractTestData
         int fieldWidth = 9000,
         int goalWidth = 1800,
         int goalDepth = 180,
-        int boundaryWidth = 300)
+        int boundaryWidth = 300,
+        int boundaryWidthGoalLine = 300,
+        int lineThickness = 10)
     {
         return new SSL_WrapperPacket
         {
@@ -90,6 +92,8 @@ public static class TrackerContractTestData
                     GoalWidth = goalWidth,
                     GoalDepth = goalDepth,
                     BoundaryWidth = boundaryWidth,
+                    BoundaryWidthGoalLine = boundaryWidthGoalLine,
+                    LineThickness = lineThickness,
                 },
             },
         };
