@@ -1,13 +1,16 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using Google.Protobuf;
 using Microsoft.Extensions.Options;
+using Tracker.Server.Tracking;
 
 namespace Tracker.Server.Vision;
 
 public sealed class VisionReceiverService(
     IOptions<VisionReceiverOptions> options,
     VisionPacketStore store,
+    TrackerCoordinator trackerCoordinator,
     ILogger<VisionReceiverService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -55,7 +58,21 @@ public sealed class VisionReceiverService(
                 try
                 {
                     var result = await udpClient.ReceiveAsync(stoppingToken);
-                    store.StoreDatagram(result.Buffer, result.RemoteEndPoint, DateTimeOffset.UtcNow);
+                    var receivedAt = DateTimeOffset.UtcNow;
+                    SSL_WrapperPacket packet;
+                    try
+                    {
+                        packet = SSL_WrapperPacket.Parser.ParseFrom(result.Buffer);
+                    }
+                    catch (InvalidProtocolBufferException ex)
+                    {
+                        store.RecordDecodeError(ex);
+                        logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
+                        continue;
+                    }
+
+                    store.StorePacket(packet, result.RemoteEndPoint, receivedAt);
+                    trackerCoordinator.ProcessPacket(packet, receivedAt);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {

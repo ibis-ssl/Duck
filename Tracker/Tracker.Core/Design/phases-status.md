@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: integration
-- 現在のタスク: TRACKER-012
+- 現在のタスク: TRACKER-013
 - 残りフェーズ: integration, ui, verification, review
 
 ## フェーズ一覧

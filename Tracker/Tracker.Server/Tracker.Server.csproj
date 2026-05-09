@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
   </ItemGroup>
 
