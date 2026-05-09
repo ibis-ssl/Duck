@@ -47,6 +47,30 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
     }
 
     [Fact]
+    public void Generate_WhenSecondaryBallsTieOnVisibilityAndTimestamp_UsesInternalTrackIdAsFinalTieBreaker()
+    {
+        var frame = fixture.CreateFrame(
+            balls:
+            [
+                fixture.CreateTrackedBall(trackId: 40, xMm: 400, yMm: 400, visibility: 0.50f, lastVisibleTimestampNs: 5_000),
+                fixture.CreateTrackedBall(trackId: 30, xMm: 300, yMm: 300, visibility: 0.80f, lastVisibleTimestampNs: 7_000),
+                fixture.CreateTrackedBall(trackId: 10, xMm: 100, yMm: 100, visibility: 0.80f, lastVisibleTimestampNs: 7_000),
+                fixture.CreateTrackedBall(trackId: 20, xMm: 200, yMm: 200, visibility: 0.80f, lastVisibleTimestampNs: 7_000),
+            ],
+            primaryBallTrackId: 40);
+
+        var packet = fixture.CreatePacketGenerator().Generate(frame);
+        var trackedFrame = AssertTrackedFrame(packet);
+
+        Assert.Collection(
+            trackedFrame.Balls,
+            ball => Assert.Equal(0.4f, ball.Pos.X, 3),
+            ball => Assert.Equal(0.1f, ball.Pos.X, 3),
+            ball => Assert.Equal(0.2f, ball.Pos.X, 3),
+            ball => Assert.Equal(0.3f, ball.Pos.X, 3));
+    }
+
+    [Fact]
     public void Generate_ConvertsInternalUnitsAndUsesFrameDataTimestamp()
     {
         var frame = fixture.CreateFrame(
@@ -78,6 +102,23 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
     }
 
     [Fact]
+    public void Generate_EmitsWrapperMetadata()
+    {
+        var frame = fixture.CreateFrame(
+            balls:
+            [
+                fixture.CreateTrackedBall(trackId: 10, xMm: 120, yMm: 240),
+            ],
+            primaryBallTrackId: 10);
+
+        var packet = fixture.CreatePacketGenerator().Generate(frame);
+
+        Assert.Equal(TrackerContractFixture.DefaultUuid, packet.Uuid);
+        Assert.Equal(TrackerContractFixture.DefaultSourceName, packet.SourceName);
+        Assert.NotNull(packet.TrackedFrame);
+    }
+
+    [Fact]
     public void Generate_EmitsExpectedCapabilitiesInStableOrder()
     {
         var frame = fixture.CreateFrame(
@@ -99,6 +140,67 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
                 Capability.DetectMultipleBalls,
             ],
             trackedFrame.Capabilities);
+    }
+
+    [Fact]
+    public void Generate_EmitsFixedCapabilitiesEvenWhenFrameDoesNotContainKickOrFlyingBall()
+    {
+        var frame = fixture.CreateFrame(
+            balls:
+            [
+                fixture.CreateTrackedBall(trackId: 10, isFlying: false),
+            ],
+            primaryBallTrackId: 10,
+            kickedBall: null);
+
+        var packet = fixture.CreatePacketGenerator().Generate(frame);
+        var trackedFrame = AssertTrackedFrame(packet);
+
+        Assert.Equal(
+            [
+                Capability.DetectKickedBalls,
+                Capability.DetectFlyingBalls,
+                Capability.DetectMultipleBalls,
+            ],
+            trackedFrame.Capabilities);
+    }
+
+    [Fact]
+    public void Generate_WithStillMovingKick_EmitsConvertedKickedBallPayload()
+    {
+        var frame = fixture.CreateFrame(
+            balls:
+            [
+                fixture.CreateTrackedBall(trackId: 10, xMm: 100, yMm: 200),
+            ],
+            primaryBallTrackId: 10,
+            kickedBall: fixture.CreateKick(
+                isStillMoving: true,
+                startXMm: 1200,
+                startYMm: -3400,
+                startTimestampNs: 12_500_000_000,
+                initialVelocityXMmPerS: 2500,
+                initialVelocityYMmPerS: -1250,
+                initialVelocityZMmPerS: 300,
+                stopXMm: 1800,
+                stopYMm: -4000,
+                stopTimestampNs: 13_500_000_000,
+                kickerRobotId: 7));
+
+        var packet = fixture.CreatePacketGenerator().Generate(frame);
+        var trackedFrame = AssertTrackedFrame(packet);
+        var kickedBall = Assert.IsType<KickedBall>(trackedFrame.KickedBall);
+
+        Assert.Equal(1.2f, kickedBall.Pos.X, 3);
+        Assert.Equal(-3.4f, kickedBall.Pos.Y, 3);
+        Assert.Equal(2.5f, kickedBall.Vel.X, 3);
+        Assert.Equal(-1.25f, kickedBall.Vel.Y, 3);
+        Assert.Equal(0.3f, kickedBall.Vel.Z, 3);
+        Assert.Equal(12.5, kickedBall.StartTimestamp, 6);
+        Assert.Equal(13.5, kickedBall.StopTimestamp, 6);
+        Assert.Equal(1.8f, kickedBall.StopPos.X, 3);
+        Assert.Equal(-4.0f, kickedBall.StopPos.Y, 3);
+        Assert.Equal((uint)7, kickedBall.RobotId.Id);
     }
 
     [Fact]

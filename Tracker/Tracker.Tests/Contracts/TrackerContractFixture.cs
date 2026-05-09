@@ -103,21 +103,33 @@ public sealed class TrackerContractFixture
         };
     }
 
-    public KickEventState CreateKick(bool isStillMoving)
+    public KickEventState CreateKick(
+        bool isStillMoving,
+        double startXMm = 100,
+        double startYMm = 200,
+        long startTimestampNs = 9_500_000_000,
+        double initialVelocityXMmPerS = 3000,
+        double initialVelocityYMmPerS = 1500,
+        double initialVelocityZMmPerS = 0,
+        double? stopXMm = 900,
+        double? stopYMm = 1000,
+        long? stopTimestampNs = 12_000_000_000,
+        uint? kickerRobotId = null)
     {
         return new KickEventState
         {
-            StartXMm = 100,
-            StartYMm = 200,
-            StartTimestampNs = 9_500_000_000,
-            InitialVelocityXMmPerS = 3000,
-            InitialVelocityYMmPerS = 1500,
-            InitialVelocityZMmPerS = 0,
-            StopXMm = 900,
-            StopYMm = 1000,
-            StopTimestampNs = 12_000_000_000,
+            StartXMm = startXMm,
+            StartYMm = startYMm,
+            StartTimestampNs = startTimestampNs,
+            InitialVelocityXMmPerS = initialVelocityXMmPerS,
+            InitialVelocityYMmPerS = initialVelocityYMmPerS,
+            InitialVelocityZMmPerS = initialVelocityZMmPerS,
+            StopXMm = stopXMm,
+            StopYMm = stopYMm,
+            StopTimestampNs = stopTimestampNs,
             IsStillMoving = isStillMoving,
             BallTrackId = 10,
+            KickerRobotId = kickerRobotId,
         };
     }
 }
