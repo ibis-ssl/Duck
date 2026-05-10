@@ -484,3 +484,8 @@ $RECYCLE.BIN/
 # codex
 .agents
 AGENTS.md
+.codex-dotnet-home/
+.codex-nuget-packages/
+
+# ref
+Tracker/Tracker.Core/Design/Ref
