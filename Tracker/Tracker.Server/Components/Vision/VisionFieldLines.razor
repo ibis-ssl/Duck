@@ -14,6 +14,7 @@
         var p2 = Projection.Project(line.P2.X, line.P2.Y);
         <line class="vision-field-line"
               style="@LineStyle(Field)"
+              fill="none"
               x1="@N(p1.X)"
               y1="@N(p1.Y)"
               x2="@N(p2.X)"
@@ -22,7 +23,7 @@
 
     @foreach (var arc in Field.FieldArcs)
     {
-        <path class="vision-field-line" style="@LineStyle(Field)" d="@ArcPath(Projection, arc)" />
+        <path class="vision-field-line" style="@LineStyle(Field)" fill="none" d="@ArcPath(Projection, arc)" />
     }
 }
 else if (Field is not null)
@@ -91,6 +92,7 @@ else if (Field is not null)
         builder.OpenElement(sequence++, "circle");
         builder.AddAttribute(sequence++, "class", "vision-field-line");
         builder.AddAttribute(sequence++, "style", lineStyle);
+        builder.AddAttribute(sequence++, "fill", "none");
         builder.AddAttribute(sequence++, "cx", N(Projection.Project(0, 0).X));
         builder.AddAttribute(sequence++, "cy", N(Projection.Project(0, 0).Y));
         builder.AddAttribute(sequence++, "r", N(Projection.ProjectLength(centerCircleRadius)));
@@ -143,6 +145,7 @@ else if (Field is not null)
         builder.OpenElement(sequence++, "line");
         builder.AddAttribute(sequence++, "class", "vision-field-line");
         builder.AddAttribute(sequence++, "style", lineStyle);
+        builder.AddAttribute(sequence++, "fill", "none");
         builder.AddAttribute(sequence++, "x1", N(p1.X));
         builder.AddAttribute(sequence++, "y1", N(p1.Y));
         builder.AddAttribute(sequence++, "x2", N(p2.X));
