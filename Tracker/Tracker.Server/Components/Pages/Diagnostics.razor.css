@@ -214,6 +214,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.35rem;
     min-height: 0;
+    overflow: hidden;
 }
 
 .diagnostics-render {
@@ -263,9 +264,12 @@
     font-size: 0.78rem;
 }
 
-.diagnostics-detail__columns section {
+.diagnostics-detail-panel {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 
 .diagnostics-detail h2,
@@ -320,7 +324,6 @@
 
 .diagnostics-detail pre {
     min-height: 1.55rem;
-    max-height: 12rem;
     overflow: auto;
     border: 1px solid #315235;
     border-radius: 6px;
@@ -330,6 +333,20 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     font-size: 0.7rem;
+}
+
+.diagnostics-detail-summary {
+    flex: 0 0 auto;
+    max-height: 2.4rem;
+}
+
+.diagnostics-detail-list {
+    flex: 1 1 0;
+    min-height: 4.5rem;
+}
+
+.diagnostics-detail-list--robots {
+    min-height: 9rem;
 }
 
 .diagnostics-shell--render .diagnostics-detail {
@@ -347,11 +364,15 @@
 
 .diagnostics-shell--render .diagnostics-detail__columns {
     flex: 1 1 auto;
-    overflow: auto;
+    overflow: hidden;
 }
 
-.diagnostics-shell--render .diagnostics-detail pre {
-    max-height: 3.1rem;
+.diagnostics-shell--render .diagnostics-detail-summary {
+    max-height: 2.1rem;
+}
+
+.diagnostics-shell--render .diagnostics-detail-list {
+    max-height: none;
 }
 
 @media (max-width: 1100px) {

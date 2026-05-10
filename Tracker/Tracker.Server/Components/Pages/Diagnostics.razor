@@ -123,7 +123,7 @@
                     }
 
                     <div class="diagnostics-detail__columns">
-                        <section>
+                        <section class="diagnostics-detail-panel">
                             <h2>Vision Input</h2>
                             <dl class="diagnostics-inline-stats">
                                 <dt>Vision frames</dt>
@@ -133,14 +133,14 @@
                                 <dt>Detected balls</dt>
                                 <dd>@selectedEntry.RawBallCount</dd>
                             </dl>
-                            <pre>@Display(selectedEntry.RawBallDetails)</pre>
+                            <pre class="diagnostics-detail-summary">@Display(selectedEntry.RawBallDetails)</pre>
                             <h3>Yellow</h3>
-                            <pre>@Display(selectedEntry.RawYellowDetails)</pre>
+                            <pre class="diagnostics-detail-list">@Display(selectedEntry.RawYellowDetails)</pre>
                             <h3>Blue</h3>
-                            <pre>@Display(selectedEntry.RawBlueDetails)</pre>
+                            <pre class="diagnostics-detail-list">@Display(selectedEntry.RawBlueDetails)</pre>
                         </section>
 
-                        <section>
+                        <section class="diagnostics-detail-panel">
                             <h2>Tracker Output</h2>
                             <dl class="diagnostics-inline-stats">
                                 <dt>Output frame</dt>
@@ -150,9 +150,9 @@
                                 <dt>Tracked robots</dt>
                                 <dd>@selectedEntry.TrackedRobotCount</dd>
                             </dl>
-                            <pre>@Display(selectedEntry.TrackedBallDetails)</pre>
+                            <pre class="diagnostics-detail-summary">@Display(selectedEntry.TrackedBallDetails)</pre>
                             <h3>Robots</h3>
-                            <pre>@Display(selectedEntry.TrackedRobotDetails)</pre>
+                            <pre class="diagnostics-detail-list diagnostics-detail-list--robots">@Display(selectedEntry.TrackedRobotDetails)</pre>
                         </section>
                     </div>
                 }
