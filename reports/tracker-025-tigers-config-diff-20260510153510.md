@@ -17,6 +17,40 @@ Tracked 表示に、存在しない 11 番ロボットや過剰な ball が残�
 | ball tracker maturity | `BallTracker.grownUpAge = 3` | 未実装 | Tigers は十分育った tracker を primary merge 対象にする。今回の最小修正では output threshold/lifetime を優先する。 |
 | ball tracker 最大数 | `CamFilter.maxBallTrackers = 10` | 明示制限なし | 誤 ball が多い場合に内部 track 数が増えやすい可能性がある。今回の修正候補に含めるかは実装影響を確認する。 |
 
+## 追加調査で更新した差分状態
+
+TRACKER-025 反映後も Tracked 表示で過剰な object が残るため、現時点では次の切り分けが未完了。
+
+| 観点 | Tigers 実装 | IbisDuck 現状 | 次の確認 |
+| --- | --- | --- | --- |
+| raw detection の混入 | `CamFilter` が camera viewport / field rect / 近接 robot / outlier で新規 tracker 生成を抑制する | raw viewer / tracked viewer のどちらで過剰 object が発生しているか未確定 | `Tracker diagnostics` log で raw ball / robot と tracked ball / robot を同一行に出し、raw 入力時点の誤検出か tracker 出力側の stale かを判定する。 |
+| robot quality 判定 | `RobotQualityInspector` が 20 秒 horizon の検出頻度で `robotQualityThreshold = 0.05` を超えた robot だけを出す | `OutputVisibilityThreshold = 0.05` は単発 track の exponential visibility に対する簡易 gate | 11 番 robot が raw に継続的に出ている場合、Tigers 相当の検出頻度 quality gate が別途必要。 |
+| ball primary 候補 | `BallTracker.grownUpAge = 3`、直前 ball 近傍探索、camera ごと代表 1 件で primary merge | `TrackLifetimeNs = 1s` と output threshold はあるが、grown-up / primary 探索半径 / camera 代表選択は未実装 | raw ball が複数継続して入る場合、lifetime ではなく Tigers の grown-up / primary selector 差分が原因候補。 |
+| ball tracker 数制限 | `CamFilter.maxBallTrackers = 10` | 明示制限なし | raw ball が多い環境で内部 track が増え続けるかを diagnostics log で確認する。 |
+
+## 追加した調査ログ
+
+`TrackerCoordinator` に `Tracker diagnostics` log を追加する。
+
+- 出力頻度:
+  - 通常は最大 1 秒に 1 回
+  - raw ball または tracked ball が複数ある場合は追加で出力
+- 出力内容:
+  - active tracker profile
+  - raw frame / camera id
+  - raw ball count/detail
+  - raw blue/yellow robot id/detail
+  - tracked frame
+  - tracked ball count/detail
+  - tracked robot count/detail
+  - robot / ball の output visibility threshold、half-life、ball lifetime
+- 期待する切り分け:
+  - raw 側に B11/Y11 や複数 ball が出ているなら SSL-Vision 入力または raw filtering 差分を疑う
+  - raw 側に出ていないのに tracked 側だけ残るなら tracker stale / merge / output gate 差分を疑う
+- build 確認:
+  - `DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" NUGET_PACKAGES="$PWD/.codex-nuget-packages" dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`
+  - 0 warnings / 0 errors
+
 ## 今回反映した写像
 
 | IbisDuck 設定 | 反映値 | Tigers 根拠 | 備考 |

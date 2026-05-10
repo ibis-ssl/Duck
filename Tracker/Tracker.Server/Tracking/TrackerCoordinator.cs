@@ -4,6 +4,7 @@ namespace Tracker.Server.Tracking;
 
 public sealed class TrackerCoordinator
 {
+    private static readonly TimeSpan TrackerDiagnosticsLogInterval = TimeSpan.FromSeconds(1);
     private readonly object gate = new();
     private readonly ITrackerEngine engine;
     private readonly TrackerPacketGenerator packetGenerator;
@@ -20,6 +21,7 @@ public sealed class TrackerCoordinator
     private PendingProfileSwitchRequest? inFlightRequest;
     private int nextRequestVersion = 1;
     private bool isProcessingUpdate;
+    private DateTimeOffset lastTrackerDiagnosticsLogAt = DateTimeOffset.MinValue;
 
     public TrackerCoordinator(
         ITrackerEngine engine,
@@ -149,6 +151,7 @@ public sealed class TrackerCoordinator
                 var updatePacket = firstIteration ? packet : null;
                 var switchRequest = explicitProfileSwitchRequest ?? PromotePendingRequest();
                 var result = engine.Update(updatePacket, currentSettings, switchRequest);
+                LogTrackerDiagnostics(updatePacket, result, receivedAt);
                 DispatchResult(result, receivedAt);
 
                 committedFrames.AddRange(result.CommittedFrames);
@@ -222,6 +225,117 @@ public sealed class TrackerCoordinator
                     break;
             }
         }
+    }
+
+    private void LogTrackerDiagnostics(
+        SSL_WrapperPacket? packet,
+        TrackerUpdateResult result,
+        DateTimeOffset receivedAt)
+    {
+        if (!logger.IsEnabled(LogLevel.Information) || result.CommittedFrames.Count == 0)
+        {
+            return;
+        }
+
+        var newestFrame = result.CommittedFrames[^1];
+        var detection = packet?.Detection;
+        if (!ShouldLogTrackerDiagnostics(receivedAt, detection, newestFrame))
+        {
+            return;
+        }
+
+        lastTrackerDiagnosticsLogAt = receivedAt;
+        logger.LogInformation(
+            "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
+            currentSettings.ProfileName,
+            detection?.FrameNumber,
+            detection?.CameraId,
+            detection?.Balls.Count ?? 0,
+            FormatRawBalls(detection?.Balls),
+            FormatRawRobots(detection?.RobotsBlue, TrackerTeam.Blue),
+            FormatRawRobots(detection?.RobotsYellow, TrackerTeam.Yellow),
+            newestFrame.FrameNumber,
+            newestFrame.Balls.Count,
+            FormatTrackedBalls(newestFrame.Balls),
+            newestFrame.Robots.Count,
+            FormatTrackedRobots(newestFrame.Robots),
+            currentSettings.RobotTracker.OutputVisibilityThreshold,
+            currentSettings.RobotTracker.VisibilityHalfLifeSeconds,
+            currentSettings.BallTracker.OutputVisibilityThreshold,
+            currentSettings.BallTracker.VisibilityHalfLifeSeconds,
+            currentSettings.BallTracker.TrackLifetimeNs);
+    }
+
+    private bool ShouldLogTrackerDiagnostics(
+        DateTimeOffset receivedAt,
+        SSL_DetectionFrame? detection,
+        TrackerFrame newestFrame)
+    {
+        if (receivedAt - lastTrackerDiagnosticsLogAt >= TrackerDiagnosticsLogInterval)
+        {
+            return true;
+        }
+
+        return (detection?.Balls.Count ?? 0) > 1
+            || newestFrame.Balls.Count > 1;
+    }
+
+    private static string FormatRawBalls(IEnumerable<SSL_DetectionBall>? balls)
+    {
+        return FormatItems(
+            balls,
+            ball => FormattableString.Invariant(
+                $"x={ball.X:0.#},y={ball.Y:0.#},z={ball.Z:0.#},c={ball.Confidence:0.###}"));
+    }
+
+    private static string FormatRawRobots(
+        IEnumerable<SSL_DetectionRobot>? robots,
+        TrackerTeam team)
+    {
+        var teamPrefix = team == TrackerTeam.Blue ? "B" : "Y";
+        return FormatItems(
+            robots,
+            robot => FormattableString.Invariant(
+                $"{teamPrefix}{robot.RobotId}:x={robot.X:0.#},y={robot.Y:0.#},o={robot.Orientation:0.###},c={robot.Confidence:0.###}"));
+    }
+
+    private static string FormatTrackedBalls(IEnumerable<TrackedBallState> balls)
+    {
+        return FormatItems(
+            balls,
+            ball => FormattableString.Invariant(
+                $"#{ball.InternalTrackId}:x={ball.XMm:0.#},y={ball.YMm:0.#},z={ball.ZMm:0.#},vis={ball.Visibility:0.###},q={ball.Quality:0.###},cams={string.Join("/", ball.SourceCameraIds)}"));
+    }
+
+    private static string FormatTrackedRobots(IEnumerable<TrackedRobotState> robots)
+    {
+        return FormatItems(
+            robots,
+            robot => FormattableString.Invariant(
+                $"{FormatTeam(robot.Team)}{robot.RobotId}:x={robot.XMm:0.#},y={robot.YMm:0.#},vis={robot.Visibility:0.###},q={robot.Quality:0.###}"));
+    }
+
+    private static string FormatTeam(TrackerTeam team)
+    {
+        return team switch
+        {
+            TrackerTeam.Blue => "B",
+            TrackerTeam.Yellow => "Y",
+            _ => "?",
+        };
+    }
+
+    private static string FormatItems<T>(
+        IEnumerable<T>? items,
+        Func<T, string> formatter)
+    {
+        if (items is null)
+        {
+            return "";
+        }
+
+        var formattedItems = items.Take(16).Select(formatter).ToList();
+        return formattedItems.Count == 0 ? "" : string.Join("; ", formattedItems);
     }
 
     private TrackerProfileSwitchRequest? PromotePendingRequest()

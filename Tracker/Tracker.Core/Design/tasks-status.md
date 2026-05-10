@@ -16,6 +16,20 @@
   - Tigers 由来の設定差分と写像が `reports/tracker-025-tigers-config-diff-20260510153510.md` に記録されている
   - `reports/tracker-025-review-20260510154020.md` に review / re-review 結果が記録され、blocking finding が残っていない
 
+## 次の調査タスク
+
+- ID: TRACKER-026
+- Title: Tracked 表示の raw/tracked diagnostics log を追加する
+- Phase: investigation
+- Status: done
+- Size: small
+- Dependencies: TRACKER-025 が完了していること
+- Exit Criteria:
+  - raw SSL-Vision detection の ball / robot と tracked 出力の ball / robot を同じログで比較できる
+  - ログから「raw 側に存在する誤検出」か「tracker 側の stale 出力」かを切り分けられる
+  - 既存 build/test が通る
+  - Tigers との差分状態が `reports/tracker-025-tigers-config-diff-20260510153510.md` に追記されている
+
 ## タスク一覧
 
 | ID | タスク | フェーズ | 状態 | 依存関係 | 完了条件 |
@@ -46,3 +60,4 @@
 | TRACKER-023 | camera-local tracking を線形 Kalman filter 標準へ是正する | engine | done | TRACKER-013, TRACKER-022 | ball / robot の camera-local track 更新が線形 Kalman filter ベースになり、`ProcessNoise` / `MeasurementNoise` / `Gate` / `VisibilityHalfLifeSeconds` が runtime 挙動へ反映され、既存 contract に矛盾しない。 |
 | TRACKER-024 | Kalman 標準準拠の検証と release 判定をやり直す | verification | done | TRACKER-023 | Kalman 化後の focused/full test と review report が存在し、設計書の「v1 は直線運動前提の Kalman filter を標準とする」に対して未解決 blocker が残っていない。 |
 | TRACKER-025 | Tracked 表示へ低 visibility の stale object を出さない | engine | done | TRACKER-024 | 欠測で十分 decayed した robot / ball track が `TrackerFrame` に出力されず、1 frame 程度の短期欠測を残す既存契約は維持される。設定差分は `reports/tracker-025-tigers-config-diff-20260510153510.md`、review は `reports/tracker-025-review-20260510154020.md` に記録済み。 |
+| TRACKER-026 | Tracked 表示の raw/tracked diagnostics log を追加する | investigation | done | TRACKER-025 | raw SSL-Vision detection と tracked 出力を同じログで比較でき、誤検出の発生源を切り分けられる。`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` は 0 warning / 0 error。 |

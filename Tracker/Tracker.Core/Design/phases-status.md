@@ -4,8 +4,8 @@
 
 ## 全体状況
 
-- 現在のフェーズ: engine
-- 現在のタスク: TRACKER-025
+- 現在のフェーズ: investigation
+- 現在のタスク: TRACKER-026
 - 残りフェーズ: none
 
 ## フェーズ一覧
@@ -20,3 +20,4 @@
 | verification | done | `TRACKER-018` と `TRACKER-019` に加え、`TRACKER-024` が完了し、Kalman 標準準拠後および stale object 抑制後の build/test/review 証跡が reports に存在する。 |
 | review | done | `TRACKER-020` に加え、Kalman 標準準拠後および stale object 抑制後の review 結果が記録され、致命的な指摘が残っていない。 |
 | documentation | done | `TRACKER-021` が完了し、`Tracker.Server` の README に起動手順、画面の使い方、主要設定値の意味が記録されている。 |
+| investigation | done | `TRACKER-026` が完了し、raw SSL-Vision detection と tracked 出力を同じログで比較できる。 |
