@@ -27,10 +27,6 @@ public sealed class TrackerOptions
 
 public sealed class TrackerDiagnosticsOptions
 {
-    public bool Enabled { get; init; }
-
-    public bool FileEnabled { get; init; } = true;
-
     public string? FilePath { get; init; }
 }
 

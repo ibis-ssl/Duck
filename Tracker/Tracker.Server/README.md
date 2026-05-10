@@ -77,9 +77,8 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 
 ### `Diagnostics` ページ
 
-- `/diagnostics` で capture sidecar の `*.tracker-diagnostics.log`、実行 directory の `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
+- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の capture sidecar `*.tracker-diagnostics.log`、default `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
 - 左側の timeline でログ行を時系列にスクロールできます
-- tracked ball が 2 個以上の行は強調表示されます
 - capture sidecar と同じ basename の `*.render-snapshots.jsonl.gz` がある場合は、選択行の raw / tracked field を描画できます
 - 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
 
@@ -124,7 +123,7 @@ capture を開始すると、同じ basename で次の sidecar も作成しま�
 
 | キー | 意味 |
 | --- | --- |
-| `Enabled` | `true` なら packet capture を有効にします。packet は重くなり得るため、通常は必要な調査時だけ有効にします。 |
+| `Enabled` | 起動時の packet capture 初期値です。起動後は画面の `Capture On/Off` ボタンで切り替えできます。 |
 | `DirectoryPath` | capture file の出力 directory です。相対 path は実行ファイル directory から解決します。 |
 | `FilePrefix` | capture file 名の prefix です。実際の file 名は `<prefix>-<timestamp>-<guid>.jsonl.gz` になります。 |
 | `FlushEachPacket` | `true` なら packet ごとに flush します。異常終了時の欠落は減りますが、I/O cost は上がります。 |
@@ -219,40 +218,16 @@ tracker 全体の設定です。
 
 ### `Tracker:Diagnostics`
 
-tracker の調査用診断ログ設定です。`Enabled=false` の場合、`TrackerCoordinator` は `Tracker diagnostics ...` の structured log と `tracker-diagnostics-*.log` のファイル出力をどちらも行いません。
+tracker の調査用診断ログ設定です。diagnostics log は常に出力され、`FilePath` が `null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。packet capture 有効時は、capture sidecar の `*.tracker-diagnostics.log` にも同時に出力します。
 
 | キー | 意味 |
 | --- | --- |
-| `Enabled` | `true` なら tracker diagnostics を出力します。`false` なら console / file の診断ログを停止します。 |
-| `FileEnabled` | `Enabled=true` のとき、診断ログをファイルにも追記するかを指定します。 |
-| `FilePath` | ファイル出力先です。`null` の場合は実行ファイルと同じ directory に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。packet capture 有効時は、`FilePath` の有無にかかわらず capture sidecar の `*.tracker-diagnostics.log` にも出力します。 |
+| `FilePath` | 明示的なファイル出力先です。`null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に出力します。 |
 
-現在の `appsettings.json` は、標準ログと起動ごとの新規ファイルの両方へ出力する設定です。
+現在の `appsettings.json` は、`packet-captures` 配下へ起動ごとの新規ファイルを出力する設定です。
 
 ```json
 "Diagnostics": {
-  "Enabled": true,
-  "FileEnabled": true,
-  "FilePath": null
-}
-```
-
-ファイル出力を止め、標準ログだけにする場合は `FileEnabled=false` にします。
-
-```json
-"Diagnostics": {
-  "Enabled": true,
-  "FileEnabled": false,
-  "FilePath": null
-}
-```
-
-診断ログを完全に止める場合は `Enabled=false` にします。
-
-```json
-"Diagnostics": {
-  "Enabled": false,
-  "FileEnabled": true,
   "FilePath": null
 }
 ```

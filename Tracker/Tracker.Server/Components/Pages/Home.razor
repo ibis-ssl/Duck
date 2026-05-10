@@ -9,6 +9,9 @@
 @inject TrackedSnapshotStore TrackedStore
 @inject IOptions<TrackerOptions> TrackerOptionsAccessor
 @inject TrackerProfileRequestService ProfileRequestService
+@inject VisionPacketCaptureRuntimeControl CaptureControl
+@inject VisionPacketCaptureWriter PacketCaptureWriter
+@inject TrackerRenderSnapshotCaptureWriter RenderSnapshotCaptureWriter
 @implements IAsyncDisposable
 
 <PageTitle>Tracker.Server</PageTitle>
@@ -33,17 +36,24 @@
                 <strong>@FormatTimestamp(CurrentReceivedAt)</strong>
             </div>
         </div>
-        <div class="vision-mode-toggle" role="tablist" aria-label="Viewer mode selector">
+        <div class="vision-toolbar">
             <button type="button"
-                    class="@ModeButtonClass(ViewerMode.Raw)"
-                    @onclick="@(() => SelectMode(ViewerMode.Raw))">
-                Raw
+                    class="@CaptureButtonClass()"
+                    @onclick="ToggleCaptureAsync">
+                Capture @(CaptureControl.Enabled ? "On" : "Off")
             </button>
-            <button type="button"
-                    class="@ModeButtonClass(ViewerMode.Tracked)"
-                    @onclick="@(() => SelectMode(ViewerMode.Tracked))">
-                Tracked
-            </button>
+            <div class="vision-mode-toggle" role="tablist" aria-label="Viewer mode selector">
+                <button type="button"
+                        class="@ModeButtonClass(ViewerMode.Raw)"
+                        @onclick="@(() => SelectMode(ViewerMode.Raw))">
+                    Raw
+                </button>
+                <button type="button"
+                        class="@ModeButtonClass(ViewerMode.Tracked)"
+                        @onclick="@(() => SelectMode(ViewerMode.Tracked))">
+                    Tracked
+                </button>
+            </div>
         </div>
     </header>
 
@@ -208,6 +218,20 @@
         return Task.CompletedTask;
     }
 
+    private Task ToggleCaptureAsync()
+    {
+        var nextEnabled = !CaptureControl.Enabled;
+        CaptureControl.SetEnabled(nextEnabled);
+
+        if (!nextEnabled)
+        {
+            PacketCaptureWriter.Stop();
+            RenderSnapshotCaptureWriter.Stop();
+        }
+
+        return Task.CompletedTask;
+    }
+
     private void EnsureSelectedViewExists(VisionPacketSnapshot currentSnapshot)
     {
         if (selectedViewKey == AggregateViewKey)
@@ -295,6 +319,11 @@
     private string ModeButtonClass(ViewerMode mode)
     {
         return viewerMode == mode ? "vision-mode-toggle__button is-active" : "vision-mode-toggle__button";
+    }
+
+    private string CaptureButtonClass()
+    {
+        return CaptureControl.Enabled ? "vision-capture-toggle is-active" : "vision-capture-toggle";
     }
 
     private enum ViewerMode

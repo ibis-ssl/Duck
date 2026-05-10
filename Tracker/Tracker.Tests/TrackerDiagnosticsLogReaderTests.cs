@@ -29,17 +29,19 @@ public class TrackerDiagnosticsLogReaderTests
     }
 
     [Fact]
-    public void ListFiles_IncludesCaptureSidecarDefaultAndConfiguredLogs()
+    public void ListFiles_IncludesCaptureDirectorySidecarDefaultAndConfiguredLogs()
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-diagnostics-capture-{Guid.NewGuid():N}");
         Directory.CreateDirectory(captureDirectory);
         var sidecarPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.tracker-diagnostics.log");
-        var defaultPath = Path.Combine(AppContext.BaseDirectory, $"tracker-diagnostics-reader-test-{Guid.NewGuid():N}.log");
+        var baseDirectorySidecarPath = Path.Combine(AppContext.BaseDirectory, $"ssl-vision-packets-reader-test-{Guid.NewGuid():N}.tracker-diagnostics.log");
+        var defaultPath = Path.Combine(captureDirectory, $"tracker-diagnostics-reader-test-{Guid.NewGuid():N}.log");
         var configuredPath = Path.Combine(Path.GetTempPath(), $"tracker-diagnostics-configured-{Guid.NewGuid():N}.log");
 
         try
         {
             File.WriteAllText(sidecarPath, DiagnosticsLine);
+            File.WriteAllText(baseDirectorySidecarPath, DiagnosticsLine);
             File.WriteAllText(defaultPath, DiagnosticsLine);
             File.WriteAllText(configuredPath, DiagnosticsLine);
 
@@ -50,6 +52,7 @@ public class TrackerDiagnosticsLogReaderTests
             Assert.Contains(files, file => file.FullPath == sidecarPath);
             Assert.Contains(files, file => file.FullPath == defaultPath);
             Assert.Contains(files, file => file.FullPath == configuredPath);
+            Assert.DoesNotContain(files, file => file.FullPath == baseDirectorySidecarPath);
 
             var snapshot = reader.ReadFile(configuredPath);
             Assert.Null(snapshot.Error);
@@ -58,13 +61,14 @@ public class TrackerDiagnosticsLogReaderTests
         }
         finally
         {
+            File.Delete(baseDirectorySidecarPath);
+            File.Delete(defaultPath);
+            File.Delete(configuredPath);
+
             if (Directory.Exists(captureDirectory))
             {
                 Directory.Delete(captureDirectory, recursive: true);
             }
-
-            File.Delete(defaultPath);
-            File.Delete(configuredPath);
         }
     }
 

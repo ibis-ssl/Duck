@@ -20,8 +20,8 @@
                 <strong>@entries.Count</strong>
             </div>
             <div>
-                <span>Multi Ball</span>
-                <strong>@entries.Count(entry => entry.HasMultipleTrackedBalls)</strong>
+                <span>Skipped</span>
+                <strong>@(snapshot?.SkippedLineCount ?? 0)</strong>
             </div>
             <div>
                 <span>Selected</span>
@@ -217,8 +217,7 @@
 
         snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
-        selectedEntry = entries.FirstOrDefault(entry => entry.HasMultipleTrackedBalls)
-            ?? entries.FirstOrDefault();
+        selectedEntry = entries.FirstOrDefault();
         LoadSelectedRenderSnapshot();
     }
 
@@ -234,15 +233,6 @@
         if (ReferenceEquals(entry, selectedEntry))
         {
             classes.Add("is-selected");
-        }
-
-        if (entry.HasMultipleTrackedBalls)
-        {
-            classes.Add("has-multiple-balls");
-        }
-        else if (entry.HasRawBallMismatch)
-        {
-            classes.Add("has-mismatch");
         }
 
         return string.Join(" ", classes);

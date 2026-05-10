@@ -500,8 +500,6 @@ geometry 更新規則:
   - `BallTracker`
   - `KickDetector`
 - `Diagnostics`
-  - `Enabled`
-  - `FileEnabled`
   - `FilePath`
 
 `VisionReceiver` 側は replay 用の packet capture 設定を持つ。
@@ -528,7 +526,8 @@ raw / tracked 診断で比較する raw detection は、現在着信した packe
 
 - multicast address / port / source name / uuid は設定外出しする
 - tracking parameter は設定外出しする
-- raw / tracked 診断ログは `Tracker:Diagnostics:Enabled` で停止できるようにする
+- raw / tracked 診断ログの明示出力先は `Tracker:Diagnostics:FilePath` で設定できるようにする
+- packet capture は `VisionReceiver:PacketCapture:Enabled` を起動時初期値として持ち、起動後は UI から On / Off を切り替えられるようにする
 - v1 標準であるカルマン filter の process noise / measurement noise / gating threshold も設定外出しする
 - 近傍判定、visibility decay、kick speed threshold、chip 判定 threshold も設定外出しする
 

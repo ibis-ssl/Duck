@@ -101,7 +101,7 @@ internal static class VisionPacketCaptureFile
             RenderSnapshotPath: $"{basePath}.render-snapshots.jsonl.gz");
     }
 
-    private static string ResolveDirectoryPath(string directoryPath)
+    internal static string ResolveDirectoryPath(string directoryPath)
     {
         return Path.IsPathRooted(directoryPath)
             ? directoryPath

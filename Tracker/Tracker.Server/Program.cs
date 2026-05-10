@@ -21,6 +21,9 @@ builder.Services.AddSingleton(serviceProvider =>
             trackerOptions.ActiveProfileName));
 });
 builder.Services.AddSingleton(serviceProvider =>
+    new VisionPacketCaptureRuntimeControl(
+        serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value.PacketCapture.Enabled));
+builder.Services.AddSingleton(serviceProvider =>
     TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().EngineSettings);
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().PublisherOptions);

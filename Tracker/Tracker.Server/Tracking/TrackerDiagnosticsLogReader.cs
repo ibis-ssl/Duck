@@ -25,8 +25,9 @@ public sealed class TrackerDiagnosticsLogReader
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
         var files = new Dictionary<string, FileInfo>(StringComparer.Ordinal);
-        AddFiles(files, ResolveDirectoryPath(packetCaptureOptions.DirectoryPath), "*.tracker-diagnostics.log");
-        AddFiles(files, AppContext.BaseDirectory, "tracker-diagnostics-*.log");
+        var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
+        AddFiles(files, captureDirectoryPath, "*.tracker-diagnostics.log");
+        AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
 
         if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
         {

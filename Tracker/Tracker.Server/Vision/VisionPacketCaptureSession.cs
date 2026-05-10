@@ -13,6 +13,7 @@ public sealed class VisionPacketCaptureSession
 
     private readonly object gate = new();
     private readonly VisionPacketCaptureOptions options;
+    private readonly VisionPacketCaptureRuntimeControl runtimeControl;
     private readonly TrackerOptions trackerOptions;
     private readonly TrackerResolvedOptions resolvedTrackerOptions;
     private readonly ILogger<VisionPacketCaptureSession> logger;
@@ -23,17 +24,21 @@ public sealed class VisionPacketCaptureSession
         IOptions<VisionReceiverOptions> visionReceiverOptions,
         IOptions<TrackerOptions> trackerOptions,
         TrackerResolvedOptions resolvedTrackerOptions,
-        ILogger<VisionPacketCaptureSession> logger)
+        ILogger<VisionPacketCaptureSession> logger,
+        VisionPacketCaptureRuntimeControl? runtimeControl = null)
     {
         options = visionReceiverOptions.Value.PacketCapture;
         this.trackerOptions = trackerOptions.Value;
         this.resolvedTrackerOptions = resolvedTrackerOptions;
         this.logger = logger;
+        this.runtimeControl = runtimeControl ?? new VisionPacketCaptureRuntimeControl(options.Enabled);
     }
 
-    public bool Enabled => options.Enabled;
+    public bool Enabled => runtimeControl.Enabled;
 
     public bool FlushEachPacket => options.FlushEachPacket;
+
+    public string DirectoryPath => VisionPacketCaptureFile.ResolveDirectoryPath(options.DirectoryPath);
 
     public VisionPacketCaptureSessionState? Current
     {
@@ -48,7 +53,7 @@ public sealed class VisionPacketCaptureSession
 
     public VisionPacketCaptureSessionState? EnsureStarted(DateTimeOffset startedAt)
     {
-        if (!options.Enabled)
+        if (!runtimeControl.Enabled)
         {
             return null;
         }
@@ -69,6 +74,15 @@ public sealed class VisionPacketCaptureSession
                 paths.RenderSnapshotPath);
             WriteMetadata(state);
             return state;
+        }
+    }
+
+    public void Stop()
+    {
+        lock (gate)
+        {
+            state = null;
+            metadataWriteFailed = false;
         }
     }
 

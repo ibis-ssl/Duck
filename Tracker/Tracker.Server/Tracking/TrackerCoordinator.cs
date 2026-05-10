@@ -29,7 +29,6 @@ public sealed class TrackerCoordinator
     private DateTimeOffset lastTrackerDiagnosticsLogAt = DateTimeOffset.MinValue;
     private readonly HashSet<string> failedTrackerDiagnosticsLogPaths = new(StringComparer.Ordinal);
     private string? defaultTrackerDiagnosticsLogPath;
-    private string? sidecarTrackerDiagnosticsLogPath;
 
     public TrackerCoordinator(
         ITrackerEngine engine,
@@ -248,11 +247,6 @@ public sealed class TrackerCoordinator
         TrackerUpdateResult result,
         DateTimeOffset receivedAt)
     {
-        if (!diagnosticsOptions.Enabled)
-        {
-            return;
-        }
-
         if (result.CommittedFrames.Count == 0)
         {
             return;
@@ -301,10 +295,7 @@ public sealed class TrackerCoordinator
                 currentSettings.BallTracker.TrackLifetimeNs);
         }
 
-        if (diagnosticsOptions.FileEnabled)
-        {
-            AppendTrackerDiagnosticsFile(diagnosticsLine, receivedAt);
-        }
+        AppendTrackerDiagnosticsFile(diagnosticsLine, receivedAt);
     }
 
     private void AppendTrackerDiagnosticsFile(string diagnosticsLine, DateTimeOffset receivedAt)
@@ -318,6 +309,12 @@ public sealed class TrackerCoordinator
 
             try
             {
+                var directory = Path.GetDirectoryName(logPath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
                 File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
             }
             catch (Exception ex)
@@ -348,15 +345,19 @@ public sealed class TrackerCoordinator
 
     private string? ResolveTrackerDiagnosticsSidecarPath(DateTimeOffset receivedAt)
     {
-        sidecarTrackerDiagnosticsLogPath ??= packetCaptureSession?.EnsureStarted(receivedAt)?.DiagnosticsLogPath;
-        return sidecarTrackerDiagnosticsLogPath;
+        if (packetCaptureSession?.Enabled != true)
+        {
+            return null;
+        }
+
+        return packetCaptureSession.EnsureStarted(receivedAt)?.DiagnosticsLogPath;
     }
 
-    private static string CreateTrackerDiagnosticsLogPath()
+    private string CreateTrackerDiagnosticsLogPath()
     {
         var timestamp = FormattableString.Invariant($"{DateTimeOffset.UtcNow:yyyyMMddTHHmmssfffZ}");
         return Path.Combine(
-            AppContext.BaseDirectory,
+            packetCaptureSession?.DirectoryPath ?? Path.Combine(AppContext.BaseDirectory, "packet-captures"),
             $"tracker-diagnostics-{timestamp}-{Guid.NewGuid():N}.log");
     }
 
@@ -578,8 +579,6 @@ public sealed class TrackerCoordinator
     {
         return new TrackerDiagnosticsOptions
         {
-            Enabled = options.Enabled,
-            FileEnabled = options.FileEnabled,
             FilePath = options.FilePath,
         };
     }

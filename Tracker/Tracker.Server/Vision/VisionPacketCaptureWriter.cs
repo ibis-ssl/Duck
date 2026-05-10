@@ -32,7 +32,13 @@ public sealed class VisionPacketCaptureWriter : IDisposable
 
     public void Capture(ReadOnlySpan<byte> payload, EndPoint remoteEndpoint, DateTimeOffset receivedAt)
     {
-        if (!session.Enabled || writeFailed)
+        if (!session.Enabled)
+        {
+            Stop();
+            return;
+        }
+
+        if (writeFailed)
         {
             return;
         }
@@ -58,10 +64,18 @@ public sealed class VisionPacketCaptureWriter : IDisposable
 
     public void Dispose()
     {
+        Stop();
+    }
+
+    public void Stop()
+    {
         lock (gate)
         {
             writer?.Dispose();
             writer = null;
+            capturePath = null;
+            writeFailed = false;
+            session.Stop();
         }
     }
 
@@ -81,4 +95,5 @@ public sealed class VisionPacketCaptureWriter : IDisposable
             capturePath,
             sessionState.MetadataPath);
     }
+
 }

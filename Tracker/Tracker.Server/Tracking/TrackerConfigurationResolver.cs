@@ -52,8 +52,6 @@ public static class TrackerConfigurationResolver
     {
         return new TrackerDiagnosticsOptions
         {
-            Enabled = options.Enabled,
-            FileEnabled = options.FileEnabled,
             FilePath = options.FilePath,
         };
     }

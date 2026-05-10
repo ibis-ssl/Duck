@@ -144,11 +144,42 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Null(writer.CapturePath);
     }
 
+    [Fact]
+    public void Capture_RuntimeToggleStartsFromConfiguredDisabledValueAndCreatesFilesAfterEnable()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-runtime-{Guid.NewGuid():N}");
+        var runtimeControl = new VisionPacketCaptureRuntimeControl(initialEnabled: false);
+        using var writer = new VisionPacketCaptureWriter(
+            CreateCaptureSession(
+                captureDirectory,
+                filePrefix: "runtime-vision",
+                enabled: false,
+                flushEachPacket: true,
+                runtimeControl: runtimeControl),
+            NullLogger<VisionPacketCaptureWriter>.Instance);
+        var remoteEndpoint = new IPEndPoint(IPAddress.Loopback, 10020);
+
+        writer.Capture([1, 2, 3], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 0, TimeSpan.Zero));
+        Assert.False(Directory.Exists(captureDirectory));
+
+        runtimeControl.SetEnabled(true);
+        writer.Capture([4, 5, 6], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 1, TimeSpan.Zero));
+        runtimeControl.SetEnabled(false);
+        writer.Stop();
+        runtimeControl.SetEnabled(true);
+        writer.Capture([7, 8, 9], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 2, TimeSpan.Zero));
+
+        var captureFiles = Directory.GetFiles(captureDirectory, "runtime-vision-*.jsonl.gz");
+
+        Assert.Equal(2, captureFiles.Length);
+    }
+
     private VisionPacketCaptureSession CreateCaptureSession(
         string captureDirectory,
         string filePrefix,
         bool enabled,
-        bool flushEachPacket = false)
+        bool flushEachPacket = false,
+        VisionPacketCaptureRuntimeControl? runtimeControl = null)
     {
         return new VisionPacketCaptureSession(
             Options.Create(new VisionReceiverOptions
@@ -163,6 +194,7 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
             }),
             Options.Create(new TrackerOptions { ActiveProfileName = "sim" }),
             fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
-            NullLogger<VisionPacketCaptureSession>.Instance);
+            NullLogger<VisionPacketCaptureSession>.Instance,
+            runtimeControl);
     }
 }

@@ -39,7 +39,13 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
 
     public void CaptureFrame(TrackerFrame frame, DateTimeOffset receivedAt)
     {
-        if (!session.Enabled || writeFailed)
+        if (!session.Enabled)
+        {
+            Stop();
+            return;
+        }
+
+        if (writeFailed)
         {
             return;
         }
@@ -69,10 +75,18 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
 
     public void Dispose()
     {
+        Stop();
+    }
+
+    public void Stop()
+    {
         lock (gate)
         {
             writer?.Dispose();
             writer = null;
+            capturePath = null;
+            writeFailed = false;
+            session.Stop();
         }
     }
 
@@ -89,6 +103,7 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
         writer = VisionPacketCaptureFile.CreateWriter(capturePath);
         logger.LogInformation("Writing tracker render snapshots to {CapturePath}", capturePath);
     }
+
 }
 
 public sealed record TrackerRenderSnapshotRecord(
