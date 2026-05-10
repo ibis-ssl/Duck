@@ -7,6 +7,9 @@ using Tracker.Server.Tracking;
 
 namespace Tracker.Server.Vision;
 
+/// <summary>
+/// SSL-Vision UDP packet を受信し、raw store、capture writer、tracker coordinator へ順に渡す background service。
+/// </summary>
 public sealed class VisionReceiverService(
     VisionReceiverRuntimeOptionsStore receiverOptionsStore,
     IOptions<TrackerOptions> trackerOptions,
@@ -15,6 +18,9 @@ public sealed class VisionReceiverService(
     VisionPacketCaptureWriter packetCaptureWriter,
     ILogger<VisionReceiverService> logger) : BackgroundService
 {
+    /// <summary>
+    /// profile-aware receiver 設定に追従しながら UDP 受信 loop を実行する。
+    /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -194,6 +200,9 @@ public sealed class VisionReceiverService(
         return new MulticastJoinResult(joinedInterfaces, failedInterfaces);
     }
 
+    /// <summary>
+    /// 明示 interface address があればそれだけを、なければ multicast join 候補 IPv4 address を返す。
+    /// </summary>
     internal static IReadOnlyList<IPAddress> ResolveMulticastJoinAddresses(
         string? configuredInterfaceAddress,
         IEnumerable<IPAddress> discoveredAddresses)

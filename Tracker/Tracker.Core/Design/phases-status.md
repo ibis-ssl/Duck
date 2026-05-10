@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: maintenance
-- 現在のタスク: TRACKER-034
+- 現在のタスク: TRACKER-035
 - 残りフェーズ: maintenance, verification, review
 
 ## フェーズ一覧

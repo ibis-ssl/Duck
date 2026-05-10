@@ -1,10 +1,12 @@
-using System.Globalization;
 using Tracker.Core;
 using Tracker.Server.Vision;
 
 namespace Tracker.Server.Tracking;
 
-public sealed class TrackerCoordinator
+/// <summary>
+/// raw vision packet を tracker engine に投入し、snapshot、publisher、observer へ反映する調停役。
+/// </summary>
+public sealed partial class TrackerCoordinator
 {
     private static readonly TimeSpan TrackerDiagnosticsLogInterval = TimeSpan.FromSeconds(1);
     private readonly object gate = new();
@@ -30,6 +32,9 @@ public sealed class TrackerCoordinator
     private readonly HashSet<string> failedTrackerDiagnosticsLogPaths = new(StringComparer.Ordinal);
     private string? defaultTrackerDiagnosticsLogPath;
 
+    /// <summary>
+    /// tracker engine と配信先を受け取り、初期 publisher 設定を適用する。
+    /// </summary>
     public TrackerCoordinator(
         ITrackerEngine engine,
         TrackerPacketGenerator packetGenerator,
@@ -45,9 +50,9 @@ public sealed class TrackerCoordinator
     {
         this.engine = engine;
         this.packetGenerator = packetGenerator;
-        currentSettings = CloneSettings(settings);
-        currentPublisherOptions = ClonePublisherOptions(publisherOptions);
-        this.diagnosticsOptions = CloneDiagnosticsOptions(diagnosticsOptions);
+        currentSettings = TrackerOptionsCloner.CloneSettings(settings);
+        currentPublisherOptions = TrackerOptionsCloner.ClonePublisherOptions(publisherOptions);
+        this.diagnosticsOptions = TrackerOptionsCloner.CloneDiagnosticsOptions(diagnosticsOptions);
         this.snapshotStore = snapshotStore;
         this.publisher = publisher;
         this.observers = observers.ToArray();
@@ -57,15 +62,18 @@ public sealed class TrackerCoordinator
         appliedOptions = new TrackerResolvedOptions
         {
             Enabled = true,
-            EngineSettings = CloneSettings(settings),
-            PublisherOptions = ClonePublisherOptions(publisherOptions),
-            Diagnostics = CloneDiagnosticsOptions(diagnosticsOptions),
+            EngineSettings = TrackerOptionsCloner.CloneSettings(settings),
+            PublisherOptions = TrackerOptionsCloner.ClonePublisherOptions(publisherOptions),
+            Diagnostics = TrackerOptionsCloner.CloneDiagnosticsOptions(diagnosticsOptions),
         };
-        desiredOptions = CloneResolvedOptions(appliedOptions);
+        desiredOptions = TrackerOptionsCloner.CloneResolvedOptions(appliedOptions);
         desiredRuntimeOverrides = new TrackerRuntimeOverrides();
         publisher.ApplyConfiguration(currentPublisherOptions);
     }
 
+    /// <summary>
+    /// 受信 packet と任意の明示的 profile switch 要求を同じ lock 上で処理する。
+    /// </summary>
     public TrackerUpdateResult ProcessPacket(
         SSL_WrapperPacket? packet,
         DateTimeOffset receivedAt,
@@ -77,6 +85,9 @@ public sealed class TrackerCoordinator
         }
     }
 
+    /// <summary>
+    /// UI などから要求された profile switch を pending に積み、処理中でなければ control-only update を即時 drain する。
+    /// </summary>
     public void RequestProfileSwitch(
         TrackerResolvedOptions targetOptions,
         DateTimeOffset receivedAt,
@@ -84,12 +95,12 @@ public sealed class TrackerCoordinator
     {
         lock (gate)
         {
-            var normalizedTarget = CloneResolvedOptions(targetOptions);
+            var normalizedTarget = TrackerOptionsCloner.CloneResolvedOptions(targetOptions);
             var normalizedRuntimeOverrides = runtimeOverrides is null
                 ? new TrackerRuntimeOverrides()
-                : CloneRuntimeOverrides(runtimeOverrides);
-            if (AreResolvedOptionsEquivalent(desiredOptions, normalizedTarget) &&
-                AreRuntimeOverridesEquivalent(desiredRuntimeOverrides, normalizedRuntimeOverrides) &&
+                : TrackerOptionsCloner.CloneRuntimeOverrides(runtimeOverrides);
+            if (TrackerResolvedOptionsComparer.AreResolvedOptionsEquivalent(desiredOptions, normalizedTarget) &&
+                TrackerResolvedOptionsComparer.AreRuntimeOverridesEquivalent(desiredRuntimeOverrides, normalizedRuntimeOverrides) &&
                 pendingRequest is null &&
                 inFlightRequest is null)
             {
@@ -109,41 +120,6 @@ public sealed class TrackerCoordinator
             }
 
             _ = ExecuteUpdates(packet: null, receivedAt, explicitProfileSwitchRequest: null);
-        }
-    }
-
-    private void ApplyProfileSwitch(string profileName)
-    {
-        if (inFlightRequest is not null)
-        {
-            appliedOptions = CloneResolvedOptions(inFlightRequest.TargetOptions);
-            desiredOptions = CloneResolvedOptions(inFlightRequest.TargetOptions);
-            desiredRuntimeOverrides = CloneRuntimeOverrides(inFlightRequest.RuntimeOverrides);
-            currentSettings = CloneSettings(inFlightRequest.TargetOptions.EngineSettings);
-            currentPublisherOptions = ClonePublisherOptions(inFlightRequest.TargetOptions.PublisherOptions);
-            publisher.ApplyConfiguration(currentPublisherOptions);
-            snapshotStore.SwitchActiveProfile(profileName);
-            inFlightRequest = null;
-        }
-        else
-        {
-            snapshotStore.SwitchActiveProfile(profileName);
-        }
-
-        NotifyObservers(observer => observer.OnProfileSwitched(profileName));
-    }
-
-    private void PublishFrame(TrackerFrame frame)
-    {
-        try
-        {
-            publisher.Publish(packetGenerator.Generate(frame));
-            snapshotStore.RecordPublishSuccess();
-        }
-        catch (Exception ex)
-        {
-            snapshotStore.RecordPublishFailure();
-            logger.LogWarning(ex, "Failed to publish tracker packet for frame {FrameNumber}", frame.FrameNumber);
         }
     }
 
@@ -191,482 +167,4 @@ public sealed class TrackerCoordinator
             isProcessingUpdate = false;
         }
     }
-
-    private void DispatchResult(TrackerUpdateResult result, DateTimeOffset receivedAt)
-    {
-        var framesByNumber = result.CommittedFrames.ToDictionary(frame => frame.FrameNumber);
-
-        foreach (var emittedEvent in result.EmittedEvents)
-        {
-            switch (emittedEvent.Kind)
-            {
-                case TrackerEventKind.ProfileSwitched:
-                    ApplyProfileSwitch(emittedEvent.ProfileName ?? currentSettings.ProfileName);
-                    break;
-                case TrackerEventKind.GeometryReset:
-                    snapshotStore.ClearLatestFrame();
-                    NotifyObservers(observer => observer.OnGeometryReset());
-                    break;
-                case TrackerEventKind.WorldFrameCommitted:
-                    if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var committedFrame))
-                    {
-                        snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);
-                        renderSnapshotCaptureWriter?.CaptureFrame(committedFrame, receivedAt);
-                        PublishFrame(committedFrame);
-                        NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));
-                    }
-
-                    break;
-                case TrackerEventKind.KickDetected:
-                    if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var kickFrame) && kickFrame.KickedBall is not null)
-                    {
-                        NotifyObservers(observer => observer.OnKickDetected(kickFrame.KickedBall, kickFrame));
-                    }
-
-                    break;
-                case TrackerEventKind.ContactChanged:
-                    if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var contactFrame))
-                    {
-                        NotifyObservers(observer => observer.OnContactChanged(contactFrame));
-                    }
-
-                    break;
-                case TrackerEventKind.BallLeftField:
-                    if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var leftFieldFrame) && leftFieldFrame.BallLeftField is not null)
-                    {
-                        NotifyObservers(observer => observer.OnBallLeftField(leftFieldFrame.BallLeftField, leftFieldFrame));
-                    }
-
-                    break;
-            }
-        }
-    }
-
-    private void LogTrackerDiagnostics(
-        SSL_WrapperPacket? packet,
-        TrackerUpdateResult result,
-        DateTimeOffset receivedAt)
-    {
-        if (result.CommittedFrames.Count == 0)
-        {
-            return;
-        }
-
-        var newestFrame = result.CommittedFrames[^1];
-        var sourceDetections = newestFrame.SourceDetections;
-        if (!ShouldLogTrackerDiagnostics(receivedAt, newestFrame))
-        {
-            return;
-        }
-
-        lastTrackerDiagnosticsLogAt = receivedAt;
-        var rawBalls = sourceDetections.SelectMany(detection => detection.Balls).ToArray();
-        var rawBlue = sourceDetections.SelectMany(detection => detection.RobotsBlue).ToArray();
-        var rawYellow = sourceDetections.SelectMany(detection => detection.RobotsYellow).ToArray();
-        var rawFrameLabel = FormatSourceFrameNumbers(sourceDetections);
-        var rawCameraLabel = FormatSourceCameraIds(sourceDetections);
-        var rawBallDetails = FormatRawBalls(rawBalls);
-        var rawBlueDetails = FormatRawRobots(rawBlue, TrackerTeam.Blue);
-        var rawYellowDetails = FormatRawRobots(rawYellow, TrackerTeam.Yellow);
-        var trackedBallDetails = FormatTrackedBalls(newestFrame.Balls);
-        var trackedRobotDetails = FormatTrackedRobots(newestFrame.Robots);
-        var diagnosticsLine = FormattableString.Invariant(
-            $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={rawFrameLabel} rawCamera={rawCameraLabel} rawBalls={rawBalls.Length} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation(
-                "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
-                currentSettings.ProfileName,
-                rawFrameLabel,
-                rawCameraLabel,
-                rawBalls.Length,
-                rawBallDetails,
-                rawBlueDetails,
-                rawYellowDetails,
-                newestFrame.FrameNumber,
-                newestFrame.Balls.Count,
-                trackedBallDetails,
-                newestFrame.Robots.Count,
-                trackedRobotDetails,
-                currentSettings.RobotTracker.OutputVisibilityThreshold,
-                currentSettings.RobotTracker.VisibilityHalfLifeSeconds,
-                currentSettings.BallTracker.OutputVisibilityThreshold,
-                currentSettings.BallTracker.VisibilityHalfLifeSeconds,
-                currentSettings.BallTracker.TrackLifetimeNs);
-        }
-
-        AppendTrackerDiagnosticsFile(diagnosticsLine, receivedAt);
-    }
-
-    private void AppendTrackerDiagnosticsFile(string diagnosticsLine, DateTimeOffset receivedAt)
-    {
-        foreach (var logPath in ResolveTrackerDiagnosticsLogPaths(receivedAt))
-        {
-            if (failedTrackerDiagnosticsLogPaths.Contains(logPath))
-            {
-                continue;
-            }
-
-            try
-            {
-                var directory = Path.GetDirectoryName(logPath);
-                if (!string.IsNullOrEmpty(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-
-                File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
-            }
-            catch (Exception ex)
-            {
-                failedTrackerDiagnosticsLogPaths.Add(logPath);
-                logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", logPath);
-            }
-        }
-    }
-
-    private IReadOnlyList<string> ResolveTrackerDiagnosticsLogPaths(DateTimeOffset receivedAt)
-    {
-        var logPaths = new List<string>();
-        var captureSidecarPath = ResolveTrackerDiagnosticsSidecarPath(receivedAt);
-        if (captureSidecarPath is not null)
-        {
-            logPaths.Add(captureSidecarPath);
-        }
-
-        logPaths.Add(diagnosticsOptions.FilePath ?? (captureSidecarPath is null
-            ? defaultTrackerDiagnosticsLogPath ??= CreateTrackerDiagnosticsLogPath()
-            : captureSidecarPath));
-
-        return logPaths
-            .Distinct(StringComparer.Ordinal)
-            .ToList();
-    }
-
-    private string? ResolveTrackerDiagnosticsSidecarPath(DateTimeOffset receivedAt)
-    {
-        if (packetCaptureSession?.Enabled != true)
-        {
-            return null;
-        }
-
-        return packetCaptureSession.EnsureStarted(receivedAt)?.DiagnosticsLogPath;
-    }
-
-    private string CreateTrackerDiagnosticsLogPath()
-    {
-        var timestamp = FormattableString.Invariant($"{DateTimeOffset.UtcNow:yyyyMMddTHHmmssfffZ}");
-        return Path.Combine(
-            packetCaptureSession?.DirectoryPath ?? Path.Combine(AppContext.BaseDirectory, "packet-captures"),
-            $"tracker-diagnostics-{timestamp}-{Guid.NewGuid():N}.log");
-    }
-
-    private bool ShouldLogTrackerDiagnostics(
-        DateTimeOffset receivedAt,
-        TrackerFrame newestFrame)
-    {
-        if (receivedAt - lastTrackerDiagnosticsLogAt >= TrackerDiagnosticsLogInterval)
-        {
-            return true;
-        }
-
-        return newestFrame.SourceDetections.Sum(detection => detection.Balls.Count) > 1
-            || newestFrame.Balls.Count > 1;
-    }
-
-    private static string FormatSourceFrameNumbers(IReadOnlyList<TrackerSourceDetectionFrame> sourceDetections)
-    {
-        return FormatSourceValues(sourceDetections.Select(detection => detection.SourceFrameNumber));
-    }
-
-    private static string FormatSourceCameraIds(IReadOnlyList<TrackerSourceDetectionFrame> sourceDetections)
-    {
-        return FormatSourceValues(sourceDetections.Select(detection => detection.CameraId));
-    }
-
-    private static string FormatSourceValues(IEnumerable<uint> values)
-    {
-        var distinctValues = values
-            .Distinct()
-            .Order()
-            .Select(value => value.ToString(CultureInfo.InvariantCulture))
-            .ToArray();
-        return distinctValues.Length == 0 ? "-" : string.Join("/", distinctValues);
-    }
-
-    private static string FormatRawBalls(IEnumerable<SSL_DetectionBall>? balls)
-    {
-        return FormatItems(
-            balls,
-            ball => FormattableString.Invariant(
-                $"x={ball.X:0.#},y={ball.Y:0.#},z={ball.Z:0.#},c={ball.Confidence:0.###}"));
-    }
-
-    private static string FormatRawRobots(
-        IEnumerable<SSL_DetectionRobot>? robots,
-        TrackerTeam team)
-    {
-        var teamPrefix = team == TrackerTeam.Blue ? "B" : "Y";
-        return FormatItems(
-            robots,
-            robot => FormattableString.Invariant(
-                $"{teamPrefix}{robot.RobotId}:x={robot.X:0.#},y={robot.Y:0.#},o={robot.Orientation:0.###},c={robot.Confidence:0.###}"));
-    }
-
-    private static string FormatTrackedBalls(IEnumerable<TrackedBallState> balls)
-    {
-        return FormatItems(
-            balls,
-            ball => FormattableString.Invariant(
-                $"#{ball.InternalTrackId}:x={ball.XMm:0.#},y={ball.YMm:0.#},z={ball.ZMm:0.#},vis={ball.Visibility:0.###},q={ball.Quality:0.###},cams={string.Join("/", ball.SourceCameraIds)}"));
-    }
-
-    private static string FormatTrackedRobots(IEnumerable<TrackedRobotState> robots)
-    {
-        return FormatItems(
-            robots,
-            robot => FormattableString.Invariant(
-                $"{FormatTeam(robot.Team)}{robot.RobotId}:x={robot.XMm:0.#},y={robot.YMm:0.#},vis={robot.Visibility:0.###},q={robot.Quality:0.###}"));
-    }
-
-    private static string FormatTeam(TrackerTeam team)
-    {
-        return team switch
-        {
-            TrackerTeam.Blue => "B",
-            TrackerTeam.Yellow => "Y",
-            _ => "?",
-        };
-    }
-
-    private static string FormatItems<T>(
-        IEnumerable<T>? items,
-        Func<T, string> formatter)
-    {
-        if (items is null)
-        {
-            return "";
-        }
-
-        var formattedItems = items.Take(16).Select(formatter).ToList();
-        return formattedItems.Count == 0 ? "" : string.Join("; ", formattedItems);
-    }
-
-    private TrackerProfileSwitchRequest? PromotePendingRequest()
-    {
-        if (inFlightRequest is not null || pendingRequest is null)
-        {
-            return null;
-        }
-
-        inFlightRequest = pendingRequest;
-        pendingRequest = null;
-        return new TrackerProfileSwitchRequest
-        {
-            RequestVersion = inFlightRequest.RequestVersion,
-            ProfileName = inFlightRequest.TargetOptions.EngineSettings.ProfileName,
-            ResolvedBaseSettings = CloneSettings(inFlightRequest.TargetOptions.EngineSettings),
-            RuntimeOverrides = CloneRuntimeOverrides(inFlightRequest.RuntimeOverrides),
-        };
-    }
-
-    private static bool AreResolvedOptionsEquivalent(
-        TrackerResolvedOptions left,
-        TrackerResolvedOptions right)
-    {
-        return left.Enabled == right.Enabled
-            && left.EngineSettings.ProfileName == right.EngineSettings.ProfileName
-            && left.EngineSettings.ReorderWindowNs == right.EngineSettings.ReorderWindowNs
-            && left.EngineSettings.MergeWindowNs == right.EngineSettings.MergeWindowNs
-            && left.EngineSettings.GeometryResetFieldLengthThresholdMm == right.EngineSettings.GeometryResetFieldLengthThresholdMm
-            && left.EngineSettings.GeometryResetFieldWidthThresholdMm == right.EngineSettings.GeometryResetFieldWidthThresholdMm
-            && left.EngineSettings.KalmanInitialVelocityVariance == right.EngineSettings.KalmanInitialVelocityVariance
-            && left.EngineSettings.KalmanProcessNoiseScale == right.EngineSettings.KalmanProcessNoiseScale
-            && left.EngineSettings.MeasurementNoiseVarianceScale == right.EngineSettings.MeasurementNoiseVarianceScale
-            && AreRobotTrackerOverridesEquivalent(left.EngineSettings.RobotTracker, right.EngineSettings.RobotTracker)
-            && AreBallTrackerOverridesEquivalent(left.EngineSettings.BallTracker, right.EngineSettings.BallTracker)
-            && AreKickDetectorOverridesEquivalent(left.EngineSettings.KickDetector, right.EngineSettings.KickDetector)
-            && left.PublisherOptions.PublishUdp == right.PublisherOptions.PublishUdp
-            && left.PublisherOptions.MulticastAddress == right.PublisherOptions.MulticastAddress
-            && left.PublisherOptions.Port == right.PublisherOptions.Port
-            && left.PublisherOptions.SourceName == right.PublisherOptions.SourceName
-            && left.PublisherOptions.Uuid == right.PublisherOptions.Uuid;
-    }
-
-    private static bool AreRuntimeOverridesEquivalent(
-        TrackerRuntimeOverrides left,
-        TrackerRuntimeOverrides right)
-    {
-        return left.Publish.MulticastAddress == right.Publish.MulticastAddress
-            && left.Publish.Port == right.Publish.Port
-            && left.Publish.SourceName == right.Publish.SourceName
-            && left.Publish.Uuid == right.Publish.Uuid
-            && AreRobotTrackerOverridesEquivalent(left.RobotTracker, right.RobotTracker)
-            && AreBallTrackerOverridesEquivalent(left.BallTracker, right.BallTracker)
-            && AreKickDetectorOverridesEquivalent(left.KickDetector, right.KickDetector);
-    }
-
-    private static bool AreRobotTrackerOverridesEquivalent(
-        TrackerRobotTrackerOverrides left,
-        TrackerRobotTrackerOverrides right)
-    {
-        return left.ProcessNoise == right.ProcessNoise
-            && left.MeasurementNoise == right.MeasurementNoise
-            && left.VisibilityHalfLifeSeconds == right.VisibilityHalfLifeSeconds
-            && left.OutputVisibilityThreshold == right.OutputVisibilityThreshold
-            && left.Gate == right.Gate
-            && left.OutlierLimitMm == right.OutlierLimitMm;
-    }
-
-    private static bool AreBallTrackerOverridesEquivalent(
-        TrackerBallTrackerOverrides left,
-        TrackerBallTrackerOverrides right)
-    {
-        return left.ProcessNoise == right.ProcessNoise
-            && left.MeasurementNoise == right.MeasurementNoise
-            && left.VisibilityHalfLifeSeconds == right.VisibilityHalfLifeSeconds
-            && left.OutputVisibilityThreshold == right.OutputVisibilityThreshold
-            && left.Gate == right.Gate
-            && left.OutlierLimitMm == right.OutlierLimitMm
-            && left.TrackLifetimeNs == right.TrackLifetimeNs;
-    }
-
-    private static bool AreKickDetectorOverridesEquivalent(
-        TrackerKickDetectorOverrides left,
-        TrackerKickDetectorOverrides right)
-    {
-        return left.KickSpeedThresholdMmPerS == right.KickSpeedThresholdMmPerS
-            && left.ChipHeightThresholdMm == right.ChipHeightThresholdMm
-            && left.ContactMarginMm == right.ContactMarginMm;
-    }
-
-    private static TrackerResolvedOptions CloneResolvedOptions(TrackerResolvedOptions options)
-    {
-        return new TrackerResolvedOptions
-        {
-            Enabled = options.Enabled,
-            EngineSettings = CloneSettings(options.EngineSettings),
-            PublisherOptions = ClonePublisherOptions(options.PublisherOptions),
-            Diagnostics = CloneDiagnosticsOptions(options.Diagnostics),
-        };
-    }
-
-    private static TrackerEngineSettings CloneSettings(TrackerEngineSettings settings)
-    {
-        return new TrackerEngineSettings
-        {
-            ProfileName = settings.ProfileName,
-            ReorderWindowNs = settings.ReorderWindowNs,
-            MergeWindowNs = settings.MergeWindowNs,
-            GeometryResetFieldLengthThresholdMm = settings.GeometryResetFieldLengthThresholdMm,
-            GeometryResetFieldWidthThresholdMm = settings.GeometryResetFieldWidthThresholdMm,
-            KalmanInitialVelocityVariance = settings.KalmanInitialVelocityVariance,
-            KalmanProcessNoiseScale = settings.KalmanProcessNoiseScale,
-            MeasurementNoiseVarianceScale = settings.MeasurementNoiseVarianceScale,
-            RobotTracker = CloneRobotTracker(settings.RobotTracker),
-            BallTracker = CloneBallTracker(settings.BallTracker),
-            KickDetector = CloneKickDetector(settings.KickDetector),
-        };
-    }
-
-    private static TrackerPublisherOptions ClonePublisherOptions(TrackerPublisherOptions options)
-    {
-        return new TrackerPublisherOptions
-        {
-            PublishUdp = options.PublishUdp,
-            MulticastAddress = options.MulticastAddress,
-            Port = options.Port,
-            SourceName = options.SourceName,
-            Uuid = options.Uuid,
-        };
-    }
-
-    private static TrackerDiagnosticsOptions CloneDiagnosticsOptions(TrackerDiagnosticsOptions options)
-    {
-        return new TrackerDiagnosticsOptions
-        {
-            FilePath = options.FilePath,
-        };
-    }
-
-    private static TrackerRuntimeOverrides CloneRuntimeOverrides(TrackerRuntimeOverrides overrides)
-    {
-        return new TrackerRuntimeOverrides
-        {
-            Publish = new TrackerPublishOverrides
-            {
-                MulticastAddress = overrides.Publish.MulticastAddress,
-                Port = overrides.Publish.Port,
-                SourceName = overrides.Publish.SourceName,
-                Uuid = overrides.Publish.Uuid,
-            },
-            RobotTracker = CloneRobotTracker(overrides.RobotTracker),
-            BallTracker = CloneBallTracker(overrides.BallTracker),
-            KickDetector = CloneKickDetector(overrides.KickDetector),
-        };
-    }
-
-    private static TrackerRobotTrackerOverrides CloneRobotTracker(TrackerRobotTrackerOverrides tracker)
-    {
-        return new TrackerRobotTrackerOverrides
-        {
-            ProcessNoise = tracker.ProcessNoise,
-            MeasurementNoise = tracker.MeasurementNoise,
-            VisibilityHalfLifeSeconds = tracker.VisibilityHalfLifeSeconds,
-            OutputVisibilityThreshold = tracker.OutputVisibilityThreshold,
-            Gate = tracker.Gate,
-            OutlierLimitMm = tracker.OutlierLimitMm,
-        };
-    }
-
-    private static TrackerBallTrackerOverrides CloneBallTracker(TrackerBallTrackerOverrides tracker)
-    {
-        return new TrackerBallTrackerOverrides
-        {
-            ProcessNoise = tracker.ProcessNoise,
-            MeasurementNoise = tracker.MeasurementNoise,
-            VisibilityHalfLifeSeconds = tracker.VisibilityHalfLifeSeconds,
-            OutputVisibilityThreshold = tracker.OutputVisibilityThreshold,
-            Gate = tracker.Gate,
-            OutlierLimitMm = tracker.OutlierLimitMm,
-            TrackLifetimeNs = tracker.TrackLifetimeNs,
-        };
-    }
-
-    private static TrackerKickDetectorOverrides CloneKickDetector(TrackerKickDetectorOverrides detector)
-    {
-        return new TrackerKickDetectorOverrides
-        {
-            KickSpeedThresholdMmPerS = detector.KickSpeedThresholdMmPerS,
-            ChipHeightThresholdMm = detector.ChipHeightThresholdMm,
-            ContactMarginMm = detector.ContactMarginMm,
-        };
-    }
-
-    private void NotifyObservers(Action<ITrackerObserver> notify)
-    {
-        foreach (var observer in observers)
-        {
-            notify(observer);
-        }
-    }
-
-    private static bool TryGetFrame(
-        IReadOnlyDictionary<uint, TrackerFrame> framesByNumber,
-        uint? frameNumber,
-        out TrackerFrame frame)
-    {
-        if (frameNumber is not null && framesByNumber.TryGetValue(frameNumber.Value, out frame!))
-        {
-            return true;
-        }
-
-        frame = null!;
-        return false;
-    }
-
-    private sealed record PendingProfileSwitchRequest(
-        int RequestVersion,
-        TrackerResolvedOptions TargetOptions,
-        TrackerRuntimeOverrides RuntimeOverrides);
 }

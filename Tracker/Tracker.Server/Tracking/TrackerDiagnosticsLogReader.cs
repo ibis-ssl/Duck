@@ -5,6 +5,9 @@ using Tracker.Server.Vision;
 
 namespace Tracker.Server.Tracking;
 
+/// <summary>
+/// tracker diagnostics log file を列挙し、UI 表示用 snapshot へ parse する。
+/// </summary>
 public sealed class TrackerDiagnosticsLogReader
 {
     private static readonly Regex FieldRegex = new(
@@ -14,6 +17,9 @@ public sealed class TrackerDiagnosticsLogReader
     private readonly VisionPacketCaptureOptions packetCaptureOptions;
     private readonly TrackerDiagnosticsOptions diagnosticsOptions;
 
+    /// <summary>
+    /// capture sidecar directory と明示 diagnostics file path を参照する reader を作る。
+    /// </summary>
     public TrackerDiagnosticsLogReader(
         IOptions<VisionReceiverOptions> visionReceiverOptions,
         TrackerDiagnosticsOptions diagnosticsOptions)
@@ -22,6 +28,9 @@ public sealed class TrackerDiagnosticsLogReader
         this.diagnosticsOptions = diagnosticsOptions;
     }
 
+    /// <summary>
+    /// capture sidecar と明示 log path から表示可能な diagnostics log file を新しい順に返す。
+    /// </summary>
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
         var files = new Dictionary<string, FileInfo>(StringComparer.Ordinal);
@@ -48,6 +57,9 @@ public sealed class TrackerDiagnosticsLogReader
             .ToList();
     }
 
+    /// <summary>
+    /// 許可された diagnostics log file を読み、末尾側の最大件数を snapshot として返す。
+    /// </summary>
     public TrackerDiagnosticsLogSnapshot ReadFile(string fileName, int maxEntries = 10_000)
     {
         var requestedPath = Path.GetFullPath(ResolveFilePath(fileName));
@@ -95,6 +107,9 @@ public sealed class TrackerDiagnosticsLogReader
             OmittedEntryCount: omittedEntryCount);
     }
 
+    /// <summary>
+    /// TrackerCoordinator が出力する diagnostics log 1 行を互換 schema として parse する。
+    /// </summary>
     internal static bool TryParseLine(string line, int lineNumber, out TrackerDiagnosticsLogEntry entry)
     {
         entry = TrackerDiagnosticsLogEntry.Empty(lineNumber, line);
@@ -191,12 +206,18 @@ public sealed class TrackerDiagnosticsLogReader
 
 }
 
+/// <summary>
+/// Diagnostics UI に表示する diagnostics log file の metadata。
+/// </summary>
 public sealed record TrackerDiagnosticsLogFile(
     string FileName,
     string FullPath,
     long SizeBytes,
     DateTime LastWriteTimeUtc);
 
+/// <summary>
+/// diagnostics log file の parse 結果と skipped / omitted 件数。
+/// </summary>
 public sealed record TrackerDiagnosticsLogSnapshot(
     string FileName,
     IReadOnlyList<TrackerDiagnosticsLogEntry> Entries,
@@ -204,6 +225,9 @@ public sealed record TrackerDiagnosticsLogSnapshot(
     int SkippedLineCount = 0,
     int OmittedEntryCount = 0);
 
+/// <summary>
+/// diagnostics log 1 行の raw detection と tracked output の比較情報。
+/// </summary>
 public sealed record TrackerDiagnosticsLogEntry(
     int LineNumber,
     DateTimeOffset Timestamp,
@@ -224,10 +248,19 @@ public sealed record TrackerDiagnosticsLogEntry(
     string BallTrackLifetimeNs,
     string RawLine)
 {
+    /// <summary>
+    /// tracked output に複数 ball が出ているかを示す。
+    /// </summary>
     public bool HasMultipleTrackedBalls => TrackedBallCount > 1;
 
+    /// <summary>
+    /// raw ball 数と tracked ball 数に差があるかを示す。
+    /// </summary>
     public bool HasRawBallMismatch => RawBallCount != TrackedBallCount;
 
+    /// <summary>
+    /// parse 失敗行を line number と raw text だけ保持する entry として表す。
+    /// </summary>
     public static TrackerDiagnosticsLogEntry Empty(int lineNumber, string rawLine)
     {
         return new TrackerDiagnosticsLogEntry(
