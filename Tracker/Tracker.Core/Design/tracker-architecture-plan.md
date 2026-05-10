@@ -450,6 +450,8 @@ geometry 更新規則:
   - 追跡アルゴリズム本体
 - `TrackerPacketGenerator`
   - official proto 変換
+- `Tracker.CaptureReplay`
+  - 保存済み packet capture を再生し、summary metric と条件式で regression check / 調査を行う CLI
 - `TrackedSnapshotStore`
   - tracked UI 読み取り用状態
 - viewer
@@ -511,6 +513,8 @@ geometry 更新規則:
   - `FlushEachPacket`
 
 packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
+
+`Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。
 
 既定配信先は official tracker の慣例値に合わせる。
 

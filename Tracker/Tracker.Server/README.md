@@ -75,6 +75,13 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 - `VisionReceiver:Profiles` に同名 profile がある場合は、receiver の multicast address / port / interface もその profile に追従します
 - 新しい packet が commit されると、新 profile の context で tracked frame が再表示されます
 
+### `Diagnostics` ページ
+
+- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の `*.tracker-diagnostics.log` を読めます
+- 左側の timeline でログ行を時系列にスクロールできます
+- tracked ball が 2 個以上の行は強調表示されます
+- 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
+
 ## API
 
 profile switch は HTTP API からも要求できます。既定 launch profile では `UseHttpsRedirection()` が有効なため、通常は HTTPS endpoint を使ってください。
@@ -107,6 +114,13 @@ raw SSL-Vision packet の受信設定です。
 
 SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes として `jsonl.gz` に保存します。各行には `receivedAt`、remote endpoint、payload の base64 が入るため、後から同じ順序で `SSL_WrapperPacket` に戻して tracker へ再投入できます。decode に失敗した packet も保存対象です。
 
+capture を開始すると、同じ basename で次の sidecar も作成します。
+
+- `<prefix>-<timestamp>-<guid>.jsonl.gz`: packet capture 本体
+- `<prefix>-<timestamp>-<guid>.metadata.json`: capture 時の `Tracker` 設定と resolved profile 設定
+- `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: capture と対応する tracker diagnostics log。`Tracker:Diagnostics:FilePath` が指定されていても、capture 有効時は sidecar として同時に出力します。
+- `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: timeline / 逆方向スクラブ用の描画 snapshot。tracker engine の内部状態ではなく、commit 済み `TrackerFrame` だけを保存します。
+
 | キー | 意味 |
 | --- | --- |
 | `Enabled` | `true` なら packet capture を有効にします。packet は重くなり得るため、通常は必要な調査時だけ有効にします。 |
@@ -136,7 +150,46 @@ SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes �
 }
 ```
 
-保存された capture は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各 record の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで replay できます。
+保存された capture は `Tracker.CaptureReplay` tool で replay / analyze できます。
+
+```bash
+DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" \
+NUGET_PACKAGES="$PWD/.codex-nuget-packages" \
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures/ssl-vision-packets-<timestamp>-<guid>.jsonl.gz \
+  --settings Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures/ssl-vision-packets-<timestamp>-<guid>.metadata.json \
+  --profile sim
+```
+
+自動テストや regression check では exit code を使えます。
+
+```bash
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture <capture.jsonl.gz> \
+  --profile sim \
+  --expect 'committed-frames>0' \
+  --expect 'max-balls<=1'
+```
+
+- `--expect <condition>`: summary metric の期待条件です。失敗すると exit code `1` になります。
+- `--detail-filter <condition>`: 条件に一致する committed frame の詳細を出力します。複数指定した場合は AND 条件です。
+- `--max-details <count>`: 詳細出力数を制限します。
+- `--settings <file>`: `Tracker.Server/appsettings.json` 形式、または capture の `metadata.json` 形式から tracker 設定を読み込みます。
+
+利用できる summary metric は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。frame 詳細の filter では `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。
+
+例えば、raw では ball が 1 個なのに replay 後 frame で ball が 2 個以上になる箇所を確認する場合は次のようにします。
+
+```bash
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture <capture.jsonl.gz> \
+  --profile sim \
+  --expect 'max-balls>=2' \
+  --detail-filter 'raw-balls==1' \
+  --detail-filter 'balls>=2'
+```
+
+test code から直接扱う場合は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各 record の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで replay できます。
 
 ### `VisionReceiver:Profiles:<name>`
 
@@ -171,7 +224,7 @@ tracker の調査用診断ログ設定です。`Enabled=false` の場合、`Trac
 | --- | --- |
 | `Enabled` | `true` なら tracker diagnostics を出力します。`false` なら console / file の診断ログを停止します。 |
 | `FileEnabled` | `Enabled=true` のとき、診断ログをファイルにも追記するかを指定します。 |
-| `FilePath` | ファイル出力先です。`null` の場合は実行ファイルと同じ directory に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。 |
+| `FilePath` | ファイル出力先です。`null` の場合は実行ファイルと同じ directory に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。packet capture 有効時は、`FilePath` の有無にかかわらず capture sidecar の `*.tracker-diagnostics.log` にも出力します。 |
 
 現在の `appsettings.json` は、標準ログと起動ごとの新規ファイルの両方へ出力する設定です。
 

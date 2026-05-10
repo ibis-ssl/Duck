@@ -85,10 +85,20 @@ internal static class VisionPacketCaptureFile
 
     public static string BuildCapturePath(VisionPacketCaptureOptions options, DateTimeOffset startedAt)
     {
+        return BuildCapturePaths(options, startedAt).PacketPath;
+    }
+
+    public static VisionPacketCapturePaths BuildCapturePaths(VisionPacketCaptureOptions options, DateTimeOffset startedAt)
+    {
         var timestamp = startedAt.UtcDateTime.ToString("yyyyMMddTHHmmssfffZ", CultureInfo.InvariantCulture);
-        return Path.Combine(
+        var basePath = Path.Combine(
             ResolveDirectoryPath(options.DirectoryPath),
-            $"{options.FilePrefix}-{timestamp}-{Guid.NewGuid():N}.jsonl.gz");
+            $"{options.FilePrefix}-{timestamp}-{Guid.NewGuid():N}");
+        return new VisionPacketCapturePaths(
+            PacketPath: $"{basePath}.jsonl.gz",
+            MetadataPath: $"{basePath}.metadata.json",
+            DiagnosticsLogPath: $"{basePath}.tracker-diagnostics.log",
+            RenderSnapshotPath: $"{basePath}.render-snapshots.jsonl.gz");
     }
 
     private static string ResolveDirectoryPath(string directoryPath)
@@ -97,6 +107,12 @@ internal static class VisionPacketCaptureFile
             ? directoryPath
             : Path.Combine(AppContext.BaseDirectory, directoryPath);
     }
+
+    public sealed record VisionPacketCapturePaths(
+        string PacketPath,
+        string MetadataPath,
+        string DiagnosticsLogPath,
+        string RenderSnapshotPath);
 
     private sealed class CaptureRecordDto
     {

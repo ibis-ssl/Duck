@@ -1,0 +1,216 @@
+@page "/diagnostics"
+@using System.Globalization
+@using Tracker.Server.Tracking
+@inject TrackerDiagnosticsLogReader LogReader
+
+<PageTitle>Diagnostics</PageTitle>
+
+<section class="diagnostics-shell">
+    <header class="diagnostics-header">
+        <div class="diagnostics-status">
+            <div>
+                <span>Files</span>
+                <strong>@logFiles.Count</strong>
+            </div>
+            <div>
+                <span>Entries</span>
+                <strong>@entries.Count</strong>
+            </div>
+            <div>
+                <span>Multi Ball</span>
+                <strong>@entries.Count(entry => entry.HasMultipleTrackedBalls)</strong>
+            </div>
+            <div>
+                <span>Selected</span>
+                <strong>@(selectedEntry?.TrackedFrame ?? "-")</strong>
+            </div>
+        </div>
+
+        <div class="diagnostics-toolbar">
+            <select class="diagnostics-select"
+                    value="@selectedFileName"
+                    @onchange="OnLogFileChanged"
+                    aria-label="Diagnostics log file">
+                @foreach (var file in logFiles)
+                {
+                    <option value="@file.FileName">@file.FileName</option>
+                }
+            </select>
+            <button type="button" class="diagnostics-button" @onclick="ReloadAsync">Reload</button>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrEmpty(snapshot?.Error))
+    {
+        <div class="diagnostics-alert">@snapshot.Error</div>
+    }
+    else if (logFiles.Count == 0)
+    {
+        <div class="diagnostics-alert">No tracker diagnostics logs found.</div>
+    }
+    else
+    {
+        <div class="diagnostics-grid">
+            <aside class="diagnostics-timeline" aria-label="Diagnostics timeline">
+                @foreach (var entry in entries)
+                {
+                    <button type="button"
+                            class="@TimelineItemClass(entry)"
+                            @onclick="@(() => SelectEntry(entry))">
+                        <span class="diagnostics-timeline__time">@FormatTime(entry.Timestamp)</span>
+                        <span class="diagnostics-timeline__frame">tracked @entry.TrackedFrame</span>
+                        <span class="diagnostics-timeline__counts">
+                            raw @entry.RawBallCount / tracked @entry.TrackedBallCount
+                        </span>
+                    </button>
+                }
+            </aside>
+
+            <main class="diagnostics-detail">
+                @if (selectedEntry is null)
+                {
+                    <div class="diagnostics-empty">No entry selected.</div>
+                }
+                else
+                {
+                    <div class="diagnostics-detail__header">
+                        <div>
+                            <span>Time</span>
+                            <strong>@selectedEntry.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</strong>
+                        </div>
+                        <div>
+                            <span>Profile</span>
+                            <strong>@selectedEntry.ProfileName</strong>
+                        </div>
+                        <div>
+                            <span>Line</span>
+                            <strong>@selectedEntry.LineNumber</strong>
+                        </div>
+                    </div>
+
+                    <div class="diagnostics-detail__columns">
+                        <section>
+                            <h2>Raw</h2>
+                            <dl>
+                                <dt>Frame</dt>
+                                <dd>@Display(selectedEntry.RawFrame)</dd>
+                                <dt>Camera</dt>
+                                <dd>@(selectedEntry.RawCamera?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                                <dt>Balls</dt>
+                                <dd>@selectedEntry.RawBallCount</dd>
+                            </dl>
+                            <pre>@Display(selectedEntry.RawBallDetails)</pre>
+                            <h3>Yellow</h3>
+                            <pre>@Display(selectedEntry.RawYellowDetails)</pre>
+                            <h3>Blue</h3>
+                            <pre>@Display(selectedEntry.RawBlueDetails)</pre>
+                        </section>
+
+                        <section>
+                            <h2>Tracked</h2>
+                            <dl>
+                                <dt>Frame</dt>
+                                <dd>@Display(selectedEntry.TrackedFrame)</dd>
+                                <dt>Balls</dt>
+                                <dd>@selectedEntry.TrackedBallCount</dd>
+                                <dt>Robots</dt>
+                                <dd>@selectedEntry.TrackedRobotCount</dd>
+                            </dl>
+                            <pre>@Display(selectedEntry.TrackedBallDetails)</pre>
+                            <h3>Robots</h3>
+                            <pre>@Display(selectedEntry.TrackedRobotDetails)</pre>
+                        </section>
+                    </div>
+                }
+            </main>
+        </div>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<TrackerDiagnosticsLogFile> logFiles = [];
+    private TrackerDiagnosticsLogSnapshot? snapshot;
+    private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
+    private string? selectedFileName;
+    private TrackerDiagnosticsLogEntry? selectedEntry;
+
+    protected override void OnInitialized()
+    {
+        LoadFiles();
+        LoadSelectedFile();
+    }
+
+    private Task ReloadAsync()
+    {
+        LoadFiles();
+        LoadSelectedFile();
+        return Task.CompletedTask;
+    }
+
+    private Task OnLogFileChanged(ChangeEventArgs args)
+    {
+        selectedFileName = args.Value?.ToString();
+        LoadSelectedFile();
+        return Task.CompletedTask;
+    }
+
+    private void LoadFiles()
+    {
+        logFiles = LogReader.ListFiles();
+        if (selectedFileName is null || !logFiles.Any(file => file.FileName == selectedFileName))
+        {
+            selectedFileName = logFiles.FirstOrDefault()?.FileName;
+        }
+    }
+
+    private void LoadSelectedFile()
+    {
+        if (selectedFileName is null)
+        {
+            snapshot = null;
+            entries = [];
+            selectedEntry = null;
+            return;
+        }
+
+        snapshot = LogReader.ReadFile(selectedFileName);
+        entries = snapshot.Entries;
+        selectedEntry = entries.FirstOrDefault(entry => entry.HasMultipleTrackedBalls)
+            ?? entries.FirstOrDefault();
+    }
+
+    private void SelectEntry(TrackerDiagnosticsLogEntry entry)
+    {
+        selectedEntry = entry;
+    }
+
+    private string TimelineItemClass(TrackerDiagnosticsLogEntry entry)
+    {
+        var classes = new List<string> { "diagnostics-timeline__item" };
+        if (ReferenceEquals(entry, selectedEntry))
+        {
+            classes.Add("is-selected");
+        }
+
+        if (entry.HasMultipleTrackedBalls)
+        {
+            classes.Add("has-multiple-balls");
+        }
+        else if (entry.HasRawBallMismatch)
+        {
+            classes.Add("has-mismatch");
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    private static string FormatTime(DateTimeOffset timestamp)
+    {
+        return timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture);
+    }
+
+    private static string Display(string value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+}

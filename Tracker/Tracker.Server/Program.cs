@@ -37,9 +37,12 @@ builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
     return new TrackerPacketGenerator(resolved.PublisherOptions.SourceName, resolved.PublisherOptions.Uuid);
 });
 builder.Services.AddSingleton<TrackerCoordinator>();
+builder.Services.AddSingleton<TrackerDiagnosticsLogReader>();
 builder.Services.AddSingleton<TrackerProfileRequestService>();
 builder.Services.AddSingleton<VisionPacketStore>();
+builder.Services.AddSingleton<VisionPacketCaptureSession>();
 builder.Services.AddSingleton<VisionPacketCaptureWriter>();
+builder.Services.AddSingleton<TrackerRenderSnapshotCaptureWriter>();
 builder.Services.AddHostedService<VisionReceiverService>();
 
 var app = builder.Build();

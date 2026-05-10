@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.Server.Tracking;
+using Tracker.Server.Vision;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -256,6 +258,91 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
     }
 
     [Fact]
+    public void ProcessPacket_WithPacketCaptureSession_WritesDiagnosticsLogSidecar()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-diagnostics-{Guid.NewGuid():N}");
+        var snapshotStore = new TrackedSnapshotStore();
+        var publisher = new RecordingTrackerPacketPublisher();
+        var captureSession = CreateCaptureSession(captureDirectory);
+        using var renderSnapshotWriter = new TrackerRenderSnapshotCaptureWriter(
+            captureSession,
+            NullLogger<TrackerRenderSnapshotCaptureWriter>.Instance);
+        var coordinator = CreateCoordinator(
+            snapshotStore,
+            publisher,
+            [],
+            fixture.CreateSettings(profileName: "sim", reorderWindowNs: 0, mergeWindowNs: 0),
+            fixture.CreatePublisherOptions(),
+            new TrackerDiagnosticsOptions
+            {
+                Enabled = true,
+                FileEnabled = true,
+            },
+            captureSession,
+            renderSnapshotWriter);
+        var receivedAt = new DateTimeOffset(2026, 5, 10, 18, 30, 0, TimeSpan.Zero);
+
+        _ = coordinator.ProcessPacket(
+            TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            receivedAt);
+
+        var logPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log"));
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json"));
+        var renderSnapshotPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.render-snapshots.jsonl.gz"));
+        var logText = File.ReadAllText(logPath);
+        var metadataText = File.ReadAllText(metadataPath);
+
+        Assert.Contains("Tracker diagnostics profile=sim", logText);
+        Assert.Contains(logPath, metadataText);
+        Assert.True(new FileInfo(renderSnapshotPath).Length > 0);
+    }
+
+    [Fact]
+    public void ProcessPacket_WithPacketCaptureSessionAndConfiguredDiagnosticsFile_WritesBothLogs()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-diagnostics-both-{Guid.NewGuid():N}");
+        var configuredLogPath = Path.Combine(
+            Path.GetTempPath(),
+            $"tracker-diagnostics-configured-{Guid.NewGuid():N}.log");
+        var snapshotStore = new TrackedSnapshotStore();
+        var publisher = new RecordingTrackerPacketPublisher();
+        var captureSession = CreateCaptureSession(captureDirectory);
+        var coordinator = CreateCoordinator(
+            snapshotStore,
+            publisher,
+            [],
+            fixture.CreateSettings(profileName: "sim", reorderWindowNs: 0, mergeWindowNs: 0),
+            fixture.CreatePublisherOptions(),
+            new TrackerDiagnosticsOptions
+            {
+                Enabled = true,
+                FileEnabled = true,
+                FilePath = configuredLogPath,
+            },
+            captureSession);
+        var receivedAt = new DateTimeOffset(2026, 5, 10, 18, 40, 0, TimeSpan.Zero);
+
+        _ = coordinator.ProcessPacket(
+            TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            receivedAt);
+
+        var sidecarLogPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log"));
+        var sidecarLogText = File.ReadAllText(sidecarLogPath);
+        var configuredLogText = File.ReadAllText(configuredLogPath);
+
+        Assert.Contains("Tracker diagnostics profile=sim", sidecarLogText);
+        Assert.Contains("Tracker diagnostics profile=sim", configuredLogText);
+    }
+
+    [Fact]
     public void RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings()
     {
         var snapshotStore = new TrackedSnapshotStore();
@@ -352,7 +439,29 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
         IReadOnlyList<ITrackerObserver> observers,
         TrackerEngineSettings settings,
         TrackerPublisherOptions publisherOptions,
-        TrackerDiagnosticsOptions diagnosticsOptions)
+        TrackerDiagnosticsOptions diagnosticsOptions,
+        VisionPacketCaptureSession? packetCaptureSession = null)
+    {
+        return CreateCoordinator(
+            snapshotStore,
+            publisher,
+            observers,
+            settings,
+            publisherOptions,
+            diagnosticsOptions,
+            packetCaptureSession,
+            renderSnapshotCaptureWriter: null);
+    }
+
+    private TrackerCoordinator CreateCoordinator(
+        TrackedSnapshotStore snapshotStore,
+        ITrackerPacketPublisher publisher,
+        IReadOnlyList<ITrackerObserver> observers,
+        TrackerEngineSettings settings,
+        TrackerPublisherOptions publisherOptions,
+        TrackerDiagnosticsOptions diagnosticsOptions,
+        VisionPacketCaptureSession? packetCaptureSession,
+        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter)
     {
         return new TrackerCoordinator(
             fixture.CreateEngine(),
@@ -363,7 +472,27 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
             snapshotStore,
             publisher,
             observers,
-            NullLogger<TrackerCoordinator>.Instance);
+            NullLogger<TrackerCoordinator>.Instance,
+            packetCaptureSession,
+            renderSnapshotCaptureWriter);
+    }
+
+    private VisionPacketCaptureSession CreateCaptureSession(string captureDirectory)
+    {
+        return new VisionPacketCaptureSession(
+            Options.Create(new VisionReceiverOptions
+            {
+                PacketCapture = new VisionPacketCaptureOptions
+                {
+                    Enabled = true,
+                    DirectoryPath = captureDirectory,
+                    FilePrefix = "test-vision",
+                    FlushEachPacket = true,
+                },
+            }),
+            Options.Create(new TrackerOptions { ActiveProfileName = "sim" }),
+            fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
+            NullLogger<VisionPacketCaptureSession>.Instance);
     }
 
     private sealed class RecordingTrackerPacketPublisher : ITrackerPacketPublisher

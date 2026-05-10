@@ -1,4 +1,5 @@
 using Tracker.Core;
+using Tracker.Server.Vision;
 
 namespace Tracker.Server.Tracking;
 
@@ -15,6 +16,8 @@ public sealed class TrackerCoordinator
     private readonly ITrackerPacketPublisher publisher;
     private readonly IReadOnlyList<ITrackerObserver> observers;
     private readonly ILogger<TrackerCoordinator> logger;
+    private readonly VisionPacketCaptureSession? packetCaptureSession;
+    private readonly TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter;
     private TrackerResolvedOptions appliedOptions;
     private TrackerResolvedOptions desiredOptions;
     private TrackerRuntimeOverrides desiredRuntimeOverrides = new();
@@ -23,8 +26,9 @@ public sealed class TrackerCoordinator
     private int nextRequestVersion = 1;
     private bool isProcessingUpdate;
     private DateTimeOffset lastTrackerDiagnosticsLogAt = DateTimeOffset.MinValue;
-    private bool trackerDiagnosticsFileWriteFailed;
-    private string? trackerDiagnosticsLogPath;
+    private readonly HashSet<string> failedTrackerDiagnosticsLogPaths = new(StringComparer.Ordinal);
+    private string? defaultTrackerDiagnosticsLogPath;
+    private string? sidecarTrackerDiagnosticsLogPath;
 
     public TrackerCoordinator(
         ITrackerEngine engine,
@@ -35,7 +39,9 @@ public sealed class TrackerCoordinator
         TrackedSnapshotStore snapshotStore,
         ITrackerPacketPublisher publisher,
         IEnumerable<ITrackerObserver> observers,
-        ILogger<TrackerCoordinator> logger)
+        ILogger<TrackerCoordinator> logger,
+        VisionPacketCaptureSession? packetCaptureSession = null,
+        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter = null)
     {
         this.engine = engine;
         this.packetGenerator = packetGenerator;
@@ -46,6 +52,8 @@ public sealed class TrackerCoordinator
         this.publisher = publisher;
         this.observers = observers.ToArray();
         this.logger = logger;
+        this.packetCaptureSession = packetCaptureSession;
+        this.renderSnapshotCaptureWriter = renderSnapshotCaptureWriter;
         appliedOptions = new TrackerResolvedOptions
         {
             Enabled = true,
@@ -203,6 +211,7 @@ public sealed class TrackerCoordinator
                     if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var committedFrame))
                     {
                         snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);
+                        renderSnapshotCaptureWriter?.CaptureFrame(committedFrame, receivedAt);
                         PublishFrame(committedFrame);
                         NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));
                     }
@@ -288,27 +297,53 @@ public sealed class TrackerCoordinator
 
         if (diagnosticsOptions.FileEnabled)
         {
-            AppendTrackerDiagnosticsFile(diagnosticsLine);
+            AppendTrackerDiagnosticsFile(diagnosticsLine, receivedAt);
         }
     }
 
-    private void AppendTrackerDiagnosticsFile(string diagnosticsLine)
+    private void AppendTrackerDiagnosticsFile(string diagnosticsLine, DateTimeOffset receivedAt)
     {
-        if (trackerDiagnosticsFileWriteFailed)
+        foreach (var logPath in ResolveTrackerDiagnosticsLogPaths(receivedAt))
         {
-            return;
+            if (failedTrackerDiagnosticsLogPaths.Contains(logPath))
+            {
+                continue;
+            }
+
+            try
+            {
+                File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                failedTrackerDiagnosticsLogPaths.Add(logPath);
+                logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", logPath);
+            }
+        }
+    }
+
+    private IReadOnlyList<string> ResolveTrackerDiagnosticsLogPaths(DateTimeOffset receivedAt)
+    {
+        var logPaths = new List<string>();
+        var captureSidecarPath = ResolveTrackerDiagnosticsSidecarPath(receivedAt);
+        if (captureSidecarPath is not null)
+        {
+            logPaths.Add(captureSidecarPath);
         }
 
-        try
-        {
-            var logPath = trackerDiagnosticsLogPath ??= diagnosticsOptions.FilePath ?? CreateTrackerDiagnosticsLogPath();
-            File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
-        }
-        catch (Exception ex)
-        {
-            trackerDiagnosticsFileWriteFailed = true;
-            logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", trackerDiagnosticsLogPath);
-        }
+        logPaths.Add(diagnosticsOptions.FilePath ?? (captureSidecarPath is null
+            ? defaultTrackerDiagnosticsLogPath ??= CreateTrackerDiagnosticsLogPath()
+            : captureSidecarPath));
+
+        return logPaths
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private string? ResolveTrackerDiagnosticsSidecarPath(DateTimeOffset receivedAt)
+    {
+        sidecarTrackerDiagnosticsLogPath ??= packetCaptureSession?.EnsureStarted(receivedAt)?.DiagnosticsLogPath;
+        return sidecarTrackerDiagnosticsLogPath;
     }
 
     private static string CreateTrackerDiagnosticsLogPath()

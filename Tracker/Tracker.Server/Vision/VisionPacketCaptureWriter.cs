@@ -1,22 +1,21 @@
 using System.Net;
-using Microsoft.Extensions.Options;
 
 namespace Tracker.Server.Vision;
 
 public sealed class VisionPacketCaptureWriter : IDisposable
 {
     private readonly object gate = new();
-    private readonly VisionPacketCaptureOptions options;
+    private readonly VisionPacketCaptureSession session;
     private readonly ILogger<VisionPacketCaptureWriter> logger;
     private StreamWriter? writer;
     private string? capturePath;
     private bool writeFailed;
 
     public VisionPacketCaptureWriter(
-        IOptions<VisionReceiverOptions> options,
+        VisionPacketCaptureSession session,
         ILogger<VisionPacketCaptureWriter> logger)
     {
-        this.options = options.Value.PacketCapture;
+        this.session = session;
         this.logger = logger;
     }
 
@@ -33,7 +32,7 @@ public sealed class VisionPacketCaptureWriter : IDisposable
 
     public void Capture(ReadOnlySpan<byte> payload, EndPoint remoteEndpoint, DateTimeOffset receivedAt)
     {
-        if (!options.Enabled || writeFailed)
+        if (!session.Enabled || writeFailed)
         {
             return;
         }
@@ -44,7 +43,7 @@ public sealed class VisionPacketCaptureWriter : IDisposable
             {
                 EnsureWriter(receivedAt);
                 VisionPacketCaptureFile.WriteRecord(writer!, receivedAt, remoteEndpoint, payload);
-                if (options.FlushEachPacket)
+                if (session.FlushEachPacket)
                 {
                     writer!.Flush();
                 }
@@ -73,8 +72,13 @@ public sealed class VisionPacketCaptureWriter : IDisposable
             return;
         }
 
-        capturePath = VisionPacketCaptureFile.BuildCapturePath(options, receivedAt);
+        var sessionState = session.EnsureStarted(receivedAt)
+            ?? throw new InvalidOperationException("SSL-Vision packet capture session is disabled.");
+        capturePath = sessionState.PacketPath;
         writer = VisionPacketCaptureFile.CreateWriter(capturePath);
-        logger.LogInformation("Writing SSL-Vision packet capture to {CapturePath}", capturePath);
+        logger.LogInformation(
+            "Writing SSL-Vision packet capture to {CapturePath} with metadata {MetadataPath}",
+            capturePath,
+            sessionState.MetadataPath);
     }
 }
