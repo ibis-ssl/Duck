@@ -83,7 +83,7 @@ tracker が直接扱う proto 入力は次の通り。
   - `Field` を保持し、必要に応じて calibration は診断表示へ回す
 - `SSL_GeometryFieldSize`
   - field 寸法と line / arc 情報
-  - 主に `FieldLength`, `FieldWidth`, `GoalWidth`, `GoalDepth`, `BoundaryWidth`, `BoundaryWidthGoalLine`, `LineThickness`, `FieldLines`, `FieldArcs`
+  - 主に `FieldLength`, `FieldWidth`, `GoalWidth`, `GoalDepth`, `BoundaryWidth`, `BoundaryWidthGoalLine`, `PenaltyAreaDepth`, `PenaltyAreaWidth`, `CenterCircleRadius`, `LineThickness`, `FieldLines`, `FieldArcs`
 
 ## 外部出力
 

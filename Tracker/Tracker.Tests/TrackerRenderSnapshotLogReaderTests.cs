@@ -227,6 +227,9 @@ public class TrackerRenderSnapshotLogReaderTests
                 GoalDepthMm = 180,
                 BoundaryWidthMm = 300,
                 BoundaryWidthGoalLineMm = 300,
+                PenaltyAreaDepthMm = 1000,
+                PenaltyAreaWidthMm = 2000,
+                CenterCircleRadiusMm = 500,
                 LineThicknessMm = 10,
             },
             Balls =

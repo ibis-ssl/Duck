@@ -360,19 +360,43 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
-    public void Update_PreservesGoalLineBoundaryAndLineThicknessInGeometrySnapshot()
+    public void Update_PreservesDisplayGeometryInGeometrySnapshot()
     {
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
-        _ = engine.Update(
-            packet: TrackerContractTestData.CreateGeometryPacket(
-                fieldLength: 12000,
-                fieldWidth: 9000,
-                boundaryWidth: 300,
-                boundaryWidthGoalLine: 350,
-                lineThickness: 12),
-            settings: settings);
+        // tracked field 表示で defense area や center circle が消えないよう、描画用 geometry 寸法を保持することを確認する。
+        var geometryPacket = TrackerContractTestData.CreateGeometryPacket(
+            fieldLength: 12000,
+            fieldWidth: 9000,
+            boundaryWidth: 300,
+            boundaryWidthGoalLine: 350,
+            penaltyAreaDepth: 1200,
+            penaltyAreaWidth: 2400,
+            centerCircleRadius: 600,
+            lineThickness: 12);
+        geometryPacket.Geometry.Field.FieldLines.Add(
+            new SSL_FieldLineSegment
+            {
+                Name = "LeftPenaltyStretch",
+                P1 = new Vector2f { X = -4800, Y = -1200 },
+                P2 = new Vector2f { X = -4800, Y = 1200 },
+                Thickness = 12,
+                Type = SSL_FieldShapeType.LeftPenaltyStretch,
+            });
+        geometryPacket.Geometry.Field.FieldArcs.Add(
+            new SSL_FieldCircularArc
+            {
+                Name = "CenterCircle",
+                Center = new Vector2f { X = 0, Y = 0 },
+                Radius = 600,
+                A1 = 0,
+                A2 = MathF.PI,
+                Thickness = 12,
+                Type = SSL_FieldShapeType.CenterCircle,
+            });
+
+        _ = engine.Update(packet: geometryPacket, settings: settings);
 
         var result = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
@@ -385,7 +409,19 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         var committedFrame = Assert.Single(result.CommittedFrames);
         Assert.NotNull(committedFrame.GeometrySnapshot);
         Assert.Equal(350, committedFrame.GeometrySnapshot!.BoundaryWidthGoalLineMm);
+        Assert.Equal(1200, committedFrame.GeometrySnapshot.PenaltyAreaDepthMm);
+        Assert.Equal(2400, committedFrame.GeometrySnapshot.PenaltyAreaWidthMm);
+        Assert.Equal(600, committedFrame.GeometrySnapshot.CenterCircleRadiusMm);
         Assert.Equal(12, committedFrame.GeometrySnapshot.LineThicknessMm);
+        var fieldLine = Assert.Single(committedFrame.GeometrySnapshot.FieldLines);
+        Assert.Equal("LeftPenaltyStretch", fieldLine.Name);
+        Assert.Equal(-4800, fieldLine.P1XMm);
+        Assert.Equal(1200, fieldLine.P2YMm);
+        Assert.Equal(SSL_FieldShapeType.LeftPenaltyStretch, fieldLine.Type);
+        var fieldArc = Assert.Single(committedFrame.GeometrySnapshot.FieldArcs);
+        Assert.Equal("CenterCircle", fieldArc.Name);
+        Assert.Equal(600, fieldArc.RadiusMm);
+        Assert.Equal(SSL_FieldShapeType.CenterCircle, fieldArc.Type);
     }
 
     [Fact]

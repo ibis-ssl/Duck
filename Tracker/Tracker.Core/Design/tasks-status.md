@@ -7,7 +7,7 @@
 - ID: TRACKER-030
 - Title: Tracked field 表示を Vision field geometry と揃える
 - Phase: ui
-- Status: pending
+- Status: done
 - Size: small
 - Dependencies: TRACKER-029 の review が完了していること
 - Exit Criteria:
@@ -18,17 +18,7 @@
 
 ## 次の調査タスク
 
-- ID: TRACKER-030
-- Title: Tracked field 表示を Vision field geometry と揃える
-- Phase: ui
-- Status: pending
-- Size: small
-- Dependencies: TRACKER-029 の review が完了していること
-- Exit Criteria:
-  - tracked view でも defense area / goal / center / field arcs など Vision field と同等の線が描画される
-  - raw Vision 画面と tracked 画面の field orientation / scale / viewport の差分が report に記録されている
-  - component/view-state regression または screenshot evidence で表示差分の解消を確認できる
-  - review 結果が `reports/tracker-030-review-*.md` に記録され、blocking finding が残っていない
+- none
 
 ## タスク一覧
 
@@ -64,4 +54,4 @@
 | TRACKER-027 | Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する | engine | done | TRACKER-026 | 近接別 ID robot を raw detection 単位で抑制し、短命 secondary ball ghost を 1 frame で出力しない。継続観測された genuine な複数 ball は stable sort で出力できる。実装・検証は `reports/tracker-027-evidence-20260510161437.md`、review は `reports/tracker-027-review-20260510161549.md` に記録済み。 |
 | TRACKER-028 | capture 1680 付近の複数 ball 再発を解析して修正する | engine | done | TRACKER-027 | 指定 diagnostics log の trackedFrame 1680 付近で複数 ball になる原因を記録し、成長済み secondary ball が fresh observation を失った後に出続けないよう修正した。実装・検証は `reports/tracker-028-evidence-20260510215726.md`、review は `reports/tracker-028-review-20260510215726.md` に記録済み。 |
 | TRACKER-029 | tracked object の小刻みな振動を抑制する | engine | done | TRACKER-028 | stationary に近い tracked ball / robot の表示揺れを抑制しつつ、実移動している object の追従性を過度に落とさない。振動抑制 tuning 値は profile 設定から外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、review は `reports/tracker-029-review-20260510221200.md` に記録済み。 |
-| TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | pending | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を report と表示検証で確認する。 |
+| TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | done | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。review は `reports/tracker-030-review-20260510222529.md` に記録済み。 |

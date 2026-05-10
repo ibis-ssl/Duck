@@ -41,7 +41,53 @@ public sealed class TrackerGeometrySnapshot
 
     public int BoundaryWidthGoalLineMm { get; init; }
 
+    public int PenaltyAreaDepthMm { get; init; }
+
+    public int PenaltyAreaWidthMm { get; init; }
+
+    public int CenterCircleRadiusMm { get; init; }
+
     public int LineThicknessMm { get; init; }
+
+    public IReadOnlyList<TrackerGeometryLineSegment> FieldLines { get; init; } = [];
+
+    public IReadOnlyList<TrackerGeometryCircularArc> FieldArcs { get; init; } = [];
+}
+
+public sealed class TrackerGeometryLineSegment
+{
+    public string Name { get; init; } = string.Empty;
+
+    public double P1XMm { get; init; }
+
+    public double P1YMm { get; init; }
+
+    public double P2XMm { get; init; }
+
+    public double P2YMm { get; init; }
+
+    public double ThicknessMm { get; init; }
+
+    public SSL_FieldShapeType Type { get; init; } = SSL_FieldShapeType.Undefined;
+}
+
+public sealed class TrackerGeometryCircularArc
+{
+    public string Name { get; init; } = string.Empty;
+
+    public double CenterXMm { get; init; }
+
+    public double CenterYMm { get; init; }
+
+    public double RadiusMm { get; init; }
+
+    public double A1Rad { get; init; }
+
+    public double A2Rad { get; init; }
+
+    public double ThicknessMm { get; init; }
+
+    public SSL_FieldShapeType Type { get; init; } = SSL_FieldShapeType.Undefined;
 }
 
 public sealed class TrackedBallState
