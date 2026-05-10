@@ -100,7 +100,43 @@ raw SSL-Vision packet の受信設定です。
 | `MulticastAddress` | 受信対象の multicast group address です。値が multicast 範囲ならその group へ join します。通常は SSL-Vision 側の multicast address を指定します。 |
 | `Port` | SSL-Vision packet の受信 port です。 |
 | `InterfaceAddress` | multicast join に使う local IPv4 address です。`null` の場合は利用可能な IPv4 interface を自動探索します。複数 NIC がある環境や join 失敗時は明示指定すると安定します。 |
+| `PacketCapture` | 受信した UDP packet を後で replay できるように圧縮保存する設定です。 |
 | `Profiles` | profile ごとの receiver override です。`Tracker` 側の active profile 名と同名エントリがあれば、起動時と runtime profile switch 完了後にその receiver 設定へ追従します。 |
+
+### `VisionReceiver:PacketCapture`
+
+SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes として `jsonl.gz` に保存します。各行には `receivedAt`、remote endpoint、payload の base64 が入るため、後から同じ順序で `SSL_WrapperPacket` に戻して tracker へ再投入できます。decode に失敗した packet も保存対象です。
+
+| キー | 意味 |
+| --- | --- |
+| `Enabled` | `true` なら packet capture を有効にします。packet は重くなり得るため、通常は必要な調査時だけ有効にします。 |
+| `DirectoryPath` | capture file の出力 directory です。相対 path は実行ファイル directory から解決します。 |
+| `FilePrefix` | capture file 名の prefix です。実際の file 名は `<prefix>-<timestamp>-<guid>.jsonl.gz` になります。 |
+| `FlushEachPacket` | `true` なら packet ごとに flush します。異常終了時の欠落は減りますが、I/O cost は上がります。 |
+
+現在の `appsettings.json` では無効です。
+
+```json
+"PacketCapture": {
+  "Enabled": false,
+  "DirectoryPath": "packet-captures",
+  "FilePrefix": "ssl-vision-packets",
+  "FlushEachPacket": false
+}
+```
+
+問題再現用に保存したい場合は `Enabled=true` にします。
+
+```json
+"PacketCapture": {
+  "Enabled": true,
+  "DirectoryPath": "packet-captures",
+  "FilePrefix": "ssl-vision-packets",
+  "FlushEachPacket": true
+}
+```
+
+保存された capture は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各 record の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで replay できます。
 
 ### `VisionReceiver:Profiles:<name>`
 
@@ -123,7 +159,7 @@ tracker 全体の設定です。
 | `SourceName` | tracker packet の source name です。profile ごとの publish 設定と合わせて packet generator に渡されます。 |
 | `Uuid` | tracker packet の UUID です。受信側で source 識別に使う値です。 |
 | `ActiveProfileName` | 起動時に使う profile 名です。`Tracker:Profiles` に存在する必要があります。 |
-| `Diagnostics` | tracker の raw / tracked 診断ログ出力設定です。通常運用では `Enabled=false` にします。 |
+| `Diagnostics` | tracker の raw / tracked 診断ログ出力設定です。 |
 | `RuntimeOverrides` | 起動時に active profile へ上書きする optional override 群です。profile 定義を変えずに一時的な publish / tracker tuning を差し込む用途です。 |
 | `Profiles` | profile ごとの publish / engine / tuning 設定です。UI と API の profile switch 対象にもなります。 |
 
@@ -136,6 +172,36 @@ tracker の調査用診断ログ設定です。`Enabled=false` の場合、`Trac
 | `Enabled` | `true` なら tracker diagnostics を出力します。`false` なら console / file の診断ログを停止します。 |
 | `FileEnabled` | `Enabled=true` のとき、診断ログをファイルにも追記するかを指定します。 |
 | `FilePath` | ファイル出力先です。`null` の場合は実行ファイルと同じ directory に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。 |
+
+現在の `appsettings.json` は、標準ログと起動ごとの新規ファイルの両方へ出力する設定です。
+
+```json
+"Diagnostics": {
+  "Enabled": true,
+  "FileEnabled": true,
+  "FilePath": null
+}
+```
+
+ファイル出力を止め、標準ログだけにする場合は `FileEnabled=false` にします。
+
+```json
+"Diagnostics": {
+  "Enabled": true,
+  "FileEnabled": false,
+  "FilePath": null
+}
+```
+
+診断ログを完全に止める場合は `Enabled=false` にします。
+
+```json
+"Diagnostics": {
+  "Enabled": false,
+  "FileEnabled": true,
+  "FilePath": null
+}
+```
 
 ### `Tracker:RuntimeOverrides`
 

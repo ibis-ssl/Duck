@@ -39,6 +39,7 @@ builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
 builder.Services.AddSingleton<TrackerCoordinator>();
 builder.Services.AddSingleton<TrackerProfileRequestService>();
 builder.Services.AddSingleton<VisionPacketStore>();
+builder.Services.AddSingleton<VisionPacketCaptureWriter>();
 builder.Services.AddHostedService<VisionReceiverService>();
 
 var app = builder.Build();

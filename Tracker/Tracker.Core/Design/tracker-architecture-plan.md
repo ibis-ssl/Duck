@@ -441,6 +441,7 @@ geometry 更新規則:
 
 - `VisionReceiverService`
   - UDP 受信と proto decode
+  - 問題再現用に、必要な調査時だけ着信 UDP datagram を圧縮 capture として保存する
 - `VisionPacketStore`
   - raw snapshot 保持
 - `TrackerCoordinator`
@@ -457,12 +458,13 @@ geometry 更新規則:
 ## データフロー
 
 1. `VisionReceiverService` が `SSL_WrapperPacket` を受信する
-2. raw packet を `VisionPacketStore` に反映する
-3. 同じ raw packet を tracker coordinator が `TrackerEngine` に流す
-4. `TrackerEngine` が `TrackerFrame` を更新する
-5. `TrackerPacketGenerator` が official `TrackerWrapperPacket` を生成する
-6. publisher が UDP multicast へ送信する
-7. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
+2. packet capture が有効な場合は、decode 前の UDP payload bytes と受信時刻を `jsonl.gz` に保存する
+3. raw packet を `VisionPacketStore` に反映する
+4. 同じ raw packet を tracker coordinator が `TrackerEngine` に流す
+5. `TrackerEngine` が `TrackerFrame` を更新する
+6. `TrackerPacketGenerator` が official `TrackerWrapperPacket` を生成する
+7. publisher が UDP multicast へ送信する
+8. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
 
 ## 設定
 
@@ -499,6 +501,16 @@ geometry 更新規則:
   - `Enabled`
   - `FileEnabled`
   - `FilePath`
+
+`VisionReceiver` 側は replay 用の packet capture 設定を持つ。
+
+- `PacketCapture`
+  - `Enabled`
+  - `DirectoryPath`
+  - `FilePrefix`
+  - `FlushEachPacket`
+
+packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
 
 既定配信先は official tracker の慣例値に合わせる。
 
