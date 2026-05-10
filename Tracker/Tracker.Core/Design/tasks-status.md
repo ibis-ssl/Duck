@@ -7,7 +7,7 @@
 - ID: TRACKER-024
 - Title: Kalman 標準準拠の検証と release 判定をやり直す
 - Phase: verification
-- Status: pending
+- Status: done
 - Size: medium
 - Dependencies: TRACKER-023 が完了していること
 - Exit Criteria:
@@ -42,4 +42,4 @@
 | TRACKER-021 | `Tracker.Server` の使い方 README を追加する | documentation | done | TRACKER-020 | `Tracker/Tracker.Server/README.md` が存在し、起動手順、画面の使い方、主要設定値の意味が記載されている。 |
 | TRACKER-022 | `VisionReceiver` を profile-aware にする | integration | done | TRACKER-021 | `VisionReceiver` 設定が複数 profile を持てて、起動中 profile と runtime switch に追従でき、関連検証結果が存在する。 |
 | TRACKER-023 | camera-local tracking を線形 Kalman filter 標準へ是正する | engine | done | TRACKER-013, TRACKER-022 | ball / robot の camera-local track 更新が線形 Kalman filter ベースになり、`ProcessNoise` / `MeasurementNoise` / `Gate` / `VisibilityHalfLifeSeconds` が runtime 挙動へ反映され、既存 contract に矛盾しない。 |
-| TRACKER-024 | Kalman 標準準拠の検証と release 判定をやり直す | verification | pending | TRACKER-023 | Kalman 化後の focused/full test と review report が存在し、設計書の「v1 は直線運動前提の Kalman filter を標準とする」に対して未解決 blocker が残っていない。 |
+| TRACKER-024 | Kalman 標準準拠の検証と release 判定をやり直す | verification | done | TRACKER-023 | Kalman 化後の focused/full test と review report が存在し、設計書の「v1 は直線運動前提の Kalman filter を標準とする」に対して未解決 blocker が残っていない。 |
