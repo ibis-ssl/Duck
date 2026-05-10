@@ -293,6 +293,7 @@ public sealed class TrackerEngine : ITrackerEngine
             {
                 ProfileName = activeProfileName,
             },
+            SourceDetections = CreateSourceDetectionFrames(orderedDetections),
         };
 
         committedFrames.Add(committedFrame);
@@ -817,6 +818,22 @@ public sealed class TrackerEngine : ITrackerEngine
             detection.Balls.ToList(),
             detection.RobotsYellow.ToList(),
             detection.RobotsBlue.ToList());
+    }
+
+    private static IReadOnlyList<TrackerSourceDetectionFrame> CreateSourceDetectionFrames(
+        IReadOnlyList<BufferedDetection> detections)
+    {
+        return detections
+            .Select(detection => new TrackerSourceDetectionFrame
+            {
+                SourceFrameNumber = detection.SourceFrameNumber,
+                CameraId = detection.CameraId,
+                EventTimestampNs = detection.EventTimestampNs,
+                Balls = detection.Balls.Select(ball => ball.Clone()).ToArray(),
+                RobotsYellow = detection.RobotsYellow.Select(robot => robot.Clone()).ToArray(),
+                RobotsBlue = detection.RobotsBlue.Select(robot => robot.Clone()).ToArray(),
+            })
+            .ToArray();
     }
 
     private static double SelectEventTimeSeconds(SSL_DetectionFrame detection)

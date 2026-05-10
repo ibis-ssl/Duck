@@ -1,3 +1,4 @@
+using System.Globalization;
 using Tracker.Core;
 using Tracker.Server.Vision;
 
@@ -258,28 +259,33 @@ public sealed class TrackerCoordinator
         }
 
         var newestFrame = result.CommittedFrames[^1];
-        var detection = packet?.Detection;
-        if (!ShouldLogTrackerDiagnostics(receivedAt, detection, newestFrame))
+        var sourceDetections = newestFrame.SourceDetections;
+        if (!ShouldLogTrackerDiagnostics(receivedAt, newestFrame))
         {
             return;
         }
 
         lastTrackerDiagnosticsLogAt = receivedAt;
-        var rawBallDetails = FormatRawBalls(detection?.Balls);
-        var rawBlueDetails = FormatRawRobots(detection?.RobotsBlue, TrackerTeam.Blue);
-        var rawYellowDetails = FormatRawRobots(detection?.RobotsYellow, TrackerTeam.Yellow);
+        var rawBalls = sourceDetections.SelectMany(detection => detection.Balls).ToArray();
+        var rawBlue = sourceDetections.SelectMany(detection => detection.RobotsBlue).ToArray();
+        var rawYellow = sourceDetections.SelectMany(detection => detection.RobotsYellow).ToArray();
+        var rawFrameLabel = FormatSourceFrameNumbers(sourceDetections);
+        var rawCameraLabel = FormatSourceCameraIds(sourceDetections);
+        var rawBallDetails = FormatRawBalls(rawBalls);
+        var rawBlueDetails = FormatRawRobots(rawBlue, TrackerTeam.Blue);
+        var rawYellowDetails = FormatRawRobots(rawYellow, TrackerTeam.Yellow);
         var trackedBallDetails = FormatTrackedBalls(newestFrame.Balls);
         var trackedRobotDetails = FormatTrackedRobots(newestFrame.Robots);
         var diagnosticsLine = FormattableString.Invariant(
-            $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={detection?.FrameNumber} rawCamera={detection?.CameraId} rawBalls={detection?.Balls.Count ?? 0} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
+            $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={rawFrameLabel} rawCamera={rawCameraLabel} rawBalls={rawBalls.Length} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
         if (logger.IsEnabled(LogLevel.Information))
         {
             logger.LogInformation(
                 "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
                 currentSettings.ProfileName,
-                detection?.FrameNumber,
-                detection?.CameraId,
-                detection?.Balls.Count ?? 0,
+                rawFrameLabel,
+                rawCameraLabel,
+                rawBalls.Length,
                 rawBallDetails,
                 rawBlueDetails,
                 rawYellowDetails,
@@ -356,7 +362,6 @@ public sealed class TrackerCoordinator
 
     private bool ShouldLogTrackerDiagnostics(
         DateTimeOffset receivedAt,
-        SSL_DetectionFrame? detection,
         TrackerFrame newestFrame)
     {
         if (receivedAt - lastTrackerDiagnosticsLogAt >= TrackerDiagnosticsLogInterval)
@@ -364,8 +369,28 @@ public sealed class TrackerCoordinator
             return true;
         }
 
-        return (detection?.Balls.Count ?? 0) > 1
+        return newestFrame.SourceDetections.Sum(detection => detection.Balls.Count) > 1
             || newestFrame.Balls.Count > 1;
+    }
+
+    private static string FormatSourceFrameNumbers(IReadOnlyList<TrackerSourceDetectionFrame> sourceDetections)
+    {
+        return FormatSourceValues(sourceDetections.Select(detection => detection.SourceFrameNumber));
+    }
+
+    private static string FormatSourceCameraIds(IReadOnlyList<TrackerSourceDetectionFrame> sourceDetections)
+    {
+        return FormatSourceValues(sourceDetections.Select(detection => detection.CameraId));
+    }
+
+    private static string FormatSourceValues(IEnumerable<uint> values)
+    {
+        var distinctValues = values
+            .Distinct()
+            .Order()
+            .Select(value => value.ToString(CultureInfo.InvariantCulture))
+            .ToArray();
+        return distinctValues.Length == 0 ? "-" : string.Join("/", distinctValues);
     }
 
     private static string FormatRawBalls(IEnumerable<SSL_DetectionBall>? balls)

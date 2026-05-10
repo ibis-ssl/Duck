@@ -77,7 +77,7 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 
 ### `Diagnostics` ページ
 
-- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の `*.tracker-diagnostics.log` を読めます
+- `/diagnostics` で capture sidecar の `*.tracker-diagnostics.log`、実行 directory の `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
 - 左側の timeline でログ行を時系列にスクロールできます
 - tracked ball が 2 個以上の行は強調表示されます
 - 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
@@ -174,9 +174,9 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 - `--expect <condition>`: summary metric の期待条件です。失敗すると exit code `1` になります。
 - `--detail-filter <condition>`: 条件に一致する committed frame の詳細を出力します。複数指定した場合は AND 条件です。
 - `--max-details <count>`: 詳細出力数を制限します。
-- `--settings <file>`: `Tracker.Server/appsettings.json` 形式、または capture の `metadata.json` 形式から tracker 設定を読み込みます。
+- `--settings <file>`: `Tracker.Server/appsettings.json` 形式、または capture の `metadata.json` 形式から tracker 設定を読み込みます。`Tracker.Server/appsettings.json` 形式では `Tracker:RuntimeOverrides` も profile 設定へ反映します。
 
-利用できる summary metric は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。frame 詳細の filter では `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。
+利用できる summary metric は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。frame 詳細の filter では `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。raw 系 metric は、その committed frame の source detection 群から集計します。
 
 例えば、raw では ball が 1 個なのに replay 後 frame で ball が 2 個以上になる箇所を確認する場合は次のようにします。
 

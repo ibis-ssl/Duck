@@ -28,12 +28,12 @@
 
         <div class="diagnostics-toolbar">
             <select class="diagnostics-select"
-                    value="@selectedFileName"
+                    value="@selectedLogPath"
                     @onchange="OnLogFileChanged"
                     aria-label="Diagnostics log file">
                 @foreach (var file in logFiles)
                 {
-                    <option value="@file.FileName">@file.FileName</option>
+                    <option value="@file.FullPath">@file.FileName</option>
                 }
             </select>
             <button type="button" class="diagnostics-button" @onclick="ReloadAsync">Reload</button>
@@ -95,7 +95,7 @@
                                 <dt>Frame</dt>
                                 <dd>@Display(selectedEntry.RawFrame)</dd>
                                 <dt>Camera</dt>
-                                <dd>@(selectedEntry.RawCamera?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                                <dd>@Display(selectedEntry.RawCamera)</dd>
                                 <dt>Balls</dt>
                                 <dd>@selectedEntry.RawBallCount</dd>
                             </dl>
@@ -131,7 +131,7 @@
     private IReadOnlyList<TrackerDiagnosticsLogFile> logFiles = [];
     private TrackerDiagnosticsLogSnapshot? snapshot;
     private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
-    private string? selectedFileName;
+    private string? selectedLogPath;
     private TrackerDiagnosticsLogEntry? selectedEntry;
 
     protected override void OnInitialized()
@@ -149,7 +149,7 @@
 
     private Task OnLogFileChanged(ChangeEventArgs args)
     {
-        selectedFileName = args.Value?.ToString();
+        selectedLogPath = args.Value?.ToString();
         LoadSelectedFile();
         return Task.CompletedTask;
     }
@@ -157,15 +157,15 @@
     private void LoadFiles()
     {
         logFiles = LogReader.ListFiles();
-        if (selectedFileName is null || !logFiles.Any(file => file.FileName == selectedFileName))
+        if (selectedLogPath is null || !logFiles.Any(file => file.FullPath == selectedLogPath))
         {
-            selectedFileName = logFiles.FirstOrDefault()?.FileName;
+            selectedLogPath = logFiles.FirstOrDefault()?.FullPath;
         }
     }
 
     private void LoadSelectedFile()
     {
-        if (selectedFileName is null)
+        if (selectedLogPath is null)
         {
             snapshot = null;
             entries = [];
@@ -173,7 +173,7 @@
             return;
         }
 
-        snapshot = LogReader.ReadFile(selectedFileName);
+        snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault(entry => entry.HasMultipleTrackedBalls)
             ?? entries.FirstOrDefault();

@@ -12,23 +12,32 @@ public sealed class TrackerDiagnosticsLogReader
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly VisionPacketCaptureOptions packetCaptureOptions;
+    private readonly TrackerDiagnosticsOptions diagnosticsOptions;
 
-    public TrackerDiagnosticsLogReader(IOptions<VisionReceiverOptions> visionReceiverOptions)
+    public TrackerDiagnosticsLogReader(
+        IOptions<VisionReceiverOptions> visionReceiverOptions,
+        TrackerDiagnosticsOptions diagnosticsOptions)
     {
         packetCaptureOptions = visionReceiverOptions.Value.PacketCapture;
+        this.diagnosticsOptions = diagnosticsOptions;
     }
 
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
-        var directoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
-        if (!Directory.Exists(directoryPath))
+        var files = new Dictionary<string, FileInfo>(StringComparer.Ordinal);
+        AddFiles(files, ResolveDirectoryPath(packetCaptureOptions.DirectoryPath), "*.tracker-diagnostics.log");
+        AddFiles(files, AppContext.BaseDirectory, "tracker-diagnostics-*.log");
+
+        if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
         {
-            return [];
+            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
+            if (File.Exists(filePath))
+            {
+                files[filePath] = new FileInfo(filePath);
+            }
         }
 
-        return Directory
-            .EnumerateFiles(directoryPath, "*.tracker-diagnostics.log")
-            .Select(path => new FileInfo(path))
+        return files.Values
             .OrderByDescending(file => file.LastWriteTimeUtc)
             .Select(file => new TrackerDiagnosticsLogFile(
                 file.Name,
@@ -40,14 +49,19 @@ public sealed class TrackerDiagnosticsLogReader
 
     public TrackerDiagnosticsLogSnapshot ReadFile(string fileName, int maxEntries = 10_000)
     {
-        var safeFileName = Path.GetFileName(fileName);
-        var directoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
-        var path = Path.Combine(directoryPath, safeFileName);
-        if (!File.Exists(path))
+        var requestedPath = Path.GetFullPath(ResolveFilePath(fileName));
+        var listedFile = ListFiles()
+            .FirstOrDefault(file => string.Equals(
+                Path.GetFullPath(file.FullPath),
+                requestedPath,
+                StringComparison.Ordinal));
+        var safeFileName = Path.GetFileName(requestedPath);
+        if (listedFile is null)
         {
             return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Log file '{safeFileName}' was not found.");
         }
 
+        var path = listedFile.FullPath;
         var entries = new List<TrackerDiagnosticsLogEntry>();
         var skippedLineCount = 0;
         var lineNumber = 0;
@@ -107,7 +121,7 @@ public sealed class TrackerDiagnosticsLogReader
             timestamp,
             GetString(fields, "profile"),
             GetString(fields, "rawFrame"),
-            GetNullableInt(fields, "rawCamera"),
+            GetString(fields, "rawCamera"),
             GetInt(fields, "rawBalls"),
             GetString(fields, "rawBallDetails"),
             GetString(fields, "rawBlue"),
@@ -131,6 +145,29 @@ public sealed class TrackerDiagnosticsLogReader
             : Path.Combine(AppContext.BaseDirectory, directoryPath);
     }
 
+    private static string ResolveFilePath(string fileName)
+    {
+        return Path.IsPathRooted(fileName)
+            ? fileName
+            : Path.Combine(AppContext.BaseDirectory, fileName);
+    }
+
+    private static void AddFiles(
+        IDictionary<string, FileInfo> files,
+        string directoryPath,
+        string searchPattern)
+    {
+        if (!Directory.Exists(directoryPath))
+        {
+            return;
+        }
+
+        foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern))
+        {
+            files[path] = new FileInfo(path);
+        }
+    }
+
     private static string TrimBracketedValue(string value)
     {
         return value.Length >= 2 && value[0] == '[' && value[^1] == ']'
@@ -151,13 +188,6 @@ public sealed class TrackerDiagnosticsLogReader
             : 0;
     }
 
-    private static int? GetNullableInt(IReadOnlyDictionary<string, string> fields, string key)
-    {
-        return fields.TryGetValue(key, out var value) &&
-            int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : null;
-    }
 }
 
 public sealed record TrackerDiagnosticsLogFile(
@@ -178,7 +208,7 @@ public sealed record TrackerDiagnosticsLogEntry(
     DateTimeOffset Timestamp,
     string ProfileName,
     string RawFrame,
-    int? RawCamera,
+    string RawCamera,
     int RawBallCount,
     string RawBallDetails,
     string RawBlueDetails,
@@ -204,7 +234,7 @@ public sealed record TrackerDiagnosticsLogEntry(
             DateTimeOffset.MinValue,
             "",
             "",
-            null,
+            "",
             0,
             "",
             "",

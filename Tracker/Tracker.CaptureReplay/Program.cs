@@ -80,13 +80,6 @@ internal static class CaptureReplayRunner
         {
             packetCount++;
             var packet = record.ParsePacket();
-            var rawBallCount = packet.Detection?.Balls.Count ?? 0;
-            var rawYellowCount = packet.Detection?.RobotsYellow.Count ?? 0;
-            var rawBlueCount = packet.Detection?.RobotsBlue.Count ?? 0;
-
-            maxRawBallCount = Math.Max(maxRawBallCount, rawBallCount);
-            maxRawYellowCount = Math.Max(maxRawYellowCount, rawYellowCount);
-            maxRawBlueCount = Math.Max(maxRawBlueCount, rawBlueCount);
 
             if (packet.Detection is not null)
             {
@@ -101,9 +94,15 @@ internal static class CaptureReplayRunner
             var result = engine.Update(packet, settings);
             foreach (var frame in result.CommittedFrames)
             {
+                var rawBallCount = CountRawBalls(frame);
+                var rawYellowCount = CountRawYellowRobots(frame);
+                var rawBlueCount = CountRawBlueRobots(frame);
                 committedFrameCount++;
                 maxBallCount = Math.Max(maxBallCount, frame.Balls.Count);
                 maxRobotCount = Math.Max(maxRobotCount, frame.Robots.Count);
+                maxRawBallCount = Math.Max(maxRawBallCount, rawBallCount);
+                maxRawYellowCount = Math.Max(maxRawYellowCount, rawYellowCount);
+                maxRawBlueCount = Math.Max(maxRawBlueCount, rawBlueCount);
 
                 if (!MatchesDetailFilters(detailFilters, rawBallCount, rawYellowCount, rawBlueCount, frame))
                 {
@@ -116,7 +115,7 @@ internal static class CaptureReplayRunner
                     continue;
                 }
 
-                detailFrames.Add(FormatFrame(packetCount, record.ReceivedAt, packet, frame));
+                detailFrames.Add(FormatFrame(packetCount, record.ReceivedAt, frame));
             }
         }
 
@@ -170,13 +169,10 @@ internal static class CaptureReplayRunner
     private static string FormatFrame(
         int packetIndex,
         DateTimeOffset receivedAt,
-        SSL_WrapperPacket packet,
         TrackerFrame frame)
     {
-        var detection = packet.Detection;
-        var rawSummary = detection is null
-            ? "rawFrame=- rawCamera=- rawBalls=0 rawYellow=0 rawBlue=0"
-            : $"rawFrame={detection.FrameNumber} rawCamera={detection.CameraId} rawBalls={detection.Balls.Count} rawYellow={detection.RobotsYellow.Count} rawBlue={detection.RobotsBlue.Count}";
+        var rawSummary =
+            $"rawFrame={FormatSourceFrameNumbers(frame)} rawCamera={FormatSourceCameraIds(frame)} rawBalls={CountRawBalls(frame)} rawYellow={CountRawYellowRobots(frame)} rawBlue={CountRawBlueRobots(frame)}";
         var balls = string.Join("; ", frame.Balls.Select(ball =>
             $"#{ball.InternalTrackId}:x={ball.XMm.ToString("F1", CultureInfo.InvariantCulture)},y={ball.YMm.ToString("F1", CultureInfo.InvariantCulture)},vis={ball.Visibility.ToString("F3", CultureInfo.InvariantCulture)},cams={string.Join("/", ball.SourceCameraIds.OrderBy(id => id))}"));
         var robots = string.Join("; ", frame.Robots.Take(8).Select(robot =>
@@ -184,6 +180,41 @@ internal static class CaptureReplayRunner
         var robotSuffix = frame.Robots.Count > 8 ? $"; ... +{frame.Robots.Count - 8}" : "";
 
         return $"input={packetIndex} receivedAt={receivedAt:O} {rawSummary} committedFrame={frame.FrameNumber} dataTs={frame.DataTimestampNs} balls={frame.Balls.Count} [{balls}] robots={frame.Robots.Count} [{robots}{robotSuffix}]";
+    }
+
+    private static int CountRawBalls(TrackerFrame frame)
+    {
+        return frame.SourceDetections.Sum(detection => detection.Balls.Count);
+    }
+
+    private static int CountRawYellowRobots(TrackerFrame frame)
+    {
+        return frame.SourceDetections.Sum(detection => detection.RobotsYellow.Count);
+    }
+
+    private static int CountRawBlueRobots(TrackerFrame frame)
+    {
+        return frame.SourceDetections.Sum(detection => detection.RobotsBlue.Count);
+    }
+
+    private static string FormatSourceFrameNumbers(TrackerFrame frame)
+    {
+        return FormatSourceValues(frame.SourceDetections.Select(detection => detection.SourceFrameNumber));
+    }
+
+    private static string FormatSourceCameraIds(TrackerFrame frame)
+    {
+        return FormatSourceValues(frame.SourceDetections.Select(detection => detection.CameraId));
+    }
+
+    private static string FormatSourceValues(IEnumerable<uint> values)
+    {
+        var distinctValues = values
+            .Distinct()
+            .Order()
+            .Select(value => value.ToString(CultureInfo.InvariantCulture))
+            .ToArray();
+        return distinctValues.Length == 0 ? "-" : string.Join("/", distinctValues);
     }
 }
 
@@ -351,7 +382,7 @@ internal static class TrackerSettingsFactory
         }
 
         var defaults = CreateDefault(profileName);
-        return new TrackerEngineSettings
+        var profileSettings = new TrackerEngineSettings
         {
             ProfileName = profileName,
             ReorderWindowNs = profile.Engine?.ReorderWindowNs ?? defaults.ReorderWindowNs,
@@ -364,6 +395,10 @@ internal static class TrackerSettingsFactory
             BallTracker = MergeBallTracker(defaults.BallTracker, profile.BallTracker),
             KickDetector = MergeKickDetector(defaults.KickDetector, profile.KickDetector),
         };
+
+        return tracker.RuntimeOverrides is null
+            ? profileSettings
+            : ApplyRuntimeOverrides(profileSettings, tracker.RuntimeOverrides);
     }
 
     private static TrackerEngineSettings ApplyOverrides(
@@ -390,6 +425,23 @@ internal static class TrackerSettingsFactory
                 TrackLifetimeNs = overrides.BallTrackLifetimeNs ?? settings.BallTracker.TrackLifetimeNs,
             },
             KickDetector = settings.KickDetector,
+        };
+    }
+
+    private static TrackerEngineSettings ApplyRuntimeOverrides(
+        TrackerEngineSettings settings,
+        TrackerRuntimeOverrides overrides)
+    {
+        return new TrackerEngineSettings
+        {
+            ProfileName = settings.ProfileName,
+            ReorderWindowNs = settings.ReorderWindowNs,
+            MergeWindowNs = settings.MergeWindowNs,
+            GeometryResetFieldLengthThresholdMm = settings.GeometryResetFieldLengthThresholdMm,
+            GeometryResetFieldWidthThresholdMm = settings.GeometryResetFieldWidthThresholdMm,
+            RobotTracker = MergeRobotTracker(settings.RobotTracker, overrides.RobotTracker),
+            BallTracker = MergeBallTracker(settings.BallTracker, overrides.BallTracker),
+            KickDetector = MergeKickDetector(settings.KickDetector, overrides.KickDetector),
         };
     }
 
@@ -435,6 +487,49 @@ internal static class TrackerSettingsFactory
             ContactMarginMm = options?.ContactMarginMm ?? defaults.ContactMarginMm,
         };
     }
+
+    private static TrackerRobotTrackerOverrides MergeRobotTracker(
+        TrackerRobotTrackerOverrides defaults,
+        TrackerRobotTrackerOverrides overrides)
+    {
+        return new TrackerRobotTrackerOverrides
+        {
+            ProcessNoise = overrides.ProcessNoise ?? defaults.ProcessNoise,
+            MeasurementNoise = overrides.MeasurementNoise ?? defaults.MeasurementNoise,
+            VisibilityHalfLifeSeconds = overrides.VisibilityHalfLifeSeconds ?? defaults.VisibilityHalfLifeSeconds,
+            OutputVisibilityThreshold = overrides.OutputVisibilityThreshold ?? defaults.OutputVisibilityThreshold,
+            Gate = overrides.Gate ?? defaults.Gate,
+            OutlierLimitMm = overrides.OutlierLimitMm ?? defaults.OutlierLimitMm,
+        };
+    }
+
+    private static TrackerBallTrackerOverrides MergeBallTracker(
+        TrackerBallTrackerOverrides defaults,
+        TrackerBallTrackerOverrides overrides)
+    {
+        return new TrackerBallTrackerOverrides
+        {
+            ProcessNoise = overrides.ProcessNoise ?? defaults.ProcessNoise,
+            MeasurementNoise = overrides.MeasurementNoise ?? defaults.MeasurementNoise,
+            VisibilityHalfLifeSeconds = overrides.VisibilityHalfLifeSeconds ?? defaults.VisibilityHalfLifeSeconds,
+            OutputVisibilityThreshold = overrides.OutputVisibilityThreshold ?? defaults.OutputVisibilityThreshold,
+            Gate = overrides.Gate ?? defaults.Gate,
+            OutlierLimitMm = overrides.OutlierLimitMm ?? defaults.OutlierLimitMm,
+            TrackLifetimeNs = overrides.TrackLifetimeNs ?? defaults.TrackLifetimeNs,
+        };
+    }
+
+    private static TrackerKickDetectorOverrides MergeKickDetector(
+        TrackerKickDetectorOverrides defaults,
+        TrackerKickDetectorOverrides overrides)
+    {
+        return new TrackerKickDetectorOverrides
+        {
+            KickSpeedThresholdMmPerS = overrides.KickSpeedThresholdMmPerS ?? defaults.KickSpeedThresholdMmPerS,
+            ChipHeightThresholdMm = overrides.ChipHeightThresholdMm ?? defaults.ChipHeightThresholdMm,
+            ContactMarginMm = overrides.ContactMarginMm ?? defaults.ContactMarginMm,
+        };
+    }
 }
 
 internal sealed class ReplaySettingsFile
@@ -444,6 +539,8 @@ internal sealed class ReplaySettingsFile
     public ReplaySettingsFile? TrackerOptions { get; set; }
 
     public ReplayResolvedOptions? ResolvedTrackerOptions { get; set; }
+
+    public TrackerRuntimeOverrides? RuntimeOverrides { get; set; }
 
     public Dictionary<string, TrackerProfileOptions>? Profiles { get; set; }
 }

@@ -23,6 +23,8 @@ public sealed class TrackerFrame
     public BallLeftFieldState? BallLeftField { get; init; }
 
     public TrackerFrameMetadata Metadata { get; init; } = new();
+
+    public IReadOnlyList<TrackerSourceDetectionFrame> SourceDetections { get; init; } = [];
 }
 
 public sealed class TrackerGeometrySnapshot
@@ -160,6 +162,21 @@ public sealed class TrackerFrameMetadata
     public string? SourceName { get; init; }
 
     public string? ProfileName { get; init; }
+}
+
+public sealed class TrackerSourceDetectionFrame
+{
+    public uint SourceFrameNumber { get; init; }
+
+    public uint CameraId { get; init; }
+
+    public long EventTimestampNs { get; init; }
+
+    public IReadOnlyList<SSL_DetectionBall> Balls { get; init; } = [];
+
+    public IReadOnlyList<SSL_DetectionRobot> RobotsYellow { get; init; } = [];
+
+    public IReadOnlyList<SSL_DetectionRobot> RobotsBlue { get; init; } = [];
 }
 
 public enum TrackerTeam
