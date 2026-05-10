@@ -518,6 +518,8 @@ packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に�
 
 raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
 
+`Tracker.Server` の diagnostics viewer は、diagnostics log と同じ basename の `*.render-snapshots.jsonl.gz` がある場合に、選択した tracked frame の raw source detection と tracked frame を field 上に並べて描画する。描画 snapshot は調査用の UI データであり、tracker engine の replay 入力や内部状態保持には使わない。
+
 既定配信先は official tracker の慣例値に合わせる。
 
 - `224.5.23.2:10010`

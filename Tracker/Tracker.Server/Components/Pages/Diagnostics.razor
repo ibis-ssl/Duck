@@ -1,7 +1,10 @@
 @page "/diagnostics"
 @using System.Globalization
+@using Tracker.Core
+@using Tracker.Server.Components.Vision
 @using Tracker.Server.Tracking
 @inject TrackerDiagnosticsLogReader LogReader
+@inject TrackerRenderSnapshotLogReader RenderSnapshotReader
 
 <PageTitle>Diagnostics</PageTitle>
 
@@ -88,6 +91,30 @@
                         </div>
                     </div>
 
+                    @if (selectedRenderSnapshot is not null)
+                    {
+                        <div class="diagnostics-render">
+                            <section>
+                                <h2>Raw Field</h2>
+                                <VisionFieldCanvas Geometry="CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot)"
+                                                   Balls="CreateRawBalls(selectedRenderSnapshot.Frame)"
+                                                   RobotsYellow="CreateRawYellowRobots(selectedRenderSnapshot.Frame)"
+                                                   RobotsBlue="CreateRawBlueRobots(selectedRenderSnapshot.Frame)" />
+                            </section>
+                            <section>
+                                <h2>Tracked Field</h2>
+                                <VisionFieldCanvas Geometry="trackedRenderView.Geometry"
+                                                   Balls="trackedRenderView.Balls"
+                                                   RobotsYellow="trackedRenderView.RobotsYellow"
+                                                   RobotsBlue="trackedRenderView.RobotsBlue" />
+                            </section>
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(renderSnapshotError))
+                    {
+                        <div class="diagnostics-render-alert">@renderSnapshotError</div>
+                    }
+
                     <div class="diagnostics-detail__columns">
                         <section>
                             <h2>Raw</h2>
@@ -133,6 +160,18 @@
     private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
     private string? selectedLogPath;
     private TrackerDiagnosticsLogEntry? selectedEntry;
+    private TrackerRenderSnapshotView? selectedRenderSnapshot;
+    private string? renderSnapshotError;
+
+    private TrackedVisionViewState trackedRenderView =>
+        selectedRenderSnapshot is null
+            ? TrackedVisionViewState.FromSnapshot(new TrackedSnapshot(null, null, "-", 0, 0))
+            : TrackedVisionViewState.FromSnapshot(new TrackedSnapshot(
+                selectedRenderSnapshot.Frame,
+                selectedRenderSnapshot.ReceivedAt,
+                selectedRenderSnapshot.Frame.Metadata.ProfileName ?? "-",
+                0,
+                0));
 
     protected override void OnInitialized()
     {
@@ -149,7 +188,8 @@
 
     private Task OnLogFileChanged(ChangeEventArgs args)
     {
-        selectedLogPath = args.Value?.ToString();
+        var requestedLogPath = args.Value?.ToString();
+        selectedLogPath = logFiles.FirstOrDefault(file => file.FullPath == requestedLogPath)?.FullPath;
         LoadSelectedFile();
         return Task.CompletedTask;
     }
@@ -170,6 +210,8 @@
             snapshot = null;
             entries = [];
             selectedEntry = null;
+            selectedRenderSnapshot = null;
+            renderSnapshotError = null;
             return;
         }
 
@@ -177,11 +219,13 @@
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault(entry => entry.HasMultipleTrackedBalls)
             ?? entries.FirstOrDefault();
+        LoadSelectedRenderSnapshot();
     }
 
     private void SelectEntry(TrackerDiagnosticsLogEntry entry)
     {
         selectedEntry = entry;
+        LoadSelectedRenderSnapshot();
     }
 
     private string TimelineItemClass(TrackerDiagnosticsLogEntry entry)
@@ -212,5 +256,62 @@
     private static string Display(string value)
     {
         return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+
+    private void LoadSelectedRenderSnapshot()
+    {
+        if (selectedLogPath is null || selectedEntry is null)
+        {
+            selectedRenderSnapshot = null;
+            renderSnapshotError = null;
+            return;
+        }
+
+        var result = RenderSnapshotReader.ReadFrame(selectedLogPath, selectedEntry.TrackedFrame);
+        selectedRenderSnapshot = result.Snapshot;
+        renderSnapshotError = result.Error;
+    }
+
+    private static SSL_GeometryData? CreateGeometry(TrackerGeometrySnapshot? geometrySnapshot)
+    {
+        if (geometrySnapshot is null)
+        {
+            return null;
+        }
+
+        return new SSL_GeometryData
+        {
+            Field = new SSL_GeometryFieldSize
+            {
+                FieldLength = geometrySnapshot.FieldLengthMm,
+                FieldWidth = geometrySnapshot.FieldWidthMm,
+                GoalWidth = geometrySnapshot.GoalWidthMm,
+                GoalDepth = geometrySnapshot.GoalDepthMm,
+                BoundaryWidth = geometrySnapshot.BoundaryWidthMm,
+                BoundaryWidthGoalLine = geometrySnapshot.BoundaryWidthGoalLineMm,
+                LineThickness = geometrySnapshot.LineThicknessMm,
+            },
+        };
+    }
+
+    private static IReadOnlyList<SSL_DetectionBall> CreateRawBalls(TrackerFrame frame)
+    {
+        return frame.SourceDetections
+            .SelectMany(detection => detection.Balls)
+            .ToArray();
+    }
+
+    private static IReadOnlyList<SSL_DetectionRobot> CreateRawYellowRobots(TrackerFrame frame)
+    {
+        return frame.SourceDetections
+            .SelectMany(detection => detection.RobotsYellow)
+            .ToArray();
+    }
+
+    private static IReadOnlyList<SSL_DetectionRobot> CreateRawBlueRobots(TrackerFrame frame)
+    {
+        return frame.SourceDetections
+            .SelectMany(detection => detection.RobotsBlue)
+            .ToArray();
     }
 }

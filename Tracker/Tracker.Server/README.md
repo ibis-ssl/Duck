@@ -80,6 +80,7 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 - `/diagnostics` で capture sidecar の `*.tracker-diagnostics.log`、実行 directory の `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
 - 左側の timeline でログ行を時系列にスクロールできます
 - tracked ball が 2 個以上の行は強調表示されます
+- capture sidecar と同じ basename の `*.render-snapshots.jsonl.gz` がある場合は、選択行の raw / tracked field を描画できます
 - 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
 
 ## API
