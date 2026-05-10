@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: verification
-- 現在のタスク: TRACKER-018
+- 現在のタスク: TRACKER-019
 - 残りフェーズ: verification, review
 
 ## フェーズ一覧

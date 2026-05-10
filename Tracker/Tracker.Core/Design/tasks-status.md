@@ -4,14 +4,14 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-018
-- Title: Tracker v1 の build/test 証跡を取得する
+- ID: TRACKER-019
+- Title: Tracker v1 の integration 観点検証を行う
 - Phase: verification
 - Status: in_progress
 - Size: medium
-- Dependencies: TRACKER-017 が完了していること
+- Dependencies: TRACKER-018 が完了していること
 - Exit Criteria:
-  - build/test の証跡が記録され、主要 unit/contract 観点の結果が reports に存在する。
+  - late packet、geometry reset、profile switch、observer/event、viewer 切替の確認結果が reports に存在する。
 
 ## タスク一覧
 
@@ -35,6 +35,6 @@
 | TRACKER-015 | tracked viewer と raw/tracked toggle を追加する | ui | done | TRACKER-012 | UI で raw/tracked を切り替えられ、tracked field と主要 object を描画できる。 |
 | TRACKER-016 | tracked diagnostics 表示を追加する | ui | done | TRACKER-015 | tracked diagnostics、profile 名、kick/contact/field 状態を表示できる。 |
 | TRACKER-017 | runtime profile 表示・操作 UI を追加する | ui | done | TRACKER-014, TRACKER-016 | profile 名表示と profile 切替要求 UI が表示・操作できる。 |
-| TRACKER-018 | Tracker v1 の build/test 証跡を取得する | verification | in_progress | TRACKER-017 | build/test の証跡が記録され、主要 unit/contract 観点の結果が reports に存在する。 |
-| TRACKER-019 | Tracker v1 の integration 観点検証を行う | verification | pending | TRACKER-018 | late packet、geometry reset、profile switch、observer/event、viewer 切替の確認結果が reports に存在する。 |
+| TRACKER-018 | Tracker v1 の build/test 証跡を取得する | verification | done | TRACKER-017 | build/test の証跡が記録され、主要 unit/contract 観点の結果が reports に存在する。 |
+| TRACKER-019 | Tracker v1 の integration 観点検証を行う | verification | in_progress | TRACKER-018 | late packet、geometry reset、profile switch、observer/event、viewer 切替の確認結果が reports に存在する。 |
 | TRACKER-020 | Tracker v1 の最終レビューと追跡ファイル同期を行う | review | pending | TRACKER-019 | sub-agent レビュー結果が記録され、致命的な指摘が残っておらず、tracking files が最終状態と一致する。 |
