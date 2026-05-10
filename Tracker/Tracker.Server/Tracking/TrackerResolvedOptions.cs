@@ -9,4 +9,6 @@ public sealed class TrackerResolvedOptions
     public TrackerEngineSettings EngineSettings { get; init; } = new();
 
     public TrackerPublisherOptions PublisherOptions { get; init; } = new();
+
+    public TrackerDiagnosticsOptions Diagnostics { get; init; } = new();
 }

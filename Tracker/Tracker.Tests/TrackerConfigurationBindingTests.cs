@@ -42,6 +42,9 @@ public class TrackerConfigurationBindingTests
         Assert.Equal("runtime-source", resolved.PublisherOptions.SourceName);
         Assert.Equal("runtime-uuid", resolved.PublisherOptions.Uuid);
         Assert.False(resolved.PublisherOptions.PublishUdp);
+        Assert.True(resolved.Diagnostics.Enabled);
+        Assert.False(resolved.Diagnostics.FileEnabled);
+        Assert.Equal("tracker-diagnostics-test.log", resolved.Diagnostics.FilePath);
     }
 
     [Fact]
@@ -69,11 +72,13 @@ public class TrackerConfigurationBindingTests
             TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<TrackerOptions>>().Value));
         services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().EngineSettings);
         services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().PublisherOptions);
+        services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().Diagnostics);
 
         using var serviceProvider = services.BuildServiceProvider();
 
         var engineSettings = serviceProvider.GetRequiredService<TrackerEngineSettings>();
         var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
+        var diagnostics = serviceProvider.GetRequiredService<TrackerDiagnosticsOptions>();
 
         Assert.Equal("simulation", engineSettings.ProfileName);
         Assert.Equal(1.4d, engineSettings.RobotTracker.VisibilityHalfLifeSeconds);
@@ -88,6 +93,9 @@ public class TrackerConfigurationBindingTests
         Assert.Equal(13000, publisherOptions.Port);
         Assert.Equal("runtime-source", publisherOptions.SourceName);
         Assert.Equal("runtime-uuid", publisherOptions.Uuid);
+        Assert.True(diagnostics.Enabled);
+        Assert.False(diagnostics.FileEnabled);
+        Assert.Equal("tracker-diagnostics-test.log", diagnostics.FilePath);
     }
 
     [Fact]
@@ -103,6 +111,9 @@ public class TrackerConfigurationBindingTests
         var trackerOptions = Assert.IsType<TrackerOptions>(options);
 
         Assert.Equal("sim", trackerOptions.ActiveProfileName);
+        Assert.False(trackerOptions.Diagnostics.Enabled);
+        Assert.True(trackerOptions.Diagnostics.FileEnabled);
+        Assert.Null(trackerOptions.Diagnostics.FilePath);
         AssertTigersAlignedProfile(trackerOptions.Profiles["default"], expectedPublishPort: 10010, expectedGate: 1.0d);
         AssertTigersAlignedProfile(trackerOptions.Profiles["sim"], expectedPublishPort: 11010, expectedGate: 1.0d);
         AssertTigersAlignedProfile(trackerOptions.Profiles["fast"], expectedPublishPort: 10011, expectedGate: 0.85d);
@@ -127,6 +138,9 @@ public class TrackerConfigurationBindingTests
                     ["Tracker:SourceName"] = "configured-source",
                     ["Tracker:Uuid"] = "configured-uuid",
                     ["Tracker:ActiveProfileName"] = "simulation",
+                    ["Tracker:Diagnostics:Enabled"] = "true",
+                    ["Tracker:Diagnostics:FileEnabled"] = "false",
+                    ["Tracker:Diagnostics:FilePath"] = "tracker-diagnostics-test.log",
                     ["Tracker:Profiles:simulation:Publish:MulticastAddress"] = "239.1.2.3",
                     ["Tracker:Profiles:simulation:Publish:Port"] = "12000",
                     ["Tracker:Profiles:simulation:Engine:ReorderWindowNs"] = "123",

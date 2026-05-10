@@ -5,12 +5,12 @@ namespace Tracker.Server.Tracking;
 public sealed class TrackerCoordinator
 {
     private static readonly TimeSpan TrackerDiagnosticsLogInterval = TimeSpan.FromSeconds(1);
-    private static readonly string TrackerDiagnosticsLogPath = CreateTrackerDiagnosticsLogPath();
     private readonly object gate = new();
     private readonly ITrackerEngine engine;
     private readonly TrackerPacketGenerator packetGenerator;
     private TrackerEngineSettings currentSettings;
     private TrackerPublisherOptions currentPublisherOptions;
+    private readonly TrackerDiagnosticsOptions diagnosticsOptions;
     private readonly TrackedSnapshotStore snapshotStore;
     private readonly ITrackerPacketPublisher publisher;
     private readonly IReadOnlyList<ITrackerObserver> observers;
@@ -24,12 +24,14 @@ public sealed class TrackerCoordinator
     private bool isProcessingUpdate;
     private DateTimeOffset lastTrackerDiagnosticsLogAt = DateTimeOffset.MinValue;
     private bool trackerDiagnosticsFileWriteFailed;
+    private string? trackerDiagnosticsLogPath;
 
     public TrackerCoordinator(
         ITrackerEngine engine,
         TrackerPacketGenerator packetGenerator,
         TrackerEngineSettings settings,
         TrackerPublisherOptions publisherOptions,
+        TrackerDiagnosticsOptions diagnosticsOptions,
         TrackedSnapshotStore snapshotStore,
         ITrackerPacketPublisher publisher,
         IEnumerable<ITrackerObserver> observers,
@@ -39,6 +41,7 @@ public sealed class TrackerCoordinator
         this.packetGenerator = packetGenerator;
         currentSettings = CloneSettings(settings);
         currentPublisherOptions = ClonePublisherOptions(publisherOptions);
+        this.diagnosticsOptions = CloneDiagnosticsOptions(diagnosticsOptions);
         this.snapshotStore = snapshotStore;
         this.publisher = publisher;
         this.observers = observers.ToArray();
@@ -48,6 +51,7 @@ public sealed class TrackerCoordinator
             Enabled = true,
             EngineSettings = CloneSettings(settings),
             PublisherOptions = ClonePublisherOptions(publisherOptions),
+            Diagnostics = CloneDiagnosticsOptions(diagnosticsOptions),
         };
         desiredOptions = CloneResolvedOptions(appliedOptions);
         desiredRuntimeOverrides = new TrackerRuntimeOverrides();
@@ -234,6 +238,11 @@ public sealed class TrackerCoordinator
         TrackerUpdateResult result,
         DateTimeOffset receivedAt)
     {
+        if (!diagnosticsOptions.Enabled)
+        {
+            return;
+        }
+
         if (result.CommittedFrames.Count == 0)
         {
             return;
@@ -277,7 +286,10 @@ public sealed class TrackerCoordinator
                 currentSettings.BallTracker.TrackLifetimeNs);
         }
 
-        AppendTrackerDiagnosticsFile(diagnosticsLine);
+        if (diagnosticsOptions.FileEnabled)
+        {
+            AppendTrackerDiagnosticsFile(diagnosticsLine);
+        }
     }
 
     private void AppendTrackerDiagnosticsFile(string diagnosticsLine)
@@ -289,12 +301,13 @@ public sealed class TrackerCoordinator
 
         try
         {
-            File.AppendAllText(TrackerDiagnosticsLogPath, diagnosticsLine + Environment.NewLine);
+            var logPath = trackerDiagnosticsLogPath ??= diagnosticsOptions.FilePath ?? CreateTrackerDiagnosticsLogPath();
+            File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
         }
         catch (Exception ex)
         {
             trackerDiagnosticsFileWriteFailed = true;
-            logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", TrackerDiagnosticsLogPath);
+            logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", trackerDiagnosticsLogPath);
         }
     }
 
@@ -470,6 +483,7 @@ public sealed class TrackerCoordinator
             Enabled = options.Enabled,
             EngineSettings = CloneSettings(options.EngineSettings),
             PublisherOptions = ClonePublisherOptions(options.PublisherOptions),
+            Diagnostics = CloneDiagnosticsOptions(options.Diagnostics),
         };
     }
 
@@ -497,6 +511,16 @@ public sealed class TrackerCoordinator
             Port = options.Port,
             SourceName = options.SourceName,
             Uuid = options.Uuid,
+        };
+    }
+
+    private static TrackerDiagnosticsOptions CloneDiagnosticsOptions(TrackerDiagnosticsOptions options)
+    {
+        return new TrackerDiagnosticsOptions
+        {
+            Enabled = options.Enabled,
+            FileEnabled = options.FileEnabled,
+            FilePath = options.FilePath,
         };
     }
 

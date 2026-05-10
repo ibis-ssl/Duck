@@ -141,6 +141,39 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
     }
 
     [Fact]
+    public void ProcessPacket_WhenDiagnosticsDisabled_DoesNotWriteConfiguredDiagnosticsFile()
+    {
+        var snapshotStore = new TrackedSnapshotStore();
+        var publisher = new RecordingTrackerPacketPublisher();
+        var diagnosticsFilePath = Path.Combine(
+            Path.GetTempPath(),
+            $"tracker-diagnostics-disabled-{Guid.NewGuid():N}.log");
+        var coordinator = CreateCoordinator(
+            snapshotStore,
+            publisher,
+            [],
+            fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0),
+            fixture.CreatePublisherOptions(),
+            new TrackerDiagnosticsOptions
+            {
+                Enabled = false,
+                FileEnabled = true,
+                FilePath = diagnosticsFilePath,
+            });
+        var receivedAt = new DateTimeOffset(2026, 5, 10, 9, 30, 0, TimeSpan.Zero);
+
+        _ = coordinator.ProcessPacket(
+            TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 50, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            receivedAt);
+
+        Assert.False(File.Exists(diagnosticsFilePath));
+    }
+
+    [Fact]
     public void RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification()
     {
         var snapshotStore = new TrackedSnapshotStore();
@@ -304,11 +337,29 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
         TrackerEngineSettings settings,
         TrackerPublisherOptions publisherOptions)
     {
+        return CreateCoordinator(
+            snapshotStore,
+            publisher,
+            observers,
+            settings,
+            publisherOptions,
+            new TrackerDiagnosticsOptions());
+    }
+
+    private TrackerCoordinator CreateCoordinator(
+        TrackedSnapshotStore snapshotStore,
+        ITrackerPacketPublisher publisher,
+        IReadOnlyList<ITrackerObserver> observers,
+        TrackerEngineSettings settings,
+        TrackerPublisherOptions publisherOptions,
+        TrackerDiagnosticsOptions diagnosticsOptions)
+    {
         return new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
             settings,
             publisherOptions,
+            diagnosticsOptions,
             snapshotStore,
             publisher,
             observers,

@@ -44,6 +44,17 @@ public static class TrackerConfigurationResolver
                 SourceName = effectiveRuntimeOverrides.Publish.SourceName ?? options.SourceName,
                 Uuid = effectiveRuntimeOverrides.Publish.Uuid ?? options.Uuid,
             },
+            Diagnostics = CloneDiagnostics(options.Diagnostics),
+        };
+    }
+
+    private static TrackerDiagnosticsOptions CloneDiagnostics(TrackerDiagnosticsOptions options)
+    {
+        return new TrackerDiagnosticsOptions
+        {
+            Enabled = options.Enabled,
+            FileEnabled = options.FileEnabled,
+            FilePath = options.FilePath,
         };
     }
 

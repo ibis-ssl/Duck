@@ -24,6 +24,7 @@ builder.Services.AddSingleton(serviceProvider =>
     TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().EngineSettings);
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().PublisherOptions);
+builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().Diagnostics);
 builder.Services.AddSingleton<ITrackerEngine, TrackerEngine>();
 builder.Services.AddSingleton(serviceProvider =>
     new TrackedSnapshotStore(

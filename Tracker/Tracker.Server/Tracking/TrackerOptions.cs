@@ -14,6 +14,8 @@ public sealed class TrackerOptions
 
     public string ActiveProfileName { get; init; } = "default";
 
+    public TrackerDiagnosticsOptions Diagnostics { get; init; } = new();
+
     public TrackerRuntimeOverrides RuntimeOverrides { get; init; } = new();
 
     public Dictionary<string, TrackerProfileOptions> Profiles { get; init; } =
@@ -21,6 +23,15 @@ public sealed class TrackerOptions
         {
             ["default"] = new(),
         };
+}
+
+public sealed class TrackerDiagnosticsOptions
+{
+    public bool Enabled { get; init; }
+
+    public bool FileEnabled { get; init; } = true;
+
+    public string? FilePath { get; init; }
 }
 
 public sealed class TrackerProfileOptions

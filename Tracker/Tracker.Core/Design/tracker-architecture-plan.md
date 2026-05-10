@@ -474,6 +474,7 @@ geometry 更新規則:
 - `Port`
 - `SourceName`
 - `Uuid`
+- `Diagnostics`
 - `RobotTracker`
 - `BallTracker`
 - `KickDetector`
@@ -494,6 +495,10 @@ geometry 更新規則:
   - `RobotTracker`
   - `BallTracker`
   - `KickDetector`
+- `Diagnostics`
+  - `Enabled`
+  - `FileEnabled`
+  - `FilePath`
 
 既定配信先は official tracker の慣例値に合わせる。
 
@@ -503,6 +508,7 @@ geometry 更新規則:
 
 - multicast address / port / source name / uuid は設定外出しする
 - tracking parameter は設定外出しする
+- raw / tracked 診断ログは `Tracker:Diagnostics:Enabled` で停止できるようにする
 - v1 標準であるカルマン filter の process noise / measurement noise / gating threshold も設定外出しする
 - 近傍判定、visibility decay、kick speed threshold、chip 判定 threshold も設定外出しする
 

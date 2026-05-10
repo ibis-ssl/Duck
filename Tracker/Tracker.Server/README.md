@@ -123,8 +123,19 @@ tracker 全体の設定です。
 | `SourceName` | tracker packet の source name です。profile ごとの publish 設定と合わせて packet generator に渡されます。 |
 | `Uuid` | tracker packet の UUID です。受信側で source 識別に使う値です。 |
 | `ActiveProfileName` | 起動時に使う profile 名です。`Tracker:Profiles` に存在する必要があります。 |
+| `Diagnostics` | tracker の raw / tracked 診断ログ出力設定です。通常運用では `Enabled=false` にします。 |
 | `RuntimeOverrides` | 起動時に active profile へ上書きする optional override 群です。profile 定義を変えずに一時的な publish / tracker tuning を差し込む用途です。 |
 | `Profiles` | profile ごとの publish / engine / tuning 設定です。UI と API の profile switch 対象にもなります。 |
+
+### `Tracker:Diagnostics`
+
+tracker の調査用診断ログ設定です。`Enabled=false` の場合、`TrackerCoordinator` は `Tracker diagnostics ...` の structured log と `tracker-diagnostics-*.log` のファイル出力をどちらも行いません。
+
+| キー | 意味 |
+| --- | --- |
+| `Enabled` | `true` なら tracker diagnostics を出力します。`false` なら console / file の診断ログを停止します。 |
+| `FileEnabled` | `Enabled=true` のとき、診断ログをファイルにも追記するかを指定します。 |
+| `FilePath` | ファイル出力先です。`null` の場合は実行ファイルと同じ directory に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。 |
 
 ### `Tracker:RuntimeOverrides`
 
