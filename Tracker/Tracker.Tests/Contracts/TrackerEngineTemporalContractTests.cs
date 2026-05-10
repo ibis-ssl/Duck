@@ -668,6 +668,42 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_UsesConfiguredRobotOutlierLimitWhenDerivingVelocity()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            robotTracker: new TrackerRobotTrackerOverrides
+            {
+                OutlierLimitMm = 50d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 100, y: 200, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 220, y: 200, orientation: 0.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(Assert.Single(secondResult.CommittedFrames).Robots);
+
+        Assert.Equal(220, trackedRobot.XMm, precision: 3);
+        Assert.Equal(0, trackedRobot.VXMmPerS, precision: 3);
+        Assert.Equal(0, trackedRobot.VYMmPerS, precision: 3);
+        Assert.Equal(0, trackedRobot.AngularVelocityRadPerS, precision: 3);
+    }
+
+    [Fact]
     public void Update_KeepsRobotTrackAliveAcrossOneMissingFrameWithDecayedVisibility()
     {
         var engine = fixture.CreateEngine();
@@ -874,6 +910,105 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal(firstBall.YMm, predictedBall.YMm, precision: 3);
         Assert.True(predictedBall.Visibility < firstBall.Visibility);
         Assert.True(predictedBall.Visibility > 0);
+    }
+
+    [Fact]
+    public void Update_UsesConfiguredBallTrackLifetimeToExpirePredictedTracks()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                TrackLifetimeNs = 100_000_000,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 200, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 300, y: 400, orientation: 0.5f)],
+                captureTimeSeconds: 1.200),
+            settings: settings);
+
+        Assert.Empty(Assert.Single(secondResult.CommittedFrames).Balls);
+    }
+
+    [Fact]
+    public void Update_UsesConfiguredBallVisibilityHalfLifeWhenPredictingTrack()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                VisibilityHalfLifeSeconds = 0.1d,
+            });
+
+        var firstResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 200, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 300, y: 400, orientation: 0.5f)],
+                captureTimeSeconds: 1.200),
+            settings: settings);
+
+        var firstBall = Assert.Single(Assert.Single(firstResult.CommittedFrames).Balls);
+        var predictedBall = Assert.Single(Assert.Single(secondResult.CommittedFrames).Balls);
+
+        Assert.Equal(firstBall.Visibility * 0.25f, predictedBall.Visibility, precision: 3);
+    }
+
+    [Fact]
+    public void Update_UsesConfiguredBallGateForTrackMatchingAcrossFrames()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                Gate = 1.5d,
+            });
+
+        var firstResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 150, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var firstBall = Assert.Single(Assert.Single(firstResult.CommittedFrames).Balls);
+        var secondBall = Assert.Single(Assert.Single(secondResult.CommittedFrames).Balls);
+
+        Assert.Equal(firstBall.InternalTrackId, secondBall.InternalTrackId);
     }
 
     [Fact]
@@ -1178,6 +1313,35 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_UsesConfiguredContactMarginForBallContactDetection()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            kickDetector: new TrackerKickDetectorOverrides
+            {
+                ContactMarginMm = 0d,
+            });
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 130, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var trackedRobot = Assert.Single(committedFrame.Robots);
+
+        Assert.Null(committedFrame.LatestContact);
+        Assert.False(trackedRobot.HasBallContact);
+        Assert.Equal([TrackerEventKind.WorldFrameCommitted], result.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
     public void Update_PreservesLastToucherAfterBallContactEnds()
     {
         var engine = fixture.CreateEngine();
@@ -1251,6 +1415,46 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_UsesConfiguredKickSpeedThresholdForKickDetection()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            kickDetector: new TrackerKickDetectorOverrides
+            {
+                KickSpeedThresholdMmPerS = 1200d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var kickResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 110, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var committedFrame = Assert.Single(kickResult.CommittedFrames);
+        var contact = Assert.IsType<BallContactState>(committedFrame.LatestContact);
+
+        Assert.Null(committedFrame.KickedBall);
+        Assert.False(contact.IsInContact);
+        Assert.Equal((uint)4, contact.LastRobotId);
+        Assert.Equal(
+            [TrackerEventKind.WorldFrameCommitted, TrackerEventKind.ContactChanged],
+            kickResult.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
+    [Fact]
     public void Update_DoesNotCarryLastToucherToDifferentPrimaryBallTrack()
     {
         var engine = fixture.CreateEngine();
@@ -1313,6 +1517,40 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
 
         Assert.Equal("flat", kick.KickKind);
         Assert.Equal((uint)4, kick.KickerRobotId);
+    }
+
+    [Fact]
+    public void Update_UsesConfiguredChipHeightThresholdForChipClassification()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            kickDetector: new TrackerKickDetectorOverrides
+            {
+                ChipHeightThresholdMm = 60d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, z: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 80, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var kickResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 110, y: 0, z: 80, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var kick = Assert.IsType<KickEventState>(Assert.Single(kickResult.CommittedFrames).KickedBall);
+
+        Assert.Equal("chip", kick.KickKind);
     }
 
     [Fact]

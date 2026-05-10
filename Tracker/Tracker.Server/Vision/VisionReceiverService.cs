@@ -9,6 +9,7 @@ namespace Tracker.Server.Vision;
 
 public sealed class VisionReceiverService(
     IOptions<VisionReceiverOptions> options,
+    IOptions<TrackerOptions> trackerOptions,
     VisionPacketStore store,
     TrackerCoordinator trackerCoordinator,
     ILogger<VisionReceiverService> logger) : BackgroundService
@@ -72,7 +73,10 @@ public sealed class VisionReceiverService(
                     }
 
                     store.StorePacket(packet, result.RemoteEndPoint, receivedAt);
-                    trackerCoordinator.ProcessPacket(packet, receivedAt);
+                    if (trackerOptions.Value.Enabled)
+                    {
+                        trackerCoordinator.ProcessPacket(packet, receivedAt);
+                    }
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {

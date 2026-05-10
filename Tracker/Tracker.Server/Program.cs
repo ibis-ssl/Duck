@@ -2,6 +2,7 @@ using Tracker.Core;
 using Tracker.Server.Components;
 using Tracker.Server.Tracking;
 using Tracker.Server.Vision;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,23 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.Configure<VisionReceiverOptions>(builder.Configuration.GetSection("VisionReceiver"));
-builder.Services.AddSingleton(
-    new TrackerEngineSettings
-    {
-        ProfileName = "default",
-        ReorderWindowNs = 100_000_000,
-        MergeWindowNs = 20_000_000,
-        GeometryResetFieldLengthThresholdMm = 500,
-        GeometryResetFieldWidthThresholdMm = 500,
-    });
-builder.Services.AddSingleton(new TrackerPublisherOptions());
+builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection("Tracker"));
+builder.Services.AddSingleton(serviceProvider =>
+    TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
+builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().EngineSettings);
+builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().PublisherOptions);
 builder.Services.AddSingleton<ITrackerEngine, TrackerEngine>();
 builder.Services.AddSingleton<TrackedSnapshotStore>();
 builder.Services.AddSingleton<ITrackerPacketPublisher, UdpTrackerPacketPublisher>();
 builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
 {
-    var options = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
-    return new TrackerPacketGenerator(options.SourceName, options.Uuid);
+    var resolved = serviceProvider.GetRequiredService<TrackerResolvedOptions>();
+    return new TrackerPacketGenerator(resolved.PublisherOptions.SourceName, resolved.PublisherOptions.Uuid);
 });
 builder.Services.AddSingleton<TrackerCoordinator>();
 builder.Services.AddSingleton<VisionPacketStore>();

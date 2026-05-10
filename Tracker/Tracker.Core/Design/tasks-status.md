@@ -4,14 +4,14 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-013
-- Title: tracker/network 設定束縛を統合する
+- ID: TRACKER-014
+- Title: profile 切替要求経路を統合する
 - Phase: integration
 - Status: in_progress
 - Size: medium
-- Dependencies: TRACKER-012 が完了していること
+- Dependencies: TRACKER-012, TRACKER-013 が完了していること
 - Exit Criteria:
-  - tracker/network 設定が外部設定から束縛され、起動時設定が engine と publisher に反映される。
+  - profile 切替要求が server から engine へ流れ、切替結果が observer/UI 側へ反映される。
 
 ## タスク一覧
 
@@ -30,8 +30,8 @@
 | TRACKER-010 | kick と contact metadata を実装する | engine | done | TRACKER-007, TRACKER-008, TRACKER-009 | `KickEventState`、`BallContactState`、`KickDetected`、`ContactChanged` が生成され、関連契約テストが通る。 |
 | TRACKER-011 | ball left field metadata を実装する | engine | done | TRACKER-007, TRACKER-009 | `BallLeftFieldState` と `BallLeftField` event が生成され、関連契約テストが通る。 |
 | TRACKER-012 | `Tracker.Server` へ engine と packet 配信を統合する | integration | done | TRACKER-005, TRACKER-007, TRACKER-010, TRACKER-011 | raw vision 入力が engine へ流れ、`TrackerUpdateResult` が snapshot store・observer・official packet 配信へ反映される。 |
-| TRACKER-013 | tracker/network 設定束縛を統合する | integration | in_progress | TRACKER-012 | tracker/network 設定が外部設定から束縛され、起動時設定が engine と publisher に反映される。 |
-| TRACKER-014 | profile 切替要求経路を統合する | integration | pending | TRACKER-012, TRACKER-013 | profile 切替要求が server から engine へ流れ、切替結果が observer/UI 側へ反映される。 |
+| TRACKER-013 | tracker/network 設定束縛を統合する | integration | done | TRACKER-012 | tracker/network 設定が外部設定から束縛され、起動時設定が engine と publisher に反映される。 |
+| TRACKER-014 | profile 切替要求経路を統合する | integration | in_progress | TRACKER-012, TRACKER-013 | profile 切替要求が server から engine へ流れ、切替結果が observer/UI 側へ反映される。 |
 | TRACKER-015 | tracked viewer と raw/tracked toggle を追加する | ui | pending | TRACKER-012 | UI で raw/tracked を切り替えられ、tracked field と主要 object を描画できる。 |
 | TRACKER-016 | tracked diagnostics 表示を追加する | ui | pending | TRACKER-015 | tracked diagnostics、profile 名、kick/contact/field 状態を表示できる。 |
 | TRACKER-017 | runtime profile 表示・操作 UI を追加する | ui | pending | TRACKER-014, TRACKER-016 | profile 名表示と profile 切替要求 UI が表示・操作できる。 |

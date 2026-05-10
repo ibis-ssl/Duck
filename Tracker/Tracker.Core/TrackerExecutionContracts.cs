@@ -12,14 +12,14 @@ public sealed class TrackerEngine : ITrackerEngine
 {
     private const double BallTrackMatchDistanceMm = 120d;
     private const double BallMergeDistanceMm = 120d;
+    private const double RobotTrackMovementGateMm = 120d;
     private const double RobotRadiusMm = 90d;
     private const double BallRadiusMm = 21.5d;
-    private const double ContactMarginMm = 25d;
-    private const double KickDetectionSpeedThresholdMmPerS = 800d;
     private const double KickStillMovingSpeedThresholdMmPerS = 400d;
-    private const double ChipHeightThresholdMm = 120d;
     private const int KickStillMovingGraceFrames = 2;
     private const long RecentContactWindowNs = 200_000_000;
+    private const double DefaultVisibilityHalfLifeSeconds = 1d;
+    private const double DefaultBallProcessNoise = 50d;
     private readonly List<BufferedDetection> pendingDetections = [];
     private readonly Dictionary<int, BallTrackState> cameraBallTrackStates = [];
     private readonly Dictionary<int, BallContactState> latestBallContactStates = [];
@@ -156,7 +156,7 @@ public sealed class TrackerEngine : ITrackerEngine
         var committedFrames = new List<TrackerFrame>();
         foreach (var group in bufferedGroups.Take(flushableGroupCount))
         {
-            CommitGroup(group, committedFrames, emittedEvents);
+            CommitGroup(group, settings, committedFrames, emittedEvents);
         }
 
         return committedFrames;
@@ -198,6 +198,7 @@ public sealed class TrackerEngine : ITrackerEngine
 
     private void CommitGroup(
         BufferedDetectionGroup group,
+        TrackerEngineSettings settings,
         List<TrackerFrame> committedFrames,
         List<TrackerEvent> emittedEvents)
     {
@@ -207,15 +208,15 @@ public sealed class TrackerEngine : ITrackerEngine
 
         var balls = new List<TrackedBallState>();
         var robots = new List<TrackedRobotState>();
-        var observedBallTrackIds = UpdateCameraBallTrackStates(orderedDetections, frameTimestampNs);
-        foreach (var ballEntry in AssignMergedBallIdentity(CollectMergedBallStates(observedBallTrackIds)))
+        var observedBallTrackIds = UpdateCameraBallTrackStates(settings, orderedDetections, frameTimestampNs);
+        foreach (var ballEntry in AssignMergedBallIdentity(settings, CollectMergedBallStates(settings, observedBallTrackIds)))
         {
             balls.Add(CreateTrackedBall(ballEntry));
         }
 
         balls.Sort(TrackedBallComparer.Instance);
 
-        var observedCameraRobotKeys = UpdateCameraRobotTrackStates(orderedDetections, frameTimestampNs);
+        var observedCameraRobotKeys = UpdateCameraRobotTrackStates(settings, orderedDetections, frameTimestampNs);
         foreach (var robotEntry in CollectMergedRobotStates(observedCameraRobotKeys))
         {
             robots.Add(CreateTrackedRobot(robotEntry.Key, robotEntry.Value));
@@ -236,7 +237,7 @@ public sealed class TrackerEngine : ITrackerEngine
         var freshRobotKeys = observedCameraRobotKeys
             .Select(key => new RobotKey(key.Team, key.RobotId))
             .ToHashSet();
-        var contactState = CreateBallContactState(primaryBall, robots, freshRobotKeys, frameTimestampNs, previousContactState);
+        var contactState = CreateBallContactState(settings, primaryBall, robots, freshRobotKeys, frameTimestampNs, previousContactState);
         robots = ApplyBallContactFlags(robots, contactState);
         UpdateLatestBallContactState(primaryBall, contactState);
         PruneLatestBallContactStates(balls);
@@ -244,7 +245,7 @@ public sealed class TrackerEngine : ITrackerEngine
         UpdateLatestBallLeftFieldState(primaryBall, ballLeftFieldState);
         PruneLatestBallLeftFieldStates(balls);
 
-        var kickUpdate = UpdateKickState(primaryBall, previousPrimaryBall, previousContactState, contactState, frameTimestampNs);
+        var kickUpdate = UpdateKickState(settings, primaryBall, previousPrimaryBall, previousContactState, contactState, frameTimestampNs);
         activeKickState = kickUpdate.KickState;
         lastCommittedPrimaryBall = primaryBall;
 
@@ -307,12 +308,14 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private static BallContactState? CreateBallContactState(
+        TrackerEngineSettings settings,
         TrackedBallState? primaryBall,
         IReadOnlyList<TrackedRobotState> robots,
         ISet<RobotKey> freshRobotKeys,
         long frameTimestampNs,
         BallContactState? previousContactState)
     {
+        var contactMarginMm = GetContactMarginMm(settings);
         var currentContact = primaryBall is null
             ? null
             : robots
@@ -323,7 +326,7 @@ public sealed class TrackerEngine : ITrackerEngine
                         Robot = robot,
                         DistanceMm = GetDistanceMm(robot.XMm, robot.YMm, primaryBall.XMm, primaryBall.YMm),
                     })
-                .Where(candidate => candidate.DistanceMm <= RobotRadiusMm + BallRadiusMm + ContactMarginMm)
+                .Where(candidate => candidate.DistanceMm <= RobotRadiusMm + BallRadiusMm + contactMarginMm)
                 .OrderBy(candidate => candidate.DistanceMm)
                 .ThenBy(candidate => candidate.Robot.Team)
                 .ThenBy(candidate => candidate.Robot.RobotId)
@@ -477,13 +480,14 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private (KickEventState? KickState, bool KickDetected) UpdateKickState(
+        TrackerEngineSettings settings,
         TrackedBallState? primaryBall,
         TrackedBallState? previousPrimaryBall,
         BallContactState? previousContactState,
         BallContactState? currentContactState,
         long frameTimestampNs)
     {
-        var detectedKick = TryCreateKickEventState(primaryBall, previousPrimaryBall, previousContactState, currentContactState, frameTimestampNs);
+        var detectedKick = TryCreateKickEventState(settings, primaryBall, previousPrimaryBall, previousContactState, currentContactState, frameTimestampNs);
         if (detectedKick is not null)
         {
             kickBelowStillMovingThresholdFrameCount = 0;
@@ -546,6 +550,7 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private static KickEventState? TryCreateKickEventState(
+        TrackerEngineSettings settings,
         TrackedBallState? primaryBall,
         TrackedBallState? previousPrimaryBall,
         BallContactState? previousContactState,
@@ -558,7 +563,8 @@ public sealed class TrackerEngine : ITrackerEngine
         }
 
         var planarSpeedMmPerS = GetPlanarSpeedMmPerS(primaryBall);
-        if (planarSpeedMmPerS < KickDetectionSpeedThresholdMmPerS)
+        var kickDetectionSpeedThresholdMmPerS = GetKickDetectionSpeedThresholdMmPerS(settings);
+        if (planarSpeedMmPerS < kickDetectionSpeedThresholdMmPerS)
         {
             return null;
         }
@@ -567,7 +573,7 @@ public sealed class TrackerEngine : ITrackerEngine
             && previousPrimaryBall.InternalTrackId == primaryBall.InternalTrackId
             ? GetPlanarSpeedMmPerS(previousPrimaryBall)
             : 0d;
-        if (previousPlanarSpeedMmPerS >= KickDetectionSpeedThresholdMmPerS)
+        if (previousPlanarSpeedMmPerS >= kickDetectionSpeedThresholdMmPerS)
         {
             return null;
         }
@@ -594,7 +600,7 @@ public sealed class TrackerEngine : ITrackerEngine
             LatestSpeedMmPerS = planarSpeedMmPerS,
             LatestUpdateTimestampNs = frameTimestampNs,
             KickerRobotId = recentContact.LastRobotId,
-            KickKind = IsChipKick(primaryBall) ? "chip" : "flat",
+            KickKind = IsChipKick(settings, primaryBall) ? "chip" : "flat",
             IsStillMoving = true,
         };
     }
@@ -617,9 +623,10 @@ public sealed class TrackerEngine : ITrackerEngine
         return Math.Sqrt((ball.VXMmPerS * ball.VXMmPerS) + (ball.VYMmPerS * ball.VYMmPerS));
     }
 
-    private static bool IsChipKick(TrackedBallState ball)
+    private static bool IsChipKick(TrackerEngineSettings settings, TrackedBallState ball)
     {
-        return ball.ZMm >= ChipHeightThresholdMm || ball.VZMmPerS >= ChipHeightThresholdMm;
+        var chipHeightThresholdMm = GetChipHeightThresholdMm(settings);
+        return ball.ZMm >= chipHeightThresholdMm || ball.VZMmPerS >= chipHeightThresholdMm;
     }
 
     private static bool IsBallOutOfField(TrackedBallState ball, TrackerGeometrySnapshot geometrySnapshot)
@@ -868,6 +875,7 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private HashSet<int> UpdateCameraBallTrackStates(
+        TrackerEngineSettings settings,
         IReadOnlyList<BufferedDetection> orderedDetections,
         long frameTimestampNs)
     {
@@ -906,7 +914,7 @@ public sealed class TrackerEngine : ITrackerEngine
                                 Track = track,
                                 DistanceMm = GetDistanceMm(track.XMm, track.YMm, observation.XMm, observation.YMm),
                             })
-                        .Where(candidate => candidate.DistanceMm <= BallTrackMatchDistanceMm)
+                        .Where(candidate => candidate.DistanceMm <= GetBallTrackMatchDistanceMm(settings))
                         .OrderBy(candidate => candidate.DistanceMm)
                         .ThenBy(candidate => candidate.Track.LocalTrackId)
                         .FirstOrDefault();
@@ -924,14 +932,14 @@ public sealed class TrackerEngine : ITrackerEngine
                             observation.EventTimestampNs,
                             observation.Confidence,
                             observation.Confidence,
-                            GetObservedBallUncertaintyMm(observation.Confidence),
+                            GetObservedBallUncertaintyMm(settings, observation.Confidence),
                             0d,
                             0d,
                             0d);
                     }
                     else
                     {
-                        updatedTrackState = CreateObservedBallTrackState(matchedTrack.Track, observation);
+                        updatedTrackState = CreateObservedBallTrackState(settings, matchedTrack.Track, observation);
                     }
 
                     claimedTrackIds.Add(updatedTrackState.LocalTrackId);
@@ -949,8 +957,8 @@ public sealed class TrackerEngine : ITrackerEngine
                 continue;
             }
 
-            var predictedState = CreatePredictedBallTrackState(existingEntry.Value, frameTimestampNs);
-            if (predictedState.Visibility <= 0.01f)
+            var predictedState = CreatePredictedBallTrackState(settings, existingEntry.Value, frameTimestampNs);
+            if (predictedState is null || predictedState.Visibility <= 0.01f)
             {
                 cameraBallTrackStates.Remove(existingEntry.Key);
                 continue;
@@ -963,6 +971,7 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private static BallTrackState CreateObservedBallTrackState(
+        TrackerEngineSettings settings,
         BallTrackState previousState,
         BallObservation observation)
     {
@@ -973,9 +982,19 @@ public sealed class TrackerEngine : ITrackerEngine
         if (observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
         {
             var deltaSeconds = (observation.EventTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
-            vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
-            vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
-            vzMmPerS = (observation.ZMm - previousState.ZMm) / deltaSeconds;
+            var distanceMm = GetDistanceMm(previousState.XMm, previousState.YMm, observation.XMm, observation.YMm);
+            if (distanceMm <= GetBallTrackMatchDistanceMm(settings))
+            {
+                vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
+                vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
+                vzMmPerS = (observation.ZMm - previousState.ZMm) / deltaSeconds;
+            }
+            else
+            {
+                vxMmPerS = 0d;
+                vyMmPerS = 0d;
+                vzMmPerS = 0d;
+            }
         }
 
         return previousState with
@@ -987,14 +1006,15 @@ public sealed class TrackerEngine : ITrackerEngine
             LastUpdateTimestampNs = observation.EventTimestampNs,
             Visibility = observation.Confidence,
             Quality = observation.Confidence,
-            PositionUncertaintyMm = GetObservedBallUncertaintyMm(observation.Confidence),
+            PositionUncertaintyMm = GetObservedBallUncertaintyMm(settings, observation.Confidence),
             VXMmPerS = vxMmPerS,
             VYMmPerS = vyMmPerS,
             VZMmPerS = vzMmPerS,
         };
     }
 
-    private static BallTrackState CreatePredictedBallTrackState(
+    private static BallTrackState? CreatePredictedBallTrackState(
+        TrackerEngineSettings settings,
         BallTrackState previousState,
         long frameTimestampNs)
     {
@@ -1003,8 +1023,14 @@ public sealed class TrackerEngine : ITrackerEngine
             return previousState;
         }
 
+        var ballTrackLifetimeNs = GetBallTrackLifetimeNs(settings);
+        if (ballTrackLifetimeNs is not null && frameTimestampNs - previousState.LastVisibleTimestampNs > ballTrackLifetimeNs.Value)
+        {
+            return null;
+        }
+
         var deltaSeconds = (frameTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
-        var decay = Math.Pow(0.5d, deltaSeconds);
+        var visibilityHalfLifeSeconds = GetBallVisibilityHalfLifeSeconds(settings);
 
         return previousState with
         {
@@ -1012,13 +1038,15 @@ public sealed class TrackerEngine : ITrackerEngine
             YMm = previousState.YMm + previousState.VYMmPerS * deltaSeconds,
             ZMm = previousState.ZMm + previousState.VZMmPerS * deltaSeconds,
             LastUpdateTimestampNs = frameTimestampNs,
-            Visibility = (float)(previousState.Visibility * decay),
-            Quality = previousState.Quality * decay,
-            PositionUncertaintyMm = previousState.PositionUncertaintyMm + (deltaSeconds * 50d),
+            Visibility = ComputeDecayVisibility(previousState.Visibility, deltaSeconds, visibilityHalfLifeSeconds),
+            Quality = ComputeDecayQuality(previousState.Quality, deltaSeconds, visibilityHalfLifeSeconds),
+            PositionUncertaintyMm = previousState.PositionUncertaintyMm + (deltaSeconds * GetBallProcessNoise(settings)),
         };
     }
 
-    private List<MergedBallState> CollectMergedBallStates(HashSet<int> observedBallTrackIds)
+    private List<MergedBallState> CollectMergedBallStates(
+        TrackerEngineSettings settings,
+        HashSet<int> observedBallTrackIds)
     {
         var freshStates = cameraBallTrackStates.Values
             .Where(state => observedBallTrackIds.Contains(state.LocalTrackId))
@@ -1028,21 +1056,21 @@ public sealed class TrackerEngine : ITrackerEngine
             .Where(state => !observedBallTrackIds.Contains(state.LocalTrackId))
             .OrderBy(state => state.LocalTrackId)
             .ToList();
-        var clusters = BuildBallClusters(freshStates);
+        var clusters = BuildBallClusters(settings, freshStates);
         var freshClusterCount = clusters.Count;
 
         foreach (var staleState in staleStates)
         {
             var nearbyFreshClusterExists = clusters.Any(
                 cluster => clusters.IndexOf(cluster) < freshClusterCount
-                    && CanAttachBallTrackToCluster(cluster, staleState));
+                    && CanAttachBallTrackToCluster(settings, cluster, staleState));
             if (nearbyFreshClusterExists)
             {
                 continue;
             }
 
             var staleCluster = clusters.FirstOrDefault(
-                cluster => CanAttachBallTrackToCluster(cluster, staleState));
+                cluster => CanAttachBallTrackToCluster(settings, cluster, staleState));
             if (staleCluster is null)
             {
                 clusters.Add([staleState]);
@@ -1081,14 +1109,16 @@ public sealed class TrackerEngine : ITrackerEngine
         return mergedStates;
     }
 
-    private static List<List<BallTrackState>> BuildBallClusters(IEnumerable<BallTrackState> states)
+    private static List<List<BallTrackState>> BuildBallClusters(
+        TrackerEngineSettings settings,
+        IEnumerable<BallTrackState> states)
     {
         var clusters = new List<List<BallTrackState>>();
 
         foreach (var state in states)
         {
             var matchingClusters = clusters
-                .Where(candidate => CanAttachBallTrackToCluster(candidate, state))
+                .Where(candidate => CanAttachBallTrackToCluster(settings, candidate, state))
                 .ToList();
             if (matchingClusters.Count == 0)
             {
@@ -1110,15 +1140,18 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private static bool CanAttachBallTrackToCluster(
+        TrackerEngineSettings settings,
         IReadOnlyCollection<BallTrackState> cluster,
         BallTrackState candidate)
     {
         return !cluster.Any(existing => existing.CameraId == candidate.CameraId)
             && cluster.Any(
-                existing => GetDistanceMm(existing.XMm, existing.YMm, candidate.XMm, candidate.YMm) <= BallMergeDistanceMm);
+                existing => GetDistanceMm(existing.XMm, existing.YMm, candidate.XMm, candidate.YMm) <= GetBallMergeDistanceMm(settings));
     }
 
-    private List<MergedBallState> AssignMergedBallIdentity(List<MergedBallState> mergedStates)
+    private List<MergedBallState> AssignMergedBallIdentity(
+        TrackerEngineSettings settings,
+        List<MergedBallState> mergedStates)
     {
         var assignedStates = new List<MergedBallState>();
         var unmatchedPreviousStates = mergedBallIdentityStates.Values.ToDictionary(state => state.InternalTrackId);
@@ -1136,7 +1169,7 @@ public sealed class TrackerEngine : ITrackerEngine
                             mergedState.XMm,
                             mergedState.YMm),
                     })
-                .Where(candidate => candidate.DistanceMm <= BallMergeDistanceMm)
+                .Where(candidate => candidate.DistanceMm <= GetBallMergeDistanceMm(settings))
                 .OrderBy(candidate => candidate.DistanceMm)
                 .ThenBy(candidate => candidate.State.InternalTrackId)
                 .FirstOrDefault();
@@ -1214,6 +1247,7 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private HashSet<CameraRobotKey> UpdateCameraRobotTrackStates(
+        TrackerEngineSettings settings,
         IReadOnlyList<BufferedDetection> orderedDetections,
         long frameTimestampNs)
     {
@@ -1222,7 +1256,7 @@ public sealed class TrackerEngine : ITrackerEngine
 
         foreach (var entry in observations)
         {
-            cameraRobotTrackStates[entry.Key] = CreateObservedRobotTrackState(entry.Key, entry.Value);
+            cameraRobotTrackStates[entry.Key] = CreateObservedRobotTrackState(settings, entry.Key, entry.Value);
         }
 
         foreach (var existingEntry in cameraRobotTrackStates.ToList())
@@ -1232,7 +1266,7 @@ public sealed class TrackerEngine : ITrackerEngine
                 continue;
             }
 
-            var predictedState = CreatePredictedRobotTrackState(existingEntry.Value, frameTimestampNs);
+            var predictedState = CreatePredictedRobotTrackState(settings, existingEntry.Value, frameTimestampNs);
             if (predictedState.Visibility <= 0.01f)
             {
                 cameraRobotTrackStates.Remove(existingEntry.Key);
@@ -1281,6 +1315,7 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private RobotTrackState CreateObservedRobotTrackState(
+        TrackerEngineSettings settings,
         CameraRobotKey key,
         RobotObservation observation)
     {
@@ -1292,12 +1327,16 @@ public sealed class TrackerEngine : ITrackerEngine
         var vyMmPerS = 0d;
         var angularVelocityRadPerS = 0d;
 
-        if (previousState is not null && observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
+            if (previousState is not null && observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
         {
             var deltaSeconds = (observation.EventTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
-            vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
-            vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
-            angularVelocityRadPerS = (unwrappedOrientation - previousState.OrientationRad) / deltaSeconds;
+            var distanceMm = GetDistanceMm(previousState.XMm, previousState.YMm, observation.XMm, observation.YMm);
+            if (distanceMm <= GetRobotMovementGateMm(settings))
+            {
+                vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
+                vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
+                angularVelocityRadPerS = (unwrappedOrientation - previousState.OrientationRad) / deltaSeconds;
+            }
         }
 
         return new RobotTrackState(
@@ -1307,13 +1346,15 @@ public sealed class TrackerEngine : ITrackerEngine
             observation.EventTimestampNs,
             observation.EventTimestampNs,
             observation.Confidence,
-            observation.Confidence,
+            observation.Confidence / GetRobotMeasurementNoise(settings),
+            GetObservedRobotUncertaintyMm(settings, observation.Confidence),
             vxMmPerS,
             vyMmPerS,
             angularVelocityRadPerS);
     }
 
     private static RobotTrackState CreatePredictedRobotTrackState(
+        TrackerEngineSettings settings,
         RobotTrackState previousState,
         long frameTimestampNs)
     {
@@ -1323,7 +1364,7 @@ public sealed class TrackerEngine : ITrackerEngine
         }
 
         var deltaSeconds = (frameTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
-        var decay = Math.Pow(0.5d, deltaSeconds);
+        var visibilityHalfLifeSeconds = GetRobotVisibilityHalfLifeSeconds(settings);
 
         return previousState with
         {
@@ -1331,8 +1372,9 @@ public sealed class TrackerEngine : ITrackerEngine
             YMm = previousState.YMm + previousState.VYMmPerS * deltaSeconds,
             OrientationRad = previousState.OrientationRad + previousState.AngularVelocityRadPerS * deltaSeconds,
             LastUpdateTimestampNs = frameTimestampNs,
-            Visibility = (float)(previousState.Visibility * decay),
-            Quality = previousState.Quality * decay,
+            Visibility = ComputeDecayVisibility(previousState.Visibility, deltaSeconds, visibilityHalfLifeSeconds),
+            Quality = ComputeDecayQuality(previousState.Quality, deltaSeconds, visibilityHalfLifeSeconds),
+            PositionUncertaintyMm = previousState.PositionUncertaintyMm + (deltaSeconds * GetRobotProcessNoise(settings)),
         };
     }
 
@@ -1372,16 +1414,16 @@ public sealed class TrackerEngine : ITrackerEngine
         RobotKey key,
         IReadOnlyList<RobotTrackState> states)
     {
-        var totalWeight = states.Sum(state => Math.Max(0.001d, state.Visibility));
-        var mergedX = states.Sum(state => state.XMm * Math.Max(0.001d, state.Visibility)) / totalWeight;
-        var mergedY = states.Sum(state => state.YMm * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var totalWeight = states.Sum(GetRobotMergeWeight);
+        var mergedX = states.Sum(state => state.XMm * GetRobotMergeWeight(state)) / totalWeight;
+        var mergedY = states.Sum(state => state.YMm * GetRobotMergeWeight(state)) / totalWeight;
         var orientationReference = states[0].OrientationRad;
         var mergedOrientation = states
-            .Sum(state => UnwrapAngleNearReference(state.OrientationRad, orientationReference) * Math.Max(0.001d, state.Visibility))
+            .Sum(state => UnwrapAngleNearReference(state.OrientationRad, orientationReference) * GetRobotMergeWeight(state))
             / totalWeight;
-        var mergedVx = states.Sum(state => state.VXMmPerS * Math.Max(0.001d, state.Visibility)) / totalWeight;
-        var mergedVy = states.Sum(state => state.VYMmPerS * Math.Max(0.001d, state.Visibility)) / totalWeight;
-        var mergedAngularVelocity = states.Sum(state => state.AngularVelocityRadPerS * Math.Max(0.001d, state.Visibility)) / totalWeight;
+        var mergedVx = states.Sum(state => state.VXMmPerS * GetRobotMergeWeight(state)) / totalWeight;
+        var mergedVy = states.Sum(state => state.VYMmPerS * GetRobotMergeWeight(state)) / totalWeight;
+        var mergedAngularVelocity = states.Sum(state => state.AngularVelocityRadPerS * GetRobotMergeWeight(state)) / totalWeight;
         var visibility = states.Average(state => state.Visibility);
         var quality = states.Average(state => state.Quality);
 
@@ -1435,6 +1477,113 @@ public sealed class TrackerEngine : ITrackerEngine
     private static double GetDistanceMm(double x1, double y1, double x2, double y2)
     {
         return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+    }
+
+    private static double GetBallTrackMatchDistanceMm(TrackerEngineSettings settings)
+    {
+        var gatedDistanceMm = settings.BallTracker.Gate is null
+            ? BallTrackMatchDistanceMm
+            : BallTrackMatchDistanceMm * settings.BallTracker.Gate.Value;
+        return settings.BallTracker.OutlierLimitMm is null
+            ? gatedDistanceMm
+            : Math.Min(settings.BallTracker.OutlierLimitMm.Value, gatedDistanceMm);
+    }
+
+    private static double GetBallMergeDistanceMm(TrackerEngineSettings settings)
+    {
+        var gatedDistanceMm = settings.BallTracker.Gate is null
+            ? BallMergeDistanceMm
+            : BallMergeDistanceMm * settings.BallTracker.Gate.Value;
+        return settings.BallTracker.OutlierLimitMm is null
+            ? gatedDistanceMm
+            : Math.Min(settings.BallTracker.OutlierLimitMm.Value, gatedDistanceMm);
+    }
+
+    private static long? GetBallTrackLifetimeNs(TrackerEngineSettings settings)
+    {
+        return settings.BallTracker.TrackLifetimeNs;
+    }
+
+    private static double GetBallMeasurementNoise(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.BallTracker.MeasurementNoise ?? 1d);
+    }
+
+    private static double GetBallProcessNoise(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.BallTracker.ProcessNoise ?? DefaultBallProcessNoise);
+    }
+
+    private static double GetBallVisibilityHalfLifeSeconds(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.BallTracker.VisibilityHalfLifeSeconds ?? DefaultVisibilityHalfLifeSeconds);
+    }
+
+    private static double GetRobotMovementGateMm(TrackerEngineSettings settings)
+    {
+        var gatedDistanceMm = settings.RobotTracker.Gate is null
+            ? RobotTrackMovementGateMm
+            : RobotTrackMovementGateMm * settings.RobotTracker.Gate.Value;
+        return settings.RobotTracker.OutlierLimitMm is null
+            ? gatedDistanceMm
+            : Math.Min(settings.RobotTracker.OutlierLimitMm.Value, gatedDistanceMm);
+    }
+
+    private static double GetRobotMeasurementNoise(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.RobotTracker.MeasurementNoise ?? 1d);
+    }
+
+    private static double GetRobotProcessNoise(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.RobotTracker.ProcessNoise ?? DefaultBallProcessNoise);
+    }
+
+    private static double GetRobotVisibilityHalfLifeSeconds(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.RobotTracker.VisibilityHalfLifeSeconds ?? DefaultVisibilityHalfLifeSeconds);
+    }
+
+    private static float ComputeDecayVisibility(float visibility, double deltaSeconds, double halfLifeSeconds)
+    {
+        var decay = Math.Pow(0.5d, deltaSeconds / halfLifeSeconds);
+        return (float)(visibility * decay);
+    }
+
+    private static double ComputeDecayQuality(double quality, double deltaSeconds, double halfLifeSeconds)
+    {
+        var decay = Math.Pow(0.5d, deltaSeconds / halfLifeSeconds);
+        return quality * decay;
+    }
+
+    private static double GetObservedBallUncertaintyMm(TrackerEngineSettings settings, float confidence)
+    {
+        return GetBallMeasurementNoise(settings) / Math.Max(0.001d, confidence);
+    }
+
+    private static double GetObservedRobotUncertaintyMm(TrackerEngineSettings settings, float confidence)
+    {
+        return GetRobotMeasurementNoise(settings) / Math.Max(0.001d, confidence);
+    }
+
+    private static double GetRobotMergeWeight(RobotTrackState state)
+    {
+        return 1d / Math.Max(0.001d, state.PositionUncertaintyMm);
+    }
+
+    private static double GetContactMarginMm(TrackerEngineSettings settings)
+    {
+        return settings.KickDetector.ContactMarginMm ?? TrackerEngineSettings.DefaultContactMarginMm;
+    }
+
+    private static double GetKickDetectionSpeedThresholdMmPerS(TrackerEngineSettings settings)
+    {
+        return settings.KickDetector.KickSpeedThresholdMmPerS ?? TrackerEngineSettings.DefaultKickDetectionSpeedThresholdMmPerS;
+    }
+
+    private static double GetChipHeightThresholdMm(TrackerEngineSettings settings)
+    {
+        return settings.KickDetector.ChipHeightThresholdMm ?? TrackerEngineSettings.DefaultChipHeightThresholdMm;
     }
 
     private static long ConvertSecondsToNanoseconds(double seconds)
@@ -1521,6 +1670,7 @@ public sealed class TrackerEngine : ITrackerEngine
         long LastUpdateTimestampNs,
         float Visibility,
         double Quality,
+        double PositionUncertaintyMm,
         double VXMmPerS,
         double VYMmPerS,
         double AngularVelocityRadPerS);
@@ -1601,6 +1751,10 @@ public sealed class TrackerEngine : ITrackerEngine
 
 public sealed class TrackerEngineSettings
 {
+    public const double DefaultKickDetectionSpeedThresholdMmPerS = 800d;
+    public const double DefaultChipHeightThresholdMm = 120d;
+    public const double DefaultContactMarginMm = 25d;
+
     public string ProfileName { get; init; } = "default";
 
     public long ReorderWindowNs { get; init; }
@@ -1610,6 +1764,17 @@ public sealed class TrackerEngineSettings
     public int GeometryResetFieldLengthThresholdMm { get; init; }
 
     public int GeometryResetFieldWidthThresholdMm { get; init; }
+
+    public TrackerRobotTrackerOverrides RobotTracker { get; init; } = new();
+
+    public TrackerBallTrackerOverrides BallTracker { get; init; } = new();
+
+    public TrackerKickDetectorOverrides KickDetector { get; init; } = new()
+    {
+        KickSpeedThresholdMmPerS = DefaultKickDetectionSpeedThresholdMmPerS,
+        ChipHeightThresholdMm = DefaultChipHeightThresholdMm,
+        ContactMarginMm = DefaultContactMarginMm,
+    };
 }
 
 public sealed class TrackerRuntimeOverrides
@@ -1640,6 +1805,8 @@ public sealed class TrackerRobotTrackerOverrides
 
     public double? MeasurementNoise { get; init; }
 
+    public double? VisibilityHalfLifeSeconds { get; init; }
+
     public double? Gate { get; init; }
 
     public double? OutlierLimitMm { get; init; }
@@ -1650,6 +1817,8 @@ public sealed class TrackerBallTrackerOverrides
     public double? ProcessNoise { get; init; }
 
     public double? MeasurementNoise { get; init; }
+
+    public double? VisibilityHalfLifeSeconds { get; init; }
 
     public double? Gate { get; init; }
 

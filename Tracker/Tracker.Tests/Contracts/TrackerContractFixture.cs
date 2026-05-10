@@ -29,7 +29,10 @@ public sealed class TrackerContractFixture
         long reorderWindowNs = DefaultReorderWindowNs,
         long mergeWindowNs = DefaultMergeWindowNs,
         int geometryResetFieldLengthThresholdMm = DefaultGeometryResetFieldLengthThresholdMm,
-        int geometryResetFieldWidthThresholdMm = DefaultGeometryResetFieldWidthThresholdMm)
+        int geometryResetFieldWidthThresholdMm = DefaultGeometryResetFieldWidthThresholdMm,
+        TrackerRobotTrackerOverrides? robotTracker = null,
+        TrackerBallTrackerOverrides? ballTracker = null,
+        TrackerKickDetectorOverrides? kickDetector = null)
     {
         return new TrackerEngineSettings
         {
@@ -38,6 +41,9 @@ public sealed class TrackerContractFixture
             MergeWindowNs = mergeWindowNs,
             GeometryResetFieldLengthThresholdMm = geometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = geometryResetFieldWidthThresholdMm,
+            RobotTracker = robotTracker ?? new TrackerRobotTrackerOverrides(),
+            BallTracker = ballTracker ?? new TrackerBallTrackerOverrides(),
+            KickDetector = kickDetector ?? new TrackerKickDetectorOverrides(),
         };
     }
 
