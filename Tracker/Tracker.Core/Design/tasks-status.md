@@ -4,22 +4,31 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-031
-- Title: camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する
-- Phase: engine
-- Status: done
+- ID: TRACKER-032
+- Title: Tracker 保守性改善の詳細設計書を分割作成する
+- Phase: maintenance
+- Status: in_progress
 - Size: small
-- Dependencies: TRACKER-030 が完了し、対象 diagnostics log が利用できること
+- Dependencies: TRACKER-031 が完了していること
 - Exit Criteria:
-  - `2026-05-10 22:33:16.070` 付近で yellow robot 1 が瞬間移動する原因が `reports/tracker-031-evidence-20260510223916.md` に記録されている
-  - 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない
-  - 単一観測の大きな移動や既存 outlier 契約を不必要に壊さない
-  - focused regression と full test の結果が `reports/tracker-031-evidence-20260510223916.md` に記録されている
-  - review 結果が `reports/tracker-031-review-20260510223916.md` に記録され、blocking finding が残っていない
+  - 現行の基本設計寄りの設計書から、詳細設計を責務別の日本語ファイルへ分割する
+  - Core engine、Server/CLI/UI、test 保守性改善の作業境界と依存関係を明記する
+  - 巨大ファイル分割、クラス・関数・プロパティ単位の日本語コメント追加、テスト説明コメント追加の基準を明記する
+  - review 結果が `reports/tracker-032-review-*.md` に記録され、blocking finding が残っていない
 
 ## 次の調査タスク
 
-- none
+- ID: TRACKER-033
+- Title: Core tracker engine の巨大ファイルを責務別に細分化し日本語コメントを追加する
+- Phase: maintenance
+- Status: pending
+- Size: medium
+- Dependencies: TRACKER-032
+- Exit Criteria:
+  - `TrackerExecutionContracts.cs` を中心に、巨大な engine 実装を責務別ファイルへ分割する
+  - public/internal の主要 class、property、method に日本語コメントを追加する
+  - 既存の tracking 挙動を変えず、focused/full test が通る
+  - review 結果が `reports/tracker-033-review-*.md` に記録され、blocking finding が残っていない
 
 ## タスク一覧
 
@@ -57,3 +66,8 @@
 | TRACKER-029 | tracked object の小刻みな振動を抑制する | engine | done | TRACKER-028 | stationary に近い tracked ball / robot の表示揺れを抑制しつつ、実移動している object の追従性を過度に落とさない。振動抑制 tuning 値は profile 設定から外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、review は `reports/tracker-029-review-20260510221200.md` に記録済み。 |
 | TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | done | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。review は `reports/tracker-030-review-20260510222529.md` に記録済み。 |
 | TRACKER-031 | camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する | engine | done | TRACKER-030 | 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない。原因・実装・検証は `reports/tracker-031-evidence-20260510223916.md`、review は `reports/tracker-031-review-20260510223916.md` に記録済み。 |
+| TRACKER-032 | Tracker 保守性改善の詳細設計書を分割作成する | maintenance | in_progress | TRACKER-031 | 現行の基本設計寄りの設計書から、Core engine、Server/CLI/UI、test 保守性改善の詳細設計を日本語の分割ファイルとして作成する。 |
+| TRACKER-033 | Core tracker engine の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | pending | TRACKER-032 | `TrackerExecutionContracts.cs` を中心に巨大な engine 実装を責務別ファイルへ分割し、主要 class / property / method に日本語コメントを追加する。 |
+| TRACKER-034 | Server / CLI / UI の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | pending | TRACKER-032 | `Tracker.CaptureReplay/Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` などを対象に、責務別分割と主要 class / property / method の日本語コメント追加を行う。 |
+| TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | pending | TRACKER-033, TRACKER-034 | 巨大 test file を必要に応じて分割し、各 test に何を確認しているかの日本語コメントを追加する。 |
+| TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | pending | TRACKER-033, TRACKER-034, TRACKER-035 | full test と必要な focused test を実行し、review report を揃え、PR コメントに作業完了を記録する。 |
