@@ -8,8 +8,21 @@ public sealed class VisionReceiverOptions
 
     public string? InterfaceAddress { get; set; }
 
+    public VisionPacketCaptureOptions PacketCapture { get; set; } = new();
+
     public Dictionary<string, VisionReceiverProfileOptions> Profiles { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
+}
+
+public sealed class VisionPacketCaptureOptions
+{
+    public bool Enabled { get; set; }
+
+    public string DirectoryPath { get; set; } = "packet-captures";
+
+    public string FilePrefix { get; set; } = "ssl-vision-packets";
+
+    public bool FlushEachPacket { get; set; }
 }
 
 public sealed class VisionReceiverProfileOptions

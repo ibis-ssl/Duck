@@ -111,7 +111,7 @@ public class TrackerConfigurationBindingTests
         var trackerOptions = Assert.IsType<TrackerOptions>(options);
 
         Assert.Equal("sim", trackerOptions.ActiveProfileName);
-        Assert.False(trackerOptions.Diagnostics.Enabled);
+        Assert.True(trackerOptions.Diagnostics.Enabled);
         Assert.True(trackerOptions.Diagnostics.FileEnabled);
         Assert.Null(trackerOptions.Diagnostics.FilePath);
         AssertTigersAlignedProfile(trackerOptions.Profiles["default"], expectedPublishPort: 10010, expectedGate: 1.0d);

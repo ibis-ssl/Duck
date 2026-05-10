@@ -12,6 +12,7 @@ public sealed class VisionReceiverService(
     IOptions<TrackerOptions> trackerOptions,
     VisionPacketStore store,
     TrackerCoordinator trackerCoordinator,
+    VisionPacketCaptureWriter packetCaptureWriter,
     ILogger<VisionReceiverService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -67,6 +68,7 @@ public sealed class VisionReceiverService(
                     {
                         var result = await udpClient.ReceiveAsync(configurationScope.Token);
                         var receivedAt = DateTimeOffset.UtcNow;
+                        packetCaptureWriter.Capture(result.Buffer, result.RemoteEndPoint, receivedAt);
                         SSL_WrapperPacket packet;
                         try
                         {

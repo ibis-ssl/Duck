@@ -148,4 +148,38 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal(12020, snapshot.Options.Port);
         Assert.Equal("10.0.0.5", snapshot.Options.InterfaceAddress);
     }
+
+    [Fact]
+    public void AppsettingsJson_ExposesPacketCaptureDefaults()
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(repositoryRoot)
+            .AddJsonFile("Tracker/Tracker.Server/appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
+
+        var options = configuration.GetSection("VisionReceiver").Get<VisionReceiverOptions>();
+        var receiverOptions = Assert.IsType<VisionReceiverOptions>(options);
+
+        Assert.False(receiverOptions.PacketCapture.Enabled);
+        Assert.Equal("packet-captures", receiverOptions.PacketCapture.DirectoryPath);
+        Assert.Equal("ssl-vision-packets", receiverOptions.PacketCapture.FilePrefix);
+        Assert.False(receiverOptions.PacketCapture.FlushEachPacket);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (directory is not null)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.Server", "appsettings.json")))
+            {
+                return directory.FullName;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.Server/appsettings.json.");
+    }
 }
