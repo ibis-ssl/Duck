@@ -27,10 +27,6 @@ public sealed class TrackerOptions
 
 public sealed class TrackerDiagnosticsOptions
 {
-    public bool Enabled { get; init; }
-
-    public bool FileEnabled { get; init; } = true;
-
     public string? FilePath { get; init; }
 }
 
@@ -63,4 +59,10 @@ public sealed class TrackerEngineProfileOptions
     public int GeometryResetFieldLengthThresholdMm { get; init; } = 500;
 
     public int GeometryResetFieldWidthThresholdMm { get; init; } = 500;
+
+    public double KalmanInitialVelocityVariance { get; init; } = TrackerEngineSettings.DefaultKalmanInitialVelocityVariance;
+
+    public double KalmanProcessNoiseScale { get; init; } = TrackerEngineSettings.DefaultKalmanProcessNoiseScale;
+
+    public double MeasurementNoiseVarianceScale { get; init; } = TrackerEngineSettings.DefaultMeasurementNoiseVarianceScale;
 }

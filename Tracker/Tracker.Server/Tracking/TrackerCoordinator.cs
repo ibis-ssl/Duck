@@ -1,4 +1,6 @@
+using System.Globalization;
 using Tracker.Core;
+using Tracker.Server.Vision;
 
 namespace Tracker.Server.Tracking;
 
@@ -15,6 +17,8 @@ public sealed class TrackerCoordinator
     private readonly ITrackerPacketPublisher publisher;
     private readonly IReadOnlyList<ITrackerObserver> observers;
     private readonly ILogger<TrackerCoordinator> logger;
+    private readonly VisionPacketCaptureSession? packetCaptureSession;
+    private readonly TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter;
     private TrackerResolvedOptions appliedOptions;
     private TrackerResolvedOptions desiredOptions;
     private TrackerRuntimeOverrides desiredRuntimeOverrides = new();
@@ -23,8 +27,8 @@ public sealed class TrackerCoordinator
     private int nextRequestVersion = 1;
     private bool isProcessingUpdate;
     private DateTimeOffset lastTrackerDiagnosticsLogAt = DateTimeOffset.MinValue;
-    private bool trackerDiagnosticsFileWriteFailed;
-    private string? trackerDiagnosticsLogPath;
+    private readonly HashSet<string> failedTrackerDiagnosticsLogPaths = new(StringComparer.Ordinal);
+    private string? defaultTrackerDiagnosticsLogPath;
 
     public TrackerCoordinator(
         ITrackerEngine engine,
@@ -35,7 +39,9 @@ public sealed class TrackerCoordinator
         TrackedSnapshotStore snapshotStore,
         ITrackerPacketPublisher publisher,
         IEnumerable<ITrackerObserver> observers,
-        ILogger<TrackerCoordinator> logger)
+        ILogger<TrackerCoordinator> logger,
+        VisionPacketCaptureSession? packetCaptureSession = null,
+        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter = null)
     {
         this.engine = engine;
         this.packetGenerator = packetGenerator;
@@ -46,6 +52,8 @@ public sealed class TrackerCoordinator
         this.publisher = publisher;
         this.observers = observers.ToArray();
         this.logger = logger;
+        this.packetCaptureSession = packetCaptureSession;
+        this.renderSnapshotCaptureWriter = renderSnapshotCaptureWriter;
         appliedOptions = new TrackerResolvedOptions
         {
             Enabled = true,
@@ -203,6 +211,7 @@ public sealed class TrackerCoordinator
                     if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var committedFrame))
                     {
                         snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);
+                        renderSnapshotCaptureWriter?.CaptureFrame(committedFrame, receivedAt);
                         PublishFrame(committedFrame);
                         NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));
                     }
@@ -238,39 +247,39 @@ public sealed class TrackerCoordinator
         TrackerUpdateResult result,
         DateTimeOffset receivedAt)
     {
-        if (!diagnosticsOptions.Enabled)
-        {
-            return;
-        }
-
         if (result.CommittedFrames.Count == 0)
         {
             return;
         }
 
         var newestFrame = result.CommittedFrames[^1];
-        var detection = packet?.Detection;
-        if (!ShouldLogTrackerDiagnostics(receivedAt, detection, newestFrame))
+        var sourceDetections = newestFrame.SourceDetections;
+        if (!ShouldLogTrackerDiagnostics(receivedAt, newestFrame))
         {
             return;
         }
 
         lastTrackerDiagnosticsLogAt = receivedAt;
-        var rawBallDetails = FormatRawBalls(detection?.Balls);
-        var rawBlueDetails = FormatRawRobots(detection?.RobotsBlue, TrackerTeam.Blue);
-        var rawYellowDetails = FormatRawRobots(detection?.RobotsYellow, TrackerTeam.Yellow);
+        var rawBalls = sourceDetections.SelectMany(detection => detection.Balls).ToArray();
+        var rawBlue = sourceDetections.SelectMany(detection => detection.RobotsBlue).ToArray();
+        var rawYellow = sourceDetections.SelectMany(detection => detection.RobotsYellow).ToArray();
+        var rawFrameLabel = FormatSourceFrameNumbers(sourceDetections);
+        var rawCameraLabel = FormatSourceCameraIds(sourceDetections);
+        var rawBallDetails = FormatRawBalls(rawBalls);
+        var rawBlueDetails = FormatRawRobots(rawBlue, TrackerTeam.Blue);
+        var rawYellowDetails = FormatRawRobots(rawYellow, TrackerTeam.Yellow);
         var trackedBallDetails = FormatTrackedBalls(newestFrame.Balls);
         var trackedRobotDetails = FormatTrackedRobots(newestFrame.Robots);
         var diagnosticsLine = FormattableString.Invariant(
-            $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={detection?.FrameNumber} rawCamera={detection?.CameraId} rawBalls={detection?.Balls.Count ?? 0} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
+            $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={rawFrameLabel} rawCamera={rawCameraLabel} rawBalls={rawBalls.Length} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
         if (logger.IsEnabled(LogLevel.Information))
         {
             logger.LogInformation(
                 "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
                 currentSettings.ProfileName,
-                detection?.FrameNumber,
-                detection?.CameraId,
-                detection?.Balls.Count ?? 0,
+                rawFrameLabel,
+                rawCameraLabel,
+                rawBalls.Length,
                 rawBallDetails,
                 rawBlueDetails,
                 rawYellowDetails,
@@ -286,42 +295,74 @@ public sealed class TrackerCoordinator
                 currentSettings.BallTracker.TrackLifetimeNs);
         }
 
-        if (diagnosticsOptions.FileEnabled)
-        {
-            AppendTrackerDiagnosticsFile(diagnosticsLine);
-        }
+        AppendTrackerDiagnosticsFile(diagnosticsLine, receivedAt);
     }
 
-    private void AppendTrackerDiagnosticsFile(string diagnosticsLine)
+    private void AppendTrackerDiagnosticsFile(string diagnosticsLine, DateTimeOffset receivedAt)
     {
-        if (trackerDiagnosticsFileWriteFailed)
+        foreach (var logPath in ResolveTrackerDiagnosticsLogPaths(receivedAt))
         {
-            return;
-        }
+            if (failedTrackerDiagnosticsLogPaths.Contains(logPath))
+            {
+                continue;
+            }
 
-        try
-        {
-            var logPath = trackerDiagnosticsLogPath ??= diagnosticsOptions.FilePath ?? CreateTrackerDiagnosticsLogPath();
-            File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
-        }
-        catch (Exception ex)
-        {
-            trackerDiagnosticsFileWriteFailed = true;
-            logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", trackerDiagnosticsLogPath);
+            try
+            {
+                var directory = Path.GetDirectoryName(logPath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                File.AppendAllText(logPath, diagnosticsLine + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                failedTrackerDiagnosticsLogPaths.Add(logPath);
+                logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", logPath);
+            }
         }
     }
 
-    private static string CreateTrackerDiagnosticsLogPath()
+    private IReadOnlyList<string> ResolveTrackerDiagnosticsLogPaths(DateTimeOffset receivedAt)
+    {
+        var logPaths = new List<string>();
+        var captureSidecarPath = ResolveTrackerDiagnosticsSidecarPath(receivedAt);
+        if (captureSidecarPath is not null)
+        {
+            logPaths.Add(captureSidecarPath);
+        }
+
+        logPaths.Add(diagnosticsOptions.FilePath ?? (captureSidecarPath is null
+            ? defaultTrackerDiagnosticsLogPath ??= CreateTrackerDiagnosticsLogPath()
+            : captureSidecarPath));
+
+        return logPaths
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private string? ResolveTrackerDiagnosticsSidecarPath(DateTimeOffset receivedAt)
+    {
+        if (packetCaptureSession?.Enabled != true)
+        {
+            return null;
+        }
+
+        return packetCaptureSession.EnsureStarted(receivedAt)?.DiagnosticsLogPath;
+    }
+
+    private string CreateTrackerDiagnosticsLogPath()
     {
         var timestamp = FormattableString.Invariant($"{DateTimeOffset.UtcNow:yyyyMMddTHHmmssfffZ}");
         return Path.Combine(
-            AppContext.BaseDirectory,
+            packetCaptureSession?.DirectoryPath ?? Path.Combine(AppContext.BaseDirectory, "packet-captures"),
             $"tracker-diagnostics-{timestamp}-{Guid.NewGuid():N}.log");
     }
 
     private bool ShouldLogTrackerDiagnostics(
         DateTimeOffset receivedAt,
-        SSL_DetectionFrame? detection,
         TrackerFrame newestFrame)
     {
         if (receivedAt - lastTrackerDiagnosticsLogAt >= TrackerDiagnosticsLogInterval)
@@ -329,8 +370,28 @@ public sealed class TrackerCoordinator
             return true;
         }
 
-        return (detection?.Balls.Count ?? 0) > 1
+        return newestFrame.SourceDetections.Sum(detection => detection.Balls.Count) > 1
             || newestFrame.Balls.Count > 1;
+    }
+
+    private static string FormatSourceFrameNumbers(IReadOnlyList<TrackerSourceDetectionFrame> sourceDetections)
+    {
+        return FormatSourceValues(sourceDetections.Select(detection => detection.SourceFrameNumber));
+    }
+
+    private static string FormatSourceCameraIds(IReadOnlyList<TrackerSourceDetectionFrame> sourceDetections)
+    {
+        return FormatSourceValues(sourceDetections.Select(detection => detection.CameraId));
+    }
+
+    private static string FormatSourceValues(IEnumerable<uint> values)
+    {
+        var distinctValues = values
+            .Distinct()
+            .Order()
+            .Select(value => value.ToString(CultureInfo.InvariantCulture))
+            .ToArray();
+        return distinctValues.Length == 0 ? "-" : string.Join("/", distinctValues);
     }
 
     private static string FormatRawBalls(IEnumerable<SSL_DetectionBall>? balls)
@@ -419,6 +480,9 @@ public sealed class TrackerCoordinator
             && left.EngineSettings.MergeWindowNs == right.EngineSettings.MergeWindowNs
             && left.EngineSettings.GeometryResetFieldLengthThresholdMm == right.EngineSettings.GeometryResetFieldLengthThresholdMm
             && left.EngineSettings.GeometryResetFieldWidthThresholdMm == right.EngineSettings.GeometryResetFieldWidthThresholdMm
+            && left.EngineSettings.KalmanInitialVelocityVariance == right.EngineSettings.KalmanInitialVelocityVariance
+            && left.EngineSettings.KalmanProcessNoiseScale == right.EngineSettings.KalmanProcessNoiseScale
+            && left.EngineSettings.MeasurementNoiseVarianceScale == right.EngineSettings.MeasurementNoiseVarianceScale
             && AreRobotTrackerOverridesEquivalent(left.EngineSettings.RobotTracker, right.EngineSettings.RobotTracker)
             && AreBallTrackerOverridesEquivalent(left.EngineSettings.BallTracker, right.EngineSettings.BallTracker)
             && AreKickDetectorOverridesEquivalent(left.EngineSettings.KickDetector, right.EngineSettings.KickDetector)
@@ -496,6 +560,9 @@ public sealed class TrackerCoordinator
             MergeWindowNs = settings.MergeWindowNs,
             GeometryResetFieldLengthThresholdMm = settings.GeometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = settings.GeometryResetFieldWidthThresholdMm,
+            KalmanInitialVelocityVariance = settings.KalmanInitialVelocityVariance,
+            KalmanProcessNoiseScale = settings.KalmanProcessNoiseScale,
+            MeasurementNoiseVarianceScale = settings.MeasurementNoiseVarianceScale,
             RobotTracker = CloneRobotTracker(settings.RobotTracker),
             BallTracker = CloneBallTracker(settings.BallTracker),
             KickDetector = CloneKickDetector(settings.KickDetector),
@@ -518,8 +585,6 @@ public sealed class TrackerCoordinator
     {
         return new TrackerDiagnosticsOptions
         {
-            Enabled = options.Enabled,
-            FileEnabled = options.FileEnabled,
             FilePath = options.FilePath,
         };
     }

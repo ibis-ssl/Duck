@@ -1,8 +1,10 @@
 using System.Net;
+using System.Text.Json;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
+using Tracker.Server.Tracking;
 using Tracker.Server.Vision;
 using Tracker.Tests.Contracts;
 
@@ -21,17 +23,13 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
     public void Capture_WhenEnabled_WritesCompressedReplayRecords()
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "test-vision",
+            enabled: true,
+            flushEachPacket: true);
         var writer = new VisionPacketCaptureWriter(
-            Options.Create(new VisionReceiverOptions
-            {
-                PacketCapture = new VisionPacketCaptureOptions
-                {
-                    Enabled = true,
-                    DirectoryPath = captureDirectory,
-                    FilePrefix = "test-vision",
-                    FlushEachPacket = true,
-                },
-            }),
+            session,
             NullLogger<VisionPacketCaptureWriter>.Instance);
         var receivedAt = new DateTimeOffset(2026, 5, 10, 17, 45, 0, TimeSpan.Zero);
         var packet = new SSL_WrapperPacket
@@ -56,8 +54,10 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         writer.Dispose();
 
         var capturePath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.jsonl.gz"));
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json"));
         var record = Assert.Single(VisionPacketCaptureFile.ReadRecords(capturePath));
         var replayedPacket = record.ParsePacket();
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
 
         Assert.Equal(receivedAt, record.ReceivedAt);
         Assert.Equal("127.0.0.1:10020", record.RemoteEndpoint);
@@ -65,6 +65,32 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Equal((uint)123, replayedPacket.Detection.FrameNumber);
         Assert.Equal((uint)1, replayedPacket.Detection.CameraId);
         Assert.Single(replayedPacket.Detection.Balls);
+        Assert.Equal(capturePath, metadata.RootElement.GetProperty("PacketPath").GetString());
+        Assert.Equal(metadataPath, metadata.RootElement.GetProperty("MetadataPath").GetString());
+        Assert.EndsWith(
+            ".tracker-diagnostics.log",
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString(),
+            StringComparison.Ordinal);
+        Assert.EndsWith(
+            ".render-snapshots.jsonl.gz",
+            metadata.RootElement.GetProperty("RenderSnapshotPath").GetString(),
+            StringComparison.Ordinal);
+        Assert.Equal(
+            "sim",
+            metadata.RootElement
+                .GetProperty("ResolvedTrackerOptions")
+                .GetProperty("EngineSettings")
+                .GetProperty("ProfileName")
+                .GetString());
+        var simProfile = metadata.RootElement
+            .GetProperty("TrackerOptions")
+            .GetProperty("Profiles")
+            .GetProperty("sim");
+        Assert.Equal(11010, simProfile.GetProperty("Publish").GetProperty("Port").GetInt32());
+        Assert.Equal(
+            0.85,
+            simProfile.GetProperty("BallTracker").GetProperty("Gate").GetDouble(),
+            precision: 3);
     }
 
     [Fact]
@@ -72,15 +98,7 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-replay-{Guid.NewGuid():N}");
         var writer = new VisionPacketCaptureWriter(
-            Options.Create(new VisionReceiverOptions
-            {
-                PacketCapture = new VisionPacketCaptureOptions
-                {
-                    Enabled = true,
-                    DirectoryPath = captureDirectory,
-                    FilePrefix = "replay-vision",
-                },
-            }),
+            CreateCaptureSession(captureDirectory, filePrefix: "replay-vision", enabled: true),
             NullLogger<VisionPacketCaptureWriter>.Instance);
         var remoteEndpoint = new IPEndPoint(IPAddress.Loopback, 10020);
         var receivedAt = new DateTimeOffset(2026, 5, 10, 18, 15, 0, TimeSpan.Zero);
@@ -126,20 +144,83 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-disabled-{Guid.NewGuid():N}");
         using var writer = new VisionPacketCaptureWriter(
-            Options.Create(new VisionReceiverOptions
-            {
-                PacketCapture = new VisionPacketCaptureOptions
-                {
-                    Enabled = false,
-                    DirectoryPath = captureDirectory,
-                    FilePrefix = "test-vision",
-                },
-            }),
+            CreateCaptureSession(captureDirectory, filePrefix: "test-vision", enabled: false),
             NullLogger<VisionPacketCaptureWriter>.Instance);
 
         writer.Capture([1, 2, 3], new IPEndPoint(IPAddress.Loopback, 10020), DateTimeOffset.UtcNow);
 
         Assert.False(Directory.Exists(captureDirectory));
         Assert.Null(writer.CapturePath);
+    }
+
+    [Fact]
+    public void Capture_RuntimeToggleStartsFromConfiguredDisabledValueAndCreatesFilesAfterEnable()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-runtime-{Guid.NewGuid():N}");
+        var runtimeControl = new VisionPacketCaptureRuntimeControl(initialEnabled: false);
+        using var writer = new VisionPacketCaptureWriter(
+            CreateCaptureSession(
+                captureDirectory,
+                filePrefix: "runtime-vision",
+                enabled: false,
+                flushEachPacket: true,
+                runtimeControl: runtimeControl),
+            NullLogger<VisionPacketCaptureWriter>.Instance);
+        var remoteEndpoint = new IPEndPoint(IPAddress.Loopback, 10020);
+
+        writer.Capture([1, 2, 3], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 0, TimeSpan.Zero));
+        Assert.False(Directory.Exists(captureDirectory));
+
+        runtimeControl.SetEnabled(true);
+        writer.Capture([4, 5, 6], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 1, TimeSpan.Zero));
+        runtimeControl.SetEnabled(false);
+        writer.Stop();
+        runtimeControl.SetEnabled(true);
+        writer.Capture([7, 8, 9], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 2, TimeSpan.Zero));
+
+        var captureFiles = Directory.GetFiles(captureDirectory, "runtime-vision-*.jsonl.gz");
+
+        Assert.Equal(2, captureFiles.Length);
+    }
+
+    private VisionPacketCaptureSession CreateCaptureSession(
+        string captureDirectory,
+        string filePrefix,
+        bool enabled,
+        bool flushEachPacket = false,
+        VisionPacketCaptureRuntimeControl? runtimeControl = null)
+    {
+        return new VisionPacketCaptureSession(
+            Options.Create(new VisionReceiverOptions
+            {
+                PacketCapture = new VisionPacketCaptureOptions
+                {
+                    Enabled = enabled,
+                    DirectoryPath = captureDirectory,
+                    FilePrefix = filePrefix,
+                    FlushEachPacket = flushEachPacket,
+                },
+            }),
+            Options.Create(new TrackerOptions
+            {
+                ActiveProfileName = "sim",
+                Profiles = new Dictionary<string, TrackerProfileOptions>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["sim"] = new()
+                    {
+                        Publish = new TrackerPublishProfileOptions
+                        {
+                            Port = 11010,
+                        },
+                        BallTracker = new TrackerBallTrackerOverrides
+                        {
+                            Gate = 0.85,
+                        },
+                    },
+                },
+            }),
+            fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
+            NullLogger<VisionPacketCaptureSession>.Instance,
+            runtimeControl);
     }
 }

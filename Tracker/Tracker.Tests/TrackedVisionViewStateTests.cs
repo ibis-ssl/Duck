@@ -62,7 +62,33 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
                 GoalDepthMm = 200,
                 BoundaryWidthMm = 300,
                 BoundaryWidthGoalLineMm = 350,
+                PenaltyAreaDepthMm = 1200,
+                PenaltyAreaWidthMm = 2400,
+                CenterCircleRadiusMm = 600,
                 LineThicknessMm = 10,
+                FieldLines =
+                [
+                    new TrackerGeometryLineSegment
+                    {
+                        Name = "HalfwayLine",
+                        P1YMm = -4500,
+                        P2YMm = 4500,
+                        ThicknessMm = 10,
+                        Type = SSL_FieldShapeType.HalfwayLine,
+                    },
+                ],
+                FieldArcs =
+                [
+                    new TrackerGeometryCircularArc
+                    {
+                        Name = "CenterCircle",
+                        RadiusMm = 600,
+                        A1Rad = 0,
+                        A2Rad = Math.PI,
+                        ThicknessMm = 10,
+                        Type = SSL_FieldShapeType.CenterCircle,
+                    },
+                ],
             },
             Metadata = new TrackerFrameMetadata
             {
@@ -112,6 +138,16 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(12000, viewState.Geometry.Field.FieldLength);
         Assert.Equal(1800, viewState.Geometry.Field.GoalWidth);
         Assert.Equal(300, viewState.Geometry.Field.BoundaryWidth);
+        Assert.Equal(1200, viewState.Geometry.Field.PenaltyAreaDepth);
+        Assert.Equal(2400, viewState.Geometry.Field.PenaltyAreaWidth);
+        Assert.Equal(600, viewState.Geometry.Field.CenterCircleRadius);
+        var fieldLine = Assert.Single(viewState.Geometry.Field.FieldLines);
+        Assert.Equal("HalfwayLine", fieldLine.Name);
+        Assert.Equal(SSL_FieldShapeType.HalfwayLine, fieldLine.Type);
+        var fieldArc = Assert.Single(viewState.Geometry.Field.FieldArcs);
+        Assert.Equal("CenterCircle", fieldArc.Name);
+        Assert.Equal(600, fieldArc.Radius);
+        Assert.Equal(SSL_FieldShapeType.CenterCircle, fieldArc.Type);
         Assert.Equal(2, viewState.Diagnostics.BallCount);
         Assert.Equal(2, viewState.Diagnostics.RobotCount);
         Assert.Equal(2_500_000_000, viewState.Diagnostics.DataTimestampNs);

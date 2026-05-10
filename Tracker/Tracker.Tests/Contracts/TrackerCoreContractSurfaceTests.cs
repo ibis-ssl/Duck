@@ -15,7 +15,29 @@ public class TrackerCoreContractSurfaceTests
             GoalDepthMm = 180,
             BoundaryWidthMm = 300,
             BoundaryWidthGoalLineMm = 350,
+            PenaltyAreaDepthMm = 1000,
+            PenaltyAreaWidthMm = 2000,
+            CenterCircleRadiusMm = 500,
             LineThicknessMm = 10,
+            FieldLines =
+            [
+                new TrackerGeometryLineSegment
+                {
+                    Name = "HalfwayLine",
+                    P1YMm = -4500,
+                    P2YMm = 4500,
+                    Type = SSL_FieldShapeType.HalfwayLine,
+                },
+            ],
+            FieldArcs =
+            [
+                new TrackerGeometryCircularArc
+                {
+                    Name = "CenterCircle",
+                    RadiusMm = 500,
+                    Type = SSL_FieldShapeType.CenterCircle,
+                },
+            ],
         };
         var contact = new BallContactState
         {
@@ -34,6 +56,11 @@ public class TrackerCoreContractSurfaceTests
         };
 
         Assert.Equal(12000, frame.GeometrySnapshot.FieldLengthMm);
+        Assert.Equal(1000, frame.GeometrySnapshot.PenaltyAreaDepthMm);
+        Assert.Equal(2000, frame.GeometrySnapshot.PenaltyAreaWidthMm);
+        Assert.Equal(500, frame.GeometrySnapshot.CenterCircleRadiusMm);
+        Assert.Equal("HalfwayLine", Assert.Single(frame.GeometrySnapshot.FieldLines).Name);
+        Assert.Equal("CenterCircle", Assert.Single(frame.GeometrySnapshot.FieldArcs).Name);
         Assert.True(frame.LatestContact.IsInContact);
         Assert.Equal((uint)7, frame.LatestContact.ContactingRobotId);
         Assert.Equal(TrackerTeam.Blue, frame.LatestContact.LastTeam);
@@ -102,6 +129,9 @@ public class TrackerCoreContractSurfaceTests
             {
                 FieldLengthMm = 12000,
                 FieldWidthMm = 9000,
+                PenaltyAreaDepthMm = 1000,
+                PenaltyAreaWidthMm = 2000,
+                CenterCircleRadiusMm = 500,
             },
             LatestContact = new BallContactState
             {

@@ -4,33 +4,22 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-027
-- Title: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する
+- ID: TRACKER-031
+- Title: camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する
 - Phase: engine
 - Status: done
 - Size: small
-- Dependencies: TRACKER-026 が完了し、再現ログ解析が記録されていること
+- Dependencies: TRACKER-030 が完了し、対象 diagnostics log が利用できること
 - Exit Criteria:
-  - raw detection に Y1/Y11 のような同一 camera / team / 近接別 ID robot が入っても、低 ID / 高 confidence 側だけが tracked output へ採用される
-  - 短命 secondary ball ghost が 1 frame の raw detection だけで tracked output に増えない
-  - genuine な複数 ball は継続観測後に stable sort で出力できる
-  - 再現ログ解析と Tigers 差分が `reports/tracker-026-reproduction-analysis-20260510160509.md` に記録されている
-  - 実装・検証結果が `reports/tracker-027-evidence-20260510161437.md` に記録されている
-  - review / re-review 結果が `reports/tracker-027-review-20260510161549.md` に記録され、blocking finding が残っていない
+  - `2026-05-10 22:33:16.070` 付近で yellow robot 1 が瞬間移動する原因が `reports/tracker-031-evidence-20260510223916.md` に記録されている
+  - 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない
+  - 単一観測の大きな移動や既存 outlier 契約を不必要に壊さない
+  - focused regression と full test の結果が `reports/tracker-031-evidence-20260510223916.md` に記録されている
+  - review 結果が `reports/tracker-031-review-20260510223916.md` に記録され、blocking finding が残っていない
 
 ## 次の調査タスク
 
-- ID: TRACKER-026
-- Title: Tracked 表示の raw/tracked diagnostics log を追加する
-- Phase: investigation
-- Status: done
-- Size: small
-- Dependencies: TRACKER-025 が完了していること
-- Exit Criteria:
-  - raw SSL-Vision detection の ball / robot と tracked 出力の ball / robot を同じログで比較できる
-  - ログから「raw 側に存在する誤検出」か「tracker 側の stale 出力」かを切り分けられる
-  - 既存 build/test が通る
-  - Tigers との差分状態が `reports/tracker-025-tigers-config-diff-20260510153510.md` に追記されている
+- none
 
 ## タスク一覧
 
@@ -64,3 +53,7 @@
 | TRACKER-025 | Tracked 表示へ低 visibility の stale object を出さない | engine | done | TRACKER-024 | 欠測で十分 decayed した robot / ball track が `TrackerFrame` に出力されず、1 frame 程度の短期欠測を残す既存契約は維持される。設定差分は `reports/tracker-025-tigers-config-diff-20260510153510.md`、review は `reports/tracker-025-review-20260510154020.md` に記録済み。 |
 | TRACKER-026 | Tracked 表示の raw/tracked diagnostics log を追加する | investigation | done | TRACKER-025 | raw SSL-Vision detection と tracked 出力を同じログで比較でき、誤検出の発生源を切り分けられる。`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` は 0 warning / 0 error。 |
 | TRACKER-027 | Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する | engine | done | TRACKER-026 | 近接別 ID robot を raw detection 単位で抑制し、短命 secondary ball ghost を 1 frame で出力しない。継続観測された genuine な複数 ball は stable sort で出力できる。実装・検証は `reports/tracker-027-evidence-20260510161437.md`、review は `reports/tracker-027-review-20260510161549.md` に記録済み。 |
+| TRACKER-028 | capture 1680 付近の複数 ball 再発を解析して修正する | engine | done | TRACKER-027 | 指定 diagnostics log の trackedFrame 1680 付近で複数 ball になる原因を記録し、成長済み secondary ball が fresh observation を失った後に出続けないよう修正した。実装・検証は `reports/tracker-028-evidence-20260510215726.md`、review は `reports/tracker-028-review-20260510215726.md` に記録済み。 |
+| TRACKER-029 | tracked object の小刻みな振動を抑制する | engine | done | TRACKER-028 | stationary に近い tracked ball / robot の表示揺れを抑制しつつ、実移動している object の追従性を過度に落とさない。振動抑制 tuning 値は profile 設定から外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、review は `reports/tracker-029-review-20260510221200.md` に記録済み。 |
+| TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | done | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。review は `reports/tracker-030-review-20260510222529.md` に記録済み。 |
+| TRACKER-031 | camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する | engine | done | TRACKER-030 | 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない。原因・実装・検証は `reports/tracker-031-evidence-20260510223916.md`、review は `reports/tracker-031-review-20260510223916.md` に記録済み。 |

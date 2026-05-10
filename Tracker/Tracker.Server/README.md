@@ -75,6 +75,14 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 - `VisionReceiver:Profiles` に同名 profile がある場合は、receiver の multicast address / port / interface もその profile に追従します
 - 新しい packet が commit されると、新 profile の context で tracked frame が再表示されます
 
+### `Diagnostics` ページ
+
+- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の capture sidecar `*.tracker-diagnostics.log`、default `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
+- 上部の timeline scrubber をドラッグすると、選択 frame が連続的に切り替わります
+- 左側の timeline でログ行を時系列にスクロールできます
+- capture sidecar と同じ basename の `*.render-snapshots.jsonl.gz` がある場合は、選択行の raw / tracked field を描画できます
+- 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
+
 ## API
 
 profile switch は HTTP API からも要求できます。既定 launch profile では `UseHttpsRedirection()` が有効なため、通常は HTTPS endpoint を使ってください。
@@ -107,21 +115,30 @@ raw SSL-Vision packet の受信設定です。
 
 SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes として `jsonl.gz` に保存します。各行には `receivedAt`、remote endpoint、payload の base64 が入るため、後から同じ順序で `SSL_WrapperPacket` に戻して tracker へ再投入できます。decode に失敗した packet も保存対象です。
 
+capture を開始すると、同じ basename で次の sidecar も作成します。
+
+- `<prefix>-<timestamp>-<guid>.jsonl.gz`: packet capture 本体
+- `<prefix>-<timestamp>-<guid>.metadata.json`: capture 時の `Tracker` 設定と resolved profile 設定
+- `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: capture と対応する tracker diagnostics log。`Tracker:Diagnostics:FilePath` が指定されていても、capture 有効時は sidecar として同時に出力します。
+- `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: timeline / 逆方向スクラブ用の描画 snapshot。tracker engine の内部状態ではなく、commit 済み `TrackerFrame` だけを保存します。
+
+`metadata.json` には active profile 名だけではなく、`Tracker:Profiles` 配下の profile 設定値と、runtime override 適用後の resolved settings も保存します。
+
 | キー | 意味 |
 | --- | --- |
-| `Enabled` | `true` なら packet capture を有効にします。packet は重くなり得るため、通常は必要な調査時だけ有効にします。 |
+| `Enabled` | 起動時の packet capture 初期値です。起動後は画面の `Capture On/Off` ボタンで切り替えできます。 |
 | `DirectoryPath` | capture file の出力 directory です。相対 path は実行ファイル directory から解決します。 |
 | `FilePrefix` | capture file 名の prefix です。実際の file 名は `<prefix>-<timestamp>-<guid>.jsonl.gz` になります。 |
 | `FlushEachPacket` | `true` なら packet ごとに flush します。異常終了時の欠落は減りますが、I/O cost は上がります。 |
 
-現在の `appsettings.json` では無効です。
+現在の `appsettings.json` では、起動時 capture は無効ですが、画面で `Capture On` にした後は packet ごとに flush します。
 
 ```json
 "PacketCapture": {
   "Enabled": false,
   "DirectoryPath": "packet-captures",
   "FilePrefix": "ssl-vision-packets",
-  "FlushEachPacket": false
+  "FlushEachPacket": true
 }
 ```
 
@@ -136,7 +153,46 @@ SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes �
 }
 ```
 
-保存された capture は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各 record の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで replay できます。
+保存された capture は `Tracker.CaptureReplay` tool で replay / analyze できます。
+
+```bash
+DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" \
+NUGET_PACKAGES="$PWD/.codex-nuget-packages" \
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures/ssl-vision-packets-<timestamp>-<guid>.jsonl.gz \
+  --settings Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures/ssl-vision-packets-<timestamp>-<guid>.metadata.json \
+  --profile sim
+```
+
+自動テストや regression check では exit code を使えます。
+
+```bash
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture <capture.jsonl.gz> \
+  --profile sim \
+  --expect 'committed-frames>0' \
+  --expect 'max-balls<=1'
+```
+
+- `--expect <condition>`: summary metric の期待条件です。失敗すると exit code `1` になります。
+- `--detail-filter <condition>`: 条件に一致する committed frame の詳細を出力します。複数指定した場合は AND 条件です。
+- `--max-details <count>`: 詳細出力数を制限します。
+- `--settings <file>`: `Tracker.Server/appsettings.json` 形式、または capture の `metadata.json` 形式から tracker 設定を読み込みます。`Tracker.Server/appsettings.json` 形式では `Tracker:RuntimeOverrides` も profile 設定へ反映します。
+
+利用できる summary metric は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。frame 詳細の filter では `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。raw 系 metric は、その committed frame の source detection 群から集計します。
+
+例えば、raw では ball が 1 個なのに replay 後 frame で ball が 2 個以上になる箇所を確認する場合は次のようにします。
+
+```bash
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture <capture.jsonl.gz> \
+  --profile sim \
+  --expect 'max-balls>=2' \
+  --detail-filter 'raw-balls==1' \
+  --detail-filter 'balls>=2'
+```
+
+test code から直接扱う場合は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各 record の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで replay できます。
 
 ### `VisionReceiver:Profiles:<name>`
 
@@ -165,43 +221,33 @@ tracker 全体の設定です。
 
 ### `Tracker:Diagnostics`
 
-tracker の調査用診断ログ設定です。`Enabled=false` の場合、`TrackerCoordinator` は `Tracker diagnostics ...` の structured log と `tracker-diagnostics-*.log` のファイル出力をどちらも行いません。
+tracker の調査用診断ログ設定です。diagnostics log は常に出力され、`FilePath` が `null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。packet capture 有効時は、capture sidecar の `*.tracker-diagnostics.log` にも同時に出力します。
 
 | キー | 意味 |
 | --- | --- |
-| `Enabled` | `true` なら tracker diagnostics を出力します。`false` なら console / file の診断ログを停止します。 |
-| `FileEnabled` | `Enabled=true` のとき、診断ログをファイルにも追記するかを指定します。 |
-| `FilePath` | ファイル出力先です。`null` の場合は実行ファイルと同じ directory に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。 |
+| `FilePath` | 明示的なファイル出力先です。`null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に出力します。 |
 
-現在の `appsettings.json` は、標準ログと起動ごとの新規ファイルの両方へ出力する設定です。
+現在の `appsettings.json` は、`packet-captures` 配下へ起動ごとの新規ファイルを出力する設定です。
 
 ```json
 "Diagnostics": {
-  "Enabled": true,
-  "FileEnabled": true,
   "FilePath": null
 }
 ```
 
-ファイル出力を止め、標準ログだけにする場合は `FileEnabled=false` にします。
+console に出る tracker diagnostics の structured log は `Logging:LogLevel` で抑制します。ファイル出力はこの設定とは別に継続します。
 
 ```json
-"Diagnostics": {
-  "Enabled": true,
-  "FileEnabled": false,
-  "FilePath": null
+"Logging": {
+  "LogLevel": {
+    "Default": "Information",
+    "Microsoft.AspNetCore": "Warning",
+    "Tracker.Server.Tracking.TrackerCoordinator": "Warning"
+  }
 }
 ```
 
-診断ログを完全に止める場合は `Enabled=false` にします。
-
-```json
-"Diagnostics": {
-  "Enabled": false,
-  "FileEnabled": true,
-  "FilePath": null
-}
-```
+全体の `Information` log も止めたい場合は `Default` を `Warning` にします。
 
 ### `Tracker:RuntimeOverrides`
 
@@ -238,6 +284,9 @@ tracker engine の時系列処理設定です。
 | `MergeWindowNs` | ns | 近接 timestamp の detection を同じ world frame にまとめる window です。大きいほど camera 間 merge はしやすくなりますが、別 frame まで混ざりやすくなります。 |
 | `GeometryResetFieldLengthThresholdMm` | mm | field length 変化を geometry reset とみなす閾値です。 |
 | `GeometryResetFieldWidthThresholdMm` | mm | field width 変化を geometry reset とみなす閾値です。 |
+| `KalmanInitialVelocityVariance` | 任意係数 | 新規 track の速度不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |
+| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman prediction の分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |
+| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど raw detection の小刻みな揺れを弱く信用します。 |
 
 geometry reset が起きると pending state が切り替わり、旧 geometry 前提の tracked frame は破棄されます。
 

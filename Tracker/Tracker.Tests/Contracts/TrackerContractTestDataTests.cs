@@ -46,5 +46,8 @@ public class TrackerContractTestDataTests
         Assert.Equal(1200, packet.Geometry.Field.GoalWidth);
         Assert.Equal(200, packet.Geometry.Field.GoalDepth);
         Assert.Equal(250, packet.Geometry.Field.BoundaryWidth);
+        Assert.Equal(1000, packet.Geometry.Field.PenaltyAreaDepth);
+        Assert.Equal(2000, packet.Geometry.Field.PenaltyAreaWidth);
+        Assert.Equal(500, packet.Geometry.Field.CenterCircleRadius);
     }
 }

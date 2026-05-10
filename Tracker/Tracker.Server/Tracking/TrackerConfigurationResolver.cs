@@ -32,6 +32,9 @@ public static class TrackerConfigurationResolver
                 MergeWindowNs = activeProfile.Engine.MergeWindowNs,
                 GeometryResetFieldLengthThresholdMm = activeProfile.Engine.GeometryResetFieldLengthThresholdMm,
                 GeometryResetFieldWidthThresholdMm = activeProfile.Engine.GeometryResetFieldWidthThresholdMm,
+                KalmanInitialVelocityVariance = activeProfile.Engine.KalmanInitialVelocityVariance,
+                KalmanProcessNoiseScale = activeProfile.Engine.KalmanProcessNoiseScale,
+                MeasurementNoiseVarianceScale = activeProfile.Engine.MeasurementNoiseVarianceScale,
                 RobotTracker = ResolveRobotTracker(activeProfile.RobotTracker, effectiveRuntimeOverrides.RobotTracker),
                 BallTracker = ResolveBallTracker(activeProfile.BallTracker, effectiveRuntimeOverrides.BallTracker),
                 KickDetector = ResolveKickDetector(activeProfile.KickDetector, effectiveRuntimeOverrides.KickDetector),
@@ -52,8 +55,6 @@ public static class TrackerConfigurationResolver
     {
         return new TrackerDiagnosticsOptions
         {
-            Enabled = options.Enabled,
-            FileEnabled = options.FileEnabled,
             FilePath = options.FilePath,
         };
     }

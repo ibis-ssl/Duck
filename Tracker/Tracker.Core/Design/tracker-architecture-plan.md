@@ -83,7 +83,7 @@ tracker が直接扱う proto 入力は次の通り。
   - `Field` を保持し、必要に応じて calibration は診断表示へ回す
 - `SSL_GeometryFieldSize`
   - field 寸法と line / arc 情報
-  - 主に `FieldLength`, `FieldWidth`, `GoalWidth`, `GoalDepth`, `BoundaryWidth`, `BoundaryWidthGoalLine`, `LineThickness`, `FieldLines`, `FieldArcs`
+  - 主に `FieldLength`, `FieldWidth`, `GoalWidth`, `GoalDepth`, `BoundaryWidth`, `BoundaryWidthGoalLine`, `PenaltyAreaDepth`, `PenaltyAreaWidth`, `CenterCircleRadius`, `LineThickness`, `FieldLines`, `FieldArcs`
 
 ## 外部出力
 
@@ -450,6 +450,8 @@ geometry 更新規則:
   - 追跡アルゴリズム本体
 - `TrackerPacketGenerator`
   - official proto 変換
+- `Tracker.CaptureReplay`
+  - 保存済み packet capture を再生し、summary metric と条件式で regression check / 調査を行う CLI
 - `TrackedSnapshotStore`
   - tracked UI 読み取り用状態
 - viewer
@@ -498,8 +500,6 @@ geometry 更新規則:
   - `BallTracker`
   - `KickDetector`
 - `Diagnostics`
-  - `Enabled`
-  - `FileEnabled`
   - `FilePath`
 
 `VisionReceiver` 側は replay 用の packet capture 設定を持つ。
@@ -512,6 +512,14 @@ geometry 更新規則:
 
 packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
 
+packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。
+
+`Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。`--settings` で `Tracker.Server/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
+
+raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
+
+`Tracker.Server` の diagnostics viewer は、diagnostics log と同じ basename の `*.render-snapshots.jsonl.gz` がある場合に、選択した tracked frame の raw source detection と tracked frame を field 上に並べて描画する。描画 snapshot は調査用の UI データであり、tracker engine の replay 入力や内部状態保持には使わない。viewer は timeline scrubber のドラッグで frame を連続切替でき、field 描画時はページ全体をスクロールさせず、field の zoom / pan と画面スクロールが干渉しない layout とする。
+
 既定配信先は official tracker の慣例値に合わせる。
 
 - `224.5.23.2:10010`
@@ -520,7 +528,8 @@ packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に�
 
 - multicast address / port / source name / uuid は設定外出しする
 - tracking parameter は設定外出しする
-- raw / tracked 診断ログは `Tracker:Diagnostics:Enabled` で停止できるようにする
+- raw / tracked 診断ログの明示出力先は `Tracker:Diagnostics:FilePath` で設定できるようにする
+- packet capture は `VisionReceiver:PacketCapture:Enabled` を起動時初期値として持ち、起動後は UI から On / Off を切り替えられるようにする
 - v1 標準であるカルマン filter の process noise / measurement noise / gating threshold も設定外出しする
 - 近傍判定、visibility decay、kick speed threshold、chip 判定 threshold も設定外出しする
 
@@ -685,7 +694,8 @@ v1 実装契約:
 
 - camera-local ball / robot track は、観測値をそのまま上書きする簡易追跡ではなく、predict-update を持つ線形 Kalman filter で更新する
 - 各 track は少なくとも state estimate と covariance 相当の不確かさを保持する
-- `ProcessNoise` は予測時の process covariance へ、`MeasurementNoise` は観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
+- `ProcessNoise` は `KalmanProcessNoiseScale` を通して予測時の process covariance へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
+- `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は profile ごとの外部設定値とし、停止時の小刻みな raw detection 揺れと移動追従性のバランスを code 変更なしで調整できるようにする
 - `VisibilityHalfLifeSeconds` は観測欠測時の liveliness 管理に使う値であり、Kalman の covariance 更新を省略する理由にはならない
 - world 統合で使う uncertainty は camera-local Kalman filter の事後不確かさから導く
 - 単純な等速外挿 + 観測値上書き + 手動 uncertainty 加算だけで済ませる実装は、この v1 契約を満たさない

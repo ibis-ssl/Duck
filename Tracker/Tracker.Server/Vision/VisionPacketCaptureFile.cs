@@ -85,18 +85,34 @@ internal static class VisionPacketCaptureFile
 
     public static string BuildCapturePath(VisionPacketCaptureOptions options, DateTimeOffset startedAt)
     {
-        var timestamp = startedAt.UtcDateTime.ToString("yyyyMMddTHHmmssfffZ", CultureInfo.InvariantCulture);
-        return Path.Combine(
-            ResolveDirectoryPath(options.DirectoryPath),
-            $"{options.FilePrefix}-{timestamp}-{Guid.NewGuid():N}.jsonl.gz");
+        return BuildCapturePaths(options, startedAt).PacketPath;
     }
 
-    private static string ResolveDirectoryPath(string directoryPath)
+    public static VisionPacketCapturePaths BuildCapturePaths(VisionPacketCaptureOptions options, DateTimeOffset startedAt)
+    {
+        var timestamp = startedAt.UtcDateTime.ToString("yyyyMMddTHHmmssfffZ", CultureInfo.InvariantCulture);
+        var basePath = Path.Combine(
+            ResolveDirectoryPath(options.DirectoryPath),
+            $"{options.FilePrefix}-{timestamp}-{Guid.NewGuid():N}");
+        return new VisionPacketCapturePaths(
+            PacketPath: $"{basePath}.jsonl.gz",
+            MetadataPath: $"{basePath}.metadata.json",
+            DiagnosticsLogPath: $"{basePath}.tracker-diagnostics.log",
+            RenderSnapshotPath: $"{basePath}.render-snapshots.jsonl.gz");
+    }
+
+    internal static string ResolveDirectoryPath(string directoryPath)
     {
         return Path.IsPathRooted(directoryPath)
             ? directoryPath
             : Path.Combine(AppContext.BaseDirectory, directoryPath);
     }
+
+    public sealed record VisionPacketCapturePaths(
+        string PacketPath,
+        string MetadataPath,
+        string DiagnosticsLogPath,
+        string RenderSnapshotPath);
 
     private sealed class CaptureRecordDto
     {
