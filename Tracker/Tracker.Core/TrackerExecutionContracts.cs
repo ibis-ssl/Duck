@@ -20,6 +20,8 @@ public sealed class TrackerEngine : ITrackerEngine
     private const long RecentContactWindowNs = 200_000_000;
     private const double DefaultVisibilityHalfLifeSeconds = 1d;
     private const double DefaultBallProcessNoise = 50d;
+    private const double InitialVelocityVariance = 1_000_000d;
+    private const double KalmanProcessNoiseScale = 10_000_000d;
     private readonly List<BufferedDetection> pendingDetections = [];
     private readonly Dictionary<int, BallTrackState> cameraBallTrackStates = [];
     private readonly Dictionary<int, BallContactState> latestBallContactStates = [];
@@ -912,7 +914,13 @@ public sealed class TrackerEngine : ITrackerEngine
                             track => new
                             {
                                 Track = track,
-                                DistanceMm = GetDistanceMm(track.XMm, track.YMm, observation.XMm, observation.YMm),
+                                PredictedTrack = PredictBallTrackState(settings, track, observation.EventTimestampNs),
+                            })
+                        .Select(
+                            candidate => new
+                            {
+                                candidate.Track,
+                                DistanceMm = GetDistanceMm(candidate.PredictedTrack.XMm, candidate.PredictedTrack.YMm, observation.XMm, observation.YMm),
                             })
                         .Where(candidate => candidate.DistanceMm <= GetBallTrackMatchDistanceMm(settings))
                         .OrderBy(candidate => candidate.DistanceMm)
@@ -925,17 +933,13 @@ public sealed class TrackerEngine : ITrackerEngine
                         updatedTrackState = new BallTrackState(
                             nextCameraBallTrackId++,
                             observation.CameraId,
-                            observation.XMm,
-                            observation.YMm,
-                            observation.ZMm,
+                            CreateInitialKalmanAxis(observation.XMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
+                            CreateInitialKalmanAxis(observation.YMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
+                            CreateInitialKalmanAxis(observation.ZMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
                             observation.EventTimestampNs,
                             observation.EventTimestampNs,
                             observation.Confidence,
-                            observation.Confidence,
-                            GetObservedBallUncertaintyMm(settings, observation.Confidence),
-                            0d,
-                            0d,
-                            0d);
+                            observation.Confidence);
                     }
                     else
                     {
@@ -975,41 +979,19 @@ public sealed class TrackerEngine : ITrackerEngine
         BallTrackState previousState,
         BallObservation observation)
     {
-        var vxMmPerS = previousState.VXMmPerS;
-        var vyMmPerS = previousState.VYMmPerS;
-        var vzMmPerS = previousState.VZMmPerS;
+        var predictedState = PredictBallTrackState(settings, previousState, observation.EventTimestampNs);
+        var deltaSeconds = GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, observation.EventTimestampNs);
+        var measurementVariance = GetObservedBallUncertaintyMm(settings, observation.Confidence);
 
-        if (observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
+        return predictedState with
         {
-            var deltaSeconds = (observation.EventTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
-            var distanceMm = GetDistanceMm(previousState.XMm, previousState.YMm, observation.XMm, observation.YMm);
-            if (distanceMm <= GetBallTrackMatchDistanceMm(settings))
-            {
-                vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
-                vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
-                vzMmPerS = (observation.ZMm - previousState.ZMm) / deltaSeconds;
-            }
-            else
-            {
-                vxMmPerS = 0d;
-                vyMmPerS = 0d;
-                vzMmPerS = 0d;
-            }
-        }
-
-        return previousState with
-        {
-            XMm = observation.XMm,
-            YMm = observation.YMm,
-            ZMm = observation.ZMm,
+            XAxis = UpdateKalmanAxis(predictedState.XAxis, previousState.XAxis.Position, observation.XMm, deltaSeconds, measurementVariance),
+            YAxis = UpdateKalmanAxis(predictedState.YAxis, previousState.YAxis.Position, observation.YMm, deltaSeconds, measurementVariance),
+            ZAxis = UpdateKalmanAxis(predictedState.ZAxis, previousState.ZAxis.Position, observation.ZMm, deltaSeconds, measurementVariance),
             LastVisibleTimestampNs = observation.EventTimestampNs,
             LastUpdateTimestampNs = observation.EventTimestampNs,
             Visibility = observation.Confidence,
             Quality = observation.Confidence,
-            PositionUncertaintyMm = GetObservedBallUncertaintyMm(settings, observation.Confidence),
-            VXMmPerS = vxMmPerS,
-            VYMmPerS = vyMmPerS,
-            VZMmPerS = vzMmPerS,
         };
     }
 
@@ -1029,18 +1011,35 @@ public sealed class TrackerEngine : ITrackerEngine
             return null;
         }
 
-        var deltaSeconds = (frameTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
         var visibilityHalfLifeSeconds = GetBallVisibilityHalfLifeSeconds(settings);
+        var predictedState = PredictBallTrackState(settings, previousState, frameTimestampNs);
 
+        return predictedState with
+        {
+            LastUpdateTimestampNs = frameTimestampNs,
+            Visibility = ComputeDecayVisibility(previousState.Visibility, GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, frameTimestampNs), visibilityHalfLifeSeconds),
+            Quality = ComputeDecayQuality(previousState.Quality, GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, frameTimestampNs), visibilityHalfLifeSeconds),
+        };
+    }
+
+    private static BallTrackState PredictBallTrackState(
+        TrackerEngineSettings settings,
+        BallTrackState previousState,
+        long targetTimestampNs)
+    {
+        var deltaSeconds = GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, targetTimestampNs);
+        if (deltaSeconds <= 0d)
+        {
+            return previousState;
+        }
+
+        var processNoise = GetBallProcessNoise(settings);
         return previousState with
         {
-            XMm = previousState.XMm + previousState.VXMmPerS * deltaSeconds,
-            YMm = previousState.YMm + previousState.VYMmPerS * deltaSeconds,
-            ZMm = previousState.ZMm + previousState.VZMmPerS * deltaSeconds,
-            LastUpdateTimestampNs = frameTimestampNs,
-            Visibility = ComputeDecayVisibility(previousState.Visibility, deltaSeconds, visibilityHalfLifeSeconds),
-            Quality = ComputeDecayQuality(previousState.Quality, deltaSeconds, visibilityHalfLifeSeconds),
-            PositionUncertaintyMm = previousState.PositionUncertaintyMm + (deltaSeconds * GetBallProcessNoise(settings)),
+            XAxis = PredictKalmanAxis(previousState.XAxis, deltaSeconds, processNoise),
+            YAxis = PredictKalmanAxis(previousState.YAxis, deltaSeconds, processNoise),
+            ZAxis = PredictKalmanAxis(previousState.ZAxis, deltaSeconds, processNoise),
+            LastUpdateTimestampNs = targetTimestampNs,
         };
     }
 
@@ -1323,34 +1322,52 @@ public sealed class TrackerEngine : ITrackerEngine
         var unwrappedOrientation = UnwrapAngleNearReference(
             observation.OrientationRad,
             previousState?.OrientationRad ?? observation.OrientationRad);
-        var vxMmPerS = 0d;
-        var vyMmPerS = 0d;
-        var angularVelocityRadPerS = 0d;
 
-            if (previousState is not null && observation.EventTimestampNs > previousState.LastUpdateTimestampNs)
+        if (previousState is null)
         {
-            var deltaSeconds = (observation.EventTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
-            var distanceMm = GetDistanceMm(previousState.XMm, previousState.YMm, observation.XMm, observation.YMm);
-            if (distanceMm <= GetRobotMovementGateMm(settings))
-            {
-                vxMmPerS = (observation.XMm - previousState.XMm) / deltaSeconds;
-                vyMmPerS = (observation.YMm - previousState.YMm) / deltaSeconds;
-                angularVelocityRadPerS = (unwrappedOrientation - previousState.OrientationRad) / deltaSeconds;
-            }
+            var measurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
+            return new RobotTrackState(
+                CreateInitialKalmanAxis(observation.XMm, measurementVariance),
+                CreateInitialKalmanAxis(observation.YMm, measurementVariance),
+                CreateInitialKalmanAxis(unwrappedOrientation, measurementVariance),
+                observation.EventTimestampNs,
+                observation.EventTimestampNs,
+                observation.Confidence,
+                observation.Confidence / GetRobotMeasurementNoise(settings));
         }
 
-        return new RobotTrackState(
-            observation.XMm,
-            observation.YMm,
-            unwrappedOrientation,
-            observation.EventTimestampNs,
-            observation.EventTimestampNs,
-            observation.Confidence,
-            observation.Confidence / GetRobotMeasurementNoise(settings),
-            GetObservedRobotUncertaintyMm(settings, observation.Confidence),
-            vxMmPerS,
-            vyMmPerS,
-            angularVelocityRadPerS);
+        var predictedState = PredictRobotTrackState(settings, previousState, observation.EventTimestampNs);
+        var deltaSeconds = GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, observation.EventTimestampNs);
+        var distanceMm = GetDistanceMm(predictedState.XMm, predictedState.YMm, observation.XMm, observation.YMm);
+        if (distanceMm > GetRobotMovementGateMm(settings))
+        {
+            var measurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
+            return new RobotTrackState(
+                CreateInitialKalmanAxis(observation.XMm, measurementVariance),
+                CreateInitialKalmanAxis(observation.YMm, measurementVariance),
+                CreateInitialKalmanAxis(unwrappedOrientation, measurementVariance),
+                observation.EventTimestampNs,
+                observation.EventTimestampNs,
+                observation.Confidence,
+                observation.Confidence / GetRobotMeasurementNoise(settings));
+        }
+
+        var observedMeasurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
+        return predictedState with
+        {
+            XAxis = UpdateKalmanAxis(predictedState.XAxis, previousState.XAxis.Position, observation.XMm, deltaSeconds, observedMeasurementVariance),
+            YAxis = UpdateKalmanAxis(predictedState.YAxis, previousState.YAxis.Position, observation.YMm, deltaSeconds, observedMeasurementVariance),
+            OrientationAxis = UpdateKalmanAxis(
+                predictedState.OrientationAxis,
+                previousState.OrientationAxis.Position,
+                unwrappedOrientation,
+                deltaSeconds,
+                observedMeasurementVariance),
+            LastVisibleTimestampNs = observation.EventTimestampNs,
+            LastUpdateTimestampNs = observation.EventTimestampNs,
+            Visibility = observation.Confidence,
+            Quality = observation.Confidence / GetRobotMeasurementNoise(settings),
+        };
     }
 
     private static RobotTrackState CreatePredictedRobotTrackState(
@@ -1363,18 +1380,35 @@ public sealed class TrackerEngine : ITrackerEngine
             return previousState;
         }
 
-        var deltaSeconds = (frameTimestampNs - previousState.LastUpdateTimestampNs) / 1_000_000_000d;
         var visibilityHalfLifeSeconds = GetRobotVisibilityHalfLifeSeconds(settings);
+        var predictedState = PredictRobotTrackState(settings, previousState, frameTimestampNs);
 
+        return predictedState with
+        {
+            LastUpdateTimestampNs = frameTimestampNs,
+            Visibility = ComputeDecayVisibility(previousState.Visibility, GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, frameTimestampNs), visibilityHalfLifeSeconds),
+            Quality = ComputeDecayQuality(previousState.Quality, GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, frameTimestampNs), visibilityHalfLifeSeconds),
+        };
+    }
+
+    private static RobotTrackState PredictRobotTrackState(
+        TrackerEngineSettings settings,
+        RobotTrackState previousState,
+        long targetTimestampNs)
+    {
+        var deltaSeconds = GetPredictionDeltaSeconds(previousState.LastUpdateTimestampNs, targetTimestampNs);
+        if (deltaSeconds <= 0d)
+        {
+            return previousState;
+        }
+
+        var processNoise = GetRobotProcessNoise(settings);
         return previousState with
         {
-            XMm = previousState.XMm + previousState.VXMmPerS * deltaSeconds,
-            YMm = previousState.YMm + previousState.VYMmPerS * deltaSeconds,
-            OrientationRad = previousState.OrientationRad + previousState.AngularVelocityRadPerS * deltaSeconds,
-            LastUpdateTimestampNs = frameTimestampNs,
-            Visibility = ComputeDecayVisibility(previousState.Visibility, deltaSeconds, visibilityHalfLifeSeconds),
-            Quality = ComputeDecayQuality(previousState.Quality, deltaSeconds, visibilityHalfLifeSeconds),
-            PositionUncertaintyMm = previousState.PositionUncertaintyMm + (deltaSeconds * GetRobotProcessNoise(settings)),
+            XAxis = PredictKalmanAxis(previousState.XAxis, deltaSeconds, processNoise),
+            YAxis = PredictKalmanAxis(previousState.YAxis, deltaSeconds, processNoise),
+            OrientationAxis = PredictKalmanAxis(previousState.OrientationAxis, deltaSeconds, processNoise),
+            LastUpdateTimestampNs = targetTimestampNs,
         };
     }
 
@@ -1566,6 +1600,68 @@ public sealed class TrackerEngine : ITrackerEngine
         return GetRobotMeasurementNoise(settings) / Math.Max(0.001d, confidence);
     }
 
+    private static KalmanAxisState CreateInitialKalmanAxis(double position, double measurementVariance)
+    {
+        return new KalmanAxisState(
+            position,
+            0d,
+            measurementVariance,
+            InitialVelocityVariance);
+    }
+
+    private static KalmanAxisState PredictKalmanAxis(
+        KalmanAxisState state,
+        double deltaSeconds,
+        double processNoise)
+    {
+        var processVariance = processNoise * KalmanProcessNoiseScale;
+        return state with
+        {
+            Position = state.Position + state.Velocity * deltaSeconds,
+            PositionVariance = state.PositionVariance
+                + (deltaSeconds * deltaSeconds * state.VelocityVariance)
+                + (processVariance * deltaSeconds * deltaSeconds),
+            VelocityVariance = state.VelocityVariance + processVariance,
+        };
+    }
+
+    private static KalmanAxisState UpdateKalmanAxis(
+        KalmanAxisState predictedState,
+        double previousPosition,
+        double measurement,
+        double deltaSeconds,
+        double measurementVariance)
+    {
+        var innovationVariance = predictedState.PositionVariance + measurementVariance;
+        if (innovationVariance <= 0d)
+        {
+            return predictedState;
+        }
+
+        var gain = predictedState.PositionVariance / innovationVariance;
+        var observedVelocity = deltaSeconds > 0d
+            ? (measurement - previousPosition) / deltaSeconds
+            : predictedState.Velocity;
+        if (gain >= 0.9999d)
+        {
+            return predictedState with
+            {
+                Position = measurement,
+                Velocity = observedVelocity,
+                PositionVariance = Math.Max(0.001d, (1d - gain) * predictedState.PositionVariance),
+                VelocityVariance = Math.Max(0.001d, (1d - gain) * predictedState.VelocityVariance),
+            };
+        }
+
+        return predictedState with
+        {
+            Position = predictedState.Position + gain * (measurement - predictedState.Position),
+            Velocity = predictedState.Velocity + gain * (observedVelocity - predictedState.Velocity),
+            PositionVariance = Math.Max(0.001d, (1d - gain) * predictedState.PositionVariance),
+            VelocityVariance = Math.Max(0.001d, (1d - gain) * predictedState.VelocityVariance),
+        };
+    }
+
     private static double GetRobotMergeWeight(RobotTrackState state)
     {
         return 1d / Math.Max(0.001d, state.PositionUncertaintyMm);
@@ -1612,20 +1708,37 @@ public sealed class TrackerEngine : ITrackerEngine
         double ZMm,
         float Confidence);
 
+    private readonly record struct KalmanAxisState(
+        double Position,
+        double Velocity,
+        double PositionVariance,
+        double VelocityVariance);
+
     private sealed record BallTrackState(
         int LocalTrackId,
         uint CameraId,
-        double XMm,
-        double YMm,
-        double ZMm,
+        KalmanAxisState XAxis,
+        KalmanAxisState YAxis,
+        KalmanAxisState ZAxis,
         long LastVisibleTimestampNs,
         long LastUpdateTimestampNs,
         float Visibility,
-        double Quality,
-        double PositionUncertaintyMm,
-        double VXMmPerS,
-        double VYMmPerS,
-        double VZMmPerS);
+        double Quality)
+    {
+        public double XMm => XAxis.Position;
+
+        public double YMm => YAxis.Position;
+
+        public double ZMm => ZAxis.Position;
+
+        public double VXMmPerS => XAxis.Velocity;
+
+        public double VYMmPerS => YAxis.Velocity;
+
+        public double VZMmPerS => ZAxis.Velocity;
+
+        public double PositionUncertaintyMm => (XAxis.PositionVariance + YAxis.PositionVariance) / 2d;
+    }
 
     private sealed record MergedBallState(
         int InternalTrackId,
@@ -1663,17 +1776,28 @@ public sealed class TrackerEngine : ITrackerEngine
     }
 
     private sealed record RobotTrackState(
-        double XMm,
-        double YMm,
-        double OrientationRad,
+        KalmanAxisState XAxis,
+        KalmanAxisState YAxis,
+        KalmanAxisState OrientationAxis,
         long LastVisibleTimestampNs,
         long LastUpdateTimestampNs,
         float Visibility,
-        double Quality,
-        double PositionUncertaintyMm,
-        double VXMmPerS,
-        double VYMmPerS,
-        double AngularVelocityRadPerS);
+        double Quality)
+    {
+        public double XMm => XAxis.Position;
+
+        public double YMm => YAxis.Position;
+
+        public double OrientationRad => OrientationAxis.Position;
+
+        public double VXMmPerS => XAxis.Velocity;
+
+        public double VYMmPerS => YAxis.Velocity;
+
+        public double AngularVelocityRadPerS => OrientationAxis.Velocity;
+
+        public double PositionUncertaintyMm => (XAxis.PositionVariance + YAxis.PositionVariance) / 2d;
+    }
 
     private sealed record BufferedDetectionGroup(
         long AnchorTimestampNs,

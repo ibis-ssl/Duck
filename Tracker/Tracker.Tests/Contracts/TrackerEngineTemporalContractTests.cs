@@ -668,6 +668,86 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_UsesPredictedRobotPositionForGateAfterVelocityIsLearned()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+        var narrowGateSettings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            robotTracker: new TrackerRobotTrackerOverrides
+            {
+                OutlierLimitMm = 50d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 0, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 100, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var thirdResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 200, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.200),
+            settings: narrowGateSettings);
+
+        var trackedRobot = Assert.Single(Assert.Single(thirdResult.CommittedFrames).Robots);
+
+        Assert.True(trackedRobot.VXMmPerS > 500);
+    }
+
+    [Fact]
+    public void Update_AppliesRobotKalmanMeasurementNoiseInsteadOfOverwritingObservation()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            robotTracker: new TrackerRobotTrackerOverrides
+            {
+                MeasurementNoise = 1_000_000d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 100, y: 200, orientation: 0.1f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 180, y: 260, orientation: 0.9f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(Assert.Single(secondResult.CommittedFrames).Robots);
+
+        Assert.True(trackedRobot.XMm > 100.0);
+        Assert.True(trackedRobot.XMm < 180.0);
+        Assert.True(trackedRobot.YMm > 200.0);
+        Assert.True(trackedRobot.YMm < 260.0);
+        Assert.True(trackedRobot.OrientationRad > 0.1);
+        Assert.True(trackedRobot.OrientationRad < 0.9);
+    }
+
+    [Fact]
     public void Update_UsesConfiguredRobotOutlierLimitWhenDerivingVelocity()
     {
         var engine = fixture.CreateEngine();
@@ -879,6 +959,116 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         Assert.Equal(300, trackedBall.VXMmPerS, precision: 3);
         Assert.Equal(400, trackedBall.VYMmPerS, precision: 3);
         Assert.Equal(300, trackedBall.VZMmPerS, precision: 3);
+    }
+
+    [Fact]
+    public void Update_AppliesBallKalmanMeasurementNoiseInsteadOfOverwritingObservation()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                MeasurementNoise = 1_000_000d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 200, z: 10, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 180, y: 260, z: 70, confidence: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var trackedBall = Assert.Single(Assert.Single(secondResult.CommittedFrames).Balls);
+
+        Assert.True(trackedBall.XMm > 100.0);
+        Assert.True(trackedBall.XMm < 180.0);
+        Assert.True(trackedBall.YMm > 200.0);
+        Assert.True(trackedBall.YMm < 260.0);
+        Assert.True(trackedBall.ZMm > 10.0);
+        Assert.True(trackedBall.ZMm < 70.0);
+    }
+
+    [Fact]
+    public void Update_UsesConfiguredBallProcessNoiseWhenUpdatingAfterPredictionOnlyFrame()
+    {
+        var lowProcessEngine = fixture.CreateEngine();
+        var highProcessEngine = fixture.CreateEngine();
+        var lowProcessSettings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                ProcessNoise = 0.001d,
+                MeasurementNoise = 10_000d,
+            });
+        var highProcessSettings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                ProcessNoise = 10_000d,
+                MeasurementNoise = 10_000d,
+            });
+
+        _ = lowProcessEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: lowProcessSettings);
+        _ = lowProcessEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 300, y: 400, orientation: 0.5f)],
+                captureTimeSeconds: 1.200),
+            settings: lowProcessSettings);
+        var lowProcessResult = lowProcessEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 200, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.300),
+            settings: lowProcessSettings);
+
+        _ = highProcessEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: highProcessSettings);
+        _ = highProcessEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 300, y: 400, orientation: 0.5f)],
+                captureTimeSeconds: 1.200),
+            settings: highProcessSettings);
+        var highProcessResult = highProcessEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 200, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.300),
+            settings: highProcessSettings);
+
+        var lowProcessBall = Assert.Single(Assert.Single(lowProcessResult.CommittedFrames).Balls);
+        var highProcessBall = Assert.Single(Assert.Single(highProcessResult.CommittedFrames).Balls);
+
+        Assert.True(highProcessBall.XMm > lowProcessBall.XMm);
     }
 
     [Fact]

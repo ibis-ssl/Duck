@@ -503,7 +503,7 @@ geometry 更新規則:
 
 - multicast address / port / source name / uuid は設定外出しする
 - tracking parameter は設定外出しする
-- カルマン filter を使う場合、その process noise / measurement noise / gating threshold も設定外出しする
+- v1 標準であるカルマン filter の process noise / measurement noise / gating threshold も設定外出しする
 - 近傍判定、visibility decay、kick speed threshold、chip 判定 threshold も設定外出しする
 
 要望として、これらの設定は最終的に UI から動的変更できる構成にする。
@@ -527,6 +527,10 @@ v1 では次の 2 段階で進める。
 
 各設定セットには少なくとも次を含める。
 
+- raw vision 受信元
+  - `MulticastAddress`
+  - `Port`
+  - `InterfaceAddress`
 - 配信先
   - `MulticastAddress`
   - `Port`
@@ -559,6 +563,7 @@ v1 では次の 2 段階で進める。
 - 起動時に任意の設定セットを 1 つ選べる
 - UI から登録済み設定セットの一覧を選択できる
 - UI からの切替後は tracker coordinator が新しい設定セットへの切替要求を engine へ渡す
+- 同名の `VisionReceiver` profile が存在する場合、起動時と profile switch 完了後にその受信元設定へ追従できる
 - 個別値の微調整は選択中の設定セットに対する上書きとして扱えるようにする
 - 設定セットは将来的に追加できる前提にする
 - coordinator は最新のユーザー意図を `desired target snapshot` として保持し、profile 選択や override apply のたびにそれを最新値で置き換える
@@ -579,6 +584,7 @@ v1 では次の 2 段階で進める。
   - `Update` 呼び出し直前に pending request を `in-flight request` へ昇格させ、result 処理完了まで固定する
   - `ProfileSwitched` を受けるまでは publisher 配信先や active profile 表示を切り替えない
   - `ProfileSwitched` を受けた時点で、その `in-flight request` に対応する `現在適用済み snapshot`、publisher 配信先、active profile 表示、`TrackedSnapshotStore` の現在設定セット名を原子的に切り替える
+  - receiver profile の切替は `ProfileSwitched` 後の observer 側で行い、tracker 側の active profile と受信元設定の観測可能な切替点を揃える
   - 上記 local state 遷移と store clear を完了してから `OnProfileSwitched` を通知する
   - 任意の `Update` の result 処理後に pending request が残る場合は、その場で `desired target snapshot` に一致するまで control-only `Update` を繰り返す
   - `TrackerProfileSwitchRequest` を次の `ITrackerEngine.Update` へ 1 回だけ渡す
@@ -595,6 +601,7 @@ runtime identity は設定セットとは分離する。
 - `Uuid` は process 起動中に一定とし、profile 切替では変更しない
 - `SourceName` も v1 では起動時固定とし、profile 切替では変更しない
 - `MulticastAddress` / `Port` は profile 切替で変えてよい
+- raw vision 受信元 `MulticastAddress` / `Port` / `InterfaceAddress` も profile 切替で変えてよい
 
 profile 切替時の state 規則:
 
@@ -656,6 +663,15 @@ v1 は決定的な古典的追跡を採用する。設計時点では particle f
 - ball については「追跡本体」と「kick / 追加メタ推定」を分離する
 - world 側の永続 filter は v1 では持たず、camera-local track を uncertainty-weighted に統合した結果をその frame の world snapshot とする
 
+v1 実装契約:
+
+- camera-local ball / robot track は、観測値をそのまま上書きする簡易追跡ではなく、predict-update を持つ線形 Kalman filter で更新する
+- 各 track は少なくとも state estimate と covariance 相当の不確かさを保持する
+- `ProcessNoise` は予測時の process covariance へ、`MeasurementNoise` は観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
+- `VisibilityHalfLifeSeconds` は観測欠測時の liveliness 管理に使う値であり、Kalman の covariance 更新を省略する理由にはならない
+- world 統合で使う uncertainty は camera-local Kalman filter の事後不確かさから導く
+- 単純な等速外挿 + 観測値上書き + 手動 uncertainty 加算だけで済ませる実装は、この v1 契約を満たさない
+
 段階分割:
 
 1. raw vision 正規化
@@ -698,11 +714,22 @@ robot ごとの可視性:
 robot 状態モデル:
 
 - 状態量
-  - `x, y, vx, vy, theta, omega`
+  - 位置 filter: `x, y, vx, vy`
+  - 向き filter: `theta, omega`
 - 観測量
-  - `x, y, theta`
+  - 位置 filter: `x, y`
+  - 向き filter: `theta`
 - 推定
-  - 等速移動 + 一定角速度
+  - 位置 filter: 等速移動
+  - 向き filter: 一定角速度
+
+robot v1 filter 要件:
+
+- `team + robot id` ごとに camera-local track を維持し、位置系と向き系を独立した線形 Kalman filter として更新する
+- 向き観測は update 前に unwrap して、`-pi` / `pi` 境界の不連続を filter 外へ漏らさない
+- gate 判定は生観測との差分ではなく、予測状態に対する対応付け規則として使う
+- 欠測 frame では predict のみを行い、visibility 減衰と track 削除判定は別責務として扱う
+- merge に使う uncertainty は最新観測 confidence のみでなく、filter 後の position uncertainty を基準にする
 
 orientation は unwrap して連続化する。`-pi` / `pi` 境界での跳びは state 層で吸収する。
 
@@ -746,6 +773,15 @@ ball 状態モデル:
   - `x, y, z`
 - 推定
   - 等速移動
+
+ball v1 filter 要件:
+
+- camera-local ball track は各 track ごとに線形 Kalman filter を持ち、観測 update と欠測時 predict を分ける
+- `ProcessNoise` と `MeasurementNoise` は ball filter の covariance 更新に直接使う
+- `Gate` は新規観測を既存 ball track へ結び付ける可否判定に使い、対応付け失敗時だけ新規 track を生成する
+- track の uncertainty は観測 confidence の単純逆数ではなく、filter 事後 covariance から導く
+- camera 横断統合の weighted merge は、この ball filter の事後 uncertainty を重みとする
+- health / 育成 / visibility の管理は filter 更新とは別責務だが、少なくとも Kalman ベースの状態推定を置き換えてはならない
 
 複数 ball 対応:
 
