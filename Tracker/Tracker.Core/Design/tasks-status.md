@@ -4,30 +4,20 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-035
-- Title: Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する
-- Phase: maintenance
-- Status: in_progress
-- Size: medium
-- Dependencies: TRACKER-033, TRACKER-034
-- Exit Criteria:
-  - 巨大 test file を必要に応じて責務別ファイルへ分割する
-  - 各 test に何を確認しているかの日本語コメントを追加する
-  - 既存の test 意味を変えず、focused/full test が通る
-  - review 結果が `reports/tracker-035-review-*.md` に記録され、blocking finding が残っていない
-
-## 次の調査タスク
-
 - ID: TRACKER-036
 - Title: 保守性改善全体の検証・レビュー・PR 完了通知を行う
 - Phase: verification
-- Status: pending
+- Status: in_progress
 - Size: small
 - Dependencies: TRACKER-033, TRACKER-034
 - Exit Criteria:
   - 保守性改善全体の full test と必要な focused test が通る
   - TRACKER-032 から TRACKER-035 の report / review / commits が PR に反映されている
   - PR コメントに作業完了が記録されている
+
+## 次の調査タスク
+
+- none
 
 ## タスク一覧
 
@@ -68,5 +58,5 @@
 | TRACKER-032 | Tracker 保守性改善の詳細設計書を分割作成する | maintenance | done | TRACKER-031 | Core engine、Server/CLI/UI、test 保守性改善の詳細設計を日本語の分割ファイルとして作成した。worker report は `reports/tracker-032-core-design-worker-20260511063428.md`、`reports/tracker-032-server-design-worker-20260511063428.md`、`reports/tracker-032-test-design-worker-20260511063428.md`、review は `reports/tracker-032-review-20260511063428.md` に記録済み。 |
 | TRACKER-033 | Core tracker engine の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `TrackerExecutionContracts.cs`、`TrackerModelContracts.cs`、`TrackerPacketGenerator.cs` を Core の責務別ファイルへ分割し、主要 class / property / method に日本語コメントを追加した。実装・検証は `reports/tracker-033-core-worker-20260511070200.md`、review は `reports/tracker-033-review-20260511072000.md` に記録済み。 |
 | TRACKER-034 | Server / CLI / UI の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `Tracker.CaptureReplay/Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` などを責務別に分割し、主要 class / property / method に日本語コメントを追加した。実装・検証は `reports/tracker-034-server-worker-20260511074000.md`、追加コメント補強は `reports/tracker-034-comment-followup-worker-20260511082000.md`、review は `reports/tracker-034-review-20260511081000.md` と `reports/tracker-034-review-r2-20260511083000.md` に記録済み。 |
-| TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | in_progress | TRACKER-033, TRACKER-034 | 巨大 test file を必要に応じて分割し、各 test に何を確認しているかの日本語コメントを追加する。 |
-| TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | pending | TRACKER-033, TRACKER-034, TRACKER-035 | full test と必要な focused test を実行し、review report を揃え、PR コメントに作業完了を記録する。 |
+| TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | done | TRACKER-033, TRACKER-034 | 巨大 test file を責務別に分割し、対象 test 81 件に何を確認しているかの日本語コメントを追加した。実装・検証は `reports/tracker-035-test-worker-20260511085000.md`、review は `reports/tracker-035-review-20260511091000.md` に記録済み。 |
+| TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | in_progress | TRACKER-033, TRACKER-034, TRACKER-035 | full test と必要な focused test を実行し、review report を揃え、PR コメントに作業完了を記録する。 |

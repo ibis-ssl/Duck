@@ -17,6 +17,7 @@ public class TrackerRenderSnapshotLogReaderTests
     [Fact]
     public void ReadFrame_ReturnsSnapshotMatchingDiagnosticsFrame()
     {
+        // 何を確認しているか: diagnostics log に対応する render snapshot から指定 frame の描画状態を復元できることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
         Directory.CreateDirectory(captureDirectory);
         var diagnosticsLogPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.tracker-diagnostics.log");
@@ -53,6 +54,7 @@ public class TrackerRenderSnapshotLogReaderTests
     [Fact]
     public void ReadIndex_ReturnsSnapshotsByFrameForRepeatedScrubbing()
     {
+        // 何を確認しているか: scrubber が繰り返し参照できるように、frame number keyed index が cache されることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
         Directory.CreateDirectory(captureDirectory);
         var diagnosticsLogPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.tracker-diagnostics.log");
@@ -94,6 +96,7 @@ public class TrackerRenderSnapshotLogReaderTests
     [Fact]
     public void ReadFrame_RejectsDiagnosticsLogOutsideList()
     {
+        // 何を確認しているか: packet capture 一覧外の diagnostics log から render snapshot を読ませないことを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
         Directory.CreateDirectory(captureDirectory);
         var unlistedDiagnosticsLogPath = Path.Combine(Path.GetTempPath(), $"tracker-diagnostics-unlisted-{Guid.NewGuid():N}.log");
@@ -122,6 +125,7 @@ public class TrackerRenderSnapshotLogReaderTests
     [Fact]
     public void ReadFrame_ReturnsErrorForCorruptRenderSnapshot()
     {
+        // 何を確認しているか: gzip として壊れた render snapshot では snapshot を返さず error を返すことを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
         Directory.CreateDirectory(captureDirectory);
         var diagnosticsLogPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.tracker-diagnostics.log");
@@ -150,6 +154,7 @@ public class TrackerRenderSnapshotLogReaderTests
     [Fact]
     public void ReadFrame_ReturnsErrorForRenderSnapshotMissingFrame()
     {
+        // 何を確認しているか: frame payload が欠落した render snapshot 行では snapshot を返さず error を返すことを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
         Directory.CreateDirectory(captureDirectory);
         var diagnosticsLogPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.tracker-diagnostics.log");

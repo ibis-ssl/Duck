@@ -17,6 +17,8 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
     [Fact]
     public void FromSnapshot_WithLatestFrame_MapsTrackedObjectsAndGeometryForViewer()
     {
+        // 何を確認しているか: latest frame の object、geometry、diagnostics、event metadata が viewer 用 view state に写ることを確認する。
+        // Viewer が参照する geometry と event metadata を同じ snapshot に含め、統合 mapping の契約を固定する。
         var latestFrame = fixture.CreateFrame(
             frameNumber: 7,
             dataTimestampNs: 2_500_000_000,
@@ -134,6 +136,8 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(1200, viewState.Balls[0].X);
         Assert.Equal((uint)2, Assert.Single(viewState.RobotsYellow).RobotId);
         Assert.Equal((uint)4, Assert.Single(viewState.RobotsBlue).RobotId);
+
+        // geometry: raw/tracked field 表示で必要な field shape が view state に残ることを確認する。
         Assert.NotNull(viewState.Geometry);
         Assert.Equal(12000, viewState.Geometry.Field.FieldLength);
         Assert.Equal(1800, viewState.Geometry.Field.GoalWidth);
@@ -148,10 +152,14 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         Assert.Equal("CenterCircle", fieldArc.Name);
         Assert.Equal(600, fieldArc.Radius);
         Assert.Equal(SSL_FieldShapeType.CenterCircle, fieldArc.Type);
+
+        // diagnostics: frame timestamp と publish count が viewer diagnostics に反映されることを確認する。
         Assert.Equal(2, viewState.Diagnostics.BallCount);
         Assert.Equal(2, viewState.Diagnostics.RobotCount);
         Assert.Equal(2_500_000_000, viewState.Diagnostics.DataTimestampNs);
         Assert.Equal(2_501_000_000, viewState.Diagnostics.ProcessedAtNs);
+
+        // event metadata: kick/contact/field-left の状態が diagnostics panel 用に保持されることを確認する。
         Assert.True(viewState.Kick.IsDetected);
         Assert.True(viewState.Kick.IsStillMoving);
         Assert.Equal((uint)2, viewState.Kick.KickerRobotId);
@@ -168,6 +176,7 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
     [Fact]
     public void FromSnapshot_WithoutLatestFrame_UsesActiveProfileAndReturnsEmptyViewerState()
     {
+        // 何を確認しているか: latest frame がない場合でも active profile と publish count を残し、viewer object は空になることを確認する。
         var snapshot = new TrackedSnapshot(
             LatestFrame: null,
             ReceivedAt: null,
