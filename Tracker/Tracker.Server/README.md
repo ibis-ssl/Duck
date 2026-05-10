@@ -72,6 +72,7 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 
 - `Tracked` モードの `Profile Control` から configured profile を選べます
 - switch を要求すると active profile が切り替わり、古い tracked frame は一度 clear されます
+- `VisionReceiver:Profiles` に同名 profile がある場合は、receiver の multicast address / port / interface もその profile に追従します
 - 新しい packet が commit されると、新 profile の context で tracked frame が再表示されます
 
 ## API
@@ -99,6 +100,17 @@ raw SSL-Vision packet の受信設定です。
 | `MulticastAddress` | 受信対象の multicast group address です。値が multicast 範囲ならその group へ join します。通常は SSL-Vision 側の multicast address を指定します。 |
 | `Port` | SSL-Vision packet の受信 port です。 |
 | `InterfaceAddress` | multicast join に使う local IPv4 address です。`null` の場合は利用可能な IPv4 interface を自動探索します。複数 NIC がある環境や join 失敗時は明示指定すると安定します。 |
+| `Profiles` | profile ごとの receiver override です。`Tracker` 側の active profile 名と同名エントリがあれば、起動時と runtime profile switch 完了後にその receiver 設定へ追従します。 |
+
+### `VisionReceiver:Profiles:<name>`
+
+receiver profile override です。未指定項目は top-level `VisionReceiver` の値を引き継ぎます。
+
+| キー | 意味 |
+| --- | --- |
+| `MulticastAddress` | profile 切替後に join する multicast group address です。 |
+| `Port` | profile 切替後に bind / receive する UDP port です。 |
+| `InterfaceAddress` | profile 切替後に multicast join へ使う local IPv4 address です。 |
 
 ### `Tracker`
 
@@ -203,6 +215,28 @@ kick / chip / contact 周辺の判定設定です。
     "MulticastAddress": "224.5.23.2",
     "Port": 10020,
     "InterfaceAddress": "192.168.10.5"
+  }
+}
+```
+
+### tracker profile に対応する receiver profile を分ける
+
+```json
+{
+  "VisionReceiver": {
+    "MulticastAddress": "224.5.23.2",
+    "Port": 10020,
+    "InterfaceAddress": null,
+    "Profiles": {
+      "sim": {
+        "MulticastAddress": "224.5.23.2",
+        "Port": 12020,
+        "InterfaceAddress": "10.0.0.5"
+      }
+    }
+  },
+  "Tracker": {
+    "ActiveProfileName": "sim"
   }
 }
 ```

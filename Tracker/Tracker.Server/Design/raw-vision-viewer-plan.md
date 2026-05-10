@@ -27,6 +27,13 @@
 - `MulticastAddress`: 既定値 `224.5.23.2`
 - `Port`: 受信 port
 - `InterfaceAddress`: multicast join に使う local IPv4 address。未設定時は候補 interface を自動解決する
+- `Profiles.<name>`: profile ごとの receiver override。`MulticastAddress` / `Port` / `InterfaceAddress` を同名 tracker profile に追従させたい場合に使う
+
+resolver 規則:
+
+- 起動時は `Tracker:ActiveProfileName` と同名の `VisionReceiver:Profiles.<name>` を優先する
+- 同名 profile が無い場合は top-level `VisionReceiver` 値をそのまま使う
+- runtime の tracker profile switch 完了後は、receiver も同じ profile 名で再解決し、必要なら socket を reopen する
 
 ## 受信設計
 
@@ -36,6 +43,7 @@
 - address reuse を有効にする
 - `IPAddress.Any` と設定 port に bind する
 - cancellation まで datagram を継続受信する
+- receiver 設定が切り替わったら現在の receive loop を cancel し、新しい設定で socket を開き直す
 
 設定された address が multicast の場合、group membership は次の規則で解決する。
 

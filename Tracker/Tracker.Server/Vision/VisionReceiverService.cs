@@ -8,7 +8,7 @@ using Tracker.Server.Tracking;
 namespace Tracker.Server.Vision;
 
 public sealed class VisionReceiverService(
-    IOptions<VisionReceiverOptions> options,
+    VisionReceiverRuntimeOptionsStore receiverOptionsStore,
     IOptions<TrackerOptions> trackerOptions,
     VisionPacketStore store,
     TrackerCoordinator trackerCoordinator,
@@ -16,82 +16,111 @@ public sealed class VisionReceiverService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var receiverOptions = options.Value;
-        var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
-        UdpClient udpClient;
-        MulticastJoinResult joinResult;
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            var snapshot = receiverOptionsStore.GetSnapshot();
+            var receiverOptions = snapshot.Options;
+            var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
+            UdpClient udpClient;
+            MulticastJoinResult joinResult;
 
-        try
-        {
-            (udpClient, joinResult) = CreateUdpClient(receiverOptions);
-        }
-        catch (Exception ex)
-        {
-            store.RecordDecodeError(ex);
-            logger.LogError(ex, "Failed to initialize SSL-Vision receiver for {Endpoint}", endpointDescription);
-            return;
-        }
-
-        using (udpClient)
-        {
-            if (joinResult.FailedInterfaces.Count > 0)
+            try
             {
-                logger.LogWarning(
-                    "Joined SSL-Vision multicast group on {JoinedInterfaces}; failed on {FailedInterfaces}",
-                    string.Join(", ", joinResult.JoinedInterfaces),
-                    string.Join(", ", joinResult.FailedInterfaces));
+                (udpClient, joinResult) = CreateUdpClient(receiverOptions);
+            }
+            catch (Exception ex)
+            {
+                store.RecordDecodeError(ex);
+                logger.LogError(ex, "Failed to initialize SSL-Vision receiver for {Endpoint}", endpointDescription);
+                await WaitForConfigurationChangeAsync(snapshot.ChangeToken, stoppingToken);
+                continue;
             }
 
-            if (joinResult.JoinedInterfaces.Count > 0)
+            using (udpClient)
+            using (var configurationScope = CancellationTokenSource.CreateLinkedTokenSource(
+                       stoppingToken,
+                       snapshot.ChangeToken))
             {
-                logger.LogInformation(
-                    "Receiving SSL-Vision packets from {Endpoint} via {JoinedInterfaces}",
-                    endpointDescription,
-                    string.Join(", ", joinResult.JoinedInterfaces));
-            }
-            else
-            {
-                logger.LogInformation("Receiving SSL-Vision packets from {Endpoint}", endpointDescription);
-            }
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
+                if (joinResult.FailedInterfaces.Count > 0)
                 {
-                    var result = await udpClient.ReceiveAsync(stoppingToken);
-                    var receivedAt = DateTimeOffset.UtcNow;
-                    SSL_WrapperPacket packet;
+                    logger.LogWarning(
+                        "Joined SSL-Vision multicast group on {JoinedInterfaces}; failed on {FailedInterfaces}",
+                        string.Join(", ", joinResult.JoinedInterfaces),
+                        string.Join(", ", joinResult.FailedInterfaces));
+                }
+
+                if (joinResult.JoinedInterfaces.Count > 0)
+                {
+                    logger.LogInformation(
+                        "Receiving SSL-Vision packets from {Endpoint} via {JoinedInterfaces}",
+                        endpointDescription,
+                        string.Join(", ", joinResult.JoinedInterfaces));
+                }
+                else
+                {
+                    logger.LogInformation("Receiving SSL-Vision packets from {Endpoint}", endpointDescription);
+                }
+
+                while (!configurationScope.IsCancellationRequested)
+                {
                     try
                     {
-                        packet = SSL_WrapperPacket.Parser.ParseFrom(result.Buffer);
+                        var result = await udpClient.ReceiveAsync(configurationScope.Token);
+                        var receivedAt = DateTimeOffset.UtcNow;
+                        SSL_WrapperPacket packet;
+                        try
+                        {
+                            packet = SSL_WrapperPacket.Parser.ParseFrom(result.Buffer);
+                        }
+                        catch (InvalidProtocolBufferException ex)
+                        {
+                            store.RecordDecodeError(ex);
+                            logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
+                            continue;
+                        }
+
+                        store.StorePacket(packet, result.RemoteEndPoint, receivedAt);
+                        if (trackerOptions.Value.Enabled)
+                        {
+                            trackerCoordinator.ProcessPacket(packet, receivedAt);
+                        }
                     }
-                    catch (InvalidProtocolBufferException ex)
+                    catch (OperationCanceledException) when (snapshot.ChangeToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+                    {
+                        logger.LogInformation(
+                            "Reconfiguring SSL-Vision receiver to follow profile-specific settings");
+                        break;
+                    }
+                    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (Exception ex)
                     {
                         store.RecordDecodeError(ex);
                         logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
-                        continue;
                     }
-
-                    store.StorePacket(packet, result.RemoteEndPoint, receivedAt);
-                    if (trackerOptions.Value.Enabled)
-                    {
-                        trackerCoordinator.ProcessPacket(packet, receivedAt);
-                    }
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    store.RecordDecodeError(ex);
-                    logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
                 }
             }
         }
     }
 
-    private static (UdpClient Client, MulticastJoinResult JoinResult) CreateUdpClient(VisionReceiverOptions options)
+    private static async Task WaitForConfigurationChangeAsync(
+        CancellationToken changeToken,
+        CancellationToken stoppingToken)
+    {
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(changeToken, stoppingToken);
+
+        try
+        {
+            await Task.Delay(Timeout.InfiniteTimeSpan, linked.Token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private static (UdpClient Client, MulticastJoinResult JoinResult) CreateUdpClient(VisionReceiverResolvedOptions options)
     {
         if (!IPAddress.TryParse(options.MulticastAddress, out var groupAddress))
         {

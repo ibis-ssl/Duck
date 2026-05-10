@@ -12,12 +12,24 @@ builder.Services.AddRazorComponents()
 builder.Services.Configure<VisionReceiverOptions>(builder.Configuration.GetSection("VisionReceiver"));
 builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection("Tracker"));
 builder.Services.AddSingleton(serviceProvider =>
+{
+    var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
+    var visionReceiverOptions = serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value;
+    return new VisionReceiverRuntimeOptionsStore(
+        VisionReceiverConfigurationResolver.Resolve(
+            visionReceiverOptions,
+            trackerOptions.ActiveProfileName));
+});
+builder.Services.AddSingleton(serviceProvider =>
     TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().EngineSettings);
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().PublisherOptions);
 builder.Services.AddSingleton<ITrackerEngine, TrackerEngine>();
-builder.Services.AddSingleton<TrackedSnapshotStore>();
+builder.Services.AddSingleton(serviceProvider =>
+    new TrackedSnapshotStore(
+        serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value.ActiveProfileName));
 builder.Services.AddSingleton<ITrackerPacketPublisher, UdpTrackerPacketPublisher>();
+builder.Services.AddSingleton<ITrackerObserver, VisionReceiverProfileSwitchObserver>();
 builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
 {
     var resolved = serviceProvider.GetRequiredService<TrackerResolvedOptions>();

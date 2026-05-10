@@ -53,4 +53,16 @@ public class TrackerProfileControlViewStateTests
         Assert.Equal("default", profile.Name);
         Assert.True(profile.IsActive);
     }
+
+    [Fact]
+    public void TrackedSnapshotStore_UsesConfiguredInitialActiveProfile()
+    {
+        var store = new TrackedSnapshotStore("sim");
+
+        var snapshot = store.GetSnapshot();
+
+        Assert.Equal("sim", snapshot.ActiveProfileName);
+        Assert.Null(snapshot.LatestFrame);
+        Assert.Null(snapshot.ReceivedAt);
+    }
 }

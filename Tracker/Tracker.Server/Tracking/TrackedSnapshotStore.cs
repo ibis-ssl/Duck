@@ -7,9 +7,16 @@ public sealed class TrackedSnapshotStore
     private readonly object gate = new();
     private TrackerFrame? latestFrame;
     private DateTimeOffset? receivedAt;
-    private string activeProfileName = "default";
+    private string activeProfileName;
     private long publishSuccessCount;
     private long publishFailureCount;
+
+    public TrackedSnapshotStore(string initialActiveProfileName = "default")
+    {
+        activeProfileName = string.IsNullOrWhiteSpace(initialActiveProfileName)
+            ? "default"
+            : initialActiveProfileName;
+    }
 
     public TrackedSnapshot GetSnapshot()
     {
