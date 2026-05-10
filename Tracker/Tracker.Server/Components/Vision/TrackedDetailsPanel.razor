@@ -1,5 +1,6 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Components.Rendering
+@using Tracker.Core
 
 <aside class="details-panel">
     <div class="details-panel__meta">
@@ -38,6 +39,84 @@
         }
         else
         {
+            <section class="tracked-details-panel__section">
+                <h3>Diagnostics</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Ts</th>
+                            <th>Processed</th>
+                            <th>Balls</th>
+                            <th>Robots</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@FormatLong(ViewState.Diagnostics.DataTimestampNs)</td>
+                            <td>@FormatLong(ViewState.Diagnostics.ProcessedAtNs)</td>
+                            <td>@ViewState.Diagnostics.BallCount.ToString(CultureInfo.InvariantCulture)</td>
+                            <td>@ViewState.Diagnostics.RobotCount.ToString(CultureInfo.InvariantCulture)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="tracked-details-panel__section">
+                <h3>Kick</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Kicker</th>
+                            <th>Kind</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@KickStatus()</td>
+                            <td>@FormatRobotId(ViewState.Kick.KickerRobotId)</td>
+                            <td>@(ViewState.Kick.KickKind ?? "-")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="tracked-details-panel__section">
+                <h3>Contact</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Current</th>
+                            <th>Last</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@ContactCurrent()</td>
+                            <td>@ContactLast()</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="tracked-details-panel__section">
+                <h3>Field</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Boundary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@(ViewState.FieldState.IsOutOfField ? "Out" : "In")</td>
+                            <td>@(ViewState.FieldState.BoundaryName ?? "-")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
             <section class="tracked-details-panel__section">
                 <h3>Balls</h3>
                 <table>
@@ -91,6 +170,46 @@
     private static string N(float value)
     {
         return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private static string FormatLong(long? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string FormatRobotId(uint? robotId)
+    {
+        return robotId?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private string KickStatus()
+    {
+        if (!ViewState.Kick.IsDetected)
+        {
+            return "None";
+        }
+
+        return ViewState.Kick.IsStillMoving ? "Active" : "Stopped";
+    }
+
+    private string ContactCurrent()
+    {
+        if (!ViewState.Contact.IsInContact)
+        {
+            return "None";
+        }
+
+        return $"{ViewState.Contact.ContactingTeam} #{FormatRobotId(ViewState.Contact.ContactingRobotId)}";
+    }
+
+    private string ContactLast()
+    {
+        if (ViewState.Contact.LastTeam == TrackerTeam.Unknown || ViewState.Contact.LastRobotId is null)
+        {
+            return "-";
+        }
+
+        return $"{ViewState.Contact.LastTeam} #{ViewState.Contact.LastRobotId.Value.ToString(CultureInfo.InvariantCulture)}";
     }
 
     private static RenderFragment RobotTable(IEnumerable<SSL_DetectionRobot> robots) => builder =>

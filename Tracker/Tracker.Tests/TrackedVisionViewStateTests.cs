@@ -54,7 +54,6 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
             Balls = latestFrame.Balls,
             Robots = latestFrame.Robots,
             PrimaryBallTrackId = latestFrame.PrimaryBallTrackId,
-            KickedBall = latestFrame.KickedBall,
             GeometrySnapshot = new TrackerGeometrySnapshot
             {
                 FieldLengthMm = 12000,
@@ -68,6 +67,28 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
             Metadata = new TrackerFrameMetadata
             {
                 ProfileName = "fast",
+            },
+            KickedBall = new KickEventState
+            {
+                BallTrackId = 3,
+                KickerRobotId = 2,
+                KickKind = "straight",
+                IsStillMoving = true,
+            },
+            LatestContact = new BallContactState
+            {
+                IsInContact = true,
+                ContactingTeam = TrackerTeam.Yellow,
+                ContactingRobotId = 2,
+                LastTeam = TrackerTeam.Yellow,
+                LastRobotId = 2,
+                LastContactTimestampNs = 2_400_000_000,
+            },
+            BallLeftField = new BallLeftFieldState
+            {
+                IsOutOfField = true,
+                BoundaryName = "TouchLineTop",
+                CrossingTimestampNs = 2_450_000_000,
             },
         };
 
@@ -91,6 +112,19 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(12000, viewState.Geometry.Field.FieldLength);
         Assert.Equal(1800, viewState.Geometry.Field.GoalWidth);
         Assert.Equal(300, viewState.Geometry.Field.BoundaryWidth);
+        Assert.Equal(2, viewState.Diagnostics.BallCount);
+        Assert.Equal(2, viewState.Diagnostics.RobotCount);
+        Assert.Equal(2_500_000_000, viewState.Diagnostics.DataTimestampNs);
+        Assert.Equal(2_501_000_000, viewState.Diagnostics.ProcessedAtNs);
+        Assert.True(viewState.Kick.IsDetected);
+        Assert.True(viewState.Kick.IsStillMoving);
+        Assert.Equal((uint)2, viewState.Kick.KickerRobotId);
+        Assert.Equal("straight", viewState.Kick.KickKind);
+        Assert.True(viewState.Contact.IsInContact);
+        Assert.Equal(TrackerTeam.Yellow, viewState.Contact.ContactingTeam);
+        Assert.Equal((uint)2, viewState.Contact.ContactingRobotId);
+        Assert.True(viewState.FieldState.IsOutOfField);
+        Assert.Equal("TouchLineTop", viewState.FieldState.BoundaryName);
         Assert.Equal(11, viewState.PublishSuccessCount);
         Assert.Equal(1, viewState.PublishFailureCount);
     }
@@ -114,6 +148,11 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         Assert.Empty(viewState.Balls);
         Assert.Empty(viewState.RobotsYellow);
         Assert.Empty(viewState.RobotsBlue);
+        Assert.Equal(0, viewState.Diagnostics.BallCount);
+        Assert.Equal(0, viewState.Diagnostics.RobotCount);
+        Assert.False(viewState.Kick.IsDetected);
+        Assert.False(viewState.Contact.IsInContact);
+        Assert.False(viewState.FieldState.IsOutOfField);
         Assert.Equal(3, viewState.PublishSuccessCount);
         Assert.Equal(2, viewState.PublishFailureCount);
     }

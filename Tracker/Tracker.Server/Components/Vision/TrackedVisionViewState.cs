@@ -13,6 +13,10 @@ public sealed record TrackedVisionViewState(
     IReadOnlyList<SSL_DetectionBall> Balls,
     IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
     IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+    TrackedDiagnosticsViewState Diagnostics,
+    TrackedKickViewState Kick,
+    TrackedContactViewState Contact,
+    TrackedFieldStateViewState FieldState,
     long PublishSuccessCount,
     long PublishFailureCount)
 {
@@ -32,6 +36,10 @@ public sealed record TrackedVisionViewState(
                 Array.Empty<SSL_DetectionBall>(),
                 Array.Empty<SSL_DetectionRobot>(),
                 Array.Empty<SSL_DetectionRobot>(),
+                new TrackedDiagnosticsViewState(0, 0, null, null),
+                new TrackedKickViewState(false, false, null, null),
+                new TrackedContactViewState(false, TrackerTeam.Unknown, null, TrackerTeam.Unknown, null),
+                new TrackedFieldStateViewState(false, null),
                 snapshot.PublishSuccessCount,
                 snapshot.PublishFailureCount);
         }
@@ -55,8 +63,42 @@ public sealed record TrackedVisionViewState(
             latestFrame.Balls.Select(CreateBall).ToArray(),
             yellowRobots,
             blueRobots,
+            new TrackedDiagnosticsViewState(
+                latestFrame.Balls.Count,
+                latestFrame.Robots.Count,
+                latestFrame.DataTimestampNs,
+                latestFrame.ProcessedAtNs),
+            CreateKick(latestFrame.KickedBall),
+            CreateContact(latestFrame.LatestContact),
+            CreateFieldState(latestFrame.BallLeftField),
             snapshot.PublishSuccessCount,
             snapshot.PublishFailureCount);
+    }
+
+    private static TrackedKickViewState CreateKick(KickEventState? kick)
+    {
+        return kick is null
+            ? new TrackedKickViewState(false, false, null, null)
+            : new TrackedKickViewState(true, kick.IsStillMoving, kick.KickerRobotId, kick.KickKind);
+    }
+
+    private static TrackedContactViewState CreateContact(BallContactState? contact)
+    {
+        return contact is null
+            ? new TrackedContactViewState(false, TrackerTeam.Unknown, null, TrackerTeam.Unknown, null)
+            : new TrackedContactViewState(
+                contact.IsInContact,
+                contact.ContactingTeam,
+                contact.ContactingRobotId,
+                contact.LastTeam,
+                contact.LastRobotId);
+    }
+
+    private static TrackedFieldStateViewState CreateFieldState(BallLeftFieldState? fieldState)
+    {
+        return fieldState is null
+            ? new TrackedFieldStateViewState(false, null)
+            : new TrackedFieldStateViewState(fieldState.IsOutOfField, fieldState.BoundaryName);
     }
 
     private static SSL_GeometryData? CreateGeometry(TrackerGeometrySnapshot? geometrySnapshot)
@@ -104,3 +146,26 @@ public sealed record TrackedVisionViewState(
         };
     }
 }
+
+public sealed record TrackedDiagnosticsViewState(
+    int BallCount,
+    int RobotCount,
+    long? DataTimestampNs,
+    long? ProcessedAtNs);
+
+public sealed record TrackedKickViewState(
+    bool IsDetected,
+    bool IsStillMoving,
+    uint? KickerRobotId,
+    string? KickKind);
+
+public sealed record TrackedContactViewState(
+    bool IsInContact,
+    TrackerTeam ContactingTeam,
+    uint? ContactingRobotId,
+    TrackerTeam LastTeam,
+    uint? LastRobotId);
+
+public sealed record TrackedFieldStateViewState(
+    bool IsOutOfField,
+    string? BoundaryName);

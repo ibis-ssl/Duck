@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: ui
-- 現在のタスク: TRACKER-016
+- 現在のタスク: TRACKER-017
 - 残りフェーズ: ui, verification, review
 
 ## フェーズ一覧
