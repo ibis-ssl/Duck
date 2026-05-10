@@ -1,5 +1,9 @@
 namespace Tracker.Core;
 
+/// <summary>
+/// Core 内部の TrackerFrame を official TrackerWrapperPacket に変換する生成器。
+/// 単位変換と official proto の出力順序をこの境界で固定する。
+/// </summary>
 public sealed class TrackerPacketGenerator
 {
     private static readonly Capability[] Capabilities =
@@ -9,16 +13,29 @@ public sealed class TrackerPacketGenerator
         Capability.DetectMultipleBalls,
     ];
 
+    /// <summary>
+    /// official packet に設定する source_name と uuid を受け取って generator を初期化する。
+    /// </summary>
     public TrackerPacketGenerator(string sourceName, string uuid)
     {
         SourceName = sourceName;
         Uuid = uuid;
     }
 
+    /// <summary>
+    /// official packet の source_name。
+    /// </summary>
     public string SourceName { get; }
 
+    /// <summary>
+    /// official packet の uuid。
+    /// </summary>
     public string Uuid { get; }
 
+    /// <summary>
+    /// TrackerFrame を official TrackerWrapperPacket へ変換する。
+    /// timestamp は ns から seconds へ、位置と速度は mm / mm/s から m / m/s へ変換する。
+    /// </summary>
     public TrackerWrapperPacket Generate(TrackerFrame frame)
     {
         var trackedFrame = new TrackedFrame
@@ -34,6 +51,7 @@ public sealed class TrackerPacketGenerator
             .Select(CreateTrackedRobot));
         trackedFrame.Capabilities.AddRange(Capabilities);
 
+        // official kicked_ball は移動中の kick だけを出力する。
         if (frame.KickedBall is { IsStillMoving: true } kickedBall)
         {
             trackedFrame.KickedBall = CreateKickedBall(kickedBall);
@@ -47,6 +65,9 @@ public sealed class TrackerPacketGenerator
         };
     }
 
+    /// <summary>
+    /// primary ball を先頭に固定し、secondary ball は visibility、last visible timestamp、track id の安定順で並べる。
+    /// </summary>
     private static IEnumerable<TrackedBallState> OrderBalls(TrackerFrame frame)
     {
         if (frame.PrimaryBallTrackId is { } primaryTrackId)
@@ -68,6 +89,9 @@ public sealed class TrackerPacketGenerator
         }
     }
 
+    /// <summary>
+    /// 内部 ball state を official proto の tracked ball に変換する。
+    /// </summary>
     private static TrackedBall CreateTrackedBall(TrackedBallState state)
     {
         return new TrackedBall
@@ -88,6 +112,9 @@ public sealed class TrackerPacketGenerator
         };
     }
 
+    /// <summary>
+    /// 内部 robot state を official proto の tracked robot に変換する。
+    /// </summary>
     private static TrackedRobot CreateTrackedRobot(TrackedRobotState state)
     {
         return new TrackedRobot
@@ -113,6 +140,9 @@ public sealed class TrackerPacketGenerator
         };
     }
 
+    /// <summary>
+    /// 継続中の kick 状態を official proto の kicked_ball に変換する。
+    /// </summary>
     private static KickedBall CreateKickedBall(KickEventState state)
     {
         var kickedBall = new KickedBall
