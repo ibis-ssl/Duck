@@ -66,6 +66,10 @@
                         <div>
                             <span>Profile</span>
                             <strong>@selectedEntry.ProfileName</strong>
+                            @if (profileMetadata is not null)
+                            {
+                                <button type="button" class="diagnostics-profile-link" @onclick="OpenProfileSettings">Settings</button>
+                            }
                         </div>
                         <div>
                             <span>Line</span>
@@ -89,26 +93,7 @@
                         </div>
                     </div>
 
-                    @if (profileMetadata is not null)
-                    {
-                        <details class="diagnostics-profile">
-                            <summary>
-                                <span>Profile settings</span>
-                                <strong>@profileMetadata.ProfileName</strong>
-                            </summary>
-                            <div class="diagnostics-profile__grid">
-                                <section>
-                                    <h2>Configured profile</h2>
-                                    <pre>@profileMetadata.ConfiguredProfileJson</pre>
-                                </section>
-                                <section>
-                                    <h2>Resolved settings</h2>
-                                    <pre>@profileMetadata.ResolvedSettingsJson</pre>
-                                </section>
-                            </div>
-                        </details>
-                    }
-                    else if (!string.IsNullOrEmpty(profileMetadataError))
+                    @if (!string.IsNullOrEmpty(profileMetadataError))
                     {
                         <div class="diagnostics-profile-alert">@profileMetadataError</div>
                     }
@@ -183,6 +168,8 @@
                        max="@MaxEntryIndex"
                        value="@SelectedEntryIndex"
                        @oninput="OnTimelineScrubbed"
+                       @onwheel="OnTimelineWheel"
+                       @onwheel:preventDefault="true"
                        aria-label="Diagnostics timeline scrubber" />
                 <div class="diagnostics-scrubber__meta">
                     <span>@(SelectedEntryIndex + 1) / @entries.Count</span>
@@ -192,6 +179,31 @@
         }
     }
 </section>
+
+@if (isProfileSettingsModalOpen && profileMetadata is not null)
+{
+    <div class="diagnostics-modal" role="dialog" aria-modal="true" aria-label="Profile settings" @onclick="CloseProfileSettings">
+        <div class="diagnostics-modal__panel" @onclick:stopPropagation="true">
+            <header class="diagnostics-modal__header">
+                <div>
+                    <span>Profile settings</span>
+                    <strong>@profileMetadata.ProfileName</strong>
+                </div>
+                <button type="button" class="diagnostics-button" @onclick="CloseProfileSettings">Close</button>
+            </header>
+            <div class="diagnostics-profile__grid">
+                <section>
+                    <h2>Configured profile</h2>
+                    <pre>@profileMetadata.ConfiguredProfileJson</pre>
+                </section>
+                <section>
+                    <h2>Resolved settings</h2>
+                    <pre>@profileMetadata.ResolvedSettingsJson</pre>
+                </section>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     private IReadOnlyList<TrackerDiagnosticsLogFile> logFiles = [];
@@ -209,6 +221,7 @@
     private string? resolvedSettingsJson;
     private CaptureProfileMetadataView? profileMetadata;
     private string? profileMetadataError;
+    private bool isProfileSettingsModalOpen;
     private static readonly JsonSerializerOptions MetadataJsonOptions = new()
     {
         WriteIndented = true,
@@ -301,6 +314,18 @@
         }
 
         SelectEntryByIndex(index);
+    }
+
+    private void OnTimelineWheel(WheelEventArgs args)
+    {
+        if (entries.Count == 0)
+        {
+            return;
+        }
+
+        var step = args.CtrlKey ? 100 : args.ShiftKey ? 10 : 1;
+        var direction = args.DeltaY > 0 || args.DeltaX > 0 ? 1 : -1;
+        SelectEntryByIndex(SelectedEntryIndex + (direction * step));
     }
 
     private void SelectEntryByIndex(int index)
@@ -443,6 +468,7 @@
 
         if (!string.IsNullOrEmpty(profileMetadataError) || selectedEntry is null)
         {
+            isProfileSettingsModalOpen = false;
             return;
         }
 
@@ -457,6 +483,19 @@
             profileName,
             configuredProfile,
             resolvedSettingsJson ?? "Resolved settings were not found in metadata.");
+    }
+
+    private void OpenProfileSettings()
+    {
+        if (profileMetadata is not null)
+        {
+            isProfileSettingsModalOpen = true;
+        }
+    }
+
+    private void CloseProfileSettings()
+    {
+        isProfileSettingsModalOpen = false;
     }
 
     private void LoadRenderSnapshotIndex()
