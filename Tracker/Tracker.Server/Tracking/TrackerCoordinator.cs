@@ -234,7 +234,7 @@ public sealed class TrackerCoordinator
         TrackerUpdateResult result,
         DateTimeOffset receivedAt)
     {
-        if (!logger.IsEnabled(LogLevel.Information) || result.CommittedFrames.Count == 0)
+        if (result.CommittedFrames.Count == 0)
         {
             return;
         }
@@ -254,25 +254,29 @@ public sealed class TrackerCoordinator
         var trackedRobotDetails = FormatTrackedRobots(newestFrame.Robots);
         var diagnosticsLine = FormattableString.Invariant(
             $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={detection?.FrameNumber} rawCamera={detection?.CameraId} rawBalls={detection?.Balls.Count ?? 0} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
-        logger.LogInformation(
-            "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
-            currentSettings.ProfileName,
-            detection?.FrameNumber,
-            detection?.CameraId,
-            detection?.Balls.Count ?? 0,
-            rawBallDetails,
-            rawBlueDetails,
-            rawYellowDetails,
-            newestFrame.FrameNumber,
-            newestFrame.Balls.Count,
-            trackedBallDetails,
-            newestFrame.Robots.Count,
-            trackedRobotDetails,
-            currentSettings.RobotTracker.OutputVisibilityThreshold,
-            currentSettings.RobotTracker.VisibilityHalfLifeSeconds,
-            currentSettings.BallTracker.OutputVisibilityThreshold,
-            currentSettings.BallTracker.VisibilityHalfLifeSeconds,
-            currentSettings.BallTracker.TrackLifetimeNs);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(
+                "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
+                currentSettings.ProfileName,
+                detection?.FrameNumber,
+                detection?.CameraId,
+                detection?.Balls.Count ?? 0,
+                rawBallDetails,
+                rawBlueDetails,
+                rawYellowDetails,
+                newestFrame.FrameNumber,
+                newestFrame.Balls.Count,
+                trackedBallDetails,
+                newestFrame.Robots.Count,
+                trackedRobotDetails,
+                currentSettings.RobotTracker.OutputVisibilityThreshold,
+                currentSettings.RobotTracker.VisibilityHalfLifeSeconds,
+                currentSettings.BallTracker.OutputVisibilityThreshold,
+                currentSettings.BallTracker.VisibilityHalfLifeSeconds,
+                currentSettings.BallTracker.TrackLifetimeNs);
+        }
+
         AppendTrackerDiagnosticsFile(diagnosticsLine);
     }
 
@@ -298,7 +302,7 @@ public sealed class TrackerCoordinator
     {
         var timestamp = FormattableString.Invariant($"{DateTimeOffset.UtcNow:yyyyMMddTHHmmssfffZ}");
         return Path.Combine(
-            Directory.GetCurrentDirectory(),
+            AppContext.BaseDirectory,
             $"tracker-diagnostics-{timestamp}-{Guid.NewGuid():N}.log");
     }
 
