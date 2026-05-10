@@ -11,25 +11,6 @@
 
 <section class="@ShellClass()">
     <header class="diagnostics-header">
-        <div class="diagnostics-status">
-            <div>
-                <span>Files</span>
-                <strong>@logFiles.Count</strong>
-            </div>
-            <div>
-                <span>Entries</span>
-                <strong>@entries.Count</strong>
-            </div>
-            <div>
-                <span>Skipped</span>
-                <strong>@(snapshot?.SkippedLineCount ?? 0)</strong>
-            </div>
-            <div>
-                <span>Selected</span>
-                <strong>@(selectedEntry?.TrackedFrame ?? "-")</strong>
-            </div>
-        </div>
-
         <div class="diagnostics-toolbar">
             <select class="diagnostics-select"
                     value="@selectedLogPath"
@@ -89,6 +70,22 @@
                         <div>
                             <span>Line</span>
                             <strong>@selectedEntry.LineNumber</strong>
+                        </div>
+                        <div>
+                            <span>Files</span>
+                            <strong>@logFiles.Count</strong>
+                        </div>
+                        <div>
+                            <span>Entries</span>
+                            <strong>@entries.Count</strong>
+                        </div>
+                        <div>
+                            <span>Skipped</span>
+                            <strong>@(snapshot?.SkippedLineCount ?? 0)</strong>
+                        </div>
+                        <div>
+                            <span>Selected</span>
+                            <strong>@selectedEntry.TrackedFrame</strong>
                         </div>
                     </div>
 
