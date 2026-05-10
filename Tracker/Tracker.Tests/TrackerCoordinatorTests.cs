@@ -140,6 +140,136 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
             observer.Events);
     }
 
+    [Fact]
+    public void RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification()
+    {
+        var snapshotStore = new TrackedSnapshotStore();
+        var publisher = new RecordingTrackerPacketPublisher();
+        var observer = new RecordingTrackerObserver(snapshotStore);
+        var initialPublisherOptions = fixture.CreatePublisherOptions(port: 10010);
+        var coordinator = CreateCoordinator(
+            snapshotStore,
+            publisher,
+            [observer],
+            fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
+            initialPublisherOptions);
+        var receivedAt = new DateTimeOffset(2026, 5, 10, 9, 0, 0, TimeSpan.Zero);
+
+        _ = coordinator.ProcessPacket(
+            TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            receivedAt);
+
+        observer.Events.Clear();
+
+        coordinator.RequestProfileSwitch(
+            fixture.CreateResolvedOptions(
+                fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0),
+                fixture.CreatePublisherOptions(port: 12000)),
+            receivedAt.AddMilliseconds(50));
+
+        var snapshot = snapshotStore.GetSnapshot();
+
+        Assert.Equal("fast", snapshot.ActiveProfileName);
+        Assert.Null(snapshot.LatestFrame);
+        Assert.Null(snapshot.ReceivedAt);
+        Assert.True(observer.LatestFrameWasClearedAtProfileSwitch);
+        Assert.Equal(["profile:fast"], observer.Events);
+        Assert.Equal(12000, publisher.CurrentOptions.Port);
+    }
+
+    [Fact]
+    public void ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext()
+    {
+        var snapshotStore = new TrackedSnapshotStore();
+        var publisher = new RecordingTrackerPacketPublisher();
+        var observer = new RecordingTrackerObserver(snapshotStore);
+        var initialPublisherOptions = fixture.CreatePublisherOptions(port: 10010);
+        var coordinator = CreateCoordinator(
+            snapshotStore,
+            publisher,
+            [observer],
+            fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
+            initialPublisherOptions);
+        var receivedAt = new DateTimeOffset(2026, 5, 10, 9, 5, 0, TimeSpan.Zero);
+
+        coordinator.RequestProfileSwitch(
+            fixture.CreateResolvedOptions(
+                fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0),
+                fixture.CreatePublisherOptions(port: 12000)),
+            receivedAt);
+
+        observer.Events.Clear();
+
+        var result = coordinator.ProcessPacket(
+            TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 150, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            receivedAt.AddMilliseconds(100));
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+        var snapshot = snapshotStore.GetSnapshot();
+
+        Assert.Equal("fast", committedFrame.Metadata.ProfileName);
+        Assert.Equal("fast", snapshot.ActiveProfileName);
+        Assert.Equal((uint)1, Assert.IsType<TrackerFrame>(snapshot.LatestFrame).FrameNumber);
+        Assert.Equal(12000, publisher.PublishedPorts.Single());
+        Assert.Equal(["world-frame:1"], observer.Events);
+    }
+
+    [Fact]
+    public void RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings()
+    {
+        var snapshotStore = new TrackedSnapshotStore();
+        var publisher = new RecordingTrackerPacketPublisher();
+        var coordinator = CreateCoordinator(
+            snapshotStore,
+            publisher,
+            [],
+            fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
+            fixture.CreatePublisherOptions(port: 10010));
+        var receivedAt = new DateTimeOffset(2026, 5, 10, 9, 15, 0, TimeSpan.Zero);
+
+        coordinator.RequestProfileSwitch(
+            fixture.CreateResolvedOptions(
+                fixture.CreateSettings(
+                    profileName: "default",
+                    reorderWindowNs: 0,
+                    mergeWindowNs: 0,
+                    kickDetector: new TrackerKickDetectorOverrides
+                    {
+                        ContactMarginMm = 0d,
+                    }),
+                fixture.CreatePublisherOptions(port: 10010)),
+            receivedAt,
+            new TrackerRuntimeOverrides
+            {
+                KickDetector = new TrackerKickDetectorOverrides
+                {
+                    ContactMarginMm = 0d,
+                },
+            });
+
+        var result = coordinator.ProcessPacket(
+            TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 4, x: 130, y: 0, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            receivedAt.AddMilliseconds(100));
+
+        var committedFrame = Assert.Single(result.CommittedFrames);
+
+        Assert.Null(committedFrame.LatestContact);
+        Assert.Equal([TrackerEventKind.WorldFrameCommitted], result.EmittedEvents.Select(emitted => emitted.Kind));
+    }
+
     private TrackerCoordinator CreateCoordinator(
         TrackedSnapshotStore snapshotStore,
         ITrackerPacketPublisher publisher,
@@ -149,7 +279,8 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
             snapshotStore,
             publisher,
             observers,
-            fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0));
+            fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0),
+            fixture.CreatePublisherOptions());
     }
 
     private TrackerCoordinator CreateCoordinator(
@@ -158,10 +289,26 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
         IReadOnlyList<ITrackerObserver> observers,
         TrackerEngineSettings settings)
     {
+        return CreateCoordinator(
+            snapshotStore,
+            publisher,
+            observers,
+            settings,
+            fixture.CreatePublisherOptions());
+    }
+
+    private TrackerCoordinator CreateCoordinator(
+        TrackedSnapshotStore snapshotStore,
+        ITrackerPacketPublisher publisher,
+        IReadOnlyList<ITrackerObserver> observers,
+        TrackerEngineSettings settings,
+        TrackerPublisherOptions publisherOptions)
+    {
         return new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
             settings,
+            publisherOptions,
             snapshotStore,
             publisher,
             observers,
@@ -170,11 +317,28 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
 
     private sealed class RecordingTrackerPacketPublisher : ITrackerPacketPublisher
     {
+        public TrackerPublisherOptions CurrentOptions { get; private set; } = new();
+
         public List<TrackerWrapperPacket> Packets { get; } = [];
+
+        public List<int> PublishedPorts { get; } = [];
+
+        public void ApplyConfiguration(TrackerPublisherOptions options)
+        {
+            CurrentOptions = new TrackerPublisherOptions
+            {
+                PublishUdp = options.PublishUdp,
+                MulticastAddress = options.MulticastAddress,
+                Port = options.Port,
+                SourceName = options.SourceName,
+                Uuid = options.Uuid,
+            };
+        }
 
         public void Publish(TrackerWrapperPacket packet)
         {
             Packets.Add(packet.Clone());
+            PublishedPorts.Add(CurrentOptions.Port);
         }
     }
 
@@ -191,8 +355,11 @@ public class TrackerCoordinatorTests : IClassFixture<TrackerContractFixture>
 
         public bool LatestFrameWasClearedAtGeometryReset { get; private set; }
 
+        public bool LatestFrameWasClearedAtProfileSwitch { get; private set; }
+
         public void OnProfileSwitched(string profileName)
         {
+            LatestFrameWasClearedAtProfileSwitch = snapshotStore.GetSnapshot().LatestFrame is null;
             Events.Add($"profile:{profileName}");
         }
 

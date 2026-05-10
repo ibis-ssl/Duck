@@ -1,4 +1,5 @@
 using Tracker.Core;
+using Tracker.Server.Tracking;
 
 namespace Tracker.Tests.Contracts;
 
@@ -22,6 +23,35 @@ public sealed class TrackerContractFixture
         string uuid = DefaultUuid)
     {
         return new TrackerPacketGenerator(sourceName, uuid);
+    }
+
+    public TrackerPublisherOptions CreatePublisherOptions(
+        bool publishUdp = true,
+        string multicastAddress = "224.5.23.2",
+        int port = 10010,
+        string sourceName = DefaultSourceName,
+        string uuid = DefaultUuid)
+    {
+        return new TrackerPublisherOptions
+        {
+            PublishUdp = publishUdp,
+            MulticastAddress = multicastAddress,
+            Port = port,
+            SourceName = sourceName,
+            Uuid = uuid,
+        };
+    }
+
+    public TrackerResolvedOptions CreateResolvedOptions(
+        TrackerEngineSettings? engineSettings = null,
+        TrackerPublisherOptions? publisherOptions = null)
+    {
+        return new TrackerResolvedOptions
+        {
+            Enabled = true,
+            EngineSettings = engineSettings ?? CreateSettings(),
+            PublisherOptions = publisherOptions ?? CreatePublisherOptions(),
+        };
     }
 
     public TrackerEngineSettings CreateSettings(

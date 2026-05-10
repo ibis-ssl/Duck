@@ -43,6 +43,16 @@ public sealed class TrackedSnapshotStore
         }
     }
 
+    public void SwitchActiveProfile(string profileName)
+    {
+        lock (gate)
+        {
+            activeProfileName = profileName;
+            latestFrame = null;
+            receivedAt = null;
+        }
+    }
+
     public void SetActiveProfileName(string profileName)
     {
         lock (gate)

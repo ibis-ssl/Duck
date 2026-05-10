@@ -6,33 +6,43 @@ public static class TrackerConfigurationResolver
 {
     public static TrackerResolvedOptions Resolve(TrackerOptions options)
     {
-        if (!options.Profiles.TryGetValue(options.ActiveProfileName, out var activeProfile))
+        return Resolve(options, options.ActiveProfileName, options.RuntimeOverrides);
+    }
+
+    public static TrackerResolvedOptions Resolve(
+        TrackerOptions options,
+        string profileName,
+        TrackerRuntimeOverrides? runtimeOverrides = null)
+    {
+        if (!options.Profiles.TryGetValue(profileName, out var activeProfile))
         {
             throw new InvalidOperationException(
-                $"Tracker active profile '{options.ActiveProfileName}' was not found in Tracker:Profiles.");
+                $"Tracker active profile '{profileName}' was not found in Tracker:Profiles.");
         }
+
+        var effectiveRuntimeOverrides = runtimeOverrides ?? options.RuntimeOverrides;
 
         return new TrackerResolvedOptions
         {
             Enabled = options.Enabled,
             EngineSettings = new TrackerEngineSettings
             {
-                ProfileName = options.ActiveProfileName,
+                ProfileName = profileName,
                 ReorderWindowNs = activeProfile.Engine.ReorderWindowNs,
                 MergeWindowNs = activeProfile.Engine.MergeWindowNs,
                 GeometryResetFieldLengthThresholdMm = activeProfile.Engine.GeometryResetFieldLengthThresholdMm,
                 GeometryResetFieldWidthThresholdMm = activeProfile.Engine.GeometryResetFieldWidthThresholdMm,
-                RobotTracker = ResolveRobotTracker(activeProfile.RobotTracker, options.RuntimeOverrides.RobotTracker),
-                BallTracker = ResolveBallTracker(activeProfile.BallTracker, options.RuntimeOverrides.BallTracker),
-                KickDetector = ResolveKickDetector(activeProfile.KickDetector, options.RuntimeOverrides.KickDetector),
+                RobotTracker = ResolveRobotTracker(activeProfile.RobotTracker, effectiveRuntimeOverrides.RobotTracker),
+                BallTracker = ResolveBallTracker(activeProfile.BallTracker, effectiveRuntimeOverrides.BallTracker),
+                KickDetector = ResolveKickDetector(activeProfile.KickDetector, effectiveRuntimeOverrides.KickDetector),
             },
             PublisherOptions = new TrackerPublisherOptions
             {
                 PublishUdp = options.PublishUdp,
-                MulticastAddress = options.RuntimeOverrides.Publish.MulticastAddress ?? activeProfile.Publish.MulticastAddress,
-                Port = options.RuntimeOverrides.Publish.Port ?? activeProfile.Publish.Port,
-                SourceName = options.RuntimeOverrides.Publish.SourceName ?? options.SourceName,
-                Uuid = options.RuntimeOverrides.Publish.Uuid ?? options.Uuid,
+                MulticastAddress = effectiveRuntimeOverrides.Publish.MulticastAddress ?? activeProfile.Publish.MulticastAddress,
+                Port = effectiveRuntimeOverrides.Publish.Port ?? activeProfile.Publish.Port,
+                SourceName = effectiveRuntimeOverrides.Publish.SourceName ?? options.SourceName,
+                Uuid = effectiveRuntimeOverrides.Publish.Uuid ?? options.Uuid,
             },
         };
     }

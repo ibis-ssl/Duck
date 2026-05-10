@@ -24,6 +24,7 @@ builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
     return new TrackerPacketGenerator(resolved.PublisherOptions.SourceName, resolved.PublisherOptions.Uuid);
 });
 builder.Services.AddSingleton<TrackerCoordinator>();
+builder.Services.AddSingleton<TrackerProfileRequestService>();
 builder.Services.AddSingleton<VisionPacketStore>();
 builder.Services.AddHostedService<VisionReceiverService>();
 
@@ -44,5 +45,12 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+app.MapPost(
+    "/api/tracker/profile-switch/{profileName}",
+    (string profileName, TrackerProfileRequestService profileRequestService) =>
+    {
+        profileRequestService.RequestProfileSwitch(profileName);
+        return Results.Accepted($"/api/tracker/profile-switch/{profileName}");
+    });
 
 app.Run();
