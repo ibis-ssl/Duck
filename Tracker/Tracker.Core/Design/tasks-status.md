@@ -4,19 +4,19 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-027
-- Title: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する
+- ID: TRACKER-028
+- Title: capture 1680 付近の複数 ball 再発を解析して修正する
 - Phase: engine
 - Status: done
 - Size: small
-- Dependencies: TRACKER-026 が完了し、再現ログ解析が記録されていること
+- Dependencies: TRACKER-027 が完了し、対象 diagnostics log と capture replay tooling が利用できること
 - Exit Criteria:
-  - raw detection に Y1/Y11 のような同一 camera / team / 近接別 ID robot が入っても、低 ID / 高 confidence 側だけが tracked output へ採用される
-  - 短命 secondary ball ghost が 1 frame の raw detection だけで tracked output に増えない
-  - genuine な複数 ball は継続観測後に stable sort で出力できる
-  - 再現ログ解析と Tigers 差分が `reports/tracker-026-reproduction-analysis-20260510160509.md` に記録されている
-  - 実装・検証結果が `reports/tracker-027-evidence-20260510161437.md` に記録されている
-  - review / re-review 結果が `reports/tracker-027-review-20260510161549.md` に記録され、blocking finding が残っていない
+  - `ssl-vision-packets-20260510T111704742Z-846c2d1a382549cfb13cca520eb7f7cb.tracker-diagnostics.log` の trackedFrame 1680 付近で複数 ball になる原因が report に記録されている
+  - 同じ近接 raw ball が camera 間または短時間の track 分岐で secondary ball として出続ける再発ケースを回帰テストで固定する
+  - genuine な複数 ball の継続観測出力は維持する
+  - 指定 capture または同等の replay 証跡で trackedFrame 1680 付近の複数 ball 再発が抑制される
+  - 実装・検証結果が `reports/tracker-028-evidence-20260510215726.md` に記録されている
+  - review 結果が `reports/tracker-028-review-20260510215726.md` に記録され、blocking finding が残っていない
 
 ## 次の調査タスク
 
@@ -64,3 +64,4 @@
 | TRACKER-025 | Tracked 表示へ低 visibility の stale object を出さない | engine | done | TRACKER-024 | 欠測で十分 decayed した robot / ball track が `TrackerFrame` に出力されず、1 frame 程度の短期欠測を残す既存契約は維持される。設定差分は `reports/tracker-025-tigers-config-diff-20260510153510.md`、review は `reports/tracker-025-review-20260510154020.md` に記録済み。 |
 | TRACKER-026 | Tracked 表示の raw/tracked diagnostics log を追加する | investigation | done | TRACKER-025 | raw SSL-Vision detection と tracked 出力を同じログで比較でき、誤検出の発生源を切り分けられる。`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` は 0 warning / 0 error。 |
 | TRACKER-027 | Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する | engine | done | TRACKER-026 | 近接別 ID robot を raw detection 単位で抑制し、短命 secondary ball ghost を 1 frame で出力しない。継続観測された genuine な複数 ball は stable sort で出力できる。実装・検証は `reports/tracker-027-evidence-20260510161437.md`、review は `reports/tracker-027-review-20260510161549.md` に記録済み。 |
+| TRACKER-028 | capture 1680 付近の複数 ball 再発を解析して修正する | engine | done | TRACKER-027 | 指定 diagnostics log の trackedFrame 1680 付近で複数 ball になる原因を記録し、成長済み secondary ball が fresh observation を失った後に出続けないよう修正した。実装・検証は `reports/tracker-028-evidence-20260510215726.md`、review は `reports/tracker-028-review-20260510215726.md` に記録済み。 |

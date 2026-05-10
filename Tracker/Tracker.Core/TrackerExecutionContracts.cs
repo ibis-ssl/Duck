@@ -231,7 +231,9 @@ public sealed class TrackerEngine : ITrackerEngine
         for (var index = 0; index < ballCandidates.Count; index++)
         {
             var ballCandidate = ballCandidates[index];
-            if (index > 0 && ballCandidate.MergedBall.ObservationCount < BallGrownUpObservationCount)
+            if (index > 0
+                && (!ballCandidate.MergedBall.HasFreshObservation
+                    || ballCandidate.MergedBall.ObservationCount < BallGrownUpObservationCount))
             {
                 continue;
             }

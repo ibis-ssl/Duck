@@ -1304,6 +1304,43 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_DoesNotEmitStaleGrownUpSecondaryBall()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        // 成長済み secondary ball でも、fresh observation を失った後は外部出力しないことを確認する。
+        TrackerUpdateResult result = new();
+        for (var frameIndex = 0; frameIndex < 3; frameIndex++)
+        {
+            result = engine.Update(
+                packet: TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: (uint)(10 + frameIndex),
+                    cameraId: 1,
+                    balls:
+                    [
+                        TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
+                        TrackerContractTestData.CreateBall(x: 300, y: 0, confidence: 1.0f),
+                    ],
+                    captureTimeSeconds: 1.000 + (frameIndex * 0.100)),
+                settings: settings);
+        }
+
+        Assert.Equal(2, Assert.Single(result.CommittedFrames).Balls.Count);
+
+        var staleResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.300),
+            settings: settings);
+
+        var ball = Assert.Single(Assert.Single(staleResult.CommittedFrames).Balls);
+        Assert.Equal(0, ball.XMm, precision: 3);
+    }
+
+    [Fact]
     public void Update_UsesConfiguredBallVisibilityHalfLifeWhenPredictingTrack()
     {
         var engine = fixture.CreateEngine();
