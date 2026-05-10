@@ -1,5 +1,6 @@
 @page "/diagnostics"
 @using System.Globalization
+@using System.Text.Json
 @using Tracker.Core
 @using Tracker.Server.Components.Vision
 @using Tracker.Server.Tracking
@@ -61,9 +62,9 @@
                             class="@TimelineItemClass(entry)"
                             @onclick="@(() => SelectEntry(entry))">
                         <span class="diagnostics-timeline__time">@FormatTime(entry.Timestamp)</span>
-                        <span class="diagnostics-timeline__frame">tracked @entry.TrackedFrame</span>
+                        <span class="diagnostics-timeline__frame">output frame @entry.TrackedFrame</span>
                         <span class="diagnostics-timeline__counts">
-                            raw @entry.RawBallCount / tracked @entry.TrackedBallCount
+                            vision balls @entry.RawBallCount / output @entry.TrackedBallCount
                         </span>
                     </button>
                 }
@@ -91,18 +92,42 @@
                         </div>
                     </div>
 
+                    @if (profileMetadata is not null)
+                    {
+                        <details class="diagnostics-profile">
+                            <summary>
+                                <span>Profile settings</span>
+                                <strong>@profileMetadata.ProfileName</strong>
+                            </summary>
+                            <div class="diagnostics-profile__grid">
+                                <section>
+                                    <h2>Configured profile</h2>
+                                    <pre>@profileMetadata.ConfiguredProfileJson</pre>
+                                </section>
+                                <section>
+                                    <h2>Resolved settings</h2>
+                                    <pre>@profileMetadata.ResolvedSettingsJson</pre>
+                                </section>
+                            </div>
+                        </details>
+                    }
+                    else if (!string.IsNullOrEmpty(profileMetadataError))
+                    {
+                        <div class="diagnostics-profile-alert">@profileMetadataError</div>
+                    }
+
                     @if (selectedRenderSnapshot is not null)
                     {
                         <div class="diagnostics-render">
                             <section>
-                                <h2>Raw Field</h2>
+                                <h2>Vision Input Field</h2>
                                 <VisionFieldCanvas Geometry="CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot)"
                                                    Balls="CreateRawBalls(selectedRenderSnapshot.Frame)"
                                                    RobotsYellow="CreateRawYellowRobots(selectedRenderSnapshot.Frame)"
                                                    RobotsBlue="CreateRawBlueRobots(selectedRenderSnapshot.Frame)" />
                             </section>
                             <section>
-                                <h2>Tracked Field</h2>
+                                <h2>Tracker Output Field</h2>
                                 <VisionFieldCanvas Geometry="trackedRenderView.Geometry"
                                                    Balls="trackedRenderView.Balls"
                                                    RobotsYellow="trackedRenderView.RobotsYellow"
@@ -117,13 +142,13 @@
 
                     <div class="diagnostics-detail__columns">
                         <section>
-                            <h2>Raw</h2>
+                            <h2>Vision Input</h2>
                             <dl class="diagnostics-inline-stats">
-                                <dt>Frame</dt>
+                                <dt>Vision frames</dt>
                                 <dd>@Display(selectedEntry.RawFrame)</dd>
-                                <dt>Camera</dt>
+                                <dt>Cameras</dt>
                                 <dd>@Display(selectedEntry.RawCamera)</dd>
-                                <dt>Balls</dt>
+                                <dt>Detected balls</dt>
                                 <dd>@selectedEntry.RawBallCount</dd>
                             </dl>
                             <pre>@Display(selectedEntry.RawBallDetails)</pre>
@@ -134,13 +159,13 @@
                         </section>
 
                         <section>
-                            <h2>Tracked</h2>
+                            <h2>Tracker Output</h2>
                             <dl class="diagnostics-inline-stats">
-                                <dt>Frame</dt>
+                                <dt>Output frame</dt>
                                 <dd>@Display(selectedEntry.TrackedFrame)</dd>
-                                <dt>Balls</dt>
+                                <dt>Tracked balls</dt>
                                 <dd>@selectedEntry.TrackedBallCount</dd>
-                                <dt>Robots</dt>
+                                <dt>Tracked robots</dt>
                                 <dd>@selectedEntry.TrackedRobotCount</dd>
                             </dl>
                             <pre>@Display(selectedEntry.TrackedBallDetails)</pre>
@@ -181,6 +206,16 @@
     private IReadOnlyDictionary<uint, TrackerRenderSnapshotView> renderSnapshotsByFrame =
         new Dictionary<uint, TrackerRenderSnapshotView>();
     private string? renderSnapshotError;
+    private IReadOnlyDictionary<string, string> configuredProfilesByName =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    private string? activeProfileNameFromMetadata;
+    private string? resolvedSettingsJson;
+    private CaptureProfileMetadataView? profileMetadata;
+    private string? profileMetadataError;
+    private static readonly JsonSerializerOptions MetadataJsonOptions = new()
+    {
+        WriteIndented = true,
+    };
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
 
     private int SelectedEntryIndex => selectedEntry is null
@@ -237,12 +272,19 @@
             selectedRenderSnapshot = null;
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
+            configuredProfilesByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            activeProfileNameFromMetadata = null;
+            resolvedSettingsJson = null;
+            profileMetadata = null;
+            profileMetadataError = null;
             return;
         }
 
         snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
+        LoadProfileMetadataIndex();
+        UpdateProfileMetadataForSelectedEntry();
         LoadRenderSnapshotIndex();
         LoadSelectedRenderSnapshot();
     }
@@ -250,6 +292,7 @@
     private void SelectEntry(TrackerDiagnosticsLogEntry entry)
     {
         selectedEntry = entry;
+        UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
     }
 
@@ -271,10 +314,12 @@
             selectedRenderSnapshot = null;
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
+            profileMetadata = null;
             return;
         }
 
         selectedEntry = entries[Math.Clamp(index, 0, entries.Count - 1)];
+        UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
     }
 
@@ -346,6 +391,77 @@
         renderSnapshotError = $"Render snapshot for tracked frame '{selectedEntry.TrackedFrame}' was not found.";
     }
 
+    private void LoadProfileMetadataIndex()
+    {
+        configuredProfilesByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        activeProfileNameFromMetadata = null;
+        resolvedSettingsJson = null;
+        profileMetadata = null;
+        profileMetadataError = null;
+
+        if (selectedLogPath is null)
+        {
+            return;
+        }
+
+        var metadataPath = ResolveMetadataPath(selectedLogPath);
+        if (metadataPath is null)
+        {
+            profileMetadataError = "Capture metadata is available only for capture sidecar diagnostics logs.";
+            return;
+        }
+
+        if (!File.Exists(metadataPath))
+        {
+            profileMetadataError = "Capture metadata file was not found for this diagnostics log.";
+            return;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(metadataPath));
+            var root = document.RootElement;
+            var trackerOptions = root.GetProperty("TrackerOptions");
+            activeProfileNameFromMetadata = trackerOptions.GetProperty("ActiveProfileName").GetString();
+            configuredProfilesByName = trackerOptions
+                .GetProperty("Profiles")
+                .EnumerateObject()
+                .ToDictionary(
+                    property => property.Name,
+                    property => FormatJson(property.Value),
+                    StringComparer.OrdinalIgnoreCase);
+            resolvedSettingsJson = root.TryGetProperty("ResolvedTrackerOptions", out var resolvedElement)
+                ? FormatJson(resolvedElement)
+                : "Resolved settings were not found in metadata.";
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or KeyNotFoundException or InvalidOperationException)
+        {
+            profileMetadataError = $"Capture metadata could not be read: {ex.Message}";
+        }
+    }
+
+    private void UpdateProfileMetadataForSelectedEntry()
+    {
+        profileMetadata = null;
+
+        if (!string.IsNullOrEmpty(profileMetadataError) || selectedEntry is null)
+        {
+            return;
+        }
+
+        var profileName = string.IsNullOrWhiteSpace(selectedEntry.ProfileName)
+            ? activeProfileNameFromMetadata ?? "-"
+            : selectedEntry.ProfileName;
+        var configuredProfile = configuredProfilesByName.TryGetValue(profileName, out var profileJson)
+            ? profileJson
+            : $"Profile '{profileName}' was not found in metadata.";
+
+        profileMetadata = new CaptureProfileMetadataView(
+            profileName,
+            configuredProfile,
+            resolvedSettingsJson ?? "Resolved settings were not found in metadata.");
+    }
+
     private void LoadRenderSnapshotIndex()
     {
         renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
@@ -364,6 +480,21 @@
         }
 
         renderSnapshotsByFrame = result.Index.SnapshotsByFrame;
+    }
+
+    private static string? ResolveMetadataPath(string diagnosticsLogPath)
+    {
+        const string diagnosticsSuffix = ".tracker-diagnostics.log";
+        const string metadataSuffix = ".metadata.json";
+
+        return diagnosticsLogPath.EndsWith(diagnosticsSuffix, StringComparison.Ordinal)
+            ? string.Concat(diagnosticsLogPath.AsSpan(0, diagnosticsLogPath.Length - diagnosticsSuffix.Length), metadataSuffix)
+            : null;
+    }
+
+    private static string FormatJson(JsonElement element)
+    {
+        return JsonSerializer.Serialize(element, MetadataJsonOptions);
     }
 
     private static SSL_GeometryData? CreateGeometry(TrackerGeometrySnapshot? geometrySnapshot)
@@ -408,4 +539,9 @@
             .SelectMany(detection => detection.RobotsBlue)
             .ToArray();
     }
+
+    private sealed record CaptureProfileMetadataView(
+        string ProfileName,
+        string ConfiguredProfileJson,
+        string ResolvedSettingsJson);
 }

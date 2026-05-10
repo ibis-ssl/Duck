@@ -141,7 +141,7 @@
     appearance: none;
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(6.6rem, auto) minmax(5.4rem, auto) minmax(0, 1fr);
+    grid-template-columns: minmax(5.8rem, auto) minmax(6.6rem, auto) minmax(0, 1fr);
     align-items: center;
     gap: 0.35rem;
     border: 1px solid transparent;
@@ -227,6 +227,46 @@
     color: #d7ebff;
     padding: 0.75rem 1rem;
     margin-bottom: 0.75rem;
+}
+
+.diagnostics-profile,
+.diagnostics-profile-alert {
+    margin-bottom: 0.35rem;
+}
+
+.diagnostics-profile {
+    border: 1px solid #315235;
+    border-radius: 6px;
+    background: #0c1d13;
+}
+
+.diagnostics-profile summary {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.32rem 0.5rem;
+    color: #c5d7c2;
+    cursor: pointer;
+    font-size: 0.76rem;
+}
+
+.diagnostics-profile summary strong {
+    color: #f3f8ef;
+}
+
+.diagnostics-profile__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    padding: 0 0.5rem 0.5rem;
+}
+
+.diagnostics-profile-alert {
+    border-left: 4px solid #7ab7ff;
+    background: #152b3c;
+    color: #d7ebff;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.78rem;
 }
 
 .diagnostics-detail__columns section {
@@ -320,6 +360,10 @@
     max-height: 3.1rem;
 }
 
+.diagnostics-shell--render .diagnostics-profile pre {
+    max-height: 8rem;
+}
+
 @media (max-width: 1100px) {
     .diagnostics-shell {
         height: calc(100dvh - 1rem);
@@ -344,6 +388,10 @@
     }
 
     .diagnostics-detail__columns {
+        grid-template-columns: 1fr;
+    }
+
+    .diagnostics-profile__grid {
         grid-template-columns: 1fr;
     }
 
