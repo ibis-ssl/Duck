@@ -81,7 +81,7 @@
         }
         else
         {
-            <VisionFieldCanvas Geometry="trackedView.Geometry"
+            <VisionFieldCanvas Geometry="ResolveTrackedGeometry(rawSnapshot, trackedView)"
                                Balls="trackedView.Balls"
                                RobotsYellow="trackedView.RobotsYellow"
                                RobotsBlue="trackedView.RobotsBlue" />
@@ -180,6 +180,13 @@
         {
             WriteIndented = true,
         });
+    }
+
+    private static SSL_GeometryData? ResolveTrackedGeometry(
+        VisionPacketSnapshot rawSnapshot,
+        TrackedVisionViewState trackedView)
+    {
+        return rawSnapshot.Geometry ?? trackedView.Geometry;
     }
 
     private Task SelectView(string key)
