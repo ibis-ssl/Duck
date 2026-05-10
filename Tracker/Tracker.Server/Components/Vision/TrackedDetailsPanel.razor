@@ -1,0 +1,133 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Rendering
+
+<aside class="details-panel">
+    <div class="details-panel__meta">
+        <div>
+            <span>View</span>
+            <strong>Tracked</strong>
+        </div>
+        <div>
+            <span>Frame</span>
+            <strong>@ViewState.FrameLabel</strong>
+        </div>
+        <div>
+            <span>Profile</span>
+            <strong>@ViewState.ProfileName</strong>
+        </div>
+        <div>
+            <span>Received</span>
+            <strong>@FormatTimestamp(ViewState.ReceivedAt)</strong>
+        </div>
+        <div>
+            <span>Publish OK</span>
+            <strong>@ViewState.PublishSuccessCount.ToString(CultureInfo.InvariantCulture)</strong>
+        </div>
+        <div>
+            <span>Publish Fail</span>
+            <strong>@ViewState.PublishFailureCount.ToString(CultureInfo.InvariantCulture)</strong>
+        </div>
+    </div>
+
+    <div class="details-panel__body">
+        @if (!ViewState.HasFrame)
+        {
+            <div class="tracked-details-panel__empty">
+                No tracked frame
+            </div>
+        }
+        else
+        {
+            <section class="tracked-details-panel__section">
+                <h3>Balls</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Z</th>
+                            <th>Conf</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (var index = 0; index < ViewState.Balls.Count; index++)
+                        {
+                            var ball = ViewState.Balls[index];
+                            <tr>
+                                <td>@(index == 0 ? "Primary" : "Secondary")</td>
+                                <td>@N(ball.X)</td>
+                                <td>@N(ball.Y)</td>
+                                <td>@N(ball.Z)</td>
+                                <td>@N(ball.Confidence)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="tracked-details-panel__section">
+                <h3>Yellow Robots</h3>
+                @RobotTable(ViewState.RobotsYellow)
+            </section>
+
+            <section class="tracked-details-panel__section">
+                <h3>Blue Robots</h3>
+                @RobotTable(ViewState.RobotsBlue)
+            </section>
+        }
+    </div>
+</aside>
+
+@code {
+    [Parameter, EditorRequired]
+    public TrackedVisionViewState ViewState { get; set; } = default!;
+
+    private static string FormatTimestamp(DateTimeOffset? timestamp)
+    {
+        return timestamp?.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string N(float value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private static RenderFragment RobotTable(IEnumerable<SSL_DetectionRobot> robots) => builder =>
+    {
+        var rows = robots.ToArray();
+        var sequence = 0;
+
+        builder.OpenElement(sequence++, "table");
+        builder.AddMarkupContent(sequence++, "<thead><tr><th>ID</th><th>Conf</th><th>X</th><th>Y</th><th>Ori</th></tr></thead>");
+        builder.OpenElement(sequence++, "tbody");
+
+        if (rows.Length == 0)
+        {
+            builder.AddMarkupContent(sequence++, "<tr><td colspan=\"5\">No robots</td></tr>");
+        }
+        else
+        {
+            foreach (var robot in rows)
+            {
+                builder.OpenElement(sequence++, "tr");
+                AddCell(builder, ref sequence, robot.RobotId.ToString(CultureInfo.InvariantCulture));
+                AddCell(builder, ref sequence, N(robot.Confidence));
+                AddCell(builder, ref sequence, N(robot.X));
+                AddCell(builder, ref sequence, N(robot.Y));
+                AddCell(builder, ref sequence, N(robot.Orientation));
+                builder.CloseElement();
+            }
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private static void AddCell(RenderTreeBuilder builder, ref int sequence, string value)
+    {
+        builder.OpenElement(sequence++, "td");
+        builder.AddContent(sequence++, value);
+        builder.CloseElement();
+    }
+}

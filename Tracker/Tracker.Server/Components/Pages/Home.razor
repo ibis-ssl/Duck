@@ -2,8 +2,10 @@
 @using System.Globalization
 @using System.Text.Json
 @using Google.Protobuf
+@using Tracker.Server.Tracking
 @using Tracker.Server.Vision
 @inject VisionPacketStore Store
+@inject TrackedSnapshotStore TrackedStore
 @implements IAsyncDisposable
 
 <PageTitle>Tracker.Server</PageTitle>
@@ -13,67 +15,92 @@
         <div class="vision-status">
             <div>
                 <span>Packets</span>
-                <strong>@snapshot.PacketCount</strong>
+                <strong>@rawSnapshot.PacketCount</strong>
             </div>
             <div>
                 <span>Errors</span>
-                <strong>@snapshot.ErrorCount</strong>
+                <strong>@rawSnapshot.ErrorCount</strong>
             </div>
             <div>
                 <span>Remote</span>
-                <strong>@(snapshot.RemoteEndpoint ?? "-")</strong>
+                <strong>@(rawSnapshot.RemoteEndpoint ?? "-")</strong>
             </div>
             <div>
                 <span>Received</span>
-                <strong>@FormatTimestamp(snapshot.ReceivedAt)</strong>
+                <strong>@FormatTimestamp(CurrentReceivedAt)</strong>
             </div>
+        </div>
+        <div class="vision-mode-toggle" role="tablist" aria-label="Viewer mode selector">
+            <button type="button"
+                    class="@ModeButtonClass(ViewerMode.Raw)"
+                    @onclick="@(() => SelectMode(ViewerMode.Raw))">
+                Raw
+            </button>
+            <button type="button"
+                    class="@ModeButtonClass(ViewerMode.Tracked)"
+                    @onclick="@(() => SelectMode(ViewerMode.Tracked))">
+                Tracked
+            </button>
         </div>
     </header>
 
-    @if (snapshot.LastError is not null)
+    @if (rawSnapshot.LastError is not null)
     {
-        <div class="vision-alert">@snapshot.LastError</div>
+        <div class="vision-alert">@rawSnapshot.LastError</div>
     }
 
     @{
-        var selectedView = ResolveSelectedView(snapshot);
-        var balls = selectedView.Balls;
-        var yellowRobots = selectedView.RobotsYellow;
-        var blueRobots = selectedView.RobotsBlue;
+        var selectedView = ResolveSelectedView(rawSnapshot);
+        var trackedView = TrackedVisionViewState.FromSnapshot(trackedSnapshot);
     }
 
     <div class="vision-grid">
-        <VisionFieldCanvas Geometry="snapshot.Geometry"
-                           Balls="balls"
-                           RobotsYellow="yellowRobots"
-                           RobotsBlue="blueRobots" />
+        @if (viewerMode == ViewerMode.Raw)
+        {
+            <VisionFieldCanvas Geometry="rawSnapshot.Geometry"
+                               Balls="selectedView.Balls"
+                               RobotsYellow="selectedView.RobotsYellow"
+                               RobotsBlue="selectedView.RobotsBlue" />
 
-        <VisionDetailsPanel ViewLabel="selectedView.Label"
-                            FrameLabel="selectedView.FrameLabel"
-                            CameraLabel="selectedView.CameraLabel"
-                            SourceLabel="selectedView.SourceLabel"
-                            RawJson="selectedView.RawJson"
-                            Cameras="snapshot.Cameras"
-                            SelectedViewKey="selectedViewKey"
-                            OnSelectView="SelectView"
-                            Geometry="snapshot.Geometry"
-                            Balls="balls"
-                            RobotsYellow="yellowRobots"
-                            RobotsBlue="blueRobots" />
+            <VisionDetailsPanel ViewLabel="selectedView.Label"
+                                FrameLabel="selectedView.FrameLabel"
+                                CameraLabel="selectedView.CameraLabel"
+                                SourceLabel="selectedView.SourceLabel"
+                                RawJson="selectedView.RawJson"
+                                Cameras="rawSnapshot.Cameras"
+                                SelectedViewKey="selectedViewKey"
+                                OnSelectView="SelectView"
+                                Geometry="rawSnapshot.Geometry"
+                                Balls="selectedView.Balls"
+                                RobotsYellow="selectedView.RobotsYellow"
+                                RobotsBlue="selectedView.RobotsBlue" />
+        }
+        else
+        {
+            <VisionFieldCanvas Geometry="trackedView.Geometry"
+                               Balls="trackedView.Balls"
+                               RobotsYellow="trackedView.RobotsYellow"
+                               RobotsBlue="trackedView.RobotsBlue" />
+
+            <TrackedDetailsPanel ViewState="trackedView" />
+        }
     </div>
 </section>
 
 @code {
     private const string AggregateViewKey = "aggregate";
     private readonly CancellationTokenSource disposalTokenSource = new();
-    private VisionPacketSnapshot snapshot = VisionPacketSnapshot.Empty;
+    private VisionPacketSnapshot rawSnapshot = VisionPacketSnapshot.Empty;
+    private TrackedSnapshot trackedSnapshot = new(null, null, "default", 0, 0);
     private Task? refreshTask;
     private string selectedViewKey = AggregateViewKey;
+    private ViewerMode viewerMode = ViewerMode.Raw;
 
     protected override void OnInitialized()
     {
-        snapshot = Store.GetSnapshot();
-        EnsureSelectedViewExists(snapshot);
+        rawSnapshot = Store.GetSnapshot();
+        trackedSnapshot = TrackedStore.GetSnapshot();
+        EnsureSelectedViewExists(rawSnapshot);
         refreshTask = RefreshAsync(disposalTokenSource.Token);
     }
 
@@ -83,11 +110,16 @@
 
         while (await timer.WaitForNextTickAsync(cancellationToken))
         {
-            snapshot = Store.GetSnapshot();
-            EnsureSelectedViewExists(snapshot);
+            rawSnapshot = Store.GetSnapshot();
+            trackedSnapshot = TrackedStore.GetSnapshot();
+            EnsureSelectedViewExists(rawSnapshot);
             await InvokeAsync(StateHasChanged);
         }
     }
+
+    private DateTimeOffset? CurrentReceivedAt => viewerMode == ViewerMode.Tracked
+        ? trackedSnapshot.ReceivedAt
+        : rawSnapshot.ReceivedAt;
 
     private static string FormatTimestamp(DateTimeOffset? timestamp)
     {
@@ -147,6 +179,12 @@
     private Task SelectView(string key)
     {
         selectedViewKey = key;
+        return Task.CompletedTask;
+    }
+
+    private Task SelectMode(ViewerMode mode)
+    {
+        viewerMode = mode;
         return Task.CompletedTask;
     }
 
@@ -233,6 +271,17 @@
         IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
         IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
         string RawJson);
+
+    private string ModeButtonClass(ViewerMode mode)
+    {
+        return viewerMode == mode ? "vision-mode-toggle__button is-active" : "vision-mode-toggle__button";
+    }
+
+    private enum ViewerMode
+    {
+        Raw,
+        Tracked,
+    }
 
     public async ValueTask DisposeAsync()
     {

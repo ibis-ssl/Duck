@@ -105,6 +105,24 @@
     overflow: auto;
 }
 
+.tracked-details-panel__empty {
+    padding: 1rem;
+    color: #dce8d4;
+}
+
+.tracked-details-panel__section + .tracked-details-panel__section {
+    border-top: 1px solid #28432c;
+}
+
+.tracked-details-panel__section h3 {
+    margin: 0;
+    padding: 0.85rem 0.9rem 0.35rem;
+    color: #9db49f;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
 .details-panel__json {
     min-height: 100%;
     margin: 0;
