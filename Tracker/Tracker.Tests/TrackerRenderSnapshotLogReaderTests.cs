@@ -51,6 +51,47 @@ public class TrackerRenderSnapshotLogReaderTests
     }
 
     [Fact]
+    public void ReadIndex_ReturnsSnapshotsByFrameForRepeatedScrubbing()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(captureDirectory);
+        var diagnosticsLogPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.tracker-diagnostics.log");
+        var renderSnapshotPath = Path.Combine(captureDirectory, "ssl-vision-packets-test.render-snapshots.jsonl.gz");
+
+        try
+        {
+            File.WriteAllText(diagnosticsLogPath, "");
+            WriteRenderSnapshots(
+                renderSnapshotPath,
+                new TrackerRenderSnapshotRecord(
+                    SchemaVersion: 1,
+                    ReceivedAt: new DateTimeOffset(2026, 5, 10, 20, 0, 0, TimeSpan.Zero),
+                    Frame: CreateFrame(frameNumber: 41)),
+                new TrackerRenderSnapshotRecord(
+                    SchemaVersion: 1,
+                    ReceivedAt: new DateTimeOffset(2026, 5, 10, 20, 0, 1, TimeSpan.Zero),
+                    Frame: CreateFrame(frameNumber: 42)));
+            var reader = CreateReader(captureDirectory);
+
+            var firstResult = reader.ReadIndex(diagnosticsLogPath);
+            var secondResult = reader.ReadIndex(diagnosticsLogPath);
+
+            Assert.Null(firstResult.Error);
+            Assert.NotNull(firstResult.Index);
+            Assert.Same(firstResult.Index, secondResult.Index);
+            Assert.Equal((uint)41, firstResult.Index.SnapshotsByFrame[41].Frame.FrameNumber);
+            Assert.Equal((uint)42, firstResult.Index.SnapshotsByFrame[42].Frame.FrameNumber);
+        }
+        finally
+        {
+            if (Directory.Exists(captureDirectory))
+            {
+                Directory.Delete(captureDirectory, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public void ReadFrame_RejectsDiagnosticsLogOutsideList()
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-render-snapshot-{Guid.NewGuid():N}");
@@ -150,7 +191,18 @@ public class TrackerRenderSnapshotLogReaderTests
 
     private static void WriteRenderSnapshot(string path, TrackerRenderSnapshotRecord record)
     {
-        WriteRenderSnapshotLine(path, JsonSerializer.Serialize(record, JsonOptions));
+        WriteRenderSnapshots(path, record);
+    }
+
+    private static void WriteRenderSnapshots(string path, params TrackerRenderSnapshotRecord[] records)
+    {
+        using var fileStream = File.Create(path);
+        using var gzipStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
+        using var writer = new StreamWriter(gzipStream);
+        foreach (var record in records)
+        {
+            writer.WriteLine(JsonSerializer.Serialize(record, JsonOptions));
+        }
     }
 
     private static void WriteRenderSnapshotLine(string path, string line)

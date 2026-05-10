@@ -78,6 +78,7 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 ### `Diagnostics` ページ
 
 - `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の capture sidecar `*.tracker-diagnostics.log`、default `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
+- 上部の timeline scrubber をドラッグすると、選択 frame が連続的に切り替わります
 - 左側の timeline でログ行を時系列にスクロールできます
 - capture sidecar と同じ basename の `*.render-snapshots.jsonl.gz` がある場合は、選択行の raw / tracked field を描画できます
 - 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
@@ -128,14 +129,14 @@ capture を開始すると、同じ basename で次の sidecar も作成しま�
 | `FilePrefix` | capture file 名の prefix です。実際の file 名は `<prefix>-<timestamp>-<guid>.jsonl.gz` になります。 |
 | `FlushEachPacket` | `true` なら packet ごとに flush します。異常終了時の欠落は減りますが、I/O cost は上がります。 |
 
-現在の `appsettings.json` では無効です。
+現在の `appsettings.json` では、起動時 capture は無効ですが、画面で `Capture On` にした後は packet ごとに flush します。
 
 ```json
 "PacketCapture": {
   "Enabled": false,
   "DirectoryPath": "packet-captures",
   "FilePrefix": "ssl-vision-packets",
-  "FlushEachPacket": false
+  "FlushEachPacket": true
 }
 ```
 
@@ -231,6 +232,20 @@ tracker の調査用診断ログ設定です。diagnostics log は常に出力�
   "FilePath": null
 }
 ```
+
+console に出る tracker diagnostics の structured log は `Logging:LogLevel` で抑制します。ファイル出力はこの設定とは別に継続します。
+
+```json
+"Logging": {
+  "LogLevel": {
+    "Default": "Information",
+    "Microsoft.AspNetCore": "Warning",
+    "Tracker.Server.Tracking.TrackerCoordinator": "Warning"
+  }
+}
+```
+
+全体の `Information` log も止めたい場合は `Default` を `Warning` にします。
 
 ### `Tracker:RuntimeOverrides`
 

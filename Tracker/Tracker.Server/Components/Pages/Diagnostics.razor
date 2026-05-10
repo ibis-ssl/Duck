@@ -8,7 +8,7 @@
 
 <PageTitle>Diagnostics</PageTitle>
 
-<section class="diagnostics-shell">
+<section class="@ShellClass()">
     <header class="diagnostics-header">
         <div class="diagnostics-status">
             <div>
@@ -42,6 +42,23 @@
             <button type="button" class="diagnostics-button" @onclick="ReloadAsync">Reload</button>
         </div>
     </header>
+
+    @if (entries.Count > 0)
+    {
+        <div class="diagnostics-scrubber">
+            <input type="range"
+                   class="diagnostics-scrubber__range"
+                   min="0"
+                   max="@MaxEntryIndex"
+                   value="@SelectedEntryIndex"
+                   @oninput="OnTimelineScrubbed"
+                   aria-label="Diagnostics timeline scrubber" />
+            <div class="diagnostics-scrubber__meta">
+                <span>@(SelectedEntryIndex + 1) / @entries.Count</span>
+                <span>@(selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp))</span>
+            </div>
+        </div>
+    }
 
     @if (!string.IsNullOrEmpty(snapshot?.Error))
     {
@@ -161,7 +178,14 @@
     private string? selectedLogPath;
     private TrackerDiagnosticsLogEntry? selectedEntry;
     private TrackerRenderSnapshotView? selectedRenderSnapshot;
+    private IReadOnlyDictionary<uint, TrackerRenderSnapshotView> renderSnapshotsByFrame =
+        new Dictionary<uint, TrackerRenderSnapshotView>();
     private string? renderSnapshotError;
+    private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
+
+    private int SelectedEntryIndex => selectedEntry is null
+        ? 0
+        : FindEntryIndex(selectedEntry);
 
     private TrackedVisionViewState trackedRenderView =>
         selectedRenderSnapshot is null
@@ -211,6 +235,7 @@
             entries = [];
             selectedEntry = null;
             selectedRenderSnapshot = null;
+            renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
             return;
         }
@@ -218,6 +243,7 @@
         snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
+        LoadRenderSnapshotIndex();
         LoadSelectedRenderSnapshot();
     }
 
@@ -225,6 +251,51 @@
     {
         selectedEntry = entry;
         LoadSelectedRenderSnapshot();
+    }
+
+    private void OnTimelineScrubbed(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), CultureInfo.InvariantCulture, out var index))
+        {
+            return;
+        }
+
+        SelectEntryByIndex(index);
+    }
+
+    private void SelectEntryByIndex(int index)
+    {
+        if (entries.Count == 0)
+        {
+            selectedEntry = null;
+            selectedRenderSnapshot = null;
+            renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
+            renderSnapshotError = null;
+            return;
+        }
+
+        selectedEntry = entries[Math.Clamp(index, 0, entries.Count - 1)];
+        LoadSelectedRenderSnapshot();
+    }
+
+    private int FindEntryIndex(TrackerDiagnosticsLogEntry entry)
+    {
+        for (var index = 0; index < entries.Count; index++)
+        {
+            if (ReferenceEquals(entries[index], entry))
+            {
+                return index;
+            }
+        }
+
+        return 0;
+    }
+
+    private string ShellClass()
+    {
+        return selectedRenderSnapshot is null
+            ? "diagnostics-shell"
+            : "diagnostics-shell diagnostics-shell--render";
     }
 
     private string TimelineItemClass(TrackerDiagnosticsLogEntry entry)
@@ -257,9 +328,42 @@
             return;
         }
 
-        var result = RenderSnapshotReader.ReadFrame(selectedLogPath, selectedEntry.TrackedFrame);
-        selectedRenderSnapshot = result.Snapshot;
-        renderSnapshotError = result.Error;
+        if (!uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var frameNumber))
+        {
+            selectedRenderSnapshot = null;
+            renderSnapshotError = $"Tracked frame '{selectedEntry.TrackedFrame}' is not a numeric frame number.";
+            return;
+        }
+
+        if (renderSnapshotsByFrame.TryGetValue(frameNumber, out var renderSnapshot))
+        {
+            selectedRenderSnapshot = renderSnapshot;
+            renderSnapshotError = null;
+            return;
+        }
+
+        selectedRenderSnapshot = null;
+        renderSnapshotError = $"Render snapshot for tracked frame '{selectedEntry.TrackedFrame}' was not found.";
+    }
+
+    private void LoadRenderSnapshotIndex()
+    {
+        renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
+        renderSnapshotError = null;
+
+        if (selectedLogPath is null)
+        {
+            return;
+        }
+
+        var result = RenderSnapshotReader.ReadIndex(selectedLogPath);
+        if (result.Index is null)
+        {
+            renderSnapshotError = result.Error;
+            return;
+        }
+
+        renderSnapshotsByFrame = result.Index.SnapshotsByFrame;
     }
 
     private static SSL_GeometryData? CreateGeometry(TrackerGeometrySnapshot? geometrySnapshot)

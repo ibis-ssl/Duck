@@ -164,7 +164,7 @@ public class VisionReceiverConfigurationResolverTests
         Assert.False(receiverOptions.PacketCapture.Enabled);
         Assert.Equal("packet-captures", receiverOptions.PacketCapture.DirectoryPath);
         Assert.Equal("ssl-vision-packets", receiverOptions.PacketCapture.FilePrefix);
-        Assert.False(receiverOptions.PacketCapture.FlushEachPacket);
+        Assert.True(receiverOptions.PacketCapture.FlushEachPacket);
     }
 
     private static string FindRepositoryRoot()
