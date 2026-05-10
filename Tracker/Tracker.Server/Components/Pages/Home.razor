@@ -2,10 +2,13 @@
 @using System.Globalization
 @using System.Text.Json
 @using Google.Protobuf
+@using Microsoft.Extensions.Options
 @using Tracker.Server.Tracking
 @using Tracker.Server.Vision
 @inject VisionPacketStore Store
 @inject TrackedSnapshotStore TrackedStore
+@inject IOptions<TrackerOptions> TrackerOptionsAccessor
+@inject TrackerProfileRequestService ProfileRequestService
 @implements IAsyncDisposable
 
 <PageTitle>Tracker.Server</PageTitle>
@@ -52,6 +55,7 @@
     @{
         var selectedView = ResolveSelectedView(rawSnapshot);
         var trackedView = TrackedVisionViewState.FromSnapshot(trackedSnapshot);
+        var profileControl = TrackerProfileControlViewState.FromOptions(TrackerOptionsAccessor.Value, trackedSnapshot);
     }
 
     <div class="vision-grid">
@@ -82,7 +86,9 @@
                                RobotsYellow="trackedView.RobotsYellow"
                                RobotsBlue="trackedView.RobotsBlue" />
 
-            <TrackedDetailsPanel ViewState="trackedView" />
+            <TrackedDetailsPanel ViewState="trackedView"
+                                 ProfileControl="profileControl"
+                                 OnRequestProfileSwitch="RequestProfileSwitchAsync" />
         }
     </div>
 </section>
@@ -185,6 +191,13 @@
     private Task SelectMode(ViewerMode mode)
     {
         viewerMode = mode;
+        return Task.CompletedTask;
+    }
+
+    private Task RequestProfileSwitchAsync(string profileName)
+    {
+        ProfileRequestService.RequestProfileSwitch(profileName);
+        trackedSnapshot = TrackedStore.GetSnapshot();
         return Task.CompletedTask;
     }
 

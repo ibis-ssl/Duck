@@ -335,6 +335,13 @@ proto 変換境界でのみ official 単位へ変換する。
 - publish 成功回数 / 失敗回数
 - profile 切替直後に frame 未確定であることを表す empty 状態
 
+runtime profile control の UI 規則:
+
+- tracked 側の detail panel は active profile 表示と profile 切替要求 UI を持つ
+- active profile 表示の source of truth は `TrackedSnapshotStore.ActiveProfileName` とする
+- profile 候補一覧は `TrackerOptions.Profiles` から作り、空なら current active profile 1 件だけを disabled 表示する
+- profile 切替要求 UI は `ProfileSwitched` 直後に latest frame が clear されても操作不能にならないよう、frame の有無とは独立して描画する
+
 ## 入出力詳細
 
 ### 入力 packet の扱い

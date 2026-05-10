@@ -1,4 +1,5 @@
 @using System.Globalization
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Rendering
 @using Tracker.Core
 
@@ -14,7 +15,7 @@
         </div>
         <div>
             <span>Profile</span>
-            <strong>@ViewState.ProfileName</strong>
+            <strong>@ProfileControl.ActiveProfileName</strong>
         </div>
         <div>
             <span>Received</span>
@@ -31,6 +32,26 @@
     </div>
 
     <div class="details-panel__body">
+        <section class="tracked-details-panel__section">
+            <h3>Profile Control</h3>
+            <div class="tracked-details-panel__profile-list" role="group" aria-label="Tracked profile control">
+                @foreach (var profile in ProfileControl.Profiles)
+                {
+                    <button type="button"
+                            class="@ProfileButtonClass(profile)"
+                            disabled="@profile.IsActive"
+                            @onclick="@(() => OnRequestProfileSwitch.InvokeAsync(profile.Name))">
+                        @profile.Name
+                    </button>
+                }
+            </div>
+            <p class="tracked-details-panel__hint">
+                @(ProfileControl.CanSwitch
+                    ? "Select a configured profile to request a runtime switch."
+                    : "Only one configured profile is available.")
+            </p>
+        </section>
+
         @if (!ViewState.HasFrame)
         {
             <div class="tracked-details-panel__empty">
@@ -162,6 +183,12 @@
     [Parameter, EditorRequired]
     public TrackedVisionViewState ViewState { get; set; } = default!;
 
+    [Parameter, EditorRequired]
+    public TrackerProfileControlViewState ProfileControl { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> OnRequestProfileSwitch { get; set; }
+
     private static string FormatTimestamp(DateTimeOffset? timestamp)
     {
         return timestamp?.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture) ?? "-";
@@ -210,6 +237,11 @@
         }
 
         return $"{ViewState.Contact.LastTeam} #{ViewState.Contact.LastRobotId.Value.ToString(CultureInfo.InvariantCulture)}";
+    }
+
+    private static string ProfileButtonClass(TrackerProfileOptionViewState profile)
+    {
+        return profile.IsActive ? "details-panel__tab is-active" : "details-panel__tab";
     }
 
     private static RenderFragment RobotTable(IEnumerable<SSL_DetectionRobot> robots) => builder =>
