@@ -1338,7 +1338,7 @@ public sealed class TrackerEngine : ITrackerEngine
         IReadOnlyList<BufferedDetection> orderedDetections,
         long frameTimestampNs)
     {
-        var observations = CollectCameraRobotObservations(orderedDetections);
+        var observations = CollectCameraRobotObservations(settings, orderedDetections);
         var observedKeys = observations.Keys.ToHashSet();
 
         foreach (var entry in observations)
@@ -1366,7 +1366,8 @@ public sealed class TrackerEngine : ITrackerEngine
         return observedKeys;
     }
 
-    private static Dictionary<CameraRobotKey, RobotObservation> CollectCameraRobotObservations(
+    private Dictionary<CameraRobotKey, RobotObservation> CollectCameraRobotObservations(
+        TrackerEngineSettings settings,
         IReadOnlyList<BufferedDetection> orderedDetections)
     {
         var observations = new Dictionary<CameraRobotKey, RobotObservation>();
@@ -1393,7 +1394,65 @@ public sealed class TrackerEngine : ITrackerEngine
             }
         }
 
-        return observations;
+        return DropFarRobotOutliersWhenSameRobotHasNearObservation(settings, observations);
+    }
+
+    private Dictionary<CameraRobotKey, RobotObservation> DropFarRobotOutliersWhenSameRobotHasNearObservation(
+        TrackerEngineSettings settings,
+        Dictionary<CameraRobotKey, RobotObservation> observations)
+    {
+        var filtered = new Dictionary<CameraRobotKey, RobotObservation>();
+        var movementGateMm = GetRobotMovementGateMm(settings);
+
+        foreach (var robotGroup in observations.GroupBy(observation => new RobotKey(observation.Key.Team, observation.Key.RobotId)))
+        {
+            var groupedObservations = robotGroup.ToArray();
+            if (groupedObservations.Length == 1)
+            {
+                filtered[groupedObservations[0].Key] = groupedObservations[0].Value;
+                continue;
+            }
+
+            var nearExistingTrackObservations = groupedObservations
+                .Where(observation => IsNearExistingRobotTrack(settings, observation.Key, observation.Value, movementGateMm))
+                .ToArray();
+            if (nearExistingTrackObservations.Length == 0)
+            {
+                foreach (var observation in groupedObservations)
+                {
+                    filtered[observation.Key] = observation.Value;
+                }
+
+                continue;
+            }
+
+            foreach (var observation in groupedObservations)
+            {
+                if (nearExistingTrackObservations.Any(
+                        anchor => anchor.Key.Equals(observation.Key)
+                            || GetDistanceMm(anchor.Value.XMm, anchor.Value.YMm, observation.Value.XMm, observation.Value.YMm) <= movementGateMm))
+                {
+                    filtered[observation.Key] = observation.Value;
+                }
+            }
+        }
+
+        return filtered;
+    }
+
+    private bool IsNearExistingRobotTrack(
+        TrackerEngineSettings settings,
+        CameraRobotKey key,
+        RobotObservation observation,
+        double movementGateMm)
+    {
+        if (!cameraRobotTrackStates.TryGetValue(key, out var previousState))
+        {
+            return false;
+        }
+
+        var predictedState = PredictRobotTrackState(settings, previousState, observation.EventTimestampNs);
+        return GetDistanceMm(predictedState.XMm, predictedState.YMm, observation.XMm, observation.YMm) <= movementGateMm;
     }
 
     private static void AddRobotObservations(

@@ -4,17 +4,18 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-030
-- Title: Tracked field 表示を Vision field geometry と揃える
-- Phase: ui
+- ID: TRACKER-031
+- Title: camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する
+- Phase: engine
 - Status: done
 - Size: small
-- Dependencies: TRACKER-029 の review が完了していること
+- Dependencies: TRACKER-030 が完了し、対象 diagnostics log が利用できること
 - Exit Criteria:
-  - tracked view でも defense area / goal / center / field arcs など Vision field と同等の線が描画される
-  - raw Vision 画面と tracked 画面の field orientation / scale / viewport の差分が report に記録されている
-  - component/view-state regression または screenshot evidence で表示差分の解消を確認できる
-  - review 結果が `reports/tracker-030-review-*.md` に記録され、blocking finding が残っていない
+  - `2026-05-10 22:33:16.070` 付近で yellow robot 1 が瞬間移動する原因が `reports/tracker-031-evidence-20260510223916.md` に記録されている
+  - 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない
+  - 単一観測の大きな移動や既存 outlier 契約を不必要に壊さない
+  - focused regression と full test の結果が `reports/tracker-031-evidence-20260510223916.md` に記録されている
+  - review 結果が `reports/tracker-031-review-20260510223916.md` に記録され、blocking finding が残っていない
 
 ## 次の調査タスク
 
@@ -55,3 +56,4 @@
 | TRACKER-028 | capture 1680 付近の複数 ball 再発を解析して修正する | engine | done | TRACKER-027 | 指定 diagnostics log の trackedFrame 1680 付近で複数 ball になる原因を記録し、成長済み secondary ball が fresh observation を失った後に出続けないよう修正した。実装・検証は `reports/tracker-028-evidence-20260510215726.md`、review は `reports/tracker-028-review-20260510215726.md` に記録済み。 |
 | TRACKER-029 | tracked object の小刻みな振動を抑制する | engine | done | TRACKER-028 | stationary に近い tracked ball / robot の表示揺れを抑制しつつ、実移動している object の追従性を過度に落とさない。振動抑制 tuning 値は profile 設定から外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、review は `reports/tracker-029-review-20260510221200.md` に記録済み。 |
 | TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | done | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。review は `reports/tracker-030-review-20260510222529.md` に記録済み。 |
+| TRACKER-031 | camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する | engine | done | TRACKER-030 | 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない。原因・実装・検証は `reports/tracker-031-evidence-20260510223916.md`、review は `reports/tracker-031-review-20260510223916.md` に記録済み。 |

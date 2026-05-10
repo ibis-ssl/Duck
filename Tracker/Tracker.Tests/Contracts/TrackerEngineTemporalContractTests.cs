@@ -845,6 +845,57 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_DropsFarCameraRobotOutlierWhenAnotherCameraHasSameRobotNearTrack()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 20_000_000);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 0,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 1, x: 5160, y: -2000, orientation: 2.9f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 11,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 1, x: 5162, y: -1998, orientation: 2.9f)],
+                captureTimeSeconds: 1.005),
+            settings: settings);
+
+        // 別 camera に正常な同一 robot ID 観測がある場合、遠方の誤 ID 観測で merged robot が瞬間移動しないことを確認する。
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 0,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 1, x: -5275, y: -2255, orientation: 3.2f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 21,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 1, x: 5161, y: -1997, orientation: 2.9f)],
+                captureTimeSeconds: 1.105),
+            settings: settings);
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall()],
+                captureTimeSeconds: 1.200),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(Assert.Single(result.CommittedFrames).Robots);
+        Assert.Equal(TrackerTeam.Yellow, trackedRobot.Team);
+        Assert.Equal((uint)1, trackedRobot.RobotId);
+        Assert.InRange(trackedRobot.XMm, 5100, 5200);
+        Assert.InRange(trackedRobot.YMm, -2050, -1950);
+    }
+
+    [Fact]
     public void Update_KeepsRobotTrackAliveAcrossOneMissingFrameWithDecayedVisibility()
     {
         var engine = fixture.CreateEngine();
