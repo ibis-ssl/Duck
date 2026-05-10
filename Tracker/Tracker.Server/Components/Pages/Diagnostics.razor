@@ -43,23 +43,6 @@
         </div>
     </header>
 
-    @if (entries.Count > 0)
-    {
-        <div class="diagnostics-scrubber">
-            <input type="range"
-                   class="diagnostics-scrubber__range"
-                   min="0"
-                   max="@MaxEntryIndex"
-                   value="@SelectedEntryIndex"
-                   @oninput="OnTimelineScrubbed"
-                   aria-label="Diagnostics timeline scrubber" />
-            <div class="diagnostics-scrubber__meta">
-                <span>@(SelectedEntryIndex + 1) / @entries.Count</span>
-                <span>@(selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp))</span>
-            </div>
-        </div>
-    }
-
     @if (!string.IsNullOrEmpty(snapshot?.Error))
     {
         <div class="diagnostics-alert">@snapshot.Error</div>
@@ -135,7 +118,7 @@
                     <div class="diagnostics-detail__columns">
                         <section>
                             <h2>Raw</h2>
-                            <dl>
+                            <dl class="diagnostics-inline-stats">
                                 <dt>Frame</dt>
                                 <dd>@Display(selectedEntry.RawFrame)</dd>
                                 <dt>Camera</dt>
@@ -152,7 +135,7 @@
 
                         <section>
                             <h2>Tracked</h2>
-                            <dl>
+                            <dl class="diagnostics-inline-stats">
                                 <dt>Frame</dt>
                                 <dd>@Display(selectedEntry.TrackedFrame)</dd>
                                 <dt>Balls</dt>
@@ -168,6 +151,23 @@
                 }
             </main>
         </div>
+
+        @if (entries.Count > 0)
+        {
+            <div class="diagnostics-scrubber">
+                <input type="range"
+                       class="diagnostics-scrubber__range"
+                       min="0"
+                       max="@MaxEntryIndex"
+                       value="@SelectedEntryIndex"
+                       @oninput="OnTimelineScrubbed"
+                       aria-label="Diagnostics timeline scrubber" />
+                <div class="diagnostics-scrubber__meta">
+                    <span>@(SelectedEntryIndex + 1) / @entries.Count</span>
+                    <span>@(selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp))</span>
+                </div>
+            </div>
+        }
     }
 </section>
 

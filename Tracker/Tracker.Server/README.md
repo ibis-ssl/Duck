@@ -122,6 +122,8 @@ capture を開始すると、同じ basename で次の sidecar も作成しま�
 - `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: capture と対応する tracker diagnostics log。`Tracker:Diagnostics:FilePath` が指定されていても、capture 有効時は sidecar として同時に出力します。
 - `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: timeline / 逆方向スクラブ用の描画 snapshot。tracker engine の内部状態ではなく、commit 済み `TrackerFrame` だけを保存します。
 
+`metadata.json` には active profile 名だけではなく、`Tracker:Profiles` 配下の profile 設定値と、runtime override 適用後の resolved settings も保存します。
+
 | キー | 意味 |
 | --- | --- |
 | `Enabled` | 起動時の packet capture 初期値です。起動後は画面の `Capture On/Off` ボタンで切り替えできます。 |

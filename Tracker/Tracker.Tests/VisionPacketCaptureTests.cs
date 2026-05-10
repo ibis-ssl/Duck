@@ -82,6 +82,15 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
                 .GetProperty("EngineSettings")
                 .GetProperty("ProfileName")
                 .GetString());
+        var simProfile = metadata.RootElement
+            .GetProperty("TrackerOptions")
+            .GetProperty("Profiles")
+            .GetProperty("sim");
+        Assert.Equal(11010, simProfile.GetProperty("Publish").GetProperty("Port").GetInt32());
+        Assert.Equal(
+            0.85,
+            simProfile.GetProperty("BallTracker").GetProperty("Gate").GetDouble(),
+            precision: 3);
     }
 
     [Fact]
@@ -192,7 +201,24 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
                     FlushEachPacket = flushEachPacket,
                 },
             }),
-            Options.Create(new TrackerOptions { ActiveProfileName = "sim" }),
+            Options.Create(new TrackerOptions
+            {
+                ActiveProfileName = "sim",
+                Profiles = new Dictionary<string, TrackerProfileOptions>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["sim"] = new()
+                    {
+                        Publish = new TrackerPublishProfileOptions
+                        {
+                            Port = 11010,
+                        },
+                        BallTracker = new TrackerBallTrackerOverrides
+                        {
+                            Gate = 0.85,
+                        },
+                    },
+                },
+            }),
             fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
             NullLogger<VisionPacketCaptureSession>.Instance,
             runtimeControl);
