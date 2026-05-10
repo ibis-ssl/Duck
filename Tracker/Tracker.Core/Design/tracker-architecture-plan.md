@@ -694,7 +694,8 @@ v1 実装契約:
 
 - camera-local ball / robot track は、観測値をそのまま上書きする簡易追跡ではなく、predict-update を持つ線形 Kalman filter で更新する
 - 各 track は少なくとも state estimate と covariance 相当の不確かさを保持する
-- `ProcessNoise` は予測時の process covariance へ、`MeasurementNoise` は観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
+- `ProcessNoise` は `KalmanProcessNoiseScale` を通して予測時の process covariance へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
+- `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は profile ごとの外部設定値とし、停止時の小刻みな raw detection 揺れと移動追従性のバランスを code 変更なしで調整できるようにする
 - `VisibilityHalfLifeSeconds` は観測欠測時の liveliness 管理に使う値であり、Kalman の covariance 更新を省略する理由にはならない
 - world 統合で使う uncertainty は camera-local Kalman filter の事後不確かさから導く
 - 単純な等速外挿 + 観測値上書き + 手動 uncertainty 加算だけで済ませる実装は、この v1 契約を満たさない

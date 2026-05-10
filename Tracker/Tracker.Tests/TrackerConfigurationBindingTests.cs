@@ -21,6 +21,9 @@ public class TrackerConfigurationBindingTests
         Assert.Equal(45, resolved.EngineSettings.MergeWindowNs);
         Assert.Equal(678, resolved.EngineSettings.GeometryResetFieldLengthThresholdMm);
         Assert.Equal(910, resolved.EngineSettings.GeometryResetFieldWidthThresholdMm);
+        Assert.Equal(111d, resolved.EngineSettings.KalmanInitialVelocityVariance);
+        Assert.Equal(222d, resolved.EngineSettings.KalmanProcessNoiseScale);
+        Assert.Equal(333d, resolved.EngineSettings.MeasurementNoiseVarianceScale);
         Assert.Equal(1.5d, resolved.EngineSettings.RobotTracker.ProcessNoise);
         Assert.Equal(0.8d, resolved.EngineSettings.RobotTracker.MeasurementNoise);
         Assert.Equal(1.4d, resolved.EngineSettings.RobotTracker.VisibilityHalfLifeSeconds);
@@ -79,6 +82,9 @@ public class TrackerConfigurationBindingTests
         var diagnostics = serviceProvider.GetRequiredService<TrackerDiagnosticsOptions>();
 
         Assert.Equal("simulation", engineSettings.ProfileName);
+        Assert.Equal(111d, engineSettings.KalmanInitialVelocityVariance);
+        Assert.Equal(222d, engineSettings.KalmanProcessNoiseScale);
+        Assert.Equal(333d, engineSettings.MeasurementNoiseVarianceScale);
         Assert.Equal(1.4d, engineSettings.RobotTracker.VisibilityHalfLifeSeconds);
         Assert.Equal(0.2d, engineSettings.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(350d, engineSettings.RobotTracker.OutlierLimitMm);
@@ -116,6 +122,9 @@ public class TrackerConfigurationBindingTests
 
         Assert.Equal("sim", resolved.EngineSettings.ProfileName);
         Assert.Equal(11010, resolved.PublisherOptions.Port);
+        Assert.Equal(10_000d, resolved.EngineSettings.KalmanInitialVelocityVariance);
+        Assert.Equal(10_000d, resolved.EngineSettings.KalmanProcessNoiseScale);
+        Assert.Equal(100d, resolved.EngineSettings.MeasurementNoiseVarianceScale);
         Assert.Equal(0.462756d, resolved.EngineSettings.RobotTracker.VisibilityHalfLifeSeconds);
         Assert.Equal(0.05d, resolved.EngineSettings.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(1_000_000_000L, resolved.EngineSettings.BallTracker.TrackLifetimeNs);
@@ -139,6 +148,9 @@ public class TrackerConfigurationBindingTests
                     ["Tracker:Profiles:simulation:Engine:MergeWindowNs"] = "45",
                     ["Tracker:Profiles:simulation:Engine:GeometryResetFieldLengthThresholdMm"] = "678",
                     ["Tracker:Profiles:simulation:Engine:GeometryResetFieldWidthThresholdMm"] = "910",
+                    ["Tracker:Profiles:simulation:Engine:KalmanInitialVelocityVariance"] = "111",
+                    ["Tracker:Profiles:simulation:Engine:KalmanProcessNoiseScale"] = "222",
+                    ["Tracker:Profiles:simulation:Engine:MeasurementNoiseVarianceScale"] = "333",
                     ["Tracker:Profiles:simulation:RobotTracker:ProcessNoise"] = "1.5",
                     ["Tracker:Profiles:simulation:RobotTracker:MeasurementNoise"] = "0.8",
                     ["Tracker:Profiles:simulation:RobotTracker:VisibilityHalfLifeSeconds"] = "1.2",
@@ -177,6 +189,9 @@ public class TrackerConfigurationBindingTests
         double expectedGate)
     {
         Assert.Equal(expectedPublishPort, profile.Publish.Port);
+        Assert.Equal(10_000d, profile.Engine.KalmanInitialVelocityVariance);
+        Assert.Equal(10_000d, profile.Engine.KalmanProcessNoiseScale);
+        Assert.Equal(100d, profile.Engine.MeasurementNoiseVarianceScale);
         Assert.Equal(0.1d, profile.RobotTracker.ProcessNoise);
         Assert.Equal(20.0d, profile.RobotTracker.MeasurementNoise);
         Assert.Equal(0.462756d, profile.RobotTracker.VisibilityHalfLifeSeconds);

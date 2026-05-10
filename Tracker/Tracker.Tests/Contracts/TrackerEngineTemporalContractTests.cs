@@ -662,9 +662,34 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
 
         var trackedRobot = Assert.Single(Assert.Single(secondResult.CommittedFrames).Robots);
 
-        Assert.Equal(300, trackedRobot.VXMmPerS, precision: 3);
-        Assert.Equal(400, trackedRobot.VYMmPerS, precision: 3);
+        Assert.InRange(trackedRobot.VXMmPerS, 290, 310);
+        Assert.InRange(trackedRobot.VYMmPerS, 385, 415);
         Assert.InRange(trackedRobot.AngularVelocityRadPerS, 0.9, 1.2);
+    }
+
+    [Fact]
+    public void Update_DampsStationaryRobotMeasurementJitter()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        // 停止している robot の raw detection が小さく揺れても、tracked 出力が同じ幅で振動しないことを確認する。
+        TrackerUpdateResult result = new();
+        for (var frameIndex = 0; frameIndex < 12; frameIndex++)
+        {
+            var jitterXMm = frameIndex % 2 == 0 ? 8 : -8;
+            result = engine.Update(
+                packet: TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: (uint)(10 + frameIndex),
+                    cameraId: 1,
+                    robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: jitterXMm, y: 0, orientation: 0)],
+                    captureTimeSeconds: 1.000 + (frameIndex * 0.016)),
+                settings: settings);
+        }
+
+        var trackedRobot = Assert.Single(Assert.Single(result.CommittedFrames).Robots);
+        Assert.InRange(Math.Abs(trackedRobot.XMm), 0, 5);
+        Assert.InRange(Math.Abs(trackedRobot.VXMmPerS), 0, 600);
     }
 
     [Fact]
@@ -1053,9 +1078,9 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
 
         var trackedBall = Assert.Single(Assert.Single(secondResult.CommittedFrames).Balls);
 
-        Assert.Equal(300, trackedBall.VXMmPerS, precision: 3);
-        Assert.Equal(400, trackedBall.VYMmPerS, precision: 3);
-        Assert.Equal(300, trackedBall.VZMmPerS, precision: 3);
+        Assert.InRange(trackedBall.VXMmPerS, 290, 310);
+        Assert.InRange(trackedBall.VYMmPerS, 385, 415);
+        Assert.InRange(trackedBall.VZMmPerS, 290, 310);
     }
 
     [Fact]
@@ -1375,6 +1400,31 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_DampsStationaryBallMeasurementJitter()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        // 停止している ball の raw detection が小さく揺れても、tracked 出力が同じ幅で振動しないことを確認する。
+        TrackerUpdateResult result = new();
+        for (var frameIndex = 0; frameIndex < 12; frameIndex++)
+        {
+            var jitterXMm = frameIndex % 2 == 0 ? 10 : -10;
+            result = engine.Update(
+                packet: TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: (uint)(10 + frameIndex),
+                    cameraId: 1,
+                    balls: [TrackerContractTestData.CreateBall(x: jitterXMm, y: 0, confidence: 1.0f)],
+                    captureTimeSeconds: 1.000 + (frameIndex * 0.016)),
+                settings: settings);
+        }
+
+        var trackedBall = Assert.Single(Assert.Single(result.CommittedFrames).Balls);
+        Assert.InRange(Math.Abs(trackedBall.XMm), 0, 5);
+        Assert.InRange(Math.Abs(trackedBall.VXMmPerS), 0, 600);
+    }
+
+    [Fact]
     public void Update_UsesConfiguredBallGateForTrackMatchingAcrossFrames()
     {
         var engine = fixture.CreateEngine();
@@ -1512,7 +1562,9 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
 
         var committedFrame = Assert.Single(result.CommittedFrames);
         Assert.Equal(2, committedFrame.Balls.Count);
-        Assert.Equal([0d, 200d], committedFrame.Balls.Select(ball => ball.XMm).OrderBy(x => x));
+        var sortedBallX = committedFrame.Balls.Select(ball => ball.XMm).OrderBy(x => x).ToArray();
+        Assert.InRange(sortedBallX[0], -5, 5);
+        Assert.InRange(sortedBallX[1], 195, 205);
     }
 
     [Fact]
@@ -1546,7 +1598,7 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
             settings: settings);
 
         var mergedBall = Assert.Single(flushResult.CommittedFrames[0].Balls);
-        Assert.Equal(112, mergedBall.XMm, precision: 3);
+        Assert.InRange(mergedBall.XMm, 100, 115);
     }
 
     [Fact]
@@ -1580,7 +1632,7 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
             settings: settings);
 
         var committedBall = Assert.Single(flushResult.CommittedFrames[0].Balls);
-        Assert.Equal(110, committedBall.XMm, precision: 3);
+        Assert.InRange(committedBall.XMm, 100, 110);
         Assert.Equal(committedBall.InternalTrackId, flushResult.CommittedFrames[0].PrimaryBallTrackId);
     }
 
@@ -1660,8 +1712,8 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         var secondFrameBall = Assert.Single(Assert.Single(secondFrameResult.CommittedFrames).Balls);
         var thirdFrameBall = Assert.Single(Assert.Single(flushResult.CommittedFrames).Balls);
 
-        Assert.Equal(100, secondFrameBall.XMm, precision: 3);
-        Assert.Equal(300, thirdFrameBall.XMm, precision: 3);
+        Assert.InRange(secondFrameBall.XMm, 95, 105);
+        Assert.InRange(thirdFrameBall.XMm, 250, 310);
         Assert.Equal(secondFrameBall.InternalTrackId, thirdFrameBall.InternalTrackId);
     }
 

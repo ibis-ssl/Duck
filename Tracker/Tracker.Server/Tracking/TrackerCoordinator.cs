@@ -480,6 +480,9 @@ public sealed class TrackerCoordinator
             && left.EngineSettings.MergeWindowNs == right.EngineSettings.MergeWindowNs
             && left.EngineSettings.GeometryResetFieldLengthThresholdMm == right.EngineSettings.GeometryResetFieldLengthThresholdMm
             && left.EngineSettings.GeometryResetFieldWidthThresholdMm == right.EngineSettings.GeometryResetFieldWidthThresholdMm
+            && left.EngineSettings.KalmanInitialVelocityVariance == right.EngineSettings.KalmanInitialVelocityVariance
+            && left.EngineSettings.KalmanProcessNoiseScale == right.EngineSettings.KalmanProcessNoiseScale
+            && left.EngineSettings.MeasurementNoiseVarianceScale == right.EngineSettings.MeasurementNoiseVarianceScale
             && AreRobotTrackerOverridesEquivalent(left.EngineSettings.RobotTracker, right.EngineSettings.RobotTracker)
             && AreBallTrackerOverridesEquivalent(left.EngineSettings.BallTracker, right.EngineSettings.BallTracker)
             && AreKickDetectorOverridesEquivalent(left.EngineSettings.KickDetector, right.EngineSettings.KickDetector)
@@ -557,6 +560,9 @@ public sealed class TrackerCoordinator
             MergeWindowNs = settings.MergeWindowNs,
             GeometryResetFieldLengthThresholdMm = settings.GeometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = settings.GeometryResetFieldWidthThresholdMm,
+            KalmanInitialVelocityVariance = settings.KalmanInitialVelocityVariance,
+            KalmanProcessNoiseScale = settings.KalmanProcessNoiseScale,
+            MeasurementNoiseVarianceScale = settings.MeasurementNoiseVarianceScale,
             RobotTracker = CloneRobotTracker(settings.RobotTracker),
             BallTracker = CloneBallTracker(settings.BallTracker),
             KickDetector = CloneKickDetector(settings.KickDetector),

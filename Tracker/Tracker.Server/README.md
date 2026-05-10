@@ -284,6 +284,9 @@ tracker engine の時系列処理設定です。
 | `MergeWindowNs` | ns | 近接 timestamp の detection を同じ world frame にまとめる window です。大きいほど camera 間 merge はしやすくなりますが、別 frame まで混ざりやすくなります。 |
 | `GeometryResetFieldLengthThresholdMm` | mm | field length 変化を geometry reset とみなす閾値です。 |
 | `GeometryResetFieldWidthThresholdMm` | mm | field width 変化を geometry reset とみなす閾値です。 |
+| `KalmanInitialVelocityVariance` | 任意係数 | 新規 track の速度不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |
+| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman prediction の分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |
+| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど raw detection の小刻みな揺れを弱く信用します。 |
 
 geometry reset が起きると pending state が切り替わり、旧 geometry 前提の tracked frame は破棄されます。
 

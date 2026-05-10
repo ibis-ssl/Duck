@@ -12,6 +12,9 @@ public sealed class TrackerContractFixture
     public const long DefaultMergeWindowNs = 20_000_000;
     public const int DefaultGeometryResetFieldLengthThresholdMm = 500;
     public const int DefaultGeometryResetFieldWidthThresholdMm = 500;
+    public const double DefaultKalmanInitialVelocityVariance = TrackerEngineSettings.DefaultKalmanInitialVelocityVariance;
+    public const double DefaultKalmanProcessNoiseScale = TrackerEngineSettings.DefaultKalmanProcessNoiseScale;
+    public const double DefaultMeasurementNoiseVarianceScale = TrackerEngineSettings.DefaultMeasurementNoiseVarianceScale;
 
     public ITrackerEngine CreateEngine()
     {
@@ -60,6 +63,9 @@ public sealed class TrackerContractFixture
         long mergeWindowNs = DefaultMergeWindowNs,
         int geometryResetFieldLengthThresholdMm = DefaultGeometryResetFieldLengthThresholdMm,
         int geometryResetFieldWidthThresholdMm = DefaultGeometryResetFieldWidthThresholdMm,
+        double kalmanInitialVelocityVariance = DefaultKalmanInitialVelocityVariance,
+        double kalmanProcessNoiseScale = DefaultKalmanProcessNoiseScale,
+        double measurementNoiseVarianceScale = DefaultMeasurementNoiseVarianceScale,
         TrackerRobotTrackerOverrides? robotTracker = null,
         TrackerBallTrackerOverrides? ballTracker = null,
         TrackerKickDetectorOverrides? kickDetector = null)
@@ -71,6 +77,9 @@ public sealed class TrackerContractFixture
             MergeWindowNs = mergeWindowNs,
             GeometryResetFieldLengthThresholdMm = geometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = geometryResetFieldWidthThresholdMm,
+            KalmanInitialVelocityVariance = kalmanInitialVelocityVariance,
+            KalmanProcessNoiseScale = kalmanProcessNoiseScale,
+            MeasurementNoiseVarianceScale = measurementNoiseVarianceScale,
             RobotTracker = robotTracker ?? new TrackerRobotTrackerOverrides(),
             BallTracker = ballTracker ?? new TrackerBallTrackerOverrides(),
             KickDetector = kickDetector ?? new TrackerKickDetectorOverrides(),

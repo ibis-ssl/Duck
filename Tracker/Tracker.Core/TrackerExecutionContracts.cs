@@ -22,8 +22,6 @@ public sealed class TrackerEngine : ITrackerEngine
     private const long RecentContactWindowNs = 200_000_000;
     private const double DefaultVisibilityHalfLifeSeconds = 1d;
     private const double DefaultBallProcessNoise = 50d;
-    private const double InitialVelocityVariance = 1_000_000d;
-    private const double KalmanProcessNoiseScale = 10_000_000d;
     private readonly List<BufferedDetection> pendingDetections = [];
     private readonly Dictionary<int, BallTrackState> cameraBallTrackStates = [];
     private readonly Dictionary<int, BallContactState> latestBallContactStates = [];
@@ -978,9 +976,9 @@ public sealed class TrackerEngine : ITrackerEngine
                         updatedTrackState = new BallTrackState(
                             nextCameraBallTrackId++,
                             observation.CameraId,
-                            CreateInitialKalmanAxis(observation.XMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
-                            CreateInitialKalmanAxis(observation.YMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
-                            CreateInitialKalmanAxis(observation.ZMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
+                            CreateInitialKalmanAxis(settings, observation.XMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
+                            CreateInitialKalmanAxis(settings, observation.YMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
+                            CreateInitialKalmanAxis(settings, observation.ZMm, GetObservedBallUncertaintyMm(settings, observation.Confidence)),
                             observation.EventTimestampNs,
                             observation.EventTimestampNs,
                             observation.Confidence,
@@ -1083,9 +1081,9 @@ public sealed class TrackerEngine : ITrackerEngine
         var processNoise = GetBallProcessNoise(settings);
         return previousState with
         {
-            XAxis = PredictKalmanAxis(previousState.XAxis, deltaSeconds, processNoise),
-            YAxis = PredictKalmanAxis(previousState.YAxis, deltaSeconds, processNoise),
-            ZAxis = PredictKalmanAxis(previousState.ZAxis, deltaSeconds, processNoise),
+            XAxis = PredictKalmanAxis(settings, previousState.XAxis, deltaSeconds, processNoise),
+            YAxis = PredictKalmanAxis(settings, previousState.YAxis, deltaSeconds, processNoise),
+            ZAxis = PredictKalmanAxis(settings, previousState.ZAxis, deltaSeconds, processNoise),
             LastUpdateTimestampNs = targetTimestampNs,
         };
     }
@@ -1423,9 +1421,9 @@ public sealed class TrackerEngine : ITrackerEngine
         {
             var measurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
             return new RobotTrackState(
-                CreateInitialKalmanAxis(observation.XMm, measurementVariance),
-                CreateInitialKalmanAxis(observation.YMm, measurementVariance),
-                CreateInitialKalmanAxis(unwrappedOrientation, measurementVariance),
+                CreateInitialKalmanAxis(settings, observation.XMm, measurementVariance),
+                CreateInitialKalmanAxis(settings, observation.YMm, measurementVariance),
+                CreateInitialKalmanAxis(settings, unwrappedOrientation, measurementVariance),
                 observation.EventTimestampNs,
                 observation.EventTimestampNs,
                 observation.Confidence,
@@ -1439,9 +1437,9 @@ public sealed class TrackerEngine : ITrackerEngine
         {
             var measurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
             return new RobotTrackState(
-                CreateInitialKalmanAxis(observation.XMm, measurementVariance),
-                CreateInitialKalmanAxis(observation.YMm, measurementVariance),
-                CreateInitialKalmanAxis(unwrappedOrientation, measurementVariance),
+                CreateInitialKalmanAxis(settings, observation.XMm, measurementVariance),
+                CreateInitialKalmanAxis(settings, observation.YMm, measurementVariance),
+                CreateInitialKalmanAxis(settings, unwrappedOrientation, measurementVariance),
                 observation.EventTimestampNs,
                 observation.EventTimestampNs,
                 observation.Confidence,
@@ -1501,9 +1499,9 @@ public sealed class TrackerEngine : ITrackerEngine
         var processNoise = GetRobotProcessNoise(settings);
         return previousState with
         {
-            XAxis = PredictKalmanAxis(previousState.XAxis, deltaSeconds, processNoise),
-            YAxis = PredictKalmanAxis(previousState.YAxis, deltaSeconds, processNoise),
-            OrientationAxis = PredictKalmanAxis(previousState.OrientationAxis, deltaSeconds, processNoise),
+            XAxis = PredictKalmanAxis(settings, previousState.XAxis, deltaSeconds, processNoise),
+            YAxis = PredictKalmanAxis(settings, previousState.YAxis, deltaSeconds, processNoise),
+            OrientationAxis = PredictKalmanAxis(settings, previousState.OrientationAxis, deltaSeconds, processNoise),
             LastUpdateTimestampNs = targetTimestampNs,
         };
     }
@@ -1703,29 +1701,50 @@ public sealed class TrackerEngine : ITrackerEngine
 
     private static double GetObservedBallUncertaintyMm(TrackerEngineSettings settings, float confidence)
     {
-        return GetBallMeasurementNoise(settings) / Math.Max(0.001d, confidence);
+        var measurementNoise = GetBallMeasurementNoise(settings) / Math.Max(0.001d, confidence);
+        return measurementNoise * measurementNoise * GetMeasurementNoiseVarianceScale(settings);
     }
 
     private static double GetObservedRobotUncertaintyMm(TrackerEngineSettings settings, float confidence)
     {
-        return GetRobotMeasurementNoise(settings) / Math.Max(0.001d, confidence);
+        var measurementNoise = GetRobotMeasurementNoise(settings) / Math.Max(0.001d, confidence);
+        return measurementNoise * measurementNoise * GetMeasurementNoiseVarianceScale(settings);
     }
 
-    private static KalmanAxisState CreateInitialKalmanAxis(double position, double measurementVariance)
+    private static double GetInitialVelocityVariance(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.KalmanInitialVelocityVariance);
+    }
+
+    private static double GetKalmanProcessNoiseScale(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.KalmanProcessNoiseScale);
+    }
+
+    private static double GetMeasurementNoiseVarianceScale(TrackerEngineSettings settings)
+    {
+        return Math.Max(0.001d, settings.MeasurementNoiseVarianceScale);
+    }
+
+    private static KalmanAxisState CreateInitialKalmanAxis(
+        TrackerEngineSettings settings,
+        double position,
+        double measurementVariance)
     {
         return new KalmanAxisState(
             position,
             0d,
             measurementVariance,
-            InitialVelocityVariance);
+            GetInitialVelocityVariance(settings));
     }
 
     private static KalmanAxisState PredictKalmanAxis(
+        TrackerEngineSettings settings,
         KalmanAxisState state,
         double deltaSeconds,
         double processNoise)
     {
-        var processVariance = processNoise * KalmanProcessNoiseScale;
+        var processVariance = processNoise * GetKalmanProcessNoiseScale(settings);
         return state with
         {
             Position = state.Position + state.Velocity * deltaSeconds,
@@ -1994,6 +2013,9 @@ public sealed class TrackerEngineSettings
     public const double DefaultKickDetectionSpeedThresholdMmPerS = 800d;
     public const double DefaultChipHeightThresholdMm = 120d;
     public const double DefaultContactMarginMm = 25d;
+    public const double DefaultKalmanInitialVelocityVariance = 10_000d;
+    public const double DefaultKalmanProcessNoiseScale = 10_000d;
+    public const double DefaultMeasurementNoiseVarianceScale = 100d;
 
     public string ProfileName { get; init; } = "default";
 
@@ -2004,6 +2026,12 @@ public sealed class TrackerEngineSettings
     public int GeometryResetFieldLengthThresholdMm { get; init; }
 
     public int GeometryResetFieldWidthThresholdMm { get; init; }
+
+    public double KalmanInitialVelocityVariance { get; init; } = DefaultKalmanInitialVelocityVariance;
+
+    public double KalmanProcessNoiseScale { get; init; } = DefaultKalmanProcessNoiseScale;
+
+    public double MeasurementNoiseVarianceScale { get; init; } = DefaultMeasurementNoiseVarianceScale;
 
     public TrackerRobotTrackerOverrides RobotTracker { get; init; } = new();
 

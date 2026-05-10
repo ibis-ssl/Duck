@@ -17,6 +17,9 @@ public class TrackerContractFixtureTests
         Assert.Equal(20_000_000L, settings.MergeWindowNs);
         Assert.Equal(500, settings.GeometryResetFieldLengthThresholdMm);
         Assert.Equal(500, settings.GeometryResetFieldWidthThresholdMm);
+        Assert.Equal(10_000d, settings.KalmanInitialVelocityVariance);
+        Assert.Equal(10_000d, settings.KalmanProcessNoiseScale);
+        Assert.Equal(100d, settings.MeasurementNoiseVarianceScale);
     }
 
     [Fact]
