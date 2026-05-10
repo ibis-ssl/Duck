@@ -35,6 +35,9 @@ TRACKER-025 反映後も Tracked 表示で過剰な object が残るため、現
 - 出力頻度:
   - 通常は最大 1 秒に 1 回
   - raw ball または tracked ball が複数ある場合は追加で出力
+- 出力先:
+  - 標準の `ILogger` 出力
+  - publish / 実行時の working directory に起動ごとに新規作成される `tracker-diagnostics-<timestamp>-<id>.log`
 - 出力内容:
   - active tracker profile
   - raw frame / camera id
@@ -48,6 +51,12 @@ TRACKER-025 反映後も Tracked 表示で過剰な object が残るため、現
   - raw 側に B11/Y11 や複数 ball が出ているなら SSL-Vision 入力または raw filtering 差分を疑う
   - raw 側に出ていないのに tracked 側だけ残るなら tracker stale / merge / output gate 差分を疑う
 - build 確認:
+  - `DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" NUGET_PACKAGES="$PWD/.codex-nuget-packages" dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`
+  - 0 warnings / 0 errors
+- ファイル出力追加後の build 確認:
+  - `DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" NUGET_PACKAGES="$PWD/.codex-nuget-packages" dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`
+  - 0 warnings / 0 errors
+- 起動ごとに新規ファイル化した後の build 確認:
   - `DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" NUGET_PACKAGES="$PWD/.codex-nuget-packages" dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`
   - 0 warnings / 0 errors
 

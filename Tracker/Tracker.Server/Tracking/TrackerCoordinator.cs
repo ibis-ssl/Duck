@@ -5,6 +5,7 @@ namespace Tracker.Server.Tracking;
 public sealed class TrackerCoordinator
 {
     private static readonly TimeSpan TrackerDiagnosticsLogInterval = TimeSpan.FromSeconds(1);
+    private static readonly string TrackerDiagnosticsLogPath = CreateTrackerDiagnosticsLogPath();
     private readonly object gate = new();
     private readonly ITrackerEngine engine;
     private readonly TrackerPacketGenerator packetGenerator;
@@ -22,6 +23,7 @@ public sealed class TrackerCoordinator
     private int nextRequestVersion = 1;
     private bool isProcessingUpdate;
     private DateTimeOffset lastTrackerDiagnosticsLogAt = DateTimeOffset.MinValue;
+    private bool trackerDiagnosticsFileWriteFailed;
 
     public TrackerCoordinator(
         ITrackerEngine engine,
@@ -245,25 +247,59 @@ public sealed class TrackerCoordinator
         }
 
         lastTrackerDiagnosticsLogAt = receivedAt;
+        var rawBallDetails = FormatRawBalls(detection?.Balls);
+        var rawBlueDetails = FormatRawRobots(detection?.RobotsBlue, TrackerTeam.Blue);
+        var rawYellowDetails = FormatRawRobots(detection?.RobotsYellow, TrackerTeam.Yellow);
+        var trackedBallDetails = FormatTrackedBalls(newestFrame.Balls);
+        var trackedRobotDetails = FormatTrackedRobots(newestFrame.Robots);
+        var diagnosticsLine = FormattableString.Invariant(
+            $"{receivedAt:O} Tracker diagnostics profile={currentSettings.ProfileName} rawFrame={detection?.FrameNumber} rawCamera={detection?.CameraId} rawBalls={detection?.Balls.Count ?? 0} rawBallDetails=[{rawBallDetails}] rawBlue=[{rawBlueDetails}] rawYellow=[{rawYellowDetails}] trackedFrame={newestFrame.FrameNumber} trackedBalls={newestFrame.Balls.Count} trackedBallDetails=[{trackedBallDetails}] trackedRobots={newestFrame.Robots.Count} trackedRobotDetails=[{trackedRobotDetails}] robotOutVisibility={currentSettings.RobotTracker.OutputVisibilityThreshold} robotHalfLifeSec={currentSettings.RobotTracker.VisibilityHalfLifeSeconds} ballOutVisibility={currentSettings.BallTracker.OutputVisibilityThreshold} ballHalfLifeSec={currentSettings.BallTracker.VisibilityHalfLifeSeconds} ballLifetimeNs={currentSettings.BallTracker.TrackLifetimeNs}");
         logger.LogInformation(
             "Tracker diagnostics profile={ProfileName} rawFrame={RawFrameNumber} rawCamera={RawCameraId} rawBalls={RawBallCount} rawBallDetails=[{RawBallDetails}] rawBlue=[{RawBlueDetails}] rawYellow=[{RawYellowDetails}] trackedFrame={TrackedFrameNumber} trackedBalls={TrackedBallCount} trackedBallDetails=[{TrackedBallDetails}] trackedRobots={TrackedRobotCount} trackedRobotDetails=[{TrackedRobotDetails}] robotOutVisibility={RobotOutputVisibilityThreshold} robotHalfLifeSec={RobotVisibilityHalfLifeSeconds} ballOutVisibility={BallOutputVisibilityThreshold} ballHalfLifeSec={BallVisibilityHalfLifeSeconds} ballLifetimeNs={BallTrackLifetimeNs}",
             currentSettings.ProfileName,
             detection?.FrameNumber,
             detection?.CameraId,
             detection?.Balls.Count ?? 0,
-            FormatRawBalls(detection?.Balls),
-            FormatRawRobots(detection?.RobotsBlue, TrackerTeam.Blue),
-            FormatRawRobots(detection?.RobotsYellow, TrackerTeam.Yellow),
+            rawBallDetails,
+            rawBlueDetails,
+            rawYellowDetails,
             newestFrame.FrameNumber,
             newestFrame.Balls.Count,
-            FormatTrackedBalls(newestFrame.Balls),
+            trackedBallDetails,
             newestFrame.Robots.Count,
-            FormatTrackedRobots(newestFrame.Robots),
+            trackedRobotDetails,
             currentSettings.RobotTracker.OutputVisibilityThreshold,
             currentSettings.RobotTracker.VisibilityHalfLifeSeconds,
             currentSettings.BallTracker.OutputVisibilityThreshold,
             currentSettings.BallTracker.VisibilityHalfLifeSeconds,
             currentSettings.BallTracker.TrackLifetimeNs);
+        AppendTrackerDiagnosticsFile(diagnosticsLine);
+    }
+
+    private void AppendTrackerDiagnosticsFile(string diagnosticsLine)
+    {
+        if (trackerDiagnosticsFileWriteFailed)
+        {
+            return;
+        }
+
+        try
+        {
+            File.AppendAllText(TrackerDiagnosticsLogPath, diagnosticsLine + Environment.NewLine);
+        }
+        catch (Exception ex)
+        {
+            trackerDiagnosticsFileWriteFailed = true;
+            logger.LogWarning(ex, "Failed to write tracker diagnostics log file {LogPath}", TrackerDiagnosticsLogPath);
+        }
+    }
+
+    private static string CreateTrackerDiagnosticsLogPath()
+    {
+        var timestamp = FormattableString.Invariant($"{DateTimeOffset.UtcNow:yyyyMMddTHHmmssfffZ}");
+        return Path.Combine(
+            Directory.GetCurrentDirectory(),
+            $"tracker-diagnostics-{timestamp}-{Guid.NewGuid():N}.log");
     }
 
     private bool ShouldLogTrackerDiagnostics(
