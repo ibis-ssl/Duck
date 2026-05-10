@@ -4,8 +4,8 @@
 
 ## 全体状況
 
-- 現在のフェーズ: review
-- 現在のタスク: TRACKER-020
+- 現在のフェーズ: documentation
+- 現在のタスク: TRACKER-021
 - 残りフェーズ: なし
 
 ## フェーズ一覧
@@ -19,3 +19,4 @@
 | ui | done | `TRACKER-015` から `TRACKER-017` が完了し、tracked viewer、raw/tracked 切替、tracked diagnostics 表示、runtime profile 切替要求 UI が用意される。 |
 | verification | done | `TRACKER-018` と `TRACKER-019` が完了し、実装した v1 範囲について build/test と integration 観点の証跡が reports に存在する。 |
 | review | done | `TRACKER-020` が完了し、最終 sub-agent レビューが記録され、tracking files が実状態へ同期され、致命的な指摘が残っていない。 |
+| documentation | done | `TRACKER-021` が完了し、`Tracker.Server` の README に起動手順、画面の使い方、主要設定値の意味が記録されている。 |

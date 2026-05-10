@@ -4,14 +4,14 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-020
-- Title: Tracker v1 の最終レビューと追跡ファイル同期を行う
-- Phase: review
+- ID: TRACKER-021
+- Title: `Tracker.Server` の使い方 README を追加する
+- Phase: documentation
 - Status: done
-- Size: medium
-- Dependencies: TRACKER-019 が完了していること
+- Size: small
+- Dependencies: TRACKER-020 が完了していること
 - Exit Criteria:
-  - sub-agent レビュー結果が記録され、致命的な指摘が残っておらず、tracking files が最終状態と一致する。
+  - `Tracker/Tracker.Server/README.md` が存在し、起動手順、画面の使い方、主要設定値の意味が記載されている。
 
 ## タスク一覧
 
@@ -38,3 +38,4 @@
 | TRACKER-018 | Tracker v1 の build/test 証跡を取得する | verification | done | TRACKER-017 | build/test の証跡が記録され、主要 unit/contract 観点の結果が reports に存在する。 |
 | TRACKER-019 | Tracker v1 の integration 観点検証を行う | verification | done | TRACKER-018 | late packet、geometry reset、profile switch、observer/event、viewer 切替の確認結果が reports に存在する。 |
 | TRACKER-020 | Tracker v1 の最終レビューと追跡ファイル同期を行う | review | done | TRACKER-019 | sub-agent レビュー結果が記録され、致命的な指摘が残っておらず、tracking files が最終状態と一致する。 |
+| TRACKER-021 | `Tracker.Server` の使い方 README を追加する | documentation | done | TRACKER-020 | `Tracker/Tracker.Server/README.md` が存在し、起動手順、画面の使い方、主要設定値の意味が記載されている。 |
