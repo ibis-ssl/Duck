@@ -726,6 +726,8 @@ robot 状態モデル:
 robot v1 filter 要件:
 
 - `team + robot id` ごとに camera-local track を維持し、位置系と向き系を独立した線形 Kalman filter として更新する
+- 同一 camera / team の raw detection に、既に採用済み robot と近すぎる別 ID robot が含まれる場合は、Tigers の `Geometry.getBotRadius() * 1.5` 相当の距離を基準に後続候補を採用しない
+- 近接重複 robot の採用順は deterministic にし、confidence が高い候補を優先し、同 confidence では robot id の小さい候補を優先する
 - 向き観測は update 前に unwrap して、`-pi` / `pi` 境界の不連続を filter 外へ漏らさない
 - gate 判定は生観測との差分ではなく、予測状態に対する対応付け規則として使う
 - 欠測 frame では predict のみを行い、visibility 減衰と track 削除判定は別責務として扱う
@@ -765,6 +767,8 @@ ball ごとの生存管理:
 - 生成直後の track は育成前として扱う
 - 一定回数の更新後に成長済みとみなす
 - 成長前 track は primary 候補の優先度を下げる
+- v1 では Tigers の `grownUpAge = 3` に合わせ、primary 以外の secondary ball は 3 回以上観測された track だけを外部出力する
+- 1 frame だけ raw detection に入った secondary ball ghost は camera-local track として短時間残せるが、tracked frame / viewer / official packet へは出さない
 - 長時間更新されない track は削除する
 
 ball 状態モデル:
@@ -790,10 +794,10 @@ ball v1 filter 要件:
 複数 ball 対応:
 
 - 内部では `TrackedBallState` を複数保持する
-- 外部 `TrackedFrame.Balls` に全 ball を出す
+- 外部 `TrackedFrame.Balls` には primary ball と、成長済み secondary ball だけを出す
 - `Balls[0]` は primary ball に固定する
-- primary 選定は visibility、経過時間、field 上の重要度、直近 contact との整合を使う
-- secondary ball は出力規則節の stable sort に従う
+- primary 選定は直前 primary track を優先し、その後 visibility、経過時間、field 上の重要度、直近 contact との整合を使う
+- secondary ball は出力規則節の stable sort に従うが、single-frame ghost 抑制のため育成前 track は出力しない
 
 ### camera 統合
 
@@ -1047,6 +1051,7 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 - `TRACKER-018`: Tracker v1 の build/test 証跡を取得する
 - `TRACKER-019`: Tracker v1 の integration 観点検証を行う
 - `TRACKER-020`: Tracker v1 の最終レビューと追跡ファイル同期を行う
+- `TRACKER-027`: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する
 
 contracts フェーズの着手順:
 

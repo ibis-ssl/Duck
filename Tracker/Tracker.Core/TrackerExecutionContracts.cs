@@ -14,7 +14,9 @@ public sealed class TrackerEngine : ITrackerEngine
     private const double BallMergeDistanceMm = 120d;
     private const double RobotTrackMovementGateMm = 120d;
     private const double RobotRadiusMm = 90d;
+    private const double RobotCloseDuplicateDistanceMm = RobotRadiusMm * 1.5d;
     private const double BallRadiusMm = 21.5d;
+    private const int BallGrownUpObservationCount = 3;
     private const double KickStillMovingSpeedThresholdMmPerS = 400d;
     private const int KickStillMovingGraceFrames = 2;
     private const long RecentContactWindowNs = 200_000_000;
@@ -210,18 +212,32 @@ public sealed class TrackerEngine : ITrackerEngine
 
         var balls = new List<TrackedBallState>();
         var robots = new List<TrackedRobotState>();
+        var previousPrimaryBall = lastCommittedPrimaryBall;
         var observedBallTrackIds = UpdateCameraBallTrackStates(settings, orderedDetections, frameTimestampNs);
-        foreach (var ballEntry in AssignMergedBallIdentity(settings, CollectMergedBallStates(settings, observedBallTrackIds)))
+        var ballCandidates = AssignMergedBallIdentity(settings, CollectMergedBallStates(settings, observedBallTrackIds))
+            .Where(ballEntry => PassesOutputVisibility(ballEntry.Visibility, GetBallOutputVisibilityThreshold(settings)))
+            .Select(ballEntry => new BallOutputCandidate(ballEntry, CreateTrackedBall(ballEntry)))
+            .ToList();
+        ballCandidates.Sort(
+            (left, right) =>
+            {
+                var leftPrimaryComparison = IsFreshPreviousPrimaryBall(left, previousPrimaryBall)
+                    .CompareTo(IsFreshPreviousPrimaryBall(right, previousPrimaryBall));
+                return leftPrimaryComparison != 0
+                    ? -leftPrimaryComparison
+                    : TrackedBallComparer.Instance.Compare(left.TrackedBall, right.TrackedBall);
+            });
+
+        for (var index = 0; index < ballCandidates.Count; index++)
         {
-            if (!PassesOutputVisibility(ballEntry.Visibility, GetBallOutputVisibilityThreshold(settings)))
+            var ballCandidate = ballCandidates[index];
+            if (index > 0 && ballCandidate.MergedBall.ObservationCount < BallGrownUpObservationCount)
             {
                 continue;
             }
 
-            balls.Add(CreateTrackedBall(ballEntry));
+            balls.Add(ballCandidate.TrackedBall);
         }
-
-        balls.Sort(TrackedBallComparer.Instance);
 
         var observedCameraRobotKeys = UpdateCameraRobotTrackStates(settings, orderedDetections, frameTimestampNs);
         foreach (var robotEntry in CollectMergedRobotStates(observedCameraRobotKeys))
@@ -238,7 +254,6 @@ public sealed class TrackerEngine : ITrackerEngine
         robots.Sort(TrackedRobotComparer.Instance);
 
         var primaryBall = balls.FirstOrDefault();
-        var previousPrimaryBall = lastCommittedPrimaryBall;
         var previousContactState = primaryBall is not null
             && latestBallContactStates.TryGetValue(primaryBall.InternalTrackId, out var currentPrimaryContactState)
             ? currentPrimaryContactState
@@ -950,7 +965,8 @@ public sealed class TrackerEngine : ITrackerEngine
                             observation.EventTimestampNs,
                             observation.EventTimestampNs,
                             observation.Confidence,
-                            observation.Confidence);
+                            observation.Confidence,
+                            1);
                     }
                     else
                     {
@@ -1003,6 +1019,7 @@ public sealed class TrackerEngine : ITrackerEngine
             LastUpdateTimestampNs = observation.EventTimestampNs,
             Visibility = observation.Confidence,
             Quality = observation.Confidence,
+            ObservationCount = previousState.ObservationCount + 1,
         };
     }
 
@@ -1113,7 +1130,9 @@ public sealed class TrackerEngine : ITrackerEngine
                     cluster.Average(state => state.Visibility),
                     cluster.Max(state => state.LastVisibleTimestampNs),
                     cluster.Average(state => state.Quality),
-                    cluster.Select(state => state.CameraId).Distinct().OrderBy(cameraId => cameraId).ToList()));
+                    cluster.Select(state => state.CameraId).Distinct().OrderBy(cameraId => cameraId).ToList(),
+                    cluster.Max(state => state.ObservationCount),
+                    cluster.Any(state => observedBallTrackIds.Contains(state.LocalTrackId))));
         }
 
         return mergedStates;
@@ -1246,6 +1265,13 @@ public sealed class TrackerEngine : ITrackerEngine
         };
     }
 
+    private static bool IsFreshPreviousPrimaryBall(BallOutputCandidate candidate, TrackedBallState? previousPrimaryBall)
+    {
+        return candidate.MergedBall.HasFreshObservation
+            && previousPrimaryBall is not null
+            && candidate.TrackedBall.InternalTrackId == previousPrimaryBall.InternalTrackId;
+    }
+
     private static double GetObservedBallUncertaintyMm(float confidence)
     {
         return 1d / Math.Max(0.001d, confidence);
@@ -1296,18 +1322,58 @@ public sealed class TrackerEngine : ITrackerEngine
 
         foreach (var detection in orderedDetections)
         {
-            foreach (var robot in detection.RobotsYellow)
-            {
-                AddRobotObservation(observations, TrackerTeam.Yellow, robot, detection.CameraId, detection.EventTimestampNs);
-            }
+            var detectionObservations = new Dictionary<CameraRobotKey, RobotObservation>();
+            AddRobotObservations(
+                detectionObservations,
+                TrackerTeam.Yellow,
+                detection.RobotsYellow,
+                detection.CameraId,
+                detection.EventTimestampNs);
+            AddRobotObservations(
+                detectionObservations,
+                TrackerTeam.Blue,
+                detection.RobotsBlue,
+                detection.CameraId,
+                detection.EventTimestampNs);
 
-            foreach (var robot in detection.RobotsBlue)
+            foreach (var observation in detectionObservations)
             {
-                AddRobotObservation(observations, TrackerTeam.Blue, robot, detection.CameraId, detection.EventTimestampNs);
+                observations[observation.Key] = observation.Value;
             }
         }
 
         return observations;
+    }
+
+    private static void AddRobotObservations(
+        Dictionary<CameraRobotKey, RobotObservation> observations,
+        TrackerTeam team,
+        IEnumerable<SSL_DetectionRobot> robots,
+        uint cameraId,
+        long eventTimestampNs)
+    {
+        foreach (var robot in robots.OrderByDescending(candidate => candidate.Confidence).ThenBy(candidate => candidate.RobotId))
+        {
+            if (HasCloseRobotObservationWithDifferentId(observations, team, robot, cameraId))
+            {
+                continue;
+            }
+
+            AddRobotObservation(observations, team, robot, cameraId, eventTimestampNs);
+        }
+    }
+
+    private static bool HasCloseRobotObservationWithDifferentId(
+        IReadOnlyDictionary<CameraRobotKey, RobotObservation> observations,
+        TrackerTeam team,
+        SSL_DetectionRobot robot,
+        uint cameraId)
+    {
+        return observations.Any(
+            observation => observation.Key.CameraId == cameraId
+                && observation.Key.Team == team
+                && observation.Key.RobotId != robot.RobotId
+                && GetDistanceMm(observation.Value.XMm, observation.Value.YMm, robot.X, robot.Y) < RobotCloseDuplicateDistanceMm);
     }
 
     private static void AddRobotObservation(
@@ -1749,7 +1815,8 @@ public sealed class TrackerEngine : ITrackerEngine
         long LastVisibleTimestampNs,
         long LastUpdateTimestampNs,
         float Visibility,
-        double Quality)
+        double Quality,
+        int ObservationCount)
     {
         public double XMm => XAxis.Position;
 
@@ -1777,7 +1844,11 @@ public sealed class TrackerEngine : ITrackerEngine
         float Visibility,
         long LastVisibleTimestampNs,
         double Quality,
-        IReadOnlyList<uint> SourceCameraIds);
+        IReadOnlyList<uint> SourceCameraIds,
+        int ObservationCount,
+        bool HasFreshObservation);
+
+    private sealed record BallOutputCandidate(MergedBallState MergedBall, TrackedBallState TrackedBall);
 
     private sealed record MergedBallIdentityState(
         int InternalTrackId,

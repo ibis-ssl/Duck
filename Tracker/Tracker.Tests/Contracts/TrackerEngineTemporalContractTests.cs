@@ -848,6 +848,67 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_IgnoresCloseDuplicateRobotIdsFromSameCameraAndTeam()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow:
+                [
+                    TrackerContractTestData.CreateRobot(robotId: 1, x: -5539.6f, y: -4310.4f, orientation: -1.567f),
+                    TrackerContractTestData.CreateRobot(robotId: 11, x: -5539.2f, y: -4310.4f, orientation: 0.013f),
+                ],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(Assert.Single(result.CommittedFrames).Robots);
+        Assert.Equal(TrackerTeam.Yellow, trackedRobot.Team);
+        Assert.Equal((uint)1, trackedRobot.RobotId);
+    }
+
+    [Fact]
+    public void Update_DoesNotApplyCloseDuplicateRobotFilterAcrossDetections()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 1, x: 100, y: 100, orientation: 0.1f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 11,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 11, x: 101, y: 100, orientation: 0.2f)],
+                captureTimeSeconds: 1.010),
+            settings: settings);
+
+        var flushResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 2,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0)],
+                captureTimeSeconds: 2.000),
+            settings: settings);
+
+        var robotIds = flushResult.CommittedFrames[0].Robots
+            .Where(robot => robot.Team == TrackerTeam.Yellow)
+            .Select(robot => robot.RobotId)
+            .Order()
+            .ToList();
+        Assert.Equal([(uint)1, (uint)11], robotIds);
+    }
+
+    [Fact]
     public void Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation()
     {
         var engine = fixture.CreateEngine();
@@ -943,18 +1004,22 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
-        var result = engine.Update(
-            packet: TrackerContractTestData.CreateDetectionPacket(
-                frameNumber: 10,
-                cameraId: 1,
-                balls:
-                [
-                    TrackerContractTestData.CreateBall(x: 100, y: 100, confidence: 0.60f),
-                    TrackerContractTestData.CreateBall(x: 300, y: 300, confidence: 0.95f),
-                    TrackerContractTestData.CreateBall(x: 200, y: 200, confidence: 0.80f),
-                ],
-                captureTimeSeconds: 1.000),
-            settings: settings);
+        TrackerUpdateResult result = new();
+        for (var frameIndex = 0; frameIndex < 3; frameIndex++)
+        {
+            result = engine.Update(
+                packet: TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: (uint)(10 + frameIndex),
+                    cameraId: 1,
+                    balls:
+                    [
+                        TrackerContractTestData.CreateBall(x: 100, y: 100, confidence: 0.60f),
+                        TrackerContractTestData.CreateBall(x: 300, y: 300, confidence: 0.95f),
+                        TrackerContractTestData.CreateBall(x: 200, y: 200, confidence: 0.80f),
+                    ],
+                    captureTimeSeconds: 1.000 + (frameIndex * 0.100)),
+                settings: settings);
+        }
 
         var committedFrame = Assert.Single(result.CommittedFrames);
 
@@ -1199,6 +1264,46 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_DoesNotEmitSingleFrameSecondaryBallGhost()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls:
+                [
+                    TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
+                    TrackerContractTestData.CreateBall(x: -3173.6f, y: -4397.0f, confidence: 1.0f),
+                ],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+
+        var thirdResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f)],
+                captureTimeSeconds: 1.200),
+            settings: settings);
+
+        var secondBall = Assert.Single(Assert.Single(secondResult.CommittedFrames).Balls);
+        var thirdBall = Assert.Single(Assert.Single(thirdResult.CommittedFrames).Balls);
+        Assert.Equal(0, secondBall.XMm, precision: 3);
+        Assert.Equal(0, thirdBall.XMm, precision: 3);
+    }
+
+    [Fact]
     public void Update_UsesConfiguredBallVisibilityHalfLifeWhenPredictingTrack()
     {
         var engine = fixture.CreateEngine();
@@ -1332,7 +1437,7 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
                 captureTimeSeconds: 1.010),
             settings: settings);
 
-        var result = engine.Update(
+        _ = engine.Update(
             packet: TrackerContractTestData.CreateDetectionPacket(
                 frameNumber: 20,
                 cameraId: 2,
@@ -1342,6 +1447,30 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
                     TrackerContractTestData.CreateBall(x: 200, y: 0, confidence: 1.0f),
                 ],
                 captureTimeSeconds: 2.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 2,
+                balls:
+                [
+                    TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
+                    TrackerContractTestData.CreateBall(x: 200, y: 0, confidence: 1.0f),
+                ],
+                captureTimeSeconds: 2.100),
+            settings: settings);
+
+        var result = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 40,
+                cameraId: 2,
+                balls:
+                [
+                    TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
+                    TrackerContractTestData.CreateBall(x: 200, y: 0, confidence: 1.0f),
+                ],
+                captureTimeSeconds: 2.200),
             settings: settings);
 
         var committedFrame = Assert.Single(result.CommittedFrames);
@@ -1424,17 +1553,21 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
-        var result = engine.Update(
-            packet: TrackerContractTestData.CreateDetectionPacket(
-                frameNumber: 10,
-                cameraId: 1,
-                balls:
-                [
-                    TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
-                    TrackerContractTestData.CreateBall(x: 80, y: 80, confidence: 0.9f),
-                ],
-                captureTimeSeconds: 1.000),
-            settings: settings);
+        TrackerUpdateResult result = new();
+        for (var frameIndex = 0; frameIndex < 3; frameIndex++)
+        {
+            result = engine.Update(
+                packet: TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: (uint)(10 + frameIndex),
+                    cameraId: 1,
+                    balls:
+                    [
+                        TrackerContractTestData.CreateBall(x: 0, y: 0, confidence: 1.0f),
+                        TrackerContractTestData.CreateBall(x: 80, y: 80, confidence: 0.9f),
+                    ],
+                    captureTimeSeconds: 1.000 + (frameIndex * 0.100)),
+                settings: settings);
+        }
 
         var committedFrame = Assert.Single(result.CommittedFrames);
         Assert.Equal(2, committedFrame.Balls.Count);

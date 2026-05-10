@@ -4,17 +4,19 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-025
-- Title: Tracked 表示へ低 visibility の stale object を出さない
+- ID: TRACKER-027
+- Title: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する
 - Phase: engine
 - Status: done
 - Size: small
-- Dependencies: TRACKER-024 が完了していること
+- Dependencies: TRACKER-026 が完了し、再現ログ解析が記録されていること
 - Exit Criteria:
-  - 欠測で十分 decayed した robot / ball track が `TrackerFrame` に出力されない
-  - 1 frame 程度の短期欠測を残す既存契約は維持される
-  - Tigers 由来の設定差分と写像が `reports/tracker-025-tigers-config-diff-20260510153510.md` に記録されている
-  - `reports/tracker-025-review-20260510154020.md` に review / re-review 結果が記録され、blocking finding が残っていない
+  - raw detection に Y1/Y11 のような同一 camera / team / 近接別 ID robot が入っても、低 ID / 高 confidence 側だけが tracked output へ採用される
+  - 短命 secondary ball ghost が 1 frame の raw detection だけで tracked output に増えない
+  - genuine な複数 ball は継続観測後に stable sort で出力できる
+  - 再現ログ解析と Tigers 差分が `reports/tracker-026-reproduction-analysis-20260510160509.md` に記録されている
+  - 実装・検証結果が `reports/tracker-027-evidence-20260510161437.md` に記録されている
+  - review / re-review 結果が `reports/tracker-027-review-20260510161549.md` に記録され、blocking finding が残っていない
 
 ## 次の調査タスク
 
@@ -61,3 +63,4 @@
 | TRACKER-024 | Kalman 標準準拠の検証と release 判定をやり直す | verification | done | TRACKER-023 | Kalman 化後の focused/full test と review report が存在し、設計書の「v1 は直線運動前提の Kalman filter を標準とする」に対して未解決 blocker が残っていない。 |
 | TRACKER-025 | Tracked 表示へ低 visibility の stale object を出さない | engine | done | TRACKER-024 | 欠測で十分 decayed した robot / ball track が `TrackerFrame` に出力されず、1 frame 程度の短期欠測を残す既存契約は維持される。設定差分は `reports/tracker-025-tigers-config-diff-20260510153510.md`、review は `reports/tracker-025-review-20260510154020.md` に記録済み。 |
 | TRACKER-026 | Tracked 表示の raw/tracked diagnostics log を追加する | investigation | done | TRACKER-025 | raw SSL-Vision detection と tracked 出力を同じログで比較でき、誤検出の発生源を切り分けられる。`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` は 0 warning / 0 error。 |
+| TRACKER-027 | Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する | engine | done | TRACKER-026 | 近接別 ID robot を raw detection 単位で抑制し、短命 secondary ball ghost を 1 frame で出力しない。継続観測された genuine な複数 ball は stable sort で出力できる。実装・検証は `reports/tracker-027-evidence-20260510161437.md`、review は `reports/tracker-027-review-20260510161549.md` に記録済み。 |
