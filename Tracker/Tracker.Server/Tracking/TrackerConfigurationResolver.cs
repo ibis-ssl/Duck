@@ -56,6 +56,7 @@ public static class TrackerConfigurationResolver
             ProcessNoise = runtimeOverrides.ProcessNoise ?? profile.ProcessNoise,
             MeasurementNoise = runtimeOverrides.MeasurementNoise ?? profile.MeasurementNoise,
             VisibilityHalfLifeSeconds = runtimeOverrides.VisibilityHalfLifeSeconds ?? profile.VisibilityHalfLifeSeconds,
+            OutputVisibilityThreshold = runtimeOverrides.OutputVisibilityThreshold ?? profile.OutputVisibilityThreshold,
             Gate = runtimeOverrides.Gate ?? profile.Gate,
             OutlierLimitMm = runtimeOverrides.OutlierLimitMm ?? profile.OutlierLimitMm,
         };
@@ -70,6 +71,7 @@ public static class TrackerConfigurationResolver
             ProcessNoise = runtimeOverrides.ProcessNoise ?? profile.ProcessNoise,
             MeasurementNoise = runtimeOverrides.MeasurementNoise ?? profile.MeasurementNoise,
             VisibilityHalfLifeSeconds = runtimeOverrides.VisibilityHalfLifeSeconds ?? profile.VisibilityHalfLifeSeconds,
+            OutputVisibilityThreshold = runtimeOverrides.OutputVisibilityThreshold ?? profile.OutputVisibilityThreshold,
             Gate = runtimeOverrides.Gate ?? profile.Gate,
             OutlierLimitMm = runtimeOverrides.OutlierLimitMm ?? profile.OutlierLimitMm,
             TrackLifetimeNs = runtimeOverrides.TrackLifetimeNs ?? profile.TrackLifetimeNs,

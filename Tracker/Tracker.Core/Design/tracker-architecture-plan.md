@@ -730,6 +730,8 @@ robot v1 filter 要件:
 - gate 判定は生観測との差分ではなく、予測状態に対する対応付け規則として使う
 - 欠測 frame では predict のみを行い、visibility 減衰と track 削除判定は別責務として扱う
 - merge に使う uncertainty は最新観測 confidence のみでなく、filter 後の position uncertainty を基準にする
+- 欠測により visibility が十分低下した stale track は内部状態として短時間残せるが、tracked frame / viewer / official packet へ出し続けてはならない
+- 外部出力可否は `OutputVisibilityThreshold` で判定し、Tigers の robot quality gate 初期値 `0.05` を設定値の基準とする
 
 orientation は unwrap して連続化する。`-pi` / `pi` 境界での跳びは state 層で吸収する。
 
@@ -782,6 +784,8 @@ ball v1 filter 要件:
 - track の uncertainty は観測 confidence の単純逆数ではなく、filter 事後 covariance から導く
 - camera 横断統合の weighted merge は、この ball filter の事後 uncertainty を重みとする
 - health / 育成 / visibility の管理は filter 更新とは別責務だが、少なくとも Kalman ベースの状態推定を置き換えてはならない
+- 欠測により visibility が十分低下した stale track は内部状態として短時間残せるが、tracked frame / viewer / official packet へ出し続けてはならない
+- 外部出力可否は `OutputVisibilityThreshold` で判定可能とし、Tigers の ball 不可視 lifetime 初期値 `1.0s` は `TrackLifetimeNs` の基準とする
 
 複数 ball 対応:
 

@@ -55,6 +55,7 @@ public class TrackerCoreContractSurfaceTests
             {
                 ProcessNoise = 1.5,
                 MeasurementNoise = 0.8,
+                OutputVisibilityThreshold = 0.2,
                 Gate = 2.0,
                 OutlierLimitMm = 300,
             },
@@ -62,6 +63,7 @@ public class TrackerCoreContractSurfaceTests
             {
                 ProcessNoise = 1.7,
                 MeasurementNoise = 0.6,
+                OutputVisibilityThreshold = 0.4,
                 Gate = 2.5,
                 OutlierLimitMm = 450,
                 TrackLifetimeNs = 2_000_000_000,
@@ -83,7 +85,9 @@ public class TrackerCoreContractSurfaceTests
 
         Assert.Equal("224.5.23.2", request.RuntimeOverrides.Publish.MulticastAddress);
         Assert.Equal(10010, request.RuntimeOverrides.Publish.Port);
+        Assert.Equal(0.2, request.RuntimeOverrides.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(300, request.RuntimeOverrides.RobotTracker.OutlierLimitMm);
+        Assert.Equal(0.4, request.RuntimeOverrides.BallTracker.OutputVisibilityThreshold);
         Assert.Equal(2_000_000_000, request.RuntimeOverrides.BallTracker.TrackLifetimeNs);
         Assert.Equal(25, request.RuntimeOverrides.KickDetector.ContactMarginMm);
     }

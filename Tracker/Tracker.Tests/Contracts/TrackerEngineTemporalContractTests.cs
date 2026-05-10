@@ -816,6 +816,38 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
     }
 
     [Fact]
+    public void Update_DoesNotEmitRobotTrackAfterOutputVisibilityFallsBelowThreshold()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            robotTracker: new TrackerRobotTrackerOverrides
+            {
+                VisibilityHalfLifeSeconds = 1.0d,
+                OutputVisibilityThreshold = 0.25d,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 11, x: 100, y: 200, orientation: 0.5f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 300)],
+                captureTimeSeconds: 3.100),
+            settings: settings);
+
+        Assert.Empty(Assert.Single(secondResult.CommittedFrames).Robots);
+    }
+
+    [Fact]
     public void Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation()
     {
         var engine = fixture.CreateEngine();
@@ -1128,6 +1160,39 @@ public class TrackerEngineTemporalContractTests : IClassFixture<TrackerContractF
                 cameraId: 1,
                 robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 300, y: 400, orientation: 0.5f)],
                 captureTimeSeconds: 1.200),
+            settings: settings);
+
+        Assert.Empty(Assert.Single(secondResult.CommittedFrames).Balls);
+    }
+
+    [Fact]
+    public void Update_DoesNotEmitBallTrackAfterOutputVisibilityFallsBelowThreshold()
+    {
+        var engine = fixture.CreateEngine();
+        var settings = fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            ballTracker: new TrackerBallTrackerOverrides
+            {
+                VisibilityHalfLifeSeconds = 1.0d,
+                OutputVisibilityThreshold = 0.5d,
+                TrackLifetimeNs = 10_000_000_000,
+            });
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall(x: 100, y: 200, confidence: 1.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 300, y: 400, orientation: 0.5f)],
+                captureTimeSeconds: 2.100),
             settings: settings);
 
         Assert.Empty(Assert.Single(secondResult.CommittedFrames).Balls);

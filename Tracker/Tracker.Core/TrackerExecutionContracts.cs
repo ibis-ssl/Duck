@@ -213,6 +213,11 @@ public sealed class TrackerEngine : ITrackerEngine
         var observedBallTrackIds = UpdateCameraBallTrackStates(settings, orderedDetections, frameTimestampNs);
         foreach (var ballEntry in AssignMergedBallIdentity(settings, CollectMergedBallStates(settings, observedBallTrackIds)))
         {
+            if (!PassesOutputVisibility(ballEntry.Visibility, GetBallOutputVisibilityThreshold(settings)))
+            {
+                continue;
+            }
+
             balls.Add(CreateTrackedBall(ballEntry));
         }
 
@@ -221,7 +226,13 @@ public sealed class TrackerEngine : ITrackerEngine
         var observedCameraRobotKeys = UpdateCameraRobotTrackStates(settings, orderedDetections, frameTimestampNs);
         foreach (var robotEntry in CollectMergedRobotStates(observedCameraRobotKeys))
         {
-            robots.Add(CreateTrackedRobot(robotEntry.Key, robotEntry.Value));
+            var trackedRobot = CreateTrackedRobot(robotEntry.Key, robotEntry.Value);
+            if (!PassesOutputVisibility(trackedRobot.Visibility, GetRobotOutputVisibilityThreshold(settings)))
+            {
+                continue;
+            }
+
+            robots.Add(trackedRobot);
         }
 
         robots.Sort(TrackedRobotComparer.Instance);
@@ -1553,6 +1564,11 @@ public sealed class TrackerEngine : ITrackerEngine
         return Math.Max(0.001d, settings.BallTracker.VisibilityHalfLifeSeconds ?? DefaultVisibilityHalfLifeSeconds);
     }
 
+    private static double GetBallOutputVisibilityThreshold(TrackerEngineSettings settings)
+    {
+        return Math.Clamp(settings.BallTracker.OutputVisibilityThreshold ?? 0d, 0d, 1d);
+    }
+
     private static double GetRobotMovementGateMm(TrackerEngineSettings settings)
     {
         var gatedDistanceMm = settings.RobotTracker.Gate is null
@@ -1576,6 +1592,16 @@ public sealed class TrackerEngine : ITrackerEngine
     private static double GetRobotVisibilityHalfLifeSeconds(TrackerEngineSettings settings)
     {
         return Math.Max(0.001d, settings.RobotTracker.VisibilityHalfLifeSeconds ?? DefaultVisibilityHalfLifeSeconds);
+    }
+
+    private static double GetRobotOutputVisibilityThreshold(TrackerEngineSettings settings)
+    {
+        return Math.Clamp(settings.RobotTracker.OutputVisibilityThreshold ?? 0d, 0d, 1d);
+    }
+
+    private static bool PassesOutputVisibility(float visibility, double threshold)
+    {
+        return visibility >= threshold;
     }
 
     private static float ComputeDecayVisibility(float visibility, double deltaSeconds, double halfLifeSeconds)
@@ -1931,6 +1957,8 @@ public sealed class TrackerRobotTrackerOverrides
 
     public double? VisibilityHalfLifeSeconds { get; init; }
 
+    public double? OutputVisibilityThreshold { get; init; }
+
     public double? Gate { get; init; }
 
     public double? OutlierLimitMm { get; init; }
@@ -1943,6 +1971,8 @@ public sealed class TrackerBallTrackerOverrides
     public double? MeasurementNoise { get; init; }
 
     public double? VisibilityHalfLifeSeconds { get; init; }
+
+    public double? OutputVisibilityThreshold { get; init; }
 
     public double? Gate { get; init; }
 

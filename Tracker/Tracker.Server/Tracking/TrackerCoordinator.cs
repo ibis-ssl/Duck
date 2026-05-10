@@ -282,6 +282,7 @@ public sealed class TrackerCoordinator
         return left.ProcessNoise == right.ProcessNoise
             && left.MeasurementNoise == right.MeasurementNoise
             && left.VisibilityHalfLifeSeconds == right.VisibilityHalfLifeSeconds
+            && left.OutputVisibilityThreshold == right.OutputVisibilityThreshold
             && left.Gate == right.Gate
             && left.OutlierLimitMm == right.OutlierLimitMm;
     }
@@ -293,6 +294,7 @@ public sealed class TrackerCoordinator
         return left.ProcessNoise == right.ProcessNoise
             && left.MeasurementNoise == right.MeasurementNoise
             && left.VisibilityHalfLifeSeconds == right.VisibilityHalfLifeSeconds
+            && left.OutputVisibilityThreshold == right.OutputVisibilityThreshold
             && left.Gate == right.Gate
             && left.OutlierLimitMm == right.OutlierLimitMm
             && left.TrackLifetimeNs == right.TrackLifetimeNs;
@@ -368,6 +370,7 @@ public sealed class TrackerCoordinator
             ProcessNoise = tracker.ProcessNoise,
             MeasurementNoise = tracker.MeasurementNoise,
             VisibilityHalfLifeSeconds = tracker.VisibilityHalfLifeSeconds,
+            OutputVisibilityThreshold = tracker.OutputVisibilityThreshold,
             Gate = tracker.Gate,
             OutlierLimitMm = tracker.OutlierLimitMm,
         };
@@ -380,6 +383,7 @@ public sealed class TrackerCoordinator
             ProcessNoise = tracker.ProcessNoise,
             MeasurementNoise = tracker.MeasurementNoise,
             VisibilityHalfLifeSeconds = tracker.VisibilityHalfLifeSeconds,
+            OutputVisibilityThreshold = tracker.OutputVisibilityThreshold,
             Gate = tracker.Gate,
             OutlierLimitMm = tracker.OutlierLimitMm,
             TrackLifetimeNs = tracker.TrackLifetimeNs,
