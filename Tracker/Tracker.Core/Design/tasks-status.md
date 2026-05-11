@@ -7,18 +7,18 @@
 - ID: TRACKER-037
 - Title: Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する
 - Phase: maintenance
-- Status: in_progress
+- Status: done
 - Size: small
 - Dependencies: TRACKER-036
 - Exit Criteria:
   - dot 区切りを使うファイル名とフォルダ分割を優先するファイル名の基準が日本語で明文化されている
   - class / property / method / test のコメント付与基準が日本語で明文化され、test も XML コメントで確認内容を説明する方針になっている
   - `gpt-5.5 high` の sub-agent が現状ファイルを基準に照らして監査し、結果が `reports/tracker-037-naming-comment-audit-20260511195008.md` に記録されている
-  - 必要な rename / 配置変更 / コメント補強がある場合は実施され、build/test/review の結果に blocking finding が残っていない
+  - 必要な rename / 配置変更 / コメント補強が実施され、build/test/review の結果に blocking finding が残っていない。最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み
 
 ## 次の調査タスク
 
-- TRACKER-037
+- none
 
 ## タスク一覧
 
@@ -61,4 +61,4 @@
 | TRACKER-034 | Server / CLI / UI の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `Tracker.CaptureReplay/Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` などを責務別に分割し、主要 class / property / method に日本語コメントを追加した。実装・検証は `reports/tracker-034-server-worker-20260511074000.md`、追加コメント補強は `reports/tracker-034-comment-followup-worker-20260511082000.md`、review は `reports/tracker-034-review-20260511081000.md` と `reports/tracker-034-review-r2-20260511083000.md` に記録済み。 |
 | TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | done | TRACKER-033, TRACKER-034 | 巨大 test file を責務別に分割し、対象 test 81 件に何を確認しているかの日本語コメントを追加した。実装・検証は `reports/tracker-035-test-worker-20260511085000.md`、review は `reports/tracker-035-review-20260511091000.md` に記録済み。 |
 | TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | done | TRACKER-033, TRACKER-034, TRACKER-035 | 保守性改善全体の最終検証と final review を実施した。最終検証は `reports/tracker-036-final-verification-20260511093000.md`、final review は `reports/tracker-036-final-review-20260511094000.md` に記録済み。 |
-| TRACKER-037 | Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する | maintenance | in_progress | TRACKER-036 | dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を日本語で明文化し、`gpt-5.5 high` sub-agent の監査結果と必要な修正・検証・レビューを reports に残す。 |
+| TRACKER-037 | Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する | maintenance | done | TRACKER-036 | dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を日本語で明文化した。監査は `reports/tracker-037-naming-comment-audit-20260511195008.md`、実装分担は `reports/tracker-037-design-rules-worker-20260511195640.md`、`reports/tracker-037-core-server-worker-20260511195640.md`、`reports/tracker-037-test-xml-comments-worker-20260511195640.md`、修正は `reports/tracker-037-review-fix-worker-20260511200910.md`、最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み。 |

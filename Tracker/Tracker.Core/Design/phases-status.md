@@ -4,9 +4,9 @@
 
 ## 全体状況
 
-- 現在のフェーズ: maintenance
+- 現在のフェーズ: done
 - 現在のタスク: TRACKER-037
-- 残りフェーズ: maintenance, verification, review
+- 残りフェーズ: none
 
 ## フェーズ一覧
 
@@ -21,4 +21,4 @@
 | review | done | `TRACKER-020` に加え、Kalman 標準準拠後および stale object 抑制後の review 結果が記録され、致命的な指摘が残っていない。`TRACKER-028`、`TRACKER-029`、`TRACKER-030`、`TRACKER-031` の review 結果は reports に記録済み。`TRACKER-032` 以降も task ごとの review report を作成し、blocking finding は残っていない。final review は `reports/tracker-036-final-review-20260511094000.md` に記録済み。 |
 | documentation | done | `TRACKER-021` が完了し、`Tracker.Server` の README に起動手順、画面の使い方、主要設定値の意味が記録されている。 |
 | investigation | done | `TRACKER-026` が完了し、raw SSL-Vision detection と tracked 出力を同じログで比較できる。 |
-| maintenance | in_progress | `TRACKER-032` から `TRACKER-035` で詳細設計書の分割、巨大ソースファイルの責務別分割、主要 class / property / method の日本語コメント追加、test の確認内容コメント追加を完了した。`TRACKER-037` で dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を明文化し、現状ファイルが同じ基準に従っているか確認する。親 Codex は manager として作業を管理し、実装・設計書作成・test 編集は worker sub-agent に委譲する。 |
+| maintenance | done | `TRACKER-032` から `TRACKER-035` で詳細設計書の分割、巨大ソースファイルの責務別分割、主要 class / property / method の日本語コメント追加、test の確認内容コメント追加を完了した。`TRACKER-037` で dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を明文化し、現状ファイルを同じ基準へ揃えた。親 Codex は manager として作業を管理し、実装・設計書作成・test 編集・レビューは `gpt-5.5 high` sub-agent に委譲した。 |
