@@ -35,7 +35,11 @@
     }
     else
     {
-        <div class="diagnostics-grid">
+        <div class="diagnostics-grid"
+             style="@TimelineAreaStyle()"
+             @onmousemove="OnTimelineResizeMove"
+             @onmouseup="OnTimelineResizeEnd"
+             @onmouseleave="OnTimelineResizeEnd">
             <aside class="diagnostics-timeline" aria-label="Diagnostics timeline">
                 @foreach (var entry in entries)
                 {
@@ -50,8 +54,23 @@
                     </button>
                 }
             </aside>
+            <div class="@TimelineResizeHandleClass()"
+                 role="separator"
+                 aria-orientation="vertical"
+                 aria-valuemin="@DiagnosticsRenderLayoutState.MinTimelineWidthRem"
+                 aria-valuemax="@DiagnosticsRenderLayoutState.MaxTimelineWidthRem"
+                 aria-valuenow="@timelineWidthRem"
+                 tabindex="0"
+                 @onmousedown="OnTimelineResizeStart"
+                 @onmousedown:preventDefault="true"
+                 @onkeydown="OnTimelineResizeKeyDown">
+            </div>
 
-            <main class="diagnostics-detail">
+            <main class="diagnostics-detail"
+                  style="@RenderAreaStyle()"
+                  @onmousemove="OnRenderResizeMove"
+                  @onmouseup="OnRenderResizeEnd"
+                  @onmouseleave="OnRenderResizeEnd">
                 @if (selectedEntry is null)
                 {
                     <div class="diagnostics-empty">No entry selected.</div>
@@ -116,6 +135,17 @@
                                                    RobotsBlue="trackedRenderView.RobotsBlue" />
                             </section>
                         </div>
+                        <div class="@RenderResizeHandleClass()"
+                             role="separator"
+                             aria-orientation="horizontal"
+                             aria-valuemin="@DiagnosticsRenderLayoutState.MinHeightRem"
+                             aria-valuemax="@DiagnosticsRenderLayoutState.MaxHeightRem"
+                             aria-valuenow="@renderAreaHeightRem"
+                             tabindex="0"
+                             @onmousedown="OnRenderResizeStart"
+                             @onmousedown:preventDefault="true"
+                             @onkeydown="OnRenderResizeKeyDown">
+                        </div>
                     }
                     else if (!string.IsNullOrEmpty(renderSnapshotError))
                     {
@@ -162,6 +192,50 @@
         @if (entries.Count > 0)
         {
             <div class="diagnostics-scrubber">
+                <div class="diagnostics-scrubber__playback" aria-label="Diagnostics playback controls">
+                    @if (playbackMode == DiagnosticsPlaybackMode.Play)
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button is-active"
+                                title="Stop"
+                                aria-label="Stop"
+                                @onclick="StopPlayback">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button"
+                                disabled="@(!CanPlayback)"
+                                title="Play"
+                                aria-label="Play"
+                                @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.Play))">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--play" aria-hidden="true"></span>
+                        </button>
+                    }
+                    @if (playbackMode == DiagnosticsPlaybackMode.FastForward)
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button is-active"
+                                title="Stop"
+                                aria-label="Stop"
+                                @onclick="StopPlayback">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button"
+                                disabled="@(!CanPlayback)"
+                                title="Fast forward"
+                                aria-label="Fast forward"
+                                @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward))">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--fast-forward" aria-hidden="true"></span>
+                        </button>
+                    }
+                </div>
                 <input type="range"
                        class="diagnostics-scrubber__range"
                        min="0"

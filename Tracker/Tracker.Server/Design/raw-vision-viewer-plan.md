@@ -210,6 +210,17 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionFieldCanvas.razor` は field 本体に加えて axis overlay と cursor coordinate overlay を管理する
 - cursor coordinate overlay は proto 由来の field geometry と `VisionFieldProjection` の逆写像から求める
 - sidebar 折りたたみは layout レベルで扱い、viewer 専用コンポーネントへ閉じ込めない
+- `Diagnostics.razor` の render snapshot 表示は、Vision Input / Tracker Output の field 表示領域と下部 detail 領域の境界をドラッグで変更できるようにする
+- diagnostics の field/detail 比率は viewport 高さに依存した固定上限だけにせず、4K など高解像度環境で field を大きく広げられる上限を持つ
+- detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / Tracker Output の文字列確認を壊さない
+- `Diagnostics.razor` の左側 frame timeline は、右側 detail との境界をドラッグして幅を変更できるようにする
+- frame timeline は右側 field/detail 表示領域を広げたい場合に小さくでき、最小幅でも frame 選択操作と省略表示を維持する
+- `MainLayout.razor.css` と `NavMenu.razor.css` は raw vision / diagnostics の濃色 green UI と同じ配色・密度を使い、default Blazor template 由来の青紫 gradient や浮いた navigation 表現を残さない
+- side navigation の active / hover / collapsed / mobile toggle は既存操作を維持しつつ、viewer と同じ border、background、text color の階調で表現する
+- `Diagnostics.razor` の timeline scrubber には再生、停止、早送り controls を置き、選択 entry を順方向に進める
+- 通常再生は log entry の timestamp 差分を使い、上限 clamp なしで実際の記録速度に合わせて進める
+- 再生中は再生ボタンを停止ボタン表示へ切り替え、早送り中は早送りボタンを停止ボタン表示へ切り替える
+- 再生/早送りは最後の entry に到達したら停止して先頭 entry に戻し、log 切替や entry 不在時には playback state を停止状態へ戻す
 
 ## テスト方針
 
@@ -220,6 +231,9 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionReceiverService.ResolveMulticastJoinAddresses` が configured address と auto discovery を正しく処理する
 - `VisionFieldProjection` が `(0, 0)` を center に写像する
 - `VisionFieldProjection` が field / boundary / goal depth を含めても viewport 内に収める
+- diagnostics render snapshot の field/detail 可変高さは、最小値・最大値・drag delta の clamp を単体テストで確認する
+- diagnostics frame timeline の可変幅は、最小値・最大値・drag delta の clamp を単体テストで確認する
+- diagnostics timeline playback は、次 index 計算、最後での停止と先頭復帰、通常再生と早送り step、timestamp 差分に基づく実速度 interval を単体テストで確認する
 
 ## 前提
 

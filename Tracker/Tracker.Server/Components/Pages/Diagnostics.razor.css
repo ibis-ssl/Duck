@@ -76,6 +76,62 @@
     min-height: 1.9rem;
 }
 
+.diagnostics-scrubber__playback {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+}
+
+.diagnostics-playback__button {
+    appearance: none;
+    display: inline-grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #17301d;
+    color: #dbe7d6;
+    cursor: pointer;
+}
+
+.diagnostics-playback__button:hover:not(:disabled),
+.diagnostics-playback__button:focus-visible {
+    border-color: #94d76b;
+    background: #24482b;
+    outline: none;
+}
+
+.diagnostics-playback__button.is-active {
+    border-color: #94d76b;
+    background: #24482b;
+    color: #f6fff1;
+}
+
+.diagnostics-playback__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.diagnostics-playback__icon {
+    display: block;
+    width: 0.95rem;
+    height: 0.95rem;
+    background: currentcolor;
+}
+
+.diagnostics-playback__icon--play {
+    clip-path: polygon(24% 14%, 24% 86%, 82% 50%);
+}
+
+.diagnostics-playback__icon--stop {
+    clip-path: inset(18% 18% 18% 18%);
+}
+
+.diagnostics-playback__icon--fast-forward {
+    clip-path: polygon(8% 14%, 8% 86%, 47% 50%, 47% 86%, 88% 50%, 47% 14%, 47% 50%);
+}
+
 .diagnostics-select {
     flex: 1;
     min-width: 0;
@@ -93,7 +149,7 @@
 
 .diagnostics-scrubber {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.55rem;
     border: 1px solid #315235;
@@ -127,9 +183,10 @@
 }
 
 .diagnostics-grid {
+    --diagnostics-timeline-width: 21rem;
     display: grid;
-    grid-template-columns: minmax(15rem, 21rem) minmax(0, 1fr);
-    gap: 0.55rem;
+    grid-template-columns: var(--diagnostics-timeline-width) 0.35rem minmax(0, 1fr);
+    gap: 0.35rem;
     flex: 1;
     min-height: 0;
 }
@@ -147,13 +204,40 @@
     padding: 0.35rem;
 }
 
+.diagnostics-timeline-resizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: ew-resize;
+    touch-action: none;
+}
+
+.diagnostics-timeline-resizer::before {
+    content: "";
+    width: 0.12rem;
+    height: min(6rem, 36%);
+    border-radius: 999px;
+    background: #5b805d;
+    box-shadow: -0.16rem 0 0 #2d4f32, 0.16rem 0 0 #2d4f32;
+}
+
+.diagnostics-timeline-resizer:hover,
+.diagnostics-timeline-resizer:focus-visible,
+.diagnostics-timeline-resizer.is-active {
+    border-color: #94d76b;
+    outline: none;
+    background: #17301d;
+}
+
 .diagnostics-timeline__item {
     appearance: none;
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(5.8rem, auto) minmax(6.6rem, auto) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr) minmax(0, 1.15fr);
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.28rem;
     border: 1px solid transparent;
     border-radius: 5px;
     margin: 0;
@@ -194,6 +278,7 @@
 }
 
 .diagnostics-detail {
+    --diagnostics-render-height: 32rem;
     border: 1px solid #315235;
     border-radius: 8px;
     background: #102318;
@@ -235,6 +320,34 @@
 .diagnostics-render section ::deep(.field-card) {
     flex: 1 1 auto;
     min-height: 0;
+}
+
+.diagnostics-render-resizer {
+    flex: 0 0 0.42rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: ns-resize;
+    touch-action: none;
+}
+
+.diagnostics-render-resizer::before {
+    content: "";
+    width: min(6rem, 36%);
+    height: 0.12rem;
+    border-radius: 999px;
+    background: #5b805d;
+    box-shadow: 0 -0.16rem 0 #2d4f32, 0 0.16rem 0 #2d4f32;
+}
+
+.diagnostics-render-resizer:hover,
+.diagnostics-render-resizer:focus-visible,
+.diagnostics-render-resizer.is-active {
+    border-color: #94d76b;
+    outline: none;
+    background: #17301d;
 }
 
 .diagnostics-render-alert {
@@ -359,12 +472,15 @@
 }
 
 .diagnostics-shell--render .diagnostics-render {
-    flex: 0 0 clamp(23rem, 44vh, 29rem);
+    flex: 0 1 var(--diagnostics-render-height);
+    min-height: 18rem;
+    max-height: calc(100% - 9rem);
     margin-bottom: 0.04rem;
 }
 
 .diagnostics-shell--render .diagnostics-detail__columns {
     flex: 1 1 auto;
+    min-height: 8rem;
     overflow: hidden;
 }
 
@@ -392,7 +508,7 @@
     }
 
     .diagnostics-grid {
-        grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+        grid-template-columns: var(--diagnostics-timeline-width) 0.35rem minmax(0, 1fr);
     }
 
     .diagnostics-detail__columns {
@@ -496,7 +612,8 @@
         grid-template-columns: 1fr;
     }
 
-    .diagnostics-timeline {
+    .diagnostics-timeline,
+    .diagnostics-timeline-resizer {
         display: none;
     }
 }

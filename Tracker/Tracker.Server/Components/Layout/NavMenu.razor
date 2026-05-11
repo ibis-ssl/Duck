@@ -1,43 +1,49 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid nav-topbar">
-        <a class="navbar-brand" href="">
-            @if (!IsCollapsed)
-            {
-                <span class="sidebar-brand-text">Tracker.Server</span>
-            }
-        </a>
-        <button type="button"
-                class="@(IsCollapsed ? "desktop-sidebar-toggle is-collapsed" : "desktop-sidebar-toggle")"
-                title="Toggle sidebar"
-                aria-label="Toggle sidebar"
-                aria-expanded="@(!IsCollapsed)"
-                @onclick="ToggleSidebarAsync"></button>
+﻿<div class="@NavMenuClass()">
+    <div class="top-row navbar navbar-dark">
+        <div class="container-fluid nav-topbar">
+            <a class="navbar-brand" href="">
+                @if (!IsCollapsed)
+                {
+                    <span class="sidebar-brand-text">Tracker.Server</span>
+                }
+                else
+                {
+                    <span class="sidebar-brand-mark" aria-hidden="true">TS</span>
+                }
+            </a>
+            <button type="button"
+                    class="@(IsCollapsed ? "desktop-sidebar-toggle is-collapsed" : "desktop-sidebar-toggle")"
+                    title="Toggle sidebar"
+                    aria-label="Toggle sidebar"
+                    aria-expanded="@(!IsCollapsed)"
+                    @onclick="ToggleSidebarAsync"></button>
+        </div>
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-vision-nav-menu" aria-hidden="true"></span>
-                @if (!IsCollapsed)
-                {
-                    <span class="nav-label">Vision</span>
-                }
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="diagnostics">
-                <span class="bi bi-diagnostics-nav-menu" aria-hidden="true"></span>
-                @if (!IsCollapsed)
-                {
-                    <span class="nav-label">Diagnostics</span>
-                }
-            </NavLink>
-        </div>
-    </nav>
+    <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+        <nav class="nav flex-column">
+            <div class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-vision-nav-menu" aria-hidden="true"></span>
+                    @if (!IsCollapsed)
+                    {
+                        <span class="nav-label">Vision</span>
+                    }
+                </NavLink>
+            </div>
+            <div class="nav-item">
+                <NavLink class="nav-link" href="diagnostics">
+                    <span class="bi bi-diagnostics-nav-menu" aria-hidden="true"></span>
+                    @if (!IsCollapsed)
+                    {
+                        <span class="nav-label">Diagnostics</span>
+                    }
+                </NavLink>
+            </div>
+        </nav>
+    </div>
 </div>
 
 @code {
@@ -46,6 +52,11 @@
 
     [Parameter]
     public EventCallback OnToggleSidebar { get; set; }
+
+    private string NavMenuClass()
+    {
+        return IsCollapsed ? "nav-menu is-collapsed" : "nav-menu";
+    }
 
     private Task ToggleSidebarAsync()
     {
