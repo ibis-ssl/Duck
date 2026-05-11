@@ -36,4 +36,37 @@ public class DiagnosticsRenderLayoutStateTests
 
         Assert.Equal(DiagnosticsRenderLayoutState.MaxHeightRem, height);
     }
+
+    /// <summary>
+    /// 横方向 drag delta が rem に変換され、frame timeline 幅へ反映されることを確認する。
+    /// </summary>
+    [Fact]
+    public void ApplyTimelineDragDelta_ConvertsPixelsToRem()
+    {
+        var width = DiagnosticsRenderLayoutState.ApplyTimelineDragDeltaRem(21, -96);
+
+        Assert.Equal(15, width);
+    }
+
+    /// <summary>
+    /// frame timeline を小さくしても操作可能な最小幅で止まることを確認する。
+    /// </summary>
+    [Fact]
+    public void ApplyTimelineDragDelta_ClampsToMinimumWidth()
+    {
+        var width = DiagnosticsRenderLayoutState.ApplyTimelineDragDeltaRem(21, -400);
+
+        Assert.Equal(DiagnosticsRenderLayoutState.MinTimelineWidthRem, width);
+    }
+
+    /// <summary>
+    /// frame timeline が detail 領域を壊すほど広がらないことを確認する。
+    /// </summary>
+    [Fact]
+    public void ApplyTimelineDragDelta_ClampsToMaximumWidth()
+    {
+        var width = DiagnosticsRenderLayoutState.ApplyTimelineDragDeltaRem(21, 800);
+
+        Assert.Equal(DiagnosticsRenderLayoutState.MaxTimelineWidthRem, width);
+    }
 }

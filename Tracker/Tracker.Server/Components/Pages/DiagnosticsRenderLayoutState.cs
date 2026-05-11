@@ -22,6 +22,21 @@ public static class DiagnosticsRenderLayoutState
     /// </summary>
     public const double DefaultHeightRem = 32;
 
+    /// <summary>
+    /// frame timeline を縮小しても選択操作を維持するための幅の下限。
+    /// </summary>
+    public const double MinTimelineWidthRem = 12;
+
+    /// <summary>
+    /// frame timeline が detail 領域を圧迫しすぎないための幅の上限。
+    /// </summary>
+    public const double MaxTimelineWidthRem = 36;
+
+    /// <summary>
+    /// diagnostics 初期表示時の frame timeline 幅。
+    /// </summary>
+    public const double DefaultTimelineWidthRem = 21;
+
     private const double RootFontSizePx = 16;
 
     /// <summary>
@@ -41,10 +56,34 @@ public static class DiagnosticsRenderLayoutState
     }
 
     /// <summary>
+    /// drag の横方向 pixel 差分を rem に変換し、frame timeline 幅の許容範囲へ収める。
+    /// </summary>
+    public static double ApplyTimelineDragDeltaRem(double startWidthRem, double deltaPixels)
+    {
+        return ClampTimelineWidthRem(startWidthRem + (deltaPixels / RootFontSizePx));
+    }
+
+    /// <summary>
+    /// frame timeline 幅を許容範囲へ収める。
+    /// </summary>
+    public static double ClampTimelineWidthRem(double widthRem)
+    {
+        return Math.Clamp(widthRem, MinTimelineWidthRem, MaxTimelineWidthRem);
+    }
+
+    /// <summary>
     /// CSS custom property として field 表示高さを渡す style 文字列を作る。
     /// </summary>
     public static string ToCssVariable(double heightRem)
     {
         return $"--diagnostics-render-height: {ClampHeightRem(heightRem).ToString("0.###", CultureInfo.InvariantCulture)}rem;";
+    }
+
+    /// <summary>
+    /// CSS custom property として frame timeline 幅を渡す style 文字列を作る。
+    /// </summary>
+    public static string ToTimelineCssVariable(double widthRem)
+    {
+        return $"--diagnostics-timeline-width: {ClampTimelineWidthRem(widthRem).ToString("0.###", CultureInfo.InvariantCulture)}rem;";
     }
 }

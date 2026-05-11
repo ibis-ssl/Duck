@@ -29,6 +29,10 @@ public partial class Diagnostics
     private double renderAreaHeightRem = DiagnosticsRenderLayoutState.DefaultHeightRem;
     private double renderResizeStartHeightRem;
     private double renderResizeStartY;
+    private bool isTimelineResizeActive;
+    private double timelineWidthRem = DiagnosticsRenderLayoutState.DefaultTimelineWidthRem;
+    private double timelineResizeStartWidthRem;
+    private double timelineResizeStartX;
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
 
@@ -189,11 +193,23 @@ public partial class Diagnostics
         return DiagnosticsRenderLayoutState.ToCssVariable(renderAreaHeightRem);
     }
 
+    private string TimelineAreaStyle()
+    {
+        return DiagnosticsRenderLayoutState.ToTimelineCssVariable(timelineWidthRem);
+    }
+
     private string RenderResizeHandleClass()
     {
         return isRenderResizeActive
             ? "diagnostics-render-resizer is-active"
             : "diagnostics-render-resizer";
+    }
+
+    private string TimelineResizeHandleClass()
+    {
+        return isTimelineResizeActive
+            ? "diagnostics-timeline-resizer is-active"
+            : "diagnostics-timeline-resizer";
     }
 
     private void OnRenderResizeStart(MouseEventArgs args)
@@ -229,6 +245,42 @@ public partial class Diagnostics
             "Home" => DiagnosticsRenderLayoutState.MinHeightRem,
             "End" => DiagnosticsRenderLayoutState.MaxHeightRem,
             _ => renderAreaHeightRem,
+        };
+    }
+
+    private void OnTimelineResizeStart(MouseEventArgs args)
+    {
+        isTimelineResizeActive = true;
+        timelineResizeStartX = args.ClientX;
+        timelineResizeStartWidthRem = timelineWidthRem;
+    }
+
+    private void OnTimelineResizeMove(MouseEventArgs args)
+    {
+        if (!isTimelineResizeActive)
+        {
+            return;
+        }
+
+        timelineWidthRem = DiagnosticsRenderLayoutState.ApplyTimelineDragDeltaRem(
+            timelineResizeStartWidthRem,
+            args.ClientX - timelineResizeStartX);
+    }
+
+    private void OnTimelineResizeEnd(MouseEventArgs _)
+    {
+        isTimelineResizeActive = false;
+    }
+
+    private void OnTimelineResizeKeyDown(KeyboardEventArgs args)
+    {
+        timelineWidthRem = args.Key switch
+        {
+            "ArrowLeft" => DiagnosticsRenderLayoutState.ClampTimelineWidthRem(timelineWidthRem - 2),
+            "ArrowRight" => DiagnosticsRenderLayoutState.ClampTimelineWidthRem(timelineWidthRem + 2),
+            "Home" => DiagnosticsRenderLayoutState.MinTimelineWidthRem,
+            "End" => DiagnosticsRenderLayoutState.MaxTimelineWidthRem,
+            _ => timelineWidthRem,
         };
     }
 

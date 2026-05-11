@@ -213,6 +213,8 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `Diagnostics.razor` の render snapshot 表示は、Vision Input / Tracker Output の field 表示領域と下部 detail 領域の境界をドラッグで変更できるようにする
 - diagnostics の field/detail 比率は viewport 高さに依存した固定上限だけにせず、4K など高解像度環境で field を大きく広げられる上限を持つ
 - detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / Tracker Output の文字列確認を壊さない
+- `Diagnostics.razor` の左側 frame timeline は、右側 detail との境界をドラッグして幅を変更できるようにする
+- frame timeline は右側 field/detail 表示領域を広げたい場合に小さくでき、最小幅でも frame 選択操作と省略表示を維持する
 
 ## テスト方針
 
@@ -224,6 +226,7 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionFieldProjection` が `(0, 0)` を center に写像する
 - `VisionFieldProjection` が field / boundary / goal depth を含めても viewport 内に収める
 - diagnostics render snapshot の field/detail 可変高さは、最小値・最大値・drag delta の clamp を単体テストで確認する
+- diagnostics frame timeline の可変幅は、最小値・最大値・drag delta の clamp を単体テストで確認する
 
 ## 前提
 

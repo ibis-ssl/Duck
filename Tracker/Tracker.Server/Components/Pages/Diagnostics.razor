@@ -35,7 +35,11 @@
     }
     else
     {
-        <div class="diagnostics-grid">
+        <div class="diagnostics-grid"
+             style="@TimelineAreaStyle()"
+             @onmousemove="OnTimelineResizeMove"
+             @onmouseup="OnTimelineResizeEnd"
+             @onmouseleave="OnTimelineResizeEnd">
             <aside class="diagnostics-timeline" aria-label="Diagnostics timeline">
                 @foreach (var entry in entries)
                 {
@@ -50,6 +54,17 @@
                     </button>
                 }
             </aside>
+            <div class="@TimelineResizeHandleClass()"
+                 role="separator"
+                 aria-orientation="vertical"
+                 aria-valuemin="@DiagnosticsRenderLayoutState.MinTimelineWidthRem"
+                 aria-valuemax="@DiagnosticsRenderLayoutState.MaxTimelineWidthRem"
+                 aria-valuenow="@timelineWidthRem"
+                 tabindex="0"
+                 @onmousedown="OnTimelineResizeStart"
+                 @onmousedown:preventDefault="true"
+                 @onkeydown="OnTimelineResizeKeyDown">
+            </div>
 
             <main class="diagnostics-detail"
                   style="@RenderAreaStyle()"
