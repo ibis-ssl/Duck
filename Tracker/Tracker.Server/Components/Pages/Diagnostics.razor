@@ -51,7 +51,11 @@
                 }
             </aside>
 
-            <main class="diagnostics-detail">
+            <main class="diagnostics-detail"
+                  style="@RenderAreaStyle()"
+                  @onmousemove="OnRenderResizeMove"
+                  @onmouseup="OnRenderResizeEnd"
+                  @onmouseleave="OnRenderResizeEnd">
                 @if (selectedEntry is null)
                 {
                     <div class="diagnostics-empty">No entry selected.</div>
@@ -115,6 +119,17 @@
                                                    RobotsYellow="trackedRenderView.RobotsYellow"
                                                    RobotsBlue="trackedRenderView.RobotsBlue" />
                             </section>
+                        </div>
+                        <div class="@RenderResizeHandleClass()"
+                             role="separator"
+                             aria-orientation="horizontal"
+                             aria-valuemin="@DiagnosticsRenderLayoutState.MinHeightRem"
+                             aria-valuemax="@DiagnosticsRenderLayoutState.MaxHeightRem"
+                             aria-valuenow="@renderAreaHeightRem"
+                             tabindex="0"
+                             @onmousedown="OnRenderResizeStart"
+                             @onmousedown:preventDefault="true"
+                             @onkeydown="OnRenderResizeKeyDown">
                         </div>
                     }
                     else if (!string.IsNullOrEmpty(renderSnapshotError))

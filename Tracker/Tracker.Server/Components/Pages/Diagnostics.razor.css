@@ -194,6 +194,7 @@
 }
 
 .diagnostics-detail {
+    --diagnostics-render-height: 32rem;
     border: 1px solid #315235;
     border-radius: 8px;
     background: #102318;
@@ -235,6 +236,34 @@
 .diagnostics-render section ::deep(.field-card) {
     flex: 1 1 auto;
     min-height: 0;
+}
+
+.diagnostics-render-resizer {
+    flex: 0 0 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: ns-resize;
+    touch-action: none;
+}
+
+.diagnostics-render-resizer::before {
+    content: "";
+    width: min(8rem, 46%);
+    height: 0.18rem;
+    border-radius: 999px;
+    background: #5b805d;
+    box-shadow: 0 -0.22rem 0 #2d4f32, 0 0.22rem 0 #2d4f32;
+}
+
+.diagnostics-render-resizer:hover,
+.diagnostics-render-resizer:focus-visible,
+.diagnostics-render-resizer.is-active {
+    border-color: #94d76b;
+    outline: none;
+    background: #17301d;
 }
 
 .diagnostics-render-alert {
@@ -359,12 +388,15 @@
 }
 
 .diagnostics-shell--render .diagnostics-render {
-    flex: 0 0 clamp(23rem, 44vh, 29rem);
+    flex: 0 1 var(--diagnostics-render-height);
+    min-height: 18rem;
+    max-height: calc(100% - 9rem);
     margin-bottom: 0.04rem;
 }
 
 .diagnostics-shell--render .diagnostics-detail__columns {
     flex: 1 1 auto;
+    min-height: 8rem;
     overflow: hidden;
 }
 

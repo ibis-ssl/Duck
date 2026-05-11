@@ -25,6 +25,10 @@ public partial class Diagnostics
     private DiagnosticsProfileMetadataView? profileMetadata;
     private string? profileMetadataError;
     private bool isProfileSettingsModalOpen;
+    private bool isRenderResizeActive;
+    private double renderAreaHeightRem = DiagnosticsRenderLayoutState.DefaultHeightRem;
+    private double renderResizeStartHeightRem;
+    private double renderResizeStartY;
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
 
@@ -178,6 +182,54 @@ public partial class Diagnostics
         }
 
         return string.Join(" ", classes);
+    }
+
+    private string RenderAreaStyle()
+    {
+        return DiagnosticsRenderLayoutState.ToCssVariable(renderAreaHeightRem);
+    }
+
+    private string RenderResizeHandleClass()
+    {
+        return isRenderResizeActive
+            ? "diagnostics-render-resizer is-active"
+            : "diagnostics-render-resizer";
+    }
+
+    private void OnRenderResizeStart(MouseEventArgs args)
+    {
+        isRenderResizeActive = true;
+        renderResizeStartY = args.ClientY;
+        renderResizeStartHeightRem = renderAreaHeightRem;
+    }
+
+    private void OnRenderResizeMove(MouseEventArgs args)
+    {
+        if (!isRenderResizeActive)
+        {
+            return;
+        }
+
+        renderAreaHeightRem = DiagnosticsRenderLayoutState.ApplyDragDeltaRem(
+            renderResizeStartHeightRem,
+            args.ClientY - renderResizeStartY);
+    }
+
+    private void OnRenderResizeEnd(MouseEventArgs _)
+    {
+        isRenderResizeActive = false;
+    }
+
+    private void OnRenderResizeKeyDown(KeyboardEventArgs args)
+    {
+        renderAreaHeightRem = args.Key switch
+        {
+            "ArrowUp" => DiagnosticsRenderLayoutState.ClampHeightRem(renderAreaHeightRem - 2),
+            "ArrowDown" => DiagnosticsRenderLayoutState.ClampHeightRem(renderAreaHeightRem + 2),
+            "Home" => DiagnosticsRenderLayoutState.MinHeightRem,
+            "End" => DiagnosticsRenderLayoutState.MaxHeightRem,
+            _ => renderAreaHeightRem,
+        };
     }
 
     private static string FormatTime(DateTimeOffset timestamp)

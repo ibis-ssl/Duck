@@ -210,6 +210,9 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionFieldCanvas.razor` は field 本体に加えて axis overlay と cursor coordinate overlay を管理する
 - cursor coordinate overlay は proto 由来の field geometry と `VisionFieldProjection` の逆写像から求める
 - sidebar 折りたたみは layout レベルで扱い、viewer 専用コンポーネントへ閉じ込めない
+- `Diagnostics.razor` の render snapshot 表示は、Vision Input / Tracker Output の field 表示領域と下部 detail 領域の境界をドラッグで変更できるようにする
+- diagnostics の field/detail 比率は viewport 高さに依存した固定上限だけにせず、4K など高解像度環境で field を大きく広げられる上限を持つ
+- detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / Tracker Output の文字列確認を壊さない
 
 ## テスト方針
 
@@ -220,6 +223,7 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionReceiverService.ResolveMulticastJoinAddresses` が configured address と auto discovery を正しく処理する
 - `VisionFieldProjection` が `(0, 0)` を center に写像する
 - `VisionFieldProjection` が field / boundary / goal depth を含めても viewport 内に収める
+- diagnostics render snapshot の field/detail 可変高さは、最小値・最大値・drag delta の clamp を単体テストで確認する
 
 ## 前提
 

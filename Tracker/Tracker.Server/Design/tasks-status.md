@@ -4,19 +4,18 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 
 ## Current Task
 
-- ID: RAW-VISION-008
-- Title: Compact field-first raw vision layout and field overlays
+- ID: RAW-VISION-009
+- Title: Diagnostics render snapshot の field/detail 比率をドラッグで変更可能にする
 - Phase: review
 - Status: complete
 - Size: medium
-- Dependencies: RAW-VISION-007 complete.
+- Dependencies: RAW-VISION-008 complete.
 - Exit Criteria:
-  - Header text `Raw Vision Viewer` と `SSL_WrapperPacket / SSL-Vision multicast` は省略され、field 表示面積が拡大される。
-  - Aggregate / camera selector は field 上部から移動し、field の縦方向面積を圧迫しない。
-  - Field canvas に +X / +Y 方向が分かる axis overlay が追加される。
-  - Cursor 座標は field 上で確認でき、cursor 位置に応じて上側または下側に表示される。
-  - Desktop の左 sidebar は折りたたみ可能になる。
-  - `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes.
+  - `/diagnostics` の render snapshot 表示で、field 表示領域と下部 detail 領域の境界をドラッグして縦方向の比率を変更できる。
+  - 4K など縦に広い viewport では、field 表示領域が固定上限で小さくならず、ユーザー操作で大きくできる。
+  - detail 領域は縮小時も最低限の表示・スクロールが維持され、Vision Input / Tracker Output の確認が壊れない。
+  - 可変高さの境界値を単体テストで確認する。実装・検証は `reports/raw-vision-009-evidence-20260511231841.md` に記録済み。
+  - `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes。review は `reports/raw-vision-009-review-20260511231841.md` に記録済み。
 
 ## Tasks
 
@@ -31,3 +30,4 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 | RAW-VISION-006 | Harden multicast receiver initialization | verification | complete | RAW-VISION-001 | Receiver attempts multicast join across viable IPv4 interfaces, configured interface validation is explicit, tests/build pass, and review is recorded in `reports/raw-vision-multicast-join-evidence-20260430174124.md`. |
 | RAW-VISION-007 | Add aggregate and per-camera raw vision views | implementation | complete | RAW-VISION-001, RAW-VISION-003 | Store keeps latest frame per camera, aggregate and camera-specific views are available in the UI, field canvas follows `ssl-vision-client` source-selector/canvas behavior, tests/build pass, and review/evidence are recorded in `reports/raw-vision-source-selector-evidence-20260430181252.md`. |
 | RAW-VISION-008 | Compact field-first raw vision layout and field overlays | review | complete | RAW-VISION-007 | Viewer header is compact, source selector moves away from the field top, axis/cursor overlays are added, sidebar can collapse on desktop, `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes, and `reports/raw-vision-008-review-20260501101437.md` records a no-findings sub-agent review. |
+| RAW-VISION-009 | Diagnostics render snapshot の field/detail 比率をドラッグで変更可能にする | review | complete | RAW-VISION-008 | `/diagnostics` の render snapshot 表示で field/detail 境界をドラッグでき、4K viewport でも field を大きく表示できる。detail 領域の最低表示・スクロールを維持し、可変高さの境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-009-evidence-20260511231841.md`、review は `reports/raw-vision-009-review-20260511231841.md` に記録済み。 |
