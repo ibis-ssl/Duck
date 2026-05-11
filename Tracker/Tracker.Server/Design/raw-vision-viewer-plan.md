@@ -215,6 +215,8 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / Tracker Output の文字列確認を壊さない
 - `Diagnostics.razor` の左側 frame timeline は、右側 detail との境界をドラッグして幅を変更できるようにする
 - frame timeline は右側 field/detail 表示領域を広げたい場合に小さくでき、最小幅でも frame 選択操作と省略表示を維持する
+- `MainLayout.razor.css` と `NavMenu.razor.css` は raw vision / diagnostics の濃色 green UI と同じ配色・密度を使い、default Blazor template 由来の青紫 gradient や浮いた navigation 表現を残さない
+- side navigation の active / hover / collapsed / mobile toggle は既存操作を維持しつつ、viewer と同じ border、background、text color の階調で表現する
 
 ## テスト方針
 
