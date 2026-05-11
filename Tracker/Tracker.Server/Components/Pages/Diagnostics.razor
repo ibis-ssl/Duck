@@ -192,6 +192,50 @@
         @if (entries.Count > 0)
         {
             <div class="diagnostics-scrubber">
+                <div class="diagnostics-scrubber__playback" aria-label="Diagnostics playback controls">
+                    @if (playbackMode == DiagnosticsPlaybackMode.Play)
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button is-active"
+                                title="Stop"
+                                aria-label="Stop"
+                                @onclick="StopPlayback">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button"
+                                disabled="@(!CanPlayback)"
+                                title="Play"
+                                aria-label="Play"
+                                @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.Play))">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--play" aria-hidden="true"></span>
+                        </button>
+                    }
+                    @if (playbackMode == DiagnosticsPlaybackMode.FastForward)
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button is-active"
+                                title="Stop"
+                                aria-label="Stop"
+                                @onclick="StopPlayback">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button"
+                                class="diagnostics-playback__button"
+                                disabled="@(!CanPlayback)"
+                                title="Fast forward"
+                                aria-label="Fast forward"
+                                @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward))">
+                            <span class="diagnostics-playback__icon diagnostics-playback__icon--fast-forward" aria-hidden="true"></span>
+                        </button>
+                    }
+                </div>
                 <input type="range"
                        class="diagnostics-scrubber__range"
                        min="0"

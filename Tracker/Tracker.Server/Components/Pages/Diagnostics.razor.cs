@@ -9,7 +9,7 @@ namespace Tracker.Server.Components.Pages;
 /// <summary>
 /// diagnostics log の選択、timeline、render snapshot、profile metadata modal を同期するページ状態。
 /// </summary>
-public partial class Diagnostics
+public partial class Diagnostics : IDisposable
 {
     private IReadOnlyList<TrackerDiagnosticsLogFile> logFiles = [];
     private TrackerDiagnosticsLogSnapshot? snapshot;
@@ -33,12 +33,16 @@ public partial class Diagnostics
     private double timelineWidthRem = DiagnosticsRenderLayoutState.DefaultTimelineWidthRem;
     private double timelineResizeStartWidthRem;
     private double timelineResizeStartX;
+    private CancellationTokenSource? playbackCancellationTokenSource;
+    private DiagnosticsPlaybackMode playbackMode = DiagnosticsPlaybackMode.Stopped;
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
 
     private int SelectedEntryIndex => selectedEntry is null
         ? 0
         : FindEntryIndex(selectedEntry);
+
+    private bool CanPlayback => entries.Count > 1;
 
     private TrackedVisionViewState trackedRenderView =>
         selectedRenderSnapshot is null
@@ -61,6 +65,7 @@ public partial class Diagnostics
 
     private Task ReloadAsync()
     {
+        StopPlayback();
         LoadFiles();
         LoadSelectedFile();
         return Task.CompletedTask;
@@ -70,6 +75,7 @@ public partial class Diagnostics
     {
         var requestedLogPath = args.Value?.ToString();
         selectedLogPath = logFiles.FirstOrDefault(file => file.FullPath == requestedLogPath)?.FullPath;
+        StopPlayback();
         LoadSelectedFile();
         return Task.CompletedTask;
     }
@@ -100,6 +106,7 @@ public partial class Diagnostics
             return;
         }
 
+        StopPlayback();
         snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
@@ -119,6 +126,8 @@ public partial class Diagnostics
 
     private void OnTimelineScrubbed(ChangeEventArgs args)
     {
+        StopPlayback();
+
         if (!int.TryParse(args.Value?.ToString(), CultureInfo.InvariantCulture, out var index))
         {
             return;
@@ -129,6 +138,8 @@ public partial class Diagnostics
 
     private void OnTimelineWheel(WheelEventArgs args)
     {
+        StopPlayback();
+
         if (entries.Count == 0)
         {
             return;
@@ -292,6 +303,107 @@ public partial class Diagnostics
     private static string Display(string value)
     {
         return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+
+    private Task StartPlaybackAsync(DiagnosticsPlaybackMode mode)
+    {
+        if (!CanPlayback)
+        {
+            return Task.CompletedTask;
+        }
+
+        StopPlayback();
+        playbackMode = mode;
+        playbackCancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = playbackCancellationTokenSource.Token;
+        _ = RunPlaybackAsync(mode, cancellationToken);
+        return Task.CompletedTask;
+    }
+
+    private async Task RunPlaybackAsync(
+        DiagnosticsPlaybackMode mode,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var currentIndex = SelectedEntryIndex;
+                var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
+                    currentIndex,
+                    entries.Count,
+                    mode);
+                var interval = GetPlaybackInterval(mode, currentIndex, nextIndex);
+                await Task.Delay(interval, cancellationToken);
+
+                await InvokeAsync(() =>
+                {
+                    if (!DiagnosticsPlaybackState.ShouldApplyTick(
+                            playbackMode,
+                            mode,
+                            cancellationToken.IsCancellationRequested))
+                    {
+                        return;
+                    }
+
+                    if (!CanPlayback)
+                    {
+                        StopPlayback();
+                        return;
+                    }
+
+                    var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
+                        SelectedEntryIndex,
+                        entries.Count,
+                        mode);
+
+                    if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, entries.Count))
+                    {
+                        StopPlayback();
+                        SelectEntryByIndex(DiagnosticsPlaybackState.GetIndexAfterEndHandling(
+                            nextIndex,
+                            entries.Count));
+                    }
+                    else
+                    {
+                        SelectEntryByIndex(nextIndex);
+                    }
+
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private TimeSpan GetPlaybackInterval(
+        DiagnosticsPlaybackMode mode,
+        int currentIndex,
+        int nextIndex)
+    {
+        if (entries.Count == 0)
+        {
+            return TimeSpan.Zero;
+        }
+
+        var current = entries[Math.Clamp(currentIndex, 0, entries.Count - 1)];
+        var next = entries[Math.Clamp(nextIndex, 0, entries.Count - 1)];
+        return DiagnosticsPlaybackState.GetInterval(mode, current.Timestamp, next.Timestamp);
+    }
+
+    private void StopPlayback()
+    {
+        playbackMode = DiagnosticsPlaybackMode.Stopped;
+        playbackCancellationTokenSource?.Cancel();
+        playbackCancellationTokenSource?.Dispose();
+        playbackCancellationTokenSource = null;
+    }
+
+    public void Dispose()
+    {
+        StopPlayback();
     }
 
     // 選択 entry の tracked frame 番号で render snapshot sidecar を引き、shell class と field 表示を同期する。

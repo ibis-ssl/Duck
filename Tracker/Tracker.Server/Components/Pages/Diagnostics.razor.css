@@ -76,6 +76,62 @@
     min-height: 1.9rem;
 }
 
+.diagnostics-scrubber__playback {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+}
+
+.diagnostics-playback__button {
+    appearance: none;
+    display: inline-grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #17301d;
+    color: #dbe7d6;
+    cursor: pointer;
+}
+
+.diagnostics-playback__button:hover:not(:disabled),
+.diagnostics-playback__button:focus-visible {
+    border-color: #94d76b;
+    background: #24482b;
+    outline: none;
+}
+
+.diagnostics-playback__button.is-active {
+    border-color: #94d76b;
+    background: #24482b;
+    color: #f6fff1;
+}
+
+.diagnostics-playback__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.diagnostics-playback__icon {
+    display: block;
+    width: 0.95rem;
+    height: 0.95rem;
+    background: currentcolor;
+}
+
+.diagnostics-playback__icon--play {
+    clip-path: polygon(24% 14%, 24% 86%, 82% 50%);
+}
+
+.diagnostics-playback__icon--stop {
+    clip-path: inset(18% 18% 18% 18%);
+}
+
+.diagnostics-playback__icon--fast-forward {
+    clip-path: polygon(8% 14%, 8% 86%, 47% 50%, 47% 86%, 88% 50%, 47% 14%, 47% 50%);
+}
+
 .diagnostics-select {
     flex: 1;
     min-width: 0;
@@ -93,7 +149,7 @@
 
 .diagnostics-scrubber {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.55rem;
     border: 1px solid #315235;

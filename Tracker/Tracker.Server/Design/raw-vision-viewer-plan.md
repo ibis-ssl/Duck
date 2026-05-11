@@ -217,6 +217,10 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - frame timeline は右側 field/detail 表示領域を広げたい場合に小さくでき、最小幅でも frame 選択操作と省略表示を維持する
 - `MainLayout.razor.css` と `NavMenu.razor.css` は raw vision / diagnostics の濃色 green UI と同じ配色・密度を使い、default Blazor template 由来の青紫 gradient や浮いた navigation 表現を残さない
 - side navigation の active / hover / collapsed / mobile toggle は既存操作を維持しつつ、viewer と同じ border、background、text color の階調で表現する
+- `Diagnostics.razor` の timeline scrubber には再生、停止、早送り controls を置き、選択 entry を順方向に進める
+- 通常再生は log entry の timestamp 差分を使い、上限 clamp なしで実際の記録速度に合わせて進める
+- 再生中は再生ボタンを停止ボタン表示へ切り替え、早送り中は早送りボタンを停止ボタン表示へ切り替える
+- 再生/早送りは最後の entry に到達したら停止して先頭 entry に戻し、log 切替や entry 不在時には playback state を停止状態へ戻す
 
 ## テスト方針
 
@@ -229,6 +233,7 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionFieldProjection` が field / boundary / goal depth を含めても viewport 内に収める
 - diagnostics render snapshot の field/detail 可変高さは、最小値・最大値・drag delta の clamp を単体テストで確認する
 - diagnostics frame timeline の可変幅は、最小値・最大値・drag delta の clamp を単体テストで確認する
+- diagnostics timeline playback は、次 index 計算、最後での停止と先頭復帰、通常再生と早送り step、timestamp 差分に基づく実速度 interval を単体テストで確認する
 
 ## 前提
 
