@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerEngine の ball tracking、merge、visibility、identity contract を検証する。
+/// </summary>
 public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestBase, IClassFixture<TrackerContractFixture>
 {
     public TrackerEngineBallTrackingContractTests(TrackerContractFixture fixture)
@@ -10,10 +13,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
     {
     }
 
+    /// <summary>
+    /// 何を確認しているか: 複数 camera の同一 ball 観測が 1 つの tracked ball に統合されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall()
     {
-        // 何を確認しているか: 複数 camera の同一 ball 観測が 1 つの tracked ball に統合されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -47,10 +52,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal([1u, 2u], mergedBall.SourceCameraIds.OrderBy(id => id));
     }
 
+    /// <summary>
+    /// 何を確認しているか: visibility と stable sort により primary / secondary ball の順序が決まることを確認する。
+    /// </summary>
     [Fact]
     public void Update_SelectsPrimaryBallByVisibilityAndStableSortsSecondaryBalls()
     {
-        // 何を確認しているか: visibility と stable sort により primary / secondary ball の順序が決まることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -79,10 +86,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(100, committedFrame.Balls[2].XMm, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 連続 frame から ball velocity が算出されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_TracksBallVelocityAcrossFrames()
     {
-        // 何を確認しているか: 連続 frame から ball velocity が算出されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -109,10 +118,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.InRange(trackedBall.VZMmPerS, 290, 310);
     }
 
+    /// <summary>
+    /// 何を確認しているか: ball の measurement noise が Kalman 更新へ反映され、観測値で状態を直接上書きしないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_AppliesBallKalmanMeasurementNoiseInsteadOfOverwritingObservation()
     {
-        // 何を確認しているか: ball の measurement noise が Kalman 更新へ反映され、観測値で状態を直接上書きしないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -148,10 +159,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.True(trackedBall.ZMm < 70.0);
     }
 
+    /// <summary>
+    /// 何を確認しているか: prediction-only frame 後の更新で BallProcessNoise 設定が不確かさと追従に反映されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredBallProcessNoiseWhenUpdatingAfterPredictionOnlyFrame()
     {
-        // 何を確認しているか: prediction-only frame 後の更新で BallProcessNoise 設定が不確かさと追従に反映されることを確認する。
         var lowProcessEngine = Fixture.CreateEngine();
         var highProcessEngine = Fixture.CreateEngine();
         var lowProcessSettings = Fixture.CreateSettings(
@@ -221,10 +234,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.True(highProcessBall.XMm > lowProcessBall.XMm);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 1 frame 欠測した ball track が visibility を減衰させながら短期保持されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_KeepsBallTrackAliveAcrossOneMissingFrameWithDecayedVisibility()
     {
-        // 何を確認しているか: 1 frame 欠測した ball track が visibility を減衰させながら短期保持されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -253,10 +268,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.True(predictedBall.Visibility > 0);
     }
 
+    /// <summary>
+    /// 何を確認しているか: BallTrackLifetime 設定に従って prediction のみの ball track が期限切れになることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredBallTrackLifetimeToExpirePredictedTracks()
     {
-        // 何を確認しているか: BallTrackLifetime 設定に従って prediction のみの ball track が期限切れになることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -285,10 +302,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Empty(Assert.Single(secondResult.CommittedFrames).Balls);
     }
 
+    /// <summary>
+    /// 何を確認しているか: ball の output visibility が閾値未満まで落ちたら tracked frame へ出さないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotEmitBallTrackAfterOutputVisibilityFallsBelowThreshold()
     {
-        // 何を確認しているか: ball の output visibility が閾値未満まで落ちたら tracked frame へ出さないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -319,10 +338,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Empty(Assert.Single(secondResult.CommittedFrames).Balls);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 1 frame だけ現れた secondary ball ghost を tracked frame へ出さないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotEmitSingleFrameSecondaryBallGhost()
     {
-        // 何を確認しているか: 1 frame だけ現れた secondary ball ghost を tracked frame へ出さないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -360,10 +381,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(0, thirdBall.XMm, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 成長済み secondary ball が fresh observation を失った後に出続けないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotEmitStaleGrownUpSecondaryBall()
     {
-        // 何を確認しているか: 成長済み secondary ball が fresh observation を失った後に出続けないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -398,10 +421,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(0, ball.XMm, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: BallVisibilityHalfLifeSeconds 設定が欠測時の ball visibility 減衰へ反映されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredBallVisibilityHalfLifeWhenPredictingTrack()
     {
-        // 何を確認しているか: BallVisibilityHalfLifeSeconds 設定が欠測時の ball visibility 減衰へ反映されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -433,10 +458,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(firstBall.Visibility * 0.25f, predictedBall.Visibility, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 停止中に近い ball の measurement jitter が表示位置へそのまま出ないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DampsStationaryBallMeasurementJitter()
     {
-        // 何を確認しているか: 停止中に近い ball の measurement jitter が表示位置へそのまま出ないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -459,10 +486,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.InRange(Math.Abs(trackedBall.VXMmPerS), 0, 600);
     }
 
+    /// <summary>
+    /// 何を確認しているか: BallGate 設定により frame 間の ball track matching 可否が決まることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredBallGateForTrackMatchingAcrossFrames()
     {
-        // 何を確認しているか: BallGate 設定により frame 間の ball track matching 可否が決まることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -494,10 +523,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(firstBall.InternalTrackId, secondBall.InternalTrackId);
     }
 
+    /// <summary>
+    /// 何を確認しているか: visible camera が切り替わっても同一 ball track の identity が保たれることを確認する。
+    /// </summary>
     [Fact]
     public void Update_PreservesBallTrackIdentityWhenVisibleCameraChanges()
     {
-        // 何を確認しているか: visible camera が切り替わっても同一 ball track の identity が保たれることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -539,10 +570,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(firstBall.InternalTrackId, secondBall.InternalTrackId);
     }
 
+    /// <summary>
+    /// 何を確認しているか: stale ball track が離れた 2 つの fresh ball を誤って bridge しないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotLetStaleBallTrackBridgeTwoFreshBalls()
     {
-        // 何を確認しているか: stale ball track が離れた 2 つの fresh ball を誤って bridge しないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -605,10 +638,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.InRange(sortedBallX[1], 195, 205);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 複数 ball 観測の merge で uncertainty-weighted position が使われることを確認する。
+    /// </summary>
     [Fact]
     public void Update_MergesBallsUsingUncertaintyWeightedPositions()
     {
-        // 何を確認しているか: 複数 ball 観測の merge で uncertainty-weighted position が使われることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -640,10 +675,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.InRange(mergedBall.XMm, 100, 115);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 同一 committed group 内の同一 camera 連続 detection で同じ ball track を再利用することを確認する。
+    /// </summary>
     [Fact]
     public void Update_ReusesSameCameraBallTrackAcrossSequentialDetectionsInOneCommittedGroup()
     {
-        // 何を確認しているか: 同一 committed group 内の同一 camera 連続 detection で同じ ball track を再利用することを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -676,10 +713,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(committedBall.InternalTrackId, flushResult.CommittedFrames[0].PrimaryBallTrackId);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 同一 camera の近接しているが別物の ball を 1 つに潰さないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_KeepsNearbyDistinctBallsFromSameCameraSeparated()
     {
-        // 何を確認しているか: 同一 camera の近接しているが別物の ball を 1 つに潰さないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -704,10 +743,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal([0d, 80d], committedFrame.Balls.Select(ball => ball.XMm).OrderBy(x => x));
     }
 
+    /// <summary>
+    /// 何を確認しているか: 中間 detection が速度を支える場合、大きな frame jump 後も merged ball identity が保たれることを確認する。
+    /// </summary>
     [Fact]
     public void Update_PreservesMergedBallIdentityAcrossLargeCommittedFrameJumpWhenIntermediateDetectionsSustainVelocity()
     {
-        // 何を確認しているか: 中間 detection が速度を支える場合、大きな frame jump 後も merged ball identity が保たれることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -759,10 +800,12 @@ public class TrackerEngineBallTrackingContractTests : TrackerEngineContractTestB
         Assert.Equal(secondFrameBall.InternalTrackId, thirdFrameBall.InternalTrackId);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 3 camera の chain 状 ball 観測が同一 cluster として merge されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_MergesThreeCameraBallChainIntoSingleCluster()
     {
-        // 何を確認しているか: 3 camera の chain 状 ball 観測が同一 cluster として merge されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 

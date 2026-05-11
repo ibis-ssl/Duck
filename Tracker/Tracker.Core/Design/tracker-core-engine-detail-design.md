@@ -109,6 +109,14 @@ TRACKER-033 で `Tracker.Core` の巨大ファイルを責務別に分割し、�
 
 TRACKER-033 では namespace を `Tracker.Core` のまま維持し、同一 assembly 内の source file 分割だけを行う。public type 名、member 名、accessibility、nullable shape は変更しない。
 
+### ファイル命名と partial 配置
+
+dot 区切りファイル名は framework / toolchain 慣習に限って許容する。例: `.csproj`、`.sln`、`.razor.cs`、`.razor.css`、`.g.cs`、`.Designer.cs`、`.AssemblyInfo.cs`、generated / build output。
+
+手書き C# の責務 marker として `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。folder が型名、file が責務名を表すため、namespace と public contract を維持したまま責務境界を path で読める。
+
+1 public / internal top-level type 1 file を基本にする。複数 top-level type を同居させるのは、親子 DTO、密結合した small enum / extension、同じ external schema の一部で単独参照されない場合に限る。
+
 ### 公開契約
 
 - `Tracker/Tracker.Core/Engine/ITrackerEngine.cs`
@@ -128,24 +136,24 @@ TRACKER-033 では namespace を `Tracker.Core` のまま維持し、同一 asse
 - `Tracker/Tracker.Core/Engine/TrackerEngine.cs`
   - `TrackerEngine` の field、constructor なし状態、`Update`
   - profile switch、geometry 更新、detection 受付、flush 呼び出しの最上位 orchestration
-- `Tracker/Tracker.Core/Engine/TrackerEngine.FrameCommit.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs`
   - `FlushCommittedFrames`
   - `ClearPendingStateAndAdvanceLateCutoff`
   - `CommitGroup`
   - frame / event emit の組み立て
-- `Tracker/Tracker.Core/Engine/TrackerEngine.DetectionBuffer.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs`
   - `CreateBufferedDetection`
   - `CreateSourceDetectionFrames`
   - `SelectEventTimeSeconds`
   - `BuildDetectionGroups`
   - `BufferedDetection`
   - `BufferedDetectionGroup`
-- `Tracker/Tracker.Core/Engine/TrackerEngine.Geometry.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/Geometry.cs`
   - `ShouldResetForGeometryChange`
   - `CreateGeometrySnapshot`
   - `CreateGeometryLineSegment`
   - `CreateGeometryCircularArc`
-- `Tracker/Tracker.Core/Engine/TrackerEngine.BallTracking.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/BallTracking.cs`
   - `UpdateCameraBallTrackStates`
   - `CreateObservedBallTrackState`
   - `CreatePredictedBallTrackState`
@@ -157,7 +165,7 @@ TRACKER-033 では namespace を `Tracker.Core` のまま維持し、同一 asse
   - `CreateTrackedBall`
   - `IsFreshPreviousPrimaryBall`
   - ball track 関連 private record
-- `Tracker/Tracker.Core/Engine/TrackerEngine.RobotTracking.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/RobotTracking.cs`
   - `UpdateCameraRobotTrackStates`
   - `CollectCameraRobotObservations`
   - `DropFarRobotOutliersWhenSameRobotHasNearObservation`
@@ -171,19 +179,19 @@ TRACKER-033 では namespace を `Tracker.Core` のまま維持し、同一 asse
   - `CollectMergedRobotStates`
   - `CreateTrackedRobot`
   - robot key / observation / track 関連 private record
-- `Tracker/Tracker.Core/Engine/TrackerEngine.Contact.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/Contact.cs`
   - `CreateBallContactState`
   - `ApplyBallContactFlags`
   - `UpdateLatestBallContactState`
   - `PruneLatestBallContactStates`
   - `DidBallContactChange`
-- `Tracker/Tracker.Core/Engine/TrackerEngine.Kick.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/Kick.cs`
   - `UpdateKickState`
   - `TryCreateKickEventState`
   - `SelectRecentContact`
   - `GetPlanarSpeedMmPerS`
   - `IsChipKick`
-- `Tracker/Tracker.Core/Engine/TrackerEngine.BallLeftField.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/BallLeftField.cs`
   - `CreateBallLeftFieldState`
   - `UpdateLatestBallLeftFieldState`
   - `PruneLatestBallLeftFieldStates`
@@ -195,12 +203,12 @@ TRACKER-033 では namespace を `Tracker.Core` のまま維持し、同一 asse
   - `ProjectTouchLineCrossing`
   - `ProjectGoalLineCrossing`
   - `InterpolateTimestamp`
-- `Tracker/Tracker.Core/Engine/TrackerEngine.Kalman.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/Kalman.cs`
   - `KalmanAxisState`
   - `CreateInitialKalmanAxis`
   - `PredictKalmanAxis`
   - `UpdateKalmanAxis`
-- `Tracker/Tracker.Core/Engine/TrackerEngine.Settings.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/Settings.cs`
   - private settings 解決 helper
   - visibility / quality decay helper
   - unit / timestamp helper
@@ -250,11 +258,13 @@ TRACKER-033 では namespace を `Tracker.Core` のまま維持し、同一 asse
 - `Tracker/Tracker.Core/Proto/TrackerPacketGenerator.cs`
   - `TrackerPacketGenerator`
 
-`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`TrackerPacketGenerator.Balls.cs`、`TrackerPacketGenerator.Robots.cs`、`TrackerPacketGenerator.KickedBall.cs` の partial 分割を検討する。
+`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial 分割を検討する。
 
 ## 日本語コメント追加基準
 
 TRACKER-033 では XML documentation comment を日本語で追加する。proper noun、型名、設定 key、proto 名、単位記号は英字のままでよい。
+
+class / property / method の説明は原則として XML documentation comment に寄せる。通常コメント `//` は method 内の複雑な block、不変条件、順序制約の直前に限定し、type や member の契約説明には使わない。
 
 ### class / interface / enum
 

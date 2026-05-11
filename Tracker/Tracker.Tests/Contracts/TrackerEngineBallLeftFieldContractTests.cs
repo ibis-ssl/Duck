@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerEngine の ball left field event と退出分類 contract を検証する。
+/// </summary>
 public class TrackerEngineBallLeftFieldContractTests : TrackerEngineContractTestBase, IClassFixture<TrackerContractFixture>
 {
     public TrackerEngineBallLeftFieldContractTests(TrackerContractFixture fixture)
@@ -10,10 +13,12 @@ public class TrackerEngineBallLeftFieldContractTests : TrackerEngineContractTest
     {
     }
 
+    /// <summary>
+    /// 何を確認しているか: primary ball が touch line から field 外へ出た場合に BallLeftField event が発行されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine()
     {
-        // 何を確認しているか: primary ball が touch line から field 外へ出た場合に BallLeftField event が発行されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -52,10 +57,12 @@ public class TrackerEngineBallLeftFieldContractTests : TrackerEngineContractTest
             result.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: goal mouth 内から field 外へ出た ball が GoalInterior と分類されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_ClassifiesGoalMouthExitAsGoalInterior()
     {
-        // 何を確認しているか: goal mouth 内から field 外へ出た ball が GoalInterior と分類されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -94,10 +101,12 @@ public class TrackerEngineBallLeftFieldContractTests : TrackerEngineContractTest
             result.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: goal mouth 外の goal line 退出が GoalLine と分類されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_ClassifiesNonGoalMouthExitAsGoalLine()
     {
-        // 何を確認しているか: goal mouth 外の goal line 退出が GoalLine と分類されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -133,10 +142,12 @@ public class TrackerEngineBallLeftFieldContractTests : TrackerEngineContractTest
         Assert.Equal(6000, leftField.CrossingXMm, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: corner 方向の退出で最初に交差した perimeter に基づく分類になることを確認する。
+    /// </summary>
     [Fact]
     public void Update_ClassifiesCornerExitByFirstPerimeterCrossing()
     {
-        // 何を確認しているか: corner 方向の退出で最初に交差した perimeter に基づく分類になることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 

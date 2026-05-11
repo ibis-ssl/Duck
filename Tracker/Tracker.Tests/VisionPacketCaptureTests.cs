@@ -10,6 +10,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: vision packet capture が replay record の保存、読み戻し、runtime toggle を扱う contract を検証する。
+/// </summary>
 public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
 {
     private readonly TrackerContractFixture fixture;
@@ -19,10 +22,12 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         this.fixture = fixture;
     }
 
+    /// <summary>
+    /// 何を確認しているか: capture 有効時に payload、remote endpoint、metadata を gzip replay file として保存することを確認する。
+    /// </summary>
     [Fact]
     public void Capture_WhenEnabled_WritesCompressedReplayRecords()
     {
-        // 何を確認しているか: capture 有効時に payload、remote endpoint、metadata を gzip replay file として保存することを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-{Guid.NewGuid():N}");
         var session = CreateCaptureSession(
             captureDirectory,
@@ -94,10 +99,12 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
             precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 保存済み capture record を読み戻し、TrackerEngine に replay して geometry と detection を再現できることを確認する。
+    /// </summary>
     [Fact]
     public void ReadRecords_CanReplayCapturedPacketsThroughTrackerEngine()
     {
-        // 何を確認しているか: 保存済み capture record を読み戻し、TrackerEngine に replay して geometry と detection を再現できることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-replay-{Guid.NewGuid():N}");
         var writer = new VisionPacketCaptureWriter(
             CreateCaptureSession(captureDirectory, filePrefix: "replay-vision", enabled: true),
@@ -141,10 +148,12 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(50, committedBall.YMm, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: capture 無効時に capture directory と writer path が作られないことを確認する。
+    /// </summary>
     [Fact]
     public void Capture_WhenDisabled_DoesNotCreateCaptureFile()
     {
-        // 何を確認しているか: capture 無効時に capture directory と writer path が作られないことを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-disabled-{Guid.NewGuid():N}");
         using var writer = new VisionPacketCaptureWriter(
             CreateCaptureSession(captureDirectory, filePrefix: "test-vision", enabled: false),
@@ -156,10 +165,12 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Null(writer.CapturePath);
     }
 
+    /// <summary>
+    /// 何を確認しているか: runtime toggle が初期無効状態を尊重し、有効化後だけ新しい capture file を作ることを確認する。
+    /// </summary>
     [Fact]
     public void Capture_RuntimeToggleStartsFromConfiguredDisabledValueAndCreatesFilesAfterEnable()
     {
-        // 何を確認しているか: runtime toggle が初期無効状態を尊重し、有効化後だけ新しい capture file を作ることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-runtime-{Guid.NewGuid():N}");
         var runtimeControl = new VisionPacketCaptureRuntimeControl(initialEnabled: false);
         using var writer = new VisionPacketCaptureWriter(

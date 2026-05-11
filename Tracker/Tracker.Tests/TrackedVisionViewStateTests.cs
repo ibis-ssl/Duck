@@ -5,6 +5,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: tracked vision viewer 用 view state が snapshot と空状態を正しく表現することを検証する。
+/// </summary>
 public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
 {
     private readonly TrackerContractFixture fixture;
@@ -14,10 +17,12 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         this.fixture = fixture;
     }
 
+    /// <summary>
+    /// 何を確認しているか: latest frame の object、geometry、diagnostics、event metadata が viewer 用 view state に写ることを確認する。
+    /// </summary>
     [Fact]
     public void FromSnapshot_WithLatestFrame_MapsTrackedObjectsAndGeometryForViewer()
     {
-        // 何を確認しているか: latest frame の object、geometry、diagnostics、event metadata が viewer 用 view state に写ることを確認する。
         // Viewer が参照する geometry と event metadata を同じ snapshot に含め、統合 mapping の契約を固定する。
         var latestFrame = fixture.CreateFrame(
             frameNumber: 7,
@@ -173,10 +178,12 @@ public class TrackedVisionViewStateTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(1, viewState.PublishFailureCount);
     }
 
+    /// <summary>
+    /// 何を確認しているか: latest frame がない場合でも active profile と publish count を残し、viewer object は空になることを確認する。
+    /// </summary>
     [Fact]
     public void FromSnapshot_WithoutLatestFrame_UsesActiveProfileAndReturnsEmptyViewerState()
     {
-        // 何を確認しているか: latest frame がない場合でも active profile と publish count を残し、viewer object は空になることを確認する。
         var snapshot = new TrackedSnapshot(
             LatestFrame: null,
             ReceivedAt: null,

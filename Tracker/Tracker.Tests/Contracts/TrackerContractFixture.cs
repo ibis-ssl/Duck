@@ -3,6 +3,9 @@ using Tracker.Server.Tracking;
 
 namespace Tracker.Tests.Contracts;
 
+/// <summary>
+/// 何を確認しているか: Tracker contract test が共通で使う engine、settings、frame、publisher の安定した fixture を提供する。
+/// </summary>
 public sealed class TrackerContractFixture
 {
     public const string DefaultSourceName = "test-source";

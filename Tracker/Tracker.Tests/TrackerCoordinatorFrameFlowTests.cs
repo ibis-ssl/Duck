@@ -6,6 +6,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerCoordinator の frame commit、snapshot 更新、publish、observer 通知 flow を検証する。
+/// </summary>
 public class TrackerCoordinatorFrameFlowTests : IClassFixture<TrackerContractFixture>
 {
     public TrackerCoordinatorFrameFlowTests(TrackerContractFixture fixture)
@@ -18,10 +21,12 @@ public class TrackerCoordinatorFrameFlowTests : IClassFixture<TrackerContractFix
 
     private TrackerCoordinatorTestFactory Factory { get; }
 
+    /// <summary>
+    /// 何を確認しているか: committed frame が snapshot と tracker packet publish に反映され、observer が world-frame を受けることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WithCommittedFrame_UpdatesTrackedSnapshotAndPublishesTrackerPacket()
     {
-        // 何を確認しているか: committed frame が snapshot と tracker packet publish に反映され、observer が world-frame を受けることを確認する。
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
         var observer = new TrackerCoordinatorRecordingTrackerObserver(snapshotStore);
@@ -58,10 +63,12 @@ public class TrackerCoordinatorFrameFlowTests : IClassFixture<TrackerContractFix
             observer.Events);
     }
 
+    /// <summary>
+    /// 何を確認しているか: derived event がある場合も observer へ engine の event 順で通知されることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WhenDerivedEventsExist_NotifiesObserverInEmittedOrder()
     {
-        // 何を確認しているか: derived event がある場合も observer へ engine の event 順で通知されることを確認する。
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
         var observer = new TrackerCoordinatorRecordingTrackerObserver(snapshotStore);

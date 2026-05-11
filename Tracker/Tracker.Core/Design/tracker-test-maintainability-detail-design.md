@@ -2,7 +2,7 @@
 
 ## 目的
 
-TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責務別へ分割し、各 test が何を確認しているかを日本語コメントで明示する。
+TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責務別へ分割し、各 test が何を確認しているかを日本語 XML コメントで明示する。
 
 この詳細設計は `Tracker.Tests` の test 保守性改善に限定する。Core engine、Server、CLI、UI の production code 分割方針は別の詳細設計で扱う。
 
@@ -117,13 +117,16 @@ TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責
 
 ### 必須コメント
 
-各 `[Fact]` / `[Theory]` method の Arrange 直後、または test method 冒頭に、次の形式で 1 から 2 行の日本語コメントを追加する。
+各 `[Fact]` / `[Theory]` の直前に、日本語 XML summary で「何を確認しているか」を 1 から 2 行で書く。通常コメント `// 何を確認しているか:` を必須形式とはしない。
 
 ```csharp
-// 何を確認しているか: event time が到着順と異なる場合でも、確定 frame が event time 昇順で flush されることを確認する。
+/// <summary>
+/// 何を確認しているか: event time が到着順と異なる場合でも、確定 frame が event time 昇順で flush されることを確認する。
+/// </summary>
+[Fact]
 ```
 
-コメントは次を満たす。
+XML summary は次を満たす。
 
 - test 名を日本語へ直訳するだけにしない。
 - 「入力条件」「守りたい契約」「壊れると起きる問題」のうち最低 1 つを含める。
@@ -133,7 +136,7 @@ TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責
 
 ### 任意コメント
 
-次の場合は test 内の該当 block の直前にも日本語コメントを置いてよい。
+test method 内では、次の場合に該当 block の直前へ短い日本語通常コメントを置いてよい。
 
 - 複数 packet を順に投入し、どの packet が flush trigger か分かりにくい。
 - profile switch や geometry reset のように、event 順序と local state clear の両方を同時に確認している。
@@ -144,6 +147,7 @@ TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責
 - assertion と同じ内容だけを繰り返すコメント。
 - production code の内部実装手順を固定しすぎるコメント。
 - `Arrange`、`Act`、`Assert` だけの見出しコメント。
+- `[Fact]` / `[Theory]` の説明を通常コメントだけで済ませること。
 - 英語だけのコメント。識別子や protocol 名は英語のままでよい。
 
 ## TRACKER-035 実行順序
@@ -156,7 +160,7 @@ TRACKER-035 worker は次の順に進める。
 4. engine contract test の focused test を実行し、失敗があれば移動漏れ、namespace、using、fixture 宣言だけを直す。
 5. `TrackerCoordinatorTests.cs` を 3 class と support helper へ分割する。helper 抽出時も observable な記録内容を変えない。
 6. coordinator focused test を実行し、失敗があれば helper 移動に伴う state 共有や disposal 漏れを直す。
-7. `TrackerRenderSnapshotLogReaderTests.cs`、`TrackedVisionViewStateTests.cs`、`VisionPacketCaptureTests.cs`、その他 `Tracker/Tracker.Tests/*Tests.cs` に、必須コメント基準を満たす日本語コメントを追加する。
+7. `TrackerRenderSnapshotLogReaderTests.cs`、`TrackedVisionViewStateTests.cs`、`VisionPacketCaptureTests.cs`、その他 `Tracker/Tracker.Tests/*Tests.cs` に、必須コメント基準を満たす日本語 XML summary を追加する。
 8. `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj` を実行し、full test の結果を report に記録する。
 9. 差分を確認し、test method の assertion 変更、入力値変更、期待順序変更が混ざっていないことを確認する。
 10. TRACKER-035 review 用 report を作成し、専用 review gate が閉じるまで `tasks-status.md` を done にしない。
@@ -172,7 +176,7 @@ TRACKER-035 worker は次の順に進める。
 - temp directory / temp file を使う test では、既存の cleanup を保持する。
 - shared helper 抽出後も、各 test が新しい engine / store / publisher / observer を作る独立性を維持する。
 - support helper に static mutable state を持たせない。
-- comment 追加時に test の Arrange / Act / Assert の順序を変えない。
+- XML summary 追加時に test の Arrange / Act / Assert の順序を変えない。
 
 ## 検証観点
 
@@ -182,6 +186,6 @@ TRACKER-035 の検証は次を最低限にする。
 - engine contract focused test がすべて通る。
 - coordinator focused test がすべて通る。
 - full `Tracker.Tests` が通る。
-- `rg -n "何を確認しているか" Tracker/Tracker.Tests` で、追加対象の `[Fact]` / `[Theory]` に説明コメントがあることを確認できる。
+- `rg -n "何を確認しているか" Tracker/Tracker.Tests` と周辺 diff で、追加対象の `[Fact]` / `[Theory]` 直前に XML summary があることを確認できる。
 - `git diff --stat` と `git diff --name-status` で、production code 変更が混ざっていない。
 - review では「移動のみのはずの test が assertion を変えていないか」を重点的に見る。

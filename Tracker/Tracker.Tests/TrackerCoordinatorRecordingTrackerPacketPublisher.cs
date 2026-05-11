@@ -3,6 +3,9 @@ using Tracker.Server.Tracking;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerCoordinator test が publish された tracker packet を記録するための shared support double を提供する。
+/// </summary>
 internal sealed class TrackerCoordinatorRecordingTrackerPacketPublisher : ITrackerPacketPublisher
 {
     public TrackerPublisherOptions CurrentOptions { get; private set; } = new();

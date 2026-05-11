@@ -2,8 +2,14 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerContractTestData が SSL-Vision contract test packet を指定値どおりに組み立てることを検証する。
+/// </summary>
 public class TrackerContractTestDataTests
 {
+    /// <summary>
+    /// 何を確認しているか: detection packet に指定した ball、yellow robot、blue robot と timestamp が入ることを確認する。
+    /// </summary>
     [Fact]
     public void CreateDetectionPacket_BuildsDetectionFrameWithProvidedObjects()
     {
@@ -30,6 +36,9 @@ public class TrackerContractTestDataTests
         Assert.Single(packet.Detection.RobotsBlue);
     }
 
+    /// <summary>
+    /// 何を確認しているか: geometry packet に指定 field 寸法と既定 geometry 値が入ることを確認する。
+    /// </summary>
     [Fact]
     public void CreateGeometryPacket_BuildsFieldGeometryWithConfiguredDimensions()
     {

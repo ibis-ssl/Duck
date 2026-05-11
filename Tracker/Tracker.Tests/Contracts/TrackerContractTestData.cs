@@ -1,5 +1,8 @@
 namespace Tracker.Tests.Contracts;
 
+/// <summary>
+/// 何を確認しているか: Tracker contract test 用の SSL-Vision packet と detection object を一貫した既定値で生成する。
+/// </summary>
 public static class TrackerContractTestData
 {
     public static SSL_DetectionBall CreateBall(

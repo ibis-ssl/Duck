@@ -2,13 +2,22 @@ using Tracker.Core;
 
 namespace Tracker.Server.Tracking;
 
+/// <summary>
+/// appsettings の tracker 設定、profile、runtime override から coordinator が利用する解決済み設定を作る。
+/// </summary>
 public static class TrackerConfigurationResolver
 {
+    /// <summary>
+    /// appsettings で指定された active profile と runtime override を使って tracker 設定を解決する。
+    /// </summary>
     public static TrackerResolvedOptions Resolve(TrackerOptions options)
     {
         return Resolve(options, options.ActiveProfileName, options.RuntimeOverrides);
     }
 
+    /// <summary>
+    /// 指定 profile と任意の runtime override を使って tracker 設定を解決する。
+    /// </summary>
     public static TrackerResolvedOptions Resolve(
         TrackerOptions options,
         string profileName,

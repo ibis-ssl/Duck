@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerEngine の geometry snapshot、geometry reset、profile switch contract を検証する。
+/// </summary>
 public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTestBase, IClassFixture<TrackerContractFixture>
 {
     public TrackerEngineGeometryProfileContractTests(TrackerContractFixture fixture)
@@ -10,10 +13,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
     {
     }
 
+    /// <summary>
+    /// 何を確認しているか: geometry packet の表示用 field / goal 情報が geometry snapshot に保持されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_PreservesDisplayGeometryInGeometrySnapshot()
     {
-        // 何を確認しているか: geometry packet の表示用 field / goal 情報が geometry snapshot に保持されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -76,10 +81,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
         Assert.Equal(SSL_FieldShapeType.CenterCircle, fieldArc.Type);
     }
 
+    /// <summary>
+    /// 何を確認しているか: field geometry の大きな変更で geometry reset が発行され、旧 generation の pending frame が破棄されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration()
     {
-        // 何を確認しているか: field geometry の大きな変更で geometry reset が発行され、旧 generation の pending frame が破棄されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 100_000_000,
@@ -119,10 +126,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
             resetResult.EmittedEvents.Select(emitted => emitted.Kind).Take(2));
     }
 
+    /// <summary>
+    /// 何を確認しているか: goal geometry の変更だけでも geometry reset として扱われることを確認する。
+    /// </summary>
     [Fact]
     public void Update_EmitsGeometryResetWhenGoalGeometryChanges()
     {
-        // 何を確認しているか: goal geometry の変更だけでも geometry reset として扱われることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 100_000_000,
@@ -167,10 +176,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
         Assert.Equal(2_000_000_000L, resetResult.CommittedFrames[0].DataTimestampNs);
     }
 
+    /// <summary>
+    /// 何を確認しているか: packet を伴わない profile switch では ProfileSwitched だけが発行され、frame commit が混ざらないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched()
     {
-        // 何を確認しているか: packet を伴わない profile switch では ProfileSwitched だけが発行され、frame commit が混ざらないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(profileName: "default");
         var switchedSettings = Fixture.CreateSettings(profileName: "fast");
@@ -188,10 +199,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
         Assert.Equal("fast", result.EmittedEvents[0].ProfileName);
     }
 
+    /// <summary>
+    /// 何を確認しているか: profile switch と frame commit が同じ result に入る場合、profile 適用 event が先に並ぶことを確認する。
+    /// </summary>
     [Fact]
     public void Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult()
     {
-        // 何を確認しているか: profile switch と frame commit が同じ result に入る場合、profile 適用 event が先に並ぶことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
         var switchedSettings = Fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0);
@@ -214,10 +227,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
         Assert.Equal("fast", Assert.Single(result.CommittedFrames).Metadata.ProfileName);
     }
 
+    /// <summary>
+    /// 何を確認しているか: profile switch を挟んでも出力 frame number が連続し、番号が巻き戻らないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_PreservesFrameNumberContinuityAcrossProfileSwitch()
     {
-        // 何を確認しているか: profile switch を挟んでも出力 frame number が連続し、番号が巻き戻らないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0);
         var switchedSettings = Fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0);
@@ -252,10 +267,12 @@ public class TrackerEngineGeometryProfileContractTests : TrackerEngineContractTe
         Assert.Equal("fast", switchedCommittedFrame.Metadata.ProfileName);
     }
 
+    /// <summary>
+    /// 何を確認しているか: profile switch 時に旧 profile の buffered detection が消え、新 profile の frame に混ざらないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile()
     {
-        // 何を確認しているか: profile switch 時に旧 profile の buffered detection が消え、新 profile の frame に混ざらないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(profileName: "default", reorderWindowNs: 1_500_000_000, mergeWindowNs: 20_000_000);
         var switchedSettings = Fixture.CreateSettings(profileName: "fast", reorderWindowNs: 0, mergeWindowNs: 0);

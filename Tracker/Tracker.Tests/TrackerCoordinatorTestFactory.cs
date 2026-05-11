@@ -7,6 +7,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerCoordinator test が coordinator と依存 object を同じ fixture 設定で生成できることを支える。
+/// </summary>
 internal sealed class TrackerCoordinatorTestFactory
 {
     private readonly TrackerContractFixture fixture;

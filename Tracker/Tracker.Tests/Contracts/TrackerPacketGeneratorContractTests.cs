@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerPacketGenerator が TrackerFrame を SSL tracked wrapper contract へ安定変換することを検証する。
+/// </summary>
 public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContractFixture>
 {
     private readonly TrackerContractFixture fixture;
@@ -12,6 +15,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
         this.fixture = fixture;
     }
 
+    /// <summary>
+    /// 何を確認しているか: primary ball が先頭に出力され、secondary ball が visibility と timestamp で安定整列されることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_WithPrimaryAndSecondaryBalls_EmitsPrimaryFirstAndStableSortedSecondaryBalls()
     {
@@ -46,6 +52,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
             });
     }
 
+    /// <summary>
+    /// 何を確認しているか: secondary ball の visibility と timestamp が同じ場合に internal track ID が最終 tie breaker になることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_WhenSecondaryBallsTieOnVisibilityAndTimestamp_UsesInternalTrackIdAsFinalTieBreaker()
     {
@@ -70,6 +79,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
             ball => Assert.Equal(0.3f, ball.Pos.X, 3));
     }
 
+    /// <summary>
+    /// 何を確認しているか: internal unit が SSL tracked unit へ変換され、frame data timestamp が出力 timestamp になることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_ConvertsInternalUnitsAndUsesFrameDataTimestamp()
     {
@@ -101,6 +113,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
         Assert.Equal(0.3f, ball.Vel.Z, 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: wrapper packet に fixture 由来の UUID、source name、tracked frame が入ることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_EmitsWrapperMetadata()
     {
@@ -118,6 +133,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
         Assert.NotNull(packet.TrackedFrame);
     }
 
+    /// <summary>
+    /// 何を確認しているか: robot が team と robot ID による安定順序で出力されることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_EmitsRobotsInStableTeamAndIdOrder()
     {
@@ -157,6 +175,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
             });
     }
 
+    /// <summary>
+    /// 何を確認しているか: kicked ball と flying ball を含む frame で capabilities が固定順序で出力されることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_EmitsExpectedCapabilitiesInStableOrder()
     {
@@ -181,6 +202,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
             trackedFrame.Capabilities);
     }
 
+    /// <summary>
+    /// 何を確認しているか: kick や flying ball がない frame でも capabilities が固定 contract として出力されることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_EmitsFixedCapabilitiesEvenWhenFrameDoesNotContainKickOrFlyingBall()
     {
@@ -204,6 +228,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
             trackedFrame.Capabilities);
     }
 
+    /// <summary>
+    /// 何を確認しているか: moving kick がある場合に kicked ball payload が SSL tracked unit へ変換されることを確認する。
+    /// </summary>
     [Fact]
     public void Generate_WithStillMovingKick_EmitsConvertedKickedBallPayload()
     {
@@ -242,6 +269,9 @@ public class TrackerPacketGeneratorContractTests : IClassFixture<TrackerContract
         Assert.Equal((uint)7, kickedBall.RobotId.Id);
     }
 
+    /// <summary>
+    /// 何を確認しているか: kick が moving でない場合に kicked ball payload を出力しないことを確認する。
+    /// </summary>
     [Fact]
     public void Generate_OmitsKickedBall_WhenKickIsNoLongerMoving()
     {

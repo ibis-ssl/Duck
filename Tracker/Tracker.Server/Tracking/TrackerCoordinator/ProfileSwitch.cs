@@ -4,7 +4,9 @@ namespace Tracker.Server.Tracking;
 
 public sealed partial class TrackerCoordinator
 {
-    // ProfileSwitched 受信後にだけ applied/current 設定と publisher / snapshot store を新 profile へ同期する。
+    /// <summary>
+    /// ProfileSwitched 受信後にだけ applied/current 設定と publisher / snapshot store を新 profile へ同期する。
+    /// </summary>
     private void ApplyProfileSwitch(string profileName)
     {
         if (inFlightRequest is not null)
@@ -26,7 +28,9 @@ public sealed partial class TrackerCoordinator
         NotifyObservers(observer => observer.OnProfileSwitched(profileName));
     }
 
-    // pending 要求を engine 投入中の要求へ昇格し、ProfileSwitched まで UI / publisher 側の反映を遅延させる。
+    /// <summary>
+    /// pending 要求を engine 投入中の要求へ昇格し、ProfileSwitched まで UI / publisher 側の反映を遅延させる。
+    /// </summary>
     private TrackerProfileSwitchRequest? PromotePendingRequest()
     {
         if (inFlightRequest is not null || pendingRequest is null)

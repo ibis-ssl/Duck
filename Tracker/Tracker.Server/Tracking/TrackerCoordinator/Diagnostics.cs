@@ -5,7 +5,9 @@ namespace Tracker.Server.Tracking;
 
 public sealed partial class TrackerCoordinator
 {
-    // diagnostics log schema と render snapshot 参照を揃えるため、最新 committed frame とその source detection だけを出力する。
+    /// <summary>
+    /// diagnostics log schema と render snapshot 参照を揃えるため、最新 committed frame とその source detection だけを出力する。
+    /// </summary>
     private void LogTrackerDiagnostics(
         SSL_WrapperPacket? packet,
         TrackerUpdateResult result,

@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerEngine の detection buffering、flush ordering、late packet contract を検証する。
+/// </summary>
 public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase, IClassFixture<TrackerContractFixture>
 {
     public TrackerEngineBufferingContractTests(TrackerContractFixture fixture)
@@ -10,10 +13,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
     {
     }
 
+    /// <summary>
+    /// 何を確認しているか: 到着順が event time と異なる場合でも、確定 frame が event time 昇順で flush されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers()
     {
-        // 何を確認しているか: 到着順が event time と異なる場合でも、確定 frame が event time 昇順で flush されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 100_000_000, mergeWindowNs: 20_000_000);
 
@@ -48,10 +53,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             flushResult.CommittedFrames.Select(frame => frame.DataTimestampNs));
     }
 
+    /// <summary>
+    /// 何を確認しているか: 観測時刻の差が MergeWindow を超えた場合、同一 flush 内でも別 frame として分割されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_SplitsFrames_WhenObservationsExceedMergeWindow()
     {
-        // 何を確認しているか: 観測時刻の差が MergeWindow を超えた場合、同一 flush 内でも別 frame として分割されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 10_000_000);
 
@@ -85,10 +92,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             flushResult.CommittedFrames.Select(frame => frame.DataTimestampNs));
     }
 
+    /// <summary>
+    /// 何を確認しているか: ReorderWindow 内で buffer 中は 0 frame を返し、複数 group が閉じた時だけまとめて確定されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush()
     {
-        // 何を確認しているか: ReorderWindow 内で buffer 中は 0 frame を返し、複数 group が閉じた時だけまとめて確定されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 1_500_000_000, mergeWindowNs: 20_000_000);
 
@@ -124,10 +133,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             frame => Assert.Equal(2_000_000_000L, frame.DataTimestampNs));
     }
 
+    /// <summary>
+    /// 何を確認しているか: すでに確定済み時刻より古い packet が後続 flush の tracked frame を汚染しないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes()
     {
-        // 何を確認しているか: すでに確定済み時刻より古い packet が後続 flush の tracked frame を汚染しないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -171,10 +182,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             frame => Assert.Equal(2_000_000_000L, frame.DataTimestampNs));
     }
 
+    /// <summary>
+    /// 何を確認しているか: 複数 frame が同時に flush される場合、各 committed frame に対応する event が flush 順で発行されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_EmitsWorldFrameCommittedForEachCommittedFrameInFlushOrder()
     {
-        // 何を確認しているか: 複数 frame が同時に flush される場合、各 committed frame に対応する event が flush 順で発行されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 1_500_000_000, mergeWindowNs: 10_000_000);
 
@@ -216,10 +229,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             });
     }
 
+    /// <summary>
+    /// 何を確認しているか: capture time が欠落した detection では sent time を DataTimestampNs として使う契約を確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesSentTimeWhenCaptureTimeIsMissing()
     {
-        // 何を確認しているか: capture time が欠落した detection では sent time を DataTimestampNs として使う契約を確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -236,10 +251,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
         Assert.Equal(1_250_000_000L, committedFrame.DataTimestampNs);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 確定済み MergeWindow 内に後着した packet を late として捨て、既存 frame を再構成しないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DropsLatePacketsThatFallInsideAnAlreadyCommittedMergeWindow()
     {
-        // 何を確認しているか: 確定済み MergeWindow 内に後着した packet を late として捨て、既存 frame を再構成しないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -291,10 +308,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             frame => Assert.Equal(2_000_000_000L, frame.DataTimestampNs));
     }
 
+    /// <summary>
+    /// 何を確認しているか: 最古 group の MergeWindow が閉じるまで flush せず、早すぎる確定を避けることを確認する。
+    /// </summary>
     [Fact]
     public void Update_WaitsForTheOldestGroupMergeWindowToCloseBeforeFlushingIt()
     {
-        // 何を確認しているか: 最古 group の MergeWindow が閉じるまで flush せず、早すぎる確定を避けることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -344,10 +363,12 @@ public class TrackerEngineBufferingContractTests : TrackerEngineContractTestBase
             frame => Assert.Equal(1_060_000_000L, frame.DataTimestampNs));
     }
 
+    /// <summary>
+    /// 何を確認しているか: local processing time から ProcessedAtNs が設定され、data timestamp と独立していることを確認する。
+    /// </summary>
     [Fact]
     public void Update_PopulatesProcessedAtNsFromLocalProcessingTime()
     {
-        // 何を確認しているか: local processing time から ProcessedAtNs が設定され、data timestamp と独立していることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
         var beforeNs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 1_000_000L;

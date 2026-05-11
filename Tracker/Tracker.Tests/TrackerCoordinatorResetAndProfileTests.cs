@@ -6,6 +6,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerCoordinator の geometry reset、profile switch、runtime tuning 反映 contract を検証する。
+/// </summary>
 public class TrackerCoordinatorResetAndProfileTests : IClassFixture<TrackerContractFixture>
 {
     public TrackerCoordinatorResetAndProfileTests(TrackerContractFixture fixture)
@@ -18,10 +21,12 @@ public class TrackerCoordinatorResetAndProfileTests : IClassFixture<TrackerContr
 
     private TrackerCoordinatorTestFactory Factory { get; }
 
+    /// <summary>
+    /// 何を確認しているか: geometry reset 時に observer 通知前へ tracked snapshot が clear されることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WhenGeometryResetOccurs_ClearsTrackedSnapshotBeforeNotifyingObserver()
     {
-        // 何を確認しているか: geometry reset 時に observer 通知前へ tracked snapshot が clear されることを確認する。
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
         var observer = new TrackerCoordinatorRecordingTrackerObserver(snapshotStore);
@@ -73,10 +78,12 @@ public class TrackerCoordinatorResetAndProfileTests : IClassFixture<TrackerContr
         Assert.Equal(1, snapshot.PublishSuccessCount);
     }
 
+    /// <summary>
+    /// 何を確認しているか: packet を伴わない profile switch が control-only update を drain し、observer 通知前に snapshot を clear することを確認する。
+    /// </summary>
     [Fact]
     public void RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification()
     {
-        // 何を確認しているか: packet を伴わない profile switch が control-only update を drain し、observer 通知前に snapshot を clear することを確認する。
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
         var observer = new TrackerCoordinatorRecordingTrackerObserver(snapshotStore);
@@ -115,10 +122,12 @@ public class TrackerCoordinatorResetAndProfileTests : IClassFixture<TrackerContr
         Assert.Equal(12000, publisher.CurrentOptions.Port);
     }
 
+    /// <summary>
+    /// 何を確認しているか: pending profile switch が packet 処理前に適用され、新 profile context で frame publish されることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext()
     {
-        // 何を確認しているか: pending profile switch が packet 処理前に適用され、新 profile context で frame publish されることを確認する。
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
         var observer = new TrackerCoordinatorRecordingTrackerObserver(snapshotStore);
@@ -157,10 +166,12 @@ public class TrackerCoordinatorResetAndProfileTests : IClassFixture<TrackerContr
         Assert.Equal(["world-frame:1"], observer.Events);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 同じ profile 名でも runtime tuning 差分が engine settings に反映されることを確認する。
+    /// </summary>
     [Fact]
     public void RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings()
     {
-        // 何を確認しているか: 同じ profile 名でも runtime tuning 差分が engine settings に反映されることを確認する。
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
         var coordinator = Factory.CreateCoordinator(

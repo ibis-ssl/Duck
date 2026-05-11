@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerEngine の ball contact、kick detection、kick classification contract を検証する。
+/// </summary>
 public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBase, IClassFixture<TrackerContractFixture>
 {
     public TrackerEngineKickContactContractTests(TrackerContractFixture fixture)
@@ -10,10 +13,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
     {
     }
 
+    /// <summary>
+    /// 何を確認しているか: ball contact が成立した frame で current contact と robot 側 contact marker が設定されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_PopulatesCurrentBallContactAndMarksContactingRobot()
     {
-        // 何を確認しているか: ball contact が成立した frame で current contact と robot 側 contact marker が設定されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -40,10 +45,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
             result.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: ContactMarginMm 設定が ball contact 判定距離に反映されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredContactMarginForBallContactDetection()
     {
-        // 何を確認しているか: ContactMarginMm 設定が ball contact 判定距離に反映されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -70,10 +77,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
         Assert.Equal([TrackerEventKind.WorldFrameCommitted], result.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: contact が終了した後も last toucher 情報が保持されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_PreservesLastToucherAfterBallContactEnds()
     {
-        // 何を確認しているか: contact が終了した後も last toucher 情報が保持されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -106,10 +115,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
             secondResult.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: recent contact 後の ball 加速を kick として検出し、kick event が contact change より先に発行されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_DetectsKickFromRecentContactAndPublishesKickBeforeContactChange()
     {
-        // 何を確認しているか: recent contact 後の ball 加速を kick として検出し、kick event が contact change より先に発行されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -145,10 +156,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
             kickResult.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: KickSpeedThreshold 設定により kick 検出の有無が変わることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredKickSpeedThresholdForKickDetection()
     {
-        // 何を確認しているか: KickSpeedThreshold 設定により kick 検出の有無が変わることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -186,10 +199,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
             kickResult.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: primary ball track が別物になった場合に last toucher を持ち越さないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotCarryLastToucherToDifferentPrimaryBallTrack()
     {
-        // 何を確認しているか: primary ball track が別物になった場合に last toucher を持ち越さないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -222,10 +237,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
         Assert.Equal([TrackerEventKind.WorldFrameCommitted], switchedPrimaryResult.EmittedEvents.Select(emitted => emitted.Kind));
     }
 
+    /// <summary>
+    /// 何を確認しているか: vertical velocity noise が chip threshold 未満なら flat kick と分類されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_DetectsFlatKickWhenVerticalVelocityNoiseIsBelowChipThreshold()
     {
-        // 何を確認しているか: vertical velocity noise が chip threshold 未満なら flat kick と分類されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -253,10 +270,12 @@ public class TrackerEngineKickContactContractTests : TrackerEngineContractTestBa
         Assert.Equal((uint)4, kick.KickerRobotId);
     }
 
+    /// <summary>
+    /// 何を確認しているか: ChipHeightThreshold 設定により chip / flat 分類が変わることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredChipHeightThresholdForChipClassification()
     {
-        // 何を確認しているか: ChipHeightThreshold 設定により chip / flat 分類が変わることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,

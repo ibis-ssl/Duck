@@ -2,8 +2,14 @@ using Tracker.Core;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: Tracker.Core の公開 contract surface が typed geometry、contact、observer contract を参照できることを検証する。
+/// </summary>
 public class TrackerCoreContractSurfaceTests
 {
+    /// <summary>
+    /// 何を確認しているか: TrackerFrame が typed geometry snapshot と ball contact state を保持して参照できることを確認する。
+    /// </summary>
     [Fact]
     public void TrackerFrame_ExposesTypedGeometryAndContactContracts()
     {
@@ -66,6 +72,9 @@ public class TrackerCoreContractSurfaceTests
         Assert.Equal(TrackerTeam.Blue, frame.LatestContact.LastTeam);
     }
 
+    /// <summary>
+    /// 何を確認しているか: runtime overrides が profile switch request 用の publish / tracker / kick 設定を typed snapshot として公開することを確認する。
+    /// </summary>
     [Fact]
     public void TrackerRuntimeOverrides_ExposesTypedSnapshotForProfileSwitchRequests()
     {
@@ -119,6 +128,9 @@ public class TrackerCoreContractSurfaceTests
         Assert.Equal(25, request.RuntimeOverrides.KickDetector.ContactMarginMm);
     }
 
+    /// <summary>
+    /// 何を確認しているか: TrackerUpdateResult と observer contract が contact と frame event を typed contract として扱えることを確認する。
+    /// </summary>
     [Fact]
     public void TrackerUpdateResult_AndObserverContracts_CanReferenceTypedContactAndFrameEvents()
     {

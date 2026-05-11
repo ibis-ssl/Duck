@@ -3,6 +3,9 @@ using Tracker.Server.Tracking;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerCoordinator test が observer 通知順序と snapshot 更新を記録するための shared support double を提供する。
+/// </summary>
 internal sealed class TrackerCoordinatorRecordingTrackerObserver : ITrackerObserver
 {
     private readonly TrackedSnapshotStore snapshotStore;

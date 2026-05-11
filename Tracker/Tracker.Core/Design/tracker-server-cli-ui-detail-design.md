@@ -38,6 +38,8 @@
 
 - 1 ファイル 1 主責務を基本とし、巨大ファイルから純粋 helper、I/O、view state、formatting、option parsing を分離する。
 - public / internal の既存型名は可能な限り維持し、外部参照がある型の rename は避ける。
+- dot 区切りファイル名は framework / toolchain 慣習に限って許容する。`.razor.cs`、`.razor.css`、`.csproj`、generated file は許容するが、手書き C# の責務 marker として `TypeName.Responsibility.cs` を使わない。
+- partial class を責務別に分ける場合は Core と同じく type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。Server 側の `TrackerCoordinator` partial も `TrackerCoordinator/Dispatch.cs`、`TrackerCoordinator/ProfileSwitch.cs` のように folder が型名、file が責務名を表す配置へ寄せる。
 - 挙動維持のため、分割前後で同じ入力から同じ observable output を返すことを最優先にする。
 - private helper を別型へ移す場合は、まず static な package-private 相当の `internal static` helper に分離し、状態を持たせる必要がある場合だけ instance class にする。
 - ファイル移動後も namespace は既存と同じにし、DI 登録や Razor import の変更を最小化する。
@@ -89,13 +91,13 @@
 - `TrackerCoordinator.cs`
   - constructor、`ProcessPacket`、`RequestProfileSwitch`、`ExecuteUpdates` を残す。
   - lock、`isProcessingUpdate`、pending drain の制御はここに残し、処理順序を見えやすくする。
-- `TrackerCoordinatorProfileSwitch.cs`
+- `TrackerCoordinator/ProfileSwitch.cs`
   - `PendingProfileSwitchRequest`、pending / in-flight 昇格、`ApplyProfileSwitch` 相当の local state 遷移。
   - `desiredOptions`、`desiredRuntimeOverrides`、`appliedOptions` の比較と更新をここへ寄せる。
-- `TrackerCoordinatorDispatch.cs`
+- `TrackerCoordinator/Dispatch.cs`
   - `TrackerUpdateResult` の `EmittedEvents` 順 dispatch、snapshot store 更新、render snapshot capture、publish、observer 通知。
   - `WorldFrameCommitted` は `framesByNumber` から該当 frame を取る現状を維持する。
-- `TrackerCoordinatorDiagnostics.cs`
+- `TrackerCoordinator/Diagnostics.cs`
   - `LogTrackerDiagnostics`、diagnostics line 組み立て、sidecar/default path 解決、write failure cache。
 - `TrackerDiagnosticsFormatter.cs`
   - raw ball / raw robot / tracked ball / tracked robot / source frame/camera の文字列化。
@@ -149,6 +151,8 @@
 ## 日本語コメント追加基準
 
 コメントは「何をしているか」ではなく「この型や member がどの契約を守るか」を説明する。自明な setter や局所変数には追加しない。
+
+C# の class / property / method の契約説明は日本語 XML documentation comment を基本にする。通常コメント `//` は method 内の複雑な block、不変条件、順序制約の直前だけに置き、type や member の説明を通常コメントで代用しない。
 
 追加対象:
 

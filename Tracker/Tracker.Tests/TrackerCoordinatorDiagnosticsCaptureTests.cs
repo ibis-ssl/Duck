@@ -6,6 +6,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerCoordinator の diagnostics capture と render snapshot sidecar 出力 contract を検証する。
+/// </summary>
 public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerContractFixture>
 {
     public TrackerCoordinatorDiagnosticsCaptureTests(TrackerContractFixture fixture)
@@ -18,10 +21,12 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
 
     private TrackerCoordinatorTestFactory Factory { get; }
 
+    /// <summary>
+    /// 何を確認しているか: packet capture session 有効時に diagnostics sidecar と render snapshot が capture directory へ出ることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WithPacketCaptureSession_WritesDiagnosticsLogSidecar()
     {
-        // 何を確認しているか: packet capture session 有効時に diagnostics sidecar と render snapshot が capture directory へ出ることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-diagnostics-{Guid.NewGuid():N}");
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
@@ -59,10 +64,12 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
         Assert.True(new FileInfo(renderSnapshotPath).Length > 0);
     }
 
+    /// <summary>
+    /// 何を確認しているか: capture を再有効化した後、新しい diagnostics sidecar に出力が切り替わることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WhenCaptureIsReenabled_WritesDiagnosticsToNewSidecar()
     {
-        // 何を確認しているか: capture を再有効化した後、新しい diagnostics sidecar に出力が切り替わることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-diagnostics-reenabled-{Guid.NewGuid():N}");
         var runtimeControl = new VisionPacketCaptureRuntimeControl(initialEnabled: true);
         var snapshotStore = new TrackedSnapshotStore();
@@ -104,10 +111,12 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
         Assert.All(logPaths, logPath => Assert.Contains("Tracker diagnostics profile=sim", File.ReadAllText(logPath)));
     }
 
+    /// <summary>
+    /// 何を確認しているか: capture 無効時でも default diagnostics log が capture directory 配下に作られることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WithCaptureDisabled_WritesDefaultDiagnosticsLogUnderCaptureDirectory()
     {
-        // 何を確認しているか: capture 無効時でも default diagnostics log が capture directory 配下に作られることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-default-diagnostics-{Guid.NewGuid():N}");
         var snapshotStore = new TrackedSnapshotStore();
         var publisher = new TrackerCoordinatorRecordingTrackerPacketPublisher();
@@ -137,10 +146,12 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
         Assert.Empty(Directory.GetFiles(captureDirectory, "test-vision-*.jsonl.gz"));
     }
 
+    /// <summary>
+    /// 何を確認しているか: capture sidecar と configured diagnostics file の両方へ diagnostics が書かれることを確認する。
+    /// </summary>
     [Fact]
     public void ProcessPacket_WithPacketCaptureSessionAndConfiguredDiagnosticsFile_WritesBothLogs()
     {
-        // 何を確認しているか: capture sidecar と configured diagnostics file の両方へ diagnostics が書かれることを確認する。
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-capture-diagnostics-both-{Guid.NewGuid():N}");
         var configuredLogPath = Path.Combine(
             Path.GetTempPath(),

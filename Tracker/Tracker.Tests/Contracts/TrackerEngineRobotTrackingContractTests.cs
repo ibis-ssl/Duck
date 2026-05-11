@@ -3,6 +3,9 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: TrackerEngine の robot tracking、Kalman 更新、duplicate / outlier 抑制 contract を検証する。
+/// </summary>
 public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTestBase, IClassFixture<TrackerContractFixture>
 {
     public TrackerEngineRobotTrackingContractTests(TrackerContractFixture fixture)
@@ -10,10 +13,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
     {
     }
 
+    /// <summary>
+    /// 何を確認しているか: 複数 camera の同一 team / robot ID 観測が 1 つの tracked robot に統合されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot()
     {
-        // 何を確認しているか: 複数 camera の同一 team / robot ID 観測が 1 つの tracked robot に統合されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -51,10 +56,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.Equal(0.3, mergedRobot.OrientationRad, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 連続 frame から robot の並進速度と unwrap 済み角速度が算出されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_TracksRobotVelocityAndUnwrappedAngularVelocityAcrossFrames()
     {
-        // 何を確認しているか: 連続 frame から robot の並進速度と unwrap 済み角速度が算出されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -81,10 +88,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.InRange(trackedRobot.AngularVelocityRadPerS, 0.9, 1.2);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 停止中に近い robot の measurement jitter が表示位置へそのまま出ないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DampsStationaryRobotMeasurementJitter()
     {
-        // 何を確認しているか: 停止中に近い robot の measurement jitter が表示位置へそのまま出ないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -107,10 +116,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.InRange(Math.Abs(trackedRobot.VXMmPerS), 0, 600);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 速度学習後の robot gate が前回観測ではなく predicted position を基準にすることを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesPredictedRobotPositionForGateAfterVelocityIsLearned()
     {
-        // 何を確認しているか: 速度学習後の robot gate が前回観測ではなく predicted position を基準にすることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
         var narrowGateSettings = Fixture.CreateSettings(
@@ -150,10 +161,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.True(trackedRobot.VXMmPerS > 500);
     }
 
+    /// <summary>
+    /// 何を確認しているか: robot の measurement noise が Kalman 更新へ反映され、観測値で状態を直接上書きしないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_AppliesRobotKalmanMeasurementNoiseInsteadOfOverwritingObservation()
     {
-        // 何を確認しているか: robot の measurement noise が Kalman 更新へ反映され、観測値で状態を直接上書きしないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -189,10 +202,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.True(trackedRobot.OrientationRad < 0.9);
     }
 
+    /// <summary>
+    /// 何を確認しているか: RobotOutlierLimit の設定が速度導出時の外れ値抑制に効くことを確認する。
+    /// </summary>
     [Fact]
     public void Update_UsesConfiguredRobotOutlierLimitWhenDerivingVelocity()
     {
-        // 何を確認しているか: RobotOutlierLimit の設定が速度導出時の外れ値抑制に効くことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -226,10 +241,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.Equal(0, trackedRobot.AngularVelocityRadPerS, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier を merge に混ぜないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DropsFarCameraRobotOutlierWhenAnotherCameraHasSameRobotNearTrack()
     {
-        // 何を確認しているか: 別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier を merge に混ぜないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 20_000_000);
 
@@ -278,10 +295,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.InRange(trackedRobot.YMm, -2050, -1950);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 1 frame 欠測した robot track が visibility を減衰させながら短期保持されることを確認する。
+    /// </summary>
     [Fact]
     public void Update_KeepsRobotTrackAliveAcrossOneMissingFrameWithDecayedVisibility()
     {
-        // 何を確認しているか: 1 frame 欠測した robot track が visibility を減衰させながら短期保持されることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -311,10 +330,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.True(predictedRobot.Visibility > 0);
     }
 
+    /// <summary>
+    /// 何を確認しているか: robot の output visibility が閾値未満まで落ちたら tracked frame へ出さないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotEmitRobotTrackAfterOutputVisibilityFallsBelowThreshold()
     {
-        // 何を確認しているか: robot の output visibility が閾値未満まで落ちたら tracked frame へ出さないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(
             reorderWindowNs: 0,
@@ -344,10 +365,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.Empty(Assert.Single(secondResult.CommittedFrames).Robots);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 同一 camera / team の近接 duplicate robot ID を抑制し、重複表示を避けることを確認する。
+    /// </summary>
     [Fact]
     public void Update_IgnoresCloseDuplicateRobotIdsFromSameCameraAndTeam()
     {
-        // 何を確認しているか: 同一 camera / team の近接 duplicate robot ID を抑制し、重複表示を避けることを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
 
@@ -368,10 +391,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.Equal((uint)1, trackedRobot.RobotId);
     }
 
+    /// <summary>
+    /// 何を確認しているか: duplicate 抑制が別 detection group の正当な robot 観測まで消さないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotApplyCloseDuplicateRobotFilterAcrossDetections()
     {
-        // 何を確認しているか: duplicate 抑制が別 detection group の正当な robot 観測まで消さないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
@@ -407,10 +432,12 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.Equal([(uint)1, (uint)11], robotIds);
     }
 
+    /// <summary>
+    /// 何を確認しているか: fresh な別 camera 観測がある場合、stale camera prediction で robot 位置を引っ張らないことを確認する。
+    /// </summary>
     [Fact]
     public void Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation()
     {
-        // 何を確認しているか: fresh な別 camera 観測がある場合、stale camera prediction で robot 位置を引っ張らないことを確認する。
         var engine = Fixture.CreateEngine();
         var settings = Fixture.CreateSettings(reorderWindowNs: 50_000_000, mergeWindowNs: 20_000_000);
 
