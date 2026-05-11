@@ -6,6 +6,9 @@ namespace Tracker.Tests;
 
 public class VisionPacketStoreTests
 {
+    /// <summary>
+    /// 何を確認しているか: detection のみの packet が detection snapshot を更新すること。
+    /// </summary>
     [Fact]
     public void StoreDatagram_WithDetectionOnlyPacket_UpdatesDetectionSnapshot()
     {
@@ -41,6 +44,9 @@ public class VisionPacketStoreTests
         Assert.Single(snapshot.Detection.Balls);
     }
 
+    /// <summary>
+    /// 何を確認しているか: geometry のみの packet が geometry snapshot を更新すること。
+    /// </summary>
     [Fact]
     public void StoreDatagram_WithGeometryOnlyPacket_UpdatesGeometrySnapshot()
     {
@@ -79,6 +85,9 @@ public class VisionPacketStoreTests
         Assert.Single(snapshot.Geometry.Field.FieldLines);
     }
 
+    /// <summary>
+    /// 何を確認しているか: invalid payload を packet として保存せず error count を増やすこと。
+    /// </summary>
     [Fact]
     public void StoreDatagram_WithInvalidPayload_IncrementsErrorCount()
     {
@@ -94,6 +103,9 @@ public class VisionPacketStoreTests
         Assert.Null(snapshot.LatestPacket);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 複数 camera frame の latest state と aggregate view を保持すること。
+    /// </summary>
     [Fact]
     public void StorePacket_WithMultipleCameraFrames_PreservesPerCameraLatestStateAndAggregateView()
     {

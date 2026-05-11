@@ -2,6 +2,9 @@ using Tracker.Core;
 
 namespace Tracker.Server.Tracking;
 
+/// <summary>
+/// TrackerCoordinator の profile switch 要求昇格と適用タイミングを担当する partial class。
+/// </summary>
 public sealed partial class TrackerCoordinator
 {
     /// <summary>

@@ -3,6 +3,9 @@ using Tracker.Server.Vision;
 
 namespace Tracker.Server.Tracking;
 
+/// <summary>
+/// TrackerCoordinator の diagnostics log 出力と diagnostics sidecar path 解決を担当する partial class。
+/// </summary>
 public sealed partial class TrackerCoordinator
 {
     /// <summary>

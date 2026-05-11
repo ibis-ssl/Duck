@@ -15,6 +15,9 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         this.fixture = fixture;
     }
 
+    /// <summary>
+    /// 何を確認しているか: profile switch request が named profile を解決し coordinator 経由で反映されること。
+    /// </summary>
     [Fact]
     public void RequestProfileSwitch_ResolvesNamedProfileAndAppliesItThroughCoordinator()
     {
@@ -65,6 +68,9 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         Assert.Equal("239.1.2.3", publisher.CurrentOptions.MulticastAddress);
     }
 
+    /// <summary>
+    /// 何を確認しているか: unknown profile への切り替え要求が profile 名付きで失敗すること。
+    /// </summary>
     [Fact]
     public void RequestProfileSwitch_WithUnknownProfile_Throws()
     {

@@ -133,7 +133,7 @@ dot 区切りファイル名は framework / toolchain 慣習に限って許容�
 
 ### engine 本体
 
-- `Tracker/Tracker.Core/Engine/TrackerEngine.cs`
+- `Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs`
   - `TrackerEngine` の field、constructor なし状態、`Update`
   - profile switch、geometry 更新、detection 受付、flush 呼び出しの最上位 orchestration
 - `Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs`
@@ -328,7 +328,7 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 
 1. 作業前に `Tracker/Tracker.Core/Design/tracker-core-engine-detail-design.md` と `Tracker/Tracker.Core/Design/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。
 2. `TrackerExecutionContracts.cs` から公開契約を先に分離する。`ITrackerEngine`、result / event、observer、profile switch request の型名と namespace を変えない。
-3. `TrackerEngine` を `partial sealed class` にして、最上位 `Update` と field を `Engine/TrackerEngine.cs` に残す。
+3. `TrackerEngine` を `partial sealed class` にして、最上位 `Update` と field を `Engine/TrackerEngine/TrackerEngine.cs` に残す。
 4. detection buffer と frame commit を分離する。ここで `CommittedFrames` と `EmittedEvents` の順序が変わらないことを focused test で確認する。
 5. geometry 変換と geometry reset 判定を分離する。pending detection clear、frame number 維持、late cutoff の扱いを変えない。
 6. ball tracking を分離する。camera-local track id、merged internal track id、primary ball 継続、secondary ball 成長条件を変えない。

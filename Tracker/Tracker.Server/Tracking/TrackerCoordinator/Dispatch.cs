@@ -2,8 +2,14 @@ using Tracker.Core;
 
 namespace Tracker.Server.Tracking;
 
+/// <summary>
+/// TrackerCoordinator の engine event dispatch、snapshot 更新、publish、observer 通知順序を担当する partial class。
+/// </summary>
 public sealed partial class TrackerCoordinator
 {
+    /// <summary>
+    /// TrackerUpdateResult の emitted event 順に snapshot、capture、publish、observer 通知を dispatch する。
+    /// </summary>
     private void DispatchResult(TrackerUpdateResult result, DateTimeOffset receivedAt)
     {
         var framesByNumber = result.CommittedFrames.ToDictionary(frame => frame.FrameNumber);

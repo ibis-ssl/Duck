@@ -8,6 +8,9 @@ namespace Tracker.Tests;
 
 public class VisionReceiverConfigurationResolverTests
 {
+    /// <summary>
+    /// 何を確認しているか: Tracker active profile と一致する VisionReceiver profile の値を使用すること。
+    /// </summary>
     [Fact]
     public void Resolve_WithMatchingProfile_UsesProfileSpecificValues()
     {
@@ -34,6 +37,9 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal("10.0.0.5", resolved.InterfaceAddress);
     }
 
+    /// <summary>
+    /// 何を確認しているか: 一致する profile がない場合に top-level の VisionReceiver 設定へ fallback すること。
+    /// </summary>
     [Fact]
     public void Resolve_WithoutMatchingProfile_FallsBackToTopLevelValues()
     {
@@ -51,6 +57,9 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal("192.168.10.2", resolved.InterfaceAddress);
     }
 
+    /// <summary>
+    /// 何を確認しているか: runtime options store の設定更新が既存 snapshot の change token を cancel すること。
+    /// </summary>
     [Fact]
     public void RuntimeOptionsStore_ApplyConfiguration_CancelsPreviousSnapshot()
     {
@@ -80,6 +89,9 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal("10.0.0.5", secondSnapshot.Options.InterfaceAddress);
     }
 
+    /// <summary>
+    /// 何を確認しているか: profile switch observer が一致する receiver profile を runtime store へ反映すること。
+    /// </summary>
     [Fact]
     public void ProfileSwitchObserver_OnProfileSwitched_AppliesMatchingReceiverProfile()
     {
@@ -112,6 +124,9 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal(12020, snapshot.Options.Port);
     }
 
+    /// <summary>
+    /// 何を確認しているか: startup 登録が Tracker active profile から receiver profile を解決すること。
+    /// </summary>
     [Fact]
     public void StartupRegistrations_ResolveReceiverProfileFromTrackerActiveProfile()
     {
@@ -149,6 +164,9 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal("10.0.0.5", snapshot.Options.InterfaceAddress);
     }
 
+    /// <summary>
+    /// 何を確認しているか: appsettings.json が packet capture の既定値を公開していること。
+    /// </summary>
     [Fact]
     public void AppsettingsJson_ExposesPacketCaptureDefaults()
     {
