@@ -4,6 +4,9 @@ namespace Tracker.Tests;
 
 public class VisionFieldProjectionTests
 {
+    /// <summary>
+    /// 何を確認しているか: field 原点が viewport 中央へ射影されること。
+    /// </summary>
     [Fact]
     public void Project_WithOrigin_ReturnsViewportCenter()
     {
@@ -15,6 +18,9 @@ public class VisionFieldProjectionTests
         Assert.Equal(projection.ViewBoxHeight / 2, point.Y, precision: 3);
     }
 
+    /// <summary>
+    /// 何を確認しているか: geometry の field 端点が viewport 内に収まること。
+    /// </summary>
     [Fact]
     public void Project_WithGeometryFieldEdges_KeepsEndpointsInsideViewport()
     {
@@ -39,6 +45,9 @@ public class VisionFieldProjectionTests
         Assert.InRange(bottom.Y, 0, projection.ViewBoxHeight);
     }
 
+    /// <summary>
+    /// 何を確認しているか: geometry が未取得の場合に既定 field size で projection を作ること。
+    /// </summary>
     [Fact]
     public void FromGeometry_WhenGeometryIsMissing_UsesDefaultFieldSize()
     {

@@ -7,6 +7,9 @@ namespace Tracker.Tests;
 
 public class TrackerConfigurationBindingTests
 {
+    /// <summary>
+    /// 何を確認しているか: active profile と runtime override が解決済み Tracker 設定へ反映されること。
+    /// </summary>
     [Fact]
     public void Resolve_UsesActiveProfileAndRuntimeOverrides()
     {
@@ -48,6 +51,9 @@ public class TrackerConfigurationBindingTests
         Assert.Equal("tracker-diagnostics-test.log", resolved.Diagnostics.FilePath);
     }
 
+    /// <summary>
+    /// 何を確認しているか: active profile が存在しない場合に設定解決が profile 名付きで失敗すること。
+    /// </summary>
     [Fact]
     public void Resolve_WithMissingActiveProfile_Throws()
     {
@@ -61,6 +67,9 @@ public class TrackerConfigurationBindingTests
         Assert.Contains("missing", ex.Message);
     }
 
+    /// <summary>
+    /// 何を確認しているか: DI 登録から解決済み engine / publisher / diagnostics 設定を取得できること。
+    /// </summary>
     [Fact]
     public void StartupRegistrations_ExposeResolvedEngineAndPublisherSettings()
     {
@@ -100,6 +109,9 @@ public class TrackerConfigurationBindingTests
         Assert.Equal("tracker-diagnostics-test.log", diagnostics.FilePath);
     }
 
+    /// <summary>
+    /// 何を確認しているか: appsettings.json が Tigers 準拠の Tracker 既定 profile と解決値を公開していること。
+    /// </summary>
     [Fact]
     public void AppsettingsJson_ExposesTigersAlignedTrackerDefaults()
     {

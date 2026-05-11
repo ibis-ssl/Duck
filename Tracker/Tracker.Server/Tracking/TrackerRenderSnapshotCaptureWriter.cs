@@ -4,6 +4,9 @@ using Tracker.Server.Vision;
 
 namespace Tracker.Server.Tracking;
 
+/// <summary>
+/// tracker render snapshot を capture session の sidecar JSONL gzip file へ書き出す writer。
+/// </summary>
 public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -18,6 +21,9 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
     private string? capturePath;
     private bool writeFailed;
 
+    /// <summary>
+    /// capture session と logger を受け取り、必要になるまで file writer を遅延初期化する。
+    /// </summary>
     public TrackerRenderSnapshotCaptureWriter(
         VisionPacketCaptureSession session,
         ILogger<TrackerRenderSnapshotCaptureWriter> logger)
@@ -26,6 +32,9 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
         this.logger = logger;
     }
 
+    /// <summary>
+    /// 現在書き込み中の render snapshot capture path。未開始または停止後は null。
+    /// </summary>
     public string? CapturePath
     {
         get
@@ -37,6 +46,9 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
         }
     }
 
+    /// <summary>
+    /// 指定 frame を render snapshot record として追記し、capture 無効時は session を停止する。
+    /// </summary>
     public void CaptureFrame(TrackerFrame frame, DateTimeOffset receivedAt)
     {
         if (!session.Enabled)
@@ -73,11 +85,17 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
         }
     }
 
+    /// <summary>
+    /// writer を停止して保持中の file handle を解放する。
+    /// </summary>
     public void Dispose()
     {
         Stop();
     }
 
+    /// <summary>
+    /// capture writer と session を停止し、次回 capture 時に新しい file を開始できる状態へ戻す。
+    /// </summary>
     public void Stop()
     {
         lock (gate)
@@ -106,6 +124,12 @@ public sealed class TrackerRenderSnapshotCaptureWriter : IDisposable
 
 }
 
+/// <summary>
+/// tracker render snapshot capture の 1 行分の JSON record。
+/// </summary>
+/// <param name="SchemaVersion">record schema version。</param>
+/// <param name="ReceivedAt">tracked frame を受信した UTC 時刻。</param>
+/// <param name="Frame">capture した tracker frame。</param>
 public sealed record TrackerRenderSnapshotRecord(
     int SchemaVersion,
     DateTimeOffset ReceivedAt,

@@ -7,6 +7,9 @@ using Tracker.Server.Vision;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 何を確認しているか: render snapshot log reader が frame index、capture 対応、破損入力を扱う contract を検証する。
+/// </summary>
 public class TrackerRenderSnapshotLogReaderTests
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -14,6 +17,9 @@ public class TrackerRenderSnapshotLogReaderTests
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
+    /// <summary>
+    /// 何を確認しているか: diagnostics log に対応する render snapshot から指定 frame の描画状態を復元できることを確認する。
+    /// </summary>
     [Fact]
     public void ReadFrame_ReturnsSnapshotMatchingDiagnosticsFrame()
     {
@@ -50,6 +56,9 @@ public class TrackerRenderSnapshotLogReaderTests
         }
     }
 
+    /// <summary>
+    /// 何を確認しているか: scrubber が繰り返し参照できるように、frame number keyed index が cache されることを確認する。
+    /// </summary>
     [Fact]
     public void ReadIndex_ReturnsSnapshotsByFrameForRepeatedScrubbing()
     {
@@ -91,6 +100,9 @@ public class TrackerRenderSnapshotLogReaderTests
         }
     }
 
+    /// <summary>
+    /// 何を確認しているか: packet capture 一覧外の diagnostics log から render snapshot を読ませないことを確認する。
+    /// </summary>
     [Fact]
     public void ReadFrame_RejectsDiagnosticsLogOutsideList()
     {
@@ -119,6 +131,9 @@ public class TrackerRenderSnapshotLogReaderTests
         }
     }
 
+    /// <summary>
+    /// 何を確認しているか: gzip として壊れた render snapshot では snapshot を返さず error を返すことを確認する。
+    /// </summary>
     [Fact]
     public void ReadFrame_ReturnsErrorForCorruptRenderSnapshot()
     {
@@ -147,6 +162,9 @@ public class TrackerRenderSnapshotLogReaderTests
         }
     }
 
+    /// <summary>
+    /// 何を確認しているか: frame payload が欠落した render snapshot 行では snapshot を返さず error を返すことを確認する。
+    /// </summary>
     [Fact]
     public void ReadFrame_ReturnsErrorForRenderSnapshotMissingFrame()
     {

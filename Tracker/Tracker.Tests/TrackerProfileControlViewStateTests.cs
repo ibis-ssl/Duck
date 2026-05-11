@@ -5,6 +5,9 @@ namespace Tracker.Tests;
 
 public class TrackerProfileControlViewStateTests
 {
+    /// <summary>
+    /// 何を確認しているか: snapshot の active profile が view state の選択状態として優先されること。
+    /// </summary>
     [Fact]
     public void FromOptions_UsesTrackedSnapshotActiveProfileAndMarksItSelected()
     {
@@ -32,6 +35,9 @@ public class TrackerProfileControlViewStateTests
         Assert.True(viewState.Profiles[1].IsActive);
     }
 
+    /// <summary>
+    /// 何を確認しているか: profile 一覧が空の場合でも設定済み active profile だけを表示できること。
+    /// </summary>
     [Fact]
     public void FromOptions_WithoutProfiles_ReturnsConfiguredActiveProfileOnly()
     {
@@ -54,6 +60,9 @@ public class TrackerProfileControlViewStateTests
         Assert.True(profile.IsActive);
     }
 
+    /// <summary>
+    /// 何を確認しているか: TrackedSnapshotStore が configured initial active profile を初期 snapshot に保持すること。
+    /// </summary>
     [Fact]
     public void TrackedSnapshotStore_UsesConfiguredInitialActiveProfile()
     {

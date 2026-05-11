@@ -4,18 +4,17 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-031
-- Title: camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する
-- Phase: engine
+- ID: TRACKER-037
+- Title: Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する
+- Phase: maintenance
 - Status: done
 - Size: small
-- Dependencies: TRACKER-030 が完了し、対象 diagnostics log が利用できること
+- Dependencies: TRACKER-036
 - Exit Criteria:
-  - `2026-05-10 22:33:16.070` 付近で yellow robot 1 が瞬間移動する原因が `reports/tracker-031-evidence-20260510223916.md` に記録されている
-  - 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない
-  - 単一観測の大きな移動や既存 outlier 契約を不必要に壊さない
-  - focused regression と full test の結果が `reports/tracker-031-evidence-20260510223916.md` に記録されている
-  - review 結果が `reports/tracker-031-review-20260510223916.md` に記録され、blocking finding が残っていない
+  - dot 区切りを使うファイル名とフォルダ分割を優先するファイル名の基準が日本語で明文化されている
+  - class / property / method / test のコメント付与基準が日本語で明文化され、test も XML コメントで確認内容を説明する方針になっている
+  - `gpt-5.5 high` の sub-agent が現状ファイルを基準に照らして監査し、結果が `reports/tracker-037-naming-comment-audit-20260511195008.md` に記録されている
+  - 必要な rename / 配置変更 / コメント補強が実施され、build/test/review の結果に blocking finding が残っていない。最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み
 
 ## 次の調査タスク
 
@@ -57,3 +56,9 @@
 | TRACKER-029 | tracked object の小刻みな振動を抑制する | engine | done | TRACKER-028 | stationary に近い tracked ball / robot の表示揺れを抑制しつつ、実移動している object の追従性を過度に落とさない。振動抑制 tuning 値は profile 設定から外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、review は `reports/tracker-029-review-20260510221200.md` に記録済み。 |
 | TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | done | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。review は `reports/tracker-030-review-20260510222529.md` に記録済み。 |
 | TRACKER-031 | camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する | engine | done | TRACKER-030 | 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない。原因・実装・検証は `reports/tracker-031-evidence-20260510223916.md`、review は `reports/tracker-031-review-20260510223916.md` に記録済み。 |
+| TRACKER-032 | Tracker 保守性改善の詳細設計書を分割作成する | maintenance | done | TRACKER-031 | Core engine、Server/CLI/UI、test 保守性改善の詳細設計を日本語の分割ファイルとして作成した。worker report は `reports/tracker-032-core-design-worker-20260511063428.md`、`reports/tracker-032-server-design-worker-20260511063428.md`、`reports/tracker-032-test-design-worker-20260511063428.md`、review は `reports/tracker-032-review-20260511063428.md` に記録済み。 |
+| TRACKER-033 | Core tracker engine の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `TrackerExecutionContracts.cs`、`TrackerModelContracts.cs`、`TrackerPacketGenerator.cs` を Core の責務別ファイルへ分割し、主要 class / property / method に日本語コメントを追加した。実装・検証は `reports/tracker-033-core-worker-20260511070200.md`、review は `reports/tracker-033-review-20260511072000.md` に記録済み。 |
+| TRACKER-034 | Server / CLI / UI の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `Tracker.CaptureReplay/Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` などを責務別に分割し、主要 class / property / method に日本語コメントを追加した。実装・検証は `reports/tracker-034-server-worker-20260511074000.md`、追加コメント補強は `reports/tracker-034-comment-followup-worker-20260511082000.md`、review は `reports/tracker-034-review-20260511081000.md` と `reports/tracker-034-review-r2-20260511083000.md` に記録済み。 |
+| TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | done | TRACKER-033, TRACKER-034 | 巨大 test file を責務別に分割し、対象 test 81 件に何を確認しているかの日本語コメントを追加した。実装・検証は `reports/tracker-035-test-worker-20260511085000.md`、review は `reports/tracker-035-review-20260511091000.md` に記録済み。 |
+| TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | done | TRACKER-033, TRACKER-034, TRACKER-035 | 保守性改善全体の最終検証と final review を実施した。最終検証は `reports/tracker-036-final-verification-20260511093000.md`、final review は `reports/tracker-036-final-review-20260511094000.md` に記録済み。 |
+| TRACKER-037 | Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する | maintenance | done | TRACKER-036 | dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を日本語で明文化した。監査は `reports/tracker-037-naming-comment-audit-20260511195008.md`、実装分担は `reports/tracker-037-design-rules-worker-20260511195640.md`、`reports/tracker-037-core-server-worker-20260511195640.md`、`reports/tracker-037-test-xml-comments-worker-20260511195640.md`、修正は `reports/tracker-037-review-fix-worker-20260511200910.md`、最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み。 |
