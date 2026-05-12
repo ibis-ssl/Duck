@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: comparison-logging
-- 現在のタスク: TRACKER-052
+- 現在のタスク: TRACKER-053
 - 残りフェーズ: none
 
 ## フェーズ一覧
@@ -24,6 +24,6 @@
 - `TRACKER-049`: diagnostics comparison の design / tracking を再同期する。CLI 比較実装を保持したまま、`/diagnostics` UI comparison を PR ready 前の固定タスクへ入れる。gpt-5.5 high review blocking findings なしまで完了済み。
 - `TRACKER-050`: diagnostics comparison reader / view-state contract を追加する。diagnostics log path から metadata / sidecar を解決し、source list、selected source filter、selected entry comparison、sidecar status、skipped/error count を pure model として固定した。初回 gpt-5.5 high review の blocking finding に対し、10,000 件超 log の omit 後 selection regression を追加し、`selectedEntryIndex` ではなく表示済み entry 由来の `TrackerDiagnosticsComparisonSelectedEntry` を渡す contract へ修正済み。focused 8 passed、関連 focused 38 passed、full `Tracker.Tests` 202 passed、`git diff --check` 問題なし。gpt-5.5 high r2 review は `reports/tracker-050-review-r2-20260512210935.md` に記録済みで blocking findings なし。完了済み。
 - `TRACKER-051`: `/diagnostics` UI へ comparison 表示と source filtering を接続する。selected log / selected entry / playback tick と comparison view-state を同期し、既存 diagnostics / render snapshot / playback controls を壊さない。完了済み。
-- `TRACKER-052`: CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する。CLI は agent / 検証用、通常確認は `/diagnostics` comparison panel を主経路として説明する。
+- `TRACKER-052`: CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する。CLI は agent / 検証用、通常確認は `/diagnostics` comparison panel を主経路として説明する。完了済み。
 - `TRACKER-053`: PR #9 ready 化。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、manual evidence、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
 - `TRACKER-054` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。

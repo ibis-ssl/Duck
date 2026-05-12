@@ -9,11 +9,13 @@
 - tracked viewer で tracker の統合結果、kick / contact / field 状態、publish 関連カウンタを確認する
 - 複数 profile を定義して、UI または API から runtime profile switch を行う
 - `Tracker:PublishUdp` が有効なら official tracker packet を UDP multicast/unicast で送信する
+- CaptureOn 中に見えている official tracker packet を同じ session folder へ保存し、後から ibis 出力と比較する
 
 ## 前提
 
 - .NET SDK `10.0`
 - SSL-Vision packet を送ってくる送信元
+- CaptureOn 比較ログを取る場合は official tracker multicast endpoint に流れている tracker packet
 - ブラウザで `Tracker.Server` の HTTP endpoint にアクセスできること
 
 ## 起動方法
@@ -82,6 +84,10 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 - 左側の timeline でログ行を時系列にスクロールできます
 - capture sidecar と同じ basename の `*.render-snapshots.jsonl.gz` がある場合は、選択行の raw / tracked field を描画できます
 - 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
+- capture sidecar の diagnostics log を選ぶと、`Settings` から capture metadata に保存された configured profile と resolved settings を確認できます
+- capture sidecar の diagnostics log と tracker packet snapshot sidecar が揃っている場合は、`Tracker Comparison` panel で ibis tracker と 3rd party tracker の差分を確認できます
+- `Tracker Comparison` panel の source filter は `All`、`External`、`Own`、`Unknown`、source label 単位で切り替えられます。通常確認では `External` または対象 source label を選び、選択中 diagnostics entry の ibis own snapshot timestamp に最も近い 3rd party tracker snapshot と比較します。
+- panel には sidecar status、record / skipped / error count、選択 frame / time、comparison status、matching rule、source role / label、snapshot frame、own / nearest timestamp、delta、balls / robots、raw payload の復元状態が表示されます。
 
 ## API
 
@@ -115,14 +121,15 @@ raw SSL-Vision packet の受信設定です。
 
 SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes として `jsonl.gz` に保存します。各行には `receivedAt`、remote endpoint、payload の base64 が入るため、後から同じ順序で `SSL_WrapperPacket` に戻して tracker へ再投入できます。decode に失敗した packet も保存対象です。
 
-capture を開始すると、同じ basename で次の sidecar も作成します。
+capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn session folder を作り、その中に同じ basename で次の sidecar も作成します。
 
 - `<prefix>-<timestamp>-<guid>.jsonl.gz`: packet capture 本体
 - `<prefix>-<timestamp>-<guid>.metadata.json`: capture 時の `Tracker` 設定と resolved profile 設定
 - `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: capture と対応する tracker diagnostics log。`Tracker:Diagnostics:FilePath` が指定されていても、capture 有効時は sidecar として同時に出力します。
 - `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: timeline / 逆方向スクラブ用の描画 snapshot。tracker engine の内部状態ではなく、commit 済み `TrackerFrame` だけを保存します。
+- `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の live receiver が見た official tracker packet の snapshot sidecar です。
 
-`metadata.json` には active profile 名だけではなく、`Tracker:Profiles` 配下の profile 設定値と、runtime override 適用後の resolved settings も保存します。
+`metadata.json` には active profile 名だけではなく、`Tracker:Profiles` 配下の profile 設定値と、runtime override 適用後の resolved settings も保存します。CaptureOn 比較ログがある場合は、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotLog`、`TrackerSnapshotSources` もここから辿ります。
 
 | キー | 意味 |
 | --- | --- |
@@ -153,7 +160,7 @@ capture を開始すると、同じ basename で次の sidecar も作成しま�
 }
 ```
 
-保存された capture は `Tracker.CaptureReplay` tool で replay / analyze できます。
+保存された capture は `Tracker.CaptureReplay` tool で replay / analyze できます。通常のユーザー確認は `/diagnostics` の `Tracker Comparison` panel を主経路にし、この CLI は agent / 自動検証 / regression 調査で同じ session を再現するために残します。
 
 ```bash
 DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" \
@@ -163,6 +170,8 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
   --settings Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures/ssl-vision-packets-<timestamp>-<guid>.metadata.json \
   --profile sim
 ```
+
+CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder 内の `*.jsonl.gz` を渡し、`--settings` には同じ session folder 内の `*.metadata.json` を渡します。この場合、replay は capture 時点の resolved tracker settings を使い、metadata の relative path から `tracker-packet-snapshots.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=nearest-timestamp ...` が出れば、tracker packet snapshot sidecar と ibis diagnostics frame の近傍比較まで読めています。
 
 自動テストや regression check では exit code を使えます。
 
@@ -179,6 +188,8 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 - `--max-details <count>`: 詳細出力数を制限します。
 - `--settings <file>`: `Tracker.Server/appsettings.json` 形式、または capture の `metadata.json` 形式から tracker 設定を読み込みます。`Tracker.Server/appsettings.json` 形式では `Tracker:RuntimeOverrides` も profile 設定へ反映します。
 
+`--settings` は tracker settings の解決にも使われます。CaptureOn metadata を渡す normal path では、capture 時に保存済みの resolved settings と sidecar relative path を使うため、当時の profile / override / snapshot sidecar をまとめて再現できます。手元の `Tracker.Server/appsettings.json` を渡すのは、capture metadata がない古い capture を現在設定で再評価したい場合や、意図的に別設定で replay したい場合に限ります。その場合、metadata から辿る `tracker-packet-snapshots.jsonl` は自動解決されないため、CaptureOn 比較ログの確認手順としては metadata を優先してください。手書き metadata を作る場合は、packet capture と同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotLog` を矛盾なく入れてください。
+
 利用できる summary metric は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。frame 詳細の filter では `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。raw 系 metric は、その committed frame の source detection 群から集計します。
 
 例えば、raw では ball が 1 個なのに replay 後 frame で ball が 2 個以上になる箇所を確認する場合は次のようにします。
@@ -193,6 +204,30 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 ```
 
 test code から直接扱う場合は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各 record の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで replay できます。
+
+### CaptureOn 比較ログの manual evidence
+
+CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を残します。
+
+1. `Tracker:Receive:Enabled=true` にし、active profile の `Tracker:Profiles:<name>:Publish:MulticastAddress` / `Port` が監視したい official tracker multicast endpoint を指していることを確認します。既定の `sim` profile は `224.5.23.2:11010`、`default` profile は `224.5.23.2:10010` です。複数 NIC 環境では `Tracker:Receive:InterfaceAddress` を明示します。
+2. `Tracker.Server` を起動し、画面で `Capture On` にしてから SSL-Vision packet と official tracker packet を流します。`Tracker:Receive:Enabled=false` のままでは live tracker receiver が起動しないため、packet capture と diagnostics は残っても tracker packet snapshot sidecar は増えません。
+3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl` があることを確認します。metadata では `SessionFolder` と各 relative path、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。
+4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。timeline、scrubber、Play / Fast Forward、raw / tracked field、`Settings` modal の resolved settings を確認します。
+5. `Tracker Comparison` panel で `Status` が `Ready` になることを確認し、source filter を `External` または対象 source label に切り替えます。比較対象がないことを確認したい場合は `Own` / `Unknown` も使えます。
+6. report には、selected frame / selected time、source filter、sidecar status、record / skipped / error count、entry status、source role / label、snapshot frame、own timestamp ns、nearest timestamp ns、delta ns、balls / robots、raw payload 表示を残します。UI の raw payload は `Restored` が rawPayloadRestored true、`Missing` が false です。
+7. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`nearest-timestamp` の比較 summary を agent / 検証 / 回帰用 evidence として残します。CLI evidence は UI evidence の補助であり、通常確認の主経路ではありません。
+
+`Tracker Comparison` panel の sidecar status は次のように読みます。
+
+- `Ready`: metadata と `tracker-packet-snapshots.jsonl` を読み、選択 diagnostics entry の comparison を作成できる状態です。
+- `NoLogSelected`: diagnostics log がまだ選択されていません。
+- `MetadataMissing` / `MetadataCorrupt`: 選択 log に対応する `*.metadata.json` がない、または JSON を読み取れません。古い diagnostics log や壊れた metadata の可能性があります。
+- `SnapshotMetadataMissing`: metadata に tracker snapshot log 情報がありません。CaptureOn 比較ログ導入前の capture ではこの状態になり得ます。
+- `SidecarNotCreated`: metadata は snapshot sidecar 未作成を示しています。`Tracker:Receive:Enabled=false`、receiver 未起動、または CaptureOn 中に writer が開始されなかった場合を疑います。
+- `SidecarPathMissing` / `SidecarMissing`: metadata に sidecar path がない、または metadata が指す file が存在しません。session folder の移動や部分コピーを疑います。
+- `SidecarEmpty` または `RecordCount=0`: sidecar は作成されていますが、保存済み tracker packet がありません。official tracker packet が endpoint に流れていない、multicast interface が違う、source がまだ見えていない場合を確認します。
+- `SidecarCorrupt`: sidecar JSONL を読み取れません。壊れた file、途中書き込み、手動編集を疑います。
+- `Skipped` が 0 より大きい場合は decode または書き込み失敗で snapshot record にできなかった packet があることを示します。`Errors` が 0 より大きい場合は writer 側で記録された error があるため、比較結果の代表性を report のリスクに残します。
 
 ### `VisionReceiver:Profiles:<name>`
 
@@ -216,8 +251,25 @@ tracker 全体の設定です。
 | `Uuid` | tracker packet の UUID です。受信側で source 識別に使う値です。 |
 | `ActiveProfileName` | 起動時に使う profile 名です。`Tracker:Profiles` に存在する必要があります。 |
 | `Diagnostics` | tracker の raw / tracked 診断ログ出力設定です。 |
+| `Receive` | CaptureOn 比較ログ用に official tracker packet を受信する設定です。既定は無効です。 |
 | `RuntimeOverrides` | 起動時に active profile へ上書きする optional override 群です。profile 定義を変えずに一時的な publish / tracker tuning を差し込む用途です。 |
 | `Profiles` | profile ごとの publish / engine / tuning 設定です。UI と API の profile switch 対象にもなります。 |
+
+### `Tracker:Receive`
+
+CaptureOn 比較ログ用の live tracker packet receiver 設定です。`Enabled=true` のときだけ `TrackerConnectionLib` receiver が起動し、active profile の `Tracker:Profiles:<name>:Publish:MulticastAddress` / `Port` を監視します。受信した `TrackerWrapperPacket` は CaptureOn 中だけ `tracker-packet-snapshots.jsonl` へ保存され、Capture Off 中は追記しません。
+
+| キー | 意味 |
+| --- | --- |
+| `Enabled` | `true` なら official tracker packet receiver を起動します。既定は `false` です。 |
+| `InterfaceAddress` | multicast join に使う local IPv4 address です。`null` の場合は receiver 実装の既定に任せます。複数 NIC がある環境では明示指定してください。 |
+
+```json
+"Receive": {
+  "Enabled": true,
+  "InterfaceAddress": "192.0.2.10"
+}
+```
 
 ### `Tracker:Diagnostics`
 
