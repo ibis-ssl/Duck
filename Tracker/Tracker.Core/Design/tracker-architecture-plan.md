@@ -514,7 +514,7 @@ packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に�
 
 packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。
 
-`Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。`--settings` で `Tracker.Server/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
+`Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。detail filter は `frame` でも絞り込めるようにし、robot detail には位置だけでなく `orientation / angular velocity` も出して、raw detection と tracked 出力の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.Server/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
 
 raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
 
@@ -756,7 +756,11 @@ robot v1 filter 要件:
 - `team + robot id` ごとに camera-local track を維持し、位置系と向き系を独立した線形 Kalman filter として更新する
 - 同一 camera / team の raw detection に、既に採用済み robot と近すぎる別 ID robot が含まれる場合は、Tigers の `Geometry.getBotRadius() * 1.5` 相当の距離を基準に後続候補を採用しない
 - 近接重複 robot の採用順は deterministic にし、confidence が高い候補を優先し、同 confidence では robot id の小さい候補を優先する
+- 同一 camera / team の既存別 ID track 近傍へ raw detection の robot id だけが突然変わる候補は、同一 ID の通常位置ずれより起きづらいものとして扱い、`RobotTracker.IdentitySwitchDistanceMm` の範囲では既存 identity を優先して新 ID 観測を採用しない
+- 同一 camera / team / robot id の候補が merge window 内に複数ある場合は、既存同一 ID track 近傍の候補を遠方候補より優先し、後続 detection の誤 ID で track を瞬間移動させない
 - 向き観測は update 前に unwrap して、`-pi` / `pi` 境界の不連続を filter 外へ漏らさない
+- 向き filter の measurement variance、process variance、初期角速度分散は rad / rad/s の単位で扱い、位置 mm 用の不確かさをそのまま流用しない。profile の `MeasurementNoiseVarianceScale`、`KalmanProcessNoiseScale`、`KalmanInitialVelocityVariance` は既定値比で rad 用基準値へ反映する
+- 静止 robot の小さな orientation jitter が過大な angular velocity として表示へ増幅されないよう、向き filter の速度更新には角速度上限を適用する
 - gate 判定は生観測との差分ではなく、予測状態に対する対応付け規則として使う
 - 欠測 frame では predict のみを行い、visibility 減衰と track 削除判定は別責務として扱う
 - merge に使う uncertainty は最新観測 confidence のみでなく、filter 後の position uncertainty を基準にする

@@ -301,6 +301,11 @@ robot tracking の tuning 値です。
 | `VisibilityHalfLifeSeconds` | s | 観測が来ない track の visibility をどの速度で減衰させるかです。 |
 | `Gate` | 任意係数 | 既存 track と新観測を同一対象とみなす近傍判定の厳しさです。小さいほど厳しくなります。 |
 | `OutlierLimitMm` | mm | 外れ値として弾く許容距離の上限です。 |
+| `IdentitySwitchDistanceMm` | mm | 既存別 ID track 近傍へ突然現れた robot id 変更候補を抑制する距離です。`0` で無効化できます。 |
+| `OrientationMeasurementNoiseRad` | rad | robot 向き観測の noise 想定です。大きいほど向き観測を弱く信用します。 |
+| `OrientationProcessNoise` | 任意係数 | robot 向き filter の model 変化量をどれだけ許すかです。 |
+| `InitialAngularVelocityVariance` | 任意係数 | 新規 robot track の初期角速度不確かさです。 |
+| `AngularVelocityLimitRadPerS` | rad/s | robot 角速度推定の上限です。 |
 
 ### `Tracker:Profiles:<name>:BallTracker`
 

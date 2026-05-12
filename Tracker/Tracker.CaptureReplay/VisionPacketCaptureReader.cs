@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Tracker.Core;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// jsonl.gz 形式の vision packet capture を読み、schema version と payload を復元する。
 /// </summary>

@@ -1,6 +1,8 @@
 using System.Globalization;
 using Tracker.Core;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// Capture replay の detail 行を、従来 CLI と同じ schema の文字列へ整形する。
 /// </summary>
@@ -12,15 +14,19 @@ internal static class ReplayFrameFormatter
     public static string FormatFrame(
         int packetIndex,
         DateTimeOffset receivedAt,
-        TrackerFrame frame)
+        TrackerFrame frame,
+        int maxDetailRobots = 16)
     {
+        var robotDetailLimit = Math.Max(0, maxDetailRobots);
         var rawSummary =
             $"rawFrame={FormatSourceFrameNumbers(frame)} rawCamera={FormatSourceCameraIds(frame)} rawBalls={CountRawBalls(frame)} rawYellow={CountRawYellowRobots(frame)} rawBlue={CountRawBlueRobots(frame)}";
         var balls = string.Join("; ", frame.Balls.Select(ball =>
             $"#{ball.InternalTrackId}:x={ball.XMm.ToString("F1", CultureInfo.InvariantCulture)},y={ball.YMm.ToString("F1", CultureInfo.InvariantCulture)},vis={ball.Visibility.ToString("F3", CultureInfo.InvariantCulture)},cams={string.Join("/", ball.SourceCameraIds.OrderBy(id => id))}"));
-        var robots = string.Join("; ", frame.Robots.Take(8).Select(robot =>
-            $"{robot.Team}{robot.RobotId}:x={robot.XMm.ToString("F1", CultureInfo.InvariantCulture)},y={robot.YMm.ToString("F1", CultureInfo.InvariantCulture)},vis={robot.Visibility.ToString("F3", CultureInfo.InvariantCulture)}"));
-        var robotSuffix = frame.Robots.Count > 8 ? $"; ... +{frame.Robots.Count - 8}" : "";
+        var robots = string.Join("; ", frame.Robots.Take(robotDetailLimit).Select(robot =>
+            $"{FormatTeam(robot.Team)}{robot.RobotId}:x={robot.XMm.ToString("F1", CultureInfo.InvariantCulture)},y={robot.YMm.ToString("F1", CultureInfo.InvariantCulture)},o={robot.OrientationRad.ToString("F3", CultureInfo.InvariantCulture)},w={robot.AngularVelocityRadPerS.ToString("F3", CultureInfo.InvariantCulture)},vis={robot.Visibility.ToString("F3", CultureInfo.InvariantCulture)}"));
+        var robotSuffix = frame.Robots.Count > robotDetailLimit
+            ? $"{(robots.Length > 0 ? "; " : "")}... +{frame.Robots.Count - robotDetailLimit}"
+            : "";
 
         return $"input={packetIndex} receivedAt={receivedAt:O} {rawSummary} committedFrame={frame.FrameNumber} dataTs={frame.DataTimestampNs} balls={frame.Balls.Count} [{balls}] robots={frame.Robots.Count} [{robots}{robotSuffix}]";
     }
@@ -67,5 +73,15 @@ internal static class ReplayFrameFormatter
             .Select(value => value.ToString(CultureInfo.InvariantCulture))
             .ToArray();
         return distinctValues.Length == 0 ? "-" : string.Join("/", distinctValues);
+    }
+
+    private static string FormatTeam(TrackerTeam team)
+    {
+        return team switch
+        {
+            TrackerTeam.Blue => "B",
+            TrackerTeam.Yellow => "Y",
+            _ => "?",
+        };
     }
 }

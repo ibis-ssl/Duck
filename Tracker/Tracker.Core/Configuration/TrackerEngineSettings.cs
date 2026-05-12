@@ -30,6 +30,26 @@ public sealed class TrackerEngineSettings
     /// 観測 noise variance に掛ける既定 scale。
     /// </summary>
     public const double DefaultMeasurementNoiseVarianceScale = 100d;
+    /// <summary>
+    /// robot 向き観測 noise の既定値。単位は rad。
+    /// </summary>
+    public const double DefaultRobotOrientationMeasurementNoiseRad = 0.05d;
+    /// <summary>
+    /// robot 向き Kalman predict の既定 process noise。
+    /// </summary>
+    public const double DefaultRobotOrientationProcessNoise = 0.05d;
+    /// <summary>
+    /// robot 向き Kalman state 初期化時の既定角速度分散。
+    /// </summary>
+    public const double DefaultRobotInitialAngularVelocityVariance = 10d;
+    /// <summary>
+    /// robot 角速度 clamp の既定値。単位は rad/s。
+    /// </summary>
+    public const double DefaultRobotAngularVelocityLimitRadPerS = Math.PI * 2d;
+    /// <summary>
+    /// robot id が既存別 ID track 近傍へ突然入れ替わったとみなす既定距離。単位は mm。
+    /// </summary>
+    public const double DefaultRobotIdentitySwitchDistanceMm = 135d;
 
     /// <summary>
     /// この settings snapshot の profile 名。

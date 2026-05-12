@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Tracker.Core;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// Capture replay 用の TrackerEngineSettings を既定値、appsettings、capture metadata から解決する。
 /// </summary>
@@ -39,6 +41,11 @@ internal static class TrackerSettingsFactory
                 OutputVisibilityThreshold = 0.05,
                 Gate = gate,
                 OutlierLimitMm = 120.0,
+                IdentitySwitchDistanceMm = TrackerEngineSettings.DefaultRobotIdentitySwitchDistanceMm,
+                OrientationMeasurementNoiseRad = TrackerEngineSettings.DefaultRobotOrientationMeasurementNoiseRad,
+                OrientationProcessNoise = TrackerEngineSettings.DefaultRobotOrientationProcessNoise,
+                InitialAngularVelocityVariance = TrackerEngineSettings.DefaultRobotInitialAngularVelocityVariance,
+                AngularVelocityLimitRadPerS = TrackerEngineSettings.DefaultRobotAngularVelocityLimitRadPerS,
             },
             BallTracker = new TrackerBallTrackerOverrides
             {
@@ -89,6 +96,12 @@ internal static class TrackerSettingsFactory
                 ?? defaults.GeometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = profile.Engine?.GeometryResetFieldWidthThresholdMm
                 ?? defaults.GeometryResetFieldWidthThresholdMm,
+            KalmanInitialVelocityVariance = profile.Engine?.KalmanInitialVelocityVariance
+                ?? defaults.KalmanInitialVelocityVariance,
+            KalmanProcessNoiseScale = profile.Engine?.KalmanProcessNoiseScale
+                ?? defaults.KalmanProcessNoiseScale,
+            MeasurementNoiseVarianceScale = profile.Engine?.MeasurementNoiseVarianceScale
+                ?? defaults.MeasurementNoiseVarianceScale,
             RobotTracker = MergeRobotTracker(defaults.RobotTracker, profile.RobotTracker),
             BallTracker = MergeBallTracker(defaults.BallTracker, profile.BallTracker),
             KickDetector = MergeKickDetector(defaults.KickDetector, profile.KickDetector),
@@ -110,6 +123,9 @@ internal static class TrackerSettingsFactory
             MergeWindowNs = overrides.MergeWindowNs ?? settings.MergeWindowNs,
             GeometryResetFieldLengthThresholdMm = settings.GeometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = settings.GeometryResetFieldWidthThresholdMm,
+            KalmanInitialVelocityVariance = settings.KalmanInitialVelocityVariance,
+            KalmanProcessNoiseScale = settings.KalmanProcessNoiseScale,
+            MeasurementNoiseVarianceScale = settings.MeasurementNoiseVarianceScale,
             RobotTracker = settings.RobotTracker,
             BallTracker = new TrackerBallTrackerOverrides
             {
@@ -137,6 +153,9 @@ internal static class TrackerSettingsFactory
             MergeWindowNs = settings.MergeWindowNs,
             GeometryResetFieldLengthThresholdMm = settings.GeometryResetFieldLengthThresholdMm,
             GeometryResetFieldWidthThresholdMm = settings.GeometryResetFieldWidthThresholdMm,
+            KalmanInitialVelocityVariance = settings.KalmanInitialVelocityVariance,
+            KalmanProcessNoiseScale = settings.KalmanProcessNoiseScale,
+            MeasurementNoiseVarianceScale = settings.MeasurementNoiseVarianceScale,
             RobotTracker = MergeRobotTracker(settings.RobotTracker, overrides.RobotTracker),
             BallTracker = MergeBallTracker(settings.BallTracker, overrides.BallTracker),
             KickDetector = MergeKickDetector(settings.KickDetector, overrides.KickDetector),
@@ -155,6 +174,11 @@ internal static class TrackerSettingsFactory
             OutputVisibilityThreshold = options?.OutputVisibilityThreshold ?? defaults.OutputVisibilityThreshold,
             Gate = options?.Gate ?? defaults.Gate,
             OutlierLimitMm = options?.OutlierLimitMm ?? defaults.OutlierLimitMm,
+            IdentitySwitchDistanceMm = options?.IdentitySwitchDistanceMm ?? defaults.IdentitySwitchDistanceMm,
+            OrientationMeasurementNoiseRad = options?.OrientationMeasurementNoiseRad ?? defaults.OrientationMeasurementNoiseRad,
+            OrientationProcessNoise = options?.OrientationProcessNoise ?? defaults.OrientationProcessNoise,
+            InitialAngularVelocityVariance = options?.InitialAngularVelocityVariance ?? defaults.InitialAngularVelocityVariance,
+            AngularVelocityLimitRadPerS = options?.AngularVelocityLimitRadPerS ?? defaults.AngularVelocityLimitRadPerS,
         };
     }
 
@@ -198,6 +222,11 @@ internal static class TrackerSettingsFactory
             OutputVisibilityThreshold = overrides.OutputVisibilityThreshold ?? defaults.OutputVisibilityThreshold,
             Gate = overrides.Gate ?? defaults.Gate,
             OutlierLimitMm = overrides.OutlierLimitMm ?? defaults.OutlierLimitMm,
+            IdentitySwitchDistanceMm = overrides.IdentitySwitchDistanceMm ?? defaults.IdentitySwitchDistanceMm,
+            OrientationMeasurementNoiseRad = overrides.OrientationMeasurementNoiseRad ?? defaults.OrientationMeasurementNoiseRad,
+            OrientationProcessNoise = overrides.OrientationProcessNoise ?? defaults.OrientationProcessNoise,
+            InitialAngularVelocityVariance = overrides.InitialAngularVelocityVariance ?? defaults.InitialAngularVelocityVariance,
+            AngularVelocityLimitRadPerS = overrides.AngularVelocityLimitRadPerS ?? defaults.AngularVelocityLimitRadPerS,
         };
     }
 

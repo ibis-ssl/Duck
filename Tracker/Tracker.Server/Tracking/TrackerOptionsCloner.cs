@@ -98,6 +98,11 @@ internal static class TrackerOptionsCloner
             OutputVisibilityThreshold = tracker.OutputVisibilityThreshold,
             Gate = tracker.Gate,
             OutlierLimitMm = tracker.OutlierLimitMm,
+            IdentitySwitchDistanceMm = tracker.IdentitySwitchDistanceMm,
+            OrientationMeasurementNoiseRad = tracker.OrientationMeasurementNoiseRad,
+            OrientationProcessNoise = tracker.OrientationProcessNoise,
+            InitialAngularVelocityVariance = tracker.InitialAngularVelocityVariance,
+            AngularVelocityLimitRadPerS = tracker.AngularVelocityLimitRadPerS,
         };
     }
 

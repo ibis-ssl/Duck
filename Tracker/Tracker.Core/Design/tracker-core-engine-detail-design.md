@@ -45,6 +45,7 @@ TRACKER-033 で `Tracker.Core` の巨大ファイルを責務別に分割し、�
   - 同一 robot id の遠方外れ値除去
   - robot track の観測更新、予測、multi-camera merge
   - orientation unwrap / normalize
+  - 向き filter の rad 単位 covariance と angular velocity clamp
 - AutoRef 向け meta event
   - ball contact
   - kick detection / kicked ball state 継続
@@ -208,6 +209,7 @@ dot 区切りファイル名は framework / toolchain 慣習に限って許容�
   - `CreateInitialKalmanAxis`
   - `PredictKalmanAxis`
   - `UpdateKalmanAxis`
+  - 向き filter 用の velocity variance / process variance / velocity clamp 指定
 - `Tracker/Tracker.Core/Engine/TrackerEngine/Settings.cs`
   - private settings 解決 helper
   - visibility / quality decay helper
@@ -359,6 +361,8 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 - secondary ball は visibility 降順、last visible timestamp 降順、internal track id 昇順の安定順を維持する。
 - secondary ball の出力は fresh observation と grown-up observation count の条件を維持する。
 - ball / robot の Kalman update は predicted state を基準にし、observed velocity 算出に previous position を使う。
+- robot orientation axis は位置 mm 用 covariance を流用せず、rad 単位の measurement / process variance と angular velocity clamp を使う。profile の Kalman scale 系設定は既定値比で rad 用基準値へ反映する。
+- robot observation 収集では、merge window 内の同一 camera / team / robot id 候補を既存同一 ID track への近さで優先し、さらに既存別 ID track 近傍への突然の ID 変更候補を `RobotTracker.IdentitySwitchDistanceMm` で抑制する。ID が急に入れ替わることは小さな位置ずれより起きづらいという前提を association に反映する。
 - settings override helper は null の意味と default 値を変えない。
 - `TrackerPacketGenerator` の unit conversion は `mm -> m`、`mm/s -> m/s`、`ns -> s` のままにする。
 - `TrackerPacketGenerator` は `KickedBall` が `IsStillMoving == true` の場合だけ official `kicked_ball` を出す。

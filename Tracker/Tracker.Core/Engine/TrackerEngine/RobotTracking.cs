@@ -68,11 +68,49 @@ public sealed partial class TrackerEngine
 
             foreach (var observation in detectionObservations)
             {
-                observations[observation.Key] = observation.Value;
+                AddRobotObservationCandidate(settings, observations, observation.Key, observation.Value);
             }
         }
 
-        return DropFarRobotOutliersWhenSameRobotHasNearObservation(settings, observations);
+        return DropLikelyRobotIdentitySwitches(
+            settings,
+            DropFarRobotOutliersWhenSameRobotHasNearObservation(settings, observations));
+    }
+
+    /// <summary>
+    /// merge window 内で同じ camera/team/id の候補が複数ある場合、既存 track に近い候補を優先する。
+    /// </summary>
+    private void AddRobotObservationCandidate(
+        TrackerEngineSettings settings,
+        Dictionary<CameraRobotKey, RobotObservation> observations,
+        CameraRobotKey key,
+        RobotObservation candidate)
+    {
+        if (!observations.TryGetValue(key, out var current))
+        {
+            observations[key] = candidate;
+            return;
+        }
+
+        var movementGateMm = GetRobotMovementGateMm(settings);
+        var currentIsNearTrack = IsNearExistingRobotTrack(settings, key, current, movementGateMm);
+        var candidateIsNearTrack = IsNearExistingRobotTrack(settings, key, candidate, movementGateMm);
+        if (currentIsNearTrack && !candidateIsNearTrack)
+        {
+            return;
+        }
+
+        if (candidateIsNearTrack && !currentIsNearTrack)
+        {
+            observations[key] = candidate;
+            return;
+        }
+
+        if (candidate.Confidence > current.Confidence
+            || (candidate.Confidence == current.Confidence && candidate.EventTimestampNs >= current.EventTimestampNs))
+        {
+            observations[key] = candidate;
+        }
     }
 
     /// <summary>
@@ -122,6 +160,40 @@ public sealed partial class TrackerEngine
     }
 
     /// <summary>
+    /// 既存別 ID track 近傍に現れた sudden id switch 候補を落とす。
+    /// </summary>
+    private Dictionary<CameraRobotKey, RobotObservation> DropLikelyRobotIdentitySwitches(
+        TrackerEngineSettings settings,
+        Dictionary<CameraRobotKey, RobotObservation> observations)
+    {
+        var filtered = new Dictionary<CameraRobotKey, RobotObservation>();
+        var identitySwitchDistanceMm = GetRobotIdentitySwitchDistanceMm(settings);
+        if (identitySwitchDistanceMm <= 0d)
+        {
+            return observations;
+        }
+
+        var movementGateMm = GetRobotMovementGateMm(settings);
+        foreach (var observation in observations)
+        {
+            if (IsNearExistingRobotTrack(settings, observation.Key, observation.Value, movementGateMm))
+            {
+                filtered[observation.Key] = observation.Value;
+                continue;
+            }
+
+            if (IsNearDifferentExistingRobotTrack(settings, observation.Key, observation.Value, identitySwitchDistanceMm))
+            {
+                continue;
+            }
+
+            filtered[observation.Key] = observation.Value;
+        }
+
+        return filtered;
+    }
+
+    /// <summary>
     /// observation が同一 camera/team/id の既存 track の予測位置に近いか判定する。
     /// </summary>
     private bool IsNearExistingRobotTrack(
@@ -137,6 +209,30 @@ public sealed partial class TrackerEngine
 
         var predictedState = PredictRobotTrackState(settings, previousState, observation.EventTimestampNs);
         return GetDistanceMm(predictedState.XMm, predictedState.YMm, observation.XMm, observation.YMm) <= movementGateMm;
+    }
+
+    /// <summary>
+    /// observation が同一 camera/team の別 ID 既存 track 近傍にあるか判定する。
+    /// </summary>
+    private bool IsNearDifferentExistingRobotTrack(
+        TrackerEngineSettings settings,
+        CameraRobotKey key,
+        RobotObservation observation,
+        double identitySwitchDistanceMm)
+    {
+        return cameraRobotTrackStates.Any(
+            entry =>
+            {
+                if (entry.Key.CameraId != key.CameraId
+                    || entry.Key.Team != key.Team
+                    || entry.Key.RobotId == key.RobotId)
+                {
+                    return false;
+                }
+
+                var predictedState = PredictRobotTrackState(settings, entry.Value, observation.EventTimestampNs);
+                return GetDistanceMm(predictedState.XMm, predictedState.YMm, observation.XMm, observation.YMm) <= identitySwitchDistanceMm;
+            });
     }
 
     private static void AddRobotObservations(
@@ -200,10 +296,11 @@ public sealed partial class TrackerEngine
         if (previousState is null)
         {
             var measurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
+            var orientationMeasurementVariance = GetObservedRobotOrientationUncertaintyRad(settings, observation.Confidence);
             return new RobotTrackState(
                 CreateInitialKalmanAxis(settings, observation.XMm, measurementVariance),
                 CreateInitialKalmanAxis(settings, observation.YMm, measurementVariance),
-                CreateInitialKalmanAxis(settings, unwrappedOrientation, measurementVariance),
+                CreateInitialKalmanAxis(unwrappedOrientation, orientationMeasurementVariance, GetRobotInitialAngularVelocityVariance(settings)),
                 observation.EventTimestampNs,
                 observation.EventTimestampNs,
                 observation.Confidence,
@@ -216,10 +313,11 @@ public sealed partial class TrackerEngine
         if (distanceMm > GetRobotMovementGateMm(settings))
         {
             var measurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
+            var orientationMeasurementVariance = GetObservedRobotOrientationUncertaintyRad(settings, observation.Confidence);
             return new RobotTrackState(
                 CreateInitialKalmanAxis(settings, observation.XMm, measurementVariance),
                 CreateInitialKalmanAxis(settings, observation.YMm, measurementVariance),
-                CreateInitialKalmanAxis(settings, unwrappedOrientation, measurementVariance),
+                CreateInitialKalmanAxis(unwrappedOrientation, orientationMeasurementVariance, GetRobotInitialAngularVelocityVariance(settings)),
                 observation.EventTimestampNs,
                 observation.EventTimestampNs,
                 observation.Confidence,
@@ -227,6 +325,8 @@ public sealed partial class TrackerEngine
         }
 
         var observedMeasurementVariance = GetObservedRobotUncertaintyMm(settings, observation.Confidence);
+        var observedOrientationMeasurementVariance = GetObservedRobotOrientationUncertaintyRad(settings, observation.Confidence);
+        var angularVelocityLimitRadPerS = GetRobotAngularVelocityLimitRadPerS(settings);
         // Kalman update は predicted state を基準にし、observed velocity は previous position から計算する。
         return predictedState with
         {
@@ -237,7 +337,8 @@ public sealed partial class TrackerEngine
                 previousState.OrientationAxis.Position,
                 unwrappedOrientation,
                 deltaSeconds,
-                observedMeasurementVariance),
+                observedOrientationMeasurementVariance,
+                angularVelocityLimitRadPerS),
             LastVisibleTimestampNs = observation.EventTimestampNs,
             LastUpdateTimestampNs = observation.EventTimestampNs,
             Visibility = observation.Confidence,
@@ -284,11 +385,15 @@ public sealed partial class TrackerEngine
         }
 
         var processNoise = GetRobotProcessNoise(settings);
+        var angularVelocityLimitRadPerS = GetRobotAngularVelocityLimitRadPerS(settings);
         return previousState with
         {
             XAxis = PredictKalmanAxis(settings, previousState.XAxis, deltaSeconds, processNoise),
             YAxis = PredictKalmanAxis(settings, previousState.YAxis, deltaSeconds, processNoise),
-            OrientationAxis = PredictKalmanAxis(settings, previousState.OrientationAxis, deltaSeconds, processNoise),
+            OrientationAxis = PredictKalmanAxis(
+                ClampKalmanAxisVelocity(previousState.OrientationAxis, angularVelocityLimitRadPerS),
+                deltaSeconds,
+                GetRobotOrientationProcessVariance(settings)),
             LastUpdateTimestampNs = targetTimestampNs,
         };
     }

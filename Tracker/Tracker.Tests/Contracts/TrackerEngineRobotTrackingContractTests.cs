@@ -117,6 +117,138 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
     }
 
     /// <summary>
+    /// 何を確認しているか: 停止中の robot の小さな orientation jitter が過大な首振り角速度へ増幅されないことを確認する。
+    /// </summary>
+    [Fact]
+    public void Update_DampsStationaryRobotOrientationJitter()
+    {
+        var engine = Fixture.CreateEngine();
+        var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+        var orientations = new[]
+        {
+            -1.000f,
+            -1.584f,
+            -1.561f,
+            -1.572f,
+            -1.555f,
+            -1.559f,
+            -1.556f,
+            -1.57f,
+            -1.569f,
+            -1.574f,
+            -1.564f,
+            -1.58f,
+            -1.573f,
+        };
+
+        TrackerUpdateResult result = new();
+        for (var frameIndex = 0; frameIndex < orientations.Length; frameIndex++)
+        {
+            result = engine.Update(
+                packet: TrackerContractTestData.CreateDetectionPacket(
+                    frameNumber: (uint)(3_475 + frameIndex),
+                    cameraId: 2,
+                    robotsYellow:
+                    [
+                        TrackerContractTestData.CreateRobot(
+                            robotId: 8,
+                            x: -3_438,
+                            y: -4_309,
+                            orientation: orientations[frameIndex]),
+                    ],
+                    captureTimeSeconds: 1.000 + (frameIndex * 0.016)),
+                settings: settings);
+        }
+
+        var trackedRobot = Assert.Single(Assert.Single(result.CommittedFrames).Robots);
+        Assert.Equal(TrackerTeam.Yellow, trackedRobot.Team);
+        Assert.Equal((uint)8, trackedRobot.RobotId);
+        Assert.InRange(trackedRobot.OrientationRad, -1.62, -1.52);
+        Assert.InRange(Math.Abs(trackedRobot.AngularVelocityRadPerS), 0, 1.5);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: robot orientation filter でも profile の measurement noise variance scale が反映されることを確認する。
+    /// </summary>
+    [Fact]
+    public void Update_AppliesMeasurementNoiseScaleToRobotOrientationFilter()
+    {
+        var lowNoiseEngine = Fixture.CreateEngine();
+        var highNoiseEngine = Fixture.CreateEngine();
+        var lowNoiseSettings = Fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            measurementNoiseVarianceScale: TrackerEngineSettings.DefaultMeasurementNoiseVarianceScale);
+        var highNoiseSettings = Fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 0,
+            measurementNoiseVarianceScale: TrackerEngineSettings.DefaultMeasurementNoiseVarianceScale * 10_000d);
+
+        _ = lowNoiseEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: lowNoiseSettings);
+        _ = highNoiseEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: highNoiseSettings);
+
+        var lowNoiseResult = lowNoiseEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, orientation: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: lowNoiseSettings);
+        var highNoiseResult = highNoiseEngine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, orientation: 1.0f)],
+                captureTimeSeconds: 1.100),
+            settings: highNoiseSettings);
+
+        var lowNoiseRobot = Assert.Single(Assert.Single(lowNoiseResult.CommittedFrames).Robots);
+        var highNoiseRobot = Assert.Single(Assert.Single(highNoiseResult.CommittedFrames).Robots);
+        Assert.True(lowNoiseRobot.OrientationRad > highNoiseRobot.OrientationRad);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: angular velocity clamp が正常な高速回転追従を過度に潰さないことを確認する。
+    /// </summary>
+    [Fact]
+    public void Update_TracksFastRobotAngularVelocityWithinClamp()
+    {
+        var engine = Fixture.CreateEngine();
+        var settings = Fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, orientation: 0.0f)],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        var secondResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 8, orientation: 3.0f)],
+                captureTimeSeconds: 1.500),
+            settings: settings);
+
+        var trackedRobot = Assert.Single(Assert.Single(secondResult.CommittedFrames).Robots);
+        Assert.InRange(trackedRobot.AngularVelocityRadPerS, 5.5, Math.PI * 2d);
+    }
+
+    /// <summary>
     /// 何を確認しているか: 速度学習後の robot gate が前回観測ではなく predicted position を基準にすることを確認する。
     /// </summary>
     [Fact]
@@ -293,6 +425,69 @@ public class TrackerEngineRobotTrackingContractTests : TrackerEngineContractTest
         Assert.Equal((uint)1, trackedRobot.RobotId);
         Assert.InRange(trackedRobot.XMm, 5100, 5200);
         Assert.InRange(trackedRobot.YMm, -2050, -1950);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: 既存別 ID track 近傍への突然の robot id 入れ替わり候補で tracked identity が瞬間移動しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void Update_PrefersExistingRobotIdentityOverSuddenNearbyIdSwitch()
+    {
+        var engine = Fixture.CreateEngine();
+        var settings = Fixture.CreateSettings(
+            reorderWindowNs: 0,
+            mergeWindowNs: 20_000_000);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 10,
+                cameraId: 1,
+                robotsBlue:
+                [
+                    TrackerContractTestData.CreateRobot(robotId: 1, x: 5_540, y: -4_310, orientation: -1.56f),
+                    TrackerContractTestData.CreateRobot(robotId: 10, x: 2_840, y: -4_310, orientation: 0.01f),
+                ],
+                captureTimeSeconds: 1.000),
+            settings: settings);
+
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 20,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 1, x: 5_541, y: -4_309, orientation: -1.55f)],
+                captureTimeSeconds: 1.100),
+            settings: settings);
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 21,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 11, x: 5_540, y: -4_307, orientation: 0.0f)],
+                captureTimeSeconds: 1.105),
+            settings: settings);
+        _ = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 22,
+                cameraId: 1,
+                robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 1, x: 2_841, y: -4_310, orientation: 0.01f)],
+                captureTimeSeconds: 1.110),
+            settings: settings);
+        var flushResult = engine.Update(
+            packet: TrackerContractTestData.CreateDetectionPacket(
+                frameNumber: 30,
+                cameraId: 1,
+                balls: [TrackerContractTestData.CreateBall()],
+                captureTimeSeconds: 1.200),
+            settings: settings);
+
+        var trackedRobots = Assert.Single(flushResult.CommittedFrames).Robots
+            .Where(robot => robot.Team == TrackerTeam.Blue)
+            .ToDictionary(robot => robot.RobotId);
+
+        Assert.True(trackedRobots.ContainsKey(1));
+        Assert.True(trackedRobots.ContainsKey(10));
+        Assert.False(trackedRobots.ContainsKey(11));
+        Assert.InRange(trackedRobots[1].XMm, 5_500, 5_580);
+        Assert.InRange(trackedRobots[10].XMm, 2_800, 2_880);
     }
 
     /// <summary>
