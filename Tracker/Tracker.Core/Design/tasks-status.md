@@ -8,15 +8,15 @@
 - Title: diagnostics replay で ER-Force tracker snapshot が Field に再生されない原因を調査・修正する
 - Phase: comparison-logging
 - Status: in_progress
-- TDD Entry: 未実施。まず `/home/ibis/ssl/IbisDuck/Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures` の実captureに ER-Force tracker snapshot が存在するか、存在する場合に `/diagnostics` replay / Field source へ出ない再現条件を sub-agent 調査で特定する。
-- Implementation Entry: 未実施。調査結果に基づき、capture-side 欠落、metadata/sidecar 解決、source option 生成、playback tick 同期、Field source frame 選択のどこを修正するかを確定してから実装する。
+- TDD Entry: 未実施。`/home/ibis/ssl/IbisDuck/Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures` の実captureでは ER-Force tracker snapshot が存在し、ibis own と ER-Force の `TrackedFrame.timestamp` 時刻系不一致が主因候補と判定済み。既存ログ救済は必須ではないため、今後の capture 保存時対応付けを主経路として TDD 対象を定義する。
+- Implementation Entry: 未実施。調査結果に基づき、capture 保存時の diagnostics entry / vision frame / tracker source snapshot 対応表、metadata/sidecar schema、replay reader / Field source frame 選択のどこを修正するかを設計してから実装する。
 - Review Entry: 未実施。修正後に gpt-5.5 high review report を作成し、blocking finding が残らないことを確認する。
 - Size: medium
 - Dependencies: TRACKER-053
 - Exit Criteria:
-  - 指定 packet-captures 配下の直近 capture について、ER-Force tracker snapshot が sidecar に存在するかどうかを証跡付きで判定している
-  - sidecar に存在する場合、Replay / scrub / playback tick で ER-Force を Field source として選択・表示できる
-  - sidecar に存在しない場合、capture-time の設定または receiver 経路の不足を UI/ログ/ドキュメント上の誤解なく判断できる
+  - 指定 packet-captures 配下の直近 capture について、ER-Force tracker snapshot が sidecar に存在し、時刻系不一致が再生不具合の主因候補であることを証跡付きで判定している
+  - 新規 capture では保存時に diagnostics entry / vision frame / tracker source snapshot の対応を記録し、Replay / scrub / playback tick で ER-Force を Field source として選択・表示できる
+  - 保存済み対応表がない capture では、UI/ログ/ドキュメント上で未対応または fallback の有無を誤解なく判断できる
   - `Tracker:Receive` の source appsettings / bin appsettings / runtime override の扱いを混同せず、必要な修正または運用注意を明記している
   - focused regression test、必要な build/test evidence、gpt-5.5 high review report が揃い、blocking finding が残っていない
 
