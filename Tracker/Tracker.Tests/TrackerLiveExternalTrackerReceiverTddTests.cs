@@ -250,7 +250,9 @@ public class TrackerLiveExternalTrackerReceiverTddTests : IClassFixture<TrackerC
 
     private static string CreateCaptureDirectory(string prefix)
     {
-        return Path.Combine(Path.GetTempPath(), $"{prefix}-{Guid.NewGuid():N}");
+        var path = Path.Combine(Path.GetTempPath(), $"{prefix}-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(path);
+        return path;
     }
 
     private static IPEndPoint Endpoint(int port)
