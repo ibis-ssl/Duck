@@ -108,11 +108,11 @@ replay / diagnostics / playback の出力は、少なくとも次を確認でき
 
 ## 後続タスクへの固定事項
 
-- `TRACKER-041` では、既存の self除外前提を取り下げ、見えている `TrackerWrapperPacket` をすべて snapshot sidecar へ保存する方針へ設計と tracking を修正する。
-- `TRACKER-042` では、all tracker 保存 contract の production 実装を行い、own / external / unknown tracker packet の observed / snapshot state 保持と raw payload 復元可能性を固定する。
-- `TRACKER-043` では、CaptureOn session folder と metadata の relative path 契約を test / 実装で固定し、tracker packet snapshot sidecar path、source role metadata、snapshot log 設定、reader 入力契約を追加する。
-- `TRACKER-044` では、CaptureOn 中に見えている tracker packet をすべて session folder 配下の sidecar JSONL へ保存する。表示用 snapshot だけでなく比較用の raw payload または復元可能参照を保持し、writer / reader round-trip と raw由来 semantic summary を TDD 前提にする。
-- `TRACKER-045` では、diagnostics / replay / playback で metadata relative path から snapshot sidecar を解決し、ibis committed frame と tracker packet snapshot を timestamp 近傍比較・再生できるようにし、UI / README / 運用証跡を整えて既存 capture / diagnostics / render snapshot 表示を壊していないことを確認する。
+- `TRACKER-047` では、既存 `TrackerSnapshotReplayReader` / `TrackerReplayIntegrationTddTests` の review gate を閉じる。focused 4 passed、関連 focused 39 passed、full `Tracker.Tests` 191 passed の実装検証済み状態を保持し、gpt-5.5 high review で blocking finding がないことを確認する。finding が出た場合は修正・再検証・r2 review まで完了する。
+- `TRACKER-048` では、diagnostics / replay / playback の比較表示・出力へ接続する。metadata relative path から snapshot sidecar を読み、source role / label、tracked timestamp、ball / robot count、raw payload restored、nearest timestamp summary を `Tracker.CaptureReplay` または diagnostics playback で確認可能にする。既存 capture / diagnostics / render snapshot 表示を壊さない。
+- `TRACKER-049` では、CaptureOn 比較ログの運用ドキュメントと確認手順を整える。`Tracker:Receive:Enabled`、multicast endpoint、CaptureOn session folder、snapshot sidecar、replay / diagnostics 確認方法、manual evidence を含める。
+- `TRACKER-050` では、PR #9 ready 化を行う。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
+- `TRACKER-051` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
 
 ## 完了条件
 
