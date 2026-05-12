@@ -95,6 +95,100 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// 同じ diagnostics / metadata / sidecar file state の連続 load では sidecar index を再構築しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_WhenFileStateIsUnchanged_ReusesCachedSidecarIndex()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9100, 91_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9100, 91_004_000_000, ballCount: 2, robotCount: 2),
+                SnapshotInput("ibis-runtime", "ibis", "own", 9101, 91_010_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9101, 91_014_000_000, ballCount: 3, robotCount: 3),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrames: [9100, 9101]);
+        var buildCount = 0;
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(sidecarPath =>
+        {
+            buildCount++;
+            return TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();
+        });
+
+        var first = reader.Load(session.DiagnosticsPath, SelectedEntry(9100), TrackerDiagnosticsComparisonSourceFilter.External);
+        var second = reader.Load(session.DiagnosticsPath, SelectedEntry(9101), TrackerDiagnosticsComparisonSourceFilter.External);
+
+        Assert.Equal(1, buildCount);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, first.SidecarStatus);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, second.SidecarStatus);
+        Assert.Equal(9100u, first.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(9101u, second.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+    }
+
+    /// <summary>
+    /// sidecar の file state が変わった場合は cache を破棄し、新しい index を構築することを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_WhenSidecarFileStateChanges_RebuildsSidecarIndex()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9100, 91_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9100, 91_004_000_000, ballCount: 2, robotCount: 2),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0);
+        var buildCount = 0;
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(sidecarPath =>
+        {
+            buildCount++;
+            return TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();
+        });
+
+        _ = reader.Load(session.DiagnosticsPath, SelectedEntry(9100), TrackerDiagnosticsComparisonSourceFilter.External);
+        File.AppendAllText(session.SidecarPath, Environment.NewLine);
+        File.SetLastWriteTimeUtc(session.SidecarPath, File.GetLastWriteTimeUtc(session.SidecarPath).AddSeconds(1));
+        _ = reader.Load(session.DiagnosticsPath, SelectedEntry(9100), TrackerDiagnosticsComparisonSourceFilter.External);
+
+        Assert.Equal(2, buildCount);
+    }
+
+    /// <summary>
+    /// nearest timestamp が同一 timestamp の複数 record に一致する場合、旧実装と同じく ReceivedAt 昇順の先頭を選ぶことを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_WhenNearestTimestampHasDuplicates_UsesEarliestReceivedAtCandidate()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9500, 95_010_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9501, 95_000_000_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 30),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9502, 95_000_000_000, ballCount: 2, robotCount: 2, receivedAtOffsetTicks: 10),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9503, 95_000_000_000, ballCount: 3, robotCount: 3, receivedAtOffsetTicks: 20),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 9500);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var state = reader.Load(session.DiagnosticsPath, SelectedEntry(9500), TrackerDiagnosticsComparisonSourceFilter.External);
+
+        Assert.NotNull(state.SelectedEntryComparison);
+        var comparison = state.SelectedEntryComparison!;
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, comparison.Status);
+        Assert.Equal(9502u, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(95_000_000_000, comparison.NearestSnapshotTimestampNs);
+        Assert.Equal(10_000_000, comparison.TimestampDeltaNs);
+        Assert.Equal(2, comparison.BallCount);
+        Assert.Equal(2, comparison.RobotCount);
+    }
+
+    /// <summary>
     /// diagnostics reader が長い log の先頭 entry を omit した後でも、表示済み list の先頭選択が full file 先頭ではなく表示中 entry に対応することを確認する。
     /// </summary>
     [Fact]
@@ -283,7 +377,8 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
                 var packet = CreatePacket(input);
                 return JsonSerializer.Serialize(TrackerPacketSnapshotRecord.FromPacket(
                     packet,
-                    new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero).AddTicks(input.TimestampNs / 100),
+                    new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero).AddTicks(
+                        input.ReceivedAtOffsetTicks ?? input.TimestampNs / 100),
                     remoteEndpoint: input.Role == "own" ? "self" : $"192.0.2.{input.FrameNumber % 100}:12010",
                     sourceRole: input.Role,
                     sourceLabel: string.IsNullOrWhiteSpace(input.SourceName) ? input.Role : input.SourceName));
@@ -350,9 +445,18 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         uint frameNumber,
         long timestampNs,
         int ballCount,
-        int robotCount)
+        int robotCount,
+        long? receivedAtOffsetTicks = null)
     {
-        return new SnapshotInputData(sourceUuid, sourceName, role, frameNumber, timestampNs, ballCount, robotCount);
+        return new SnapshotInputData(
+            sourceUuid,
+            sourceName,
+            role,
+            frameNumber,
+            timestampNs,
+            ballCount,
+            robotCount,
+            receivedAtOffsetTicks);
     }
 
     private static TrackerDiagnosticsComparisonSelectedEntry SelectedEntry(uint trackedFrame)
@@ -391,5 +495,6 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         uint FrameNumber,
         long TimestampNs,
         int BallCount,
-        int RobotCount);
+        int RobotCount,
+        long? ReceivedAtOffsetTicks = null);
 }

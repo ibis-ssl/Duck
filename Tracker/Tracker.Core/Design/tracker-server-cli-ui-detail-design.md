@@ -102,6 +102,12 @@ diagnostics log reader、`Tracker.CaptureReplay`、diagnostics playback は、me
 
 `/diagnostics` はユーザー向けに同じ comparison を画面上で確認できるようにする。diagnostics playback は選択中の diagnostics entry と playback tick に合わせて tracker snapshot comparison を更新し、source identity / role / label で表示対象を切り替えられる comparison panel を持つ。render snapshot と同じく session folder 内 sidecar への対応付けを行うが、比較の基準 timestamp は render snapshot ではなく、ibis own snapshot の `TrackedFrame.timestamp` とする。
 
+`/diagnostics` の tracker snapshot comparison は、timeline scrubber 移動や playback tick のたびに tracker packet snapshot sidecar JSONL を再読込しない。log 選択時に metadata path、sidecar path、diagnostics log path と各 file の last write time / length を key にした lightweight index を作成または cache し、selected entry の変更時はその index から source options と nearest timestamp comparison を生成する。
+
+100MB は上限ではなく通常の capture で到達しうるサイズとして扱う。100MB 以上の sidecar でも tick / scrub 時に sidecar size へ比例した I/O / JSON parse / protobuf parse を発生させない。初回 log 選択時の index build は既存 JSONL sidecar を活かし、bounded memory cache により同じ file state の再読込を避ける。
+
+通常 Play は diagnostics entry の実 timestamp delta を維持する。調査用の高速再生は Fast Forward と明示 speed selector として表現し、Play の 1x real-time 契約、Stop、末尾到達時の先頭戻り、stale tick guard を維持する。
+
 replay / diagnostics / playback の出力または UI 表示は、少なくとも次を確認できるようにする。
 
 - ibis committed frame の timestamp

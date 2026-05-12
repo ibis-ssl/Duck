@@ -132,6 +132,17 @@
     clip-path: polygon(8% 14%, 8% 86%, 47% 50%, 47% 86%, 88% 50%, 47% 14%, 47% 50%);
 }
 
+.diagnostics-playback__speed {
+    width: 3.6rem;
+    min-height: 1.9rem;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #17301d;
+    color: #dbe7d6;
+    font: inherit;
+    font-size: 0.76rem;
+}
+
 .diagnostics-select {
     flex: 1;
     min-width: 0;

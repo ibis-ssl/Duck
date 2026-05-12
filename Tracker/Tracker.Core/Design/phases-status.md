@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: comparison-logging
-- 現在のタスク: TRACKER-055
+- 現在のタスク: TRACKER-056
 - 残りフェーズ: none
 
 ## フェーズ一覧
@@ -26,7 +26,7 @@
 - `TRACKER-051`: `/diagnostics` UI へ comparison 表示と source filtering を接続する。selected log / selected entry / playback tick と comparison view-state を同期し、既存 diagnostics / render snapshot / playback controls を壊さない。完了済み。
 - `TRACKER-052`: CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する。CLI は agent / 検証用、通常確認は `/diagnostics` comparison panel を主経路として説明する。完了済み。
 - `TRACKER-054`: live tracker receiver の endpoint override を追加する。既定は起動時 resolved ibis publish endpoint と同じ address / port を監視しつつ、`Tracker:Receive:MulticastAddress` / `Port` で別 endpoint を明示できるようにした。gpt-5.5 high review blocking findings なしまで完了済み。
-- `TRACKER-055`: diagnostics playback / scrubber の低速問題を解消する。tracker snapshot sidecar を scrub / playback tick ごとに再読込しない cache / index と、調査用高速再生を追加する。
+- `TRACKER-055`: diagnostics playback / scrubber の低速問題を解消する。実装担当 sub-agent が lightweight index cache と Fast Forward `4x` / `16x` / `64x` selector を追加した。初回reviewの同一timestamp tie-break regression は regression test と `FindTimestampStartIndex` で修正済み。focused full 32 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-055-playback-scrub-performance-implementation-20260513001906.md`、初回reviewは `reports/tracker-055-review-20260513003935.md`、r2 review は `reports/tracker-055-review-r2-20260513005448.md`、進捗同期は `reports/tracker-055-progress-sync-20260513005919.md` に記録済みで blocking findings なし。完了済み。
 - `TRACKER-056`: diagnostics Field の左右 source 切替と comparison 折り畳みを追加する。既定は現状維持の `Vision Input` vs `ibis tracker` とし、3rd party / unknown / source label を左右どちらにも選べるようにする。
 - `TRACKER-057`: diagnostics Field 重ね合わせ表示を追加する。want 扱いだが、`TRACKER-056` の Field source model を再利用できる範囲で実装する。
 - `TRACKER-053`: PR #9 ready 化。`TRACKER-057` 完了後、または overlay を明示 defer した後に PR本文を `TRACKER-040` から最終状態まで更新し、final validation、manual evidence、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。

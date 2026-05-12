@@ -16,14 +16,21 @@ public class DiagnosticsPlaybackStateTests
     }
 
     /// <summary>
-    /// 早送りでは通常再生より大きい step で次の index へ進むことを確認する。
+    /// 早送りでは選択した調査用速度に応じて次の index へ進むことを確認する。
     /// </summary>
-    [Fact]
-    public void GetNextIndex_ForFastForward_AdvancesFastForwardStep()
+    [Theory]
+    [InlineData(4, 4)]
+    [InlineData(16, 7)]
+    [InlineData(64, 19)]
+    public void GetNextIndex_ForFastForward_AdvancesBySelectedSpeed(int speedMultiplier, int expected)
     {
-        var next = DiagnosticsPlaybackState.GetNextIndex(3, entryCount: 20, DiagnosticsPlaybackMode.FastForward);
+        var next = DiagnosticsPlaybackState.GetNextIndex(
+            3,
+            entryCount: 40,
+            DiagnosticsPlaybackMode.FastForward,
+            speedMultiplier);
 
-        Assert.Equal(8, next);
+        Assert.Equal(expected, next);
     }
 
     /// <summary>
@@ -32,7 +39,11 @@ public class DiagnosticsPlaybackStateTests
     [Fact]
     public void GetNextIndex_WhenStepExceedsEnd_ClampsToLastIndex()
     {
-        var next = DiagnosticsPlaybackState.GetNextIndex(8, entryCount: 10, DiagnosticsPlaybackMode.FastForward);
+        var next = DiagnosticsPlaybackState.GetNextIndex(
+            8,
+            entryCount: 10,
+            DiagnosticsPlaybackMode.FastForward,
+            speedMultiplier: 64);
 
         Assert.Equal(9, next);
     }
@@ -156,20 +167,26 @@ public class DiagnosticsPlaybackStateTests
     }
 
     /// <summary>
-    /// 早送りは実速度 interval の 1/4 の間隔で進むことを確認する。
+    /// 早送りは選択した調査用速度に応じて interval を短くすることを確認する。
     /// </summary>
-    [Fact]
-    public void GetInterval_ForFastForward_UsesQuarterTimestampDelta()
+    [Theory]
+    [InlineData(4, 400)]
+    [InlineData(16, 100)]
+    [InlineData(64, 30)]
+    public void GetInterval_ForFastForward_UsesSelectedSpeedMultiplier(
+        int speedMultiplier,
+        int expectedMilliseconds)
     {
         var current = DateTimeOffset.Parse("2026-05-12T00:00:00.000+09:00");
-        var next = DateTimeOffset.Parse("2026-05-12T00:00:00.400+09:00");
+        var next = DateTimeOffset.Parse("2026-05-12T00:00:01.600+09:00");
 
         var interval = DiagnosticsPlaybackState.GetInterval(
             DiagnosticsPlaybackMode.FastForward,
             current,
-            next);
+            next,
+            speedMultiplier);
 
-        Assert.Equal(TimeSpan.FromMilliseconds(100), interval);
+        Assert.Equal(TimeSpan.FromMilliseconds(expectedMilliseconds), interval);
     }
 
     /// <summary>
@@ -184,8 +201,25 @@ public class DiagnosticsPlaybackStateTests
         var interval = DiagnosticsPlaybackState.GetInterval(
             DiagnosticsPlaybackMode.FastForward,
             current,
-            next);
+            next,
+            speedMultiplier: 64);
 
         Assert.Equal(TimeSpan.FromMilliseconds(30), interval);
+    }
+
+    /// <summary>
+    /// speed 変更前の古い早送り tick は反映しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void ShouldApplyTick_WhenFastForwardSpeedChanged_ReturnsFalse()
+    {
+        var shouldApply = DiagnosticsPlaybackState.ShouldApplyTick(
+            DiagnosticsPlaybackMode.FastForward,
+            DiagnosticsPlaybackMode.FastForward,
+            isCancellationRequested: false,
+            activeSpeedMultiplier: 64,
+            tickSpeedMultiplier: 16);
+
+        Assert.False(shouldApply);
     }
 }

@@ -35,6 +35,7 @@ public partial class Diagnostics : IDisposable
     private double timelineResizeStartX;
     private CancellationTokenSource? playbackCancellationTokenSource;
     private DiagnosticsPlaybackMode playbackMode = DiagnosticsPlaybackMode.Stopped;
+    private int fastForwardSpeedMultiplier = DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
     private TrackerDiagnosticsComparisonUiState? comparisonUiState;
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
@@ -352,6 +353,22 @@ public partial class Diagnostics : IDisposable
         return Task.CompletedTask;
     }
 
+    private Task OnFastForwardSpeedChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), CultureInfo.InvariantCulture, out var speedMultiplier))
+        {
+            return Task.CompletedTask;
+        }
+
+        fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(speedMultiplier);
+        if (playbackMode == DiagnosticsPlaybackMode.FastForward)
+        {
+            return StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward);
+        }
+
+        return Task.CompletedTask;
+    }
+
     private void SyncComparisonState()
     {
         comparisonUiState?.Load(selectedLogPath, selectedEntry);
@@ -368,12 +385,14 @@ public partial class Diagnostics : IDisposable
         playbackMode = mode;
         playbackCancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = playbackCancellationTokenSource.Token;
-        _ = RunPlaybackAsync(mode, cancellationToken);
+        var speedMultiplier = GetPlaybackSpeedMultiplier(mode);
+        _ = RunPlaybackAsync(mode, speedMultiplier, cancellationToken);
         return Task.CompletedTask;
     }
 
     private async Task RunPlaybackAsync(
         DiagnosticsPlaybackMode mode,
+        int speedMultiplier,
         CancellationToken cancellationToken)
     {
         try
@@ -384,8 +403,9 @@ public partial class Diagnostics : IDisposable
                 var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
                     currentIndex,
                     entries.Count,
-                    mode);
-                var interval = GetPlaybackInterval(mode, currentIndex, nextIndex);
+                    mode,
+                    speedMultiplier);
+                var interval = GetPlaybackInterval(mode, currentIndex, nextIndex, speedMultiplier);
                 await Task.Delay(interval, cancellationToken);
 
                 await InvokeAsync(() =>
@@ -393,7 +413,9 @@ public partial class Diagnostics : IDisposable
                     if (!DiagnosticsPlaybackState.ShouldApplyTick(
                             playbackMode,
                             mode,
-                            cancellationToken.IsCancellationRequested))
+                            cancellationToken.IsCancellationRequested,
+                            GetPlaybackSpeedMultiplier(playbackMode),
+                            speedMultiplier))
                     {
                         return;
                     }
@@ -407,7 +429,8 @@ public partial class Diagnostics : IDisposable
                     var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
                         SelectedEntryIndex,
                         entries.Count,
-                        mode);
+                        mode,
+                        speedMultiplier);
 
                     if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, entries.Count))
                     {
@@ -433,7 +456,8 @@ public partial class Diagnostics : IDisposable
     private TimeSpan GetPlaybackInterval(
         DiagnosticsPlaybackMode mode,
         int currentIndex,
-        int nextIndex)
+        int nextIndex,
+        int speedMultiplier)
     {
         if (entries.Count == 0)
         {
@@ -442,7 +466,14 @@ public partial class Diagnostics : IDisposable
 
         var current = entries[Math.Clamp(currentIndex, 0, entries.Count - 1)];
         var next = entries[Math.Clamp(nextIndex, 0, entries.Count - 1)];
-        return DiagnosticsPlaybackState.GetInterval(mode, current.Timestamp, next.Timestamp);
+        return DiagnosticsPlaybackState.GetInterval(mode, current.Timestamp, next.Timestamp, speedMultiplier);
+    }
+
+    private int GetPlaybackSpeedMultiplier(DiagnosticsPlaybackMode mode)
+    {
+        return mode == DiagnosticsPlaybackMode.FastForward
+            ? fastForwardSpeedMultiplier
+            : DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
     }
 
     private void StopPlayback()

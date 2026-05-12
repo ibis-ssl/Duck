@@ -303,6 +303,15 @@
                             <span class="diagnostics-playback__icon diagnostics-playback__icon--fast-forward" aria-hidden="true"></span>
                         </button>
                     }
+                    <select class="diagnostics-playback__speed"
+                            value="@fastForwardSpeedMultiplier"
+                            @onchange="OnFastForwardSpeedChanged"
+                            aria-label="Fast forward speed">
+                        @foreach (var speedMultiplier in DiagnosticsPlaybackState.FastForwardSpeedMultipliers)
+                        {
+                            <option value="@speedMultiplier">@($"{speedMultiplier}x")</option>
+                        }
+                    </select>
                 </div>
                 <input type="range"
                        class="diagnostics-scrubber__range"

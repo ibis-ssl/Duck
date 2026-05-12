@@ -27,21 +27,36 @@ public enum DiagnosticsPlaybackMode
 public static class DiagnosticsPlaybackState
 {
     private const int PlayStep = 1;
-    private const int FastForwardStep = 5;
     private static readonly TimeSpan MinimumPlaybackInterval = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan FastForwardMinimumInterval = TimeSpan.FromMilliseconds(30);
 
     /// <summary>
+    /// 調査用早送りの既定倍率。
+    /// </summary>
+    public const int DefaultFastForwardSpeedMultiplier = 16;
+
+    /// <summary>
+    /// UI で選べる調査用早送り倍率。
+    /// </summary>
+    public static IReadOnlyList<int> FastForwardSpeedMultipliers { get; } = [4, 16, 64];
+
+    /// <summary>
     /// playback mode に応じた次の entry index を返す。
     /// </summary>
-    public static int GetNextIndex(int currentIndex, int entryCount, DiagnosticsPlaybackMode mode)
+    public static int GetNextIndex(
+        int currentIndex,
+        int entryCount,
+        DiagnosticsPlaybackMode mode,
+        int speedMultiplier = DefaultFastForwardSpeedMultiplier)
     {
         if (entryCount <= 0)
         {
             return 0;
         }
 
-        var step = mode == DiagnosticsPlaybackMode.FastForward ? FastForwardStep : PlayStep;
+        var step = mode == DiagnosticsPlaybackMode.FastForward
+            ? GetFastForwardStep(speedMultiplier)
+            : PlayStep;
         return Math.Clamp(currentIndex + step, 0, entryCount - 1);
     }
 
@@ -72,9 +87,13 @@ public static class DiagnosticsPlaybackState
     public static bool ShouldApplyTick(
         DiagnosticsPlaybackMode activeMode,
         DiagnosticsPlaybackMode tickMode,
-        bool isCancellationRequested)
+        bool isCancellationRequested,
+        int activeSpeedMultiplier = DefaultFastForwardSpeedMultiplier,
+        int tickSpeedMultiplier = DefaultFastForwardSpeedMultiplier)
     {
-        return !isCancellationRequested && activeMode == tickMode;
+        return !isCancellationRequested &&
+               activeMode == tickMode &&
+               activeSpeedMultiplier == tickSpeedMultiplier;
     }
 
     /// <summary>
@@ -83,7 +102,8 @@ public static class DiagnosticsPlaybackState
     public static TimeSpan GetInterval(
         DiagnosticsPlaybackMode mode,
         DateTimeOffset currentTimestamp,
-        DateTimeOffset nextTimestamp)
+        DateTimeOffset nextTimestamp,
+        int speedMultiplier = DefaultFastForwardSpeedMultiplier)
     {
         var realTimeInterval = nextTimestamp - currentTimestamp;
         if (realTimeInterval <= TimeSpan.Zero)
@@ -96,7 +116,24 @@ public static class DiagnosticsPlaybackState
             : realTimeInterval;
 
         return mode == DiagnosticsPlaybackMode.FastForward
-            ? TimeSpan.FromTicks(Math.Max(FastForwardMinimumInterval.Ticks, normalizedInterval.Ticks / 4))
+            ? TimeSpan.FromTicks(Math.Max(
+                FastForwardMinimumInterval.Ticks,
+                normalizedInterval.Ticks / NormalizeSpeedMultiplier(speedMultiplier)))
             : normalizedInterval;
+    }
+
+    /// <summary>
+    /// UI から渡された早送り倍率を選択可能な値へ丸める。
+    /// </summary>
+    public static int NormalizeSpeedMultiplier(int speedMultiplier)
+    {
+        return FastForwardSpeedMultipliers.Contains(speedMultiplier)
+            ? speedMultiplier
+            : DefaultFastForwardSpeedMultiplier;
+    }
+
+    private static int GetFastForwardStep(int speedMultiplier)
+    {
+        return Math.Max(PlayStep, NormalizeSpeedMultiplier(speedMultiplier) / 4);
     }
 }

@@ -11,7 +11,31 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 {
     private const string DiagnosticsLogSuffix = ".tracker-diagnostics.log";
     private const string MetadataSuffix = ".metadata.json";
-    private readonly TrackerSnapshotReplayReader replayReader = new();
+    private const int SnapshotSchemaVersion = 1;
+    private const int MaxCachedIndexes = 2;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
+    private readonly Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader;
+    private readonly object cacheLock = new();
+    private readonly Dictionary<ComparisonIndexCacheKey, ComparisonSnapshotIndex> indexCache = [];
+    private readonly LinkedList<ComparisonIndexCacheKey> indexLru = [];
+
+    /// <summary>
+    /// 既定の sidecar JSONL reader で comparison view-state reader を初期化する。
+    /// </summary>
+    public TrackerDiagnosticsComparisonViewStateReader()
+        : this(ReadSidecarRecords)
+    {
+    }
+
+    internal TrackerDiagnosticsComparisonViewStateReader(
+        Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader)
+    {
+        this.sidecarRecordReader = sidecarRecordReader;
+    }
 
     /// <summary>
     /// diagnostics log path と表示済み selected entry から comparison view-state を読み取る。
@@ -56,7 +80,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 metadataError);
         }
 
-        var sourceOptions = CreateSourceOptions([]);
+        var sourceOptions = CreateEmptySourceOptions();
         if (metadata.TrackerSnapshotLog is null)
         {
             return CreateState(
@@ -122,15 +146,11 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 "Tracker snapshot sidecar file was not found.");
         }
 
-        IReadOnlyList<ComparisonSnapshot> snapshots;
+        ComparisonSnapshotIndex comparisonIndex;
+        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath);
         try
         {
-            snapshots = replayReader.ReadSession(metadataPath)
-                .SnapshotInputs
-                .Select(CreateComparisonSnapshot)
-                .OrderBy(snapshot => snapshot.TrackedFrameTimestampNs)
-                .ThenBy(snapshot => snapshot.ReceivedAt)
-                .ToArray();
+            comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath);
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
         {
@@ -148,7 +168,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 $"Tracker snapshot sidecar could not be read: {ex.Message}");
         }
 
-        if (snapshots.Count == 0)
+        if (comparisonIndex.SnapshotCount == 0)
         {
             return CreateState(
                 fullDiagnosticsLogPath,
@@ -164,11 +184,11 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 "Tracker snapshot sidecar did not contain records.");
         }
 
-        sourceOptions = CreateSourceOptions(snapshots);
+        sourceOptions = comparisonIndex.SourceOptions;
         var selectedEntryComparison = CreateSelectedEntryComparison(
             selectedEntry,
             selectedSourceFilter,
-            snapshots);
+            comparisonIndex);
 
         return CreateState(
             fullDiagnosticsLogPath,
@@ -182,6 +202,65 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             metadata.TrackerSnapshotLog.SkippedRecordCount,
             metadata.TrackerSnapshotLog.ErrorCount,
             error: null);
+    }
+
+    private ComparisonSnapshotIndex GetOrBuildIndex(
+        ComparisonIndexCacheKey cacheKey,
+        string sidecarPath)
+    {
+        lock (cacheLock)
+        {
+            if (indexCache.TryGetValue(cacheKey, out var cachedIndex))
+            {
+                TouchCacheKey(cacheKey);
+                return cachedIndex;
+            }
+        }
+
+        var builtIndex = BuildIndex(sidecarPath);
+
+        lock (cacheLock)
+        {
+            if (indexCache.TryGetValue(cacheKey, out var cachedIndex))
+            {
+                TouchCacheKey(cacheKey);
+                return cachedIndex;
+            }
+
+            indexCache[cacheKey] = builtIndex;
+            indexLru.AddFirst(cacheKey);
+            while (indexLru.Count > MaxCachedIndexes)
+            {
+                var keyToRemove = indexLru.Last!.Value;
+                indexLru.RemoveLast();
+                indexCache.Remove(keyToRemove);
+            }
+        }
+
+        return builtIndex;
+    }
+
+    private void TouchCacheKey(ComparisonIndexCacheKey cacheKey)
+    {
+        var node = indexLru.Find(cacheKey);
+        if (node is null)
+        {
+            indexLru.AddFirst(cacheKey);
+            return;
+        }
+
+        indexLru.Remove(node);
+        indexLru.AddFirst(node);
+    }
+
+    private ComparisonSnapshotIndex BuildIndex(string sidecarPath)
+    {
+        var snapshots = sidecarRecordReader(sidecarPath)
+            .Select(CreateComparisonSnapshot)
+            .OrderBy(snapshot => snapshot.TrackedFrameTimestampNs)
+            .ThenBy(snapshot => snapshot.ReceivedAt)
+            .ToArray();
+        return new ComparisonSnapshotIndex(snapshots);
     }
 
     private static TrackerDiagnosticsComparisonViewState CreateState(
@@ -211,10 +290,99 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             error);
     }
 
+    private static IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateEmptySourceOptions()
+    {
+        return
+        [
+            new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.All, "All", 0),
+            new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.External, "External", 0),
+            new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.Own, "Own", 0),
+            new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.Unknown, "Unknown", 0),
+        ];
+    }
+
+    private static IReadOnlyList<TrackerPacketSnapshotRecord> ReadSidecarRecords(string sidecarPath)
+    {
+        var records = new List<TrackerPacketSnapshotRecord>();
+        foreach (var line in File.ReadLines(sidecarPath))
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            var record = JsonSerializer.Deserialize<TrackerPacketSnapshotRecord>(line, JsonOptions)
+                ?? throw new InvalidDataException("Tracker packet snapshot record is empty.");
+            if (record.SchemaVersion != SnapshotSchemaVersion)
+            {
+                throw new InvalidDataException(
+                    $"Unsupported tracker packet snapshot schema version '{record.SchemaVersion}'.");
+            }
+
+            records.Add(record);
+        }
+
+        return records;
+    }
+
+    private static ComparisonSnapshot CreateComparisonSnapshot(TrackerPacketSnapshotRecord record)
+    {
+        var semanticSummary = CreateSemanticSummary(record, out var rawPayloadRestored);
+        var sourceRole = TrackerPacketSnapshotRecord.NormalizeSourceRole(record.SourceRole);
+        var sourceLabel = TrackerPacketSnapshotRecord.NormalizeSourceLabel(
+            record.SourceLabel,
+            record.SourceName,
+            record.SourceUuid,
+            record.RemoteEndpoint,
+            sourceRole);
+
+        return new ComparisonSnapshot(
+            record.ReceivedAt,
+            sourceRole,
+            sourceLabel,
+            record.TrackedFrameNumber,
+            record.TrackedFrameTimestampNs,
+            rawPayloadRestored,
+            semanticSummary.BallCount,
+            semanticSummary.RobotCount);
+    }
+
+    private static TrackerPacketSnapshotSemanticSummary CreateSemanticSummary(
+        TrackerPacketSnapshotRecord record,
+        out bool rawPayloadRestored)
+    {
+        if (record.SemanticSummary is not null)
+        {
+            rawPayloadRestored = !string.IsNullOrWhiteSpace(record.PayloadBase64);
+            return record.SemanticSummary;
+        }
+
+        try
+        {
+            var payload = Convert.FromBase64String(record.PayloadBase64);
+            var packet = TrackerWrapperPacket.Parser.ParseFrom(payload);
+            rawPayloadRestored = true;
+            return TrackerPacketSnapshotSemanticSummary.FromPacket(
+                packet,
+                TrackerPacketSnapshotRecord.NormalizeSourceRole(record.SourceRole),
+                TrackerPacketSnapshotRecord.NormalizeSourceLabel(
+                    record.SourceLabel,
+                    record.SourceName,
+                    record.SourceUuid,
+                    record.RemoteEndpoint,
+                    record.SourceRole));
+        }
+        catch (Exception ex) when (ex is FormatException or InvalidProtocolBufferException)
+        {
+            rawPayloadRestored = false;
+            return TrackerPacketSnapshotSemanticSummary.FromRecord(record);
+        }
+    }
+
     private static TrackerDiagnosticsComparisonEntryComparison CreateSelectedEntryComparison(
         TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
         TrackerDiagnosticsComparisonSourceFilter selectedSourceFilter,
-        IReadOnlyList<ComparisonSnapshot> snapshots)
+        ComparisonSnapshotIndex index)
     {
         if (selectedEntry is null)
         {
@@ -229,12 +397,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 selectedEntry.LineNumber);
         }
 
-        var ownSnapshot = snapshots
-            .Where(snapshot =>
-                snapshot.TrackedFrameNumber == trackedFrame &&
-                string.Equals(snapshot.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
-            .OrderBy(snapshot => snapshot.TrackedFrameTimestampNs)
-            .FirstOrDefault();
+        var ownSnapshot = index.GetOwnSnapshot(trackedFrame);
         if (ownSnapshot is null)
         {
             return TrackerDiagnosticsComparisonEntryComparison.WithStatus(
@@ -242,19 +405,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 selectedEntry.LineNumber);
         }
 
-        var candidates = ApplyFilter(snapshots, selectedSourceFilter).ToArray();
-        if (selectedSourceFilter.Kind == TrackerDiagnosticsComparisonSourceFilterKind.All)
-        {
-            var nonOwnCandidates = candidates
-                .Where(snapshot => !string.Equals(snapshot.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-            if (nonOwnCandidates.Length > 0)
-            {
-                candidates = nonOwnCandidates;
-            }
-        }
-
-        if (candidates.Length == 0)
+        var nearest = index.FindNearestCandidate(selectedSourceFilter, ownSnapshot.TrackedFrameTimestampNs);
+        if (nearest is null)
         {
             return TrackerDiagnosticsComparisonEntryComparison.WithStatus(
                 TrackerDiagnosticsComparisonEntryStatus.NoCandidateSnapshot,
@@ -262,10 +414,6 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 ownSnapshot.TrackedFrameTimestampNs);
         }
 
-        var nearest = candidates
-            .OrderBy(snapshot => Math.Abs(snapshot.TrackedFrameTimestampNs - ownSnapshot.TrackedFrameTimestampNs))
-            .ThenBy(snapshot => snapshot.TrackedFrameTimestampNs)
-            .First();
         var timestampDeltaNs = Math.Abs(nearest.TrackedFrameTimestampNs - ownSnapshot.TrackedFrameTimestampNs);
         return new TrackerDiagnosticsComparisonEntryComparison(
             TrackerDiagnosticsComparisonEntryStatus.Ready,
@@ -280,68 +428,6 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             nearest.RawPayloadRestored,
             nearest.BallCount,
             nearest.RobotCount);
-    }
-
-    private static IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateSourceOptions(
-        IReadOnlyList<ComparisonSnapshot> snapshots)
-    {
-        var options = new List<TrackerDiagnosticsComparisonSourceOption>
-        {
-            CreateRoleOption(TrackerDiagnosticsComparisonSourceFilter.All, "All", snapshots),
-            CreateRoleOption(TrackerDiagnosticsComparisonSourceFilter.External, "External", snapshots),
-            CreateRoleOption(TrackerDiagnosticsComparisonSourceFilter.Own, "Own", snapshots),
-            CreateRoleOption(TrackerDiagnosticsComparisonSourceFilter.Unknown, "Unknown", snapshots),
-        };
-        options.AddRange(snapshots
-            .GroupBy(snapshot => snapshot.SourceLabel, StringComparer.Ordinal)
-            .OrderBy(group => group.Key, StringComparer.Ordinal)
-            .Select(group => new TrackerDiagnosticsComparisonSourceOption(
-                TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel(group.Key),
-                group.Key,
-                group.Count())));
-
-        return options;
-    }
-
-    private static TrackerDiagnosticsComparisonSourceOption CreateRoleOption(
-        TrackerDiagnosticsComparisonSourceFilter filter,
-        string label,
-        IReadOnlyList<ComparisonSnapshot> snapshots)
-    {
-        var count = filter.Kind == TrackerDiagnosticsComparisonSourceFilterKind.All
-            ? snapshots.Count
-            : ApplyFilter(snapshots, filter).Count();
-        return new TrackerDiagnosticsComparisonSourceOption(filter, label, count);
-    }
-
-    private static IEnumerable<ComparisonSnapshot> ApplyFilter(
-        IEnumerable<ComparisonSnapshot> snapshots,
-        TrackerDiagnosticsComparisonSourceFilter filter)
-    {
-        return filter.Kind switch
-        {
-            TrackerDiagnosticsComparisonSourceFilterKind.All => snapshots,
-            TrackerDiagnosticsComparisonSourceFilterKind.External => snapshots.Where(snapshot => string.Equals(snapshot.SourceRole, "external", StringComparison.OrdinalIgnoreCase)),
-            TrackerDiagnosticsComparisonSourceFilterKind.Own => snapshots.Where(snapshot => string.Equals(snapshot.SourceRole, "own", StringComparison.OrdinalIgnoreCase)),
-            TrackerDiagnosticsComparisonSourceFilterKind.Unknown => snapshots.Where(snapshot => string.Equals(snapshot.SourceRole, "unknown", StringComparison.OrdinalIgnoreCase)),
-            TrackerDiagnosticsComparisonSourceFilterKind.SourceLabel => snapshots.Where(snapshot => string.Equals(snapshot.SourceLabel, filter.Value, StringComparison.Ordinal)),
-            _ => snapshots,
-        };
-    }
-
-    private static ComparisonSnapshot CreateComparisonSnapshot(TrackerSnapshotReplayInput input)
-    {
-        var semanticSummary = input.ComparisonSource.SemanticSummary;
-
-        return new ComparisonSnapshot(
-            input.ReceivedAt,
-            input.SourceRole,
-            input.SourceLabel,
-            input.TrackedFrameNumber,
-            input.TrackedFrameTimestampNs,
-            input.ComparisonSource.RawPayloadRestored,
-            semanticSummary.BallCount,
-            semanticSummary.RobotCount);
     }
 
     private static string? ResolveMetadataPath(string diagnosticsLogPath)
@@ -408,6 +494,225 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         bool RawPayloadRestored,
         int BallCount,
         int RobotCount);
+
+    private sealed class ComparisonSnapshotIndex
+    {
+        private readonly ComparisonSnapshot[] allSnapshots;
+        private readonly ComparisonSnapshot[] externalSnapshots;
+        private readonly ComparisonSnapshot[] ownSnapshots;
+        private readonly ComparisonSnapshot[] unknownSnapshots;
+        private readonly ComparisonSnapshot[] nonOwnSnapshots;
+        private readonly IReadOnlyDictionary<uint, ComparisonSnapshot[]> ownSnapshotsByFrame;
+        private readonly IReadOnlyDictionary<string, ComparisonSnapshot[]> snapshotsBySourceLabel;
+
+        public ComparisonSnapshotIndex(ComparisonSnapshot[] snapshots)
+        {
+            allSnapshots = snapshots;
+            externalSnapshots = FilterByRole(snapshots, "external");
+            ownSnapshots = FilterByRole(snapshots, "own");
+            unknownSnapshots = FilterByRole(snapshots, "unknown");
+            nonOwnSnapshots = snapshots
+                .Where(snapshot => !string.Equals(snapshot.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            ownSnapshotsByFrame = ownSnapshots
+                .GroupBy(snapshot => snapshot.TrackedFrameNumber)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.OrderBy(snapshot => snapshot.TrackedFrameTimestampNs).ThenBy(snapshot => snapshot.ReceivedAt).ToArray());
+            snapshotsBySourceLabel = snapshots
+                .GroupBy(snapshot => snapshot.SourceLabel, StringComparer.Ordinal)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.ToArray(),
+                    StringComparer.Ordinal);
+            SourceOptions = CreateSourceOptions();
+        }
+
+        public int SnapshotCount => allSnapshots.Length;
+
+        public IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> SourceOptions { get; }
+
+        public ComparisonSnapshot? GetOwnSnapshot(uint trackedFrame)
+        {
+            return ownSnapshotsByFrame.TryGetValue(trackedFrame, out var snapshots)
+                ? snapshots.FirstOrDefault()
+                : null;
+        }
+
+        public ComparisonSnapshot? FindNearestCandidate(
+            TrackerDiagnosticsComparisonSourceFilter filter,
+            long targetTimestampNs)
+        {
+            var candidates = GetCandidates(filter);
+            return candidates.Length == 0 ? null : FindNearest(candidates, targetTimestampNs);
+        }
+
+        private IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateSourceOptions()
+        {
+            var options = new List<TrackerDiagnosticsComparisonSourceOption>
+            {
+                new(TrackerDiagnosticsComparisonSourceFilter.All, "All", allSnapshots.Length),
+                new(TrackerDiagnosticsComparisonSourceFilter.External, "External", externalSnapshots.Length),
+                new(TrackerDiagnosticsComparisonSourceFilter.Own, "Own", ownSnapshots.Length),
+                new(TrackerDiagnosticsComparisonSourceFilter.Unknown, "Unknown", unknownSnapshots.Length),
+            };
+            options.AddRange(snapshotsBySourceLabel
+                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .Select(pair => new TrackerDiagnosticsComparisonSourceOption(
+                    TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel(pair.Key),
+                    pair.Key,
+                    pair.Value.Length)));
+
+            return options;
+        }
+
+        private ComparisonSnapshot[] GetCandidates(TrackerDiagnosticsComparisonSourceFilter filter)
+        {
+            return filter.Kind switch
+            {
+                TrackerDiagnosticsComparisonSourceFilterKind.All =>
+                    nonOwnSnapshots.Length > 0 ? nonOwnSnapshots : allSnapshots,
+                TrackerDiagnosticsComparisonSourceFilterKind.External => externalSnapshots,
+                TrackerDiagnosticsComparisonSourceFilterKind.Own => ownSnapshots,
+                TrackerDiagnosticsComparisonSourceFilterKind.Unknown => unknownSnapshots,
+                TrackerDiagnosticsComparisonSourceFilterKind.SourceLabel =>
+                    filter.Value is not null && snapshotsBySourceLabel.TryGetValue(filter.Value, out var snapshots)
+                        ? snapshots
+                        : [],
+                _ => allSnapshots,
+            };
+        }
+
+        private static ComparisonSnapshot[] FilterByRole(
+            IEnumerable<ComparisonSnapshot> snapshots,
+            string role)
+        {
+            return snapshots
+                .Where(snapshot => string.Equals(snapshot.SourceRole, role, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+        }
+
+        private static ComparisonSnapshot FindNearest(
+            IReadOnlyList<ComparisonSnapshot> candidates,
+            long targetTimestampNs)
+        {
+            var insertionIndex = FindInsertionIndex(candidates, targetTimestampNs);
+            ComparisonSnapshot? best = null;
+            if (insertionIndex < candidates.Count)
+            {
+                best = candidates[insertionIndex];
+            }
+
+            if (insertionIndex > 0)
+            {
+                var previousTimestampStartIndex = FindTimestampStartIndex(candidates, insertionIndex - 1);
+                best = PickNearest(best, candidates[previousTimestampStartIndex], targetTimestampNs);
+            }
+
+            return best!;
+        }
+
+        private static int FindInsertionIndex(
+            IReadOnlyList<ComparisonSnapshot> candidates,
+            long targetTimestampNs)
+        {
+            var lower = 0;
+            var upper = candidates.Count;
+            while (lower < upper)
+            {
+                var middle = lower + ((upper - lower) / 2);
+                if (candidates[middle].TrackedFrameTimestampNs < targetTimestampNs)
+                {
+                    lower = middle + 1;
+                }
+                else
+                {
+                    upper = middle;
+                }
+            }
+
+            return lower;
+        }
+
+        private static int FindTimestampStartIndex(
+            IReadOnlyList<ComparisonSnapshot> candidates,
+            int index)
+        {
+            var timestampNs = candidates[index].TrackedFrameTimestampNs;
+            var lower = 0;
+            var upper = index;
+            while (lower < upper)
+            {
+                var middle = lower + ((upper - lower) / 2);
+                if (candidates[middle].TrackedFrameTimestampNs < timestampNs)
+                {
+                    lower = middle + 1;
+                }
+                else
+                {
+                    upper = middle;
+                }
+            }
+
+            return lower;
+        }
+
+        private static ComparisonSnapshot PickNearest(
+            ComparisonSnapshot? current,
+            ComparisonSnapshot candidate,
+            long targetTimestampNs)
+        {
+            if (current is null)
+            {
+                return candidate;
+            }
+
+            var currentDelta = Math.Abs(current.TrackedFrameTimestampNs - targetTimestampNs);
+            var candidateDelta = Math.Abs(candidate.TrackedFrameTimestampNs - targetTimestampNs);
+            if (candidateDelta < currentDelta)
+            {
+                return candidate;
+            }
+
+            return candidateDelta == currentDelta &&
+                   candidate.TrackedFrameTimestampNs < current.TrackedFrameTimestampNs
+                ? candidate
+                : current;
+        }
+    }
+
+    private sealed record ComparisonIndexCacheKey(
+        FileState DiagnosticsLog,
+        FileState Metadata,
+        FileState Sidecar)
+    {
+        public static ComparisonIndexCacheKey Create(
+            string diagnosticsLogPath,
+            string metadataPath,
+            string sidecarPath)
+        {
+            return new ComparisonIndexCacheKey(
+                FileState.FromPath(diagnosticsLogPath),
+                FileState.FromPath(metadataPath),
+                FileState.FromPath(sidecarPath));
+        }
+    }
+
+    private sealed record FileState(
+        string Path,
+        bool Exists,
+        long LastWriteTimeUtcTicks,
+        long Length)
+    {
+        public static FileState FromPath(string path)
+        {
+            var fullPath = System.IO.Path.GetFullPath(path);
+            var info = new FileInfo(fullPath);
+            return info.Exists
+                ? new FileState(fullPath, Exists: true, info.LastWriteTimeUtc.Ticks, info.Length)
+                : new FileState(fullPath, Exists: false, LastWriteTimeUtcTicks: 0, Length: 0);
+        }
+    }
 
     private sealed class CaptureMetadata
     {

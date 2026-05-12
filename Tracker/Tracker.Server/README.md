@@ -87,6 +87,8 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 - capture sidecar の diagnostics log を選ぶと、`Settings` から capture metadata に保存された configured profile と resolved settings を確認できます
 - capture sidecar の diagnostics log と tracker packet snapshot sidecar が揃っている場合は、`Tracker Comparison` panel で ibis tracker と 3rd party tracker の差分を確認できます
 - `Tracker Comparison` panel の source filter は `All`、`External`、`Own`、`Unknown`、source label 単位で切り替えられます。通常確認では `External` または対象 source label を選び、選択中 diagnostics entry の ibis own snapshot timestamp に最も近い 3rd party tracker snapshot と比較します。
+- `Tracker Comparison` は tracker packet snapshot sidecar を log 選択時に lightweight index 化し、timeline scrubber 移動や playback tick では同じ file state の sidecar を再読込しません。100MB を超える sidecar でも scrub / tick ごとの I/O と parse は sidecar サイズに比例しません。
+- Play は diagnostics entry の実 timestamp delta で 1x 再生します。調査用の Fast Forward は speed selector で `4x` / `16x` / `64x` を選べます。
 - panel には sidecar status、record / skipped / error count、選択 frame / time、comparison status、matching rule、source role / label、snapshot frame、own / nearest timestamp、delta、balls / robots、raw payload の復元状態が表示されます。
 
 ## API
@@ -212,7 +214,7 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 1. `Tracker:Receive:Enabled=true` にし、receiver が監視する endpoint を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した ibis publish endpoint を使います。既定の `sim` profile は `224.5.23.2:11010`、`default` profile は `224.5.23.2:10010` です。3rd party tracker が別 endpoint に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。複数 NIC 環境では `Tracker:Receive:InterfaceAddress` を明示します。
 2. `Tracker.Server` を起動し、画面で `Capture On` にしてから SSL-Vision packet と official tracker packet を流します。`Tracker:Receive:Enabled=false` のままでは live tracker receiver が起動しないため、packet capture と diagnostics は残っても tracker packet snapshot sidecar は増えません。
 3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl` があることを確認します。metadata では `SessionFolder` と各 relative path、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。
-4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。timeline、scrubber、Play / Fast Forward、raw / tracked field、`Settings` modal の resolved settings を確認します。
+4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。timeline、scrubber、Play / Fast Forward、Fast Forward speed、raw / tracked field、`Settings` modal の resolved settings を確認します。
 5. `Tracker Comparison` panel で `Status` が `Ready` になることを確認し、source filter を `External` または対象 source label に切り替えます。比較対象がないことを確認したい場合は `Own` / `Unknown` も使えます。
 6. report には、selected frame / selected time、source filter、sidecar status、record / skipped / error count、entry status、source role / label、snapshot frame、own timestamp ns、nearest timestamp ns、delta ns、balls / robots、raw payload 表示を残します。UI の raw payload は `Restored` が rawPayloadRestored true、`Missing` が false です。
 7. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`nearest-timestamp` の比較 summary を agent / 検証 / 回帰用 evidence として残します。CLI evidence は UI evidence の補助であり、通常確認の主経路ではありません。
