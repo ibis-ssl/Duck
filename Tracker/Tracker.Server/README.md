@@ -209,7 +209,7 @@ test code から直接扱う場合は `VisionPacketCaptureFile.ReadRecords(path)
 
 CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を残します。
 
-1. `Tracker:Receive:Enabled=true` にし、active profile の `Tracker:Profiles:<name>:Publish:MulticastAddress` / `Port` が監視したい official tracker multicast endpoint を指していることを確認します。既定の `sim` profile は `224.5.23.2:11010`、`default` profile は `224.5.23.2:10010` です。複数 NIC 環境では `Tracker:Receive:InterfaceAddress` を明示します。
+1. `Tracker:Receive:Enabled=true` にし、receiver が監視する endpoint を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した ibis publish endpoint を使います。既定の `sim` profile は `224.5.23.2:11010`、`default` profile は `224.5.23.2:10010` です。3rd party tracker が別 endpoint に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。複数 NIC 環境では `Tracker:Receive:InterfaceAddress` を明示します。
 2. `Tracker.Server` を起動し、画面で `Capture On` にしてから SSL-Vision packet と official tracker packet を流します。`Tracker:Receive:Enabled=false` のままでは live tracker receiver が起動しないため、packet capture と diagnostics は残っても tracker packet snapshot sidecar は増えません。
 3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl` があることを確認します。metadata では `SessionFolder` と各 relative path、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。
 4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。timeline、scrubber、Play / Fast Forward、raw / tracked field、`Settings` modal の resolved settings を確認します。
@@ -257,16 +257,22 @@ tracker 全体の設定です。
 
 ### `Tracker:Receive`
 
-CaptureOn 比較ログ用の live tracker packet receiver 設定です。`Enabled=true` のときだけ `TrackerConnectionLib` receiver が起動し、active profile の `Tracker:Profiles:<name>:Publish:MulticastAddress` / `Port` を監視します。受信した `TrackerWrapperPacket` は CaptureOn 中だけ `tracker-packet-snapshots.jsonl` へ保存され、Capture Off 中は追記しません。
+CaptureOn 比較ログ用の live tracker packet receiver 設定です。`Enabled=true` のときだけ `TrackerConnectionLib` receiver が起動します。`MulticastAddress` / `Port` が未指定なら、起動時 active profile と `Tracker:RuntimeOverrides:Publish` から解決した ibis publish endpoint を監視します。`MulticastAddress` / `Port` を明示した場合は、receiver 独自 endpoint を監視します。endpoint 解決は起動時固定で、runtime profile switch 後に receiver socket は再構成されません。受信した `TrackerWrapperPacket` は CaptureOn 中だけ `tracker-packet-snapshots.jsonl` へ保存され、Capture Off 中は追記しません。
+
+`Enabled=false` のままでは live receiver が起動しないため、external tracker packet は記録されません。sidecar が空の場合は、監視 endpoint、`InterfaceAddress`、OS の multicast route、3rd party tracker の送信先が一致しているか確認してください。
 
 | キー | 意味 |
 | --- | --- |
 | `Enabled` | `true` なら official tracker packet receiver を起動します。既定は `false` です。 |
+| `MulticastAddress` | receiver が監視する multicast group address です。`null` の場合は起動時に解決済みの ibis publish address を使います。 |
+| `Port` | receiver が監視する UDP port です。`null` の場合は起動時に解決済みの ibis publish port を使います。 |
 | `InterfaceAddress` | multicast join に使う local IPv4 address です。`null` の場合は receiver 実装の既定に任せます。複数 NIC がある環境では明示指定してください。 |
 
 ```json
 "Receive": {
   "Enabled": true,
+  "MulticastAddress": null,
+  "Port": null,
   "InterfaceAddress": "192.0.2.10"
 }
 ```

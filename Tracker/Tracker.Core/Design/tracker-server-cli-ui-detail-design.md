@@ -26,6 +26,8 @@
 - `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点にする。
 - `Tracker.Server` へ組み込む際は、既存の `UdpTrackerReceiver` / `MultiTrackerManager` / `TrackerPacketAdapter` の責務を優先して使う。CaptureOn lifecycle と session folder に合わせる必要がある場合だけ薄い adapter を置く。
 - official tracker packet は multicast endpoint から届く前提とし、receiver は設定済み multicast address / port を使って multicast group に参加する。loopback unicast 受信だけでは CaptureOn 比較ログの runtime 正常系証跡として扱わない。
+- live receiver の endpoint は起動時に解決する。`Tracker:Receive:MulticastAddress` / `Port` を明示した場合は receiver 独自 endpoint を監視し、未指定項目は起動時 active profile と `Tracker:RuntimeOverrides:Publish` から解決した ibis publish endpoint へ fallback する。`Tracker:Receive:InterfaceAddress` は従来通り multicast join に使う local interface 指定であり、endpoint fallback とは独立して扱う。
+- runtime profile switch 後に live receiver socket を再構成することは `TRACKER-054` の対象外とする。profile switch 後も receiver は起動時に解決した endpoint を監視し続けるため、運用手順と README では起動時固定であることを明記する。
 - `Tracker.Server` は CaptureOn session と tracker packet snapshot log を紐付ける統合層にする。packet capture 本体、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar を同じ session folder 配下の成果物として扱う。
 - `Tracker.Core` には official tracker packet 傍受、snapshot sidecar 保存、ibis / other tracker の後処理比較を入れない。Core は ibis tracker の internal frame と official packet 生成だけを担当する。
 
@@ -82,6 +84,8 @@ ibis committed frame と tracker packet snapshot は同じ frame number や publ
 
 live receiver のネットワーク受信は明示設定で有効化する。既定設定では常時 bind / receive を始めず、運用者が official tracker multicast receive を有効化した場合だけ receiver を起動する。
 
+`Tracker:Receive:MulticastAddress` / `Port` が未指定なら、live receiver は起動時に解決した ibis publish endpoint と同じ address / port を監視する。3rdparty tracker が別 endpoint へ publish する運用では、`Tracker:Receive` に receiver 独自 endpoint を明示する。`Tracker:Receive:Enabled=false` の場合、external tracker packet は CaptureOn 中でも記録されない。
+
 CaptureOn は receiver 起動条件ではなく、session sidecar 書き込み条件を制御する。Capture Off 中に receiver が packet を受けても snapshot sidecar を作成・追記しない。
 
 Capture Off 中は snapshot sidecar を作成・追記しない。Capture Off / 再On では session folder を更新し、前 session folder の snapshot writer へ追記しない。
@@ -121,12 +125,14 @@ metadata がない、metadata に snapshot sidecar path がない、sidecar file
 - `TRACKER-050` では、diagnostics comparison reader / view-state contract を追加する。diagnostics log path から metadata / sidecar を解決し、source list、selected source filter、selected entry comparison、sidecar status、skipped/error count を pure model として固定する。
 - `TRACKER-051` では、`/diagnostics` UI へ comparison 表示と source filtering を接続する。selected log / selected entry / playback tick と comparison view-state を同期し、既存 render snapshot、settings modal、timeline、playback controls、resize layout を壊さない。
 - `TRACKER-052` では、CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する。CLI は agent / 検証用、通常確認は `/diagnostics` の comparison panel を主経路として説明する。
+- `TRACKER-054` では、live tracker receiver の endpoint override を追加する。既定は起動時 resolved ibis publish endpoint を監視し、`Tracker:Receive:MulticastAddress` / `Port` 指定時は receiver 独自 endpoint を監視する。runtime profile switch 後の receiver socket 再構成は対象外とし、起動時固定として README と設計に明記する。
 - `TRACKER-053` では、PR #9 ready 化を行う。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
-- `TRACKER-054` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
+- `TRACKER-055` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
 
 ## 完了条件
 
 - CaptureOn 中に見えている tracker packet を self 除外なしで sidecar JSONL に保存できる。
+- live receiver は起動時 resolved ibis publish endpoint を既定で監視し、`Tracker:Receive:MulticastAddress` / `Port` 指定時は receiver 独自 endpoint を監視できる。
 - 同一 CaptureOn session で生成される packet capture、metadata、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL が一つの session folder 配下にまとまり、異なる CaptureOn タイミングのログは別 folder に分かれる。
 - metadata から session folder と各 file relative path を辿れる。
 - Capture Off / 再On で session folder と snapshot writer が切り替わり、前 session folder へ追記しない。

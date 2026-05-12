@@ -4,19 +4,22 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-053
-- Title: PR #9 を ready 化する
+- ID: TRACKER-055
+- Title: diagnostics playback / scrubber の低速問題を解消する
 - Phase: comparison-logging
 - Status: planned
-- TDD Entry: 未実施。PR本文、final validation、manual evidence、review evidence、risk整理、tracking同期が PR ready 判断材料として揃うことを確認する。
-- Implementation Entry: 未実施。PR #9 本文を `TRACKER-040` から最終状態まで更新し、final validation と draft 解除判断材料を揃える。
-- Review Entry: 未実施。PR ready 前に必要な final review / evidence を確認する。
+- TDD Entry: 未実施。timeline scrubber / playback tick が tracker snapshot sidecar を毎回再読込しないこと、100MB 超の sidecar でも entry 選択が sidecar size に比例しないこと、通常再生と調査用高速再生を区別して使えることを focused test で固定する。
+- Implementation Entry: 未実施。tracker snapshot comparison input を file 状態つき cache / index 化し、entry 選択時は memory lookup だけで comparison / Field 用 snapshot を解決する。巨大 sidecar では初回読み込みの固まりも抑えるため、既存 JSONL sidecar を活かした lightweight index / background preload / cancellation / bounded memory policy を検討する。Play / Fast Forward の速度 UX を調査用に改善する。
+- Review Entry: 未実施。実装後に gpt-5.5 high review report を作成する。
 - Size: medium
-- Dependencies: TRACKER-052
+- Dependencies: TRACKER-054
 - Exit Criteria:
-  - PR本文を `TRACKER-040` から最終状態まで更新する
-  - final focused / related / 必要な full test、manual evidence、全 task review evidence、risk整理、tracking同期、draft解除判断材料を揃える
-  - PR ready 化または draft 継続理由を明示する
+  - 140MB / 29k records 級およびそれ以上の `tracker-packet-snapshots.jsonl` を scrub / playback tick ごとに再読込しない
+  - selected entry 変更時の comparison 更新は log 選択時に作った in-memory cache / index を使う
+  - 通常 Play は実 timestamp delta を維持しつつ、調査用高速再生をユーザーが選べる
+  - 既存の Stop、末尾到達時の先頭戻り、stale tick guard を維持する
+  - 指定 session `ssl-vision-packets-20260512T145134883Z-cf4b51408ed44743b2350520eb9eec6e` 級のログで追従改善 evidence を残す
+  - focused / related test、実装レポート、gpt-5.5 high review report が揃い、blocking finding が残っていない
 
 ## 次の調査タスク
 
@@ -24,15 +27,19 @@
 
 ## 固定残タスク
 
-- 固定一覧は `TRACKER-047`、`TRACKER-048`、`TRACKER-049`、`TRACKER-050`、`TRACKER-051`、`TRACKER-052`、`TRACKER-053` とする。tracking / design では補助番号を使わない。
+- 固定一覧は `TRACKER-047`、`TRACKER-048`、`TRACKER-049`、`TRACKER-050`、`TRACKER-051`、`TRACKER-052`、`TRACKER-054`、`TRACKER-055`、`TRACKER-056`、`TRACKER-057`、`TRACKER-053` とする。tracking / design では補助番号を使わない。
 - `TRACKER-047` は既存 `TrackerSnapshotReplayReader` / `TrackerReplayIntegrationTddTests` の review gate を閉じるタスクで、review-fix、focused 5 passed、関連 focused 40 passed、full `Tracker.Tests` 192 passed、gpt-5.5 high r2 review blocking findings なしまで完了した。
 - `TRACKER-048` は diagnostics / replay / playback の比較表示・出力へ接続するタスクで、metadata relative path から snapshot sidecar を読み、source role / label、tracked timestamp、ball / robot count、raw payload restored、nearest timestamp summary を `Tracker.CaptureReplay` で確認可能にした。focused 8 passed、関連 focused 47 passed、full `Tracker.Tests` 194 passed、gpt-5.5 high review blocking findings なしまで完了した。
 - `TRACKER-049` は diagnostics comparison の design / tracking 再同期タスクで、CLI 比較実装を保持したまま `/diagnostics` UI comparison を PR ready 前の固定タスクへ入れ、`TRACKER-050` から `TRACKER-053` までを再定義した。設計・tracking 同期と gpt-5.5 high review blocking findings なしまで完了した。
 - `TRACKER-050` は diagnostics comparison reader / view-state contract を追加するタスクとし、diagnostics log path から metadata / sidecar を解決し、source list、selected source filter、selected entry comparison、sidecar status、skipped/error count を pure model として固定した。初回 gpt-5.5 high review の blocking finding に対し、10,000 件超 log の omit 後 selection regression を追加し、`selectedEntryIndex` ではなく表示済み entry 由来の `TrackerDiagnosticsComparisonSelectedEntry` を渡す contract へ修正済み。focused 8 passed、関連 focused 38 passed、full `Tracker.Tests` 202 passed、`git diff --check` 問題なし。gpt-5.5 high r2 review は `reports/tracker-050-review-r2-20260512210935.md` に記録済みで blocking findings なし。
 - `TRACKER-051` は `/diagnostics` UI へ comparison 表示と source filtering を接続するタスクとし、selected log / selected entry / playback tick と comparison view-state を同期して、source role / label、snapshot frame、timestamp delta、ball / robot count、raw payload restored、sidecar status を画面上で確認できるようにした。初回 gpt-5.5 high review の blocking finding に対し、nearest snapshot tracked frame number を comparison model と UI 表示へ追加済み。focused comparison tests 10 passed、関連 focused 33 passed、`CaptureReplayTests` 8 passed、`git diff --check` 問題なし。gpt-5.5 high r2 review は `reports/tracker-051-review-r2-20260512215156.md` に記録済みで blocking findings なし。
 - `TRACKER-052` は CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新するタスクとし、CLI は agent / 検証用、通常確認は `/diagnostics` comparison panel を主経路として説明した。sidecar missing / record 0 / skipped / error の読み方、manual evidence に残す selected frame / selected time、source filter、sidecar status、source role / label、snapshot frame、own / nearest timestamp、delta、balls / robots、raw payload 表示を README に追記済み。docs-only のため dotnet test は未実施、`git diff --check` 問題なし。gpt-5.5 high review は `reports/tracker-052-review-20260512221019.md` に記録済みで blocking findings なし。
-- `TRACKER-053` は PR #9 ready 化タスクとし、PR本文を `TRACKER-040` から最終状態まで更新し、final validation、manual evidence、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
-- `TRACKER-054` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
+- `TRACKER-054` は live tracker receiver の endpoint override を追加するタスクで、既定は起動時 resolved ibis publish endpoint と同じ address / port を監視しつつ、`Tracker:Receive:MulticastAddress` / `Port` で別 endpoint を明示できるようにした。focused `TrackerConfigurationBindingTests` 6 passed、関連 focused 10 passed / 5 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-054-receive-endpoint-implementation-20260512231920.md`、gpt-5.5 high review は `reports/tracker-054-review-20260512233050.md` に記録済みで blocking findings なし。
+- `TRACKER-055` は diagnostics playback / scrubber の低速問題を解消するタスクとし、100MB 超の tracker snapshot sidecar を entry 変更ごとに再読込しない cache / index と、調査用高速再生を追加する。100MB は上限ではなく通常到達しうるサイズとして扱い、巨大 sidecar でも tick / scrub が sidecar size に比例しないことを重視する。計画レポートは `reports/tracker-055-057-diagnostics-ui-performance-plan-20260513000601.md`、調査レポートは `reports/tracker-diagnostics-playback-speed-investigation-20260512235420.md` に記録する。
+- `TRACKER-056` は `Tracker Comparison` を折り畳み可能にし、左右 Field の source を任意に切り替えるタスクとする。既定は現状維持の `Vision Input` vs `ibis tracker` とし、3rd party / unknown / source label を左右どちらにも選べるようにする。事前調査は `reports/tracker-055-diagnostics-field-source-investigation-20260512233148.md` に記録済み。
+- `TRACKER-057` は Field 重ね合わせ表示を追加する want タスクとする。`TRACKER-056` の Field source model を再利用し、複雑化しすぎる場合は review 前に defer 判断を report に明記する。
+- `TRACKER-053` は PR #9 ready 化タスクとし、`TRACKER-057` 完了後、または overlay を明示 defer した後に PR本文を `TRACKER-040` から最終状態まで更新し、final validation、manual evidence、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
+- `TRACKER-058` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
 
 ## タスク一覧
 
@@ -52,4 +59,8 @@
 | TRACKER-050 | diagnostics comparison reader / view-state contract を追加する | comparison-logging | done | TRACKER-049 | `TrackerDiagnosticsComparisonViewStateTests` と `TrackerDiagnosticsComparisonViewStateReader` を追加し、diagnostics log path から metadata / sidecar を解決する UI 用 selected entry model、source list、selected source filter、selected entry comparison、sidecar status、skipped/error count を pure model として固定した。source filtering は all / external / own / unknown / source label 単位を扱い、missing / empty / corrupt / not-created / metadata missing sidecar を既存 diagnostics 表示の blocker にしない。初回 gpt-5.5 high review の blocking finding に対し、10,000 件超 log の omit 後 selection regression を追加し、`selectedEntryIndex` ではなく表示済み entry 由来の `TrackerDiagnosticsComparisonSelectedEntry` を渡す contract へ修正済み。focused 8 passed、関連 focused 38 passed、full `Tracker.Tests` 202 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-050-diagnostics-comparison-contract-implementation-20260512202753.md`、初回 review は `reports/tracker-050-review-20260512204924.md`、review fix report は `reports/tracker-050-review-fix-implementation-20260512205728.md`、gpt-5.5 high r2 review は `reports/tracker-050-review-r2-20260512210935.md`、進捗同期は `reports/tracker-050-progress-sync-20260512211517.md` に記録済みで blocking findings なし。 |
 | TRACKER-051 | `/diagnostics` UI へ comparison 表示と source filtering を接続する | comparison-logging | done | TRACKER-050 | `Diagnostics.razor` / `Diagnostics.razor.cs` が selected log / selected entry / playback tick と comparison view-state を同期し、source role / label、tracked frame / timestamp、snapshot frame、timestamp delta、matching rule、ball / robot count、raw payload restored、sidecar missing / empty / error を表示できるようにした。既存 raw / tracked render snapshot、profile settings modal、timeline scrubber、Play / Fast Forward / Stop、4K 向け resize layout を壊さない focused tests は pass した。実装レポートは `reports/tracker-051-diagnostics-ui-comparison-implementation-20260512212409.md`、初回 review は `reports/tracker-051-review-20260512213715.md`、review fix は `reports/tracker-051-review-fix-implementation-20260512214442.md`、gpt-5.5 high r2 review は `reports/tracker-051-review-r2-20260512215156.md`、進捗同期は `reports/tracker-051-progress-sync-20260512215710.md` に記録済みで blocking findings なし。browser manual evidence と README 更新は `TRACKER-052` で扱う。 |
 | TRACKER-052 | CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する | comparison-logging | done | TRACKER-051 | `Tracker.Server/README.md` が CaptureReplay CLI を agent / 検証 / regression 用として残し、通常確認では `/diagnostics` の source filter と `Tracker Comparison` panel で差を見ることを説明するように更新した。sidecar missing / record 0 / skipped / error の読み方、manual evidence に残す selected frame / selected time、source filter、sidecar status、record / skipped / error count、entry status、source role / label、snapshot frame、own / nearest timestamp、delta、balls / robots、raw payload 表示を追記した。実装レポートは `reports/tracker-052-docs-manual-evidence-implementation-20260512220318.md`、gpt-5.5 high review は `reports/tracker-052-review-20260512221019.md`、進捗同期は `reports/tracker-052-progress-sync-20260512221551.md` に記録済みで blocking findings なし。docs-only のため dotnet test は未実施、`git diff --check` 問題なし。 |
-| TRACKER-053 | PR #9 を ready 化する | comparison-logging | planned | TRACKER-052 | PR本文を `TRACKER-040` から最終状態まで更新し、final focused / related / 必要な full test、manual evidence、全 task review evidence、risk整理、tracking同期、draft解除判断材料を揃える。 |
+| TRACKER-054 | live tracker receiver の endpoint override を追加する | comparison-logging | done | TRACKER-052 | `Tracker:Receive:MulticastAddress` / `Port` を nullable override として追加し、未指定時は起動時 resolved ibis publish endpoint、指定時は receiver 独自 endpoint を `UdpTrackerReceiver` へ渡すようにした。`InterfaceAddress` は local multicast interface 指定として維持した。README / design へ設定優先順位、runtime profile switch 後の起動時固定、3rd party が記録されない場合の確認点を追記済み。focused `TrackerConfigurationBindingTests` 6 passed、関連 focused 10 passed / 5 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-054-receive-endpoint-implementation-20260512231920.md`、gpt-5.5 high review は `reports/tracker-054-review-20260512233050.md` に記録済みで blocking findings なし。 |
+| TRACKER-055 | diagnostics playback / scrubber の低速問題を解消する | comparison-logging | planned | TRACKER-054 | 140MB / 29k records 級およびそれ以上の tracker snapshot sidecar を scrub / playback tick ごとに再読込せず、selected entry 変更時は cache / index で comparison を更新する。巨大 sidecar でも tick / scrub が sidecar size に比例しない。通常 Play は実 timestamp delta を維持しつつ、調査用高速再生を選べる。既存の Stop、末尾到達時の先頭戻り、stale tick guard は維持する。 |
+| TRACKER-056 | diagnostics Field の左右 source 切替と comparison 折り畳みを追加する | comparison-logging | planned | TRACKER-055 | `Tracker Comparison` panel を折り畳み可能にし、左右 Field の source を `Vision Input`、ibis own、external、unknown、source label から任意に選べる。既定は現状維持の `Vision Input` vs `ibis tracker` とし、3rd party tracker は selected diagnostics entry に対する nearest timestamp snapshot を `VisionFieldCanvas` に描画する。 |
+| TRACKER-057 | diagnostics Field 重ね合わせ表示を追加する | comparison-logging | planned | TRACKER-056 | Field source model を再利用し、選択した tracker sources を同じ Field に重ねて表示できる。色分け / legend / visibility を最小限で用意し、複雑化しすぎる場合は defer 判断を report に明記する。 |
+| TRACKER-053 | PR #9 を ready 化する | comparison-logging | planned | TRACKER-057 | PR本文を `TRACKER-040` から最終状態まで更新し、final focused / related / 必要な full test、manual evidence、全 task review evidence、risk整理、tracking同期、draft解除判断材料を揃える。 |

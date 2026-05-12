@@ -64,11 +64,14 @@ if (startupTrackerOptions.Receive.Enabled)
     {
         var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
         var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
+        var receiveEndpoint = TrackerReceiveEndpointResolver.Resolve(
+            trackerOptions.Receive,
+            publisherOptions);
         return new UdpTrackerReceiver<TrackerPacketAdapter>(
-            publisherOptions.Port,
-            publisherOptions.MulticastAddress,
+            receiveEndpoint.Port,
+            receiveEndpoint.MulticastAddress,
             new TrackerWrapperPacketDeserializer(),
-            trackerOptions.Receive.InterfaceAddress);
+            receiveEndpoint.InterfaceAddress);
     });
     builder.Services.AddSingleton<TrackerConnectionLibSnapshotRecorder>();
     builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();

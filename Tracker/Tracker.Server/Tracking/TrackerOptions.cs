@@ -79,6 +79,16 @@ public sealed class TrackerReceiveOptions
     public bool Enabled { get; init; }
 
     /// <summary>
+    /// receiver が監視する multicast group address。未指定時は起動時に解決済みの publish address を使う。
+    /// </summary>
+    public string? MulticastAddress { get; init; }
+
+    /// <summary>
+    /// receiver が監視する UDP port。未指定時は起動時に解決済みの publish port を使う。
+    /// </summary>
+    public int? Port { get; init; }
+
+    /// <summary>
     /// multicast join に使う local IPv4 address。未指定時は候補 interface から選ぶ。
     /// </summary>
     public string? InterfaceAddress { get; init; }
