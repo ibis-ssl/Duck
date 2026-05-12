@@ -67,7 +67,11 @@
   - draft: `true`
   - base: `main`
   - head: `feat/tracker-captureon-compare-log`
-  - このレポートを含む最終 commit hash と push 結果は、commit / push 実行後に親応答で確定値を提示する。
+- commit hash: `2c6e977ee1cd58c7829962f0f1c886c449ddb14f`
+- push 結果: `d1de67b..2c6e977  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
+- push 後の PR #9 headRefOid: `2c6e977ee1cd58c7829962f0f1c886c449ddb14f`
+- この push 結果記録自体は後続の report-only commit として親応答で最終 commit hash を提示する。
 
 ## リスク
 
