@@ -4,25 +4,25 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-053
-- Title: PR #9 を ready 化する
+- ID: TRACKER-058
+- Title: diagnostics replay で ER-Force tracker snapshot が Field に再生されない原因を調査・修正する
 - Phase: comparison-logging
-- Status: done
-- TDD Entry: 実施済み。PR ready前の final validation として `Tracker.Server` build、full `Tracker.Tests`、`git diff --check` を確認した。初回 full test failure は `Tracker:Receive:Enabled` default off 契約からの逸脱として Red 再現し、appsettings を設計へ戻して focused green / full green を確認した。
-- Implementation Entry: 実施済み。PR #9本文案、final validation、全task review evidence、held concern / residual risk、browser manual evidence未実施の扱い、draft解除判断材料を `reports/tracker-053-pr-ready-evidence-20260513024248.md` に整理した。PR ready blockingだった validation failure は `reports/tracker-053-final-validation-fix-20260513025052.md` で解消済み。
-- Review Entry: 実施済み。gpt-5.5 high review は `reports/tracker-053-review-20260513025530.md`、r2 review は `reports/tracker-053-review-r2-20260513030250.md` に記録済みで PR ready blocking なし。
+- Status: in_progress
+- TDD Entry: 未実施。まず `/home/ibis/ssl/IbisDuck/Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures` の実captureに ER-Force tracker snapshot が存在するか、存在する場合に `/diagnostics` replay / Field source へ出ない再現条件を sub-agent 調査で特定する。
+- Implementation Entry: 未実施。調査結果に基づき、capture-side 欠落、metadata/sidecar 解決、source option 生成、playback tick 同期、Field source frame 選択のどこを修正するかを確定してから実装する。
+- Review Entry: 未実施。修正後に gpt-5.5 high review report を作成し、blocking finding が残らないことを確認する。
 - Size: medium
-- Dependencies: TRACKER-057
+- Dependencies: TRACKER-053
 - Exit Criteria:
-  - PR本文が `TRACKER-040` から `TRACKER-057` までの最終実装状態、CLI/diagnostics UI/Field source/overlay/低速対策を反映している
-  - final validation と manual evidence が揃っている
-  - 全task review evidence と held concern / residual risk が整理されている
-  - `tasks-status.md` / `phases-status.md` が PR ready 判断と一致している
-  - gpt-5.5 high review report が揃い、blocking finding が残っていない
+  - 指定 packet-captures 配下の直近 capture について、ER-Force tracker snapshot が sidecar に存在するかどうかを証跡付きで判定している
+  - sidecar に存在する場合、Replay / scrub / playback tick で ER-Force を Field source として選択・表示できる
+  - sidecar に存在しない場合、capture-time の設定または receiver 経路の不足を UI/ログ/ドキュメント上の誤解なく判断できる
+  - `Tracker:Receive` の source appsettings / bin appsettings / runtime override の扱いを混同せず、必要な修正または運用注意を明記している
+  - focused regression test、必要な build/test evidence、gpt-5.5 high review report が揃い、blocking finding が残っていない
 
 ## 次の調査タスク
 
-- none
+- TRACKER-058: diagnostics replay で ER-Force tracker snapshot が Field に再生されない原因を調査中。
 
 ## 固定残タスク
 
@@ -39,7 +39,7 @@
 - `TRACKER-057` は Field 重ね合わせ表示を追加する want タスクとする。設計は `reports/tracker-057-field-overlay-design-20260513014926.md` に記録済みで、実装担当 sub-agent が `TRACKER-056` の左右 Field source selector / `TrackerDiagnosticsFieldSourceFrame` を再利用した左右2 source overlayを最小実装した。初回reviewの同一source二重描画 held concern は follow-up で同一sourceを1 layer扱いに修正済み。focused test は `TrackerDiagnosticsComparisonViewStateTests|DiagnosticsFieldViewFactoryTests|DiagnosticsPlaybackStateTests` 45 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-057-field-overlay-implementation-20260513015935.md`、初回reviewは `reports/tracker-057-review-20260513022102.md`、r2 review は `reports/tracker-057-review-r2-20260513023505.md`、進捗同期は `reports/tracker-057-progress-sync-20260513023929.md` に記録済みで blocking findings なし。
 - `TRACKER-053` は PR #9 ready 化タスクとし、`TRACKER-057` 完了後、または overlay を明示 defer した後に PR本文を `TRACKER-040` から最終状態まで更新し、final validation、manual evidence、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
 - `TRACKER-053` は PR #9 ready 化タスクとして、PR本文案、final validation、manual evidence不足の扱い、全task review evidence、held concern / residual risk、draft解除判断材料を整理した。final validation は `Tracker.Server` build pass、full `Tracker.Tests` 227 passed、`git diff --check` pass。初回 review の stale PR本文案 blocking は r2 で解消済み。browser manual evidence 未実施はユーザー指示に照らして residual risk とし、単独 blocker にはしない。PR ready evidence は `reports/tracker-053-pr-ready-evidence-20260513024248.md`、final validation fix は `reports/tracker-053-final-validation-fix-20260513025052.md`、review は `reports/tracker-053-review-20260513025530.md`、r2 review は `reports/tracker-053-review-r2-20260513030250.md`、進捗同期は `reports/tracker-053-progress-sync-20260513030702.md` に記録済みで blocking findings なし。
-- `TRACKER-058` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
+- `TRACKER-058` はユーザーが明示した ER-Force replay 不具合対応として今回PRへ追加する。socket abstraction 等の hardening は、今回の不具合修正に直接必要な場合だけ含める。
 
 ## タスク一覧
 
