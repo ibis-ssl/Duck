@@ -35,6 +35,12 @@ public sealed class TrackerSnapshotReplayReader
             sessionDirectory,
             "DiagnosticsLogPath",
             null);
+        var alignmentPath = ResolveArtifactPath(
+            root,
+            captureDirectory,
+            sessionDirectory,
+            "TrackerSnapshotAlignmentPath",
+            TrackerSnapshotAlignmentLogReader.SidecarFileName);
 
         var inputs = File.Exists(sidecarPath)
             ? TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath)
@@ -43,7 +49,7 @@ public sealed class TrackerSnapshotReplayReader
                 .ThenBy(input => input.ReceivedAt)
                 .ToArray()
             : [];
-        var summaries = BuildComparisonSummaries(diagnosticsPath, inputs);
+        var summaries = BuildComparisonSummaries(diagnosticsPath, alignmentPath, inputs);
 
         return new TrackerSnapshotReplaySession(
             fullMetadataPath,
@@ -53,7 +59,7 @@ public sealed class TrackerSnapshotReplayReader
             summaries);
     }
 
-    private static TrackerSnapshotReplayInput CreateReplayInput(TrackerPacketSnapshotRecord record)
+    private static TrackerSnapshotReplayInput CreateReplayInput(TrackerPacketSnapshotRecord record, int recordIndex)
     {
         var normalizedRecord = record.EnsureSemanticSummary();
         var semanticSummary = normalizedRecord.SemanticSummary
@@ -71,6 +77,7 @@ public sealed class TrackerSnapshotReplayReader
             semanticSummary);
 
         return new TrackerSnapshotReplayInput(
+            recordIndex,
             normalizedRecord.ReceivedAt,
             normalizedRecord.RemoteEndpoint,
             normalizedRecord.SourceUuid,
@@ -90,6 +97,7 @@ public sealed class TrackerSnapshotReplayReader
 
     private static IReadOnlyList<TrackerSnapshotComparisonSummary> BuildComparisonSummaries(
         string? diagnosticsPath,
+        string? alignmentPath,
         IReadOnlyList<TrackerSnapshotReplayInput> inputs)
     {
         if (string.IsNullOrWhiteSpace(diagnosticsPath) ||
@@ -100,6 +108,19 @@ public sealed class TrackerSnapshotReplayReader
         }
 
         var summaries = new List<TrackerSnapshotComparisonSummary>();
+        var alignmentByLine = !string.IsNullOrWhiteSpace(alignmentPath) && File.Exists(alignmentPath)
+            ? TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
+                .Where(record => string.Equals(record.Status, TrackerSnapshotAlignmentRecord.ReadyStatus, StringComparison.OrdinalIgnoreCase))
+                .GroupBy(record => record.DiagnosticsLineNumber)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group
+                        .OrderBy(record => record.ReceivedAtDeltaTicks)
+                        .ThenBy(record => record.TrackerSnapshotRecordIndex)
+                        .ThenBy(record => record.RemoteEndpoint, StringComparer.Ordinal)
+                        .ToArray())
+            : new Dictionary<int, TrackerSnapshotAlignmentRecord[]>();
+        var inputsByRecordIndex = inputs.ToDictionary(input => input.RecordIndex);
         var lineNumber = 0;
         foreach (var line in File.ReadLines(diagnosticsPath))
         {
@@ -112,6 +133,27 @@ public sealed class TrackerSnapshotReplayReader
             if (!TryGetIbisDataTimestampNs(entry, inputs, out var ibisDataTimestampNs))
             {
                 continue;
+            }
+
+            if (alignmentByLine.TryGetValue(lineNumber, out var alignmentRecords))
+            {
+                var alignment = alignmentRecords
+                    .FirstOrDefault(record => !string.Equals(record.SourceRole, "own", StringComparison.OrdinalIgnoreCase));
+                if (alignment is not null &&
+                    inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex, out var alignedInput))
+                {
+                    var alignedSemanticSummary = alignedInput.ComparisonSource.SemanticSummary;
+                    summaries.Add(new TrackerSnapshotComparisonSummary(
+                        alignment.MatchingRule,
+                        alignment.OwnSnapshotTimestampNs,
+                        alignedInput.SourceRole,
+                        alignedInput.SourceLabel,
+                        alignedInput.TrackedFrameTimestampNs,
+                        alignedInput.ComparisonSource.RawPayloadRestored,
+                        alignedSemanticSummary.BallCount,
+                        alignedSemanticSummary.RobotCount));
+                    continue;
+                }
             }
 
             var nearestCandidates = inputs
@@ -244,6 +286,7 @@ public sealed record TrackerSnapshotReplaySession(
 /// <summary>
 /// diagnostics / replay / playback が時系列に扱う tracker snapshot 1 件。
 /// </summary>
+/// <param name="RecordIndex">tracker-packet-snapshots.jsonl 上の 0 始まり record index。</param>
 /// <param name="ReceivedAt">tracker packet を受信した wall-clock UTC 時刻。data timestamp ではない。</param>
 /// <param name="RemoteEndpoint">packet の送信元 endpoint 表示。</param>
 /// <param name="SourceUuid">official tracker packet の source UUID。</param>
@@ -255,6 +298,7 @@ public sealed record TrackerSnapshotReplaySession(
 /// <param name="DisplaySnapshot">表示用に整形済みの snapshot summary。</param>
 /// <param name="ComparisonSource">比較用に保持する raw payload と semantic summary。</param>
 public sealed record TrackerSnapshotReplayInput(
+    int RecordIndex,
     DateTimeOffset ReceivedAt,
     string RemoteEndpoint,
     string SourceUuid,

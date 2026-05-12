@@ -66,11 +66,17 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
         AssertArtifactPath(root, captureDirectory, sessionFolder, "DiagnosticsLogPath", mustExist: true);
         AssertArtifactPath(root, captureDirectory, sessionFolder, "RenderSnapshotPath", mustExist: true);
         AssertArtifactPath(root, captureDirectory, sessionFolder, "TrackerSnapshotSidecarPath", mustExist: false);
+        AssertArtifactPath(root, captureDirectory, sessionFolder, "TrackerSnapshotAlignmentPath", mustExist: false);
 
         var snapshotLog = root.GetProperty("TrackerSnapshotLog");
         Assert.Equal("jsonl", GetRequiredString(snapshotLog, "Format"));
         Assert.False(snapshotLog.GetProperty("IsCreated").GetBoolean());
         Assert.Equal(0, snapshotLog.GetProperty("RecordCount").GetInt32());
+
+        var alignmentLog = root.GetProperty("TrackerSnapshotAlignmentLog");
+        Assert.Equal("jsonl", GetRequiredString(alignmentLog, "Format"));
+        Assert.False(alignmentLog.GetProperty("IsCreated").GetBoolean());
+        Assert.Equal(0, alignmentLog.GetProperty("RecordCount").GetInt32());
 
         var sources = root.GetProperty("TrackerSnapshotSources").EnumerateArray().ToArray();
         Assert.Empty(sources);
@@ -165,6 +171,71 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
 
         Assert.NotNull(method);
         Assert.NotEqual(typeof(void), method!.ReturnType);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: alignment sidecar writer が snapshot sidecar と別 file に source key と capture-time 対応を保存し、metadata から辿れることを確認する。
+    /// </summary>
+    [Fact]
+    public void TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-alignment-session-{Guid.NewGuid():N}");
+        var captureSession = factory.CreateCaptureSession(captureDirectory);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            captureSession,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        using var alignmentWriter = new TrackerSnapshotAlignmentLogWriter(
+            captureSession,
+            snapshotWriter,
+            NullLogger<TrackerSnapshotAlignmentLogWriter>.Instance);
+        var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero);
+        var ownFrame = fixture.CreateFrame(
+            frameNumber: 1200,
+            dataTimestampNs: 81_686_200_000_000,
+            balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 100, yMm: 200)],
+            robots: [],
+            primaryBallTrackId: 1);
+        var ownPacket = fixture.CreatePacketGenerator("ibis", "ibis-runtime").Generate(ownFrame);
+        var externalFrame = fixture.CreateFrame(
+            frameNumber: 2200,
+            dataTimestampNs: 1_778_620_919_000_000_000,
+            balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 300, yMm: 400)],
+            robots: [],
+            primaryBallTrackId: 2);
+        var externalPacket = fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame);
+
+        snapshotWriter.CapturePacket(ownPacket, receivedAt, remoteEndpoint: null, sourceRole: "own", sourceLabel: "ibis");
+        snapshotWriter.CapturePacket(
+            externalPacket,
+            receivedAt.AddMilliseconds(3),
+            remoteEndpoint: "192.0.2.50:12010",
+            sourceRole: "external",
+            sourceLabel: "ER-FORCE");
+        alignmentWriter.CaptureDiagnosticsEntry(ownFrame, receivedAt.AddMilliseconds(5));
+        snapshotWriter.Flush();
+        alignmentWriter.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        var root = metadata.RootElement;
+        var sessionFolder = GetRequiredString(root, "SessionFolder");
+        AssertArtifactPath(root, captureDirectory, sessionFolder, "TrackerSnapshotSidecarPath", mustExist: true);
+        AssertArtifactPath(root, captureDirectory, sessionFolder, "TrackerSnapshotAlignmentPath", mustExist: true);
+        Assert.Equal(2, root.GetProperty("TrackerSnapshotAlignmentLog").GetProperty("RecordCount").GetInt32());
+
+        var alignmentPath = Path.Combine(
+            captureDirectory,
+            GetRequiredString(root, "TrackerSnapshotAlignmentPath"));
+        var externalAlignment = TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
+            .Single(record => record.SourceLabel == "ER-FORCE");
+
+        Assert.Equal(TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule, externalAlignment.MatchingRule);
+        Assert.Equal("external", externalAlignment.SourceRole);
+        Assert.Equal("er-force-uuid", externalAlignment.SourceUuid);
+        Assert.Equal("192.0.2.50:12010", externalAlignment.RemoteEndpoint);
+        Assert.Equal(1200u, externalAlignment.DiagnosticsTrackedFrameNumber);
+        Assert.Equal(2200u, externalAlignment.TrackerSnapshotTrackedFrameNumber);
+        Assert.True(externalAlignment.ReceivedAtDeltaTicks <= TimeSpan.FromMilliseconds(10).Ticks);
     }
 
     private TrackerCoordinator CreateCoordinator(

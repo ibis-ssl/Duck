@@ -269,7 +269,7 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
             "trackerSnapshot source=thirdparty-replay role=external trackedFrame=8101 trackedTs=88001000000 balls=1 robots=1 rawPayloadRestored=True",
             summary.TrackerSnapshotLines);
         Assert.Contains(
-            "trackerComparison rule=nearest-timestamp ibisTs=88000000000 source=thirdparty-replay role=external nearestTs=88001000000 balls=1 robots=1 rawPayloadRestored=True",
+            "trackerComparison rule=saved-session-alignment ibisTs=88000000000 source=thirdparty-replay role=external nearestTs=88001000000 balls=1 robots=1 rawPayloadRestored=True",
             summary.TrackerSnapshotLines);
     }
 
@@ -352,6 +352,30 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
             diagnosticsPath,
             $"2026-05-12T12:00:00.0000000+00:00 Tracker diagnostics profile=sim rawFrame=8001 rawCamera=0 rawBalls=1 rawBallDetails=[x=100,y=200,z=0,c=1] rawBlue=[] rawYellow=[] trackedFrame=8100 trackedBalls=1 trackedBallDetails=[#1:x=100,y=200,z=0,vis=1,q=1,cams=0] trackedRobots=1 trackedRobotDetails=[Y3:x=1200,y=-300,o=0,w=0,vis=1,q=1] ballOutVisibility=0 ballHalfLifeSec=1 ballLifetimeNs=1000000000{Environment.NewLine}");
 
+        var alignmentPath = Path.Combine(sessionFolderPath, TrackerSnapshotAlignmentLogReader.SidecarFileName);
+        File.WriteAllText(
+            alignmentPath,
+            JsonSerializer.Serialize(new
+            {
+                schemaVersion = 1,
+                diagnosticsLineNumber = 1,
+                diagnosticsTrackedFrameNumber = 8100,
+                diagnosticsReceivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero),
+                diagnosticsSessionRelativeTicks = 0,
+                ownSnapshotTimestampNs = 88_000_000_000,
+                sourceRole = "external",
+                sourceLabel = "thirdparty-replay",
+                sourceUuid = "external-replay",
+                remoteEndpoint = "192.0.2.77:10010",
+                trackerSnapshotRecordIndex = 1,
+                trackerSnapshotReceivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 1, TimeSpan.Zero),
+                trackerSnapshotTrackedFrameNumber = 8101,
+                trackerSnapshotTimestampNs = 88_001_000_000,
+                matchingRule = "saved-session-alignment",
+                receivedAtDeltaTicks = TimeSpan.FromSeconds(1).Ticks,
+                status = "ready",
+            }) + Environment.NewLine);
+
         var metadataPath = Path.Combine(sessionFolderPath, "snapshot-session.metadata.json");
         File.WriteAllText(
             metadataPath,
@@ -362,11 +386,20 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
                 DiagnosticsLogPath = Path.Combine(sessionFolder, Path.GetFileName(diagnosticsPath)),
                 RenderSnapshotPath = Path.Combine(sessionFolder, "snapshot-session.render-snapshots.jsonl.gz"),
                 TrackerSnapshotSidecarPath = Path.Combine(sessionFolder, TrackerPacketSnapshotLogReader.SidecarFileName),
+                TrackerSnapshotAlignmentPath = Path.Combine(sessionFolder, TrackerSnapshotAlignmentLogReader.SidecarFileName),
                 TrackerSnapshotLog = new
                 {
                     Format = "jsonl",
                     IsCreated = true,
                     RecordCount = 2,
+                    SkippedRecordCount = 0,
+                    ErrorCount = 0,
+                },
+                TrackerSnapshotAlignmentLog = new
+                {
+                    Format = "jsonl",
+                    IsCreated = true,
+                    RecordCount = 1,
                     SkippedRecordCount = 0,
                     ErrorCount = 0,
                 },

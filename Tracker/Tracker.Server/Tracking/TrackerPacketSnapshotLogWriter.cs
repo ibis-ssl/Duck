@@ -18,6 +18,7 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
     private readonly VisionPacketCaptureSession session;
     private readonly ILogger<TrackerPacketSnapshotLogWriter> logger;
     private readonly Dictionary<string, TrackerPacketSnapshotSourceMetadata> sources = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TrackerPacketSnapshotIndexedRecord> latestSnapshotsBySource = new(StringComparer.Ordinal);
     private StreamWriter? writer;
     private string? capturePath;
     private bool writeFailed;
@@ -165,8 +166,9 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
                 EnsureWriter(record.ReceivedAt);
                 var normalizedRecord = record.EnsureSemanticSummary();
                 writer!.WriteLine(JsonSerializer.Serialize(normalizedRecord, JsonOptions));
+                var recordIndex = recordCount;
                 recordCount++;
-                UpdateSource(normalizedRecord);
+                UpdateSource(normalizedRecord, recordIndex);
                 UpdateMetadata();
                 if (session.FlushEachPacket)
                 {
@@ -197,6 +199,21 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
     }
 
     /// <summary>
+    /// source key ごとの最新 snapshot record を alignment writer に渡す。
+    /// </summary>
+    public IReadOnlyList<TrackerPacketSnapshotIndexedRecord> GetLatestSnapshotsBySource()
+    {
+        lock (gate)
+        {
+            return latestSnapshotsBySource.Values
+                .OrderBy(snapshot => snapshot.Record.SourceRole, StringComparer.Ordinal)
+                .ThenBy(snapshot => snapshot.Record.SourceLabel, StringComparer.Ordinal)
+                .ThenBy(snapshot => snapshot.Record.RemoteEndpoint, StringComparer.Ordinal)
+                .ToArray();
+        }
+    }
+
+    /// <summary>
     /// writer を停止して保持中の file handle を解放する。
     /// </summary>
     public void Dispose()
@@ -219,6 +236,7 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
             skippedRecordCount = 0;
             errorCount = 0;
             sources.Clear();
+            latestSnapshotsBySource.Clear();
             session.Stop();
         }
     }
@@ -243,7 +261,7 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
         logger.LogInformation("Writing tracker packet snapshots to {CapturePath}", capturePath);
     }
 
-    private void UpdateSource(TrackerPacketSnapshotRecord record)
+    private void UpdateSource(TrackerPacketSnapshotRecord record, int recordIndex)
     {
         var key = string.Join(
             '\u001f',
@@ -251,6 +269,7 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
             record.SourceName,
             record.SourceRole,
             record.RemoteEndpoint);
+        latestSnapshotsBySource[key] = new TrackerPacketSnapshotIndexedRecord(recordIndex, record);
         var source = sources.TryGetValue(key, out var existing)
             ? existing with
             {

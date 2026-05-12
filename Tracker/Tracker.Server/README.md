@@ -178,6 +178,15 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 
 CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder 内の `*.jsonl.gz` を渡し、`--settings` には同じ session folder 内の `*.metadata.json` を渡します。この場合、replay は capture 時点の resolved tracker settings を使い、metadata の relative path から `tracker-packet-snapshots.jsonl` と `tracker-snapshot-alignment.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=saved-session-alignment ...` が出れば、保存時対応表に基づく比較まで読めています。alignment がない既存 capture では `legacy-nearest-timestamp` または unsupported status を確認してください。
 
+ER-Force 外部 tracker を手動検証に使う場合は、`Tracker/Tracker.Core/Design/Ref/ibis` 配下の Docker 開発環境を使えます。CI や通常 unit test は Docker に依存させず、手元の再現確認だけで使ってください。
+
+```bash
+cd Tracker/Tracker.Core/Design/Ref/ibis
+./scripts/docker-dev.sh --sim erforce -d
+```
+
+ER-Force profile は同 repository の `docker/dev/README.md` に従います。Tracker.Server 側は `Tracker:Receive:Enabled=true` とし、外部 tracker が送る multicast endpoint と `Tracker:Receive:MulticastAddress` / `Port` / `InterfaceAddress` が合っていることを確認してから CaptureOn します。検証後の停止は同じ directory で `./scripts/docker-dev.sh down` を使います。
+
 自動テストや regression check では exit code を使えます。
 
 ```bash

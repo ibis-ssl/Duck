@@ -100,7 +100,8 @@ internal static class VisionPacketCaptureFile
             MetadataPath: $"{basePath}.metadata.json",
             DiagnosticsLogPath: $"{basePath}.tracker-diagnostics.log",
             RenderSnapshotPath: $"{basePath}.render-snapshots.jsonl.gz",
-            TrackerSnapshotSidecarPath: Path.Combine(sessionFolderPath, "tracker-packet-snapshots.jsonl"));
+            TrackerSnapshotSidecarPath: Path.Combine(sessionFolderPath, "tracker-packet-snapshots.jsonl"),
+            TrackerSnapshotAlignmentSidecarPath: Path.Combine(sessionFolderPath, "tracker-snapshot-alignment.jsonl"));
     }
 
     internal static string ResolveDirectoryPath(string directoryPath)
@@ -116,7 +117,8 @@ internal static class VisionPacketCaptureFile
         string MetadataPath,
         string DiagnosticsLogPath,
         string RenderSnapshotPath,
-        string TrackerSnapshotSidecarPath);
+        string TrackerSnapshotSidecarPath,
+        string TrackerSnapshotAlignmentSidecarPath);
 
     private sealed class CaptureRecordDto
     {

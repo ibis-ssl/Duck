@@ -19,6 +19,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     };
 
     private readonly Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader;
+    private readonly Func<string, IReadOnlyList<TrackerSnapshotAlignmentRecord>> alignmentRecordReader;
     private readonly object cacheLock = new();
     private readonly Dictionary<ComparisonIndexCacheKey, ComparisonSnapshotIndex> indexCache = [];
     private readonly LinkedList<ComparisonIndexCacheKey> indexLru = [];
@@ -27,14 +28,22 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     /// 既定の sidecar JSONL reader で comparison view-state reader を初期化する。
     /// </summary>
     public TrackerDiagnosticsComparisonViewStateReader()
-        : this(ReadSidecarRecords)
+        : this(ReadSidecarRecords, ReadAlignmentRecords)
     {
     }
 
     internal TrackerDiagnosticsComparisonViewStateReader(
         Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader)
+        : this(sidecarRecordReader, ReadAlignmentRecords)
+    {
+    }
+
+    internal TrackerDiagnosticsComparisonViewStateReader(
+        Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader,
+        Func<string, IReadOnlyList<TrackerSnapshotAlignmentRecord>> alignmentRecordReader)
     {
         this.sidecarRecordReader = sidecarRecordReader;
+        this.alignmentRecordReader = alignmentRecordReader;
     }
 
     /// <summary>
@@ -151,11 +160,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 "Tracker snapshot sidecar file was not found.");
         }
 
+        var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
         ComparisonSnapshotIndex comparisonIndex;
-        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath);
+        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
         try
         {
-            comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath);
+            comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath, alignmentPath);
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
         {
@@ -273,11 +283,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 "Tracker snapshot sidecar is not available.");
         }
 
+        var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
         ComparisonSnapshotIndex comparisonIndex;
-        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath);
+        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
         try
         {
-            comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath);
+            comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath, alignmentPath);
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
         {
@@ -300,7 +311,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private ComparisonSnapshotIndex GetOrBuildIndex(
         ComparisonIndexCacheKey cacheKey,
-        string sidecarPath)
+        string sidecarPath,
+        string? alignmentPath)
     {
         lock (cacheLock)
         {
@@ -311,7 +323,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             }
         }
 
-        var builtIndex = BuildIndex(sidecarPath);
+        var builtIndex = BuildIndex(sidecarPath, alignmentPath);
 
         lock (cacheLock)
         {
@@ -347,14 +359,19 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         indexLru.AddFirst(node);
     }
 
-    private ComparisonSnapshotIndex BuildIndex(string sidecarPath)
+    private ComparisonSnapshotIndex BuildIndex(string sidecarPath, string? alignmentPath)
     {
         var snapshots = sidecarRecordReader(sidecarPath)
-            .Select(CreateComparisonSnapshot)
+            .Select((record, index) => CreateComparisonSnapshot(record, index))
             .OrderBy(snapshot => snapshot.TrackedFrameTimestampNs)
             .ThenBy(snapshot => snapshot.ReceivedAt)
             .ToArray();
-        return new ComparisonSnapshotIndex(snapshots);
+        var alignmentRecords = string.IsNullOrWhiteSpace(alignmentPath) || !File.Exists(alignmentPath)
+            ? Array.Empty<TrackerSnapshotAlignmentRecord>()
+            : alignmentRecordReader(alignmentPath)
+                .Where(record => string.Equals(record.Status, TrackerSnapshotAlignmentRecord.ReadyStatus, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+        return new ComparisonSnapshotIndex(snapshots, alignmentRecords);
     }
 
     private static TrackerDiagnosticsComparisonViewState CreateState(
@@ -432,7 +449,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         return records;
     }
 
-    private static ComparisonSnapshot CreateComparisonSnapshot(TrackerPacketSnapshotRecord record)
+    private static IReadOnlyList<TrackerSnapshotAlignmentRecord> ReadAlignmentRecords(string alignmentPath)
+    {
+        return TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath).ToArray();
+    }
+
+    private static ComparisonSnapshot CreateComparisonSnapshot(TrackerPacketSnapshotRecord record, int recordIndex)
     {
         var semanticSummary = CreateSemanticSummary(record, out var rawPayloadRestored);
         var sourceRole = TrackerPacketSnapshotRecord.NormalizeSourceRole(record.SourceRole);
@@ -444,7 +466,10 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             sourceRole);
 
         return new ComparisonSnapshot(
+            recordIndex,
             record.ReceivedAt,
+            record.SourceUuid,
+            record.RemoteEndpoint,
             sourceRole,
             sourceLabel,
             record.TrackedFrameNumber,
@@ -513,6 +538,26 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 selectedEntry.LineNumber);
         }
 
+        var aligned = index.FindAlignedCandidate(selectedEntry.LineNumber, selectedSourceFilter);
+        if (aligned is not null)
+        {
+            var snapshot = aligned.Snapshot;
+            var alignment = aligned.Alignment;
+            return new TrackerDiagnosticsComparisonEntryComparison(
+                TrackerDiagnosticsComparisonEntryStatus.Ready,
+                selectedEntry.LineNumber,
+                alignment.MatchingRule,
+                alignment.OwnSnapshotTimestampNs,
+                snapshot.SourceRole,
+                snapshot.SourceLabel,
+                snapshot.TrackedFrameNumber,
+                snapshot.TrackedFrameTimestampNs,
+                ToNanoseconds(alignment.ReceivedAtDeltaTicks),
+                snapshot.RawPayloadRestored,
+                snapshot.BallCount,
+                snapshot.RobotCount);
+        }
+
         var nearest = index.FindNearestCandidate(selectedSourceFilter, ownSnapshot.TrackedFrameTimestampNs);
         if (nearest is null)
         {
@@ -570,6 +615,32 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 selectedEntry.LineNumber);
         }
 
+        var aligned = index.FindAlignedFieldSourceCandidate(selectedEntry.LineNumber, fieldSource);
+        if (aligned is not null)
+        {
+            var snapshot = aligned.Snapshot;
+            var alignment = aligned.Alignment;
+            var alignedStatus = snapshot.BallCount == 0 && snapshot.RobotCount == 0
+                ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
+            return new TrackerDiagnosticsFieldSourceFrame(
+                alignedStatus,
+                fieldSource,
+                selectedEntry.LineNumber,
+                alignment.MatchingRule,
+                alignment.OwnSnapshotTimestampNs,
+                snapshot.SourceRole,
+                snapshot.SourceLabel,
+                snapshot.TrackedFrameNumber,
+                snapshot.TrackedFrameTimestampNs,
+                ToNanoseconds(alignment.ReceivedAtDeltaTicks),
+                snapshot.RawPayloadRestored,
+                snapshot.SemanticSummary,
+                alignedStatus == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                    ? "Tracker snapshot matched, but it has no drawable balls or robots."
+                    : null);
+        }
+
         var nearest = index.FindNearestFieldSourceCandidate(fieldSource, ownSnapshot.TrackedFrameTimestampNs);
         if (nearest is null)
         {
@@ -625,6 +696,27 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             : Path.Combine(captureDirectory, metadata.TrackerSnapshotSidecarPath));
     }
 
+    private static string? ResolveAlignmentPath(CaptureMetadata metadata, string metadataPath)
+    {
+        if (metadata.TrackerSnapshotAlignmentLog?.IsCreated != true ||
+            string.IsNullOrWhiteSpace(metadata.TrackerSnapshotAlignmentPath))
+        {
+            return null;
+        }
+
+        var sessionDirectory = Path.GetDirectoryName(metadataPath)
+            ?? throw new InvalidDataException("Capture metadata path must have a parent directory.");
+        var captureDirectory = ResolveCaptureDirectory(metadata, sessionDirectory);
+        return Path.GetFullPath(Path.IsPathRooted(metadata.TrackerSnapshotAlignmentPath)
+            ? metadata.TrackerSnapshotAlignmentPath
+            : Path.Combine(captureDirectory, metadata.TrackerSnapshotAlignmentPath));
+    }
+
+    private static long ToNanoseconds(long ticks)
+    {
+        return checked(ticks * 100);
+    }
+
     private static string ResolveCaptureDirectory(CaptureMetadata metadata, string sessionDirectory)
     {
         if (string.IsNullOrWhiteSpace(metadata.SessionFolder))
@@ -659,7 +751,10 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     }
 
     private sealed record ComparisonSnapshot(
+        int RecordIndex,
         DateTimeOffset ReceivedAt,
+        string SourceUuid,
+        string RemoteEndpoint,
         string SourceRole,
         string SourceLabel,
         uint TrackedFrameNumber,
@@ -668,6 +763,10 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         int BallCount,
         int RobotCount,
         TrackerPacketSnapshotSemanticSummary SemanticSummary);
+
+    private sealed record AlignedComparisonSnapshot(
+        TrackerSnapshotAlignmentRecord Alignment,
+        ComparisonSnapshot Snapshot);
 
     private sealed class ComparisonSnapshotIndex
     {
@@ -678,8 +777,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         private readonly ComparisonSnapshot[] nonOwnSnapshots;
         private readonly IReadOnlyDictionary<uint, ComparisonSnapshot[]> ownSnapshotsByFrame;
         private readonly IReadOnlyDictionary<string, ComparisonSnapshot[]> snapshotsBySourceLabel;
+        private readonly IReadOnlyDictionary<int, ComparisonSnapshot> snapshotsByRecordIndex;
+        private readonly IReadOnlyDictionary<int, TrackerSnapshotAlignmentRecord[]> alignmentByDiagnosticsLine;
 
-        public ComparisonSnapshotIndex(ComparisonSnapshot[] snapshots)
+        public ComparisonSnapshotIndex(
+            ComparisonSnapshot[] snapshots,
+            IReadOnlyList<TrackerSnapshotAlignmentRecord> alignmentRecords)
         {
             allSnapshots = snapshots;
             externalSnapshots = FilterByRole(snapshots, "external");
@@ -699,6 +802,18 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     group => group.Key,
                     group => group.ToArray(),
                     StringComparer.Ordinal);
+            snapshotsByRecordIndex = snapshots
+                .GroupBy(snapshot => snapshot.RecordIndex)
+                .ToDictionary(group => group.Key, group => group.First());
+            alignmentByDiagnosticsLine = alignmentRecords
+                .GroupBy(record => record.DiagnosticsLineNumber)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group
+                        .OrderBy(record => record.ReceivedAtDeltaTicks)
+                        .ThenBy(record => record.TrackerSnapshotRecordIndex)
+                        .ThenBy(record => record.RemoteEndpoint, StringComparer.Ordinal)
+                        .ToArray());
             SourceOptions = CreateSourceOptions();
             FieldSourceOptions = CreateFieldSourceOptions();
         }
@@ -716,6 +831,31 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 : null;
         }
 
+        public AlignedComparisonSnapshot? FindAlignedCandidate(
+            int diagnosticsLineNumber,
+            TrackerDiagnosticsComparisonSourceFilter filter)
+        {
+            if (!alignmentByDiagnosticsLine.TryGetValue(diagnosticsLineNumber, out var records))
+            {
+                return null;
+            }
+
+            foreach (var record in records)
+            {
+                if (!MatchesFilter(record, filter))
+                {
+                    continue;
+                }
+
+                if (snapshotsByRecordIndex.TryGetValue(record.TrackerSnapshotRecordIndex, out var snapshot))
+                {
+                    return new AlignedComparisonSnapshot(record, snapshot);
+                }
+            }
+
+            return null;
+        }
+
         public ComparisonSnapshot? FindNearestCandidate(
             TrackerDiagnosticsComparisonSourceFilter filter,
             long targetTimestampNs)
@@ -730,6 +870,14 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         {
             var filter = fieldSource.ToComparisonFilter();
             return filter is null ? null : FindNearestCandidate(filter, targetTimestampNs);
+        }
+
+        public AlignedComparisonSnapshot? FindAlignedFieldSourceCandidate(
+            int diagnosticsLineNumber,
+            TrackerDiagnosticsFieldSource fieldSource)
+        {
+            var filter = fieldSource.ToComparisonFilter();
+            return filter is null ? null : FindAlignedCandidate(diagnosticsLineNumber, filter);
         }
 
         private IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateSourceOptions()
@@ -784,6 +932,26 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                         ? snapshots
                         : [],
                 _ => allSnapshots,
+            };
+        }
+
+        private static bool MatchesFilter(
+            TrackerSnapshotAlignmentRecord record,
+            TrackerDiagnosticsComparisonSourceFilter filter)
+        {
+            return filter.Kind switch
+            {
+                TrackerDiagnosticsComparisonSourceFilterKind.All =>
+                    !string.Equals(record.SourceRole, "own", StringComparison.OrdinalIgnoreCase),
+                TrackerDiagnosticsComparisonSourceFilterKind.External =>
+                    string.Equals(record.SourceRole, "external", StringComparison.OrdinalIgnoreCase),
+                TrackerDiagnosticsComparisonSourceFilterKind.Own =>
+                    string.Equals(record.SourceRole, "own", StringComparison.OrdinalIgnoreCase),
+                TrackerDiagnosticsComparisonSourceFilterKind.Unknown =>
+                    string.Equals(record.SourceRole, "unknown", StringComparison.OrdinalIgnoreCase),
+                TrackerDiagnosticsComparisonSourceFilterKind.SourceLabel =>
+                    string.Equals(record.SourceLabel, filter.Value, StringComparison.Ordinal),
+                _ => false,
             };
         }
 
@@ -888,17 +1056,20 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     private sealed record ComparisonIndexCacheKey(
         FileState DiagnosticsLog,
         FileState Metadata,
-        FileState Sidecar)
+        FileState Sidecar,
+        FileState? Alignment)
     {
         public static ComparisonIndexCacheKey Create(
             string diagnosticsLogPath,
             string metadataPath,
-            string sidecarPath)
+            string sidecarPath,
+            string? alignmentPath)
         {
             return new ComparisonIndexCacheKey(
                 FileState.FromPath(diagnosticsLogPath),
                 FileState.FromPath(metadataPath),
-                FileState.FromPath(sidecarPath));
+                FileState.FromPath(sidecarPath),
+                string.IsNullOrWhiteSpace(alignmentPath) ? null : FileState.FromPath(alignmentPath));
         }
     }
 
@@ -924,7 +1095,11 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         public string TrackerSnapshotSidecarPath { get; init; } = "";
 
+        public string TrackerSnapshotAlignmentPath { get; init; } = "";
+
         public TrackerSnapshotLogMetadata? TrackerSnapshotLog { get; init; }
+
+        public TrackerSnapshotLogMetadata? TrackerSnapshotAlignmentLog { get; init; }
     }
 
     private sealed class TrackerSnapshotLogMetadata

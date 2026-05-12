@@ -11,21 +11,21 @@ public sealed partial class TrackerCoordinator
     /// <summary>
     /// diagnostics log schema と render snapshot 参照を揃えるため、最新 committed frame とその source detection だけを出力する。
     /// </summary>
-    private void LogTrackerDiagnostics(
+    private TrackerFrame? LogTrackerDiagnostics(
         SSL_WrapperPacket? packet,
         TrackerUpdateResult result,
         DateTimeOffset receivedAt)
     {
         if (result.CommittedFrames.Count == 0)
         {
-            return;
+            return null;
         }
 
         var newestFrame = result.CommittedFrames[^1];
         var sourceDetections = newestFrame.SourceDetections;
         if (!ShouldLogTrackerDiagnostics(receivedAt, newestFrame))
         {
-            return;
+            return null;
         }
 
         lastTrackerDiagnosticsLogAt = receivedAt;
@@ -65,6 +65,7 @@ public sealed partial class TrackerCoordinator
         }
 
         AppendTrackerDiagnosticsFile(diagnosticsLine, receivedAt);
+        return newestFrame;
     }
 
     private void AppendTrackerDiagnosticsFile(string diagnosticsLine, DateTimeOffset receivedAt)
