@@ -74,7 +74,16 @@
   - `TrackerSnapshotSidecar_RecordContract_KeepsRawDerivedSemanticSummary`: `TrackerPacketSnapshotRecord.SemanticSummary` が存在しないため失敗。
 - NuGet vulnerability data の read-only cache warning が出たが、test assembly の build と実行は完了した。
 - `tasks-status.md` / `phases-status.md` は、`TRACKER-044` が TDD failing test 作成済み・production 実装待ちである状態へ同期した。
-- commit / push / PR 証跡は commit 後に追記する。
+- TDD commit hash: `c2d41458aaec6d63a18e128cd9be5fd8f0f87756`
+- push 結果: `89e7929..c2d4145  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
+- PR #9: `https://github.com/ibis-ssl/Duck/pull/9`
+  - state: `OPEN`
+  - draft: `true`
+  - base: `main`
+  - head: `feat/tracker-captureon-compare-log`
+  - headRefOid: `c2d41458aaec6d63a18e128cd9be5fd8f0f87756`
+- この証跡追記は report-only commit として別途 PR #9 branch へ push する。
 
 ## リスク
 
