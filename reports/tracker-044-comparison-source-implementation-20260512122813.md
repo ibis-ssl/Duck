@@ -46,7 +46,9 @@
 - `DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" NUGET_PACKAGES="$PWD/.codex-nuget-packages" dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false`
 - `git diff --check`
 - `git status --short --branch`
-- commit / push / PR 確認コマンドは commit 後に追記する。
+- `git rev-parse HEAD`
+- `git push origin feat/tracker-captureon-compare-log`
+- `gh pr view 9 --repo ibis-ssl/Duck --json number,title,state,isDraft,headRefName,baseRefName,url,headRefOid`
 
 ## 対象ファイル
 
@@ -87,9 +89,15 @@
 - full test 結果: 175 passed / 0 failed / 0 skipped。
 - test 実行時に NuGet vulnerability data の read-only cache warning が出たが、build / test は成功した。
 - `tasks-status.md` / `phases-status.md` は `TRACKER-044` production 実装・focused/full test 完了、gpt-5.5 high review待ちへ同期した。
-- commit hash: 後続追記。
-- push 結果: 後続追記。
+- implementation commit hash: `253c22d48db156d63b4e97ab6c684f9733c704fa`
+- implementation push 結果: `4a4d07a..253c22d  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- implementation push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
 - PR #9: `https://github.com/ibis-ssl/Duck/pull/9`
+  - state: `OPEN`
+  - draft: `true`
+  - base: `main`
+  - head: `feat/tracker-captureon-compare-log`
+  - headRefOid: `253c22d48db156d63b4e97ab6c684f9733c704fa`
 
 ## リスク
 
