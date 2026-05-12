@@ -274,6 +274,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             ownSnapshot.TrackedFrameTimestampNs,
             nearest.SourceRole,
             nearest.SourceLabel,
+            nearest.TrackedFrameNumber,
             nearest.TrackedFrameTimestampNs,
             timestampDeltaNs,
             nearest.RawPayloadRestored,
@@ -640,6 +641,7 @@ public enum TrackerDiagnosticsComparisonEntryStatus
 /// <param name="IbisOwnSnapshotTimestampNs">基準にした ibis own snapshot の TrackedFrame.timestamp。</param>
 /// <param name="NearestSnapshotSourceRole">nearest snapshot の source role。</param>
 /// <param name="NearestSnapshotSourceLabel">nearest snapshot の source label。</param>
+/// <param name="NearestSnapshotTrackedFrameNumber">nearest snapshot の TrackedFrame.frame_number。</param>
 /// <param name="NearestSnapshotTimestampNs">nearest snapshot の TrackedFrame.timestamp。</param>
 /// <param name="TimestampDeltaNs">基準 timestamp と nearest snapshot timestamp の絶対差分。</param>
 /// <param name="RawPayloadRestored">nearest snapshot の raw payload を protobuf として復元できる場合は true。</param>
@@ -652,6 +654,7 @@ public sealed record TrackerDiagnosticsComparisonEntryComparison(
     long? IbisOwnSnapshotTimestampNs,
     string? NearestSnapshotSourceRole,
     string? NearestSnapshotSourceLabel,
+    uint? NearestSnapshotTrackedFrameNumber,
     long? NearestSnapshotTimestampNs,
     long? TimestampDeltaNs,
     bool? RawPayloadRestored,
@@ -673,6 +676,7 @@ public sealed record TrackerDiagnosticsComparisonEntryComparison(
             ibisOwnSnapshotTimestampNs,
             NearestSnapshotSourceRole: null,
             NearestSnapshotSourceLabel: null,
+            NearestSnapshotTrackedFrameNumber: null,
             NearestSnapshotTimestampNs: null,
             TimestampDeltaNs: null,
             RawPayloadRestored: null,

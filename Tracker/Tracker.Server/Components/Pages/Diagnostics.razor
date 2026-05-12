@@ -6,6 +6,7 @@
 @using Tracker.Server.Tracking
 @inject TrackerDiagnosticsLogReader LogReader
 @inject TrackerRenderSnapshotLogReader RenderSnapshotReader
+@inject TrackerDiagnosticsComparisonViewStateReader ComparisonReader
 
 <PageTitle>Diagnostics</PageTitle>
 
@@ -116,6 +117,73 @@
                     {
                         <div class="diagnostics-profile-alert">@profileMetadataError</div>
                     }
+
+                    <section class="diagnostics-comparison" aria-label="Tracker comparison">
+                        <header class="diagnostics-comparison__header">
+                            <h2>Tracker Comparison</h2>
+                            <select class="diagnostics-select diagnostics-comparison__select"
+                                    value="@ComparisonSourceFilterValue()"
+                                    @onchange="OnComparisonSourceFilterChanged"
+                                    aria-label="Comparison source filter">
+                                @foreach (var option in ComparisonViewState.SourceOptions)
+                                {
+                                    <option value="@TrackerDiagnosticsComparisonUiState.ToFilterValue(option.Filter)">
+                                        @option.Label (@option.RecordCount)
+                                    </option>
+                                }
+                            </select>
+                        </header>
+
+                        <dl class="diagnostics-comparison__stats">
+                            <dt>Status</dt>
+                            <dd>@ComparisonViewState.SidecarStatus</dd>
+                            <dt>Records</dt>
+                            <dd>@ComparisonViewState.RecordCount</dd>
+                            <dt>Skipped</dt>
+                            <dd>@ComparisonViewState.SkippedRecordCount</dd>
+                            <dt>Errors</dt>
+                            <dd>@ComparisonViewState.ErrorCount</dd>
+                            <dt>Selected frame</dt>
+                            <dd>@Display(selectedEntry.TrackedFrame)</dd>
+                            <dt>Selected time</dt>
+                            <dd>@selectedEntry.Timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)</dd>
+                        </dl>
+
+                        @if (!string.IsNullOrEmpty(ComparisonViewState.Error))
+                        {
+                            <div class="diagnostics-comparison__alert">@ComparisonViewState.Error</div>
+                        }
+
+                        @if (ComparisonViewState.SelectedEntryComparison is { } comparison)
+                        {
+                            <dl class="diagnostics-comparison__stats diagnostics-comparison__stats--comparison">
+                                <dt>Entry status</dt>
+                                <dd>@comparison.Status</dd>
+                                <dt>Line</dt>
+                                <dd>@Display(comparison.EntryLineNumber)</dd>
+                                <dt>Rule</dt>
+                                <dd>@Display(comparison.MatchingRule)</dd>
+                                <dt>Source role</dt>
+                                <dd>@Display(comparison.NearestSnapshotSourceRole)</dd>
+                                <dt>Source label</dt>
+                                <dd>@Display(comparison.NearestSnapshotSourceLabel)</dd>
+                                <dt>Snapshot frame</dt>
+                                <dd>@Display(comparison.NearestSnapshotTrackedFrameNumber)</dd>
+                                <dt>Own timestamp ns</dt>
+                                <dd>@Display(comparison.IbisOwnSnapshotTimestampNs)</dd>
+                                <dt>Nearest timestamp ns</dt>
+                                <dd>@Display(comparison.NearestSnapshotTimestampNs)</dd>
+                                <dt>Delta ns</dt>
+                                <dd>@Display(comparison.TimestampDeltaNs)</dd>
+                                <dt>Balls</dt>
+                                <dd>@Display(comparison.BallCount)</dd>
+                                <dt>Robots</dt>
+                                <dd>@Display(comparison.RobotCount)</dd>
+                                <dt>Raw payload</dt>
+                                <dd>@DisplayRawPayloadRestored(comparison.RawPayloadRestored)</dd>
+                            </dl>
+                        }
+                    </section>
 
                     @if (selectedRenderSnapshot is not null)
                     {

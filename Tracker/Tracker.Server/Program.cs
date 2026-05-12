@@ -44,6 +44,7 @@ builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
 builder.Services.AddSingleton<TrackerCoordinator>();
 builder.Services.AddSingleton<TrackerDiagnosticsLogReader>();
 builder.Services.AddSingleton<TrackerRenderSnapshotLogReader>();
+builder.Services.AddSingleton<TrackerDiagnosticsComparisonViewStateReader>();
 builder.Services.AddSingleton<TrackerProfileRequestService>();
 builder.Services.AddSingleton<VisionPacketStore>();
 builder.Services.AddSingleton<VisionPacketCaptureSession>();

@@ -35,6 +35,7 @@ public partial class Diagnostics : IDisposable
     private double timelineResizeStartX;
     private CancellationTokenSource? playbackCancellationTokenSource;
     private DiagnosticsPlaybackMode playbackMode = DiagnosticsPlaybackMode.Stopped;
+    private TrackerDiagnosticsComparisonUiState? comparisonUiState;
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
 
@@ -43,6 +44,9 @@ public partial class Diagnostics : IDisposable
         : FindEntryIndex(selectedEntry);
 
     private bool CanPlayback => entries.Count > 1;
+
+    private TrackerDiagnosticsComparisonViewState ComparisonViewState =>
+        comparisonUiState?.ViewState ?? TrackerDiagnosticsComparisonUiState.InitialViewState;
 
     private TrackedVisionViewState trackedRenderView =>
         selectedRenderSnapshot is null
@@ -59,6 +63,7 @@ public partial class Diagnostics : IDisposable
     /// </summary>
     protected override void OnInitialized()
     {
+        comparisonUiState = new TrackerDiagnosticsComparisonUiState(ComparisonReader);
         LoadFiles();
         LoadSelectedFile();
     }
@@ -76,6 +81,7 @@ public partial class Diagnostics : IDisposable
         var requestedLogPath = args.Value?.ToString();
         selectedLogPath = logFiles.FirstOrDefault(file => file.FullPath == requestedLogPath)?.FullPath;
         StopPlayback();
+        comparisonUiState?.ResetFilter();
         LoadSelectedFile();
         return Task.CompletedTask;
     }
@@ -103,6 +109,7 @@ public partial class Diagnostics : IDisposable
             profileMetadataIndex = DiagnosticsProfileMetadataIndex.Empty;
             profileMetadata = null;
             profileMetadataError = null;
+            SyncComparisonState();
             return;
         }
 
@@ -114,6 +121,7 @@ public partial class Diagnostics : IDisposable
         UpdateProfileMetadataForSelectedEntry();
         LoadRenderSnapshotIndex();
         LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     // timeline / scrubber の選択 entry 変更に合わせて、metadata 表示と render snapshot を同じ frame に同期する。
@@ -122,6 +130,7 @@ public partial class Diagnostics : IDisposable
         selectedEntry = entry;
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     private void OnTimelineScrubbed(ChangeEventArgs args)
@@ -160,12 +169,14 @@ public partial class Diagnostics : IDisposable
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
             profileMetadata = null;
+            SyncComparisonState();
             return;
         }
 
         selectedEntry = entries[Math.Clamp(index, 0, entries.Count - 1)];
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     private int FindEntryIndex(TrackerDiagnosticsLogEntry entry)
@@ -300,9 +311,50 @@ public partial class Diagnostics : IDisposable
         return timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture);
     }
 
-    private static string Display(string value)
+    private static string Display(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+
+    private static string Display(int? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string Display(uint? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string Display(long? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string DisplayRawPayloadRestored(bool? value)
+    {
+        return value switch
+        {
+            true => "Restored",
+            false => "Missing",
+            _ => "-",
+        };
+    }
+
+    private string ComparisonSourceFilterValue()
+    {
+        return TrackerDiagnosticsComparisonUiState.ToFilterValue(ComparisonViewState.SelectedSourceFilter);
+    }
+
+    private Task OnComparisonSourceFilterChanged(ChangeEventArgs args)
+    {
+        comparisonUiState?.SelectFilterValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
+        return Task.CompletedTask;
+    }
+
+    private void SyncComparisonState()
+    {
+        comparisonUiState?.Load(selectedLogPath, selectedEntry);
     }
 
     private Task StartPlaybackAsync(DiagnosticsPlaybackMode mode)

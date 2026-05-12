@@ -60,6 +60,7 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         Assert.Equal("nearest-timestamp", comparison.MatchingRule);
         Assert.Equal("external", comparison.NearestSnapshotSourceRole);
         Assert.Equal("thirdparty-a", comparison.NearestSnapshotSourceLabel);
+        Assert.Equal(9101u, comparison.NearestSnapshotTrackedFrameNumber);
         Assert.Equal(91_004_000_000, comparison.NearestSnapshotTimestampNs);
         Assert.Equal(4_000_000, comparison.TimestampDeltaNs);
         Assert.True(comparison.RawPayloadRestored);
@@ -90,6 +91,7 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         var comparison = state.SelectedEntryComparison!;
         Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.OwnSnapshotMissing, comparison.Status);
         Assert.Null(comparison.NearestSnapshotSourceLabel);
+        Assert.Null(comparison.NearestSnapshotTrackedFrameNumber);
     }
 
     /// <summary>
@@ -122,8 +124,85 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, comparison.Status);
         Assert.Equal(2, comparison.EntryLineNumber);
         Assert.Equal(93_010_000_000, comparison.IbisOwnSnapshotTimestampNs);
+        Assert.Equal(9301u, comparison.NearestSnapshotTrackedFrameNumber);
         Assert.Equal(93_014_000_000, comparison.NearestSnapshotTimestampNs);
         Assert.Equal(3, comparison.BallCount);
+        Assert.Equal(3, comparison.RobotCount);
+    }
+
+    /// <summary>
+    /// diagnostics UI の同期 state が表示済み entry から comparison selected-entry を作り、full file index ずれを再発させないことを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_Load_UsesDisplayedEntrySelectionForComparison()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9300, 93_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9300, 93_004_000_000, ballCount: 2, robotCount: 2),
+                SnapshotInput("ibis-runtime", "ibis", "own", 9301, 93_010_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9301, 93_014_000_000, ballCount: 3, robotCount: 3),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrames: Enumerable.Range(9300, 10_001).Select(frame => (uint)frame).ToArray());
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var displayedEntry = ReadDisplayedEntries(session.DiagnosticsPath).First();
+
+        uiState.SelectFilter(
+            TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("thirdparty-a"),
+            session.DiagnosticsPath,
+            displayedEntry);
+
+        Assert.Equal(TrackerDiagnosticsComparisonSourceFilterKind.SourceLabel, uiState.SelectedSourceFilter.Kind);
+        Assert.NotNull(uiState.ViewState.SelectedEntryComparison);
+        var comparison = uiState.ViewState.SelectedEntryComparison!;
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, comparison.Status);
+        Assert.Equal(2, comparison.EntryLineNumber);
+        Assert.Equal(93_010_000_000, comparison.IbisOwnSnapshotTimestampNs);
+        Assert.Equal(9301u, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(93_014_000_000, comparison.NearestSnapshotTimestampNs);
+        Assert.Equal(3, comparison.BallCount);
+        Assert.Equal(3, comparison.RobotCount);
+    }
+
+    /// <summary>
+    /// diagnostics UI の source filter select 値から source label filter を選び、selected entry comparison を再計算できることを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_SelectFilterValue_RecomputesComparisonForSourceLabelOption()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9100, 91_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9101, 91_004_000_000, ballCount: 2, robotCount: 2),
+                SnapshotInput("external-b", "thirdparty-b", "external", 9102, 91_020_000_000, ballCount: 1, robotCount: 3),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0);
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var displayedEntry = ReadDisplayedEntries(session.DiagnosticsPath).Single();
+        uiState.Load(session.DiagnosticsPath, displayedEntry);
+
+        var selected = uiState.SelectFilterValue(
+            TrackerDiagnosticsComparisonUiState.ToFilterValue(
+                TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("thirdparty-b")),
+            session.DiagnosticsPath,
+            displayedEntry);
+
+        Assert.True(selected);
+        Assert.Equal(TrackerDiagnosticsComparisonSourceFilterKind.SourceLabel, uiState.SelectedSourceFilter.Kind);
+        Assert.Equal("thirdparty-b", uiState.SelectedSourceFilter.Value);
+        Assert.NotNull(uiState.ViewState.SelectedEntryComparison);
+        var comparison = uiState.ViewState.SelectedEntryComparison!;
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, comparison.Status);
+        Assert.Equal("thirdparty-b", comparison.NearestSnapshotSourceLabel);
+        Assert.Equal(9102u, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(91_020_000_000, comparison.NearestSnapshotTimestampNs);
+        Assert.Equal(20_000_000, comparison.TimestampDeltaNs);
+        Assert.Equal(1, comparison.BallCount);
         Assert.Equal(3, comparison.RobotCount);
     }
 

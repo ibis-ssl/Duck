@@ -358,6 +358,70 @@
     margin-bottom: 0.75rem;
 }
 
+.diagnostics-comparison {
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #0b1a11;
+    margin-bottom: 0.25rem;
+    padding: 0.35rem;
+}
+
+.diagnostics-comparison__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    margin-bottom: 0.26rem;
+}
+
+.diagnostics-comparison__header h2 {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.diagnostics-comparison__select {
+    flex: 0 1 20rem;
+    min-height: 1.7rem;
+    font-size: 0.72rem;
+}
+
+.diagnostics-comparison__stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.18rem;
+    margin: 0;
+}
+
+.diagnostics-comparison__stats dt,
+.diagnostics-comparison__stats dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 0.68rem;
+}
+
+.diagnostics-comparison__stats dt {
+    color: #89a38b;
+}
+
+.diagnostics-comparison__stats dd {
+    margin: 0;
+    color: #f3f8ef;
+}
+
+.diagnostics-comparison__stats--comparison {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin-top: 0.25rem;
+}
+
+.diagnostics-comparison__alert {
+    border-left: 4px solid #ffb454;
+    background: #332918;
+    color: #ffe2ad;
+    margin-top: 0.25rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.72rem;
+}
+
 .diagnostics-profile-alert {
     margin-bottom: 0.2rem;
 }
@@ -474,7 +538,7 @@
 .diagnostics-shell--render .diagnostics-render {
     flex: 0 1 var(--diagnostics-render-height);
     min-height: 18rem;
-    max-height: calc(100% - 9rem);
+    max-height: calc(100% - 14rem);
     margin-bottom: 0.04rem;
 }
 
@@ -513,6 +577,11 @@
 
     .diagnostics-detail__columns {
         grid-template-columns: 1fr;
+    }
+
+    .diagnostics-comparison__stats,
+    .diagnostics-comparison__stats--comparison {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .diagnostics-profile__grid {
@@ -605,6 +674,21 @@
     .diagnostics-scrubber {
         grid-template-columns: 1fr;
         gap: 0.45rem;
+    }
+
+    .diagnostics-comparison__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .diagnostics-comparison__select {
+        flex-basis: auto;
+        width: 100%;
+    }
+
+    .diagnostics-comparison__stats,
+    .diagnostics-comparison__stats--comparison {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .diagnostics-grid,
