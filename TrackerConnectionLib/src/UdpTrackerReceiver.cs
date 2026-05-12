@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
 namespace TrackerConnectionLib;
@@ -23,6 +24,15 @@ public sealed class UdpTrackerReceiver<TPacket> : IDisposable
     public UdpTrackerReceiver(
         int port,
         ITrackerDeserializer<TPacket> deserializer)
+        : this(port, null, deserializer, null)
+    {
+    }
+
+    public UdpTrackerReceiver(
+        int port,
+        string? multicastAddress,
+        ITrackerDeserializer<TPacket> deserializer,
+        string? interfaceAddress = null)
     {
         _deserializer = deserializer;
 
@@ -34,7 +44,13 @@ public sealed class UdpTrackerReceiver<TPacket> : IDisposable
             true);
 
         _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+
+        if (!string.IsNullOrWhiteSpace(multicastAddress))
+        {
+            JoinMulticastGroup(_udpClient, multicastAddress, interfaceAddress);
+        }
     }
+
     public void Start()
     {
         if (_receiveTask is not null)
@@ -115,6 +131,89 @@ public sealed class UdpTrackerReceiver<TPacket> : IDisposable
                 Interlocked.Increment(ref handlerErrorCount);
             }
         }
+    }
+
+    private static void JoinMulticastGroup(
+        UdpClient udpClient,
+        string multicastAddress,
+        string? interfaceAddress)
+    {
+        if (!IPAddress.TryParse(multicastAddress, out var groupAddress))
+        {
+            throw new InvalidOperationException($"Invalid tracker multicast address '{multicastAddress}'.");
+        }
+
+        if (!IsMulticast(groupAddress))
+        {
+            return;
+        }
+
+        var candidateAddresses = ResolveMulticastJoinAddresses(interfaceAddress);
+        if (candidateAddresses.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"No IPv4 interface is available to join tracker multicast group '{groupAddress}'.");
+        }
+
+        var failedInterfaces = new List<string>();
+        SocketException? firstSocketException = null;
+        var joinedCount = 0;
+
+        foreach (var candidateAddress in candidateAddresses)
+        {
+            try
+            {
+                udpClient.JoinMulticastGroup(groupAddress, candidateAddress);
+                joinedCount++;
+            }
+            catch (SocketException ex)
+            {
+                firstSocketException ??= ex;
+                failedInterfaces.Add($"{candidateAddress} ({ex.SocketErrorCode})");
+            }
+        }
+
+        if (joinedCount > 0)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"Failed to join tracker multicast group '{groupAddress}' on any local IPv4 interface. " +
+            $"Tried: {string.Join(", ", failedInterfaces)}",
+            firstSocketException);
+    }
+
+    private static bool IsMulticast(IPAddress address)
+    {
+        var bytes = address.GetAddressBytes();
+        return bytes.Length == 4 && bytes[0] >= 224 && bytes[0] <= 239;
+    }
+
+    private static IReadOnlyList<IPAddress> ResolveMulticastJoinAddresses(string? interfaceAddress)
+    {
+        if (!string.IsNullOrWhiteSpace(interfaceAddress))
+        {
+            if (!IPAddress.TryParse(interfaceAddress, out var parsedAddress) ||
+                parsedAddress.AddressFamily != AddressFamily.InterNetwork)
+            {
+                throw new InvalidOperationException($"Invalid tracker receiver interface address '{interfaceAddress}'.");
+            }
+
+            return [parsedAddress];
+        }
+
+        return NetworkInterface.GetAllNetworkInterfaces()
+            .Where(networkInterface =>
+                networkInterface.OperationalStatus == OperationalStatus.Up &&
+                (networkInterface.SupportsMulticast ||
+                 networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback))
+            .SelectMany(networkInterface => networkInterface.GetIPProperties().UnicastAddresses)
+            .Select(unicastAddress => unicastAddress.Address)
+            .Where(address => address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.Any.Equals(address))
+            .Distinct()
+            .OrderBy(address => IPAddress.IsLoopback(address) ? 1 : 0)
+            .ToArray();
     }
 
     public void Dispose()

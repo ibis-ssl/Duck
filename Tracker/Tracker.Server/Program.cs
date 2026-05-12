@@ -12,6 +12,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.Configure<VisionReceiverOptions>(builder.Configuration.GetSection("VisionReceiver"));
 builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection("Tracker"));
+var startupTrackerOptions = builder.Configuration.GetSection("Tracker").Get<TrackerOptions>() ?? new TrackerOptions();
 builder.Services.AddSingleton(serviceProvider =>
 {
     var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
@@ -56,16 +57,23 @@ builder.Services.AddSingleton(serviceProvider =>
         publisherOptions.Uuid,
         publisherOptions.SourceName);
 });
-builder.Services.AddSingleton(serviceProvider =>
+if (startupTrackerOptions.Receive.Enabled)
 {
-    var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
-    return new UdpTrackerReceiver<TrackerPacketAdapter>(
-        publisherOptions.Port,
-        new TrackerWrapperPacketDeserializer());
-});
-builder.Services.AddSingleton<TrackerConnectionLibSnapshotRecorder>();
+    builder.Services.AddSingleton(serviceProvider =>
+    {
+        var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
+        var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
+        return new UdpTrackerReceiver<TrackerPacketAdapter>(
+            publisherOptions.Port,
+            publisherOptions.MulticastAddress,
+            new TrackerWrapperPacketDeserializer(),
+            trackerOptions.Receive.InterfaceAddress);
+    });
+    builder.Services.AddSingleton<TrackerConnectionLibSnapshotRecorder>();
+    builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();
+}
+
 builder.Services.AddHostedService<VisionReceiverService>();
-builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();
 
 var app = builder.Build();
 

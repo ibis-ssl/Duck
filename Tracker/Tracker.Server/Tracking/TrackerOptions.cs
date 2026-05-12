@@ -18,6 +18,11 @@ public sealed class TrackerOptions
     public bool PublishUdp { get; init; } = true;
 
     /// <summary>
+    /// live official tracker packet receiver の起動設定。
+    /// </summary>
+    public TrackerReceiveOptions Receive { get; init; } = new();
+
+    /// <summary>
     /// publish する wrapper packet の source name。
     /// </summary>
     public string SourceName { get; init; } = "ibisduck-tracker";
@@ -61,6 +66,22 @@ public sealed class TrackerDiagnosticsOptions
     /// diagnostics log を固定出力する path。未指定時は capture sidecar または自動生成 path を使う。
     /// </summary>
     public string? FilePath { get; init; }
+}
+
+/// <summary>
+/// live official tracker packet receiver の appsettings schema。
+/// </summary>
+public sealed class TrackerReceiveOptions
+{
+    /// <summary>
+    /// official tracker packet の UDP 受信を有効化するかどうか。
+    /// </summary>
+    public bool Enabled { get; init; }
+
+    /// <summary>
+    /// multicast join に使う local IPv4 address。未指定時は候補 interface から選ぶ。
+    /// </summary>
+    public string? InterfaceAddress { get; init; }
 }
 
 /// <summary>
