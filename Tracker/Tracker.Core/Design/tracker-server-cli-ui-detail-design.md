@@ -50,7 +50,7 @@ diagnostics log 側は互換追加に留める。
 - metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などを optional field として追加する
 - snapshot sidecar がない既存ログを引き続き読めるようにする
 
-sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis frame と再比較できるよう次を保持する。
+sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis frame と再比較できるよう次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできることを入力契約にする。
 
 - `receivedAt`
 - remote endpoint
@@ -60,7 +60,7 @@ sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis 
 - tracked frame number
 - tracked frame timestamp
 - raw payload base64、または raw payload を session folder 内で復元できる参照情報
-- ball / robot count、team / robot id、代表位置などの比較・一覧表示用 summary
+- raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary などの比較・一覧表示用 summary
 - decode failure、tracked frame 欠落、timestamp 欠落などを示す skipped/error 情報
 
 ## source 識別と role分類
@@ -69,7 +69,7 @@ sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis 
 
 どちらかが空、設定と異なる、または他 tracker と衝突する場合も record を破棄しない。remote endpoint と受信経路を併記し、role を `unknown` や `ambiguous` として扱う。self / 3rdparty / unknown の判別は、保存後の表示名、フィルタ、比較対象選択のための metadata であり、保存可否を決める条件ではない。
 
-同じ `uuid` で `sourceName` が異なる場合、または `sourceName` が空の場合も、record を破棄せず source identity の不足として保存する。
+同じ `uuid` で `sourceName` が異なる場合、または `sourceName` が空の場合も、record を破棄せず source identity の不足として保存する。source ごとの active tracker API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクとして扱う。通常経路では raw payload と source identity を落とさず、衝突時も `unknown` / `ambiguous` として保存できれば比較元データは保持されるため、保存処理の blocker にはしない。
 
 ## timestamp 比較
 
@@ -103,11 +103,11 @@ replay / diagnostics / playback の出力は、少なくとも次を確認でき
 
 ## 後続タスクへの固定事項
 
-- `TRACKER-041` では、既存の self除外 test / 実装が新方針と矛盾するため、次に test contract を all tracker 保存へ修正する。ibis 自身の official packet も保持し、source role は保存後の metadata として検証する。
-- `TRACKER-042` では、CaptureOn session folder と metadata の relative path 契約を test で固定し、tracker packet snapshot sidecar path、source role metadata、snapshot log 設定を追加する。
-- `TRACKER-043` では、CaptureOn 中に見えている tracker packet をすべて session folder 配下の sidecar JSONL へ保存する。
-- `TRACKER-044` では、diagnostics / replay / playback で metadata relative path から snapshot sidecar を解決し、ibis committed frame と tracker packet snapshot を timestamp 近傍比較・再生できるようにする。
-- `TRACKER-045` では、UI / README / 運用証跡を整え、session folder 配下の既存 capture / diagnostics / render snapshot 表示を壊していないことを確認する。
+- `TRACKER-041` では、既存の self除外前提を取り下げ、見えている `TrackerWrapperPacket` をすべて snapshot sidecar へ保存する方針へ設計と tracking を修正する。
+- `TRACKER-042` では、all tracker 保存 contract の production 実装を行い、own / external / unknown tracker packet の observed / snapshot state 保持と raw payload 復元可能性を固定する。
+- `TRACKER-043` では、CaptureOn session folder と metadata の relative path 契約を test / 実装で固定し、tracker packet snapshot sidecar path、source role metadata、snapshot log 設定、reader 入力契約を追加する。
+- `TRACKER-044` では、CaptureOn 中に見えている tracker packet をすべて session folder 配下の sidecar JSONL へ保存する。表示用 snapshot だけでなく比較用の raw payload または復元可能参照を保持し、writer / reader round-trip と raw由来 semantic summary を TDD 前提にする。
+- `TRACKER-045` では、diagnostics / replay / playback で metadata relative path から snapshot sidecar を解決し、ibis committed frame と tracker packet snapshot を timestamp 近傍比較・再生できるようにし、UI / README / 運用証跡を整えて既存 capture / diagnostics / render snapshot 表示を壊していないことを確認する。
 
 ## 完了条件
 

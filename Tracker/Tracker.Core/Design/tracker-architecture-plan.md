@@ -125,7 +125,7 @@ snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない
 
 session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。
 
-sidecar JSONL の各 record は少なくとも次を保持する。
+sidecar JSONL の各 record は少なくとも次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできるようにする。
 
 - `receivedAt`
 - remote endpoint
@@ -135,10 +135,10 @@ sidecar JSONL の各 record は少なくとも次を保持する。
 - tracked frame number
 - tracked frame timestamp
 - raw payload、または session folder 内で raw payload を復元できる参照情報
-- 後から比較・一覧表示するための summary
+- raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary など、後から比較・一覧表示するための summary
 - decode / schema error がある場合の skipped/error 情報
 
-ibis tracker の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 tracker と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。
+ibis tracker の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 tracker と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active tracker API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
 
 ibis committed frame と tracker packet snapshot は publish frequency が一致しない前提で扱う。比較は exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint / role は後から再計算できるように保存する。
 
