@@ -35,10 +35,8 @@ public sealed class MultiTrackerManager<TPacket>
     public void ProcessPacket(TPacket packet, EndPoint? remoteEndpoint, DateTimeOffset receivedAt)
     {
         var now = DateTime.UtcNow;
-        if (IsSelfPacket(packet))
-        {
-            return;
-        }
+        var sourceRole = GetSourceRole(packet);
+        var sourceLabel = GetSourceLabel(packet, remoteEndpoint, sourceRole);
 
         var trackerKey = CreateTrackerKey(packet, remoteEndpoint);
 
@@ -50,6 +48,8 @@ public sealed class MultiTrackerManager<TPacket>
                 SourceName = packet.SourceName,
                 RemoteEndpoint = remoteEndpoint,
                 ReceivedAt = receivedAt,
+                SourceRole = sourceRole,
+                SourceLabel = sourceLabel,
                 LastUpdateUtc = now,
                 LastPacket = packet
             },
@@ -58,6 +58,8 @@ public sealed class MultiTrackerManager<TPacket>
                 existing.SourceName = packet.SourceName;
                 existing.RemoteEndpoint = remoteEndpoint;
                 existing.ReceivedAt = receivedAt;
+                existing.SourceRole = sourceRole;
+                existing.SourceLabel = sourceLabel;
                 existing.LastUpdateUtc = now;
                 existing.LastPacket = packet;
                 return existing;
@@ -73,10 +75,41 @@ public sealed class MultiTrackerManager<TPacket>
         }
     }
 
-    private bool IsSelfPacket(TPacket packet)
+    private string GetSourceRole(TPacket packet)
     {
-        return string.Equals(packet.Uuid, _selfUuid, StringComparison.Ordinal)
-            && string.Equals(packet.SourceName, _selfSourceName, StringComparison.Ordinal);
+        if (string.Equals(packet.Uuid, _selfUuid, StringComparison.Ordinal)
+            && string.Equals(packet.SourceName, _selfSourceName, StringComparison.Ordinal))
+        {
+            return "own";
+        }
+
+        if (string.IsNullOrWhiteSpace(packet.Uuid)
+            && string.IsNullOrWhiteSpace(packet.SourceName))
+        {
+            return "unknown";
+        }
+
+        return "external";
+    }
+
+    private static string GetSourceLabel(TPacket packet, EndPoint? remoteEndpoint, string sourceRole)
+    {
+        if (sourceRole == "unknown")
+        {
+            return "unknown";
+        }
+
+        if (!string.IsNullOrWhiteSpace(packet.SourceName))
+        {
+            return packet.SourceName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(packet.Uuid))
+        {
+            return packet.Uuid;
+        }
+
+        return remoteEndpoint?.ToString() ?? sourceRole;
     }
 
     private static string CreateTrackerKey(TPacket packet, EndPoint? remoteEndpoint)
