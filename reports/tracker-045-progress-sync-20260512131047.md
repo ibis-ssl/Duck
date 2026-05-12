@@ -44,6 +44,7 @@
 - `git rev-parse HEAD`
 - `git push origin feat/tracker-captureon-compare-log`
 - `git status --short --branch`
+- `gh pr view 9 --repo ibis-ssl/Duck --json number,title,state,isDraft,headRefName,baseRefName,url,headRefOid`
 
 ## 対象ファイル
 
@@ -63,13 +64,18 @@
 - `TRACKER-045` を production 実装・focused test・関連 focused test・full test・gpt-5.5 high review 完了として `done` へ同期した。
 - `TRACKER-046` を現在タスク `todo` とし、runtime 起動登録、diagnostics / replay / playback 再生・比較、CaptureOff 競合時の writer 例外伝播再確認を明示した。
 - `git diff --check`: 問題なし。
-- commit hash: commit 後に追記する。
-- push 結果: push 後に追記する。
-- push 後の `git status --short --branch`: push 後に追記する。
+- progress sync commit hash: `481f374657d0352f21963e26f350367b4d23be90`
+- push 結果: `fdf318c..481f374  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
 - PR #9: `https://github.com/ibis-ssl/Duck/pull/9`
+  - state: `OPEN`
+  - draft: `true`
+  - base: `main`
+  - head: `feat/tracker-captureon-compare-log`
+  - headRefOid: `481f374657d0352f21963e26f350367b4d23be90`
 
 ## リスク
 
 - PR #9 は draft のまま。ready 化は対象外。
 - 実装コード・テストコードは変更していない。
-- このレポート自身を含む最終 commit hash は同一 commit 内へ正確に記録できないため、進捗同期 commit 後に hash / push 結果を本レポートへ追記する。
+- このレポートの hash / push 結果追記は、自己参照を避けるため進捗同期 commit 後の追加 docs commit として扱う。
