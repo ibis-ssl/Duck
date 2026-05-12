@@ -3,6 +3,7 @@ using Tracker.Server.Components;
 using Tracker.Server.Tracking;
 using Tracker.Server.Vision;
 using Microsoft.Extensions.Options;
+using TrackerConnectionLib;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +49,23 @@ builder.Services.AddSingleton<VisionPacketCaptureSession>();
 builder.Services.AddSingleton<VisionPacketCaptureWriter>();
 builder.Services.AddSingleton<TrackerRenderSnapshotCaptureWriter>();
 builder.Services.AddSingleton<TrackerPacketSnapshotLogWriter>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
+    return new MultiTrackerManager<TrackerPacketAdapter>(
+        publisherOptions.Uuid,
+        publisherOptions.SourceName);
+});
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
+    return new UdpTrackerReceiver<TrackerPacketAdapter>(
+        publisherOptions.Port,
+        new TrackerWrapperPacketDeserializer());
+});
+builder.Services.AddSingleton<TrackerConnectionLibSnapshotRecorder>();
 builder.Services.AddHostedService<VisionReceiverService>();
+builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();
 
 var app = builder.Build();
 

@@ -11,8 +11,14 @@ public sealed class UdpTrackerReceiver<TPacket> : IDisposable
 
     private CancellationTokenSource? _cts;
     private Task? _receiveTask;
+    private int handlerErrorCount;
 
     public event Action<TPacket, IPEndPoint>? PacketReceived;
+
+    /// <summary>
+    /// PacketReceived handler から出た例外を receiver loop から隔離した回数。
+    /// </summary>
+    public int HandlerErrorCount => handlerErrorCount;
 
     public UdpTrackerReceiver(
         int port,
@@ -85,7 +91,28 @@ public sealed class UdpTrackerReceiver<TPacket> : IDisposable
             if (_deserializer.TryDeserialize(result.Buffer, out var packet) &&
                 packet is not null)
             {
-                PacketReceived?.Invoke(packet, result.RemoteEndPoint);
+                DispatchPacket(packet, result.RemoteEndPoint);
+            }
+        }
+    }
+
+    private void DispatchPacket(TPacket packet, IPEndPoint remoteEndPoint)
+    {
+        var handlers = PacketReceived;
+        if (handlers is null)
+        {
+            return;
+        }
+
+        foreach (Action<TPacket, IPEndPoint> handler in handlers.GetInvocationList())
+        {
+            try
+            {
+                handler(packet, remoteEndPoint);
+            }
+            catch
+            {
+                Interlocked.Increment(ref handlerErrorCount);
             }
         }
     }
