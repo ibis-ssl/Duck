@@ -42,6 +42,12 @@
 - `git ls-files reports/tracker-042-review-20260512114147.md reports/tracker-042-verification-20260512114147.md reports/tracker-042-progress-sync-20260512114544.md --error-unmatch`
 - `git diff -- Tracker/Tracker.Core/Design/tasks-status.md Tracker/Tracker.Core/Design/phases-status.md`
 - `git diff --check`
+- `git add Tracker/Tracker.Core/Design/tasks-status.md Tracker/Tracker.Core/Design/phases-status.md reports/tracker-042-review-20260512114147.md reports/tracker-042-verification-20260512114147.md reports/tracker-042-progress-sync-20260512114544.md && git diff --cached --name-status`
+- `git commit -m "docs(tracker): TRACKER-042進捗同期を記録" ...`
+- `git rev-parse HEAD && git status --short --branch && git push origin feat/tracker-captureon-compare-log`
+- `gh pr edit 9 --repo ibis-ssl/Duck --body-file <tmp>`
+- `git status --short --branch`
+- `gh pr view 9 --repo ibis-ssl/Duck --json number,title,state,isDraft,headRefName,baseRefName,url,body`
 
 ## 対象ファイル
 
@@ -73,6 +79,11 @@
 - `TRACKER-043` は未着手の次タスクとして `todo` のまま明確化した。
 - 実装コード・テストコードは変更していない。
 - `git diff --check`: 問題なし。
+- progress sync commit hash: `f9d810d9b52ef0243b83c332391d9f5d0de0420d`
+- progress sync push 結果: `b8161f9..f9d810d  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
+- PR #9 body は review / verification / progress report と後続リスクを含む内容へ更新済み。
+- PR #9 URL: `https://github.com/ibis-ssl/Duck/pull/9`
 
 ## リスク
 
