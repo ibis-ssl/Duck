@@ -81,6 +81,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
 
         var sourceOptions = CreateEmptySourceOptions();
+        var fieldSourceOptions = CreateEmptyFieldSourceOptions();
         if (metadata.TrackerSnapshotLog is null)
         {
             return CreateState(
@@ -90,6 +91,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsComparisonSidecarStatus.SnapshotMetadataMissing,
                 selectedSourceFilter,
                 sourceOptions,
+                fieldSourceOptions,
                 selectedEntryComparison: null,
                 recordCount: 0,
                 skippedRecordCount: 0,
@@ -106,6 +108,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsComparisonSidecarStatus.SidecarNotCreated,
                 selectedSourceFilter,
                 sourceOptions,
+                fieldSourceOptions,
                 selectedEntryComparison: null,
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
@@ -123,6 +126,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsComparisonSidecarStatus.SidecarPathMissing,
                 selectedSourceFilter,
                 sourceOptions,
+                fieldSourceOptions,
                 selectedEntryComparison: null,
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
@@ -139,6 +143,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsComparisonSidecarStatus.SidecarMissing,
                 selectedSourceFilter,
                 sourceOptions,
+                fieldSourceOptions,
                 selectedEntryComparison: null,
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
@@ -161,6 +166,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt,
                 selectedSourceFilter,
                 sourceOptions,
+                fieldSourceOptions,
                 selectedEntryComparison: null,
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
@@ -177,6 +183,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty,
                 selectedSourceFilter,
                 sourceOptions,
+                fieldSourceOptions,
                 selectedEntryComparison: null,
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
@@ -185,6 +192,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
 
         sourceOptions = comparisonIndex.SourceOptions;
+        fieldSourceOptions = comparisonIndex.FieldSourceOptions;
         var selectedEntryComparison = CreateSelectedEntryComparison(
             selectedEntry,
             selectedSourceFilter,
@@ -197,11 +205,97 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             TrackerDiagnosticsComparisonSidecarStatus.Ready,
             selectedSourceFilter,
             sourceOptions,
+            fieldSourceOptions,
             selectedEntryComparison,
             metadata.TrackerSnapshotLog.RecordCount,
             metadata.TrackerSnapshotLog.SkippedRecordCount,
             metadata.TrackerSnapshotLog.ErrorCount,
             error: null);
+    }
+
+    /// <summary>
+    /// diagnostics log path と selected entry から Field source 用の tracker snapshot frame を読み取る。
+    /// </summary>
+    public TrackerDiagnosticsFieldSourceFrame LoadFieldSourceFrame(
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsFieldSource fieldSource)
+    {
+        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.VisionInput,
+                fieldSource,
+                "Vision Input uses the selected render snapshot.");
+        }
+
+        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.IbisTrackerRenderSnapshot,
+                fieldSource,
+                "ibis tracker uses the selected render snapshot.");
+        }
+
+        if (string.IsNullOrWhiteSpace(diagnosticsLogPath))
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                "Diagnostics log is not selected.");
+        }
+
+        var fullDiagnosticsLogPath = Path.GetFullPath(diagnosticsLogPath);
+        var metadataPath = ResolveMetadataPath(fullDiagnosticsLogPath);
+        if (metadataPath is null || !File.Exists(metadataPath))
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                "Capture metadata file was not found for this diagnostics log.");
+        }
+
+        if (!TryReadMetadata(metadataPath, out var metadata, out var metadataError))
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                metadataError);
+        }
+
+        var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
+        if (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated ||
+            sidecarPath is null || !File.Exists(sidecarPath))
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                "Tracker snapshot sidecar is not available.");
+        }
+
+        ComparisonSnapshotIndex comparisonIndex;
+        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath);
+        try
+        {
+            comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath);
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                $"Tracker snapshot sidecar could not be read: {ex.Message}");
+        }
+
+        if (comparisonIndex.SnapshotCount == 0)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                "Tracker snapshot sidecar did not contain records.");
+        }
+
+        return CreateFieldSourceFrame(selectedEntry, fieldSource, comparisonIndex);
     }
 
     private ComparisonSnapshotIndex GetOrBuildIndex(
@@ -270,6 +364,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         TrackerDiagnosticsComparisonSidecarStatus sidecarStatus,
         TrackerDiagnosticsComparisonSourceFilter selectedSourceFilter,
         IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> sourceOptions,
+        IReadOnlyList<TrackerDiagnosticsFieldSourceOption> fieldSourceOptions,
         TrackerDiagnosticsComparisonEntryComparison? selectedEntryComparison,
         int recordCount,
         int skippedRecordCount,
@@ -282,6 +377,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             sidecarPath,
             sidecarStatus,
             sourceOptions,
+            fieldSourceOptions,
             selectedSourceFilter,
             selectedEntryComparison,
             recordCount,
@@ -298,6 +394,17 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.External, "External", 0),
             new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.Own, "Own", 0),
             new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.Unknown, "Unknown", 0),
+        ];
+    }
+
+    private static IReadOnlyList<TrackerDiagnosticsFieldSourceOption> CreateEmptyFieldSourceOptions()
+    {
+        return
+        [
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.VisionInput, "Vision Input", 0),
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.IbisTracker, "ibis tracker", 0),
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.External, "External", 0),
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.Unknown, "Unknown", 0),
         ];
     }
 
@@ -344,7 +451,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             record.TrackedFrameTimestampNs,
             rawPayloadRestored,
             semanticSummary.BallCount,
-            semanticSummary.RobotCount);
+            semanticSummary.RobotCount,
+            semanticSummary);
     }
 
     private static TrackerPacketSnapshotSemanticSummary CreateSemanticSummary(
@@ -430,6 +538,71 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             nearest.RobotCount);
     }
 
+    private static TrackerDiagnosticsFieldSourceFrame CreateFieldSourceFrame(
+        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsFieldSource fieldSource,
+        ComparisonSnapshotIndex index)
+    {
+        if (selectedEntry is null)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.NoDiagnosticsEntrySelected,
+                fieldSource,
+                "Diagnostics entry is not selected.");
+        }
+
+        if (!uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var trackedFrame))
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.DiagnosticsTrackedFrameMissing,
+                fieldSource,
+                $"Tracked frame '{selectedEntry.TrackedFrame}' is not numeric.",
+                selectedEntry.LineNumber);
+        }
+
+        var ownSnapshot = index.GetOwnSnapshot(trackedFrame);
+        if (ownSnapshot is null)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.OwnBaselineMissing,
+                fieldSource,
+                "ibis own baseline snapshot was not found for the selected diagnostics entry.",
+                selectedEntry.LineNumber);
+        }
+
+        var nearest = index.FindNearestFieldSourceCandidate(fieldSource, ownSnapshot.TrackedFrameTimestampNs);
+        if (nearest is null)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing,
+                fieldSource,
+                "No tracker snapshot matched the selected Field source.",
+                selectedEntry.LineNumber,
+                ownSnapshot.TrackedFrameTimestampNs);
+        }
+
+        var timestampDeltaNs = Math.Abs(nearest.TrackedFrameTimestampNs - ownSnapshot.TrackedFrameTimestampNs);
+        var status = nearest.BallCount == 0 && nearest.RobotCount == 0
+            ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+            : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
+        return new TrackerDiagnosticsFieldSourceFrame(
+            status,
+            fieldSource,
+            selectedEntry.LineNumber,
+            "nearest-timestamp",
+            ownSnapshot.TrackedFrameTimestampNs,
+            nearest.SourceRole,
+            nearest.SourceLabel,
+            nearest.TrackedFrameNumber,
+            nearest.TrackedFrameTimestampNs,
+            timestampDeltaNs,
+            nearest.RawPayloadRestored,
+            nearest.SemanticSummary,
+            status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                ? "Tracker snapshot matched, but it has no drawable balls or robots."
+                : null);
+    }
+
     private static string? ResolveMetadataPath(string diagnosticsLogPath)
     {
         return diagnosticsLogPath.EndsWith(DiagnosticsLogSuffix, StringComparison.Ordinal)
@@ -493,7 +666,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         long TrackedFrameTimestampNs,
         bool RawPayloadRestored,
         int BallCount,
-        int RobotCount);
+        int RobotCount,
+        TrackerPacketSnapshotSemanticSummary SemanticSummary);
 
     private sealed class ComparisonSnapshotIndex
     {
@@ -526,11 +700,14 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     group => group.ToArray(),
                     StringComparer.Ordinal);
             SourceOptions = CreateSourceOptions();
+            FieldSourceOptions = CreateFieldSourceOptions();
         }
 
         public int SnapshotCount => allSnapshots.Length;
 
         public IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> SourceOptions { get; }
+
+        public IReadOnlyList<TrackerDiagnosticsFieldSourceOption> FieldSourceOptions { get; }
 
         public ComparisonSnapshot? GetOwnSnapshot(uint trackedFrame)
         {
@@ -547,6 +724,14 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             return candidates.Length == 0 ? null : FindNearest(candidates, targetTimestampNs);
         }
 
+        public ComparisonSnapshot? FindNearestFieldSourceCandidate(
+            TrackerDiagnosticsFieldSource fieldSource,
+            long targetTimestampNs)
+        {
+            var filter = fieldSource.ToComparisonFilter();
+            return filter is null ? null : FindNearestCandidate(filter, targetTimestampNs);
+        }
+
         private IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateSourceOptions()
         {
             var options = new List<TrackerDiagnosticsComparisonSourceOption>
@@ -560,6 +745,25 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 .OrderBy(pair => pair.Key, StringComparer.Ordinal)
                 .Select(pair => new TrackerDiagnosticsComparisonSourceOption(
                     TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel(pair.Key),
+                    pair.Key,
+                    pair.Value.Length)));
+
+            return options;
+        }
+
+        private IReadOnlyList<TrackerDiagnosticsFieldSourceOption> CreateFieldSourceOptions()
+        {
+            var options = new List<TrackerDiagnosticsFieldSourceOption>
+            {
+                new(TrackerDiagnosticsFieldSource.VisionInput, "Vision Input", 0),
+                new(TrackerDiagnosticsFieldSource.IbisTracker, "ibis tracker", ownSnapshots.Length),
+                new(TrackerDiagnosticsFieldSource.External, "External", externalSnapshots.Length),
+                new(TrackerDiagnosticsFieldSource.Unknown, "Unknown", unknownSnapshots.Length),
+            };
+            options.AddRange(snapshotsBySourceLabel
+                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .Select(pair => new TrackerDiagnosticsFieldSourceOption(
+                    TrackerDiagnosticsFieldSource.ForSourceLabel(pair.Key),
                     pair.Key,
                     pair.Value.Length)));
 
@@ -883,6 +1087,219 @@ public sealed record TrackerDiagnosticsComparisonSourceOption(
     int RecordCount);
 
 /// <summary>
+/// diagnostics Field source selector の source 種別。
+/// </summary>
+public enum TrackerDiagnosticsFieldSourceKind
+{
+    /// <summary>
+    /// 選択中 render snapshot の raw vision input。
+    /// </summary>
+    VisionInput,
+
+    /// <summary>
+    /// 選択中 render snapshot の ibis tracker output。
+    /// </summary>
+    IbisTracker,
+
+    /// <summary>
+    /// tracker packet sidecar の external source。
+    /// </summary>
+    External,
+
+    /// <summary>
+    /// tracker packet sidecar の unknown source。
+    /// </summary>
+    Unknown,
+
+    /// <summary>
+    /// tracker packet sidecar の source label。
+    /// </summary>
+    SourceLabel,
+}
+
+/// <summary>
+/// diagnostics Field に描画する source 選択。
+/// </summary>
+/// <param name="Kind">Field source の種別。</param>
+/// <param name="Value">source label 選択時の label。role 選択では null。</param>
+public sealed record TrackerDiagnosticsFieldSource(
+    TrackerDiagnosticsFieldSourceKind Kind,
+    string? Value)
+{
+    /// <summary>
+    /// 選択中 render snapshot の raw vision input。
+    /// </summary>
+    public static TrackerDiagnosticsFieldSource VisionInput { get; } = new(
+        TrackerDiagnosticsFieldSourceKind.VisionInput,
+        Value: null);
+
+    /// <summary>
+    /// 選択中 render snapshot の ibis tracker output。
+    /// </summary>
+    public static TrackerDiagnosticsFieldSource IbisTracker { get; } = new(
+        TrackerDiagnosticsFieldSourceKind.IbisTracker,
+        Value: null);
+
+    /// <summary>
+    /// tracker packet sidecar の external source。
+    /// </summary>
+    public static TrackerDiagnosticsFieldSource External { get; } = new(
+        TrackerDiagnosticsFieldSourceKind.External,
+        Value: null);
+
+    /// <summary>
+    /// tracker packet sidecar の unknown source。
+    /// </summary>
+    public static TrackerDiagnosticsFieldSource Unknown { get; } = new(
+        TrackerDiagnosticsFieldSourceKind.Unknown,
+        Value: null);
+
+    /// <summary>
+    /// 指定 source label の Field source を作る。
+    /// </summary>
+    public static TrackerDiagnosticsFieldSource ForSourceLabel(string sourceLabel)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceLabel);
+        return new TrackerDiagnosticsFieldSource(
+            TrackerDiagnosticsFieldSourceKind.SourceLabel,
+            sourceLabel);
+    }
+
+    internal TrackerDiagnosticsComparisonSourceFilter? ToComparisonFilter()
+    {
+        return Kind switch
+        {
+            TrackerDiagnosticsFieldSourceKind.IbisTracker => TrackerDiagnosticsComparisonSourceFilter.Own,
+            TrackerDiagnosticsFieldSourceKind.External => TrackerDiagnosticsComparisonSourceFilter.External,
+            TrackerDiagnosticsFieldSourceKind.Unknown => TrackerDiagnosticsComparisonSourceFilter.Unknown,
+            TrackerDiagnosticsFieldSourceKind.SourceLabel when Value is not null =>
+                TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel(Value),
+            _ => null,
+        };
+    }
+}
+
+/// <summary>
+/// UI が選べる diagnostics Field source option。
+/// </summary>
+/// <param name="Source">この option を選んだときに使う Field source。</param>
+/// <param name="Label">UI 表示用 label。</param>
+/// <param name="RecordCount">source に一致する tracker snapshot record 数。render snapshot source では 0。</param>
+public sealed record TrackerDiagnosticsFieldSourceOption(
+    TrackerDiagnosticsFieldSource Source,
+    string Label,
+    int RecordCount);
+
+/// <summary>
+/// diagnostics Field source frame の作成状態。
+/// </summary>
+public enum TrackerDiagnosticsFieldSourceFrameStatus
+{
+    /// <summary>
+    /// Field source frame を作成できた。
+    /// </summary>
+    Ready,
+
+    /// <summary>
+    /// Vision Input は render snapshot から直接描画する。
+    /// </summary>
+    VisionInput,
+
+    /// <summary>
+    /// ibis tracker は render snapshot から直接描画する。
+    /// </summary>
+    IbisTrackerRenderSnapshot,
+
+    /// <summary>
+    /// diagnostics entry が選択されていない。
+    /// </summary>
+    NoDiagnosticsEntrySelected,
+
+    /// <summary>
+    /// selected diagnostics entry の tracked frame が数値ではない。
+    /// </summary>
+    DiagnosticsTrackedFrameMissing,
+
+    /// <summary>
+    /// selected diagnostics entry に対応する own baseline snapshot がない。
+    /// </summary>
+    OwnBaselineMissing,
+
+    /// <summary>
+    /// 選択 Field source に一致する candidate snapshot がない。
+    /// </summary>
+    CandidateMissing,
+
+    /// <summary>
+    /// candidate snapshot はあるが描画可能な ball / robot がない。
+    /// </summary>
+    DrawableEmpty,
+
+    /// <summary>
+    /// tracker packet sidecar が利用できない。
+    /// </summary>
+    SidecarUnavailable,
+}
+
+/// <summary>
+/// tracker packet sidecar から解決した diagnostics Field source frame。
+/// </summary>
+/// <param name="Status">Field source frame の作成状態。</param>
+/// <param name="Source">要求された Field source。</param>
+/// <param name="EntryLineNumber">selected diagnostics entry の line number。</param>
+/// <param name="MatchingRule">snapshot 対応付けに使った規則。</param>
+/// <param name="IbisOwnSnapshotTimestampNs">基準にした ibis own snapshot timestamp。</param>
+/// <param name="SourceRole">nearest snapshot の source role。</param>
+/// <param name="SourceLabel">nearest snapshot の source label。</param>
+/// <param name="TrackedFrameNumber">nearest snapshot の tracked frame number。</param>
+/// <param name="TrackedFrameTimestampNs">nearest snapshot の tracked frame timestamp。</param>
+/// <param name="TimestampDeltaNs">基準 timestamp と nearest snapshot timestamp の絶対差分。</param>
+/// <param name="RawPayloadRestored">nearest snapshot の raw payload を protobuf として復元できる場合は true。</param>
+/// <param name="SemanticSummary">Field 描画に使う最小 semantic summary。</param>
+/// <param name="Message">非 Ready 状態の補足 message。</param>
+public sealed record TrackerDiagnosticsFieldSourceFrame(
+    TrackerDiagnosticsFieldSourceFrameStatus Status,
+    TrackerDiagnosticsFieldSource Source,
+    int? EntryLineNumber,
+    string? MatchingRule,
+    long? IbisOwnSnapshotTimestampNs,
+    string? SourceRole,
+    string? SourceLabel,
+    uint? TrackedFrameNumber,
+    long? TrackedFrameTimestampNs,
+    long? TimestampDeltaNs,
+    bool? RawPayloadRestored,
+    TrackerPacketSnapshotSemanticSummary? SemanticSummary,
+    string? Message)
+{
+    /// <summary>
+    /// Field source frame を作れない理由だけを持つ状態を作る。
+    /// </summary>
+    public static TrackerDiagnosticsFieldSourceFrame WithStatus(
+        TrackerDiagnosticsFieldSourceFrameStatus status,
+        TrackerDiagnosticsFieldSource source,
+        string? message,
+        int? entryLineNumber = null,
+        long? ibisOwnSnapshotTimestampNs = null)
+    {
+        return new TrackerDiagnosticsFieldSourceFrame(
+            status,
+            source,
+            entryLineNumber,
+            MatchingRule: null,
+            ibisOwnSnapshotTimestampNs,
+            SourceRole: null,
+            SourceLabel: null,
+            TrackedFrameNumber: null,
+            TrackedFrameTimestampNs: null,
+            TimestampDeltaNs: null,
+            RawPayloadRestored: null,
+            SemanticSummary: null,
+            message);
+    }
+}
+
+/// <summary>
 /// diagnostics comparison が選択行を特定するために UI の表示済み entry から受け取る最小 model。
 /// </summary>
 /// <param name="LineNumber">元 diagnostics log 上の 1 始まり line number。</param>
@@ -998,6 +1415,7 @@ public sealed record TrackerDiagnosticsComparisonEntryComparison(
 /// <param name="SidecarPath">解決した tracker snapshot sidecar path。</param>
 /// <param name="SidecarStatus">sidecar 読み取り状態。</param>
 /// <param name="SourceOptions">UI が選択できる source filter option。</param>
+/// <param name="FieldSourceOptions">左右 Field が選択できる source option。All は含めない。</param>
 /// <param name="SelectedSourceFilter">現在選択中の source filter。</param>
 /// <param name="SelectedEntryComparison">selected diagnostics entry の comparison summary。</param>
 /// <param name="RecordCount">metadata が示す sidecar record 数。</param>
@@ -1010,6 +1428,7 @@ public sealed record TrackerDiagnosticsComparisonViewState(
     string? SidecarPath,
     TrackerDiagnosticsComparisonSidecarStatus SidecarStatus,
     IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> SourceOptions,
+    IReadOnlyList<TrackerDiagnosticsFieldSourceOption> FieldSourceOptions,
     TrackerDiagnosticsComparisonSourceFilter SelectedSourceFilter,
     TrackerDiagnosticsComparisonEntryComparison? SelectedEntryComparison,
     int RecordCount,
@@ -1039,6 +1458,13 @@ public sealed record TrackerDiagnosticsComparisonViewState(
                 new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.External, "External", 0),
                 new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.Own, "Own", 0),
                 new TrackerDiagnosticsComparisonSourceOption(TrackerDiagnosticsComparisonSourceFilter.Unknown, "Unknown", 0),
+            ],
+            FieldSourceOptions:
+            [
+                new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.VisionInput, "Vision Input", 0),
+                new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.IbisTracker, "ibis tracker", 0),
+                new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.External, "External", 0),
+                new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.Unknown, "Unknown", 0),
             ],
             selectedSourceFilter,
             SelectedEntryComparison: null,

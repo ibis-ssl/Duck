@@ -121,86 +121,134 @@
                     <section class="diagnostics-comparison" aria-label="Tracker comparison">
                         <header class="diagnostics-comparison__header">
                             <h2>Tracker Comparison</h2>
-                            <select class="diagnostics-select diagnostics-comparison__select"
-                                    value="@ComparisonSourceFilterValue()"
-                                    @onchange="OnComparisonSourceFilterChanged"
-                                    aria-label="Comparison source filter">
-                                @foreach (var option in ComparisonViewState.SourceOptions)
-                                {
-                                    <option value="@TrackerDiagnosticsComparisonUiState.ToFilterValue(option.Filter)">
-                                        @option.Label (@option.RecordCount)
-                                    </option>
-                                }
-                            </select>
+                            <button type="button"
+                                    class="diagnostics-comparison__toggle"
+                                    @onclick="ToggleComparisonPanelAsync"
+                                    aria-expanded="@(!(comparisonUiState?.IsComparisonPanelCollapsed ?? false))">
+                                @ComparisonPanelToggleLabel()
+                            </button>
                         </header>
 
-                        <dl class="diagnostics-comparison__stats">
-                            <dt>Status</dt>
-                            <dd>@ComparisonViewState.SidecarStatus</dd>
-                            <dt>Records</dt>
-                            <dd>@ComparisonViewState.RecordCount</dd>
-                            <dt>Skipped</dt>
-                            <dd>@ComparisonViewState.SkippedRecordCount</dd>
-                            <dt>Errors</dt>
-                            <dd>@ComparisonViewState.ErrorCount</dd>
-                            <dt>Selected frame</dt>
-                            <dd>@Display(selectedEntry.TrackedFrame)</dd>
-                            <dt>Selected time</dt>
-                            <dd>@selectedEntry.Timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)</dd>
-                        </dl>
-
-                        @if (!string.IsNullOrEmpty(ComparisonViewState.Error))
+                        @if (!(comparisonUiState?.IsComparisonPanelCollapsed ?? false))
                         {
-                            <div class="diagnostics-comparison__alert">@ComparisonViewState.Error</div>
-                        }
+                            <div class="diagnostics-comparison__controls">
+                                <select class="diagnostics-select diagnostics-comparison__select"
+                                        value="@ComparisonSourceFilterValue()"
+                                        @onchange="OnComparisonSourceFilterChanged"
+                                        aria-label="Comparison source filter">
+                                    @foreach (var option in ComparisonViewState.SourceOptions)
+                                    {
+                                        <option value="@TrackerDiagnosticsComparisonUiState.ToFilterValue(option.Filter)">
+                                            @option.Label (@option.RecordCount)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
 
-                        @if (ComparisonViewState.SelectedEntryComparison is { } comparison)
-                        {
-                            <dl class="diagnostics-comparison__stats diagnostics-comparison__stats--comparison">
-                                <dt>Entry status</dt>
-                                <dd>@comparison.Status</dd>
-                                <dt>Line</dt>
-                                <dd>@Display(comparison.EntryLineNumber)</dd>
-                                <dt>Rule</dt>
-                                <dd>@Display(comparison.MatchingRule)</dd>
-                                <dt>Source role</dt>
-                                <dd>@Display(comparison.NearestSnapshotSourceRole)</dd>
-                                <dt>Source label</dt>
-                                <dd>@Display(comparison.NearestSnapshotSourceLabel)</dd>
-                                <dt>Snapshot frame</dt>
-                                <dd>@Display(comparison.NearestSnapshotTrackedFrameNumber)</dd>
-                                <dt>Own timestamp ns</dt>
-                                <dd>@Display(comparison.IbisOwnSnapshotTimestampNs)</dd>
-                                <dt>Nearest timestamp ns</dt>
-                                <dd>@Display(comparison.NearestSnapshotTimestampNs)</dd>
-                                <dt>Delta ns</dt>
-                                <dd>@Display(comparison.TimestampDeltaNs)</dd>
-                                <dt>Balls</dt>
-                                <dd>@Display(comparison.BallCount)</dd>
-                                <dt>Robots</dt>
-                                <dd>@Display(comparison.RobotCount)</dd>
-                                <dt>Raw payload</dt>
-                                <dd>@DisplayRawPayloadRestored(comparison.RawPayloadRestored)</dd>
+                            <dl class="diagnostics-comparison__stats">
+                                <dt>Status</dt>
+                                <dd>@ComparisonViewState.SidecarStatus</dd>
+                                <dt>Records</dt>
+                                <dd>@ComparisonViewState.RecordCount</dd>
+                                <dt>Skipped</dt>
+                                <dd>@ComparisonViewState.SkippedRecordCount</dd>
+                                <dt>Errors</dt>
+                                <dd>@ComparisonViewState.ErrorCount</dd>
+                                <dt>Selected frame</dt>
+                                <dd>@Display(selectedEntry.TrackedFrame)</dd>
+                                <dt>Selected time</dt>
+                                <dd>@selectedEntry.Timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)</dd>
                             </dl>
+
+                            @if (!string.IsNullOrEmpty(ComparisonViewState.Error))
+                            {
+                                <div class="diagnostics-comparison__alert">@ComparisonViewState.Error</div>
+                            }
+
+                            @if (ComparisonViewState.SelectedEntryComparison is { } comparison)
+                            {
+                                <dl class="diagnostics-comparison__stats diagnostics-comparison__stats--comparison">
+                                    <dt>Entry status</dt>
+                                    <dd>@comparison.Status</dd>
+                                    <dt>Line</dt>
+                                    <dd>@Display(comparison.EntryLineNumber)</dd>
+                                    <dt>Rule</dt>
+                                    <dd>@Display(comparison.MatchingRule)</dd>
+                                    <dt>Source role</dt>
+                                    <dd>@Display(comparison.NearestSnapshotSourceRole)</dd>
+                                    <dt>Source label</dt>
+                                    <dd>@Display(comparison.NearestSnapshotSourceLabel)</dd>
+                                    <dt>Snapshot frame</dt>
+                                    <dd>@Display(comparison.NearestSnapshotTrackedFrameNumber)</dd>
+                                    <dt>Own timestamp ns</dt>
+                                    <dd>@Display(comparison.IbisOwnSnapshotTimestampNs)</dd>
+                                    <dt>Nearest timestamp ns</dt>
+                                    <dd>@Display(comparison.NearestSnapshotTimestampNs)</dd>
+                                    <dt>Delta ns</dt>
+                                    <dd>@Display(comparison.TimestampDeltaNs)</dd>
+                                    <dt>Balls</dt>
+                                    <dd>@Display(comparison.BallCount)</dd>
+                                    <dt>Robots</dt>
+                                    <dd>@Display(comparison.RobotCount)</dd>
+                                    <dt>Raw payload</dt>
+                                    <dd>@DisplayRawPayloadRestored(comparison.RawPayloadRestored)</dd>
+                                </dl>
+                            }
                         }
                     </section>
 
                     @if (selectedRenderSnapshot is not null)
                     {
+                        var leftField = LeftFieldRenderModel();
+                        var rightField = RightFieldRenderModel();
                         <div class="diagnostics-render">
                             <section>
-                                <h2>Vision Input Field</h2>
-                                <VisionFieldCanvas Geometry="DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot)"
-                                                   Balls="DiagnosticsFieldViewFactory.CreateRawBalls(selectedRenderSnapshot.Frame)"
-                                                   RobotsYellow="DiagnosticsFieldViewFactory.CreateRawYellowRobots(selectedRenderSnapshot.Frame)"
-                                                   RobotsBlue="DiagnosticsFieldViewFactory.CreateRawBlueRobots(selectedRenderSnapshot.Frame)" />
+                                <header class="diagnostics-render__header">
+                                    <h2>@leftField.Title Field</h2>
+                                    <select class="diagnostics-select diagnostics-field-source__select"
+                                            value="@LeftFieldSourceValue()"
+                                            @onchange="OnLeftFieldSourceChanged"
+                                            aria-label="Left Field source">
+                                        @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                        {
+                                            <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                @option.Label
+                                            </option>
+                                        }
+                                    </select>
+                                </header>
+                                @if (!string.IsNullOrEmpty(leftField.Status))
+                                {
+                                    <div class="diagnostics-field-source__status">@leftField.Status</div>
+                                }
+                                <VisionFieldCanvas Geometry="leftField.Geometry"
+                                                   Balls="leftField.Balls"
+                                                   RobotsYellow="leftField.RobotsYellow"
+                                                   RobotsBlue="leftField.RobotsBlue" />
                             </section>
                             <section>
-                                <h2>Tracker Output Field</h2>
-                                <VisionFieldCanvas Geometry="trackedRenderView.Geometry"
-                                                   Balls="trackedRenderView.Balls"
-                                                   RobotsYellow="trackedRenderView.RobotsYellow"
-                                                   RobotsBlue="trackedRenderView.RobotsBlue" />
+                                <header class="diagnostics-render__header">
+                                    <h2>@rightField.Title Field</h2>
+                                    <select class="diagnostics-select diagnostics-field-source__select"
+                                            value="@RightFieldSourceValue()"
+                                            @onchange="OnRightFieldSourceChanged"
+                                            aria-label="Right Field source">
+                                        @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                        {
+                                            <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                @option.Label
+                                            </option>
+                                        }
+                                    </select>
+                                </header>
+                                @if (!string.IsNullOrEmpty(rightField.Status))
+                                {
+                                    <div class="diagnostics-field-source__status">@rightField.Status</div>
+                                }
+                                <VisionFieldCanvas Geometry="rightField.Geometry"
+                                                   Balls="rightField.Balls"
+                                                   RobotsYellow="rightField.RobotsYellow"
+                                                   RobotsBlue="rightField.RobotsBlue" />
                             </section>
                         </div>
                         <div class="@RenderResizeHandleClass()"

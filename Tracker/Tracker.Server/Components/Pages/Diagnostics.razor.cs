@@ -82,7 +82,7 @@ public partial class Diagnostics : IDisposable
         var requestedLogPath = args.Value?.ToString();
         selectedLogPath = logFiles.FirstOrDefault(file => file.FullPath == requestedLogPath)?.FullPath;
         StopPlayback();
-        comparisonUiState?.ResetFilter();
+        comparisonUiState?.ResetForLogChange();
         LoadSelectedFile();
         return Task.CompletedTask;
     }
@@ -347,10 +347,117 @@ public partial class Diagnostics : IDisposable
         return TrackerDiagnosticsComparisonUiState.ToFilterValue(ComparisonViewState.SelectedSourceFilter);
     }
 
+    private string LeftFieldSourceValue()
+    {
+        return TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(
+            comparisonUiState?.LeftFieldSource ?? TrackerDiagnosticsFieldSource.VisionInput);
+    }
+
+    private string RightFieldSourceValue()
+    {
+        return TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(
+            comparisonUiState?.RightFieldSource ?? TrackerDiagnosticsFieldSource.IbisTracker);
+    }
+
+    private string ComparisonPanelToggleLabel()
+    {
+        return comparisonUiState?.IsComparisonPanelCollapsed == true ? "Show" : "Hide";
+    }
+
+    private Task ToggleComparisonPanelAsync()
+    {
+        comparisonUiState?.ToggleComparisonPanelCollapsed();
+        return Task.CompletedTask;
+    }
+
     private Task OnComparisonSourceFilterChanged(ChangeEventArgs args)
     {
         comparisonUiState?.SelectFilterValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
         return Task.CompletedTask;
+    }
+
+    private Task OnLeftFieldSourceChanged(ChangeEventArgs args)
+    {
+        comparisonUiState?.SelectLeftFieldSourceValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
+        return Task.CompletedTask;
+    }
+
+    private Task OnRightFieldSourceChanged(ChangeEventArgs args)
+    {
+        comparisonUiState?.SelectRightFieldSourceValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
+        return Task.CompletedTask;
+    }
+
+    private DiagnosticsFieldRenderModel LeftFieldRenderModel()
+    {
+        return CreateFieldRenderModel(
+            comparisonUiState?.LeftFieldSource ?? TrackerDiagnosticsFieldSource.VisionInput,
+            comparisonUiState?.LeftTrackerFieldSourceFrame);
+    }
+
+    private DiagnosticsFieldRenderModel RightFieldRenderModel()
+    {
+        return CreateFieldRenderModel(
+            comparisonUiState?.RightFieldSource ?? TrackerDiagnosticsFieldSource.IbisTracker,
+            comparisonUiState?.RightTrackerFieldSourceFrame);
+    }
+
+    private DiagnosticsFieldRenderModel CreateFieldRenderModel(
+        TrackerDiagnosticsFieldSource source,
+        TrackerDiagnosticsFieldSourceFrame? trackerFrame)
+    {
+        if (selectedRenderSnapshot is null)
+        {
+            return DiagnosticsFieldRenderModel.Empty(FieldSourceLabel(source), null, "Render snapshot was not found.");
+        }
+
+        var geometry = DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
+        return source.Kind switch
+        {
+            TrackerDiagnosticsFieldSourceKind.VisionInput => new DiagnosticsFieldRenderModel(
+                FieldSourceLabel(source),
+                geometry,
+                DiagnosticsFieldViewFactory.CreateRawBalls(selectedRenderSnapshot.Frame),
+                DiagnosticsFieldViewFactory.CreateRawYellowRobots(selectedRenderSnapshot.Frame),
+                DiagnosticsFieldViewFactory.CreateRawBlueRobots(selectedRenderSnapshot.Frame),
+                Status: null),
+            TrackerDiagnosticsFieldSourceKind.IbisTracker => new DiagnosticsFieldRenderModel(
+                FieldSourceLabel(source),
+                trackedRenderView.Geometry,
+                trackedRenderView.Balls,
+                trackedRenderView.RobotsYellow,
+                trackedRenderView.RobotsBlue,
+                Status: null),
+            _ => new DiagnosticsFieldRenderModel(
+                FieldSourceLabel(source),
+                geometry,
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceYellowRobots(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary),
+                FieldSourceStatusText(trackerFrame)),
+        };
+    }
+
+    private string FieldSourceLabel(TrackerDiagnosticsFieldSource source)
+    {
+        return ComparisonViewState.FieldSourceOptions
+            .FirstOrDefault(option => option.Source == source)
+            ?.Label ?? source.Kind.ToString();
+    }
+
+    private static string? FieldSourceStatusText(TrackerDiagnosticsFieldSourceFrame? frame)
+    {
+        if (frame is null || frame.Status == TrackerDiagnosticsFieldSourceFrameStatus.Ready)
+        {
+            return null;
+        }
+
+        if (frame.Status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty)
+        {
+            return frame.Message ?? "No drawable balls or robots.";
+        }
+
+        return frame.Message ?? frame.Status.ToString();
     }
 
     private Task OnFastForwardSpeedChanged(ChangeEventArgs args)
@@ -581,5 +688,28 @@ public partial class Diagnostics : IDisposable
         }
 
         renderSnapshotsByFrame = result.Index.SnapshotsByFrame;
+    }
+
+    private sealed record DiagnosticsFieldRenderModel(
+        string Title,
+        SSL_GeometryData? Geometry,
+        IReadOnlyList<SSL_DetectionBall> Balls,
+        IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
+        IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+        string? Status)
+    {
+        public static DiagnosticsFieldRenderModel Empty(
+            string title,
+            SSL_GeometryData? geometry,
+            string? status)
+        {
+            return new DiagnosticsFieldRenderModel(
+                title,
+                geometry,
+                [],
+                [],
+                [],
+                status);
+        }
     }
 }

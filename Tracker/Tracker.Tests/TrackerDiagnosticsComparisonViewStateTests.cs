@@ -129,6 +129,162 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// Field source selector は描画可能な source だけを出し、comparison 用の All filter を混ぜないことを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_FieldSourceOptionsExcludeAllAndIncludeRenderableSources()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9100, 91_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9101, 91_004_000_000, ballCount: 2, robotCount: 2),
+                SnapshotInput("", "", "unknown", 9102, 91_006_000_000, ballCount: 0, robotCount: 0),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var state = reader.Load(session.DiagnosticsPath, SelectedEntry(9100), TrackerDiagnosticsComparisonSourceFilter.All);
+
+        Assert.DoesNotContain(state.FieldSourceOptions, option => string.Equals(option.Label, "All", StringComparison.Ordinal));
+        Assert.Contains(state.FieldSourceOptions, option => option.Source.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput && option.Label == "Vision Input");
+        Assert.Contains(state.FieldSourceOptions, option => option.Source.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker && option.Label == "ibis tracker");
+        Assert.Contains(state.FieldSourceOptions, option => option.Source.Kind == TrackerDiagnosticsFieldSourceKind.External && option.Label == "External");
+        Assert.Contains(state.FieldSourceOptions, option => option.Source.Kind == TrackerDiagnosticsFieldSourceKind.Unknown && option.Label == "Unknown");
+        Assert.Contains(
+            state.FieldSourceOptions,
+            option => option.Source.Kind == TrackerDiagnosticsFieldSourceKind.SourceLabel && option.Source.Value == "thirdparty-a");
+    }
+
+    /// <summary>
+    /// external/source label Field は selected entry の own timestamp を基準に nearest snapshot から描画用 summary を作ることを確認する。
+    /// </summary>
+    [Fact]
+    public void LoadFieldSourceFrame_ForSourceLabelUsesNearestSnapshotToSelectedOwnTimestamp()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9600, 96_010_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9601, 96_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9602, 96_013_000_000, ballCount: 2, robotCount: 2),
+                SnapshotInput("external-b", "thirdparty-b", "external", 9603, 96_011_000_000, ballCount: 3, robotCount: 3),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 9600);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(9600),
+            TrackerDiagnosticsFieldSource.ForSourceLabel("thirdparty-a"));
+
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
+        Assert.Equal("nearest-timestamp", frame.MatchingRule);
+        Assert.Equal(96_010_000_000, frame.IbisOwnSnapshotTimestampNs);
+        Assert.Equal("external", frame.SourceRole);
+        Assert.Equal("thirdparty-a", frame.SourceLabel);
+        Assert.Equal(9602u, frame.TrackedFrameNumber);
+        Assert.Equal(96_013_000_000, frame.TrackedFrameTimestampNs);
+        Assert.Equal(3_000_000, frame.TimestampDeltaNs);
+        Assert.NotNull(frame.SemanticSummary);
+        Assert.Equal(2, frame.SemanticSummary!.Balls.Count);
+        Assert.Equal(2, frame.SemanticSummary.Robots.Count);
+    }
+
+    /// <summary>
+    /// source 変更や selected entry 変更で tracker sidecar JSONL を再読込せず、TRACKER-055 の cached index を再利用することを確認する。
+    /// </summary>
+    [Fact]
+    public void LoadFieldSourceFrame_WhenSourceOrSelectedEntryChanges_ReusesCachedSidecarIndex()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9700, 97_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9701, 97_002_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("ibis-runtime", "ibis", "own", 9702, 97_010_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("", "", "unknown", 9703, 97_011_000_000, ballCount: 1, robotCount: 1),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrames: [9700, 9702]);
+        var buildCount = 0;
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(sidecarPath =>
+        {
+            buildCount++;
+            return TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();
+        });
+
+        var first = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(9700),
+            TrackerDiagnosticsFieldSource.External);
+        var second = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(9702),
+            TrackerDiagnosticsFieldSource.Unknown);
+
+        Assert.Equal(1, buildCount);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, first.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, second.Status);
+        Assert.Equal(9701u, first.TrackedFrameNumber);
+        Assert.Equal(9703u, second.TrackedFrameNumber);
+    }
+
+    /// <summary>
+    /// page state は log 変更で左右 Field source を既定に戻し、scrub / playback 相当の selected entry 更新では selector と折り畳み状態を保持する。
+    /// </summary>
+    [Fact]
+    public void UiState_FieldSourceAndFoldState_ResetOnlyWhenLogChanges()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9800, 98_000_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9801, 98_002_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("ibis-runtime", "ibis", "own", 9802, 98_010_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9803, 98_011_000_000, ballCount: 1, robotCount: 1),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrames: [9800, 9802]);
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var displayedEntries = ReadDisplayedEntries(session.DiagnosticsPath);
+        var firstEntry = displayedEntries[0];
+        var secondEntry = displayedEntries[1];
+
+        uiState.Load(session.DiagnosticsPath, firstEntry);
+        Assert.Equal(TrackerDiagnosticsFieldSource.VisionInput, uiState.LeftFieldSource);
+        Assert.Equal(TrackerDiagnosticsFieldSource.IbisTracker, uiState.RightFieldSource);
+        Assert.False(uiState.IsComparisonPanelCollapsed);
+
+        uiState.SelectLeftFieldSource(
+            TrackerDiagnosticsFieldSource.External,
+            session.DiagnosticsPath,
+            firstEntry);
+        uiState.SelectRightFieldSource(
+            TrackerDiagnosticsFieldSource.ForSourceLabel("thirdparty-a"),
+            session.DiagnosticsPath,
+            firstEntry);
+        uiState.ToggleComparisonPanelCollapsed();
+        uiState.Load(session.DiagnosticsPath, secondEntry);
+
+        Assert.Equal(TrackerDiagnosticsFieldSource.External, uiState.LeftFieldSource);
+        Assert.Equal(TrackerDiagnosticsFieldSourceKind.SourceLabel, uiState.RightFieldSource.Kind);
+        Assert.True(uiState.IsComparisonPanelCollapsed);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, uiState.LeftTrackerFieldSourceFrame?.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, uiState.RightTrackerFieldSourceFrame?.Status);
+
+        uiState.ResetForLogChange();
+
+        Assert.Equal(TrackerDiagnosticsFieldSource.VisionInput, uiState.LeftFieldSource);
+        Assert.Equal(TrackerDiagnosticsFieldSource.IbisTracker, uiState.RightFieldSource);
+    }
+
+    /// <summary>
     /// sidecar の file state が変わった場合は cache を破棄し、新しい index を構築することを確認する。
     /// </summary>
     [Fact]
