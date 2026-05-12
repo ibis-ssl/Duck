@@ -113,6 +113,8 @@ v1 の外部配信は official tracker proto に限定する。
 
 CaptureOn 中に ibis tracker 以外の tracker も同じ official tracker multicast / port 上に存在する場合、後から ibis 出力と比較できるように 3rdparty tracker packet を別系統で保存する。
 
+Server / CLI / UI 側の詳細な機能仕様は `tracker-server-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
+
 責務境界は次の通り。
 
 - `TrackerConnectionLib` を 3rdparty tracker 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
