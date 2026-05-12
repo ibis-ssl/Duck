@@ -25,6 +25,7 @@
 
 - `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点にする。
 - `Tracker.Server` へ組み込む際は、既存の `UdpTrackerReceiver` / `MultiTrackerManager` / `TrackerPacketAdapter` の責務を優先して使う。CaptureOn lifecycle と session folder に合わせる必要がある場合だけ薄い adapter を置く。
+- official tracker packet は multicast endpoint から届く前提とし、receiver は設定済み multicast address / port を使って multicast group に参加する。loopback unicast 受信だけでは CaptureOn 比較ログの runtime 正常系証跡として扱わない。
 - `Tracker.Server` は CaptureOn session と tracker packet snapshot log を紐付ける統合層にする。packet capture 本体、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar を同じ session folder 配下の成果物として扱う。
 - `Tracker.Core` には official tracker packet 傍受、snapshot sidecar 保存、ibis / other tracker の後処理比較を入れない。Core は ibis tracker の internal frame と official packet 生成だけを担当する。
 
@@ -78,6 +79,10 @@ ibis committed frame と tracker packet snapshot は同じ frame number や publ
 初期実装では nearest timestamp または latest-before のどちらを採用するかを task 内で固定する。採用した対応規則、許容 window、該当 source identity は出力と sidecar から後で確認できるようにする。
 
 ## CaptureOn lifecycle
+
+live receiver のネットワーク受信は明示設定で有効化する。既定設定では常時 bind / receive を始めず、運用者が official tracker multicast receive を有効化した場合だけ receiver を起動する。
+
+CaptureOn は receiver 起動条件ではなく、session sidecar 書き込み条件を制御する。Capture Off 中に receiver が packet を受けても snapshot sidecar を作成・追記しない。
 
 Capture Off 中は snapshot sidecar を作成・追記しない。Capture Off / 再On では session folder を更新し、前 session folder の snapshot writer へ追記しない。
 
