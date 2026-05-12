@@ -118,10 +118,12 @@ Server / CLI / UI 側の詳細な機能仕様は `tracker-server-cli-ui-detail-d
 責務境界は次の通り。
 
 - `TrackerConnectionLib` を 3rdparty tracker 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
-- `Tracker.Server` は CaptureOn session と比較ログを紐付ける統合層とする。packet capture、metadata、diagnostics sidecar、render snapshot と同じ basename に、比較用 sidecar JSONL を関連付ける。
+- `Tracker.Server` は CaptureOn session と比較ログを紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、比較用 sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
 - `Tracker.Core` には 3rdparty tracker 傍受、保存、比較処理を入れない。Core は ibis tracker の内部状態生成と official packet 生成だけを担当する。
 
-比較ログは既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は capture sidecar の JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、比較 sidecar path、source 数、近傍比較 summary などの参照/集計追加に限定する。
+比較ログは既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の capture sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる比較 sidecar relative path、source 数、近傍比較 summary などの参照/集計追加に限定する。
+
+session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。
 
 sidecar JSONL の各 record は少なくとも次を保持する。
 
@@ -138,7 +140,7 @@ self除外は ibis tracker の `Uuid` / `SourceName` を第一条件とする。
 
 ibis committed frame と 3rdparty tracker frame は publish frequency が一致しない前提で扱う。比較は exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と 3rdparty `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint は後から再計算できるように保存する。
 
-Capture Off 中は比較 sidecar へ追記しない。Capture Off / 再On では新しい capture session と新しい比較 sidecar に切り替え、前 session へ追記しない。他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の挙動を変えず、metadata には比較ログが未作成または record 0 件であることを表現できるようにする。
+Capture Off 中は比較 sidecar へ追記しない。Capture Off / 再On では新しい capture session folder と新しい比較 sidecar に切り替え、前 session folder へ追記しない。他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の内容上の挙動を変えず、metadata には比較ログが未作成または record 0 件であることを表現できるようにする。
 
 ### 内部出力
 
@@ -499,7 +501,7 @@ geometry 更新規則:
 7. publisher が UDP multicast へ送信する
 8. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
 
-CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline とは別に `Tracker.Server` が `TrackerConnectionLib` 経由で official tracker packet を傍受する。傍受した `TrackerWrapperPacket` は ibis 自身の `uuid` / `sourceName` と照合して self除外し、他 tracker の packet だけを CaptureOn session の sidecar JSONL へ保存する。`Tracker.Core` の入力や状態更新には流さない。
+CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline とは別に `Tracker.Server` が `TrackerConnectionLib` 経由で official tracker packet を傍受する。傍受した `TrackerWrapperPacket` は ibis 自身の `uuid` / `sourceName` と照合して self除外し、他 tracker の packet だけを CaptureOn session folder 配下の sidecar JSONL へ保存する。`Tracker.Core` の入力や状態更新には流さない。
 
 ## 設定
 
@@ -545,7 +547,7 @@ CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline
 
 packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
 
-packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。
+packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。CaptureOn 比較ログでは、同一 session folder 配下にある packet capture、tracker diagnostics、render snapshots、comparison sidecar JSONL の relative path も metadata に保存する。
 
 `Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。detail filter は `frame` でも絞り込めるようにし、robot detail には位置だけでなく `orientation / angular velocity` も出して、raw detection と tracked 出力の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.Server/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
 
