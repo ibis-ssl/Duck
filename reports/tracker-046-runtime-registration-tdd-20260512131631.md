@@ -44,11 +44,13 @@
 - `sed -n '1,320p' TrackerConnectionLib/src/UdpTrackerReceiver.cs`
 - `sed -n '1,260p' Tracker/Tracker.Tests/Tracker.Tests.csproj`
 - `DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" NUGET_PACKAGES="$PWD/.codex-nuget-packages" dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~TrackerRuntimeRegistrationTddTests -m:1 /nr:false`
-- `git diff --check`（commit 前に実行予定）
-- `git add ...`（commit 前に実行予定）
-- `git commit ...`（commit 前に実行予定）
-- `git push origin feat/tracker-captureon-compare-log`（commit 後に実行予定）
-- `gh pr view 9 --repo ibis-ssl/Duck --json number,title,state,isDraft,headRefName,baseRefName,url,headRefOid`（push 後に実行予定）
+- `git diff --check`
+- `git add Tracker/Tracker.Tests/TrackerRuntimeRegistrationTddTests.cs Tracker/Tracker.Core/Design/tasks-status.md Tracker/Tracker.Core/Design/phases-status.md reports/tracker-046-runtime-registration-tdd-20260512131631.md && git diff --cached --name-status && git diff --cached --check`
+- `git commit -m "test(tracker): TRACKER-046 runtime登録TDDを追加する" ...`
+- `git rev-parse HEAD`
+- `git push origin feat/tracker-captureon-compare-log`
+- `gh pr view 9 --repo ibis-ssl/Duck --json number,title,state,isDraft,headRefName,baseRefName,url,headRefOid`
+- `git status --short --branch`
 
 ## 対象ファイル
 
@@ -77,9 +79,17 @@
   - live UDP receiver sidecar contract: `live receiver must forward own, external, and unknown tracker packets to the snapshot writer.`
   - CaptureOff race contract: `writer InvalidOperationException must be converted to skip/error handling or otherwise isolated from the live receiver loop.`
 - `tasks-status.md` / `phases-status.md` は `TRACKER-046` TDD failing test 作成済み・production 実装待ちへ同期した。
-- commit hash: 後続追記。
-- push 結果: 後続追記。
-- PR #9: 後続追記。
+- `git diff --check`: 問題なし。
+- `git diff --cached --check`: 問題なし。
+- TDD commit hash: `948e7d7d1c52d886506b32e203f0f2262adecd60`
+- push 結果: `674531e..948e7d7  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
+- PR #9: `https://github.com/ibis-ssl/Duck/pull/9`
+  - state: `OPEN`
+  - draft: `true`
+  - base: `main`
+  - head: `feat/tracker-captureon-compare-log`
+  - headRefOid: `948e7d7d1c52d886506b32e203f0f2262adecd60`
 
 ## リスク
 
