@@ -4,22 +4,17 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-040
-- Title: CaptureOn 比較ログ拡張の設計と tracking を追加する
+- ID: TRACKER-041
+- Title: 他 tracker packet 受信・識別の契約テストを追加する
 - Phase: comparison-logging
-- Status: in_progress
+- Status: todo
 - Size: small
-- Dependencies: TRACKER-039
+- Dependencies: TRACKER-040, ユーザーの設計承認
 - Exit Criteria:
-  - `TRACKER-039` が PR #8 merge 済みであることを tracking に同期している
-  - `comparison-logging` phase と `TRACKER-041` 以降の後続小タスクが `tasks-status.md` / `phases-status.md` に登録されている
-  - `TrackerConnectionLib` を 3rdparty tracker 傍受の第一候補統合点とする設計方針が文書化されている
-  - `Tracker.Server` を CaptureOn session と比較ログの統合層とし、`Tracker.Core` へ 3rdparty tracker 傍受・比較保存処理を入れない責務境界が文書化されている
-  - 比較ログを既存 diagnostics log の破壊的拡張ではなく sidecar JSONL 主記録にする方針と、diagnostics 側の参照/集計互換追加方針が文書化されている
-  - self除外、`uuid` / `sourceName` / remote endpoint、timestamp近傍比較、Capture Off / 再On、他 tracker 不在時の扱いが設計に含まれている
-  - `TRACKER-000` から `TRACKER-038` までの完了済み履歴が `Tracker/Tracker.Core/Design/tracker-history-000-038.md` に退避され、現行 `tasks-status.md` は `TRACKER-039` 起点で読める
-  - 実装前 draft PR に載せる差分として、実装コードやテストコードを変更していない
-  - 作業レポート `reports/topic-tracker-captureon-compare-design-sync-20260512092613.md` に実行コマンド、変更ファイル、結果、リスクが記録されている
+  - 実装開始前に、PR #9 `https://github.com/ibis-ssl/Duck/pull/9` の `TRACKER-040` 設計・tracking 差分についてユーザーの設計承認を得ている
+  - `TrackerConnectionLib` を第一候補として、ibis と異なる `uuid` / `sourceName` の `TrackerWrapperPacket` を比較候補として扱う failing test を追加する
+  - ibis 自身の packet は除外し、複数 source の最新状態を保持する failing test を追加する
+  - 実装は test を通す最小限に限定し、review report に blocking finding が残らない
 
 ## 次の調査タスク
 
@@ -30,8 +25,8 @@
 | ID | タスク | フェーズ | 状態 | 依存関係 | 完了条件 |
 | --- | --- | --- | --- | --- | --- |
 | TRACKER-039 | diagnostics log の trackedFrame 3448 付近で青1番が11番へ化ける原因を調査して修正する | investigation | done | TRACKER-038 | 原因は raw Vision で青1番 / 青11番が同一位置近傍に重複し、さらに青1番が別 robot 位置にも現れたとき、merge window 内の後続同一 ID 候補が既存 track 近傍候補を上書きし、突然の ID 入れ替わりを位置ズレより低確率として扱っていなかったことだった。既存同一 ID track 近傍候補の優先と、既存別 ID track 近傍への突然の ID 入れ替わり抑制を `RobotTracker.IdentitySwitchDistanceMm` として外出しして実装した。番号ワープを失敗条件にした再発防止テストは stash で旧実装が失敗し、修正後に成功した。証跡は `reports/tracker-039-evidence-20260512084929.md`、初回 review は `reports/tracker-039-review-20260512085258.md`、r2 review は `reports/tracker-039-review-r2-20260512090207.md` に記録済み。初回 review の Medium 指摘は進捗ファイル同期漏れで対応済み。r2 review は指摘なし。PR #8 `https://github.com/ibis-ssl/Duck/pull/8` は `2026-05-12T00:06:33Z` に merge 済み。 |
-| TRACKER-040 | CaptureOn 比較ログ拡張の設計と tracking を追加する | comparison-logging | in_progress | TRACKER-039 | `comparison-logging` phase と後続小タスクを追加し、`TrackerConnectionLib` を 3rdparty tracker 傍受の第一候補統合点、`Tracker.Server` を CaptureOn session への比較ログ統合層、`Tracker.Core` を傍受・比較保存対象外とする責務境界を設計書に明記する。sidecar JSONL 主記録、diagnostics 互換参照/self除外/timestamp近傍比較/Capture Off 再On/他 tracker 不在時の扱いを文書化し、実装前 draft PR 用の差分として実装コード・テストコードは変更しない。 |
-| TRACKER-041 | 他 tracker packet 受信・識別の契約テストを追加する | comparison-logging | todo | TRACKER-040 | `TrackerConnectionLib` を第一候補として、ibis と異なる `uuid` / `sourceName` の `TrackerWrapperPacket` を比較候補として扱い、ibis 自身の packet は除外し、複数 source の最新状態を保持する failing test を追加する。実装は test を通す最小限に限定し、review report に blocking finding が残らない。 |
+| TRACKER-040 | CaptureOn 比較ログ拡張の設計と tracking を追加する | comparison-logging | done | TRACKER-039 | `comparison-logging` phase と後続小タスクを追加し、`TrackerConnectionLib` を 3rdparty tracker 傍受の第一候補統合点、`Tracker.Server` を CaptureOn session への比較ログ統合層、`Tracker.Core` を傍受・比較保存対象外とする責務境界を設計書に明記した。sidecar JSONL 主記録、diagnostics 互換参照/self除外/timestamp近傍比較/Capture Off 再On/他 tracker 不在時の扱いを文書化し、実装前 draft PR #9 `https://github.com/ibis-ssl/Duck/pull/9` を作成済み。実装コード・テストコードは未変更。gpt-5.5 high review は `reports/tracker-040-design-review-20260512094448.md` に記録済みで blocking findings なし。進捗同期は `reports/tracker-040-progress-sync-20260512094809.md` に記録する。 |
+| TRACKER-041 | 他 tracker packet 受信・識別の契約テストを追加する | comparison-logging | todo | TRACKER-040, ユーザーの設計承認 | 実装開始前に、PR #9 `https://github.com/ibis-ssl/Duck/pull/9` の `TRACKER-040` 設計・tracking 差分についてユーザーの設計承認を得る。`TrackerConnectionLib` を第一候補として、ibis と異なる `uuid` / `sourceName` の `TrackerWrapperPacket` を比較候補として扱い、ibis 自身の packet は除外し、複数 source の最新状態を保持する failing test を追加する。実装は test を通す最小限に限定し、review report に blocking finding が残らない。 |
 | TRACKER-042 | CaptureOn session に比較 sidecar path と metadata を追加する | comparison-logging | todo | TRACKER-041 | CaptureOn session metadata に比較 sidecar path と比較ログ設定を記録し、Capture Off / 再On で新しい session へ切り替わる契約を test で固定する。既存 packet capture、diagnostics sidecar、render snapshot の basename 関係を壊さない。 |
 | TRACKER-043 | CaptureOn 中に他 tracker packet を比較 sidecar JSONL へ保存する | comparison-logging | todo | TRACKER-042 | CaptureOn 中に受信した他 tracker packet を `receivedAt`、remote endpoint、`uuid`、`sourceName`、tracked frame number/timestamp、payload または summary として sidecar JSONL に保存し、self除外、flush、壊れた packet の skipped/error count を満たす。 |
 | TRACKER-044 | ibis committed frame と他 tracker 最新 packet を diagnostics / replay で比較可能にする | comparison-logging | todo | TRACKER-043 | 既存 diagnostics log reader の互換性を壊さず、比較 sidecar を reader または `Tracker.CaptureReplay` から読めるようにし、ibis committed frame の timestamp 近傍にある他 tracker frame の source、frame number、ball/robot count を出せる。 |
