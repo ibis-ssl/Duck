@@ -39,6 +39,20 @@
 - `git log --oneline --decorate -5`
 - `git diff -- Tracker/Tracker.Core/Design/tasks-status.md Tracker/Tracker.Core/Design/phases-status.md`
 - `git diff --numstat -- '*.cs' '*.razor' '*.csproj' '*.fs' '*.vb'`
+- `git diff --check`
+- `git add Tracker/Tracker.Core/Design/tasks-status.md Tracker/Tracker.Core/Design/phases-status.md reports/tracker-040-design-review-r2-20260512102542.md reports/tracker-040-r2-progress-sync-20260512102917.md`
+- `git diff --cached --name-status`
+- `git diff --cached --check`
+- `git commit -m "docs(tracker): TRACKER-040 r2レビュー結果を同期" ...`
+- `git push origin feat/tracker-captureon-compare-log`
+- `git status --short --branch`
+- `git rev-parse HEAD`
+- `gh pr view 9 --json number,title,state,isDraft,headRefName,baseRefName,url`
+- `git add reports/tracker-040-r2-progress-sync-20260512102917.md`
+- `git diff --cached --name-status`
+- `git diff --cached --check`
+- `git commit -m "docs(tracker): TRACKER-040 r2同期結果を記録" ...`
+- `git push origin feat/tracker-captureon-compare-log`
 
 ## 対象ファイル
 
@@ -60,10 +74,12 @@
 - `TRACKER-041` は未着手のまま維持し、開始前にユーザー設計承認が必要であることを維持した。
 - 実装コード・テストコードは変更していない。`git diff --numstat -- '*.cs' '*.razor' '*.csproj' '*.fs' '*.vb'` は空。
 - PR #9 は `OPEN` / draft、base `main`、head `feat/tracker-captureon-compare-log` のまま。URL は `https://github.com/ibis-ssl/Duck/pull/9`。
-- 同期 commit hash と push 結果は、この report を含む同期 commit / push 後に追記する。
+- 同期 commit hash: `7ff975e388ba1e4f2dc73b6696919a5b363acace`
+- 同期 commit push 結果: `9ac4d23..7ff975e  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
+- 同期 commit push 後の `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log`
 
 ## リスク
 
 - PR #9 は draft のままで、ready 化は対象外。
 - `TRACKER-041` は未着手。ユーザーの設計承認なしに TDD / 実装へ進めてはならない。
-- この report 自身を含む commit hash を同じ commit 内へ正確に記録することは、commit hash がファイル内容に依存するためできない。同期 commit / push 結果は後続の report-only 追記 commit で記録する。
+- この report 自身を含む最終 report-only 追記 commit hash を同じ commit 内へ正確に記録することは、commit hash がファイル内容に依存するためできない。同期 commit / push 結果はこの report に記録済み。
