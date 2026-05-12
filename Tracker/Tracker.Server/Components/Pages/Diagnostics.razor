@@ -201,56 +201,115 @@
                     {
                         var leftField = LeftFieldRenderModel();
                         var rightField = RightFieldRenderModel();
-                        <div class="diagnostics-render">
-                            <section>
-                                <header class="diagnostics-render__header">
-                                    <h2>@leftField.Title Field</h2>
-                                    <select class="diagnostics-select diagnostics-field-source__select"
-                                            value="@LeftFieldSourceValue()"
-                                            @onchange="OnLeftFieldSourceChanged"
-                                            aria-label="Left Field source">
-                                        @foreach (var option in ComparisonViewState.FieldSourceOptions)
-                                        {
-                                            <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
-                                                @option.Label
-                                            </option>
-                                        }
-                                    </select>
-                                </header>
-                                @if (!string.IsNullOrEmpty(leftField.Status))
-                                {
-                                    <div class="diagnostics-field-source__status">@leftField.Status</div>
-                                }
-                                <VisionFieldCanvas Geometry="leftField.Geometry"
-                                                   Balls="leftField.Balls"
-                                                   RobotsYellow="leftField.RobotsYellow"
-                                                   RobotsBlue="leftField.RobotsBlue" />
-                            </section>
-                            <section>
-                                <header class="diagnostics-render__header">
-                                    <h2>@rightField.Title Field</h2>
-                                    <select class="diagnostics-select diagnostics-field-source__select"
-                                            value="@RightFieldSourceValue()"
-                                            @onchange="OnRightFieldSourceChanged"
-                                            aria-label="Right Field source">
-                                        @foreach (var option in ComparisonViewState.FieldSourceOptions)
-                                        {
-                                            <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
-                                                @option.Label
-                                            </option>
-                                        }
-                                    </select>
-                                </header>
-                                @if (!string.IsNullOrEmpty(rightField.Status))
-                                {
-                                    <div class="diagnostics-field-source__status">@rightField.Status</div>
-                                }
-                                <VisionFieldCanvas Geometry="rightField.Geometry"
-                                                   Balls="rightField.Balls"
-                                                   RobotsYellow="rightField.RobotsYellow"
-                                                   RobotsBlue="rightField.RobotsBlue" />
-                            </section>
+                        var isOverlayMode = comparisonUiState?.FieldDisplayMode == TrackerDiagnosticsFieldDisplayMode.Overlay;
+                        <div class="diagnostics-field-display">
+                            <div class="diagnostics-field-display__mode">
+                                <span>Field view</span>
+                                <select class="diagnostics-select diagnostics-field-mode__select"
+                                        value="@FieldDisplayModeValue()"
+                                        @onchange="OnFieldDisplayModeChanged"
+                                        aria-label="Field display mode">
+                                    <option value="@TrackerDiagnosticsFieldDisplayMode.Split">Split</option>
+                                    <option value="@TrackerDiagnosticsFieldDisplayMode.Overlay">Overlay</option>
+                                </select>
+                            </div>
                         </div>
+                        @if (isOverlayMode)
+                        {
+                            var overlayField = OverlayFieldRenderModel();
+                            <div class="diagnostics-render diagnostics-render--overlay">
+                                <section>
+                                    <header class="diagnostics-render__header diagnostics-render__header--overlay">
+                                        <h2>Overlay Field</h2>
+                                        <div class="diagnostics-field-source__overlay-selectors">
+                                            <label>
+                                                <span>Layer A</span>
+                                                <select class="diagnostics-select diagnostics-field-source__select"
+                                                        value="@LeftFieldSourceValue()"
+                                                        @onchange="OnLeftFieldSourceChanged"
+                                                        aria-label="Layer A Field source">
+                                                    @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                                    {
+                                                        <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                            @option.Label
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </label>
+                                            <label>
+                                                <span>Layer B</span>
+                                                <select class="diagnostics-select diagnostics-field-source__select"
+                                                        value="@RightFieldSourceValue()"
+                                                        @onchange="OnRightFieldSourceChanged"
+                                                        aria-label="Layer B Field source">
+                                                    @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                                    {
+                                                        <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                            @option.Label
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </header>
+                                    <DiagnosticsFieldOverlayCanvas Model="overlayField"
+                                                                   VisibilityChanged="OnOverlayLayerVisibilityChanged" />
+                                </section>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="diagnostics-render">
+                                <section>
+                                    <header class="diagnostics-render__header">
+                                        <h2>@leftField.Title Field</h2>
+                                        <select class="diagnostics-select diagnostics-field-source__select"
+                                                value="@LeftFieldSourceValue()"
+                                                @onchange="OnLeftFieldSourceChanged"
+                                                aria-label="Left Field source">
+                                            @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                            {
+                                                <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                    @option.Label
+                                                </option>
+                                            }
+                                        </select>
+                                    </header>
+                                    @if (!string.IsNullOrEmpty(leftField.Status))
+                                    {
+                                        <div class="diagnostics-field-source__status">@leftField.Status</div>
+                                    }
+                                    <VisionFieldCanvas Geometry="leftField.Geometry"
+                                                       Balls="leftField.Balls"
+                                                       RobotsYellow="leftField.RobotsYellow"
+                                                       RobotsBlue="leftField.RobotsBlue" />
+                                </section>
+                                <section>
+                                    <header class="diagnostics-render__header">
+                                        <h2>@rightField.Title Field</h2>
+                                        <select class="diagnostics-select diagnostics-field-source__select"
+                                                value="@RightFieldSourceValue()"
+                                                @onchange="OnRightFieldSourceChanged"
+                                                aria-label="Right Field source">
+                                            @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                            {
+                                                <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                    @option.Label
+                                                </option>
+                                            }
+                                        </select>
+                                    </header>
+                                    @if (!string.IsNullOrEmpty(rightField.Status))
+                                    {
+                                        <div class="diagnostics-field-source__status">@rightField.Status</div>
+                                    }
+                                    <VisionFieldCanvas Geometry="rightField.Geometry"
+                                                       Balls="rightField.Balls"
+                                                       RobotsYellow="rightField.RobotsYellow"
+                                                       RobotsBlue="rightField.RobotsBlue" />
+                                </section>
+                            </div>
+                        }
                         <div class="@RenderResizeHandleClass()"
                              role="separator"
                              aria-orientation="horizontal"

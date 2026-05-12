@@ -5,7 +5,7 @@
 ## 全体状況
 
 - 現在のフェーズ: comparison-logging
-- 現在のタスク: TRACKER-057
+- 現在のタスク: TRACKER-053
 - 残りフェーズ: none
 
 ## フェーズ一覧
@@ -28,6 +28,6 @@
 - `TRACKER-054`: live tracker receiver の endpoint override を追加する。既定は起動時 resolved ibis publish endpoint と同じ address / port を監視しつつ、`Tracker:Receive:MulticastAddress` / `Port` で別 endpoint を明示できるようにした。gpt-5.5 high review blocking findings なしまで完了済み。
 - `TRACKER-055`: diagnostics playback / scrubber の低速問題を解消する。実装担当 sub-agent が lightweight index cache と Fast Forward `4x` / `16x` / `64x` selector を追加した。初回reviewの同一timestamp tie-break regression は regression test と `FindTimestampStartIndex` で修正済み。focused full 32 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-055-playback-scrub-performance-implementation-20260513001906.md`、初回reviewは `reports/tracker-055-review-20260513003935.md`、r2 review は `reports/tracker-055-review-r2-20260513005448.md`、進捗同期は `reports/tracker-055-progress-sync-20260513005919.md` に記録済みで blocking findings なし。完了済み。
 - `TRACKER-056`: diagnostics Field の左右 source 切替と comparison 折り畳みを追加する。実装担当 sub-agent が TDD Red 後、左右 Field source selector、Field source に `All` を含めない contract、nearest snapshot Field data、TRACKER-055 cache reuse、comparison panel fold state を focused test で固定し、実装済み。focused test は `TrackerDiagnosticsComparisonViewStateTests|DiagnosticsPlaybackStateTests` 36 passed、`git diff --check` 問題なし。設計具体化は `reports/tracker-056-field-source-toggle-design-20260513010250.md`、実装は `reports/tracker-056-field-source-toggle-implementation-20260513011324.md`、review は `reports/tracker-056-review-20260513013805.md`、進捗同期は `reports/tracker-056-progress-sync-20260513014628.md` に記録済みで blocking findings なし。`DiagnosticsFieldViewFactory` の mapper 直テスト不足は held concern として保持する。完了済み。
-- `TRACKER-057`: diagnostics Field 重ね合わせ表示を追加する。want 扱いだが、`TRACKER-056` の単一 Field source model を再利用できる範囲で実装する。
+- `TRACKER-057`: diagnostics Field 重ね合わせ表示を追加する。want 扱いだが、`TRACKER-056` の左右 Field source selector / `TrackerDiagnosticsFieldSourceFrame` を再利用した左右2 source overlayを最小実装した。初回reviewの同一source二重描画 held concern は follow-up で同一sourceを1 layer扱いに修正済み。focused test は `TrackerDiagnosticsComparisonViewStateTests|DiagnosticsFieldViewFactoryTests|DiagnosticsPlaybackStateTests` 45 passed、`git diff --check` 問題なし。実装レポートは `reports/tracker-057-field-overlay-implementation-20260513015935.md`、初回reviewは `reports/tracker-057-review-20260513022102.md`、r2 review は `reports/tracker-057-review-r2-20260513023505.md`、進捗同期は `reports/tracker-057-progress-sync-20260513023929.md` に記録済みで blocking findings なし。完了済み。
 - `TRACKER-053`: PR #9 ready 化。`TRACKER-057` 完了後、または overlay を明示 defer した後に PR本文を `TRACKER-040` から最終状態まで更新し、final validation、manual evidence、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
 - `TRACKER-058` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。

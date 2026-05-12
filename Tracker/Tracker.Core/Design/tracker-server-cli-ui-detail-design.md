@@ -170,6 +170,35 @@ focused tests では、少なくとも次を固定する。
 - missing / empty / corrupt / own baseline missing / candidate missing / drawable objects empty の status が Field 表示用 model に残る。
 - `DiagnosticsFieldViewFactory` が semantic summary の ball と yellow / blue robot を `VisionFieldCanvas` 用 DTO に変換する。
 
+## diagnostics Field 重ね合わせ表示
+
+`TRACKER-057` では、`TRACKER-056` の左右 Field source selector と `TrackerDiagnosticsFieldSourceFrame` を再利用して、選択中 diagnostics entry に対する 2 source overlay を追加する。want 扱いのため、source selector を別体系に増やす実装や、任意個数 source の多重 overlay はこの PR の最小実装に含めない。
+
+overlay mode の UI は Field 表示領域の見出し行に置く。左右 Field の selector は維持し、表示 mode は `Split` / `Overlay` の segmented control または同等の二択 control として Field 表示領域全体に対して切り替える。`Split` は現行どおり左 Field と右 Field を並べ、`Overlay` は同じ左右 selector の選択結果を `Layer A` / `Layer B` として 1 枚の Field に重ねる。`Tracker Comparison` panel の折り畳み状態とは独立させ、panel 折り畳み中も mode 切替、左右 selector、overlay legend / visibility は使える。
+
+overlay 対象 source は、追加の multi-select ではなく現在の左 Field source と右 Field source の 2 つに限定する。既定は左 `Vision Input`、右 ibis tracker output のため、初期 overlay は vision input と ibis tracker output の重ね合わせになる。`External`、`Unknown`、source label は `TRACKER-056` と同じ nearest timestamp selection で `TrackerDiagnosticsFieldSourceFrame` を解決する。Field source として `All` は引き続き使わない。左右が同じ source の場合は 1 layer として扱い、legend に同一 source であることを表示する。
+
+overlay の色分けは source layer を識別するためのもので、yellow / blue team の意味を置き換えない。最小仕様では、`Layer A` を cyan 系 stroke / label、`Layer B` を magenta 系 stroke / label とし、robot body の yellow / blue fill は維持する。ball は layer 色の ring または stroke で区別する。重なりを読めるように `Layer B` は破線または半透明 stroke を使う。legend は overlay Field の近くに表示し、各 layer の表示名、source role / label、status、nearest timestamp delta、record count または drawable count を最小限表示する。
+
+visibility は overlay legend 内の layer ごとの checkbox または toggle で制御する。既定は両 layer visible とする。visibility state は `Diagnostics.razor.cs` の page state に保持し、query string、session storage、local storage には保存しない。log file 変更時は両 layer visible に戻し、timeline scrub / playback tick / Field source selector 変更では現在の visibility を維持する。片方を非表示にしても source selection 自体は変えない。
+
+描画 component は、既存 `VisionFieldCanvas` を多 source 入力へ拡張するのではなく、`Tracker.Server` の diagnostics 用 overlay component を追加する。`VisionFieldCanvas` は raw vision / single source Field の汎用 component として維持し、overlay component は `VisionFieldProjection`、`VisionFieldLines`、`VisionRenderOptions`、既存 geometry DTO を再利用する。marker の source layer styling が必要な場合は `VisionBallMarker` / `VisionRobotMarker` に任意 class / stroke option を最小追加するか、overlay component 内で layer marker を直接描く。既存 `VisionFieldCanvas` の single source 表示、zoom / pan、cursor overlay を壊さない範囲に留める。
+
+overlay 用 model は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を直接再利用し、raw `Vision Input` と ibis tracker output も同じ overlay layer に変換できる小さな view model を `Diagnostics.razor.cs` または専用 factory で作る。tracker source layer は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の mapper で ball / yellow robot / blue robot に変換する。render snapshot 由来 layer は既存の raw source detections と `TrackedVisionViewState.FromSnapshot(...)` を使う。nearest selection、own baseline timestamp、candidate missing 等の status 判定は `TrackerDiagnosticsComparisonViewStateReader.LoadFieldSourceFrame(...)` と cached index を使い、overlay 専用に sidecar JSONL を再読込しない。
+
+missing / empty / geometry なし / candidate なしの扱いは `TRACKER-056` と揃える。render snapshot geometry がない場合、overlay Field は geometry なしの empty state とし、tracker source sidecar だけから geometry を復元しない。metadata missing、sidecar not-created、sidecar missing、sidecar empty、sidecar corrupt、own baseline missing、candidate missing、drawable objects empty は layer status として legend に表示し、他の ready layer があればその layer だけ描画する。両 layer が描画不可でも Field 領域は消さず、empty Field と status を表示する。
+
+focused tests では、少なくとも次を固定する。
+
+- overlay mode state は `Split` / `Overlay` を持ち、log file 変更時に `Split` または既定 mode へ戻す。scrub / playback tick では mode と visibility を維持する。
+- overlay 対象 source は左右 Field source selector の 2 source であり、overlay 専用 source list や Field source `All` を追加しない。
+- overlay layer は `Vision Input`、ibis tracker、`External`、`Unknown`、source label を混在でき、tracker source は `TRACKER-056` と同じ `TrackerDiagnosticsFieldSourceFrame` / nearest timestamp selection / cached index を使う。
+- sidecar unavailable、own baseline missing、candidate missing、drawable empty、geometry missing が layer status として残り、ready layer の描画を巻き込んで消さない。
+- layer visibility toggle は source selection を変えず、hidden layer を overlay 描画から除外する。
+- overlay component または factory が layer A / B の色分け、legend 表示値、semantic summary mapper の ball / yellow / blue 変換を固定する。
+
+実装対象は `TrackerDiagnosticsComparisonUiState`、`TrackerDiagnosticsComparisonViewStateReader`、`Diagnostics.razor` / `.cs` / `.css`、diagnostics Field overlay component、`DiagnosticsFieldViewFactory`、関連 focused tests、必要なら `Tracker.Server/README.md` に限定する。非対象は receiver / snapshot writer / metadata schema / `Tracker.Core` tracking algorithm / `Tracker.CaptureReplay` 出力変更 / 任意個数 source overlay / 永続化設定とする。
+
 ## 後続タスクへの固定事項
 
 - `TRACKER-047` では、既存 `TrackerSnapshotReplayReader` / `TrackerReplayIntegrationTddTests` の review gate を閉じる。focused 4 passed、関連 focused 39 passed、full `Tracker.Tests` 191 passed の実装検証済み状態を保持し、gpt-5.5 high review で blocking finding がないことを確認する。finding が出た場合は修正・再検証・r2 review まで完了する。
@@ -181,7 +210,7 @@ focused tests では、少なくとも次を固定する。
 - `TRACKER-054` では、live tracker receiver の endpoint override を追加する。既定は起動時 resolved ibis publish endpoint を監視し、`Tracker:Receive:MulticastAddress` / `Port` 指定時は receiver 独自 endpoint を監視する。runtime profile switch 後の receiver socket 再構成は対象外とし、起動時固定として README と設計に明記する。
 - `TRACKER-055` では、diagnostics playback / scrubber の低速問題を解消する。scrub / playback tick は lightweight index cache から comparison を更新し、sidecar size に比例する再読込に戻さない。
 - `TRACKER-056` では、`Tracker Comparison` panel を折り畳み可能にし、左右 Field の source を `Vision Input`、ibis tracker、external、unknown、source label から選べるようにする。既定は左 `Vision Input`、右 ibis tracker output とし、tracker source は selected diagnostics entry に対する nearest timestamp snapshot を Field に描画する。`All` は Field source として使わない。
-- `TRACKER-057` では、Field 重ね合わせ表示を追加する want タスクとして、`TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を再利用する。overlay 実装が複雑化する場合は PR ready 前に defer 判断を report に明記する。
+- `TRACKER-057` では、Field 重ね合わせ表示を追加する want タスクとして、`TRACKER-056` の左右 Field source selector と `TrackerDiagnosticsFieldSourceFrame` を再利用する。最小実装は左右 2 source overlay、layer 色分け、legend、layer visibility に限定し、任意個数 source overlay や永続化設定は含めない。overlay 実装が複雑化する場合は PR ready 前に defer 判断を report に明記する。
 - `TRACKER-053` では、PR #9 ready 化を行う。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
 - `TRACKER-058` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
 
@@ -197,5 +226,6 @@ focused tests では、少なくとも次を固定する。
 - 3rdparty tracker snapshot を `Tracker.CaptureReplay` の CLI 出力と `/diagnostics` の comparison panel / playback から再生・比較表示できる。
 - `/diagnostics` の左右 Field で `Vision Input`、ibis tracker、external、unknown、source label を選択でき、既定は左 `Vision Input`、右 ibis tracker output のまま維持される。
 - `Tracker Comparison` panel を折り畳んでも Field source selector と Field 描画を使える。
+- `/diagnostics` の Field overlay mode で左右 Field source selector の 2 source を同一 Field に重ね、source layer ごとの色分け、legend、visibility を確認できる。
 - scrub / playback tick / Field source selector 変更で tracker packet snapshot sidecar JSONL 全体を再読込しない。
 - 各小タスクで TDD、review、commit、PR gate が閉じている。

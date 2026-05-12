@@ -321,6 +321,30 @@
     min-height: 0;
 }
 
+.diagnostics-field-display {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.12rem;
+}
+
+.diagnostics-field-display__mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #89a38b;
+    font-size: 0.72rem;
+}
+
+.diagnostics-field-mode__select {
+    flex: 0 0 7.4rem;
+    min-height: 1.7rem;
+    font-size: 0.72rem;
+}
+
+.diagnostics-render--overlay {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .diagnostics-render section {
     display: flex;
     flex-direction: column;
@@ -343,10 +367,31 @@
     white-space: nowrap;
 }
 
+.diagnostics-render__header--overlay {
+    align-items: flex-end;
+}
+
 .diagnostics-field-source__select {
     flex: 0 1 12rem;
     min-height: 1.7rem;
     font-size: 0.72rem;
+}
+
+.diagnostics-field-source__overlay-selectors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.28rem;
+    min-width: 0;
+}
+
+.diagnostics-field-source__overlay-selectors label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.24rem;
+    min-width: 0;
+    color: #89a38b;
+    font-size: 0.68rem;
 }
 
 .diagnostics-field-source__status {

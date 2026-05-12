@@ -39,6 +39,9 @@ public sealed class TrackerDiagnosticsComparisonUiState
         SelectedSourceFilter = TrackerDiagnosticsComparisonSourceFilter.All;
         LeftFieldSource = TrackerDiagnosticsFieldSource.VisionInput;
         RightFieldSource = TrackerDiagnosticsFieldSource.IbisTracker;
+        FieldDisplayMode = TrackerDiagnosticsFieldDisplayMode.Split;
+        IsOverlayLayerAVisible = true;
+        IsOverlayLayerBVisible = true;
     }
 
     /// <summary>
@@ -60,6 +63,21 @@ public sealed class TrackerDiagnosticsComparisonUiState
     /// 右 Field の source selector 状態。
     /// </summary>
     public TrackerDiagnosticsFieldSource RightFieldSource { get; private set; }
+
+    /// <summary>
+    /// Field 表示 mode。
+    /// </summary>
+    public TrackerDiagnosticsFieldDisplayMode FieldDisplayMode { get; private set; }
+
+    /// <summary>
+    /// overlay Layer A の表示状態。
+    /// </summary>
+    public bool IsOverlayLayerAVisible { get; private set; }
+
+    /// <summary>
+    /// overlay Layer B の表示状態。
+    /// </summary>
+    public bool IsOverlayLayerBVisible { get; private set; }
 
     /// <summary>
     /// 左 Field に tracker sidecar source を選んだ場合の解決結果。
@@ -94,6 +112,8 @@ public sealed class TrackerDiagnosticsComparisonUiState
         RightFieldSource = TrackerDiagnosticsFieldSource.IbisTracker;
         LeftTrackerFieldSourceFrame = null;
         RightTrackerFieldSourceFrame = null;
+        FieldDisplayMode = TrackerDiagnosticsFieldDisplayMode.Split;
+        ResetOverlayLayerVisibility();
     }
 
     /// <summary>
@@ -102,6 +122,67 @@ public sealed class TrackerDiagnosticsComparisonUiState
     public void ToggleComparisonPanelCollapsed()
     {
         IsComparisonPanelCollapsed = !IsComparisonPanelCollapsed;
+    }
+
+    /// <summary>
+    /// Field 表示 mode を切り替える。
+    /// </summary>
+    public void SelectFieldDisplayMode(TrackerDiagnosticsFieldDisplayMode displayMode)
+    {
+        FieldDisplayMode = displayMode;
+    }
+
+    /// <summary>
+    /// overlay layer の表示状態を設定する。
+    /// </summary>
+    public void SetOverlayLayerVisibility(
+        TrackerDiagnosticsOverlayLayerKey layerKey,
+        bool isVisible)
+    {
+        switch (layerKey)
+        {
+            case TrackerDiagnosticsOverlayLayerKey.LayerA:
+                IsOverlayLayerAVisible = isVisible;
+                break;
+            case TrackerDiagnosticsOverlayLayerKey.LayerB:
+                IsOverlayLayerBVisible = isVisible;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(layerKey), layerKey, null);
+        }
+    }
+
+    /// <summary>
+    /// overlay layer source model を現在の左右 Field source selector から作る。
+    /// </summary>
+    public IReadOnlyList<TrackerDiagnosticsFieldOverlayLayerSource> CreateOverlayLayerSources()
+    {
+        if (LeftFieldSource == RightFieldSource)
+        {
+            return
+            [
+                new TrackerDiagnosticsFieldOverlayLayerSource(
+                    TrackerDiagnosticsOverlayLayerKey.LayerA,
+                    "Layer A/B",
+                    LeftFieldSource,
+                    IsOverlayLayerAVisible,
+                    "same source"),
+            ];
+        }
+
+        return
+        [
+            new TrackerDiagnosticsFieldOverlayLayerSource(
+                TrackerDiagnosticsOverlayLayerKey.LayerA,
+                "Layer A",
+                LeftFieldSource,
+                IsOverlayLayerAVisible),
+            new TrackerDiagnosticsFieldOverlayLayerSource(
+                TrackerDiagnosticsOverlayLayerKey.LayerB,
+                "Layer B",
+                RightFieldSource,
+                IsOverlayLayerBVisible),
+        ];
     }
 
     /// <summary>
@@ -214,6 +295,12 @@ public sealed class TrackerDiagnosticsComparisonUiState
 
         SelectRightFieldSource(source, diagnosticsLogPath, selectedEntry);
         return true;
+    }
+
+    private void ResetOverlayLayerVisibility()
+    {
+        IsOverlayLayerAVisible = true;
+        IsOverlayLayerBVisible = true;
     }
 
     /// <summary>
@@ -336,3 +423,50 @@ public sealed class TrackerDiagnosticsComparisonUiState
             : TrackerDiagnosticsComparisonSelectedEntry.FromDiagnosticsEntry(selectedEntry);
     }
 }
+
+/// <summary>
+/// diagnostics Field の表示 mode。
+/// </summary>
+public enum TrackerDiagnosticsFieldDisplayMode
+{
+    /// <summary>
+    /// 左右 Field を別々に表示する。
+    /// </summary>
+    Split,
+
+    /// <summary>
+    /// 左右 Field source を同一 Field に重ねて表示する。
+    /// </summary>
+    Overlay,
+}
+
+/// <summary>
+/// diagnostics Field overlay の layer 識別子。
+/// </summary>
+public enum TrackerDiagnosticsOverlayLayerKey
+{
+    /// <summary>
+    /// 左 Field source selector に対応する layer。
+    /// </summary>
+    LayerA,
+
+    /// <summary>
+    /// 右 Field source selector に対応する layer。
+    /// </summary>
+    LayerB,
+}
+
+/// <summary>
+/// diagnostics Field overlay layer の source selection model。
+/// </summary>
+/// <param name="LayerKey">layer 識別子。</param>
+/// <param name="LayerName">UI 表示用 layer 名。</param>
+/// <param name="Source">layer に割り当てる Field source。</param>
+/// <param name="IsVisible">layer が表示対象かどうか。</param>
+/// <param name="LegendNote">legend に追加表示する短い補足。</param>
+public sealed record TrackerDiagnosticsFieldOverlayLayerSource(
+    TrackerDiagnosticsOverlayLayerKey LayerKey,
+    string LayerName,
+    TrackerDiagnosticsFieldSource Source,
+    bool IsVisible,
+    string? LegendNote = null);

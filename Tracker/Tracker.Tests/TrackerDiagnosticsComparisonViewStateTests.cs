@@ -285,6 +285,149 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// overlay mode と layer visibility は selected entry / source 変更では維持し、log 変更時だけ既定へ戻ることを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_OverlayModeAndLayerVisibility_ResetOnlyWhenLogChanges()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9850, 98_500_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9851, 98_502_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("ibis-runtime", "ibis", "own", 9852, 98_510_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("", "", "unknown", 9853, 98_511_000_000, ballCount: 1, robotCount: 1),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrames: [9850, 9852]);
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var displayedEntries = ReadDisplayedEntries(session.DiagnosticsPath);
+
+        uiState.Load(session.DiagnosticsPath, displayedEntries[0]);
+        Assert.Equal(TrackerDiagnosticsFieldDisplayMode.Split, uiState.FieldDisplayMode);
+        Assert.True(uiState.IsOverlayLayerAVisible);
+        Assert.True(uiState.IsOverlayLayerBVisible);
+
+        uiState.SelectFieldDisplayMode(TrackerDiagnosticsFieldDisplayMode.Overlay);
+        uiState.SetOverlayLayerVisibility(TrackerDiagnosticsOverlayLayerKey.LayerA, isVisible: false);
+        uiState.Load(session.DiagnosticsPath, displayedEntries[1]);
+        uiState.SelectRightFieldSource(TrackerDiagnosticsFieldSource.Unknown, session.DiagnosticsPath, displayedEntries[1]);
+
+        Assert.Equal(TrackerDiagnosticsFieldDisplayMode.Overlay, uiState.FieldDisplayMode);
+        Assert.False(uiState.IsOverlayLayerAVisible);
+        Assert.True(uiState.IsOverlayLayerBVisible);
+
+        uiState.ResetForLogChange();
+
+        Assert.Equal(TrackerDiagnosticsFieldDisplayMode.Split, uiState.FieldDisplayMode);
+        Assert.True(uiState.IsOverlayLayerAVisible);
+        Assert.True(uiState.IsOverlayLayerBVisible);
+    }
+
+    /// <summary>
+    /// overlay layer source model は既存の左右 selector の 2 source をそのまま使い、Field source に All を含めないことを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_CreateOverlayLayerSources_UsesLeftAndRightSelectorsWithoutAll()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9860, 98_600_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9861, 98_602_000_000, ballCount: 1, robotCount: 1),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 9860);
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var displayedEntry = ReadDisplayedEntries(session.DiagnosticsPath).Single();
+        uiState.Load(session.DiagnosticsPath, displayedEntry);
+        uiState.SelectLeftFieldSource(TrackerDiagnosticsFieldSource.External, session.DiagnosticsPath, displayedEntry);
+        uiState.SelectRightFieldSource(
+            TrackerDiagnosticsFieldSource.ForSourceLabel("thirdparty-a"),
+            session.DiagnosticsPath,
+            displayedEntry);
+
+        var layers = uiState.CreateOverlayLayerSources().ToArray();
+
+        Assert.Equal(2, layers.Length);
+        Assert.Equal(TrackerDiagnosticsOverlayLayerKey.LayerA, layers[0].LayerKey);
+        Assert.Equal(TrackerDiagnosticsFieldSource.External, layers[0].Source);
+        Assert.Equal(TrackerDiagnosticsOverlayLayerKey.LayerB, layers[1].LayerKey);
+        Assert.Equal(TrackerDiagnosticsFieldSourceKind.SourceLabel, layers[1].Source.Kind);
+        Assert.DoesNotContain(
+            uiState.ViewState.FieldSourceOptions,
+            option => string.Equals(option.Label, "All", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// 左右 Field selector が同じ source の overlay は二重描画を避けるため 1 layer に畳み、legend で同一 source と分かることを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_CreateOverlayLayerSources_WhenSelectorsUseSameSource_ReturnsSingleSameSourceLayer()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9865, 98_650_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9866, 98_652_000_000, ballCount: 1, robotCount: 1),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 9865);
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var displayedEntry = ReadDisplayedEntries(session.DiagnosticsPath).Single();
+        uiState.Load(session.DiagnosticsPath, displayedEntry);
+        uiState.SelectLeftFieldSource(TrackerDiagnosticsFieldSource.External, session.DiagnosticsPath, displayedEntry);
+        uiState.SelectRightFieldSource(TrackerDiagnosticsFieldSource.External, session.DiagnosticsPath, displayedEntry);
+
+        var layer = Assert.Single(uiState.CreateOverlayLayerSources());
+
+        Assert.Equal(TrackerDiagnosticsOverlayLayerKey.LayerA, layer.LayerKey);
+        Assert.Equal("Layer A/B", layer.LayerName);
+        Assert.Equal(TrackerDiagnosticsFieldSource.External, layer.Source);
+        Assert.Equal("same source", layer.LegendNote);
+        Assert.True(layer.IsVisible);
+    }
+
+    /// <summary>
+    /// overlay mode / visibility 操作は TRACKER-056 の cached index と source frame を再利用し、sidecar JSONL を再読込しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_OverlayOperations_DoNotReloadSidecar()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 9870, 98_700_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("external-a", "thirdparty-a", "external", 9871, 98_702_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("", "", "unknown", 9872, 98_704_000_000, ballCount: 1, robotCount: 1),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 9870);
+        var buildCount = 0;
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(sidecarPath =>
+        {
+            buildCount++;
+            return TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();
+        });
+        var uiState = new TrackerDiagnosticsComparisonUiState(reader);
+        var displayedEntry = ReadDisplayedEntries(session.DiagnosticsPath).Single();
+
+        uiState.Load(session.DiagnosticsPath, displayedEntry);
+        uiState.SelectLeftFieldSource(TrackerDiagnosticsFieldSource.External, session.DiagnosticsPath, displayedEntry);
+        uiState.SelectRightFieldSource(TrackerDiagnosticsFieldSource.Unknown, session.DiagnosticsPath, displayedEntry);
+        uiState.SelectFieldDisplayMode(TrackerDiagnosticsFieldDisplayMode.Overlay);
+        uiState.SetOverlayLayerVisibility(TrackerDiagnosticsOverlayLayerKey.LayerB, isVisible: false);
+
+        Assert.Equal(1, buildCount);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, uiState.LeftTrackerFieldSourceFrame?.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, uiState.RightTrackerFieldSourceFrame?.Status);
+    }
+
+    /// <summary>
     /// sidecar の file state が変わった場合は cache を破棄し、新しい index を構築することを確認する。
     /// </summary>
     [Fact]

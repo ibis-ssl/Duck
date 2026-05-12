@@ -359,6 +359,11 @@ public partial class Diagnostics : IDisposable
             comparisonUiState?.RightFieldSource ?? TrackerDiagnosticsFieldSource.IbisTracker);
     }
 
+    private string FieldDisplayModeValue()
+    {
+        return (comparisonUiState?.FieldDisplayMode ?? TrackerDiagnosticsFieldDisplayMode.Split).ToString();
+    }
+
     private string ComparisonPanelToggleLabel()
     {
         return comparisonUiState?.IsComparisonPanelCollapsed == true ? "Show" : "Hide";
@@ -388,6 +393,26 @@ public partial class Diagnostics : IDisposable
         return Task.CompletedTask;
     }
 
+    private Task OnFieldDisplayModeChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<TrackerDiagnosticsFieldDisplayMode>(
+                args.Value?.ToString(),
+                ignoreCase: false,
+                out var displayMode))
+        {
+            comparisonUiState?.SelectFieldDisplayMode(displayMode);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnOverlayLayerVisibilityChanged(
+        (TrackerDiagnosticsOverlayLayerKey LayerKey, bool IsVisible) change)
+    {
+        comparisonUiState?.SetOverlayLayerVisibility(change.LayerKey, change.IsVisible);
+        return Task.CompletedTask;
+    }
+
     private DiagnosticsFieldRenderModel LeftFieldRenderModel()
     {
         return CreateFieldRenderModel(
@@ -399,6 +424,31 @@ public partial class Diagnostics : IDisposable
     {
         return CreateFieldRenderModel(
             comparisonUiState?.RightFieldSource ?? TrackerDiagnosticsFieldSource.IbisTracker,
+            comparisonUiState?.RightTrackerFieldSourceFrame);
+    }
+
+    private DiagnosticsFieldOverlayRenderModel OverlayFieldRenderModel()
+    {
+        var overlaySources = comparisonUiState?.CreateOverlayLayerSources()
+            ?? [
+                new TrackerDiagnosticsFieldOverlayLayerSource(
+                    TrackerDiagnosticsOverlayLayerKey.LayerA,
+                    "Layer A",
+                    TrackerDiagnosticsFieldSource.VisionInput,
+                    IsVisible: true),
+                new TrackerDiagnosticsFieldOverlayLayerSource(
+                    TrackerDiagnosticsOverlayLayerKey.LayerB,
+                    "Layer B",
+                    TrackerDiagnosticsFieldSource.IbisTracker,
+                    IsVisible: true),
+            ];
+
+        return DiagnosticsFieldOverlayRenderModelFactory.Create(
+            selectedRenderSnapshot,
+            trackedRenderView,
+            ComparisonViewState,
+            overlaySources,
+            comparisonUiState?.LeftTrackerFieldSourceFrame,
             comparisonUiState?.RightTrackerFieldSourceFrame);
     }
 
