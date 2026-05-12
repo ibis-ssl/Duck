@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Google.Protobuf;
 
@@ -108,15 +109,27 @@ public sealed class TrackerSnapshotReplayReader
                 continue;
             }
 
-            var diagnosticsTimestampNs = ToMinuteRelativeTimestampNs(entry.Timestamp);
-            var nearest = inputs
-                .OrderBy(input => Math.Abs(input.TrackedFrameTimestampNs - diagnosticsTimestampNs))
+            if (!TryGetIbisDataTimestampNs(entry, inputs, out var ibisDataTimestampNs))
+            {
+                continue;
+            }
+
+            var nearestCandidates = inputs
+                .Where(input => !string.Equals(input.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            if (nearestCandidates.Length == 0)
+            {
+                nearestCandidates = inputs.ToArray();
+            }
+
+            var nearest = nearestCandidates
+                .OrderBy(input => Math.Abs(input.TrackedFrameTimestampNs - ibisDataTimestampNs))
                 .ThenBy(input => input.TrackedFrameTimestampNs)
                 .First();
             var semanticSummary = nearest.ComparisonSource.SemanticSummary;
             summaries.Add(new TrackerSnapshotComparisonSummary(
                 "nearest-timestamp",
-                diagnosticsTimestampNs,
+                ibisDataTimestampNs,
                 nearest.SourceRole,
                 nearest.SourceLabel,
                 nearest.TrackedFrameTimestampNs,
@@ -126,6 +139,32 @@ public sealed class TrackerSnapshotReplayReader
         }
 
         return summaries;
+    }
+
+    private static bool TryGetIbisDataTimestampNs(
+        TrackerDiagnosticsLogEntry entry,
+        IReadOnlyList<TrackerSnapshotReplayInput> inputs,
+        out long timestampNs)
+    {
+        timestampNs = 0;
+        if (!uint.TryParse(entry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var trackedFrameNumber))
+        {
+            return false;
+        }
+
+        var ownSnapshot = inputs
+            .Where(input =>
+                input.TrackedFrameNumber == trackedFrameNumber &&
+                string.Equals(input.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(input => input.TrackedFrameTimestampNs)
+            .FirstOrDefault();
+        if (ownSnapshot is null)
+        {
+            return false;
+        }
+
+        timestampNs = ownSnapshot.TrackedFrameTimestampNs;
+        return true;
     }
 
     private static bool CanRestoreRawPayload(string payloadBase64)
@@ -185,15 +224,16 @@ public sealed class TrackerSnapshotReplayReader
             : Path.GetFullPath(Path.Combine(sessionDirectory, fallbackFileName));
     }
 
-    private static long ToMinuteRelativeTimestampNs(DateTimeOffset timestamp)
-    {
-        return (timestamp.TimeOfDay.Ticks % TimeSpan.TicksPerMinute) * 100L;
-    }
 }
 
 /// <summary>
 /// CaptureOn session から読み出した tracker snapshot replay 入力一式。
 /// </summary>
+/// <param name="MetadataPath">読み込み元の CaptureOn metadata JSON の絶対 path。</param>
+/// <param name="TrackerSnapshotSidecarPath">metadata から解決した tracker snapshot sidecar JSONL の絶対 path。</param>
+/// <param name="DiagnosticsLogPath">metadata から解決した diagnostics log の絶対 path。metadata に path がない場合は null。</param>
+/// <param name="SnapshotInputs">diagnostics / replay / playback が timestamp 順に扱う tracker snapshot 入力。</param>
+/// <param name="ComparisonSummaries">ibis diagnostics frame と tracker snapshot を timestamp 近傍規則で対応付けた summary。</param>
 public sealed record TrackerSnapshotReplaySession(
     string MetadataPath,
     string TrackerSnapshotSidecarPath,
@@ -204,6 +244,16 @@ public sealed record TrackerSnapshotReplaySession(
 /// <summary>
 /// diagnostics / replay / playback が時系列に扱う tracker snapshot 1 件。
 /// </summary>
+/// <param name="ReceivedAt">tracker packet を受信した wall-clock UTC 時刻。data timestamp ではない。</param>
+/// <param name="RemoteEndpoint">packet の送信元 endpoint 表示。</param>
+/// <param name="SourceUuid">official tracker packet の source UUID。</param>
+/// <param name="SourceName">official tracker packet の source name。</param>
+/// <param name="SourceRole">own、external、unknown などの保存後分類。</param>
+/// <param name="SourceLabel">UI、replay、diagnostics 表示で使う source label。</param>
+/// <param name="TrackedFrameNumber">snapshot 側 TrackedFrame.frame_number。</param>
+/// <param name="TrackedFrameTimestampNs">snapshot 側 TrackedFrame.timestamp を ns に変換した data timestamp。</param>
+/// <param name="DisplaySnapshot">表示用に整形済みの snapshot summary。</param>
+/// <param name="ComparisonSource">比較用に保持する raw payload と semantic summary。</param>
 public sealed record TrackerSnapshotReplayInput(
     DateTimeOffset ReceivedAt,
     string RemoteEndpoint,
@@ -219,6 +269,11 @@ public sealed record TrackerSnapshotReplayInput(
 /// <summary>
 /// 画面表示用に整形済みの tracker snapshot summary。
 /// </summary>
+/// <param name="Summary">source、role、frame、ball / robot 数を含む短い表示 summary。</param>
+/// <param name="SourceRole">own、external、unknown などの保存後分類。</param>
+/// <param name="SourceLabel">UI、replay、diagnostics 表示で使う source label。</param>
+/// <param name="TrackedFrameNumber">snapshot 側 TrackedFrame.frame_number。</param>
+/// <param name="TrackedFrameTimestampNs">snapshot 側 TrackedFrame.timestamp を ns に変換した data timestamp。</param>
 public sealed record TrackerSnapshotDisplaySnapshot(
     string Summary,
     string SourceRole,
@@ -229,6 +284,9 @@ public sealed record TrackerSnapshotDisplaySnapshot(
 /// <summary>
 /// 比較用元データとして復元可能な raw payload と raw 由来 semantic summary。
 /// </summary>
+/// <param name="RawPayloadRestored">raw tracker packet payload を protobuf として復元できる場合は true。</param>
+/// <param name="PayloadBase64">replay や再比較に使う raw tracker packet payload の base64 表現。</param>
+/// <param name="SemanticSummary">raw payload または record metadata から作った比較用 semantic summary。</param>
 public sealed record TrackerSnapshotComparisonSource(
     bool RawPayloadRestored,
     string PayloadBase64,
@@ -237,6 +295,14 @@ public sealed record TrackerSnapshotComparisonSource(
 /// <summary>
 /// ibis diagnostics 1 行と近傍 tracker snapshot の比較 summary。
 /// </summary>
+/// <param name="MatchingRule">snapshot 対応付けに使った規則。現行実装では nearest-timestamp。</param>
+/// <param name="IbisDiagnosticsTimestampNs">ibis own snapshot の TrackedFrame.timestamp から得た committed frame data timestamp。</param>
+/// <param name="NearestSnapshotSourceRole">近傍 snapshot の source role。</param>
+/// <param name="NearestSnapshotSourceLabel">近傍 snapshot の source label。</param>
+/// <param name="NearestSnapshotTimestampNs">近傍 snapshot 側 TrackedFrame.timestamp を ns に変換した data timestamp。</param>
+/// <param name="NearestSnapshotRawPayloadRestored">近傍 snapshot の raw payload を protobuf として復元できる場合は true。</param>
+/// <param name="NearestSnapshotBallCount">近傍 snapshot の semantic summary に含まれる ball 数。</param>
+/// <param name="NearestSnapshotRobotCount">近傍 snapshot の semantic summary に含まれる robot 数。</param>
 public sealed record TrackerSnapshotComparisonSummary(
     string MatchingRule,
     long IbisDiagnosticsTimestampNs,

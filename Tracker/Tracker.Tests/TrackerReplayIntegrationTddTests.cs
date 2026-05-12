@@ -99,7 +99,8 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
                 SnapshotInput("external-d", "thirdparty-d", "external", 7120, 12_199_000_000),
                 SnapshotInput("ibis-runtime", "ibis", "own", 7121, 12_201_000_000),
             ],
-            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 200, TimeSpan.Zero));
+            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 200, TimeSpan.Zero),
+            diagnosticsTrackedFrame: 7121);
         var reader = CreateReplayReader();
 
         var replaySession = InvokeReadSession(reader, session.MetadataPath);
@@ -107,13 +108,39 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
 
         var summary = Assert.Single(summaries);
         Assert.Equal("nearest-timestamp", GetStringProperty(summary, "MatchingRule"));
-        Assert.Equal(12_200_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
+        Assert.Equal(12_201_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
         Assert.Equal("external", GetStringProperty(summary, "NearestSnapshotSourceRole"));
         Assert.Equal("thirdparty-d", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
         Assert.Equal(12_199_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
         Assert.True(GetBoolProperty(summary, "NearestSnapshotRawPayloadRestored"));
         Assert.Equal(2, GetIntProperty(summary, "NearestSnapshotBallCount"));
         Assert.Equal(2, GetIntProperty(summary, "NearestSnapshotRobotCount"));
+    }
+
+    /// <summary>
+    /// 何を確認しているか: diagnostics log 行頭の receivedAt ではなく、ibis own snapshot の data timestamp を基準に nearest summary を作ることを確認する。
+    /// </summary>
+    [Fact]
+    public void ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("external-clock", "received-clock", "external", 7201, 12_200_000_000),
+                SnapshotInput("ibis-runtime", "ibis", "own", 7202, 99_000_000_000),
+                SnapshotInput("external-data", "data-nearest", "external", 7203, 99_001_000_000),
+            ],
+            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 200, TimeSpan.Zero),
+            diagnosticsTrackedFrame: 7202);
+        var reader = CreateReplayReader();
+
+        var replaySession = InvokeReadSession(reader, session.MetadataPath);
+        var summaries = GetEnumerableProperty(replaySession, "ComparisonSummaries").ToArray();
+
+        var summary = Assert.Single(summaries);
+        Assert.Equal(99_000_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
+        Assert.Equal("external", GetStringProperty(summary, "NearestSnapshotSourceRole"));
+        Assert.Equal("data-nearest", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(99_001_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
     }
 
     private object CreateReplayReader()
@@ -133,7 +160,8 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
 
     private TestSession CreateSession(
         IReadOnlyList<SnapshotInputData> snapshotInputs,
-        DateTimeOffset? diagnosticsTimestamp = null)
+        DateTimeOffset? diagnosticsTimestamp = null,
+        uint? diagnosticsTrackedFrame = null)
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-047-replay-{Guid.NewGuid():N}");
         var sessionFolder = "test-session";
@@ -157,7 +185,7 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         var timestamp = diagnosticsTimestamp ?? new DateTimeOffset(2026, 5, 12, 12, 0, 12, 102, TimeSpan.Zero);
         File.WriteAllText(
             diagnosticsPath,
-            $"{timestamp:O} Tracker diagnostics profile=sim rawFrame=7001 rawCamera=0 rawBalls=2 rawBallDetails=[x=100,y=200,z=0,c=1] rawBlue=[] rawYellow=[] trackedFrame=900 trackedBalls=2 trackedBallDetails=[#1:x=100,y=200,z=0,vis=1,q=1,cams=0] trackedRobots=2 trackedRobotDetails=[Y3:x=1200,y=-300,o=0,w=0,vis=1,q=1] ballOutVisibility=0 ballHalfLifeSec=1 ballLifetimeNs=1000000000{Environment.NewLine}");
+            $"{timestamp:O} Tracker diagnostics profile=sim rawFrame=7001 rawCamera=0 rawBalls=2 rawBallDetails=[x=100,y=200,z=0,c=1] rawBlue=[] rawYellow=[] trackedFrame={diagnosticsTrackedFrame ?? 900} trackedBalls=2 trackedBallDetails=[#1:x=100,y=200,z=0,vis=1,q=1,cams=0] trackedRobots=2 trackedRobotDetails=[Y3:x=1200,y=-300,o=0,w=0,vis=1,q=1] ballOutVisibility=0 ballHalfLifeSec=1 ballLifetimeNs=1000000000{Environment.NewLine}");
 
         var metadataPath = Path.Combine(sessionFolderPath, "test-session.metadata.json");
         File.WriteAllText(
