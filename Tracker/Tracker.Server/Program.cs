@@ -47,6 +47,7 @@ builder.Services.AddSingleton<VisionPacketStore>();
 builder.Services.AddSingleton<VisionPacketCaptureSession>();
 builder.Services.AddSingleton<VisionPacketCaptureWriter>();
 builder.Services.AddSingleton<TrackerRenderSnapshotCaptureWriter>();
+builder.Services.AddSingleton<TrackerPacketSnapshotLogWriter>();
 builder.Services.AddHostedService<VisionReceiverService>();
 
 var app = builder.Build();

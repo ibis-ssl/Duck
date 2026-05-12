@@ -50,7 +50,7 @@ public sealed class TrackerPacketSnapshotLogReader
                     $"Unsupported tracker packet snapshot schema version '{record.SchemaVersion}'.");
             }
 
-            yield return record;
+            yield return record.EnsureSemanticSummary();
         }
     }
 

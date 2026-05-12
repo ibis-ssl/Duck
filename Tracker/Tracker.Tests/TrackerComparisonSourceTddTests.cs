@@ -1,8 +1,11 @@
 using System.Reflection;
 using System.Text.Json;
 using Google.Protobuf;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.Server.Tracking;
+using Tracker.Server.Vision;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -69,6 +72,88 @@ public class TrackerComparisonSourceTddTests : IClassFixture<TrackerContractFixt
                     parameters.Length >= 1 &&
                     parameters[0].ParameterType == recordType;
             });
+    }
+
+    /// <summary>
+    /// 何を確認しているか: writer が own / external / unknown を sidecar に保存し、metadata の record/source 集計を更新することを確認する。
+    /// </summary>
+    [Fact]
+    public void TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-comparison-writer-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(captureDirectory);
+        using var writer = new TrackerPacketSnapshotLogWriter(
+            session,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 25, 0, TimeSpan.Zero);
+
+        writer.CapturePacket(
+            CreatePacket("ibis-runtime-uuid", "ibis-runtime-source", 4501, 12_500_000_000, "own"),
+            receivedAt,
+            remoteEndpoint: "self",
+            sourceRole: "own");
+        writer.CapturePacket(
+            CreatePacket("thirdparty-d-uuid", "thirdparty-d-source", 4502, 12_501_000_000, "external"),
+            receivedAt.AddMilliseconds(1),
+            remoteEndpoint: "192.0.2.10:12010",
+            sourceRole: "external");
+        writer.CapturePacket(
+            CreatePacket(string.Empty, string.Empty, 4503, 12_502_000_000, "unknown"),
+            receivedAt.AddMilliseconds(2),
+            remoteEndpoint: "192.0.2.11:12011",
+            sourceRole: "unknown");
+        writer.Flush();
+
+        var sidecarPath = Assert.Single(Directory.GetFiles(
+            captureDirectory,
+            TrackerPacketSnapshotLogReader.SidecarFileName,
+            SearchOption.AllDirectories));
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json", SearchOption.AllDirectories));
+        var records = TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        var root = metadata.RootElement;
+        var snapshotLog = root.GetProperty("TrackerSnapshotLog");
+        var sources = root.GetProperty("TrackerSnapshotSources").EnumerateArray().ToArray();
+
+        Assert.Equal(["own", "external", "unknown"], records.Select(record => record.SourceRole).ToArray());
+        Assert.All(records, record => Assert.NotNull(record.SemanticSummary));
+        Assert.Equal(3, snapshotLog.GetProperty("RecordCount").GetInt32());
+        Assert.Equal(0, snapshotLog.GetProperty("SkippedRecordCount").GetInt32());
+        Assert.Equal(0, snapshotLog.GetProperty("ErrorCount").GetInt32());
+        Assert.Equal(3, sources.Length);
+        Assert.Equal(
+            ["external", "own", "unknown"],
+            sources.Select(source => source.GetProperty("SourceRole").GetString() ?? string.Empty).ToArray());
+        Assert.All(sources, source => Assert.Equal(1, source.GetProperty("RecordCount").GetInt32()));
+    }
+
+    /// <summary>
+    /// 何を確認しているか: 壊れた raw payload は sidecar record にせず、skipped/error count として metadata に残ることを確認する。
+    /// </summary>
+    [Fact]
+    public void TrackerSnapshotSidecar_WriterTracksSkippedErrorCountForInvalidPayload()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-comparison-writer-error-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(captureDirectory);
+        using var writer = new TrackerPacketSnapshotLogWriter(
+            session,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+
+        var captured = writer.TryCapturePayload(
+            [0x01, 0x02, 0x03],
+            new DateTimeOffset(2026, 5, 12, 12, 26, 0, TimeSpan.Zero),
+            remoteEndpoint: "192.0.2.12:12012");
+        writer.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        var snapshotLog = metadata.RootElement.GetProperty("TrackerSnapshotLog");
+
+        Assert.False(captured);
+        Assert.Equal(0, snapshotLog.GetProperty("RecordCount").GetInt32());
+        Assert.Equal(1, snapshotLog.GetProperty("SkippedRecordCount").GetInt32());
+        Assert.Equal(1, snapshotLog.GetProperty("ErrorCount").GetInt32());
+        Assert.Empty(Directory.GetFiles(captureDirectory, TrackerPacketSnapshotLogReader.SidecarFileName, SearchOption.AllDirectories));
     }
 
     /// <summary>
@@ -207,6 +292,27 @@ public class TrackerComparisonSourceTddTests : IClassFixture<TrackerContractFixt
         string remoteEndpoint)
     {
         return (packet, packet.ToByteArray(), role, remoteEndpoint);
+    }
+
+    private VisionPacketCaptureSession CreateCaptureSession(string captureDirectory)
+    {
+        return new VisionPacketCaptureSession(
+            Options.Create(new VisionReceiverOptions
+            {
+                PacketCapture = new VisionPacketCaptureOptions
+                {
+                    Enabled = true,
+                    DirectoryPath = captureDirectory,
+                    FilePrefix = "test-vision",
+                    FlushEachPacket = true,
+                },
+            }),
+            Options.Create(new TrackerOptions
+            {
+                ActiveProfileName = "sim",
+            }),
+            fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
+            NullLogger<VisionPacketCaptureSession>.Instance);
     }
 
     private static Type GetRequiredServerType(string fullName)

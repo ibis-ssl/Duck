@@ -18,6 +18,11 @@ public sealed class VisionPacketCaptureSession
     private readonly TrackerResolvedOptions resolvedTrackerOptions;
     private readonly ILogger<VisionPacketCaptureSession> logger;
     private VisionPacketCaptureSessionState? state;
+    private TrackerPacketSnapshotLogMetadataSnapshot trackerSnapshotLogMetadata = new(
+        RecordCount: 0,
+        SkippedRecordCount: 0,
+        ErrorCount: 0,
+        Sources: []);
     private bool metadataWriteFailed;
 
     public VisionPacketCaptureSession(
@@ -79,11 +84,31 @@ public sealed class VisionPacketCaptureSession
         }
     }
 
+    /// <summary>
+    /// tracker packet snapshot sidecar の record 件数、skipped/error 件数、source 集計を metadata へ反映する。
+    /// </summary>
+    public void UpdateTrackerSnapshotLogMetadata(TrackerPacketSnapshotLogMetadataSnapshot metadata)
+    {
+        lock (gate)
+        {
+            trackerSnapshotLogMetadata = metadata;
+            if (state is not null)
+            {
+                WriteMetadata(state);
+            }
+        }
+    }
+
     public void Stop()
     {
         lock (gate)
         {
             state = null;
+            trackerSnapshotLogMetadata = new TrackerPacketSnapshotLogMetadataSnapshot(
+                RecordCount: 0,
+                SkippedRecordCount: 0,
+                ErrorCount: 0,
+                Sources: []);
             metadataWriteFailed = false;
         }
     }
@@ -117,9 +142,22 @@ public sealed class VisionPacketCaptureSession
                 {
                     Format = "jsonl",
                     IsCreated = File.Exists(sessionState.TrackerSnapshotSidecarPath),
-                    RecordCount = 0,
+                    RecordCount = trackerSnapshotLogMetadata.RecordCount,
+                    SkippedRecordCount = trackerSnapshotLogMetadata.SkippedRecordCount,
+                    ErrorCount = trackerSnapshotLogMetadata.ErrorCount,
                 },
-                TrackerSnapshotSources = [],
+                TrackerSnapshotSources = trackerSnapshotLogMetadata.Sources
+                    .Select(source => new VisionPacketCaptureTrackerSnapshotSourceMetadata
+                    {
+                        SourceUuid = source.SourceUuid,
+                        SourceName = source.SourceName,
+                        SourceRole = source.SourceRole,
+                        SourceLabel = source.SourceLabel,
+                        RemoteEndpoint = source.RemoteEndpoint,
+                        RecordCount = source.RecordCount,
+                        LastReceivedAt = source.LastReceivedAt,
+                    })
+                    .ToArray(),
                 TrackerOptions = trackerOptions,
                 ResolvedTrackerOptions = resolvedTrackerOptions,
             };
@@ -173,6 +211,10 @@ public sealed class VisionPacketCaptureSession
         public bool IsCreated { get; init; }
 
         public int RecordCount { get; init; }
+
+        public int SkippedRecordCount { get; init; }
+
+        public int ErrorCount { get; init; }
     }
 
     private sealed class VisionPacketCaptureTrackerSnapshotSourceMetadata
@@ -184,6 +226,12 @@ public sealed class VisionPacketCaptureSession
         public string SourceRole { get; init; } = "";
 
         public string SourceLabel { get; init; } = "";
+
+        public string RemoteEndpoint { get; init; } = "";
+
+        public int RecordCount { get; init; }
+
+        public DateTimeOffset LastReceivedAt { get; init; }
     }
 }
 

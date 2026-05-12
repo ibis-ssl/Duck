@@ -21,6 +21,7 @@ public sealed partial class TrackerCoordinator
     private readonly ILogger<TrackerCoordinator> logger;
     private readonly VisionPacketCaptureSession? packetCaptureSession;
     private readonly TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter;
+    private readonly TrackerPacketSnapshotLogWriter? trackerPacketSnapshotLogWriter;
     private TrackerResolvedOptions appliedOptions;
     private TrackerResolvedOptions desiredOptions;
     private TrackerRuntimeOverrides desiredRuntimeOverrides = new();
@@ -46,7 +47,8 @@ public sealed partial class TrackerCoordinator
         IEnumerable<ITrackerObserver> observers,
         ILogger<TrackerCoordinator> logger,
         VisionPacketCaptureSession? packetCaptureSession = null,
-        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter = null)
+        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter = null,
+        TrackerPacketSnapshotLogWriter? trackerPacketSnapshotLogWriter = null)
     {
         this.engine = engine;
         this.packetGenerator = packetGenerator;
@@ -59,6 +61,7 @@ public sealed partial class TrackerCoordinator
         this.logger = logger;
         this.packetCaptureSession = packetCaptureSession;
         this.renderSnapshotCaptureWriter = renderSnapshotCaptureWriter;
+        this.trackerPacketSnapshotLogWriter = trackerPacketSnapshotLogWriter;
         appliedOptions = new TrackerResolvedOptions
         {
             Enabled = true,
