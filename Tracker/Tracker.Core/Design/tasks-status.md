@@ -8,7 +8,7 @@
 - Title: diagnostics replay で ER-Force tracker snapshot が Field に再生されない原因を調査・修正する
 - Phase: comparison-logging
 - Status: in_progress
-- TDD Entry: 未実施。`/home/ibis/ssl/IbisDuck/Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures` の実captureでは ER-Force tracker snapshot が存在し、ibis own と ER-Force の `TrackedFrame.timestamp` 時刻系不一致が主因候補と判定済み。既存ログ救済は必須ではないため、今後の capture 保存時対応付けを主経路として TDD 対象を定義する。
+- TDD Entry: 未実施。`/home/ibis/ssl/IbisDuck/Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures` の実captureでは ER-Force tracker snapshot が存在し、ibis own と ER-Force の `TrackedFrame.timestamp` 時刻系不一致が主因候補と判定済み。既存ログ救済は必須ではないため、今後の capture 保存時対応付けを主経路とする。Red test は external tracker の `TrackedFrame.timestamp` range が own と非重複な fixture を使い、capture-time alignment により selected diagnostics entry / render frame に対応する external snapshot が replay Field に選ばれること、および selected diagnostics entry の session-relative time / `receivedAt` と chosen external snapshot の capture-time / `receivedAt` 差分が許容範囲内であることを先に固定する。
 - Implementation Entry: 未実施。調査結果に基づき、capture 保存時の diagnostics entry / vision frame / tracker source snapshot 対応表、metadata/sidecar schema、replay reader / Field source frame 選択のどこを修正するかを設計してから実装する。
 - Review Entry: 未実施。修正後に gpt-5.5 high review report を作成し、blocking finding が残らないことを確認する。
 - Size: medium

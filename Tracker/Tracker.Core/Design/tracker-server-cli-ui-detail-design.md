@@ -44,8 +44,9 @@ session folder には少なくとも次を配置できるようにする。
 - tracker diagnostics sidecar
 - render snapshots
 - tracker packet snapshot sidecar JSONL
+- tracker snapshot alignment sidecar JSONL
 
-metadata には session folder の path と、packet capture 本体、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL などの各 file relative path を記録する。snapshot sidecar が未作成または record 0 件の場合も、その状態を metadata で表現できるようにする。
+metadata には session folder の path と、packet capture 本体、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL などの各 file relative path を記録する。snapshot sidecar や alignment sidecar が未作成または record 0 件の場合も、その状態を metadata で表現できるようにする。
 
 diagnostics log 側は互換追加に留める。
 
@@ -66,6 +67,22 @@ sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis 
 - raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary などの比較・一覧表示用 summary
 - decode failure、tracked frame 欠落、timestamp 欠落などを示す skipped/error 情報
 
+tracker snapshot alignment sidecar は `tracker-packet-snapshots.jsonl` とは別 file の `tracker-snapshot-alignment.jsonl` とする。snapshot record 自体へ diagnostics entry 対応を埋め込むと、同じ tracker snapshot を複数 diagnostics entry / Field source / aggregate source から参照するときに重複と後方互換の分岐が増え、snapshot sidecar 破損時と alignment 破損時を分けて扱いにくい。別 sidecar にすることで、snapshot sidecar は受信 packet の主記録、alignment sidecar は replay 用 index として責務を分け、alignment が欠落または壊れても raw snapshot 保存の成否を独立に診断できる。
+
+alignment sidecar record は、CaptureOn 中に diagnostics/render snapshot と tracker source snapshot を同一 session timeline で対応付けるため、少なくとも次を保持する。
+
+- diagnostics entry の stable key: diagnostics log line number、tracked frame number、diagnostics entry timestamp、ibis `TrackerFrame.data_timestamp_ns`
+- render snapshot 参照: render snapshot frame number、render snapshot record index または session-relative offset
+- session-relative time: session start からの diagnostics entry offset、vision packet/render snapshot の `receivedAt` offset、対応に使った capture-time `receivedAt`
+- source key: source role、source label、source uuid、remote endpoint、normalized source key
+- 選択した tracker snapshot 参照: tracker snapshot record index、tracker snapshot `receivedAt`、tracked frame number、tracked frame timestamp、semantic summary 有無
+- matching rule: `saved-session-alignment`、`saved-session-received-at-nearest`、`legacy-nearest-timestamp`、`unsupported-alignment-missing` など
+- delta: diagnostics entry / capture-time と tracker snapshot `receivedAt` の差分、必要なら own data timestamp と tracker timestamp の差分
+- aggregate 情報: source label / role aggregate で選ばれた場合の代表 source key、tie-break 理由、同一 label / uuid の endpoint 数
+- status: ready、source missing、snapshot missing、alignment skipped、alignment corrupt など
+
+alignment sidecar は log open 時に軽く index 化できる形にする。reader は JSONL を 1 回だけ読み、diagnostics entry stable key と Field source key から alignment record へ直接引ける dictionary または sorted array を構築する。scrub / playback tick / Field source selector 変更時に `tracker-packet-snapshots.jsonl` 全体や alignment JSONL 全体を再読込・再探索しない。100MB 超または長時間 capture では、alignment record から tracker snapshot record index と source key を引き、必要な semantic summary だけを既存 snapshot index から参照する。
+
 ## source 識別と role分類
 
 `Tracker:Uuid` と `Tracker:SourceName` は保存除外の条件ではなく、後続表示・比較用の source role / label / metadata を付与するために使う。ibis runtime identity と一致する `TrackerWrapperPacket` も tracker packet snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。
@@ -74,11 +91,17 @@ sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis 
 
 同じ `uuid` で `sourceName` が異なる場合、または `sourceName` が空の場合も、record を破棄せず source identity の不足として保存する。source ごとの active tracker API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクとして扱う。通常経路では raw payload と source identity を落とさず、衝突時も `unknown` / `ambiguous` として保存できれば比較元データは保持されるため、保存処理の blocker にはしない。
 
+ER-FORCE のように同じ source label / uuid が複数 remote endpoint から届く場合、保存上の source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` で endpoint 単位に分ける。UI の `External` や source label 選択は aggregate source として扱い、aggregate は endpoint 別 key の候補から diagnostics entry の session-relative `receivedAt` に最も近い snapshot を代表に選ぶ。tie-break は、絶対 delta が小さい候補、同 delta なら同じ tracked frame timestamp のうち record index が小さい候補、さらに同値なら remote endpoint 文字列の ordinal 順とし、alignment record に選択理由を残す。endpoint 別の詳細が必要な場合は source option に remote endpoint を含めた表示名を追加できるが、通常の Field source label では aggregate 代表を描画する。
+
 ## timestamp 比較
 
 ibis committed frame と tracker packet snapshot は同じ frame number や publish frequency を持つとは限らない。比較は ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の timestamp 近傍で行う。
 
 初期実装では nearest timestamp または latest-before のどちらを採用するかを task 内で固定する。採用した対応規則、許容 window、該当 source identity は出力と sidecar から後で確認できるようにする。
+
+`TrackedFrame.timestamp` は tracker 実装ごとの時刻系であり、ibis own と 3rdparty が同じ epoch / monotonic clock を使うとは限らない。新規 capture の diagnostics replay / Field source 表示は、保存済み alignment sidecar がある場合はこれを優先し、外部 tracker の `TrackedFrame.timestamp` ではなく CaptureOn 中に観測した `receivedAt`、session-relative time、diagnostics entry time を使って tracker source snapshot を対応付ける。ibis own と外部 tracker の timestamp range が明らかに非重複の場合でも、保存時 alignment があれば `saved-session-alignment` として replay / scrub / playback の Field 表示を成立させる。
+
+保存済み alignment sidecar がない capture では、`/diagnostics` は外部 tracker Field source の正確な時刻対応を保証しない。既存 timestamp nearest を使う場合は `legacy-nearest-timestamp` / best-effort と表示し、timestamp range 非重複を検出した場合は `unsupported-alignment-missing` として、既存ログの欠落を正常な既存互換状態として扱う。既存ログ救済のために読み込み時 fallback を主経路へ昇格しない。
 
 ## CaptureOn lifecycle
 
@@ -98,11 +121,13 @@ CaptureOn 直後、まだ packet capture 本体の session が遅延作成され
 
 diagnostics log reader、`Tracker.CaptureReplay`、diagnostics playback は、metadata の relative path から tracker packet snapshot sidecar を解決し、存在する場合だけ追加情報を読む。既存 capture や既存 diagnostics log では session folder または snapshot sidecar 欠落を正常系として扱う。
 
-`Tracker.CaptureReplay` は agent / 自動検証 / CLI 調査向けに、3rdparty tracker snapshot と ibis committed frame の nearest timestamp comparison を `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は diagnostics UI 実装後も削除せず、UI と同じ reader contract の検証経路として維持する。
+`Tracker.CaptureReplay` は agent / 自動検証 / CLI 調査向けに、3rdparty tracker snapshot と ibis committed frame の保存時 alignment comparison、または既存 capture の明示的な best-effort comparison を `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は diagnostics UI 実装後も削除せず、UI と同じ reader contract の検証経路として維持する。
 
-`/diagnostics` はユーザー向けに同じ comparison を画面上で確認できるようにする。diagnostics playback は選択中の diagnostics entry と playback tick に合わせて tracker snapshot comparison を更新し、source identity / role / label で表示対象を切り替えられる comparison panel を持つ。render snapshot と同じく session folder 内 sidecar への対応付けを行うが、比較の基準 timestamp は render snapshot ではなく、ibis own snapshot の `TrackedFrame.timestamp` とする。
+`/diagnostics` はユーザー向けに同じ comparison を画面上で確認できるようにする。diagnostics playback は選択中の diagnostics entry と playback tick に合わせて tracker snapshot comparison を更新し、source identity / role / label で表示対象を切り替えられる comparison panel を持つ。新規 capture では保存済み alignment sidecar を基準にし、legacy best-effort の場合だけ render snapshot ではなく ibis own snapshot の `TrackedFrame.timestamp` を比較基準 timestamp とする。
 
-`/diagnostics` の tracker snapshot comparison は、timeline scrubber 移動や playback tick のたびに tracker packet snapshot sidecar JSONL を再読込しない。log 選択時に metadata path、sidecar path、diagnostics log path と各 file の last write time / length を key にした lightweight index を作成または cache し、selected entry の変更時はその index から source options と nearest timestamp comparison を生成する。
+新規 capture の `/diagnostics` の tracker snapshot comparison と Field source 表示は、metadata から解決した `tracker-snapshot-alignment.jsonl` を優先する。alignment sidecar が ready の場合、selected diagnostics entry と Field source key から保存済み tracker snapshot record index を引き、matching rule を `saved-session-alignment` として表示する。alignment sidecar がない、metadata に path がない、または壊れている capture では、既存 diagnostics log / render snapshot 表示を壊さず、external/source label の Field source は `unsupported-alignment-missing` または明示的な `legacy-nearest-timestamp` best-effort として扱う。
+
+`/diagnostics` の tracker snapshot comparison は、timeline scrubber 移動や playback tick のたびに tracker packet snapshot sidecar JSONL や alignment sidecar JSONL を再読込しない。log 選択時に metadata path、sidecar path、alignment path、diagnostics log path と各 file の last write time / length を key にした lightweight index を作成または cache し、selected entry の変更時はその index から source options、保存済み alignment、または明示された best-effort comparison を生成する。
 
 100MB は上限ではなく通常の capture で到達しうるサイズとして扱う。100MB 以上の sidecar でも tick / scrub 時に sidecar size へ比例した I/O / JSON parse / protobuf parse を発生させない。初回 log 選択時の index build は既存 JSONL sidecar を活かし、bounded memory cache により同じ file state の再読込を避ける。
 
@@ -113,15 +138,16 @@ replay / diagnostics / playback の出力または UI 表示は、少なくと�
 - ibis committed frame の timestamp
 - 対応する source identity と role / label
 - 採用した timestamp 対応規則
+- alignment sidecar の有無、alignment record の status、aggregate/tie-break 理由
 - snapshot 側 tracked frame number / timestamp
 - timestamp delta
 - ball / robot count
 - skipped/error count
 - raw payload 参照または復元状態
 
-3rdparty tracker packet は snapshot として保持し、`Tracker.CaptureReplay` と `/diagnostics` の playback は session folder 内の snapshot log を読み、timestamp 近傍規則で ibis committed frame と並べて再生・比較表示できるようにする。playback は raw / tracked render snapshot だけに依存せず、source identity / role ごとの tracker packet snapshot timeline を入力として扱える必要がある。
+3rdparty tracker packet は snapshot として保持し、`Tracker.CaptureReplay` と `/diagnostics` の playback は session folder 内の snapshot log と alignment sidecar を読み、保存時対応付け規則で ibis committed frame と並べて再生・比較表示できるようにする。playback は raw / tracked render snapshot だけに依存せず、source identity / role ごとの tracker packet snapshot timeline と diagnostics entry alignment を入力として扱える必要がある。
 
-metadata がない、metadata に snapshot sidecar path がない、sidecar file がない、metadata `TrackerSnapshotLog.IsCreated=false`、record count 0、読み取り error はそれぞれ UI 上の status として区別する。これらは既存 diagnostics log / render snapshot 表示を壊す blocker ではない。
+metadata がない、metadata に snapshot sidecar path または alignment sidecar path がない、sidecar file がない、metadata `TrackerSnapshotLog.IsCreated=false`、record count 0、alignment record 0、読み取り error はそれぞれ UI 上の status として区別する。これらは既存 diagnostics log / render snapshot 表示を壊す blocker ではない。
 
 ## diagnostics Field source 切替
 
@@ -133,9 +159,9 @@ Field source の選択肢は次を使う。
 
 - `Vision Input`: 選択中 diagnostics entry に対応する render snapshot frame の `SourceDetections` を既存 mapper で描画する virtual source。
 - `ibis tracker`: 選択中 diagnostics entry に対応する render snapshot frame を既存 `TrackedVisionViewState.FromSnapshot(...)` で描画する virtual source。source role としては `own` に相当するが、既定表示維持のため sidecar の有無に依存させない。
-- `External`: tracker packet snapshot sidecar の source role `external` に一致する snapshot 群から、選択中 diagnostics entry の ibis own timestamp に最も近い snapshot を描画する。
-- `Unknown`: source role `unknown` に一致する snapshot 群から nearest snapshot を描画する。
-- source label: sidecar に存在する正規化済み source label と完全一致する snapshot 群から nearest snapshot を描画する。
+- `External`: 保存済み alignment sidecar がある場合は source role `external` の aggregate 代表 snapshot を描画する。alignment がない既存 capture では `unsupported-alignment-missing`、または明示的な best-effort として既存 nearest timestamp を使う。
+- `Unknown`: 保存済み alignment sidecar がある場合は source role `unknown` の aggregate 代表 snapshot を描画する。alignment がない既存 capture では `External` と同じ status 方針を使う。
+- source label: sidecar に存在する正規化済み source label と完全一致する snapshot 群から、保存済み alignment sidecar の代表 snapshot を描画する。同じ label / uuid が複数 remote endpoint を持つ場合は aggregate tie-break を alignment record に残す。
 
 `All` は Field source としては使わない。`All` は複数 source のうちどれを Field に描くかが曖昧で、既存 comparison filter の non-own 優先規則を Field に持ち込むと、Field の既定表示や左右比較の根拠が不明確になるためである。`All` は `Tracker Comparison` panel の数値比較 filter にだけ残す。
 
@@ -145,15 +171,17 @@ tracker source Field data は、`TrackerDiagnosticsComparisonViewStateReader` �
 - selected Field source kind: `VisionInput` / `IbisOwn` / `External` / `Unknown` / `SourceLabel`
 - status: ready / no diagnostics entry / diagnostics tracked frame missing / render snapshot missing / sidecar unavailable / own baseline snapshot missing / candidate snapshot missing / drawable objects empty / error
 - source role / source label
-- matching rule: `nearest-timestamp`
+- matching rule: `saved-session-alignment` / `legacy-nearest-timestamp` / `unsupported-alignment-missing`
 - ibis own baseline timestamp ns
+- diagnostics entry time / session-relative received offset
 - nearest snapshot tracked frame number / timestamp ns / delta ns
+- alignment source key / aggregate tie-break reason
 - raw payload restored flag
 - `TrackerPacketSnapshotSemanticSummary`、または同等の ball / robot position projection
 
-tracker source の nearest selection は、既存 comparison と同じく selected diagnostics entry の tracked frame number から ibis `own` snapshot を引き、その `TrackedFrame.timestamp` を基準 timestamp にして source role / label 別の候補から nearest snapshot を選ぶ。Field と comparison が別々の規則で nearest を選ばないよう、nearest selection は cached index 内の共通処理を使う。
+tracker source の selection は、新規 capture では selected diagnostics entry の stable key から保存済み alignment record を引き、その record が参照する tracker snapshot を source role / label 別の候補として使う。Field と comparison が別々の規則で snapshot を選ばないよう、alignment lookup と legacy nearest selection は cached index 内の共通処理を使う。alignment がない既存 capture で legacy nearest を許可する場合だけ、selected diagnostics entry の tracked frame number から ibis `own` snapshot を引き、その `TrackedFrame.timestamp` を基準 timestamp にして source role / label 別の候補から nearest snapshot を選ぶ。
 
-`TRACKER-055` の cache / index 経路を維持するため、scrub / playback tick / Field source selector 変更時に tracker packet snapshot sidecar JSONL 全体を再読込しない。index build は log / metadata / sidecar の path、last write time、length を key にした既存 cache 経路に統合し、Field 用には raw payload 全体ではなく描画に必要な semantic summary または最小 projection だけを index に保持する。通常 writer が作る record では `SemanticSummary` を使い、古い record などで summary がない場合だけ index build 時に payload fallback を行う。
+`TRACKER-055` の cache / index 経路を維持するため、scrub / playback tick / Field source selector 変更時に tracker packet snapshot sidecar JSONL または alignment sidecar JSONL 全体を再読込しない。index build は log / metadata / sidecar / alignment の path、last write time、length を key にした既存 cache 経路に統合し、Field 用には raw payload 全体ではなく描画に必要な semantic summary または最小 projection だけを index に保持する。通常 writer が作る record では `SemanticSummary` を使い、古い record などで summary がない場合だけ index build 時に payload fallback を行う。
 
 Field 描画はすべて `VisionFieldCanvas` を使う。geometry は選択中 render snapshot の geometry を使い、tracker source sidecar だけから geometry を復元しようとしない。tracker source snapshot の ball / robot は `TrackerPacketSnapshotSemanticSummary` から `SSL_DetectionBall`、yellow / blue 別 `SSL_DetectionRobot` へ変換する mapper を `DiagnosticsFieldViewFactory` に追加する。team が yellow / blue と判定できない robot は Field 上へ無理に描画せず、Field source frame の status / summary で drawable object が欠落し得ることを示す。
 
@@ -165,8 +193,13 @@ focused tests では、少なくとも次を固定する。
 
 - Field source options は `Vision Input`、ibis tracker、`External`、`Unknown`、source label を持ち、Field source には `All` を含めない。
 - 既定は左 `Vision Input`、右 ibis tracker output で、log 変更時に既定へ戻る。
-- selected diagnostics entry と source label / role から、comparison と同じ nearest timestamp snapshot の semantic summary が Field source frame に返る。
-- source selector 変更、timeline scrub、playback tick で sidecar 全体再読込に戻らず、`TRACKER-055` の index cache を使う。
+- selected diagnostics entry と source label / role から、comparison と同じ alignment または明示的 best-effort snapshot の semantic summary が Field source frame に返る。
+- 新規 capture では selected diagnostics entry と source label / role から、保存済み alignment sidecar が参照する snapshot の semantic summary が Field source frame に返る。
+- regression test は Red test から追加する。external tracker の `TrackedFrame.timestamp` range が ibis own の `TrackedFrame.timestamp` range と非重複な fixture を作り、nearest data timestamp だけに戻る実装では失敗することを固定する。
+- 保存時 alignment regression では、external timestamp が own と非重複でも、capture-time alignment により selected diagnostics entry / render frame に対応する external snapshot が replay Field に選ばれることを検証する。
+- 対応付け結果の時間軸検査として、selected diagnostics entry の session-relative time または `receivedAt` と chosen external snapshot の capture-time `receivedAt` の差分が許容範囲内であることを assertion に含める。許容範囲は task 実装時に明示し、fixture の packet 間隔より十分小さい値に固定する。
+- alignment sidecar がない既存 capture では、external/source label Field source が unsupported または明示的 best-effort status になる。
+- source selector 変更、timeline scrub、playback tick で sidecar / alignment 全体再読込に戻らず、`TRACKER-055` の index cache を使う。
 - missing / empty / corrupt / own baseline missing / candidate missing / drawable objects empty の status が Field 表示用 model に残る。
 - `DiagnosticsFieldViewFactory` が semantic summary の ball と yellow / blue robot を `VisionFieldCanvas` 用 DTO に変換する。
 
@@ -176,9 +209,9 @@ focused tests では、少なくとも次を固定する。
 
 overlay mode の UI は Field 表示領域の見出し行に置く。左右 Field の selector は維持し、表示 mode は `Split` / `Overlay` の segmented control または同等の二択 control として Field 表示領域全体に対して切り替える。`Split` は現行どおり左 Field と右 Field を並べ、`Overlay` は同じ左右 selector の選択結果を `Layer A` / `Layer B` として 1 枚の Field に重ねる。`Tracker Comparison` panel の折り畳み状態とは独立させ、panel 折り畳み中も mode 切替、左右 selector、overlay legend / visibility は使える。
 
-overlay 対象 source は、追加の multi-select ではなく現在の左 Field source と右 Field source の 2 つに限定する。既定は左 `Vision Input`、右 ibis tracker output のため、初期 overlay は vision input と ibis tracker output の重ね合わせになる。`External`、`Unknown`、source label は `TRACKER-056` と同じ nearest timestamp selection で `TrackerDiagnosticsFieldSourceFrame` を解決する。Field source として `All` は引き続き使わない。左右が同じ source の場合は 1 layer として扱い、legend に同一 source であることを表示する。
+overlay 対象 source は、追加の multi-select ではなく現在の左 Field source と右 Field source の 2 つに限定する。既定は左 `Vision Input`、右 ibis tracker output のため、初期 overlay は vision input と ibis tracker output の重ね合わせになる。`External`、`Unknown`、source label は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を使い、新規 capture では保存済み alignment、既存 capture では unsupported または明示的 best-effort で解決する。Field source として `All` は引き続き使わない。左右が同じ source の場合は 1 layer として扱い、legend に同一 source であることを表示する。
 
-overlay の色分けは source layer を識別するためのもので、yellow / blue team の意味を置き換えない。最小仕様では、`Layer A` を cyan 系 stroke / label、`Layer B` を magenta 系 stroke / label とし、robot body の yellow / blue fill は維持する。ball は layer 色の ring または stroke で区別する。重なりを読めるように `Layer B` は破線または半透明 stroke を使う。legend は overlay Field の近くに表示し、各 layer の表示名、source role / label、status、nearest timestamp delta、record count または drawable count を最小限表示する。
+overlay の色分けは source layer を識別するためのもので、yellow / blue team の意味を置き換えない。最小仕様では、`Layer A` を cyan 系 stroke / label、`Layer B` を magenta 系 stroke / label とし、robot body の yellow / blue fill は維持する。ball は layer 色の ring または stroke で区別する。重なりを読めるように `Layer B` は破線または半透明 stroke を使う。legend は overlay Field の近くに表示し、各 layer の表示名、source role / label、status、alignment delta または best-effort timestamp delta、record count または drawable count を最小限表示する。
 
 visibility は overlay legend 内の layer ごとの checkbox または toggle で制御する。既定は両 layer visible とする。visibility state は `Diagnostics.razor.cs` の page state に保持し、query string、session storage、local storage には保存しない。log file 変更時は両 layer visible に戻し、timeline scrub / playback tick / Field source selector 変更では現在の visibility を維持する。片方を非表示にしても source selection 自体は変えない。
 
@@ -192,7 +225,7 @@ focused tests では、少なくとも次を固定する。
 
 - overlay mode state は `Split` / `Overlay` を持ち、log file 変更時に `Split` または既定 mode へ戻す。scrub / playback tick では mode と visibility を維持する。
 - overlay 対象 source は左右 Field source selector の 2 source であり、overlay 専用 source list や Field source `All` を追加しない。
-- overlay layer は `Vision Input`、ibis tracker、`External`、`Unknown`、source label を混在でき、tracker source は `TRACKER-056` と同じ `TrackerDiagnosticsFieldSourceFrame` / nearest timestamp selection / cached index を使う。
+- overlay layer は `Vision Input`、ibis tracker、`External`、`Unknown`、source label を混在でき、tracker source は `TRACKER-056` と同じ `TrackerDiagnosticsFieldSourceFrame` / alignment lookup / cached index を使う。
 - sidecar unavailable、own baseline missing、candidate missing、drawable empty、geometry missing が layer status として残り、ready layer の描画を巻き込んで消さない。
 - layer visibility toggle は source selection を変えず、hidden layer を overlay 描画から除外する。
 - overlay component または factory が layer A / B の色分け、legend 表示値、semantic summary mapper の ball / yellow / blue 変換を固定する。
@@ -209,7 +242,7 @@ focused tests では、少なくとも次を固定する。
 - `TRACKER-052` では、CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する。CLI は agent / 検証用、通常確認は `/diagnostics` の comparison panel を主経路として説明する。
 - `TRACKER-054` では、live tracker receiver の endpoint override を追加する。既定は起動時 resolved ibis publish endpoint を監視し、`Tracker:Receive:MulticastAddress` / `Port` 指定時は receiver 独自 endpoint を監視する。runtime profile switch 後の receiver socket 再構成は対象外とし、起動時固定として README と設計に明記する。
 - `TRACKER-055` では、diagnostics playback / scrubber の低速問題を解消する。scrub / playback tick は lightweight index cache から comparison を更新し、sidecar size に比例する再読込に戻さない。
-- `TRACKER-056` では、`Tracker Comparison` panel を折り畳み可能にし、左右 Field の source を `Vision Input`、ibis tracker、external、unknown、source label から選べるようにする。既定は左 `Vision Input`、右 ibis tracker output とし、tracker source は selected diagnostics entry に対する nearest timestamp snapshot を Field に描画する。`All` は Field source として使わない。
+- `TRACKER-056` では、`Tracker Comparison` panel を折り畳み可能にし、左右 Field の source を `Vision Input`、ibis tracker、external、unknown、source label から選べるようにする。既定は左 `Vision Input`、右 ibis tracker output とし、tracker source は selected diagnostics entry に対する alignment または当時の nearest timestamp snapshot を Field に描画する。`All` は Field source として使わない。
 - `TRACKER-057` では、Field 重ね合わせ表示を追加する want タスクとして、`TRACKER-056` の左右 Field source selector と `TrackerDiagnosticsFieldSourceFrame` を再利用する。最小実装は左右 2 source overlay、layer 色分け、legend、layer visibility に限定し、任意個数 source overlay や永続化設定は含めない。overlay 実装が複雑化する場合は PR ready 前に defer 判断を report に明記する。
 - `TRACKER-053` では、PR #9 ready 化を行う。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
 - `TRACKER-058` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
