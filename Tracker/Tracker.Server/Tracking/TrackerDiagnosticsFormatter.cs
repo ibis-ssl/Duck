@@ -68,7 +68,7 @@ internal static class TrackerDiagnosticsFormatter
         return FormatItems(
             robots,
             robot => FormattableString.Invariant(
-                $"{FormatTeam(robot.Team)}{robot.RobotId}:x={robot.XMm:0.#},y={robot.YMm:0.#},vis={robot.Visibility:0.###},q={robot.Quality:0.###}"));
+                $"{FormatTeam(robot.Team)}{robot.RobotId}:x={robot.XMm:0.#},y={robot.YMm:0.#},o={robot.OrientationRad:0.###},w={robot.AngularVelocityRadPerS:0.###},vis={robot.Visibility:0.###},q={robot.Quality:0.###}"));
     }
 
     private static string FormatSourceValues(IEnumerable<uint> values)

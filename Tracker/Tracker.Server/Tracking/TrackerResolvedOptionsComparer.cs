@@ -58,7 +58,12 @@ internal static class TrackerResolvedOptionsComparer
             && left.VisibilityHalfLifeSeconds == right.VisibilityHalfLifeSeconds
             && left.OutputVisibilityThreshold == right.OutputVisibilityThreshold
             && left.Gate == right.Gate
-            && left.OutlierLimitMm == right.OutlierLimitMm;
+            && left.OutlierLimitMm == right.OutlierLimitMm
+            && left.IdentitySwitchDistanceMm == right.IdentitySwitchDistanceMm
+            && left.OrientationMeasurementNoiseRad == right.OrientationMeasurementNoiseRad
+            && left.OrientationProcessNoise == right.OrientationProcessNoise
+            && left.InitialAngularVelocityVariance == right.InitialAngularVelocityVariance
+            && left.AngularVelocityLimitRadPerS == right.AngularVelocityLimitRadPerS;
     }
 
     private static bool AreBallTrackerOverridesEquivalent(

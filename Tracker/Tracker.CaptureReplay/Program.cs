@@ -1,3 +1,5 @@
+using Tracker.CaptureReplay;
+
 var options = ReplayOptions.Parse(args);
 if (options.ShowHelp)
 {
@@ -13,7 +15,12 @@ if (options.Error is not null)
 }
 
 var settings = TrackerSettingsFactory.Create(options.ProfileName, options.SettingsPath, options.SettingsOverrides);
-var summary = CaptureReplayRunner.Run(options.CapturePath!, settings, options.DetailFilters, options.MaxDetails);
+var summary = CaptureReplayRunner.Run(
+    options.CapturePath!,
+    settings,
+    options.DetailFilters,
+    options.MaxDetails,
+    options.MaxDetailRobots);
 
 Console.WriteLine($"capture={options.CapturePath}");
 Console.WriteLine($"settingsFile={options.SettingsPath ?? "(built-in defaults)"}");

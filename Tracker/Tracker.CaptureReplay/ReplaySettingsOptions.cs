@@ -1,5 +1,7 @@
 using Tracker.Core;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// Tracker.Server appsettings.json と capture metadata の両方を受ける replay settings root。
 /// </summary>
@@ -92,6 +94,21 @@ internal sealed class TrackerEngineOptions
     /// geometry reset 判定で使う field width 差分のしきい値を mm 単位で表す。
     /// </summary>
     public int? GeometryResetFieldWidthThresholdMm { get; set; }
+
+    /// <summary>
+    /// Kalman state 初期化時の速度分散。
+    /// </summary>
+    public double? KalmanInitialVelocityVariance { get; set; }
+
+    /// <summary>
+    /// Kalman predict の process noise scale。
+    /// </summary>
+    public double? KalmanProcessNoiseScale { get; set; }
+
+    /// <summary>
+    /// measurement noise variance scale。
+    /// </summary>
+    public double? MeasurementNoiseVarianceScale { get; set; }
 }
 
 /// <summary>
@@ -128,6 +145,31 @@ internal class TrackerRobotTrackerOptions
     /// outlier とみなす距離上限を mm 単位で表す。
     /// </summary>
     public double? OutlierLimitMm { get; set; }
+
+    /// <summary>
+    /// 既存別 ID track 近傍への sudden robot id switch を抑制する距離を mm 単位で表す。
+    /// </summary>
+    public double? IdentitySwitchDistanceMm { get; set; }
+
+    /// <summary>
+    /// robot 向き観測 noise を rad 単位で表す。
+    /// </summary>
+    public double? OrientationMeasurementNoiseRad { get; set; }
+
+    /// <summary>
+    /// robot 向き Kalman predict の process noise。
+    /// </summary>
+    public double? OrientationProcessNoise { get; set; }
+
+    /// <summary>
+    /// robot 向き Kalman state 初期化時の角速度分散。
+    /// </summary>
+    public double? InitialAngularVelocityVariance { get; set; }
+
+    /// <summary>
+    /// robot 角速度 clamp を rad/s 単位で表す。
+    /// </summary>
+    public double? AngularVelocityLimitRadPerS { get; set; }
 }
 
 /// <summary>

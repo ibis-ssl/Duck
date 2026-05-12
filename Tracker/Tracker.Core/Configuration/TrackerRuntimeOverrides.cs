@@ -87,6 +87,32 @@ public sealed class TrackerRobotTrackerOverrides
     /// robot outlier 除外距離の上限。単位は mm。null の場合は gate 距離だけを使う。
     /// </summary>
     public double? OutlierLimitMm { get; init; }
+
+    /// <summary>
+    /// 既存別 ID track 近傍への sudden robot id switch を抑制する距離。単位は mm。
+    /// null の場合は engine 既定値を使う。
+    /// </summary>
+    public double? IdentitySwitchDistanceMm { get; init; }
+
+    /// <summary>
+    /// robot 向き観測 noise。単位は rad。null の場合は engine 既定値を使う。
+    /// </summary>
+    public double? OrientationMeasurementNoiseRad { get; init; }
+
+    /// <summary>
+    /// robot 向き Kalman predict の process noise。null の場合は engine 既定値を使う。
+    /// </summary>
+    public double? OrientationProcessNoise { get; init; }
+
+    /// <summary>
+    /// robot 向き Kalman state 初期化時の角速度分散。null の場合は engine 既定値を使う。
+    /// </summary>
+    public double? InitialAngularVelocityVariance { get; init; }
+
+    /// <summary>
+    /// robot 角速度 clamp。単位は rad/s。null の場合は engine 既定値を使う。
+    /// </summary>
+    public double? AngularVelocityLimitRadPerS { get; init; }
 }
 
 /// <summary>

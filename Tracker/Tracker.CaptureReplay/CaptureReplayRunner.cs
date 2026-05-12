@@ -1,5 +1,7 @@
 using Tracker.Core;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// 保存済み vision capture を tracker engine に順序通り再投入し、summary と detail 行を作る。
 /// </summary>
@@ -12,7 +14,8 @@ internal static class CaptureReplayRunner
         string capturePath,
         TrackerEngineSettings settings,
         IReadOnlyList<Condition> detailFilters,
-        int maxDetails)
+        int maxDetails,
+        int maxDetailRobots)
     {
         var engine = new TrackerEngine();
         var packetCount = 0;
@@ -66,7 +69,7 @@ internal static class CaptureReplayRunner
                     continue;
                 }
 
-                detailFrames.Add(ReplayFrameFormatter.FormatFrame(packetCount, record.ReceivedAt, frame));
+                detailFrames.Add(ReplayFrameFormatter.FormatFrame(packetCount, record.ReceivedAt, frame, maxDetailRobots));
             }
         }
 
@@ -101,6 +104,7 @@ internal static class CaptureReplayRunner
             var metricValue = condition.Metric switch
             {
                 "balls" => frame.Balls.Count,
+                "frame" => ToMetricValue(frame.FrameNumber),
                 "robots" => frame.Robots.Count,
                 "raw-balls" => rawBallCount,
                 "raw-yellow" => rawYellowCount,
@@ -115,5 +119,10 @@ internal static class CaptureReplayRunner
         }
 
         return true;
+    }
+
+    private static int ToMetricValue(uint value)
+    {
+        return value > int.MaxValue ? int.MaxValue : (int)value;
     }
 }

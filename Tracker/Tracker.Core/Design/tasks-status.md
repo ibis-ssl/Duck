@@ -4,17 +4,19 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-037
-- Title: Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する
-- Phase: maintenance
-- Status: done
+- ID: TRACKER-039
+- Title: diagnostics log の trackedFrame 3448 付近で青1番が11番へ化ける原因を調査して修正する
+- Phase: investigation
+- Status: in_progress
 - Size: small
-- Dependencies: TRACKER-036
+- Dependencies: TRACKER-038
 - Exit Criteria:
-  - dot 区切りを使うファイル名とフォルダ分割を優先するファイル名の基準が日本語で明文化されている
-  - class / property / method / test のコメント付与基準が日本語で明文化され、test も XML コメントで確認内容を説明する方針になっている
-  - `gpt-5.5 high` の sub-agent が現状ファイルを基準に照らして監査し、結果が `reports/tracker-037-naming-comment-audit-20260511195008.md` に記録されている
-  - 必要な rename / 配置変更 / コメント補強が実施され、build/test/review の結果に blocking finding が残っていない。最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み
+  - `Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260511T133110654Z-b94338b955704b8bb195e7d60bc7f68c.tracker-diagnostics.log` の `trackedFrame=3448` 付近で青1番と青11番の raw detection と tracked 出力の差分を説明できる
+  - ID が急に入れ替わることは位置ズレより起きづらいという前提を tracker の対応付けに反映している
+  - raw Vision 側の番号変化、camera 間 merge、robot identity association、表示処理のどこが原因かを切り分け、必要な修正を実施している
+  - 再発を固定する focused test または replay/diagnostics 証跡を `reports/` に記録している
+  - build/test と review の結果に blocking finding が残っていない
+  - 現状: 実装・検証・review 完了。初回 review の Medium 指摘は進捗ファイル同期漏れで、`tasks-status.md` / `phases-status.md` の更新により対応済み。r2 review は指摘なし。commit / PR 作成待ち。
 
 ## 次の調査タスク
 
@@ -62,3 +64,5 @@
 | TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | done | TRACKER-033, TRACKER-034 | 巨大 test file を責務別に分割し、対象 test 81 件に何を確認しているかの日本語コメントを追加した。実装・検証は `reports/tracker-035-test-worker-20260511085000.md`、review は `reports/tracker-035-review-20260511091000.md` に記録済み。 |
 | TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | done | TRACKER-033, TRACKER-034, TRACKER-035 | 保守性改善全体の最終検証と final review を実施した。最終検証は `reports/tracker-036-final-verification-20260511093000.md`、final review は `reports/tracker-036-final-review-20260511094000.md` に記録済み。 |
 | TRACKER-037 | Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する | maintenance | done | TRACKER-036 | dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を日本語で明文化した。監査は `reports/tracker-037-naming-comment-audit-20260511195008.md`、実装分担は `reports/tracker-037-design-rules-worker-20260511195640.md`、`reports/tracker-037-core-server-worker-20260511195640.md`、`reports/tracker-037-test-xml-comments-worker-20260511195640.md`、修正は `reports/tracker-037-review-fix-worker-20260511200910.md`、最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み。 |
+| TRACKER-038 | diagnostics log の trackedFrame 3483 付近で黄色8番が首振りする原因を調査して修正する | investigation | done | TRACKER-037 | 原因は raw Vision 入力、camera 間 merge、表示処理ではなく、robot orientation filter が位置 mm 用 covariance を向き axis に流用して過去の角速度を残すことだった。rad 単位の orientation covariance と angular velocity clamp を `RobotTracker` 設定へ外出しし、既存 Kalman scale 契約も維持した。`Tracker.CaptureReplay` に frame detail filter と robot orientation / angular velocity 出力を追加し、appsettings / resolved metadata replay で Kalman scale を保持するようにした。証跡は `reports/tracker-038-evidence-20260512080732.md` に記録済み。focused test 26 件、full test 155 件は passed。初回 review と r2 review の Medium finding は対応済み。r3 review は `reports/tracker-038-review-r3-20260512082903.md` に記録済みで no findings。 |
+| TRACKER-039 | diagnostics log の trackedFrame 3448 付近で青1番が11番へ化ける原因を調査して修正する | investigation | in_progress | TRACKER-038 | 原因は raw Vision で青1番 / 青11番が同一位置近傍に重複し、さらに青1番が別 robot 位置にも現れたとき、merge window 内の後続同一 ID 候補が既存 track 近傍候補を上書きし、突然の ID 入れ替わりを位置ズレより低確率として扱っていなかったことだった。既存同一 ID track 近傍候補の優先と、既存別 ID track 近傍への突然の ID 入れ替わり抑制を `RobotTracker.IdentitySwitchDistanceMm` として外出しして実装した。番号ワープを失敗条件にした再発防止テストは stash で旧実装が失敗し、修正後に成功した。証跡は `reports/tracker-039-evidence-20260512084929.md`、初回 review は `reports/tracker-039-review-20260512085258.md`、r2 review は `reports/tracker-039-review-r2-20260512090207.md` に記録済み。初回 review の Medium 指摘は進捗ファイル同期漏れで対応済み。r2 review は指摘なし。commit / PR 作成待ち。 |

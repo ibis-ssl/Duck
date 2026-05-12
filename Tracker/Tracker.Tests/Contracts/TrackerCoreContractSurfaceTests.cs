@@ -94,6 +94,11 @@ public class TrackerCoreContractSurfaceTests
                 OutputVisibilityThreshold = 0.2,
                 Gate = 2.0,
                 OutlierLimitMm = 300,
+                IdentitySwitchDistanceMm = 145,
+                OrientationMeasurementNoiseRad = 0.07,
+                OrientationProcessNoise = 0.08,
+                InitialAngularVelocityVariance = 12,
+                AngularVelocityLimitRadPerS = 5.0,
             },
             BallTracker = new TrackerBallTrackerOverrides
             {
@@ -123,6 +128,11 @@ public class TrackerCoreContractSurfaceTests
         Assert.Equal(10010, request.RuntimeOverrides.Publish.Port);
         Assert.Equal(0.2, request.RuntimeOverrides.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(300, request.RuntimeOverrides.RobotTracker.OutlierLimitMm);
+        Assert.Equal(145, request.RuntimeOverrides.RobotTracker.IdentitySwitchDistanceMm);
+        Assert.Equal(0.07, request.RuntimeOverrides.RobotTracker.OrientationMeasurementNoiseRad);
+        Assert.Equal(0.08, request.RuntimeOverrides.RobotTracker.OrientationProcessNoise);
+        Assert.Equal(12, request.RuntimeOverrides.RobotTracker.InitialAngularVelocityVariance);
+        Assert.Equal(5.0, request.RuntimeOverrides.RobotTracker.AngularVelocityLimitRadPerS);
         Assert.Equal(0.4, request.RuntimeOverrides.BallTracker.OutputVisibilityThreshold);
         Assert.Equal(2_000_000_000, request.RuntimeOverrides.BallTracker.TrackLifetimeNs);
         Assert.Equal(25, request.RuntimeOverrides.KickDetector.ContactMarginMm);

@@ -80,6 +80,11 @@ public static class TrackerConfigurationResolver
             OutputVisibilityThreshold = runtimeOverrides.OutputVisibilityThreshold ?? profile.OutputVisibilityThreshold,
             Gate = runtimeOverrides.Gate ?? profile.Gate,
             OutlierLimitMm = runtimeOverrides.OutlierLimitMm ?? profile.OutlierLimitMm,
+            IdentitySwitchDistanceMm = runtimeOverrides.IdentitySwitchDistanceMm ?? profile.IdentitySwitchDistanceMm,
+            OrientationMeasurementNoiseRad = runtimeOverrides.OrientationMeasurementNoiseRad ?? profile.OrientationMeasurementNoiseRad,
+            OrientationProcessNoise = runtimeOverrides.OrientationProcessNoise ?? profile.OrientationProcessNoise,
+            InitialAngularVelocityVariance = runtimeOverrides.InitialAngularVelocityVariance ?? profile.InitialAngularVelocityVariance,
+            AngularVelocityLimitRadPerS = runtimeOverrides.AngularVelocityLimitRadPerS ?? profile.AngularVelocityLimitRadPerS,
         };
     }
 

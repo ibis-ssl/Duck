@@ -33,6 +33,11 @@ public class TrackerConfigurationBindingTests
         Assert.Equal(0.2d, resolved.EngineSettings.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(2.0d, resolved.EngineSettings.RobotTracker.Gate);
         Assert.Equal(350d, resolved.EngineSettings.RobotTracker.OutlierLimitMm);
+        Assert.Equal(145d, resolved.EngineSettings.RobotTracker.IdentitySwitchDistanceMm);
+        Assert.Equal(0.07d, resolved.EngineSettings.RobotTracker.OrientationMeasurementNoiseRad);
+        Assert.Equal(0.09d, resolved.EngineSettings.RobotTracker.OrientationProcessNoise);
+        Assert.Equal(12d, resolved.EngineSettings.RobotTracker.InitialAngularVelocityVariance);
+        Assert.Equal(4.5d, resolved.EngineSettings.RobotTracker.AngularVelocityLimitRadPerS);
         Assert.Equal(1.7d, resolved.EngineSettings.BallTracker.ProcessNoise);
         Assert.Equal(0.6d, resolved.EngineSettings.BallTracker.MeasurementNoise);
         Assert.Equal(0.7d, resolved.EngineSettings.BallTracker.VisibilityHalfLifeSeconds);
@@ -97,6 +102,11 @@ public class TrackerConfigurationBindingTests
         Assert.Equal(1.4d, engineSettings.RobotTracker.VisibilityHalfLifeSeconds);
         Assert.Equal(0.2d, engineSettings.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(350d, engineSettings.RobotTracker.OutlierLimitMm);
+        Assert.Equal(145d, engineSettings.RobotTracker.IdentitySwitchDistanceMm);
+        Assert.Equal(0.07d, engineSettings.RobotTracker.OrientationMeasurementNoiseRad);
+        Assert.Equal(0.09d, engineSettings.RobotTracker.OrientationProcessNoise);
+        Assert.Equal(12d, engineSettings.RobotTracker.InitialAngularVelocityVariance);
+        Assert.Equal(4.5d, engineSettings.RobotTracker.AngularVelocityLimitRadPerS);
         Assert.Equal(0.7d, engineSettings.BallTracker.VisibilityHalfLifeSeconds);
         Assert.Equal(0.4d, engineSettings.BallTracker.OutputVisibilityThreshold);
         Assert.Equal(1.8d, engineSettings.BallTracker.Gate);
@@ -139,6 +149,11 @@ public class TrackerConfigurationBindingTests
         Assert.Equal(100d, resolved.EngineSettings.MeasurementNoiseVarianceScale);
         Assert.Equal(0.462756d, resolved.EngineSettings.RobotTracker.VisibilityHalfLifeSeconds);
         Assert.Equal(0.05d, resolved.EngineSettings.RobotTracker.OutputVisibilityThreshold);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotOrientationMeasurementNoiseRad, resolved.EngineSettings.RobotTracker.OrientationMeasurementNoiseRad);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotOrientationProcessNoise, resolved.EngineSettings.RobotTracker.OrientationProcessNoise);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotInitialAngularVelocityVariance, resolved.EngineSettings.RobotTracker.InitialAngularVelocityVariance);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotAngularVelocityLimitRadPerS, resolved.EngineSettings.RobotTracker.AngularVelocityLimitRadPerS);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotIdentitySwitchDistanceMm, resolved.EngineSettings.RobotTracker.IdentitySwitchDistanceMm);
         Assert.Equal(1_000_000_000L, resolved.EngineSettings.BallTracker.TrackLifetimeNs);
     }
 
@@ -169,6 +184,11 @@ public class TrackerConfigurationBindingTests
                     ["Tracker:Profiles:simulation:RobotTracker:OutputVisibilityThreshold"] = "0.1",
                     ["Tracker:Profiles:simulation:RobotTracker:Gate"] = "2.0",
                     ["Tracker:Profiles:simulation:RobotTracker:OutlierLimitMm"] = "300",
+                    ["Tracker:Profiles:simulation:RobotTracker:IdentitySwitchDistanceMm"] = "140",
+                    ["Tracker:Profiles:simulation:RobotTracker:OrientationMeasurementNoiseRad"] = "0.07",
+                    ["Tracker:Profiles:simulation:RobotTracker:OrientationProcessNoise"] = "0.08",
+                    ["Tracker:Profiles:simulation:RobotTracker:InitialAngularVelocityVariance"] = "12",
+                    ["Tracker:Profiles:simulation:RobotTracker:AngularVelocityLimitRadPerS"] = "5.0",
                     ["Tracker:Profiles:simulation:BallTracker:ProcessNoise"] = "1.7",
                     ["Tracker:Profiles:simulation:BallTracker:MeasurementNoise"] = "0.6",
                     ["Tracker:Profiles:simulation:BallTracker:VisibilityHalfLifeSeconds"] = "0.9",
@@ -185,6 +205,9 @@ public class TrackerConfigurationBindingTests
                     ["Tracker:RuntimeOverrides:RobotTracker:VisibilityHalfLifeSeconds"] = "1.4",
                     ["Tracker:RuntimeOverrides:RobotTracker:OutputVisibilityThreshold"] = "0.2",
                     ["Tracker:RuntimeOverrides:RobotTracker:OutlierLimitMm"] = "350",
+                    ["Tracker:RuntimeOverrides:RobotTracker:IdentitySwitchDistanceMm"] = "145",
+                    ["Tracker:RuntimeOverrides:RobotTracker:OrientationProcessNoise"] = "0.09",
+                    ["Tracker:RuntimeOverrides:RobotTracker:AngularVelocityLimitRadPerS"] = "4.5",
                     ["Tracker:RuntimeOverrides:BallTracker:VisibilityHalfLifeSeconds"] = "0.7",
                     ["Tracker:RuntimeOverrides:BallTracker:OutputVisibilityThreshold"] = "0.4",
                     ["Tracker:RuntimeOverrides:BallTracker:Gate"] = "1.8",
@@ -209,6 +232,11 @@ public class TrackerConfigurationBindingTests
         Assert.Equal(0.462756d, profile.RobotTracker.VisibilityHalfLifeSeconds);
         Assert.Equal(0.05d, profile.RobotTracker.OutputVisibilityThreshold);
         Assert.Equal(expectedGate, profile.RobotTracker.Gate);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotIdentitySwitchDistanceMm, profile.RobotTracker.IdentitySwitchDistanceMm);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotOrientationMeasurementNoiseRad, profile.RobotTracker.OrientationMeasurementNoiseRad);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotOrientationProcessNoise, profile.RobotTracker.OrientationProcessNoise);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotInitialAngularVelocityVariance, profile.RobotTracker.InitialAngularVelocityVariance);
+        Assert.Equal(TrackerEngineSettings.DefaultRobotAngularVelocityLimitRadPerS, profile.RobotTracker.AngularVelocityLimitRadPerS);
         Assert.Equal(0.1d, profile.BallTracker.ProcessNoise);
         Assert.Equal(100.0d, profile.BallTracker.MeasurementNoise);
         Assert.Equal(1.0d, profile.BallTracker.VisibilityHalfLifeSeconds);

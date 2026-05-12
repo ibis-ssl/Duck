@@ -1,5 +1,7 @@
 using System.Globalization;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// Capture replay CLI の引数と検証条件を保持する。
 /// </summary>
@@ -24,6 +26,11 @@ internal sealed record ReplayOptions
     /// detail frame の最大出力件数。
     /// </summary>
     public int MaxDetails { get; private init; } = 40;
+
+    /// <summary>
+    /// 1 detail frame に表示する tracked robot の最大件数。
+    /// </summary>
+    public int MaxDetailRobots { get; private init; } = 16;
 
     /// <summary>
     /// replay summary に対する自動検証条件。
@@ -106,6 +113,16 @@ internal sealed record ReplayOptions
                     }
 
                     options = options with { MaxDetails = maxDetails };
+                    break;
+                case "--max-detail-robots":
+                    if (!TryReadValue(args, ref i, out var maxDetailRobotsText)
+                        || !int.TryParse(maxDetailRobotsText, NumberStyles.None, CultureInfo.InvariantCulture, out var maxDetailRobots)
+                        || maxDetailRobots < 0)
+                    {
+                        return options with { Error = "--max-detail-robots requires a non-negative integer." };
+                    }
+
+                    options = options with { MaxDetailRobots = maxDetailRobots };
                     break;
                 case "--ball-gate":
                     if (!TryReadNonNegativeDouble(args, ref i, "--ball-gate", out var ballGate, out var ballGateError))
@@ -216,6 +233,7 @@ internal sealed record ReplayOptions
               --expect <condition>         Assert a summary metric, for automation. Can be repeated.
               --detail-filter <condition>  Print committed frames matching all detail filters. Can be repeated.
               --max-details <count>        Maximum matching frame details to print. default: 40
+              --max-detail-robots <count>  Maximum tracked robots per detail frame. default: 16
               --ball-gate <value>          Override BallTracker.Gate for replay.
               --ball-outlier-limit-mm <v>  Override BallTracker.OutlierLimitMm for replay.
               --ball-output-visibility <v> Override BallTracker.OutputVisibilityThreshold for replay.
@@ -229,7 +247,7 @@ internal sealed record ReplayOptions
               max-balls, max-robots, max-raw-balls, max-raw-yellow, max-raw-blue
 
             Frame metrics for --detail-filter:
-              balls, robots, raw-balls, raw-yellow, raw-blue
+              frame, balls, robots, raw-balls, raw-yellow, raw-blue
 
             Operators:
               >=, <=, ==, !=, >, <
@@ -259,6 +277,7 @@ internal sealed record ReplayOptions
     private static readonly HashSet<string> DetailMetrics =
     [
         "balls",
+        "frame",
         "robots",
         "raw-balls",
         "raw-yellow",

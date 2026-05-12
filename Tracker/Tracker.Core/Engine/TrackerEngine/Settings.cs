@@ -125,6 +125,16 @@ public sealed partial class TrackerEngine
     }
 
     /// <summary>
+    /// sudden robot id switch を疑う既存別 ID track との近接距離を mm 単位で解決する。
+    /// </summary>
+    private static double GetRobotIdentitySwitchDistanceMm(TrackerEngineSettings settings)
+    {
+        return Math.Max(
+            0d,
+            settings.RobotTracker.IdentitySwitchDistanceMm ?? TrackerEngineSettings.DefaultRobotIdentitySwitchDistanceMm);
+    }
+
+    /// <summary>
     /// track visibility が出力 threshold を満たすか判定する。
     /// </summary>
     private static bool PassesOutputVisibility(float visibility, double threshold)
@@ -169,6 +179,70 @@ public sealed partial class TrackerEngine
     }
 
     /// <summary>
+    /// raw robot confidence から向き観測の rad 単位の不確かさを算出する。
+    /// </summary>
+    private static double GetObservedRobotOrientationUncertaintyRad(TrackerEngineSettings settings, float confidence)
+    {
+        var measurementNoise = GetRobotOrientationMeasurementNoiseRad(settings) / Math.Max(0.001d, confidence);
+        return measurementNoise * measurementNoise * GetKalmanScaleRatio(
+            GetMeasurementNoiseVarianceScale(settings),
+            TrackerEngineSettings.DefaultMeasurementNoiseVarianceScale);
+    }
+
+    /// <summary>
+    /// robot orientation Kalman predict に使う rad 単位の process variance を返す。
+    /// </summary>
+    private static double GetRobotOrientationProcessVariance(TrackerEngineSettings settings)
+    {
+        return GetRobotOrientationProcessNoise(settings) * GetKalmanScaleRatio(
+            GetKalmanProcessNoiseScale(settings),
+            TrackerEngineSettings.DefaultKalmanProcessNoiseScale);
+    }
+
+    /// <summary>
+    /// robot orientation Kalman state 初期化時の角速度分散を返す。
+    /// </summary>
+    private static double GetRobotInitialAngularVelocityVariance(TrackerEngineSettings settings)
+    {
+        return Math.Max(
+            0.001d,
+            (settings.RobotTracker.InitialAngularVelocityVariance ?? TrackerEngineSettings.DefaultRobotInitialAngularVelocityVariance)
+                * GetKalmanScaleRatio(
+            GetInitialVelocityVariance(settings),
+            TrackerEngineSettings.DefaultKalmanInitialVelocityVariance));
+    }
+
+    /// <summary>
+    /// robot 向き観測 noise を rad 単位で解決する。
+    /// </summary>
+    private static double GetRobotOrientationMeasurementNoiseRad(TrackerEngineSettings settings)
+    {
+        return Math.Max(
+            0.001d,
+            settings.RobotTracker.OrientationMeasurementNoiseRad ?? TrackerEngineSettings.DefaultRobotOrientationMeasurementNoiseRad);
+    }
+
+    /// <summary>
+    /// robot 向き Kalman predict の process noise を解決する。
+    /// </summary>
+    private static double GetRobotOrientationProcessNoise(TrackerEngineSettings settings)
+    {
+        return Math.Max(
+            0.001d,
+            settings.RobotTracker.OrientationProcessNoise ?? TrackerEngineSettings.DefaultRobotOrientationProcessNoise);
+    }
+
+    /// <summary>
+    /// robot 角速度 clamp を rad/s 単位で解決する。
+    /// </summary>
+    private static double GetRobotAngularVelocityLimitRadPerS(TrackerEngineSettings settings)
+    {
+        return Math.Max(
+            0.001d,
+            settings.RobotTracker.AngularVelocityLimitRadPerS ?? TrackerEngineSettings.DefaultRobotAngularVelocityLimitRadPerS);
+    }
+
+    /// <summary>
     /// Kalman state 初期化時の速度分散を下限付きで解決する。
     /// </summary>
     private static double GetInitialVelocityVariance(TrackerEngineSettings settings)
@@ -190,6 +264,11 @@ public sealed partial class TrackerEngine
     private static double GetMeasurementNoiseVarianceScale(TrackerEngineSettings settings)
     {
         return Math.Max(0.001d, settings.MeasurementNoiseVarianceScale);
+    }
+
+    private static double GetKalmanScaleRatio(double scale, double defaultScale)
+    {
+        return scale / Math.Max(0.001d, defaultScale);
     }
 
     /// <summary>

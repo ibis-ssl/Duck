@@ -1,5 +1,7 @@
 using System.Globalization;
 
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// Capture replay の --expect / --detail-filter で使う整数 metric 条件。
 /// </summary>

@@ -1,3 +1,5 @@
+namespace Tracker.CaptureReplay;
+
 /// <summary>
 /// Capture replay が標準出力へ出す summary metric を保持する。
 /// </summary>
