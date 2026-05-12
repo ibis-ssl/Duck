@@ -94,25 +94,35 @@ CaptureOn 直後、まだ packet capture 本体の session が遅延作成され
 
 diagnostics log reader、`Tracker.CaptureReplay`、diagnostics playback は、metadata の relative path から tracker packet snapshot sidecar を解決し、存在する場合だけ追加情報を読む。既存 capture や既存 diagnostics log では session folder または snapshot sidecar 欠落を正常系として扱う。
 
-replay / diagnostics / playback の出力は、少なくとも次を確認できるようにする。
+`Tracker.CaptureReplay` は agent / 自動検証 / CLI 調査向けに、3rdparty tracker snapshot と ibis committed frame の nearest timestamp comparison を `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は diagnostics UI 実装後も削除せず、UI と同じ reader contract の検証経路として維持する。
+
+`/diagnostics` はユーザー向けに同じ comparison を画面上で確認できるようにする。diagnostics playback は選択中の diagnostics entry と playback tick に合わせて tracker snapshot comparison を更新し、source identity / role / label で表示対象を切り替えられる comparison panel を持つ。render snapshot と同じく session folder 内 sidecar への対応付けを行うが、比較の基準 timestamp は render snapshot ではなく、ibis own snapshot の `TrackedFrame.timestamp` とする。
+
+replay / diagnostics / playback の出力または UI 表示は、少なくとも次を確認できるようにする。
 
 - ibis committed frame の timestamp
 - 対応する source identity と role / label
 - 採用した timestamp 対応規則
 - snapshot 側 tracked frame number / timestamp
+- timestamp delta
 - ball / robot count
 - skipped/error count
 - raw payload 参照または復元状態
 
 3rdparty tracker packet は snapshot として保持し、`Tracker.CaptureReplay` と `/diagnostics` の playback は session folder 内の snapshot log を読み、timestamp 近傍規則で ibis committed frame と並べて再生・比較表示できるようにする。playback は raw / tracked render snapshot だけに依存せず、source identity / role ごとの tracker packet snapshot timeline を入力として扱える必要がある。
 
+metadata がない、metadata に snapshot sidecar path がない、sidecar file がない、metadata `TrackerSnapshotLog.IsCreated=false`、record count 0、読み取り error はそれぞれ UI 上の status として区別する。これらは既存 diagnostics log / render snapshot 表示を壊す blocker ではない。
+
 ## 後続タスクへの固定事項
 
 - `TRACKER-047` では、既存 `TrackerSnapshotReplayReader` / `TrackerReplayIntegrationTddTests` の review gate を閉じる。focused 4 passed、関連 focused 39 passed、full `Tracker.Tests` 191 passed の実装検証済み状態を保持し、gpt-5.5 high review で blocking finding がないことを確認する。finding が出た場合は修正・再検証・r2 review まで完了する。
 - `TRACKER-048` では、diagnostics / replay / playback の比較表示・出力へ接続する。metadata relative path から snapshot sidecar を読み、source role / label、tracked timestamp、ball / robot count、raw payload restored、nearest timestamp summary を `Tracker.CaptureReplay` または diagnostics playback で確認可能にする。既存 capture / diagnostics / render snapshot 表示を壊さない。
-- `TRACKER-049` では、CaptureOn 比較ログの運用ドキュメントと確認手順を整える。`Tracker:Receive:Enabled`、multicast endpoint、CaptureOn session folder、snapshot sidecar、replay / diagnostics 確認方法、manual evidence を含める。
-- `TRACKER-050` では、PR #9 ready 化を行う。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
-- `TRACKER-051` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
+- `TRACKER-049` では、diagnostics comparison の design / tracking を再同期する。CLI 比較実装は保持し、`/diagnostics` UI comparison を PR ready 前の固定タスクに入れ、後続タスクの dependencies と exit criteria を明確にする。
+- `TRACKER-050` では、diagnostics comparison reader / view-state contract を追加する。diagnostics log path から metadata / sidecar を解決し、source list、selected source filter、selected entry comparison、sidecar status、skipped/error count を pure model として固定する。
+- `TRACKER-051` では、`/diagnostics` UI へ comparison 表示と source filtering を接続する。selected log / selected entry / playback tick と comparison view-state を同期し、既存 render snapshot、settings modal、timeline、playback controls、resize layout を壊さない。
+- `TRACKER-052` では、CaptureOn 比較ログの運用ドキュメントと manual evidence を UI 比較完了後の実態へ更新する。CLI は agent / 検証用、通常確認は `/diagnostics` の comparison panel を主経路として説明する。
+- `TRACKER-053` では、PR #9 ready 化を行う。PR本文を `TRACKER-040` から最終状態まで更新し、final validation、review evidence、risk整理、tracking同期、draft解除判断材料を揃える。
+- `TRACKER-054` 以降は、socket abstraction 等の hardening を今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
 
 ## 完了条件
 
@@ -122,5 +132,5 @@ replay / diagnostics / playback の出力は、少なくとも次を確認でき
 - Capture Off / 再On で session folder と snapshot writer が切り替わり、前 session folder へ追記しない。
 - 他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の挙動が変わらない。
 - 既存 diagnostics log reader 互換性を壊さず、snapshot sidecar がある場合だけ追加比較情報を読める。
-- 3rdparty tracker snapshot を `Tracker.CaptureReplay` と diagnostics playback から再生・比較表示できる。
+- 3rdparty tracker snapshot を `Tracker.CaptureReplay` の CLI 出力と `/diagnostics` の comparison panel / playback から再生・比較表示できる。
 - 各小タスクで TDD、review、commit、PR gate が閉じている。

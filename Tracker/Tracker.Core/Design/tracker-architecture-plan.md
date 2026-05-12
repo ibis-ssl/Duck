@@ -553,7 +553,9 @@ packet capture の metadata には active profile 名だけでなく、`TrackerO
 
 `Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。detail filter は `frame` でも絞り込めるようにし、robot detail には位置だけでなく `orientation / angular velocity` も出して、raw detection と tracked 出力の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.Server/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
 
-CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot sidecar を metadata から読み、3rdparty tracker snapshot を timestamp 近傍規則で ibis committed frame と並べて再生・比較できるようにする。diagnostics viewer と playback も同じ snapshot log を読み、source identity / role ごとの timeline、frame number / timestamp、ball / robot count、raw payload 復元状態を表示できる入力契約にする。
+CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot sidecar を metadata から読み、3rdparty tracker snapshot を timestamp 近傍規則で ibis committed frame と並べて再生・比較できるようにする。この CLI 比較経路は agent / 自動検証 / 調査用に保持し、diagnostics UI 実装後も削除しない。
+
+diagnostics viewer と playback も同じ snapshot log と reader contract を使い、source identity / role / label ごとの timeline、frame number / timestamp、timestamp delta、ball / robot count、raw payload 復元状態を画面上で確認できるようにする。`/diagnostics` の比較基準は選択中 diagnostics entry と対応する ibis own snapshot の `TrackedFrame.timestamp` とし、source filter 後の 3rdparty tracker snapshot を nearest timestamp 規則で並べる。metadata / sidecar がない、record count 0、読み取り error がある場合は状態表示に留め、既存 diagnostics log、render snapshot、settings 表示を壊さない。
 
 raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
 
