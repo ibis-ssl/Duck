@@ -1,4 +1,5 @@
 using Tracker.Core;
+using Tracker.Server.Tracking;
 
 namespace Tracker.CaptureReplay;
 
@@ -15,7 +16,8 @@ internal static class CaptureReplayRunner
         TrackerEngineSettings settings,
         IReadOnlyList<Condition> detailFilters,
         int maxDetails,
-        int maxDetailRobots)
+        int maxDetailRobots,
+        string? metadataPath = null)
     {
         var engine = new TrackerEngine();
         var packetCount = 0;
@@ -84,7 +86,8 @@ internal static class CaptureReplayRunner
             maxRawYellowCount,
             maxRawBlueCount,
             detailFrames,
-            Math.Max(0, matchingDetailFrameCount - detailFrames.Count));
+            Math.Max(0, matchingDetailFrameCount - detailFrames.Count),
+            TrackerSnapshotReplayLineFormatter.ReadLines(metadataPath));
     }
 
     private static bool MatchesDetailFilters(
@@ -124,5 +127,44 @@ internal static class CaptureReplayRunner
     private static int ToMetricValue(uint value)
     {
         return value > int.MaxValue ? int.MaxValue : (int)value;
+    }
+}
+
+/// <summary>
+/// Capture metadata から tracker snapshot replay 情報を読み、既存 CLI に合わせた key=value 行へ整形する。
+/// </summary>
+internal static class TrackerSnapshotReplayLineFormatter
+{
+    /// <summary>
+    /// metadata path が tracker snapshot sidecar を解決できる場合だけ snapshot / comparison 表示行を返す。
+    /// </summary>
+    public static IReadOnlyList<string> ReadLines(string? metadataPath)
+    {
+        if (string.IsNullOrWhiteSpace(metadataPath) || !File.Exists(metadataPath))
+        {
+            return [];
+        }
+
+        var session = new TrackerSnapshotReplayReader().ReadSession(metadataPath);
+        if (session.SnapshotInputs.Count == 0 && session.ComparisonSummaries.Count == 0)
+        {
+            return [];
+        }
+
+        var lines = new List<string>();
+        foreach (var input in session.SnapshotInputs)
+        {
+            var semanticSummary = input.ComparisonSource.SemanticSummary;
+            lines.Add(
+                $"trackerSnapshot source={input.SourceLabel} role={input.SourceRole} trackedFrame={input.TrackedFrameNumber} trackedTs={input.TrackedFrameTimestampNs} balls={semanticSummary.BallCount} robots={semanticSummary.RobotCount} rawPayloadRestored={input.ComparisonSource.RawPayloadRestored}");
+        }
+
+        foreach (var summary in session.ComparisonSummaries)
+        {
+            lines.Add(
+                $"trackerComparison rule={summary.MatchingRule} ibisTs={summary.IbisDiagnosticsTimestampNs} source={summary.NearestSnapshotSourceLabel} role={summary.NearestSnapshotSourceRole} nearestTs={summary.NearestSnapshotTimestampNs} balls={summary.NearestSnapshotBallCount} robots={summary.NearestSnapshotRobotCount} rawPayloadRestored={summary.NearestSnapshotRawPayloadRestored}");
+        }
+
+        return lines;
     }
 }
