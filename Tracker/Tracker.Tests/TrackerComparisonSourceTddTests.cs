@@ -165,6 +165,13 @@ public class TrackerComparisonSourceTddTests : IClassFixture<TrackerContractFixt
         var recordType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotRecord");
         var summaryProperty = GetRequiredProperty(recordType, "SemanticSummary");
         var summaryType = summaryProperty.PropertyType;
+        var packet = CreatePacket(
+            sourceUuid: "thirdparty-summary-uuid",
+            sourceName: "thirdparty-summary-source",
+            frameNumber: 4430,
+            timestampNs: 12_370_000_000,
+            role: "external");
+        var sidecarPath = WriteSidecarRecord(packet, packet.ToByteArray(), role: "external");
 
         GetRequiredProperty(summaryType, "BallCount", typeof(int));
         GetRequiredProperty(summaryType, "RobotCount", typeof(int));
@@ -177,6 +184,48 @@ public class TrackerComparisonSourceTddTests : IClassFixture<TrackerContractFixt
         Assert.True(
             typeof(System.Collections.IEnumerable).IsAssignableFrom(robotsProperty.PropertyType),
             "SemanticSummary.Robots must expose team/id/representative position entries for comparison.");
+
+        var record = Assert.Single(TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath));
+        var summary = Assert.IsType<TrackerPacketSnapshotSemanticSummary>(record.SemanticSummary);
+
+        Assert.Equal(2, summary.BallCount);
+        Assert.Equal(2, summary.RobotCount);
+        Assert.Equal(4430u, summary.TrackedFrameNumber);
+        Assert.Equal(12_370_000_000, summary.TrackedFrameTimestampNs);
+        Assert.Equal("thirdparty-summary-uuid", summary.SourceUuid);
+        Assert.Equal("thirdparty-summary-source", summary.SourceName);
+        Assert.Equal("external", summary.SourceRole);
+        Assert.Equal("thirdparty-summary-source", summary.SourceLabel);
+        Assert.Collection(
+            summary.Balls,
+            ball =>
+            {
+                Assert.Equal(0, ball.Index);
+                Assert.Equal(100.0, ball.XMm, 3);
+                Assert.Equal(200.0, ball.YMm, 3);
+            },
+            ball =>
+            {
+                Assert.Equal(1, ball.Index);
+                Assert.Equal(300.0, ball.XMm, 3);
+                Assert.Equal(400.0, ball.YMm, 3);
+            });
+        Assert.Collection(
+            summary.Robots,
+            robot =>
+            {
+                Assert.Equal(Team.Yellow.ToString(), robot.Team);
+                Assert.Equal(3u, robot.RobotId);
+                Assert.Equal(1200.0, robot.XMm, 3);
+                Assert.Equal(-300.0, robot.YMm, 3);
+            },
+            robot =>
+            {
+                Assert.Equal(Team.Blue.ToString(), robot.Team);
+                Assert.Equal(7u, robot.RobotId);
+                Assert.Equal(-500.0, robot.XMm, 3);
+                Assert.Equal(900.0, robot.YMm, 3);
+            });
     }
 
     /// <summary>
