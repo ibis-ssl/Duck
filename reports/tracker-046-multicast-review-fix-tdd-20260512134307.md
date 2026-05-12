@@ -78,9 +78,11 @@
 - `tracker-server-cli-ui-detail-design.md` は official multicast endpoint join、loopback unicast-only 不足、receiver 明示 enable、CaptureOn は sidecar 書き込み制御であることへ同期した。
 - `tasks-status.md` / `phases-status.md` は `TRACKER-046` が review blocking 対応中・multicast TDD failing test 作成済み・production 実装待ちである状態へ同期した。
 - `git diff --check`: 問題なし。
-- commit hash: commit 後に追記。
-- push 結果: push 後に追記。
+- TDD commit hash: `1abe53704200d67f4b1b32aaadf824e009266076`
+- TDD push 結果: `8695918..1abe537  feat/tracker-captureon-compare-log -> feat/tracker-captureon-compare-log`
 - PR #9: `https://github.com/ibis-ssl/Duck/pull/9`
+- PR #9 状態: `OPEN` / draft / base `main` / head `feat/tracker-captureon-compare-log`。
+- 最終 `git status --short --branch`: `## feat/tracker-captureon-compare-log...origin/feat/tracker-captureon-compare-log` と `?? reports/tracker-046-review-20260512133802.md`。
 
 ## リスク
 
