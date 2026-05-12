@@ -22,6 +22,55 @@
 - diagnostics log / capture file の schema 変更
 - official tracker packet の送信内容変更
 
+## CaptureOn 比較ログ拡張
+
+`TRACKER-040` 以降では、CaptureOn 中に ibis tracker と同時に存在する 3rdparty tracker の official `TrackerWrapperPacket` を保存し、capture 後に比較できるようにする。これは保守性改善そのものではなく、Server / CLI / UI の diagnostics surface に追加する新しい観察性契約である。
+
+この節は `TRACKER-034` の保守性改善対象外だった schema 変更を後から解禁するものではなく、`comparison-logging` phase の設計入口として扱う。実際の code / test / schema 変更は `TRACKER-041` 以降の小タスクで TDD と review gate を通す。
+
+### 責務境界
+
+- 3rdparty tracker 傍受は `TrackerConnectionLib` を第一候補の統合点にする。`Tracker.Server` へ組み込む際は、既存の `UdpTrackerReceiver` / `MultiTrackerManager` / `TrackerPacketAdapter` の責務を優先して使うか、Server の capture lifecycle に合わせて薄い adapter を置く。
+- `Tracker.Server` は CaptureOn session と比較ログを紐付ける統合層にする。CaptureOn の session basename を正とし、packet capture 本体、metadata、diagnostics sidecar、render snapshot、比較 sidecar を同じ session として扱う。
+- `Tracker.Core` には 3rdparty tracker 傍受、比較 sidecar 保存、ibis / other tracker の後処理比較を入れない。Core は ibis tracker の internal frame と official packet 生成だけを担当する。
+
+### 保存形式
+
+比較ログの主記録は既存 `.tracker-diagnostics.log` の破壊的拡張ではなく、CaptureOn sidecar JSONL とする。ファイル名は packet capture と同じ basename に、例えば `*.tracker-comparison.jsonl.gz` のような suffix を付ける。
+
+diagnostics log 側は互換追加に留める。
+
+- 既存 key=value 行を読めることを維持する
+- 比較 sidecar path、比較対象 source 数、近傍比較 summary などを optional field として追加する
+- 比較 sidecar がない既存ログを引き続き読めるようにする
+
+sidecar JSONL record は、後から ibis frame と再比較できるよう次を保持する。
+
+- `receivedAt`
+- remote endpoint
+- `uuid`
+- `sourceName`
+- tracked frame number
+- tracked frame timestamp
+- payload base64 または ball/robot count などの再比較に必要な summary
+- decode failure、tracked frame 欠落、timestamp 欠落などを示す skipped/error 情報
+
+### source 識別と self除外
+
+self除外は `Tracker:Uuid` と `Tracker:SourceName` を基準にする。両方が ibis runtime identity と一致する `TrackerWrapperPacket` は比較対象にしない。どちらかが空、設定と異なる、または他 tracker と衝突する場合は、remote endpoint と受信経路を併記し、区別不能な packet を比較対象として断定しない。
+
+複数の 3rdparty tracker が存在する場合は、`uuid` / `sourceName` / remote endpoint の組を source identity として扱う。同じ `uuid` で `sourceName` が異なる場合、または `sourceName` が空の場合も、record を破棄せず source identity の不足として保存する。
+
+### timestamp 比較
+
+ibis committed frame と 3rdparty tracker frame は同じ frame number や publish frequency を持つとは限らない。比較は ibis `TrackerFrame.data_timestamp_ns` と 3rdparty `TrackedFrame.timestamp` の timestamp 近傍で行う。初期実装では nearest timestamp または latest-before のどちらを採用するかを task 内で固定し、許容 window と採用 source identity を出力に残す。
+
+### CaptureOn lifecycle
+
+Capture Off 中は比較 sidecar を作成・追記しない。Capture Off / 再On では session basename を更新し、前 session の comparison writer へ追記しない。CaptureOn 直後、まだ packet capture 本体の session が遅延作成されている場合は、最初に保存対象 packet が来た時点で同一 session に比較 sidecar を関連付ける。
+
+他 tracker が存在しない場合、既存 packet capture、diagnostics log、render snapshot の挙動は変えない。metadata には comparison sidecar が未作成、または record 0 件である状態を明示できるようにする。
+
 ## 現状の巨大ファイル
 
 | ファイル | 行数 | 主な責務 | 分割優先度 |

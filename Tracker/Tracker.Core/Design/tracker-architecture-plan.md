@@ -109,6 +109,35 @@ v1 の外部配信は official tracker proto に限定する。
 - `CAPABILITY_DETECT_FLYING_BALLS`
 - `CAPABILITY_DETECT_MULTIPLE_BALLS`
 
+### 3rdparty tracker 比較ログ
+
+CaptureOn 中に ibis tracker 以外の tracker も同じ official tracker multicast / port 上に存在する場合、後から ibis 出力と比較できるように 3rdparty tracker packet を別系統で保存する。
+
+責務境界は次の通り。
+
+- `TrackerConnectionLib` を 3rdparty tracker 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
+- `Tracker.Server` は CaptureOn session と比較ログを紐付ける統合層とする。packet capture、metadata、diagnostics sidecar、render snapshot と同じ basename に、比較用 sidecar JSONL を関連付ける。
+- `Tracker.Core` には 3rdparty tracker 傍受、保存、比較処理を入れない。Core は ibis tracker の内部状態生成と official packet 生成だけを担当する。
+
+比較ログは既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は capture sidecar の JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、比較 sidecar path、source 数、近傍比較 summary などの参照/集計追加に限定する。
+
+sidecar JSONL の各 record は少なくとも次を保持する。
+
+- `receivedAt`
+- remote endpoint
+- `uuid`
+- `sourceName`
+- tracked frame number
+- tracked frame timestamp
+- payload または後から比較に必要な summary
+- decode / schema error がある場合の skipped/error 情報
+
+self除外は ibis tracker の `Uuid` / `SourceName` を第一条件とする。両方が一致する packet は比較対象にしない。どちらかが空、重複、または他 tracker と衝突する場合は remote endpoint と publish socket loopback の扱いを diagnostics に記録し、区別不能な packet を ibis 比較対象として断定しない。
+
+ibis committed frame と 3rdparty tracker frame は publish frequency が一致しない前提で扱う。比較は exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と 3rdparty `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint は後から再計算できるように保存する。
+
+Capture Off 中は比較 sidecar へ追記しない。Capture Off / 再On では新しい capture session と新しい比較 sidecar に切り替え、前 session へ追記しない。他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の挙動を変えず、metadata には比較ログが未作成または record 0 件であることを表現できるようにする。
+
 ### 内部出力
 
 official proto だけでは AutoRef に必要な情報が不足するため、`Tracker.Core` はより豊かな内部 frame を持つ。
@@ -467,6 +496,8 @@ geometry 更新規則:
 6. `TrackerPacketGenerator` が official `TrackerWrapperPacket` を生成する
 7. publisher が UDP multicast へ送信する
 8. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
+
+CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline とは別に `Tracker.Server` が `TrackerConnectionLib` 経由で official tracker packet を傍受する。傍受した `TrackerWrapperPacket` は ibis 自身の `uuid` / `sourceName` と照合して self除外し、他 tracker の packet だけを CaptureOn session の sidecar JSONL へ保存する。`Tracker.Core` の入力や状態更新には流さない。
 
 ## 設定
 
