@@ -59,8 +59,8 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         writer.Capture(packet.ToByteArray(), new IPEndPoint(IPAddress.Loopback, 10020), receivedAt);
         writer.Dispose();
 
-        var capturePath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.jsonl.gz"));
-        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json"));
+        var capturePath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.jsonl.gz", SearchOption.AllDirectories));
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json", SearchOption.AllDirectories));
         var record = Assert.Single(VisionPacketCaptureFile.ReadRecords(capturePath));
         var replayedPacket = record.ParsePacket();
         using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
@@ -71,8 +71,8 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Equal((uint)123, replayedPacket.Detection.FrameNumber);
         Assert.Equal((uint)1, replayedPacket.Detection.CameraId);
         Assert.Single(replayedPacket.Detection.Balls);
-        Assert.Equal(capturePath, metadata.RootElement.GetProperty("PacketPath").GetString());
-        Assert.Equal(metadataPath, metadata.RootElement.GetProperty("MetadataPath").GetString());
+        Assert.Equal(Path.GetRelativePath(captureDirectory, capturePath), metadata.RootElement.GetProperty("PacketPath").GetString());
+        Assert.Equal(Path.GetRelativePath(captureDirectory, metadataPath), metadata.RootElement.GetProperty("MetadataPath").GetString());
         Assert.EndsWith(
             ".tracker-diagnostics.log",
             metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString(),
@@ -128,7 +128,7 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
 
         writer.Dispose();
 
-        var capturePath = Assert.Single(Directory.GetFiles(captureDirectory, "replay-vision-*.jsonl.gz"));
+        var capturePath = Assert.Single(Directory.GetFiles(captureDirectory, "replay-vision-*.jsonl.gz", SearchOption.AllDirectories));
         var engine = fixture.CreateEngine();
         var settings = fixture.CreateSettings(reorderWindowNs: 0, mergeWindowNs: 0);
         var results = VisionPacketCaptureFile.ReadRecords(capturePath)
@@ -193,7 +193,7 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         runtimeControl.SetEnabled(true);
         writer.Capture([7, 8, 9], remoteEndpoint, new DateTimeOffset(2026, 5, 10, 20, 0, 2, TimeSpan.Zero));
 
-        var captureFiles = Directory.GetFiles(captureDirectory, "runtime-vision-*.jsonl.gz");
+        var captureFiles = Directory.GetFiles(captureDirectory, "runtime-vision-*.jsonl.gz", SearchOption.AllDirectories);
 
         Assert.Equal(2, captureFiles.Length);
     }

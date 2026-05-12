@@ -91,14 +91,16 @@ internal static class VisionPacketCaptureFile
     public static VisionPacketCapturePaths BuildCapturePaths(VisionPacketCaptureOptions options, DateTimeOffset startedAt)
     {
         var timestamp = startedAt.UtcDateTime.ToString("yyyyMMddTHHmmssfffZ", CultureInfo.InvariantCulture);
-        var basePath = Path.Combine(
-            ResolveDirectoryPath(options.DirectoryPath),
-            $"{options.FilePrefix}-{timestamp}-{Guid.NewGuid():N}");
+        var baseName = $"{options.FilePrefix}-{timestamp}-{Guid.NewGuid():N}";
+        var sessionFolderPath = Path.Combine(ResolveDirectoryPath(options.DirectoryPath), baseName);
+        var basePath = Path.Combine(sessionFolderPath, baseName);
         return new VisionPacketCapturePaths(
+            SessionFolder: baseName,
             PacketPath: $"{basePath}.jsonl.gz",
             MetadataPath: $"{basePath}.metadata.json",
             DiagnosticsLogPath: $"{basePath}.tracker-diagnostics.log",
-            RenderSnapshotPath: $"{basePath}.render-snapshots.jsonl.gz");
+            RenderSnapshotPath: $"{basePath}.render-snapshots.jsonl.gz",
+            TrackerSnapshotSidecarPath: Path.Combine(sessionFolderPath, "tracker-packet-snapshots.jsonl"));
     }
 
     internal static string ResolveDirectoryPath(string directoryPath)
@@ -109,10 +111,12 @@ internal static class VisionPacketCaptureFile
     }
 
     public sealed record VisionPacketCapturePaths(
+        string SessionFolder,
         string PacketPath,
         string MetadataPath,
         string DiagnosticsLogPath,
-        string RenderSnapshotPath);
+        string RenderSnapshotPath,
+        string TrackerSnapshotSidecarPath);
 
     private sealed class CaptureRecordDto
     {

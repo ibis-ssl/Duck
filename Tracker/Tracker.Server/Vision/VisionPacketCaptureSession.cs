@@ -68,10 +68,12 @@ public sealed class VisionPacketCaptureSession
             var paths = VisionPacketCaptureFile.BuildCapturePaths(options, startedAt);
             state = new VisionPacketCaptureSessionState(
                 startedAt.ToUniversalTime(),
+                paths.SessionFolder,
                 paths.PacketPath,
                 paths.MetadataPath,
                 paths.DiagnosticsLogPath,
-                paths.RenderSnapshotPath);
+                paths.RenderSnapshotPath,
+                paths.TrackerSnapshotSidecarPath);
             WriteMetadata(state);
             return state;
         }
@@ -105,10 +107,19 @@ public sealed class VisionPacketCaptureSession
             {
                 SchemaVersion = 1,
                 StartedAt = sessionState.StartedAt,
-                PacketPath = sessionState.PacketPath,
-                MetadataPath = sessionState.MetadataPath,
-                DiagnosticsLogPath = sessionState.DiagnosticsLogPath,
-                RenderSnapshotPath = sessionState.RenderSnapshotPath,
+                SessionFolder = sessionState.SessionFolder,
+                PacketPath = ToCaptureDirectoryRelativePath(sessionState.PacketPath),
+                MetadataPath = ToCaptureDirectoryRelativePath(sessionState.MetadataPath),
+                DiagnosticsLogPath = ToCaptureDirectoryRelativePath(sessionState.DiagnosticsLogPath),
+                RenderSnapshotPath = ToCaptureDirectoryRelativePath(sessionState.RenderSnapshotPath),
+                TrackerSnapshotSidecarPath = ToCaptureDirectoryRelativePath(sessionState.TrackerSnapshotSidecarPath),
+                TrackerSnapshotLog = new VisionPacketCaptureTrackerSnapshotLogMetadata
+                {
+                    Format = "jsonl",
+                    IsCreated = File.Exists(sessionState.TrackerSnapshotSidecarPath),
+                    RecordCount = 0,
+                },
+                TrackerSnapshotSources = [],
                 TrackerOptions = trackerOptions,
                 ResolvedTrackerOptions = resolvedTrackerOptions,
             };
@@ -123,11 +134,18 @@ public sealed class VisionPacketCaptureSession
         }
     }
 
+    private string ToCaptureDirectoryRelativePath(string path)
+    {
+        return Path.GetRelativePath(DirectoryPath, path);
+    }
+
     private sealed class VisionPacketCaptureMetadata
     {
         public int SchemaVersion { get; init; }
 
         public DateTimeOffset StartedAt { get; init; }
+
+        public string SessionFolder { get; init; } = "";
 
         public string PacketPath { get; init; } = "";
 
@@ -137,15 +155,43 @@ public sealed class VisionPacketCaptureSession
 
         public string RenderSnapshotPath { get; init; } = "";
 
+        public string TrackerSnapshotSidecarPath { get; init; } = "";
+
+        public VisionPacketCaptureTrackerSnapshotLogMetadata TrackerSnapshotLog { get; init; } = new();
+
+        public IReadOnlyList<VisionPacketCaptureTrackerSnapshotSourceMetadata> TrackerSnapshotSources { get; init; } = [];
+
         public TrackerOptions TrackerOptions { get; init; } = new();
 
         public TrackerResolvedOptions ResolvedTrackerOptions { get; init; } = new();
+    }
+
+    private sealed class VisionPacketCaptureTrackerSnapshotLogMetadata
+    {
+        public string Format { get; init; } = "jsonl";
+
+        public bool IsCreated { get; init; }
+
+        public int RecordCount { get; init; }
+    }
+
+    private sealed class VisionPacketCaptureTrackerSnapshotSourceMetadata
+    {
+        public string SourceUuid { get; init; } = "";
+
+        public string SourceName { get; init; } = "";
+
+        public string SourceRole { get; init; } = "";
+
+        public string SourceLabel { get; init; } = "";
     }
 }
 
 public sealed record VisionPacketCaptureSessionState(
     DateTimeOffset StartedAt,
+    string SessionFolder,
     string PacketPath,
     string MetadataPath,
     string DiagnosticsLogPath,
-    string RenderSnapshotPath);
+    string RenderSnapshotPath,
+    string TrackerSnapshotSidecarPath);
