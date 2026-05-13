@@ -44,13 +44,24 @@ public sealed record DiagnosticsPlaybackSpeedTransition(
     int FastForwardSpeedMultiplier);
 
 /// <summary>
+/// transport button 押下後に diagnostics playback UI へ反映する開始状態。
+/// </summary>
+/// <param name="Mode">開始する playback mode。</param>
+/// <param name="SelectedPlaybackSpeedLabel">選択表示に使う速度名。</param>
+/// <param name="FastForwardSpeedMultiplier">保持する早送り倍率。</param>
+public sealed record DiagnosticsPlaybackStart(
+    DiagnosticsPlaybackMode Mode,
+    string SelectedPlaybackSpeedLabel,
+    int FastForwardSpeedMultiplier);
+
+/// <summary>
 /// diagnostics timeline playback の index と interval の計算。
 /// </summary>
 public static class DiagnosticsPlaybackState
 {
     private const int PlayStep = 1;
     private static readonly TimeSpan MinimumPlaybackInterval = TimeSpan.FromMilliseconds(16);
-    private static readonly TimeSpan FastForwardMinimumInterval = TimeSpan.FromMilliseconds(30);
+    private static readonly TimeSpan FastForwardTimerFloor = TimeSpan.FromMilliseconds(1);
     private static readonly TimeSpan PlayDisplayInterval = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 30);
 
     /// <summary>
@@ -59,12 +70,22 @@ public static class DiagnosticsPlaybackState
     public const int DefaultFastForwardSpeedMultiplier = 16;
 
     /// <summary>
+    /// 可変早送り倍率の最小値。
+    /// </summary>
+    public const int MinFastForwardSpeedMultiplier = 2;
+
+    /// <summary>
+    /// 可変早送り倍率の最大値。
+    /// </summary>
+    public const int MaxFastForwardSpeedMultiplier = 1024;
+
+    /// <summary>
     /// 等倍速の表示名。
     /// </summary>
     public const string NormalPlaybackSpeedLabel = "等倍速";
 
     /// <summary>
-    /// UI で選べる調査用早送り倍率。
+    /// UI で shortcut として選べる調査用早送り倍率。
     /// </summary>
     public static IReadOnlyList<int> FastForwardSpeedMultipliers { get; } = [4, 16, 64];
 
@@ -102,6 +123,56 @@ public static class DiagnosticsPlaybackState
         };
 
         return new DiagnosticsPlaybackSpeedTransition(choice.Label, restartMode, speedMultiplier);
+    }
+
+    /// <summary>
+    /// Play button 押下時に、現在選択中の速度から開始 mode を解決する。
+    /// </summary>
+    public static DiagnosticsPlaybackStart ResolvePlayButtonStart(
+        string selectedPlaybackSpeedLabel,
+        int currentFastForwardSpeedMultiplier)
+    {
+        var normalizedSpeedMultiplier = NormalizeSpeedMultiplier(currentFastForwardSpeedMultiplier);
+        if (selectedPlaybackSpeedLabel == NormalPlaybackSpeedLabel)
+        {
+            return new DiagnosticsPlaybackStart(
+                DiagnosticsPlaybackMode.Play,
+                NormalPlaybackSpeedLabel,
+                normalizedSpeedMultiplier);
+        }
+
+        return new DiagnosticsPlaybackStart(
+            DiagnosticsPlaybackMode.FastForward,
+            FormatFastForwardSpeedLabel(normalizedSpeedMultiplier),
+            normalizedSpeedMultiplier);
+    }
+
+    /// <summary>
+    /// 早送り倍率 input 変更時に、選択表示と active playback mode を矛盾させない状態遷移を返す。
+    /// </summary>
+    public static DiagnosticsPlaybackSpeedTransition ResolveFastForwardMultiplierTransition(
+        DiagnosticsPlaybackMode currentMode,
+        int requestedFastForwardSpeedMultiplier)
+    {
+        var speedMultiplier = NormalizeSpeedMultiplier(requestedFastForwardSpeedMultiplier);
+        var restartMode = currentMode switch
+        {
+            DiagnosticsPlaybackMode.Stopped => (DiagnosticsPlaybackMode?)null,
+            _ => DiagnosticsPlaybackMode.FastForward,
+        };
+
+        return new DiagnosticsPlaybackSpeedTransition(
+            FormatFastForwardSpeedLabel(speedMultiplier),
+            restartMode,
+            speedMultiplier);
+    }
+
+    /// <summary>
+    /// 早送り倍率の表示名を返す。
+    /// </summary>
+    public static string FormatFastForwardSpeedLabel(int speedMultiplier)
+    {
+        return $"{NormalizeSpeedMultiplier(speedMultiplier)}x";
     }
 
     /// <summary>
@@ -209,19 +280,17 @@ public static class DiagnosticsPlaybackState
 
         return mode == DiagnosticsPlaybackMode.FastForward
             ? TimeSpan.FromTicks(Math.Max(
-                FastForwardMinimumInterval.Ticks,
+                FastForwardTimerFloor.Ticks,
                 normalizedInterval.Ticks / NormalizeSpeedMultiplier(speedMultiplier)))
             : normalizedInterval;
     }
 
     /// <summary>
-    /// UI から渡された早送り倍率を選択可能な値へ丸める。
+    /// UI から渡された早送り倍率を有効範囲へ丸める。
     /// </summary>
     public static int NormalizeSpeedMultiplier(int speedMultiplier)
     {
-        return FastForwardSpeedMultipliers.Contains(speedMultiplier)
-            ? speedMultiplier
-            : DefaultFastForwardSpeedMultiplier;
+        return Math.Clamp(speedMultiplier, MinFastForwardSpeedMultiplier, MaxFastForwardSpeedMultiplier);
     }
 
     private static int FindLatestIndexAtOrBefore(

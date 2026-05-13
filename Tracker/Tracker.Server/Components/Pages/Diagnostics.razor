@@ -386,7 +386,7 @@
                                     disabled="@(!CanPlayback)"
                                     title="Play"
                                     aria-label="Play"
-                                    @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.Play))">
+                                    @onclick="StartSelectedPlaybackAsync">
                                 <span class="diagnostics-playback__icon diagnostics-playback__icon--play" aria-hidden="true"></span>
                             </button>
                         }
@@ -424,6 +424,16 @@
                             </button>
                         }
                     </div>
+                    <label class="diagnostics-playback-multiplier">
+                        <span>早送り倍率</span>
+                        <input type="number"
+                               min="@DiagnosticsPlaybackState.MinFastForwardSpeedMultiplier"
+                               max="@DiagnosticsPlaybackState.MaxFastForwardSpeedMultiplier"
+                               step="1"
+                               value="@fastForwardSpeedMultiplier"
+                               @onchange="OnFastForwardMultiplierChanged"
+                               aria-label="早送り倍率" />
+                    </label>
                 </div>
                 <input type="range"
                        class="diagnostics-scrubber__range"

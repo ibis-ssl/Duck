@@ -635,6 +635,38 @@ public partial class Diagnostics : IDisposable
             : Task.CompletedTask;
     }
 
+    private Task OnFastForwardMultiplierChanged(ChangeEventArgs args)
+    {
+        var requestedSpeedMultiplier = int.TryParse(
+            args.Value?.ToString(),
+            CultureInfo.InvariantCulture,
+            out var parsedSpeedMultiplier)
+            ? parsedSpeedMultiplier
+            : DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
+
+        var transition = DiagnosticsPlaybackState.ResolveFastForwardMultiplierTransition(
+            playbackMode,
+            requestedSpeedMultiplier);
+
+        selectedPlaybackSpeedLabel = transition.SelectedPlaybackSpeedLabel;
+        fastForwardSpeedMultiplier = transition.FastForwardSpeedMultiplier;
+
+        return transition.RestartMode is { } restartMode
+            ? StartPlaybackAsync(restartMode)
+            : Task.CompletedTask;
+    }
+
+    private Task StartSelectedPlaybackAsync()
+    {
+        var start = DiagnosticsPlaybackState.ResolvePlayButtonStart(
+            selectedPlaybackSpeedLabel,
+            fastForwardSpeedMultiplier);
+
+        selectedPlaybackSpeedLabel = start.SelectedPlaybackSpeedLabel;
+        fastForwardSpeedMultiplier = start.FastForwardSpeedMultiplier;
+        return StartPlaybackAsync(start.Mode);
+    }
+
     private Task StartFastForwardPlaybackAsync()
     {
         var selectedFastChoice = DiagnosticsPlaybackState.PlaybackSpeedChoices.FirstOrDefault(
@@ -646,8 +678,10 @@ public partial class Diagnostics : IDisposable
         }
         else
         {
-            fastForwardSpeedMultiplier = DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
-            selectedPlaybackSpeedLabel = $"{fastForwardSpeedMultiplier}x";
+            fastForwardSpeedMultiplier = selectedPlaybackSpeedLabel == DiagnosticsPlaybackState.NormalPlaybackSpeedLabel
+                ? DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier
+                : DiagnosticsPlaybackState.NormalizeSpeedMultiplier(fastForwardSpeedMultiplier);
+            selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.FormatFastForwardSpeedLabel(fastForwardSpeedMultiplier);
         }
 
         return StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward);
@@ -664,6 +698,11 @@ public partial class Diagnostics : IDisposable
         if (mode == DiagnosticsPlaybackMode.Play)
         {
             selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.NormalPlaybackSpeedLabel;
+        }
+        else if (mode == DiagnosticsPlaybackMode.FastForward)
+        {
+            fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(fastForwardSpeedMultiplier);
+            selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.FormatFastForwardSpeedLabel(fastForwardSpeedMultiplier);
         }
 
         playbackMode = mode;
