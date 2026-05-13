@@ -4,29 +4,29 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-058
-- Title: diagnostics replay で ER-Force tracker snapshot が Field に再生されない原因を調査・修正する
+- ID: TRACKER-059
+- Title: diagnostics replay timeline を最速 tracker source cadence に合わせる
 - Phase: comparison-logging
-- Status: done
-- TDD Entry: 実施済み。`/home/ibis/ssl/IbisDuck/Tracker/Tracker.Server/bin/Debug/net10.0/packet-captures` の実captureでは ER-Force tracker snapshot が存在し、ibis own と ER-Force の `TrackedFrame.timestamp` 時刻系不一致が主因候補と判定した。既存ログ救済は必須ではないため、新規 capture の保存時対応付けを主経路とした。Red test は external tracker の `TrackedFrame.timestamp` range が own と非重複な fixture を使い、capture-time alignment により selected diagnostics entry / render frame に対応する external snapshot が replay Field に選ばれること、および selected diagnostics entry の session-relative time / `receivedAt` と chosen external snapshot の capture-time / `receivedAt` 差分が許容範囲内であることを固定した。
-- Implementation Entry: 実施済み。別 sidecar `tracker-snapshot-alignment.jsonl`、alignment model / reader / writer、metadata の `TrackerSnapshotAlignmentPath` / `TrackerSnapshotAlignmentLog`、保存時 alignment 出力、diagnostics comparison / Field source / `Tracker.CaptureReplay` の `saved-session-alignment` 優先経路、ER-Force Docker helper README を追加した。実装 report は `reports/tracker-058-saved-alignment-implementation-20260513064540.md`。実装 commit は `b8e8252`。
-- Review Entry: 実施済み。gpt-5.5 high review は `reports/tracker-058-review-20260513070147.md` に記録済みで blocking finding なし。
+- Status: in_progress
+- TDD Entry: 未実施。現状の diagnostics playback は diagnostics log entry / Vision cadence を主 timeline として進む可能性が高い。ER-FORCE など tracker source の更新周期が Vision より速い場合、replay は速い source cadence に合わせて進み、Vision 側は同じ frame を保持してカクカク見えることを期待値として固定する。
+- Implementation Entry: 未実施。調査で現在の replay timeline 基準を確定し、保存済み alignment / tracker snapshot cadence / diagnostics entry cadence から unified timeline を構成する設計を決めてから実装する。
+- Review Entry: 未実施。修正後に gpt-5.5 high review report を作成し、blocking finding が残らないことを確認する。
 - Size: medium
-- Dependencies: TRACKER-053
+- Dependencies: TRACKER-058
 - Exit Criteria:
-  - 指定 packet-captures 配下の直近 capture について、ER-Force tracker snapshot が sidecar に存在し、時刻系不一致が再生不具合の主因候補であることを証跡付きで判定している
-  - 新規 capture では保存時に diagnostics entry / vision frame / tracker source snapshot の対応を記録し、Replay / scrub / playback tick で ER-Force を Field source として選択・表示できる
-  - 保存済み対応表がない capture では、UI/ログ/ドキュメント上で未対応または fallback の有無を誤解なく判断できる
-  - `Tracker:Receive` の source appsettings / bin appsettings / runtime override の扱いを混同せず、必要な修正または運用注意を明記している
+  - 現在の `/diagnostics` replay が Vision / diagnostics entry cadence に寄るのかを証跡付きで判定している
+  - ER-FORCE のような高速 tracker source がある場合、Play / Fast Forward / scrub の timeline step は fastest available source cadence を含む
+  - Vision / render snapshot が低速な場合は、速い tracker tick の間は nearest / last Vision frame を保持し、Field 上では Vision 側がカクカク見える
+  - saved alignment sidecar と既存 diagnostics playback controls の責務境界が設計に反映されている
   - focused regression test、必要な build/test evidence、gpt-5.5 high review report が揃い、blocking finding が残っていない
 
 ## 次の調査タスク
 
-- none
+- TRACKER-059: diagnostics replay timeline を最速 tracker source cadence に合わせる調査中。
 
 ## 固定残タスク
 
-- 固定一覧は `TRACKER-047`、`TRACKER-048`、`TRACKER-049`、`TRACKER-050`、`TRACKER-051`、`TRACKER-052`、`TRACKER-054`、`TRACKER-055`、`TRACKER-056`、`TRACKER-057`、`TRACKER-053`、`TRACKER-058` とする。tracking / design では補助番号を使わない。
+- 固定一覧は `TRACKER-047`、`TRACKER-048`、`TRACKER-049`、`TRACKER-050`、`TRACKER-051`、`TRACKER-052`、`TRACKER-054`、`TRACKER-055`、`TRACKER-056`、`TRACKER-057`、`TRACKER-053`、`TRACKER-058`、`TRACKER-059` とする。tracking / design では補助番号を使わない。
 - `TRACKER-047` は既存 `TrackerSnapshotReplayReader` / `TrackerReplayIntegrationTddTests` の review gate を閉じるタスクで、review-fix、focused 5 passed、関連 focused 40 passed、full `Tracker.Tests` 192 passed、gpt-5.5 high r2 review blocking findings なしまで完了した。
 - `TRACKER-048` は diagnostics / replay / playback の比較表示・出力へ接続するタスクで、metadata relative path から snapshot sidecar を読み、source role / label、tracked timestamp、ball / robot count、raw payload restored、nearest timestamp summary を `Tracker.CaptureReplay` で確認可能にした。focused 8 passed、関連 focused 47 passed、full `Tracker.Tests` 194 passed、gpt-5.5 high review blocking findings なしまで完了した。
 - `TRACKER-049` は diagnostics comparison の design / tracking 再同期タスクで、CLI 比較実装を保持したまま `/diagnostics` UI comparison を PR ready 前の固定タスクへ入れ、`TRACKER-050` から `TRACKER-053` までを再定義した。設計・tracking 同期と gpt-5.5 high review blocking findings なしまで完了した。
