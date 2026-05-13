@@ -5,17 +5,6 @@ namespace Tracker.Tests;
 public class DiagnosticsPlaybackStateTests
 {
     /// <summary>
-    /// 通常再生では 1 frame ずつ次の index へ進むことを確認する。
-    /// </summary>
-    [Fact]
-    public void GetNextIndex_ForPlay_AdvancesOneFrame()
-    {
-        var next = DiagnosticsPlaybackState.GetNextIndex(3, entryCount: 10, DiagnosticsPlaybackMode.Play);
-
-        Assert.Equal(4, next);
-    }
-
-    /// <summary>
     /// 早送りでも unified replay timeline tick は間引かず 1 tick ずつ進むことを確認する。
     /// </summary>
     [Theory]
@@ -156,27 +145,10 @@ public class DiagnosticsPlaybackStateTests
     }
 
     /// <summary>
-    /// 通常再生は現在 entry と次 entry の timestamp 差分で進むことを確認する。
+    /// 等倍速 Play は timestamp delta ではなく30fps相当の表示間隔で更新することを確認する。
     /// </summary>
     [Fact]
-    public void GetInterval_ForPlay_UsesEntryTimestampDelta()
-    {
-        var current = DateTimeOffset.Parse("2026-05-12T00:00:00.100+09:00");
-        var next = DateTimeOffset.Parse("2026-05-12T00:00:00.133+09:00");
-
-        var interval = DiagnosticsPlaybackState.GetInterval(
-            DiagnosticsPlaybackMode.Play,
-            current,
-            next);
-
-        Assert.Equal(TimeSpan.FromMilliseconds(33), interval);
-    }
-
-    /// <summary>
-    /// 通常再生は長い timestamp 差分でも実時間の interval を維持することを確認する。
-    /// </summary>
-    [Fact]
-    public void GetInterval_ForPlay_UsesLongTimestampDeltaWithoutMaximumClamp()
+    public void GetInterval_ForPlay_UsesThirtyFpsDisplayInterval()
     {
         var current = DateTimeOffset.Parse("2026-05-12T00:00:00.000+09:00");
         var next = DateTimeOffset.Parse("2026-05-12T00:00:03.500+09:00");
@@ -186,7 +158,28 @@ public class DiagnosticsPlaybackStateTests
             current,
             next);
 
-        Assert.Equal(TimeSpan.FromMilliseconds(3500), interval);
+        Assert.Equal(TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 30), interval);
+    }
+
+    /// <summary>
+    /// 等倍速 Play は timer 回数ではなく wall-clock 経過時間に対応する latest timeline tick へ追従することを確認する。
+    /// </summary>
+    [Fact]
+    public void GetRealtimePlayIndex_WhenTimelineIs200Hz_UsesWallClockElapsedTime()
+    {
+        var startReceivedAt = DateTimeOffset.Parse("2026-05-12T00:00:00.000+09:00");
+        var timeline = Enumerable.Range(0, 241)
+            .Select(offset => startReceivedAt.AddMilliseconds(offset * 5))
+            .ToArray();
+
+        var index = DiagnosticsPlaybackState.GetRealtimePlayIndex(
+            currentIndex: 0,
+            timeline,
+            startReceivedAt,
+            startWallClock: startReceivedAt,
+            currentWallClock: startReceivedAt.AddSeconds(1));
+
+        Assert.Equal(200, index);
     }
 
     /// <summary>

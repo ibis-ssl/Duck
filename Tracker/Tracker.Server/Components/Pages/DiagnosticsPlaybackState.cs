@@ -11,7 +11,7 @@ public enum DiagnosticsPlaybackMode
     Stopped,
 
     /// <summary>
-    /// 1 entry ずつ進める通常再生。
+    /// 30fps 相当の表示更新で wall-clock 経過時間に対応する replay timeline tick へ追従する通常再生。
     /// </summary>
     Play,
 
@@ -29,6 +29,7 @@ public static class DiagnosticsPlaybackState
     private const int PlayStep = 1;
     private static readonly TimeSpan MinimumPlaybackInterval = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan FastForwardMinimumInterval = TimeSpan.FromMilliseconds(30);
+    private static readonly TimeSpan PlayDisplayInterval = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 30);
 
     /// <summary>
     /// 調査用早送りの既定倍率。
@@ -55,6 +56,32 @@ public static class DiagnosticsPlaybackState
         }
 
         return Math.Clamp(currentIndex + PlayStep, 0, entryCount - 1);
+    }
+
+    /// <summary>
+    /// 等倍速 Play の wall-clock 経過時間に対応する replay timeline index を返す。
+    /// </summary>
+    public static int GetRealtimePlayIndex(
+        int currentIndex,
+        IReadOnlyList<DateTimeOffset> timelineTimestamps,
+        DateTimeOffset startReceivedAt,
+        DateTimeOffset startWallClock,
+        DateTimeOffset currentWallClock)
+    {
+        if (timelineTimestamps.Count == 0)
+        {
+            return 0;
+        }
+
+        var elapsed = currentWallClock - startWallClock;
+        if (elapsed < TimeSpan.Zero)
+        {
+            elapsed = TimeSpan.Zero;
+        }
+
+        var targetReceivedAt = startReceivedAt + elapsed;
+        var latestIndex = FindLatestIndexAtOrBefore(timelineTimestamps, targetReceivedAt);
+        return Math.Clamp(Math.Max(currentIndex, latestIndex), 0, timelineTimestamps.Count - 1);
     }
 
     /// <summary>
@@ -102,6 +129,11 @@ public static class DiagnosticsPlaybackState
         DateTimeOffset nextTimestamp,
         int speedMultiplier = DefaultFastForwardSpeedMultiplier)
     {
+        if (mode == DiagnosticsPlaybackMode.Play)
+        {
+            return PlayDisplayInterval;
+        }
+
         var realTimeInterval = nextTimestamp - currentTimestamp;
         if (realTimeInterval <= TimeSpan.Zero)
         {
@@ -127,5 +159,30 @@ public static class DiagnosticsPlaybackState
         return FastForwardSpeedMultipliers.Contains(speedMultiplier)
             ? speedMultiplier
             : DefaultFastForwardSpeedMultiplier;
+    }
+
+    private static int FindLatestIndexAtOrBefore(
+        IReadOnlyList<DateTimeOffset> timelineTimestamps,
+        DateTimeOffset targetReceivedAt)
+    {
+        var result = 0;
+        var low = 0;
+        var high = timelineTimestamps.Count - 1;
+
+        while (low <= high)
+        {
+            var middle = low + ((high - low) / 2);
+            if (timelineTimestamps[middle] <= targetReceivedAt)
+            {
+                result = middle;
+                low = middle + 1;
+            }
+            else
+            {
+                high = middle - 1;
+            }
+        }
+
+        return result;
     }
 }

@@ -644,16 +644,28 @@ public partial class Diagnostics : IDisposable
         int speedMultiplier,
         CancellationToken cancellationToken)
     {
+        var timelineTimestamps = GetPlaybackTimelineTimestamps();
+        var startIndex = timelineTimestamps.Count == 0
+            ? 0
+            : Math.Clamp(SelectedReplayTimelineIndex, 0, timelineTimestamps.Count - 1);
+        var startReceivedAt = timelineTimestamps.Count == 0
+            ? DateTimeOffset.UtcNow
+            : timelineTimestamps[startIndex];
+        var startWallClock = DateTimeOffset.UtcNow;
+
         try
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 var currentIndex = SelectedReplayTimelineIndex;
-                var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
-                    currentIndex,
-                    ReplayTimelineCount,
+                var nextIndex = GetNextPlaybackIndex(
                     mode,
-                    speedMultiplier);
+                    currentIndex,
+                    speedMultiplier,
+                    timelineTimestamps,
+                    startReceivedAt,
+                    startWallClock,
+                    DateTimeOffset.UtcNow);
                 var interval = GetPlaybackInterval(mode, currentIndex, nextIndex, speedMultiplier);
                 await Task.Delay(interval, cancellationToken);
 
@@ -675,11 +687,14 @@ public partial class Diagnostics : IDisposable
                         return;
                     }
 
-                    var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
-                        SelectedReplayTimelineIndex,
-                        ReplayTimelineCount,
+                    var nextIndex = GetNextPlaybackIndex(
                         mode,
-                        speedMultiplier);
+                        SelectedReplayTimelineIndex,
+                        speedMultiplier,
+                        timelineTimestamps,
+                        startReceivedAt,
+                        startWallClock,
+                        DateTimeOffset.UtcNow);
 
                     if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, ReplayTimelineCount))
                     {
@@ -700,6 +715,29 @@ public partial class Diagnostics : IDisposable
         catch (OperationCanceledException)
         {
         }
+    }
+
+    private int GetNextPlaybackIndex(
+        DiagnosticsPlaybackMode mode,
+        int currentIndex,
+        int speedMultiplier,
+        IReadOnlyList<DateTimeOffset> timelineTimestamps,
+        DateTimeOffset startReceivedAt,
+        DateTimeOffset startWallClock,
+        DateTimeOffset currentWallClock)
+    {
+        return mode == DiagnosticsPlaybackMode.Play
+            ? DiagnosticsPlaybackState.GetRealtimePlayIndex(
+                currentIndex,
+                timelineTimestamps,
+                startReceivedAt,
+                startWallClock,
+                currentWallClock)
+            : DiagnosticsPlaybackState.GetNextIndex(
+                currentIndex,
+                ReplayTimelineCount,
+                mode,
+                speedMultiplier);
     }
 
     private TimeSpan GetPlaybackInterval(
@@ -723,6 +761,16 @@ public partial class Diagnostics : IDisposable
         return mode == DiagnosticsPlaybackMode.FastForward
             ? fastForwardSpeedMultiplier
             : DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
+    }
+
+    private IReadOnlyList<DateTimeOffset> GetPlaybackTimelineTimestamps()
+    {
+        if (replayTimeline.Count > 0)
+        {
+            return replayTimeline.Select(tick => tick.ReceivedAt).ToArray();
+        }
+
+        return entries.Select(entry => entry.Timestamp).ToArray();
     }
 
     private void StopPlayback()
