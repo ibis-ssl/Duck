@@ -80,18 +80,18 @@ tracker 側で frame がまだ commit されていない場合は `No tracked fr
 ### `Diagnostics` ページ
 
 - `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の capture sidecar `*.tracker-diagnostics.log`、default `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
-- 上部の timeline scrubber をドラッグすると、選択 frame が連続的に切り替わります
+- 上部の timeline scrubber をドラッグすると、選択 replay tick が連続的に切り替わります
 - 左側の timeline でログ行を時系列にスクロールできます
 - capture sidecar と同じ basename の `*.render-snapshots.jsonl.gz` がある場合は、選択行の raw / tracked field を描画できます
 - 左右 Field の見出し行で Field source を `Vision Input`、ibis tracker、`External`、`Unknown`、source label から選択できます。Field source には曖昧な `All` は含めず、log 変更時は左 `Vision Input` / 右 ibis tracker に戻ります。
-- 新規 capture に `tracker-snapshot-alignment.jsonl` がある場合、`External` / `Unknown` / source label の Field source は保存時対応表を優先して選択行に対応する tracker snapshot を描画します。alignment がない既存 capture では、外部 tracker の時刻対応は unsupported または明示的な best-effort として表示されます。
+- 新規 capture に `tracker-snapshot-alignment.jsonl` がある場合、`External` / `Unknown` / source label の Field source は保存時対応表を優先して選択 replay tick に対応する tracker snapshot を描画します。alignment がない既存 capture では、外部 tracker の時刻対応は unsupported または明示的な best-effort として表示されます。
 - 右側で選択行の raw / tracked の ball、robot、frame 情報を比較できます
 - capture sidecar の diagnostics log を選ぶと、`Settings` から capture metadata に保存された configured profile と resolved settings を確認できます
 - capture sidecar の diagnostics log と tracker packet snapshot sidecar が揃っている場合は、折り畳み可能な `Tracker Comparison` panel で ibis tracker と 3rd party tracker の差分を確認できます
 - `Tracker Comparison` panel の source filter は `All`、`External`、`Own`、`Unknown`、source label 単位で切り替えられます。通常確認では `External` または対象 source label を選び、新規 capture では保存済み alignment に対応する 3rd party tracker snapshot と比較します。alignment がない既存 capture で nearest timestamp を使う場合は best-effort として表示されます。
-- `Tracker Comparison` は tracker packet snapshot sidecar と alignment sidecar を log 選択時に lightweight index 化し、timeline scrubber 移動や playback tick では同じ file state の sidecar を再読込しません。100MB を超える sidecar でも scrub / tick ごとの I/O と parse は sidecar サイズに比例しません。
-- Play は diagnostics entry の実 timestamp delta で 1x 再生します。調査用の Fast Forward は speed selector で `4x` / `16x` / `64x` を選べます。
-- panel には sidecar status、alignment status、record / skipped / error count、選択 frame / time、comparison status、matching rule、source role / label、source key / remote endpoint、snapshot frame、own / aligned snapshot timestamp、delta、balls / robots、raw payload の復元状態が表示されます。
+- `Tracker Comparison` は tracker packet snapshot sidecar と alignment sidecar を log 選択時に lightweight index 化し、unified replay timeline も同時に構築します。timeline scrubber 移動や playback tick では同じ file state の sidecar を再読込しません。100MB を超える sidecar でも scrub / tick ごとの I/O と parse は sidecar サイズに比例しません。
+- Play / Fast Forward / scrub は diagnostics entry count ではなく、capture-time `ReceivedAt` に基づく unified replay timeline を使います。Vision / render より ER-FORCE などの tracker source が速い場合、timeline は fast tracker ticks を含み、Vision / render は latest-before frame を保持します。調査用の Fast Forward は speed selector で `4x` / `16x` / `64x` を選べます。
+- panel には sidecar status、alignment status、record / skipped / error count、選択 replay timeline index / time、held diagnostics line / render frame、comparison status、matching rule、source role / label、source key / remote endpoint、snapshot frame、own / aligned snapshot timestamp、delta、balls / robots、raw payload の復元状態が表示されます。
 
 ## API
 
@@ -132,7 +132,7 @@ capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn s
 - `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: capture と対応する tracker diagnostics log。`Tracker:Diagnostics:FilePath` が指定されていても、capture 有効時は sidecar として同時に出力します。
 - `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: timeline / 逆方向スクラブ用の描画 snapshot。tracker engine の内部状態ではなく、commit 済み `TrackerFrame` だけを保存します。
 - `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の live receiver が見た official tracker packet の snapshot sidecar です。
-- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の diagnostics entry / render snapshot / tracker source snapshot を session timeline で対応付ける replay 用 sidecar です。外部 tracker の `TrackedFrame.timestamp` が ibis own と別時刻系でも、`receivedAt` と session-relative time で `/diagnostics` の Field source と comparison を再生するために使います。
+- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の diagnostics entry / render snapshot / tracker source snapshot を session timeline で対応付ける replay 用 sidecar です。外部 tracker の `TrackedFrame.timestamp` が ibis own と別時刻系でも、`receivedAt` と session-relative time で `/diagnostics` の Field source と comparison を再生するために使います。schema version 2 では diagnostics line 単位ではなく fastest source cadence の replay timeline records を保存し、同じ Vision / render frame を複数 fast tracker records から参照できます。v1 互換は持たず、log 選択時の index 構築と playback/scrub 時の高速 lookup を優先します。
 
 `metadata.json` には active profile 名だけではなく、`Tracker:Profiles` 配下の profile 設定値と、runtime override 適用後の resolved settings も保存します。CaptureOn 比較ログがある場合は、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` もここから辿ります。
 
@@ -226,10 +226,10 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 1. `Tracker:Receive:Enabled=true` にし、receiver が監視する endpoint を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した ibis publish endpoint を使います。既定の `sim` profile は `224.5.23.2:11010`、`default` profile は `224.5.23.2:10010` です。3rd party tracker が別 endpoint に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。複数 NIC 環境では `Tracker:Receive:InterfaceAddress` を明示します。
 2. `Tracker.Server` を起動し、画面で `Capture On` にしてから SSL-Vision packet と official tracker packet を流します。`Tracker:Receive:Enabled=false` のままでは live tracker receiver が起動しないため、packet capture と diagnostics は残っても tracker packet snapshot sidecar は増えません。
 3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。metadata では `SessionFolder` と各 relative path、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotAlignmentLog.RecordCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。
-4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。timeline、scrubber、Play / Fast Forward、Fast Forward speed、左右 Field source selector、`Settings` modal の resolved settings を確認します。
-5. 左右 Field で `External`、`Unknown`、対象 source label を選び、選択 diagnostics entry の保存済み alignment に対応する tracker snapshot が Field に描画されることを確認します。Field view は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左 Field source selector が `Layer A`、右 Field source selector が `Layer B` として同一 Field に重なり、legend の layer checkbox で表示/非表示を切り替えられます。`Tracker Comparison` panel は必要に応じて折り畳めます。
+4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。unified replay timeline、scrubber、Play / Fast Forward、Fast Forward speed、左右 Field source selector、`Settings` modal の resolved settings を確認します。ER-FORCE など tracker source が Vision より速い capture では、timeline が fast tracker ticks を含み、Vision / render Field が latest-before frame を保持することも確認します。
+5. 左右 Field で `External`、`Unknown`、対象 source label を選び、選択 replay tick の保存済み alignment に対応する tracker snapshot が Field に描画されることを確認します。Field view は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左 Field source selector が `Layer A`、右 Field source selector が `Layer B` として同一 Field に重なり、legend の layer checkbox で表示/非表示を切り替えられます。`Tracker Comparison` panel は必要に応じて折り畳めます。
 6. `Tracker Comparison` panel で `Status` が `Ready` になることを確認し、source filter を `External` または対象 source label に切り替えます。比較対象がないことを確認したい場合は `Own` / `Unknown` も使えます。
-7. report には、selected frame / selected time、Field view mode、Layer A / Layer B の Field source と visibility、source filter、sidecar status、alignment status、record / skipped / error count、entry status、source role / label、source key / remote endpoint、aggregate tie-break、snapshot frame、own timestamp ns、aligned snapshot timestamp ns、delta ns、balls / robots、raw payload 表示を残します。UI の raw payload は `Restored` が rawPayloadRestored true、`Missing` が false です。
+7. report には、selected replay timeline index / selected time、held diagnostics line / held render frame、Field view mode、Layer A / Layer B の Field source と visibility、source filter、sidecar status、alignment status、record / skipped / error count、entry status、source role / label、source key / remote endpoint、aggregate tie-break、snapshot frame、own timestamp ns、aligned snapshot timestamp ns、delta ns、balls / robots、raw payload 表示を残します。UI の raw payload は `Restored` が rawPayloadRestored true、`Missing` が false です。
 8. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`saved-session-alignment` の比較 summary を agent / 検証 / 回帰用 evidence として残します。CLI evidence は UI evidence の補助であり、通常確認の主経路ではありません。
 
 `Tracker Comparison` panel の sidecar status は次のように読みます。
