@@ -5,6 +5,79 @@ namespace Tracker.Tests;
 public class DiagnosticsPlaybackStateTests
 {
     /// <summary>
+    /// playback UI choice は等倍速と調査用倍率を別の選択肢として公開することを確認する。
+    /// </summary>
+    [Fact]
+    public void PlaybackChoices_ExposeNormalPlayAndFastForwardChoices()
+    {
+        Assert.Collection(
+            DiagnosticsPlaybackState.PlaybackChoices,
+            choice =>
+            {
+                Assert.Equal("等倍速", choice.Label);
+                Assert.Equal(DiagnosticsPlaybackMode.Play, choice.Mode);
+                Assert.Null(choice.FastForwardSpeedMultiplier);
+            },
+            choice =>
+            {
+                Assert.Equal("4x", choice.Label);
+                Assert.Equal(DiagnosticsPlaybackMode.FastForward, choice.Mode);
+                Assert.Equal(4, choice.FastForwardSpeedMultiplier);
+            },
+            choice =>
+            {
+                Assert.Equal("16x", choice.Label);
+                Assert.Equal(DiagnosticsPlaybackMode.FastForward, choice.Mode);
+                Assert.Equal(16, choice.FastForwardSpeedMultiplier);
+            },
+            choice =>
+            {
+                Assert.Equal("64x", choice.Label);
+                Assert.Equal(DiagnosticsPlaybackMode.FastForward, choice.Mode);
+                Assert.Equal(64, choice.FastForwardSpeedMultiplier);
+            });
+    }
+
+    /// <summary>
+    /// diagnostics playback markup が等倍速の隣に早送り speed select を戻さないことを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsPlaybackMarkup_DoesNotUseFastForwardSpeedSelect()
+    {
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+
+        Assert.DoesNotContain("diagnostics-playback__speed", markup, StringComparison.Ordinal);
+        Assert.DoesNotContain("Fast forward speed", markup, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<select", ExtractPlaybackControlsMarkup(markup), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// diagnostics playback markup が数値の等倍ラベルを表示しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsPlaybackMarkup_DoesNotExposeNumericNormalSpeedLabel()
+    {
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var numericNormalSpeedLabel = "1" + "x";
+
+        Assert.DoesNotContain(numericNormalSpeedLabel, markup, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// active playback choice の停止表示が日本語 UI として表示されることを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsPlaybackComponent_UsesJapaneseStopLabelForActiveChoices()
+    {
+        var code = File.ReadAllText(
+            FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor.cs"));
+        var oldActiveLabel = "{choice.Label} " + "Stop";
+
+        Assert.Contains("{choice.Label} 停止", code, StringComparison.Ordinal);
+        Assert.DoesNotContain(oldActiveLabel, code, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 早送りでも unified replay timeline tick は間引かず 1 tick ずつ進むことを確認する。
     /// </summary>
     [Theory]
@@ -237,5 +310,36 @@ public class DiagnosticsPlaybackStateTests
             tickSpeedMultiplier: 16);
 
         Assert.False(shouldApply);
+    }
+
+    private static string FindRepositoryFile(string relativePath)
+    {
+        var current = new DirectoryInfo(Environment.CurrentDirectory);
+        while (current is not null)
+        {
+            var candidate = Path.Combine(current.FullName, relativePath);
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            current = current.Parent;
+        }
+
+        throw new FileNotFoundException($"Could not find repository file '{relativePath}'.");
+    }
+
+    private static string ExtractPlaybackControlsMarkup(string markup)
+    {
+        const string startMarker = "aria-label=\"Diagnostics playback controls\"";
+        const string endMarker = "aria-label=\"Diagnostics timeline scrubber\"";
+        var start = markup.IndexOf(startMarker, StringComparison.Ordinal);
+        var end = markup.IndexOf(endMarker, StringComparison.Ordinal);
+        if (start < 0 || end <= start)
+        {
+            return markup;
+        }
+
+        return markup[start..end];
     }
 }

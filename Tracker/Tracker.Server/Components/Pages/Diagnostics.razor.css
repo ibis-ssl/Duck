@@ -79,20 +79,26 @@
 .diagnostics-scrubber__playback {
     display: inline-flex;
     align-items: center;
-    gap: 0.22rem;
+    gap: 0.25rem;
 }
 
 .diagnostics-playback__button {
     appearance: none;
-    display: inline-grid;
-    place-items: center;
-    width: 1.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.28rem;
+    min-width: 2.8rem;
     height: 1.9rem;
+    padding: 0 0.48rem;
     border: 1px solid #315235;
     border-radius: 7px;
     background: #17301d;
     color: #dbe7d6;
     cursor: pointer;
+    font: inherit;
+    font-size: 0.76rem;
+    white-space: nowrap;
 }
 
 .diagnostics-playback__button:hover:not(:disabled),
@@ -132,15 +138,8 @@
     clip-path: polygon(8% 14%, 8% 86%, 47% 50%, 47% 86%, 88% 50%, 47% 14%, 47% 50%);
 }
 
-.diagnostics-playback__speed {
-    width: 3.6rem;
-    min-height: 1.9rem;
-    border: 1px solid #315235;
-    border-radius: 7px;
-    background: #17301d;
-    color: #dbe7d6;
-    font: inherit;
-    font-size: 0.76rem;
+.diagnostics-playback__label {
+    line-height: 1;
 }
 
 .diagnostics-select {

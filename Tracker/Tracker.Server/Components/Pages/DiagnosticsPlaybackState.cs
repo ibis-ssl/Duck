@@ -22,6 +22,17 @@ public enum DiagnosticsPlaybackMode
 }
 
 /// <summary>
+/// diagnostics playback UI で表示する再生選択肢。
+/// </summary>
+/// <param name="Label">UI に表示する選択肢名。</param>
+/// <param name="Mode">開始する playback mode。</param>
+/// <param name="FastForwardSpeedMultiplier">早送り選択肢の倍率。等倍速では null。</param>
+public sealed record DiagnosticsPlaybackChoice(
+    string Label,
+    DiagnosticsPlaybackMode Mode,
+    int? FastForwardSpeedMultiplier);
+
+/// <summary>
 /// diagnostics timeline playback の index と interval の計算。
 /// </summary>
 public static class DiagnosticsPlaybackState
@@ -40,6 +51,18 @@ public static class DiagnosticsPlaybackState
     /// UI で選べる調査用早送り倍率。
     /// </summary>
     public static IReadOnlyList<int> FastForwardSpeedMultipliers { get; } = [4, 16, 64];
+
+    /// <summary>
+    /// UI で表示する等倍速と調査用早送りの選択肢。
+    /// </summary>
+    public static IReadOnlyList<DiagnosticsPlaybackChoice> PlaybackChoices { get; } =
+    [
+        new("等倍速", DiagnosticsPlaybackMode.Play, null),
+        .. FastForwardSpeedMultipliers.Select(speedMultiplier => new DiagnosticsPlaybackChoice(
+            $"{speedMultiplier}x",
+            DiagnosticsPlaybackMode.FastForward,
+            speedMultiplier)),
+    ];
 
     /// <summary>
     /// playback mode に応じた次の replay timeline index を返す。

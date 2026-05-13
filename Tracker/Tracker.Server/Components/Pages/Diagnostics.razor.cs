@@ -602,25 +602,61 @@ public partial class Diagnostics : IDisposable
         return frame.Message ?? frame.Status.ToString();
     }
 
-    private Task OnFastForwardSpeedChanged(ChangeEventArgs args)
-    {
-        if (!int.TryParse(args.Value?.ToString(), CultureInfo.InvariantCulture, out var speedMultiplier))
-        {
-            return Task.CompletedTask;
-        }
-
-        fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(speedMultiplier);
-        if (playbackMode == DiagnosticsPlaybackMode.FastForward)
-        {
-            return StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward);
-        }
-
-        return Task.CompletedTask;
-    }
-
     private void SyncComparisonState()
     {
         comparisonUiState?.Load(selectedLogPath, selectedEntry, ToReplayTimelineSelection());
+    }
+
+    private string PlaybackChoiceButtonClass(DiagnosticsPlaybackChoice choice)
+    {
+        return IsActivePlaybackChoice(choice)
+            ? "diagnostics-playback__button is-active"
+            : "diagnostics-playback__button";
+    }
+
+    private string PlaybackChoiceButtonLabel(DiagnosticsPlaybackChoice choice)
+    {
+        return IsActivePlaybackChoice(choice) ? $"{choice.Label} 停止" : choice.Label;
+    }
+
+    private bool IsActivePlaybackChoice(DiagnosticsPlaybackChoice choice)
+    {
+        return playbackMode == choice.Mode &&
+               (choice.Mode != DiagnosticsPlaybackMode.FastForward ||
+                fastForwardSpeedMultiplier == choice.FastForwardSpeedMultiplier);
+    }
+
+    private string PlaybackChoiceIconClass(DiagnosticsPlaybackChoice choice)
+    {
+        if (IsActivePlaybackChoice(choice))
+        {
+            return "diagnostics-playback__icon diagnostics-playback__icon--stop";
+        }
+
+        return choice.Mode == DiagnosticsPlaybackMode.Play
+            ? "diagnostics-playback__icon diagnostics-playback__icon--play"
+            : "diagnostics-playback__icon diagnostics-playback__icon--fast-forward";
+    }
+
+    private Task OnPlaybackChoiceClicked(DiagnosticsPlaybackChoice choice)
+    {
+        if (IsActivePlaybackChoice(choice))
+        {
+            StopPlayback();
+            return Task.CompletedTask;
+        }
+
+        return StartPlaybackChoiceAsync(choice);
+    }
+
+    private Task StartPlaybackChoiceAsync(DiagnosticsPlaybackChoice choice)
+    {
+        if (choice.FastForwardSpeedMultiplier is { } speedMultiplier)
+        {
+            fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(speedMultiplier);
+        }
+
+        return StartPlaybackAsync(choice.Mode);
     }
 
     private Task StartPlaybackAsync(DiagnosticsPlaybackMode mode)
