@@ -30,6 +30,7 @@ public sealed partial class TrackerCoordinator
                     {
                         snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);
                         renderSnapshotCaptureWriter?.CaptureFrame(committedFrame, receivedAt);
+                        trackerSnapshotAlignmentLogWriter?.CaptureRenderSnapshot(committedFrame, receivedAt);
                         PublishFrame(committedFrame, receivedAt);
                         NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));
                     }

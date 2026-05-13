@@ -316,6 +316,126 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// selected replay timeline tick がある場合、同じ diagnostics line 内の先頭 record ではなく timeline index の alignment を使うことを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_WithSelectedReplayTimeline_UsesTimelineRecordForComparisonAndFieldSource()
+    {
+        var diagnosticsReceivedAt = new DateTimeOffset(2026, 5, 13, 9, 0, 0, TimeSpan.Zero);
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 1000, 81_686_200_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3000, 1_778_620_918_834_101_760, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3001, 1_778_620_918_834_101_761, ballCount: 2, robotCount: 2, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(20).Ticks),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 1000,
+            alignmentRecords:
+            [
+                AlignmentInput(
+                    diagnosticsLineNumber: 1,
+                    diagnosticsTrackedFrameNumber: 1000,
+                    diagnosticsReceivedAt,
+                    ownSnapshotTimestampNs: 81_686_200_000_000,
+                    sourceRole: "external",
+                    sourceLabel: "ER-FORCE",
+                    sourceUuid: "er-force-uuid",
+                    remoteEndpoint: "192.0.2.0:12010",
+                    trackerSnapshotRecordIndex: 1,
+                    trackerSnapshotReceivedAt: diagnosticsReceivedAt,
+                    trackerSnapshotTrackedFrameNumber: 3000,
+                    trackerSnapshotTimestampNs: 1_778_620_918_834_101_760),
+                AlignmentInput(
+                    diagnosticsLineNumber: 1,
+                    diagnosticsTrackedFrameNumber: 1000,
+                    diagnosticsReceivedAt: diagnosticsReceivedAt.AddMilliseconds(20),
+                    ownSnapshotTimestampNs: 81_686_200_000_000,
+                    sourceRole: "external",
+                    sourceLabel: "ER-FORCE",
+                    sourceUuid: "er-force-uuid",
+                    remoteEndpoint: "192.0.2.20:12010",
+                    trackerSnapshotRecordIndex: 2,
+                    trackerSnapshotReceivedAt: diagnosticsReceivedAt.AddMilliseconds(20),
+                    trackerSnapshotTrackedFrameNumber: 3001,
+                    trackerSnapshotTimestampNs: 1_778_620_918_834_101_761),
+            ]);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var selectedTimeline = new TrackerDiagnosticsReplayTimelineSelection(
+            ReplayTimelineIndex: 1,
+            DiagnosticsLineNumber: 1,
+            ReceivedAt: diagnosticsReceivedAt.AddMilliseconds(20));
+
+        var state = reader.Load(
+            session.DiagnosticsPath,
+            SelectedEntry(1000),
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("ER-FORCE"));
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(1000),
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.ForSourceLabel("ER-FORCE"));
+
+        Assert.Equal(2, state.ReplayTimeline.Count);
+        Assert.Equal(3001u, state.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(3001u, frame.TrackedFrameNumber);
+        Assert.Equal(2, frame.SemanticSummary?.Balls.Count);
+    }
+
+    /// <summary>
+    /// tick / scrub / source selector 変更で tracker sidecar と alignment sidecar を再読込しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void LoadAndFieldSourceChanges_WhenFileStateIsUnchanged_ReusesSnapshotAndAlignmentIndexes()
+    {
+        var diagnosticsReceivedAt = new DateTimeOffset(2026, 5, 13, 9, 0, 0, TimeSpan.Zero);
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 1010, 81_686_201_000_000, ballCount: 1, robotCount: 1),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3010, 1_778_620_918_834_201_760, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3011, 1_778_620_918_834_201_761, ballCount: 2, robotCount: 2, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(20).Ticks),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 1010,
+            alignmentRecords:
+            [
+                AlignmentInput(1, 1010, diagnosticsReceivedAt, 81_686_201_000_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.0:12010", 1, diagnosticsReceivedAt, 3010, 1_778_620_918_834_201_760),
+                AlignmentInput(1, 1010, diagnosticsReceivedAt.AddMilliseconds(20), 81_686_201_000_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.20:12010", 2, diagnosticsReceivedAt.AddMilliseconds(20), 3011, 1_778_620_918_834_201_761),
+            ]);
+        var sidecarBuildCount = 0;
+        var alignmentBuildCount = 0;
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(
+            sidecarPath =>
+            {
+                sidecarBuildCount++;
+                return TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();
+            },
+            alignmentPath =>
+            {
+                alignmentBuildCount++;
+                return TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath).ToArray();
+            });
+
+        _ = reader.Load(
+            session.DiagnosticsPath,
+            SelectedEntry(1010),
+            new TrackerDiagnosticsReplayTimelineSelection(0, 1, diagnosticsReceivedAt),
+            TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("ER-FORCE"));
+        _ = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(1010),
+            new TrackerDiagnosticsReplayTimelineSelection(1, 1, diagnosticsReceivedAt.AddMilliseconds(20)),
+            TrackerDiagnosticsFieldSource.ForSourceLabel("ER-FORCE"));
+
+        Assert.Equal(1, sidecarBuildCount);
+        Assert.Equal(1, alignmentBuildCount);
+    }
+
+    /// <summary>
     /// source 変更や selected entry 変更で tracker sidecar JSONL を再読込せず、TRACKER-055 の cached index を再利用することを確認する。
     /// </summary>
     [Fact]
@@ -810,15 +930,21 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
             var alignmentPath = Path.Combine(sessionFolderPath, "tracker-snapshot-alignment.jsonl");
             File.WriteAllLines(
                 alignmentPath,
-                alignmentRecords.Select(input => JsonSerializer.Serialize(new
+                alignmentRecords.Select((input, index) => JsonSerializer.Serialize(new
                 {
-                    schemaVersion = 1,
+                    schemaVersion = 2,
+                    replayTimelineIndex = index,
+                    replayTimelineReceivedAt = input.DiagnosticsReceivedAt,
+                    replayTimelineKind = "diagnostics-entry",
                     diagnosticsLineNumber = input.DiagnosticsLineNumber,
-                    diagnosticsTrackedFrameNumber = input.DiagnosticsTrackedFrameNumber,
-                    diagnosticsReceivedAt = input.DiagnosticsReceivedAt,
-                    diagnosticsSessionRelativeTicks = input.DiagnosticsReceivedAt.Ticks -
-                        new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero).Ticks,
-                    ownSnapshotTimestampNs = input.OwnSnapshotTimestampNs,
+                    renderFrameNumber = input.DiagnosticsTrackedFrameNumber,
+                    renderReceivedAt = input.DiagnosticsReceivedAt,
+                    renderMatchRule = "exact",
+                    sourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey(
+                        input.SourceRole,
+                        input.SourceLabel,
+                        input.SourceUuid,
+                        input.RemoteEndpoint),
                     sourceRole = input.SourceRole,
                     sourceLabel = input.SourceLabel,
                     sourceUuid = input.SourceUuid,

@@ -54,6 +54,18 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
         TrackerDiagnosticsComparisonSourceFilter selectedSourceFilter)
     {
+        return Load(diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null, selectedSourceFilter);
+    }
+
+    /// <summary>
+    /// diagnostics log path、表示済み selected entry、selected replay timeline tick から comparison view-state を読み取る。
+    /// </summary>
+    public TrackerDiagnosticsComparisonViewState Load(
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
+        TrackerDiagnosticsComparisonSourceFilter selectedSourceFilter)
+    {
         if (string.IsNullOrWhiteSpace(diagnosticsLogPath))
         {
             return TrackerDiagnosticsComparisonViewState.Unavailable(
@@ -102,6 +114,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
+                replayTimeline: [],
                 recordCount: 0,
                 skippedRecordCount: 0,
                 errorCount: 0,
@@ -119,6 +132,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
+                replayTimeline: [],
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
                 metadata.TrackerSnapshotLog.ErrorCount,
@@ -137,6 +151,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
+                replayTimeline: [],
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
                 metadata.TrackerSnapshotLog.ErrorCount,
@@ -154,6 +169,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
+                replayTimeline: [],
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
                 metadata.TrackerSnapshotLog.ErrorCount,
@@ -178,6 +194,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
+                replayTimeline: [],
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
                 metadata.TrackerSnapshotLog.ErrorCount,
@@ -195,6 +212,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
+                replayTimeline: [],
                 metadata.TrackerSnapshotLog.RecordCount,
                 metadata.TrackerSnapshotLog.SkippedRecordCount,
                 metadata.TrackerSnapshotLog.ErrorCount,
@@ -204,9 +222,10 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         sourceOptions = comparisonIndex.SourceOptions;
         fieldSourceOptions = comparisonIndex.FieldSourceOptions;
         var selectedEntryComparison = CreateSelectedEntryComparison(
-            selectedEntry,
-            selectedSourceFilter,
-            comparisonIndex);
+                selectedEntry,
+                selectedReplayTimeline,
+                selectedSourceFilter,
+                comparisonIndex);
 
         return CreateState(
             fullDiagnosticsLogPath,
@@ -217,10 +236,24 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             sourceOptions,
             fieldSourceOptions,
             selectedEntryComparison,
+            comparisonIndex.ReplayTimeline.Ticks,
             metadata.TrackerSnapshotLog.RecordCount,
             metadata.TrackerSnapshotLog.SkippedRecordCount,
             metadata.TrackerSnapshotLog.ErrorCount,
             error: null);
+    }
+
+    /// <summary>
+    /// diagnostics log path から unified replay timeline を読み取る。
+    /// </summary>
+    public IReadOnlyList<TrackerDiagnosticsReplayTimelineTick> LoadReplayTimeline(string? diagnosticsLogPath)
+    {
+        var state = Load(
+            diagnosticsLogPath,
+            selectedEntry: null,
+            selectedReplayTimeline: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+        return state.ReplayTimeline;
     }
 
     /// <summary>
@@ -229,6 +262,18 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     public TrackerDiagnosticsFieldSourceFrame LoadFieldSourceFrame(
         string? diagnosticsLogPath,
         TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsFieldSource fieldSource)
+    {
+        return LoadFieldSourceFrame(diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null, fieldSource);
+    }
+
+    /// <summary>
+    /// diagnostics log path、selected entry、selected replay tick から Field source 用の tracker snapshot frame を読み取る。
+    /// </summary>
+    public TrackerDiagnosticsFieldSourceFrame LoadFieldSourceFrame(
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
         TrackerDiagnosticsFieldSource fieldSource)
     {
         if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput)
@@ -306,7 +351,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 "Tracker snapshot sidecar did not contain records.");
         }
 
-        return CreateFieldSourceFrame(selectedEntry, fieldSource, comparisonIndex);
+        return CreateFieldSourceFrame(selectedEntry, selectedReplayTimeline, fieldSource, comparisonIndex);
     }
 
     private ComparisonSnapshotIndex GetOrBuildIndex(
@@ -383,6 +428,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> sourceOptions,
         IReadOnlyList<TrackerDiagnosticsFieldSourceOption> fieldSourceOptions,
         TrackerDiagnosticsComparisonEntryComparison? selectedEntryComparison,
+        IReadOnlyList<TrackerDiagnosticsReplayTimelineTick> replayTimeline,
         int recordCount,
         int skippedRecordCount,
         int errorCount,
@@ -397,6 +443,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             fieldSourceOptions,
             selectedSourceFilter,
             selectedEntryComparison,
+            replayTimeline,
             recordCount,
             skippedRecordCount,
             errorCount,
@@ -514,9 +561,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private static TrackerDiagnosticsComparisonEntryComparison CreateSelectedEntryComparison(
         TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
         TrackerDiagnosticsComparisonSourceFilter selectedSourceFilter,
         ComparisonSnapshotIndex index)
     {
+        if (selectedReplayTimeline is not null)
+        {
+            var alignedTick = index.FindAlignedTimelineCandidate(
+                selectedReplayTimeline.ReplayTimelineIndex,
+                selectedSourceFilter);
+            if (alignedTick is not null)
+            {
+                return CreateSavedAlignmentComparison(alignedTick);
+            }
+        }
+
         if (selectedEntry is null)
         {
             return TrackerDiagnosticsComparisonEntryComparison.WithStatus(
@@ -541,21 +600,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         var aligned = index.FindAlignedCandidate(selectedEntry.LineNumber, selectedSourceFilter);
         if (aligned is not null)
         {
-            var snapshot = aligned.Snapshot;
-            var alignment = aligned.Alignment;
-            return new TrackerDiagnosticsComparisonEntryComparison(
-                TrackerDiagnosticsComparisonEntryStatus.Ready,
-                selectedEntry.LineNumber,
-                alignment.MatchingRule,
-                alignment.OwnSnapshotTimestampNs,
-                snapshot.SourceRole,
-                snapshot.SourceLabel,
-                snapshot.TrackedFrameNumber,
-                snapshot.TrackedFrameTimestampNs,
-                ToNanoseconds(alignment.ReceivedAtDeltaTicks),
-                snapshot.RawPayloadRestored,
-                snapshot.BallCount,
-                snapshot.RobotCount);
+            return CreateSavedAlignmentComparison(aligned, ownSnapshot.TrackedFrameTimestampNs);
         }
 
         var nearest = index.FindNearestCandidate(selectedSourceFilter, ownSnapshot.TrackedFrameTimestampNs);
@@ -585,9 +630,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private static TrackerDiagnosticsFieldSourceFrame CreateFieldSourceFrame(
         TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
         TrackerDiagnosticsFieldSource fieldSource,
         ComparisonSnapshotIndex index)
     {
+        if (selectedReplayTimeline is not null)
+        {
+            var alignedTick = index.FindAlignedTimelineFieldSourceCandidate(
+                selectedReplayTimeline.ReplayTimelineIndex,
+                fieldSource);
+            if (alignedTick is not null)
+            {
+                return CreateSavedAlignmentFieldSourceFrame(alignedTick, fieldSource);
+            }
+        }
+
         if (selectedEntry is null)
         {
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
@@ -618,27 +675,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         var aligned = index.FindAlignedFieldSourceCandidate(selectedEntry.LineNumber, fieldSource);
         if (aligned is not null)
         {
-            var snapshot = aligned.Snapshot;
-            var alignment = aligned.Alignment;
-            var alignedStatus = snapshot.BallCount == 0 && snapshot.RobotCount == 0
-                ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
-                : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
-            return new TrackerDiagnosticsFieldSourceFrame(
-                alignedStatus,
-                fieldSource,
-                selectedEntry.LineNumber,
-                alignment.MatchingRule,
-                alignment.OwnSnapshotTimestampNs,
-                snapshot.SourceRole,
-                snapshot.SourceLabel,
-                snapshot.TrackedFrameNumber,
-                snapshot.TrackedFrameTimestampNs,
-                ToNanoseconds(alignment.ReceivedAtDeltaTicks),
-                snapshot.RawPayloadRestored,
-                snapshot.SemanticSummary,
-                alignedStatus == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
-                    ? "Tracker snapshot matched, but it has no drawable balls or robots."
-                    : null);
+            return CreateSavedAlignmentFieldSourceFrame(aligned, fieldSource, ownSnapshot.TrackedFrameTimestampNs);
         }
 
         var nearest = index.FindNearestFieldSourceCandidate(fieldSource, ownSnapshot.TrackedFrameTimestampNs);
@@ -670,6 +707,55 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             nearest.RawPayloadRestored,
             nearest.SemanticSummary,
             status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                ? "Tracker snapshot matched, but it has no drawable balls or robots."
+                : null);
+    }
+
+    private static TrackerDiagnosticsComparisonEntryComparison CreateSavedAlignmentComparison(
+        AlignedComparisonSnapshot aligned,
+        long? ibisOwnSnapshotTimestampNs = null)
+    {
+        var snapshot = aligned.Snapshot;
+        var alignment = aligned.Alignment;
+        return new TrackerDiagnosticsComparisonEntryComparison(
+            TrackerDiagnosticsComparisonEntryStatus.Ready,
+            alignment.DiagnosticsLineNumber,
+            alignment.MatchingRule,
+            ibisOwnSnapshotTimestampNs,
+            snapshot.SourceRole,
+            snapshot.SourceLabel,
+            snapshot.TrackedFrameNumber,
+            snapshot.TrackedFrameTimestampNs,
+            ToNanoseconds(alignment.ReceivedAtDeltaTicks ?? 0),
+            snapshot.RawPayloadRestored,
+            snapshot.BallCount,
+            snapshot.RobotCount);
+    }
+
+    private static TrackerDiagnosticsFieldSourceFrame CreateSavedAlignmentFieldSourceFrame(
+        AlignedComparisonSnapshot aligned,
+        TrackerDiagnosticsFieldSource fieldSource,
+        long? ibisOwnSnapshotTimestampNs = null)
+    {
+        var snapshot = aligned.Snapshot;
+        var alignment = aligned.Alignment;
+        var alignedStatus = snapshot.BallCount == 0 && snapshot.RobotCount == 0
+            ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+            : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
+        return new TrackerDiagnosticsFieldSourceFrame(
+            alignedStatus,
+            fieldSource,
+            alignment.DiagnosticsLineNumber,
+            alignment.MatchingRule,
+            ibisOwnSnapshotTimestampNs,
+            snapshot.SourceRole,
+            snapshot.SourceLabel,
+            snapshot.TrackedFrameNumber,
+            snapshot.TrackedFrameTimestampNs,
+            ToNanoseconds(alignment.ReceivedAtDeltaTicks ?? 0),
+            snapshot.RawPayloadRestored,
+            snapshot.SemanticSummary,
+            alignedStatus == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
                 ? "Tracker snapshot matched, but it has no drawable balls or robots."
                 : null);
     }
@@ -779,6 +865,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         private readonly IReadOnlyDictionary<string, ComparisonSnapshot[]> snapshotsBySourceLabel;
         private readonly IReadOnlyDictionary<int, ComparisonSnapshot> snapshotsByRecordIndex;
         private readonly IReadOnlyDictionary<int, TrackerSnapshotAlignmentRecord[]> alignmentByDiagnosticsLine;
+        private readonly IReadOnlyDictionary<int, TrackerSnapshotAlignmentRecord[]> alignmentByTimelineIndex;
 
         public ComparisonSnapshotIndex(
             ComparisonSnapshot[] snapshots,
@@ -806,14 +893,25 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 .GroupBy(snapshot => snapshot.RecordIndex)
                 .ToDictionary(group => group.Key, group => group.First());
             alignmentByDiagnosticsLine = alignmentRecords
-                .GroupBy(record => record.DiagnosticsLineNumber)
+                .Where(record => record.DiagnosticsLineNumber is not null)
+                .GroupBy(record => record.DiagnosticsLineNumber!.Value)
                 .ToDictionary(
                     group => group.Key,
                     group => group
-                        .OrderBy(record => record.ReceivedAtDeltaTicks)
-                        .ThenBy(record => record.TrackerSnapshotRecordIndex)
+                        .OrderBy(record => record.ReceivedAtDeltaTicks ?? long.MaxValue)
+                        .ThenBy(record => record.TrackerSnapshotRecordIndex ?? int.MaxValue)
                         .ThenBy(record => record.RemoteEndpoint, StringComparer.Ordinal)
                         .ToArray());
+            alignmentByTimelineIndex = alignmentRecords
+                .GroupBy(record => record.ReplayTimelineIndex)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group
+                        .OrderBy(record => record.ReceivedAtDeltaTicks ?? long.MaxValue)
+                        .ThenBy(record => record.TrackerSnapshotRecordIndex ?? int.MaxValue)
+                        .ThenBy(record => record.RemoteEndpoint, StringComparer.Ordinal)
+                        .ToArray());
+            ReplayTimeline = TrackerDiagnosticsReplayTimelineIndex.Build(alignmentRecords);
             SourceOptions = CreateSourceOptions();
             FieldSourceOptions = CreateFieldSourceOptions();
         }
@@ -823,6 +921,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         public IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> SourceOptions { get; }
 
         public IReadOnlyList<TrackerDiagnosticsFieldSourceOption> FieldSourceOptions { get; }
+
+        public TrackerDiagnosticsReplayTimelineIndex ReplayTimeline { get; }
 
         public ComparisonSnapshot? GetOwnSnapshot(uint trackedFrame)
         {
@@ -847,7 +947,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     continue;
                 }
 
-                if (snapshotsByRecordIndex.TryGetValue(record.TrackerSnapshotRecordIndex, out var snapshot))
+                if (record.TrackerSnapshotRecordIndex is not null &&
+                    snapshotsByRecordIndex.TryGetValue(record.TrackerSnapshotRecordIndex.Value, out var snapshot))
                 {
                     return new AlignedComparisonSnapshot(record, snapshot);
                 }
@@ -878,6 +979,40 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         {
             var filter = fieldSource.ToComparisonFilter();
             return filter is null ? null : FindAlignedCandidate(diagnosticsLineNumber, filter);
+        }
+
+        public AlignedComparisonSnapshot? FindAlignedTimelineCandidate(
+            int replayTimelineIndex,
+            TrackerDiagnosticsComparisonSourceFilter filter)
+        {
+            if (!alignmentByTimelineIndex.TryGetValue(replayTimelineIndex, out var records))
+            {
+                return null;
+            }
+
+            foreach (var record in records)
+            {
+                if (!MatchesFilter(record, filter))
+                {
+                    continue;
+                }
+
+                if (record.TrackerSnapshotRecordIndex is not null &&
+                    snapshotsByRecordIndex.TryGetValue(record.TrackerSnapshotRecordIndex.Value, out var snapshot))
+                {
+                    return new AlignedComparisonSnapshot(record, snapshot);
+                }
+            }
+
+            return null;
+        }
+
+        public AlignedComparisonSnapshot? FindAlignedTimelineFieldSourceCandidate(
+            int replayTimelineIndex,
+            TrackerDiagnosticsFieldSource fieldSource)
+        {
+            var filter = fieldSource.ToComparisonFilter();
+            return filter is null ? null : FindAlignedTimelineCandidate(replayTimelineIndex, filter);
         }
 
         private IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateSourceOptions()
@@ -1593,6 +1728,7 @@ public sealed record TrackerDiagnosticsComparisonEntryComparison(
 /// <param name="FieldSourceOptions">左右 Field が選択できる source option。All は含めない。</param>
 /// <param name="SelectedSourceFilter">現在選択中の source filter。</param>
 /// <param name="SelectedEntryComparison">selected diagnostics entry の comparison summary。</param>
+/// <param name="ReplayTimeline">unified replay timeline ticks。</param>
 /// <param name="RecordCount">metadata が示す sidecar record 数。</param>
 /// <param name="SkippedRecordCount">metadata が示す skipped record 数。</param>
 /// <param name="ErrorCount">metadata が示す error 数。</param>
@@ -1606,6 +1742,7 @@ public sealed record TrackerDiagnosticsComparisonViewState(
     IReadOnlyList<TrackerDiagnosticsFieldSourceOption> FieldSourceOptions,
     TrackerDiagnosticsComparisonSourceFilter SelectedSourceFilter,
     TrackerDiagnosticsComparisonEntryComparison? SelectedEntryComparison,
+    IReadOnlyList<TrackerDiagnosticsReplayTimelineTick> ReplayTimeline,
     int RecordCount,
     int SkippedRecordCount,
     int ErrorCount,
@@ -1643,6 +1780,7 @@ public sealed record TrackerDiagnosticsComparisonViewState(
             ],
             selectedSourceFilter,
             SelectedEntryComparison: null,
+            ReplayTimeline: [],
             RecordCount: 0,
             SkippedRecordCount: 0,
             ErrorCount: 0,

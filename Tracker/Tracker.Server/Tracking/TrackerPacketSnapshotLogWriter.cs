@@ -27,6 +27,11 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
     private int errorCount;
 
     /// <summary>
+    /// snapshot record を sidecar へ保存した後に通知する。
+    /// </summary>
+    public event Action<TrackerPacketSnapshotIndexedRecord>? SnapshotAppended;
+
+    /// <summary>
     /// capture session と logger を受け取り、必要になるまで file writer を遅延初期化する。
     /// </summary>
     public TrackerPacketSnapshotLogWriter(
@@ -170,6 +175,7 @@ public sealed class TrackerPacketSnapshotLogWriter : IDisposable
                 recordCount++;
                 UpdateSource(normalizedRecord, recordIndex);
                 UpdateMetadata();
+                SnapshotAppended?.Invoke(new TrackerPacketSnapshotIndexedRecord(recordIndex, normalizedRecord));
                 if (session.FlushEachPacket)
                 {
                     writer.Flush();

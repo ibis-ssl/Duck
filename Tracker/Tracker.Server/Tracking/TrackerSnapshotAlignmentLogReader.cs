@@ -7,7 +7,7 @@ namespace Tracker.Server.Tracking;
 /// </summary>
 public sealed class TrackerSnapshotAlignmentLogReader
 {
-    private const int SchemaVersion = 1;
+    private const int SchemaVersion = 2;
 
     /// <summary>
     /// session folder 配下に置く tracker snapshot alignment sidecar の file 名。

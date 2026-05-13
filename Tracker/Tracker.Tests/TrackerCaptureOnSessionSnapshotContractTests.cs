@@ -211,6 +211,7 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
             remoteEndpoint: "192.0.2.50:12010",
             sourceRole: "external",
             sourceLabel: "ER-FORCE");
+        alignmentWriter.CaptureRenderSnapshot(ownFrame, receivedAt.AddMilliseconds(5));
         alignmentWriter.CaptureDiagnosticsEntry(ownFrame, receivedAt.AddMilliseconds(5));
         snapshotWriter.Flush();
         alignmentWriter.Flush();
@@ -221,21 +222,101 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
         var sessionFolder = GetRequiredString(root, "SessionFolder");
         AssertArtifactPath(root, captureDirectory, sessionFolder, "TrackerSnapshotSidecarPath", mustExist: true);
         AssertArtifactPath(root, captureDirectory, sessionFolder, "TrackerSnapshotAlignmentPath", mustExist: true);
-        Assert.Equal(2, root.GetProperty("TrackerSnapshotAlignmentLog").GetProperty("RecordCount").GetInt32());
+        Assert.True(root.GetProperty("TrackerSnapshotAlignmentLog").GetProperty("RecordCount").GetInt32() >= 2);
 
         var alignmentPath = Path.Combine(
             captureDirectory,
             GetRequiredString(root, "TrackerSnapshotAlignmentPath"));
         var externalAlignment = TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
-            .Single(record => record.SourceLabel == "ER-FORCE");
+            .First(record => record.SourceLabel == "ER-FORCE" && record.RenderFrameNumber is not null);
 
         Assert.Equal(TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule, externalAlignment.MatchingRule);
         Assert.Equal("external", externalAlignment.SourceRole);
         Assert.Equal("er-force-uuid", externalAlignment.SourceUuid);
         Assert.Equal("192.0.2.50:12010", externalAlignment.RemoteEndpoint);
-        Assert.Equal(1200u, externalAlignment.DiagnosticsTrackedFrameNumber);
+        Assert.Equal(1200u, externalAlignment.RenderFrameNumber);
         Assert.Equal(2200u, externalAlignment.TrackerSnapshotTrackedFrameNumber);
         Assert.True(externalAlignment.ReceivedAtDeltaTicks <= TimeSpan.FromMilliseconds(10).Ticks);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: alignment sidecar が diagnostics line 数ではなく最速 tracker source cadence の record を保存することを確認する。
+    /// </summary>
+    [Fact]
+    public void TrackerSnapshotAlignmentWriter_WritesFastestSourceCadenceRecordsWithHeldRenderFrame()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-alignment-fastest-{Guid.NewGuid():N}");
+        var captureSession = factory.CreateCaptureSession(captureDirectory);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            captureSession,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        using var alignmentWriter = new TrackerSnapshotAlignmentLogWriter(
+            captureSession,
+            snapshotWriter,
+            NullLogger<TrackerSnapshotAlignmentLogWriter>.Instance);
+        var receivedAt = new DateTimeOffset(2026, 5, 13, 9, 0, 0, TimeSpan.Zero);
+        var render0 = fixture.CreateFrame(
+            frameNumber: 1000,
+            dataTimestampNs: 81_686_200_000_000,
+            balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 100, yMm: 200)],
+            robots: [],
+            primaryBallTrackId: 1);
+        var render100 = fixture.CreateFrame(
+            frameNumber: 1100,
+            dataTimestampNs: 81_686_200_100_000,
+            balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 110, yMm: 210)],
+            robots: [],
+            primaryBallTrackId: 1);
+
+        alignmentWriter.CaptureRenderSnapshot(render0, receivedAt);
+        alignmentWriter.CaptureDiagnosticsEntry(render0, receivedAt);
+        for (var index = 0; index < 6; index++)
+        {
+            var offset = TimeSpan.FromMilliseconds(index * 20);
+            if (index == 5)
+            {
+                alignmentWriter.CaptureRenderSnapshot(render100, receivedAt.AddMilliseconds(100));
+                alignmentWriter.CaptureDiagnosticsEntry(render100, receivedAt.AddMilliseconds(100));
+            }
+
+            var externalFrame = fixture.CreateFrame(
+                frameNumber: (uint)(3000 + index),
+                dataTimestampNs: 1_778_620_918_834_101_760 + index,
+                balls: [fixture.CreateTrackedBall(trackId: index + 10, xMm: 300 + index, yMm: 400 + index)],
+                robots: [],
+                primaryBallTrackId: index + 10);
+            var packet = fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame);
+            snapshotWriter.CapturePacket(
+                packet,
+                receivedAt.Add(offset),
+                remoteEndpoint: "192.0.2.50:12010",
+                sourceRole: "external",
+                sourceLabel: "ER-FORCE");
+        }
+
+        snapshotWriter.Flush();
+        alignmentWriter.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        var root = metadata.RootElement;
+        var alignmentPath = Path.Combine(
+            captureDirectory,
+            GetRequiredString(root, "TrackerSnapshotAlignmentPath"));
+        var records = TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
+            .Where(record => record.SourceLabel == "ER-FORCE" &&
+                record.ReplayTimelineKind == TrackerSnapshotAlignmentRecord.TrackerSnapshotTimelineKind)
+            .OrderBy(record => record.ReplayTimelineReceivedAt)
+            .ToArray();
+
+        Assert.True(records.Length >= 6, "alignment sidecar must not collapse to the two diagnostics lines.");
+        Assert.All(records, record => Assert.Equal(2, record.SchemaVersion));
+        Assert.Equal(
+            [1000u, 1000u, 1000u, 1000u, 1000u, 1100u],
+            records.Take(6).Select(record => record.RenderFrameNumber).ToArray());
+        Assert.Equal(
+            [3000u, 3001u, 3002u, 3003u, 3004u, 3005u],
+            records.Take(6).Select(record => record.TrackerSnapshotTrackedFrameNumber).ToArray());
     }
 
     private TrackerCoordinator CreateCoordinator(

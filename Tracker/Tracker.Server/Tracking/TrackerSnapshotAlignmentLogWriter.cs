@@ -22,9 +22,13 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
     private string? capturePath;
     private bool writeFailed;
     private int diagnosticsLineNumber;
+    private int replayTimelineIndex;
     private int recordCount;
     private int skippedRecordCount;
     private int errorCount;
+    private TrackerRenderSnapshotRecord? latestRenderSnapshot;
+    private TrackerFrame? latestDiagnosticsFrame;
+    private DateTimeOffset? latestDiagnosticsReceivedAt;
 
     /// <summary>
     /// capture session、snapshot writer、logger を受け取り、必要になるまで file writer を遅延初期化する。
@@ -37,6 +41,7 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
         this.session = session;
         this.snapshotWriter = snapshotWriter;
         this.logger = logger;
+        this.snapshotWriter.SnapshotAppended += CaptureTrackerSnapshot;
     }
 
     /// <summary>
@@ -50,6 +55,33 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
             {
                 return capturePath;
             }
+        }
+    }
+
+    /// <summary>
+    /// render snapshot tick に対する保存済み alignment record を source ごとに追記する。
+    /// </summary>
+    public void CaptureRenderSnapshot(TrackerFrame frame, DateTimeOffset receivedAt)
+    {
+        if (!session.Enabled)
+        {
+            Stop();
+            return;
+        }
+
+        if (writeFailed)
+        {
+            return;
+        }
+
+        var candidates = snapshotWriter.GetLatestSnapshotsBySource();
+        lock (gate)
+        {
+            latestRenderSnapshot = new TrackerRenderSnapshotRecord(1, receivedAt.ToUniversalTime(), frame);
+            WriteTimelineRecords(
+                TrackerSnapshotAlignmentRecord.RenderSnapshotTimelineKind,
+                receivedAt,
+                candidates);
         }
     }
 
@@ -69,50 +101,18 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
             return;
         }
 
+        var candidates = snapshotWriter.GetLatestSnapshotsBySource();
         lock (gate)
         {
             try
             {
-                var sessionState = EnsureWriter(receivedAt);
                 diagnosticsLineNumber++;
-                var candidates = snapshotWriter.GetLatestSnapshotsBySource();
-                foreach (var candidate in candidates)
-                {
-                    var record = candidate.Record.EnsureSemanticSummary();
-                    var normalizedRole = TrackerPacketSnapshotRecord.NormalizeSourceRole(record.SourceRole);
-                    var normalizedLabel = TrackerPacketSnapshotRecord.NormalizeSourceLabel(
-                        record.SourceLabel,
-                        record.SourceName,
-                        record.SourceUuid,
-                        record.RemoteEndpoint,
-                        normalizedRole);
-                    var alignment = new TrackerSnapshotAlignmentRecord(
-                        SchemaVersion: 1,
-                        DiagnosticsLineNumber: diagnosticsLineNumber,
-                        DiagnosticsTrackedFrameNumber: frame.FrameNumber,
-                        DiagnosticsReceivedAt: receivedAt.ToUniversalTime(),
-                        DiagnosticsSessionRelativeTicks: receivedAt.ToUniversalTime().Ticks - sessionState.StartedAt.UtcTicks,
-                        OwnSnapshotTimestampNs: frame.DataTimestampNs,
-                        SourceRole: normalizedRole,
-                        SourceLabel: normalizedLabel,
-                        SourceUuid: record.SourceUuid,
-                        RemoteEndpoint: record.RemoteEndpoint,
-                        TrackerSnapshotRecordIndex: candidate.RecordIndex,
-                        TrackerSnapshotReceivedAt: record.ReceivedAt.ToUniversalTime(),
-                        TrackerSnapshotTrackedFrameNumber: record.TrackedFrameNumber,
-                        TrackerSnapshotTimestampNs: record.TrackedFrameTimestampNs,
-                        MatchingRule: TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
-                        ReceivedAtDeltaTicks: Math.Abs((record.ReceivedAt.ToUniversalTime() - receivedAt.ToUniversalTime()).Ticks),
-                        Status: TrackerSnapshotAlignmentRecord.ReadyStatus);
-                    writer!.WriteLine(JsonSerializer.Serialize(alignment, JsonOptions));
-                    recordCount++;
-                }
-
-                UpdateMetadata();
-                if (session.FlushEachPacket)
-                {
-                    writer!.Flush();
-                }
+                latestDiagnosticsFrame = frame;
+                latestDiagnosticsReceivedAt = receivedAt.ToUniversalTime();
+                WriteTimelineRecords(
+                    TrackerSnapshotAlignmentRecord.DiagnosticsEntryTimelineKind,
+                    receivedAt,
+                    candidates);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
             {
@@ -142,6 +142,7 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
     /// </summary>
     public void Dispose()
     {
+        snapshotWriter.SnapshotAppended -= CaptureTrackerSnapshot;
         Stop();
     }
 
@@ -157,11 +158,118 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
             capturePath = null;
             writeFailed = false;
             diagnosticsLineNumber = 0;
+            replayTimelineIndex = 0;
             recordCount = 0;
             skippedRecordCount = 0;
             errorCount = 0;
+            latestRenderSnapshot = null;
+            latestDiagnosticsFrame = null;
+            latestDiagnosticsReceivedAt = null;
             session.Stop();
         }
+    }
+
+    private void CaptureTrackerSnapshot(TrackerPacketSnapshotIndexedRecord snapshot)
+    {
+        if (!session.Enabled || writeFailed)
+        {
+            return;
+        }
+
+        lock (gate)
+        {
+            WriteTimelineRecords(
+                TrackerSnapshotAlignmentRecord.TrackerSnapshotTimelineKind,
+                snapshot.Record.ReceivedAt,
+                [snapshot]);
+        }
+    }
+
+    private void WriteTimelineRecords(
+        string replayTimelineKind,
+        DateTimeOffset replayTimelineReceivedAt,
+        IReadOnlyList<TrackerPacketSnapshotIndexedRecord> candidates)
+    {
+        if (candidates.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            _ = EnsureWriter(replayTimelineReceivedAt);
+            var timelineIndex = replayTimelineIndex++;
+            foreach (var candidate in candidates)
+            {
+                var record = candidate.Record.EnsureSemanticSummary();
+                var normalizedRole = TrackerPacketSnapshotRecord.NormalizeSourceRole(record.SourceRole);
+                var normalizedLabel = TrackerPacketSnapshotRecord.NormalizeSourceLabel(
+                    record.SourceLabel,
+                    record.SourceName,
+                    record.SourceUuid,
+                    record.RemoteEndpoint,
+                    normalizedRole);
+                var renderMatch = ResolveRenderMatchRule(replayTimelineReceivedAt);
+                var alignment = new TrackerSnapshotAlignmentRecord(
+                    SchemaVersion: 2,
+                    ReplayTimelineIndex: timelineIndex,
+                    ReplayTimelineReceivedAt: replayTimelineReceivedAt.ToUniversalTime(),
+                    ReplayTimelineKind: replayTimelineKind,
+                    DiagnosticsLineNumber: latestDiagnosticsFrame is null ? null : diagnosticsLineNumber,
+                    RenderFrameNumber: latestRenderSnapshot?.Frame.FrameNumber,
+                    RenderReceivedAt: latestRenderSnapshot?.ReceivedAt.ToUniversalTime(),
+                    RenderMatchRule: renderMatch,
+                    SourceKey: TrackerSnapshotAlignmentRecord.CreateSourceKey(
+                        normalizedRole,
+                        normalizedLabel,
+                        record.SourceUuid,
+                        record.RemoteEndpoint),
+                    SourceRole: normalizedRole,
+                    SourceLabel: normalizedLabel,
+                    SourceUuid: record.SourceUuid,
+                    RemoteEndpoint: record.RemoteEndpoint,
+                    TrackerSnapshotRecordIndex: candidate.RecordIndex,
+                    TrackerSnapshotReceivedAt: record.ReceivedAt.ToUniversalTime(),
+                    TrackerSnapshotTrackedFrameNumber: record.TrackedFrameNumber,
+                    TrackerSnapshotTimestampNs: record.TrackedFrameTimestampNs,
+                    MatchingRule: TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
+                    ReceivedAtDeltaTicks: Math.Abs((record.ReceivedAt.ToUniversalTime() - replayTimelineReceivedAt.ToUniversalTime()).Ticks),
+                    Status: TrackerSnapshotAlignmentRecord.ReadyStatus).Normalize();
+                writer!.WriteLine(JsonSerializer.Serialize(alignment, JsonOptions));
+                recordCount++;
+            }
+
+            UpdateMetadata();
+            if (session.FlushEachPacket)
+            {
+                writer!.Flush();
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            writeFailed = true;
+            skippedRecordCount++;
+            errorCount++;
+            UpdateMetadata();
+            logger.LogWarning(ex, "Failed to write tracker snapshot alignment {CapturePath}", capturePath);
+        }
+    }
+
+    private string ResolveRenderMatchRule(DateTimeOffset replayTimelineReceivedAt)
+    {
+        if (latestRenderSnapshot is null)
+        {
+            return "unavailable";
+        }
+
+        if (latestRenderSnapshot.ReceivedAt == replayTimelineReceivedAt.ToUniversalTime())
+        {
+            return "exact";
+        }
+
+        return latestRenderSnapshot.ReceivedAt <= replayTimelineReceivedAt.ToUniversalTime()
+            ? "latest-before"
+            : "nearest-after";
     }
 
     private VisionPacketCaptureSessionState EnsureWriter(DateTimeOffset receivedAt)

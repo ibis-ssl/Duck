@@ -111,12 +111,13 @@ public sealed class TrackerSnapshotReplayReader
         var alignmentByLine = !string.IsNullOrWhiteSpace(alignmentPath) && File.Exists(alignmentPath)
             ? TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
                 .Where(record => string.Equals(record.Status, TrackerSnapshotAlignmentRecord.ReadyStatus, StringComparison.OrdinalIgnoreCase))
-                .GroupBy(record => record.DiagnosticsLineNumber)
+                .Where(record => record.DiagnosticsLineNumber is not null)
+                .GroupBy(record => record.DiagnosticsLineNumber!.Value)
                 .ToDictionary(
                     group => group.Key,
                     group => group
-                        .OrderBy(record => record.ReceivedAtDeltaTicks)
-                        .ThenBy(record => record.TrackerSnapshotRecordIndex)
+                        .OrderBy(record => record.ReceivedAtDeltaTicks ?? long.MaxValue)
+                        .ThenBy(record => record.TrackerSnapshotRecordIndex ?? int.MaxValue)
                         .ThenBy(record => record.RemoteEndpoint, StringComparer.Ordinal)
                         .ToArray())
             : new Dictionary<int, TrackerSnapshotAlignmentRecord[]>();
@@ -140,12 +141,13 @@ public sealed class TrackerSnapshotReplayReader
                 var alignment = alignmentRecords
                     .FirstOrDefault(record => !string.Equals(record.SourceRole, "own", StringComparison.OrdinalIgnoreCase));
                 if (alignment is not null &&
-                    inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex, out var alignedInput))
+                    alignment.TrackerSnapshotRecordIndex is not null &&
+                    inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex.Value, out var alignedInput))
                 {
                     var alignedSemanticSummary = alignedInput.ComparisonSource.SemanticSummary;
                     summaries.Add(new TrackerSnapshotComparisonSummary(
                         alignment.MatchingRule,
-                        alignment.OwnSnapshotTimestampNs,
+                        ibisDataTimestampNs,
                         alignedInput.SourceRole,
                         alignedInput.SourceLabel,
                         alignedInput.TrackedFrameTimestampNs,

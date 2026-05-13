@@ -423,15 +423,15 @@
                 <input type="range"
                        class="diagnostics-scrubber__range"
                        min="0"
-                       max="@MaxEntryIndex"
-                       value="@SelectedEntryIndex"
+                       max="@MaxReplayTimelineIndex"
+                       value="@SelectedReplayTimelineIndex"
                        @oninput="OnTimelineScrubbed"
                        @onwheel="OnTimelineWheel"
                        @onwheel:preventDefault="true"
                        aria-label="Diagnostics timeline scrubber" />
                 <div class="diagnostics-scrubber__meta">
-                    <span>@(SelectedEntryIndex + 1) / @entries.Count</span>
-                    <span>@(selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp))</span>
+                    <span>@(SelectedReplayTimelineIndex + 1) / @ReplayTimelineCount</span>
+                    <span>@(selectedReplayTimelineTick is null ? selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp) : FormatTime(selectedReplayTimelineTick.ReceivedAt))</span>
                 </div>
             </div>
         }

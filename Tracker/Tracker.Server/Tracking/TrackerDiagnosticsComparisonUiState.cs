@@ -190,15 +190,27 @@ public sealed class TrackerDiagnosticsComparisonUiState
     /// </summary>
     public void Load(string? diagnosticsLogPath, TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        Load(diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// selected log、表示済み selected entry、selected replay timeline tick から comparison view-state を読み直す。
+    /// </summary>
+    public void Load(
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         var comparisonSelectedEntry = ToSelectedEntry(selectedEntry);
         ViewState = reader.Load(
             diagnosticsLogPath,
             comparisonSelectedEntry,
+            selectedReplayTimeline,
             SelectedSourceFilter);
 
         if (IsSelectedFilterAvailable(ViewState))
         {
-            RefreshFieldSourceFrames(diagnosticsLogPath, comparisonSelectedEntry);
+            RefreshFieldSourceFrames(diagnosticsLogPath, comparisonSelectedEntry, selectedReplayTimeline);
             return;
         }
 
@@ -206,8 +218,9 @@ public sealed class TrackerDiagnosticsComparisonUiState
         ViewState = reader.Load(
             diagnosticsLogPath,
             comparisonSelectedEntry,
+            selectedReplayTimeline,
             SelectedSourceFilter);
-        RefreshFieldSourceFrames(diagnosticsLogPath, comparisonSelectedEntry);
+        RefreshFieldSourceFrames(diagnosticsLogPath, comparisonSelectedEntry, selectedReplayTimeline);
     }
 
     /// <summary>
@@ -218,8 +231,20 @@ public sealed class TrackerDiagnosticsComparisonUiState
         string? diagnosticsLogPath,
         TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        SelectFilter(filter, diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// source filter を直接指定して comparison view-state を読み直す。
+    /// </summary>
+    public void SelectFilter(
+        TrackerDiagnosticsComparisonSourceFilter filter,
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         SelectedSourceFilter = filter;
-        Load(diagnosticsLogPath, selectedEntry);
+        Load(diagnosticsLogPath, selectedEntry, selectedReplayTimeline);
     }
 
     /// <summary>
@@ -230,12 +255,24 @@ public sealed class TrackerDiagnosticsComparisonUiState
         string? diagnosticsLogPath,
         TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        return SelectFilterValue(selectedValue, diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// UI select の option value から source filter を選択し、comparison view-state を読み直す。
+    /// </summary>
+    public bool SelectFilterValue(
+        string? selectedValue,
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         if (!TryParseFilterValue(selectedValue, ViewState.SourceOptions, out var filter))
         {
             return false;
         }
 
-        SelectFilter(filter, diagnosticsLogPath, selectedEntry);
+        SelectFilter(filter, diagnosticsLogPath, selectedEntry, selectedReplayTimeline);
         return true;
     }
 
@@ -247,8 +284,20 @@ public sealed class TrackerDiagnosticsComparisonUiState
         string? diagnosticsLogPath,
         TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        SelectLeftFieldSource(source, diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// 左 Field source を直接指定して Field source frame を読み直す。
+    /// </summary>
+    public void SelectLeftFieldSource(
+        TrackerDiagnosticsFieldSource source,
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         LeftFieldSource = source;
-        RefreshFieldSourceFrames(diagnosticsLogPath, ToSelectedEntry(selectedEntry));
+        RefreshFieldSourceFrames(diagnosticsLogPath, ToSelectedEntry(selectedEntry), selectedReplayTimeline);
     }
 
     /// <summary>
@@ -259,8 +308,20 @@ public sealed class TrackerDiagnosticsComparisonUiState
         string? diagnosticsLogPath,
         TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        SelectRightFieldSource(source, diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// 右 Field source を直接指定して Field source frame を読み直す。
+    /// </summary>
+    public void SelectRightFieldSource(
+        TrackerDiagnosticsFieldSource source,
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         RightFieldSource = source;
-        RefreshFieldSourceFrames(diagnosticsLogPath, ToSelectedEntry(selectedEntry));
+        RefreshFieldSourceFrames(diagnosticsLogPath, ToSelectedEntry(selectedEntry), selectedReplayTimeline);
     }
 
     /// <summary>
@@ -271,12 +332,24 @@ public sealed class TrackerDiagnosticsComparisonUiState
         string? diagnosticsLogPath,
         TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        return SelectLeftFieldSourceValue(selectedValue, diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// UI select の option value から左 Field source を選択する。
+    /// </summary>
+    public bool SelectLeftFieldSourceValue(
+        string? selectedValue,
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         if (!TryParseFieldSourceValue(selectedValue, ViewState.FieldSourceOptions, out var source))
         {
             return false;
         }
 
-        SelectLeftFieldSource(source, diagnosticsLogPath, selectedEntry);
+        SelectLeftFieldSource(source, diagnosticsLogPath, selectedEntry, selectedReplayTimeline);
         return true;
     }
 
@@ -288,12 +361,24 @@ public sealed class TrackerDiagnosticsComparisonUiState
         string? diagnosticsLogPath,
         TrackerDiagnosticsLogEntry? selectedEntry)
     {
+        return SelectRightFieldSourceValue(selectedValue, diagnosticsLogPath, selectedEntry, selectedReplayTimeline: null);
+    }
+
+    /// <summary>
+    /// UI select の option value から右 Field source を選択する。
+    /// </summary>
+    public bool SelectRightFieldSourceValue(
+        string? selectedValue,
+        string? diagnosticsLogPath,
+        TrackerDiagnosticsLogEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
+    {
         if (!TryParseFieldSourceValue(selectedValue, ViewState.FieldSourceOptions, out var source))
         {
             return false;
         }
 
-        SelectRightFieldSource(source, diagnosticsLogPath, selectedEntry);
+        SelectRightFieldSource(source, diagnosticsLogPath, selectedEntry, selectedReplayTimeline);
         return true;
     }
 
@@ -378,7 +463,8 @@ public sealed class TrackerDiagnosticsComparisonUiState
 
     private void RefreshFieldSourceFrames(
         string? diagnosticsLogPath,
-        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry)
+        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline)
     {
         if (!IsFieldSourceAvailable(LeftFieldSource))
         {
@@ -390,17 +476,26 @@ public sealed class TrackerDiagnosticsComparisonUiState
             RightFieldSource = TrackerDiagnosticsFieldSource.IbisTracker;
         }
 
-        LeftTrackerFieldSourceFrame = LoadTrackerFieldSourceFrame(diagnosticsLogPath, selectedEntry, LeftFieldSource);
-        RightTrackerFieldSourceFrame = LoadTrackerFieldSourceFrame(diagnosticsLogPath, selectedEntry, RightFieldSource);
+        LeftTrackerFieldSourceFrame = LoadTrackerFieldSourceFrame(
+            diagnosticsLogPath,
+            selectedEntry,
+            selectedReplayTimeline,
+            LeftFieldSource);
+        RightTrackerFieldSourceFrame = LoadTrackerFieldSourceFrame(
+            diagnosticsLogPath,
+            selectedEntry,
+            selectedReplayTimeline,
+            RightFieldSource);
     }
 
     private TrackerDiagnosticsFieldSourceFrame? LoadTrackerFieldSourceFrame(
         string? diagnosticsLogPath,
         TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
         TrackerDiagnosticsFieldSource source)
     {
         return NeedsTrackerFieldSourceFrame(source)
-            ? reader.LoadFieldSourceFrame(diagnosticsLogPath, selectedEntry, source)
+            ? reader.LoadFieldSourceFrame(diagnosticsLogPath, selectedEntry, selectedReplayTimeline, source)
             : null;
     }
 

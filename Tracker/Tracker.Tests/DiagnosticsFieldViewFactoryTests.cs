@@ -262,6 +262,7 @@ public class DiagnosticsFieldViewFactoryTests
             ],
             TrackerDiagnosticsComparisonSourceFilter.All,
             SelectedEntryComparison: null,
+            ReplayTimeline: [],
             RecordCount: 1,
             SkippedRecordCount: 0,
             ErrorCount: 0,

@@ -16,6 +16,8 @@ public partial class Diagnostics : IDisposable
     private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
     private string? selectedLogPath;
     private TrackerDiagnosticsLogEntry? selectedEntry;
+    private IReadOnlyList<TrackerDiagnosticsReplayTimelineTick> replayTimeline = [];
+    private TrackerDiagnosticsReplayTimelineTick? selectedReplayTimelineTick;
     private TrackerRenderSnapshotView? selectedRenderSnapshot;
     private IReadOnlyDictionary<uint, TrackerRenderSnapshotView> renderSnapshotsByFrame =
         new Dictionary<uint, TrackerRenderSnapshotView>();
@@ -40,11 +42,19 @@ public partial class Diagnostics : IDisposable
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
 
+    private int MaxReplayTimelineIndex => Math.Max(0, ReplayTimelineCount - 1);
+
     private int SelectedEntryIndex => selectedEntry is null
         ? 0
         : FindEntryIndex(selectedEntry);
 
-    private bool CanPlayback => entries.Count > 1;
+    private int SelectedReplayTimelineIndex => selectedReplayTimelineTick is null
+        ? SelectedEntryIndex
+        : FindReplayTimelineIndex(selectedReplayTimelineTick);
+
+    private int ReplayTimelineCount => replayTimeline.Count > 0 ? replayTimeline.Count : entries.Count;
+
+    private bool CanPlayback => ReplayTimelineCount > 1;
 
     private TrackerDiagnosticsComparisonViewState ComparisonViewState =>
         comparisonUiState?.ViewState ?? TrackerDiagnosticsComparisonUiState.InitialViewState;
@@ -104,6 +114,8 @@ public partial class Diagnostics : IDisposable
             snapshot = null;
             entries = [];
             selectedEntry = null;
+            replayTimeline = [];
+            selectedReplayTimelineTick = null;
             selectedRenderSnapshot = null;
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
@@ -118,9 +130,18 @@ public partial class Diagnostics : IDisposable
         snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
+        selectedReplayTimelineTick = null;
         LoadProfileMetadataIndex();
         UpdateProfileMetadataForSelectedEntry();
         LoadRenderSnapshotIndex();
+        LoadReplayTimelineIndex();
+        selectedReplayTimelineTick = replayTimeline.FirstOrDefault();
+        if (selectedReplayTimelineTick is not null)
+        {
+            SelectReplayTimelineTick(selectedReplayTimelineTick);
+            return;
+        }
+
         LoadSelectedRenderSnapshot();
         SyncComparisonState();
     }
@@ -129,6 +150,7 @@ public partial class Diagnostics : IDisposable
     private void SelectEntry(TrackerDiagnosticsLogEntry entry)
     {
         selectedEntry = entry;
+        selectedReplayTimelineTick = FindReplayTimelineTickForEntry(entry);
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
         SyncComparisonState();
@@ -143,21 +165,41 @@ public partial class Diagnostics : IDisposable
             return;
         }
 
-        SelectEntryByIndex(index);
+        SelectTimelineByIndex(index);
     }
 
     private void OnTimelineWheel(WheelEventArgs args)
     {
         StopPlayback();
 
-        if (entries.Count == 0)
+        if (ReplayTimelineCount == 0)
         {
             return;
         }
 
         var step = args.CtrlKey ? 100 : args.ShiftKey ? 10 : 1;
         var direction = args.DeltaY > 0 || args.DeltaX > 0 ? 1 : -1;
-        SelectEntryByIndex(SelectedEntryIndex + (direction * step));
+        SelectTimelineByIndex(SelectedReplayTimelineIndex + (direction * step));
+    }
+
+    private void SelectTimelineByIndex(int index)
+    {
+        if (replayTimeline.Count > 0)
+        {
+            SelectReplayTimelineTick(replayTimeline[Math.Clamp(index, 0, replayTimeline.Count - 1)]);
+            return;
+        }
+
+        SelectEntryByIndex(index);
+    }
+
+    private void SelectReplayTimelineTick(TrackerDiagnosticsReplayTimelineTick tick)
+    {
+        selectedReplayTimelineTick = tick;
+        selectedEntry = ResolveDiagnosticsEntry(tick) ?? entries.FirstOrDefault();
+        UpdateProfileMetadataForSelectedEntry();
+        LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     // index 指定の選択更新でも click 選択と同じ同期順序を維持する。
@@ -166,6 +208,7 @@ public partial class Diagnostics : IDisposable
         if (entries.Count == 0)
         {
             selectedEntry = null;
+            selectedReplayTimelineTick = null;
             selectedRenderSnapshot = null;
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
@@ -175,6 +218,7 @@ public partial class Diagnostics : IDisposable
         }
 
         selectedEntry = entries[Math.Clamp(index, 0, entries.Count - 1)];
+        selectedReplayTimelineTick = FindReplayTimelineTickForEntry(selectedEntry);
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
         SyncComparisonState();
@@ -191,6 +235,42 @@ public partial class Diagnostics : IDisposable
         }
 
         return 0;
+    }
+
+    private int FindReplayTimelineIndex(TrackerDiagnosticsReplayTimelineTick tick)
+    {
+        for (var index = 0; index < replayTimeline.Count; index++)
+        {
+            if (ReferenceEquals(replayTimeline[index], tick) ||
+                replayTimeline[index].ReplayTimelineIndex == tick.ReplayTimelineIndex)
+            {
+                return index;
+            }
+        }
+
+        return SelectedEntryIndex;
+    }
+
+    private TrackerDiagnosticsLogEntry? ResolveDiagnosticsEntry(TrackerDiagnosticsReplayTimelineTick tick)
+    {
+        if (tick.DiagnosticsLineNumber is null)
+        {
+            return entries.LastOrDefault(entry => entry.Timestamp <= tick.ReceivedAt) ?? entries.FirstOrDefault();
+        }
+
+        return entries.LastOrDefault(entry => entry.LineNumber <= tick.DiagnosticsLineNumber.Value)
+            ?? entries.FirstOrDefault();
+    }
+
+    private TrackerDiagnosticsReplayTimelineTick? FindReplayTimelineTickForEntry(TrackerDiagnosticsLogEntry? entry)
+    {
+        if (entry is null || replayTimeline.Count == 0)
+        {
+            return null;
+        }
+
+        return replayTimeline.LastOrDefault(tick => tick.DiagnosticsLineNumber <= entry.LineNumber)
+            ?? replayTimeline.FirstOrDefault();
     }
 
     private string ShellClass()
@@ -377,19 +457,31 @@ public partial class Diagnostics : IDisposable
 
     private Task OnComparisonSourceFilterChanged(ChangeEventArgs args)
     {
-        comparisonUiState?.SelectFilterValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
+        comparisonUiState?.SelectFilterValue(
+            args.Value?.ToString(),
+            selectedLogPath,
+            selectedEntry,
+            ToReplayTimelineSelection());
         return Task.CompletedTask;
     }
 
     private Task OnLeftFieldSourceChanged(ChangeEventArgs args)
     {
-        comparisonUiState?.SelectLeftFieldSourceValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
+        comparisonUiState?.SelectLeftFieldSourceValue(
+            args.Value?.ToString(),
+            selectedLogPath,
+            selectedEntry,
+            ToReplayTimelineSelection());
         return Task.CompletedTask;
     }
 
     private Task OnRightFieldSourceChanged(ChangeEventArgs args)
     {
-        comparisonUiState?.SelectRightFieldSourceValue(args.Value?.ToString(), selectedLogPath, selectedEntry);
+        comparisonUiState?.SelectRightFieldSourceValue(
+            args.Value?.ToString(),
+            selectedLogPath,
+            selectedEntry,
+            ToReplayTimelineSelection());
         return Task.CompletedTask;
     }
 
@@ -528,7 +620,7 @@ public partial class Diagnostics : IDisposable
 
     private void SyncComparisonState()
     {
-        comparisonUiState?.Load(selectedLogPath, selectedEntry);
+        comparisonUiState?.Load(selectedLogPath, selectedEntry, ToReplayTimelineSelection());
     }
 
     private Task StartPlaybackAsync(DiagnosticsPlaybackMode mode)
@@ -556,10 +648,10 @@ public partial class Diagnostics : IDisposable
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var currentIndex = SelectedEntryIndex;
+                var currentIndex = SelectedReplayTimelineIndex;
                 var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
                     currentIndex,
-                    entries.Count,
+                    ReplayTimelineCount,
                     mode,
                     speedMultiplier);
                 var interval = GetPlaybackInterval(mode, currentIndex, nextIndex, speedMultiplier);
@@ -584,21 +676,21 @@ public partial class Diagnostics : IDisposable
                     }
 
                     var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
-                        SelectedEntryIndex,
-                        entries.Count,
+                        SelectedReplayTimelineIndex,
+                        ReplayTimelineCount,
                         mode,
                         speedMultiplier);
 
-                    if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, entries.Count))
+                    if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, ReplayTimelineCount))
                     {
                         StopPlayback();
-                        SelectEntryByIndex(DiagnosticsPlaybackState.GetIndexAfterEndHandling(
+                        SelectTimelineByIndex(DiagnosticsPlaybackState.GetIndexAfterEndHandling(
                             nextIndex,
-                            entries.Count));
+                            ReplayTimelineCount));
                     }
                     else
                     {
-                        SelectEntryByIndex(nextIndex);
+                        SelectTimelineByIndex(nextIndex);
                     }
 
                     StateHasChanged();
@@ -616,14 +708,14 @@ public partial class Diagnostics : IDisposable
         int nextIndex,
         int speedMultiplier)
     {
-        if (entries.Count == 0)
+        if (ReplayTimelineCount == 0)
         {
             return TimeSpan.Zero;
         }
 
-        var current = entries[Math.Clamp(currentIndex, 0, entries.Count - 1)];
-        var next = entries[Math.Clamp(nextIndex, 0, entries.Count - 1)];
-        return DiagnosticsPlaybackState.GetInterval(mode, current.Timestamp, next.Timestamp, speedMultiplier);
+        var currentTimestamp = GetTimelineTimestamp(currentIndex);
+        var nextTimestamp = GetTimelineTimestamp(nextIndex);
+        return DiagnosticsPlaybackState.GetInterval(mode, currentTimestamp, nextTimestamp, speedMultiplier);
     }
 
     private int GetPlaybackSpeedMultiplier(DiagnosticsPlaybackMode mode)
@@ -656,14 +748,22 @@ public partial class Diagnostics : IDisposable
             return;
         }
 
-        if (!uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var frameNumber))
+        uint? timelineRenderFrame = selectedReplayTimelineTick?.RenderFrameNumber;
+        if (timelineRenderFrame is null &&
+            uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var selectedFrameNumber))
+        {
+            timelineRenderFrame = selectedFrameNumber;
+        }
+
+        if (timelineRenderFrame is null)
         {
             selectedRenderSnapshot = null;
             renderSnapshotError = $"Tracked frame '{selectedEntry.TrackedFrame}' is not a numeric frame number.";
             return;
         }
 
-        if (renderSnapshotsByFrame.TryGetValue(frameNumber, out var renderSnapshot))
+        if (timelineRenderFrame is not null &&
+            renderSnapshotsByFrame.TryGetValue(timelineRenderFrame.Value, out var renderSnapshot))
         {
             selectedRenderSnapshot = renderSnapshot;
             renderSnapshotError = null;
@@ -738,6 +838,30 @@ public partial class Diagnostics : IDisposable
         }
 
         renderSnapshotsByFrame = result.Index.SnapshotsByFrame;
+    }
+
+    private void LoadReplayTimelineIndex()
+    {
+        replayTimeline = selectedLogPath is null
+            ? []
+            : ComparisonReader.LoadReplayTimeline(selectedLogPath);
+    }
+
+    private DateTimeOffset GetTimelineTimestamp(int index)
+    {
+        if (replayTimeline.Count > 0)
+        {
+            return replayTimeline[Math.Clamp(index, 0, replayTimeline.Count - 1)].ReceivedAt;
+        }
+
+        return entries[Math.Clamp(index, 0, entries.Count - 1)].Timestamp;
+    }
+
+    private TrackerDiagnosticsReplayTimelineSelection? ToReplayTimelineSelection()
+    {
+        return selectedReplayTimelineTick is null
+            ? null
+            : TrackerDiagnosticsReplayTimelineSelection.FromTick(selectedReplayTimelineTick);
     }
 
     private sealed record DiagnosticsFieldRenderModel(
