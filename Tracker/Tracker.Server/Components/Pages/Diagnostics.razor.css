@@ -79,26 +79,27 @@
 .diagnostics-scrubber__playback {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.35rem;
+}
+
+.diagnostics-playback__transport,
+.diagnostics-playback-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
 }
 
 .diagnostics-playback__button {
     appearance: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.28rem;
-    min-width: 2.8rem;
+    display: inline-grid;
+    place-items: center;
+    width: 1.9rem;
     height: 1.9rem;
-    padding: 0 0.48rem;
     border: 1px solid #315235;
     border-radius: 7px;
     background: #17301d;
     color: #dbe7d6;
     cursor: pointer;
-    font: inherit;
-    font-size: 0.76rem;
-    white-space: nowrap;
 }
 
 .diagnostics-playback__button:hover:not(:disabled),
@@ -138,8 +139,39 @@
     clip-path: polygon(8% 14%, 8% 86%, 47% 50%, 47% 86%, 88% 50%, 47% 14%, 47% 50%);
 }
 
-.diagnostics-playback__label {
+.diagnostics-playback-tabs {
+    min-height: 1.9rem;
+    padding: 0.12rem;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #102716;
+}
+
+.diagnostics-playback-tabs__button {
+    appearance: none;
+    min-width: 3.35rem;
+    height: 1.55rem;
+    padding: 0 0.45rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #dbe7d6;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
     line-height: 1;
+    white-space: nowrap;
+}
+
+.diagnostics-playback-tabs__button:hover,
+.diagnostics-playback-tabs__button:focus-visible {
+    background: #1d3a23;
+    outline: none;
+}
+
+.diagnostics-playback-tabs__button.is-selected {
+    background: #24482b;
+    color: #f6fff1;
 }
 
 .diagnostics-select {

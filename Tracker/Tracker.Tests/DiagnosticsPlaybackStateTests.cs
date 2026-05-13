@@ -5,13 +5,13 @@ namespace Tracker.Tests;
 public class DiagnosticsPlaybackStateTests
 {
     /// <summary>
-    /// playback UI choice は等倍速と調査用倍率を別の選択肢として公開することを確認する。
+    /// playback speed choice は等倍速と調査用倍率をこの順で公開することを確認する。
     /// </summary>
     [Fact]
-    public void PlaybackChoices_ExposeNormalPlayAndFastForwardChoices()
+    public void PlaybackSpeedChoices_ExposeNormalPlayAndFastForwardChoices()
     {
         Assert.Collection(
-            DiagnosticsPlaybackState.PlaybackChoices,
+            DiagnosticsPlaybackState.PlaybackSpeedChoices,
             choice =>
             {
                 Assert.Equal("等倍速", choice.Label);
@@ -45,10 +45,30 @@ public class DiagnosticsPlaybackStateTests
     public void DiagnosticsPlaybackMarkup_DoesNotUseFastForwardSpeedSelect()
     {
         var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var oldSpeedSelectClass = "diagnostics-playback__" + "speed";
+        var oldSpeedSelectLabel = "Fast forward " + "speed";
 
-        Assert.DoesNotContain("diagnostics-playback__speed", markup, StringComparison.Ordinal);
-        Assert.DoesNotContain("Fast forward speed", markup, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(oldSpeedSelectClass, markup, StringComparison.Ordinal);
+        Assert.DoesNotContain(oldSpeedSelectLabel, markup, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("<select", ExtractPlaybackControlsMarkup(markup), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// diagnostics playback markup は transport buttons と speed tabs を分けて描画することを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsPlaybackMarkup_SeparatesTransportButtonsAndSpeedTabs()
+    {
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var playbackControls = ExtractPlaybackControlsMarkup(markup);
+        var oldActionHandler = "OnPlayback" + "ChoiceClicked";
+
+        Assert.Contains("diagnostics-playback__transport", playbackControls, StringComparison.Ordinal);
+        Assert.Contains("diagnostics-playback-tabs", playbackControls, StringComparison.Ordinal);
+        Assert.Contains("DiagnosticsPlaybackState.PlaybackSpeedChoices", playbackControls, StringComparison.Ordinal);
+        Assert.Contains("StartPlaybackAsync(DiagnosticsPlaybackMode.Play)", playbackControls, StringComparison.Ordinal);
+        Assert.Contains("StartFastForwardPlaybackAsync", playbackControls, StringComparison.Ordinal);
+        Assert.DoesNotContain(oldActionHandler, playbackControls, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -64,17 +84,74 @@ public class DiagnosticsPlaybackStateTests
     }
 
     /// <summary>
-    /// active playback choice の停止表示が日本語 UI として表示されることを確認する。
+    /// active transport button の停止表示が transport button 側に限定されることを確認する。
     /// </summary>
     [Fact]
-    public void DiagnosticsPlaybackComponent_UsesJapaneseStopLabelForActiveChoices()
+    public void DiagnosticsPlaybackComponent_DoesNotTurnSpeedTabsIntoStopActions()
     {
         var code = File.ReadAllText(
             FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor.cs"));
         var oldActiveLabel = "{choice.Label} " + "Stop";
 
-        Assert.Contains("{choice.Label} 停止", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("{choice.Label} 停止", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("StopPlayback();", ExtractMethodBody(code, "OnPlaybackSpeedChoiceClicked"), StringComparison.Ordinal);
         Assert.DoesNotContain(oldActiveLabel, code, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// FastForward 中に等倍速 tab を選ぶと、表示と実 mode を Play へ揃えることを確認する。
+    /// </summary>
+    [Fact]
+    public void ResolveSpeedChoiceTransition_WhenFastForwardSelectsNormalSpeed_SwitchesToPlay()
+    {
+        var normalChoice = DiagnosticsPlaybackState.PlaybackSpeedChoices.Single(
+            choice => choice.Label == DiagnosticsPlaybackState.NormalPlaybackSpeedLabel);
+
+        var transition = DiagnosticsPlaybackState.ResolveSpeedChoiceTransition(
+            DiagnosticsPlaybackMode.FastForward,
+            currentFastForwardSpeedMultiplier: 16,
+            normalChoice);
+
+        Assert.Equal(DiagnosticsPlaybackState.NormalPlaybackSpeedLabel, transition.SelectedPlaybackSpeedLabel);
+        Assert.Equal(DiagnosticsPlaybackMode.Play, transition.RestartMode);
+        Assert.Equal(16, transition.FastForwardSpeedMultiplier);
+    }
+
+    /// <summary>
+    /// Play 中に fast tab を選ぶと、表示と実 mode を FastForward へ揃えることを確認する。
+    /// </summary>
+    [Fact]
+    public void ResolveSpeedChoiceTransition_WhenPlaySelectsFastSpeed_SwitchesToFastForward()
+    {
+        var fastChoice = DiagnosticsPlaybackState.PlaybackSpeedChoices.Single(choice => choice.Label == "4x");
+
+        var transition = DiagnosticsPlaybackState.ResolveSpeedChoiceTransition(
+            DiagnosticsPlaybackMode.Play,
+            currentFastForwardSpeedMultiplier: 16,
+            fastChoice);
+
+        Assert.Equal("4x", transition.SelectedPlaybackSpeedLabel);
+        Assert.Equal(DiagnosticsPlaybackMode.FastForward, transition.RestartMode);
+        Assert.Equal(4, transition.FastForwardSpeedMultiplier);
+    }
+
+    /// <summary>
+    /// 停止中に等倍速 tab を選んでも再生開始しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void ResolveSpeedChoiceTransition_WhenStoppedSelectsNormalSpeed_DoesNotStartPlayback()
+    {
+        var normalChoice = DiagnosticsPlaybackState.PlaybackSpeedChoices.Single(
+            choice => choice.Label == DiagnosticsPlaybackState.NormalPlaybackSpeedLabel);
+
+        var transition = DiagnosticsPlaybackState.ResolveSpeedChoiceTransition(
+            DiagnosticsPlaybackMode.Stopped,
+            currentFastForwardSpeedMultiplier: 16,
+            normalChoice);
+
+        Assert.Equal(DiagnosticsPlaybackState.NormalPlaybackSpeedLabel, transition.SelectedPlaybackSpeedLabel);
+        Assert.Null(transition.RestartMode);
+        Assert.Equal(16, transition.FastForwardSpeedMultiplier);
     }
 
     /// <summary>
@@ -341,5 +418,39 @@ public class DiagnosticsPlaybackStateTests
         }
 
         return markup[start..end];
+    }
+
+    private static string ExtractMethodBody(string code, string methodName)
+    {
+        var start = code.IndexOf(methodName, StringComparison.Ordinal);
+        if (start < 0)
+        {
+            return string.Empty;
+        }
+
+        var bodyStart = code.IndexOf('{', start);
+        if (bodyStart < 0)
+        {
+            return string.Empty;
+        }
+
+        var depth = 0;
+        for (var index = bodyStart; index < code.Length; index++)
+        {
+            if (code[index] == '{')
+            {
+                depth++;
+            }
+            else if (code[index] == '}')
+            {
+                depth--;
+                if (depth == 0)
+                {
+                    return code[bodyStart..(index + 1)];
+                }
+            }
+        }
+
+        return code[bodyStart..];
     }
 }

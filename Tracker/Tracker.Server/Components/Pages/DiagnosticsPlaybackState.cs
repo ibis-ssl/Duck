@@ -22,15 +22,26 @@ public enum DiagnosticsPlaybackMode
 }
 
 /// <summary>
-/// diagnostics playback UI で表示する再生選択肢。
+/// diagnostics playback UI で表示する速度選択肢。
 /// </summary>
-/// <param name="Label">UI に表示する選択肢名。</param>
-/// <param name="Mode">開始する playback mode。</param>
+/// <param name="Label">UI に表示する速度名。</param>
+/// <param name="Mode">transport button で開始する playback mode。</param>
 /// <param name="FastForwardSpeedMultiplier">早送り選択肢の倍率。等倍速では null。</param>
-public sealed record DiagnosticsPlaybackChoice(
+public sealed record DiagnosticsPlaybackSpeedChoice(
     string Label,
     DiagnosticsPlaybackMode Mode,
     int? FastForwardSpeedMultiplier);
+
+/// <summary>
+/// 速度 tab 選択後に diagnostics playback UI へ反映する状態遷移。
+/// </summary>
+/// <param name="SelectedPlaybackSpeedLabel">選択表示に使う速度名。</param>
+/// <param name="RestartMode">再生中 mode を切り替える場合の開始 mode。停止中または切替不要なら null。</param>
+/// <param name="FastForwardSpeedMultiplier">保持する早送り倍率。</param>
+public sealed record DiagnosticsPlaybackSpeedTransition(
+    string SelectedPlaybackSpeedLabel,
+    DiagnosticsPlaybackMode? RestartMode,
+    int FastForwardSpeedMultiplier);
 
 /// <summary>
 /// diagnostics timeline playback の index と interval の計算。
@@ -48,21 +59,50 @@ public static class DiagnosticsPlaybackState
     public const int DefaultFastForwardSpeedMultiplier = 16;
 
     /// <summary>
+    /// 等倍速の表示名。
+    /// </summary>
+    public const string NormalPlaybackSpeedLabel = "等倍速";
+
+    /// <summary>
     /// UI で選べる調査用早送り倍率。
     /// </summary>
     public static IReadOnlyList<int> FastForwardSpeedMultipliers { get; } = [4, 16, 64];
 
     /// <summary>
-    /// UI で表示する等倍速と調査用早送りの選択肢。
+    /// UI で表示する等倍速と調査用早送りの速度選択肢。
     /// </summary>
-    public static IReadOnlyList<DiagnosticsPlaybackChoice> PlaybackChoices { get; } =
+    public static IReadOnlyList<DiagnosticsPlaybackSpeedChoice> PlaybackSpeedChoices { get; } =
     [
-        new("等倍速", DiagnosticsPlaybackMode.Play, null),
-        .. FastForwardSpeedMultipliers.Select(speedMultiplier => new DiagnosticsPlaybackChoice(
+        new(NormalPlaybackSpeedLabel, DiagnosticsPlaybackMode.Play, null),
+        .. FastForwardSpeedMultipliers.Select(speedMultiplier => new DiagnosticsPlaybackSpeedChoice(
             $"{speedMultiplier}x",
             DiagnosticsPlaybackMode.FastForward,
             speedMultiplier)),
     ];
+
+    /// <summary>
+    /// 速度 tab 選択時に表示と active playback mode を矛盾させない状態遷移を返す。
+    /// </summary>
+    public static DiagnosticsPlaybackSpeedTransition ResolveSpeedChoiceTransition(
+        DiagnosticsPlaybackMode currentMode,
+        int currentFastForwardSpeedMultiplier,
+        DiagnosticsPlaybackSpeedChoice choice)
+    {
+        var speedMultiplier = choice.FastForwardSpeedMultiplier is { } selectedSpeedMultiplier
+            ? NormalizeSpeedMultiplier(selectedSpeedMultiplier)
+            : currentFastForwardSpeedMultiplier;
+
+        DiagnosticsPlaybackMode? restartMode = currentMode switch
+        {
+            DiagnosticsPlaybackMode.Stopped => null,
+            DiagnosticsPlaybackMode.FastForward when choice.Mode == DiagnosticsPlaybackMode.FastForward =>
+                DiagnosticsPlaybackMode.FastForward,
+            _ when currentMode != choice.Mode => choice.Mode,
+            _ => null,
+        };
+
+        return new DiagnosticsPlaybackSpeedTransition(choice.Label, restartMode, speedMultiplier);
+    }
 
     /// <summary>
     /// playback mode に応じた次の replay timeline index を返す。

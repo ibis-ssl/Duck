@@ -368,18 +368,62 @@
         {
             <div class="diagnostics-scrubber">
                 <div class="diagnostics-scrubber__playback" aria-label="Diagnostics playback controls">
-                    @foreach (var choice in DiagnosticsPlaybackState.PlaybackChoices)
-                    {
-                        <button type="button"
-                                class="@PlaybackChoiceButtonClass(choice)"
-                                disabled="@(!CanPlayback && !IsActivePlaybackChoice(choice))"
-                                title="@PlaybackChoiceButtonLabel(choice)"
-                                aria-label="@PlaybackChoiceButtonLabel(choice)"
-                                @onclick="@(() => OnPlaybackChoiceClicked(choice))">
-                            <span class="@PlaybackChoiceIconClass(choice)" aria-hidden="true"></span>
-                            <span class="diagnostics-playback__label">@PlaybackChoiceButtonLabel(choice)</span>
-                        </button>
-                    }
+                    <div class="diagnostics-playback__transport">
+                        @if (playbackMode == DiagnosticsPlaybackMode.Play)
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button is-active"
+                                    title="Stop"
+                                    aria-label="Stop"
+                                    @onclick="StopPlayback">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button"
+                                    disabled="@(!CanPlayback)"
+                                    title="Play"
+                                    aria-label="Play"
+                                    @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.Play))">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--play" aria-hidden="true"></span>
+                            </button>
+                        }
+                        @if (playbackMode == DiagnosticsPlaybackMode.FastForward)
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button is-active"
+                                    title="Stop"
+                                    aria-label="Stop"
+                                    @onclick="StopPlayback">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button"
+                                    disabled="@(!CanPlayback)"
+                                    title="Fast forward"
+                                    aria-label="Fast forward"
+                                    @onclick="StartFastForwardPlaybackAsync">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--fast-forward" aria-hidden="true"></span>
+                            </button>
+                        }
+                    </div>
+                    <div class="diagnostics-playback-tabs" role="tablist" aria-label="Playback speed">
+                        @foreach (var choice in DiagnosticsPlaybackState.PlaybackSpeedChoices)
+                        {
+                            <button type="button"
+                                    class="@PlaybackSpeedChoiceButtonClass(choice)"
+                                    role="tab"
+                                    aria-selected="@IsSelectedPlaybackSpeedChoice(choice)"
+                                    @onclick="@(() => OnPlaybackSpeedChoiceClicked(choice))">
+                                @choice.Label
+                            </button>
+                        }
+                    </div>
                 </div>
                 <input type="range"
                        class="diagnostics-scrubber__range"

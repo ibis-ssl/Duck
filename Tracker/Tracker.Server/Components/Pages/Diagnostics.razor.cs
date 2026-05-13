@@ -37,6 +37,7 @@ public partial class Diagnostics : IDisposable
     private double timelineResizeStartX;
     private CancellationTokenSource? playbackCancellationTokenSource;
     private DiagnosticsPlaybackMode playbackMode = DiagnosticsPlaybackMode.Stopped;
+    private string selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.NormalPlaybackSpeedLabel;
     private int fastForwardSpeedMultiplier = DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
     private TrackerDiagnosticsComparisonUiState? comparisonUiState;
 
@@ -607,56 +608,49 @@ public partial class Diagnostics : IDisposable
         comparisonUiState?.Load(selectedLogPath, selectedEntry, ToReplayTimelineSelection());
     }
 
-    private string PlaybackChoiceButtonClass(DiagnosticsPlaybackChoice choice)
+    private string PlaybackSpeedChoiceButtonClass(DiagnosticsPlaybackSpeedChoice choice)
     {
-        return IsActivePlaybackChoice(choice)
-            ? "diagnostics-playback__button is-active"
-            : "diagnostics-playback__button";
+        return IsSelectedPlaybackSpeedChoice(choice)
+            ? "diagnostics-playback-tabs__button is-selected"
+            : "diagnostics-playback-tabs__button";
     }
 
-    private string PlaybackChoiceButtonLabel(DiagnosticsPlaybackChoice choice)
+    private bool IsSelectedPlaybackSpeedChoice(DiagnosticsPlaybackSpeedChoice choice)
     {
-        return IsActivePlaybackChoice(choice) ? $"{choice.Label} 停止" : choice.Label;
+        return selectedPlaybackSpeedLabel == choice.Label;
     }
 
-    private bool IsActivePlaybackChoice(DiagnosticsPlaybackChoice choice)
+    private Task OnPlaybackSpeedChoiceClicked(DiagnosticsPlaybackSpeedChoice choice)
     {
-        return playbackMode == choice.Mode &&
-               (choice.Mode != DiagnosticsPlaybackMode.FastForward ||
-                fastForwardSpeedMultiplier == choice.FastForwardSpeedMultiplier);
+        var transition = DiagnosticsPlaybackState.ResolveSpeedChoiceTransition(
+            playbackMode,
+            fastForwardSpeedMultiplier,
+            choice);
+
+        selectedPlaybackSpeedLabel = transition.SelectedPlaybackSpeedLabel;
+        fastForwardSpeedMultiplier = transition.FastForwardSpeedMultiplier;
+
+        return transition.RestartMode is { } restartMode
+            ? StartPlaybackAsync(restartMode)
+            : Task.CompletedTask;
     }
 
-    private string PlaybackChoiceIconClass(DiagnosticsPlaybackChoice choice)
+    private Task StartFastForwardPlaybackAsync()
     {
-        if (IsActivePlaybackChoice(choice))
-        {
-            return "diagnostics-playback__icon diagnostics-playback__icon--stop";
-        }
-
-        return choice.Mode == DiagnosticsPlaybackMode.Play
-            ? "diagnostics-playback__icon diagnostics-playback__icon--play"
-            : "diagnostics-playback__icon diagnostics-playback__icon--fast-forward";
-    }
-
-    private Task OnPlaybackChoiceClicked(DiagnosticsPlaybackChoice choice)
-    {
-        if (IsActivePlaybackChoice(choice))
-        {
-            StopPlayback();
-            return Task.CompletedTask;
-        }
-
-        return StartPlaybackChoiceAsync(choice);
-    }
-
-    private Task StartPlaybackChoiceAsync(DiagnosticsPlaybackChoice choice)
-    {
-        if (choice.FastForwardSpeedMultiplier is { } speedMultiplier)
+        var selectedFastChoice = DiagnosticsPlaybackState.PlaybackSpeedChoices.FirstOrDefault(
+            choice => IsSelectedPlaybackSpeedChoice(choice) &&
+                      choice.FastForwardSpeedMultiplier.HasValue);
+        if (selectedFastChoice?.FastForwardSpeedMultiplier is { } speedMultiplier)
         {
             fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(speedMultiplier);
         }
+        else
+        {
+            fastForwardSpeedMultiplier = DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
+            selectedPlaybackSpeedLabel = $"{fastForwardSpeedMultiplier}x";
+        }
 
-        return StartPlaybackAsync(choice.Mode);
+        return StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward);
     }
 
     private Task StartPlaybackAsync(DiagnosticsPlaybackMode mode)
@@ -667,6 +661,11 @@ public partial class Diagnostics : IDisposable
         }
 
         StopPlayback();
+        if (mode == DiagnosticsPlaybackMode.Play)
+        {
+            selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.NormalPlaybackSpeedLabel;
+        }
+
         playbackMode = mode;
         playbackCancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = playbackCancellationTokenSource.Token;
