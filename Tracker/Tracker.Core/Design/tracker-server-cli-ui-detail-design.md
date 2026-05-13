@@ -137,9 +137,9 @@ diagnostics log reader、`Tracker.CaptureReplay`、diagnostics playback は、me
 
 この表示スキップは Play 専用の表示対象 index 選択であり、保存済み alignment v2、unified replay timeline、tracker packet snapshot、comparison 用 data を削らない。timeline scrubber のドラッグ、Field source selector、`Tracker Comparison` panel、`Tracker.CaptureReplay` は引き続き selected replay timeline tick を任意に選べる経路として維持し、ユーザーが気に入っている saved alignment / scrub / Field source / comparison による「確実に比較できる」能力を落とさない。Play が 30fps で描画しなかった中間 tick でも、scrub や comparison では保存済み alignment record から選択・比較できる必要がある。
 
-`TRACKER-061` では、playback 操作を `等倍速`、`4x`、`16x`、`64x` の playback choices として表現する。`等倍速` は `DiagnosticsPlaybackMode.Play` を開始し、TRACKER-060 の30fps相当 realtime stepping を使う。`4x` / `16x` / `64x` は `DiagnosticsPlaybackMode.FastForward` を開始し、選択した multiplier で TRACKER-059 の調査用挙動を維持する。UI では数値の等倍ラベルを使わず、`Fast Forward` button と speed select の組み合わせで倍率が等倍速の設定値に見える構成も採用しない。実装都合で select box を残す場合でも、等倍速とは別の fast-forward group 内に閉じ、倍率設定が `等倍速` に効くように見せない。
+`TRACKER-062` では、TRACKER-061 の巨大な playback choice button 配置を撤回し、transport 操作は従来どおり Play icon button、Fast Forward icon button、Stop button の配置へ戻す。`等倍速`、`4x`、`16x`、`64x` は transport button ではなく速度選択側の compact segmented/tabs として並べる。select box へ単純に項目追加するより、ユーザーの「選択肢のタブ」という意図と、`等倍速` / 調査用倍率が独立した choices に見える自然さを優先する。ただし tabs は scrubber 行の補助 control として小さく置き、TRACKER-061 のような巨大な action button 群にはしない。数値の等倍ラベルは使わず、表示は必ず `等倍速` とする。
 
-調査用の高速再生は Play 専用 realtime stepping から分離する。Fast Forward は TRACKER-059 の調査用挙動を維持し、tick を間引かず capture-time delta / multiplier を短縮して進める。active playback choice は、その choice のボタンが `Stop` に変わる、または既存の Stop affordance と同等の操作で停止できる。Stop、末尾到達時の先頭戻り、mode switch、speed switch の stale tick guard は Play / Fast Forward の両方で維持し、旧 mode または旧 multiplier の queued tick が selection を進めないことを contract にする。saved alignment v2、timeline scrubber、Field source selector、`Tracker Comparison` panel、`Tracker.CaptureReplay` の任意 tick 比較経路は変更しない。
+速度 choice と transport の対応は次で固定する。`等倍速` は `DiagnosticsPlaybackMode.Play` と TRACKER-060 の30fps相当 realtime stepping に対応する。`4x` / `16x` / `64x` は `DiagnosticsPlaybackMode.FastForward` と該当 multiplier に対応し、TRACKER-059 の tick 非間引き挙動を維持する。Play button を押した場合は `等倍速` choice を選択して Play を開始する。Fast Forward button を押した場合は選択中の fast multiplier で FastForward を開始し、現在 choice が `等倍速` の場合は既定の fast multiplier に切り替えて開始する。active mode の停止は active Play / Fast Forward affordance が Stop button へ入れ替わる、または同じ位置の Stop button で止める構成とし、速度 tab 自体を Stop action に変えない。Stop、末尾到達時の先頭戻り、mode switch、speed switch の stale tick guard は Play / Fast Forward の両方で維持し、旧 mode または旧 multiplier の queued tick が selection を進めないことを contract にする。saved alignment v2、timeline scrubber、Field source selector、`Tracker Comparison` panel、`Tracker.CaptureReplay` の任意 tick 比較経路は変更しない。
 
 高速 tracker tick では、Vision / render snapshot は tick timestamp に対する latest-before を保持する。先頭だけ prior render snapshot がない場合は nearest-after fallback を許容する。例えば Vision / render snapshot が 0ms / 100ms、ER-FORCE snapshot が 0 / 20 / 40 / 60 / 80 / 100ms の場合、20 / 40 / 60 / 80ms の replay tick は同じ Vision / render 0ms frame を参照し、100ms tick で Vision / render 100ms frame へ進む。これにより replay は高速 tracker cadence に合わせて進み、低速 Vision 側は同じ frame を保持してカクカク見える。
 
@@ -214,10 +214,12 @@ focused tests では、少なくとも次を固定する。
 - 等倍速 `Play` は30fps相当の表示更新で、開始 wall-clock と開始 tick `ReceivedAt` から target capture-time を計算し、その時刻以下の latest replay timeline tick へ追従する。200Hz tick fixture では、開始から1秒後に約30個目の逐次 tick ではなく wall-clock 1秒相当の tick へ進むことを固定する。
 - Play が表示スキップした中間 tick でも、timeline scrubber、Field source、comparison は selected replay timeline tick と saved alignment v2 record から任意 tick を選択・比較できることを固定する。
 - Fast Forward は Play 専用 realtime stepping に巻き込まず、既存の調査用 capture-time delta / multiplier 挙動を維持する。
-- playback choices の `等倍速` は `DiagnosticsPlaybackMode.Play` を開始し、Fast Forward multiplier を変更しないことを UI state / component contract で固定する。
-- playback choices の `4x` / `16x` / `64x` は `DiagnosticsPlaybackMode.FastForward` と該当 multiplier を開始し、TRACKER-059 の tick 非間引き挙動を維持することを固定する。
-- active playback choice は該当 choice の `Stop` 表示または既存 Stop affordance と同等の停止操作を持ち、Stop / mode switch / speed switch 後の queued tick が stale guard で破棄されることを固定する。
-- `Fast Forward` button + speed select が残って倍率設定に見える UI に戻さない。select box を残す場合は fast-forward group 内の補助 control として等倍速から明確に分離されることを固定する。
+- playback controls は Play icon button、Fast Forward icon button、Stop button の従来配置を持ち、`等倍速` / `4x` / `16x` / `64x` を巨大な action button として描画しないことを固定する。
+- 速度選択は compact segmented/tabs として `等倍速`、`4x`、`16x`、`64x` を並べ、数値の等倍ラベルを表示しないことを固定する。
+- `等倍速` choice は `DiagnosticsPlaybackMode.Play` と TRACKER-060 の30fps相当 realtime stepping に対応し、Fast Forward multiplier を変更しないことを UI state / component contract で固定する。
+- `4x` / `16x` / `64x` choice は `DiagnosticsPlaybackMode.FastForward` と該当 multiplier に対応し、TRACKER-059 の tick 非間引き挙動を維持することを固定する。
+- Play button は `等倍速` choice を選択して Play を開始し、Fast Forward button は選択中または既定の fast multiplier で FastForward を開始することを固定する。
+- active mode は Stop button で停止でき、Stop / mode switch / speed switch 後の queued tick が stale guard で破棄されることを固定する。
 - Field source options は `Vision Input`、ibis tracker、`External`、`Unknown`、source label を持ち、Field source には `All` を含めない。
 - 既定は左 `Vision Input`、右 ibis tracker output で、log 変更時に既定へ戻る。
 - selected replay timeline tick と source label / role から、comparison と同じ alignment または明示的 best-effort snapshot の semantic summary が Field source frame に返る。
@@ -275,7 +277,7 @@ focused tests では、少なくとも次を固定する。
 - `TRACKER-058` では、新規 capture の保存時 alignment sidecar を追加し、external tracker timestamp が ibis own と非同一時刻系でも Field source / CLI comparison が saved alignment を優先できるようにする。
 - `TRACKER-059` では、diagnostics replay timeline を fastest available source cadence に合わせる。Play / Fast Forward / scrub は diagnostics entry count ではなく unified replay timeline を使い、高速 tracker tick では Vision / render snapshot を latest-before で保持する。保存時 alignment sidecar は既存 file 名のまま schema version 2 の clean record へ置き換え、diagnostics line だけでなく fast tracker sample 分の alignment records を残す。互換 fallback は入れず、log open 時の index 構築と tick/scrub 時の O(1) または bounded lookup を優先する。
 - `TRACKER-060` では、等倍速 `Play` だけを30fps相当の表示更新で wall-clock 経過時間へ追従させる。開始 tick の `ReceivedAt` と開始 wall-clock から target capture-time を計算し、その時刻以下の latest replay timeline tick を表示対象にする。saved alignment v2 / scrub / Field source / comparison は任意 tick を比較できる経路として維持し、Fast Forward は既存の調査用 capture-time delta / multiplier 挙動を壊さない。
-- `TRACKER-061` では、diagnostics playback UI の `等倍速` と `4x` / `16x` / `64x` を別の playback choices として表現する。`等倍速` は `DiagnosticsPlaybackMode.Play`、各倍率は `DiagnosticsPlaybackMode.FastForward` と該当 multiplier を開始し、active choice は Stop に切り替わるか既存 Stop と同等に停止できる。倍率 select が残る場合でも等倍速とは明確に分離し、数値の等倍ラベルは使わない。saved alignment v2 / scrub / Field source / comparison、TRACKER-060 realtime Play、TRACKER-059 Fast Forward tick 非間引き挙動は壊さない。
+- `TRACKER-061` では、diagnostics playback UI の `等倍速` と `4x` / `16x` / `64x` を別の playback choices として表現したが、ユーザー意図より action button が大きく変わりすぎたため、`TRACKER-062` で UI 形状を修正する。`TRACKER-062` では Play / Fast Forward / Stop の従来 transport button 配置を戻し、速度選択側の compact tabs に `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は `DiagnosticsPlaybackMode.Play`、各倍率は `DiagnosticsPlaybackMode.FastForward` と該当 multiplier に対応し、saved alignment v2 / scrub / Field source / comparison、TRACKER-060 realtime Play、TRACKER-059 Fast Forward tick 非間引き挙動は壊さない。
 - `TRACKER-059` 以降の socket abstraction 等の hardening は今回PRへ含める判断が明示された場合、またはユーザー承認がある場合だけ追加する。
 
 ## 完了条件
@@ -293,7 +295,7 @@ focused tests では、少なくとも次を固定する。
 - `/diagnostics` の Field overlay mode で左右 Field source selector の 2 source を同一 Field に重ね、source layer ごとの色分け、legend、visibility を確認できる。
 - Vision より高速な tracker source がある場合、scrub / playback tick は unified replay timeline の fast tracker ticks を含み、Vision / render snapshot は latest-before frame を保持する。
 - 等倍速 `Play` は30fps相当の表示更新で wall-clock 経過時間に対応する latest replay timeline tick へ追従し、高頻度 tick の全件逐次描画で遅れ続けない。
-- playback UI は `等倍速`、`4x`、`16x`、`64x` を別の choices として表示し、`4x` / `16x` / `64x` が等倍速の設定値に見えない。
+- playback UI は Play / Fast Forward / Stop の従来 transport button 配置を持ち、速度選択側に `等倍速`、`4x`、`16x`、`64x` の compact tabs を表示する。
 - 保存時 alignment sidecar は fastest source cadence の comparison records を持ち、複数 fast tracker records が同じ Vision / render frame を参照できる。
 - scrub / playback tick / Field source selector 変更で tracker packet snapshot sidecar JSONL や alignment sidecar JSONL 全体を再読込しない。
 - 各小タスクで TDD、review、commit、PR gate が閉じている。
