@@ -16,13 +16,13 @@ public class DiagnosticsPlaybackStateTests
     }
 
     /// <summary>
-    /// 早送りでは選択した調査用速度に応じて次の index へ進むことを確認する。
+    /// 早送りでも unified replay timeline tick は間引かず 1 tick ずつ進むことを確認する。
     /// </summary>
     [Theory]
-    [InlineData(4, 4)]
-    [InlineData(16, 7)]
-    [InlineData(64, 19)]
-    public void GetNextIndex_ForFastForward_AdvancesBySelectedSpeed(int speedMultiplier, int expected)
+    [InlineData(4)]
+    [InlineData(16)]
+    [InlineData(64)]
+    public void GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(int speedMultiplier)
     {
         var next = DiagnosticsPlaybackState.GetNextIndex(
             3,
@@ -30,7 +30,30 @@ public class DiagnosticsPlaybackStateTests
             DiagnosticsPlaybackMode.FastForward,
             speedMultiplier);
 
-        Assert.Equal(expected, next);
+        Assert.Equal(4, next);
+    }
+
+    /// <summary>
+    /// Fast Forward 16x でも 0ms -> 20ms -> 40ms の replay timeline tick を飛ばさないことを確認する。
+    /// </summary>
+    [Fact]
+    public void GetNextIndex_ForFastForward16x_DoesNotSkipFastTimelineTicks()
+    {
+        var timelineOffsetsMs = new[] { 0, 20, 40, 60, 80 };
+
+        var first = DiagnosticsPlaybackState.GetNextIndex(
+            currentIndex: 0,
+            entryCount: timelineOffsetsMs.Length,
+            DiagnosticsPlaybackMode.FastForward,
+            speedMultiplier: 16);
+        var second = DiagnosticsPlaybackState.GetNextIndex(
+            first,
+            entryCount: timelineOffsetsMs.Length,
+            DiagnosticsPlaybackMode.FastForward,
+            speedMultiplier: 16);
+
+        Assert.Equal(20, timelineOffsetsMs[first]);
+        Assert.Equal(40, timelineOffsetsMs[second]);
     }
 
     /// <summary>

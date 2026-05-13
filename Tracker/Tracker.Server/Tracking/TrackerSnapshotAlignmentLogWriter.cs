@@ -176,12 +176,13 @@ public sealed class TrackerSnapshotAlignmentLogWriter : IDisposable
             return;
         }
 
+        var candidates = snapshotWriter.GetLatestSnapshotsBySource();
         lock (gate)
         {
             WriteTimelineRecords(
                 TrackerSnapshotAlignmentRecord.TrackerSnapshotTimelineKind,
                 snapshot.Record.ReceivedAt,
-                [snapshot]);
+                candidates);
         }
     }
 

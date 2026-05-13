@@ -385,6 +385,59 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// fast tracker tick 上で別 source を選んでも、source ごとの latest-before alignment record から snapshot を引けることを確認する。
+    /// </summary>
+    [Fact]
+    public void LoadFieldSourceFrame_WithSelectedReplayTimeline_UsesLatestBeforeRecordForSelectedSource()
+    {
+        var receivedAt = new DateTimeOffset(2026, 5, 13, 9, 0, 0, TimeSpan.Zero);
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 1000, 81_686_200_000_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3000, 1_778_620_918_834_101_760, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3001, 1_778_620_918_834_101_761, ballCount: 2, robotCount: 2, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(20).Ticks),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3002, 1_778_620_918_834_101_762, ballCount: 3, robotCount: 3, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(40).Ticks),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 1000,
+            alignmentRecords:
+            [
+                AlignmentInput(1, 1000, receivedAt, 81_686_200_000_000, "own", "ibis", "ibis-runtime", "self", 0, receivedAt, 1000, 81_686_200_000_000, replayTimelineIndex: 0),
+                AlignmentInput(1, 1000, receivedAt, 81_686_200_000_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.0:12010", 1, receivedAt, 3000, 1_778_620_918_834_101_760, replayTimelineIndex: 0),
+                AlignmentInput(1, 1000, receivedAt.AddMilliseconds(20), 81_686_200_000_000, "own", "ibis", "ibis-runtime", "self", 0, receivedAt, 1000, 81_686_200_000_000, replayTimelineIndex: 1),
+                AlignmentInput(1, 1000, receivedAt.AddMilliseconds(20), 81_686_200_000_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.20:12010", 2, receivedAt.AddMilliseconds(20), 3001, 1_778_620_918_834_101_761, replayTimelineIndex: 1),
+                AlignmentInput(1, 1000, receivedAt.AddMilliseconds(40), 81_686_200_000_000, "own", "ibis", "ibis-runtime", "self", 0, receivedAt, 1000, 81_686_200_000_000, replayTimelineIndex: 2),
+                AlignmentInput(1, 1000, receivedAt.AddMilliseconds(40), 81_686_200_000_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.40:12010", 3, receivedAt.AddMilliseconds(40), 3002, 1_778_620_918_834_101_762, replayTimelineIndex: 2),
+            ]);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var selectedTimeline = new TrackerDiagnosticsReplayTimelineSelection(
+            ReplayTimelineIndex: 2,
+            DiagnosticsLineNumber: 1,
+            ReceivedAt: receivedAt.AddMilliseconds(40));
+
+        var state = reader.Load(
+            session.DiagnosticsPath,
+            SelectedEntry(1000),
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.Own);
+        var externalFrame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(1000),
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.ForSourceLabel("ER-FORCE"));
+
+        Assert.Equal("saved-session-alignment", state.SelectedEntryComparison?.MatchingRule);
+        Assert.Equal(1000u, state.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(81_686_200_000_000, state.SelectedEntryComparison?.NearestSnapshotTimestampNs);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, externalFrame.Status);
+        Assert.Equal("saved-session-alignment", externalFrame.MatchingRule);
+        Assert.Equal(3002u, externalFrame.TrackedFrameNumber);
+        Assert.True(externalFrame.TrackedFrameTimestampNs > 1_000_000_000_000_000_000);
+    }
+
+    /// <summary>
     /// tick / scrub / source selector 変更で tracker sidecar と alignment sidecar を再読込しないことを確認する。
     /// </summary>
     [Fact]
@@ -933,7 +986,7 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
                 alignmentRecords.Select((input, index) => JsonSerializer.Serialize(new
                 {
                     schemaVersion = 2,
-                    replayTimelineIndex = index,
+                    replayTimelineIndex = input.ReplayTimelineIndex ?? index,
                     replayTimelineReceivedAt = input.DiagnosticsReceivedAt,
                     replayTimelineKind = "diagnostics-entry",
                     diagnosticsLineNumber = input.DiagnosticsLineNumber,
@@ -1059,7 +1112,8 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         int trackerSnapshotRecordIndex,
         DateTimeOffset trackerSnapshotReceivedAt,
         uint trackerSnapshotTrackedFrameNumber,
-        long trackerSnapshotTimestampNs)
+        long trackerSnapshotTimestampNs,
+        int? replayTimelineIndex = null)
     {
         return new AlignmentInputData(
             diagnosticsLineNumber,
@@ -1073,7 +1127,8 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
             trackerSnapshotRecordIndex,
             trackerSnapshotReceivedAt,
             trackerSnapshotTrackedFrameNumber,
-            trackerSnapshotTimestampNs);
+            trackerSnapshotTimestampNs,
+            replayTimelineIndex);
     }
 
     private static string ResolveRemoteEndpoint(SnapshotInputData input)
@@ -1132,5 +1187,6 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
         int TrackerSnapshotRecordIndex,
         DateTimeOffset TrackerSnapshotReceivedAt,
         uint TrackerSnapshotTrackedFrameNumber,
-        long TrackerSnapshotTimestampNs);
+        long TrackerSnapshotTimestampNs,
+        int? ReplayTimelineIndex);
 }

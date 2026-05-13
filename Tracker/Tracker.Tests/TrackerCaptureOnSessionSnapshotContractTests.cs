@@ -319,6 +319,85 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
             records.Take(6).Select(record => record.TrackerSnapshotTrackedFrameNumber).ToArray());
     }
 
+    /// <summary>
+    /// 何を確認しているか: fast tracker tick 上でも append source だけでなく source ごとの latest-before snapshot を保存することを確認する。
+    /// </summary>
+    [Fact]
+    public void TrackerSnapshotAlignmentWriter_WritesLatestSnapshotForEachSourceOnFastTrackerTick()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-alignment-latest-sources-{Guid.NewGuid():N}");
+        var captureSession = factory.CreateCaptureSession(captureDirectory);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            captureSession,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        using var alignmentWriter = new TrackerSnapshotAlignmentLogWriter(
+            captureSession,
+            snapshotWriter,
+            NullLogger<TrackerSnapshotAlignmentLogWriter>.Instance);
+        var receivedAt = new DateTimeOffset(2026, 5, 13, 9, 0, 0, TimeSpan.Zero);
+        var ownFrame = fixture.CreateFrame(
+            frameNumber: 4000,
+            dataTimestampNs: 81_686_200_000_000,
+            balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 100, yMm: 200)],
+            robots: [],
+            primaryBallTrackId: 1);
+        var ownPacket = fixture.CreatePacketGenerator("ibis", "ibis-runtime").Generate(ownFrame);
+
+        snapshotWriter.CapturePacket(
+            ownPacket,
+            receivedAt,
+            remoteEndpoint: "self",
+            sourceRole: "own",
+            sourceLabel: "ibis");
+        alignmentWriter.CaptureRenderSnapshot(ownFrame, receivedAt);
+        alignmentWriter.CaptureDiagnosticsEntry(ownFrame, receivedAt);
+        for (var index = 0; index < 3; index++)
+        {
+            var externalFrame = fixture.CreateFrame(
+                frameNumber: (uint)(5000 + index),
+                dataTimestampNs: 1_778_620_918_834_101_760 + index,
+                balls: [fixture.CreateTrackedBall(trackId: index + 10, xMm: 300 + index, yMm: 400 + index)],
+                robots: [],
+                primaryBallTrackId: index + 10);
+            var externalPacket = fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame);
+            snapshotWriter.CapturePacket(
+                externalPacket,
+                receivedAt.AddMilliseconds(index * 20),
+                remoteEndpoint: "192.0.2.50:12010",
+                sourceRole: "external",
+                sourceLabel: "ER-FORCE");
+        }
+
+        snapshotWriter.Flush();
+        alignmentWriter.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        var alignmentPath = Path.Combine(
+            captureDirectory,
+            GetRequiredString(metadata.RootElement, "TrackerSnapshotAlignmentPath"));
+        var fastTick20Records = TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
+            .Where(record => record.ReplayTimelineKind == TrackerSnapshotAlignmentRecord.TrackerSnapshotTimelineKind &&
+                record.ReplayTimelineReceivedAt == receivedAt.AddMilliseconds(20))
+            .OrderBy(record => record.SourceRole, StringComparer.Ordinal)
+            .ThenBy(record => record.SourceLabel, StringComparer.Ordinal)
+            .ToArray();
+        var fastTick40Records = TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
+            .Where(record => record.ReplayTimelineKind == TrackerSnapshotAlignmentRecord.TrackerSnapshotTimelineKind &&
+                record.ReplayTimelineReceivedAt == receivedAt.AddMilliseconds(40))
+            .OrderBy(record => record.SourceRole, StringComparer.Ordinal)
+            .ThenBy(record => record.SourceLabel, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Contains(fastTick20Records, record => record.SourceLabel == "ER-FORCE" && record.TrackerSnapshotTrackedFrameNumber == 5001u);
+        Assert.Contains(fastTick20Records, record => record.SourceLabel == "ibis" && record.TrackerSnapshotTrackedFrameNumber == 4000u);
+        Assert.Contains(fastTick40Records, record => record.SourceLabel == "ER-FORCE" && record.TrackerSnapshotTrackedFrameNumber == 5002u);
+        Assert.Contains(fastTick40Records, record => record.SourceLabel == "ibis" && record.TrackerSnapshotTrackedFrameNumber == 4000u);
+        Assert.All(
+            fastTick20Records.Concat(fastTick40Records),
+            record => Assert.Equal(TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule, record.MatchingRule));
+    }
+
     private TrackerCoordinator CreateCoordinator(
         VisionPacketCaptureSession captureSession,
         TrackerRenderSnapshotCaptureWriter renderSnapshotWriter)

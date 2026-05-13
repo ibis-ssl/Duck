@@ -16,7 +16,7 @@ public enum DiagnosticsPlaybackMode
     Play,
 
     /// <summary>
-    /// 複数 entry ずつ進める早送り。
+    /// timeline tick を間引かず、timestamp delta を短縮する早送り。
     /// </summary>
     FastForward,
 }
@@ -41,7 +41,7 @@ public static class DiagnosticsPlaybackState
     public static IReadOnlyList<int> FastForwardSpeedMultipliers { get; } = [4, 16, 64];
 
     /// <summary>
-    /// playback mode に応じた次の entry index を返す。
+    /// playback mode に応じた次の replay timeline index を返す。
     /// </summary>
     public static int GetNextIndex(
         int currentIndex,
@@ -54,10 +54,7 @@ public static class DiagnosticsPlaybackState
             return 0;
         }
 
-        var step = mode == DiagnosticsPlaybackMode.FastForward
-            ? GetFastForwardStep(speedMultiplier)
-            : PlayStep;
-        return Math.Clamp(currentIndex + step, 0, entryCount - 1);
+        return Math.Clamp(currentIndex + PlayStep, 0, entryCount - 1);
     }
 
     /// <summary>
@@ -130,10 +127,5 @@ public static class DiagnosticsPlaybackState
         return FastForwardSpeedMultipliers.Contains(speedMultiplier)
             ? speedMultiplier
             : DefaultFastForwardSpeedMultiplier;
-    }
-
-    private static int GetFastForwardStep(int speedMultiplier)
-    {
-        return Math.Max(PlayStep, NormalizeSpeedMultiplier(speedMultiplier) / 4);
     }
 }
