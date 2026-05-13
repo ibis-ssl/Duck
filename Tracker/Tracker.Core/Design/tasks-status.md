@@ -4,28 +4,21 @@
 
 ## 現在のタスク
 
-- ID: TRACKER-063
-- Title: playback start の速度選択維持と可変早送り倍率を追加する
+- ID: none
+- Title: none
 - Phase: comparison-logging
-- Status: in_progress
-- TDD Entry: 未実施。fast speed 選択中に再生ボタンを押しても `等倍速` へ戻らず、選択中 speed と実 playback mode が一致すること、固定 `64x` に依存せず可変倍率で 64x 超の早送りが効くことを固定する。
-- Design Entry: 完了。`reports/tracker-063-variable-playback-speed-design-20260513222344.md` と design / README 更新で、TRACKER-062 の transport button 配置を維持しつつ、速度選択側を `等倍速` と可変早送り倍率へ更新する方針、および 64x で頭打ちにならない timer floor / normalization contract を記録した。
-- Implementation Entry: 完了。`reports/tracker-063-variable-playback-speed-implementation-20260513223102.md` に、赤確認、focused 44 passed、関連 73 passed、`git diff --check` pass を記録した。Play button は選択中 speed を尊重し、可変早送り倍率は `2x..1024x` clamp と small timer floor で 64x 超を扱う。
-- Review Entry: 未実施。実装後に gpt-5.5 high review report を作成し、blocking finding が残らないことを確認する。
-- Size: small
-- Dependencies: TRACKER-062
-- Exit Criteria:
-  - fast speed 選択中に再生ボタンを押しても selected speed が `等倍速` へ戻らない
-  - selected speed と実 playback mode / multiplier が一致し、Play button 押下時も選択中 speed を尊重する
-  - 固定 `4x` / `16x` / `64x` だけに依存せず、64x 超を含む可変早送り倍率を UI と state contract で扱える
-  - 64x 超の倍率が timer interval / state normalization で無効化されず、実効速度を上げられる
-  - `等倍速` tab 選択中の再生は TRACKER-060 の realtime Play を維持する
-  - TRACKER-059 の FastForward tick 非間引き、saved alignment v2 / scrub / Field source / comparison の任意 tick 比較経路を壊さない
-  - focused regression test、必要な validation、gpt-5.5 high review report が揃い、blocking finding が残っていない
+- Status: none
+- TDD Entry: none
+- Design Entry: none
+- Implementation Entry: none
+- Review Entry: none
+- Size: none
+- Dependencies: none
+- Exit Criteria: none
 
 ## 次の調査タスク
 
-- TRACKER-063: playback start の速度選択維持と可変早送り倍率を追加する。
+- なし。
 
 ## 固定残タスク
 
@@ -47,7 +40,7 @@
 - `TRACKER-060` は等倍速 playback を30fps相当の表示更新で実時間の等倍速へ追従させる追加要望として今回PRへ追加した。高頻度 tracker tick は保存済み alignment / comparison 用には保持し、scrub / Field source / comparison で任意 tick を確実に比較できる既存経路を維持する。等倍速表示だけは中間 tick を必要に応じてスキップし、遅れ確認用の時間軸を維持する。設計では Play 開始時の wall-clock と selected tick `ReceivedAt` から target capture-time を計算し、その時刻以下の latest replay timeline tick へ追従する方針、Fast Forward との責務分離、200Hz tick / 30fps 表示更新の TDD acceptance を固定した。focused validation は 19 passed、related validation は 48 passed、`git diff --check` pass、gpt-5.5 high r2 review blocking findings なし。full `Tracker.Tests` は 237 passed / 1 failed で、失敗は今回 commit 外のローカル `Tracker/Tracker.Server/appsettings.json` 差分 (`Tracker:Receive:Enabled=true`) による default-off contract failure として保持する。
 - `TRACKER-061` は playback UI 上で `等倍速` と調査用 `4x` / `16x` / `64x` を分離する追加要望として今回PRへ追加した。現状の `Fast forward` button + speed select では倍率が等倍速設定のように見えるため、独立した playback choices として設計した。実装では `DiagnosticsPlaybackState.PlaybackChoices` を追加し、`等倍速` は `DiagnosticsPlaybackMode.Play`、`4x` / `16x` / `64x` は `DiagnosticsPlaybackMode.FastForward` と対応 multiplier に接続した。active choice は `等倍速 停止` / `4x 停止` / `16x 停止` / `64x 停止` と表示し、数値の等倍表記と旧 speed select は使わない。focused validation は `DiagnosticsPlaybackStateTests` 23 passed、関連 validation は 51 passed、`git diff --check` pass、gpt-5.5 high r2 review blocking findings なし。full `Tracker.Tests` は 240 passed / 1 failed で、失敗は今回 commit 外のローカル `Tracker/Tracker.Server/appsettings.json` 差分 (`Tracker:Receive:Enabled=true`) による default-off contract failure として保持する。設計は `reports/tracker-061-playback-ui-separation-design-20260513204405.md`、実装は `reports/tracker-061-playback-ui-separation-implementation-20260513205042.md`、初回 review は `reports/tracker-061-review-20260513205647.md`、review-fix は `reports/tracker-061-review-fix-implementation-20260513210059.md`、r2 review は `reports/tracker-061-review-r2-20260513210407.md` に記録済み。
 - `TRACKER-062` はユーザー確認により、TRACKER-061 の UI を再調整する追加要望として今回PRへ追加した。Play / Fast Forward / Stop のボタン配置は従来どおり維持し、速度選択側に compact tabs として `等倍速`、`4x`、`16x`、`64x` を並べる。FastForward 中に `等倍速` tab を選んだ場合は Play へ、Play 中に fast tab を選んだ場合は FastForward へ切り替えて、表示と実 playback mode を一致させる。focused validation は `DiagnosticsPlaybackStateTests` 27 passed、関連 validation は 56 passed、`git diff --check` pass、gpt-5.5 high r2 review findings なし。設計は `reports/tracker-062-playback-speed-choice-design-20260513213014.md`、実装は `reports/tracker-062-playback-speed-choice-implementation-20260513213716.md`、初回 review は `reports/tracker-062-review-20260513214513.md`、review-fix は `reports/tracker-062-review-fix-implementation-20260513214808.md`、r2 review は `reports/tracker-062-review-r2-20260513215222.md` に記録済み。
-- `TRACKER-063` は再生ボタン押下時に selected speed が `等倍速` へ戻る不具合修正と、固定 `64x` では不足する早送り倍率を可変化する追加対応として今回PRへ追加した。Play / Fast Forward / Stop の従来 transport button 配置は維持し、速度選択側を `等倍速` と可変早送り倍率へ更新する。64x 超の倍率が normalization や timer minimum interval で実質無効化されないことを確認する。設計は `reports/tracker-063-variable-playback-speed-design-20260513222344.md`、実装は `reports/tracker-063-variable-playback-speed-implementation-20260513223102.md` に記録済み。review は未実施。
+- `TRACKER-063` は再生ボタン押下時に selected speed が `等倍速` へ戻る不具合修正と、固定 `64x` では不足する早送り倍率を可変化する追加対応として今回PRへ追加した。Play / Fast Forward / Stop の従来 transport button 配置は維持し、速度選択側を `等倍速` と可変早送り倍率へ更新した。Play button は選択中 speed を尊重し、fast multiplier 選択中は `FastForward` として開始する。可変早送り倍率は `2x..1024x` clamp で、FastForward interval は 30ms hard floor ではなく small timer floor を使う。focused validation は `DiagnosticsPlaybackStateTests` 44 passed、関連 validation は 73 passed、`git diff --check` pass。設計は `reports/tracker-063-variable-playback-speed-design-20260513222344.md`、実装は `reports/tracker-063-variable-playback-speed-implementation-20260513223102.md`、review は `reports/tracker-063-review-20260513224028.md` に記録済みで blocking findings なし。実画面 compact UI 未確認と timer granularity は held concern として保持する。
 
 ## タスク一覧
 
@@ -77,4 +70,4 @@
 | TRACKER-060 | diagnostics 等倍速 playback を30fps相当の実時間追従にする | comparison-logging | done | TRACKER-059 | 等倍速 `Play` は全 replay timeline tick を逐次表示するのではなく、30fps相当の表示更新で wall-clock 経過時間に対応する capture-time `ReceivedAt` の replay timeline tick へ追従する。高頻度 tracker tick は保存済み alignment / comparison 用には保持し、scrub / Field source / comparison で任意 tick を確実に比較できる既存経路を維持する。等倍速表示だけは必要に応じて中間 tick をスキップして実時間遅れ確認を優先する。focused validation は 19 passed、related validation は 48 passed、`git diff --check` pass、gpt-5.5 high r2 review blocking findings なし。full `Tracker.Tests` は 237 passed / 1 failed で、失敗は今回 commit 外のローカル `Tracker/Tracker.Server/appsettings.json` 差分 (`Tracker:Receive:Enabled=true`) による default-off contract failure。設計は `reports/tracker-060-realtime-playback-design-20260513194832.md`、実装は `reports/tracker-060-realtime-playback-implementation-20260513195439.md`、初回 review は `reports/tracker-060-review-20260513200044.md`、review-fix は `reports/tracker-060-review-fix-implementation-20260513200441.md`、r2 review は `reports/tracker-060-review-r2-20260513200634.md` に記録済み。 |
 | TRACKER-061 | diagnostics playback UI で 等倍速 と 4x / 16x / 64x を分離する | comparison-logging | done | TRACKER-060 | UI 上で `等倍速` と `4x` / `16x` / `64x` が別の playback choices として表示され、`4x` / `16x` / `64x` が等倍速の設定値に見えない。`等倍速` は `DiagnosticsPlaybackMode.Play` で開始し、`4x` / `16x` / `64x` は `DiagnosticsPlaybackMode.FastForward` と該当倍率で開始する。active choice は `等倍速 停止` / `4x 停止` / `16x 停止` / `64x 停止` と表示し、旧 speed select と 数値の等倍表記は使わない。saved alignment v2 / scrub / Field source / comparison の任意 tick 比較経路、TRACKER-059 の FastForward tick 非間引き、TRACKER-060 の30fps相当 realtime Play は維持した。focused `DiagnosticsPlaybackStateTests` 23 passed、関連 validation 51 passed、`git diff --check` pass。初回 review N1 は follow-up で解消し、gpt-5.5 high r2 review は `reports/tracker-061-review-r2-20260513210407.md` に記録済みで findings なし。 |
 | TRACKER-062 | diagnostics playback UI を従来ボタン配置に戻し、速度選択に等倍速を追加する | comparison-logging | done | TRACKER-061 | Play / Fast Forward / Stop のボタン配置を従来どおりに戻し、速度選択側に compact tabs として `等倍速`、`4x`、`16x`、`64x` を表示する。`等倍速` 選択時は Play が 30fps相当 realtime stepping、各倍率選択時は FastForward が該当 multiplier で開始する。FastForward 中に `等倍速` tab を選んだ場合は Play へ、Play 中に fast tab を選んだ場合は FastForward へ切り替え、表示と実 playback mode を一致させる。TRACKER-059 の FastForward tick 非間引き、TRACKER-060 の realtime Play、saved alignment v2 / scrub / Field source / comparison の任意 tick 比較経路は維持した。focused `DiagnosticsPlaybackStateTests` 27 passed、関連 validation 56 passed、`git diff --check` pass。初回 review B1 は follow-up で解消し、gpt-5.5 high r2 review は `reports/tracker-062-review-r2-20260513215222.md` に記録済みで findings なし。 |
-| TRACKER-063 | playback start の速度選択維持と可変早送り倍率を追加する | comparison-logging | in_progress | TRACKER-062 | fast speed 選択中に再生ボタンを押しても selected speed が `等倍速` へ戻らず、selected speed と実 playback mode / multiplier が一致する。固定 `4x` / `16x` / `64x` だけに依存せず、64x 超を含む可変早送り倍率を UI / state contract で扱える。64x 超の倍率が timer interval / state normalization で無効化されず実効速度を上げられる。`等倍速` 選択中の再生は TRACKER-060 の realtime Play を維持し、TRACKER-059 の FastForward tick 非間引き、saved alignment v2 / scrub / Field source / comparison の任意 tick 比較経路を壊さない。設計は `reports/tracker-063-variable-playback-speed-design-20260513222344.md`、実装は `reports/tracker-063-variable-playback-speed-implementation-20260513223102.md` に記録済み。review は未実施。 |
+| TRACKER-063 | playback start の速度選択維持と可変早送り倍率を追加する | comparison-logging | done | TRACKER-062 | fast speed 選択中に再生ボタンを押しても selected speed が `等倍速` へ戻らず、selected speed と実 playback mode / multiplier が一致する。固定 `4x` / `16x` / `64x` だけに依存せず、64x 超を含む可変早送り倍率を UI / state contract で扱える。64x 超の倍率が timer interval / state normalization で無効化されず実効速度を上げられる。`等倍速` 選択中の再生は TRACKER-060 の realtime Play を維持し、TRACKER-059 の FastForward tick 非間引き、saved alignment v2 / scrub / Field source / comparison の任意 tick 比較経路を壊さない。focused `DiagnosticsPlaybackStateTests` 44 passed、関連 validation 73 passed、`git diff --check` pass。設計は `reports/tracker-063-variable-playback-speed-design-20260513222344.md`、実装は `reports/tracker-063-variable-playback-speed-implementation-20260513223102.md`、review は `reports/tracker-063-review-20260513224028.md` に記録済みで blocking findings なし。 |
