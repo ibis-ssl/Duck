@@ -120,6 +120,54 @@ public class TrackerConfigurationBindingTests
     }
 
     /// <summary>
+    /// 何を確認しているか: receive endpoint 未指定時は起動時に解決済みの ibis publish endpoint を監視すること。
+    /// </summary>
+    [Fact]
+    public void ReceiveEndpointResolver_UsesResolvedPublisherEndpointByDefault()
+    {
+        var receiveOptions = new TrackerReceiveOptions
+        {
+            InterfaceAddress = "192.0.2.10",
+        };
+        var publisherOptions = new TrackerPublisherOptions
+        {
+            MulticastAddress = "239.1.2.3",
+            Port = 13000,
+        };
+
+        var endpoint = TrackerReceiveEndpointResolver.Resolve(receiveOptions, publisherOptions);
+
+        Assert.Equal("239.1.2.3", endpoint.MulticastAddress);
+        Assert.Equal(13000, endpoint.Port);
+        Assert.Equal("192.0.2.10", endpoint.InterfaceAddress);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: Tracker:Receive に endpoint を明示した場合は receiver 独自 endpoint を監視すること。
+    /// </summary>
+    [Fact]
+    public void ReceiveEndpointResolver_UsesExplicitReceiveEndpointOverride()
+    {
+        var receiveOptions = new TrackerReceiveOptions
+        {
+            MulticastAddress = "239.9.8.7",
+            Port = 15000,
+            InterfaceAddress = "192.0.2.20",
+        };
+        var publisherOptions = new TrackerPublisherOptions
+        {
+            MulticastAddress = "239.1.2.3",
+            Port = 13000,
+        };
+
+        var endpoint = TrackerReceiveEndpointResolver.Resolve(receiveOptions, publisherOptions);
+
+        Assert.Equal("239.9.8.7", endpoint.MulticastAddress);
+        Assert.Equal(15000, endpoint.Port);
+        Assert.Equal("192.0.2.20", endpoint.InterfaceAddress);
+    }
+
+    /// <summary>
     /// 何を確認しているか: appsettings.json が Tigers 準拠の Tracker 既定 profile と解決値を公開していること。
     /// </summary>
     [Fact]
@@ -136,6 +184,10 @@ public class TrackerConfigurationBindingTests
 
         Assert.Equal("sim", trackerOptions.ActiveProfileName);
         Assert.Null(trackerOptions.Diagnostics.FilePath);
+        Assert.False(trackerOptions.Receive.Enabled);
+        Assert.Null(trackerOptions.Receive.MulticastAddress);
+        Assert.Null(trackerOptions.Receive.Port);
+        Assert.Null(trackerOptions.Receive.InterfaceAddress);
         AssertTigersAlignedProfile(trackerOptions.Profiles["default"], expectedPublishPort: 10010, expectedGate: 1.0d);
         AssertTigersAlignedProfile(trackerOptions.Profiles["sim"], expectedPublishPort: 11010, expectedGate: 1.0d);
         AssertTigersAlignedProfile(trackerOptions.Profiles["fast"], expectedPublishPort: 10011, expectedGate: 0.85d);

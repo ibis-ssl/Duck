@@ -3,6 +3,7 @@ using Tracker.Server.Components;
 using Tracker.Server.Tracking;
 using Tracker.Server.Vision;
 using Microsoft.Extensions.Options;
+using TrackerConnectionLib;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.Configure<VisionReceiverOptions>(builder.Configuration.GetSection("VisionReceiver"));
 builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection("Tracker"));
+var startupTrackerOptions = builder.Configuration.GetSection("Tracker").Get<TrackerOptions>() ?? new TrackerOptions();
 builder.Services.AddSingleton(serviceProvider =>
 {
     var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
@@ -42,11 +44,40 @@ builder.Services.AddSingleton<TrackerPacketGenerator>(serviceProvider =>
 builder.Services.AddSingleton<TrackerCoordinator>();
 builder.Services.AddSingleton<TrackerDiagnosticsLogReader>();
 builder.Services.AddSingleton<TrackerRenderSnapshotLogReader>();
+builder.Services.AddSingleton<TrackerDiagnosticsComparisonViewStateReader>();
 builder.Services.AddSingleton<TrackerProfileRequestService>();
 builder.Services.AddSingleton<VisionPacketStore>();
 builder.Services.AddSingleton<VisionPacketCaptureSession>();
 builder.Services.AddSingleton<VisionPacketCaptureWriter>();
 builder.Services.AddSingleton<TrackerRenderSnapshotCaptureWriter>();
+builder.Services.AddSingleton<TrackerPacketSnapshotLogWriter>();
+builder.Services.AddSingleton<TrackerSnapshotAlignmentLogWriter>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
+    return new MultiTrackerManager<TrackerPacketAdapter>(
+        publisherOptions.Uuid,
+        publisherOptions.SourceName);
+});
+if (startupTrackerOptions.Receive.Enabled)
+{
+    builder.Services.AddSingleton(serviceProvider =>
+    {
+        var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
+        var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
+        var receiveEndpoint = TrackerReceiveEndpointResolver.Resolve(
+            trackerOptions.Receive,
+            publisherOptions);
+        return new UdpTrackerReceiver<TrackerPacketAdapter>(
+            receiveEndpoint.Port,
+            receiveEndpoint.MulticastAddress,
+            new TrackerWrapperPacketDeserializer(),
+            receiveEndpoint.InterfaceAddress);
+    });
+    builder.Services.AddSingleton<TrackerConnectionLibSnapshotRecorder>();
+    builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();
+}
+
 builder.Services.AddHostedService<VisionReceiverService>();
 
 var app = builder.Build();

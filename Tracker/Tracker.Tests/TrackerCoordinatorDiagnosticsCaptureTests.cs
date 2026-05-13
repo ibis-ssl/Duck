@@ -53,14 +53,14 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
                 captureTimeSeconds: 1.000),
             receivedAt);
 
-        var logPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log"));
-        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json"));
-        var renderSnapshotPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.render-snapshots.jsonl.gz"));
+        var logPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log", SearchOption.AllDirectories));
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.metadata.json", SearchOption.AllDirectories));
+        var renderSnapshotPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.render-snapshots.jsonl.gz", SearchOption.AllDirectories));
         var logText = File.ReadAllText(logPath);
         var metadataText = File.ReadAllText(metadataPath);
 
         Assert.Contains("Tracker diagnostics profile=sim", logText);
-        Assert.Contains(logPath, metadataText);
+        Assert.Contains(Path.GetRelativePath(captureDirectory, logPath), metadataText);
         Assert.True(new FileInfo(renderSnapshotPath).Length > 0);
     }
 
@@ -105,7 +105,7 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
                 captureTimeSeconds: 1.100),
             receivedAt.AddSeconds(2));
 
-        var logPaths = Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log");
+        var logPaths = Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log", SearchOption.AllDirectories);
 
         Assert.Equal(2, logPaths.Length);
         Assert.All(logPaths, logPath => Assert.Contains("Tracker diagnostics profile=sim", File.ReadAllText(logPath)));
@@ -180,7 +180,7 @@ public class TrackerCoordinatorDiagnosticsCaptureTests : IClassFixture<TrackerCo
                 captureTimeSeconds: 1.000),
             receivedAt);
 
-        var sidecarLogPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log"));
+        var sidecarLogPath = Assert.Single(Directory.GetFiles(captureDirectory, "test-vision-*.tracker-diagnostics.log", SearchOption.AllDirectories));
         var sidecarLogText = File.ReadAllText(sidecarLogPath);
         var configuredLogText = File.ReadAllText(configuredLogPath);
 

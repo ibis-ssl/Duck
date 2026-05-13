@@ -30,7 +30,8 @@ public sealed partial class TrackerCoordinator
                     {
                         snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);
                         renderSnapshotCaptureWriter?.CaptureFrame(committedFrame, receivedAt);
-                        PublishFrame(committedFrame);
+                        trackerSnapshotAlignmentLogWriter?.CaptureRenderSnapshot(committedFrame, receivedAt);
+                        PublishFrame(committedFrame, receivedAt);
                         NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));
                     }
 
@@ -60,11 +61,18 @@ public sealed partial class TrackerCoordinator
         }
     }
 
-    private void PublishFrame(TrackerFrame frame)
+    private void PublishFrame(TrackerFrame frame, DateTimeOffset receivedAt)
     {
         try
         {
-            publisher.Publish(packetGenerator.Generate(frame));
+            var packet = packetGenerator.Generate(frame);
+            trackerPacketSnapshotLogWriter?.CapturePacket(
+                packet,
+                receivedAt,
+                remoteEndpoint: null,
+                sourceRole: "own",
+                sourceLabel: packet.SourceName);
+            publisher.Publish(packet);
             snapshotStore.RecordPublishSuccess();
         }
         catch (Exception ex)

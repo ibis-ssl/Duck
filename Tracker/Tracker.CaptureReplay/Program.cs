@@ -20,7 +20,8 @@ var summary = CaptureReplayRunner.Run(
     settings,
     options.DetailFilters,
     options.MaxDetails,
-    options.MaxDetailRobots);
+    options.MaxDetailRobots,
+    options.SettingsPath);
 
 Console.WriteLine($"capture={options.CapturePath}");
 Console.WriteLine($"settingsFile={options.SettingsPath ?? "(built-in defaults)"}");
@@ -35,6 +36,11 @@ Console.WriteLine(
 foreach (var frame in summary.DetailFrames)
 {
     Console.WriteLine(frame);
+}
+
+foreach (var trackerSnapshotLine in summary.TrackerSnapshotLines)
+{
+    Console.WriteLine(trackerSnapshotLine);
 }
 
 if (summary.OmittedDetailFrameCount > 0)

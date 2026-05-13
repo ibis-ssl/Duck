@@ -6,6 +6,7 @@
 @using Tracker.Server.Tracking
 @inject TrackerDiagnosticsLogReader LogReader
 @inject TrackerRenderSnapshotLogReader RenderSnapshotReader
+@inject TrackerDiagnosticsComparisonViewStateReader ComparisonReader
 
 <PageTitle>Diagnostics</PageTitle>
 
@@ -117,24 +118,198 @@
                         <div class="diagnostics-profile-alert">@profileMetadataError</div>
                     }
 
+                    <section class="diagnostics-comparison" aria-label="Tracker comparison">
+                        <header class="diagnostics-comparison__header">
+                            <h2>Tracker Comparison</h2>
+                            <button type="button"
+                                    class="diagnostics-comparison__toggle"
+                                    @onclick="ToggleComparisonPanelAsync"
+                                    aria-expanded="@(!(comparisonUiState?.IsComparisonPanelCollapsed ?? false))">
+                                @ComparisonPanelToggleLabel()
+                            </button>
+                        </header>
+
+                        @if (!(comparisonUiState?.IsComparisonPanelCollapsed ?? false))
+                        {
+                            <div class="diagnostics-comparison__controls">
+                                <select class="diagnostics-select diagnostics-comparison__select"
+                                        value="@ComparisonSourceFilterValue()"
+                                        @onchange="OnComparisonSourceFilterChanged"
+                                        aria-label="Comparison source filter">
+                                    @foreach (var option in ComparisonViewState.SourceOptions)
+                                    {
+                                        <option value="@TrackerDiagnosticsComparisonUiState.ToFilterValue(option.Filter)">
+                                            @option.Label (@option.RecordCount)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <dl class="diagnostics-comparison__stats">
+                                <dt>Status</dt>
+                                <dd>@ComparisonViewState.SidecarStatus</dd>
+                                <dt>Records</dt>
+                                <dd>@ComparisonViewState.RecordCount</dd>
+                                <dt>Skipped</dt>
+                                <dd>@ComparisonViewState.SkippedRecordCount</dd>
+                                <dt>Errors</dt>
+                                <dd>@ComparisonViewState.ErrorCount</dd>
+                                <dt>Selected frame</dt>
+                                <dd>@Display(selectedEntry.TrackedFrame)</dd>
+                                <dt>Selected time</dt>
+                                <dd>@selectedEntry.Timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)</dd>
+                            </dl>
+
+                            @if (!string.IsNullOrEmpty(ComparisonViewState.Error))
+                            {
+                                <div class="diagnostics-comparison__alert">@ComparisonViewState.Error</div>
+                            }
+
+                            @if (ComparisonViewState.SelectedEntryComparison is { } comparison)
+                            {
+                                <dl class="diagnostics-comparison__stats diagnostics-comparison__stats--comparison">
+                                    <dt>Entry status</dt>
+                                    <dd>@comparison.Status</dd>
+                                    <dt>Line</dt>
+                                    <dd>@Display(comparison.EntryLineNumber)</dd>
+                                    <dt>Rule</dt>
+                                    <dd>@Display(comparison.MatchingRule)</dd>
+                                    <dt>Source role</dt>
+                                    <dd>@Display(comparison.NearestSnapshotSourceRole)</dd>
+                                    <dt>Source label</dt>
+                                    <dd>@Display(comparison.NearestSnapshotSourceLabel)</dd>
+                                    <dt>Snapshot frame</dt>
+                                    <dd>@Display(comparison.NearestSnapshotTrackedFrameNumber)</dd>
+                                    <dt>Own timestamp ns</dt>
+                                    <dd>@Display(comparison.IbisOwnSnapshotTimestampNs)</dd>
+                                    <dt>Nearest timestamp ns</dt>
+                                    <dd>@Display(comparison.NearestSnapshotTimestampNs)</dd>
+                                    <dt>Delta ns</dt>
+                                    <dd>@Display(comparison.TimestampDeltaNs)</dd>
+                                    <dt>Balls</dt>
+                                    <dd>@Display(comparison.BallCount)</dd>
+                                    <dt>Robots</dt>
+                                    <dd>@Display(comparison.RobotCount)</dd>
+                                    <dt>Raw payload</dt>
+                                    <dd>@DisplayRawPayloadRestored(comparison.RawPayloadRestored)</dd>
+                                </dl>
+                            }
+                        }
+                    </section>
+
                     @if (selectedRenderSnapshot is not null)
                     {
-                        <div class="diagnostics-render">
-                            <section>
-                                <h2>Vision Input Field</h2>
-                                <VisionFieldCanvas Geometry="DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot)"
-                                                   Balls="DiagnosticsFieldViewFactory.CreateRawBalls(selectedRenderSnapshot.Frame)"
-                                                   RobotsYellow="DiagnosticsFieldViewFactory.CreateRawYellowRobots(selectedRenderSnapshot.Frame)"
-                                                   RobotsBlue="DiagnosticsFieldViewFactory.CreateRawBlueRobots(selectedRenderSnapshot.Frame)" />
-                            </section>
-                            <section>
-                                <h2>Tracker Output Field</h2>
-                                <VisionFieldCanvas Geometry="trackedRenderView.Geometry"
-                                                   Balls="trackedRenderView.Balls"
-                                                   RobotsYellow="trackedRenderView.RobotsYellow"
-                                                   RobotsBlue="trackedRenderView.RobotsBlue" />
-                            </section>
+                        var leftField = LeftFieldRenderModel();
+                        var rightField = RightFieldRenderModel();
+                        var isOverlayMode = comparisonUiState?.FieldDisplayMode == TrackerDiagnosticsFieldDisplayMode.Overlay;
+                        <div class="diagnostics-field-display">
+                            <div class="diagnostics-field-display__mode">
+                                <span>Field view</span>
+                                <select class="diagnostics-select diagnostics-field-mode__select"
+                                        value="@FieldDisplayModeValue()"
+                                        @onchange="OnFieldDisplayModeChanged"
+                                        aria-label="Field display mode">
+                                    <option value="@TrackerDiagnosticsFieldDisplayMode.Split">Split</option>
+                                    <option value="@TrackerDiagnosticsFieldDisplayMode.Overlay">Overlay</option>
+                                </select>
+                            </div>
                         </div>
+                        @if (isOverlayMode)
+                        {
+                            var overlayField = OverlayFieldRenderModel();
+                            <div class="diagnostics-render diagnostics-render--overlay">
+                                <section>
+                                    <header class="diagnostics-render__header diagnostics-render__header--overlay">
+                                        <h2>Overlay Field</h2>
+                                        <div class="diagnostics-field-source__overlay-selectors">
+                                            <label>
+                                                <span>Layer A</span>
+                                                <select class="diagnostics-select diagnostics-field-source__select"
+                                                        value="@LeftFieldSourceValue()"
+                                                        @onchange="OnLeftFieldSourceChanged"
+                                                        aria-label="Layer A Field source">
+                                                    @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                                    {
+                                                        <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                            @option.Label
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </label>
+                                            <label>
+                                                <span>Layer B</span>
+                                                <select class="diagnostics-select diagnostics-field-source__select"
+                                                        value="@RightFieldSourceValue()"
+                                                        @onchange="OnRightFieldSourceChanged"
+                                                        aria-label="Layer B Field source">
+                                                    @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                                    {
+                                                        <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                            @option.Label
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </header>
+                                    <DiagnosticsFieldOverlayCanvas Model="overlayField"
+                                                                   VisibilityChanged="OnOverlayLayerVisibilityChanged" />
+                                </section>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="diagnostics-render">
+                                <section>
+                                    <header class="diagnostics-render__header">
+                                        <h2>@leftField.Title Field</h2>
+                                        <select class="diagnostics-select diagnostics-field-source__select"
+                                                value="@LeftFieldSourceValue()"
+                                                @onchange="OnLeftFieldSourceChanged"
+                                                aria-label="Left Field source">
+                                            @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                            {
+                                                <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                    @option.Label
+                                                </option>
+                                            }
+                                        </select>
+                                    </header>
+                                    @if (!string.IsNullOrEmpty(leftField.Status))
+                                    {
+                                        <div class="diagnostics-field-source__status">@leftField.Status</div>
+                                    }
+                                    <VisionFieldCanvas Geometry="leftField.Geometry"
+                                                       Balls="leftField.Balls"
+                                                       RobotsYellow="leftField.RobotsYellow"
+                                                       RobotsBlue="leftField.RobotsBlue" />
+                                </section>
+                                <section>
+                                    <header class="diagnostics-render__header">
+                                        <h2>@rightField.Title Field</h2>
+                                        <select class="diagnostics-select diagnostics-field-source__select"
+                                                value="@RightFieldSourceValue()"
+                                                @onchange="OnRightFieldSourceChanged"
+                                                aria-label="Right Field source">
+                                            @foreach (var option in ComparisonViewState.FieldSourceOptions)
+                                            {
+                                                <option value="@TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(option.Source)">
+                                                    @option.Label
+                                                </option>
+                                            }
+                                        </select>
+                                    </header>
+                                    @if (!string.IsNullOrEmpty(rightField.Status))
+                                    {
+                                        <div class="diagnostics-field-source__status">@rightField.Status</div>
+                                    }
+                                    <VisionFieldCanvas Geometry="rightField.Geometry"
+                                                       Balls="rightField.Balls"
+                                                       RobotsYellow="rightField.RobotsYellow"
+                                                       RobotsBlue="rightField.RobotsBlue" />
+                                </section>
+                            </div>
+                        }
                         <div class="@RenderResizeHandleClass()"
                              role="separator"
                              aria-orientation="horizontal"
@@ -193,61 +368,85 @@
         {
             <div class="diagnostics-scrubber">
                 <div class="diagnostics-scrubber__playback" aria-label="Diagnostics playback controls">
-                    @if (playbackMode == DiagnosticsPlaybackMode.Play)
-                    {
-                        <button type="button"
-                                class="diagnostics-playback__button is-active"
-                                title="Stop"
-                                aria-label="Stop"
-                                @onclick="StopPlayback">
-                            <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button"
-                                class="diagnostics-playback__button"
-                                disabled="@(!CanPlayback)"
-                                title="Play"
-                                aria-label="Play"
-                                @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.Play))">
-                            <span class="diagnostics-playback__icon diagnostics-playback__icon--play" aria-hidden="true"></span>
-                        </button>
-                    }
-                    @if (playbackMode == DiagnosticsPlaybackMode.FastForward)
-                    {
-                        <button type="button"
-                                class="diagnostics-playback__button is-active"
-                                title="Stop"
-                                aria-label="Stop"
-                                @onclick="StopPlayback">
-                            <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="button"
-                                class="diagnostics-playback__button"
-                                disabled="@(!CanPlayback)"
-                                title="Fast forward"
-                                aria-label="Fast forward"
-                                @onclick="@(() => StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward))">
-                            <span class="diagnostics-playback__icon diagnostics-playback__icon--fast-forward" aria-hidden="true"></span>
-                        </button>
-                    }
+                    <div class="diagnostics-playback__transport">
+                        @if (playbackMode == DiagnosticsPlaybackMode.Play)
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button is-active"
+                                    title="Stop"
+                                    aria-label="Stop"
+                                    @onclick="StopPlayback">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button"
+                                    disabled="@(!CanPlayback)"
+                                    title="Play"
+                                    aria-label="Play"
+                                    @onclick="StartSelectedPlaybackAsync">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--play" aria-hidden="true"></span>
+                            </button>
+                        }
+                        @if (playbackMode == DiagnosticsPlaybackMode.FastForward)
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button is-active"
+                                    title="Stop"
+                                    aria-label="Stop"
+                                    @onclick="StopPlayback">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--stop" aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="diagnostics-playback__button"
+                                    disabled="@(!CanPlayback)"
+                                    title="Fast forward"
+                                    aria-label="Fast forward"
+                                    @onclick="StartFastForwardPlaybackAsync">
+                                <span class="diagnostics-playback__icon diagnostics-playback__icon--fast-forward" aria-hidden="true"></span>
+                            </button>
+                        }
+                    </div>
+                    <div class="diagnostics-playback-tabs" role="tablist" aria-label="Playback speed">
+                        @foreach (var choice in DiagnosticsPlaybackState.PlaybackSpeedChoices)
+                        {
+                            <button type="button"
+                                    class="@PlaybackSpeedChoiceButtonClass(choice)"
+                                    role="tab"
+                                    aria-selected="@IsSelectedPlaybackSpeedChoice(choice)"
+                                    @onclick="@(() => OnPlaybackSpeedChoiceClicked(choice))">
+                                @choice.Label
+                            </button>
+                        }
+                    </div>
+                    <label class="diagnostics-playback-multiplier">
+                        <span>早送り倍率</span>
+                        <input type="number"
+                               min="@DiagnosticsPlaybackState.MinFastForwardSpeedMultiplier"
+                               max="@DiagnosticsPlaybackState.MaxFastForwardSpeedMultiplier"
+                               step="1"
+                               value="@fastForwardSpeedMultiplier"
+                               @onchange="OnFastForwardMultiplierChanged"
+                               aria-label="早送り倍率" />
+                    </label>
                 </div>
                 <input type="range"
                        class="diagnostics-scrubber__range"
                        min="0"
-                       max="@MaxEntryIndex"
-                       value="@SelectedEntryIndex"
+                       max="@MaxReplayTimelineIndex"
+                       value="@SelectedReplayTimelineIndex"
                        @oninput="OnTimelineScrubbed"
                        @onwheel="OnTimelineWheel"
                        @onwheel:preventDefault="true"
                        aria-label="Diagnostics timeline scrubber" />
                 <div class="diagnostics-scrubber__meta">
-                    <span>@(SelectedEntryIndex + 1) / @entries.Count</span>
-                    <span>@(selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp))</span>
+                    <span>@(SelectedReplayTimelineIndex + 1) / @ReplayTimelineCount</span>
+                    <span>@(selectedReplayTimelineTick is null ? selectedEntry is null ? "-" : FormatTime(selectedEntry.Timestamp) : FormatTime(selectedReplayTimelineTick.ReceivedAt))</span>
                 </div>
             </div>
         }

@@ -109,6 +109,49 @@ v1 の外部配信は official tracker proto に限定する。
 - `CAPABILITY_DETECT_FLYING_BALLS`
 - `CAPABILITY_DETECT_MULTIPLE_BALLS`
 
+### tracker packet snapshot 比較ログ
+
+CaptureOn 中に同じ official tracker multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の official packet、3rdparty tracker packet を再生・比較できるように別系統で保存する。
+
+Server / CLI / UI 側の詳細な機能仕様は `tracker-server-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
+
+責務境界は次の通り。
+
+- `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
+- `Tracker.Server` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
+- `Tracker.Core` には official tracker packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis tracker の内部状態生成と official packet 生成だけを担当する。
+
+snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。
+
+session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。新規 capture では `tracker-snapshot-alignment.jsonl` も metadata から辿れるようにし、alignment が未作成、record 0 件、破損している状態を tracker packet snapshot sidecar の成否とは別に表現する。
+
+sidecar JSONL の各 record は少なくとも次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできるようにする。
+
+- `receivedAt`
+- remote endpoint
+- `uuid`
+- `sourceName`
+- source role / label / metadata
+- tracked frame number
+- tracked frame timestamp
+- raw payload、または session folder 内で raw payload を復元できる参照情報
+- raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary など、後から比較・一覧表示するための summary
+- decode / schema error がある場合の skipped/error 情報
+
+ibis tracker の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 tracker と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active tracker API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
+
+ibis committed frame と tracker packet snapshot は publish frequency が一致しない前提で扱う。さらに、3rdparty tracker の `TrackedFrame.timestamp` は ibis own と同じ時刻系とは限らない。新規 capture の replay / diagnostics / Field source 表示では、CaptureOn 保存時に diagnostics entry / render snapshot / tracker source snapshot を session-relative `receivedAt` と diagnostics entry time で対応付けた alignment sidecar を優先する。legacy capture で alignment がない場合だけ、exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を best-effort として明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint / role、alignment status は後から確認できるように保存または表示する。
+
+diagnostics replay timeline は capture-time `ReceivedAt` を軸にし、diagnostics entry / render snapshot / tracker packet snapshot の union、または同等に fastest available source cadence を含む index とする。`TrackedFrame.timestamp` は source 間で時刻系が違う場合があるため、timeline ordering には使わない。Vision / render snapshot より tracker source が高速な場合は、fast tracker tick ごとに tracker snapshot を進め、Vision / render は latest-before frame を保持する。先頭で prior render snapshot がない場合だけ nearest-after fallback を許容する。
+
+等倍速 `Play` は replay timeline の全 tick を逐次描画する契約ではない。Play 開始時の wall-clock と selected replay timeline tick の `ReceivedAt` を基準に target capture-time を計算し、30fps相当の表示更新ごとに `ReceivedAt <= target` の latest tick へ追従する。高頻度 tracker tick は alignment / comparison data として保持し、表示だけが中間 tick をスキップしうる。scrub、Field source、comparison、CLI comparison は selected replay timeline tick を任意に選べる経路として維持し、Play の表示スキップで保存済み alignment v2 や比較精度を落とさない。diagnostics playback UI は Play / Fast Forward / Stop の従来 transport button 配置を維持し、速度選択側の compact tabs に `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は Play、各倍率は調査用 Fast Forward として Play 専用 realtime stepping から分離し、数値の等倍ラベルは使わない。
+
+alignment sidecar は `tracker-packet-snapshots.jsonl` へ埋め込まず、別 file とする。snapshot sidecar は受信 packet の主記録、alignment sidecar は diagnostics replay 用 index として分けることで、alignment 欠落や破損を既存 snapshot 保存の破損と区別できる。source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` を基本にし、同じ label / uuid が複数 endpoint に分かれる場合の UI aggregate は session-relative `receivedAt` に最も近い代表 snapshot を deterministic tie-break で選ぶ。
+
+`tracker-snapshot-alignment.jsonl` は diagnostics line ごとの対応表ではなく、schema version 2 の replay timeline records として扱う。新規 capture では fast tracker sample 分の alignment records も保存し、同じ Vision / render frame を複数 fast tracker records から参照できるようにする。低速 Vision / render tick でも、その時点の latest/current tracker snapshot と対応する record を残す。別 sidecar は作らず、互換 fallback も持たない。性能第一のため、reader は v2 JSONL から replay timeline index、render latest-before index、tracker source index を log open 時に一度だけ構築し、tick / scrub では既存 diagnostics-line-driven reader へ戻らない。
+
+Capture Off 中は snapshot sidecar へ追記しない。Capture Off / 再On では新しい capture session folder と新しい snapshot sidecar に切り替え、前 session folder へ追記しない。他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の内容上の挙動を変えず、metadata には snapshot log が未作成または record 0 件であることを表現できるようにする。
+
 ### 内部出力
 
 official proto だけでは AutoRef に必要な情報が不足するため、`Tracker.Core` はより豊かな内部 frame を持つ。
@@ -468,6 +511,8 @@ geometry 更新規則:
 7. publisher が UDP multicast へ送信する
 8. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
 
+CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline とは別に `Tracker.Server` が `TrackerConnectionLib` 経由で official tracker packet を傍受する。傍受した `TrackerWrapperPacket` は self 除外せず、見えている tracker packet をすべて CaptureOn session folder 配下の tracker packet snapshot sidecar JSONL へ保存する。ibis 自身か 3rdparty かの判別は保存後の source role / label / metadata として扱い、判別できない場合も保存を落とさない。`Tracker.Core` の入力や状態更新には流さない。
+
 ## 設定
 
 `Tracker.Server` 側に `Tracker` section を追加する前提とする。
@@ -512,9 +557,13 @@ geometry 更新規則:
 
 packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
 
-packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。
+packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。CaptureOn 比較ログでは、同一 session folder 配下にある packet capture、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の relative path、source identity 一覧、role / label、alignment status、timestamp 対応規則も metadata に保存する。
 
 `Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。detail filter は `frame` でも絞り込めるようにし、robot detail には位置だけでなく `orientation / angular velocity` も出して、raw detection と tracked 出力の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.Server/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
+
+CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot sidecar と alignment sidecar を metadata から読み、3rdparty tracker snapshot を保存時対応付けで ibis committed frame と並べて再生・比較できるようにする。alignment がない既存 capture では timestamp 近傍規則を best-effort として明示する。この CLI 比較経路は agent / 自動検証 / 調査用に保持し、diagnostics UI 実装後も削除しない。
+
+diagnostics viewer と playback も同じ snapshot log / alignment log と reader contract を使い、source identity / role / label ごとの timeline、frame number / timestamp、alignment delta、ball / robot count、raw payload 復元状態を画面上で確認できるようにする。新規 capture の `/diagnostics` は選択中 replay timeline tick と対応する saved alignment record を基準とし、source filter 後の 3rdparty tracker snapshot を session-relative `receivedAt` 対応で並べる。metadata / sidecar / alignment がない、record count 0、読み取り error がある場合は状態表示に留め、既存 diagnostics log、render snapshot、settings 表示を壊さない。等倍速 Play の表示更新は30fps相当に抑えて wall-clock 経過時間へ追従するが、scrub / Field source / comparison は任意 replay tick を選択できる比較経路として保持する。playback UI は Play / Fast Forward / Stop の従来 button 配置を使い、速度選択 tabs の `等倍速` は Play、`4x` / `16x` / `64x` は調査用 Fast Forward に対応させる。Fast Forward は tick 非間引きのまま capture-time delta と倍率で進める。
 
 raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
 

@@ -17,20 +17,20 @@
 <g class="@ClassName">
     <path class="vision-robot__body"
           fill="@teamFill"
-          stroke="@VisionPalette.MarkerStroke"
+          stroke="@MarkerStroke"
           d="M @N(bodyStart.X) @N(bodyStart.Y) A @N(radius) @N(radius) 0 @largeArc 0 @N(bodyEnd.X) @N(bodyEnd.Y) Z" />
     <line class="vision-robot__front"
-          stroke="@VisionPalette.MarkerStroke"
+          stroke="@MarkerStroke"
           x1="@N(bodyStart.X)"
           y1="@N(bodyStart.Y)"
           x2="@N(bodyEnd.X)"
           y2="@N(bodyEnd.Y)" />
     <circle class="vision-robot__nose"
-            fill="@VisionPalette.MarkerStroke"
+            fill="@MarkerStroke"
             cx="@N(frontCenter.X)"
             cy="@N(frontCenter.Y)"
             r="@N(RenderOptions.RobotNoseRadius)" />
-    <text class="vision-robot__label" fill="@VisionPalette.MarkerStroke" x="@N(center.X)" y="@N(center.Y + RenderOptions.RobotLabelYOffset)">
+    <text class="vision-robot__label" fill="@MarkerStroke" x="@N(center.X)" y="@N(center.Y + RenderOptions.RobotLabelYOffset)">
         @Robot.RobotId.ToString(CultureInfo.InvariantCulture)
     </text>
 </g>
@@ -47,6 +47,9 @@
 
     [Parameter]
     public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
+
+    [Parameter]
+    public string MarkerStroke { get; set; } = VisionPalette.MarkerStroke;
 
     private static string N(double value)
     {

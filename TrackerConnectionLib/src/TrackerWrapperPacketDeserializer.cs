@@ -11,7 +11,7 @@ public sealed class TrackerWrapperPacketDeserializer
         {
             var raw = TrackerWrapperPacket.Parser.ParseFrom(data);
             packet = new TrackerPacketAdapter(raw);
-            return !string.IsNullOrWhiteSpace(packet.Uuid);
+            return true;
         }
         catch
         {

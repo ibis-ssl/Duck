@@ -1,4 +1,5 @@
 using Tracker.Core;
+using Tracker.Server.Tracking;
 
 namespace Tracker.Server.Components.Pages;
 
@@ -66,6 +67,41 @@ internal static class DiagnosticsFieldViewFactory
             .ToArray();
     }
 
+    /// <summary>
+    /// tracker packet semantic summary の ball を Field 表示用 DTO に変換する。
+    /// </summary>
+    public static IReadOnlyList<SSL_DetectionBall> CreateTrackerSourceBalls(
+        TrackerPacketSnapshotSemanticSummary? summary)
+    {
+        return summary?.Balls
+            .Select(ball => new SSL_DetectionBall
+            {
+                Confidence = ball.Visibility,
+                X = (float)ball.XMm,
+                Y = (float)ball.YMm,
+                Z = (float)ball.ZMm,
+            })
+            .ToArray() ?? [];
+    }
+
+    /// <summary>
+    /// tracker packet semantic summary の yellow robot を Field 表示用 DTO に変換する。
+    /// </summary>
+    public static IReadOnlyList<SSL_DetectionRobot> CreateTrackerSourceYellowRobots(
+        TrackerPacketSnapshotSemanticSummary? summary)
+    {
+        return CreateTrackerSourceRobots(summary, "Yellow");
+    }
+
+    /// <summary>
+    /// tracker packet semantic summary の blue robot を Field 表示用 DTO に変換する。
+    /// </summary>
+    public static IReadOnlyList<SSL_DetectionRobot> CreateTrackerSourceBlueRobots(
+        TrackerPacketSnapshotSemanticSummary? summary)
+    {
+        return CreateTrackerSourceRobots(summary, "Blue");
+    }
+
     private static SSL_FieldLineSegment CreateFieldLine(TrackerGeometryLineSegment line)
     {
         return new SSL_FieldLineSegment
@@ -76,6 +112,23 @@ internal static class DiagnosticsFieldViewFactory
             Thickness = (float)line.ThicknessMm,
             Type = line.Type,
         };
+    }
+
+    private static IReadOnlyList<SSL_DetectionRobot> CreateTrackerSourceRobots(
+        TrackerPacketSnapshotSemanticSummary? summary,
+        string team)
+    {
+        return summary?.Robots
+            .Where(robot => string.Equals(robot.Team, team, StringComparison.OrdinalIgnoreCase))
+            .Select(robot => new SSL_DetectionRobot
+            {
+                Confidence = robot.Visibility,
+                RobotId = robot.RobotId,
+                X = (float)robot.XMm,
+                Y = (float)robot.YMm,
+                Orientation = robot.OrientationRad,
+            })
+            .ToArray() ?? [];
     }
 
     private static SSL_FieldCircularArc CreateFieldArc(TrackerGeometryCircularArc arc)

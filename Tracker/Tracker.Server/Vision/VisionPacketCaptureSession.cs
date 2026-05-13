@@ -18,6 +18,15 @@ public sealed class VisionPacketCaptureSession
     private readonly TrackerResolvedOptions resolvedTrackerOptions;
     private readonly ILogger<VisionPacketCaptureSession> logger;
     private VisionPacketCaptureSessionState? state;
+    private TrackerPacketSnapshotLogMetadataSnapshot trackerSnapshotLogMetadata = new(
+        RecordCount: 0,
+        SkippedRecordCount: 0,
+        ErrorCount: 0,
+        Sources: []);
+    private TrackerSnapshotAlignmentLogMetadataSnapshot trackerSnapshotAlignmentLogMetadata = new(
+        RecordCount: 0,
+        SkippedRecordCount: 0,
+        ErrorCount: 0);
     private bool metadataWriteFailed;
 
     public VisionPacketCaptureSession(
@@ -68,12 +77,45 @@ public sealed class VisionPacketCaptureSession
             var paths = VisionPacketCaptureFile.BuildCapturePaths(options, startedAt);
             state = new VisionPacketCaptureSessionState(
                 startedAt.ToUniversalTime(),
+                paths.SessionFolder,
                 paths.PacketPath,
                 paths.MetadataPath,
                 paths.DiagnosticsLogPath,
-                paths.RenderSnapshotPath);
+                paths.RenderSnapshotPath,
+                paths.TrackerSnapshotSidecarPath,
+                paths.TrackerSnapshotAlignmentSidecarPath);
             WriteMetadata(state);
             return state;
+        }
+    }
+
+    /// <summary>
+    /// tracker packet snapshot sidecar の record 件数、skipped/error 件数、source 集計を metadata へ反映する。
+    /// </summary>
+    public void UpdateTrackerSnapshotLogMetadata(TrackerPacketSnapshotLogMetadataSnapshot metadata)
+    {
+        lock (gate)
+        {
+            trackerSnapshotLogMetadata = metadata;
+            if (state is not null)
+            {
+                WriteMetadata(state);
+            }
+        }
+    }
+
+    /// <summary>
+    /// tracker snapshot alignment sidecar の record 件数、skipped/error 件数を metadata へ反映する。
+    /// </summary>
+    public void UpdateTrackerSnapshotAlignmentLogMetadata(TrackerSnapshotAlignmentLogMetadataSnapshot metadata)
+    {
+        lock (gate)
+        {
+            trackerSnapshotAlignmentLogMetadata = metadata;
+            if (state is not null)
+            {
+                WriteMetadata(state);
+            }
         }
     }
 
@@ -82,6 +124,15 @@ public sealed class VisionPacketCaptureSession
         lock (gate)
         {
             state = null;
+            trackerSnapshotLogMetadata = new TrackerPacketSnapshotLogMetadataSnapshot(
+                RecordCount: 0,
+                SkippedRecordCount: 0,
+                ErrorCount: 0,
+                Sources: []);
+            trackerSnapshotAlignmentLogMetadata = new TrackerSnapshotAlignmentLogMetadataSnapshot(
+                RecordCount: 0,
+                SkippedRecordCount: 0,
+                ErrorCount: 0);
             metadataWriteFailed = false;
         }
     }
@@ -105,10 +156,41 @@ public sealed class VisionPacketCaptureSession
             {
                 SchemaVersion = 1,
                 StartedAt = sessionState.StartedAt,
-                PacketPath = sessionState.PacketPath,
-                MetadataPath = sessionState.MetadataPath,
-                DiagnosticsLogPath = sessionState.DiagnosticsLogPath,
-                RenderSnapshotPath = sessionState.RenderSnapshotPath,
+                SessionFolder = sessionState.SessionFolder,
+                PacketPath = ToCaptureDirectoryRelativePath(sessionState.PacketPath),
+                MetadataPath = ToCaptureDirectoryRelativePath(sessionState.MetadataPath),
+                DiagnosticsLogPath = ToCaptureDirectoryRelativePath(sessionState.DiagnosticsLogPath),
+                RenderSnapshotPath = ToCaptureDirectoryRelativePath(sessionState.RenderSnapshotPath),
+                TrackerSnapshotSidecarPath = ToCaptureDirectoryRelativePath(sessionState.TrackerSnapshotSidecarPath),
+                TrackerSnapshotAlignmentPath = ToCaptureDirectoryRelativePath(sessionState.TrackerSnapshotAlignmentSidecarPath),
+                TrackerSnapshotLog = new VisionPacketCaptureTrackerSnapshotLogMetadata
+                {
+                    Format = "jsonl",
+                    IsCreated = File.Exists(sessionState.TrackerSnapshotSidecarPath),
+                    RecordCount = trackerSnapshotLogMetadata.RecordCount,
+                    SkippedRecordCount = trackerSnapshotLogMetadata.SkippedRecordCount,
+                    ErrorCount = trackerSnapshotLogMetadata.ErrorCount,
+                },
+                TrackerSnapshotAlignmentLog = new VisionPacketCaptureTrackerSnapshotLogMetadata
+                {
+                    Format = "jsonl",
+                    IsCreated = File.Exists(sessionState.TrackerSnapshotAlignmentSidecarPath),
+                    RecordCount = trackerSnapshotAlignmentLogMetadata.RecordCount,
+                    SkippedRecordCount = trackerSnapshotAlignmentLogMetadata.SkippedRecordCount,
+                    ErrorCount = trackerSnapshotAlignmentLogMetadata.ErrorCount,
+                },
+                TrackerSnapshotSources = trackerSnapshotLogMetadata.Sources
+                    .Select(source => new VisionPacketCaptureTrackerSnapshotSourceMetadata
+                    {
+                        SourceUuid = source.SourceUuid,
+                        SourceName = source.SourceName,
+                        SourceRole = source.SourceRole,
+                        SourceLabel = source.SourceLabel,
+                        RemoteEndpoint = source.RemoteEndpoint,
+                        RecordCount = source.RecordCount,
+                        LastReceivedAt = source.LastReceivedAt,
+                    })
+                    .ToArray(),
                 TrackerOptions = trackerOptions,
                 ResolvedTrackerOptions = resolvedTrackerOptions,
             };
@@ -123,11 +205,18 @@ public sealed class VisionPacketCaptureSession
         }
     }
 
+    private string ToCaptureDirectoryRelativePath(string path)
+    {
+        return Path.GetRelativePath(DirectoryPath, path);
+    }
+
     private sealed class VisionPacketCaptureMetadata
     {
         public int SchemaVersion { get; init; }
 
         public DateTimeOffset StartedAt { get; init; }
+
+        public string SessionFolder { get; init; } = "";
 
         public string PacketPath { get; init; } = "";
 
@@ -137,15 +226,58 @@ public sealed class VisionPacketCaptureSession
 
         public string RenderSnapshotPath { get; init; } = "";
 
+        public string TrackerSnapshotSidecarPath { get; init; } = "";
+
+        public string TrackerSnapshotAlignmentPath { get; init; } = "";
+
+        public VisionPacketCaptureTrackerSnapshotLogMetadata TrackerSnapshotLog { get; init; } = new();
+
+        public VisionPacketCaptureTrackerSnapshotLogMetadata TrackerSnapshotAlignmentLog { get; init; } = new();
+
+        public IReadOnlyList<VisionPacketCaptureTrackerSnapshotSourceMetadata> TrackerSnapshotSources { get; init; } = [];
+
         public TrackerOptions TrackerOptions { get; init; } = new();
 
         public TrackerResolvedOptions ResolvedTrackerOptions { get; init; } = new();
+    }
+
+    private sealed class VisionPacketCaptureTrackerSnapshotLogMetadata
+    {
+        public string Format { get; init; } = "jsonl";
+
+        public bool IsCreated { get; init; }
+
+        public int RecordCount { get; init; }
+
+        public int SkippedRecordCount { get; init; }
+
+        public int ErrorCount { get; init; }
+    }
+
+    private sealed class VisionPacketCaptureTrackerSnapshotSourceMetadata
+    {
+        public string SourceUuid { get; init; } = "";
+
+        public string SourceName { get; init; } = "";
+
+        public string SourceRole { get; init; } = "";
+
+        public string SourceLabel { get; init; } = "";
+
+        public string RemoteEndpoint { get; init; } = "";
+
+        public int RecordCount { get; init; }
+
+        public DateTimeOffset LastReceivedAt { get; init; }
     }
 }
 
 public sealed record VisionPacketCaptureSessionState(
     DateTimeOffset StartedAt,
+    string SessionFolder,
     string PacketPath,
     string MetadataPath,
     string DiagnosticsLogPath,
-    string RenderSnapshotPath);
+    string RenderSnapshotPath,
+    string TrackerSnapshotSidecarPath,
+    string TrackerSnapshotAlignmentSidecarPath);

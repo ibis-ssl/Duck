@@ -5,7 +5,7 @@
     var point = Projection.Project(Ball.X, Ball.Y);
 }
 
-<circle class="vision-ball-marker" cx="@N(point.X)" cy="@N(point.Y)" r="7" />
+<circle class="vision-ball-marker" style="@Style" cx="@N(point.X)" cy="@N(point.Y)" r="7" />
 
 @code {
     [Parameter, EditorRequired]
@@ -13,6 +13,9 @@
 
     [Parameter, EditorRequired]
     public SSL_DetectionBall Ball { get; set; } = default!;
+
+    [Parameter]
+    public string? Style { get; set; }
 
     private static string N(double value)
     {

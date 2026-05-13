@@ -178,7 +178,7 @@ public sealed class TrackerDiagnosticsLogReader
             return;
         }
 
-        foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern))
+        foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
         {
             files[path] = new FileInfo(path);
         }

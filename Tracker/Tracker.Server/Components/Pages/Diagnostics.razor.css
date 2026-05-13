@@ -79,6 +79,13 @@
 .diagnostics-scrubber__playback {
     display: inline-flex;
     align-items: center;
+    gap: 0.35rem;
+}
+
+.diagnostics-playback__transport,
+.diagnostics-playback-tabs {
+    display: inline-flex;
+    align-items: center;
     gap: 0.22rem;
 }
 
@@ -130,6 +137,72 @@
 
 .diagnostics-playback__icon--fast-forward {
     clip-path: polygon(8% 14%, 8% 86%, 47% 50%, 47% 86%, 88% 50%, 47% 14%, 47% 50%);
+}
+
+.diagnostics-playback-tabs {
+    min-height: 1.9rem;
+    padding: 0.12rem;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #102716;
+}
+
+.diagnostics-playback-tabs__button {
+    appearance: none;
+    min-width: 3.35rem;
+    height: 1.55rem;
+    padding: 0 0.45rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #dbe7d6;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.diagnostics-playback-tabs__button:hover,
+.diagnostics-playback-tabs__button:focus-visible {
+    background: #1d3a23;
+    outline: none;
+}
+
+.diagnostics-playback-tabs__button.is-selected {
+    background: #24482b;
+    color: #f6fff1;
+}
+
+.diagnostics-playback-multiplier {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    min-height: 1.9rem;
+    padding: 0.12rem 0.35rem;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #102716;
+    color: #dbe7d6;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.diagnostics-playback-multiplier input {
+    width: 4.5rem;
+    min-width: 0;
+    height: 1.55rem;
+    padding: 0 0.35rem;
+    border: 1px solid #315235;
+    border-radius: 5px;
+    background: #17301d;
+    color: #f6fff1;
+    font: inherit;
+}
+
+.diagnostics-playback-multiplier input:focus-visible {
+    border-color: #94d76b;
+    outline: none;
 }
 
 .diagnostics-select {
@@ -310,11 +383,87 @@
     min-height: 0;
 }
 
+.diagnostics-field-display {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.12rem;
+}
+
+.diagnostics-field-display__mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #89a38b;
+    font-size: 0.72rem;
+}
+
+.diagnostics-field-mode__select {
+    flex: 0 0 7.4rem;
+    min-height: 1.7rem;
+    font-size: 0.72rem;
+}
+
+.diagnostics-render--overlay {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .diagnostics-render section {
     display: flex;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
+}
+
+.diagnostics-render__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    min-height: 2rem;
+}
+
+.diagnostics-render__header h2 {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.diagnostics-render__header--overlay {
+    align-items: flex-end;
+}
+
+.diagnostics-field-source__select {
+    flex: 0 1 12rem;
+    min-height: 1.7rem;
+    font-size: 0.72rem;
+}
+
+.diagnostics-field-source__overlay-selectors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.28rem;
+    min-width: 0;
+}
+
+.diagnostics-field-source__overlay-selectors label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.24rem;
+    min-width: 0;
+    color: #89a38b;
+    font-size: 0.68rem;
+}
+
+.diagnostics-field-source__status {
+    border-left: 4px solid #ffb454;
+    background: #332918;
+    color: #ffe2ad;
+    margin-bottom: 0.18rem;
+    padding: 0.25rem 0.42rem;
+    font-size: 0.68rem;
+    overflow-wrap: anywhere;
 }
 
 .diagnostics-render section ::deep(.field-card) {
@@ -356,6 +505,96 @@
     color: #d7ebff;
     padding: 0.75rem 1rem;
     margin-bottom: 0.75rem;
+}
+
+.diagnostics-comparison {
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #0b1a11;
+    margin-bottom: 0.25rem;
+    padding: 0.35rem;
+}
+
+.diagnostics-comparison__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    margin-bottom: 0.26rem;
+}
+
+.diagnostics-comparison__header h2 {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.diagnostics-comparison__toggle {
+    appearance: none;
+    border: 1px solid #315235;
+    border-radius: 7px;
+    background: #17301d;
+    color: #f3f8ef;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    min-height: 1.7rem;
+    padding: 0.18rem 0.55rem;
+}
+
+.diagnostics-comparison__toggle:hover,
+.diagnostics-comparison__toggle:focus-visible {
+    border-color: #94d76b;
+    background: #24482b;
+    outline: none;
+}
+
+.diagnostics-comparison__controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
+}
+
+.diagnostics-comparison__select {
+    flex: 0 1 20rem;
+    min-height: 1.7rem;
+    font-size: 0.72rem;
+}
+
+.diagnostics-comparison__stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.18rem;
+    margin: 0;
+}
+
+.diagnostics-comparison__stats dt,
+.diagnostics-comparison__stats dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 0.68rem;
+}
+
+.diagnostics-comparison__stats dt {
+    color: #89a38b;
+}
+
+.diagnostics-comparison__stats dd {
+    margin: 0;
+    color: #f3f8ef;
+}
+
+.diagnostics-comparison__stats--comparison {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin-top: 0.25rem;
+}
+
+.diagnostics-comparison__alert {
+    border-left: 4px solid #ffb454;
+    background: #332918;
+    color: #ffe2ad;
+    margin-top: 0.25rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.72rem;
 }
 
 .diagnostics-profile-alert {
@@ -474,7 +713,7 @@
 .diagnostics-shell--render .diagnostics-render {
     flex: 0 1 var(--diagnostics-render-height);
     min-height: 18rem;
-    max-height: calc(100% - 9rem);
+    max-height: calc(100% - 14rem);
     margin-bottom: 0.04rem;
 }
 
@@ -513,6 +752,11 @@
 
     .diagnostics-detail__columns {
         grid-template-columns: 1fr;
+    }
+
+    .diagnostics-comparison__stats,
+    .diagnostics-comparison__stats--comparison {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .diagnostics-profile__grid {
@@ -605,6 +849,21 @@
     .diagnostics-scrubber {
         grid-template-columns: 1fr;
         gap: 0.45rem;
+    }
+
+    .diagnostics-comparison__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .diagnostics-comparison__select {
+        flex-basis: auto;
+        width: 100%;
+    }
+
+    .diagnostics-comparison__stats,
+    .diagnostics-comparison__stats--comparison {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .diagnostics-grid,

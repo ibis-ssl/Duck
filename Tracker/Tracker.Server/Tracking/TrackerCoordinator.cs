@@ -21,6 +21,8 @@ public sealed partial class TrackerCoordinator
     private readonly ILogger<TrackerCoordinator> logger;
     private readonly VisionPacketCaptureSession? packetCaptureSession;
     private readonly TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter;
+    private readonly TrackerPacketSnapshotLogWriter? trackerPacketSnapshotLogWriter;
+    private readonly TrackerSnapshotAlignmentLogWriter? trackerSnapshotAlignmentLogWriter;
     private TrackerResolvedOptions appliedOptions;
     private TrackerResolvedOptions desiredOptions;
     private TrackerRuntimeOverrides desiredRuntimeOverrides = new();
@@ -46,7 +48,9 @@ public sealed partial class TrackerCoordinator
         IEnumerable<ITrackerObserver> observers,
         ILogger<TrackerCoordinator> logger,
         VisionPacketCaptureSession? packetCaptureSession = null,
-        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter = null)
+        TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter = null,
+        TrackerPacketSnapshotLogWriter? trackerPacketSnapshotLogWriter = null,
+        TrackerSnapshotAlignmentLogWriter? trackerSnapshotAlignmentLogWriter = null)
     {
         this.engine = engine;
         this.packetGenerator = packetGenerator;
@@ -59,6 +63,8 @@ public sealed partial class TrackerCoordinator
         this.logger = logger;
         this.packetCaptureSession = packetCaptureSession;
         this.renderSnapshotCaptureWriter = renderSnapshotCaptureWriter;
+        this.trackerPacketSnapshotLogWriter = trackerPacketSnapshotLogWriter;
+        this.trackerSnapshotAlignmentLogWriter = trackerSnapshotAlignmentLogWriter;
         appliedOptions = new TrackerResolvedOptions
         {
             Enabled = true,
@@ -141,8 +147,12 @@ public sealed partial class TrackerCoordinator
                 var updatePacket = firstIteration ? packet : null;
                 var switchRequest = explicitProfileSwitchRequest ?? PromotePendingRequest();
                 var result = engine.Update(updatePacket, currentSettings, switchRequest);
-                LogTrackerDiagnostics(updatePacket, result, receivedAt);
+                var diagnosticsFrame = LogTrackerDiagnostics(updatePacket, result, receivedAt);
                 DispatchResult(result, receivedAt);
+                if (diagnosticsFrame is not null)
+                {
+                    trackerSnapshotAlignmentLogWriter?.CaptureDiagnosticsEntry(diagnosticsFrame, receivedAt);
+                }
 
                 committedFrames.AddRange(result.CommittedFrames);
                 emittedEvents.AddRange(result.EmittedEvents);

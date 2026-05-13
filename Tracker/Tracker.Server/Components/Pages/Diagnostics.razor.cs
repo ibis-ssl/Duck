@@ -16,6 +16,8 @@ public partial class Diagnostics : IDisposable
     private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
     private string? selectedLogPath;
     private TrackerDiagnosticsLogEntry? selectedEntry;
+    private IReadOnlyList<TrackerDiagnosticsReplayTimelineTick> replayTimeline = [];
+    private TrackerDiagnosticsReplayTimelineTick? selectedReplayTimelineTick;
     private TrackerRenderSnapshotView? selectedRenderSnapshot;
     private IReadOnlyDictionary<uint, TrackerRenderSnapshotView> renderSnapshotsByFrame =
         new Dictionary<uint, TrackerRenderSnapshotView>();
@@ -35,14 +37,28 @@ public partial class Diagnostics : IDisposable
     private double timelineResizeStartX;
     private CancellationTokenSource? playbackCancellationTokenSource;
     private DiagnosticsPlaybackMode playbackMode = DiagnosticsPlaybackMode.Stopped;
+    private string selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.NormalPlaybackSpeedLabel;
+    private int fastForwardSpeedMultiplier = DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
+    private TrackerDiagnosticsComparisonUiState? comparisonUiState;
 
     private int MaxEntryIndex => Math.Max(0, entries.Count - 1);
+
+    private int MaxReplayTimelineIndex => Math.Max(0, ReplayTimelineCount - 1);
 
     private int SelectedEntryIndex => selectedEntry is null
         ? 0
         : FindEntryIndex(selectedEntry);
 
-    private bool CanPlayback => entries.Count > 1;
+    private int SelectedReplayTimelineIndex => selectedReplayTimelineTick is null
+        ? SelectedEntryIndex
+        : FindReplayTimelineIndex(selectedReplayTimelineTick);
+
+    private int ReplayTimelineCount => replayTimeline.Count > 0 ? replayTimeline.Count : entries.Count;
+
+    private bool CanPlayback => ReplayTimelineCount > 1;
+
+    private TrackerDiagnosticsComparisonViewState ComparisonViewState =>
+        comparisonUiState?.ViewState ?? TrackerDiagnosticsComparisonUiState.InitialViewState;
 
     private TrackedVisionViewState trackedRenderView =>
         selectedRenderSnapshot is null
@@ -59,6 +75,7 @@ public partial class Diagnostics : IDisposable
     /// </summary>
     protected override void OnInitialized()
     {
+        comparisonUiState = new TrackerDiagnosticsComparisonUiState(ComparisonReader);
         LoadFiles();
         LoadSelectedFile();
     }
@@ -76,6 +93,7 @@ public partial class Diagnostics : IDisposable
         var requestedLogPath = args.Value?.ToString();
         selectedLogPath = logFiles.FirstOrDefault(file => file.FullPath == requestedLogPath)?.FullPath;
         StopPlayback();
+        comparisonUiState?.ResetForLogChange();
         LoadSelectedFile();
         return Task.CompletedTask;
     }
@@ -97,12 +115,15 @@ public partial class Diagnostics : IDisposable
             snapshot = null;
             entries = [];
             selectedEntry = null;
+            replayTimeline = [];
+            selectedReplayTimelineTick = null;
             selectedRenderSnapshot = null;
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
             profileMetadataIndex = DiagnosticsProfileMetadataIndex.Empty;
             profileMetadata = null;
             profileMetadataError = null;
+            SyncComparisonState();
             return;
         }
 
@@ -110,18 +131,30 @@ public partial class Diagnostics : IDisposable
         snapshot = LogReader.ReadFile(selectedLogPath);
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
+        selectedReplayTimelineTick = null;
         LoadProfileMetadataIndex();
         UpdateProfileMetadataForSelectedEntry();
         LoadRenderSnapshotIndex();
+        LoadReplayTimelineIndex();
+        selectedReplayTimelineTick = replayTimeline.FirstOrDefault();
+        if (selectedReplayTimelineTick is not null)
+        {
+            SelectReplayTimelineTick(selectedReplayTimelineTick);
+            return;
+        }
+
         LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     // timeline / scrubber の選択 entry 変更に合わせて、metadata 表示と render snapshot を同じ frame に同期する。
     private void SelectEntry(TrackerDiagnosticsLogEntry entry)
     {
         selectedEntry = entry;
+        selectedReplayTimelineTick = FindReplayTimelineTickForEntry(entry);
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     private void OnTimelineScrubbed(ChangeEventArgs args)
@@ -133,21 +166,41 @@ public partial class Diagnostics : IDisposable
             return;
         }
 
-        SelectEntryByIndex(index);
+        SelectTimelineByIndex(index);
     }
 
     private void OnTimelineWheel(WheelEventArgs args)
     {
         StopPlayback();
 
-        if (entries.Count == 0)
+        if (ReplayTimelineCount == 0)
         {
             return;
         }
 
         var step = args.CtrlKey ? 100 : args.ShiftKey ? 10 : 1;
         var direction = args.DeltaY > 0 || args.DeltaX > 0 ? 1 : -1;
-        SelectEntryByIndex(SelectedEntryIndex + (direction * step));
+        SelectTimelineByIndex(SelectedReplayTimelineIndex + (direction * step));
+    }
+
+    private void SelectTimelineByIndex(int index)
+    {
+        if (replayTimeline.Count > 0)
+        {
+            SelectReplayTimelineTick(replayTimeline[Math.Clamp(index, 0, replayTimeline.Count - 1)]);
+            return;
+        }
+
+        SelectEntryByIndex(index);
+    }
+
+    private void SelectReplayTimelineTick(TrackerDiagnosticsReplayTimelineTick tick)
+    {
+        selectedReplayTimelineTick = tick;
+        selectedEntry = ResolveDiagnosticsEntry(tick) ?? entries.FirstOrDefault();
+        UpdateProfileMetadataForSelectedEntry();
+        LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     // index 指定の選択更新でも click 選択と同じ同期順序を維持する。
@@ -156,16 +209,20 @@ public partial class Diagnostics : IDisposable
         if (entries.Count == 0)
         {
             selectedEntry = null;
+            selectedReplayTimelineTick = null;
             selectedRenderSnapshot = null;
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
             profileMetadata = null;
+            SyncComparisonState();
             return;
         }
 
         selectedEntry = entries[Math.Clamp(index, 0, entries.Count - 1)];
+        selectedReplayTimelineTick = FindReplayTimelineTickForEntry(selectedEntry);
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();
+        SyncComparisonState();
     }
 
     private int FindEntryIndex(TrackerDiagnosticsLogEntry entry)
@@ -179,6 +236,42 @@ public partial class Diagnostics : IDisposable
         }
 
         return 0;
+    }
+
+    private int FindReplayTimelineIndex(TrackerDiagnosticsReplayTimelineTick tick)
+    {
+        for (var index = 0; index < replayTimeline.Count; index++)
+        {
+            if (ReferenceEquals(replayTimeline[index], tick) ||
+                replayTimeline[index].ReplayTimelineIndex == tick.ReplayTimelineIndex)
+            {
+                return index;
+            }
+        }
+
+        return SelectedEntryIndex;
+    }
+
+    private TrackerDiagnosticsLogEntry? ResolveDiagnosticsEntry(TrackerDiagnosticsReplayTimelineTick tick)
+    {
+        if (tick.DiagnosticsLineNumber is null)
+        {
+            return entries.LastOrDefault(entry => entry.Timestamp <= tick.ReceivedAt) ?? entries.FirstOrDefault();
+        }
+
+        return entries.LastOrDefault(entry => entry.LineNumber <= tick.DiagnosticsLineNumber.Value)
+            ?? entries.FirstOrDefault();
+    }
+
+    private TrackerDiagnosticsReplayTimelineTick? FindReplayTimelineTickForEntry(TrackerDiagnosticsLogEntry? entry)
+    {
+        if (entry is null || replayTimeline.Count == 0)
+        {
+            return null;
+        }
+
+        return replayTimeline.LastOrDefault(tick => tick.DiagnosticsLineNumber <= entry.LineNumber)
+            ?? replayTimeline.FirstOrDefault();
     }
 
     private string ShellClass()
@@ -300,9 +393,298 @@ public partial class Diagnostics : IDisposable
         return timestamp.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture);
     }
 
-    private static string Display(string value)
+    private static string Display(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+
+    private static string Display(int? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string Display(uint? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string Display(long? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string DisplayRawPayloadRestored(bool? value)
+    {
+        return value switch
+        {
+            true => "Restored",
+            false => "Missing",
+            _ => "-",
+        };
+    }
+
+    private string ComparisonSourceFilterValue()
+    {
+        return TrackerDiagnosticsComparisonUiState.ToFilterValue(ComparisonViewState.SelectedSourceFilter);
+    }
+
+    private string LeftFieldSourceValue()
+    {
+        return TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(
+            comparisonUiState?.LeftFieldSource ?? TrackerDiagnosticsFieldSource.VisionInput);
+    }
+
+    private string RightFieldSourceValue()
+    {
+        return TrackerDiagnosticsComparisonUiState.ToFieldSourceValue(
+            comparisonUiState?.RightFieldSource ?? TrackerDiagnosticsFieldSource.IbisTracker);
+    }
+
+    private string FieldDisplayModeValue()
+    {
+        return (comparisonUiState?.FieldDisplayMode ?? TrackerDiagnosticsFieldDisplayMode.Split).ToString();
+    }
+
+    private string ComparisonPanelToggleLabel()
+    {
+        return comparisonUiState?.IsComparisonPanelCollapsed == true ? "Show" : "Hide";
+    }
+
+    private Task ToggleComparisonPanelAsync()
+    {
+        comparisonUiState?.ToggleComparisonPanelCollapsed();
+        return Task.CompletedTask;
+    }
+
+    private Task OnComparisonSourceFilterChanged(ChangeEventArgs args)
+    {
+        comparisonUiState?.SelectFilterValue(
+            args.Value?.ToString(),
+            selectedLogPath,
+            selectedEntry,
+            ToReplayTimelineSelection());
+        return Task.CompletedTask;
+    }
+
+    private Task OnLeftFieldSourceChanged(ChangeEventArgs args)
+    {
+        comparisonUiState?.SelectLeftFieldSourceValue(
+            args.Value?.ToString(),
+            selectedLogPath,
+            selectedEntry,
+            ToReplayTimelineSelection());
+        return Task.CompletedTask;
+    }
+
+    private Task OnRightFieldSourceChanged(ChangeEventArgs args)
+    {
+        comparisonUiState?.SelectRightFieldSourceValue(
+            args.Value?.ToString(),
+            selectedLogPath,
+            selectedEntry,
+            ToReplayTimelineSelection());
+        return Task.CompletedTask;
+    }
+
+    private Task OnFieldDisplayModeChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<TrackerDiagnosticsFieldDisplayMode>(
+                args.Value?.ToString(),
+                ignoreCase: false,
+                out var displayMode))
+        {
+            comparisonUiState?.SelectFieldDisplayMode(displayMode);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnOverlayLayerVisibilityChanged(
+        (TrackerDiagnosticsOverlayLayerKey LayerKey, bool IsVisible) change)
+    {
+        comparisonUiState?.SetOverlayLayerVisibility(change.LayerKey, change.IsVisible);
+        return Task.CompletedTask;
+    }
+
+    private DiagnosticsFieldRenderModel LeftFieldRenderModel()
+    {
+        return CreateFieldRenderModel(
+            comparisonUiState?.LeftFieldSource ?? TrackerDiagnosticsFieldSource.VisionInput,
+            comparisonUiState?.LeftTrackerFieldSourceFrame);
+    }
+
+    private DiagnosticsFieldRenderModel RightFieldRenderModel()
+    {
+        return CreateFieldRenderModel(
+            comparisonUiState?.RightFieldSource ?? TrackerDiagnosticsFieldSource.IbisTracker,
+            comparisonUiState?.RightTrackerFieldSourceFrame);
+    }
+
+    private DiagnosticsFieldOverlayRenderModel OverlayFieldRenderModel()
+    {
+        var overlaySources = comparisonUiState?.CreateOverlayLayerSources()
+            ?? [
+                new TrackerDiagnosticsFieldOverlayLayerSource(
+                    TrackerDiagnosticsOverlayLayerKey.LayerA,
+                    "Layer A",
+                    TrackerDiagnosticsFieldSource.VisionInput,
+                    IsVisible: true),
+                new TrackerDiagnosticsFieldOverlayLayerSource(
+                    TrackerDiagnosticsOverlayLayerKey.LayerB,
+                    "Layer B",
+                    TrackerDiagnosticsFieldSource.IbisTracker,
+                    IsVisible: true),
+            ];
+
+        return DiagnosticsFieldOverlayRenderModelFactory.Create(
+            selectedRenderSnapshot,
+            trackedRenderView,
+            ComparisonViewState,
+            overlaySources,
+            comparisonUiState?.LeftTrackerFieldSourceFrame,
+            comparisonUiState?.RightTrackerFieldSourceFrame);
+    }
+
+    private DiagnosticsFieldRenderModel CreateFieldRenderModel(
+        TrackerDiagnosticsFieldSource source,
+        TrackerDiagnosticsFieldSourceFrame? trackerFrame)
+    {
+        if (selectedRenderSnapshot is null)
+        {
+            return DiagnosticsFieldRenderModel.Empty(FieldSourceLabel(source), null, "Render snapshot was not found.");
+        }
+
+        var geometry = DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
+        return source.Kind switch
+        {
+            TrackerDiagnosticsFieldSourceKind.VisionInput => new DiagnosticsFieldRenderModel(
+                FieldSourceLabel(source),
+                geometry,
+                DiagnosticsFieldViewFactory.CreateRawBalls(selectedRenderSnapshot.Frame),
+                DiagnosticsFieldViewFactory.CreateRawYellowRobots(selectedRenderSnapshot.Frame),
+                DiagnosticsFieldViewFactory.CreateRawBlueRobots(selectedRenderSnapshot.Frame),
+                Status: null),
+            TrackerDiagnosticsFieldSourceKind.IbisTracker => new DiagnosticsFieldRenderModel(
+                FieldSourceLabel(source),
+                trackedRenderView.Geometry,
+                trackedRenderView.Balls,
+                trackedRenderView.RobotsYellow,
+                trackedRenderView.RobotsBlue,
+                Status: null),
+            _ => new DiagnosticsFieldRenderModel(
+                FieldSourceLabel(source),
+                geometry,
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceYellowRobots(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary),
+                FieldSourceStatusText(trackerFrame)),
+        };
+    }
+
+    private string FieldSourceLabel(TrackerDiagnosticsFieldSource source)
+    {
+        return ComparisonViewState.FieldSourceOptions
+            .FirstOrDefault(option => option.Source == source)
+            ?.Label ?? source.Kind.ToString();
+    }
+
+    private static string? FieldSourceStatusText(TrackerDiagnosticsFieldSourceFrame? frame)
+    {
+        if (frame is null || frame.Status == TrackerDiagnosticsFieldSourceFrameStatus.Ready)
+        {
+            return null;
+        }
+
+        if (frame.Status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty)
+        {
+            return frame.Message ?? "No drawable balls or robots.";
+        }
+
+        return frame.Message ?? frame.Status.ToString();
+    }
+
+    private void SyncComparisonState()
+    {
+        comparisonUiState?.Load(selectedLogPath, selectedEntry, ToReplayTimelineSelection());
+    }
+
+    private string PlaybackSpeedChoiceButtonClass(DiagnosticsPlaybackSpeedChoice choice)
+    {
+        return IsSelectedPlaybackSpeedChoice(choice)
+            ? "diagnostics-playback-tabs__button is-selected"
+            : "diagnostics-playback-tabs__button";
+    }
+
+    private bool IsSelectedPlaybackSpeedChoice(DiagnosticsPlaybackSpeedChoice choice)
+    {
+        return selectedPlaybackSpeedLabel == choice.Label;
+    }
+
+    private Task OnPlaybackSpeedChoiceClicked(DiagnosticsPlaybackSpeedChoice choice)
+    {
+        var transition = DiagnosticsPlaybackState.ResolveSpeedChoiceTransition(
+            playbackMode,
+            fastForwardSpeedMultiplier,
+            choice);
+
+        selectedPlaybackSpeedLabel = transition.SelectedPlaybackSpeedLabel;
+        fastForwardSpeedMultiplier = transition.FastForwardSpeedMultiplier;
+
+        return transition.RestartMode is { } restartMode
+            ? StartPlaybackAsync(restartMode)
+            : Task.CompletedTask;
+    }
+
+    private Task OnFastForwardMultiplierChanged(ChangeEventArgs args)
+    {
+        var requestedSpeedMultiplier = int.TryParse(
+            args.Value?.ToString(),
+            CultureInfo.InvariantCulture,
+            out var parsedSpeedMultiplier)
+            ? parsedSpeedMultiplier
+            : DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
+
+        var transition = DiagnosticsPlaybackState.ResolveFastForwardMultiplierTransition(
+            playbackMode,
+            requestedSpeedMultiplier);
+
+        selectedPlaybackSpeedLabel = transition.SelectedPlaybackSpeedLabel;
+        fastForwardSpeedMultiplier = transition.FastForwardSpeedMultiplier;
+
+        return transition.RestartMode is { } restartMode
+            ? StartPlaybackAsync(restartMode)
+            : Task.CompletedTask;
+    }
+
+    private Task StartSelectedPlaybackAsync()
+    {
+        var start = DiagnosticsPlaybackState.ResolvePlayButtonStart(
+            selectedPlaybackSpeedLabel,
+            fastForwardSpeedMultiplier);
+
+        selectedPlaybackSpeedLabel = start.SelectedPlaybackSpeedLabel;
+        fastForwardSpeedMultiplier = start.FastForwardSpeedMultiplier;
+        return StartPlaybackAsync(start.Mode);
+    }
+
+    private Task StartFastForwardPlaybackAsync()
+    {
+        var selectedFastChoice = DiagnosticsPlaybackState.PlaybackSpeedChoices.FirstOrDefault(
+            choice => IsSelectedPlaybackSpeedChoice(choice) &&
+                      choice.FastForwardSpeedMultiplier.HasValue);
+        if (selectedFastChoice?.FastForwardSpeedMultiplier is { } speedMultiplier)
+        {
+            fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(speedMultiplier);
+        }
+        else
+        {
+            fastForwardSpeedMultiplier = selectedPlaybackSpeedLabel == DiagnosticsPlaybackState.NormalPlaybackSpeedLabel
+                ? DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier
+                : DiagnosticsPlaybackState.NormalizeSpeedMultiplier(fastForwardSpeedMultiplier);
+            selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.FormatFastForwardSpeedLabel(fastForwardSpeedMultiplier);
+        }
+
+        return StartPlaybackAsync(DiagnosticsPlaybackMode.FastForward);
     }
 
     private Task StartPlaybackAsync(DiagnosticsPlaybackMode mode)
@@ -313,27 +695,52 @@ public partial class Diagnostics : IDisposable
         }
 
         StopPlayback();
+        if (mode == DiagnosticsPlaybackMode.Play)
+        {
+            selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.NormalPlaybackSpeedLabel;
+        }
+        else if (mode == DiagnosticsPlaybackMode.FastForward)
+        {
+            fastForwardSpeedMultiplier = DiagnosticsPlaybackState.NormalizeSpeedMultiplier(fastForwardSpeedMultiplier);
+            selectedPlaybackSpeedLabel = DiagnosticsPlaybackState.FormatFastForwardSpeedLabel(fastForwardSpeedMultiplier);
+        }
+
         playbackMode = mode;
         playbackCancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = playbackCancellationTokenSource.Token;
-        _ = RunPlaybackAsync(mode, cancellationToken);
+        var speedMultiplier = GetPlaybackSpeedMultiplier(mode);
+        _ = RunPlaybackAsync(mode, speedMultiplier, cancellationToken);
         return Task.CompletedTask;
     }
 
     private async Task RunPlaybackAsync(
         DiagnosticsPlaybackMode mode,
+        int speedMultiplier,
         CancellationToken cancellationToken)
     {
+        var timelineTimestamps = GetPlaybackTimelineTimestamps();
+        var startIndex = timelineTimestamps.Count == 0
+            ? 0
+            : Math.Clamp(SelectedReplayTimelineIndex, 0, timelineTimestamps.Count - 1);
+        var startReceivedAt = timelineTimestamps.Count == 0
+            ? DateTimeOffset.UtcNow
+            : timelineTimestamps[startIndex];
+        var startWallClock = DateTimeOffset.UtcNow;
+
         try
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var currentIndex = SelectedEntryIndex;
-                var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
+                var currentIndex = SelectedReplayTimelineIndex;
+                var nextIndex = GetNextPlaybackIndex(
+                    mode,
                     currentIndex,
-                    entries.Count,
-                    mode);
-                var interval = GetPlaybackInterval(mode, currentIndex, nextIndex);
+                    speedMultiplier,
+                    timelineTimestamps,
+                    startReceivedAt,
+                    startWallClock,
+                    DateTimeOffset.UtcNow);
+                var interval = GetPlaybackInterval(mode, currentIndex, nextIndex, speedMultiplier);
                 await Task.Delay(interval, cancellationToken);
 
                 await InvokeAsync(() =>
@@ -341,7 +748,9 @@ public partial class Diagnostics : IDisposable
                     if (!DiagnosticsPlaybackState.ShouldApplyTick(
                             playbackMode,
                             mode,
-                            cancellationToken.IsCancellationRequested))
+                            cancellationToken.IsCancellationRequested,
+                            GetPlaybackSpeedMultiplier(playbackMode),
+                            speedMultiplier))
                     {
                         return;
                     }
@@ -352,21 +761,25 @@ public partial class Diagnostics : IDisposable
                         return;
                     }
 
-                    var nextIndex = DiagnosticsPlaybackState.GetNextIndex(
-                        SelectedEntryIndex,
-                        entries.Count,
-                        mode);
+                    var nextIndex = GetNextPlaybackIndex(
+                        mode,
+                        SelectedReplayTimelineIndex,
+                        speedMultiplier,
+                        timelineTimestamps,
+                        startReceivedAt,
+                        startWallClock,
+                        DateTimeOffset.UtcNow);
 
-                    if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, entries.Count))
+                    if (DiagnosticsPlaybackState.ShouldStopAtEnd(nextIndex, ReplayTimelineCount))
                     {
                         StopPlayback();
-                        SelectEntryByIndex(DiagnosticsPlaybackState.GetIndexAfterEndHandling(
+                        SelectTimelineByIndex(DiagnosticsPlaybackState.GetIndexAfterEndHandling(
                             nextIndex,
-                            entries.Count));
+                            ReplayTimelineCount));
                     }
                     else
                     {
-                        SelectEntryByIndex(nextIndex);
+                        SelectTimelineByIndex(nextIndex);
                     }
 
                     StateHasChanged();
@@ -378,19 +791,60 @@ public partial class Diagnostics : IDisposable
         }
     }
 
+    private int GetNextPlaybackIndex(
+        DiagnosticsPlaybackMode mode,
+        int currentIndex,
+        int speedMultiplier,
+        IReadOnlyList<DateTimeOffset> timelineTimestamps,
+        DateTimeOffset startReceivedAt,
+        DateTimeOffset startWallClock,
+        DateTimeOffset currentWallClock)
+    {
+        return mode == DiagnosticsPlaybackMode.Play
+            ? DiagnosticsPlaybackState.GetRealtimePlayIndex(
+                currentIndex,
+                timelineTimestamps,
+                startReceivedAt,
+                startWallClock,
+                currentWallClock)
+            : DiagnosticsPlaybackState.GetNextIndex(
+                currentIndex,
+                ReplayTimelineCount,
+                mode,
+                speedMultiplier);
+    }
+
     private TimeSpan GetPlaybackInterval(
         DiagnosticsPlaybackMode mode,
         int currentIndex,
-        int nextIndex)
+        int nextIndex,
+        int speedMultiplier)
     {
-        if (entries.Count == 0)
+        if (ReplayTimelineCount == 0)
         {
             return TimeSpan.Zero;
         }
 
-        var current = entries[Math.Clamp(currentIndex, 0, entries.Count - 1)];
-        var next = entries[Math.Clamp(nextIndex, 0, entries.Count - 1)];
-        return DiagnosticsPlaybackState.GetInterval(mode, current.Timestamp, next.Timestamp);
+        var currentTimestamp = GetTimelineTimestamp(currentIndex);
+        var nextTimestamp = GetTimelineTimestamp(nextIndex);
+        return DiagnosticsPlaybackState.GetInterval(mode, currentTimestamp, nextTimestamp, speedMultiplier);
+    }
+
+    private int GetPlaybackSpeedMultiplier(DiagnosticsPlaybackMode mode)
+    {
+        return mode == DiagnosticsPlaybackMode.FastForward
+            ? fastForwardSpeedMultiplier
+            : DiagnosticsPlaybackState.DefaultFastForwardSpeedMultiplier;
+    }
+
+    private IReadOnlyList<DateTimeOffset> GetPlaybackTimelineTimestamps()
+    {
+        if (replayTimeline.Count > 0)
+        {
+            return replayTimeline.Select(tick => tick.ReceivedAt).ToArray();
+        }
+
+        return entries.Select(entry => entry.Timestamp).ToArray();
     }
 
     private void StopPlayback()
@@ -416,14 +870,22 @@ public partial class Diagnostics : IDisposable
             return;
         }
 
-        if (!uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var frameNumber))
+        uint? timelineRenderFrame = selectedReplayTimelineTick?.RenderFrameNumber;
+        if (timelineRenderFrame is null &&
+            uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var selectedFrameNumber))
+        {
+            timelineRenderFrame = selectedFrameNumber;
+        }
+
+        if (timelineRenderFrame is null)
         {
             selectedRenderSnapshot = null;
             renderSnapshotError = $"Tracked frame '{selectedEntry.TrackedFrame}' is not a numeric frame number.";
             return;
         }
 
-        if (renderSnapshotsByFrame.TryGetValue(frameNumber, out var renderSnapshot))
+        if (timelineRenderFrame is not null &&
+            renderSnapshotsByFrame.TryGetValue(timelineRenderFrame.Value, out var renderSnapshot))
         {
             selectedRenderSnapshot = renderSnapshot;
             renderSnapshotError = null;
@@ -498,5 +960,52 @@ public partial class Diagnostics : IDisposable
         }
 
         renderSnapshotsByFrame = result.Index.SnapshotsByFrame;
+    }
+
+    private void LoadReplayTimelineIndex()
+    {
+        replayTimeline = selectedLogPath is null
+            ? []
+            : ComparisonReader.LoadReplayTimeline(selectedLogPath);
+    }
+
+    private DateTimeOffset GetTimelineTimestamp(int index)
+    {
+        if (replayTimeline.Count > 0)
+        {
+            return replayTimeline[Math.Clamp(index, 0, replayTimeline.Count - 1)].ReceivedAt;
+        }
+
+        return entries[Math.Clamp(index, 0, entries.Count - 1)].Timestamp;
+    }
+
+    private TrackerDiagnosticsReplayTimelineSelection? ToReplayTimelineSelection()
+    {
+        return selectedReplayTimelineTick is null
+            ? null
+            : TrackerDiagnosticsReplayTimelineSelection.FromTick(selectedReplayTimelineTick);
+    }
+
+    private sealed record DiagnosticsFieldRenderModel(
+        string Title,
+        SSL_GeometryData? Geometry,
+        IReadOnlyList<SSL_DetectionBall> Balls,
+        IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
+        IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+        string? Status)
+    {
+        public static DiagnosticsFieldRenderModel Empty(
+            string title,
+            SSL_GeometryData? geometry,
+            string? status)
+        {
+            return new DiagnosticsFieldRenderModel(
+                title,
+                geometry,
+                [],
+                [],
+                [],
+                status);
+        }
     }
 }
