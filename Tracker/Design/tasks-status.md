@@ -4,16 +4,16 @@
 
 ## 現在のタスク
 
-- ID: RUNTIME-HOST-010
-- Title: RuntimeHost / DebugHost split の focused validation と manual evidence を揃える
+- ID: RUNTIME-HOST-011
+- Title: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する
 - Phase: review
 - Status: in-progress
 - Size: large
-- Dependencies: RUNTIME-HOST-009.
+- Dependencies: RUNTIME-HOST-010.
 - Exit Criteria:
-  - RuntimeHost / DebugHost の focused tests と build の証跡を report に残す。
-  - diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の manual evidence を report に残す。
-  - focused tests / build、task 専用 review、commit、Draft PR #17 update が揃う。
+  - RUNTIME-HOST-010 の validation evidence と review result を含めて tracking を最終同期する。
+  - gpt-5.5 high final review、必要な修正と r2 review、commit、Draft PR #17 ready 化を完了する。
+  - 既知 hold `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` の扱いを最終判断として report / PR に残す。
 
 ## 完了済みタスク
 
@@ -102,6 +102,15 @@
     - `reports/runtime-host-009-review-20260514195653.md`
     - `reports/runtime-host-009-review-r2-20260514200945.md`
     - 初回 review の missing active profile fallback blocker を修正し、r2 で no findings を確認した。latest packet buffer は latest 優先のまま R010 manual evidence 後判断の hold とした。
+- `RUNTIME-HOST-010`: RuntimeHost / DebugHost split の focused validation と manual evidence を揃えた。RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path を sub-agent report に残し、`.gitignore` に runtime / diagnostics capture artifacts を追加してローカル生成物が通常差分へ混入しないことを確認した。
+  - Validation Evidence:
+    - `reports/runtime-host-010-validation-20260514201701.md`
+    - RuntimeHost focused tests は 10 passed、adjusted boundary focused は 10 passed、diagnostics focused は 15 passed。
+    - `Tracker.RuntimeHost` / `Tracker.DebugHost` / `Tracker.Tests` build、RuntimeHost 短時間 headless 起動、DebugHost HTTP 200 起動確認、`git diff --check`、`.gitignore` artifact ignore 確認は sub-agent report で成功を確認した。
+    - broad focused は既知の `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` 1 件のみ failure。現設計では DebugHost の Core loop adapter 残存を許容しているため、R010 blocker ではなく R011 final review で扱う hold とした。
+  - Review Evidence:
+    - `reports/runtime-host-010-review-20260514202428.md`
+    - review で blocking findings なし。既知 DebugHost ownership assertion failure は hold 継続が妥当と確認した。
 
 ## 固定残タスク
 
@@ -138,5 +147,5 @@
 | RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | complete; draft PR #17 | RUNTIME-HOST-003, RUNTIME-HOST-006 | UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って latest raw / tracker snapshot を `diagnostics-samples.jsonl` へ保存し、Diagnostics replay / Field は sample sidecar の bounded lookup と semantic summary を主経路にする。focused / affected tests、build、diff-check は sub-agent report で green。初回 review は blocking 2 件、review-fix 後 r2 は Pass、設定化後 r3 は no findings、RuntimeHost 実行周期設定化要件追加後 r4 は no findings。 |
 | RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする contract を focused tests / build / review / commit / Draft PR #17 update 付きで固定した。 |
 | RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | complete; draft PR #17 | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させた。 |
-| RUNTIME-HOST-010 | RuntimeHost / DebugHost split の focused validation と manual evidence を揃える | review | in-progress | RUNTIME-HOST-009 | RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残し、review / commit / Draft PR #17 update まで完了する。 |
-| RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | pending | RUNTIME-HOST-010 | gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description を最新化し、PR ready 判断を完了する。 |
+| RUNTIME-HOST-010 | RuntimeHost / DebugHost split の focused validation と manual evidence を揃える | review | complete; draft PR #17 | RUNTIME-HOST-009 | RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残し、task review で no findings を確認した。 |
+| RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | in-progress | RUNTIME-HOST-010 | gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description を最新化し、PR ready 判断を完了する。 |

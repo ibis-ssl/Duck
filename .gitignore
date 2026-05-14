@@ -482,11 +482,21 @@ $RECYCLE.BIN/
 *.swp
 
 # codex
-.agents
+.agents/
 AGENTS.md
 .serena/
 .codex-dotnet-home/
 .codex-nuget-packages/
+
+# Local runtime and diagnostics capture artifacts
+packet-captures/
+ssl-vision-packets-*.jsonl.gz
+ssl-vision-packets-*.metadata.json
+ssl-vision-packets-*.render-snapshots.jsonl.gz
+tracker-diagnostics-*.log
+tracker-packet-snapshots.jsonl
+tracker-snapshot-alignment.jsonl
+diagnostics-samples.jsonl
 
 # ref
 Tracker/Tracker.Core/Design/Ref/
