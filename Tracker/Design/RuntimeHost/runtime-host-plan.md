@@ -103,6 +103,16 @@ RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の 
 
 Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。
 
+### RUNTIME-HOST-009: RuntimeHost normal path
+
+RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。
+
+受信処理は latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の latest packet がある場合だけ `TrackerCoordinator.ProcessPacket` へ渡す。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。
+
+RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。
+
+DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。
+
 ## 設計資料配置
 
 設計資料は `Tracker/Design/` を canonical root とする。
