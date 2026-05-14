@@ -80,47 +80,52 @@ public class RuntimeHostDependencyBoundaryContractTests
     }
 
     /// <summary>
-    /// 何を確認しているか: DebugHost は tracker operation loop の主実行責務を持たず、latest immutable snapshot または published output を読む側であることを固定する。
+    /// 何を確認しているか: DebugHost の UI / diagnostics replay / render source が tracker operation loop を直接駆動しないことを固定する。
     /// </summary>
     [Fact]
-    public void DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop()
+    public void DebugHostUiDiagnosticsAndRenderSources_DoNotDriveTrackerOperationLoop()
     {
-        var debugHostRoot = RepositoryPath("Tracker", "Tracker.DebugHost");
-
-        Assert.True(
-            Directory.Exists(debugHostRoot),
-            "RUNTIME-HOST-002 contract requires Tracker.DebugHost to replace the current Tracker.Server debug UI host before read-side boundaries can be checked.");
-
-        var sourceText = ReadSourceText(debugHostRoot);
-        var loopOwnershipTokens = new[]
+        var homePath = RepositoryPath("Tracker", "Tracker.DebugHost", "Components", "Pages", "Home.razor");
+        var uiAndDiagnosticsSourcePaths = new[]
         {
-            "AddSingleton<TrackerCoordinator>",
-            "new TrackerCoordinator",
-            "AddHostedService<VisionReceiverService>",
-            "trackerCoordinator.ProcessPacket",
-            "ITrackerEngine, TrackerEngine",
-            "ITrackerPacketPublisher",
+            homePath,
+            RepositoryPath("Tracker", "Tracker.DebugHost", "Components", "Pages", "Diagnostics.razor"),
+            RepositoryPath("Tracker", "Tracker.DebugHost", "Components", "Pages", "Diagnostics.razor.cs"),
+            RepositoryPath("Tracker", "Tracker.DebugHost", "Tracking", "DiagnosticsSampleHostedService.cs"),
+            RepositoryPath("Tracker", "Tracker.DebugHost", "Tracking", "TrackerDiagnosticsComparisonViewStateReader.cs"),
+            RepositoryPath("Tracker", "Tracker.DebugHost", "Vision", "VisionLiveComparisonViewState.cs"),
+            RepositoryPath("Tracker", "Tracker.DebugHost", "Vision", "VisionLiveDisplaySnapshotProvider.cs"),
+        };
+
+        foreach (var sourcePath in uiAndDiagnosticsSourcePaths)
+        {
+            Assert.True(
+                File.Exists(sourcePath),
+                $"RUNTIME-HOST-011 contract requires DebugHost read-side source to exist before boundary checks can run: {sourcePath}");
+        }
+
+        var homeSource = File.ReadAllText(homePath);
+        Assert.Contains("@inject VisionLiveDisplaySnapshotProvider", homeSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("@inject VisionPacketStore", homeSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("@inject TrackedSnapshotStore", homeSource, StringComparison.Ordinal);
+
+        var sourceText = string.Join(Environment.NewLine, uiAndDiagnosticsSourcePaths.Select(File.ReadAllText));
+        var forbiddenTokens = new[]
+        {
+            "TrackerCoordinator",
+            "ITrackerEngine",
             "TrackerPacketGenerator",
+            "ITrackerPacketPublisher",
+            "VisionReceiverService",
+            "ProcessPacket(",
         };
-        var readSideTokens = new[]
-        {
-            "LatestTrackerSnapshot",
-            "LatestImmutableSnapshot",
-            "PublishedTrackerOutput",
-            "PublishedOutput",
-            "TrackedSnapshotStore",
-        };
-        var loopHits = loopOwnershipTokens
+        var hits = forbiddenTokens
             .Where(token => sourceText.Contains(token, StringComparison.Ordinal))
             .ToArray();
-        var hasReadSideBoundary = readSideTokens.Any(token => sourceText.Contains(token, StringComparison.Ordinal));
 
         Assert.True(
-            loopHits.Length == 0,
-            $"Tracker.DebugHost must not own the tracker operation loop; it should read latest immutable snapshots or published output. Found loop ownership markers: {string.Join(", ", loopHits)}");
-        Assert.True(
-            hasReadSideBoundary,
-            "Tracker.DebugHost must expose a read-side boundary by consuming latest immutable snapshots or published tracker output.");
+            hits.Length == 0,
+            $"DebugHost UI, diagnostics replay, and render snapshot sources must read snapshots instead of driving the tracker operation loop. Found operation loop markers: {string.Join(", ", hits)}");
     }
 
     private static string ReadSourceText(string root)

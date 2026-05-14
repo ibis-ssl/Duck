@@ -7,13 +7,13 @@
 - ID: RUNTIME-HOST-011
 - Title: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する
 - Phase: review
-- Status: in-progress
+- Status: complete
 - Size: large
 - Dependencies: RUNTIME-HOST-010.
 - Exit Criteria:
-  - RUNTIME-HOST-010 の validation evidence と review result を含めて tracking を最終同期する。
-  - gpt-5.5 high final review、必要な修正と r2 review、commit、Draft PR #17 ready 化を完了する。
-  - 既知 hold `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` の扱いを最終判断として report / PR に残す。
+  - RUNTIME-HOST-010 の validation evidence と review result を含めて tracking を最終同期した。
+  - final review、blocking fix、r2 review、commit、Draft PR #17 ready 化を完了した。
+  - 既知 hold `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` は現設計に合わせた contract へ修正し、checked-in failing test を残さない。
 
 ## 完了済みタスク
 
@@ -111,6 +111,12 @@
   - Review Evidence:
     - `reports/runtime-host-010-review-20260514202428.md`
     - review で blocking findings なし。既知 DebugHost ownership assertion failure は hold 継続が妥当と確認した。
+- `RUNTIME-HOST-011`: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了した。final review で checked-in failing contract が blocking と判定されたため、`RuntimeHostDependencyBoundaryContractTests` を現設計に合わせ、DebugHost 全体の Core loop adapter を禁止する contract から UI / diagnostics replay / render source が operation loop を直接駆動しない contract へ狭めた。r2 review で blocking findings なし、PR ready 可を確認した。
+  - Review Evidence:
+    - `reports/runtime-host-011-final-review-20260514203109.md`
+    - `reports/runtime-host-011-review-fix-20260514203809.md`
+    - `reports/runtime-host-011-final-review-r2-20260514204526.md`
+    - 初回 final review は checked-in failing contract を blocking と判定した。review-fix 後、`RuntimeHostDependencyBoundaryContractTests` は 3 passed、split/boundary focused は 11 passed、`Tracker.Tests` build と `git diff --check` は pass。r2 review で no findings / PR ready 可を確認した。
 
 ## 固定残タスク
 
@@ -148,4 +154,4 @@
 | RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする contract を focused tests / build / review / commit / Draft PR #17 update 付きで固定した。 |
 | RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | complete; draft PR #17 | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させた。 |
 | RUNTIME-HOST-010 | RuntimeHost / DebugHost split の focused validation と manual evidence を揃える | review | complete; draft PR #17 | RUNTIME-HOST-009 | RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残し、task review で no findings を確認した。 |
-| RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | in-progress | RUNTIME-HOST-010 | gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description を最新化し、PR ready 判断を完了する。 |
+| RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | complete; PR #17 ready | RUNTIME-HOST-010 | final review、blocking fix、r2 review、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description 最新化、PR ready 判断を完了した。 |
