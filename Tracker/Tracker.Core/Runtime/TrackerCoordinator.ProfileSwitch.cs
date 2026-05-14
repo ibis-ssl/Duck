@@ -1,6 +1,4 @@
-using Tracker.Core;
-
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
 /// TrackerCoordinator の profile switch 要求昇格と適用タイミングを担当する partial class。
@@ -14,11 +12,11 @@ public sealed partial class TrackerCoordinator
     {
         if (inFlightRequest is not null)
         {
-            appliedOptions = TrackerOptionsCloner.CloneResolvedOptions(inFlightRequest.TargetOptions);
-            desiredOptions = TrackerOptionsCloner.CloneResolvedOptions(inFlightRequest.TargetOptions);
-            desiredRuntimeOverrides = TrackerOptionsCloner.CloneRuntimeOverrides(inFlightRequest.RuntimeOverrides);
-            currentSettings = TrackerOptionsCloner.CloneSettings(inFlightRequest.TargetOptions.EngineSettings);
-            currentPublisherOptions = TrackerOptionsCloner.ClonePublisherOptions(inFlightRequest.TargetOptions.PublisherOptions);
+            appliedOptions = TrackerRuntimeOptionsCloner.CloneResolvedOptions(inFlightRequest.TargetOptions);
+            desiredOptions = TrackerRuntimeOptionsCloner.CloneResolvedOptions(inFlightRequest.TargetOptions);
+            desiredRuntimeOverrides = TrackerRuntimeOptionsCloner.CloneRuntimeOverrides(inFlightRequest.RuntimeOverrides);
+            currentSettings = TrackerRuntimeOptionsCloner.CloneSettings(inFlightRequest.TargetOptions.EngineSettings);
+            currentPublisherOptions = TrackerRuntimeOptionsCloner.ClonePublisherOptions(inFlightRequest.TargetOptions.PublisherOptions);
             publisher.ApplyConfiguration(currentPublisherOptions);
             snapshotStore.SwitchActiveProfile(profileName);
             inFlightRequest = null;
@@ -32,7 +30,7 @@ public sealed partial class TrackerCoordinator
     }
 
     /// <summary>
-    /// pending 要求を engine 投入中の要求へ昇格し、ProfileSwitched まで UI / publisher 側の反映を遅延させる。
+    /// pending 要求を engine 投入中の要求へ昇格し、ProfileSwitched まで read-side / publisher 側の反映を遅延させる。
     /// </summary>
     private TrackerProfileSwitchRequest? PromotePendingRequest()
     {
@@ -47,8 +45,8 @@ public sealed partial class TrackerCoordinator
         {
             RequestVersion = inFlightRequest.RequestVersion,
             ProfileName = inFlightRequest.TargetOptions.EngineSettings.ProfileName,
-            ResolvedBaseSettings = TrackerOptionsCloner.CloneSettings(inFlightRequest.TargetOptions.EngineSettings),
-            RuntimeOverrides = TrackerOptionsCloner.CloneRuntimeOverrides(inFlightRequest.RuntimeOverrides),
+            ResolvedBaseSettings = TrackerRuntimeOptionsCloner.CloneSettings(inFlightRequest.TargetOptions.EngineSettings),
+            RuntimeOverrides = TrackerRuntimeOptionsCloner.CloneRuntimeOverrides(inFlightRequest.RuntimeOverrides),
         };
     }
 
@@ -57,6 +55,6 @@ public sealed partial class TrackerCoordinator
     /// </summary>
     private sealed record PendingProfileSwitchRequest(
         int RequestVersion,
-        TrackerResolvedOptions TargetOptions,
+        TrackerRuntimeResolvedOptions TargetOptions,
         TrackerRuntimeOverrides RuntimeOverrides);
 }

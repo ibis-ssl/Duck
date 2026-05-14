@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Tracker.Core;
 using Tracker.DebugHost.Components.Vision;
 using Tracker.DebugHost.Tracking;
 

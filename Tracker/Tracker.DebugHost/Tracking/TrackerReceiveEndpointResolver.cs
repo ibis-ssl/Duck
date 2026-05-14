@@ -1,3 +1,5 @@
+using Tracker.Core;
+
 namespace Tracker.DebugHost.Tracking;
 
 /// <summary>

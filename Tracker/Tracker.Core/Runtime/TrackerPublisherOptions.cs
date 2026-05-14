@@ -1,4 +1,4 @@
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
 /// tracker packet publisher に適用済みの送信設定。

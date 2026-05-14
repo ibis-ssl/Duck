@@ -1,6 +1,4 @@
-using Tracker.Core;
-
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
 /// TrackerCoordinator の engine event dispatch、snapshot 更新、publish、observer 通知順序を担当する partial class。
@@ -8,7 +6,7 @@ namespace Tracker.DebugHost.Tracking;
 public sealed partial class TrackerCoordinator
 {
     /// <summary>
-    /// TrackerUpdateResult の emitted event 順に snapshot、capture、publish、observer 通知を dispatch する。
+    /// TrackerUpdateResult の emitted event 順に snapshot、publish、observer 通知を dispatch する。
     /// </summary>
     private void DispatchResult(TrackerUpdateResult result, DateTimeOffset receivedAt)
     {
@@ -29,9 +27,7 @@ public sealed partial class TrackerCoordinator
                     if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var committedFrame))
                     {
                         snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);
-                        renderSnapshotCaptureWriter?.CaptureFrame(committedFrame, receivedAt);
-                        trackerSnapshotAlignmentLogWriter?.CaptureRenderSnapshot(committedFrame, receivedAt);
-                        PublishFrame(committedFrame, receivedAt);
+                        PublishFrame(committedFrame);
                         NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));
                     }
 
@@ -61,24 +57,17 @@ public sealed partial class TrackerCoordinator
         }
     }
 
-    private void PublishFrame(TrackerFrame frame, DateTimeOffset receivedAt)
+    private void PublishFrame(TrackerFrame frame)
     {
         try
         {
             var packet = packetGenerator.Generate(frame);
-            trackerPacketSnapshotLogWriter?.CapturePacket(
-                packet,
-                receivedAt,
-                remoteEndpoint: null,
-                sourceRole: "own",
-                sourceLabel: packet.SourceName);
             publisher.Publish(packet);
             snapshotStore.RecordPublishSuccess();
         }
-        catch (Exception ex)
+        catch
         {
             snapshotStore.RecordPublishFailure();
-            logger.LogWarning(ex, "Failed to publish tracker packet for frame {FrameNumber}", frame.FrameNumber);
         }
     }
 

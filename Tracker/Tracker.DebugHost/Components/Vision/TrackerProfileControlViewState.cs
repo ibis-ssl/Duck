@@ -1,3 +1,4 @@
+using Tracker.Core;
 using Tracker.DebugHost.Tracking;
 
 namespace Tracker.DebugHost.Components.Vision;

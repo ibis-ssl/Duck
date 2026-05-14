@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using Google.Protobuf;
 
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
 /// tracker wrapper packet を UDP multicast/unicast 宛先へ送信する publisher。

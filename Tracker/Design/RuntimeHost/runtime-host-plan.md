@@ -57,6 +57,32 @@ tracker operation loop は、Web server live display processing と diagnostics 
 - diagnostics logging / replay は DebugHost 側の sample loop として扱い、tracker committed frame cadence を保存 cadence として要求しない。
 - 旧 render snapshot sidecar 互換は非要件とし、新規 logging / new capture の performance を優先する。
 
+### RUNTIME-HOST-005: Core shared runtime boundary
+
+RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。
+
+`Tracker.Core` の shared runtime boundary は次を担当する。
+
+- `ITrackerEngine.Update` の直列実行。
+- profile switch request の pending / in-flight 管理と control-only update drain。
+- `TrackerUpdateResult.EmittedEvents` 順の dispatch。
+- committed frame ごとの latest snapshot store 更新。
+- official `TrackerWrapperPacket` 生成と `ITrackerPacketPublisher` への publish。
+- publisher 設定反映、publish 成功/失敗統計、observer 通知。
+
+`Tracker.Core` の shared runtime boundary は次を参照しない。
+
+- `Tracker.DebugHost` namespace / project。
+- Blazor / Web UI。
+- diagnostics file logging。
+- capture writer / reader。
+- `VisionPacketCaptureSession`。
+- `TrackerRenderSnapshot`。
+- `TrackerPacketSnapshotLog`。
+- `TrackerSnapshotAlignmentLog`。
+
+DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。
+
 ## 設計資料配置
 
 設計資料は `Tracker/Design/` を canonical root とする。

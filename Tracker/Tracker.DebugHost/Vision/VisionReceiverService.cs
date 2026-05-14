@@ -3,6 +3,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
+using Tracker.Core;
 using Tracker.DebugHost.Tracking;
 
 namespace Tracker.DebugHost.Vision;

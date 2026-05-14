@@ -1,4 +1,4 @@
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
 /// tracker packet の配信先を抽象化し、実行中の publisher 設定変更と packet 送信を扱う。

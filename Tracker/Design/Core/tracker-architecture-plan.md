@@ -340,7 +340,7 @@ proto 変換境界でのみ official 単位へ変換する。
 
 ### `TrackerCoordinator`
 
-`Tracker.DebugHost` 側の責務として置く。
+`Tracker.Core` 側の runtime 境界として置く。RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project は作らず、将来の RuntimeHost から再利用できる UI 非依存 shared operation loop を Core に抽出する。
 
 役割:
 
@@ -349,6 +349,15 @@ proto 変換境界でのみ official 単位へ変換する。
 - 設定セット変更時に engine へ切替要求を渡す
 - 必要に応じて UDP 配信を行う
 - publisher の配信先切替や UI 表示用の active profile 名更新など、engine 外 state の反映を行う
+
+境界規則:
+
+- `TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore` は `Tracker.Core` に置く
+- `UdpTrackerPacketPublisher` は UI 非依存 publisher として `Tracker.Core` に置いてよい
+- Core の runtime source は `Tracker.DebugHost`、Blazor、diagnostics / capture writer / reader、`VisionPacketCaptureSession`、`TrackerRenderSnapshot`、`TrackerPacketSnapshotLog`、`TrackerSnapshotAlignmentLog` を参照しない
+- diagnostics file logging、render snapshot capture、alignment log、packet capture session sidecar path 依存は DebugHost 側の別処理として扱い、Core の operation loop には入れない
+- DebugHost の `VisionReceiverService` は UDP decode / raw store / capture の後、Core の `TrackerCoordinator.ProcessPacket` を呼ぶ adapter とする
+- DebugHost の diagnostics 設定解決結果は `TrackerResolvedOptions` に残せるが、Core loop が必要とする設定は `TrackerRuntimeResolvedOptions` として Core に置ける shape に分離する
 
 処理規則:
 
@@ -371,7 +380,7 @@ proto 変換境界でのみ official 単位へ変換する。
 
 ### `TrackedSnapshotStore`
 
-`Tracker.DebugHost` 側の UI 用読み取り模型とする。
+`Tracker.Core` 側の runtime 読み取り snapshot store とする。DebugHost UI と将来 RuntimeHost はこの store を介して latest frame、active profile、publish 統計を読む。
 
 最低限の内容:
 

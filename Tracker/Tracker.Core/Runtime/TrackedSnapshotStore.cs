@@ -1,9 +1,7 @@
-using Tracker.Core;
-
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
-/// tracker coordinator が更新し、UI が読み取る最新 snapshot と publish 統計を thread-safe に保持する。
+/// tracker coordinator が更新し、read-side が読み取る最新 snapshot と publish 統計を thread-safe に保持する。
 /// </summary>
 public sealed class TrackedSnapshotStore
 {
@@ -66,7 +64,7 @@ public sealed class TrackedSnapshotStore
     }
 
     /// <summary>
-    /// active profile を切り替え、旧 profile の latest frame を UI へ残さないように消去する。
+    /// active profile を切り替え、旧 profile の latest frame を read-side へ残さないように消去する。
     /// </summary>
     public void SwitchActiveProfile(string profileName)
     {

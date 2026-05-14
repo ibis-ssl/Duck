@@ -95,15 +95,15 @@ internal sealed class TrackerCoordinatorTestFactory
         return new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
-            settings,
-            publisherOptions,
-            diagnosticsOptions,
+            new TrackerRuntimeResolvedOptions
+            {
+                Enabled = true,
+                EngineSettings = settings,
+                PublisherOptions = publisherOptions,
+            },
             snapshotStore,
             publisher,
-            observers,
-            NullLogger<TrackerCoordinator>.Instance,
-            packetCaptureSession,
-            renderSnapshotCaptureWriter);
+            observers);
     }
 
     public VisionPacketCaptureSession CreateCaptureSession(

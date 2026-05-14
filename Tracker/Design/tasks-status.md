@@ -4,15 +4,15 @@
 
 ## 現在のタスク
 
-- ID: RUNTIME-HOST-005
-- Title: tracker operation loop の共有 runtime boundary を抽出する
+- ID: RUNTIME-HOST-006
+- Title: DebugHost live display を read-side snapshot 境界へ寄せる
 - Phase: implementation
 - Status: pending
 - Size: large
-- Dependencies: RUNTIME-HOST-004.
+- Dependencies: RUNTIME-HOST-005.
 - Exit Criteria:
-  - SSL-Vision input、tracker update、official tracker packet publish、latest tracker snapshot 公開の境界を UI / diagnostics logging から分離する。
-  - RuntimeHost から再利用できる UI 非依存 shared boundary と focused tests を揃える。
+  - DebugHost live display が UI render tick ごとに latest immutable snapshot を固定する。
+  - Web rendering tick が tracker operation loop を駆動しない構造にする。
   - focused tests / build、task 専用 review、commit、Draft PR #17 update が揃う。
 
 ## 完了済みタスク
@@ -50,6 +50,15 @@
   - Review Evidence:
     - `reports/runtime-host-004-review-20260514172921.md`
     - review で blocking findings なし。full `Tracker.Tests` は RUNTIME-HOST-002 / RUNTIME-HOST-003 の既存 Red contract があるため未実行とした。
+- `RUNTIME-HOST-005`: tracker operation loop の共有 runtime boundary を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI 非依存 Core runtime 境界へ寄せ、DebugHost は UDP decode / raw store / capture 後に Core coordinator を呼ぶ adapter とした。旧 diagnostics log / render snapshot sidecar 生成は Core operation loop から外し、performance 優先と RuntimeHost 再利用境界を固定した。
+  - Implementation Evidence:
+    - `reports/runtime-host-005-implementation-20260514180031.md`
+    - `reports/runtime-host-005-verification-20260514180308.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostSharedOperationLoopBoundaryTests|FullyQualifiedName~TrackerCoordinatorFrameFlowTests|FullyQualifiedName~TrackerCoordinatorResetAndProfileTests|FullyQualifiedName~TrackerProfileRequestServiceTests|FullyQualifiedName~TrackerCoordinatorDiagnosticsCaptureTests" -m:1 /nr:false` は 15 passed。
+    - `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false` は成功し、`git diff --check` も成功した。
+  - Review Evidence:
+    - `reports/runtime-host-005-review-20260514180308.md`
+    - review で blocking findings なし。DebugHost read-side UI 化、diagnostics sample sidecar、RuntimeHost scaffold は RUNTIME-HOST-006 以降へ残す。
 
 ## 固定残タスク
 
@@ -81,7 +90,7 @@
 | RUNTIME-HOST-002 | RuntimeHost / DebugHost project dependency boundary contract を追加する | verification | complete; draft PR #17 update pending | RUNTIME-HOST-001 | RuntimeHost が DebugHost / Web UI / diagnostics replay UI に依存しないこと、DebugHost が tracker operation loop の主責務を持たず read-side であることを Red test として固定し、r2 review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-003 | diagnostics sample boundary と legacy degraded contract を追加する | verification | complete; draft PR #17 | RUNTIME-HOST-002 | diagnostics sample tick が tracker committed frame cadence / `WorldFrameCommitted` に依存しないこと、Diagnostics `Vision Input` が diagnostics sample sidecar から復元されること、旧 render snapshot sidecar が unsupported / degraded legacy であることを Red contract として固定し、review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-004 | `Tracker.Server` を `Tracker.DebugHost` project / namespace / 起動経路へ rename する | implementation | complete; draft PR #17 | RUNTIME-HOST-003 | 現 `Tracker.Server` の Web UI / diagnostics / replay / capture viewer 責務を `Tracker.DebugHost` として明確化し、既存 debug normal path、README、launch settings、solution / project reference を維持し、review で blocking findings なしを確認した。 |
-| RUNTIME-HOST-005 | tracker operation loop の共有 runtime boundary を抽出する | implementation | pending | RUNTIME-HOST-004 | SSL-Vision input、tracker update、official tracker packet publish、latest tracker snapshot 公開の境界を UI / diagnostics logging から分離し、RuntimeHost から再利用できる UI 非依存 shared boundary と focused tests、review / commit / Draft PR #17 update を揃える。 |
+| RUNTIME-HOST-005 | tracker operation loop の共有 runtime boundary を抽出する | implementation | complete; draft PR #17 | RUNTIME-HOST-004 | `Tracker.Core/Runtime` に UI 非依存 shared operation loop、publisher、latest snapshot store を抽出し、DebugHost を Core coordinator 呼び出し adapter に寄せた。focused tests / build / review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-006 | DebugHost live display を read-side snapshot 境界へ寄せる | implementation | pending | RUNTIME-HOST-005 | DebugHost live display が UI render tick ごとに latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しないことを focused tests / build で確認し、review / commit / Draft PR #17 update まで完了する。 |
 | RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | pending | RUNTIME-HOST-003, RUNTIME-HOST-006 | diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して diagnostics sample sidecar に保存し、新規 capture / logging の bounded lookup を主経路にして RUNTIME-HOST-003 の Red tests を green にし、review / commit / Draft PR #17 update まで完了する。 |
 | RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | pending | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現し、build / focused tests / review / commit / Draft PR #17 update を揃える。 |

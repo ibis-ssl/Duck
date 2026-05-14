@@ -1,9 +1,7 @@
-using Tracker.Core;
-
-namespace Tracker.DebugHost.Tracking;
+namespace Tracker.Core;
 
 /// <summary>
-/// UI と diagnostics が参照する tracker の最新 frame、active profile、publish 統計の snapshot。
+/// runtime と read-side が参照する tracker の最新 frame、active profile、publish 統計の snapshot。
 /// </summary>
 /// <param name="LatestFrame">最後に committed された tracker frame。未受信または reset 後は null。</param>
 /// <param name="ReceivedAt">最新 frame を受信した時刻。frame がない場合は null。</param>
