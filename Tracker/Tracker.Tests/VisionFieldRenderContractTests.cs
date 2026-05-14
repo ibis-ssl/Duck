@@ -64,6 +64,21 @@ public class VisionFieldRenderContractTests
         Assert.DoesNotContain("<select", overlayComponentMarkup, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// diagnostics sample sidecar 由来の field source は render snapshot が無くても field block を表示できること。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsFieldMarkup_IsNotGatedOnlyByRenderSnapshot()
+    {
+        var diagnosticsMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor");
+        var diagnosticsCode = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor.cs");
+
+        Assert.Contains("@if (CanShowFieldDisplay)", diagnosticsMarkup, StringComparison.Ordinal);
+        Assert.Contains("private bool CanShowFieldDisplay =>", diagnosticsCode, StringComparison.Ordinal);
+        Assert.Contains("LeftTrackerFieldSourceFrame", diagnosticsCode, StringComparison.Ordinal);
+        Assert.DoesNotContain("@if (selectedRenderSnapshot is not null)", diagnosticsMarkup, StringComparison.Ordinal);
+    }
+
     private static string ExtractBetween(string text, string start, string end)
     {
         var startIndex = text.IndexOf(start, StringComparison.Ordinal);

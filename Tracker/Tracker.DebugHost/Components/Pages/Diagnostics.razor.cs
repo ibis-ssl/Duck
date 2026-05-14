@@ -58,6 +58,11 @@ public partial class Diagnostics : IDisposable
 
     private bool CanPlayback => ReplayTimelineCount > 1;
 
+    private bool CanShowFieldDisplay =>
+        selectedRenderSnapshot is not null ||
+        comparisonUiState?.LeftTrackerFieldSourceFrame is not null ||
+        comparisonUiState?.RightTrackerFieldSourceFrame is not null;
+
     private TrackerDiagnosticsComparisonViewState ComparisonViewState =>
         comparisonUiState?.ViewState ?? TrackerDiagnosticsComparisonUiState.InitialViewState;
 
@@ -277,7 +282,7 @@ public partial class Diagnostics : IDisposable
 
     private string ShellClass()
     {
-        return selectedRenderSnapshot is null
+        return !CanShowFieldDisplay
             ? "diagnostics-shell"
             : "diagnostics-shell diagnostics-shell--render";
     }
@@ -879,7 +884,16 @@ public partial class Diagnostics : IDisposable
         if (timelineRenderFrame is null)
         {
             selectedRenderSnapshot = null;
-            renderSnapshotError = $"Tracked frame '{selectedEntry.TrackedFrame}' is not a numeric frame number.";
+            renderSnapshotError = replayTimeline.Count > 0
+                ? null
+                : $"Tracked frame '{selectedEntry.TrackedFrame}' is not a numeric frame number.";
+            return;
+        }
+
+        if (renderSnapshotsByFrame.Count == 0 && replayTimeline.Count > 0)
+        {
+            selectedRenderSnapshot = null;
+            renderSnapshotError = null;
             return;
         }
 
