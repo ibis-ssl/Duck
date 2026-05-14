@@ -4,9 +4,9 @@
 
 ## 全体状況
 
-- 現在のフェーズ: none
-- 現在のタスク: none
-- 残りフェーズ: none
+- 現在のフェーズ: simulator-docker
+- 現在のタスク: TRACKER-064
+- 残りフェーズ: simulator-docker
 
 ## フェーズ一覧
 
@@ -15,6 +15,15 @@
 | past-tracker-history | done | `TRACKER-000` から `TRACKER-038` までの完了済みタスクと旧フェーズ詳細は `Tracker/Tracker.Core/Design/tracker-history-000-038.md` に退避済み。tracking 軽量化と履歴退避は PR #9 準備の保守性/運用作業として完了済みで、CaptureOn 比較ログの機能仕様には含めない。 |
 | investigation | done | 直近履歴として `TRACKER-039` は PR #8 `https://github.com/ibis-ssl/Duck/pull/8` で `2026-05-12T00:06:33Z` に merge 済み。証跡は `reports/tracker-039-evidence-20260512084929.md`、review は `reports/tracker-039-review-20260512085258.md` と `reports/tracker-039-review-r2-20260512090207.md` に記録済み。 |
 | comparison-logging | done | `TRACKER-040` から `TRACKER-063` までの CaptureOn 比較ログ拡張、live tracker receiver、CLI / diagnostics comparison、playback / scrub高速化、Field source切替、Field overlay、ER-Force replay 用保存時 alignment、最速 tracker source cadence replay、等倍速 Play の30fps相当実時間追従、playback UI の速度選択再調整、可変早送り倍率は task-by-task review gate まで完了済み。Play / Fast Forward / Stop のボタン配置は従来どおり維持し、速度選択側には `等倍速` と可変 `早送り倍率` control を compact に表示する。fast multiplier 選択中に Play を押した場合は `等倍速` へ戻さず、選択中倍率の Fast Forward として開始する。可変早送り倍率は `2x..1024x` clamp とし、64x 超の倍率が timer interval / state normalization で無効化されず、実効速度を上げられる。CaptureOn 中に見えている tracker packet を session folder 配下の snapshot sidecar JSONL に保存し、metadata から各 file relative path、source identity、role、比較用 raw payloadまたは復元可能参照を辿れる。official multicast receiver は明示有効化時だけ group joinし、3rdparty tracker snapshot は `Tracker.CaptureReplay` の CLI出力、`/diagnostics` comparison panel / playback / Field source切替 / Field overlay で再生・比較できる。ER-Force のように external tracker timestamp が ibis と非同一時刻系でも新規 capture の保存済み alignment で replay Field に表示でき、Vision より高速な tracker source がある場合は replay timeline が高速 source cadence を含み Vision 側が低速 frame を保持して見える。保存済み alignment / scrub / Field source / comparison による任意 tick の確実な比較能力は維持し、等倍速 Play は30fps相当の表示更新で高頻度 tracker tick を必要に応じて表示スキップし、遅れ確認用の実時間の等倍速を維持する。alignment schema v1 互換は非要件として性能第一の v2 index を使う。review / commit / PR gate が taskごとに閉じていること。 |
+| simulator-docker | in-progress | ER-Force simulator protocol でボール / ロボットの移動を制御し、その観測から ibis tracker と他 tracker の挙動差を測る E2E 検証基盤を、Spec driven / TDD で段階的に作る。最初に `Tracker/Tracker.Server/Design/tracker-e2e-simulator-requirements.md` で要件定義を固定し、その後 `/home/ibis/ibis_ws/src/crane/docker` の ER-Force simulator / 3rd party tracker 用 Docker 資産と simulator protocol を調査し、Duck repo へ移植する。grSim は使わず、調査・設計・実装対象外とする。評価基準は ER-Force simulator protocol から取得できるノイズなし真値を最優先とし、取れない場合は ER-Force tracker、Tigers tracker の順で参照 tracker 差分 fallback として使い、真値とは呼ばない。既存 ER-Force simulator からノイズなし真値を取得できない場合は、今後の方針としてノイズなし真値を出すための simulator 改造が必要か、改造対象、想定 protocol / file output、Duck 側比較への取り込み方を検討する。設計書は `Tracker/Tracker.Server/Design/raw-vision-viewer-plan.md` の脚注形式を参照し、専門用語・略語の説明を脚注で入れる。調査、設計、実装、validation、gpt-5.5 high review、tracking 同期、commit / PR ready gate が task ごとに閉じていること。 |
+
+## simulator-docker 固定残タスク
+
+- 固定一覧は `TRACKER-064`、`TRACKER-065`、`TRACKER-066`、`TRACKER-067` とする。補助番号は phase tracking に載せない。追加 task 番号はユーザー承認なしに作らない。
+- `TRACKER-064`: ER-Force simulator protocol E2E 差分評価の要件定義書を作成する。要件定義書では、最終的に simulator protocol でボール / ロボットの移動を制御し、その観測テストを段階的に増やす方針、grSim 不採用、観測ノイズなし真値優先、ER-Force tracker -> Tigers tracker の参照 tracker 差分 fallback、手元確認優先、Spec driven / TDD の進め方を固定した。専門用語・略語は脚注で説明した。調査分担、設計作成、gpt-5.5 high r2 review まで完了済みで指摘なし。
+- `TRACKER-065`: ER-Force docker / simulator protocol / 参照 tracker の調査で移植範囲を固定する。
+- `TRACKER-066`: E2E 差分評価用 Docker 環境と比較補助を TDD で追加する。
+- `TRACKER-067`: simulator-docker 作業を review / validation / PR ready にする。
 
 ## comparison-logging 固定残タスク
 
