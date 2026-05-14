@@ -173,6 +173,58 @@ public class RuntimeHostOperationLoopTests
         Assert.Equal("runtime-uuid", publishedPacket.Uuid);
     }
 
+    /// <summary>
+    /// 何を確認しているか: RuntimeHost の tick 間に複数 camera packet が届いた場合、片方を latest 上書きで落とさず camera ごとの latest を処理することを確認する。
+    /// </summary>
+    [Fact]
+    public void ProcessLatestPacket_WithMultipleCameraInputsBeforeTick_ProcessesLatestPacketPerCamera()
+    {
+        var camera0Packet = TrackerContractTestData.CreateDetectionPacket(
+            frameNumber: 100,
+            cameraId: 0,
+            robotsYellow: [TrackerContractTestData.CreateRobot(robotId: 1, x: -4000, y: 0)]);
+        var olderCamera1Packet = TrackerContractTestData.CreateDetectionPacket(
+            frameNumber: 101,
+            cameraId: 1,
+            robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 2, x: 4000, y: 0)]);
+        var latestCamera1Packet = TrackerContractTestData.CreateDetectionPacket(
+            frameNumber: 102,
+            cameraId: 1,
+            robotsBlue: [TrackerContractTestData.CreateRobot(robotId: 3, x: 4100, y: 0)]);
+        var resolvedOptions = new TrackerRuntimeResolvedOptions
+        {
+            Enabled = true,
+            EngineSettings = new TrackerEngineSettings
+            {
+                ProfileName = "default",
+            },
+            PublisherOptions = new TrackerPublisherOptions
+            {
+                SourceName = "runtime-source",
+                Uuid = "runtime-uuid",
+            },
+        };
+        var engine = new RecordingEngine(new TrackerUpdateResult());
+        var coordinator = new TrackerCoordinator(
+            engine,
+            new TrackerPacketGenerator("runtime-source", "runtime-uuid"),
+            resolvedOptions,
+            new TrackedSnapshotStore(),
+            new RecordingPublisher(),
+            []);
+        var packetBuffer = new RuntimeVisionPacketBuffer();
+        var operationLoop = new RuntimeHostOperationLoop(packetBuffer, coordinator, resolvedOptions);
+
+        packetBuffer.StorePacket(camera0Packet, DateTimeOffset.UnixEpoch.AddMilliseconds(1));
+        packetBuffer.StorePacket(olderCamera1Packet, DateTimeOffset.UnixEpoch.AddMilliseconds(2));
+        packetBuffer.StorePacket(latestCamera1Packet, DateTimeOffset.UnixEpoch.AddMilliseconds(3));
+        var processed = operationLoop.ProcessLatestPacket();
+
+        Assert.True(processed);
+        Assert.Equal([100u, 102u], engine.Calls.Select(call => call.Packet!.Detection.FrameNumber));
+        Assert.Equal([0u, 1u], engine.Calls.Select(call => call.Packet!.Detection.CameraId));
+    }
+
     private static IHost BuildHost(IEnumerable<KeyValuePair<string, string?>> configurationValues)
     {
         var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings

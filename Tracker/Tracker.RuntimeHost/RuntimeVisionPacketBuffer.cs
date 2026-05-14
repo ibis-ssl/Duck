@@ -6,7 +6,8 @@ namespace Tracker.RuntimeHost;
 public sealed class RuntimeVisionPacketBuffer
 {
     private readonly object gate = new();
-    private RuntimeVisionPacket? latestPacket;
+    private readonly Dictionary<uint, RuntimeVisionPacket> latestDetectionPacketsByCamera = [];
+    private RuntimeVisionPacket? latestNonDetectionPacket;
 
     /// <summary>
     /// latest SSL-Vision packet と受信時刻を保存する。
@@ -17,25 +18,38 @@ public sealed class RuntimeVisionPacketBuffer
 
         lock (gate)
         {
-            latestPacket = new RuntimeVisionPacket(packet.Clone(), receivedAt);
+            var runtimePacket = new RuntimeVisionPacket(packet.Clone(), receivedAt);
+            if (packet.Detection is not null)
+            {
+                latestDetectionPacketsByCamera[packet.Detection.CameraId] = runtimePacket;
+            }
+            else
+            {
+                latestNonDetectionPacket = runtimePacket;
+            }
         }
     }
 
     /// <summary>
-    /// 未処理の latest packet があれば取り出し、buffer を空にする。
+    /// 未処理の camera ごとの latest packet があれば取り出し、buffer を空にする。
     /// </summary>
-    public bool TryTakeLatest(out RuntimeVisionPacket packet)
+    public bool TryTakeLatestBatch(out IReadOnlyList<RuntimeVisionPacket> packets)
     {
         lock (gate)
         {
-            if (latestPacket is null)
+            if (latestDetectionPacketsByCamera.Count == 0 &&
+                latestNonDetectionPacket is null)
             {
-                packet = null!;
+                packets = [];
                 return false;
             }
 
-            packet = latestPacket;
-            latestPacket = null;
+            packets = latestDetectionPacketsByCamera.Values
+                .Concat(latestNonDetectionPacket is null ? [] : [latestNonDetectionPacket])
+                .OrderBy(packet => packet.ReceivedAt)
+                .ToArray();
+            latestDetectionPacketsByCamera.Clear();
+            latestNonDetectionPacket = null;
             return true;
         }
     }

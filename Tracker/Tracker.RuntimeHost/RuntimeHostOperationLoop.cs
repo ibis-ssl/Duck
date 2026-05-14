@@ -25,7 +25,7 @@ public sealed class RuntimeHostOperationLoop
     }
 
     /// <summary>
-    /// 未処理の latest packet があれば tracker coordinator に渡し、処理したかどうかを返す。
+    /// 未処理の camera ごとの latest packet があれば tracker coordinator に渡し、処理したかどうかを返す。
     /// </summary>
     public bool ProcessLatestPacket()
     {
@@ -34,12 +34,16 @@ public sealed class RuntimeHostOperationLoop
             return false;
         }
 
-        if (!packetBuffer.TryTakeLatest(out var packet))
+        if (!packetBuffer.TryTakeLatestBatch(out var packets))
         {
             return false;
         }
 
-        _ = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
+        foreach (var packet in packets)
+        {
+            _ = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
+        }
+
         return true;
     }
 }

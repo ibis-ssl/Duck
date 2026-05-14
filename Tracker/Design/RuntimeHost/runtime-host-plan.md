@@ -107,7 +107,7 @@ Diagnostics replay / comparison は diagnostics sample sidecar が存在する s
 
 RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。
 
-受信処理は latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の latest packet がある場合だけ `TrackerCoordinator.ProcessPacket` へ渡す。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。
+受信処理は camera ごとの latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の camera ごとの latest packet を受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じ camera から tick 間に複数 packet が届いた場合は最新だけを残し、異なる camera の packet は single latest 上書きで落とさない。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。
 
 RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。
 
