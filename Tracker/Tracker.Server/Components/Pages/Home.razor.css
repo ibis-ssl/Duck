@@ -101,6 +101,213 @@
     align-items: stretch;
 }
 
+.vision-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-width: 0;
+    min-height: 0;
+}
+
+.vision-comparison-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vision-comparison-toolbar label,
+.vision-comparison-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #b6c9b1;
+    font-size: 0.82rem;
+}
+
+.vision-comparison-toolbar select {
+    min-width: 10rem;
+    border: 1px solid #315235;
+    border-radius: 6px;
+    padding: 0.42rem 0.55rem;
+    background: #102417;
+    color: #f3f8ef;
+}
+
+.vision-comparison-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+    min-height: 0;
+    flex: 1;
+}
+
+.vision-comparison-layer {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid #315235;
+    border-radius: 8px;
+    background: #102417;
+    overflow: hidden;
+}
+
+.vision-comparison-layer header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid #315235;
+    color: #b6c9b1;
+    font-size: 0.78rem;
+}
+
+.vision-comparison-layer strong {
+    color: #f3f8ef;
+    font-weight: 600;
+}
+
+.vision-comparison-layer.is-missing {
+    min-height: 12rem;
+}
+
+.vision-comparison-missing {
+    display: grid;
+    place-items: center;
+    flex: 1;
+    min-height: 10rem;
+    padding: 1rem;
+    color: #d4c39a;
+    text-align: center;
+}
+
+.vision-comparison-overlay {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+    border: 1px solid #315235;
+    border-radius: 8px;
+    background: #102417;
+    overflow: hidden;
+}
+
+.vision-comparison-overlay header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid #315235;
+    color: #b6c9b1;
+    font-size: 0.78rem;
+}
+
+.vision-comparison-overlay header strong {
+    color: #f3f8ef;
+    font-weight: 600;
+}
+
+.vision-comparison-overlay-stack {
+    position: relative;
+    flex: 1;
+    min-height: 18rem;
+    overflow: hidden;
+}
+
+.vision-comparison-overlay-layer {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+}
+
+.vision-comparison-overlay-layer ::deep(.field-card) {
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+}
+
+.vision-comparison-overlay-layer.is-layer-a,
+.vision-comparison-overlay-layer.is-collapsed {
+    z-index: 1;
+}
+
+.vision-comparison-overlay-layer.is-layer-b {
+    z-index: 2;
+    opacity: 0.68;
+    mix-blend-mode: screen;
+}
+
+.vision-comparison-overlay-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.45rem 0.6rem;
+    border-top: 1px solid #315235;
+}
+
+.vision-comparison-overlay-legend__item {
+    border: 1px solid #406b43;
+    border-radius: 999px;
+    padding: 0.22rem 0.5rem;
+    color: #f3f8ef;
+    background: #17301d;
+    font-size: 0.72rem;
+}
+
+.vision-comparison-overlay-legend__item.is-muted {
+    color: #89a38b;
+    opacity: 0.72;
+}
+
+.vision-comparison-details {
+    border: 1px solid #315235;
+    border-radius: 8px;
+    padding: 0.75rem;
+    background: #102417;
+    overflow: auto;
+}
+
+.vision-comparison-details h2 {
+    margin: 0 0 0.45rem;
+    color: #f3f8ef;
+    font-size: 0.95rem;
+}
+
+.vision-comparison-details ul {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0 0 0.8rem;
+    padding: 0;
+    list-style: none;
+}
+
+.vision-comparison-details li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.45rem;
+    align-items: center;
+    color: #b6c9b1;
+    font-size: 0.82rem;
+}
+
+.vision-comparison-details dl {
+    display: grid;
+    grid-template-columns: minmax(5rem, auto) minmax(0, 1fr);
+    gap: 0.25rem 0.55rem;
+    margin: 0 0 0.8rem;
+    color: #b6c9b1;
+    font-size: 0.82rem;
+}
+
+.vision-comparison-details dt {
+    color: #89a38b;
+}
+
+.vision-comparison-details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
 @media (max-width: 1100px) {
     .vision-shell {
         height: auto;
@@ -122,6 +329,10 @@
     }
 
     .vision-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vision-comparison-fields {
         grid-template-columns: 1fr;
     }
 }

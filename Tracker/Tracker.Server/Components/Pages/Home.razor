@@ -7,6 +7,7 @@
 @using Tracker.Server.Vision
 @inject VisionPacketStore Store
 @inject TrackedSnapshotStore TrackedStore
+@inject VisionLiveComparisonSnapshotComposer ComparisonComposer
 @inject IOptions<TrackerOptions> TrackerOptionsAccessor
 @inject TrackerProfileRequestService ProfileRequestService
 @inject VisionPacketCaptureRuntimeControl CaptureControl
@@ -53,6 +54,11 @@
                         @onclick="@(() => SelectMode(ViewerMode.Tracked))">
                     Tracked
                 </button>
+                <button type="button"
+                        class="@ModeButtonClass(ViewerMode.Compare)"
+                        @onclick="@(() => SelectMode(ViewerMode.Compare))">
+                    Compare
+                </button>
             </div>
         </div>
     </header>
@@ -89,7 +95,7 @@
                                 RobotsYellow="selectedView.RobotsYellow"
                                 RobotsBlue="selectedView.RobotsBlue" />
         }
-        else
+        else if (viewerMode == ViewerMode.Tracked)
         {
             <VisionFieldCanvas Geometry="ResolveTrackedGeometry(rawSnapshot, trackedView)"
                                Balls="trackedView.Balls"
@@ -100,6 +106,148 @@
                                  ProfileControl="profileControl"
                                  OnRequestProfileSwitch="RequestProfileSwitchAsync" />
         }
+        else
+        {
+            <div class="vision-comparison">
+                <div class="vision-comparison-toolbar">
+                    <div class="vision-mode-toggle" role="tablist" aria-label="Comparison display mode">
+                        <button type="button"
+                                class="@ComparisonModeButtonClass(VisionLiveComparisonMode.Split)"
+                                @onclick="@(() => SelectComparisonMode(VisionLiveComparisonMode.Split))">
+                            Split
+                        </button>
+                        <button type="button"
+                                class="@ComparisonModeButtonClass(VisionLiveComparisonMode.Overlay)"
+                                @onclick="@(() => SelectComparisonMode(VisionLiveComparisonMode.Overlay))">
+                            Overlay
+                        </button>
+                    </div>
+                    <label>
+                        Layer A
+                        <select value="@layerASourceKey" @onchange='@((ChangeEventArgs args) => SelectLayerSource("A", args))'>
+                            @foreach (var option in comparisonViewState.SourceOptions)
+                            {
+                                <option value="@option.Key">@ComparisonOptionLabel(option)</option>
+                            }
+                        </select>
+                    </label>
+                    <label class="vision-comparison-check">
+                        <input type="checkbox"
+                               checked="@layerAVisible"
+                               @onchange='@((ChangeEventArgs args) => SetLayerVisibility("A", args))' />
+                        Visible
+                    </label>
+                    <label>
+                        Layer B
+                        <select value="@layerBSourceKey" @onchange='@((ChangeEventArgs args) => SelectLayerSource("B", args))'>
+                            @foreach (var option in comparisonViewState.SourceOptions)
+                            {
+                                <option value="@option.Key">@ComparisonOptionLabel(option)</option>
+                            }
+                        </select>
+                    </label>
+                    <label class="vision-comparison-check">
+                        <input type="checkbox"
+                               checked="@layerBVisible"
+                               @onchange='@((ChangeEventArgs args) => SetLayerVisibility("B", args))' />
+                        Visible
+                    </label>
+                </div>
+                @if (comparisonMode == VisionLiveComparisonMode.Overlay)
+                {
+                    <section class="vision-comparison-overlay">
+                        <header>
+                            <span>Overlay Field</span>
+                            <strong>@comparisonViewState.RenderSnapshot.GeometrySourceLabel</strong>
+                        </header>
+                        <div class="vision-comparison-overlay-stack">
+                            @foreach (var layer in ComparisonLayers)
+                            {
+                                @if (layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible)
+                                {
+                                    <div class="@ComparisonOverlayLayerClass(layer)">
+                                        <VisionFieldCanvas Geometry="layer.Field.Geometry"
+                                                           Balls="layer.Field.Balls"
+                                                           RobotsYellow="layer.Field.RobotsYellow"
+                                                           RobotsBlue="layer.Field.RobotsBlue" />
+                                    </div>
+                                }
+                            }
+                            @if (!ComparisonLayers.Any(layer => layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible))
+                            {
+                                <div class="vision-comparison-missing">No visible ready layer.</div>
+                            }
+                        </div>
+                        <div class="vision-comparison-overlay-legend">
+                            @foreach (var layer in ComparisonLayers)
+                            {
+                                <span class="@ComparisonOverlayLegendClass(layer)">
+                                    @layer.LayerName: @layer.SourceLabel
+                                </span>
+                            }
+                        </div>
+                    </section>
+                }
+                else
+                {
+                    <div class="vision-comparison-fields">
+                        @foreach (var layer in ComparisonLayers)
+                        {
+                            <section class="@ComparisonLayerClass(layer)">
+                                <header>
+                                    <span>@layer.LayerName</span>
+                                    <strong>@layer.SourceLabel</strong>
+                                </header>
+                                @if (layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible)
+                                {
+                                    <VisionFieldCanvas Geometry="layer.Field.Geometry"
+                                                       Balls="layer.Field.Balls"
+                                                       RobotsYellow="layer.Field.RobotsYellow"
+                                                       RobotsBlue="layer.Field.RobotsBlue" />
+                                }
+                                else
+                                {
+                                    <div class="vision-comparison-missing">@layer.MissingReason</div>
+                                }
+                            </section>
+                        }
+                    </div>
+                }
+            </div>
+
+            <aside class="vision-comparison-details">
+                <h2>Layers</h2>
+                <ul>
+                    @foreach (var legend in comparisonViewState.LegendItems)
+                    {
+                        <li>
+                            <span>@legend.LayerName</span>
+                            <strong>@legend.SourceLabel</strong>
+                            <small>@legend.Status</small>
+                        </li>
+                    }
+                </ul>
+                <h2>Details</h2>
+                @foreach (var detail in comparisonViewState.LayerDetails)
+                {
+                    <dl>
+                        <dt>Source</dt>
+                        <dd>@detail.SourceLabel</dd>
+                        <dt>Kind</dt>
+                        <dd>@detail.SourceKind</dd>
+                        <dt>Received</dt>
+                        <dd>@FormatTimestamp(detail.ReceivedAt)</dd>
+                        <dt>Timestamp</dt>
+                        <dd>@(detail.TimestampNs?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                        <dt>Balls</dt>
+                        <dd>@(detail.BallCount?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                        <dt>Robots</dt>
+                        <dd>@(detail.RobotCount?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                    </dl>
+                }
+                <p>Geometry: @comparisonViewState.RenderSnapshot.GeometrySourceLabel</p>
+            </aside>
+        }
     </div>
 </section>
 
@@ -108,14 +256,21 @@
     private readonly CancellationTokenSource disposalTokenSource = new();
     private VisionPacketSnapshot rawSnapshot = VisionPacketSnapshot.Empty;
     private TrackedSnapshot trackedSnapshot = new(null, null, "default", 0, 0);
+    private VisionLiveComparisonViewState comparisonViewState = CreateInitialComparisonViewState();
     private Task? refreshTask;
     private string selectedViewKey = AggregateViewKey;
     private ViewerMode viewerMode = ViewerMode.Raw;
+    private VisionLiveComparisonMode comparisonMode = VisionLiveComparisonMode.Split;
+    private string layerASourceKey = "raw:aggregate";
+    private string layerBSourceKey = "tracked:ibis";
+    private bool layerAVisible = true;
+    private bool layerBVisible = true;
 
     protected override void OnInitialized()
     {
         rawSnapshot = Store.GetSnapshot();
         trackedSnapshot = TrackedStore.GetSnapshot();
+        RefreshComparisonViewState();
         EnsureSelectedViewExists(rawSnapshot);
         refreshTask = RefreshAsync(disposalTokenSource.Token);
     }
@@ -128,10 +283,15 @@
         {
             rawSnapshot = Store.GetSnapshot();
             trackedSnapshot = TrackedStore.GetSnapshot();
+            RefreshComparisonViewState();
             EnsureSelectedViewExists(rawSnapshot);
             await InvokeAsync(StateHasChanged);
         }
     }
+
+    private IReadOnlyList<VisionLiveComparisonLayer> ComparisonLayers => comparisonViewState.Mode == VisionLiveComparisonMode.Overlay
+        ? comparisonViewState.CreateOverlayLayers()
+        : comparisonViewState.CreateSplitLayers();
 
     private DateTimeOffset? CurrentReceivedAt => viewerMode == ViewerMode.Tracked
         ? trackedSnapshot.ReceivedAt
@@ -208,6 +368,50 @@
     private Task SelectMode(ViewerMode mode)
     {
         viewerMode = mode;
+        return Task.CompletedTask;
+    }
+
+    private Task SelectComparisonMode(VisionLiveComparisonMode mode)
+    {
+        comparisonMode = mode;
+        RefreshComparisonViewState();
+        return Task.CompletedTask;
+    }
+
+    private Task SelectLayerSource(string layerName, ChangeEventArgs args)
+    {
+        var value = args.Value?.ToString();
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.CompletedTask;
+        }
+
+        if (string.Equals(layerName, "A", StringComparison.Ordinal))
+        {
+            layerASourceKey = value;
+        }
+        else
+        {
+            layerBSourceKey = value;
+        }
+
+        RefreshComparisonViewState();
+        return Task.CompletedTask;
+    }
+
+    private Task SetLayerVisibility(string layerName, ChangeEventArgs args)
+    {
+        var isVisible = args.Value is bool value && value;
+        if (string.Equals(layerName, "A", StringComparison.Ordinal))
+        {
+            layerAVisible = isVisible;
+        }
+        else
+        {
+            layerBVisible = isVisible;
+        }
+
+        RefreshComparisonViewState();
         return Task.CompletedTask;
     }
 
@@ -321,6 +525,87 @@
         return viewerMode == mode ? "vision-mode-toggle__button is-active" : "vision-mode-toggle__button";
     }
 
+    private string ComparisonModeButtonClass(VisionLiveComparisonMode mode)
+    {
+        return comparisonMode == mode ? "vision-mode-toggle__button is-active" : "vision-mode-toggle__button";
+    }
+
+    private static string ComparisonLayerClass(VisionLiveComparisonLayer layer)
+    {
+        return layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible
+            ? "vision-comparison-layer"
+            : "vision-comparison-layer is-missing";
+    }
+
+    private static string ComparisonOverlayLayerClass(VisionLiveComparisonLayer layer)
+    {
+        return layer.IsSameSourceCollapsed
+            ? "vision-comparison-overlay-layer is-collapsed"
+            : $"vision-comparison-overlay-layer is-{layer.LayerName.Replace(" ", "-", StringComparison.Ordinal).ToLowerInvariant()}";
+    }
+
+    private static string ComparisonOverlayLegendClass(VisionLiveComparisonLayer layer)
+    {
+        return layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible
+            ? "vision-comparison-overlay-legend__item"
+            : "vision-comparison-overlay-legend__item is-muted";
+    }
+
+    private static string ComparisonOptionLabel(VisionLiveComparisonSourceOption option)
+    {
+        return option.IsAvailable ? option.Label : $"{option.Label} (missing)";
+    }
+
+    private void RefreshComparisonViewState()
+    {
+        var snapshot = ComparisonComposer.CaptureRenderTickSnapshot();
+        var defaultViewState = ComparisonComposer.CreateViewState(snapshot);
+        var layerA = FindSourceOption(defaultViewState.SourceOptions, layerASourceKey);
+        var layerB = FindSourceOption(defaultViewState.SourceOptions, layerBSourceKey);
+        comparisonViewState = new VisionLiveComparisonViewState(
+            comparisonMode,
+            snapshot,
+            defaultViewState.SourceOptions,
+            new VisionLiveComparisonLayerSelection(layerA, layerAVisible),
+            new VisionLiveComparisonLayerSelection(layerB, layerBVisible));
+    }
+
+    private static VisionLiveComparisonSourceOption FindSourceOption(
+        IReadOnlyList<VisionLiveComparisonSourceOption> options,
+        string key)
+    {
+        return options.FirstOrDefault(option => string.Equals(option.Key, key, StringComparison.Ordinal))
+            ?? options.First();
+    }
+
+    private static VisionLiveComparisonViewState CreateInitialComparisonViewState()
+    {
+        var snapshot = new VisionLiveComparisonRenderSnapshot(
+            DateTimeOffset.UtcNow,
+            0,
+            Array.Empty<VisionLiveComparisonRawAggregateSnapshot>(),
+            Array.Empty<VisionLiveComparisonRawCameraSnapshot>(),
+            null,
+            Array.Empty<VisionLiveComparisonThirdPartyTrackerSnapshot>(),
+            null,
+            "Missing",
+            "Missing",
+            IsImmutable: true);
+        var rawAggregate = new VisionLiveComparisonSourceOption(
+            VisionLiveComparisonSourceKind.RawAggregate,
+            "raw:aggregate",
+            "Raw Aggregate",
+            CameraId: null,
+            IsAvailable: false,
+            MissingReason: "No raw aggregate snapshot in current render tick.");
+        return new VisionLiveComparisonViewState(
+            VisionLiveComparisonMode.Split,
+            snapshot,
+            [rawAggregate],
+            new VisionLiveComparisonLayerSelection(rawAggregate, IsVisible: true),
+            new VisionLiveComparisonLayerSelection(rawAggregate, IsVisible: true));
+    }
+
     private string CaptureButtonClass()
     {
         return CaptureControl.Enabled ? "vision-capture-toggle is-active" : "vision-capture-toggle";
@@ -330,6 +615,7 @@
     {
         Raw,
         Tracked,
+        Compare,
     }
 
     public async ValueTask DisposeAsync()

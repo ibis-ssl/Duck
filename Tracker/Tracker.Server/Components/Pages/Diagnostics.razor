@@ -192,6 +192,16 @@
                                     <dd>@Display(comparison.RobotCount)</dd>
                                     <dt>Raw payload</dt>
                                     <dd>@DisplayRawPayloadRestored(comparison.RawPayloadRestored)</dd>
+                                    <dt>Source received</dt>
+                                    <dd>@Display(comparison.NearestSnapshotReceivedAt)</dd>
+                                    <dt>Selected received</dt>
+                                    <dd>@Display(comparison.SelectedReplayTimelineReceivedAt)</dd>
+                                    <dt>Latest-before</dt>
+                                    <dd>@Display(comparison.IsLatestBefore)</dd>
+                                    <dt>Stale</dt>
+                                    <dd>@Display(comparison.IsStale)</dd>
+                                    <dt>Staleness delta ns</dt>
+                                    <dd>@Display(comparison.StalenessDeltaNs)</dd>
                                 </dl>
                             }
                         }
@@ -254,6 +264,38 @@
                                     </header>
                                     <DiagnosticsFieldOverlayCanvas Model="overlayField"
                                                                    VisibilityChanged="OnOverlayLayerVisibilityChanged" />
+                                    <div class="diagnostics-field-source__metadata-grid">
+                                        @if (comparisonUiState?.LeftTrackerFieldSourceFrame is { } overlayLeftFrame)
+                                        {
+                                            <dl class="diagnostics-field-source__metadata">
+                                                <dt>Layer A source received</dt>
+                                                <dd>@Display(overlayLeftFrame.SourceSnapshotReceivedAt)</dd>
+                                                <dt>Layer A selected received</dt>
+                                                <dd>@Display(overlayLeftFrame.SelectedReplayTimelineReceivedAt)</dd>
+                                                <dt>Layer A latest-before</dt>
+                                                <dd>@Display(overlayLeftFrame.IsLatestBefore)</dd>
+                                                <dt>Layer A stale</dt>
+                                                <dd>@Display(overlayLeftFrame.IsStale)</dd>
+                                                <dt>Layer A staleness delta ns</dt>
+                                                <dd>@Display(overlayLeftFrame.StalenessDeltaNs)</dd>
+                                            </dl>
+                                        }
+                                        @if (comparisonUiState?.RightTrackerFieldSourceFrame is { } overlayRightFrame)
+                                        {
+                                            <dl class="diagnostics-field-source__metadata">
+                                                <dt>Layer B source received</dt>
+                                                <dd>@Display(overlayRightFrame.SourceSnapshotReceivedAt)</dd>
+                                                <dt>Layer B selected received</dt>
+                                                <dd>@Display(overlayRightFrame.SelectedReplayTimelineReceivedAt)</dd>
+                                                <dt>Layer B latest-before</dt>
+                                                <dd>@Display(overlayRightFrame.IsLatestBefore)</dd>
+                                                <dt>Layer B stale</dt>
+                                                <dd>@Display(overlayRightFrame.IsStale)</dd>
+                                                <dt>Layer B staleness delta ns</dt>
+                                                <dd>@Display(overlayRightFrame.StalenessDeltaNs)</dd>
+                                            </dl>
+                                        }
+                                    </div>
                                 </section>
                             </div>
                         }
@@ -279,6 +321,21 @@
                                     {
                                         <div class="diagnostics-field-source__status">@leftField.Status</div>
                                     }
+                                    @if (comparisonUiState?.LeftTrackerFieldSourceFrame is { } leftFrame)
+                                    {
+                                        <dl class="diagnostics-field-source__metadata">
+                                            <dt>Source received</dt>
+                                            <dd>@Display(leftFrame.SourceSnapshotReceivedAt)</dd>
+                                            <dt>Selected received</dt>
+                                            <dd>@Display(leftFrame.SelectedReplayTimelineReceivedAt)</dd>
+                                            <dt>Latest-before</dt>
+                                            <dd>@Display(leftFrame.IsLatestBefore)</dd>
+                                            <dt>Stale</dt>
+                                            <dd>@Display(leftFrame.IsStale)</dd>
+                                            <dt>Staleness delta ns</dt>
+                                            <dd>@Display(leftFrame.StalenessDeltaNs)</dd>
+                                        </dl>
+                                    }
                                     <VisionFieldCanvas Geometry="leftField.Geometry"
                                                        Balls="leftField.Balls"
                                                        RobotsYellow="leftField.RobotsYellow"
@@ -302,6 +359,21 @@
                                     @if (!string.IsNullOrEmpty(rightField.Status))
                                     {
                                         <div class="diagnostics-field-source__status">@rightField.Status</div>
+                                    }
+                                    @if (comparisonUiState?.RightTrackerFieldSourceFrame is { } rightFrame)
+                                    {
+                                        <dl class="diagnostics-field-source__metadata">
+                                            <dt>Source received</dt>
+                                            <dd>@Display(rightFrame.SourceSnapshotReceivedAt)</dd>
+                                            <dt>Selected received</dt>
+                                            <dd>@Display(rightFrame.SelectedReplayTimelineReceivedAt)</dd>
+                                            <dt>Latest-before</dt>
+                                            <dd>@Display(rightFrame.IsLatestBefore)</dd>
+                                            <dt>Stale</dt>
+                                            <dd>@Display(rightFrame.IsStale)</dd>
+                                            <dt>Staleness delta ns</dt>
+                                            <dd>@Display(rightFrame.StalenessDeltaNs)</dd>
+                                        </dl>
                                     }
                                     <VisionFieldCanvas Geometry="rightField.Geometry"
                                                        Balls="rightField.Balls"
@@ -476,4 +548,16 @@
             </div>
         </div>
     </div>
+}
+
+@code {
+    private static string Display(DateTimeOffset? value)
+    {
+        return value?.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string Display(bool value)
+    {
+        return value ? "Yes" : "No";
+    }
 }
