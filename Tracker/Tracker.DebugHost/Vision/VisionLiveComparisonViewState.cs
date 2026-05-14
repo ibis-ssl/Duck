@@ -1,9 +1,7 @@
 using System.Globalization;
-using System.Threading;
 using Tracker.Core;
 using Tracker.DebugHost.Components.Vision;
 using Tracker.DebugHost.Tracking;
-using TrackerConnectionLib;
 
 namespace Tracker.DebugHost.Vision;
 
@@ -449,37 +447,20 @@ public sealed record VisionLiveComparisonViewState(
 /// </summary>
 public sealed class VisionLiveComparisonSnapshotComposer
 {
-    private readonly VisionPacketStore visionPacketStore;
-    private readonly TrackedSnapshotStore? trackedSnapshotStore;
-    private readonly MultiTrackerManager<TrackerPacketAdapter>? externalTrackerManager;
-    private long renderTickId;
-
     /// <summary>
-    /// raw / tracked / external tracker store を使う composer を作る。
+    /// 固定済み raw / tracked / external tracker snapshot から comparison 用 snapshot を作る。
     /// </summary>
-    public VisionLiveComparisonSnapshotComposer(
-        VisionPacketStore visionPacketStore,
-        TrackedSnapshotStore? trackedSnapshotStore = null,
-        MultiTrackerManager<TrackerPacketAdapter>? externalTrackerManager = null)
+    public VisionLiveComparisonRenderSnapshot CaptureRenderTickSnapshot(
+        DateTimeOffset sampledAt,
+        long renderTickId,
+        VisionPacketSnapshot rawSnapshot,
+        TrackedSnapshot trackedSnapshot,
+        IReadOnlyList<ExternalTrackerReadSideSnapshot> externalTrackerSnapshots)
     {
-        this.visionPacketStore = visionPacketStore;
-        this.trackedSnapshotStore = trackedSnapshotStore;
-        this.externalTrackerManager = externalTrackerManager;
-    }
-
-    /// <summary>
-    /// 1 回の UI render tick で参照する source snapshot を固定する。
-    /// </summary>
-    public VisionLiveComparisonRenderSnapshot CaptureRenderTickSnapshot()
-    {
-        var rawSnapshot = visionPacketStore.GetSnapshot();
-        var trackedSnapshot = trackedSnapshotStore?.GetSnapshot();
-        var trackedView = trackedSnapshot is null
-            ? null
-            : TrackedVisionViewState.FromSnapshot(trackedSnapshot);
-        var thirdPartySnapshots = CaptureThirdPartyTrackerSnapshots();
+        var trackedView = TrackedVisionViewState.FromSnapshot(trackedSnapshot);
+        var thirdPartySnapshots = CaptureThirdPartyTrackerSnapshots(externalTrackerSnapshots);
         var rawGeometry = rawSnapshot.Geometry?.Clone();
-        var trackedGeometry = trackedView?.Geometry?.Clone();
+        var trackedGeometry = trackedView.Geometry?.Clone();
         var geometry = rawGeometry ?? trackedGeometry;
         var geometrySource = rawGeometry is not null
             ? "RawAggregate"
@@ -502,8 +483,8 @@ public sealed class VisionLiveComparisonSnapshotComposer
             ];
 
         return new VisionLiveComparisonRenderSnapshot(
-            DateTimeOffset.UtcNow,
-            Interlocked.Increment(ref renderTickId),
+            sampledAt,
+            renderTickId,
             rawAggregateSnapshots,
             rawSnapshot.Cameras
                 .Select(camera => new VisionLiveComparisonRawCameraSnapshot(
@@ -513,7 +494,7 @@ public sealed class VisionLiveComparisonSnapshotComposer
                     camera.RemoteEndpoint,
                     camera.ReceivedAt))
                 .ToArray(),
-            trackedView is { HasFrame: true }
+            trackedView.HasFrame
                 ? new VisionLiveComparisonTrackedSnapshot(
                     "tracked:ibis",
                     "Tracked",
@@ -614,17 +595,12 @@ public sealed class VisionLiveComparisonSnapshotComposer
         return options;
     }
 
-    private IReadOnlyList<VisionLiveComparisonThirdPartyTrackerSnapshot> CaptureThirdPartyTrackerSnapshots()
+    private static IReadOnlyList<VisionLiveComparisonThirdPartyTrackerSnapshot> CaptureThirdPartyTrackerSnapshots(
+        IReadOnlyList<ExternalTrackerReadSideSnapshot> externalTrackerSnapshots)
     {
-        if (externalTrackerManager is null)
-        {
-            return [];
-        }
-
-        var snapshots = externalTrackerManager.Trackers.Values
-            .Where(state => state.LastPacket is not null)
-            .OrderBy(state => state.SourceLabel, StringComparer.Ordinal)
-            .ThenBy(state => state.RemoteEndpoint?.ToString(), StringComparer.Ordinal)
+        var snapshots = externalTrackerSnapshots
+            .OrderBy(snapshot => snapshot.SourceLabel, StringComparer.Ordinal)
+            .ThenBy(snapshot => snapshot.RemoteEndpoint, StringComparer.Ordinal)
             .Select(CreateThirdPartyTrackerSnapshot)
             .GroupBy(snapshot => snapshot.Key, StringComparer.Ordinal)
             .Select(group => group
@@ -637,27 +613,27 @@ public sealed class VisionLiveComparisonSnapshotComposer
     }
 
     private static VisionLiveComparisonThirdPartyTrackerSnapshot CreateThirdPartyTrackerSnapshot(
-        TrackerState<TrackerPacketAdapter> state)
+        ExternalTrackerReadSideSnapshot snapshot)
     {
-        var packet = state.LastPacket!.Packet.Clone();
-        var sourceUuid = packet.Uuid ?? state.Uuid ?? string.Empty;
-        var remoteEndpoint = state.RemoteEndpoint?.ToString() ?? string.Empty;
+        var packet = snapshot.Packet.Clone();
+        var sourceUuid = packet.Uuid ?? snapshot.SourceUuid;
+        var remoteEndpoint = snapshot.RemoteEndpoint;
         var sourceLabel = TrackerPacketSnapshotRecord.NormalizeSourceLabel(
-            state.SourceLabel,
-            state.SourceName,
+            snapshot.SourceLabel,
+            snapshot.SourceName,
             sourceUuid,
             remoteEndpoint,
-            state.SourceRole);
+            snapshot.SourceRole);
         var sourceKey = TrackerSourceIdentity.CreateUuidPreferredKey(
             "third-party",
             sourceLabel,
-            state.SourceName,
+            snapshot.SourceName,
             sourceUuid,
             remoteEndpoint,
-            state.SourceRole);
+            snapshot.SourceRole);
         var summary = TrackerPacketSnapshotSemanticSummary.FromPacket(
             packet,
-            state.SourceRole,
+            snapshot.SourceRole,
             sourceLabel);
         var balls = summary.Balls.Select(ball => new SSL_DetectionBall
         {
@@ -678,12 +654,12 @@ public sealed class VisionLiveComparisonSnapshotComposer
         return new VisionLiveComparisonThirdPartyTrackerSnapshot(
             sourceKey,
             sourceLabel,
-            state.ReceivedAt,
+            snapshot.ReceivedAt,
             summary.TrackedFrameTimestampNs,
             balls,
             robotsYellow,
             robotsBlue,
-            state.SourceRole,
+            snapshot.SourceRole,
             sourceUuid,
             remoteEndpoint);
     }

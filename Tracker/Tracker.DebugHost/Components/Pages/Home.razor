@@ -6,9 +6,7 @@
 @using Tracker.Core
 @using Tracker.DebugHost.Tracking
 @using Tracker.DebugHost.Vision
-@inject VisionPacketStore Store
-@inject TrackedSnapshotStore TrackedStore
-@inject VisionLiveComparisonSnapshotComposer ComparisonComposer
+@inject VisionLiveDisplaySnapshotProvider LiveDisplaySnapshotProvider
 @inject IOptions<TrackerOptions> TrackerOptionsAccessor
 @inject TrackerProfileRequestService ProfileRequestService
 @inject VisionPacketCaptureRuntimeControl CaptureControl
@@ -251,6 +249,7 @@
 @code {
     private const string AggregateViewKey = "aggregate";
     private readonly CancellationTokenSource disposalTokenSource = new();
+    private VisionLiveDisplayRenderSnapshot liveDisplaySnapshot = VisionLiveDisplayRenderSnapshot.Empty;
     private VisionPacketSnapshot rawSnapshot = VisionPacketSnapshot.Empty;
     private TrackedSnapshot trackedSnapshot = new(null, null, "default", 0, 0);
     private VisionLiveComparisonViewState comparisonViewState = CreateInitialComparisonViewState();
@@ -265,9 +264,7 @@
 
     protected override void OnInitialized()
     {
-        rawSnapshot = Store.GetSnapshot();
-        trackedSnapshot = TrackedStore.GetSnapshot();
-        RefreshComparisonViewState();
+        CaptureLiveDisplaySnapshot();
         EnsureSelectedViewExists(rawSnapshot);
         refreshTask = RefreshAsync(disposalTokenSource.Token);
     }
@@ -278,9 +275,7 @@
 
         while (await timer.WaitForNextTickAsync(cancellationToken))
         {
-            rawSnapshot = Store.GetSnapshot();
-            trackedSnapshot = TrackedStore.GetSnapshot();
-            RefreshComparisonViewState();
+            CaptureLiveDisplaySnapshot();
             EnsureSelectedViewExists(rawSnapshot);
             await InvokeAsync(StateHasChanged);
         }
@@ -415,7 +410,7 @@
     private Task RequestProfileSwitchAsync(string profileName)
     {
         ProfileRequestService.RequestProfileSwitch(profileName);
-        trackedSnapshot = TrackedStore.GetSnapshot();
+        CaptureLiveDisplaySnapshot();
         return Task.CompletedTask;
     }
 
@@ -575,24 +570,21 @@
 
     private void RefreshComparisonViewState()
     {
-        var snapshot = ComparisonComposer.CaptureRenderTickSnapshot();
-        var defaultViewState = ComparisonComposer.CreateViewState(snapshot);
-        var layerA = FindSourceOption(defaultViewState.SourceOptions, layerASourceKey);
-        var layerB = FindSourceOption(defaultViewState.SourceOptions, layerBSourceKey);
-        comparisonViewState = new VisionLiveComparisonViewState(
+        comparisonViewState = LiveDisplaySnapshotProvider.CreateComparisonViewState(
+            liveDisplaySnapshot,
             comparisonMode,
-            snapshot,
-            defaultViewState.SourceOptions,
-            new VisionLiveComparisonLayerSelection(layerA, layerAVisible),
-            new VisionLiveComparisonLayerSelection(layerB, layerBVisible));
+            layerASourceKey,
+            layerBSourceKey,
+            layerAVisible,
+            layerBVisible);
     }
 
-    private static VisionLiveComparisonSourceOption FindSourceOption(
-        IReadOnlyList<VisionLiveComparisonSourceOption> options,
-        string key)
+    private void CaptureLiveDisplaySnapshot()
     {
-        return options.FirstOrDefault(option => string.Equals(option.Key, key, StringComparison.Ordinal))
-            ?? options.First();
+        liveDisplaySnapshot = LiveDisplaySnapshotProvider.CaptureRenderTickSnapshot();
+        rawSnapshot = liveDisplaySnapshot.RawSnapshot;
+        trackedSnapshot = liveDisplaySnapshot.TrackedSnapshot;
+        RefreshComparisonViewState();
     }
 
     private static VisionLiveComparisonViewState CreateInitialComparisonViewState()

@@ -50,6 +50,8 @@ builder.Services.AddSingleton<TrackerDiagnosticsComparisonViewStateReader>();
 builder.Services.AddSingleton<TrackerProfileRequestService>();
 builder.Services.AddSingleton<VisionPacketStore>();
 builder.Services.AddSingleton<VisionLiveComparisonSnapshotComposer>();
+builder.Services.AddSingleton<ExternalTrackerSnapshotStore>();
+builder.Services.AddSingleton<VisionLiveDisplaySnapshotProvider>();
 builder.Services.AddSingleton<VisionPacketCaptureSession>();
 builder.Services.AddSingleton<VisionPacketCaptureWriter>();
 builder.Services.AddSingleton<TrackerRenderSnapshotCaptureWriter>();

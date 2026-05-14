@@ -4,15 +4,15 @@
 
 ## 現在のタスク
 
-- ID: RUNTIME-HOST-006
-- Title: DebugHost live display を read-side snapshot 境界へ寄せる
+- ID: RUNTIME-HOST-007
+- Title: DebugHost diagnostics sample sidecar fast path を実装する
 - Phase: implementation
 - Status: pending
 - Size: large
-- Dependencies: RUNTIME-HOST-005.
+- Dependencies: RUNTIME-HOST-003, RUNTIME-HOST-006.
 - Exit Criteria:
-  - DebugHost live display が UI render tick ごとに latest immutable snapshot を固定する。
-  - Web rendering tick が tracker operation loop を駆動しない構造にする。
+  - diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して diagnostics sample sidecar に保存する。
+  - 新規 capture / logging の bounded lookup を主経路にして RUNTIME-HOST-003 の Red tests を green にする。
   - focused tests / build、task 専用 review、commit、Draft PR #17 update が揃う。
 
 ## 完了済みタスク
@@ -59,6 +59,16 @@
   - Review Evidence:
     - `reports/runtime-host-005-review-20260514180308.md`
     - review で blocking findings なし。DebugHost read-side UI 化、diagnostics sample sidecar、RuntimeHost scaffold は RUNTIME-HOST-006 以降へ残す。
+- `RUNTIME-HOST-006`: DebugHost live display を read-side snapshot 境界へ寄せた。`VisionLiveDisplaySnapshotProvider` が 1 render tick で raw / tracked / 3rd party tracker snapshot を固定し、`Home.razor` は raw / tracked store を直接 inject せず同一 composite snapshot から Raw / Tracked / Compare を派生する。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` update event から packet / metadata を clone 済み DTO として保持し、render path が mutable manager state を直接読まない構造にした。
+  - Implementation Evidence:
+    - `reports/runtime-host-006-boundary-context-20260514181333.md`
+    - `reports/runtime-host-006-implementation-20260514182342.md`
+    - `reports/runtime-host-006-verification-20260514182549.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests|FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~TrackedVisionViewStateTests" -m:1 /nr:false` は 18 passed。
+    - `dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false` と `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false` は成功し、`git diff --check` も成功した。
+  - Review Evidence:
+    - `reports/runtime-host-006-review-20260514182549.md`
+    - review で blocking findings なし。diagnostics sample sidecar と RuntimeHost scaffold は RUNTIME-HOST-007 以降へ残す。
 
 ## 固定残タスク
 
@@ -91,7 +101,7 @@
 | RUNTIME-HOST-003 | diagnostics sample boundary と legacy degraded contract を追加する | verification | complete; draft PR #17 | RUNTIME-HOST-002 | diagnostics sample tick が tracker committed frame cadence / `WorldFrameCommitted` に依存しないこと、Diagnostics `Vision Input` が diagnostics sample sidecar から復元されること、旧 render snapshot sidecar が unsupported / degraded legacy であることを Red contract として固定し、review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-004 | `Tracker.Server` を `Tracker.DebugHost` project / namespace / 起動経路へ rename する | implementation | complete; draft PR #17 | RUNTIME-HOST-003 | 現 `Tracker.Server` の Web UI / diagnostics / replay / capture viewer 責務を `Tracker.DebugHost` として明確化し、既存 debug normal path、README、launch settings、solution / project reference を維持し、review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-005 | tracker operation loop の共有 runtime boundary を抽出する | implementation | complete; draft PR #17 | RUNTIME-HOST-004 | `Tracker.Core/Runtime` に UI 非依存 shared operation loop、publisher、latest snapshot store を抽出し、DebugHost を Core coordinator 呼び出し adapter に寄せた。focused tests / build / review で blocking findings なしを確認した。 |
-| RUNTIME-HOST-006 | DebugHost live display を read-side snapshot 境界へ寄せる | implementation | pending | RUNTIME-HOST-005 | DebugHost live display が UI render tick ごとに latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しないことを focused tests / build で確認し、review / commit / Draft PR #17 update まで完了する。 |
+| RUNTIME-HOST-006 | DebugHost live display を read-side snapshot 境界へ寄せる | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により DebugHost live display が UI render tick ごとに latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しないことを focused tests / build / review で確認した。 |
 | RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | pending | RUNTIME-HOST-003, RUNTIME-HOST-006 | diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して diagnostics sample sidecar に保存し、新規 capture / logging の bounded lookup を主経路にして RUNTIME-HOST-003 の Red tests を green にし、review / commit / Draft PR #17 update まで完了する。 |
 | RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | pending | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現し、build / focused tests / review / commit / Draft PR #17 update を揃える。 |
 | RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | pending | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させる。 |

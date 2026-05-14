@@ -204,6 +204,8 @@ Vision 画面の split / overlay で選択できる source[^source-term] 候補�
 
 live 比較では、厳密な同一 packet timestamp[^packet-timestamp] や全 source 共通の同一 receive callback[^receive-callback] は要求しない。raw SSL-Vision、ibis tracker、3rd party tracker は受信 stream と更新 callback が異なるため、ここを contract にすると通常表示の実装が過剰に結合する。採用方針は、1 回の `UI render tick`[^ui-render-tick] で各 source の latest immutable snapshot[^immutable-snapshot] を固定し、その composite snapshot を split / overlay の Layer A/B に渡すことである。
 
+RUNTIME-HOST-006 以降の live display では、`Home.razor` は raw / tracked store を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は store を再読取せず、固定済み composite snapshot から comparison 用 snapshot と view-state を生成する。これにより Raw / Tracked / Compare は同じ render tick の snapshot から派生する。
+
 `UI render tick` の composite snapshot は次を保持する。
 
 - render tick ID[^render-tick-id] または `SampledAt`
@@ -211,7 +213,7 @@ live 比較では、厳密な同一 packet timestamp[^packet-timestamp] や全 s
 - source ごとの receive timestamp[^receive-timestamp] / frame timestamp[^frame-timestamp] / packet count など、時刻差を説明する metadata
 - balls / robots / geometry reference[^geometry-reference] / missing reason を含む immutable source snapshot
 
-3rd party tracker の live 接続では、`MultiTrackerManager<TrackerPacketAdapter>` から external tracker packet を受け、source identity は UUID を優先して集約する。同じ `uuid` の tracker は remote endpoint が異なっても 1 つの source として扱い、同じ uuid group 内で最新 `ReceivedAt` の snapshot を代表として描画する。balls / robots は複数 endpoint 間で union merge しない。`uuid` が空または不明な場合だけ、source name / remote endpoint fallback で識別する。`uuid` が異なる tracker は source name が同じでも別 source とし、同じ display label が複数残る場合は短い uuid または endpoint を補助表示して UI 上で区別できる label にする。ただし `TrackerState` や protobuf packet 参照を UI が直接保持しない。`ExternalTrackerSnapshotStore` または `VisionLiveComparisonSnapshot` composer のような境界で clone / DTO 化し、描画中に state が変わらない immutable snapshot として扱う。`TrackerPacketSnapshotLogWriter` や CaptureOn sidecar writer を Vision live store[^live-store] として使う方針は不採用とする。これは CaptureOn session 保存用の仕組みであり、CaptureOff の通常 live Vision 画面では更新 source として成立しないためである。
+3rd party tracker の live 接続では、`MultiTrackerManager<TrackerPacketAdapter>` から external tracker packet を受け、source identity は UUID を優先して集約する。同じ `uuid` の tracker は remote endpoint が異なっても 1 つの source として扱い、同じ uuid group 内で最新 `ReceivedAt` の snapshot を代表として描画する。balls / robots は複数 endpoint 間で union merge しない。`uuid` が空または不明な場合だけ、source name / remote endpoint fallback で識別する。`uuid` が異なる tracker は source name が同じでも別 source とし、同じ display label が複数残る場合は短い uuid または endpoint を補助表示して UI 上で区別できる label にする。ただし `TrackerState` や protobuf packet 参照を UI が直接保持しない。`ExternalTrackerSnapshotStore` が manager update event から packet / metadata を clone し、`VisionLiveDisplaySnapshotProvider` が render tick でその read-side DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn sidecar writer を Vision live store[^live-store] として使う方針は不採用とする。これは CaptureOn session 保存用の仕組みであり、CaptureOff の通常 live Vision 画面では更新 source として成立しないためである。
 
 geometry 基準は raw geometry 優先とする。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新 `SSL_GeometryData` を overlay 全体の field 基準に使い、raw geometry がまだ無い場合のみ `Tracked` の geometry へ fallback する。`3rd party tracker` packet から field geometry を復元する方針は不採用とする。external tracker packet は比較対象の object state であり、field calibration の責任を持たせると source ごとの座標比較の意味が曖昧になる。
 
