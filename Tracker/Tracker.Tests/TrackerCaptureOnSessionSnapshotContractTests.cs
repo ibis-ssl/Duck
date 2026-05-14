@@ -4,8 +4,8 @@ using System.Text.Json;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -124,7 +124,7 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
     [Fact]
     public void TrackerSnapshotSidecar_RecordContractAcceptsOwnExternalAndUnknownSources()
     {
-        var recordType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotRecord");
+        var recordType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerPacketSnapshotRecord");
         var sourceRoleProperty = GetRequiredProperty(recordType, "SourceRole", typeof(string));
         var requiredRoles = new[] { "own", "external", "unknown" };
 
@@ -138,7 +138,7 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
     [Fact]
     public void TrackerSnapshotSidecar_RecordContractKeepsReplayRequiredFields()
     {
-        var recordType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotRecord");
+        var recordType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerPacketSnapshotRecord");
 
         GetRequiredProperty(recordType, "ReceivedAt", typeof(DateTimeOffset));
         GetRequiredProperty(recordType, "RemoteEndpoint", typeof(string));
@@ -162,7 +162,7 @@ public class TrackerCaptureOnSessionSnapshotContractTests : IClassFixture<Tracke
     [Fact]
     public void TrackerSnapshotLogReader_ReadsSessionSidecarAsReplayInput()
     {
-        var readerType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotLogReader");
+        var readerType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader");
         var method = readerType
             .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
             .FirstOrDefault(candidate =>

@@ -2,17 +2,17 @@
 
 ## 目的
 
-この文書は `TRACKER-034` で実施した旧 `Tracker.Server`、`Tracker.CaptureReplay`、diagnostics UI の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。現行方針では旧 `Tracker.Server` の Web UI / diagnostics 責務を `Tracker.DebugHost` と呼ぶ。
+この文書は `TRACKER-034` で実施した旧 `Tracker.Server`、`Tracker.CaptureReplay`、diagnostics UI の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。現行の project / namespace / 起動経路では、旧 `Tracker.Server` の Web UI / diagnostics 責務を `Tracker.DebugHost` と呼ぶ。
 
 CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` に分離し、この文書では扱わない。
 
 ## 対象範囲
 
 - `Tracker/Tracker.CaptureReplay/Program.cs`
-- `Tracker/Tracker.Server/Tracking/TrackerCoordinator.cs`
-- `Tracker/Tracker.Server/Components/Pages/Diagnostics.razor`
-- `Tracker.Server/Tracking` の diagnostics / render snapshot / profile switch 周辺
-- `Tracker.Server/Vision` の capture / receiver / store 周辺の既存境界確認
+- `Tracker/Tracker.DebugHost/Tracking/TrackerCoordinator.cs`
+- `Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor`
+- `Tracker.DebugHost/Tracking` の diagnostics / render snapshot / profile switch 周辺
+- `Tracker.DebugHost/Vision` の capture / receiver / store 周辺の既存境界確認
 
 対象外:
 

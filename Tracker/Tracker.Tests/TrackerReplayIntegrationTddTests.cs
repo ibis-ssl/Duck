@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using Google.Protobuf;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -145,7 +145,7 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
 
     private object CreateReplayReader()
     {
-        var readerType = GetRequiredServerType("Tracker.Server.Tracking.TrackerSnapshotReplayReader");
+        var readerType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerSnapshotReplayReader");
         return Activator.CreateInstance(readerType)
             ?? throw new InvalidOperationException("TrackerSnapshotReplayReader must have a public parameterless constructor.");
     }

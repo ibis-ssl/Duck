@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;

@@ -1,6 +1,6 @@
 using System.Net;
 using Google.Protobuf;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 

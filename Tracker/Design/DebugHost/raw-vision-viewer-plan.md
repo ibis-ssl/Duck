@@ -2,7 +2,7 @@
 
 ## 目的
 
-`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` datagram を直接受信し、最新の detection / geometry 情報を Blazor UI 上で可視化できるようにする。実装移行前の project 名は `Tracker.Server` だが、本設計上の責務名は `Tracker.DebugHost` とする。
+`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` datagram を直接受信し、最新の detection / geometry 情報を Blazor UI 上で可視化できるようにする。旧 project 名は `Tracker.Server` だが、現行の project / namespace / 起動経路は `Tracker.DebugHost` とする。
 
 ## スコープ
 
@@ -387,4 +387,4 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^diagnostics-sample-sidecar]: diagnostics sample sidecar: loop isolation 後に diagnostics logging / replay processing が保存する latest raw / latest tracker snapshot の sidecar。具体的な schema 名は実装 task で固定する。
 [^degraded-legacy-session]: unsupported / degraded legacy session: 旧 render snapshot sidecar しか持たない capture session。新しい diagnostics sample path の性能や cadence 保証を受けず、表示できる範囲だけを旧形式として扱う。
 [^raw-snapshot-cadence]: raw snapshot cadence: SSL-Vision packet / raw latest snapshot が更新される周期。Diagnostics の `Vision Input` 表示は新規 capture でこの cadence を失わない保存経路を持つ。
-[^tracker-debug-host]: Tracker.DebugHost: 現 `Tracker.Server` の後継名。Web UI、raw vision viewer、diagnostics、capture / replay、比較表示を担当する debug 用 host。
+[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、raw vision viewer、diagnostics、capture / replay、比較表示を担当する。

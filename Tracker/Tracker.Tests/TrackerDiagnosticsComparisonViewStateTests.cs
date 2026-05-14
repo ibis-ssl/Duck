@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;

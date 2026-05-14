@@ -2,8 +2,8 @@ using System.IO.Compression;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 

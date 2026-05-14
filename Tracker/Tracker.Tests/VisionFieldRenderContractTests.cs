@@ -1,4 +1,4 @@
-using Tracker.Server.Components.Vision;
+using Tracker.DebugHost.Components.Vision;
 
 namespace Tracker.Tests;
 
@@ -47,10 +47,10 @@ public class VisionFieldRenderContractTests
     [Fact]
     public void VisionAndDiagnosticsFieldMarkup_UseSeparateSplitAndOverlayFieldComponents()
     {
-        var homeMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Pages/Home.razor");
-        var diagnosticsMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor");
-        var diagnosticsOverlayMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Pages/DiagnosticsFieldOverlayCanvas.razor");
-        var overlayComponentMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Vision/VisionFieldOverlayCanvas.razor");
+        var homeMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Home.razor");
+        var diagnosticsMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor");
+        var diagnosticsOverlayMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/DiagnosticsFieldOverlayCanvas.razor");
+        var overlayComponentMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Vision/VisionFieldOverlayCanvas.razor");
 
         var overlayMarkup = ExtractBetween(homeMarkup, "@if (comparisonMode == VisionLiveComparisonMode.Overlay)", "else");
 
@@ -83,7 +83,7 @@ public class VisionFieldRenderContractTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.Server/Program.cs")))
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.DebugHost/Program.cs")))
             {
                 return directory.FullName;
             }
@@ -91,6 +91,6 @@ public class VisionFieldRenderContractTests
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Repository root containing Tracker/Tracker.Server/Program.cs was not found.");
+        throw new DirectoryNotFoundException("Repository root containing Tracker/Tracker.DebugHost/Program.cs was not found.");
     }
 }

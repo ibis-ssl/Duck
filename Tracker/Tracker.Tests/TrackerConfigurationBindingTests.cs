@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 
 namespace Tracker.Tests;
 
@@ -176,7 +176,7 @@ public class TrackerConfigurationBindingTests
         var repositoryRoot = FindRepositoryRoot();
         var configuration = new ConfigurationBuilder()
             .SetBasePath(repositoryRoot)
-            .AddJsonFile("Tracker/Tracker.Server/appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("Tracker/Tracker.DebugHost/appsettings.json", optional: false, reloadOnChange: false)
             .Build();
 
         var options = configuration.GetSection("Tracker").Get<TrackerOptions>();
@@ -302,7 +302,7 @@ public class TrackerConfigurationBindingTests
         var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.Server", "appsettings.json")))
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.DebugHost", "appsettings.json")))
             {
                 return directory.FullName;
             }
@@ -310,6 +310,6 @@ public class TrackerConfigurationBindingTests
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.Server/appsettings.json.");
+        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.DebugHost/appsettings.json.");
     }
 }

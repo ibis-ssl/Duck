@@ -229,7 +229,7 @@ internal sealed record ReplayOptions
 
             Options:
               --profile <name>             Tracker profile settings to use. default: sim
-              --settings <file>            Tracker settings JSON. Accepts Tracker.Server appsettings.json or capture metadata shape.
+              --settings <file>            Tracker settings JSON. Accepts Tracker.DebugHost appsettings.json or capture metadata shape.
               --expect <condition>         Assert a summary metric, for automation. Can be repeated.
               --detail-filter <condition>  Print committed frames matching all detail filters. Can be repeated.
               --max-details <count>        Maximum matching frame details to print. default: 40
@@ -255,7 +255,7 @@ internal sealed record ReplayOptions
             Examples:
               --expect committed-frames>0
               --expect max-balls<=1
-              --settings Tracker/Tracker.Server/appsettings.json --profile sim
+              --settings Tracker/Tracker.DebugHost/appsettings.json --profile sim
               --settings <capture.metadata.json>
               --detail-filter balls>=2 --detail-filter raw-balls==1
             """);

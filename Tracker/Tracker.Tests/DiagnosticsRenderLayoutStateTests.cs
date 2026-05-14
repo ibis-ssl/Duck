@@ -1,4 +1,4 @@
-using Tracker.Server.Components.Pages;
+using Tracker.DebugHost.Components.Pages;
 
 namespace Tracker.Tests;
 

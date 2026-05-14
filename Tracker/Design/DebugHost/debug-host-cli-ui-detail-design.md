@@ -252,7 +252,7 @@ overlay の色分けは source layer を識別するためのもので、yellow 
 
 visibility は overlay legend 内の layer ごとの checkbox または toggle で制御する。既定は両 layer visible とする。visibility state は `Diagnostics.razor.cs` の page state に保持し、query string、session storage、local storage には保存しない。log file 変更時は両 layer visible に戻し、timeline scrub / playback tick / Field source selector 変更では現在の visibility を維持する。片方を非表示にしても source selection 自体は変えない。
 
-描画 component は、既存 `VisionFieldCanvas` を多 source 入力へ拡張するのではなく、`Tracker.Server` の diagnostics 用 overlay component を追加する。`VisionFieldCanvas` は raw vision / single source Field の汎用 component として維持し、overlay component は `VisionFieldProjection`、`VisionFieldLines`、`VisionRenderOptions`、既存 geometry DTO を再利用する。marker の source layer styling が必要な場合は `VisionBallMarker` / `VisionRobotMarker` に任意 class / stroke option を最小追加するか、overlay component 内で layer marker を直接描く。既存 `VisionFieldCanvas` の single source 表示、zoom / pan、cursor overlay を壊さない範囲に留める。
+描画 component は、既存 `VisionFieldCanvas` を多 source 入力へ拡張するのではなく、`Tracker.DebugHost` の diagnostics 用 overlay component を追加する。`VisionFieldCanvas` は raw vision / single source Field の汎用 component として維持し、overlay component は `VisionFieldProjection`、`VisionFieldLines`、`VisionRenderOptions`、既存 geometry DTO を再利用する。marker の source layer styling が必要な場合は `VisionBallMarker` / `VisionRobotMarker` に任意 class / stroke option を最小追加するか、overlay component 内で layer marker を直接描く。既存 `VisionFieldCanvas` の single source 表示、zoom / pan、cursor overlay を壊さない範囲に留める。
 
 overlay 用 model は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を直接再利用し、raw `Vision Input` と ibis tracker output も同じ overlay layer に変換できる小さな view model を `Diagnostics.razor.cs` または専用 factory で作る。tracker source layer は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の mapper で ball / yellow robot / blue robot に変換する。render snapshot 由来 layer は既存の raw source detections と `TrackedVisionViewState.FromSnapshot(...)` を使う。nearest selection、own baseline timestamp、candidate missing 等の status 判定は `TrackerDiagnosticsComparisonViewStateReader.LoadFieldSourceFrame(...)` と cached index を使い、overlay 専用に sidecar JSONL を再読込しない。
 
@@ -267,7 +267,7 @@ focused tests では、少なくとも次を固定する。
 - layer visibility toggle は source selection を変えず、hidden layer を overlay 描画から除外する。
 - overlay component または factory が layer A / B の色分け、legend 表示値、semantic summary mapper の ball / yellow / blue 変換を固定する。
 
-実装対象は `TrackerDiagnosticsComparisonUiState`、`TrackerDiagnosticsComparisonViewStateReader`、`Diagnostics.razor` / `.cs` / `.css`、diagnostics Field overlay component、`DiagnosticsFieldViewFactory`、関連 focused tests、必要なら `Tracker.Server/README.md` に限定する。非対象は receiver / snapshot writer / metadata schema / `Tracker.Core` tracking algorithm / `Tracker.CaptureReplay` 出力変更 / 任意個数 source overlay / 永続化設定とする。
+実装対象は `TrackerDiagnosticsComparisonUiState`、`TrackerDiagnosticsComparisonViewStateReader`、`Diagnostics.razor` / `.cs` / `.css`、diagnostics Field overlay component、`DiagnosticsFieldViewFactory`、関連 focused tests、必要なら `Tracker.DebugHost/README.md` に限定する。非対象は receiver / snapshot writer / metadata schema / `Tracker.Core` tracking algorithm / `Tracker.CaptureReplay` 出力変更 / 任意個数 source overlay / 永続化設定とする。
 
 ## 後続タスクへの固定事項
 

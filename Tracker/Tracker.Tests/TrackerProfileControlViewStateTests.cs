@@ -1,5 +1,5 @@
-using Tracker.Server.Components.Vision;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Components.Vision;
+using Tracker.DebugHost.Tracking;
 
 namespace Tracker.Tests;
 

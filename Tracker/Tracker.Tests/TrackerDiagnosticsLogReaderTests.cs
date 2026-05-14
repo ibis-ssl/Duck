@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 
@@ -173,7 +173,7 @@ public class VisionReceiverConfigurationResolverTests
         var repositoryRoot = FindRepositoryRoot();
         var configuration = new ConfigurationBuilder()
             .SetBasePath(repositoryRoot)
-            .AddJsonFile("Tracker/Tracker.Server/appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("Tracker/Tracker.DebugHost/appsettings.json", optional: false, reloadOnChange: false)
             .Build();
 
         var options = configuration.GetSection("VisionReceiver").Get<VisionReceiverOptions>();
@@ -190,7 +190,7 @@ public class VisionReceiverConfigurationResolverTests
         var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.Server", "appsettings.json")))
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.DebugHost", "appsettings.json")))
             {
                 return directory.FullName;
             }
@@ -198,6 +198,6 @@ public class VisionReceiverConfigurationResolverTests
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.Server/appsettings.json.");
+        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.DebugHost/appsettings.json.");
     }
 }

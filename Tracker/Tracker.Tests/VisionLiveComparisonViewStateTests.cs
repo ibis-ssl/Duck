@@ -2,10 +2,10 @@ using System.Collections;
 using System.Net;
 using System.Reflection;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 using TrackerConnectionLib;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 
@@ -526,8 +526,8 @@ public class VisionLiveComparisonViewStateTests
 
     private static Type RequiredVisionType(string shortName)
     {
-        var type = typeof(VisionPacketStore).Assembly.GetType($"Tracker.Server.Vision.{shortName}");
-        Assert.True(type is not null, $"Tracker.Server.Vision.{shortName} must exist.");
+        var type = typeof(VisionPacketStore).Assembly.GetType($"Tracker.DebugHost.Vision.{shortName}");
+        Assert.True(type is not null, $"Tracker.DebugHost.Vision.{shortName} must exist.");
         return type;
     }
 

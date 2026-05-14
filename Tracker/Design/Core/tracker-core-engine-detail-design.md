@@ -232,7 +232,7 @@ dot 区切りファイル名は framework / toolchain 慣習に限って許容�
   - `TrackerBallTrackerOverrides`
   - `TrackerKickDetectorOverrides`
 
-既存の `Tracker.Server` と `Tracker.CaptureReplay` が参照している型名は維持する。フォルダ移動によって namespace は変えない。
+既存の `Tracker.DebugHost` と `Tracker.CaptureReplay` が参照している型名は維持する。Core 内のフォルダ移動によってこれらの参照 namespace は変えない。
 
 ### model contract
 

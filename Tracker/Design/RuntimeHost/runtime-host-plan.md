@@ -7,7 +7,7 @@
 ## 命名
 
 - `Tracker.RuntimeHost`: tracker operation[^tracker-operation] と将来 AutoRef mode を同一 process で実行する runtime host。
-- `Tracker.DebugHost`: 現 `Tracker.Server` の後継名。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する debug host。
+- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。
 - `Tracker.Core`: tracker algorithm[^tracker-algorithm]、contract、pure model、runtime host と debug host の共通ロジックを置く。
 
 `Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体は tracker 専用の executor ではなく、将来 AutoRef mode も同居する試合時 runtime だからである。
@@ -87,7 +87,7 @@ tracker operation loop は、Web server live display processing と diagnostics 
 [^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。
 [^diagnostics-replay]: diagnostics replay: 保存済み sample / log を DebugHost 側で再生し、raw / tracker 出力を比較する debug 機能。
 [^capture-viewer]: capture viewer: 保存済み capture session の内容を確認する debug 表示機能。
-[^tracker-debug-host]: Tracker.DebugHost: 現 `Tracker.Server` の後継名。Web UI、diagnostics、capture / replay、比較表示を担当する debug 用 host。
+[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。
 [^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。
 [^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。
 [^tracker-algorithm]: tracker algorithm: raw detection から balls / robots の tracked state を決定的に生成する Core 側の追跡ロジック。
