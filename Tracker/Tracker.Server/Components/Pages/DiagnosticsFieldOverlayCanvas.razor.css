@@ -1,50 +1,17 @@
-.field-card {
+.diagnostics-overlay-field {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    border: 1px solid #315235;
-    border-radius: 10px;
-    background: #102617;
-    overflow: hidden;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.field-card__toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.45rem;
-    padding: 0.32rem 0.5rem;
-    border-bottom: 1px solid #315235;
-    color: #89a38b;
-    font-size: 0.72rem;
-}
-
-.field-card__canvas {
-    flex: 1;
-    min-height: 0;
-    position: relative;
-}
-
-.field-card__svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    background: #18813b;
-}
-
-.field-card__boundary-background {
-    fill: #1a8a40;
-}
-
-.field-card__boundary {
-    fill: #1f9448;
-    stroke: #ffffff;
-    stroke-width: 3;
+    gap: 0.35rem;
 }
 
 .diagnostics-overlay-field__toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.45rem;
+    padding: 0.32rem 0;
+    color: #89a38b;
+    font-size: 0.72rem;
     align-items: flex-start;
 }
 
@@ -90,22 +57,12 @@
 }
 
 .diagnostics-overlay-field__empty {
-    display: grid;
-    place-items: center;
-    flex: 1 1 auto;
-    min-height: 14rem;
-    background: #07140c;
+    border: 1px solid #315235;
+    border-radius: 6px;
+    background: #17301d;
     color: #ffe2ad;
-    padding: 1rem;
-    text-align: center;
-}
-
-.diagnostics-overlay-field__layer-group--a {
-    opacity: 0.96;
-}
-
-.diagnostics-overlay-field__layer-group--b {
-    opacity: 0.76;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.74rem;
 }
 
 @media (max-width: 760px) {

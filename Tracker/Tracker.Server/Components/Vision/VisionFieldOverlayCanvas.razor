@@ -5,7 +5,7 @@
 
 <section class="field-card">
     <div class="field-card__toolbar">
-        <span>Zoom / pan</span>
+        <span>@ToolbarLabel</span>
         <button type="button" class="field-card__reset" @onclick="ResetFieldView">Reset</button>
     </div>
     <div class="field-card__canvas" @ref="canvasElement">
@@ -46,7 +46,7 @@
         <svg class="field-card__svg"
              viewBox="@ViewBox(projection)"
              role="img"
-             aria-label="SSL-Vision field"
+             aria-label="@AriaLabel"
              @onwheel="OnFieldWheel"
              @onmousedown="OnFieldMouseDown"
              @onmousemove="OnFieldMouseMove"
@@ -67,27 +67,32 @@
 
                 <VisionFieldLines Projection="projection" Field="field" />
 
-                @foreach (var ball in Balls)
+                @foreach (var layer in Layers.Where(layer => layer.IsVisible && layer.DrawableCount > 0))
                 {
-                    <VisionBallMarker Projection="projection" Ball="ball" Style="@BallMarkerStyle" />
-                }
+                    <g class="@LayerClass(layer)">
+                        @foreach (var ball in layer.Balls)
+                        {
+                            <VisionBallMarker Projection="projection" Ball="ball" Style="@BallMarkerStyle(layer.MarkerStroke)" />
+                        }
 
-                @foreach (var robot in RobotsYellow)
-                {
-                    <VisionRobotMarker Projection="projection"
-                                       Robot="robot"
-                                       ClassName="robot-yellow"
-                                       RenderOptions="RenderOptions"
-                                       MarkerStroke="@ResolvedMarkerStroke" />
-                }
+                        @foreach (var robot in layer.RobotsYellow)
+                        {
+                            <VisionRobotMarker Projection="projection"
+                                               Robot="robot"
+                                               ClassName="robot-yellow"
+                                               RenderOptions="RenderOptions"
+                                               MarkerStroke="@ResolvedMarkerStroke(layer.MarkerStroke)" />
+                        }
 
-                @foreach (var robot in RobotsBlue)
-                {
-                    <VisionRobotMarker Projection="projection"
-                                       Robot="robot"
-                                       ClassName="robot-blue"
-                                       RenderOptions="RenderOptions"
-                                       MarkerStroke="@ResolvedMarkerStroke" />
+                        @foreach (var robot in layer.RobotsBlue)
+                        {
+                            <VisionRobotMarker Projection="projection"
+                                               Robot="robot"
+                                               ClassName="robot-blue"
+                                               RenderOptions="RenderOptions"
+                                               MarkerStroke="@ResolvedMarkerStroke(layer.MarkerStroke)" />
+                        }
+                    </g>
                 }
             </g>
         </svg>
@@ -99,33 +104,24 @@
     public SSL_GeometryData? Geometry { get; set; }
 
     [Parameter]
-    public IReadOnlyList<SSL_DetectionBall> Balls { get; set; } = Array.Empty<SSL_DetectionBall>();
-
-    [Parameter]
-    public IReadOnlyList<SSL_DetectionRobot> RobotsYellow { get; set; } = Array.Empty<SSL_DetectionRobot>();
-
-    [Parameter]
-    public IReadOnlyList<SSL_DetectionRobot> RobotsBlue { get; set; } = Array.Empty<SSL_DetectionRobot>();
+    public IReadOnlyList<VisionFieldLayerRenderModel> Layers { get; set; } = Array.Empty<VisionFieldLayerRenderModel>();
 
     [Parameter]
     public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
 
     [Parameter]
-    public string? MarkerStroke { get; set; }
+    public string ToolbarLabel { get; set; } = "Overlay";
 
-    private ElementReference canvasElement;
+    [Parameter]
+    public string AriaLabel { get; set; } = "Vision overlay field";
+
     private readonly VisionFieldViewportState viewport = new();
+    private ElementReference canvasElement;
     private double canvasWidth = VisionFieldProjection.DefaultViewBoxWidth;
     private double canvasHeight = VisionFieldProjection.DefaultViewBoxHeight;
-    private DotNetObjectReference<VisionFieldCanvas>? dotNetReference;
+    private DotNetObjectReference<VisionFieldOverlayCanvas>? dotNetReference;
     private IJSObjectReference? module;
     private CursorOverlayState? cursorOverlay;
-
-    private string ResolvedMarkerStroke => MarkerStroke ?? VisionPalette.MarkerStroke;
-
-    private string? BallMarkerStyle => MarkerStroke is null
-        ? null
-        : $"stroke:{MarkerStroke};stroke-width:2.8;opacity:0.92";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -187,18 +183,17 @@
     private void OnFieldMouseMove(MouseEventArgs eventArgs)
     {
         UpdateCursorOverlay(eventArgs);
-
         viewport.DragTo(eventArgs.ClientX, eventArgs.ClientY);
     }
 
     private void OnFieldMouseUp(MouseEventArgs _)
     {
-        CommitFieldTranslation();
+        viewport.CommitDrag();
     }
 
     private void OnFieldMouseLeave(MouseEventArgs _)
     {
-        CommitFieldTranslation();
+        viewport.CommitDrag();
         cursorOverlay = null;
     }
 
@@ -237,9 +232,23 @@
         cursorOverlay = new CursorOverlayState(leftPx, topPx, fieldPoint.X, fieldPoint.Y);
     }
 
-    private void CommitFieldTranslation()
+    private static string? BallMarkerStyle(string? markerStroke)
     {
-        viewport.CommitDrag();
+        return markerStroke is null
+            ? null
+            : $"stroke:{markerStroke};stroke-width:2.8;opacity:0.92";
+    }
+
+    private static string ResolvedMarkerStroke(string? markerStroke)
+    {
+        return markerStroke ?? VisionPalette.MarkerStroke;
+    }
+
+    private static string LayerClass(VisionFieldLayerRenderModel layer)
+    {
+        return string.IsNullOrWhiteSpace(layer.CssClass)
+            ? "field-card__layer-group"
+            : $"field-card__layer-group {layer.CssClass}";
     }
 
     public async ValueTask DisposeAsync()

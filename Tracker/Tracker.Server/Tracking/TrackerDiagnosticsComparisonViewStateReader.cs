@@ -574,6 +574,19 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             {
                 return CreateSavedAlignmentComparison(alignedTick);
             }
+
+            var latestBeforeTick = index.FindLatestBeforeTimelineCandidate(
+                selectedReplayTimeline.ReplayTimelineIndex,
+                selectedReplayTimeline.ReceivedAt,
+                selectedSourceFilter);
+            if (latestBeforeTick is not null)
+            {
+                return CreateLatestBeforeComparison(latestBeforeTick, selectedReplayTimeline);
+            }
+
+            return TrackerDiagnosticsComparisonEntryComparison.WithStatus(
+                TrackerDiagnosticsComparisonEntryStatus.NoCandidateSnapshot,
+                selectedEntry?.LineNumber);
         }
 
         if (selectedEntry is null)
@@ -643,6 +656,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             {
                 return CreateSavedAlignmentFieldSourceFrame(alignedTick, fieldSource);
             }
+
+            var latestBeforeTick = index.FindLatestBeforeTimelineFieldSourceCandidate(
+                selectedReplayTimeline.ReplayTimelineIndex,
+                selectedReplayTimeline.ReceivedAt,
+                fieldSource);
+            if (latestBeforeTick is not null)
+            {
+                return CreateLatestBeforeFieldSourceFrame(latestBeforeTick, selectedReplayTimeline, fieldSource);
+            }
+
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing,
+                fieldSource,
+                "No tracker snapshot matched the selected Field source at or before the selected replay timeline tick.",
+                selectedEntry?.LineNumber);
         }
 
         if (selectedEntry is null)
@@ -729,7 +757,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             ToNanoseconds(alignment.ReceivedAtDeltaTicks ?? 0),
             snapshot.RawPayloadRestored,
             snapshot.BallCount,
-            snapshot.RobotCount);
+            snapshot.RobotCount,
+            snapshot.ReceivedAt,
+            alignment.ReplayTimelineReceivedAt,
+            IsLatestBefore: false,
+            IsStale: false,
+            StalenessDeltaNs: null);
     }
 
     private static TrackerDiagnosticsFieldSourceFrame CreateSavedAlignmentFieldSourceFrame(
@@ -757,7 +790,83 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             snapshot.SemanticSummary,
             alignedStatus == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
                 ? "Tracker snapshot matched, but it has no drawable balls or robots."
-                : null);
+                : null,
+            snapshot.ReceivedAt,
+            alignment.ReplayTimelineReceivedAt,
+            IsLatestBefore: false,
+            IsStale: false,
+            StalenessDeltaNs: null);
+    }
+
+    private static TrackerDiagnosticsComparisonEntryComparison CreateLatestBeforeComparison(
+        AlignedComparisonSnapshot aligned,
+        TrackerDiagnosticsReplayTimelineSelection selectedReplayTimeline)
+    {
+        var snapshot = aligned.Snapshot;
+        var stalenessDeltaNs = ToNanoseconds(Math.Max(
+            0,
+            (selectedReplayTimeline.ReceivedAt.ToUniversalTime() -
+             ResolveSourceReceivedAt(aligned).ToUniversalTime()).Ticks));
+        var sourceReceivedAt = ResolveSourceReceivedAt(aligned);
+        return new TrackerDiagnosticsComparisonEntryComparison(
+            TrackerDiagnosticsComparisonEntryStatus.Ready,
+            aligned.Alignment.DiagnosticsLineNumber,
+            "latest-before",
+            IbisOwnSnapshotTimestampNs: null,
+            snapshot.SourceRole,
+            snapshot.SourceLabel,
+            snapshot.TrackedFrameNumber,
+            snapshot.TrackedFrameTimestampNs,
+            stalenessDeltaNs,
+            snapshot.RawPayloadRestored,
+            snapshot.BallCount,
+            snapshot.RobotCount,
+            sourceReceivedAt,
+            selectedReplayTimeline.ReceivedAt,
+            IsLatestBefore: true,
+            IsStale: stalenessDeltaNs > 0,
+            StalenessDeltaNs: stalenessDeltaNs);
+    }
+
+    private static TrackerDiagnosticsFieldSourceFrame CreateLatestBeforeFieldSourceFrame(
+        AlignedComparisonSnapshot aligned,
+        TrackerDiagnosticsReplayTimelineSelection selectedReplayTimeline,
+        TrackerDiagnosticsFieldSource fieldSource)
+    {
+        var snapshot = aligned.Snapshot;
+        var status = snapshot.BallCount == 0 && snapshot.RobotCount == 0
+            ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+            : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
+        var sourceReceivedAt = ResolveSourceReceivedAt(aligned);
+        var stalenessDeltaNs = ToNanoseconds(Math.Max(
+            0,
+            (selectedReplayTimeline.ReceivedAt.ToUniversalTime() - sourceReceivedAt.ToUniversalTime()).Ticks));
+        return new TrackerDiagnosticsFieldSourceFrame(
+            status,
+            fieldSource,
+            aligned.Alignment.DiagnosticsLineNumber,
+            "latest-before",
+            IbisOwnSnapshotTimestampNs: null,
+            snapshot.SourceRole,
+            snapshot.SourceLabel,
+            snapshot.TrackedFrameNumber,
+            snapshot.TrackedFrameTimestampNs,
+            stalenessDeltaNs,
+            snapshot.RawPayloadRestored,
+            snapshot.SemanticSummary,
+            status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                ? "Tracker snapshot matched, but it has no drawable balls or robots."
+                : null,
+            sourceReceivedAt,
+            selectedReplayTimeline.ReceivedAt,
+            IsLatestBefore: true,
+            IsStale: stalenessDeltaNs > 0,
+            StalenessDeltaNs: stalenessDeltaNs);
+    }
+
+    private static DateTimeOffset ResolveSourceReceivedAt(AlignedComparisonSnapshot aligned)
+    {
+        return aligned.Alignment.TrackerSnapshotReceivedAt ?? aligned.Snapshot.ReceivedAt;
     }
 
     private static string? ResolveMetadataPath(string diagnosticsLogPath)
@@ -1007,12 +1116,51 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             return null;
         }
 
+        public AlignedComparisonSnapshot? FindLatestBeforeTimelineCandidate(
+            int replayTimelineIndex,
+            DateTimeOffset selectedReceivedAt,
+            TrackerDiagnosticsComparisonSourceFilter filter)
+        {
+            var selectedReceivedAtUtc = selectedReceivedAt.ToUniversalTime();
+            return alignmentByTimelineIndex
+                .Where(pair => pair.Key <= replayTimelineIndex)
+                .SelectMany(pair => pair.Value)
+                .Where(record => MatchesFilter(record, filter))
+                .Select(TryCreateAlignedSnapshot)
+                .Where(aligned => aligned is not null &&
+                                  ResolveSourceReceivedAt(aligned!).ToUniversalTime() <= selectedReceivedAtUtc)
+                .Select(aligned => aligned!)
+                .OrderByDescending(aligned => aligned.Snapshot.ReceivedAt)
+                .ThenByDescending(aligned => aligned.Alignment.ReplayTimelineIndex)
+                .ThenByDescending(aligned => aligned.Snapshot.RecordIndex)
+                .FirstOrDefault();
+        }
+
         public AlignedComparisonSnapshot? FindAlignedTimelineFieldSourceCandidate(
             int replayTimelineIndex,
             TrackerDiagnosticsFieldSource fieldSource)
         {
             var filter = fieldSource.ToComparisonFilter();
             return filter is null ? null : FindAlignedTimelineCandidate(replayTimelineIndex, filter);
+        }
+
+        public AlignedComparisonSnapshot? FindLatestBeforeTimelineFieldSourceCandidate(
+            int replayTimelineIndex,
+            DateTimeOffset selectedReceivedAt,
+            TrackerDiagnosticsFieldSource fieldSource)
+        {
+            var filter = fieldSource.ToComparisonFilter();
+            return filter is null
+                ? null
+                : FindLatestBeforeTimelineCandidate(replayTimelineIndex, selectedReceivedAt, filter);
+        }
+
+        private AlignedComparisonSnapshot? TryCreateAlignedSnapshot(TrackerSnapshotAlignmentRecord record)
+        {
+            return record.TrackerSnapshotRecordIndex is not null &&
+                   snapshotsByRecordIndex.TryGetValue(record.TrackerSnapshotRecordIndex.Value, out var snapshot)
+                ? new AlignedComparisonSnapshot(record, snapshot)
+                : null;
         }
 
         private IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateSourceOptions()
@@ -1567,6 +1715,11 @@ public enum TrackerDiagnosticsFieldSourceFrameStatus
 /// <param name="RawPayloadRestored">nearest snapshot の raw payload を protobuf として復元できる場合は true。</param>
 /// <param name="SemanticSummary">Field 描画に使う最小 semantic summary。</param>
 /// <param name="Message">非 Ready 状態の補足 message。</param>
+/// <param name="SourceSnapshotReceivedAt">source snapshot の実際の受信時刻。</param>
+/// <param name="SelectedReplayTimelineReceivedAt">選択中 replay timeline tick の受信時刻。</param>
+/// <param name="IsLatestBefore">selected tick 以前の直前 sample hold の場合は true。</param>
+/// <param name="IsStale">selected tick と source snapshot に時間差がある場合は true。</param>
+/// <param name="StalenessDeltaNs">selected tick と source snapshot の capture-time 差分。</param>
 public sealed record TrackerDiagnosticsFieldSourceFrame(
     TrackerDiagnosticsFieldSourceFrameStatus Status,
     TrackerDiagnosticsFieldSource Source,
@@ -1580,7 +1733,12 @@ public sealed record TrackerDiagnosticsFieldSourceFrame(
     long? TimestampDeltaNs,
     bool? RawPayloadRestored,
     TrackerPacketSnapshotSemanticSummary? SemanticSummary,
-    string? Message)
+    string? Message,
+    DateTimeOffset? SourceSnapshotReceivedAt = null,
+    DateTimeOffset? SelectedReplayTimelineReceivedAt = null,
+    bool IsLatestBefore = false,
+    bool IsStale = false,
+    long? StalenessDeltaNs = null)
 {
     /// <summary>
     /// Field source frame を作れない理由だけを持つ状態を作る。
@@ -1679,6 +1837,11 @@ public enum TrackerDiagnosticsComparisonEntryStatus
 /// <param name="RawPayloadRestored">nearest snapshot の raw payload を protobuf として復元できる場合は true。</param>
 /// <param name="BallCount">nearest snapshot の semantic summary に含まれる ball 数。</param>
 /// <param name="RobotCount">nearest snapshot の semantic summary に含まれる robot 数。</param>
+/// <param name="NearestSnapshotReceivedAt">nearest/latest-before snapshot の実際の受信時刻。</param>
+/// <param name="SelectedReplayTimelineReceivedAt">選択中 replay timeline tick の受信時刻。</param>
+/// <param name="IsLatestBefore">selected tick 以前の直前 sample hold の場合は true。</param>
+/// <param name="IsStale">selected tick と source snapshot に時間差がある場合は true。</param>
+/// <param name="StalenessDeltaNs">selected tick と source snapshot の capture-time 差分。</param>
 public sealed record TrackerDiagnosticsComparisonEntryComparison(
     TrackerDiagnosticsComparisonEntryStatus Status,
     int? EntryLineNumber,
@@ -1691,7 +1854,12 @@ public sealed record TrackerDiagnosticsComparisonEntryComparison(
     long? TimestampDeltaNs,
     bool? RawPayloadRestored,
     int? BallCount,
-    int? RobotCount)
+    int? RobotCount,
+    DateTimeOffset? NearestSnapshotReceivedAt = null,
+    DateTimeOffset? SelectedReplayTimelineReceivedAt = null,
+    bool IsLatestBefore = false,
+    bool IsStale = false,
+    long? StalenessDeltaNs = null)
 {
     /// <summary>
     /// comparison を作れない理由だけを持つ summary を作る。

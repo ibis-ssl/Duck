@@ -438,6 +438,127 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// selected replay timeline tick に対象 source の alignment が無い場合、timeline を動かさず直前 sample を latest-before hold として使うことを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_WithSelectedReplayTimeline_WhenSourceMissingAtSelectedTick_UsesLatestBeforeSnapshotWithoutMovingSelectedTime()
+    {
+        var receivedAt = new DateTimeOffset(2026, 5, 13, 9, 30, 0, TimeSpan.Zero);
+        var selectedReceivedAt = receivedAt.AddMilliseconds(40);
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 1100, 81_686_210_000_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3100, 1_778_620_918_834_301_760, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("ibis-runtime", "ibis", "own", 1101, 81_686_210_020_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(20).Ticks),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3101, 1_778_620_918_834_301_761, ballCount: 2, robotCount: 2, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(20).Ticks),
+                SnapshotInput("ibis-runtime", "ibis", "own", 1102, 81_686_210_040_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(40).Ticks),
+                SnapshotInput("mage-uuid", "MAGE", "external", 4100, 1_778_620_918_834_301_762, ballCount: 3, robotCount: 3, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(40).Ticks),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 1102,
+            alignmentRecords:
+            [
+                AlignmentInput(1, 1100, receivedAt, 81_686_210_000_000, "own", "ibis", "ibis-runtime", "self", 0, receivedAt, 1100, 81_686_210_000_000, replayTimelineIndex: 0),
+                AlignmentInput(1, 1100, receivedAt, 81_686_210_000_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.0:12010", 1, receivedAt, 3100, 1_778_620_918_834_301_760, replayTimelineIndex: 0),
+                AlignmentInput(1, 1101, receivedAt.AddMilliseconds(20), 81_686_210_020_000, "own", "ibis", "ibis-runtime", "self", 2, receivedAt.AddMilliseconds(20), 1101, 81_686_210_020_000, replayTimelineIndex: 1),
+                AlignmentInput(1, 1101, receivedAt.AddMilliseconds(20), 81_686_210_020_000, "external", "ER-FORCE", "er-force-uuid", "192.0.2.20:12010", 3, receivedAt.AddMilliseconds(20), 3101, 1_778_620_918_834_301_761, replayTimelineIndex: 1),
+                AlignmentInput(1, 1102, selectedReceivedAt, 81_686_210_040_000, "own", "ibis", "ibis-runtime", "self", 4, selectedReceivedAt, 1102, 81_686_210_040_000, replayTimelineIndex: 2),
+                AlignmentInput(1, 1102, selectedReceivedAt, 81_686_210_040_000, "external", "MAGE", "mage-uuid", "192.0.2.40:12010", 5, selectedReceivedAt, 4100, 1_778_620_918_834_301_762, replayTimelineIndex: 2),
+            ]);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var selectedTimeline = new TrackerDiagnosticsReplayTimelineSelection(2, 1, selectedReceivedAt);
+
+        var state = reader.Load(
+            session.DiagnosticsPath,
+            SelectedEntry(1102),
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("ER-FORCE"));
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(1102),
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.ForSourceLabel("ER-FORCE"));
+
+        var selectedTick = Assert.Single(state.ReplayTimeline, tick => tick.ReplayTimelineIndex == 2);
+        Assert.Equal(selectedReceivedAt, selectedTick.ReceivedAt);
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, state.SelectedEntryComparison?.Status);
+        Assert.Equal("latest-before", state.SelectedEntryComparison?.MatchingRule);
+        Assert.Equal(3101u, state.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(20_000_000, state.SelectedEntryComparison?.TimestampDeltaNs);
+        AssertObjectProperty(
+            state.SelectedEntryComparison!,
+            "NearestSnapshotReceivedAt",
+            receivedAt.AddMilliseconds(20));
+        AssertObjectProperty(
+            state.SelectedEntryComparison!,
+            "SelectedReplayTimelineReceivedAt",
+            selectedReceivedAt);
+        AssertObjectProperty(state.SelectedEntryComparison!, "IsLatestBefore", true);
+        AssertObjectProperty(state.SelectedEntryComparison!, "IsStale", true);
+        AssertObjectProperty(state.SelectedEntryComparison!, "StalenessDeltaNs", 20_000_000L);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
+        Assert.Equal("latest-before", frame.MatchingRule);
+        Assert.Equal(3101u, frame.TrackedFrameNumber);
+        Assert.Equal(20_000_000, frame.TimestampDeltaNs);
+        AssertObjectProperty(frame, "SourceSnapshotReceivedAt", receivedAt.AddMilliseconds(20));
+        AssertObjectProperty(frame, "SelectedReplayTimelineReceivedAt", selectedReceivedAt);
+        AssertObjectProperty(frame, "IsLatestBefore", true);
+        AssertObjectProperty(frame, "IsStale", true);
+        AssertObjectProperty(frame, "StalenessDeltaNs", 20_000_000L);
+        Assert.Equal(2, frame.SemanticSummary?.Balls.Count);
+    }
+
+    /// <summary>
+    /// selected tick 以前に同じ source が無い場合だけ missing とし、future snapshot へ fallback しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void Load_WithSelectedReplayTimeline_WhenOnlyFutureSourceSnapshotExists_ReturnsMissingWithoutFutureFallback()
+    {
+        var receivedAt = new DateTimeOffset(2026, 5, 13, 9, 45, 0, TimeSpan.Zero);
+        var selectedReceivedAt = receivedAt.AddMilliseconds(40);
+        var futureReceivedAt = receivedAt.AddMilliseconds(60);
+        var session = CreateSession(
+            [
+                SnapshotInput("ibis-runtime", "ibis", "own", 1200, 81_686_220_000_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("ibis-runtime", "ibis", "own", 1201, 81_686_220_040_000, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(40).Ticks),
+                SnapshotInput("mage-uuid", "MAGE", "external", 4200, 1_778_620_918_834_401_760, ballCount: 3, robotCount: 3, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(40).Ticks),
+                SnapshotInput("late-uuid", "LATE-TRACKER", "external", 5200, 1_778_620_918_834_401_761, ballCount: 4, robotCount: 4, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(60).Ticks),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 1201,
+            alignmentRecords:
+            [
+                AlignmentInput(1, 1200, receivedAt, 81_686_220_000_000, "own", "ibis", "ibis-runtime", "self", 0, receivedAt, 1200, 81_686_220_000_000, replayTimelineIndex: 0),
+                AlignmentInput(1, 1201, selectedReceivedAt, 81_686_220_040_000, "own", "ibis", "ibis-runtime", "self", 1, selectedReceivedAt, 1201, 81_686_220_040_000, replayTimelineIndex: 1),
+                AlignmentInput(1, 1201, selectedReceivedAt, 81_686_220_040_000, "external", "MAGE", "mage-uuid", "192.0.2.40:12010", 2, selectedReceivedAt, 4200, 1_778_620_918_834_401_760, replayTimelineIndex: 1),
+                AlignmentInput(1, 1201, futureReceivedAt, 81_686_220_040_000, "external", "LATE-TRACKER", "late-uuid", "192.0.2.60:12010", 3, futureReceivedAt, 5200, 1_778_620_918_834_401_761, replayTimelineIndex: 2),
+            ]);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var selectedTimeline = new TrackerDiagnosticsReplayTimelineSelection(1, 1, selectedReceivedAt);
+
+        var state = reader.Load(
+            session.DiagnosticsPath,
+            SelectedEntry(1201),
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("LATE-TRACKER"));
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(1201),
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.ForSourceLabel("LATE-TRACKER"));
+
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.NoCandidateSnapshot, state.SelectedEntryComparison?.Status);
+        Assert.Null(state.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing, frame.Status);
+        Assert.Null(frame.TrackedFrameNumber);
+        Assert.Null(frame.SemanticSummary);
+    }
+
+    /// <summary>
     /// tick / scrub / source selector 変更で tracker sidecar と alignment sidecar を再読込しないことを確認する。
     /// </summary>
     [Fact]
@@ -1139,6 +1260,14 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     private static TrackerDiagnosticsComparisonSelectedEntry SelectedEntry(uint trackedFrame)
     {
         return new TrackerDiagnosticsComparisonSelectedEntry(1, trackedFrame.ToString(CultureInfo.InvariantCulture));
+    }
+
+    private static void AssertObjectProperty<T>(object instance, string propertyName, T expected)
+    {
+        var property = instance.GetType().GetProperty(propertyName);
+        Assert.True(property is not null, $"{instance.GetType().Name}.{propertyName} property must exist.");
+        var value = Assert.IsType<T>(property!.GetValue(instance));
+        Assert.Equal(expected, value);
     }
 
     private static IReadOnlyList<TrackerDiagnosticsLogEntry> ReadDisplayedEntries(string diagnosticsPath, int maxEntries = 10_000)

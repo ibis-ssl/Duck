@@ -1,0 +1,123 @@
+.field-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid #315235;
+    border-radius: 10px;
+    background: #102617;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.field-card__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    padding: 0.32rem 0.5rem;
+    border-bottom: 1px solid #315235;
+    color: #89a38b;
+    font-size: 0.72rem;
+}
+
+.field-card__reset {
+    border: 1px solid #406b43;
+    border-radius: 6px;
+    padding: 0.24rem 0.45rem;
+    background: #17301d;
+    color: #e6f0e0;
+    font-size: 0.72rem;
+    line-height: 1;
+}
+
+.field-card__canvas {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.field-card__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background: #18813b;
+    cursor: grab;
+}
+
+.field-card__svg:active {
+    cursor: grabbing;
+}
+
+.field-card__boundary-background {
+    fill: #1a8a40;
+}
+
+.field-card__boundary {
+    fill: #1f9448;
+    stroke: #ffffff;
+    stroke-width: 3;
+}
+
+.field-card__axes {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    z-index: 2;
+    width: 4.4rem;
+    height: 4.4rem;
+    border: 1px solid rgba(12, 33, 18, 0.24);
+    border-radius: 10px;
+    background: rgba(240, 248, 236, 0.18);
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+}
+
+.field-card__axes svg {
+    width: 100%;
+    height: 100%;
+}
+
+.field-card__axes path {
+    fill: none;
+    stroke: #f4fff1;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.field-card__axes text {
+    fill: #f4fff1;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.field-card__cursor {
+    position: absolute;
+    z-index: 2;
+    min-width: 8rem;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    background: rgba(11, 22, 14, 0.82);
+    color: #eff7eb;
+    font-size: 0.78rem;
+    line-height: 1;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.field-card__layer-group--a {
+    opacity: 0.96;
+}
+
+.field-card__layer-group--b {
+    opacity: 0.76;
+}
+
+@media (max-width: 760px) {
+    .field-card__toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
