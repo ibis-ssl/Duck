@@ -388,28 +388,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     useTrackedSummary: false);
         }
 
-        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker)
+        var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
+        if (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated ||
+            sidecarPath is null || !File.Exists(sidecarPath))
         {
-            if (diagnosticsSampleResult.Index is null)
+            if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker &&
+                diagnosticsSampleResult.Index is not null)
             {
-                return TrackerDiagnosticsFieldSourceFrame.WithStatus(
-                    TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
-                    fieldSource,
-                    "Diagnostics sample sidecar is not available for ibis tracker.");
-            }
-
-            return CreateDiagnosticsSampleFieldSourceFrame(
+                return CreateDiagnosticsSampleFieldSourceFrame(
                     diagnosticsSampleResult.Index,
                     selectedEntry,
                     selectedReplayTimeline,
                     fieldSource,
                     useTrackedSummary: true);
-        }
+            }
 
-        var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
-        if (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated ||
-            sidecarPath is null || !File.Exists(sidecarPath))
-        {
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
                 TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
                 fieldSource,
@@ -691,6 +684,17 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 return CreateLatestBeforeComparison(latestBeforeTick, selectedReplayTimeline);
             }
 
+            var latestBeforeSnapshot = index.FindLatestBeforeReceivedAtCandidate(
+                selectedReplayTimeline.ReceivedAt,
+                selectedSourceFilter);
+            if (latestBeforeSnapshot is not null)
+            {
+                return CreateLatestBeforeComparison(
+                    latestBeforeSnapshot,
+                    selectedReplayTimeline,
+                    selectedEntry?.LineNumber);
+            }
+
             return TrackerDiagnosticsComparisonEntryComparison.WithStatus(
                 TrackerDiagnosticsComparisonEntryStatus.NoCandidateSnapshot,
                 selectedEntry?.LineNumber);
@@ -771,6 +775,18 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             if (latestBeforeTick is not null)
             {
                 return CreateLatestBeforeFieldSourceFrame(latestBeforeTick, selectedReplayTimeline, fieldSource);
+            }
+
+            var latestBeforeSnapshot = index.FindLatestBeforeReceivedAtFieldSourceCandidate(
+                selectedReplayTimeline.ReceivedAt,
+                fieldSource);
+            if (latestBeforeSnapshot is not null)
+            {
+                return CreateLatestBeforeFieldSourceFrame(
+                    latestBeforeSnapshot,
+                    selectedReplayTimeline,
+                    fieldSource,
+                    selectedEntry?.LineNumber);
             }
 
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
@@ -935,6 +951,34 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             StalenessDeltaNs: stalenessDeltaNs);
     }
 
+    private static TrackerDiagnosticsComparisonEntryComparison CreateLatestBeforeComparison(
+        ComparisonSnapshot snapshot,
+        TrackerDiagnosticsReplayTimelineSelection selectedReplayTimeline,
+        int? diagnosticsLineNumber)
+    {
+        var stalenessDeltaNs = ToNanoseconds(Math.Max(
+            0,
+            (selectedReplayTimeline.ReceivedAt.ToUniversalTime() - snapshot.ReceivedAt.ToUniversalTime()).Ticks));
+        return new TrackerDiagnosticsComparisonEntryComparison(
+            TrackerDiagnosticsComparisonEntryStatus.Ready,
+            diagnosticsLineNumber,
+            "latest-before",
+            IbisOwnSnapshotTimestampNs: null,
+            snapshot.SourceRole,
+            snapshot.SourceLabel,
+            snapshot.TrackedFrameNumber,
+            snapshot.TrackedFrameTimestampNs,
+            stalenessDeltaNs,
+            snapshot.RawPayloadRestored,
+            snapshot.BallCount,
+            snapshot.RobotCount,
+            snapshot.ReceivedAt,
+            selectedReplayTimeline.ReceivedAt,
+            IsLatestBefore: true,
+            IsStale: stalenessDeltaNs > 0,
+            StalenessDeltaNs: stalenessDeltaNs);
+    }
+
     private static TrackerDiagnosticsFieldSourceFrame CreateLatestBeforeFieldSourceFrame(
         AlignedComparisonSnapshot aligned,
         TrackerDiagnosticsReplayTimelineSelection selectedReplayTimeline,
@@ -965,6 +1009,41 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 ? "Tracker snapshot matched, but it has no drawable balls or robots."
                 : null,
             sourceReceivedAt,
+            selectedReplayTimeline.ReceivedAt,
+            IsLatestBefore: true,
+            IsStale: stalenessDeltaNs > 0,
+            StalenessDeltaNs: stalenessDeltaNs);
+    }
+
+    private static TrackerDiagnosticsFieldSourceFrame CreateLatestBeforeFieldSourceFrame(
+        ComparisonSnapshot snapshot,
+        TrackerDiagnosticsReplayTimelineSelection selectedReplayTimeline,
+        TrackerDiagnosticsFieldSource fieldSource,
+        int? diagnosticsLineNumber)
+    {
+        var status = snapshot.BallCount == 0 && snapshot.RobotCount == 0
+            ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+            : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
+        var stalenessDeltaNs = ToNanoseconds(Math.Max(
+            0,
+            (selectedReplayTimeline.ReceivedAt.ToUniversalTime() - snapshot.ReceivedAt.ToUniversalTime()).Ticks));
+        return new TrackerDiagnosticsFieldSourceFrame(
+            status,
+            fieldSource,
+            diagnosticsLineNumber,
+            "latest-before",
+            IbisOwnSnapshotTimestampNs: null,
+            snapshot.SourceRole,
+            snapshot.SourceLabel,
+            snapshot.TrackedFrameNumber,
+            snapshot.TrackedFrameTimestampNs,
+            stalenessDeltaNs,
+            snapshot.RawPayloadRestored,
+            snapshot.SemanticSummary,
+            status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                ? "Tracker snapshot matched, but it has no drawable balls or robots."
+                : null,
+            snapshot.ReceivedAt,
             selectedReplayTimeline.ReceivedAt,
             IsLatestBefore: true,
             IsStale: stalenessDeltaNs > 0,
@@ -1440,6 +1519,32 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             return filter is null
                 ? null
                 : FindLatestBeforeTimelineCandidate(replayTimelineIndex, selectedReceivedAt, filter);
+        }
+
+        public ComparisonSnapshot? FindLatestBeforeReceivedAtCandidate(
+            DateTimeOffset selectedReceivedAt,
+            TrackerDiagnosticsComparisonSourceFilter filter)
+        {
+            var candidates = GetCandidates(filter);
+            if (candidates.Length == 0)
+            {
+                return null;
+            }
+
+            var selectedReceivedAtUtc = selectedReceivedAt.ToUniversalTime();
+            return candidates
+                .Where(snapshot => snapshot.ReceivedAt.ToUniversalTime() <= selectedReceivedAtUtc)
+                .OrderByDescending(snapshot => snapshot.ReceivedAt)
+                .ThenByDescending(snapshot => snapshot.RecordIndex)
+                .FirstOrDefault();
+        }
+
+        public ComparisonSnapshot? FindLatestBeforeReceivedAtFieldSourceCandidate(
+            DateTimeOffset selectedReceivedAt,
+            TrackerDiagnosticsFieldSource fieldSource)
+        {
+            var filter = fieldSource.ToComparisonFilter();
+            return filter is null ? null : FindLatestBeforeReceivedAtCandidate(selectedReceivedAt, filter);
         }
 
         private AlignedComparisonSnapshot? TryCreateAlignedSnapshot(TrackerSnapshotAlignmentRecord record)

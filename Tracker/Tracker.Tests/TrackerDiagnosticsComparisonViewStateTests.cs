@@ -511,6 +511,53 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// sample replay timeline だけがあり alignment sidecar が無い場合でも、tracker snapshot sidecar の受信時刻から latest-before を選ぶこと。
+    /// </summary>
+    [Fact]
+    public void LoadFieldSourceFrame_WithSelectedReplayTimelineWithoutAlignment_UsesLatestBeforeSnapshotByReceivedAt()
+    {
+        var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero);
+        var selectedReceivedAt = receivedAt.AddMilliseconds(40);
+        var session = CreateSession(
+            [
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3100, 1_778_620_918_834_301_760, ballCount: 1, robotCount: 1, receivedAtOffsetTicks: 0),
+                SnapshotInput("er-force-uuid", "ER-FORCE", "external", 3101, 1_778_620_918_834_301_761, ballCount: 2, robotCount: 2, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(20).Ticks),
+                SnapshotInput("late-force-uuid", "LATE-FORCE", "external", 4100, 1_778_620_918_834_301_762, ballCount: 3, robotCount: 3, receivedAtOffsetTicks: TimeSpan.FromMilliseconds(60).Ticks),
+            ],
+            isCreated: true,
+            skippedRecordCount: 0,
+            errorCount: 0,
+            diagnosticsTrackedFrame: 1102);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var selectedTimeline = new TrackerDiagnosticsReplayTimelineSelection(2, 1, selectedReceivedAt);
+
+        var state = reader.Load(
+            session.DiagnosticsPath,
+            SelectedEntry(1102),
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.ForSourceLabel("ER-FORCE"));
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            SelectedEntry(1102),
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.ForSourceLabel("ER-FORCE"));
+
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, state.SelectedEntryComparison?.Status);
+        Assert.Equal("latest-before", state.SelectedEntryComparison?.MatchingRule);
+        Assert.Equal(3101u, state.SelectedEntryComparison?.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(receivedAt.AddMilliseconds(20), state.SelectedEntryComparison?.NearestSnapshotReceivedAt);
+        Assert.Equal(selectedReceivedAt, state.SelectedEntryComparison?.SelectedReplayTimelineReceivedAt);
+        Assert.Equal(20_000_000, state.SelectedEntryComparison?.TimestampDeltaNs);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
+        Assert.Equal("latest-before", frame.MatchingRule);
+        Assert.Equal(3101u, frame.TrackedFrameNumber);
+        Assert.Equal(receivedAt.AddMilliseconds(20), frame.SourceSnapshotReceivedAt);
+        Assert.Equal(selectedReceivedAt, frame.SelectedReplayTimelineReceivedAt);
+        Assert.Equal(20_000_000, frame.TimestampDeltaNs);
+        Assert.Equal(2, frame.SemanticSummary?.Balls.Count);
+    }
+
+    /// <summary>
     /// selected tick 以前に同じ source が無い場合だけ missing とし、future snapshot へ fallback しないことを確認する。
     /// </summary>
     [Fact]
