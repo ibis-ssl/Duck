@@ -53,3 +53,21 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 - `http://localhost:5289`
 
 `Tracker.DebugHost` の設定、UI、profile switch、API の詳細は [Tracker/Tracker.DebugHost/README.md](Tracker/Tracker.DebugHost/README.md) を参照してください。
+
+## `sim` profile で起動する例
+
+`Tracker.RuntimeHost` を `sim` profile で起動する場合:
+
+```bash
+Tracker__ActiveProfileName=sim \
+dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile
+```
+
+`Tracker.DebugHost` を `sim` profile で起動する場合:
+
+```bash
+Tracker__ActiveProfileName=sim \
+dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
+```
+
+`sim` profile の既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、official tracker packet を `224.5.23.2:11010` へ publish します。
