@@ -126,7 +126,10 @@ public sealed record VisionLiveComparisonThirdPartyTrackerSnapshot(
     long? TimestampNs,
     IReadOnlyList<SSL_DetectionBall> Balls,
     IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
-    IReadOnlyList<SSL_DetectionRobot> RobotsBlue);
+    IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+    string SourceRole,
+    string SourceUuid,
+    string RemoteEndpoint);
 
 /// <summary>
 /// 1 回の UI render tick で固定した Vision live comparison snapshot。
@@ -617,21 +620,40 @@ public sealed class VisionLiveComparisonSnapshotComposer
             return [];
         }
 
-        return externalTrackerManager.Trackers.Values
+        var snapshots = externalTrackerManager.Trackers.Values
             .Where(state => state.LastPacket is not null)
             .OrderBy(state => state.SourceLabel, StringComparer.Ordinal)
             .ThenBy(state => state.RemoteEndpoint?.ToString(), StringComparer.Ordinal)
             .Select(CreateThirdPartyTrackerSnapshot)
+            .GroupBy(snapshot => snapshot.Key, StringComparer.Ordinal)
+            .Select(group => group
+                .OrderByDescending(snapshot => snapshot.ReceivedAt ?? DateTimeOffset.MinValue)
+                .ThenBy(snapshot => snapshot.RemoteEndpoint, StringComparer.Ordinal)
+                .First())
             .ToArray();
+
+        return DisambiguateThirdPartyTrackerLabels(snapshots);
     }
 
     private static VisionLiveComparisonThirdPartyTrackerSnapshot CreateThirdPartyTrackerSnapshot(
         TrackerState<TrackerPacketAdapter> state)
     {
         var packet = state.LastPacket!.Packet.Clone();
-        var sourceLabel = string.IsNullOrWhiteSpace(state.SourceLabel)
-            ? "3rd party tracker"
-            : state.SourceLabel;
+        var sourceUuid = packet.Uuid ?? state.Uuid ?? string.Empty;
+        var remoteEndpoint = state.RemoteEndpoint?.ToString() ?? string.Empty;
+        var sourceLabel = TrackerPacketSnapshotRecord.NormalizeSourceLabel(
+            state.SourceLabel,
+            state.SourceName,
+            sourceUuid,
+            remoteEndpoint,
+            state.SourceRole);
+        var sourceKey = TrackerSourceIdentity.CreateUuidPreferredKey(
+            "third-party",
+            sourceLabel,
+            state.SourceName,
+            sourceUuid,
+            remoteEndpoint,
+            state.SourceRole);
         var summary = TrackerPacketSnapshotSemanticSummary.FromPacket(
             packet,
             state.SourceRole,
@@ -653,13 +675,40 @@ public sealed class VisionLiveComparisonSnapshotComposer
             .ToArray();
 
         return new VisionLiveComparisonThirdPartyTrackerSnapshot(
-            $"third-party:{sourceLabel}",
+            sourceKey,
             sourceLabel,
             state.ReceivedAt,
             summary.TrackedFrameTimestampNs,
             balls,
             robotsYellow,
-            robotsBlue);
+            robotsBlue,
+            state.SourceRole,
+            sourceUuid,
+            remoteEndpoint);
+    }
+
+    private static IReadOnlyList<VisionLiveComparisonThirdPartyTrackerSnapshot> DisambiguateThirdPartyTrackerLabels(
+        IReadOnlyList<VisionLiveComparisonThirdPartyTrackerSnapshot> snapshots)
+    {
+        var duplicatedLabels = snapshots
+            .GroupBy(snapshot => snapshot.Label, StringComparer.Ordinal)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .ToHashSet(StringComparer.Ordinal);
+
+        return snapshots
+            .Select(snapshot => duplicatedLabels.Contains(snapshot.Label)
+                ? snapshot with
+                {
+                    Label = TrackerSourceIdentity.CreateDisambiguatedLabel(
+                        snapshot.Label,
+                        snapshot.SourceUuid,
+                        snapshot.RemoteEndpoint),
+                }
+                : snapshot)
+            .OrderBy(snapshot => snapshot.Label, StringComparer.Ordinal)
+            .ThenBy(snapshot => snapshot.Key, StringComparer.Ordinal)
+            .ToArray();
     }
 
     private static SSL_DetectionRobot CreateRobot(TrackerPacketSnapshotRobotSummary robot)

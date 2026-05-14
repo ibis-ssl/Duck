@@ -241,6 +241,130 @@ public class VisionLiveComparisonViewStateTests
     }
 
     /// <summary>
+    /// 3rd party tracker は uuid が同じなら endpoint が違っても 1 source に統合し、最新受信 snapshot だけを代表描画する。
+    /// </summary>
+    [Fact]
+    public void VisionLiveComparisonSnapshotComposer_WhenThirdPartyTrackersShareUuid_CollapsesEndpointsToLatestRepresentative()
+    {
+        var store = new VisionPacketStore();
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis");
+        var firstReceivedAt = new DateTimeOffset(2026, 5, 14, 12, 0, 0, TimeSpan.Zero);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", "er-force-uuid", frameNumber: 101, timestampNs: 10_100, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.11"), 12010),
+            firstReceivedAt);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", "er-force-uuid", frameNumber: 102, timestampNs: 10_200, ballCount: 2, robotCount: 3),
+            new IPEndPoint(IPAddress.Parse("192.0.2.12"), 12010),
+            firstReceivedAt.AddMilliseconds(20));
+
+        var composer = new VisionLiveComparisonSnapshotComposer(store, trackedSnapshotStore: null, manager);
+        var renderSnapshot = composer.CaptureRenderTickSnapshot();
+        var viewState = composer.CreateViewState(renderSnapshot);
+
+        var snapshot = Assert.Single(renderSnapshot.ThirdPartyTrackerSnapshots);
+        Assert.Equal("third-party:uuid:er-force-uuid", snapshot.Key);
+        Assert.Equal("ER-FORCE", snapshot.Label);
+        Assert.Equal(firstReceivedAt.AddMilliseconds(20), snapshot.ReceivedAt);
+        Assert.Equal(10_200, snapshot.TimestampNs);
+        Assert.Equal(2, snapshot.Balls.Count);
+        Assert.Equal(3, snapshot.RobotsYellow.Count + snapshot.RobotsBlue.Count);
+
+        var option = Assert.Single(viewState.SourceOptions, option => option.Kind == VisionLiveComparisonSourceKind.ThirdPartyTracker);
+        Assert.Equal("third-party:uuid:er-force-uuid", option.Key);
+        Assert.Equal("ER-FORCE", option.Label);
+
+        var overlayState = viewState with
+        {
+            Mode = VisionLiveComparisonMode.Overlay,
+            LayerASelection = new VisionLiveComparisonLayerSelection(option, IsVisible: true),
+            LayerBSelection = new VisionLiveComparisonLayerSelection(option, IsVisible: true),
+        };
+        var layer = Assert.Single(overlayState.CreateOverlayLayers());
+        Assert.True(layer.IsSameSourceCollapsed);
+        Assert.Equal(2, layer.Details.BallCount);
+        Assert.Equal(3, layer.Details.RobotCount);
+    }
+
+    /// <summary>
+    /// source name が同じでも uuid が違う 3rd party tracker は別 source とし、label で区別できる。
+    /// </summary>
+    [Fact]
+    public void VisionLiveComparisonSnapshotComposer_WhenThirdPartyTrackersShareLabelButDifferentUuid_KeepsDistinctOptionsWithDisambiguatedLabels()
+    {
+        var store = new VisionPacketStore();
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis");
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 12, 0, 0, TimeSpan.Zero);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", "er-force-a", frameNumber: 201, timestampNs: 20_100, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.21"), 12010),
+            receivedAt);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", "er-force-b", frameNumber: 202, timestampNs: 20_200, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.22"), 12010),
+            receivedAt.AddMilliseconds(10));
+
+        var composer = new VisionLiveComparisonSnapshotComposer(store, trackedSnapshotStore: null, manager);
+        var viewState = composer.CreateViewState(composer.CaptureRenderTickSnapshot());
+        var options = viewState.SourceOptions
+            .Where(option => option.Kind == VisionLiveComparisonSourceKind.ThirdPartyTracker)
+            .OrderBy(option => option.Key, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Collection(
+            options,
+            option =>
+            {
+                Assert.Equal("third-party:uuid:er-force-a", option.Key);
+                Assert.Equal("ER-FORCE (er-force-a)", option.Label);
+            },
+            option =>
+            {
+                Assert.Equal("third-party:uuid:er-force-b", option.Key);
+                Assert.Equal("ER-FORCE (er-force-b)", option.Label);
+            });
+    }
+
+    /// <summary>
+    /// uuid が空の 3rd party tracker だけ、source name と endpoint fallback で識別する。
+    /// </summary>
+    [Fact]
+    public void VisionLiveComparisonSnapshotComposer_WhenThirdPartyTrackerUuidIsEmpty_UsesSourceNameAndEndpointFallback()
+    {
+        var store = new VisionPacketStore();
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis");
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 12, 0, 0, TimeSpan.Zero);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", string.Empty, frameNumber: 301, timestampNs: 30_100, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.31"), 12010),
+            receivedAt);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", string.Empty, frameNumber: 302, timestampNs: 30_200, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.32"), 12010),
+            receivedAt.AddMilliseconds(10));
+
+        var composer = new VisionLiveComparisonSnapshotComposer(store, trackedSnapshotStore: null, manager);
+        var viewState = composer.CreateViewState(composer.CaptureRenderTickSnapshot());
+        var options = viewState.SourceOptions
+            .Where(option => option.Kind == VisionLiveComparisonSourceKind.ThirdPartyTracker)
+            .OrderBy(option => option.Key, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Collection(
+            options,
+            option =>
+            {
+                Assert.Equal("third-party:fallback:ER-FORCE\u001f192.0.2.31:12010", option.Key);
+                Assert.Equal("ER-FORCE (192.0.2.31:12010)", option.Label);
+            },
+            option =>
+            {
+                Assert.Equal("third-party:fallback:ER-FORCE\u001f192.0.2.32:12010", option.Key);
+                Assert.Equal("ER-FORCE (192.0.2.32:12010)", option.Label);
+            });
+    }
+
+    /// <summary>
     /// overlay は Layer A/B が same-source の場合に 1 layer へ畳み、visibility を維持する。
     /// </summary>
     [Fact]
@@ -834,6 +958,40 @@ public class VisionLiveComparisonViewStateTests
         var packet = Fixture
             .CreatePacketGenerator(sourceName: "third-party-live", uuid: "third-party-uuid")
             .Generate(CreateTrackedFrameWithGeometry(fieldLength, fieldWidth));
+        return new TrackerPacketAdapter(packet);
+    }
+
+    private static TrackerPacketAdapter CreateExternalTrackerAdapter(
+        string sourceName,
+        string uuid,
+        uint frameNumber,
+        long timestampNs,
+        int ballCount,
+        int robotCount)
+    {
+        var balls = Enumerable.Range(0, ballCount)
+            .Select(index => Fixture.CreateTrackedBall(
+                trackId: index + 1,
+                xMm: 100 + (index * 100),
+                yMm: 200 + (index * 100)))
+            .ToArray();
+        var robots = Enumerable.Range(0, robotCount)
+            .Select(index => new TrackedRobotState
+            {
+                Team = index % 2 == 0 ? TrackerTeam.Yellow : TrackerTeam.Blue,
+                RobotId = (uint)(index + 1),
+                XMm = 1200 + (index * 100),
+                YMm = -300 - (index * 100),
+                Visibility = 1.0f,
+            })
+            .ToArray();
+        var frame = Fixture.CreateFrame(
+            frameNumber: frameNumber,
+            dataTimestampNs: timestampNs,
+            balls: balls,
+            robots: robots,
+            primaryBallTrackId: ballCount > 0 ? 1 : null);
+        var packet = Fixture.CreatePacketGenerator(sourceName: sourceName, uuid: uuid).Generate(frame);
         return new TrackerPacketAdapter(packet);
     }
 

@@ -114,12 +114,11 @@ public sealed record TrackerSnapshotAlignmentRecord(
         string sourceUuid,
         string remoteEndpoint)
     {
-        return string.Join(
-            '\u001f',
-            TrackerPacketSnapshotRecord.NormalizeSourceRole(sourceRole),
-            TrackerPacketSnapshotRecord.NormalizeSourceLabel(sourceLabel, null, sourceUuid, remoteEndpoint, sourceRole),
-            sourceUuid ?? string.Empty,
-            remoteEndpoint ?? string.Empty);
+        return TrackerSourceIdentity.CreateEndpointSensitiveKey(
+            sourceRole,
+            sourceLabel,
+            sourceUuid,
+            remoteEndpoint);
     }
 }
 
