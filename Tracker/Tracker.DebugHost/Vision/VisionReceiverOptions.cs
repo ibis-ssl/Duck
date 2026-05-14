@@ -16,6 +16,8 @@ public sealed class VisionReceiverOptions
 
 public sealed class VisionPacketCaptureOptions
 {
+    public const int DefaultDiagnosticsSampleIntervalMilliseconds = 100;
+
     public bool Enabled { get; set; }
 
     public string DirectoryPath { get; set; } = "packet-captures";
@@ -23,6 +25,8 @@ public sealed class VisionPacketCaptureOptions
     public string FilePrefix { get; set; } = "ssl-vision-packets";
 
     public bool FlushEachPacket { get; set; }
+
+    public int DiagnosticsSampleIntervalMilliseconds { get; set; } = DefaultDiagnosticsSampleIntervalMilliseconds;
 }
 
 public sealed class VisionReceiverProfileOptions

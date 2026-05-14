@@ -57,6 +57,53 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
         Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
         Assert.Equal("diagnostics-sample-sidecar", frame.MatchingRule);
         Assert.Equal(BaseTime.AddMilliseconds(10), frame.SourceSnapshotReceivedAt);
+        Assert.Equal(1, frame.SemanticSummary?.BallCount);
+        Assert.Equal(101, frame.SemanticSummary?.Balls.Single().XMm);
+    }
+
+    /// <summary>
+    /// Diagnostics UI state が Vision Input / ibis tracker も sample sidecar frame として reader から読むことを確認する。
+    /// </summary>
+    [Fact]
+    public void UiState_ForVisionInputAndIbisTrackerLoadsDiagnosticsSampleFrames()
+    {
+        var session = CreateDiagnosticsSampleSession(
+            [
+                SampleInput(0, TimeSpan.Zero, rawFrameNumber: 2200, worldFrameCommitted: true, renderFrameNumber: 1200),
+                SampleInput(1, TimeSpan.FromMilliseconds(10), rawFrameNumber: 2201, worldFrameCommitted: true, renderFrameNumber: 1201),
+            ]);
+        var uiState = new TrackerDiagnosticsComparisonUiState(new TrackerDiagnosticsComparisonViewStateReader());
+        var selectedEntry = CreateDisplayedEntry(lineNumber: 1, trackedFrame: "1201");
+        var selectedTimeline = new TrackerDiagnosticsReplayTimelineSelection(1, 1, BaseTime.AddMilliseconds(10));
+
+        uiState.Load(session.DiagnosticsPath, selectedEntry, selectedTimeline);
+
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, uiState.LeftTrackerFieldSourceFrame?.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, uiState.RightTrackerFieldSourceFrame?.Status);
+        Assert.Equal("diagnostics-sample-sidecar", uiState.LeftTrackerFieldSourceFrame?.MatchingRule);
+        Assert.Equal("diagnostics-sample-sidecar", uiState.RightTrackerFieldSourceFrame?.MatchingRule);
+        Assert.Equal("Vision Input", uiState.LeftTrackerFieldSourceFrame?.SourceLabel);
+        Assert.Equal("ibis tracker", uiState.RightTrackerFieldSourceFrame?.SourceLabel);
+        Assert.Equal(101, uiState.LeftTrackerFieldSourceFrame?.SemanticSummary?.Balls.Single().XMm);
+        Assert.Equal(201, uiState.RightTrackerFieldSourceFrame?.SemanticSummary?.Balls.Single().XMm);
+    }
+
+    /// <summary>
+    /// sample sidecar がない session で Vision Input が旧 render snapshot fallback に戻らないことを確認する。
+    /// </summary>
+    [Fact]
+    public void LoadFieldSourceFrame_ForVisionInputWithoutDiagnosticsSampleDoesNotFallbackToRenderSnapshot()
+    {
+        var session = CreateLegacyRenderSnapshotOnlySession();
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath,
+            new TrackerDiagnosticsComparisonSelectedEntry(1, "1000"),
+            TrackerDiagnosticsFieldSource.VisionInput);
+
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, frame.Status);
+        Assert.DoesNotContain("render snapshot", frame.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -97,6 +144,22 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
                 rawCameraId = 0,
                 worldFrameCommitted = sample.WorldFrameCommitted,
                 renderFrameNumber = sample.RenderFrameNumber,
+                trackedFrameNumber = sample.RenderFrameNumber,
+                trackedFrameTimestampNs = sample.RenderFrameNumber * 1000L,
+                rawSemanticSummary = CreateSemanticSummary(
+                    "Vision Input",
+                    "vision-input",
+                    sample.RawFrameNumber,
+                    timestampNs: 0,
+                    ballX: 100 + sample.SampleIndex,
+                    robotX: 1200),
+                trackedSemanticSummary = CreateSemanticSummary(
+                    "ibis tracker",
+                    "own",
+                    sample.RenderFrameNumber,
+                    sample.RenderFrameNumber * 1000L,
+                    ballX: 200 + sample.SampleIndex,
+                    robotX: 1300),
             })));
         WriteDiagnosticsLog(diagnosticsPath, trackedFrame: 1000);
         File.WriteAllText(
@@ -152,6 +215,73 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
         File.WriteAllText(
             diagnosticsPath,
             $"2026-05-14T08:00:00.0000000+00:00 Tracker diagnostics profile=sim rawFrame=2000 rawCamera=0 rawBalls=1 rawBallDetails=[x=100,y=200,z=0,c=1] rawBlue=[] rawYellow=[] trackedFrame={trackedFrame} trackedBalls=1 trackedBallDetails=[#1:x=100,y=200,z=0,vis=1,q=1,cams=0] trackedRobots=1 trackedRobotDetails=[Y3:x=1200,y=-300,o=0,w=0,vis=1,q=1] ballOutVisibility=0 ballHalfLifeSec=1 ballLifetimeNs=1000000000");
+    }
+
+    private static object CreateSemanticSummary(
+        string sourceLabel,
+        string sourceRole,
+        uint frameNumber,
+        long timestampNs,
+        double ballX,
+        double robotX)
+    {
+        return new
+        {
+            ballCount = 1,
+            robotCount = 1,
+            trackedFrameNumber = frameNumber,
+            trackedFrameTimestampNs = timestampNs,
+            sourceUuid = "",
+            sourceName = sourceLabel,
+            sourceRole,
+            sourceLabel,
+            balls = new[]
+            {
+                new
+                {
+                    index = 0,
+                    xMm = ballX,
+                    yMm = 20,
+                    zMm = 0,
+                    visibility = 1.0f,
+                },
+            },
+            robots = new[]
+            {
+                new
+                {
+                    team = "Yellow",
+                    robotId = 3,
+                    xMm = robotX,
+                    yMm = -300,
+                    orientationRad = 0.5f,
+                    visibility = 1.0f,
+                },
+            },
+        };
+    }
+
+    private static TrackerDiagnosticsLogEntry CreateDisplayedEntry(int lineNumber, string trackedFrame)
+    {
+        return new TrackerDiagnosticsLogEntry(
+            lineNumber,
+            BaseTime,
+            "sim",
+            "2000",
+            "0",
+            RawBallCount: 1,
+            RawBallDetails: "",
+            RawBlueDetails: "",
+            RawYellowDetails: "",
+            trackedFrame,
+            TrackedBallCount: 1,
+            TrackedBallDetails: "",
+            TrackedRobotCount: 1,
+            TrackedRobotDetails: "",
+            BallOutputVisibility: "0",
+            BallVisibilityHalfLifeSeconds: "1",
+            BallTrackLifetimeNs: "1000000000",
+            RawLine: "");
     }
 
     private static SampleInputData SampleInput(

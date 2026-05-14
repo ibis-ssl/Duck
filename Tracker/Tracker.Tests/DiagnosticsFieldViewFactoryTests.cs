@@ -84,6 +84,15 @@ public class DiagnosticsFieldViewFactoryTests
             TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing,
             TrackerDiagnosticsFieldSource.External,
             "No tracker snapshot matched the selected Field source.");
+        var readyIbisFrame = CreateReadyFieldFrame(
+            TrackerDiagnosticsFieldSource.IbisTracker,
+            CreateSummary(
+                [
+                    new TrackerPacketSnapshotBallSummary(0, 100, 200, 0, 0.9f),
+                ],
+                [
+                    new TrackerPacketSnapshotRobotSummary("Yellow", 3, 1000, 2000, 0, 0.85f),
+                ]));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
             renderSnapshot,
@@ -102,7 +111,7 @@ public class DiagnosticsFieldViewFactoryTests
                     IsVisible: true),
             ],
             missingLayerFrame,
-            layerBFrame: null);
+            readyIbisFrame);
 
         Assert.NotNull(model.Geometry);
         var layerA = Assert.Single(model.Layers, layer => layer.LayerKey == TrackerDiagnosticsOverlayLayerKey.LayerA);
@@ -196,6 +205,26 @@ public class DiagnosticsFieldViewFactoryTests
             SourceLabel: "source",
             Balls: balls,
             Robots: robots);
+    }
+
+    private static TrackerDiagnosticsFieldSourceFrame CreateReadyFieldFrame(
+        TrackerDiagnosticsFieldSource source,
+        TrackerPacketSnapshotSemanticSummary summary)
+    {
+        return new TrackerDiagnosticsFieldSourceFrame(
+            TrackerDiagnosticsFieldSourceFrameStatus.Ready,
+            source,
+            EntryLineNumber: 1,
+            MatchingRule: "diagnostics-sample-sidecar",
+            IbisOwnSnapshotTimestampNs: null,
+            SourceRole: summary.SourceRole,
+            SourceLabel: summary.SourceLabel,
+            TrackedFrameNumber: summary.TrackedFrameNumber,
+            TrackedFrameTimestampNs: summary.TrackedFrameTimestampNs,
+            TimestampDeltaNs: 0,
+            RawPayloadRestored: false,
+            summary,
+            Message: null);
     }
 
     private static TrackerRenderSnapshotView CreateRenderSnapshot(bool withGeometry)

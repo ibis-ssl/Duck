@@ -27,6 +27,10 @@ public sealed class VisionPacketCaptureSession
         RecordCount: 0,
         SkippedRecordCount: 0,
         ErrorCount: 0);
+    private DiagnosticsSampleLogMetadataSnapshot diagnosticsSampleLogMetadata = new(
+        RecordCount: 0,
+        SkippedRecordCount: 0,
+        ErrorCount: 0);
     private bool metadataWriteFailed;
 
     public VisionPacketCaptureSession(
@@ -83,7 +87,8 @@ public sealed class VisionPacketCaptureSession
                 paths.DiagnosticsLogPath,
                 paths.RenderSnapshotPath,
                 paths.TrackerSnapshotSidecarPath,
-                paths.TrackerSnapshotAlignmentSidecarPath);
+                paths.TrackerSnapshotAlignmentSidecarPath,
+                paths.DiagnosticsSampleSidecarPath);
             WriteMetadata(state);
             return state;
         }
@@ -119,6 +124,21 @@ public sealed class VisionPacketCaptureSession
         }
     }
 
+    /// <summary>
+    /// diagnostics sample sidecar の record 件数、skipped/error 件数を metadata へ反映する。
+    /// </summary>
+    public void UpdateDiagnosticsSampleLogMetadata(DiagnosticsSampleLogMetadataSnapshot metadata)
+    {
+        lock (gate)
+        {
+            diagnosticsSampleLogMetadata = metadata;
+            if (state is not null)
+            {
+                WriteMetadata(state);
+            }
+        }
+    }
+
     public void Stop()
     {
         lock (gate)
@@ -130,6 +150,10 @@ public sealed class VisionPacketCaptureSession
                 ErrorCount: 0,
                 Sources: []);
             trackerSnapshotAlignmentLogMetadata = new TrackerSnapshotAlignmentLogMetadataSnapshot(
+                RecordCount: 0,
+                SkippedRecordCount: 0,
+                ErrorCount: 0);
+            diagnosticsSampleLogMetadata = new DiagnosticsSampleLogMetadataSnapshot(
                 RecordCount: 0,
                 SkippedRecordCount: 0,
                 ErrorCount: 0);
@@ -163,6 +187,7 @@ public sealed class VisionPacketCaptureSession
                 RenderSnapshotPath = ToCaptureDirectoryRelativePath(sessionState.RenderSnapshotPath),
                 TrackerSnapshotSidecarPath = ToCaptureDirectoryRelativePath(sessionState.TrackerSnapshotSidecarPath),
                 TrackerSnapshotAlignmentPath = ToCaptureDirectoryRelativePath(sessionState.TrackerSnapshotAlignmentSidecarPath),
+                DiagnosticsSampleSidecarPath = ToCaptureDirectoryRelativePath(sessionState.DiagnosticsSampleSidecarPath),
                 TrackerSnapshotLog = new VisionPacketCaptureTrackerSnapshotLogMetadata
                 {
                     Format = "jsonl",
@@ -178,6 +203,14 @@ public sealed class VisionPacketCaptureSession
                     RecordCount = trackerSnapshotAlignmentLogMetadata.RecordCount,
                     SkippedRecordCount = trackerSnapshotAlignmentLogMetadata.SkippedRecordCount,
                     ErrorCount = trackerSnapshotAlignmentLogMetadata.ErrorCount,
+                },
+                DiagnosticsSampleLog = new VisionPacketCaptureTrackerSnapshotLogMetadata
+                {
+                    Format = "jsonl",
+                    IsCreated = File.Exists(sessionState.DiagnosticsSampleSidecarPath),
+                    RecordCount = diagnosticsSampleLogMetadata.RecordCount,
+                    SkippedRecordCount = diagnosticsSampleLogMetadata.SkippedRecordCount,
+                    ErrorCount = diagnosticsSampleLogMetadata.ErrorCount,
                 },
                 TrackerSnapshotSources = trackerSnapshotLogMetadata.Sources
                     .Select(source => new VisionPacketCaptureTrackerSnapshotSourceMetadata
@@ -230,9 +263,13 @@ public sealed class VisionPacketCaptureSession
 
         public string TrackerSnapshotAlignmentPath { get; init; } = "";
 
+        public string DiagnosticsSampleSidecarPath { get; init; } = "";
+
         public VisionPacketCaptureTrackerSnapshotLogMetadata TrackerSnapshotLog { get; init; } = new();
 
         public VisionPacketCaptureTrackerSnapshotLogMetadata TrackerSnapshotAlignmentLog { get; init; } = new();
+
+        public VisionPacketCaptureTrackerSnapshotLogMetadata DiagnosticsSampleLog { get; init; } = new();
 
         public IReadOnlyList<VisionPacketCaptureTrackerSnapshotSourceMetadata> TrackerSnapshotSources { get; init; } = [];
 
@@ -280,4 +317,5 @@ public sealed record VisionPacketCaptureSessionState(
     string DiagnosticsLogPath,
     string RenderSnapshotPath,
     string TrackerSnapshotSidecarPath,
-    string TrackerSnapshotAlignmentSidecarPath);
+    string TrackerSnapshotAlignmentSidecarPath,
+    string DiagnosticsSampleSidecarPath);

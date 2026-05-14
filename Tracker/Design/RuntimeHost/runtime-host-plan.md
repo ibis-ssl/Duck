@@ -48,6 +48,12 @@ AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` �
 
 AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。
 
+## RuntimeHost 設定方針
+
+RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。
+
+`Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを options / appsettings に出す。protocol 名、sidecar 名、metadata field 名など replay / wire contract として固定すべき値は設定化しない。
+
 ## Loop isolation 方針
 
 tracker operation loop は、Web server live display processing と diagnostics logging / replay processing の両方から切り離す。
@@ -90,6 +96,12 @@ RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの com
 `VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。
 
 3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。
+
+### RUNTIME-HOST-007: DebugHost diagnostics sample sidecar fast path
+
+RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
+
+Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。
 
 ## 設計資料配置
 

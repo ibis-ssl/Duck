@@ -255,7 +255,7 @@ loop isolation[^loop-isolation] の中心目的は、tracker operation loop[^tra
 
 - tracker operation loop は raw packet と profile / control input を tracker engine へ渡し、tracker state 更新、publish、latest tracker snapshot の公開までを担当する。diagnostics sidecar への frame 保存をこの loop の `WorldFrameCommitted` callback へ直接結合しない。
 - server live display processing は `UI render tick` ごとに raw / tracked / 3rd party tracker の latest immutable snapshot を固定し、通常 Vision 画面の split / overlay を描画する。これは表示用 loop であり、diagnostics logging の sample cadence を決めない。
-- diagnostics logging / replay processing は tracker operation loop から直接書き込まれた render frame を読むのではなく、独立した diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] に保存する。replay はこの sample timeline から `Vision Input` と比較対象を復元する。
+- diagnostics logging / replay processing は tracker operation loop から直接書き込まれた render frame を読むのではなく、DebugHost hosted service の独立した diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定し、`diagnostics-samples.jsonl` diagnostics sample sidecar[^diagnostics-sample-sidecar] に保存する。tick 周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、replay はこの sample timeline から `Vision Input` と `ibis tracker` の semantic summary を通常経路として復元する。
 
 logging 互換性はこの loop isolation の必須要件にしない。新規 capture の性能と cadence 維持を優先し、旧 render snapshot sidecar に対する高コストな互換 layer は設計しない。旧形式の render snapshot sidecar しか持たない session は、この新機能では unsupported / degraded legacy session[^degraded-legacy-session] として扱ってよい。旧形式を読む場合も、旧経路が tracker committed frame cadence に制限されることを UI / details で説明できれば足りる。
 
@@ -386,7 +386,7 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^web-server-live-display-processing]: web server live display processing: 通常 Vision 画面が `UI render tick` ごとに latest immutable snapshot を固定して描画する処理。diagnostics logging / replay とは別扱いにする。
 [^diagnostics-logging-replay-processing]: diagnostics logging / replay processing: CaptureOn 中に latest raw snapshot と latest tracker snapshot を独立した sample として保存し、Diagnostics 画面でその sample timeline を replay する処理。
 [^ui-only-display-correction]: UI-only display correction: 保存済み data の cadence は変えず、描画時の補正だけで遅延を隠そうとする修正方針。RAW-VISION-017 の loop isolation では不採用とする。
-[^diagnostics-sample-sidecar]: diagnostics sample sidecar: loop isolation 後に diagnostics logging / replay processing が保存する latest raw / latest tracker snapshot の sidecar。具体的な schema 名は実装 task で固定する。
+[^diagnostics-sample-sidecar]: diagnostics sample sidecar: loop isolation 後に diagnostics logging / replay processing が保存する latest raw / latest tracker snapshot の sidecar。RUNTIME-HOST-007 では `diagnostics-samples.jsonl` として固定し、record は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本 field とする。
 [^degraded-legacy-session]: unsupported / degraded legacy session: 旧 render snapshot sidecar しか持たない capture session。新しい diagnostics sample path の性能や cadence 保証を受けず、表示できる範囲だけを旧形式として扱う。
 [^raw-snapshot-cadence]: raw snapshot cadence: SSL-Vision packet / raw latest snapshot が更新される周期。Diagnostics の `Vision Input` 表示は新規 capture でこの cadence を失わない保存経路を持つ。
 [^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、raw vision viewer、diagnostics、capture / replay、比較表示を担当する。

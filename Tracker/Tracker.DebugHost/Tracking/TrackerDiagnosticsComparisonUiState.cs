@@ -506,7 +506,9 @@ public sealed class TrackerDiagnosticsComparisonUiState
 
     private static bool NeedsTrackerFieldSourceFrame(TrackerDiagnosticsFieldSource source)
     {
-        return source.Kind is TrackerDiagnosticsFieldSourceKind.External
+        return source.Kind is TrackerDiagnosticsFieldSourceKind.VisionInput
+            or TrackerDiagnosticsFieldSourceKind.IbisTracker
+            or TrackerDiagnosticsFieldSourceKind.External
             or TrackerDiagnosticsFieldSourceKind.Unknown
             or TrackerDiagnosticsFieldSourceKind.SourceLabel;
     }

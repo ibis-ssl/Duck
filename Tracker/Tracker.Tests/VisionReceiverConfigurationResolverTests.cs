@@ -183,6 +183,43 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal("packet-captures", receiverOptions.PacketCapture.DirectoryPath);
         Assert.Equal("ssl-vision-packets", receiverOptions.PacketCapture.FilePrefix);
         Assert.True(receiverOptions.PacketCapture.FlushEachPacket);
+        Assert.Equal(100, receiverOptions.PacketCapture.DiagnosticsSampleIntervalMilliseconds);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: diagnostics sample loop が PacketCapture 設定の周期を使うこと。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsSampleHostedService_ResolveSampleInterval_UsesConfiguredPacketCaptureInterval()
+    {
+        var options = new VisionPacketCaptureOptions
+        {
+            DiagnosticsSampleIntervalMilliseconds = 25,
+        };
+
+        var interval = DiagnosticsSampleHostedService.ResolveSampleInterval(options);
+
+        Assert.Equal(TimeSpan.FromMilliseconds(25), interval);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: diagnostics sample loop の 0 以下の周期設定は既定値へ戻すこと。
+    /// </summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void DiagnosticsSampleHostedService_ResolveSampleInterval_FallsBackForNonPositiveValues(int configuredIntervalMilliseconds)
+    {
+        var options = new VisionPacketCaptureOptions
+        {
+            DiagnosticsSampleIntervalMilliseconds = configuredIntervalMilliseconds,
+        };
+
+        var interval = DiagnosticsSampleHostedService.ResolveSampleInterval(options);
+
+        Assert.Equal(
+            TimeSpan.FromMilliseconds(VisionPacketCaptureOptions.DefaultDiagnosticsSampleIntervalMilliseconds),
+            interval);
     }
 
     private static string FindRepositoryRoot()

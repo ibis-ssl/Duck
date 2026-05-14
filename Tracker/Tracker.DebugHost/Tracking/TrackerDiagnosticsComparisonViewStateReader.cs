@@ -11,6 +11,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 {
     private const string DiagnosticsLogSuffix = ".tracker-diagnostics.log";
     private const string MetadataSuffix = ".metadata.json";
+    private const string DiagnosticsSampleMatchingRule = "diagnostics-sample-sidecar";
     private const int SnapshotSchemaVersion = 1;
     private const int MaxCachedIndexes = 2;
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -103,6 +104,63 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         var sourceOptions = CreateEmptySourceOptions();
         var fieldSourceOptions = CreateEmptyFieldSourceOptions();
+        var diagnosticsSamplePath = ResolveDiagnosticsSampleSidecarPath(metadata, metadataPath);
+        var diagnosticsSampleResult = ReadDiagnosticsSampleIndexIfAvailable(diagnosticsSamplePath);
+        if (diagnosticsSampleResult.Error is not null)
+        {
+            return CreateState(
+                fullDiagnosticsLogPath,
+                metadataPath,
+                diagnosticsSamplePath,
+                TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt,
+                selectedSourceFilter,
+                sourceOptions,
+                fieldSourceOptions,
+                selectedEntryComparison: null,
+                replayTimeline: [],
+                metadata.DiagnosticsSampleLog?.RecordCount ?? 0,
+                metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
+                metadata.DiagnosticsSampleLog?.ErrorCount ?? 1,
+                $"Diagnostics sample sidecar could not be read: {diagnosticsSampleResult.Error}");
+        }
+
+        var diagnosticsSampleIndex = diagnosticsSampleResult.Index;
+        if (diagnosticsSampleIndex is not null && metadata.TrackerSnapshotLog is null)
+        {
+            return CreateState(
+                fullDiagnosticsLogPath,
+                metadataPath,
+                diagnosticsSamplePath,
+                TrackerDiagnosticsComparisonSidecarStatus.Ready,
+                selectedSourceFilter,
+                sourceOptions,
+                CreateDiagnosticsSampleFieldSourceOptions(diagnosticsSampleIndex),
+                selectedEntryComparison: null,
+                diagnosticsSampleIndex.Timeline,
+                metadata.DiagnosticsSampleLog?.RecordCount ?? diagnosticsSampleIndex.RecordCount,
+                metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
+                metadata.DiagnosticsSampleLog?.ErrorCount ?? 0,
+                error: null);
+        }
+
+        if (diagnosticsSampleIndex is null && IsLegacyRenderSnapshotOnly(metadata))
+        {
+            return CreateState(
+                fullDiagnosticsLogPath,
+                metadataPath,
+                sidecarPath: null,
+                TrackerDiagnosticsComparisonSidecarStatus.SnapshotMetadataMissing,
+                selectedSourceFilter,
+                sourceOptions,
+                fieldSourceOptions,
+                selectedEntryComparison: null,
+                replayTimeline: [],
+                recordCount: 0,
+                skippedRecordCount: 0,
+                errorCount: 0,
+                "unsupported degraded legacy diagnostics session: render snapshot sidecar without diagnostics sample sidecar is not supported.");
+        }
+
         if (metadata.TrackerSnapshotLog is null)
         {
             return CreateState(
@@ -236,7 +294,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             sourceOptions,
             fieldSourceOptions,
             selectedEntryComparison,
-            comparisonIndex.ReplayTimeline.Ticks,
+            diagnosticsSampleIndex?.Timeline ?? comparisonIndex.ReplayTimeline.Ticks,
             metadata.TrackerSnapshotLog.RecordCount,
             metadata.TrackerSnapshotLog.SkippedRecordCount,
             metadata.TrackerSnapshotLog.ErrorCount,
@@ -276,22 +334,6 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
         TrackerDiagnosticsFieldSource fieldSource)
     {
-        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput)
-        {
-            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
-                TrackerDiagnosticsFieldSourceFrameStatus.VisionInput,
-                fieldSource,
-                "Vision Input uses the selected render snapshot.");
-        }
-
-        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker)
-        {
-            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
-                TrackerDiagnosticsFieldSourceFrameStatus.IbisTrackerRenderSnapshot,
-                fieldSource,
-                "ibis tracker uses the selected render snapshot.");
-        }
-
         if (string.IsNullOrWhiteSpace(diagnosticsLogPath))
         {
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
@@ -316,6 +358,52 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
                 fieldSource,
                 metadataError);
+        }
+
+        var diagnosticsSamplePath = ResolveDiagnosticsSampleSidecarPath(metadata, metadataPath);
+        var diagnosticsSampleResult = ReadDiagnosticsSampleIndexIfAvailable(diagnosticsSamplePath);
+        if (diagnosticsSampleResult.Error is not null)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                fieldSource,
+                $"Diagnostics sample sidecar could not be read: {diagnosticsSampleResult.Error}");
+        }
+
+        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput)
+        {
+            if (diagnosticsSampleResult.Index is null)
+            {
+                return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                    TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                    fieldSource,
+                    "Diagnostics sample sidecar is not available for Vision Input.");
+            }
+
+            return CreateDiagnosticsSampleFieldSourceFrame(
+                    diagnosticsSampleResult.Index,
+                    selectedEntry,
+                    selectedReplayTimeline,
+                    fieldSource,
+                    useTrackedSummary: false);
+        }
+
+        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker)
+        {
+            if (diagnosticsSampleResult.Index is null)
+            {
+                return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                    TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                    fieldSource,
+                    "Diagnostics sample sidecar is not available for ibis tracker.");
+            }
+
+            return CreateDiagnosticsSampleFieldSourceFrame(
+                    diagnosticsSampleResult.Index,
+                    selectedEntry,
+                    selectedReplayTimeline,
+                    fieldSource,
+                    useTrackedSummary: true);
         }
 
         var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
@@ -352,6 +440,25 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
 
         return CreateFieldSourceFrame(selectedEntry, selectedReplayTimeline, fieldSource, comparisonIndex);
+    }
+
+    private static DiagnosticsSampleReadResult ReadDiagnosticsSampleIndexIfAvailable(string? diagnosticsSamplePath)
+    {
+        if (string.IsNullOrWhiteSpace(diagnosticsSamplePath) || !File.Exists(diagnosticsSamplePath))
+        {
+            return new DiagnosticsSampleReadResult(null, Error: null);
+        }
+
+        try
+        {
+            return new DiagnosticsSampleReadResult(
+                new DiagnosticsSampleIndex(DiagnosticsSampleLogReader.ReadRecords(diagnosticsSamplePath)),
+                Error: null);
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException)
+        {
+            return new DiagnosticsSampleReadResult(null, ex.Message);
+        }
     }
 
     private ComparisonSnapshotIndex GetOrBuildIndex(
@@ -891,6 +998,27 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             : Path.Combine(captureDirectory, metadata.TrackerSnapshotSidecarPath));
     }
 
+    private static string? ResolveDiagnosticsSampleSidecarPath(CaptureMetadata metadata, string metadataPath)
+    {
+        if (metadata.DiagnosticsSampleLog?.IsCreated != true &&
+            string.IsNullOrWhiteSpace(metadata.DiagnosticsSampleSidecarPath))
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(metadata.DiagnosticsSampleSidecarPath))
+        {
+            return null;
+        }
+
+        var sessionDirectory = Path.GetDirectoryName(metadataPath)
+            ?? throw new InvalidDataException("Capture metadata path must have a parent directory.");
+        var captureDirectory = ResolveCaptureDirectory(metadata, sessionDirectory);
+        return Path.GetFullPath(Path.IsPathRooted(metadata.DiagnosticsSampleSidecarPath)
+            ? metadata.DiagnosticsSampleSidecarPath
+            : Path.Combine(captureDirectory, metadata.DiagnosticsSampleSidecarPath));
+    }
+
     private static string? ResolveAlignmentPath(CaptureMetadata metadata, string metadataPath)
     {
         if (metadata.TrackerSnapshotAlignmentLog?.IsCreated != true ||
@@ -945,6 +1073,86 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
     }
 
+    private static bool IsLegacyRenderSnapshotOnly(CaptureMetadata metadata)
+    {
+        return metadata.TrackerSnapshotLog is null &&
+               metadata.DiagnosticsSampleLog is null &&
+               !string.IsNullOrWhiteSpace(metadata.RenderSnapshotPath);
+    }
+
+    private static IReadOnlyList<TrackerDiagnosticsFieldSourceOption> CreateDiagnosticsSampleFieldSourceOptions(
+        DiagnosticsSampleIndex index)
+    {
+        return
+        [
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.VisionInput, "Vision Input", index.RecordCount),
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.IbisTracker, "ibis tracker", index.TrackedRecordCount),
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.External, "External", 0),
+            new TrackerDiagnosticsFieldSourceOption(TrackerDiagnosticsFieldSource.Unknown, "Unknown", 0),
+        ];
+    }
+
+    private static TrackerDiagnosticsFieldSourceFrame CreateDiagnosticsSampleFieldSourceFrame(
+        DiagnosticsSampleIndex index,
+        TrackerDiagnosticsComparisonSelectedEntry? selectedEntry,
+        TrackerDiagnosticsReplayTimelineSelection? selectedReplayTimeline,
+        TrackerDiagnosticsFieldSource fieldSource,
+        bool useTrackedSummary)
+    {
+        var sample = selectedReplayTimeline is not null
+            ? index.FindByTimelineSelection(selectedReplayTimeline)
+            : index.FindBySelectedEntry(selectedEntry);
+        if (sample is null)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing,
+                fieldSource,
+                "No diagnostics sample matched the selected timeline tick.",
+                selectedReplayTimeline?.DiagnosticsLineNumber ?? selectedEntry?.LineNumber);
+        }
+
+        var summary = useTrackedSummary ? sample.TrackedSemanticSummary : sample.RawSemanticSummary;
+        if (summary is null)
+        {
+            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing,
+                fieldSource,
+                useTrackedSummary
+                    ? "Diagnostics sample does not contain ibis tracker semantic summary."
+                    : "Diagnostics sample does not contain Vision Input semantic summary.",
+                selectedReplayTimeline?.DiagnosticsLineNumber ?? selectedEntry?.LineNumber);
+        }
+
+        var status = summary.BallCount == 0 && summary.RobotCount == 0
+            ? TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+            : TrackerDiagnosticsFieldSourceFrameStatus.Ready;
+        var timestampNs = useTrackedSummary ? sample.TrackedFrameTimestampNs : null;
+        var frameNumber = useTrackedSummary
+            ? sample.TrackedFrameNumber ?? sample.RenderFrameNumber
+            : sample.RawFrameNumber;
+        return new TrackerDiagnosticsFieldSourceFrame(
+            status,
+            fieldSource,
+            selectedReplayTimeline?.DiagnosticsLineNumber ?? selectedEntry?.LineNumber,
+            DiagnosticsSampleMatchingRule,
+            IbisOwnSnapshotTimestampNs: null,
+            useTrackedSummary ? "own" : "vision-input",
+            useTrackedSummary ? "ibis tracker" : "Vision Input",
+            frameNumber,
+            timestampNs,
+            TimestampDeltaNs: 0,
+            RawPayloadRestored: false,
+            summary,
+            status == TrackerDiagnosticsFieldSourceFrameStatus.DrawableEmpty
+                ? "Diagnostics sample matched, but it has no drawable balls or robots."
+                : null,
+            sample.SampleReceivedAt,
+            selectedReplayTimeline?.ReceivedAt,
+            IsLatestBefore: false,
+            IsStale: false,
+            StalenessDeltaNs: 0);
+    }
+
     private sealed record ComparisonSnapshot(
         int RecordIndex,
         DateTimeOffset ReceivedAt,
@@ -962,6 +1170,85 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     private sealed record AlignedComparisonSnapshot(
         TrackerSnapshotAlignmentRecord Alignment,
         ComparisonSnapshot Snapshot);
+
+    private sealed record DiagnosticsSampleReadResult(
+        DiagnosticsSampleIndex? Index,
+        string? Error);
+
+    private sealed class DiagnosticsSampleIndex
+    {
+        private readonly DiagnosticsSampleRecord[] recordsByIndex;
+        private readonly IReadOnlyDictionary<int, DiagnosticsSampleRecord> recordBySampleIndex;
+
+        public DiagnosticsSampleIndex(IReadOnlyList<DiagnosticsSampleRecord> records)
+        {
+            recordsByIndex = records
+                .OrderBy(record => record.SampleReceivedAt)
+                .ThenBy(record => record.SampleIndex)
+                .ToArray();
+            recordBySampleIndex = recordsByIndex
+                .GroupBy(record => record.SampleIndex)
+                .ToDictionary(group => group.Key, group => group.First());
+            Timeline = recordsByIndex
+                .Select(CreateTimelineTick)
+                .ToArray();
+        }
+
+        public int RecordCount => recordsByIndex.Length;
+
+        public int TrackedRecordCount => recordsByIndex.Count(record => record.TrackedFrameNumber is not null);
+
+        public IReadOnlyList<TrackerDiagnosticsReplayTimelineTick> Timeline { get; }
+
+        public DiagnosticsSampleRecord? FindByTimelineSelection(TrackerDiagnosticsReplayTimelineSelection selection)
+        {
+            if (recordBySampleIndex.TryGetValue(selection.ReplayTimelineIndex, out var byIndex))
+            {
+                return byIndex;
+            }
+
+            var selectedReceivedAt = selection.ReceivedAt.ToUniversalTime();
+            return recordsByIndex.FirstOrDefault(record => record.SampleReceivedAt == selectedReceivedAt);
+        }
+
+        public DiagnosticsSampleRecord? FindBySelectedEntry(TrackerDiagnosticsComparisonSelectedEntry? selectedEntry)
+        {
+            if (selectedEntry is null)
+            {
+                return recordsByIndex.LastOrDefault();
+            }
+
+            if (uint.TryParse(selectedEntry.TrackedFrame, NumberStyles.Integer, CultureInfo.InvariantCulture, out var frameNumber))
+            {
+                return recordsByIndex.LastOrDefault(record => record.RenderFrameNumber == frameNumber) ??
+                       recordsByIndex.LastOrDefault(record => record.TrackedFrameNumber == frameNumber);
+            }
+
+            return recordsByIndex.LastOrDefault();
+        }
+
+        private static TrackerDiagnosticsReplayTimelineTick CreateTimelineTick(DiagnosticsSampleRecord record)
+        {
+            return new TrackerDiagnosticsReplayTimelineTick(
+                record.SampleIndex,
+                record.SampleReceivedAt,
+                string.IsNullOrWhiteSpace(record.SampleKind)
+                    ? DiagnosticsSampleRecord.DiagnosticsSampleKind
+                    : record.SampleKind,
+                DiagnosticsLineNumber: null,
+                record.RenderFrameNumber,
+                RenderReceivedAt: record.SampleReceivedAt,
+                RenderMatchRule: DiagnosticsSampleMatchingRule,
+                SourceRole: record.TrackedFrameNumber is null ? "vision-input" : "own",
+                SourceLabel: record.TrackedFrameNumber is null ? "Vision Input" : "ibis tracker",
+                SourceUuid: string.Empty,
+                RemoteEndpoint: string.Empty,
+                TrackerSnapshotRecordIndex: null,
+                TrackerSnapshotReceivedAt: record.TrackedReceivedAt,
+                TrackerSnapshotTrackedFrameNumber: record.TrackedFrameNumber,
+                TrackerSnapshotTimestampNs: record.TrackedFrameTimestampNs);
+        }
+    }
 
     private sealed class ComparisonSnapshotIndex
     {
@@ -1380,13 +1667,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         public string TrackerSnapshotAlignmentPath { get; init; } = "";
 
+        public string RenderSnapshotPath { get; init; } = "";
+
+        public string DiagnosticsSampleSidecarPath { get; init; } = "";
+
         public TrackerSnapshotLogMetadata? TrackerSnapshotLog { get; init; }
 
         public TrackerSnapshotLogMetadata? TrackerSnapshotAlignmentLog { get; init; }
+
+        public TrackerSnapshotLogMetadata? DiagnosticsSampleLog { get; init; }
     }
 
     private sealed class TrackerSnapshotLogMetadata
     {
+        public string Format { get; init; } = "";
+
         public bool IsCreated { get; init; }
 
         public int RecordCount { get; init; }
@@ -1550,12 +1845,12 @@ public sealed record TrackerDiagnosticsComparisonSourceOption(
 public enum TrackerDiagnosticsFieldSourceKind
 {
     /// <summary>
-    /// 選択中 render snapshot の raw vision input。
+    /// diagnostics sample sidecar の raw vision input。
     /// </summary>
     VisionInput,
 
     /// <summary>
-    /// 選択中 render snapshot の ibis tracker output。
+    /// diagnostics sample sidecar の ibis tracker output。
     /// </summary>
     IbisTracker,
 
@@ -1585,14 +1880,14 @@ public sealed record TrackerDiagnosticsFieldSource(
     string? Value)
 {
     /// <summary>
-    /// 選択中 render snapshot の raw vision input。
+    /// diagnostics sample sidecar の raw vision input。
     /// </summary>
     public static TrackerDiagnosticsFieldSource VisionInput { get; } = new(
         TrackerDiagnosticsFieldSourceKind.VisionInput,
         Value: null);
 
     /// <summary>
-    /// 選択中 render snapshot の ibis tracker output。
+    /// diagnostics sample sidecar の ibis tracker output。
     /// </summary>
     public static TrackerDiagnosticsFieldSource IbisTracker { get; } = new(
         TrackerDiagnosticsFieldSourceKind.IbisTracker,
@@ -1642,7 +1937,7 @@ public sealed record TrackerDiagnosticsFieldSource(
 /// </summary>
 /// <param name="Source">この option を選んだときに使う Field source。</param>
 /// <param name="Label">UI 表示用 label。</param>
-/// <param name="RecordCount">source に一致する tracker snapshot record 数。render snapshot source では 0。</param>
+/// <param name="RecordCount">source に一致する sample / tracker snapshot record 数。</param>
 public sealed record TrackerDiagnosticsFieldSourceOption(
     TrackerDiagnosticsFieldSource Source,
     string Label,
@@ -1659,12 +1954,12 @@ public enum TrackerDiagnosticsFieldSourceFrameStatus
     Ready,
 
     /// <summary>
-    /// Vision Input は render snapshot から直接描画する。
+    /// 旧 render snapshot 直接描画経路の Vision Input 状態。新規 sample sidecar session では使わない。
     /// </summary>
     VisionInput,
 
     /// <summary>
-    /// ibis tracker は render snapshot から直接描画する。
+    /// 旧 render snapshot 直接描画経路の ibis tracker 状態。新規 sample sidecar session では使わない。
     /// </summary>
     IbisTrackerRenderSnapshot,
 

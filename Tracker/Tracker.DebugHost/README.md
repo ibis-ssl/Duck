@@ -133,6 +133,7 @@ capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn s
 - `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: timeline / 逆方向スクラブ用の描画 snapshot。tracker engine の内部状態ではなく、commit 済み `TrackerFrame` だけを保存します。
 - `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の live receiver が見た official tracker packet の snapshot sidecar です。
 - `tracker-snapshot-alignment.jsonl`: CaptureOn 中の diagnostics entry / render snapshot / tracker source snapshot を session timeline で対応付ける replay 用 sidecar です。外部 tracker の `TrackedFrame.timestamp` が ibis own と別時刻系でも、`receivedAt` と session-relative time で `/diagnostics` の Field source と comparison を再生するために使います。schema version 2 では diagnostics line 単位ではなく fastest source cadence の replay timeline records を保存し、同じ Vision / render frame を複数 fast tracker records から参照できます。v1 互換は持たず、log 選択時の index 構築と playback/scrub 時の高速 lookup を優先します。
+- `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で latest raw / tracker snapshot を同じ sample record として固定する diagnostics sample sidecar です。
 
 `metadata.json` には active profile 名だけではなく、`Tracker:Profiles` 配下の profile 設定値と、runtime override 適用後の resolved settings も保存します。CaptureOn 比較ログがある場合は、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` もここから辿ります。
 
@@ -142,6 +143,7 @@ capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn s
 | `DirectoryPath` | capture file の出力 directory です。相対 path は実行ファイル directory から解決します。 |
 | `FilePrefix` | capture file 名の prefix です。実際の file 名は `<prefix>-<timestamp>-<guid>.jsonl.gz` になります。 |
 | `FlushEachPacket` | `true` なら packet ごとに flush します。異常終了時の欠落は減りますが、I/O cost は上がります。 |
+| `DiagnosticsSampleIntervalMilliseconds` | CaptureOn 中に `diagnostics-samples.jsonl` へ latest raw / tracker snapshot を固定保存する周期です。0 以下の場合は既定値 `100` ms を使います。 |
 
 現在の `appsettings.json` では、起動時 capture は無効ですが、画面で `Capture On` にした後は packet ごとに flush します。
 
@@ -150,7 +152,8 @@ capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn s
   "Enabled": false,
   "DirectoryPath": "packet-captures",
   "FilePrefix": "ssl-vision-packets",
-  "FlushEachPacket": true
+  "FlushEachPacket": true,
+  "DiagnosticsSampleIntervalMilliseconds": 100
 }
 ```
 
@@ -161,7 +164,8 @@ capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn s
   "Enabled": true,
   "DirectoryPath": "packet-captures",
   "FilePrefix": "ssl-vision-packets",
-  "FlushEachPacket": true
+  "FlushEachPacket": true,
+  "DiagnosticsSampleIntervalMilliseconds": 100
 }
 ```
 

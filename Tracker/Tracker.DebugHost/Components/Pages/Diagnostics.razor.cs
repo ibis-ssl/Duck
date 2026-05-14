@@ -550,28 +550,26 @@ public partial class Diagnostics : IDisposable
         TrackerDiagnosticsFieldSource source,
         TrackerDiagnosticsFieldSourceFrame? trackerFrame)
     {
-        if (selectedRenderSnapshot is null)
-        {
-            return DiagnosticsFieldRenderModel.Empty(FieldSourceLabel(source), null, "Render snapshot was not found.");
-        }
-
-        var geometry = DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
+        var geometry = selectedRenderSnapshot is null
+            ? null
+            : DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
+        var status = FieldSourceStatusText(trackerFrame);
         return source.Kind switch
         {
             TrackerDiagnosticsFieldSourceKind.VisionInput => new DiagnosticsFieldRenderModel(
                 FieldSourceLabel(source),
                 geometry,
-                DiagnosticsFieldViewFactory.CreateRawBalls(selectedRenderSnapshot.Frame),
-                DiagnosticsFieldViewFactory.CreateRawYellowRobots(selectedRenderSnapshot.Frame),
-                DiagnosticsFieldViewFactory.CreateRawBlueRobots(selectedRenderSnapshot.Frame),
-                Status: null),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceYellowRobots(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary),
+                status),
             TrackerDiagnosticsFieldSourceKind.IbisTracker => new DiagnosticsFieldRenderModel(
                 FieldSourceLabel(source),
-                trackedRenderView.Geometry,
-                trackedRenderView.Balls,
-                trackedRenderView.RobotsYellow,
-                trackedRenderView.RobotsBlue,
-                Status: null),
+                geometry,
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceYellowRobots(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary),
+                status),
             _ => new DiagnosticsFieldRenderModel(
                 FieldSourceLabel(source),
                 geometry,

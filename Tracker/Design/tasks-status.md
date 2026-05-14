@@ -4,15 +4,15 @@
 
 ## 現在のタスク
 
-- ID: RUNTIME-HOST-007
-- Title: DebugHost diagnostics sample sidecar fast path を実装する
+- ID: RUNTIME-HOST-008
+- Title: `Tracker.RuntimeHost` headless project scaffold と configuration を追加する
 - Phase: implementation
 - Status: pending
 - Size: large
-- Dependencies: RUNTIME-HOST-003, RUNTIME-HOST-006.
+- Dependencies: RUNTIME-HOST-005.
 - Exit Criteria:
-  - diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して diagnostics sample sidecar に保存する。
-  - 新規 capture / logging の bounded lookup を主経路にして RUNTIME-HOST-003 の Red tests を green にする。
+  - Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加する。
+  - `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする。
   - focused tests / build、task 専用 review、commit、Draft PR #17 update が揃う。
 
 ## 完了済みタスク
@@ -69,6 +69,19 @@
   - Review Evidence:
     - `reports/runtime-host-006-review-20260514182549.md`
     - review で blocking findings なし。diagnostics sample sidecar と RuntimeHost scaffold は RUNTIME-HOST-007 以降へ残す。
+- `RUNTIME-HOST-007`: DebugHost diagnostics sample sidecar fast path を実装した。UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って latest raw / tracker snapshot を `diagnostics-samples.jsonl` へ保存し、Diagnostics replay / Field は sample sidecar の bounded lookup と semantic summary を主経路にする。旧 render snapshot sidecar だけの session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。
+  - Implementation Evidence:
+    - `reports/runtime-host-007-implementation-20260514184219.md`
+    - `reports/runtime-host-007-review-fix-20260514185807.md`
+    - `reports/runtime-host-007-configurable-sample-interval-20260514191628.md`
+    - `reports/runtime-host-007-verification-20260514184527.md`
+    - focused / affected tests、`Tracker.DebugHost` build、`Tracker.Tests` build、`git diff --check` は sub-agent report で成功を確認した。
+  - Review Evidence:
+    - `reports/runtime-host-007-review-20260514184501.md`
+    - `reports/runtime-host-007-review-r2-20260514190459.md`
+    - `reports/runtime-host-007-review-r3-20260514191820.md`
+    - `reports/runtime-host-007-review-r4-20260514192425.md`
+    - 初回 review の blocking 2 件を修正し、r2 / r3 / r4 で no findings を確認した。
 
 ## 固定残タスク
 
@@ -80,8 +93,8 @@
 - `RUNTIME-HOST-005`: tracker operation loop の共有 runtime boundary を抽出する。SSL-Vision input、tracker update、official tracker packet publish、latest tracker snapshot 公開の境界を UI / diagnostics logging から分離し、RuntimeHost から再利用できる形にする。
 - `RUNTIME-HOST-006`: DebugHost live display を read-side snapshot 境界へ寄せる。UI render tick ごとに raw / tracked / 3rd party tracker の latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しない構造にする。
 - `RUNTIME-HOST-007`: DebugHost diagnostics sample sidecar fast path を実装する。diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して保存し、新規 capture / logging の bounded lookup を主経路にする。
-- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` headless project scaffold と configuration を追加する。Web UI / diagnostics replay / capture viewer を持たない headless host として起動できる project / Program / options / DI bootstrap / solution entry を追加する。
-- `RUNTIME-HOST-009`: RuntimeHost tracker operation loop と official packet publish normal path を実装する。SSL-Vision input、tracker state update、official tracker packet publish、DebugHost が読める latest tracker snapshot 公開を headless host の正常系として成立させる。
+- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` headless project scaffold と configuration を追加する。Web UI / diagnostics replay / capture viewer を持たない headless host として起動できる project / Program / options / DI bootstrap / solution entry を追加し、`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開する。
+- `RUNTIME-HOST-009`: RuntimeHost tracker operation loop と official packet publish normal path を実装する。SSL-Vision input、tracker state update、official tracker packet publish、DebugHost が読める latest tracker snapshot 公開を headless host の正常系として成立させ、RuntimeHost 実行周期を `RuntimeHost:OperationLoopIntervalMilliseconds` で制御する。
 - `RUNTIME-HOST-010`: RuntimeHost / DebugHost split の focused validation と manual evidence を揃える。RuntimeHost / DebugHost build、focused tests、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残す。
 - `RUNTIME-HOST-011`: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する。gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、Draft PR #17 ready 化を完了する。
 
@@ -102,8 +115,8 @@
 | RUNTIME-HOST-004 | `Tracker.Server` を `Tracker.DebugHost` project / namespace / 起動経路へ rename する | implementation | complete; draft PR #17 | RUNTIME-HOST-003 | 現 `Tracker.Server` の Web UI / diagnostics / replay / capture viewer 責務を `Tracker.DebugHost` として明確化し、既存 debug normal path、README、launch settings、solution / project reference を維持し、review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-005 | tracker operation loop の共有 runtime boundary を抽出する | implementation | complete; draft PR #17 | RUNTIME-HOST-004 | `Tracker.Core/Runtime` に UI 非依存 shared operation loop、publisher、latest snapshot store を抽出し、DebugHost を Core coordinator 呼び出し adapter に寄せた。focused tests / build / review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-006 | DebugHost live display を read-side snapshot 境界へ寄せる | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により DebugHost live display が UI render tick ごとに latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しないことを focused tests / build / review で確認した。 |
-| RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | pending | RUNTIME-HOST-003, RUNTIME-HOST-006 | diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して diagnostics sample sidecar に保存し、新規 capture / logging の bounded lookup を主経路にして RUNTIME-HOST-003 の Red tests を green にし、review / commit / Draft PR #17 update まで完了する。 |
-| RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | pending | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現し、build / focused tests / review / commit / Draft PR #17 update を揃える。 |
-| RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | pending | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させる。 |
+| RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | complete; draft PR #17 update pending | RUNTIME-HOST-003, RUNTIME-HOST-006 | UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って latest raw / tracker snapshot を `diagnostics-samples.jsonl` へ保存し、Diagnostics replay / Field は sample sidecar の bounded lookup と semantic summary を主経路にする。focused / affected tests、build、diff-check は sub-agent report で green。初回 review は blocking 2 件、review-fix 後 r2 は Pass、設定化後 r3 は no findings、RuntimeHost 実行周期設定化要件追加後 r4 は no findings。 |
+| RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | pending | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする contract を focused tests / build / review / commit / Draft PR #17 update 付きで固定する。 |
+| RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | pending | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させる。 |
 | RUNTIME-HOST-010 | RuntimeHost / DebugHost split の focused validation と manual evidence を揃える | review | pending | RUNTIME-HOST-009 | RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残し、review / commit / Draft PR #17 update まで完了する。 |
 | RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | pending | RUNTIME-HOST-010 | gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description を最新化し、PR ready 判断を完了する。 |

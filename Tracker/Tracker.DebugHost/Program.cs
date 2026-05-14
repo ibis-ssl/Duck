@@ -57,6 +57,9 @@ builder.Services.AddSingleton<VisionPacketCaptureWriter>();
 builder.Services.AddSingleton<TrackerRenderSnapshotCaptureWriter>();
 builder.Services.AddSingleton<TrackerPacketSnapshotLogWriter>();
 builder.Services.AddSingleton<TrackerSnapshotAlignmentLogWriter>();
+builder.Services.AddSingleton<DiagnosticsSampleLogWriter>();
+builder.Services.AddSingleton<DiagnosticsSampleCaptureLoop>();
+builder.Services.AddHostedService<DiagnosticsSampleHostedService>();
 builder.Services.AddSingleton(serviceProvider =>
 {
     var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();

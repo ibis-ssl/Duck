@@ -22,15 +22,9 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
         TrackerDiagnosticsFieldSourceFrame? layerAFrame,
         TrackerDiagnosticsFieldSourceFrame? layerBFrame)
     {
-        if (selectedRenderSnapshot is null)
-        {
-            return new DiagnosticsFieldOverlayRenderModel(
-                Geometry: null,
-                EmptyState: "Render snapshot was not found.",
-                Layers: []);
-        }
-
-        var geometry = DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
+        var geometry = selectedRenderSnapshot is null
+            ? null
+            : DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
         var layers = layerSources
             .Select(layer => CreateLayer(
                 selectedRenderSnapshot,
@@ -47,7 +41,7 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
     }
 
     private static DiagnosticsFieldOverlayLayerRenderModel CreateLayer(
-        TrackerRenderSnapshotView selectedRenderSnapshot,
+        TrackerRenderSnapshotView? selectedRenderSnapshot,
         TrackedVisionViewState trackedRenderView,
         TrackerDiagnosticsComparisonViewState comparisonViewState,
         TrackerDiagnosticsFieldOverlayLayerSource layerSource,
@@ -77,7 +71,7 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
     }
 
     private static DiagnosticsFieldRenderData CreateFieldRenderModel(
-        TrackerRenderSnapshotView selectedRenderSnapshot,
+        TrackerRenderSnapshotView? selectedRenderSnapshot,
         TrackedVisionViewState trackedRenderView,
         TrackerDiagnosticsComparisonViewState comparisonViewState,
         TrackerDiagnosticsFieldSource source,
@@ -87,14 +81,14 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
         {
             TrackerDiagnosticsFieldSourceKind.VisionInput => new DiagnosticsFieldRenderData(
                 FieldSourceLabel(comparisonViewState, source),
-                DiagnosticsFieldViewFactory.CreateRawBalls(selectedRenderSnapshot.Frame),
-                DiagnosticsFieldViewFactory.CreateRawYellowRobots(selectedRenderSnapshot.Frame),
-                DiagnosticsFieldViewFactory.CreateRawBlueRobots(selectedRenderSnapshot.Frame)),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceYellowRobots(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary)),
             TrackerDiagnosticsFieldSourceKind.IbisTracker => new DiagnosticsFieldRenderData(
                 FieldSourceLabel(comparisonViewState, source),
-                trackedRenderView.Balls,
-                trackedRenderView.RobotsYellow,
-                trackedRenderView.RobotsBlue),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceYellowRobots(trackerFrame?.SemanticSummary),
+                DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary)),
             _ => new DiagnosticsFieldRenderData(
                 FieldSourceLabel(comparisonViewState, source),
                 DiagnosticsFieldViewFactory.CreateTrackerSourceBalls(trackerFrame?.SemanticSummary),
@@ -116,11 +110,6 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
         TrackerDiagnosticsFieldSource source,
         TrackerDiagnosticsFieldSourceFrame? frame)
     {
-        if (source.Kind is TrackerDiagnosticsFieldSourceKind.VisionInput or TrackerDiagnosticsFieldSourceKind.IbisTracker)
-        {
-            return "Ready";
-        }
-
         return frame?.Status.ToString() ?? TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable.ToString();
     }
 
