@@ -214,27 +214,10 @@
     overflow: hidden;
 }
 
-.vision-comparison-overlay-layer {
-    position: absolute;
-    inset: 0;
-    min-height: 0;
-}
-
-.vision-comparison-overlay-layer ::deep(.field-card) {
+.vision-comparison-overlay-stack ::deep(.field-card) {
     height: 100%;
     border: 0;
     border-radius: 0;
-}
-
-.vision-comparison-overlay-layer.is-layer-a,
-.vision-comparison-overlay-layer.is-collapsed {
-    z-index: 1;
-}
-
-.vision-comparison-overlay-layer.is-layer-b {
-    z-index: 2;
-    opacity: 0.68;
-    mix-blend-mode: screen;
 }
 
 .vision-comparison-overlay-legend {

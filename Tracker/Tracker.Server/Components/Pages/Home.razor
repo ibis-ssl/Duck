@@ -161,19 +161,10 @@
                             <strong>@comparisonViewState.RenderSnapshot.GeometrySourceLabel</strong>
                         </header>
                         <div class="vision-comparison-overlay-stack">
-                            @foreach (var layer in ComparisonLayers)
-                            {
-                                @if (layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible)
-                                {
-                                    <div class="@ComparisonOverlayLayerClass(layer)">
-                                        <VisionFieldCanvas Geometry="layer.Field.Geometry"
-                                                           Balls="layer.Field.Balls"
-                                                           RobotsYellow="layer.Field.RobotsYellow"
-                                                           RobotsBlue="layer.Field.RobotsBlue"
-                                                           MarkerStroke="@layer.AccentColor" />
-                                    </div>
-                                }
-                            }
+                            <VisionFieldOverlayCanvas Geometry="comparisonViewState.RenderSnapshot.Geometry"
+                                                      Layers="CreateVisionOverlayFieldLayers(ComparisonLayers)"
+                                                      ToolbarLabel="Overlay"
+                                                      AriaLabel="Vision comparison overlay field" />
                             @if (!ComparisonLayers.Any(layer => layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible))
                             {
                                 <div class="vision-comparison-missing">No visible ready layer.</div>
@@ -542,13 +533,6 @@
             : "vision-comparison-layer is-missing";
     }
 
-    private static string ComparisonOverlayLayerClass(VisionLiveComparisonLayer layer)
-    {
-        return layer.IsSameSourceCollapsed
-            ? "vision-comparison-overlay-layer is-collapsed"
-            : $"vision-comparison-overlay-layer is-{layer.LayerName.Replace(" ", "-", StringComparison.Ordinal).ToLowerInvariant()}";
-    }
-
     private static string ComparisonOverlayLegendClass(VisionLiveComparisonLayer layer)
     {
         return layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible
@@ -559,6 +543,33 @@
     private static string ComparisonOptionLabel(VisionLiveComparisonSourceOption option)
     {
         return option.IsAvailable ? option.Label : $"{option.Label} (missing)";
+    }
+
+    private static IReadOnlyList<VisionFieldLayerRenderModel> CreateVisionOverlayFieldLayers(
+        IReadOnlyList<VisionLiveComparisonLayer> layers)
+    {
+        return layers
+            .Select(layer => new VisionFieldLayerRenderModel(
+                layer.LayerName,
+                layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible,
+                layer.AccentColor,
+                layer.Field.Balls,
+                layer.Field.RobotsYellow,
+                layer.Field.RobotsBlue,
+                OverlayFieldLayerClass(layer)))
+            .ToArray();
+    }
+
+    private static string OverlayFieldLayerClass(VisionLiveComparisonLayer layer)
+    {
+        if (layer.IsSameSourceCollapsed || string.Equals(layer.LayerName, "Layer A", StringComparison.Ordinal))
+        {
+            return "field-card__layer-group--a";
+        }
+
+        return string.Equals(layer.LayerName, "Layer B", StringComparison.Ordinal)
+            ? "field-card__layer-group--b"
+            : string.Empty;
     }
 
     private void RefreshComparisonViewState()

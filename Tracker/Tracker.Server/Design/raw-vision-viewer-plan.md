@@ -218,6 +218,12 @@ split / overlay の UI 挙動は diagnostics に寄せる。
 
 - split mode は Layer A と Layer B を左右に並べる
 - overlay mode は 1 つの field に Layer A/B を重ねる
+- overlay と split を相互に共通化するのではなく、それぞれの mode に必要な画面構造は分けて保つ。そのうえで、Vision live と diagnostics の field 描画部[^field-rendering-part]は同じ責務境界に揃える
+- split 用 field コンポーネント[^split-field-component]と overlay 用 field コンポーネント[^overlay-field-component]は別物として切り出す。overlay と split を 1 つのコンポーネントへ統合する意味ではない
+- Vision live と diagnostics は、split では同じ split 用 field コンポーネントを使い、overlay では同じ overlay 用 field コンポーネントを使う
+- field / boundary / geometry / marker の描画責務は split 用 / overlay 用の field コンポーネントへ置き、source selector、timestamp metadata、missing reason、legend、layout wrapper は Vision live と diagnostics の page / wrapper / 付加 component 側に持たせる
+- overlay mode では layer ごとに独立した `VisionFieldCanvas` を重ねる方針は不採用とする。overlay 用 field コンポーネントは field / geometry を 1 回だけ描き、Layer A/B の balls / robots を layer group[^layer-group] として同じ viewport state[^viewport-state] 配下に描く
+- split mode では左右 field は独立 viewport[^split-independent-viewport] として扱う。左右の pan / zoom 同期は要件にしないが、Vision live split と diagnostics split は同じ split 用 field コンポーネント、同じ marker 描画方針、同じ geometry fallback 方針を使う
 - details は source ごとの summary、timestamp metadata、missing reason、raw/tracked/3rd party の違いを確認できる構成にする
 - legend は diagnostics と同じく layer name、source label、visibility toggle、ready / missing state を表示する
 - layer visibility は Layer A/B ごとに切り替えられる
@@ -288,6 +294,8 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - diagnostics timeline playback は、次 index 計算、最後での停止と先頭復帰、通常再生と早送り step、timestamp 差分に基づく実速度 interval を単体テストで確認する
 - Vision split / overlay contract は、source 候補、split / overlay mode、Layer A/B source selection、layer visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend / details を単体テストで先に固定する
 - Vision overlay color contract は、Layer A/B の field marker と legend が diagnostics と同じ考え方の別 accent color を持ち、same-source collapse 時は 1 layer の色へまとまることを単体テストで先に固定する
+- Vision / diagnostics overlay field contract は、overlay mode が layer ごとに独立した field canvas を重ねず、Vision live overlay と diagnostics overlay が同じ overlay 用 field コンポーネントの単一 viewport state 配下で Layer A/B を描くことを単体テストで先に固定する
+- Vision / diagnostics split field contract は、左右 field の viewport は独立のまま、Vision live split と diagnostics split が同じ split 用 field コンポーネントと同じ marker / geometry 描画方針を使うことを単体テストで先に固定する
 - Vision live comparison contract は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の latest immutable snapshot を固定し、後続 store 更新で描画中 snapshot が変化しないことを単体テストで先に固定する
 - 3rd party tracker live source contract は、`MultiTrackerManager<TrackerPacketAdapter>` の mutable state を UI が直接読まず、immutable snapshot store / composer を通して source option と field DTO を作ることを単体テストで先に固定する
 - diagnostics time-sync regression は、selected `ReplayTimelineIndex` に対象 3rd party source の alignment record が無い場合でも、selected replay timeline tick 自体は動かさず、同じ source の selected tick 以前の `latest-before snapshot` を Field source と comparison に使い、matching rule、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を表示することを単体テストで先に固定する
@@ -321,6 +329,13 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^source-label]: source label: legend や details に出す source 名。ユーザーが Layer A/B でどの raw / tracked / 3rd party tracker を選んでいるか確認するために使う。
 [^live-store]: live store: 通常 Vision 画面の現在表示を更新するための store。CaptureOn session 保存用の `TrackerPacketSnapshotLogWriter` や sidecar writer はこの役割に使わない。
 [^accent-color]: accent color: Layer A/B を見分けるために marker の stroke や legend swatch に使う強調色。Issue #10 の Vision overlay では diagnostics overlay と同じ考え方で、重なった layer を色で判別できるようにする。
+[^field-rendering-part]: field 描画部: field の背景、boundary、geometry line、ball marker、robot marker を SVG に描く部品境界。source 選択や詳細 metadata 表示ではなく、field 上に何をどう描くかを担当する部分を指す。
+[^split-field-component]: split 用 field コンポーネント: split mode の左右それぞれの field を描くコンポーネント。左右の viewport は独立させるが、Vision live と diagnostics は同じコンポーネント境界を使う。
+[^overlay-field-component]: overlay 用 field コンポーネント: overlay mode で 1 つの field 上に Layer A/B を重ねて描くコンポーネント。field と geometry を layer ごとに描き直さず、object marker だけを Layer A/B の group として重ねる。
+[^overlay-field-rendering]: overlay field 描画部: overlay 用 field コンポーネントと同じ責務範囲を指す。field と geometry を layer ごとに描き直さず、object marker だけを Layer A/B の group として重ねる。
+[^layer-group]: layer group: 同じ field 上で Layer A または Layer B に属する balls / robots をまとめる SVG group。group ごとに visibility や accent color を持たせるが、pan / zoom の基準は overlay field 描画部のものを共有する。
+[^viewport-state]: viewport state: field 表示の zoom、pan、drag 中の移動量など、画面上で field をどの位置と倍率で見るかを表す状態。overlay mode では layer ごとに別々に持たず、1 つの viewport state を共有する。
+[^split-independent-viewport]: split の独立 viewport: split mode の左右 field が、それぞれ別の表示位置と倍率を持つこと。左右は比較対象を並べる表示なので、片方を drag してももう片方を自動追従させる要件ではない。
 [^same-source]: same-source: Layer A/B が同じ source を選んだ状態。Vision overlay では重複描画で誤差があるように見せないため、1 layer 表示にまとめる。
 [^multi-tracker-manager]: MultiTrackerManager / TrackerPacketAdapter: `MultiTrackerManager` は `TrackerConnectionLib` の tracker state 管理コンポーネントで、own / external / unknown tracker の latest state を保持する。`TrackerPacketAdapter` は 3rd party tracker packet を `MultiTrackerManager` で扱うための adapter。
 [^selected-replay-timeline-tick]: selected replay timeline tick: diagnostics replay でユーザーが現在選択している再生タイムライン上の基準 tick。Vision/Input、ibis tracker、3rd party tracker を比較するとき、この tick は source ごとへ移動させない。
