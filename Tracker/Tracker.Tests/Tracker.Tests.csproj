@@ -20,7 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
-    <ProjectReference Include="..\Tracker.Server\Tracker.Server.csproj" />
+    <ProjectReference Include="..\Tracker.DebugHost\Tracker.DebugHost.csproj" />
+    <ProjectReference Include="..\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
     <ProjectReference Include="..\Tracker.CaptureReplay\Tracker.CaptureReplay.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />

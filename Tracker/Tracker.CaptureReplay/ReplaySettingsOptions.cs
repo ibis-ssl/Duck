@@ -3,7 +3,7 @@ using Tracker.Core;
 namespace Tracker.CaptureReplay;
 
 /// <summary>
-/// Tracker.Server appsettings.json と capture metadata の両方を受ける replay settings root。
+/// Tracker.DebugHost appsettings.json と capture metadata の両方を受ける replay settings root。
 /// </summary>
 internal sealed class ReplaySettingsFile
 {

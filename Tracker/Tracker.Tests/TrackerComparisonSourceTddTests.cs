@@ -4,8 +4,8 @@ using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -55,8 +55,8 @@ public class TrackerComparisonSourceTddTests : IClassFixture<TrackerContractFixt
     [Fact]
     public void TrackerSnapshotSidecar_WriterContract_ExistsForCaptureOnSidecarPersistence()
     {
-        var writerType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotLogWriter");
-        var recordType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotRecord");
+        var writerType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogWriter");
+        var recordType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerPacketSnapshotRecord");
 
         Assert.True(
             typeof(IDisposable).IsAssignableFrom(writerType) ||
@@ -162,7 +162,7 @@ public class TrackerComparisonSourceTddTests : IClassFixture<TrackerContractFixt
     [Fact]
     public void TrackerSnapshotSidecar_RecordContract_KeepsRawDerivedSemanticSummary()
     {
-        var recordType = GetRequiredServerType("Tracker.Server.Tracking.TrackerPacketSnapshotRecord");
+        var recordType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerPacketSnapshotRecord");
         var summaryProperty = GetRequiredProperty(recordType, "SemanticSummary");
         var summaryType = summaryProperty.PropertyType;
         var packet = CreatePacket(

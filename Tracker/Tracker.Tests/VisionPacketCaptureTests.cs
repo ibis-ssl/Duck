@@ -4,9 +4,10 @@ using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 using Tracker.Tests.Contracts;
+using TrackerConnectionLib;
 
 namespace Tracker.Tests;
 
@@ -97,6 +98,157 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
             0.85,
             simProfile.GetProperty("BallTracker").GetProperty("Gate").GetDouble(),
             precision: 3);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: capture 有効時に diagnostics sample sidecar と metadata 集計を保存することを確認する。
+    /// </summary>
+    [Fact]
+    public void Capture_WhenEnabled_WritesDiagnosticsSampleSidecarMetadataAndRecords()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-sample-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "sample-vision",
+            enabled: true,
+            flushEachPacket: true);
+        using var writer = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var externalStore = new ExternalTrackerSnapshotStore(new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis"));
+        var provider = new VisionLiveDisplaySnapshotProvider(
+            rawStore,
+            trackedStore,
+            externalStore,
+            new VisionLiveComparisonSnapshotComposer());
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 19, 30, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 1, frameNumber: 3000),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4000,
+                dataTimestampNs: 4_000_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 10, yMm: 20)]),
+            receivedAt.AddMilliseconds(1));
+        writer.CaptureSample(provider.CaptureRenderTickSnapshot());
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 1, frameNumber: 3001),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt.AddMilliseconds(10));
+        writer.CaptureSample(provider.CaptureRenderTickSnapshot());
+
+        writer.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "sample-vision-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        var samplePath = Assert.Single(Directory.GetFiles(captureDirectory, "diagnostics-samples.jsonl", SearchOption.AllDirectories));
+        var records = DiagnosticsSampleLogReader.ReadRecords(samplePath);
+
+        Assert.Equal(
+            Path.GetRelativePath(captureDirectory, samplePath),
+            metadata.RootElement.GetProperty("DiagnosticsSampleSidecarPath").GetString());
+        var log = metadata.RootElement.GetProperty("DiagnosticsSampleLog");
+        Assert.Equal("jsonl", log.GetProperty("Format").GetString());
+        Assert.True(log.GetProperty("IsCreated").GetBoolean());
+        Assert.Equal(2, log.GetProperty("RecordCount").GetInt32());
+        Assert.Equal(0, log.GetProperty("SkippedRecordCount").GetInt32());
+        Assert.Equal(0, log.GetProperty("ErrorCount").GetInt32());
+        Assert.Equal([0, 1], records.Select(record => record.SampleIndex).ToArray());
+        Assert.Equal((uint)3000, records[0].RawFrameNumber);
+        Assert.Equal((uint)1, records[0].RawCameraId);
+        Assert.True(records[0].WorldFrameCommitted);
+        Assert.Equal((uint)4000, records[0].RenderFrameNumber);
+        Assert.Equal(1, records[0].RawSemanticSummary?.BallCount);
+        Assert.Equal(1, records[0].TrackedSemanticSummary?.BallCount);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: Home UI を介さない DebugHost sample loop が CaptureOn 中に diagnostics sample を保存することを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsSampleCaptureLoop_WhenCaptureEnabled_WritesSamplesWithoutHomeUi()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-loop-{Guid.NewGuid():N}");
+        var runtimeControl = new VisionPacketCaptureRuntimeControl(initialEnabled: false);
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "loop-vision",
+            enabled: false,
+            flushEachPacket: true,
+            runtimeControl: runtimeControl);
+        using var writer = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var loop = new DiagnosticsSampleCaptureLoop(
+            runtimeControl,
+            CreateSnapshotProvider(rawStore, trackedStore),
+            writer);
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 20, 0, 0, TimeSpan.Zero);
+
+        loop.CaptureOnce();
+        Assert.False(Directory.Exists(captureDirectory));
+
+        runtimeControl.SetEnabled(true);
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 2, frameNumber: 3100),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4100,
+                dataTimestampNs: 4_100_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 11, yMm: 21)]),
+            receivedAt.AddMilliseconds(1));
+
+        loop.CaptureOnce();
+        writer.Flush();
+
+        var samplePath = Assert.Single(Directory.GetFiles(captureDirectory, "diagnostics-samples.jsonl", SearchOption.AllDirectories));
+        var record = Assert.Single(DiagnosticsSampleLogReader.ReadRecords(samplePath));
+        Assert.Equal((uint)3100, record.RawFrameNumber);
+        Assert.Equal((uint)2, record.RawCameraId);
+        Assert.Equal((uint)4100, record.TrackedFrameNumber);
+        Assert.Equal(1, record.RawSemanticSummary?.BallCount);
+        Assert.Equal(1, record.TrackedSemanticSummary?.BallCount);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: diagnostics sample writer の停止が shared capture session 全体を止めないことを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsSampleLogWriterStop_DoesNotStopSharedCaptureSession()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-stop-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "stop-vision",
+            enabled: true,
+            flushEachPacket: true);
+        using var writer = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 20, 10, 0, TimeSpan.Zero);
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 3, frameNumber: 3200),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+
+        writer.CaptureSample(CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot());
+        Assert.NotNull(session.Current);
+
+        writer.Stop();
+
+        Assert.NotNull(session.Current);
     }
 
     /// <summary>
@@ -237,5 +389,37 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
             fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
             NullLogger<VisionPacketCaptureSession>.Instance,
             runtimeControl);
+    }
+
+    private static VisionLiveDisplaySnapshotProvider CreateSnapshotProvider(
+        VisionPacketStore rawStore,
+        TrackedSnapshotStore trackedStore)
+    {
+        return new VisionLiveDisplaySnapshotProvider(
+            rawStore,
+            trackedStore,
+            new ExternalTrackerSnapshotStore(new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis")),
+            new VisionLiveComparisonSnapshotComposer());
+    }
+
+    private static SSL_WrapperPacket CreateRawPacket(uint cameraId, uint frameNumber)
+    {
+        return new SSL_WrapperPacket
+        {
+            Detection = new SSL_DetectionFrame
+            {
+                CameraId = cameraId,
+                FrameNumber = frameNumber,
+                Balls =
+                {
+                    new SSL_DetectionBall
+                    {
+                        Confidence = 0.8f,
+                        X = 100,
+                        Y = 200,
+                    },
+                },
+            },
+        };
     }
 }

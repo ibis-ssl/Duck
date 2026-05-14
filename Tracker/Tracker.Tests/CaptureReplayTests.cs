@@ -2,7 +2,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using Tracker.Core;
 using Tracker.CaptureReplay;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;

@@ -4,8 +4,8 @@ using System.Reflection;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 using Tracker.Tests.Contracts;
 using TrackerConnectionLib;
 
@@ -53,7 +53,7 @@ public class TrackerMulticastReceiverReviewFixTddTests : IClassFixture<TrackerCo
     [Fact]
     public void RuntimeStartup_ConnectsReceiverToOfficialMulticastEndpoint()
     {
-        var programSource = ReadRepositoryFile("Tracker/Tracker.Server/Program.cs");
+        var programSource = ReadRepositoryFile("Tracker/Tracker.DebugHost/Program.cs");
 
         Assert.Contains("UdpTrackerReceiver<TrackerPacketAdapter>", programSource, StringComparison.Ordinal);
         Assert.Contains("MulticastAddress", programSource, StringComparison.Ordinal);
@@ -235,7 +235,7 @@ public class TrackerMulticastReceiverReviewFixTddTests : IClassFixture<TrackerCo
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.Server/Program.cs")))
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.DebugHost/Program.cs")))
             {
                 return directory.FullName;
             }
@@ -243,7 +243,7 @@ public class TrackerMulticastReceiverReviewFixTddTests : IClassFixture<TrackerCo
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Repository root containing Tracker/Tracker.Server/Program.cs was not found.");
+        throw new DirectoryNotFoundException("Repository root containing Tracker/Tracker.DebugHost/Program.cs was not found.");
     }
 
     private static string CreateCaptureDirectory(string prefix)

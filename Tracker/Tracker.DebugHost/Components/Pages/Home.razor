@@ -1,0 +1,647 @@
+﻿@page "/"
+@using System.Globalization
+@using System.Text.Json
+@using Google.Protobuf
+@using Microsoft.Extensions.Options
+@using Tracker.Core
+@using Tracker.DebugHost.Tracking
+@using Tracker.DebugHost.Vision
+@inject VisionLiveDisplaySnapshotProvider LiveDisplaySnapshotProvider
+@inject IOptions<TrackerOptions> TrackerOptionsAccessor
+@inject TrackerProfileRequestService ProfileRequestService
+@inject VisionPacketCaptureRuntimeControl CaptureControl
+@inject VisionPacketCaptureWriter PacketCaptureWriter
+@inject TrackerRenderSnapshotCaptureWriter RenderSnapshotCaptureWriter
+@implements IAsyncDisposable
+
+<PageTitle>Tracker.DebugHost</PageTitle>
+
+<section class="vision-shell">
+    <header class="vision-header">
+        <div class="vision-status">
+            <div>
+                <span>Packets</span>
+                <strong>@rawSnapshot.PacketCount</strong>
+            </div>
+            <div>
+                <span>Errors</span>
+                <strong>@rawSnapshot.ErrorCount</strong>
+            </div>
+            <div>
+                <span>Remote</span>
+                <strong>@(rawSnapshot.RemoteEndpoint ?? "-")</strong>
+            </div>
+            <div>
+                <span>Received</span>
+                <strong>@FormatTimestamp(CurrentReceivedAt)</strong>
+            </div>
+        </div>
+        <div class="vision-toolbar">
+            <button type="button"
+                    class="@CaptureButtonClass()"
+                    @onclick="ToggleCaptureAsync">
+                Capture @(CaptureControl.Enabled ? "On" : "Off")
+            </button>
+            <div class="vision-mode-toggle" role="tablist" aria-label="Viewer mode selector">
+                <button type="button"
+                        class="@ModeButtonClass(ViewerMode.Raw)"
+                        @onclick="@(() => SelectMode(ViewerMode.Raw))">
+                    Raw
+                </button>
+                <button type="button"
+                        class="@ModeButtonClass(ViewerMode.Tracked)"
+                        @onclick="@(() => SelectMode(ViewerMode.Tracked))">
+                    Tracked
+                </button>
+                <button type="button"
+                        class="@ModeButtonClass(ViewerMode.Compare)"
+                        @onclick="@(() => SelectMode(ViewerMode.Compare))">
+                    Compare
+                </button>
+            </div>
+        </div>
+    </header>
+
+    @if (rawSnapshot.LastError is not null)
+    {
+        <div class="vision-alert">@rawSnapshot.LastError</div>
+    }
+
+    @{
+        var selectedView = ResolveSelectedView(rawSnapshot);
+        var trackedView = TrackedVisionViewState.FromSnapshot(trackedSnapshot);
+        var profileControl = TrackerProfileControlViewState.FromOptions(TrackerOptionsAccessor.Value, trackedSnapshot);
+    }
+
+    <div class="vision-grid">
+        @if (viewerMode == ViewerMode.Raw)
+        {
+            <VisionFieldCanvas Geometry="rawSnapshot.Geometry"
+                               Balls="selectedView.Balls"
+                               RobotsYellow="selectedView.RobotsYellow"
+                               RobotsBlue="selectedView.RobotsBlue" />
+
+            <VisionDetailsPanel ViewLabel="@selectedView.Label"
+                                FrameLabel="@selectedView.FrameLabel"
+                                CameraLabel="@selectedView.CameraLabel"
+                                SourceLabel="@selectedView.SourceLabel"
+                                RawJson="@selectedView.RawJson"
+                                Cameras="@rawSnapshot.Cameras"
+                                SelectedViewKey="selectedViewKey"
+                                OnSelectView="SelectView"
+                                Geometry="@rawSnapshot.Geometry"
+                                Balls="@selectedView.Balls"
+                                RobotsYellow="@selectedView.RobotsYellow"
+                                RobotsBlue="@selectedView.RobotsBlue" />
+        }
+        else if (viewerMode == ViewerMode.Tracked)
+        {
+            <VisionFieldCanvas Geometry="ResolveTrackedGeometry(rawSnapshot, trackedView)"
+                               Balls="trackedView.Balls"
+                               RobotsYellow="trackedView.RobotsYellow"
+                               RobotsBlue="trackedView.RobotsBlue" />
+
+            <TrackedDetailsPanel ViewState="trackedView"
+                                 ProfileControl="profileControl"
+                                 OnRequestProfileSwitch="RequestProfileSwitchAsync" />
+        }
+        else
+        {
+            <div class="vision-comparison">
+                <div class="vision-comparison-toolbar">
+                    <div class="vision-mode-toggle" role="tablist" aria-label="Comparison display mode">
+                        <button type="button"
+                                class="@ComparisonModeButtonClass(VisionLiveComparisonMode.Split)"
+                                @onclick="@(() => SelectComparisonMode(VisionLiveComparisonMode.Split))">
+                            Split
+                        </button>
+                        <button type="button"
+                                class="@ComparisonModeButtonClass(VisionLiveComparisonMode.Overlay)"
+                                @onclick="@(() => SelectComparisonMode(VisionLiveComparisonMode.Overlay))">
+                            Overlay
+                        </button>
+                    </div>
+                    <label>
+                        Layer A
+                        <select value="@layerASourceKey" @onchange='@((ChangeEventArgs args) => SelectLayerSource("A", args))'>
+                            @foreach (var option in comparisonViewState.SourceOptions)
+                            {
+                                <option value="@option.Key">@ComparisonOptionLabel(option)</option>
+                            }
+                        </select>
+                    </label>
+                    <label class="vision-comparison-check">
+                        <input type="checkbox"
+                               checked="@layerAVisible"
+                               @onchange='@((ChangeEventArgs args) => SetLayerVisibility("A", args))' />
+                        Visible
+                    </label>
+                    <label>
+                        Layer B
+                        <select value="@layerBSourceKey" @onchange='@((ChangeEventArgs args) => SelectLayerSource("B", args))'>
+                            @foreach (var option in comparisonViewState.SourceOptions)
+                            {
+                                <option value="@option.Key">@ComparisonOptionLabel(option)</option>
+                            }
+                        </select>
+                    </label>
+                    <label class="vision-comparison-check">
+                        <input type="checkbox"
+                               checked="@layerBVisible"
+                               @onchange='@((ChangeEventArgs args) => SetLayerVisibility("B", args))' />
+                        Visible
+                    </label>
+                </div>
+                @if (comparisonMode == VisionLiveComparisonMode.Overlay)
+                {
+                    <section class="vision-comparison-overlay">
+                        <header>
+                            <span>Overlay Field</span>
+                            <strong>@comparisonViewState.RenderSnapshot.GeometrySourceLabel</strong>
+                        </header>
+                        <div class="vision-comparison-overlay-stack">
+                            <VisionFieldOverlayCanvas Geometry="comparisonViewState.RenderSnapshot.Geometry"
+                                                      Layers="CreateVisionOverlayFieldLayers(ComparisonLayers)"
+                                                      ToolbarLabel="Overlay"
+                                                      AriaLabel="Vision comparison overlay field" />
+                            @if (!ComparisonLayers.Any(layer => layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible))
+                            {
+                                <div class="vision-comparison-missing">No visible ready layer.</div>
+                            }
+                        </div>
+                        <div class="vision-comparison-overlay-legend">
+                            @foreach (var layer in ComparisonLayers)
+                            {
+                                <span class="@ComparisonOverlayLegendClass(layer)">
+                                    <span class="vision-comparison-overlay-legend__swatch"
+                                          style="background:@layer.AccentColor"></span>
+                                    @layer.LayerName: @layer.SourceLabel
+                                </span>
+                            }
+                        </div>
+                    </section>
+                }
+                else
+                {
+                    <div class="vision-comparison-fields">
+                        @foreach (var layer in ComparisonLayers)
+                        {
+                            <section class="@ComparisonLayerClass(layer)">
+                                <header>
+                                    <span>@layer.LayerName</span>
+                                    <strong>@layer.SourceLabel</strong>
+                                </header>
+                                @if (layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible)
+                                {
+                                    <VisionFieldCanvas Geometry="layer.Field.Geometry"
+                                                       Balls="layer.Field.Balls"
+                                                       RobotsYellow="layer.Field.RobotsYellow"
+                                                       RobotsBlue="layer.Field.RobotsBlue" />
+                                }
+                                else
+                                {
+                                    <div class="vision-comparison-missing">@layer.MissingReason</div>
+                                }
+                            </section>
+                        }
+                    </div>
+                }
+            </div>
+
+            <aside class="vision-comparison-details">
+                <h2>Layers</h2>
+                <ul>
+                    @foreach (var legend in comparisonViewState.LegendItems)
+                    {
+                        <li>
+                            <span class="vision-comparison-details__swatch"
+                                  style="background:@legend.AccentColor"></span>
+                            <span>@legend.LayerName</span>
+                            <strong>@legend.SourceLabel</strong>
+                            <small>@legend.Status</small>
+                        </li>
+                    }
+                </ul>
+                <h2>Details</h2>
+                @foreach (var detail in comparisonViewState.LayerDetails)
+                {
+                    <dl>
+                        <dt>Source</dt>
+                        <dd>@detail.SourceLabel</dd>
+                        <dt>Kind</dt>
+                        <dd>@detail.SourceKind</dd>
+                        <dt>Received</dt>
+                        <dd>@FormatTimestamp(detail.ReceivedAt)</dd>
+                        <dt>Timestamp</dt>
+                        <dd>@(detail.TimestampNs?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                        <dt>Balls</dt>
+                        <dd>@(detail.BallCount?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                        <dt>Robots</dt>
+                        <dd>@(detail.RobotCount?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
+                    </dl>
+                }
+                <p>Geometry: @comparisonViewState.RenderSnapshot.GeometrySourceLabel</p>
+            </aside>
+        }
+    </div>
+</section>
+
+@code {
+    private const string AggregateViewKey = "aggregate";
+    private readonly CancellationTokenSource disposalTokenSource = new();
+    private VisionLiveDisplayRenderSnapshot liveDisplaySnapshot = VisionLiveDisplayRenderSnapshot.Empty;
+    private VisionPacketSnapshot rawSnapshot = VisionPacketSnapshot.Empty;
+    private TrackedSnapshot trackedSnapshot = new(null, null, "default", 0, 0);
+    private VisionLiveComparisonViewState comparisonViewState = CreateInitialComparisonViewState();
+    private Task? refreshTask;
+    private string selectedViewKey = AggregateViewKey;
+    private ViewerMode viewerMode = ViewerMode.Raw;
+    private VisionLiveComparisonMode comparisonMode = VisionLiveComparisonMode.Split;
+    private string layerASourceKey = "raw:aggregate";
+    private string layerBSourceKey = "tracked:ibis";
+    private bool layerAVisible = true;
+    private bool layerBVisible = true;
+
+    protected override void OnInitialized()
+    {
+        CaptureLiveDisplaySnapshot();
+        EnsureSelectedViewExists(rawSnapshot);
+        refreshTask = RefreshAsync(disposalTokenSource.Token);
+    }
+
+    private async Task RefreshAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
+
+        while (await timer.WaitForNextTickAsync(cancellationToken))
+        {
+            CaptureLiveDisplaySnapshot();
+            EnsureSelectedViewExists(rawSnapshot);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private IReadOnlyList<VisionLiveComparisonLayer> ComparisonLayers => comparisonViewState.Mode == VisionLiveComparisonMode.Overlay
+        ? comparisonViewState.CreateOverlayLayers()
+        : comparisonViewState.CreateSplitLayers();
+
+    private DateTimeOffset? CurrentReceivedAt => viewerMode == ViewerMode.Tracked
+        ? trackedSnapshot.ReceivedAt
+        : rawSnapshot.ReceivedAt;
+
+    private static string FormatTimestamp(DateTimeOffset? timestamp)
+    {
+        return timestamp?.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture) ?? "-";
+    }
+
+    private static string FormatJson(IMessage? message)
+    {
+        return message is null ? "{}" : JsonFormatter.Default.Format(message);
+    }
+
+    private static string FormatAggregateJson(VisionAggregateDetectionSnapshot aggregate)
+    {
+        var payload = new
+        {
+            view = "aggregate",
+            cameraIds = aggregate.CameraIds,
+            balls = aggregate.Balls.Select(ball => new
+            {
+                confidence = ball.Confidence,
+                x = ball.X,
+                y = ball.Y,
+                z = ball.Z,
+                pixelX = ball.PixelX,
+                pixelY = ball.PixelY,
+            }),
+            robotsYellow = aggregate.RobotsYellow.Select(robot => new
+            {
+                confidence = robot.Confidence,
+                robotId = robot.RobotId,
+                x = robot.X,
+                y = robot.Y,
+                orientation = robot.Orientation,
+                pixelX = robot.PixelX,
+                pixelY = robot.PixelY,
+                height = robot.Height,
+            }),
+            robotsBlue = aggregate.RobotsBlue.Select(robot => new
+            {
+                confidence = robot.Confidence,
+                robotId = robot.RobotId,
+                x = robot.X,
+                y = robot.Y,
+                orientation = robot.Orientation,
+                pixelX = robot.PixelX,
+                pixelY = robot.PixelY,
+                height = robot.Height,
+            }),
+        };
+
+        return JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        });
+    }
+
+    private static SSL_GeometryData? ResolveTrackedGeometry(
+        VisionPacketSnapshot rawSnapshot,
+        TrackedVisionViewState trackedView)
+    {
+        return rawSnapshot.Geometry ?? trackedView.Geometry;
+    }
+
+    private Task SelectView(string key)
+    {
+        selectedViewKey = key;
+        return Task.CompletedTask;
+    }
+
+    private Task SelectMode(ViewerMode mode)
+    {
+        viewerMode = mode;
+        return Task.CompletedTask;
+    }
+
+    private Task SelectComparisonMode(VisionLiveComparisonMode mode)
+    {
+        comparisonMode = mode;
+        RefreshComparisonViewState();
+        return Task.CompletedTask;
+    }
+
+    private Task SelectLayerSource(string layerName, ChangeEventArgs args)
+    {
+        var value = args.Value?.ToString();
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.CompletedTask;
+        }
+
+        if (string.Equals(layerName, "A", StringComparison.Ordinal))
+        {
+            layerASourceKey = value;
+        }
+        else
+        {
+            layerBSourceKey = value;
+        }
+
+        RefreshComparisonViewState();
+        return Task.CompletedTask;
+    }
+
+    private Task SetLayerVisibility(string layerName, ChangeEventArgs args)
+    {
+        var isVisible = args.Value is bool value && value;
+        if (string.Equals(layerName, "A", StringComparison.Ordinal))
+        {
+            layerAVisible = isVisible;
+        }
+        else
+        {
+            layerBVisible = isVisible;
+        }
+
+        RefreshComparisonViewState();
+        return Task.CompletedTask;
+    }
+
+    private Task RequestProfileSwitchAsync(string profileName)
+    {
+        ProfileRequestService.RequestProfileSwitch(profileName);
+        CaptureLiveDisplaySnapshot();
+        return Task.CompletedTask;
+    }
+
+    private Task ToggleCaptureAsync()
+    {
+        var nextEnabled = !CaptureControl.Enabled;
+        CaptureControl.SetEnabled(nextEnabled);
+
+        if (!nextEnabled)
+        {
+            PacketCaptureWriter.Stop();
+            RenderSnapshotCaptureWriter.Stop();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void EnsureSelectedViewExists(VisionPacketSnapshot currentSnapshot)
+    {
+        if (selectedViewKey == AggregateViewKey)
+        {
+            return;
+        }
+
+        if (TryGetCameraId(selectedViewKey, out var cameraId) &&
+            currentSnapshot.Cameras.Any(camera => camera.CameraId == cameraId))
+        {
+            return;
+        }
+
+        selectedViewKey = AggregateViewKey;
+    }
+
+    private VisionViewState ResolveSelectedView(VisionPacketSnapshot currentSnapshot)
+    {
+        if (selectedViewKey == AggregateViewKey)
+        {
+            return new VisionViewState(
+                AggregateViewKey,
+                "Aggregate",
+                currentSnapshot.Cameras.Count > 0 ? "aggregate" : "-",
+                currentSnapshot.Cameras.Count > 0 ? string.Join(", ", currentSnapshot.AggregateDetection.CameraIds) : "-",
+                "aggregate",
+                currentSnapshot.AggregateDetection.Balls,
+                currentSnapshot.AggregateDetection.RobotsYellow,
+                currentSnapshot.AggregateDetection.RobotsBlue,
+                FormatAggregateJson(currentSnapshot.AggregateDetection));
+        }
+
+        if (TryGetCameraId(selectedViewKey, out var cameraId))
+        {
+            var camera = currentSnapshot.Cameras.FirstOrDefault(entry => entry.CameraId == cameraId);
+            if (camera is not null)
+            {
+                return new VisionViewState(
+                    CameraViewKey(camera.CameraId),
+                    $"Camera {camera.CameraId}",
+                    camera.Detection.FrameNumber.ToString(CultureInfo.InvariantCulture),
+                    camera.CameraId.ToString(CultureInfo.InvariantCulture),
+                    camera.LatestPacket?.Source.ToString() ?? "-",
+                    camera.Detection.Balls,
+                    camera.Detection.RobotsYellow,
+                    camera.Detection.RobotsBlue,
+                    FormatJson(camera.LatestPacket));
+            }
+        }
+
+        selectedViewKey = AggregateViewKey;
+        return ResolveSelectedView(currentSnapshot);
+    }
+
+    private static string CameraViewKey(uint cameraId)
+    {
+        return $"camera:{cameraId}";
+    }
+
+    private static bool TryGetCameraId(string key, out uint cameraId)
+    {
+        const string prefix = "camera:";
+
+        if (key.StartsWith(prefix, StringComparison.Ordinal) &&
+            uint.TryParse(key[prefix.Length..], CultureInfo.InvariantCulture, out cameraId))
+        {
+            return true;
+        }
+
+        cameraId = 0;
+        return false;
+    }
+
+    private sealed record VisionViewState(
+        string Key,
+        string Label,
+        string FrameLabel,
+        string CameraLabel,
+        string SourceLabel,
+        IReadOnlyList<SSL_DetectionBall> Balls,
+        IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
+        IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+        string RawJson);
+
+    private string ModeButtonClass(ViewerMode mode)
+    {
+        return viewerMode == mode ? "vision-mode-toggle__button is-active" : "vision-mode-toggle__button";
+    }
+
+    private string ComparisonModeButtonClass(VisionLiveComparisonMode mode)
+    {
+        return comparisonMode == mode ? "vision-mode-toggle__button is-active" : "vision-mode-toggle__button";
+    }
+
+    private static string ComparisonLayerClass(VisionLiveComparisonLayer layer)
+    {
+        return layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible
+            ? "vision-comparison-layer"
+            : "vision-comparison-layer is-missing";
+    }
+
+    private static string ComparisonOverlayLegendClass(VisionLiveComparisonLayer layer)
+    {
+        return layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible
+            ? "vision-comparison-overlay-legend__item"
+            : "vision-comparison-overlay-legend__item is-muted";
+    }
+
+    private static string ComparisonOptionLabel(VisionLiveComparisonSourceOption option)
+    {
+        return option.IsAvailable ? option.Label : $"{option.Label} (missing)";
+    }
+
+    private static IReadOnlyList<VisionFieldLayerRenderModel> CreateVisionOverlayFieldLayers(
+        IReadOnlyList<VisionLiveComparisonLayer> layers)
+    {
+        return layers
+            .Select(layer => new VisionFieldLayerRenderModel(
+                layer.LayerName,
+                layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible,
+                layer.AccentColor,
+                layer.Field.Balls,
+                layer.Field.RobotsYellow,
+                layer.Field.RobotsBlue,
+                OverlayFieldLayerClass(layer)))
+            .ToArray();
+    }
+
+    private static string OverlayFieldLayerClass(VisionLiveComparisonLayer layer)
+    {
+        if (layer.IsSameSourceCollapsed || string.Equals(layer.LayerName, "Layer A", StringComparison.Ordinal))
+        {
+            return "field-card__layer-group--a";
+        }
+
+        return string.Equals(layer.LayerName, "Layer B", StringComparison.Ordinal)
+            ? "field-card__layer-group--b"
+            : string.Empty;
+    }
+
+    private void RefreshComparisonViewState()
+    {
+        comparisonViewState = LiveDisplaySnapshotProvider.CreateComparisonViewState(
+            liveDisplaySnapshot,
+            comparisonMode,
+            layerASourceKey,
+            layerBSourceKey,
+            layerAVisible,
+            layerBVisible);
+    }
+
+    private void CaptureLiveDisplaySnapshot()
+    {
+        liveDisplaySnapshot = LiveDisplaySnapshotProvider.CaptureRenderTickSnapshot();
+        rawSnapshot = liveDisplaySnapshot.RawSnapshot;
+        trackedSnapshot = liveDisplaySnapshot.TrackedSnapshot;
+        RefreshComparisonViewState();
+    }
+
+    private static VisionLiveComparisonViewState CreateInitialComparisonViewState()
+    {
+        var snapshot = new VisionLiveComparisonRenderSnapshot(
+            DateTimeOffset.UtcNow,
+            0,
+            Array.Empty<VisionLiveComparisonRawAggregateSnapshot>(),
+            Array.Empty<VisionLiveComparisonRawCameraSnapshot>(),
+            null,
+            Array.Empty<VisionLiveComparisonThirdPartyTrackerSnapshot>(),
+            null,
+            "Missing",
+            "Missing",
+            IsImmutable: true);
+        var rawAggregate = new VisionLiveComparisonSourceOption(
+            VisionLiveComparisonSourceKind.RawAggregate,
+            "raw:aggregate",
+            "Raw Aggregate",
+            CameraId: null,
+            IsAvailable: false,
+            MissingReason: "No raw aggregate snapshot in current render tick.");
+        return new VisionLiveComparisonViewState(
+            VisionLiveComparisonMode.Split,
+            snapshot,
+            [rawAggregate],
+            new VisionLiveComparisonLayerSelection(rawAggregate, IsVisible: true),
+            new VisionLiveComparisonLayerSelection(rawAggregate, IsVisible: true));
+    }
+
+    private string CaptureButtonClass()
+    {
+        return CaptureControl.Enabled ? "vision-capture-toggle is-active" : "vision-capture-toggle";
+    }
+
+    private enum ViewerMode
+    {
+        Raw,
+        Tracked,
+        Compare,
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await disposalTokenSource.CancelAsync();
+
+        if (refreshTask is not null)
+        {
+            try
+            {
+                await refreshTask;
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        disposalTokenSource.Dispose();
+    }
+}

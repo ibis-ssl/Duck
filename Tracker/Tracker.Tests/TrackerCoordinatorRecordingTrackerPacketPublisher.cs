@@ -1,5 +1,5 @@
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 
 namespace Tracker.Tests;
 

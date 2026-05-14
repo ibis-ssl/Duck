@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
-    <ProjectReference Include="..\Tracker.Server\Tracker.Server.csproj" />
+    <ProjectReference Include="..\Tracker.DebugHost\Tracker.DebugHost.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
   </ItemGroup>
 

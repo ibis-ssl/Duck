@@ -1,8 +1,8 @@
 using System.Globalization;
 using Tracker.Core;
-using Tracker.Server.Components.Pages;
-using Tracker.Server.Components.Vision;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Components.Pages;
+using Tracker.DebugHost.Components.Vision;
+using Tracker.DebugHost.Tracking;
 
 namespace Tracker.Tests;
 
@@ -84,8 +84,18 @@ public class DiagnosticsFieldViewFactoryTests
             TrackerDiagnosticsFieldSourceFrameStatus.CandidateMissing,
             TrackerDiagnosticsFieldSource.External,
             "No tracker snapshot matched the selected Field source.");
+        var readyIbisFrame = CreateReadyFieldFrame(
+            TrackerDiagnosticsFieldSource.IbisTracker,
+            CreateSummary(
+                [
+                    new TrackerPacketSnapshotBallSummary(0, 100, 200, 0, 0.9f),
+                ],
+                [
+                    new TrackerPacketSnapshotRobotSummary("Yellow", 3, 1000, 2000, 0, 0.85f),
+                ]));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
+            DiagnosticsFieldViewFactory.CreateGeometry(renderSnapshot.Frame.GeometrySnapshot),
             renderSnapshot,
             trackedRenderView,
             comparisonViewState,
@@ -102,7 +112,7 @@ public class DiagnosticsFieldViewFactoryTests
                     IsVisible: true),
             ],
             missingLayerFrame,
-            layerBFrame: null);
+            readyIbisFrame);
 
         Assert.NotNull(model.Geometry);
         var layerA = Assert.Single(model.Layers, layer => layer.LayerKey == TrackerDiagnosticsOverlayLayerKey.LayerA);
@@ -116,7 +126,7 @@ public class DiagnosticsFieldViewFactoryTests
     }
 
     /// <summary>
-    /// render snapshot geometry がない overlay は sidecar 由来 geometry を復元せず、geometry なし empty state を返すことを確認する。
+    /// raw geometry が渡されない overlay は geometry なし empty state を返すことを確認する。
     /// </summary>
     [Fact]
     public void CreateOverlayRenderModel_WhenRenderSnapshotHasNoGeometry_ReturnsGeometryEmptyState()
@@ -130,6 +140,7 @@ public class DiagnosticsFieldViewFactoryTests
             PublishFailureCount: 0));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
+            geometry: null,
             renderSnapshot,
             trackedRenderView,
             CreateComparisonViewState(),
@@ -144,7 +155,7 @@ public class DiagnosticsFieldViewFactoryTests
             layerBFrame: null);
 
         Assert.Null(model.Geometry);
-        Assert.Equal("Render snapshot geometry was not found.", model.EmptyState);
+        Assert.Equal("Raw SSL-Vision geometry was not found.", model.EmptyState);
         Assert.Single(model.Layers);
     }
 
@@ -163,6 +174,7 @@ public class DiagnosticsFieldViewFactoryTests
             PublishFailureCount: 0));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
+            DiagnosticsFieldViewFactory.CreateGeometry(renderSnapshot.Frame.GeometrySnapshot),
             renderSnapshot,
             trackedRenderView,
             CreateComparisonViewState(),
@@ -196,6 +208,26 @@ public class DiagnosticsFieldViewFactoryTests
             SourceLabel: "source",
             Balls: balls,
             Robots: robots);
+    }
+
+    private static TrackerDiagnosticsFieldSourceFrame CreateReadyFieldFrame(
+        TrackerDiagnosticsFieldSource source,
+        TrackerPacketSnapshotSemanticSummary summary)
+    {
+        return new TrackerDiagnosticsFieldSourceFrame(
+            TrackerDiagnosticsFieldSourceFrameStatus.Ready,
+            source,
+            EntryLineNumber: 1,
+            MatchingRule: "diagnostics-sample-sidecar",
+            IbisOwnSnapshotTimestampNs: null,
+            SourceRole: summary.SourceRole,
+            SourceLabel: summary.SourceLabel,
+            TrackedFrameNumber: summary.TrackedFrameNumber,
+            TrackedFrameTimestampNs: summary.TrackedFrameTimestampNs,
+            TimestampDeltaNs: 0,
+            RawPayloadRestored: false,
+            summary,
+            Message: null);
     }
 
     private static TrackerRenderSnapshotView CreateRenderSnapshot(bool withGeometry)

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -26,13 +26,15 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         var coordinator = new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
-            fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
-            fixture.CreatePublisherOptions(port: 10010),
-            new TrackerDiagnosticsOptions(),
+            new TrackerRuntimeResolvedOptions
+            {
+                Enabled = true,
+                EngineSettings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
+                PublisherOptions = fixture.CreatePublisherOptions(port: 10010),
+            },
             snapshotStore,
             publisher,
-            [],
-            NullLogger<TrackerCoordinator>.Instance);
+            []);
         var service = new TrackerProfileRequestService(
             Options.Create(new TrackerOptions
             {
@@ -79,13 +81,15 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         var coordinator = new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
-            fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
-            fixture.CreatePublisherOptions(port: 10010),
-            new TrackerDiagnosticsOptions(),
+            new TrackerRuntimeResolvedOptions
+            {
+                Enabled = true,
+                EngineSettings = fixture.CreateSettings(profileName: "default", reorderWindowNs: 0, mergeWindowNs: 0),
+                PublisherOptions = fixture.CreatePublisherOptions(port: 10010),
+            },
             snapshotStore,
             publisher,
-            [],
-            NullLogger<TrackerCoordinator>.Instance);
+            []);
         var service = new TrackerProfileRequestService(
             Options.Create(new TrackerOptions()),
             coordinator);

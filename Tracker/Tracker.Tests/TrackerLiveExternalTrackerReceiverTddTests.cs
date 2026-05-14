@@ -2,8 +2,8 @@ using System.Net;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 using Tracker.Tests.Contracts;
 using TrackerConnectionLib;
 
@@ -205,7 +205,7 @@ public class TrackerLiveExternalTrackerReceiverTddTests : IClassFixture<TrackerC
         TrackerPacketSnapshotLogWriter writer)
     {
         var recorderType = typeof(TrackerDiagnosticsLogReader).Assembly.GetType(
-            "Tracker.Server.Tracking.TrackerConnectionLibSnapshotRecorder",
+            "Tracker.DebugHost.Tracking.TrackerConnectionLibSnapshotRecorder",
             throwOnError: false);
         Assert.NotNull(recorderType);
 

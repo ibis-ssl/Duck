@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
@@ -95,15 +95,15 @@ internal sealed class TrackerCoordinatorTestFactory
         return new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
-            settings,
-            publisherOptions,
-            diagnosticsOptions,
+            new TrackerRuntimeResolvedOptions
+            {
+                Enabled = true,
+                EngineSettings = settings,
+                PublisherOptions = publisherOptions,
+            },
             snapshotStore,
             publisher,
-            observers,
-            NullLogger<TrackerCoordinator>.Instance,
-            packetCaptureSession,
-            renderSnapshotCaptureWriter);
+            observers);
     }
 
     public VisionPacketCaptureSession CreateCaptureSession(

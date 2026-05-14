@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Tracker.Server.Tracking;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 
@@ -173,7 +173,7 @@ public class VisionReceiverConfigurationResolverTests
         var repositoryRoot = FindRepositoryRoot();
         var configuration = new ConfigurationBuilder()
             .SetBasePath(repositoryRoot)
-            .AddJsonFile("Tracker/Tracker.Server/appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("Tracker/Tracker.DebugHost/appsettings.json", optional: false, reloadOnChange: false)
             .Build();
 
         var options = configuration.GetSection("VisionReceiver").Get<VisionReceiverOptions>();
@@ -183,6 +183,43 @@ public class VisionReceiverConfigurationResolverTests
         Assert.Equal("packet-captures", receiverOptions.PacketCapture.DirectoryPath);
         Assert.Equal("ssl-vision-packets", receiverOptions.PacketCapture.FilePrefix);
         Assert.True(receiverOptions.PacketCapture.FlushEachPacket);
+        Assert.Equal(100, receiverOptions.PacketCapture.DiagnosticsSampleIntervalMilliseconds);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: diagnostics sample loop が PacketCapture 設定の周期を使うこと。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsSampleHostedService_ResolveSampleInterval_UsesConfiguredPacketCaptureInterval()
+    {
+        var options = new VisionPacketCaptureOptions
+        {
+            DiagnosticsSampleIntervalMilliseconds = 25,
+        };
+
+        var interval = DiagnosticsSampleHostedService.ResolveSampleInterval(options);
+
+        Assert.Equal(TimeSpan.FromMilliseconds(25), interval);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: diagnostics sample loop の 0 以下の周期設定は既定値へ戻すこと。
+    /// </summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void DiagnosticsSampleHostedService_ResolveSampleInterval_FallsBackForNonPositiveValues(int configuredIntervalMilliseconds)
+    {
+        var options = new VisionPacketCaptureOptions
+        {
+            DiagnosticsSampleIntervalMilliseconds = configuredIntervalMilliseconds,
+        };
+
+        var interval = DiagnosticsSampleHostedService.ResolveSampleInterval(options);
+
+        Assert.Equal(
+            TimeSpan.FromMilliseconds(VisionPacketCaptureOptions.DefaultDiagnosticsSampleIntervalMilliseconds),
+            interval);
     }
 
     private static string FindRepositoryRoot()
@@ -190,7 +227,7 @@ public class VisionReceiverConfigurationResolverTests
         var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.Server", "appsettings.json")))
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker", "Tracker.DebugHost", "appsettings.json")))
             {
                 return directory.FullName;
             }
@@ -198,6 +235,6 @@ public class VisionReceiverConfigurationResolverTests
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.Server/appsettings.json.");
+        throw new DirectoryNotFoundException("Could not locate repository root containing Tracker/Tracker.DebugHost/appsettings.json.");
     }
 }

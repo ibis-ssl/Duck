@@ -1,4 +1,4 @@
-using Tracker.Server.Components.Vision;
+using Tracker.DebugHost.Components.Vision;
 
 namespace Tracker.Tests;
 
@@ -47,10 +47,10 @@ public class VisionFieldRenderContractTests
     [Fact]
     public void VisionAndDiagnosticsFieldMarkup_UseSeparateSplitAndOverlayFieldComponents()
     {
-        var homeMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Pages/Home.razor");
-        var diagnosticsMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor");
-        var diagnosticsOverlayMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Pages/DiagnosticsFieldOverlayCanvas.razor");
-        var overlayComponentMarkup = ReadRepositoryFile("Tracker/Tracker.Server/Components/Vision/VisionFieldOverlayCanvas.razor");
+        var homeMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Home.razor");
+        var diagnosticsMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor");
+        var diagnosticsOverlayMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/DiagnosticsFieldOverlayCanvas.razor");
+        var overlayComponentMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Vision/VisionFieldOverlayCanvas.razor");
 
         var overlayMarkup = ExtractBetween(homeMarkup, "@if (comparisonMode == VisionLiveComparisonMode.Overlay)", "else");
 
@@ -62,6 +62,21 @@ public class VisionFieldRenderContractTests
         Assert.DoesNotContain("vision-comparison-overlay-layer", overlayMarkup, StringComparison.Ordinal);
         Assert.DoesNotContain("legend", overlayComponentMarkup, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("<select", overlayComponentMarkup, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// diagnostics sample sidecar 由来の field source は render snapshot が無くても field block を表示できること。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsFieldMarkup_IsNotGatedOnlyByRenderSnapshot()
+    {
+        var diagnosticsMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor");
+        var diagnosticsCode = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor.cs");
+
+        Assert.Contains("@if (CanShowFieldDisplay)", diagnosticsMarkup, StringComparison.Ordinal);
+        Assert.Contains("private bool CanShowFieldDisplay =>", diagnosticsCode, StringComparison.Ordinal);
+        Assert.Contains("LeftTrackerFieldSourceFrame", diagnosticsCode, StringComparison.Ordinal);
+        Assert.DoesNotContain("@if (selectedRenderSnapshot is not null)", diagnosticsMarkup, StringComparison.Ordinal);
     }
 
     private static string ExtractBetween(string text, string start, string end)
@@ -83,7 +98,7 @@ public class VisionFieldRenderContractTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.Server/Program.cs")))
+            if (File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.DebugHost/Program.cs")))
             {
                 return directory.FullName;
             }
@@ -91,6 +106,6 @@ public class VisionFieldRenderContractTests
             directory = directory.Parent;
         }
 
-        throw new DirectoryNotFoundException("Repository root containing Tracker/Tracker.Server/Program.cs was not found.");
+        throw new DirectoryNotFoundException("Repository root containing Tracker/Tracker.DebugHost/Program.cs was not found.");
     }
 }

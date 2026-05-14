@@ -1,4 +1,4 @@
-using Tracker.Server.Components.Pages;
+using Tracker.DebugHost.Components.Pages;
 
 namespace Tracker.Tests;
 
@@ -64,7 +64,7 @@ public class DiagnosticsPlaybackStateTests
     [Fact]
     public void DiagnosticsPlaybackMarkup_DoesNotUseFastForwardSpeedSelect()
     {
-        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor"));
         var oldSpeedSelectClass = "diagnostics-playback__" + "speed";
         var oldSpeedSelectLabel = "Fast forward " + "speed";
 
@@ -79,7 +79,7 @@ public class DiagnosticsPlaybackStateTests
     [Fact]
     public void DiagnosticsPlaybackMarkup_SeparatesTransportButtonsAndSpeedTabs()
     {
-        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor"));
         var playbackControls = ExtractPlaybackControlsMarkup(markup);
         var oldActionHandler = "OnPlayback" + "ChoiceClicked";
 
@@ -97,7 +97,7 @@ public class DiagnosticsPlaybackStateTests
     [Fact]
     public void DiagnosticsPlaybackMarkup_ExposesCompactVariableMultiplierControl()
     {
-        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor"));
         var playbackControls = ExtractPlaybackControlsMarkup(markup);
 
         Assert.Contains("diagnostics-playback-multiplier", playbackControls, StringComparison.Ordinal);
@@ -111,7 +111,7 @@ public class DiagnosticsPlaybackStateTests
     [Fact]
     public void DiagnosticsPlaybackMarkup_DoesNotExposeNumericNormalSpeedLabel()
     {
-        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor"));
+        var markup = File.ReadAllText(FindRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor"));
         var numericNormalSpeedLabel = "1" + "x";
 
         Assert.DoesNotContain(numericNormalSpeedLabel, markup, StringComparison.OrdinalIgnoreCase);
@@ -124,7 +124,7 @@ public class DiagnosticsPlaybackStateTests
     public void DiagnosticsPlaybackComponent_DoesNotTurnSpeedTabsIntoStopActions()
     {
         var code = File.ReadAllText(
-            FindRepositoryFile("Tracker/Tracker.Server/Components/Pages/Diagnostics.razor.cs"));
+            FindRepositoryFile("Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor.cs"));
         var oldActiveLabel = "{choice.Label} " + "Stop";
 
         Assert.DoesNotContain("{choice.Label} 停止", code, StringComparison.Ordinal);

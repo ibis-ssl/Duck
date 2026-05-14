@@ -1,0 +1,263 @@
+@using System.Globalization
+@using Tracker.DebugHost.Vision
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<section class="field-card">
+    <div class="field-card__toolbar">
+        <span>Zoom / pan</span>
+        <button type="button" class="field-card__reset" @onclick="ResetFieldView">Reset</button>
+    </div>
+    <div class="field-card__canvas" @ref="canvasElement">
+        @{
+            var projection = VisionFieldProjection.FromGeometry(Geometry);
+            var field = Geometry?.Field;
+            var (boundaryWidthGoalLine, boundaryWidthTouchLine) = ResolveBoundaryWidths(Geometry);
+            var outerLengthMargin = Math.Max(boundaryWidthGoalLine, field?.GoalDepth ?? 0);
+            var fieldTopLeft = projection.Project(-projection.FieldLength / 2, projection.FieldWidth / 2);
+            var fieldWidth = projection.ProjectLength(projection.FieldLength);
+            var fieldHeight = projection.ProjectLength(projection.FieldWidth);
+            var boundaryTopLeft = projection.Project(
+                -(projection.FieldLength / 2 + outerLengthMargin),
+                projection.FieldWidth / 2 + boundaryWidthTouchLine);
+            var boundaryWidthProjected = projection.ProjectLength(projection.FieldLength + (outerLengthMargin * 2));
+            var boundaryHeightProjected = projection.ProjectLength(projection.FieldWidth + (boundaryWidthTouchLine * 2));
+        }
+
+        <div class="field-card__axes" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+                <path d="M12 52H52" />
+                <path d="M44 44L52 52L44 60" />
+                <path d="M12 52V12" />
+                <path d="M4 20L12 12L20 20" />
+                <text x="50" y="38" text-anchor="end">+X</text>
+                <text x="16" y="14">+Y</text>
+            </svg>
+        </div>
+
+        @if (cursorOverlay is not null)
+        {
+            <div class="field-card__cursor"
+                 style="left:@N(cursorOverlay.LeftPx)px; top:@N(cursorOverlay.TopPx)px;">
+                X @N(cursorOverlay.FieldX), Y @N(cursorOverlay.FieldY)
+            </div>
+        }
+
+        <svg class="field-card__svg"
+             viewBox="@ViewBox(projection)"
+             role="img"
+             aria-label="SSL-Vision field"
+             @onwheel="OnFieldWheel"
+             @onmousedown="OnFieldMouseDown"
+             @onmousemove="OnFieldMouseMove"
+             @onmouseup="OnFieldMouseUp"
+             @onmouseleave="OnFieldMouseLeave">
+            <g transform="@FieldTransform(projection)" pointer-events="none">
+                <rect class="field-card__boundary-background"
+                      x="@N(boundaryTopLeft.X)"
+                      y="@N(boundaryTopLeft.Y)"
+                      width="@N(boundaryWidthProjected)"
+                      height="@N(boundaryHeightProjected)" />
+
+                <rect class="field-card__boundary"
+                      x="@N(fieldTopLeft.X)"
+                      y="@N(fieldTopLeft.Y)"
+                      width="@N(fieldWidth)"
+                      height="@N(fieldHeight)" />
+
+                <VisionFieldLines Projection="projection" Field="field" />
+
+                @foreach (var ball in Balls)
+                {
+                    <VisionBallMarker Projection="projection" Ball="ball" Style="@BallMarkerStyle" />
+                }
+
+                @foreach (var robot in RobotsYellow)
+                {
+                    <VisionRobotMarker Projection="projection"
+                                       Robot="robot"
+                                       ClassName="robot-yellow"
+                                       RenderOptions="RenderOptions"
+                                       MarkerStroke="@ResolvedMarkerStroke" />
+                }
+
+                @foreach (var robot in RobotsBlue)
+                {
+                    <VisionRobotMarker Projection="projection"
+                                       Robot="robot"
+                                       ClassName="robot-blue"
+                                       RenderOptions="RenderOptions"
+                                       MarkerStroke="@ResolvedMarkerStroke" />
+                }
+            </g>
+        </svg>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public SSL_GeometryData? Geometry { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<SSL_DetectionBall> Balls { get; set; } = Array.Empty<SSL_DetectionBall>();
+
+    [Parameter]
+    public IReadOnlyList<SSL_DetectionRobot> RobotsYellow { get; set; } = Array.Empty<SSL_DetectionRobot>();
+
+    [Parameter]
+    public IReadOnlyList<SSL_DetectionRobot> RobotsBlue { get; set; } = Array.Empty<SSL_DetectionRobot>();
+
+    [Parameter]
+    public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
+
+    [Parameter]
+    public string? MarkerStroke { get; set; }
+
+    private ElementReference canvasElement;
+    private readonly VisionFieldViewportState viewport = new();
+    private double canvasWidth = VisionFieldProjection.DefaultViewBoxWidth;
+    private double canvasHeight = VisionFieldProjection.DefaultViewBoxHeight;
+    private DotNetObjectReference<VisionFieldCanvas>? dotNetReference;
+    private IJSObjectReference? module;
+    private CursorOverlayState? cursorOverlay;
+
+    private string ResolvedMarkerStroke => MarkerStroke ?? VisionPalette.MarkerStroke;
+
+    private string? BallMarkerStyle => MarkerStroke is null
+        ? null
+        : $"stroke:{MarkerStroke};stroke-width:2.8;opacity:0.92";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./Components/Vision/VisionFieldCanvas.razor.js");
+        dotNetReference = DotNetObjectReference.Create(this);
+        await module.InvokeVoidAsync("observeSize", canvasElement, dotNetReference);
+    }
+
+    private static string ViewBox(VisionFieldProjection projection)
+    {
+        return $"0 0 {N(projection.ViewBoxWidth)} {N(projection.ViewBoxHeight)}";
+    }
+
+    private string FieldTransform(VisionFieldProjection projection)
+    {
+        var centerX = projection.ViewBoxWidth / 2;
+        var centerY = projection.ViewBoxHeight / 2;
+
+        return
+            $"translate({N(viewport.TotalTranslationX)} {N(viewport.TotalTranslationY)}) " +
+            $"translate({N(centerX)} {N(centerY)}) " +
+            $"scale({N(viewport.Zoom)}) " +
+            $"translate({N(-centerX)} {N(-centerY)})";
+    }
+
+    private static (double GoalLine, double TouchLine) ResolveBoundaryWidths(SSL_GeometryData? geometry)
+    {
+        var field = geometry?.Field;
+        var touchLine = field?.BoundaryWidth > 0 ? field.BoundaryWidth : 300;
+        var goalLine = field?.BoundaryWidthGoalLine > 0 ? field.BoundaryWidthGoalLine : touchLine;
+        return (goalLine, touchLine);
+    }
+
+    private static string N(double value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private void ResetFieldView()
+    {
+        viewport.Reset();
+    }
+
+    private void OnFieldWheel(WheelEventArgs eventArgs)
+    {
+        viewport.ApplyWheelDelta(eventArgs.DeltaY);
+    }
+
+    private void OnFieldMouseDown(MouseEventArgs eventArgs)
+    {
+        viewport.BeginDrag(eventArgs.ClientX, eventArgs.ClientY);
+    }
+
+    private void OnFieldMouseMove(MouseEventArgs eventArgs)
+    {
+        UpdateCursorOverlay(eventArgs);
+
+        viewport.DragTo(eventArgs.ClientX, eventArgs.ClientY);
+    }
+
+    private void OnFieldMouseUp(MouseEventArgs _)
+    {
+        CommitFieldTranslation();
+    }
+
+    private void OnFieldMouseLeave(MouseEventArgs _)
+    {
+        CommitFieldTranslation();
+        cursorOverlay = null;
+    }
+
+    [JSInvokable]
+    public void UpdateCanvasSize(double width, double height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        canvasWidth = width;
+        canvasHeight = height;
+    }
+
+    private void UpdateCursorOverlay(MouseEventArgs eventArgs)
+    {
+        if (canvasWidth <= 0 || canvasHeight <= 0)
+        {
+            return;
+        }
+
+        var projection = VisionFieldProjection.FromGeometry(Geometry);
+        var svgX = eventArgs.OffsetX * projection.ViewBoxWidth / canvasWidth;
+        var svgY = eventArgs.OffsetY * projection.ViewBoxHeight / canvasHeight;
+        var centerX = projection.ViewBoxWidth / 2;
+        var centerY = projection.ViewBoxHeight / 2;
+        var baseX = ((svgX - centerX - viewport.TotalTranslationX) / viewport.Zoom) + centerX;
+        var baseY = ((svgY - centerY - viewport.TotalTranslationY) / viewport.Zoom) + centerY;
+        var fieldPoint = projection.Unproject(baseX, baseY);
+        var leftPx = Math.Clamp(eventArgs.OffsetX + 12, 8, Math.Max(8, canvasWidth - 148));
+        var topPx = eventArgs.OffsetY > canvasHeight / 2
+            ? Math.Max(8, eventArgs.OffsetY - 34)
+            : Math.Min(canvasHeight - 28, eventArgs.OffsetY + 14);
+
+        cursorOverlay = new CursorOverlayState(leftPx, topPx, fieldPoint.X, fieldPoint.Y);
+    }
+
+    private void CommitFieldTranslation()
+    {
+        viewport.CommitDrag();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try
+            {
+                await module.InvokeVoidAsync("unobserveSize", canvasElement);
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        dotNetReference?.Dispose();
+    }
+
+    private sealed record CursorOverlayState(double LeftPx, double TopPx, double FieldX, double FieldY);
+}

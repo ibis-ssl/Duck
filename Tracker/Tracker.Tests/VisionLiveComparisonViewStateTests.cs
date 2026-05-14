@@ -2,10 +2,10 @@ using System.Collections;
 using System.Net;
 using System.Reflection;
 using Tracker.Core;
-using Tracker.Server.Tracking;
+using Tracker.DebugHost.Tracking;
 using Tracker.Tests.Contracts;
 using TrackerConnectionLib;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 
@@ -153,15 +153,31 @@ public class VisionLiveComparisonViewStateTests
         var composerType = RequiredVisionType("VisionLiveComparisonSnapshotComposer");
         var renderSnapshotType = RequiredVisionType("VisionLiveComparisonRenderSnapshot");
         var viewStateType = RequiredVisionType("VisionLiveComparisonViewState");
-        var composer = CreateObject(composerType, ("VisionPacketStore", store));
+        var composer = CreateObject(composerType);
 
-        var captureMethod = RequiredMethod(composerType, "CaptureRenderTickSnapshot", renderSnapshotType);
+        var captureMethod = RequiredMethod(
+            composerType,
+            "CaptureRenderTickSnapshot",
+            renderSnapshotType,
+            typeof(DateTimeOffset),
+            typeof(long),
+            typeof(VisionPacketSnapshot),
+            typeof(TrackedSnapshot),
+            typeof(IReadOnlyList<ExternalTrackerReadSideSnapshot>));
         var createViewStateMethod = RequiredMethod(
             composerType,
             "CreateViewState",
             viewStateType,
             renderSnapshotType);
-        var renderSnapshot = captureMethod.Invoke(composer, []);
+        var renderSnapshot = captureMethod.Invoke(
+            composer,
+            [
+                firstReceivedAt,
+                1L,
+                store.GetSnapshot(),
+                new TrackedSnapshot(null, null, "default", 0, 0),
+                Array.Empty<ExternalTrackerReadSideSnapshot>(),
+            ]);
 
         Assert.NotNull(renderSnapshot);
         Assert.Equal(firstReceivedAt, GetValue(GetSingle(GetValues(renderSnapshot!, "RawCameraSnapshots")), "ReceivedAt"));
@@ -258,8 +274,8 @@ public class VisionLiveComparisonViewStateTests
             new IPEndPoint(IPAddress.Parse("192.0.2.12"), 12010),
             firstReceivedAt.AddMilliseconds(20));
 
-        var composer = new VisionLiveComparisonSnapshotComposer(store, trackedSnapshotStore: null, manager);
-        var renderSnapshot = composer.CaptureRenderTickSnapshot();
+        var composer = new VisionLiveComparisonSnapshotComposer();
+        var renderSnapshot = CaptureRenderSnapshot(store, externalTrackerManager: manager);
         var viewState = composer.CreateViewState(renderSnapshot);
 
         var snapshot = Assert.Single(renderSnapshot.ThirdPartyTrackerSnapshots);
@@ -304,8 +320,8 @@ public class VisionLiveComparisonViewStateTests
             new IPEndPoint(IPAddress.Parse("192.0.2.22"), 12010),
             receivedAt.AddMilliseconds(10));
 
-        var composer = new VisionLiveComparisonSnapshotComposer(store, trackedSnapshotStore: null, manager);
-        var viewState = composer.CreateViewState(composer.CaptureRenderTickSnapshot());
+        var composer = new VisionLiveComparisonSnapshotComposer();
+        var viewState = composer.CreateViewState(CaptureRenderSnapshot(store, externalTrackerManager: manager));
         var options = viewState.SourceOptions
             .Where(option => option.Kind == VisionLiveComparisonSourceKind.ThirdPartyTracker)
             .OrderBy(option => option.Key, StringComparer.Ordinal)
@@ -343,8 +359,8 @@ public class VisionLiveComparisonViewStateTests
             new IPEndPoint(IPAddress.Parse("192.0.2.32"), 12010),
             receivedAt.AddMilliseconds(10));
 
-        var composer = new VisionLiveComparisonSnapshotComposer(store, trackedSnapshotStore: null, manager);
-        var viewState = composer.CreateViewState(composer.CaptureRenderTickSnapshot());
+        var composer = new VisionLiveComparisonSnapshotComposer();
+        var viewState = composer.CreateViewState(CaptureRenderSnapshot(store, externalTrackerManager: manager));
         var options = viewState.SourceOptions
             .Where(option => option.Kind == VisionLiveComparisonSourceKind.ThirdPartyTracker)
             .OrderBy(option => option.Key, StringComparer.Ordinal)
@@ -526,27 +542,42 @@ public class VisionLiveComparisonViewStateTests
 
     private static Type RequiredVisionType(string shortName)
     {
-        var type = typeof(VisionPacketStore).Assembly.GetType($"Tracker.Server.Vision.{shortName}");
-        Assert.True(type is not null, $"Tracker.Server.Vision.{shortName} must exist.");
+        var type = typeof(VisionPacketStore).Assembly.GetType($"Tracker.DebugHost.Vision.{shortName}");
+        Assert.True(type is not null, $"Tracker.DebugHost.Vision.{shortName} must exist.");
         return type;
     }
 
-    private static object CaptureRenderSnapshot(
+    private static VisionLiveComparisonRenderSnapshot CaptureRenderSnapshot(
         VisionPacketStore store,
         TrackedSnapshotStore? trackedStore = null,
         MultiTrackerManager<TrackerPacketAdapter>? externalTrackerManager = null)
     {
         var composerType = RequiredVisionType("VisionLiveComparisonSnapshotComposer");
         var renderSnapshotType = RequiredVisionType("VisionLiveComparisonRenderSnapshot");
-        var composer = CreateObject(
+        var composer = CreateObject(composerType);
+        var externalSnapshots = externalTrackerManager is null
+            ? Array.Empty<ExternalTrackerReadSideSnapshot>()
+            : new ExternalTrackerSnapshotStore(externalTrackerManager).GetSnapshot();
+        var captureMethod = RequiredMethod(
             composerType,
-            ("VisionPacketStore", store),
-            ("TrackedSnapshotStore", trackedStore),
-            ("ExternalTrackerManager", externalTrackerManager));
-        var captureMethod = RequiredMethod(composerType, "CaptureRenderTickSnapshot", renderSnapshotType);
-        var renderSnapshot = captureMethod.Invoke(composer, []);
+            "CaptureRenderTickSnapshot",
+            renderSnapshotType,
+            typeof(DateTimeOffset),
+            typeof(long),
+            typeof(VisionPacketSnapshot),
+            typeof(TrackedSnapshot),
+            typeof(IReadOnlyList<ExternalTrackerReadSideSnapshot>));
+        var renderSnapshot = captureMethod.Invoke(
+            composer,
+            [
+                new DateTimeOffset(2026, 5, 14, 8, 0, 0, TimeSpan.Zero),
+                1L,
+                store.GetSnapshot(),
+                trackedStore?.GetSnapshot() ?? new TrackedSnapshot(null, null, "default", 0, 0),
+                externalSnapshots,
+            ]);
         Assert.NotNull(renderSnapshot);
-        return renderSnapshot!;
+        return (VisionLiveComparisonRenderSnapshot)renderSnapshot!;
     }
 
     private static MethodInfo RequiredMethod(Type declaringType, string methodName, Type returnType, params Type[] parameterTypes)

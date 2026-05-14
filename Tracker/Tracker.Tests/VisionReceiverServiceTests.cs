@@ -1,5 +1,5 @@
 using System.Net;
-using Tracker.Server.Vision;
+using Tracker.DebugHost.Vision;
 
 namespace Tracker.Tests;
 
