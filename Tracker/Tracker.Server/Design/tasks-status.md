@@ -6,14 +6,14 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 
 - ID: RAW-VISION-016
 - Title: Issue #10 の最終検証 / docs / review / PR ready を完了する
-- Phase: verification
+- Phase: review
 - Status: in-progress
 - Size: small
 - Dependencies: RAW-VISION-015 complete.
 - Exit Criteria:
-  - RAW-VISION-015 の実装結果について、対象テスト、サーバービルド、必要な追加検証を記録する。
-  - Compare overlay と diagnostics latest-before metadata 表示の手動または画面確認証跡を `reports/` に残す。
-  - README / docs の更新要否を確認し、必要な場合だけ更新する。
+  - RAW-VISION-015 の実装結果について、対象テスト、サーバービルド、必要な追加検証を `reports/issue-10-raw-vision-016-validation-20260514095659.md` に記録した。
+  - Compare overlay と diagnostics latest-before metadata 表示の確認証跡を `reports/issue-10-raw-vision-016-validation-20260514095659.md` に残した。Playwright は利用不可、metadata 付き diagnostics log は未取得のため、HTML 応答と契約テストによる代替証跡として記録済み。
+  - README / docs の更新要否を確認し、設計用語説明は `raw-vision-viewer-plan.md` の脚注へ統合した。audit / review は `reports/issue-10-design-terminology-audit-r3-20260514102338.md` と `reports/issue-10-design-terminology-review-r3-20260514103027.md` に記録済みで指摘なし。
   - gpt-5.5 high の最終レビューを `reports/` に残し、blocking 指摘がない状態にする。
   - tracking と PR #15 本文を同期し、draft 解除判断材料を揃える。
 
@@ -23,7 +23,7 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 - `RAW-VISION-013`: Vision split / overlay の source 候補、同時取得方針、diagnostics replay の時間同期監査、geometry 基準、diagnostics 寄せ UI、固有名詞説明を設計へ固定した。調査 report、設計 report / r2、gpt-5.5 high review は完了済みで blocking findings なし。
 - `RAW-VISION-014`: Vision split / overlay の view-state、layout、source selection、overlay layer contract、geometry contract と diagnostics latest-before fallback contract を TDD Red として固定した。gpt-5.5 high review r4 は blocking findings なし。
 - `RAW-VISION-015`: Vision split / overlay UI、live source snapshot 接続、diagnostics selected tick missing 時の latest-before 表示/比較を実装した。gpt-5.5 high r2 review は指摘なし。
-- `RAW-VISION-016`: README / manual evidence、最終検証、review、PR #15 ready 化を完了する。現在実行中。
+- `RAW-VISION-016`: README / manual evidence、最終検証、review、PR #15 ready 化を完了する。検証 report と設計用語脚注化 review は完了、最終 review と PR #15 同期を実行中。
 
 ## 完了した追加タスク
 
@@ -97,7 +97,7 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
   - diagnostics replay / comparison は selected replay timeline tick を動かさず、対象 source record がない場合は selected tick 以前の `latest-before snapshot` を直前 sample hold として表示/比較する方針にした。
   - geometry は raw geometry 優先、tracked fallback、3rd party tracker packet から復元しない方針にした。
   - split / overlay の details、legend、layer visibility、same-source 1 layer 化、ready layer 維持は diagnostics に寄せる。
-  - 固有名詞説明を `raw-vision-viewer-plan.md` へ追加した。
+  - 固有名詞説明を `raw-vision-viewer-plan.md` の脚注へ統合した。
   - 調査 report は `reports/issue-10-vision-overlay-investigation-20260514080106.md`、`reports/issue-10-live-same-tick-investigation-20260514081135.md`、`reports/issue-10-diagnostics-time-sync-audit-20260514081730.md` に記録済み。
   - 設計 report は `reports/issue-10-vision-overlay-design-20260514082233.md`、r2 は `reports/issue-10-vision-overlay-design-r2-20260514082755.md` に記録済み。
   - gpt-5.5 high review は `reports/issue-10-raw-vision-013-design-review-20260514083515.md` に記録済みで blocking findings なし。PR #15 へ push 済み。
@@ -119,7 +119,7 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 | RAW-VISION-010 | Diagnostics frame timeline の幅をドラッグで変更可能にする | review | complete | RAW-VISION-009 | `/diagnostics` 左側の frame timeline と右側 detail の境界をドラッグして timeline 幅を変更できる。timeline は小さくでき、右側 field/detail 領域を広げられる。最小幅でも frame 選択操作が壊れず、可変幅の境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-010-evidence-20260511233242.md`、review は `reports/raw-vision-010-review-20260511233242.md`、`reports/raw-vision-010-review-r2-20260511233631.md`、`reports/raw-vision-010-review-r3-20260511234000.md`、PR は https://github.com/ibis-ssl/Duck/pull/7 に記録済み。 |
 | RAW-VISION-011 | Tracker.Server 共通 navigation の見た目を viewer UI と揃える | review | complete | RAW-VISION-010 | side navigation / page list を raw vision / diagnostics の濃色 green UI と同じ配色・密度に揃え、active / hover / collapsed / mobile toggle の既存操作を維持する。`dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-011-evidence-20260512001259.md`、review は `reports/raw-vision-011-review-20260512001259.md` に記録済み。 |
 | RAW-VISION-012 | Diagnostics timeline に再生・停止・早送り controls を追加する | review | complete | RAW-VISION-010 | `/diagnostics` の timeline scrubber 付近に再生、停止、早送り controls を追加し、通常再生は log timestamp 差分に合わせて順方向に frame を進める。最後に到達したら停止して先頭 entry に戻る。再生中/早送り中は該当ボタンが停止ボタンへ切り替わり、停止操作は現在選択を維持して止める。log 切替や entry 不在、停止直後の stale tick で state 不整合を起こさず、playback index / interval / stale tick guard テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-012-evidence-20260512002100.md`、review は `reports/raw-vision-012-review-20260512002100.md`、`reports/raw-vision-012-review-r2-20260512002502.md`、`reports/raw-vision-012-review-r3-20260512002923.md`、`reports/raw-vision-012-review-r4-20260512003653.md`、`reports/raw-vision-012-review-r5-20260512004014.md` に記録済み。 |
-| RAW-VISION-013 | Issue #10 Vision split / overlay の同時取得方針と設計を確定する | design | complete | RAW-VISION-012 | Source 候補を `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` として固定した。live 比較は同一 UI render tick immutable snapshot、diagnostics は selected tick 固定 + latest-before hold、geometry は raw 優先 / tracked fallback、UI は diagnostics 寄せとして設計済み。調査・設計・r2・gpt-5.5 high review は `reports/issue-10-vision-overlay-investigation-20260514080106.md`、`reports/issue-10-live-same-tick-investigation-20260514081135.md`、`reports/issue-10-diagnostics-time-sync-audit-20260514081730.md`、`reports/issue-10-vision-overlay-design-20260514082233.md`、`reports/issue-10-vision-overlay-design-r2-20260514082755.md`、`reports/issue-10-raw-vision-013-design-review-20260514083515.md` に記録済みで blocking findings なし。 |
+| RAW-VISION-013 | Issue #10 Vision split / overlay の同時取得方針と設計を確定する | design | complete | RAW-VISION-012 | Source 候補を `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` として固定した。live 比較は同一 UI render tick immutable snapshot、diagnostics は selected tick 固定 + latest-before hold、geometry は raw 優先 / tracked fallback、UI は diagnostics 寄せとして設計済み。調査・設計・r2・gpt-5.5 high review は `reports/issue-10-vision-overlay-investigation-20260514080106.md`、`reports/issue-10-live-same-tick-investigation-20260514081135.md`、`reports/issue-10-diagnostics-time-sync-audit-20260514081730.md`、`reports/issue-10-vision-overlay-design-20260514082233.md`、`reports/issue-10-vision-overlay-design-r2-20260514082755.md`、`reports/issue-10-raw-vision-013-design-review-20260514083515.md` に記録済みで blocking findings なし。設計用語説明は後続で脚注へ統合し、`reports/issue-10-design-terminology-review-r3-20260514103027.md` で指摘なしを確認済み。 |
 | RAW-VISION-014 | Vision split / overlay と diagnostics time sync の TDD contract を追加する | verification | complete | RAW-VISION-013 | split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details、latest-before hold、source `receivedAt` / delta / stale metadata、future fallback 禁止を TDD Red として固定した。focused test は 37 件中 26 pass / 11 fail。r4 review は `reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md` に記録済みで blocking findings なし。 |
 | RAW-VISION-015 | Vision split / overlay UI と live source snapshot 接続を実装する | implementation | complete | RAW-VISION-014 | Vision 画面で左右分割と overlay mode を切り替えられ、Layer A/B source と visibility を diagnostics に近い UI で操作できる。Raw / Tracked / 3rd party tracker の同一 UI render tick snapshot を field に描画し、既存 raw/tracked 単体表示を壊さない。3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から immutable snapshot store / composer を通して接続し、diagnostics は selected replay timeline tick / selected time を固定したまま、対象 source alignment がない場合に同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較し、future/later snapshot へ fallback しない。対象契約テスト 37 件とサーバービルドは成功し、r2 review は `reports/issue-10-raw-vision-015-review-r2-20260514095053.md` に記録済みで指摘なし。 |
-| RAW-VISION-016 | Issue #10 の final validation / docs / review / PR ready を完了する | verification | in-progress | RAW-VISION-015 | README/manual evidence、focused/full validation、gpt-5.5 high review、tracking sync、PR #15 本文更新、draft 解除判断材料を揃える。 |
+| RAW-VISION-016 | Issue #10 の final validation / docs / review / PR ready を完了する | review | in-progress | RAW-VISION-015 | 検証 report は `reports/issue-10-raw-vision-016-validation-20260514095659.md` に記録済み。設計用語説明は脚注へ統合し、`reports/issue-10-design-terminology-audit-r3-20260514102338.md` と `reports/issue-10-design-terminology-review-r3-20260514103027.md` に記録済みで指摘なし。gpt-5.5 high final review、tracking sync、PR #15 本文更新、draft 解除判断材料を揃える。 |
