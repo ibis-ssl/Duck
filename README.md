@@ -59,14 +59,12 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 `Tracker.RuntimeHost` を `sim` profile で起動する場合:
 
 ```bash
-Tracker__ActiveProfileName=sim \
 dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile
 ```
 
 `Tracker.DebugHost` を `sim` profile で起動する場合:
 
 ```bash
-Tracker__ActiveProfileName=sim \
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
