@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Vision;
@@ -10,6 +11,9 @@ namespace Tracker.DebugHost.Tracking;
 /// </summary>
 public sealed class TrackerDiagnosticsLogReader
 {
+    private const string DiagnosticsLogSuffix = ".tracker-diagnostics.log";
+    private const string MetadataSuffix = ".metadata.json";
+
     private static readonly Regex FieldRegex = new(
         @"(?<key>[A-Za-z][A-Za-z0-9]*)=(?<value>\[[^\]]*\]|\S*)",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -33,27 +37,23 @@ public sealed class TrackerDiagnosticsLogReader
     /// </summary>
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
-        var files = new Dictionary<string, FileInfo>(StringComparer.Ordinal);
+        var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
         var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
-        AddFiles(files, captureDirectoryPath, "*.tracker-diagnostics.log");
+        AddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}");
         AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
+        AddMetadataBackedDiagnosticsLogs(files, captureDirectoryPath);
 
         if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
         {
             var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
             if (File.Exists(filePath))
             {
-                files[filePath] = new FileInfo(filePath);
+                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
             }
         }
 
         return files.Values
             .OrderByDescending(file => file.LastWriteTimeUtc)
-            .Select(file => new TrackerDiagnosticsLogFile(
-                file.Name,
-                file.FullName,
-                file.Length,
-                file.LastWriteTimeUtc))
             .ToList();
     }
 
@@ -75,6 +75,11 @@ public sealed class TrackerDiagnosticsLogReader
         }
 
         var path = listedFile.FullPath;
+        if (!File.Exists(path))
+        {
+            return ReadMetadataBackedFile(path, safeFileName, maxEntries);
+        }
+
         var entries = new List<TrackerDiagnosticsLogEntry>();
         var skippedLineCount = 0;
         var lineNumber = 0;
@@ -169,7 +174,7 @@ public sealed class TrackerDiagnosticsLogReader
     }
 
     private static void AddFiles(
-        IDictionary<string, FileInfo> files,
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath,
         string searchPattern)
     {
@@ -180,8 +185,248 @@ public sealed class TrackerDiagnosticsLogReader
 
         foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
         {
-            files[path] = new FileInfo(path);
+            files[path] = CreateLogFile(path, new FileInfo(path));
         }
+    }
+
+    private static void AddMetadataBackedDiagnosticsLogs(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        string directoryPath)
+    {
+        if (!Directory.Exists(directoryPath))
+        {
+            return;
+        }
+
+        foreach (var metadataPath in Directory.EnumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
+        {
+            if (!TryResolveMetadataBackedPaths(metadataPath, out var diagnosticsLogPath, out var sampleSidecarPath) ||
+                !File.Exists(sampleSidecarPath) ||
+                files.ContainsKey(diagnosticsLogPath))
+            {
+                continue;
+            }
+
+            var metadataInfo = new FileInfo(metadataPath);
+            var sampleInfo = new FileInfo(sampleSidecarPath);
+            files[diagnosticsLogPath] = new TrackerDiagnosticsLogFile(
+                Path.GetFileName(diagnosticsLogPath),
+                diagnosticsLogPath,
+                sampleInfo.Length,
+                metadataInfo.LastWriteTimeUtc > sampleInfo.LastWriteTimeUtc
+                    ? metadataInfo.LastWriteTimeUtc
+                    : sampleInfo.LastWriteTimeUtc);
+        }
+    }
+
+    private TrackerDiagnosticsLogSnapshot ReadMetadataBackedFile(
+        string diagnosticsLogPath,
+        string safeFileName,
+        int maxEntries)
+    {
+        var metadataPath = ResolveMetadataPath(diagnosticsLogPath);
+        if (metadataPath is null ||
+            !TryResolveMetadataBackedPaths(metadataPath, out _, out var sampleSidecarPath) ||
+            !File.Exists(sampleSidecarPath))
+        {
+            return new TrackerDiagnosticsLogSnapshot(
+                safeFileName,
+                [],
+                $"Log file '{safeFileName}' was not found.");
+        }
+
+        try
+        {
+            var entries = DiagnosticsSampleLogReader.ReadRecords(sampleSidecarPath)
+                .Select(CreateEntry)
+                .ToList();
+            var omittedEntryCount = Math.Max(0, entries.Count - maxEntries);
+            if (omittedEntryCount > 0)
+            {
+                entries = entries
+                    .Skip(omittedEntryCount)
+                    .ToList();
+            }
+
+            return new TrackerDiagnosticsLogSnapshot(
+                safeFileName,
+                entries,
+                Error: null,
+                SkippedLineCount: 0,
+                OmittedEntryCount: omittedEntryCount);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or JsonException)
+        {
+            return new TrackerDiagnosticsLogSnapshot(
+                safeFileName,
+                [],
+                $"Diagnostics sample sidecar could not be read: {ex.Message}");
+        }
+    }
+
+    private static TrackerDiagnosticsLogEntry CreateEntry(DiagnosticsSampleRecord record)
+    {
+        var rawSummary = record.RawSemanticSummary;
+        var trackedSummary = record.TrackedSemanticSummary;
+        var trackedFrame = record.TrackedFrameNumber ?? record.RenderFrameNumber;
+        return new TrackerDiagnosticsLogEntry(
+            record.SampleIndex + 1,
+            record.SampleReceivedAt,
+            "",
+            Display(record.RawFrameNumber),
+            Display(record.RawCameraId),
+            rawSummary?.BallCount ?? 0,
+            FormatBallDetails(rawSummary),
+            FormatRobotDetails(rawSummary, "Blue"),
+            FormatRobotDetails(rawSummary, "Yellow"),
+            Display(trackedFrame),
+            trackedSummary?.BallCount ?? 0,
+            FormatBallDetails(trackedSummary),
+            trackedSummary?.RobotCount ?? 0,
+            FormatRobotDetails(trackedSummary, team: null),
+            "",
+            "",
+            "",
+            FormattableString.Invariant(
+                $"{record.SampleReceivedAt:O} diagnostics-sample sampleIndex={record.SampleIndex} rawFrame={Display(record.RawFrameNumber)} trackedFrame={Display(trackedFrame)}"));
+    }
+
+    private static string FormatBallDetails(TrackerPacketSnapshotSemanticSummary? summary)
+    {
+        return summary is null
+            ? ""
+            : string.Join("; ", summary.Balls.Select(ball => FormattableString.Invariant(
+                $"#{ball.Index}:x={ball.XMm:0.#},y={ball.YMm:0.#},z={ball.ZMm:0.#},vis={ball.Visibility:0.###}")));
+    }
+
+    private static string FormatRobotDetails(TrackerPacketSnapshotSemanticSummary? summary, string? team)
+    {
+        if (summary is null)
+        {
+            return "";
+        }
+
+        var robots = string.IsNullOrWhiteSpace(team)
+            ? summary.Robots
+            : summary.Robots.Where(robot => string.Equals(robot.Team, team, StringComparison.OrdinalIgnoreCase));
+        return string.Join("; ", robots.Select(robot => FormattableString.Invariant(
+            $"{FormatTeam(robot.Team)}{robot.RobotId}:x={robot.XMm:0.#},y={robot.YMm:0.#},o={robot.OrientationRad:0.###},vis={robot.Visibility:0.###}")));
+    }
+
+    private static string FormatTeam(string team)
+    {
+        return team.Equals("Yellow", StringComparison.OrdinalIgnoreCase)
+            ? "Y"
+            : team.Equals("Blue", StringComparison.OrdinalIgnoreCase)
+                ? "B"
+                : $"{team}:";
+    }
+
+    private static string Display(uint? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? "";
+    }
+
+    private static TrackerDiagnosticsLogFile CreateLogFile(string path, FileInfo info)
+    {
+        return new TrackerDiagnosticsLogFile(
+            Path.GetFileName(path),
+            Path.GetFullPath(path),
+            info.Length,
+            info.LastWriteTimeUtc);
+    }
+
+    private static string? ResolveMetadataPath(string diagnosticsLogPath)
+    {
+        return diagnosticsLogPath.EndsWith(DiagnosticsLogSuffix, StringComparison.Ordinal)
+            ? string.Concat(diagnosticsLogPath.AsSpan(0, diagnosticsLogPath.Length - DiagnosticsLogSuffix.Length), MetadataSuffix)
+            : null;
+    }
+
+    private static bool TryResolveMetadataBackedPaths(
+        string metadataPath,
+        out string diagnosticsLogPath,
+        out string sampleSidecarPath)
+    {
+        diagnosticsLogPath = "";
+        sampleSidecarPath = "";
+        if (!File.Exists(metadataPath))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(metadataPath));
+            var root = document.RootElement;
+            if (!TryGetString(root, "DiagnosticsSampleSidecarPath", out var samplePath) ||
+                string.IsNullOrWhiteSpace(samplePath) ||
+                !IsDiagnosticsSampleCreated(root))
+            {
+                return false;
+            }
+
+            if (!TryGetString(root, "DiagnosticsLogPath", out var logPath) ||
+                string.IsNullOrWhiteSpace(logPath))
+            {
+                logPath = metadataPath.EndsWith(MetadataSuffix, StringComparison.Ordinal)
+                    ? string.Concat(metadataPath.AsSpan(0, metadataPath.Length - MetadataSuffix.Length), DiagnosticsLogSuffix)
+                    : $"{metadataPath}{DiagnosticsLogSuffix}";
+            }
+
+            var baseDirectory = ResolveCaptureDirectory(root, metadataPath);
+            diagnosticsLogPath = ResolveMetadataRelativePath(baseDirectory, logPath);
+            sampleSidecarPath = ResolveMetadataRelativePath(baseDirectory, samplePath);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
+    private static bool IsDiagnosticsSampleCreated(JsonElement root)
+    {
+        if (!root.TryGetProperty("DiagnosticsSampleLog", out var log))
+        {
+            return true;
+        }
+
+        return !log.TryGetProperty("IsCreated", out var isCreated) || isCreated.GetBoolean();
+    }
+
+    private static bool TryGetString(JsonElement element, string propertyName, out string value)
+    {
+        value = "";
+        if (!element.TryGetProperty(propertyName, out var property) || property.ValueKind != JsonValueKind.String)
+        {
+            return false;
+        }
+
+        value = property.GetString() ?? "";
+        return true;
+    }
+
+    private static string ResolveCaptureDirectory(JsonElement root, string metadataPath)
+    {
+        var metadataDirectory = Path.GetDirectoryName(metadataPath)
+            ?? throw new InvalidDataException("Capture metadata path must have a parent directory.");
+        if (!TryGetString(root, "SessionFolder", out var sessionFolder) ||
+            string.IsNullOrWhiteSpace(sessionFolder))
+        {
+            return metadataDirectory;
+        }
+
+        return string.Equals(Path.GetFileName(metadataDirectory), sessionFolder, StringComparison.Ordinal)
+            ? Path.GetDirectoryName(metadataDirectory) ?? metadataDirectory
+            : metadataDirectory;
+    }
+
+    private static string ResolveMetadataRelativePath(string baseDirectory, string path)
+    {
+        return Path.GetFullPath(Path.IsPathRooted(path)
+            ? path
+            : Path.Combine(baseDirectory, path));
     }
 
     private static string TrimBracketedValue(string value)

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 
@@ -109,6 +110,77 @@ public class TrackerDiagnosticsLogReaderTests
         }
     }
 
+    /// <summary>
+    /// 何を確認しているか: tracker diagnostics log 本体が未作成でも、capture metadata と diagnostics sample sidecar から表示対象として列挙できること。
+    /// </summary>
+    [Fact]
+    public void ListFiles_IncludesMetadataBackedDiagnosticsSampleSession()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-diagnostics-sample-{Guid.NewGuid():N}");
+        var sessionFolder = "ssl-vision-packets-sample";
+        var sessionDirectory = Path.Combine(captureDirectory, sessionFolder);
+        Directory.CreateDirectory(sessionDirectory);
+        var metadataPath = Path.Combine(sessionDirectory, "ssl-vision-packets-sample.metadata.json");
+        var diagnosticsPath = Path.Combine(sessionDirectory, "ssl-vision-packets-sample.tracker-diagnostics.log");
+        var samplePath = Path.Combine(sessionDirectory, "diagnostics-samples.jsonl");
+
+        try
+        {
+            File.WriteAllText(
+                samplePath,
+                JsonSerializer.Serialize(new
+                {
+                    schemaVersion = 1,
+                    sampleIndex = 0,
+                    sampleReceivedAt = "2026-05-14T13:13:39.5385693+00:00",
+                    sampleKind = "diagnostics-sample",
+                    rawFrameNumber = 2100,
+                    rawCameraId = 1,
+                    worldFrameCommitted = true,
+                    renderFrameNumber = 1200,
+                    trackedFrameNumber = 1200,
+                    trackedFrameTimestampNs = 1200000,
+                    rawSemanticSummary = CreateSummary("Vision Input", "vision-input", 2100, ballX: 100),
+                    trackedSemanticSummary = CreateSummary("ibis", "own", 1200, ballX: 200),
+                }));
+            File.WriteAllText(
+                metadataPath,
+                JsonSerializer.Serialize(new
+                {
+                    SessionFolder = sessionFolder,
+                    DiagnosticsLogPath = Path.Combine(sessionFolder, Path.GetFileName(diagnosticsPath)),
+                    DiagnosticsSampleSidecarPath = Path.Combine(sessionFolder, Path.GetFileName(samplePath)),
+                    DiagnosticsSampleLog = new
+                    {
+                        Format = "jsonl",
+                        IsCreated = true,
+                        RecordCount = 1,
+                    },
+                }));
+            var reader = CreateReader(captureDirectory, configuredPath: null);
+
+            var files = reader.ListFiles();
+            var snapshot = reader.ReadFile(diagnosticsPath);
+
+            Assert.Contains(files, file => file.FullPath == diagnosticsPath);
+            Assert.Null(snapshot.Error);
+            var entry = Assert.Single(snapshot.Entries);
+            Assert.Equal("2100", entry.RawFrame);
+            Assert.Equal("1", entry.RawCamera);
+            Assert.Equal("1200", entry.TrackedFrame);
+            Assert.Equal(1, entry.RawBallCount);
+            Assert.Equal(1, entry.TrackedBallCount);
+            Assert.Contains("#0:x=200", entry.TrackedBallDetails);
+        }
+        finally
+        {
+            if (Directory.Exists(captureDirectory))
+            {
+                Directory.Delete(captureDirectory, recursive: true);
+            }
+        }
+    }
+
     private static TrackerDiagnosticsLogReader CreateReader(string captureDirectory, string? configuredPath)
     {
         return new TrackerDiagnosticsLogReader(
@@ -123,5 +195,43 @@ public class TrackerDiagnosticsLogReaderTests
             {
                 FilePath = configuredPath,
             });
+    }
+
+    private static object CreateSummary(string sourceLabel, string sourceRole, uint frameNumber, int ballX)
+    {
+        return new
+        {
+            ballCount = 1,
+            robotCount = 1,
+            trackedFrameNumber = frameNumber,
+            trackedFrameTimestampNs = frameNumber * 1000L,
+            sourceUuid = sourceLabel,
+            sourceName = sourceLabel,
+            sourceRole,
+            sourceLabel,
+            balls = new[]
+            {
+                new
+                {
+                    index = 0,
+                    xMm = ballX,
+                    yMm = 200,
+                    zMm = 0,
+                    visibility = 1.0f,
+                },
+            },
+            robots = new[]
+            {
+                new
+                {
+                    team = "Yellow",
+                    robotId = 3,
+                    xMm = 1200,
+                    yMm = -300,
+                    orientationRad = 0.1f,
+                    visibility = 1.0f,
+                },
+            },
+        };
     }
 }
