@@ -91,6 +91,7 @@ public class VisionLiveComparisonViewStateTests
         AssertProperty(layerType, "Status", layerStatusType);
         AssertProperty(layerType, "IsVisible", typeof(bool));
         AssertProperty(layerType, "IsSameSourceCollapsed", typeof(bool));
+        AssertProperty(layerType, "AccentColor", typeof(string));
         AssertProperty(layerType, "SourceLabel", typeof(string));
         AssertProperty(layerType, "MissingReason", typeof(string));
         AssertProperty(layerType, "SourceReceivedAt", typeof(DateTimeOffset?));
@@ -119,6 +120,7 @@ public class VisionLiveComparisonViewStateTests
         AssertProperty(legendItemType, "Status", typeof(string));
         AssertProperty(legendItemType, "IsVisible", typeof(bool));
         AssertProperty(legendItemType, "IsSameSourceCollapsed", typeof(bool));
+        AssertProperty(legendItemType, "AccentColor", typeof(string));
         AssertProperty(legendItemType, "MissingReason", typeof(string));
 
         var detailsType = RequiredVisionType("VisionLiveComparisonLayerDetails");
@@ -273,6 +275,75 @@ public class VisionLiveComparisonViewStateTests
         Assert.Equal("Raw Aggregate", GetValue(layer, "SourceLabel"));
         Assert.Equal("", GetValue(layer, "MissingReason"));
         Assert.Equal(3001L, GetValue(layer, "RenderTickId"));
+        Assert.Equal("#68d8ff", GetValue(layer, "AccentColor"));
+        Assert.Equal("#68d8ff", GetValue(GetValue(layer, "Legend")!, "AccentColor"));
+    }
+
+    /// <summary>
+    /// overlay は diagnostics と同じ考え方で Layer A/B の marker と legend swatch 用 accent color を view-state に渡す。
+    /// </summary>
+    [Fact]
+    public void VisionLiveComparisonViewState_CreateOverlayLayers_CarriesDiagnosticsAccentColors()
+    {
+        var contract = CreateLayerContract();
+        var rawAggregate = CreateSourceOption(
+            contract.SourceOptionType,
+            contract.SourceKindType,
+            kindName: "RawAggregate",
+            key: "raw:aggregate",
+            label: "Raw Aggregate",
+            cameraId: null,
+            isAvailable: true,
+            missingReason: "");
+        var tracked = CreateSourceOption(
+            contract.SourceOptionType,
+            contract.SourceKindType,
+            kindName: "Tracked",
+            key: "tracked:ibis",
+            label: "Tracked",
+            cameraId: null,
+            isAvailable: true,
+            missingReason: "");
+        var rawCameraMissing = CreateSourceOption(
+            contract.SourceOptionType,
+            contract.SourceKindType,
+            kindName: "RawCamera",
+            key: "raw:camera:2",
+            label: "Raw Camera 2",
+            cameraId: 2,
+            isAvailable: false,
+            missingReason: "No raw camera 2 snapshot in current render tick.");
+        var viewState = CreateViewState(
+            contract,
+            modeName: "Overlay",
+            sourceOptions: [rawAggregate, tracked],
+            layerASource: rawAggregate,
+            layerAVisible: true,
+            layerBSource: tracked,
+            layerBVisible: true);
+
+        var layers = InvokeLayerMethod(viewState, "CreateOverlayLayers");
+        var layerA = Assert.Single(layers, layer => Equals("Layer A", GetValue(layer, "LayerName")));
+        var layerB = Assert.Single(layers, layer => Equals("Layer B", GetValue(layer, "LayerName")));
+
+        Assert.Equal("#68d8ff", GetValue(layerA, "AccentColor"));
+        Assert.Equal("#68d8ff", GetValue(GetValue(layerA, "Legend")!, "AccentColor"));
+        Assert.Equal("#ff7ad9", GetValue(layerB, "AccentColor"));
+        Assert.Equal("#ff7ad9", GetValue(GetValue(layerB, "Legend")!, "AccentColor"));
+
+        var missingViewState = CreateViewState(
+            contract,
+            modeName: "Overlay",
+            sourceOptions: [rawAggregate, rawCameraMissing],
+            layerASource: rawAggregate,
+            layerAVisible: true,
+            layerBSource: rawCameraMissing,
+            layerBVisible: true);
+        var missingLayers = InvokeLayerMethod(missingViewState, "CreateOverlayLayers");
+        var missingLayer = Assert.Single(missingLayers, layer => Equals("Layer B", GetValue(layer, "LayerName")));
+        Assert.Equal("Missing", GetValue(missingLayer, "Status")!.ToString());
+        Assert.Equal("#ff7ad9", GetValue(missingLayer, "AccentColor"));
+        Assert.Equal("#ff7ad9", GetValue(GetValue(missingLayer, "Legend")!, "AccentColor"));
     }
 
     /// <summary>

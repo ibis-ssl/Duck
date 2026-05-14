@@ -246,12 +246,24 @@
 }
 
 .vision-comparison-overlay-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     border: 1px solid #406b43;
     border-radius: 999px;
     padding: 0.22rem 0.5rem;
     color: #f3f8ef;
     background: #17301d;
     font-size: 0.72rem;
+}
+
+.vision-comparison-overlay-legend__swatch,
+.vision-comparison-details__swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    flex: 0 0 auto;
 }
 
 .vision-comparison-overlay-legend__item.is-muted {
@@ -283,7 +295,7 @@
 
 .vision-comparison-details li {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto auto 1fr auto;
     gap: 0.45rem;
     align-items: center;
     color: #b6c9b1;

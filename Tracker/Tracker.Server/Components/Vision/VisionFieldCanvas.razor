@@ -69,7 +69,7 @@
 
                 @foreach (var ball in Balls)
                 {
-                    <VisionBallMarker Projection="projection" Ball="ball" />
+                    <VisionBallMarker Projection="projection" Ball="ball" Style="@BallMarkerStyle" />
                 }
 
                 @foreach (var robot in RobotsYellow)
@@ -77,7 +77,8 @@
                     <VisionRobotMarker Projection="projection"
                                        Robot="robot"
                                        ClassName="robot-yellow"
-                                       RenderOptions="RenderOptions" />
+                                       RenderOptions="RenderOptions"
+                                       MarkerStroke="@ResolvedMarkerStroke" />
                 }
 
                 @foreach (var robot in RobotsBlue)
@@ -85,7 +86,8 @@
                     <VisionRobotMarker Projection="projection"
                                        Robot="robot"
                                        ClassName="robot-blue"
-                                       RenderOptions="RenderOptions" />
+                                       RenderOptions="RenderOptions"
+                                       MarkerStroke="@ResolvedMarkerStroke" />
                 }
             </g>
         </svg>
@@ -108,6 +110,9 @@
     [Parameter]
     public VisionRenderOptions RenderOptions { get; set; } = VisionRenderOptions.Default;
 
+    [Parameter]
+    public string? MarkerStroke { get; set; }
+
     private ElementReference canvasElement;
     private double zoom = 1;
     private double translationX;
@@ -120,6 +125,12 @@
     private IJSObjectReference? module;
     private CursorOverlayState? cursorOverlay;
     private SvgPoint? mouseDownPoint;
+
+    private string ResolvedMarkerStroke => MarkerStroke ?? VisionPalette.MarkerStroke;
+
+    private string? BallMarkerStyle => MarkerStroke is null
+        ? null
+        : $"stroke:{MarkerStroke};stroke-width:2.8;opacity:0.92";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -221,6 +221,7 @@ split / overlay の UI 挙動は diagnostics に寄せる。
 - details は source ごとの summary、timestamp metadata、missing reason、raw/tracked/3rd party の違いを確認できる構成にする
 - legend は diagnostics と同じく layer name、source label、visibility toggle、ready / missing state を表示する
 - layer visibility は Layer A/B ごとに切り替えられる
+- overlay mode では diagnostics overlay と同じく Layer A/B を別の accent color[^accent-color] で表示し、field marker と legend swatch の両方で layer を識別できるようにする
 - Layer A/B が同じ source を選んだ場合は same-source[^same-source] として 1 layer 表示にまとめ、重複描画で誤差があるように見せない
 - 片方の layer が missing でも、ready な layer は残して表示する
 - missing layer は field 全体を空にせず、legend / details に missing reason を出す
@@ -286,6 +287,7 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - diagnostics frame timeline の可変幅は、最小値・最大値・drag delta の clamp を単体テストで確認する
 - diagnostics timeline playback は、次 index 計算、最後での停止と先頭復帰、通常再生と早送り step、timestamp 差分に基づく実速度 interval を単体テストで確認する
 - Vision split / overlay contract は、source 候補、split / overlay mode、Layer A/B source selection、layer visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend / details を単体テストで先に固定する
+- Vision overlay color contract は、Layer A/B の field marker と legend が diagnostics と同じ考え方の別 accent color を持ち、same-source collapse 時は 1 layer の色へまとまることを単体テストで先に固定する
 - Vision live comparison contract は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の latest immutable snapshot を固定し、後続 store 更新で描画中 snapshot が変化しないことを単体テストで先に固定する
 - 3rd party tracker live source contract は、`MultiTrackerManager<TrackerPacketAdapter>` の mutable state を UI が直接読まず、immutable snapshot store / composer を通して source option と field DTO を作ることを単体テストで先に固定する
 - diagnostics time-sync regression は、selected `ReplayTimelineIndex` に対象 3rd party source の alignment record が無い場合でも、selected replay timeline tick 自体は動かさず、同じ source の selected tick 以前の `latest-before snapshot` を Field source と comparison に使い、matching rule、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を表示することを単体テストで先に固定する
@@ -318,6 +320,7 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^geometry-reference]: geometry reference: field 描画に使う geometry 参照。overlay では raw geometry を優先し、無い場合だけ `Tracked` の geometry へ fallback するため、source 同士の座標比較の基準を示す。
 [^source-label]: source label: legend や details に出す source 名。ユーザーが Layer A/B でどの raw / tracked / 3rd party tracker を選んでいるか確認するために使う。
 [^live-store]: live store: 通常 Vision 画面の現在表示を更新するための store。CaptureOn session 保存用の `TrackerPacketSnapshotLogWriter` や sidecar writer はこの役割に使わない。
+[^accent-color]: accent color: Layer A/B を見分けるために marker の stroke や legend swatch に使う強調色。Issue #10 の Vision overlay では diagnostics overlay と同じ考え方で、重なった layer を色で判別できるようにする。
 [^same-source]: same-source: Layer A/B が同じ source を選んだ状態。Vision overlay では重複描画で誤差があるように見せないため、1 layer 表示にまとめる。
 [^multi-tracker-manager]: MultiTrackerManager / TrackerPacketAdapter: `MultiTrackerManager` は `TrackerConnectionLib` の tracker state 管理コンポーネントで、own / external / unknown tracker の latest state を保持する。`TrackerPacketAdapter` は 3rd party tracker packet を `MultiTrackerManager` で扱うための adapter。
 [^selected-replay-timeline-tick]: selected replay timeline tick: diagnostics replay でユーザーが現在選択している再生タイムライン上の基準 tick。Vision/Input、ibis tracker、3rd party tracker を比較するとき、この tick は source ごとへ移動させない。

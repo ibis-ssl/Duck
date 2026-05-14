@@ -169,7 +169,8 @@
                                         <VisionFieldCanvas Geometry="layer.Field.Geometry"
                                                            Balls="layer.Field.Balls"
                                                            RobotsYellow="layer.Field.RobotsYellow"
-                                                           RobotsBlue="layer.Field.RobotsBlue" />
+                                                           RobotsBlue="layer.Field.RobotsBlue"
+                                                           MarkerStroke="@layer.AccentColor" />
                                     </div>
                                 }
                             }
@@ -182,6 +183,8 @@
                             @foreach (var layer in ComparisonLayers)
                             {
                                 <span class="@ComparisonOverlayLegendClass(layer)">
+                                    <span class="vision-comparison-overlay-legend__swatch"
+                                          style="background:@layer.AccentColor"></span>
                                     @layer.LayerName: @layer.SourceLabel
                                 </span>
                             }
@@ -221,6 +224,8 @@
                     @foreach (var legend in comparisonViewState.LegendItems)
                     {
                         <li>
+                            <span class="vision-comparison-details__swatch"
+                                  style="background:@legend.AccentColor"></span>
                             <span>@legend.LayerName</span>
                             <strong>@legend.SourceLabel</strong>
                             <small>@legend.Status</small>

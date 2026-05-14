@@ -188,6 +188,7 @@ public sealed record VisionLiveComparisonLegendItem(
     string Status,
     bool IsVisible,
     bool IsSameSourceCollapsed,
+    string AccentColor,
     string MissingReason);
 
 /// <summary>
@@ -210,6 +211,7 @@ public sealed record VisionLiveComparisonLayer(
     VisionLiveComparisonLayerStatus Status,
     bool IsVisible,
     bool IsSameSourceCollapsed,
+    string AccentColor,
     string SourceLabel,
     string MissingReason,
     DateTimeOffset? SourceReceivedAt,
@@ -228,15 +230,18 @@ public sealed record VisionLiveComparisonViewState(
     VisionLiveComparisonLayerSelection LayerASelection,
     VisionLiveComparisonLayerSelection LayerBSelection)
 {
+    private const string LayerAAccentColor = "#68d8ff";
+    private const string LayerBAccentColor = "#ff7ad9";
+
     /// <summary>
     /// Layer A の現在状態。
     /// </summary>
-    public VisionLiveComparisonLayer LayerA => CreateLayer("Layer A", LayerASelection, isSameSourceCollapsed: false);
+    public VisionLiveComparisonLayer LayerA => CreateLayer("Layer A", LayerASelection, isSameSourceCollapsed: false, LayerAAccentColor);
 
     /// <summary>
     /// Layer B の現在状態。
     /// </summary>
-    public VisionLiveComparisonLayer LayerB => CreateLayer("Layer B", LayerBSelection, isSameSourceCollapsed: false);
+    public VisionLiveComparisonLayer LayerB => CreateLayer("Layer B", LayerBSelection, isSameSourceCollapsed: false, LayerBAccentColor);
 
     /// <summary>
     /// legend に表示する layer item。
@@ -278,7 +283,7 @@ public sealed record VisionLiveComparisonViewState(
             {
                 IsVisible = LayerASelection.IsVisible || LayerBSelection.IsVisible,
             };
-            return [CreateLayer("Layer A/B", mergedSelection, isSameSourceCollapsed: true)];
+            return [CreateLayer("Layer A/B", mergedSelection, isSameSourceCollapsed: true, LayerAAccentColor)];
         }
 
         return CreateSplitLayers();
@@ -287,7 +292,8 @@ public sealed record VisionLiveComparisonViewState(
     private VisionLiveComparisonLayer CreateLayer(
         string layerName,
         VisionLiveComparisonLayerSelection selection,
-        bool isSameSourceCollapsed)
+        bool isSameSourceCollapsed,
+        string accentColor)
     {
         var source = selection.Source;
         var sourceSnapshot = ResolveSourceSnapshot(source);
@@ -308,6 +314,7 @@ public sealed record VisionLiveComparisonViewState(
             status.ToString(),
             selection.IsVisible,
             isSameSourceCollapsed,
+            accentColor,
             missingReason);
         var details = new VisionLiveComparisonLayerDetails(
             source.Label,
@@ -323,6 +330,7 @@ public sealed record VisionLiveComparisonViewState(
             status,
             selection.IsVisible,
             isSameSourceCollapsed,
+            accentColor,
             source.Label,
             missingReason,
             sourceSnapshot.ReceivedAt,
