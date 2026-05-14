@@ -15,6 +15,7 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
     /// 現在の render snapshot と左右 Field source selector から overlay 描画 model を作る。
     /// </summary>
     public static DiagnosticsFieldOverlayRenderModel Create(
+        SSL_GeometryData? geometry,
         TrackerRenderSnapshotView? selectedRenderSnapshot,
         TrackedVisionViewState trackedRenderView,
         TrackerDiagnosticsComparisonViewState comparisonViewState,
@@ -22,9 +23,6 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
         TrackerDiagnosticsFieldSourceFrame? layerAFrame,
         TrackerDiagnosticsFieldSourceFrame? layerBFrame)
     {
-        var geometry = selectedRenderSnapshot is null
-            ? null
-            : DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
         var layers = layerSources
             .Select(layer => CreateLayer(
                 selectedRenderSnapshot,
@@ -36,7 +34,7 @@ internal static class DiagnosticsFieldOverlayRenderModelFactory
 
         return new DiagnosticsFieldOverlayRenderModel(
             geometry,
-            geometry is null ? "Render snapshot geometry was not found." : null,
+            geometry is null ? "Raw SSL-Vision geometry was not found." : null,
             layers);
     }
 

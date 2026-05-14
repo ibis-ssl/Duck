@@ -95,6 +95,7 @@ public class DiagnosticsFieldViewFactoryTests
                 ]));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
+            DiagnosticsFieldViewFactory.CreateGeometry(renderSnapshot.Frame.GeometrySnapshot),
             renderSnapshot,
             trackedRenderView,
             comparisonViewState,
@@ -125,7 +126,7 @@ public class DiagnosticsFieldViewFactoryTests
     }
 
     /// <summary>
-    /// render snapshot geometry がない overlay は sidecar 由来 geometry を復元せず、geometry なし empty state を返すことを確認する。
+    /// raw geometry が渡されない overlay は geometry なし empty state を返すことを確認する。
     /// </summary>
     [Fact]
     public void CreateOverlayRenderModel_WhenRenderSnapshotHasNoGeometry_ReturnsGeometryEmptyState()
@@ -139,6 +140,7 @@ public class DiagnosticsFieldViewFactoryTests
             PublishFailureCount: 0));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
+            geometry: null,
             renderSnapshot,
             trackedRenderView,
             CreateComparisonViewState(),
@@ -153,7 +155,7 @@ public class DiagnosticsFieldViewFactoryTests
             layerBFrame: null);
 
         Assert.Null(model.Geometry);
-        Assert.Equal("Render snapshot geometry was not found.", model.EmptyState);
+        Assert.Equal("Raw SSL-Vision geometry was not found.", model.EmptyState);
         Assert.Single(model.Layers);
     }
 
@@ -172,6 +174,7 @@ public class DiagnosticsFieldViewFactoryTests
             PublishFailureCount: 0));
 
         var model = DiagnosticsFieldOverlayRenderModelFactory.Create(
+            DiagnosticsFieldViewFactory.CreateGeometry(renderSnapshot.Frame.GeometrySnapshot),
             renderSnapshot,
             trackedRenderView,
             CreateComparisonViewState(),

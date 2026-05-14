@@ -25,6 +25,8 @@ public partial class Diagnostics : IDisposable
     private string? renderSnapshotError;
     private DiagnosticsProfileMetadataIndex profileMetadataIndex =
         DiagnosticsProfileMetadataIndex.Empty;
+    private DiagnosticsRawGeometryIndex rawGeometryIndex =
+        DiagnosticsRawGeometryIndex.Empty;
     private DiagnosticsProfileMetadataView? profileMetadata;
     private string? profileMetadataError;
     private bool isProfileSettingsModalOpen;
@@ -127,6 +129,7 @@ public partial class Diagnostics : IDisposable
             renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
             renderSnapshotError = null;
             profileMetadataIndex = DiagnosticsProfileMetadataIndex.Empty;
+            rawGeometryIndex = DiagnosticsRawGeometryIndex.Empty;
             profileMetadata = null;
             profileMetadataError = null;
             SyncComparisonState();
@@ -139,6 +142,7 @@ public partial class Diagnostics : IDisposable
         selectedEntry = entries.FirstOrDefault();
         selectedReplayTimelineTick = null;
         LoadProfileMetadataIndex();
+        LoadRawGeometryIndex();
         UpdateProfileMetadataForSelectedEntry();
         LoadRenderSnapshotIndex();
         LoadReplayTimelineIndex();
@@ -543,6 +547,7 @@ public partial class Diagnostics : IDisposable
             ];
 
         return DiagnosticsFieldOverlayRenderModelFactory.Create(
+            ResolveSelectedGeometry(),
             selectedRenderSnapshot,
             trackedRenderView,
             ComparisonViewState,
@@ -555,9 +560,7 @@ public partial class Diagnostics : IDisposable
         TrackerDiagnosticsFieldSource source,
         TrackerDiagnosticsFieldSourceFrame? trackerFrame)
     {
-        var geometry = selectedRenderSnapshot is null
-            ? null
-            : DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot);
+        var geometry = ResolveSelectedGeometry();
         var status = FieldSourceStatusText(trackerFrame);
         return source.Kind switch
         {
@@ -583,6 +586,19 @@ public partial class Diagnostics : IDisposable
                 DiagnosticsFieldViewFactory.CreateTrackerSourceBlueRobots(trackerFrame?.SemanticSummary),
                 FieldSourceStatusText(trackerFrame)),
         };
+    }
+
+    private SSL_GeometryData? ResolveSelectedGeometry()
+    {
+        return rawGeometryIndex.Select(SelectedGeometryTimestamp())
+            ?? (selectedRenderSnapshot is null
+                ? null
+                : DiagnosticsFieldViewFactory.CreateGeometry(selectedRenderSnapshot.Frame.GeometrySnapshot));
+    }
+
+    private DateTimeOffset? SelectedGeometryTimestamp()
+    {
+        return selectedReplayTimelineTick?.ReceivedAt ?? selectedEntry?.Timestamp;
     }
 
     private string FieldSourceLabel(TrackerDiagnosticsFieldSource source)
@@ -915,6 +931,12 @@ public partial class Diagnostics : IDisposable
         profileMetadataIndex = DiagnosticsProfileMetadataLoader.Load(selectedLogPath);
         profileMetadata = null;
         profileMetadataError = profileMetadataIndex.Error;
+    }
+
+    // Diagnostics Field の線は固定寸法ではなく、capture session 内の raw SSL-Vision geometry packet から復元する。
+    private void LoadRawGeometryIndex()
+    {
+        rawGeometryIndex = DiagnosticsRawGeometryLoader.Load(selectedLogPath);
     }
 
     // 選択 entry の profile 名に合わせて modal 用 metadata を作り直し、metadata 不整合時は modal を閉じる。
