@@ -4,25 +4,26 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 
 ## Current Task
 
-- ID: RAW-VISION-014
-- Title: Vision split / overlay と diagnostics time sync の TDD contract を追加する
-- Phase: verification
+- ID: RAW-VISION-015
+- Title: Vision split / overlay UI と live source snapshot 接続を実装する
+- Phase: implementation
 - Status: in-progress
-- Size: small
-- Dependencies: RAW-VISION-013 complete.
+- Size: medium
+- Dependencies: RAW-VISION-014 complete.
 - Exit Criteria:
-  - split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details の期待挙動を単体テストで先に固定する。
-  - selected replay timeline tick に対象 3rd party source の alignment record が無い場合、selected replay timeline tick / selected time 自体は source ごとに動かさず、同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較に使う regression test を追加する。
-  - latest-before regression は matching rule、source `receivedAt`、selected tick との差分 delta、stale/latest-before 状態を確認する。
-  - selected tick 以前に同じ source の snapshot が一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、future/later snapshot へ fallback せず ready layer を残すことも固定する。
-  - 少なくとも 1 件の failing test を確認し、TDD report を `reports/` に残し、PR #15 へ push する。
+  - Vision 画面で左右分割と overlay mode を切り替えられ、Layer A/B source と visibility を diagnostics に近い UI で操作できる。
+  - Raw / Tracked / 3rd party tracker の同一 UI render tick immutable snapshot を field に描画し、既存 raw/tracked 単体表示を壊さない。
+  - 3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から immutable snapshot store / composer を通して接続する。
+  - geometry は raw geometry 優先、raw geometry が無い場合のみ tracked fallback、3rd party tracker packet から復元しない。
+  - diagnostics は selected replay timeline tick / selected time を固定したまま、対象 source alignment がない場合に同じ source の selected tick 以前の `latest-before snapshot` を直前 sample hold として表示/比較し、future/later snapshot へ fallback しない。
+  - RAW-VISION-014 で追加した focused contract tests を pass させ、実装 evidence と review report を `reports/` に残し、PR #15 へ push する。
 
 ## Issue #10 固定残タスク
 
 - 固定一覧は `RAW-VISION-013`、`RAW-VISION-014`、`RAW-VISION-015`、`RAW-VISION-016` とする。Issue #10 の tracking では補助番号を使わない。
 - `RAW-VISION-013`: Vision split / overlay の source 候補、同時取得方針、diagnostics replay の時間同期監査、geometry 基準、diagnostics 寄せ UI、固有名詞説明を設計へ固定した。調査 report、設計 report / r2、gpt-5.5 high review は完了済みで blocking findings なし。
-- `RAW-VISION-014`: Vision split / overlay の view-state、layout、source selection、overlay layer contract と diagnostics latest-before fallback contract を TDD で固定する。現在実行中。
-- `RAW-VISION-015`: Vision split / overlay UI、live source snapshot 接続、diagnostics selected tick missing 時の latest-before 表示/比較を実装する。
+- `RAW-VISION-014`: Vision split / overlay の view-state、layout、source selection、overlay layer contract、geometry contract と diagnostics latest-before fallback contract を TDD Red として固定した。gpt-5.5 high review r4 は blocking findings なし。
+- `RAW-VISION-015`: Vision split / overlay UI、live source snapshot 接続、diagnostics selected tick missing 時の latest-before 表示/比較を実装する。現在実行中。
 - `RAW-VISION-016`: README / manual evidence、最終検証、review、PR #15 ready 化を完了する。
 
 ## 完了した追加タスク
@@ -55,6 +56,20 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
   - `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes。実装・検証は `reports/raw-vision-011-evidence-20260512001259.md`、review は `reports/raw-vision-011-review-20260512001259.md` に記録済み。
 
 ## 直近完了タスク
+
+- ID: RAW-VISION-014
+- Title: Vision split / overlay と diagnostics time sync の TDD contract を追加する
+- Phase: verification
+- Status: complete
+- Size: small
+- Dependencies: RAW-VISION-013 complete.
+- Exit Criteria:
+  - split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details の期待挙動を単体テストで固定した。
+  - selected replay timeline tick に対象 3rd party source の alignment record が無い場合、selected replay timeline tick / selected time 自体は source ごとに動かさず、同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較に使う regression test を追加した。
+  - latest-before regression は matching rule、source `receivedAt`、selected tick との差分 delta、stale/latest-before 状態を確認する。
+  - selected tick 以前に同じ source の snapshot が一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、future/later snapshot へ fallback しないことを固定した。
+  - focused test は TDD Red として 37 件中 26 pass / 11 fail を確認した。fail は Vision live comparison API 未実装 9 件、diagnostics latest-before / future fallback 未実装 2 件。
+  - TDD / fix / review reports は `reports/issue-10-raw-vision-014-tdd-contract-20260514084547.md`、`reports/issue-10-raw-vision-014-tdd-review-20260514085339.md`、`reports/issue-10-raw-vision-014-tdd-fix-20260514085712.md`、`reports/issue-10-raw-vision-014-tdd-review-r2-20260514090315.md`、`reports/issue-10-raw-vision-014-tdd-fix-r2-20260514090645.md`、`reports/issue-10-raw-vision-014-tdd-review-r3-20260514091311.md`、`reports/issue-10-raw-vision-014-tdd-fix-r3-20260514091616.md`、`reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md` に記録済みで、r4 review は blocking findings なし。
 
 - ID: RAW-VISION-013
 - Title: Issue #10 Vision split / overlay の同時取得方針と設計を確定する
@@ -91,6 +106,6 @@ Rule: This file may be updated only through `task-breakdown-planner`, `task-cons
 | RAW-VISION-011 | Tracker.Server 共通 navigation の見た目を viewer UI と揃える | review | complete | RAW-VISION-010 | side navigation / page list を raw vision / diagnostics の濃色 green UI と同じ配色・密度に揃え、active / hover / collapsed / mobile toggle の既存操作を維持する。`dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-011-evidence-20260512001259.md`、review は `reports/raw-vision-011-review-20260512001259.md` に記録済み。 |
 | RAW-VISION-012 | Diagnostics timeline に再生・停止・早送り controls を追加する | review | complete | RAW-VISION-010 | `/diagnostics` の timeline scrubber 付近に再生、停止、早送り controls を追加し、通常再生は log timestamp 差分に合わせて順方向に frame を進める。最後に到達したら停止して先頭 entry に戻る。再生中/早送り中は該当ボタンが停止ボタンへ切り替わり、停止操作は現在選択を維持して止める。log 切替や entry 不在、停止直後の stale tick で state 不整合を起こさず、playback index / interval / stale tick guard テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-012-evidence-20260512002100.md`、review は `reports/raw-vision-012-review-20260512002100.md`、`reports/raw-vision-012-review-r2-20260512002502.md`、`reports/raw-vision-012-review-r3-20260512002923.md`、`reports/raw-vision-012-review-r4-20260512003653.md`、`reports/raw-vision-012-review-r5-20260512004014.md` に記録済み。 |
 | RAW-VISION-013 | Issue #10 Vision split / overlay の同時取得方針と設計を確定する | design | complete | RAW-VISION-012 | Source 候補を `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` として固定した。live 比較は同一 UI render tick immutable snapshot、diagnostics は selected tick 固定 + latest-before hold、geometry は raw 優先 / tracked fallback、UI は diagnostics 寄せとして設計済み。調査・設計・r2・gpt-5.5 high review は `reports/issue-10-vision-overlay-investigation-20260514080106.md`、`reports/issue-10-live-same-tick-investigation-20260514081135.md`、`reports/issue-10-diagnostics-time-sync-audit-20260514081730.md`、`reports/issue-10-vision-overlay-design-20260514082233.md`、`reports/issue-10-vision-overlay-design-r2-20260514082755.md`、`reports/issue-10-raw-vision-013-design-review-20260514083515.md` に記録済みで blocking findings なし。 |
-| RAW-VISION-014 | Vision split / overlay と diagnostics time sync の TDD contract を追加する | verification | in-progress | RAW-VISION-013 | split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details の期待挙動を単体テストで先に固定する。selected replay timeline tick に対象 3rd party source の alignment record が無い場合、selected replay timeline tick / selected time 自体は source ごとに動かさず、同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較に使い、matching rule、source `receivedAt`、selected tick との差分 delta、stale/latest-before 状態を出す regression test も先に追加する。selected tick 以前に同じ source の snapshot が一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、future/later snapshot へ fallback せず ready layer を残すことも固定し、少なくとも 1 件の failing test を確認する。 |
-| RAW-VISION-015 | Vision split / overlay UI と live source snapshot 接続を実装する | implementation | pending | RAW-VISION-014 | Vision 画面で左右分割と overlay mode を切り替えられ、Layer A/B source と visibility を diagnostics に近い UI で操作できる。Raw / Tracked / 3rd party tracker の同一 UI render tick snapshot を field に描画し、既存 raw/tracked 単体表示を壊さない。3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から immutable snapshot store / composer を通して接続し、diagnostics は selected replay timeline tick / selected time を固定したまま、対象 source alignment がない場合に同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較し、future/later snapshot へ fallback しない。 |
+| RAW-VISION-014 | Vision split / overlay と diagnostics time sync の TDD contract を追加する | verification | complete | RAW-VISION-013 | split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details、latest-before hold、source `receivedAt` / delta / stale metadata、future fallback 禁止を TDD Red として固定した。focused test は 37 件中 26 pass / 11 fail。r4 review は `reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md` に記録済みで blocking findings なし。 |
+| RAW-VISION-015 | Vision split / overlay UI と live source snapshot 接続を実装する | implementation | in-progress | RAW-VISION-014 | Vision 画面で左右分割と overlay mode を切り替えられ、Layer A/B source と visibility を diagnostics に近い UI で操作できる。Raw / Tracked / 3rd party tracker の同一 UI render tick snapshot を field に描画し、既存 raw/tracked 単体表示を壊さない。3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から immutable snapshot store / composer を通して接続し、diagnostics は selected replay timeline tick / selected time を固定したまま、対象 source alignment がない場合に同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較し、future/later snapshot へ fallback しない。RAW-VISION-014 の focused contract tests を pass させる。 |
 | RAW-VISION-016 | Issue #10 の final validation / docs / review / PR ready を完了する | review | pending | RAW-VISION-015 | README/manual evidence、focused/full validation、gpt-5.5 high review、tracking sync、PR #15 本文更新、draft 解除判断材料を揃える。 |
