@@ -4,4 +4,5 @@
   <Project Path="TrackerConnectionLibExample/TrackerConnectionLibExample.csproj" />
   <Project Path="Tracker/Tracker.Core/Tracker.Core.csproj" />
   <Project Path="Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj" />
+  <Project Path="Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj" />
 </Solution>

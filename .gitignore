@@ -484,6 +484,7 @@ $RECYCLE.BIN/
 # codex
 .agents
 AGENTS.md
+.serena/
 .codex-dotnet-home/
 .codex-nuget-packages/
 

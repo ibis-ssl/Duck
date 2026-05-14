@@ -4,15 +4,15 @@
 
 ## 現在のタスク
 
-- ID: RUNTIME-HOST-008
-- Title: `Tracker.RuntimeHost` headless project scaffold と configuration を追加する
+- ID: RUNTIME-HOST-009
+- Title: RuntimeHost tracker operation loop と official packet publish normal path を実装する
 - Phase: implementation
-- Status: pending
+- Status: in-progress
 - Size: large
-- Dependencies: RUNTIME-HOST-005.
+- Dependencies: RUNTIME-HOST-007, RUNTIME-HOST-008.
 - Exit Criteria:
-  - Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加する。
-  - `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする。
+  - RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新する。
+  - official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を成立させる。
   - focused tests / build、task 専用 review、commit、Draft PR #17 update が揃う。
 
 ## 完了済みタスク
@@ -82,6 +82,16 @@
     - `reports/runtime-host-007-review-r3-20260514191820.md`
     - `reports/runtime-host-007-review-r4-20260514192425.md`
     - 初回 review の blocking 2 件を修正し、r2 / r3 / r4 で no findings を確認した。
+- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` headless project scaffold と configuration を追加した。`Tracker.RuntimeHost` project、Program、options / DI bootstrap、solution entry を追加し、Web UI / diagnostics replay / capture viewer を持たない headless host として起動できる scaffold を作った。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は host start validation error になる contract を追加した。
+  - Implementation Evidence:
+    - `reports/runtime-host-008-implementation-20260514192917.md`
+    - adjusted R008 focused は 7 passed。broad focused は 23 passed / 1 failed で、失敗は R008 範囲外の既存 DebugHost loop ownership assertion として review で確認した。
+    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は sub-agent report で成功を確認した。
+  - Review Evidence:
+    - `reports/runtime-host-008-review-20260514193633.md`
+    - `reports/runtime-host-008-review-fix-20260514194021.md`
+    - `reports/runtime-host-008-review-r2-20260514194042.md`
+    - 初回 review の XML summary blocker を修正し、r2 で no findings を確認した。
 
 ## 固定残タスク
 
@@ -116,7 +126,7 @@
 | RUNTIME-HOST-005 | tracker operation loop の共有 runtime boundary を抽出する | implementation | complete; draft PR #17 | RUNTIME-HOST-004 | `Tracker.Core/Runtime` に UI 非依存 shared operation loop、publisher、latest snapshot store を抽出し、DebugHost を Core coordinator 呼び出し adapter に寄せた。focused tests / build / review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-006 | DebugHost live display を read-side snapshot 境界へ寄せる | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により DebugHost live display が UI render tick ごとに latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しないことを focused tests / build / review で確認した。 |
 | RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | complete; draft PR #17 | RUNTIME-HOST-003, RUNTIME-HOST-006 | UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って latest raw / tracker snapshot を `diagnostics-samples.jsonl` へ保存し、Diagnostics replay / Field は sample sidecar の bounded lookup と semantic summary を主経路にする。focused / affected tests、build、diff-check は sub-agent report で green。初回 review は blocking 2 件、review-fix 後 r2 は Pass、設定化後 r3 は no findings、RuntimeHost 実行周期設定化要件追加後 r4 は no findings。 |
-| RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | pending | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする contract を focused tests / build / review / commit / Draft PR #17 update 付きで固定する。 |
-| RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | pending | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させる。 |
+| RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする contract を focused tests / build / review / commit / Draft PR #17 update 付きで固定した。 |
+| RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | in-progress | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させる。 |
 | RUNTIME-HOST-010 | RuntimeHost / DebugHost split の focused validation と manual evidence を揃える | review | pending | RUNTIME-HOST-009 | RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残し、review / commit / Draft PR #17 update まで完了する。 |
 | RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | pending | RUNTIME-HOST-010 | gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description を最新化し、PR ready 判断を完了する。 |
