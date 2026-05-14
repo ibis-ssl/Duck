@@ -81,18 +81,18 @@
                                RobotsYellow="selectedView.RobotsYellow"
                                RobotsBlue="selectedView.RobotsBlue" />
 
-            <VisionDetailsPanel ViewLabel="selectedView.Label"
-                                FrameLabel="selectedView.FrameLabel"
-                                CameraLabel="selectedView.CameraLabel"
-                                SourceLabel="selectedView.SourceLabel"
-                                RawJson="selectedView.RawJson"
-                                Cameras="rawSnapshot.Cameras"
+            <VisionDetailsPanel ViewLabel="@selectedView.Label"
+                                FrameLabel="@selectedView.FrameLabel"
+                                CameraLabel="@selectedView.CameraLabel"
+                                SourceLabel="@selectedView.SourceLabel"
+                                RawJson="@selectedView.RawJson"
+                                Cameras="@rawSnapshot.Cameras"
                                 SelectedViewKey="selectedViewKey"
                                 OnSelectView="SelectView"
-                                Geometry="rawSnapshot.Geometry"
-                                Balls="selectedView.Balls"
-                                RobotsYellow="selectedView.RobotsYellow"
-                                RobotsBlue="selectedView.RobotsBlue" />
+                                Geometry="@rawSnapshot.Geometry"
+                                Balls="@selectedView.Balls"
+                                RobotsYellow="@selectedView.RobotsYellow"
+                                RobotsBlue="@selectedView.RobotsBlue" />
         }
         else if (viewerMode == ViewerMode.Tracked)
         {
