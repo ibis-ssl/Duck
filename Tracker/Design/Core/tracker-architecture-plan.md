@@ -2,7 +2,7 @@
 
 ## 目的
 
-`Tracker.Server` を唯一の実行体として維持しつつ、`Tracker.Core` に AutoRef 向けの高品質な追跡エンジンを分離実装する。
+`Tracker.Core` に AutoRef 向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、debug / diagnostics 用 Web UI は `Tracker.DebugHost` として分ける。
 
 初期目標は次の 3 点に置く。
 
@@ -14,7 +14,8 @@
 ## 対象範囲
 
 - `Tracker.Core` に tracker の内部モデル、エンジン契約、proto 変換器を実装する
-- `Tracker.Server` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と official tracker packet を生成できるようにする
+- `Tracker.RuntimeHost` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と official tracker packet を生成できるようにする
+- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、比較表示に専念し、tracker operation loop を描画や logging の周期から切り離す
 - UI は raw viewer に加えて tracked viewer を持ち、button で切り替えられるようにする
 - v1 では primary ball を先頭にしつつ、複数 ball を同時に維持して出力できるようにする
 - v1 では決定性とルール上重要な品質を優先し、過剰な機械学習や非決定的要素は入れない
@@ -23,16 +24,18 @@
 
 - feedback packet や robot telemetry を tracker 入力に使うこと
 - Tigers と完全な挙動一致を取ること
-- 独立した別 executable として tracker daemon を増やすこと
+- AutoRef logic を今回の scope で実装すること
 - 永続化や replay database を v1 で持つこと
 
 ## 基本方針
 
 ### 実行形態
 
-- 実行体は `Tracker.Server` の 1 プロセスのみ
+- 実行体は本番寄りの `Tracker.RuntimeHost` と debug 用の `Tracker.DebugHost` に分ける
 - 追跡アルゴリズム本体は `Tracker.Core` に置く
-- `Tracker.Server` は host / UDP publish / UI / config の責務に限定する
+- `Tracker.RuntimeHost` は tracker operation、UDP publish、将来 AutoRef mode の同一 process 実行を担当する
+- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、comparison、debug config を担当する
+- `Tracker.DebugHost` の Web rendering と diagnostics logging は `Tracker.RuntimeHost` の tracker operation loop を直接駆動しない
 
 ### 品質優先順位
 
@@ -43,7 +46,7 @@
 
 ### 参考実装の扱い
 
-`Tracker/Tracker.Core/Design/Ref/AutoReferee` は構成参考として使う。
+`Tracker/Design/Core/Ref/AutoReferee` は構成参考として使う。
 
 - 採用する
   - raw vision と tracked world の責務分離
@@ -113,12 +116,12 @@ v1 の外部配信は official tracker proto に限定する。
 
 CaptureOn 中に同じ official tracker multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の official packet、3rdparty tracker packet を再生・比較できるように別系統で保存する。
 
-Server / CLI / UI 側の詳細な機能仕様は `tracker-server-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
+DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
 
 責務境界は次の通り。
 
 - `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
-- `Tracker.Server` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
+- `Tracker.DebugHost` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
 - `Tracker.Core` には official tracker packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis tracker の内部状態生成と official packet 生成だけを担当する。
 
 snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。

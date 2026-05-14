@@ -488,4 +488,5 @@ AGENTS.md
 .codex-nuget-packages/
 
 # ref
-Tracker/Tracker.Core/Design/Ref
+Tracker/Tracker.Core/Design/Ref/
+Tracker/Design/Core/Ref/

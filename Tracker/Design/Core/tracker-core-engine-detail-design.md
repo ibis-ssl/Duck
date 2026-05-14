@@ -14,7 +14,7 @@ TRACKER-033 で `Tracker.Core` の巨大ファイルを責務別に分割し、�
 
 対象外:
 
-- Server / CLI / UI 側の詳細設計
+- DebugHost / CLI / UI 側の詳細設計
 - test file の分割設計
 - 追跡アルゴリズム、設定値、proto 出力の仕様変更
 
@@ -328,7 +328,7 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 
 ## TRACKER-033 実行順序
 
-1. 作業前に `Tracker/Tracker.Core/Design/tracker-core-engine-detail-design.md` と `Tracker/Tracker.Core/Design/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。
+1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。
 2. `TrackerExecutionContracts.cs` から公開契約を先に分離する。`ITrackerEngine`、result / event、observer、profile switch request の型名と namespace を変えない。
 3. `TrackerEngine` を `partial sealed class` にして、最上位 `Update` と field を `Engine/TrackerEngine/TrackerEngine.cs` に残す。
 4. detection buffer と frame commit を分離する。ここで `CommittedFrames` と `EmittedEvents` の順序が変わらないことを focused test で確認する。
@@ -337,7 +337,7 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 7. Kalman helper を分離する。`UpdateKalmanAxis` の引数と、predicted state / previous position を使う baseline を変えない。
 8. robot tracking を分離する。same robot id の multi-camera merge、遠方外れ値除去、orientation unwrap の順序を変えない。
 9. contact、kick、ball left field を分離する。event 発火条件、recent contact window、boundary 名を変えない。
-10. settings / runtime override contract を `Configuration` 配下へ分離し、`Tracker.Server`、`Tracker.CaptureReplay`、tests の参照が source file path に依存していないことを確認する。
+10. settings / runtime override contract を `Configuration` 配下へ分離し、`Tracker.RuntimeHost`、`Tracker.DebugHost`、`Tracker.CaptureReplay`、tests の参照が source file path に依存していないことを確認する。
 11. model contract を `Model` 配下へ分離し、public property shape を変えずに日本語 XML コメントを追加する。
 12. `TrackerPacketGenerator` を `Proto` 配下へ移動し、primary ball 先頭化、robot sort、capability 順、単位変換のコメントを追加する。
 13. 全分割後に `TrackerExecutionContracts.cs` と `TrackerModelContracts.cs` が残る場合は、空の compatibility file を残さず削除する。

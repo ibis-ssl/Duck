@@ -1,0 +1,93 @@
+# Tracker.RuntimeHost 設計
+
+## 目的
+
+`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。
+
+## 命名
+
+- `Tracker.RuntimeHost`: tracker operation[^tracker-operation] と将来 AutoRef mode を同一 process で実行する runtime host。
+- `Tracker.DebugHost`: 現 `Tracker.Server` の後継名。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する debug host。
+- `Tracker.Core`: tracker algorithm[^tracker-algorithm]、contract、pure model、runtime host と debug host の共通ロジックを置く。
+
+`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体は tracker 専用の executor ではなく、将来 AutoRef mode も同居する試合時 runtime だからである。
+
+## 責務境界
+
+`Tracker.RuntimeHost` は次を担当する。
+
+- SSL-Vision input の受信または runtime 用 receiver 境界。
+- tracker operation loop の実行。
+- tracker packet publish。
+- 将来 AutoRef mode を同一 process へ入れるための mode 境界。
+- 実時間処理の performance を優先する設定と起動経路。
+
+`Tracker.RuntimeHost` は次を担当しない。
+
+- Web UI rendering。
+- diagnostics replay UI。
+- capture viewer。
+- debug 用 comparison panel。
+- 旧 logging 形式の互換維持。
+
+`Tracker.DebugHost` は次を担当する。
+
+- Web UI と diagnostics 表示。
+- raw vision / tracked / 3rd party tracker の debug visualization。
+- capture / replay / comparison。
+- RuntimeHost または published tracker output の購読と debug 用 sample 保存。
+
+`Tracker.DebugHost` は tracker operation loop を主実行責務として持たない。debug 用に同一 repository の共通部品を使っても、Web rendering や diagnostics logging が RuntimeHost の処理周期を支配しない構造にする。
+
+## AutoRef 方針
+
+AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来 AutoRef mode を同一 process に内包できる名前と責務境界にする。想定 mode は次のように扱う。
+
+- tracker only mode。
+- tracker + AutoRef mode。
+
+AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。
+
+## Loop isolation 方針
+
+tracker operation loop は、Web server live display processing と diagnostics logging / replay processing の両方から切り離す。
+
+- tracker operation loop は tracker state update と publish を最優先する。
+- DebugHost live display は latest immutable snapshot または published output を読む側に回る。
+- diagnostics logging / replay は DebugHost 側の sample loop として扱い、tracker committed frame cadence を保存 cadence として要求しない。
+- 旧 render snapshot sidecar 互換は非要件とし、新規 logging / new capture の performance を優先する。
+
+## 設計資料配置
+
+設計資料は `Tracker/Design/` を canonical root とする。
+
+- `Tracker/Design/Core/`: tracker algorithm / contract / pure logic。
+- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。
+- `Tracker/Design/RuntimeHost/`: RuntimeHost、process 分離、将来 AutoRef mode。
+- `Tracker/Design/Archive/`: 旧 tracking file の保存先。active tracking ではない。
+
+## 非スコープ
+
+- AutoRef logic の実装。
+- Referee program の rule engine 実装。
+- 旧 diagnostics logging 形式の完全互換。
+- `BreakingChanges` の作成。
+
+## テスト方針
+
+- RuntimeHost が Web UI project を参照しないことを project reference / dependency test で固定する。
+- RuntimeHost の tracker operation loop が diagnostics logging / replay API を直接呼ばないことを contract test で固定する。
+- DebugHost が tracker output を読む側であり、tracker operation loop を Web rendering tick から駆動しないことを contract test で固定する。
+- diagnostics sample tick が tracker committed frame cadence に依存しないことを regression test で固定する。
+
+[^tracker-runtime-host]: Tracker.RuntimeHost: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。
+[^autoref-mode]: AutoRef mode: referee program 相当の判定処理を tracker と同一 process で動かす将来 mode。今回の実装対象ではない。
+[^same-process]: same process: tracker と将来 AutoRef logic を process 外通信なしで同じ OS process 内に置く実行形態。
+[^headless-host]: headless host: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。
+[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。
+[^diagnostics-replay]: diagnostics replay: 保存済み sample / log を DebugHost 側で再生し、raw / tracker 出力を比較する debug 機能。
+[^capture-viewer]: capture viewer: 保存済み capture session の内容を確認する debug 表示機能。
+[^tracker-debug-host]: Tracker.DebugHost: 現 `Tracker.Server` の後継名。Web UI、diagnostics、capture / replay、比較表示を担当する debug 用 host。
+[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。
+[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。
+[^tracker-algorithm]: tracker algorithm: raw detection から balls / robots の tracked state を決定的に生成する Core 側の追跡ロジック。

@@ -1,10 +1,10 @@
-# Tracker Server / CLI / UI 保守性改善 設計
+# Tracker DebugHost / CLI / UI 保守性改善 設計
 
 ## 目的
 
-この文書は `TRACKER-034` で実施した `Tracker.Server`、`Tracker.CaptureReplay`、diagnostics UI の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。
+この文書は `TRACKER-034` で実施した旧 `Tracker.Server`、`Tracker.CaptureReplay`、diagnostics UI の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。現行方針では旧 `Tracker.Server` の Web UI / diagnostics 責務を `Tracker.DebugHost` と呼ぶ。
 
-CaptureOn 比較ログの機能仕様は `tracker-server-cli-ui-detail-design.md` に分離し、この文書では扱わない。
+CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` に分離し、この文書では扱わない。
 
 ## 対象範囲
 

@@ -1,17 +1,17 @@
-# Tracker Server / CLI / UI CaptureOn 比較ログ 詳細設計
+# Tracker DebugHost / CLI / UI CaptureOn 比較ログ 詳細設計
 
 ## 目的
 
 `TRACKER-040` 以降では、CaptureOn 中に見えている official `TrackerWrapperPacket` をすべて保存し、capture 後に ibis 出力、ibis 自身の official packet、3rdparty tracker packet を再生・比較できるようにする。
 
-この文書は CaptureOn 比較ログの Server / CLI / UI 側の機能設計を定める。旧 `TRACKER-034` の巨大ファイル分割やコメント追加などの保守性改善は機能仕様に含めない。保守性改善の履歴と運用設計は `tracker-server-cli-ui-maintainability-design.md` と `tracker-history-000-038.md` を参照する。
+この文書は CaptureOn 比較ログの DebugHost / CLI / UI 側の機能設計を定める。旧 `TRACKER-034` の巨大ファイル分割やコメント追加などの保守性改善は機能仕様に含めない。保守性改善の履歴と運用設計は `debug-host-maintainability-design.md` と `../Core/tracker-history-000-038.md` を参照する。
 
 ## 対象範囲
 
-- `Tracker.Server` の CaptureOn session と比較ログの関連付け
+- `Tracker.DebugHost` の CaptureOn session と比較ログの関連付け
 - `TrackerConnectionLib` を使った official tracker packet 傍受
 - CaptureOn session folder 配下へ packet capture、metadata、diagnostics、render snapshot、tracker packet snapshot sidecar JSONL をまとめる保存契約
-- diagnostics log / replay / playback から snapshot sidecar を参照する互換追加
+- diagnostics log / replay / playback から最新 capture / 最新 logging の sidecar を参照し、旧形式は legacy / best-effort 表示に留める入力契約
 - `/diagnostics` または `Tracker.CaptureReplay` で後から 3rdparty tracker snapshot を再生・比較表示するための入力契約
 
 対象外:
@@ -24,11 +24,11 @@
 ## 責務境界
 
 - `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点にする。
-- `Tracker.Server` へ組み込む際は、既存の `UdpTrackerReceiver` / `MultiTrackerManager` / `TrackerPacketAdapter` の責務を優先して使う。CaptureOn lifecycle と session folder に合わせる必要がある場合だけ薄い adapter を置く。
+- `Tracker.DebugHost` へ組み込む際は、既存の `UdpTrackerReceiver` / `MultiTrackerManager` / `TrackerPacketAdapter` の責務を優先して使う。CaptureOn lifecycle と session folder に合わせる必要がある場合だけ薄い adapter を置く。
 - official tracker packet は multicast endpoint から届く前提とし、receiver は設定済み multicast address / port を使って multicast group に参加する。loopback unicast 受信だけでは CaptureOn 比較ログの runtime 正常系証跡として扱わない。
 - live receiver の endpoint は起動時に解決する。`Tracker:Receive:MulticastAddress` / `Port` を明示した場合は receiver 独自 endpoint を監視し、未指定項目は起動時 active profile と `Tracker:RuntimeOverrides:Publish` から解決した ibis publish endpoint へ fallback する。`Tracker:Receive:InterfaceAddress` は従来通り multicast join に使う local interface 指定であり、endpoint fallback とは独立して扱う。
 - runtime profile switch 後に live receiver socket を再構成することは `TRACKER-054` の対象外とする。profile switch 後も receiver は起動時に解決した endpoint を監視し続けるため、運用手順と README では起動時固定であることを明記する。
-- `Tracker.Server` は CaptureOn session と tracker packet snapshot log を紐付ける統合層にする。packet capture 本体、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar を同じ session folder 配下の成果物として扱う。
+- `Tracker.DebugHost` は CaptureOn session と tracker packet snapshot log を紐付ける統合層にする。packet capture 本体、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar を同じ session folder 配下の成果物として扱う。
 - `Tracker.Core` には official tracker packet 傍受、snapshot sidecar 保存、ibis / other tracker の後処理比較を入れない。Core は ibis tracker の internal frame と official packet 生成だけを担当する。
 
 ## 保存形式
@@ -48,11 +48,11 @@ session folder には少なくとも次を配置できるようにする。
 
 metadata には session folder の path と、packet capture 本体、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL などの各 file relative path を記録する。snapshot sidecar や alignment sidecar が未作成または record 0 件の場合も、その状態を metadata で表現できるようにする。
 
-diagnostics log 側は互換追加に留める。
+diagnostics logging / replay の主経路は、metadata から解決する新規 sidecar 群と log open 時に構築する index を使う。既存 `.tracker-diagnostics.log` の破壊的 schema 変更は避けるが、旧 diagnostics log や旧 render snapshot sidecar の完全互換は要件にしない。旧形式を読む場合は legacy / best-effort / degraded 表示に留め、新規 capture / 新規 logging の write cadence、bounded lookup、RuntimeHost / DebugHost 分離、diagnostics sample sidecar の設計を犠牲にしない。
 
-- 既存 key=value 行を読めることを維持する
+- 既存 key=value 行は、旧 session を degraded legacy として開くために必要な範囲だけ best-effort で読む。旧互換のために新規 reader の主経路を旧 log parser へ固定しない
 - metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などを optional field として追加する
-- snapshot sidecar がない既存ログを引き続き読めるようにする
+- snapshot sidecar がない既存ログは、新規 capture の正常系証跡ではなく unsupported / degraded legacy session として扱う。表示できる場合も bounded index と latest sidecar path の設計を迂回する高コスト fallback は追加しない
 
 sidecar JSONL record は、後から 3rdparty tracker frame を再生し、ibis frame と再比較できるよう次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできることを入力契約にする。
 
@@ -117,15 +117,15 @@ CaptureOn 直後、まだ packet capture 本体の session が遅延作成され
 
 他 tracker が存在しない場合、既存 packet capture、diagnostics log、render snapshot の内容上の挙動は変えない。metadata には snapshot sidecar が未作成、または record 0 件である状態を明示できるようにする。
 
-## diagnostics / replay / playback 互換追加
+## diagnostics / replay / playback 最新経路と legacy 表示
 
-diagnostics log reader、`Tracker.CaptureReplay`、diagnostics playback は、metadata の relative path から tracker packet snapshot sidecar を解決し、存在する場合だけ追加情報を読む。既存 capture や既存 diagnostics log では session folder または snapshot sidecar 欠落を正常系として扱う。
+diagnostics log reader、`Tracker.CaptureReplay`、diagnostics playback は、metadata の relative path から tracker packet snapshot sidecar と diagnostics sample sidecar を解決し、新規 capture では latest raw snapshot / latest tracker snapshot を基準に追加情報を読む。既存 capture や既存 diagnostics log で session folder、snapshot sidecar、diagnostics sample sidecar が欠落する場合は、新規経路の正常系ではなく legacy / best-effort / degraded 表示として扱う。
 
 `Tracker.CaptureReplay` は agent / 自動検証 / CLI 調査向けに、3rdparty tracker snapshot と ibis committed frame の保存時 alignment comparison、または既存 capture の明示的な best-effort comparison を `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は diagnostics UI 実装後も削除せず、UI と同じ reader contract の検証経路として維持する。
 
-`/diagnostics` はユーザー向けに同じ comparison を画面上で確認できるようにする。diagnostics playback は選択中の replay timeline tick に合わせて tracker snapshot comparison を更新し、source identity / role / label で表示対象を切り替えられる comparison panel を持つ。新規 capture では保存済み alignment sidecar を基準にし、legacy best-effort の場合だけ render snapshot ではなく ibis own snapshot の `TrackedFrame.timestamp` を比較基準 timestamp とする。
+`/diagnostics` はユーザー向けに同じ comparison を画面上で確認できるようにする。diagnostics playback は選択中の replay timeline tick に合わせて tracker snapshot comparison を更新し、source identity / role / label で表示対象を切り替えられる comparison panel を持つ。新規 capture では保存済み alignment sidecar と diagnostics sample sidecar を基準にし、legacy best-effort の場合だけ render snapshot ではなく ibis own snapshot の `TrackedFrame.timestamp` を比較基準 timestamp とする。legacy best-effort は旧形式の表示救済であり、最新 capture / 最新 logging の性能、bounded lookup、RuntimeHost / DebugHost 分離を弱める要求にはしない。
 
-新規 capture の `/diagnostics` の tracker snapshot comparison と Field source 表示は、metadata から解決した `tracker-snapshot-alignment.jsonl` を優先する。alignment sidecar が ready の場合、selected replay timeline tick と Field source key から保存済み tracker snapshot record index を引き、matching rule を `saved-session-alignment` として表示する。alignment sidecar がない、metadata に path がない、または壊れている capture では、既存 diagnostics log / render snapshot 表示を壊さず、external/source label の Field source は `unsupported-alignment-missing` または明示的な `legacy-nearest-timestamp` best-effort として扱う。
+新規 capture の `/diagnostics` の tracker snapshot comparison と Field source 表示は、metadata から解決した diagnostics sample sidecar と `tracker-snapshot-alignment.jsonl` を優先する。alignment sidecar が ready の場合、selected replay timeline tick と Field source key から保存済み tracker snapshot record index を引き、matching rule を `saved-session-alignment` として表示する。alignment sidecar がない、metadata に path がない、または壊れている capture では、旧 diagnostics log / 旧 render snapshot sidecar を新規経路へ昇格させず、external/source label の Field source は `unsupported-alignment-missing` または明示的な `legacy-nearest-timestamp` best-effort として扱う。旧形式を表示できる場合も、tick / scrub ごとに sidecar 全体を読み直す互換 layer は作らない。
 
 `/diagnostics` の tracker snapshot comparison は、timeline scrubber 移動や playback tick のたびに tracker packet snapshot sidecar JSONL や alignment sidecar JSONL を再読込しない。log 選択時に metadata path、sidecar path、alignment path、diagnostics log path と各 file の last write time / length を key にした lightweight index を作成または cache し、selected entry / selected replay timeline tick の変更時はその index から source options、保存済み alignment、または明示された best-effort comparison を生成する。
 
@@ -296,8 +296,8 @@ focused tests では、少なくとも次を固定する。
 - 同一 CaptureOn session で生成される packet capture、metadata、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL が一つの session folder 配下にまとまり、異なる CaptureOn タイミングのログは別 folder に分かれる。
 - metadata から session folder と各 file relative path を辿れる。
 - Capture Off / 再On で session folder と snapshot writer が切り替わり、前 session folder へ追記しない。
-- 他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の挙動が変わらない。
-- 既存 diagnostics log reader 互換性を壊さず、snapshot sidecar がある場合だけ追加比較情報を読める。
+- 他 tracker が存在しない新規 capture では packet capture、diagnostics log、render snapshot の通常挙動を変えず、旧形式は degraded legacy として表示できる範囲だけ扱う。
+- 旧 diagnostics log / render snapshot sidecar は legacy / best-effort として扱い、snapshot sidecar や diagnostics sample sidecar がある最新経路では性能最優先の bounded lookup で追加比較情報を読める。
 - 3rdparty tracker snapshot を `Tracker.CaptureReplay` の CLI 出力と `/diagnostics` の comparison panel / playback から再生・比較表示できる。
 - `/diagnostics` の左右 Field で `Vision Input`、ibis tracker、external、unknown、source label を選択でき、既定は左 `Vision Input`、右 ibis tracker output のまま維持される。
 - `Tracker Comparison` panel を折り畳んでも Field source selector と Field 描画を使える。
