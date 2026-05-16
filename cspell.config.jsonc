@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en,ja",
+  "useGitignore": true,
+  "globRoot": ".",
+  "files": [
+    "**/*.md"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    ".git/**",
+    ".codex-dotnet-home/**",
+    ".codex-nuget-packages/**",
+    "**/bin/**",
+    "**/obj/**",
+    "tools/lint/excluded/**",
+    "Tracker/Design/Core/Ref/**",
+    "SslProto/src/external/ssl-game-controller/**",
+    "SslProto/src/external/ssl-simulation-protocol/**"
+  ],
+  "patterns": [
+    {
+      "name": "markdown-fenced-code",
+      "pattern": "/^```[\\s\\S]*?^```/gm"
+    },
+    {
+      "name": "markdown-inline-code",
+      "pattern": "/`[^`\\n]+`/g"
+    },
+    {
+      "name": "markdown-footnote-definition",
+      "pattern": "/^\\[\\^[^\\]]+\\]:.*$/gm"
+    },
+    {
+      "name": "non-latin-non-japanese-script",
+      "pattern": "/[\\u10A0-\\u10FF]+/g"
+    },
+    {
+      "name": "mixed-japanese-token",
+      "pattern": "/[A-Za-z0-9_-]*[\\u3040-\\u30ff\\u3400-\\u9fff]+[A-Za-z0-9_\\-\\u3040-\\u30ff\\u3400-\\u9fff]*/g"
+    }
+  ],
+  "ignoreRegExpList": [
+    "Urls",
+    "Email",
+    "CommitHash",
+    "markdown-fenced-code",
+    "markdown-inline-code",
+    "markdown-footnote-definition",
+    "non-latin-non-japanese-script",
+    "mixed-japanese-token"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "no-fullwidth-space": true,
+    "no-unresolved-placeholder-marker": {
+      "markers": [
+        "TBD",
+        "WIP"
+      ]
+    }
+  }
+}

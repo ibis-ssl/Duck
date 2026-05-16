@@ -47,6 +47,27 @@
     - `reports/pr19-review-runtimehost-profile-r2-20260516201757.md`
     - 初回 review の High finding は修正済み。r2 review で指摘なし、gate close 可を確認した。
 
+- ID: DOC-LINT-001
+- Title: Markdown lint / spellcheck を導入し、英単語とカタカナ語を意味付き whitelist で管理する
+- Phase: docs-tooling
+- Status: review complete; PR pending
+- Size: small
+- Dependencies: none
+- Exit Criteria:
+  - repository root から Markdown lint を実行できる `npm` script を追加する。
+  - `textlint` がユーザー編集対象の `*.md` 全般に実行され、Markdown の表記揺れや文章ルールを検出できる。
+  - `cspell` がユーザー編集対象の `*.md` 全般に実行され、英単語は専用 whitelist に登録されていない場合に失敗する。
+  - 独自 whitelist check が、ユーザー編集対象の `*.md` 全般と whitelist 説明文に含まれる英単語・カタカナ語を検査し、専用 whitelist に登録されていない場合に失敗する。
+  - whitelist は既存 Markdown 脚注から初版を収集した専用 YAML 1 ファイルを source of truth とし、単語名と説明の対を残す。
+  - generated / vendored / build output などユーザー編集対象ではない Markdown は明示的に除外する。
+  - lint 導入意図、環境構築、実行方法、専用 whitelist 更新手順、対象と除外を repo 内の Markdown メモに残す。
+  - sub-agent による implementation / validation / dedicated review を通し、tracking を同期する。
+- Implementation Evidence:
+  - `reports/doc-lint-001-implementation-20260516221628.md`
+- Review Evidence:
+  - `reports/doc-lint-001-review-20260516233048.md`
+  - Full-scope Markdown lint は、既存 Markdown の未登録英単語・カタカナ語を大量 whitelist で勝手に通さないため意図的に failed のまま。専用 whitelist の内容変更はユーザー明示レビュー必須。
+
 ## 完了済みタスク
 
 - `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了した。`Tracker/Design/` へ設計資料と active tracking を統合し、RuntimeHost / DebugHost の命名、責務境界、AutoRef 将来内包、loop isolation、旧ログ互換非要件、BreakingChanges 不要を設計へ固定した。gpt-5.5 high review は初回 blocking 2 件を修正し、r2 で no findings を確認した。Draft PR #17 を作成した。

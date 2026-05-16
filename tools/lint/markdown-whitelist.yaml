@@ -1,0 +1,25 @@
+version: "0.2"
+entries:
+  - term: CandidateMissing
+    description: Field source に選択 source の候補 snapshot が無いことを示す missing 状態。Field 全体は消さず、ready な layer は残し、legend / details に missing reason を出す。
+  - term: NoCandidateSnapshot
+    description: comparison に選択 source の候補 snapshot が無いことを示す missing 状態。比較対象が無い理由を UI に出すための状態であり、future / later snapshot を代わりに使う合図ではない。
+  - term: ReplayTimelineIndex
+    description: diagnostics replay の selected timeline tick を識別する index。`saved-session-alignment` record と結び付けて、どの tick の比較かを特定する。
+  - term: same-source
+    description: Layer A/B が同じ source を選んだ状態。Vision overlay では重複描画で誤差があるように見せないため、1 layer 表示にまとめる。
+  - term: saved-session-alignment
+    description: CaptureOn session に保存された、replay timeline tick と tracker source snapshot の対応 record 群。diagnostics replay で 3rd party tracker の snapshot を同じ selected replay timeline tick に合わせるために使う。
+  - term: source
+    description: 画面に描画する balls / robots / geometry の由来を表す設計上の概念。Vision split / overlay では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。
+  - term: Tracked
+    description: ibis tracker が生成した `TrackerFrame` を Vision 表示用 DTO に変換した source。raw detection ではなく ibis tracker 出力を Layer A/B や overlay 比較へ出すために使う。
+  - term: Tracker.DebugHost
+    aliases:
+      - tracker-debug-host
+      - tracker debug host
+    description: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、raw vision viewer、diagnostics、capture / replay、比較表示を担当する。
+  - term: Tracker.RuntimeHost
+    description: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。
+  - term: WorldFrameCommitted
+    description: ibis tracker が world frame を commit したタイミングを表す dispatch result。既存 render snapshot 保存はこの callback に結合しており、raw Vision の保存 cadence としては遅くなり得る。

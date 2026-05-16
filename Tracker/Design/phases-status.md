@@ -5,8 +5,8 @@
 ## 全体状況
 
 - 現在のフェーズ: PR
-- 現在のタスク: CAPTURE-REPLAY-001 / RUNTIME-HOST-012
-- 残りフェーズ: PR review / merge
+- 現在のタスク: CAPTURE-REPLAY-001 / RUNTIME-HOST-012 / DOC-LINT-001
+- 残りフェーズ: docs-tooling PR / PR review / merge
 
 ## フェーズ一覧
 
@@ -19,3 +19,4 @@
 | review | complete; PR #17 ready | `RUNTIME-HOST-010` で RuntimeHost / DebugHost build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の validation evidence と task review を完了した。`RUNTIME-HOST-011` では final review の blocking finding を受けて checked-in failing contract を現設計へ修正し、`reports/runtime-host-011-final-review-r2-20260514204526.md` で blocking findings なし / PR ready 可を確認した。 |
 | capture-replay-investigation | PR #19 open | `CAPTURE-REPLAY-001` で `Tracker.CaptureReplay` に raw vision / ibis tracker の cadence と `ReceivedAt` ベース lag を比較する汎用出力を追加し、指定 capture session の遅延原因を `reports/capture-replay-001-latency-investigation-20260516185833.md` に記録した。focused tests 11 passed、`Tracker.CaptureReplay` build は成功。dedicated review は `reports/pr19-review-capturereplay-20260516200807.md` で blocking findings なし、docs/tracking review は `reports/pr19-review-docs-tracking-20260516200807.md` で blocking findings なし。 |
 | runtime-host-cli-profile | PR #19 open | `RUNTIME-HOST-012` で `Tracker.RuntimeHost` 起動時に `--profile <name>` / `--profile=<name>` から active profile を指定できるようにした。command-line parsing は `Microsoft.Extensions.Configuration.CommandLine` provider と switch mapping を使う。review finding 修正後 focused tests 17 passed、`Tracker.RuntimeHost` build は成功。初回 review の High finding は修正し、`reports/pr19-review-runtimehost-profile-r2-20260516201757.md` で指摘なしを確認した。 |
+| docs-tooling | review complete; PR pending | `DOC-LINT-001` で repository root に Markdown 向け `textlint` / `cspell` を導入し、ユーザー編集対象の `*.md` 全般を品質ゲートに載せる。英単語・カタカナ語 whitelist は既存 Markdown 脚注から初版を収集した専用 YAML 1 ファイルを source of truth とし、単語名と説明の対を保持する。環境構築メモ、`npm` script、除外対象、sub-agent validation、dedicated review を `reports/doc-lint-001-review-20260516233048.md` で closed にした。Full-scope lint は未登録語を大量 whitelist で自動許可しないため意図的に failed の状態。 |
