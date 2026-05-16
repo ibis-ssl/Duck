@@ -51,7 +51,7 @@ node .agents/skills/review-enforcer/scripts/check-markdown-whitelist.js --files 
 
 ## Scope
 
-通常対象は `**/*.md` のうち、ユーザーが編集対象にする Markdown 全般である。`.agents/skills/review-enforcer/scripts/list-markdown-targets.js` が repository 内の対象 Markdown を列挙する。root documents、`reports/**`、`Tracker/Design/**`、`Tracker/**/*.md`、`feedback-points/**` は対象に含める。
+通常対象は `**/*.md` のうち、ユーザーが編集対象にする Markdown 全般である。`.agents/skills/review-enforcer/scripts/list-markdown-targets.js` が repository 内の対象 Markdown を列挙する。root documents、`Tracker/Design/**`、`Tracker/**/*.md`、`feedback-points/**` は対象に含める。`reports/**` は暫定的に対象外にする。
 
 対象外 directory / prefix は `tools/lint/markdown-targets.json` に明示する。`.textlintignore` と `cspell.config.jsonc` も同じ対象外方針に揃える。現時点では dependency、generated output、明示 opt-out folder、vendored upstream reference だけを除外する。
 
@@ -59,6 +59,7 @@ node .agents/skills/review-enforcer/scripts/check-markdown-whitelist.js --files 
 - `.git/**`: Git internal metadata。
 - `.codex-dotnet-home/**`、`.codex-nuget-packages/**`: local .NET cache。
 - `**/bin/**`、`**/obj/**`: .NET build output。
+- `reports/**`: 調査、レビュー、handover、検証レポート。現時点では対象外。
 - `tools/lint/excluded/**`: Markdown lint から明示的に外したいファイルを置く opt-out folder。通常の docs / reports / design はここへ移動しない。
 - `Tracker/Design/Core/Ref/**`: copied reference source and build tree。
 - `SslProto/src/external/ssl-game-controller/**`: vendored upstream project。

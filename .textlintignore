@@ -5,6 +5,7 @@ node_modules/**
 .codex-nuget-packages/**
 **/bin/**
 **/obj/**
+reports/**
 
 # Explicit Markdown lint opt-out folder.
 tools/lint/excluded/**

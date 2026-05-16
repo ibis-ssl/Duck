@@ -5,7 +5,8 @@
     ".codex-nuget-packages",
     "bin",
     "node_modules",
-    "obj"
+    "obj",
+    "reports"
   ],
   "ignoredPrefixes": [
     "tools/lint/excluded/",

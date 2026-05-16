@@ -14,6 +14,7 @@
     ".codex-nuget-packages/**",
     "**/bin/**",
     "**/obj/**",
+    "reports/**",
     "tools/lint/excluded/**",
     "Tracker/Design/Core/Ref/**",
     "SslProto/src/external/ssl-game-controller/**",
