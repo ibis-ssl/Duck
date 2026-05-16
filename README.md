@@ -6,6 +6,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 
 - `Tracker/Tracker.Core`: tracker のドメインロジック、packet 生成、実行契約。
 - `Tracker/Tracker.DebugHost`: raw / tracked SSL-Vision data を表示する ASP.NET Core viewer/server。
+- `Tracker/Tracker.CaptureReplay`: 保存済み capture を replay / analyze する CLI tool。
 - `Tracker/Tracker.Tests`: tracker と server 周辺のテスト。
 - `TrackerConnectionLib`: tracker 接続用の再利用ライブラリ。
 - `TrackerConnectionLibExample`: `TrackerConnectionLib` のサンプルクライアント。
@@ -59,8 +60,11 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 `Tracker.RuntimeHost` を `sim` profile で起動する場合:
 
 ```bash
-dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile
+dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profile sim
 ```
+
+`--profile <name>` は `Tracker.RuntimeHost` の起動時 active profile を指定します。未指定時は appsettings の `Tracker:ActiveProfileName` を使います。
+`Tracker.RuntimeHost` の checked-in `sim` profile は `ReorderWindowNs=10000000`、つまり 10 ms の reorder window で起動します。
 
 `Tracker.DebugHost` を `sim` profile で起動する場合:
 

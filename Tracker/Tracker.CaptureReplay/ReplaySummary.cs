@@ -15,6 +15,7 @@ namespace Tracker.CaptureReplay;
 /// <param name="DetailFrames">detail filter に一致した committed frame の表示行。</param>
 /// <param name="OmittedDetailFrameCount">detail 上限により省略された matching frame 数。</param>
 /// <param name="TrackerSnapshotLines">metadata から解決した tracker snapshot / comparison の表示行。</param>
+/// <param name="LatencyLines">raw vision cadence と ibis tracker commit lag の分析行。</param>
 internal sealed record ReplaySummary(
     int PacketCount,
     int DetectionCount,
@@ -27,7 +28,8 @@ internal sealed record ReplaySummary(
     int MaxRawBlueCount,
     IReadOnlyList<string> DetailFrames,
     int OmittedDetailFrameCount,
-    IReadOnlyList<string> TrackerSnapshotLines)
+    IReadOnlyList<string> TrackerSnapshotLines,
+    IReadOnlyList<string> LatencyLines)
 {
     /// <summary>
     /// --expect が参照する metric 名を既存 CLI schema の値へ解決する。

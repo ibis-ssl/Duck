@@ -4,16 +4,48 @@
 
 ## 現在のタスク
 
-- ID: RUNTIME-HOST-011
-- Title: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する
-- Phase: review
-- Status: complete
-- Size: large
-- Dependencies: RUNTIME-HOST-010.
+- ID: CAPTURE-REPLAY-001
+- Title: Tracker.CaptureReplay に vision / ibis tracker 遅延分析出力を追加する
+- Phase: PR
+- Status: PR #19 open
+- Size: medium
+- Dependencies: RUNTIME-HOST-011 complete.
 - Exit Criteria:
-  - RUNTIME-HOST-010 の validation evidence と review result を含めて tracking を最終同期した。
-  - final review、blocking fix、r2 review、commit、Draft PR #17 ready 化を完了した。
-  - 既知 hold `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` は現設計に合わせた contract へ修正し、checked-in failing test を残さない。
+  - `Tracker.CaptureReplay` が capture session path を入力として、raw SSL-Vision packet cadence と ibis tracker output cadence / timestamp delta を同一出力で比較できる。
+  - 出力は今回の capture 固有ではなく、次回以降の遅延・stale・cadence 調査に再利用できる option 名と summary / detail 形式にする。
+  - 指定 capture session `/home/ibis/ssl/IbisDuck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260514T132706328Z-4a19e61b92c443929f91eccdff3512c9` に対して、ibis tracker が vision より遅れて見える原因を report に記録する。
+  - focused tests / `Tracker.CaptureReplay` build / dedicated review を通し、tracking を同期する。
+  - Implementation Evidence:
+    - `reports/capture-replay-001-latency-investigation-20260516185833.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~CaptureReplayTests -m:1 /nr:false` は 11 passed。
+    - `dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false` は 0 warnings / 0 errors。
+    - 指定 capture では通常設定 `ReorderWindowNs=100ms` で `avgCommitLagMs=111.813` / `maxCommitLagMs=117.302`。`--reorder-window-ns 0` の対照実行では `avgCommitLagMs=15.812` / `maxCommitLagMs=20.842` まで下がることを確認した。
+  - Review Evidence:
+    - `reports/pr19-review-capturereplay-20260516200807.md`
+    - `reports/pr19-review-docs-tracking-20260516200807.md`
+    - CaptureReplay scope は blocking findings なし。`ReceivedAt` ベースの lag 説明に関する non-blocking concern は README / 調査レポート文言を修正した。
+
+- ID: RUNTIME-HOST-012
+- Title: RuntimeHost 起動時に CLI 引数で active profile を指定できるようにする
+- Phase: PR
+- Status: PR #19 open
+- Size: small
+- Dependencies: RUNTIME-HOST-011 complete.
+- Exit Criteria:
+  - `Tracker.RuntimeHost` が `--profile <name>` と `--profile=<name>` を受け取り、`Tracker:ActiveProfileName` より優先して active profile を選択できる。
+  - profile 引数が未指定の場合は既存 appsettings の `Tracker:ActiveProfileName` 挙動を維持する。
+  - 不正な `--profile` 指定は起動時に明示失敗する。
+  - focused tests / `Tracker.RuntimeHost` build / dedicated review を通し、tracking を同期する。
+  - Implementation Evidence:
+    - `reports/runtime-host-012-cli-profile-20260516195943.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostOperationLoopTests|FullyQualifiedName~RuntimeHostScaffoldContractTests" -m:1 /nr:false` は review finding 修正後 17 passed。
+    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false` は 0 warnings / 0 errors。
+    - command-line parsing は `Microsoft.Extensions.Configuration.CommandLine` provider と switch mapping で実装した。
+    - `--profile` / `--profile=` の値なし指定は checked-in appsettings を読み込む実起動経路でも `ArgumentException` で即終了することを確認した。
+  - Review Evidence:
+    - `reports/pr19-review-runtimehost-profile-20260516200807.md`
+    - `reports/pr19-review-runtimehost-profile-r2-20260516201757.md`
+    - 初回 review の High finding は修正済み。r2 review で指摘なし、gate close 可を確認した。
 
 ## 完了済みタスク
 
