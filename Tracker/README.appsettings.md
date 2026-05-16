@@ -44,12 +44,12 @@
 | キー | 単位 | 意味 |
 | --- | --- | --- |
 | `ReorderWindowNs` | ns | reorder window[^reorder-window] の長さです。値を大きくすると、到着順と event time 順がずれたパケットを吸収しやすくなりますが、tracked frame の確定はその分遅くなります。`0` は遅延パケットを待たず、到着済みの入力だけで即時確定する指定です。 |
-| `MergeWindowNs` | ns | 近い timestamp の detection を同じ world frame にまとめる時間幅です。値を大きくすると camera 間の統合はしやすくなりますが、別 frame の detection まで混ざりやすくなります。 |
+| `MergeWindowNs` | ns | 近い timestamp の検出結果を同じ world frame にまとめる時間幅です。値を大きくするとカメラ間の統合はしやすくなりますが、別 frame の検出結果まで混ざりやすくなります。 |
 | `GeometryResetFieldLengthThresholdMm` | mm | field length の変化を geometry reset とみなす閾値です。 |
 | `GeometryResetFieldWidthThresholdMm` | mm | field width の変化を geometry reset とみなす閾値です。 |
 | `KalmanInitialVelocityVariance` | 任意係数 | 新規 track の初期速度の不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |
 | `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` をカルマン推定の分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |
-| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換する係数です。大きいほど raw detection の小刻みな揺れを弱く信用します。 |
+| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換する係数です。大きいほど未加工の検出結果の小刻みな揺れを弱く信用します。 |
 
 geometry reset が起きると、旧 geometry 前提の pending frame は破棄されます。
 
@@ -142,8 +142,5 @@ kick、chip、contact 周辺の判定設定です。
 
 ## 脚注
 
-[^ssl-vision]: SSL-Vision は RoboCup Small Size League で使われる vision system です。
-[^udp]: UDP は User Datagram Protocol の略です。
-[^uuid]: UUID は Universally Unique Identifier の略です。
-[^tracked-frame]: tracked frame は、raw detection をトラッカーが統合して出力する 1 フレーム分の追跡結果です。
-[^reorder-window]: reorder window は、event time が少し古いパケットの到着を待つ猶予時間です。複数 camera や network jitter で到着順が前後する場合に効きます。
+[^tracked-frame]: tracked frame は、未加工の検出結果をトラッカーが統合して出力する 1 フレーム分の追跡結果です。
+[^reorder-window]: reorder window は、パケット内時刻が少し古い入力の到着を待つ猶予時間です。複数カメラやネットワーク揺らぎで到着順が前後する場合に効きます。

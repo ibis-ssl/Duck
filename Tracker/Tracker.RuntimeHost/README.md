@@ -1,6 +1,6 @@
 # Tracker.RuntimeHost
 
-`Tracker.RuntimeHost` は、画面を持たずに SSL-Vision[^ssl-vision] パケットを受信し、トラッカーを実行して公式トラッカーパケットを UDP[^udp] 送信する常駐プロセスです。試合時やシミュレータ連携で、DebugHost の画面や診断機能を使わずにトラッカーだけを動かす用途を想定しています。
+`Tracker.RuntimeHost` は、画面を持たずに SSL-Vision パケットを受信し、トラッカーを実行して公式トラッカーパケットを UDP 送信する常駐プロセスです。試合時やシミュレータ連携で、DebugHost の画面や診断機能を使わずにトラッカーだけを動かす用途を想定しています。
 
 ## できること
 
@@ -15,7 +15,7 @@ DebugHost の Raw / Tracked 表示、CaptureOn、`/diagnostics`、外部トラ�
 
 - .NET SDK `10.0`
 - SSL-Vision 互換パケットを送ってくる送信元
-- 公式トラッカーパケットの送信先となる multicast / unicast の endpoint
+- 公式トラッカーパケットの送信先となる multicast / unicast の受付先
 
 ## 起動方法
 
@@ -47,7 +47,7 @@ SSL-Vision パケットの受信設定です。
 | --- | --- |
 | `MulticastAddress` | 受信対象の multicast group address です。値が multicast 範囲ならその group へ join します。 |
 | `Port` | SSL-Vision パケットの受信 UDP ポートです。 |
-| `InterfaceAddress` | multicast join に使う local IPv4 address です。`null` の場合は利用可能な IPv4 interface を自動探索します。複数 NIC[^nic] がある環境や join 失敗時は明示指定してください。 |
+| `InterfaceAddress` | multicast join に使う local IPv4 address です。`null` の場合は利用可能な IPv4 interface を自動探索します。複数 NIC がある環境や join 失敗時は明示指定してください。 |
 
 ### `RuntimeHost`
 
@@ -104,8 +104,5 @@ RuntimeHost の実行周期を決める設定です。
 
 ## 脚注
 
-[^ssl-vision]: SSL-Vision は RoboCup Small Size League で使われる vision system です。
-[^udp]: UDP は User Datagram Protocol の略です。
-[^nic]: NIC は Network Interface Card の略で、ここでは受信に使う network interface を指します。
-[^tracked-frame]: tracked frame は、raw detection をトラッカーが統合して出力する 1 フレーム分の追跡結果です。
-[^reorder-window]: reorder window は、event time が少し古いパケットの到着を待つ猶予時間です。複数 camera や network jitter で到着順が前後する場合に効きます。
+[^tracked-frame]: tracked frame は、未加工の検出結果をトラッカーが統合して出力する 1 フレーム分の追跡結果です。
+[^reorder-window]: reorder window は、パケット内時刻が少し古い入力の到着を待つ猶予時間です。複数カメラやネットワーク揺らぎで到着順が前後する場合に効きます。
