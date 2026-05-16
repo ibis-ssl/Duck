@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Text.Json;
+using Google.Protobuf;
 using Tracker.Core;
 using Tracker.CaptureReplay;
 using Tracker.DebugHost.Tracking;
@@ -79,6 +80,26 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
 
         Assert.Null(options.Error);
         Assert.Equal(32, options.MaxDetailRobots);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: latency analysis を明示 opt-in でき、通常 summary 互換を維持できることを確認する。
+    /// </summary>
+    [Fact]
+    public void Parse_AllowsLatencyAnalysis()
+    {
+        var options = ReplayOptions.Parse([
+            "--capture",
+            "capture.jsonl.gz",
+            "--analyze-latency",
+            "--max-latency-frames",
+            "3",
+            "--skip-tracker-snapshots"]);
+
+        Assert.Null(options.Error);
+        Assert.True(options.AnalyzeLatency);
+        Assert.Equal(3, options.MaxLatencyFrames);
+        Assert.True(options.SkipTrackerSnapshots);
     }
 
     /// <summary>
@@ -274,6 +295,101 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
     }
 
     /// <summary>
+    /// 何を確認しているか: CaptureReplay が raw detection cadence と ibis tracker commit lag を汎用行として返すことを確認する。
+    /// </summary>
+    [Fact]
+    public void Run_WithLatencyAnalysis_ReturnsRawCadenceAndCommitLagLines()
+    {
+        var capturePath = Path.Combine(Path.GetTempPath(), $"capture-replay-latency-{Guid.NewGuid():N}.jsonl.gz");
+        try
+        {
+            var baseReceivedAt = new DateTimeOffset(2026, 5, 16, 12, 0, 0, TimeSpan.Zero);
+            WriteCapture(
+                capturePath,
+                [
+                    (baseReceivedAt, TrackerContractTestData.CreateDetectionPacket(
+                        frameNumber: 100,
+                        cameraId: 0,
+                        balls: [TrackerContractTestData.CreateBall(x: 100)],
+                        captureTimeSeconds: 1.000)),
+                    (baseReceivedAt.AddMilliseconds(10), TrackerContractTestData.CreateDetectionPacket(
+                        frameNumber: 101,
+                        cameraId: 0,
+                        balls: [TrackerContractTestData.CreateBall(x: 101)],
+                        captureTimeSeconds: 1.010)),
+                    (baseReceivedAt.AddMilliseconds(20), TrackerContractTestData.CreateDetectionPacket(
+                        frameNumber: 102,
+                        cameraId: 0,
+                        balls: [TrackerContractTestData.CreateBall(x: 102)],
+                        captureTimeSeconds: 1.020)),
+                    (baseReceivedAt.AddMilliseconds(40), TrackerContractTestData.CreateDetectionPacket(
+                        frameNumber: 103,
+                        cameraId: 0,
+                        balls: [TrackerContractTestData.CreateBall(x: 103)],
+                        captureTimeSeconds: 1.040)),
+                ]);
+            var settings = fixture.CreateSettings(
+                reorderWindowNs: 15_000_000,
+                mergeWindowNs: 1_000_000);
+
+            var summary = CaptureReplayRunner.Run(
+                capturePath,
+                settings,
+                [],
+                maxDetails: 40,
+                maxDetailRobots: 16,
+                analyzeLatency: true);
+
+            Assert.Contains(
+                "latencySummary rawDetections=4 committedFrames=3 rawAvgDeltaMs=13.333 committedAvgDeltaMs=10.000 avgCommitLagMs=23.333 maxCommitLagMs=30.000 maxCommitLagInputs=2 reorderWindowMs=15.000 mergeWindowMs=1.000",
+                summary.LatencyLines);
+            Assert.Contains(
+                "latencyFrame input=3 committedFrame=1 rawFrame=100 rawCamera=0 sourceReceivedAt=2026-05-16T12:00:00.0000000+00:00 commitReceivedAt=2026-05-16T12:00:00.0200000+00:00 commitLagMs=20.000 commitLagInputs=2 dataTs=1000000000",
+                summary.LatencyLines);
+        }
+        finally
+        {
+            File.Delete(capturePath);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: --capture に CaptureOn session folder を渡した場合に metadata から packet capture と settings を解決できることを確認する。
+    /// </summary>
+    [Fact]
+    public void Resolve_WithSessionFolder_UsesMetadataPacketPathAndSettings()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"capture-replay-folder-{Guid.NewGuid():N}");
+        var sessionFolder = "folder-session";
+        var sessionFolderPath = Path.Combine(captureDirectory, sessionFolder);
+        Directory.CreateDirectory(sessionFolderPath);
+        var capturePath = Path.Combine(sessionFolderPath, "packets.jsonl.gz");
+        WriteEmptyCapture(capturePath);
+        var metadataPath = Path.Combine(sessionFolderPath, "folder-session.metadata.json");
+        File.WriteAllText(
+            metadataPath,
+            JsonSerializer.Serialize(new
+            {
+                SessionFolder = sessionFolder,
+                PacketPath = Path.Combine(sessionFolder, Path.GetFileName(capturePath)),
+                MetadataPath = Path.Combine(sessionFolder, Path.GetFileName(metadataPath)),
+                ResolvedTrackerOptions = new
+                {
+                    EngineSettings = new
+                    {
+                        ProfileName = "sim",
+                    },
+                },
+            }));
+
+        var resolved = ReplayInputPathResolver.Resolve(sessionFolderPath, settingsPath: null);
+
+        Assert.Equal(capturePath, resolved.CapturePath);
+        Assert.Equal(metadataPath, resolved.SettingsPath);
+        Assert.Equal(metadataPath, resolved.MetadataPath);
+    }
+
+    /// <summary>
     /// 何を確認しているか: metadata に snapshot sidecar がない既存 capture / diagnostics / render snapshot では追加比較行を出さず、既存 replay summary を維持することを確認する。
     /// </summary>
     [Fact]
@@ -441,6 +557,25 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
         using var fileStream = File.Create(capturePath);
         using var gzipStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
         using var writer = new StreamWriter(gzipStream);
+    }
+
+    private static void WriteCapture(
+        string capturePath,
+        IReadOnlyList<(DateTimeOffset ReceivedAt, SSL_WrapperPacket Packet)> records)
+    {
+        using var fileStream = File.Create(capturePath);
+        using var gzipStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
+        using var writer = new StreamWriter(gzipStream);
+        foreach (var record in records)
+        {
+            writer.WriteLine(JsonSerializer.Serialize(new
+            {
+                schemaVersion = 1,
+                receivedAt = record.ReceivedAt.ToString("O"),
+                remoteEndpoint = "127.0.0.1:10020",
+                payloadBase64 = Convert.ToBase64String(record.Packet.ToByteArray()),
+            }));
+        }
     }
 
     private sealed record SnapshotReplaySession(string CapturePath, string MetadataPath);

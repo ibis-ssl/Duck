@@ -62,6 +62,52 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
+    /// 何を確認しているか: RuntimeHost 起動引数の --profile が appsettings の active profile を上書きすることを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData("--profile", "fast")]
+    [InlineData("--profile=fast", null)]
+    public void RuntimeHostCommandLineProfile_OverridesConfiguredActiveProfile(string firstArg, string? secondArg)
+    {
+        using var host = BuildHost(
+        [
+            KeyValuePair.Create<string, string?>("Tracker:ActiveProfileName", "sim"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:sim:Publish:MulticastAddress", "239.10.20.30"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:sim:Publish:Port", "12030"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:sim:Engine:ReorderWindowNs", "100000000"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:fast:Publish:MulticastAddress", "239.10.20.31"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:fast:Publish:Port", "12031"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:fast:Engine:ReorderWindowNs", "0"),
+        ],
+        secondArg is null ? [firstArg] : [firstArg, secondArg]);
+
+        var resolvedOptions = host.Services.GetRequiredService<TrackerRuntimeResolvedOptions>();
+
+        Assert.Equal("fast", resolvedOptions.EngineSettings.ProfileName);
+        Assert.Equal(0, resolvedOptions.EngineSettings.ReorderWindowNs);
+        Assert.Equal(12031, resolvedOptions.PublisherOptions.Port);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: RuntimeHost 起動引数の --profile に値がない場合は明示失敗することを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData("--profile", null)]
+    [InlineData("--profile=", null)]
+    [InlineData("--profile", "")]
+    [InlineData("--profile", "--unknown")]
+    public void RuntimeHostCommandLineProfile_WithoutValueThrows(string firstArg, string? secondArg)
+    {
+        var ex = Assert.Throws<ArgumentException>(() => BuildHost(
+        [
+            KeyValuePair.Create<string, string?>("Tracker:ActiveProfileName", "sim"),
+        ],
+        secondArg is null ? [firstArg] : [firstArg, secondArg]));
+
+        Assert.Contains("--profile", ex.Message);
+    }
+
+    /// <summary>
     /// 何を確認しているか: RuntimeHost の active profile が missing の場合は default profile へ fallback せず明示失敗することを確認する。
     /// </summary>
     [Fact]
@@ -225,7 +271,9 @@ public class RuntimeHostOperationLoopTests
         Assert.Equal([0u, 1u], engine.Calls.Select(call => call.Packet!.Detection.CameraId));
     }
 
-    private static IHost BuildHost(IEnumerable<KeyValuePair<string, string?>> configurationValues)
+    private static IHost BuildHost(
+        IEnumerable<KeyValuePair<string, string?>> configurationValues,
+        string[]? args = null)
     {
         var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
         {
@@ -233,6 +281,7 @@ public class RuntimeHostOperationLoopTests
             EnvironmentName = "Testing",
         });
         builder.Configuration.AddInMemoryCollection(configurationValues);
+        RuntimeHostCommandLine.ApplyOverrides(builder.Configuration, args ?? []);
         builder.Services.AddRuntimeHost(builder.Configuration);
         return builder.Build();
     }

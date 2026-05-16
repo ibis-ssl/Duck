@@ -169,7 +169,7 @@ capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn s
 }
 ```
 
-保存された capture は `Tracker.CaptureReplay` tool で replay / analyze できます。通常のユーザー確認は `/diagnostics` の `Tracker Comparison` panel を主経路にし、この CLI は agent / 自動検証 / regression 調査で同じ session を再現するために残します。
+保存された capture は `Tracker.CaptureReplay` tool で replay / analyze できます。通常のユーザー確認は `/diagnostics` の `Tracker Comparison` panel を主経路にし、この CLI は agent / 自動検証 / regression 調査で同じ session を再現するために残します。詳細は [Tracker.CaptureReplay README](../Tracker.CaptureReplay/README.md) を参照してください。
 
 ```bash
 DOTNET_CLI_HOME="$PWD/.codex-dotnet-home" \
@@ -180,7 +180,17 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
   --profile sim
 ```
 
-CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder 内の `*.jsonl.gz` を渡し、`--settings` には同じ session folder 内の `*.metadata.json` を渡します。この場合、replay は capture 時点の resolved tracker settings を使い、metadata の relative path から `tracker-packet-snapshots.jsonl` と `tracker-snapshot-alignment.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=saved-session-alignment ...` が出れば、保存時対応表に基づく比較まで読めています。alignment がない既存 capture では `legacy-nearest-timestamp` または unsupported status を確認してください。
+CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder または session folder 内の `*.jsonl.gz` を渡します。session folder を渡した場合、CLI は同じ folder の `*.metadata.json` から packet capture と resolved tracker settings を解決します。この場合、replay は capture 時点の resolved tracker settings を使い、metadata の relative path から `tracker-packet-snapshots.jsonl` と `tracker-snapshot-alignment.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=saved-session-alignment ...` が出れば、保存時対応表に基づく比較まで読めています。alignment がない既存 capture では `legacy-nearest-timestamp` または unsupported status を確認してください。
+
+raw vision に対して ibis tracker が遅れて見える場合は、capture file を手作業で読む代わりに latency analysis を使います。`--analyze-latency` は raw detection の受信 cadence と、replay 後に ibis tracker frame が commit されるまでの capture-time lag を出します。metadata 由来 snapshot 行が多い session では `--skip-tracker-snapshots` と `--max-latency-frames` で出力量を絞れます。
+
+```bash
+dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj --no-restore -- \
+  --capture <session-folder> \
+  --analyze-latency \
+  --skip-tracker-snapshots \
+  --max-latency-frames 8
+```
 
 ER-Force 外部 tracker を手動検証に使う場合は、`Tracker/Design/Core/Ref/ibis` 配下の Docker 開発環境を使えます。CI や通常 unit test は Docker に依存させず、手元の再現確認だけで使ってください。
 

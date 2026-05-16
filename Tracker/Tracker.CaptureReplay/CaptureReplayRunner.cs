@@ -17,9 +17,13 @@ internal static class CaptureReplayRunner
         IReadOnlyList<Condition> detailFilters,
         int maxDetails,
         int maxDetailRobots,
-        string? metadataPath = null)
+        string? metadataPath = null,
+        bool analyzeLatency = false,
+        int maxLatencyFrames = 40,
+        bool includeTrackerSnapshots = true)
     {
         var engine = new TrackerEngine();
+        var latencyAnalyzer = analyzeLatency ? new ReplayLatencyAnalyzer(settings, maxLatencyFrames) : null;
         var packetCount = 0;
         var detectionCount = 0;
         var geometryCount = 0;
@@ -36,6 +40,7 @@ internal static class CaptureReplayRunner
         {
             packetCount++;
             var packet = record.ParsePacket();
+            latencyAnalyzer?.RecordInput(packetCount, record, packet);
 
             if (packet.Detection is not null)
             {
@@ -50,6 +55,7 @@ internal static class CaptureReplayRunner
             var result = engine.Update(packet, settings);
             foreach (var frame in result.CommittedFrames)
             {
+                latencyAnalyzer?.RecordCommittedFrame(packetCount, record.ReceivedAt, frame);
                 var rawBallCount = ReplayFrameFormatter.CountRawBalls(frame);
                 var rawYellowCount = ReplayFrameFormatter.CountRawYellowRobots(frame);
                 var rawBlueCount = ReplayFrameFormatter.CountRawBlueRobots(frame);
@@ -87,7 +93,8 @@ internal static class CaptureReplayRunner
             maxRawBlueCount,
             detailFrames,
             Math.Max(0, matchingDetailFrameCount - detailFrames.Count),
-            TrackerSnapshotReplayLineFormatter.ReadLines(metadataPath));
+            includeTrackerSnapshots ? TrackerSnapshotReplayLineFormatter.ReadLines(metadataPath) : [],
+            latencyAnalyzer?.FormatLines() ?? []);
     }
 
     private static bool MatchesDetailFilters(

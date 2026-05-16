@@ -33,6 +33,21 @@ internal sealed record ReplayOptions
     public int MaxDetailRobots { get; private init; } = 16;
 
     /// <summary>
+    /// raw vision と replay 後 ibis tracker commit の cadence / lag 分析行を出すかどうか。
+    /// </summary>
+    public bool AnalyzeLatency { get; private init; }
+
+    /// <summary>
+    /// latency detail frame の最大出力件数。
+    /// </summary>
+    public int MaxLatencyFrames { get; private init; } = 40;
+
+    /// <summary>
+    /// metadata 由来 tracker snapshot / comparison 行を抑制するかどうか。
+    /// </summary>
+    public bool SkipTrackerSnapshots { get; private init; }
+
+    /// <summary>
     /// replay summary に対する自動検証条件。
     /// </summary>
     public IReadOnlyList<Condition> Expectations { get; private init; } = [];
@@ -123,6 +138,22 @@ internal sealed record ReplayOptions
                     }
 
                     options = options with { MaxDetailRobots = maxDetailRobots };
+                    break;
+                case "--analyze-latency":
+                    options = options with { AnalyzeLatency = true };
+                    break;
+                case "--max-latency-frames":
+                    if (!TryReadValue(args, ref i, out var maxLatencyFramesText)
+                        || !int.TryParse(maxLatencyFramesText, NumberStyles.None, CultureInfo.InvariantCulture, out var maxLatencyFrames)
+                        || maxLatencyFrames < 0)
+                    {
+                        return options with { Error = "--max-latency-frames requires a non-negative integer." };
+                    }
+
+                    options = options with { MaxLatencyFrames = maxLatencyFrames };
+                    break;
+                case "--skip-tracker-snapshots":
+                    options = options with { SkipTrackerSnapshots = true };
                     break;
                 case "--ball-gate":
                     if (!TryReadNonNegativeDouble(args, ref i, "--ball-gate", out var ballGate, out var ballGateError))
@@ -225,7 +256,7 @@ internal sealed record ReplayOptions
         Console.WriteLine(
             """
             Usage:
-              dotnet run --project Tracker/Tracker.CaptureReplay -- --capture <file> [options]
+              dotnet run --project Tracker/Tracker.CaptureReplay -- --capture <file-or-session-folder> [options]
 
             Options:
               --profile <name>             Tracker profile settings to use. default: sim
@@ -234,6 +265,9 @@ internal sealed record ReplayOptions
               --detail-filter <condition>  Print committed frames matching all detail filters. Can be repeated.
               --max-details <count>        Maximum matching frame details to print. default: 40
               --max-detail-robots <count>  Maximum tracked robots per detail frame. default: 16
+              --analyze-latency            Print raw vision cadence and tracker commit lag analysis.
+              --max-latency-frames <count> Maximum latency frame details to print. default: 40
+              --skip-tracker-snapshots     Suppress trackerSnapshot/trackerComparison metadata lines.
               --ball-gate <value>          Override BallTracker.Gate for replay.
               --ball-outlier-limit-mm <v>  Override BallTracker.OutlierLimitMm for replay.
               --ball-output-visibility <v> Override BallTracker.OutputVisibilityThreshold for replay.

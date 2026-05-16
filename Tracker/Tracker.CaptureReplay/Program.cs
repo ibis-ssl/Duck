@@ -14,17 +14,21 @@ if (options.Error is not null)
     return 2;
 }
 
-var settings = TrackerSettingsFactory.Create(options.ProfileName, options.SettingsPath, options.SettingsOverrides);
+var inputPaths = ReplayInputPathResolver.Resolve(options.CapturePath!, options.SettingsPath);
+var settings = TrackerSettingsFactory.Create(options.ProfileName, inputPaths.SettingsPath, options.SettingsOverrides);
 var summary = CaptureReplayRunner.Run(
-    options.CapturePath!,
+    inputPaths.CapturePath,
     settings,
     options.DetailFilters,
     options.MaxDetails,
     options.MaxDetailRobots,
-    options.SettingsPath);
+    inputPaths.MetadataPath,
+    options.AnalyzeLatency,
+    options.MaxLatencyFrames,
+    !options.SkipTrackerSnapshots);
 
-Console.WriteLine($"capture={options.CapturePath}");
-Console.WriteLine($"settingsFile={options.SettingsPath ?? "(built-in defaults)"}");
+Console.WriteLine($"capture={inputPaths.CapturePath}");
+Console.WriteLine($"settingsFile={inputPaths.SettingsPath ?? "(built-in defaults)"}");
 Console.WriteLine($"profile={options.ProfileName}");
 Console.WriteLine(
     $"settings=reorderWindowNs={settings.ReorderWindowNs} mergeWindowNs={settings.MergeWindowNs} ballGate={settings.BallTracker.Gate} ballOutlierLimitMm={settings.BallTracker.OutlierLimitMm} ballOutputVisibility={settings.BallTracker.OutputVisibilityThreshold} ballTrackLifetimeNs={settings.BallTracker.TrackLifetimeNs}");
@@ -41,6 +45,11 @@ foreach (var frame in summary.DetailFrames)
 foreach (var trackerSnapshotLine in summary.TrackerSnapshotLines)
 {
     Console.WriteLine(trackerSnapshotLine);
+}
+
+foreach (var latencyLine in summary.LatencyLines)
+{
+    Console.WriteLine(latencyLine);
 }
 
 if (summary.OmittedDetailFrameCount > 0)

@@ -111,6 +111,8 @@ RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver �
 
 RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。
 
+起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。
+
 DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。
 
 ## 設計資料配置
