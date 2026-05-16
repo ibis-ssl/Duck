@@ -1,26 +1,27 @@
 # Duck
 
-Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision packet の受信、raw / tracked 状態の可視化、official tracker packet の publish を行う Tracker 関連機能を中心にしています。
+Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision パケットの受信、Raw / Tracked 状態の可視化、公式トラッカーパケットの送信を行う Tracker 関連機能を中心にしています。
 
 ## リポジトリ構成
 
-- `Tracker/Tracker.Core`: tracker のドメインロジック、packet 生成、実行契約。
-- `Tracker/Tracker.DebugHost`: raw / tracked SSL-Vision data を表示する ASP.NET Core viewer/server。
+- `Tracker/Tracker.Core`: トラッカーのドメインロジック、パケット生成、実行契約。
+- `Tracker/Tracker.RuntimeHost`: 画面を持たずに SSL-Vision 受信、トラッカー実行、公式トラッカーパケット送信を行う常駐プロセス。
+- `Tracker/Tracker.DebugHost`: Raw / Tracked SSL-Vision data を表示し、CaptureOn や診断画面を提供する ASP.NET Core viewer/server。
 - `Tracker/Tracker.CaptureReplay`: 保存済み capture を replay / analyze する CLI tool。
-- `Tracker/Tracker.Tests`: tracker と server 周辺のテスト。
+- `Tracker/Tracker.Tests`: トラッカーと server 周辺のテスト。
 - `TrackerConnectionLib`: tracker 接続用の再利用ライブラリ。
 - `TrackerConnectionLibExample`: `TrackerConnectionLib` のサンプルクライアント。
-- `SslProto`: tracker component が使う protocol binding。
+- `SslProto`: トラッカー関連 component が使う protocol binding。
 - `reports`: 調査、レビュー、handover、検証レポート。
 
 ## 前提
 
 - .NET SDK 10.0
-- `Tracker.DebugHost` を実行する場合は SSL-Vision 互換の packet 送信元
+- `Tracker.RuntimeHost` または `Tracker.DebugHost` を実行する場合は SSL-Vision 互換パケットの送信元
 
 ## ビルド
 
-repository root から実行します。
+リポジトリのルートディレクトリから実行します。
 
 ```bash
 dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
@@ -53,23 +54,39 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 - `https://localhost:7042`
 - `http://localhost:5289`
 
-`Tracker.DebugHost` の設定、UI、profile switch、API の詳細は [Tracker/Tracker.DebugHost/README.md](Tracker/Tracker.DebugHost/README.md) を参照してください。
+`Tracker.DebugHost` の設定、UI、プロファイル切替、API の詳細は [Tracker/Tracker.DebugHost/README.md](Tracker/Tracker.DebugHost/README.md) を参照してください。
 
-## `sim` profile で起動する例
+## Tracker.RuntimeHost の起動
 
-`Tracker.RuntimeHost` を `sim` profile で起動する場合:
+```bash
+dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile
+```
+
+`sim` プロファイルで起動する場合:
 
 ```bash
 dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profile sim
 ```
 
-`--profile <name>` は `Tracker.RuntimeHost` の起動時 active profile を指定します。未指定時は appsettings の `Tracker:ActiveProfileName` を使います。
-`Tracker.RuntimeHost` の checked-in `sim` profile は `ReorderWindowNs=10000000`、つまり 10 ms の reorder window で起動します。
+`--profile <name>` は `Tracker.RuntimeHost` の起動時プロファイルを指定します。未指定時は appsettings の `Tracker:ActiveProfileName` を使います。
+現在の `Tracker.RuntimeHost/appsettings.json` では `sim` プロファイルが既定で、`ReorderWindowNs=10000000`、つまり 10 ms の reorder window[^reorder-window] で起動します。
 
-`Tracker.DebugHost` を `sim` profile で起動する場合:
+詳細は [Tracker/Tracker.RuntimeHost/README.md](Tracker/Tracker.RuntimeHost/README.md) を参照してください。
+
+## appsettings の共通設定
+
+`Tracker.RuntimeHost` と `Tracker.DebugHost` が共有する `Tracker` / `Tracker:Profiles:<name>` の設定は [Tracker/README.appsettings.md](Tracker/README.appsettings.md) を参照してください。
+
+## `sim` プロファイルの DebugHost 起動例
+
+`Tracker.DebugHost` を `sim` プロファイルで起動する場合:
 
 ```bash
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
-`sim` profile の既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、official tracker packet を `224.5.23.2:11010` へ publish します。
+`sim` プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式トラッカーパケットを `224.5.23.2:11010` へ送信します。
+
+## 脚注
+
+[^reorder-window]: `reorder window` の意味は [Tracker appsettings README](Tracker/README.appsettings.md) の脚注を参照してください。
