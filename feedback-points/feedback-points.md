@@ -1,13 +1,13 @@
-# Feedback Points
+# 指摘記録
 
-Canonical active feedback-point ledger.
+現在有効な指摘項目の台帳。
 
-Update rule:
+更新規則:
 
-- このファイルは `feedback-points-manager` または `feedback-points-sanitizer` を通してのみ更新する
+- この文書は `feedback-points-manager` または `feedback-points-sanitizer` を通してのみ更新する
 - それ以外の経路で直接追記・修正しない
 
-| FP | 記録起点 | 内容 | カテゴリ | 重複グループ | 指摘回数 | skill化状態 | 関連skill | 状態 | 記録日 | 直近指摘日 | 最終更新日 | 次アクション対応 | 根拠リンク |
+| 番号 | 記録起点 | 内容 | 分類 | 重複識別子 | 指摘回数 | 手順化状態 | 関連手順 | 状態 | 記録日 | 直近指摘日 | 最終更新日 | 次対応 | 根拠 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| FP-001 | ユーザー指示 | sub-agent に pre-created report を渡すときは、report の直接編集許可を prompt に明示し、見出し順と既存テキストを保ったまま空欄だけを埋めさせる | delegation | allow_subagent_report_edits | 1 | 未整理 | `sub-agent-task-manager`, `review-enforcer`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 現在の sub-agent prompt へ反映済み。関連 skill の wording 反映要否を後続で判断する | user instruction 2026-05-09: 「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」 |
-| FP-002 | ユーザー指示 | sub-agent に nested `codex exec` / `codex exec review` を実行させず、このセッションの通常 tool と workspace 読み取りだけで review / verification を完結させる | delegation | forbid_nested_codex_exec_in_subagents | 1 | 未整理 | `sub-agent-task-manager`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 現在の sub-agent prompt へ禁止事項として反映済み。関連 skill の wording 反映要否を後続で判断する | user instruction 2026-05-09: 「サブエージェントにcodex exec実行させるのやめろ」 |
+| FP-001 | 利用者指示 | 委譲先に事前作成済み報告書を渡すときは、報告書の直接編集許可を指示文に明示し、見出し順と既存本文を保ったまま空欄だけを埋めさせる | 委譲 | `allow_subagent_report_edits` | 1 | 未整理 | `sub-agent-task-manager`, `review-enforcer`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 現在の委譲先指示文へ反映済み。関連手順の文言反映要否を後続で判断する | 利用者指示 2026-05-09: 「次回から点検報告書の編集許可を委譲先に渡すようにしてください」 |
+| FP-002 | 利用者指示 | 委譲先に入れ子の `codex exec` / `codex exec review` を実行させず、この作業単位の通常機能と作業場所の読み取りだけで点検と検証を完結させる | 委譲 | `forbid_nested_codex_exec_in_subagents` | 1 | 未整理 | `sub-agent-task-manager`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 現在の委譲先指示文へ禁止事項として反映済み。関連手順の文言反映要否を後続で判断する | 利用者指示 2026-05-09: 「委譲先に入れ子実行させるのやめろ」 |

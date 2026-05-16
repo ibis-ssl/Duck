@@ -1,10 +1,10 @@
-# Tracker Core engine 詳細設計
+# トラッカー Core engine 詳細設計
 
 ## 目的
 
 TRACKER-033 で `Tracker.Core` の巨大ファイルを責務別に分割し、主要な class / property / method に日本語コメントを追加できるように、Core engine 側の分割境界、実行順序、挙動維持の確認観点を固定する。
 
-この設計は保守性改善の詳細設計であり、TRACKER-033 では tracker の追跡挙動、公開 contract、proto 出力、設定値の意味を変更しない。
+この設計は保守性改善の詳細設計であり、TRACKER-033 では トラッカー の追跡挙動、公開 contract、proto 出力、設定値の意味を変更しない。
 
 ## 対象範囲
 
@@ -14,7 +14,7 @@ TRACKER-033 で `Tracker.Core` の巨大ファイルを責務別に分割し、�
 
 対象外:
 
-- DebugHost / CLI / UI 側の詳細設計
+- Tracker.DebugHost / CLI / UI 側の詳細設計
 - test file の分割設計
 - 追跡アルゴリズム、設定値、proto 出力の仕様変更
 
@@ -53,7 +53,7 @@ TRACKER-033 で `Tracker.Core` の巨大ファイルを責務別に分割し、�
 - geometry 変換
   - `SSL_GeometryData` から `TrackerGeometrySnapshot` への変換
   - line / arc の snapshot 化
-- Kalman と数値 helper
+- カルマン と数値 helper
   - axis state の初期化、predict、update
   - measurement noise / process noise / visibility threshold の settings 解決
   - distance、timestamp 変換、速度計算
@@ -309,7 +309,7 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 - public / internal method
 - `TrackerEngine.Update`
 - 分割後に partial file の入口になる private method
-- reorder / merge / Kalman / geometry reset / identity assignment / event emit / proto 変換の境界 method
+- reorder / merge / カルマン / geometry reset / identity assignment / event emit / proto 変換の境界 method
 
 単純な getter helper、数式そのものが明らかな private helper、1 行 wrapper には無理に付けない。ただし「なぜこの順序か」「どの挙動を固定するか」が読み手に伝わりにくい場合は、private method でも summary または短い通常コメントを追加する。
 
@@ -323,7 +323,7 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 - `ReorderWindow` と `MergeWindow` による flush 対象決定
 - geometry 大変更 reset で pending detection を捨てる箇所
 - ball primary 継続を secondary sort より優先する箇所
-- Kalman update で predicted state と previous position を併用する箇所
+- カルマン update で predicted state と previous position を併用する箇所
 - robot の遠方外れ値を同一 robot id の近傍観測で落とす箇所
 
 ## TRACKER-033 実行順序
@@ -334,7 +334,7 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 4. detection buffer と frame commit を分離する。ここで `CommittedFrames` と `EmittedEvents` の順序が変わらないことを focused test で確認する。
 5. geometry 変換と geometry reset 判定を分離する。pending detection clear、frame number 維持、late cutoff の扱いを変えない。
 6. ball tracking を分離する。camera-local track id、merged internal track id、primary ball 継続、secondary ball 成長条件を変えない。
-7. Kalman helper を分離する。`UpdateKalmanAxis` の引数と、predicted state / previous position を使う baseline を変えない。
+7. カルマン helper を分離する。`UpdateKalmanAxis` の引数と、predicted state / previous position を使う baseline を変えない。
 8. robot tracking を分離する。same robot id の multi-camera merge、遠方外れ値除去、orientation unwrap の順序を変えない。
 9. contact、kick、ball left field を分離する。event 発火条件、recent contact window、boundary 名を変えない。
 10. settings / runtime override contract を `Configuration` 配下へ分離し、`Tracker.RuntimeHost`、`Tracker.DebugHost`、`Tracker.CaptureReplay`、tests の参照が source file path に依存していないことを確認する。
@@ -360,8 +360,8 @@ summary では単位と null / 0 / empty の意味を明記する。特に次は
 - ball の primary 継続判定を secondary sort より優先する。
 - secondary ball は visibility 降順、last visible timestamp 降順、internal track id 昇順の安定順を維持する。
 - secondary ball の出力は fresh observation と grown-up observation count の条件を維持する。
-- ball / robot の Kalman update は predicted state を基準にし、observed velocity 算出に previous position を使う。
-- robot orientation axis は位置 mm 用 covariance を流用せず、rad 単位の measurement / process variance と angular velocity clamp を使う。profile の Kalman scale 系設定は既定値比で rad 用基準値へ反映する。
+- ball / robot の カルマン update は predicted state を基準にし、observed velocity 算出に previous position を使う。
+- robot orientation axis は位置 mm 用 covariance を流用せず、rad 単位の measurement / process variance と angular velocity clamp を使う。profile の カルマン scale 系設定は既定値比で rad 用基準値へ反映する。
 - robot observation 収集では、merge window 内の同一 camera / team / robot id 候補を既存同一 ID track への近さで優先し、さらに既存別 ID track 近傍への突然の ID 変更候補を `RobotTracker.IdentitySwitchDistanceMm` で抑制する。ID が急に入れ替わることは小さな位置ずれより起きづらいという前提を association に反映する。
 - settings override helper は null の意味と default 値を変えない。
 - `TrackerPacketGenerator` の unit conversion は `mm -> m`、`mm/s -> m/s`、`ns -> s` のままにする。
@@ -390,7 +390,7 @@ TRACKER-033 の focused verification は、少なくとも次を含める。
   - primary ball 継続
   - multi-camera ball merge
   - secondary ball の安定順
-  - Kalman baseline が予測状態を使うこと
+  - カルマン baseline が予測状態を使うこと
 - robot tracking
   - multi-camera robot merge
   - same robot id の遠方外れ値で merged robot が瞬間移動しないこと

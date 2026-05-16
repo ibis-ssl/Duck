@@ -19,7 +19,7 @@
 - `TrackerConnectionLib` は使わない
 - packet の永続化はしない
 - raw detection を超える tracking / filtering / world-model 解釈は入れない
-- 本番寄りの tracker operation と将来 AutoRef mode は `Tracker.RuntimeHost` の責務とし、DebugHost の Web rendering / diagnostics logging から切り離す
+- 本番寄りの トラッカー operation と将来 AutoRef mode は `Tracker.RuntimeHost` の責務とし、Tracker.DebugHost の Web rendering / diagnostics logging から切り離す
 
 ## 設定
 
@@ -28,13 +28,13 @@
 - `MulticastAddress`: 既定値 `224.5.23.2`
 - `Port`: 受信 port
 - `InterfaceAddress`: multicast join に使う local IPv4 address。未設定時は候補 interface を自動解決する
-- `Profiles.<name>`: profile ごとの receiver override。`MulticastAddress` / `Port` / `InterfaceAddress` を同名 tracker profile に追従させたい場合に使う
+- `Profiles.<name>`: profile ごとの receiver override。`MulticastAddress` / `Port` / `InterfaceAddress` を同名 トラッカー profile に追従させたい場合に使う
 
 resolver 規則:
 
 - 起動時は `Tracker:ActiveProfileName` と同名の `VisionReceiver:Profiles.<name>` を優先する
 - 同名 profile が無い場合は top-level `VisionReceiver` 値をそのまま使う
-- runtime の tracker profile switch 完了後は、receiver も同じ profile 名で再解決し、必要なら socket を reopen する
+- runtime の トラッカー profile switch 完了後は、receiver も同じ profile 名で再解決し、必要なら socket を reopen する
 
 ## 受信設計
 
@@ -196,13 +196,13 @@ Vision 画面の split / overlay で選択できる source[^source-term] 候補�
   - `VisionPacketStore` の camera ごとの latest detection snapshot を使う
   - camera ID を選択肢の内部 key に含め、表示 label だけで source を識別しない
 - `Tracked`[^tracked-source]
-  - ibis tracker の `TrackedSnapshotStore` から得た latest `TrackerFrame` を `TrackedVisionViewState` 相当の field 描画 DTO へ変換して使う
-  - raw detection ではなく ibis tracker 出力として扱う
+  - ibis トラッカー の `TrackedSnapshotStore` から得た latest `TrackerFrame` を `TrackedVisionViewState` 相当の field 描画 DTO へ変換して使う
+  - raw detection ではなく ibis トラッカー 出力として扱う
 - `3rd party tracker`[^third-party-tracker]
-  - `MultiTrackerManager<TrackerPacketAdapter>`[^multi-tracker-manager] から受けた external tracker live state[^live-state] を使う
+  - `MultiTrackerManager<TrackerPacketAdapter>`[^multi-tracker-manager] から受けた external トラッカー live state[^live-state] を使う
   - UI は `MultiTrackerManager` の mutable state[^mutable-state] を直接読まず、live UI[^live-ui] 用の immutable snapshot store[^immutable-snapshot-store] または composer を必ず挟む
 
-live 比較では、厳密な同一 packet timestamp[^packet-timestamp] や全 source 共通の同一 receive callback[^receive-callback] は要求しない。raw SSL-Vision、ibis tracker、3rd party tracker は受信 stream と更新 callback が異なるため、ここを contract にすると通常表示の実装が過剰に結合する。採用方針は、1 回の `UI render tick`[^ui-render-tick] で各 source の latest immutable snapshot[^immutable-snapshot] を固定し、その composite snapshot を split / overlay の Layer A/B に渡すことである。
+live 比較では、厳密な同一 packet timestamp[^packet-timestamp] や全 source 共通の同一 receive callback[^receive-callback] は要求しない。raw SSL-Vision、ibis トラッカー、3rd party トラッカー は受信 stream と更新 callback が異なるため、ここを contract にすると通常表示の実装が過剰に結合する。採用方針は、1 回の `UI render tick`[^ui-render-tick] で各 source の latest immutable snapshot[^immutable-snapshot] を固定し、その composite snapshot を split / overlay の Layer A/B に渡すことである。
 
 RUNTIME-HOST-006 以降の live display では、`Home.razor` は raw / tracked store を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は store を再読取せず、固定済み composite snapshot から comparison 用 snapshot と view-state を生成する。これにより Raw / Tracked / Compare は同じ render tick の snapshot から派生する。
 
@@ -213,9 +213,9 @@ RUNTIME-HOST-006 以降の live display では、`Home.razor` は raw / tracked 
 - source ごとの receive timestamp[^receive-timestamp] / frame timestamp[^frame-timestamp] / packet count など、時刻差を説明する metadata
 - balls / robots / geometry reference[^geometry-reference] / missing reason を含む immutable source snapshot
 
-3rd party tracker の live 接続では、`MultiTrackerManager<TrackerPacketAdapter>` から external tracker packet を受け、source identity は UUID を優先して集約する。同じ `uuid` の tracker は remote endpoint が異なっても 1 つの source として扱い、同じ uuid group 内で最新 `ReceivedAt` の snapshot を代表として描画する。balls / robots は複数 endpoint 間で union merge しない。`uuid` が空または不明な場合だけ、source name / remote endpoint fallback で識別する。`uuid` が異なる tracker は source name が同じでも別 source とし、同じ display label が複数残る場合は短い uuid または endpoint を補助表示して UI 上で区別できる label にする。ただし `TrackerState` や protobuf packet 参照を UI が直接保持しない。`ExternalTrackerSnapshotStore` が manager update event から packet / metadata を clone し、`VisionLiveDisplaySnapshotProvider` が render tick でその read-side DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn sidecar writer を Vision live store[^live-store] として使う方針は不採用とする。これは CaptureOn session 保存用の仕組みであり、CaptureOff の通常 live Vision 画面では更新 source として成立しないためである。
+3rd party トラッカー の live 接続では、`MultiTrackerManager<TrackerPacketAdapter>` から external トラッカー packet を受け、source identity は UUID を優先して集約する。同じ `uuid` の トラッカー は remote endpoint が異なっても 1 つの source として扱い、同じ uuid group 内で最新 `ReceivedAt` の snapshot を代表として描画する。balls / robots は複数 endpoint 間で union merge しない。`uuid` が空または不明な場合だけ、source name / remote endpoint fallback で識別する。`uuid` が異なる トラッカー は source name が同じでも別 source とし、同じ display label が複数残る場合は短い uuid または endpoint を補助表示して UI 上で区別できる label にする。ただし `TrackerState` や protobuf packet 参照を UI が直接保持しない。`ExternalTrackerSnapshotStore` が manager update event から packet / metadata を clone し、`VisionLiveDisplaySnapshotProvider` が render tick でその read-side DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn sidecar writer を Vision live store[^live-store] として使う方針は不採用とする。これは CaptureOn session 保存用の仕組みであり、CaptureOff の通常 live Vision 画面では更新 source として成立しないためである。
 
-geometry 基準は raw geometry 優先とする。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新 `SSL_GeometryData` を overlay 全体の field 基準に使い、raw geometry がまだ無い場合のみ `Tracked` の geometry へ fallback する。`3rd party tracker` packet から field geometry を復元する方針は不採用とする。external tracker packet は比較対象の object state であり、field calibration の責任を持たせると source ごとの座標比較の意味が曖昧になる。
+geometry 基準は raw geometry 優先とする。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新 `SSL_GeometryData` を overlay 全体の field 基準に使い、raw geometry がまだ無い場合のみ `Tracked` の geometry へ fallback する。`3rd party tracker` packet から field geometry を復元する方針は不採用とする。external トラッカー packet は比較対象の object state であり、field calibration の責任を持たせると source ごとの座標比較の意味が曖昧になる。
 
 split / overlay の UI 挙動は diagnostics に寄せる。
 
@@ -237,29 +237,29 @@ split / overlay の UI 挙動は diagnostics に寄せる。
 
 ## Diagnostics time-sync 方針
 
-diagnostics replay / comparison は selected replay timeline tick[^selected-replay-timeline-tick] を同期基準にする。旧形式 / current limitation[^old-format-current-limitation] では、Vision/Input と ibis tracker は selected tick の render frame から得た snapshot を使い、3rd party tracker は同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] record を使う。この render snapshot[^legacy-render-snapshot-sidecar] 経路は `WorldFrameCommitted`[^world-frame-committed] に従うため tracker committed frame cadence[^tracker-committed-frame-cadence] に制限され、新規 capture[^new-capture] の目標経路としては扱わない。
+diagnostics replay / comparison は selected replay timeline tick[^selected-replay-timeline-tick] を同期基準にする。旧形式 / current limitation[^old-format-current-limitation] では、Vision/Input と ibis トラッカー は selected tick の render frame から得た snapshot を使い、3rd party トラッカー は同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] record を使う。この render snapshot[^legacy-render-snapshot-sidecar] 経路は `WorldFrameCommitted`[^world-frame-committed] に従うため トラッカー committed frame cadence[^tracker-committed-frame-cadence] に制限され、新規 capture[^new-capture] の目標経路としては扱わない。
 
-新規 capture の diagnostics replay / comparison は diagnostics sample tick[^diagnostics-sample-tick] を保存単位にする。Diagnostics の `Vision Input` は selected tick の render frame ではなく、diagnostics sample tick に保存された latest raw snapshot[^latest-raw-snapshot] から復元する。ibis tracker と 3rd party tracker の比較対象は同じ diagnostics sample tick に保存された latest tracker snapshot[^latest-tracker-snapshot]、または同 tick 以前の `latest-before snapshot` を使う。このため、新規 capture では Vision、ibis tracker、3rd party tracker を tracker committed frame cadence ではなく diagnostics sample timeline[^diagnostics-sample-timeline] 上の比較として扱う。
+新規 capture の diagnostics replay / comparison は diagnostics sample tick[^diagnostics-sample-tick] を保存単位にする。Diagnostics の `Vision Input` は selected tick の render frame ではなく、diagnostics sample tick に保存された latest raw snapshot[^latest-raw-snapshot] から復元する。ibis トラッカー と 3rd party トラッカー の比較対象は同じ diagnostics sample tick に保存された latest トラッカー snapshot[^latest-tracker-snapshot]、または同 tick 以前の `latest-before snapshot` を使う。このため、新規 capture では Vision、ibis トラッカー、3rd party トラッカー を トラッカー committed frame cadence ではなく diagnostics sample timeline[^diagnostics-sample-timeline] 上の比較として扱う。
 
-selected tick[^selected-tick] に対象 `3rd party tracker` source の alignment record が無い場合でも、表示と比較を消さない。採用方針は、同じ source の selected tick 以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を Field source と comparison に使うことである。UI / comparison は matching rule が `latest-before` であること、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を明示する。これにより、対象 source が selected tick で未更新でも、ユーザーは直前まで得られていた tracker 状態を raw / ibis tracker と比較できる。
+selected tick[^selected-tick] に対象 `3rd party tracker` source の alignment record が無い場合でも、表示と比較を消さない。採用方針は、同じ source の selected tick 以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を Field source と comparison に使うことである。UI / comparison は matching rule が `latest-before` であること、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を明示する。これにより、対象 source が selected tick で未更新でも、ユーザーは直前まで得られていた トラッカー 状態を raw / ibis トラッカー と比較できる。
 
-`latest-before snapshot` を使う場合も、replay / comparison の基準 timeline は selected replay timeline tick のまま固定する。source ごとに timeline cursor[^timeline-cursor] をずらしたり、表示上の selected time を tracker source 側へスライドしたりしない。Field と comparison は「selected tick に対して、この source は直前 sample を hold している」として表示し、delta は selected tick と hold した source snapshot の差として扱う。これにより、表示が消えることを避けつつ、時間軸が source ごとにずれて異なる時刻のものを同時刻扱いで表示しているように見える状態を避ける。
+`latest-before snapshot` を使う場合も、replay / comparison の基準 timeline は selected replay timeline tick のまま固定する。source ごとに timeline cursor[^timeline-cursor] をずらしたり、表示上の selected time を トラッカー source 側へスライドしたりしない。Field と comparison は「selected tick に対して、この source は直前 sample を hold している」として表示し、delta は selected tick と hold した source snapshot の差として扱う。これにより、表示が消えることを避けつつ、時間軸が source ごとにずれて異なる時刻のものを同時刻扱いで表示しているように見える状態を避ける。
 
-selected tick 以前に同じ source の snapshot が一切無い場合だけ、Field source は `CandidateMissing`[^candidate-missing]、comparison は `NoCandidateSnapshot`[^no-candidate-snapshot] 相当の missing 表示にする。この場合も Field 全体は消さず、ready な layer は残し、legend / details に missing reason を出す。future / later snapshot[^future-later-snapshot] への fallback は行わない。未来 tick の tracker 状態を現在 tick の比較へ混ぜると、replay timeline の因果関係が崩れ、comparison delta が実際より良く見えるためである。diagnostics-line alignment[^diagnostics-line-alignment] や nearest timestamp[^nearest-timestamp] は、selected tick 以前の同一 source snapshot を探すための補助 index として使ってよいが、selected tick より後の snapshot は候補に含めない。この挙動は既存 diagnostics time-sync regression contract として維持し、RuntimeHost / DebugHost 分離 scope では新しい `RAW-VISION-*` タスクを追加しない。
+selected tick 以前に同じ source の snapshot が一切無い場合だけ、Field source は `CandidateMissing`[^candidate-missing]、comparison は `NoCandidateSnapshot`[^no-candidate-snapshot] 相当の missing 表示にする。この場合も Field 全体は消さず、ready な layer は残し、legend / details に missing reason を出す。future / later snapshot[^future-later-snapshot] への fallback は行わない。未来 tick の トラッカー 状態を現在 tick の比較へ混ぜると、replay timeline の因果関係が崩れ、comparison delta が実際より良く見えるためである。diagnostics-line alignment[^diagnostics-line-alignment] や nearest timestamp[^nearest-timestamp] は、selected tick 以前の同一 source snapshot を探すための補助 index として使ってよいが、selected tick より後の snapshot は候補に含めない。この挙動は既存 diagnostics time-sync regression contract として維持し、Tracker.RuntimeHost / Tracker.DebugHost 分離 scope では新しい `RAW-VISION-*` タスクを追加しない。
 
 ## Diagnostics loop isolation 方針
 
-loop isolation[^loop-isolation] の中心目的は、tracker operation loop[^tracker-operation-loop] を web server live display processing[^web-server-live-display-processing] と diagnostics logging / replay processing[^diagnostics-logging-replay-processing] の両方から隔離することである。修正は UI-only display correction[^ui-only-display-correction] ではなく、保存と replay の入力 cadence を tracker committed frame cadence から切り離す設計として扱う。
+loop isolation[^loop-isolation] の中心目的は、トラッカー operation loop[^tracker-operation-loop] を web server live display processing[^web-server-live-display-processing] と diagnostics logging / replay processing[^diagnostics-logging-replay-processing] の両方から隔離することである。修正は UI-only display correction[^ui-only-display-correction] ではなく、保存と replay の入力 cadence を トラッカー committed frame cadence から切り離す設計として扱う。
 
 3 つの loop の責務は次の通り分ける。
 
-- tracker operation loop は raw packet と profile / control input を tracker engine へ渡し、tracker state 更新、publish、latest tracker snapshot の公開までを担当する。diagnostics sidecar への frame 保存をこの loop の `WorldFrameCommitted` callback へ直接結合しない。
-- server live display processing は `UI render tick` ごとに raw / tracked / 3rd party tracker の latest immutable snapshot を固定し、通常 Vision 画面の split / overlay を描画する。これは表示用 loop であり、diagnostics logging の sample cadence を決めない。
-- diagnostics logging / replay processing は tracker operation loop から直接書き込まれた render frame を読むのではなく、DebugHost hosted service の独立した diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定し、`diagnostics-samples.jsonl` diagnostics sample sidecar[^diagnostics-sample-sidecar] に保存する。tick 周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、replay はこの sample timeline から `Vision Input` と `ibis tracker` の semantic summary を通常経路として復元する。
+- トラッカー operation loop は raw packet と profile / control input を トラッカー engine へ渡し、トラッカー state 更新、publish、latest トラッカー snapshot の公開までを担当する。diagnostics sidecar への frame 保存をこの loop の `WorldFrameCommitted` callback へ直接結合しない。
+- server live display processing は `UI render tick` ごとに raw / tracked / 3rd party トラッカー の latest immutable snapshot を固定し、通常 Vision 画面の split / overlay を描画する。これは表示用 loop であり、diagnostics logging の sample cadence を決めない。
+- diagnostics logging / replay processing は トラッカー operation loop から直接書き込まれた render frame を読むのではなく、Tracker.DebugHost hosted service の独立した diagnostics sample tick で latest raw snapshot と latest トラッカー snapshot を固定し、`diagnostics-samples.jsonl` diagnostics sample sidecar[^diagnostics-sample-sidecar] に保存する。tick 周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、replay はこの sample timeline から `Vision Input` と `ibis tracker` の semantic summary を通常経路として復元する。
 
-logging 互換性はこの loop isolation の必須要件にしない。新規 capture の性能と cadence 維持を優先し、旧 render snapshot sidecar に対する高コストな互換 layer は設計しない。旧形式の render snapshot sidecar しか持たない session は、この新機能では unsupported / degraded legacy session[^degraded-legacy-session] として扱ってよい。旧形式を読む場合も、旧経路が tracker committed frame cadence に制限されることを UI / details で説明できれば足りる。
+logging 互換性はこの loop isolation の必須要件にしない。新規 capture の性能と cadence 維持を優先し、旧 render snapshot sidecar に対する高コストな互換 layer は設計しない。旧形式の render snapshot sidecar しか持たない session は、この新機能では unsupported / degraded legacy session[^degraded-legacy-session] として扱ってよい。旧形式を読む場合も、旧経路が トラッカー committed frame cadence に制限されることを UI / details で説明できれば足りる。
 
-diagnostics sample tick の cadence は tracker committed frame cadence と同義にしない。raw SSL-Vision の latest snapshot が tracker commit より高頻度に更新される場合、new logging は raw snapshot cadence[^raw-snapshot-cadence] を失わない保存境界を持つ。tracker snapshot は sample tick 時点の latest を読むが、tracker operation 自体を sample tick から駆動しない。これにより、tracker operation、server live display、diagnostics logging / replay のいずれかの負荷や周期が、他の loop の user-visible 表示や保存 cadence を支配しない。
+diagnostics sample tick の cadence は トラッカー committed frame cadence と同義にしない。raw SSL-Vision の latest snapshot が トラッカー commit より高頻度に更新される場合、new logging は raw snapshot cadence[^raw-snapshot-cadence] を失わない保存境界を持つ。トラッカー snapshot は sample tick 時点の latest を読むが、トラッカー operation 自体を sample tick から駆動しない。これにより、トラッカー operation、server live display、diagnostics logging / replay のいずれかの負荷や周期が、他の loop の user-visible 表示や保存 cadence を支配しない。
 
 ## UI 方針
 
@@ -287,9 +287,9 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - `VisionFieldCanvas.razor` は field 本体に加えて axis overlay と cursor coordinate overlay を管理する
 - cursor coordinate overlay は proto 由来の field geometry と `VisionFieldProjection` の逆写像から求める
 - sidebar 折りたたみは layout レベルで扱い、viewer 専用コンポーネントへ閉じ込めない
-- `Diagnostics.razor` の render snapshot 表示は、Vision Input / Tracker Output の field 表示領域と下部 detail 領域の境界をドラッグで変更できるようにする
+- `Diagnostics.razor` の render snapshot 表示は、Vision Input / トラッカー Output の field 表示領域と下部 detail 領域の境界をドラッグで変更できるようにする
 - diagnostics の field/detail 比率は viewport 高さに依存した固定上限だけにせず、4K など高解像度環境で field を大きく広げられる上限を持つ
-- detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / Tracker Output の文字列確認を壊さない
+- detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / トラッカー Output の文字列確認を壊さない
 - `Diagnostics.razor` の左側 frame timeline は、右側 detail との境界をドラッグして幅を変更できるようにする
 - frame timeline は右側 field/detail 表示領域を広げたい場合に小さくでき、最小幅でも frame 選択操作と省略表示を維持する
 - `MainLayout.razor.css` と `NavMenu.razor.css` は raw vision / diagnostics の濃色 green UI と同じ配色・密度を使い、default Blazor template 由来の青紫 gradient や浮いた navigation 表現を残さない
@@ -316,11 +316,11 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 - Vision / diagnostics overlay field contract は、overlay mode が layer ごとに独立した field canvas を重ねず、Vision live overlay と diagnostics overlay が同じ overlay 用 field コンポーネントの単一 viewport state 配下で Layer A/B を描くことを単体テストで先に固定する
 - Vision / diagnostics split field contract は、左右 field の viewport は独立のまま、Vision live split と diagnostics split が同じ split 用 field コンポーネントと同じ marker / geometry 描画方針を使うことを単体テストで先に固定する
 - Vision live comparison contract は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の latest immutable snapshot を固定し、後続 store 更新で描画中 snapshot が変化しないことを単体テストで先に固定する
-- 3rd party tracker live source contract は、`MultiTrackerManager<TrackerPacketAdapter>` の mutable state を UI が直接読まず、immutable snapshot store / composer を通して source option と field DTO を作ることを単体テストで先に固定する
+- 3rd party トラッカー live source contract は、`MultiTrackerManager<TrackerPacketAdapter>` の mutable state を UI が直接読まず、immutable snapshot store / composer を通して source option と field DTO を作ることを単体テストで先に固定する
 - diagnostics time-sync regression は、selected `ReplayTimelineIndex` に対象 3rd party source の alignment record が無い場合でも、selected replay timeline tick 自体は動かさず、同じ source の selected tick 以前の `latest-before snapshot` を Field source と comparison に使い、matching rule、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を表示することを単体テストで先に固定する
 - diagnostics missing regression は、selected tick 以前に同じ source の snapshot が一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、future / later snapshot へ fallback せず、ready layer は残ることを単体テストで先に固定する
-- RUNTIME-HOST-002 の TDD contract は、RuntimeHost / DebugHost の project dependency boundary と DebugHost read-side responsibility を固定する
-- RUNTIME-HOST-003 の TDD contract は、diagnostics sample boundary と legacy degraded contract を固定する。diagnostics sample tick が tracker committed frame cadence に依存せず latest raw snapshot と latest tracker snapshot を保存すること、Diagnostics `Vision Input` が render snapshot sidecar ではなく diagnostics sample sidecar から復元されること、DebugHost の diagnostics logging / replay processing が RuntimeHost の tracker operation loop や server live display processing の `UI render tick` snapshot contract を壊さないこと、旧 render snapshot sidecar だけを持つ session は unsupported / degraded legacy session として扱われ高コストな互換保証を持たないことを単体テストで先に固定する
+- RUNTIME-HOST-002 の TDD contract は、Tracker.RuntimeHost / Tracker.DebugHost の project dependency boundary と Tracker.DebugHost read-side responsibility を固定する
+- RUNTIME-HOST-003 の TDD contract は、diagnostics sample boundary と legacy degraded contract を固定する。diagnostics sample tick が トラッカー committed frame cadence に依存せず latest raw snapshot と latest トラッカー snapshot を保存すること、Diagnostics `Vision Input` が render snapshot sidecar ではなく diagnostics sample sidecar から復元されること、Tracker.DebugHost の diagnostics logging / replay processing が Tracker.RuntimeHost の トラッカー operation loop や server live display processing の `UI render tick` snapshot contract を壊さないこと、旧 render snapshot sidecar だけを持つ session は unsupported / degraded legacy session として扱われ高コストな互換保証を持たないことを単体テストで先に固定する
 
 ## 前提
 
@@ -331,13 +331,13 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^source-term]: source: 画面に描画する balls / robots / geometry の由来を表す設計上の概念。Vision split / overlay では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。
 [^raw-aggregate]: Raw Aggregate: raw SSL-Vision の camera ごとの latest detection を UI 表示用に統合した source。複数 camera の balls / robots をまとめて Vision 画面で見るための候補で、camera 単体ではなく集約表示を選ぶときに使う。
 [^raw-camera]: Raw Camera: 特定 camera ID の raw SSL-Vision latest detection を表示する source。camera ごとの見え方や検出差を確認するための候補で、選択肢の内部 key には camera ID を含める。
-[^tracked-source]: Tracked: ibis tracker が生成した `TrackerFrame` を Vision 表示用 DTO に変換した source。raw detection ではなく ibis tracker 出力を Layer A/B や overlay 比較へ出すために使う。
-[^third-party-tracker]: 3rd party tracker: ibis tracker 以外の外部 tracker から受けた tracker packet source。外部 tracker の出力を raw SSL-Vision や ibis tracker と比較するための候補。
-[^live-state]: live state: Vision split / overlay の `3rd party tracker` で、実行中に外部 tracker から最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、snapshot 化された表示用データを読む。
+[^tracked-source]: Tracked: ibis トラッカー が生成した `TrackerFrame` を Vision 表示用 DTO に変換した source。raw detection ではなく ibis トラッカー 出力を Layer A/B や overlay 比較へ出すために使う。
+[^third-party-tracker]: 3rd party tracker: ibis トラッカー 以外の外部 トラッカー から受けた トラッカー packet source。外部 トラッカー の出力を raw SSL-Vision や ibis トラッカー と比較するための候補。
+[^live-state]: live state: Vision split / overlay の `3rd party tracker` で、実行中に外部 トラッカー から最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、snapshot 化された表示用データを読む。
 [^mutable-state]: mutable state: `MultiTrackerManager` 内で後から内容が変わる状態オブジェクト。Vision 画面の split / overlay では、描画中に値が変わることを避けるため、この状態を直接読まず snapshot 化してから比較に使う。
-[^live-ui]: live UI: CaptureOn の保存 replay ではなく、CaptureOff の通常 Vision 画面で現在受信している source を比較する画面。raw SSL-Vision、ibis tracker、3rd party tracker の現在値を split / overlay で見比べる。
-[^immutable-snapshot-store]: immutable snapshot store: Vision 画面の通常表示で、Layer A/B に渡す前に描画中に変わらない表示用データを保持する境界。外部 tracker の更新と field 描画のタイミングを切り離すために使う。
-[^packet-timestamp]: packet timestamp: packet に入っている時刻。Vision split / overlay の通常表示では、raw SSL-Vision、ibis tracker、3rd party tracker の packet timestamp が厳密に同一であることは比較条件にしない。
+[^live-ui]: live UI: CaptureOn の保存 replay ではなく、CaptureOff の通常 Vision 画面で現在受信している source を比較する画面。raw SSL-Vision、ibis トラッカー、3rd party トラッカー の現在値を split / overlay で見比べる。
+[^immutable-snapshot-store]: immutable snapshot store: Vision 画面の通常表示で、Layer A/B に渡す前に描画中に変わらない表示用データを保持する境界。外部 トラッカー の更新と field 描画のタイミングを切り離すために使う。
+[^packet-timestamp]: packet timestamp: packet に入っている時刻。Vision split / overlay の通常表示では、raw SSL-Vision、ibis トラッカー、3rd party トラッカー の packet timestamp が厳密に同一であることは比較条件にしない。
 [^receive-callback]: receive callback: packet 到着時の受信処理呼び出し。通常表示では、すべての source が同じ receive callback で更新されたことを Layer A/B の比較条件にしない。
 [^ui-render-tick]: UI render tick: Blazor UI が 1 回の表示更新を行う単位。この tick 内で各 source の latest snapshot を固定し、split / overlay へ渡す。
 [^immutable-snapshot]: immutable snapshot: 描画中に内容が変わらないよう clone / DTO 化された読み取り専用 snapshot。後続の store 更新で描画中 snapshot が変化しないことを保証するために使う。
@@ -345,9 +345,9 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^source-key]: source key: Vision 画面の source を識別する内部 key。`Raw Camera` では camera ID を含め、display label だけで source を取り違えないようにする。
 [^display-label]: display label: UI に出す表示名。source key と違い内部識別には使わず、details や選択肢でユーザーに source を読ませるために使う。
 [^receive-timestamp]: receive timestamp: packet を受け取った時刻。details で source 間の時刻差を確認し、`latest-before snapshot` が selected tick からどれだけ古いかを説明するために使う。
-[^frame-timestamp]: frame timestamp: detection frame や tracker frame 側の時刻。receive timestamp と併せて、source 同士の比較がどの時刻情報に基づくかを details で説明する。
+[^frame-timestamp]: frame timestamp: detection frame や トラッカー frame 側の時刻。receive timestamp と併せて、source 同士の比較がどの時刻情報に基づくかを details で説明する。
 [^geometry-reference]: geometry reference: field 描画に使う geometry 参照。overlay では raw geometry を優先し、無い場合だけ `Tracked` の geometry へ fallback するため、source 同士の座標比較の基準を示す。
-[^source-label]: source label: legend や details に出す source 名。ユーザーが Layer A/B でどの raw / tracked / 3rd party tracker を選んでいるか確認するために使う。
+[^source-label]: source label: legend や details に出す source 名。ユーザーが Layer A/B でどの raw / tracked / 3rd party トラッカー を選んでいるか確認するために使う。
 [^live-store]: live store: 通常 Vision 画面の現在表示を更新するための store。CaptureOn session 保存用の `TrackerPacketSnapshotLogWriter` や sidecar writer はこの役割に使わない。
 [^accent-color]: accent color: Layer A/B を見分けるために marker の stroke や legend swatch に使う強調色。Issue #10 の Vision overlay では diagnostics overlay と同じ考え方で、重なった layer を色で判別できるようにする。
 [^field-rendering-part]: field 描画部: field の背景、boundary、geometry line、ball marker、robot marker を SVG に描く部品境界。source 選択や詳細 metadata 表示ではなく、field 上に何をどう描くかを担当する部分を指す。
@@ -358,35 +358,35 @@ field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲す�
 [^viewport-state]: viewport state: field 表示の zoom、pan、drag 中の移動量など、画面上で field をどの位置と倍率で見るかを表す状態。overlay mode では layer ごとに別々に持たず、1 つの viewport state を共有する。
 [^split-independent-viewport]: split の独立 viewport: split mode の左右 field が、それぞれ別の表示位置と倍率を持つこと。左右は比較対象を並べる表示なので、片方を drag してももう片方を自動追従させる要件ではない。
 [^same-source]: same-source: Layer A/B が同じ source を選んだ状態。Vision overlay では重複描画で誤差があるように見せないため、1 layer 表示にまとめる。
-[^multi-tracker-manager]: MultiTrackerManager / TrackerPacketAdapter: `MultiTrackerManager` は `TrackerConnectionLib` の tracker state 管理コンポーネントで、own / external / unknown tracker の latest state を保持する。`TrackerPacketAdapter` は 3rd party tracker packet を `MultiTrackerManager` で扱うための adapter。
-[^selected-replay-timeline-tick]: selected replay timeline tick: diagnostics replay でユーザーが現在選択している再生タイムライン上の基準 tick。Vision/Input、ibis tracker、3rd party tracker を比較するとき、この tick は source ごとへ移動させない。
+[^multi-tracker-manager]: MultiTrackerManager / TrackerPacketAdapter: `MultiTrackerManager` は `TrackerConnectionLib` の トラッカー state 管理コンポーネントで、own / external / unknown トラッカー の latest state を保持する。`TrackerPacketAdapter` は 3rd party トラッカー packet を `MultiTrackerManager` で扱うための adapter。
+[^selected-replay-timeline-tick]: selected replay timeline tick: diagnostics replay でユーザーが現在選択している再生タイムライン上の基準 tick。Vision/Input、ibis トラッカー、3rd party トラッカー を比較するとき、この tick は source ごとへ移動させない。
 [^replay-timeline-index]: ReplayTimelineIndex: diagnostics replay の selected timeline tick を識別する index。`saved-session-alignment` record と結び付けて、どの tick の比較かを特定する。
-[^saved-session-alignment]: saved-session-alignment: CaptureOn session に保存された、replay timeline tick と tracker source snapshot の対応 record 群。diagnostics replay で 3rd party tracker の snapshot を同じ selected replay timeline tick に合わせるために使う。
-[^alignment-sidecar]: alignment sidecar: CaptureOn session の主ログとは別に保存される対応付け用の補助ファイル。diagnostics replay で、選択中の replay timeline tick と tracker source snapshot の関係を後から復元するために使う。
-[^alignment-record]: alignment record: alignment sidecar 内の 1 件の対応付け。diagnostics replay で特定の replay timeline tick を選んだとき、どの tracker source snapshot を比較に使うかを示す。
+[^saved-session-alignment]: saved-session-alignment: CaptureOn session に保存された、replay timeline tick と トラッカー source snapshot の対応 record 群。diagnostics replay で 3rd party トラッカー の snapshot を同じ selected replay timeline tick に合わせるために使う。
+[^alignment-sidecar]: alignment sidecar: CaptureOn session の主ログとは別に保存される対応付け用の補助ファイル。diagnostics replay で、選択中の replay timeline tick と トラッカー source snapshot の関係を後から復元するために使う。
+[^alignment-record]: alignment record: alignment sidecar 内の 1 件の対応付け。diagnostics replay で特定の replay timeline tick を選んだとき、どの トラッカー source snapshot を比較に使うかを示す。
 [^selected-tick]: selected tick: selected replay timeline tick の短縮表現。本文で「選択 tick」と書く場合も同じ意味を指す。
 [^latest-before-snapshot]: latest-before snapshot: selected replay timeline tick に対象 source の alignment record が無い場合に使う、同じ source で selected tick 以前に存在する最新 snapshot。future / later snapshot は含めない。timeline cursor は selected tick のまま固定し、この snapshot は直前 sample の hold として扱う。
 [^timeline-cursor]: timeline cursor: diagnostics replay 画面で現在選ばれている再生タイムライン上の位置。`latest-before snapshot` を使う場合でも、timeline cursor は selected tick のまま動かさない。
 [^candidate-missing]: CandidateMissing: Field source に選択 source の候補 snapshot が無いことを示す missing 状態。Field 全体は消さず、ready な layer は残し、legend / details に missing reason を出す。
 [^no-candidate-snapshot]: NoCandidateSnapshot: comparison に選択 source の候補 snapshot が無いことを示す missing 状態。比較対象が無い理由を UI に出すための状態であり、future / later snapshot を代わりに使う合図ではない。
-[^future-later-snapshot]: future / later snapshot: selected replay timeline tick より後に存在する snapshot。Issue #10 の diagnostics では、未来側の tracker 状態を現在 tick の比較に混ぜないため、Field source や comparison の代替候補にしない。
-[^diagnostics-line-alignment]: diagnostics-line alignment: diagnostics のログ行と tracker source snapshot の対応付け。selected tick 以前の同じ source の snapshot を探す補助情報としてだけ使い、selected tick より後の snapshot を候補にするためには使わない。
+[^future-later-snapshot]: future / later snapshot: selected replay timeline tick より後に存在する snapshot。Issue #10 の diagnostics では、未来側の トラッカー 状態を現在 tick の比較に混ぜないため、Field source や comparison の代替候補にしない。
+[^diagnostics-line-alignment]: diagnostics-line alignment: diagnostics のログ行と トラッカー source snapshot の対応付け。selected tick 以前の同じ source の snapshot を探す補助情報としてだけ使い、selected tick より後の snapshot を候補にするためには使わない。
 [^nearest-timestamp]: nearest timestamp: selected tick に近い時刻を探す検索方法。Issue #10 では近さだけで future / later snapshot を選ばず、同じ source の selected tick 以前の snapshot だけを候補にする。
-[^old-format-current-limitation]: 旧形式 / current limitation: 既存の diagnostics capture が render frame 単位の sidecar に依存している状態。新規 capture の target ではなく、tracker committed frame cadence に制限される既存制約として扱う。
-[^legacy-render-snapshot-sidecar]: render snapshot / legacy render snapshot sidecar: 既存 `.render-snapshots.jsonl.gz` のように tracker render frame 単位で保存された sidecar。loop isolation 後の新規 capture では主要な `Vision Input` 復元元にしない。
-[^world-frame-committed]: WorldFrameCommitted: ibis tracker が world frame を commit したタイミングを表す dispatch result。既存 render snapshot 保存はこの callback に結合しており、raw Vision の保存 cadence としては遅くなり得る。
-[^tracker-committed-frame-cadence]: tracker committed frame cadence: ibis tracker が `WorldFrameCommitted` を出し、`TrackerFrame` を publish する周期。raw Vision Input の新規保存周期として扱わない。
-[^new-capture]: new capture: loop isolation 設計後に作る CaptureOn session。旧 render snapshot sidecar 互換より、latest raw / latest tracker snapshot を高頻度に保存できることを優先する。
-[^diagnostics-sample-tick]: diagnostics sample tick: diagnostics logging / replay processing が latest raw snapshot と latest tracker snapshot を同じ保存単位として固定する tick。tracker committed frame と同義にしない。
+[^old-format-current-limitation]: 旧形式 / current limitation: 既存の diagnostics capture が render frame 単位の sidecar に依存している状態。新規 capture の target ではなく、トラッカー committed frame cadence に制限される既存制約として扱う。
+[^legacy-render-snapshot-sidecar]: render snapshot / legacy render snapshot sidecar: 既存 `.render-snapshots.jsonl.gz` のように トラッカー render frame 単位で保存された sidecar。loop isolation 後の新規 capture では主要な `Vision Input` 復元元にしない。
+[^world-frame-committed]: WorldFrameCommitted: ibis トラッカー が world frame を commit したタイミングを表す dispatch result。既存 render snapshot 保存はこの callback に結合しており、raw Vision の保存 cadence としては遅くなり得る。
+[^tracker-committed-frame-cadence]: トラッカー committed frame cadence: ibis トラッカー が `WorldFrameCommitted` を出し、`TrackerFrame` を publish する周期。raw Vision Input の新規保存周期として扱わない。
+[^new-capture]: new capture: loop isolation 設計後に作る CaptureOn session。旧 render snapshot sidecar 互換より、latest raw / latest トラッカー snapshot を高頻度に保存できることを優先する。
+[^diagnostics-sample-tick]: diagnostics sample tick: diagnostics logging / replay processing が latest raw snapshot と latest トラッカー snapshot を同じ保存単位として固定する tick。トラッカー committed frame と同義にしない。
 [^latest-raw-snapshot]: latest raw snapshot: `VisionPacketStore` 相当の raw SSL-Vision latest detection / geometry を snapshot 化したもの。Diagnostics の `Vision Input` は新規 capture ではこの snapshot 系から復元する。
-[^latest-tracker-snapshot]: latest tracker snapshot: ibis tracker または 3rd party tracker の最新出力を diagnostics sample に含めるために snapshot 化したもの。
+[^latest-tracker-snapshot]: latest トラッカー snapshot: ibis トラッカー または 3rd party トラッカー の最新出力を diagnostics sample に含めるために snapshot 化したもの。
 [^diagnostics-sample-timeline]: diagnostics sample timeline: diagnostics sample tick を時系列に並べた replay 用 timeline。selected replay timeline tick の考え方を維持しつつ、render frame ではなく diagnostics sample を基準にする。
-[^loop-isolation]: loop isolation: tracker operation、server live display、diagnostics logging / replay の周期と責務を分け、片方の cadence や負荷が別 loop の表示や保存を支配しないようにする方針。
-[^tracker-operation-loop]: tracker operation loop: raw packet や profile / control input を tracker engine に渡し、tracker state の更新、publish、latest tracker snapshot の公開までを担当する処理 loop。
+[^loop-isolation]: loop isolation: トラッカー operation、server live display、diagnostics logging / replay の周期と責務を分け、片方の cadence や負荷が別 loop の表示や保存を支配しないようにする方針。
+[^tracker-operation-loop]: トラッカー operation loop: raw packet や profile / control input を トラッカー engine に渡し、トラッカー state の更新、publish、latest トラッカー snapshot の公開までを担当する処理 loop。
 [^web-server-live-display-processing]: web server live display processing: 通常 Vision 画面が `UI render tick` ごとに latest immutable snapshot を固定して描画する処理。diagnostics logging / replay とは別扱いにする。
-[^diagnostics-logging-replay-processing]: diagnostics logging / replay processing: CaptureOn 中に latest raw snapshot と latest tracker snapshot を独立した sample として保存し、Diagnostics 画面でその sample timeline を replay する処理。
+[^diagnostics-logging-replay-processing]: diagnostics logging / replay processing: CaptureOn 中に latest raw snapshot と latest トラッカー snapshot を独立した sample として保存し、Diagnostics 画面でその sample timeline を replay する処理。
 [^ui-only-display-correction]: UI-only display correction: 保存済み data の cadence は変えず、描画時の補正だけで遅延を隠そうとする修正方針。RAW-VISION-017 の loop isolation では不採用とする。
-[^diagnostics-sample-sidecar]: diagnostics sample sidecar: loop isolation 後に diagnostics logging / replay processing が保存する latest raw / latest tracker snapshot の sidecar。RUNTIME-HOST-007 では `diagnostics-samples.jsonl` として固定し、record は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本 field とする。
+[^diagnostics-sample-sidecar]: diagnostics sample sidecar: loop isolation 後に diagnostics logging / replay processing が保存する latest raw / latest トラッカー snapshot の sidecar。RUNTIME-HOST-007 では `diagnostics-samples.jsonl` として固定し、record は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本 field とする。
 [^degraded-legacy-session]: unsupported / degraded legacy session: 旧 render snapshot sidecar しか持たない capture session。新しい diagnostics sample path の性能や cadence 保証を受けず、表示できる範囲だけを旧形式として扱う。
 [^raw-snapshot-cadence]: raw snapshot cadence: SSL-Vision packet / raw latest snapshot が更新される周期。Diagnostics の `Vision Input` 表示は新規 capture でこの cadence を失わない保存経路を持つ。
 [^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、raw vision viewer、diagnostics、capture / replay、比較表示を担当する。

@@ -1,19 +1,19 @@
-# Phases Status
+# 工程状態
 
-Rule: This file may be updated only through `task-breakdown-planner`, `task-consistency-manager`, or `progress-sync-manager`.
+更新規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` のいずれかを通してのみ更新する。
 
-## Overall State
+## 全体状態
 
-- Active Phase: design
-- Active Task: RAW-VISION-017
-- Remaining Phases: design, verification, implementation, review
+- 現在の工程: 設計
+- 現在の作業: `RAW-VISION-017`
+- 残り工程: 設計、検証、実装、確認
 
-## Phases
+## 工程
 
-| Phase | Status | Exit Criteria |
+| 工程 | 状態 | 完了条件 |
 | --- | --- | --- |
-| preparation | complete | Design plan and tracking files exist before implementation. |
-| implementation | pending | PR #15 までの implementation は complete。`RAW-VISION-019` で diagnostics logging loop isolation を実装し、tracker loop から render snapshot を直接保存する経路を新規 capture では置き換え、別 loop が latest raw / latest own tracker / latest external tracker snapshot を読み取って diagnostics 保存・alignment/replay に接続する。 |
-| verification | pending | PR #15 までの verification は complete。`RAW-VISION-018` で diagnostics sampling loop / latest snapshot boundary の TDD contract を追加し、`RAW-VISION-020` で対象 capture または同等ログにより raw/latest snapshot cadence と replay `Vision Input` cadence の改善を説明できる evidence を残す。 |
-| review | pending | PR #15 は `2026-05-14T03:29:25Z` に merge 済み。`RAW-VISION-020` で diagnostics loop isolation の dedicated gpt-5.5 high review、progress sync、commit / PR ready を完了する。 |
-| design | in-progress | PR #15 までの design は complete。`RAW-VISION-017` で `raw-vision-viewer-plan.md` に tracker 処理ループ、server live 表示ループ、diagnostics logging / replay ループの分離、diagnostics sample tick、旧 render snapshot sidecar 互換を非要件とする性能優先方針、固有名詞脚注を追記し、gpt-5.5 high design review で blocking findings がないことを確認する。 |
+| 準備 | 完了 | 実装前に設計計画と進捗管理文書が存在する。 |
+| 実装 | 未着手 | PR #15 までの実装は完了済み。`RAW-VISION-019` で診断記録保存周期の分離を実装する。 |
+| 検証 | 未着手 | PR #15 までの検証は完了済み。`RAW-VISION-018` と `RAW-VISION-020` で診断保存周期と再生周期の改善を証明する。 |
+| 確認 | 未着手 | PR #15 は統合済み。`RAW-VISION-020` で専用確認、進捗同期、変更記録、PR 準備完了までを完了する。 |
+| 設計 | 進行中 | PR #15 までの設計は完了済み。`RAW-VISION-017` で処理周期分離方針、診断標本時点、旧形式互換を非要件とする性能優先方針、固有名詞脚注を設計へ反映し、確認で重大指摘がないことを確認する。 |

@@ -1,4 +1,4 @@
-# Tracker test 保守性改善 詳細設計
+# トラッカー test 保守性改善 詳細設計
 
 ## 目的
 
@@ -57,8 +57,8 @@ TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責
 | --- | --- | --- |
 | `Contracts/TrackerEngineBufferingContractTests.cs` | event-time reorder、merge window、0..N frame flush、late packet、processed time | `Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers`、`Update_SplitsFrames_WhenObservationsExceedMergeWindow`、`Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush`、`Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes`、`Update_EmitsWorldFrameCommittedForEachCommittedFrameInFlushOrder`、`Update_UsesSentTimeWhenCaptureTimeIsMissing`、`Update_DropsLatePacketsThatFallInsideAnAlreadyCommittedMergeWindow`、`Update_WaitsForTheOldestGroupMergeWindowToCloseBeforeFlushingIt`、`Update_PopulatesProcessedAtNsFromLocalProcessingTime` |
 | `Contracts/TrackerEngineGeometryProfileContractTests.cs` | geometry snapshot、geometry reset、profile switch | `Update_PreservesDisplayGeometryInGeometrySnapshot`、`Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration`、`Update_EmitsGeometryResetWhenGoalGeometryChanges`、`Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched`、`Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult`、`Update_PreservesFrameNumberContinuityAcrossProfileSwitch`、`Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile` |
-| `Contracts/TrackerEngineRobotTrackingContractTests.cs` | robot merge、速度、Kalman、outlier、visibility、duplicate robot 抑制 | `Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot` から `Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation` まで |
-| `Contracts/TrackerEngineBallTrackingContractTests.cs` | ball merge、primary/secondary、速度、Kalman、visibility、ghost/stale 抑制、identity、multi-camera cluster | `Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall` から `Update_MergesThreeCameraBallChainIntoSingleCluster` まで |
+| `Contracts/TrackerEngineRobotTrackingContractTests.cs` | robot merge、速度、カルマン、outlier、visibility、duplicate robot 抑制 | `Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot` から `Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation` まで |
+| `Contracts/TrackerEngineBallTrackingContractTests.cs` | ball merge、primary/secondary、速度、カルマン、visibility、ghost/stale 抑制、identity、multi-camera cluster | `Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall` から `Update_MergesThreeCameraBallChainIntoSingleCluster` まで |
 | `Contracts/TrackerEngineKickContactContractTests.cs` | contact、last toucher、kick、flat/chip 分類 | `Update_PopulatesCurrentBallContactAndMarksContactingRobot` から `Update_UsesConfiguredChipHeightThresholdForChipClassification` まで |
 | `Contracts/TrackerEngineBallLeftFieldContractTests.cs` | field 外退出、goal mouth / goal line / corner 分類 | `Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine`、`Update_ClassifiesGoalMouthExitAsGoalInterior`、`Update_ClassifiesNonGoalMouthExitAsGoalLine`、`Update_ClassifiesCornerExitByFirstPerimeterCrossing` |
 

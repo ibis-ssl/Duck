@@ -1,4 +1,4 @@
-# AutoRef 向け Tracker 設計
+# AutoRef 向け トラッカー 設計
 
 ## 目的
 
@@ -13,16 +13,16 @@
 
 ## 対象範囲
 
-- `Tracker.Core` に tracker の内部モデル、エンジン契約、proto 変換器を実装する
-- `Tracker.RuntimeHost` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と official tracker packet を生成できるようにする
-- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、比較表示に専念し、tracker operation loop を描画や logging の周期から切り離す
+- `Tracker.Core` に トラッカー の内部モデル、エンジン契約、proto 変換器を実装する
+- `Tracker.RuntimeHost` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と official トラッカー packet を生成できるようにする
+- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、比較表示に専念し、トラッカー operation loop を描画や logging の周期から切り離す
 - UI は raw viewer に加えて tracked viewer を持ち、button で切り替えられるようにする
 - v1 では primary ball を先頭にしつつ、複数 ball を同時に維持して出力できるようにする
 - v1 では決定性とルール上重要な品質を優先し、過剰な機械学習や非決定的要素は入れない
 
 ## 対象外
 
-- feedback packet や robot telemetry を tracker 入力に使うこと
+- feedback packet や robot telemetry を トラッカー 入力に使うこと
 - Tigers と完全な挙動一致を取ること
 - AutoRef logic を今回の scope で実装すること
 - 永続化や replay database を v1 で持つこと
@@ -33,15 +33,15 @@
 
 - 実行体は本番寄りの `Tracker.RuntimeHost` と debug 用の `Tracker.DebugHost` に分ける
 - 追跡アルゴリズム本体は `Tracker.Core` に置く
-- `Tracker.RuntimeHost` は tracker operation、UDP publish、将来 AutoRef mode の同一 process 実行を担当する
+- `Tracker.RuntimeHost` は トラッカー operation、UDP publish、将来 AutoRef mode の同一 process 実行を担当する
 - `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、comparison、debug config を担当する
-- `Tracker.DebugHost` の Web rendering と diagnostics logging は `Tracker.RuntimeHost` の tracker operation loop を直接駆動しない
+- `Tracker.DebugHost` の Web rendering と diagnostics logging は `Tracker.RuntimeHost` の トラッカー operation loop を直接駆動しない
 
 ### 品質優先順位
 
 1. 決定的であること
 2. ルール上重要な情報を落とさないこと
-3. official tracker proto と互換であること
+3. official トラッカー proto と互換であること
 4. raw / tracked の観察性が高いこと
 
 ### 参考実装の扱い
@@ -50,7 +50,7 @@
 
 - 採用する
   - raw vision と tracked world の責務分離
-  - tracker proto 出力と内部 world model の分離
+  - トラッカー proto 出力と内部 world model の分離
   - kicked ball / contact / ball left field のような AutoRef 向けメタ情報を内部で保持する考え方
 - 採用しない
   - Java 実装構造そのもの
@@ -67,7 +67,7 @@ Tigers および official proto の調査結果は次を参照する。
 
 ## Proto 入力
 
-tracker が直接扱う proto 入力は次の通り。
+トラッカー が直接扱う proto 入力は次の通り。
 
 - `SSL_WrapperPacket`
   - raw vision の datagram 全体
@@ -92,7 +92,7 @@ tracker が直接扱う proto 入力は次の通り。
 
 ### Official 出力
 
-v1 の外部配信は official tracker proto に限定する。
+v1 の外部配信は official トラッカー proto に限定する。
 
 - `TrackerWrapperPacket`
   - `uuid`
@@ -112,21 +112,21 @@ v1 の外部配信は official tracker proto に限定する。
 - `CAPABILITY_DETECT_FLYING_BALLS`
 - `CAPABILITY_DETECT_MULTIPLE_BALLS`
 
-### tracker packet snapshot 比較ログ
+### トラッカー packet snapshot 比較ログ
 
-CaptureOn 中に同じ official tracker multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の official packet、3rdparty tracker packet を再生・比較できるように別系統で保存する。
+CaptureOn 中に同じ official トラッカー multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の official packet、3rdparty トラッカー packet を再生・比較できるように別系統で保存する。
 
-DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
+Tracker.DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
 
 責務境界は次の通り。
 
-- `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
-- `Tracker.DebugHost` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
-- `Tracker.Core` には official tracker packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis tracker の内部状態生成と official packet 生成だけを担当する。
+- `TrackerConnectionLib` を official トラッカー packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
+- `Tracker.DebugHost` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、トラッカー packet snapshot sidecar JSONL、トラッカー snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
+- `Tracker.Core` には official トラッカー packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis トラッカー の内部状態生成と official packet 生成だけを担当する。
 
-snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。
+snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の トラッカー packet snapshot sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。
 
-session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。新規 capture では `tracker-snapshot-alignment.jsonl` も metadata から辿れるようにし、alignment が未作成、record 0 件、破損している状態を tracker packet snapshot sidecar の成否とは別に表現する。
+session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。新規 capture では `tracker-snapshot-alignment.jsonl` も metadata から辿れるようにし、alignment が未作成、record 0 件、破損している状態を トラッカー packet snapshot sidecar の成否とは別に表現する。
 
 sidecar JSONL の各 record は少なくとも次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできるようにする。
 
@@ -141,19 +141,19 @@ sidecar JSONL の各 record は少なくとも次を保持する。snapshot は�
 - raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary など、後から比較・一覧表示するための summary
 - decode / schema error がある場合の skipped/error 情報
 
-ibis tracker の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 tracker と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active tracker API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
+ibis トラッカー の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 トラッカー と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active トラッカー API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
 
-ibis committed frame と tracker packet snapshot は publish frequency が一致しない前提で扱う。さらに、3rdparty tracker の `TrackedFrame.timestamp` は ibis own と同じ時刻系とは限らない。新規 capture の replay / diagnostics / Field source 表示では、CaptureOn 保存時に diagnostics entry / render snapshot / tracker source snapshot を session-relative `receivedAt` と diagnostics entry time で対応付けた alignment sidecar を優先する。legacy capture で alignment がない場合だけ、exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を best-effort として明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint / role、alignment status は後から確認できるように保存または表示する。
+ibis committed frame と トラッカー packet snapshot は publish frequency が一致しない前提で扱う。さらに、3rdparty トラッカー の `TrackedFrame.timestamp` は ibis own と同じ時刻系とは限らない。新規 capture の replay / diagnostics / Field source 表示では、CaptureOn 保存時に diagnostics entry / render snapshot / トラッカー source snapshot を session-relative `receivedAt` と diagnostics entry time で対応付けた alignment sidecar を優先する。legacy capture で alignment がない場合だけ、exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を best-effort として明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint / role、alignment status は後から確認できるように保存または表示する。
 
-diagnostics replay timeline は capture-time `ReceivedAt` を軸にし、diagnostics entry / render snapshot / tracker packet snapshot の union、または同等に fastest available source cadence を含む index とする。`TrackedFrame.timestamp` は source 間で時刻系が違う場合があるため、timeline ordering には使わない。Vision / render snapshot より tracker source が高速な場合は、fast tracker tick ごとに tracker snapshot を進め、Vision / render は latest-before frame を保持する。先頭で prior render snapshot がない場合だけ nearest-after fallback を許容する。
+diagnostics replay timeline は capture-time `ReceivedAt` を軸にし、diagnostics entry / render snapshot / トラッカー packet snapshot の union、または同等に fastest available source cadence を含む index とする。`TrackedFrame.timestamp` は source 間で時刻系が違う場合があるため、timeline ordering には使わない。Vision / render snapshot より トラッカー source が高速な場合は、fast トラッカー tick ごとに トラッカー snapshot を進め、Vision / render は latest-before frame を保持する。先頭で prior render snapshot がない場合だけ nearest-after fallback を許容する。
 
-等倍速 `Play` は replay timeline の全 tick を逐次描画する契約ではない。Play 開始時の wall-clock と selected replay timeline tick の `ReceivedAt` を基準に target capture-time を計算し、30fps相当の表示更新ごとに `ReceivedAt <= target` の latest tick へ追従する。高頻度 tracker tick は alignment / comparison data として保持し、表示だけが中間 tick をスキップしうる。scrub、Field source、comparison、CLI comparison は selected replay timeline tick を任意に選べる経路として維持し、Play の表示スキップで保存済み alignment v2 や比較精度を落とさない。diagnostics playback UI は Play / Fast Forward / Stop の従来 transport button 配置を維持し、速度選択側の compact tabs に `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は Play、各倍率は調査用 Fast Forward として Play 専用 realtime stepping から分離し、数値の等倍ラベルは使わない。
+等倍速 `Play` は replay timeline の全 tick を逐次描画する契約ではない。Play 開始時の wall-clock と selected replay timeline tick の `ReceivedAt` を基準に target capture-time を計算し、30fps相当の表示更新ごとに `ReceivedAt <= target` の latest tick へ追従する。高頻度 トラッカー tick は alignment / comparison data として保持し、表示だけが中間 tick をスキップしうる。scrub、Field source、comparison、CLI comparison は selected replay timeline tick を任意に選べる経路として維持し、Play の表示スキップで保存済み alignment v2 や比較精度を落とさない。diagnostics playback UI は Play / Fast Forward / Stop の従来 transport button 配置を維持し、速度選択側の compact tabs に `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は Play、各倍率は調査用 Fast Forward として Play 専用 realtime stepping から分離し、数値の等倍ラベルは使わない。
 
 alignment sidecar は `tracker-packet-snapshots.jsonl` へ埋め込まず、別 file とする。snapshot sidecar は受信 packet の主記録、alignment sidecar は diagnostics replay 用 index として分けることで、alignment 欠落や破損を既存 snapshot 保存の破損と区別できる。source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` を基本にし、同じ label / uuid が複数 endpoint に分かれる場合の UI aggregate は session-relative `receivedAt` に最も近い代表 snapshot を deterministic tie-break で選ぶ。
 
-`tracker-snapshot-alignment.jsonl` は diagnostics line ごとの対応表ではなく、schema version 2 の replay timeline records として扱う。新規 capture では fast tracker sample 分の alignment records も保存し、同じ Vision / render frame を複数 fast tracker records から参照できるようにする。低速 Vision / render tick でも、その時点の latest/current tracker snapshot と対応する record を残す。別 sidecar は作らず、互換 fallback も持たない。性能第一のため、reader は v2 JSONL から replay timeline index、render latest-before index、tracker source index を log open 時に一度だけ構築し、tick / scrub では既存 diagnostics-line-driven reader へ戻らない。
+`tracker-snapshot-alignment.jsonl` は diagnostics line ごとの対応表ではなく、schema version 2 の replay timeline records として扱う。新規 capture では fast トラッカー sample 分の alignment records も保存し、同じ Vision / render frame を複数 fast トラッカー records から参照できるようにする。低速 Vision / render tick でも、その時点の latest/current トラッカー snapshot と対応する record を残す。別 sidecar は作らず、互換 fallback も持たない。性能第一のため、reader は v2 JSONL から replay timeline index、render latest-before index、トラッカー source index を log open 時に一度だけ構築し、tick / scrub では既存 diagnostics-line-driven reader へ戻らない。
 
-Capture Off 中は snapshot sidecar へ追記しない。Capture Off / 再On では新しい capture session folder と新しい snapshot sidecar に切り替え、前 session folder へ追記しない。他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の内容上の挙動を変えず、metadata には snapshot log が未作成または record 0 件であることを表現できるようにする。
+Capture Off 中は snapshot sidecar へ追記しない。Capture Off / 再On では新しい capture session folder と新しい snapshot sidecar に切り替え、前 session folder へ追記しない。他 トラッカー が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の内容上の挙動を変えず、metadata には snapshot log が未作成または record 0 件であることを表現できるようにする。
 
 ### 内部出力
 
@@ -266,7 +266,7 @@ proto 変換境界でのみ official 単位へ変換する。
 役割:
 
 - raw vision 入力を 1 件受け取り、event time で再順序化したうえで内部追跡状態を進める
-- 確定した world frame 群と tracker event 群を publish 順で返す
+- 確定した world frame 群と トラッカー event 群を publish 順で返す
 - geometry 更新だけの packet でも内部状態を壊さない
 
 最低限の入力:
@@ -340,7 +340,7 @@ proto 変換境界でのみ official 単位へ変換する。
 
 ### `TrackerCoordinator`
 
-`Tracker.Core` 側の runtime 境界として置く。RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project は作らず、将来の RuntimeHost から再利用できる UI 非依存 shared operation loop を Core に抽出する。
+`Tracker.Core` 側の runtime 境界として置く。RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project は作らず、将来の Tracker.RuntimeHost から再利用できる UI 非依存 shared operation loop を Core に抽出する。
 
 役割:
 
@@ -355,15 +355,15 @@ proto 変換境界でのみ official 単位へ変換する。
 - `TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore` は `Tracker.Core` に置く
 - `UdpTrackerPacketPublisher` は UI 非依存 publisher として `Tracker.Core` に置いてよい
 - Core の runtime source は `Tracker.DebugHost`、Blazor、diagnostics / capture writer / reader、`VisionPacketCaptureSession`、`TrackerRenderSnapshot`、`TrackerPacketSnapshotLog`、`TrackerSnapshotAlignmentLog` を参照しない
-- diagnostics file logging、render snapshot capture、alignment log、packet capture session sidecar path 依存は DebugHost 側の別処理として扱い、Core の operation loop には入れない
-- DebugHost の `VisionReceiverService` は UDP decode / raw store / capture の後、Core の `TrackerCoordinator.ProcessPacket` を呼ぶ adapter とする
-- DebugHost の diagnostics 設定解決結果は `TrackerResolvedOptions` に残せるが、Core loop が必要とする設定は `TrackerRuntimeResolvedOptions` として Core に置ける shape に分離する
+- diagnostics file logging、render snapshot capture、alignment log、packet capture session sidecar path 依存は Tracker.DebugHost 側の別処理として扱い、Core の operation loop には入れない
+- Tracker.DebugHost の `VisionReceiverService` は UDP decode / raw store / capture の後、Core の `TrackerCoordinator.ProcessPacket` を呼ぶ adapter とする
+- Tracker.DebugHost の diagnostics 設定解決結果は `TrackerResolvedOptions` に残せるが、Core loop が必要とする設定は `TrackerRuntimeResolvedOptions` として Core に置ける shape に分離する
 
 処理規則:
 
 - `CommittedFrames` が複数件ある場合、古い順に全件を処理する
 - UI 用 `TrackedSnapshotStore` には最後の `CommittedFrame` を残す
-- official tracker packet は各 `CommittedFrame` ごとに生成する
+- official トラッカー packet は各 `CommittedFrame` ごとに生成する
 - observer 通知は `EmittedEvents` の順序に従う
 - coordinator は同一 `TrackerUpdateResult` の dispatch 中、まず `ProfileSwitched` / `GeometryReset` の local state 遷移を `EmittedEvents` 順に適用し、その完了後に `WorldFrameCommitted` と対応する `CommittedFrame` / official packet を処理する
 - profile 切替要求を受けたら、coordinator は要求内容を保持したまま次の `Update` に 1 回だけ渡す
@@ -380,7 +380,7 @@ proto 変換境界でのみ official 単位へ変換する。
 
 ### `TrackedSnapshotStore`
 
-`Tracker.Core` 側の runtime 読み取り snapshot store とする。DebugHost UI と将来 RuntimeHost はこの store を介して latest frame、active profile、publish 統計を読む。
+`Tracker.Core` 側の runtime 読み取り snapshot store とする。Tracker.DebugHost UI と将来 Tracker.RuntimeHost はこの store を介して latest frame、active profile、publish 統計を読む。
 
 最低限の内容:
 
@@ -423,7 +423,7 @@ runtime profile control の UI 規則:
 
 ### multi-camera の時系列契約
 
-既存 `VisionReceiverService` は UDP 到着順で packet を渡すが、tracker は arrival order に依存しないよう次を守る。
+既存 `VisionReceiverService` は UDP 到着順で packet を渡すが、トラッカー は arrival order に依存しないよう次を守る。
 
 - `ReorderWindow`
   - packet 再順序化のための待ち時間窓
@@ -471,9 +471,9 @@ geometry 更新規則:
 ### `Tracker.Core`
 
 - `ITrackerEngine`
-  - raw vision 入力から tracker の状態を進める中核契約
+  - raw vision 入力から トラッカー の状態を進める中核契約
 - `TrackerEngine`
-  - v1 の決定的 tracker 実装
+  - v1 の決定的 トラッカー 実装
 - `TrackerPacketGenerator`
   - `TrackerFrame` から `TrackerWrapperPacket` を生成する
 - `TrackerFrame` と各 state 型
@@ -483,12 +483,12 @@ geometry 更新規則:
 
 - raw vision receiver
   - 既存 `VisionReceiverService` を入力源として再利用する
-- tracker coordinator hosted service
+- トラッカー coordinator hosted service
   - raw vision packet を `Tracker.Core` に流し、最新 tracked frame を更新する
 - tracked snapshot store
   - UI 用の最新 tracked world state を保持する
-- tracker packet publisher
-  - official tracker multicast を配信する
+- トラッカー packet publisher
+  - official トラッカー multicast を配信する
 - viewer page
   - `Raw / Tracked` button 切替を提供する
 
@@ -517,13 +517,13 @@ geometry 更新規則:
 1. `VisionReceiverService` が `SSL_WrapperPacket` を受信する
 2. packet capture が有効な場合は、decode 前の UDP payload bytes と受信時刻を `jsonl.gz` に保存する
 3. raw packet を `VisionPacketStore` に反映する
-4. 同じ raw packet を tracker coordinator が `TrackerEngine` に流す
+4. 同じ raw packet を トラッカー coordinator が `TrackerEngine` に流す
 5. `TrackerEngine` が `TrackerFrame` を更新する
 6. `TrackerPacketGenerator` が official `TrackerWrapperPacket` を生成する
 7. publisher が UDP multicast へ送信する
 8. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
 
-CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline とは別に `Tracker.DebugHost` が `TrackerConnectionLib` 経由で official tracker packet を傍受する。傍受した `TrackerWrapperPacket` は self 除外せず、見えている tracker packet をすべて CaptureOn session folder 配下の tracker packet snapshot sidecar JSONL へ保存する。ibis 自身か 3rdparty かの判別は保存後の source role / label / metadata として扱い、判別できない場合も保存を落とさない。`Tracker.Core` の入力や状態更新には流さない。
+CaptureOn 比較ログを有効にする場合は、上記 ibis トラッカー pipeline とは別に `Tracker.DebugHost` が `TrackerConnectionLib` 経由で official トラッカー packet を傍受する。傍受した `TrackerWrapperPacket` は self 除外せず、見えている トラッカー packet をすべて CaptureOn session folder 配下の トラッカー packet snapshot sidecar JSONL へ保存する。ibis 自身か 3rdparty かの判別は保存後の source role / label / metadata として扱い、判別できない場合も保存を落とさない。`Tracker.Core` の入力や状態更新には流さない。
 
 ## 設定
 
@@ -567,23 +567,23 @@ CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline
   - `FilePrefix`
   - `FlushEachPacket`
 
-packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
+packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して トラッカー へ再投入できるようにする。
 
-packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。CaptureOn 比較ログでは、同一 session folder 配下にある packet capture、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の relative path、source identity 一覧、role / label、alignment status、timestamp 対応規則も metadata に保存する。
+packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。CaptureOn 比較ログでは、同一 session folder 配下にある packet capture、トラッカー diagnostics、render snapshots、トラッカー packet snapshot sidecar JSONL、トラッカー snapshot alignment sidecar JSONL の relative path、source identity 一覧、role / label、alignment status、timestamp 対応規則も metadata に保存する。
 
 `Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。detail filter は `frame` でも絞り込めるようにし、robot detail には位置だけでなく `orientation / angular velocity` も出して、raw detection と tracked 出力の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.DebugHost/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
 
-raw vision に対して ibis tracker が遅れて見える調査では、capture file を手作業で読むのではなく `Tracker.CaptureReplay` の汎用分析出力を使う。CLI は raw SSL-Vision packet の capture-time cadence と、replay で commit された ibis tracker frame の capture-time / data timestamp / commit 入力位置を同じ summary で出し、reorder window、merge window、欠落 detection、tracker 側 commit hold のどれが遅延要因かを report 化できるようにする。この出力は特定 capture basename や特定 source 名へ依存させず、`--analyze-latency` のような明示 option で次回以降の遅延・stale・cadence 調査にも再利用する。
+raw vision に対して ibis トラッカー が遅れて見える調査では、capture file を手作業で読むのではなく `Tracker.CaptureReplay` の汎用分析出力を使う。CLI は raw SSL-Vision packet の capture-time cadence と、replay で commit された ibis トラッカー frame の capture-time / data timestamp / commit 入力位置を同じ summary で出し、reorder window、merge window、欠落 detection、トラッカー 側 commit hold のどれが遅延要因かを report 化できるようにする。この出力は特定 capture basename や特定 source 名へ依存させず、`--analyze-latency` のような明示 option で次回以降の遅延・stale・cadence 調査にも再利用する。
 
-CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot sidecar と alignment sidecar を metadata から読み、3rdparty tracker snapshot を保存時対応付けで ibis committed frame と並べて再生・比較できるようにする。alignment がない既存 capture では timestamp 近傍規則を best-effort として明示する。この CLI 比較経路は agent / 自動検証 / 調査用に保持し、diagnostics UI 実装後も削除しない。
+CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の トラッカー packet snapshot sidecar と alignment sidecar を metadata から読み、3rdparty トラッカー snapshot を保存時対応付けで ibis committed frame と並べて再生・比較できるようにする。alignment がない既存 capture では timestamp 近傍規則を best-effort として明示する。この CLI 比較経路は agent / 自動検証 / 調査用に保持し、diagnostics UI 実装後も削除しない。
 
-diagnostics viewer と playback も同じ snapshot log / alignment log と reader contract を使い、source identity / role / label ごとの timeline、frame number / timestamp、alignment delta、ball / robot count、raw payload 復元状態を画面上で確認できるようにする。新規 capture の `/diagnostics` は選択中 replay timeline tick と対応する saved alignment record を基準とし、source filter 後の 3rdparty tracker snapshot を session-relative `receivedAt` 対応で並べる。metadata / sidecar / alignment がない、record count 0、読み取り error がある場合は状態表示に留め、既存 diagnostics log、render snapshot、settings 表示を壊さない。等倍速 Play の表示更新は30fps相当に抑えて wall-clock 経過時間へ追従するが、scrub / Field source / comparison は任意 replay tick を選択できる比較経路として保持する。playback UI は Play / Fast Forward / Stop の従来 button 配置を使い、速度選択 tabs の `等倍速` は Play、`4x` / `16x` / `64x` は調査用 Fast Forward に対応させる。Fast Forward は tick 非間引きのまま capture-time delta と倍率で進める。
+diagnostics viewer と playback も同じ snapshot log / alignment log と reader contract を使い、source identity / role / label ごとの timeline、frame number / timestamp、alignment delta、ball / robot count、raw payload 復元状態を画面上で確認できるようにする。新規 capture の `/diagnostics` は選択中 replay timeline tick と対応する saved alignment record を基準とし、source filter 後の 3rdparty トラッカー snapshot を session-relative `receivedAt` 対応で並べる。metadata / sidecar / alignment がない、record count 0、読み取り error がある場合は状態表示に留め、既存 diagnostics log、render snapshot、settings 表示を壊さない。等倍速 Play の表示更新は30fps相当に抑えて wall-clock 経過時間へ追従するが、scrub / Field source / comparison は任意 replay tick を選択できる比較経路として保持する。playback UI は Play / Fast Forward / Stop の従来 button 配置を使い、速度選択 tabs の `等倍速` は Play、`4x` / `16x` / `64x` は調査用 Fast Forward に対応させる。Fast Forward は tick 非間引きのまま capture-time delta と倍率で進める。
 
 raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
 
-`Tracker.DebugHost` の diagnostics viewer は、diagnostics log と同じ basename の `*.render-snapshots.jsonl.gz` がある場合に、選択した tracked frame の raw source detection と tracked frame を field 上に並べて描画する。描画 snapshot は調査用の UI データであり、tracker engine の replay 入力や内部状態保持には使わない。viewer は timeline scrubber のドラッグで frame を連続切替でき、field 描画時はページ全体をスクロールさせず、field の zoom / pan と画面スクロールが干渉しない layout とする。
+`Tracker.DebugHost` の diagnostics viewer は、diagnostics log と同じ basename の `*.render-snapshots.jsonl.gz` がある場合に、選択した tracked frame の raw source detection と tracked frame を field 上に並べて描画する。描画 snapshot は調査用の UI データであり、トラッカー engine の replay 入力や内部状態保持には使わない。viewer は timeline scrubber のドラッグで frame を連続切替でき、field 描画時はページ全体をスクロールさせず、field の zoom / pan と画面スクロールが干渉しない layout とする。
 
-既定配信先は official tracker の慣例値に合わせる。
+既定配信先は official トラッカー の慣例値に合わせる。
 
 - `224.5.23.2:10010`
 
@@ -601,7 +601,7 @@ raw / tracked 診断で比較する raw detection は、現在着信した packe
 v1 では次の 2 段階で進める。
 
 1. `appsettings` と設定束縛で全設定を外出しする
-2. 実行時設定保存領域を追加し、UI から変更した値を tracker coordinator が再読込できるようにする
+2. 実行時設定保存領域を追加し、UI から変更した値を トラッカー coordinator が再読込できるようにする
 
 ### 設定セット切替
 
@@ -652,7 +652,7 @@ v1 では次の 2 段階で進める。
 
 - 起動時に任意の設定セットを 1 つ選べる
 - UI から登録済み設定セットの一覧を選択できる
-- UI からの切替後は tracker coordinator が新しい設定セットへの切替要求を engine へ渡す
+- UI からの切替後は トラッカー coordinator が新しい設定セットへの切替要求を engine へ渡す
 - 同名の `VisionReceiver` profile が存在する場合、起動時と profile switch 完了後にその受信元設定へ追従できる
 - 個別値の微調整は選択中の設定セットに対する上書きとして扱えるようにする
 - 設定セットは将来的に追加できる前提にする
@@ -674,7 +674,7 @@ v1 では次の 2 段階で進める。
   - `Update` 呼び出し直前に pending request を `in-flight request` へ昇格させ、result 処理完了まで固定する
   - `ProfileSwitched` を受けるまでは publisher 配信先や active profile 表示を切り替えない
   - `ProfileSwitched` を受けた時点で、その `in-flight request` に対応する `現在適用済み snapshot`、publisher 配信先、active profile 表示、`TrackedSnapshotStore` の現在設定セット名を原子的に切り替える
-  - receiver profile の切替は `ProfileSwitched` 後の observer 側で行い、tracker 側の active profile と受信元設定の観測可能な切替点を揃える
+  - receiver profile の切替は `ProfileSwitched` 後の observer 側で行い、トラッカー 側の active profile と受信元設定の観測可能な切替点を揃える
   - 上記 local state 遷移と store clear を完了してから `OnProfileSwitched` を通知する
   - 任意の `Update` の result 処理後に pending request が残る場合は、その場で `desired target snapshot` に一致するまで control-only `Update` を繰り返す
   - `TrackerProfileSwitchRequest` を次の `ITrackerEngine.Update` へ 1 回だけ渡す
@@ -714,13 +714,13 @@ v1 は決定的な古典的追跡を採用する。設計時点では particle f
 - `VisionFilterImpl`
   - camera ごとの処理、統合、品質評価、公開周期の分離
 - `BallFilterPreprocessor`
-  - ball tracker 群の統合、kick 検出、kick 推定の前処理分離
+  - ball トラッカー 群の統合、kick 検出、kick 推定の前処理分離
 - `BallTracker`
-  - 個別 ball ごとの Kalman filter、health、成長判定、外れ値除外
+  - 個別 ball ごとの カルマン filter、health、成長判定、外れ値除外
 - `RobotTracker`
   - 個別 robot ごとの位置・角度の別 filter、向きの巻き戻し補正、外れ値除外
 - `TrackerPacketGenerator`
-  - world model から official tracker proto への専用変換
+  - world model から official トラッカー proto への専用変換
   - rule 層が直接 raw packet に触れずに済む境界を保つ
 
 寄せる対象は「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。
@@ -749,18 +749,18 @@ v1 は決定的な古典的追跡を採用する。設計時点では particle f
 - 対象の識別は ball / team / robot id で分けて管理する
 - 対応付けは明示的な規則で決める
 - 状態推定は設定可能な filter で行う
-- filter 実装は差し替え可能にするが、v1 は直線運動前提の Kalman filter を標準とする
+- filter 実装は差し替え可能にするが、v1 は直線運動前提の カルマン filter を標準とする
 - ball については「追跡本体」と「kick / 追加メタ推定」を分離する
 - world 側の永続 filter は v1 では持たず、camera-local track を uncertainty-weighted に統合した結果をその frame の world snapshot とする
 
 v1 実装契約:
 
-- camera-local ball / robot track は、観測値をそのまま上書きする簡易追跡ではなく、predict-update を持つ線形 Kalman filter で更新する
+- camera-local ball / robot track は、観測値をそのまま上書きする簡易追跡ではなく、predict-update を持つ線形 カルマン filter で更新する
 - 各 track は少なくとも state estimate と covariance 相当の不確かさを保持する
 - `ProcessNoise` は `KalmanProcessNoiseScale` を通して予測時の process covariance へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
 - `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は profile ごとの外部設定値とし、停止時の小刻みな raw detection 揺れと移動追従性のバランスを code 変更なしで調整できるようにする
-- `VisibilityHalfLifeSeconds` は観測欠測時の liveliness 管理に使う値であり、Kalman の covariance 更新を省略する理由にはならない
-- world 統合で使う uncertainty は camera-local Kalman filter の事後不確かさから導く
+- `VisibilityHalfLifeSeconds` は観測欠測時の liveliness 管理に使う値であり、カルマン の covariance 更新を省略する理由にはならない
+- world 統合で使う uncertainty は camera-local カルマン filter の事後不確かさから導く
 - 単純な等速外挿 + 観測値上書き + 手動 uncertainty 加算だけで済ませる実装は、この v1 契約を満たさない
 
 段階分割:
@@ -816,7 +816,7 @@ robot 状態モデル:
 
 robot v1 filter 要件:
 
-- `team + robot id` ごとに camera-local track を維持し、位置系と向き系を独立した線形 Kalman filter として更新する
+- `team + robot id` ごとに camera-local track を維持し、位置系と向き系を独立した線形 カルマン filter として更新する
 - 同一 camera / team の raw detection に、既に採用済み robot と近すぎる別 ID robot が含まれる場合は、Tigers の `Geometry.getBotRadius() * 1.5` 相当の距離を基準に後続候補を採用しない
 - 近接重複 robot の採用順は deterministic にし、confidence が高い候補を優先し、同 confidence では robot id の小さい候補を優先する
 - 同一 camera / team の既存別 ID track 近傍へ raw detection の robot id だけが突然変わる候補は、同一 ID の通常位置ずれより起きづらいものとして扱い、`RobotTracker.IdentitySwitchDistanceMm` の範囲では既存 identity を優先して新 ID 観測を採用しない
@@ -851,7 +851,7 @@ Tigers の `BallTracker` と `BallFilterPreprocessor` に合わせ、ball は「
 
 Tigers 由来で重視する点:
 
-- `BallTracker` 単位の Kalman filter
+- `BallTracker` 単位の カルマン filter
 - health と成長判定
 - 最大速度による外れ値除外
 - 直前の ball 位置や空中 ball 投影位置を基準にした探索半径
@@ -877,12 +877,12 @@ ball 状態モデル:
 
 ball v1 filter 要件:
 
-- camera-local ball track は各 track ごとに線形 Kalman filter を持ち、観測 update と欠測時 predict を分ける
+- camera-local ball track は各 track ごとに線形 カルマン filter を持ち、観測 update と欠測時 predict を分ける
 - `ProcessNoise` と `MeasurementNoise` は ball filter の covariance 更新に直接使う
 - `Gate` は新規観測を既存 ball track へ結び付ける可否判定に使い、対応付け失敗時だけ新規 track を生成する
 - track の uncertainty は観測 confidence の単純逆数ではなく、filter 事後 covariance から導く
 - camera 横断統合の weighted merge は、この ball filter の事後 uncertainty を重みとする
-- health / 育成 / visibility の管理は filter 更新とは別責務だが、少なくとも Kalman ベースの状態推定を置き換えてはならない
+- health / 育成 / visibility の管理は filter 更新とは別責務だが、少なくとも カルマン ベースの状態推定を置き換えてはならない
 - 欠測により visibility が十分低下した stale track は内部状態として短時間残せるが、tracked frame / viewer / official packet へ出し続けてはならない
 - 外部出力可否は `OutputVisibilityThreshold` で判定可能とし、Tigers の ball 不可視 lifetime 初期値 `1.0s` は `TrackLifetimeNs` の基準とする
 
@@ -1009,8 +1009,8 @@ rule 側へ渡す基本要素:
 - rule ごとに observer を持てる構造にする
 - observer は raw vision packet を直接 subscribe しない
 - observer は `TrackerFrame` と domain event を入力にする
-- kick / contact / ball left field の計算は tracker 側で責務を持ち、rule 側で同じ前提計算を重複させない
-- rule 順序依存を避けるため、event は tracker で確定した順に publish する
+- kick / contact / ball left field の計算は トラッカー 側で責務を持ち、rule 側で同じ前提計算を重複させない
+- rule 順序依存を避けるため、event は トラッカー で確定した順に publish する
 - rule が追加されても tracking core の数値処理へ影響しない境界を保つ
 
 publish 順は次で固定する。
@@ -1138,14 +1138,14 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 - `TRACKER-010`: kick と contact metadata を実装する
 - `TRACKER-011`: ball left field metadata を実装する
 - `TRACKER-012`: 旧 `Tracker.Server` へ engine と packet 配信を統合する
-- `TRACKER-013`: tracker/network 設定束縛を統合する
+- `TRACKER-013`: トラッカー/network 設定束縛を統合する
 - `TRACKER-014`: profile 切替要求経路を統合する
 - `TRACKER-015`: tracked viewer と raw/tracked toggle を追加する
 - `TRACKER-016`: tracked diagnostics 表示を追加する
 - `TRACKER-017`: runtime profile 表示・操作 UI を追加する
-- `TRACKER-018`: Tracker v1 の build/test 証跡を取得する
-- `TRACKER-019`: Tracker v1 の integration 観点検証を行う
-- `TRACKER-020`: Tracker v1 の最終レビューと追跡ファイル同期を行う
+- `TRACKER-018`: トラッカー v1 の build/test 証跡を取得する
+- `TRACKER-019`: トラッカー v1 の integration 観点検証を行う
+- `TRACKER-020`: トラッカー v1 の最終レビューと追跡ファイル同期を行う
 - `TRACKER-027`: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する
 
 contracts フェーズの着手順:
