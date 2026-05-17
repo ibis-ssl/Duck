@@ -6,6 +6,11 @@
         "TBD",
         "WIP"
       ]
+    },
+    "prh": {
+      "rulePaths": [
+        "./tools/lint/prh.yml"
+      ]
     }
   }
 }

@@ -1,13 +1,16 @@
 # 文書検査設定
 
-この作業一式では、利用者または委譲先が通常編集する文書を品質確認に載せるため、最上位に `textlint` と `cspell` を置く。
+この作業一式では、利用者または委譲先が通常編集する文書を品質確認に載せるため、最上位に `textlint` と `cspell` を置く。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。
 
 ## 準備
 
-初回または `package-lock.json` 更新後は最上位で次を実行する。
+初回、`package-lock.json` 更新後、または `tools/lint/requirements.txt` 更新後は最上位で次を実行する。標準の `npm run lint:md` は SudachiPy 版の許可一覧検査も実行するため、`npm install` だけでは足りない。
 
 ```bash
 npm install
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r tools/lint/requirements.txt
 ```
 
 この検査は `.agents/skills/review-enforcer/scripts/` にある共通処理を使う。`.agents/skills` は記録対象には含めず、手元の記号参照として `~/AI/CodexSkill/skills` を指している必要がある。
@@ -24,9 +27,10 @@ npm run lint:md
 npm run lint:md:text
 npm run lint:md:spell
 npm run lint:md:whitelist
+npm run lint:md:vocab
 ```
 
-`npm run lint:md` は、対象文書全体に対して `textlint`、`cspell`、専用許可一覧の強制検査を実行する。`cspell` は `--no-default-configuration` で標準辞書を読まないため、一般英単語も専用許可一覧にない場合は失敗する。
+`npm run lint:md` は、対象文書全体に対して `textlint`、`cspell`、専用許可一覧の強制検査を実行する。`textlint` は `tools/lint/prh.yml` の `prh` 辞書も読み込む。`cspell` は `--no-default-configuration` で標準辞書を読まないため、一般英単語も専用許可一覧にない場合は失敗する。
 
 現在の対象文書は次で確認する。
 
@@ -46,7 +50,22 @@ npm run lint:md:targets -- --changed
 node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/README.appsettings.md
 node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
 node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
-node .agents/skills/review-enforcer/scripts/check-markdown-whitelist.js --files README.md
+npm run lint:md:whitelist -- --files README.md
+```
+
+SudachiPy を使って既存文書から語彙を抽出する場合は次を使う。出力は `TSV` が既定で、必要なら `--format json` も指定できる。
+
+```bash
+npm run lint:md:vocab
+npm run lint:md:vocab -- --files README.md tools/lint/README.md
+npm run lint:md:vocab -- --format json
+```
+
+SudachiPy 版の許可一覧検査は `npm run lint:md:whitelist` から実行する。従来の JavaScript 版と比較したい場合は `npm run lint:md:whitelist:legacy` を使う。
+
+```bash
+npm run lint:md:whitelist -- --files tools/lint/README.md
+npm run lint:md:whitelist:legacy -- --files tools/lint/README.md
 ```
 
 ## 対象範囲
@@ -87,3 +106,19 @@ entries:
 `npm run lint:md:spell` は `tools/lint/markdown-whitelist.yaml` の `entries.term` と `entries.aliases` から一時辞書と無視条件を作って `cspell` を実行する。許可一覧の管理文書はこの 1 つだけである。`tracker-debug-host` と `tracker debug host` のように連結符付き表記と空白区切り表記の両方を許可する場合は、同じ項目の `aliases` に両方を明示する。
 
 `cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。既存文書に未登録語がある場合は検査が落ちるため、文章を日本語へ直すか、固有語として許可できる理由を `tools/lint/markdown-whitelist.yaml` に追加する。
+
+SudachiPy 版の抽出と検査では、日本語を文字種だけではなく形態素として扱う。漢字語、片仮名語、混在語を `surface`、正規形、読み、品詞、候補グループ、頻度、出現元で集計し、許可一覧再構築の候補にする。英字語は従来どおり専用の厳しい抽出規則で扱う。SudachiPy の正規形や読みが同じ語は候補として近くに出せるが、`namespace`、`ネームスペース`、`名前空間` のような英日意味対応は自動確定しない。最終的に許可する語と説明は利用者の明示確認を受けて `tools/lint/markdown-whitelist.yaml` に反映する。
+
+## 表記揺れ辞書
+
+表記揺れ辞書の正本は `tools/lint/prh.yml` である。`textlint-rule-prh` はこの `YAML` 文書を読み、期待する表記と誤表記の組み合わせを検出する。初期状態では具体的な表記統一規則を登録しない。
+
+```yaml
+version: 1
+rules:
+  - expected: 期待する表記
+    pattern:
+      - 避けたい表記
+```
+
+`prh` 規則は文書全体の表記方針を変えるため、追加や変更は利用者の明示確認を受けてから行う。`textlint-rule-prh` は `textlint` の Markdown 解析を通るため、リンクなどの Markdown 構造を素朴な文字列検索より安全に扱える。

@@ -1,5 +1,15 @@
 version: "0.2"
 entries:
+  - term: SudachiPy
+    description: 日本語を形態素に分けるために使う解析器名。
+  - term: Python
+    description: 語彙抽出と形態素検査を実行する処理系名。
+  - term: JavaScript
+    description: 従来の許可一覧検査で使っている処理系名。
+  - term: Markdown
+    description: 文書構造と記法を持つ軽量記述形式名。
+  - term: リンク
+    description: 文書内から別の場所や参照先を指す記法名。
   - term: CandidateMissing
     aliases:
       - candidate-missing
