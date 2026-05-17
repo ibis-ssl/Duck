@@ -2,150 +2,150 @@
 
 ## 目的
 
-`Tracker.RuntimeHost`[^本番実行体] は、トラッカー と将来の AutoRef 動作形態[^将来動作形態] を同一実行単位[^同一実行単位] で低遅延に動かす本番寄りの画面なし実行体[^画面なし実行体] とする。画面機能[^画面機能]、診断再生[^診断再生]、収録表示[^収録表示] は `Tracker.DebugHost`[^確認用実行体] へ分離し、描画や記録の負荷が トラッカー / AutoRef の実時間処理へ影響しないようにする。
+`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。
 
 ## 命名
 
-- `Tracker.RuntimeHost`: トラッカー運用処理[^トラッカー運用処理] と将来の AutoRef 動作形態を同一実行単位で実行する本番実行体。
-- `Tracker.DebugHost`: 旧 `Tracker.Server` から改名した確認用実行体。画面機能、未加工映像表示[^未加工映像表示]、診断、収録 / 再生、比較表示を担当する。
-- `Tracker.Core`: トラッカー追跡処理[^トラッカー追跡処理]、契約、純粋な状態表現、本番実行体と確認用実行体の共通処理を置く。
+- `Tracker.RuntimeHost`: tracker operation[^tracker-operation] と将来 AutoRef mode を同一 process で実行する runtime host。
+- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。
+- `Tracker.Core`: tracker algorithm[^tracker-algorithm]、contract、pure model、runtime host と debug host の共通ロジックを置く。
 
-`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体は トラッカー 専用の実行器ではなく、将来の AutoRef 動作形態も同居する試合時の実行基盤だからである。
+`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体は tracker 専用の executor ではなく、将来 AutoRef mode も同居する試合時 runtime だからである。
 
 ## 責務境界
 
 `Tracker.RuntimeHost` は次を担当する。
 
-- SSL-Vision 入力の受信、または実行時向け受信境界。
-- トラッカー運用周期処理の実行。
-- トラッカー出力情報の発行。
-- 将来の AutoRef 動作形態を同一実行単位へ入れるための境界。
-- 実時間処理の性能を優先する設定と起動経路。
+- SSL-Vision input の受信または runtime 用 receiver 境界。
+- tracker operation loop の実行。
+- tracker packet publish。
+- 将来 AutoRef mode を同一 process へ入れるための mode 境界。
+- 実時間処理の performance を優先する設定と起動経路。
 
 `Tracker.RuntimeHost` は次を担当しない。
 
-- 画面描画。
-- 診断再生画面。
-- 収録表示。
-- 確認用の比較表示。
-- 旧記録形式の互換維持。
+- Web UI rendering。
+- diagnostics replay UI。
+- capture viewer。
+- debug 用 comparison panel。
+- 旧 logging 形式の互換維持。
 
 `Tracker.DebugHost` は次を担当する。
 
-- 画面機能と診断表示。
-- 未加工映像 / 追跡済み結果 / 外部トラッカーの確認表示。
-- 収録 / 再生 / 比較。
-- `Tracker.RuntimeHost` または発行済みトラッカー出力の購読と、確認用標本の保存。
+- Web UI と diagnostics 表示。
+- raw vision / tracked / 3rd party tracker の debug visualization。
+- capture / replay / comparison。
+- RuntimeHost または published tracker output の購読と debug 用 sample 保存。
 
-`Tracker.DebugHost` は トラッカー運用周期処理を主実行責務として持たない。確認用に同一保存庫の共通部品を使っても、画面描画や診断記録が `Tracker.RuntimeHost` の処理周期を支配しない構造にする。
+`Tracker.DebugHost` は tracker operation loop を主実行責務として持たない。debug 用に同一 repository の共通部品を使っても、Web rendering や diagnostics logging が RuntimeHost の処理周期を支配しない構造にする。
 
 ## AutoRef 方針
 
-AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来の AutoRef 動作形態を同一実行単位に内包できる名前と責務境界にする。想定する動作形態は次のように扱う。
+AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来 AutoRef mode を同一 process に内包できる名前と責務境界にする。想定 mode は次のように扱う。
 
-- トラッカー単独の動作形態。
-- トラッカー + AutoRef の動作形態。
+- tracker only mode。
+- tracker + AutoRef mode。
 
-AutoRef の動作形態は トラッカー出力を実行単位外の通信で再購読する前提にしない。試合時の性能を優先するため、`Tracker.RuntimeHost` 内で トラッカー状態と AutoRef 判定処理を同居できる境界を残す。
+AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。
 
-## Tracker.RuntimeHost 設定方針
+## RuntimeHost 設定方針
 
-`Tracker.RuntimeHost` の実行周期は実装内の固定値にしない。`Tracker.RuntimeHost` の初期構成では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、`Tracker.RuntimeHost` の主周期処理 / 制御周期処理はこの値を使って周期を決める。0 以下の値は性能調整の意図を曖昧にするため、既定値への代替ではなく起動時の検証失敗とする。
+RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。
 
-`Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを設定 / `appsettings` に出す。通信方式名、補助記録名、付加情報の項目名など、再生や通信上の契約として固定すべき値は設定化しない。
+`Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを options / appsettings に出す。protocol 名、sidecar 名、metadata field 名など replay / wire contract として固定すべき値は設定化しない。
 
-## 周期処理分離方針
+## Loop isolation 方針
 
-トラッカー運用周期処理は、画面側の生表示処理と診断記録 / 再生処理の両方から切り離す。
+tracker operation loop は、Web server live display processing と diagnostics logging / replay processing の両方から切り離す。
 
-- トラッカー運用周期処理は トラッカー状態更新と発行を最優先する。
-- `Tracker.DebugHost` の生表示は最新の不変断面、または発行済み出力を読む側に回る。
-- 診断記録 / 再生は `Tracker.DebugHost` 側の標本周期処理として扱い、トラッカー確定済み処理時点の周期を保存周期として要求しない。
-- 旧描画断面補助記録の互換は非要件とし、新規記録 / 新規収録の性能を優先する。
+- tracker operation loop は tracker state update と publish を最優先する。
+- DebugHost live display は latest immutable snapshot または published output を読む側に回る。
+- diagnostics logging / replay は DebugHost 側の sample loop として扱い、tracker committed frame cadence を保存 cadence として要求しない。
+- 旧 render snapshot sidecar 互換は非要件とし、新規 logging / new capture の performance を優先する。
 
-### `RUNTIME-HOST-005`: 中核共有実行境界
+### RUNTIME-HOST-005: Core shared runtime boundary
 
-`RUNTIME-HOST-005` では新規 `Tracker.RuntimeHost` 構成単位の初期構成は作らない。先に `Tracker.DebugHost` が持っていた トラッカー運用周期処理を `Tracker.Core` 内の画面非依存な実行境界へ抽出し、将来 `Tracker.RuntimeHost` 構成単位からそのまま再利用できる形にする。
+RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。
 
-`Tracker.Core` の共有実行境界は次を担当する。
+`Tracker.Core` の shared runtime boundary は次を担当する。
 
 - `ITrackerEngine.Update` の直列実行。
-- 設定組切り替え要求の保留 / 実行中管理と、制御専用更新の排出。
-- `TrackerUpdateResult.EmittedEvents` 順の配信。
-- 確定済み処理時点ごとの最新断面保存先更新。
-- 公式 `TrackerWrapperPacket` 生成と `ITrackerPacketPublisher` への発行。
-- 発行器設定反映、発行成功/失敗統計、観測者通知。
+- profile switch request の pending / in-flight 管理と control-only update drain。
+- `TrackerUpdateResult.EmittedEvents` 順の dispatch。
+- committed frame ごとの latest snapshot store 更新。
+- official `TrackerWrapperPacket` 生成と `ITrackerPacketPublisher` への publish。
+- publisher 設定反映、publish 成功/失敗統計、observer 通知。
 
-`Tracker.Core` の共有実行境界は次を参照しない。
+`Tracker.Core` の shared runtime boundary は次を参照しない。
 
-- `Tracker.DebugHost` の名前空間 / 構成単位。
-- `Blazor` / 画面機能。
-- 診断記録文書への記録。
-- 収録の書き込み器 / 読み取り器。
+- `Tracker.DebugHost` namespace / project。
+- Blazor / Web UI。
+- diagnostics file logging。
+- capture writer / reader。
 - `VisionPacketCaptureSession`。
 - `TrackerRenderSnapshot`。
 - `TrackerPacketSnapshotLog`。
 - `TrackerSnapshotAlignmentLog`。
 
-`Tracker.DebugHost` の `VisionReceiverService` は UDP 復号、未加工情報保存、収録の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ適合層として残してよい。`Tracker.DebugHost` 固有の診断設定解決結果は `TrackerResolvedOptions` として残すが、`Tracker.Core` の周期処理が受け取る設定形状は `TrackerRuntimeResolvedOptions` に分離し、`Tracker.Core` が `Tracker.DebugHost` 型を参照しないようにする。
+DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。
 
-### `RUNTIME-HOST-006`: Tracker.DebugHost 生表示の読み取り側断面境界
+### RUNTIME-HOST-006: DebugHost live display read-side snapshot boundary
 
-`RUNTIME-HOST-006` では `Tracker.DebugHost` の生表示を、描画刻みごとの合成読み取り側断面境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接注入せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この断面は同一描画刻みの未加工 SSL-Vision 断面、自側追跡済み断面、外部トラッカーの読み取り側断面、比較用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。
+RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの composite read-side snapshot 境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この snapshot は同一 tick の raw SSL-Vision snapshot、ibis tracked snapshot、3rd party tracker read-side snapshot、comparison 用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。
 
-`VisionLiveComparisonSnapshotComposer` は保存先を直接読まない。提供側が固定済みの未加工 / 追跡済み / 外部トラッカー断面を渡し、構成器はその値から比較入力元の選択肢、`Layer A/B`、詳細を生成する。これにより `Raw` / `Tracked` / `Compare` の表示は同一描画刻み断面から派生し、比較のために未加工 / 追跡済み保存先を再読取しない。
+`VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。
 
-外部トラッカーは `MultiTrackerManager<TrackerPacketAdapter>` の可変状態を描画経路で直接読まない。`ExternalTrackerSnapshotStore` が管理器の更新事象から通信内容と付加情報を複製済み DTO として保持し、生表示の提供側はその読み取り側断面だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn 記録器は従来どおり管理器の更新経路に接続し、`RUNTIME-HOST-006` では診断標本の補助記録や `Tracker.RuntimeHost` 初期構成へ踏み込まない。
+3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。
 
-### `RUNTIME-HOST-007`: Tracker.DebugHost 診断標本補助記録の高速経路
+### RUNTIME-HOST-007: DebugHost diagnostics sample sidecar fast path
 
-`RUNTIME-HOST-007` では `Tracker.RuntimeHost` 初期構成へ踏み込まず、`Tracker.DebugHost` の CaptureOn 収録単位に診断標本の補助記録を追加する。`DiagnosticsSampleHostedService` は画面表示有無に依存しない診断標本周期処理として `VisionLiveDisplaySnapshotProvider` から最新の未加工断面と最新の自側トラッカー断面を固定し、同じ標本記録として `diagnostics-samples.jsonl` へ保存する。標本周期処理の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は 0.1 秒、0 以下は既定値へ戻す。`Home.razor` の更新刻みは生表示の描画更新だけを担当し、診断記録周期を決めない。収録付加情報は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
+RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
 
-診断再生 / 比較は診断標本補助記録が存在する収録単位では、標本刻みを再生時間軸の主経路にする。`Vision Input` の競技場形状入力元と `ibis tracker` の競技場形状入力元は旧描画断面補助記録ではなく、診断標本記録の意味要約から復元する。旧描画断面補助記録だけを持ち診断標本補助記録を持たない収録単位は非対応 / 機能低下した旧形式として扱い、高負荷な互換経路は復活させない。
+Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。
 
-### `RUNTIME-HOST-009`: Tracker.RuntimeHost 正常系
+### RUNTIME-HOST-009: RuntimeHost normal path
 
-`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なし SSL-Vision 受信器と トラッカー運用周期処理を実装する。`Tracker.RuntimeHost` は `VisionReceiver` 節から SSL-Vision 多重配信宛先、UDP 番号、任意の自機 IPv4 接続面指定を読み取り、`Tracker.DebugHost` の `VisionReceiverService` / 未加工情報保存先 / 収録書き込み器 / 診断画面に依存せずに `SSL_WrapperPacket` を受信する。
+RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。
 
-受信処理は撮像機ごとの最新受信内容保持領域へ、通信内容と受信時刻を保存する。トラッカー運用周期処理はこの保持領域を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の撮像機ごとの最新通信内容を受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じ撮像機から刻み間に複数の通信内容が届いた場合は最新だけを残し、異なる撮像機の通信内容は単一最新値の上書きで落とさない。実行周期は実装内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
+受信処理は camera ごとの latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の camera ごとの latest packet を受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じ camera から tick 間に複数 packet が届いた場合は最新だけを残し、異なる camera の packet は single latest 上書きで落とさない。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。
 
-`Tracker.RuntimeHost` は `Tracker` 節から トラッカー有効化、入力元名、uuid、UDP 発行有効化、設定組単位の発行先、追跡処理設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を依存性注入で組み立て、確定済み処理時点ごとに公式 `TrackerWrapperPacket` を発行し、同じ共有境界の最新トラッカー断面を更新する。
+RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。
 
-起動時の設定組選択は `appsettings` の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の命令行設定提供器と切り替え対応表を使い、将来の短縮選択肢追加時も同じ対応表に増やせる形にする。CLI 設定組上書きは `Tracker:Profiles:<name>` の既存設定組だけを選択し、設定組定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` 設定組へ代替しない。
+起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。
 
-`Tracker.DebugHost` が読む最新トラッカー断面は、`Tracker.RuntimeHost` から `Tracker.DebugHost` 構成単位へ直接依存して公開しない。`Tracker.DebugHost` 側は公式トラッカー通信内容の発行 / 受信経路、または `Tracker.Core` の共有実行境界に沿った読み取り側断面を読む側として成立させる。`RUNTIME-HOST-009` では `Tracker.RuntimeHost` の正常系を実行可能契約で固定し、`Tracker.DebugHost` 画面 / 診断再生 / 収録表示の手動証跡は `RUNTIME-HOST-010` に残す。
+DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。
 
 ## 設計資料配置
 
-設計資料は `Tracker/Design/` を正本の根とする。
+設計資料は `Tracker/Design/` を canonical root とする。
 
-- `Tracker/Design/Core/`: トラッカー追跡処理 / 契約 / 純粋な判定処理。
-- `Tracker/Design/DebugHost/`: 画面機能、診断、未加工映像表示、収録 / 再生。
-- `Tracker/Design/RuntimeHost/`: `Tracker.RuntimeHost`、実行単位分離、将来の AutoRef 動作形態。
-- `Tracker/Design/Archive/`: 旧追跡文書の保存先。現在の追跡対象ではない。
+- `Tracker/Design/Core/`: tracker algorithm / contract / pure logic。
+- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。
+- `Tracker/Design/RuntimeHost/`: RuntimeHost、process 分離、将来 AutoRef mode。
+- `Tracker/Design/Archive/`: 旧 tracking file の保存先。active tracking ではない。
 
-## 対象外
+## 非スコープ
 
-- AutoRef 判定処理の実装。
-- 審判処理相当の判定規則処理。
-- 旧診断記録形式の完全互換。
+- AutoRef logic の実装。
+- Referee program の rule engine 実装。
+- 旧 diagnostics logging 形式の完全互換。
 - `BreakingChanges` の作成。
 
-## 試験方針
+## テスト方針
 
-- `Tracker.RuntimeHost` が画面機能構成単位を参照しないことを構成単位参照 / 依存関係試験で固定する。
-- `Tracker.RuntimeHost` の トラッカー運用周期処理が診断記録 / 再生 API を直接呼ばないことを契約試験で固定する。
-- `Tracker.DebugHost` が トラッカー出力を読む側であり、トラッカー運用周期処理を画面描画刻みから駆動しないことを契約試験で固定する。
-- 診断標本刻みが トラッカー確定済み処理時点の周期に依存しないことを回帰試験で固定する。
+- RuntimeHost が Web UI project を参照しないことを project reference / dependency test で固定する。
+- RuntimeHost の tracker operation loop が diagnostics logging / replay API を直接呼ばないことを contract test で固定する。
+- DebugHost が tracker output を読む側であり、tracker operation loop を Web rendering tick から駆動しないことを contract test で固定する。
+- diagnostics sample tick が tracker committed frame cadence に依存しないことを regression test で固定する。
 
-[^本番実行体]: `Tracker.RuntimeHost`: トラッカー運用処理と将来の AutoRef 動作形態を同一実行単位で動かす本番寄りの画面なし実行体。
-[^将来動作形態]: AutoRef 動作形態: 審判処理相当の判定処理を トラッカー と同一実行単位で動かす将来形態。今回の実装対象ではない。
-[^同一実行単位]: 同一実行単位: トラッカー と将来の AutoRef 判定処理を実行単位外通信なしで同じ OS 実行単位内に置く実行形態。
-[^画面なし実行体]: 画面なし実行体: 画面機能を持たず、入出力と実時間処理を主目的に起動する実行体。
-[^画面機能]: 画面機能: ブラウザーで見る確認 / 診断画面。`Tracker.RuntimeHost` の実時間処理から分離する。
-[^診断再生]: 診断再生: 保存済み標本 / 記録を `Tracker.DebugHost` 側で再生し、未加工入力と トラッカー出力を比較する確認機能。
-[^収録表示]: 収録表示: 保存済み収録単位の内容を確認する表示機能。
-[^確認用実行体]: `Tracker.DebugHost`: 旧 `Tracker.Server` から改名した確認用実行体。画面機能、診断、収録 / 再生、比較表示を担当する。
-[^トラッカー運用処理]: トラッカー運用処理: SSL-Vision 入力から トラッカー状態を更新し、公式トラッカー通信内容を発行する実時間処理。
-[^未加工映像表示]: 未加工映像表示: SSL-Vision の検出結果 / 競技場形状を競技場上に表示する `Tracker.DebugHost` の表示機能。
-[^トラッカー追跡処理]: トラッカー追跡処理: 未加工検出結果からボール / ロボットの追跡済み状態を決定的に生成する `Tracker.Core` 側の追跡処理。
+[^tracker-runtime-host]: Tracker.RuntimeHost: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。
+[^autoref-mode]: AutoRef mode: referee program 相当の判定処理を tracker と同一 process で動かす将来 mode。今回の実装対象ではない。
+[^same-process]: same process: tracker と将来 AutoRef logic を process 外通信なしで同じ OS process 内に置く実行形態。
+[^headless-host]: headless host: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。
+[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。
+[^diagnostics-replay]: diagnostics replay: 保存済み sample / log を DebugHost 側で再生し、raw / tracker 出力を比較する debug 機能。
+[^capture-viewer]: capture viewer: 保存済み capture session の内容を確認する debug 表示機能。
+[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。
+[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。
+[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。
+[^tracker-algorithm]: tracker algorithm: raw detection から balls / robots の tracked state を決定的に生成する Core 側の追跡ロジック。

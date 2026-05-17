@@ -1,4 +1,4 @@
-# トラッカー Tracker.DebugHost / CLI / UI 保守性改善 設計
+# Tracker DebugHost / CLI / UI 保守性改善 設計
 
 ## 目的
 
@@ -20,7 +20,7 @@ CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` �
 - test file の分割
 - UI の新機能追加
 - diagnostics log / capture file の schema 変更
-- official トラッカー packet の送信内容変更
+- official tracker packet の送信内容変更
 - CaptureOn 比較ログの機能設計
 
 ## 設計履歴
@@ -67,7 +67,7 @@ C# の class / property / method の契約説明は日本語 XML documentation c
 
 ## 検証観点
 
-Tracker.CaptureReplay:
+CaptureReplay:
 
 - `--help` が usage を出して exit code 0 になる。
 - `--capture` なし、未知 option、不正数値、不正 metric が従来と同じ error message と exit code 2 になる。
@@ -98,7 +98,7 @@ Diagnostics UI:
 ## リスク
 
 - `TrackerCoordinator` は順序制御が密なため、責務分離で method 呼び出し順を読み違えると profile switch と publisher 設定の切替点がずれる。
-- Tracker.CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言の整理でも互換性リスクがある。
+- CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言の整理でも互換性リスクがある。
 - Diagnostics UI は markup と state 更新が結びついているため、partial 化で `selectedEntry`、`profileMetadata`、`selectedRenderSnapshot` の同期順序を崩しやすい。
 - コメント追加時に設計意図を広げすぎると、実装契約と異なる将来仕様を書いてしまう。
 
@@ -106,4 +106,4 @@ Diagnostics UI:
 
 - `Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` は責務別ファイルへ分割済み。
 - public/internal の主要 class / property / method に日本語コメントを追加済み。
-- Tracker.CaptureReplay、TrackerCoordinator、Diagnostics UI の既存挙動維持観点は `TRACKER-034` の report に記録済み。
+- CaptureReplay、TrackerCoordinator、Diagnostics UI の既存挙動維持観点は `TRACKER-034` の report に記録済み。
