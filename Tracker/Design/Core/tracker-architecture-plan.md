@@ -2,21 +2,21 @@
 
 ## 目的
 
-`Tracker.Core` に AutoRef 向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、debug / diagnostics 用 Web UI は `Tracker.DebugHost` として分ける。
+`Tracker.Core` に AutoRef 向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ / 診断用 Web UI は `Tracker.DebugHost` として分ける。
 
 初期目標は次の 3 点に置く。
 
-- `SSL-Vision` の raw detection / geometry から決定的に追跡結果を生成できる
-- official `TrackerWrapperPacket / TrackedFrame` を multicast 配信できる
-- official proto より豊富な内部メタ情報を保持し、将来の AutoRef 判定に再利用できる
+- `SSL-Vision` の raw 検出結果 / geometry から決定的に追跡結果を生成できる
+- 公式 `TrackerWrapperPacket / TrackedFrame` を multicast 配信できる
+- 公式 proto より豊富な内部メタ情報を保持し、将来の AutoRef 判定に再利用できる
 - 将来の AutoRef 判定は world snapshot と高レベル event から記述しやすい構造にする
 
 ## 対象範囲
 
 - `Tracker.Core` に トラッカー の内部モデル、エンジン契約、proto 変換器を実装する
-- `Tracker.RuntimeHost` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と official トラッカー packet を生成できるようにする
-- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、比較表示に専念し、トラッカー operation loop を描画や logging の周期から切り離す
-- UI は raw viewer に加えて tracked viewer を持ち、button で切り替えられるようにする
+- `Tracker.RuntimeHost` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と公式トラッカー packet を生成できるようにする
+- `Tracker.DebugHost` は Web UI、診断、capture / replay、比較表示に専念し、トラッカー運用 loop を描画や logging の周期から切り離す
+- UI は raw viewer に加えて tracked viewer を持ち、ボタンで切り替えられるようにする
 - v1 では primary ball を先頭にしつつ、複数 ball を同時に維持して出力できるようにする
 - v1 では決定性とルール上重要な品質を優先し、過剰な機械学習や非決定的要素は入れない
 
@@ -24,24 +24,24 @@
 
 - feedback packet や robot telemetry を トラッカー 入力に使うこと
 - Tigers と完全な挙動一致を取ること
-- AutoRef logic を今回の scope で実装すること
+- AutoRef の判定ロジックを今回の範囲で実装すること
 - 永続化や replay database を v1 で持つこと
 
 ## 基本方針
 
 ### 実行形態
 
-- 実行体は本番寄りの `Tracker.RuntimeHost` と debug 用の `Tracker.DebugHost` に分ける
+- 実行体は本番寄りの `Tracker.RuntimeHost` とデバッグ用の `Tracker.DebugHost` に分ける
 - 追跡アルゴリズム本体は `Tracker.Core` に置く
-- `Tracker.RuntimeHost` は トラッカー operation、UDP publish、将来 AutoRef mode の同一 process 実行を担当する
-- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、comparison、debug config を担当する
-- `Tracker.DebugHost` の Web rendering と diagnostics logging は `Tracker.RuntimeHost` の トラッカー operation loop を直接駆動しない
+- `Tracker.RuntimeHost` は トラッカー運用、UDP publish、将来 AutoRef mode の同一プロセス実行を担当する
+- `Tracker.DebugHost` は Web UI、診断、capture / replay、比較、デバッグ設定を担当する
+- `Tracker.DebugHost` の Web 描画と診断 logging は `Tracker.RuntimeHost` の トラッカー運用 loop を直接駆動しない
 
 ### 品質優先順位
 
 1. 決定的であること
 2. ルール上重要な情報を落とさないこと
-3. official トラッカー proto と互換であること
+3. 公式トラッカー proto と互換であること
 4. raw / tracked の観察性が高いこと
 
 ### 参考実装の扱い
@@ -54,18 +54,18 @@
   - kicked ball / contact / ball left field のような AutoRef 向けメタ情報を内部で保持する考え方
 - 採用しない
   - Java 実装構造そのもの
-  - Tigers 固有の module 分割や naming への追従
+  - Tigers 固有のモジュール分割や命名への追従
   - 完全一致を前提とした複雑な最適化
 
 ### 調査結果の参照先
 
-Tigers および official proto の調査結果は次を参照する。
+Tigers および公式 proto の調査結果は次を参照する。
 
 - [TRACKER-000-tigers-investigation-20260501115618.md](/home/ibis/ssl/IbisDuck/reports/TRACKER-000-tigers-investigation-20260501115618.md:1)
 
 この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモ側に寄せる。
 
-## Proto 入力
+## proto 入力
 
 トラッカー が直接扱う proto 入力は次の通り。
 
@@ -73,7 +73,7 @@ Tigers および official proto の調査結果は次を参照する。
   - raw vision の datagram 全体
   - `Detection` と `Geometry` を内包する最上位 packet
 - `SSL_DetectionFrame`
-  - camera 単位の detection
+  - camera 単位の検出結果
   - 主に `FrameNumber`, `TCapture`, `TSent`, `CameraId`, `Balls`, `RobotsYellow`, `RobotsBlue`
 - `SSL_DetectionBall`
   - ball 観測
@@ -90,9 +90,9 @@ Tigers および official proto の調査結果は次を参照する。
 
 ## 外部出力
 
-### Official 出力
+### 公式出力
 
-v1 の外部配信は official トラッカー proto に限定する。
+v1 の外部配信は公式トラッカー proto に限定する。
 
 - `TrackerWrapperPacket`
   - `uuid`
@@ -114,21 +114,21 @@ v1 の外部配信は official トラッカー proto に限定する。
 
 ### トラッカー packet snapshot 比較ログ
 
-CaptureOn 中に同じ official トラッカー multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の official packet、3rdparty トラッカー packet を再生・比較できるように別系統で保存する。
+CaptureOn 中に同じ公式トラッカー multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の公式 packet、3rdparty トラッカー packet を再生・比較できるように別系統で保存する。
 
 Tracker.DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
 
 責務境界は次の通り。
 
-- `TrackerConnectionLib` を official トラッカー packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
+- `TrackerConnectionLib` を公式トラッカー packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、公式 `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
 - `Tracker.DebugHost` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、トラッカー packet snapshot sidecar JSONL、トラッカー snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
-- `Tracker.Core` には official トラッカー packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis トラッカー の内部状態生成と official packet 生成だけを担当する。
+- `Tracker.Core` には公式トラッカー packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis トラッカー の内部状態生成と公式 packet 生成だけを担当する。
 
-snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の トラッカー packet snapshot sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。
+snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の トラッカー packet snapshot sidecar JSONL とし、診断側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。
 
 session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。新規 capture では `tracker-snapshot-alignment.jsonl` も metadata から辿れるようにし、alignment が未作成、record 0 件、破損している状態を トラッカー packet snapshot sidecar の成否とは別に表現する。
 
-sidecar JSONL の各 record は少なくとも次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできるようにする。
+sidecar JSONL の各 record は少なくとも次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再 decode できるようにする。
 
 - `receivedAt`
 - remote endpoint
@@ -141,7 +141,7 @@ sidecar JSONL の各 record は少なくとも次を保持する。snapshot は�
 - raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary など、後から比較・一覧表示するための summary
 - decode / schema error がある場合の skipped/error 情報
 
-ibis トラッカー の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 トラッカー と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active トラッカー API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
+ibis トラッカー の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の公式 packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 トラッカー と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを診断に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active トラッカー API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
 
 ibis committed frame と トラッカー packet snapshot は publish frequency が一致しない前提で扱う。さらに、3rdparty トラッカー の `TrackedFrame.timestamp` は ibis own と同じ時刻系とは限らない。新規 capture の replay / diagnostics / Field source 表示では、CaptureOn 保存時に diagnostics entry / render snapshot / トラッカー source snapshot を session-relative `receivedAt` と diagnostics entry time で対応付けた alignment sidecar を優先する。legacy capture で alignment がない場合だけ、exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を best-effort として明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint / role、alignment status は後から確認できるように保存または表示する。
 
@@ -157,7 +157,7 @@ Capture Off 中は snapshot sidecar へ追記しない。Capture Off / 再On で
 
 ### 内部出力
 
-official proto だけでは AutoRef に必要な情報が不足するため、`Tracker.Core` はより豊かな内部 frame を持つ。
+公式 proto だけでは AutoRef に必要な情報が不足するため、`Tracker.Core` はより豊かな内部 frame を持つ。
 
 - `TrackerFrame`
 - `TrackedBallState`
@@ -178,7 +178,7 @@ official proto だけでは AutoRef に必要な情報が不足するため、`T
 - 角度: `rad`
 - 時刻: `ns`
 
-proto 変換境界でのみ official 単位へ変換する。
+proto 変換境界でのみ公式単位へ変換する。
 
 - `mm` -> `m`
 - `mm/s` -> `m/s`
@@ -192,7 +192,7 @@ proto 変換境界でのみ official 単位へ変換する。
 
 - 単調増加する `frame_number`
 - data timestamp
-- diagnostics 用の処理完了時刻
+- 診断用の処理完了時刻
 - geometry snapshot
 - tracked ball の状態一覧
 - primary ball の位置または参照
@@ -211,7 +211,7 @@ proto 変換境界でのみ official 単位へ変換する。
   - receive time / processing time は data timestamp には使わない
 - `TrackerFrame.processed_at_ns`
   - engine がその frame を確定したローカル処理時刻
-  - diagnostics 用であり official proto には出さない
+  - 診断用であり公式 proto には出さない
 
 `TrackerPacketGenerator` は `TrackerFrame.data_timestamp_ns` を `TrackedFrame.timestamp` に変換する。
 

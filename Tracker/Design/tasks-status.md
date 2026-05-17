@@ -75,11 +75,11 @@
     - `reports/runtime-host-001-design-review-20260514155548.md`
     - `reports/runtime-host-001-design-fix-20260514160144.md`
     - `reports/runtime-host-001-design-review-r2-20260514160734.md`
-- `RUNTIME-HOST-002`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 依存境界契約 を追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / `Web UI` / 診断再生 UI 計画 を参照しないこと、Tracker.RuntimeHost 原典 が 診断記録 / 再生 / Blazor UI 名前空間 を直接参照しないこと、Tracker.DebugHost が 読み取り側 実行体 であることを 失敗先行 契約 として固定した。
+- `RUNTIME-HOST-002`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 依存境界契約 を追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / `Web UI` / 診断再生 UI 計画 を参照しないこと、Tracker.RuntimeHost のソースコードが 診断記録 / 再生 / Blazor UI 名前空間 を直接参照しないこと、Tracker.DebugHost が 読み取り側 実行体 であることを 失敗先行 契約 として固定した。
   - 実装証跡:
     - `reports/runtime-host-002-implementation-20260514163841.md`
     - `reports/runtime-host-002-boundary-context-20260514164124.md`
-    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は 3 件失敗 / 0 件成功。現時点では `Tracker.RuntimeHost` 計画と原典の根 と `Tracker.DebugHost` 根 が未存在のため、意図した 失敗先行 契約 として 検証失敗 になっている。
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は 3 件失敗 / 0 件成功。現時点では `Tracker.RuntimeHost` 計画とソースコードの根 と `Tracker.DebugHost` 根 が未存在のため、意図した 失敗先行 契約 として 検証失敗 になっている。
   - 確認証跡:
     - `reports/runtime-host-002-review-20260514164528.md`
     - `reports/runtime-host-002-review-fix-20260514164850.md`
@@ -164,7 +164,7 @@
   - 確認証跡:
     - `reports/runtime-host-010-review-20260514202428.md`
     - 確認 で 阻害指摘 なし。既知 Tracker.DebugHost 所有 検証失敗 は 保留 継続が妥当と確認した。
-- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 最終 確認 / 進捗管理 同期 / PR 提出可能 を完了した。最終 確認 で 取り込み済み 失敗先行 契約 が 阻害 と判定されたため、`RuntimeHostDependencyBoundaryContractTests` を現設計に合わせ、Tracker.DebugHost 全体の `Core` 実行周回 適合層 を禁止する 契約 から UI / 診断再生 / 描画 原典 が 実行周回 を直接駆動しない 契約 へ狭めた。r2 確認 で 阻害指摘 なし、PR 提出可能 可を確認した。
+- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 最終 確認 / 進捗管理 同期 / PR 提出可能 を完了した。最終 確認 で 取り込み済み 失敗先行 契約 が 阻害 と判定されたため、`RuntimeHostDependencyBoundaryContractTests` を現設計に合わせ、Tracker.DebugHost 全体の `Core` 実行周回 適合層 を禁止する 契約 から UI / 診断再生 / 描画ソースコード が 実行周回 を直接駆動しない 契約 へ狭めた。r2 確認 で 阻害指摘 なし、PR 提出可能 可を確認した。
   - 確認証跡:
     - `reports/runtime-host-011-final-review-20260514203109.md`
     - `reports/runtime-host-011-review-fix-20260514203809.md`
