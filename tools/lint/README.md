@@ -10,8 +10,10 @@
 npm install
 python3 -m venv .venv
 . .venv/bin/activate
-python3 -m pip install -r tools/lint/requirements.txt
+PIP_NO_BUILD_ISOLATION=1 python3 -m pip install -r tools/lint/requirements.txt
 ```
+
+`ChikkarPy` は現在の `Python` 環境では通常の build isolation 付きインストールに失敗することがあるため、文書検査用環境では `PIP_NO_BUILD_ISOLATION=1` を付ける。`tools/lint/requirements.txt` には、その前提で必要な build helper も含めている。
 
 この検査は `.agents/skills/review-enforcer/scripts/` にある共通処理を使う。`.agents/skills` は記録対象には含めず、手元の記号参照として `~/AI/CodexSkill/skills` を指している必要がある。
 
@@ -53,13 +55,16 @@ node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files REA
 npm run lint:md:whitelist -- --files README.md
 ```
 
-SudachiPy を使って既存文書から語彙を抽出する場合は次を使う。出力は `TSV` が既定で、必要なら `--format json` も指定できる。
+SudachiPy と ChikkarPy を使って既存文書から語彙と同義語候補を抽出する場合は次を使う。出力は `TSV` が既定で、必要なら `--format json` も指定できる。
 
 ```bash
 npm run lint:md:vocab
 npm run lint:md:vocab -- --files README.md tools/lint/README.md
 npm run lint:md:vocab -- --format json
+npm run lint:md:vocab -- --synonyms none
 ```
+
+`--synonyms none` は、ChikkarPy の同義語候補だけを外して SudachiPy の読み、正規形、品詞、頻度を確認したい場合に使う。
 
 SudachiPy 版の許可一覧検査は `npm run lint:md:whitelist` から実行する。従来の JavaScript 版と比較したい場合は `npm run lint:md:whitelist:legacy` を使う。
 
@@ -107,7 +112,7 @@ entries:
 
 `cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。既存文書に未登録語がある場合は検査が落ちるため、文章を日本語へ直すか、固有語として許可できる理由を `tools/lint/markdown-whitelist.yaml` に追加する。
 
-SudachiPy 版の抽出と検査では、日本語を文字種だけではなく形態素として扱う。漢字語、片仮名語、混在語を `surface`、正規形、読み、品詞、候補グループ、頻度、出現元で集計し、許可一覧再構築の候補にする。英字語は従来どおり専用の厳しい抽出規則で扱う。SudachiPy の正規形や読みが同じ語は候補として近くに出せるが、`namespace`、`ネームスペース`、`名前空間` のような英日意味対応は自動確定しない。最終的に許可する語と説明は利用者の明示確認を受けて `tools/lint/markdown-whitelist.yaml` に反映する。
+SudachiPy 版の抽出と検査では、日本語を文字種だけではなく形態素として扱う。漢字語、片仮名語、混在語を `surface`、正規形、読み、品詞、候補グループ、頻度、出現元で集計し、許可一覧再構築の候補にする。英字語は従来どおり専用の厳しい抽出規則で扱う。ChikkarPy が返す同義語候補は、候補グループを作るための補助情報として `synonyms` に出力する。SudachiPy の正規形や読みが同じ語、または ChikkarPy の同義語候補に入った語は近くに出せるが、`namespace`、`ネームスペース`、`名前空間` のような英日意味対応は自動確定しない。最終的に許可する語と説明は利用者の明示確認を受けて `tools/lint/markdown-whitelist.yaml` に反映する。
 
 ## 表記揺れ辞書
 
