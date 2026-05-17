@@ -11,29 +11,177 @@ entries:
       - No Candidate Snapshot
     description: 比較候補の記録が無い状態名。後続の記録を代用しないことを示す。
   - term: ReplayTimelineIndex
-    aliases:
-      - replay timeline tick
-      - selected replay timeline tick
-      - selected-replay-timeline-tick
     description: 診断再生位置を識別する値。保存済み対応表と結び付けて比較位置を特定する。
+  - term: replay timeline tick
+    description: 診断再生の時系列に含まれる 1 件の時点。
+  - term: selected replay timeline tick
+    aliases:
+      - selected-replay-timeline-tick
+    description: 診断画面で現在選ばれている再生時点。
   - term: same-source
     aliases:
       - same source
-      - same-source 1 layer
     description: 左右の表示元が同じ状態名。重複描画を避けるため単一表示へまとめる。
   - term: saved-session-alignment
     aliases:
       - saved session alignment
-      - saved alignment record
     description: 保存済み記録と外部追跡記録の対応表。同じ再生位置で比較するために使う。
-  - term: source
+  - term: alignment record
     aliases:
-      - source selection
-      - source selector
-      - source filter
-    description: 表示元を選ぶ設計語。既存本文との互換用で、一般説明語としては追加しない。
+      - alignment-record
+    description: 保存済み対応表に含まれる 1 件の対応記録。
   - term: Tracked
-    description: 自前追跡結果を表示用形式へ変換した表示名。未加工入力とは分けて扱う。
+    description: 画面で追跡済み状態を選ぶ表示名。未加工入力とは分けて扱う。
+  - term: Field source
+    description: 診断画面の競技場表示で、左右どちらに描く情報を選ぶ項目名。
+  - term: Field source selector
+    description: 診断画面で競技場表示の表示元を選ぶ画面部品名。
+  - term: source key
+    aliases:
+      - source-key
+    description: 表示元を内部で取り違えないための識別値。
+  - term: source label
+    description: 画面に出す表示元名。内部識別値とは分けて扱う。
+  - term: source role
+    description: 表示元を自前追跡、外部追跡、不明などに分ける分類名。
+  - term: source identity
+    description: 受信した追跡出力の表示元を判別するための情報。
+  - term: source metadata
+    description: 表示元の判別や比較に使う付随情報。
+  - term: source option
+    aliases:
+      - source options
+    description: 画面で選べる表示元候補。
+  - term: source selector
+    description: 表示元を選ぶ画面部品。
+  - term: source snapshot
+    description: 特定の表示元から得た時点記録。
+  - term: source cadence
+    description: 表示元ごとの到着間隔。
+  - term: source sample
+    description: 表示元から得た 1 回分の記録。
+  - term: source detection
+    aliases:
+      - source detections
+    description: 未加工入力に含まれる検出情報。
+  - term: source name
+    description: 受信内容や設定に含まれる表示元名。
+  - term: source frame number
+    description: SSL-Vision などの入力元が検出単位に付けた番号。追跡器が出す番号とは分けて扱う。
+  - term: aggregate source
+    description: 複数候補から代表値を選んで扱う表示元。
+  - term: field geometry
+    description: 競技場の線、得点枠、境界など、描画と座標比較の基準になる形状情報。
+  - term: raw geometry
+    description: 未加工入力から得た競技場形状情報。
+  - term: render snapshot geometry
+    description: render snapshot に含まれる競技場形状情報。
+  - term: field rendering part
+    aliases:
+      - field-rendering-part
+    description: 競技場背景、境界線、球、機体を描く画面部品の責務境界。
+  - term: split field component
+    aliases:
+      - split-field-component
+    description: 左右分割表示で競技場を描く画面部品。
+  - term: overlay field component
+    aliases:
+      - overlay-field-component
+    description: 重ね表示で複数の対象を同じ競技場上に描く画面部品。
+  - term: layer group
+    aliases:
+      - layer-group
+    description: 重ね表示で Layer A/B の描画要素をまとめる単位。
+  - term: viewport state
+    aliases:
+      - viewport-state
+    description: 競技場表示の拡大率、表示位置、移動状態を保持する表示状態。
+  - term: packet capture
+    description: 受信した通信内容を後から再生や調査に使えるように保存した記録。
+  - term: capture metadata
+    description: 記録時の設定、関連保存物、時刻対応などを再生時に復元するための付随情報。
+  - term: session folder
+    description: 1 回の記録に属する記録、補助保存物、付随情報をまとめて置く保存先。
+  - term: packet snapshot
+    description: 受信または生成した追跡器の通信単位を比較用に固定した記録。
+  - term: tracker packet snapshot
+    description: トラッカー通信単位を比較用に固定した記録。
+  - term: snapshot log
+    description: スナップショットを後から参照できるよう保存した記録。
+  - term: TrackedFrame snapshot
+    description: 追跡結果の内容を比較用に固定した記録。
+  - term: snapshot sidecar
+    description: 主記録とは別に保存する、時点記録用の補助保存物。
+  - term: sidecar JSONL
+    description: 補助保存物を 1 行 1 件の JSONL 形式で保存する設計語。
+  - term: alignment sidecar
+    aliases:
+      - tracker snapshot alignment sidecar
+    description: 診断項目、描画時点記録、トラッカー時点記録の対応関係を保存する補助保存物。
+  - term: alignment log
+    description: 保存済み対応関係を後から参照できるよう保存した記録。
+  - term: alignment status
+    description: 保存済み対応関係の有無や読み取り状態を表す状態。
+  - term: diagnostics sample sidecar
+    aliases:
+      - diagnostics-sample-sidecar
+    description: 診断再生で同じ保存単位の未加工入力と追跡出力を復元するための補助保存物。
+  - term: official tracker packet
+    description: 公式追跡出力の形式で送受信するトラッカー通信単位。
+  - term: official tracker proto
+    description: 公式追跡出力の通信形式。
+  - term: official proto
+    description: 公式形式として扱う通信形式。
+  - term: tracker proto
+    description: トラッカー出力の通信形式。
+  - term: comparison panel
+    description: 診断画面で複数の表示元を比較する表示領域。
+  - term: primary ball
+    description: 複数の球の中で主対象として扱う球。
+  - term: secondary ball
+    description: 主対象ではないが追跡結果として残す補助対象の球。
+  - term: kicked ball
+    description: 蹴られた状態として扱う球。
+  - term: ball left field
+    description: 球が競技場外へ出た状態を表す判定語。
+  - term: camera-local track
+    description: 撮影元単位で保持する局所的な追跡状態。
+  - term: camera-local ball track
+    description: 撮影元単位で保持する球の追跡状態。
+  - term: camera-local robot track
+    description: 撮影元単位で保持する機体の追跡状態。
+  - term: event time
+    description: 到着順ではなく、観測や検出の時刻として扱う基準時刻。
+  - term: replay timeline
+    description: 診断再生で選択や移動に使う時系列。
+  - term: timeline scrubber
+    description: 再生位置を手動で移動する画面部品。
+  - term: playback tick
+    description: 再生処理が表示位置を進める 1 回分の更新単位。
+  - term: diagnostics log
+    description: 診断情報を後から確認するために保存した記録。
+  - term: diagnostics replay
+    description: 保存済み診断情報を後から再生する機能。
+  - term: diagnostics playback
+    description: 診断画面上で再生操作により時系列を進める機能。
+  - term: diagnostics sample tick
+    aliases:
+      - diagnostics-sample-tick
+    description: 診断再生で未加工入力と追跡出力を同じ保存単位として固定する時点。
+  - term: profile switch
+    description: 実行中に有効な設定組を切り替える操作または処理。
+  - term: runtime profile
+    description: 実行時に使われる設定組と、その切替状態を表す設計語。
+  - term: partial class
+    description: C# の 1 つの型定義を複数のソースコードに分ける構成。
+  - term: type-owned folder
+    description: 型名の保存場所を作り、その中に責務別のソースコードを置く構成。
+  - term: XML documentation comment
+    description: C# の公開 API などに付ける説明文形式。
+  - term: exit code
+    description: 命令終了時に成功や失敗の種類を示す数値。
+  - term: error message
+    description: 失敗時に利用者へ表示する内容。
   - term: Tracker.DebugHost
     aliases:
       - tracker-debug-host
@@ -47,14 +195,21 @@ entries:
       - tracker runtime host
     description: 通常運用と自動判定を同じ処理内で動かす実行体名。
   - term: WorldFrameCommitted
-    aliases:
-      - world frame
-      - world-frame
     description: 追跡結果の確定時点を表す通知名。未加工入力の保存周期とは分けて扱う。
+  - term: world frame
+    aliases:
+      - world-frame
+    description: 競技場全体の追跡結果を表す 1 件の状態。
+  - term: tracked frame
+    description: 追跡器が出力する 1 件の追跡結果と、その番号または時刻を指す設計語。
+  - term: tracked frame number
+    description: 追跡器が出力する追跡結果に付いた番号。
+  - term: tracked frame timestamp
+    description: 追跡器が出力する追跡結果に付いた時刻。
   - term: SSL-Vision
     aliases:
       - SSL Vision
-    description: 競技映像入力の名称。
+    description: 競技映像入力を送る外部仕組みの名前。
   - term: ASP.NET Core
     aliases:
       - ASP NET Core
@@ -63,8 +218,9 @@ entries:
   - term: .NET SDK
     aliases:
       - NET SDK
-      - .NET
-    description: 開発環境の名称。
+    description: .NET 向けの開発道具一式。
+  - term: .NET
+    description: 実行と開発に使う基盤名。
   - term: Tracker.CaptureReplay
     aliases:
       - Tracker CaptureReplay
@@ -91,7 +247,7 @@ entries:
     aliases:
       - ER-FORCE
       - ER Force
-    description: 外部追跡器または模擬器の名称。
+    description: 外部追跡器または模擬器として参照する名称。
   - term: Vision Input
     aliases:
       - Vision input
@@ -109,10 +265,12 @@ entries:
     description: 撮影元ごとの未加工入力の表示名。
   - term: Layer A/B
     aliases:
-      - Layer A
-      - Layer B
       - layer A/B
     description: 比較表示で左右の対象を示す表示名。
+  - term: Layer A
+    description: 重ね表示で 1 つ目の表示対象を示す画面上の層名。
+  - term: Layer B
+    description: 重ね表示で 2 つ目の表示対象を示す画面上の層名。
   - term: Fast Forward
     aliases:
       - FastForward
@@ -131,16 +289,12 @@ entries:
   - term: latest-before snapshot
     aliases:
       - latest before snapshot
-      - latest-before hold
     description: 選択時点以前の最新記録を使う設計語。
   - term: Tracker:ActiveProfileName
     aliases:
       - ActiveProfileName
     description: 有効な設定名を選ぶ設定キー。
   - term: Tracker:Profiles
-    aliases:
-      - Tracker Profiles
-      - Tracker:Profiles:<name>
     description: 設定群を表す設定階層。
   - term: ReorderWindowNs
     aliases:
@@ -155,20 +309,14 @@ entries:
   - term: raw vision viewer
     aliases:
       - raw-vision-viewer
-      - raw vision
     description: 未加工入力を確認する画面の設計語。
-  - term: Vision split / overlay
+  - term: raw vision
     aliases:
-      - Vision split
-      - Vision overlay
-      - split / overlay
-      - split mode
-      - overlay mode
+      - raw-vision
+    description: 追跡処理前の映像入力を指す設計語。
+  - term: Vision split / overlay
     description: 比較画面の表示方式をまとめた設計語。
   - term: overlay layer contract
-    aliases:
-      - overlay layer
-      - layer contract
     description: 重ね描画時の契約名。
   - term: geometry contract
     aliases:
@@ -178,9 +326,11 @@ entries:
   - term: same render tick
     aliases:
       - same-render-tick
-      - UI render tick
-      - ui-render-tick
     description: 同一描画時点で比較する契約名。
+  - term: UI render tick
+    aliases:
+      - ui-render-tick
+    description: 画面表示を 1 回更新する単位。
   - term: render snapshot
     aliases:
       - render-snapshot
@@ -189,900 +339,67 @@ entries:
   - term: tracker source snapshot
     aliases:
       - tracker-source snapshot
-      - tracker snapshot
-      - tracker-snapshot
     description: 追跡器由来の記録を指す設計語。
+  - term: tracker snapshot
+    aliases:
+      - tracker-snapshot
+    description: 追跡器が出した状態を固定した記録。
   - term: latest-before fallback
     aliases:
       - latest before fallback
-      - diagnostics latest-before fallback contract
     description: 後続記録を代用しないための設計契約名。
   - term: トラッカー
     description: 追跡器の一般表記。
   - term: カルマン
     description: 推定方式の一般表記。
-  - term: temporary-doc-lint-terms
-    aliases:
-      - "・コメント"
-      - "・レビュー"
-      - "・レビュー・"
-      - "abstraction"
-      - "accent"
-      - "accent-color"
-      - "accessibility"
-      - "Act"
-      - "action"
-      - "active"
-      - "adapter"
-      - "address"
-      - "affordance"
-      - "agent"
-      - "aggregate"
-      - "alert"
-      - "algorithm"
-      - "alignment"
-      - "anchor"
-      - "angle"
-      - "angular"
-      - "apply"
-      - "approved"
-      - "appsettings"
-      - "arc"
-      - "arcs"
-      - "area"
-      - "Arrange"
-      - "array"
-      - "arrival"
-      - "assembly"
-      - "Assert"
-      - "assertion"
-      - "assignment"
-      - "association"
-      - "auto"
-      - "available"
-      - "axis"
-      - "background"
-      - "ball"
-      - "balls"
-      - "base"
-      - "baseline"
-      - "basename"
-      - "best-effort"
-      - "bind"
-      - "block"
-      - "blocker"
-      - "blocking"
-      - "blue"
-      - "body"
-      - "border"
-      - "boundary"
-      - "boundary-aware"
-      - "bounded"
-      - "box"
-      - "buffer"
-      - "build"
-      - "builder"
-      - "bus"
-      - "busy"
-      - "button"
-      - "bytes"
-      - "cache"
-      - "cached"
-      - "cadence"
-      - "calibration"
-      - "callback"
-      - "camera"
-      - "camera-local"
-      - "cancel"
-      - "cancellation"
-      - "candidate"
-      - "canonical"
-      - "canvas"
-      - "cap"
-      - "capabilities"
-      - "capability"
-      - "capture"
-      - "capture-time"
-      - "capture-viewer"
-      - "center"
-      - "change"
-      - "changed"
-      - "check"
-      - "checkbox"
-      - "chip"
-      - "choice"
-      - "choices"
-      - "chosen"
-      - "circle"
-      - "clamp"
-      - "class"
-      - "clean"
-      - "cleanup"
-      - "clear"
-      - "click"
-      - "clock"
-      - "clone"
-      - "cluster"
-      - "code"
-      - "collapse"
-      - "collapsed"
-      - "color"
-      - "command-line"
-      - "comment"
-      - "commit"
-      - "committed"
-      - "compact"
-      - "Compare"
-      - "comparer"
-      - "comparison"
-      - "compatibility"
-      - "compile"
-      - "component"
-      - "composer"
-      - "composite"
-      - "concrete"
-      - "condition"
-      - "confidence"
-      - "config"
-      - "configuration"
-      - "configured"
-      - "constructor"
-      - "contact"
-      - "content"
-      - "contract"
-      - "contracts"
-      - "control"
-      - "control-only"
-      - "controls"
-      - "conversion"
-      - "coordinate"
-      - "coordinator"
-      - "Core"
-      - "corner"
-      - "correction"
-      - "corrupt"
-      - "count"
-      - "counter"
-      - "covariance"
-      - "criteria"
-      - "crossing"
-      - "current"
-      - "cursor"
-      - "cutoff"
-      - "cyan"
-      - "data"
-      - "database"
-      - "datagram"
-      - "debug"
-      - "decay"
-      - "decayed"
-      - "decode"
-      - "default"
-      - "defense"
-      - "defer"
-      - "degraded"
-      - "degraded-legacy-session"
-      - "delta"
-      - "dependencies"
-      - "dependency"
-      - "depth"
-      - "derived"
-      - "design"
-      - "desktop"
-      - "detail"
-      - "details"
-      - "detected"
-      - "detection"
-      - "detection-only"
-      - "detections"
-      - "deterministic"
-      - "DI"
-      - "diagnostics"
-      - "diagnostics-line"
-      - "diagnostics-line-alignment"
-      - "diagnostics-line-driven"
-      - "diagnostics-logging-replay-processing"
-      - "diagnostics-replay"
-      - "diagnostics-sample-sidecar"
-      - "diagnostics-sample-tick"
-      - "diagnostics-sample-timeline"
-      - "dictionary"
-      - "diff"
-      - "dimensions"
-      - "directory"
-      - "disabled"
-      - "discovery"
-      - "dispatch"
-      - "display"
-      - "display-label"
-      - "disposal"
-      - "distance"
-      - "documentation"
-      - "domain"
-      - "done"
-      - "dot"
-      - "dotnet"
-      - "draft"
-      - "drag"
-      - "drain"
-      - "drawable"
-      - "drop"
-      - "duplicate"
-      - "emit"
-      - "empty"
-      - "enable"
-      - "endpoint"
-      - "engine"
-      - "entry"
-      - "entrypoint"
-      - "enum"
-      - "epoch"
-      - "error"
-      - "estimate"
-      - "event"
-      - "event-time"
-      - "evidence"
-      - "exact"
-      - "executable"
-      - "executor"
-      - "exit"
-      - "extension"
-      - "external"
-      - "factory"
-      - "failing"
-      - "failure"
-      - "fallback"
-      - "fast"
-      - "fastest"
-      - "feedback"
-      - "field"
-      - "field-first"
-      - "field-rendering-part"
-      - "file"
-      - "file-scoped"
-      - "files"
-      - "fill"
-      - "filter"
-      - "filtered"
-      - "filtering"
-      - "final"
-      - "finding"
-      - "findings"
-      - "first"
-      - "fixture"
-      - "flag"
-      - "flat"
-      - "floor"
-      - "flush"
-      - "focused"
-      - "folder"
-      - "formatting"
-      - "frame"
-      - "frame-timestamp"
-      - "framework"
-      - "frequency"
-      - "fresh"
-      - "full"
-      - "future"
-      - "future-later-snapshot"
-      - "gap"
-      - "gate"
-      - "gating"
-      - "generated"
-      - "generation"
-      - "generator"
-      - "genuine"
-      - "geometry"
-      - "geometry-only"
-      - "getter"
-      - "ghost"
-      - "goal"
-      - "gradient"
-      - "green"
-      - "group"
-      - "grown-up"
-      - "growth"
-      - "guard"
-      - "gzip"
-      - "hard"
-      - "hardening"
-      - "header"
-      - "headless"
-      - "headless-host"
-      - "health"
-      - "held"
-      - "helper"
-      - "hidden"
-      - "high"
-      - "hold"
-      - "home"
-      - "Home.razor"
-      - "host"
-      - "hosted"
-      - "hover"
-      - "ibis"
-      - "icon"
-      - "identity"
-      - "immutable"
-      - "immutable-snapshot"
-      - "immutable-snapshot-store"
-      - "in-flight"
-      - "index"
-      - "information"
-      - "inject"
-      - "innovation"
-      - "Input"
-      - "integration"
-      - "interface"
-      - "interior"
-      - "internal"
-      - "interval"
-      - "investigation"
-      - "isolation"
-      - "Issue"
-      - "Java"
-      - "jitter"
-      - "join"
-      - "key"
-      - "kick"
-      - "kicked"
-      - "kicker"
-      - "kind"
-      - "label"
-      - "last"
-      - "late"
-      - "later"
-      - "latest"
-      - "latest-before"
-      - "latest-before-snapshot"
-      - "latest-frame"
-      - "latest-raw-snapshot"
-      - "layer"
-      - "layer-group"
-      - "layout"
-      - "learned"
-      - "left"
-      - "left-field"
-      - "legacy"
-      - "legend"
-      - "length"
-      - "library"
-      - "lifecycle"
-      - "lifetime"
-      - "lightweight"
-      - "limitation"
-      - "line"
-      - "LINQ"
-      - "list"
-      - "live"
-      - "live-state"
-      - "live-store"
-      - "liveliness"
-      - "local"
-      - "lock"
-      - "log"
-      - "logging"
-      - "logic"
-      - "lookup"
-      - "loop"
-      - "loop-isolation"
-      - "loopback"
-      - "magenta"
-      - "magic"
-      - "main"
-      - "maintenance"
-      - "manager"
-      - "manual"
-      - "mapper"
-      - "mapping"
-      - "margin"
-      - "marker"
-      - "markup"
-      - "match"
-      - "matching"
-      - "measurement"
-      - "Medium"
-      - "member"
-      - "membership"
-      - "memory"
-      - "merge"
-      - "merged"
-      - "message"
-      - "meta"
-      - "metadata"
-      - "method"
-      - "md"
-      - "metric"
-      - "millimeter"
-      - "missing"
-      - "mobile"
-      - "modal"
-      - "mode"
-      - "model"
-      - "module"
-      - "monotonic"
-      - "mouth"
-      - "moving"
-      - "multi-camera"
-      - "multi-select"
-      - "multi-tracker-manager"
-      - "multicast"
-      - "multiplier"
-      - "mutable"
-      - "mutable-state"
-      - "name"
-      - "namespace"
-      - "naming"
-      - "navigation"
-      - "nearest"
-      - "nearest-after"
-      - "nearest-timestamp"
-      - "negative"
-      - "nested"
-      - "network"
-      - "new"
-      - "new-capture"
-      - "no"
-      - "no-op"
-      - "noise"
-      - "non-own"
-      - "normal"
-      - "normalization"
-      - "normalize"
-      - "normalized"
-      - "nose"
-      - "not-created"
-      - "noun"
-      - "null"
-      - "nullable"
-      - "number"
-      - "object"
-      - "objects"
-      - "observable"
-      - "observation"
-      - "observed"
-      - "observer"
-      - "observer-event"
-      - "of"
-      - "Off"
-      - "official"
-      - "offset"
-      - "old"
-      - "old-format-current-limitation"
-      - "omitted"
-      - "On"
-      - "only"
-      - "only-display-correction"
-      - "open"
-      - "operation"
-      - "option"
-      - "optional"
-      - "optional-field"
-      - "options"
-      - "orchestration"
-      - "order"
-      - "ordering"
-      - "ordinal"
-      - "orientation"
-      - "other"
-      - "outer"
-      - "outlier"
-      - "output"
-      - "overlay"
-      - "overlay-field-component"
-      - "overload"
-      - "override"
-      - "own"
-      - "packet"
-      - "packet-timestamp"
-      - "page"
-      - "pan"
-      - "panel"
-      - "parameter"
-      - "parse"
-      - "parser"
-      - "parsing"
-      - "partial"
-      - "particle"
-      - "party"
-      - "passed"
-      - "passing"
-      - "path"
-      - "payload"
-      - "pending"
-      - "performance"
-      - "phase"
-      - "pipeline"
-      - "Play"
-      - "playback"
-      - "port"
-      - "position"
-      - "positional"
-      - "predict"
-      - "predict-update"
-      - "predicted"
-      - "preparation"
-      - "presentation"
-      - "preset"
-      - "previous"
-      - "primary"
-      - "prior"
-      - "private"
-      - "process"
-      - "processed"
-      - "processing"
-      - "production"
-      - "profile"
-      - "profile-aware"
-      - "program"
-      - "project"
-      - "project-local"
-      - "projection"
-      - "proper"
-      - "property"
-      - "proto"
-      - "protobuf"
-      - "protocol"
-      - "provider"
-      - "public"
-      - "publish"
-      - "published"
-      - "publisher"
-      - "pure"
-      - "quality"
-      - "query"
-      - "queue"
-      - "queued"
-      - "radius"
-      - "range"
-      - "raw"
-      - "raw-snapshot-cadence"
-      - "read-side"
-      - "reader"
-      - "README"
-      - "rdparty"
-      - "ready"
-      - "realtime"
-      - "reason"
-      - "receive"
-      - "receive-callback"
-      - "receive-timestamp"
-      - "received"
-      - "receiver"
-      - "recent"
-      - "reconfigure"
-      - "record"
-      - "recorder"
-      - "records"
-      - "Red"
-      - "Referee"
-      - "reference"
-      - "refresh"
-      - "regression"
-      - "relative"
-      - "release"
-      - "reload"
-      - "remote"
-      - "rename"
-      - "render"
-      - "render-tick"
-      - "renderer"
-      - "rendering"
-      - "reopen"
-      - "reorder"
-      - "replay"
-      - "replay-timeline-index"
-      - "report"
-      - "reports"
-      - "repository"
-      - "request"
-      - "reset"
-      - "resize"
-      - "resolved"
-      - "resolver"
-      - "responsibility"
-      - "restored"
-      - "result"
-      - "reuse"
-      - "review"
-      - "right"
-      - "ring"
-      - "risk"
-      - "robot"
-      - "robots"
-      - "role"
-      - "root"
-      - "round-trip"
-      - "rule"
-      - "runtime"
-      - "same"
-      - "same-process"
-      - "sample"
-      - "saved"
-      - "scaffold"
-      - "scale"
-      - "schema"
-      - "scope"
-      - "scrub"
-      - "scrubber"
-      - "secondary"
-      - "section"
-      - "segmented"
-      - "select"
-      - "selected"
-      - "selected-tick"
-      - "selection"
-      - "selector"
-      - "self"
-      - "semantic"
-      - "server"
-      - "service"
-      - "session"
-      - "session-relative"
-      - "setter"
-      - "settings"
-      - "shape"
-      - "shared"
-      - "shortcut"
-      - "side"
-      - "sidebar"
-      - "sidecar"
-      - "single"
-      - "single-frame"
-      - "singleton"
-      - "size"
-      - "skipped"
-      - "small"
-      - "snapshot"
-      - "snapshots"
-      - "socket"
-      - "sort"
-      - "sorted"
-      - "spatial"
-      - "speed"
-      - "split"
-      - "split-field-component"
-      - "split-independent-viewport"
-      - "stable"
-      - "stale"
-      - "start"
-      - "state"
-      - "static"
-      - "stationary"
-      - "status"
-      - "step"
-      - "stepping"
-      - "still"
-      - "Stop"
-      - "storage"
-      - "store"
-      - "stream"
-      - "string"
-      - "stroke"
-      - "struct"
-      - "styling"
-      - "sub-agent"
-      - "subscribe"
-      - "summary"
-      - "support"
-      - "surface"
-      - "SVG"
-      - "swatch"
-      - "switch"
-      - "tab"
-      - "table"
-      - "tabs"
-      - "target"
-      - "task"
-      - "team"
-      - "telemetry"
-      - "temp"
-      - "template"
-      - "temporal"
-      - "term"
-      - "test"
-      - "tests"
-      - "text"
-      - "third-party-tracker"
-      - "thread-safe"
-      - "threshold"
-      - "thresholds"
-      - "tick"
-      - "ticks"
-      - "tie"
-      - "tie-break"
-      - "Tigers"
-      - "time"
-      - "time-sync"
-      - "timeline"
-      - "timeline-cursor"
-      - "timeout"
-      - "timer"
-      - "timestamp"
-      - "title"
-      - "toggle"
-      - "toolchain"
-      - "top-level"
-      - "touch"
-      - "toucher"
-      - "track"
-      - "trackedFrame"
-      - "tracker-algorithm"
-      - "tracker-committed-frame-cadence"
-      - "tracker-operation"
-      - "tracker-operation-loop"
-      - "tracking"
-      - "tracks"
-      - "transport"
-      - "trigger"
-      - "truth"
-      - "tuning"
-      - "type"
-      - "type-owned"
-      - "unavailable"
-      - "uncertainty"
-      - "uncertainty-weighted"
-      - "unicast"
-      - "unified"
-      - "union"
-      - "unit"
-      - "unix"
-      - "unknown"
-      - "unrelated"
-      - "unsupported"
-      - "unwrap"
-      - "update"
-      - "usage"
-      - "user-visible"
-      - "using"
-      - "validation"
-      - "value"
-      - "variable"
-      - "variance"
-      - "velocity"
-      - "verification"
-      - "version"
-      - "view"
-      - "view-state"
-      - "viewer"
-      - "viewport"
-      - "viewport-state"
-      - "virtual"
-      - "visibility"
-      - "visible"
-      - "Vision"
-      - "VisionBallMarker.razor"
-      - "VisionDetailsPanel.razor"
-      - "VisionFieldCanvas.razor"
-      - "VisionFieldLines.razor"
-      - "VisionRobotMarker.razor"
-      - "visualization"
-      - "wall-clock"
-      - "want"
-      - "warning"
-      - "Web"
-      - "web-server-live-display-processing"
-      - "weighted"
-      - "wheel"
-      - "width"
-      - "window"
-      - "wire"
-      - "worker"
-      - "worktree"
-      - "world"
-      - "world-model"
-      - "wrapper"
-      - "write"
-      - "writer"
-      - "XML"
-      - "xUnit"
-      - "yellow"
-      - "zero"
-      - "zoom"
-      - "アルゴリズム"
-      - "インターフェース"
-      - "エンジン"
-      - "オブジェクト"
-      - "カクカク"
-      - "クラス"
-      - "ケース"
-      - "ゲート"
-      - "コード"
-      - "コスト"
-      - "コマンド"
-      - "コメント"
-      - "コンテキスト"
-      - "コンポーネント"
-      - "サイズ"
-      - "スキップ"
-      - "スクロール"
-      - "スコープ"
-      - "スライド"
-      - "セット"
-      - "ソースファイル"
-      - "タイミング"
-      - "タスク"
-      - "タブ"
-      - "データ"
-      - "データフロー"
-      - "テスト"
-      - "ドキュメント"
-      - "ドラッグ"
-      - "ネットワーク"
-      - "パラメータ"
-      - "バランス"
-      - "ファイル"
-      - "フィルタ"
-      - "フェーズ"
-      - "フォルダ"
-      - "フラグ"
-      - "フレーム"
-      - "ページ"
-      - "ベース"
-      - "ペイン"
-      - "ボタン"
-      - "ボトルネック"
-      - "メタ"
-      - "メタデータ"
-      - "メモ"
-      - "モデル"
-      - "モデル・"
-      - "ユーザー"
-      - "ラベル"
-      - "リスク"
-      - "ルール"
-      - "レイアウト"
-      - "レビュー"
-      - "レベル"
-      - "レポート"
-      - "ローカル"
-      - "ログ"
-      - "ログファイル"
-      - "ロジック"
-    description: 一時許可語。
+  - term: スナップショット
+    description: ある時点の状態を後から参照できるよう固定した記録。
+  - term: ソースコード
+    description: 人が読んで変更する処理本文を指す一般表記。
   - term: UI
-    description: 略語。
+    description: 画面と操作部を指す略語。
   - term: API
-    description: 略語。
+    description: 外部から機能を呼び出す口を指す略語。
   - term: CLI
-    description: 略語。
+    description: 命令行から使う実行体を指す略語。
   - term: JSON
-    aliases:
-      - JSONL
-    description: 情報形式の略語。
+    description: 構造化した情報を表す文書形式。
+  - term: JSONL
+    description: 1 行ごとに情報を保存する文書形式。
   - term: UDP
-    aliases:
-      - HTTP
-      - HTTPS
-    description: 通信方式の略語。
+    description: 受信や送信に使う通信方式。
+  - term: HTTP
+    description: 画面や API の通信で使う通信方式名。
+  - term: HTTPS
+    description: 暗号化された画面や API の通信方式名。
   - term: DTO
-    description: 型分類の略語。
+    description: 値の受け渡しに使う型分類。
   - term: UUID
-    aliases:
-      - ID
-      - NIC
-      - OS
-      - TDD
-      - PR
-    description: 略語。
+    description: 全体で一意になる識別子の形式。
+  - term: ID
+    description: 作業や列の識別子を示す略語。
+  - term: TDD
+    description: 試験を先に書いて実装を進める開発手法。
+  - term: PR
+    description: 変更内容を取り込む前に確認する提案。
   - term: ms
     aliases:
       - ns
       - mm
       - rad
       - Hz
-    description: 単位。
+    description: 時間、長さ、角度、周波数を表す単位。
   - term: Codex
-    description: 開発支援環境の固有名。
+    description: 開発作業を支援する実行環境の名前。
   - term: Serena
-    description: 開発支援機能の固有名。
+    description: 作業対象の理解を支援する機能の名前。
   - term: NuGet
-    description: 依存物取得機能の固有名。
+    description: .NET の依存物を取得する仕組みの名前。
   - term: npm
-    description: 依存物取得機能の固有名。
+    description: 画面側の依存物を取得する仕組みの名前。
   - term: Git
-    description: 版管理機能の固有名。
+    description: 変更履歴を管理する仕組みの名前。
   - term: Docker
-    description: 実行環境機能の固有名。
+    description: 分離した実行環境を扱う仕組みの名前。
   - term: Blazor
-    description: 画面構築基盤の固有名。
+    description: .NET で画面を構築する仕組みの名前。
