@@ -563,7 +563,7 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     [Fact]
     public void Load_WithSelectedReplayTimeline_WhenOnlyFutureSourceSnapshotExists_ReturnsMissingWithoutFutureFallback()
     {
-        var receivedAt = new DateTimeOffset(2026, 5, 13, 9, 45, 0, TimeSpan.Zero);
+        var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero);
         var selectedReceivedAt = receivedAt.AddMilliseconds(40);
         var futureReceivedAt = receivedAt.AddMilliseconds(60);
         var session = CreateSession(
