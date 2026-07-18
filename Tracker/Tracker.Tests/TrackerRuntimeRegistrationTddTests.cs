@@ -34,7 +34,7 @@ public class TrackerRuntimeRegistrationTddTests : IClassFixture<TrackerContractF
     [Fact]
     public void RuntimeStartup_RegistersLiveTrackerReceiverRecorderAndHostedConnection()
     {
-        var serverAssembly = typeof(TrackerCoordinator).Assembly;
+        var serverAssembly = typeof(TrackerConnectionLibReceiverHostedService).Assembly;
         var receiverType = typeof(UdpTrackerReceiver<TrackerPacketAdapter>);
         var managerType = typeof(MultiTrackerManager<TrackerPacketAdapter>);
         var recorderType = typeof(TrackerConnectionLibSnapshotRecorder);
