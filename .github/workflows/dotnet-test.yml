@@ -30,7 +30,6 @@ jobs:
 
       - name: Run dotnet test
         id: dotnet_test
-        continue-on-error: true
         shell: bash
         run: |
           set +e
@@ -51,11 +50,10 @@ jobs:
 
           test_exit_code=$?
           printf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"
-          echo "exit_code=$test_exit_code" >> "$GITHUB_OUTPUT"
           exit "$test_exit_code"
 
       - name: Collect failure diagnostics
-        if: ${{ steps.dotnet_test.outcome == 'failure' }}
+        if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -70,7 +68,7 @@ jobs:
             printf 'run_id=%s\n' "$GITHUB_RUN_ID"
             printf 'run_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
             printf 'runner_os=%s\n' "$RUNNER_OS"
-            printf 'test_exit_code=%s\n' "${{ steps.dotnet_test.outputs.exit_code }}"
+            printf 'test_exit_code=%s\n' "$(cat "$results_dir/dotnet-test.exit-code" 2>/dev/null || printf unknown)"
             printf '\n## dotnet --info\n'
             dotnet --info
             printf '\n## git status --short\n'
@@ -91,8 +89,3 @@ jobs:
           path: artifacts/test-results
           if-no-files-found: error
           retention-days: 14
-
-      - name: Fail job when tests failed
-        if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}
-        shell: bash
-        run: exit 1
