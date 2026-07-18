@@ -92,6 +92,16 @@ internal sealed class TrackerCoordinatorTestFactory
         VisionPacketCaptureSession? packetCaptureSession,
         TrackerRenderSnapshotCaptureWriter? renderSnapshotCaptureWriter)
     {
+        var effectiveObservers = observers;
+        if (packetCaptureSession is not null && renderSnapshotCaptureWriter is not null)
+        {
+            effectiveObservers =
+            [
+                .. observers,
+                new CaptureArtifactObserver(packetCaptureSession, renderSnapshotCaptureWriter),
+            ];
+        }
+
         return new TrackerCoordinator(
             fixture.CreateEngine(),
             fixture.CreatePacketGenerator(),
@@ -103,7 +113,7 @@ internal sealed class TrackerCoordinatorTestFactory
             },
             snapshotStore,
             publisher,
-            observers);
+            effectiveObservers);
     }
 
     public VisionPacketCaptureSession CreateCaptureSession(
@@ -126,5 +136,51 @@ internal sealed class TrackerCoordinatorTestFactory
             fixture.CreateResolvedOptions(fixture.CreateSettings(profileName: "sim")),
             NullLogger<VisionPacketCaptureSession>.Instance,
             runtimeControl);
+    }
+
+    /// <summary>
+    /// DebugHost 側の capture artifact 配線を test 内で再現し、Core の coordinator に host 固有責務を戻さず検証する。
+    /// </summary>
+    private sealed class CaptureArtifactObserver(
+        VisionPacketCaptureSession captureSession,
+        TrackerRenderSnapshotCaptureWriter renderSnapshotCaptureWriter) : ITrackerObserver
+    {
+        public void OnProfileSwitched(string profileName)
+        {
+        }
+
+        public void OnGeometryReset()
+        {
+        }
+
+        public void OnWorldFrameCommitted(TrackerFrame frame)
+        {
+            var receivedAt = DateTimeOffset.UtcNow;
+            renderSnapshotCaptureWriter.CaptureFrame(frame, receivedAt);
+
+            var sessionState = captureSession.Current ?? captureSession.EnsureStarted(receivedAt);
+            if (sessionState is null)
+            {
+                return;
+            }
+
+            using var _ = File.Open(
+                sessionState.DiagnosticsLogPath,
+                FileMode.OpenOrCreate,
+                FileAccess.Write,
+                FileShare.ReadWrite);
+        }
+
+        public void OnKickDetected(KickEventState kick, TrackerFrame frame)
+        {
+        }
+
+        public void OnContactChanged(TrackerFrame frame)
+        {
+        }
+
+        public void OnBallLeftField(BallLeftFieldState state, TrackerFrame frame)
+        {
+        }
     }
 }
