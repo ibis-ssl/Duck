@@ -1,0 +1,98 @@
+name: .NET tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: ga
+
+      - name: Run dotnet test
+        id: dotnet_test
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/test-results"
+          mkdir -p "$results_dir"
+
+          dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \
+            --logger "trx;LogFileName=dotnet-test.trx" \
+            --results-directory "$results_dir" \
+            --diag "$results_dir/vstest-diagnostics.log" \
+            --blame \
+            -m:1 \
+            /nr:false \
+            -bl:"$results_dir/dotnet-test.binlog" \
+            > >(tee "$results_dir/dotnet-test.stdout.log") \
+            2> >(tee "$results_dir/dotnet-test.stderr.log" >&2)
+
+          test_exit_code=$?
+          printf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"
+          echo "exit_code=$test_exit_code" >> "$GITHUB_OUTPUT"
+          exit "$test_exit_code"
+
+      - name: Collect failure diagnostics
+        if: ${{ steps.dotnet_test.outcome == 'failure' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/test-results"
+          mkdir -p "$results_dir"
+
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'sha=%s\n' "$GITHUB_SHA"
+            printf 'ref=%s\n' "$GITHUB_REF"
+            printf 'run_id=%s\n' "$GITHUB_RUN_ID"
+            printf 'run_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
+            printf 'runner_os=%s\n' "$RUNNER_OS"
+            printf 'test_exit_code=%s\n' "${{ steps.dotnet_test.outputs.exit_code }}"
+            printf '\n## dotnet --info\n'
+            dotnet --info
+            printf '\n## git status --short\n'
+            git status --short
+            printf '\n## git submodule status --recursive\n'
+            git submodule status --recursive
+          } > "$results_dir/environment.txt" 2>&1
+
+          git ls-files --recurse-submodules -z \
+            | tar --null --verbatim-files-from --files-from=- \
+                -czf "$results_dir/source.tar.gz"
+
+      - name: Upload test failure artifact
+        if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: dotnet-test-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/test-results
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Fail job when tests failed
+        if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}
+        shell: bash
+        run: exit 1
