@@ -446,7 +446,7 @@ flowchart LR
     Desired -->|"最新要求で置換"| Pending
     Pending -->|"Update 直前に昇格"| InFlight
     InFlight -->|"ProfileSwitched"| Applied
-    Applied -. "差分が残れば再計算" .-> Pending
+    Applied -. 差分が残れば再計算 .-> Pending
 ```
 
 ### 5.2 sequence
@@ -746,7 +746,7 @@ flowchart LR
     Engine --> Events["high-level events"]
     Frame --> Observer["ITrackerObserver / rule"]
     Events --> Observer
-    Raw -. "直接 subscribe しない" .-> Observer
+    Raw -. 直接 subscribe しない .-> Observer
 ```
 
 `ITrackerObserver` の最小契約:
