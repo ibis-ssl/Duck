@@ -36,35 +36,37 @@
 
 ```mermaid
 flowchart LR
-    Vision["SSL-Vision<br/>raw detection / geometry"]
+    Vision["外部: SSL-Vision<br/>raw detection / geometry"]
 
     subgraph Runtime["Tracker.RuntimeHost"]
-        RuntimeReceiver["Vision receiver"]
-        RuntimeOperation["Tracker operation"]
-        AutoRef["将来の AutoRef rule"]
-        RuntimeReceiver --> RuntimeOperation --> AutoRef
+        RuntimeReceiver["RuntimeVisionReceiverService<br/>ExecuteAsync()"]
+        RuntimeBuffer["RuntimeVisionPacketBuffer<br/>StorePacket() / TryTakeLatestBatch()"]
+        RuntimeOperation["RuntimeHostOperationLoop<br/>ProcessLatestPacket()"]
+        AutoRef["将来の AutoRef rule<br/>未実装"]
+        RuntimeReceiver --> RuntimeBuffer --> RuntimeOperation --> AutoRef
     end
 
     subgraph Debug["Tracker.DebugHost"]
-        DebugReceiver["VisionReceiverService"]
-        RawStore["VisionPacketStore"]
-        DebugOperation["Tracker operation adapter"]
-        TrackedStore["TrackedSnapshotStore"]
-        Viewer["Raw / Tracked viewer"]
-        Diagnostics["Diagnostics / Capture"]
+        DebugReceiver["VisionReceiverService<br/>ExecuteAsync()"]
+        RawStore["VisionPacketStore<br/>StorePacket() / GetSnapshot()"]
+        DebugOperation["VisionReceiverService.ExecuteAsync()<br/>TrackerCoordinator.ProcessPacket()"]
+        TrackedStore["TrackedSnapshotStore<br/>UpdateLatestFrame() / GetSnapshot()"]
+        Viewer["VisionLiveDisplaySnapshotProvider<br/>CaptureRenderTickSnapshot()"]
+        Diagnostics["DiagnosticsSampleCaptureLoop.CaptureOnce()<br/>capture writer classes"]
 
         DebugReceiver --> RawStore --> Viewer
-        DebugReceiver --> DebugOperation --> TrackedStore --> Viewer
+        DebugReceiver --> DebugOperation
+        DebugOperation --> TrackedStore --> Viewer
         DebugReceiver --> Diagnostics
         DebugOperation --> Diagnostics
     end
 
     subgraph Core["Tracker.Core"]
-        Coordinator["TrackerCoordinator"]
-        Engine["ITrackerEngine / TrackerEngine"]
-        Frame["TrackerFrame + domain state"]
-        Generator["TrackerPacketGenerator"]
-        Publisher["ITrackerPacketPublisher"]
+        Coordinator["TrackerCoordinator<br/>ProcessPacket() / ExecuteUpdates() / DispatchResult()"]
+        Engine["TrackerEngine<br/>Update()"]
+        Frame["TrackerFrame<br/>(domain data type)"]
+        Generator["TrackerPacketGenerator<br/>Generate()"]
+        Publisher["UdpTrackerPacketPublisher<br/>Publish()"]
 
         Coordinator --> Engine
         Engine --> Frame
@@ -78,27 +80,27 @@ flowchart LR
     RuntimeOperation --> Coordinator
     DebugOperation --> Coordinator
 
-    Publisher --> Official["Official tracker multicast"]
-    Official --> Consumers["GameController / AutoRef / tools"]
-    Official --> ConnectionLib["TrackerConnectionLib"]
-    ConnectionLib --> Comparison["DebugHost comparison log"]
+    Publisher --> Official["Official tracker multicast<br/>UdpTrackerPacketPublisher.Publish()"]
+    Official --> Consumers["外部: GameController / AutoRef / tools"]
+    Official --> ConnectionLib["UdpTrackerReceiver.ReceiveLoopAsync()<br/>MultiTrackerManager.ProcessPacket()"]
+    ConnectionLib --> Comparison["ExternalTrackerSnapshotStore.GetSnapshot()<br/>TrackerPacketSnapshotLogWriter.Append()"]
 ```
 
 `Tracker.RuntimeHost` と `Tracker.DebugHost` は、それぞれ独立した Core pipeline instance を compose する。図中の `Tracker.Core` は共有 process を表すのではなく、両 host が同じ契約と実装を利用することを表す。
 
 ### 1.2 End-to-end 全体フロー
 
-以降の詳細図は、すべてこの `F1` から `F7` のどこを展開しているかを明記する。
+以降の詳細図は、すべてこの `F1` から `F7` のどこを展開しているかを明記する。各ブロック内の `Class.Method()` は、その stage を開始または統括する主な実装 entry point である。
 
 ```mermaid
 flowchart LR
-    F1["F1. Vision packet 受信"]
-    F2["F2. Host adapter / Coordinator<br/>decode・raw store・capture・直列化"]
-    F3["F3. Engine update<br/>event-time reorder・tracking・merge"]
-    F4["F4. Result dispatch<br/>0..N frames・ordered events"]
-    F5["F5. Core output<br/>snapshot・official packet・observer"]
-    F6["F6. Live consumer<br/>viewer・multicast・AutoRef"]
-    F7["F7. Capture / comparison<br/>sidecar・alignment・replay"]
+    F1["F1. Vision packet 受信<br/>RuntimeVisionReceiverService.ExecuteAsync()<br/>VisionReceiverService.ExecuteAsync()"]
+    F2["F2. Host adapter / Coordinator<br/>RuntimeHostOperationLoop.ProcessLatestPacket()<br/>VisionPacketStore.StorePacket()<br/>TrackerCoordinator.ProcessPacket()"]
+    F3["F3. Engine update<br/>TrackerEngine.Update()"]
+    F4["F4. Result dispatch<br/>TrackerCoordinator.DispatchResult()"]
+    F5["F5. Core output<br/>TrackedSnapshotStore.UpdateLatestFrame()<br/>TrackerPacketGenerator.Generate()<br/>ITrackerPacketPublisher.Publish()<br/>TrackerCoordinator.NotifyObservers()"]
+    F6["F6. Live consumer<br/>VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()<br/>UdpTrackerPacketPublisher.Publish()<br/>ITrackerObserver.On...()"]
+    F7["F7. Capture / comparison<br/>VisionPacketCaptureWriter.Capture()<br/>TrackerPacketSnapshotLogWriter.Append()<br/>TrackerSnapshotAlignmentLogWriter.WriteTimelineRecords()<br/>replay reader classes"]
 
     F1 --> F2 --> F3 --> F4 --> F5 --> F6
     F1 -.-> F7
@@ -112,22 +114,27 @@ flowchart LR
 
 ### 1.3 全体フローと詳細図の対応
 
-| 全体 stage | 役割 | 展開する章 |
-| --- | --- | --- |
-| `F1` | SSL-Vision packet / UDP payload の受信 | 2. Live tracking、7. Capture / replay |
-| `F2` | host adapter、raw store / capture、coordinator の直列化 | 2. Live tracking、6. Profile switch |
-| `F3` | engine 内の request 適用、event-time buffer、camera-local tracking、merge、domain metadata | 3. Engine 内部パイプライン |
-| `F4` | `TrackerUpdateResult` の state transition / frame / derived event dispatch | 2. Live tracking、5. Result dispatch |
-| `F5` | `TrackerFrame`、snapshot store、packet generator、publisher、observer の境界 | 4. Core data model、5. Result dispatch |
-| `F6` | viewer、official multicast consumer、AutoRef rule | 2. Live tracking、8. UI / rule |
-| `F7` | CaptureOn session、snapshot / alignment sidecar、replay / comparison | 7. Capture / replay |
-| `C1` | profile / override の切替 control flow | 6. Profile switch |
+| 全体 stage | 主な実装 entry point | 役割 | 展開する章 |
+| --- | --- | --- | --- |
+| `F1` | `RuntimeVisionReceiverService.ExecuteAsync()` / `VisionReceiverService.ExecuteAsync()` | SSL-Vision packet / UDP payload の受信 | 2. Live tracking、7. Capture / replay |
+| `F2` | `RuntimeHostOperationLoop.ProcessLatestPacket()` / `VisionPacketStore.StorePacket()` / `TrackerCoordinator.ProcessPacket()` | host adapter、raw store / capture、coordinator の直列化 | 2. Live tracking、6. Profile switch |
+| `F3` | `TrackerEngine.Update()` と `TrackerEngine` partial methods | request 適用、event-time buffer、camera-local tracking、merge、domain metadata | 3. Engine 内部パイプライン |
+| `F4` | `TrackerCoordinator.DispatchResult()` | `TrackerUpdateResult` の state transition / frame / derived event dispatch | 2. Live tracking、5. Result dispatch |
+| `F5` | `TrackedSnapshotStore.UpdateLatestFrame()` / `TrackerPacketGenerator.Generate()` / `PublishFrame()` / `NotifyObservers()` | snapshot store、official packet、publisher、observer の境界 | 4. Core data model、5. Result dispatch |
+| `F6` | `VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()` / `UdpTrackerPacketPublisher.Publish()` / `ITrackerObserver` callbacks | viewer、official multicast consumer、AutoRef rule | 2. Live tracking、8. UI / rule |
+| `F7` | capture writer classes / `TrackerSnapshotReplayReader.ReadSession()` / `TrackerDiagnosticsComparisonViewStateReader.Load()` | CaptureOn session、snapshot / alignment sidecar、replay / comparison | 7. Capture / replay |
+| `C1` | `TrackerProfileRequestService.RequestProfileSwitch()` / `TrackerCoordinator.RequestProfileSwitch()` / `ApplyProfileSwitch()` | profile / override の切替 control flow | 6. Profile switch |
 
 ### 1.4 図の読み方
 
 - `F#` は End-to-end 全体フローの stage を表す
 - `F3.1` のような番号は、stage `F3` の内部処理を表す
 - `C1` は live data flow と別系統の profile 切替 control flow を表す
+- `Class.Method()` はそのブロックを統括する実装 entry point を表す
+- `Class.field` は独立した関数ではなく保持状態を表す
+- `(data type)` は処理ではなく、stage 間を流れる契約型を表す
+- `外部` と `未実装` はリポジトリ内に対応関数がないことを表す
+- 複数の private helper が関与するブロックでは、代表的な method を図中に記載し、詳細は本文と詳細仕様を参照する
 - `sequenceDiagram` は実行順、`flowchart` は処理の分解またはデータ境界を表す
 - 4章の図は時系列フローではなく、`F3` から `F5` に渡るデータモデルと依存境界を表す
 - 詳細図から全体へ戻るときは、図中の `F#` を 1.2 の同じ stage に対応付ける
@@ -173,35 +180,37 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     autonumber
-    participant V as SSL-Vision
-    participant R as Vision receiver
+    participant V as 外部: SSL-Vision
+    participant R as VisionReceiverService / RuntimeHostOperationLoop
     participant C as TrackerCoordinator
-    participant E as ITrackerEngine
+    participant E as TrackerEngine
     participant S as TrackedSnapshotStore
     participant G as TrackerPacketGenerator
-    participant P as Publisher
-    participant M as Official multicast
-    participant O as Observer / rule
+    participant P as UdpTrackerPacketPublisher
+    participant M as 外部: Official multicast
+    participant O as ITrackerObserver / rule
 
-    V->>R: F1. SSL_WrapperPacket
-    R->>C: F2. ProcessPacket(packet, receivedAt)
-    C->>E: F3. Update(packet, settings, optional request)
-    E->>E: F3.1-F3.8 request / reorder / tracking / merge
-    E-->>C: F4. TrackerUpdateResult<br/>CommittedFrames 0..N + EmittedEvents
+    V->>R: F1. ExecuteAsync() で受信・decode
+    R->>C: F2. TrackerCoordinator.ProcessPacket(packet, receivedAt)
+    C->>E: F3. TrackerEngine.Update(packet, settings, request)
+    E->>E: F3.1-F3.8 TrackerEngine partial methods
+    E-->>C: F4. TrackerUpdateResult
 
-    C->>C: F4. state transition event を順に適用
+    C->>C: F4. TrackerCoordinator.DispatchResult()
 
     loop CommittedFrames を古い順に全件処理
-        C->>S: F5. latest frame / receivedAt 更新
-        C->>G: F5. TrackerFrame を変換
+        C->>S: F5. TrackedSnapshotStore.UpdateLatestFrame()
+        C->>G: F5. TrackerPacketGenerator.Generate()
         G-->>C: F5. TrackerWrapperPacket
-        C->>P: F5. UDP publish
-        P->>M: F6. official multicast
-        C->>O: F5→F6. WorldFrameCommitted / 派生 event
+        C->>P: F5. ITrackerPacketPublisher.Publish()
+        P->>M: F6. UdpTrackerPacketPublisher.Publish()
+        C->>O: F5→F6. TrackerCoordinator.NotifyObservers() / ITrackerObserver.On...()
     end
 ```
 
-viewer は `F5` で更新された `TrackedSnapshotStore` を読み、official tracker consumer は `F6` の multicast を読む。どちらも tracking operation loop を駆動しない。
+DebugHost viewer は `VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()` を通じて `VisionPacketStore.GetSnapshot()`、`TrackedSnapshotStore.GetSnapshot()`、`ExternalTrackerSnapshotStore.GetSnapshot()` を読み取る。official tracker consumer は `F6` の multicast を読む。どちらも tracking operation loop を駆動しない。
+
+RuntimeHost では `RuntimeVisionReceiverService.ExecuteAsync()` が `RuntimeVisionPacketBuffer.StorePacket()` へ保存し、`RuntimeHostLifecycleService.ExecuteAsync()` が周期的に `RuntimeHostOperationLoop.ProcessLatestPacket()` を呼ぶ。DebugHost では `VisionReceiverService.ExecuteAsync()` が decode、raw store、capture の後に `TrackerCoordinator.ProcessPacket()` を直接呼ぶ。
 
 ### 2.1 Coordinator が保証すること
 
@@ -220,15 +229,15 @@ viewer は `F5` で更新された `TrackedSnapshotStore` を読み、official t
 
 ```mermaid
 flowchart LR
-    Input["F2→F3<br/>packet / control-only Update"]
-    Request["F3.1<br/>profile request 適用"]
-    Geometry["F3.2<br/>geometry snapshot 更新"]
-    Buffer["F3.3<br/>event time 決定・buffer"]
-    Flush["F3.4<br/>ReorderWindow 判定・flush"]
-    Local["F3.5<br/>camera-local Kalman update"]
-    Merge["F3.6<br/>camera 横断 merge"]
-    Domain["F3.7<br/>kick / contact / field exit"]
-    Result["F3.8→F4<br/>0..N frames + ordered events"]
+    Input["F2→F3<br/>TrackerCoordinator.ExecuteUpdates()<br/>TrackerEngine.Update(...)"]
+    Request["F3.1 profile request 適用<br/>TrackerEngine.Update()<br/>ClearPendingStateAndAdvanceLateCutoff()"]
+    Geometry["F3.2 geometry snapshot 更新<br/>CreateGeometrySnapshot()<br/>ShouldResetForGeometryChange()"]
+    Buffer["F3.3 event time 決定・buffer<br/>CreateBufferedDetection()<br/>pendingDetections.Add()"]
+    Flush["F3.4 ReorderWindow 判定・flush<br/>FlushCommittedFrames()<br/>BuildDetectionGroups()"]
+    Local["F3.5 camera-local Kalman update<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
+    Merge["F3.6 camera 横断 merge<br/>CollectMergedBallStates()<br/>CollectMergedRobotStates()"]
+    Domain["F3.7 domain metadata<br/>UpdateKickState()<br/>CreateBallContactState()<br/>CreateBallLeftFieldState()"]
+    Result["F3.8→F4 frame / event 構築<br/>CommitGroup()<br/>TrackerUpdateResult (data type)"]
 
     Input --> Request --> Geometry --> Buffer --> Flush --> Local --> Merge --> Domain --> Result
 ```
@@ -239,18 +248,19 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Packet["F3.3 Detection packet"] --> Capture{"TCapture は有効か"}
-    Capture -->|Yes| TCapture["TCapture を event time に使用"]
-    Capture -->|No| Sent{"TSent は有効か"}
-    Sent -->|Yes| TSent["TSent を event time に使用"]
-    Sent -->|No| Invalid["欠落として diagnostics 対象"]
+    Packet["F3.3 SSL_DetectionFrame<br/>TrackerEngine.Update()"] --> Capture{"event time 選択<br/>SelectEventTimeSeconds()"}
+    Capture -->|TCapture > 0| TCapture["TCapture を使用<br/>SelectEventTimeSeconds()"]
+    Capture -->|それ以外| TSent["TSent を使用<br/>SelectEventTimeSeconds()"]
+    TSent -.-> Invalid["欠落入力の診断契約<br/>TrackerEngineDiagnostics (data type)"]
 
-    TCapture --> Stable["F3.3<br/>event time・camera id・frame number で安定整列"]
-    TSent --> Stable
-    Stable --> Pending["F3.3<br/>pending detection buffer"]
-    Pending --> Window{"F3.4<br/>ReorderWindow を越えたか"}
-    Window -->|No| Hold["buffer に保持"]
-    Window -->|Yes| Flush["F3.4<br/>確定可能な group を event time 順に flush"]
+    TCapture --> Snapshot["BufferedDetection を生成<br/>CreateBufferedDetection()"]
+    TSent --> Snapshot
+    Snapshot --> Pending["F3.3 pending buffer<br/>TrackerEngine.pendingDetections"]
+    Pending --> Stable["event time・camera id・frame number で安定整列<br/>FlushCommittedFrames()"]
+    Stable --> Groups["MergeWindow ごとに group 化<br/>BuildDetectionGroups()"]
+    Groups --> Window{"F3.4 ReorderWindow を越えたか<br/>FlushCommittedFrames()"}
+    Window -->|No| Hold["buffer に保持<br/>TrackerEngine.pendingDetections"]
+    Window -->|Yes| Flush["確定可能な group を flush<br/>FlushCommittedFrames() → CommitGroup()"]
 ```
 
 - UDP arrival order は world frame の確定順に使わない
@@ -266,19 +276,21 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    D0["camera 0 observations"] --> Cam0["F3.5 camera 0 tracks<br/>Kalman predict / update"]
-    D1["camera 1 observations"] --> Cam1["F3.5 camera 1 tracks<br/>Kalman predict / update"]
-    DN["camera N observations"] --> CamN["F3.5 camera N tracks<br/>Kalman predict / update"]
+    D0["camera 0 BufferedDetection<br/>(data type)"] --> Cam0["F3.5 camera 0 tracks<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
+    D1["camera 1 BufferedDetection<br/>(data type)"] --> Cam1["F3.5 camera 1 tracks<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
+    DN["camera N BufferedDetection<br/>(data type)"] --> CamN["F3.5 camera N tracks<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
 
-    Cam0 --> Gate["F3.6<br/>time / spatial / identity gate"]
+    Cam0 --> Gate["F3.6 association / outlier gate<br/>BuildBallClusters()<br/>CanAttachBallTrackToCluster()<br/>CollectCameraRobotObservations()"]
     Cam1 --> Gate
     CamN --> Gate
-    Gate --> Sort["F3.6<br/>camera id + local track id で stable sort"]
-    Sort --> Weighted["F3.6<br/>posterior uncertainty で weighted merge"]
-    Weighted --> World["F3.6<br/>frame ごとの world snapshot"]
-    World --> Domain["F3.7<br/>kick / contact / field exit"]
-    Domain --> Result["F3.8<br/>TrackerUpdateResult"]
+    Gate --> Sort["stable ordering<br/>CollectMergedBallStates()<br/>CollectMergedRobotStates()"]
+    Sort --> Weighted["posterior uncertainty で merge<br/>CollectMergedBallStates()<br/>CreateTrackedRobot()"]
+    Weighted --> World["world snapshot 構築<br/>CommitGroup() → TrackerFrame"]
+    World --> Domain["F3.7 domain metadata<br/>UpdateKickState()<br/>CreateBallContactState()<br/>CreateBallLeftFieldState()"]
+    Domain --> Result["F3.8 frame / events<br/>CommitGroup() → TrackerUpdateResult"]
 ```
+
+ball の camera-local predict / update は `PredictBallTrackState()`、`CreateObservedBallTrackState()`、`CreatePredictedBallTrackState()` が担う。robot は `PredictRobotTrackState()`、`CreateObservedRobotTrackState()`、`CreatePredictedRobotTrackState()` が担う。
 
 v1 では camera-local Kalman state を統合し、merge 後の world に第2の永続 filter は置かない。robot は `team + robot id`、ball は距離、速度上限、track 成長、直前 primary との整合を用いて対応付ける。詳細な gate、visibility、ghost 抑制、orientation unwrap は詳細仕様を参照する。
 
@@ -290,26 +302,27 @@ v1 では camera-local Kalman state を統合し、merge 後の world に第2の
 
 ```mermaid
 flowchart LR
-    Result["F3.8 TrackerUpdateResult"]
-    Frames["CommittedFrames 0..N"]
-    Events["EmittedEvents"]
-    Frame["TrackerFrame"]
-    Dispatch["F4 TrackerCoordinator dispatch"]
+    Result["F3.8 TrackerUpdateResult<br/>(data type)"]
+    Frames["TrackerUpdateResult.CommittedFrames<br/>0..N TrackerFrame"]
+    Events["TrackerUpdateResult.EmittedEvents<br/>TrackerEvent collection"]
+    Frame["TrackerFrame<br/>(domain data type)"]
+    Dispatch["F4 TrackerCoordinator<br/>DispatchResult()"]
 
     Result --> Frames --> Frame --> Dispatch
     Result --> Events --> Dispatch
 
-    Frame --> Ball["TrackedBallState"]
-    Frame --> Robot["TrackedRobotState"]
-    Frame --> Kick["KickEventState"]
-    Frame --> Contact["BallContactState"]
-    Frame --> Left["BallLeftFieldState"]
-    Frame --> Metadata["TrackerFrameMetadata"]
+    Frame --> Ball["TrackedBallState<br/>(data type)"]
+    Frame --> Robot["TrackedRobotState<br/>(data type)"]
+    Frame --> Kick["KickEventState<br/>(data type)"]
+    Frame --> Contact["BallContactState<br/>(data type)"]
+    Frame --> Left["BallLeftFieldState<br/>(data type)"]
+    Frame --> Metadata["TrackerFrameMetadata<br/>(data type)"]
 
-    Dispatch --> Store["F5 TrackedSnapshotStore"]
-    Frame --> Generator["F5 TrackerPacketGenerator"]
-    Generator --> Official["F5 TrackerWrapperPacket / TrackedFrame"]
-    Dispatch --> Observer["F5 ITrackerObserver / AutoRef rule"]
+    Dispatch --> Store["F5 TrackedSnapshotStore<br/>UpdateLatestFrame() / ClearLatestFrame()"]
+    Frame --> Generator["F5 TrackerPacketGenerator<br/>Generate()"]
+    Generator --> Official["TrackerWrapperPacket / TrackedFrame<br/>(official proto data types)"]
+    Dispatch --> Publisher["F5 TrackerCoordinator.PublishFrame()<br/>ITrackerPacketPublisher.Publish()"]
+    Dispatch --> Observer["F5 TrackerCoordinator.NotifyObservers()<br/>ITrackerObserver.On...()"]
 ```
 
 ### 4.1 時刻と単位
@@ -325,13 +338,13 @@ flowchart LR
 | Core 内部 | `mm` | `mm/s` | `rad` | `ns` |
 | official proto | `m` | `m/s` | proto 定義 | `s` |
 
-単位変換は `TrackerPacketGenerator` の境界でのみ行う。
+単位変換は `TrackerPacketGenerator.Generate()` が呼ぶ `CreateTrackedBall()`、`CreateTrackedRobot()`、`CreateKickedBall()` の境界で行う。
 
 ### 4.2 Official packet の安定順
 
-- `Balls[0]` は primary ball
+- `TrackerPacketGenerator.OrderBalls()` が `Balls[0]` を primary ball に固定する
 - secondary ball は `visibility desc`、`last_visible_timestamp_ns desc`、`internal_track_id asc`
-- robots は team と robot id で安定順を持つ
+- `TrackerPacketGenerator.Generate()` が robots を team と robot id の安定順に並べる
 - capabilities は毎回同じ順で出す
 - `kicked_ball` は kick 済みかつ still moving の間だけ出す
 
@@ -343,16 +356,16 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    Result["F3.8 TrackerUpdateResult"]
-    Transition["F4.1 state transition<br/>ProfileSwitched / GeometryReset"]
-    Frame["F4.2 committed frame<br/>WorldFrameCommitted"]
-    Derived["F4.3 derived event<br/>KickDetected / ContactChanged / BallLeftField"]
-    Output["F5 snapshot / packet / observer"]
+    Result["F3.8 TrackerUpdateResult<br/>(data type)"]
+    Transition["F4.1 state transition<br/>TrackerCoordinator.DispatchResult()<br/>ApplyProfileSwitch() / ClearLatestFrame()"]
+    Frame["F4.2 committed frame<br/>DispatchResult()<br/>UpdateLatestFrame() / PublishFrame()<br/>OnWorldFrameCommitted()"]
+    Derived["F4.3 derived event<br/>DispatchResult()<br/>OnKickDetected() / OnContactChanged()<br/>OnBallLeftField()"]
+    Output["F5 output boundary<br/>PublishFrame() / NotifyObservers()"]
 
     Result --> Transition --> Frame --> Derived --> Output
 ```
 
-同一 phase 内は `TrackerUpdateResult.EmittedEvents` の格納順を正とする。rule や observer は raw packet を直接 subscribe せず、committed `TrackerFrame` と高レベル event を読む。
+`TrackerCoordinator.DispatchResult()` は `TrackerUpdateResult.EmittedEvents` を順に走査し、`TrackerEventKind` ごとに store、publish、observer callback を呼び分ける。同一 phase 内は `EmittedEvents` の格納順を正とする。
 
 `ITrackerObserver` の最小契約:
 
@@ -369,26 +382,26 @@ flowchart LR
 
 profile 切替は End-to-end 全体フローに直列追加される stage ではない。control flow `C1` として、`F2` の coordinator request 管理、`F3.1` の engine 適用、`F4` の `ProfileSwitched` dispatch、`F5` の host state 更新を横断する。
 
-| control step | 全体フロー上の位置 |
-| --- | --- |
-| `C1.1` desired / pending / in-flight 管理 | `F2` TrackerCoordinator |
-| `C1.2` request を `Update` 先頭で適用 | `F3.1` |
-| `C1.3` `ProfileSwitched` を返して dispatch | `F4` |
-| `C1.4` endpoint / active profile / store を更新 | `F5` |
+| control step | 全体フロー上の位置 | 主な実装 |
+| --- | --- | --- |
+| `C1.1` desired / pending / in-flight 管理 | `F2` TrackerCoordinator | `TrackerProfileRequestService.RequestProfileSwitch()` / `TrackerCoordinator.RequestProfileSwitch()` / `PromotePendingRequest()` |
+| `C1.2` request を `Update` 先頭で適用 | `F3.1` | `TrackerEngine.Update()` / `ClearPendingStateAndAdvanceLateCutoff()` |
+| `C1.3` `ProfileSwitched` を返して dispatch | `F4` | `TrackerEngine.Update()` / `TrackerCoordinator.DispatchResult()` |
+| `C1.4` endpoint / active profile / store を更新 | `F5` | `TrackerCoordinator.ApplyProfileSwitch()` / `UdpTrackerPacketPublisher.ApplyConfiguration()` / `TrackedSnapshotStore.SwitchActiveProfile()` |
 
 ### 6.1 C1.1: 4種類の snapshot / request
 
 ```mermaid
 flowchart LR
-    Desired["C1.1 desired target snapshot<br/>最新のユーザー意図"]
-    Pending["C1.1 pending request<br/>未送信・最大1件"]
-    InFlight["C1.1 in-flight request<br/>Update 中 immutable"]
-    Applied["C1.4 applied snapshot<br/>現在適用済み"]
+    Desired["C1.1 TrackerCoordinator.desiredOptions<br/>最新のユーザー意図"]
+    Pending["C1.1 TrackerCoordinator.pendingRequest<br/>未送信・最大1件"]
+    InFlight["C1.1 TrackerCoordinator.inFlightRequest<br/>Update 中 immutable"]
+    Applied["C1.4 TrackerCoordinator.appliedOptions<br/>現在適用済み"]
 
-    Desired -->|"最新要求で置換"| Pending
-    Pending -->|"F2: Update 直前に昇格"| InFlight
-    InFlight -->|"F4: ProfileSwitched"| Applied
-    Applied -->|"差分が残れば再計算"| Pending
+    Desired -->|"RequestProfileSwitch() で置換"| Pending
+    Pending -->|"PromotePendingRequest()"| InFlight
+    InFlight -->|"DispatchResult() → ApplyProfileSwitch()"| Applied
+    Applied -->|"RequestProfileSwitch() が差分を再計算"| Pending
 ```
 
 ### 6.2 C1.1-C1.4: 切替 sequence
@@ -396,25 +409,29 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     autonumber
-    participant UI
+    participant UI as Home.razor / API
+    participant R as TrackerProfileRequestService
     participant C as TrackerCoordinator
-    participant E as ITrackerEngine
+    participant E as TrackerEngine
     participant S as TrackedSnapshotStore
-    participant P as Publisher
-    participant O as Observer
+    participant P as UdpTrackerPacketPublisher
+    participant O as VisionReceiverProfileSwitchObserver
 
-    UI->>C: C1.1 / F2 profile 選択・override apply
-    C->>C: C1.1 desired 更新、pending を最新要求で置換
-    C->>C: C1.1 pending を in-flight へ昇格
-    C->>E: C1.2 / F3.1 control-only Update(request)
-    E->>E: C1.2 settings 確定、track / pending / world clear
-    E-->>C: C1.3 / F4 ProfileSwitched
-    C->>P: C1.4 / F5 publish endpoint 切替
-    C->>S: C1.4 / F5 active profile 更新、latest frame clear
-    C->>C: C1.4 applied 更新、in-flight 解放
-    C->>O: C1.4 / F5 OnProfileSwitched
-    opt より新しい pending がある
-        C->>E: C1.2 次の control-only Update
+    UI->>R: TrackerProfileRequestService.RequestProfileSwitch()
+    R->>C: C1.1 TrackerCoordinator.RequestProfileSwitch()
+    C->>C: desiredOptions 更新 / pendingRequest 置換
+    C->>C: PromotePendingRequest()
+    C->>E: C1.2 TrackerEngine.Update(null, settings, request)
+    E->>E: ClearPendingStateAndAdvanceLateCutoff()
+    E-->>C: C1.3 TrackerEventKind.ProfileSwitched
+    C->>C: TrackerCoordinator.DispatchResult()
+    C->>P: C1.4 ApplyProfileSwitch() → ApplyConfiguration()
+    C->>S: C1.4 TrackedSnapshotStore.SwitchActiveProfile()
+    C->>C: appliedOptions 更新 / inFlightRequest 解放
+    C->>O: NotifyObservers() → OnProfileSwitched()
+    O->>O: VisionReceiverRuntimeOptionsStore.ApplyConfiguration()
+    opt より新しい pendingRequest がある
+        C->>E: ExecuteUpdates() から次の control-only Update
     end
 ```
 
@@ -422,10 +439,10 @@ sequenceDiagram
 
 - coordinator は queue を積まず、最新のユーザー意図へ収束する
 - in-flight request は result 処理完了まで書き換えない
-- raw packet がなくても pending があれば control-only `Update` を実行する
-- engine は `Update` の先頭で request を適用する
-- `ProfileSwitched` 後に host 側 endpoint、active profile、store を原子的に切り替える
-- receiver profile は `ProfileSwitched` 後の observer 側で切り替える
+- raw packet がなくても pending があれば `TrackerCoordinator.ExecuteUpdates()` が control-only `Update` を実行する
+- engine は `TrackerEngine.Update()` の先頭で request を適用する
+- `ProfileSwitched` 後に `TrackerCoordinator.ApplyProfileSwitch()` が host 側 endpoint、active profile、store を原子的に切り替える
+- receiver profile は `VisionReceiverProfileSwitchObserver.OnProfileSwitched()` で切り替える
 - first committed frame after switch は必ず新 profile の state から生成する
 
 **clear する state:** camera-local tracks、pending detection buffer、world snapshot、kick / contact / field metadata。
@@ -440,32 +457,35 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    Vision["F1 SSL-Vision UDP payload"] --> Receiver["F2 DebugHost receiver"]
-    Receiver --> Core["F3-F5 Core tracking pipeline"]
-    Core --> OwnPacket["F5 ibis official packet"]
-    OwnPacket --> Multicast["F6 official tracker multicast"]
+    Vision["F1 外部: SSL-Vision UDP payload"] --> Receiver["F2 VisionReceiverService<br/>ExecuteAsync()"]
+    Receiver --> Core["F3-F5<br/>TrackerCoordinator.ProcessPacket()<br/>TrackerEngine.Update()<br/>DispatchResult()"]
+    Core --> OwnPacket["F5 ibis official packet<br/>TrackerPacketGenerator.Generate()"]
+    OwnPacket --> Multicast["F6 official multicast<br/>UdpTrackerPacketPublisher.Publish()"]
 
-    Receiver --> RawCapture["F7.1 packet capture<br/>jsonl.gz"]
-    Receiver --> Diagnostics["F7.1 diagnostics / render snapshots"]
+    Receiver --> RawCapture["F7.1 raw packet capture<br/>VisionPacketCaptureWriter.Capture()"]
+    Receiver --> Diagnostics["F7.1 diagnostics sample<br/>DiagnosticsSampleCaptureLoop.CaptureOnce()<br/>TrackerRenderSnapshotCaptureWriter.CaptureFrame()"]
 
-    ThirdParty["3rdparty tracker"] --> Multicast
-    Multicast --> Connection["F7.2 TrackerConnectionLib"]
-    Connection --> Snapshot["F7.2 tracker packet snapshot sidecar"]
+    ThirdParty["外部: 3rdparty tracker"] --> Multicast
+    Multicast --> Connection["F7.2 official packet 受信<br/>UdpTrackerReceiver.ReceiveLoopAsync()<br/>TrackerConnectionLibReceiverHostedService.ProcessPacket()<br/>MultiTrackerManager.ProcessPacket()"]
+    Connection --> Snapshot["F7.2 snapshot sidecar<br/>TrackerConnectionLibSnapshotRecorder.CaptureTrackerUpdate()<br/>TrackerPacketSnapshotLogWriter.CapturePacket() / Append()"]
 
-    RawCapture --> Session["F7.3 CaptureOn session folder"]
+    RawCapture --> Session["F7.3 CaptureOn session<br/>VisionPacketCaptureSession.EnsureStarted()<br/>WriteMetadata()"]
     Diagnostics --> Session
     Snapshot --> Session
-    Session --> Alignment["F7.3 tracker-snapshot-alignment.jsonl"]
-    Alignment --> Reader["F7.4 bounded index / replay timeline"]
+    Session --> Alignment["F7.3 alignment sidecar<br/>TrackerSnapshotAlignmentLogWriter.WriteTimelineRecords()"]
+    Alignment --> Reader["F7.4 replay index / view-state<br/>TrackerSnapshotReplayReader.ReadSession()<br/>TrackerDiagnosticsComparisonViewStateReader.Load()"]
     Session --> Reader
-    Reader --> UI["F7.4 Diagnostics UI"]
-    Reader --> CLI["F7.4 Tracker.CaptureReplay"]
+    Reader --> UI["F7.4 Diagnostics UI<br/>Diagnostics.razor<br/>TrackerDiagnosticsComparisonViewStateReader.Load()"]
+    Reader --> CLI["F7.4 Tracker.CaptureReplay<br/>CaptureReplayRunner.Run()"]
 
-    Connection -.-> Isolation["comparison-only<br/>F3 へ入力しない"]
+    Connection -.-> Isolation["comparison-only boundary<br/>TrackerEngine.Update() を呼ばない"]
 ```
 
 ### 7.1 Capture boundary の要点
 
+- `VisionReceiverService.ExecuteAsync()` は protobuf decode 前の payload を `VisionPacketCaptureWriter.Capture()` へ渡す
+- `UdpTrackerReceiver.ReceiveLoopAsync()` は official packet を受信し、`TrackerConnectionLibReceiverHostedService.ProcessPacket()` が `MultiTrackerManager.ProcessPacket()` へ渡す
+- `TrackerConnectionLibSnapshotRecorder.CaptureTrackerUpdate()` は `TrackerUpdated` event を受け、`TrackerPacketSnapshotLogWriter.CapturePacket()` へ保存する
 - official packet の傍受、snapshot 保存、比較処理を `Tracker.Core` に入れない
 - ibis 自身の packet も self 除外せず保存対象にできる
 - `uuid` / `sourceName` が空、重複、衝突しても raw payload と source identity を落とさない
@@ -505,36 +525,41 @@ VisionReceiver
    └─ FlushEachPacket
 ```
 
+`TrackerConfigurationResolver.Resolve()` が tracker profile と runtime override を解決する。`VisionReceiverConfigurationResolver.Resolve()` が receiver profile を解決し、`VisionReceiverRuntimeOptionsStore.ApplyConfiguration()` が runtime receiver 設定へ反映する。
+
 外出しする主要値は receive / publish endpoint、`ReorderWindow`、`MergeWindow`、Kalman process / measurement noise、initial variance、association gate、outlier threshold、track lifetime、visibility、kick / chip / contact threshold、geometry reset threshold、diagnostics / capture path である。
 
 ### 8.2 F5-F6: UI
 
-- raw viewer は `VisionPacketStore` を読む
-- tracked viewer は `TrackedSnapshotStore` を読む
-- `Raw / Tracked` を button で切り替える
+- `VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()` が 1 render tick の raw / tracked / external tracker snapshot を固定する
+- raw viewer は `VisionPacketStore.GetSnapshot()` を読む
+- tracked viewer は `TrackedSnapshotStore.GetSnapshot()` を読む
+- external comparison は `ExternalTrackerSnapshotStore.GetSnapshot()` を読む
+- `Home.razor` の `CaptureLiveDisplaySnapshot()` と `RefreshAsync()` が read-side snapshot を UI state へ反映する
+- `Raw / Tracked / Compare` を button で切り替える
 - tracked view は primary / secondary ball、robots、profile、kick、contact、field state を表示する
 - frame が clear された直後でも profile UI は操作可能にする
 - UI rendering の周期は tracking operation loop を駆動しない
 
 ### 8.3 F5-F6: Rule
 
-AutoRef rule は raw packet や camera-local track を直接読まず、committed `TrackerFrame` と高レベル event を読む。rule の追加が tracking core の数値処理へ影響しない境界を保つ。
+`TrackerCoordinator.DispatchResult()` が `TrackerCoordinator.NotifyObservers()` を呼び、`ITrackerObserver.OnWorldFrameCommitted()`、`OnKickDetected()`、`OnContactChanged()`、`OnBallLeftField()` へ committed `TrackerFrame` と高レベル event を渡す。AutoRef rule は raw packet や camera-local track を直接読まない。rule の追加が tracking core の数値処理へ影響しない境界を保つ。
 
 ---
 
 ## 9. 詳細仕様との対応
 
-| この文書 | 全体フロー / 図の種類 | 詳細仕様で確認する章 | 詳細仕様に残る主な情報 |
-| --- | --- | --- | --- |
-| 1. システム全体像 | component context + `F1-F7` master flow | 目的、対象範囲、対象外、基本方針、構成 | 参考実装の採否、proto 型一覧、構成要素の個別説明 |
-| 2. Live tracking | `F1-F6` end-to-end sequence | 契約詳細、`TrackerCoordinator`、データフロー | 0-frame / multi-frame の細則、local state 更新順、receiver adapter 条件 |
-| 3. Engine pipeline | `F3` detail flow | 入出力詳細、multi-camera、アルゴリズム設計 | late packet、geometry generation、robot / ball filter の全要件 |
-| 4. Core model | `F3.8-F5` data boundary。時系列図ではない | 内部出力、内部モデル方針、`TrackerPacketGenerator` | state 型の全 field、official proto field、capability、kick 寿命 |
-| 5. Result dispatch | `F4` detail flow | rule 連携 | observer interface、同一 phase 内の順序、同期 observer 方針 |
-| 6. Profile switch | `C1` control flow。`F2-F5` を横断 | 設定、設定セット切替 | duplicate 判定、override snapshot、receiver 切替、identity 維持条件 |
-| 7. Capture / replay | `F7` side flow。`F1` / `F6` から分岐 | tracker packet snapshot 比較ログ、設定 | sidecar record、alignment v2、legacy fallback、timeline / playback 規則 |
-| 8. 設定 / UI / rule | configuration tree + `F5-F6` boundary | 設定、UI 方針、filter 設定 | 全設定項目、profile 例、UI 操作要件、既定 endpoint |
-| TDD / 実装順 | 詳細仕様のみ | テスト方針、タスク分割方針、承認ゲート | 最初の失敗テスト候補、TRACKER-000 以降の実装順、完了条件 |
+| この文書 | 全体フロー / 図の種類 | 主な実装 entry point | 詳細仕様で確認する章 | 詳細仕様に残る主な情報 |
+| --- | --- | --- | --- | --- |
+| 1. システム全体像 | component context + `F1-F7` master flow | receiver services、`TrackerCoordinator`、`TrackerEngine`、publisher / reader classes | 目的、対象範囲、対象外、基本方針、構成 | 参考実装の採否、proto 型一覧、構成要素の個別説明 |
+| 2. Live tracking | `F1-F6` end-to-end sequence | `ExecuteAsync()`、`ProcessLatestPacket()`、`ProcessPacket()`、`Update()`、`DispatchResult()` | 契約詳細、`TrackerCoordinator`、データフロー | 0-frame / multi-frame の細則、local state 更新順、receiver adapter 条件 |
+| 3. Engine pipeline | `F3` detail flow | `TrackerEngine.Update()` と責務別 partial methods | 入出力詳細、multi-camera、アルゴリズム設計 | late packet、geometry generation、robot / ball filter の全要件 |
+| 4. Core model | `F3.8-F5` data boundary。時系列図ではない | `CommitGroup()`、`DispatchResult()`、`TrackerPacketGenerator.Generate()` | 内部出力、内部モデル方針、`TrackerPacketGenerator` | state 型の全 field、official proto field、capability、kick 寿命 |
+| 5. Result dispatch | `F4` detail flow | `TrackerCoordinator.DispatchResult()` / `PublishFrame()` / `NotifyObservers()` | rule 連携 | observer interface、同一 phase 内の順序、同期 observer 方針 |
+| 6. Profile switch | `C1` control flow。`F2-F5` を横断 | `RequestProfileSwitch()`、`PromotePendingRequest()`、`ApplyProfileSwitch()` | 設定、設定セット切替 | duplicate 判定、override snapshot、receiver 切替、identity 維持条件 |
+| 7. Capture / replay | `F7` side flow。`F1` / `F6` から分岐 | capture writers、`MultiTrackerManager.ProcessPacket()`、replay readers | tracker packet snapshot 比較ログ、設定 | sidecar record、alignment v2、legacy fallback、timeline / playback 規則 |
+| 8. 設定 / UI / rule | configuration tree + `F5-F6` boundary | configuration resolvers、snapshot provider、observer callbacks | 設定、UI 方針、filter 設定 | 全設定項目、profile 例、UI 操作要件、既定 endpoint |
+| TDD / 実装順 | 詳細仕様のみ | 文書変更のための新規 test は追加しない | テスト方針、タスク分割方針、承認ゲート | 最初の失敗テスト候補、TRACKER-000 以降の実装順、完了条件 |
 
 図や表から実装判断が一意に決まらない場合は、詳細仕様の記述を優先する。
 
@@ -573,6 +598,8 @@ AutoRef rule は raw packet や camera-local track を直接読まず、committe
 
 - [ ] 図で置き換えた条件が詳細仕様から失われていない
 - [ ] 全体フローの `F#` と詳細図の stage 番号が対応している
+- [ ] 各 flow block に実在する `Class.Method()`、`Class.field`、data type、外部 / 未実装の区別がある
+- [ ] method rename や責務移動時に該当 block と実装対応表を同期した
 - [ ] 時系列図、データ境界図、control flow、side flow の種類を明示している
 - [ ] Core の境界変更はこの文書へ反映した
 - [ ] 例外・設定・保存形式の変更は詳細仕様へ反映した
