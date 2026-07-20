@@ -1,1172 +1,606 @@
-# AutoRef 向け Tracker 設計
+# AutoRef 向け Tracker アーキテクチャ計画
 
-## 目的
+この文書は、Tracker v1 の**全体構成、責務境界、主要な処理フロー、設計上の不変条件**を図と表で把握するための正本である。
 
-`Tracker.Core` に AutoRef 向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、debug / diagnostics 用 Web UI は `Tracker.DebugHost` として分ける。
+細かな入力型、保存形式、例外条件、設定値、アルゴリズム要件、TDD 方針、タスク分割は [Tracker アーキテクチャ詳細仕様](tracker-architecture-plan-details.md) を正とする。この文書と詳細仕様を合わせて、従来の設計情報をすべて構成する。
 
-初期目標は次の 3 点に置く。
+文字だけでは追いにくかった箇所のうち、図や表で同じ意味を表現できる部分は置き換えている。図だけでは条件や例外を表現しきれない箇所は、本文または詳細仕様に残す。
 
-- `SSL-Vision` の raw detection / geometry から決定的に追跡結果を生成できる
-- official `TrackerWrapperPacket / TrackedFrame` を multicast 配信できる
-- official proto より豊富な内部メタ情報を保持し、将来の AutoRef 判定に再利用できる
-- 将来の AutoRef 判定は world snapshot と高レベル event から記述しやすい構造にする
+## 最初に読む場所
 
-## 対象範囲
+1. [End-to-end 全体フロー](#12-end-to-end-全体フロー)
+2. [全体フローと詳細図の対応](#13-全体フローと詳細図の対応)
+3. [Live tracking の処理フロー](#2-live-tracking-の処理フロー)
+4. [Engine 内部パイプライン](#3-engine-内部パイプライン)
+5. [Profile 切替フロー](#6-profile-切替フロー)
+6. [Capture / replay / comparison フロー](#7-capture--replay--comparison-フロー)
+7. [詳細仕様との対応](#9-詳細仕様との対応)
 
-- `Tracker.Core` に tracker の内部モデル、エンジン契約、proto 変換器を実装する
-- `Tracker.RuntimeHost` から raw vision の流れを `Tracker.Core` に流し、最新の tracked snapshot と official tracker packet を生成できるようにする
-- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、比較表示に専念し、tracker operation loop を描画や logging の周期から切り離す
-- UI は raw viewer に加えて tracked viewer を持ち、button で切り替えられるようにする
-- v1 では primary ball を先頭にしつつ、複数 ball を同時に維持して出力できるようにする
-- v1 では決定性とルール上重要な品質を優先し、過剰な機械学習や非決定的要素は入れない
+## 関連文書
 
-## 対象外
+| 文書 | 役割 |
+| --- | --- |
+| この文書 | Tracker 全体のアーキテクチャ、主要フロー、責務境界、不変条件 |
+| [Tracker アーキテクチャ詳細仕様](tracker-architecture-plan-details.md) | 入出力、例外、設定、追跡要件、TDD、タスク分割を含む詳細仕様 |
+| [DebugHost / CLI / UI CaptureOn 比較ログ詳細設計](../DebugHost/debug-host-cli-ui-detail-design.md) | CaptureOn session、sidecar、alignment、UI / CLI 比較の詳細仕様 |
+| [DebugHost 保守性改善設計](../DebugHost/debug-host-maintainability-design.md) | DebugHost / CLI / UI の分割・保守性方針 |
+| [TRACKER-000 から TRACKER-038 の履歴](tracker-history-000-038.md) | 完了済みタスク、検証・レビュー履歴 |
 
-- feedback packet や robot telemetry を tracker 入力に使うこと
-- Tigers と完全な挙動一致を取ること
-- AutoRef logic を今回の scope で実装すること
-- 永続化や replay database を v1 で持つこと
+---
 
-## 基本方針
+## 1. システム全体像
 
-### 実行形態
+### 1.1 システムコンテキスト
 
-- 実行体は本番寄りの `Tracker.RuntimeHost` と debug 用の `Tracker.DebugHost` に分ける
-- 追跡アルゴリズム本体は `Tracker.Core` に置く
-- `Tracker.RuntimeHost` は tracker operation、UDP publish、将来 AutoRef mode の同一 process 実行を担当する
-- `Tracker.DebugHost` は Web UI、diagnostics、capture / replay、comparison、debug config を担当する
-- `Tracker.DebugHost` の Web rendering と diagnostics logging は `Tracker.RuntimeHost` の tracker operation loop を直接駆動しない
+この図は**コンポーネントの配置と責務**を示す。処理順序を示す図ではない。処理順序は [1.2 End-to-end 全体フロー](#12-end-to-end-全体フロー) を起点に読む。
 
-### 品質優先順位
+```mermaid
+flowchart LR
+    Vision["外部: SSL-Vision<br/>raw detection / geometry"]
+
+    subgraph Runtime["Tracker.RuntimeHost"]
+        RuntimeReceiver["RuntimeVisionReceiverService<br/>ExecuteAsync()"]
+        RuntimeBuffer["RuntimeVisionPacketBuffer<br/>StorePacket() / TryTakeLatestBatch()"]
+        RuntimeOperation["RuntimeHostOperationLoop<br/>ProcessLatestPacket()"]
+        AutoRef["将来の AutoRef rule<br/>未実装"]
+        RuntimeReceiver --> RuntimeBuffer --> RuntimeOperation --> AutoRef
+    end
+
+    subgraph Debug["Tracker.DebugHost"]
+        DebugReceiver["VisionReceiverService<br/>ExecuteAsync()"]
+        RawStore["VisionPacketStore<br/>StorePacket() / GetSnapshot()"]
+        DebugOperation["VisionReceiverService.ExecuteAsync()<br/>TrackerCoordinator.ProcessPacket()"]
+        TrackedStore["TrackedSnapshotStore<br/>UpdateLatestFrame() / GetSnapshot()"]
+        Viewer["VisionLiveDisplaySnapshotProvider<br/>CaptureRenderTickSnapshot()"]
+        Diagnostics["DiagnosticsSampleCaptureLoop.CaptureOnce()<br/>capture writer classes"]
+
+        DebugReceiver --> RawStore --> Viewer
+        DebugReceiver --> DebugOperation
+        DebugOperation --> TrackedStore --> Viewer
+        DebugReceiver --> Diagnostics
+        DebugOperation --> Diagnostics
+    end
+
+    subgraph Core["Tracker.Core"]
+        Coordinator["TrackerCoordinator<br/>ProcessPacket() / ExecuteUpdates() / DispatchResult()"]
+        Engine["TrackerEngine<br/>Update()"]
+        Frame["TrackerFrame<br/>(domain data type)"]
+        Generator["TrackerPacketGenerator<br/>Generate()"]
+        Publisher["UdpTrackerPacketPublisher<br/>Publish()"]
+
+        Coordinator --> Engine
+        Engine --> Frame
+        Coordinator --> Generator
+        Frame --> Generator
+        Generator --> Publisher
+    end
+
+    Vision --> RuntimeReceiver
+    Vision --> DebugReceiver
+    RuntimeOperation --> Coordinator
+    DebugOperation --> Coordinator
+
+    Publisher --> Official["Official tracker multicast<br/>UdpTrackerPacketPublisher.Publish()"]
+    Official --> Consumers["外部: GameController / AutoRef / tools"]
+    Official --> ConnectionLib["UdpTrackerReceiver.ReceiveLoopAsync()<br/>MultiTrackerManager.ProcessPacket()"]
+    ConnectionLib --> Comparison["ExternalTrackerSnapshotStore.GetSnapshot()<br/>TrackerPacketSnapshotLogWriter.Append()"]
+```
+
+`Tracker.RuntimeHost` と `Tracker.DebugHost` は、それぞれ独立した Core pipeline instance を compose する。図中の `Tracker.Core` は共有 process を表すのではなく、両 host が同じ契約と実装を利用することを表す。
+
+### 1.2 End-to-end 全体フロー
+
+以降の詳細図は、すべてこの `F1` から `F7` のどこを展開しているかを明記する。各ブロック内の `Class.Method()` は、その stage を開始または統括する主な実装 entry point である。
+
+```mermaid
+flowchart LR
+    F1["F1. Vision packet 受信<br/>RuntimeVisionReceiverService.ExecuteAsync()<br/>VisionReceiverService.ExecuteAsync()"]
+    F2["F2. Host adapter / Coordinator<br/>RuntimeHostOperationLoop.ProcessLatestPacket()<br/>VisionPacketStore.StorePacket()<br/>TrackerCoordinator.ProcessPacket()"]
+    F3["F3. Engine update<br/>TrackerEngine.Update()"]
+    F4["F4. Result dispatch<br/>TrackerCoordinator.DispatchResult()"]
+    F5["F5. Core output<br/>TrackedSnapshotStore.UpdateLatestFrame()<br/>TrackerPacketGenerator.Generate()<br/>ITrackerPacketPublisher.Publish()<br/>TrackerCoordinator.NotifyObservers()"]
+    F6["F6. Live consumer<br/>VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()<br/>UdpTrackerPacketPublisher.Publish()<br/>ITrackerObserver.On...()"]
+    F7["F7. Capture / comparison<br/>VisionPacketCaptureWriter.Capture()<br/>TrackerPacketSnapshotLogWriter.Append()<br/>TrackerSnapshotAlignmentLogWriter.WriteTimelineRecords()<br/>replay reader classes"]
+
+    F1 --> F2 --> F3 --> F4 --> F5 --> F6
+    F1 -.-> F7
+    F6 -.-> F7
+```
+
+- 実線の `F1` から `F6` は live tracking の主経路である
+- `F7` は `F1` の raw payload と `F6` で観測できる official packet から分岐する診断経路である
+- `F7` のデータは `F3` の tracking state 更新へ戻さない
+- profile 切替は `F1` から `F6` に並ぶ追加 stage ではなく、`F2`、`F3`、`F4`、`F5` を横断する control flow `C1` として扱う
+
+### 1.3 全体フローと詳細図の対応
+
+| 全体 stage | 主な実装 entry point | 役割 | 展開する章 |
+| --- | --- | --- | --- |
+| `F1` | `RuntimeVisionReceiverService.ExecuteAsync()` / `VisionReceiverService.ExecuteAsync()` | SSL-Vision packet / UDP payload の受信 | 2. Live tracking、7. Capture / replay |
+| `F2` | `RuntimeHostOperationLoop.ProcessLatestPacket()` / `VisionPacketStore.StorePacket()` / `TrackerCoordinator.ProcessPacket()` | host adapter、raw store / capture、coordinator の直列化 | 2. Live tracking、6. Profile switch |
+| `F3` | `TrackerEngine.Update()` と `TrackerEngine` partial methods | request 適用、event-time buffer、camera-local tracking、merge、domain metadata | 3. Engine 内部パイプライン |
+| `F4` | `TrackerCoordinator.DispatchResult()` | `TrackerUpdateResult` の state transition / frame / derived event dispatch | 2. Live tracking、5. Result dispatch |
+| `F5` | `TrackedSnapshotStore.UpdateLatestFrame()` / `TrackerPacketGenerator.Generate()` / `PublishFrame()` / `NotifyObservers()` | snapshot store、official packet、publisher、observer の境界 | 4. Core data model、5. Result dispatch |
+| `F6` | `VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()` / `UdpTrackerPacketPublisher.Publish()` / `ITrackerObserver` callbacks | viewer、official multicast consumer、AutoRef rule | 2. Live tracking、8. UI / rule |
+| `F7` | capture writer classes / `TrackerSnapshotReplayReader.ReadSession()` / `TrackerDiagnosticsComparisonViewStateReader.Load()` | CaptureOn session、snapshot / alignment sidecar、replay / comparison | 7. Capture / replay |
+| `C1` | `TrackerProfileRequestService.RequestProfileSwitch()` / `TrackerCoordinator.RequestProfileSwitch()` / `ApplyProfileSwitch()` | profile / override の切替 control flow | 6. Profile switch |
+
+### 1.4 図の読み方
+
+- `F#` は End-to-end 全体フローの stage を表す
+- `F3.1` のような番号は、stage `F3` の内部処理を表す
+- `C1` は live data flow と別系統の profile 切替 control flow を表す
+- `Class.Method()` はそのブロックを統括する実装 entry point を表す
+- `Class.field` は独立した関数ではなく保持状態を表す
+- `(data type)` は処理ではなく、stage 間を流れる契約型を表す
+- `外部` と `未実装` はリポジトリ内に対応関数がないことを表す
+- 複数の private helper が関与するブロックでは、代表的な method を図中に記載し、詳細は本文と詳細仕様を参照する
+- `sequenceDiagram` は実行順、`flowchart` は処理の分解またはデータ境界を表す
+- 4章の図は時系列フローではなく、`F3` から `F5` に渡るデータモデルと依存境界を表す
+- 詳細図から全体へ戻るときは、図中の `F#` を 1.2 の同じ stage に対応付ける
+
+### 1.5 責務境界
+
+| コンポーネント | 主責務 | 持ち込まない責務 |
+| --- | --- | --- |
+| `Tracker.Core` | tracking、内部 world、domain event、official packet 生成、UI 非依存の operation 契約 | Web UI、capture session、file logging、comparison UI |
+| `Tracker.RuntimeHost` | 本番寄りの受信、tracking operation、UDP publish、将来の AutoRef 同居 | diagnostics viewer、replay UI |
+| `Tracker.DebugHost` | raw / tracked viewer、diagnostics、capture / replay、comparison、debug config | tracking 数値ロジックの再実装 |
+| `TrackerConnectionLib` | official tracker packet の受信と source 識別 | ibis tracker の内部 state 更新 |
+| `Tracker.CaptureReplay` | 保存済み capture の再投入、metric、回帰確認、比較 | live Web UI |
+| `Tracker.Tests` | contract / regression / integration test | production orchestration |
+
+最重要の依存規則は、`Tracker.Core` から `Tracker.DebugHost`、Blazor、diagnostics、capture session、sidecar path を参照しないことである。
+
+### 1.6 対象範囲
+
+- raw vision から決定的な tracked world を生成する
+- official `TrackerWrapperPacket / TrackedFrame` を multicast 配信する
+- official proto より豊富な内部 metadata を保持する
+- primary ball を先頭にした複数 ball を出力する
+- profile と runtime override を安全に切り替える
+- kick / contact / ball-left-field metadata を AutoRef rule へ提供する
+- raw / tracked viewer、diagnostics、capture / replay、comparison を提供する
+
+対象外は、feedback packet / robot telemetry の tracking 入力利用、Tigers との完全一致、AutoRef rule 本体、v1 の永続 replay database、非決定的な learned model の標準採用である。
+
+### 1.7 品質優先順位
 
 1. 決定的であること
 2. ルール上重要な情報を落とさないこと
 3. official tracker proto と互換であること
 4. raw / tracked の観察性が高いこと
 
-### 参考実装の扱い
+---
+
+## 2. Live tracking の処理フロー
+
+この sequence は、全体フローの `F1` から `F6` を実行順に展開する。`F3` の内部は3章、`F4` の dispatch 順は5章、`F5` のデータ境界は4章でさらに展開する。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant V as 外部: SSL-Vision
+    participant R as VisionReceiverService / RuntimeHostOperationLoop
+    participant C as TrackerCoordinator
+    participant E as TrackerEngine
+    participant S as TrackedSnapshotStore
+    participant G as TrackerPacketGenerator
+    participant P as UdpTrackerPacketPublisher
+    participant M as 外部: Official multicast
+    participant O as ITrackerObserver / rule
+
+    V->>R: F1. ExecuteAsync() で受信・decode
+    R->>C: F2. TrackerCoordinator.ProcessPacket(packet, receivedAt)
+    C->>E: F3. TrackerEngine.Update(packet, settings, request)
+    E->>E: F3.1-F3.8 TrackerEngine partial methods
+    E-->>C: F4. TrackerUpdateResult
+
+    C->>C: F4. TrackerCoordinator.DispatchResult()
+
+    loop CommittedFrames を古い順に全件処理
+        C->>S: F5. TrackedSnapshotStore.UpdateLatestFrame()
+        C->>G: F5. TrackerPacketGenerator.Generate()
+        G-->>C: F5. TrackerWrapperPacket
+        C->>P: F5. ITrackerPacketPublisher.Publish()
+        P->>M: F6. UdpTrackerPacketPublisher.Publish()
+        C->>O: F5→F6. TrackerCoordinator.NotifyObservers() / ITrackerObserver.On...()
+    end
+```
+
+DebugHost viewer は `VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()` を通じて `VisionPacketStore.GetSnapshot()`、`TrackedSnapshotStore.GetSnapshot()`、`ExternalTrackerSnapshotStore.GetSnapshot()` を読み取る。official tracker consumer は `F6` の multicast を読む。どちらも tracking operation loop を駆動しない。
+
+RuntimeHost では `RuntimeVisionReceiverService.ExecuteAsync()` が `RuntimeVisionPacketBuffer.StorePacket()` へ保存し、`RuntimeHostLifecycleService.ExecuteAsync()` が周期的に `RuntimeHostOperationLoop.ProcessLatestPacket()` を呼ぶ。DebugHost では `VisionReceiverService.ExecuteAsync()` が decode、raw store、capture の後に `TrackerCoordinator.ProcessPacket()` を直接呼ぶ。
+
+### 2.1 Coordinator が保証すること
+
+- engine から返された `CommittedFrames` を古い順にすべて処理し、中間 frame を捨てない
+- `CommittedFrames` が 0 件で、state transition event もない場合は publish や frame 更新を行わない
+- profile switch や geometry reset の local state 遷移を完了してから observer へ通知する
+- official packet は各 committed frame ごとに生成する
+- UI rendering や diagnostics logging の周期で operation loop を駆動しない
+- profile request 受付、`Update`、result dispatch を同じ直列化区間で扱う
+
+---
+
+## 3. Engine 内部パイプライン
+
+この章は、全体フローの **`F3. Engine update` だけを展開する**。入力は `F2` から受け取り、結果を `F4` へ返す。3.1 は `F3.3` から `F3.4`、3.2 は `F3.5` から `F3.6` に対応する。
+
+```mermaid
+flowchart LR
+    Input["F2→F3<br/>TrackerCoordinator.ExecuteUpdates()<br/>TrackerEngine.Update(...)"]
+    Request["F3.1 profile request 適用<br/>TrackerEngine.Update()<br/>ClearPendingStateAndAdvanceLateCutoff()"]
+    Geometry["F3.2 geometry snapshot 更新<br/>CreateGeometrySnapshot()<br/>ShouldResetForGeometryChange()"]
+    Buffer["F3.3 event time 決定・buffer<br/>CreateBufferedDetection()<br/>pendingDetections.Add()"]
+    Flush["F3.4 ReorderWindow 判定・flush<br/>FlushCommittedFrames()<br/>BuildDetectionGroups()"]
+    Local["F3.5 camera-local Kalman update<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
+    Merge["F3.6 camera 横断 merge<br/>CollectMergedBallStates()<br/>CollectMergedRobotStates()"]
+    Domain["F3.7 domain metadata<br/>UpdateKickState()<br/>CreateBallContactState()<br/>CreateBallLeftFieldState()"]
+    Result["F3.8→F4 frame / event 構築<br/>CommitGroup()<br/>TrackerUpdateResult (data type)"]
+
+    Input --> Request --> Geometry --> Buffer --> Flush --> Local --> Merge --> Domain --> Result
+```
+
+### 3.1 F3.3-F3.4: event time、buffer、flush
+
+この図は、上の Engine pipeline の `F3.3` と `F3.4` を展開する。
+
+```mermaid
+flowchart TD
+    Packet["F3.3 SSL_DetectionFrame<br/>TrackerEngine.Update()"] --> Capture{"event time 選択<br/>SelectEventTimeSeconds()"}
+    Capture -->|TCapture > 0| TCapture["TCapture を使用<br/>SelectEventTimeSeconds()"]
+    Capture -->|それ以外| TSent["TSent を使用<br/>SelectEventTimeSeconds()"]
+    TSent -.-> Invalid["欠落入力の診断契約<br/>TrackerEngineDiagnostics (data type)"]
+
+    TCapture --> Snapshot["BufferedDetection を生成<br/>CreateBufferedDetection()"]
+    TSent --> Snapshot
+    Snapshot --> Pending["F3.3 pending buffer<br/>TrackerEngine.pendingDetections"]
+    Pending --> Stable["event time・camera id・frame number で安定整列<br/>FlushCommittedFrames()"]
+    Stable --> Groups["MergeWindow ごとに group 化<br/>BuildDetectionGroups()"]
+    Groups --> Window{"F3.4 ReorderWindow を越えたか<br/>FlushCommittedFrames()"}
+    Window -->|No| Hold["buffer に保持<br/>TrackerEngine.pendingDetections"]
+    Window -->|Yes| Flush["確定可能な group を flush<br/>FlushCommittedFrames() → CommitGroup()"]
+```
+
+- UDP arrival order は world frame の確定順に使わない
+- receive time / processing time は `TrackerFrame.data_timestamp_ns` に使わない
+- geometry-only packet は geometry を更新するが `frame_number` を進めない
+- flush 済み event time より古い late packet は状態更新へ使わない
+- geometry の大変更時は、旧 geometry 世代の pending detection を破棄する
+- `ReorderWindow` と `MergeWindow` は設定から注入する
+
+### 3.2 F3.5-F3.6: camera-local tracking と multi-camera 統合
+
+この図は、Engine pipeline の `F3.5` と `F3.6` を展開し、結果が `F3.7` と `F3.8` へ渡る位置までを示す。
 
-`Tracker/Design/Core/Ref/AutoReferee` は構成参考として使う。
+```mermaid
+flowchart LR
+    D0["camera 0 BufferedDetection<br/>(data type)"] --> Cam0["F3.5 camera 0 tracks<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
+    D1["camera 1 BufferedDetection<br/>(data type)"] --> Cam1["F3.5 camera 1 tracks<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
+    DN["camera N BufferedDetection<br/>(data type)"] --> CamN["F3.5 camera N tracks<br/>UpdateCameraBallTrackStates()<br/>UpdateCameraRobotTrackStates()"]
 
-- 採用する
-  - raw vision と tracked world の責務分離
-  - tracker proto 出力と内部 world model の分離
-  - kicked ball / contact / ball left field のような AutoRef 向けメタ情報を内部で保持する考え方
-- 採用しない
-  - Java 実装構造そのもの
-  - Tigers 固有の module 分割や naming への追従
-  - 完全一致を前提とした複雑な最適化
+    Cam0 --> Gate["F3.6 association / outlier gate<br/>BuildBallClusters()<br/>CanAttachBallTrackToCluster()<br/>CollectCameraRobotObservations()"]
+    Cam1 --> Gate
+    CamN --> Gate
+    Gate --> Sort["stable ordering<br/>CollectMergedBallStates()<br/>CollectMergedRobotStates()"]
+    Sort --> Weighted["posterior uncertainty で merge<br/>CollectMergedBallStates()<br/>CreateTrackedRobot()"]
+    Weighted --> World["world snapshot 構築<br/>CommitGroup() → TrackerFrame"]
+    World --> Domain["F3.7 domain metadata<br/>UpdateKickState()<br/>CreateBallContactState()<br/>CreateBallLeftFieldState()"]
+    Domain --> Result["F3.8 frame / events<br/>CommitGroup() → TrackerUpdateResult"]
+```
 
-### 調査結果の参照先
+ball の camera-local predict / update は `PredictBallTrackState()`、`CreateObservedBallTrackState()`、`CreatePredictedBallTrackState()` が担う。robot は `PredictRobotTrackState()`、`CreateObservedRobotTrackState()`、`CreatePredictedRobotTrackState()` が担う。
 
-Tigers および official proto の調査結果は次を参照する。
+v1 では camera-local Kalman state を統合し、merge 後の world に第2の永続 filter は置かない。robot は `team + robot id`、ball は距離、速度上限、track 成長、直前 primary との整合を用いて対応付ける。詳細な gate、visibility、ghost 抑制、orientation unwrap は詳細仕様を参照する。
 
-- [TRACKER-000-tigers-investigation-20260501115618.md](/home/ibis/ssl/IbisDuck/reports/TRACKER-000-tigers-investigation-20260501115618.md:1)
+---
 
-この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモ側に寄せる。
+## 4. F3.8-F5: Core data model と出力境界
 
-## Proto 入力
+この図は**時系列の処理フローではない**。`F3.8` が生成した `TrackerUpdateResult` を `F4` が dispatch し、`F5` の store、packet、observer へ渡すときのデータモデルと依存境界を示す。
 
-tracker が直接扱う proto 入力は次の通り。
+```mermaid
+flowchart LR
+    Result["F3.8 TrackerUpdateResult<br/>(data type)"]
+    Frames["TrackerUpdateResult.CommittedFrames<br/>0..N TrackerFrame"]
+    Events["TrackerUpdateResult.EmittedEvents<br/>TrackerEvent collection"]
+    Frame["TrackerFrame<br/>(domain data type)"]
+    Dispatch["F4 TrackerCoordinator<br/>DispatchResult()"]
 
-- `SSL_WrapperPacket`
-  - raw vision の datagram 全体
-  - `Detection` と `Geometry` を内包する最上位 packet
-- `SSL_DetectionFrame`
-  - camera 単位の detection
-  - 主に `FrameNumber`, `TCapture`, `TSent`, `CameraId`, `Balls`, `RobotsYellow`, `RobotsBlue`
-- `SSL_DetectionBall`
-  - ball 観測
-  - 主に `X`, `Y`, `Z`, `Confidence`, `Area`
-- `SSL_DetectionRobot`
-  - robot 観測
-  - 主に `RobotId`, `X`, `Y`, `Orientation`, `Confidence`, `Height`
-- `SSL_GeometryData`
-  - field geometry 全体
-  - `Field` を保持し、必要に応じて calibration は診断表示へ回す
-- `SSL_GeometryFieldSize`
-  - field 寸法と line / arc 情報
-  - 主に `FieldLength`, `FieldWidth`, `GoalWidth`, `GoalDepth`, `BoundaryWidth`, `BoundaryWidthGoalLine`, `PenaltyAreaDepth`, `PenaltyAreaWidth`, `CenterCircleRadius`, `LineThickness`, `FieldLines`, `FieldArcs`
+    Result --> Frames --> Frame --> Dispatch
+    Result --> Events --> Dispatch
 
-## 外部出力
-
-### Official 出力
-
-v1 の外部配信は official tracker proto に限定する。
-
-- `TrackerWrapperPacket`
-  - `uuid`
-  - `source_name`
-  - `tracked_frame`
-- `TrackedFrame`
-  - `frame_number`
-  - `timestamp`
-  - `balls`
-  - `robots`
-  - `kicked_ball`
-  - `capabilities`
-
-初期 capability は次を出す。
-
-- `CAPABILITY_DETECT_KICKED_BALLS`
-- `CAPABILITY_DETECT_FLYING_BALLS`
-- `CAPABILITY_DETECT_MULTIPLE_BALLS`
-
-### tracker packet snapshot 比較ログ
-
-CaptureOn 中に同じ official tracker multicast / port 上で見えている `TrackerWrapperPacket` は、後から ibis 出力、ibis 自身の official packet、3rdparty tracker packet を再生・比較できるように別系統で保存する。
-
-DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイル分割や tracking 軽量化などの保守性/運用作業はこの機能仕様に含めない。
-
-責務境界は次の通り。
-
-- `TrackerConnectionLib` を official tracker packet 傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、official `TrackerWrapperPacket` を `uuid` / `sourceName` / remote endpoint 単位で識別する。
-- `Tracker.DebugHost` は CaptureOn session と snapshot log を紐付ける統合層とする。同一 CaptureOn session の packet capture、metadata、diagnostics sidecar、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめ、異なる CaptureOn タイミングのログは別 folder に分ける。
-- `Tracker.Core` には official tracker packet 傍受、snapshot 保存、比較処理を入れない。Core は ibis tracker の内部状態生成と official packet 生成だけを担当する。
-
-snapshot log は既存 `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とし、diagnostics 側は既存 reader が読める key=value 互換を保ったまま、metadata から解決できる snapshot sidecar relative path、source 数、role 別件数、近傍比較 summary などの参照/集計追加に限定する。
-
-session folder 名には既存の `<prefix>-<timestamp>-<guid>` basename を使う。folder 内の file 名も同じ basename を含めるか、用途名を使うが、metadata には session folder と各 file relative path を記録し、既存 basename 同期の考え方は session folder 名または folder 内 file 名で維持する。新規 capture では `tracker-snapshot-alignment.jsonl` も metadata から辿れるようにし、alignment が未作成、record 0 件、破損している状態を tracker packet snapshot sidecar の成否とは別に表現する。
-
-sidecar JSONL の各 record は少なくとも次を保持する。snapshot は表示用データとして扱ってよいが、表示用 snapshot だけでは比較元データとして不十分である。通常経路では raw payload または raw payload を復元できる参照を必ず保持し、writer / reader round-trip で保存済み record から raw payload を復元または再decodeできるようにする。
-
-- `receivedAt`
-- remote endpoint
-- `uuid`
-- `sourceName`
-- source role / label / metadata
-- tracked frame number
-- tracked frame timestamp
-- raw payload、または session folder 内で raw payload を復元できる参照情報
-- raw由来で作れる ball / robot count、team / robot id、代表位置、track source summary など、後から比較・一覧表示するための summary
-- decode / schema error がある場合の skipped/error 情報
-
-ibis tracker の `Uuid` / `SourceName` は self packet を保存対象から外す条件ではなく、後続表示・比較用の source role / label / metadata 付与に使う。ibis 自身の official packet も snapshot sidecar へ保存してよく、ibis 詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他 tracker と衝突する場合も record は落とさず、remote endpoint と publish socket loopback の扱いを diagnostics に記録し、role を `unknown` や `ambiguous` として扱う。source ごとの active tracker API と同一 `uuid` 衝突ケースは source summary / role 解決の追跡リスクであり、raw payload と source identity を落とさない限り保存処理の blocker にはしない。
-
-ibis committed frame と tracker packet snapshot は publish frequency が一致しない前提で扱う。さらに、3rdparty tracker の `TrackedFrame.timestamp` は ibis own と同じ時刻系とは限らない。新規 capture の replay / diagnostics / Field source 表示では、CaptureOn 保存時に diagnostics entry / render snapshot / tracker source snapshot を session-relative `receivedAt` と diagnostics entry time で対応付けた alignment sidecar を優先する。legacy capture で alignment がない場合だけ、exact frame number match ではなく、ibis `TrackerFrame.data_timestamp_ns` と snapshot 側 `TrackedFrame.timestamp` の nearest timestamp または latest-before 規則を best-effort として明示して行う。採用した対応規則、許容 window、該当 source の `uuid` / `sourceName` / remote endpoint / role、alignment status は後から確認できるように保存または表示する。
-
-diagnostics replay timeline は capture-time `ReceivedAt` を軸にし、diagnostics entry / render snapshot / tracker packet snapshot の union、または同等に fastest available source cadence を含む index とする。`TrackedFrame.timestamp` は source 間で時刻系が違う場合があるため、timeline ordering には使わない。Vision / render snapshot より tracker source が高速な場合は、fast tracker tick ごとに tracker snapshot を進め、Vision / render は latest-before frame を保持する。先頭で prior render snapshot がない場合だけ nearest-after fallback を許容する。
-
-等倍速 `Play` は replay timeline の全 tick を逐次描画する契約ではない。Play 開始時の wall-clock と selected replay timeline tick の `ReceivedAt` を基準に target capture-time を計算し、30fps相当の表示更新ごとに `ReceivedAt <= target` の latest tick へ追従する。高頻度 tracker tick は alignment / comparison data として保持し、表示だけが中間 tick をスキップしうる。scrub、Field source、comparison、CLI comparison は selected replay timeline tick を任意に選べる経路として維持し、Play の表示スキップで保存済み alignment v2 や比較精度を落とさない。diagnostics playback UI は Play / Fast Forward / Stop の従来 transport button 配置を維持し、速度選択側の compact tabs に `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は Play、各倍率は調査用 Fast Forward として Play 専用 realtime stepping から分離し、数値の等倍ラベルは使わない。
-
-alignment sidecar は `tracker-packet-snapshots.jsonl` へ埋め込まず、別 file とする。snapshot sidecar は受信 packet の主記録、alignment sidecar は diagnostics replay 用 index として分けることで、alignment 欠落や破損を既存 snapshot 保存の破損と区別できる。source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` を基本にし、同じ label / uuid が複数 endpoint に分かれる場合の UI aggregate は session-relative `receivedAt` に最も近い代表 snapshot を deterministic tie-break で選ぶ。
-
-`tracker-snapshot-alignment.jsonl` は diagnostics line ごとの対応表ではなく、schema version 2 の replay timeline records として扱う。新規 capture では fast tracker sample 分の alignment records も保存し、同じ Vision / render frame を複数 fast tracker records から参照できるようにする。低速 Vision / render tick でも、その時点の latest/current tracker snapshot と対応する record を残す。別 sidecar は作らず、互換 fallback も持たない。性能第一のため、reader は v2 JSONL から replay timeline index、render latest-before index、tracker source index を log open 時に一度だけ構築し、tick / scrub では既存 diagnostics-line-driven reader へ戻らない。
-
-Capture Off 中は snapshot sidecar へ追記しない。Capture Off / 再On では新しい capture session folder と新しい snapshot sidecar に切り替え、前 session folder へ追記しない。他 tracker が存在しない場合でも既存 packet capture、diagnostics log、render snapshot の内容上の挙動を変えず、metadata には snapshot log が未作成または record 0 件であることを表現できるようにする。
-
-### 内部出力
-
-official proto だけでは AutoRef に必要な情報が不足するため、`Tracker.Core` はより豊かな内部 frame を持つ。
-
-- `TrackerFrame`
-- `TrackedBallState`
-- `TrackedRobotState`
-- `KickEventState`
-- `BallContactState`
-- `BallLeftFieldState`
-- `TrackerFrameMetadata`
-
-## 内部モデル方針
-
-### 単位
-
-内部単位は次で統一する。
-
-- 位置: `mm`
-- 速度: `mm/s`
-- 角度: `rad`
-- 時刻: `ns`
-
-proto 変換境界でのみ official 単位へ変換する。
-
-- `mm` -> `m`
-- `mm/s` -> `m/s`
-- `ns` -> `s`
-
-### `TrackerFrame`
-
-`TrackerFrame` は UI と packet generator の両方が参照する内部参照モデルとする。
-
-最低限の内容:
-
-- 単調増加する `frame_number`
-- data timestamp
-- diagnostics 用の処理完了時刻
-- geometry snapshot
-- tracked ball の状態一覧
-- primary ball の位置または参照
-- tracked robot の状態一覧
-- kicked ball state
-- 最新 contact / 最終接触者
-- ball の field 内外状態 / field 外退出状態
-- source metadata
-
-時刻の意味は次で固定する。
-
-- `TrackerFrame.data_timestamp_ns`
-  - world を構成した観測の基準時刻
-  - detection を含む packet では `SSL_DetectionFrame.TCapture` を unix time とみなして `ns` 化した値を使う
-  - `TCapture` が欠落または 0 以下なら `TSent` を使う
-  - receive time / processing time は data timestamp には使わない
-- `TrackerFrame.processed_at_ns`
-  - engine がその frame を確定したローカル処理時刻
-  - diagnostics 用であり official proto には出さない
-
-`TrackerPacketGenerator` は `TrackerFrame.data_timestamp_ns` を `TrackedFrame.timestamp` に変換する。
-
-### `TrackedBallState`
-
-最低限の内容:
-
-- 現在位置 / 速度 / 高さ
-- visibility
-- 参照元 camera 範囲
-- 浮遊中かどうか
-- 最終観測時刻
-- 品質値
-
-### `TrackedRobotState`
-
-最低限の内容:
-
-- team / robot id
-- 位置 / 向き
-- 並進速度 / 角速度
-- visibility
-- 品質値
-- 直近 ball 接触フラグ
-
-### `KickEventState`
-
-最低限の内容:
-
-- 開始位置
-- 初速度
-- 開始時刻
-- 追跡対象 ball の内部 track id
-- still moving 判定用の最新速度 / 最新更新時刻
-- 任意の停止予測
-- 任意の kicker robot id
-- kick 種別候補
-
-### `BallLeftFieldState`
-
-最低限の内容:
-
-- 内外状態
-- 横切った line 種別
-- 横切り位置
-- 横切り時刻
-
-## 契約詳細
-
-### `ITrackerEngine`
-
-役割:
-
-- raw vision 入力を 1 件受け取り、event time で再順序化したうえで内部追跡状態を進める
-- 確定した world frame 群と tracker event 群を publish 順で返す
-- geometry 更新だけの packet でも内部状態を壊さない
-
-最低限の入力:
-
-- `SSL_WrapperPacket?`
-  - detection / geometry を含む通常入力では必須
-  - control-only reconfigure `Update` では省略可
-- 現在有効な設定セット
-- 必要に応じて設定セット切替要求
-  - `TrackerProfileSwitchRequest`
-    - `RequestVersion`
-    - 適用対象 profile 名
-    - その時点の immutable な resolved base settings snapshot
-    - その時点の `RuntimeOverrides` snapshot
-
-最低限の出力:
-
-- `TrackerUpdateResult`
-  - `CommittedFrames`
-    - この入力処理で確定した `TrackerFrame` の列
-    - 0 件以上を許可する
-    - publish 順に並ぶ
-  - `EmittedEvents`
-    - `ProfileSwitched`、`GeometryReset`、`WorldFrameCommitted`、`KickDetected`、`ContactChanged`、`BallLeftField` の列
-    - publish 順に並ぶ
-    - event は必要に応じて対象 `frame_number` を参照する
-
-最低限の保持状態:
-
-- event time 順の pending detection buffer
-- camera ごとの最新 packet timestamp
-- camera ごとの robot track 群
-- camera ごとの ball track 群
-- 直近に確定した world snapshot
-- 最新 geometry
-- frame counter
-- 現在の設定セット
-- active な kick / contact / field metadata
-
-`ITrackerEngine` の v1 契約は「packet を受けるたびに直ちに 1 frame 出す」ではなく、buffer に積んだうえで確定可能な event time 群だけを順に flush する方式とする。
-
-`TrackerUpdateResult` の返却規則:
-
-- detection を含まない入力では `CommittedFrames` が 0 件でもよい
-- `ReorderWindow` をまたいで複数 group が確定した入力では `CommittedFrames` が複数件でもよい
-- `TrackerCoordinator` は `CommittedFrames` を先頭から順に処理し、中間 frame を捨てない
-- `TrackerCoordinator` は `CommittedFrames` が 0 件で `ProfileSwitched` / `GeometryReset` も無い入力では packet 配信、frame 表示更新、`WorldFrameCommitted` 通知を行わない
-- `ProfileSwitched` / `GeometryReset` を含む 0-frame 入力では、対応する state clear と UI / store の状態更新だけを行ってよい
-- control-only の入力でも reconfigure request を処理でき、その場合 `CommittedFrames` は 0 件でも `ProfileSwitched` などの event だけを返してよい
-- 設定セット切替要求を受けたときの profile 適用、clear、設定差し替え、`ProfileSwitched` emit は `ITrackerEngine` の責務とする
-- `TrackerCoordinator` は engine state を直接 clear せず、切替要求を次の `Update` 呼び出しへ渡すだけにする
-- `ITrackerEngine` は `Update` の先頭で切替要求を消費し、以後の geometry / detection 処理を新 profile で実行する
-- `ProfileSwitched` は新設定セットの反映と state clear が完了した直後に emit し、同じ `TrackerUpdateResult` に `WorldFrameCommitted` がある場合はそれより前に並べる
-- `ProfileSwitched` と `GeometryReset` が同じ `TrackerUpdateResult` に共存する場合も、`EmittedEvents` の順序を正とし、coordinator はその順に local state 遷移を適用する
-- `TrackerCoordinator` は `Update` 呼び出しごとに `pending request` を最大 1 件だけ `in-flight request` へ昇格させ、その request を result 処理完了まで immutable として扱う
-
-### `TrackerPacketGenerator`
-
-役割:
-
-- `TrackerFrame` を official `TrackerWrapperPacket` に変換する
-
-最低限の責務:
-
-- `uuid` / `source_name` の設定
-- 内部単位から official 単位への変換
-- 複数 ball 出力
-- primary ball 先頭化
-- `kicked_ball` の組み立て
-- capabilities の設定
-
-### `TrackerCoordinator`
-
-`Tracker.Core` 側の runtime 境界として置く。RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project は作らず、将来の RuntimeHost から再利用できる UI 非依存 shared operation loop を Core に抽出する。
-
-役割:
-
-- raw vision packet を `ITrackerEngine` へ渡す
-- `TrackerUpdateResult` に含まれる `CommittedFrames` を順に store と observer へ反映する
-- 設定セット変更時に engine へ切替要求を渡す
-- 必要に応じて UDP 配信を行う
-- publisher の配信先切替や UI 表示用の active profile 名更新など、engine 外 state の反映を行う
-
-境界規則:
-
-- `TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore` は `Tracker.Core` に置く
-- `UdpTrackerPacketPublisher` は UI 非依存 publisher として `Tracker.Core` に置いてよい
-- Core の runtime source は `Tracker.DebugHost`、Blazor、diagnostics / capture writer / reader、`VisionPacketCaptureSession`、`TrackerRenderSnapshot`、`TrackerPacketSnapshotLog`、`TrackerSnapshotAlignmentLog` を参照しない
-- diagnostics file logging、render snapshot capture、alignment log、packet capture session sidecar path 依存は DebugHost 側の別処理として扱い、Core の operation loop には入れない
-- DebugHost の `VisionReceiverService` は UDP decode / raw store / capture の後、Core の `TrackerCoordinator.ProcessPacket` を呼ぶ adapter とする
-- DebugHost の diagnostics 設定解決結果は `TrackerResolvedOptions` に残せるが、Core loop が必要とする設定は `TrackerRuntimeResolvedOptions` として Core に置ける shape に分離する
-
-処理規則:
-
-- `CommittedFrames` が複数件ある場合、古い順に全件を処理する
-- UI 用 `TrackedSnapshotStore` には最後の `CommittedFrame` を残す
-- official tracker packet は各 `CommittedFrame` ごとに生成する
-- observer 通知は `EmittedEvents` の順序に従う
-- coordinator は同一 `TrackerUpdateResult` の dispatch 中、まず `ProfileSwitched` / `GeometryReset` の local state 遷移を `EmittedEvents` 順に適用し、その完了後に `WorldFrameCommitted` と対応する `CommittedFrame` / official packet を処理する
-- profile 切替要求を受けたら、coordinator は要求内容を保持したまま次の `Update` に 1 回だけ渡す
-- raw packet が来ていなくても pending request がある場合は、coordinator は control-only `Update` を即時呼び出して request を drain しなければならない
-- profile 切替要求に伴う engine state clear や `ProfileSwitched` の発火順制御は coordinator 側で再実装しない
-- coordinator は profile 要求受付、`Update` 呼び出し、`TrackerUpdateResult` 処理を同じ直列化区間で扱い、1 回の `Update` 処理中に `in-flight request` を上書きしない
-- coordinator は profile 切替要求を受け取った時点では publisher 配信先や UI 表示中 profile 名を即時反映しない
-- `ProfileSwitched` を受け取った時点で、その `in-flight request` に対応する `現在適用済み snapshot`、publisher 配信先、active profile 表示、`TrackedSnapshotStore` の現在設定セット名を先に更新し、その後に `TrackedSnapshotStore` の最新 frame と受信時刻を clear する
-- `ProfileSwitched` の observer 通知は、上記 local state 更新と `in-flight request` 解放が完了した後に行う
-- `GeometryReset` を受け取った時点でも `TrackedSnapshotStore` の最新 frame と受信時刻を clear し、その clear 完了後に `OnGeometryReset` を通知する
-- 任意の `Update` 呼び出しの result 処理が完了した直後に pending request がまだ残っていれば、coordinator はその場で次の control-only `Update` を直ちに再実行して `desired target snapshot` まで drain し続ける
-- coordinator は `desired target snapshot`、`pending request`、`in-flight request`、`現在適用済み snapshot` を別に持ち、切替完了前の old state 出力と new state 表示を混在させない
-- これにより、profile 切替後の最初の official packet / `WorldFrameCommitted` は必ず新 publisher 配信先と新 active profile 文脈の下で処理される
-
-### `TrackedSnapshotStore`
-
-`Tracker.Core` 側の runtime 読み取り snapshot store とする。DebugHost UI と将来 RuntimeHost はこの store を介して latest frame、active profile、publish 統計を読む。
-
-最低限の内容:
-
-- 最新 `TrackerFrame`
-- 受信時刻
-- 現在の設定セット名
-- publish 成功回数 / 失敗回数
-- profile 切替直後に frame 未確定であることを表す empty 状態
-
-runtime profile control の UI 規則:
-
-- tracked 側の detail panel は active profile 表示と profile 切替要求 UI を持つ
-- active profile 表示の source of truth は `TrackedSnapshotStore.ActiveProfileName` とする
-- profile 候補一覧は `TrackerOptions.Profiles` から作り、空なら current active profile 1 件だけを disabled 表示する
-- profile 切替要求 UI は `ProfileSwitched` 直後に latest frame が clear されても操作不能にならないよう、frame の有無とは独立して描画する
-
-## 入出力詳細
-
-### 入力 packet の扱い
-
-`SSL_WrapperPacket` の扱いは 3 種に分ける。
-
-1. detection のみを含む packet
-2. geometry のみを含む packet
-3. detection と geometry の両方を含む packet
-
-これに加えて、coordinator から engine へ reconfigure request だけを渡す control-only `Update` 呼び出しを許可する。
-
-処理規則:
-
-- geometry があれば、まず geometry snapshot を更新する
-- detection があれば、`TCapture` を第 1 優先、`TSent` を第 2 優先の event time として pending buffer に積む
-- pending buffer は `(event time, camera id, frame number)` の安定順で処理する
-- 最新に見えた event time から `ReorderWindow` を越えた detection group を flush 対象にする
-- detection の flush 時は、その時点の geometry snapshot を参照しつつ追跡処理を進める
-- detection がない packet では `frame_number` を無理に進めない
-- すでに flush 済みの event time より古い late packet は diagnostics に記録し、状態更新には使わない
-- geometry 大変更 reset が発生した場合、pending buffer に残っている旧 geometry 世代の detection は flush せず破棄する
-- control-only `Update` では detection / geometry を追加せず、pending request の消費と event 生成だけを行う
-
-### multi-camera の時系列契約
-
-既存 `VisionReceiverService` は UDP 到着順で packet を渡すが、tracker は arrival order に依存しないよう次を守る。
-
-- `ReorderWindow`
-  - packet 再順序化のための待ち時間窓
-  - 設定値で外出しする
-- `MergeWindow`
-  - 同一 world frame に統合してよい camera 間時刻差の上限
-  - 設定値で外出しする
-- 1 つの world frame は「anchor event time から `MergeWindow` 以内の camera-local state」のみを使って構成する
-- world frame 確定順は event time 昇順とし、同時刻 tie は `camera id` 昇順で安定化する
-- `frame_number` は flush された world frame ごとに 1 ずつ進める
-- geometry-only packet は frame を進めないが、次に flush される frame から新 geometry を参照できる
-- event time の基準は detection data の unix time であり、receive time は統合順序決定に使わない
-
-### 出力 packet の並び順
-
-`TrackedFrame` の出力規則は次とする。
-
-- `Balls[0]` は primary ball
-- `Balls[1..]` は secondary ball
-- `Robots` は team と id で安定順を持たせる
-- `Capabilities` は毎回同じ順で出す
-
-secondary ball の安定順は次で固定する。
-
-- primary を除いた残りを `visibility desc`、`last_visible_timestamp_ns desc`、`internal_track_id asc` の順で整列する
-- `internal_track_id` は engine 内で単調増加の採番とし、state reset 時のみ採番を初期化してよい
-
-### geometry の扱い
-
-geometry は次の 2 つの用途を持つ。
-
-1. 追跡時の field 内外判定
-2. UI 表示と AutoRef メタ計算
-
-geometry 更新規則:
-
-- 新しい geometry を受信したら snapshot を置き換える
-- 既存 track は geometry 更新で捨てない
-- ただし field length / width / goal geometry が設定閾値以上に変化した場合は camera-local track、kick/contact state、world snapshot を reset する
-- geometry 大変更 reset 時は pending buffer も同時に clear し、旧 geometry 世代の未確定 detection を次 frame へ持ち越さない
-- geometry 起因 reset でも `frame_number` と runtime identity は維持する
-
-## 構成
-
-### `Tracker.Core`
-
-- `ITrackerEngine`
-  - raw vision 入力から tracker の状態を進める中核契約
-- `TrackerEngine`
-  - v1 の決定的 tracker 実装
-- `TrackerPacketGenerator`
-  - `TrackerFrame` から `TrackerWrapperPacket` を生成する
-- `TrackerFrame` と各 state 型
-  - 内部状態モデル
-
-### `Tracker.DebugHost`
-
-- raw vision receiver
-  - 既存 `VisionReceiverService` を入力源として再利用する
-- tracker coordinator hosted service
-  - raw vision packet を `Tracker.Core` に流し、最新 tracked frame を更新する
-- tracked snapshot store
-  - UI 用の最新 tracked world state を保持する
-- tracker packet publisher
-  - official tracker multicast を配信する
-- viewer page
-  - `Raw / Tracked` button 切替を提供する
-
-### 層ごとの責務境界
-
-- `VisionReceiverService`
-  - UDP 受信と proto decode
-  - 問題再現用に、必要な調査時だけ着信 UDP datagram を圧縮 capture として保存する
-- `VisionPacketStore`
-  - raw snapshot 保持
-- `TrackerCoordinator`
-  - raw から tracked への橋渡し
-- `Tracker.Core`
-  - 追跡アルゴリズム本体
-- `TrackerPacketGenerator`
-  - official proto 変換
-- `Tracker.CaptureReplay`
-  - 保存済み packet capture を再生し、summary metric と条件式で regression check / 調査を行う CLI
-- `TrackedSnapshotStore`
-  - tracked UI 読み取り用状態
-- viewer
-  - 可視化のみ
-
-## データフロー
-
-1. `VisionReceiverService` が `SSL_WrapperPacket` を受信する
-2. packet capture が有効な場合は、decode 前の UDP payload bytes と受信時刻を `jsonl.gz` に保存する
-3. raw packet を `VisionPacketStore` に反映する
-4. 同じ raw packet を tracker coordinator が `TrackerEngine` に流す
-5. `TrackerEngine` が `TrackerFrame` を更新する
-6. `TrackerPacketGenerator` が official `TrackerWrapperPacket` を生成する
-7. publisher が UDP multicast へ送信する
-8. UI は raw snapshot または tracked snapshot を button で切り替えて描画する
-
-CaptureOn 比較ログを有効にする場合は、上記 ibis tracker pipeline とは別に `Tracker.DebugHost` が `TrackerConnectionLib` 経由で official tracker packet を傍受する。傍受した `TrackerWrapperPacket` は self 除外せず、見えている tracker packet をすべて CaptureOn session folder 配下の tracker packet snapshot sidecar JSONL へ保存する。ibis 自身か 3rdparty かの判別は保存後の source role / label / metadata として扱い、判別できない場合も保存を落とさない。`Tracker.Core` の入力や状態更新には流さない。
-
-## 設定
-
-`Tracker.DebugHost` 側に `Tracker` section を追加する前提とする。
-
-- `Enabled`
-- `PublishUdp`
-- `MulticastAddress`
-- `Port`
-- `SourceName`
-- `Uuid`
-- `Diagnostics`
-- `RobotTracker`
-- `BallTracker`
-- `KickDetector`
-- `RuntimeOverrides`
-- `Profiles`
-
-設定の大枠は次の形を想定する。
-
-- `ActiveProfileName`
-- `Profiles`
-  - `<profile-name>`
-    - `Publish`
-    - `RobotTracker`
-    - `BallTracker`
-    - `KickDetector`
-- `RuntimeOverrides`
-  - `Publish`
-  - `RobotTracker`
-  - `BallTracker`
-  - `KickDetector`
-- `Diagnostics`
-  - `FilePath`
-
-`VisionReceiver` 側は replay 用の packet capture 設定を持つ。
-
-- `PacketCapture`
-  - `Enabled`
-  - `DirectoryPath`
-  - `FilePrefix`
-  - `FlushEachPacket`
-
-packet capture は protobuf decode 前の UDP payload bytes を `jsonl.gz` に保存し、`receivedAt` と remote endpoint を同じ record に持つ。保存された capture は順序通りに読み戻し、`SSL_WrapperPacket` へ復元して tracker へ再投入できるようにする。
-
-packet capture の metadata には active profile 名だけでなく、`TrackerOptions` 全体の `Profiles` 設定値と、runtime override 適用後の resolved settings を保存する。profile 名だけでは replay 時に当時の tuning を復元できないため、capture と同時点の profile 設定値を同封する。CaptureOn 比較ログでは、同一 session folder 配下にある packet capture、tracker diagnostics、render snapshots、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の relative path、source identity 一覧、role / label、alignment status、timestamp 対応規則も metadata に保存する。
-
-`Tracker.CaptureReplay` は、保存済み capture を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの summary metric と、frame detail filter の条件式で自動テストや調査に使えるようにする。detail filter は `frame` でも絞り込めるようにし、robot detail には位置だけでなく `orientation / angular velocity` も出して、raw detection と tracked 出力の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.DebugHost/appsettings.json` を読む場合は active profile の設定に `Tracker:RuntimeOverrides` を適用した engine settings を使う。
-
-raw vision に対して ibis tracker が遅れて見える調査では、capture file を手作業で読むのではなく `Tracker.CaptureReplay` の汎用分析出力を使う。CLI は raw SSL-Vision packet の capture-time cadence と、replay で commit された ibis tracker frame の capture-time / data timestamp / commit 入力位置を同じ summary で出し、reorder window、merge window、欠落 detection、tracker 側 commit hold のどれが遅延要因かを report 化できるようにする。この出力は特定 capture basename や特定 source 名へ依存させず、`--analyze-latency` のような明示 option で次回以降の遅延・stale・cadence 調査にも再利用する。
-
-CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot sidecar と alignment sidecar を metadata から読み、3rdparty tracker snapshot を保存時対応付けで ibis committed frame と並べて再生・比較できるようにする。alignment がない既存 capture では timestamp 近傍規則を best-effort として明示する。この CLI 比較経路は agent / 自動検証 / 調査用に保持し、diagnostics UI 実装後も削除しない。
-
-diagnostics viewer と playback も同じ snapshot log / alignment log と reader contract を使い、source identity / role / label ごとの timeline、frame number / timestamp、alignment delta、ball / robot count、raw payload 復元状態を画面上で確認できるようにする。新規 capture の `/diagnostics` は選択中 replay timeline tick と対応する saved alignment record を基準とし、source filter 後の 3rdparty tracker snapshot を session-relative `receivedAt` 対応で並べる。metadata / sidecar / alignment がない、record count 0、読み取り error がある場合は状態表示に留め、既存 diagnostics log、render snapshot、settings 表示を壊さない。等倍速 Play の表示更新は30fps相当に抑えて wall-clock 経過時間へ追従するが、scrub / Field source / comparison は任意 replay tick を選択できる比較経路として保持する。playback UI は Play / Fast Forward / Stop の従来 button 配置を使い、速度選択 tabs の `等倍速` は Play、`4x` / `16x` / `64x` は調査用 Fast Forward に対応させる。Fast Forward は tick 非間引きのまま capture-time delta と倍率で進める。
-
-raw / tracked 診断で比較する raw detection は、現在着信した packet ではなく、commit 済み `TrackerFrame` を生成した source detection 群に紐づける。これにより reorder / merge window で遅延 commit された tracked frame と raw count / raw frame / raw camera の対応がずれない。
-
-`Tracker.DebugHost` の diagnostics viewer は、diagnostics log と同じ basename の `*.render-snapshots.jsonl.gz` がある場合に、選択した tracked frame の raw source detection と tracked frame を field 上に並べて描画する。描画 snapshot は調査用の UI データであり、tracker engine の replay 入力や内部状態保持には使わない。viewer は timeline scrubber のドラッグで frame を連続切替でき、field 描画時はページ全体をスクロールさせず、field の zoom / pan と画面スクロールが干渉しない layout とする。
-
-既定配信先は official tracker の慣例値に合わせる。
-
-- `224.5.23.2:10010`
-
-ただし既定値は埋め込み固定せず、すべて設定から注入する。
-
-- multicast address / port / source name / uuid は設定外出しする
-- tracking parameter は設定外出しする
-- raw / tracked 診断ログの明示出力先は `Tracker:Diagnostics:FilePath` で設定できるようにする
-- packet capture は `VisionReceiver:PacketCapture:Enabled` を起動時初期値として持ち、起動後は UI から On / Off を切り替えられるようにする
-- v1 標準であるカルマン filter の process noise / measurement noise / gating threshold も設定外出しする
-- 近傍判定、visibility decay、kick speed threshold、chip 判定 threshold も設定外出しする
-
-要望として、これらの設定は最終的に UI から動的変更できる構成にする。
-
-v1 では次の 2 段階で進める。
-
-1. `appsettings` と設定束縛で全設定を外出しする
-2. 実行時設定保存領域を追加し、UI から変更した値を tracker coordinator が再読込できるようにする
-
-### 設定セット切替
-
-設定値は個別項目だけでなく、まとまりで切り替えられるようにする。
-
-`Profiles` は 2 個以上の設定セットを保持できるようにする。
-
-初期例:
-
-- `Profiles.Simulation`
-- `Profiles.RealHardware`
-- `Profiles.RealHardwareB`
-
-各設定セットには少なくとも次を含める。
-
-- raw vision 受信元
-  - `MulticastAddress`
-  - `Port`
-  - `InterfaceAddress`
-- 配信先
-  - `MulticastAddress`
-  - `Port`
-- `RobotTracker`
-  - process noise
-  - measurement noise
-  - gate
-  - 外れ値上限
-- `BallTracker`
-  - process noise
-  - measurement noise
-  - gate
-  - 外れ値上限
-  - 追跡寿命
-- `KickDetector`
-  - kick 判定閾値
-  - chip 判定閾値
-  - 接触余白
-
-`RuntimeOverrides` の意図:
-
-- 選択中設定セットの上に一時上書きをかける
-- UI からの微調整はまずここへ入れる
-- 設定セットそのものの保存は別操作に分ける
-- v1 では UI の微調整はまず draft override として coordinator 側に保持し、engine へは明示 apply 時の snapshot だけを渡す
-- pending または in-flight の request に入った override snapshot は immutable とし、その後の UI 編集は次の request 候補にだけ反映する
-
-切替要件:
-
-- 起動時に任意の設定セットを 1 つ選べる
-- UI から登録済み設定セットの一覧を選択できる
-- UI からの切替後は tracker coordinator が新しい設定セットへの切替要求を engine へ渡す
-- 同名の `VisionReceiver` profile が存在する場合、起動時と profile switch 完了後にその受信元設定へ追従できる
-- 個別値の微調整は選択中の設定セットに対する上書きとして扱えるようにする
-- 設定セットは将来的に追加できる前提にする
-- coordinator は最新のユーザー意図を `desired target snapshot` として保持し、profile 選択や override apply のたびにそれを最新値で置き換える
-- 未適用の切替要求がある間にさらに profile 選択が来た場合、coordinator は pending request を最新要求で上書きし、queue は積まない
-- `ProfileSwitched` は engine へ実際に渡されて適用された `RequestVersion` に対してのみ 1 回 emit される
-- override の明示 apply 要求も v1 では同じ reconfigure request 経路で扱い、profile 名と draft override snapshot を組にして pending request を置き換える
-- すでに `in-flight request` がある間の override 編集はその request を書き換えず、次の pending request 候補だけを更新する
-- 新しいユーザー操作が現在の `desired target snapshot` と同値な場合だけ duplicate とみなし、新たな request を作らない
-- `desired target snapshot` が `現在適用済み snapshot` と同値でも、pending または in-flight が別 snapshot を指しているなら、その差分を打ち消すための request を残す
-
-切替責務の境界:
-
-- `TrackerCoordinator`
-  - UI や設定保存領域から新 profile 選択を受け取る
-  - `desired target snapshot` を保持し、後続の profile 選択または override apply が来たら最新意図で置き換える
-  - pending request を 1 件だけ保持し、後続の profile 選択または override apply が来たら `desired target snapshot` へ収束する内容に上書きする
-  - 新しいユーザー操作が現在の `desired target snapshot` と同値な場合だけ no-op として破棄する
-  - `Update` 呼び出し直前に pending request を `in-flight request` へ昇格させ、result 処理完了まで固定する
-  - `ProfileSwitched` を受けるまでは publisher 配信先や active profile 表示を切り替えない
-  - `ProfileSwitched` を受けた時点で、その `in-flight request` に対応する `現在適用済み snapshot`、publisher 配信先、active profile 表示、`TrackedSnapshotStore` の現在設定セット名を原子的に切り替える
-  - receiver profile の切替は `ProfileSwitched` 後の observer 側で行い、tracker 側の active profile と受信元設定の観測可能な切替点を揃える
-  - 上記 local state 遷移と store clear を完了してから `OnProfileSwitched` を通知する
-  - 任意の `Update` の result 処理後に pending request が残る場合は、その場で `desired target snapshot` に一致するまで control-only `Update` を繰り返す
-  - `TrackerProfileSwitchRequest` を次の `ITrackerEngine.Update` へ 1 回だけ渡す
-- `ITrackerEngine`
-  - `TrackerProfileSwitchRequest` を受けたら `Update` の先頭で新 profile と `RuntimeOverrides` を確定する
-  - immutable な resolved base settings snapshot と override snapshot を request そのものから読む
-  - coordinator が duplicate request を除外する前提とし、engine は受け取った request を実変更として扱う
-  - camera-local track、kick/contact state、pending buffer、world snapshot を clear する
-  - clear 完了後に `ProfileSwitched` を `EmittedEvents` へ積む
-  - 同じ `Update` 呼び出し内で後続 packet を処理する場合、その flush 結果は新 profile の state だけを使う
-
-runtime identity は設定セットとは分離する。
-
-- `Uuid` は process 起動中に一定とし、profile 切替では変更しない
-- `SourceName` も v1 では起動時固定とし、profile 切替では変更しない
-- `MulticastAddress` / `Port` は profile 切替で変えてよい
-- raw vision 受信元 `MulticastAddress` / `Port` / `InterfaceAddress` も profile 切替で変えてよい
-
-profile 切替時の state 規則:
-
-- `ITrackerEngine` は新 profile 適用時に camera-local track、kick/contact state、pending buffer、world snapshot を clear する
-- 最新 geometry snapshot と runtime identity は維持する
-- `frame_number` は単調増加を保つため継続する
-- これにより old profile の filter state を new profile に持ち越さない
-- profile 切替要求を受けた `Update` 呼び出しでは、clear 前に pending buffer を flush しない
-- その入力が detection を含む場合、clear 後に新 profile の空 state へ積み直して処理する
-- これにより `ProfileSwitched` より後に emit される `WorldFrameCommitted` は必ず new profile の state だけから生成される
-
-初期実装では、設定セット切替は `appsettings` と実行時設定保存領域で扱う。
-
-## アルゴリズム設計
-
-v1 は決定的な古典的追跡を採用する。設計時点では particle filter や learned model は使わない。
-
-この方針は、Tigers の次の実装を参考に寄せる。
-
-- `VisionFilterImpl`
-  - camera ごとの処理、統合、品質評価、公開周期の分離
-- `BallFilterPreprocessor`
-  - ball tracker 群の統合、kick 検出、kick 推定の前処理分離
-- `BallTracker`
-  - 個別 ball ごとの Kalman filter、health、成長判定、外れ値除外
-- `RobotTracker`
-  - 個別 robot ごとの位置・角度の別 filter、向きの巻き戻し補正、外れ値除外
-- `TrackerPacketGenerator`
-  - world model から official tracker proto への専用変換
-  - rule 層が直接 raw packet に触れずに済む境界を保つ
-
-寄せる対象は「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。
-
-### Tigers との対応関係
-
-- `VisionFilterImpl`
-  - 本設計では `TrackerCoordinator` と `TrackerEngine` の分担に相当
-- `RobotTracker`
-  - 本設計の camera 単位 robot track に相当
-- `BallTracker`
-  - 本設計の camera 単位 ball track に相当
-- `BallFilterPreprocessor`
-  - 本設計の ball 統合、kick 検出、kick 推定の前処理段に相当
-- `TrackerPacketGenerator`
-  - 本設計の `TrackerPacketGenerator` にそのまま相当
-- `BotBallContactAutoRefCalc`
-  - 本設計の `BallContactState` と最終接触者計算に相当
-- `BallLeftFieldAutoRefCalc`
-  - 本設計の `BallLeftFieldState` に相当
-
-### 全体方針
-
-- camera ごとの raw 観測を時系列順に処理する
-- camera ごとにいったん局所的に追跡し、その結果を統合して world を作る
-- 対象の識別は ball / team / robot id で分けて管理する
-- 対応付けは明示的な規則で決める
-- 状態推定は設定可能な filter で行う
-- filter 実装は差し替え可能にするが、v1 は直線運動前提の Kalman filter を標準とする
-- ball については「追跡本体」と「kick / 追加メタ推定」を分離する
-- world 側の永続 filter は v1 では持たず、camera-local track を uncertainty-weighted に統合した結果をその frame の world snapshot とする
-
-v1 実装契約:
-
-- camera-local ball / robot track は、観測値をそのまま上書きする簡易追跡ではなく、predict-update を持つ線形 Kalman filter で更新する
-- 各 track は少なくとも state estimate と covariance 相当の不確かさを保持する
-- `ProcessNoise` は `KalmanProcessNoiseScale` を通して予測時の process covariance へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して観測 covariance へ、`Gate` は対応付け時の innovation / 距離 gate へ使う
-- `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は profile ごとの外部設定値とし、停止時の小刻みな raw detection 揺れと移動追従性のバランスを code 変更なしで調整できるようにする
-- `VisibilityHalfLifeSeconds` は観測欠測時の liveliness 管理に使う値であり、Kalman の covariance 更新を省略する理由にはならない
-- world 統合で使う uncertainty は camera-local Kalman filter の事後不確かさから導く
-- 単純な等速外挿 + 観測値上書き + 手動 uncertainty 加算だけで済ませる実装は、この v1 契約を満たさない
-
-段階分割:
-
-1. raw vision 正規化
-2. camera 単位 track 更新
-3. camera 横断統合
-4. kick / contact / field 外退出計算
-5. official proto 変換
-6. rule 消費向け event 通知
-
-### robot 追跡
-
-robot は `team + robot id` が既知なので、対応付け問題は ball より小さい。
-
-Tigers の `RobotTracker` に合わせ、位置系と向き系を別 filter で扱う。
-
-処理段階:
-
-1. camera 単位の観測を正規化する
-2. camera ごとに `team + robot id` の robot track を維持する
-3. 同一 `team + robot id` の複数 camera track を束ねて統合する
-4. 既存 track と id で直接対応付ける
-5. `position / velocity` と `orientation / angular velocity` を別 filter で更新する
-6. 向きは unwrap して多回転補正する
-7. 欠測時は予測のみ行い visibility を減衰する
-8. 外れ値は gate で除外する
-
-Tigers 由来で重視する点:
-
-- 位置と向きの filter 分離
-- 速度上限、角速度上限による外れ値除外
-- health と更新頻度から visibility / quality を作る
-- camera ごとの track と統合後の robot を分けて扱う
-
-robot ごとの可視性:
-
-- 直近 1 秒程度の更新履歴を保持する
-- 更新頻度と平均 frame 間隔から `visibility` を作る
-- 長時間欠測した robot は出力から外す
-
-robot 状態モデル:
-
-- 状態量
-  - 位置 filter: `x, y, vx, vy`
-  - 向き filter: `theta, omega`
-- 観測量
-  - 位置 filter: `x, y`
-  - 向き filter: `theta`
-- 推定
-  - 位置 filter: 等速移動
-  - 向き filter: 一定角速度
-
-robot v1 filter 要件:
-
-- `team + robot id` ごとに camera-local track を維持し、位置系と向き系を独立した線形 Kalman filter として更新する
-- 同一 camera / team の raw detection に、既に採用済み robot と近すぎる別 ID robot が含まれる場合は、Tigers の `Geometry.getBotRadius() * 1.5` 相当の距離を基準に後続候補を採用しない
-- 近接重複 robot の採用順は deterministic にし、confidence が高い候補を優先し、同 confidence では robot id の小さい候補を優先する
-- 同一 camera / team の既存別 ID track 近傍へ raw detection の robot id だけが突然変わる候補は、同一 ID の通常位置ずれより起きづらいものとして扱い、`RobotTracker.IdentitySwitchDistanceMm` の範囲では既存 identity を優先して新 ID 観測を採用しない
-- 同一 camera / team / robot id の候補が merge window 内に複数ある場合は、既存同一 ID track 近傍の候補を遠方候補より優先し、後続 detection の誤 ID で track を瞬間移動させない
-- 向き観測は update 前に unwrap して、`-pi` / `pi` 境界の不連続を filter 外へ漏らさない
-- 向き filter の measurement variance、process variance、初期角速度分散は rad / rad/s の単位で扱い、位置 mm 用の不確かさをそのまま流用しない。profile の `MeasurementNoiseVarianceScale`、`KalmanProcessNoiseScale`、`KalmanInitialVelocityVariance` は既定値比で rad 用基準値へ反映する
-- 静止 robot の小さな orientation jitter が過大な angular velocity として表示へ増幅されないよう、向き filter の速度更新には角速度上限を適用する
-- gate 判定は生観測との差分ではなく、予測状態に対する対応付け規則として使う
-- 欠測 frame では predict のみを行い、visibility 減衰と track 削除判定は別責務として扱う
-- merge に使う uncertainty は最新観測 confidence のみでなく、filter 後の position uncertainty を基準にする
-- 欠測により visibility が十分低下した stale track は内部状態として短時間残せるが、tracked frame / viewer / official packet へ出し続けてはならない
-- 外部出力可否は `OutputVisibilityThreshold` で判定し、Tigers の robot quality gate 初期値 `0.05` を設定値の基準とする
-
-orientation は unwrap して連続化する。`-pi` / `pi` 境界での跳びは state 層で吸収する。
-
-### ball 追跡
-
-ball は id がないため、対応付けを明示設計する。
-
-Tigers の `BallTracker` と `BallFilterPreprocessor` に合わせ、ball は「個別 track 群」と「primary ball 決定および kick 推定」の 2 段に分ける。
-
-処理段階:
-
-1. camera ごとの raw ball 観測を正規化する
-2. camera ごとに ball track 群を維持する
-3. track ごとに予測位置との距離と最大速度上限で外れ値を除外する
-4. 更新できた track は health を上げ、育成前の track と成長済み track を分ける
-5. camera をまたいで ball track 群を統合する
-6. 直前の filtered ball 近傍を優先する探索半径で primary 候補を絞る
-7. 古くなった track は visibility を減衰し、閾値以下で除外する
-8. primary ball をルール上重要な優先度で 1 つ選ぶ
-
-Tigers 由来で重視する点:
-
-- `BallTracker` 単位の Kalman filter
-- health と成長判定
-- 最大速度による外れ値除外
-- 直前の ball 位置や空中 ball 投影位置を基準にした探索半径
-- camera ごとに 1 つまでの代表 track を選んで統合する考え方
-
-ball ごとの生存管理:
-
-- 生成直後の track は育成前として扱う
-- 一定回数の更新後に成長済みとみなす
-- 成長前 track は primary 候補の優先度を下げる
-- v1 では Tigers の `grownUpAge = 3` に合わせ、primary 以外の secondary ball は 3 回以上観測された track だけを外部出力する
-- 1 frame だけ raw detection に入った secondary ball ghost は camera-local track として短時間残せるが、tracked frame / viewer / official packet へは出さない
-- 長時間更新されない track は削除する
-
-ball 状態モデル:
-
-- 状態量
-  - `x, y, z, vx, vy, vz`
-- 観測量
-  - `x, y, z`
-- 推定
-  - 等速移動
-
-ball v1 filter 要件:
-
-- camera-local ball track は各 track ごとに線形 Kalman filter を持ち、観測 update と欠測時 predict を分ける
-- `ProcessNoise` と `MeasurementNoise` は ball filter の covariance 更新に直接使う
-- `Gate` は新規観測を既存 ball track へ結び付ける可否判定に使い、対応付け失敗時だけ新規 track を生成する
-- track の uncertainty は観測 confidence の単純逆数ではなく、filter 事後 covariance から導く
-- camera 横断統合の weighted merge は、この ball filter の事後 uncertainty を重みとする
-- health / 育成 / visibility の管理は filter 更新とは別責務だが、少なくとも Kalman ベースの状態推定を置き換えてはならない
-- 欠測により visibility が十分低下した stale track は内部状態として短時間残せるが、tracked frame / viewer / official packet へ出し続けてはならない
-- 外部出力可否は `OutputVisibilityThreshold` で判定可能とし、Tigers の ball 不可視 lifetime 初期値 `1.0s` は `TrackLifetimeNs` の基準とする
-
-複数 ball 対応:
-
-- 内部では `TrackedBallState` を複数保持する
-- 外部 `TrackedFrame.Balls` には primary ball と、成長済み secondary ball だけを出す
-- `Balls[0]` は primary ball に固定する
-- primary 選定は直前 primary track を優先し、その後 visibility、経過時間、field 上の重要度、直近 contact との整合を使う
-- secondary ball は出力規則節の stable sort に従うが、single-frame ghost 抑制のため育成前 track は出力しない
-
-### camera 統合
-
-複数 camera から同一対象が見えるときは、単純平均ではなく「規則ベースの候補選別 + uncertainty-weighted merge」を行う。
-
-- まず spatial gate と id 規則で同一候補を束ねる
-- ball は直前の filtered ball 近傍または chip 投影近傍にある camera-local track だけを primary 候補に残す
-- ball は camera ごとに代表 track を 1 つ選んでから統合する
-- robot は同一 `team + robot id` の camera-local track だけを束ねる
-- merge 自体は camera-local filter state の uncertainty を重みとして使う
-- confidence や camera 固有品質は uncertainty 補正係数として将来拡張できるようにする
-- 視線角や camera 固有品質を後で入れられるよう拡張点を持つ
-- v1 では統合後の world 側に別 filter をもう 1 段かけない
-- `TrackedBallState` / `TrackedRobotState` は camera-local track 群からその frame ごとに合成した world snapshot とする
-
-統合時の安定性要件:
-
-- 同時刻近傍の観測のみを統合対象にする
-- 明らかに古い camera track は統合対象から外す
-- 統合順序で結果がぶれないよう、安定した並び順を持つ
-- merge 前に候補列を `(camera id, local track id)` で安定整列する
-- 同一 uncertainty の tie は `camera id` と local track id で決める
-
-### kick 検出
-
-kick は AutoRef に重要なので v1 から入れる。Tigers の `BallFilterPreprocessor` のように、ball の主追跡から分離した前処理段で扱う。
-
-候補条件:
-
-- ball 速度が短時間で閾値以上に増加した
-- 増加直前に近傍 robot の接触候補がある
-- ball 進行方向と robot 前方がある程度整合する
-
-処理方針:
-
-- 早期検出系と安定検出系の 2 系統を持てる構造にする
-- 推定結果がある場合はそちらを優先する
-- kick 検出後は flat / chip の推定器へ流す
-
-v1 の最小実装:
-
-- 1 本の判定器から開始してよい
-- ただし構造は 2 系統へ増やせる形にしておく
-
-出力:
-
-- kicker robot id
-- kick 開始時刻
-- 開始位置 / 初速度
-- flat / chip 候補
-- stop 予測があれば停止時刻 / 停止位置
-
-`kicked_ball` の寿命規則:
-
-- official proto には「kick 済みかつ still moving の間だけ」出力する
-- active kick は、対応 ball の平面速度が `KickStillMovingSpeedThreshold` を下回る状態が `KickStillMovingGraceFrames` 続いたら clear する
-- 対応 ball track が削除された、または `BallInvisibleTimeout` を超えて不可視になった場合も clear する
-- 別の kick が確定した場合は古い kick を置き換える
-
-flat と chip は次で近似判定する。
-
-- `vz` または `z` 上昇が閾値以上なら chip 候補
-- それ以外は flat 候補
-
-### ball 接触
-
-contact は専用 state として保持する。Tigers の `BotBallContactAutoRefCalc` と同様に、「現在接触中」と「最終接触者」を分ける。
-
-- robot 半径 + ball 半径 + margin に入ったら接触候補
-- 方向整合や相対速度で誤判定を減らす
-- 現在接触中と最終接触者を分けて保持する
-
-出力規則:
-
-- 現在接触中がいなければ、直前の kick 情報も使って最終接触者を維持する
-- 複数候補がある場合は距離と進行方向で優先順位を付ける
-
-### ball の field 外退出
-
-geometry の line 群または field size を使って判定する。Tigers の `BallLeftFieldAutoRefCalc` と同じく、world から外退出位置と field 内外状態を作る。
-
-- ball center が field interior を出た時刻を記録する
-- 横切った line 種別を持つ
-  - touch line
-  - goal line
-  - goal interior
-- 複数 ball がある場合も各 ball track ごとに判定する
-
-goal 判定:
-
-- goal mouth を通って goal interior に入ったか
-- 単に goal line を横切っただけか
-
-は分けて保持する。
-
-### rule 連携
-
-AutoRef などの rule 側は raw packet や camera-local track を直接読むのではなく、確定済み world snapshot と高レベル event を読む前提とする。
-
-rule 側へ渡す基本要素:
-
-- 最新 `TrackerFrame`
-- 必要に応じた直近数 frame の履歴
-- 高レベル event
-  - `WorldFrameCommitted`
-  - `KickDetected`
-  - `ContactChanged`
-  - `BallLeftField`
-  - `ProfileSwitched`
-  - `GeometryReset`
-
-設計方針:
-
-- rule ごとに observer を持てる構造にする
-- observer は raw vision packet を直接 subscribe しない
-- observer は `TrackerFrame` と domain event を入力にする
-- kick / contact / ball left field の計算は tracker 側で責務を持ち、rule 側で同じ前提計算を重複させない
-- rule 順序依存を避けるため、event は tracker で確定した順に publish する
-- rule が追加されても tracking core の数値処理へ影響しない境界を保つ
-
-publish 順は次で固定する。
-
-1. state clear や意味の切替を伴う event
-   - `ProfileSwitched`
-   - `GeometryReset`
-2. frame 本体
-   - `WorldFrameCommitted`
-3. その frame に従属する派生 event
-   - `KickDetected`
-   - `ContactChanged`
-   - `BallLeftField`
-
-同一 phase 内の並びは `TrackerUpdateResult.EmittedEvents` に格納された順を正とする。
-
-最小インターフェースの考え方:
-
-- `ITrackerObserver`
-  - `OnProfileSwitched(string profileName)`
-  - `OnGeometryReset()`
-  - `OnWorldFrameCommitted(TrackerFrame frame)`
-  - `OnKickDetected(KickEventState kick, TrackerFrame frame)`
-  - `OnContactChanged(TrackerFrame frame)`
-  - `OnBallLeftField(BallLeftFieldState state, TrackerFrame frame)`
-
-v1 ではまず同期 observer でよい。将来、非同期配信や event bus へ差し替えられるよう、`TrackerEngine` 本体から publish 実装を分離できる余地を残す。
-
-### filter 設定
-
-filter と gate の主要設定は外出し前提にする。
-
-- robot process noise
-- robot measurement noise
-- robot gating distance
-- ball process noise
-- ball measurement noise
-- ball gating distance
-- stale timeout
-- visibility decay
-- kick thresholds
-- chip thresholds
-
-設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` が debug 起動時の設定供給責務を持つ。
-
-## UI 方針
-
-- 現在の raw vision viewer は維持する
-- viewer 上部または detail panel に `Raw / Tracked` の button 切替を置く
-- tracked 表示では filtered ball / robots / kick 情報 / contact 情報を確認できるようにする
-- raw と tracked で field 表示の見た目は揃え、比較しやすくする
-
-tracked 表示の最低限:
-
-- primary ball
-- secondary ball
-- tracked robots
-- 現在の設定セット名
-- kicked ball の有無
-- 最終接触者
-- ball の field 内外
-
-## テスト方針
-
-TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
-
-### 最初に失敗テストを作る対象
-
-- `TrackerPacketGenerator` が内部単位から official proto 単位へ正しく変換する
-- `TrackerPacketGenerator` が `kicked_ball` と capabilities を正しく埋める
-- `TrackerPacketGenerator` が複数 ball を `TrackedFrame.Balls` に出し、primary ball を先頭に置く
-- `TrackerPacketGenerator` が `TrackerFrame.data_timestamp_ns` を `TrackedFrame.timestamp` に使う
-- `TrackerEngine` が 1 frame の raw vision から primary ball と robots を持つ `TrackerFrame` を返す
-- `TrackerEngine` が複数 ball 観測を別 track として保持できる
-- `TrackerEngine` が同一 robot の 2 frame から velocity を推定する
-- `TrackerEngine` の threshold / noise parameter が設定オブジェクトから供給される
-- `TrackerEngine` が複数の設定セットから選択された 1 つを受け取れる
-- `TrackerEngine` が arrival order の異なる同一入力でも同じ event time 順で frame を確定する
-- `TrackerEngine` が `MergeWindow` 外の camera 観測を同一 frame に混ぜない
-- `TrackerEngine` が確定した world frame に対して高レベル event を安定順で通知する
-- `TrackerEngine` が 1 入力から `0..N` 件の `CommittedFrames` を返せる
-- `TrackerEngine` が geometry reset 時に pending buffer を clear する
-
-### 具体的な最初のテスト候補
-
-1. `TrackerPacketGenerator` に 2 個の ball を与えると、primary 指定 ball が `Balls[0]` になる
-2. `TrackerPacketGenerator` が `mm` を `m` に、`ns` を `s` に変換する
-3. `TrackerPacketGenerator` が `CAPABILITY_DETECT_MULTIPLE_BALLS` を含める
-4. `TrackerPacketGenerator` が `TrackerFrame.data_timestamp_ns` を `TrackedFrame.timestamp` に使う
-5. `TrackerEngine` が geometry のみ packet を受けても例外なく geometry snapshot を更新する
-6. `TrackerEngine` が 2 frame の同一 robot 観測から非 0 の速度を出す
-7. `TrackerEngine` が離れた 2 ball 観測を別 track として保持する
-8. `TrackerEngine` が設定セット名変更で新しい設定を参照する
-9. `TrackerEngine` が arrival order の異なる同一入力でも同じ frame 順を返す
-10. `TrackerEngine` が `MergeWindow` を超えた camera 観測を別 frame に分ける
-11. `TrackerPacketGenerator` が secondary ball を stable sort で出力する
-12. `TrackerPacketGenerator` が still moving でない kick を `kicked_ball` に出さない
-13. `TrackerCoordinator` が profile 切替時に track state を reset しても `frame_number` を巻き戻さない
-14. `TrackerObserver` が raw packet ではなく確定済み `TrackerFrame` と domain event を受け取る
-15. `TrackerCoordinator` が 1 入力で複数 `CommittedFrames` を受けたとき中間 frame を落とさない
-16. `TrackerObserver` が `ProfileSwitched` / `GeometryReset` / `WorldFrameCommitted` / 派生 event を固定順で受け取る
-17. geometry 大変更時に旧 geometry 世代の pending detection が破棄される
-
-### 後続で追加する対象
-
-- ball visibility decay
-- recent contact / last toucher
-- ball left field 判定
-- geometry 大変更時 reset
-- late packet diagnostics
-- raw/tracked viewer 切替の統合確認
-
-## タスク分割方針
-
-- `TRACKER-000`: 設計書と進捗管理ファイル作成
-- `TRACKER-001`: `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る
-- `TRACKER-002`: packet generator の契約テストを追加する
-- `TRACKER-003`: engine の時系列契約テストを追加する
-- `TRACKER-004`: `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する
-- `TRACKER-005`: `TrackerPacketGenerator` を実装する
-- `TRACKER-006`: `TrackerEngine` の reorder buffer と flush pipeline を実装する
-- `TRACKER-007`: `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する
-- `TRACKER-008`: robot tracking と robot merge を実装する
-- `TRACKER-009`: ball tracking と primary/secondary ball 選定を実装する
-- `TRACKER-010`: kick と contact metadata を実装する
-- `TRACKER-011`: ball left field metadata を実装する
-- `TRACKER-012`: 旧 `Tracker.Server` へ engine と packet 配信を統合する
-- `TRACKER-013`: tracker/network 設定束縛を統合する
-- `TRACKER-014`: profile 切替要求経路を統合する
-- `TRACKER-015`: tracked viewer と raw/tracked toggle を追加する
-- `TRACKER-016`: tracked diagnostics 表示を追加する
-- `TRACKER-017`: runtime profile 表示・操作 UI を追加する
-- `TRACKER-018`: Tracker v1 の build/test 証跡を取得する
-- `TRACKER-019`: Tracker v1 の integration 観点検証を行う
-- `TRACKER-020`: Tracker v1 の最終レビューと追跡ファイル同期を行う
-- `TRACKER-027`: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する
-
-contracts フェーズの着手順:
-
-1. `TRACKER-001` で `Tracker.Tests` から `Tracker.Core` を参照し、shared fixture と test data 基盤を整える
-2. `TRACKER-002` で packet generator の失敗契約テストを固定する
-3. `TRACKER-003` で engine の時系列契約テストを固定する
-4. `TRACKER-004` で内部モデル・state 型・observer/event 契約を固定する
-5. `TRACKER-005` で packet generator 実装へ進む
-
-## 承認ゲート
-
-`TRACKER-000` の設計承認は完了済みであり、以後はこの設計書を正本として contracts フェーズ以降を進める。
-
-- 仕様変更や task 再分割があれば先にこの設計書と tracking files を同期する
-- contracts フェーズでは failing test と契約 surface を先に固定する
-
-## 前提
-
-- source first で進める
-- 初期入力は vision only
-- 配信は library + UDP
-- viewer は `ssl-vision-client` のように raw / tracked を button で切り替える
-- 無関係な worktree 変更は保護する
+    Frame --> Ball["TrackedBallState<br/>(data type)"]
+    Frame --> Robot["TrackedRobotState<br/>(data type)"]
+    Frame --> Kick["KickEventState<br/>(data type)"]
+    Frame --> Contact["BallContactState<br/>(data type)"]
+    Frame --> Left["BallLeftFieldState<br/>(data type)"]
+    Frame --> Metadata["TrackerFrameMetadata<br/>(data type)"]
+
+    Dispatch --> Store["F5 TrackedSnapshotStore<br/>UpdateLatestFrame() / ClearLatestFrame()"]
+    Frame --> Generator["F5 TrackerPacketGenerator<br/>Generate()"]
+    Generator --> Official["TrackerWrapperPacket / TrackedFrame<br/>(official proto data types)"]
+    Dispatch --> Publisher["F5 TrackerCoordinator.PublishFrame()<br/>ITrackerPacketPublisher.Publish()"]
+    Dispatch --> Observer["F5 TrackerCoordinator.NotifyObservers()<br/>ITrackerObserver.On...()"]
+```
+
+### 4.1 時刻と単位
+
+| 値 | 意味 |
+| --- | --- |
+| `TrackerFrame.data_timestamp_ns` | world を構成した観測の基準時刻。`TCapture`、欠落時は `TSent` |
+| `TrackerFrame.processed_at_ns` | engine が frame を確定したローカル処理時刻。diagnostics 用 |
+| `receivedAt` | packet / sidecar を host が受信・保存した時刻。capture timeline 用 |
+
+| 領域 | 位置 | 速度 | 角度 | 時刻 |
+| --- | --- | --- | --- | --- |
+| Core 内部 | `mm` | `mm/s` | `rad` | `ns` |
+| official proto | `m` | `m/s` | proto 定義 | `s` |
+
+単位変換は `TrackerPacketGenerator.Generate()` が呼ぶ `CreateTrackedBall()`、`CreateTrackedRobot()`、`CreateKickedBall()` の境界で行う。
+
+### 4.2 Official packet の安定順
+
+- `TrackerPacketGenerator.OrderBalls()` が `Balls[0]` を primary ball に固定する
+- secondary ball は `visibility desc`、`last_visible_timestamp_ns desc`、`internal_track_id asc`
+- `TrackerPacketGenerator.Generate()` が robots を team と robot id の安定順に並べる
+- capabilities は毎回同じ順で出す
+- `kicked_ball` は kick 済みかつ still moving の間だけ出す
+
+---
+
+## 5. F4: Result dispatch と event publish 順
+
+この章は、全体フローの **`F4. Result dispatch`** を展開する。`F3.8` の結果を受け取り、state transition、committed frame、derived event の順で処理した後、`F5` の出力へ渡す。
+
+```mermaid
+flowchart LR
+    Result["F3.8 TrackerUpdateResult<br/>(data type)"]
+    Transition["F4.1 state transition<br/>TrackerCoordinator.DispatchResult()<br/>ApplyProfileSwitch() / ClearLatestFrame()"]
+    Frame["F4.2 committed frame<br/>DispatchResult()<br/>UpdateLatestFrame() / PublishFrame()<br/>OnWorldFrameCommitted()"]
+    Derived["F4.3 derived event<br/>DispatchResult()<br/>OnKickDetected() / OnContactChanged()<br/>OnBallLeftField()"]
+    Output["F5 output boundary<br/>PublishFrame() / NotifyObservers()"]
+
+    Result --> Transition --> Frame --> Derived --> Output
+```
+
+`TrackerCoordinator.DispatchResult()` は `TrackerUpdateResult.EmittedEvents` を順に走査し、`TrackerEventKind` ごとに store、publish、observer callback を呼び分ける。同一 phase 内は `EmittedEvents` の格納順を正とする。
+
+`ITrackerObserver` の最小契約:
+
+- `OnProfileSwitched`
+- `OnGeometryReset`
+- `OnWorldFrameCommitted`
+- `OnKickDetected`
+- `OnContactChanged`
+- `OnBallLeftField`
+
+---
+
+## 6. Profile 切替フロー
+
+profile 切替は End-to-end 全体フローに直列追加される stage ではない。control flow `C1` として、`F2` の coordinator request 管理、`F3.1` の engine 適用、`F4` の `ProfileSwitched` dispatch、`F5` の host state 更新を横断する。
+
+| control step | 全体フロー上の位置 | 主な実装 |
+| --- | --- | --- |
+| `C1.1` desired / pending / in-flight 管理 | `F2` TrackerCoordinator | `TrackerProfileRequestService.RequestProfileSwitch()` / `TrackerCoordinator.RequestProfileSwitch()` / `PromotePendingRequest()` |
+| `C1.2` request を `Update` 先頭で適用 | `F3.1` | `TrackerEngine.Update()` / `ClearPendingStateAndAdvanceLateCutoff()` |
+| `C1.3` `ProfileSwitched` を返して dispatch | `F4` | `TrackerEngine.Update()` / `TrackerCoordinator.DispatchResult()` |
+| `C1.4` endpoint / active profile / store を更新 | `F5` | `TrackerCoordinator.ApplyProfileSwitch()` / `UdpTrackerPacketPublisher.ApplyConfiguration()` / `TrackedSnapshotStore.SwitchActiveProfile()` |
+
+### 6.1 C1.1: 4種類の snapshot / request
+
+```mermaid
+flowchart LR
+    Desired["C1.1 TrackerCoordinator.desiredOptions<br/>最新のユーザー意図"]
+    Pending["C1.1 TrackerCoordinator.pendingRequest<br/>未送信・最大1件"]
+    InFlight["C1.1 TrackerCoordinator.inFlightRequest<br/>Update 中 immutable"]
+    Applied["C1.4 TrackerCoordinator.appliedOptions<br/>現在適用済み"]
+
+    Desired -->|"RequestProfileSwitch() で置換"| Pending
+    Pending -->|"PromotePendingRequest()"| InFlight
+    InFlight -->|"DispatchResult() → ApplyProfileSwitch()"| Applied
+    Applied -->|"RequestProfileSwitch() が差分を再計算"| Pending
+```
+
+### 6.2 C1.1-C1.4: 切替 sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as Home.razor / API
+    participant R as TrackerProfileRequestService
+    participant C as TrackerCoordinator
+    participant E as TrackerEngine
+    participant S as TrackedSnapshotStore
+    participant P as UdpTrackerPacketPublisher
+    participant O as VisionReceiverProfileSwitchObserver
+
+    UI->>R: TrackerProfileRequestService.RequestProfileSwitch()
+    R->>C: C1.1 TrackerCoordinator.RequestProfileSwitch()
+    C->>C: desiredOptions 更新 / pendingRequest 置換
+    C->>C: PromotePendingRequest()
+    C->>E: C1.2 TrackerEngine.Update(null, settings, request)
+    E->>E: ClearPendingStateAndAdvanceLateCutoff()
+    E-->>C: C1.3 TrackerEventKind.ProfileSwitched
+    C->>C: TrackerCoordinator.DispatchResult()
+    C->>P: C1.4 ApplyProfileSwitch() → ApplyConfiguration()
+    C->>S: C1.4 TrackedSnapshotStore.SwitchActiveProfile()
+    C->>C: appliedOptions 更新 / inFlightRequest 解放
+    C->>O: NotifyObservers() → OnProfileSwitched()
+    O->>O: VisionReceiverRuntimeOptionsStore.ApplyConfiguration()
+    opt より新しい pendingRequest がある
+        C->>E: ExecuteUpdates() から次の control-only Update
+    end
+```
+
+### 6.3 切替規則
+
+- coordinator は queue を積まず、最新のユーザー意図へ収束する
+- in-flight request は result 処理完了まで書き換えない
+- raw packet がなくても pending があれば `TrackerCoordinator.ExecuteUpdates()` が control-only `Update` を実行する
+- engine は `TrackerEngine.Update()` の先頭で request を適用する
+- `ProfileSwitched` 後に `TrackerCoordinator.ApplyProfileSwitch()` が host 側 endpoint、active profile、store を原子的に切り替える
+- receiver profile は `VisionReceiverProfileSwitchObserver.OnProfileSwitched()` で切り替える
+- first committed frame after switch は必ず新 profile の state から生成する
+
+**clear する state:** camera-local tracks、pending detection buffer、world snapshot、kick / contact / field metadata。
+
+**維持する state:** latest geometry、単調増加する `frame_number`、runtime identity (`Uuid`, `SourceName`)。
+
+---
+
+## 7. Capture / replay / comparison フロー
+
+この章は End-to-end 全体フローの **`F7`** を展開する。`F7` は `F1` の raw payload と `F6` の official multicast から分岐する。`F7` で保存・比較したデータは `F3` の live tracking state へ入力しない。
+
+```mermaid
+flowchart LR
+    Vision["F1 外部: SSL-Vision UDP payload"] --> Receiver["F2 VisionReceiverService<br/>ExecuteAsync()"]
+    Receiver --> Core["F3-F5<br/>TrackerCoordinator.ProcessPacket()<br/>TrackerEngine.Update()<br/>DispatchResult()"]
+    Core --> OwnPacket["F5 ibis official packet<br/>TrackerPacketGenerator.Generate()"]
+    OwnPacket --> Multicast["F6 official multicast<br/>UdpTrackerPacketPublisher.Publish()"]
+
+    Receiver --> RawCapture["F7.1 raw packet capture<br/>VisionPacketCaptureWriter.Capture()"]
+    Receiver --> Diagnostics["F7.1 diagnostics sample<br/>DiagnosticsSampleCaptureLoop.CaptureOnce()<br/>TrackerRenderSnapshotCaptureWriter.CaptureFrame()"]
+
+    ThirdParty["外部: 3rdparty tracker"] --> Multicast
+    Multicast --> Connection["F7.2 official packet 受信<br/>UdpTrackerReceiver.ReceiveLoopAsync()<br/>TrackerConnectionLibReceiverHostedService.ProcessPacket()<br/>MultiTrackerManager.ProcessPacket()"]
+    Connection --> Snapshot["F7.2 snapshot sidecar<br/>TrackerConnectionLibSnapshotRecorder.CaptureTrackerUpdate()<br/>TrackerPacketSnapshotLogWriter.CapturePacket() / Append()"]
+
+    RawCapture --> Session["F7.3 CaptureOn session<br/>VisionPacketCaptureSession.EnsureStarted()<br/>WriteMetadata()"]
+    Diagnostics --> Session
+    Snapshot --> Session
+    Session --> Alignment["F7.3 alignment sidecar<br/>TrackerSnapshotAlignmentLogWriter.WriteTimelineRecords()"]
+    Alignment --> Reader["F7.4 replay index / view-state<br/>TrackerSnapshotReplayReader.ReadSession()<br/>TrackerDiagnosticsComparisonViewStateReader.Load()"]
+    Session --> Reader
+    Reader --> UI["F7.4 Diagnostics UI<br/>Diagnostics.razor<br/>TrackerDiagnosticsComparisonViewStateReader.Load()"]
+    Reader --> CLI["F7.4 Tracker.CaptureReplay<br/>CaptureReplayRunner.Run()"]
+
+    Connection -.-> Isolation["comparison-only boundary<br/>TrackerEngine.Update() を呼ばない"]
+```
+
+### 7.1 Capture boundary の要点
+
+- `VisionReceiverService.ExecuteAsync()` は protobuf decode 前の payload を `VisionPacketCaptureWriter.Capture()` へ渡す
+- `UdpTrackerReceiver.ReceiveLoopAsync()` は official packet を受信し、`TrackerConnectionLibReceiverHostedService.ProcessPacket()` が `MultiTrackerManager.ProcessPacket()` へ渡す
+- `TrackerConnectionLibSnapshotRecorder.CaptureTrackerUpdate()` は `TrackerUpdated` event を受け、`TrackerPacketSnapshotLogWriter.CapturePacket()` へ保存する
+- official packet の傍受、snapshot 保存、比較処理を `Tracker.Core` に入れない
+- ibis 自身の packet も self 除外せず保存対象にできる
+- `uuid` / `sourceName` が空、重複、衝突しても raw payload と source identity を落とさない
+- packet capture、metadata、diagnostics、render snapshot、tracker snapshot、alignment を同じ session folder で関連付ける
+- snapshot sidecar と alignment sidecar の未作成、0件、破損を別々に表現する
+- replay timeline の順序は capture-time `receivedAt` を基準にする
+- source ごとに時刻系が異なる可能性があるため、`TrackedFrame.timestamp` を source 横断の timeline ordering へ使わない
+- Capture Off / 再 On では新しい session folder へ切り替え、旧 session へ追記しない
+
+保存 record、alignment v2、legacy fallback、Play / Fast Forward の挙動は DebugHost 詳細設計を正とする。
+
+---
+
+## 8. 設定と UI / rule 境界
+
+### 8.1 設定の構成
+
+```text
+Tracker
+├─ Enabled / PublishUdp / SourceName / Uuid
+├─ ActiveProfileName
+├─ Profiles
+│  └─ <profile-name>
+│     ├─ VisionReceiver
+│     ├─ Publish
+│     ├─ RobotTracker
+│     ├─ BallTracker
+│     └─ KickDetector
+├─ RuntimeOverrides
+└─ Diagnostics
+
+VisionReceiver
+└─ PacketCapture
+   ├─ Enabled
+   ├─ DirectoryPath
+   ├─ FilePrefix
+   └─ FlushEachPacket
+```
+
+`TrackerConfigurationResolver.Resolve()` が tracker profile と runtime override を解決する。`VisionReceiverConfigurationResolver.Resolve()` が receiver profile を解決し、`VisionReceiverRuntimeOptionsStore.ApplyConfiguration()` が runtime receiver 設定へ反映する。
+
+外出しする主要値は receive / publish endpoint、`ReorderWindow`、`MergeWindow`、Kalman process / measurement noise、initial variance、association gate、outlier threshold、track lifetime、visibility、kick / chip / contact threshold、geometry reset threshold、diagnostics / capture path である。
+
+### 8.2 F5-F6: UI
+
+- `VisionLiveDisplaySnapshotProvider.CaptureRenderTickSnapshot()` が 1 render tick の raw / tracked / external tracker snapshot を固定する
+- raw viewer は `VisionPacketStore.GetSnapshot()` を読む
+- tracked viewer は `TrackedSnapshotStore.GetSnapshot()` を読む
+- external comparison は `ExternalTrackerSnapshotStore.GetSnapshot()` を読む
+- `Home.razor` の `CaptureLiveDisplaySnapshot()` と `RefreshAsync()` が read-side snapshot を UI state へ反映する
+- `Raw / Tracked / Compare` を button で切り替える
+- tracked view は primary / secondary ball、robots、profile、kick、contact、field state を表示する
+- frame が clear された直後でも profile UI は操作可能にする
+- UI rendering の周期は tracking operation loop を駆動しない
+
+### 8.3 F5-F6: Rule
+
+`TrackerCoordinator.DispatchResult()` が `TrackerCoordinator.NotifyObservers()` を呼び、`ITrackerObserver.OnWorldFrameCommitted()`、`OnKickDetected()`、`OnContactChanged()`、`OnBallLeftField()` へ committed `TrackerFrame` と高レベル event を渡す。AutoRef rule は raw packet や camera-local track を直接読まない。rule の追加が tracking core の数値処理へ影響しない境界を保つ。
+
+---
+
+## 9. 詳細仕様との対応
+
+| この文書 | 全体フロー / 図の種類 | 主な実装 entry point | 詳細仕様で確認する章 | 詳細仕様に残る主な情報 |
+| --- | --- | --- | --- | --- |
+| 1. システム全体像 | component context + `F1-F7` master flow | receiver services、`TrackerCoordinator`、`TrackerEngine`、publisher / reader classes | 目的、対象範囲、対象外、基本方針、構成 | 参考実装の採否、proto 型一覧、構成要素の個別説明 |
+| 2. Live tracking | `F1-F6` end-to-end sequence | `ExecuteAsync()`、`ProcessLatestPacket()`、`ProcessPacket()`、`Update()`、`DispatchResult()` | 契約詳細、`TrackerCoordinator`、データフロー | 0-frame / multi-frame の細則、local state 更新順、receiver adapter 条件 |
+| 3. Engine pipeline | `F3` detail flow | `TrackerEngine.Update()` と責務別 partial methods | 入出力詳細、multi-camera、アルゴリズム設計 | late packet、geometry generation、robot / ball filter の全要件 |
+| 4. Core model | `F3.8-F5` data boundary。時系列図ではない | `CommitGroup()`、`DispatchResult()`、`TrackerPacketGenerator.Generate()` | 内部出力、内部モデル方針、`TrackerPacketGenerator` | state 型の全 field、official proto field、capability、kick 寿命 |
+| 5. Result dispatch | `F4` detail flow | `TrackerCoordinator.DispatchResult()` / `PublishFrame()` / `NotifyObservers()` | rule 連携 | observer interface、同一 phase 内の順序、同期 observer 方針 |
+| 6. Profile switch | `C1` control flow。`F2-F5` を横断 | `RequestProfileSwitch()`、`PromotePendingRequest()`、`ApplyProfileSwitch()` | 設定、設定セット切替 | duplicate 判定、override snapshot、receiver 切替、identity 維持条件 |
+| 7. Capture / replay | `F7` side flow。`F1` / `F6` から分岐 | capture writers、`MultiTrackerManager.ProcessPacket()`、replay readers | tracker packet snapshot 比較ログ、設定 | sidecar record、alignment v2、legacy fallback、timeline / playback 規則 |
+| 8. 設定 / UI / rule | configuration tree + `F5-F6` boundary | configuration resolvers、snapshot provider、observer callbacks | 設定、UI 方針、filter 設定 | 全設定項目、profile 例、UI 操作要件、既定 endpoint |
+| TDD / 実装順 | 詳細仕様のみ | 文書変更のための新規 test は追加しない | テスト方針、タスク分割方針、承認ゲート | 最初の失敗テスト候補、TRACKER-000 以降の実装順、完了条件 |
+
+図や表から実装判断が一意に決まらない場合は、詳細仕様の記述を優先する。
+
+---
+
+## 10. 変更時に確認する不変条件
+
+### Core boundary
+
+- [ ] Core から DebugHost / Blazor / capture / diagnostics を参照していない
+- [ ] host 固有の file path や session lifecycle を Core に持ち込んでいない
+- [ ] tracking algorithm を host 側で重複実装していない
+
+### Determinism
+
+- [ ] arrival order ではなく event time を使っている
+- [ ] buffer / merge / output / event に stable order がある
+- [ ] tie-break が明示されている
+- [ ] 1 input から複数 frame が出ても欠落しない
+
+### State transition
+
+- [ ] profile request は desired / pending / in-flight / applied を区別している
+- [ ] `ProfileSwitched` 前に active profile 表示や endpoint を先走って変えていない
+- [ ] reset 後も `frame_number` と runtime identity を維持している
+- [ ] first frame after switch が新 settings の state だけを使う
+
+### Capture / diagnostics
+
+- [ ] CaptureOn session の成果物を同じ folder と metadata で関連付けている
+- [ ] snapshot と alignment の破損状態を別々に表現できる
+- [ ] raw payload または復元可能な参照を保持している
+- [ ] Core の live operation を diagnostics / rendering cadence に依存させていない
+
+### Documentation
+
+- [ ] 図で置き換えた条件が詳細仕様から失われていない
+- [ ] 全体フローの `F#` と詳細図の stage 番号が対応している
+- [ ] 各 flow block に実在する `Class.Method()`、`Class.field`、data type、外部 / 未実装の区別がある
+- [ ] method rename や責務移動時に該当 block と実装対応表を同期した
+- [ ] 時系列図、データ境界図、control flow、side flow の種類を明示している
+- [ ] Core の境界変更はこの文書へ反映した
+- [ ] 例外・設定・保存形式の変更は詳細仕様へ反映した
+- [ ] task / verification / review の履歴は tracking 文書へ同期した
