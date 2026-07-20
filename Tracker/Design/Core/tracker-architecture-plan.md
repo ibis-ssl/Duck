@@ -18,7 +18,7 @@
 | [DebugHost / CLI / UI CaptureOn 比較ログ詳細設計](../DebugHost/debug-host-cli-ui-detail-design.md) | CaptureOn session、sidecar、alignment、UI / CLI 比較の詳細仕様 |
 | [DebugHost 保守性設計](../DebugHost/debug-host-maintainability-design.md) | DebugHost / CLI / UI の分割・保守性方針 |
 | [TRACKER-000 から TRACKER-038 の履歴](tracker-history-000-038.md) | 完了済みタスク、検証・レビュー履歴 |
-| [`Ref/AutoReferee`](Ref/AutoReferee/) | Tigers AutoReferee の構成を確認するための参照実装 |
+| `Ref/AutoReferee`（ローカル配置時） | Tigers AutoReferee の構成を確認するための参照実装 |
 
 ---
 
