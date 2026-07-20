@@ -4,6 +4,28 @@
 
 ## 現在のタスク
 
+- ID: ISSUE-12-POSTMERGE-REVIEW
+- Title: merge 済み PR #23 の wheel zoom 変更を事後レビューし、必要な修正を提出する
+- Phase: post-merge-review
+- Status: complete; PR #24 open
+- Size: small
+- Dependencies: PR #23 merged (`d9ca3ee`), Issue #12 closed.
+- Exit Criteria:
+  - PR #23 の差分と周辺の split / overlay viewport contract を独立 sub-agent がレビューし、結果を report に残す。
+  - normal path を壊す finding があれば regression test を先に追加し、最小修正、検証、再レビューを完了する。
+  - design impact、tracking、review / validation evidence を同期し、Issue #12 を参照する専用 PR を作成する。
+  - Review Evidence:
+    - `reports/issue-12-pr23-postmerge-review-20260720190950.md`
+    - blocking normal-path finding と利用者確認が必要な capability gap はなし。browser-level test 不在は Low / hold とした。
+    - `reports/issue-12-pr23-submission-review-20260720191650.md`
+    - 提出差分の tracking / report / GitHub evidence は整合し、追加指摘なし、submission-ready と確認した。
+  - Validation Evidence:
+    - merge commit `d9ca3ee` の GitHub Actions run `29732105393` は recursive submodule checkout 後に 329 tests passed。
+    - ローカル focused test は隔離 worktree の submodule 未初期化により build 不能だったため、同一 commit の CI 証跡を採用した。
+  - Git Evidence:
+    - branch `review/pr-23-wheel-zoom`
+    - PR #24 `docs(vision): PR #23の事後レビュー結果を記録する`
+
 - ID: CAPTURE-REPLAY-001
 - Title: Tracker.CaptureReplay に vision / ibis tracker 遅延分析出力を追加する
 - Phase: PR
@@ -176,6 +198,7 @@
 
 | ID | タスク | フェーズ | 状態 | 依存関係 | 完了条件 |
 | --- | --- | --- | --- | --- | --- |
+| ISSUE-12-POSTMERGE-REVIEW | merge 済み PR #23 の wheel zoom 変更を事後レビューし、必要な修正を提出する | post-merge-review | complete; PR #24 open | PR #23 merged (`d9ca3ee`), Issue #12 closed | 独立 review で blocking finding なしを確認し、同一 merge commit の CI 329 tests pass を検証証跡として採用した。submission review は追加指摘なし。Issue #12 を参照する PR #24 を作成した。 |
 | RUNTIME-HOST-001 | `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了する | design | complete; draft PR #17 | PR #15 merge complete | `Tracker/Design/` へ設計資料と active tracking を統合し、RuntimeHost / DebugHost の命名、責務境界、AutoRef 将来内包、loop isolation、旧ログ互換非要件、BreakingChanges 不要を設計へ固定し、gpt-5.5 high r2 review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-002 | RuntimeHost / DebugHost project dependency boundary contract を追加する | verification | complete; draft PR #17 | RUNTIME-HOST-001 | RuntimeHost が DebugHost / Web UI / diagnostics replay UI に依存しないこと、DebugHost が tracker operation loop の主責務を持たず read-side であることを Red test として固定し、r2 review で blocking findings なしを確認した。 |
 | RUNTIME-HOST-003 | diagnostics sample boundary と legacy degraded contract を追加する | verification | complete; draft PR #17 | RUNTIME-HOST-002 | diagnostics sample tick が tracker committed frame cadence / `WorldFrameCommitted` に依存しないこと、Diagnostics `Vision Input` が diagnostics sample sidecar から復元されること、旧 render snapshot sidecar が unsupported / degraded legacy であることを Red contract として固定し、review で blocking findings なしを確認した。 |

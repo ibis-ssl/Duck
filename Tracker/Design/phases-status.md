@@ -4,14 +4,15 @@
 
 ## 全体状況
 
-- 現在のフェーズ: PR
-- 現在のタスク: CAPTURE-REPLAY-001 / RUNTIME-HOST-012
+- 現在のフェーズ: PR #24 open
+- 現在のタスク: ISSUE-12-POSTMERGE-REVIEW
 - 残りフェーズ: PR review / merge
 
 ## フェーズ一覧
 
 | フェーズ | 状態 | 完了条件 |
 | --- | --- | --- |
+| post-merge-review | complete; PR #24 open | PR #23 の独立 review で blocking finding なしを確認し、提出差分も追加指摘なしと確認した。review report、CI validation evidence、tracking を同期し、Issue #12 を参照する PR #24 を作成した。 |
 | preparation | complete | 旧 `Tracker.Core/Design` と `Tracker.Server/Design` の設計資料を確認し、`Tracker/Design/Archive/` に旧 tracking を保存した。 |
 | design | complete; draft PR #17 | `Tracker/Design/` を canonical design root とし、Core / DebugHost / RuntimeHost の設計範囲をフォルダで分ける。`Tracker.RuntimeHost` を tracker / 将来 AutoRef の本番寄り headless 実行体、`Tracker.DebugHost` を Web UI / diagnostics / replay / capture viewer 用 debug host として設計し、loop isolation と旧ログ互換非要件を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で blocking findings なしを確認済み。 |
 | verification | complete; draft PR #17 | `RUNTIME-HOST-002` と `RUNTIME-HOST-003` で RuntimeHost / DebugHost dependency boundary、read-side responsibility、diagnostics sample boundary、legacy degraded contract の Red tests を追加し、task ごとの review で blocking findings なしを確認した。RUNTIME-HOST-002 は r2 review、RUNTIME-HOST-003 は `reports/runtime-host-003-review-20260514170652.md` で完了した。 |
