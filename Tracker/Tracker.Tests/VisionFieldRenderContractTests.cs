@@ -42,6 +42,19 @@ public class VisionFieldRenderContractTests
     }
 
     /// <summary>
+    /// overlay field は split field と同じ wheel zoom / reset contract を持ち、wheel gesture を page scroll へ流さない。
+    /// </summary>
+    [Fact]
+    public void VisionFieldMarkup_OverlayAndSplitProvideDedicatedWheelZoom()
+    {
+        var splitMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Vision/VisionFieldCanvas.razor");
+        var overlayMarkup = ReadRepositoryFile("Tracker/Tracker.DebugHost/Components/Vision/VisionFieldOverlayCanvas.razor");
+
+        AssertDedicatedWheelZoom(splitMarkup);
+        AssertDedicatedWheelZoom(overlayMarkup);
+    }
+
+    /// <summary>
     /// split は split 用 component、overlay は overlay 用 component を別境界として使う。
     /// </summary>
     [Fact]
@@ -77,6 +90,14 @@ public class VisionFieldRenderContractTests
         Assert.Contains("private bool CanShowFieldDisplay =>", diagnosticsCode, StringComparison.Ordinal);
         Assert.Contains("LeftTrackerFieldSourceFrame", diagnosticsCode, StringComparison.Ordinal);
         Assert.DoesNotContain("@if (selectedRenderSnapshot is not null)", diagnosticsMarkup, StringComparison.Ordinal);
+    }
+
+    private static void AssertDedicatedWheelZoom(string markup)
+    {
+        Assert.Contains("@onwheel=\"OnFieldWheel\"", markup, StringComparison.Ordinal);
+        Assert.Contains("@onwheel:preventDefault=\"true\"", markup, StringComparison.Ordinal);
+        Assert.Contains("@onclick=\"ResetFieldView\"", markup, StringComparison.Ordinal);
+        Assert.Contains("scale({N(viewport.Zoom)})", markup, StringComparison.Ordinal);
     }
 
     private static string ExtractBetween(string text, string start, string end)
