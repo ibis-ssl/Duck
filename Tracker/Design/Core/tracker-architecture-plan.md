@@ -8,11 +8,13 @@
 
 ## 最初に読む場所
 
-1. [システム全体像](#1-システム全体像)
-2. [Live tracking の処理フロー](#2-live-tracking-の処理フロー)
-3. [Profile 切替フロー](#6-profile-切替フロー)
-4. [Capture / replay / comparison フロー](#7-capture--replay--comparison-フロー)
-5. [詳細仕様との対応](#9-詳細仕様との対応)
+1. [End-to-end 全体フロー](#12-end-to-end-全体フロー)
+2. [全体フローと詳細図の対応](#13-全体フローと詳細図の対応)
+3. [Live tracking の処理フロー](#2-live-tracking-の処理フロー)
+4. [Engine 内部パイプライン](#3-engine-内部パイプライン)
+5. [Profile 切替フロー](#6-profile-切替フロー)
+6. [Capture / replay / comparison フロー](#7-capture--replay--comparison-フロー)
+7. [詳細仕様との対応](#9-詳細仕様との対応)
 
 ## 関連文書
 
@@ -27,6 +29,10 @@
 ---
 
 ## 1. システム全体像
+
+### 1.1 システムコンテキスト
+
+この図は**コンポーネントの配置と責務**を示す。処理順序を示す図ではない。処理順序は [1.2 End-to-end 全体フロー](#12-end-to-end-全体フロー) を起点に読む。
 
 ```mermaid
 flowchart LR
@@ -80,7 +86,53 @@ flowchart LR
 
 `Tracker.RuntimeHost` と `Tracker.DebugHost` は、それぞれ独立した Core pipeline instance を compose する。図中の `Tracker.Core` は共有 process を表すのではなく、両 host が同じ契約と実装を利用することを表す。
 
-### 1.1 責務境界
+### 1.2 End-to-end 全体フロー
+
+以降の詳細図は、すべてこの `F1` から `F7` のどこを展開しているかを明記する。
+
+```mermaid
+flowchart LR
+    F1["F1. Vision packet 受信"]
+    F2["F2. Host adapter / Coordinator<br/>decode・raw store・capture・直列化"]
+    F3["F3. Engine update<br/>event-time reorder・tracking・merge"]
+    F4["F4. Result dispatch<br/>0..N frames・ordered events"]
+    F5["F5. Core output<br/>snapshot・official packet・observer"]
+    F6["F6. Live consumer<br/>viewer・multicast・AutoRef"]
+    F7["F7. Capture / comparison<br/>sidecar・alignment・replay"]
+
+    F1 --> F2 --> F3 --> F4 --> F5 --> F6
+    F1 -.-> F7
+    F6 -.-> F7
+```
+
+- 実線の `F1` から `F6` は live tracking の主経路である
+- `F7` は `F1` の raw payload と `F6` で観測できる official packet から分岐する診断経路である
+- `F7` のデータは `F3` の tracking state 更新へ戻さない
+- profile 切替は `F1` から `F6` に並ぶ追加 stage ではなく、`F2`、`F3`、`F4`、`F5` を横断する control flow `C1` として扱う
+
+### 1.3 全体フローと詳細図の対応
+
+| 全体 stage | 役割 | 展開する章 |
+| --- | --- | --- |
+| `F1` | SSL-Vision packet / UDP payload の受信 | 2. Live tracking、7. Capture / replay |
+| `F2` | host adapter、raw store / capture、coordinator の直列化 | 2. Live tracking、6. Profile switch |
+| `F3` | engine 内の request 適用、event-time buffer、camera-local tracking、merge、domain metadata | 3. Engine 内部パイプライン |
+| `F4` | `TrackerUpdateResult` の state transition / frame / derived event dispatch | 2. Live tracking、5. Result dispatch |
+| `F5` | `TrackerFrame`、snapshot store、packet generator、publisher、observer の境界 | 4. Core data model、5. Result dispatch |
+| `F6` | viewer、official multicast consumer、AutoRef rule | 2. Live tracking、8. UI / rule |
+| `F7` | CaptureOn session、snapshot / alignment sidecar、replay / comparison | 7. Capture / replay |
+| `C1` | profile / override の切替 control flow | 6. Profile switch |
+
+### 1.4 図の読み方
+
+- `F#` は End-to-end 全体フローの stage を表す
+- `F3.1` のような番号は、stage `F3` の内部処理を表す
+- `C1` は live data flow と別系統の profile 切替 control flow を表す
+- `sequenceDiagram` は実行順、`flowchart` は処理の分解またはデータ境界を表す
+- 4章の図は時系列フローではなく、`F3` から `F5` に渡るデータモデルと依存境界を表す
+- 詳細図から全体へ戻るときは、図中の `F#` を 1.2 の同じ stage に対応付ける
+
+### 1.5 責務境界
 
 | コンポーネント | 主責務 | 持ち込まない責務 |
 | --- | --- | --- |
@@ -93,7 +145,7 @@ flowchart LR
 
 最重要の依存規則は、`Tracker.Core` から `Tracker.DebugHost`、Blazor、diagnostics、capture session、sidecar path を参照しないことである。
 
-### 1.2 対象範囲
+### 1.6 対象範囲
 
 - raw vision から決定的な tracked world を生成する
 - official `TrackerWrapperPacket / TrackedFrame` を multicast 配信する
@@ -105,7 +157,7 @@ flowchart LR
 
 対象外は、feedback packet / robot telemetry の tracking 入力利用、Tigers との完全一致、AutoRef rule 本体、v1 の永続 replay database、非決定的な learned model の標準採用である。
 
-### 1.3 品質優先順位
+### 1.7 品質優先順位
 
 1. 決定的であること
 2. ルール上重要な情報を落とさないこと
@@ -115,6 +167,8 @@ flowchart LR
 ---
 
 ## 2. Live tracking の処理フロー
+
+この sequence は、全体フローの `F1` から `F6` を実行順に展開する。`F3` の内部は3章、`F4` の dispatch 順は5章、`F5` のデータ境界は4章でさらに展開する。
 
 ```mermaid
 sequenceDiagram
@@ -126,24 +180,28 @@ sequenceDiagram
     participant S as TrackedSnapshotStore
     participant G as TrackerPacketGenerator
     participant P as Publisher
-    participant O as Observer
+    participant M as Official multicast
+    participant O as Observer / rule
 
-    V->>R: SSL_WrapperPacket
-    R->>C: ProcessPacket(packet, receivedAt)
-    C->>E: Update(packet, settings, optional request)
-    E->>E: geometry 更新 / event-time buffer / tracking
-    E-->>C: TrackerUpdateResult<br/>CommittedFrames 0..N + EmittedEvents
+    V->>R: F1. SSL_WrapperPacket
+    R->>C: F2. ProcessPacket(packet, receivedAt)
+    C->>E: F3. Update(packet, settings, optional request)
+    E->>E: F3.1-F3.8 request / reorder / tracking / merge
+    E-->>C: F4. TrackerUpdateResult<br/>CommittedFrames 0..N + EmittedEvents
 
-    C->>C: state transition event を順に適用
+    C->>C: F4. state transition event を順に適用
 
     loop CommittedFrames を古い順に全件処理
-        C->>S: latest frame / receivedAt 更新
-        C->>G: TrackerFrame を変換
-        G-->>C: TrackerWrapperPacket
-        C->>P: UDP publish
-        C->>O: OnWorldFrameCommitted / 派生 event
+        C->>S: F5. latest frame / receivedAt 更新
+        C->>G: F5. TrackerFrame を変換
+        G-->>C: F5. TrackerWrapperPacket
+        C->>P: F5. UDP publish
+        P->>M: F6. official multicast
+        C->>O: F5→F6. WorldFrameCommitted / 派生 event
     end
 ```
+
+viewer は `F5` で更新された `TrackedSnapshotStore` を読み、official tracker consumer は `F6` の multicast を読む。どちらも tracking operation loop を駆動しない。
 
 ### 2.1 Coordinator が保証すること
 
@@ -158,33 +216,41 @@ sequenceDiagram
 
 ## 3. Engine 内部パイプライン
 
+この章は、全体フローの **`F3. Engine update` だけを展開する**。入力は `F2` から受け取り、結果を `F4` へ返す。3.1 は `F3.3` から `F3.4`、3.2 は `F3.5` から `F3.6` に対応する。
+
 ```mermaid
 flowchart LR
-    Input["SSL_WrapperPacket<br/>または control-only Update"]
-    Request["profile request を<br/>Update 先頭で適用"]
-    Geometry["geometry snapshot 更新"]
-    Buffer["detection を event time 順に buffer"]
-    Flush["ReorderWindow を越えた group を flush"]
-    Local["camera-local tracks<br/>Kalman predict / update"]
-    Merge["camera 横断統合<br/>uncertainty-weighted"]
-    Domain["kick / contact / field exit"]
-    Result["TrackerUpdateResult<br/>0..N frames + ordered events"]
+    Input["F2→F3<br/>packet / control-only Update"]
+    Request["F3.1<br/>profile request 適用"]
+    Geometry["F3.2<br/>geometry snapshot 更新"]
+    Buffer["F3.3<br/>event time 決定・buffer"]
+    Flush["F3.4<br/>ReorderWindow 判定・flush"]
+    Local["F3.5<br/>camera-local Kalman update"]
+    Merge["F3.6<br/>camera 横断 merge"]
+    Domain["F3.7<br/>kick / contact / field exit"]
+    Result["F3.8→F4<br/>0..N frames + ordered events"]
 
     Input --> Request --> Geometry --> Buffer --> Flush --> Local --> Merge --> Domain --> Result
 ```
 
-### 3.1 時系列の基準
+### 3.1 F3.3-F3.4: event time、buffer、flush
+
+この図は、上の Engine pipeline の `F3.3` と `F3.4` を展開する。
 
 ```mermaid
 flowchart TD
-    Packet["Detection packet"] --> Capture{"TCapture は有効か"}
+    Packet["F3.3 Detection packet"] --> Capture{"TCapture は有効か"}
     Capture -->|Yes| TCapture["TCapture を event time に使用"]
     Capture -->|No| Sent{"TSent は有効か"}
     Sent -->|Yes| TSent["TSent を event time に使用"]
     Sent -->|No| Invalid["欠落として diagnostics 対象"]
 
-    TCapture --> Stable["event time, camera id, frame number<br/>の安定順で処理"]
+    TCapture --> Stable["F3.3<br/>event time・camera id・frame number で安定整列"]
     TSent --> Stable
+    Stable --> Pending["F3.3<br/>pending detection buffer"]
+    Pending --> Window{"F3.4<br/>ReorderWindow を越えたか"}
+    Window -->|No| Hold["buffer に保持"]
+    Window -->|Yes| Flush["F3.4<br/>確定可能な group を event time 順に flush"]
 ```
 
 - UDP arrival order は world frame の確定順に使わない
@@ -194,34 +260,44 @@ flowchart TD
 - geometry の大変更時は、旧 geometry 世代の pending detection を破棄する
 - `ReorderWindow` と `MergeWindow` は設定から注入する
 
-### 3.2 Multi-camera 統合
+### 3.2 F3.5-F3.6: camera-local tracking と multi-camera 統合
+
+この図は、Engine pipeline の `F3.5` と `F3.6` を展開し、結果が `F3.7` と `F3.8` へ渡る位置までを示す。
 
 ```mermaid
 flowchart LR
-    C0["camera 0 local tracks"]
-    C1["camera 1 local tracks"]
-    CN["camera N local tracks"]
-    Gate["time / spatial / identity gate"]
-    Sort["camera id + local track id<br/>で stable sort"]
-    Weighted["posterior uncertainty による<br/>weighted merge"]
-    World["frame ごとの world snapshot"]
+    D0["camera 0 observations"] --> Cam0["F3.5 camera 0 tracks<br/>Kalman predict / update"]
+    D1["camera 1 observations"] --> Cam1["F3.5 camera 1 tracks<br/>Kalman predict / update"]
+    DN["camera N observations"] --> CamN["F3.5 camera N tracks<br/>Kalman predict / update"]
 
-    C0 --> Gate
-    C1 --> Gate
-    CN --> Gate
-    Gate --> Sort --> Weighted --> World
+    Cam0 --> Gate["F3.6<br/>time / spatial / identity gate"]
+    Cam1 --> Gate
+    CamN --> Gate
+    Gate --> Sort["F3.6<br/>camera id + local track id で stable sort"]
+    Sort --> Weighted["F3.6<br/>posterior uncertainty で weighted merge"]
+    Weighted --> World["F3.6<br/>frame ごとの world snapshot"]
+    World --> Domain["F3.7<br/>kick / contact / field exit"]
+    Domain --> Result["F3.8<br/>TrackerUpdateResult"]
 ```
 
 v1 では camera-local Kalman state を統合し、merge 後の world に第2の永続 filter は置かない。robot は `team + robot id`、ball は距離、速度上限、track 成長、直前 primary との整合を用いて対応付ける。詳細な gate、visibility、ghost 抑制、orientation unwrap は詳細仕様を参照する。
 
 ---
 
-## 4. Core model と出力境界
+## 4. F3.8-F5: Core data model と出力境界
+
+この図は**時系列の処理フローではない**。`F3.8` が生成した `TrackerUpdateResult` を `F4` が dispatch し、`F5` の store、packet、observer へ渡すときのデータモデルと依存境界を示す。
 
 ```mermaid
 flowchart LR
-    Raw["SSL_WrapperPacket"] --> Engine["TrackerEngine"]
-    Engine --> Frame["TrackerFrame"]
+    Result["F3.8 TrackerUpdateResult"]
+    Frames["CommittedFrames 0..N"]
+    Events["EmittedEvents"]
+    Frame["TrackerFrame"]
+    Dispatch["F4 TrackerCoordinator dispatch"]
+
+    Result --> Frames --> Frame --> Dispatch
+    Result --> Events --> Dispatch
 
     Frame --> Ball["TrackedBallState"]
     Frame --> Robot["TrackedRobotState"]
@@ -230,9 +306,10 @@ flowchart LR
     Frame --> Left["BallLeftFieldState"]
     Frame --> Metadata["TrackerFrameMetadata"]
 
-    Frame --> Generator["TrackerPacketGenerator"]
-    Generator --> Official["TrackerWrapperPacket / TrackedFrame"]
-    Frame --> Observer["ITrackerObserver / AutoRef rule"]
+    Dispatch --> Store["F5 TrackedSnapshotStore"]
+    Frame --> Generator["F5 TrackerPacketGenerator"]
+    Generator --> Official["F5 TrackerWrapperPacket / TrackedFrame"]
+    Dispatch --> Observer["F5 ITrackerObserver / AutoRef rule"]
 ```
 
 ### 4.1 時刻と単位
@@ -260,15 +337,19 @@ flowchart LR
 
 ---
 
-## 5. Event publish 順
+## 5. F4: Result dispatch と event publish 順
+
+この章は、全体フローの **`F4. Result dispatch`** を展開する。`F3.8` の結果を受け取り、state transition、committed frame、derived event の順で処理した後、`F5` の出力へ渡す。
 
 ```mermaid
 flowchart LR
-    Transition["1. state transition<br/>ProfileSwitched / GeometryReset"]
-    Frame["2. committed frame<br/>WorldFrameCommitted"]
-    Derived["3. derived event<br/>KickDetected / ContactChanged / BallLeftField"]
+    Result["F3.8 TrackerUpdateResult"]
+    Transition["F4.1 state transition<br/>ProfileSwitched / GeometryReset"]
+    Frame["F4.2 committed frame<br/>WorldFrameCommitted"]
+    Derived["F4.3 derived event<br/>KickDetected / ContactChanged / BallLeftField"]
+    Output["F5 snapshot / packet / observer"]
 
-    Transition --> Frame --> Derived
+    Result --> Transition --> Frame --> Derived --> Output
 ```
 
 同一 phase 内は `TrackerUpdateResult.EmittedEvents` の格納順を正とする。rule や observer は raw packet を直接 subscribe せず、committed `TrackerFrame` と高レベル event を読む。
@@ -286,22 +367,31 @@ flowchart LR
 
 ## 6. Profile 切替フロー
 
-### 6.1 4種類の snapshot / request
+profile 切替は End-to-end 全体フローに直列追加される stage ではない。control flow `C1` として、`F2` の coordinator request 管理、`F3.1` の engine 適用、`F4` の `ProfileSwitched` dispatch、`F5` の host state 更新を横断する。
+
+| control step | 全体フロー上の位置 |
+| --- | --- |
+| `C1.1` desired / pending / in-flight 管理 | `F2` TrackerCoordinator |
+| `C1.2` request を `Update` 先頭で適用 | `F3.1` |
+| `C1.3` `ProfileSwitched` を返して dispatch | `F4` |
+| `C1.4` endpoint / active profile / store を更新 | `F5` |
+
+### 6.1 C1.1: 4種類の snapshot / request
 
 ```mermaid
 flowchart LR
-    Desired["desired target snapshot<br/>最新のユーザー意図"]
-    Pending["pending request<br/>未送信・最大1件"]
-    InFlight["in-flight request<br/>Update 中 immutable"]
-    Applied["applied snapshot<br/>現在適用済み"]
+    Desired["C1.1 desired target snapshot<br/>最新のユーザー意図"]
+    Pending["C1.1 pending request<br/>未送信・最大1件"]
+    InFlight["C1.1 in-flight request<br/>Update 中 immutable"]
+    Applied["C1.4 applied snapshot<br/>現在適用済み"]
 
     Desired -->|"最新要求で置換"| Pending
-    Pending -->|"Update 直前に昇格"| InFlight
-    InFlight -->|"ProfileSwitched"| Applied
+    Pending -->|"F2: Update 直前に昇格"| InFlight
+    InFlight -->|"F4: ProfileSwitched"| Applied
     Applied -->|"差分が残れば再計算"| Pending
 ```
 
-### 6.2 切替 sequence
+### 6.2 C1.1-C1.4: 切替 sequence
 
 ```mermaid
 sequenceDiagram
@@ -313,18 +403,18 @@ sequenceDiagram
     participant P as Publisher
     participant O as Observer
 
-    UI->>C: profile 選択 / override apply
-    C->>C: desired 更新、pending を最新要求で置換
-    C->>C: pending を in-flight へ昇格
-    C->>E: control-only Update(request)
-    E->>E: settings 確定、track / pending / world clear
-    E-->>C: ProfileSwitched
-    C->>P: publish endpoint 切替
-    C->>S: active profile 更新、latest frame clear
-    C->>C: applied 更新、in-flight 解放
-    C->>O: OnProfileSwitched
+    UI->>C: C1.1 / F2 profile 選択・override apply
+    C->>C: C1.1 desired 更新、pending を最新要求で置換
+    C->>C: C1.1 pending を in-flight へ昇格
+    C->>E: C1.2 / F3.1 control-only Update(request)
+    E->>E: C1.2 settings 確定、track / pending / world clear
+    E-->>C: C1.3 / F4 ProfileSwitched
+    C->>P: C1.4 / F5 publish endpoint 切替
+    C->>S: C1.4 / F5 active profile 更新、latest frame clear
+    C->>C: C1.4 applied 更新、in-flight 解放
+    C->>O: C1.4 / F5 OnProfileSwitched
     opt より新しい pending がある
-        C->>E: 次の control-only Update
+        C->>E: C1.2 次の control-only Update
     end
 ```
 
@@ -346,29 +436,32 @@ sequenceDiagram
 
 ## 7. Capture / replay / comparison フロー
 
+この章は End-to-end 全体フローの **`F7`** を展開する。`F7` は `F1` の raw payload と `F6` の official multicast から分岐する。`F7` で保存・比較したデータは `F3` の live tracking state へ入力しない。
+
 ```mermaid
 flowchart LR
-    Vision["SSL-Vision UDP payload"] --> Receiver["DebugHost receiver"]
-    Receiver --> RawCapture["packet capture<br/>jsonl.gz"]
-    Receiver --> Diagnostics["diagnostics / render snapshots"]
-    Receiver --> Core["Core tracking pipeline"]
-    Core --> OwnPacket["ibis official packet"]
-    OwnPacket --> Multicast["official tracker multicast"]
+    Vision["F1 SSL-Vision UDP payload"] --> Receiver["F2 DebugHost receiver"]
+    Receiver --> Core["F3-F5 Core tracking pipeline"]
+    Core --> OwnPacket["F5 ibis official packet"]
+    OwnPacket --> Multicast["F6 official tracker multicast"]
+
+    Receiver --> RawCapture["F7.1 packet capture<br/>jsonl.gz"]
+    Receiver --> Diagnostics["F7.1 diagnostics / render snapshots"]
 
     ThirdParty["3rdparty tracker"] --> Multicast
-    Multicast --> Connection["TrackerConnectionLib"]
-    Connection --> Snapshot["tracker packet snapshot sidecar"]
+    Multicast --> Connection["F7.2 TrackerConnectionLib"]
+    Connection --> Snapshot["F7.2 tracker packet snapshot sidecar"]
 
-    RawCapture --> Session["CaptureOn session folder"]
+    RawCapture --> Session["F7.3 CaptureOn session folder"]
     Diagnostics --> Session
     Snapshot --> Session
-    Session --> Alignment["tracker-snapshot-alignment.jsonl"]
-    Alignment --> Reader["bounded index / replay timeline"]
+    Session --> Alignment["F7.3 tracker-snapshot-alignment.jsonl"]
+    Alignment --> Reader["F7.4 bounded index / replay timeline"]
     Session --> Reader
-    Reader --> UI["Diagnostics UI"]
-    Reader --> CLI["Tracker.CaptureReplay"]
+    Reader --> UI["F7.4 Diagnostics UI"]
+    Reader --> CLI["F7.4 Tracker.CaptureReplay"]
 
-    Connection -->|"Core へは入力しない"| Isolation["comparison-only boundary"]
+    Connection -.-> Isolation["comparison-only<br/>F3 へ入力しない"]
 ```
 
 ### 7.1 Capture boundary の要点
@@ -414,7 +507,7 @@ VisionReceiver
 
 外出しする主要値は receive / publish endpoint、`ReorderWindow`、`MergeWindow`、Kalman process / measurement noise、initial variance、association gate、outlier threshold、track lifetime、visibility、kick / chip / contact threshold、geometry reset threshold、diagnostics / capture path である。
 
-### 8.2 UI
+### 8.2 F5-F6: UI
 
 - raw viewer は `VisionPacketStore` を読む
 - tracked viewer は `TrackedSnapshotStore` を読む
@@ -423,7 +516,7 @@ VisionReceiver
 - frame が clear された直後でも profile UI は操作可能にする
 - UI rendering の周期は tracking operation loop を駆動しない
 
-### 8.3 Rule
+### 8.3 F5-F6: Rule
 
 AutoRef rule は raw packet や camera-local track を直接読まず、committed `TrackerFrame` と高レベル event を読む。rule の追加が tracking core の数値処理へ影響しない境界を保つ。
 
@@ -431,17 +524,17 @@ AutoRef rule は raw packet や camera-local track を直接読まず、committe
 
 ## 9. 詳細仕様との対応
 
-| この文書 | 詳細仕様で確認する章 | 詳細仕様に残る主な情報 |
-| --- | --- | --- |
-| 1. システム全体像 | 目的、対象範囲、対象外、基本方針、構成 | 参考実装の採否、proto 型一覧、構成要素の個別説明 |
-| 2. Live tracking | 契約詳細、`TrackerCoordinator`、データフロー | 0-frame / multi-frame の細則、local state 更新順、receiver adapter 条件 |
-| 3. Engine pipeline | 入出力詳細、multi-camera、アルゴリズム設計 | late packet、geometry generation、robot / ball filter の全要件 |
-| 4. Core model | 内部出力、内部モデル方針、`TrackerPacketGenerator` | state 型の全 field、official proto field、capability、kick 寿命 |
-| 5. Event publish | rule 連携 | observer interface、同一 phase 内の順序、同期 observer 方針 |
-| 6. Profile switch | 設定、設定セット切替 | duplicate 判定、override snapshot、receiver 切替、identity 維持条件 |
-| 7. Capture / replay | tracker packet snapshot 比較ログ、設定 | sidecar record、alignment v2、legacy fallback、timeline / playback 規則 |
-| 8. 設定 / UI / rule | 設定、UI 方針、filter 設定 | 全設定項目、profile 例、UI 操作要件、既定 endpoint |
-| TDD / 実装順 | テスト方針、タスク分割方針、承認ゲート | 最初の失敗テスト候補、TRACKER-000 以降の実装順、完了条件 |
+| この文書 | 全体フロー / 図の種類 | 詳細仕様で確認する章 | 詳細仕様に残る主な情報 |
+| --- | --- | --- | --- |
+| 1. システム全体像 | component context + `F1-F7` master flow | 目的、対象範囲、対象外、基本方針、構成 | 参考実装の採否、proto 型一覧、構成要素の個別説明 |
+| 2. Live tracking | `F1-F6` end-to-end sequence | 契約詳細、`TrackerCoordinator`、データフロー | 0-frame / multi-frame の細則、local state 更新順、receiver adapter 条件 |
+| 3. Engine pipeline | `F3` detail flow | 入出力詳細、multi-camera、アルゴリズム設計 | late packet、geometry generation、robot / ball filter の全要件 |
+| 4. Core model | `F3.8-F5` data boundary。時系列図ではない | 内部出力、内部モデル方針、`TrackerPacketGenerator` | state 型の全 field、official proto field、capability、kick 寿命 |
+| 5. Result dispatch | `F4` detail flow | rule 連携 | observer interface、同一 phase 内の順序、同期 observer 方針 |
+| 6. Profile switch | `C1` control flow。`F2-F5` を横断 | 設定、設定セット切替 | duplicate 判定、override snapshot、receiver 切替、identity 維持条件 |
+| 7. Capture / replay | `F7` side flow。`F1` / `F6` から分岐 | tracker packet snapshot 比較ログ、設定 | sidecar record、alignment v2、legacy fallback、timeline / playback 規則 |
+| 8. 設定 / UI / rule | configuration tree + `F5-F6` boundary | 設定、UI 方針、filter 設定 | 全設定項目、profile 例、UI 操作要件、既定 endpoint |
+| TDD / 実装順 | 詳細仕様のみ | テスト方針、タスク分割方針、承認ゲート | 最初の失敗テスト候補、TRACKER-000 以降の実装順、完了条件 |
 
 図や表から実装判断が一意に決まらない場合は、詳細仕様の記述を優先する。
 
@@ -479,6 +572,8 @@ AutoRef rule は raw packet や camera-local track を直接読まず、committe
 ### Documentation
 
 - [ ] 図で置き換えた条件が詳細仕様から失われていない
+- [ ] 全体フローの `F#` と詳細図の stage 番号が対応している
+- [ ] 時系列図、データ境界図、control flow、side flow の種類を明示している
 - [ ] Core の境界変更はこの文書へ反映した
 - [ ] 例外・設定・保存形式の変更は詳細仕様へ反映した
 - [ ] task / verification / review の履歴は tracking 文書へ同期した
