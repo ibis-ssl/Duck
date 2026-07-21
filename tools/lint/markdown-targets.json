@@ -1,0 +1,17 @@
+{
+  "ignoreDirectories": [
+    ".git",
+    ".codex-dotnet-home",
+    ".codex-nuget-packages",
+    "bin",
+    "node_modules",
+    "obj",
+    "reports"
+  ],
+  "ignoredPrefixes": [
+    "tools/lint/excluded/",
+    "Tracker/Design/Core/Ref/",
+    "SslProto/src/external/ssl-game-controller/",
+    "SslProto/src/external/ssl-simulation-protocol/"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "ibisduck-doc-tooling",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Repository-local Markdown lint and spellcheck tooling for IbisDuck.",
+  "scripts": {
+    "lint:md": "npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist",
+    "lint:md:targets": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js",
+    "lint:md:text": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+    "lint:md:spell": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+    "lint:md:whitelist": "python3 .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+    "lint:md:whitelist:legacy": "node .agents/skills/review-enforcer/scripts/check-markdown-whitelist.js",
+    "lint:md:vocab": "python3 .agents/skills/review-enforcer/scripts/extract-markdown-vocabulary-sudachi.py"
+  },
+  "devDependencies": {
+    "cspell": "^9.2.1",
+    "textlint": "^15.7.0",
+    "textlint-rule-prh": "^6.1.0",
+    "yaml": "^2.9.0"
+  }
+}
