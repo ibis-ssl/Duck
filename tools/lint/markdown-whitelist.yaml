@@ -165,6 +165,8 @@ entries:
   - term: camera-local robot track
     description: 撮影元単位で保持する機体の追跡状態。
   - term: event time
+    aliases:
+      - event-time
     description: 到着順ではなく、観測や検出の時刻として扱う基準時刻。
   - term: replay timeline
     description: 診断再生で選択や移動に使う時系列。
@@ -198,12 +200,14 @@ entries:
     description: 失敗時に利用者へ表示する内容。
   - term: Tracker.DebugHost
     aliases:
+      - DebugHost
       - tracker-debug-host
       - tracker debug host
       - Tracker DebugHost
     description: 診断と比較表示を担当する実行体名。
   - term: Tracker.RuntimeHost
     aliases:
+      - RuntimeHost
       - Tracker RuntimeHost
       - tracker-runtime-host
       - tracker runtime host
@@ -237,6 +241,7 @@ entries:
     description: 実行と開発に使う基盤名。
   - term: Tracker.CaptureReplay
     aliases:
+      - CaptureReplay
       - Tracker CaptureReplay
     description: 記録再生用の実行体名。
   - term: Tracker.Server
@@ -365,6 +370,8 @@ entries:
   - term: トラッカー
     description: 追跡器の一般表記。
   - term: カルマン
+    aliases:
+      - Kalman
     description: 推定方式の一般表記。
   - term: スナップショット
     description: ある時点の状態を後から参照できるよう固定した記録。
@@ -417,3 +424,59 @@ entries:
     description: 分離した実行環境を扱う仕組みの名前。
   - term: Blazor
     description: .NET で画面を構築する仕組みの名前。
+  - term: XML
+    description: 構造化した文書と説明コメントの形式を示す略語。
+  - term: SVG
+    description: 競技場の図を描画する画像形式の略語。
+  - term: DI
+    description: 必要な部品を外部から渡して依存関係を組み立てる手法の略語。
+  - term: LINQ
+    description: .NET で値の集合を検索、抽出、変換する機能の名前。
+  - term: CI
+    description: 変更を継続的に統合し、自動検証する開発手法の略語。
+  - term: OS
+    description: 計算機の基本的な動作と資源を管理する仕組みの略語。
+  - term: NIC
+    description: 計算機を通信網へ接続する装置の略語。
+  - term: URL
+    description: 通信先や文書の場所を示す識別表記の略語。
+  - term: Java
+    description: 参照元の追跡処理で使われている開発言語名。
+  - term: xUnit.net
+    aliases:
+      - xUnit
+    description: .NET の自動テストで使う検証基盤の名前。
+  - term: Protocol Buffers
+    aliases:
+      - protobuf
+    description: 通信内容の構造を定義し、保存や送受信に使う形式と処理基盤の名前。
+  - term: gzip
+    description: 記録の保存と読み戻しで使う圧縮形式名。
+  - term: Web UI
+    description: ブラウザーから操作する画面。処理の実行体とは分けて扱う。
+  - term: SSL
+    description: ロボットサッカーの小型機部門を指す競技区分の略語。暗号化通信の略語とは区別する。
+  - term: README
+    description: 概要や利用方法を説明する案内文書の名称。
+  - term: Duck
+    description: この作業一式の名称。
+  - term: TIGERs Mannheim
+    aliases:
+      - TIGERs
+    description: 追跡処理の参照元となる外部チームの名称。
+  - term: Kalman filter
+    description: "`KalmanAxisState` などの実装に対応する推定方式名。"
+  - term: process noise
+    aliases:
+      - ProcessNoise
+    description: "`ProcessNoise` と `KalmanProcessNoiseScale` に対応する、予測時の不確かさに関する設定語。観測側の設定とは区別する。"
+  - term: measurement noise
+    aliases:
+      - MeasurementNoise
+    description: "`MeasurementNoise` と `MeasurementNoiseVarianceScale` に対応する、観測値の不確かさに関する設定語。予測側の設定とは区別する。"
+  - term: wall-clock
+    description: "`startWallClock` と `currentWallClock` に対応する、実行環境側の時計。記録内の時刻や観測時刻とは区別する。"
+  - term: round-trip
+    description: "`TrackerSnapshotSidecar_RoundTripPayload_RestoresRawTrackerPacketForReplayDecode` に対応する、保存後の読み戻しで元の通信内容を復元する検証語。"
+  - term: tie-break
+    description: "`Generate_WhenSecondaryBallsTieOnVisibilityAndTimestamp_UsesInternalTrackIdAsFinalTieBreaker` に対応する、同条件の球の並び順を内部 ID で決める規則。"
