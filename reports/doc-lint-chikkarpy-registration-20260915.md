@@ -57,7 +57,11 @@
 
 ## 指摘事項
 
-レビュー待ち。
+- 指摘なし。
+- Sol high の追加確認では、commit `aaa479dc0fee6016c934a9255b3b8bfecad25e5a` の 6 ファイルを親 commit `a15fcb30dc38253a0d3090454964816f018921a5` と比較し、承認済みの `ChikkarPy` 項目と説明文がそのまま登録され、他の新規用語や設定緩和がないことを確認した。
+- `Tracker/Design/tasks-status.md` と `tools/lint/README.md` の対象を絞った `textlint` / `cspell` はすべて成功した。stdin の `ChikkarPy` は成功し、未登録の `UnregisteredEnglish` は意図どおり終了コード 1 で拒否された。
+- 許可一覧文書を `--stdin tools/lint/markdown-whitelist.yaml` で検査する経路は、YAML を解析して各 `term`、`aliases`、`description` を検査入力へ展開する。そのため説明文検査の証拠として有効であり、新規説明文由来の未登録語 7 件を記録した本レポートの説明は実行結果と一致する。
+- 全範囲の `cspell` は 20 ファイル中 11 ファイル、1,029 件の既存未登録英語で終了コード 123 になった。既知の全範囲 gate 未達を保持し、公開可能とは判定しない。
 
 ## 結果
 
