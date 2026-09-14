@@ -4,6 +4,22 @@
 
 ## 現在の作業
 
+- ID: `DOC-LINT-003`
+- 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
+- 段階: 文書検査整備
+- 状態: 本文修正と承認済み項目登録を実施、追加確認中。PR #20 公開中。
+- 規模: 小
+- 依存関係: `DOC-LINT-002` と承認済み `Tracked 画面` / `Tracked 表示` の許可一覧変更。
+- 完了条件:
+  - 本文の追跡済み状態の表記を承認済みの Tracked 表示へ直す。
+  - 文書検査手順の一般英語を意味を変えず日本語へ直す。
+  - 対象検査と専用確認の結果を記録し、全範囲検査の未登録語を残課題として区別する。
+- 証跡: `reports/doc-lint-resume-20260915.md`
+- 残課題: 未承認の許可一覧項目と表記揺れ規則は、候補と根拠を提示してから反映する。
+- 追加承認: 利用者が `ChikkarPy` と提示済み説明文の登録を承認した。用語登録専用担当が登録と対象検査を行い、別担当が確認する。
+- 追加証跡: `reports/doc-lint-chikkarpy-registration-20260915.md`
+- 検証: `ChikkarPy` の許可判定と文書検査手順の綴り検査は成功。全範囲の検査は未登録語で失敗しており、公開前の検証は未完了。
+
 - ID: `CAPTURE-REPLAY-001`
 - 題名: Tracker.CaptureReplay に 映像 / `ibis` 自前追跡 遅延分析出力を追加する
 - 段階: PR
@@ -50,7 +66,7 @@
 - ID: `DOC-LINT-001`
 - 題名: 文書検査 / 綴り検査 を導入し、英単語と片仮名語を意味付き 許可一覧で管理する
 - 段階: 文書検査整備
-- 状態: 確認完了、PR 待ち
+- 状態: PR #20 公開中、追加整備は `DOC-LINT-003` で追跡
 - 規模: 小
 - 依存関係: なし
 - 完了条件:
@@ -73,7 +89,7 @@
 - ID: `DOC-LINT-002`
 - 題名: SudachiPy で文書語彙を抽出し、許可一覧検査の日本語解析を形態素単位へ寄せる
 - 段階: 文書検査整備
-- 状態: 確認完了、PR 待ち
+- 状態: PR #20 公開中、追加整備は `DOC-LINT-003` で追跡
 - 規模: 中
 - 依存関係: `DOC-LINT-001` の文書検査対象列挙と許可一覧設定。
 - 完了条件:
@@ -90,7 +106,7 @@
 - 確認証跡:
   - `reports/doc-lint-002-review-20260517104319.md`
   - `reports/doc-lint-002-review-r2-20260517104319.md`
-  - 初回確認で `--stdin` の focused check 互換性に関する阻害指摘があり、修正後の r2 確認で指摘なし。
+  - 初回確認で `--stdin` の対象を絞った検査の互換性に関する阻害指摘があり、修正後の r2 確認で指摘なし。
 
 ## 完了済み作業
 
@@ -136,7 +152,7 @@
   - 確認証跡:
     - `reports/runtime-host-005-review-20260514180308.md`
     - 確認 で 阻害指摘 なし。Tracker.DebugHost 読み取り側 UI 化、診断標本補助記録、Tracker.RuntimeHost 骨組み は `RUNTIME-HOST-006` 以降へ残す。
-- `RUNTIME-HOST-006`: Tracker.DebugHost 実時表示 を 読み取り側 時点記録 境界へ寄せた。`VisionLiveDisplaySnapshotProvider` が 1 描画 時点 で 未加工 / 追跡済み / 外部 自前追跡 時点記録 を固定し、`Home.razor` は 未加工 / 追跡済み 保存 を直接 注入 せず同一 合成 時点記録 から 未加工 / Tracked / 比較 を派生する。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` 更新通知 から 入力包 / 付随情報 を 複製 済み DTO として保持し、描画経路 が 可変管理状態 を直接読まない構造にした。
+- `RUNTIME-HOST-006`: Tracker.DebugHost 実時表示 を 読み取り側 時点記録 境界へ寄せた。`VisionLiveDisplaySnapshotProvider` が 1 描画 時点 で 未加工 / 追跡済み / 外部 自前追跡 時点記録 を固定し、`Home.razor` は 未加工 / 追跡済み 保存 を直接 注入 せず同一 合成 時点記録 から 未加工 / Tracked 表示 / 比較 を派生する。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` 更新通知 から 入力包 / 付随情報 を 複製 済み DTO として保持し、描画経路 が 可変管理状態 を直接読まない構造にした。
   - 実装証跡:
     - `reports/runtime-host-006-boundary-context-20260514181333.md`
     - `reports/runtime-host-006-implementation-20260514182342.md`

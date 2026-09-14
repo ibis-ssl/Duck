@@ -2,6 +2,8 @@ version: "0.2"
 entries:
   - term: SudachiPy
     description: 日本語を形態素に分けるために使う解析器名。
+  - term: ChikkarPy
+    description: 語彙候補を同義語グループにまとめるために使う解析補助ライブラリ名。
   - term: Python
     description: 語彙抽出と形態素検査を実行する処理系名。
   - term: JavaScript
@@ -40,8 +42,10 @@ entries:
     aliases:
       - alignment-record
     description: 保存済み対応表に含まれる 1 件の対応記録。
-  - term: Tracked
-    description: 画面で追跡済み状態を選ぶ表示名。未加工入力とは分けて扱う。
+  - term: Tracked 画面
+    description: 診断画面で追跡済み状態の表示に切り替えた画面または表示文脈。
+  - term: Tracked 表示
+    description: 診断画面で追跡済み状態を表示している状態。UI 表示名そのものの `Tracked` とは分けて扱う。
   - term: Field source
     description: 診断画面の競技場表示で、左右どちらに描く情報を選ぶ項目名。
   - term: Field source selector

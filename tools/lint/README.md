@@ -13,7 +13,7 @@ python3 -m venv .venv
 PIP_NO_BUILD_ISOLATION=1 python3 -m pip install -r tools/lint/requirements.txt
 ```
 
-`ChikkarPy` は現在の `Python` 環境では通常の build isolation 付きインストールに失敗することがあるため、文書検査用環境では `PIP_NO_BUILD_ISOLATION=1` を付ける。`tools/lint/requirements.txt` には、その前提で必要な build helper も含めている。
+`ChikkarPy` は現在の `Python` 環境では構築時の分離を有効にした通常のインストールに失敗することがあるため、文書検査用環境では `PIP_NO_BUILD_ISOLATION=1` を付ける。`tools/lint/requirements.txt` には、その前提で必要な構築用補助パッケージも含めている。
 
 この検査は `.agents/skills/review-enforcer/scripts/` にある共通処理を使う。`.agents/skills` は記録対象には含めず、手元の記号参照として `~/AI/CodexSkill/skills` を指している必要がある。
 
