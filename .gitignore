@@ -482,6 +482,8 @@ $RECYCLE.BIN/
 *.swp
 
 # codex
+# Codex local working files
+/.codex/
 .agents/
 AGENTS.md
 .serena/

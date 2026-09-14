@@ -1,0 +1,1021 @@
+surface	normalized	reading	partOfSpeech	type	count	sources
+確認	確認	カクニン	名詞,普通名詞,サ変可能	japanese	268	Tracker/Design/tasks-status.md:99; Tracker/Design/Archive/Core/tasks-status.md:32; Tracker/Design/Archive/DebugHost/tasks-status.md:31; Tracker/Tracker.DebugHost/README.md:26; Tracker/Design/phases-status.md:19; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:9; tools/lint/README.md:9; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Design/Archive/DebugHost/phases-status.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/Core/tracker-history-000-038.md:5; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Tracker.CaptureReplay/README.md:4; AGENTS.md:3; Tracker/Design/Archive/Core/phases-status.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+表示	表示	ヒョウジ	名詞,普通名詞,サ変可能	japanese	232	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:65; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:38; Tracker/Design/Archive/DebugHost/tasks-status.md:31; Tracker/Design/Core/tracker-architecture-plan.md:31; Tracker/Design/Archive/Core/tasks-status.md:24; Tracker/Tracker.DebugHost/README.md:15; Tracker/Design/Core/tracker-history-000-038.md:13; Tracker/Design/tasks-status.md:5; Tracker/Design/RuntimeHost/runtime-host-plan.md:4; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; README.md:1; Tracker/Design/Archive/Core/phases-status.md:1; tools/lint/README.md:1
+完了	完了	カンリョウ	名詞,普通名詞,サ変可能	japanese	195	Tracker/Design/Archive/Core/tasks-status.md:55; Tracker/Design/Archive/DebugHost/tasks-status.md:51; Tracker/Design/tasks-status.md:30; Tracker/Design/Core/tracker-history-000-038.md:14; Tracker/Design/Core/tracker-architecture-plan.md:13; Tracker/Design/Archive/Core/phases-status.md:9; Tracker/Design/phases-status.md:9; Tracker/Design/Archive/DebugHost/phases-status.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+場合	場合	バアイ	名詞,普通名詞,副詞可能	japanese	190	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:47; Tracker/Tracker.DebugHost/README.md:42; Tracker/Design/Core/tracker-architecture-plan.md:36; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:22; tools/lint/README.md:9; Tracker/Design/Core/tracker-core-engine-detail-design.md:8; AGENTS.md:5; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:5; README.md:4; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Design/tasks-status.md:3; Tracker/Tracker.CaptureReplay/README.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+設定	設定	セッテイ	名詞,普通名詞,サ変可能	japanese	174	Tracker/Design/Core/tracker-architecture-plan.md:64; Tracker/Tracker.DebugHost/README.md:29; Tracker/Design/tasks-status.md:20; Tracker/Design/Core/tracker-history-000-038.md:13; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:11; Tracker/Design/RuntimeHost/runtime-host-plan.md:10; Tracker/Design/Core/tracker-core-engine-detail-design.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; README.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/phases-status.md:2; tools/lint/README.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+記録	記録	キロク	名詞,普通名詞,サ変可能	japanese	169	Tracker/Design/tasks-status.md:61; Tracker/Design/Archive/Core/tasks-status.md:37; Tracker/Design/Core/tracker-history-000-038.md:25; Tracker/Design/Archive/DebugHost/tasks-status.md:9; Tracker/Design/Archive/Core/phases-status.md:6; Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/phases-status.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Tracker.DebugHost/README.md:3; feedback-points/feedback-points.md:3; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; AGENTS.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; tools/lint/README.md:1
+追加	追加	ツイカ	名詞,普通名詞,サ変可能	japanese	145	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:19; Tracker/Design/tasks-status.md:19; Tracker/Design/Core/tracker-history-000-038.md:18; Tracker/Design/Archive/Core/tasks-status.md:17; Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Design/Core/tracker-core-engine-detail-design.md:14; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:11; Tracker/Design/Archive/DebugHost/tasks-status.md:9; Tracker/Design/DebugHost/debug-host-maintainability-design.md:9; tools/lint/README.md:5; Tracker/Design/phases-status.md:4; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; AGENTS.md:1
+保存	保存	ホゾン	名詞,普通名詞,サ変可能	japanese	135	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:42; Tracker/Design/Core/tracker-architecture-plan.md:27; Tracker/Tracker.DebugHost/README.md:18; Tracker/Design/tasks-status.md:12; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:10; Tracker/Design/Archive/DebugHost/tasks-status.md:8; Tracker/Design/Archive/Core/tasks-status.md:6; Tracker/Design/RuntimeHost/runtime-host-plan.md:4; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/phases-status.md:2; Tracker/Tracker.CaptureReplay/README.md:2; README.md:1; Tracker/Design/Archive/Core/phases-status.md:1
+実装	実装	ジッソウ	名詞,普通名詞,サ変可能	japanese	133	Tracker/Design/tasks-status.md:29; Tracker/Design/Core/tracker-architecture-plan.md:24; Tracker/Design/Core/tracker-history-000-038.md:19; Tracker/Design/Archive/DebugHost/tasks-status.md:16; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:15; Tracker/Design/Archive/DebugHost/phases-status.md:5; Tracker/Design/RuntimeHost/runtime-host-plan.md:5; Tracker/Design/Archive/Core/tasks-status.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Tracker.DebugHost/README.md:3; AGENTS.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/phases-status.md:1
+比較	比較	ヒカク	名詞,普通名詞,サ変可能	japanese	130	Tracker/Design/Archive/Core/tasks-status.md:39; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:36; Tracker/Design/Core/tracker-architecture-plan.md:18; Tracker/Tracker.DebugHost/README.md:16; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:8; Tracker/Design/Archive/Core/phases-status.md:3; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+固定	固定	コテイ	名詞,普通名詞,サ変可能	japanese	116	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:32; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:21; Tracker/Design/tasks-status.md:19; Tracker/Design/Core/tracker-architecture-plan.md:13; Tracker/Design/RuntimeHost/runtime-host-plan.md:9; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/phases-status.md:1
+既存	既存	キソン	名詞,普通名詞,サ変可能	japanese	108	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:46; Tracker/Design/Core/tracker-architecture-plan.md:18; Tracker/Design/tasks-status.md:9; Tracker/Tracker.DebugHost/README.md:6; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:5; Tracker/Design/DebugHost/debug-host-maintainability-design.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; tools/lint/README.md:3; AGENTS.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/phases-status.md:1; feedback-points/feedback-points.md:1
+対象	対象	タイショウ	名詞,普通名詞,一般	japanese	102	Tracker/Design/tasks-status.md:33; Tracker/Design/Core/tracker-architecture-plan.md:14; tools/lint/README.md:11; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:9; Tracker/Tracker.DebugHost/README.md:8; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:4; Tracker/Design/phases-status.md:4; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:1
+実行	実行	ジッコウ	名詞,普通名詞,サ変可能	japanese	100	Tracker/Design/tasks-status.md:43; Tracker/Design/RuntimeHost/runtime-host-plan.md:8; tools/lint/README.md:6; Tracker/Design/Archive/DebugHost/tasks-status.md:5; Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:5; Tracker/Design/phases-status.md:5; Tracker/Design/Archive/Core/tasks-status.md:4; Tracker/Tracker.DebugHost/README.md:4; README.md:3; Tracker/Tracker.CaptureReplay/README.md:3; AGENTS.md:2; feedback-points/feedback-points.md:2
+設計	設計	セッケイ	名詞,普通名詞,サ変可能	japanese	99	Tracker/Design/Archive/DebugHost/tasks-status.md:17; Tracker/Design/tasks-status.md:14; Tracker/Design/Core/tracker-architecture-plan.md:13; Tracker/Design/Archive/Core/tasks-status.md:7; Tracker/Design/Archive/DebugHost/phases-status.md:6; Tracker/Design/Core/tracker-core-engine-detail-design.md:6; Tracker/Design/Core/tracker-history-000-038.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; Tracker/Design/phases-status.md:6; Tracker/Design/DebugHost/debug-host-maintainability-design.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; AGENTS.md:1; tools/lint/README.md:1
+状態	状態	ジョウタイ	名詞,普通名詞,一般	japanese	97	Tracker/Design/Core/tracker-architecture-plan.md:29; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:11; Tracker/Design/tasks-status.md:10; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:9; Tracker/Design/Archive/DebugHost/tasks-status.md:6; Tracker/Tracker.DebugHost/README.md:6; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/Archive/DebugHost/phases-status.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/phases-status.md:2; feedback-points/feedback-points.md:2; README.md:1; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; tools/lint/README.md:1
+診断	診断	シンダン	名詞,普通名詞,サ変可能	japanese	94	Tracker/Design/tasks-status.md:43; Tracker/Design/Archive/DebugHost/tasks-status.md:19; Tracker/Design/Archive/Core/tasks-status.md:17; Tracker/Design/phases-status.md:5; Tracker/Design/Archive/DebugHost/phases-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+選択	選択	センタク	名詞,普通名詞,サ変可能	japanese	94	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:46; Tracker/Tracker.DebugHost/README.md:15; Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Design/Archive/Core/tasks-status.md:7; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+検証	検証	ケンショウ	名詞,普通名詞,サ変可能	japanese	91	Tracker/Design/Archive/Core/tasks-status.md:19; Tracker/Design/tasks-status.md:17; Tracker/Design/Core/tracker-history-000-038.md:16; Tracker/Design/Archive/DebugHost/tasks-status.md:10; Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Archive/DebugHost/phases-status.md:3; Tracker/Tracker.CaptureReplay/README.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/phases-status.md:2; tools/lint/README.md:2; README.md:1; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; feedback-points/feedback-points.md:1
+更新	更新	コウシン	名詞,普通名詞,サ変可能	japanese	88	Tracker/Design/Core/tracker-architecture-plan.md:31; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:10; Tracker/Design/tasks-status.md:9; Tracker/Design/Archive/Core/tasks-status.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; tools/lint/README.md:3; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:2; feedback-points/feedback-points.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1
+出力	出力	シュツリョク	名詞,普通名詞,サ変可能	japanese	83	Tracker/Design/Core/tracker-architecture-plan.md:25; Tracker/Tracker.DebugHost/README.md:14; Tracker/Design/Core/tracker-history-000-038.md:8; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Design/tasks-status.md:7; Tracker/Design/Core/tracker-core-engine-detail-design.md:6; Tracker/Tracker.CaptureReplay/README.md:5; Tracker/Design/Archive/Core/tasks-status.md:3; tools/lint/README.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/phases-status.md:1
+維持	維持	イジ	名詞,普通名詞,サ変可能	japanese	77	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:27; Tracker/Design/Core/tracker-core-engine-detail-design.md:13; Tracker/Design/Core/tracker-architecture-plan.md:11; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:7; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Archive/Core/tasks-status.md:4; Tracker/Design/tasks-status.md:4; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+起動	起動	キドウ	名詞,普通名詞,サ変可能	japanese	77	Tracker/Tracker.DebugHost/README.md:23; Tracker/Design/tasks-status.md:17; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:10; Tracker/Design/Core/tracker-architecture-plan.md:7; README.md:6; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/RuntimeHost/runtime-host-plan.md:4; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1
+契約	契約	ケイヤク	名詞,普通名詞,サ変可能	japanese	76	Tracker/Design/Core/tracker-architecture-plan.md:17; Tracker/Design/tasks-status.md:17; Tracker/Design/Core/tracker-history-000-038.md:12; Tracker/Design/Archive/DebugHost/tasks-status.md:8; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/DebugHost/debug-host-maintainability-design.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/phases-status.md:2; README.md:1
+追跡	追跡	ツイセキ	名詞,普通名詞,サ変可能	japanese	75	Tracker/Design/tasks-status.md:36; Tracker/Design/Core/tracker-architecture-plan.md:18; Tracker/Design/Archive/Core/tasks-status.md:13; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/phases-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+変更	変更	ヘンコウ	名詞,普通名詞,サ変可能	japanese	73	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:18; Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:11; Tracker/Design/Core/tracker-core-engine-detail-design.md:9; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Tracker.DebugHost/README.md:3; tools/lint/README.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+描画	描画	ビョウガ	名詞,普通名詞,サ変可能	japanese	71	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:22; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:15; Tracker/Design/tasks-status.md:12; Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Tracker.DebugHost/README.md:7; Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2
+文書	文書	ブンショ	名詞,普通名詞,一般	japanese	70	Tracker/Design/tasks-status.md:21; tools/lint/README.md:21; Tracker/Design/phases-status.md:10; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:5; Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; feedback-points/feedback-points.md:1
+証跡	証跡	ショウセキ	名詞,普通名詞,一般	japanese	67	Tracker/Design/tasks-status.md:42; Tracker/Design/Core/tracker-history-000-038.md:6; Tracker/Design/Archive/Core/tasks-status.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/phases-status.md:3; Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; AGENTS.md:1; README.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+対応	対応	タイオウ	名詞,普通名詞,サ変可能	japanese	67	Tracker/Design/Core/tracker-architecture-plan.md:24; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:21; Tracker/Tracker.DebugHost/README.md:9; feedback-points/feedback-points.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+保持	保持	ホジ	名詞,普通名詞,サ変可能	japanese	65	Tracker/Design/Core/tracker-architecture-plan.md:28; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:19; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:8; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+入力	入力	ニュウリョク	名詞,普通名詞,サ変可能	japanese	64	Tracker/Design/Core/tracker-architecture-plan.md:25; Tracker/Design/tasks-status.md:15; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+分離	分離	ブンリ	名詞,普通名詞,サ変可能	japanese	64	Tracker/Design/tasks-status.md:17; Tracker/Design/Core/tracker-architecture-plan.md:13; Tracker/Design/Core/tracker-core-engine-detail-design.md:9; Tracker/Design/Archive/DebugHost/tasks-status.md:7; Tracker/Design/DebugHost/debug-host-maintainability-design.md:4; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/phases-status.md:1
+参照	参照	サンショウ	名詞,普通名詞,サ変可能	japanese	63	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:15; Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Design/tasks-status.md:9; Tracker/Design/Core/tracker-core-engine-detail-design.md:7; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; AGENTS.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; tools/lint/README.md:2; README.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+失敗	失敗	シッパイ	名詞,普通名詞,サ変可能	japanese	62	Tracker/Design/tasks-status.md:33; Tracker/Tracker.DebugHost/README.md:7; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/phases-status.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; tools/lint/README.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+分割	分割	ブンカツ	名詞,普通名詞,サ変可能	japanese	61	Tracker/Design/Core/tracker-core-engine-detail-design.md:16; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:14; Tracker/Design/Core/tracker-history-000-038.md:10; Tracker/Design/Archive/DebugHost/tasks-status.md:7; Tracker/Design/DebugHost/debug-host-maintainability-design.md:7; Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2
+境界	境界	キョウカイ	名詞,普通名詞,一般	japanese	59	Tracker/Design/tasks-status.md:21; Tracker/Design/Core/tracker-architecture-plan.md:10; Tracker/Design/RuntimeHost/runtime-host-plan.md:7; Tracker/Design/Archive/DebugHost/tasks-status.md:6; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/phases-status.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+作業	作業	サギョウ	名詞,普通名詞,サ変可能	japanese	59	AGENTS.md:16; Tracker/Design/Archive/DebugHost/tasks-status.md:8; Tracker/Design/tasks-status.md:8; Tracker/Design/Archive/Core/tasks-status.md:7; tools/lint/README.md:5; Tracker/Design/Archive/Core/phases-status.md:4; Tracker/Design/phases-status.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; feedback-points/feedback-points.md:1
+責務	責務	セキム	名詞,普通名詞,一般	japanese	59	Tracker/Design/Core/tracker-architecture-plan.md:12; Tracker/Design/Core/tracker-core-engine-detail-design.md:11; Tracker/Design/DebugHost/debug-host-maintainability-design.md:8; Tracker/Design/tasks-status.md:7; Tracker/Design/Core/tracker-history-000-038.md:6; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/phases-status.md:1
+最新	最新	サイシン	名詞,普通名詞,一般	japanese	58	Tracker/Design/Core/tracker-architecture-plan.md:19; Tracker/Design/tasks-status.md:15; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:14; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+処理	処理	ショリ	名詞,普通名詞,サ変可能	japanese	57	Tracker/Design/Core/tracker-architecture-plan.md:29; Tracker/Design/Archive/DebugHost/tasks-status.md:6; Tracker/Design/RuntimeHost/runtime-host-plan.md:4; Tracker/Design/tasks-status.md:3; Tracker/Tracker.DebugHost/README.md:3; tools/lint/README.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; AGENTS.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+切替	切り替え	キリカエ	名詞,普通名詞,一般	japanese	56	Tracker/Design/Core/tracker-architecture-plan.md:36; Tracker/Design/Core/tracker-history-000-038.md:8; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+再生	再生	サイセイ	名詞,普通名詞,サ変可能	japanese	55	Tracker/Design/Archive/Core/tasks-status.md:16; Tracker/Design/tasks-status.md:12; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:9; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/phases-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+経路	経路	ケイロ	名詞,普通名詞,一般	japanese	54	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:18; Tracker/Design/tasks-status.md:13; Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1; feedback-points/feedback-points.md:1
+統合	統合	トウゴウ	名詞,普通名詞,サ変可能	japanese	54	Tracker/Design/Core/tracker-architecture-plan.md:27; Tracker/Design/tasks-status.md:10; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+受信	受信	ジュシン	名詞,普通名詞,サ変可能	japanese	53	Tracker/Tracker.DebugHost/README.md:16; Tracker/Design/Core/tracker-architecture-plan.md:12; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:8; Tracker/Design/RuntimeHost/runtime-host-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Archive/Core/tasks-status.md:3; README.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+明示	明示	メイジ	名詞,普通名詞,サ変可能	japanese	53	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:15; tools/lint/README.md:9; Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Tracker.DebugHost/README.md:8; Tracker/Design/tasks-status.md:5; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; AGENTS.md:1; README.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1; feedback-points/feedback-points.md:1
+コメント	コメント	コメント	名詞,普通名詞,サ変可能	katakana	51	Tracker/Design/Core/tracker-core-engine-detail-design.md:14; Tracker/Design/Core/tracker-history-000-038.md:14; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:14; Tracker/Design/DebugHost/debug-host-maintainability-design.md:8; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+速度	速度	ソクド	名詞,普通名詞,一般	japanese	50	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:17; Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Tracker.DebugHost/README.md:7; Tracker/Design/Archive/Core/tasks-status.md:6; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+一覧	一覧	イチラン	名詞,普通名詞,サ変可能	japanese	48	Tracker/Design/tasks-status.md:18; tools/lint/README.md:10; Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/phases-status.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+観測	観測	カンソク	名詞,普通名詞,サ変可能	japanese	48	Tracker/Design/Core/tracker-architecture-plan.md:28; Tracker/Tracker.DebugHost/README.md:12; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+優先	優先	ユウセン	名詞,普通名詞,サ変可能	japanese	48	Tracker/Design/Core/tracker-architecture-plan.md:11; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:10; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:7; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/tasks-status.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+候補	候補	コウホ	名詞,普通名詞,一般	japanese	47	Tracker/Design/Core/tracker-architecture-plan.md:26; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; tools/lint/README.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Tracker.DebugHost/README.md:2
+画面	画面	ガメン	名詞,普通名詞,一般	japanese	46	Tracker/Design/tasks-status.md:16; Tracker/Design/Archive/DebugHost/tasks-status.md:7; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; Tracker/Design/phases-status.md:4; Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; tools/lint/README.md:1
+構築	構築	コウチク	名詞,普通名詞,サ変可能	japanese	46	Tracker/Design/tasks-status.md:17; Tracker/Design/Archive/DebugHost/tasks-status.md:12; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/phases-status.md:4; tools/lint/README.md:3; Tracker/Tracker.DebugHost/README.md:2; AGENTS.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1
+時点	時点	ジテン	名詞,普通名詞,一般	japanese	46	Tracker/Design/tasks-status.md:30; Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+成功	成功	セイコウ	名詞,普通名詞,サ変可能	japanese	46	Tracker/Design/tasks-status.md:33; Tracker/Design/phases-status.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+単位	単位	タンイ	名詞,普通名詞,一般	japanese	46	Tracker/Design/Core/tracker-architecture-plan.md:15; Tracker/Design/Core/tracker-core-engine-detail-design.md:10; Tracker/Tracker.DebugHost/README.md:6; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/tasks-status.md:2; AGENTS.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; feedback-points/feedback-points.md:1
+方針	方針	ホウシン	名詞,普通名詞,一般	japanese	46	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:12; Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Design/Archive/DebugHost/tasks-status.md:5; Tracker/Design/RuntimeHost/runtime-host-plan.md:4; Tracker/Design/tasks-status.md:4; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; tools/lint/README.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+依存	依存	イゾン	名詞,普通名詞,サ変可能	japanese	45	Tracker/Design/tasks-status.md:18; Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/RuntimeHost/runtime-host-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; tools/lint/README.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+指摘	指摘	シテキ	名詞,普通名詞,サ変可能	japanese	45	Tracker/Design/tasks-status.md:26; Tracker/Design/phases-status.md:11; feedback-points/feedback-points.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+複数	複数	フクスウ	名詞,普通名詞,一般	japanese	45	Tracker/Design/Core/tracker-architecture-plan.md:18; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Tracker.DebugHost/README.md:7; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+現在	現在	ゲンザイ	名詞,普通名詞,副詞可能	japanese	44	Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:9; Tracker/Tracker.DebugHost/README.md:5; feedback-points/feedback-points.md:3; Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/phases-status.md:2; README.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+通常	通常	ツウジョウ	名詞,普通名詞,副詞可能	japanese	44	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Tracker.DebugHost/README.md:7; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; tools/lint/README.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/tasks-status.md:2; AGENTS.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Tracker.CaptureReplay/README.md:1; feedback-points/feedback-points.md:1
+周期	周期	シュウキ	名詞,普通名詞,一般	japanese	40	Tracker/Design/Archive/DebugHost/tasks-status.md:11; Tracker/Design/tasks-status.md:9; Tracker/Design/RuntimeHost/runtime-host-plan.md:6; Tracker/Design/Archive/DebugHost/phases-status.md:4; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/phases-status.md:1
+修正	修正	シュウセイ	名詞,普通名詞,サ変可能	japanese	40	Tracker/Design/tasks-status.md:13; Tracker/Design/Archive/Core/tasks-status.md:11; Tracker/Design/Core/tracker-history-000-038.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/phases-status.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; feedback-points/feedback-points.md:1
+管理	管理	カンリ	名詞,普通名詞,サ変可能	japanese	39	Tracker/Design/tasks-status.md:15; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/phases-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; tools/lint/README.md:1
+規則	規則	キソク	名詞,普通名詞,一般	japanese	39	Tracker/Design/Core/tracker-architecture-plan.md:19; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; tools/lint/README.md:4; Tracker/Design/tasks-status.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/phases-status.md:1; feedback-points/feedback-points.md:1
+時刻	時刻	ジコク	名詞,普通名詞,副詞可能	japanese	39	Tracker/Design/Core/tracker-architecture-plan.md:17; Tracker/Design/Archive/DebugHost/tasks-status.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Tracker.CaptureReplay/README.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/tasks-status.md:1
+同期	同期	ドウキ	名詞,普通名詞,サ変可能	japanese	39	Tracker/Design/Archive/DebugHost/tasks-status.md:13; Tracker/Design/tasks-status.md:9; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+許可	許可	キョカ	名詞,普通名詞,サ変可能	japanese	38	tools/lint/README.md:15; Tracker/Design/tasks-status.md:14; Tracker/Design/phases-status.md:4; Tracker/Design/Core/tracker-architecture-plan.md:2; feedback-points/feedback-points.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+試験	試験	シケン	名詞,普通名詞,サ変可能	japanese	37	Tracker/Design/tasks-status.md:17; Tracker/Design/Archive/DebugHost/tasks-status.md:14; Tracker/Design/phases-status.md:4; Tracker/Design/Archive/Core/tasks-status.md:2
+進捗	進捗	シンチョク	名詞,普通名詞,サ変可能	japanese	37	Tracker/Design/tasks-status.md:13; Tracker/Design/Archive/DebugHost/tasks-status.md:11; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/phases-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+調査	調査	チョウサ	名詞,普通名詞,サ変可能	japanese	37	Tracker/Design/Core/tracker-architecture-plan.md:12; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/tasks-status.md:2; Tracker/Tracker.DebugHost/README.md:2; AGENTS.md:1; README.md:1; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.CaptureReplay/README.md:1; tools/lint/README.md:1
+判定	判定	ハンテイ	名詞,普通名詞,サ変可能	japanese	36	Tracker/Design/Core/tracker-architecture-plan.md:22; Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+ログ	ログ	ログ	名詞,普通名詞,一般	katakana	36	Tracker/Tracker.DebugHost/README.md:13; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:11; Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2
+位置	位置	イチ	名詞,普通名詞,サ変可能	japanese	35	Tracker/Design/Core/tracker-architecture-plan.md:24; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+意味	意味	イミ	名詞,普通名詞,サ変可能	japanese	35	Tracker/Tracker.DebugHost/README.md:13; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/tasks-status.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; tools/lint/README.md:2
+解決	解決	カイケツ	名詞,普通名詞,サ変可能	japanese	35	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:11; Tracker/Tracker.DebugHost/README.md:11; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+作成	作成	サクセイ	名詞,普通名詞,サ変可能	japanese	35	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:8; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Design/Core/tracker-history-000-038.md:5; Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/Core/tracker-architecture-plan.md:3; AGENTS.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1; feedback-points/feedback-points.md:1
+自前	自前	ジマエ	名詞,普通名詞,一般	japanese	35	Tracker/Design/tasks-status.md:33; Tracker/Design/phases-status.md:2
+条件	条件	ジョウケン	名詞,普通名詞,一般	japanese	35	Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Design/tasks-status.md:5; Tracker/Design/Archive/Core/tasks-status.md:4; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.CaptureReplay/README.md:1; tools/lint/README.md:1
+必要	必要	ヒツヨウ	名詞,普通名詞,形状詞可能	japanese	35	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:11; Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Tracker.DebugHost/README.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; tools/lint/README.md:3; AGENTS.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/tasks-status.md:1
+形式	形式	ケイシキ	名詞,普通名詞,一般	japanese	34	Tracker/Design/tasks-status.md:12; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/phases-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1; tools/lint/README.md:1
+指定	指定	シテイ	名詞,普通名詞,サ変可能	japanese	34	Tracker/Design/tasks-status.md:9; Tracker/Tracker.DebugHost/README.md:9; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/phases-status.md:2; tools/lint/README.md:2; README.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+ファイル	ファイル	ファイル	名詞,普通名詞,サ変可能	katakana	33	Tracker/Design/Core/tracker-history-000-038.md:10; Tracker/Design/Core/tracker-core-engine-detail-design.md:8; Tracker/Design/DebugHost/debug-host-maintainability-design.md:5; Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2
+既定	既定	キテイ	名詞,普通名詞,一般	japanese	32	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:18; Tracker/Tracker.DebugHost/README.md:8; README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1; tools/lint/README.md:1
+順序	順序	ジュンジョ	名詞,普通名詞,一般	japanese	32	Tracker/Design/Core/tracker-core-engine-detail-design.md:12; Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:6; Tracker/Design/DebugHost/debug-host-maintainability-design.md:5; Tracker/Tracker.DebugHost/README.md:1
+生成	生成	セイセイ	名詞,普通名詞,サ変可能	japanese	32	Tracker/Design/Core/tracker-architecture-plan.md:12; Tracker/Design/tasks-status.md:5; Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; README.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; tools/lint/README.md:1
+開始	開始	カイシ	名詞,普通名詞,サ変可能	japanese	31	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:20; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1
+全体	全体	ゼンタイ	名詞,普通名詞,一般	japanese	31	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/tasks-status.md:2; Tracker/Tracker.DebugHost/README.md:2; tools/lint/README.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/phases-status.md:1
+日本語	日本語	ニホンゴ	名詞,普通名詞,一般	japanese	31	Tracker/Design/Core/tracker-history-000-038.md:9; Tracker/Design/Core/tracker-core-engine-detail-design.md:6; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:6; Tracker/Design/DebugHost/debug-host-maintainability-design.md:4; Tracker/Design/tasks-status.md:3; tools/lint/README.md:2; Tracker/Design/phases-status.md:1
+範囲	範囲	ハンイ	名詞,普通名詞,一般	japanese	31	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:10; Tracker/Design/tasks-status.md:8; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/phases-status.md:2; AGENTS.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+変換	変換	ヘンカン	名詞,普通名詞,サ変可能	japanese	31	Tracker/Design/Core/tracker-architecture-plan.md:11; Tracker/Design/Core/tracker-core-engine-detail-design.md:10; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+検査	検査	ケンサ	名詞,普通名詞,サ変可能	japanese	30	Tracker/Design/tasks-status.md:14; tools/lint/README.md:10; Tracker/Design/phases-status.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+詳細	詳細	ショウサイ	名詞,普通名詞,形状詞可能	japanese	30	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:3; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/tasks-status.md:2; README.md:1; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+専用	専用	センヨウ	名詞,普通名詞,サ変可能	japanese	30	Tracker/Design/tasks-status.md:8; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Design/Core/tracker-architecture-plan.md:4; tools/lint/README.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/phases-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+阻害	阻害	ソガイ	名詞,普通名詞,サ変可能	japanese	30	Tracker/Design/tasks-status.md:24; Tracker/Design/phases-status.md:6
+存在	存在	ソンザイ	名詞,普通名詞,サ変可能	japanese	30	Tracker/Design/Core/tracker-history-000-038.md:10; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/tasks-status.md:2; AGENTS.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+内部	内部	ナイブ	名詞,普通名詞,一般	japanese	30	Tracker/Design/Core/tracker-architecture-plan.md:21; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; tools/lint/README.md:1
+基準	基準	キジュン	名詞,普通名詞,一般	japanese	29	Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+相当	相当	ソウトウ	名詞,普通名詞,サ変可能	japanese	29	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:13; Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+任意	任意	ニンイ	名詞,普通名詞,一般	japanese	29	Tracker/Tracker.DebugHost/README.md:11; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:9; Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+標本	標本	ヒョウホン	名詞,普通名詞,一般	japanese	29	Tracker/Design/tasks-status.md:22; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/phases-status.md:3; Tracker/Design/Archive/DebugHost/phases-status.md:1
+要求	要求	ヨウキュウ	名詞,普通名詞,サ変可能	japanese	29	Tracker/Design/Core/tracker-architecture-plan.md:18; Tracker/Design/Core/tracker-history-000-038.md:6; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+左右	左右	サユウ	名詞,普通名詞,サ変可能	japanese	28	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:18; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/Core/tasks-status.md:2
+外部	外部	ガイブ	名詞,普通名詞,一般	japanese	27	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Tracker.DebugHost/README.md:4; tools/lint/README.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/Core/tasks-status.md:1
+正常	正常	セイジョウ	名詞,普通名詞,形状詞可能	japanese	27	Tracker/Design/tasks-status.md:15; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/phases-status.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+移動	移動	イドウ	名詞,普通名詞,サ変可能	japanese	26	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:10; Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+結果	結果	ケッカ	名詞,普通名詞,副詞可能	japanese	26	Tracker/Design/Core/tracker-architecture-plan.md:10; Tracker/Design/Core/tracker-history-000-038.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+内容	内容	ナイヨウ	名詞,普通名詞,一般	japanese	26	Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; AGENTS.md:2; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; feedback-points/feedback-points.md:1
+配下	配下	ハイカ	名詞,普通名詞,一般	japanese	26	Tracker/Tracker.DebugHost/README.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; AGENTS.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/tasks-status.md:1
+反映	反映	ハンエイ	名詞,普通名詞,サ変可能	japanese	26	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-history-000-038.md:5; feedback-points/feedback-points.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+挙動	挙動	キョドウ	名詞,普通名詞,一般	japanese	25	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Design/Core/tracker-core-engine-detail-design.md:7; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+互換	互換	ゴカン	名詞,普通名詞,一般	japanese	25	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/RuntimeHost/runtime-host-plan.md:4; Tracker/Design/tasks-status.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; README.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+最終	最終	サイシュウ	名詞,普通名詞,一般	japanese	25	Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Design/tasks-status.md:7; Tracker/Design/Core/tracker-history-000-038.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; feedback-points/feedback-points.md:1
+将来	将来	ショウライ	名詞,普通名詞,副詞可能	japanese	25	Tracker/Design/RuntimeHost/runtime-host-plan.md:8; Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/tasks-status.md:5; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/phases-status.md:1
+周回	周回	シュウカイ	名詞,普通名詞,サ変可能	japanese	24	Tracker/Design/tasks-status.md:22; Tracker/Design/phases-status.md:2
+セット	セット	セット	名詞,普通名詞,サ変可能	katakana	24	Tracker/Design/Core/tracker-architecture-plan.md:24
+上書き	上書き	ウワガキ	名詞,普通名詞,一般	japanese	23	Tracker/Tracker.DebugHost/README.md:9; Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Tracker.CaptureReplay/README.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+情報	情報	ジョウホウ	名詞,普通名詞,一般	japanese	23	Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/tasks-status.md:2; Tracker/Tracker.DebugHost/README.md:2; tools/lint/README.md:1
+接続	接続	セツゾク	名詞,普通名詞,サ変可能	japanese	23	Tracker/Design/Archive/Core/tasks-status.md:10; Tracker/Design/Archive/DebugHost/tasks-status.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; README.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+復元	復元	フクゲン	名詞,普通名詞,サ変可能	japanese	23	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/tasks-status.md:3; AGENTS.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+確定	確定	カクテイ	名詞,普通名詞,サ変可能	japanese	22	Tracker/Design/Core/tracker-architecture-plan.md:14; Tracker/Design/tasks-status.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; tools/lint/README.md:1
+前提	前提	ゼンテイ	名詞,普通名詞,一般	japanese	22	Tracker/Design/Core/tracker-architecture-plan.md:10; AGENTS.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; README.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+配置	配置	ハイチ	名詞,普通名詞,サ変可能	japanese	22	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+補助	補助	ホジョ	名詞,普通名詞,サ変可能	japanese	22	Tracker/Design/tasks-status.md:17; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+手順	手順	テジュン	名詞,普通名詞,一般	japanese	21	AGENTS.md:10; feedback-points/feedback-points.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+テスト	テスト	テスト	名詞,普通名詞,サ変可能	katakana	21	Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Design/Core/tracker-history-000-038.md:7; README.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+領域	領域	リョウイキ	名詞,普通名詞,一般	japanese	21	AGENTS.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/tasks-status.md:2; README.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; tools/lint/README.md:1
+利用者	利用者	リヨウシャ	名詞,普通名詞,一般	japanese	21	Tracker/Design/tasks-status.md:7; tools/lint/README.md:5; feedback-points/feedback-points.md:4; AGENTS.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/phases-status.md:1
+追従	追従	ツイジュウ	名詞,普通名詞,サ変可能	japanese	20	Tracker/Tracker.DebugHost/README.md:6; Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+配信	配信	ハイシン	名詞,普通名詞,サ変可能	japanese	20	Tracker/Design/Core/tracker-architecture-plan.md:16; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Tracker.DebugHost/README.md:1
+報告	報告	ホウコク	名詞,普通名詞,サ変可能	japanese	20	Tracker/Design/tasks-status.md:12; Tracker/Design/Archive/DebugHost/tasks-status.md:5; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/Core/phases-status.md:1
+下書き	下書き	シタガキ	名詞,普通名詞,サ変可能	japanese	19	Tracker/Design/tasks-status.md:15; Tracker/Design/phases-status.md:3; Tracker/Design/Archive/Core/tasks-status.md:1
+重複	重複	チョウフク	名詞,普通名詞,サ変可能	japanese	19	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; AGENTS.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; feedback-points/feedback-points.md:1
+計画	計画	ケイカク	名詞,普通名詞,サ変可能	japanese	18	Tracker/Design/tasks-status.md:15; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1
+差分	差分	サブン	名詞,普通名詞,一般	japanese	18	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+上限	上限	ジョウゲン	名詞,普通名詞,一般	japanese	18	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/tasks-status.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+除外	除外	ジョガイ	名詞,普通名詞,サ変可能	japanese	18	Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/tasks-status.md:3; tools/lint/README.md:3
+送信	送信	ソウシン	名詞,普通名詞,サ変可能	japanese	18	Tracker/Design/tasks-status.md:8; Tracker/Tracker.DebugHost/README.md:8; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+抽出	抽出	チュウシュツ	名詞,普通名詞,サ変可能	japanese	18	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:6; Tracker/Design/tasks-status.md:6; tools/lint/README.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/phases-status.md:1
+抑制	抑制	ヨクセイ	名詞,普通名詞,サ変可能	japanese	18	Tracker/Design/Core/tracker-history-000-038.md:10; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+履歴	履歴	リレキ	名詞,普通名詞,一般	japanese	18	Tracker/Design/Core/tracker-history-000-038.md:5; Tracker/Design/tasks-status.md:5; Tracker/Design/Archive/Core/phases-status.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+改善	改善	カイゼン	名詞,普通名詞,サ変可能	japanese	17	Tracker/Design/Core/tracker-history-000-038.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+近傍	近傍	キンボウ	名詞,普通名詞,一般	japanese	17	Tracker/Design/Core/tracker-architecture-plan.md:10; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2
+構成	構成	コウセイ	名詞,普通名詞,サ変可能	japanese	17	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/tasks-status.md:5; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; README.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+保守性	保守性	ホシュセイ	名詞,普通名詞,一般	japanese	17	Tracker/Design/Core/tracker-history-000-038.md:8; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+加工	加工	カコウ	名詞,普通名詞,サ変可能	japanese	16	Tracker/Design/tasks-status.md:11; Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/phases-status.md:1
+工程	工程	コウテイ	名詞,普通名詞,一般	japanese	16	Tracker/Design/Archive/Core/phases-status.md:6; Tracker/Design/Archive/DebugHost/phases-status.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/Archive/Core/tasks-status.md:2
+項目	項目	コウモク	名詞,普通名詞,一般	japanese	16	Tracker/Design/Archive/Core/tasks-status.md:4; Tracker/Design/tasks-status.md:3; tools/lint/README.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; feedback-points/feedback-points.md:1
+コンポーネント	コンポーネント	コンポーネント	名詞,普通名詞,一般	katakana	16	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:16
+再利用	再利用	サイリヨウ	名詞,普通名詞,一般	japanese	16	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/tasks-status.md:3; AGENTS.md:2; README.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+説明	説明	セツメイ	名詞,普通名詞,サ変可能	japanese	16	Tracker/Design/DebugHost/debug-host-maintainability-design.md:3; Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; tools/lint/README.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/phases-status.md:1
+停止	停止	テイシ	名詞,普通名詞,サ変可能	japanese	16	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:2
+編集	編集	ヘンシュウ	名詞,普通名詞,サ変可能	japanese	16	Tracker/Design/tasks-status.md:5; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; feedback-points/feedback-points.md:2; tools/lint/README.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+本体	本体	ホンタイ	名詞,普通名詞,一般	japanese	16	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+向き	向き	ムキ	名詞,普通名詞,一般	japanese	16	Tracker/Design/Core/tracker-architecture-plan.md:10; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:1
+要件	要件	ヨウケン	名詞,普通名詞,一般	japanese	16	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/tasks-status.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/phases-status.md:1
+公開	公開	コウカイ	名詞,普通名詞,サ変可能	japanese	15	Tracker/Design/tasks-status.md:6; Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+自動	自動	ジドウ	名詞,普通名詞,一般	japanese	15	Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Tracker.CaptureReplay/README.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+先頭	先頭	セントウ	名詞,普通名詞,一般	japanese	15	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+操作	操作	ソウサ	名詞,普通名詞,サ変可能	japanese	15	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+担当	担当	タントウ	名詞,普通名詞,サ変可能	japanese	15	Tracker/Design/RuntimeHost/runtime-host-plan.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+直前	直前	チョクゼン	名詞,普通名詞,副詞可能	japanese	15	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+以上	以上	イジョウ	名詞,普通名詞,副詞可能	japanese	14	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+関連	関連	カンレン	名詞,普通名詞,サ変可能	japanese	14	Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; feedback-points/feedback-points.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; AGENTS.md:1; README.md:1; Tracker/Tracker.DebugHost/README.md:1
+競技場	競技場	キョウギジョウ	名詞,普通名詞,一般	japanese	14	Tracker/Design/Archive/DebugHost/tasks-status.md:7; Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+許容	許容	キョヨウ	名詞,普通名詞,サ変可能	japanese	14	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+係数	係数	ケイスウ	名詞,普通名詞,一般	japanese	14	Tracker/Tracker.DebugHost/README.md:13; Tracker/Design/Core/tracker-architecture-plan.md:1
+検出	検出	ケンシュツ	名詞,普通名詞,サ変可能	japanese	14	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/tasks-status.md:3; tools/lint/README.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+後続	後続	コウゾク	名詞,普通名詞,一般	japanese	14	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; feedback-points/feedback-points.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+採用	採用	サイヨウ	名詞,普通名詞,サ変可能	japanese	14	Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+縮退	縮退	シュクタイ	名詞,普通名詞,サ変可能	japanese	14	Tracker/Design/tasks-status.md:11; Tracker/Design/phases-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+初期	初期	ショキ	名詞,普通名詞,一般	japanese	14	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+従来	従来	ジュウライ	名詞,普通名詞,副詞可能	japanese	14	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Core/tracker-architecture-plan.md:2; tools/lint/README.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+準備	準備	ジュンビ	名詞,普通名詞,サ変可能	japanese	14	Tracker/Design/Archive/DebugHost/tasks-status.md:6; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+対象外	対象外	タイショウガイ	名詞,普通名詞,一般	japanese	14	tools/lint/README.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+段階	段階	ダンカイ	名詞,普通名詞,一般	japanese	14	Tracker/Design/phases-status.md:5; Tracker/Design/tasks-status.md:5; Tracker/Design/Core/tracker-architecture-plan.md:4
+外れ値	外れ値	ハズレチ	名詞,普通名詞,一般	japanese	14	Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Tracker.DebugHost/README.md:2
+倍率	倍率	バイリツ	名詞,普通名詞,一般	japanese	14	Tracker/Design/Archive/Core/tasks-status.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2
+扱い	扱い	アツカイ	名詞,普通名詞,一般	japanese	13	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+以下	以下	イカ	名詞,普通名詞,一般	japanese	13	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/tasks-status.md:2; AGENTS.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+監視	監視	カンシ	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Tracker.DebugHost/README.md:6
+機能	機能	キノウ	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; README.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1; feedback-points/feedback-points.md:1; tools/lint/README.md:1
+計算	計算	ケイサン	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+初回	初回	ショカイ	名詞,普通名詞,一般	japanese	13	Tracker/Design/tasks-status.md:8; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+推定	推定	スイテイ	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/Core/tracker-architecture-plan.md:11; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+代表	代表	ダイヒョウ	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+適用	適用	テキヨウ	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/Core/tracker-architecture-plan.md:9; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+同時	同時	ドウジ	名詞,普通名詞,一般	japanese	13	Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+独立	独立	ドクリツ	名詞,普通名詞,サ変形状詞可能	japanese	13	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Core/tracker-architecture-plan.md:2
+倍速	倍速	バイソク	名詞,普通名詞,一般	japanese	13	Tracker/Design/Archive/Core/tasks-status.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Tracker.DebugHost/README.md:1
+由来	由来	ユライ	名詞,普通名詞,サ変可能	japanese	13	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+安定	安定	アンテイ	名詞,普通名詞,サ変形状詞可能	japanese	12	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Tracker.DebugHost/README.md:1
+関係	関係	カンケイ	名詞,普通名詞,サ変可能	japanese	12	Tracker/Design/tasks-status.md:5; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+継続	継続	ケイゾク	名詞,普通名詞,サ変可能	japanese	12	Tracker/Design/Core/tracker-core-engine-detail-design.md:6; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+欠落	欠落	ケツラク	名詞,普通名詞,サ変可能	japanese	12	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/tasks-status.md:2; Tracker/Tracker.DebugHost/README.md:1
+構造	構造	コウゾウ	名詞,普通名詞,一般	japanese	12	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/tasks-status.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; tools/lint/README.md:1
+最小	最小	サイショウ	名詞,普通名詞,一般	japanese	12	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:7; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+最低限	最低限	サイテイゲン	名詞,普通名詞,一般	japanese	12	Tracker/Design/Core/tracker-architecture-plan.md:11; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+手動	手動	シュドウ	名詞,普通名詞,一般	japanese	12	Tracker/Design/tasks-status.md:4; Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1
+時間	時間	ジカン	名詞,普通名詞,助数詞可能	japanese	12	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2
+先行	先行	センコウ	名詞,普通名詞,サ変可能	japanese	12	Tracker/Design/tasks-status.md:11; Tracker/Design/phases-status.md:1
+単体テスト	単体テスト	タンタイテスト	名詞,普通名詞,一般	japanese	12	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:12
+遅延	遅延	チエン	名詞,普通名詞,サ変可能	japanese	12	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/tasks-status.md:3; Tracker/Design/phases-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+通知	通知	ツウチ	名詞,普通名詞,サ変可能	japanese	12	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+表記	表記	ヒョウキ	名詞,普通名詞,サ変可能	japanese	12	tools/lint/README.md:8; Tracker/Design/tasks-status.md:3; Tracker/Design/phases-status.md:1
+標準	標準	ヒョウジュン	名詞,普通名詞,一般	japanese	12	Tracker/Design/Core/tracker-history-000-038.md:6; tools/lint/README.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+ユーザー	ユーザー	ユーザー	名詞,普通名詞,一般	katakana	12	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+両方	両方	リョウホウ	名詞,普通名詞,一般	japanese	12	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; tools/lint/README.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+以降	以降	イコウ	名詞,普通名詞,副詞可能	japanese	11	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+委譲	委譲	イジョウ	名詞,普通名詞,サ変可能	japanese	11	feedback-points/feedback-points.md:8; tools/lint/README.md:2; Tracker/Design/Core/tracker-history-000-038.md:1
+一致	一致	イッチ	名詞,普通名詞,サ変可能	japanese	11	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+重ね合わせ	重ね合わせ	カサネアワセ	名詞,普通名詞,一般	japanese	11	Tracker/Design/Archive/DebugHost/tasks-status.md:6; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Archive/Core/tasks-status.md:2
+既定値	既定値	キテイチ	名詞,普通名詞,一般	japanese	11	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1
+高速	高速	コウソク	名詞,普通名詞,形状詞可能	japanese	11	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/tasks-status.md:3; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+固有	固有	コユウ	名詞,普通名詞,形状詞可能	japanese	11	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; tools/lint/README.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+仕様	仕様	シヨウ	名詞,普通名詞,一般	japanese	11	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+辞書	辞書	ジショ	名詞,普通名詞,一般	japanese	11	tools/lint/README.md:7; Tracker/Design/tasks-status.md:3; Tracker/Design/phases-status.md:1
+数値	数値	スウチ	名詞,普通名詞,一般	japanese	11	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+設計書	設計書	セッケイショ	名詞,普通名詞,一般	japanese	11	Tracker/Design/Core/tracker-history-000-038.md:7; Tracker/Design/Core/tracker-architecture-plan.md:4
+タスク	タスク	タスク	名詞,普通名詞,一般	katakana	11	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+揺れ	揺れ	ユレ	名詞,普通名詞,一般	japanese	11	Tracker/Tracker.DebugHost/README.md:3; tools/lint/README.md:3; Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/phases-status.md:1
+意図	意図	イト	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+片仮名	片仮名	カタカナ	名詞,普通名詞,一般	japanese	10	tools/lint/README.md:5; Tracker/Design/tasks-status.md:4; Tracker/Design/phases-status.md:1
+可変	可変	カヘン	名詞,普通名詞,一般	japanese	10	Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+外出	外出	ガイシュツ	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/Core/tracker-architecture-plan.md:8; Tracker/Design/Core/tracker-history-000-038.md:2
+共有	共有	キョウユウ	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:5; Tracker/Design/tasks-status.md:4; Tracker/Design/phases-status.md:1
+現状	現状	ゲンジョウ	名詞,普通名詞,一般	japanese	10	Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-history-000-038.md:1
+再読込	再読込	サイヨミコミ	名詞,普通名詞,一般	japanese	10	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:8; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+取得	取得	シュトク	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+資料	資料	シリョウ	名詞,普通名詞,一般	japanese	10	Tracker/Design/tasks-status.md:6; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/phases-status.md:1
+付け	付け	ツケ	名詞,普通名詞,一般	japanese	10	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Archive/Core/tasks-status.md:1
+定義	定義	テイギ	名詞,普通名詞,サ変可能	japanese	10	Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/Core/tracker-history-000-038.md:2; AGENTS.md:1; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+提出	提出	テイシュツ	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/tasks-status.md:8; Tracker/Design/phases-status.md:2
+登録	登録	トウロク	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/tasks-status.md:6; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; tools/lint/README.md:1
+早送り	早送り	ハヤオクリ	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+判断	判断	ハンダン	名詞,普通名詞,サ変可能	japanese	10	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/tasks-status.md:2; feedback-points/feedback-points.md:2; AGENTS.md:1; Tracker/Tracker.DebugHost/README.md:1
+必須	必須	ヒッス	名詞,普通名詞,形状詞可能	japanese	10	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:6; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+頻度	頻度	ヒンド	名詞,普通名詞,一般	japanese	10	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+レビュー	レビュー	レビュー	名詞,普通名詞,サ変可能	katakana	10	Tracker/Design/Core/tracker-history-000-038.md:7; README.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+運用	運用	ウンヨウ	名詞,普通名詞,サ変可能	japanese	9	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+英単語	英単語	エイタンゴ	名詞,普通名詞,一般	japanese	9	Tracker/Design/tasks-status.md:4; tools/lint/README.md:4; Tracker/Design/phases-status.md:1
+欠測	欠測	ケッソク	名詞,普通名詞,一般	japanese	9	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-history-000-038.md:2
+削除	削除	サクジョ	名詞,普通名詞,サ変可能	japanese	9	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; tools/lint/README.md:1
+瞬間	瞬間	シュンカン	名詞,普通名詞,副詞可能	japanese	9	Tracker/Design/Archive/DebugHost/tasks-status.md:6; Tracker/Design/Archive/Core/tasks-status.md:3
+自体	自体	ジタイ	名詞,普通名詞,一般	japanese	9	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+性能	性能	セイノウ	名詞,普通名詞,一般	japanese	9	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1
+調整	調整	チョウセイ	名詞,普通名詞,サ変可能	japanese	9	Tracker/Design/tasks-status.md:6; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+名前	名前	ナマエ	名詞,普通名詞,一般	japanese	9	Tracker/Design/tasks-status.md:5; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+品質	品質	ヒンシツ	名詞,普通名詞,一般	japanese	9	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+目的	目的	モクテキ	名詞,普通名詞,一般	japanese	9	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+問題	問題	モンダイ	名詞,普通名詞,一般	japanese	9	Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+予測	予測	ヨソク	名詞,普通名詞,サ変可能	japanese	9	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/Core/tracker-core-engine-detail-design.md:3
+映像	映像	エイゾウ	名詞,普通名詞,一般	japanese	8	Tracker/Design/tasks-status.md:4; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/phases-status.md:1
+遠方	遠方	エンポウ	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-core-engine-detail-design.md:4; Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+角速度	角速度	カクソクド	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-history-000-038.md:1
+箇所	箇所	カショ	名詞,普通名詞,助数詞可能	japanese	8	Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+考え方	考え方	カンガエカタ	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+観点	観点	カンテン	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+基本	基本	キホン	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+共通	共通	キョウツウ	名詞,普通名詞,サ変形状詞可能	japanese	8	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; tools/lint/README.md:1
+距離	距離	キョリ	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Tracker.DebugHost/README.md:4
+原因	原因	ゲンイン	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Core/tracker-history-000-038.md:5; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+限定	限定	ゲンテイ	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+識別	識別	シキベツ	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1
+指示	指示	シジ	名詞,普通名詞,サ変可能	japanese	8	feedback-points/feedback-points.md:7; AGENTS.md:1
+正本	正本	ショウホン	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/phases-status.md:2; tools/lint/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1
+実際	実際	ジッサイ	名詞,普通名詞,副詞可能	japanese	8	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Tracker.CaptureReplay/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+成長	成長	セイチョウ	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:6; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+整理	整理	セイリ	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; feedback-points/feedback-points.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+接触	接触	セッショク	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:8
+中間	中間	チュウカン	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Tracker.DebugHost/README.md:2
+直近	直近	チョッキン	名詞,普通名詞,一般	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1; feedback-points/feedback-points.md:1
+追記	追記	ツイキ	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Tracker.DebugHost/README.md:1; feedback-points/feedback-points.md:1
+通信	通信	ツウシン	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Archive/Core/tasks-status.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; tools/lint/README.md:1
+データ	データ	データ	名詞,普通名詞,一般	katakana	8	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Tracker.DebugHost/README.md:1
+通り	通り	トオリ	名詞,普通名詞,助数詞可能	japanese	8	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+表現	表現	ヒョウゲン	名詞,普通名詞,サ変可能	japanese	8	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/tasks-status.md:2
+モデル	モデル	モデル	名詞,普通名詞,一般	katakana	8	Tracker/Design/Core/tracker-architecture-plan.md:7; Tracker/Design/Core/tracker-history-000-038.md:1
+一時	一時	イチジ	名詞,普通名詞,副詞可能	japanese	7	AGENTS.md:1; README.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1; tools/lint/README.md:1
+一式	一式	イッシキ	名詞,普通名詞,一般	japanese	7	tools/lint/README.md:5; AGENTS.md:2
+委任	委任	イニン	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/tasks-status.md:7
+有無	有無	ウム	名詞,普通名詞,一般	japanese	7	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+影響	影響	エイキョウ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/tasks-status.md:2; AGENTS.md:1; README.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+書き込み	書き込み	カキコミ	名詞,普通名詞,一般	japanese	7	Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; AGENTS.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+拡張	拡張	カクチョウ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/tasks-status.md:1
+型名	型名	カタメイ	名詞,普通名詞,一般	japanese	7	Tracker/Design/Core/tracker-core-engine-detail-design.md:5; Tracker/Design/DebugHost/debug-host-maintainability-design.md:2
+該当	該当	ガイトウ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:4; AGENTS.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+現行	現行	ゲンコウ	名詞,普通名詞,一般	japanese	7	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1
+語彙	語彙	ゴイ	名詞,普通名詞,一般	japanese	7	Tracker/Design/tasks-status.md:5; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+再現	再現	サイゲン	名詞,普通名詞,サ変可能	japanese	7	Tracker/Tracker.DebugHost/README.md:4; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+最上位	最上位	サイジョウイ	名詞,普通名詞,一般	japanese	7	tools/lint/README.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+時系列	時系列	ジケイレツ	名詞,普通名詞,一般	japanese	7	Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+実行時	実行時	ジッコウジ	名詞,普通名詞,一般	japanese	7	Tracker/Design/tasks-status.md:5; Tracker/Design/Core/tracker-architecture-plan.md:2
+制御	制御	セイギョ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+送信先	送信先	ソウシンサキ	名詞,普通名詞,一般	japanese	7	Tracker/Tracker.DebugHost/README.md:7
+探索	探索	タンサク	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+着手	着手	チャクシュ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/Archive/DebugHost/phases-status.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+取り込み	取り込み	トリコミ	名詞,普通名詞,一般	japanese	7	Tracker/Design/tasks-status.md:4; tools/lint/README.md:3
+同居	同居	ドウキョ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:4; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+破棄	破棄	ハキ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Tracker.DebugHost/README.md:1
+引数	引数	ヒキスウ	名詞,普通名詞,一般	japanese	7	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:2; Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+変化	変化	ヘンカ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Tracker.DebugHost/README.md:5; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+骨組み	骨組み	ホネグミ	名詞,普通名詞,一般	japanese	7	Tracker/Design/tasks-status.md:6; Tracker/Design/phases-status.md:1
+傍受	傍受	ボウジュ	名詞,普通名詞,サ変可能	japanese	7	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3
+未指定	未指定	ミシテイ	名詞,普通名詞,一般	japanese	7	Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; README.md:1; Tracker/Design/tasks-status.md:1
+見出し	見出し	ミダシ	名詞,普通名詞,一般	japanese	7	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1; feedback-points/feedback-points.md:1
+以前	以前	イゼン	名詞,普通名詞,副詞可能	japanese	6	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:6
+環境	環境	カンキョウ	名詞,普通名詞,一般	japanese	6	Tracker/Tracker.DebugHost/README.md:4; AGENTS.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+規模	規模	キボ	名詞,普通名詞,一般	japanese	6	Tracker/Design/tasks-status.md:4; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+脚注	脚注	キャクチュウ	名詞,普通名詞,一般	japanese	6	tools/lint/README.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+近接	近接	キンセツ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Tracker.DebugHost/README.md:1
+駆動	駆動	クドウ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+経過	経過	ケイカ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:2
+系列	系列	ケイレツ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+決定的	決定的	ケッテイテキ	名詞,普通名詞,形状詞可能	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/Core/tracker-history-000-038.md:1
+公式	公式	コウシキ	名詞,普通名詞,形状詞可能	japanese	6	Tracker/Design/tasks-status.md:6
+個別	個別	コベツ	名詞,普通名詞,形状詞可能	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:5; tools/lint/README.md:1
+今回	今回	コンカイ	名詞,普通名詞,副詞可能	japanese	6	Tracker/Design/RuntimeHost/runtime-host-plan.md:2; AGENTS.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/tasks-status.md:1
+最初	最初	サイショ	名詞,普通名詞,副詞可能	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+座標	座標	ザヒョウ	名詞,普通名詞,一般	japanese	6	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:5; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+閾値	閾値	シキイチ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+集計	集計	シュウケイ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+収集	収集	シュウシュウ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; tools/lint/README.md:2; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+省略	省略	ショウリャク	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+上記	上記	ジョウキ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+状況	状況	ジョウキョウ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/phases-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/tasks-status.md:1
+スキップ	スキップ	スキップ	名詞,普通名詞,サ変可能	katakana	6	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Tracker.DebugHost/README.md:1
+寸法	寸法	スンポウ	名詞,普通名詞,一般	japanese	6	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+接触者	接触者	セッショクシャ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:6
+線形	線形	センケイ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-history-000-038.md:3
+選択肢	選択肢	センタクシ	名詞,普通名詞,一般	japanese	6	Tracker/Design/tasks-status.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+退避	退避	タイヒ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/Archive/Core/phases-status.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+直後	直後	チョクゴ	名詞,普通名詞,副詞可能	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:5; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+低速	低速	テイソク	名詞,普通名詞,一般	japanese	6	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+到達	到達	トウタツ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+同名	同名	ドウメイ	名詞,普通名詞,一般	japanese	6	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+内包	内包	ナイホウ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+フェーズ	フェーズ	フェーズ	名詞,普通名詞,一般	katakana	6	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-history-000-038.md:3
+不足	不足	フソク	名詞,普通名詞,サ変形状詞可能	japanese	6	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; AGENTS.md:1; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+方向	方向	ホウコウ	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3
+保留	保留	ホリュウ	名詞,普通名詞,サ変可能	japanese	6	Tracker/Design/tasks-status.md:5; Tracker/Design/Archive/Core/phases-status.md:1
+本番	本番	ホンバン	名詞,普通名詞,一般	japanese	6	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/phases-status.md:1
+リスク	リスク	リスク	名詞,普通名詞,一般	katakana	6	Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+アルゴリズム	アルゴリズム	アルゴリズム	名詞,普通名詞,一般	katakana	5	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+以外	以外	イガイ	名詞,普通名詞,副詞可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; feedback-points/feedback-points.md:1
+一時的	一時的	イチジテキ	名詞,普通名詞,形状詞可能	japanese	5	Tracker/Tracker.DebugHost/README.md:5
+色分け	色分け	イロワケ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5
+解析	解析	カイセキ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+空間	空間	クウカン	名詞,普通名詞,一般	japanese	5	Tracker/Design/tasks-status.md:5
+区切り	区切り	クギリ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; tools/lint/README.md:1
+区別	区別	クベツ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+軽量化	軽量化	ケイリョウカ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+減衰	減衰	ゲンスイ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.DebugHost/README.md:2
+周辺	周辺	シュウヘン	名詞,普通名詞,一般	japanese	5	Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; README.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+衝突	衝突	ショウトツ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2
+承認	承認	ショウニン	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+時刻系	時刻系	ジコクケイ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1
+実効	実効	ジッコウ	名詞,普通名詞,一般	japanese	5	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:5
+推奨	推奨	スイショウ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+成立	成立	セイリツ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+全般	全般	ゼンパン	名詞,普通名詞,一般	japanese	5	Tracker/Design/tasks-status.md:3; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+想定	想定	ソウテイ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Tracker.DebugHost/README.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+束縛	束縛	ソクバク	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/Core/tracker-architecture-plan.md:2
+増加	増加	ゾウカ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:5
+対応表	対応表	タイオウヒョウ	名詞,普通名詞,一般	japanese	5	Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+退出	退出	タイシュツ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+高さ	高さ	タカサ	名詞,普通名詞,一般	japanese	5	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+短時間	短時間	タンジカン	名詞,普通名詞,副詞可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/tasks-status.md:1
+追補	追補	ツイホ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Archive/DebugHost/tasks-status.md:4; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+使い方	使い方	ツカイカタ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-history-000-038.md:3; AGENTS.md:1; Tracker/Tracker.DebugHost/README.md:1
+手元	手元	テモト	名詞,普通名詞,一般	japanese	5	Tracker/Tracker.DebugHost/README.md:2; tools/lint/README.md:2; Tracker/Design/tasks-status.md:1
+点検	点検	テンケン	名詞,普通名詞,サ変可能	japanese	5	tools/lint/README.md:3; feedback-points/feedback-points.md:2
+投影	投影	トウエイ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+投入	投入	トウニュウ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+内外	内外	ナイガイ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:5
+派生	派生	ハセイ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+破損	破損	ハソン	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2
+汎用	汎用	ハンヨウ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/phases-status.md:1
+付近	付近	フキン	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-history-000-038.md:4; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+報告書	報告書	ホウコクショ	名詞,普通名詞,一般	japanese	5	feedback-points/feedback-points.md:3; tools/lint/README.md:2
+ボタン	ボタン	ボタン	名詞,普通名詞,一般	katakana	5	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:4; Tracker/Tracker.DebugHost/README.md:1
+命名	命名	メイメイ	名詞,普通名詞,サ変可能	japanese	5	Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+用途	用途	ヨウト	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+呼び出し	呼び出し	ヨビダシ	名詞,普通名詞,一般	japanese	5	Tracker/Design/Core/tracker-architecture-plan.md:4; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+理由	理由	リユウ	名詞,普通名詞,一般	japanese	5	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1; tools/lint/README.md:1
+宛先	宛て先	アテサキ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+案内	案内	アンナイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Archive/DebugHost/tasks-status.md:4
+育成	育成	イクセイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:4
+以後	以後	イゴ	名詞,普通名詞,副詞可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+一時保存	一時保存	イチジホゾン	名詞,普通名詞,一般	japanese	4	AGENTS.md:3; tools/lint/README.md:1
+意図的	意図的	イトテキ	名詞,普通名詞,形状詞可能	japanese	4	Tracker/Design/tasks-status.md:2; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+永続化	永続化	エイゾクカ	名詞,普通名詞,一般	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+回数	回数	カイスウ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; feedback-points/feedback-points.md:1
+改名	改名	カイメイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/tasks-status.md:3; Tracker/Design/phases-status.md:1
+可能性	可能性	カノウセイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+可否	可否	カヒ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+概要	概要	ガイヨウ	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:4
+期待	期待	キタイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1; tools/lint/README.md:1
+基盤	基盤	キバン	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:2
+組み立て	組み立て	クミタテ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+形態素	形態素	ケイタイソ	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:2; Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+決定	決定	ケッテイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+公開中	公開中	コウカイチュウ	名詞,普通名詞,一般	japanese	4	Tracker/Design/phases-status.md:2; Tracker/Design/tasks-status.md:2
+小刻み	小刻み	コキザミ	名詞,普通名詞,形状詞可能	japanese	4	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+コスト	コスト	コスト	名詞,普通名詞,一般	katakana	4	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+根拠	根拠	コンキョ	名詞,普通名詞,一般	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; feedback-points/feedback-points.md:1
+混在	混在	コンザイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; tools/lint/README.md:1
+互換性	互換性	ゴカンセイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1
+最大	最大	サイダイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.CaptureReplay/README.md:1
+再読	再読	サイドク	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+実時	実時	サネトキ	名詞,固有名詞,人名,名	japanese	4	Tracker/Design/tasks-status.md:4
+識別子	識別子	シキベツシ	名詞,普通名詞,一般	japanese	4	tools/lint/README.md:2; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; feedback-points/feedback-points.md:1
+集約	集約	シュウヤク	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+瞬間移動	瞬間移動	シュンカンイドウ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+昇格	昇格	ショウカク	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2
+初期値	初期値	ショキチ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Tracker.DebugHost/README.md:1
+所有	所有	ショユウ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/tasks-status.md:4
+進行中	進行中	シンコウチュウ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Archive/DebugHost/tasks-status.md:3; Tracker/Design/Archive/DebugHost/phases-status.md:1
+振動	振動	シンドウ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-history-000-038.md:4
+自身	自身	ジシン	名詞,普通名詞,副詞可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+スクロール	スクロール	スクロール	名詞,普通名詞,サ変可能	katakana	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+正規	正規	セイキ	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:2; tools/lint/README.md:2
+正規化	正規化	セイキカ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+精度	精度	セイド	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+選定	選定	センテイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:2
+相対	相対	ソウタイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+短命	短命	タンメイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-history-000-038.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+題名	題名	ダイメイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:4
+逐次	逐次	チクジ	名詞,普通名詞,副詞可能	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+程度	程度	テイド	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+適合	適合	テキゴウ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/tasks-status.md:4
+同値	同値	ドウチ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+導入	導入	ドウニュウ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/tasks-status.md:2; Tracker/Design/phases-status.md:1; Tracker/Tracker.DebugHost/README.md:1
+残り	残り	ノコリ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/phases-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/phases-status.md:1
+破壊的	破壊的	ハカイテキ	名詞,普通名詞,形状詞可能	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+半径	半径	ハンケイ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:4
+非対応	非対応	ヒタイオウ	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:4
+負荷	負荷	フカ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+複雑	複雑	フクザツ	名詞,普通名詞,形状詞可能	japanese	4	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+不具合	不具合	フグアイ	名詞,普通名詞,形状詞可能	japanese	4	Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+不正	不正	フセイ	名詞,普通名詞,形状詞可能	japanese	4	Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+不変	不変	フヘン	名詞,普通名詞,一般	japanese	4	Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+付与	付与	フヨ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+分類	分類	ブンルイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; feedback-points/feedback-points.md:1
+ベース	ベース	ベース	名詞,普通名詞,一般	katakana	4	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+補正	補正	ホセイ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+間引き	間引き	マビキ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+明記	明記	メイキ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+メタ	メタ	メタ	名詞,普通名詞,一般	katakana	4	Tracker/Design/Core/tracker-architecture-plan.md:4
+文言	文言	モンゴン	名詞,普通名詞,一般	japanese	4	feedback-points/feedback-points.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/tasks-status.md:1
+役割	役割	ヤクワリ	名詞,普通名詞,一般	japanese	4	Tracker/Design/Core/tracker-architecture-plan.md:3; AGENTS.md:1
+ラベル	ラベル	ラベル	名詞,普通名詞,一般	katakana	4	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3; Tracker/Design/Core/tracker-architecture-plan.md:1
+利用	利用	リヨウ	名詞,普通名詞,サ変可能	japanese	4	Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.CaptureReplay/README.md:1
+列挙	列挙	レッキョ	名詞,普通名詞,サ変可能	japanese	4	tools/lint/README.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1
+閾値	閾値	イキチ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+一度	一度	イチド	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+一部	一部	イチブ	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+一定	一定	イッテイ	名詞,普通名詞,サ変形状詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+引用符	引用符	インヨウフ	名詞,普通名詞,一般	japanese	3	tools/lint/README.md:3
+英語	英語	エイゴ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; tools/lint/README.md:1
+英字	英字	エイジ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+置き場	置き場	オキバ	名詞,普通名詞,一般	japanese	3	tools/lint/README.md:3
+折り畳み	折り畳み	オリタタミ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+回帰	回帰	カイキ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1
+解消	解消	カイショウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Archive/Core/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+カウンタ	カウンター	カウンタ	名詞,普通名詞,一般	katakana	3	Tracker/Tracker.DebugHost/README.md:3
+角度	角度	カクド	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1
+過去	過去	カコ	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+可視化	可視化	カシカ	名詞,普通名詞,一般	japanese	3	README.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+過剰	過剰	カジョウ	名詞,普通名詞,形状詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+課題	課題	カダイ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:3
+記号	記号	キゴウ	名詞,普通名詞,一般	japanese	3	AGENTS.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; tools/lint/README.md:1
+既知	既知	キチ	名詞,普通名詞,一般	japanese	3	Tracker/Design/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+局所	局所	キョクショ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/debug-host-maintainability-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+行数	行数	ギョウスウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+具体的	具体的	グタイテキ	名詞,普通名詞,形状詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+形状	形状	ケイジョウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+系統	系統	ケイトウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+結合	結合	ケツゴウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+現時点	現時点	ゲンジテン	名詞,普通名詞,一般	japanese	3	tools/lint/README.md:2; Tracker/Design/tasks-status.md:1
+原則	原則	ゲンソク	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+降順	降順	コウジュン	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-core-engine-detail-design.md:2; Tracker/Design/tasks-status.md:1
+個数	個数	コスウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3
+再構成	再構成	サイコウセイ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1
+最後	最後	サイゴ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+最終的	最終的	サイシュウテキ	名詞,普通名詞,形状詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+最優先	最優先	サイユウセン	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+撮影	撮影	サツエイ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:3
+参考	参考	サンコウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+写像	写像	シャゾウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3
+種別	種別	シュベツ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+昇順	昇順	ショウジュン	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+消費	消費	ショウヒ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+初期化	初期化	ショキカ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+初版	初版	ショハン	名詞,普通名詞,一般	japanese	3	Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+信用	信用	シンヨウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Tracker.DebugHost/README.md:3
+次回	次回	ジカイ	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1; feedback-points/feedback-points.md:1
+事後	事後	ジゴ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+事前	事前	ジゼン	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Tracker.DebugHost/README.md:1; feedback-points/feedback-points.md:1
+受信器	受信器	ジュシンキ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/Core/tasks-status.md:1
+寿命	寿命	ジュミョウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/Core/tracker-history-000-038.md:1
+準拠	準拠	ジュンキョ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-history-000-038.md:3
+スコープ	スコープ	スコープ	名詞,普通名詞,一般	katakana	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+制限	制限	セイゲン	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:1
+整合	整合	セイゴウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+整備	整備	セイビ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/tasks-status.md:2; Tracker/Design/phases-status.md:1
+世代	世代	セダイ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+遷移	遷移	センイ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+送信元	送信元	ソウシンモト	名詞,普通名詞,一般	japanese	3	Tracker/Tracker.DebugHost/README.md:2; README.md:1
+その後	その後	ソノアト	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+ソースコード	ソースコード	ソースコード	名詞,普通名詞,一般	katakana	3	Tracker/Design/tasks-status.md:3
+対照	対照	タイショウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Tracker.CaptureReplay/README.md:2; Tracker/Design/tasks-status.md:1
+タイミング	タイミング	タイミング	名詞,普通名詞,一般	katakana	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+単調	単調	タンチョウ	名詞,普通名詞,形状詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+着信	着信	チャクシン	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Tracker.DebugHost/README.md:1
+注意点	注意点	チュウイテン	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+中心	中心	チュウシン	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; README.md:1
+長時間	長時間	チョウジカン	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+直接	直接	チョクセツ	名詞,普通名詞,サ変形状詞可能	japanese	3	Tracker/Design/tasks-status.md:2; feedback-points/feedback-points.md:1
+提供	提供	テイキョウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+手書き	手書き	テガキ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+統一	統一	トウイツ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+当時	当時	トウジ	名詞,普通名詞,副詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+等速	等速	トウソク	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+特定	特定	トクテイ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+動作	動作	ドウサ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+ドラッグ	ドラッグ	ドラッグ	名詞,普通名詞,一般	katakana	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+判別	判別	ハンベツ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:2; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+比例	比例	ヒレイ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Tracker.DebugHost/README.md:1
+微調整	微調整	ビチョウセイ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+フォルダ	フォルダー	フォルダ	名詞,普通名詞,一般	katakana	3	Tracker/Design/Core/tracker-history-000-038.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+不採用	不採用	フサイヨウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3
+ブラウザ	ブラウザ	ブラウザ	名詞,普通名詞,一般	katakana	3	Tracker/Tracker.DebugHost/README.md:3
+分岐	分岐	ブンキ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3
+分散	分散	ブンサン	名詞,普通名詞,サ変可能	japanese	3	Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+文章	文章	ブンショウ	名詞,普通名詞,一般	japanese	3	tools/lint/README.md:2; Tracker/Design/tasks-status.md:1
+方法	方法	ホウホウ	名詞,普通名詞,一般	japanese	3	Tracker/Tracker.DebugHost/README.md:2; Tracker/Design/tasks-status.md:1
+保管	保管	ホカン	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/tasks-status.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+保護	保護	ホゴ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+保証	保証	ホショウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+本文	本文	ホンブン	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; feedback-points/feedback-points.md:1
+前処理	前処理	マエショリ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+末尾	末尾	マツビ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+右側	右側	ミギガワ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2; Tracker/Tracker.DebugHost/README.md:1
+見た目	見た目	ミタメ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Core/tracker-architecture-plan.md:1
+無理	無理	ムリ	名詞,普通名詞,形状詞可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+名詞	名詞	メイシ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/DebugHost/tasks-status.md:2; Tracker/Design/Archive/DebugHost/phases-status.md:1
+命令	命令	メイレイ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+面積	面積	メンセキ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:3
+目標	目標	モクヒョウ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+文字列	文字列	モジレツ	名詞,普通名詞,一般	japanese	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; tools/lint/README.md:1
+漏れ	漏れ	モレ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+モード	モード	モード	名詞,普通名詞,一般	katakana	3	Tracker/Tracker.DebugHost/README.md:3
+読み取り	読み取り	ヨミトリ	名詞,普通名詞,一般	japanese	3	Tracker/Design/Archive/Core/tasks-status.md:2; feedback-points/feedback-points.md:1
+流用	流用	リュウヨウ	名詞,普通名詞,サ変可能	japanese	3	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+ルール	ルール	ルール	名詞,普通名詞,一般	katakana	3	Tracker/Design/Core/tracker-architecture-plan.md:3
+レポート	レポート	レポート	名詞,普通名詞,サ変可能	katakana	3	Tracker/Design/Core/tracker-history-000-038.md:2; README.md:1
+圧縮	圧縮	アッシュク	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+安定化	安定化	アンテイカ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+安定性	安定性	アンテイセイ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+一切	一切	イッサイ	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+一般	一般	イッパン	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; tools/lint/README.md:1
+入れ子	入れ子	イレコ	名詞,普通名詞,一般	japanese	2	feedback-points/feedback-points.md:2
+受付	受け付け	ウケツケ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+動き	動き	ウゴキ	名詞,普通名詞,一般	japanese	2	Tracker/Tracker.DebugHost/README.md:2
+内側	内側	ウチガワ	名詞,普通名詞,一般	japanese	2	AGENTS.md:2
+運動	運動	ウンドウ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+エンジン	エンジン	エンジン	名詞,普通名詞,一般	katakana	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+横断	横断	オウダン	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+多く	多く	オオク	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2
+オブジェクト	オブジェクト	オブジェクト	名詞,普通名詞,一般	katakana	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+重み	重み	オモミ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+開始時刻	開始時刻	カイシジコク	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+開発	開発	カイハツ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Tracker.DebugHost/README.md:1
+限り	限り	カギリ	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+確保	確保	カクホ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+隔離	隔離	カクリ	名詞,普通名詞,サ変可能	japanese	2	AGENTS.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+片方	片方	カタホウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+下部	下部	カブ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+代わり	代わり	カワリ	名詞,普通名詞,一般	japanese	2	Tracker/Tracker.CaptureReplay/README.md:1; Tracker/Tracker.DebugHost/README.md:1
+間隔	間隔	カンカク	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+環境構築	環境構築	カンキョウコウチク	名詞,普通名詞,一般	japanese	2	Tracker/Design/tasks-status.md:2
+慣習	慣習	カンシュウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+漢字語	漢字語	カンジゴ	名詞,普通名詞,一般	japanese	2	Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+黄色	黄色	キイロ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:2
+記述	記述	キジュツ	名詞,普通名詞,サ変可能	japanese	2	AGENTS.md:1; Tracker/Design/Core/tracker-architecture-plan.md:1
+基準値	基準値	キジュンチ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+厳しさ	厳しさ	キビシサ	名詞,普通名詞,一般	japanese	2	Tracker/Tracker.DebugHost/README.md:2
+基本方針	基本方針	キホンホウシン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+救済	救済	キュウサイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:2
+供給	供給	キョウキュウ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+禁止	禁止	キンシ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+首振り	首振り	クビフリ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:2
+警告	警告	ケイコク	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/tasks-status.md:2
+経由	経由	ケイユ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+懸念	懸念	ケネン	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/tasks-status.md:1
+件数	件数	ケンスウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+堅牢	堅牢	ケンロウ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+ケース	ケース	ケース	名詞,普通名詞,一般	katakana	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+購読	購読	コウドク	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/RuntimeHost/runtime-host-plan.md:2
+今後	今後	コンゴ	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:2
+合成	合成	ゴウセイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1
+最終確認	最終確認	サイシュウカクニン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/phases-status.md:1
+最小限	最小限	サイショウゲン	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; tools/lint/README.md:1
+最小値	最小値	サイショウチ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+サイズ	サイズ	サイズ	名詞,普通名詞,一般	katakana	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+最速	最速	サイソク	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/Core/tasks-status.md:2
+最大値	最大値	サイダイチ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+最低	最低	サイテイ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+採番	採番	サイバン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+細分化	細分化	サイブンカ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:2
+参加	参加	サンカ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+参照情報	参照情報	サンショウジョウホウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+参照元	参照元	サンショウモト	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; tools/lint/README.md:1
+材料	材料	ザイリョウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+試合	試合	シアイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/RuntimeHost/runtime-host-plan.md:2
+支配	支配	シハイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+絞り込み	絞り込み	シボリコミ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/Core/tasks-status.md:2
+出現	出現	シュツゲン	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+初速度	初速度	ショソクド	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+新機能	新機能	シンキノウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+進行	進行	シンコウ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+時間軸	時間軸	ジカンジク	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+事項	事項	ジコウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/Core/phases-status.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+実施	実施	ジッシ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+重視	重視	ジュウシ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+順番	順番	ジュンバン	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+条件式	条件式	ジョウケンシキ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+状態量	状態量	ジョウタイリョウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+上部	上部	ジョウブ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+除去	除去	ジョキョ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-core-engine-detail-design.md:2
+済み	済み	スミ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+成否	成否	セイヒ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+制約	制約	セイヤク	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+整列	整列	セイレツ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+選択行	選択行	センタクギョウ	名詞,普通名詞,一般	japanese	2	Tracker/Tracker.DebugHost/README.md:2
+全件	全件	ゼンケン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+前後	前後	ゼンゴ	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1; Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+即時	即時	ソクジ	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+側面	側面	ソクメン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/DebugHost/tasks-status.md:2
+大量	大量	タイリョウ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+単語	単語	タンゴ	名詞,普通名詞,一般	japanese	2	Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+代替	代替	ダイタイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/tasks-status.md:1
+近く	近く	チカク	名詞,普通名詞,副詞可能	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; tools/lint/README.md:1
+違い	違い	チガイ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-core-engine-detail-design.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+致命的	致命的	チメイテキ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:2
+中核	中核	チュウカク	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+注入	注入	チュウニュウ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1
+直線	直線	チョクセン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+直列	直列	チョクレツ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+使い分け	使い分け	ツカイワケ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:2
+低下	低下	テイカ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+手作業	手作業	テサギョウ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+統計	統計	トウケイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+ドラッグ	ドラッグ	ドラッグ	名詞,普通名詞,サ変可能	katakana	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+並び順	並び順	ナラビジュン	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+ノイズ	ノイズ	ノイズ	名詞,普通名詞,一般	katakana	2	Tracker/Tracker.DebugHost/README.md:2
+発火	発火	ハッカ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+発生	発生	ハッセイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+場所	場所	バショ	名詞,普通名詞,一般	japanese	2	AGENTS.md:1; tools/lint/README.md:1
+パネル	パネル	パネル	名詞,普通名詞,一般	katakana	2	Tracker/Tracker.DebugHost/README.md:2
+左側	左側	ヒダリガワ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+非表示	非表示	ヒヒョウジ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+表題	表題	ヒョウダイ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/Core/tasks-status.md:1; Tracker/Design/Archive/DebugHost/tasks-status.md:1
+比率	比率	ヒリツ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+品詞	品詞	ヒンシ	名詞,普通名詞,一般	japanese	2	Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+不可視	不可視	フカシ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+復号	復号	フクゴウ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Archive/DebugHost/tasks-status.md:1; Tracker/Design/tasks-status.md:1
+複製	複製	フクセイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1
+不十分	不十分	フジュウブン	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+付帯	付帯	フタイ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Archive/Core/tasks-status.md:2
+復活	復活	フッカツ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+分析	分析	ブンセキ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1
+分担	分担	ブンタン	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/Core/tracker-history-000-038.md:1
+平均	平均	ヘイキン	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+ペイン	ペイン	ペイン	名詞,普通名詞,一般	katakana	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:2
+ページ	ページ	ページ	名詞,普通名詞,助数詞可能	katakana	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Tracker.DebugHost/README.md:1
+保管場所	保管場所	ホカンバショ	名詞,普通名詞,一般	japanese	2	Tracker/Design/phases-status.md:1; Tracker/Design/tasks-status.md:1
+保存先	保存先	ホゾンサキ	名詞,普通名詞,一般	japanese	2	Tracker/Design/RuntimeHost/runtime-host-plan.md:1; Tracker/Design/tasks-status.md:1
+未確定	未確定	ミカクテイ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+未更新	未更新	ミコウシン	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1; Tracker/Design/tasks-status.md:1
+未知	未知	ミチ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+未登録語	未登録語	ミトウロクゴ	名詞,普通名詞,一般	japanese	2	Tracker/Design/phases-status.md:1; tools/lint/README.md:1
+無効	無効	ムコウ	名詞,普通名詞,形状詞可能	japanese	2	Tracker/Tracker.DebugHost/README.md:2
+無効化	無効化	ムコウカ	名詞,普通名詞,一般	japanese	2	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1; Tracker/Tracker.DebugHost/README.md:1
+矛盾	矛盾	ムジュン	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:1; Tracker/Tracker.DebugHost/README.md:1
+明確化	明確化	メイカクカ	名詞,普通名詞,一般	japanese	2	Tracker/Design/tasks-status.md:2
+明文化	明文化	メイブンカ	名詞,普通名詞,サ変可能	japanese	2	Tracker/Design/Core/tracker-history-000-038.md:2
+メモ	メモ	メモ	名詞,普通名詞,サ変可能	katakana	2	Tracker/Design/Core/tracker-architecture-plan.md:1; Tracker/Design/tasks-status.md:1
+文字種	文字種	モジシュ	名詞,普通名詞,一般	japanese	2	Tracker/Design/tasks-status.md:1; tools/lint/README.md:1
+優先順位	優先順位	ユウセンジュンイ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+優先度	優先度	ユウセンド	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+要素	要素	ヨウソ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+要否	要否	ヨウヒ	名詞,普通名詞,一般	japanese	2	feedback-points/feedback-points.md:2
+リポジトリ	リポジトリー	リポジトリ	名詞,普通名詞,一般	katakana	2	README.md:2
+例外	例外	レイガイ	名詞,普通名詞,一般	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:1; tools/lint/README.md:1
+連続	連続	レンゾク	名詞,普通名詞,サ変形状詞可能	japanese	2	Tracker/Design/Core/tracker-architecture-plan.md:2
+ロジック	ロジック	ロジック	名詞,普通名詞,一般	katakana	2	README.md:1; Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+青紫	青紫	アオムラサキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+アクセス	アクセス	アクセス	名詞,普通名詞,サ変可能	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+頭打ち	頭打ち	アタマウチ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+後処理	後処理	アトショリ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+アプリ	アプリ	アプリ	名詞,普通名詞,一般	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+安全	安全	アンゼン	名詞,普通名詞,形状詞可能	japanese	1	tools/lint/README.md:1
+異常	異常	イジョウ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+異常終了	異常終了	イジョウシュウリョウ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+位置づけ	位置付け	イチヅケ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+一貫性	一貫性	イッカンセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+以内	以内	イナイ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+入口	入り口	イリグチ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+因果	因果	インガ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+インターフェース	インターフェース	インターフェース	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+迂回	迂回	ウカイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+受け口	受け口	ウケグチ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+運用時	運用時	ウンヨウジ	名詞,普通名詞,一般	japanese	1	Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+永続	永続	エイゾク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+英日	英日	エイニチ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+エントリ	エントリー	エントリ	名詞,普通名詞,サ変可能	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+押下	押下	オウカ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+大枠	大枠	オオワク	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+遅れ	遅れ	オクレ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.CaptureReplay/README.md:1
+覚書	覚え書き	オボエガキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+親子	親子	オヤコ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+温存	温存	オンゾン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+解釈	解釈	カイシャク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+解除	解除	カイジョ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+階層	階層	カイソウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+解像度	解像度	カイゾウド	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+階調	階調	カイチョウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+回転	回転	カイテン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+解放	解放	カイホウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+各行	各行	カクコウ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+拡大	拡大	カクダイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+格納	格納	カクノウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+下限	下限	カゲン	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+重なり	重なり	カサナリ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+重ね	重ね	カサネ	名詞,普通名詞,助数詞可能	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+加算	加算	カサン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+可視	可視	カシ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+過大	過大	カダイ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+可読性	可読性	カドクセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+加味	加味	カミ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+カルマン	カルマン	カルマン	名詞,固有名詞,人名,一般	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+完結	完結	カンケツ	名詞,普通名詞,サ変可能	japanese	1	feedback-points/feedback-points.md:1
+監査	監査	カンサ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+観察	観察	カンサツ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+干渉	干渉	カンショウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+漢字	漢字	カンジ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+慣例	慣例	カンレイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+外挿	外挿	ガイソウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+起因	起因	キイン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+機械学習	機械学習	キカイガクシュウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+機械的	機械的	キカイテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+危険	危険	キケン	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Archive/Core/tasks-status.md:1
+記載	記載	キサイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+期待値	期待値	キタイチ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+起点	起点	キテン	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+吸収	吸収	キュウシュウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+強制	強制	キョウセイ	名詞,普通名詞,サ変可能	japanese	1	tools/lint/README.md:1
+共存	共存	キョウゾン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+寄与	寄与	キヨ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Tracker.CaptureReplay/README.md:1
+禁止事項	禁止事項	キンシジコウ	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+近似	近似	キンジ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+擬似	疑似	ギジ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+技術面	技術面	ギジュツメン	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+犠牲	犠牲	ギセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+逆数	逆数	ギャクスウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+逆方向	逆方向	ギャクホウコウ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+空行	空行	クウギョウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+空中	空中	クウチュウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+空白	空白	クウハク	名詞,普通名詞,形状詞可能	japanese	1	tools/lint/README.md:1
+空欄	空欄	クウラン	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+区間	区間	クカン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+組み合わせ	組み合わせ	クミアワセ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+クライアント	クライアント	クライアント	名詞,普通名詞,一般	katakana	1	README.md:1
+クラス	クラス	クラス	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+グループ	グループ	グループ	名詞,普通名詞,一般	katakana	1	tools/lint/README.md:1
+継承	継承	ケイショウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+形態	形態	ケイタイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+軽量	軽量	ケイリョウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/Core/tasks-status.md:1
+検索	検索	ケンサク	名詞,普通名詞,サ変可能	japanese	1	tools/lint/README.md:1
+検証用	検証用	ケンショウヨウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+検討	検討	ケントウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+原子	原子	ゲンシ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+現象	現象	ゲンショウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+ゲート	ゲート	ゲート	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+更新日	更新日	コウシンビ	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+更新履歴	更新履歴	コウシンリレキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+高速化	高速化	コウソクカ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+行内	行内	コウナイ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+高品質	高品質	コウヒンシツ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+後方	後方	コウホウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+小型	小型	コガタ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+小型化	小型化	コガタカ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+古典的	古典的	コテンテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+庫内	庫内	コナイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+コピー	コピー	コピー	名詞,普通名詞,サ変可能	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+コマンド	コマンド	コマンド	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+コンテキスト	コンテキスト	コンテキスト	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-history-000-038.md:1
+混入	混入	コンニュウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/tasks-status.md:1
+コード	コード	コード	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+誤差	誤差	ゴサ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+誤表記	誤表記	ゴヒョウキ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+再検証	再検証	サイケンショウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+再作成	再作成	サイサクセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+再実行	再実行	サイジッコウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+最長	最長	サイチョウ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+再調整	再調整	サイチョウセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/Core/tasks-status.md:1
+最適化	最適化	サイテキカ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+再発	再発	サイハツ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+再発防止	再発防止	サイハツボウシ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/Core/tasks-status.md:1
+再評価	再評価	サイヒョウカ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+再表示	再表示	サイヒョウジ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+作業中	作業中	サギョウチュウ	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+作業場所	作業場所	サギョウバショ	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+索引	索引	サクイン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/Core/tasks-status.md:1
+算出	算出	サンシュツ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+参照先	参照先	サンショウサキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+サンプル	サンプル	サンプル	名詞,普通名詞,一般	katakana	1	README.md:1
+残存	残存	ザンゾン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/tasks-status.md:1
+暫定的	暫定的	ザンテイテキ	名詞,普通名詞,形状詞可能	japanese	1	tools/lint/README.md:1
+支援	支援	シエン	名詞,普通名詞,サ変可能	japanese	1	README.md:1
+仕組み	仕組み	シクミ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+試行	試行	シコウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+姿勢	姿勢	シセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+視線	視線	シセン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+視認	視認	シニン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+指標	指標	シヒョウ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.CaptureReplay/README.md:1
+収束	収束	シュウソク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+終了	終了	シュウリョウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/tasks-status.md:1
+縮小	縮小	シュクショウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+種類	種類	シュルイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+照合	照合	ショウゴウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+消失	消失	ショウシツ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+証明	証明	ショウメイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Archive/DebugHost/phases-status.md:1
+将来的	将来的	ショウライテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+処理系	処理系	ショリケイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+処理単位	処理単位	ショリタンイ	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+処理中	処理中	ショリチュウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+実体	実体	ジッタイ	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+実態	実態	ジッタイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+実運用	実運用	ジツウンヨウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+自分	自分	ジブン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+自明	自明	ジメイ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+従属	従属	ジュウゾク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+重点的	重点的	ジュウテンテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+重要度	重要度	ジュウヨウド	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+上下	上下	ジョウゲ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+上昇	上昇	ジョウショウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+常時	常時	ジョウジ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+上端	上端	ジョウタン	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+常駐	常駐	ジョウチュウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+数式	数式	スウシキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+スクラブ	スクラブ	スクラブ	名詞,普通名詞,一般	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+進め方	進め方	ススメカタ	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+全て	全て	スベテ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+スライド	スライド	スライド	名詞,普通名詞,サ変可能	katakana	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+正確	正確	セイカク	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+成果物	成果物	セイカブツ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+静止	静止	セイシ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+生存	生存	セイゾン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+責任	責任	セキニン	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+接頭辞	接頭辞	セットウジ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+説明文	説明文	セツメイブン	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+宣言	宣言	センゲン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+専念	専念	センネン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+選別	選別	センベツ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+是正	是正	ゼセイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+絶対	絶対	ゼッタイ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+前方	前方	ゼンポウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+前面	前面	ゼンメン	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+早期	早期	ソウキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+相互	相互	ソウゴ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+即興	即興	ソッキョウ	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+素朴	素朴	ソボク	名詞,普通名詞,形状詞可能	japanese	1	tools/lint/README.md:1
+ソースファイル	ソースファイル	ソースファイル	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-history-000-038.md:1
+増幅	増幅	ゾウフク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+退化	退化	タイカ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+体系	体系	タイケイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+多重	多重	タジュウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+多数	多数	タスウ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+タブ	タブ	タブ	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+短期	短期	タンキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+短縮	短縮	タンシュク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+台帳	台帳	ダイチョウ	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+代表的	代表的	ダイヒョウテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+妥当	妥当	ダトウ	名詞,普通名詞,サ変形状詞可能	japanese	1	Tracker/Design/tasks-status.md:1
+逐語	逐語	チクゴ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+直訳	直訳	チョクヤク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+通過	通過	ツウカ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+綴り	綴り	ツヅリ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+定期	定期	テイキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+定時	定時	テイジ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+提示	提示	テイジ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/tasks-status.md:1
+撤回	撤回	テッカイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+典型的	典型的	テンケイテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+踏襲	踏襲	トウシュウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+到着	到着	トウチャク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+途中	途中	トチュウ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+トップページ	トップページ	トップページ	名詞,普通名詞,一般	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+跳び	跳び	トビ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+取りまとめ役	取りまとめ役	トリマトメヤク	名詞,普通名詞,一般	japanese	1	AGENTS.md:1
+同義	同義	ドウギ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+同種	同種	ドウシュ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+同封	同封	ドウフウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+ドキュメント	ドキュメント	ドキュメント	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+独立性	独立性	ドクリツセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+ドメイン	ドメイン	ドメイン	名詞,普通名詞,一般	katakana	1	README.md:1
+中身	中身	ナカミ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+流れ	流れ	ナガレ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+並び	並び	ナラビ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+並べ替え	並べ替え	ナラベカエ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+逃げ	逃げ	ニゲ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+入出力	入出力	ニュウシュツリョク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+ネットワーク	ネットワーク	ネットワーク	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+濃色	濃色	ノウショク	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+能力	能力	ノウリョク	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+背景	背景	ハイケイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+配色	配色	ハイショク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+破壊	破壊	ハカイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+橋渡し	橋渡し	ハシワタシ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+破線	破線	ハセン	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+発生源	発生源	ハッセイゲン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+半透明	半透明	ハントウメイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+バランス	バランス	バランス	名詞,普通名詞,サ変可能	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+番号	番号	バンゴウ	名詞,普通名詞,一般	japanese	1	feedback-points/feedback-points.md:1
+パラメータ	パラメーター	パラメータ	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+引き継ぎ	引き継ぎ	ヒキツギ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+非対象	非対象	ヒタイショウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+肥大化	肥大化	ヒダイカ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+非同期	非同期	ヒドウキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+評価	評価	ヒョウカ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+ビルド	ビルド	ビルド	名詞,普通名詞,一般	katakana	1	README.md:1
+不安定	不安定	フアンテイ	名詞,普通名詞,形状詞可能	japanese	1	AGENTS.md:1
+フィルタ	フィルター	フィルタ	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+不可	不可	フカ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+付加	付加	フカ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+複雑化	複雑化	フクザツカ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+複写	複写	フクシャ	名詞,普通名詞,サ変可能	japanese	1	tools/lint/README.md:1
+符号	符号	フゴウ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+不在	不在	フザイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+付随	付随	フズイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/tasks-status.md:1
+復帰	復帰	フッキ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+不能	不能	フノウ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+不明	不明	フメイ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+不明確	不明確	フメイカク	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+浮遊	浮遊	フユウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+フラグ	フラグ	フラグ	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+不利	不利	フリ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+不連続	不連続	フレンゾク	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+フレーム	フレーム	フレーム	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-history-000-038.md:1
+フロー	フロー	フロー	名詞,普通名詞,一般	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+部品	部品	ブヒン	名詞,普通名詞,一般	japanese	1	Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+部分	部分	ブブン	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+文脈	文脈	ブンミャク	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+併記	併記	ヘイキ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+並進	並進	ヘイシン	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+平面	平面	ヘイメン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+併用	併用	ヘイヨウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+並列	並列	ヘイレツ	名詞,普通名詞,サ変可能	japanese	1	AGENTS.md:1
+ヘッダー	ヘッダー	ヘッダー	名詞,普通名詞,一般	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+返却	返却	ヘンキャク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+変数	変数	ヘンスウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+別物	別物	ベツモノ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+方向性	方向性	ホウコウセイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+方式	方式	ホウシキ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+補強	補強	ホキョウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+保守	保守	ホシュ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+本開発	本開発	ホンカイホツ	名詞,固有名詞,地名,一般	japanese	1	AGENTS.md:1
+本質	本質	ホンシツ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-test-maintainability-detail-design.md:1
+本物	本物	ホンモノ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+防止	防止	ボウシ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+ボトルネック	ボトルネック	ボトルネック	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+毎回	毎回	マイカイ	名詞,普通名詞,副詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+マージン	マージン	マージン	名詞,普通名詞,一般	katakana	1	Tracker/Tracker.DebugHost/README.md:1
+見え方	見え方	ミエカタ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-maintainability-design.md:1
+未解決	未解決	ミカイケツ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+見かけ	見掛け	ミカケ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.CaptureReplay/README.md:1
+見方	見方	ミカタ	名詞,固有名詞,人名,姓	japanese	1	Tracker/Tracker.CaptureReplay/README.md:1
+未処理	未処理	ミショリ	名詞,普通名詞,一般	japanese	1	Tracker/Design/RuntimeHost/runtime-host-plan.md:1
+未実行	未実行	ミジッコウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+未設定	未設定	ミセッテイ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+未設	未設	ミセツ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+密度	密度	ミツド	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+未適用	未適用	ミテキヨウ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+未登録	未登録	ミトウロク	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+未来	未来	ミライ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+無関係	無関係	ムカンケイ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+無視	無視	ムシ	名詞,普通名詞,サ変可能	japanese	1	tools/lint/README.md:1
+目印	目印	メジルシ	名詞,普通名詞,一般	japanese	1	Tracker/Design/tasks-status.md:1
+メタデータ	メタデータ	メタデータ	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+目安	目安	メヤス	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+目視	目視	モクシ	名詞,普通名詞,一般	japanese	1	Tracker/Tracker.CaptureReplay/README.md:1
+最寄り	最寄り	モヨリ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+用意	用意	ヨウイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-history-000-038.md:1
+要因	要因	ヨウイン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+用語	用語	ヨウゴ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Archive/DebugHost/tasks-status.md:1
+要点	要点	ヨウテン	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+要望	要望	ヨウボウ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+要約	要約	ヨウヤク	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Archive/Core/tasks-status.md:1
+横並び	横並び	ヨコナラビ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+寄せ	寄せ	ヨセ	名詞,普通名詞,一般	japanese	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+余地	余地	ヨチ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+余白	余白	ヨハク	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+読み	読み	ヨミ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+読み手	読み手	ヨミテ	名詞,普通名詞,一般	japanese	1	Tracker/Design/Core/tracker-core-engine-detail-design.md:1
+ライブラリ	ライブラリー	ライブラリ	名詞,普通名詞,一般	katakana	1	README.md:1
+略語	略語	リャクゴ	名詞,普通名詞,一般	japanese	1	tools/lint/README.md:1
+リンク	リンク	リンク	名詞,普通名詞,サ変可能	katakana	1	tools/lint/README.md:1
+レイアウト	レイアウト	レイアウト	名詞,普通名詞,サ変可能	katakana	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+レベル	レベル	レベル	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/raw-vision-viewer-plan.md:1
+連携	連携	レンケイ	名詞,普通名詞,サ変可能	japanese	1	Tracker/Design/Core/tracker-architecture-plan.md:1
+連結	連結	レンケツ	名詞,普通名詞,サ変可能	japanese	1	tools/lint/README.md:1
+連続的	連続的	レンゾクテキ	名詞,普通名詞,形状詞可能	japanese	1	Tracker/Tracker.DebugHost/README.md:1
+ログファイル	ログファイル	ログファイル	名詞,普通名詞,一般	katakana	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+ロボット	ロボット	ロボット	名詞,普通名詞,一般	katakana	1	README.md:1
+ローカル	ローカル	ローカル	名詞,普通名詞,形状詞可能	katakana	1	Tracker/Design/Core/tracker-architecture-plan.md:1
