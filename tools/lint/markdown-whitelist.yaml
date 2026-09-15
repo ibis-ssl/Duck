@@ -480,3 +480,277 @@ entries:
     description: "`TrackerSnapshotSidecar_RoundTripPayload_RestoresRawTrackerPacketForReplayDecode` に対応する、保存後の読み戻しで元の通信内容を復元する検証語。"
   - term: tie-break
     description: "`Generate_WhenSecondaryBallsTieOnVisibilityAndTimestamp_UsesInternalTrackIdAsFinalTieBreaker` に対応する、同条件の球の並び順を内部 ID で決める規則。"
+  - term: アイコン
+    description: 操作や状態を表す小さな図。
+  - term: アセンブリ
+    description: .NETの型や処理をまとめた配布単位。
+  - term: アプリケーション
+    description: 起動して利用するプログラム。
+  - term: アルゴリズム
+    description: 結果を求めるための計算手順。
+  - term: イベント
+    description: 処理中に起きた出来事の通知。
+  - term: インスタンス
+    description: クラスなどから生成された個々の実体。
+  - term: インストール
+    description: 実行に必要な依存物を導入する操作。
+  - term: エラー
+    description: 処理失敗を示す状態や情報。
+  - term: エラーメッセージ
+    description: 処理失敗を説明する表示文。
+  - term: エージェント
+    description: 割り当てられた調査や検証を行う作業主体。
+  - term: オブジェクト
+    description: 型から作られた値や状態の実体。
+  - term: オーバーロード
+    description: 同じメソッド名で引数の異なる定義。
+  - term: カウンタ
+    aliases:
+    - カウンター
+    description: 受信数や送信数などの計数値。
+  - term: カメラ
+    description: SSL-Visionの検出情報を得る撮影元。
+  - term: カーソル
+    description: 画面上でマウスが指す位置。
+  - term: キック
+    description: ロボットがボールを蹴る動作。
+  - term: キャッシュ
+    description: 再読込や再計算を省くため保持する結果。
+  - term: クライアント
+    description: 提供された機能へ接続して利用する側。
+  - term: クラス
+    description: 状態と処理をまとめる型。
+  - term: クリック
+    description: 画面上の操作対象を選ぶマウス操作。
+  - term: グラデーション
+    description: 段階的に変化する画面の色。
+  - term: コピー
+    description: 元の内容と同じ内容を複製する操作。
+  - term: コマンド
+    description: 端末などから実行する命令。
+  - term: コマンドライン
+    description: 文字による命令入力。
+  - term: コメント
+    description: コードの意図や契約を説明する記述。
+  - term: コンストラクター
+    aliases:
+    - コンストラクタ
+    description: オブジェクトの生成時に呼ぶ初期化処理。
+  - term: コンパイルエラー
+    description: ソースコードを実行可能な形へ変換できない問題。
+  - term: コンポーネント
+    description: Blazor等で責務を分けた構成部品。
+  - term: ゴール
+    description: 競技場の得点枠。
+  - term: ゴールライン
+    description: ゴール側の競技場境界線。
+  - term: サイズ
+    description: 表示領域やデータの大きさ。
+  - term: サイドバー
+    description: 主表示の側面に置く操作領域。
+  - term: サッカー
+    description: 対象競技の名称。
+  - term: サーバー
+    aliases:
+    - サーバ
+    description: 画面やAPIを提供する実行側。
+  - term: シアン
+    description: 重ね表示の層を区別する色名。
+  - term: スクロール
+    description: 画面の表示位置を移動する操作。
+  - term: スレッド
+    description: プログラムの実行単位。
+  - term: ソケット
+    description: UDP等の通信に使う送受信の口。
+  - term: ソースファイル
+    description: ソースコードを保存したファイル。
+  - term: タイトル
+    description: 画面や文書の表題。
+  - term: タイマー
+    description: 一定時間後や一定周期で処理を呼び出す仕組み。
+  - term: タッチライン
+    description: 競技場の側方境界線。
+  - term: タブ
+    description: 表示対象や再生速度を選ぶ画面部品。
+  - term: ダイアログ
+    description: 設定などのため一時表示する操作画面。
+  - term: チェックボックス
+    description: 項目の有効無効を選ぶ画面部品。
+  - term: チーム
+    description: ロボットが属する対戦側。
+  - term: ツール
+    description: 開発や検証に使う道具。
+  - term: テスト
+    description: 期待する動作を確かめる検証。
+  - term: テストデータ
+    description: 検証に用いる入力値や記録。
+  - term: テンプレート
+    description: 文書やコード作成時のひな形。
+  - term: ディレクトリ
+    description: ファイルをまとめる保存領域。
+  - term: デコード
+    description: 通信形式のバイト列から内容を復元する処理。
+  - term: デスクトップ
+    description: 主にPC画面での表示環境。
+  - term: デバッグ
+    description: 動作を調べ不具合を特定する作業。
+  - term: データ
+    description: 処理で受け渡す値や記録。
+  - term: データベース
+    description: 記録を保存し検索する仕組み。
+  - term: トップページ
+    description: 最初に表示する画面。
+  - term: ドラッグ
+    description: 押したまま移動する画面操作。
+  - term: ネットワーク
+    description: 機器間の通信経路。
+  - term: バイト
+    description: 保存量や通信量を数える単位。
+  - term: バッファ
+    description: 後続処理まで入力や出力を保持する領域。
+  - term: パケット
+    description: 送受信する通信データの単位。
+  - term: パッケージ
+    description: 配布される依存ライブラリの単位。
+  - term: パラメータ
+    aliases:
+    - パラメーター
+    description: 計算や処理を調整する設定値。
+  - term: パーティクルフィルター
+    description: 多数の候補状態による推定手法。本文の不採用方針を維持。
+  - term: ビルド
+    description: ソースコードから実行物を生成する処理。
+  - term: ファイル
+    description: 情報を保存する単位。
+  - term: フォルダ
+    description: ファイルをまとめる保存場所。
+  - term: フラグ
+    description: 条件や状態の有無を表す値。
+  - term: フレームワーク
+    description: プログラムを実行するための共通基盤。
+  - term: ブラウザ
+    aliases:
+    - ブラウザー
+    description: Web UIを表示し操作するソフトウェア。
+  - term: プログラム
+    description: 実行する処理を記述したもの。
+  - term: プロジェクト
+    description: ビルドや責務をまとめる開発単位。
+  - term: プロセス
+    description: 実行中のプログラムの単位。
+  - term: プロパティ
+    description: 型が公開する値の取得設定口。
+  - term: ページ
+    description: URLなどで分かれる画面。
+  - term: ボタン
+    description: 処理開始等の操作を選ぶ画面部品。
+  - term: ボール
+    description: 追跡対象の球。
+  - term: マウス
+    description: 画面を指示する入力機器。
+  - term: マゼンタ
+    description: 重ね表示の層を区別する色名。
+  - term: マルチキャスト
+    description: 指定グループへ通信する方式。
+  - term: マーカー
+    description: ボールやロボット等を示す描画要素。
+  - term: メガバイト
+    description: 記録ファイル等の容量単位。
+  - term: メソッド
+    description: 型に属する呼び出し可能な処理。
+  - term: メニュー
+    description: 操作や画面の選択肢。
+  - term: メモ
+    description: 補足や調査内容の記録。
+  - term: メモリ
+    description: 実行時の値や状態を保持する領域。
+  - term: モバイル
+    description: 携帯端末向けの表示環境。
+  - term: モード
+    description: 動作や表示の選択状態。
+  - term: ユニキャスト
+    description: 特定の宛て先への通信方式。
+  - term: ユーザー
+    description: 画面や機能を利用する人。
+  - term: ライブラリ
+    description: 他のプログラムから再利用する機能群。
+  - term: ラベル
+    description: 画面上の表示名。
+  - term: リスク
+    description: 未解消の問題が結果へ影響する可能性。
+  - term: リポジトリ
+    description: Gitで管理するソースコードや文書のまとまり。
+  - term: レイアウト
+    description: 画面部品の配置。
+  - term: レビュー
+    description: 成果物の内容を確認する作業。
+  - term: レフェリー
+    description: 競技の判定を担当するもの。
+  - term: レポート
+    description: 調査や検証結果をまとめた文書。
+  - term: ログ
+    description: 動作や受信内容の記録。
+  - term: ログファイル
+    description: 動作記録を保存したファイル。
+  - term: ロック
+    description: 同時操作を制御する排他処理。
+  - term: ロボット
+    description: 追跡対象となる競技機体。
+  - term: UDPパケット
+    aliases:
+    - UDP パケット
+    description: UDPで送受信する通信データの単位。
+  - term: Base64
+    description: 通信内容のバイト列を文字列として保存し、読み戻し時に復元する符号化形式。
+  - term: Unix 時刻
+    description: 1970年1月1日00時00分00秒の協定世界時を基準とする時刻表現。実際の値の単位は本文で明記する。
+  - term: 通信アドレス
+    description: 通信相手や通信に使う接続先を指定する値。
+  - term: 通信ポート
+    description: 通信の送受信先を分ける番号。
+  - term: URLクエリ
+    description: URLに含める問い合わせ条件。
+  - term: 型のメンバー
+    description: 型に属するメソッドやプロパティなど。
+  - term: 追跡エンジン
+    description: 入力から追跡結果を生成する処理本体。
+  - term: コマンドラインオプション
+    description: 端末から実行する命令に渡す動作選択項目。
+  - term: マルチキャストグループ
+    description: マルチキャスト通信で参加先として指定する宛て先。
+  - term: 描画グループ
+    description: 画面上で同じ表示層としてまとめて描画する対象群。
+  - term: テストケース
+    description: 検証する入力、条件、期待する結果の組み合わせ。
+  - term: サンプルコード
+    description: 使い方を示す例示用のソースコード。
+  - term: サンプルデータ
+    description: 使い方を示す例示用の入力値や記録。診断で定期採取する記録とは区別する。
+  - term: 表示スタイル
+    description: 画面部品の見た目の指定。
+  - term: 画面ヘッダー
+    description: 画面上部の見出しや操作領域。通信の付加情報とは区別する。
+  - term: マウスホイール
+    description: マウスの回転操作部。
+  - term: 設定値のバインド
+    description: 設定値と型のプロパティの関連付け。
+  - term: ソケットのバインド
+    description: ソケットに通信アドレスと通信ポートを割り当てる操作。
+  - term: バックグラウンド処理
+    description: 画面の操作とは独立して動く処理。
+  - term: ファイルパス
+    description: ファイルの保存場所を示す表記。実行経路とは区別する。
+  - term: ローカルファイル
+    description: 実行端末内に保存されているファイル。
+  - term: ローカル実行
+    description: 実行端末内で処理を動かすこと。
+  - term: 競技フィールド
+    description: ロボットサッカーの競技場またはその描画領域。型のデータ項目とは区別する。
+  - term: 観測フレーム
+    description: ある観測時点の検出情報をまとめた単位。
+  - term: 追跡フレーム
+    description: 追跡処理が確定した状態をまとめた単位。
+  - term: ライブ表示
+    description: 保存記録の再生ではなく、現在受信している内容を扱う表示。
+  - term: 競技ルール
+    description: ロボットサッカーの判定規則。文書の検査条件や処理条件とは区別する。
