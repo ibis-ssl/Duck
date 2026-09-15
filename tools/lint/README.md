@@ -1,10 +1,10 @@
 # 文書検査設定
 
-この作業一式では、利用者または委譲先が通常編集する文書を品質確認に載せるため、最上位に `textlint` と `cspell` を置く。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。
+このリポジトリでは、ユーザーまたはエージェントが編集する文書を `textlint` と `cspell` で検査する。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。
 
 ## 準備
 
-初回、`package-lock.json` 更新後、または `tools/lint/requirements.txt` 更新後は最上位で次を実行する。標準の `npm run lint:md` は SudachiPy 版の許可一覧検査も実行するため、`npm install` だけでは足りない。
+初回、`package-lock.json` 更新後、または `tools/lint/requirements.txt` 更新後はリポジトリの最上位で次を実行する。標準の `npm run lint:md` は SudachiPy 版の許可一覧検査も実行するため、`npm install` だけでは足りない。
 
 ```bash
 npm install
@@ -13,9 +13,9 @@ python3 -m venv .venv
 PIP_NO_BUILD_ISOLATION=1 python3 -m pip install -r tools/lint/requirements.txt
 ```
 
-`ChikkarPy` は現在の `Python` 環境では構築時の分離を有効にした通常のインストールに失敗することがあるため、文書検査用環境では `PIP_NO_BUILD_ISOLATION=1` を付ける。`tools/lint/requirements.txt` には、その前提で必要な構築用補助パッケージも含めている。
+`ChikkarPy` は現在の `Python` 環境ではビルド時の環境分離を有効にした通常のインストールに失敗することがあるため、文書検査用環境では `PIP_NO_BUILD_ISOLATION=1` を付ける。`tools/lint/requirements.txt` には、その前提で必要なビルド用の補助パッケージも含めている。
 
-この検査は `.agents/skills/review-enforcer/scripts/` にある共通処理を使う。`.agents/skills` は記録対象には含めず、手元の記号参照として `~/AI/CodexSkill/skills` を指している必要がある。
+この検査は `.agents/skills/review-enforcer/scripts/` にある共通処理を使う。`.agents/skills` は `ln -s` で作成するリンクとし、`~/AI/CodexSkill/skills` を参照させる。このリンクは Git の管理対象に含めない。
 
 通常の検証は次を実行する。
 
@@ -75,25 +75,25 @@ npm run lint:md:whitelist:legacy -- --files tools/lint/README.md
 
 ## 対象範囲
 
-通常対象は `**/*.md` のうち、利用者が編集対象にする文書全般である。`.agents/skills/review-enforcer/scripts/list-markdown-targets.js` が作業一式内の対象文書を列挙する。最上位文書、`Tracker/Design/**`、`Tracker/**/*.md`、`feedback-points/**` は対象に含める。`reports/**` は暫定的に対象外にする。
+通常対象は `**/*.md` のうち、利用者が編集対象にする文書全般である。`.agents/skills/review-enforcer/scripts/list-markdown-targets.js` がリポジトリ内の対象文書を列挙する。最上位にある文書、`Tracker/Design/**`、`Tracker/**/*.md`、`feedback-points/**` は対象に含める。`reports/**` は暫定的に対象外にする。
 
-対象外の置き場や接頭辞は `tools/lint/markdown-targets.json` に明示する。`.textlintignore` と `cspell.config.jsonc` も同じ対象外方針に揃える。現時点では依存物、生成物、明示的な除外置き場、取り込み済みの外部参照だけを除外する。
+検査対象から除外するディレクトリとファイルパスの接頭辞は `tools/lint/markdown-targets.json` に明示する。`.textlintignore` と `cspell.config.jsonc` も同じ対象外方針に揃える。現時点では依存物、生成物、明示的な除外用ディレクトリ、取り込み済みの外部参照だけを除外する。
 
-- `node_modules/**`: npm 依存物の出力。
+- `node_modules/**`: npm 依存パッケージの保存先。
 - `.git/**`: Git の内部情報。
 - `.codex-dotnet-home/**`、`.codex-nuget-packages/**`: 手元の .NET 一時保存領域。
-- `**/bin/**`、`**/obj/**`: .NET 構築出力。
-- `reports/**`: 調査、点検、引き継ぎ、検証の報告書。現時点では対象外。
-- `tools/lint/excluded/**`: 文書検査から明示的に外したい文書を置く除外置き場。通常の文書、報告書、設計文書はここへ移動しない。
-- `Tracker/Design/Core/Ref/**`: 複写された参照元と構築木。
-- `SslProto/src/external/ssl-game-controller/**`: 取り込み済みの外部作業一式。
-- `SslProto/src/external/ssl-simulation-protocol/**`: 取り込み済みの外部通信形式作業一式。
+- `**/bin/**`、`**/obj/**`: .NET のビルド出力。
+- `reports/**`: 調査、レビュー、引き継ぎ、検証の報告書。現時点では対象外。
+- `tools/lint/excluded/**`: 文書検査から明示的に外したい文書を置く除外用ディレクトリ。通常の文書、報告書、設計文書はここへ移動しない。
+- `Tracker/Design/Core/Ref/**`: コピーした参照元のソースコードとビルド用ディレクトリ。
+- `SslProto/src/external/ssl-game-controller/**`: 取り込み済みの外部リポジトリ。
+- `SslProto/src/external/ssl-simulation-protocol/**`: 通信形式を定義した外部リポジトリの取り込み先。
 
 ## 許可一覧
 
-許可一覧の正本は `tools/lint/markdown-whitelist.yaml` である。この初版は既存文書の脚注から収集したが、脚注収集処理は残していない。以後は新しい固有語、機能名、略語、外部作業一式名、片仮名語を許可する場合、この設定文書に最小限の項目を明示的に追加する。
+許可一覧の正本は `tools/lint/markdown-whitelist.yaml` である。初版の一覧は既存文書の脚注から収集したが、脚注収集処理は残していない。以後は新しい固有語、機能名、略語、外部リポジトリ名、片仮名語を許可する場合、この設定文書に最小限の項目を明示的に追加する。
 
-`tools/lint/markdown-whitelist.yaml` の追加、変更、削除は、利用者の明示確認を必須とする。委譲先の点検だけで許可一覧更新を完了扱いしてはならない。
+`tools/lint/markdown-whitelist.yaml` の追加、変更、削除は、利用者の明示確認を必須とする。エージェントのレビューだけで許可一覧更新を完了扱いしてはならない。
 
 ```yaml
 entries:
@@ -101,14 +101,14 @@ entries:
     aliases:
       - example-term
       - example term
-    description: ExampleTerm を許可する理由と、この作業一式での意味。
+    description: ExampleTerm を許可する理由と、このリポジトリでの意味。
 ```
 
 `term` と `aliases` が許可語になる。`description` は人が意味を確認するための説明であり、`description` 内の英単語と片仮名語も `npm run lint:md:whitelist` の対象になる。
 
-逆引用符で囲んだ行内の識別子と囲み付き符号片は検査対象外である。ただし、これは本物の識別子、命令、文書の場所、画面表示名、明示的な項目名のための例外であり、通常の文章中の英単語や片仮名語を検査から逃がすために逆引用符や引用符で囲むことは禁止する。点検ではこの逃げがないことも確認する。
+`TrackerFrame` のような行内の識別子や、複数行のソースコードを囲んだ部分は検査対象外である。ただし、これは本物の識別子、コマンド、ファイルパス、画面表示名、明示的な項目名のための例外であり、通常の文章中の英単語や片仮名語を検査から逃がすためにこれらの記法や引用符で囲むことは禁止する。レビューでは、検査の回避がないことも確認する。
 
-`npm run lint:md:spell` は `tools/lint/markdown-whitelist.yaml` の `entries.term` と `entries.aliases` から一時辞書と無視条件を作って `cspell` を実行する。許可一覧の管理文書はこの 1 つだけである。`tracker-debug-host` と `tracker debug host` のように連結符付き表記と空白区切り表記の両方を許可する場合は、同じ項目の `aliases` に両方を明示する。
+`npm run lint:md:spell` は `tools/lint/markdown-whitelist.yaml` の `entries.term` と `entries.aliases` から一時辞書と無視条件を作って `cspell` を実行する。許可一覧の設定ファイルはこの 1 つだけである。`tracker-debug-host` と `tracker debug host` のように `-` でつないだ表記と空白で区切った表記の両方を許可する場合は、同じ項目の `aliases` に両方を明示する。
 
 `cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。既存文書に未登録語がある場合は検査が落ちるため、文章を日本語へ直すか、固有語として許可できる理由を `tools/lint/markdown-whitelist.yaml` に追加する。
 
