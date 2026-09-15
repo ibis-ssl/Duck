@@ -1,0 +1,290 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: initial implementation
+  generated_at: '2026-09-15T19:45:00+09:00'
+repository: ibis-ssl/Duck
+issue_or_pr: 'PR #20'
+task_id: DOC-LINT-003
+branch: docs/runtimehost-readme-appsettings
+base_ref: main
+target:
+  current_head: 05e5eafc0728c7fdc15dfa071d63a3d3300e529b
+  reviewed_head: null
+  commit_range: f1fd7a52ed95c3f5e80ca529243974ff917d1f67..c8f256f3e215f125756ed1051a91b6b401971833
+verification:
+  capability: local_execution_available
+  capability_evidence:
+  - RDC ibis-ThinkBook-14-G7-IML can run repository commands and local validation.
+  technical_head: c8f256f3e215f125756ed1051a91b6b401971833
+  administrative_parent: 05e5eafc0728c7fdc15dfa071d63a3d3300e529b
+  commit:
+    state: commit_pending
+    review_target_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  push:
+    state: push_pending
+    head_sha: unknown
+  ci_wait:
+    state: ci_wait_pending
+    required_for: merge_gate
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+authoritative_requirements:
+- source: user_instruction
+  reference: current chat
+  summary: Add the approved whitelist candidates; use UDPパケット instead of データグラム; push the changes.
+- source: user_instruction
+  reference: current chat
+  summary: When RDC is used, perform git operations with git commands rather than repository connector writes.
+- source: repository_instruction
+  reference: AGENTS.md / project instructions
+  summary: Keep unrelated working-tree changes; save detailed report; post concise PR comment; do not merge; only exact-head CI counts.
+development_policy:
+  method: documentation/configuration validation
+  testing_order: Focused term probes and Markdown checks before publication; full gates recorded separately.
+  governing_source: repository skills and current user instruction
+validation_plan:
+  commands:
+  - focused textlint on 8 changed Markdown files
+  - git diff --check
+  - npm run lint:md
+  - full whitelist checker
+  - dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj
+  required_failure_diagnostics:
+  - test results
+  - stdout
+  - stderr
+  - VSTest diagnostic log
+  - MSBuild binary log
+blocked: []
+authorized_actions:
+- read_repository
+- edit_documentation
+- edit_configuration
+- write_handoff
+- write_report
+- commit
+- push
+- update_pr
+- comment_pr
+write_boundary:
+  allowed:
+  - path_or_operation: approved Markdown wording, tools/lint/markdown-whitelist.yaml, task report/handoff
+    reason: approved scope
+  forbidden:
+  - path_or_operation: merge
+    reason: user performs merge
+  - path_or_operation: unrelated existing working-tree changes
+    reason: owned by other ongoing work
+scope:
+- Register 131 approved whitelist entries plus 6 aliases.
+- Replace normal-prose datagram wording with UDPパケット.
+- Apply the approved Japanese wording changes to 8 documents.
+- Persist report and handoff and update PR.
+non_goals:
+- Complete DOC-LINT-003 globally.
+- Fix the Markdown checker implementation.
+- Fix unrelated .NET test failures.
+- 'Merge PR #20.'
+files:
+  changed:
+  - path: tools/lint/markdown-whitelist.yaml
+    purpose: approved terminology/wording update
+  - path: Tracker/Tracker.DebugHost/README.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/Core/tracker-architecture-plan.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/Core/tracker-core-engine-detail-design.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/Core/tracker-test-maintainability-detail-design.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/DebugHost/debug-host-maintainability-design.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/DebugHost/raw-vision-viewer-plan.md
+    purpose: approved terminology/wording update
+  - path: Tracker/Design/RuntimeHost/runtime-host-plan.md
+    purpose: approved terminology/wording update
+  - path: reports/markdown-whitelist-approved-20260915.md
+    purpose: detailed implementation report
+  - path: reports/markdown-whitelist-approved-validation-20260915.json
+    purpose: machine-readable validation evidence
+  - path: reports/handoffs/markdown-whitelist-approved-20260915.yaml
+    purpose: schema-v3 handoff
+  inspected:
+  - path: .github/workflows/dotnet-test.yml
+    purpose: confirm failure diagnostic artifacts on main
+  intentionally_untouched:
+  - path_or_area: Tracker/Design/tasks-status.md and existing lint disposition working files
+    reason: pre-existing unrelated working-tree changes
+commands:
+- command: git fetch origin docs/runtimehost-readme-appsettings
+  purpose: synchronize remote state through RDC git
+  exit_code: 0
+  result: passed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: origin head fetched successfully
+- command: focused textlint
+  purpose: validate changed Markdown
+  exit_code: 0
+  result: passed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: RDC evidence directory
+- command: npm run lint:md
+  purpose: repository-wide Markdown gate
+  exit_code: 123
+  result: failed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: global lint remains incomplete
+- command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj
+  purpose: local .NET verification
+  exit_code: 1
+  result: failed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: 323 passed, 5 failed
+tests:
+- name: whitelist/cspell per-spelling probes
+  phase: verification
+  result: passed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: 337/337 valid allow/reject expectations
+- name: focused textlint
+  phase: verification
+  result: passed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: 8 changed documents, exit 0
+- name: repository Markdown lint
+  phase: verification
+  result: failed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: exit 123
+- name: local .NET tests
+  phase: verification
+  result: failed
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  evidence: '328 total: 323 passed, 5 failed'
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: 34956195904
+  head_sha: c8f256f3e215f125756ed1051a91b6b401971833
+  conclusion: success
+  artifacts: []
+implementation:
+  outcome: completed
+  final_head: c8f256f3e215f125756ed1051a91b6b401971833
+  commits:
+  - sha: d5bbdc5491ee726a2791cc0d582b444685598c80
+    purpose: approved whitelist entries
+  - sha: ed3fceb3e9dc34cd903bbfa405b746bcef44e304
+    purpose: DebugHost README UDP wording
+  - sha: 67937f8a6965f74430b2c695cc665133716c03db
+    purpose: Core design wording
+  - sha: c8f256f3e215f125756ed1051a91b6b401971833
+    purpose: DebugHost/RuntimeHost design wording
+  addressed_findings: []
+  failure_diagnostics:
+  - type: other
+    location: /home/ibis/.local/share/duck-doc-lint/approved-whitelist-20260915T180655
+    summary: All probe and test diagnostic evidence.
+  blocked_items: []
+  summary:
+  - Approved terminology changes are published.
+  - Global lint and unrelated local .NET failures remain explicit and are not reported as pass.
+review:
+  mode: not_applicable
+  reviewed_head: unknown
+  reviewer:
+    identity: unknown
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: null
+    independence:
+      implemented_change: unknown
+      implemented_review_fix: unknown
+      served_as_normal_reviewer: unknown
+      inherited_conversation: unknown
+      evidence: []
+  verdict: not_applicable
+  required_coverage: []
+  independent_closure:
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    reviewer_continuity: null
+    closure_scope: []
+    completeness_matrix: []
+  validation_assessment: []
+  reserved_report_paths: []
+  report_attestation:
+    allowed: not_applicable
+    reviewed_implementation_head: null
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence: []
+  summary:
+  - No independent final review was performed in this task.
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+  - reports/markdown-whitelist-approved-20260915.md
+  - reports/markdown-whitelist-approved-validation-20260915.json
+  reviewed_head: null
+  attestation_head: null
+  pr_comments: []
+  summary:
+  - Detailed report persisted; concise PR comment remains to be posted after final push/CI.
+findings: []
+held: []
+unexplored: []
+unknown:
+- field_or_fact: final administrative HEAD and matching CI
+  reason: handoff is generated before its own persistence commit
+not_applicable:
+- field_or_area: merge
+  reason: merge is explicitly left to the user
+remaining_risks:
+- Repository-wide Markdown lint still fails.
+- Full whitelist checker hits SudachiPy input length limit.
+- Local .NET tests have 5 failures not attributed to this documentation/configuration change.
+- Normal and independent review remain outstanding.
+source_payloads:
+- source_skill: work-context-manager
+  output_contract_version: '3'
+  content_type: text/plain
+  payload: 'Context resolved from PR #20, current user instructions, RDC repository state, and exact-head CI policy.'
+- source_skill: implementation-worker
+  output_contract_version: '3'
+  content_type: text/plain
+  payload: Approved whitelist and wording scope implemented and locally validated; detailed evidence is in the report and validation JSON.
+- source_skill: report-writer
+  output_contract_version: '3'
+  content_type: text/plain
+  payload: 'Detailed report: reports/markdown-whitelist-approved-20260915.md'
+extensions: []
+next_action:
+  type: review
+  target_skill: review-worker
+  mode: initial_review
+  summary: If continuing DOC-LINT-003 beyond this approved batch, review the current PR state before additional implementation.
+  instructions:
+  - Do not merge.
+  - Use current PR HEAD and exact-head CI only.
+  required_attachments_or_references:
+  - reports/markdown-whitelist-approved-20260915.md
+  requested_authorized_actions:
+  - read_repository
+transport:
+  method: repository_file
+  packet_path: reports/handoffs/markdown-whitelist-approved-20260915.yaml
+  packet_url: null
+  transport_note: Persisted on PR branch; final administrative SHA and exact-head CI are recorded externally in the PR comment.
