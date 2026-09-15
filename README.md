@@ -6,7 +6,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 
 - `Tracker/Tracker.Core`: トラッカーの中核処理、パケット生成、実行契約。
 - `Tracker/Tracker.DebugHost`: 未加工入力 / 追跡結果の SSL-Vision データを表示する ASP.NET Core の表示画面兼サーバー。
-- `Tracker/Tracker.CaptureReplay`: 保存済みの受信記録を再生・分析する CLI ツール。
+- `Tracker/Tracker.CaptureReplay`: 保存済みのキャプチャーを再生・分析する CLI ツール。
 - `Tracker/Tracker.Tests`: トラッカーとサーバー周辺のテスト。
 - `TrackerConnectionLib`: トラッカー接続用の再利用ライブラリ。
 - `TrackerConnectionLibExample`: `TrackerConnectionLib` の利用例となるクライアント。
@@ -53,23 +53,23 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 - `https://localhost:7042`
 - `http://localhost:5289`
 
-`Tracker.DebugHost` の設定、UI、設定組の切り替え、API の詳細は [DebugHost の利用手順](Tracker/Tracker.DebugHost/README.md) を参照してください。
+`Tracker.DebugHost` の設定、UI、設定プロファイルの切り替え、API の詳細は [DebugHost の利用手順](Tracker/Tracker.DebugHost/README.md) を参照してください。
 
-## `sim` 設定組で起動する例
+## `sim` 設定プロファイルで起動する例
 
-`Tracker.RuntimeHost` を `sim` 設定組で起動する場合:
+`Tracker.RuntimeHost` を `sim` 設定プロファイルで起動する場合:
 
 ```bash
 dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profile sim
 ```
 
-`--profile <name>` は `Tracker.RuntimeHost` の起動時に有効な設定組を指定します。未指定時は `appsettings.json` の `Tracker:ActiveProfileName` を使います。
-`Tracker.RuntimeHost` のリポジトリに保存済みの `sim` 設定組は `ReorderWindowNs=10000000`、つまり 10 ms の並べ替え対象時間幅で起動します。
+`--profile <name>` は `Tracker.RuntimeHost` の起動時に有効な設定プロファイルを指定します。未指定時は `appsettings.json` の `Tracker:ActiveProfileName` を使います。
+`Tracker.RuntimeHost` のリポジトリに保存済みの `sim` 設定プロファイルは `ReorderWindowNs=10000000`、つまり 10 ms の並べ替え対象時間幅で起動します。
 
-`Tracker.DebugHost` を `sim` 設定組で起動する場合:
+`Tracker.DebugHost` を `sim` 設定プロファイルで起動する場合:
 
 ```bash
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
-`sim` 設定組の既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式のトラッカーパケットを `224.5.23.2:11010` へ送信します。
+`sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式のトラッカーパケットを `224.5.23.2:11010` へ送信します。

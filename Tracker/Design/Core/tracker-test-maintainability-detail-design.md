@@ -12,14 +12,14 @@
 
 - `Tracker/Tracker.Tests/Contracts/TrackerEngineTemporalContractTests.cs`
   - 2,281 行、60 個の `[Fact]` を 1 クラスに保持している。
-  - 観測時刻順の入力保持、競技場形状の初期化、設定組の切り替え、ロボット追跡、ボール追跡、キックと接触、ボールの場外退出が同居している。
+  - 観測時刻順の入力保持、フィールド形状の初期化、設定プロファイルの切り替え、ロボット追跡、ボール追跡、キックと接触、ボールの場外退出が同居している。
   - `TRACKER-003` 由来の時系列契約テストから、`TRACKER-031` までの回帰検証が同じクラスに追加され続けているため、変更箇所を探す負荷が高い。
 - `Tracker/Tracker.Tests/TrackerCoordinatorTests.cs`
   - 613 行、10 個の `[Fact]` と補助クラス `RecordingTrackerPacketPublisher` / `RecordingTrackerObserver` が同居している。
-  - `TrackerCoordinator` の状態保存、送信、イベント、設定組、記録時の診断のテストが同じクラスに並び、補助クラスの責務境界がテスト本体から見えにくい。
+  - `TrackerCoordinator` の状態保存、送信、イベント、設定プロファイル、記録時の診断のテストが同じクラスに並び、補助クラスの責務境界がテスト本体から見えにくい。
 - `Tracker/Tracker.Tests/TrackerRenderSnapshotLogReaderTests.cs`
   - 291 行、読み取りのテストと gzip / JSONL 用の補助処理が同居している。
-  - 巨大ではないが、描画時点の記録を用意する処理を他の診断ログ読み取りテストと共有できる形に分離すると、今後の追加テストが読みやすくなる。
+  - 巨大ではないが、render snapshot を用意する処理を他の診断ログ読み取りテストと共有できる形に分離すると、今後の追加テストが読みやすくなる。
 - `Tracker/Tracker.Tests/TrackedVisionViewStateTests.cs`
   - 195 行、1 つの変換テストで多くの条件を検証している。
   - 分割必須ではないが、コメント追加とテスト用データの生成処理の分離を行う対象にする。
@@ -32,7 +32,7 @@
 ### 既存の補助処理
 
 - `Tracker/Tracker.Tests/Contracts/TrackerContractFixture.cs`
-  - 追跡エンジン、パケット生成器、設定、設定組の切り替え要求、追跡結果や状態を生成する補助メソッドを持つ。
+  - 追跡エンジン、パケット生成器、設定、設定プロファイルの切り替え要求、追跡結果や状態を生成する補助メソッドを持つ。
   - テスト分割後も共通の生成処理として維持し、同種の生成処理を各テストクラスに再作成しない。
 - `Tracker/Tracker.Tests/Contracts/TrackerContractTestData.cs`
   - 未加工の SSL-Vision パケットを作成する正本として維持する。
@@ -56,7 +56,7 @@
 | 新規ファイル | 主な責務 | 移動するテスト |
 | --- | --- | --- |
 | `Contracts/TrackerEngineBufferingContractTests.cs` | 観測時刻順の並べ替え、統合する時間範囲、0..N 件の追跡結果の確定、遅着パケット、処理時刻 | `Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers`、`Update_SplitsFrames_WhenObservationsExceedMergeWindow`、`Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush`、`Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes`、`Update_EmitsWorldFrameCommittedForEachCommittedFrameInFlushOrder`、`Update_UsesSentTimeWhenCaptureTimeIsMissing`、`Update_DropsLatePacketsThatFallInsideAnAlreadyCommittedMergeWindow`、`Update_WaitsForTheOldestGroupMergeWindowToCloseBeforeFlushingIt`、`Update_PopulatesProcessedAtNsFromLocalProcessingTime` |
-| `Contracts/TrackerEngineGeometryProfileContractTests.cs` | 競技場形状の保持と初期化、設定組の切り替え | `Update_PreservesDisplayGeometryInGeometrySnapshot`、`Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration`、`Update_EmitsGeometryResetWhenGoalGeometryChanges`、`Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched`、`Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult`、`Update_PreservesFrameNumberContinuityAcrossProfileSwitch`、`Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile` |
+| `Contracts/TrackerEngineGeometryProfileContractTests.cs` | フィールド形状の保持と初期化、設定プロファイルの切り替え | `Update_PreservesDisplayGeometryInGeometrySnapshot`、`Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration`、`Update_EmitsGeometryResetWhenGoalGeometryChanges`、`Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched`、`Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult`、`Update_PreservesFrameNumberContinuityAcrossProfileSwitch`、`Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile` |
 | `Contracts/TrackerEngineRobotTrackingContractTests.cs` | ロボット追跡の統合、速度、Kalman、外れ値、可視性、ロボットの重複抑制 | `Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot` から `Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation` まで |
 | `Contracts/TrackerEngineBallTrackingContractTests.cs` | ボール追跡の統合、主対象と補助対象、速度、Kalman、可視性、実体のない追跡や古い追跡の抑制、同じボールとしての識別、複数カメラの観測の集合化 | `Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall` から `Update_MergesThreeCameraBallChainIntoSingleCluster` まで |
 | `Contracts/TrackerEngineKickContactContractTests.cs` | 接触、最後に触れたロボット、キック、地上キックと浮き球キックの分類 | `Update_PopulatesCurrentBallContactAndMarksContactingRobot` から `Update_UsesConfiguredChipHeightThresholdForChipClassification` まで |
@@ -84,8 +84,8 @@
 | 新規ファイル | 主な責務 | 移動するテスト |
 | --- | --- | --- |
 | `TrackerCoordinatorFrameFlowTests.cs` | 確定済みの追跡結果、保存状態の更新、パケット送信、派生イベントの順序 | `ProcessPacket_WithCommittedFrame_UpdatesTrackedSnapshotAndPublishesTrackerPacket`、`ProcessPacket_WhenDerivedEventsExist_NotifiesObserverInEmittedOrder` |
-| `TrackerCoordinatorResetAndProfileTests.cs` | 競技場形状の初期化、設定組の切り替え、実行時の調整 | `ProcessPacket_WhenGeometryResetOccurs_ClearsTrackedSnapshotBeforeNotifyingObserver`、`RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification`、`ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext`、`RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings` |
-| `TrackerCoordinatorDiagnosticsCaptureTests.cs` | 受信記録の保存単位、診断用の補助ファイル、設定で指定した診断ファイル | `ProcessPacket_WithPacketCaptureSession_WritesDiagnosticsLogSidecar`、`ProcessPacket_WhenCaptureIsReenabled_WritesDiagnosticsToNewSidecar`、`ProcessPacket_WithCaptureDisabled_WritesDefaultDiagnosticsLogUnderCaptureDirectory`、`ProcessPacket_WithPacketCaptureSessionAndConfiguredDiagnosticsFile_WritesBothLogs` |
+| `TrackerCoordinatorResetAndProfileTests.cs` | フィールド形状の初期化、設定プロファイルの切り替え、実行時の調整 | `ProcessPacket_WhenGeometryResetOccurs_ClearsTrackedSnapshotBeforeNotifyingObserver`、`RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification`、`ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext`、`RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings` |
+| `TrackerCoordinatorDiagnosticsCaptureTests.cs` | キャプチャーの保存単位、診断用の補助ファイル、設定で指定した診断ファイル | `ProcessPacket_WithPacketCaptureSession_WritesDiagnosticsLogSidecar`、`ProcessPacket_WhenCaptureIsReenabled_WritesDiagnosticsToNewSidecar`、`ProcessPacket_WithCaptureDisabled_WritesDefaultDiagnosticsLogUnderCaptureDirectory`、`ProcessPacket_WithPacketCaptureSessionAndConfiguredDiagnosticsFile_WritesBothLogs` |
 
 共有する補助処理は次へ抽出する。
 
@@ -110,7 +110,7 @@
   - `CreateCaptureSession` は非公開の補助メソッドのまま維持してよい。
   - 再生テストの検証条件と、記録に付随する情報の検証条件を補助処理に隠しすぎない。
 - `TrackedVisionViewStateTests.cs`
-  - 1 つ目の変換テストは、テスト用データの作成部にコメントを足し、検証箇所を競技場形状、診断情報、イベントの付随情報の順で空行により整理する。
+  - 1 つ目の変換テストは、テスト用データの作成部にコメントを足し、検証箇所をフィールド形状、診断情報、イベントの付随情報の順で空行により整理する。
   - 検証箇所を複数のテストへ分ける場合は、1 つの表示状態の変換から複数の公開契約を確認していることを保つため、重複するテスト用データの作成を補助処理へ分離してから行う。
 
 ## 日本語コメント追加基準
@@ -139,7 +139,7 @@ XML の `summary` 要素は次を満たす。
 テストメソッド内では、次の場合に該当する処理の直前へ短い日本語の通常コメントを置いてよい。
 
 - 複数のパケットを順に投入し、どのパケットが追跡結果の確定のきっかけになるか分かりにくい。
-- 設定組の切り替えや競技場形状の初期化のように、イベント順序と内部状態の消去の両方を同時に確認している。
+- 設定プロファイルの切り替えやフィールド形状の初期化のように、イベント順序と内部状態の消去の両方を同時に確認している。
 - 繰り返し処理で、観測の揺れ、可視性の減衰、補助対象のボールの増加などの状態を作っている。
 
 ### 避けるコメント
