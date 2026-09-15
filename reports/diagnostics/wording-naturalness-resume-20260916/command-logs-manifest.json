@@ -51,6 +51,18 @@
     "bytes": 694,
     "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
   },
+  "lint-integrated.exit": {
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "lint-integrated.stderr.log": {
+    "bytes": 1295,
+    "sha256": "efb2f0cbf5eb96e5a2c9fb198b3323626dad3ad0608e1506cda1396c5a73e5fb"
+  },
+  "lint-integrated.stdout.log": {
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  },
   "lint.exit": {
     "bytes": 4,
     "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"

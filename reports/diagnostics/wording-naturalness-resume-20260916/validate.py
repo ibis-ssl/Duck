@@ -7,7 +7,7 @@ def git(*args):
     return subprocess.check_output(['git', *args], text=True)
 head = git('rev-parse', 'HEAD').strip()
 seed = '9e48670560a17feb4fd65f126a6c7eac7116f7dc'
-paths = git('diff', '--name-only', seed, '--', '*.md', ':(exclude)reports/**').splitlines()
+paths = git('diff', '--name-only', seed, '84dbf6c235be9e89e775bc0020fb891d56131ee5', '--', '*.md', ':(exclude)reports/**').splitlines()
 checks = []
 def check(name, passed):
     checks.append({'name': name, 'passed': bool(passed)})
@@ -37,8 +37,8 @@ for name, args in [('focused-whitelist', ['/home/ibis/ssl/IbisDuck/.venv/bin/pyt
     commands.append({'name': name, 'command': args, 'exit_code': cp.returncode})
     print(name, cp.returncode, cp.stderr.decode()[-1000:])
 manifest = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in files + [quote_path, 'tools/lint/markdown-whitelist.yaml']}
-result = {'seed_head': seed, 'tested_head': head, 'checked_at': datetime.datetime.now().astimezone().isoformat(), 'changed_files': paths, 'manifest': manifest, 'commands': commands, 'checks': checks, 'full_lint_exit_code': int((out / 'lint-committed.exit').read_text()), 'note': 'Implementation self-check; not independent review or full occurrence-level closure.'}
-(out / 'validation.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+result = {'seed_head': seed, 'tested_head': head, 'checked_at': datetime.datetime.now().astimezone().isoformat(), 'changed_files': paths, 'manifest': manifest, 'commands': commands, 'checks': checks, 'full_lint_exit_code': int((out / 'lint-integrated.exit').read_text()), 'note': 'Implementation self-check; not independent review or full occurrence-level closure.'}
+(out / 'validation-current.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
 print('CHECKS', sum(c['passed'] for c in checks), '/', len(checks))
 print([c for c in checks if not c['passed']])
 print(result['checked_at'])
