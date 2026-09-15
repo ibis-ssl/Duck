@@ -1,8 +1,8 @@
-# `Tracker.Core` エンジン詳細設計
+# `Tracker.Core` 追跡処理詳細設計
 
 ## 目的
 
-`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジン側の分割境界、実行順序、挙動維持の確認観点を固定する。
+`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡処理側の分割境界、実行順序、挙動維持の確認観点を固定する。
 
 この設計は保守性改善の詳細設計であり、`TRACKER-033` ではトラッカーの追跡挙動、公開契約、通信形式での出力、設定値の意味を変更しない。
 
@@ -24,7 +24,7 @@
 
 現状は約 2200 行を超え、次の責務が 1 ファイルに混在している。
 
-- エンジンの公開契約
+- 追跡エンジンの公開契約
   - `ITrackerEngine`
   - `TrackerUpdateResult`
   - `TrackerEngineDiagnostics`
@@ -32,20 +32,20 @@
   - `TrackerEventKind`
   - `ITrackerObserver`
 - `TrackerEngine` 本体
-  - `Update` による設定組の切り替え、競技場形状の更新、バッファへの検出情報追加、フレーム確定の実行
+  - `Update` による設定組の切り替え、競技場形状の更新、バッファへの検出情報追加、追跡結果の確定の実行
   - 未処理の検出情報を保持するバッファと、観測時刻順の並べ替え・統合する時間範囲の管理
-  - 競技場形状の大幅変更によるリセットと最新状態の消去
-  - 競技場全体のフレーム確定とイベント発行
+  - 競技場形状の大幅変更による初期化と最新状態の消去
+  - 競技場全体の追跡追跡結果の確定とイベント発行
 - ボール追跡
   - カメラごとのボール追跡状態の観測更新、予測、可視性の減衰
-  - 複数カメラのボール観測のグループ化と統合後のボールの識別情報の維持
+  - 複数カメラのボール観測の集合化と統合後のボールの識別情報の維持
   - 主対象のボールの安定化と補助対象のボールの出力順序
 - ロボット追跡
   - カメラごとのロボット観測の収集
   - 同一ロボット ID の遠方の外れ値の除去
   - ロボット追跡状態の観測更新、予測、複数カメラの追跡結果の統合
   - 向きの角度の連続化と正規化
-  - 向きのフィルターで使う rad 単位に対応する共分散と、角速度の制限
+  - 向きの状態推定で使う rad 単位に対応する共分散と、角速度の制限
 - AutoRef 向けの派生イベント
   - ボール接触
   - キック検出とキック後のボール状態の継続
@@ -57,7 +57,7 @@
   - 軸ごとの状態の初期化、予測、更新
   - measurement noise、process noise、可視性の閾値に関する設定の解決
   - 距離の計算、時刻の変換、速度の計算
-- 非公開の状態保持レコードと比較処理
+- 非公開の状態保持用の `record`と比較処理
   - `BufferedDetection`
   - `BallObservation`
   - `KalmanAxisState`
@@ -71,7 +71,7 @@
   - `BufferedDetectionGroup`
   - `TrackedBallComparer`
   - `TrackedRobotComparer`
-- エンジン設定と実行時の上書き設定の契約
+- 追跡エンジンの設定と実行時の上書き設定の契約
   - `TrackerEngineSettings`
   - `TrackerRuntimeOverrides`
   - `TrackerPublishOverrides`
@@ -82,11 +82,11 @@
 
 ### `TrackerModelContracts.cs`
 
-現状は約 230 行で、内部で使う競技場全体の状態モデル、競技場形状のスナップショット、追跡状態、接触・キック・場外退出などの派生状態、元の検出情報、チームの列挙型が 1 ファイルにまとまっている。行数は `TrackerExecutionContracts.cs` より小さいが、公開 DTO が多く、`TRACKER-033` の日本語コメント追加時に責務単位で分けた方が読みやすい。
+現状は約 230 行で、内部で使う競技場全体の状態表現、競技場形状のスナップショット、追跡状態、接触・キック・場外退出などの派生状態、元の検出情報、チームの列挙型が 1 ファイルにまとまっている。行数は `TrackerExecutionContracts.cs` より小さいが、公開 DTO が多く、`TRACKER-033` の日本語コメント追加時に責務単位で分けた方が読みやすい。
 
 主な責務:
 
-- フレーム全体: `TrackerFrame`, `TrackerFrameMetadata`
+- 追跡結果全体: `TrackerFrame`, `TrackerFrameMetadata`
 - 競技場形状: `TrackerGeometrySnapshot`, `TrackerGeometryLineSegment`, `TrackerGeometryCircularArc`
 - 追跡対象: `TrackedBallState`, `TrackedRobotState`, `TrackerTeam`
 - AutoRef 向けの派生状態: `KickEventState`, `BallContactState`, `BallLeftFieldState`
@@ -99,7 +99,7 @@
 主な責務:
 
 - パケット全体に付随する情報の設定
-- `TrackedFrame` のフレーム番号と時刻の設定
+- `TrackedFrame` の追跡結果の番号と時刻の設定
 - 主対象のボールを先頭に置く処理と、補助対象のボールの安定した並び順
 - ボール、ロボット、キック後のボールの情報を通信形式へ変換
 - `TrackerTeam` から公式形式の `Team` への変換
@@ -108,13 +108,13 @@
 
 ## 分割後の推奨ファイル構成
 
-`TRACKER-033` では名前空間を `Tracker.Core` のまま維持し、同一アセンブリ内のソースファイルの分割だけを行う。公開する型名、メンバー名、公開範囲、`null` を許可する箇所は変更しない。
+`TRACKER-033` では名前空間を `Tracker.Core` のまま維持し、同一アセンブリ内のソースファイルの分割だけを行う。公開する型名、型のメンバーの名前、公開範囲、`null` を許可する箇所は変更しない。
 
 ### ファイル命名と `partial` 配置
 
-ドット区切りのファイル名は、フレームワークや開発ツールの慣習に限って許容する。例: `.csproj`、`.sln`、`.razor.cs`、`.razor.css`、`.g.cs`、`.Designer.cs`、`.AssemblyInfo.cs`、自動生成物やビルド出力。
+`.` 区切りのファイル名は、フレームワークや開発ツールの慣習に限って許容する。例: `.csproj`、`.sln`、`.razor.cs`、`.razor.css`、`.g.cs`、`.Designer.cs`、`.AssemblyInfo.cs`、自動生成物やビルド出力。
 
-手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は型名のフォルダを作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をパスで読める。
+手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は型名のフォルダを作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をファイルパスで読める。
 
 `public` / `internal` の最上位の型 1 つにつき、1 ファイルを基本にする。複数の最上位の型を同居させるのは、親子 DTO、密結合した小さな列挙型や拡張処理、同じ外部データ形式の一部で単独参照されない型の場合に限る。
 
@@ -132,16 +132,16 @@
 - `Tracker/Tracker.Core/Engine/TrackerProfileSwitchRequest.cs`
   - `TrackerProfileSwitchRequest`
 
-### エンジン本体
+### 追跡エンジンの本体
 
 - `Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs`
-  - `TrackerEngine` のフィールド、明示的なコンストラクターを持たない構成、`Update`
-  - 設定組の切り替え、競技場形状の更新、検出情報の受け付け、フレーム確定の呼び出しをまとめる最上位の制御処理
+  - `TrackerEngine` の保持項目、明示的なコンストラクターを持たない構成、`Update`
+  - 設定組の切り替え、競技場形状の更新、検出情報の受け付け、追跡結果の確定の呼び出しをまとめる最上位の制御処理
 - `Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs`
   - `FlushCommittedFrames`
   - `ClearPendingStateAndAdvanceLateCutoff`
   - `CommitGroup`
-  - フレームとイベントを出力する処理の組み立て
+  - 追跡結果とイベントを出力する処理の組み立て
 - `Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs`
   - `CreateBufferedDetection`
   - `CreateSourceDetectionFrames`
@@ -165,7 +165,7 @@
   - `AssignMergedBallIdentity`
   - `CreateTrackedBall`
   - `IsFreshPreviousPrimaryBall`
-  - ボール追跡に関する非公開のレコード
+  - ボール追跡に関する非公開の `record`
 - `Tracker/Tracker.Core/Engine/TrackerEngine/RobotTracking.cs`
   - `UpdateCameraRobotTrackStates`
   - `CollectCameraRobotObservations`
@@ -179,7 +179,7 @@
   - `PredictRobotTrackState`
   - `CollectMergedRobotStates`
   - `CreateTrackedRobot`
-  - ロボットの識別子・観測・追跡に関する非公開のレコード
+  - ロボットの識別子・観測・追跡に関する非公開の `record`
 - `Tracker/Tracker.Core/Engine/TrackerEngine/Contact.cs`
   - `CreateBallContactState`
   - `ApplyBallContactFlags`
@@ -209,7 +209,7 @@
   - `CreateInitialKalmanAxis`
   - `PredictKalmanAxis`
   - `UpdateKalmanAxis`
-  - 向きのフィルター用の速度分散、予測に伴う分散、速度制限の指定
+  - 向きの状態推定用の速度分散、予測に伴う分散、速度制限の指定
 - `Tracker/Tracker.Core/Engine/TrackerEngine/Settings.cs`
   - 非公開の設定解決処理
   - 可視性と観測品質の減衰処理
@@ -234,7 +234,7 @@
 
 既存の `Tracker.DebugHost` と `Tracker.CaptureReplay` が参照している型名は維持する。`Tracker.Core` 内のフォルダ移動によって、これらが参照する名前空間は変えない。
 
-### モデルの契約
+### 状態表現の契約
 
 - `Tracker/Tracker.Core/Model/TrackerFrame.cs`
   - `TrackerFrame`
@@ -266,14 +266,14 @@
 
 `TRACKER-033` では日本語の XML コメントを追加する。固有名詞、型名、設定キー、通信形式の名前、単位記号は英字のままでよい。
 
-クラス、プロパティ、メソッドの説明は、原則として XML コメントに寄せる。通常コメント `//` はメソッド内の複雑な処理、不変条件、順序制約の直前に限定し、型やメンバーの契約説明には使わない。
+クラス、プロパティ、メソッドの説明は、原則として XML コメントに寄せる。通常コメント `//` はメソッド内の複雑な処理、不変条件、順序制約の直前に限定し、型や型のメンバーの契約説明には使わない。
 
-### クラス・インターフェース・列挙型
+### クラス・`interface`・列挙型
 
 次の型には必ず `/// <summary>` を付ける。
 
-- `public` / `internal` のクラス、インターフェース、レコード、レコード構造体、列挙型
-- `TrackerEngine` の非公開の入れ子レコードと比較処理のうち、分割後も非公開の補助処理として残す型
+- `public` / `internal` のクラス、`interface`、`record`、`record struct`、列挙型
+- `TrackerEngine` の非公開の入れ子の `record`と比較処理のうち、分割後も非公開の補助処理として残す型
 
 説明文には「何を表すか」「どの境界で使うか」を 1 から 2 文で書く。実装手順や履歴は書かない。
 
@@ -309,7 +309,7 @@
 - `public` / `internal` のメソッド
 - `TrackerEngine.Update`
 - 分割後に各ファイルの入口になる非公開のメソッド
-- 並べ替え、統合、Kalman、競技場形状のリセット、識別情報の割り当て、イベント発行、通信形式への変換の境界となるメソッド
+- 並べ替え、統合、Kalman、競技場形状の初期化、識別情報の割り当て、イベント発行、通信形式への変換の境界となるメソッド
 
 単純な値の取得処理、数式そのものが明らかな非公開の補助処理、1 行で別の処理を呼び出すだけのメソッドには無理に付けない。ただし「なぜこの順序か」「どの挙動を固定するか」が読み手に伝わりにくい場合は、非公開のメソッドでも説明文または短い通常コメントを追加する。
 
@@ -320,8 +320,8 @@
 追加対象の例:
 
 - 設定組の切り替えイベントを `WorldFrameCommitted` より前に発行する箇所
-- `ReorderWindow` と `MergeWindow` によって、確定するフレームを決める箇所
-- 競技場形状の大幅変更によるリセットで未処理の検出情報を捨てる箇所
+- `ReorderWindow` と `MergeWindow` によって、確定する追跡結果を決める箇所
+- 競技場形状の大幅変更による初期化で未処理の検出情報を捨てる箇所
 - 主対象のボールの継続を、補助対象の並べ替えより優先する箇所
 - Kalman 更新で予測状態と前回の位置を併用する箇所
 - ロボットの遠方外れ値を同一ロボット ID の近傍観測で落とす箇所
@@ -329,16 +329,16 @@
 ## `TRACKER-033` 実行順序
 
 1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。
-2. `TrackerExecutionContracts.cs` から公開契約を先に分離する。`ITrackerEngine`、結果とイベント、オブザーバー、設定組の切り替え要求の型名と名前空間を変えない。
-3. `TrackerEngine` を `partial sealed class` にして、最上位の `Update` とフィールドを `Engine/TrackerEngine/TrackerEngine.cs` に残す。
-4. 検出情報を保持するバッファとフレーム確定処理を分離する。ここで `CommittedFrames` と `EmittedEvents` の順序が変わらないことを、対象を絞ったテストで確認する。
-5. 競技場形状の変換とリセット判定を分離する。未処理の検出情報の消去、フレーム番号の維持、遅着の判定境界の扱いを変えない。
+2. `TrackerExecutionContracts.cs` から公開契約を先に分離する。`ITrackerEngine`、結果とイベント、通知先、設定組の切り替え要求の型名と名前空間を変えない。
+3. `TrackerEngine` を `partial sealed class` にして、最上位の `Update` と保持項目を `Engine/TrackerEngine/TrackerEngine.cs` に残す。
+4. 検出情報を保持するバッファと追跡結果の確定処理を分離する。ここで `CommittedFrames` と `EmittedEvents` の順序が変わらないことを、対象を絞ったテストで確認する。
+5. 競技場形状の変換と初期化判定を分離する。未処理の検出情報の消去、追跡結果の番号の維持、遅着の判定境界の扱いを変えない。
 6. ボール追跡を分離する。カメラごとの追跡 ID、統合後の内部追跡 ID、主対象のボールの継続、補助対象のボールの成長条件を変えない。
 7. Kalman の補助処理を分離する。`UpdateKalmanAxis` の引数と、予測状態・前回の位置を使う計算の基準を変えない。
 8. ロボット追跡を分離する。同一ロボット ID の複数カメラの追跡結果を統合する処理、遠方の外れ値の除去、向きの角度を連続化する処理の順序を変えない。
 9. 接触、キック、ボールの場外退出を分離する。イベントの発火条件、直近の接触とみなす時間範囲、境界名を変えない。
-10. 設定と実行時の上書き設定の契約を `Configuration` 配下へ分離し、`Tracker.RuntimeHost`、`Tracker.DebugHost`、`Tracker.CaptureReplay`、テストの参照がソースファイルのパスに依存していないことを確認する。
-11. モデルの契約を `Model` 配下へ分離し、公開プロパティの構造を変えずに日本語の XML コメントを追加する。
+10. 設定と実行時の上書き設定の契約を `Configuration` 配下へ分離し、`Tracker.RuntimeHost`、`Tracker.DebugHost`、`Tracker.CaptureReplay`、テストの参照がソースファイルのファイルパスに依存していないことを確認する。
+11. 状態表現の契約を `Model` 配下へ分離し、公開プロパティの構造を変えずに日本語の XML コメントを追加する。
 12. `TrackerPacketGenerator` を `Proto` 配下へ移動し、主対象のボールを先頭に置く処理、ロボットの並べ替え、対応機能の順序、単位変換のコメントを追加する。
 13. 全分割後に `TrackerExecutionContracts.cs` と `TrackerModelContracts.cs` が残る場合は、空の互換用ファイルを残さず削除する。
 14. 対象を絞ったテストを実行し、`Tracker.Core` の契約、時系列の契約、パケット生成器、処理全体を制御するクラスでの設定組の切り替えの正常系が通ることを確認する。
@@ -347,15 +347,15 @@
 ## 挙動を変えないための注意点
 
 - 名前空間は `Tracker.Core` のまま維持する。
-- `public` / `internal` の型名、メンバー名、プロパティの型、`null` を許可するかどうか、既定値を変えない。
+- `public` / `internal` の型名、型のメンバーの名前、プロパティの型、`null` を許可するかどうか、既定値を変えない。
 - `ITrackerEngine.Update` の引数順、引数の既定値、`null` を許す条件を変えない。
 - `ProfileSwitched` は状態の消去後、同じ結果内の `WorldFrameCommitted` より前に発行する。
-- `GeometryReset` は競技場形状の大幅変更によるリセット時だけ発行し、フレーム番号と実行時の識別情報は維持する。
+- `GeometryReset` は競技場形状の大幅変更による初期化時だけ発行し、追跡結果の番号と実行時の識別情報は維持する。
 - 検出情報の観測時刻は `TCapture > 0` を優先し、これを使えない場合の代用は `TSent` のままにする。
-- 未処理の検出情報からフレームを確定する順序は、観測時刻、カメラ ID、入力元のフレーム番号の安定した順序を維持する。
+- 未処理の検出情報から追跡結果を確定する順序は、観測時刻、カメラ ID、入力元の追跡結果の番号の安定した順序を維持する。
 - `ReorderWindow` と `MergeWindow` の意味を入れ替えない。
 - 遅着パケットの破棄では、観測時刻が `lastCommittedGroupCloseTimestampNs` 以下の入力を状態更新に使わない。
-- 競技場形状のリセットや設定組の切り替え時に、未処理の入力バッファ、カメラごとの追跡状態、統合後のボールの識別情報、接触と場外退出の状態、継続中のキック状態、主対象のボールを消去する範囲を変えない。
+- 競技場形状の初期化や設定組の切り替え時に、未処理の入力バッファ、カメラごとの追跡状態、統合後のボールの識別情報、接触と場外退出の状態、継続中のキック状態、主対象のボールを消去する範囲を変えない。
 - `nextCommittedFrameNumber` は状態の消去で戻さない。
 - 主対象のボールの継続判定を、補助対象の並べ替えより優先する。
 - 補助対象のボールは、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。
@@ -377,15 +377,15 @@
   - `TrackerRuntimeOverrides` と `TrackerProfileSwitchRequest` のスナップショットの構造が変わらないこと
 - 追跡エンジンの時系列処理
   - 観測時刻順の並べ替え
-  - 統合する時間範囲に応じたフレームの分割
+  - 統合する時間範囲に応じた追跡結果の分割
   - 遅着パケットの破棄
-  - 確定フレームが 0 件の結果
+  - 確定済みの追跡結果が 0 件の結果
   - `WorldFrameCommitted` イベントの順序
-- 設定組の切り替え / 競技場形状のリセット
+- 設定組の切り替え / 競技場形状の初期化
   - `ProfileSwitched` の発行順序
   - 観測データを伴わない制御要求の処理
-  - 競技場形状の大幅変更によるリセット
-  - 状態の消去後もフレーム番号が維持されること
+  - 競技場形状の大幅変更による初期化
+  - 状態の消去後も追跡結果の番号が維持されること
 - ボール追跡
   - 主対象のボールの継続
   - 複数カメラのボール追跡の統合
@@ -425,6 +425,6 @@ dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false
 
 ## 残るリスク
 
-- 非公開の補助処理の分割だけでも、`partial` 化の際に非公開の入れ子レコードの参照順やファイル配置を誤るとコンパイルエラーになりやすい。
+- 非公開の補助処理の分割だけでも、`partial` 化の際に非公開の入れ子の `record`の参照順やファイル配置を誤るとコンパイルエラーになりやすい。
 - コメント追加量が多いため、実装移動とコメント追加を同時に広く行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。
 - `TrackerPacketGenerator` は行数が小さいため、過剰分割すると可読性が下がる。`TRACKER-033` では移動とコメント追加を優先し、partial class の分割は必要になった場合だけ行う。
