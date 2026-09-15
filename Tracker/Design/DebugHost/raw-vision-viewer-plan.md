@@ -331,7 +331,7 @@ UI には変更不能なスナップショットを返し、描画中にロッ�
 [^source-term]: 表示元: 画面に描画するボール、ロボット、競技場形状の由来。映像画面の分割表示・重ね表示では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。
 [^raw-aggregate]: Raw Aggregate: 未加工 SSL-Vision 入力のカメラごとの最新検出情報を UI 表示用に統合した表示元。複数カメラのボール・ロボットをまとめて映像画面で見るための候補で、カメラ単体ではなく集約表示を選ぶときに使う。
 [^raw-camera]: Raw Camera: 特定のカメラ ID の未加工 SSL-Vision 入力の最新検出情報を表示する表示元。カメラごとの見え方や検出差を確認するための候補で、選択肢の内部識別子にはカメラ ID を含める。
-[^tracked-source]: Tracked: 自前トラッカーが生成した `TrackerFrame` を映像表示用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。
+[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` を映像表示用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。
 [^third-party-tracker]: 3rd party tracker: 自前トラッカー以外の外部トラッカーから受けたパケットの表示元。外部トラッカーの出力を未加工の SSL-Vision 入力や自前トラッカーと比較するための候補。
 [^live-state]: 実行中の状態: 映像画面の分割表示・重ね表示の `3rd party tracker` で、実行中に外部トラッカーから最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、スナップショット化された表示用データを読む。
 [^mutable-state]: 変更可能な状態: `MultiTrackerManager` 内で後から内容が変わる状態オブジェクト。映像画面の分割表示・重ね表示では、描画中に値が変わることを避けるため、この状態を直接読まず、スナップショット化してから比較に使う。
@@ -358,7 +358,7 @@ UI には変更不能なスナップショットを返し、描画中にロッ�
 [^viewport-state]: 表示位置・倍率の状態: フィールドの拡大縮小、表示位置の移動、ドラッグ中の移動量など、画面上でフィールドをどの位置と倍率で見るかを表す状態。重ね表示では層ごとに別々に持たず、1 つの状態を共有する。
 [^split-independent-viewport]: 分割表示の独立した表示位置・倍率: 左右のフィールドが、それぞれ別の表示位置と倍率を持つこと。左右は比較対象を並べる表示なので、片方をドラッグしても、もう片方を自動追従させる要件ではない。
 [^same-source]: 同じ表示元を選んだ状態: Layer A/B が同じ表示元を選んだ状態。映像画面の重ね表示では、重複描画で誤差があるように見せないため、1 層の表示にまとめる。
-[^multi-tracker-manager]: MultiTrackerManager / TrackerPacketAdapter: `MultiTrackerManager` は `TrackerConnectionLib` の追跡状態を管理するコンポーネントで、自前・外部・不明のトラッカーの最新状態を保持する。`TrackerPacketAdapter` は、外部トラッカーのパケットを `MultiTrackerManager` で扱うための変換用部品。
+[^multi-tracker-manager]: `MultiTrackerManager` / `TrackerPacketAdapter`: `MultiTrackerManager` は `TrackerConnectionLib` の追跡状態を管理するコンポーネントで、自前・外部・不明のトラッカーの最新状態を保持する。`TrackerPacketAdapter` は、外部トラッカーのパケットを `MultiTrackerManager` で扱うための変換用部品。
 [^selected-replay-timeline-tick]: 選択中の再生時点: 診断再生でユーザーが現在選択している、再生時系列上の基準時点。映像入力、自前トラッカー、外部トラッカーを比較するとき、この時点は表示元ごとに移動させない。
 [^replay-timeline-index]: ReplayTimelineIndex: 診断再生の選択時点を識別する位置番号。`saved-session-alignment` の対応記録と結び付けて、どの時点の比較かを特定する。
 [^saved-session-alignment]: saved-session-alignment: CaptureOn の記録単位に保存された、再生時系列上の時点とトラッカーの表示元スナップショットの対応記録群。診断再生で外部トラッカーのスナップショットを、同じ選択時点に合わせるために使う。
