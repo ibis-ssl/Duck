@@ -16,7 +16,7 @@
 - .NET SDK `10.0`
 - SSL-Vision packet を送ってくる送信元
 - CaptureOn 比較ログを取る場合は official tracker multicast endpoint に流れている tracker packet
-- ブラウザで `Tracker.DebugHost` の HTTP endpoint にアクセスできること
+- ブラウザで `Tracker.DebugHost` のHTTP接続先に接続できること
 
 ## 起動方法
 
@@ -41,7 +41,7 @@ ASPNETCORE_URLS=http://0.0.0.0:5289 dotnet run --project Tracker/Tracker.DebugHo
 
 トップページは `/` です。
 
-### ヘッダー
+### 画面ヘッダー
 
 - `Packets`: 受信した raw packet 数です
 - `Errors`: 受信・decode・socket 処理で記録された error 数です
@@ -123,7 +123,7 @@ raw SSL-Vision packet の受信設定です。
 
 ### `VisionReceiver:PacketCapture`
 
-SSL-Vision から着信した UDP datagram を、protobuf decode 前の bytes として `jsonl.gz` に保存します。各行には `receivedAt`、remote endpoint、payload の base64 が入るため、後から同じ順序で `SSL_WrapperPacket` に戻して tracker へ再投入できます。decode に失敗した packet も保存対象です。
+SSL-Vision から受信したUDPパケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。
 
 capture を開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn session folder を作り、その中に同じ basename で次の sidecar も作成します。
 
