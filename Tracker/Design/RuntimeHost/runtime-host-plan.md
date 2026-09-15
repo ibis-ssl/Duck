@@ -105,19 +105,19 @@ DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入�
 
 ### `RUNTIME-HOST-009`: RuntimeHost の通常処理
 
-`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、SSL-Vision のマルチキャスト用の通信アドレス、UDP の通信ポート、必要に応じて指定する使用する IPv4 の通信アドレスを読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、受信記録の書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。
+`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、SSL-Vision のマルチキャスト用の通信アドレス、UDP の通信ポート、必要に応じて使用する IPv4 の通信アドレスを読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、受信記録の書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。
 
 受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
 
 RuntimeHost は `Tracker` の設定階層から、追跡の有効化、追跡結果の送信元名、UUID、UDP 送信の有効化、設定組ごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡結果ごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理の最新の追跡スナップショットを更新する。
 
-起動時の設定組の選択は、設定ファイルの `Tracker:ActiveProfileName` を既定にする。ただし、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET のコマンドライン設定を読み込む仕組みと、引数から設定項目への対応表を使い、将来の短縮したコマンドラインオプションも同じ対応表に追加できる形にする。CLI による設定組の上書きは `Tracker:Profiles:<name>` の既存の設定組だけを選択し、設定組の定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示的に失敗させ、誤って `default` の設定組で代用しない。
+起動時の設定組の選択は、設定ファイルの `Tracker:ActiveProfileName` を既定にする。ただし、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET のコマンドライン設定を読み込む仕組みと、引数から設定項目への対応表を使い、将来の短縮引数も同じ対応表に追加できる形にする。CLI による設定組の上書きは `Tracker:Profiles:<name>` の既存の設定組だけを選択し、設定組の定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示的に失敗させ、誤って `default` の設定組で代用しない。
 
 DebugHost が読む最新の追跡スナップショットは、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、公式形式の追跡パケットの送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、診断記録の再生、記録内容の確認画面の手動検証は `RUNTIME-HOST-010` に残す。
 
 ## 設計資料配置
 
-設計資料は `Tracker/Design/` を正本の起点とする。
+設計資料は `Tracker/Design/` を正本の配置先とする。
 
 - `Tracker/Design/Core/`: 追跡アルゴリズム、契約、副作用のない処理。
 - `Tracker/Design/DebugHost/`: Web UI、診断、未加工の映像入力の表示、記録と再生。
@@ -127,7 +127,7 @@ DebugHost が読む最新の追跡スナップショットは、RuntimeHost か�
 ## 対象外
 
 - 自動判定の処理の実装。
-- レフェリープログラムの判定規則を実行する追跡エンジンの実装。
+- レフェリープログラムの判定規則を実行する処理の実装。
 - 旧診断ログ形式の完全互換。
 - `BreakingChanges` の作成。
 
