@@ -1,17 +1,19 @@
 # Tracker.CaptureReplay
 
-`Tracker.CaptureReplay` は、保存済みの SSL-Vision 受信記録を追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールはエージェント / 自動検証 / 回帰調査で同じ記録単位を再現するために使います。
+`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールはエージェント / 自動検証 / 回帰調査で同じ記録単位を再現するために使います。
 
+
+本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 ## 基本実行
 
-記録単位のフォルダをそのまま渡すと、同じフォルダの付随情報から受信記録と解決済みのトラッカー設定を取得します。
+記録単位のフォルダをそのまま渡すと、同じフォルダの付随情報からキャプチャーと解決済みのトラッカー設定を取得します。
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \
   --capture <session-folder>
 ```
 
-受信記録ファイルと設定ファイルを明示する場合:
+キャプチャーファイルと設定ファイルを明示する場合:
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \
@@ -22,7 +24,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 
 ## 遅延分析
 
-未加工の映像入力に対して自前トラッカーが遅れて見える場合は、受信記録ファイルを直接読む代わりに `--analyze-latency` を使います。未加工の検出情報の受信周期と、再生後に追跡フレームが確定するまでの `ReceivedAt` 基準の遅延を同じ出力で確認できます。
+raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを直接読む代わりに `--analyze-latency` を使います。未加工の検出情報の受信周期と、再生後に追跡フレームが確定するまでの `ReceivedAt` 基準の遅延を同じ出力で確認できます。
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \
@@ -47,10 +49,10 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 
 | コマンドラインオプション | 用途 |
 | --- | --- |
-| `--capture <path>` | `*.jsonl.gz` の受信記録ファイル、または記録単位のフォルダ。 |
-| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または受信記録の付随情報。記録単位のフォルダを入力する場合は省略できます。 |
-| `--profile <name>` | 設定から選ぶトラッカーの設定組。既定は `sim`。 |
-| `--analyze-latency` | 未加工の映像入力の受信周期と、トラッカーの確定遅延を出力します。 |
+| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または記録単位のフォルダ。 |
+| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、またはキャプチャーの付随情報。記録単位のフォルダを入力する場合は省略できます。 |
+| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |
+| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |
 | `--max-latency-frames <count>` | 追跡フレームごとの遅延詳細の最大出力数。 |
 | `--skip-tracker-snapshots` | 付随情報由来の `trackerSnapshot` / `trackerComparison` 行を抑制します。 |
 | `--detail-filter <condition>` | 条件に合う確定済みの追跡フレームの詳細を出力します。複数指定できます。 |
@@ -60,7 +62,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 
 ## 出力の見方
 
-- `capture=...`: 実際に再生した受信記録ファイル。
+- `capture=...`: 実際に再生したキャプチャーファイル。
 - `settingsFile=...`: 実際に使った設定または付随情報。
 - `settings=...`: 再生に適用した主なトラッカー設定。
 - `packets=... committedFrames=...`: 再生結果の概要。
@@ -68,7 +70,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 - `latencySummary ...`: 未加工入力の受信周期とトラッカーの確定遅延の概要。
 - `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。
 
-`latencySummary` の確定遅延は受信記録の `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「未加工の映像入力が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。
+`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。
 
 ## 自動検証
 
