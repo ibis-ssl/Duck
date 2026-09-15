@@ -3,7 +3,7 @@ entries:
   - term: SudachiPy
     description: 日本語を形態素に分けるために使う解析器名。
   - term: ChikkarPy
-    description: 語彙候補を同義語グループにまとめるために使う解析補助ライブラリ名。
+    description: 語彙候補を同義語のまとまりにまとめるために使う解析補助ライブラリ名。
   - term: Python
     description: 語彙抽出と形態素検査を実行する処理系名。
   - term: JavaScript
@@ -531,7 +531,7 @@ entries:
   - term: コマンドライン
     description: 文字による命令入力。
   - term: コメント
-    description: コードの意図や契約を説明する記述。
+    description: ソースコードの意図や契約を説明する記述。
   - term: コンストラクター
     aliases:
     - コンストラクタ
@@ -585,13 +585,13 @@ entries:
   - term: テストデータ
     description: 検証に用いる入力値や記録。
   - term: テンプレート
-    description: 文書やコード作成時のひな形。
+    description: 文書やソースコードを作成するときのひな形。
   - term: ディレクトリ
     description: ファイルをまとめる保存領域。
   - term: デコード
     description: 通信形式のバイト列から内容を復元する処理。
   - term: デスクトップ
-    description: 主にPC画面での表示環境。
+    description: 携帯端末ではなく、主に机上で使う端末向けの表示環境。
   - term: デバッグ
     description: 動作を調べ不具合を特定する作業。
   - term: データ
@@ -631,7 +631,7 @@ entries:
   - term: ブラウザ
     aliases:
     - ブラウザー
-    description: Web UIを表示し操作するソフトウェア。
+    description: Web UIを表示し操作するアプリケーション。
   - term: プログラム
     description: 実行する処理を記述したもの。
   - term: プロジェクト
@@ -651,7 +651,7 @@ entries:
   - term: マゼンタ
     description: 重ね表示の層を区別する色名。
   - term: マルチキャスト
-    description: 指定グループへ通信する方式。
+    description: 指定した複数の受信先へ通信する方式。
   - term: マーカー
     description: ボールやロボット等を示す描画要素。
   - term: メガバイト
