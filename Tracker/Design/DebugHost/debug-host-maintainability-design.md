@@ -34,7 +34,7 @@ CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` �
 - `reports/tracker-034-review-20260511081000.md`
 - `reports/tracker-034-review-r2-20260511083000.md`
 
-旧タスク一覧上の位置づけは `tracker-history-000-038.md` の `TRACKER-034` と `maintenance` の段階に退避済み。
+旧作業一覧上の位置づけは `tracker-history-000-038.md` の `TRACKER-034` と `maintenance` の段階に退避済み。
 
 ## 分割方針
 

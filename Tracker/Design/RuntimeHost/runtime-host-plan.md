@@ -50,7 +50,7 @@ AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` �
 
 ## RuntimeHost 設定方針
 
-RuntimeHost の実行周期はコード内に数値を直接埋め込まない。`Tracker.RuntimeHost` の初期構成では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、主処理と制御処理はこの値を使って周期を決める。0 以下の値は性能調整の意図を曖昧にするため、既定値で代用せず、起動時の設定検証エラーとする。
+RuntimeHost の実行周期はソースコード内に数値を直接埋め込まない。`Tracker.RuntimeHost` の初期構成では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、主処理と制御処理はこの値を使って周期を決める。0 以下の値は性能調整の意図を曖昧にするため、既定値で代用せず、起動時の設定検証エラーとする。
 
 `Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを設定オブジェクトや設定ファイルに出す。通信規約の名前、補助ファイル名、記録に付随する情報の項目名など、再生や通信形式の契約として固定すべき値は設定化しない。
 
@@ -101,13 +101,13 @@ DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入�
 
 `RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost の CaptureOn による記録単位に、診断の定期記録を保存する補助ファイルを追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。記録の付随情報は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
 
-診断記録の再生・比較は、診断の定期記録を保存する補助ファイルが存在する記録単位では、採取時点の列を再生時系列の主経路にする。表示元としての `Vision Input` と `ibis tracker` は、旧描画記録の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧描画記録の補助ファイルだけを持ち、診断の定期記録を保存する補助ファイルを持たない記録単位は、非対応または機能を制限した旧形式として扱い、高コストな互換経路は復活させない。
+診断記録の再生・比較は、診断の定期記録を保存する補助ファイルが存在する記録単位では、採取時点の列を再生時系列の主経路にする。表示元としての `Vision Input` と `ibis tracker` は、旧描画記録の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧描画記録の補助ファイルだけを持ち、診断の定期記録を保存する補助ファイルを持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。
 
 ### `RUNTIME-HOST-009`: RuntimeHost の通常処理
 
 `RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、SSL-Vision のマルチキャストアドレス、UDP ポート、必要に応じて指定するローカル IPv4 インターフェースのアドレスを読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、受信記録の書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。
 
-受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
+受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
 
 RuntimeHost は `Tracker` の設定階層から、追跡の有効化、追跡結果の送信元名、UUID、UDP 送信の有効化、設定組ごとの送信先、エンジン設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理の最新の追跡スナップショットを更新する。
 
