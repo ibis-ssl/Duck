@@ -1,0 +1,86 @@
+[
+  {
+    "name": "full-md",
+    "command": [
+      "npm",
+      "run",
+      "lint:md"
+    ],
+    "exit_code": 123,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:29:46.921433+09:00",
+    "stdout": "after-full-md.stdout.log",
+    "stderr": "after-full-md.stderr.log"
+  },
+  {
+    "name": "focused-text",
+    "command": [
+      "node_modules/.bin/textlint",
+      "--config",
+      ".textlintrc.json",
+      "--rulesdir",
+      ".agents/skills/review-enforcer/scripts/textlint-rules",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:29:47.202244+09:00",
+    "stdout": "after-focused-text.stdout.log",
+    "stderr": "after-focused-text.stderr.log"
+  },
+  {
+    "name": "focused-spell",
+    "command": [
+      "node",
+      ".agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 1,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:29:47.604789+09:00",
+    "stdout": "after-focused-spell.stdout.log",
+    "stderr": "after-focused-spell.stderr.log"
+  },
+  {
+    "name": "focused-whitelist",
+    "command": [
+      "python3",
+      ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 1,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:29:47.772970+09:00",
+    "stdout": "after-focused-whitelist.stdout.log",
+    "stderr": "after-focused-whitelist.stderr.log"
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:29:47.848662+09:00",
+    "stdout": "after-diff-check.stdout.log",
+    "stderr": "after-diff-check.stderr.log"
+  }
+]
