@@ -4,7 +4,7 @@
 
 `TRACKER-035` では、既存テストの意味を変えずに巨大なテストファイルを責務別へ分割し、各テストが何を確認しているかを日本語の XML コメントで明示する。
 
-この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。追跡エンジン、サーバー、CLI、UI の製品コードの分割方針は別の詳細設計で扱う。
+この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。追跡エンジン、サーバー、CLI、UI の製品のソースコードの分割方針は別の詳細設計で扱う。
 
 ## 現状
 
@@ -46,7 +46,7 @@
 - 1 つの既存 `[Fact]` は原則 1 つの新しいテストメソッドへそのまま移動する。
 - メソッド名は原則維持し、同じメソッド名が別のクラスに存在してもよい。
 - 名前空間は既存と同じ `Tracker.Tests` を維持する。
-- `TrackerContractFixture` と `TrackerContractTestData` を使い回し、分割のためだけに製品コードへテスト専用 API を追加しない。
+- `TrackerContractFixture` と `TrackerContractTestData` を使い回し、分割のためだけに製品のソースコードへテスト専用 API を追加しない。
 - ファイル内だけで使う補助処理は、2 クラス以上で共有する場合だけ `Tracker.Tests/Contracts` または `Tracker.Tests/Support` 配下へ抽出する。
 
 ### `TrackerEngineTemporalContractTests.cs` の推奨分割
@@ -62,7 +62,7 @@
 | `Contracts/TrackerEngineKickContactContractTests.cs` | 接触、最後に触れたロボット、キック、地上キックとチップキックの分類 | `Update_PopulatesCurrentBallContactAndMarksContactingRobot` から `Update_UsesConfiguredChipHeightThresholdForChipClassification` まで |
 | `Contracts/TrackerEngineBallLeftFieldContractTests.cs` | 場外退出、ゴール開口部・ゴールライン・角からの退出の分類 | `Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine`、`Update_ClassifiesGoalMouthExitAsGoalInterior`、`Update_ClassifiesNonGoalMouthExitAsGoalLine`、`Update_ClassifiesCornerExitByFirstPerimeterCrossing` |
 
-抽出後の旧 `TrackerEngineTemporalContractTests.cs` は削除する。空クラスや互換用のラッパーは残さない。
+抽出後の旧 `TrackerEngineTemporalContractTests.cs` は削除する。空クラスや互換性を保つためだけの呼び出し用の型は残さない。
 
 ### エンジンの契約テスト用の基底クラス
 
@@ -145,7 +145,7 @@ XML の `summary` 要素は次を満たす。
 ### 避けるコメント
 
 - 検証条件と同じ内容だけを繰り返すコメント。
-- 製品コードの内部実装手順を固定しすぎるコメント。
+- 製品のソースコードの内部実装手順を固定しすぎるコメント。
 - `Arrange`、`Act`、`Assert` だけの見出しコメント。
 - `[Fact]` / `[Theory]` の説明を通常コメントだけで済ませること。
 - 英語だけのコメント。識別子や通信規約の名前は英語のままでよい。
@@ -187,5 +187,5 @@ XML の `summary` 要素は次を満たす。
 - `TrackerCoordinator` のテストがすべて通る。
 - `Tracker.Tests` の全テストが通る。
 - `rg -n "何を確認しているか" Tracker/Tracker.Tests` と周辺の差分で、追加対象の `[Fact]` / `[Theory]` 直前に XML の `summary` 要素があることを確認できる。
-- `git diff --stat` と `git diff --name-status` で、製品コードの変更が混ざっていない。
+- `git diff --stat` と `git diff --name-status` で、製品のソースコードの変更が混ざっていない。
 - レビューでは「移動のみのはずのテストで検証条件が変わっていないか」を重点的に見る。

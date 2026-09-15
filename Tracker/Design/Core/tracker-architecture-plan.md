@@ -70,7 +70,7 @@ TIGERs および公式の通信形式の調査結果は次を参照する。
 トラッカーが直接扱う入力の型は次の通り。
 
 - `SSL_WrapperPacket`
-  - 未加工映像のデータグラム全体
+  - 未加工の映像入力を含むUDPパケットの受信データ全体
   - `Detection` と `Geometry` を内包する最上位パケット
 - `SSL_DetectionFrame`
   - カメラ単位の検出情報
@@ -121,7 +121,7 @@ DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli
 責務境界は次の通り。
 
 - `TrackerConnectionLib` を公式形式の追跡パケット傍受の第一候補統合点とする。`UdpTrackerReceiver`、`MultiTrackerManager`、`TrackerPacketAdapter` の既存責務を使い、公式形式の `TrackerWrapperPacket` を `uuid` / `sourceName` / 送信元アドレスとポート単位で識別する。
-- `Tracker.DebugHost` は CaptureOn の記録単位とスナップショットの記録を紐付ける統合層とする。同一 CaptureOn の記録単位の受信記録、付随情報、診断用の補助ファイル、描画スナップショット、追跡パケットを保存する補助 JSONL ファイル、追跡スナップショットの対応付け用補助 JSONL ファイルを一つの記録用フォルダ配下にまとめ、異なる CaptureOn タイミングのログは別フォルダに分ける。
+- `Tracker.DebugHost` は CaptureOn の記録単位とスナップショットの記録を紐付ける統合層とする。同一 CaptureOn の記録単位の受信記録、付随情報、診断用の補助ファイル、描画スナップショット、追跡パケットを保存する補助 JSONL ファイル、追跡スナップショットの対応付け用補助 JSONL ファイルを一つの記録用フォルダ配下にまとめ、記録開始時点が異なる CaptureOn のログは別フォルダに分ける。
 - `Tracker.Core` には公式形式の追跡パケット傍受、スナップショット保存、比較処理を入れない。`Tracker.Core` は自前トラッカーの内部状態生成と公式形式のパケット生成だけを担当する。
 
 スナップショットの記録は、既存の `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は記録用フォルダ配下の追跡パケットを保存する補助 JSONL ファイルとする。診断側の追加は、既存の読み取り処理との `key=value` 形式の互換性を保ったまま、付随情報から解決できる補助ファイルへの相対パス、表示元数、分類別件数、近傍比較の概要などの参照・集計に限定する。
@@ -496,7 +496,7 @@ Capture Off 中はスナップショットの補助ファイルへ追記しな�
 
 - `VisionReceiverService`
   - UDP の受信と通信データのデコード
-  - 問題再現用に、必要な調査時だけ着信 UDP データグラムを圧縮記録として保存する
+  - 問題再現用に、必要な調査時だけ受信したUDPパケットを圧縮記録として保存する
 - `VisionPacketStore`
   - 未加工入力のスナップショット保持
 - `TrackerCoordinator`
@@ -758,7 +758,7 @@ CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は記録用フ�
 - カメラごとのボール・ロボットの追跡状態は、観測値をそのまま上書きする簡易追跡ではなく、予測と観測更新を持つ線形カルマンフィルターで更新する
 - 各追跡状態は少なくとも状態の推定値と共分散相当の不確かさを保持する
 - `ProcessNoise` は `KalmanProcessNoiseScale` を通して予測時の共分散へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して観測の共分散へ反映する。`Gate` は、観測値と予測値の差や距離に基づき、観測を追跡状態へ対応付けてよいかの判定に使う
-- `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は設定組ごとの外部設定値とし、静止時の検出情報の小さな揺れと移動への追従性のバランスを、ソースコードの変更なしで調整できるようにする
+- `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は設定組ごとの外部設定値とし、静止時の検出情報の小さな揺れと移動への追従性の兼ね合いを、ソースコードの変更なしで調整できるようにする
 - `VisibilityHalfLifeSeconds` は観測欠測時の追跡の有効性管理に使う値であり、Kalman の共分散更新を省略する理由にはならない
 - 競技場全体の状態を統合する際の不確かさは、カメラごとのカルマンフィルターの更新後の不確かさから導く
 - 単純な等速外挿、観測値による上書き、手動での不確かさの加算だけで済ませる実装は、この初期版の契約を満たさない
@@ -1121,7 +1121,7 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 - 遅れて届いたパケットの診断
 - 未加工入力・追跡結果表示画面切替の統合確認
 
-## タスク分割方針
+## 作業分割方針
 
 - `TRACKER-000`: 設計書と進捗管理ファイル作成
 - `TRACKER-001`: `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る
@@ -1158,7 +1158,7 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 
 `TRACKER-000` の設計承認は完了済みであり、以後はこの設計書を正本として契約フェーズ以降を進める。
 
-- 仕様変更やタスク再分割があれば先にこの設計書と進捗管理ファイルを同期する
+- 仕様変更や作業再分割があれば先にこの設計書と進捗管理ファイルを同期する
 - 契約フェーズでは先行する失敗テストと契約の範囲を先に固定する
 
 ## 前提
