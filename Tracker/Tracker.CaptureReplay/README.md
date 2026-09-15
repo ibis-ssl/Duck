@@ -6,7 +6,7 @@
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 ## 基本実行
 
-記録単位のフォルダをそのまま渡すと、同じフォルダの付随情報からキャプチャーと解決済みのトラッカー設定を取得します。
+session folder をそのまま渡すと、同じフォルダの付随情報からキャプチャーと解決済みのトラッカー設定を取得します。
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \
@@ -49,14 +49,14 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 
 | コマンドラインオプション | 用途 |
 | --- | --- |
-| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または記録単位のフォルダ。 |
-| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、またはキャプチャーの付随情報。記録単位のフォルダを入力する場合は省略できます。 |
+| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |
+| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |
 | `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |
 | `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |
 | `--max-latency-frames <count>` | 追跡フレームごとの遅延詳細の最大出力数。 |
 | `--skip-tracker-snapshots` | 付随情報由来の `trackerSnapshot` / `trackerComparison` 行を抑制します。 |
 | `--detail-filter <condition>` | 条件に合う確定済みの追跡フレームの詳細を出力します。複数指定できます。 |
-| `--expect <condition>` | 集計指標を検証し、失敗時は終了値を 1 にします。 |
+| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |
 | `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |
 | `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |
 

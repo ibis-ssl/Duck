@@ -39,7 +39,7 @@
   - フィールド形状の大幅変更による初期化と最新状態の消去
   - フィールド全体の追跡結果の確定とイベント発行
 - ボール追跡
-  - カメラごとのボール追跡状態の観測更新、予測、可視性の減衰
+  - camera-local ball track の観測更新、予測、可視性の減衰
   - 複数カメラのボール観測の集合化と統合後のボールの識別情報の維持
   - 主対象のボールの安定化と補助対象のボールの出力順序
 - ロボット追跡
@@ -116,7 +116,7 @@
 
 `.` 区切りのファイル名は、フレームワークや開発ツールの慣習に限って許容する。例: `.csproj`、`.sln`、`.razor.cs`、`.razor.css`、`.g.cs`、`.Designer.cs`、`.AssemblyInfo.cs`、自動生成物やビルド出力。
 
-手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は型名のフォルダを作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をファイルパスで読める。
+手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をファイルパスで読める。
 
 `public` / `internal` の最上位の型 1 つにつき、1 ファイルを基本にする。複数の最上位の型を同居させるのは、親子 DTO、密結合した小さな列挙型や拡張処理、同じ外部データ形式の一部で単独参照されない型の場合に限る。
 
@@ -262,7 +262,7 @@
 - `Tracker/Tracker.Core/Proto/TrackerPacketGenerator.cs`
   - `TrackerPacketGenerator`
 
-`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような型名のフォルダによる partial class の分割を検討する。
+`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。
 
 ## 日本語コメント追加基準
 
@@ -357,7 +357,7 @@
 - 未処理の検出情報から追跡結果を確定する順序は、観測時刻、カメラ ID、source frame number（入力の観測フレームの番号）の安定した順序を維持する。
 - `ReorderWindow` と `MergeWindow` の意味を入れ替えない。
 - 遅着パケットの破棄では、観測時刻が `lastCommittedGroupCloseTimestampNs` 以下の入力を状態更新に使わない。
-- フィールド形状の初期化や設定プロファイルの切り替え時に、未処理の入力バッファ、カメラごとの追跡状態、統合後のボールの識別情報、接触と場外退出の状態、継続中のキック状態、主対象のボールを消去する範囲を変えない。
+- フィールド形状の初期化や設定プロファイルの切り替え時に、未処理の入力バッファ、camera-local track、統合後のボールの識別情報、接触と場外退出の状態、継続中のキック状態、主対象のボールを消去する範囲を変えない。
 - `nextCommittedFrameNumber` は状態の消去で戻さない。
 - 主対象のボールの継続判定を、補助対象の並べ替えより優先する。
 - 補助対象のボールは、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。

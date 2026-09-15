@@ -66,7 +66,7 @@
 
 ### 追跡エンジンの契約テスト用の基底クラス
 
-追跡エンジンの各契約テスト用クラスで、コンストラクターと共通の準備用オブジェクトを保持する項目の重複が増えるため、次の補助クラスを追加してよい。
+追跡エンジンの各契約テスト用クラスで重複する `TrackerContractFixture` の受け取りと保持をまとめるため、次の基底クラスを追加してよい。
 
 - ファイル: `Tracker/Tracker.Tests/Contracts/TrackerEngineContractTestBase.cs`
 - 名前空間: `Tracker.Tests`

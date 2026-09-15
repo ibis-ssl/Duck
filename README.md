@@ -1,6 +1,6 @@
 # Duck
 
-Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision パケットの受信、未加工入力 / 追跡結果の可視化、公式形式のトラッカーパケットの送信を行うトラッカー関連機能を中心にしています。
+Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision パケットの受信、未加工入力 / 追跡結果の可視化、official tracker packet の送信を行うトラッカー関連機能を中心にしています。
 
 ## リポジトリ構成
 
@@ -72,4 +72,4 @@ dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profil
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
-`sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式のトラッカーパケットを `224.5.23.2:11010` へ送信します。
+`sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、official tracker packet を `224.5.23.2:11010` へ送信します。

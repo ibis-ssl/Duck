@@ -97,13 +97,13 @@ DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入�
 
 `VisionLiveComparisonSnapshotComposer` は状態の保存先を直接読まない。提供側が固定済みの未加工入力、自前の追跡結果、外部トラッカーのスナップショットを渡し、合成処理はその値から比較する表示元の候補、Layer A/B、詳細表示を生成する。これにより、未加工入力・追跡結果・比較の各表示は同一の描画更新時点のスナップショットから派生し、比較のために未加工入力や追跡結果の保存先を再読取しない。
 
-外部トラッカーについては、`MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を描画経路で直接読まない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製済み DTO として保持し、ライブ表示への提供側はその読み取り用スナップショットだけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn の記録処理は従来どおり管理側の更新経路に接続し、`RUNTIME-HOST-006` では診断の定期記録を保存する補助ファイルや RuntimeHost の初期構成へ踏み込まない。
+外部トラッカーについては、`MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を描画経路で直接読まない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製済み DTO として保持し、ライブ表示への提供側はその読み取り用スナップショットだけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn の記録処理は従来どおり管理側の更新経路に接続し、`RUNTIME-HOST-006` では diagnostics sample sidecar や RuntimeHost の初期構成へ踏み込まない。
 
 ### `RUNTIME-HOST-007`: DebugHost の診断記録を補助ファイルへ保存する高速経路
 
-`RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost の CaptureOn による記録単位に、診断の定期記録を保存する補助ファイルを追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。記録の付随情報は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
+`RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost の CaptureOn による記録単位に、diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
 
-診断記録の再生・比較は、診断の定期記録を保存する補助ファイルが存在する記録単位では、採取時点の列を replay timeline の主経路にする。表示元としての `Vision Input` と `ibis tracker` は、旧描画記録の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧描画記録の補助ファイルだけを持ち、診断の定期記録を保存する補助ファイルを持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。
+診断記録の再生・比較は、diagnostics sample sidecar が存在する記録単位では、採取時点の列を replay timeline の主経路にする。表示元としての `Vision Input` と `ibis tracker` は、旧描画記録の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧描画記録の補助ファイルだけを持ち、diagnostics sample sidecar を持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。
 
 ### `RUNTIME-HOST-009`: RuntimeHost の通常処理
 
@@ -115,7 +115,7 @@ RuntimeHost は `Tracker` の設定階層から、追跡の有効化、追跡結
 
 起動時の設定プロファイルの選択は、設定ファイルの `Tracker:ActiveProfileName` を既定にする。ただし、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET のコマンドライン設定を読み込む仕組みと、引数から設定項目への対応表を使い、将来の短縮引数も同じ対応表に追加できる形にする。CLI による設定プロファイルの上書きは `Tracker:Profiles:<name>` の既存の設定プロファイルだけを選択し、設定プロファイルの定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示的に失敗させ、誤って `default` の設定プロファイルで代用しない。
 
-DebugHost が読む最新の追跡スナップショットは、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、公式形式の追跡パケットの送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、診断記録の再生、記録内容の確認画面の手動検証は `RUNTIME-HOST-010` に残す。
+DebugHost が読む最新の追跡スナップショットは、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、official tracker packet の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、診断記録の再生、記録内容の確認画面の手動検証は `RUNTIME-HOST-010` に残す。
 
 ## 設計資料配置
 
@@ -148,6 +148,6 @@ DebugHost が読む最新の追跡スナップショットは、RuntimeHost か�
 [^diagnostics-replay]: 診断記録の再生: 採取した診断データやログを DebugHost 側で再生し、未加工入力と追跡結果を比較する診断機能。
 [^capture-viewer]: 記録内容の確認画面: 保存済みの記録単位の内容を確認する診断用の表示機能。
 [^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、診断、記録と再生、比較表示を担当する。
-[^tracker-operation]: トラッカーの実時間処理: SSL-Vision 入力から追跡状態を更新し、公式形式の追跡パケットを送信する処理。
+[^tracker-operation]: トラッカーの実時間処理: SSL-Vision 入力から追跡状態を更新し、official tracker packet を送信する処理。
 [^raw-vision-viewer]: raw vision の表示: SSL-Vision の検出情報とフィールド形状をフィールド上に表示する DebugHost の画面。
 [^tracker-algorithm]: 追跡アルゴリズム: 未加工の検出情報からボールとロボットの追跡状態を決定的に生成する `Tracker.Core` 側の処理。
