@@ -57,7 +57,7 @@
 
 ## 診断記録とCI
 
-結果、標準出力、標準エラー、内容識別一覧は `reports/diagnostics/markdown-wording-followup-20260916/` に保存する。検証スクリプトと、成功・失敗のログを含む。端末上の途中記録は `/home/ibis/.local/share/duck-pr20-review-followup-evidence-20260916/resume/` に残す。この端末パスはチャットのダウンロードリンクではない。
+結果、標準出力、標準エラー、内容識別一覧は `reports/diagnostics/markdown-wording-followup-20260916/` に保存する。検証スクリプトと、成功・失敗のログを含む。ログ16ファイルは `command-logs.tar.gz` にバイトを変更せず収録し、`command-logs-manifest.json` に大きさとSHA-256を記録した。引き継ぎで示すログ名はこのアーカイブ内にある。端末上の途中記録は `/home/ibis/.local/share/duck-pr20-review-followup-evidence-20260916/resume/` に残す。この端末パスはチャットのダウンロードリンクではない。
 
 npm依存物と共有検査器は既存環境への参照を利用した。Pythonは既存の専用仮想環境を利用した。共有検査器そのものを検証実行時の内容識別一覧へ含めていないため、完全に固定された独立環境での再現を証明するものではない。
 
