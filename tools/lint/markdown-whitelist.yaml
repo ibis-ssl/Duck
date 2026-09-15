@@ -47,9 +47,9 @@ entries:
   - term: Tracked 表示
     description: 診断画面で追跡済み状態を表示している状態。UI 表示名そのものの `Tracked` とは分けて扱う。
   - term: Field source
-    description: 診断画面の競技場表示で、左右どちらに描く情報を選ぶ項目名。
+    description: 診断画面のフィールド表示で、左右どちらに描く情報を選ぶ項目名。
   - term: Field source selector
-    description: 診断画面で競技場表示の表示元を選ぶ画面部品名。
+    description: 診断画面でフィールド表示の表示元を選ぶ画面部品名。
   - term: source key
     aliases:
       - source-key
@@ -85,23 +85,23 @@ entries:
   - term: aggregate source
     description: 複数候補から代表値を選んで扱う表示元。
   - term: field geometry
-    description: 競技場の線、得点枠、境界など、描画と座標比較の基準になる形状情報。
+    description: フィールドの線、得点枠、境界など、描画と座標比較の基準になる形状情報。
   - term: raw geometry
-    description: 未加工入力から得た競技場形状情報。
+    description: 未加工入力から得たフィールド形状情報。
   - term: render snapshot geometry
-    description: render snapshot に含まれる競技場形状情報。
+    description: render snapshot に含まれるフィールド形状情報。
   - term: field rendering part
     aliases:
       - field-rendering-part
-    description: 競技場背景、境界線、球、機体を描く画面部品の責務境界。
+    description: フィールド背景、境界線、球、機体を描く画面部品の責務境界。
   - term: split field component
     aliases:
       - split-field-component
-    description: 左右分割表示で競技場を描く画面部品。
+    description: 左右分割表示でフィールドを描く画面部品。
   - term: overlay field component
     aliases:
       - overlay-field-component
-    description: 重ね表示で複数の対象を同じ競技場上に描く画面部品。
+    description: 重ね表示で複数の対象を同じフィールド上に描く画面部品。
   - term: layer group
     aliases:
       - layer-group
@@ -109,9 +109,11 @@ entries:
   - term: viewport state
     aliases:
       - viewport-state
-    description: 競技場表示の拡大率、表示位置、移動状態を保持する表示状態。
+    description: フィールド表示の拡大率、表示位置、移動状態を保持する表示状態。
   - term: packet capture
     description: 受信した通信内容を後から再生や調査に使えるように保存した記録。
+  - term: キャプチャー
+    description: 通信内容を後から再生や調査に使えるよう取得・保存する操作またはその記録。単なる受信処理とは区別する。
   - term: capture metadata
     description: 記録時の設定、関連保存物、時刻対応などを再生時に復元するための付随情報。
   - term: session folder
@@ -131,7 +133,7 @@ entries:
   - term: alignment sidecar
     aliases:
       - tracker snapshot alignment sidecar
-    description: 診断項目、描画時点記録、トラッカー時点記録の対応関係を保存する補助保存物。
+    description: 診断項目、render snapshot、トラッカー時点記録の対応関係を保存する補助保存物。
   - term: alignment log
     description: 保存済み対応関係を後から参照できるよう保存した記録。
   - term: alignment status
@@ -157,7 +159,7 @@ entries:
   - term: kicked ball
     description: 蹴られた状態として扱う球。
   - term: ball left field
-    description: 球が競技場外へ出た状態を表す判定語。
+    description: 球がフィールド外へ出た状態を表す判定語。
   - term: camera-local track
     description: 撮影元単位で保持する局所的な追跡状態。
   - term: camera-local ball track
@@ -185,9 +187,11 @@ entries:
       - diagnostics-sample-tick
     description: 診断再生で未加工入力と追跡出力を同じ保存単位として固定する時点。
   - term: profile switch
-    description: 実行中に有効な設定組を切り替える操作または処理。
+    description: 実行中に有効な設定プロファイルを切り替える操作または処理。
   - term: runtime profile
-    description: 実行時に使われる設定組と、その切替状態を表す設計語。
+    description: 実行時に使われる設定プロファイルと、その切替状態を表す設計語。
+  - term: 設定プロファイル
+    description: 実行時に選択する設定値のまとまり。`Profiles` / `ActiveProfileName` に対応し、単独の設定値とは区別する。
   - term: partial class
     description: C# の 1 つの型定義を複数のソースコードに分ける構成。
   - term: type-owned folder
@@ -217,7 +221,7 @@ entries:
   - term: world frame
     aliases:
       - world-frame
-    description: 競技場全体の追跡結果を表す 1 件の状態。
+    description: フィールド全体の追跡結果を表す 1 件の状態。
   - term: tracked frame
     description: 追跡器が出力する 1 件の追跡結果と、その番号または時刻を指す設計語。
   - term: tracked frame number
@@ -227,7 +231,7 @@ entries:
   - term: SSL-Vision
     aliases:
       - SSL Vision
-    description: 競技映像入力を送る外部仕組みの名前。
+    description: カメラ画像からボール・ロボットの検出情報を作り、フィールド形状とともに送る外部の仕組みの名前。
   - term: ASP.NET Core
     aliases:
       - ASP NET Core
@@ -332,7 +336,7 @@ entries:
   - term: raw vision
     aliases:
       - raw-vision
-    description: 追跡処理前の映像入力を指す設計語。
+    description: 追跡処理前の SSL-Vision の検出情報を指す設計語。画像や動画そのものとは区別する。
   - term: Vision split / overlay
     description: 比較画面の表示方式をまとめた設計語。
   - term: overlay layer contract
@@ -341,7 +345,7 @@ entries:
     aliases:
       - geometry-reference
       - geometry reference
-    description: 競技場描画の基準を表す契約名。
+    description: フィールド描画の基準を表す契約名。
   - term: same render tick
     aliases:
       - same-render-tick
@@ -427,7 +431,7 @@ entries:
   - term: XML
     description: 構造化した文書と説明コメントの形式を示す略語。
   - term: SVG
-    description: 競技場の図を描画する画像形式の略語。
+    description: フィールドの図を描画する画像形式の略語。
   - term: DI
     description: 必要な部品を外部から渡して依存関係を組み立てる手法の略語。
   - term: LINQ
@@ -541,9 +545,9 @@ entries:
   - term: コンポーネント
     description: Blazor等で責務を分けた構成部品。
   - term: ゴール
-    description: 競技場の得点枠。
+    description: フィールドの得点枠。
   - term: ゴールライン
-    description: ゴール側の競技場境界線。
+    description: ゴール側のフィールド境界線。
   - term: サイズ
     description: 表示領域やデータの大きさ。
   - term: サイドバー
@@ -569,7 +573,7 @@ entries:
   - term: タイマー
     description: 一定時間後や一定周期で処理を呼び出す仕組み。
   - term: タッチライン
-    description: 競技場の側方境界線。
+    description: フィールドの側方境界線。
   - term: タブ
     description: 表示対象や再生速度を選ぶ画面部品。
   - term: ダイアログ
@@ -744,8 +748,10 @@ entries:
     description: 実行端末内に保存されているファイル。
   - term: ローカル実行
     description: 実行端末内で処理を動かすこと。
-  - term: 競技フィールド
-    description: ロボットサッカーの競技場またはその描画領域。型のデータ項目とは区別する。
+  - term: フィールド
+    aliases:
+      - 競技フィールド
+    description: ロボットサッカーの競技領域またはその描画領域。型のデータ項目とは区別する。
   - term: 観測フレーム
     description: ある観測時点の検出情報をまとめた単位。
   - term: 追跡フレーム
