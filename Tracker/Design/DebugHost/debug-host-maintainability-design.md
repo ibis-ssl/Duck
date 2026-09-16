@@ -12,7 +12,7 @@ CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` �
 - `Tracker/Tracker.DebugHost/Tracking/TrackerCoordinator.cs`
 - `Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor`
 - `Tracker.DebugHost/Tracking` の診断、render snapshot、設定プロファイルの切り替えに関わる処理
-- `Tracker.DebugHost/Vision` の記録、受信、状態の保存に関わる既存の責務境界の確認
+- `Tracker.DebugHost/Vision` のキャプチャー、受信、状態の保存に関わる既存の責務境界の確認
 
 対象外:
 
@@ -34,21 +34,21 @@ CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` �
 - `reports/tracker-034-review-20260511081000.md`
 - `reports/tracker-034-review-r2-20260511083000.md`
 
-旧作業一覧上の位置づけは `tracker-history-000-038.md` の `TRACKER-034` と `maintenance` の段階に退避済み。
+旧作業一覧上の位置づけは、`tracker-history-000-038.md` の `TRACKER-034` と「保守」の段階に記録している。
 
 ## 分割方針
 
 - 1 ファイル 1 主責務を基本とする。起動処理、処理全体の制御、画面構造の記述から、副作用のない補助処理、入出力、表示状態の管理、表示内容の整形、コマンドラインオプションの解析を分離する。
 - `public` / `internal` の既存型名は可能な限り維持し、外部参照がある型の名前変更は避ける。
 - `.` 区切りのファイル名はフレームワークや開発ツールの慣習に限って許容する。手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。
-- partial class を責務別に分ける場合は、type-owned folder を作り、その中のファイル名が責務を表す配置へ寄せる。
+- partial class を責務別に分ける場合は、type-owned folder（型名のフォルダ）を作り、その中のファイル名が責務を表す配置にする。
 - 挙動維持のため、分割前後で同じ入力から外部に観測できる同じ出力を返すことを最優先にする。
 
 ## コメント追加基準
 
 コメントは「何をしているか」ではなく「この型や型のメンバーがどの契約を守るか」を説明する。自明な値の設定処理や局所変数には追加しない。
 
-C# のクラス、プロパティ、メソッドの契約説明は日本語の XML コメントを基本にする。通常コメント `//` はメソッド内の複雑な処理、不変条件、順序制約の直前だけに置く。
+C# のクラス、プロパティ、メソッドの契約説明は、原則として XML documentation comment の形式で日本語を記述する。通常コメント `//` はメソッド内の複雑な処理、不変条件、順序制約の直前だけに置く。
 
 追加対象:
 
@@ -73,7 +73,7 @@ CaptureReplay:
 - `--capture` なし、未知のコマンドラインオプション、不正な数値、不正な指標の指定が、従来と同じエラーメッセージと exit code 2 になる。
 - `--expect` 成功時は exit code 0、失敗時は exit code 1 になる。
 - `--detail-filter` と `--max-details` による詳細行数と省略件数が変わらない。
-- `--settings` でアプリケーション設定と capture metadata の両方を読める。
+- `--settings` で `appsettings.json` 形式の設定と capture metadata の両方を読める。
 
 TrackerCoordinator:
 
@@ -82,17 +82,17 @@ TrackerCoordinator:
 - 観測データを伴わない設定プロファイルの切り替え要求も、未加工のパケットなしで処理される。
 - `ProfileSwitched` と `GeometryReset` に伴う保存状態の消去と、通知先への通知順序が変わらない。
 - 送信設定は `ProfileSwitched` 後にだけ反映される。
-- 診断ログの各行は確定済みの追跡結果の元となった検出情報を使い、未加工の検出件数と追跡結果との対応がずれない。
-- render snapshot を保存する補助ファイルは、診断ログと同じ追跡結果の番号で参照できる。
+- 診断ログの各行は確定済みの追跡フレームの source detections を使い、未加工の検出件数と追跡フレームとの対応がずれない。
+- render snapshot の補助ファイルは、診断ログと同じ追跡フレームの番号で参照できる。
 
 診断画面:
 
 - 診断ログがない場合、ログがないことを示す既存の通知を表示する。
 - ログの選択と再読み込みで、選択する記録を先頭へ戻す。
-- 時系列表示のクリック、範囲指定による移動、マウスホイールによる移動で、同じ記録を選択する。
+- 時系列表示のクリック、timeline scrubber の操作、マウスホイールによる移動で、同じ記録を選択する。
 - render snapshot があるときは、未加工の入力と追跡結果のフィールド表示が並ぶ。
 - render snapshot がないときは、既存のエラー表示になる。
-- 記録に付随する補助ファイルの情報があると、設定プロファイルの内容を示すダイアログを開ける。
+- capture metadata があると、設定プロファイルの内容を示すダイアログを開ける。
 - `VisionFieldCanvas` のフィールド形状、ボール、黄色・青色のロボットの見え方が分割前と一致する。
 
 ## リスク

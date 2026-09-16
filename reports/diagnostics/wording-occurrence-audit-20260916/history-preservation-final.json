@@ -1,0 +1,27 @@
+{
+  "time": "2026-09-16T19:57:35.046534+09:00",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "start_sha": "a2e63f05345bb4301d6033273910a26ccfb4a1d2",
+  "results": [
+    {
+      "file": "Tracker/Design/Core/tracker-history-000-038.md",
+      "reports_preserved": true,
+      "task_id_counts_preserved": true,
+      "numeric_token_counts_preserved": true,
+      "all_start_head_quotation_spans_preserved": true,
+      "initial_check_explanation": "設計書からの引用を含む全括弧句を基準本文から保持した。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "reports_preserved": true,
+      "task_id_counts_preserved": true,
+      "numeric_token_counts_preserved": true,
+      "all_start_head_quotation_spans_preserved": true,
+      "initial_check_explanation": "初回の基準本文との全括弧句一致検査では、前任が変更した著者自身の説明句「この型や member がどの契約を守るか」を検出した。これは出典付きの直接引用ではない。今回の変更前後ではこの句を含む既存の括弧句を変更していない。"
+    }
+  ],
+  "feedback_file_byte_identical_to_start": true,
+  "feedback_sha256": "bfccbc255f67be2af421693e09650d2233c1d2e13ac0cf6b64dea0e2693d8584",
+  "strict_initial_check_rerun_exit": 1,
+  "note": "初回検査のJSONを保持し、同じ判定の再現実行でstdout/stderr/exitを別々に保存した。初回RDCの結合表示を事後的にstdout/stderrへ分離したものではない。"
+}

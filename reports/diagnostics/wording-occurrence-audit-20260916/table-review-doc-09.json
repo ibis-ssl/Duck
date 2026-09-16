@@ -1,0 +1,492 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 11,
+    "before_text": "| TRACKER-000 | Tracker の設計書と進捗管理ファイルを作成する | preparation | done | Tracker の事前調査が完了していること | 設計書、task/phase 管理、調査レポート、レビュー報告が揃い、ユーザー承認の上で設計を完了できる。 |",
+    "current_line": 13,
+    "current_text": "| `TRACKER-000` | トラッカーの設計書と進捗管理ファイルを作成する | 準備 | 完了 | トラッカーの事前調査が完了していること | 設計書、作業 / 段階管理、調査レポート、レビュー報告が揃い、ユーザー承認の上で設計を完了できる。 |",
+    "disposition": "context_reviewed",
+    "reason": "設計・調査・レビュー・作業と段階の管理、ユーザー承認という完了条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 12,
+    "before_text": "| TRACKER-001 | `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る | contracts | done | TRACKER-000 approved | `Tracker.Tests` から `Tracker.Core` を参照でき、contract test 用の fixture と test data 基盤が存在する。 |",
+    "current_line": 14,
+    "current_text": "| `TRACKER-001` | `Tracker.Tests` から `Tracker.Core` を参照可能にし契約テスト基盤を作る | 契約 | 完了 | `TRACKER-000` 承認済み | `Tracker.Tests` から `Tracker.Core` を参照でき、契約テスト用の共通準備とテストデータ基盤が存在する。 |",
+    "disposition": "context_reviewed",
+    "reason": "fixtureは共通のテスト準備を指す。型名とテストデータを保持し、造語を避けて説明する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 13,
+    "before_text": "| TRACKER-002 | packet generator の契約テストを追加する | contracts | done | TRACKER-001 | 単位変換、primary/secondary ball 並び、capabilities、`kicked_ball` 寿命、timestamp 出力を定義する failing test が存在する。 |",
+    "current_line": 15,
+    "current_text": "| `TRACKER-002` | パケット生成処理の契約テストを追加する | 契約 | 完了 | `TRACKER-001` | 単位変換、主対象 / 補助対象のボールの並び、対応機能、`kicked_ball` の寿命、時刻出力を定義し、実装前に失敗を確認できるテストが存在する。 |",
+    "disposition": "context_reviewed",
+    "reason": "単位変換、主対象と補助対象のボールの役割・並び、対応機能、寿命、時刻、実装前の失敗という条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 14,
+    "before_text": "| TRACKER-003 | engine の時系列契約テストを追加する | contracts | done | TRACKER-001 | reorder、`MergeWindow`、`0..N CommittedFrames`、late packet、geometry reset、profile switch、event publish 順を定義する failing test が存在する。 |",
+    "current_line": 16,
+    "current_text": "| `TRACKER-003` | 追跡エンジンの時系列契約テストを追加する | 契約 | 完了 | `TRACKER-001` | 並べ替え、`MergeWindow`、`0..N CommittedFrames`、遅延到着パケット、形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え、イベント通知順を定義し、実装前に失敗を確認できるテストが存在する。 |",
+    "disposition": "context_reviewed",
+    "reason": "0..Nの範囲と時系列条件を保持する。geometry resetで初期化する対象は形状でなく追跡状態に修正する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 15,
+    "before_text": "| TRACKER-004 | `TrackerFrame` / state 型 / `TrackerUpdateResult` / observer-event 契約を実装する | contracts | done | TRACKER-002, TRACKER-003 | 内部フレーム、state 型、`TrackerUpdateResult`、domain event、observer 契約が存在し、契約テストが参照できる。 |",
+    "current_line": 17,
+    "current_text": "| `TRACKER-004` | `TrackerFrame` / 状態型 / `TrackerUpdateResult` / イベントと通知先の契約を実装する | 契約 | 完了 | `TRACKER-002`, `TRACKER-003` | 内部の追跡フレーム、状態型、`TrackerUpdateResult`、イベントデータの `TrackerEvent` と通知先の `ITrackerObserver` の契約が存在し、契約テストから参照できる。 |",
+    "disposition": "context_reviewed",
+    "reason": "イベントデータTrackerEventと通知先ITrackerObserverを区別した契約を採用する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 16,
+    "before_text": "| TRACKER-005 | `TrackerPacketGenerator` を実装する | contracts | done | TRACKER-004 | official tracker proto 出力、primary/secondary ball 並び、timestamp、`kicked_ball`、capabilities がテストを通過する。 |",
+    "current_line": 18,
+    "current_text": "| `TRACKER-005` | `TrackerPacketGenerator` を実装する | 契約 | 完了 | `TRACKER-004` | official tracker proto 形式の出力、主対象 / 補助対象のボールの並び、時刻、`kicked_ball`、対応機能がテストを通過する。 |",
+    "disposition": "context_reviewed",
+    "reason": "official tracker protoを保持する。主対象・補助対象という自然な役割説明でも並び順の条件は変わらない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 17,
+    "before_text": "| TRACKER-006 | `TrackerEngine` の reorder buffer と flush pipeline を実装する | engine | done | TRACKER-003, TRACKER-004 | event-time buffer、flush 判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本 pipeline が決定的に動作する。 |",
+    "current_line": 19,
+    "current_text": "| `TRACKER-006` | `TrackerEngine` の並べ替え用バッファと一連の確定処理を実装する | 追跡処理 | 完了 | `TRACKER-003`, `TRACKER-004` | event time を基準とした入力の一時保存、確定判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本処理が、同じ入力に対して同じ結果を返す。 |",
+    "disposition": "context_reviewed",
+    "reason": "確定処理列を一連の確定処理とし、event timeと同じ入力に対する同じ結果という性質を維持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 18,
+    "before_text": "| TRACKER-007 | `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する | engine | done | TRACKER-006 | profile switch 要求、pending buffer clear、geometry reset、observer/event publish 順が契約どおりに動作する。 |",
+    "current_line": 20,
+    "current_text": "| `TRACKER-007` | `TrackerEngine` の設定プロファイルの切り替え / 形状変更に伴う追跡状態の初期化 / イベント通知順を実装する | 追跡処理 | 完了 | `TRACKER-006` | 設定プロファイルの切り替え要求、未確定入力のバッファの消去、形状変更に伴う追跡状態の初期化、イベントの発行と通知先への配送順序が契約どおりに動作する。 |",
+    "disposition": "context_reviewed",
+    "reason": "設定切替、未確定入力の破棄、形状変更に伴う追跡状態の初期化、イベント発行と配送の順序を区別する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 19,
+    "before_text": "| TRACKER-008 | robot tracking と robot merge を実装する | engine | done | TRACKER-006 | camera-local robot track、位置/角度の別 filter、robot merge、visibility/quality が raw vision 入力から生成される。 |",
+    "current_line": 21,
+    "current_text": "| `TRACKER-008` | ロボット追跡とロボット情報の統合を実装する | 追跡処理 | 完了 | `TRACKER-006` | camera-local robot track、位置 / 角度を別々に扱う状態推定、ロボット情報の統合、可視性 / 品質が raw vision から生成される。 |",
+    "disposition": "context_reviewed",
+    "reason": "camera-local robot trackとraw visionを保持する。位置・角度別の推定、統合、可視性と品質の生成という対象は同じ。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 20,
+    "before_text": "| TRACKER-009 | ball tracking と primary/secondary ball 選定を実装する | engine | done | TRACKER-006 | camera-local ball track、uncertainty-weighted merge、primary ball 選定、secondary ball stable sort が raw vision 入力から生成される。 |",
+    "current_line": 22,
+    "current_text": "| `TRACKER-009` | ボール追跡と主対象 / 補助対象のボール選定を実装する | 追跡処理 | 完了 | `TRACKER-006` | camera-local ball track、不確かさで重み付けした統合、主対象のボール選定、補助対象のボールの安定した並べ替えが raw vision から生成される。 |",
+    "disposition": "context_reviewed",
+    "reason": "camera-local ball trackとraw visionを保持する。主対象・補助対象の役割、不確かさによる重み、安定した並べ替えを自然な日本語で説明する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 21,
+    "before_text": "| TRACKER-010 | kick と contact metadata を実装する | engine | done | TRACKER-007, TRACKER-008, TRACKER-009 | `KickEventState`、`BallContactState`、`KickDetected`、`ContactChanged` が生成され、関連契約テストが通る。 |",
+    "current_line": 23,
+    "current_text": "| `TRACKER-010` | キックと接触の付随情報を実装する | 追跡処理 | 完了 | `TRACKER-007`, `TRACKER-008`, `TRACKER-009` | `KickEventState`、`BallContactState`、`KickDetected`、`ContactChanged` が生成され、関連契約テストが通る。 |",
+    "disposition": "context_reviewed",
+    "reason": "キック・接触の付随情報という説明と、4つの実際の状態・イベント型名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 22,
+    "before_text": "| TRACKER-011 | ball left field metadata を実装する | engine | done | TRACKER-007, TRACKER-009 | `BallLeftFieldState` と `BallLeftField` event が生成され、関連契約テストが通る。 |",
+    "current_line": 24,
+    "current_text": "| `TRACKER-011` | ボールのフィールド外判定の付随情報を実装する | 追跡処理 | 完了 | `TRACKER-007`, `TRACKER-009` | `BallLeftFieldState` と `BallLeftField` イベントが生成され、関連契約テストが通る。 |",
+    "disposition": "context_reviewed",
+    "reason": "ball left fieldはボールのフィールド外判定として自然に説明でき、BallLeftFieldStateとBallLeftFieldで型・イベントを特定できる。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 23,
+    "before_text": "| TRACKER-012 | `Tracker.Server` へ engine と packet 配信を統合する | integration | done | TRACKER-005, TRACKER-007, TRACKER-010, TRACKER-011 | raw vision 入力が engine へ流れ、`TrackerUpdateResult` が snapshot store・observer・official packet 配信へ反映される。 |",
+    "current_line": 25,
+    "current_text": "| `TRACKER-012` | `Tracker.Server` へ追跡エンジンとパケット配信を統合する | 統合 | 完了 | `TRACKER-005`, `TRACKER-007`, `TRACKER-010`, `TRACKER-011` | raw vision が追跡エンジンへ流れ、`TrackerUpdateResult` がスナップショット保存処理、通知処理、公式形式のパケット配信へ反映される。 |",
+    "disposition": "context_reviewed",
+    "reason": "入力raw vision、追跡エンジン、TrackerUpdateResult、保存・通知・送信への反映を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 24,
+    "before_text": "| TRACKER-013 | tracker/network 設定束縛を統合する | integration | done | TRACKER-012 | tracker/network 設定が外部設定から束縛され、起動時設定が engine と publisher に反映される。 |",
+    "current_line": 26,
+    "current_text": "| `TRACKER-013` | 設定値のバインドを統合する（トラッカー / ネットワーク） | 統合 | 完了 | `TRACKER-012` | 外部設定の値がトラッカー / ネットワーク設定へ反映され、起動時設定が追跡エンジンと送信処理に反映される。 |",
+    "disposition": "context_reviewed",
+    "reason": "設定値のバインドは承認済み。トラッカー・ネットワークの両設定と起動時の反映先を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 25,
+    "before_text": "| TRACKER-014 | profile 切替要求経路を統合する | integration | done | TRACKER-012, TRACKER-013 | profile 切替要求が server から engine へ流れ、切替結果が observer/UI 側へ反映される。 |",
+    "current_line": 27,
+    "current_text": "| `TRACKER-014` | 設定プロファイルの切り替え要求経路を統合する | 統合 | 完了 | `TRACKER-012`, `TRACKER-013` | 設定プロファイルの切り替え要求がサーバーから追跡エンジンへ流れ、切り替え結果が通知処理 / UI 側へ反映される。 |",
+    "disposition": "context_reviewed",
+    "reason": "設定プロファイルの切替要求と結果の伝達経路、依存IDを保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 26,
+    "before_text": "| TRACKER-015 | tracked viewer と raw/tracked toggle を追加する | ui | done | TRACKER-012 | UI で raw/tracked を切り替えられ、tracked field と主要 object を描画できる。 |",
+    "current_line": 28,
+    "current_text": "| `TRACKER-015` | 追跡結果の表示画面と未加工入力 / 追跡結果の切り替えを追加する | UI | 完了 | `TRACKER-012` | UI で未加工入力 / 追跡結果を切り替えられ、追跡結果のフィールド表示と主要な追跡対象を描画できる。 |",
+    "disposition": "context_reviewed",
+    "reason": "raw/trackedはこの行では入力と追跡結果の切替を表す通常説明であり、特定の画面表示文字列を翻訳したものではない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 27,
+    "before_text": "| TRACKER-016 | tracked diagnostics 表示を追加する | ui | done | TRACKER-015 | tracked diagnostics、profile 名、kick/contact/field 状態を表示できる。 |",
+    "current_line": 29,
+    "current_text": "| `TRACKER-016` | 追跡結果の診断表示を追加する | UI | 完了 | `TRACKER-015` | 追跡結果の診断、設定プロファイルの名前、キック / 接触 / フィールドの状態を表示できる。 |",
+    "disposition": "context_reviewed",
+    "reason": "診断表示、設定プロファイル名、キック・接触・フィールド状態という表示対象を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 28,
+    "before_text": "| TRACKER-017 | runtime profile 表示・操作 UI を追加する | ui | done | TRACKER-014, TRACKER-016 | profile 名表示と profile 切替要求 UI が表示・操作できる。 |",
+    "current_line": 30,
+    "current_text": "| `TRACKER-017` | 実行時の設定プロファイルの表示・操作 UI を追加する | UI | 完了 | `TRACKER-014`, `TRACKER-016` | 設定プロファイルの名前の表示と設定プロファイルの切り替え要求の UI を表示・操作できる。 |",
+    "disposition": "context_reviewed",
+    "reason": "runtime profileは承認済みの実行時の設定プロファイルで説明し、表示と切替要求UIを保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 29,
+    "before_text": "| TRACKER-018 | Tracker v1 の build/test 証跡を取得する | verification | done | TRACKER-017 | build/test の証跡が記録され、主要 unit/contract 観点の結果が reports に存在する。 |",
+    "current_line": 31,
+    "current_text": "| `TRACKER-018` | トラッカー v1 のビルド / テスト証跡を取得する | 検証 | 完了 | `TRACKER-017` | ビルド / テストの証跡が記録され、主な単体テストと契約テストの結果が `reports/` に保存されている。 |",
+    "disposition": "context_reviewed",
+    "reason": "ビルド・テストと単体・契約テストの区別を明記し、原文の証拠保存先reports/を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 30,
+    "before_text": "| TRACKER-019 | Tracker v1 の integration 観点検証を行う | verification | done | TRACKER-018 | late packet、geometry reset、profile switch、observer/event、viewer 切替の確認結果が reports に存在する。 |",
+    "current_line": 32,
+    "current_text": "| `TRACKER-019` | トラッカー v1 の統合観点検証を行う | 検証 | 完了 | `TRACKER-018` | 遅延到着パケット、形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え、イベントと通知先の契約、表示画面切り替えの確認結果が `reports/` に保存されている。 |",
+    "disposition": "context_reviewed",
+    "reason": "統合検証の対象とreports/保存先を保持する。geometry resetとobserver/eventの意味を明確化する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 31,
+    "before_text": "| TRACKER-020 | Tracker v1 の最終レビューと追跡ファイル同期を行う | review | done | TRACKER-019 | sub-agent レビュー結果が記録され、致命的な指摘が残っておらず、tracking files が最終状態と一致する。 |",
+    "current_line": 33,
+    "current_text": "| `TRACKER-020` | トラッカー v1 の最終レビューと進捗管理ファイル同期を行う | レビュー | 完了 | `TRACKER-019` | 別担当のレビュー結果が記録され、致命的な指摘が残っておらず、進捗管理ファイルが最終状態と一致する。 |",
+    "disposition": "context_reviewed",
+    "reason": "sub-agentは直接引用ではない作業の説明。別担当のレビューで役割を保ち、致命的指摘なしと進捗一致の条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 32,
+    "before_text": "| TRACKER-021 | `Tracker.Server` の使い方 README を追加する | documentation | done | TRACKER-020 | `Tracker/Tracker.Server/README.md` が存在し、起動手順、画面の使い方、主要設定値の意味が記載されている。 |",
+    "current_line": 34,
+    "current_text": "| `TRACKER-021` | `Tracker.Server` の使い方 README を追加する | 文書化 | 完了 | `TRACKER-020` | `Tracker/Tracker.Server/README.md` が存在し、起動手順、画面の使い方、主要設定値の意味が記載されている。 |",
+    "disposition": "context_reviewed",
+    "reason": "旧Tracker.Server/README.mdは当時の成果物名として保持し、起動・画面・設定の説明範囲を維持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 33,
+    "before_text": "| TRACKER-022 | `VisionReceiver` を profile-aware にする | integration | done | TRACKER-021 | `VisionReceiver` 設定が複数 profile を持てて、起動中 profile と runtime switch に追従でき、関連検証結果が存在する。 |",
+    "current_line": 35,
+    "current_text": "| `TRACKER-022` | `VisionReceiver` を設定プロファイルに対応させる | 統合 | 完了 | `TRACKER-021` | `VisionReceiver` 設定が複数の設定プロファイルを持てて、起動中の設定プロファイルと実行時の切り替えに追従でき、関連検証結果が存在する。 |",
+    "disposition": "context_reviewed",
+    "reason": "に対応にするという文法崩れを直す。複数プロファイル、起動中の選択、実行時切替への追従条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 34,
+    "before_text": "| TRACKER-023 | camera-local tracking を線形 Kalman filter 標準へ是正する | engine | done | TRACKER-013, TRACKER-022 | ball / robot の camera-local track 更新が線形 Kalman filter ベースになり、`ProcessNoise` / `MeasurementNoise` / `Gate` / `VisibilityHalfLifeSeconds` が runtime 挙動へ反映され、既存 contract に矛盾しない。 |",
+    "current_line": 36,
+    "current_text": "| `TRACKER-023` | カメラ単位の追跡を線形 Kalman filter へ是正する | 追跡処理 | 完了 | `TRACKER-013`, `TRACKER-022` | ボール / ロボットの camera-local track を線形 Kalman filter で更新し、`ProcessNoise` / `MeasurementNoise` / `Gate` / `VisibilityHalfLifeSeconds` が実行時の動作へ反映され、既存契約に矛盾しない。 |",
+    "disposition": "context_reviewed",
+    "reason": "camera-local trackと線形Kalman filterを保持し、4つの実設定名と既存契約への整合条件を維持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 35,
+    "before_text": "| TRACKER-024 | Kalman 標準準拠の検証と release 判定をやり直す | verification | done | TRACKER-023 | Kalman 化後の focused/full test と review report が存在し、設計書の「v1 は直線運動前提の Kalman filter を標準とする」に対して未解決 blocker が残っていない。 |",
+    "current_line": 37,
+    "current_text": "| `TRACKER-024` | Kalman filter への変更後に検証と公開可否判定をやり直す | 検証 | 完了 | `TRACKER-023` | Kalman filter への変更後の対象テスト、全体テスト、レビュー報告書が存在し、設計書の「v1 は直線運動前提の Kalman filter を標準とする」に対して完了を妨げる未解決の問題が残っていない。 |",
+    "disposition": "context_reviewed",
+    "reason": "カルマン標準・カルマン化という曖昧な縮約をKalman filterに戻す。設計からの直接引用は変更せず、限定・全体テストと公開可否の条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 36,
+    "before_text": "| TRACKER-025 | Tracked 表示へ低 visibility の stale object を出さない | engine | done | TRACKER-024 | 欠測で十分 decayed した robot / ball track が `TrackerFrame` に出力されず、1 frame 程度の短期欠測を残す既存契約は維持される。設定差分は `reports/tracker-025-tigers-config-diff-20260510153510.md`、review は `reports/tracker-025-review-20260510154020.md` に記録済み。 |",
+    "current_line": 38,
+    "current_text": "| `TRACKER-025` | `Tracked` 表示へ可視性が低い古い追跡対象を出さない | 追跡処理 | 完了 | `TRACKER-024` | 欠測で十分に減衰したロボット / ボールの追跡状態が `TrackerFrame` に出力されず、追跡フレーム 1 件分程度の短期欠測では追跡状態を保持する既存契約は維持される。設定差分は `reports/tracker-025-tigers-config-diff-20260510153510.md`、レビューは `reports/tracker-025-review-20260510154020.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "低い可視性による出力除外と短期欠測時の保持を区別する。frame単位を戻し、報告2件の参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 37,
+    "before_text": "| TRACKER-026 | Tracked 表示の raw/tracked diagnostics log を追加する | investigation | done | TRACKER-025 | raw SSL-Vision detection と tracked 出力を同じログで比較でき、誤検出の発生源を切り分けられる。`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` は 0 warning / 0 error。 |",
+    "current_line": 39,
+    "current_text": "| `TRACKER-026` | `Tracked` 表示の未加工入力 / 追跡結果の診断ログを追加する | 調査 | 完了 | `TRACKER-025` | 未加工の SSL-Vision 検出情報と追跡結果を同じログで比較でき、誤検出の発生源を切り分けられる。`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` は警告 0 件 / エラー 0 件。 |",
+    "disposition": "context_reviewed",
+    "reason": "SSL-Visionの検出情報と追跡結果を区別し、ビルドコマンドと警告0・エラー0を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 38,
+    "before_text": "| TRACKER-027 | Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する | engine | done | TRACKER-026 | 近接別 ID robot を raw detection 単位で抑制し、短命 secondary ball ghost を 1 frame で出力しない。継続観測された genuine な複数 ball は stable sort で出力できる。実装・検証は `reports/tracker-027-evidence-20260510161437.md`、review は `reports/tracker-027-review-20260510161549.md` に記録済み。 |",
+    "current_line": 40,
+    "current_text": "| `TRACKER-027` | Tigers 由来の近接重複ロボット / 短命ボール抑制を追加する | 追跡処理 | 完了 | `TRACKER-026` | 近接する別 ID のロボットを未加工の検出情報単位で抑制し、誤検出された短命な secondary ball を、観測フレーム 1 件だけに基づいて出力しない。継続観測された実際の複数ボールは安定した並べ替えで出力できる。実装・検証は `reports/tracker-027-evidence-20260510161437.md`、レビューは `reports/tracker-027-review-20260510161549.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "ghostを画像の残像とせずsecondary ballの誤検出として説明する。入力単位と継続観測された複数ボールの安定順序を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 39,
+    "before_text": "| TRACKER-028 | capture 1680 付近の複数 ball 再発を解析して修正する | engine | done | TRACKER-027 | 指定 diagnostics log の trackedFrame 1680 付近で複数 ball になる原因を記録し、成長済み secondary ball が fresh observation を失った後に出続けないよう修正した。実装・検証は `reports/tracker-028-evidence-20260510215726.md`、review は `reports/tracker-028-review-20260510215726.md` に記録済み。 |",
+    "current_line": 41,
+    "current_text": "| `TRACKER-028` | キャプチャー内の追跡フレーム 1680 付近で複数ボールが再発する原因を解析して修正する | 追跡処理 | 完了 | `TRACKER-027` | 指定診断ログの `trackedFrame` 1680 付近で複数ボールになる原因を記録し、継続観測されていた secondary ball が、新しい観測を得られなくなった後も出力され続ける問題を修正した。実装・検証は `reports/tracker-028-evidence-20260510215726.md`、レビューは `reports/tracker-028-review-20260510215726.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "1680が追跡フレーム番号だと明示する。成長済みは継続観測後という実テストの条件で説明し、欠測後に出力され続けない性質を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 40,
+    "before_text": "| TRACKER-029 | tracked object の小刻みな振動を抑制する | engine | done | TRACKER-028 | stationary に近い tracked ball / robot の表示揺れを抑制しつつ、実移動している object の追従性を過度に落とさない。振動抑制 tuning 値は profile 設定から外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、review は `reports/tracker-029-review-20260510221200.md` に記録済み。 |",
+    "current_line": 42,
+    "current_text": "| `TRACKER-029` | 追跡対象の小刻みな振動を抑制する | 追跡処理 | 完了 | `TRACKER-028` | 静止に近い追跡中のボール / ロボットの表示揺れを抑制しつつ、実移動している対象の追従性を過度に落とさない。振動抑制の調整値は設定プロファイルから外部調整できる。実装・検証は `reports/tracker-029-evidence-20260510221200.md`、レビューは `reports/tracker-029-review-20260510221200.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "静止時の表示揺れ抑制と実移動への追従性を両立する条件、設定プロファイルからの調整、証拠参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 41,
+    "before_text": "| TRACKER-030 | Tracked field 表示を Vision field geometry と揃える | ui | done | TRACKER-029 | tracked view でも defense area / goal / center / field arcs など Vision field と同等の線を描画し、raw Vision 画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。review は `reports/tracker-030-review-20260510222529.md` に記録済み。 |",
+    "current_line": 43,
+    "current_text": "| `TRACKER-030` | `Tracked` のフィールド表示を SSL-Vision のフィールド形状と揃える | UI | 完了 | `TRACKER-029` | 追跡結果の表示でも守備領域、ゴール、中央線、フィールドの円弧など SSL-Vision と同等の線を描画し、未加工入力画面との差分を `reports/tracker-030-evidence-20260510222529.md` に記録済み。レビューは `reports/tracker-030-review-20260510222529.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "Trackedは画面名として保持する。フィールド形状と描画要素・比較結果への参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 42,
+    "before_text": "| TRACKER-031 | camera 間の同一 robot ID 遠方 outlier で robot が瞬間移動する問題を修正する | engine | done | TRACKER-030 | 同じ frame の別 camera に正常な同一 robot ID 観測がある場合、遠方 outlier camera 観測を tracked merge に混ぜない。原因・実装・検証は `reports/tracker-031-evidence-20260510223916.md`、review は `reports/tracker-031-review-20260510223916.md` に記録済み。 |",
+    "current_line": 44,
+    "current_text": "| `TRACKER-031` | 別カメラが同一ロボット ID を遠方に誤検出した際、追跡位置が急変する問題を修正する | 追跡処理 | 完了 | `TRACKER-030` | 同じ追跡フレームへ統合する観測の中に、別カメラによる正常な同一ロボット ID の観測がある場合は、遠方外れ値となるカメラの観測を統合対象から除く。原因・実装・検証は `reports/tracker-031-evidence-20260510223916.md`、レビューは `reports/tracker-031-review-20260510223916.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "外れ値がIDでなく観測位置の値であること、同じ追跡フレームへ統合する別カメラの観測であることを実装と照合して説明する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 43,
+    "before_text": "| TRACKER-032 | Tracker 保守性改善の詳細設計書を分割作成する | maintenance | done | TRACKER-031 | Core engine、Server/CLI/UI、test 保守性改善の詳細設計を日本語の分割ファイルとして作成した。worker report は `reports/tracker-032-core-design-worker-20260511063428.md`、`reports/tracker-032-server-design-worker-20260511063428.md`、`reports/tracker-032-test-design-worker-20260511063428.md`、review は `reports/tracker-032-review-20260511063428.md` に記録済み。 |",
+    "current_line": 45,
+    "current_text": "| `TRACKER-032` | トラッカー保守性改善の詳細設計書を分割作成する | 保守 | 完了 | `TRACKER-031` | 中核処理、サーバー / CLI / UI、テストの保守性改善に関する詳細設計を日本語の分割ファイルとして作成した。作業報告書は `reports/tracker-032-core-design-worker-20260511063428.md`、`reports/tracker-032-server-design-worker-20260511063428.md`、`reports/tracker-032-test-design-worker-20260511063428.md`、レビューは `reports/tracker-032-review-20260511063428.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "設計分割の3領域と作業報告3件・レビュー1件の参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 44,
+    "before_text": "| TRACKER-033 | Core tracker engine の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `TrackerExecutionContracts.cs`、`TrackerModelContracts.cs`、`TrackerPacketGenerator.cs` を Core の責務別ファイルへ分割し、主要 class / property / method に日本語コメントを追加した。実装・検証は `reports/tracker-033-core-worker-20260511070200.md`、review は `reports/tracker-033-review-20260511072000.md` に記録済み。 |",
+    "current_line": 46,
+    "current_text": "| `TRACKER-033` | 中核の追跡エンジンにある巨大ファイルを責務別に細分化し日本語コメントを追加する | 保守 | 完了 | `TRACKER-032` | `TrackerExecutionContracts.cs`、`TrackerModelContracts.cs`、`TrackerPacketGenerator.cs` を責務別ファイルへ分割し、主要クラス / プロパティ / メソッドに日本語コメントを追加した。実装・検証は `reports/tracker-033-core-worker-20260511070200.md`、レビューは `reports/tracker-033-review-20260511072000.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "3つの実ファイル名と責務別分割、クラス・プロパティ・メソッドのコメント対象、報告を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 45,
+    "before_text": "| TRACKER-034 | Server / CLI / UI の巨大ファイルを責務別に細分化し日本語コメントを追加する | maintenance | done | TRACKER-032 | `Tracker.CaptureReplay/Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` などを責務別に分割し、主要 class / property / method に日本語コメントを追加した。保守性設計は `Tracker/Design/DebugHost/debug-host-maintainability-design.md`、実装・検証は `reports/tracker-034-server-worker-20260511074000.md`、追加コメント補強は `reports/tracker-034-comment-followup-worker-20260511082000.md`、review は `reports/tracker-034-review-20260511081000.md` と `reports/tracker-034-review-r2-20260511083000.md` に記録済み。 |",
+    "current_line": 47,
+    "current_text": "| `TRACKER-034` | サーバー / CLI / UI の巨大ファイルを責務別に細分化し日本語コメントを追加する | 保守 | 完了 | `TRACKER-032` | `Tracker.CaptureReplay/Program.cs`、`TrackerCoordinator.cs`、`Diagnostics.razor` などを責務別に分割し、主要クラス / プロパティ / メソッドに日本語コメントを追加した。保守性設計は `Tracker/Design/DebugHost/debug-host-maintainability-design.md`、実装・検証は `reports/tracker-034-server-worker-20260511074000.md`、追加コメント補強は `reports/tracker-034-comment-followup-worker-20260511082000.md`、レビューは `reports/tracker-034-review-20260511081000.md` と `reports/tracker-034-review-r2-20260511083000.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "実ファイル名、保守性設計、追加コメント補強、初回と2回目のレビュー参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 46,
+    "before_text": "| TRACKER-035 | Tracker tests を読みやすく分割し確認内容の日本語コメントを追加する | maintenance | done | TRACKER-033, TRACKER-034 | 巨大 test file を責務別に分割し、対象 test 81 件に何を確認しているかの日本語コメントを追加した。実装・検証は `reports/tracker-035-test-worker-20260511085000.md`、review は `reports/tracker-035-review-20260511091000.md` に記録済み。 |",
+    "current_line": 48,
+    "current_text": "| `TRACKER-035` | トラッカーのテストを読みやすく分割し確認内容の日本語コメントを追加する | 保守 | 完了 | `TRACKER-033`, `TRACKER-034` | 巨大なテストファイルを責務別に分割し、対象テスト 81 件に何を確認しているかの日本語コメントを追加した。実装・検証は `reports/tracker-035-test-worker-20260511085000.md`、レビューは `reports/tracker-035-review-20260511091000.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "対象テスト81件、責務別分割と確認内容のコメント追加、実装とレビューの参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 47,
+    "before_text": "| TRACKER-036 | 保守性改善全体の検証・レビュー・PR 完了通知を行う | verification | done | TRACKER-033, TRACKER-034, TRACKER-035 | 保守性改善全体の最終検証と final review を実施した。最終検証は `reports/tracker-036-final-verification-20260511093000.md`、final review は `reports/tracker-036-final-review-20260511094000.md` に記録済み。 |",
+    "current_line": 49,
+    "current_text": "| `TRACKER-036` | 保守性改善全体の検証・レビュー・PR 完了通知を行う | 検証 | 完了 | `TRACKER-033`, `TRACKER-034`, `TRACKER-035` | 保守性改善全体の最終検証と最終レビューを実施した。最終検証は `reports/tracker-036-final-verification-20260511093000.md`、最終レビューは `reports/tracker-036-final-review-20260511094000.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "最終検証・最終レビューの区別と2つの報告参照、依存する3作業を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 48,
+    "before_text": "| TRACKER-037 | Tracker 保守性改善の命名・配置・コメント基準を決めて一貫性を確認する | maintenance | done | TRACKER-036 | dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を日本語で明文化した。監査は `reports/tracker-037-naming-comment-audit-20260511195008.md`、実装分担は `reports/tracker-037-design-rules-worker-20260511195640.md`、`reports/tracker-037-core-server-worker-20260511195640.md`、`reports/tracker-037-test-xml-comments-worker-20260511195640.md`、修正は `reports/tracker-037-review-fix-worker-20260511200910.md`、最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み。 |",
+    "current_line": 50,
+    "current_text": "| `TRACKER-037` | トラッカー保守性改善の命名・配置・コメント基準を決めて一貫性を確認する | 保守 | 完了 | `TRACKER-036` | `.` 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、テストの XML コメント化方針を日本語で明文化した。監査は `reports/tracker-037-naming-comment-audit-20260511195008.md`、実装分担は `reports/tracker-037-design-rules-worker-20260511195640.md`、`reports/tracker-037-core-server-worker-20260511195640.md`、`reports/tracker-037-test-xml-comments-worker-20260511195640.md`、修正は `reports/tracker-037-review-fix-worker-20260511200910.md`、最終再レビューは `reports/tracker-037-review-r2-20260511201410.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "ドット区切りとフォルダ分割、コメント対象、XML化、各分担・修正・最終再レビューの参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 49,
+    "before_text": "| TRACKER-038 | diagnostics log の trackedFrame 3483 付近で黄色8番が首振りする原因を調査して修正する | investigation | done | TRACKER-037 | 原因は raw Vision 入力、camera 間 merge、表示処理ではなく、robot orientation filter が位置 mm 用 covariance を向き axis に流用して過去の角速度を残すことだった。rad 単位の orientation covariance と angular velocity clamp を `RobotTracker` 設定へ外出しし、既存 Kalman scale 契約も維持した。`Tracker.CaptureReplay` に frame detail filter と robot orientation / angular velocity 出力を追加し、appsettings / resolved metadata replay で Kalman scale を保持するようにした。証跡は `reports/tracker-038-evidence-20260512080732.md` に記録済み。focused test 26 件、full test 155 件は passed。初回 review と r2 review の Medium finding は対応済み。r3 review は `reports/tracker-038-review-r3-20260512082903.md` に記録済みで no findings。 |",
+    "current_line": 51,
+    "current_text": "| `TRACKER-038` | 診断ログの `trackedFrame` 3483 付近で黄色8番が首振りする原因を調査して修正する | 調査 | 完了 | `TRACKER-037` | 原因は raw vision、カメラ間の統合、表示処理ではなく、ロボットの向きを推定する Kalman filter が、位置（mm）用の共分散を向きの軸に流用して過去の角速度を残すことだった。rad 単位の向きの共分散と角速度の範囲制限を `RobotTracker` 設定へ外出しし、既存の Kalman filter の係数設定に関する契約も維持した。`Tracker.CaptureReplay` に追跡結果の詳細絞り込みとロボット向き / 角速度出力を追加し、設定ファイルまたは capture metadata の保存済み設定を使った再生でも、Kalman filter の係数を保持するようにした。証跡は `reports/tracker-038-evidence-20260512080732.md` に記録済み。対象限定テスト 26 件、全体テスト 155 件は成功。初回レビューと r2 レビューの中程度の指摘は対応済み。r3 レビューは `reports/tracker-038-review-r3-20260512082903.md` に記録済みで指摘なし。 |",
+    "disposition": "context_reviewed",
+    "reason": "raw vision・統合・表示は原因ではないという否定を保持する。Kalman filterの向き軸、mm/rad、共分散と角速度制限、保存設定での再生、26件・155件とレビュー結果を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 55,
+    "before_text": "| preparation | done | Tracker の設計書、調査レポート、設計レビュー報告、task/phase 管理が揃い、ユーザー承認の上で設計を完了した。 |",
+    "current_line": 57,
+    "current_text": "| 準備 | 完了 | トラッカーの設計書、調査レポート、設計レビュー報告、作業 / 段階管理が揃い、ユーザー承認の上で設計を完了した。 |",
+    "disposition": "context_reviewed",
+    "reason": "設計資料一式、管理記録、ユーザー承認という条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 56,
+    "before_text": "| contracts | done | `TRACKER-001` から `TRACKER-005` が完了し、`Tracker.Core` の内部モデル、`TrackerUpdateResult`、packet generator、observer/event 契約、およびそれらを固定する failing/passing test が揃う。 |",
+    "current_line": 58,
+    "current_text": "| 契約 | 完了 | `TRACKER-001` から `TRACKER-005` が完了し、`Tracker.Core` の内部状態表現、`TrackerUpdateResult`、パケット生成処理、イベントと通知先の契約、および実装前の失敗と実装後の成功を確認するテストが揃う。 |",
+    "disposition": "context_reviewed",
+    "reason": "完了ID範囲、イベントと通知先の契約、実装前の失敗と実装後の成功という検証の順序を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 57,
+    "before_text": "| engine | done | `TRACKER-006` から `TRACKER-011` に加え、`TRACKER-023`、`TRACKER-025`、`TRACKER-027`、`TRACKER-028`、`TRACKER-029`、`TRACKER-031` が完了した。camera-local robot/ball tracking が設計どおり線形 Kalman filter を標準として実装され、低 visibility の stale object と Tigers 由来の近接重複 robot / 短命 ball ghost / stale secondary ball が tracked frame へ出続けない。stationary に近い tracked object の小刻みな振動は抑制され、camera 間の同一 robot ID 遠方 outlier は正常な別 camera 観測がある場合に tracked merge へ混ざらない。 |",
+    "current_line": 59,
+    "current_text": "| 追跡処理 | 完了 | `TRACKER-006` から `TRACKER-011` に加え、`TRACKER-023`、`TRACKER-025`、`TRACKER-027`、`TRACKER-028`、`TRACKER-029`、`TRACKER-031` が完了した。カメラ単位のロボット / ボール追跡が設計どおり線形 Kalman filter を基準として実装され、可視性が低い古い追跡対象、Tigers 由来の近接重複ロボット、短命なボールの誤検出、観測されなくなった secondary ball が追跡フレームへ出力され続けない。静止に近い追跡対象の小刻みな振動は抑制され、あるカメラの同一ロボット ID の位置が遠方の外れ値となった場合、別カメラの正常な観測があれば、その外れ値を統合対象から除く。 |",
+    "disposition": "context_reviewed",
+    "reason": "全完了ID、線形Kalman filter、低可視性・誤検出・欠測・揺れ抑制、別カメラ正常観測が必要な外れ値除外条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 58,
+    "before_text": "| integration | done | `Tracker.Server` から engine、snapshot store、observer、official tracker packet 配信、設定束縛、profile 切替要求経路までが接続され、profile-aware な `VisionReceiver` 設定が反映される。 |",
+    "current_line": 60,
+    "current_text": "| 統合 | 完了 | `Tracker.Server` から追跡エンジン、スナップショット保存処理、通知処理、official tracker packet 配信、設定値のバインド、設定プロファイルの切り替え要求経路までが接続され、設定プロファイルに対応した `VisionReceiver` 設定が反映される。 |",
+    "disposition": "context_reviewed",
+    "reason": "エンジン・保存・通知・公式パケット配信・設定バインド・切替経路とVisionReceiverの追従を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 59,
+    "before_text": "| ui | done | `TRACKER-015` から `TRACKER-017` に加え、`TRACKER-030` が完了し、tracked viewer、raw/tracked 切替、tracked diagnostics 表示、runtime profile 切替要求 UI、raw Vision field geometry と揃った tracked field 表示が用意される。 |",
+    "current_line": 61,
+    "current_text": "| UI | 完了 | `TRACKER-015` から `TRACKER-017` に加え、`TRACKER-030` が完了し、追跡結果の表示画面、未加工入力 / 追跡結果の切り替え、追跡結果の診断表示、実行時の設定プロファイルの切り替え要求 UI、SSL-Vision のフィールド形状と揃った追跡結果のフィールド表示が用意される。 |",
+    "disposition": "context_reviewed",
+    "reason": "完了ID、入力と追跡結果の切替、診断、実行時プロファイル、形状の一致を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 60,
+    "before_text": "| verification | done | `TRACKER-018` と `TRACKER-019` に加え、`TRACKER-024` が完了し、Kalman 標準準拠後および stale object 抑制後の build/test/review 証跡が reports に存在する。`TRACKER-028` の指定 capture replay 証跡が `reports/tracker-028-evidence-20260510215726.md`、`TRACKER-029` の振動抑制検証が `reports/tracker-029-evidence-20260510221200.md`、`TRACKER-030` の field geometry 表示検証が `reports/tracker-030-evidence-20260510222529.md`、`TRACKER-031` の瞬間移動抑制検証が `reports/tracker-031-evidence-20260510223916.md` に記録済み。`TRACKER-036` で保守性改善後の final verification を `reports/tracker-036-final-verification-20260511093000.md` に記録済み。 |",
+    "current_line": 62,
+    "current_text": "| 検証 | 完了 | `TRACKER-018` と `TRACKER-019` に加え、`TRACKER-024` が完了し、設計で標準とする Kalman filter への変更後、および古い追跡対象の抑制後のビルド / テスト / レビュー証跡が `reports/` に保存されている。`TRACKER-028` の指定キャプチャーの再生証跡が `reports/tracker-028-evidence-20260510215726.md`、`TRACKER-029` の振動抑制検証が `reports/tracker-029-evidence-20260510221200.md`、`TRACKER-030` のフィールド形状表示検証が `reports/tracker-030-evidence-20260510222529.md`、`TRACKER-031` の瞬間移動抑制検証が `reports/tracker-031-evidence-20260510223916.md` に記録済み。`TRACKER-036` で保守性改善後の最終検証を `reports/tracker-036-final-verification-20260511093000.md` に記録済み。 |",
+    "disposition": "context_reviewed",
+    "reason": "方式変更後と出力抑制後の検証を区別し、reports/と各詳細レポートの参照を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 61,
+    "before_text": "| review | done | `TRACKER-020` に加え、Kalman 標準準拠後および stale object 抑制後の review 結果が記録され、致命的な指摘が残っていない。`TRACKER-028`、`TRACKER-029`、`TRACKER-030`、`TRACKER-031` の review 結果は reports に記録済み。`TRACKER-032` 以降も task ごとの review report を作成してきた。`TRACKER-038` は初回 review と r2 review の Medium finding を修正し、r3 review は `reports/tracker-038-review-r3-20260512082903.md` に記録済みで no findings。 |",
+    "current_line": 63,
+    "current_text": "| レビュー | 完了 | `TRACKER-020` に加え、設計で標準とする Kalman filter への変更後、および古い追跡対象の抑制後のレビュー結果が記録され、致命的な指摘が残っていない。`TRACKER-028`、`TRACKER-029`、`TRACKER-030`、`TRACKER-031` のレビュー結果は `reports/` に記録済み。`TRACKER-032` 以降も作業ごとのレビュー報告書を作成してきた。`TRACKER-038` は初回レビューと r2 レビューの中程度の指摘を修正し、r3 レビューは `reports/tracker-038-review-r3-20260512082903.md` に記録済みで指摘なし。 |",
+    "disposition": "context_reviewed",
+    "reason": "未解決の致命的指摘なし、各作業の報告、TRACKER-038の初回・2回目修正と3回目指摘なしを保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 62,
+    "before_text": "| documentation | done | `TRACKER-021` が完了し、`Tracker.Server` の README に起動手順、画面の使い方、主要設定値の意味が記録されている。 |",
+    "current_line": 64,
+    "current_text": "| 文書化 | 完了 | `TRACKER-021` が完了し、`Tracker.Server` の README に起動手順、画面の使い方、主要設定値の意味が記録されている。 |",
+    "disposition": "context_reviewed",
+    "reason": "旧READMEの位置づけと起動・画面・設定の記録を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 63,
+    "before_text": "| investigation | done | `TRACKER-026` が完了し、raw SSL-Vision detection と tracked 出力を同じログで比較できる。`TRACKER-038` で指定 diagnostics log の `trackedFrame=3483` 付近における黄色8番の首振り原因を orientation filter へ切り分け、rad 単位の orientation covariance / angular velocity clamp と `Tracker.CaptureReplay` の汎用 detail 改善を実装した。orientation tuning parameter は `RobotTracker` 設定へ外出し済み。CaptureReplay replay でも Kalman scale を保持する。証跡は `reports/tracker-038-evidence-20260512080732.md` に記録済み。focused test 26 件、full test 155 件は passed。r3 review は no findings。 |",
+    "current_line": 65,
+    "current_text": "| 調査 | 完了 | `TRACKER-026` が完了し、未加工の SSL-Vision 検出情報と追跡結果を同じログで比較できる。`TRACKER-038` で指定診断ログの `trackedFrame=3483` 付近における黄色8番の首振り原因を向きを推定する Kalman filter へ切り分け、rad 単位の向きの共分散と角速度の範囲制限を導入した。また、`Tracker.CaptureReplay` の詳細出力を、他の調査にも使えるよう改善した。向きの調整値は `RobotTracker` 設定へ外出し済み。CaptureReplay の再生でも Kalman filter の係数を保持する。証跡は `reports/tracker-038-evidence-20260512080732.md` に記録済み。対象限定テスト 26 件、全体テスト 155 件は成功。r3 レビューは指摘なし。 |",
+    "disposition": "context_reviewed",
+    "reason": "原因の切り分け、向きの共分散・角速度制限、CLIの詳細出力改善、保存設定の再生、26/155件と3回目レビュー結果を保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "before_line": 64,
+    "before_text": "| maintenance | done | `TRACKER-032` から `TRACKER-035` で詳細設計書の分割、巨大ソースファイルの責務別分割、主要 class / property / method の日本語コメント追加、test の確認内容コメント追加を完了した。`TRACKER-037` で dot 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、test の XML コメント化方針を明文化し、現状ファイルを同じ基準へ揃えた。親 Codex は manager として作業を管理し、実装・設計書作成・test 編集・レビューは `gpt-5.5 high` sub-agent に委譲した。 |",
+    "current_line": 66,
+    "current_text": "| 保守 | 完了 | `TRACKER-032` から `TRACKER-035` で詳細設計書の分割、巨大ソースファイルの責務別分割、主要クラス / プロパティ / メソッドの日本語コメント追加、テストの確認内容コメント追加を完了した。`TRACKER-037` で `.` 区切りファイル名とフォルダ分割の使い分け、コメント付与対象、テストの XML コメント化方針を明文化し、現状ファイルを同じ基準へ揃えた。親 Codex は管理役として作業を管理し、実装・設計書作成・テスト編集・レビューは `gpt-5.5 high` の別担当へ委譲した。 |",
+    "disposition": "context_reviewed",
+    "reason": "完了IDと分割・コメント基準、親が管理してモデル指定のエージェントへ作業を任せた役割関係を保持する。"
+  }
+]
