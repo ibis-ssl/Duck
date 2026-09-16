@@ -1,0 +1,392 @@
+{
+  "time": "2026-09-17T08:24:51.157748+09:00",
+  "technical_parent": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "targets": [
+    "feedback-points/feedback-points.md",
+    "README.md",
+    "tools/lint/README.md",
+    "Tracker/Design/Archive/Core/phases-status.md",
+    "Tracker/Design/Archive/Core/tasks-status.md",
+    "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "Tracker/Design/Core/tracker-architecture-plan.md",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "Tracker/Design/Core/tracker-history-000-038.md",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Tracker.CaptureReplay/README.md",
+    "Tracker/Tracker.DebugHost/README.md"
+  ],
+  "file_hashes": {
+    "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+    "tools/lint/README.md": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646",
+    "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "Tracker/Design/Archive/Core/tasks-status.md": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6",
+    "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "416fd7d0692a324164b631e480e510f65bcda6052452b802db066950c75b1b3a",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "b7a51040f936ea006e4ce96011b37e66776e540df7beac14063b1bd327bf9327",
+    "Tracker/Design/phases-status.md": "c787fd413ac19c3930ef9e6a38a5ab09dc232a0f017038a9aa3e51adefb11302",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+    "Tracker/Design/tasks-status.md": "8131ab3ab9f0118274d997b9b22c49139fa4d8f1c508060f0713faa59cada09b",
+    "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "Tracker/Tracker.DebugHost/README.md": "ee9d89fdeb6bdc417709eeb019850b1eda65945adb46e65ca35fd4f281916beb"
+  },
+  "focused_record": "../wording-occurrence-audit-20260916/validation-verification-six-docs-20260917-0823.json",
+  "command": [
+    "npm",
+    "run",
+    "lint:md:whitelist"
+  ],
+  "python_path_prefix": "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin",
+  "exit_code": 1,
+  "stdout": "full-whitelist-six-docs.stdout",
+  "stderr": "full-whitelist-six-docs.stderr",
+  "log_archive": "six-docs-later-stage-logs.tar.gz",
+  "log_archive_sha256": "f415a6615aa38add8b7cd1c197b6e75bb3311bdada79c27d7b347161051ba9e9",
+  "log_members_sha256": {
+    "full-whitelist-six-docs.stdout": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6",
+    "full-whitelist-six-docs.stderr": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc",
+    "full-whitelist-six-docs.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "environment_record": "validation-environment-initial.json",
+  "checker_files_rechecked": [
+    {
+      "path": "skills/chat-handoff-manager/SKILL.md",
+      "sha256": "eb58c1208923e032db060111d68e4266323a49a34c6812fa79834ca1c556b332",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/chat-implementation-worker/SKILL.md",
+      "sha256": "7b27d8c618f927d4426f74bd03968f5f7c71053c8f032d3f554fe16293dc3e12",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/chat-report-writer/SKILL.md",
+      "sha256": "f771d3dc2f1077129acc11a6d2bc4b865db32ff33cde1c3ea736bcc9cc976b2e",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/chat-review-worker/SKILL.md",
+      "sha256": "771f64abd8901f0c674385937563d6844d38f466c6af87b8e088bb9d3b9401f1",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/codex-delegation-executor/SKILL.md",
+      "sha256": "6daaf2410437324f6d8466973d605e97f24e7fbd773feb9bbf85d3e2856cd87e",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/design/skill-hierarchy-design.md",
+      "sha256": "70240f542a1d254dd1e387367fe9bcd72a0ae89379efb252e43981327eb6ecda",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/design-doc-maintainer/SKILL.md",
+      "sha256": "3a5358906377abc3f00c02a74d9f623e40f63fb29918dbb2892fd33448f5f2b8",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/design-executor/SKILL.md",
+      "sha256": "40f8f4a54b6c5643cf58b315dee25b3a128031d4ae1a0fa54de9d6cd7191e58d",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/development-orchestrator/SKILL.md",
+      "sha256": "5828d0c4b2b65e93033a5fbd93d08b0e8e382909a150359e2118a8b7219277fc",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/development-orchestrator/references/start-intake-policy.md",
+      "sha256": "cf21f863ef685bd31e363742541cd7ef3468d39c576d2a68ecf70b96a8c828a8",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/execution-cost-stabilizer/SKILL.md",
+      "sha256": "ab5c35101f32137d62b9252dd1703ecf80950cf98ed1d6d354057b12a4428b5e",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-autonomy-boundary-manager/SKILL.md",
+      "sha256": "c23cb6cce56d00e0a06eaf7714ed88933b2b5b0b7bc6d1170aa8ce25212a90f0",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-coding-standards-enforcer/SKILL.md",
+      "sha256": "8eaecbac0ac757d7028625e6edd80fd5658fcc3b6a923a51ea35ed3816b2fac2",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-issue-intake-fallback-manager/SKILL.md",
+      "sha256": "37ee16fa6aa277ec0f369f4ecc05638eb5a2da6ccf39a0f1ef9cacbe5461f11b",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/SKILL.md",
+      "sha256": "a7eabed9611fcab69544b4d63897fbaf49e35b2f36b2b65d3da03bbe1785bb0c",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/references/canonical-feedback-taxonomy.md",
+      "sha256": "6e04f109523c8342d2800167b4dc125501a0757fb1a024e59cfc3416f55191bb",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/references/feedback-format-and-cleanup.md",
+      "sha256": "81165ceeadab04b6f3bb698a25e18bc3809758909e378ac7bb53b518b1626126",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/references/skillization-issue-template.md",
+      "sha256": "5d66298d2a83fb0a28a44a3130c853987196ac4b025c848456dbfc1741b08e64",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/references/skillization-operations.md",
+      "sha256": "1df0a0f634a4a788d0e442d7600f828f16bce06a0e3755ab9adad21c7a292a37",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/references/skillization-policy.md",
+      "sha256": "91370f91aa36a462047266fc57057809a23dfd76b369f5c2142c4b2b44c72a84",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-manager/scripts/build_skillization_issue.sh",
+      "sha256": "f10b78095573327c6026c9b79b0a45dfd5535fef5e33590cd92a08659997113e",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/feedback-points-sanitizer/SKILL.md",
+      "sha256": "03ae0f3ccfae9f493c8233c1c52c2eac71b96964a817cabb49cad710f822f1ae",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/git-branch-starter/SKILL.md",
+      "sha256": "1ac60194bee28a75f594b63959c3cdb094b738c5666a8a1042982bc7dec49a8b",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/git-commit-manager/SKILL.md",
+      "sha256": "053408533defeb3d352fb1903632b70cb88bc96f8107579f08b6cc6112a91b0c",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/git-pr-submitter/SKILL.md",
+      "sha256": "d82c2092c1ee90326aa8db77a218e0e601d0a37813f38a12f783819b1e2a2e85",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/git-review-followup-manager/SKILL.md",
+      "sha256": "4c0909e5914a9f006c1e6fb3bf8fe61463bc7fd973a7636ab2539e1fed30ca2b",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/git-workflow-manager/SKILL.md",
+      "sha256": "f8a9a1c77d9951c1305eb28c809475e5e8849a66829a036f1488b31394e303c1",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/handover-memo-writer/SKILL.md",
+      "sha256": "46edb2ae57bf3214c7210cec2b8f17c77b64d00d8bf1aa682e7a1c27b4604518",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/handover-memo-writer/agents/openai.yaml",
+      "sha256": "79ed8ce26f7f253cb214169d05c3aa5b4269f04846153fb543955c483eda4383",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/implementation-executor/SKILL.md",
+      "sha256": "9d4a1a779f405c0a92c70223ea711b1ecb777502b2945eae74fa175889e361c2",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/implementation-worker/SKILL.md",
+      "sha256": "4dfaf78126904851d01f56615a23feaa8794e2b5d45e454f653191250a8e4cae",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/markdown-word-checker/SKILL.md",
+      "sha256": "496ccc3c3e09df42e11cc935edc2b3e69796b592c362f9d0742b30a77bac9df9",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/markdown-word-checker/agents/openai.yaml",
+      "sha256": "e2b6513b7e34d8225570c23282fc0c61e4e540767e706e525ba0a3d5295f6ae8",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/markdown-word-checker/hooks/hooks.sample.json",
+      "sha256": "7363b9e3d92f2d9672fd13c52e424b9a1ce8fc048576c99780d0fe7c7725ccc9",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/markdown-word-checker/hooks/post_tool_use_markdown_lint.py",
+      "sha256": "36bef9f420e796021a040264c7969d4a76c036821ce8a5b589dec0e5347c783f",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/progress-sync-manager/SKILL.md",
+      "sha256": "3caaf04841c6f47956d5cd185deae9fd551cd178276f9a6e373693f58aa292ed",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/report-output-manager/SKILL.md",
+      "sha256": "5e2c3c53aaed8d4d34fbf42a4217ccc6f620b019141ae99e663f6b649eec1c78",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/report-output-manager/references/report-filename-policy.md",
+      "sha256": "e591c6a8936ce8adbf9cb996d9b10e6052d89e96a006054666de93f6432dd8b0",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/report-output-manager/references/sub-agent-report-template.md",
+      "sha256": "f0bd35e7a0d0b6f443d1bee992eb1a32537852b44b87a505bdc4cf50b5b5d66c",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/report-output-manager/scripts/build_report_path.sh",
+      "sha256": "121a77fbc1d55f51c3561151e9b71b7558beb1752ea49a90d9452e0d3c498db0",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/report-writer/SKILL.md",
+      "sha256": "730c2efbb2f95ad27f5222bb94ac89aa96f0ace5555f76fad2f472fe64232f94",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/restart-handover-manager/SKILL.md",
+      "sha256": "7fd27a5c376a446da62720e0e7cfffa18ed3f6f75f1f62e8f81649abc0ce3fa0",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/SKILL.md",
+      "sha256": "bbee252508a43a5683b9d4f22e58df0d6be0b482f912d94d48ae81e4682680db",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/references/session-review-shape-policy.md",
+      "sha256": "bb061d32dff0666bfc6ae49aa4b8d5658651c1221b9f726d7f17f5fae1132644",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/references/source-documentation-policy.md",
+      "sha256": "98404d9d4776d5d7430251f46e4dbcb26161d6ab707260fb02d1772c574c1791",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/references/source-layout-policy.md",
+      "sha256": "35893919afb9b7ccfeb3c124632f988404dbf3cbfe4300dc363f6ce1c6641958",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+      "sha256": "b062107996ebb170c7861deff1cc312acc722d38cbdc52a5857008f2a93b1a7f",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/check-markdown-whitelist.js",
+      "sha256": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/extract-markdown-vocabulary-sudachi.py",
+      "sha256": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/list-markdown-targets.js",
+      "sha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/run-cspell-markdown.js",
+      "sha256": "4aaedca1df4d2f3b3dc88356cc747735bd6106b04f1fc4830bab01ae1ca3e3d4",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/textlint-rules/no-fullwidth-space.js",
+      "sha256": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-enforcer/scripts/textlint-rules/no-unresolved-placeholder-marker.js",
+      "sha256": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/review-worker/SKILL.md",
+      "sha256": "77ef833e772008d8d42b9d430e24305e32eb3159b7e904f96a2e8a1ac67c233d",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/skill-authoring-wrapper/SKILL.md",
+      "sha256": "c81c978148f33f900bfbcb360398662077abb88684c187e79367d6850faaf491",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/skill-authoring-wrapper/agents/openai.yaml",
+      "sha256": "789c72edd05d76498c999b6e88fe045491a98ddabb0abf600b36e93a2d638ed1",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/skill-authoring-wrapper/references/responsibility-placement-policy.md",
+      "sha256": "7dc8357c769220a4158a01270ab11e4219f9ed850dbe61bd8cf87c83a1daa87d",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/sub-agent-task-manager/SKILL.md",
+      "sha256": "50f2ef12e2e64eb032b59a3ec711e3aee1e8e6e1c61822f0e751f885bcb460e4",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/sub-agent-task-manager/references/agent-profile-selection.md",
+      "sha256": "7adbcfe84dc6a9d6b13f7a97e7d317763fb80a98f72cc13efec36501990f7b8d",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/sub-agent-task-manager/references/astra-escalation.md",
+      "sha256": "7e20fbea81943a67344c666be4218eebed685d5940a5e7489eb95e68d389d3cb",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/sub-agent-task-manager/references/spawn-agent-model-overrides.md",
+      "sha256": "5421e3763c418c11f0927d82395cebcdf81e34b7070edf9bedbf1a1d0ab9dd23",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/task-breakdown-planner/SKILL.md",
+      "sha256": "045cd5586c291c2d10425085da7053c0a5480728ce9581d6355c89c71e14c017",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/task-consistency-manager/SKILL.md",
+      "sha256": "65d50af4251ded8be07d20f9d01cc27fe4f68550c03f58d58334eaf8795da85f",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/tdd-executor/SKILL.md",
+      "sha256": "107656852624a9a61c32374f6b5ac6e25d6ba4e830afbb6609e4f7c088beb097",
+      "matches_initial": true
+    },
+    {
+      "path": "skills/work-context-manager/SKILL.md",
+      "sha256": "6a14f5292a5f15c49687e1b8890d5537b9068bb823fae25928d33baed32e647b",
+      "matches_initial": true
+    }
+  ],
+  "quote_content_still_matches": true
+}

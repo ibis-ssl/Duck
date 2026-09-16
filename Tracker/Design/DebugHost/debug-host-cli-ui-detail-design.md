@@ -74,7 +74,7 @@ tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` �
 alignment sidecar の各記録は、CaptureOn 中に診断記録、render snapshot、tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。
 
 - 診断記録の安定した識別子: 診断ログの行番号、tracked frame number、診断記録の時刻、自前トラッカーの `TrackerFrame.data_timestamp_ns`
-- render snapshot への参照: render snapshot の追跡フレームの番号、保存順の位置番号、または保存記録内の相対位置
+- render snapshot への参照: render snapshot の追跡フレームの番号、保存順の位置番号またはそのキャプチャー内の相対位置
 - 記録開始を基準とする相対時間: 記録開始から診断記録までの時間、SSL-Vision のパケットと render snapshot の `receivedAt` の相対時間、対応付けに使った収録時の `receivedAt`
 - source key: source role、source label、UUID、送信元の通信アドレスと通信ポート、正規化済みの source key
 - 選択した tracker snapshot への参照: tracker snapshot の保存順の位置番号、tracker snapshot の `receivedAt`、tracked frame number、tracked frame timestamp、比較や描画に使う概要情報の有無
