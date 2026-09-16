@@ -1,0 +1,263 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 3,
+    "before": "",
+    "after": "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+    "reason": "",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 4,
+    "before": "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+    "after": "",
+    "reason": "",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 38,
+    "before": "  - 未処理の検出情報を保持するバッファと、event time 順の並べ替えと、観測を統合する時間幅の管理",
+    "after": "  - 未確定の検出情報の保持、event time 順の並べ替え、観測を統合する時間幅の管理",
+    "reason": "とを重ねた列挙を3つの責務として整理し、pendingが未確定入力を指すことを明記する。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 44,
+    "before": "  - primary ballの安定化とsecondary ballの出力順序",
+    "after": "  - primary ball の安定化と secondary ball の出力順序",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。 許可済み名称と日本語の助詞の区切りをそろえる。 2種類のボールの分類名の前後の空白をそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 62,
+    "before": "- 非公開の状態保持用の `record`と比較処理",
+    "after": "- 非公開の状態保持用の `record` と比較処理",
+    "reason": "実際の型構文と日本語の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 91,
+    "before": "- 追跡フレーム全体: `TrackerFrame`, `TrackerFrameMetadata`",
+    "after": "- 追跡フレームとその付随情報: `TrackerFrame`, `TrackerFrameMetadata`",
+    "reason": "列挙した2型の役割をそれぞれ示し、自然な日本語で対応を明記する。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 104,
+    "before": "- `TrackedFrame` のtracked frame number と tracked frame timestampの設定",
+    "after": "- `TrackedFrame` の tracked frame number と tracked frame timestamp の設定",
+    "reason": "入力・出力の設計名を保持し、前後の区切りを整える。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 105,
+    "before": "- primary ballを先頭に置く処理と、secondary ballの安定した並び順",
+    "after": "- primary ball を先頭に置く処理と、secondary ball の安定した並び順",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。 許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 140,
+    "before": "  - `TrackerEngine` の保持項目、明示的なコンストラクターを持たない構成、`Update`",
+    "after": "  - `TrackerEngine` の状態を保持する変数、明示的なコンストラクターを持たない構成、`Update`",
+    "reason": "fieldを一般の項目とせず、インスタンスの状態を保持する変数だと説明する。競技領域を指すフィールドとは区別する。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 216,
+    "before": "  - 非公開の設定解決処理",
+    "after": "  - 設定値を決定する非公開の補助処理",
+    "reason": "各設定値を既定値・上書き値から決めるという補助処理の意味を、圧縮した名詞ではなく自然な説明にする。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 269,
+    "before": "`TRACKER-033` では日本語の XML documentation commentを追加する。固有名詞、型名、設定キー、通信形式の名前、単位記号は英字のままでよい。",
+    "after": "`TRACKER-033` では日本語の XML documentation comment を追加する。固有名詞、型名、設定キー、通信形式の名前、単位記号は英字のままでよい。",
+    "reason": "形式名の後の空白をそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 278,
+    "before": "- `TrackerEngine` の非公開の入れ子の `record`と比較処理のうち、分割後も非公開の補助処理として残す型",
+    "after": "- `TrackerEngine` の非公開の入れ子の `record` と比較処理のうち、分割後も非公開の補助処理として残す型",
+    "reason": "実際の型構文と日本語の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 286,
+    "before": "/// raw visionパケットから確定済みの追跡フレームとイベントを生成する、追跡エンジンの契約。",
+    "after": "/// raw vision のパケットから確定済みの追跡フレームとイベントを生成する、追跡エンジンの契約。",
+    "reason": "作成例のコメントも、日本語の修飾関係を自然にする。原文の引用ではない。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 327,
+    "before": "- primary ballの継続を、secondary ball の並べ替えより優先する箇所",
+    "after": "- primary ball の継続を、secondary ball の並べ替えより優先する箇所",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 335,
+    "before": "3. `TrackerEngine` を `partial sealed class` にして、最上位の `Update` と保持項目を `Engine/TrackerEngine/TrackerEngine.cs` に残す。",
+    "after": "3. `TrackerEngine` を `partial sealed class` にして、最上位の `Update` と状態を保持する変数を `Engine/TrackerEngine/TrackerEngine.cs` に残す。",
+    "reason": "分割後に同じファイルへ残すメソッドと状態変数を明確にする。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 338,
+    "before": "6. ボール追跡を分離する。camera-local track の ID、統合後の内部追跡 ID、primary ballの継続、secondary ball の追跡が確立する条件を変えない。",
+    "after": "6. ボール追跡を分離する。camera-local track の ID、統合後の内部追跡 ID、primary ball の継続、secondary ball の追跡が確立する条件を変えない。",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 341,
+    "before": "9. 接触、キック、ball left fieldを分離する。イベントの発火条件、直近の接触とみなす時間範囲、境界名を変えない。",
+    "after": "9. 接触、キック、ball left field を分離する。イベントの発火条件、直近の接触とみなす時間範囲、境界名を変えない。",
+    "reason": "許可済み判定語と助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 343,
+    "before": "11. 状態表現の契約を `Model` 配下へ分離し、公開プロパティの構造を変えずに日本語の XML documentation commentを追加する。",
+    "after": "11. 状態表現の契約を `Model` 配下へ分離し、公開プロパティの構造を変えずに日本語の XML documentation comment を追加する。",
+    "reason": "形式名の後の空白をそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 344,
+    "before": "12. `TrackerPacketGenerator` を `Proto` 配下へ移動し、primary ballを先頭に置く処理、ロボットの並べ替え、対応機能の順序、単位変換のコメントを追加する。",
+    "after": "12. `TrackerPacketGenerator` を `Proto` 配下へ移動し、primary ball を先頭に置く処理、ロボットの並べ替え、対応機能の順序、単位変換のコメントを追加する。",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 356,
+    "before": "- 検出情報の event timeは `TCapture > 0` を優先し、これを使えない場合の代用は `TSent` のままにする。",
+    "after": "- 検出情報の event time は `TCapture > 0` を優先し、これを使えない場合の代用は `TSent` のままにする。",
+    "reason": "時刻基準の名前を保持し、助詞との区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 360,
+    "before": "- 形状変更に伴う追跡状態の初期化や設定プロファイルの切り替え時に、未処理の入力バッファ、camera-local track、統合後のボールの識別情報、接触と ball left field の状態、継続中のキック状態、primary ballを消去する範囲を変えない。",
+    "after": "- 形状変更に伴う追跡状態の初期化や設定プロファイルの切り替え時に、未処理の入力バッファ、camera-local track、統合後のボールの識別情報、接触と ball left field の状態、継続中のキック状態、primary ball を消去する範囲を変えない。",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 362,
+    "before": "- primary ballの継続判定を、secondary ball の並べ替えより優先する。",
+    "after": "- primary ball の継続判定を、secondary ball の並べ替えより優先する。",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 363,
+    "before": "- secondary ballは、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。",
+    "after": "- secondary ball は、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。",
+    "reason": "設計語と助詞の間をそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 364,
+    "before": "- secondary ballの出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。",
+    "after": "- secondary ball の出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 366,
+    "before": "- ロボットの向きの推定軸は、位置の mm 単位用の共分散を流用せず、rad 単位に対応するmeasurement noise と process noise に対応する分散と、角速度の範囲制限を使う。設定プロファイルの Kalman の倍率に関する設定は、既定値との比で rad 用の基準値へ反映する。",
+    "after": "- Kalman filter の向きの軸では、位置（mm）用の共分散を流用しない。角度（rad）用の measurement noise と process noise に対応する分散と、角速度の範囲制限を使う。設定プロファイルの Kalman filter の倍率設定は、既定値との比で rad 用の基準値へ反映する。",
+    "reason": "対応するが重複した文を整理し、位置と向きの単位、2種類の不確かさ、倍率を既定値比で反映する契約を保持する。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 392,
+    "before": "  - primary ballの継続",
+    "after": "  - primary ball の継続",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 394,
+    "before": "  - secondary ballの安定順",
+    "after": "  - secondary ball の安定順",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 407,
+    "before": "  - primary ballを先頭に配置",
+    "after": "  - primary ball を先頭に配置",
+    "reason": "許可済み名称と日本語の助詞の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 430,
+    "before": "- 非公開の補助処理の分割だけでも、`partial` 化の際に非公開の入れ子の `record`の参照順やファイル配置を誤るとコンパイルエラーになりやすい。",
+    "after": "- 非公開の補助処理の分割だけでも、`partial` 化の際に非公開の入れ子の `record` の参照順やファイル配置を誤るとコンパイルエラーになりやすい。",
+    "reason": "実際の型構文と日本語の区切りをそろえる。",
+    "before_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64",
+    "after_sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+  }
+]

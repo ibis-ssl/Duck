@@ -1,0 +1,515 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 1,
+    "old": "# `Tracker.Core` 追跡処理詳細設計",
+    "new": "# `Tracker.Core` 追跡エンジンの詳細設計",
+    "reason": "対象はTracker.Coreのengineであり、許可済みの追跡エンジンを使って対象を特定する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 7,
+    "old": "`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡処理側の分割境界、実行順序、挙動維持の確認観点を固定する。",
+    "new": "`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンの分割境界、実行順序、挙動維持の確認観点を固定する。",
+    "reason": "冒頭でも実装対象を追跡エンジンに特定し、一般的な処理全般へ広げない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 38,
+    "old": "  - 未処理の検出情報を保持するバッファと、観測時刻順の並べ替え・統合する時間範囲の管理",
+    "new": "  - 未処理の検出情報を保持するバッファと、event time 順の並べ替えと、観測を統合する時間幅の管理",
+    "reason": "到着時刻と異なるevent timeの基準を保持し、並べ替えと統合する時間幅の関係を自然に説明する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 39,
+    "old": "  - フィールド形状の大幅変更による初期化と最新状態の消去",
+    "new": "  - フィールド形状の大幅変更に伴う追跡状態の初期化と最新状態の消去",
+    "reason": "TrackerEngine.csとFrameCommit.csで消去する対象は追跡状態・未確定入力。形状自体を初期化するような読み方を避ける。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 40,
+    "old": "  - フィールド全体の追跡結果の確定とイベント発行",
+    "new": "  - world frame（フィールド全体の追跡フレーム）の確定とイベント発行",
+    "reason": "許可済みの確定単位の名称を保持し、日本語の説明を添える。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 43,
+    "old": "  - 複数カメラのボール観測の集合化と統合後のボールの識別情報の維持",
+    "new": "  - 複数カメラの観測を同じボールとしてまとめる処理と統合後のボールの識別情報の維持",
+    "reason": "集合化という造語を避け、複数カメラの観測を同一対象へまとめる意味を明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 44,
+    "old": "  - 主対象のボールの安定化と補助対象のボールの出力順序",
+    "new": "  - primary ballの安定化とsecondary ballの出力順序",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。 出力条件や安定順を持つ具体的な分類名を保持し、一般的な補助対象へぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 50,
+    "old": "  - 向きの状態推定で使う rad 単位に対応する共分散と、角速度の制限",
+    "new": "  - 向きを推定する Kalman filter で使う、rad 単位に対応する共分散と角速度の範囲制限",
+    "reason": "RobotTracking.csのOrientationAxisはKalman更新・予測を使う。方式名と位置mm用との差を保持し、clampを範囲制限と説明する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 53,
+    "old": "  - キック検出とキック後のボール状態の継続",
+    "new": "  - キック検出と kicked ball の状態の継続",
+    "reason": "継続する状態の分類名を許可済みのkicked ballとして保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 54,
+    "old": "  - ボールの場外退出と境界を横切る位置の推定",
+    "new": "  - ball left field（ボールのフィールド外判定）と、境界を横切る位置の推定",
+    "reason": "退出という不自然な表現を避け、許可済みの判定名とその意味を明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 58,
+    "old": "- Kalman と数値計算の補助処理",
+    "new": "- Kalman filter と数値計算の補助処理",
+    "reason": "推定方式の許可済み名称を維持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 87,
+    "old": "現状は約 230 行で、内部で使うフィールド全体の状態表現、フィールド形状のスナップショット、追跡状態、接触・キック・場外退出などの派生状態、元の検出情報、チームの列挙型が 1 ファイルにまとまっている。行数は `TrackerExecutionContracts.cs` より小さいが、公開 DTO が多く、`TRACKER-033` の日本語コメント追加時に責務単位で分けた方が読みやすい。",
+    "new": "現状は約 230 行で、内部で使うフィールド全体の状態表現、フィールド形状のスナップショット、追跡状態、接触・キック・フィールド外判定などの派生状態、source detection、チームの列挙型が 1 ファイルにまとまっている。行数は `TrackerExecutionContracts.cs` より小さいが、公開 DTO が多く、`TRACKER-033` の日本語コメント追加時に責務単位で分けた方が読みやすい。",
+    "reason": "場外退出を境界判定として説明し、元の検出情報を示す許可済み設計語を保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 91,
+    "old": "- 追跡結果全体: `TrackerFrame`, `TrackerFrameMetadata`",
+    "new": "- 追跡フレーム全体: `TrackerFrame`, `TrackerFrameMetadata`",
+    "reason": "TrackerFrameとTrackerFrameMetadataが表す出力単位を特定する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 104,
+    "old": "- `TrackedFrame` の追跡結果の番号と時刻の設定",
+    "new": "- `TrackedFrame` のtracked frame number と tracked frame timestampの設定",
+    "reason": "出力パケットの追跡番号・時刻を許可済み名称で保持し、入力のsource frame numberとは区別する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 105,
+    "old": "- 主対象のボールを先頭に置く処理と、補助対象のボールの安定した並び順",
+    "new": "- primary ballを先頭に置く処理と、secondary ballの安定した並び順",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。 出力条件や安定順を持つ具体的な分類名を保持し、一般的な補助対象へぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 106,
+    "old": "- ボール、ロボット、キック後のボールの情報を通信形式へ変換",
+    "new": "- ボール、ロボット、kicked ball の情報を通信形式へ変換",
+    "reason": "通信形式へ変換する具体的な分類名を維持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 214,
+    "old": "  - 向きの状態推定用の速度分散、予測に伴う分散、速度制限の指定",
+    "new": "  - 向きを推定する Kalman filter の速度分散、予測に伴う分散、速度の範囲制限の指定",
+    "reason": "Kalman.csの軸固有分散と速度制限を使う処理であり、方式名を一般の状態推定へぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 269,
+    "old": "`TRACKER-033` では日本語の XML コメントを追加する。固有名詞、型名、設定キー、通信形式の名前、単位記号は英字のままでよい。",
+    "new": "`TRACKER-033` では日本語の XML documentation commentを追加する。固有名詞、型名、設定キー、通信形式の名前、単位記号は英字のままでよい。",
+    "reason": "C#の文書化コメントの形式を許可済み名称で特定する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 271,
+    "old": "クラス、プロパティ、メソッドの説明は、原則として XML コメントに寄せる。通常コメント `//` はメソッド内の複雑な処理、不変条件、順序制約の直前に限定し、型や型のメンバーの契約説明には使わない。",
+    "new": "クラス、プロパティ、メソッドの説明は、原則として XML documentation comment に記述する。通常コメント `//` はメソッド内の複雑な処理、不変条件、順序制約の直前に限定し、型や型のメンバーの契約説明には使わない。",
+    "reason": "単にXML形式のコメントではなくC#の文書化形式だと明示する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 280,
+    "old": "説明文には「何を表すか」「どの境界で使うか」を 1 から 2 文で書く。実装手順や履歴は書かない。",
+    "new": "`summary` 要素の説明文には「何を表すか」「どの境界で使うか」を 1 から 2 文で書く。実装手順や履歴は書かない。",
+    "reason": "説明を置く場所を一般語へ省略せず、直前の実要素名で示す。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 299,
+    "old": "説明文では、単位と `null` / 0 / 空の値の意味を明記する。特に次は省略しない。",
+    "new": "`summary` 要素の説明文では、単位と `null` / 0 / 空の値の意味を明記する。特に次は省略しない。",
+    "reason": "説明を置く場所を一般語へ省略せず、直前の実要素名で示す。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 314,
+    "old": "- 並べ替え、統合、Kalman、フィールド形状の初期化、識別情報の割り当て、イベント発行、通信形式への変換の境界となるメソッド",
+    "new": "- 並べ替え、統合、Kalman filter、形状変更に伴う追跡状態の初期化、識別情報の割り当て、イベント発行、通信形式への変換の境界となるメソッド",
+    "reason": "既知のgeometry resetの取り違えを同じファイルのコメント対象・注意点・検証観点でも修正する。 コメント追加対象の推定方式を許可済み名称で示す。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 326,
+    "old": "- フィールド形状の大幅変更による初期化で未処理の検出情報を捨てる箇所",
+    "new": "- フィールド形状の大幅変更に伴う追跡状態の初期化で未処理の検出情報を捨てる箇所",
+    "reason": "TrackerEngine.csとFrameCommit.csで消去する対象は追跡状態・未確定入力。形状自体を初期化するような読み方を避ける。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 327,
+    "old": "- 主対象のボールの継続を、補助対象の並べ替えより優先する箇所",
+    "new": "- primary ballの継続を、secondary ball の並べ替えより優先する箇所",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。 primary ballの継続を優先する相手を、具体的な設計語で明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 328,
+    "old": "- Kalman 更新で予測状態と前回の位置を併用する箇所",
+    "new": "- Kalman filter の更新で予測状態と前回の位置を併用する箇所",
+    "reason": "予測状態と前回位置を使う更新の方式名を明示する。設定名や計算の基準は変更しない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 337,
+    "old": "5. フィールド形状の変換と初期化判定を分離する。未処理の検出情報の消去、追跡結果の番号の維持、遅着の判定境界の扱いを変えない。",
+    "new": "5. フィールド形状の変換と、形状変更に伴う追跡状態の初期化判定を分離する。未確定の検出情報の消去、追跡フレームの番号の維持、遅延到着の判定境界の扱いを変えない。",
+    "reason": "消去対象・維持する出力番号・遅延到着の境界を、それぞれの役割が分かる自然な文章にする。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 338,
+    "old": "6. ボール追跡を分離する。カメラごとの追跡 ID、統合後の内部追跡 ID、主対象のボールの継続、補助対象のボールの成長条件を変えない。",
+    "new": "6. ボール追跡を分離する。camera-local track の ID、統合後の内部追跡 ID、primary ballの継続、secondary ball の追跡が確立する条件を変えない。",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。 出力条件や安定順を持つ具体的な分類名を保持し、一般的な補助対象へぼかさない。 カメラごとの追跡状態を表す許可済み名称と識別子を保持する。 ボール自体の成長ではなく、観測回数等による追跡状態の確立を指すことを明示する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 339,
+    "old": "7. Kalman の補助処理を分離する。`UpdateKalmanAxis` の引数と、予測状態・前回の位置を使う計算の基準を変えない。",
+    "new": "7. Kalman filter の補助処理を分離する。`UpdateKalmanAxis` の引数と、予測状態・前回の位置を使う計算の基準を変えない。",
+    "reason": "補助処理が扱う方式名を明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 341,
+    "old": "9. 接触、キック、ボールの場外退出を分離する。イベントの発火条件、直近の接触とみなす時間範囲、境界名を変えない。",
+    "new": "9. 接触、キック、ball left fieldを分離する。イベントの発火条件、直近の接触とみなす時間範囲、境界名を変えない。",
+    "reason": "判定処理の分類名を保持し、場外退出という不自然な表現を使わない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 343,
+    "old": "11. 状態表現の契約を `Model` 配下へ分離し、公開プロパティの構造を変えずに日本語の XML コメントを追加する。",
+    "new": "11. 状態表現の契約を `Model` 配下へ分離し、公開プロパティの構造を変えずに日本語の XML documentation commentを追加する。",
+    "reason": "実行手順でも公開プロパティの文書化形式を維持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 344,
+    "old": "12. `TrackerPacketGenerator` を `Proto` 配下へ移動し、主対象のボールを先頭に置く処理、ロボットの並べ替え、対応機能の順序、単位変換のコメントを追加する。",
+    "new": "12. `TrackerPacketGenerator` を `Proto` 配下へ移動し、primary ballを先頭に置く処理、ロボットの並べ替え、対応機能の順序、単位変換のコメントを追加する。",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 346,
+    "old": "14. 対象を絞ったテストを実行し、`Tracker.Core` の契約、時系列の契約、パケット生成器、処理全体を制御するクラスでの設定プロファイルの切り替えの正常系が通ることを確認する。",
+    "new": "14. 対象を絞ったテストを実行し、`Tracker.Core` の契約、時系列の契約、`TrackerPacketGenerator`、`TrackerCoordinator` での設定プロファイルの切り替えの正常系が通ることを確認する。",
+    "reason": "実際のテスト対象のクラス名を一般的な機能の説明だけへぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 355,
+    "old": "- `GeometryReset` はフィールド形状の大幅変更による初期化時だけ発行し、追跡結果の番号と実行時の識別情報は維持する。",
+    "new": "- `GeometryReset` はフィールド形状の大幅変更に伴う追跡状態の初期化時だけ発行し、追跡フレームの番号と実行時の識別情報は維持する。",
+    "reason": "TrackerEngine.csとFrameCommit.csで消去する対象は追跡状態・未確定入力。形状自体を初期化するような読み方を避ける。 GeometryReset時に維持する出力側の番号とsource frame numberを区別する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 356,
+    "old": "- 検出情報の観測時刻は `TCapture > 0` を優先し、これを使えない場合の代用は `TSent` のままにする。",
+    "new": "- 検出情報の event timeは `TCapture > 0` を優先し、これを使えない場合の代用は `TSent` のままにする。",
+    "reason": "TCaptureを使えない場合はTSentを代用するため、event timeの設計名を保つ。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 357,
+    "old": "- 未処理の検出情報から追跡結果を確定する順序は、観測時刻、カメラ ID、source frame number（入力の観測フレームの番号）の安定した順序を維持する。",
+    "new": "- 未処理の検出情報から追跡結果を確定する順序は、event time、カメラ ID、source frame number（入力の観測フレームの番号）の安定した順序を維持する。",
+    "reason": "並べ替え基準のevent timeを許可済み名称で保持し、既に復元済みのsource frame numberと合わせる。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 359,
+    "old": "- 遅着パケットの破棄では、観測時刻が `lastCommittedGroupCloseTimestampNs` 以下の入力を状態更新に使わない。",
+    "new": "- 遅延到着パケットの破棄では、event time が `lastCommittedGroupCloseTimestampNs` 以下の入力を状態更新に使わない。",
+    "reason": "遅延到着の判定はevent timeで行う。硬い省略語を避け、設定の判定基準を明示する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 360,
+    "old": "- フィールド形状の初期化や設定プロファイルの切り替え時に、未処理の入力バッファ、camera-local track、統合後のボールの識別情報、接触と場外退出の状態、継続中のキック状態、主対象のボールを消去する範囲を変えない。",
+    "new": "- 形状変更に伴う追跡状態の初期化や設定プロファイルの切り替え時に、未処理の入力バッファ、camera-local track、統合後のボールの識別情報、接触と ball left field の状態、継続中のキック状態、primary ballを消去する範囲を変えない。",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。 既知のgeometry resetの取り違えを同じファイルのコメント対象・注意点・検証観点でも修正する。 消去範囲の対象となる判定状態を、許可済みの設計名で保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 362,
+    "old": "- 主対象のボールの継続判定を、補助対象の並べ替えより優先する。",
+    "new": "- primary ballの継続判定を、secondary ball の並べ替えより優先する。",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。 primary ballの継続を優先する相手を、具体的な設計語で明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 363,
+    "old": "- 補助対象のボールは、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。",
+    "new": "- secondary ballは、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。",
+    "reason": "出力条件や安定順を持つ具体的な分類名を保持し、一般的な補助対象へぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 364,
+    "old": "- 補助対象のボールの出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。",
+    "new": "- secondary ballの出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。",
+    "reason": "出力条件や安定順を持つ具体的な分類名を保持し、一般的な補助対象へぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 365,
+    "old": "- ボールとロボットの Kalman 更新は予測状態を基準にし、観測値から速度を算出する際には前回の位置を使う。",
+    "new": "- ボールとロボットの Kalman filter の更新は予測状態を基準にし、観測値から速度を算出する際には前回の位置を使う。",
+    "reason": "予測状態と前回位置を使う更新の方式名を明示する。設定名や計算の基準は変更しない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 366,
+    "old": "- ロボットの向きの推定軸は、位置の mm 単位用の共分散を流用せず、rad 単位に対応する観測・予測それぞれの分散と角速度の制限を使う。設定プロファイルの Kalman の倍率に関する設定は、既定値との比で rad 用の基準値へ反映する。",
+    "new": "- ロボットの向きの推定軸は、位置の mm 単位用の共分散を流用せず、rad 単位に対応するmeasurement noise と process noise に対応する分散と、角速度の範囲制限を使う。設定プロファイルの Kalman の倍率に関する設定は、既定値との比で rad 用の基準値へ反映する。",
+    "reason": "設定で区別すべき2種類の不確かさを許可済みの名称で示す。位置と向きの基準値の区別は維持。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 381,
+    "old": "  - 観測時刻順の並べ替え",
+    "new": "  - event time 順の並べ替え",
+    "reason": "検証観点でも時刻基準の設計名を維持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 382,
+    "old": "  - 統合する時間範囲に応じた追跡結果の分割",
+    "new": "  - 統合する時間幅に応じた追跡フレームの分割",
+    "reason": "MergeWindowが決める出力単位を追跡フレームとして明示する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 383,
+    "old": "  - 遅着パケットの破棄",
+    "new": "  - 遅延到着パケットの破棄",
+    "reason": "一般的な遅延到着という表現で条件を保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 384,
+    "old": "  - 確定済みの追跡結果が 0 件の結果",
+    "new": "  - 確定済みの追跡フレームを含まない結果",
+    "reason": "結果が0件の結果という重複を避け、0-frame resultの意味を明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 386,
+    "old": "- 設定プロファイルの切り替え / フィールド形状の初期化",
+    "new": "- 設定プロファイルの切り替え / 形状変更に伴う追跡状態の初期化",
+    "reason": "既知のgeometry resetの取り違えを同じファイルのコメント対象・注意点・検証観点でも修正する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 389,
+    "old": "  - フィールド形状の大幅変更による初期化",
+    "new": "  - フィールド形状の大幅変更に伴う追跡状態の初期化",
+    "reason": "TrackerEngine.csとFrameCommit.csで消去する対象は追跡状態・未確定入力。形状自体を初期化するような読み方を避ける。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 390,
+    "old": "  - 状態の消去後も追跡結果の番号が維持されること",
+    "new": "  - 状態の消去後も追跡フレームの番号が維持されること",
+    "reason": "状態消去時にも維持する番号の単位を明記する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 392,
+    "old": "  - 主対象のボールの継続",
+    "new": "  - primary ballの継続",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 394,
+    "old": "  - 補助対象のボールの安定順",
+    "new": "  - secondary ballの安定順",
+    "reason": "出力条件や安定順を持つ具体的な分類名を保持し、一般的な補助対象へぼかさない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 395,
+    "old": "  - Kalman 更新の基準として予測状態を使うこと",
+    "new": "  - Kalman filter の更新の基準として予測状態を使うこと",
+    "reason": "予測状態と前回位置を使う更新の方式名を明示する。設定名や計算の基準は変更しない。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 402,
+    "old": "  - キック検出とキック後のボール状態の継続",
+    "new": "  - キック検出と kicked ball の状態の継続",
+    "reason": "継続する状態の分類名を許可済みのkicked ballとして保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 403,
+    "old": "  - ボールの場外退出と境界の横断",
+    "new": "  - ball left field と境界を横切る位置の判定",
+    "reason": "具体的な判定語を保持し、境界横断の検証対象を自然に説明する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 405,
+    "old": "  - 送信元名と UUID",
+    "new": "  - source name と UUID",
+    "reason": "生成パケットに保持する許可済みの識別情報名を復元する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 407,
+    "old": "  - 主対象のボールを先頭に配置",
+    "new": "  - primary ballを先頭に配置",
+    "reason": "選定・継続・並べ替え・出力順を表す設計語として、許可済みのprimary ballを保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "line": 409,
+    "old": "  - キック後のボール情報の出力条件",
+    "new": "  - kicked ball の出力条件",
+    "reason": "出力する通信データの具体的な分類名を保持する。",
+    "before_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "after_sha256": "ad44eab449aa58a174c4883694e3b0ad626407263a57e5942647a3ffc0504a64"
+  }
+]

@@ -1,0 +1,450 @@
+[
+  {
+    "block": "D08-B001",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "見出しの対象を許可済みの追跡エンジンとして明記し、Tracker.Coreの実プロジェクト名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049817+09:00"
+  },
+  {
+    "block": "D08-B002",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "追加されたraw visionの定義はSSL-Visionの検出情報と画像・動画の違いを正しく示す。段落間隔のみ整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049836+09:00"
+  },
+  {
+    "block": "D08-B003",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "クラス・プロパティ・メソッドの承認済み表記を採用。分割境界と実行順の対象を追跡エンジンに特定する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049841+09:00"
+  },
+  {
+    "block": "D08-B004",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "保守性改善で追跡挙動・公開契約・通信出力・設定の意味を変更しない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049844+09:00"
+  },
+  {
+    "block": "D08-B005",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "テスト分割とアルゴリズム・設定・通信出力仕様を対象外とする意味を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049847+09:00"
+  },
+  {
+    "block": "D08-B006",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "engineの公開契約を追跡エンジンとし、列挙した6つの実型名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049850+09:00"
+  },
+  {
+    "block": "D08-B007",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "全責務を文脈確認。world frame、primary/secondary ball、kicked ball、ball left field、event timeを保持。集合化・場外退出を自然に説明し、形状変更時の初期化対象とKalman filterを明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049853+09:00"
+  },
+  {
+    "block": "D08-B008",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "軸の初期化・予測・更新、measurement/process noise、閾値、数値変換と全状態型を保持。方式名はKalman filter、非公開recordと比較処理は実構文を示す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049857+09:00"
+  },
+  {
+    "block": "D08-B009",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "engine settingsとruntime overrideの設定契約を自然な日本語にし、全実型名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049860+09:00"
+  },
+  {
+    "block": "D08-B010",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "約230行・公開DTO・責務別分割の理由を保持。source detectionを復元し、場外退出をフィールド外判定として説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049863+09:00"
+  },
+  {
+    "block": "D08-B011",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "5責務の全型名を保持。TrackerFrameとMetadataは追跡フレームと付随情報として明記し、診断・再生の入力型を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049865+09:00"
+  },
+  {
+    "block": "D08-B012",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "約190行、TrackerFrameから公式TrackerWrapperPacketへの変換という役割と公開境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049868+09:00"
+  },
+  {
+    "block": "D08-B013",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "7責務を照合。tracked frame number/timestamp、primary/secondary/kicked ballを保持し、変換単位とCapabilitiesの固定順を変えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049871+09:00"
+  },
+  {
+    "block": "D08-B014",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "名前空間・アセンブリ・ソースファイル、公開型/メンバー/公開範囲/null許容の不変条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049874+09:00"
+  },
+  {
+    "block": "D08-B015",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "partialはC#の実構文なので識別名として保持。見出しの意味は同一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049879+09:00"
+  },
+  {
+    "block": "D08-B016",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "ドット区切りを許す慣習と7種類の拡張子・生成物・ビルド出力を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049882+09:00"
+  },
+  {
+    "block": "D08-B017",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TypeName.Responsibility.cs禁止、partial class/type-owned folder、フォルダとファイルの役割、公開契約と名前空間を保つ配置を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049886+09:00"
+  },
+  {
+    "block": "D08-B018",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "最上位型1つにつき1ファイルと、親子DTO・小さな列挙型や拡張・同一外部形式で単独参照されない場合の例外を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049891+09:00"
+  },
+  {
+    "block": "D08-B019",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "engine本体を追跡エンジンの本体とする説明は自然で、以下のファイル・型名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049895+09:00"
+  },
+  {
+    "block": "D08-B020",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "コンストラクターなしとUpdateの制御順を保持。fieldを保持項目にぼかさず、状態を保持する変数と明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049899+09:00"
+  },
+  {
+    "block": "D08-B021",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "FrameCommitの3実メソッドと追跡結果・イベントを組み立てる責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049902+09:00"
+  },
+  {
+    "block": "D08-B022",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "ball track関連のprivate recordをボール追跡に関する非公開recordと自然に説明。前後の全メソッド名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049909+09:00"
+  },
+  {
+    "block": "D08-B023",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "robot key/observation/trackの非公開recordの役割を識別子・観測・追跡として説明し、前後の全メソッド名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049912+09:00"
+  },
+  {
+    "block": "D08-B024",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "向きの軸で使う速度分散・予測分散・速度clampを維持し、方式を一般的な状態推定でなくKalman filterと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049916+09:00"
+  },
+  {
+    "block": "D08-B025",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "4種類の補助処理を保持し、settings解決は設定値を決定する処理と自然に説明。可視性/品質の減衰、単位/時刻、角度/距離を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049920+09:00"
+  },
+  {
+    "block": "D08-B026",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "partial sealed classの許容、補助処理をprivateに保つ条件、internal化しないこと、公開契約からテストする方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049924+09:00"
+  },
+  {
+    "block": "D08-B027",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "設定と実行時の上書き設定という一般的な見出しで契約を説明し、型名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049928+09:00"
+  },
+  {
+    "block": "D08-B028",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "DebugHost/CaptureReplayから参照する実型名と名前空間を変えない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049932+09:00"
+  },
+  {
+    "block": "D08-B029",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "model contractは状態表現の契約として自然に説明し、Model配下の実型名とファイルを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049937+09:00"
+  },
+  {
+    "block": "D08-B030",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "packet generatorは生成器という役割の説明であり、直下のTrackerPacketGeneratorで具体型を識別できる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049941+09:00"
+  },
+  {
+    "block": "D08-B031",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "1ファイル維持と将来肥大化したときだけ分割する条件、type-owned folderとpartial classの名称、具体例を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049946+09:00"
+  },
+  {
+    "block": "D08-B032",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "C#のXML documentation commentを一般のXMLコメントへぼかさず復元し、固有名詞・型・設定・通信形式・単位を英語のままにできる条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049950+09:00"
+  },
+  {
+    "block": "D08-B033",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "クラス/プロパティ/メソッドの説明はXML documentation commentに記述する。通常コメントを置く条件と型の契約説明に使わない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049954+09:00"
+  },
+  {
+    "block": "D08-B034",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "クラス・interface・列挙型という種類を日本語と実構文で明記。型の種類は変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049958+09:00"
+  },
+  {
+    "block": "D08-B035",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "public/internalの5構文とprivate入れ子record/comparerを対象にする範囲を保持。recordの前後の区切りを整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049961+09:00"
+  },
+  {
+    "block": "D08-B036",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "summary要素に記述するという元の配置条件を復元。何を表すか・境界の2点、1〜2文、手順や履歴を書かない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049966+09:00"
+  },
+  {
+    "block": "D08-B037",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "作成例のコメントはraw visionパケットから追跡フレームとイベントを生成する契約を保持。日本語の修飾を自然にし、実装の追加・引用改変ではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049970+09:00"
+  },
+  {
+    "block": "D08-B038",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "propertyは承認済みのプロパティを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049972+09:00"
+  },
+  {
+    "block": "D08-B039",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "summaryを付けるプロパティの導入文と実タグを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049977+09:00"
+  },
+  {
+    "block": "D08-B040",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "公開範囲、設定値、単位/時刻/プロファイル/識別/順序、nullの業務上の意味という4対象を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049982+09:00"
+  },
+  {
+    "block": "D08-B041",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "summary要素で単位とnull/0/空の意味を書く配置と内容を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049987+09:00"
+  },
+  {
+    "block": "D08-B042",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "PrimaryBallTrackIdとKickedBallのnull条件、IsStillMoving=false、RuntimeOverridesの一時上書き対象を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049992+09:00"
+  },
+  {
+    "block": "D08-B043",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "methodは承認済みのメソッドを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.049996+09:00"
+  },
+  {
+    "block": "D08-B044",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "summaryを付けるメソッドの導入文と実タグを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050000+09:00"
+  },
+  {
+    "block": "D08-B045",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "public/internalのメソッドを対象とする公開範囲を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050003+09:00"
+  },
+  {
+    "block": "D08-B046",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "分割後の入口とアルゴリズム境界のコメント対象を保持し、Kalman filterと形状変更時の追跡状態初期化を明確化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050008+09:00"
+  },
+  {
+    "block": "D08-B047",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "単純な取得・明らかな数式・1行呼出は無理にコメントしない条件と、順序や固定する挙動が不明なら補足する例外を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050012+09:00"
+  },
+  {
+    "block": "D08-B048",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "複雑な処理のまとまりの前にコメントを置き、コードの逐語説明を追加しない方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050017+09:00"
+  },
+  {
+    "block": "D08-B049",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "6つの順序/境界の例を保持。初期化対象、primary/secondary ball、Kalman filterの更新基準を具体名で復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050021+09:00"
+  },
+  {
+    "block": "D08-B050",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "実行順の作業IDを実識別子として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050026+09:00"
+  },
+  {
+    "block": "D08-B051",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "全15手順と全型・パス・コマンドを照合。geometry reset、camera-local track、ボールの追跡確立、ball left field、文書化コメント、Coordinator/Generatorの対象名を復元。削除対象とテスト順を変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050030+09:00"
+  },
+  {
+    "block": "D08-B052",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "API形状とnull・既定値、ProfileSwitchedの順序、GeometryReset、TCapture/TSentの選択、event time/camera/source frame numberの安定順を保持。入力と出力番号は区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050035+09:00"
+  },
+  {
+    "block": "D08-B053",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "全15の不変条件を照合。初期化範囲、nextCommittedFrameNumber維持、primary/secondary優先順と観測回数、Kalman予測基準、位置と向きの単位・不確かさ、ID抑制、上書き・単位変換・kicked_ball出力条件・Capabilities順を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050038+09:00"
+  },
+  {
+    "block": "D08-B054",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "対象を絞った検証という通常の日本語で、少なくともという網羅条件を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050042+09:00"
+  },
+  {
+    "block": "D08-B055",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "fixed",
+    "reason": "7分類の全検証観点を照合。event time、geometry reset、0-frame、primary/secondary ball、Kalman filter、ball left field、kicked ball、source nameを保持し、入力欠損と出力の違いを明確化。コマンドは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050046+09:00"
+  },
+  {
+    "block": "D08-B056",
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "disposition": "accepted",
+    "reason": "3つのリスクを保持。非公開型とファイルの分割に伴うコンパイルエラー、変更を小分けに検証、Generatorの過剰分割を避ける条件を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:17:30.050050+09:00"
+  }
+]
