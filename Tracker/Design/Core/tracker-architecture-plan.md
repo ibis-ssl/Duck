@@ -268,7 +268,7 @@ Capture Off 中は snapshot sidecar へ追記しない。Capture Off から再�
 役割:
 
 - raw vision を 1 件受け取り、観測時刻で並べ替えたうえで内部の追跡状態を進める
-- 確定したフィールド全体の追跡フレームとトラッカーの通知を、送信順で返す
+- 確定したフィールド全体の追跡フレームとトラッカーの通知を、出力順で返す
 - フィールド形状更新だけのパケットでも内部状態を壊さない
 
 最低限の入力:
@@ -290,10 +290,10 @@ Capture Off 中は snapshot sidecar へ追記しない。Capture Off から再�
   - `CommittedFrames`
     - この入力処理で確定した `TrackerFrame` の列
     - 0 件以上を許可する
-    - 送信順に並ぶ
+    - 出力順に並ぶ
   - `EmittedEvents`
     - `ProfileSwitched`、`GeometryReset`、`WorldFrameCommitted`、`KickDetected`、`ContactChanged`、`BallLeftField` の列
-    - 送信順に並ぶ
+    - 通知順に並ぶ
     - 通知は必要に応じて対象 `frame_number` を参照する
 
 最低限の保持状態:
@@ -1010,10 +1010,10 @@ TIGERs 由来で重視する点:
 - 通知を受け取る処理は raw vision パケットを直接購読しない
 - 通知を受け取る処理は `TrackerFrame` と、`TrackerEvent` で表すキックや接触などの通知を入力にする
 - キック / 接触 / ボールの場外退出の計算はトラッカー側で担当し、競技規則の判定側で同じ計算を重複させない
-- 競技規則を判定する順序に依存しないよう、通知はトラッカーで確定した順に送信する
+- 競技規則を判定する順序に依存しないよう、トラッカーで確定した順に通知する
 - 競技規則の判定処理が追加されても、追跡処理の中核となる数値処理へ影響しない責務境界を保つ
 
-送信順は次で固定する。
+通知順は次で固定する。
 
 1. 状態の消去や意味の切替を伴う通知
    - `ProfileSwitched`
@@ -1132,7 +1132,7 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 - `TRACKER-004`: `TrackerFrame` / 状態型 / `TrackerUpdateResult` / イベントと通知先の契約を実装する
 - `TRACKER-005`: `TrackerPacketGenerator` を実装する
 - `TRACKER-006`: `TrackerEngine` の順序を並べ替えるバッファと確定可能な入力を順に処理する仕組みを実装する
-- `TRACKER-007`: `TrackerEngine` の設定プロファイルの切り替え / フィールド形状の変化による初期化 / 通知送信順を実装する
+- `TRACKER-007`: `TrackerEngine` の設定プロファイルの切り替え / フィールド形状の変化による初期化 / 通知順を実装する
 - `TRACKER-008`: ロボットの追跡とロボット追跡結果の統合を実装する
 - `TRACKER-009`: ボールの追跡と主対象・補助対象のボール選定を実装する
 - `TRACKER-010`: キックと接触に関する情報を実装する
