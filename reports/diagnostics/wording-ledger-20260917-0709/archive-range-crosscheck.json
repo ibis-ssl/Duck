@@ -1,0 +1,596 @@
+[
+  {
+    "task": "TRACKER-039",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 47,
+    "recorded_end": 62,
+    "exact_text_end": 61,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-040",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 63,
+    "recorded_end": 84,
+    "exact_text_end": 83,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-041",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 85,
+    "recorded_end": 100,
+    "exact_text_end": 99,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-042",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 101,
+    "recorded_end": 118,
+    "exact_text_end": 117,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-043",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 119,
+    "recorded_end": 133,
+    "exact_text_end": 132,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-044",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 134,
+    "recorded_end": 148,
+    "exact_text_end": 147,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-045",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 149,
+    "recorded_end": 164,
+    "exact_text_end": 163,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-046",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 165,
+    "recorded_end": 183,
+    "exact_text_end": 182,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-047",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 184,
+    "recorded_end": 202,
+    "exact_text_end": 201,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-048",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 203,
+    "recorded_end": 218,
+    "exact_text_end": 217,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-049",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 219,
+    "recorded_end": 232,
+    "exact_text_end": 231,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-050",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 233,
+    "recorded_end": 250,
+    "exact_text_end": 249,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-051",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 251,
+    "recorded_end": 268,
+    "exact_text_end": 267,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-052",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 269,
+    "recorded_end": 284,
+    "exact_text_end": 283,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-054",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 285,
+    "recorded_end": 297,
+    "exact_text_end": 296,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-055",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 298,
+    "recorded_end": 314,
+    "exact_text_end": 313,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-056",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 315,
+    "recorded_end": 332,
+    "exact_text_end": 331,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-057",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 333,
+    "recorded_end": 348,
+    "exact_text_end": 347,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-053",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 349,
+    "recorded_end": 366,
+    "exact_text_end": 365,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-058",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 367,
+    "recorded_end": 384,
+    "exact_text_end": 383,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-059",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 385,
+    "recorded_end": 405,
+    "exact_text_end": 404,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-060",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 406,
+    "recorded_end": 423,
+    "exact_text_end": 422,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-061",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 424,
+    "recorded_end": 441,
+    "exact_text_end": 440,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-062",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 442,
+    "recorded_end": 459,
+    "exact_text_end": 458,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "TRACKER-063",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "recorded_start": 460,
+    "recorded_end": 474,
+    "exact_text_end": 474,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-core-final-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-000",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 43,
+    "recorded_end": 48,
+    "exact_text_end": 47,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-001",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 49,
+    "recorded_end": 54,
+    "exact_text_end": 53,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-002",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 55,
+    "recorded_end": 60,
+    "exact_text_end": 59,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-003",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 61,
+    "recorded_end": 66,
+    "exact_text_end": 65,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-004",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 67,
+    "recorded_end": 72,
+    "exact_text_end": 71,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-005",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 73,
+    "recorded_end": 82,
+    "exact_text_end": 81,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-006",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 83,
+    "recorded_end": 92,
+    "exact_text_end": 91,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-007",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 93,
+    "recorded_end": 102,
+    "exact_text_end": 101,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-008",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 103,
+    "recorded_end": 112,
+    "exact_text_end": 111,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-009",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 113,
+    "recorded_end": 123,
+    "exact_text_end": 122,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-010",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 124,
+    "recorded_end": 138,
+    "exact_text_end": 137,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-011",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 139,
+    "recorded_end": 151,
+    "exact_text_end": 150,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-012",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 152,
+    "recorded_end": 168,
+    "exact_text_end": 167,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-013",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 169,
+    "recorded_end": 190,
+    "exact_text_end": 189,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-014",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 191,
+    "recorded_end": 213,
+    "exact_text_end": 212,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-015",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 214,
+    "recorded_end": 232,
+    "exact_text_end": 231,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-016",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 233,
+    "recorded_end": 253,
+    "exact_text_end": 252,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-017",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 254,
+    "recorded_end": 272,
+    "exact_text_end": 271,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-018",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 273,
+    "recorded_end": 278,
+    "exact_text_end": 277,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-019",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 279,
+    "recorded_end": 284,
+    "exact_text_end": 283,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [
+      ""
+    ],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  },
+  {
+    "task": "RAW-VISION-020",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "recorded_start": 285,
+    "recorded_end": 290,
+    "exact_text_end": 289,
+    "recorded_text_matches_prefix": true,
+    "range_extra_lines": [],
+    "all_extra_lines_blank": true,
+    "source_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/archive-debughost-row-review.json"
+  }
+]

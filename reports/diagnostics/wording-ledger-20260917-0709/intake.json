@@ -1,0 +1,582 @@
+{
+  "observed_at": "2026-09-17T07:11:38.595083+09:00",
+  "repository": "ibis-ssl/Duck",
+  "target_branch": "docs/runtimehost-readme-appsettings",
+  "head": "6e3d34ab634295ae9d61aa985fced9cf4bf485d6",
+  "base": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "targets": [
+    "feedback-points/feedback-points.md",
+    "README.md",
+    "tools/lint/README.md",
+    "Tracker/Design/Archive/Core/phases-status.md",
+    "Tracker/Design/Archive/Core/tasks-status.md",
+    "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "Tracker/Design/Core/tracker-architecture-plan.md",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "Tracker/Design/Core/tracker-history-000-038.md",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Tracker.CaptureReplay/README.md",
+    "Tracker/Tracker.DebugHost/README.md"
+  ],
+  "markdown_diff": [
+    {
+      "status": "M",
+      "file": "README.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Archive/Core/phases-status.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Archive/Core/tasks-status.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Core/tracker-history-000-038.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/phases-status.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Design/tasks-status.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Tracker.CaptureReplay/README.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "M",
+      "file": "feedback-points/feedback-points.md",
+      "scope": "lint_and_wording_audit"
+    },
+    {
+      "status": "A",
+      "file": "reports/design-prose-japanese-20260915142353.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/diagnostics/wording-occurrence-audit-20260916/batch-history-design.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-001-implementation-20260516221628.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-001-prh-integration-20260517104319.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-001-review-20260516233048.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-002-review-20260517104319.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-002-review-r2-20260517104319.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-002-sudachipy-vocabulary-20260517104319.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-chikkarpy-registration-20260915.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-final-review-20260517085006.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-full-architecture-gpt55-20260517100000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-full-core-detail-gpt55-20260517100000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-full-core-history-gpt55-20260517100000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-full-debughost-detail-gpt55-20260517100000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-full-raw-vision-gpt55-20260517100000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-full-runtimehost-gpt55-20260517100000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-gpt55-high-lint-only-20260517094500.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-handover-20260519113733.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-noun-extraction-20260517133815.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-proper-noun-extraction-20260517133249.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-report-exclusion-review-20260516234234.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-report-exclusion-review-r2-20260516234840.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-resume-20260915.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-root-docs-worker-20260516235249.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-source-cleanup-architecture-20260517093000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-source-cleanup-debughost-cli-20260517093000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-source-cleanup-raw-vision-20260517093000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-source-cleanup-small-docs-20260517093000.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-synonym-extraction-20260517165117.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-text-active-status-20260517003617.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-text-archive-status-20260517003617.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-text-design-details-20260517003617.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-text-root-readmes-20260517003617.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-tracker-design-core-worker-20260516235249.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-tracker-design-hosts-worker-20260516235249.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-tracker-readmes-worker-20260516235249.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-approved-temporary-20260517084346.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-compound-term-proposal-20260517002025.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-definition-investigation-20260517001129.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-edit-20260517003131.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-proposal-compounds-20260517085723.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-proposal-identifiers-20260517085723.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-proposal-japanese-20260517085723.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/doc-lint-whitelist-suspicious-alias-audit-20260517090027.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/history/core-phases-before-terminology.md",
+      "scope": "history_original_preservation"
+    },
+    {
+      "status": "A",
+      "file": "reports/history/core-tasks-before-terminology.md",
+      "scope": "history_original_preservation"
+    },
+    {
+      "status": "A",
+      "file": "reports/history/debughost-phases-before-terminology.md",
+      "scope": "history_original_preservation"
+    },
+    {
+      "status": "A",
+      "file": "reports/history/debughost-tasks-before-terminology.md",
+      "scope": "history_original_preservation"
+    },
+    {
+      "status": "A",
+      "file": "reports/lint-dispositions/README.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/lint-dispositions/checker-plan.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/lint-dispositions/clarifications.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/lint-guide-clarity-20260916.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/lint-remediation-overview.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/markdown-lint-completion-20260916.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/markdown-quotation-preservation-erratum-20260916.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/markdown-whitelist-approved-20260915.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/markdown-whitelist-update-20260915084730.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/markdown-wording-followup-20260916.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/markdown-wording-review-20260916.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-003-core-wording-20260917070749.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-003-diagnostic-handoff-20260917064359.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-term-classification-20260628203849.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-term-classification-result-20260628203849.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-term-classification-review-20260628204412.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-term-wording-fix-20260628205344.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-terminology-rules-20260519114244.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-terminology-rules-fix-20260519115920.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-terminology-rules-review-20260519115203.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-terminology-rules-review-r2-20260628203849.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-tracked-whitelist-review-20260628213441.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/task-doc-lint-tracked-whitelist-update-20260628213011.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "reports/wording-naturalness-resume-20260916.md",
+      "scope": "report_or_evidence; existing configured reports exclusion, not newly excluded"
+    },
+    {
+      "status": "A",
+      "file": "tools/lint/README.md",
+      "scope": "lint_and_wording_audit"
+    }
+  ],
+  "configuration_sha256": {
+    "package.json": "860f33ea017be90ea1711adf68c276a05f3569b15bf0b7997ca944bd9dec7fab",
+    "package-lock.json": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    ".textlintignore": "c8ce527e6d22888dfdb8c52274e42b31df05fad40ff3fffba1f9b939746c371f",
+    "cspell.config.jsonc": "820d36b38a2cb92ce7abf45919579bf45c24971edc486f6a58a08f5432089ec3",
+    "tools/lint/README.md": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646",
+    "tools/lint/markdown-targets.json": "b04e345a0895cabc4011d779b4cfb8b867ab82996970afee84359529324e1e2a",
+    "tools/lint/markdown-whitelist.yaml": "4a9f9b6fa1c7fdcdfc7b6f3b114d8969aaf02b6e986996bb5b59b46bcf9ca654",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/requirements.txt": "7247b1f501c9535d531b1d8ba7ad0b66589d56570698fed770a33dd3e5047372"
+  },
+  "target_sha256": {
+    "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+    "tools/lint/README.md": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646",
+    "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "Tracker/Design/Archive/Core/tasks-status.md": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "e97db48c46cc89d3d3e518c9e32385b554a70e38bf95740f930b2247d4d6f342",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6",
+    "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "Tracker/Design/phases-status.md": "c3a16c3b5bfffb1c457cf0a9b4b99fd4ef9c8bc2ce22d69312407642c4fc9caa",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+    "Tracker/Design/tasks-status.md": "e8818ed9181279741f85ad45bf7763bea63238b6f80de2ea4dd2e7430605bcfe",
+    "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "Tracker/Tracker.DebugHost/README.md": "0f038fd467cd9c699b304d86aa6e6e0aeee633238a3fd8b56706032a56cadf68"
+  },
+  "dependencies": {
+    "node": {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/node.stdout",
+      "stderr": "logs/node.stderr"
+    },
+    "npm": {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/npm.stdout",
+      "stderr": "logs/npm.stderr"
+    },
+    "python": {
+      "command": [
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/python.stdout",
+      "stderr": "logs/python.stderr"
+    },
+    "python-packages": {
+      "command": [
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+        "-m",
+        "pip",
+        "freeze"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/python-packages.stdout",
+      "stderr": "logs/python-packages.stderr"
+    },
+    "npm-tree": {
+      "command": [
+        "npm",
+        "ls",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/npm-tree.stdout",
+      "stderr": "logs/npm-tree.stderr"
+    }
+  },
+  "checker_source_record": "reports/diagnostics/wording-occurrence-audit-20260916/checker-manifest.json",
+  "checker_all_files_hash_verified": true,
+  "checker_frozen_copy": "/home/ibis/.local/share/duck-wording-ledger-tools-20260917-0709/skills",
+  "concurrent_worker": {
+    "observed_last_command": "2026-09-17T07:07:50+09:00",
+    "original_tree": "/home/ibis/.local/share/duck-wording-audit-20260916-1855",
+    "protected": true,
+    "coordination_comment_id": 5705281447
+  },
+  "scope_limitations": [
+    "Other worker is editing remaining body documents; do not modify original worktree or those unpublished changes.",
+    "No independent final review.",
+    "No checker, whitelist, prh, exclusions or production code changes."
+  ]
+}

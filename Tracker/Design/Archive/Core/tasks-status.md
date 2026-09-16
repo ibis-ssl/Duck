@@ -106,7 +106,7 @@ snapshot sidecar の JSONL を主記録とし、診断機能からの互換参�
 
 自分自身と外部のパケットを `uuid` / `sourceName` / 送信元の通信アドレスと通信ポートごとに観測状態と tracker snapshot として保持し、保存した状態から元の official tracker packet の内容を復元できるようにした。対象の `TrackerConnectionLibAllTrackerSnapshotContractTests` は5件、全体の `Tracker.Tests` は163件成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。
 
-入力元ごとに利用中のトラッカーを取得する API と、同じ `uuid` が衝突する場合は、`TRACKER-043` 以降で追跡するリスク・後続候補とし、この作業の完了を妨げる条件とはしない。snapshot sidecar の JSONL、CaptureOn の capture metadata / session folder、診断再生はこの段階では未実装であり、後続作業の範囲とした。
+入力元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、`TRACKER-043` 以降で追跡するリスク・後続候補とし、この作業の完了を妨げる条件とはしない。snapshot sidecar の JSONL、CaptureOn の capture metadata / session folder、診断再生はこの段階では未実装であり、後続作業の範囲とした。
 
 詳細レポート:
 
@@ -124,7 +124,7 @@ CaptureOnのsession folderとcapture metadataの相対パスを追加する。
 
 session folder を基準とした相対パス、snapshot log の情報、空の入力元一覧、`TrackerPacketSnapshotRecord` / `TrackerPacketSnapshotLogReader` を追加した。既存の診断ログ読み取り処理も session folder 配下を列挙できるようにした。対象テスト5件、関連13件、全体の `Tracker.Tests` 168件が成功し、`gpt-5.5 high` のレビューは完了を妨げる指摘なし。
 
-表示用データとしての tracker snapshot 自体は問題ないが、比較元データを保持することは `TRACKER-044` の通常の処理経路で必須とした。関連ファイルを名前で対応付ける従来の考え方は session folder 名とその中のファイル名で維持する。入力元ごとに利用中のトラッカーを取得する API と、同じ `uuid` の衝突は次作業の入力元集計・役割判定で扱うリスクとし、パケットのバイト列と source identity を失わない限り、この作業の完了を妨げる条件とはしない。
+表示用データとしての tracker snapshot 自体は問題ないが、比較元データを保持することは `TRACKER-044` の通常の処理経路で必須とした。関連ファイルを名前で対応付ける従来の考え方は session folder 名とその中のファイル名で維持する。入力元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、次作業の入力元集計・役割判定で扱うリスクとし、パケットのバイト列と source identity を失わない限り、この作業の完了を妨げる条件とはしない。
 
 詳細レポート:
 

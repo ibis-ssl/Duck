@@ -1,0 +1,77 @@
+[
+  {
+    "name": "ledger-archive-20260917-0721-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-cspell.stderr",
+    "bytes": 288,
+    "sha256": "0f957d48a1ea2286e75f5b52678b60e0c6fa02570403f78cd981e6e91e68c952"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-cspell.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-whitelist.stderr",
+    "bytes": 156,
+    "sha256": "64ef26c913159bb1d4b95c78d1010da3be52a060249fd85cabddd88878137ae0"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-full-lint.stderr",
+    "bytes": 1141,
+    "sha256": "2421d3209f46e1bdc0b839d96f92fe2cf1bc48cbab639d45c2775c49b88a5331"
+  },
+  {
+    "name": "ledger-archive-20260917-0721-full-lint.stdout",
+    "bytes": 624,
+    "sha256": "fef34c684db1fb52584d514487ebd73c8c6b5110b82155d14dbf6fa1abc002af"
+  }
+]
