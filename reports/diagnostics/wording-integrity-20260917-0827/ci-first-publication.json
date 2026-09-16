@@ -1,0 +1,55 @@
+{
+  "checked_at": "2026-09-17T08:45:24.978230+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr_number": 20,
+  "actual_pr_head": "c1b28955b653d65788f8581834c0cf5b56910b64",
+  "run_id": 35163301537,
+  "run_head_sha": "c1b28955b653d65788f8581834c0cf5b56910b64",
+  "event": "pull_request",
+  "conclusion": "success",
+  "job_id": 105018697992,
+  "checkout_sha": "ffb29d6772dd4cc1d0814620582523386c0cfd6c",
+  "checkout_parents": [
+    "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+    "c1b28955b653d65788f8581834c0cf5b56910b64"
+  ],
+  "workflow_path": ".github/workflows/dotnet-test.yml",
+  "workflow_at_checkout_sha256": "0a632f31f84078083eeb9ad819e439c4594b390cd4764584a73c2e13f2c23ef1",
+  "workflow_at_pr_head_exists": false,
+  "workflow_sha_exported_in_logs": false,
+  "test_counts": {
+    "passed": 329,
+    "failed": 0,
+    "skipped": 0,
+    "total": 329
+  },
+  "artifacts": [],
+  "diagnostics_steps": "skipped on success",
+  "upload_condition": "always() && steps.dotnet_test.outcome == 'failure'",
+  "contents": [
+    "TRX",
+    "stdout",
+    "stderr",
+    "exit code",
+    "vstest diagnostics",
+    "MSBuild binlog",
+    "blame outputs when produced",
+    "environment",
+    "source archive"
+  ],
+  "markdown_lint_in_workflow": false,
+  "log_excerpts": [
+    "2026-09-16T23:40:12.8398778Z HEAD is now at ffb29d6 Merge c1b28955b653d65788f8581834c0cf5b56910b64 into d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+    "2026-09-16T23:40:45.2751324Z Passed!  - Failed:     0, Passed:   329, Skipped:     0, Total:   329, Duration: 2 s - Tracker.Tests.dll (net10.0)"
+  ],
+  "source_urls": [
+    "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35163301537",
+    "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35163301537/jobs",
+    "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35163301537/artifacts",
+    "https://github.com/ibis-ssl/Duck/actions/runs/35163301537/job/105018697992"
+  ],
+  "evidence_method": "GitHub connector read run metadata, jobs, artifacts, full job log; RDC git read immutable actual checkout and workflow. Log text here is explicitly selected excerpts, not the complete log.",
+  "scope_limit": "This successful run is evidence only for c1b2895. Any later PR HEAD needs its own matching run.",
+  "workflow_archive": "ci-workflow-evidence.tar.gz",
+  "workflow_archive_sha256": "496a08a31dd39412c59b2001b10a0f589ea8594288b04e666693ccb17e835a01"
+}
