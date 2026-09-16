@@ -1,0 +1,322 @@
+[
+  {
+    "block": "D16-B001",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "タスク状況を作業状況とする自然な見出し。文書の役割は維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574437+09:00"
+  },
+  {
+    "block": "D16-B002",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "更新可能な3Skill名と、それらからのみ更新する制限を保持。管理指示を緩和しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574460+09:00"
+  },
+  {
+    "block": "D16-B003",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "現在のタスクを現在の作業とする見出し。直下に後から追加されたDOC-LINT-003と旧作業は別々に扱う。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574465+09:00"
+  },
+  {
+    "block": "D16-B004",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "原文CAPTURE-REPLAY-001の12行は現在38〜49行に対応。新規DOC-LINT-003段落へ対応付けない。2入力の周期/遅延、汎用option/summary-detail形式、指定保存先、focused/build/review/syncの条件を保持。入力包や映像への誤訳を修正し、過去のPR19状態と現在を区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574468+09:00"
+  },
+  {
+    "block": "D16-B005",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "11件成功、build警告0/エラー0、通常100msのavg111.813/max117.302と0窓のavg15.812/max20.842、レビュー証跡の区分を保持。buildエラーとテスト失敗を混同しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574472+09:00"
+  },
+  {
+    "block": "D16-B006",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "CaptureReplay範囲はblockingなし、ReceivedAt基準lag説明のnon-blocking懸念はREADME/報告修正という限定的判断を保持。全体成功へ広げない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574475+09:00"
+  },
+  {
+    "block": "D16-B007",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RUNTIME-HOST-012の9行は現在59〜67行。2構文、設定より優先、未指定は従来appsettingsという条件とID/依存/規模/当時状態を保持。active profileを設定プロファイルと明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574478+09:00"
+  },
+  {
+    "block": "D16-B008",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "focused tests、RuntimeHost build、専用レビュー、進捗同期という終了条件を保持。実装証跡の導入も残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574481+09:00"
+  },
+  {
+    "block": "D16-B009",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "レビュー修正後17成功、build警告0/エラー0、実コマンドラインproviderと引数名→設定キー対応、値なし2構文でArgumentException即終了という証拠を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574485+09:00"
+  },
+  {
+    "block": "D16-B010",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "初回High指摘→修正→r2指摘なし→完了可という経緯を保持。門を閉じるという逐語訳を当時の完了判断へ修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574488+09:00"
+  },
+  {
+    "block": "D16-B011",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "原文50行の完了済みタスク見出しは現在126行に対応する。machine diffが対応付けたDOC-LINT-001の追加本文は別途確認し、原文見出しの変更とはしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574491+09:00"
+  },
+  {
+    "block": "D16-B012",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "原文52〜53行は現在128〜129行。設計統合、2host責務、将来自動レフェリー、周期分離、互換非要件、BreakingChanges不要、実レビュー設定gpt-5.5 high、初回2阻害→修正→r2なし、draftPR17を保持。追加DOC-LINT-002本文は別途確認。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574494+09:00"
+  },
+  {
+    "block": "D16-B013",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "project/source/namespace依存境界を、計画や根という誤訳にせず実在プロジェクトとソースの参照制約として保持。3旧host名/UI/診断とread側責務、先行失敗テストという状態を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574497+09:00"
+  },
+  {
+    "block": "D16-B014",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "3失敗/0成功を保持し、当時RuntimeHost project/sourceとDebugHost directoryが未存在だから検証が失敗したと説明。コンパイル失敗や全体成功へ読み替えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574500+09:00"
+  },
+  {
+    "block": "D16-B015",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R002のr2阻害なしと将来のownership-marker誤検出を保留する判断、R003のsample tickと確定周期/WorldFrameCommitted非依存・Vision Input復元・旧形式非対応/制限・固定参照同期という契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574503+09:00"
+  },
+  {
+    "block": "D16-B016",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R003のビルド済みテストが3失敗/0成功であること、2機能未実装を検証失敗として固定した条件を保持。構築済み済みの重複を除く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574506+09:00"
+  },
+  {
+    "block": "D16-B017",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R003のschema/rawDTO詳細はR007で確認する保留、R004のプロジェクト/名前空間/起動/README/solution参照/CaptureReplay・testsをDebugHostへ揃える変更と正常動作維持を保持。rawを映像とする誤訳を除く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574509+09:00"
+  },
+  {
+    "block": "D16-B018",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R004実装前3失敗/0成功とfolder/projectなし/active参照未更新、実装後同test3成功と3build成功を全保持。RedとGreenを実装前後として明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574512+09:00"
+  },
+  {
+    "block": "D16-B019",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R004レビュー阻害なしでもfull testsは既存Redのため未実行という制限、R005の6型をCore Runtimeへ移す境界、DebugHostのUDP decode/rawstore/capture順、診断保存を周期から除くことを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574514+09:00"
+  },
+  {
+    "block": "D16-B020",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "対象5クラスを指定したdotnet testコマンドをそのまま保持し、15 passedは15件成功とする。全体テスト成功とはしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574517+09:00"
+  },
+  {
+    "block": "D16-B021",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "Review Evidenceをレビュー証跡とし、一般的な確認と区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574521+09:00"
+  },
+  {
+    "block": "D16-B022",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R005の後続3対象を残す判断、R006の1tickにraw/自前/外部を固定、直接inject禁止、Raw/Tracked/Compare同一snapshot、clone DTOとmutable状態の直接読取禁止を保持。外部自前追跡という矛盾を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574524+09:00"
+  },
+  {
+    "block": "D16-B023",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "対象3クラスを指定したコマンドを保持し、18 passedは18件成功とする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574527+09:00"
+  },
+  {
+    "block": "D16-B024",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "Review Evidenceをレビュー証跡と明記。前後のビルド/差分検査と別の根拠として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574530+09:00"
+  },
+  {
+    "block": "D16-B025",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R006からR007以降へ2対象を残した状態、R007の設定付きsample保存/新規高速検索/semantic summary/旧形式非対応または制限/高負荷互換なしという条件を保持。保存物を具体化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574534+09:00"
+  },
+  {
+    "block": "D16-B026",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "focused/affected tests、2build、diff成功は委任した担当者の報告で確認したことを保持。今回の実行証拠へ読み替えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574537+09:00"
+  },
+  {
+    "block": "D16-B027",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R007初回2阻害を修正しr2/r3/r4なしという3後続結果、R008の画面なしproject/Program/options/DI/solution構成、3UI非搭載、周期設定と0以下起動失敗を保持。optionsを選択肢へ誤訳しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574540+09:00"
+  },
+  {
+    "block": "D16-B028",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R008対象調整7成功、広い範囲23成功/1失敗、その1件は範囲外の既存DebugHost検証と確認した限定、2build/diffは担当者報告で成功という4根拠を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574543+09:00"
+  },
+  {
+    "block": "D16-B029",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R008のXML summary指摘修正→r2なし、R009の画面なしreceiver/latest buffer/設定周期/3Core型のDI/テスト入力の正常経路/欠落profileは明示失敗という契約を保持。出力packetを入力包としない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574546+09:00"
+  },
+  {
+    "block": "D16-B030",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R009対象3成功、修正後OperationLoop5成功、広い範囲26成功/1失敗と範囲外理由、調整後26成功、2build/diffの担当者報告という各実行を区別して保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574549+09:00"
+  },
+  {
+    "block": "D16-B031",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R009のmissing-profile代用処理指摘修正→r2なしとlatest優先方針の保留、R010の対象/手動証拠6範囲とgitignore生成物除外目的を保持。報告者の出所も維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574552+09:00"
+  },
+  {
+    "block": "D16-B032",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R010の10/10/15成功は3対象、3buildと2起動確認・diff/ignore確認、広い範囲の1既知失敗と当時の設計理由でR011へ保留した判断を保持。失敗を消さない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574555+09:00"
+  },
+  {
+    "block": "D16-B033",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R010の保留継続妥当というreview、R011で残存failing contractが阻害と判定→設計に合わせUI/診断/描画の直接駆動禁止へ限定→r2なし/PR提出可という経緯を保持。今回の完了条件変更ではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574558+09:00"
+  },
+  {
+    "block": "D16-B034",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "R011初回阻害、修正後境界3成功/分離11成功、Tests build/diff成功、r2指摘なし/提出可という根拠を全保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574561+09:00"
+  },
+  {
+    "block": "D16-B035",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "固定残タスク見出しは、すでに完了が記録された当時の固定作業計画であることが分かるようにする。元の計画を削除しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574563+09:00"
+  },
+  {
+    "block": "D16-B036",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "固定11作業とRAW-VISION/TRACKER追加禁止を全12行で照合。依存境界・新規/旧形式・失敗先行・共有責務・3source・高速保存・headless構成・設定周期・検証/手動・レビュー提出の全条件を保持。実レビュー設定とUI/保存物/プロジェクト名を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574570+09:00"
+  },
+  {
+    "block": "D16-B037",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "CoreとDebugHost旧進捗4参照、RAW013〜016のPR15実題名と2026-05-14T03:29:25Z、RAW017からRuntime001へ範囲拡張で統合という事実を保持。raw映像と処理系系の誤記を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574573+09:00"
+  },
+  {
+    "block": "D16-B038",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "作業一覧が当時の完了記録であることを明記し、現在のPR20完了判定へ流用しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574576+09:00"
+  },
+  {
+    "block": "D16-B039",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "ID/作業/段階/状態/依存関係/完了条件の6列を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574579+09:00"
+  },
+  {
+    "block": "D16-B040",
+    "file": "Tracker/Design/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "11行6列を原文と個別照合。各ID/依存/当時状態/終了条件、先行失敗と実装成功の違い、R007の初回2阻害とr2/r3/r4、R008周期0以下失敗、コミット/PR更新、最終提出可の判断を保持。長い漢字連結を解き、原文の意味を本文の作業別履歴にも保つ。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574583+09:00"
+  }
+]

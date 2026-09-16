@@ -1,0 +1,77 @@
+[
+  {
+    "name": "progress-20260917-0723-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "progress-20260917-0723-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "progress-20260917-0723-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "progress-20260917-0723-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "progress-20260917-0723-focused-cspell.stderr",
+    "bytes": 145,
+    "sha256": "f31b339aa848de31fac2dd2a5e9b7bc7ff290b44859d2b2cc31da5ec6a53281d"
+  },
+  {
+    "name": "progress-20260917-0723-focused-cspell.stdout",
+    "bytes": 492,
+    "sha256": "a01e2912df29531cafd301c7fd0a00017a47b652fb6be2c4f420b4a839ccaa2c"
+  },
+  {
+    "name": "progress-20260917-0723-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "progress-20260917-0723-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "progress-20260917-0723-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "progress-20260917-0723-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "progress-20260917-0723-focused-whitelist.stderr",
+    "bytes": 1782,
+    "sha256": "92ce243921c394ab1cb27960e93f485d8e17b8bd44c70c2fe79f74b1e85c0789"
+  },
+  {
+    "name": "progress-20260917-0723-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "progress-20260917-0723-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "progress-20260917-0723-full-lint.stderr",
+    "bytes": 1145,
+    "sha256": "b21baed7d00ac2d7f6eae2376915a82ec85b566bd9efaf17a25996d1ab733839"
+  },
+  {
+    "name": "progress-20260917-0723-full-lint.stdout",
+    "bytes": 1116,
+    "sha256": "7060ddb0067000421e46fdc7e2a0bac5af486b62e15c6dd87cb3214d39cf671c"
+  }
+]

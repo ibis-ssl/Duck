@@ -1,4 +1,4 @@
-# 段階状況
+# 工程の状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
 
@@ -6,20 +6,20 @@
 
 - 現在の段階: 文書検査整備のレビュー指摘対応中、PR #20 公開中
 - 現在の作業: `DOC-LINT-003`
-- 残り段階: 許可語の全出現箇所の照合 / 引用中の未登録語の扱い / 修正後の再レビュー
+- 残りの作業: 全出現箇所の最終照合、履歴本文の再確認、承認済みの直接引用の例外機能の取り込み、全体の文書検査、独立最終レビュー。
 - 再開証跡: `reports/doc-lint-resume-20260915.md`
-- 本文修正: 現行設計書 7 文書を文書単位の 7 回の変更で PR #20 へ反映済み。製品のソースコードと許可一覧は、この本文修正では変更していない。
-- 本文修正の検証: レビュー前の `42e0637` では 2026-09-16 に全 19 文書の `npm run lint:md` が終了値 0。`cspell` 0 件、許可一覧違反 0 件、`textlint` 成功。詳細は `reports/markdown-lint-completion-20260916.md` を参照する。
+- 2026-09-15 当時の本文修正: 設計書7文書を文書ごとの7回の変更で PR #20 へ反映した。この時点の本文修正では、製品のソースコードと許可一覧は変更していなかった。
+- 過去の検証: レビュー前の `42e0637` では、2026-09-16 に全19文書の `npm run lint:md` が終了値0だった。`cspell` 0件、許可一覧違反0件、`textlint` 成功。これは現在の `HEAD`の成功証拠ではない。詳細は `reports/markdown-lint-completion-20260916.md` を参照する。
 
-## 段階一覧
+## 工程一覧（個別の完了記録は当時の状態）
 
-| 段階 | 状態 | 完了条件 |
+| 工程 | 状態 | 完了条件 |
 | --- | --- | --- |
-| 準備 | 完了 | 旧 `Tracker.Core/Design` と `Tracker.Server/Design` の設計資料を確認し、`Tracker/Design/Archive/` に旧進捗管理文書を保存した。 |
-| 設計 | 完了、下書き PR #17 | `Tracker/Design/` を正本の設計根とし、`Core` / `Tracker.DebugHost` / `Tracker.RuntimeHost` の設計範囲を保管場所で分ける。`Tracker.RuntimeHost` を自前追跡と将来 `AutoRef mode` の本番寄り画面なし実行体、`Tracker.DebugHost` を `Web UI` / 診断 / 再生 / 記録確認画面用の診断実行体として設計し、実行周回分離と旧記録互換非要件を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で阻害指摘なしを確認済み。 |
-| 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` と `RUNTIME-HOST-003` で `Tracker.RuntimeHost` / `Tracker.DebugHost` の依存境界、読み取り側責務、診断標本境界、旧形式の縮退契約の失敗先行試験を追加し、作業ごとの確認で阻害指摘なしを確認した。`RUNTIME-HOST-002` は二回目確認、`RUNTIME-HOST-003` は `reports/runtime-host-003-review-20260514170652.md` で完了した。 |
-| 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-004` から `RUNTIME-HOST-009` で `Tracker.DebugHost` 改名、共有実行周回境界、`Tracker.DebugHost` 読み取り側化、診断標本補助記録の高速経路、`Tracker.RuntimeHost` 骨組み、`Tracker.RuntimeHost` 正常系を対象試験 / 構築 / 作業確認付きで通した。`RUNTIME-HOST-004` は `reports/runtime-host-004-review-20260514172921.md`、`RUNTIME-HOST-005` は `reports/runtime-host-005-review-20260514180308.md`、`RUNTIME-HOST-006` は `reports/runtime-host-006-review-20260514182549.md`、`RUNTIME-HOST-007` は `reports/runtime-host-007-review-r4-20260514192425.md`、`RUNTIME-HOST-008` は `reports/runtime-host-008-review-r2-20260514194042.md`、`RUNTIME-HOST-009` は `reports/runtime-host-009-review-r2-20260514200945.md` で指摘なしを確認済み。 |
-| 確認 | 完了、PR #17 提出可能 | `RUNTIME-HOST-010` で `Tracker.RuntimeHost` / `Tracker.DebugHost` 構築、診断標本証跡、旧形式の縮退証跡、`Tracker.DebugHost` 画面正常系、`Tracker.RuntimeHost` 画面なし正常系の検証証跡と作業確認を完了した。`RUNTIME-HOST-011` では最終確認の阻害指摘を受けて取り込み済み失敗契約を現設計へ修正し、`reports/runtime-host-011-final-review-r2-20260514204526.md` で阻害指摘なし / PR 提出可能を確認した。 |
-| 記録再生調査 | PR #19 公開中 | `CAPTURE-REPLAY-001` で `Tracker.CaptureReplay` に raw vision / `ibis` 自前追跡の周期と `ReceivedAt` 基準遅延を比較する汎用出力を追加し、指定記録の遅延原因を `reports/capture-replay-001-latency-investigation-20260516185833.md` に記録した。対象試験は 11 件成功、`Tracker.CaptureReplay` 構築は成功。専用確認は `reports/pr19-review-capturereplay-20260516200807.md` で阻害指摘なし、文書 / 進捗管理確認は `reports/pr19-review-docs-tracking-20260516200807.md` で阻害指摘なし。 |
-| 実行体設定選択 | PR #19 公開中 | `RUNTIME-HOST-012` で `Tracker.RuntimeHost` 起動時に `--profile <name>` / `--profile=<name>` から有効設定を指定できるようにした。命令行解析は `Microsoft.Extensions.Configuration.CommandLine` 提供機能と切り替え対応表を使う。確認指摘修正後の対象試験は 17 件成功、`Tracker.RuntimeHost` 構築は成功。初回確認の重大指摘は修正し、`reports/pr19-review-runtimehost-profile-r2-20260516201757.md` で指摘なしを確認した。 |
-| 文書検査整備 | 指摘対応中、PR #20 公開中 | `DOC-LINT-001` で保存庫根に文書向け `textlint` / `cspell` を導入し、利用者編集対象の `*.md` 全般を品質門に載せる。英単語と片仮名語の許可一覧は専用 `YAML` 1 文書を正本とする。`DOC-LINT-002` で SudachiPy による語彙抽出と許可一覧検査を追加した。`DOC-LINT-003` では長文入力・脚注・語境界・日本語隣接英語・対象列挙の欠陥を修正し、未承認語の一括許可や検査除外への退避をせず、通常の説明文を整理する。全対象への `npm run lint:md` 終了値 0 と、同一 PR の `current HEAD` に対する CI 成功をもって完了とする。 |
+| 準備 | 完了 | 旧 `Tracker.Core/Design` と `Tracker.Server/Design` の設計資料を確認し、`Tracker/Design/Archive/` に旧進捗文書を保存した。 |
+| 設計 | 完了、下書き PR #17 | `Tracker/Design/` を設計資料の正本の保存先とし、`Tracker.Core` / `Tracker.DebugHost` / `Tracker.RuntimeHost` の設計範囲をフォルダで分けた。RuntimeHost はトラッカーと将来の自動レフェリーを持つ本番寄りの画面なし実行用、DebugHost は Web UI / 診断 / 再生 / キャプチャー確認用とし、処理周期の分離と旧ログとの互換性を必須としない方針を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で阻害指摘なしを確認した。 |
+| 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` / `RUNTIME-HOST-003` で、依存境界、読み取り側の責務、diagnostics sample tick の境界、旧形式の機能制限について、実装に先行する失敗テストを追加した。前者は2回目のレビュー、後者は `reports/runtime-host-003-review-20260514170652.md` で阻害指摘なしを確認した。各3件失敗 / 0件成功という当時の結果は、作業状況の各本文に保持している。 |
+| 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-004` から `RUNTIME-HOST-009` で、DebugHost への名称変更、共通の周期処理の責務分離、ライブ表示の読み取り側への分離、diagnostics sample sidecar の高速な読み書き、RuntimeHost の最小構成と正常経路を実装し、対象テスト、ビルド、作業ごとのレビューを行った。各作業のレビュー結果は `reports/runtime-host-004-review-20260514172921.md`、`reports/runtime-host-005-review-20260514180308.md`、`reports/runtime-host-006-review-20260514182549.md`、`reports/runtime-host-007-review-r4-20260514192425.md`、`reports/runtime-host-008-review-r2-20260514194042.md`、`reports/runtime-host-009-review-r2-20260514200945.md` で指摘なし。作業008・009で広い範囲のテストに各1件失敗が残った条件と保留理由は、作業状況の各本文に保持している。 |
+| 確認 | 完了、PR #17 提出可能 | `RUNTIME-HOST-010` で両プロジェクトのビルド、diagnostics sample sidecar と旧形式の機能制限の証跡、DebugHost の UI と RuntimeHost の画面なしの正常動作を検証し、作業ごとのレビューを完了した。`RUNTIME-HOST-011` では最終レビューの阻害指摘を受け、リポジトリに残る失敗した契約テストを当時の設計へ修正した。`reports/runtime-host-011-final-review-r2-20260514204526.md` で阻害指摘なしとなり、PR を提出できると確認した。 |
+| キャプチャー再生の調査 | 当時は PR #19 公開中 | `CAPTURE-REPLAY-001` で raw vision と `ibis tracker` の周期、`ReceivedAt` を基準とする遅延を比較する汎用出力を追加した。指定キャプチャーの原因は `reports/capture-replay-001-latency-investigation-20260516185833.md` に記録した。対象テスト11件成功、CaptureReplay のビルド成功。専用レビューは `reports/pr19-review-capturereplay-20260516200807.md`、文書と進捗のレビューは `reports/pr19-review-docs-tracking-20260516200807.md` で阻害指摘なし。 |
+| 起動時の設定選択 | 当時は PR #19 公開中 | `RUNTIME-HOST-012` で、起動時に `--profile <name>` / `--profile=<name>` から適用する設定プロファイルを指定できるようにした。`Microsoft.Extensions.Configuration.CommandLine` の設定読込機能と、引数名から設定キーへの対応表を使う。初回レビューの重大指摘を修正した後の対象テスト17件成功、RuntimeHost のビルド成功。`reports/pr19-review-runtimehost-profile-r2-20260516201757.md` で指摘なし。 |
+| 文書検査整備 | 指摘対応中、PR #20 公開中 | `DOC-LINT-001` でリポジトリの最上位に文書用の `textlint` / `cspell` を導入し、利用者の編集対象である `*.md` 全般を品質検査の対象にした。英単語と片仮名語の許可一覧は`tools/lint/markdown-whitelist.yaml` の1ファイルを正本とする。`DOC-LINT-002` で SudachiPy による語彙抽出と許可一覧検査を追加した。`DOC-LINT-003` は検査器の長文入力、脚注、語境界、日本語に隣接する英語、対象列挙の欠陥を修正し、未承認語の一括許可や検査除外への退避をせずに説明文を整理する。全対象の `npm run lint:md` の終了値0と、PRの最新の `HEAD`に一致する `head_sha` のCI成功、および検証証跡の記録を完了条件とする。本文の照合と全体完了は区別し、独立最終レビューの代わりに自己点検を使わない。 |

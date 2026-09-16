@@ -1,0 +1,50 @@
+[
+  {
+    "block": "D14-B001",
+    "file": "Tracker/Design/phases-status.md",
+    "disposition": "fixed",
+    "reason": "段階状況を工程の状況とする自然な見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574957+09:00"
+  },
+  {
+    "block": "D14-B002",
+    "file": "Tracker/Design/phases-status.md",
+    "disposition": "accepted",
+    "reason": "更新できる3Skillとその限定を原文どおり保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574964+09:00"
+  },
+  {
+    "block": "D14-B003",
+    "file": "Tracker/Design/phases-status.md",
+    "disposition": "fixed",
+    "reason": "DOC-LINTの状態/依存/残件と追加された検証経過を全文確認。本文側の照合と上流引用機能、独立最終レビューを分け、過去42e0637での0件成功を現在HEADの成功証拠にしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574967+09:00"
+  },
+  {
+    "block": "D14-B004",
+    "file": "Tracker/Design/phases-status.md",
+    "disposition": "fixed",
+    "reason": "工程一覧にある個別完了記録の時点を明記し、過去PR17/19と現在PR20を混同しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574970+09:00"
+  },
+  {
+    "block": "D14-B005",
+    "file": "Tracker/Design/phases-status.md",
+    "disposition": "fixed",
+    "reason": "工程/状態/完了条件の3列を保持して自然な見出しにする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574974+09:00"
+  },
+  {
+    "block": "D14-B006",
+    "file": "Tracker/Design/phases-status.md",
+    "disposition": "fixed",
+    "reason": "原文の準備/設計/検証/実装/確認/調査/profile指定の7行と後追加のDOC-LINT行を個別照合。設計配置/host境界/先行失敗各3件/作業008-009の各1失敗/最終契約修正/各レポート/11・17成功とCLI2構文を保持。文書lint0とexactHEAD CI成功という条件は緩めず、独立最終レビューと自己点検を区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:24:45.574977+09:00"
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      10
+    ],
+    "old": "- 状態: レビュー指摘への対応中。診断設計、構成設計、表示画面設計、利用手順の本文と原文を照合し、採否を記録した。全出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。",
+    "new": "- 状態: レビュー指摘への対応中。診断設計、構成設計、表示画面設計、利用手順、進捗2文書の本文と原文を照合し、採否を記録した。全出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      34
+    ],
+    "old": "- 2026-09-17 の引き継ぎ確認: 診断画面の詳細設計について差分90件の本文と原文を照合し、採否と段落の対応を記録した。残り5文書と、4,336出現箇所の最終照合は継続中。全件確認済みや作業完了とはしない。",
+    "new": "- 2026-09-17 の引き継ぎ確認: 今回の6文書の差分543件について、本文と原文を読み、採否と段落の対応を記録した。既存の13文書の記録272件との統合、4,336出現箇所の最終照合、履歴本文の再確認は継続中。全件確認済みや作業完了とはしない。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      35
+    ],
+    "old": "- 2026-09-17 の検証: 診断画面の詳細設計の対象検査3種と差分検査は成功。全体の `npm run lint:md` は終了値123。`feedback-points/feedback-points.md` の12・13行目にある2つの利用者発言の引用内の違反は、承認済みの引用例外を共有検査器へ実装する別作業として残る。",
+    "new": "- 2026-09-17 の検証: 今回の6文書は、それぞれ対象検査3種と差分検査が成功。全体の `npm run lint:md` は終了値123。`feedback-points/feedback-points.md` の2つの利用者発言の引用内の違反は、承認済みの引用例外を共有検査器へ実装する別作業として残る。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      92
+    ],
+    "old": "  - 許可一覧は、既存文書の脚注から初版を収集した`tools/lint/markdown-whitelist.yaml` の1ファイルを正本とし、単語名と説明の対を残す。",
+    "new": "  - 許可一覧は、既存文書の脚注から初版を収集した `tools/lint/markdown-whitelist.yaml` の1ファイルを正本とし、単語名と説明の対を残す。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      143
+    ],
+    "old": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加した。diagnostics sample tick が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が diagnostics sample sidecar から復元されること、旧形式の render snapshot を保存する補助ファイル は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。",
+    "new": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加した。diagnostics sample tick が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が diagnostics sample sidecar から復元されること、旧形式の render snapshot を保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      161
+    ],
+    "old": "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと render snapshot を保存する補助ファイル の生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。",
+    "new": "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと render snapshot を保存する補助ファイルの生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      180
+    ],
+    "old": "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。旧形式の render snapshot を保存する補助ファイル しか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。",
+    "new": "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。旧形式の render snapshot を保存する補助ファイルしか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      234
+    ],
+    "old": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加する。diagnostics sample tick が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が diagnostics sample sidecar から復元され、旧形式の render snapshot を保存する補助ファイル は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。",
+    "new": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加する。diagnostics sample tick が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が diagnostics sample sidecar から復元され、旧形式の render snapshot を保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      257
+    ],
+    "old": "| `RUNTIME-HOST-003` | diagnostics sample tick の境界と旧形式の機能制限の契約を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | diagnostics sample tick は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は diagnostics sample sidecar から復元し、旧形式の render snapshot を保存する補助ファイル は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |",
+    "new": "| `RUNTIME-HOST-003` | diagnostics sample tick の境界と旧形式の機能制限の契約を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | diagnostics sample tick は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は diagnostics sample sidecar から復元し、旧形式の render snapshot を保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |",
+    "reason": "最終自己点検で日本語間の不要な空白を除き、実際に記録した6文書543件と未完了台帳を進捗に同期する。"
+  }
+]

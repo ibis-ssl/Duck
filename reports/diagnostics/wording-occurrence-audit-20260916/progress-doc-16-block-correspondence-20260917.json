@@ -1,0 +1,789 @@
+{
+  "reviewed_at": "2026-09-17T07:25:46.598185+09:00",
+  "file": "Tracker/Design/tasks-status.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "final_sha256": "54c3658423601c8aeacf9b8a6004bfd1ff12669a17fb7686bec85b0af1b4e178",
+  "review_role": "implementation_worker_self_check",
+  "correspondence_method": "原文・最終全文・差分を手動照合。旧見出しと作業本文を後追加DOC-LINTへ誤対応させず、D16-B004/011/012を明示補正。",
+  "blocks": [
+    {
+      "block": "D16-B001",
+      "baseline_start": 1,
+      "baseline_end": 1,
+      "baseline_text": [
+        "# タスク状況"
+      ],
+      "final_start": 1,
+      "final_end": 1,
+      "final_text": [
+        "# 作業状況"
+      ],
+      "disposition": "accepted",
+      "reason": "タスク状況を作業状況とする自然な見出し。文書の役割は維持。"
+    },
+    {
+      "block": "D16-B002",
+      "baseline_start": 3,
+      "baseline_end": 3,
+      "baseline_text": [
+        "ルール: このファイルは `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。"
+      ],
+      "final_start": 3,
+      "final_end": 3,
+      "final_text": [
+        "規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。"
+      ],
+      "disposition": "accepted",
+      "reason": "更新可能な3Skill名と、それらからのみ更新する制限を保持。管理指示を緩和しない。"
+    },
+    {
+      "block": "D16-B003",
+      "baseline_start": 5,
+      "baseline_end": 5,
+      "baseline_text": [
+        "## 現在のタスク"
+      ],
+      "final_start": 5,
+      "final_end": 5,
+      "final_text": [
+        "## 現在の作業"
+      ],
+      "disposition": "accepted",
+      "reason": "現在のタスクを現在の作業とする見出し。直下に後から追加されたDOC-LINT-003と旧作業は別々に扱う。"
+    },
+    {
+      "block": "D16-B004",
+      "baseline_start": 7,
+      "baseline_end": 18,
+      "baseline_text": [
+        "- ID: CAPTURE-REPLAY-001",
+        "- Title: Tracker.CaptureReplay に vision / ibis tracker 遅延分析出力を追加する",
+        "- Phase: PR",
+        "- Status: PR #19 open",
+        "- Size: medium",
+        "- Dependencies: RUNTIME-HOST-011 complete.",
+        "- Exit Criteria:",
+        "  - `Tracker.CaptureReplay` が capture session path を入力として、raw SSL-Vision packet cadence と ibis tracker output cadence / timestamp delta を同一出力で比較できる。",
+        "  - 出力は今回の capture 固有ではなく、次回以降の遅延・stale・cadence 調査に再利用できる option 名と summary / detail 形式にする。",
+        "  - 指定 capture session `/home/ibis/ssl/IbisDuck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260514T132706328Z-4a19e61b92c443929f91eccdff3512c9` に対して、ibis tracker が vision より遅れて見える原因を report に記録する。",
+        "  - focused tests / `Tracker.CaptureReplay` build / dedicated review を通し、tracking を同期する。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 38,
+      "final_end": 49,
+      "final_text": [
+        "- ID: `CAPTURE-REPLAY-001`",
+        "- 題名: `Tracker.CaptureReplay` に raw vision と `ibis tracker` の遅延分析出力を追加する",
+        "- 段階: PR",
+        "- 状態: 当時は PR #19 公開中",
+        "- 規模: 中",
+        "- 依存関係: `RUNTIME-HOST-011` の完了。",
+        "- 完了条件:",
+        "  - `Tracker.CaptureReplay` がキャプチャーの保存先を入力として、raw vision のパケットの受信周期と、`ibis tracker` の出力周期および時刻差を同じ出力で比較できる。",
+        "  - 出力は今回のキャプチャー固有ではなく、次回以降の遅延、古い状態が残る問題、周期の調査に再利用できる操作名と概要 / 詳細の形式にする。",
+        "  - 指定キャプチャー `/home/ibis/ssl/IbisDuck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260514T132706328Z-4a19e61b92c443929f91eccdff3512c9` で、`ibis tracker` が raw vision より遅れて見える原因を報告書に記録する。",
+        "  - 対象を絞ったテスト、`Tracker.CaptureReplay` のビルド、専用のレビューを通し、進捗文書を同期する。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "原文CAPTURE-REPLAY-001の12行は現在38〜49行に対応。新規DOC-LINT-003段落へ対応付けない。2入力の周期/遅延、汎用option/summary-detail形式、指定保存先、focused/build/review/syncの条件を保持。入力包や映像への誤訳を修正し、過去のPR19状態と現在を区別。"
+    },
+    {
+      "block": "D16-B005",
+      "baseline_start": 20,
+      "baseline_end": 23,
+      "baseline_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~CaptureReplayTests -m:1 /nr:false` は 11 passed。",
+        "    - `dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false` は 0 warnings / 0 errors。",
+        "    - 指定 capture では通常設定 `ReorderWindowNs=100ms` で `avgCommitLagMs=111.813` / `maxCommitLagMs=117.302`。`--reorder-window-ns 0` の対照実行では `avgCommitLagMs=15.812` / `maxCommitLagMs=20.842` まで下がることを確認した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 51,
+      "final_end": 54,
+      "final_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~CaptureReplayTests -m:1 /nr:false` は 11 件成功。",
+        "    - `dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false` は警告 0 件 / エラー 0 件。",
+        "    - 指定キャプチャーでは通常設定 `ReorderWindowNs=100ms` で `avgCommitLagMs=111.813` / `maxCommitLagMs=117.302`。`--reorder-window-ns 0` の対照実行では `avgCommitLagMs=15.812` / `maxCommitLagMs=20.842` まで下がることを確認した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "11件成功、build警告0/エラー0、通常100msのavg111.813/max117.302と0窓のavg15.812/max20.842、レビュー証跡の区分を保持。buildエラーとテスト失敗を混同しない。"
+    },
+    {
+      "block": "D16-B006",
+      "baseline_start": 26,
+      "baseline_end": 26,
+      "baseline_text": [
+        "    - CaptureReplay scope は blocking findings なし。`ReceivedAt` ベースの lag 説明に関する non-blocking concern は README / 調査レポート文言を修正した。"
+      ],
+      "final_start": 57,
+      "final_end": 57,
+      "final_text": [
+        "    - `Tracker.CaptureReplay` の範囲には、完了を妨げる指摘はなかった。`ReceivedAt` を基準とする遅延の説明には、完了を妨げない懸念があり、READMEと調査報告の文言を修正した。"
+      ],
+      "disposition": "fixed",
+      "reason": "CaptureReplay範囲はblockingなし、ReceivedAt基準lag説明のnon-blocking懸念はREADME/報告修正という限定的判断を保持。全体成功へ広げない。"
+    },
+    {
+      "block": "D16-B007",
+      "baseline_start": 28,
+      "baseline_end": 36,
+      "baseline_text": [
+        "- ID: RUNTIME-HOST-012",
+        "- Title: RuntimeHost 起動時に CLI 引数で active profile を指定できるようにする",
+        "- Phase: PR",
+        "- Status: PR #19 open",
+        "- Size: small",
+        "- Dependencies: RUNTIME-HOST-011 complete.",
+        "- Exit Criteria:",
+        "  - `Tracker.RuntimeHost` が `--profile <name>` と `--profile=<name>` を受け取り、`Tracker:ActiveProfileName` より優先して active profile を選択できる。",
+        "  - profile 引数が未指定の場合は既存 appsettings の `Tracker:ActiveProfileName` 挙動を維持する。"
+      ],
+      "final_start": 59,
+      "final_end": 67,
+      "final_text": [
+        "- ID: `RUNTIME-HOST-012`",
+        "- 題名: `Tracker.RuntimeHost` 起動時に CLI 引数で適用する設定プロファイルを指定できるようにする",
+        "- 段階: PR",
+        "- 状態: 当時は PR #19 公開中",
+        "- 規模: 小",
+        "- 依存関係: `RUNTIME-HOST-011` の完了。",
+        "- 完了条件:",
+        "  - `Tracker.RuntimeHost` が `--profile <name>` と `--profile=<name>` を受け取り、`Tracker:ActiveProfileName` より優先して設定プロファイルを選択できる。",
+        "  - `--profile` 引数が未指定の場合は、既存の `appsettings.json` の `Tracker:ActiveProfileName` による動作を維持する。"
+      ],
+      "disposition": "fixed",
+      "reason": "RUNTIME-HOST-012の9行は現在59〜67行。2構文、設定より優先、未指定は従来appsettingsという条件とID/依存/規模/当時状態を保持。active profileを設定プロファイルと明示。"
+    },
+    {
+      "block": "D16-B008",
+      "baseline_start": 38,
+      "baseline_end": 39,
+      "baseline_text": [
+        "  - focused tests / `Tracker.RuntimeHost` build / dedicated review を通し、tracking を同期する。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 69,
+      "final_end": 70,
+      "final_text": [
+        "  - 対象を絞ったテスト、`Tracker.RuntimeHost` のビルド、専用のレビューを通し、進捗文書を同期する。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "focused tests、RuntimeHost build、専用レビュー、進捗同期という終了条件を保持。実装証跡の導入も残す。"
+    },
+    {
+      "block": "D16-B009",
+      "baseline_start": 41,
+      "baseline_end": 45,
+      "baseline_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostOperationLoopTests|FullyQualifiedName~RuntimeHostScaffoldContractTests\" -m:1 /nr:false` は review finding 修正後 17 passed。",
+        "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false` は 0 warnings / 0 errors。",
+        "    - command-line parsing は `Microsoft.Extensions.Configuration.CommandLine` provider と switch mapping で実装した。",
+        "    - `--profile` / `--profile=` の値なし指定は checked-in appsettings を読み込む実起動経路でも `ArgumentException` で即終了することを確認した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 72,
+      "final_end": 76,
+      "final_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostOperationLoopTests|FullyQualifiedName~RuntimeHostScaffoldContractTests\" -m:1 /nr:false` はレビュー指摘の修正後に 17 件成功。",
+        "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false` は警告 0 件 / エラー 0 件。",
+        "    - コマンドラインの解析は、`Microsoft.Extensions.Configuration.CommandLine` の設定読込機能と、引数名から設定キーへの対応表で実装した。",
+        "    - `--profile` / `--profile=` に値がない場合は、リポジトリ内の `appsettings.json` を読み込む実際の起動経路でも `ArgumentException` で即終了することを確認した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "レビュー修正後17成功、build警告0/エラー0、実コマンドラインproviderと引数名→設定キー対応、値なし2構文でArgumentException即終了という証拠を保持。"
+    },
+    {
+      "block": "D16-B010",
+      "baseline_start": 48,
+      "baseline_end": 48,
+      "baseline_text": [
+        "    - 初回 review の High finding は修正済み。r2 review で指摘なし、gate close 可を確認した。"
+      ],
+      "final_start": 79,
+      "final_end": 79,
+      "final_text": [
+        "    - 初回レビューの重大指摘は修正済み。2回目のレビューで指摘がなく、完了としてよいことを確認した。"
+      ],
+      "disposition": "fixed",
+      "reason": "初回High指摘→修正→r2指摘なし→完了可という経緯を保持。門を閉じるという逐語訳を当時の完了判断へ修正。"
+    },
+    {
+      "block": "D16-B011",
+      "baseline_start": 50,
+      "baseline_end": 50,
+      "baseline_text": [
+        "## 完了済みタスク"
+      ],
+      "final_start": 126,
+      "final_end": 126,
+      "final_text": [
+        "## 完了済み作業"
+      ],
+      "disposition": "fixed",
+      "reason": "原文50行の完了済みタスク見出しは現在126行に対応する。machine diffが対応付けたDOC-LINT-001の追加本文は別途確認し、原文見出しの変更とはしない。"
+    },
+    {
+      "block": "D16-B012",
+      "baseline_start": 52,
+      "baseline_end": 53,
+      "baseline_text": [
+        "- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了した。`Tracker/Design/` へ設計資料と active tracking を統合し、RuntimeHost / DebugHost の命名、責務境界、AutoRef 将来内包、loop isolation、旧ログ互換非要件、BreakingChanges 不要を設計へ固定した。gpt-5.5 high review は初回 blocking 2 件を修正し、r2 で no findings を確認した。Draft PR #17 を作成した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 128,
+      "final_end": 129,
+      "final_text": [
+        "- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針と設計資料の統合を完了した。設計資料と進行中の作業を管理する文書を `Tracker/Design/` へ統合し、両者の命名、責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としないこと、`BreakingChanges` が不要であることを設計に固定した。`gpt-5.5 high` による初回レビューの阻害指摘2件を修正し、2回目には指摘なしを確認した。下書き PR #17 を作成した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "原文52〜53行は現在128〜129行。設計統合、2host責務、将来自動レフェリー、周期分離、互換非要件、BreakingChanges不要、実レビュー設定gpt-5.5 high、初回2阻害→修正→r2なし、draftPR17を保持。追加DOC-LINT-002本文は別途確認。"
+    },
+    {
+      "block": "D16-B013",
+      "baseline_start": 57,
+      "baseline_end": 58,
+      "baseline_text": [
+        "- `RUNTIME-HOST-002`: RuntimeHost / DebugHost project dependency boundary contract を追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / Web UI / diagnostics replay UI project を参照しないこと、RuntimeHost source が diagnostics logging / replay / Blazor UI namespace を直接参照しないこと、DebugHost が read-side host であることを Red contract として固定した。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 133,
+      "final_end": 134,
+      "final_text": [
+        "- `RUNTIME-HOST-002`: 両プロジェクトの依存境界を検査する契約テストを追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / Web UI / 診断再生 UI のプロジェクトを参照しないこと、そのソースコードが診断ログ / 再生 / Blazor UI の名前空間を直接参照しないこと、`Tracker.DebugHost` が読み取りを担当することを、実装に先行する失敗テストで固定した。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "project/source/namespace依存境界を、計画や根という誤訳にせず実在プロジェクトとソースの参照制約として保持。3旧host名/UI/診断とread側責務、先行失敗テストという状態を維持。"
+    },
+    {
+      "block": "D16-B014",
+      "baseline_start": 61,
+      "baseline_end": 62,
+      "baseline_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は 3 failed / 0 passed。現時点では `Tracker.RuntimeHost` project/source root と `Tracker.DebugHost` root が未存在のため、意図した Red contract として assertion failure になっている。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 137,
+      "final_end": 138,
+      "final_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。当時は `Tracker.RuntimeHost` のプロジェクトとソースコードのディレクトリ、および `Tracker.DebugHost` のディレクトリが存在せず、意図した契約テストの検証失敗になっていた。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "3失敗/0成功を保持し、当時RuntimeHost project/sourceとDebugHost directoryが未存在だから検証が失敗したと説明。コンパイル失敗や全体成功へ読み替えない。"
+    },
+    {
+      "block": "D16-B015",
+      "baseline_start": 66,
+      "baseline_end": 68,
+      "baseline_text": [
+        "    - r2 review で blocking findings なし。DebugHost loop ownership marker の将来 false positive 可能性は hold として記録した。",
+        "- `RUNTIME-HOST-003`: diagnostics sample boundary と legacy degraded contract を追加した。diagnostics sample tick が tracker committed frame cadence / `WorldFrameCommitted` に依存しないこと、Diagnostics `Vision Input` が diagnostics sample sidecar から復元されること、旧 render snapshot sidecar が unsupported / degraded legacy であることを Red contract として固定し、設計文書の task reference を固定一覧へ同期した。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 142,
+      "final_end": 144,
+      "final_text": [
+        "    - 2回目のレビューで阻害指摘なし。`Tracker.DebugHost` が追跡処理の周期を担当するかの検査に使う目印については、将来の誤検出の可能性を保留事項として記録した。",
+        "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加した。diagnostics sample tick が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が diagnostics sample sidecar から復元されること、旧形式の render snapshot を保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R002のr2阻害なしと将来のownership-marker誤検出を保留する判断、R003のsample tickと確定周期/WorldFrameCommitted非依存・Vision Input復元・旧形式非対応/制限・固定参照同期という契約を保持。"
+    },
+    {
+      "block": "D16-B016",
+      "baseline_start": 71,
+      "baseline_end": 72,
+      "baseline_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は 3 failed / 0 passed。`RuntimeHostDiagnosticsSampleBoundaryContractTests` は compile 済みで、diagnostics sample sidecar 未実装と legacy degraded 表示未実装を assertion failure として固定している。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 147,
+      "final_end": 148,
+      "final_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`RuntimeHostDiagnosticsSampleBoundaryContractTests` はビルド済みで、diagnostics sample sidecar と旧形式の機能制限表示が未実装であることを、検証の失敗として固定している。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R003のビルド済みテストが3失敗/0成功であること、2機能未実装を検証失敗として固定した条件を保持。構築済み済みの重複を除く。"
+    },
+    {
+      "block": "D16-B017",
+      "baseline_start": 74,
+      "baseline_end": 76,
+      "baseline_text": [
+        "    - review で blocking findings なし。diagnostics sample sidecar schema と raw Vision payload DTO の詳細は RUNTIME-HOST-007 の green 実装側で確認する hold として記録した。",
+        "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` project / namespace / 起動経路へ rename した。active project、namespace、launch path、README、solution / project reference、CaptureReplay / tests の参照を `Tracker.DebugHost` へ揃え、existing debug normal path を維持した。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 150,
+      "final_end": 152,
+      "final_text": [
+        "    - レビューで阻害指摘なし。diagnostics sample sidecar の保存形式と、raw vision の入力データを表す DTO の詳細は、`RUNTIME-HOST-007` で実装を成功させる際に確認する保留事項として記録した。",
+        "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` というプロジェクト名、名前空間、起動経路へ変更した。使用中のプロジェクト、名前空間、起動経路、README、`Duck.slnx` とプロジェクトの参照、`Tracker.CaptureReplay` とテストからの参照を `Tracker.DebugHost` に揃え、既存の診断用機能の正常動作を維持した。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R003のschema/rawDTO詳細はR007で確認する保留、R004のプロジェクト/名前空間/起動/README/solution参照/CaptureReplay・testsをDebugHostへ揃える変更と正常動作維持を保持。rawを映像とする誤訳を除く。"
+    },
+    {
+      "block": "D16-B018",
+      "baseline_start": 80,
+      "baseline_end": 82,
+      "baseline_text": [
+        "    - Red: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDebugHostRenameContractTests -m:1 /nr:false` は 3 failed / 0 passed。`Tracker.DebugHost` folder/project 未存在と active reference 未更新を assertion failure として確認した。",
+        "    - Green: 同 focused test は 3 passed。`dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false`、`dotnet build Duck.slnx -m:1 /nr:false` は成功した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 156,
+      "final_end": 158,
+      "final_text": [
+        "    - 実装前: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDebugHostRenameContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`Tracker.DebugHost` のフォルダとプロジェクトが存在せず、使用中の参照も未更新であることを、検証の失敗として確認した。",
+        "    - 実装後: 同じ対象のテストは 3 件成功。`dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false`、`dotnet build Duck.slnx -m:1 /nr:false` は成功した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R004実装前3失敗/0成功とfolder/projectなし/active参照未更新、実装後同test3成功と3build成功を全保持。RedとGreenを実装前後として明記。"
+    },
+    {
+      "block": "D16-B019",
+      "baseline_start": 84,
+      "baseline_end": 86,
+      "baseline_text": [
+        "    - review で blocking findings なし。full `Tracker.Tests` は RUNTIME-HOST-002 / RUNTIME-HOST-003 の既存 Red contract があるため未実行とした。",
+        "- `RUNTIME-HOST-005`: tracker operation loop の共有 runtime boundary を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI 非依存 Core runtime 境界へ寄せ、DebugHost は UDP decode / raw store / capture 後に Core coordinator を呼ぶ adapter とした。旧 diagnostics log / render snapshot sidecar 生成は Core operation loop から外し、performance 優先と RuntimeHost 再利用境界を固定した。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 160,
+      "final_end": 162,
+      "final_text": [
+        "    - レビューで阻害指摘なし。`Tracker.Tests` 全体は、`RUNTIME-HOST-002` / `RUNTIME-HOST-003` の既存の失敗テストがあるため、当時は未実行とした。",
+        "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと render snapshot を保存する補助ファイルの生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R004レビュー阻害なしでもfull testsは既存Redのため未実行という制限、R005の6型をCore Runtimeへ移す境界、DebugHostのUDP decode/rawstore/capture順、診断保存を周期から除くことを保持。"
+    },
+    {
+      "block": "D16-B020",
+      "baseline_start": 89,
+      "baseline_end": 89,
+      "baseline_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostSharedOperationLoopBoundaryTests|FullyQualifiedName~TrackerCoordinatorFrameFlowTests|FullyQualifiedName~TrackerCoordinatorResetAndProfileTests|FullyQualifiedName~TrackerProfileRequestServiceTests|FullyQualifiedName~TrackerCoordinatorDiagnosticsCaptureTests\" -m:1 /nr:false` は 15 passed。"
+      ],
+      "final_start": 165,
+      "final_end": 165,
+      "final_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostSharedOperationLoopBoundaryTests|FullyQualifiedName~TrackerCoordinatorFrameFlowTests|FullyQualifiedName~TrackerCoordinatorResetAndProfileTests|FullyQualifiedName~TrackerProfileRequestServiceTests|FullyQualifiedName~TrackerCoordinatorDiagnosticsCaptureTests\" -m:1 /nr:false` は 15 件成功。"
+      ],
+      "disposition": "accepted",
+      "reason": "対象5クラスを指定したdotnet testコマンドをそのまま保持し、15 passedは15件成功とする。全体テスト成功とはしない。"
+    },
+    {
+      "block": "D16-B021",
+      "baseline_start": 91,
+      "baseline_end": 91,
+      "baseline_text": [
+        "  - Review Evidence:"
+      ],
+      "final_start": 167,
+      "final_end": 167,
+      "final_text": [
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "Review Evidenceをレビュー証跡とし、一般的な確認と区別。"
+    },
+    {
+      "block": "D16-B022",
+      "baseline_start": 93,
+      "baseline_end": 95,
+      "baseline_text": [
+        "    - review で blocking findings なし。DebugHost read-side UI 化、diagnostics sample sidecar、RuntimeHost scaffold は RUNTIME-HOST-006 以降へ残す。",
+        "- `RUNTIME-HOST-006`: DebugHost live display を read-side snapshot 境界へ寄せた。`VisionLiveDisplaySnapshotProvider` が 1 render tick で raw / tracked / 3rd party tracker snapshot を固定し、`Home.razor` は raw / tracked store を直接 inject せず同一 composite snapshot から Raw / Tracked / Compare を派生する。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` update event から packet / metadata を clone 済み DTO として保持し、render path が mutable manager state を直接読まない構造にした。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 169,
+      "final_end": 171,
+      "final_text": [
+        "    - レビューで阻害指摘なし。`Tracker.DebugHost` の UI を読み取り側へ分離すること、diagnostics sample sidecar、`Tracker.RuntimeHost` の起動に必要な最小構成は、`RUNTIME-HOST-006` 以降へ残す。",
+        "- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離した。`VisionLiveDisplaySnapshotProvider` が1回の描画更新で raw vision / 自前トラッカー / 外部トラッカーのスナップショットを固定する。`Home.razor` は未加工入力と追跡結果の保存先を直接受け取らず、同じ合成スナップショットから `Raw` / `Tracked` / `Compare` を作る。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` の更新通知からパケットと付随情報を複製した DTO を保持し、描画処理が管理処理の変更可能な状態を直接読まない構造にした。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R005の後続3対象を残す判断、R006の1tickにraw/自前/外部を固定、直接inject禁止、Raw/Tracked/Compare同一snapshot、clone DTOとmutable状態の直接読取禁止を保持。外部自前追跡という矛盾を修正。"
+    },
+    {
+      "block": "D16-B023",
+      "baseline_start": 99,
+      "baseline_end": 99,
+      "baseline_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests|FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~TrackedVisionViewStateTests\" -m:1 /nr:false` は 18 passed。"
+      ],
+      "final_start": 175,
+      "final_end": 175,
+      "final_text": [
+        "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests|FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~TrackedVisionViewStateTests\" -m:1 /nr:false` は 18 件成功。"
+      ],
+      "disposition": "accepted",
+      "reason": "対象3クラスを指定したコマンドを保持し、18 passedは18件成功とする。"
+    },
+    {
+      "block": "D16-B024",
+      "baseline_start": 101,
+      "baseline_end": 101,
+      "baseline_text": [
+        "  - Review Evidence:"
+      ],
+      "final_start": 177,
+      "final_end": 177,
+      "final_text": [
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "Review Evidenceをレビュー証跡と明記。前後のビルド/差分検査と別の根拠として保持。"
+    },
+    {
+      "block": "D16-B025",
+      "baseline_start": 103,
+      "baseline_end": 105,
+      "baseline_text": [
+        "    - review で blocking findings なし。diagnostics sample sidecar と RuntimeHost scaffold は RUNTIME-HOST-007 以降へ残す。",
+        "- `RUNTIME-HOST-007`: DebugHost diagnostics sample sidecar fast path を実装した。UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って latest raw / tracker snapshot を `diagnostics-samples.jsonl` へ保存し、Diagnostics replay / Field は sample sidecar の bounded lookup と semantic summary を主経路にする。旧 render snapshot sidecar だけの session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 179,
+      "final_end": 181,
+      "final_text": [
+        "    - レビューで阻害指摘なし。diagnostics sample sidecar と `Tracker.RuntimeHost` の起動に必要な最小構成は、`RUNTIME-HOST-007` 以降へ残す。",
+        "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。旧形式の render snapshot を保存する補助ファイルしか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R006からR007以降へ2対象を残した状態、R007の設定付きsample保存/新規高速検索/semantic summary/旧形式非対応または制限/高負荷互換なしという条件を保持。保存物を具体化。"
+    },
+    {
+      "block": "D16-B026",
+      "baseline_start": 110,
+      "baseline_end": 111,
+      "baseline_text": [
+        "    - focused / affected tests、`Tracker.DebugHost` build、`Tracker.Tests` build、`git diff --check` は sub-agent report で成功を確認した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 186,
+      "final_end": 187,
+      "final_text": [
+        "    - 対象と影響範囲を絞ったテスト、`Tracker.DebugHost` と `Tracker.Tests` のビルド、`git diff --check` は、委任した担当者の報告で成功を確認した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "focused/affected tests、2build、diff成功は委任した担当者の報告で確認したことを保持。今回の実行証拠へ読み替えない。"
+    },
+    {
+      "block": "D16-B027",
+      "baseline_start": 116,
+      "baseline_end": 118,
+      "baseline_text": [
+        "    - 初回 review の blocking 2 件を修正し、r2 / r3 / r4 で no findings を確認した。",
+        "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` headless project scaffold と configuration を追加した。`Tracker.RuntimeHost` project、Program、options / DI bootstrap、solution entry を追加し、Web UI / diagnostics replay / capture viewer を持たない headless host として起動できる scaffold を作った。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は host start validation error になる contract を追加した。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 192,
+      "final_end": 194,
+      "final_text": [
+        "    - 初回レビューの阻害指摘2件を修正し、2回目・3回目・4回目のレビューでは指摘なしを確認した。",
+        "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` が画面なしで起動するための最小構成と設定を追加した。プロジェクト、`Program`、設定と DI の初期化処理、`Duck.slnx` への登録を追加し、Web UI / 診断再生 / キャプチャー確認画面を持たずに起動できる構成を作った。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0以下では起動時の設定検証が失敗する契約を追加した。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R007初回2阻害を修正しr2/r3/r4なしという3後続結果、R008の画面なしproject/Program/options/DI/solution構成、3UI非搭載、周期設定と0以下起動失敗を保持。optionsを選択肢へ誤訳しない。"
+    },
+    {
+      "block": "D16-B028",
+      "baseline_start": 120,
+      "baseline_end": 122,
+      "baseline_text": [
+        "    - adjusted R008 focused は 7 passed。broad focused は 23 passed / 1 failed で、失敗は R008 範囲外の既存 DebugHost loop ownership assertion として review で確認した。",
+        "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は sub-agent report で成功を確認した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 196,
+      "final_end": 198,
+      "final_text": [
+        "    - `RUNTIME-HOST-008` に対象を調整したテストは7件成功。広い範囲のテストは23件成功 / 1件失敗で、失敗した1件は、この作業の範囲外にある既存の `Tracker.DebugHost` の周期処理の責務に関する検証だと、レビューで確認した。",
+        "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は、委任した担当者の報告で成功を確認した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R008対象調整7成功、広い範囲23成功/1失敗、その1件は範囲外の既存DebugHost検証と確認した限定、2build/diffは担当者報告で成功という4根拠を保持。"
+    },
+    {
+      "block": "D16-B029",
+      "baseline_start": 126,
+      "baseline_end": 128,
+      "baseline_text": [
+        "    - 初回 review の XML summary blocker を修正し、r2 で no findings を確認した。",
+        "- `RUNTIME-HOST-009`: RuntimeHost tracker operation loop と official packet publish normal path を実装した。RuntimeHost は headless SSL-Vision receiver、latest packet buffer、`RuntimeHost:OperationLoopIntervalMilliseconds` に従う operation loop、Core `TrackerCoordinator` / `TrackedSnapshotStore` / `UdpTrackerPacketPublisher` を DI で組み立て、fake SSL-Vision input が coordinator / publisher / latest snapshot store へ届く normal path を固定した。missing active profile は DebugHost と同じく明示失敗に揃えた。",
+        "  - Implementation Evidence:"
+      ],
+      "final_start": 202,
+      "final_end": 204,
+      "final_text": [
+        "    - 初回レビューで完了を妨げていた XML の概要コメントを修正し、2回目のレビューで指摘なしを確認した。",
+        "- `RUNTIME-HOST-009`: `Tracker.RuntimeHost` の周期処理と公式パケット送信の正常経路を実装した。画面なしで動く SSL-Vision 受信処理、最新パケットを保持するバッファ、`RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期処理、`Tracker.Core` の `TrackerCoordinator` / `TrackedSnapshotStore` / `UdpTrackerPacketPublisher` を DI で組み合わせた。テスト用の SSL-Vision 入力が調停処理、送信処理、最新スナップショットの保存先に届く正常経路を固定した。指定された設定プロファイルが存在しない場合は、`Tracker.DebugHost` と同じく明示的に失敗する。",
+        "  - 実装証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R008のXML summary指摘修正→r2なし、R009の画面なしreceiver/latest buffer/設定周期/3Core型のDI/テスト入力の正常経路/欠落profileは明示失敗という契約を保持。出力packetを入力包としない。"
+    },
+    {
+      "block": "D16-B030",
+      "baseline_start": 131,
+      "baseline_end": 133,
+      "baseline_text": [
+        "    - R009 focused は 3 passed、review-fix 後 `RuntimeHostOperationLoopTests` は 5 passed。broad focused は 26 passed / 1 failed で、失敗は R009 範囲外の既存 DebugHost ownership assertion として review で確認した。adjusted focused は 26 passed。",
+        "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は sub-agent report で成功を確認した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 207,
+      "final_end": 209,
+      "final_text": [
+        "    - `RUNTIME-HOST-009` の対象テストは3件成功。レビュー指摘の修正後、`RuntimeHostOperationLoopTests` は5件成功。広い範囲では26件成功 / 1件失敗で、失敗した1件は、この作業の範囲外にある既存の `Tracker.DebugHost` の責務に関する検証だと、レビューで確認した。対象を調整したテストでは26件成功。",
+        "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は、委任した担当者の報告で成功を確認した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R009対象3成功、修正後OperationLoop5成功、広い範囲26成功/1失敗と範囲外理由、調整後26成功、2build/diffの担当者報告という各実行を区別して保持。"
+    },
+    {
+      "block": "D16-B031",
+      "baseline_start": 136,
+      "baseline_end": 138,
+      "baseline_text": [
+        "    - 初回 review の missing active profile fallback blocker を修正し、r2 で no findings を確認した。latest packet buffer は latest 優先のまま R010 manual evidence 後判断の hold とした。",
+        "- `RUNTIME-HOST-010`: RuntimeHost / DebugHost split の focused validation と manual evidence を揃えた。RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path を sub-agent report に残し、`.gitignore` に runtime / diagnostics capture artifacts を追加してローカル生成物が通常差分へ混入しないことを確認した。",
+        "  - Validation Evidence:"
+      ],
+      "final_start": 212,
+      "final_end": 214,
+      "final_text": [
+        "    - 初回レビューで、指定された設定プロファイルが存在しない場合の代用処理に阻害指摘があり、修正後の2回目には指摘なしを確認した。最新パケットを保持するバッファは最新優先のままとし、`RUNTIME-HOST-010` の手動証跡を得てから判断する保留事項とした。",
+        "- `RUNTIME-HOST-010`: `Tracker.RuntimeHost` / `Tracker.DebugHost` の分離について、対象を絞った検証と手動証跡を揃えた。両者のテストとビルド、diagnostics sample sidecar の証跡、旧形式での機能制限の証跡、`Tracker.DebugHost` の UI の正常動作、`Tracker.RuntimeHost` の画面なしの正常動作を、委任した担当者の報告に残した。`.gitignore` に実行時と診断用キャプチャーの生成物を追加し、手元の生成物が通常の差分へ混入しないことを確認した。",
+        "  - 検証証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R009のmissing-profile代用処理指摘修正→r2なしとlatest優先方針の保留、R010の対象/手動証拠6範囲とgitignore生成物除外目的を保持。報告者の出所も維持。"
+    },
+    {
+      "block": "D16-B032",
+      "baseline_start": 140,
+      "baseline_end": 143,
+      "baseline_text": [
+        "    - RuntimeHost focused tests は 10 passed、adjusted boundary focused は 10 passed、diagnostics focused は 15 passed。",
+        "    - `Tracker.RuntimeHost` / `Tracker.DebugHost` / `Tracker.Tests` build、RuntimeHost 短時間 headless 起動、DebugHost HTTP 200 起動確認、`git diff --check`、`.gitignore` artifact ignore 確認は sub-agent report で成功を確認した。",
+        "    - broad focused は既知の `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` 1 件のみ failure。現設計では DebugHost の Core loop adapter 残存を許容しているため、R010 blocker ではなく R011 final review で扱う hold とした。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 216,
+      "final_end": 219,
+      "final_text": [
+        "    - `Tracker.RuntimeHost` の対象テストは10件成功。境界の確認対象を調整したテストは10件成功。診断機能の対象テストは15件成功。",
+        "    - `Tracker.RuntimeHost` / `Tracker.DebugHost` / `Tracker.Tests` のビルド、画面なしでの短時間起動、`Tracker.DebugHost` の HTTP 200 応答、`git diff --check`、`.gitignore` の生成物除外は、委任した担当者の報告で成功を確認した。",
+        "    - 広い範囲のテストでは、既知の `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` の1件だけが失敗した。当時の設計は `Tracker.DebugHost` から `Tracker.Core` の周期処理への接続部分を残すことを許容していたため、この作業の完了を妨げるものではなく、`RUNTIME-HOST-011` の最終レビューで扱う保留事項とした。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R010の10/10/15成功は3対象、3buildと2起動確認・diff/ignore確認、広い範囲の1既知失敗と当時の設計理由でR011へ保留した判断を保持。失敗を消さない。"
+    },
+    {
+      "block": "D16-B033",
+      "baseline_start": 145,
+      "baseline_end": 147,
+      "baseline_text": [
+        "    - review で blocking findings なし。既知 DebugHost ownership assertion failure は hold 継続が妥当と確認した。",
+        "- `RUNTIME-HOST-011`: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了した。final review で checked-in failing contract が blocking と判定されたため、`RuntimeHostDependencyBoundaryContractTests` を現設計に合わせ、DebugHost 全体の Core loop adapter を禁止する contract から UI / diagnostics replay / render source が operation loop を直接駆動しない contract へ狭めた。r2 review で blocking findings なし、PR ready 可を確認した。",
+        "  - Review Evidence:"
+      ],
+      "final_start": 221,
+      "final_end": 223,
+      "final_text": [
+        "    - レビューで阻害指摘なし。既知の `Tracker.DebugHost` の責務に関する検証失敗は、保留を続けることが妥当と確認した。",
+        "- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離の最終レビュー、進捗同期、PR の提出準備を完了した。最終レビューで、リポジトリに残る失敗した契約テストが完了を妨げると判定されたため、`RuntimeHostDependencyBoundaryContractTests` を当時の設計へ合わせた。`Tracker.DebugHost` 全体から `Tracker.Core` の周期処理への接続を禁止する契約ではなく、UI / 診断再生 / 描画元のソースコードが周期処理を直接駆動しない契約に限定した。2回目のレビューで阻害指摘なしとなり、PR を提出できると確認した。",
+        "  - レビュー証跡:"
+      ],
+      "disposition": "fixed",
+      "reason": "R010の保留継続妥当というreview、R011で残存failing contractが阻害と判定→設計に合わせUI/診断/描画の直接駆動禁止へ限定→r2なし/PR提出可という経緯を保持。今回の完了条件変更ではない。"
+    },
+    {
+      "block": "D16-B034",
+      "baseline_start": 151,
+      "baseline_end": 151,
+      "baseline_text": [
+        "    - 初回 final review は checked-in failing contract を blocking と判定した。review-fix 後、`RuntimeHostDependencyBoundaryContractTests` は 3 passed、split/boundary focused は 11 passed、`Tracker.Tests` build と `git diff --check` は pass。r2 review で no findings / PR ready 可を確認した。"
+      ],
+      "final_start": 227,
+      "final_end": 227,
+      "final_text": [
+        "    - 初回の最終レビューでは、リポジトリに残る失敗した契約テストが完了を妨げると判定された。修正後、`RuntimeHostDependencyBoundaryContractTests` は3件成功、分離と境界の対象テストは11件成功、`Tracker.Tests` のビルドと `git diff --check` は成功。2回目のレビューで指摘がなく、PR を提出できると確認した。"
+      ],
+      "disposition": "fixed",
+      "reason": "R011初回阻害、修正後境界3成功/分離11成功、Tests build/diff成功、r2指摘なし/提出可という根拠を全保持。"
+    },
+    {
+      "block": "D16-B035",
+      "baseline_start": 153,
+      "baseline_end": 153,
+      "baseline_text": [
+        "## 固定残タスク"
+      ],
+      "final_start": 229,
+      "final_end": 229,
+      "final_text": [
+        "## 固定した作業範囲（当時の計画）"
+      ],
+      "disposition": "fixed",
+      "reason": "固定残タスク見出しは、すでに完了が記録された当時の固定作業計画であることが分かるようにする。元の計画を削除しない。"
+    },
+    {
+      "block": "D16-B036",
+      "baseline_start": 155,
+      "baseline_end": 166,
+      "baseline_text": [
+        "- 固定一覧は `RUNTIME-HOST-001` から `RUNTIME-HOST-011` とする。RuntimeHost / DebugHost 分離 scope では `RAW-VISION-*` や `TRACKER-*` を追加しない。",
+        "- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了する。設計資料を `Tracker/Design/` 配下へ移動し、active tracking を統合し、RuntimeHost / DebugHost の責務境界、AutoRef 将来内包、loop isolation、旧ログ互換非要件を設計へ反映する。",
+        "- `RUNTIME-HOST-002`: RuntimeHost / DebugHost project dependency boundary contract を追加する。RuntimeHost が DebugHost / Web UI / diagnostics replay UI に依存しないこと、DebugHost が tracker operation loop の主責務を持たず read-side であることを failing tests として固定する。",
+        "- `RUNTIME-HOST-003`: diagnostics sample boundary と legacy degraded contract を追加する。diagnostics sample tick が tracker committed frame cadence に依存しないこと、Diagnostics `Vision Input` が diagnostics sample sidecar から復元されること、旧 render snapshot sidecar が unsupported / degraded legacy であることを failing tests として固定する。",
+        "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` project / namespace / 起動経路へ rename する。現 `Tracker.Server` の Web UI / diagnostics / replay / capture viewer 責務を DebugHost として明確化し、既存 debug normal path を壊さない。",
+        "- `RUNTIME-HOST-005`: tracker operation loop の共有 runtime boundary を抽出する。SSL-Vision input、tracker update、official tracker packet publish、latest tracker snapshot 公開の境界を UI / diagnostics logging から分離し、RuntimeHost から再利用できる形にする。",
+        "- `RUNTIME-HOST-006`: DebugHost live display を read-side snapshot 境界へ寄せる。UI render tick ごとに raw / tracked / 3rd party tracker の latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しない構造にする。",
+        "- `RUNTIME-HOST-007`: DebugHost diagnostics sample sidecar fast path を実装する。diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定して保存し、新規 capture / logging の bounded lookup を主経路にする。",
+        "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` headless project scaffold と configuration を追加する。Web UI / diagnostics replay / capture viewer を持たない headless host として起動できる project / Program / options / DI bootstrap / solution entry を追加し、`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開する。",
+        "- `RUNTIME-HOST-009`: RuntimeHost tracker operation loop と official packet publish normal path を実装する。SSL-Vision input、tracker state update、official tracker packet publish、DebugHost が読める latest tracker snapshot 公開を headless host の正常系として成立させ、RuntimeHost 実行周期を `RuntimeHost:OperationLoopIntervalMilliseconds` で制御する。",
+        "- `RUNTIME-HOST-010`: RuntimeHost / DebugHost split の focused validation と manual evidence を揃える。RuntimeHost / DebugHost build、focused tests、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残す。",
+        "- `RUNTIME-HOST-011`: RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する。gpt-5.5 high review、必要な修正と r2、tracking sync、report references、validation evidence、Draft PR #17 ready 化を完了する。"
+      ],
+      "final_start": 231,
+      "final_end": 242,
+      "final_text": [
+        "- 固定一覧は `RUNTIME-HOST-001` から `RUNTIME-HOST-011` とする。両プロジェクトの分離の範囲では、`RAW-VISION-*` や `TRACKER-*` を追加しない。",
+        "- `RUNTIME-HOST-001`: 分離方針と設計資料の統合を完了する。設計資料を `Tracker/Design/` へ移し、進行中の作業の管理文書を統合する。両プロジェクトの責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としない方針を設計へ反映する。",
+        "- `RUNTIME-HOST-002`: 両プロジェクトの依存境界を検査する契約テストを追加する。`Tracker.RuntimeHost` が `Tracker.DebugHost` / Web UI / 診断再生 UI に依存しないこと、`Tracker.DebugHost` がトラッカーの周期処理の主責務を持たず、読み取りを担当することを、実装に先行する失敗テストで固定する。",
+        "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加する。diagnostics sample tick が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が diagnostics sample sidecar から復元され、旧形式の render snapshot を保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。",
+        "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` というプロジェクト名、名前空間、起動経路へ変更する。Web UI / 診断 / 再生 / キャプチャー確認画面の責務を明確にし、既存の診断用機能の正常動作を壊さない。",
+        "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を抽出する。SSL-Vision 入力、追跡状態の更新、公式トラッカーパケットの送信、最新の追跡スナップショットの公開を UI と診断保存から分離し、`Tracker.RuntimeHost` から再利用できる形にする。",
+        "- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離する。UI の描画更新ごとに raw vision / 自前トラッカー / 外部トラッカーの変更されない最新スナップショットを固定し、Web UI の描画更新がトラッカーの周期処理を駆動しない構造にする。",
+        "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装する。diagnostics sample tick で最新の未加工入力と追跡結果のスナップショットを固定して保存する。新規キャプチャーでは、保存された診断ログを参照量を制限して検索する経路を主に使う。",
+        "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` が画面なしで起動するための最小構成と設定を追加する。Web UI / 診断再生 / キャプチャー確認画面を持たないプロジェクト、`Program`、設定と DI の初期化処理、`Duck.slnx` への登録を追加する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開する。",
+        "- `RUNTIME-HOST-009`: `Tracker.RuntimeHost` の周期処理と公式パケット送信の正常経路を実装する。SSL-Vision 入力、追跡状態の更新、公式トラッカーパケットの送信、`Tracker.DebugHost` が読める最新の追跡スナップショットの公開を、画面なしで成立させる。実行周期は `RuntimeHost:OperationLoopIntervalMilliseconds` で制御する。",
+        "- `RUNTIME-HOST-010`: 両プロジェクトの分離について、対象を絞った検証と手動証跡を揃える。ビルド、対象テスト、diagnostics sample sidecar の証跡、旧形式での機能制限、`Tracker.DebugHost` の UI の正常動作、`Tracker.RuntimeHost` の画面なしの正常動作を報告書に残す。",
+        "- `RUNTIME-HOST-011`: 分離の最終レビュー、進捗同期、PR の提出準備を完了する。`gpt-5.5 high` によるレビュー、必要な修正と再レビュー、進捗同期、報告書の参照、検証証跡、下書き PR #17 を提出できる状態への更新を完了する。"
+      ],
+      "disposition": "fixed",
+      "reason": "固定11作業とRAW-VISION/TRACKER追加禁止を全12行で照合。依存境界・新規/旧形式・失敗先行・共有責務・3source・高速保存・headless構成・設定周期・検証/手動・レビュー提出の全条件を保持。実レビュー設定とUI/保存物/プロジェクト名を明記。"
+    },
+    {
+      "block": "D16-B037",
+      "baseline_start": 170,
+      "baseline_end": 173,
+      "baseline_text": [
+        "- Core / tracker engine 系の旧 tracking は `Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。",
+        "- DebugHost / raw vision / diagnostics 系の旧 tracking は `Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。",
+        "- 旧 `RAW-VISION-013` から `RAW-VISION-016` は PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に merge 済み。",
+        "- `RAW-VISION-017` として開始した loop isolation 設計は、RuntimeHost / DebugHost 分離方針へ scope を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。"
+      ],
+      "final_start": 246,
+      "final_end": 249,
+      "final_text": [
+        "- `Tracker.Core` と追跡エンジンの旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。",
+        "- `Tracker.DebugHost`、raw vision、診断機能の旧進捗文書は、`Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。",
+        "- 旧 `RAW-VISION-013` から `RAW-VISION-016` は、PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に取り込み済み。",
+        "- `RAW-VISION-017` として開始した処理周期の分離設計は、`Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針へ対象を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。"
+      ],
+      "disposition": "fixed",
+      "reason": "CoreとDebugHost旧進捗4参照、RAW013〜016のPR15実題名と2026-05-14T03:29:25Z、RAW017からRuntime001へ範囲拡張で統合という事実を保持。raw映像と処理系系の誤記を修正。"
+    },
+    {
+      "block": "D16-B038",
+      "baseline_start": 175,
+      "baseline_end": 175,
+      "baseline_text": [
+        "## タスク一覧"
+      ],
+      "final_start": 251,
+      "final_end": 251,
+      "final_text": [
+        "## 作業一覧（当時の完了記録）"
+      ],
+      "disposition": "fixed",
+      "reason": "作業一覧が当時の完了記録であることを明記し、現在のPR20完了判定へ流用しない。"
+    },
+    {
+      "block": "D16-B039",
+      "baseline_start": 177,
+      "baseline_end": 177,
+      "baseline_text": [
+        "| ID | タスク | フェーズ | 状態 | 依存関係 | 完了条件 |"
+      ],
+      "final_start": 253,
+      "final_end": 253,
+      "final_text": [
+        "| ID | 作業 | 段階 | 状態 | 依存関係 | 完了条件 |"
+      ],
+      "disposition": "accepted",
+      "reason": "ID/作業/段階/状態/依存関係/完了条件の6列を維持。"
+    },
+    {
+      "block": "D16-B040",
+      "baseline_start": 179,
+      "baseline_end": 189,
+      "baseline_text": [
+        "| RUNTIME-HOST-001 | `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了する | design | complete; draft PR #17 | PR #15 merge complete | `Tracker/Design/` へ設計資料と active tracking を統合し、RuntimeHost / DebugHost の命名、責務境界、AutoRef 将来内包、loop isolation、旧ログ互換非要件、BreakingChanges 不要を設計へ固定し、gpt-5.5 high r2 review で blocking findings なしを確認した。 |",
+        "| RUNTIME-HOST-002 | RuntimeHost / DebugHost project dependency boundary contract を追加する | verification | complete; draft PR #17 | RUNTIME-HOST-001 | RuntimeHost が DebugHost / Web UI / diagnostics replay UI に依存しないこと、DebugHost が tracker operation loop の主責務を持たず read-side であることを Red test として固定し、r2 review で blocking findings なしを確認した。 |",
+        "| RUNTIME-HOST-003 | diagnostics sample boundary と legacy degraded contract を追加する | verification | complete; draft PR #17 | RUNTIME-HOST-002 | diagnostics sample tick が tracker committed frame cadence / `WorldFrameCommitted` に依存しないこと、Diagnostics `Vision Input` が diagnostics sample sidecar から復元されること、旧 render snapshot sidecar が unsupported / degraded legacy であることを Red contract として固定し、review で blocking findings なしを確認した。 |",
+        "| RUNTIME-HOST-004 | `Tracker.Server` を `Tracker.DebugHost` project / namespace / 起動経路へ rename する | implementation | complete; draft PR #17 | RUNTIME-HOST-003 | 現 `Tracker.Server` の Web UI / diagnostics / replay / capture viewer 責務を `Tracker.DebugHost` として明確化し、既存 debug normal path、README、launch settings、solution / project reference を維持し、review で blocking findings なしを確認した。 |",
+        "| RUNTIME-HOST-005 | tracker operation loop の共有 runtime boundary を抽出する | implementation | complete; draft PR #17 | RUNTIME-HOST-004 | `Tracker.Core/Runtime` に UI 非依存 shared operation loop、publisher、latest snapshot store を抽出し、DebugHost を Core coordinator 呼び出し adapter に寄せた。focused tests / build / review で blocking findings なしを確認した。 |",
+        "| RUNTIME-HOST-006 | DebugHost live display を read-side snapshot 境界へ寄せる | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により DebugHost live display が UI render tick ごとに latest immutable snapshot を固定し、Web rendering tick が tracker operation loop を駆動しないことを focused tests / build / review で確認した。 |",
+        "| RUNTIME-HOST-007 | DebugHost diagnostics sample sidecar fast path を実装する | implementation | complete; draft PR #17 | RUNTIME-HOST-003, RUNTIME-HOST-006 | UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って latest raw / tracker snapshot を `diagnostics-samples.jsonl` へ保存し、Diagnostics replay / Field は sample sidecar の bounded lookup と semantic summary を主経路にする。focused / affected tests、build、diff-check は sub-agent report で green。初回 review は blocking 2 件、review-fix 後 r2 は Pass、設定化後 r3 は no findings、RuntimeHost 実行周期設定化要件追加後 r4 は no findings。 |",
+        "| RUNTIME-HOST-008 | `Tracker.RuntimeHost` headless project scaffold と configuration を追加する | implementation | complete; draft PR #17 | RUNTIME-HOST-005 | Web UI / diagnostics replay / capture viewer を持たない `Tracker.RuntimeHost` project、Program / options / DI bootstrap / solution entry を追加し、tracker only と将来 tracker + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 validation error とする contract を focused tests / build / review / commit / Draft PR #17 update 付きで固定した。 |",
+        "| RUNTIME-HOST-009 | RuntimeHost tracker operation loop と official packet publish normal path を実装する | implementation | complete; draft PR #17 | RUNTIME-HOST-007, RUNTIME-HOST-008 | RuntimeHost が SSL-Vision input を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って tracker state を更新し、official tracker packet を publish し、DebugHost が読める latest tracker snapshot を公開する正常系を focused tests / build / review / commit / Draft PR #17 update 付きで成立させた。 |",
+        "| RUNTIME-HOST-010 | RuntimeHost / DebugHost split の focused validation と manual evidence を揃える | review | complete; draft PR #17 | RUNTIME-HOST-009 | RuntimeHost / DebugHost の focused tests と build、diagnostics sample evidence、legacy degraded evidence、DebugHost UI normal path、RuntimeHost headless normal path の証跡を report に残し、task review で no findings を確認した。 |",
+        "| RUNTIME-HOST-011 | RuntimeHost / DebugHost split の final review / tracking sync / PR ready を完了する | review | complete; PR #17 ready | RUNTIME-HOST-010 | final review、blocking fix、r2 review、tracking sync、report references、validation evidence、commit 履歴、Draft PR #17 description 最新化、PR ready 判断を完了した。 |"
+      ],
+      "final_start": 255,
+      "final_end": 265,
+      "final_text": [
+        "| `RUNTIME-HOST-001` | 分離方針と設計資料を統合する | 設計 | 完了、下書き PR #17 | PR #15 取り込み完了 | 設計資料と進行中の作業の管理文書を `Tracker/Design/` へ統合し、両プロジェクトの命名、責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としない方針、`BreakingChanges` が不要なことを固定した。`gpt-5.5 high` による2回目のレビューで阻害指摘なし。 |",
+        "| `RUNTIME-HOST-002` | 両プロジェクトの依存境界を検査する契約テストを追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-001` | `Tracker.RuntimeHost` が `Tracker.DebugHost` / Web UI / 診断再生 UI に依存せず、`Tracker.DebugHost` がトラッカーの周期処理の主責務を持たず読み取りを担当することを、実装に先行する失敗テストで固定した。2回目のレビューで阻害指摘なし。 |",
+        "| `RUNTIME-HOST-003` | diagnostics sample tick の境界と旧形式の機能制限の契約を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | diagnostics sample tick は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は diagnostics sample sidecar から復元し、旧形式の render snapshot を保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |",
+        "| `RUNTIME-HOST-004` | Tracker.Server のプロジェクト名、名前空間、起動経路を Tracker.DebugHost へ変更する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003` | Web UI / 診断 / 再生 / キャプチャー確認画面の責務を `Tracker.DebugHost` として明確にした。既存の診断用機能の正常動作、README、起動設定、`Duck.slnx` とプロジェクトの参照を維持した。レビューで阻害指摘なし。 |",
+        "| `RUNTIME-HOST-005` | トラッカーの周期処理で共有する実行時の責務を抽出する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-004` | UI に依存しない共通の周期処理、送信処理、最新スナップショットの保存を `Tracker.Core/Runtime` へ抽出し、`Tracker.DebugHost` は `TrackerCoordinator` を呼ぶ接続部分とした。対象テスト、ビルド、レビューを実施し、阻害指摘なし。 |",
+        "| `RUNTIME-HOST-006` | Tracker.DebugHost のライブ表示をスナップショットの読み取り側へ分離する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により、UI の描画更新ごとに変更されない最新スナップショットを固定し、Web UI の描画更新がトラッカーの周期処理を駆動しないことを、対象テスト、ビルド、レビューで確認した。 |",
+        "| `RUNTIME-HOST-007` | Tracker.DebugHost に diagnostics sample sidecar を高速に読み書きする経路を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003`, `RUNTIME-HOST-006` | UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従い、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。対象と影響範囲を絞ったテスト、ビルド、差分検査は担当者の報告で成功。初回レビューの阻害2件を修正し、2回目は成功。周期を設定可能にした後の3回目、RuntimeHost の周期設定要件を追加した後の4回目には指摘なし。 |",
+        "| `RUNTIME-HOST-008` | Tracker.RuntimeHost が画面なしで起動するための最小構成と設定を追加する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | Web UI / 診断再生 / キャプチャー確認画面を持たないプロジェクト、`Program`、設定と DI の初期化、`Duck.slnx` への登録を追加し、トラッカー単独と将来の自動レフェリー組み込みの境界を表現した。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0以下では起動時の検証が失敗する契約を、対象テスト、ビルド、レビュー、コミット、下書き PR #17 の更新とともに固定した。 |",
+        "| `RUNTIME-HOST-009` | Tracker.RuntimeHost の周期処理と公式パケット送信の正常経路を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-007`, `RUNTIME-HOST-008` | SSL-Vision 入力を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` に従って追跡状態を更新し、公式トラッカーパケットを送信し、`Tracker.DebugHost` が読める最新の追跡スナップショットを公開する正常経路を、対象テスト、ビルド、レビュー、コミット、下書き PR #17 の更新とともに成立させた。 |",
+        "| `RUNTIME-HOST-010` | 両プロジェクトの分離について対象検証と手動証跡を揃える | 確認 | 完了、下書き PR #17 | `RUNTIME-HOST-009` | 両プロジェクトの対象テストとビルド、diagnostics sample sidecar の証跡、旧形式の機能制限、DebugHost の UI の正常動作、RuntimeHost の画面なしの正常動作を報告書に残した。作業ごとのレビューで指摘なし。 |",
+        "| `RUNTIME-HOST-011` | 両プロジェクトの分離の最終レビュー、進捗同期、PR の提出準備を完了する | 確認 | 完了、PR #17 提出可能 | `RUNTIME-HOST-010` | 最終レビュー、阻害指摘の修正、再レビュー、進捗同期、報告書の参照、検証証跡、コミット履歴、下書き PR #17 の説明更新、提出可能であることの判断を完了した。 |"
+      ],
+      "disposition": "fixed",
+      "reason": "11行6列を原文と個別照合。各ID/依存/当時状態/終了条件、先行失敗と実装成功の違い、R007の初回2阻害とr2/r3/r4、R008周期0以下失敗、コミット/PR更新、最終提出可の判断を保持。長い漢字連結を解き、原文の意味を本文の作業別履歴にも保つ。"
+    }
+  ],
+  "additional_current_text_review": {
+    "ranges": [
+      [
+        7,
+        36
+      ],
+      [
+        81,
+        124
+      ]
+    ],
+    "reason": "比較元にはないDOC-LINT-001〜003、承認/検査経過、現状更新も読み、条件・失敗結果・許可方針と自己点検の位置付けを確認。"
+  }
+}
