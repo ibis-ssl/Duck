@@ -1,0 +1,286 @@
+{
+  "time": "2026-09-17T08:18:58.328762+09:00",
+  "head": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "semantic_completion_claim": false,
+  "source_blobs": [
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:feedback-points/feedback-points.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "5ab0a5ed7b9f97ce4ccd6e3090f1e803800925107c2ca786eb06d6467d332807"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:README.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "320c94653f578af55a25c7f3c6855b558d0079b76de634f97a29d2a8d1f27cd5"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "5bde2e8eeff429c4455e4670a986f63d05f0545a:tools/lint/README.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "e13957c11f5038743461bcc622388cefde2bd3d6dc7692ffd32a444f40b5a9c5"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/Core/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/Core/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/DebugHost/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/DebugHost/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-architecture-plan.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "a5aa5de4b89f0b602afe58ac62ecce417d490c87fed981da91e4f6a3211d42af"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-core-engine-detail-design.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "4079fce001ddbaacf1290a5c40721052c2c467b7d4d2669b21ed7029217664cb"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-history-000-038.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "8d925a45a1882ce418ecd071674e712c3f2b893cb9d51ba6a6122a2894c9f77e"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-test-maintainability-detail-design.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "f1dcc99a0bb26342d3b025369a1a59cf8969523e24715dcd7a9d3c9b2b377388"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "093320f39f9a748566fbdb02e45d7a060a8dc1abba31f7d6385935429a38d073"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/DebugHost/debug-host-maintainability-design.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "00a0b59f2058df331e7c6ceb4149021eac2763ffe72c9b7b091ca46c1afa3583"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/DebugHost/raw-vision-viewer-plan.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "ef3e666908c06d1278ebfadecd6262981797806823ae5b226a3cec3b6cbd0928"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "68140c59f02d01ce7f3023c9149f8c4001042d30546f485cd9e9460e5403acdd"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/RuntimeHost/runtime-host-plan.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "179b4c1dc4f37d3d02b735b1d5aeb1a8e697f094f3b172295150fb996418e1c1"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "b775cabd85c09837cc15cf47c28d87c08549e3b71b483e406871e6bb1372714d"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Tracker.CaptureReplay/README.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "dea685a8640bca95a6cfd4bbe4ae5c1ea35c4de850ce3d84e886f3c3b2c7ad9a"
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Tracker.DebugHost/README.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "sha256": "de1fe8545858abc99c9e75da2ad24dd3cf921189cb27117b837a705019aa23e5"
+    }
+  ],
+  "history_snapshots": [
+    {
+      "source": "Tracker/Design/Archive/Core/tasks-status.md",
+      "snapshot": "reports/history/core-tasks-before-terminology.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/Core/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "original_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+      "snapshot_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+      "expected_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+      "passed": true
+    },
+    {
+      "source": "Tracker/Design/Archive/Core/phases-status.md",
+      "snapshot": "reports/history/core-phases-before-terminology.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/Core/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "original_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+      "snapshot_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+      "expected_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+      "passed": true
+    },
+    {
+      "source": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "snapshot": "reports/history/debughost-tasks-before-terminology.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/DebugHost/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "original_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+      "snapshot_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+      "expected_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+      "passed": true
+    },
+    {
+      "source": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "snapshot": "reports/history/debughost-phases-before-terminology.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/DebugHost/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "original_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+      "snapshot_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+      "expected_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+      "passed": true
+    }
+  ],
+  "source_index_errors": [],
+  "guide_example_original_occurrences": [
+    "O000080",
+    "O000123",
+    "O000124"
+  ],
+  "summary": {
+    "occurrences": 4336,
+    "unique_ids": 4336,
+    "source_index_errors": 0,
+    "history_snapshots": 4,
+    "history_errors": 0,
+    "guide_example_original_occurrences": [
+      "O000080",
+      "O000123",
+      "O000124"
+    ]
+  },
+  "occurrence_details": {
+    "archive": "scope-diagnostic-logs.tar.gz",
+    "member": "source-index-20260917-0820.json",
+    "sha256": "7a7f8d0eb402cbe965a519021c00579db4943204bf88dd190af27dd0ac2fadcc"
+  }
+}

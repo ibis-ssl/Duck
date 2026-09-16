@@ -1,0 +1,1992 @@
+{
+  "time": "2026-09-17T08:14:10.457712+09:00",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-head.stdout",
+          "sha256": "bb3b507e04cd8e89989899736597c261bc94c572fe0cbdc08fc54d42e081d2ff"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-head.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-head.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--short",
+        "--untracked-files=all"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-status.stdout",
+          "sha256": "60aeb9482e815d2977281abb563bdf1e0cbc683980d6c561af9d8616984ee1be"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-status.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-status.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-status",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4...HEAD",
+        "--",
+        "*.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-markdown-diff.stdout",
+          "sha256": "1af0a0cfdb68ee998ff8e95367520e397401094fd8f9cdcf723310a75a9ee856"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-markdown-diff.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-markdown-diff.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "node",
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/skills/review-enforcer/scripts/list-markdown-targets.js"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-targets.stdout",
+          "sha256": "5e2e39e231d350996b00047ce721c139abb8cd859fcb6ed4b22adb51c4fd074e"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-targets.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-targets.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:feedback-points/feedback-points.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-0.stdout",
+          "sha256": "5ab0a5ed7b9f97ce4ccd6e3090f1e803800925107c2ca786eb06d6467d332807"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-0.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-0.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:README.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-1.stdout",
+          "sha256": "320c94653f578af55a25c7f3c6855b558d0079b76de634f97a29d2a8d1f27cd5"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-1.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "5bde2e8eeff429c4455e4670a986f63d05f0545a:tools/lint/README.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-2.stdout",
+          "sha256": "e13957c11f5038743461bcc622388cefde2bd3d6dc7692ffd32a444f40b5a9c5"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-2.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/Core/phases-status.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-3.stdout",
+          "sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-3.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-3.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/Core/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-4.stdout",
+          "sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-4.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-4.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/DebugHost/phases-status.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-5.stdout",
+          "sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-5.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-5.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Archive/DebugHost/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-6.stdout",
+          "sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-6.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-6.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-architecture-plan.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-7.stdout",
+          "sha256": "a5aa5de4b89f0b602afe58ac62ecce417d490c87fed981da91e4f6a3211d42af"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-7.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-7.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-core-engine-detail-design.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-8.stdout",
+          "sha256": "4079fce001ddbaacf1290a5c40721052c2c467b7d4d2669b21ed7029217664cb"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-8.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-8.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-history-000-038.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-9.stdout",
+          "sha256": "8d925a45a1882ce418ecd071674e712c3f2b893cb9d51ba6a6122a2894c9f77e"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-9.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-9.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/Core/tracker-test-maintainability-detail-design.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-10.stdout",
+          "sha256": "f1dcc99a0bb26342d3b025369a1a59cf8969523e24715dcd7a9d3c9b2b377388"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-10.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-10.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-11.stdout",
+          "sha256": "093320f39f9a748566fbdb02e45d7a060a8dc1abba31f7d6385935429a38d073"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-11.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-11.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/DebugHost/debug-host-maintainability-design.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-12.stdout",
+          "sha256": "00a0b59f2058df331e7c6ceb4149021eac2763ffe72c9b7b091ca46c1afa3583"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-12.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-12.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/DebugHost/raw-vision-viewer-plan.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-13.stdout",
+          "sha256": "ef3e666908c06d1278ebfadecd6262981797806823ae5b226a3cec3b6cbd0928"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-13.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-13.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/phases-status.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-14.stdout",
+          "sha256": "68140c59f02d01ce7f3023c9149f8c4001042d30546f485cd9e9460e5403acdd"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-14.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-14.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/RuntimeHost/runtime-host-plan.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-15.stdout",
+          "sha256": "179b4c1dc4f37d3d02b735b1d5aeb1a8e697f094f3b172295150fb996418e1c1"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-15.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-15.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Design/tasks-status.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-16.stdout",
+          "sha256": "b775cabd85c09837cc15cf47c28d87c08549e3b71b483e406871e6bb1372714d"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-16.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-16.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Tracker.CaptureReplay/README.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-17.stdout",
+          "sha256": "dea685a8640bca95a6cfd4bbe4ae5c1ea35c4de850ce3d84e886f3c3b2c7ad9a"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-17.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-17.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:Tracker/Tracker.DebugHost/README.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-baseline-18.stdout",
+          "sha256": "de1fe8545858abc99c9e75da2ad24dd3cf921189cb27117b837a705019aa23e5"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-baseline-18.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-baseline-18.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "command": [
+        "node",
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/skills/review-enforcer/scripts/list-markdown-targets.js",
+        "--files",
+        "README.md",
+        "Tracker/Tracker.DebugHost/README.md"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-after-20260917-0815-documented-example.stdout",
+          "sha256": "a750159082f6ce50dc0f20bbe0622ff08a9dc2d77bb86a63aa2a65bb795042d8"
+        },
+        "stderr": {
+          "file": "scope-after-20260917-0815-documented-example.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-after-20260917-0815-documented-example.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    }
+  ],
+  "semantic_completion_claim": false,
+  "head": [
+    "efe76c3dccd3683813415b7fc6f4c6b3a1764007"
+  ],
+  "status": [
+    " M tools/lint/README.md",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/check_scope.py",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-after-20260917-0815-head.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-after-20260917-0815-head.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-after-20260917-0815-head.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-0.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-0.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-0.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-1.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-1.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-1.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-10.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-10.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-10.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-11.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-11.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-11.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-12.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-12.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-12.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-13.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-13.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-13.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-14.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-14.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-14.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-15.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-15.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-15.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-16.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-16.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-16.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-17.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-17.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-17.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-18.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-18.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-18.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-2.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-2.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-2.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-3.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-3.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-3.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-4.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-4.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-4.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-5.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-5.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-5.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-6.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-6.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-6.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-7.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-7.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-7.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-8.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-8.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-8.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-9.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-9.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-baseline-9.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-documented-example.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-documented-example.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-documented-example.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-head.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-head.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-head.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-markdown-diff.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-markdown-diff.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-markdown-diff.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-status.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-status.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-status.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-targets.exit",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-targets.stderr",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814-targets.stdout",
+    "?? reports/diagnostics/wording-scope-check-20260917-0806/scope-before-20260917-0814.json"
+  ],
+  "markdown-diff": [
+    "M\tREADME.md",
+    "M\tTracker/Design/Archive/Core/phases-status.md",
+    "M\tTracker/Design/Archive/Core/tasks-status.md",
+    "M\tTracker/Design/Archive/DebugHost/phases-status.md",
+    "M\tTracker/Design/Archive/DebugHost/tasks-status.md",
+    "M\tTracker/Design/Core/tracker-architecture-plan.md",
+    "M\tTracker/Design/Core/tracker-core-engine-detail-design.md",
+    "M\tTracker/Design/Core/tracker-history-000-038.md",
+    "M\tTracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "M\tTracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "M\tTracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "M\tTracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "M\tTracker/Design/RuntimeHost/runtime-host-plan.md",
+    "M\tTracker/Design/phases-status.md",
+    "M\tTracker/Design/tasks-status.md",
+    "M\tTracker/Tracker.CaptureReplay/README.md",
+    "M\tTracker/Tracker.DebugHost/README.md",
+    "M\tfeedback-points/feedback-points.md",
+    "A\treports/design-prose-japanese-20260915142353.md",
+    "A\treports/diagnostics/wording-occurrence-audit-20260916/batch-history-design.md",
+    "A\treports/doc-lint-001-implementation-20260516221628.md",
+    "A\treports/doc-lint-001-prh-integration-20260517104319.md",
+    "A\treports/doc-lint-001-review-20260516233048.md",
+    "A\treports/doc-lint-002-review-20260517104319.md",
+    "A\treports/doc-lint-002-review-r2-20260517104319.md",
+    "A\treports/doc-lint-002-sudachipy-vocabulary-20260517104319.md",
+    "A\treports/doc-lint-chikkarpy-registration-20260915.md",
+    "A\treports/doc-lint-final-review-20260517085006.md",
+    "A\treports/doc-lint-full-architecture-gpt55-20260517100000.md",
+    "A\treports/doc-lint-full-core-detail-gpt55-20260517100000.md",
+    "A\treports/doc-lint-full-core-history-gpt55-20260517100000.md",
+    "A\treports/doc-lint-full-debughost-detail-gpt55-20260517100000.md",
+    "A\treports/doc-lint-full-raw-vision-gpt55-20260517100000.md",
+    "A\treports/doc-lint-full-runtimehost-gpt55-20260517100000.md",
+    "A\treports/doc-lint-gpt55-high-lint-only-20260517094500.md",
+    "A\treports/doc-lint-handover-20260519113733.md",
+    "A\treports/doc-lint-noun-extraction-20260517133815.md",
+    "A\treports/doc-lint-proper-noun-extraction-20260517133249.md",
+    "A\treports/doc-lint-report-exclusion-review-20260516234234.md",
+    "A\treports/doc-lint-report-exclusion-review-r2-20260516234840.md",
+    "A\treports/doc-lint-resume-20260915.md",
+    "A\treports/doc-lint-root-docs-worker-20260516235249.md",
+    "A\treports/doc-lint-source-cleanup-architecture-20260517093000.md",
+    "A\treports/doc-lint-source-cleanup-debughost-cli-20260517093000.md",
+    "A\treports/doc-lint-source-cleanup-raw-vision-20260517093000.md",
+    "A\treports/doc-lint-source-cleanup-small-docs-20260517093000.md",
+    "A\treports/doc-lint-synonym-extraction-20260517165117.md",
+    "A\treports/doc-lint-text-active-status-20260517003617.md",
+    "A\treports/doc-lint-text-archive-status-20260517003617.md",
+    "A\treports/doc-lint-text-design-details-20260517003617.md",
+    "A\treports/doc-lint-text-root-readmes-20260517003617.md",
+    "A\treports/doc-lint-tracker-design-core-worker-20260516235249.md",
+    "A\treports/doc-lint-tracker-design-hosts-worker-20260516235249.md",
+    "A\treports/doc-lint-tracker-readmes-worker-20260516235249.md",
+    "A\treports/doc-lint-whitelist-approved-temporary-20260517084346.md",
+    "A\treports/doc-lint-whitelist-compound-term-proposal-20260517002025.md",
+    "A\treports/doc-lint-whitelist-definition-investigation-20260517001129.md",
+    "A\treports/doc-lint-whitelist-edit-20260517003131.md",
+    "A\treports/doc-lint-whitelist-proposal-compounds-20260517085723.md",
+    "A\treports/doc-lint-whitelist-proposal-identifiers-20260517085723.md",
+    "A\treports/doc-lint-whitelist-proposal-japanese-20260517085723.md",
+    "A\treports/doc-lint-whitelist-suspicious-alias-audit-20260517090027.md",
+    "A\treports/history/core-phases-before-terminology.md",
+    "A\treports/history/core-tasks-before-terminology.md",
+    "A\treports/history/debughost-phases-before-terminology.md",
+    "A\treports/history/debughost-tasks-before-terminology.md",
+    "A\treports/lint-dispositions/README.md",
+    "A\treports/lint-dispositions/checker-plan.md",
+    "A\treports/lint-dispositions/clarifications.md",
+    "A\treports/lint-guide-clarity-20260916.md",
+    "A\treports/lint-remediation-overview.md",
+    "A\treports/markdown-lint-completion-20260916.md",
+    "A\treports/markdown-quotation-preservation-erratum-20260916.md",
+    "A\treports/markdown-whitelist-approved-20260915.md",
+    "A\treports/markdown-whitelist-update-20260915084730.md",
+    "A\treports/markdown-wording-followup-20260916.md",
+    "A\treports/markdown-wording-review-20260916.md",
+    "A\treports/task-doc-lint-003-archive-ledger-20260917072840.md",
+    "A\treports/task-doc-lint-003-core-wording-20260917070749.md",
+    "A\treports/task-doc-lint-003-debug-readme-20260917071805.md",
+    "A\treports/task-doc-lint-003-design-context-20260917074829.md",
+    "A\treports/task-doc-lint-003-diagnostic-handoff-20260917064359.md",
+    "A\treports/task-doc-lint-003-progress-wording-20260917072546.md",
+    "A\treports/task-doc-lint-003-raw-viewer-20260917071152.md",
+    "A\treports/task-doc-lint-term-classification-20260628203849.md",
+    "A\treports/task-doc-lint-term-classification-result-20260628203849.md",
+    "A\treports/task-doc-lint-term-classification-review-20260628204412.md",
+    "A\treports/task-doc-lint-term-wording-fix-20260628205344.md",
+    "A\treports/task-doc-lint-terminology-rules-20260519114244.md",
+    "A\treports/task-doc-lint-terminology-rules-fix-20260519115920.md",
+    "A\treports/task-doc-lint-terminology-rules-review-20260519115203.md",
+    "A\treports/task-doc-lint-terminology-rules-review-r2-20260628203849.md",
+    "A\treports/task-doc-lint-tracked-whitelist-review-20260628213441.md",
+    "A\treports/task-doc-lint-tracked-whitelist-update-20260628213011.md",
+    "A\treports/wording-naturalness-resume-20260916.md",
+    "A\ttools/lint/README.md"
+  ],
+  "targets": [
+    "feedback-points/feedback-points.md",
+    "README.md",
+    "tools/lint/README.md",
+    "Tracker/Design/Archive/Core/phases-status.md",
+    "Tracker/Design/Archive/Core/tasks-status.md",
+    "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "Tracker/Design/Core/tracker-architecture-plan.md",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "Tracker/Design/Core/tracker-history-000-038.md",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Tracker.CaptureReplay/README.md",
+    "Tracker/Tracker.DebugHost/README.md"
+  ],
+  "changed_markdown": [
+    {
+      "path": "README.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2"
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61"
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3"
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c"
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "b7a51040f936ea006e4ce96011b37e66776e540df7beac14063b1bd327bf9327"
+    },
+    {
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "a165e3c5d1b505c77f2d26c3793c0436c0a68067f2e31ef84f732043d9fa408d"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "54c3658423601c8aeacf9b8a6004bfd1ff12669a17fb7686bec85b0af1b4e178"
+    },
+    {
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "ee9d89fdeb6bdc417709eeb019850b1eda65945adb46e65ca35fd4f281916beb"
+    },
+    {
+      "path": "feedback-points/feedback-points.md",
+      "git_status": "M",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5"
+    },
+    {
+      "path": "reports/design-prose-japanese-20260915142353.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "c8657dfec432489d8a8028d8c84def6de48a9d9d8e0f02451e21c244b35a94ab"
+    },
+    {
+      "path": "reports/diagnostics/wording-occurrence-audit-20260916/batch-history-design.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "af9a6b7dc6b8c4d4347786f82fb4cbc8fad235287beed17c044d27adfba1765c"
+    },
+    {
+      "path": "reports/doc-lint-001-implementation-20260516221628.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "5ba75afafc8c7b0a95287cb7d959678c5edaebac1f18f047ef3ea3cdb689f58e"
+    },
+    {
+      "path": "reports/doc-lint-001-prh-integration-20260517104319.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "4a68f64d2de1c4410b5c895b0641f1cfb21f1c47ab0b5e4613cc632a2fff1e68"
+    },
+    {
+      "path": "reports/doc-lint-001-review-20260516233048.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "bf8651154c751077d5c7b04ff147f952afe643a610100583a5ba42f4fd3abca3"
+    },
+    {
+      "path": "reports/doc-lint-002-review-20260517104319.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "8d5d59c112b063f14bee35eb2ee9dc85dcc72d2820795d7c9b802c6c82a41ea5"
+    },
+    {
+      "path": "reports/doc-lint-002-review-r2-20260517104319.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "4e7ea913297588cea319c81b35e496370b1805988d658eef7483174c8c574692"
+    },
+    {
+      "path": "reports/doc-lint-002-sudachipy-vocabulary-20260517104319.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e497ecbe93773f0cda0d6678350f3e3baabb852508c8e03977b77bfe10ac00a7"
+    },
+    {
+      "path": "reports/doc-lint-chikkarpy-registration-20260915.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "ec6d2700394734149a9521307b4afd39e991ce2530da6982d3b4d4851fcbce37"
+    },
+    {
+      "path": "reports/doc-lint-final-review-20260517085006.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "47c81072a387814fc362146c9efd9b2035ad13a6efabcbedc3cdb8e4f2fa06aa"
+    },
+    {
+      "path": "reports/doc-lint-full-architecture-gpt55-20260517100000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "cf4e3a79dc5880238d68ca6215cce75c3a236ffcee8ed0f10918133035d81ce4"
+    },
+    {
+      "path": "reports/doc-lint-full-core-detail-gpt55-20260517100000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "c2e4b80be00de08fd2a25fcb71f0104029366e96cdf149a227841a1bbfc6cc42"
+    },
+    {
+      "path": "reports/doc-lint-full-core-history-gpt55-20260517100000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "ebb4ad0178daf0cd60bfc8b89b1fff083b6cfd9f8a3f828b324f8697101133ec"
+    },
+    {
+      "path": "reports/doc-lint-full-debughost-detail-gpt55-20260517100000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "2512234295da4ec174cd6a3c4d730e8c71d9cf2bf927b9858d7bb8e132d66488"
+    },
+    {
+      "path": "reports/doc-lint-full-raw-vision-gpt55-20260517100000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e563e7dcbfcaa92e33e830a4a5740f197499b787317dc469d0549e74c26ffb66"
+    },
+    {
+      "path": "reports/doc-lint-full-runtimehost-gpt55-20260517100000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "4cbad99390da4131be6acd6cc11f3502b61a397b2e3566db9b050a2647332cad"
+    },
+    {
+      "path": "reports/doc-lint-gpt55-high-lint-only-20260517094500.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "da6c8f3e9ad68c9dd5358d8cb82a9c6143427eb5456c27ec77683b8fdcc15138"
+    },
+    {
+      "path": "reports/doc-lint-handover-20260519113733.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "dda29e507ffa41338476dc06a2e039948e1eecec2ad7715055106e2e06e08963"
+    },
+    {
+      "path": "reports/doc-lint-noun-extraction-20260517133815.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e8c0d245451d2d9c42a93056d1ca7c766bc57b37c0a5899037bda7e909419281"
+    },
+    {
+      "path": "reports/doc-lint-proper-noun-extraction-20260517133249.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "a5a3a39893176e848b0305887a6d94fe1be69c81ae523cb783db0b62b3f25df7"
+    },
+    {
+      "path": "reports/doc-lint-report-exclusion-review-20260516234234.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "9526068ac9c69d93b8d87d3a695177a7a2f5928ec5ff44f43a59c221e761af09"
+    },
+    {
+      "path": "reports/doc-lint-report-exclusion-review-r2-20260516234840.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "2eb663d22f1ba8288b1f4e494c3c92b74e6ec971b3f2a68e6d117e5f02baa11a"
+    },
+    {
+      "path": "reports/doc-lint-resume-20260915.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "db6e8252243cdac8034e4db35d84f828243048b6b0ef6a06ece3700c32c75c55"
+    },
+    {
+      "path": "reports/doc-lint-root-docs-worker-20260516235249.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "6dff4243fe08d312246f20911eb1e3a112aa26f696df02f731552f054620b97b"
+    },
+    {
+      "path": "reports/doc-lint-source-cleanup-architecture-20260517093000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e301ae744331561a7abe5e67f49e48d2eb3c6e084e26db0f502304430017bec3"
+    },
+    {
+      "path": "reports/doc-lint-source-cleanup-debughost-cli-20260517093000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "eedfbccf2351b688149f75468afb641ef3bae5ececaecbb30c1b78be18394fb4"
+    },
+    {
+      "path": "reports/doc-lint-source-cleanup-raw-vision-20260517093000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "6ec8413f6149544eb495a1e0444ec3503ffd60ef3ea32129259cdba1bb7505c3"
+    },
+    {
+      "path": "reports/doc-lint-source-cleanup-small-docs-20260517093000.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "953dd6e6d8b35f785e970a288103fbbe1fa8bd1ff39d7a9497c69e4ffa5ec0bb"
+    },
+    {
+      "path": "reports/doc-lint-synonym-extraction-20260517165117.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "a46d8dda858b862e2737f85e74bdd8f8af47a5268eff24ef28a694764cb28b15"
+    },
+    {
+      "path": "reports/doc-lint-text-active-status-20260517003617.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "55059e28d4d2e09c0f014c7b80d71d7bba90218cabb82648f415623b20c8561e"
+    },
+    {
+      "path": "reports/doc-lint-text-archive-status-20260517003617.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "4df47fab537309eaaa77997bd210f607bd95206603d7461d93304990c1f2b5d1"
+    },
+    {
+      "path": "reports/doc-lint-text-design-details-20260517003617.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e62d970ee5e84c4035ec9c5a8423fa030eaad8aded6a9d855c255064ca921efd"
+    },
+    {
+      "path": "reports/doc-lint-text-root-readmes-20260517003617.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "a98476f05eb07812870405d43de5a8e71da1fb51a11e7159c0a7422581e66225"
+    },
+    {
+      "path": "reports/doc-lint-tracker-design-core-worker-20260516235249.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "33b2d39be568560a84a4d4b215ac6d324d290054d756a744d4890cc02952eab2"
+    },
+    {
+      "path": "reports/doc-lint-tracker-design-hosts-worker-20260516235249.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "0c06d378d5c06c730fcbf117d937b2ffa91da83e3e622928cee6fdbd1f14f25f"
+    },
+    {
+      "path": "reports/doc-lint-tracker-readmes-worker-20260516235249.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "2163c9d654d6b57757356e29ffe7eee8653fc99f34051d841a40b4ab398029f2"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-approved-temporary-20260517084346.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "8fbd8d7c6d0e7194f0bfc11c1f07f2a453c8bbb3d8eb8176de11d12a8018d841"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-compound-term-proposal-20260517002025.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "328d7fbaed4947d002eb3a1ae9bee24fbb5af77a8633de43c25468c0c59f0dd8"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-definition-investigation-20260517001129.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "7208a83a057dfabf18f792542535a46f9a8297020e35ee59a402e9e799c10711"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-edit-20260517003131.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "4cc2a3124de1e4e147e7d64db9edb461ee791a4d2e9bca7d6f3c48486e05d89c"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-proposal-compounds-20260517085723.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "c4c97eceb8e694e301b1644828c545c7258871969205c551719b53f3a0ac8c0e"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-proposal-identifiers-20260517085723.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "dcc095a35a3d4524c378775bee7dbf47d2485a8fb9741e3053326c9242106e7c"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-proposal-japanese-20260517085723.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "868534b5a6a02d4a892ab8e9772212208c3a8590ef3e8fcaf20b8c2cb3e89d03"
+    },
+    {
+      "path": "reports/doc-lint-whitelist-suspicious-alias-audit-20260517090027.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "b73add0b71ad460e0dc7dcee7f89632b5cd7c8d0a2599fb18ca05e0dff6b4465"
+    },
+    {
+      "path": "reports/history/core-phases-before-terminology.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391"
+    },
+    {
+      "path": "reports/history/core-tasks-before-terminology.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439"
+    },
+    {
+      "path": "reports/history/debughost-phases-before-terminology.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7"
+    },
+    {
+      "path": "reports/history/debughost-tasks-before-terminology.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5"
+    },
+    {
+      "path": "reports/lint-dispositions/README.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "74a06d48b8110fdfecc663d1727ab912b724fd236c2b73255ca3fd003d78d0f5"
+    },
+    {
+      "path": "reports/lint-dispositions/checker-plan.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "d907398197062cef85fffef722452faa11ce66f06cbab62e9bd9974ac1108167"
+    },
+    {
+      "path": "reports/lint-dispositions/clarifications.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "6963c804bad706c742ae0d2eded06f949b5626a651a5eb456d2dfe59d5ecf175"
+    },
+    {
+      "path": "reports/lint-guide-clarity-20260916.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "129c3399a79a31133eb3d2028a3d2589ef5776874f8979f744d95b0ba3f12291"
+    },
+    {
+      "path": "reports/lint-remediation-overview.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "44392f329e64896b54fae742ed9ab824496a05a3dea3a1eb2dc0b7a88c300b2d"
+    },
+    {
+      "path": "reports/markdown-lint-completion-20260916.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "9af1719d0ff14a8476fdabd490423bd68a438609497cf0a945eface8c3da2075"
+    },
+    {
+      "path": "reports/markdown-quotation-preservation-erratum-20260916.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "6927da46f1cce546f3003c81da785fba2e7ac943470b68c1af1a57d1f141d286"
+    },
+    {
+      "path": "reports/markdown-whitelist-approved-20260915.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "4d69a1c9a04489f714a6ed16f696cc1f51d4987694f827b2ec0939b5a70aabae"
+    },
+    {
+      "path": "reports/markdown-whitelist-update-20260915084730.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "e920ec318b071eb9112a2cbbb418c81c2838c28a9dd1022dc579649bce9bea2b"
+    },
+    {
+      "path": "reports/markdown-wording-followup-20260916.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "7ac2dc258bb9a871b4ba6c5bfc9defa9fbd0060b4390013126b086aa253789b5"
+    },
+    {
+      "path": "reports/markdown-wording-review-20260916.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "475a28d39b13d5bd53ef48e083a537bde04194168acb671a14d2f0299015affe"
+    },
+    {
+      "path": "reports/task-doc-lint-003-archive-ledger-20260917072840.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "f942c69b36579dd7f4f568d0a494b889e0c69d5492c67e5bf9d51296c8b52f54"
+    },
+    {
+      "path": "reports/task-doc-lint-003-core-wording-20260917070749.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "da4004914e5c48df6428c544d735e58ed8f1ae6aa6ae9a76912bc178d189f29b"
+    },
+    {
+      "path": "reports/task-doc-lint-003-debug-readme-20260917071805.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "bff461c1bca776d8311b803e41c8e86e8e51d6d06956f567332eb9bee269484e"
+    },
+    {
+      "path": "reports/task-doc-lint-003-design-context-20260917074829.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "dafc4785fda1b3e90bb1f24d63a4af8fa09f77addcae18993f6e947b9b890a59"
+    },
+    {
+      "path": "reports/task-doc-lint-003-diagnostic-handoff-20260917064359.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "3c14786f7f9d97004865f458d31419461c9891cde2db0eb05d900c6d5cbda3f2"
+    },
+    {
+      "path": "reports/task-doc-lint-003-progress-wording-20260917072546.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "3316a545c8a1468d4518e6866fff8cb2d79edbbde571049b6eb18bba0277bd1c"
+    },
+    {
+      "path": "reports/task-doc-lint-003-raw-viewer-20260917071152.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "088699163f3435d153e55df951d7dd8071f38484cf14d6accd9cde1a246064ae"
+    },
+    {
+      "path": "reports/task-doc-lint-term-classification-20260628203849.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "6a4cab1e03e8902f4ce7c17bf4c8d2f19cef3ab64f53de104ccbffc90ecfb737"
+    },
+    {
+      "path": "reports/task-doc-lint-term-classification-result-20260628203849.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "18d5dcd4807e108a25dc4f28567be779dfcc94ebbd79aed83ba67a8d739d1210"
+    },
+    {
+      "path": "reports/task-doc-lint-term-classification-review-20260628204412.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "d9791ac6c5145f5c43152971644fb48bb592e87824883758b952bc5b939bcfa2"
+    },
+    {
+      "path": "reports/task-doc-lint-term-wording-fix-20260628205344.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "9d5c156fce5d1d3f52c2beb86ec407f81582a06fdde48404abab1e523c7f91dd"
+    },
+    {
+      "path": "reports/task-doc-lint-terminology-rules-20260519114244.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "fb0a9afc3705e63474c1a728d8a93a570f8354824bd3ba5ae4d971a5e54eed98"
+    },
+    {
+      "path": "reports/task-doc-lint-terminology-rules-fix-20260519115920.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "3a18504e39c1ee88c6468c8324203539dca1fb56a17390d47a848956ed8958ad"
+    },
+    {
+      "path": "reports/task-doc-lint-terminology-rules-review-20260519115203.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "bbd3d7cf12ec75a506cb13570ee0b672328d9e3b01ffdd611112c0e14844c54c"
+    },
+    {
+      "path": "reports/task-doc-lint-terminology-rules-review-r2-20260628203849.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "66db49630c06da7489f79659a0c4e04388732008ccf3068dfdb3c58879fcf83c"
+    },
+    {
+      "path": "reports/task-doc-lint-tracked-whitelist-review-20260628213441.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "50dc065e295144f78a88625c72489898d8a5e9834d7aa71a6e4b88e0d2435f98"
+    },
+    {
+      "path": "reports/task-doc-lint-tracked-whitelist-update-20260628213011.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "d1bbc74ba1f8ba317fc280a8f8c1dd7f7ab7f9df8ddb2a68f547b032d4c5fa52"
+    },
+    {
+      "path": "reports/wording-naturalness-resume-20260916.md",
+      "git_status": "A",
+      "lint_target": false,
+      "exclusion_rules": [
+        "ignoreDirectories:reports"
+      ],
+      "sha256": "8fd29b9ed008887d9c025daccb9503aa329ce9f6828f4ba66673d323ce96765a"
+    },
+    {
+      "path": "tools/lint/README.md",
+      "git_status": "A",
+      "lint_target": true,
+      "exclusion_rules": [],
+      "sha256": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a"
+    }
+  ],
+  "baseline_checks": [
+    {
+      "file": "feedback-points/feedback-points.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "5ab0a5ed7b9f97ce4ccd6e3090f1e803800925107c2ca786eb06d6467d332807",
+      "actual_sha256": "5ab0a5ed7b9f97ce4ccd6e3090f1e803800925107c2ca786eb06d6467d332807",
+      "matches": true
+    },
+    {
+      "file": "README.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "320c94653f578af55a25c7f3c6855b558d0079b76de634f97a29d2a8d1f27cd5",
+      "actual_sha256": "320c94653f578af55a25c7f3c6855b558d0079b76de634f97a29d2a8d1f27cd5",
+      "matches": true
+    },
+    {
+      "file": "tools/lint/README.md",
+      "baseline_sha": "5bde2e8eeff429c4455e4670a986f63d05f0545a",
+      "expected_sha256": "e13957c11f5038743461bcc622388cefde2bd3d6dc7692ffd32a444f40b5a9c5",
+      "actual_sha256": "e13957c11f5038743461bcc622388cefde2bd3d6dc7692ffd32a444f40b5a9c5",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Archive/Core/phases-status.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+      "actual_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Archive/Core/tasks-status.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+      "actual_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+      "actual_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+      "actual_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "a5aa5de4b89f0b602afe58ac62ecce417d490c87fed981da91e4f6a3211d42af",
+      "actual_sha256": "a5aa5de4b89f0b602afe58ac62ecce417d490c87fed981da91e4f6a3211d42af",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "4079fce001ddbaacf1290a5c40721052c2c467b7d4d2669b21ed7029217664cb",
+      "actual_sha256": "4079fce001ddbaacf1290a5c40721052c2c467b7d4d2669b21ed7029217664cb",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-history-000-038.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "8d925a45a1882ce418ecd071674e712c3f2b893cb9d51ba6a6122a2894c9f77e",
+      "actual_sha256": "8d925a45a1882ce418ecd071674e712c3f2b893cb9d51ba6a6122a2894c9f77e",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "f1dcc99a0bb26342d3b025369a1a59cf8969523e24715dcd7a9d3c9b2b377388",
+      "actual_sha256": "f1dcc99a0bb26342d3b025369a1a59cf8969523e24715dcd7a9d3c9b2b377388",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "093320f39f9a748566fbdb02e45d7a060a8dc1abba31f7d6385935429a38d073",
+      "actual_sha256": "093320f39f9a748566fbdb02e45d7a060a8dc1abba31f7d6385935429a38d073",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "00a0b59f2058df331e7c6ceb4149021eac2763ffe72c9b7b091ca46c1afa3583",
+      "actual_sha256": "00a0b59f2058df331e7c6ceb4149021eac2763ffe72c9b7b091ca46c1afa3583",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "ef3e666908c06d1278ebfadecd6262981797806823ae5b226a3cec3b6cbd0928",
+      "actual_sha256": "ef3e666908c06d1278ebfadecd6262981797806823ae5b226a3cec3b6cbd0928",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/phases-status.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "68140c59f02d01ce7f3023c9149f8c4001042d30546f485cd9e9460e5403acdd",
+      "actual_sha256": "68140c59f02d01ce7f3023c9149f8c4001042d30546f485cd9e9460e5403acdd",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "179b4c1dc4f37d3d02b735b1d5aeb1a8e697f094f3b172295150fb996418e1c1",
+      "actual_sha256": "179b4c1dc4f37d3d02b735b1d5aeb1a8e697f094f3b172295150fb996418e1c1",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Design/tasks-status.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "b775cabd85c09837cc15cf47c28d87c08549e3b71b483e406871e6bb1372714d",
+      "actual_sha256": "b775cabd85c09837cc15cf47c28d87c08549e3b71b483e406871e6bb1372714d",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Tracker.CaptureReplay/README.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "dea685a8640bca95a6cfd4bbe4ae5c1ea35c4de850ce3d84e886f3c3b2c7ad9a",
+      "actual_sha256": "dea685a8640bca95a6cfd4bbe4ae5c1ea35c4de850ce3d84e886f3c3b2c7ad9a",
+      "matches": true
+    },
+    {
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "expected_sha256": "de1fe8545858abc99c9e75da2ad24dd3cf921189cb27117b837a705019aa23e5",
+      "actual_sha256": "de1fe8545858abc99c9e75da2ad24dd3cf921189cb27117b837a705019aa23e5",
+      "matches": true
+    }
+  ],
+  "target_files_without_baseline": [],
+  "baseline_files_outside_targets": [],
+  "changed_markdown_without_scope": [],
+  "occurrence_inventory": {
+    "count": 4336,
+    "unique_ids": 4336,
+    "by_file": {
+      "feedback-points/feedback-points.md": 13,
+      "README.md": 62,
+      "tools/lint/README.md": 61,
+      "Tracker/Design/Archive/Core/phases-status.md": 122,
+      "Tracker/Design/Archive/Core/tasks-status.md": 413,
+      "Tracker/Design/Archive/DebugHost/phases-status.md": 21,
+      "Tracker/Design/Archive/DebugHost/tasks-status.md": 383,
+      "Tracker/Design/Core/tracker-architecture-plan.md": 565,
+      "Tracker/Design/Core/tracker-core-engine-detail-design.md": 133,
+      "Tracker/Design/Core/tracker-history-000-038.md": 155,
+      "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": 51,
+      "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": 724,
+      "Tracker/Design/DebugHost/debug-host-maintainability-design.md": 78,
+      "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": 524,
+      "Tracker/Design/phases-status.md": 40,
+      "Tracker/Design/RuntimeHost/runtime-host-plan.md": 196,
+      "Tracker/Design/tasks-status.md": 329,
+      "Tracker/Tracker.CaptureReplay/README.md": 43,
+      "Tracker/Tracker.DebugHost/README.md": 423
+    },
+    "outside_baselines": []
+  },
+  "block_inventory": {
+    "count": 815,
+    "unique_ids": 815,
+    "by_file": {
+      "feedback-points/feedback-points.md": 6,
+      "README.md": 12,
+      "tools/lint/README.md": 24,
+      "Tracker/Design/Archive/Core/phases-status.md": 8,
+      "Tracker/Design/Archive/Core/tasks-status.md": 10,
+      "Tracker/Design/Archive/DebugHost/phases-status.md": 7,
+      "Tracker/Design/Archive/DebugHost/tasks-status.md": 16,
+      "Tracker/Design/Core/tracker-architecture-plan.md": 247,
+      "Tracker/Design/Core/tracker-core-engine-detail-design.md": 56,
+      "Tracker/Design/Core/tracker-history-000-038.md": 9,
+      "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": 48,
+      "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": 90,
+      "Tracker/Design/DebugHost/debug-host-maintainability-design.md": 19,
+      "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": 85,
+      "Tracker/Design/phases-status.md": 6,
+      "Tracker/Design/RuntimeHost/runtime-host-plan.md": 43,
+      "Tracker/Design/tasks-status.md": 40,
+      "Tracker/Tracker.CaptureReplay/README.md": 14,
+      "Tracker/Tracker.DebugHost/README.md": 75
+    }
+  },
+  "decision_inventory": [
+    {
+      "file": "feedback-points/feedback-points.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-00.json",
+      "expected_blocks": 6,
+      "decision_rows": 6,
+      "unique_blocks": 6,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "README.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-01.json",
+      "expected_blocks": 12,
+      "decision_rows": 12,
+      "unique_blocks": 12,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "tools/lint/README.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-02.json",
+      "expected_blocks": 24,
+      "decision_rows": 24,
+      "unique_blocks": 24,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Archive/Core/phases-status.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-03.json",
+      "expected_blocks": 8,
+      "decision_rows": 8,
+      "unique_blocks": 8,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Archive/Core/tasks-status.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-04.json",
+      "expected_blocks": 10,
+      "decision_rows": 10,
+      "unique_blocks": 10,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-05.json",
+      "expected_blocks": 7,
+      "decision_rows": 7,
+      "unique_blocks": 7,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-06.json",
+      "expected_blocks": 16,
+      "decision_rows": 16,
+      "unique_blocks": 16,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-07.json",
+      "expected_blocks": 247,
+      "decision_rows": 247,
+      "unique_blocks": 247,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-08.json",
+      "expected_blocks": 56,
+      "decision_rows": 56,
+      "unique_blocks": 56,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-history-000-038.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-09.json",
+      "expected_blocks": 9,
+      "decision_rows": 9,
+      "unique_blocks": 9,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-10.json",
+      "expected_blocks": 48,
+      "decision_rows": 48,
+      "unique_blocks": 48,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-11.json",
+      "expected_blocks": 90,
+      "decision_rows": 90,
+      "unique_blocks": 90,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-12.json",
+      "expected_blocks": 19,
+      "decision_rows": 19,
+      "unique_blocks": 19,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-13.json",
+      "expected_blocks": 85,
+      "decision_rows": 85,
+      "unique_blocks": 85,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/phases-status.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-14.json",
+      "expected_blocks": 6,
+      "decision_rows": 6,
+      "unique_blocks": 6,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-15.json",
+      "expected_blocks": 43,
+      "decision_rows": 43,
+      "unique_blocks": 43,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Design/tasks-status.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-16.json",
+      "expected_blocks": 40,
+      "decision_rows": 40,
+      "unique_blocks": 40,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Tracker.CaptureReplay/README.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-17.json",
+      "expected_blocks": 14,
+      "decision_rows": 14,
+      "unique_blocks": 14,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    },
+    {
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "decision_file": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-18.json",
+      "expected_blocks": 75,
+      "decision_rows": 75,
+      "unique_blocks": 75,
+      "missing": [],
+      "unexpected": [],
+      "empty_reasons": [],
+      "judgment": "Structural coverage only; inherited semantic decisions are not automatically approved."
+    }
+  ],
+  "example_check": {
+    "source_file": "tools/lint/README.md",
+    "source_sha256": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+    "example": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/Tracker.DebugHost/README.md",
+    "requested_files": [
+      "README.md",
+      "Tracker/Tracker.DebugHost/README.md"
+    ],
+    "actual_files": [
+      "README.md",
+      "Tracker/Tracker.DebugHost/README.md"
+    ],
+    "missing_files": [],
+    "passed": true
+  },
+  "summary": {
+    "changed_markdown": 96,
+    "lint_targets": 19,
+    "excluded_changed_markdown": 77,
+    "baseline_hashes_match": true,
+    "example_passed": true
+  },
+  "scope_passed": true
+}

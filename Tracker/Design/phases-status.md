@@ -23,3 +23,7 @@
 | キャプチャー再生の調査 | 当時は PR #19 公開中 | `CAPTURE-REPLAY-001` で raw vision と `ibis tracker` の周期、`ReceivedAt` を基準とする遅延を比較する汎用出力を追加した。指定キャプチャーの原因は `reports/capture-replay-001-latency-investigation-20260516185833.md` に記録した。対象テスト11件成功、CaptureReplay のビルド成功。専用レビューは `reports/pr19-review-capturereplay-20260516200807.md`、文書と進捗のレビューは `reports/pr19-review-docs-tracking-20260516200807.md` で阻害指摘なし。 |
 | 起動時の設定選択 | 当時は PR #19 公開中 | `RUNTIME-HOST-012` で、起動時に `--profile <name>` / `--profile=<name>` から適用する設定プロファイルを指定できるようにした。`Microsoft.Extensions.Configuration.CommandLine` の設定読込機能と、引数名から設定キーへの対応表を使う。初回レビューの重大指摘を修正した後の対象テスト17件成功、RuntimeHost のビルド成功。`reports/pr19-review-runtimehost-profile-r2-20260516201757.md` で指摘なし。 |
 | 文書検査整備 | 指摘対応中、PR #20 公開中 | `DOC-LINT-001` でリポジトリの最上位に文書用の `textlint` / `cspell` を導入し、利用者の編集対象である `*.md` 全般を品質検査の対象にした。英単語と片仮名語の許可一覧は`tools/lint/markdown-whitelist.yaml` の1ファイルを正本とする。`DOC-LINT-002` で SudachiPy による語彙抽出と許可一覧検査を追加した。`DOC-LINT-003` は検査器の長文入力、脚注、語境界、日本語に隣接する英語、対象列挙の欠陥を修正し、未承認語の一括許可や検査除外への退避をせずに説明文を整理する。全対象の `npm run lint:md` の終了値0と、PRの最新の `HEAD`に一致する `head_sha` のCI成功、および検証証跡の記録を完了条件とする。本文の照合と全体完了は区別し、独立最終レビューの代わりに自己点検を使わない。 |
+
+## 文書検査の補足（2026-09-17）
+
+`DOC-LINT-003` のMarkdown差分と検査範囲を照合し、検査手順の実行例を訂正した。原文の位置情報と履歴保存版の一致を確認したが、全出現箇所の最終照合、全体の文書検査、独立最終レビューの完了とは区別する。詳細は `reports/task-doc-lint-003-scope-check-20260917082040.md` を参照する。

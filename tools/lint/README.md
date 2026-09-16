@@ -49,7 +49,7 @@ npm run lint:md:targets -- --changed
 対象文書を直接指定したい場合は `--files` を使う。
 
 ```bash
-node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/README.appsettings.md
+node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/Tracker.DebugHost/README.md
 node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
 node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
 npm run lint:md:whitelist -- --files README.md
