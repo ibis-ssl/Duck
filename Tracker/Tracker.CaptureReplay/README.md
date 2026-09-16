@@ -1,12 +1,12 @@
 # Tracker.CaptureReplay
 
-`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールはエージェント / 自動検証 / 回帰調査で同じ記録単位を再現するために使います。
+`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。
 
+本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。
 
-本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 ## 基本実行
 
-session folder をそのまま渡すと、同じフォルダの付随情報からキャプチャーと解決済みのトラッカー設定を取得します。
+session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \
@@ -34,7 +34,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
   --max-latency-frames 8
 ```
 
-`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、並べ替え対象時間幅が遅延に与える影響を切り分けられます。
+`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \
@@ -54,7 +54,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 | `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |
 | `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |
 | `--max-latency-frames <count>` | 追跡フレームごとの遅延詳細の最大出力数。 |
-| `--skip-tracker-snapshots` | 付随情報由来の `trackerSnapshot` / `trackerComparison` 行を抑制します。 |
+| `--skip-tracker-snapshots` | capture metadata に基づく `trackerSnapshot` / `trackerComparison` 行を出力しません。 |
 | `--detail-filter <condition>` | 条件に合う確定済みの追跡フレームの詳細を出力します。複数指定できます。 |
 | `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |
 | `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |
@@ -66,7 +66,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 - `settingsFile=...`: 実際に使った設定または付随情報。
 - `settings=...`: 再生に適用した主なトラッカー設定。
 - `packets=... committedFrames=...`: 再生結果の概要。
-- `trackerSnapshot ...` / `trackerComparison ...`: 付随する補助ファイルから復元した、保存時のトラッカースナップショット / 比較結果。
+- `trackerSnapshot ...` / `trackerComparison ...`: capture metadata が参照する補助ファイルから復元した、保存時の tracker snapshot と比較結果。
 - `latencySummary ...`: 未加工入力の受信周期とトラッカーの確定遅延の概要。
 - `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。
 
@@ -74,7 +74,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 
 ## 自動検証
 
-`--expect` は自動検証用の簡易な期待条件の検証です。
+`--expect` には、集計指標が満たすべき条件を指定します。条件を満たさない場合は exit code 1 で終了するため、自動検証に利用できます。
 
 ```bash
 dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \

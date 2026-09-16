@@ -5,7 +5,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 ## リポジトリ構成
 
 - `Tracker/Tracker.Core`: トラッカーの中核処理、パケット生成、実行契約。
-- `Tracker/Tracker.DebugHost`: 未加工入力 / 追跡結果の SSL-Vision データを表示する ASP.NET Core の表示画面兼サーバー。
+- `Tracker/Tracker.DebugHost`: SSL-Vision から受信した検出情報とトラッカーの追跡結果を表示する ASP.NET Core のアプリケーション。
 - `Tracker/Tracker.CaptureReplay`: 保存済みのキャプチャーを再生・分析する CLI ツール。
 - `Tracker/Tracker.Tests`: トラッカーとサーバー周辺のテスト。
 - `TrackerConnectionLib`: トラッカー接続用の再利用ライブラリ。
@@ -64,7 +64,7 @@ dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profil
 ```
 
 `--profile <name>` は `Tracker.RuntimeHost` の起動時に有効な設定プロファイルを指定します。未指定時は `appsettings.json` の `Tracker:ActiveProfileName` を使います。
-`Tracker.RuntimeHost` のリポジトリに保存済みの `sim` 設定プロファイルは `ReorderWindowNs=10000000`、つまり 10 ms の並べ替え対象時間幅で起動します。
+リポジトリに含まれる `Tracker.RuntimeHost` の `sim` 設定プロファイルは、`ReorderWindowNs=10000000`、つまり 10 ms の reorder window で起動します。
 
 `Tracker.DebugHost` を `sim` 設定プロファイルで起動する場合:
 
