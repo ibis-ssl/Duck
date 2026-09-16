@@ -1,0 +1,1978 @@
+[
+  {
+    "block": "D07-B001",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "AutoRef向けTrackerという表題を自動レフェリー向けトラッカーと自然に説明。対象は同じで、AutoRefの実装範囲を追加しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047400+09:00"
+  },
+  {
+    "block": "D07-B002",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "追加されたraw visionの定義を確認。SSL-Visionの検出情報であり、カメラの画像や動画そのものではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047424+09:00"
+  },
+  {
+    "block": "D07-B003",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Coreの分離実装、本番寄りのRuntimeHost、デバッグ/診断のDebugHostという3つの責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047429+09:00"
+  },
+  {
+    "block": "D07-B004",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "原文は3点と書きつつ箇条書きが4点ある。現在の4点は実数との一致を直したもので、目標を追加したものではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047432+09:00"
+  },
+  {
+    "block": "D07-B005",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "検出/形状からの決定的出力、公式マルチキャスト、豊かな内部情報、world状態と通知という4目標を全て保持。高レベル通知は例示のなどで範囲を狭めない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047435+09:00"
+  },
+  {
+    "block": "D07-B006",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "対象範囲6行を照合。RuntimeHostとDebugHostの責務・周期分離、raw/tracked切替、複数ボール、決定性優先を保持。captureとprimary ballの名称を復元し、未許可の一般表現tracked snapshotは自然な追跡スナップショットにする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047440+09:00"
+  },
+  {
+    "block": "D07-B007",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "応答/稼働情報の入力、TIGERs完全一致、AutoRefロジック実装、永続化/再生DBという4つの対象外を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047443+09:00"
+  },
+  {
+    "block": "D07-B008",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "本番寄りRuntimeHostとデバッグDebugHostの実行形態を分ける条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047447+09:00"
+  },
+  {
+    "block": "D07-B009",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "Coreのアルゴリズム、RuntimeHostの実時間処理/UDP/将来同一プロセス、DebugHostのWeb/診断/キャプチャー/比較/設定という責務と、Web側から本番周期を駆動しない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047451+09:00"
+  },
+  {
+    "block": "D07-B010",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "品質優先順位2番のrule上重要を競技規則上重要と説明。決定性より上へ順序を変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047455+09:00"
+  },
+  {
+    "block": "D07-B011",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "品質優先順位4番のraw/trackedの観察性を未加工入力・追跡結果の観察性と説明。直前の公式形式との互換は未変更で、優先順も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047460+09:00"
+  },
+  {
+    "block": "D07-B012",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "採用する3方針を個別照合。未加工入力と追跡の分離、外部形式と内部状態の分離、自動レフェリー用の内部情報を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047465+09:00"
+  },
+  {
+    "block": "D07-B013",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TIGERs固有の構成分割と命名へ追従しない条件を保持。前後のJava実装構造や完全一致前提の最適化も対象外のまま。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047469+09:00"
+  },
+  {
+    "block": "D07-B014",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Tigersの表記を登録済みTIGERsへ、official protoを公式通信形式へ変更。参照先の対象は同じ。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047471+09:00"
+  },
+  {
+    "block": "D07-B015",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "端末固有の絶対パスと行番号付き表記を、同じ調査レポートへの相対リンクへ修正した既存変更を採用。参照対象のファイル名は保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047474+09:00"
+  },
+  {
+    "block": "D07-B016",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Proto入力という見出しを入力する通信データと説明し、直後の型一覧との対応を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047477+09:00"
+  },
+  {
+    "block": "D07-B017",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "直接扱う入力型の導入文。次のSSL_WrapperPacket等の実型名を変更していない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047481+09:00"
+  },
+  {
+    "block": "D07-B018",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "SSL_WrapperPacketはUDPパケットの受信データ全体を表すこと、DetectionとGeometryを内包することを保持。UDP周辺の空白を整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047487+09:00"
+  },
+  {
+    "block": "D07-B019",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_DetectionFrameのcamera単位のdetectionをカメラ単位の検出情報とし、メンバー一覧を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047492+09:00"
+  },
+  {
+    "block": "D07-B020",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_DetectionBallのball観測をボール観測と表記。X/Y/Z/Confidence/Areaを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047497+09:00"
+  },
+  {
+    "block": "D07-B021",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_DetectionRobotのrobot観測をロボット観測と表記。ID/位置/向き/信頼度/高さのメンバーを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047500+09:00"
+  },
+  {
+    "block": "D07-B022",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Geometry全体、Field、必要時にcalibrationを診断表示へ回すという用途を保持。calibrationはカメラの校正情報と自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047503+09:00"
+  },
+  {
+    "block": "D07-B023",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "field寸法とline/arcをフィールド寸法と線分/円弧と説明。直後の12メンバーの実名を変更せず保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047506+09:00"
+  },
+  {
+    "block": "D07-B024",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Official出力を公式形式の出力とする見出し。UIの実表示名ではなく形式区分を表している。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047509+09:00"
+  },
+  {
+    "block": "D07-B025",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "初期版の外部配信をofficial tracker protoに限定する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047512+09:00"
+  },
+  {
+    "block": "D07-B026",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "初期capabilityの導入文を対応機能と説明し、3つのCAPABILITY定数をそのまま保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047515+09:00"
+  },
+  {
+    "block": "D07-B027",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "CaptureOnで見えるパケットを別系統で保存する目的と、自前内部出力/自前公式パケット/外部パケットの3比較対象を保持。長い通信先の修飾を整理。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047518+09:00"
+  },
+  {
+    "block": "D07-B028",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "DebugHost詳細設計を機能仕様の正本とし、巨大ファイル分割や進捗管理の軽量化を含めないという境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047522+09:00"
+  },
+  {
+    "block": "D07-B029",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "TrackerConnectionLibを第一候補とする既存3型の責務、CaptureOn単位の6保存物、別開始時点の別フォルダ、Coreに受信/保存/比較を入れない条件を保持。保存物名を補助ファイル一般へぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047525+09:00"
+  },
+  {
+    "block": "D07-B030",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "主記録はsnapshot sidecar JSONL、既存診断ログは破壊的変更なし、key=value互換と参照/集計への限定を保持。capture metadata、相対パス、source roleを特定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047527+09:00"
+  },
+  {
+    "block": "D07-B031",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "フォルダ/ファイル名の2選択肢とbasename対応、相対パス保存、alignmentの未作成/0件/破損をsnapshotの成否と区別する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047530+09:00"
+  },
+  {
+    "block": "D07-B032",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "表示用snapshotだけでは比較元として不十分という否定、通常時にraw bytesまたは復元可能な参照を必須とする条件、round-tripで復元または再デコードする選択肢を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047533+09:00"
+  },
+  {
+    "block": "D07-B033",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "remote endpointを送信元の通信アドレスと通信ポートと説明。受信側ではないことを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047536+09:00"
+  },
+  {
+    "block": "D07-B034",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "source role/label/metadataの3属性をそれぞれ登録済みの名称で識別する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047540+09:00"
+  },
+  {
+    "block": "D07-B035",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "元バイト列またはsession内参照、raw由来の件数/ID/代表位置/由来概要、decode/schemaエラーのskip/error情報を保持。処理を省略した事実とエラーを自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047542+09:00"
+  },
+  {
+    "block": "D07-B036",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "self除外禁止・重複保持・空/重複/衝突時も保存・送信元/自己受信診断・unknown/ambiguousを保持。APIの扱いとUUID衝突という2確認事項を誤って一つの衝突関係にしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047545+09:00"
+  },
+  {
+    "block": "D07-B037",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "送信頻度/時刻系が違う前提、新規は保存時ReceivedAt対応、旧形式だけtracked番号一致でない近傍/直前推定、許容幅/識別属性/状態の保存を保持。Field sourceの表示を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047549+09:00"
+  },
+  {
+    "block": "D07-B038",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ReceivedAt軸の3種類の和集合または最速更新を含む索引、TrackedFrame.timestamp非使用、高速source時点の進行、低速raw/renderの直前値保持、先頭だけ後続代用を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047552+09:00"
+  },
+  {
+    "block": "D07-B039",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "通常Playの30回/秒・wall-clock追従、データ保持と描画だけの間引き、任意tick比較、v2精度維持、Play/Fast Forward/Stopと4x/16x/64x、数値の等倍ラベル禁止を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047555+09:00"
+  },
+  {
+    "block": "D07-B040",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "snapshotとalignmentを別ファイルとする理由、source keyの4属性、同label/UUIDで複数endpointの集約、時刻近傍と同条件時の決定的な選択を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047558+09:00"
+  },
+  {
+    "block": "D07-B041",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "diagnostics行単位でないv2 timeline、fast source sampleごとの記録、低速raw/renderの同一値参照、別sidecar/互換fallback禁止、ログ選択時に1回だけ3索引を作る条件を保持。source sampleをキャプチャー全体と誤訳しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047561+09:00"
+  },
+  {
+    "block": "D07-B042",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "CaptureOffでは追記しない、再Onは新規フォルダ/sidecar、外部不在でも3既存出力を壊さない、capture metadataで未作成/0件を表す条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047563+09:00"
+  },
+  {
+    "block": "D07-B043",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "公式形式だけでは不足するため内部の豊かな追跡フレームを持つ説明と7種類の内部型の一覧を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047569+09:00"
+  },
+  {
+    "block": "D07-B044",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "内部モデル方針を内部状態表現の方針とする見出し。直後の単位と各型の説明を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047573+09:00"
+  },
+  {
+    "block": "D07-B045",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "mm/mm-s/rad/nsの内部単位と、公式形式への変換箇所だけでmm→m、mm/s→m/s、ns→sに変換する境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047578+09:00"
+  },
+  {
+    "block": "D07-B046",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackerFrameをUIとpacket generatorが共有する内部参照モデルとする意味を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047582+09:00"
+  },
+  {
+    "block": "D07-B047",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "最低限の11項目を照合。番号・観測時刻・処理時刻・形状・ball/robot・primary・kick・直近contact・場外・source metadataを保持。latestを現在接触中へ狭めない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047586+09:00"
+  },
+  {
+    "block": "D07-B048",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "data_timestampの観測基準、TCapture優先、欠落/0以下ならTSent、受信/処理時刻を使わない4条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047590+09:00"
+  },
+  {
+    "block": "D07-B049",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "受信時刻と処理時刻をdata timestampとして使わないという否定条件を、そのまま保持。processed_at_nsの説明とは別の行として対応付ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047593+09:00"
+  },
+  {
+    "block": "D07-B050",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "processed_at_nsはこの端末での確定処理時刻であり、診断専用で公式形式へ出さない。ローカルという原文の限定を補う。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047597+09:00"
+  },
+  {
+    "block": "D07-B051",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackedBallStateのvisibilityを可視性、参照元camera範囲を参照元のカメラの範囲と説明。ロボットや時刻変換の説明へ誤って対応付けない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047601+09:00"
+  },
+  {
+    "block": "D07-B052",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackedRobotStateのteam/robot idをチーム/ロボットIDと説明。ボール状態の説明とは区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047603+09:00"
+  },
+  {
+    "block": "D07-B053",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackedRobotStateのvisibilityを可視性とする自然な日本語を採用。前後の速度・品質値は変更されていない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047606+09:00"
+  },
+  {
+    "block": "D07-B054",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "直近ball接触フラグを、直近にボールへ接触したかを示すフラグと自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047609+09:00"
+  },
+  {
+    "block": "D07-B055",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "キックで追跡するボールの内部追跡IDと、still moving判定用の最新速度/最新更新時刻を保持。不自然な漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047612+09:00"
+  },
+  {
+    "block": "D07-B056",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "任意のkicker robot idは必要に応じてキックしたロボットのIDと説明し、kick種別候補も保持。任意要件を必須にはしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047615+09:00"
+  },
+  {
+    "block": "D07-B057",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "BallLeftFieldStateの横切ったline種別を横切った線分種別と説明。キックの型や契約見出しとは別に対応付ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047619+09:00"
+  },
+  {
+    "block": "D07-B058",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ITrackerEngineは1件のraw visionをevent time順で処理し、確定world frame群とevent群を公開順で返し、geometry-onlyでも壊さないという3責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047621+09:00"
+  },
+  {
+    "block": "D07-B059",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "通常入力ではパケット必須、control-onlyでは省略可能、現在設定と必要時の切替要求という入力条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047625+09:00"
+  },
+  {
+    "block": "D07-B060",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "RequestVersion/対象profile/immutable resolved base snapshot/override snapshotという要求内容を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047627+09:00"
+  },
+  {
+    "block": "D07-B061",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "CommittedFramesは0件以上で公開順という数量と順序を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047630+09:00"
+  },
+  {
+    "block": "D07-B062",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "6種類のEmittedEvents、公開順、必要時に対象frame_numberを参照する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047633+09:00"
+  },
+  {
+    "block": "D07-B063",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "pending、カメラ時刻、robot/ball状態、直近world/形状、frame counter、設定、kick/contact/fieldの保持項目を照合。counterは件数集計でなく次の追跡フレーム番号の採番と明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047636+09:00"
+  },
+  {
+    "block": "D07-B064",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "1入力につき即時1frameではなく、バッファから確定可能なevent time群を順に処理する方式を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047641+09:00"
+  },
+  {
+    "block": "D07-B065",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "12返却規則を行ごとに照合。0/複数frame、中間保持、0かつeventなしの無出力、制御専用、engineの適用/clear/通知責務、イベント順、1件のin-flight固定を全て保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047644+09:00"
+  },
+  {
+    "block": "D07-B066",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackerPacketGeneratorの役割を、TrackerFrameから公式TrackerWrapperPacketへの変換として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047648+09:00"
+  },
+  {
+    "block": "D07-B067",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "内部から公式形式への単位変換、複数ball出力、primary ball先頭化という3責務を保持。前後のuuid/source_nameとkicked_ballは未変更。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047651+09:00"
+  },
+  {
+    "block": "D07-B068",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "capabilitiesの設定を対応機能の設定と説明。primary先頭化やkicked_ballの隣接行と混同しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047654+09:00"
+  },
+  {
+    "block": "D07-B069",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "RUNTIME-HOST-005では新プロジェクトを作らずUI非依存の共通周期をCoreに抽出すること、将来RuntimeHostから再利用することを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047656+09:00"
+  },
+  {
+    "block": "D07-B070",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Coordinatorはraw入力、CommittedFramesを順にstore/observerへ反映、設定切替要求、必要時UDPを担当するという役割を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047659+09:00"
+  },
+  {
+    "block": "D07-B071",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "送信先やactive profile表示などengine外の状態を反映する責務を保持。設定変更をengineの直接clearにしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047662+09:00"
+  },
+  {
+    "block": "D07-B072",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "Core配置の型、UI非依存publisher許可、参照禁止のDebugHost/Blazor/診断/保存物群、ファイル依存を別処理とする境界、receiverの接続順、設定型の分離を保持。capture writer/readerの対象を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047665+09:00"
+  },
+  {
+    "block": "D07-B073",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "差分13行と直前の未変更3行を一緒に照合。全frame処理/最終store/各packet、event順、state遷移後の公開、即時drain、in-flight不変、設定反映・clear・通知、old/new分離を全て保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047668+09:00"
+  },
+  {
+    "block": "D07-B074",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackedSnapshotStoreをCoreの実行時読み取り状態とし、DebugHostと将来RuntimeHostがlatest frame/profile/送信統計を読む責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047670+09:00"
+  },
+  {
+    "block": "D07-B075",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "storeの最新frame、受信時刻、設定名、送信成功/失敗の別カウンター、切替直後のempty状態を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047673+09:00"
+  },
+  {
+    "block": "D07-B076",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "runtime profile controlのUI規則という見出しを実行時の設定プロファイルの選択操作と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047676+09:00"
+  },
+  {
+    "block": "D07-B077",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "4つのUI規則を照合。active表示と切替操作、正本のActiveProfileName、候補0なら現在1件disabled、frame有無と独立の描画を保持。不自然な表示の正とする値を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047679+09:00"
+  },
+  {
+    "block": "D07-B078",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "入力packetの扱いという見出しを入力パケットの扱いとする自然な表記へ。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047682+09:00"
+  },
+  {
+    "block": "D07-B079",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "detectionのみ、geometryのみ、両方という3種類を過不足なく保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047685+09:00"
+  },
+  {
+    "block": "D07-B080",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "観測入力を伴わずreconfigure requestだけを渡すcontrol-only Updateを許可する条件を保持し、長い修飾を分ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047687+09:00"
+  },
+  {
+    "block": "D07-B081",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "9処理規則を照合。geometry先行、TCapture/TSent優先、event/camera/source frameの順、reorder外のflush、geometry参照、frame非進行、late除外、旧geometry入力破棄、control-onlyの非追加を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047690+09:00"
+  },
+  {
+    "block": "D07-B082",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "multi-cameraの時系列契約を複数カメラの時系列契約と自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047694+09:00"
+  },
+  {
+    "block": "D07-B083",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "VisionReceiverServiceは到着順、trackerは到着順に依存しないという対比を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047697+09:00"
+  },
+  {
+    "block": "D07-B084",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ReorderWindowを、パケットの並べ替えに使う猶予時間と説明。時間の単位と設定名は前後の未変更行で保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047700+09:00"
+  },
+  {
+    "block": "D07-B085",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "MergeWindowは同じworld frameに統合してよいカメラ間の時刻差の上限であり、受信周期や並べ替え窓とは区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047703+09:00"
+  },
+  {
+    "block": "D07-B086",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "基準時刻からMergeWindow内だけを統合、event time昇順/同時刻camera ID昇順、確定frameごとに番号+1、geometryのみは番号を進めない、受信時刻は統合順に使わない5条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047706+09:00"
+  },
+  {
+    "block": "D07-B087",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "出力packetの並び順という見出しを出力パケットの並び順とする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047709+09:00"
+  },
+  {
+    "block": "D07-B088",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "Balls[0]がprimary、残りがsecondary、Robotsがteam/ID安定順という3規則を保持。secondary ballを登録済みの設計名と日本語の説明で対応付ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047713+09:00"
+  },
+  {
+    "block": "D07-B089",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "secondary ballの安定順を導く文は、直前の主対象以外という定義に従って補助対象のボールと説明している。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047716+09:00"
+  },
+  {
+    "block": "D07-B090",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "visibility降順、last_visible_timestamp_ns降順、internal_track_id昇順の3比較キーと順を保持。内部追跡IDは単調増加でstate reset時だけ初期化可能。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047719+09:00"
+  },
+  {
+    "block": "D07-B091",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "geometryの扱いをフィールド形状の扱いとする自然な見出しを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047722+09:00"
+  },
+  {
+    "block": "D07-B092",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "geometryの用途は2つであるという導入と数量を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047725+09:00"
+  },
+  {
+    "block": "D07-B093",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "フィールド内外判定と、UI表示/自動レフェリー向け付随情報計算という2用途を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047728+09:00"
+  },
+  {
+    "block": "D07-B094",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "geometry更新規則をフィールド形状更新規則とし、次の5条件との対応を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047731+09:00"
+  },
+  {
+    "block": "D07-B095",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "新形状受信時の置換、通常は既存trackを保持、大変更で追跡/キック/接触/world状態とpendingを消去、番号/実行識別は維持という5条件を保持。FrameCommit.csのclear対象とCoordinatorのstore clearを明記。ゴール形状の閾値条件と実装の相違は別の未解決記録へ残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047734+09:00"
+  },
+  {
+    "block": "D07-B096",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ITrackerEngineの説明としてraw visionから状態を進める中核契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047736+09:00"
+  },
+  {
+    "block": "D07-B097",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackerEngineは初期版の決定的な実装であるという位置付けを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047739+09:00"
+  },
+  {
+    "block": "D07-B098",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackerFrameと各state型を内部状態表現として扱う型の範囲を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047742+09:00"
+  },
+  {
+    "block": "D07-B099",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "raw vision receiverをraw visionの受信処理と自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047745+09:00"
+  },
+  {
+    "block": "D07-B100",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "hosted serviceでCoordinatorを継続実行し、rawをCoreへ渡して最新frame更新、storeはUI状態、publisherは公式マルチキャスト、viewerはRaw/Tracked切替という4構成を保持。重複した処理の説明を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047748+09:00"
+  },
+  {
+    "block": "D07-B101",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "UDP受信/デコードと、必要な調査時だけ受信UDPデータを圧縮キャプチャーで保存する目的・条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047751+09:00"
+  },
+  {
+    "block": "D07-B102",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "VisionPacketStoreのraw snapshot保持を未加工入力のスナップショット保持と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047754+09:00"
+  },
+  {
+    "block": "D07-B103",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackerCoordinatorのrawからtrackedへの橋渡しという位置付けを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047761+09:00"
+  },
+  {
+    "block": "D07-B104",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackerPacketGeneratorのofficial proto変換という役割を公式の通信形式への変換と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047764+09:00"
+  },
+  {
+    "block": "D07-B105",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "CaptureReplayは保存済みpacket captureの再生、集計指標/条件式による回帰検証と調査のCLIであり、用途を限定しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047767+09:00"
+  },
+  {
+    "block": "D07-B106",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TrackedSnapshotStoreはtracked UI読み取り状態であり、その次のviewer構成とは分けて保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047770+09:00"
+  },
+  {
+    "block": "D07-B107",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "データフローの見出しをデータの流れと自然にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047773+09:00"
+  },
+  {
+    "block": "D07-B108",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "デコード前のUDP元バイト列/受信時刻をjsonl.gzへ保存、rawをstoreへ反映、同じrawをengineへ渡すという2〜4番の処理順を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047776+09:00"
+  },
+  {
+    "block": "D07-B109",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "公式packet生成、UDPマルチキャスト送信、raw/trackedのボタン描画切替という6〜8番の順序を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047779+09:00"
+  },
+  {
+    "block": "D07-B110",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "Coreの自前処理と別にDebugHost/ConnectionLibで受信、self除外なし、CaptureOnフォルダへ全受信packet保存、role/label/metadataとして分類、不明でも保存、Core入力にはしない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047782+09:00"
+  },
+  {
+    "block": "D07-B111",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "DebugHostのTracker sectionをTracker設定階層と説明。直後のJSON例のキー・値・階層を変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047785+09:00"
+  },
+  {
+    "block": "D07-B112",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "VisionReceiver側に再生用packet capture設定を置く責務を保持。Enabled設定等のJSONは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047788+09:00"
+  },
+  {
+    "block": "D07-B113",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "protobufデコード前のバイト列、receivedAt/送信元を同記録へ保存し、順序どおり読み戻してSSL_WrapperPacketへ復元・再投入する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047790+09:00"
+  },
+  {
+    "block": "D07-B114",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "適用名だけでなくProfiles全体とoverride後の解決済み設定、同時点の調整値、5保存物の相対パス、identity/role/label/状態/時刻規則をcapture metadataへ保存する範囲を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047793+09:00"
+  },
+  {
+    "block": "D07-B115",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "汎用CLIであり特定不具合専用ではない。5指標の例、条件式、frame番号による絞り込み、位置だけでなく向き/角速度、settings読込時のRuntimeOverrides反映を保持。保存済みcaptureという単位を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047796+09:00"
+  },
+  {
+    "block": "D07-B116",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "遅延調査の汎用出力で、入力受信周期と出力の受信時刻/観測時刻/確定入力位置を比較する。reorder/merge/欠測/保留を切り分け、固有capture/source名に依存せず明示optionで再利用する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047799+09:00"
+  },
+  {
+    "block": "D07-B117",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "capture metadataからsnapshot/alignmentを読み、外部と自前の確定frameを保存時対応で比較する。旧形式だけ推定、診断UI後もCLIをエージェント/自動検証/調査向けに残す条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047802+09:00"
+  },
+  {
+    "block": "D07-B118",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "画面/再生で同じreader契約、source別時系列と番号/時刻/差/件数/元データ復元状態を確認。新規の保存対応、欠損/0件/エラー時の状態表示、既存表示を壊さない条件、30回/秒と任意tick比較、実UI3ボタンと倍率、早送りは間引かないことを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047805+09:00"
+  },
+  {
+    "block": "D07-B119",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "診断のraw detectionは今届いたpacketではなく確定TrackerFrameを生成した元検出群に紐付く。raw count・入力元の観測フレーム番号・カメラの対応を保ち、出力番号と混同しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047808+09:00"
+  },
+  {
+    "block": "D07-B120",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "同じbasenameのrender保存物がある場合の左右表示、UIデータでありengine再生/状態には使わない、timeline scrubberで連続切替、フィールド操作とページスクロールの非干渉を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047810+09:00"
+  },
+  {
+    "block": "D07-B121",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "既定配信先はofficial trackerの慣例に合わせるという位置付けを保持。直後の通信先の設定値は変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047813+09:00"
+  },
+  {
+    "block": "D07-B122",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "6設定方針を照合。送信先/identity、追跡設定、診断出力パス、capture起動時初期値とUI切替、Kalmanの2noise/gate、近傍/可視性/キック/浮き球閾値を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047816+09:00"
+  },
+  {
+    "block": "D07-B123",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "初期版の2段階という数量を保持し、次の2項目へつなぐ。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047820+09:00"
+  },
+  {
+    "block": "D07-B124",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "appsettingsと設定値のバインドで全設定を外出し、その後実行時保存領域とCoordinator再読込へ進む順序を保持。登録済みのバインドという名称を使う。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047823+09:00"
+  },
+  {
+    "block": "D07-B125",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "設定セットを承認済みの設定プロファイルへ自然に揃えた見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047826+09:00"
+  },
+  {
+    "block": "D07-B126",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Profilesが2個以上の設定プロファイルを保持できる数量条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047830+09:00"
+  },
+  {
+    "block": "D07-B127",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "少なくともという最低範囲を保持し、後続の構成キー一覧を必須の最大全数に読み替えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047833+09:00"
+  },
+  {
+    "block": "D07-B128",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "RobotTracker設定内のgateを観測との対応付け判定と説明。周囲のProcessNoise/MeasurementNoise等のキーを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047836+09:00"
+  },
+  {
+    "block": "D07-B129",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "BallTracker設定内のgateを観測との対応付け判定と説明。ロボット側とは別の設定として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047839+09:00"
+  },
+  {
+    "block": "D07-B130",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Event設定のkick/chip閾値をキック/浮き球キックの判定閾値と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047841+09:00"
+  },
+  {
+    "block": "D07-B131",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "RuntimeOverridesは選択した設定プロファイルの上への一時上書きであることを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047844+09:00"
+  },
+  {
+    "block": "D07-B132",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "元設定の保存は別操作、UI微調整はdraftとしてCoordinatorで保持、engineへは明示適用時snapshotのみ、pending/in-flight後は不変で次候補だけ編集という境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047847+09:00"
+  },
+  {
+    "block": "D07-B133",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "13切替規則を個別照合。起動時1個/UI一覧/要求伝達/同名受信設定追従/微調整/将来追加、desired最新化、pending1件上書きでqueueなし、実適用versionだけ通知1回、override同経路、不変in-flight、同desiredだけ重複排除、適用済み同値でも打消要求保持を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047850+09:00"
+  },
+  {
+    "block": "D07-B134",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Coordinatorの10責務を個別照合。最新意図/要求1件/同値破棄/in-flight固定、通知前の表示非切替、原子的な適用とstore消去、受信切替の観測時点、通知順、残要求の即時drainを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047853+09:00"
+  },
+  {
+    "block": "D07-B135",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Engineの6責務を照合。Update先頭の適用、request由来の不変設定、重複排除はCoordinator、状態/入力clear、clear後通知、同Updateの後続入力は新状態だけを使う条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047856+09:00"
+  },
+  {
+    "block": "D07-B136",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "runtime identityを実行中のトラッカーの識別情報と説明し、設定プロファイルから分離する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047859+09:00"
+  },
+  {
+    "block": "D07-B137",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Uuid/SourceNameは起動中固定、送信先とraw受信元3設定は切替可能という可否を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047862+09:00"
+  },
+  {
+    "block": "D07-B138",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "設定切替時のstate規則を設定プロファイルの切り替え時の状態規則と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047864+09:00"
+  },
+  {
+    "block": "D07-B139",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "新設定ではcamera-local/kick/contact/pending/worldを消去するが、最新geometryとruntime identityは維持するという対比を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047868+09:00"
+  },
+  {
+    "block": "D07-B140",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "old filter stateをnew profileへ持ち越さない、clear前にpendingをflushしない、同入力のdetectionは新空状態へ、以後のWorldFrameCommittedは新状態だけという4条件を保持。重複した状態推定の内部状態を自然にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047871+09:00"
+  },
+  {
+    "block": "D07-B141",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "初期実装の設定切替はappsettingsと実行時保存領域で扱う境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047874+09:00"
+  },
+  {
+    "block": "D07-B142",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "原文particle filterを広い粒子法にぼかさず、既存許可済みパーティクルフィルターへ復元。学習に基づく推定方式とともに設計時点では使わないという対象外条件を維持。追加承認・一覧変更は不要。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047878+09:00"
+  },
+  {
+    "block": "D07-B143",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "TIGERs実装を参考にするという意味を保持し、参考に寄せるという不自然な原文も自然に修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047881+09:00"
+  },
+  {
+    "block": "D07-B144",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "CamFilter相当のカメラごとの処理/統合/品質評価/公開周期の分離を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047884+09:00"
+  },
+  {
+    "block": "D07-B145",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "BallFilterPreprocessor相当のball群統合/キック検出/キック推定の前処理分離を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047887+09:00"
+  },
+  {
+    "block": "D07-B146",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "BallTrackerごとのKalman filter/health/成長/外れ値という4責務を保持。成長は追跡状態が確立する判定と明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047890+09:00"
+  },
+  {
+    "block": "D07-B147",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "RobotTrackerごとの位置と角度を別々に推定、向きの連続化、外れ値除外を保持。向きの巻き戻し補正は後続のunwrap説明と照合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047893+09:00"
+  },
+  {
+    "block": "D07-B148",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "worldからofficial protoへの専用変換と、rule側がraw packetを直接扱わずに済む境界を保持。漢字の連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047895+09:00"
+  },
+  {
+    "block": "D07-B149",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Tigersの表記を登録済みTIGERsに揃えた対応関係の見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047898+09:00"
+  },
+  {
+    "block": "D07-B150",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ロボットのcamera-localな追跡状態という参照対象を保持し、過剰な漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047901+09:00"
+  },
+  {
+    "block": "D07-B151",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ボールのcamera-localな追跡状態という参照対象を保持し、過剰な漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047905+09:00"
+  },
+  {
+    "block": "D07-B152",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "BallFilterPreprocessorと本設計のボール統合/キック検出/推定前処理の対応を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047908+09:00"
+  },
+  {
+    "block": "D07-B153",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "カメラごとの時系列処理→局所追跡→world統合、ball/team/robot ID別の識別という3方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047911+09:00"
+  },
+  {
+    "block": "D07-B154",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "同語反復の状態推定は設定可能な状態推定を除き、設定調整・差替可能・初期Kalman方式を保持。追跡本体とキック等を分離、world側の永続推定なし、camera-local不確かさ重み付けで毎frame合成する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047914+09:00"
+  },
+  {
+    "block": "D07-B155",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "v1実装契約を初期版実装契約とする見出し。後続の必須契約を今回完了の根拠にはしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047916+09:00"
+  },
+  {
+    "block": "D07-B156",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "7契約を個別照合。線形Kalmanの予測/観測更新、状態/共分散、2noiseとgateの用途、3外部パラメータ、欠測管理で共分散更新を省略不可、事後不確かさで統合、単純外挿/上書き/手動加算だけでは不可を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047919+09:00"
+  },
+  {
+    "block": "D07-B157",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "正規化、カメラ単位更新、横断統合、キック等計算、公式形式変換、競技判定向け通知という6段階の順を保持。最後の漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047922+09:00"
+  },
+  {
+    "block": "D07-B158",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "robot追跡をロボット追跡とする見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047925+09:00"
+  },
+  {
+    "block": "D07-B159",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ロボットはteam+robot id既知でボールより対応付け問題が小さいという前提を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047928+09:00"
+  },
+  {
+    "block": "D07-B160",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "TIGERs RobotTracker同様、位置系と向き系の推定処理を分ける境界を保持。別filterを冗長な状態推定表現にしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047931+09:00"
+  },
+  {
+    "block": "D07-B161",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "8段階を照合。カメラ正規化、team/ID別状態、複数カメラ統合、ID対応、位置/速度と向き/角速度を別推定、多回転unwrap、欠測予測/可視性減衰、gate除外を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047934+09:00"
+  },
+  {
+    "block": "D07-B162",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TIGERs由来で重視する点の導入文を表記統一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047937+09:00"
+  },
+  {
+    "block": "D07-B163",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "位置と向きの推定を分けるという責務を自然な文章で表す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047940+09:00"
+  },
+  {
+    "block": "D07-B164",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "health/更新頻度からvisibility/qualityを作り、カメラごとのtrackと統合後robotを分ける2条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047943+09:00"
+  },
+  {
+    "block": "D07-B165",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "robotごとの可視性の見出しを自然なカタカナ表記にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047946+09:00"
+  },
+  {
+    "block": "D07-B166",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "更新頻度と平均frame間隔からvisibilityを作ること、長時間欠測robotは出力から外すことを保持。直近1秒程度の履歴という前行の条件も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047949+09:00"
+  },
+  {
+    "block": "D07-B167",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ロボットの状態表現の見出しに助詞を補い、直後の状態量/観測量/推定の3区分を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047952+09:00"
+  },
+  {
+    "block": "D07-B168",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "位置のx/y/vx/vyと向きのtheta/omegaという状態量を別の推定系として保持。下の線形Kalman方式の要件と連続して読む。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047955+09:00"
+  },
+  {
+    "block": "D07-B169",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "位置の観測量x/yと向きの観測量thetaを保持。状態量の速度成分を観測にも追加しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047958+09:00"
+  },
+  {
+    "block": "D07-B170",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "位置は等速移動、向きは一定角速度という2推定モデルを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047960+09:00"
+  },
+  {
+    "block": "D07-B171",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "初期版ロボットのfilter要件を、Kalman filterの要件として明示。genericな状態推定へアルゴリズム名をぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047963+09:00"
+  },
+  {
+    "block": "D07-B172",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "12規則を個別照合。近接別IDは半径×1.5、信頼度/ID順、identity switch抑制、同ID近傍優先、unwrap、角度系の分散単位と3profile係数、角速度上限、予測基準gate、欠測予測と寿命分離、事後不確かさ統合、stale外部出力禁止、閾値0.05を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047966+09:00"
+  },
+  {
+    "block": "D07-B173",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "向きを連続化し、-pi/pi境界の跳びを状態管理側で吸収する意味を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047969+09:00"
+  },
+  {
+    "block": "D07-B174",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ball追跡の見出しをボール追跡とする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047972+09:00"
+  },
+  {
+    "block": "D07-B175",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ボールにはIDがないため対応付けを明示的に設計するという前提を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047976+09:00"
+  },
+  {
+    "block": "D07-B176",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TIGERsの2参照型に従い、個別track群とprimary決定/キック推定という2段階に分ける境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047979+09:00"
+  },
+  {
+    "block": "D07-B177",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "8段階を照合。カメラ観測正規化/track維持/距離と最大速度の除外/healthと状態確立/統合/直前推定位置近傍primary/可視性減衰/1つの主対象選択を保持。成長の対象は追跡状態と明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047982+09:00"
+  },
+  {
+    "block": "D07-B178",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TIGERs由来で重視する点の導入を表記統一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047985+09:00"
+  },
+  {
+    "block": "D07-B179",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "healthと成長判定は、追跡の健全度と、観測を重ねて追跡状態が確立したかの判定と説明。ボールの数や寸法の変化ではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047988+09:00"
+  },
+  {
+    "block": "D07-B180",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "直前ball/空中投影位置を基準にする探索半径と、カメラごとに代表trackを最大1つ選んで統合する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047991+09:00"
+  },
+  {
+    "block": "D07-B181",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ballごとの生存管理という見出しをボールごとの生存管理とする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047994+09:00"
+  },
+  {
+    "block": "D07-B182",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "生成直後を追跡状態の確立前として説明。直後の未変更だった一定回数更新の行も同じ説明に修正し、追加の行単位証拠を保存。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.047997+09:00"
+  },
+  {
+    "block": "D07-B183",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "確立前primary優先度低下、secondaryは3回以上観測されたものだけ外部出力、1観測だけのghostは内部に短時間保持しても外部へ出さない、長時間未更新なら削除を保持。実装の観測回数3を照合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048000+09:00"
+  },
+  {
+    "block": "D07-B184",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ボールの状態表現の見出しに助詞を補う。x/y/z/vx/vy/vz、観測x/y/z、等速移動の状態モデルは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048003+09:00"
+  },
+  {
+    "block": "D07-B185",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "初期版ボールのfilter要件をKalman filterの要件と明示し、方式の意味を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048006+09:00"
+  },
+  {
+    "block": "D07-B186",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "8要件を照合。各trackに線形Kalman、予測/観測更新分離、noiseを共分散へ直接使用、gate失敗時だけ新track、信頼度逆数ではなく事後共分散、統合重み、health/確立/可視性は別責務、stale出力禁止、閾値と1.0s基準を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048009+09:00"
+  },
+  {
+    "block": "D07-B187",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "複数ball対応の見出しを複数のボール対応と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048012+09:00"
+  },
+  {
+    "block": "D07-B188",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "出力はprimaryと確立済みsecondaryだけ、Balls[0]固定、直前primary優先後に4判断基準、secondary安定順と1観測フレームだけのghost抑制を保持。成長は追跡状態の確立と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048015+09:00"
+  },
+  {
+    "block": "D07-B189",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "camera統合の見出しをカメラ統合とする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048018+09:00"
+  },
+  {
+    "block": "D07-B190",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "単純平均ではなく規則による候補選別と不確かさに応じた重み付き統合を行うという対比を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048021+09:00"
+  },
+  {
+    "block": "D07-B191",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "9統合規則を照合。位置/IDで束ね、ballは直前推定/浮き球投影近傍で各カメラ1代表、robotは同team/IDのみ、不確かさ重みと将来品質補正、worldの追加filterなし、毎frame合成snapshotを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048026+09:00"
+  },
+  {
+    "block": "D07-B192",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "明らかに古いcamera trackを統合対象から外す条件を保持。追跡状態そのものを即削除する要件へ変えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048029+09:00"
+  },
+  {
+    "block": "D07-B193",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "統合前のcamera ID/local track ID順と、不確かさが同値の場合に同じ2キーで決める規則を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048032+09:00"
+  },
+  {
+    "block": "D07-B194",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "kick検出をキック検出とする見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048034+09:00"
+  },
+  {
+    "block": "D07-B195",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "自動レフェリーに重要なため初期版からキック検出を入れ、主追跡から分離した前処理で扱う境界と参照型を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048037+09:00"
+  },
+  {
+    "block": "D07-B196",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "短時間で速度が閾値以上増加、直前の近傍robot接触候補、進行方向とrobot前方の整合という3候補条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048041+09:00"
+  },
+  {
+    "block": "D07-B197",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "キック検出後にflat/chip推定器へ流す経路を平面/浮き球キックの推定器と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048044+09:00"
+  },
+  {
+    "block": "D07-B198",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "初期版の最小実装という導入を保持。直後の1判定器から開始可能・2系統へ拡張可能という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048047+09:00"
+  },
+  {
+    "block": "D07-B199",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "キックしたrobot IDと開始時刻を出力項目として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048050+09:00"
+  },
+  {
+    "block": "D07-B200",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "flat/chip候補と、stop予測がある場合だけ停止時刻/位置を出す任意条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048053+09:00"
+  },
+  {
+    "block": "D07-B201",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "kicked_ballはキック済みかつ移動中だけ公式出力、速度閾値未満が指定frame数続けばclear、track削除/不可視timeoutでもclear、新キックで置換の4規則を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048056+09:00"
+  },
+  {
+    "block": "D07-B202",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "flat/chipの近似判定を平面キック/浮き球キックと説明する導入。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048059+09:00"
+  },
+  {
+    "block": "D07-B203",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "vzまたはz上昇が閾値以上ならchip、それ以外はflatという2条件を保持。ORをANDにしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048062+09:00"
+  },
+  {
+    "block": "D07-B204",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ball接触をボール接触とする見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048065+09:00"
+  },
+  {
+    "block": "D07-B205",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "contactを専用状態とし、現在接触中と最終接触者を分ける条件を参照型とともに保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048068+09:00"
+  },
+  {
+    "block": "D07-B206",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ロボット半径+ボール半径+marginを接触候補の基準とする式を保持。marginは余白と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048071+09:00"
+  },
+  {
+    "block": "D07-B207",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "現在接触中がいなければ直前キック情報も使って最終接触者を維持する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048074+09:00"
+  },
+  {
+    "block": "D07-B208",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ballのfield外退出をボールのフィールド外退出とする見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048077+09:00"
+  },
+  {
+    "block": "D07-B209",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "geometry線分群またはfield sizeを使い、worldから場外位置と内外状態を作る条件を保持。参照型もそのまま残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048081+09:00"
+  },
+  {
+    "block": "D07-B210",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ボール中心が内側を出た時刻、横切った線種の3分類、複数ballでもtrackごとに判定する範囲を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048084+09:00"
+  },
+  {
+    "block": "D07-B211",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "goal判定の導入へ、原文989行のは分けて保持するを統合した。2分類を別々に保持する意味は削除していない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048087+09:00"
+  },
+  {
+    "block": "D07-B212",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ゴール開口部を通って内部へ入った状態と、単にゴールラインを横切っただけの状態を区別する2項目を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048089+09:00"
+  },
+  {
+    "block": "D07-B213",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "原文989行のは分けて保持するは現在986行の導入文へ移動・統合されている。機械diffが示す現在991行のrule見出しへ対応付けず、意味が保持された移動として記録。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048092+09:00"
+  },
+  {
+    "block": "D07-B214",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "原文991行のrule連携は現在991行の競技規則の判定との連携に対応。機械diffが示す本文段落へ対応付けない。見出しの漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048095+09:00"
+  },
+  {
+    "block": "D07-B215",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "原文993〜995行の本文と導入は現在993〜995行に対応。raw/camera-localを直接読まず、確定world snapshotと通知を読む境界を保持し、過剰な漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048098+09:00"
+  },
+  {
+    "block": "D07-B216",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "最新TrackerFrameに加え、必要に応じ直近数frameの履歴と高レベルeventを渡す。数回分と曖昧にせず追跡フレームの履歴として特定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048101+09:00"
+  },
+  {
+    "block": "D07-B217",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "6方針を照合。rule別observer、raw直接購読なし、TrackerFrame/domain eventを入力、キック等はtracker責務、確定順公開、数値処理への非影響を保持。通知の型TrackerEventを明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048105+09:00"
+  },
+  {
+    "block": "D07-B218",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "publish順を固定する導入文を送信順と説明。次の3段階の順序を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048108+09:00"
+  },
+  {
+    "block": "D07-B219",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "第1段階は状態clear/意味切替を伴うProfileSwitched/GeometryResetという通知であることを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048111+09:00"
+  },
+  {
+    "block": "D07-B220",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "第2段階のframe本体を追跡フレームの本体と明記。WorldFrameCommittedとの対応を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048114+09:00"
+  },
+  {
+    "block": "D07-B221",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "第3段階は当該追跡フレームに従属する派生通知であり、キック等の3種を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048117+09:00"
+  },
+  {
+    "block": "D07-B222",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "同一phase内はEmittedEvents格納順を正とする条件を同一段階内と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048120+09:00"
+  },
+  {
+    "block": "D07-B223",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "最小インターフェースを、後続のITrackerObserver操作一覧に対応する最小限の公開APIと説明。過剰な漢字連結を避ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048123+09:00"
+  },
+  {
+    "block": "D07-B224",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "初期版は同期observerでよく、将来非同期配信/中継へ差替できるようEngineから公開実装を分離可能にする条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048126+09:00"
+  },
+  {
+    "block": "D07-B225",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "filter設定を状態推定設定と説明。この節のnoise/gate設定の対象は前節でKalman方式として明示済み。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048129+09:00"
+  },
+  {
+    "block": "D07-B226",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "filterとgateの主要設定を外出しする条件を、状態推定と対応付け判定の主要設定として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048132+09:00"
+  },
+  {
+    "block": "D07-B227",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "robot/ballのprocess noiseとmeasurement noise、各gating distance、stale timeout、可視性減衰、kick/chip閾値の10項目を保持。noise名称は保持し日本語との区切りを整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048135+09:00"
+  },
+  {
+    "block": "D07-B228",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "設定源を固定せずCoreが設定オブジェクトを受け、DebugHostがデバッグ起動時に供給する責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048138+09:00"
+  },
+  {
+    "block": "D07-B229",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "Raw/Trackedの実ボタン名、tracked表示の推定済みball/robot/kick/contact、raw/trackedでfield見た目を揃える3UI方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048141+09:00"
+  },
+  {
+    "block": "D07-B230",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "tracked表示の最低限という導入を追跡結果の表示と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048144+09:00"
+  },
+  {
+    "block": "D07-B231",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "primary/secondary/tracked robots/設定名/kicked ball有無の5項目を、前に定義した主対象/補助対象/追跡中/設定プロファイル/キック済みとして保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048147+09:00"
+  },
+  {
+    "block": "D07-B232",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "ballのfield内外という表示項目をボールのフィールド内外と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048150+09:00"
+  },
+  {
+    "block": "D07-B233",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "生成器の単位変換、kicked_ball/capabilities、複数ballとprimary先頭の3テスト対象を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048152+09:00"
+  },
+  {
+    "block": "D07-B234",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "8テスト対象を照合。1観測frame入力、複数ball別track、2観測frame速度、noise外部設定、複数設定選択、到着順非依存、MergeWindow外を混ぜない、安定通知を保持。frameを回数へぼかさず、noiseの2種類を明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048155+09:00"
+  },
+  {
+    "block": "D07-B235",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "geometry reset時にpending bufferをclearするテストを、フィールド形状の変化による初期化時の入力バッファ消去として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048158+09:00"
+  },
+  {
+    "block": "D07-B236",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "2個ball入力でprimary指定ballがBalls[0]となる具体テストの数量と期待値を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048161+09:00"
+  },
+  {
+    "block": "D07-B237",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "具体テスト5〜17の13項目を照合。geometry-only更新、2frame速度、2ball分離、設定名切替、順序/窓、secondary安定順、still moving、frame番号維持、observer入力/順、中間frame保持、旧geometry pending破棄を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048164+09:00"
+  },
+  {
+    "block": "D07-B238",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "後続追加6項目を保持。可視性減衰、contact/last toucher、場外、大変更reset、late診断、raw/tracked統合確認は、この文書修正で実装済みにしない。漢字連結を解く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048167+09:00"
+  },
+  {
+    "block": "D07-B239",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "タスク分割方針を作業分割方針とする見出し。作業IDは既存識別子として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048171+09:00"
+  },
+  {
+    "block": "D07-B240",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "002生成器契約テスト、003engine時系列テスト、004内部型/イベント通知先契約という分担を保持。observer-eventはイベントと通知先の契約として型一覧につながる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048174+09:00"
+  },
+  {
+    "block": "D07-B241",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "006〜020と027の16作業を照合。順序/確定、設定・形状・通知、robot/ball、kick/contact/場外、旧Server統合、設定値のバインド、切替経路、UI/診断、検証/最終レビュー、重複robot/短命ball抑制を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048178+09:00"
+  },
+  {
+    "block": "D07-B242",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "contractsフェーズの着手順を契約段階の着手順と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048181+09:00"
+  },
+  {
+    "block": "D07-B243",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "001共有準備/データ、002生成器失敗テスト、003engine時系列、004型/observer-event、005実装という5段階を保持。イベント/通知先をTrackerEvent/ITrackerObserverで明記した既存修正を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048184+09:00"
+  },
+  {
+    "block": "D07-B244",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "承認ゲートを承認条件という見出しへ自然に変更。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048187+09:00"
+  },
+  {
+    "block": "D07-B245",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "TRACKER-000設計承認済み、この設計を正本として契約段階以降を進めるという当時の位置付けを保持。今回のDOC-LINT-003完了根拠へ流用しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048190+09:00"
+  },
+  {
+    "block": "D07-B246",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "accepted",
+    "reason": "仕様変更/再分割は設計と進捗文書を先に同期し、契約段階は先行失敗テストと契約範囲を固定する2方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048193+09:00"
+  },
+  {
+    "block": "D07-B247",
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "disposition": "fixed",
+    "reason": "ソースコードを根拠、初期visionのみ、library+UDP、raw/trackedボタン切替、無関係worktree保護という5前提を保持。変更変更の重複を除き、作業ディレクトリの変更と自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:06:45.048196+09:00"
+  }
+]

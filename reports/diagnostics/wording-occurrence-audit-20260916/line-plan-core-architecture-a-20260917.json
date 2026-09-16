@@ -1,0 +1,236 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      19
+    ],
+    "old": "- `Tracker.RuntimeHost` から raw vision を `Tracker.Core` に渡し、最新の追跡スナップショットと official tracker packet を生成できるようにする",
+    "new": "- `Tracker.RuntimeHost` から raw vision を `Tracker.Core` に渡し、最新の tracked snapshot と official tracker packet を生成できるようにする",
+    "reason": "D07-B006: 保存対象の名前を維持し、RuntimeHostの生成責務を変えない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      20
+    ],
+    "old": "- `Tracker.DebugHost` は Web UI、診断、記録・再生、比較表示に専念し、トラッカーの周期処理を描画やログの保存の周期から切り離す",
+    "new": "- `Tracker.DebugHost` は Web UI、診断、キャプチャー・再生、比較表示に専念し、トラッカーの周期処理を描画やログの保存の周期から切り離す",
+    "reason": "D07-B006: captureを汎用の記録処理へぼかさず、周期処理の分離を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      39
+    ],
+    "old": "- `Tracker.DebugHost` は Web UI、診断、記録・再生、比較、デバッグ設定を担当する",
+    "new": "- `Tracker.DebugHost` は Web UI、診断、キャプチャー・再生、比較、デバッグ設定を担当する",
+    "reason": "D07-B009: 調査用キャプチャーを責務として明示。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      75
+    ],
+    "old": "  - raw vision を含むUDPパケットの受信データ全体",
+    "new": "  - raw vision を含む UDP パケットの受信データ全体",
+    "reason": "D07-B018: 許可済みUDP表記を読みやすく区切る。受信データ全体という範囲は維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      119
+    ],
+    "old": "CaptureOn 中に同じ公式のトラッカー通信のマルチキャスト用の通信アドレスと通信ポートで見えている `TrackerWrapperPacket` は、後から自前トラッカーの出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように別系統で保存する。",
+    "new": "CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように、別系統で保存する。",
+    "reason": "D07-B027: 長い修飾を整理し、内部出力・自前公式パケット・外部パケットの3対象を区別する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      126
+    ],
+    "old": "- `Tracker.DebugHost` は CaptureOn の記録単位とスナップショットの記録を紐付ける統合層とする。同一 CaptureOn の記録単位のキャプチャー、付随情報、診断用の補助ファイル、render snapshot、追跡パケットを保存する補助 JSONL ファイル、追跡スナップショットの対応付け用補助 JSONL ファイルを一つの session folder 配下にまとめ、記録開始時点が異なる CaptureOn のログは別フォルダに分ける。",
+    "new": "- `Tracker.DebugHost` は CaptureOn の記録単位と snapshot log を紐付ける統合層とする。同じ CaptureOn の記録単位のキャプチャー、capture metadata、診断用の補助ファイル、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめる。CaptureOn を開始した時点が異なるログは別フォルダに分ける。",
+    "reason": "D07-B029: ファイルの用途と名前を保持し、capture metadataと表示元の情報を混同しない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      129
+    ],
+    "old": "スナップショットの記録は、既存の `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の追跡パケットを保存する補助 JSONL ファイルとする。診断側の追加は、既存の読み取り処理との `key=value` 形式の互換性を保ったまま、付随情報から解決できる補助ファイルへの相対ファイルパス、表示元数、分類別件数、近傍比較の概要などの参照・集計に限定する。",
+    "new": "snapshot log は、既存の `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とする。診断側の追加は、既存の読み取り処理との `key=value` 形式の互換性を保ったまま、capture metadata から解決できる snapshot sidecar への相対パス、表示元数、source role 別の件数、近傍比較の概要などの参照・集計に限定する。",
+    "reason": "D07-B030: 許可済みの保存物名・相対パスを復元し、互換維持と追加範囲の限定を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      131
+    ],
+    "old": "session folder 名には既存の `<prefix>-<timestamp>-<guid>` 共通名を使う。フォルダ内のファイル名も同じ共通名を含めるか、用途名を使うが、付随情報には session folder と各ファイルへの相対ファイルパスを記録し、既存の共通名を揃える考え方は session folder 名またはフォルダ内ファイル名で維持する。新規記録では `tracker-snapshot-alignment.jsonl` も付随情報から辿れるようにし、対応付けが未作成、記録 0 件、破損している状態を追跡パケットを保存する補助ファイルの成否とは別に表現する。",
+    "new": "session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通名を使う。フォルダ内のファイル名にも同じ共通名を含めるか、用途名を使う。capture metadata には session folder と各ファイルへの相対パスを記録し、共通名を揃える考え方は session folder 名またはフォルダ内のファイル名で維持する。新規キャプチャーでは `tracker-snapshot-alignment.jsonl` も capture metadata から辿れるようにし、alignment sidecar が未作成、記録 0 件、破損している状態を tracker packet snapshot sidecar の成否とは別に表現する。",
+    "reason": "D07-B031: 2つの命名選択肢、保存先参照、0件/未作成/破損の区別を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      133
+    ],
+    "old": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、表示用スナップショットだけでは比較元データとして不十分である。通常経路では、元データまたは元データを復元できる参照を必ず保持する。書き込みと読み取りを通して、保存済み記録から元データを復元または再デコードできるようにする。",
+    "new": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）によって、保存済み記録から元のバイト列を復元し、または再デコードできるようにする。",
+    "reason": "D07-B032: raw payloadを画像や表示用概要にせず、保存後の読み戻しという検証名を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      139
+    ],
+    "old": "- 表示元の分類・表示名・付随情報",
+    "new": "- source role、source label、source metadata",
+    "reason": "D07-B034: 原文の3つの表示元属性を許可済みの名称で特定する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      142
+    ],
+    "old": "- 元データ、または session folder 内で元データを復元できる参照情報",
+    "new": "- 受信パケットの元のバイト列、または session folder 内で元のバイト列を復元できる参照情報",
+    "reason": "D07-B035: raw payloadの対象を明記し、参照による保存も許可する条件を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      144
+    ],
+    "old": "- デコード / データ構造エラーがある場合の省略・エラー情報",
+    "new": "- デコードや保存形式のエラーがある場合に、処理を省略したことやエラーの内容を示す情報",
+    "reason": "D07-B035: skipped/errorを曖昧な省略情報でなく処理結果として説明する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      146
+    ],
+    "old": "自前トラッカーの `Uuid` / `SourceName` は自前のパケットを保存対象から外す条件ではなく、後続表示・比較用の表示元の分類・表示名・付随情報付与に使う。自前トラッカー自身の公式形式のパケットも snapshot sidecar へ保存してよく、自前トラッカーの詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他トラッカーと衝突する場合も記録は落とさず、送信元の通信アドレス / 通信ポートと送信ソケットの自己受信の扱いを診断に記録し、分類を `unknown` や `ambiguous` として扱う。表示元ごとの稼働中トラッカーの API と同一 `uuid` が衝突する場合は表示元の概要 / 分類解決の追跡リスクであり、元データと表示元の識別情報を落とさない限り保存処理を止める理由にはしない。",
+    "new": "自前トラッカーの `Uuid` / `SourceName` は自前のパケットを保存対象から外す条件ではなく、後続表示・比較用の source role、source label、source metadata を付与するために使う。自前トラッカー自身の公式形式のパケットも snapshot sidecar へ保存してよく、詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他のトラッカーと衝突する場合も記録は落とさず、送信元の通信アドレス・通信ポートと送信ソケットの自己受信の扱いを診断に記録し、source role を `unknown` や `ambiguous` として扱う。表示元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、表示元の概要と source role の判定に関する確認事項である。元のパケットと source identity を落とさない限り、保存処理を止める理由にはしない。",
+    "reason": "D07-B036: APIそのものとUUIDが衝突する誤った構文を修正。自前/重複/不明時の保存条件と独立した2確認事項を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      148
+    ],
+    "old": "自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。新規記録の再生・診断・フィールド表示では、CaptureOn の保存時に診断記録、render snapshot、tracker source snapshot を、記録開始からの相対的な `receivedAt` と診断記録の時刻で対応付けた補助ファイルを優先する。旧形式の記録で対応付けがない場合だけ、追跡フレームの番号の完全一致ではなく、自前の `TrackerFrame.data_timestamp_ns` とスナップショット側の `TrackedFrame.timestamp` に対し、時刻が最も近いものか、基準時刻以前の最新のものを選ぶ。この場合は正確な対応を保証しない推定として明示する。採用した対応規則、許容する時間幅、該当表示元の `uuid` / `sourceName` / 送信元の通信アドレス / 通信ポート / 分類、対応付けの状態は、後から確認できるように保存または表示する。",
+    "new": "自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。新規キャプチャーの再生・診断・Field source 表示では、CaptureOn の保存時に診断記録、render snapshot、tracker source snapshot を、記録開始からの相対的な `receivedAt` と診断記録の時刻で対応付けた alignment sidecar を優先する。旧形式のキャプチャーで対応付けがない場合だけ、tracked frame number の完全一致ではなく、自前の `TrackerFrame.data_timestamp_ns` とスナップショット側の `TrackedFrame.timestamp` に対し、時刻が最も近いものか、基準時刻以前の最新のものを選ぶ。この場合は正確な対応を保証しない推定として明示する。採用した対応規則、許容する時間幅、該当表示元の `uuid` / `sourceName` / 送信元の通信アドレス / 通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。",
+    "reason": "D07-B037: 新規と旧形式の基準・選択肢・推定である旨を保持し、Field sourceの参照対象を復元。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      150
+    ],
+    "old": "診断画面の replay timeline は収録時の `ReceivedAt` を軸にし、診断記録 / render snapshot / tracker packet snapshot の和集合、または同等に利用可能な最速の表示元の更新周期を含む索引とする。`TrackedFrame.timestamp` は表示元間で時刻系が違う場合があるため、時系列の並び順には使わない。raw vision / render snapshot よりトラッカー表示元が高速な場合は、高速トラッカーの更新時点ごとに追跡スナップショットを進め、raw vision / 描画はその時点以前の最新の追跡フレームを保持する。先頭でその時点以前の render snapshot がない場合だけ後続のうち最も近い記録による代用を許容する。",
+    "new": "診断画面の replay timeline は収録時の `ReceivedAt` を軸にし、診断記録 / render snapshot / tracker packet snapshot の和集合、または同等に利用可能な最速の表示元の更新周期を含む索引とする。`TrackedFrame.timestamp` は表示元間で時刻系が違う場合があるため、時系列の並び順には使わない。raw vision / render snapshot よりトラッカー表示元が高速な場合は、高速トラッカーの更新時点ごとに tracker snapshot を進め、raw vision / render snapshot はその時点以前の最新のものを保持する。先頭でその時点以前の render snapshot がない場合だけ、後続のうち最も近い記録による代用を許容する。",
+    "reason": "D07-B038: raw visionや描画が追跡フレームを保持するという入力出力の混同を訂正。先頭だけの後続代用を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      154
+    ],
+    "old": "alignment sidecar は `tracker-packet-snapshots.jsonl` へ埋め込まず、別ファイルとする。snapshot sidecar は受信パケットの主記録、alignment sidecar は診断記録の再生用索引として分けることで、対応付け欠落や破損を既存スナップショット保存の破損と区別できる。source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` を基本にし、同じ表示名 / UUID が複数の送信元の通信アドレスと通信ポートに分かれる場合の UI 集約は記録開始からの相対的な `receivedAt` に最も近い代表スナップショットを結果が一意に決まる同条件時の選択規則で選ぶ。",
+    "new": "alignment sidecar は `tracker-packet-snapshots.jsonl` へ埋め込まず、別ファイルとする。snapshot sidecar は受信パケットの主記録、alignment sidecar は診断記録の再生用索引として分けることで、対応付けの欠落や破損を既存スナップショット保存の破損と区別できる。source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` を基本とする。同じ source label / UUID が複数の送信元の通信アドレスと通信ポートに分かれる場合、UI で集約する代表の tracker snapshot は、記録開始からの相対的な `receivedAt` に最も近いものを選ぶ。同条件の候補から選ぶ規則も固定し、選択結果が一意に決まるようにする。",
+    "reason": "D07-B040: 保存物分離・source key・時刻基準・同条件の決定性を維持し、漢字と修飾の連結をほどく。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      156
+    ],
+    "old": "`tracker-snapshot-alignment.jsonl` は診断ログ行ごとの対応表ではなく、第2版の保存形式による replay timeline の記録として扱う。新規記録では、高速トラッカーのキャプチャーごとの対応記録も保存し、同じ raw vision ・描画内容を複数の高速トラッカーの記録から参照できるようにする。低速な raw vision ・描画の更新時点でも、その時点の最新の追跡スナップショットに対応する記録を残す。別の補助ファイルは作らず、互換用の代用処理も持たない。性能を優先し、読み取り処理は第2版の JSONL から、replay timeline の索引、基準時刻以前の最新描画を探す索引、トラッカーの表示元の索引を、ログを開くときに一度だけ構築する。更新や再生位置のドラッグでは、既存の診断ログ行単位の読み取り処理へ戻らない。",
+    "new": "`tracker-snapshot-alignment.jsonl` は診断ログ行ごとの対応表ではなく、第2版の保存形式による replay timeline の記録として扱う。新規キャプチャーでは、高速トラッカーの source sample ごとの対応記録も保存し、同じ raw vision / render snapshot を複数の高速トラッカーの記録から参照できるようにする。低速な raw vision / render snapshot の更新時点でも、その時点の最新の tracker snapshot に対応する記録を残す。別の補助ファイルは作らず、互換用の代用処理も持たない。性能を優先し、読み取り処理は第2版の JSONL から、replay timeline の索引、基準時刻以前の最新描画を探す索引、トラッカーの表示元の索引を、ログを開くときに一度だけ構築する。更新や再生位置のドラッグでは、既存の診断ログ行単位の読み取り処理へ戻らない。",
+    "reason": "D07-B041: source sampleは表示元から得た1回分であり、キャプチャー全体ではない。保存時点の包含と読込1回の制約を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      183
+    ],
+    "old": "通信形式変換境界でのみ公式形式の単位へ変換する。",
+    "new": "公式の通信形式へ変換する箇所でのみ、内部単位から公式形式の単位へ変換する。",
+    "reason": "D07-B045: 通信形式変換境界という漢字連結を自然にし、単位変換を行う境界は限定したままにする。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      203
+    ],
+    "old": "- 現在の接触状態と最終接触者",
+    "new": "- 直近の接触状態と最終接触者",
+    "reason": "D07-B047: latest contactを現在接触中だけへ狭めない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      205
+    ],
+    "old": "- 表示元に関する付随情報",
+    "new": "- 入力元に関する source metadata",
+    "reason": "D07-B047: TrackerFrameの入力由来の情報をUI表示元一般と混同しない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      215
+    ],
+    "old": "  - 追跡エンジンがその追跡結果を確定した処理時刻",
+    "new": "  - 追跡エンジンがその追跡フレームを確定した、この端末での処理時刻",
+    "reason": "D07-B050: 原文のlocal処理完了時刻を保持し、受信時刻や観測時刻と区別。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      250
+    ],
+    "old": "- ボールの移動継続判定用の最新速度 / 最新更新時刻",
+    "new": "- ボールが動き続けているかを判定するための最新速度 / 最新更新時刻",
+    "reason": "D07-B055: 移動継続判定用という修飾を自然にし、still movingの判定対象を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      270
+    ],
+    "old": "- raw vision を 1 件受け取り、観測時刻で並べ替えたうえで内部の追跡の状態を進める",
+    "new": "- raw vision を 1 件受け取り、観測時刻で並べ替えたうえで内部の追跡状態を進める",
+    "reason": "D07-B058: 助詞の重複を除き、1入力と時刻順の契約を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      307
+    ],
+    "old": "- 追跡結果の件数カウンター",
+    "new": "- 追跡フレームの番号を採番するカウンター",
+    "reason": "D07-B063: 件数集計ではなくFrameCommit.cs:183のnextCommittedFrameNumber++に対応する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      398
+    ],
+    "old": "- 適用中の設定プロファイルの表示の正とする値は `TrackedSnapshotStore.ActiveProfileName` とする",
+    "new": "- 適用中の設定プロファイルの表示には、`TrackedSnapshotStore.ActiveProfileName` の値を使う",
+    "reason": "D07-B077: 表示の正とする値という重複を避け、正本のプロパティを特定する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      412
+    ],
+    "old": "これに加えて、`TrackerCoordinator` から追跡エンジンへ設定変更要求だけを渡す観測入力を伴わない制御専用の `Update` 呼び出しを許可する。",
+    "new": "これに加えて、`TrackerCoordinator` から追跡エンジンへ、観測入力を伴わずに設定変更要求だけを渡す、制御専用の `Update` 呼び出しを許可する。",
+    "reason": "D07-B080: control-onlyとreconfigureだけという2条件を保ち、修飾の連結を整理。"
+  }
+]
