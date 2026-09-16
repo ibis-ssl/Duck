@@ -1,0 +1,71 @@
+{
+  "time": "2026-09-17T06:41:32.698013+09:00",
+  "technical_parent": "982c760b3c7ac8722669a4b1de05fcce704ebbb0",
+  "results": [
+    {
+      "name": "full-text",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:text"
+      ],
+      "exit_code": 0,
+      "stdout": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-full-text.stdout",
+      "stderr": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-full-text.stderr"
+    },
+    {
+      "name": "full-spell",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:spell"
+      ],
+      "exit_code": 123,
+      "stdout": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-full-spell.stdout",
+      "stderr": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-full-spell.stderr"
+    },
+    {
+      "name": "full-whitelist",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:whitelist"
+      ],
+      "exit_code": 1,
+      "stdout": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-full-whitelist.stdout",
+      "stderr": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-full-whitelist.stderr"
+    },
+    {
+      "name": "python-packages",
+      "command": [
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+        "-m",
+        "pip",
+        "freeze"
+      ],
+      "exit_code": 0,
+      "stdout": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-python-packages.stdout",
+      "stderr": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-python-packages.stderr"
+    },
+    {
+      "name": "node-versions",
+      "command": [
+        "npm",
+        "ls",
+        "--depth=0",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-node-versions.stdout",
+      "stderr": "reports/diagnostics/wording-occurrence-audit-20260916/logs/diagnostic-resume-poststages-20260917-064130-node-versions.stderr"
+    }
+  ],
+  "configuration_hashes": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "package-lock.json": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+    "tools/lint/markdown-whitelist.yaml": "4a9f9b6fa1c7fdcdfc7b6f3b114d8969aaf02b6e986996bb5b59b46bcf9ca654",
+    "tools/lint/markdown-targets.json": "b04e345a0895cabc4011d779b4cfb8b867ab82996970afee84359529324e1e2a"
+  },
+  "dependency_manifest": "checker-manifest.json",
+  "checker_hash_comparison": "all manifest file hashes identical at session start; frozen directory is not itself a git checkout"
+}

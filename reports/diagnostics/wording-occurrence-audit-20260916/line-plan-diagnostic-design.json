@@ -1,0 +1,1206 @@
+[
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      7
+    ],
+    "old": "記録後に",
+    "new": "キャプチャー後に",
+    "reason": "取得・保存したパケットを後から再生する文脈なので、記録一般へぼかさない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      15
+    ],
+    "old": "CaptureOn の記録単位ごとのフォルダへ、キャプチャー、付随情報、診断記録、render snapshot、追跡パケットを記録する補助 JSONL ファイル",
+    "new": "CaptureOn の session folder へ、キャプチャー、capture metadata、diagnostics log、render snapshot、tracker packet snapshot を保存する snapshot sidecar（JSONL）",
+    "reason": "元の保存契約が扱うフォルダ・付随情報・診断・パケット保存物の名称を保持し、同じ種類の一般的な記録に見せない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      16
+    ],
+    "old": "診断ログの読み取り・再生から",
+    "new": "diagnostics log の読み取り、diagnostics replay、diagnostics playback から",
+    "reason": "ログ読み取り・記録の再生・画面上の再生操作という許可済みの機能名を残す。旧形式に対する縮退方針は変えない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      24
+    ],
+    "old": "履歴退避、進捗管理の軽量化",
+    "new": "履歴の分離、進捗管理の簡略化",
+    "reason": "対象外の保守作業を具体的で自然な日本語にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      28
+    ],
+    "old": "`TrackerConnectionLib` を、official tracker packet をキャプチャーする第一候補の統合点にする。",
+    "new": "official tracker packet のキャプチャー処理の接続先は、`TrackerConnectionLib` を第一候補とする。",
+    "reason": "第一候補の統合点という不自然な名詞句を、何の処理をどこへ接続するかが読める文にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      29,
+      225
+    ],
+    "old": "薄い接続用の処理",
+    "new": "必要最小限の接続処理",
+    "reason": "thin adapterの意図を、薄いという比喩ではなく必要最小限の接続処理として説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      30
+    ],
+    "old": "自己受信用の通信アドレスへのユニキャスト受信だけでは",
+    "new": "同じ端末内へのユニキャスト受信だけでは",
+    "reason": "loopbackによる検証だけでは実マルチキャスト受信の証拠にならないという条件を、自己受信用という造語を避けて説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      31
+    ],
+    "old": "マルチキャスト集合への参加に使うネットワーク接続の指定",
+    "new": "マルチキャストグループへの参加に使う、この端末の NIC を通信アドレスで指定する設定",
+    "reason": "許可済みマルチキャストグループとNICを保持し、受信先でなく端末側の接続を指定するInterfaceAddressの役割を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      31,
+      32,
+      110,
+      112,
+      299,
+      314
+    ],
+    "old": "通常受信",
+    "new": "トラッカーの受信処理",
+    "reason": "live receiverを通常受信と曖昧にせず、設定対象のトラッカー受信処理として説明する。起動時固定・既定無効の条件は維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      33
+    ],
+    "old": "キャプチャー本体、付随情報、診断用の補助ファイル、render snapshot、追跡パケットの記録用補助ファイル",
+    "new": "キャプチャー本体、capture metadata、診断用の補助ファイル、render snapshot、tracker packet snapshot の snapshot sidecar",
+    "reason": "同じsession folderに属する成果物を、保存形式の名称で区別できるよう戻す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      38
+    ],
+    "old": "補助 JSONL ファイル",
+    "new": "sidecar JSONL",
+    "reason": "主記録の形式を表す許可済みのsidecar JSONLを維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      40,
+      51,
+      56,
+      124,
+      294,
+      316
+    ],
+    "old": "相対ファイルパス",
+    "new": "相対パス",
+    "reason": "利用者が承認した相対パスを採用し、基準となるsession folderとの関係を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      40,
+      45,
+      51,
+      53,
+      56,
+      120,
+      124,
+      130,
+      189,
+      294,
+      296,
+      315,
+      316
+    ],
+    "old": "付随情報",
+    "new": "capture metadata",
+    "reason": "これらの箇所は保存先・設定・補助ファイルの参照を持つcapture metadataを指す。source metadataとは区別して許可済み名称へ戻す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      45
+    ],
+    "old": "記録単位のcapture metadata",
+    "new": "capture metadata",
+    "reason": "保存物の名称だけで意味が明確な一覧なので、不自然な記録単位の修飾を除く。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      48,
+      51,
+      315
+    ],
+    "old": "追跡パケットの記録用補助 JSONL ファイル",
+    "new": "tracker packet snapshot の snapshot sidecar（JSONL）",
+    "reason": "追跡パケットの記録と対応付けの記録を、元の許可済み名称で区別する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      49,
+      51
+    ],
+    "old": "追跡スナップショットの対応付け用補助 JSONL ファイル",
+    "new": "alignment sidecar（JSONL）",
+    "reason": "tracker snapshotとの対応関係を保存する補助ファイルを、許可済みalignment sidecarで特定する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      53,
+      130,
+      319
+    ],
+    "old": "旧描画記録の補助ファイル",
+    "new": "旧 render snapshot の補助ファイル",
+    "reason": "完全互換の対象外となる旧形式を、具体的な保存物の名称で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      57
+    ],
+    "old": "最新の補助ファイル経路",
+    "new": "最新の補助ファイルのファイルパス",
+    "reason": "ファイルの所在を指すpathを処理経路と取り違えないよう明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      59
+    ],
+    "old": "書き込みと読み取りを通して、保存済み記録から元データを復元または再デコードできること",
+    "new": "round-trip（書き込み後の読み戻し）により、保存済み記録から元データを復元または再デコードできること",
+    "reason": "許可済みの検証語を保持し、読み戻して比較元のパケットを復元できる条件を明確にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      65,
+      90
+    ],
+    "old": "表示元の分類、表示名、付随情報",
+    "new": "source role、source label、source metadata",
+    "reason": "保存後の比較に使う表示元の3種類の情報を、許可済みの別概念として保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      68
+    ],
+    "old": "受信した元データの Base64 表現",
+    "new": "受信パケットのバイト列の Base64 表現",
+    "reason": "画像ではなくパケット本体を保存することを、PayloadBase64からの復元実装と対応する説明にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      69
+    ],
+    "old": "追跡情報の由来の概要",
+    "new": "表示元の情報の概要",
+    "reason": "TrackerPacketSnapshotSemanticSummaryが持つSourceName等の情報を、曖昧な由来という語にせず表示元の情報として説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      72
+    ],
+    "old": "集約した表示元",
+    "new": "aggregate source",
+    "reason": "複数の候補から代表を選ぶ表示元を示す許可済みの設計語を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      74
+    ],
+    "old": "診断・描画のスナップショット",
+    "new": "診断記録・render snapshot",
+    "reason": "診断記録と描画用スナップショットは別の記録であり、一種類のスナップショットへまとめない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      74
+    ],
+    "old": "同じ記録時系列",
+    "new": "同じキャプチャーの時系列",
+    "reason": "記録時系列という不自然な造語を避け、対応付ける範囲を明確にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      77
+    ],
+    "old": "描画内容番号、描画記録の位置番号または記録開始からの相対位置",
+    "new": "render snapshot の追跡フレーム番号、保存順の位置番号、または保存記録内の相対位置",
+    "reason": "描画内容番号という造語を避け、フレーム番号と保存順・保存位置を区別する。RenderFrameNumberはrender snapshotのFrame.FrameNumberを保持する。時間の相対値と混同しない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      78
+    ],
+    "old": "映像パケット・ render snapshot",
+    "new": "SSL-Vision のパケットと render snapshot",
+    "reason": "SSL-Visionが送る検出情報のパケットを映像データと呼ばない。別保存物のrender snapshotも名称を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      79
+    ],
+    "old": "表示元の分類、表示名、UUID",
+    "new": "source role、source label、UUID",
+    "reason": "source keyを構成する情報の設計名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      80,
+      82,
+      86,
+      128,
+      130,
+      132,
+      221
+    ],
+    "old": "追跡スナップショット",
+    "new": "tracker snapshot",
+    "reason": "パケットの追跡結果を固定した記録の許可済み名称を、参照・比較・索引の各文脈で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      80
+    ],
+    "old": "追跡記録の位置番号",
+    "new": "tracker snapshot の保存順の位置番号",
+    "reason": "位置番号が追跡フレームの番号ではなくファイル内のrecord indexであることを明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      83
+    ],
+    "old": "表示元名や分類で集約して選ばれた場合",
+    "new": "source label や source role で集約して選ばれた場合",
+    "reason": "集約に使う2種類の許可済み識別情報を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      86
+    ],
+    "old": "対応記録を直接引ける",
+    "new": "alignment record を直接取得できる",
+    "reason": "索引が返す保存済みの対応記録の名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      86
+    ],
+    "old": "再生位置のドラッグ、再生更新、Field source 選択時",
+    "new": "timeline scrubber の操作、playback tick、Field source selector の変更時",
+    "reason": "再生位置操作、再生更新、表示元選択の異なる契機を、許可済みの設計名で区別する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      86
+    ],
+    "old": "対応記録からtracker snapshotの位置番号と",
+    "new": "alignment record から tracker snapshot の保存順の位置番号と",
+    "reason": "対応記録とスナップショットの保存順の索引を区別し、追跡フレーム番号と混同させない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      94
+    ],
+    "old": "表示元の識別情報",
+    "new": "source identity",
+    "reason": "不足しても記録を破棄しない情報の設計名を、2つの文脈で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      94
+    ],
+    "old": "表示元ごとの稼働中トラッカーの API と同一 `uuid` の衝突する場合は、表示元の概要と分類の解決に関する追跡リスクとして扱う。",
+    "new": "表示元ごとに利用中のトラッカーを取得する API と、同じ `uuid` が衝突する場合は、表示元の概要と source role の判定に関して後続で確認するリスクとする。",
+    "reason": "同一uuidの衝突する場合という文法崩れを直し、追跡リスクが追跡アルゴリズムの危険なのか継続確認事項なのか分からない表現を明確にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      96
+    ],
+    "old": "同じ表示元名・UUID",
+    "new": "同じ source label と UUID",
+    "reason": "複数の送信元を持つ入力の識別情報の設計名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      96
+    ],
+    "old": "UI の `External` や表示元名による選択は、集約した表示元として扱う。",
+    "new": "UI の `External` や source label による選択は、aggregate source として扱う。",
+    "reason": "UIの集約表示の設計名と選択条件を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      96
+    ],
+    "old": "診断記録の記録開始からの相対的な `receivedAt`",
+    "new": "同じキャプチャーの開始時刻を基準とする診断記録の `receivedAt`",
+    "reason": "記録の記録開始という重複を避け、比較する時刻の基準を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      96
+    ],
+    "old": "送信元の通信アドレスと通信ポートの文字列の序数順とし、対応記録に選択理由を残す。",
+    "new": "送信元の通信アドレスと通信ポートを表す文字列の `StringComparer.Ordinal` による比較順とし、alignment record に選択理由を残す。",
+    "reason": "序数順という分かりにくい訳を、実装の比較処理名で特定する。ViewStateReader.cs:1378,1387のThenByに対応し、アルゴリズムの条件は変えない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      96
+    ],
+    "old": "選択肢に送信元の通信アドレスと通信ポートを含めた表示名を追加できる",
+    "new": "source option に送信元の通信アドレスと通信ポートを含めた表示名を追加できる",
+    "reason": "追加できる表示元の選択肢を示す許可済みの設計語を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      100
+    ],
+    "old": "同じ追跡結果の番号や送信頻度",
+    "new": "同じ tracked frame number や送信頻度",
+    "reason": "入力の観測番号と異なる、出力する追跡フレーム番号を明示する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      102
+    ],
+    "old": "基準時刻以前の最新のものを使うか",
+    "new": "latest-before snapshot を使うか",
+    "reason": "近傍時刻との選択肢として許可済みの名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      102
+    ],
+    "old": "表示元の識別情報",
+    "new": "source identity",
+    "reason": "後から確認する識別情報を、許可済みの設計名で特定する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      104
+    ],
+    "old": "新規記録の診断再生とフィールド表示",
+    "new": "新規キャプチャーの diagnostics replay と Field source の表示",
+    "reason": "新しい保存記録と再生・選択項目の名前を一般語にぼかさず保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      110
+    ],
+    "old": "常時割り当て・受信を始めず",
+    "new": "ソケットのバインドや受信を始めず",
+    "reason": "bindの技術的な意味を承認済みのソケットのバインドで表し、曖昧な割り当てにしない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      116
+    ],
+    "old": "前の session folder の書き込み処理へ追記しない",
+    "new": "前の session folder の snapshot sidecar へ追記しない",
+    "reason": "処理に追記するという不自然な目的語を、実際に追記しない保存先へ修正する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      118
+    ],
+    "old": "まだキャプチャー本体の保存単位が遅延作成されている場合",
+    "new": "キャプチャー本体の保存先がまだ作成されていない場合",
+    "reason": "遅延作成中という不自然な進行形ではなく、最初のパケット到着まで未作成の条件を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      124
+    ],
+    "old": "追跡パケットと diagnostics sample sidecar を解決する",
+    "new": "tracker packet snapshot の snapshot sidecar と diagnostics sample sidecar を取得する",
+    "reason": "読み取り対象はパケット自体でなく、それを保存した補助ファイルであることを復元する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      126
+    ],
+    "old": "エージェント、自動検証、CLI での調査向けに",
+    "new": "エージェントによる調査や自動検証で使うため、CLI で",
+    "reason": "人と用途を同列に並べた不自然な列挙を、CLIの利用目的として自然に説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      128
+    ],
+    "old": "表示元の識別情報・分類・表示名で対象を切り替えられる比較領域",
+    "new": "source identity、source role、source label で対象を切り替えられる comparison panel",
+    "reason": "比較領域と3種類の識別情報を、許可済みの設計語で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      128
+    ],
+    "old": "保存済みの対応付けと diagnostics sample sidecar",
+    "new": "保存済みの alignment sidecar と diagnostics sample sidecar",
+    "reason": "新規記録の比較元となる2種類の保存物を識別できるようにする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      130
+    ],
+    "old": "保存済みの追跡記録の位置番号",
+    "new": "保存済みの tracker snapshot の保存順の位置番号",
+    "reason": "追跡フレーム番号でなくrecord indexによって参照する設計を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      132
+    ],
+    "old": "再生位置のドラッグや再生更新のたびに、追跡パケットの補助 JSONL ファイルや対応付け用の補助 JSONL ファイル",
+    "new": "timeline scrubber の操作や playback tick のたびに、snapshot sidecar や alignment sidecar の JSONL",
+    "reason": "検証する更新契機と再読込を禁止する保存物を、許可済みの別の名前で示す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      132
+    ],
+    "old": "付随情報、スナップショット、対応付け、診断ログの各ファイルパス",
+    "new": "capture metadata、snapshot sidecar、alignment sidecar、diagnostics log の各ファイルパス",
+    "reason": "キャッシュキーを構成する4つの実保存物を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      132
+    ],
+    "old": "表示元の選択肢",
+    "new": "source option",
+    "reason": "索引から生成する表示元候補の設計名を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      134
+    ],
+    "old": "通常の記録で到達し得る",
+    "new": "通常のキャプチャーで到達し得る",
+    "reason": "100メガバイトはキャプチャーで通常到達する大きさであり、上限ではないという条件を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      138,
+      142
+    ],
+    "old": "追跡パケットのスナップショット",
+    "new": "tracker packet snapshot",
+    "reason": "再生時系列を構成する記録と、表示の省略でも削除しない記録の名前を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      140
+    ],
+    "old": "実行環境側の時計",
+    "new": "wall-clock",
+    "reason": "再生開始時と経過時間の基準となる時計の許可済み名称を保持し、ReceivedAtとの違いを残す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      142
+    ],
+    "old": "再生位置のドラッグ、Field source 選択",
+    "new": "timeline scrubber の操作、Field source selector",
+    "reason": "任意の時点を比較する操作経路の具体名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      142
+    ],
+    "old": "確実に比較できる能力",
+    "new": "「確実に比較できる」能力",
+    "reason": "変更前に利用者の意図として引用されていた語句を、原文のまま保持する。引用以外の説明は自然な日本語で記述する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      142
+    ],
+    "old": "保存済みの対応記録",
+    "new": "保存済みの alignment record",
+    "reason": "表示しなかった時点も選択可能な根拠となる記録の設計名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      146,
+      242
+    ],
+    "old": "再生アイコン、早送りアイコン、停止ボタン",
+    "new": "`Play` / `Fast Forward` のアイコンボタンと `Stop` ボタン",
+    "reason": "実際の画面上のボタン名を翻訳して曖昧にしない。操作の配置を確認する文脈でそのまま残す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      146,
+      243
+    ],
+    "old": "小さな区分選択部またはタブ",
+    "new": "小さなタブ、または同等の選択部",
+    "reason": "区分選択部という硬い造語を避け、タブまたは同等の選択UIという元の選択肢を保つ。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      150
+    ],
+    "old": "Field source 選択",
+    "new": "Field source selector",
+    "reason": "状態を保持する操作部の許可済み名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      156
+    ],
+    "old": "小さな定型値の選択ボタン",
+    "new": "倍率を入力する小さなボタン",
+    "reason": "4x/16x/64xの値を入力する任意の補助ボタンという具体的な操作を自然に説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      167,
+      235,
+      305,
+      324
+    ],
+    "old": "raw vision ・ render snapshot",
+    "new": "raw vision と render snapshot",
+    "reason": "入力検出情報と描画記録の2種類を明示し、中黒の前後の不自然な空白を除く。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      167,
+      169,
+      236,
+      327
+    ],
+    "old": "raw vision ・描画内容",
+    "new": "raw vision と render snapshot",
+    "reason": "描画内容という一般語に消えたrender snapshotを戻し、低速な入力と描画記録を保持する契約を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      169
+    ],
+    "old": "raw vision ・描画の更新時点",
+    "new": "raw vision と render snapshot の更新時点",
+    "reason": "更新単位として参照する具体的な保存記録を明示する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      169
+    ],
+    "old": "保存時の対応付け用補助ファイル",
+    "new": "保存時の alignment sidecar",
+    "reason": "保存時の対応付けを行う補助ファイルの名称を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      169
+    ],
+    "old": "高速トラッカーの各キャプチャーに対する対応記録",
+    "new": "高速トラッカーの各 source sample に対する alignment record",
+    "reason": "1回の受信・観測のsampleをキャプチャー全体と取り違えた誤訳を修正する。記録単位と時点ごとの対応を区別する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      212
+    ],
+    "old": "表示元の分類と表示名",
+    "new": "source role と source label",
+    "reason": "表示に残すべき識別情報の設計語を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      178
+    ],
+    "old": "表示元の識別情報と分類・表示名",
+    "new": "source identity、source role、source label",
+    "reason": "3つの異なる識別情報を、許可済み名称で明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      180
+    ],
+    "old": "対応付け用の補助ファイルの有無、対応記録の状態",
+    "new": "alignment sidecar の有無、alignment record の状態",
+    "reason": "表示項目でもファイルと個々の対応記録を区別できるようにする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      181
+    ],
+    "old": "スナップショット側の追跡結果の番号・時刻",
+    "new": "tracker snapshot の tracked frame number と tracked frame timestamp",
+    "reason": "比較対象の番号・時刻は出力側であり、source frame numberと区別して保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      187
+    ],
+    "old": "記録用フォルダ内のスナップショットの記録と対応付け用補助ファイル",
+    "new": "session folder 内の snapshot log と alignment sidecar",
+    "reason": "再生入力になる2種類の保存物とその配置先を、許可済みの名称で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      187
+    ],
+    "old": "表示元の識別情報・分類ごとの追跡パケットの時系列",
+    "new": "source identity / source role ごとの tracker packet snapshot の時系列",
+    "reason": "再生時系列を分ける識別情報と記録の名前を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      193
+    ],
+    "old": "左右それぞれ独立した表示元の選択欄",
+    "new": "左右それぞれ独立した Field source selector",
+    "reason": "フィールドごとの実際の選択部の設計名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      193
+    ],
+    "old": "既存の描画記録の補助ファイル",
+    "new": "既存の render snapshot の補助ファイル",
+    "reason": "ownのパケットがなくても表示を維持する根拠の旧形式名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      195
+    ],
+    "old": "表示元の選択欄は",
+    "new": "Field source selector は",
+    "reason": "配置を指定している選択部の設計名を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      195,
+      272
+    ],
+    "old": "URL の問い合わせ文字列や、ブラウザーの一時保存用・永続用の保存領域",
+    "new": "URLクエリ、`sessionStorage`、`localStorage`",
+    "reason": "保存しない先を一般的な保存領域にぼかさず、URLの項目と実際のAPI名で示す。原文の非永続化条件は変えない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      195
+    ],
+    "old": "再生位置のドラッグや再生更新では",
+    "new": "timeline scrubber の操作や playback tick では",
+    "reason": "表示元の選択状態を維持する契機を、許可済み名称で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      195
+    ],
+    "old": "選択した表示元が新しい表示状態に存在しない場合",
+    "new": "選択した source option が新しい表示状態に存在しない場合",
+    "reason": "再読み込み後の既定への復帰条件を、設計名を保持して記述する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      201,
+      202
+    ],
+    "old": "保存済みの対応付け用補助ファイル",
+    "new": "保存済みの alignment sidecar",
+    "reason": "External/Unknownの代表スナップショットを選ぶ根拠となる保存物の名前を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      203
+    ],
+    "old": "表示元名: 補助ファイル内の正規化済みの表示元名",
+    "new": "source label: snapshot sidecar 内の正規化済みの source label",
+    "reason": "完全一致させる値の設計名と保存元を明示し、source keyとの違いを保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      207
+    ],
+    "old": "選択中の再生時点",
+    "new": "selected replay timeline tick",
+    "reason": "Loadへ渡す選択時点の設計名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      216
+    ],
+    "old": "近傍スナップショットの追跡結果の番号・時刻（ns）・時刻差（ns）",
+    "new": "近傍の tracker snapshot の tracked frame number、tracked frame timestamp（ns）、時刻差（ns）",
+    "reason": "UIへ返す比較対象の出力番号・時刻と単位を明確にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      217
+    ],
+    "old": "対応付けに使った表示元識別子",
+    "new": "対応付けに使った source key",
+    "reason": "source identity全般でなく、対応記録の検索キーを明示する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      221
+    ],
+    "old": "選択中の再生時点の安定した識別子から保存済みの対応記録",
+    "new": "selected replay timeline tick の安定した識別子から保存済みの alignment record",
+    "reason": "保存済み対応付けで参照する時点と記録の名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      221
+    ],
+    "old": "分類・表示名別の候補",
+    "new": "source role / source label 別の候補",
+    "reason": "候補を絞る2種類の識別情報を許可済み名称で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      221
+    ],
+    "old": "追跡結果の番号",
+    "new": "tracked frame number",
+    "reason": "旧形式のownスナップショットの取得に用いる出力番号を明示する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      223
+    ],
+    "old": "再生位置のドラッグ、再生更新、Field source 変更で、追跡パケットや対応付けの補助 JSONL ファイル",
+    "new": "timeline scrubber の操作、playback tick、Field source selector の変更で、snapshot sidecar や alignment sidecar の JSONL",
+    "reason": "キャッシュ再利用を必要とする契機と保存物を具体名で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      223
+    ],
+    "old": "ログ・付随情報・スナップショット・対応付けの各ファイルパス",
+    "new": "diagnostics log、capture metadata、snapshot sidecar、alignment sidecar の各ファイルパス",
+    "reason": "索引のキャッシュを識別する4種類の保存物を曖昧にしない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      225
+    ],
+    "old": "副作用のない索引",
+    "new": "UI やファイルの入出力から独立した索引",
+    "reason": "オブジェクトを副作用のないものと呼ぶ曖昧な表現を、純粋なBuild入力から生成するTrackerDiagnosticsReplayTimelineIndexの責務に合わせて説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      227
+    ],
+    "old": "表示元の追跡結果の状態や概要",
+    "new": "`TrackerDiagnosticsFieldSourceFrame` の状態や概要",
+    "reason": "このframeはraw入力も含む表示用データであり、トラッカーが出力した追跡結果一般とは区別する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      229
+    ],
+    "old": "描画記録",
+    "new": "render snapshot",
+    "reason": "既存のエラー表示と維持すべき表示内容はrender snapshotに対応するため、名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      231
+    ],
+    "old": "複数の追跡結果を同じ",
+    "new": "複数の `TrackerDiagnosticsFieldSourceFrame` を同じ",
+    "reason": "後続へ渡す表示用データ型を一般の追跡結果にぼかさず、型名で特定する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      236
+    ],
+    "old": "高速トラッカーのキャプチャー数以上の第2版の対応記録",
+    "new": "高速トラッカーの source sample 数以上の第2版の alignment record",
+    "reason": "キャプチャー全体の個数ではなく、各受信・観測時点に対応する記録数を必要とする検証へ戻す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      238
+    ],
+    "old": "raw vision と自前トラッカーのフィールド表示",
+    "new": "`Vision Input` / `ibis tracker` のフィールド表示",
+    "reason": "この検証は実際のField sourceの表示を確認するため、元の画面名をそのまま保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      239
+    ],
+    "old": "実行環境側の時計",
+    "new": "wall-clock",
+    "reason": "1秒後の再生位置を判定する時計の許可済み名称を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      240
+    ],
+    "old": "再生位置の操作、Field source 選択",
+    "new": "timeline scrubber の操作、Field source selector",
+    "reason": "表示を省略した中間時点も選択できる操作の設計名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      240
+    ],
+    "old": "選択中の再生時点と保存済みの第2版の対応記録",
+    "new": "selected replay timeline tick と保存済みの第2版の alignment record",
+    "reason": "任意時点比較の入力になる2種類の情報を、設計名で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      250
+    ],
+    "old": "自前トラッカー、`External`、`Unknown`、表示元名",
+    "new": "`ibis tracker`、`External`、`Unknown`、source label",
+    "reason": "Field sourceの選択肢を実表示名と許可済み名称で記載する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      252,
+      253
+    ],
+    "old": "選択中の再生時点と表示元名・分類",
+    "new": "selected replay timeline tick と source label / source role",
+    "reason": "比較の入力となる設計上の選択時点・識別情報を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      252,
+      253
+    ],
+    "old": "Field source の追跡結果に返る",
+    "new": "`TrackerDiagnosticsFieldSourceFrame` に返る",
+    "reason": "表示用のframeを追跡結果と訳した誤りを修正し、raw入力も扱う実際の型名を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      253
+    ],
+    "old": "保存済みの対応付けが参照するスナップショット",
+    "new": "保存済みの alignment sidecar が参照する tracker snapshot",
+    "reason": "元の保存物と対応先のスナップショットを設計名で識別できるようにする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      257
+    ],
+    "old": "対応付け用の補助ファイル",
+    "new": "alignment sidecar",
+    "reason": "旧記録が非対応となる条件の保存物を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      264,
+      302
+    ],
+    "old": "左右の表示元選択",
+    "new": "左右の Field source selector",
+    "reason": "再利用する既存の選択部の名前を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      266
+    ],
+    "old": "`Split` / `Overlay` の区分選択部、または同等の二択操作",
+    "new": "`Split` / `Overlay` を選ぶ操作部、または同等の二択操作",
+    "reason": "区分選択部という造語を避け、実際の2種類の表示方式を選ぶ操作として説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      268,
+      284,
+      321
+    ],
+    "old": "表示元名",
+    "new": "source label",
+    "reason": "source keyではなくUIで選ぶ正規化済み表示元名を表す設計語として保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      270
+    ],
+    "old": "表示元の分類・表示名",
+    "new": "source role / source label",
+    "reason": "凡例に表示する2種類の情報を、許可済み名称で識別できるようにする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      274
+    ],
+    "old": "任意の表示指定と線の設定",
+    "new": "任意の `class` と `stroke` の指定",
+    "reason": "描画マーカーへ追加できる属性を一般的な表示指定へぼかさず、ソース上の属性名で示す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      276
+    ],
+    "old": "既存の未加工の検出情報",
+    "new": "既存の source detections",
+    "reason": "render snapshotが保持する元の検出情報の設計名を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      278
+    ],
+    "old": "render snapshot のフィールド形状",
+    "new": "render snapshot geometry",
+    "reason": "重ね合わせ描画に使う形状情報の許可済み設計語を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      287
+    ],
+    "old": "概要情報からボール・黄色・青色チームへの変換",
+    "new": "概要情報からボールと、黄色・青色それぞれのロボットへの変換",
+    "reason": "変換対象はチーム自体ではなくチーム色別のロボットであるため、削られた対象を戻す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      289
+    ],
+    "old": "付随情報のデータ構造",
+    "new": "capture metadata のデータ構造",
+    "reason": "変更対象外の保存形式を特定し、表示元情報などの一般的なmetadataと区別する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      294
+    ],
+    "old": "スナップショットの補助ファイル",
+    "new": "snapshot sidecar",
+    "reason": "再生で読む具体的な保存物の名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      294
+    ],
+    "old": "表示元の分類・表示名、追跡時刻",
+    "new": "source role / source label、tracked frame timestamp",
+    "reason": "比較表示へ出力する識別情報と時刻の設計名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      298,
+      320
+    ],
+    "old": "比較領域",
+    "new": "comparison panel",
+    "reason": "通常のユーザー確認で使う表示領域の設計名を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      300
+    ],
+    "old": "診断再生と位置のドラッグ",
+    "new": "diagnostics playback と timeline scrubber の操作",
+    "reason": "低速問題の対象となった機能名と操作部名を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      304
+    ],
+    "old": "新規記録の保存時の対応付け用補助ファイル",
+    "new": "新規キャプチャーの保存時の alignment sidecar",
+    "reason": "新規キャプチャーが対象である条件と、追加する保存物の名称を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      305
+    ],
+    "old": "高速トラッカーのキャプチャーごとの対応",
+    "new": "高速トラッカーの source sample ごとの alignment record",
+    "reason": "sampleをキャプチャー全体と取り違えた誤訳を、後続作業の要件でも修正する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      306
+    ],
+    "old": "実行環境側の経過時間",
+    "new": "wall-clock の経過時間",
+    "reason": "再生時刻に対応付ける実行環境側の時計を許可済み名称で保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      306
+    ],
+    "old": "開始時の時計",
+    "new": "開始時の wall-clock",
+    "reason": "開始時のReceivedAtと区別する時計の名前を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      319
+    ],
+    "old": "スナップショットや diagnostics sample sidecar",
+    "new": "snapshot sidecar や diagnostics sample sidecar",
+    "reason": "読める入力ファイルがあることを条件にする文であり、スナップショットの内容とファイルの存在を区別する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      322
+    ],
+    "old": "表示元の選択欄",
+    "new": "Field source selector",
+    "reason": "比較領域を折り畳んでも利用可能にする具体的な操作部を明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      325
+    ],
+    "old": "実行環境側の経過時間",
+    "new": "wall-clock の経過時間",
+    "reason": "通常再生の完了条件にも同じ時計基準の設計名を残す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      329
+    ],
+    "old": "gitへの記録",
+    "new": "コミット",
+    "reason": "利用者が明示承認したGitの操作名を採用し、不自然な回りくどい言い換えをやめる。"
+  }
+]
