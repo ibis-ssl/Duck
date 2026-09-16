@@ -1,0 +1,149 @@
+{
+  "reviewed_at": "2026-09-17T07:41:54.877483+09:00",
+  "technical_parent": "74631ef4bf42345819893b08d984de79ac733650",
+  "role": "implementation_worker_self_check",
+  "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_read_lines": [
+    1,
+    392
+  ],
+  "final_read_lines": [
+    1,
+    394
+  ],
+  "final_sha256": "b7a51040f936ea006e4ce96011b37e66776e540df7beac14063b1bd327bf9327",
+  "input_correspondence": "reports/diagnostics/wording-occurrence-audit-20260916/raw-viewer-block-correspondence-20260917.json",
+  "input_correspondence_sha256": "22c1aee7c424aeed9bc8a98a8416a9b85c1526757e73fb92bdf5263d2cf48854",
+  "final_correspondence": "reports/diagnostics/wording-ledger-20260917-0709/raw-viewer-final-correspondence.json",
+  "input_blocks_reviewed": 85,
+  "footnotes_read": 62,
+  "method": "原文と最終本文を全行対比し、85採否理由と62脚注を本文の参照文脈とともに確認した。スラッシュを連続手順へ狭めた1箇所を補正し、以前の記録は上書きしない。",
+  "sections": [
+    {
+      "baseline_lines": [
+        1,
+        58
+      ],
+      "final_lines": [
+        1,
+        60
+      ],
+      "reason": "raw visionは検出情報で画像/動画でない。UDPバックグラウンド受信、受信先/NIC/profileの解決と再接続、Any/address reuse、明示IPv4または自動列挙で1つ成功なら継続、一部失敗警告、デコード失敗でも前正常状態保持、永続化/追跡解釈対象外を保持。"
+    },
+    {
+      "baseline_lines": [
+        60,
+        108
+      ],
+      "final_lines": [
+        62,
+        110
+      ],
+      "reason": "storeの10情報、immutable+描画中lockなし、7Proto型の実メンバーとcamera単位検出/geometry校正、mm→SVG中央投影、boundary/goal depthまで収める条件を保持。"
+    },
+    {
+      "baseline_lines": [
+        110,
+        186
+      ],
+      "final_lines": [
+        112,
+        188
+      ],
+      "reason": "9部品の描画/色/入力責務、既存line/arc優先と寸法fallback、1ball/robot数量、cursor座標、Home/Canvas/Lines/Markers/Detailsの型付き入力を全確認。"
+    },
+    {
+      "baseline_lines": [
+        188,
+        214
+      ],
+      "final_lines": [
+        190,
+        216
+      ],
+      "reason": "4実UI名固定、RawCamera内部ID、Trackedは自前出力、外部mutable直接参照禁止、同packet時刻/同callback不要、1UI render tickでまとめて固定、006以降provider/composerで同じsnapshot派生、IDまたはSampledAt/受信・frame時刻を保持。"
+    },
+    {
+      "baseline_lines": [
+        216,
+        236
+      ],
+      "final_lines": [
+        218,
+        238
+      ],
+      "reason": "UUID優先と最新ReceivedAt1代表・endpoint間unionなし、不明時だけfallback、異UUIDは同名でも別、ラベル補助、clone/readDTO境界、capturewriterはlive store不採用、raw geometry優先/外部から復元不可、15split/overlay条件を保持。splitは左右独立、overlayは1field1viewport、同source1層、missing片側でもready維持。"
+    },
+    {
+      "baseline_lines": [
+        238,
+        248
+      ],
+      "final_lines": [
+        240,
+        250
+      ],
+      "reason": "旧renderは確定周期制限で新規目標でない。新規sampleが通常入力、同tick以前latest-before、カーソル不動・実受信時刻/delta/stale可視化、同source過去なしだけ2missing、未来fallback禁止、補助indexでも未来不可を保持。"
+    },
+    {
+      "baseline_lines": [
+        250,
+        262
+      ],
+      "final_lines": [
+        252,
+        264
+      ],
+      "reason": "3ループ分離は表示だけでなく保存入力の分離。tracker実時間処理はsampleから駆動せずWorldFrameCommittedへの書込結合禁止、UIは採取周期を決めない。独立sample100ms/0以下既定/metadata2属性/通常summary復元、旧形式は非対応または制限可・高コスト互換非要件、raw周期の維持条件を保持。"
+    },
+    {
+      "baseline_lines": [
+        264,
+        300
+      ],
+      "final_lines": [
+        266,
+        302
+      ],
+      "reason": "4root表示・7field表示方針、マウス操作/座標軸/cursor上下/sidebar、14layout項目と4K/最低詳細高さ/最小幅でも選択可、実UI Vision Input/Tracker Output、timeline scrubber/時刻差速度/末尾停止先頭戻しを保持。"
+    },
+    {
+      "baseline_lines": [
+        302,
+        329
+      ],
+      "final_lines": [
+        304,
+        331
+      ],
+      "reason": "20テスト対象の境界・数量・順、単体テスト、同tick/不変snapshot、未来非混入とready維持、RuntimeHost002/003の依存/sample/legacy条件、既定受信先変更可能と無関係作業保護を保持。"
+    },
+    {
+      "baseline_lines": [
+        331,
+        360
+      ],
+      "final_lines": [
+        333,
+        362
+      ],
+      "reason": "脚注前半30件を本文と対照。sourceは由来/内部keyと表示labelは別、実UI名保持、receive時刻とframe時刻の対象を別にし、同期tickの意味・同source collapse・field描画/viewport/split独立の否定条件を保持。immutable snapshotの手段だけ今回補正。"
+    },
+    {
+      "baseline_lines": [
+        361,
+        392
+      ],
+      "final_lines": [
+        363,
+        394
+      ],
+      "reason": "脚注後半32件を本文と対照。Manager/Adapter、selectedtick/索引/alignment1件と群、sourceと時系列カーソル固定、latest-beforeと未来除外、2missing状態、旧render制約/newcapture単位、sample tickと確定周期別、3ループ/表示だけ補正不採用、sample sidecar10明示項目、legacy非保証とraw周期を保持。"
+    }
+  ],
+  "new_body_edits": [
+    "reports/diagnostics/wording-ledger-20260917-0709/raw-viewer-footnote-correction.json"
+  ],
+  "independent_final_review": false
+}

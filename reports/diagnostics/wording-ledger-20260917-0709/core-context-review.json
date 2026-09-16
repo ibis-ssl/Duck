@@ -1,0 +1,315 @@
+{
+  "reviewed_at": "2026-09-17T07:40:24.974616+09:00",
+  "technical_parent": "74631ef4bf42345819893b08d984de79ac733650",
+  "role": "implementation_worker_self_check",
+  "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_read_lines": [
+    1,
+    1172
+  ],
+  "final_read_lines": [
+    1,
+    1172
+  ],
+  "final_sha256": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843",
+  "input_correspondence": "reports/diagnostics/wording-occurrence-audit-20260916/core-block-correspondence-20260917.json",
+  "input_correspondence_sha256": "eb016c0a6e766c0d989472e1c15f9fd1e5df0f17ff6775e410f3aff89d119f4f",
+  "input_blocks_reviewed": 247,
+  "method": "原文と最終本文の全段落を対比して読み、247変更ブロックの個別採否理由を確認した。文字列一致だけから意味の採用を生成していない。",
+  "sections": [
+    {
+      "baseline_lines": [
+        1,
+        115
+      ],
+      "final_lines": [
+        1,
+        117
+      ],
+      "reason": "4目標、Core/RuntimeHost/DebugHostの責務と将来AutoRef・機械学習・永続化の対象外、4段階の優先順、TIGERsの参照方針、実Proto型/全メンバー/公式3capabilityを確認。原文3点を実際の4項目へ直す数量訂正を採用。"
+    },
+    {
+      "baseline_lines": [
+        117,
+        158
+      ],
+      "final_lines": [
+        119,
+        160
+      ],
+      "reason": "受信パケットの全量保存、6保存物、CaptureOn単位、旧key=value互換、相対パスとbasenameの選択肢、元バイト列のround-trip、identityは除外条件でない、ReceivedAtによる新規alignment・旧形式だけ推定、v2最速source sampleと低速値保持、30fpsは表示だけ、Off後の別記録単位を保持。"
+    },
+    {
+      "baseline_lines": [
+        160,
+        263
+      ],
+      "final_lines": [
+        162,
+        265
+      ],
+      "reason": "内部7型、mm/mm-s/rad/nsと外部変換境界、観測時刻はTCapture優先/欠落または0以下でTSent/受信処理時刻を使わない、processed_atは端末の診断専用時刻、各状態の最低項目と任意のキック停止予測/ロボットIDを保持。"
+    },
+    {
+      "baseline_lines": [
+        264,
+        340
+      ],
+      "final_lines": [
+        266,
+        342
+      ],
+      "reason": "engine入力通常必須/control-only省略可、要求version/不変base+override、0..N確定結果と6通知種の順、pending/camera/track/counter/worldの保持、即時1入力1出力でない、イベント先行/1in-flight固定、生成器の単位/複数/primary/kick/capability責務を保持。"
+    },
+    {
+      "baseline_lines": [
+        341,
+        401
+      ],
+      "final_lines": [
+        343,
+        403
+      ],
+      "reason": "CoordinatorのCore抽出時点、新プロジェクト作成の対象外、UI/diagnostics/capture参照禁止、各フレーム保存/送信/通知、中間frame非削除、profile受領時は未反映・ProfileSwitched時に原子的反映と消去、通知後drainと4種類の設定状態分離、UIは空frameと独立を保持。"
+    },
+    {
+      "baseline_lines": [
+        402,
+        468
+      ],
+      "final_lines": [
+        404,
+        470
+      ],
+      "reason": "3種の通常入力とcontrol-only、geometry先行、TCapture/TSentと入力SourceFrameNumber順、reorder/merge・late除外、入力無しの番号非進行、出力stable order、geometry reset対象・pending破棄・frame番号/identity維持を確認。閾値と実装の既存差は成功に読み替えない。"
+    },
+    {
+      "baseline_lines": [
+        469,
+        528
+      ],
+      "final_lines": [
+        471,
+        530
+      ],
+      "reason": "Core/DebugHost/各層の責務と8段階の処理順を保持。capture保存はデコード前のUDP元バイト列と受信時刻、official比較経路はCore入力へ入れず、self/識別不明も保存するという境界を保持。"
+    },
+    {
+      "baseline_lines": [
+        530,
+        608
+      ],
+      "final_lines": [
+        532,
+        610
+      ],
+      "reason": "全設定キー、capture metadataにProfiles全体+resolved overrideと5相対パス・identity・alignment、汎用CLIの5指標と姿勢/角速度、遅延の受信周期/観測時刻/確定入力位置、raw診断は現在受信でなく出力元SourceDetections、renderはUIだけ、Kalman filterの2noiseとgate、設定外出し2段階を保持。"
+    },
+    {
+      "baseline_lines": [
+        610,
+        708
+      ],
+      "final_lines": [
+        612,
+        710
+      ],
+      "reason": "2個以上のprofile、下書きoverrideと明示apply、最新desiredだけ重複排除、pending1件でqueueなし、in-flight不変、適用済み同値でも打消要求保持、observer通知前にprofile/store更新、engine側clear、Uuid/SourceName固定と受信先切替可、geometry維持/旧buffer非flushを保持。"
+    },
+    {
+      "baseline_lines": [
+        710,
+        774
+      ],
+      "final_lines": [
+        712,
+        776
+      ],
+      "reason": "初期版ではparticle filter/learned modelなし。線形Kalman predict/update・共分散保持、2noise/3scale設定/innovation gate、欠測visibilityは共分散更新の代用でない、world側別filterなし、不確かさ重み付き統合、6段階処理を保持。"
+    },
+    {
+      "baseline_lines": [
+        775,
+        834
+      ],
+      "final_lines": [
+        777,
+        836
+      ],
+      "reason": "robot位置/向き独立Kalman、状態/観測量の差、unwrap/多回転、confidence+ID優先・半径×1.5・IdentitySwitchDistanceMm・同ID近傍優先、角度系rad/rad-sと位置mm非流用、角速度上限、欠測予測と寿命別、事後不確かさ/閾値0.05を保持。"
+    },
+    {
+      "baseline_lines": [
+        835,
+        918
+      ],
+      "final_lines": [
+        837,
+        920
+      ],
+      "reason": "ボール2段階・8処理、各track線形Kalman・共分散・Gate失敗時だけ新track、health/growth/visibilityは別責務。secondaryは3観測以上の追跡状態の確立であり個数増加ではない。1観測ghost外部非出力、primary1個/順序、寿命1.0s、camera代表最大1、不確かさ重み・ID順安定・world推定追加なしを保持。"
+    },
+    {
+      "baseline_lines": [
+        919,
+        990
+      ],
+      "final_lines": [
+        921,
+        992
+      ],
+      "reason": "キック3候補条件、2系統に拡張可能だが最初1本可、移動継続時のみ公式出力、grace/timeout/track削除条件、zまたはvzでchip、現在接触と最終接触別、ボール中心の線横断と3分類・全ball判定。原文989行の述語は最終986行へ統合され、991行見出しへ誤対応しない。"
+    },
+    {
+      "baseline_lines": [
+        991,
+        1075
+      ],
+      "final_lines": [
+        991,
+        1075
+      ],
+      "reason": "ruleは確定world+TrackerEventでraw直接購読しない。reset/profile→frame→派生通知順、同一段階はEmittedEvents順、同期通知許容と将来非同期化、10外部設定、実UI Raw/Tracked、primary/secondary等表示最低条件を保持。"
+    },
+    {
+      "baseline_lines": [
+        1076,
+        1172
+      ],
+      "final_lines": [
+        1076,
+        1172
+      ],
+      "reason": "TDDの初期範囲、17具体テストの数量/条件と後続6項目、既存作業IDと001〜005順序、observer-eventはTrackerEvent/ITrackerObserverの両契約として明記、当時の設計承認をDOC-LINT完了としない、source-first/vision-only/無関係作業保護を保持。"
+    }
+  ],
+  "known_existing_spec_implementation_gap": [
+    {
+      "baseline_line": 465,
+      "final_line": 467,
+      "description": "原文はフィールド長/幅/ゴール形状の設定閾値以上の変化を初期化条件とするが、現行Geometry.csは長/幅だけ設定閾値、ゴール幅/奥行きは値の不一致で判定する。今回は原文条件を無断で変更せず維持し、初期化対象の説明のみ実装と照合して補った。",
+      "code": "Tracker/Tracker.Core/Engine/TrackerEngine/Geometry.cs:20-25",
+      "status": "設計と実装の条件一致は未解決。用語整理で新たに発生した差ではない。"
+    }
+  ],
+  "implementation_checks": [
+    {
+      "file": "Tracker/Tracker.Core/Engine/TrackerEngine/Geometry.cs",
+      "start": 11,
+      "end": 25,
+      "text": [
+        "    private bool ShouldResetForGeometryChange(",
+        "        TrackerGeometrySnapshot updatedGeometrySnapshot,",
+        "        TrackerEngineSettings settings)",
+        "    {",
+        "        if (geometrySnapshot is null)",
+        "        {",
+        "            return false;",
+        "        }",
+        "",
+        "        return Math.Abs(updatedGeometrySnapshot.FieldLengthMm - geometrySnapshot.FieldLengthMm)",
+        "                >= settings.GeometryResetFieldLengthThresholdMm",
+        "            || Math.Abs(updatedGeometrySnapshot.FieldWidthMm - geometrySnapshot.FieldWidthMm)",
+        "                >= settings.GeometryResetFieldWidthThresholdMm",
+        "            || updatedGeometrySnapshot.GoalWidthMm != geometrySnapshot.GoalWidthMm",
+        "            || updatedGeometrySnapshot.GoalDepthMm != geometrySnapshot.GoalDepthMm;"
+      ],
+      "sha256": "f2d003874c37850de0e71325e56a933936e48c91e1a503928e08c26e36b8ea6b",
+      "finding": "field長/幅は設定閾値以上、goal幅/奥行きは不一致。原文の閾値条件との差は既存。"
+    },
+    {
+      "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+      "start": 65,
+      "end": 98,
+      "text": [
+        "    {",
+        "        if (pendingDetections.Count > 0)",
+        "        {",
+        "            var latestBufferedGroupCloseTimestampNs = BuildDetectionGroups(",
+        "                    pendingDetections",
+        "                        .OrderBy(detection => detection.EventTimestampNs)",
+        "                        .ThenBy(detection => detection.CameraId)",
+        "                        .ThenBy(detection => detection.SourceFrameNumber)",
+        "                        .ToList(),",
+        "                    mergeWindowNs)",
+        "                .Select(group => group.CloseTimestampNs)",
+        "                .DefaultIfEmpty()",
+        "                .Max();",
+        "",
+        "            lastCommittedGroupCloseTimestampNs = lastCommittedGroupCloseTimestampNs is null",
+        "                ? latestBufferedGroupCloseTimestampNs",
+        "                : Math.Max(lastCommittedGroupCloseTimestampNs.Value, latestBufferedGroupCloseTimestampNs);",
+        "        }",
+        "",
+        "        pendingDetections.Clear();",
+        "        maxSeenDetectionTimestampNs = null;",
+        "        cameraBallTrackStates.Clear();",
+        "        latestBallContactStates.Clear();",
+        "        latestBallLeftFieldStates.Clear();",
+        "        mergedBallIdentityStates.Clear();",
+        "        cameraRobotTrackStates.Clear();",
+        "        activeKickState = null;",
+        "        lastCommittedPrimaryBall = null;",
+        "        kickBelowStillMovingThresholdFrameCount = 0;",
+        "        nextCameraBallTrackId = 1;",
+        "        nextMergedBallTrackId = 1;",
+        "    }",
+        "",
+        "    /// <summary>"
+      ],
+      "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+      "finding": "pendingとcamera ball/robot/contact/leftField/merged identity/kick/primaryを消去し、kick回数とball ID採番を初期化。frame番号をここでは初期化しない。"
+    },
+    {
+      "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+      "start": 135,
+      "end": 149,
+      "text": [
+        "                    || ballCandidate.MergedBall.ObservationCount < BallGrownUpObservationCount))",
+        "            {",
+        "                continue;",
+        "            }",
+        "",
+        "            balls.Add(ballCandidate.TrackedBall);",
+        "        }",
+        "",
+        "        var observedCameraRobotKeys = UpdateCameraRobotTrackStates(settings, orderedDetections, frameTimestampNs);",
+        "        foreach (var robotEntry in CollectMergedRobotStates(observedCameraRobotKeys))",
+        "        {",
+        "            var trackedRobot = CreateTrackedRobot(robotEntry.Key, robotEntry.Value);",
+        "            if (!PassesOutputVisibility(trackedRobot.Visibility, GetRobotOutputVisibilityThreshold(settings)))",
+        "            {",
+        "                continue;"
+      ],
+      "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+      "finding": "secondary候補だけfresh観測とBallGrownUpObservationCountの下限を課す。"
+    },
+    {
+      "file": "Tracker/Tracker.Core/Runtime/TrackerCoordinator.Dispatch.cs",
+      "start": 19,
+      "end": 33,
+      "text": [
+        "                case TrackerEventKind.ProfileSwitched:",
+        "                    ApplyProfileSwitch(emittedEvent.ProfileName ?? currentSettings.ProfileName);",
+        "                    break;",
+        "                case TrackerEventKind.GeometryReset:",
+        "                    snapshotStore.ClearLatestFrame();",
+        "                    NotifyObservers(observer => observer.OnGeometryReset());",
+        "                    break;",
+        "                case TrackerEventKind.WorldFrameCommitted:",
+        "                    if (TryGetFrame(framesByNumber, emittedEvent.FrameNumber, out var committedFrame))",
+        "                    {",
+        "                        snapshotStore.UpdateLatestFrame(committedFrame, receivedAt);",
+        "                        PublishFrame(committedFrame);",
+        "                        NotifyObservers(observer => observer.OnWorldFrameCommitted(committedFrame));",
+        "                    }",
+        ""
+      ],
+      "sha256": "cbd2d36ca1bcf11a94ed94f03e42c430a03bfb49baad6c60560dc3f23b15f908",
+      "finding": "GeometryResetでstore最新frameを消去してからobserverへ通知。"
+    }
+  ],
+  "new_body_edits": [],
+  "independent_final_review": false
+}
