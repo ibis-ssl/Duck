@@ -1,0 +1,29 @@
+[
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "lines": [
+      24
+    ],
+    "old": "- 本番寄りの実行を担うのトラッカーの実時間処理と将来の自動レフェリーモードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す",
+    "new": "- 本番寄りのトラッカーの実時間処理と将来の自動レフェリーモードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す",
+    "reason": "編集後の本文を読み、置換時に混入した助詞の崩れを訂正。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "lines": [
+      313
+    ],
+    "old": "- 診断画面のrender snapshot のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する",
+    "new": "- 診断画面の render snapshot のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する",
+    "reason": "日本語と保存物名の間隔を整える。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "lines": [
+      218
+    ],
+    "old": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは送信元名が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+    "new": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+    "reason": "source nameの説明を同段落内で統一する。"
+  }
+]

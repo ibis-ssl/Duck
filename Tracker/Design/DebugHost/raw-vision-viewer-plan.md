@@ -4,11 +4,11 @@
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 ## 目的
 
-`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` を含むUDPパケットを直接受信し、最新の検出情報とフィールド形状を Blazor UI 上で可視化できるようにする。旧プロジェクト名は `Tracker.Server` だが、現行のプロジェクト、名前空間、起動経路は `Tracker.DebugHost` とする。
+`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` を含む UDP パケットを直接受信し、最新の検出情報とフィールド形状を Blazor UI 上で可視化できるようにする。旧プロジェクト名は `Tracker.Server` だが、現行のプロジェクト、名前空間、起動経路は `Tracker.DebugHost` とする。
 
 ## 対象範囲
 
-- 設定された raw vision の受信先に割り当てる UDP 受信処理を追加する
+- 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する
 - マルチキャスト用の通信アドレスが設定されている場合はマルチキャストグループへの参加を行う
 - `SSL_WrapperPacket.Parser.ParseFrom` でパケットをデコードする
 - 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、単一のインスタンスを共有する状態保存先に保持する
@@ -21,7 +21,7 @@
 - `TrackerConnectionLib` は使わない
 - パケットの永続化はしない
 - 未加工の検出情報を超える追跡処理、状態推定処理、フィールド全体の状態表現の解釈は入れない
-- 実運用向けのトラッカーの実時間処理と将来の自動判定モードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す
+- 本番寄りのトラッカーの実時間処理と将来の自動レフェリーモードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す
 
 ## 設定
 
@@ -29,7 +29,7 @@
 
 - `MulticastAddress`: 既定値 `224.5.23.2`
 - `Port`: 受信に使う通信ポート
-- `InterfaceAddress`: マルチキャストグループへの参加に使う IPv4 の通信アドレス。未設定時は利用候補のネットワーク接続を自動解決する
+- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 の通信アドレス。未設定時はこの端末で利用候補となるネットワーク接続を自動解決する
 - `Profiles.<name>`: 設定プロファイルごとの受信設定の上書き。`MulticastAddress` / `Port` / `InterfaceAddress` を同名のトラッカーの設定プロファイルに追従させたい場合に使う
 
 設定の解決規則:
@@ -40,18 +40,18 @@
 
 ## 受信設計
 
-`VisionReceiverService` はバックグラウンド処理として動作する。
+`VisionReceiverService` は、アプリケーションの起動・停止に合わせて動作するバックグラウンド処理とする。
 
 - IPv4 UDP ソケットを作成する
 - 通信アドレスの再利用を有効にする
-- `IPAddress.Any` と設定した通信ポートに割り当てる
-- 取り消し要求が来るまでUDPパケットを継続受信する
+- ソケットを `IPAddress.Any` と設定した通信ポートに割り当てる
+- 取り消し要求が来るまで UDP パケットを継続受信する
 - 受信設定が切り替わったら現在の受信処理を取り消し、新しい設定でソケットを開き直す
 
 設定された通信アドレスがマルチキャストの場合、参加するマルチキャストグループは次の規則で解決する。
 
 - `InterfaceAddress` が設定されている場合、その IPv4 の通信アドレスのみを使う
-- 未設定の場合、利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する
+- 未設定の場合、この端末で利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する
 - 少なくとも 1 つ成功すれば受信開始を継続する
 - 一部のネットワーク接続の失敗は警告ログに残す
 
@@ -62,7 +62,7 @@
 `VisionPacketStore` は、UI が参照する状態を複数スレッドから安全に利用できる形で保持する。
 
 - 最新の受信パケット
-- 最新の検出結果
+- 最新の `SSL_DetectionFrame`
 - カメラごとの最新の検出情報のスナップショット
 - 集約表示用に統合したボール、黄色チームのロボット、青色チームのロボット
 - 最新のフィールド形状
@@ -79,7 +79,7 @@ UI には変更不能なスナップショットを返し、描画中にロッ�
 raw vision viewer が直接使う主な入力型は次の通り。
 
 - `SSL_WrapperPacket`
-  - 受信したUDPパケットのデータ全体
+  - 受信した UDP パケットのデータ全体
   - `Detection` と `Geometry` を内包する最上位のパケット
 - `SSL_DetectionFrame`
   - カメラごとの未加工の検出情報
@@ -206,20 +206,20 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 
 ライブ表示での比較では、パケット内の時刻[^packet-timestamp]の厳密な一致や、すべての表示元が同じ受信時の処理呼び出し[^receive-callback]で更新されることは要求しない。未加工の SSL-Vision 入力、自前トラッカー、外部トラッカーは、受信するデータ列と更新時の処理呼び出しが異なるため、ここを契約にすると通常表示の実装が過剰に結合する。採用方針は、1 回の `UI render tick`[^ui-render-tick] で各表示元の最新の変更不能なスナップショット[^immutable-snapshot]を固定し、まとめたスナップショットを分割表示・重ね表示の Layer A/B に渡すことである。
 
-`RUNTIME-HOST-006` 以降のライブ表示では、`Home.razor` は未加工入力や追跡結果の保存先を直接受け取らず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は保存先を再読取せず、固定してまとめたスナップショットから比較用のスナップショットと表示状態を生成する。これにより、未加工入力・追跡結果・比較の各表示は、同じ描画更新時点のスナップショットから派生する。
+`RUNTIME-HOST-006` 以降のライブ表示では、`Home.razor` は未加工入力や追跡結果の保存先を直接受け取らず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は保存先を再読取せず、固定してまとめたスナップショットから比較用のスナップショットと表示状態を生成する。これにより、`Raw`、`Tracked`、`Compare` の各表示は、同じ描画更新時点のスナップショットから派生する。
 
 `UI render tick` でまとめるスナップショットは、次を保持する。
 
 - 描画更新の識別子[^render-tick-id]、または `SampledAt`
 - source key[^source-key]と画面上の表示名[^display-label]
-- 表示元ごとの受信時刻[^receive-timestamp]、観測時刻[^frame-timestamp]、パケット数など、時刻差を説明する付随情報
+- 表示元ごとの受信時刻[^receive-timestamp]、検出情報や追跡フレームに記録された時刻[^frame-timestamp]、パケット数など、時刻差を説明する付随情報
 - ボール、ロボット、フィールド形状の参照[^geometry-reference]、欠落理由を含む、変更不能な表示元のスナップショット
 
-外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、送信元名と送信元の通信アドレスと通信ポートを代用して識別する。`uuid` が異なるトラッカーは送信元名が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。
+外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。
 
 フィールド形状の基準は未加工入力の形状を優先する。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新の `SSL_GeometryData` を重ね表示全体のフィールド基準に使い、未加工入力の形状がまだ無い場合のみ `Tracked` の形状で代用する。`3rd party tracker` のパケットからフィールド形状を復元する方針は不採用とする。外部トラッカーのパケットは比較対象の物体の状態を表すものであり、フィールドの校正の責任を持たせると、表示元ごとの座標比較の意味が曖昧になる。
 
-分割表示・重ね表示の UI 挙動は、診断画面に寄せる。
+分割表示・重ね表示の UI 挙動は、診断画面に合わせる。
 
 - 分割表示では Layer A と Layer B を左右に並べる
 - 重ね表示では 1 つのフィールドに Layer A/B を重ねる
@@ -239,9 +239,9 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 
 ## 診断再生での時刻の対応付け
 
-診断記録の再生・比較は、selected replay timeline tick[^selected-replay-timeline-tick]を同期基準にする。旧形式の既存制限[^old-format-current-limitation]では、raw vision と自前トラッカーは選択時点の描画内容から得たスナップショットを使い、外部トラッカーは同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] にある対応記録を使う。この旧描画記録の経路[^legacy-render-snapshot-sidecar]は `WorldFrameCommitted`[^world-frame-committed] に従うため、トラッカーの追跡結果の確定周期[^tracker-committed-frame-cadence]に制限され、新規記録[^new-capture]の目標経路としては扱わない。
+診断記録の再生・比較は、selected replay timeline tick[^selected-replay-timeline-tick]を同期基準にする。旧形式の既存制限[^old-format-current-limitation]では、`Vision Input` と自前トラッカーは、選択時点の render snapshot から得たスナップショットを使い、外部トラッカーは同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] にある対応記録を使う。この render snapshot の経路[^legacy-render-snapshot-sidecar]は `WorldFrameCommitted`[^world-frame-committed] に従うため、トラッカーの追跡結果の確定周期[^tracker-committed-frame-cadence]に制限され、新規キャプチャー[^new-capture]の目標経路としては扱わない。
 
-新規記録の診断再生・比較は、diagnostics sample tick[^diagnostics-sample-tick]を保存単位にする。診断画面の `Vision Input` は選択時点の描画内容ではなく、diagnostics sample tick で保存された最新の未加工入力のスナップショット[^latest-raw-snapshot]から復元する。自前トラッカーと外部トラッカーの比較対象には、同じ diagnostics sample tick で保存された最新の追跡スナップショット[^latest-tracker-snapshot]、または同時点以前の `latest-before snapshot` を使う。このため、新規記録では raw vision、自前トラッカー、外部トラッカーを、トラッカーの追跡結果の確定周期ではなく診断データの採取時系列[^diagnostics-sample-timeline]上で比較する。
+新規キャプチャーの診断再生・比較は、diagnostics sample tick[^diagnostics-sample-tick]を保存単位にする。診断画面の `Vision Input` は選択時点の render snapshot ではなく、diagnostics sample tick で保存された最新の未加工入力のスナップショット[^latest-raw-snapshot]から復元する。自前トラッカーと外部トラッカーの比較対象には、同じ diagnostics sample tick で保存された最新の追跡スナップショット[^latest-tracker-snapshot]、または同時点以前の `latest-before snapshot` を使う。このため、新規キャプチャーでは raw vision、自前トラッカー、外部トラッカーを、トラッカーの追跡結果の確定周期ではなく診断データの採取時系列[^diagnostics-sample-timeline]上で比較する。
 
 選択時点[^selected-tick]に、対象の `3rd party tracker` の表示元に対する対応記録が無い場合でも、表示と比較を消さない。採用方針は、同じ表示元について選択時点以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を、Field source と比較に使うことである。UI と比較結果には、対応規則が `latest-before` であること、表示元のスナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を明示する。これにより、対象の表示元が選択時点で未更新でも、ユーザーは直前まで得られていた追跡状態を、未加工入力や自前トラッカーと比較できる。
 
@@ -257,11 +257,11 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 
 - トラッカーの周期処理は、未加工の入力パケットと設定プロファイルと制御入力を追跡エンジンへ渡し、追跡状態の更新、送信、最新の追跡スナップショットの公開までを担当する。診断用の補助ファイルへ追跡結果を保存する処理を、この周期処理の `WorldFrameCommitted` 通知処理へ直接結合しない。
 - サーバーのライブ表示の処理は、`UI render tick` ごとに未加工入力、自前の追跡結果、外部トラッカーの最新の変更不能なスナップショットを固定し、通常の raw vision viewer の分割表示・重ね表示を描画する。これは表示用の周期処理であり、診断ログ用のデータの採取周期を決めない。
-- 診断ログの保存・再生処理は、トラッカーの周期処理から直接書き込まれた描画内容を読むのではなく、DebugHost のバックグラウンド処理が独立して診断データを採取する時点で、最新の未加工入力と追跡結果のスナップショットを固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] `diagnostics-samples.jsonl` に保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、通常の再生では、この採取時系列に保存した検出情報と追跡結果の概要から、`Vision Input` と `ibis tracker` の表示を復元する。
+- 診断ログの保存・再生処理は、トラッカーの周期処理から直接書き込まれた render snapshot を読むのではなく、DebugHost のバックグラウンド処理による独立した diagnostics sample tick で、最新の未加工入力と追跡結果のスナップショットを固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] `diagnostics-samples.jsonl` に保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、通常の再生では、この採取時系列に保存した検出情報と追跡結果の概要から、`Vision Input` と `ibis tracker` の表示を復元する。
 
-ログの互換性は、この処理周期の分離の必須要件にしない。新規記録の性能と周期維持を優先し、旧描画記録の補助ファイルに対する処理負荷の大きい互換処理は設計しない。旧形式の描画記録の補助ファイルしか持たない記録単位は、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。旧形式を読む場合も、旧経路がトラッカーの追跡結果の確定周期に制限されることを UI と詳細表示で説明できれば足りる。
+ログの互換性は、この処理周期の分離の必須要件にしない。新規キャプチャーの性能と周期維持を優先し、旧形式の render snapshot を保存した補助ファイルに対する処理負荷の大きい互換処理は設計しない。旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。旧形式を読む場合も、旧経路がトラッカーの追跡結果の確定周期に制限されることを UI と詳細表示で説明できれば足りる。
 
-診断データの採取周期は、トラッカーの追跡結果の確定周期と同義にしない。未加工の SSL-Vision 入力の最新スナップショットが追跡結果の確定より高頻度に更新される場合、新しいログ保存経路は未加工入力の更新周期[^raw-snapshot-cadence]を失わない保存境界を持つ。追跡結果のスナップショットは diagnostics sample tick での最新値を読むが、トラッカーの実時間処理自体を診断データの採取処理から駆動しない。これにより、トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生のいずれかの負荷や周期が、他の処理のユーザーに見える表示や保存周期を支配しない。
+diagnostics sample tick の周期は、トラッカーの追跡結果の確定周期と同義にしない。未加工の SSL-Vision 入力の最新スナップショットが追跡結果の確定より高頻度に更新される場合、新しいログ保存経路は未加工入力の更新周期[^raw-snapshot-cadence]を失わない保存境界を持つ。追跡結果のスナップショットは diagnostics sample tick での最新値を読むが、トラッカーの実時間処理自体を診断データの採取処理から駆動しない。これにより、トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生のいずれかの負荷や周期が、他の処理のユーザーに見える表示や保存周期を支配しない。
 
 ## UI 方針
 
@@ -289,11 +289,11 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 - `VisionFieldCanvas.razor` はフィールド本体に加えて、座標軸とカーソル座標の重ね表示を管理する
 - 重ね表示するカーソル座標は、通信形式から得たフィールド形状と `VisionFieldProjection` の逆写像から求める
 - サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントへ閉じ込めない
-- `Diagnostics.razor` の描画記録の表示は、`Vision Input` と `Tracker Output`のフィールド表示領域と下部の詳細領域との境界を、ドラッグで変更できるようにする
+- `Diagnostics.razor` の render snapshot の表示は、`Vision Input` と `Tracker Output` のフィールド表示領域と下部の詳細領域との境界を、ドラッグで変更できるようにする
 - 診断画面のフィールドと詳細領域の比率は、表示領域の高さに依存した固定上限だけにせず、4K などの高解像度環境でフィールドを大きく広げられる上限を持つ
 - 詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列の確認を壊さない
-- `Diagnostics.razor` の左側の観測結果の時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする
-- 観測結果の時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも観測結果の選択操作と省略表示を維持する
+- `Diagnostics.razor` の左側の追跡フレームの時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする
+- 追跡フレームの時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも追跡フレームの選択操作と省略表示を維持する
 - `MainLayout.razor.css` と `NavMenu.razor.css` は、raw vision viewer や診断画面の濃い緑色の UI と同じ配色・密度を使い、Blazor の既定テンプレート由来の青紫色のグラデーションや、周囲から浮いた画面移動用の表示を残さない
 - 側面の画面移動メニューの選択中・カーソルが重なった状態・折りたたみ・モバイル向けの切り替えは、既存操作を維持しつつ、表示画面と同じ枠線、背景、文字色の階調で表現する
 - `Diagnostics.razor` の timeline scrubber には、再生、停止、早送りの操作部を置き、選択する記録を順方向に進める
@@ -310,30 +310,30 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 - `VisionReceiverService.ResolveMulticastJoinAddresses` が明示指定した通信アドレスと自動探索を正しく処理する
 - `VisionFieldProjection` が `(0, 0)` を中央に写像する
 - `VisionFieldProjection` がフィールド、外周、ゴールの奥行きを含めても表示領域内に収める
-- 診断画面の描画記録のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限をテストで確認する
-- 診断画面の観測結果の時系列一覧の可変幅は、最小値・最大値・ドラッグによる移動量の制限をテストで確認する
-- 診断画面の時系列再生は、次の位置の計算、最後での停止と先頭復帰、通常再生と早送りで進める幅、時刻差に基づく実速度の間隔をテストで確認する
-- raw vision viewer の分割表示・重ね表示の契約は、表示元候補、表示方式、Layer A/B の表示元選択、層の表示・非表示、同じ表示元を 1 層へまとめる処理、欠落した層があっても準備済みの層を残す挙動、診断画面に合わせた凡例と詳細表示をテストで先に固定する
-- raw vision viewer の重ね表示の色に関する契約は、Layer A/B のフィールド上のマーカーと凡例が診断画面と同じ考え方の異なる強調色を持ち、同じ表示元をまとめる場合は 1 層の色になることをテストで先に固定する
-- raw vision viewer と診断画面の重ね表示の契約は、表示層ごとに独立したフィールド描画領域を重ねず、両画面が同じ重ね表示用のフィールド表示コンポーネントを使い、単一の viewport state の下で Layer A/B を描くことをテストで先に固定する
-- raw vision viewer と診断画面の分割表示の契約は、左右フィールドの表示位置・倍率は独立のまま、両画面が同じ分割表示用のフィールド表示コンポーネントと、同じマーカー・フィールド形状の描画方針を使うことをテストで先に固定する
-- raw vision viewer のライブ表示での比較の契約は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の最新の変更不能なスナップショットを固定し、後続の保存状態の更新で描画中のスナップショットが変化しないことをテストで先に固定する
-- 外部トラッカーのライブ表示の表示元に関する契約は、UI が `MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を直接読まず、変更不能なスナップショットの保存先または合成処理を通して、表示元の選択肢とフィールド用 DTO を作ることをテストで先に固定する
-- 診断再生での時刻の対応付けの回帰検証では、選択した `ReplayTimelineIndex` に対象の外部表示元の対応記録が無い場合でも、selected replay timeline tick 自体は動かさない。同じ表示元の選択時点以前の `latest-before snapshot` を Field source と比較に使い、対応規則、スナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を表示することをテストで先に固定する
-- 診断画面の欠落表示の回帰検証では、選択時点以前に同じ表示元のスナップショットが一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、後続のスナップショットで代用せず、準備済みの層は残ることをテストで先に固定する
+- 診断画面の render snapshot のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する
+- 診断画面の追跡フレームの時系列一覧の可変幅は、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する
+- 診断画面の時系列再生は、次の位置の計算、最後での停止と先頭復帰、通常再生と早送りで進める幅、時刻差に基づく実速度の間隔を単体テストで確認する
+- raw vision viewer の分割表示・重ね表示の契約は、表示元候補、表示方式、Layer A/B の表示元選択、層の表示・非表示、同じ表示元を 1 層へまとめる処理、欠落した層があっても準備済みの層を残す挙動、診断画面に合わせた凡例と詳細表示を単体テストで先に固定する
+- raw vision viewer の重ね表示の色に関する契約は、Layer A/B のフィールド上のマーカーと凡例が診断画面と同じ考え方の異なる強調色を持ち、同じ表示元をまとめる場合は 1 層の色になることを単体テストで先に固定する
+- raw vision viewer と診断画面の重ね表示の契約は、表示層ごとに独立したフィールド描画領域を重ねず、両画面が同じ重ね表示用のフィールド表示コンポーネントを使い、単一の viewport state の下で Layer A/B を描くことを単体テストで先に固定する
+- raw vision viewer と診断画面の分割表示の契約は、左右フィールドの表示位置・倍率は独立のまま、両画面が同じ分割表示用のフィールド表示コンポーネントと、同じマーカー・フィールド形状の描画方針を使うことを単体テストで先に固定する
+- raw vision viewer のライブ表示での比較の契約は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の最新の変更不能なスナップショットを固定し、後続の保存状態の更新で描画中のスナップショットが変化しないことを単体テストで先に固定する
+- 外部トラッカーのライブ表示の表示元に関する契約は、UI が `MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を直接読まず、変更不能なスナップショットの保存先または合成処理を通して、表示元の選択肢とフィールド用 DTO を作ることを単体テストで先に固定する
+- 診断再生での時刻の対応付けの回帰検証では、選択した `ReplayTimelineIndex` に対象の外部表示元の対応記録が無い場合でも、selected replay timeline tick 自体は動かさない。同じ表示元の選択時点以前の `latest-before snapshot` を Field source と比較に使い、対応規則、スナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を表示することを単体テストで先に固定する
+- 診断画面の欠落表示の回帰検証では、選択時点以前に同じ表示元のスナップショットが一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、後続のスナップショットで代用せず、準備済みの層は残ることを単体テストで先に固定する
 - `RUNTIME-HOST-002` の TDD 契約は、RuntimeHost / DebugHost のプロジェクト依存境界と、DebugHost が読み取り側を担当する責務を固定する
-- `RUNTIME-HOST-003` の TDD 契約は、診断データの採取境界と旧形式の機能制限に関する契約を固定する。diagnostics sample tick がトラッカーの追跡結果の確定周期に依存せず、最新の未加工入力と追跡結果のスナップショットを保存することを確認する。また、診断画面の `Vision Input` が旧描画記録の補助ファイルではなく diagnostics sample sidecar から復元されること、DebugHost の診断ログの保存・再生処理が RuntimeHost のトラッカーの周期処理やサーバーのライブ表示の処理の `UI render tick` におけるスナップショット契約を壊さないことを確認する。旧描画記録の補助ファイルしか持たない記録単位は非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換保証を持たないこともテストで先に固定する
+- `RUNTIME-HOST-003` の TDD 契約は、診断データの採取境界と旧形式の機能制限に関する契約を固定する。diagnostics sample tick がトラッカーの追跡結果の確定周期に依存せず、最新の未加工入力と追跡結果のスナップショットを保存することを確認する。また、診断画面の `Vision Input` が旧形式の render snapshot を保存した補助ファイルではなく diagnostics sample sidecar から復元されること、DebugHost の診断ログの保存・再生処理が RuntimeHost のトラッカーの周期処理やサーバーのライブ表示の処理の `UI render tick` におけるスナップショット契約を壊さないことを確認する。旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換保証を持たないことも単体テストで先に固定する
 
 ## 前提
 
 - raw vision の情報は `vision/ssl_vision_wrapper.proto` の `SSL_WrapperPacket` を指す
 - SSL-Vision の既定のマルチキャスト受信先は一般には `224.5.23.2:10006` だが、実行時の設定で変更できる
-- 作業中の変更にある既存の無関係な変更は保護する
+- 無関係な作業ディレクトリの変更は保護する
 
 [^source-term]: 表示元: 画面に描画するボール、ロボット、フィールド形状の由来。raw vision viewer の分割表示・重ね表示では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。
 [^raw-aggregate]: Raw Aggregate: 未加工 SSL-Vision 入力のカメラごとの最新検出情報を UI 表示用に統合した表示元。複数カメラのボール・ロボットをまとめて raw vision viewer で見るための候補で、カメラ単体ではなく集約表示を選ぶときに使う。
 [^raw-camera]: Raw Camera: 特定のカメラ ID の未加工 SSL-Vision 入力の最新検出情報を表示する表示元。カメラごとの見え方や検出差を確認するための候補で、選択肢の内部識別子にはカメラ ID を含める。
-[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` を映像表示用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。
+[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` をフィールド描画用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。
 [^third-party-tracker]: 3rd party tracker: 自前トラッカー以外の外部トラッカーから受けたパケットの表示元。外部トラッカーの出力を未加工の SSL-Vision 入力や自前トラッカーと比較するための候補。
 [^live-state]: 実行中の状態: raw vision viewer の分割表示・重ね表示の `3rd party tracker` で、実行中に外部トラッカーから最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、スナップショット化された表示用データを読む。
 [^mutable-state]: 変更可能な状態: `MultiTrackerManager` 内で後から内容が変わる状態オブジェクト。raw vision viewer の分割表示・重ね表示では、描画中に値が変わることを避けるため、この状態を直接読まず、スナップショット化してから比較に使う。
@@ -347,7 +347,7 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 [^source-key]: source key: raw vision viewer の表示元を識別する内部キー。`Raw Camera` ではカメラ ID を含め、画面上の表示名だけで表示元を取り違えないようにする。
 [^display-label]: 画面上の表示名: UI に出す名前。source key とは違い、内部識別には使わず、詳細表示や選択肢でユーザーに表示元を示すために使う。
 [^receive-timestamp]: 受信時刻: パケットを受け取った時刻。詳細表示で表示元間の時刻差を確認し、`latest-before snapshot` が選択時点からどれだけ古いかを説明するために使う。
-[^frame-timestamp]: 観測時刻: 検出結果や追跡結果側の時刻。受信時刻と併せて、表示元同士の比較がどの時刻情報に基づくかを詳細表示で説明する。
+[^frame-timestamp]: 検出情報や追跡フレームの時刻: 検出情報や追跡フレームに記録された時刻。受信時刻と併せて、表示元同士の比較がどの時刻情報に基づくかを詳細表示で説明する。
 [^geometry-reference]: フィールド形状の参照: フィールド描画に使う形状情報の参照。重ね表示では未加工入力のフィールド形状を優先し、無い場合だけ `Tracked` の形状で代用するため、表示元同士の座標比較の基準を示す。
 [^source-label]: 表示元名: 凡例や詳細表示に出す名前。ユーザーが Layer A/B で、どの未加工入力、自前の追跡結果、外部トラッカーを選んでいるか確認するために使う。
 [^live-store]: ライブ表示で使う状態保存先: 通常の raw vision viewer の現在表示を更新するための保存先。CaptureOn の記録単位を保存する `TrackerPacketSnapshotLogWriter` や補助ファイルの書き込み処理は、この役割に使わない。
@@ -374,21 +374,21 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 [^future-later-snapshot]: 選択時点より後のスナップショット: selected replay timeline tick より後に存在するスナップショット。課題 #10 の診断画面では、未来の追跡状態を現在時点の比較に混ぜないため、Field source や比較の代替候補にしない。
 [^diagnostics-line-alignment]: 診断ログ行との対応付け: 診断ログ行と tracker source snapshot の対応付け。選択時点以前の同じ表示元のスナップショットを探す補助情報としてだけ使い、選択時点より後のスナップショットを候補にするためには使わない。
 [^nearest-timestamp]: 近傍時刻の検索: 選択時点に近い時刻を探す検索方法。課題 #10 では、近さだけで選択時点より後のスナップショットを選ばず、同じ表示元の選択時点以前のスナップショットだけを候補にする。
-[^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、描画内容単位の補助ファイルに依存している状態。新規記録の目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。
-[^legacy-render-snapshot-sidecar]: 旧描画記録の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの描画内容単位で保存された補助ファイル。処理周期の分離後の新規記録では、主要な `Vision Input` の復元元にしない。
+[^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、render snapshot ごとの補助ファイルに依存している状態。新規キャプチャーの目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。
+[^legacy-render-snapshot-sidecar]: 旧形式の render snapshot の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの render snapshot ごとに保存した補助ファイル。処理周期の分離後の新規キャプチャーでは、主要な `Vision Input` の復元元にしない。
 [^world-frame-committed]: WorldFrameCommitted: 自前トラッカーがフィールド全体の追跡結果を確定した時点を表す処理結果。既存の描画記録の保存はこの通知処理に結合しており、raw vision の保存周期としては遅くなり得る。
 [^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を送信する周期。raw vision の新規保存周期として扱わない。
-[^new-capture]: 新規記録: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧描画記録の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。
+[^new-capture]: 新規キャプチャー: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧形式の render snapshot の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。
 [^diagnostics-sample-tick]: diagnostics sample tick: 診断ログの保存・再生処理が、最新の未加工入力と追跡結果のスナップショットを同じ保存単位として固定する時点。トラッカーの追跡結果の確定と同義にしない。
 [^latest-raw-snapshot]: 最新の未加工入力のスナップショット: `VisionPacketStore` 相当の未加工 SSL-Vision 入力の最新検出情報とフィールド形状をスナップショット化したもの。診断画面の `Vision Input` は、新規記録ではこのスナップショットから復元する。
 [^latest-tracker-snapshot]: 最新の追跡スナップショット: 自前トラッカーまたは外部トラッカーの最新出力を、診断の採取記録に含めるためにスナップショット化したもの。
-[^diagnostics-sample-timeline]: 診断データの採取時系列: diagnostics sample tick を時系列に並べた再生用の時系列。selected replay timeline tick の考え方を維持しつつ、描画内容ではなく診断データの採取記録を基準にする。
+[^diagnostics-sample-timeline]: 診断データの採取時系列: diagnostics sample tick を時系列に並べた再生用の時系列。selected replay timeline tick の考え方を維持しつつ、render snapshot ではなく診断データの採取記録を基準にする。
 [^loop-isolation]: 処理周期の分離: トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生の周期と責務を分け、片方の周期や負荷が別の処理の表示や保存を支配しないようにする方針。
 [^tracker-operation-loop]: トラッカーの周期処理: 未加工の入力パケットや設定プロファイルと制御入力を追跡エンジンに渡し、追跡状態の更新、送信、最新の追跡スナップショットの公開までを担当する周期処理。
 [^web-server-live-display-processing]: Web UI を提供するサーバーのライブ表示の処理: 通常の raw vision viewer が `UI render tick` ごとに最新の変更不能なスナップショットを固定して描画する処理。診断ログの保存・再生とは別扱いにする。
 [^diagnostics-logging-replay-processing]: 診断ログの保存・再生処理: CaptureOn 中に最新の未加工入力と追跡結果のスナップショットを独立した記録として保存し、診断画面でその採取時系列を再生する処理。
 [^ui-only-display-correction]: 表示だけの補正: 保存済みデータの周期は変えず、描画時の補正だけで遅延を隠そうとする修正方針。`RAW-VISION-017` の処理周期の分離では不採用とする。
 [^diagnostics-sample-sidecar]: diagnostics sample sidecar: 処理周期の分離後に診断ログの保存・再生処理が保存する、最新の未加工入力と追跡結果のスナップショットの補助ファイル。`RUNTIME-HOST-007` では `diagnostics-samples.jsonl` として固定し、記録は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本の項目とする。
-[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧描画記録の補助ファイルしか持たない記録単位。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。
+[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧形式の render snapshot の補助ファイルしか持たないキャプチャー。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。
 [^raw-snapshot-cadence]: 未加工入力の更新周期: SSL-Vision パケットや、未加工入力の最新スナップショットが更新される周期。診断画面の `Vision Input` 表示は、新規記録でこの周期を失わない保存経路を持つ。
-[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、記録と再生、比較表示を担当する。
+[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。

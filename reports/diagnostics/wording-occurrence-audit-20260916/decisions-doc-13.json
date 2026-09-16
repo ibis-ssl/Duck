@@ -1,0 +1,682 @@
+[
+  {
+    "block": "D13-B001",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_WrapperPacketという入力型とraw vision表示設計という用途を保持。型名をコード記法にし、一般的な動画表示にはしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465787+09:00"
+  },
+  {
+    "block": "D13-B002",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "raw visionはSSL-Visionの検出情報であり画像/動画そのものではないという定義を追加した既存文を確認。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465808+09:00"
+  },
+  {
+    "block": "D13-B003",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "SslProto生成型でUDPを直接受信し検出/形状をBlazorで可視化、旧Serverと現DebugHostのプロジェクト/名前空間/起動経路を保持。UDPの区切りを整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465813+09:00"
+  },
+  {
+    "block": "D13-B004",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "スコープを対象範囲とする自然な見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465816+09:00"
+  },
+  {
+    "block": "D13-B005",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "設定受信先の待受け、multicast参加、Parserデコード、singletonに最新3データ/受信情報/2件数、4種表示、raw中心navigation、集約/カメラ最新表示という7要件を保持。hosted serviceを継続するバックグラウンド受信として説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465819+09:00"
+  },
+  {
+    "block": "D13-B006",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "非スコープを対象外とする自然な見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465823+09:00"
+  },
+  {
+    "block": "D13-B007",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "永続化なし、rawを超えるtracking/filtering/world解釈なし、RuntimeHostの本番寄り実行と将来AutoRef責務をWeb/診断から分離する条件を保持。自動判定一般でなく自動レフェリーと特定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465826+09:00"
+  },
+  {
+    "block": "D13-B008",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "appsettingsのVisionReceiver sectionを設定階層と説明し、設定名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465828+09:00"
+  },
+  {
+    "block": "D13-B009",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "Port、InterfaceAddress、Profiles overrideの3設定を保持。local IPv4と候補interfaceがこの端末のものという限定を復元。未設定時自動解決と同名tracker設定追従の条件も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465831+09:00"
+  },
+  {
+    "block": "D13-B010",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "resolver規則を設定の解決規則と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465834+09:00"
+  },
+  {
+    "block": "D13-B011",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "同名設定なしはtop-level値、実行時のtracker切替完了後に同名受信設定を再解決し必要時socket再作成という2条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465837+09:00"
+  },
+  {
+    "block": "D13-B012",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "hosted background serviceをアプリケーションの起動・停止に合わせて動作するバックグラウンド処理と説明。単なる独立した非同期処理に広げない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465840+09:00"
+  },
+  {
+    "block": "D13-B013",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "IPv4 UDP、address reuse、AnyとPortへのbind、cancelまで継続、設定切替で受信cancelとsocket再作成という5規則を保持。割り当てる対象をソケットと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465843+09:00"
+  },
+  {
+    "block": "D13-B014",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "通信先がmulticastの場合だけgroup membershipを解決する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465846+09:00"
+  },
+  {
+    "block": "D13-B015",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "明示InterfaceAddressならそのIPv4だけ、未設定なら利用可能なlocal IPv4を列挙してjoinする条件を保持。端末内の接続という限定を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465850+09:00"
+  },
+  {
+    "block": "D13-B016",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "一部interfaceの失敗は警告ログに残すこと、直前行の1つ以上成功なら受信継続という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465853+09:00"
+  },
+  {
+    "block": "D13-B017",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "decode成功でstore更新、失敗でerror count増加と直前正常state保持という可否を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465856+09:00"
+  },
+  {
+    "block": "D13-B018",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Store設計を状態の保持とする見出し。次のVisionPacketStoreの役割を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465860+09:00"
+  },
+  {
+    "block": "D13-B019",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "UI参照用stateをthread-safeに保持する条件を複数スレッドから安全に利用できる形として説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465862+09:00"
+  },
+  {
+    "block": "D13-B020",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "最新wrapper/detection/camera別snapshot/aggregateの黄青robotとball/geometry、packet/error件数、送信元、受信時刻、parse errorの10項目を保持。latest detection frameはSSL_DetectionFrame型として特定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465865+09:00"
+  },
+  {
+    "block": "D13-B021",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "UIへimmutable snapshotを返し、描画中にlockを保持しないという2条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465868+09:00"
+  },
+  {
+    "block": "D13-B022",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Proto入力を入力する通信データとする見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465871+09:00"
+  },
+  {
+    "block": "D13-B023",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "raw vision viewerが直接使う主なproto入力型の導入を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465874+09:00"
+  },
+  {
+    "block": "D13-B024",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "WrapperPacketは受信UDPデータ全体、Detection/Geometryを内包する最上位packetであることを保持。UDP表記の区切りを整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465877+09:00"
+  },
+  {
+    "block": "D13-B025",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_DetectionFrameはカメラ単位のraw detectionであり、後続の5メンバーをそのまま保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465880+09:00"
+  },
+  {
+    "block": "D13-B026",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_DetectionBallをボール描画と詳細表示へ使う用途を保持。座標/信頼度のメンバーは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465882+09:00"
+  },
+  {
+    "block": "D13-B027",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_DetectionRobotをロボット描画と詳細表示へ使う用途を保持。ID/座標/向き等のメンバーは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465885+09:00"
+  },
+  {
+    "block": "D13-B028",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_GeometryDataがfield geometry全体を表すこととField/Calibの参照を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465888+09:00"
+  },
+  {
+    "block": "D13-B029",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_GeometryFieldSizeは寸法と線分/円弧を表す。直後の12メンバーを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465891+09:00"
+  },
+  {
+    "block": "D13-B030",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "SSL_GeometryCameraCalibrationを校正情報の一覧表示に使う用途を保持。6メンバーを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465894+09:00"
+  },
+  {
+    "block": "D13-B031",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Field投影をフィールドへの投影とする見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465897+09:00"
+  },
+  {
+    "block": "D13-B032",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "VisionFieldProjectionがmm単位の座標をSVG表示領域へ写像することを保持。単位変更なし。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465900+09:00"
+  },
+  {
+    "block": "D13-B033",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "geometryあればその寸法、なければ既定寸法、原点は中央、boundary/goal depthまで含む外周余白という4規則を保持。競技場をフィールドに揃える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465904+09:00"
+  },
+  {
+    "block": "D13-B034",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Homeがstore snapshotを定期取得しcompact headerと左右領域を構成する責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465907+09:00"
+  },
+  {
+    "block": "D13-B035",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Canvasがfield SVG親で、zoom/pan、背景、field、子marker、軸/cursor座標重ね表示を担当する範囲を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465911+09:00"
+  },
+  {
+    "block": "D13-B036",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Linesがline/arc/goalを描き、FieldLines/FieldArcsを優先、不足時だけ寸法fallbackという優先関係を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465914+09:00"
+  },
+  {
+    "block": "D13-B037",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "DetectionBall1件をSVGの円として描く数量と形状を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465916+09:00"
+  },
+  {
+    "block": "D13-B038",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "DetectionRobot1件をrobot形状で描き、team色/前面gap/nose/labelを担当する4要素を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465919+09:00"
+  },
+  {
+    "block": "D13-B039",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "DetailsPanelの右側にはJSON/ball/robot/calibrationを表示する役割を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465922+09:00"
+  },
+  {
+    "block": "D13-B040",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "team色とmarker線色の定義をPalette一箇所に集約する責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465925+09:00"
+  },
+  {
+    "block": "D13-B041",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "RenderOptionsはrobot radius等、将来設定で変更したい描画パラメータの受け口であることを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465928+09:00"
+  },
+  {
+    "block": "D13-B042",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Home.razor見出しを実ファイル名のコード記法にする。内容の除外目的ではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465931+09:00"
+  },
+  {
+    "block": "D13-B043",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "VisionPacketSnapshotがstoreから得るUI用snapshotであることを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465934+09:00"
+  },
+  {
+    "block": "D13-B044",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "selectedViewKeyがaggregate/camera選択状態であり、sidebar折りたたみ前提のfield中心主表示とする条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465937+09:00"
+  },
+  {
+    "block": "D13-B045",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Canvasの実ファイル名見出しをコード記法にし、Geometry/ball/黄青robot/RenderOptionsの5入力を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465939+09:00"
+  },
+  {
+    "block": "D13-B046",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "cursor座標表示に必要なhover stateとcanvas sizeを、重なっている状態と描画領域の大きさとして説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465942+09:00"
+  },
+  {
+    "block": "D13-B047",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Linesの実ファイル名見出しとProjection/Fieldの型付き入力を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465946+09:00"
+  },
+  {
+    "block": "D13-B048",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "BallMarkerの実ファイル名見出しとProjection/Ballの型付き入力を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465949+09:00"
+  },
+  {
+    "block": "D13-B049",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "RobotMarkerの実ファイル名見出しとProjection/Robot/ClassName/RenderOptionsの入力を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465953+09:00"
+  },
+  {
+    "block": "D13-B050",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "DetailsPanelの実ファイル名見出しと12個の型付き入力を保持。表示名や選択通知を省略しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465956+09:00"
+  },
+  {
+    "block": "D13-B051",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "既存課題番号の参照を保持し、split/overlay/sourceの設計対象を分割/重ね表示の表示元として説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465959+09:00"
+  },
+  {
+    "block": "D13-B052",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "選択肢を4種類に固定する条件を保持。以下の実UI名は翻訳しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465961+09:00"
+  },
+  {
+    "block": "D13-B053",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Raw Aggregateはcameraごとのlatest detectionをUI表示用にまとめたraw SSL-Vision source。個別camera表示との違いを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465965+09:00"
+  },
+  {
+    "block": "D13-B054",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Raw Cameraはcamera別latest snapshotを使い、内部keyにcamera IDを含め表示labelだけで識別しない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465969+09:00"
+  },
+  {
+    "block": "D13-B055",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Trackedは自前の最新TrackerFrameをTrackedVisionViewState相当DTOへ変換し、rawでなくtracker出力として扱う条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465972+09:00"
+  },
+  {
+    "block": "D13-B056",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "外部live stateをManagerから受け、UIがmutable stateを直接読まずimmutable storeまたはcomposerを必ず挟む条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465975+09:00"
+  },
+  {
+    "block": "D13-B057",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "厳密同timestamp/同callbackを要求しない理由、1 UI render tickで全source最新immutable値を固定し合成してLayer A/Bへ渡す契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465978+09:00"
+  },
+  {
+    "block": "D13-B058",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "006以降はHomeがraw/tracked storeを直接injectせずProviderから固定snapshot取得、Composerは再読込なし、Raw/Tracked/Compareが同一tick派生という3境界を保持。実UI名を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465981+09:00"
+  },
+  {
+    "block": "D13-B059",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "UI render tickのcomposite snapshotの項目を導く文を、1回にまとめるスナップショットとして説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465984+09:00"
+  },
+  {
+    "block": "D13-B060",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "tick IDまたはSampledAt、source key/表示名、受信/frame時刻/packet件数、ball/robot/geometry参照/欠落理由という4項目を保持。frame時刻を入力観測時刻だけへ限定しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465987+09:00"
+  },
+  {
+    "block": "D13-B061",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "UUID優先集約、同UUIDは最新ReceivedAtの1代表、endpoint間unionなし、不明時だけname/endpoint、異UUID別source、同名識別補助、UI直接参照なし、cloneとread側DTO固定、保存writerをlive storeにしない条件を保持。識別情報の連結を整理。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465990+09:00"
+  },
+  {
+    "block": "D13-B062",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "raw geometry優先、未取得時だけTracked fallback、外部packetからgeometry復元なしという基準と、その座標比較上の理由を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465992+09:00"
+  },
+  {
+    "block": "D13-B063",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "split/overlay UIを診断画面に寄せるという原文を、合わせると明確化。次の15規則との関係を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465995+09:00"
+  },
+  {
+    "block": "D13-B064",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "15UI規則を行ごとに照合。左右配置/1field重ね、両mode別部品、live/診断では同mode共通、描画と選択/詳細の責務分離、overlayは1viewport/field1回、split独立、詳細/凡例/visibility、別色、same-source1層、片層missingでもreadyを残す条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.465998+09:00"
+  },
+  {
+    "block": "D13-B065",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Diagnostics time-syncを診断再生での時刻の対応付けと説明。ライブ表示の同時取得契約とは区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466002+09:00"
+  },
+  {
+    "block": "D13-B066",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "旧形式はselected tickのrender由来と同ReplayTimelineIndex対応、WorldFrameCommitted周期制限で新規目標ではないという条件を保持。Vision Input実UI名/render snapshot名/キャプチャー単位を明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466005+09:00"
+  },
+  {
+    "block": "D13-B067",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "新規はdiagnostics sample tickで保存したraw/trackerまたは同tick以前のlatest-beforeを使用し、確定周期でなくsample timelineで比較する条件を保持。render snapshotとの違いとcapture単位を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466008+09:00"
+  },
+  {
+    "block": "D13-B068",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "選択時点にalignmentが無くても同source直前値を表示/比較し、matching rule・実受信時刻・delta・stale/latest-before状態を明示する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466011+09:00"
+  },
+  {
+    "block": "D13-B069",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "latest-beforeでも基準timeline/cursor/selected timeを動かさず、直前sampleを保持している表示と選択時点との差を示す条件を保持。異時刻を同時刻に見せない理由も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466014+09:00"
+  },
+  {
+    "block": "D13-B070",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "選択以前の同sourceが一切ない場合だけ2missing状態、ready層保持、未来fallback禁止、補助indexでも未来除外、既存回帰契約で新RAW作業を追加しないという条件と理由を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466017+09:00"
+  },
+  {
+    "block": "D13-B071",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "Diagnostics loop isolationを診断処理の周期の分離と説明する見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466020+09:00"
+  },
+  {
+    "block": "D13-B072",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "中心目的はtrackerをWebライブと診断保存/再生の両方から分離することであり、UIだけの補正でなく保存/再生入力周期の分離であるという対比を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466023+09:00"
+  },
+  {
+    "block": "D13-B073",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "3つのloopを分ける数量と後続3責務を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466027+09:00"
+  },
+  {
+    "block": "D13-B074",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "trackerの更新/配信、UI tickの固定/描画、独立diagnostics sampleの保存/再生という3責務を保持。render保存callbackとの非結合、100ms既定/0以下復帰、metadata2属性、Vision Input/ibis trackerの通常復元元を保持し設計名を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466030+09:00"
+  },
+  {
+    "block": "D13-B075",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "logging互換は必須でない、新規性能/周期優先、高コスト互換なし、旧renderのみはunsupported/degradedでよい、読む場合も周期制限説明で足りるという条件を保持。保存物とcapture単位を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466033+09:00"
+  },
+  {
+    "block": "D13-B076",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "sample周期をtracker確定周期と同義にせず、rawが速い場合の保存境界、sampleからtrackerを駆動しない、3処理の負荷/周期非支配という条件を保持。diagnostics sample tick名を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466036+09:00"
+  },
+  {
+    "block": "D13-B077",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "root pageを開始画面とし、パス/表示対象は前段の/と整合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466039+09:00"
+  },
+  {
+    "block": "D13-B078",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "受信状態と情報、field SVG、raw JSON、ball/robot/calibration詳細という4表示を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466042+09:00"
+  },
+  {
+    "block": "D13-B079",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "参照リポジトリのfield presentation方針へ従うことを保持。外部最新版を調査したとは主張しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466045+09:00"
+  },
+  {
+    "block": "D13-B080",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "7表示方針を照合。field中心/外周/wheel-drag/title省略-selector位置/+X+Y/cursor上下/sidebar折りたたみを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466048+09:00"
+  },
+  {
+    "block": "D13-B081",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "14レイアウト規則と未変更の再生ボタン状態規則を照合。field/detailの高さ、timeline幅、4K、最小操作域、色/階調、スクロール、再生順/時刻差/上限制限なしを保持。render snapshotと入出力frameを明示し観測結果一覧への誤訳を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466051+09:00"
+  },
+  {
+    "block": "D13-B082",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "accepted",
+    "reason": "最後で停止し先頭へ戻る、log切替/entryなしで停止状態へ戻すという条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466054+09:00"
+  },
+  {
+    "block": "D13-B083",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "20テスト項目を行ごとに照合。store/受信/投影/可変高さ幅/再生/split-overlay/色/共通部品/tick固定/外部読取/時刻対応/missing/依存境界/sample旧形式の全範囲を保持。明記された単体テストを復元し、render snapshotとframe単位を明確化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466058+09:00"
+  },
+  {
+    "block": "D13-B084",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "raw visionの型、既定224.5.23.2:10006は実行設定で変更可能、無関係worktree変更保護という3前提を保持。変更にある変更という重複表現を直す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466061+09:00"
+  },
+  {
+    "block": "D13-B085",
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "disposition": "fixed",
+    "reason": "62脚注をそれぞれ原文と照合。4source、live状態/immutable境界、時刻/識別、描画部品/viewport/層、alignment/latest-before/未来禁止、旧形式制約/sample/3周期の定義を保持。映像DTOへの誤訳、frame時刻を観測だけに限定、新規captureと1記録の混同、render snapshotの一般語化を修正。脚注IDと参照は全保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:10:06.466064+09:00"
+  }
+]
