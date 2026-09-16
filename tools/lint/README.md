@@ -1,6 +1,6 @@
-# 文書検査設定
+# Markdown文書の検査設定
 
-このリポジトリでは、ユーザーまたはエージェントが編集する文書を `textlint` と `cspell` で検査する。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。
+このリポジトリでは、ユーザーまたはエージェントが編集する Markdown 文書を `textlint` と `cspell` で検査する。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。
 
 ## 準備
 
@@ -110,7 +110,7 @@ entries:
 
 `npm run lint:md:spell` は `tools/lint/markdown-whitelist.yaml` の `entries.term` と `entries.aliases` から一時辞書と無視条件を作って `cspell` を実行する。許可一覧の設定ファイルはこの 1 つだけである。`tracker-debug-host` と `tracker debug host` のように `-` でつないだ表記と空白で区切った表記の両方を許可する場合は、同じ項目の `aliases` に両方を明示する。
 
-`cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。既存文書に未登録語がある場合は検査が落ちるため、文章を日本語へ直すか、固有語として許可できる理由を `tools/lint/markdown-whitelist.yaml` に追加する。
+`cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。未登録語が見つかった場合は、読みやすさと意味を保った本文修正で解消できるか確認する。許可済みの技術用語、実際の画面名、設定名、直接引用を、検査を通すためだけに別表現へ変えない。登録や検査条件の変更が必要な場合は、候補と理由を提示し、利用者の承認を受けてから変更する。
 
 SudachiPy 版の抽出と検査では、日本語を文字種だけではなく形態素として扱う。漢字語、片仮名語、混在語を `surface`、正規形、読み、品詞、候補集合、頻度、出現元で集計し、許可一覧再構築の候補にする。英字語は従来どおり専用の厳しい抽出規則で扱う。ChikkarPy が返す同義語候補は、候補集合を作るための補助情報として `synonyms` に出力する。SudachiPy の正規形や読みが同じ語、または ChikkarPy の同義語候補に入った語は近くに出せるが、`namespace`、`ネームスペース`、`名前空間` のような英日意味対応は自動確定しない。最終的に許可する語と説明は利用者の明示確認を受けて `tools/lint/markdown-whitelist.yaml` に反映する。
 
