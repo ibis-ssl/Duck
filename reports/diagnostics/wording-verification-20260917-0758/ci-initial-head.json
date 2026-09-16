@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-09-17T08:12:57.428931+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr_number": 20,
+  "actual_pr_head": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "run_id": 35159496695,
+  "run_head_sha": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "event": "pull_request",
+  "conclusion": "success",
+  "job_id": 105006717044,
+  "workflow_path": ".github/workflows/dotnet-test.yml",
+  "checkout_sha": "bbe3cf3cc9b88c5dcb8b311dcd1d0463833065cb",
+  "checkout_parents": [
+    "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+    "efe76c3dccd3683813415b7fc6f4c6b3a1764007"
+  ],
+  "workflow_at_checkout_sha256": "0a632f31f84078083eeb9ad819e439c4594b390cd4764584a73c2e13f2c23ef1",
+  "workflow_at_pr_head_exists": false,
+  "workflow_sha_exported_in_logs": false,
+  "workflow_provenance_limit": "実チェックアウトSHAとそこにあるworkflow本文は確認した。github.workflow_shaそのものはログに出ていない。",
+  "test_counts_from_job_log": {
+    "passed": 329,
+    "failed": 0,
+    "skipped": 0,
+    "total": 329
+  },
+  "artifacts_count_from_api": 0,
+  "collect_diagnostics_step": "skipped",
+  "upload_diagnostics_step": "skipped",
+  "diagnostics_upload_condition": "always() && steps.dotnet_test.outcome == 'failure'",
+  "diagnostics_content": [
+    "TRX",
+    "stdout",
+    "stderr",
+    "exit-code",
+    "vstest diagnostics",
+    "MSBuild binlog",
+    "blame outputs when produced",
+    "environment.txt",
+    "source.tar.gz"
+  ],
+  "markdown_lint_executed_in_workflow": false,
+  "source_urls": [
+    "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35159496695",
+    "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35159496695/jobs",
+    "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35159496695/artifacts",
+    "https://github.com/ibis-ssl/Duck/actions/runs/35159496695/job/105006717044"
+  ],
+  "evidence_method": "metadata/artifacts/jobs and job logs retrieved with GitHub connector; immutable checkout commit and workflow verified by RDC git"
+}

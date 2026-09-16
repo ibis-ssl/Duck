@@ -192,7 +192,7 @@ capture metadata がない、capture metadata に snapshot sidecar や alignment
 
 `TRACKER-056` では、`/diagnostics` の下部フィールド表示を、左右それぞれ独立した Field source selector で切り替えられるようにする。既定は現在の表示を維持し、左は `Vision Input`、右は自前トラッカーの出力とする。右側は既存の render snapshot の補助ファイルから作る `TrackedVisionViewState` を優先して使い、追跡パケットの補助ファイルに `own` の記録がなくても現行の表示を維持する。
 
-Field source selector は、`Tracker Comparison` 領域内ではなく左右のフィールド表示の見出し行に置く。`Tracker Comparison` 領域は画面ヘッダーの切り替えボタンで折りたためるようにし、折りたたみ中も左右の選択欄とフィールド描画は使える状態を維持する。比較領域の折りたたみ状態と左右の表示元選択は、`Diagnostics.razor.cs` のページ状態として保持し、URLクエリ、`sessionStorage`、`localStorage`には保存しない。ログファイルの変更時は左を `Vision Input`、右を自前トラッカーの出力へ戻し、timeline scrubber の操作や playback tick では選択状態を維持する。再読み込み時はページ状態を保持してよいが、選択した source option が新しい表示状態に存在しない場合は既定へ戻す。
+Field source selector は、`Tracker Comparison` 領域内ではなく左右のフィールド表示の見出し行に置く。`Tracker Comparison` 領域は、その見出し行にある切り替えボタンで折りたためるようにし、折りたたみ中も左右の選択欄とフィールド描画は使える状態を維持する。比較領域の折りたたみ状態と左右の表示元選択は、`Diagnostics.razor.cs` のページ状態として保持し、URLクエリ、`sessionStorage`、`localStorage`には保存しない。ログファイルの変更時は左を `Vision Input`、右を自前トラッカーの出力へ戻し、timeline scrubber の操作や playback tick では選択状態を維持する。再読み込み時はページ状態を保持してよいが、選択した source option が新しい表示状態に存在しない場合は既定へ戻す。
 
 Field source の選択肢は次の通りとする。
 
@@ -230,10 +230,10 @@ Field source の選択肢は次の通りとする。
 
 `TRACKER-057` の重ね表示は `TRACKER-056` の対象外とする。ただし `TrackerDiagnosticsFieldSourceFrame` は単一表示元の描画入力として独立させ、後続で複数の `TrackerDiagnosticsFieldSourceFrame` を同じ `VisionFieldCanvas` 相当の重ね描画処理へ渡せる最小限の状態表現として再利用する。`TRACKER-056` では重ね合わせ、色分け、凡例、表示・非表示の切り替えは実装しない。
 
-### 対象を絞ったテストで固定する事項
+対象を絞ったテストでは、少なくとも次を固定する。
 
 - 統合した replay timeline は診断記録の件数ではなく、利用可能な表示元のうち最速の source cadence を含む。raw vision と render snapshot を 0 ms / 100 ms、ER-FORCE のスナップショットを 0 / 20 / 40 / 60 / 80 / 100 ms にしたテストデータで、20 / 40 / 60 / 80 ms の再生時点を含むことを固定する。
-- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment record を持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshot を参照し、100 ms の記録は 100 ms の render snapshot を参照する。
+- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment record を持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshot を参照し、100 ms の記録は 100 ms の raw vision と render snapshot を参照する。
 - ER-FORCE の `TrackedFrame.timestamp` を自前トラッカーと重ならない値にしても、replay timeline の順序と描画内容の保持は `ReceivedAt` または記録開始からの相対受信時間で決まる。
 - `/diagnostics` の再生・早送り・位置のドラッグは統合した replay timeline の索引を使い、高速トラッカーの更新時点では、`Vision Input` / `ibis tracker` のフィールド表示が、その時点以前の最新の render snapshot を保持する。
 - 等倍速の `Play` は毎秒30回相当の表示更新で、開始時の wall-clock と開始時点の `ReceivedAt` から目標の収録時刻を計算し、その時刻以下の最新再生時点へ追従する。200 Hz の更新を持つテストデータでは、開始から1秒後に約30個目の逐次更新位置ではなく、wall-clock で1秒相当の時点へ進むことを固定する。
