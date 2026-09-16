@@ -1,0 +1,211 @@
+[
+  {
+    "index": 0,
+    "file": "feedback-points/feedback-points.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "5ab0a5ed7b9f97ce4ccd6e3090f1e803800925107c2ca786eb06d6467d332807",
+    "start_sha256": "bfccbc255f67be2af421693e09650d2233c1d2e13ac0cf6b64dea0e2693d8584",
+    "before_lines": 13,
+    "current_lines": 13,
+    "changed_blocks": 6,
+    "changed_before_lines": 7
+  },
+  {
+    "index": 1,
+    "file": "README.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "320c94653f578af55a25c7f3c6855b558d0079b76de634f97a29d2a8d1f27cd5",
+    "start_sha256": "282050b63bd858bc9a99462b35012178a0d6c2ca6c0e28b0b6d131d80b45071e",
+    "before_lines": 75,
+    "current_lines": 75,
+    "changed_blocks": 12,
+    "changed_before_lines": 20
+  },
+  {
+    "index": 2,
+    "file": "tools/lint/README.md",
+    "baseline_sha": "5bde2e8eeff429c4455e4670a986f63d05f0545a",
+    "baseline_sha256": "e13957c11f5038743461bcc622388cefde2bd3d6dc7692ffd32a444f40b5a9c5",
+    "start_sha256": "f404aa9f300255a6d885a3cb5b64ec3c9ea96711a873b56ef2caec4b327dda41",
+    "before_lines": 88,
+    "current_lines": 129,
+    "changed_blocks": 24,
+    "changed_before_lines": 29
+  },
+  {
+    "index": 3,
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+    "start_sha256": "8ec607c329730a7b594905c1701f1f9a7ef65f42d485bf514d45130ae4cdd9c3",
+    "before_lines": 38,
+    "current_lines": 25,
+    "changed_blocks": 8,
+    "changed_before_lines": 29
+  },
+  {
+    "index": 4,
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+    "start_sha256": "c925cdb5c1fcc47e7ee033dcc739edd13ff18f622bba23dc7a8084591f3731e0",
+    "before_lines": 73,
+    "current_lines": 129,
+    "changed_blocks": 10,
+    "changed_before_lines": 62
+  },
+  {
+    "index": 5,
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+    "start_sha256": "a41583e2309f1afed6518e25c5a0ca073c01bb26d9c1439d10229904c8b91419",
+    "before_lines": 19,
+    "current_lines": 21,
+    "changed_blocks": 7,
+    "changed_before_lines": 13
+  },
+  {
+    "index": 6,
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+    "start_sha256": "8db0c0445af0e37f8917a609a4c40d9c7ea0b43c1aae71e4fca177be093894bf",
+    "before_lines": 135,
+    "current_lines": 108,
+    "changed_blocks": 16,
+    "changed_before_lines": 120
+  },
+  {
+    "index": 7,
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "a5aa5de4b89f0b602afe58ac62ecce417d490c87fed981da91e4f6a3211d42af",
+    "start_sha256": "2a503ff50b51933c7f8fe1bb848b97e510913ae11b809a87122154dc0c4ba478",
+    "before_lines": 1172,
+    "current_lines": 1172,
+    "changed_blocks": 247,
+    "changed_before_lines": 570
+  },
+  {
+    "index": 8,
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "4079fce001ddbaacf1290a5c40721052c2c467b7d4d2669b21ed7029217664cb",
+    "start_sha256": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "before_lines": 430,
+    "current_lines": 432,
+    "changed_blocks": 56,
+    "changed_before_lines": 170
+  },
+  {
+    "index": 9,
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "8d925a45a1882ce418ecd071674e712c3f2b893cb9d51ba6a6122a2894c9f77e",
+    "start_sha256": "6eda583443f29084bcf0234b4685989a9380786a5f7916a07829a60f60ddaa7e",
+    "before_lines": 64,
+    "current_lines": 66,
+    "changed_blocks": 9,
+    "changed_before_lines": 56
+  },
+  {
+    "index": 10,
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "f1dcc99a0bb26342d3b025369a1a59cf8969523e24715dcd7a9d3c9b2b377388",
+    "start_sha256": "e30852ad8c858dfa788459303f547170551916096af66043f832ccf9955fab2f",
+    "before_lines": 191,
+    "current_lines": 191,
+    "changed_blocks": 48,
+    "changed_before_lines": 100
+  },
+  {
+    "index": 11,
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "093320f39f9a748566fbdb02e45d7a060a8dc1abba31f7d6385935429a38d073",
+    "start_sha256": "fdc33a01156d4a7bca4618da46ab2342908a73ee02d3a93528283762222a8864",
+    "before_lines": 310,
+    "current_lines": 329,
+    "changed_blocks": 90,
+    "changed_before_lines": 202
+  },
+  {
+    "index": 12,
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "00a0b59f2058df331e7c6ceb4149021eac2763ffe72c9b7b091ca46c1afa3583",
+    "start_sha256": "d0db8d0bb6ee1a9c42ebd1292d044fb505ae4ad6ff26dec5cc8cbdd170cd1b22",
+    "before_lines": 109,
+    "current_lines": 109,
+    "changed_blocks": 19,
+    "changed_before_lines": 47
+  },
+  {
+    "index": 13,
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "ef3e666908c06d1278ebfadecd6262981797806823ae5b226a3cec3b6cbd0928",
+    "start_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "before_lines": 392,
+    "current_lines": 394,
+    "changed_blocks": 85,
+    "changed_before_lines": 244
+  },
+  {
+    "index": 14,
+    "file": "Tracker/Design/phases-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "68140c59f02d01ce7f3023c9149f8c4001042d30546f485cd9e9460e5403acdd",
+    "start_sha256": "c3a16c3b5bfffb1c457cf0a9b4b99fd4ef9c8bc2ce22d69312407642c4fc9caa",
+    "before_lines": 21,
+    "current_lines": 25,
+    "changed_blocks": 6,
+    "changed_before_lines": 14
+  },
+  {
+    "index": 15,
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "179b4c1dc4f37d3d02b735b1d5aeb1a8e697f094f3b172295150fb996418e1c1",
+    "start_sha256": "ba2b29facc87297002d586d668bb4e5cef7f82ea9285f66b01a605061d3e5667",
+    "before_lines": 151,
+    "current_lines": 153,
+    "changed_blocks": 43,
+    "changed_before_lines": 82
+  },
+  {
+    "index": 16,
+    "file": "Tracker/Design/tasks-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "b775cabd85c09837cc15cf47c28d87c08549e3b71b483e406871e6bb1372714d",
+    "start_sha256": "e0892d1f60dd41ddc9a092c1b50093fe120819aacf32224a0123e94ef69afe42",
+    "before_lines": 189,
+    "current_lines": 261,
+    "changed_blocks": 40,
+    "changed_before_lines": 123
+  },
+  {
+    "index": 17,
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "dea685a8640bca95a6cfd4bbe4ae5c1ea35c4de850ce3d84e886f3c3b2c7ad9a",
+    "start_sha256": "d7ff0e6c04e02f86a8a2bcb399d35fd3f9d191757af154629213d122350f4dba",
+    "before_lines": 84,
+    "current_lines": 86,
+    "changed_blocks": 14,
+    "changed_before_lines": 28
+  },
+  {
+    "index": 18,
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "baseline_sha256": "de1fe8545858abc99c9e75da2ad24dd3cf921189cb27117b837a705019aa23e5",
+    "start_sha256": "0f038fd467cd9c699b304d86aa6e6e0aeee633238a3fd8b56706032a56cadf68",
+    "before_lines": 488,
+    "current_lines": 490,
+    "changed_blocks": 75,
+    "changed_before_lines": 180
+  }
+]

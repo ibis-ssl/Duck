@@ -1,0 +1,62 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "document_index": 7,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "start_sha256": "2a503ff50b51933c7f8fe1bb848b97e510913ae11b809a87122154dc0c4ba478",
+    "blocks": 247,
+    "compact_file_sha256": "4748c6aad9c68a69e27823625d2707bef6a5068b324443511a30dbcf2f399987",
+    "compact_lines": 2979,
+    "method": "Original and current changed lines plus every unchanged line; no context omitted."
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "document_index": 11,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "start_sha256": "fdc33a01156d4a7bca4618da46ab2342908a73ee02d3a93528283762222a8864",
+    "blocks": 90,
+    "compact_file_sha256": "2fd3252021e59a3ab620fa12dc0be9acc8ebdb72ddee280aa3e24996600d61e4",
+    "compact_lines": 985,
+    "method": "Original and current changed lines plus every unchanged line; no context omitted."
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "document_index": 13,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "start_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "blocks": 85,
+    "compact_file_sha256": "3585634a182534c128bec98574c0d295858c62868020ad3b4dafa53a37edcfac",
+    "compact_lines": 1065,
+    "method": "Original and current changed lines plus every unchanged line; no context omitted."
+  },
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "document_index": 14,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "start_sha256": "c3a16c3b5bfffb1c457cf0a9b4b99fd4ef9c8bc2ce22d69312407642c4fc9caa",
+    "blocks": 6,
+    "compact_file_sha256": "f6a8818b67d29a6d73546628bdc742e43429dd06f85bf4f0da73547af490da57",
+    "compact_lines": 71,
+    "method": "Original and current changed lines plus every unchanged line; no context omitted."
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "document_index": 16,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "start_sha256": "e0892d1f60dd41ddc9a092c1b50093fe120819aacf32224a0123e94ef69afe42",
+    "blocks": 40,
+    "compact_file_sha256": "0a9178a344bfda7b1e5edb22e7c34e8778f5970d7d9ad4f0e0786b32d2db7ad3",
+    "compact_lines": 586,
+    "method": "Original and current changed lines plus every unchanged line; no context omitted."
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "document_index": 18,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "start_sha256": "0f038fd467cd9c699b304d86aa6e6e0aeee633238a3fd8b56706032a56cadf68",
+    "blocks": 75,
+    "compact_file_sha256": "1ec02fbd2aa8edd3ad509623d430246ae40acf7eb84d5ead7f6259c04757b97c",
+    "compact_lines": 1049,
+    "method": "Original and current changed lines plus every unchanged line; no context omitted."
+  }
+]
