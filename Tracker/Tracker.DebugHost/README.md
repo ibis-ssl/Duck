@@ -375,9 +375,9 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 | `GeometryResetFieldWidthThresholdMm` | mm | フィールドの幅の変化により、追跡状態を初期化する閾値です。 |
 | `KalmanInitialVelocityVariance` | 任意係数 | 新規の追跡状態の速度不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |
 | `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman filter の予測に用いる分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |
-| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど未加工の検出結果の小刻みな揺れを弱く信用します。 |
+| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど観測値の重みを小さくし、未加工の検出結果の小刻みな揺れの影響を抑えます。 |
 
-フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、旧形状を前提とする保存中の追跡フレームを破棄します。
+フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。
 
 ### `Tracker:Profiles:<name>:RobotTracker`
 
@@ -386,12 +386,12 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 | キー | 単位 | 意味 |
 | --- | --- | --- |
 | `ProcessNoise` | 任意係数 | Kalman filter の予測で見込む process noise の大きさです。大きいほど素早い動きに追従しやすく、安定性は下がります。 |
-| `MeasurementNoise` | 任意係数 | 観測の誤差として見込む measurement noise の大きさです。大きいほど観測を弱く信用します。 |
+| `MeasurementNoise` | 任意係数 | 観測の誤差として見込む measurement noise の大きさです。大きいほど観測値の重みを小さくします。 |
 | `VisibilityHalfLifeSeconds` | s | 観測が来ない追跡状態の可視性をどの速度で減衰させるかです。 |
 | `Gate` | 任意係数 | 既存の追跡状態と新観測を同一対象とみなす近傍判定の厳しさです。小さいほど厳しくなります。 |
 | `OutlierLimitMm` | mm | 外れ値として弾く許容距離の上限です。 |
 | `IdentitySwitchDistanceMm` | mm | 既存の別 ID の追跡状態の近傍へ突然現れたロボット ID 変更候補を抑制する距離です。`0` で無効化できます。 |
-| `OrientationMeasurementNoiseRad` | rad | ロボットの向き観測に見込む観測誤差です。大きいほど向き観測を弱く信用します。 |
+| `OrientationMeasurementNoiseRad` | rad | ロボットの向き観測に見込む観測誤差です。大きいほど向きの観測値の重みを小さくします。 |
 | `OrientationProcessNoise` | 任意係数 | ロボットの向きを推定する Kalman filter で見込む process noise の大きさです。 |
 | `InitialAngularVelocityVariance` | 任意係数 | 新規ロボット追跡状態の初期角速度不確かさです。 |
 | `AngularVelocityLimitRadPerS` | rad/s | ロボット角速度推定の上限です。 |

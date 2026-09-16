@@ -377,7 +377,7 @@ diagnostics sample tick の周期は、トラッカーの追跡結果の確定�
 [^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、render snapshot ごとの補助ファイルに依存している状態。新規キャプチャーの目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。
 [^legacy-render-snapshot-sidecar]: 旧形式の render snapshot の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの render snapshot ごとに保存した補助ファイル。処理周期の分離後の新規キャプチャーでは、主要な `Vision Input` の復元元にしない。
 [^world-frame-committed]: WorldFrameCommitted: 自前トラッカーがフィールド全体の追跡結果を確定した時点を表す処理結果。既存の描画記録の保存はこの通知処理に結合しており、raw vision の保存周期としては遅くなり得る。
-[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を送信する周期。raw vision の新規保存周期として扱わない。
+[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を出力する周期。raw vision の新規保存周期として扱わない。
 [^new-capture]: 新規キャプチャー: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧形式の render snapshot の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。
 [^diagnostics-sample-tick]: diagnostics sample tick: 診断ログの保存・再生処理が、最新の未加工入力と追跡結果のスナップショットを同じ保存単位として固定する時点。トラッカーの追跡結果の確定と同義にしない。
 [^latest-raw-snapshot]: 最新の未加工入力のスナップショット: `VisionPacketStore` 相当の未加工 SSL-Vision 入力の最新検出情報とフィールド形状をスナップショット化したもの。診断画面の `Vision Input` は、新規記録ではこのスナップショットから復元する。
