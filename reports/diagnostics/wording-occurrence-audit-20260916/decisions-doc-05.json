@@ -1,0 +1,58 @@
+[
+  {
+    "block": "D05-B001",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "fixed",
+    "reason": "履歴と現行状態を分け、必要な条件を本文に戻す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041801+09:00"
+  },
+  {
+    "block": "D05-B002",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "fixed",
+    "reason": "原文保存先と更新規則を保持し、元の指示だけに依存する要約を廃止。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041822+09:00"
+  },
+  {
+    "block": "D05-B003",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "accepted",
+    "reason": "全体状況は一般的な見出しとして日本語化し、当時と現在の区別を加えた。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041827+09:00"
+  },
+  {
+    "block": "D05-B004",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "accepted",
+    "reason": "設計中、RAW-VISION-017、残工程の順序を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041830+09:00"
+  },
+  {
+    "block": "D05-B005",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "accepted",
+    "reason": "工程の見出しと当時の状態を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041834+09:00"
+  },
+  {
+    "block": "D05-B006",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "accepted",
+    "reason": "準備完了と実装前に設計・進捗文書が存在する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041837+09:00"
+  },
+  {
+    "block": "D05-B007",
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "disposition": "fixed",
+    "reason": "5工程を全文照合。既存PRの完了と分離作業の未着手を区別し、3種の入力・保存/再生の分離、診断周期、旧形式の対象外、設計レビューと脚注の条件・日時を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.041840+09:00"
+  }
+]

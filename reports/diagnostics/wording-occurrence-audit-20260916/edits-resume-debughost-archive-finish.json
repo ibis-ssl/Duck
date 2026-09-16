@@ -1,0 +1,11 @@
+[
+  {
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "old": "各作業の詳細な条件、状態、テスト結果、対象外事項、レポートの参照先",
+    "new": "各作業の詳細な条件、状態、テストの結果、対象外事項、レポートの参照先",
+    "reason": "条件と状態に並べる内容をテストの結果と自然に記述する。意味は変えず、未承認の複合語を登録しない。",
+    "line_before_edit": 23,
+    "before_sha256": "c8ccab5f21703bd805e52f0c1c225c7a3fe136d6be140d92cddbfa45f999a575",
+    "after_sha256": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c"
+  }
+]
