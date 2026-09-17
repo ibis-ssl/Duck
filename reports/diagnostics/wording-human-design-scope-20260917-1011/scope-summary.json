@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T10:12:00+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "source_pr_head": "f927ac7bf3105d47aca3eff5c4bc98881a8f09ab",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "source_occurrence_file": "reports/diagnostics/wording-occurrence-audit-20260916/occurrences-start.json",
+  "source_occurrence_sha256": "1babfa401444af30b5dc551fcb518004d3e7ff4ad7f5aa77e88bdcb37ca697c2",
+  "scope_rule": "Human-readable design documents only; include plan files whose content is design; exclude maintenance work, tracking/status, README, history/archive, lint/tool guides, and feedback records.",
+  "selected_documents": [
+    {
+      "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "total": 133,
+      "completed": 133,
+      "pending": 0,
+      "work_unit": "ENGINE-COMPLETE"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "total": 724,
+      "completed": 0,
+      "pending": 724,
+      "work_unit": "CLI-UI"
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "total": 565,
+      "completed": 0,
+      "pending": 565,
+      "work_unit": "ARCHITECTURE"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "total": 524,
+      "completed": 0,
+      "pending": 524,
+      "work_unit": "RAW-VISION"
+    },
+    {
+      "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "total": 196,
+      "completed": 0,
+      "pending": 196,
+      "work_unit": "RUNTIME-HOST"
+    }
+  ],
+  "total_selected_occurrences": 2142,
+  "completed_occurrences": 133,
+  "pending_occurrences": 2009,
+  "completed_evidence": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
+  "excluded_categories": [
+    "maintenance",
+    "tracking/status",
+    "README",
+    "history/archive",
+    "lint/tool guide",
+    "feedback"
+  ],
+  "scope_occurrences_sha256": "7545a710db274de9e252f66e39bfc0dd6ff15f394c97944f333bb1b67be28b2f"
+}
