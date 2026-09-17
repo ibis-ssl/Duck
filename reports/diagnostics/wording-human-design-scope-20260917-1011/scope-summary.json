@@ -26,8 +26,8 @@
     {
       "file": "Tracker/Design/Core/tracker-architecture-plan.md",
       "total": 565,
-      "completed": 0,
-      "pending": 565,
+      "completed": 565,
+      "pending": 0,
       "work_unit": "ARCHITECTURE"
     },
     {
@@ -46,8 +46,8 @@
     }
   ],
   "total_selected_occurrences": 2142,
-  "completed_occurrences": 857,
-  "pending_occurrences": 1285,
+  "completed_occurrences": 1422,
+  "pending_occurrences": 720,
   "completed_evidence": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
   "excluded_categories": [
     "maintenance",
@@ -57,11 +57,12 @@
     "lint/tool guide",
     "feedback"
   ],
-  "scope_occurrences_sha256": "19b78084a21d4c77af31aebde79fadd4d6a82f728ebb41a9d5b8c4b3e4b49671",
-  "updated_at": "2026-09-17T10:45:12+09:00",
-  "completion_technical_parent": "4eff5c3733fc5e543f7f96c35e97d1de2e505797",
+  "scope_occurrences_sha256": "1d23df9122895593cd70318fb510dfe271827b90b98dbfe3ce7b5ca616a8ca9a",
+  "updated_at": "2026-09-17T11:15:32+09:00",
+  "completion_technical_parent": "5a72850d25fa934bcb9d3e4c587bb8d88688fd59",
   "completion_evidence_by_work_unit": {
     "ENGINE-COMPLETE": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
-    "CLI-UI": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json"
+    "CLI-UI": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
+    "ARCHITECTURE": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json"
   }
 }
