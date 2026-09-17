@@ -30,7 +30,7 @@
 - official tracker packet はマルチキャストの受信先へ届く前提とし、受信処理は設定済みのマルチキャスト用の通信アドレスと通信ポートを使ってマルチキャストグループに参加する。同じ端末内へのユニキャスト受信だけでは、CaptureOn 比較ログの実行時の正常系証跡として扱わない。
 - トラッカーの受信処理の通信アドレスと通信ポートは起動時に解決する。`Tracker:Receive:MulticastAddress` / `Port` を明示した場合は受信処理独自の受信先を監視し、未指定項目は、起動時に有効な設定プロファイルと `Tracker:RuntimeOverrides:Publish` から解決した自前トラッカーの送信先の値で代用する。`Tracker:Receive:InterfaceAddress` は従来どおり、この端末でマルチキャストグループへの参加に使う NIC の通信アドレスを指定する設定であり、受信先の代用規則とは独立して扱う。
 - 実行中の設定プロファイルの切り替え後にトラッカーの受信処理のソケットを再構成することは、`TRACKER-054` の対象外とする。切り替え後も受信処理は起動時に解決した受信先を監視し続けるため、運用手順と README では起動時固定であることを明記する。
-- `Tracker.DebugHost` は、CaptureOn の記録単位と tracker packet snapshot の記録を紐付ける統合層にする。キャプチャー本体、capture metadata、診断用の補助ファイル、render snapshot、tracker packet snapshot の snapshot sidecar を、同じ session folder 配下の成果物として扱う。
+- `Tracker.DebugHost` は、CaptureOn の記録単位と診断用の保存物を紐付ける統合層にする。キャプチャー本体、capture metadata、診断ログ、`diagnostics-samples.jsonl`、render snapshot、tracker packet snapshot の snapshot sidecar、alignment sidecar を、同じ session folder 配下の成果物として扱う。新規記録では diagnostics sample sidecar を診断再生の `Vision Input` / `ibis tracker` の主な入力にする。
 - `Tracker.Core` には、official tracker packet のキャプチャー、snapshot sidecar への保存、自前トラッカーと他のトラッカーの後処理での比較を入れない。`Tracker.Core` は自前トラッカーの内部の追跡フレームと公式形式のパケット生成だけを担当する。
 
 ## 保存形式
@@ -43,12 +43,12 @@ session folder には、少なくとも次を配置できるようにする。
 
 - キャプチャー本体
 - capture metadata
-- トラッカーの診断用の補助ファイル
-- render snapshot
+- トラッカーの診断用の補助ファイルと `diagnostics-samples.jsonl`
+- render snapshot（旧形式の表示やフィールド形状などの補助情報）
 - tracker packet snapshot の snapshot sidecar（JSONL）
 - alignment sidecar（JSONL）
 
-capture metadata には session folder の保存先と、キャプチャー本体、トラッカーの診断記録、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）などの、各ファイルへの相対パスを記録する。snapshot sidecar や alignment sidecar が未作成、または記録 0 件の場合も、その状態を capture metadata で表現できるようにする。
+capture metadata には session folder の保存先と、キャプチャー本体、トラッカーの診断記録、render snapshot、diagnostics sample sidecar、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）への相対パスを記録する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を個別に保持し、一つの補助ファイルの状態を別の補助ファイルの成否として扱わない。
 
 診断ログの保存・再生の主経路は、capture metadata から解決する新規の補助ファイル群と、ログを開くときに構築する索引を使う。既存の `.tracker-diagnostics.log` のデータ構造の破壊的変更は避けるが、旧診断ログや旧 render snapshot の補助ファイルの完全互換は要件にしない。旧形式を読む場合は、旧形式としての表示、正確な対応を保証しない推定表示、機能を制限した表示に留める。新規記録の書き込み周期、探索量を制限した参照、RuntimeHost / DebugHost の分離、diagnostics sample sidecar の設計を犠牲にしない。
 
@@ -71,7 +71,7 @@ sidecar JSONL の各記録は、後から外部トラッカーの追跡結果を
 
 tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate source から参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。
 
-alignment sidecar の各記録は、CaptureOn 中に診断記録、render snapshot、tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。
+alignment sidecar の各記録は、CaptureOn 中の diagnostics sample tick または旧形式の診断記録と tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar 自体から復元し、alignment sidecar は主に外部トラッカーの tracker snapshot を選択時点へ対応付けるために使う。
 
 - 診断記録の安定した識別子: 診断ログの行番号、tracked frame number、診断記録の時刻、自前トラッカーの `TrackerFrame.data_timestamp_ns`
 - render snapshot への参照: render snapshot の追跡フレームの番号、保存順の位置番号またはそのキャプチャー内の相対位置
@@ -101,7 +101,7 @@ ER-FORCE のように同じ source label と UUID が複数の送信元の通信
 
 初期実装では、時刻が最も近いものを使うか、latest-before snapshot を使うかを、作業内で固定する。採用した対応規則、許容する時間幅、該当する source identity は、出力と補助ファイルから後で確認できるようにする。
 
-`TrackedFrame.timestamp` はトラッカー実装ごとの時刻系であり、自前と外部のトラッカーが同じ起点や単調増加する時計を使うとは限らない。新規キャプチャーの diagnostics replay と Field source の表示は、保存済みの alignment sidecar がある場合はこれを優先する。外部トラッカーの `TrackedFrame.timestamp` ではなく、CaptureOn 中に観測した `receivedAt`、記録開始からの相対時間、診断記録の時刻を使って、tracker source snapshot を対応付ける。自前と外部のトラッカーの時刻範囲が明らかに重ならない場合でも、保存時の対応付けがあれば `saved-session-alignment` として、再生や再生位置のドラッグに伴うフィールド表示を成立させる。
+`TrackedFrame.timestamp` はトラッカー実装ごとの時刻系であり、自前と外部のトラッカーが同じ起点や単調増加する時計を使うとは限らない。新規キャプチャーの diagnostics replay と Field source は diagnostics sample tick を選択時点とし、`Vision Input` / `ibis tracker` は diagnostics sample sidecar から復元する。外部トラッカーは保存済みの alignment sidecar がある場合はこれを優先し、CaptureOn 中の `receivedAt` と記録開始からの相対時間を使って tracker source snapshot を対応付ける。
 
 保存済みの alignment sidecar がない記録では、`/diagnostics` は外部トラッカーを表示元とするフィールド表示の正確な時刻対応を保証しない。既存の近傍時刻の選択を使う場合は `legacy-nearest-timestamp` と、対応を推定した表示であることを示す。時刻範囲が重ならないことを検出した場合は `unsupported-alignment-missing` とし、既存ログでは想定内の欠落として扱う。既存ログを救済するための読み込み時の代用処理を、主経路へ昇格しない。
 
@@ -135,11 +135,11 @@ tracker snapshot の比較は、timeline scrubber の操作や playback tick の
 
 ### replay timeline と通常再生
 
-`TRACKER-059` 以降の `/diagnostics` の再生、早送り、位置のドラッグは、診断記録の件数ではなく統合した replay timeline を選択軸にする。時刻軸は収録時の `ReceivedAt` とし、診断記録、render snapshot、tracker packet snapshot の各時点をまとめた集合、または同等に利用可能な表示元のうち最速の source cadence を含む索引とする。外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと時刻系が違う場合があるため、この時刻軸には使わない。`TrackedFrame.timestamp` は各表示元内の表示・比較値として保持し、収録時刻での順序は `ReceivedAt` または記録開始からの相対受信時間で固定する。
+`RUNTIME-HOST-007` 以降の新規キャプチャーでは、`/diagnostics` の再生、早送り、位置のドラッグは `diagnostics-samples.jsonl` の diagnostics sample tick を replay timeline の選択軸にする。時刻軸は `sampleReceivedAt` とし、`Vision Input` と `ibis tracker` は同じ diagnostics sample tick の概要から復元する。外部トラッカーの tracker snapshot はこの選択時点に保存済みの alignment sidecar、または選択時点以前の latest-before snapshot で対応付け、外部トラッカー自身の `TrackedFrame.timestamp` を再生順序には使わない。
 
 通常再生は、統合した replay timeline の全時点を順番に描画しない。再生開始時に、開始時の wall-clock と、selected replay timeline tick の収録時刻 `ReceivedAt` を基準として保持する。表示更新は毎秒30回相当、つまり約33.3 msごとの描画間隔を目標に行い、各更新時に `targetReceivedAt = startTick.ReceivedAt + (currentWallClock - startWallClock)` を計算する。UI は replay timeline から `ReceivedAt <= targetReceivedAt` を満たす最新時点を選択し、そこへ直接追従する。トラッカーの更新が 100 Hz / 200 Hz 相当で存在する場合でも、通常再生では中間時点の表示を省略してよく、wall-clock に対する等倍速の再生位置を優先する。
 
-この表示省略は通常再生専用の表示対象の選択であり、保存済みの第2版の対応付け、統合した replay timeline、tracker packet snapshot、比較用データを削らない。timeline scrubber の操作、Field source selector、`Tracker Comparison` 領域、`Tracker.CaptureReplay` は、引き続き任意の再生時点を選べる経路として維持する。ユーザーが重視する、保存済みの対応付け、再生位置、Field source、比較機能によって「確実に比較できる」能力を落とさない。毎秒30回の通常再生で描画しなかった中間時点でも、位置のドラッグや比較では、保存済みの alignment record から選択・比較できる必要がある。
+通常再生で表示を省略した diagnostics sample tick も、timeline scrubber、Field source selector、`Tracker Comparison` から任意に選択できる状態を維持する。外部トラッカーの高頻度な tracker snapshot と alignment record は比較データとして保持するが、それらを新規記録の replay timeline へ別の選択時点として追加しない。
 
 ### 再生操作と速度選択の変更履歴
 
@@ -164,9 +164,9 @@ tracker snapshot の比較は、timeline scrubber の操作や playback tick の
 
 ### 異なる更新周期の保持と対応記録
 
-高速なトラッカーの更新時点では、raw vision と render snapshot は、その時点以前の最新のものを保持する。先頭だけ、それ以前の render snapshot がない場合は、後続で最も近いものを代用することを許容する。例えば、raw vision と render snapshot が 0 ms / 100 ms、ER-FORCE のスナップショットが 0 / 20 / 40 / 60 / 80 / 100 ms の場合、20 / 40 / 60 / 80 ms の再生時点は同じ 0 ms の raw vision と render snapshot を参照し、100 ms で 100 ms の raw vision と render snapshot へ進む。これにより再生は高速なトラッカーの更新周期に合わせて進み、低速な raw vision 側は同じ描画内容を保持して段階的に動いて見える。
+新規記録の再生位置は diagnostics sample tick で進む。`Vision Input` と `ibis tracker` は各 diagnostics sample tick に保存された未加工入力・追跡結果の概要を使い、ER-FORCE のように外部トラッカーがより高頻度でも、外部側の受信時点だけを replay timeline へ追加しない。外部トラッカーは選択中の diagnostics sample tick に対応する保存済みの alignment sidecar、またはその時点以前の latest-before snapshot を描画・比較へ使う。
 
-保存時の alignment sidecar は、診断ログ行単位だけでは不足する。新規記録では、ER-FORCE のような高速トラッカーの各 source sample に対する alignment record も `tracker-snapshot-alignment.jsonl` に保存し、同じ raw vision と render snapshot を複数の高速トラッカーの記録から参照できるようにする。低速な raw vision と render snapshot の更新時点でも、その時点の最新の tracker snapshot に対応する記録を残す。これにより、UI が後から補助ファイルを使って推定するだけでなく、保存済みの比較点として、最速の source cadence に応じた比較根拠を再現できる。
+保存時の alignment sidecar は、外部トラッカーを含む tracker source snapshot を diagnostics sample tick などの診断側の選択時点へ対応付ける補助索引として使う。高頻度な外部トラッカーの各 tracker snapshot は失わず保存するが、新規記録の replay timeline の選択軸は diagnostics sample sidecar とし、`Vision Input` / `ibis tracker` を render snapshot から復元するためには使わない。
 
 保存形式は既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持し、第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルは、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利なため作らない。互換性は `TRACKER-059` の非要件とし、第1版の読み取りによる代用、省略可能な項目による代用、旧位置引数のコンストラクターを維持するための分岐は入れない。
 
@@ -184,20 +184,20 @@ tracker snapshot の比較は、timeline scrubber の操作や playback tick の
 - 処理を省略した件数とエラー数
 - 元データへの参照または復元状態
 
-外部トラッカーのパケットはスナップショットとして保持する。`Tracker.CaptureReplay` と `/diagnostics` の再生は、session folder 内の snapshot log と alignment sidecar を読み、保存時の対応規則で自前トラッカーの確定済みの追跡フレームと並べて再生・比較表示できるようにする。再生は未加工入力側・追跡結果側の render snapshot だけに依存せず、source identity / source role ごとの tracker packet snapshot の時系列と、診断記録の対応付けを入力として扱える必要がある。
+外部トラッカーのパケットはスナップショットとして保持する。新規記録の `/diagnostics` は diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の読み取り元にし、tracker packet snapshot と alignment sidecar を外部トラッカーの比較・フィールド表示元に使う。`Tracker.CaptureReplay` は保存済みの tracker packet snapshot と alignment sidecar を用いた外部トラッカー比較を継続し、旧 render snapshot だけに依存する経路を新規記録の正常系にはしない。
 
-capture metadata がない、capture metadata に snapshot sidecar や alignment sidecar のファイルパスがない、補助ファイルがない、capture metadata の `TrackerSnapshotLog.IsCreated=false`、記録件数0、対応記録0、読み取りエラーは、それぞれ UI 上の状態として区別する。これらは、既存の診断ログや render snapshot の表示を壊す理由にはしない。
+capture metadata がない、`DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない、diagnostics sample sidecar が未作成・欠落・空・破損している、tracker snapshot / alignment sidecar の情報やファイルがない、記録件数0、読み取りエラーは、それぞれ UI 上の状態として区別する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。
 
 ## 診断画面の Field source の切り替え
 
-`TRACKER-056` では、`/diagnostics` の下部フィールド表示を、左右それぞれ独立した Field source selector で切り替えられるようにする。既定は現在の表示を維持し、左は `Vision Input`、右は自前トラッカーの出力とする。右側は既存の render snapshot の補助ファイルから作る `TrackedVisionViewState` を優先して使い、追跡パケットの補助ファイルに `own` の記録がなくても現行の表示を維持する。
+`TRACKER-056` では、`/diagnostics` の下部フィールド表示を、左右それぞれ独立した Field source selector で切り替えられるようにする。既定は左 `Vision Input`、右 `ibis tracker` とする。新規記録では両者を diagnostics sample sidecar の同一 diagnostics sample tick から復元し、tracker packet snapshot に `own` の記録がなくても表示できる。旧 render snapshot だけの記録は旧形式または機能制限付きとして扱う。Field source selector は左右のフィールド表示の見出し行に置き、`Tracker Comparison` の折りたたみ中も使える状態を維持する。左右の選択はページ状態として保持し、ログ変更時だけ既定へ戻し、timeline scrubber や再生時点の変更では維持する。
 
 Field source selector は、`Tracker Comparison` 領域内ではなく左右のフィールド表示の見出し行に置く。`Tracker Comparison` 領域は、その見出し行にある切り替えボタンで折りたためるようにし、折りたたみ中も左右の選択欄とフィールド描画は使える状態を維持する。比較領域の折りたたみ状態と左右の表示元選択は、`Diagnostics.razor.cs` のページ状態として保持し、URLクエリ、`sessionStorage`、`localStorage`には保存しない。ログファイルの変更時は左を `Vision Input`、右を自前トラッカーの出力へ戻し、timeline scrubber の操作や playback tick では選択状態を維持する。再読み込み時はページ状態を保持してよいが、選択した source option が新しい表示状態に存在しない場合は既定へ戻す。
 
 Field source の選択肢は次の通りとする。
 
-- `Vision Input`: 選択中の診断記録に対応する render snapshot の `SourceDetections` を既存の変換処理で描画する、仮想的な表示元。
-- `ibis tracker`: 選択中の診断記録に対応する render snapshot を、既存の `TrackedVisionViewState.FromSnapshot(...)` で描画する、仮想的な表示元。分類としては `own` に相当するが、既定表示を維持するため補助ファイルの有無には依存させない。
+- `Vision Input`: 新規記録では選択中の diagnostics sample tick に保存された未加工入力の概要から描画する仮想的な表示元。diagnostics sample sidecar がない旧形式では、新規経路へ render snapshot を代用しない。
+- `ibis tracker`: 新規記録では選択中の diagnostics sample tick に保存された追跡結果の概要から描画する仮想的な表示元。分類は `own` に相当するが、tracker packet snapshot に `own` の記録がなくても diagnostics sample sidecar から表示できる。
 - `External`: 保存済みの alignment sidecar がある場合は、分類が `external` の表示元を集約した代表スナップショットを描画する。対応付けのない既存記録では `unsupported-alignment-missing` とするか、推定であることを明示して既存の近傍時刻の選択を使う。
 - `Unknown`: 保存済みの alignment sidecar がある場合は、分類が `unknown` の表示元を集約した代表スナップショットを描画する。対応付けのない既存記録では `External` と同じ状態表示の方針を使う。
 - source label: snapshot sidecar 内の正規化済みの source label と完全一致するスナップショット群から、保存済みの対応付けが示す代表を描画する。同じ表示名・UUID に複数の送信元の通信アドレスと通信ポートがある場合は、同条件の候補から代表を選んだ理由を対応記録に残す。
@@ -208,7 +208,7 @@ Field source の選択肢は次の通りとする。
 
 - フィールドの側: 左または右
 - 選択中の表示元の種類: `VisionInput` / `IbisOwn` / `External` / `Unknown` / `SourceLabel`
-- 状態: 準備済み、診断記録なし、診断記録の追跡フレームなし、render snapshot なし、補助ファイル利用不可、自前トラッカーの比較基準スナップショットなし、比較候補のスナップショットなし、描画対象なし、エラー
+- 状態: 準備済み、診断記録なし、diagnostics sample sidecar 利用不可、`tracker-packet-snapshots.jsonl` 利用不可、自前トラッカーの比較基準スナップショットなし、比較候補のスナップショットなし、描画対象なし、エラー
 - source role と source label
 - 対応規則: `saved-session-alignment` / `legacy-nearest-timestamp` / `unsupported-alignment-missing`
 - 自前トラッカーの比較基準時刻（ns）
@@ -218,26 +218,26 @@ Field source の選択肢は次の通りとする。
 - 元データを復元できたかを示すフラグ
 - `TrackerPacketSnapshotSemanticSummary`、または同等のボール・ロボットの位置を表す描画用データ
 
-新規記録での表示元選択は、selected replay timeline tick の安定した識別子から保存済みの alignment record を引き、その記録が参照する tracker snapshot を、source role / source label 別の候補として使う。フィールドと比較領域で別々の規則によってスナップショットを選ばないよう、対応付けの検索と旧形式の近傍選択は、キャッシュ済み索引内の共通処理を使う。対応付けのない既存記録で近傍選択を許可する場合だけ、保持中の診断記録の tracked frame number から自前の `own` スナップショットを引き、その `TrackedFrame.timestamp` を基準時刻として、source role / source label 別の候補から最も近いものを選ぶ。
+新規記録では、`Vision Input` と `ibis tracker` は selected replay timeline tick に対応する diagnostics sample tick の採取記録から直接解決する。`External` / `Unknown` / source label は、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、なければ選択時点以前の同じ表示元の latest-before snapshot を使う。フィールドと比較領域で別々の規則によって外部トラッカーを選ばないよう共通の索引を使う。diagnostics sample sidecar がない旧形式で近傍選択を許可する場合だけ、推定であることを明示して既存の時刻比較を使い、新規経路へ render snapshot を代用しない。
 
 `TRACKER-055` のキャッシュと索引の経路を維持するため、timeline scrubber の操作、playback tick、Field source selector の変更で、snapshot sidecar や alignment sidecar の JSONL 全体を再読込しない。索引構築は、diagnostics log、capture metadata、snapshot sidecar、alignment sidecar の各ファイルパス、最終更新時刻、長さをキーにした既存のキャッシュ経路へ統合する。フィールド用には元データ全体ではなく、描画に必要な概要情報または最小限の描画用データだけを索引に保持する。通常の書き込み処理が作る記録では `SemanticSummary` を使い、古い記録などで概要情報がない場合だけ、索引構築時に元データから復元する。統合した replay timeline もログ選択時の索引構築で作成し、更新や位置のドラッグごとに補助ファイルを全件再読込しない。
 
 ただし、`TRACKER-059` は性能第一とし、既存の `TrackerDiagnosticsComparisonViewStateReader`、対応付けの読み取り処理、選択中の診断記録を前提とする状態表現が、統合した replay timeline の性能を制限する場合は温存しない。必要なら `TrackerDiagnosticsReplayTimelineIndex` 相当の UI やファイルの入出力から独立した索引を主経路にし、既存の読み取り処理は削除するか、必要最小限の接続処理へ縮小する。判断基準は、ログを開くときに一度だけ構築し、再生・早送り・位置のドラッグ・表示元変更では、補助ファイルの再読込なしで探索量を制限して参照できるかどうかとする。
 
-フィールド描画はすべて `VisionFieldCanvas` を使う。フィールド形状は選択中の render snapshot の形状を使い、トラッカーの表示元の補助ファイルだけから復元しようとしない。トラッカーのボール・ロボットは、`TrackerPacketSnapshotSemanticSummary` から `SSL_DetectionBall` と黄色・青色チーム別の `SSL_DetectionRobot` へ変換する処理を、`DiagnosticsFieldViewFactory` に追加する。チームを黄色・青色と判定できないロボットは無理に描画せず、`TrackerDiagnosticsFieldSourceFrame` の状態や概要で、描画対象が欠落し得ることを示す。
+フィールド描画はすべて `VisionFieldCanvas` を使う。新規記録の `Vision Input` / `ibis tracker` のボール・ロボットは diagnostics sample sidecar の概要から復元する。フィールド形状は利用可能な render snapshot など既存の形状情報を使ってよいが、render snapshot の物体データを新規記録の Field source の代わりにしない。外部トラッカーのボール・ロボットは `TrackerPacketSnapshotSemanticSummary` から `SSL_DetectionBall` と黄色・青色チーム別の `SSL_DetectionRobot` へ変換する。チームを黄色・青色と判定できないロボットは無理に描画せず、状態や概要で描画対象が欠落し得ることを示す。
 
-欠落・空・エラー時もフィールド表示領域は消さず、空の `VisionFieldCanvas` または同等の空表示を出し、見出し付近に状態を示す。`Vision Input` / `ibis tracker` で render snapshot がない場合は、既存の render snapshot のエラーを優先する。トラッカーの表示元では、capture metadata なし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、近傍スナップショットに描画対象なしを区別し、既存の診断ログや render snapshot の表示を壊す理由にはしない。
+欠落・空・エラー時もフィールド表示領域は消さず、空の `VisionFieldCanvas` または同等の空表示を出し、見出し付近に状態を示す。新規記録の `Vision Input` / `ibis tracker` では diagnostics sample sidecar の未作成・欠落・空・破損を表示し、外部トラッカーでは tracker snapshot / alignment sidecar の状態、自前の比較基準なし、比較候補なし、描画対象なしを区別する。既存の診断ログや render snapshot の表示を壊す理由にはせず、旧 render snapshot の有無を diagnostics sample sidecar の正常性の代用にしない。
 
 `TRACKER-057` の重ね表示は `TRACKER-056` の対象外とする。ただし `TrackerDiagnosticsFieldSourceFrame` は単一表示元の描画入力として独立させ、後続で複数の `TrackerDiagnosticsFieldSourceFrame` を同じ `VisionFieldCanvas` 相当の重ね描画処理へ渡せる最小限の状態表現として再利用する。`TRACKER-056` では重ね合わせ、色分け、凡例、表示・非表示の切り替えは実装しない。
 
 対象を絞ったテストでは、少なくとも次を固定する。
 
-- 統合した replay timeline は診断記録の件数ではなく、利用可能な表示元のうち最速の source cadence を含む。raw vision と render snapshot を 0 ms / 100 ms、ER-FORCE のスナップショットを 0 / 20 / 40 / 60 / 80 / 100 ms にしたテストデータで、20 / 40 / 60 / 80 ms の再生時点を含むことを固定する。
-- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment record を持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshot を参照し、100 ms の記録は 100 ms の raw vision と render snapshot を参照する。
+- 新規記録の replay timeline は diagnostics sample tick を選択単位にする。例えば diagnostics sample tick が 0 ms / 100 ms、ER-FORCE の tracker snapshot が 0 / 20 / 40 / 60 / 80 / 100 ms の場合、再生位置は 0 ms / 100 ms とし、ER-FORCE の中間の tracker snapshot は 外部トラッカーの比較候補として保持する。
+- 保存時の alignment sidecar は、選択中の diagnostics sample tick に対応する外部トラッカーの tracker snapshot を再現できる記録を持つ。対応記録がない場合は、選択時点以前の同じ表示元の latest-before snapshot を使い、選択時点より後の tracker snapshot で代用しない。
 - ER-FORCE の `TrackedFrame.timestamp` を自前トラッカーと重ならない値にしても、replay timeline の順序と描画内容の保持は `ReceivedAt` または記録開始からの相対受信時間で決まる。
-- `/diagnostics` の再生・早送り・位置のドラッグは統合した replay timeline の索引を使い、高速トラッカーの更新時点では、`Vision Input` / `ibis tracker` のフィールド表示が、その時点以前の最新の render snapshot を保持する。
+- `/diagnostics` の再生・早送り・位置のドラッグは diagnostics sample tick の時系列 を使い、`Vision Input` / `ibis tracker` は選択中の採取記録 から復元する。外部トラッカーだけ tracker packet snapshot / alignment sidecar または latest-before snapshot を使う。
 - 等倍速の `Play` は毎秒30回相当の表示更新で、開始時の wall-clock と開始時点の `ReceivedAt` から目標の収録時刻を計算し、その時刻以下の最新再生時点へ追従する。200 Hz の更新を持つテストデータでは、開始から 1 秒後に約 30 回分だけ進んだ逐次更新位置ではなく、wall-clock で 1 秒相当の時点へ進むことを固定する。
-- 通常再生で表示を省略した中間時点でも、timeline scrubber の操作、Field source selector、比較は、selected replay timeline tick と保存済みの第2版の alignment record から、任意時点を選択・比較できることを固定する。
+- 通常再生で表示を省略した diagnostics sample tick も、timeline scrubber、Field source selector、比較から選択できることを固定する。外部トラッカーの高頻度な tracker snapshot は比較候補として保持し、再生位置を外部側の時刻へ動かさない。
 - 早送りは通常再生専用の実時間追従へ巻き込まず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。
 - 再生操作は `Play` / `Fast Forward` のアイコンボタンと `Stop` ボタンの従来配置を持ち、`等倍速` / `4x` / `16x` / `64x` を巨大な操作ボタンとして描画しないことを固定する。
 - 速度選択は小さなタブ、または同等の選択部として `等倍速`、`4x`、`16x`、`64x` を並べ、数値の等倍ラベルを表示しないことを固定する。
@@ -312,18 +312,18 @@ Field source の選択肢は次の通りとする。
 
 - CaptureOn 中に見えている追跡パケットを、自前のパケットも除外せず補助 JSONL ファイルに保存できる。
 - トラッカーの受信処理は起動時に解決した自前トラッカーの送信先を既定で監視し、`Tracker:Receive:MulticastAddress` / `Port` の指定時は受信処理独自の受信先を監視できる。
-- 同じ CaptureOn の記録単位で生成されるキャプチャー、capture metadata、トラッカーの診断記録、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）が一つの session folder にまとまる。異なる CaptureOn の開始時点に属するログは、別フォルダに分かれる。
+- 同じ CaptureOn の記録単位で生成されるキャプチャー、capture metadata、トラッカーの診断記録、`diagnostics-samples.jsonl`、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）が一つの session folder にまとまる。異なる CaptureOn の開始時点に属するログは別フォルダに分かれる。
 - capture metadata から session folder と、各ファイルへの相対パスを辿れる。
 - Capture Off から再度記録を開始するときに、session folder とスナップショットの書き込み処理が切り替わり、前のフォルダへ追記しない。
-- 他のトラッカーが存在しない新規記録では、キャプチャー、診断ログ、render snapshot の通常挙動を変えず、旧形式は機能制限付きで表示できる範囲だけ扱う。
-- 旧診断ログ・旧 render snapshot の補助ファイルは旧形式または推定表示として扱う。snapshot sidecar や diagnostics sample sidecar がある最新経路では、性能を最優先し、探索量を制限した参照で追加の比較情報を読める。
+- 他のトラッカーが存在しない新規記録でも diagnostics sample sidecar を作成でき、`Vision Input` / `ibis tracker` を同じ diagnostics sample tick から再生できる。旧 render snapshot だけの記録は機能制限付きの旧形式として扱う。
+- 旧診断ログ・旧 render snapshot の補助ファイルは旧形式または推定表示として扱う。diagnostics sample sidecar がある最新経路では `Vision Input` / `ibis tracker` を diagnostics sample tick の採取記録から復元し、tracker snapshot / alignment sidecar がある場合だけ外部トラッカーの比較情報を追加する。
 - 外部トラッカーのスナップショットを、`Tracker.CaptureReplay` の CLI 出力と `/diagnostics` の `Tracker Comparison` 領域と再生機能で、再生・比較表示できる。
-- `/diagnostics` の左右のフィールド表示で `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label を選択でき、既定は左 `Vision Input`、右が自前トラッカーの出力のまま維持される。
+- `/diagnostics` の左右のフィールド表示で `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label を選択でき、既定は左 `Vision Input`、右 `ibis tracker` とする。新規記録の既定2表示元は diagnostics sample sidecar の同一 diagnostics sample tick から復元される。
 - `Tracker Comparison` 領域を折りたたんでも、Field source selector とフィールド描画を使える。
 - `/diagnostics` の重ね表示方式で、左右の選択欄の2つの表示元を同じフィールドへ重ね、層ごとの色分け、凡例、表示・非表示を確認できる。
-- raw vision より高速なトラッカーの表示元がある場合、再生位置の操作や再生更新は統合した replay timeline の高速トラッカーの時点を含み、raw vision と render snapshot は、その時点以前の最新の描画内容を保持する。
+- 外部トラッカーが diagnostics sample tick より高頻度でも、新規記録の再生位置は diagnostics sample tick で進む。外部トラッカーは選択中の diagnostics sample tick に対応する alignment sidecar、または選択時点以前の latest-before snapshot として表示・比較する。
 - 等倍速の `Play` は毎秒30回相当の表示更新で、wall-clock の経過時間に対応する最新の replay timeline tick へ追従し、高頻度な更新を全件逐次描画して遅れ続けない。
 - 再生 UI は再生・早送り・停止の従来のボタン配置を持ち、速度選択側に `等倍速`、`4x`、`16x`、`64x` の小さなタブを表示する。
-- 保存時の alignment sidecar は、最速の source cadence に応じた比較記録を持ち、複数の高速トラッカーの記録が同じ raw vision と render snapshot を参照できる。
+- 保存時の alignment sidecar は、外部トラッカーの tracker snapshot と diagnostics sample tick などの診断側の選択時点を対応付け、対応がない場合でも latest-before snapshot を選ぶための索引として使える。
 - 再生位置のドラッグ、再生更新、表示元変更で、追跡パケットや対応付けの補助 JSONL ファイル全体を再読込しない。
 - 小さな作業ごとに TDD、レビュー、コミット、PR の確認を完了している。

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T21:56:17+09:00",
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "scope": "5 design documents + 3 README",
+  "documents": [
+    {
+      "document": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "expected": 133,
+      "mapped": 133,
+      "unique_ids": 133,
+      "current_sha256": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+      "ledger_sha256": "19bf92d8400fa89a8fa7ec09e8c960e4453f63dcc1df4267edf5ae1405bb98e3",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "expected": 724,
+      "mapped": 724,
+      "unique_ids": 724,
+      "current_sha256": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+      "ledger_sha256": "dbdd86431a5b090425462b755558d77b5a1ee756a7bac51f888f881f99c24672",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "expected": 565,
+      "mapped": 565,
+      "unique_ids": 565,
+      "current_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+      "ledger_sha256": "4f344547b157bde7e6e79e05e6d667ce084b4c9dbd5aacd5eb3e8b2f4c2753e0",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "expected": 524,
+      "mapped": 524,
+      "unique_ids": 524,
+      "current_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "ledger_sha256": "17e2bc2307919ef48e1ba5249cc5705178ad758256b78f67f5801103010a11bf",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "expected": 196,
+      "mapped": 196,
+      "unique_ids": 196,
+      "current_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "ledger_sha256": "8fb22a929684119dc3ebf3ce3a3165897022c40e576a2f2d015be4ba23635c75",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "README.md",
+      "expected": 62,
+      "mapped": 62,
+      "unique_ids": 62,
+      "current_sha256": "82c4d69d29c56a61e39f642b0977a727f291b26625b02d9caf755ba1e3a26a9d",
+      "ledger_sha256": "46bf562fee7f215d79af384bf0c8796e613d8d494221e6d1f082198d1605372a",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Tracker.DebugHost/README.md",
+      "expected": 423,
+      "mapped": 423,
+      "unique_ids": 423,
+      "current_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+      "ledger_sha256": "6a401a724e5a6cbd0194893a6806050da60350f44c26165767797ba1332bb68b",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Tracker.CaptureReplay/README.md",
+      "expected": 43,
+      "mapped": 43,
+      "unique_ids": 43,
+      "current_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "ledger_sha256": "9dc2e90a14f41edc3f0e9138afa331a6bb4eeac810cc5ea0fc105632f8a4d3e4",
+      "errors": [],
+      "result": "pass"
+    }
+  ],
+  "expected_total": 2670,
+  "mapped_total": 2670,
+  "unique_ids_total": 2670,
+  "cross_document_duplicate_ids": 0,
+  "errors": [],
+  "result": "pass",
+  "note": "F1修正後の構造・SHA自己点検。独立再レビューの合格証明ではない。"
+}

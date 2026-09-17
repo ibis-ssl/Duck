@@ -1,0 +1,4 @@
+1/3 Tracker/Design/Core/tracker-architecture-plan.md 52.64ms
+2/3 Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md 19.08ms
+3/3 Tracker/Tracker.DebugHost/README.md 10.06ms
+CSpell: Files checked: 3, Issues found: 0 in 0 files.

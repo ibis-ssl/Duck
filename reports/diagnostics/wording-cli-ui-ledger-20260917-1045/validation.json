@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T10:45:12+09:00",
+  "generated_at": "2026-09-17T21:56:17+09:00",
   "document": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
-  "technical_parent": "4eff5c3733fc5e543f7f96c35e97d1de2e505797",
-  "document_sha256": "ecd9419d25abec0c29cf280078c97695c38c32456f68a8d375d5df43a63d3484",
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "document_sha256": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
   "block_correspondence": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-block-correspondence-r3.json",
-  "block_correspondence_sha256": "aa8730e31af06da5186ab57629400fcf875359edfbdde3b4cf3220ce30bee1f0",
+  "block_correspondence_sha256": "a9bf83e254c5cc41b9854a90d257dd52eceda02f288e7c3ec50721077ea2ccb3",
   "occurrence_correspondence": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
-  "occurrence_correspondence_sha256": "a02f59d5d32238f718c5e7ff033fc8eb3a5b92299db87802a84531d7cd313637",
+  "occurrence_correspondence_sha256": "dbdd86431a5b090425462b755558d77b5a1ee756a7bac51f888f881f99c24672",
   "scope_occurrences_sha256": "19b78084a21d4c77af31aebde79fadd4d6a82f728ebb41a9d5b8c4b3e4b49671",
   "scope_summary_sha256": "0d2d7e4d67d4e49057b663d74bffcf48c323974a588bcc93647d872ca4b8ac85",
   "expected_occurrences": 724,
@@ -166,5 +166,28 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
     }
+  },
+  "f1_fix": {
+    "source_review": "reports/pr20-independent-final-review-20260917.md",
+    "reviewed_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+    "document_sha256": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+    "occurrence_ledger_sha256": "dbdd86431a5b090425462b755558d77b5a1ee756a7bac51f888f881f99c24672",
+    "block_ledger_sha256": "a9bf83e254c5cc41b9854a90d257dd52eceda02f288e7c3ec50721077ea2ccb3",
+    "affected_occurrence_rows": 163,
+    "affected_blocks": 19,
+    "structure_errors": [],
+    "focused_validation": {
+      "textlint": 0,
+      "cspell": 0,
+      "whitelist": 0,
+      "git_diff_check": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/"
+    },
+    "implementation_contract_test": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests",
+      "exit_code": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/"
+    },
+    "independent_rereview_required": true
   }
 }

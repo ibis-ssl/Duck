@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T11:15:32+09:00",
+  "generated_at": "2026-09-17T21:56:17+09:00",
   "document": "Tracker/Design/Core/tracker-architecture-plan.md",
-  "technical_parent": "5a72850d25fa934bcb9d3e4c587bb8d88688fd59",
-  "document_sha256": "5df79b7bd607baa39b7fad0f9a5abc3e5fb39b9c1a78786a88427048b50b21a5",
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "document_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
   "expected_occurrences": 565,
   "actual_occurrences": 565,
   "unique_ids": 565,
@@ -48,5 +48,28 @@
       "stdout": "diff-check.stdout.txt",
       "stderr": "diff-check.stderr.txt"
     }
+  },
+  "f1_fix": {
+    "source_review": "reports/pr20-independent-final-review-20260917.md",
+    "reviewed_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+    "document_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+    "occurrence_ledger_sha256": "4f344547b157bde7e6e79e05e6d667ce084b4c9dbd5aacd5eb3e8b2f4c2753e0",
+    "block_ledger_sha256": "06d4475d6c7fc20f0267f12ca70f2640e70ffef474dea69212c4ef48f6fba3c0",
+    "affected_occurrence_rows": 106,
+    "affected_blocks": 9,
+    "structure_errors": [],
+    "focused_validation": {
+      "textlint": 0,
+      "cspell": 0,
+      "whitelist": 0,
+      "git_diff_check": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/"
+    },
+    "implementation_contract_test": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests",
+      "exit_code": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/"
+    },
+    "independent_rereview_required": true
   }
 }

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T15:38:30+09:00",
+  "generated_at": "2026-09-17T21:53:39+09:00",
   "document": "Tracker/Tracker.DebugHost/README.md",
-  "final_sha256": "1a214f35b0c7c8598319c0b3a2d8e0d301a62d1c2f3cafdc7a567d7e11f8be14",
+  "final_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
   "count": 75,
   "blocks": [
     {
@@ -219,20 +219,20 @@
         "- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の `*.tracker-diagnostics.log`、既定の `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます",
         "- 上部の timeline scrubber をドラッグすると、選択中の再生時点が連続的に切り替わります",
         "- 左側の replay timeline でログ行を時系列にスクロールできます",
-        "- キャプチャーに付随する補助ファイルと共通のファイル名部分を持つ `*.render-snapshots.jsonl.gz` がある場合は、選択行の未加工入力と追跡結果をフィールドに描画できます",
+        "- 新規キャプチャーでは `diagnostics-samples.jsonl` の選択中の採取記録から `Vision Input` と `ibis tracker` のボール・ロボットを描画します。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示の代わりには使いません。",
         "- 左右の `Field` 見出し行で `Field source` を `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label から選択できます。`Field source` には曖昧な `All` は含めず、ログ変更時は左 `Vision Input` / 右 `ibis tracker` に戻ります。",
-        "- 新規キャプチャーに `tracker-snapshot-alignment.jsonl` がある場合、`External` / `Unknown` / source label の `Field source` は保存時対応表を優先し、選択中の再生時点に対応するトラッカーのスナップショットを描画します。対応付けがない既存キャプチャーでは、外部トラッカーの時刻対応は非対応または「正確な対応を保証しない推定」として表示されます。",
+        "- 新規キャプチャーの `External` / `Unknown` / source label の `Field source` は、`tracker-snapshot-alignment.jsonl` の保存時対応表を優先し、選択中の diagnostics sample tick に対応する tracker snapshot、またはその時点以前の latest-before snapshot を描画します。対応付けがない旧形式では、外部トラッカーの時刻対応は非対応または「正確な対応を保証しない推定」として表示します。",
         "- 右側で選択行の未加工入力と追跡結果について、ボール、ロボット、観測フレーム / 追跡フレームの情報を比較できます",
         "- キャプチャーの診断ログを選ぶと、`Settings` から capture metadata に保存された定義済みの設定プロファイルと解決済みの設定を確認できます",
         "- キャプチャーの診断ログとトラッカーパケットの snapshot sidecar が揃っている場合は、折り畳み可能な `Tracker Comparison` 表示領域で自前トラッカーと外部トラッカーの差分を確認できます",
         "- `Tracker Comparison` 表示領域の表示元の絞り込みは `All`、`External`、`Own`、`Unknown`、source label ごとで切り替えられます。通常確認では `External` または対象の表示元名を選び、新規キャプチャーでは保存済みの alignment sidecar に対応する外部トラッカーのスナップショットと比較します。対応付けがない既存キャプチャーで最も近い時刻を使う場合は「正確な対応を保証しない推定」として表示されます。",
-        "- `Tracker Comparison` はトラッカーパケットの snapshot sidecar と alignment sidecar をログ選択時に軽量な索引へ変換し、統合した replay timeline も同時に構築します。再生位置や再生時点を変更しても同じ補助ファイルを再読込しません。100MB を超える補助ファイルでも、再生位置や再生時点を変えるたびの I/O と解析量は補助ファイルのサイズに比例しません。",
+        "- 新規キャプチャーの replay timeline は `diagnostics-samples.jsonl` の採取時系列を使います。`Tracker Comparison` は tracker packet snapshot と alignment sidecar を外部トラッカーの比較用に索引化し、選択中の diagnostics sample tick に対応する tracker snapshot を参照します。再生位置や再生時点を変更しても外部トラッカーの補助ファイルを全件再読込せず、100MB を超える補助ファイルでも再生位置の変更ごとの I/O と解析量がファイルサイズに比例しない構成を維持します。",
         "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。",
-        "- 表示領域には、補助ファイルの状態、alignment sidecar の状態、記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、保持中の診断行 / render snapshot の追跡フレームの番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻、時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。"
+        "- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。"
       ],
       "decision": "fixed",
-      "reason": "診断UIの13項目を全文照合。ログ3経路、scrubber/timeline、render保存物、5Field sourceとAll除外、新規保存対応/旧形式推定、比較/設定/絞込、初回索引と100MB性能、3実ボタンと可変倍率/30回秒/間引き禁止/>64、表示状態を全保持。source label、capture単位、timeline位置番号、held renderの追跡番号を特定。プリセットは数値入力への補助と説明。",
-      "review_kind": "implementation_self_check"
+      "reason": "F1対応: 新規 Vision Input / ibis tracker の物体表示を diagnostics-samples.jsonl から復元し、render snapshot は旧形式・形状補助へ限定。 F1対応: 外部 Field source を diagnostics sample tick に対する alignment / latest-before tracker snapshot で描画する実装へ同期。 F1対応: 新規 replay timeline を diagnostics-samples.jsonl の採取時系列へ同期し、外部比較索引と性能条件を維持。 F1対応: diagnostics sample / tracker snapshot / alignment の状態と採取番号を画面表示項目へ反映。",
+      "review_kind": "implementation_worker_f1_fix_sync"
     },
     {
       "block": "D18-B016",
@@ -341,14 +341,14 @@
         "- `<prefix>-<timestamp>-<guid>.jsonl.gz`: パケットキャプチャーの本体",
         "- `<prefix>-<timestamp>-<guid>.metadata.json`: キャプチャー時の `Tracker` 設定と解決済みの設定プロファイル",
         "- `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: キャプチャーと対応するトラッカー診断ログ。`Tracker:Diagnostics:FilePath` が指定されていても、キャプチャーが有効なときは補助ファイルとして同時に出力します。",
-        "- `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: replay timeline と逆方向の再生位置移動に使う render snapshot。追跡エンジンの内部状態ではなく、確定済みの `TrackerFrame` だけを保存します。",
+        "- `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: 旧形式の診断表示やフィールド形状などの補助に使う render snapshot。新規キャプチャーの `Vision Input` / `ibis tracker` の物体表示や replay timeline の主な入力には使いません。",
         "- `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の受信処理が受信した公式形式の `TrackerWrapperPacket` の snapshot sidecar です。",
-        "- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断記録、render snapshot、tracker source snapshot を、1 回のキャプチャーの replay timeline 上で対応付ける補助ファイルです。外部トラッカーの `TrackedFrame.timestamp` が自前トラッカーと別の時刻系でも、`receivedAt` と記録開始からの相対時間を使って `/diagnostics` の `Field source` と比較を再生できます。保存形式の版 2 では診断ログ行単位ではなく、最も更新が速い表示元の周期に合わせた replay timeline の記録を保存し、同じ raw vision / render snapshot を複数の高速なトラッカー記録から参照できます。版 1 との互換は持たず、ログ選択時の索引構築と再生時や再生位置移動時の高速参照を優先します。",
+        "- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断側の選択時点と tracker source snapshot を対応付ける補助ファイルです。新規キャプチャーでは replay timeline 自体は diagnostics sample tick を使い、最速の source cadence を再生位置の選択軸にはしません。alignment sidecar は外部トラッカーの tracker snapshot を選択時点へ対応付けるために使い、対応記録がない場合は選択時点以前の同じ表示元の latest-before snapshot を使います。render snapshot は新規記録の `Vision Input` / `ibis tracker` の復元元にはしません。",
         "- `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecar です。"
       ],
       "decision": "fixed",
-      "reason": "保存物の役割を保持し、`tracker-packet-snapshots.jsonl` が保存する公式形式を `TrackerWrapperPacket` と具体化した。",
-      "review_kind": "implementation_self_check"
+      "reason": "F1対応: render snapshot を旧形式・形状補助へ位置付け、新規既定表示元の主入力から除外。 F1対応: alignment sidecar を外部 tracker snapshot の対応付けへ限定し、新規 replay timeline は diagnostics sample tick とする実装へ同期。",
+      "review_kind": "implementation_worker_f1_fix_sync"
     },
     {
       "block": "D18-B024",
@@ -357,11 +357,11 @@
       "final_start": 140,
       "final_end": 140,
       "final_text": [
-        "`metadata.json` には有効な設定プロファイルの名前だけではなく、`Tracker:Profiles` 配下の設定プロファイルの値と、実行時の上書き適用後に解決した設定も保存します。CaptureOn 比較ログがある場合は、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` もここから辿ります。"
+        "`metadata.json` には有効な設定プロファイルの名前だけではなく、`Tracker:Profiles` 配下の設定プロファイルの値と、実行時の上書き適用後に解決した設定も保存します。CaptureOn の記録では、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` をここから辿ります。"
       ],
-      "decision": "accepted",
-      "reason": "metadataに適用名だけでなくProfilesの値とoverride後設定を保存し、9項目の保存先/状態/sourceへ辿れる条件を保持。",
-      "review_kind": "implementation_self_check"
+      "decision": "fixed",
+      "reason": "F1対応: metadata の DiagnosticsSampleSidecarPath / DiagnosticsSampleLog を含む実際の保存項目へ同期。",
+      "review_kind": "implementation_worker_f1_fix_sync"
     },
     {
       "block": "D18-B025",
@@ -505,11 +505,11 @@
       "final_start": 221,
       "final_end": 221,
       "final_text": [
-        "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイル、上書き設定、snapshot sidecar をまとめて再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。その場合、capture metadata から辿る `tracker-packet-snapshots.jsonl` は自動解決されないため、CaptureOn 比較ログの確認手順としては capture metadata を優先してください。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotLog` を矛盾なく入れてください。"
+        "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。"
       ],
       "decision": "fixed",
-      "reason": "通常は保存metadataの解決済み設定/相対パスで当時を再現、現appsettingsは旧capture再評価または意図的別設定に限定、自動sidecar解決なし、手書きmetadataの6項目整合を保持。重複修飾を解きcapture metadataを明記。",
-      "review_kind": "implementation_self_check"
+      "reason": "F1対応: 手書き metadata の必要項目へ diagnostics sample / tracker snapshot / alignment のパスとログ情報を追加し、既存設定再評価条件を維持。",
+      "review_kind": "implementation_worker_f1_fix_sync"
     },
     {
       "block": "D18-B036",
@@ -572,16 +572,16 @@
       "final_text": [
         "1. `Tracker:Receive:Enabled=true` にし、受信処理が監視する接続先を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した自前トラッカーの送信先を使います。既定の `sim` 設定プロファイルは `224.5.23.2:11010`、`default` 設定プロファイルは `224.5.23.2:10010` です。外部トラッカーが別の接続先に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。ネットワーク接続が複数ある環境では `Tracker:Receive:InterfaceAddress` を明示します。",
         "2. `Tracker.DebugHost` を起動し、画面で `Capture On` にしてから SSL-Vision パケットと公式形式の `TrackerWrapperPacket` を流します。`Tracker:Receive:Enabled=false` のままではトラッカー受信処理が起動しないため、キャプチャーと診断ログは残ってもトラッカーパケットの snapshot sidecar は増えません。",
-        "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では `SessionFolder` と各ファイルの相対パス、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotAlignmentLog.RecordCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。",
-        "4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。統合した replay timeline、timeline scrubber、`Play` / `Fast Forward` / `Stop` の再生ボタン、速度選択タブ（`等倍速`、`4x`、`16x`、`64x`）、左右の `Field source` 選択、`Settings` の解決済み設定を確認します。ER-FORCE などトラッカー表示元が raw vision より速いキャプチャーでは、replay timeline に高速なトラッカー時点が含まれ、raw vision / render snapshot の `Field` が選択時点以前の最新のスナップショットを保持することも確認します。`Play` の等倍速再生は毎秒 30 回相当の表示更新で実時間の経過に追従するため、高頻度な再生時点の中間表示を省略する場合があります。",
+        "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`diagnostics-samples.jsonl`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では各ファイルの相対パスと、`DiagnosticsSampleLog` / `TrackerSnapshotLog` / `TrackerSnapshotAlignmentLog` の `IsCreated`、`RecordCount`、`SkippedRecordCount`、`ErrorCount` を確認します。",
+        "4. `/diagnostics` を開き、同じ session folder の診断記録を選びます。新規キャプチャーでは replay timeline が diagnostics sample tick で構成され、左 `Vision Input` と右 `ibis tracker` が同じ diagnostics sample tick の採取記録にある未加工入力・追跡結果から描画されることを確認します。`External` / `Unknown` / source label の `Field source` は保存済みの alignment sidecar、または選択時点以前の latest-before snapshot を使います。`Play` / `Fast Forward` / `Stop`、速度選択の `等倍速` / `4x` / `16x` / `64x`、timeline scrubber を操作し、ER-FORCE など外部トラッカーが高頻度でも再生位置自体は diagnostics sample tick のまま進むことを確認します。",
         "5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。",
-        "6. `Tracker Comparison` 表示領域で `Status` が `Ready` になることを確認し、表示元の絞り込みを `External` または対象の表示元名に切り替えます。比較対象がないことを確認したい場合は `Own` / `Unknown` も使えます。",
-        "7. 報告書には、選択中の replay timeline の位置番号 / 時刻、`Play` の表示更新で到達した選択時刻、保持中の診断行 / render snapshot の追跡フレームの番号、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、補助ファイルの状態、alignment sidecar の状態、記録 / 省略 / エラー件数、比較対象の記録の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時に同じ条件の候補から選ぶ規則、スナップショット側の追跡フレームの番号、自前側の時刻（ns）、対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列の表示を残します。UI の `Restored` は `rawPayloadRestored=true`、`Missing` は `rawPayloadRestored=false` を表します。`Play` で表示されなかった中間の再生時点も、timeline scrubber や比較から選択できることを必要に応じて確認します。",
+        "6. `Tracker Comparison` 表示領域では、新規キャプチャーで diagnostics sample sidecar を読み取れる場合に `Vision Input` / `ibis tracker` の Field source が利用できることを確認します。外部トラッカーの比較では tracker packet snapshot / alignment sidecar を読み、条件を満たす場合に `Status` が `Ready` になることを確認します。",
+        "7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。",
         "8. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`saved-session-alignment` の比較概要をエージェント / 検証 / 回帰用の検証記録として残します。CLI の検証記録は UI の検証記録の補助であり、通常確認の主経路ではありません。"
       ],
       "decision": "fixed",
-      "reason": "手動確認手順を保持し、流すトラッカーパケットの形式を `TrackerWrapperPacket` と具体化した。",
-      "review_kind": "implementation_self_check"
+      "reason": "F1対応: 手動確認成果物へ diagnostics-samples.jsonl と DiagnosticsSampleLog の件数・エラー状態を追加。 F1対応: 手動診断手順を diagnostics sample tick と同一採取記録の Vision Input / ibis tracker に同期し、再生操作の既存確認項目を維持。 F1対応: diagnostics sample sidecar だけでも既定2 Field source を利用でき、外部比較時は tracker snapshot/alignment を追加利用する条件へ同期。 F1対応: 報告項目へ diagnostics sample tick と各補助ファイルの状態を追加し、既存の時刻・source・復元情報を維持。",
+      "review_kind": "implementation_worker_f1_fix_sync"
     },
     {
       "block": "D18-B041",
@@ -603,19 +603,19 @@
       "final_start": 253,
       "final_end": 261,
       "final_text": [
-        "- `Ready`: capture metadata と `tracker-packet-snapshots.jsonl` を読み、選択中の診断記録の比較を作成できる状態です。",
+        "- `Ready`: 新規キャプチャーでは読み取り可能な `diagnostics-samples.jsonl` だけでも `Vision Input` / `ibis tracker` の replay timeline と Field source を構成できる状態です。外部トラッカーの比較を行う場合は、`tracker-packet-snapshots.jsonl` と alignment sidecar の利用可能な情報も組み合わせます。",
         "- `NoLogSelected`: 診断ログがまだ選択されていません。",
         "- `MetadataMissing` / `MetadataCorrupt`: 選択したログに対応する `*.metadata.json` がない、または JSON を読み取れません。古い診断ログや壊れた capture metadata の可能性があります。",
-        "- `SnapshotMetadataMissing`: capture metadata にトラッカーのスナップショットのログ情報がありません。CaptureOn 比較ログ導入前のキャプチャーではこの状態になり得ます。",
+        "- `SnapshotMetadataMissing`: diagnostics sample sidecar が利用できず、capture metadata にトラッカーのスナップショットのログ情報もないため、新規記録の比較経路を構成できない状態です。CaptureOn 比較ログ導入前や旧 render snapshot だけのキャプチャーではこの状態になり得るため、非対応または機能制限付きの旧形式として扱います。",
         "- `SidecarNotCreated`: capture metadata は snapshot sidecar が未作成であることを示します。`Tracker:Receive:Enabled=false`、受信処理未起動、または CaptureOn 中に書き込み処理が開始されなかった場合を疑います。",
         "- `SidecarPathMissing` / `SidecarMissing`: capture metadata に補助ファイルのファイルパスがない、または capture metadata が指すファイルが存在しません。session folder の移動や部分コピーを疑います。",
         "- `SidecarEmpty` または `RecordCount=0`: 補助ファイルは作成されていますが、保存済みのトラッカーパケットがありません。公式形式の `TrackerWrapperPacket` が接続先に流れていない、マルチキャスト受信に使うネットワーク接続が違う、表示元がまだ見えていない場合を確認します。",
-        "- `SidecarCorrupt`: 補助ファイルの JSONL を読み取れません。壊れたファイル、途中書き込み、手動編集を疑います。",
+        "- `SidecarCorrupt`: diagnostics sample sidecar または tracker snapshot / alignment sidecar の JSONL を読み取れません。壊れたファイル、途中書き込み、手動編集を疑います。",
         "- `Skipped` が 0 より大きい場合は、デコードまたは書き込み失敗でスナップショット記録にできなかったパケットがあることを示します。`Errors` が 0 より大きい場合は書き込み処理側で記録されたエラーがあるため、比較結果の代表性を報告書のリスクに残します。"
       ],
       "decision": "fixed",
-      "reason": "補助ファイル状態の判定を保持し、未受信時に確認する公式形式を `TrackerWrapperPacket` と具体化した。",
-      "review_kind": "implementation_self_check"
+      "reason": "F1対応: Ready は diagnostics-samples.jsonl 単独でも Vision Input / ibis tracker を構成できる実装へ同期。 F1対応: SnapshotMetadataMissing を diagnostics sample 不可かつ tracker snapshot metadata 不在の旧形式/機能制限状態として説明。 F1対応: SidecarCorrupt の対象に diagnostics sample sidecar と tracker snapshot / alignment sidecar を明記。",
+      "review_kind": "implementation_worker_f1_fix_sync"
     },
     {
       "block": "D18-B043",
@@ -1087,5 +1087,16 @@
       "reason": "既存profile名必須、multicast失敗時local指定、未知profileは4xxでない、当時のsolution buildに逐次オプションが必要な場合ありという4注意を保持。保存庫全体という誤訳を避け、実在するDuck.slnxを明示し当時の環境に限定する。",
       "review_kind": "implementation_self_check"
     }
+  ],
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "role": "implementation_worker_f1_fix_sync",
+  "independent_final_review": false,
+  "f1_affected_blocks": [
+    "D18-B015",
+    "D18-B023",
+    "D18-B024",
+    "D18-B035",
+    "D18-B040",
+    "D18-B042"
   ]
 }
