@@ -1,0 +1,19 @@
+ 1/18 README.md 58.95ms
+ 2/18 tools/lint/README.md 5.80ms
+ 3/18 Tracker/Design/Archive/Core/phases-status.md 2.35ms
+ 4/18 Tracker/Design/Archive/Core/tasks-status.md 9.91ms
+ 5/18 Tracker/Design/Archive/DebugHost/phases-status.md 1.29ms
+ 6/18 Tracker/Design/Archive/DebugHost/tasks-status.md 4.85ms
+ 7/18 Tracker/Design/Core/tracker-architecture-plan.md 17.94ms
+ 8/18 Tracker/Design/Core/tracker-core-engine-detail-design.md 5.49ms
+ 9/18 Tracker/Design/Core/tracker-history-000-038.md 3.59ms
+10/18 Tracker/Design/Core/tracker-test-maintainability-detail-design.md 4.22ms
+11/18 Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md 13.40ms
+12/18 Tracker/Design/DebugHost/debug-host-maintainability-design.md 2.24ms
+13/18 Tracker/Design/DebugHost/raw-vision-viewer-plan.md 11.44ms
+14/18 Tracker/Design/phases-status.md 5.16ms X
+15/18 Tracker/Design/RuntimeHost/runtime-host-plan.md 3.07ms
+16/18 Tracker/Design/tasks-status.md 7.75ms X
+17/18 Tracker/Tracker.CaptureReplay/README.md 1.22ms
+18/18 Tracker/Tracker.DebugHost/README.md 7.00ms
+CSpell: Files checked: 18, Issues found: 2 in 2 files.

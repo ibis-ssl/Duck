@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/doc-ledger-changes.exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/doc-ledger-changes.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/environment.txt",
+      "sha256": "9f4bc9590c01b9e98355afb8b92e72bd0129a5fe70179f777d3b2373f57c87f7",
+      "bytes": 336
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint/diff-check.exit-code.txt",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint/diff-check.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint/diff-check.stdout.txt",
+      "sha256": "783556f49325d6cad0c9a5ab7e2f3ccc0225919ff3d6f5136e380df006134642",
+      "bytes": 118
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint/exit-code.txt",
+      "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b",
+      "bytes": 4
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint/stderr.txt",
+      "sha256": "3aa91a494b7da5884fcbf4923df0c6d2851662a2b5cee85cdeccfe562bb2c7df",
+      "bytes": 1095
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint/stdout.txt",
+      "sha256": "85aef376cc849021c26c0d635a5c65032cf422d8f00cdb1a099545d499820861",
+      "bytes": 684
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint-green/diff-check.exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint-green/diff-check.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint-green/diff-check.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint-green/exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint-green/stderr.txt",
+      "sha256": "fb38a3f2bdc724706574c161d282a522c4bf51b8fe44f442e10e838ccf030385",
+      "bytes": 1091
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/final-lint-green/stdout.txt.gz",
+      "sha256": "8af46e2316d039389b9c43d3ea02d258240f6d6f72f777f80a3176a01a52a51b",
+      "bytes": 249
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/mergecheck-full/exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/mergecheck-full/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/mergecheck-full/stdout.txt",
+      "sha256": "b4353eae33c43f9bf73838c6a2f7bf4ccdc3193373ee7036b71e746be50bd179",
+      "bytes": 2620
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-green/exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-green/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-green/stdout.txt",
+      "sha256": "f1791f2ccb7861ab293c2c51e783f8ef66401c3ebf469c3fed2155701f04f00a",
+      "bytes": 1538
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red/exit-code.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red/stderr.txt",
+      "sha256": "ad12a3db4064ed4931c0d4e19a201b52b9afcce30ce26fe4676f0b58fabdb13b",
+      "bytes": 163
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red/stdout.txt",
+      "sha256": "0216955111737def9e8aa949c181c300e6b48911e0af804075a011acdf42b60a",
+      "bytes": 3179
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red-siblings/exit-code.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red-siblings/stderr.txt",
+      "sha256": "b81b35e95541f6001dc01cc08ac3e6c1a1240e07fa28a3dad4b9f70d91f2c322",
+      "bytes": 583
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red-siblings/stdout.txt",
+      "sha256": "367236e3b859b7284d53a54a773f07d699e841f0a4ad8775ceac368309e908b4",
+      "bytes": 4113
+    }
+  ]
+}

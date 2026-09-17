@@ -1,0 +1,3 @@
+[xUnit.net 00:00:00.31]     Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(unavailableCase: "missing") [FAIL]
+[xUnit.net 00:00:00.31]     Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(unavailableCase: "empty") [FAIL]
+[xUnit.net 00:00:00.31]     Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(unavailableCase: "corrupt") [FAIL]

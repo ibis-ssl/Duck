@@ -1,0 +1,43 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  SslProto -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  TrackerConnectionLib -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+  Tracker.CaptureReplay -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+  Tracker.Tests -> /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(unavailableCase: "missing") [133 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: Ready
+Actual:   SidecarMissing
+  Stack Trace:
+     at Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(String unavailableCase) in /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.Tests/VisionPacketCaptureTests.cs:line 393
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+  Failed Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(unavailableCase: "empty") [9 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: Ready
+Actual:   SidecarEmpty
+  Stack Trace:
+     at Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(String unavailableCase) in /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.Tests/VisionPacketCaptureTests.cs:line 393
+   at InvokeStub_VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  Failed Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(unavailableCase: "corrupt") [1 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: Ready
+Actual:   SidecarCorrupt
+  Stack Trace:
+     at Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(String unavailableCase) in /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704/Tracker/Tracker.Tests/VisionPacketCaptureTests.cs:line 393
+   at InvokeStub_VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+Failed!  - Failed:     3, Passed:     0, Skipped:     0, Total:     3, Duration: 154 ms - Tracker.Tests.dll (net10.0)

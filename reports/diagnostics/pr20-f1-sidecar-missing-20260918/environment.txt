@@ -1,0 +1,6 @@
+review_report=reports/pr20-independent-final-closure-r2-20260918.md
+reviewed_head=f5902f9e1de4b3fddaddf7b1d3e6c26d5443ceaa
+report_only_parent=07c49ee9d36e39a5df7e20c7f38a5c282a18dcc8
+technical_fix=f159232f90c9d486e24c70fd3daf7db951bd514c
+main=d9ca3eef62cc644a37adb8b643cc1cea7ad4a171
+mergecheck=ea8b039f189f8e2bee1cda304a928fd70ee21af0

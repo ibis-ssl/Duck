@@ -7,7 +7,7 @@
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
 - 段階: 文書検査整備
-- 状態: 独立最終レビューの再確認で見つかったF1実構成不整合を修正済み。人が読む設計書の中央台帳は2,142 / 2,142件、今回対象の3 READMEは528 / 528原出現を対応済み。18対象文書の文書検査は直前の公開コミットで終了値0。F1修正後の独立再確認は未完了。最終コミットに一致するCI結果は公開後のPR記録で確定する。
+- 状態: 独立最終レビューのF1-R2で見つかった、外部トラッカー用補助ファイルの欠落・空・破損が診断用採取記録の再生まで止める不整合を修正済み。人が読む設計書の中央台帳は2,142 / 2,142件、今回対象の3 READMEは528 / 528原出現を対応済み。F1-R2修正後の独立再確認は未完了。最終コミットに一致するCI結果は公開後のPR記録で確定する。
 - 規模: 中
 - 依存関係: `DOC-LINT-002`、承認済み許可語、共有文書検査器の修正。
 - 完了条件:
@@ -312,3 +312,12 @@ F1 の本文修正と台帳同期後も、別の独立レビュー担当によ�
 実構成を使う2件のテストを先に追加し、修正前に `SidecarNotCreated` / `CandidateMissing` で2件失敗することを確認した。`TrackerDiagnosticsComparisonViewStateReader` を修正し、追跡パケットの補助ファイルが未作成でも `diagnostics-samples.jsonl` だけで `Ready` になること、`Vision Input` / `ibis tracker` は同ファイルの採取記録を主経路とすることを固定した。
 
 現在の `main` を一時統合した検証環境では、診断・キャプチャー・比較の周辺43件と `Tracker.Tests` 全体331件が成功した。対象8文書と2,670件の原出現台帳は今回変更していないため、台帳の再生成は行わない。詳細は `reports/task-doc-lint-003-f1-actual-composition-fix-20260918055212.md`。修正担当の自己点検であり、独立再確認は別途必要である。
+## 独立最終レビュー F1-R2 対応（2026-09-18）
+
+独立最終レビューの完了再確認第2回で、読み取り可能な `diagnostics-samples.jsonl` が残っていても、`TrackerSnapshotLog.IsCreated=true` のまま `tracker-packet-snapshots.jsonl` の実体だけが欠落すると `SidecarMissing` で早期終了し、診断用採取記録の再生位置と `Vision Input` / `ibis tracker` を失う不整合が確認された。
+
+実際の `VisionPacketCaptureSession`、`DiagnosticsSampleLogWriter`、`TrackerPacketSnapshotLogWriter` を同じテストで使い、外部トラッカー用補助ファイルを欠落・空・破損の3状態にした先行テストを追加した。修正前は `SidecarMissing` / `SidecarEmpty` / `SidecarCorrupt` で3件失敗した。
+
+`TrackerDiagnosticsComparisonViewStateReader` を修正し、診断用採取記録を正常に読める場合は再生位置と既定2表示元を `Ready` のまま維持する。外部トラッカーの比較が利用できないことは警告文で別に示す。診断用採取記録がない既存経路では従来の `SidecarMissing` / `SidecarEmpty` / `SidecarCorrupt` を維持する。
+
+現在の `main` を一時統合した検証環境で `Tracker.Tests` 全334件が成功した。独立レビュー対象8文書と2,670件の原出現台帳は今回変更していない。詳細は `reports/task-doc-lint-003-f1-r2-sidecar-unavailable-fix-20260918071159.md`。修正担当の自己点検であり、独立再確認は別途必要である。

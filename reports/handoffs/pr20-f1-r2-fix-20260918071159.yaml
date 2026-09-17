@@ -1,0 +1,209 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: review follow-up
+  generated_at: '2026-09-18T07:11:59+09:00'
+repository: ibis-ssl/Duck
+issue_or_pr: 'PR #20'
+task_id: DOC-LINT-003
+branch: docs/runtimehost-readme-appsettings
+base_ref: main
+target:
+  current_head: f159232f90c9d486e24c70fd3daf7db951bd514c
+  reviewed_head: f5902f9e1de4b3fddaddf7b1d3e6c26d5443ceaa
+  commit_range: 07c49ee9d36e39a5df7e20c7f38a5c282a18dcc8..f159232f90c9d486e24c70fd3daf7db951bd514c
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+  connection: available
+  os: Ubuntu
+  shell: bash
+  working_directory: /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704
+  repository: ibis-ssl/Duck
+  branch: work/pr20-f1-sidecar-missing-20260918-0704
+  head_sha: f159232f90c9d486e24c70fd3daf7db951bd514c
+  source_state: dirty
+  ownership: current_task
+  writable_paths:
+    - /home/ibis/.local/share/duck-pr20-f1-sidecar-missing-20260918-0704
+  dependencies:
+    - name: dotnet 10
+      status: available
+      evidence: focused and full test execution succeeded
+    - name: git
+      status: available
+      evidence: local commit and normal push succeeded
+  evidence:
+    - dedicated worktree based on PR current HEAD 07c49ee9d36e39a5df7e20c7f38a5c282a18dcc8
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - Remote Desktop Commander executed focused and full local .NET tests
+  technical_head: f159232f90c9d486e24c70fd3daf7db951bd514c
+  administrative_parent: 07c49ee9d36e39a5df7e20c7f38a5c282a18dcc8
+  commit:
+    state: committed
+    review_target_sha: f159232f90c9d486e24c70fd3daf7db951bd514c
+  push:
+    state: pushed
+    head_sha: f159232f90c9d486e24c70fd3daf7db951bd514c
+  ci_wait:
+    state: ci_wait_pending
+    required_for: route_verification
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+authoritative_requirements:
+  - source: user_instruction
+    reference: current chat
+    summary: Address the latest PR #20 review finding without merging.
+  - source: repository_instruction
+    reference: project instructions
+    summary: Use TDD, preserve failure diagnostics, small commits, detailed report, PR comment, exact-head CI only.
+  - source: report
+    reference: reports/pr20-independent-final-closure-r2-20260918.md
+    summary: F1-R2 requires diagnostics sample replay and default fields to survive tracker sidecar missing/empty/corrupt conditions.
+development_policy:
+  method: TDD
+  testing_order: failing actual-composition test before production fix, then focused and full regression validation
+  governing_source: project instructions
+validation_plan:
+  commands:
+    - dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter <F1-R2 focused cases> -m:1 /nr:false
+    - dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false on current-main mergecheck
+    - npm run lint:md
+    - git diff --check
+  required_failure_diagnostics:
+    - test stdout
+    - test stderr
+    - exit code
+    - CI TRX/stdout/stderr/vstest diagnostics/binlog on failure
+blocked: []
+authorized_actions:
+  - read_repository
+  - edit_code
+  - edit_tests
+  - edit_documentation
+  - write_report
+  - write_handoff
+  - commit
+  - push
+  - update_pr
+  - comment_pr
+write_boundary:
+  allowed:
+    - path_or_operation: Tracker/Tracker.DebugHost/Tracking/TrackerDiagnosticsComparisonViewStateReader.cs
+      reason: F1-R2 production fix
+    - path_or_operation: Tracker/Tracker.Tests/VisionPacketCaptureTests.cs
+      reason: actual-composition regression coverage
+    - path_or_operation: Tracker/Design/tasks-status.md and Tracker/Design/phases-status.md
+      reason: progress synchronization
+    - path_or_operation: reports/**
+      reason: implementation evidence, report, handoff
+  forbidden:
+    - path_or_operation: merge PR #20
+      reason: user performs merge
+    - path_or_operation: independent final review verdict
+      reason: implementation worker is not independent reviewer
+scope:
+  - Preserve diagnostics sample replay timeline and default Vision Input / ibis tracker fields when external tracker sidecar is unavailable.
+  - Cover missing, empty, and corrupt actual tracker sidecar states.
+  - Preserve pre-existing unavailable statuses when diagnostics sample is absent.
+non_goals:
+  - Change the reviewed 5 design documents or 3 README files.
+  - Rebuild the 2,670 occurrence ledgers.
+  - Change tracker networking or capture format.
+files:
+  changed:
+    - path: Tracker/Tracker.DebugHost/Tracking/TrackerDiagnosticsComparisonViewStateReader.cs
+      purpose: keep sample path Ready while warning external comparison is unavailable
+    - path: Tracker/Tracker.Tests/VisionPacketCaptureTests.cs
+      purpose: actual-composition missing/empty/corrupt tests
+    - path: Tracker/Design/tasks-status.md
+      purpose: record F1-R2 implementation state
+    - path: Tracker/Design/phases-status.md
+      purpose: record phase state
+  intentionally_untouched:
+    - path_or_area: independent-review target 8 documents and occurrence ledgers
+      reason: code-only fix; diff from 07c49ee to f159232 is zero for those paths
+commands:
+  - command: focused actual-composition test before fix
+    purpose: reproduce F1-R2
+    exit_code: 1
+    result: failed
+    head_sha: 07c49ee9d36e39a5df7e20c7f38a5c282a18dcc8
+    evidence: reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red-siblings/
+  - command: focused closure and unavailable-state tests after fix
+    purpose: validate fix and preserve no-sample status contract
+    exit_code: 0
+    result: passed
+    head_sha: f159232f90c9d486e24c70fd3daf7db951bd514c
+    evidence: reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-green/
+  - command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false
+    purpose: current-main mergecheck full regression gate
+    exit_code: 0
+    result: passed
+    head_sha: ea8b039f189f8e2bee1cda304a928fd70ee21af0
+    evidence: reports/diagnostics/pr20-f1-sidecar-missing-20260918/mergecheck-full/
+tests:
+  - name: actual composition missing/empty/corrupt tracker sidecar
+    phase: red
+    result: failed
+    head_sha: 07c49ee9d36e39a5df7e20c7f38a5c282a18dcc8
+    evidence: 3 failed / 0 passed with SidecarMissing, SidecarEmpty, SidecarCorrupt
+  - name: F1-R2 focused closure set
+    phase: green
+    result: passed
+    head_sha: f159232f90c9d486e24c70fd3daf7db951bd514c
+    evidence: 15 passed / 0 failed
+  - name: Tracker.Tests current-main mergecheck
+    phase: regression
+    result: passed
+    head_sha: ea8b039f189f8e2bee1cda304a928fd70ee21af0
+    evidence: 334 passed / 0 failed / 0 skipped
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: null
+  head_sha: unknown
+  conclusion: in_progress
+  artifacts: []
+implementation:
+  outcome: completed
+  final_head: f159232f90c9d486e24c70fd3daf7db951bd514c
+  commits:
+    - sha: f159232f90c9d486e24c70fd3daf7db951bd514c
+      purpose: preserve diagnostics sample replay when external tracker sidecar is unavailable
+  addressed_findings:
+    - id: F1-R2
+      reviewed_head: f5902f9e1de4b3fddaddf7b1d3e6c26d5443ceaa
+      disposition: addressed
+      evidence: actual composition missing/empty/corrupt tests plus 334-test mergecheck
+  failure_diagnostics:
+    - type: test_result
+      location: reports/diagnostics/pr20-f1-sidecar-missing-20260918/tdd-red-siblings/
+      summary: expected Ready, actual SidecarMissing/SidecarEmpty/SidecarCorrupt
+  blocked_items: []
+  summary:
+    - diagnostics sample replay remains Ready for tracker sidecar path/missing/empty/corrupt failures.
+    - external tracker comparison unavailability is surfaced as a warning.
+    - no-sample sidecar status behavior remains unchanged.
+review:
+  mode: not_applicable
+  reviewed_head: unknown
+  reviewer:
+    identity: unknown
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: implementation follow-up only
+    independence:
+      implemented_change: true
+      implemented_review_fix: true
+      served_as_normal_reviewer: false
+      inherited_conversation: true
+      evidence:
+        - this chat performed the fix and cannot issue independent closure
+  verdict: not_applicable
