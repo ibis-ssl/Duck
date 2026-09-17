@@ -128,20 +128,15 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         if (diagnosticsSampleIndex is not null &&
             (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated))
         {
-            return CreateState(
+            return CreateDiagnosticsSampleReadyState(
                 fullDiagnosticsLogPath,
                 metadataPath,
                 diagnosticsSamplePath,
-                TrackerDiagnosticsComparisonSidecarStatus.Ready,
                 selectedSourceFilter,
                 sourceOptions,
-                CreateDiagnosticsSampleFieldSourceOptions(diagnosticsSampleIndex),
-                selectedEntryComparison: null,
-                diagnosticsSampleIndex.Timeline,
-                metadata.DiagnosticsSampleLog?.RecordCount ?? diagnosticsSampleIndex.RecordCount,
-                metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
-                metadata.DiagnosticsSampleLog?.ErrorCount ?? 0,
-                error: null);
+                diagnosticsSampleIndex,
+                metadata,
+                trackerSidecarWarning: null);
         }
 
         if (diagnosticsSampleIndex is null && IsLegacyRenderSnapshotOnly(metadata))
@@ -201,6 +196,19 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
         if (sidecarPath is null)
         {
+            if (diagnosticsSampleIndex is not null)
+            {
+                return CreateDiagnosticsSampleReadyState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    diagnosticsSamplePath,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    diagnosticsSampleIndex,
+                    metadata,
+                    "Tracker snapshot sidecar path was not found in metadata; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
+            }
+
             return CreateState(
                 fullDiagnosticsLogPath,
                 metadataPath,
@@ -219,6 +227,19 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         if (!File.Exists(sidecarPath))
         {
+            if (diagnosticsSampleIndex is not null)
+            {
+                return CreateDiagnosticsSampleReadyState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    diagnosticsSamplePath,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    diagnosticsSampleIndex,
+                    metadata,
+                    "Tracker snapshot sidecar file was not found; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
+            }
+
             return CreateState(
                 fullDiagnosticsLogPath,
                 metadataPath,
@@ -244,6 +265,19 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
         {
+            if (diagnosticsSampleIndex is not null)
+            {
+                return CreateDiagnosticsSampleReadyState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    diagnosticsSamplePath,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    diagnosticsSampleIndex,
+                    metadata,
+                    $"Tracker snapshot sidecar could not be read: {ex.Message}. Diagnostics sample replay remains available, but external tracker comparison is unavailable.");
+            }
+
             return CreateState(
                 fullDiagnosticsLogPath,
                 metadataPath,
@@ -262,6 +296,19 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         if (comparisonIndex.SnapshotCount == 0)
         {
+            if (diagnosticsSampleIndex is not null)
+            {
+                return CreateDiagnosticsSampleReadyState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    diagnosticsSamplePath,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    diagnosticsSampleIndex,
+                    metadata,
+                    "Tracker snapshot sidecar did not contain records; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
+            }
+
             return CreateState(
                 fullDiagnosticsLogPath,
                 metadataPath,
@@ -550,6 +597,32 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             skippedRecordCount,
             errorCount,
             error);
+    }
+
+    private static TrackerDiagnosticsComparisonViewState CreateDiagnosticsSampleReadyState(
+        string diagnosticsLogPath,
+        string metadataPath,
+        string? diagnosticsSamplePath,
+        TrackerDiagnosticsComparisonSourceFilter selectedSourceFilter,
+        IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> sourceOptions,
+        DiagnosticsSampleIndex diagnosticsSampleIndex,
+        CaptureMetadata metadata,
+        string? trackerSidecarWarning)
+    {
+        return CreateState(
+            diagnosticsLogPath,
+            metadataPath,
+            diagnosticsSamplePath,
+            TrackerDiagnosticsComparisonSidecarStatus.Ready,
+            selectedSourceFilter,
+            sourceOptions,
+            CreateDiagnosticsSampleFieldSourceOptions(diagnosticsSampleIndex),
+            selectedEntryComparison: null,
+            diagnosticsSampleIndex.Timeline,
+            metadata.DiagnosticsSampleLog?.RecordCount ?? diagnosticsSampleIndex.RecordCount,
+            metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
+            metadata.DiagnosticsSampleLog?.ErrorCount ?? 0,
+            trackerSidecarWarning);
     }
 
     private static IReadOnlyList<TrackerDiagnosticsComparisonSourceOption> CreateEmptySourceOptions()
