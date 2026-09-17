@@ -30047,7 +30047,7 @@
       "scope_status": "pending"
     }
   ],
-  "updated_at": "2026-09-17T11:52:27+09:00",
+  "updated_at": "2026-09-17T11:55:06+09:00",
   "completion_technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
   "completion_evidence_by_work_unit": {
     "ENGINE-COMPLETE": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
