@@ -15,6 +15,7 @@
     "**/bin/**",
     "**/obj/**",
     "reports/**",
+    "feedback-points/feedback-points.md",
     "tools/lint/excluded/**",
     "Tracker/Design/Core/Ref/**",
     "SslProto/src/external/ssl-game-controller/**",

@@ -75,15 +75,16 @@ npm run lint:md:whitelist:legacy -- --files tools/lint/README.md
 
 ## 対象範囲
 
-通常対象は `**/*.md` のうち、利用者が編集対象にする文書全般である。`.agents/skills/review-enforcer/scripts/list-markdown-targets.js` がリポジトリ内の対象文書を列挙する。最上位にある文書、`Tracker/Design/**`、`Tracker/**/*.md`、`feedback-points/**` は対象に含める。`reports/**` は暫定的に対象外にする。
+通常対象は `**/*.md` のうち、利用者が編集対象にする文書全般である。`.agents/skills/review-enforcer/scripts/list-markdown-targets.js` がリポジトリ内の対象文書を列挙する。最上位にある文書、`Tracker/Design/**`、`Tracker/**/*.md` は対象に含める。`feedback-points/**` も通常は対象だが、`feedback-points/feedback-points.md` は利用者の明示指定により対象外とする。`reports/**` は暫定的に対象外にする。
 
-検査対象から除外するディレクトリとファイルパスの接頭辞は `tools/lint/markdown-targets.json` に明示する。`.textlintignore` と `cspell.config.jsonc` も同じ対象外方針に揃える。現時点では依存物、生成物、明示的な除外用ディレクトリ、取り込み済みの外部参照だけを除外する。
+検査対象から除外するディレクトリとファイルパスの接頭辞は `tools/lint/markdown-targets.json` に明示する。`.textlintignore` と `cspell.config.jsonc` も同じ対象外方針に揃える。現時点では依存物、生成物、明示的な除外用ディレクトリ、利用者が明示的に除外した文書、取り込み済みの外部参照だけを除外する。
 
 - `node_modules/**`: npm 依存パッケージの保存先。
 - `.git/**`: Git の内部情報。
 - `.codex-dotnet-home/**`、`.codex-nuget-packages/**`: 手元の .NET 一時保存領域。
 - `**/bin/**`、`**/obj/**`: .NET のビルド出力。
 - `reports/**`: 調査、レビュー、引き継ぎ、検証の報告書。現時点では対象外。
+- `feedback-points/feedback-points.md`: 利用者発言の直接引用を保持する指摘記録。利用者の明示指定により文書検査の対象外。
 - `tools/lint/excluded/**`: 文書検査から明示的に外したい文書を置く除外用ディレクトリ。通常の文書、報告書、設計文書はここへ移動しない。
 - `Tracker/Design/Core/Ref/**`: コピーした参照元のソースコードとビルド用ディレクトリ。
 - `SslProto/src/external/ssl-game-controller/**`: 取り込み済みの外部リポジトリ。

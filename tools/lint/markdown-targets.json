@@ -10,6 +10,7 @@
   ],
   "ignoredPrefixes": [
     "tools/lint/excluded/",
+    "feedback-points/feedback-points.md",
     "Tracker/Design/Core/Ref/",
     "SslProto/src/external/ssl-game-controller/",
     "SslProto/src/external/ssl-simulation-protocol/"
