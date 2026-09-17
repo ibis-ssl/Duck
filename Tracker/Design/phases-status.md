@@ -4,7 +4,7 @@
 
 ## 全体状況
 
-- 現在の段階: 文書検査整備のレビュー指摘対応中、PR #20 公開中
+- 現在の段階: 設計書・READMEのレビュー指摘対応中、PR #20 公開中。製品実装と試験実装の修正は別分岐へ分離済み。
 - 現在の作業: `DOC-LINT-003`
 - 残りの作業: 全出現箇所の最終照合、履歴本文の再確認、承認済みの直接引用の例外機能の取り込み、全体の文書検査、独立最終レビュー。
 - 証跡: 再開時は `reports/doc-lint-resume-20260915.md`、診断設計の追加照合は `reports/task-doc-lint-003-diagnostic-scope-followup-20260917082311.md` を参照する。
@@ -37,3 +37,7 @@
 独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明に不整合があるF1が見つかり、完了判定は保留となった。構成設計、DebugHost詳細設計、DebugHost READMEを実装へ同期し、新規記録の再生位置と `Vision Input` / `ibis tracker` の復元元を diagnostics sample sidecar に統一した。外部トラッカーは tracker packet snapshot と alignment sidecar、または latest-before snapshot を使い、render snapshot は旧形式・補助用途として区別する。
 
 関連する原出現台帳と変更単位の台帳を修正後本文へ同期し、独立レビュー対象8文書の2,670件について構造自己点検は欠落・重複・本文内容不一致0。対象3文書の検査と `RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。修正後の独立再レビューは未実施であり、工程は引き続き「指摘対応中」とする。証跡は `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` とF1対応報告書を参照する。
+
+## 実装修正の分離（2026-09-18）
+
+PR #20 は設計書・README・台帳・文書検査の修正に限定する。独立確認から派生した製品実装と試験実装の変更は `fix/pr20-diagnostics-sample-runtime` へ退避し、PR #20 の対象外とした。設計側は実装修正前の状態を基点に継続し、実装側の完了判定は別分岐で扱う。
