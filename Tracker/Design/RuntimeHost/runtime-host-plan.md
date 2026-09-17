@@ -4,7 +4,7 @@
 
 ## 目的
 
-`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定した画面なしの実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと自動判定の実時間処理へ影響しないようにする。
+`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定し、画面を持たない実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。
 
 ## 命名
 
@@ -48,7 +48,7 @@ AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` �
 - トラッカーのみを動かすモード。
 - トラッカーと AutoRef を動かすモード。
 
-AutoRef mode は、追跡結果をプロセス外通信で再購読する前提にしない。試合時の性能を優先するため、RuntimeHost 内でトラッカーの状態と自動判定の処理を同居できる境界を残す。
+AutoRef mode は、追跡結果をプロセス外通信で再購読する前提にしない。試合時の性能を優先するため、RuntimeHost 内でトラッカーの状態と AutoRef の判定処理を同居できる境界を残す。
 
 ## RuntimeHost 設定方針
 
@@ -61,7 +61,7 @@ RuntimeHost の実行周期はソースコード内に数値を直接埋め込�
 トラッカーの周期処理は、Web UI を提供するサーバーのライブ表示の処理と、診断ログの保存・再生処理の両方から切り離す。
 
 - トラッカーの周期処理は、追跡状態の更新と送信を最優先する。
-- DebugHost のライブ表示は、変更不能な最新のスナップショットまたは送信された出力を読む側に回る。
+- DebugHost のライブ表示は、変更されない最新のスナップショットまたは送信された出力を読む側に回る。
 - 診断ログの保存・再生は DebugHost 側で一定周期でデータを採取する処理として扱い、トラッカーの追跡結果の確定周期と同じ周期での保存を要求しない。
 - 旧 render snapshot の補助ファイルとの互換は非要件とし、新規ログ保存と新規キャプチャーの性能を優先する。
 
@@ -101,21 +101,21 @@ DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入�
 
 ### `RUNTIME-HOST-007`: DebugHost の diagnostics sample sidecar を使う高速な保存・再生処理
 
-`RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost の CaptureOn による記録単位に、diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
+`RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost で CaptureOn 中に作成するキャプチャーに diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。キャプチャーの付随情報は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。
 
-diagnostics replay と比較は、diagnostics sample sidecar が存在する記録単位では、diagnostics sample tick を replay timeline の主な時点として使う。Field source の `Vision Input` と `ibis tracker` は、旧 render snapshot の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧 render snapshot の補助ファイルだけを持ち、diagnostics sample sidecar を持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。
+diagnostics replay と比較は、diagnostics sample sidecar が存在するキャプチャーでは、diagnostics sample tick を replay timeline の主な時点として使う。Field source の `Vision Input` と `ibis tracker` は、旧 render snapshot の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧 render snapshot の補助ファイルだけを持ち、diagnostics sample sidecar を持たないキャプチャーは、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。
 
 ### `RUNTIME-HOST-009`: RuntimeHost の通常処理
 
-`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、SSL-Vision のマルチキャスト用の通信アドレス、UDP の通信ポート、必要に応じて指定する、この端末の IPv4 の通信アドレスを読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、キャプチャーの書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。
+`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、`MulticastAddress`（SSL-Vision のマルチキャスト通信先）、`Port`（UDP の通信ポート）、必要に応じて指定する `InterfaceAddress`（この端末でマルチキャストグループへ参加するときに使う IPv4 の値）を読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、キャプチャーの書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。
 
 受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
 
-RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理の最新の tracker snapshot を更新する。
+RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理で最新の追跡スナップショットを更新する。
 
 起動時の設定プロファイルの選択は、設定ファイルの `Tracker:ActiveProfileName` を既定にする。ただし、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET のコマンドライン設定を読み込む仕組みと、引数から設定項目への対応表を使い、将来の短縮引数も同じ対応表に追加できる形にする。CLI による設定プロファイルの上書きは `Tracker:Profiles:<name>` の既存の設定プロファイルだけを選択し、設定プロファイルの定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示的に失敗させ、誤って `default` の設定プロファイルで代用しない。
 
-DebugHost が読む最新の tracker snapshot は、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、official tracker packet の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、diagnostics replay、キャプチャーの確認画面の手動検証は `RUNTIME-HOST-010` に残す。
+DebugHost が読む最新の追跡スナップショットは、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、公式形式の `TrackerWrapperPacket` の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、diagnostics replay、キャプチャーの確認画面の手動検証は `RUNTIME-HOST-010` に残す。
 
 ## 設計資料配置
 
@@ -140,14 +140,14 @@ DebugHost が読む最新の tracker snapshot は、RuntimeHost から DebugHost
 - DebugHost が追跡結果を読む側であり、トラッカーの周期処理を画面描画の更新周期から駆動しないことを契約テストで固定する。
 - diagnostics sample tick がトラッカーの追跡フレームの確定周期に依存しないことを回帰検証で固定する。
 
-[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定した画面なしの実行体。
+[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。
 [^autoref-mode]: AutoRef mode: レフェリープログラム相当の判定処理をトラッカーと同一プロセスで動かす将来のモード。今回の実装対象ではない。
-[^same-process]: 同一プロセス: トラッカーと将来の自動判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。
-[^headless-host]: 画面なしの実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。
+[^same-process]: 同一プロセス: トラッカーと将来の AutoRef の判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。
+[^headless-host]: 画面を持たない実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。
 [^web-ui]: Web UI: ブラウザーで見る診断画面。RuntimeHost の実時間処理から分離する。
 [^diagnostics-replay]: diagnostics replay: 採取した診断データやログを DebugHost 側で再生し、未加工入力と追跡結果を比較する診断機能。
 [^capture-viewer]: キャプチャーの確認画面: 保存済みのキャプチャーの内容を確認する診断用の表示機能。
 [^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、診断、キャプチャーと再生、比較表示を担当する。
-[^tracker-operation]: トラッカーの実時間処理: SSL-Vision 入力から追跡状態を更新し、official tracker packet を送信する処理。
+[^tracker-operation]: トラッカーの実時間処理: SSL-Vision 入力から追跡状態を更新し、公式形式の `TrackerWrapperPacket` を送信する処理。
 [^raw-vision-viewer]: raw vision viewer: SSL-Vision の検出情報とフィールド形状をフィールド上に表示する DebugHost の画面。
 [^tracker-algorithm]: 追跡アルゴリズム: 未加工の検出情報からボールとロボットの追跡状態を、同じ入力に対して同じ結果になるよう生成する `Tracker.Core` 側の処理。
