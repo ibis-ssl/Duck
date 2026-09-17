@@ -1,7 +1,7 @@
 # 自動レフェリー向けトラッカー設計
 
-
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
+
 ## 目的
 
 `Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。
@@ -118,7 +118,7 @@ TIGERs および公式の通信形式の調査結果は次を参照する。
 
 CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように、別系統で保存する。
 
-DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイルの分割や進捗管理の軽量化などの保守・運用作業は、この機能仕様に含めない。
+DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイルの分割や追跡処理の軽量化などの保守・運用作業は、この機能仕様に含めない。
 
 責務境界は次の通り。
 
@@ -126,7 +126,7 @@ DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli
 - `Tracker.DebugHost` は CaptureOn の記録単位と snapshot log を紐付ける統合層とする。同じ CaptureOn の記録単位のキャプチャー、capture metadata、診断用の補助ファイル、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめる。CaptureOn を開始した時点が異なるログは別フォルダに分ける。
 - `Tracker.Core` には official tracker packet のキャプチャー、スナップショット保存、比較処理を入れない。`Tracker.Core` は自前トラッカーの内部状態生成と公式形式のパケット生成だけを担当する。
 
-snapshot log は、既存の `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とする。診断側の追加は、既存の読み取り処理との `key=value` 形式の互換性を保ったまま、capture metadata から解決できる snapshot sidecar への相対パス、表示元数、source role 別の件数、近傍比較の概要などの参照・集計に限定する。
+snapshot log は、既存の `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とする。診断側の追加は、既存の読み取り処理との `key=value` 形式の互換性を保ったまま、capture metadata から解決できる snapshot sidecar への相対パス、表示元の数、source role 別の件数、近傍比較の概要などの参照・集計に限定する。
 
 session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通名を使う。フォルダ内のファイル名にも同じ共通名を含めるか、用途名を使う。capture metadata には session folder と各ファイルへの相対パスを記録し、共通名を揃える考え方は session folder 名またはフォルダ内のファイル名で維持する。新規キャプチャーでは `tracker-snapshot-alignment.jsonl` も capture metadata から辿れるようにし、alignment sidecar が未作成、記録 0 件、破損している状態を tracker packet snapshot を保存する sidecar JSONL の成否とは別に表現する。
 
@@ -140,7 +140,7 @@ session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通�
 - tracked frame number
 - tracked frame timestamp
 - 受信パケットの元のバイト列、または session folder 内で元のバイト列を復元できる参照情報
-- 元データから作れるボール・ロボット数、チーム・ロボット ID、代表位置、追跡情報の由来の概要など、後から比較・一覧表示するための概要情報
+- 元データから作れるボール・ロボット数、チーム・ロボット ID、代表位置、追跡情報の生成元の概要など、後から比較・一覧表示するための概要情報
 - デコードや保存形式のエラーがある場合に、処理を省略したことやエラーの内容を示す情報
 
 自前トラッカーの `Uuid` / `SourceName` は自前のパケットを保存対象から外す条件ではなく、後続表示・比較用の source role、source label、source metadata を付与するために使う。自前トラッカー自身の公式形式のパケットも snapshot sidecar へ保存してよく、詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他のトラッカーと衝突する場合も記録は落とさず、送信元の通信アドレスと通信ポートに加え、送信ソケットの自己受信の扱いも診断に記録し、source role を `unknown` や `ambiguous` として扱う。表示元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、表示元の概要と source role の判定に関する確認事項である。元のパケットと source identity を落とさない限り、保存処理を止める理由にはしない。
@@ -304,7 +304,7 @@ Capture Off 中は snapshot sidecar へ追記しない。Capture Off から再�
 - カメラごとのボール追跡状態群
 - 直近に確定したフィールド全体の状態のスナップショット
 - 最新のフィールド形状
-- 追跡フレームの番号を採番するカウンター
+- 追跡フレームの採番用カウンター
 - 現在の設定プロファイル
 - 現在有効なキック・接触・場外退出に関する情報
 
@@ -429,10 +429,10 @@ Capture Off 中は snapshot sidecar へ追記しない。Capture Off から再�
 
 - `ReorderWindow`
   - パケットを並べ替えるための猶予時間
-  - 設定値で外出しする
+  - 設定値として外部から指定できるようにする
 - `MergeWindow`
   - 同じフィールド全体の追跡フレームに統合してよい、カメラ間の時刻差の上限
-  - 設定値で外出しする
+  - 設定値として外部から指定できるようにする
 - 1 つのフィールド全体の追跡フレームは「基準とする観測時刻から `MergeWindow` 以内のカメラごとの状態」のみを使って構成する
 - フィールド全体の追跡フレームは観測時刻の昇順で確定し、同時刻の場合はカメラ ID の昇順で順序を安定させる
 - `frame_number` は確定処理されたフィールド全体の追跡フレームごとに 1 ずつ進める
@@ -591,12 +591,12 @@ CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session f
 
 ただし既定値は埋め込み固定せず、すべて設定から注入する。
 
-- マルチキャスト用の通信アドレス / 通信ポート / 表示元名 / UUID は設定外出しする
-- 追跡パラメーターは設定外出しする
+- マルチキャスト用の通信アドレス / 通信ポート / 表示元名 / UUID は設定から指定できるようにする
+- 追跡パラメーターは設定から指定できるようにする
 - 未加工入力・追跡結果診断ログの明示出力先は `Tracker:Diagnostics:FilePath` で設定できるようにする
 - キャプチャーは `VisionReceiver:PacketCapture:Enabled` を起動時の初期値として持ち、起動後は UI から有効・無効を切り替えられるようにする
 - 初期版標準である Kalman filter の process noise / measurement noise / 対応付けを許可する閾値も、設定として外部から指定可能にする
-- 近傍判定、可視性の減衰、キック速度の閾値、浮き球キック判定閾値も設定外出しする
+- 近傍判定、可視性の減衰、キック速度の閾値、浮き球キック判定閾値も設定から指定できるようにする
 
 要望として、これらの設定は最終的に UI から動的変更できる構成にする。
 
@@ -617,7 +617,7 @@ CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session f
 - `Profiles.RealHardware`
 - `Profiles.RealHardwareB`
 
-各々の設定プロファイルには少なくとも次を含める。
+それぞれの設定プロファイルには少なくとも次を含める。
 
 - raw vision 受信元
   - `MulticastAddress`
@@ -718,7 +718,7 @@ CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session f
 - `BallFilterPreprocessor`
   - ボール追跡処理群の統合、キック検出、キック推定の前処理分離
 - `BallTracker`
-  - 個々のボールの Kalman filter、追跡の健全度、追跡状態が確立したかの判定、外れ値の除外
+  - 個々のボールの Kalman filter、追跡状態の健全度、追跡状態が確立したかの判定、外れ値の除外
 - `RobotTracker`
   - 個々のロボットの位置と角度を別々に推定する処理、向きの連続化、外れ値の除外
 - `TrackerPacketGenerator`
@@ -761,7 +761,7 @@ CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session f
 - 各追跡状態は少なくとも状態の推定値と共分散相当の不確かさを保持する
 - `ProcessNoise` は `KalmanProcessNoiseScale` を通して process noise の共分散へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して measurement noise の共分散へ反映する。`Gate` は、観測値と予測値の差や距離に基づき、観測を追跡状態へ対応付けてよいかの判定に使う
 - `KalmanInitialVelocityVariance`、`KalmanProcessNoiseScale`、`MeasurementNoiseVarianceScale` は設定プロファイルごとの外部設定値とし、静止時の検出情報の小さな揺れと移動への追従性の兼ね合いを、ソースコードの変更なしで調整できるようにする
-- `VisibilityHalfLifeSeconds` は観測欠測時の追跡の有効性管理に使う値であり、Kalman の共分散更新を省略する理由にはならない
+- `VisibilityHalfLifeSeconds` は観測欠測時の追跡状態の生存管理に使う値であり、Kalman の共分散更新を省略する理由にはならない
 - フィールド全体の状態を統合する際の不確かさは、カメラごとの Kalman filter の更新後の不確かさから導く
 - 単純な等速外挿、観測値による上書き、手動での不確かさの加算だけで済ませる実装は、この初期版の契約を満たさない
 
@@ -772,7 +772,7 @@ CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session f
 3. カメラをまたいだ統合
 4. キック・接触・ボールの場外退出の計算
 5. 公式の通信形式への変換
-6. 競技規則の判定で使う出来事の通知
+6. 競技規則の判定で使うイベント通知
 
 ### ロボット追跡
 
@@ -795,7 +795,7 @@ TIGERs 由来で重視する点:
 
 - 位置と向きの推定処理を分ける
 - 速度上限、角速度上限による外れ値除外
-- 追跡の健全度と更新頻度から可視性 / 品質値を作る
+- 追跡状態の健全度と更新頻度から可視性 / 品質値を作る
 - カメラごとの追跡状態と統合後のロボットを分けて扱う
 
 ロボットごとの可視性:
@@ -807,14 +807,14 @@ TIGERs 由来で重視する点:
 ロボットの状態表現:
 
 - 状態量
-  - 位置の状態推定: `x, y, vx, vy`
-  - 向きの状態推定: `theta, omega`
+  - 位置用 Kalman filter: `x, y, vx, vy`
+  - 向き用 Kalman filter: `theta, omega`
 - 観測量
-  - 位置の状態推定: `x, y`
-  - 向きの状態推定: `theta`
+  - 位置用 Kalman filter: `x, y`
+  - 向き用 Kalman filter: `theta`
 - 推定
-  - 位置の状態推定: 等速移動
-  - 向きの状態推定: 一定角速度
+  - 位置用 Kalman filter: 等速移動
+  - 向き用 Kalman filter: 一定角速度
 
 初期版でロボットを追跡する Kalman filter の要件:
 
@@ -824,15 +824,15 @@ TIGERs 由来で重視する点:
 - 同じカメラ・チームの別 ID の追跡状態の近くで、検出されたロボット ID だけが突然変わる候補は、同一 ID の通常の位置ずれより起きにくいものとして扱う。`RobotTracker.IdentitySwitchDistanceMm` の範囲では既存の識別情報を優先し、新しい ID の観測を採用しない
 - 同じカメラ・チーム・ロボット ID の候補が統合する時間幅内に複数ある場合は、既存の同一 ID の追跡状態に近い候補を遠方の候補より優先する。後続の検出情報に含まれる誤った ID により、追跡位置を瞬間移動させない
 - 向き観測は観測更新前に角度を連続化して、`-pi` / `pi` 境界の不連続を状態推定外へ漏らさない
-- 向きの状態推定の観測分散、予測分散、初期角速度分散は、角度 rad と角速度 rad/s に対応する単位で扱い、位置 mm 用の不確かさをそのまま流用しない。設定プロファイルの `MeasurementNoiseVarianceScale`、`KalmanProcessNoiseScale`、`KalmanInitialVelocityVariance` は、既定値との比率で角度系の基準値へ反映する
-- 静止したロボットの向きの小さな揺れが、過大な角速度として表示されないよう、向きの状態推定の速度更新には角速度の上限を適用する
+- 向き用 Kalman filter の観測分散、予測分散、初期角速度分散は、角度 rad と角速度 rad/s に対応する単位で扱い、位置 mm 用の不確かさをそのまま流用しない。設定プロファイルの `MeasurementNoiseVarianceScale`、`KalmanProcessNoiseScale`、`KalmanInitialVelocityVariance` は、既定値との比率で角度系の基準値へ反映する
+- 静止したロボットの向きの小さな揺れが、過大な角速度として表示されないよう、向き用 Kalman filter の速度更新には角速度の上限を適用する
 - 対応付けの判定は、生の観測値との差分だけではなく、予測状態に対する対応付け規則として使う
 - 観測が欠けた場合は予測のみを行い、可視性減衰と追跡状態削除判定は別責務として扱う
 - 統合に使う不確かさは、最新の観測の信頼度だけでなく、状態推定処理後の位置の不確かさを基準にする
 - 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない
 - 外部出力の可否は `OutputVisibilityThreshold` で判定し、TIGERs のロボットの品質判定の初期閾値 `0.05` を設定値の基準とする
 
-向きを連続した角度として扱い、`-pi` / `pi` 境界での跳びを状態の管理側で吸収する。
+向きを連続した角度として扱い、`-pi` / `pi` 境界での跳びを状態管理側で吸収する。
 
 ### ボール追跡
 
@@ -854,7 +854,7 @@ TIGERs の `BallTracker` と `BallFilterPreprocessor` に合わせ、ボール�
 TIGERs 由来で重視する点:
 
 - `BallTracker` 単位の Kalman filter
-- 追跡の健全度と、観測を重ねて追跡状態が確立したかの判定
+- 追跡状態の健全度と、観測を重ねて追跡状態が確立したかの判定
 - 最大速度による外れ値除外
 - 直前のボール位置や空中ボール投影位置を基準にした探索半径
 - カメラごとに 1 つまでの代表追跡状態を選んで統合する考え方
@@ -884,7 +884,7 @@ TIGERs 由来で重視する点:
 - `Gate` は新規観測を既存ボール追跡状態へ結び付ける可否判定に使い、対応付け失敗時だけ新規追跡状態を生成する
 - 追跡状態の不確かさは、観測の信頼度の単純な逆数ではなく、Kalman filter の観測更新後の共分散から導く
 - カメラをまたぐ重み付き統合では、ボールの Kalman filter の観測更新後の不確かさを重みに使う
-- 追跡の健全度、追跡状態の確立、可視性の管理は、Kalman filter による更新とは別の責務とし、状態推定の代わりにはしない
+- 追跡状態の健全度、追跡状態の確立、可視性の管理は、Kalman filter による更新とは別の責務とし、状態推定の代わりにはしない
 - 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない
 - 外部出力の可否は `OutputVisibilityThreshold` で判定可能とし、TIGERs のボールが見えなくなった場合の寿命の初期値 `1.0s` を、`TrackLifetimeNs` の基準とする
 
@@ -1041,7 +1041,7 @@ TIGERs 由来で重視する点:
 
 ### 状態推定設定
 
-状態推定と対応付けの判定の主要設定は外出し前提にする。
+状態推定と対応付けの判定の主要設定は外部から指定できるようにする。
 
 - ロボットの process noise
 - ロボットの measurement noise
@@ -1090,7 +1090,7 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 - `TrackerEngine` が複数の設定プロファイルから選択された 1 つを受け取れる
 - `TrackerEngine` が到着順の異なる同一入力でも同じ観測時刻順で追跡フレームを確定する
 - `TrackerEngine` が `MergeWindow` 外のカメラ観測を同一の追跡結果に混ぜない
-- `TrackerEngine` が確定したフィールド全体の追跡フレームに対し、キックや接触などの出来事を安定した順序で通知する
+- `TrackerEngine` が確定したフィールド全体の追跡フレームに対し、キックや接触などのイベントを安定した順序で通知する
 - `TrackerEngine` が 1 入力から `0..N` 件の `CommittedFrames` を返せる
 - `TrackerEngine` がフィールド形状の変化による初期化時に未処理の入力バッファを消去する
 
