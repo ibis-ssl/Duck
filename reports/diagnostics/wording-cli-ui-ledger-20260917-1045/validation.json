@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T10:45:12+09:00",
+  "document": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+  "technical_parent": "4eff5c3733fc5e543f7f96c35e97d1de2e505797",
+  "document_sha256": "ecd9419d25abec0c29cf280078c97695c38c32456f68a8d375d5df43a63d3484",
+  "block_correspondence": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-block-correspondence-r3.json",
+  "block_correspondence_sha256": "aa8730e31af06da5186ab57629400fcf875359edfbdde3b4cf3220ce30bee1f0",
+  "occurrence_correspondence": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
+  "occurrence_correspondence_sha256": "a02f59d5d32238f718c5e7ff033fc8eb3a5b92299db87802a84531d7cd313637",
+  "scope_occurrences_sha256": "19b78084a21d4c77af31aebde79fadd4d6a82f728ebb41a9d5b8c4b3e4b49671",
+  "scope_summary_sha256": "0d2d7e4d67d4e49057b663d74bffcf48c323974a588bcc93647d872ca4b8ac85",
+  "expected_occurrences": 724,
+  "actual_occurrences": 724,
+  "unique_ids": 724,
+  "changed_block_occurrences": 706,
+  "text_identical_occurrences": 18,
+  "reviewed_changed_blocks": 80,
+  "r3_total_review_blocks": 90,
+  "r3_revised_blocks": 18,
+  "unresolved": [],
+  "validation_errors": [],
+  "result": "pass",
+  "focused_validation": {
+    "textlint": {
+      "exit_code": 0,
+      "stdout": "textlint.stdout.txt",
+      "stderr": "textlint.stderr.txt"
+    },
+    "cspell": {
+      "exit_code": 0,
+      "stdout": "cspell.stdout.txt",
+      "stderr": "cspell.stderr.txt",
+      "files_checked": 1,
+      "issues": 0
+    },
+    "whitelist": {
+      "exit_code": 0,
+      "stdout": "whitelist.stdout.txt",
+      "stderr": "whitelist.stderr.txt"
+    },
+    "git_diff_check": {
+      "exit_code": 0,
+      "stdout": "diff-check.stdout.txt",
+      "stderr": "diff-check.stderr.txt"
+    }
+  },
+  "preserved_probe_failures": [
+    {
+      "name": "cspell absolute-path probe",
+      "exit_code": 1,
+      "reason": "共有wrapperのroot外絶対パス指定により0 files checked。本文違反ではない。",
+      "logs": [
+        "cspell-absolute-path-probe.stdout.txt",
+        "cspell-absolute-path-probe.stderr.txt",
+        "cspell-absolute-path-probe.exit-code.txt"
+      ]
+    },
+    {
+      "name": "whitelist system-python probe",
+      "exit_code": 2,
+      "reason": "system PythonにSudachiPyがなく実行不可。",
+      "logs": [
+        "whitelist-system-python-probe.stdout.txt",
+        "whitelist-system-python-probe.stderr.txt",
+        "whitelist-system-python-probe.exit-code.txt"
+      ]
+    },
+    {
+      "name": "whitelist wrong-root probe",
+      "exit_code": 1,
+      "reason": "共有tool worktreeをcwdにしたためPR側の現行allowlistを参照していなかった。現行PR rootで再実行して終了0を確認。",
+      "logs": [
+        "whitelist-wrong-root-probe.stdout.txt",
+        "whitelist-wrong-root-probe.stderr.txt",
+        "whitelist-wrong-root-probe.exit-code.txt"
+      ]
+    }
+  ],
+  "validation_log_files": {
+    "cspell-absolute-path-probe.exit-code.txt": {
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "cspell-absolute-path-probe.stderr.txt": {
+      "sha256": "a149f5a0138e05ba31a4c70a817df538fe297e6f0701b8f9a16e174b7ada143e",
+      "bytes": 54
+    },
+    "cspell-absolute-path-probe.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "cspell.exit-code.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "cspell.stderr.txt": {
+      "sha256": "ffd8b9cd45d94ae41036937ce630e7ad760535bfe2a16ad259734fe06b78e663",
+      "bytes": 126
+    },
+    "cspell.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "diff-check.exit-code.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "diff-check.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "diff-check.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "textlint.exit-code.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "textlint.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "textlint.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "whitelist-environment.txt": {
+      "sha256": "73bdbae9d002d82524335f161fe9a8a8793dc8165f4cef0584adac6f190cfc09",
+      "bytes": 100
+    },
+    "whitelist-system-python-probe.exit-code.txt": {
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    "whitelist-system-python-probe.stderr.txt": {
+      "sha256": "720e1629c1064efb7459ab8609e2a48e3bbef97bdea1c1d5572df276cf4d0b06",
+      "bytes": 113
+    },
+    "whitelist-system-python-probe.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "whitelist-wrong-root-probe.exit-code.txt": {
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "whitelist-wrong-root-probe.stderr.txt": {
+      "sha256": "26027e8660972bd35f48d15d16a177b5c2426b0b42db78aa7de83a447f13b4e1",
+      "bytes": 9116
+    },
+    "whitelist-wrong-root-probe.stdout.txt": {
+      "sha256": "9323c2d3b356c23d8fb7812f5c7ab380d404c1d1047e2e936daa363d2a1d4f56",
+      "bytes": 517
+    },
+    "whitelist.exit-code.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "whitelist.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "whitelist.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}
