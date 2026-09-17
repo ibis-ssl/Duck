@@ -27314,7 +27314,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003347",
@@ -27328,7 +27328,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003348",
@@ -27342,7 +27342,7 @@
       "before_text": "`VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B027",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003349",
@@ -27356,7 +27356,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003350",
@@ -27370,7 +27370,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003351",
@@ -27384,7 +27384,7 @@
       "before_text": "- 旧 render snapshot sidecar 互換は非要件とし、新規 logging / new capture の performance を優先する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B016",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003352",
@@ -27398,7 +27398,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003353",
@@ -27412,7 +27412,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003354",
@@ -27426,7 +27426,7 @@
       "before_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B028",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003355",
@@ -27440,7 +27440,7 @@
       "before_text": "### RUNTIME-HOST-007: DebugHost diagnostics sample sidecar fast path",
       "status": "changed_needs_semantic_review",
       "block": "D15-B029",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003356",
@@ -27454,7 +27454,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003357",
@@ -27468,7 +27468,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003358",
@@ -27482,7 +27482,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003359",
@@ -27496,7 +27496,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003360",
@@ -27510,7 +27510,7 @@
       "before_text": "[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003361",
@@ -27524,7 +27524,7 @@
       "before_text": "- debug 用 comparison panel。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B006",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003362",
@@ -27538,7 +27538,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003363",
@@ -27552,7 +27552,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003364",
@@ -27566,7 +27566,7 @@
       "before_text": "- diagnostics replay UI。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B006",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003365",
@@ -27580,7 +27580,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003366",
@@ -27594,7 +27594,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003367",
@@ -27608,7 +27608,7 @@
       "before_text": "[^diagnostics-replay]: diagnostics replay: 保存済み sample / log を DebugHost 側で再生し、raw / tracker 出力を比較する debug 機能。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003368",
@@ -27622,7 +27622,7 @@
       "before_text": "- diagnostics sample tick が tracker committed frame cadence に依存しないことを regression test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003369",
@@ -27636,7 +27636,7 @@
       "before_text": "- profile switch request の pending / in-flight 管理と control-only update drain。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B020",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003370",
@@ -27650,7 +27650,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003371",
@@ -27664,7 +27664,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003372",
@@ -27678,7 +27678,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003373",
@@ -27692,7 +27692,7 @@
       "before_text": "`Tracker.DebugHost` は次を担当する。",
       "status": "text_identical",
       "current_line": 35,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003374",
@@ -27706,7 +27706,7 @@
       "before_text": "`Tracker.DebugHost` は tracker operation loop を主実行責務として持たない。debug 用に同一 repository の共通部品を使っても、Web rendering や diagnostics logging が RuntimeHost の処理周期を支配しない構造にする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B008",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003375",
@@ -27720,7 +27720,7 @@
       "before_text": "- DebugHost live display は latest immutable snapshot または published output を読む側に回る。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B016",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003376",
@@ -27734,7 +27734,7 @@
       "before_text": "- diagnostics logging / replay は DebugHost 側の sample loop として扱い、tracker committed frame cadence を保存 cadence として要求しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B016",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003377",
@@ -27748,7 +27748,7 @@
       "before_text": "RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B018",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003378",
@@ -27762,7 +27762,7 @@
       "before_text": "- `Tracker.DebugHost` namespace / project。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B022",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003379",
@@ -27776,7 +27776,7 @@
       "before_text": "DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B024",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003380",
@@ -27790,7 +27790,7 @@
       "before_text": "DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B024",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003381",
@@ -27804,7 +27804,7 @@
       "before_text": "DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B024",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003382",
@@ -27818,7 +27818,7 @@
       "before_text": "### RUNTIME-HOST-006: DebugHost live display read-side snapshot boundary",
       "status": "changed_needs_semantic_review",
       "block": "D15-B025",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003383",
@@ -27832,7 +27832,7 @@
       "before_text": "RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの composite read-side snapshot 境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この snapshot は同一 tick の raw SSL-Vision snapshot、ibis tracked snapshot、3rd party tracker read-side snapshot、comparison 用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B026",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003384",
@@ -27846,7 +27846,7 @@
       "before_text": "### RUNTIME-HOST-007: DebugHost diagnostics sample sidecar fast path",
       "status": "changed_needs_semantic_review",
       "block": "D15-B029",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003385",
@@ -27860,7 +27860,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003386",
@@ -27874,7 +27874,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003387",
@@ -27888,7 +27888,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003388",
@@ -27902,7 +27902,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003389",
@@ -27916,7 +27916,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003390",
@@ -27930,7 +27930,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003391",
@@ -27944,7 +27944,7 @@
       "before_text": "- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003392",
@@ -27958,7 +27958,7 @@
       "before_text": "- DebugHost が tracker output を読む側であり、tracker operation loop を Web rendering tick から駆動しないことを contract test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003393",
@@ -27972,7 +27972,7 @@
       "before_text": "[^diagnostics-replay]: diagnostics replay: 保存済み sample / log を DebugHost 側で再生し、raw / tracker 出力を比較する debug 機能。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003394",
@@ -27986,7 +27986,7 @@
       "before_text": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003395",
@@ -28000,7 +28000,7 @@
       "before_text": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003396",
@@ -28014,7 +28014,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003397",
@@ -28028,7 +28028,7 @@
       "before_text": "# Tracker.RuntimeHost 設計",
       "status": "text_identical",
       "current_line": 1,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003398",
@@ -28042,7 +28042,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003399",
@@ -28056,7 +28056,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003400",
@@ -28070,7 +28070,7 @@
       "before_text": "- `Tracker.RuntimeHost`: tracker operation[^tracker-operation] と将来 AutoRef mode を同一 process で実行する runtime host。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003401",
@@ -28084,7 +28084,7 @@
       "before_text": "`Tracker.RuntimeHost` は次を担当する。",
       "status": "text_identical",
       "current_line": 19,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003402",
@@ -28098,7 +28098,7 @@
       "before_text": "`Tracker.RuntimeHost` は次を担当しない。",
       "status": "text_identical",
       "current_line": 27,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003403",
@@ -28112,7 +28112,7 @@
       "before_text": "- RuntimeHost または published tracker output の購読と debug 用 sample 保存。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B007",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003404",
@@ -28126,7 +28126,7 @@
       "before_text": "`Tracker.DebugHost` は tracker operation loop を主実行責務として持たない。debug 用に同一 repository の共通部品を使っても、Web rendering や diagnostics logging が RuntimeHost の処理周期を支配しない構造にする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B008",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003405",
@@ -28140,7 +28140,7 @@
       "before_text": "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来 AutoRef mode を同一 process に内包できる名前と責務境界にする。想定 mode は次のように扱う。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B009",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003406",
@@ -28154,7 +28154,7 @@
       "before_text": "AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B011",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003407",
@@ -28168,7 +28168,7 @@
       "before_text": "## RuntimeHost 設定方針",
       "status": "text_identical",
       "current_line": 53,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003408",
@@ -28182,7 +28182,7 @@
       "before_text": "RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B012",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003409",
@@ -28196,7 +28196,7 @@
       "before_text": "RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B012",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003410",
@@ -28210,7 +28210,7 @@
       "before_text": "RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B012",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003411",
@@ -28224,7 +28224,7 @@
       "before_text": "RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B012",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003412",
@@ -28238,7 +28238,7 @@
       "before_text": "`Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを options / appsettings に出す。protocol 名、sidecar 名、metadata field 名など replay / wire contract として固定すべき値は設定化しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B013",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003413",
@@ -28252,7 +28252,7 @@
       "before_text": "RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B018",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003414",
@@ -28266,7 +28266,7 @@
       "before_text": "RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B018",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003415",
@@ -28280,7 +28280,7 @@
       "before_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B028",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003416",
@@ -28294,7 +28294,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003417",
@@ -28308,7 +28308,7 @@
       "before_text": "### RUNTIME-HOST-009: RuntimeHost normal path",
       "status": "changed_needs_semantic_review",
       "block": "D15-B032",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003418",
@@ -28322,7 +28322,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003419",
@@ -28336,7 +28336,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003420",
@@ -28350,7 +28350,7 @@
       "before_text": "受信処理は camera ごとの latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の camera ごとの latest packet を受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じ camera から tick 間に複数 packet が届いた場合は最新だけを残し、異なる camera の packet は single latest 上書きで落とさない。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B034",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003421",
@@ -28364,7 +28364,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003422",
@@ -28378,7 +28378,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003423",
@@ -28392,7 +28392,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003424",
@@ -28406,7 +28406,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003425",
@@ -28420,7 +28420,7 @@
       "before_text": "- `Tracker/Design/RuntimeHost/`: RuntimeHost、process 分離、将来 AutoRef mode。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003426",
@@ -28434,7 +28434,7 @@
       "before_text": "- `Tracker/Design/RuntimeHost/`: RuntimeHost、process 分離、将来 AutoRef mode。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003427",
@@ -28448,7 +28448,7 @@
       "before_text": "- RuntimeHost が Web UI project を参照しないことを project reference / dependency test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003428",
@@ -28462,7 +28462,7 @@
       "before_text": "- RuntimeHost の tracker operation loop が diagnostics logging / replay API を直接呼ばないことを contract test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003429",
@@ -28476,7 +28476,7 @@
       "before_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003430",
@@ -28490,7 +28490,7 @@
       "before_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003431",
@@ -28504,7 +28504,7 @@
       "before_text": "[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003432",
@@ -28518,7 +28518,7 @@
       "before_text": "- SSL-Vision input の受信または runtime 用 receiver 境界。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B005",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003433",
@@ -28532,7 +28532,7 @@
       "before_text": "RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの composite read-side snapshot 境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この snapshot は同一 tick の raw SSL-Vision snapshot、ibis tracked snapshot、3rd party tracker read-side snapshot、comparison 用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B026",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003434",
@@ -28546,7 +28546,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003435",
@@ -28560,7 +28560,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003436",
@@ -28574,7 +28574,7 @@
       "before_text": "[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003437",
@@ -28588,7 +28588,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003438",
@@ -28602,7 +28602,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003439",
@@ -28616,7 +28616,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003440",
@@ -28630,7 +28630,7 @@
       "before_text": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003441",
@@ -28644,7 +28644,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003442",
@@ -28658,7 +28658,7 @@
       "before_text": "DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B024",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003443",
@@ -28672,7 +28672,7 @@
       "before_text": "受信処理は camera ごとの latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の camera ごとの latest packet を受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じ camera から tick 間に複数 packet が届いた場合は最新だけを残し、異なる camera の packet は single latest 上書きで落とさない。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B034",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003444",
@@ -28686,7 +28686,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003445",
@@ -28700,7 +28700,7 @@
       "before_text": "- raw vision / tracked / 3rd party tracker の debug visualization。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B007",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003446",
@@ -28714,7 +28714,7 @@
       "before_text": "RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの composite read-side snapshot 境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この snapshot は同一 tick の raw SSL-Vision snapshot、ibis tracked snapshot、3rd party tracker read-side snapshot、comparison 用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B026",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003447",
@@ -28728,7 +28728,7 @@
       "before_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B028",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003448",
@@ -28742,7 +28742,7 @@
       "before_text": "- SSL-Vision input の受信または runtime 用 receiver 境界。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B005",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003449",
@@ -28756,7 +28756,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003450",
@@ -28770,7 +28770,7 @@
       "before_text": "[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003451",
@@ -28784,7 +28784,7 @@
       "before_text": "`VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B027",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003452",
@@ -28798,7 +28798,7 @@
       "before_text": "`VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B027",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003453",
@@ -28812,7 +28812,7 @@
       "before_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B028",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003454",
@@ -28826,7 +28826,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003455",
@@ -28840,7 +28840,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003456",
@@ -28854,7 +28854,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003457",
@@ -28868,7 +28868,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003458",
@@ -28882,7 +28882,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003459",
@@ -28896,7 +28896,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003460",
@@ -28910,7 +28910,7 @@
       "before_text": "- `Tracker.RuntimeHost`: tracker operation[^tracker-operation] と将来 AutoRef mode を同一 process で実行する runtime host。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003461",
@@ -28924,7 +28924,7 @@
       "before_text": "`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体は tracker 専用の executor ではなく、将来 AutoRef mode も同居する試合時 runtime だからである。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B004",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003462",
@@ -28938,7 +28938,7 @@
       "before_text": "- 将来 AutoRef mode を同一 process へ入れるための mode 境界。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B005",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003463",
@@ -28952,7 +28952,7 @@
       "before_text": "## AutoRef 方針",
       "status": "text_identical",
       "current_line": 44,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003464",
@@ -28966,7 +28966,7 @@
       "before_text": "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来 AutoRef mode を同一 process に内包できる名前と責務境界にする。想定 mode は次のように扱う。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B009",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003465",
@@ -28980,7 +28980,7 @@
       "before_text": "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来 AutoRef mode を同一 process に内包できる名前と責務境界にする。想定 mode は次のように扱う。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B009",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003466",
@@ -28994,7 +28994,7 @@
       "before_text": "- tracker + AutoRef mode。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B010",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003467",
@@ -29008,7 +29008,7 @@
       "before_text": "AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B011",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003468",
@@ -29022,7 +29022,7 @@
       "before_text": "AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B011",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003469",
@@ -29036,7 +29036,7 @@
       "before_text": "- `Tracker/Design/RuntimeHost/`: RuntimeHost、process 分離、将来 AutoRef mode。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003470",
@@ -29050,7 +29050,7 @@
       "before_text": "- AutoRef logic の実装。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B041",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003471",
@@ -29064,7 +29064,7 @@
       "before_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003472",
@@ -29078,7 +29078,7 @@
       "before_text": "[^autoref-mode]: AutoRef mode: referee program 相当の判定処理を tracker と同一 process で動かす将来 mode。今回の実装対象ではない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003473",
@@ -29092,7 +29092,7 @@
       "before_text": "[^autoref-mode]: AutoRef mode: referee program 相当の判定処理を tracker と同一 process で動かす将来 mode。今回の実装対象ではない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003474",
@@ -29106,7 +29106,7 @@
       "before_text": "[^same-process]: same process: tracker と将来 AutoRef logic を process 外通信なしで同じ OS process 内に置く実行形態。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003475",
@@ -29120,7 +29120,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003476",
@@ -29134,7 +29134,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003477",
@@ -29148,7 +29148,7 @@
       "before_text": "- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003478",
@@ -29162,7 +29162,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003479",
@@ -29176,7 +29176,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003480",
@@ -29190,7 +29190,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003481",
@@ -29204,7 +29204,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003482",
@@ -29218,7 +29218,7 @@
       "before_text": "- raw vision / tracked / 3rd party tracker の debug visualization。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B007",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003483",
@@ -29232,7 +29232,7 @@
       "before_text": "- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003484",
@@ -29246,7 +29246,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003485",
@@ -29260,7 +29260,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003486",
@@ -29274,7 +29274,7 @@
       "before_text": "- 旧 render snapshot sidecar 互換は非要件とし、新規 logging / new capture の performance を優先する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B016",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003487",
@@ -29288,7 +29288,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003488",
@@ -29302,7 +29302,7 @@
       "before_text": "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B031",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003489",
@@ -29316,7 +29316,7 @@
       "before_text": "`VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B027",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003490",
@@ -29330,7 +29330,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003491",
@@ -29344,7 +29344,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003492",
@@ -29358,7 +29358,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003493",
@@ -29372,7 +29372,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003494",
@@ -29386,7 +29386,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003495",
@@ -29400,7 +29400,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003496",
@@ -29414,7 +29414,7 @@
       "before_text": "- Web UI rendering。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B006",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003497",
@@ -29428,7 +29428,7 @@
       "before_text": "- diagnostics replay UI。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B006",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003498",
@@ -29442,7 +29442,7 @@
       "before_text": "- Web UI と diagnostics 表示。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B007",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003499",
@@ -29456,7 +29456,7 @@
       "before_text": "RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B018",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003500",
@@ -29470,7 +29470,7 @@
       "before_text": "- Blazor / Web UI。",
       "status": "text_identical",
       "current_line": 84,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003501",
@@ -29484,7 +29484,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003502",
@@ -29498,7 +29498,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003503",
@@ -29512,7 +29512,7 @@
       "before_text": "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B037",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003504",
@@ -29526,7 +29526,7 @@
       "before_text": "- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003505",
@@ -29540,7 +29540,7 @@
       "before_text": "- RuntimeHost が Web UI project を参照しないことを project reference / dependency test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003506",
@@ -29554,7 +29554,7 @@
       "before_text": "[^headless-host]: headless host: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003507",
@@ -29568,7 +29568,7 @@
       "before_text": "[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003508",
@@ -29582,7 +29582,7 @@
       "before_text": "[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003509",
@@ -29596,7 +29596,7 @@
       "before_text": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003510",
@@ -29610,7 +29610,7 @@
       "before_text": "- RuntimeHost の tracker operation loop が diagnostics logging / replay API を直接呼ばないことを contract test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003511",
@@ -29624,7 +29624,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003512",
@@ -29638,7 +29638,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003513",
@@ -29652,7 +29652,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003514",
@@ -29666,7 +29666,7 @@
       "before_text": "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B036",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003515",
@@ -29680,7 +29680,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003516",
@@ -29694,7 +29694,7 @@
       "before_text": "DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B024",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003517",
@@ -29708,7 +29708,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003518",
@@ -29722,7 +29722,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003519",
@@ -29736,7 +29736,7 @@
       "before_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B028",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003520",
@@ -29750,7 +29750,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003521",
@@ -29764,7 +29764,7 @@
       "before_text": "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B030",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003522",
@@ -29778,7 +29778,7 @@
       "before_text": "- Blazor / Web UI。",
       "status": "text_identical",
       "current_line": 84,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003523",
@@ -29792,7 +29792,7 @@
       "before_text": "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B035",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003524",
@@ -29806,7 +29806,7 @@
       "before_text": "[^same-process]: same process: tracker と将来 AutoRef logic を process 外通信なしで同じ OS process 内に置く実行形態。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003525",
@@ -29820,7 +29820,7 @@
       "before_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B002",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003526",
@@ -29834,7 +29834,7 @@
       "before_text": "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B003",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003527",
@@ -29848,7 +29848,7 @@
       "before_text": "- Web UI rendering。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B006",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003528",
@@ -29862,7 +29862,7 @@
       "before_text": "- Web UI と diagnostics 表示。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B007",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003529",
@@ -29876,7 +29876,7 @@
       "before_text": "- Blazor / Web UI。",
       "status": "text_identical",
       "current_line": 84,
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003530",
@@ -29890,7 +29890,7 @@
       "before_text": "- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B039",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003531",
@@ -29904,7 +29904,7 @@
       "before_text": "- RuntimeHost が Web UI project を参照しないことを project reference / dependency test で固定する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B042",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003532",
@@ -29918,7 +29918,7 @@
       "before_text": "[^headless-host]: headless host: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003533",
@@ -29932,7 +29932,7 @@
       "before_text": "[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003534",
@@ -29946,7 +29946,7 @@
       "before_text": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003535",
@@ -29960,7 +29960,7 @@
       "before_text": "- SSL-Vision input の受信または runtime 用 receiver 境界。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B005",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003536",
@@ -29974,7 +29974,7 @@
       "before_text": "RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの composite read-side snapshot 境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この snapshot は同一 tick の raw SSL-Vision snapshot、ibis tracked snapshot、3rd party tracker read-side snapshot、comparison 用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B026",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003537",
@@ -29988,7 +29988,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003538",
@@ -30002,7 +30002,7 @@
       "before_text": "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B033",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003539",
@@ -30016,7 +30016,7 @@
       "before_text": "[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003540",
@@ -30030,7 +30030,7 @@
       "before_text": "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
       "status": "changed_needs_semantic_review",
       "block": "D15-B043",
-      "scope_status": "pending"
+      "scope_status": "completed"
     },
     {
       "id": "O003541",
@@ -30044,7 +30044,7 @@
       "before_text": "## テスト方針",
       "status": "text_identical",
       "current_line": 136,
-      "scope_status": "pending"
+      "scope_status": "completed"
     }
   ],
   "updated_at": "2026-09-17T11:55:06+09:00",

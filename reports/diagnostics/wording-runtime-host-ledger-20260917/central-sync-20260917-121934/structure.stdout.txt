@@ -1,0 +1,6 @@
+selected_occurrences=2142
+completed=2142
+pending=0
+runtime=196/196
+scope_hash_match=true
+result=pass

@@ -40,14 +40,14 @@
     {
       "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
       "total": 196,
-      "completed": 0,
-      "pending": 196,
+      "completed": 196,
+      "pending": 0,
       "work_unit": "RUNTIME-HOST"
     }
   ],
   "total_selected_occurrences": 2142,
-  "completed_occurrences": 1946,
-  "pending_occurrences": 196,
+  "completed_occurrences": 2142,
+  "pending_occurrences": 0,
   "completed_evidence": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
   "excluded_categories": [
     "maintenance",
@@ -57,13 +57,14 @@
     "lint/tool guide",
     "feedback"
   ],
-  "scope_occurrences_sha256": "d9237cd47e53fdfaab0d0857459d1d5ecc190beec49fbfb078392982210b9d3c",
-  "updated_at": "2026-09-17T11:55:06+09:00",
-  "completion_technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
+  "scope_occurrences_sha256": "feef3c830299313f6ecd4d4fef491d735a176371e0ded13a5ef62538bf08b01c",
+  "updated_at": "2026-09-17T12:19:20+09:00",
+  "completion_technical_parent": "19555135394db736cb8c5eaded0eeec9417cc8c7",
   "completion_evidence_by_work_unit": {
     "ENGINE-COMPLETE": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
     "CLI-UI": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
     "ARCHITECTURE": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json",
-    "RAW-VISION": "reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json"
+    "RAW-VISION": "reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json",
+    "RUNTIME-HOST": "reports/diagnostics/wording-runtime-host-ledger-20260917/runtime-host-occurrence-correspondence.json"
   }
 }
