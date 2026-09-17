@@ -125,7 +125,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
 
         var diagnosticsSampleIndex = diagnosticsSampleResult.Index;
-        if (diagnosticsSampleIndex is not null && metadata.TrackerSnapshotLog is null)
+        if (diagnosticsSampleIndex is not null &&
+            (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated))
         {
             return CreateState(
                 fullDiagnosticsLogPath,
@@ -370,14 +371,15 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 $"Diagnostics sample sidecar could not be read: {diagnosticsSampleResult.Error}");
         }
 
-        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput)
+        if (fieldSource.Kind is TrackerDiagnosticsFieldSourceKind.VisionInput or
+            TrackerDiagnosticsFieldSourceKind.IbisTracker)
         {
             if (diagnosticsSampleResult.Index is null)
             {
                 return TrackerDiagnosticsFieldSourceFrame.WithStatus(
                     TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
                     fieldSource,
-                    "Diagnostics sample sidecar is not available for Vision Input.");
+                    "Diagnostics sample sidecar is not available for the selected Field source.");
             }
 
             return CreateDiagnosticsSampleFieldSourceFrame(
@@ -385,7 +387,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     selectedEntry,
                     selectedReplayTimeline,
                     fieldSource,
-                    useTrackedSummary: false);
+                    useTrackedSummary: fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker);
         }
 
         var sidecarPath = ResolveSidecarPath(metadata, metadataPath);

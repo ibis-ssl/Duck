@@ -169,6 +169,144 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
     }
 
     /// <summary>
+    /// 何を確認しているか: tracker packet 受信が無効な通常構成でも、実metadataの diagnostics sample だけで診断再生を構成できることを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsReader_WithActualMetadataAndTrackerReceiveDisabled_UsesDiagnosticsSamples()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-reader-disabled-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "reader-disabled",
+            enabled: true,
+            flushEachPacket: true);
+        using var sampleWriter = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 21, 0, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 4, frameNumber: 3300),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4300,
+                dataTimestampNs: 4_300_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 31, yMm: 41)]),
+            receivedAt.AddMilliseconds(1));
+        sampleWriter.CaptureSample(CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot());
+        sampleWriter.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-disabled-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        Assert.True(metadata.RootElement.GetProperty("DiagnosticsSampleLog").GetProperty("IsCreated").GetBoolean());
+        Assert.False(metadata.RootElement.GetProperty("TrackerSnapshotLog").GetProperty("IsCreated").GetBoolean());
+        var diagnosticsPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString()!);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var state = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        var selectedTimeline = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+        var visionFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.VisionInput);
+        var ibisFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.IbisTracker);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, visionFrame.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, ibisFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", visionFrame.MatchingRule);
+        Assert.Equal("diagnostics-sample-sidecar", ibisFrame.MatchingRule);
+        Assert.Equal((uint)4300, ibisFrame.TrackedFrameNumber);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: tracker packet 受信が有効な通常構成でも、ibis tracker は diagnostics sample の同一採取記録を主経路にすることを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsReader_WithActualMetadataAndTrackerReceiveEnabled_PrefersDiagnosticsSampleForIbisTracker()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-reader-enabled-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "reader-enabled",
+            enabled: true,
+            flushEachPacket: true);
+        using var sampleWriter = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            session,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 21, 10, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 5, frameNumber: 3400),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4400,
+                dataTimestampNs: 4_400_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 32, yMm: 42)]),
+            receivedAt.AddMilliseconds(1));
+        sampleWriter.CaptureSample(CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot());
+        var externalFrame = fixture.CreateFrame(
+            frameNumber: 5400,
+            dataTimestampNs: 5_400_000,
+            balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 320, yMm: 420)]);
+        snapshotWriter.CapturePacket(
+            fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame),
+            receivedAt.AddMilliseconds(2),
+            remoteEndpoint: "192.0.2.50:12010",
+            sourceRole: "external",
+            sourceLabel: "ER-FORCE");
+        sampleWriter.Flush();
+        snapshotWriter.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-enabled-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        Assert.True(metadata.RootElement.GetProperty("DiagnosticsSampleLog").GetProperty("IsCreated").GetBoolean());
+        Assert.True(metadata.RootElement.GetProperty("TrackerSnapshotLog").GetProperty("IsCreated").GetBoolean());
+        var diagnosticsPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString()!);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var state = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+        var selectedTimeline = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+
+        var ibisFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.IbisTracker);
+
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, ibisFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", ibisFrame.MatchingRule);
+        Assert.Equal((uint)4400, ibisFrame.TrackedFrameNumber);
+        Assert.Contains(state.SourceOptions, option => option.Filter == TrackerDiagnosticsComparisonSourceFilter.External);
+    }
+
+    /// <summary>
     /// 何を確認しているか: Home UI を介さない DebugHost sample loop が CaptureOn 中に diagnostics sample を保存することを確認する。
     /// </summary>
     [Fact]
