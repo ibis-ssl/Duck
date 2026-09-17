@@ -1,10 +1,11 @@
 # Duck
 
-Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision パケットの受信、未加工入力 / 追跡結果の可視化、official tracker packet の送信を行うトラッカー関連機能を中心にしています。
+Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision パケットの受信、未加工入力 / 追跡結果の可視化、公式形式の `TrackerWrapperPacket` の送信を行うトラッカー関連機能を中心にしています。
 
 ## リポジトリ構成
 
 - `Tracker/Tracker.Core`: トラッカーの中核処理、パケット生成、実行契約。
+- `Tracker/Tracker.RuntimeHost`: 画面なしで SSL-Vision を受信し、トラッカーを周期実行して公式形式の `TrackerWrapperPacket` を送信する実行用アプリケーション。
 - `Tracker/Tracker.DebugHost`: SSL-Vision から受信した検出情報とトラッカーの追跡結果を表示する ASP.NET Core のアプリケーション。
 - `Tracker/Tracker.CaptureReplay`: 保存済みのキャプチャーを再生・分析する CLI ツール。
 - `Tracker/Tracker.Tests`: トラッカーとサーバー周辺のテスト。
@@ -16,7 +17,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 ## 前提
 
 - .NET SDK 10.0
-- `Tracker.DebugHost` を実行する場合は SSL-Vision 互換のパケット送信元
+- `Tracker.RuntimeHost` または `Tracker.DebugHost` で SSL-Vision を受信する場合は SSL-Vision 互換のパケット送信元
 
 ## ビルド
 
@@ -72,4 +73,4 @@ dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profil
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
-`sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、official tracker packet を `224.5.23.2:11010` へ送信します。
+`sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式の `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信します。

@@ -7,7 +7,7 @@
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
 - 段階: 文書検査整備
-- 状態: レビュー指摘への対応中。診断設計、構成設計、表示画面設計、raw vision 表示設計、RuntimeHost 設計、利用手順、進捗2文書の本文と原文を照合し、採否を記録した。人が読む設計書の中央台帳は2,142 / 2,142件完了。4,336出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
+- 状態: レビュー指摘への対応中。人が読む設計書の中央台帳は2,142 / 2,142件完了。最上位 `README.md` は基準62 / 62原出現を最新本文へ対応付け、未解決0。README更新後の18対象文書に対する `npm run lint:md` は終了値0。4,336出現箇所の最終台帳、履歴本文との最終照合、独立最終レビューは未完了。
 - 規模: 中
 - 依存関係: `DOC-LINT-002`、承認済み許可語、共有文書検査器の修正。
 - 完了条件:
@@ -18,7 +18,7 @@
   - 最終 PR の `current HEAD` と同じ `head_sha` の CI を確認し、成功結果と検証証跡を記録する。
 - 証跡: `reports/doc-lint-resume-20260915.md`
 - 完了前証跡: `reports/markdown-lint-completion-20260916.md`
-- 残課題: 許可語の全出現箇所の最終照合、履歴本文の再確認、承認済みの直接引用の例外機能の取り込み、修正後の独立最終レビュー。本文の確認は、共有検査器の修正を待たずに進める。
+- 残課題: 4,336出現箇所の最終台帳への統合、履歴本文の最終照合、修正後の独立最終レビュー、最終PRの`current HEAD`と一致するCI確認。承認済みの直接引用例外は上流の追跡事項として残るが、`feedback-points/feedback-points.md` は利用者の明示指定で文書検査対象外となっており、現在のDuck側18文書の検査を妨げていない。
 - 追加承認: 利用者が `ChikkarPy` と提示済み説明文の登録を承認した。用語登録専用担当が登録と対象検査を行い、別担当が確認する。
 - 追加証跡: `reports/doc-lint-chikkarpy-registration-20260915.md`
 - 2026-09-15 時点の検証: `ChikkarPy` の許可判定と文書検査手順の綴り検査は成功したが、全範囲の検査は未登録語で失敗していた。
@@ -40,6 +40,9 @@
 
 - 2026-09-17 の RuntimeHost 設計照合: `Tracker/Design/RuntimeHost/runtime-host-plan.md` の原文196出現を全件中央台帳へ統合した。変更箇所186件と原文同一10件を確認し、未解決0。本文では AutoRef の意味、`InterfaceAddress` の用途、CaptureOn 中のキャプチャー、追跡スナップショット、公式形式の `TrackerWrapperPacket` の説明を原文と実装に合わせて整理した。
 - 2026-09-17 の RuntimeHost 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。人が読む設計書の中央台帳は2,142 / 2,142件完了、残り0。証跡は `reports/task-doc-lint-003-runtime-host-correspondence-20260917.md` と `reports/diagnostics/wording-runtime-host-ledger-20260917/`。4,336出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
+
+- 2026-09-17 の最上位 README 照合: `README.md` の基準62原出現を最新本文へ対応付け、未解決0。`Tracker.RuntimeHost` を構成一覧へ追加し、SSL-Vision の受信前提と公式形式の `TrackerWrapperPacket` の説明を実装・設定に合わせて更新した。2,142件の設計書中央台帳には混在させず、4,336件全体の完了とも扱わない。
+- 2026-09-17 の README 検証: 18対象文書の `npm run lint:md` と `git diff --check` は終了値0。台帳は `reports/diagnostics/wording-root-readme-ledger-20260917/root-readme-occurrence-correspondence.json`、証跡は `reports/task-doc-lint-003-root-readme-correspondence-20260917.md` に記録する。
 
 - ID: `CAPTURE-REPLAY-001`
 - 題名: `Tracker.CaptureReplay` に raw vision と `ibis tracker` の遅延分析出力を追加する
