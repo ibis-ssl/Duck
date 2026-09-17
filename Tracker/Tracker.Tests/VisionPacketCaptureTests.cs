@@ -307,6 +307,110 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
     }
 
     /// <summary>
+    /// 何を確認しているか: tracker snapshot sidecar の実体だけが欠落しても、読み取り可能な diagnostics sample で既定の診断再生を維持することを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("empty")]
+    [InlineData("corrupt")]
+    public void DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(
+        string unavailableCase)
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-reader-missing-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "reader-missing",
+            enabled: true,
+            flushEachPacket: true);
+        using var sampleWriter = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            session,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 21, 20, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 6, frameNumber: 3500),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4500,
+                dataTimestampNs: 4_500_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 33, yMm: 43)]),
+            receivedAt.AddMilliseconds(1));
+        sampleWriter.CaptureSample(CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot());
+        var externalFrame = fixture.CreateFrame(
+            frameNumber: 5500,
+            dataTimestampNs: 5_500_000,
+            balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 330, yMm: 430)]);
+        snapshotWriter.CapturePacket(
+            fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame),
+            receivedAt.AddMilliseconds(2),
+            remoteEndpoint: "192.0.2.51:12010",
+            sourceRole: "external",
+            sourceLabel: "ER-FORCE");
+        sampleWriter.Flush();
+        snapshotWriter.Flush();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-missing-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        Assert.True(metadata.RootElement.GetProperty("DiagnosticsSampleLog").GetProperty("IsCreated").GetBoolean());
+        Assert.True(metadata.RootElement.GetProperty("TrackerSnapshotLog").GetProperty("IsCreated").GetBoolean());
+        var snapshotPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("TrackerSnapshotSidecarPath").GetString()!);
+        if (unavailableCase == "missing")
+        {
+            File.Delete(snapshotPath);
+            Assert.False(File.Exists(snapshotPath));
+        }
+        else if (unavailableCase == "empty")
+        {
+            File.WriteAllText(snapshotPath, "");
+        }
+        else if (unavailableCase == "corrupt")
+        {
+            File.WriteAllText(snapshotPath, "{not-json");
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(unavailableCase), unavailableCase, "Unknown sidecar case.");
+        }
+        var diagnosticsPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString()!);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var state = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        Assert.Contains("external tracker comparison is unavailable", state.Error, StringComparison.OrdinalIgnoreCase);
+        var selectedTimeline = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+        var visionFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.VisionInput);
+        var ibisFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.IbisTracker);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, visionFrame.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, ibisFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", visionFrame.MatchingRule);
+        Assert.Equal("diagnostics-sample-sidecar", ibisFrame.MatchingRule);
+        Assert.Equal((uint)4500, ibisFrame.TrackedFrameNumber);
+    }
+
+    /// <summary>
     /// 何を確認しているか: Home UI を介さない DebugHost sample loop が CaptureOn 中に diagnostics sample を保存することを確認する。
     /// </summary>
     [Fact]
