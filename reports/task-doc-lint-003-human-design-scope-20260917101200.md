@@ -20,11 +20,11 @@ PR #20 の用語整理について、利用者の今回の指示に基づき、�
 | ENGINE-COMPLETE | `Tracker/Design/Core/tracker-core-engine-detail-design.md` | 133 | 133 | 0 |
 | CLI-UI | `Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md` | 724 | 724 | 0 |
 | ARCHITECTURE | `Tracker/Design/Core/tracker-architecture-plan.md` | 565 | 565 | 0 |
-| RAW-VISION | `Tracker/Design/DebugHost/raw-vision-viewer-plan.md` | 524 | 0 | 524 |
+| RAW-VISION | `Tracker/Design/DebugHost/raw-vision-viewer-plan.md` | 524 | 524 | 0 |
 | RUNTIME-HOST | `Tracker/Design/RuntimeHost/runtime-host-plan.md` | 196 | 0 | 196 |
-| **合計** |  | **2,142** | **1,422** | **720** |
+| **合計** |  | **2,142** | **1,946** | **196** |
 
-`tracker-core-engine-detail-design.md` は133/133出現の対応表が公開済みなので、新規担当の作業対象ではなく回帰確認用の参照とする。残り720件を2文書へ完全に分割し、同じ原出現IDを複数担当で処理しない。CLI-UI 724件と ARCHITECTURE 565件は、それぞれの現行本文に対する対応表へ統合済みである。
+`tracker-core-engine-detail-design.md` は133/133出現の対応表が公開済みなので、新規担当の作業対象ではなく回帰確認用の参照とする。RAW-VISION 524件は全件対応済みで、残り196件は RUNTIME-HOST へ割り当てる。同じ原出現IDを複数担当で処理しない。CLI-UI 724件、ARCHITECTURE 565件、RAW-VISION 524件は、それぞれの現行本文に対する対応表へ統合済みである。
 
 ## 対象外
 
@@ -58,4 +58,4 @@ PR #20 の用語整理について、利用者の今回の指示に基づき、�
 
 ## 現時点の状態
 
-範囲定義時点では対象2,142件中133件が完了していた。その後、CLI-UI 724件と ARCHITECTURE 565件を全件対応表へ統合したため、現在は **1,422 / 2,142件完了、残り720件**。ARCHITECTURE の対応表は `reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json`、現行ブロック自己点検は同ディレクトリの `architecture-block-correspondence-r2.json` を参照する。4,336件全体の未処理数はDOC-LINT-003の今回完了条件には用いない。
+範囲定義時点では対象2,142件中133件が完了していた。その後、CLI-UI 724件、ARCHITECTURE 565件、RAW-VISION 524件を全件対応表へ統合したため、現在は **1,946 / 2,142件完了、残り196件**。ARCHITECTURE の対応表は `reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json`、RAW-VISION の対応表は `reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json` を参照する。4,336件全体の未処理数はDOC-LINT-003の今回完了条件には用いない。

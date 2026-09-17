@@ -33,8 +33,8 @@
     {
       "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
       "total": 524,
-      "completed": 0,
-      "pending": 524,
+      "completed": 524,
+      "pending": 0,
       "work_unit": "RAW-VISION"
     },
     {
@@ -46,8 +46,8 @@
     }
   ],
   "total_selected_occurrences": 2142,
-  "completed_occurrences": 1422,
-  "pending_occurrences": 720,
+  "completed_occurrences": 1946,
+  "pending_occurrences": 196,
   "completed_evidence": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
   "excluded_categories": [
     "maintenance",
@@ -57,12 +57,13 @@
     "lint/tool guide",
     "feedback"
   ],
-  "scope_occurrences_sha256": "1d23df9122895593cd70318fb510dfe271827b90b98dbfe3ce7b5ca616a8ca9a",
-  "updated_at": "2026-09-17T11:15:32+09:00",
-  "completion_technical_parent": "5a72850d25fa934bcb9d3e4c587bb8d88688fd59",
+  "scope_occurrences_sha256": "d9237cd47e53fdfaab0d0857459d1d5ecc190beec49fbfb078392982210b9d3c",
+  "updated_at": "2026-09-17T11:52:27+09:00",
+  "completion_technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
   "completion_evidence_by_work_unit": {
     "ENGINE-COMPLETE": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
     "CLI-UI": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
-    "ARCHITECTURE": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json"
+    "ARCHITECTURE": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json",
+    "RAW-VISION": "reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json"
   }
 }
