@@ -1,6 +1,6 @@
 # Tracker.DebugHost
 
-`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて official tracker packet を UDP で配信する ASP.NET Core アプリケーションです。
+`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信する ASP.NET Core アプリケーションです。
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 
@@ -10,8 +10,8 @@
 - `Raw` 表示でカメラごとの検出結果と集約表示を確認する
 - `Tracked` 表示でトラッカーの統合結果、キック・接触・フィールドの状態、送信関連カウンタを確認する
 - 複数の設定プロファイルを定義し、UI または API から実行中の設定プロファイルを切り替える
-- `Tracker:PublishUdp` が有効なら official tracker packet を UDP のマルチキャストまたはユニキャストで送信する
-- CaptureOn 中に受信した official tracker packet を同じ session folder へ保存し、後から自前トラッカー出力と比較する
+- `Tracker:PublishUdp` が有効なら公式形式の `TrackerWrapperPacket` を UDP のマルチキャストまたはユニキャストで送信する
+- CaptureOn 中に受信した公式形式の `TrackerWrapperPacket` を同じ session folder へ保存し、後から自前トラッカー出力と比較する
 
 ## 前提
 
@@ -133,7 +133,7 @@ SSL-Vision から受信した UDP パケットを、protobuf デコード前の�
 - `<prefix>-<timestamp>-<guid>.metadata.json`: キャプチャー時の `Tracker` 設定と解決済みの設定プロファイル
 - `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: キャプチャーと対応するトラッカー診断ログ。`Tracker:Diagnostics:FilePath` が指定されていても、キャプチャーが有効なときは補助ファイルとして同時に出力します。
 - `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: replay timeline と逆方向の再生位置移動に使う render snapshot。追跡エンジンの内部状態ではなく、確定済みの `TrackerFrame` だけを保存します。
-- `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の受信処理が受信した official tracker packet の snapshot sidecar です。
+- `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の受信処理が受信した公式形式の `TrackerWrapperPacket` の snapshot sidecar です。
 - `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断記録、render snapshot、tracker source snapshot を、1 回のキャプチャーの replay timeline 上で対応付ける補助ファイルです。外部トラッカーの `TrackedFrame.timestamp` が自前トラッカーと別の時刻系でも、`receivedAt` と記録開始からの相対時間を使って `/diagnostics` の `Field source` と比較を再生できます。保存形式の版 2 では診断ログ行単位ではなく、最も更新が速い表示元の周期に合わせた replay timeline の記録を保存し、同じ raw vision / render snapshot を複数の高速なトラッカー記録から参照できます。版 1 との互換は持たず、ログ選択時の索引構築と再生時や再生位置移動時の高速参照を優先します。
 - `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecar です。
 
@@ -240,7 +240,7 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を残します。
 
 1. `Tracker:Receive:Enabled=true` にし、受信処理が監視する接続先を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した自前トラッカーの送信先を使います。既定の `sim` 設定プロファイルは `224.5.23.2:11010`、`default` 設定プロファイルは `224.5.23.2:10010` です。外部トラッカーが別の接続先に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。ネットワーク接続が複数ある環境では `Tracker:Receive:InterfaceAddress` を明示します。
-2. `Tracker.DebugHost` を起動し、画面で `Capture On` にしてから SSL-Vision パケットと official tracker packet を流します。`Tracker:Receive:Enabled=false` のままではトラッカー受信処理が起動しないため、キャプチャーと診断ログは残ってもトラッカーパケットの snapshot sidecar は増えません。
+2. `Tracker.DebugHost` を起動し、画面で `Capture On` にしてから SSL-Vision パケットと公式形式の `TrackerWrapperPacket` を流します。`Tracker:Receive:Enabled=false` のままではトラッカー受信処理が起動しないため、キャプチャーと診断ログは残ってもトラッカーパケットの snapshot sidecar は増えません。
 3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では `SessionFolder` と各ファイルの相対パス、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotAlignmentLog.RecordCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。
 4. `/diagnostics` を開き、同じ session folder の `*.tracker-diagnostics.log` を選びます。統合した replay timeline、timeline scrubber、`Play` / `Fast Forward` / `Stop` の再生ボタン、速度選択タブ（`等倍速`、`4x`、`16x`、`64x`）、左右の `Field source` 選択、`Settings` の解決済み設定を確認します。ER-FORCE などトラッカー表示元が raw vision より速いキャプチャーでは、replay timeline に高速なトラッカー時点が含まれ、raw vision / render snapshot の `Field` が選択時点以前の最新のスナップショットを保持することも確認します。`Play` の等倍速再生は毎秒 30 回相当の表示更新で実時間の経過に追従するため、高頻度な再生時点の中間表示を省略する場合があります。
 5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。
@@ -256,7 +256,7 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 - `SnapshotMetadataMissing`: capture metadata にトラッカーのスナップショットのログ情報がありません。CaptureOn 比較ログ導入前のキャプチャーではこの状態になり得ます。
 - `SidecarNotCreated`: capture metadata は snapshot sidecar が未作成であることを示します。`Tracker:Receive:Enabled=false`、受信処理未起動、または CaptureOn 中に書き込み処理が開始されなかった場合を疑います。
 - `SidecarPathMissing` / `SidecarMissing`: capture metadata に補助ファイルのファイルパスがない、または capture metadata が指すファイルが存在しません。session folder の移動や部分コピーを疑います。
-- `SidecarEmpty` または `RecordCount=0`: 補助ファイルは作成されていますが、保存済みのトラッカーパケットがありません。official tracker packet が接続先に流れていない、マルチキャスト受信に使うネットワーク接続が違う、表示元がまだ見えていない場合を確認します。
+- `SidecarEmpty` または `RecordCount=0`: 補助ファイルは作成されていますが、保存済みのトラッカーパケットがありません。公式形式の `TrackerWrapperPacket` が接続先に流れていない、マルチキャスト受信に使うネットワーク接続が違う、表示元がまだ見えていない場合を確認します。
 - `SidecarCorrupt`: 補助ファイルの JSONL を読み取れません。壊れたファイル、途中書き込み、手動編集を疑います。
 - `Skipped` が 0 より大きい場合は、デコードまたは書き込み失敗でスナップショット記録にできなかったパケットがあることを示します。`Errors` が 0 より大きい場合は書き込み処理側で記録されたエラーがあるため、比較結果の代表性を報告書のリスクに残します。
 
@@ -282,7 +282,7 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 | `Uuid` | トラッカーパケットの UUID です。受信側で表示元の識別に使う値です。 |
 | `ActiveProfileName` | 起動時に使う設定プロファイルの名前です。`Tracker:Profiles` に存在する必要があります。 |
 | `Diagnostics` | トラッカーの未加工入力 / 追跡結果の診断ログ出力設定です。 |
-| `Receive` | CaptureOn 比較ログ用に official tracker packet を受信する設定です。既定は無効です。 |
+| `Receive` | CaptureOn 比較ログ用に公式形式の `TrackerWrapperPacket` を受信する設定です。既定は無効です。 |
 | `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、一時的な送信設定 / トラッカー調整値を差し込む用途です。 |
 | `Profiles` | 設定プロファイルごとの送信 / 追跡エンジン / 調整値の設定です。UI と API の設定プロファイルの切り替え対象にもなります。 |
 
@@ -294,7 +294,7 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 
 | キー | 意味 |
 | --- | --- |
-| `Enabled` | `true` なら official tracker packet の受信処理を起動します。既定は `false` です。 |
+| `Enabled` | `true` なら公式形式の `TrackerWrapperPacket` の受信処理を起動します。既定は `false` です。 |
 | `MulticastAddress` | 受信処理が監視するマルチキャストグループの通信アドレスです。`null` の場合は起動時に解決済みの自前トラッカー送信先の通信アドレスを使います。 |
 | `Port` | 受信処理が監視する UDP の通信ポートです。`null` の場合は起動時に解決済みの自前トラッカー送信先の通信ポートを使います。 |
 | `InterfaceAddress` | マルチキャスト参加に使う、この端末の IPv4 の通信アドレスです。`null` の場合は受信処理実装の既定に任せます。複数 NIC がある環境では明示指定してください。 |
@@ -360,8 +360,8 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 
 | キー | 意味 |
 | --- | --- |
-| `MulticastAddress` | official tracker packet の送信先の通信アドレスです。マルチキャスト / ユニキャストのどちらも指定できます。 |
-| `Port` | official tracker packet の送信先の通信ポートです。設定プロファイルごとに切り替えられます。 |
+| `MulticastAddress` |公式形式の `TrackerWrapperPacket` の送信先の通信アドレスです。マルチキャスト / ユニキャストのどちらも指定できます。 |
+| `Port` |公式形式の `TrackerWrapperPacket` の送信先の通信ポートです。設定プロファイルごとに切り替えられます。 |
 
 ### `Tracker:Profiles:<name>:Engine`
 

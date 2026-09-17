@@ -7,7 +7,7 @@
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
 - 段階: 文書検査整備
-- 状態: レビュー指摘への対応中。人が読む設計書の中央台帳は2,142 / 2,142件完了。最上位 `README.md` は基準62 / 62原出現を最新本文へ対応付け、未解決0。README更新後の18対象文書に対する `npm run lint:md` は終了値0。4,336出現箇所の最終台帳、履歴本文との最終照合、独立最終レビューは未完了。
+- 状態: レビュー指摘への対応中。人が読む設計書の中央台帳は2,142 / 2,142件完了。今回対象の3 READMEは基準528 / 528原出現を最新本文へ対応付け、未解決0。18対象文書に対する `npm run lint:md` は終了値0。4,336出現箇所の最終台帳、履歴本文との最終照合、独立最終レビューは未完了。
 - 規模: 中
 - 依存関係: `DOC-LINT-002`、承認済み許可語、共有文書検査器の修正。
 - 完了条件:
@@ -43,6 +43,10 @@
 
 - 2026-09-17 の最上位 README 照合: `README.md` の基準62原出現を最新本文へ対応付け、未解決0。`Tracker.RuntimeHost` を構成一覧へ追加し、SSL-Vision の受信前提と公式形式の `TrackerWrapperPacket` の説明を実装・設定に合わせて更新した。2,142件の設計書中央台帳には混在させず、4,336件全体の完了とも扱わない。
 - 2026-09-17 の README 検証: 18対象文書の `npm run lint:md` と `git diff --check` は終了値0。台帳は `reports/diagnostics/wording-root-readme-ledger-20260917/root-readme-occurrence-correspondence.json`、証跡は `reports/task-doc-lint-003-root-readme-correspondence-20260917.md` に記録する。
+
+- 2026-09-17 の CaptureReplay README 照合: `Tracker/Tracker.CaptureReplay/README.md` の基準43原出現を最新本文へ対応付けた。変更対象28件、原文同一15件、未解決0。既存14変更箇所の意味判断と実装を再確認し、追加の本文修正は不要と判断した。
+- 2026-09-17 の DebugHost README 照合: `Tracker/Tracker.DebugHost/README.md` の基準423原出現を最新本文へ対応付けた。変更対象345件、原文同一78件、未解決0。公式形式のトラッカーパケット10箇所を実装型 `TrackerWrapperPacket` と具体化し、既存の設定値、保存条件、比較条件は変更していない。
+- 2026-09-17 の3 README集計: 最上位62件、CaptureReplay 43件、DebugHost 423件の合計528 / 528件を対応済み。台帳は `reports/diagnostics/wording-root-readme-ledger-20260917/` と `reports/diagnostics/wording-remaining-readmes-ledger-20260917/` に保存する。4,336件全体や2,142件の設計書中央台帳とは重複加算しない。
 
 - ID: `CAPTURE-REPLAY-001`
 - 題名: `Tracker.CaptureReplay` に raw vision と `ibis tracker` の遅延分析出力を追加する

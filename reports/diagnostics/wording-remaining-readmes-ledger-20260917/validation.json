@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T15:38:30+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "documents": [
+    {
+      "document": "Tracker/Tracker.CaptureReplay/README.md",
+      "expected": 43,
+      "mapped": 43,
+      "unique_ids": 43,
+      "changed_source": 28,
+      "text_identical_source": 15,
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Tracker.DebugHost/README.md",
+      "expected": 423,
+      "mapped": 423,
+      "unique_ids": 423,
+      "changed_source": 345,
+      "text_identical_source": 78,
+      "final_sha256": "1a214f35b0c7c8598319c0b3a2d8e0d301a62d1c2f3cafdc7a567d7e11f8be14",
+      "errors": [],
+      "result": "pass"
+    }
+  ],
+  "expected_total": 466,
+  "mapped_total": 466,
+  "result": "pass"
+}
