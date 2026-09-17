@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T11:15:32+09:00",
+  "document": "Tracker/Design/Core/tracker-architecture-plan.md",
+  "technical_parent": "5a72850d25fa934bcb9d3e4c587bb8d88688fd59",
+  "document_sha256": "5df79b7bd607baa39b7fad0f9a5abc3e5fb39b9c1a78786a88427048b50b21a5",
+  "expected_occurrences": 565,
+  "actual_occurrences": 565,
+  "unique_ids": 565,
+  "changed_occurrences": 496,
+  "text_identical_occurrences": 69,
+  "reviewed_changed_blocks": 131,
+  "current_revised_blocks": 26,
+  "unresolved": [],
+  "validation_errors": [],
+  "result": "pass",
+  "independent_structure_check": {
+    "source_occurrences": 565,
+    "ledger_rows": 565,
+    "unique_ids": 565,
+    "missing_ids": 0,
+    "extra_ids": 0,
+    "block_count": 247,
+    "revised_blocks": 26,
+    "scope_completed": 1422,
+    "scope_pending": 720,
+    "document_sha256": "5df79b7bd607baa39b7fad0f9a5abc3e5fb39b9c1a78786a88427048b50b21a5",
+    "technical_parent_document_sha256": "5df79b7bd607baa39b7fad0f9a5abc3e5fb39b9c1a78786a88427048b50b21a5"
+  },
+  "focused_validation": {
+    "textlint": {
+      "exit_code": 0,
+      "stdout": "textlint.stdout.txt",
+      "stderr": "textlint.stderr.txt"
+    },
+    "cspell": {
+      "exit_code": 0,
+      "stdout": "cspell.stdout.txt",
+      "stderr": "cspell.stderr.txt"
+    },
+    "whitelist": {
+      "exit_code": 0,
+      "stdout": "whitelist.stdout.txt",
+      "stderr": "whitelist.stderr.txt"
+    },
+    "diff-check": {
+      "exit_code": 0,
+      "stdout": "diff-check.stdout.txt",
+      "stderr": "diff-check.stderr.txt"
+    }
+  }
+}
