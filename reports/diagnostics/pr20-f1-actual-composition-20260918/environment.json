@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "pr": 20,
+  "review_finding_report": "reports/pr20-independent-final-closure-20260917.md",
+  "fix_worktree_base": "868fe673093679639b0cc072b7c670b8b48cddda",
+  "fix_commit": "bd0b08c15309e3815d7720ffd16db6b5c11eb130",
+  "main_sha": "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+  "mergecheck_commit": "fa522618d543a245304dffcd8cf98a7ff2fd4e74",
+  "mergecheck_parents": [
+    "bd0b08c15309e3815d7720ffd16db6b5c11eb130",
+    "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171"
+  ],
+  "tdd_expected_failures": [
+    {
+      "test": "DiagnosticsReader_WithActualMetadataAndTrackerReceiveDisabled_UsesDiagnosticsSamples",
+      "expected": "Ready",
+      "actual": "SidecarNotCreated"
+    },
+    {
+      "test": "DiagnosticsReader_WithActualMetadataAndTrackerReceiveEnabled_PrefersDiagnosticsSampleForIbisTracker",
+      "expected": "Ready",
+      "actual": "CandidateMissing"
+    }
+  ],
+  "head_only_existing_failure": {
+    "test": "Load_WithSelectedReplayTimeline_WhenOnlyFutureSourceSnapshotExists_ReturnsMissingWithoutFutureFallback",
+    "also_fails_on_unmodified_868fe": true,
+    "mergecheck_with_current_main": "pass"
+  },
+  "mergecheck_focused": {
+    "passed": 43,
+    "failed": 0
+  },
+  "mergecheck_full": {
+    "passed": 331,
+    "failed": 0
+  }
+}

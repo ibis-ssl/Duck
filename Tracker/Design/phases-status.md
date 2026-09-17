@@ -4,7 +4,7 @@
 
 ## 全体状況
 
-- 現在の段階: 文書検査整備のレビュー指摘対応中、PR #20 公開中
+- 現在の段階: 文書検査整備のF1実構成修正済み、独立再確認待ち、PR #20 公開中
 - 現在の作業: `DOC-LINT-003`
 - 残りの作業: 全出現箇所の最終照合、履歴本文の再確認、承認済みの直接引用の例外機能の取り込み、全体の文書検査、独立最終レビュー。
 - 証跡: 再開時は `reports/doc-lint-resume-20260915.md`、診断設計の追加照合は `reports/task-doc-lint-003-diagnostic-scope-followup-20260917082311.md` を参照する。
@@ -37,3 +37,9 @@
 独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明に不整合があるF1が見つかり、完了判定は保留となった。構成設計、DebugHost詳細設計、DebugHost READMEを実装へ同期し、新規記録の再生位置と `Vision Input` / `ibis tracker` の復元元を diagnostics sample sidecar に統一した。外部トラッカーは tracker packet snapshot と alignment sidecar、または latest-before snapshot を使い、render snapshot は旧形式・補助用途として区別する。
 
 関連する原出現台帳と変更単位の台帳を修正後本文へ同期し、独立レビュー対象8文書の2,670件について構造自己点検は欠落・重複・本文内容不一致0。対象3文書の検査と `RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。修正後の独立再レビューは未実施であり、工程は引き続き「指摘対応中」とする。証跡は `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` とF1対応報告書を参照する。
+
+## 独立最終レビュー F1 実構成修正（2026-09-18）
+
+F1の文書同期後の再確認で、実際のキャプチャーに付随する情報では `diagnostics-samples.jsonl` が正常でも追跡パケットの補助ファイルが未作成のときに `SidecarNotCreated` となる不整合が判明した。実構成の先行テスト2件で失敗を固定してから読み取り処理を修正し、診断用採取記録だけの正常経路と `ibis tracker` の採取記録優先経路を実装した。
+
+現在の `main` との一時統合環境で周辺43件と全体331件のテスト成功を確認した。今回の修正では独立レビュー対象8文書と2,670件台帳を変更していない。詳細は `reports/task-doc-lint-003-f1-actual-composition-fix-20260918055212.md`。別担当の独立再確認が残る。最終コミットに一致するCI結果は公開後のPR記録で確定する。

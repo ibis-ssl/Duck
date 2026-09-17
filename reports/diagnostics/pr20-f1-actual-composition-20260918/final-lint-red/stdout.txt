@@ -1,0 +1,35 @@
+
+> ibisduck-doc-tooling@0.0.0 lint:md
+> npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist
+
+
+> ibisduck-doc-tooling@0.0.0 lint:md:text
+> node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
+
+
+> ibisduck-doc-tooling@0.0.0 lint:md:spell
+> node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+
+Tracker/Design/phases-status.md:43:36 - Unknown word (diagnostics)
+Tracker/Design/phases-status.md:43:48 - Unknown word (sampleが正常でもtracker)
+Tracker/Design/phases-status.md:43:67 - Unknown word (snapshot)
+Tracker/Design/phases-status.md:43:134 - Unknown word (reader)
+Tracker/Design/phases-status.md:43:145 - Unknown word (sample)
+Tracker/Design/phases-status.md:43:152 - Unknown word (only)
+Tracker/Design/phases-status.md:43:178 - Unknown word (sample)
+Tracker/Design/phases-status.md:45:1 - Unknown word (current)
+Tracker/Design/phases-status.md:45:163 - Unknown word (current)
+Tracker/Design/phases-status.md:45:171 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:10:116 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:10:140 - Unknown word (current)
+Tracker/Design/tasks-status.md:10:148 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:310:53 - Unknown word (metadata)
+Tracker/Design/tasks-status.md:310:236 - Unknown word (diagnostics)
+Tracker/Design/tasks-status.md:310:248 - Unknown word (sampleではなくtracker)
+Tracker/Design/tasks-status.md:310:266 - Unknown word (snapshot)
+Tracker/Design/tasks-status.md:312:134 - Unknown word (tracker)
+Tracker/Design/tasks-status.md:312:142 - Unknown word (snapshot未作成でもdiagnostics)
+Tracker/Design/tasks-status.md:312:167 - Unknown word (sample)
+Tracker/Design/tasks-status.md:312:224 - Unknown word (diagnostics)
+Tracker/Design/tasks-status.md:312:236 - Unknown word (sample)
+Tracker/Design/tasks-status.md:314:1 - Unknown word (current)

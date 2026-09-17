@@ -1,0 +1,34 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  SslProto -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  TrackerConnectionLib -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+  Tracker.CaptureReplay -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+  Tracker.Tests -> /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndTrackerReceiveDisabled_UsesDiagnosticsSamples [113 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: Ready
+Actual:   SidecarNotCreated
+  Stack Trace:
+     at Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndTrackerReceiveDisabled_UsesDiagnosticsSamples() in /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.Tests/VisionPacketCaptureTests.cs:line 217
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  Failed Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndTrackerReceiveEnabled_PrefersDiagnosticsSampleForIbisTracker [36 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: Ready
+Actual:   CandidateMissing
+  Stack Trace:
+     at Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndTrackerReceiveEnabled_PrefersDiagnosticsSampleForIbisTracker() in /home/ibis/.local/share/duck-pr20-f1-composition-fix-20260918-0540/Tracker/Tracker.Tests/VisionPacketCaptureTests.cs:line 303
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Failed!  - Failed:     2, Passed:     0, Skipped:     0, Total:     2, Duration: 159 ms - Tracker.Tests.dll (net10.0)

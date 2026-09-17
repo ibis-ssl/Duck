@@ -7,7 +7,7 @@
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
 - 段階: 文書検査整備
-- 状態: レビュー指摘への対応中。人が読む設計書の中央台帳は2,142 / 2,142件完了。今回対象の3 READMEは基準528 / 528原出現を最新本文へ対応付け、未解決0。18対象文書に対する `npm run lint:md` は終了値0。4,336出現箇所の最終台帳、履歴本文との最終照合、独立最終レビューは未完了。
+- 状態: 独立最終レビューの再確認で見つかったF1実構成不整合を修正済み。人が読む設計書の中央台帳は2,142 / 2,142件、今回対象の3 READMEは528 / 528原出現を対応済み。18対象文書の文書検査は直前の公開コミットで終了値0。F1修正後の独立再確認は未完了。最終コミットに一致するCI結果は公開後のPR記録で確定する。
 - 規模: 中
 - 依存関係: `DOC-LINT-002`、承認済み許可語、共有文書検査器の修正。
 - 完了条件:
@@ -304,3 +304,11 @@ F1 対応では `Tracker/Design/Core/tracker-architecture-plan.md`、`Tracker/De
 対象3文書の検証では、初回に新規文章の英語複合語を単独語へ分解したため、綴り検査と許可一覧検査が失敗した。許可一覧は変更せず、承認済み複合語・正式識別子・自然な日本語へ整理し、最終的に3文書の文章検査、綴り検査、許可一覧検査、`git diff --check` は終了値0。`RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。失敗・成功ログは `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` に保存する。
 
 F1 の本文修正と台帳同期後も、別の独立レビュー担当による再レビューが必要である。修正担当自身の確認だけで `DOC-LINT-003` やPR #20の最終レビュー完了とは扱わない。
+
+## 独立最終レビュー F1 実構成修正（2026-09-18）
+
+独立最終レビューの再確認で、実際の `VisionPacketCaptureSession` が生成するキャプチャーに付随する情報では `DiagnosticsSampleLog.IsCreated=true` と `TrackerSnapshotLog.IsCreated=false` が共存し、読み取り処理が `SidecarNotCreated` を返す不整合が確認された。また、追跡パケットの補助ファイルが存在すると `ibis tracker` が `diagnostics-samples.jsonl` の採取記録ではなく追跡パケット側へ流れる経路も残っていた。
+
+実構成を使う2件のテストを先に追加し、修正前に `SidecarNotCreated` / `CandidateMissing` で2件失敗することを確認した。`TrackerDiagnosticsComparisonViewStateReader` を修正し、追跡パケットの補助ファイルが未作成でも `diagnostics-samples.jsonl` だけで `Ready` になること、`Vision Input` / `ibis tracker` は同ファイルの採取記録を主経路とすることを固定した。
+
+現在の `main` を一時統合した検証環境では、診断・キャプチャー・比較の周辺43件と `Tracker.Tests` 全体331件が成功した。対象8文書と2,670件の原出現台帳は今回変更していないため、台帳の再生成は行わない。詳細は `reports/task-doc-lint-003-f1-actual-composition-fix-20260918055212.md`。修正担当の自己点検であり、独立再確認は別途必要である。

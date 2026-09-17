@@ -1,0 +1,2 @@
+[xUnit.net 00:00:00.27]     Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndTrackerReceiveDisabled_UsesDiagnosticsSamples [FAIL]
+[xUnit.net 00:00:00.31]     Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_WithActualMetadataAndTrackerReceiveEnabled_PrefersDiagnosticsSampleForIbisTracker [FAIL]

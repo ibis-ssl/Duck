@@ -1,0 +1,22 @@
+  Determining projects to restore...
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 226 ms).
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/TrackerConnectionLib/TrackerConnectionLib.csproj (in 226 ms).
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 225 ms).
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/SslProto/SslProto.csproj (in 226 ms).
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 228 ms).
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 225 ms).
+  Restored /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.Core/Tracker.Core.csproj (in 225 ms).
+  SslProto -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  TrackerConnectionLib -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+  Tracker.CaptureReplay -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+  Tracker.Tests -> /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/ibis/.local/share/duck-pr20-f1-composition-mergecheck-20260918-0550/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 407 ms - Tracker.Tests.dll (net10.0)
