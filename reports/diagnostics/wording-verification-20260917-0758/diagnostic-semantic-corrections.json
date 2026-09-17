@@ -1,0 +1,47 @@
+{
+  "time": "2026-09-17T08:06:27.378732+09:00",
+  "technical_parent": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+  "before_sha256": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894",
+  "after_sha256": "23f0f68faed4b53bc0f95746e0d281cb383a491de49404d0b095ea43f1e07a04",
+  "line_count_unchanged": true,
+  "changes": [
+    {
+      "block": "D11-B062",
+      "before": "`Tracker Comparison` 領域は画面ヘッダーの切り替えボタンで折りたためるようにし、",
+      "after": "`Tracker Comparison` 領域は、その見出し行にある切り替えボタンで折りたためるようにし、",
+      "reason": "折りたたみボタンは比較領域自身のheader内にある。画面全体のヘッダーを指す表現を修正する。"
+    },
+    {
+      "block": "D11-B074",
+      "before": "### 対象を絞ったテストで固定する事項",
+      "after": "対象を絞ったテストでは、少なくとも次を固定する。",
+      "reason": "見出しへの変換でなくなった原文の最低限の検証範囲という条件を戻す。"
+    },
+    {
+      "block": "D11-B075",
+      "before": "100 ms の記録は 100 ms の render snapshot を参照する。",
+      "after": "100 ms の記録は 100 ms の raw vision と render snapshot を参照する。",
+      "reason": "原文では100 msのVisionとrenderの両方が参照対象。テスト条件から落ちたraw visionを戻す。"
+    }
+  ],
+  "source_evidence": [
+    {
+      "sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "lines": [
+        176,
+        214,
+        217
+      ]
+    },
+    {
+      "sha": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+      "file": "Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor",
+      "lines": [
+        121,
+        130
+      ]
+    }
+  ]
+}

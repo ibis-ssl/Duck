@@ -1,0 +1,2 @@
+Tracker/Design/tasks-status.md:39:37 - Unknown word (textlint)
+Tracker/Design/tasks-status.md:39:46 - Unknown word (cspell)

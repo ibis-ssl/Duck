@@ -1,0 +1,2 @@
+1/1 Tracker/Design/Core/tracker-architecture-plan.md 45.53ms
+CSpell: Files checked: 1, Issues found: 0 in 0 files.

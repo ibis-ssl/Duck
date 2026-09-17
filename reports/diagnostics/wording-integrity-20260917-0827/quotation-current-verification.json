@@ -1,0 +1,14 @@
+{
+  "file": "feedback-points/feedback-points.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "original_quotes": [
+    "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+    "「サブエージェントにcodex exec実行させるのやめろ」"
+  ],
+  "current_quotes": [
+    "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+    "「サブエージェントにcodex exec実行させるのやめろ」"
+  ],
+  "both_exact": true,
+  "current_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5"
+}

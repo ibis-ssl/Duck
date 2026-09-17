@@ -1,0 +1,2093 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T11:50:09+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "document": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
+  "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+  "review_kind": "implementation_self_check",
+  "prior_evidence": "reports/diagnostics/wording-ledger-20260917-0709/raw-viewer-final-correspondence.json",
+  "block_count": 85,
+  "occurrence_changed_block_count": 45,
+  "changed_since_prior_self_check": [
+    "D13-B005",
+    "D13-B009",
+    "D13-B013",
+    "D13-B015",
+    "D13-B016",
+    "D13-B036",
+    "D13-B041",
+    "D13-B046",
+    "D13-B061",
+    "D13-B064",
+    "D13-B068",
+    "D13-B081",
+    "D13-B085"
+  ],
+  "blocks": [
+    {
+      "block": "D13-B001",
+      "baseline_start": 1,
+      "baseline_end": 1,
+      "baseline_text": [
+        "# SSL_WrapperPacket Raw Vision Viewer 設計"
+      ],
+      "final_start": 1,
+      "final_end": 1,
+      "final_text": [
+        "# `SSL_WrapperPacket` raw vision 表示設計"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_WrapperPacketという入力型とraw vision表示設計という用途を保持。型名をコード記法にし、一般的な動画表示にはしない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B002",
+      "baseline_start": 3,
+      "baseline_end": 2,
+      "baseline_text": [],
+      "final_start": 3,
+      "final_end": 4,
+      "final_text": [
+        "",
+        "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。"
+      ],
+      "disposition": "accepted",
+      "reason": "raw visionはSSL-Visionの検出情報であり画像/動画そのものではないという定義を追加した既存文を確認。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B003",
+      "baseline_start": 5,
+      "baseline_end": 5,
+      "baseline_text": [
+        "`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` datagram を直接受信し、最新の detection / geometry 情報を Blazor UI 上で可視化できるようにする。旧 project 名は `Tracker.Server` だが、現行の project / namespace / 起動経路は `Tracker.DebugHost` とする。"
+      ],
+      "final_start": 7,
+      "final_end": 7,
+      "final_text": [
+        "`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` を含む UDP パケットを直接受信し、最新の検出情報とフィールド形状を Blazor UI 上で可視化できるようにする。旧プロジェクト名は `Tracker.Server` だが、現行のプロジェクト、名前空間、起動経路は `Tracker.DebugHost` とする。"
+      ],
+      "disposition": "fixed",
+      "reason": "SslProto生成型でUDPを直接受信し検出/形状をBlazorで可視化、旧Serverと現DebugHostのプロジェクト/名前空間/起動経路を保持。UDPの区切りを整える。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B004",
+      "baseline_start": 7,
+      "baseline_end": 7,
+      "baseline_text": [
+        "## スコープ"
+      ],
+      "final_start": 9,
+      "final_end": 9,
+      "final_text": [
+        "## 対象範囲"
+      ],
+      "disposition": "accepted",
+      "reason": "スコープを対象範囲とする自然な見出し。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B005",
+      "baseline_start": 9,
+      "baseline_end": 15,
+      "baseline_text": [
+        "- 設定された vision endpoint に bind する UDP hosted service を追加する",
+        "- multicast address が設定されている場合は multicast join を行う",
+        "- `SSL_WrapperPacket.Parser.ParseFrom` で packet を decode する",
+        "- 最新 packet、最新 detection、最新 geometry、受信メタデータ、packet count、error count を singleton store に保持する",
+        "- `/` に field SVG、detection 情報、geometry calibration、raw packet JSON を表示する",
+        "- navigation は raw vision viewer 中心に保つ",
+        "- aggregate view と camera 別 latest-frame view の両方を raw vision UI で扱う"
+      ],
+      "final_start": 11,
+      "final_end": 17,
+      "final_text": [
+        "- 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する",
+        "- マルチキャストの通信アドレスが設定されている場合は、マルチキャストグループへ参加する",
+        "- `SSL_WrapperPacket.Parser.ParseFrom` でパケットをデコードする",
+        "- 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、アプリケーション内で単一インスタンスとして共有する状態保存先に保持する",
+        "- `/` にフィールドを描く SVG、検出情報、カメラの校正情報、受信パケットの JSON を表示する",
+        "- 画面遷移は raw vision viewer を中心にする",
+        "- 集約表示と、カメラごとの最新の検出情報表示の両方を raw vision viewer で扱う"
+      ],
+      "disposition": "fixed",
+      "reason": "受信、デコード、状態保持、表示、画面遷移、集約表示とカメラ別表示の7要件を保持した。singleton store はアプリケーション内の単一共有インスタンス、latest-frame view はカメラごとの最新検出情報表示として意味を明確にした。",
+      "prior_final_text": [
+        "- 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する",
+        "- マルチキャスト用の通信アドレスが設定されている場合はマルチキャストグループへの参加を行う",
+        "- `SSL_WrapperPacket.Parser.ParseFrom` でパケットをデコードする",
+        "- 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、単一のインスタンスを共有する状態保存先に保持する",
+        "- `/` にフィールドを描く SVG、検出情報、カメラの校正情報、受信パケットの JSON を表示する",
+        "- 画面移動は raw vision viewer を中心に保つ",
+        "- 集約表示と、カメラごとの最新の観測結果表示の両方を raw vision viewer で扱う"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B006",
+      "baseline_start": 17,
+      "baseline_end": 17,
+      "baseline_text": [
+        "## 非スコープ"
+      ],
+      "final_start": 19,
+      "final_end": 19,
+      "final_text": [
+        "## 対象外"
+      ],
+      "disposition": "accepted",
+      "reason": "非スコープを対象外とする自然な見出し。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B007",
+      "baseline_start": 20,
+      "baseline_end": 22,
+      "baseline_text": [
+        "- packet の永続化はしない",
+        "- raw detection を超える tracking / filtering / world-model 解釈は入れない",
+        "- 本番寄りの tracker operation と将来 AutoRef mode は `Tracker.RuntimeHost` の責務とし、DebugHost の Web rendering / diagnostics logging から切り離す"
+      ],
+      "final_start": 22,
+      "final_end": 24,
+      "final_text": [
+        "- パケットの永続化はしない",
+        "- 未加工の検出情報を超える追跡処理、状態推定処理、フィールド全体の状態表現の解釈は入れない",
+        "- 本番寄りのトラッカーの実時間処理と将来の自動レフェリーモードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す"
+      ],
+      "disposition": "fixed",
+      "reason": "永続化なし、rawを超えるtracking/filtering/world解釈なし、RuntimeHostの本番寄り実行と将来AutoRef責務をWeb/診断から分離する条件を保持。自動判定一般でなく自動レフェリーと特定。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B008",
+      "baseline_start": 26,
+      "baseline_end": 26,
+      "baseline_text": [
+        "`appsettings.json` の `VisionReceiver` section を使う。"
+      ],
+      "final_start": 28,
+      "final_end": 28,
+      "final_text": [
+        "`appsettings.json` の `VisionReceiver` 設定階層を使う。"
+      ],
+      "disposition": "accepted",
+      "reason": "appsettingsのVisionReceiver sectionを設定階層と説明し、設定名を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B009",
+      "baseline_start": 29,
+      "baseline_end": 31,
+      "baseline_text": [
+        "- `Port`: 受信 port",
+        "- `InterfaceAddress`: multicast join に使う local IPv4 address。未設定時は候補 interface を自動解決する",
+        "- `Profiles.<name>`: profile ごとの receiver override。`MulticastAddress` / `Port` / `InterfaceAddress` を同名 tracker profile に追従させたい場合に使う"
+      ],
+      "final_start": 31,
+      "final_end": 33,
+      "final_text": [
+        "- `Port`: 受信に使う通信ポート",
+        "- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 通信アドレス。未設定時は、この端末で利用可能な IPv4 通信アドレスから候補を自動解決する",
+        "- `Profiles.<name>`: 設定プロファイルごとの受信設定の上書き。`MulticastAddress` / `Port` / `InterfaceAddress` を同名のトラッカーの設定プロファイルに追従させたい場合に使う"
+      ],
+      "disposition": "fixed",
+      "reason": "Port、InterfaceAddress、Profiles overrideの3設定を保持。local IPv4と候補interfaceがこの端末のものという限定を復元。未設定時自動解決と同名tracker設定追従の条件も保持。",
+      "prior_final_text": [
+        "- `Port`: 受信に使う通信ポート",
+        "- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 の通信アドレス。未設定時はこの端末で利用候補となるネットワーク接続を自動解決する",
+        "- `Profiles.<name>`: 設定プロファイルごとの受信設定の上書き。`MulticastAddress` / `Port` / `InterfaceAddress` を同名のトラッカーの設定プロファイルに追従させたい場合に使う"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B010",
+      "baseline_start": 33,
+      "baseline_end": 33,
+      "baseline_text": [
+        "resolver 規則:"
+      ],
+      "final_start": 35,
+      "final_end": 35,
+      "final_text": [
+        "設定の解決規則:"
+      ],
+      "disposition": "accepted",
+      "reason": "resolver規則を設定の解決規則と説明。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B011",
+      "baseline_start": 36,
+      "baseline_end": 37,
+      "baseline_text": [
+        "- 同名 profile が無い場合は top-level `VisionReceiver` 値をそのまま使う",
+        "- runtime の tracker profile switch 完了後は、receiver も同じ profile 名で再解決し、必要なら socket を reopen する"
+      ],
+      "final_start": 38,
+      "final_end": 39,
+      "final_text": [
+        "- 同名の設定プロファイルが無い場合は、最上位の `VisionReceiver` の値をそのまま使う",
+        "- 実行中にトラッカーの設定プロファイルの切り替えが完了した後は、受信設定も同じ設定プロファイルの名前で再解決し、必要ならソケットを開き直す"
+      ],
+      "disposition": "accepted",
+      "reason": "同名設定なしはtop-level値、実行時のtracker切替完了後に同名受信設定を再解決し必要時socket再作成という2条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B012",
+      "baseline_start": 41,
+      "baseline_end": 41,
+      "baseline_text": [
+        "`VisionReceiverService` は hosted background service として動作する。"
+      ],
+      "final_start": 43,
+      "final_end": 43,
+      "final_text": [
+        "`VisionReceiverService` は、アプリケーションの起動・停止に合わせて動作するバックグラウンド処理とする。"
+      ],
+      "disposition": "fixed",
+      "reason": "hosted background serviceをアプリケーションの起動・停止に合わせて動作するバックグラウンド処理と説明。単なる独立した非同期処理に広げない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B013",
+      "baseline_start": 43,
+      "baseline_end": 47,
+      "baseline_text": [
+        "- IPv4 UDP socket を作成する",
+        "- address reuse を有効にする",
+        "- `IPAddress.Any` と設定 port に bind する",
+        "- cancellation まで datagram を継続受信する",
+        "- receiver 設定が切り替わったら現在の receive loop を cancel し、新しい設定で socket を開き直す"
+      ],
+      "final_start": 45,
+      "final_end": 49,
+      "final_text": [
+        "- IPv4 UDP ソケットを作成する",
+        "- 通信アドレスの再利用を有効にする",
+        "- ソケットのバインドでは、`IPAddress.Any` と設定した通信ポートを使う",
+        "- 取り消し要求が来るまで UDP パケットを継続受信する",
+        "- 受信設定が切り替わったら現在の受信処理を取り消し、新しい設定でソケットを開き直す"
+      ],
+      "disposition": "fixed",
+      "reason": "IPv4 UDP、address reuse、AnyとPortへのbind、cancelまで継続、設定切替で受信cancelとsocket再作成という5規則を保持。割り当てる対象をソケットと明記。",
+      "prior_final_text": [
+        "- IPv4 UDP ソケットを作成する",
+        "- 通信アドレスの再利用を有効にする",
+        "- ソケットを `IPAddress.Any` と設定した通信ポートに割り当てる",
+        "- 取り消し要求が来るまで UDP パケットを継続受信する",
+        "- 受信設定が切り替わったら現在の受信処理を取り消し、新しい設定でソケットを開き直す"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B014",
+      "baseline_start": 49,
+      "baseline_end": 49,
+      "baseline_text": [
+        "設定された address が multicast の場合、group membership は次の規則で解決する。"
+      ],
+      "final_start": 51,
+      "final_end": 51,
+      "final_text": [
+        "設定された通信アドレスがマルチキャストの場合、参加するマルチキャストグループは次の規則で解決する。"
+      ],
+      "disposition": "accepted",
+      "reason": "通信先がmulticastの場合だけgroup membershipを解決する条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B015",
+      "baseline_start": 51,
+      "baseline_end": 52,
+      "baseline_text": [
+        "- `InterfaceAddress` が設定されている場合、その IPv4 address のみを使う",
+        "- 未設定の場合、利用可能な local IPv4 interface を列挙して順に join を試行する"
+      ],
+      "final_start": 53,
+      "final_end": 54,
+      "final_text": [
+        "- `InterfaceAddress` が設定されている場合、その IPv4 通信アドレスだけを使う",
+        "- 未設定の場合、この端末で利用可能な IPv4 通信アドレスを列挙し、順に参加を試行する"
+      ],
+      "disposition": "fixed",
+      "reason": "明示InterfaceAddressならそのIPv4だけ、未設定なら利用可能なlocal IPv4を列挙してjoinする条件を保持。端末内の接続という限定を復元。",
+      "prior_final_text": [
+        "- `InterfaceAddress` が設定されている場合、その IPv4 の通信アドレスのみを使う",
+        "- 未設定の場合、この端末で利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B016",
+      "baseline_start": 54,
+      "baseline_end": 54,
+      "baseline_text": [
+        "- 一部 interface の失敗は warning log に残す"
+      ],
+      "final_start": 56,
+      "final_end": 56,
+      "final_text": [
+        "- 一部の通信アドレスでの参加失敗は警告ログに残す"
+      ],
+      "disposition": "accepted",
+      "reason": "一部interfaceの失敗は警告ログに残すこと、直前行の1つ以上成功なら受信継続という条件を保持。",
+      "prior_final_text": [
+        "- 一部のネットワーク接続の失敗は警告ログに残す"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B017",
+      "baseline_start": 56,
+      "baseline_end": 56,
+      "baseline_text": [
+        "decode 成功時は `VisionPacketStore` を更新し、失敗時は error count を増やし、直前の正常 state を保持する。"
+      ],
+      "final_start": 58,
+      "final_end": 58,
+      "final_text": [
+        "デコード成功時は `VisionPacketStore` を更新し、失敗時はエラー数を増やし、直前の正常状態を保持する。"
+      ],
+      "disposition": "accepted",
+      "reason": "decode成功でstore更新、失敗でerror count増加と直前正常state保持という可否を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B018",
+      "baseline_start": 58,
+      "baseline_end": 58,
+      "baseline_text": [
+        "## Store 設計"
+      ],
+      "final_start": 60,
+      "final_end": 60,
+      "final_text": [
+        "## 状態の保持"
+      ],
+      "disposition": "accepted",
+      "reason": "Store設計を状態の保持とする見出し。次のVisionPacketStoreの役割を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B019",
+      "baseline_start": 60,
+      "baseline_end": 60,
+      "baseline_text": [
+        "`VisionPacketStore` は UI 参照用の thread-safe state を保持する。"
+      ],
+      "final_start": 62,
+      "final_end": 62,
+      "final_text": [
+        "`VisionPacketStore` は、UI が参照する状態を複数スレッドから安全に利用できる形で保持する。"
+      ],
+      "disposition": "accepted",
+      "reason": "UI参照用stateをthread-safeに保持する条件を複数スレッドから安全に利用できる形として説明。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B020",
+      "baseline_start": 62,
+      "baseline_end": 71,
+      "baseline_text": [
+        "- 最新 wrapper packet",
+        "- 最新 detection frame",
+        "- camera ごとの最新 detection snapshot",
+        "- aggregate 表示用に統合した balls / yellow robots / blue robots",
+        "- 最新 geometry data",
+        "- packet count",
+        "- error count",
+        "- remote endpoint",
+        "- receive timestamp",
+        "- 最新 parse error message"
+      ],
+      "final_start": 64,
+      "final_end": 73,
+      "final_text": [
+        "- 最新の受信パケット",
+        "- 最新の `SSL_DetectionFrame`",
+        "- カメラごとの最新の検出情報のスナップショット",
+        "- 集約表示用に統合したボール、黄色チームのロボット、青色チームのロボット",
+        "- 最新のフィールド形状",
+        "- パケット数",
+        "- エラー数",
+        "- 送信元の通信アドレスと通信ポート",
+        "- 受信時刻",
+        "- 最新の解析エラーメッセージ"
+      ],
+      "disposition": "fixed",
+      "reason": "最新wrapper/detection/camera別snapshot/aggregateの黄青robotとball/geometry、packet/error件数、送信元、受信時刻、parse errorの10項目を保持。latest detection frameはSSL_DetectionFrame型として特定。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B021",
+      "baseline_start": 73,
+      "baseline_end": 73,
+      "baseline_text": [
+        "UI には immutable snapshot を返し、描画中に lock を保持しない。"
+      ],
+      "final_start": 75,
+      "final_end": 75,
+      "final_text": [
+        "UI には変更不能なスナップショットを返し、描画中にロックを保持しない。"
+      ],
+      "disposition": "accepted",
+      "reason": "UIへimmutable snapshotを返し、描画中にlockを保持しないという2条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B022",
+      "baseline_start": 75,
+      "baseline_end": 75,
+      "baseline_text": [
+        "## Proto 入力"
+      ],
+      "final_start": 77,
+      "final_end": 77,
+      "final_text": [
+        "## 入力する通信データ"
+      ],
+      "disposition": "accepted",
+      "reason": "Proto入力を入力する通信データとする見出し。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B023",
+      "baseline_start": 77,
+      "baseline_end": 77,
+      "baseline_text": [
+        "raw vision viewer が直接使う主な proto 入力は次の通り。"
+      ],
+      "final_start": 79,
+      "final_end": 79,
+      "final_text": [
+        "raw vision viewer が直接使う主な入力型は次の通り。"
+      ],
+      "disposition": "accepted",
+      "reason": "raw vision viewerが直接使う主なproto入力型の導入を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B024",
+      "baseline_start": 80,
+      "baseline_end": 81,
+      "baseline_text": [
+        "  - 受信 datagram 全体",
+        "  - `Detection` と `Geometry` を内包する最上位 packet"
+      ],
+      "final_start": 82,
+      "final_end": 83,
+      "final_text": [
+        "  - 受信した UDP パケットのデータ全体",
+        "  - `Detection` と `Geometry` を内包する最上位のパケット"
+      ],
+      "disposition": "fixed",
+      "reason": "WrapperPacketは受信UDPデータ全体、Detection/Geometryを内包する最上位packetであることを保持。UDP表記の区切りを整える。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B025",
+      "baseline_start": 83,
+      "baseline_end": 83,
+      "baseline_text": [
+        "  - camera 単位の raw detection"
+      ],
+      "final_start": 85,
+      "final_end": 85,
+      "final_text": [
+        "  - カメラごとの未加工の検出情報"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_DetectionFrameはカメラ単位のraw detectionであり、後続の5メンバーをそのまま保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B026",
+      "baseline_start": 86,
+      "baseline_end": 86,
+      "baseline_text": [
+        "  - ball 描画と詳細表示に使う"
+      ],
+      "final_start": 88,
+      "final_end": 88,
+      "final_text": [
+        "  - ボール描画と詳細表示に使う"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_DetectionBallをボール描画と詳細表示へ使う用途を保持。座標/信頼度のメンバーは変更しない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B027",
+      "baseline_start": 89,
+      "baseline_end": 89,
+      "baseline_text": [
+        "  - robot 描画と詳細表示に使う"
+      ],
+      "final_start": 91,
+      "final_end": 91,
+      "final_text": [
+        "  - ロボット描画と詳細表示に使う"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_DetectionRobotをロボット描画と詳細表示へ使う用途を保持。ID/座標/向き等のメンバーは変更しない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B028",
+      "baseline_start": 92,
+      "baseline_end": 92,
+      "baseline_text": [
+        "  - field geometry 全体"
+      ],
+      "final_start": 94,
+      "final_end": 94,
+      "final_text": [
+        "  - フィールド形状全体"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_GeometryDataがfield geometry全体を表すこととField/Calibの参照を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B029",
+      "baseline_start": 95,
+      "baseline_end": 95,
+      "baseline_text": [
+        "  - field の寸法と line / arc 情報"
+      ],
+      "final_start": 97,
+      "final_end": 97,
+      "final_text": [
+        "  - フィールドの寸法と線分・円弧の情報"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_GeometryFieldSizeは寸法と線分/円弧を表す。直後の12メンバーを保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B030",
+      "baseline_start": 98,
+      "baseline_end": 98,
+      "baseline_text": [
+        "  - calibration table 表示に使う"
+      ],
+      "final_start": 100,
+      "final_end": 100,
+      "final_text": [
+        "  - カメラの校正情報を一覧表示するために使う"
+      ],
+      "disposition": "accepted",
+      "reason": "SSL_GeometryCameraCalibrationを校正情報の一覧表示に使う用途を保持。6メンバーを保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B031",
+      "baseline_start": 101,
+      "baseline_end": 101,
+      "baseline_text": [
+        "## Field 投影"
+      ],
+      "final_start": 103,
+      "final_end": 103,
+      "final_text": [
+        "## フィールドへの投影"
+      ],
+      "disposition": "accepted",
+      "reason": "Field投影をフィールドへの投影とする見出し。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B032",
+      "baseline_start": 103,
+      "baseline_end": 103,
+      "baseline_text": [
+        "`VisionFieldProjection` は field の millimeter 座標を SVG viewport に写像する。"
+      ],
+      "final_start": 105,
+      "final_end": 105,
+      "final_text": [
+        "`VisionFieldProjection` は、フィールドの mm 単位の座標を SVG の表示領域に写像する。"
+      ],
+      "disposition": "accepted",
+      "reason": "VisionFieldProjectionがmm単位の座標をSVG表示領域へ写像することを保持。単位変更なし。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B033",
+      "baseline_start": 105,
+      "baseline_end": 108,
+      "baseline_text": [
+        "- geometry がある場合はその field dimensions を使う",
+        "- geometry がまだない場合は default の競技場寸法を使う",
+        "- `(0, 0)` は viewport center に対応する",
+        "- field 本体だけでなく、boundary と goal depth が見切れないよう outer margin を加味する"
+      ],
+      "final_start": 107,
+      "final_end": 110,
+      "final_text": [
+        "- フィールド形状がある場合はそのフィールド寸法を使う",
+        "- フィールド形状がまだない場合は既定のフィールド寸法を使う",
+        "- `(0, 0)` は表示領域の中央に対応する",
+        "- フィールド本体だけでなく、境界とゴールの奥行きが見切れないよう外周の余白を加味する"
+      ],
+      "disposition": "accepted",
+      "reason": "geometryあればその寸法、なければ既定寸法、原点は中央、boundary/goal depthまで含む外周余白という4規則を保持。競技場をフィールドに揃える。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B034",
+      "baseline_start": 116,
+      "baseline_end": 116,
+      "baseline_text": [
+        "  - `VisionPacketStore.GetSnapshot()` の結果を定期取得し、compact header と左右ペインを構成する"
+      ],
+      "final_start": 118,
+      "final_end": 118,
+      "final_text": [
+        "  - `VisionPacketStore.GetSnapshot()` の結果を定期取得し、小さな画面ヘッダーと左右の表示領域を構成する"
+      ],
+      "disposition": "accepted",
+      "reason": "Homeがstore snapshotを定期取得しcompact headerと左右領域を構成する責務を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B035",
+      "baseline_start": 118,
+      "baseline_end": 119,
+      "baseline_text": [
+        "  - field SVG の親コンポーネント",
+        "  - zoom / pan 状態、boundary 背景、field 本体、子 marker の配置、axis overlay、cursor 座標 overlay を担当する"
+      ],
+      "final_start": 120,
+      "final_end": 121,
+      "final_text": [
+        "  - フィールドを描く SVG の親コンポーネント",
+        "  - 拡大縮小と表示位置の状態、外周の背景、フィールド本体、子マーカーの配置、座標軸とカーソル座標の重ね表示を担当する"
+      ],
+      "disposition": "accepted",
+      "reason": "Canvasがfield SVG親で、zoom/pan、背景、field、子marker、軸/cursor座標重ね表示を担当する範囲を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B036",
+      "baseline_start": 121,
+      "baseline_end": 122,
+      "baseline_text": [
+        "  - field line / arc / goal の描画を担当する",
+        "  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時は geometry 寸法から fallback 描画する"
+      ],
+      "final_start": 123,
+      "final_end": 124,
+      "final_text": [
+        "  - フィールドの線分、円弧、ゴールの描画を担当する",
+        "  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時はフィールドの寸法から補完して描画する"
+      ],
+      "disposition": "accepted",
+      "reason": "`FieldLines` / `FieldArcs` を優先し、不足時だけフィールド寸法から補完描画する優先関係を保持した。",
+      "prior_final_text": [
+        "  - フィールドの線分、円弧、ゴールの描画を担当する",
+        "  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時はフィールドの寸法から代わりの描画を行う"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B037",
+      "baseline_start": 124,
+      "baseline_end": 124,
+      "baseline_text": [
+        "  - `SSL_DetectionBall` 1 件を SVG circle として描く"
+      ],
+      "final_start": 126,
+      "final_end": 126,
+      "final_text": [
+        "  - `SSL_DetectionBall` 1 件を SVG の円として描く"
+      ],
+      "disposition": "accepted",
+      "reason": "DetectionBall1件をSVGの円として描く数量と形状を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B038",
+      "baseline_start": 126,
+      "baseline_end": 127,
+      "baseline_text": [
+        "  - `SSL_DetectionRobot` 1 件を robot shape として描く",
+        "  - team 色、前面 gap、nose marker、label を担当する"
+      ],
+      "final_start": 128,
+      "final_end": 129,
+      "final_text": [
+        "  - `SSL_DetectionRobot` 1 件をロボットの形状として描く",
+        "  - チームの色、前面の切り欠き、正面方向の印、表示名を担当する"
+      ],
+      "disposition": "accepted",
+      "reason": "DetectionRobot1件をrobot形状で描き、team色/前面gap/nose/labelを担当する4要素を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B039",
+      "baseline_start": 129,
+      "baseline_end": 129,
+      "baseline_text": [
+        "  - JSON / balls / robots / geometry calibration の右ペイン表示を担当する"
+      ],
+      "final_start": 131,
+      "final_end": 131,
+      "final_text": [
+        "  - JSON、ボール、ロボット、カメラの校正情報を右側の領域へ表示する"
+      ],
+      "disposition": "accepted",
+      "reason": "DetailsPanelの右側にはJSON/ball/robot/calibrationを表示する役割を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B040",
+      "baseline_start": 131,
+      "baseline_end": 131,
+      "baseline_text": [
+        "  - team color と marker stroke color の定義を一箇所に集約する"
+      ],
+      "final_start": 133,
+      "final_end": 133,
+      "final_text": [
+        "  - チームの色とマーカーの線の色の定義を一箇所に集約する"
+      ],
+      "disposition": "accepted",
+      "reason": "team色とmarker線色の定義をPalette一箇所に集約する責務を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B041",
+      "baseline_start": 133,
+      "baseline_end": 133,
+      "baseline_text": [
+        "  - robot radius など、将来設定から変更したい描画パラメータの受け口"
+      ],
+      "final_start": 135,
+      "final_end": 135,
+      "final_text": [
+        "  - ロボットの半径など、将来設定から変更可能にする描画パラメータをまとめる"
+      ],
+      "disposition": "accepted",
+      "reason": "`VisionRenderOptions` はロボット半径など、将来設定から変更可能にする描画パラメータをまとめる型であることを保持した。",
+      "prior_final_text": [
+        "  - ロボットの半径など、将来設定から変更したい描画パラメータの受け口"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B042",
+      "baseline_start": 139,
+      "baseline_end": 139,
+      "baseline_text": [
+        "### Home.razor"
+      ],
+      "final_start": 141,
+      "final_end": 141,
+      "final_text": [
+        "### `Home.razor`"
+      ],
+      "disposition": "accepted",
+      "reason": "Home.razor見出しを実ファイル名のコード記法にする。内容の除外目的ではない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B043",
+      "baseline_start": 142,
+      "baseline_end": 142,
+      "baseline_text": [
+        "  - store から取得した UI 用 snapshot"
+      ],
+      "final_start": 144,
+      "final_end": 144,
+      "final_text": [
+        "  - 状態の保存先から取得した UI 用スナップショット"
+      ],
+      "disposition": "accepted",
+      "reason": "VisionPacketSnapshotがstoreから得るUI用snapshotであることを保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B044",
+      "baseline_start": 144,
+      "baseline_end": 145,
+      "baseline_text": [
+        "  - aggregate / camera 切替状態",
+        "- sidebar 折りたたみ状態を前提に field-first の main content を構成する"
+      ],
+      "final_start": 146,
+      "final_end": 147,
+      "final_text": [
+        "  - 集約表示とカメラ別表示の切り替え状態",
+        "- サイドバーを折りたたんだ状態を前提に、フィールドを中心とする主表示を構成する"
+      ],
+      "disposition": "accepted",
+      "reason": "selectedViewKeyがaggregate/camera選択状態であり、sidebar折りたたみ前提のfield中心主表示とする条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B045",
+      "baseline_start": 147,
+      "baseline_end": 147,
+      "baseline_text": [
+        "### VisionFieldCanvas.razor"
+      ],
+      "final_start": 149,
+      "final_end": 149,
+      "final_text": [
+        "### `VisionFieldCanvas.razor`"
+      ],
+      "disposition": "accepted",
+      "reason": "Canvasの実ファイル名見出しをコード記法にし、Geometry/ball/黄青robot/RenderOptionsの5入力を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B046",
+      "baseline_start": 154,
+      "baseline_end": 154,
+      "baseline_text": [
+        "- cursor 座標表示に必要な hover state と canvas size"
+      ],
+      "final_start": 156,
+      "final_end": 156,
+      "final_text": [
+        "- カーソル座標の表示に必要な、カーソルが描画領域内にあるかどうかと描画領域の大きさ"
+      ],
+      "disposition": "accepted",
+      "reason": "cursor の hover state と canvas size を、カーソルが描画領域内にあるかどうかと描画領域の大きさとして明確にした。",
+      "prior_final_text": [
+        "- カーソル座標の表示に必要な、カーソルが重なっている状態と描画領域の大きさ"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B047",
+      "baseline_start": 156,
+      "baseline_end": 156,
+      "baseline_text": [
+        "### VisionFieldLines.razor"
+      ],
+      "final_start": 158,
+      "final_end": 158,
+      "final_text": [
+        "### `VisionFieldLines.razor`"
+      ],
+      "disposition": "accepted",
+      "reason": "Linesの実ファイル名見出しとProjection/Fieldの型付き入力を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B048",
+      "baseline_start": 161,
+      "baseline_end": 161,
+      "baseline_text": [
+        "### VisionBallMarker.razor"
+      ],
+      "final_start": 163,
+      "final_end": 163,
+      "final_text": [
+        "### `VisionBallMarker.razor`"
+      ],
+      "disposition": "accepted",
+      "reason": "BallMarkerの実ファイル名見出しとProjection/Ballの型付き入力を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B049",
+      "baseline_start": 166,
+      "baseline_end": 166,
+      "baseline_text": [
+        "### VisionRobotMarker.razor"
+      ],
+      "final_start": 168,
+      "final_end": 168,
+      "final_text": [
+        "### `VisionRobotMarker.razor`"
+      ],
+      "disposition": "accepted",
+      "reason": "RobotMarkerの実ファイル名見出しとProjection/Robot/ClassName/RenderOptionsの入力を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B050",
+      "baseline_start": 173,
+      "baseline_end": 173,
+      "baseline_text": [
+        "### VisionDetailsPanel.razor"
+      ],
+      "final_start": 175,
+      "final_end": 175,
+      "final_text": [
+        "### `VisionDetailsPanel.razor`"
+      ],
+      "disposition": "accepted",
+      "reason": "DetailsPanelの実ファイル名見出しと12個の型付き入力を保持。表示名や選択通知を省略しない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B051",
+      "baseline_start": 188,
+      "baseline_end": 188,
+      "baseline_text": [
+        "## Issue #10 split / overlay source 設計"
+      ],
+      "final_start": 190,
+      "final_end": 190,
+      "final_text": [
+        "## 課題 #10 分割表示・重ね表示に使う表示元の設計"
+      ],
+      "disposition": "accepted",
+      "reason": "既存課題番号の参照を保持し、split/overlay/sourceの設計対象を分割/重ね表示の表示元として説明。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B052",
+      "baseline_start": 190,
+      "baseline_end": 190,
+      "baseline_text": [
+        "Vision 画面の split / overlay で選択できる source[^source-term] 候補は次の 4 種類に固定する。"
+      ],
+      "final_start": 192,
+      "final_end": 192,
+      "final_text": [
+        "raw vision viewer の分割表示・重ね表示で選択できる表示元[^source-term]の候補は、次の 4 種類に固定する。"
+      ],
+      "disposition": "accepted",
+      "reason": "選択肢を4種類に固定する条件を保持。以下の実UI名は翻訳しない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B053",
+      "baseline_start": 193,
+      "baseline_end": 194,
+      "baseline_text": [
+        "  - `VisionPacketStore` の aggregate 表示用 snapshot を使う",
+        "  - camera ごとの最新 detection を UI 表示用に統合した raw SSL-Vision source として扱う"
+      ],
+      "final_start": 195,
+      "final_end": 196,
+      "final_text": [
+        "  - `VisionPacketStore` の集約表示用スナップショットを使う",
+        "  - カメラごとの最新の検出情報を UI 表示用に統合した、未加工 SSL-Vision 入力の表示元として扱う"
+      ],
+      "disposition": "accepted",
+      "reason": "Raw Aggregateはcameraごとのlatest detectionをUI表示用にまとめたraw SSL-Vision source。個別camera表示との違いを保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B054",
+      "baseline_start": 196,
+      "baseline_end": 197,
+      "baseline_text": [
+        "  - `VisionPacketStore` の camera ごとの latest detection snapshot を使う",
+        "  - camera ID を選択肢の内部 key に含め、表示 label だけで source を識別しない"
+      ],
+      "final_start": 198,
+      "final_end": 199,
+      "final_text": [
+        "  - `VisionPacketStore` のカメラごとの最新検出情報のスナップショットを使う",
+        "  - カメラ ID を選択肢の内部識別子に含め、表示名だけで表示元を識別しない"
+      ],
+      "disposition": "accepted",
+      "reason": "Raw Cameraはcamera別latest snapshotを使い、内部keyにcamera IDを含め表示labelだけで識別しない条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B055",
+      "baseline_start": 199,
+      "baseline_end": 200,
+      "baseline_text": [
+        "  - ibis tracker の `TrackedSnapshotStore` から得た latest `TrackerFrame` を `TrackedVisionViewState` 相当の field 描画 DTO へ変換して使う",
+        "  - raw detection ではなく ibis tracker 出力として扱う"
+      ],
+      "final_start": 201,
+      "final_end": 202,
+      "final_text": [
+        "  - 自前トラッカーの `TrackedSnapshotStore` から得た最新の `TrackerFrame` を、`TrackedVisionViewState` 相当のフィールド描画用 DTO へ変換して使う",
+        "  - 未加工の検出情報ではなく、自前トラッカーの出力として扱う"
+      ],
+      "disposition": "accepted",
+      "reason": "Trackedは自前の最新TrackerFrameをTrackedVisionViewState相当DTOへ変換し、rawでなくtracker出力として扱う条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B056",
+      "baseline_start": 202,
+      "baseline_end": 203,
+      "baseline_text": [
+        "  - `MultiTrackerManager<TrackerPacketAdapter>`[^multi-tracker-manager] から受けた external tracker live state[^live-state] を使う",
+        "  - UI は `MultiTrackerManager` の mutable state[^mutable-state] を直接読まず、live UI[^live-ui] 用の immutable snapshot store[^immutable-snapshot-store] または composer を必ず挟む"
+      ],
+      "final_start": 204,
+      "final_end": 205,
+      "final_text": [
+        "  - `MultiTrackerManager<TrackerPacketAdapter>`[^multi-tracker-manager] から受けた外部トラッカーの実行中の状態[^live-state]を使う",
+        "  - UI は `MultiTrackerManager` の変更可能な状態[^mutable-state]を直接読まず、ライブ表示[^live-ui]用の変更不能なスナップショットの保存先[^immutable-snapshot-store]、またはスナップショットを合成する処理を必ず挟む"
+      ],
+      "disposition": "accepted",
+      "reason": "外部live stateをManagerから受け、UIがmutable stateを直接読まずimmutable storeまたはcomposerを必ず挟む条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B057",
+      "baseline_start": 205,
+      "baseline_end": 205,
+      "baseline_text": [
+        "live 比較では、厳密な同一 packet timestamp[^packet-timestamp] や全 source 共通の同一 receive callback[^receive-callback] は要求しない。raw SSL-Vision、ibis tracker、3rd party tracker は受信 stream と更新 callback が異なるため、ここを contract にすると通常表示の実装が過剰に結合する。採用方針は、1 回の `UI render tick`[^ui-render-tick] で各 source の latest immutable snapshot[^immutable-snapshot] を固定し、その composite snapshot を split / overlay の Layer A/B に渡すことである。"
+      ],
+      "final_start": 207,
+      "final_end": 207,
+      "final_text": [
+        "ライブ表示での比較では、パケット内の時刻[^packet-timestamp]の厳密な一致や、すべての表示元が同じ受信時の処理呼び出し[^receive-callback]で更新されることは要求しない。未加工の SSL-Vision 入力、自前トラッカー、外部トラッカーは、受信するデータ列と更新時の処理呼び出しが異なるため、ここを契約にすると通常表示の実装が過剰に結合する。採用方針は、1 回の `UI render tick`[^ui-render-tick] で各表示元の最新の変更不能なスナップショット[^immutable-snapshot]を固定し、まとめたスナップショットを分割表示・重ね表示の Layer A/B に渡すことである。"
+      ],
+      "disposition": "accepted",
+      "reason": "厳密同timestamp/同callbackを要求しない理由、1 UI render tickで全source最新immutable値を固定し合成してLayer A/Bへ渡す契約を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B058",
+      "baseline_start": 207,
+      "baseline_end": 207,
+      "baseline_text": [
+        "RUNTIME-HOST-006 以降の live display では、`Home.razor` は raw / tracked store を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は store を再読取せず、固定済み composite snapshot から comparison 用 snapshot と view-state を生成する。これにより Raw / Tracked / Compare は同じ render tick の snapshot から派生する。"
+      ],
+      "final_start": 209,
+      "final_end": 209,
+      "final_text": [
+        "`RUNTIME-HOST-006` 以降のライブ表示では、`Home.razor` は未加工入力や追跡結果の保存先を直接受け取らず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は保存先を再読取せず、固定してまとめたスナップショットから比較用のスナップショットと表示状態を生成する。これにより、`Raw`、`Tracked`、`Compare` の各表示は、同じ描画更新時点のスナップショットから派生する。"
+      ],
+      "disposition": "fixed",
+      "reason": "006以降はHomeがraw/tracked storeを直接injectせずProviderから固定snapshot取得、Composerは再読込なし、Raw/Tracked/Compareが同一tick派生という3境界を保持。実UI名を復元。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B059",
+      "baseline_start": 209,
+      "baseline_end": 209,
+      "baseline_text": [
+        "`UI render tick` の composite snapshot は次を保持する。"
+      ],
+      "final_start": 211,
+      "final_end": 211,
+      "final_text": [
+        "`UI render tick` でまとめるスナップショットは、次を保持する。"
+      ],
+      "disposition": "accepted",
+      "reason": "UI render tickのcomposite snapshotの項目を導く文を、1回にまとめるスナップショットとして説明。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B060",
+      "baseline_start": 211,
+      "baseline_end": 214,
+      "baseline_text": [
+        "- render tick ID[^render-tick-id] または `SampledAt`",
+        "- source key[^source-key] と display label[^display-label]",
+        "- source ごとの receive timestamp[^receive-timestamp] / frame timestamp[^frame-timestamp] / packet count など、時刻差を説明する metadata",
+        "- balls / robots / geometry reference[^geometry-reference] / missing reason を含む immutable source snapshot"
+      ],
+      "final_start": 213,
+      "final_end": 216,
+      "final_text": [
+        "- 描画更新の識別子[^render-tick-id]、または `SampledAt`",
+        "- source key[^source-key]と画面上の表示名[^display-label]",
+        "- 表示元ごとの受信時刻[^receive-timestamp]、検出情報や追跡フレームに記録された時刻[^frame-timestamp]、パケット数など、時刻差を説明する付随情報",
+        "- ボール、ロボット、フィールド形状の参照[^geometry-reference]、欠落理由を含む、変更不能な表示元のスナップショット"
+      ],
+      "disposition": "fixed",
+      "reason": "tick IDまたはSampledAt、source key/表示名、受信/frame時刻/packet件数、ball/robot/geometry参照/欠落理由という4項目を保持。frame時刻を入力観測時刻だけへ限定しない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B061",
+      "baseline_start": 216,
+      "baseline_end": 216,
+      "baseline_text": [
+        "3rd party tracker の live 接続では、`MultiTrackerManager<TrackerPacketAdapter>` から external tracker packet を受け、source identity は UUID を優先して集約する。同じ `uuid` の tracker は remote endpoint が異なっても 1 つの source として扱い、同じ uuid group 内で最新 `ReceivedAt` の snapshot を代表として描画する。balls / robots は複数 endpoint 間で union merge しない。`uuid` が空または不明な場合だけ、source name / remote endpoint fallback で識別する。`uuid` が異なる tracker は source name が同じでも別 source とし、同じ display label が複数残る場合は短い uuid または endpoint を補助表示して UI 上で区別できる label にする。ただし `TrackerState` や protobuf packet 参照を UI が直接保持しない。`ExternalTrackerSnapshotStore` が manager update event から packet / metadata を clone し、`VisionLiveDisplaySnapshotProvider` が render tick でその read-side DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn sidecar writer を Vision live store[^live-store] として使う方針は不採用とする。これは CaptureOn session 保存用の仕組みであり、CaptureOff の通常 live Vision 画面では更新 source として成立しないためである。"
+      ],
+      "final_start": 218,
+      "final_end": 218,
+      "final_text": [
+        "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元の識別と集約では UUID を優先する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID を持つ候補の中で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が `MultiTrackerManager` の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。"
+      ],
+      "disposition": "fixed",
+      "reason": "UUID優先の識別・集約、同一UUIDの最新 `ReceivedAt` を代表にすること、endpoint間でunionしないこと、UIが変更可能状態を直接読まないことを保持した。`ExternalTrackerSnapshotStore` の入力を実装どおり `MultiTrackerManager` の更新イベントと明記した。",
+      "prior_final_text": [
+        "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B062",
+      "baseline_start": 218,
+      "baseline_end": 218,
+      "baseline_text": [
+        "geometry 基準は raw geometry 優先とする。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新 `SSL_GeometryData` を overlay 全体の field 基準に使い、raw geometry がまだ無い場合のみ `Tracked` の geometry へ fallback する。`3rd party tracker` packet から field geometry を復元する方針は不採用とする。external tracker packet は比較対象の object state であり、field calibration の責任を持たせると source ごとの座標比較の意味が曖昧になる。"
+      ],
+      "final_start": 220,
+      "final_end": 220,
+      "final_text": [
+        "フィールド形状の基準は未加工入力の形状を優先する。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新の `SSL_GeometryData` を重ね表示全体のフィールド基準に使い、未加工入力の形状がまだ無い場合のみ `Tracked` の形状で代用する。`3rd party tracker` のパケットからフィールド形状を復元する方針は不採用とする。外部トラッカーのパケットは比較対象の物体の状態を表すものであり、フィールドの校正の責任を持たせると、表示元ごとの座標比較の意味が曖昧になる。"
+      ],
+      "disposition": "accepted",
+      "reason": "raw geometry優先、未取得時だけTracked fallback、外部packetからgeometry復元なしという基準と、その座標比較上の理由を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B063",
+      "baseline_start": 220,
+      "baseline_end": 220,
+      "baseline_text": [
+        "split / overlay の UI 挙動は diagnostics に寄せる。"
+      ],
+      "final_start": 222,
+      "final_end": 222,
+      "final_text": [
+        "分割表示・重ね表示の UI 挙動は、診断画面に合わせる。"
+      ],
+      "disposition": "fixed",
+      "reason": "split/overlay UIを診断画面に寄せるという原文を、合わせると明確化。次の15規則との関係を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B064",
+      "baseline_start": 222,
+      "baseline_end": 236,
+      "baseline_text": [
+        "- split mode は Layer A と Layer B を左右に並べる",
+        "- overlay mode は 1 つの field に Layer A/B を重ねる",
+        "- overlay と split を相互に共通化するのではなく、それぞれの mode に必要な画面構造は分けて保つ。そのうえで、Vision live と diagnostics の field 描画部[^field-rendering-part]は同じ責務境界に揃える",
+        "- split 用 field コンポーネント[^split-field-component]と overlay 用 field コンポーネント[^overlay-field-component]は別物として切り出す。overlay と split を 1 つのコンポーネントへ統合する意味ではない",
+        "- Vision live と diagnostics は、split では同じ split 用 field コンポーネントを使い、overlay では同じ overlay 用 field コンポーネントを使う",
+        "- field / boundary / geometry / marker の描画責務は split 用 / overlay 用の field コンポーネントへ置き、source selector、timestamp metadata、missing reason、legend、layout wrapper は Vision live と diagnostics の page / wrapper / 付加 component 側に持たせる",
+        "- overlay mode では layer ごとに独立した `VisionFieldCanvas` を重ねる方針は不採用とする。overlay 用 field コンポーネントは field / geometry を 1 回だけ描き、Layer A/B の balls / robots を layer group[^layer-group] として同じ viewport state[^viewport-state] 配下に描く",
+        "- split mode では左右 field は独立 viewport[^split-independent-viewport] として扱う。左右の pan / zoom 同期は要件にしないが、Vision live split と diagnostics split は同じ split 用 field コンポーネント、同じ marker 描画方針、同じ geometry fallback 方針を使う",
+        "- details は source ごとの summary、timestamp metadata、missing reason、raw/tracked/3rd party の違いを確認できる構成にする",
+        "- legend は diagnostics と同じく layer name、source label、visibility toggle、ready / missing state を表示する",
+        "- layer visibility は Layer A/B ごとに切り替えられる",
+        "- overlay mode では diagnostics overlay と同じく Layer A/B を別の accent color[^accent-color] で表示し、field marker と legend swatch の両方で layer を識別できるようにする",
+        "- Layer A/B が同じ source を選んだ場合は same-source[^same-source] として 1 layer 表示にまとめ、重複描画で誤差があるように見せない",
+        "- 片方の layer が missing でも、ready な layer は残して表示する",
+        "- missing layer は field 全体を空にせず、legend / details に missing reason を出す"
+      ],
+      "final_start": 224,
+      "final_end": 238,
+      "final_text": [
+        "- 分割表示では Layer A と Layer B を左右に並べる",
+        "- 重ね表示では 1 つのフィールドに Layer A/B を重ねる",
+        "- 重ね表示と分割表示を 1 つの画面構造へ無理に共通化せず、それぞれに必要な画面構造は分けて保つ。そのうえで、raw vision のライブ表示と診断画面のフィールド描画部[^field-rendering-part]は、同じ責務境界に揃える",
+        "- 分割表示用のフィールド表示コンポーネント[^split-field-component]と重ね表示用のフィールド表示コンポーネント[^overlay-field-component]は、別物として切り出す。重ね表示と分割表示を 1 つのコンポーネントへ統合する意味ではない",
+        "- raw vision のライブ表示と診断画面は、分割表示では同じ分割表示用のフィールド表示コンポーネントを使い、重ね表示では同じ重ね表示用のフィールド表示コンポーネントを使う",
+        "- フィールド、外周、フィールド形状、マーカーの描画責務は、分割表示用・重ね表示用のフィールド表示コンポーネントへ置く。表示元の選択欄、時刻に関する情報、欠落理由、凡例、レイアウトを構成する外枠は、raw vision のライブ表示と診断画面のページ、外枠、付加コンポーネント側に持たせる",
+        "- 重ね表示では、表示層ごとに独立した `VisionFieldCanvas` を重ねる方針は不採用とする。重ね表示用のフィールド表示コンポーネントはフィールドとフィールド形状を 1 回だけ描き、Layer A/B のボール・ロボットを描画グループ[^layer-group]として、同じ viewport state[^viewport-state]の下に描く",
+        "- 分割表示では、左右のフィールドの表示位置と倍率を独立させる[^split-independent-viewport]。左右の表示移動・拡大縮小の同期は要件にしないが、raw vision のライブ表示と診断画面の分割表示は、同じフィールド表示コンポーネント、マーカー描画方針、フィールド形状を代用する方針を使う",
+        "- 詳細表示は、表示元ごとの概要、時刻に関する情報、欠落理由、未加工入力・自前の追跡結果・外部の追跡結果の違いを確認できる構成にする",
+        "- 凡例には診断画面と同じく、層名、表示元名、表示・非表示の切り替え、準備済み・欠落の状態を表示する",
+        "- Layer A/B ごとに表示・非表示を切り替えられる",
+        "- 重ね表示では診断画面と同じく、Layer A/B を異なる強調色[^accent-color]で表示し、フィールド上のマーカーと凡例の色見本の両方で層を識別できるようにする",
+        "- Layer A/B が同じ表示元を選んだ場合[^same-source]は 1 層の表示にまとめ、重複描画で誤差があるように見せない",
+        "- 片方の層が欠落していても、準備済みの層は残して表示する",
+        "- 欠落した層があってもフィールド全体を空にせず、凡例と詳細表示に欠落理由を出す"
+      ],
+      "disposition": "accepted",
+      "reason": "分割表示と重ね表示は別の画面構造を保ちつつ、raw vision のライブ表示と診断画面で同じ責務境界を共有する契約を保持した。1つの画面構造へ無理に共通化する意味ではないことを明確にした。",
+      "prior_final_text": [
+        "- 分割表示では Layer A と Layer B を左右に並べる",
+        "- 重ね表示では 1 つのフィールドに Layer A/B を重ねる",
+        "- 重ね表示と分割表示を相互に共通化するのではなく、それぞれに必要な画面構造は分けて保つ。そのうえで、raw vision のライブ表示と診断画面のフィールド描画部[^field-rendering-part]は、同じ責務境界に揃える",
+        "- 分割表示用のフィールド表示コンポーネント[^split-field-component]と重ね表示用のフィールド表示コンポーネント[^overlay-field-component]は、別物として切り出す。重ね表示と分割表示を 1 つのコンポーネントへ統合する意味ではない",
+        "- raw vision のライブ表示と診断画面は、分割表示では同じ分割表示用のフィールド表示コンポーネントを使い、重ね表示では同じ重ね表示用のフィールド表示コンポーネントを使う",
+        "- フィールド、外周、フィールド形状、マーカーの描画責務は、分割表示用・重ね表示用のフィールド表示コンポーネントへ置く。表示元の選択欄、時刻に関する情報、欠落理由、凡例、レイアウトを構成する外枠は、raw vision のライブ表示と診断画面のページ、外枠、付加コンポーネント側に持たせる",
+        "- 重ね表示では、表示層ごとに独立した `VisionFieldCanvas` を重ねる方針は不採用とする。重ね表示用のフィールド表示コンポーネントはフィールドとフィールド形状を 1 回だけ描き、Layer A/B のボール・ロボットを描画グループ[^layer-group]として、同じ viewport state[^viewport-state]の下に描く",
+        "- 分割表示では、左右のフィールドの表示位置と倍率を独立させる[^split-independent-viewport]。左右の表示移動・拡大縮小の同期は要件にしないが、raw vision のライブ表示と診断画面の分割表示は、同じフィールド表示コンポーネント、マーカー描画方針、フィールド形状を代用する方針を使う",
+        "- 詳細表示は、表示元ごとの概要、時刻に関する情報、欠落理由、未加工入力・自前の追跡結果・外部の追跡結果の違いを確認できる構成にする",
+        "- 凡例には診断画面と同じく、層名、表示元名、表示・非表示の切り替え、準備済み・欠落の状態を表示する",
+        "- Layer A/B ごとに表示・非表示を切り替えられる",
+        "- 重ね表示では診断画面と同じく、Layer A/B を異なる強調色[^accent-color]で表示し、フィールド上のマーカーと凡例の色見本の両方で層を識別できるようにする",
+        "- Layer A/B が同じ表示元を選んだ場合[^same-source]は 1 層の表示にまとめ、重複描画で誤差があるように見せない",
+        "- 片方の層が欠落していても、準備済みの層は残して表示する",
+        "- 欠落した層があってもフィールド全体を空にせず、凡例と詳細表示に欠落理由を出す"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B065",
+      "baseline_start": 238,
+      "baseline_end": 238,
+      "baseline_text": [
+        "## Diagnostics time-sync 方針"
+      ],
+      "final_start": 240,
+      "final_end": 240,
+      "final_text": [
+        "## 診断再生での時刻の対応付け"
+      ],
+      "disposition": "accepted",
+      "reason": "Diagnostics time-syncを診断再生での時刻の対応付けと説明。ライブ表示の同時取得契約とは区別。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B066",
+      "baseline_start": 240,
+      "baseline_end": 240,
+      "baseline_text": [
+        "diagnostics replay / comparison は selected replay timeline tick[^selected-replay-timeline-tick] を同期基準にする。旧形式 / current limitation[^old-format-current-limitation] では、Vision/Input と ibis tracker は selected tick の render frame から得た snapshot を使い、3rd party tracker は同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] record を使う。この render snapshot[^legacy-render-snapshot-sidecar] 経路は `WorldFrameCommitted`[^world-frame-committed] に従うため tracker committed frame cadence[^tracker-committed-frame-cadence] に制限され、新規 capture[^new-capture] の目標経路としては扱わない。"
+      ],
+      "final_start": 242,
+      "final_end": 242,
+      "final_text": [
+        "診断記録の再生・比較は、selected replay timeline tick[^selected-replay-timeline-tick]を同期基準にする。旧形式の既存制限[^old-format-current-limitation]では、`Vision Input` と自前トラッカーは、選択時点の render snapshot から得たスナップショットを使い、外部トラッカーは同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] にある対応記録を使う。この render snapshot の経路[^legacy-render-snapshot-sidecar]は `WorldFrameCommitted`[^world-frame-committed] に従うため、トラッカーの追跡結果の確定周期[^tracker-committed-frame-cadence]に制限され、新規キャプチャー[^new-capture]の目標経路としては扱わない。"
+      ],
+      "disposition": "fixed",
+      "reason": "旧形式はselected tickのrender由来と同ReplayTimelineIndex対応、WorldFrameCommitted周期制限で新規目標ではないという条件を保持。Vision Input実UI名/render snapshot名/キャプチャー単位を明示。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B067",
+      "baseline_start": 242,
+      "baseline_end": 242,
+      "baseline_text": [
+        "新規 capture の diagnostics replay / comparison は diagnostics sample tick[^diagnostics-sample-tick] を保存単位にする。Diagnostics の `Vision Input` は selected tick の render frame ではなく、diagnostics sample tick に保存された latest raw snapshot[^latest-raw-snapshot] から復元する。ibis tracker と 3rd party tracker の比較対象は同じ diagnostics sample tick に保存された latest tracker snapshot[^latest-tracker-snapshot]、または同 tick 以前の `latest-before snapshot` を使う。このため、新規 capture では Vision、ibis tracker、3rd party tracker を tracker committed frame cadence ではなく diagnostics sample timeline[^diagnostics-sample-timeline] 上の比較として扱う。"
+      ],
+      "final_start": 244,
+      "final_end": 244,
+      "final_text": [
+        "新規キャプチャーの診断再生・比較は、diagnostics sample tick[^diagnostics-sample-tick]を保存単位にする。診断画面の `Vision Input` は選択時点の render snapshot ではなく、diagnostics sample tick で保存された最新の未加工入力のスナップショット[^latest-raw-snapshot]から復元する。自前トラッカーと外部トラッカーの比較対象には、同じ diagnostics sample tick で保存された最新の追跡スナップショット[^latest-tracker-snapshot]、または同時点以前の `latest-before snapshot` を使う。このため、新規キャプチャーでは raw vision、自前トラッカー、外部トラッカーを、トラッカーの追跡結果の確定周期ではなく診断データの採取時系列[^diagnostics-sample-timeline]上で比較する。"
+      ],
+      "disposition": "fixed",
+      "reason": "新規はdiagnostics sample tickで保存したraw/trackerまたは同tick以前のlatest-beforeを使用し、確定周期でなくsample timelineで比較する条件を保持。render snapshotとの違いとcapture単位を明記。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B068",
+      "baseline_start": 244,
+      "baseline_end": 244,
+      "baseline_text": [
+        "selected tick[^selected-tick] に対象 `3rd party tracker` source の alignment record が無い場合でも、表示と比較を消さない。採用方針は、同じ source の selected tick 以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を Field source と comparison に使うことである。UI / comparison は matching rule が `latest-before` であること、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を明示する。これにより、対象 source が selected tick で未更新でも、ユーザーは直前まで得られていた tracker 状態を raw / ibis tracker と比較できる。"
+      ],
+      "final_start": 246,
+      "final_end": 246,
+      "final_text": [
+        "選択時点[^selected-tick]に、対象の `3rd party tracker` の表示元に対する対応記録が無い場合でも、表示と比較を消さない。採用方針は、同じ表示元について選択時点以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を、Field source と比較に使うことである。UI と比較結果には、対応規則が `latest-before` であること、表示元のスナップショットの実際の `receivedAt`、選択時点との差、選択時点より古い状態と `latest-before snapshot` を使用していることを明示する。これにより、対象の表示元が選択時点で未更新でも、ユーザーは直前まで得られていた追跡状態を、未加工入力や自前トラッカーと比較できる。"
+      ],
+      "disposition": "accepted",
+      "reason": "選択時点に対応記録が無い場合も同じ表示元の直前値を使い、`latest-before`、実際の受信時刻、差分、選択時点より古い状態と `latest-before snapshot` 利用を明示する契約を保持した。",
+      "prior_final_text": [
+        "選択時点[^selected-tick]に、対象の `3rd party tracker` の表示元に対する対応記録が無い場合でも、表示と比較を消さない。採用方針は、同じ表示元について選択時点以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を、Field source と比較に使うことである。UI と比較結果には、対応規則が `latest-before` であること、表示元のスナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を明示する。これにより、対象の表示元が選択時点で未更新でも、ユーザーは直前まで得られていた追跡状態を、未加工入力や自前トラッカーと比較できる。"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B069",
+      "baseline_start": 246,
+      "baseline_end": 246,
+      "baseline_text": [
+        "`latest-before snapshot` を使う場合も、replay / comparison の基準 timeline は selected replay timeline tick のまま固定する。source ごとに timeline cursor[^timeline-cursor] をずらしたり、表示上の selected time を tracker source 側へスライドしたりしない。Field と comparison は「selected tick に対して、この source は直前 sample を hold している」として表示し、delta は selected tick と hold した source snapshot の差として扱う。これにより、表示が消えることを避けつつ、時間軸が source ごとにずれて異なる時刻のものを同時刻扱いで表示しているように見える状態を避ける。"
+      ],
+      "final_start": 248,
+      "final_end": 248,
+      "final_text": [
+        "`latest-before snapshot` を使う場合も、再生・比較の基準時系列は selected replay timeline tick のまま固定する。表示元ごとに再生位置[^timeline-cursor]をずらしたり、画面上の選択時刻をトラッカー側の時刻へ移動したりしない。フィールド表示と比較は「選択時点に対して、この表示元は直前の記録を保持している」として表示し、時刻差は選択時点と保持した表示元のスナップショットとの差として扱う。これにより、表示が消えることを避けつつ、時間軸が表示元ごとにずれ、異なる時刻のものを同時刻として表示しているように見える状態を避ける。"
+      ],
+      "disposition": "accepted",
+      "reason": "latest-beforeでも基準timeline/cursor/selected timeを動かさず、直前sampleを保持している表示と選択時点との差を示す条件を保持。異時刻を同時刻に見せない理由も保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B070",
+      "baseline_start": 248,
+      "baseline_end": 248,
+      "baseline_text": [
+        "selected tick 以前に同じ source の snapshot が一切無い場合だけ、Field source は `CandidateMissing`[^candidate-missing]、comparison は `NoCandidateSnapshot`[^no-candidate-snapshot] 相当の missing 表示にする。この場合も Field 全体は消さず、ready な layer は残し、legend / details に missing reason を出す。future / later snapshot[^future-later-snapshot] への fallback は行わない。未来 tick の tracker 状態を現在 tick の比較へ混ぜると、replay timeline の因果関係が崩れ、comparison delta が実際より良く見えるためである。diagnostics-line alignment[^diagnostics-line-alignment] や nearest timestamp[^nearest-timestamp] は、selected tick 以前の同一 source snapshot を探すための補助 index として使ってよいが、selected tick より後の snapshot は候補に含めない。この挙動は既存 diagnostics time-sync regression contract として維持し、RuntimeHost / DebugHost 分離 scope では新しい `RAW-VISION-*` タスクを追加しない。"
+      ],
+      "final_start": 250,
+      "final_end": 250,
+      "final_text": [
+        "選択時点以前に同じ表示元のスナップショットが一切無い場合だけ、Field source は `CandidateMissing`[^candidate-missing]、比較は `NoCandidateSnapshot`[^no-candidate-snapshot] 相当の欠落表示にする。この場合もフィールド全体は消さず、準備済みの層は残し、凡例と詳細表示に欠落理由を出す。選択時点より後のスナップショット[^future-later-snapshot]での代用は行わない。未来の追跡状態を現在時点の比較へ混ぜると、replay timeline の因果関係が崩れ、比較差分が実際より良く見えるためである。診断ログ行との対応付け[^diagnostics-line-alignment]や近傍時刻の検索[^nearest-timestamp]は、選択時点以前の同じ表示元のスナップショットを探すための補助索引として使ってよいが、選択時点より後のスナップショットは候補に含めない。この挙動は既存の診断再生での時刻対応に関する回帰検証の契約として維持し、RuntimeHost / DebugHost の分離範囲では新しい `RAW-VISION-*` 作業を追加しない。"
+      ],
+      "disposition": "accepted",
+      "reason": "選択以前の同sourceが一切ない場合だけ2missing状態、ready層保持、未来fallback禁止、補助indexでも未来除外、既存回帰契約で新RAW作業を追加しないという条件と理由を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B071",
+      "baseline_start": 250,
+      "baseline_end": 250,
+      "baseline_text": [
+        "## Diagnostics loop isolation 方針"
+      ],
+      "final_start": 252,
+      "final_end": 252,
+      "final_text": [
+        "## 診断処理の周期の分離方針"
+      ],
+      "disposition": "accepted",
+      "reason": "Diagnostics loop isolationを診断処理の周期の分離と説明する見出し。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B072",
+      "baseline_start": 252,
+      "baseline_end": 252,
+      "baseline_text": [
+        "loop isolation[^loop-isolation] の中心目的は、tracker operation loop[^tracker-operation-loop] を web server live display processing[^web-server-live-display-processing] と diagnostics logging / replay processing[^diagnostics-logging-replay-processing] の両方から隔離することである。修正は UI-only display correction[^ui-only-display-correction] ではなく、保存と replay の入力 cadence を tracker committed frame cadence から切り離す設計として扱う。"
+      ],
+      "final_start": 254,
+      "final_end": 254,
+      "final_text": [
+        "処理周期を分離する[^loop-isolation]中心目的は、トラッカーの周期処理[^tracker-operation-loop]を、Web UI を提供するサーバーのライブ表示の処理[^web-server-live-display-processing]と診断ログの保存・再生処理[^diagnostics-logging-replay-processing]の両方から隔離することである。修正は表示だけの補正[^ui-only-display-correction]ではなく、保存と再生の入力周期をトラッカーの追跡結果の確定周期から切り離す設計として扱う。"
+      ],
+      "disposition": "accepted",
+      "reason": "中心目的はtrackerをWebライブと診断保存/再生の両方から分離することであり、UIだけの補正でなく保存/再生入力周期の分離であるという対比を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B073",
+      "baseline_start": 254,
+      "baseline_end": 254,
+      "baseline_text": [
+        "3 つの loop の責務は次の通り分ける。"
+      ],
+      "final_start": 256,
+      "final_end": 256,
+      "final_text": [
+        "3 つの周期処理の責務は、次の通り分ける。"
+      ],
+      "disposition": "accepted",
+      "reason": "3つのloopを分ける数量と後続3責務を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B074",
+      "baseline_start": 256,
+      "baseline_end": 258,
+      "baseline_text": [
+        "- tracker operation loop は raw packet と profile / control input を tracker engine へ渡し、tracker state 更新、publish、latest tracker snapshot の公開までを担当する。diagnostics sidecar への frame 保存をこの loop の `WorldFrameCommitted` callback へ直接結合しない。",
+        "- server live display processing は `UI render tick` ごとに raw / tracked / 3rd party tracker の latest immutable snapshot を固定し、通常 Vision 画面の split / overlay を描画する。これは表示用 loop であり、diagnostics logging の sample cadence を決めない。",
+        "- diagnostics logging / replay processing は tracker operation loop から直接書き込まれた render frame を読むのではなく、DebugHost hosted service の独立した diagnostics sample tick で latest raw snapshot と latest tracker snapshot を固定し、`diagnostics-samples.jsonl` diagnostics sample sidecar[^diagnostics-sample-sidecar] に保存する。tick 周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、replay はこの sample timeline から `Vision Input` と `ibis tracker` の semantic summary を通常経路として復元する。"
+      ],
+      "final_start": 258,
+      "final_end": 260,
+      "final_text": [
+        "- トラッカーの周期処理は、未加工の入力パケットと設定プロファイルと制御入力を追跡エンジンへ渡し、追跡状態の更新、送信、最新の追跡スナップショットの公開までを担当する。診断用の補助ファイルへ追跡結果を保存する処理を、この周期処理の `WorldFrameCommitted` 通知処理へ直接結合しない。",
+        "- サーバーのライブ表示の処理は、`UI render tick` ごとに未加工入力、自前の追跡結果、外部トラッカーの最新の変更不能なスナップショットを固定し、通常の raw vision viewer の分割表示・重ね表示を描画する。これは表示用の周期処理であり、診断ログ用のデータの採取周期を決めない。",
+        "- 診断ログの保存・再生処理は、トラッカーの周期処理から直接書き込まれた render snapshot を読むのではなく、DebugHost のバックグラウンド処理による独立した diagnostics sample tick で、最新の未加工入力と追跡結果のスナップショットを固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] `diagnostics-samples.jsonl` に保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、通常の再生では、この採取時系列に保存した検出情報と追跡結果の概要から、`Vision Input` と `ibis tracker` の表示を復元する。"
+      ],
+      "disposition": "fixed",
+      "reason": "trackerの更新/配信、UI tickの固定/描画、独立diagnostics sampleの保存/再生という3責務を保持。render保存callbackとの非結合、100ms既定/0以下復帰、metadata2属性、Vision Input/ibis trackerの通常復元元を保持し設計名を明記。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B075",
+      "baseline_start": 260,
+      "baseline_end": 260,
+      "baseline_text": [
+        "logging 互換性はこの loop isolation の必須要件にしない。新規 capture の性能と cadence 維持を優先し、旧 render snapshot sidecar に対する高コストな互換 layer は設計しない。旧形式の render snapshot sidecar しか持たない session は、この新機能では unsupported / degraded legacy session[^degraded-legacy-session] として扱ってよい。旧形式を読む場合も、旧経路が tracker committed frame cadence に制限されることを UI / details で説明できれば足りる。"
+      ],
+      "final_start": 262,
+      "final_end": 262,
+      "final_text": [
+        "ログの互換性は、この処理周期の分離の必須要件にしない。新規キャプチャーの性能と周期維持を優先し、旧形式の render snapshot を保存した補助ファイルに対する処理負荷の大きい互換処理は設計しない。旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。旧形式を読む場合も、旧経路がトラッカーの追跡結果の確定周期に制限されることを UI と詳細表示で説明できれば足りる。"
+      ],
+      "disposition": "fixed",
+      "reason": "logging互換は必須でない、新規性能/周期優先、高コスト互換なし、旧renderのみはunsupported/degradedでよい、読む場合も周期制限説明で足りるという条件を保持。保存物とcapture単位を明記。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B076",
+      "baseline_start": 262,
+      "baseline_end": 262,
+      "baseline_text": [
+        "diagnostics sample tick の cadence は tracker committed frame cadence と同義にしない。raw SSL-Vision の latest snapshot が tracker commit より高頻度に更新される場合、new logging は raw snapshot cadence[^raw-snapshot-cadence] を失わない保存境界を持つ。tracker snapshot は sample tick 時点の latest を読むが、tracker operation 自体を sample tick から駆動しない。これにより、tracker operation、server live display、diagnostics logging / replay のいずれかの負荷や周期が、他の loop の user-visible 表示や保存 cadence を支配しない。"
+      ],
+      "final_start": 264,
+      "final_end": 264,
+      "final_text": [
+        "diagnostics sample tick の周期は、トラッカーの追跡結果の確定周期と同義にしない。未加工の SSL-Vision 入力の最新スナップショットが追跡結果の確定より高頻度に更新される場合、新しいログ保存経路は未加工入力の更新周期[^raw-snapshot-cadence]を失わない保存境界を持つ。追跡結果のスナップショットは diagnostics sample tick での最新値を読むが、トラッカーの実時間処理自体を診断データの採取処理から駆動しない。これにより、トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生のいずれかの負荷や周期が、他の処理のユーザーに見える表示や保存周期を支配しない。"
+      ],
+      "disposition": "fixed",
+      "reason": "sample周期をtracker確定周期と同義にせず、rawが速い場合の保存境界、sampleからtrackerを駆動しない、3処理の負荷/周期非支配という条件を保持。diagnostics sample tick名を復元。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B077",
+      "baseline_start": 266,
+      "baseline_end": 266,
+      "baseline_text": [
+        "root page では次を表示する。"
+      ],
+      "final_start": 268,
+      "final_end": 268,
+      "final_text": [
+        "開始画面では次を表示する。"
+      ],
+      "disposition": "accepted",
+      "reason": "root pageを開始画面とし、パス/表示対象は前段の/と整合。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B078",
+      "baseline_start": 268,
+      "baseline_end": 271,
+      "baseline_text": [
+        "- receiver status と最新 receive metadata",
+        "- field-first の SVG 表示",
+        "- raw JSON",
+        "- balls / robots / geometry calibration の詳細表示"
+      ],
+      "final_start": 270,
+      "final_end": 273,
+      "final_text": [
+        "- 受信状態と最新の受信に付随する情報",
+        "- フィールドを中心とした SVG 表示",
+        "- 受信内容の JSON",
+        "- ボール、ロボット、カメラの校正情報の詳細表示"
+      ],
+      "disposition": "accepted",
+      "reason": "受信状態と情報、field SVG、raw JSON、ball/robot/calibration詳細という4表示を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B079",
+      "baseline_start": 273,
+      "baseline_end": 273,
+      "baseline_text": [
+        "field presentation は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲する。"
+      ],
+      "final_start": 275,
+      "final_end": 275,
+      "final_text": [
+        "フィールドの見せ方は `RoboCup-SSL/ssl-vision-client` の方向性を踏襲する。"
+      ],
+      "disposition": "accepted",
+      "reason": "参照リポジトリのfield presentation方針へ従うことを保持。外部最新版を調査したとは主張しない。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B080",
+      "baseline_start": 275,
+      "baseline_end": 281,
+      "baseline_text": [
+        "- field canvas を主表示にする",
+        "- boundary-aware の field background",
+        "- wheel zoom と drag pan",
+        "- field 面積を優先するため、画面 title は省略し、source selector は field 上端から外す",
+        "- +X / +Y 方向が分かる axis overlay を field 上に固定表示する",
+        "- cursor 座標は cursor の上下で表示位置を切り替え、field 視認性を落とさない",
+        "- desktop sidebar は viewer 表示面積確保のため折りたたみ可能にする"
+      ],
+      "final_start": 277,
+      "final_end": 283,
+      "final_text": [
+        "- フィールドの描画領域を主表示にする",
+        "- フィールド背景は外周の余白を考慮する",
+        "- マウスホイールで拡大縮小し、ドラッグで表示位置を移動する",
+        "- フィールドの表示面積を優先するため、画面タイトルは省略し、表示元の選択欄はフィールド上端から外す",
+        "- +X / +Y 方向が分かる座標軸をフィールド上に固定して重ね表示する",
+        "- カーソル座標はカーソルの上下で表示位置を切り替え、フィールドの視認性を落とさない",
+        "- デスクトップ表示のサイドバーは、表示面積の確保のため折りたたみ可能にする"
+      ],
+      "disposition": "accepted",
+      "reason": "7表示方針を照合。field中心/外周/wheel-drag/title省略-selector位置/+X+Y/cursor上下/sidebar折りたたみを保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B081",
+      "baseline_start": 285,
+      "baseline_end": 298,
+      "baseline_text": [
+        "- `Home.razor` は大きな title block を持たず、status と main content を優先する",
+        "- source selector は `VisionDetailsPanel.razor` 側へ移し、field の縦方向面積を確保する",
+        "- `VisionFieldCanvas.razor` は field 本体に加えて axis overlay と cursor coordinate overlay を管理する",
+        "- cursor coordinate overlay は proto 由来の field geometry と `VisionFieldProjection` の逆写像から求める",
+        "- sidebar 折りたたみは layout レベルで扱い、viewer 専用コンポーネントへ閉じ込めない",
+        "- `Diagnostics.razor` の render snapshot 表示は、Vision Input / Tracker Output の field 表示領域と下部 detail 領域の境界をドラッグで変更できるようにする",
+        "- diagnostics の field/detail 比率は viewport 高さに依存した固定上限だけにせず、4K など高解像度環境で field を大きく広げられる上限を持つ",
+        "- detail 領域は縮小時も最低高さとスクロールを維持し、Vision Input / Tracker Output の文字列確認を壊さない",
+        "- `Diagnostics.razor` の左側 frame timeline は、右側 detail との境界をドラッグして幅を変更できるようにする",
+        "- frame timeline は右側 field/detail 表示領域を広げたい場合に小さくでき、最小幅でも frame 選択操作と省略表示を維持する",
+        "- `MainLayout.razor.css` と `NavMenu.razor.css` は raw vision / diagnostics の濃色 green UI と同じ配色・密度を使い、default Blazor template 由来の青紫 gradient や浮いた navigation 表現を残さない",
+        "- side navigation の active / hover / collapsed / mobile toggle は既存操作を維持しつつ、viewer と同じ border、background、text color の階調で表現する",
+        "- `Diagnostics.razor` の timeline scrubber には再生、停止、早送り controls を置き、選択 entry を順方向に進める",
+        "- 通常再生は log entry の timestamp 差分を使い、上限 clamp なしで実際の記録速度に合わせて進める"
+      ],
+      "final_start": 287,
+      "final_end": 300,
+      "final_text": [
+        "- `Home.razor` は大きなタイトル表示を持たず、状態と主な表示内容を優先する",
+        "- 表示元の選択欄は `VisionDetailsPanel.razor` 側へ移し、フィールドの縦方向の表示面積を確保する",
+        "- `VisionFieldCanvas.razor` はフィールド本体に加えて、座標軸とカーソル座標の重ね表示を管理する",
+        "- 重ね表示するカーソル座標は、通信形式から得たフィールド形状と `VisionFieldProjection` の逆写像から求める",
+        "- サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントへ閉じ込めない",
+        "- `Diagnostics.razor` の render snapshot の表示は、`Vision Input` と `Tracker Output` のフィールド表示領域と下部の詳細領域との境界を、ドラッグで変更できるようにする",
+        "- 診断画面のフィールドと詳細領域の比率は、表示領域の高さに依存した固定上限だけにせず、4K などの高解像度環境でフィールドを大きく広げられる上限を持つ",
+        "- 詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列の確認を壊さない",
+        "- `Diagnostics.razor` の左側の追跡フレームの時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする",
+        "- 追跡フレームの時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも追跡フレームの選択操作と省略表示を維持する",
+        "- `MainLayout.razor.css` と `NavMenu.razor.css` は、raw vision viewer や診断画面の濃い緑色の UI と同じ配色・密度を使い、Blazor の既定テンプレート由来の青紫色のグラデーションや、周囲の配色から浮いた画面遷移用の表示を残さない",
+        "- 側面の画面遷移メニューは、選択中、カーソルを重ねたとき、折りたたみ時、モバイル向け切り替え時の既存操作を維持しつつ、表示画面と同じ枠線、背景、文字色の階調で表現する",
+        "- `Diagnostics.razor` の timeline scrubber には、再生、停止、早送りの操作部を置き、選択する記録を順方向に進める",
+        "- 通常再生はログ記録の時刻差を使い、間隔を上限で制限せず、実際の記録速度に合わせて進める"
+      ],
+      "disposition": "fixed",
+      "reason": "レイアウト、フィールド/詳細領域、再生操作の契約を保持した。機械的な「画面移動」「カーソルが重なった状態」を、画面遷移メニューとカーソルを重ねたときの表示として自然な説明へ直した。",
+      "prior_final_text": [
+        "- `Home.razor` は大きなタイトル表示を持たず、状態と主な表示内容を優先する",
+        "- 表示元の選択欄は `VisionDetailsPanel.razor` 側へ移し、フィールドの縦方向の表示面積を確保する",
+        "- `VisionFieldCanvas.razor` はフィールド本体に加えて、座標軸とカーソル座標の重ね表示を管理する",
+        "- 重ね表示するカーソル座標は、通信形式から得たフィールド形状と `VisionFieldProjection` の逆写像から求める",
+        "- サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントへ閉じ込めない",
+        "- `Diagnostics.razor` の render snapshot の表示は、`Vision Input` と `Tracker Output` のフィールド表示領域と下部の詳細領域との境界を、ドラッグで変更できるようにする",
+        "- 診断画面のフィールドと詳細領域の比率は、表示領域の高さに依存した固定上限だけにせず、4K などの高解像度環境でフィールドを大きく広げられる上限を持つ",
+        "- 詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列の確認を壊さない",
+        "- `Diagnostics.razor` の左側の追跡フレームの時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする",
+        "- 追跡フレームの時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも追跡フレームの選択操作と省略表示を維持する",
+        "- `MainLayout.razor.css` と `NavMenu.razor.css` は、raw vision viewer や診断画面の濃い緑色の UI と同じ配色・密度を使い、Blazor の既定テンプレート由来の青紫色のグラデーションや、周囲から浮いた画面移動用の表示を残さない",
+        "- 側面の画面移動メニューの選択中・カーソルが重なった状態・折りたたみ・モバイル向けの切り替えは、既存操作を維持しつつ、表示画面と同じ枠線、背景、文字色の階調で表現する",
+        "- `Diagnostics.razor` の timeline scrubber には、再生、停止、早送りの操作部を置き、選択する記録を順方向に進める",
+        "- 通常再生はログ記録の時刻差を使い、間隔を上限で制限せず、実際の記録速度に合わせて進める"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B082",
+      "baseline_start": 300,
+      "baseline_end": 300,
+      "baseline_text": [
+        "- 再生/早送りは最後の entry に到達したら停止して先頭 entry に戻し、log 切替や entry 不在時には playback state を停止状態へ戻す"
+      ],
+      "final_start": 302,
+      "final_end": 302,
+      "final_text": [
+        "- 再生・早送りは最後の記録に到達したら停止して先頭へ戻し、ログの切り替え時や記録が無いときには再生状態を停止状態へ戻す"
+      ],
+      "disposition": "accepted",
+      "reason": "最後で停止し先頭へ戻る、log切替/entryなしで停止状態へ戻すという条件を保持。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B083",
+      "baseline_start": 304,
+      "baseline_end": 323,
+      "baseline_text": [
+        "- `VisionPacketStore` が detection-only packet を保持できる",
+        "- `VisionPacketStore` が geometry-only packet を保持できる",
+        "- `VisionPacketStore` が camera ごとの latest state と aggregate state を返せる",
+        "- `VisionPacketStore` が decode failure 時に error count を増やす",
+        "- `VisionReceiverService.ResolveMulticastJoinAddresses` が configured address と auto discovery を正しく処理する",
+        "- `VisionFieldProjection` が `(0, 0)` を center に写像する",
+        "- `VisionFieldProjection` が field / boundary / goal depth を含めても viewport 内に収める",
+        "- diagnostics render snapshot の field/detail 可変高さは、最小値・最大値・drag delta の clamp を単体テストで確認する",
+        "- diagnostics frame timeline の可変幅は、最小値・最大値・drag delta の clamp を単体テストで確認する",
+        "- diagnostics timeline playback は、次 index 計算、最後での停止と先頭復帰、通常再生と早送り step、timestamp 差分に基づく実速度 interval を単体テストで確認する",
+        "- Vision split / overlay contract は、source 候補、split / overlay mode、Layer A/B source selection、layer visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend / details を単体テストで先に固定する",
+        "- Vision overlay color contract は、Layer A/B の field marker と legend が diagnostics と同じ考え方の別 accent color を持ち、same-source collapse 時は 1 layer の色へまとまることを単体テストで先に固定する",
+        "- Vision / diagnostics overlay field contract は、overlay mode が layer ごとに独立した field canvas を重ねず、Vision live overlay と diagnostics overlay が同じ overlay 用 field コンポーネントの単一 viewport state 配下で Layer A/B を描くことを単体テストで先に固定する",
+        "- Vision / diagnostics split field contract は、左右 field の viewport は独立のまま、Vision live split と diagnostics split が同じ split 用 field コンポーネントと同じ marker / geometry 描画方針を使うことを単体テストで先に固定する",
+        "- Vision live comparison contract は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の latest immutable snapshot を固定し、後続 store 更新で描画中 snapshot が変化しないことを単体テストで先に固定する",
+        "- 3rd party tracker live source contract は、`MultiTrackerManager<TrackerPacketAdapter>` の mutable state を UI が直接読まず、immutable snapshot store / composer を通して source option と field DTO を作ることを単体テストで先に固定する",
+        "- diagnostics time-sync regression は、selected `ReplayTimelineIndex` に対象 3rd party source の alignment record が無い場合でも、selected replay timeline tick 自体は動かさず、同じ source の selected tick 以前の `latest-before snapshot` を Field source と comparison に使い、matching rule、source snapshot の実際の `receivedAt`、selected tick との差分 delta、stale / latest-before 状態を表示することを単体テストで先に固定する",
+        "- diagnostics missing regression は、selected tick 以前に同じ source の snapshot が一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、future / later snapshot へ fallback せず、ready layer は残ることを単体テストで先に固定する",
+        "- RUNTIME-HOST-002 の TDD contract は、RuntimeHost / DebugHost の project dependency boundary と DebugHost read-side responsibility を固定する",
+        "- RUNTIME-HOST-003 の TDD contract は、diagnostics sample boundary と legacy degraded contract を固定する。diagnostics sample tick が tracker committed frame cadence に依存せず latest raw snapshot と latest tracker snapshot を保存すること、Diagnostics `Vision Input` が render snapshot sidecar ではなく diagnostics sample sidecar から復元されること、DebugHost の diagnostics logging / replay processing が RuntimeHost の tracker operation loop や server live display processing の `UI render tick` snapshot contract を壊さないこと、旧 render snapshot sidecar だけを持つ session は unsupported / degraded legacy session として扱われ高コストな互換保証を持たないことを単体テストで先に固定する"
+      ],
+      "final_start": 306,
+      "final_end": 325,
+      "final_text": [
+        "- `VisionPacketStore` が検出情報のみを含むパケットを保持できる",
+        "- `VisionPacketStore` がフィールド形状のみを含むパケットを保持できる",
+        "- `VisionPacketStore` がカメラごとの最新状態と集約した状態を返せる",
+        "- `VisionPacketStore` がデコード失敗時にエラー数を増やす",
+        "- `VisionReceiverService.ResolveMulticastJoinAddresses` が明示指定した通信アドレスと自動探索を正しく処理する",
+        "- `VisionFieldProjection` が `(0, 0)` を中央に写像する",
+        "- `VisionFieldProjection` がフィールド、外周、ゴールの奥行きを含めても表示領域内に収める",
+        "- 診断画面の render snapshot のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する",
+        "- 診断画面の追跡フレームの時系列一覧の可変幅は、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する",
+        "- 診断画面の時系列再生は、次の位置の計算、最後での停止と先頭復帰、通常再生と早送りで進める幅、時刻差に基づく実速度の間隔を単体テストで確認する",
+        "- raw vision viewer の分割表示・重ね表示の契約は、表示元候補、表示方式、Layer A/B の表示元選択、層の表示・非表示、同じ表示元を 1 層へまとめる処理、欠落した層があっても準備済みの層を残す挙動、診断画面に合わせた凡例と詳細表示を単体テストで先に固定する",
+        "- raw vision viewer の重ね表示の色に関する契約は、Layer A/B のフィールド上のマーカーと凡例が診断画面と同じ考え方の異なる強調色を持ち、同じ表示元をまとめる場合は 1 層の色になることを単体テストで先に固定する",
+        "- raw vision viewer と診断画面の重ね表示の契約は、表示層ごとに独立したフィールド描画領域を重ねず、両画面が同じ重ね表示用のフィールド表示コンポーネントを使い、単一の viewport state の下で Layer A/B を描くことを単体テストで先に固定する",
+        "- raw vision viewer と診断画面の分割表示の契約は、左右フィールドの表示位置・倍率は独立のまま、両画面が同じ分割表示用のフィールド表示コンポーネントと、同じマーカー・フィールド形状の描画方針を使うことを単体テストで先に固定する",
+        "- raw vision viewer のライブ表示での比較の契約は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の最新の変更不能なスナップショットを固定し、後続の保存状態の更新で描画中のスナップショットが変化しないことを単体テストで先に固定する",
+        "- 外部トラッカーのライブ表示の表示元に関する契約は、UI が `MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を直接読まず、変更不能なスナップショットの保存先または合成処理を通して、表示元の選択肢とフィールド用 DTO を作ることを単体テストで先に固定する",
+        "- 診断再生での時刻の対応付けの回帰検証では、選択した `ReplayTimelineIndex` に対象の外部表示元の対応記録が無い場合でも、selected replay timeline tick 自体は動かさない。同じ表示元の選択時点以前の `latest-before snapshot` を Field source と比較に使い、対応規則、スナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を表示することを単体テストで先に固定する",
+        "- 診断画面の欠落表示の回帰検証では、選択時点以前に同じ表示元のスナップショットが一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、後続のスナップショットで代用せず、準備済みの層は残ることを単体テストで先に固定する",
+        "- `RUNTIME-HOST-002` の TDD 契約は、RuntimeHost / DebugHost のプロジェクト依存境界と、DebugHost が読み取り側を担当する責務を固定する",
+        "- `RUNTIME-HOST-003` の TDD 契約は、診断データの採取境界と旧形式の機能制限に関する契約を固定する。diagnostics sample tick がトラッカーの追跡結果の確定周期に依存せず、最新の未加工入力と追跡結果のスナップショットを保存することを確認する。また、診断画面の `Vision Input` が旧形式の render snapshot を保存した補助ファイルではなく diagnostics sample sidecar から復元されること、DebugHost の診断ログの保存・再生処理が RuntimeHost のトラッカーの周期処理やサーバーのライブ表示の処理の `UI render tick` におけるスナップショット契約を壊さないことを確認する。旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換保証を持たないことも単体テストで先に固定する"
+      ],
+      "disposition": "fixed",
+      "reason": "20テスト項目を行ごとに照合。store/受信/投影/可変高さ幅/再生/split-overlay/色/共通部品/tick固定/外部読取/時刻対応/missing/依存境界/sample旧形式の全範囲を保持。明記された単体テストを復元し、render snapshotとframe単位を明確化。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B084",
+      "baseline_start": 327,
+      "baseline_end": 329,
+      "baseline_text": [
+        "- raw vision information は `vision/ssl_vision_wrapper.proto` の `SSL_WrapperPacket` を指す",
+        "- default の SSL-Vision multicast endpoint は一般には `224.5.23.2:10006` だが、runtime 設定で変更できる",
+        "- 既存の unrelated worktree change は保護する"
+      ],
+      "final_start": 329,
+      "final_end": 331,
+      "final_text": [
+        "- raw vision の情報は `vision/ssl_vision_wrapper.proto` の `SSL_WrapperPacket` を指す",
+        "- SSL-Vision の既定のマルチキャスト受信先は一般には `224.5.23.2:10006` だが、実行時の設定で変更できる",
+        "- 無関係な作業ディレクトリの変更は保護する"
+      ],
+      "disposition": "fixed",
+      "reason": "raw visionの型、既定224.5.23.2:10006は実行設定で変更可能、無関係worktree変更保護という3前提を保持。変更にある変更という重複表現を直す。",
+      "prior_final_text": null,
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D13-B085",
+      "baseline_start": 331,
+      "baseline_end": 392,
+      "baseline_text": [
+        "[^source-term]: source: 画面に描画する balls / robots / geometry の由来を表す設計上の概念。Vision split / overlay では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。",
+        "[^raw-aggregate]: Raw Aggregate: raw SSL-Vision の camera ごとの latest detection を UI 表示用に統合した source。複数 camera の balls / robots をまとめて Vision 画面で見るための候補で、camera 単体ではなく集約表示を選ぶときに使う。",
+        "[^raw-camera]: Raw Camera: 特定 camera ID の raw SSL-Vision latest detection を表示する source。camera ごとの見え方や検出差を確認するための候補で、選択肢の内部 key には camera ID を含める。",
+        "[^tracked-source]: Tracked: ibis tracker が生成した `TrackerFrame` を Vision 表示用 DTO に変換した source。raw detection ではなく ibis tracker 出力を Layer A/B や overlay 比較へ出すために使う。",
+        "[^third-party-tracker]: 3rd party tracker: ibis tracker 以外の外部 tracker から受けた tracker packet source。外部 tracker の出力を raw SSL-Vision や ibis tracker と比較するための候補。",
+        "[^live-state]: live state: Vision split / overlay の `3rd party tracker` で、実行中に外部 tracker から最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、snapshot 化された表示用データを読む。",
+        "[^mutable-state]: mutable state: `MultiTrackerManager` 内で後から内容が変わる状態オブジェクト。Vision 画面の split / overlay では、描画中に値が変わることを避けるため、この状態を直接読まず snapshot 化してから比較に使う。",
+        "[^live-ui]: live UI: CaptureOn の保存 replay ではなく、CaptureOff の通常 Vision 画面で現在受信している source を比較する画面。raw SSL-Vision、ibis tracker、3rd party tracker の現在値を split / overlay で見比べる。",
+        "[^immutable-snapshot-store]: immutable snapshot store: Vision 画面の通常表示で、Layer A/B に渡す前に描画中に変わらない表示用データを保持する境界。外部 tracker の更新と field 描画のタイミングを切り離すために使う。",
+        "[^packet-timestamp]: packet timestamp: packet に入っている時刻。Vision split / overlay の通常表示では、raw SSL-Vision、ibis tracker、3rd party tracker の packet timestamp が厳密に同一であることは比較条件にしない。",
+        "[^receive-callback]: receive callback: packet 到着時の受信処理呼び出し。通常表示では、すべての source が同じ receive callback で更新されたことを Layer A/B の比較条件にしない。",
+        "[^ui-render-tick]: UI render tick: Blazor UI が 1 回の表示更新を行う単位。この tick 内で各 source の latest snapshot を固定し、split / overlay へ渡す。",
+        "[^immutable-snapshot]: immutable snapshot: 描画中に内容が変わらないよう clone / DTO 化された読み取り専用 snapshot。後続の store 更新で描画中 snapshot が変化しないことを保証するために使う。",
+        "[^render-tick-id]: render tick ID: `UI render tick` ごとの表示更新単位を識別する ID。Layer A/B が同じ表示更新で固定された snapshot を見ていることを説明するために使う。",
+        "[^source-key]: source key: Vision 画面の source を識別する内部 key。`Raw Camera` では camera ID を含め、display label だけで source を取り違えないようにする。",
+        "[^display-label]: display label: UI に出す表示名。source key と違い内部識別には使わず、details や選択肢でユーザーに source を読ませるために使う。",
+        "[^receive-timestamp]: receive timestamp: packet を受け取った時刻。details で source 間の時刻差を確認し、`latest-before snapshot` が selected tick からどれだけ古いかを説明するために使う。",
+        "[^frame-timestamp]: frame timestamp: detection frame や tracker frame 側の時刻。receive timestamp と併せて、source 同士の比較がどの時刻情報に基づくかを details で説明する。",
+        "[^geometry-reference]: geometry reference: field 描画に使う geometry 参照。overlay では raw geometry を優先し、無い場合だけ `Tracked` の geometry へ fallback するため、source 同士の座標比較の基準を示す。",
+        "[^source-label]: source label: legend や details に出す source 名。ユーザーが Layer A/B でどの raw / tracked / 3rd party tracker を選んでいるか確認するために使う。",
+        "[^live-store]: live store: 通常 Vision 画面の現在表示を更新するための store。CaptureOn session 保存用の `TrackerPacketSnapshotLogWriter` や sidecar writer はこの役割に使わない。",
+        "[^accent-color]: accent color: Layer A/B を見分けるために marker の stroke や legend swatch に使う強調色。Issue #10 の Vision overlay では diagnostics overlay と同じ考え方で、重なった layer を色で判別できるようにする。",
+        "[^field-rendering-part]: field 描画部: field の背景、boundary、geometry line、ball marker、robot marker を SVG に描く部品境界。source 選択や詳細 metadata 表示ではなく、field 上に何をどう描くかを担当する部分を指す。",
+        "[^split-field-component]: split 用 field コンポーネント: split mode の左右それぞれの field を描くコンポーネント。左右の viewport は独立させるが、Vision live と diagnostics は同じコンポーネント境界を使う。",
+        "[^overlay-field-component]: overlay 用 field コンポーネント: overlay mode で 1 つの field 上に Layer A/B を重ねて描くコンポーネント。field と geometry を layer ごとに描き直さず、object marker だけを Layer A/B の group として重ねる。",
+        "[^overlay-field-rendering]: overlay field 描画部: overlay 用 field コンポーネントと同じ責務範囲を指す。field と geometry を layer ごとに描き直さず、object marker だけを Layer A/B の group として重ねる。",
+        "[^layer-group]: layer group: 同じ field 上で Layer A または Layer B に属する balls / robots をまとめる SVG group。group ごとに visibility や accent color を持たせるが、pan / zoom の基準は overlay field 描画部のものを共有する。",
+        "[^viewport-state]: viewport state: field 表示の zoom、pan、drag 中の移動量など、画面上で field をどの位置と倍率で見るかを表す状態。overlay mode では layer ごとに別々に持たず、1 つの viewport state を共有する。",
+        "[^split-independent-viewport]: split の独立 viewport: split mode の左右 field が、それぞれ別の表示位置と倍率を持つこと。左右は比較対象を並べる表示なので、片方を drag してももう片方を自動追従させる要件ではない。",
+        "[^same-source]: same-source: Layer A/B が同じ source を選んだ状態。Vision overlay では重複描画で誤差があるように見せないため、1 layer 表示にまとめる。",
+        "[^multi-tracker-manager]: MultiTrackerManager / TrackerPacketAdapter: `MultiTrackerManager` は `TrackerConnectionLib` の tracker state 管理コンポーネントで、own / external / unknown tracker の latest state を保持する。`TrackerPacketAdapter` は 3rd party tracker packet を `MultiTrackerManager` で扱うための adapter。",
+        "[^selected-replay-timeline-tick]: selected replay timeline tick: diagnostics replay でユーザーが現在選択している再生タイムライン上の基準 tick。Vision/Input、ibis tracker、3rd party tracker を比較するとき、この tick は source ごとへ移動させない。",
+        "[^replay-timeline-index]: ReplayTimelineIndex: diagnostics replay の selected timeline tick を識別する index。`saved-session-alignment` record と結び付けて、どの tick の比較かを特定する。",
+        "[^saved-session-alignment]: saved-session-alignment: CaptureOn session に保存された、replay timeline tick と tracker source snapshot の対応 record 群。diagnostics replay で 3rd party tracker の snapshot を同じ selected replay timeline tick に合わせるために使う。",
+        "[^alignment-sidecar]: alignment sidecar: CaptureOn session の主ログとは別に保存される対応付け用の補助ファイル。diagnostics replay で、選択中の replay timeline tick と tracker source snapshot の関係を後から復元するために使う。",
+        "[^alignment-record]: alignment record: alignment sidecar 内の 1 件の対応付け。diagnostics replay で特定の replay timeline tick を選んだとき、どの tracker source snapshot を比較に使うかを示す。",
+        "[^selected-tick]: selected tick: selected replay timeline tick の短縮表現。本文で「選択 tick」と書く場合も同じ意味を指す。",
+        "[^latest-before-snapshot]: latest-before snapshot: selected replay timeline tick に対象 source の alignment record が無い場合に使う、同じ source で selected tick 以前に存在する最新 snapshot。future / later snapshot は含めない。timeline cursor は selected tick のまま固定し、この snapshot は直前 sample の hold として扱う。",
+        "[^timeline-cursor]: timeline cursor: diagnostics replay 画面で現在選ばれている再生タイムライン上の位置。`latest-before snapshot` を使う場合でも、timeline cursor は selected tick のまま動かさない。",
+        "[^candidate-missing]: CandidateMissing: Field source に選択 source の候補 snapshot が無いことを示す missing 状態。Field 全体は消さず、ready な layer は残し、legend / details に missing reason を出す。",
+        "[^no-candidate-snapshot]: NoCandidateSnapshot: comparison に選択 source の候補 snapshot が無いことを示す missing 状態。比較対象が無い理由を UI に出すための状態であり、future / later snapshot を代わりに使う合図ではない。",
+        "[^future-later-snapshot]: future / later snapshot: selected replay timeline tick より後に存在する snapshot。Issue #10 の diagnostics では、未来側の tracker 状態を現在 tick の比較に混ぜないため、Field source や comparison の代替候補にしない。",
+        "[^diagnostics-line-alignment]: diagnostics-line alignment: diagnostics のログ行と tracker source snapshot の対応付け。selected tick 以前の同じ source の snapshot を探す補助情報としてだけ使い、selected tick より後の snapshot を候補にするためには使わない。",
+        "[^nearest-timestamp]: nearest timestamp: selected tick に近い時刻を探す検索方法。Issue #10 では近さだけで future / later snapshot を選ばず、同じ source の selected tick 以前の snapshot だけを候補にする。",
+        "[^old-format-current-limitation]: 旧形式 / current limitation: 既存の diagnostics capture が render frame 単位の sidecar に依存している状態。新規 capture の target ではなく、tracker committed frame cadence に制限される既存制約として扱う。",
+        "[^legacy-render-snapshot-sidecar]: render snapshot / legacy render snapshot sidecar: 既存 `.render-snapshots.jsonl.gz` のように tracker render frame 単位で保存された sidecar。loop isolation 後の新規 capture では主要な `Vision Input` 復元元にしない。",
+        "[^world-frame-committed]: WorldFrameCommitted: ibis tracker が world frame を commit したタイミングを表す dispatch result。既存 render snapshot 保存はこの callback に結合しており、raw Vision の保存 cadence としては遅くなり得る。",
+        "[^tracker-committed-frame-cadence]: tracker committed frame cadence: ibis tracker が `WorldFrameCommitted` を出し、`TrackerFrame` を publish する周期。raw Vision Input の新規保存周期として扱わない。",
+        "[^new-capture]: new capture: loop isolation 設計後に作る CaptureOn session。旧 render snapshot sidecar 互換より、latest raw / latest tracker snapshot を高頻度に保存できることを優先する。",
+        "[^diagnostics-sample-tick]: diagnostics sample tick: diagnostics logging / replay processing が latest raw snapshot と latest tracker snapshot を同じ保存単位として固定する tick。tracker committed frame と同義にしない。",
+        "[^latest-raw-snapshot]: latest raw snapshot: `VisionPacketStore` 相当の raw SSL-Vision latest detection / geometry を snapshot 化したもの。Diagnostics の `Vision Input` は新規 capture ではこの snapshot 系から復元する。",
+        "[^latest-tracker-snapshot]: latest tracker snapshot: ibis tracker または 3rd party tracker の最新出力を diagnostics sample に含めるために snapshot 化したもの。",
+        "[^diagnostics-sample-timeline]: diagnostics sample timeline: diagnostics sample tick を時系列に並べた replay 用 timeline。selected replay timeline tick の考え方を維持しつつ、render frame ではなく diagnostics sample を基準にする。",
+        "[^loop-isolation]: loop isolation: tracker operation、server live display、diagnostics logging / replay の周期と責務を分け、片方の cadence や負荷が別 loop の表示や保存を支配しないようにする方針。",
+        "[^tracker-operation-loop]: tracker operation loop: raw packet や profile / control input を tracker engine に渡し、tracker state の更新、publish、latest tracker snapshot の公開までを担当する処理 loop。",
+        "[^web-server-live-display-processing]: web server live display processing: 通常 Vision 画面が `UI render tick` ごとに latest immutable snapshot を固定して描画する処理。diagnostics logging / replay とは別扱いにする。",
+        "[^diagnostics-logging-replay-processing]: diagnostics logging / replay processing: CaptureOn 中に latest raw snapshot と latest tracker snapshot を独立した sample として保存し、Diagnostics 画面でその sample timeline を replay する処理。",
+        "[^ui-only-display-correction]: UI-only display correction: 保存済み data の cadence は変えず、描画時の補正だけで遅延を隠そうとする修正方針。RAW-VISION-017 の loop isolation では不採用とする。",
+        "[^diagnostics-sample-sidecar]: diagnostics sample sidecar: loop isolation 後に diagnostics logging / replay processing が保存する latest raw / latest tracker snapshot の sidecar。RUNTIME-HOST-007 では `diagnostics-samples.jsonl` として固定し、record は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本 field とする。",
+        "[^degraded-legacy-session]: unsupported / degraded legacy session: 旧 render snapshot sidecar しか持たない capture session。新しい diagnostics sample path の性能や cadence 保証を受けず、表示できる範囲だけを旧形式として扱う。",
+        "[^raw-snapshot-cadence]: raw snapshot cadence: SSL-Vision packet / raw latest snapshot が更新される周期。Diagnostics の `Vision Input` 表示は新規 capture でこの cadence を失わない保存経路を持つ。",
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、raw vision viewer、diagnostics、capture / replay、比較表示を担当する。"
+      ],
+      "final_start": 333,
+      "final_end": 394,
+      "final_text": [
+        "[^source-term]: 表示元: 画面に描画するボール、ロボット、フィールド形状の由来。raw vision viewer の分割表示・重ね表示では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。",
+        "[^raw-aggregate]: Raw Aggregate: 未加工 SSL-Vision 入力のカメラごとの最新検出情報を UI 表示用に統合した表示元。複数カメラのボール・ロボットをまとめて raw vision viewer で見るための候補で、カメラ単体ではなく集約表示を選ぶときに使う。",
+        "[^raw-camera]: Raw Camera: 特定のカメラ ID の未加工 SSL-Vision 入力の最新検出情報を表示する表示元。カメラごとの見え方や検出差を確認するための候補で、選択肢の内部識別子にはカメラ ID を含める。",
+        "[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` をフィールド描画用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。",
+        "[^third-party-tracker]: 3rd party tracker: 自前トラッカー以外の外部トラッカーから受けたパケットの表示元。外部トラッカーの出力を未加工の SSL-Vision 入力や自前トラッカーと比較するための候補。",
+        "[^live-state]: 実行中の状態: raw vision viewer の分割表示・重ね表示の `3rd party tracker` で、実行中に外部トラッカーから最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、スナップショット化された表示用データを読む。",
+        "[^mutable-state]: 変更可能な状態: `MultiTrackerManager` 内で後から内容が変わる状態オブジェクト。raw vision viewer の分割表示・重ね表示では、描画中に値が変わることを避けるため、この状態を直接読まず、スナップショット化してから比較に使う。",
+        "[^live-ui]: ライブ表示: CaptureOn の保存記録の再生ではなく、CaptureOff の通常の raw vision viewer で現在受信している表示元を比較する画面。未加工の SSL-Vision 入力、自前トラッカー、外部トラッカーの現在値を分割表示・重ね表示で見比べる。",
+        "[^immutable-snapshot-store]: 変更不能なスナップショットの保存先: raw vision viewer の通常表示で、Layer A/B に渡す前に、描画中に変わらない表示用データを保持する境界。外部トラッカーの更新とフィールド描画の時点を切り離すために使う。",
+        "[^packet-timestamp]: パケット内の時刻: パケットに入っている時刻。raw vision viewer の分割表示・重ね表示の通常表示では、未加工の SSL-Vision 入力、自前トラッカー、外部トラッカーのパケット内の時刻が厳密に同一であることは比較条件にしない。",
+        "[^receive-callback]: 受信時の処理呼び出し: パケット到着時に呼び出される受信処理。通常表示では、すべての表示元が同じ受信時の処理呼び出しで更新されたことを Layer A/B の比較条件にしない。",
+        "[^ui-render-tick]: UI render tick: Blazor UI が 1 回の表示更新を行う単位。この更新内で各表示元の最新スナップショットを固定し、分割表示・重ね表示へ渡す。",
+        "[^immutable-snapshot]: 変更不能なスナップショット: 複製や DTO 化により、描画中に内容が変わらないようにした読み取り専用のスナップショット。後続の保存状態の更新で、描画中のスナップショットが変化しないことを保証するために使う。",
+        "[^render-tick-id]: 描画更新の識別子: `UI render tick` ごとの表示更新単位を識別する ID。Layer A/B が同じ表示更新で固定されたスナップショットを見ていることを説明するために使う。",
+        "[^source-key]: source key: raw vision viewer の表示元を識別する内部キー。`Raw Camera` ではカメラ ID を含め、画面上の表示名だけで表示元を取り違えないようにする。",
+        "[^display-label]: 画面上の表示名: UI に出す名前。source key とは違い、内部識別には使わず、詳細表示や選択肢でユーザーに表示元を示すために使う。",
+        "[^receive-timestamp]: 受信時刻: パケットを受け取った時刻。詳細表示で表示元間の時刻差を確認し、`latest-before snapshot` が選択時点からどれだけ古いかを説明するために使う。",
+        "[^frame-timestamp]: 検出情報や追跡フレームの時刻: 検出情報や追跡フレームに記録された時刻。受信時刻と併せて、表示元同士の比較がどの時刻情報に基づくかを詳細表示で説明する。",
+        "[^geometry-reference]: フィールド形状の参照: フィールド描画に使う形状情報の参照。重ね表示では未加工入力のフィールド形状を優先し、無い場合だけ `Tracked` の形状で代用するため、表示元同士の座標比較の基準を示す。",
+        "[^source-label]: 表示元名: 凡例や詳細表示に出す名前。ユーザーが Layer A/B で、どの未加工入力、自前の追跡結果、外部トラッカーを選んでいるか確認するために使う。",
+        "[^live-store]: ライブ表示で使う状態保存先: 通常の raw vision viewer の現在表示を更新するための保存先。CaptureOn の記録単位を保存する `TrackerPacketSnapshotLogWriter` や補助ファイルの書き込み処理は、この役割に使わない。",
+        "[^accent-color]: 強調色: Layer A/B を見分けるために、マーカーの線や凡例の色見本に使う色。課題 #10 の raw vision viewer の重ね表示では、診断画面の重ね表示と同じ考え方で、重なった層を色で判別できるようにする。",
+        "[^field-rendering-part]: フィールド描画部: フィールドの背景、外周、フィールドの線、ボールとロボットのマーカーを SVG に描く部品の境界。表示元の選択や付随情報の詳細表示ではなく、フィールド上に何をどう描くかを担当する部分を指す。",
+        "[^split-field-component]: 分割表示用のフィールド表示コンポーネント: 分割表示の左右それぞれのフィールドを描くコンポーネント。左右の表示位置と倍率は独立させるが、raw vision のライブ表示と診断画面は同じコンポーネント境界を使う。",
+        "[^overlay-field-component]: 重ね表示用のフィールド表示コンポーネント: 1 つのフィールド上に Layer A/B を重ねて描くコンポーネント。フィールドとフィールド形状を層ごとに描き直さず、物体のマーカーだけを Layer A/B の描画グループとして重ねる。",
+        "[^overlay-field-rendering]: 重ね表示のフィールド描画部: 重ね表示用のフィールド表示コンポーネントと同じ責務範囲を指す。フィールドとフィールド形状を層ごとに描き直さず、物体のマーカーだけを Layer A/B の描画グループとして重ねる。",
+        "[^layer-group]: 描画グループ: 同じフィールド上で Layer A または Layer B に属するボール・ロボットをまとめる SVG の描画要素。各描画要素に表示・非表示や強調色を持たせるが、表示位置の移動・拡大縮小の基準は、重ね表示のフィールド描画部のものを共有する。",
+        "[^viewport-state]: viewport state: フィールドの拡大縮小、表示位置の移動、ドラッグ中の移動量など、画面上でフィールドをどの位置と倍率で見るかを表す状態。重ね表示では層ごとに別々に持たず、1 つの状態を共有する。",
+        "[^split-independent-viewport]: 分割表示の独立した表示位置・倍率: 左右のフィールドが、それぞれ別の表示位置と倍率を持つこと。左右は比較対象を並べる表示なので、片方をドラッグしても、もう片方を自動追従させる要件ではない。",
+        "[^same-source]: 同じ表示元を選んだ状態: Layer A/B が同じ表示元を選んだ状態。raw vision viewer の重ね表示では、重複描画で誤差があるように見せないため、1 層の表示にまとめる。",
+        "[^multi-tracker-manager]: `MultiTrackerManager` / `TrackerPacketAdapter`: `MultiTrackerManager` は `TrackerConnectionLib` の追跡状態を管理するコンポーネントで、自前・外部・不明のトラッカーの最新状態を保持する。`TrackerPacketAdapter` は、外部トラッカーのパケットを `MultiTrackerManager` で扱うための変換用部品。",
+        "[^selected-replay-timeline-tick]: selected replay timeline tick: 診断再生でユーザーが現在選択している、replay timeline 上の基準時点。raw vision、自前トラッカー、外部トラッカーを比較するとき、この時点は表示元ごとに移動させない。",
+        "[^replay-timeline-index]: ReplayTimelineIndex: 診断再生の選択時点を識別する位置番号。`saved-session-alignment` の対応記録と結び付けて、どの時点の比較かを特定する。",
+        "[^saved-session-alignment]: saved-session-alignment: CaptureOn の記録単位に保存された、replay timeline 上の時点と tracker source snapshot の対応記録群。診断再生で外部トラッカーのスナップショットを、同じ選択時点に合わせるために使う。",
+        "[^alignment-sidecar]: alignment sidecar: CaptureOn の記録単位の主ログとは別に保存されるファイル。診断再生で、選択中の replay timeline tick と tracker source snapshot の関係を後から復元するために使う。",
+        "[^alignment-record]: 対応記録: alignment sidecar 内の 1 件の対応付け。診断再生で特定の時点を選んだとき、どの tracker source snapshot を比較に使うかを示す。",
+        "[^selected-tick]: 選択時点: selected replay timeline tick の短縮表現。本文で「選択時点」と書く場合も同じ意味を指す。",
+        "[^latest-before-snapshot]: latest-before snapshot: selected replay timeline tick に対象表示元の対応記録が無い場合に使う、同じ表示元で選択時点以前に存在する最新スナップショット。選択時点より後のものは含めない。再生位置は選択時点のまま固定し、このスナップショットは直前の記録を保持したものとして扱う。",
+        "[^timeline-cursor]: 再生位置: 診断再生画面で現在選ばれている replay timeline 上の位置。`latest-before snapshot` を使う場合でも、再生位置は選択時点のまま動かさない。",
+        "[^candidate-missing]: CandidateMissing: Field source として選択した表示元の候補スナップショットが無いことを示す欠落状態。フィールド全体は消さず、準備済みの層は残し、凡例と詳細表示に欠落理由を出す。",
+        "[^no-candidate-snapshot]: NoCandidateSnapshot: 比較に選択した表示元の候補スナップショットが無いことを示す欠落状態。比較対象が無い理由を UI に出すための状態であり、選択時点より後のスナップショットを代わりに使う合図ではない。",
+        "[^future-later-snapshot]: 選択時点より後のスナップショット: selected replay timeline tick より後に存在するスナップショット。課題 #10 の診断画面では、未来の追跡状態を現在時点の比較に混ぜないため、Field source や比較の代替候補にしない。",
+        "[^diagnostics-line-alignment]: 診断ログ行との対応付け: 診断ログ行と tracker source snapshot の対応付け。選択時点以前の同じ表示元のスナップショットを探す補助情報としてだけ使い、選択時点より後のスナップショットを候補にするためには使わない。",
+        "[^nearest-timestamp]: 近傍時刻の検索: 選択時点に近い時刻を探す検索方法。課題 #10 では、近さだけで選択時点より後のスナップショットを選ばず、同じ表示元の選択時点以前のスナップショットだけを候補にする。",
+        "[^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、render snapshot ごとの補助ファイルに依存している状態。新規キャプチャーの目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。",
+        "[^legacy-render-snapshot-sidecar]: 旧形式の render snapshot の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの render snapshot ごとに保存した補助ファイル。処理周期の分離後の新規キャプチャーでは、主要な `Vision Input` の復元元にしない。",
+        "[^world-frame-committed]: WorldFrameCommitted: 自前トラッカーがフィールド全体の追跡結果を確定した時点を表す処理結果。既存の描画記録の保存はこの通知処理に結合しており、raw vision の保存周期としては遅くなり得る。",
+        "[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を出力する周期。raw vision の新規保存周期として扱わない。",
+        "[^new-capture]: 新規キャプチャー: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧形式の render snapshot の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。",
+        "[^diagnostics-sample-tick]: diagnostics sample tick: 診断ログの保存・再生処理が、最新の未加工入力と追跡結果のスナップショットを同じ保存単位として固定する時点。トラッカーの追跡結果の確定と同義にしない。",
+        "[^latest-raw-snapshot]: 最新の未加工入力のスナップショット: `VisionPacketStore` 相当の未加工 SSL-Vision 入力の最新検出情報とフィールド形状をスナップショット化したもの。診断画面の `Vision Input` は、新規記録ではこのスナップショットから復元する。",
+        "[^latest-tracker-snapshot]: 最新の追跡スナップショット: 自前トラッカーまたは外部トラッカーの最新出力を、診断の採取記録に含めるためにスナップショット化したもの。",
+        "[^diagnostics-sample-timeline]: 診断データの採取時系列: diagnostics sample tick を時系列に並べた再生用の時系列。selected replay timeline tick の考え方を維持しつつ、render snapshot ではなく診断データの採取記録を基準にする。",
+        "[^loop-isolation]: 処理周期の分離: トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生の周期と責務を分け、片方の周期や負荷が別の処理の表示や保存を支配しないようにする方針。",
+        "[^tracker-operation-loop]: トラッカーの周期処理: 未加工の入力パケットや設定プロファイルと制御入力を追跡エンジンに渡し、追跡状態の更新、送信、最新の追跡スナップショットの公開までを担当する周期処理。",
+        "[^web-server-live-display-processing]: Web UI を提供するサーバーのライブ表示の処理: 通常の raw vision viewer が `UI render tick` ごとに最新の変更不能なスナップショットを固定して描画する処理。診断ログの保存・再生とは別扱いにする。",
+        "[^diagnostics-logging-replay-processing]: 診断ログの保存・再生処理: CaptureOn 中に最新の未加工入力と追跡結果のスナップショットを独立した記録として保存し、診断画面でその採取時系列を再生する処理。",
+        "[^ui-only-display-correction]: 表示だけの補正: 保存済みデータの周期は変えず、描画時の補正だけで遅延を隠そうとする修正方針。`RAW-VISION-017` の処理周期の分離では不採用とする。",
+        "[^diagnostics-sample-sidecar]: diagnostics sample sidecar: 処理周期の分離後に診断ログの保存・再生処理が保存する、最新の未加工入力と追跡結果のスナップショットの補助ファイル。`RUNTIME-HOST-007` では `diagnostics-samples.jsonl` として固定し、記録は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本の項目とする。",
+        "[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧形式の render snapshot の補助ファイルしか持たないキャプチャー。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。",
+        "[^raw-snapshot-cadence]: 未加工入力の更新周期: SSL-Vision パケットや、未加工入力の最新スナップショットが更新される周期。診断画面の `Vision Input` 表示は、新規記録でこの周期を失わない保存経路を持つ。",
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用アプリケーション。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。"
+      ],
+      "disposition": "fixed",
+      "reason": "脚注の表示元、スナップショット、時刻、識別、描画、対応付け、旧形式、採取周期の定義を保持した。既存補正に加え、`TrackerFrame` は通信送信に限定せず出力周期であることを維持した。",
+      "prior_final_text": [
+        "[^source-term]: 表示元: 画面に描画するボール、ロボット、フィールド形状の由来。raw vision viewer の分割表示・重ね表示では Layer A/B で何を選び、何と比較するかを決める単位であり、`Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` が候補になる。",
+        "[^raw-aggregate]: Raw Aggregate: 未加工 SSL-Vision 入力のカメラごとの最新検出情報を UI 表示用に統合した表示元。複数カメラのボール・ロボットをまとめて raw vision viewer で見るための候補で、カメラ単体ではなく集約表示を選ぶときに使う。",
+        "[^raw-camera]: Raw Camera: 特定のカメラ ID の未加工 SSL-Vision 入力の最新検出情報を表示する表示元。カメラごとの見え方や検出差を確認するための候補で、選択肢の内部識別子にはカメラ ID を含める。",
+        "[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` をフィールド描画用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。",
+        "[^third-party-tracker]: 3rd party tracker: 自前トラッカー以外の外部トラッカーから受けたパケットの表示元。外部トラッカーの出力を未加工の SSL-Vision 入力や自前トラッカーと比較するための候補。",
+        "[^live-state]: 実行中の状態: raw vision viewer の分割表示・重ね表示の `3rd party tracker` で、実行中に外部トラッカーから最後に受けた状態。Layer A/B で `3rd party tracker` を選んだときの描画元になるが、UI はこの状態を直接保持せず、スナップショット化された表示用データを読む。",
+        "[^mutable-state]: 変更可能な状態: `MultiTrackerManager` 内で後から内容が変わる状態オブジェクト。raw vision viewer の分割表示・重ね表示では、描画中に値が変わることを避けるため、この状態を直接読まず、スナップショット化してから比較に使う。",
+        "[^live-ui]: ライブ表示: CaptureOn の保存記録の再生ではなく、CaptureOff の通常の raw vision viewer で現在受信している表示元を比較する画面。未加工の SSL-Vision 入力、自前トラッカー、外部トラッカーの現在値を分割表示・重ね表示で見比べる。",
+        "[^immutable-snapshot-store]: 変更不能なスナップショットの保存先: raw vision viewer の通常表示で、Layer A/B に渡す前に、描画中に変わらない表示用データを保持する境界。外部トラッカーの更新とフィールド描画の時点を切り離すために使う。",
+        "[^packet-timestamp]: パケット内の時刻: パケットに入っている時刻。raw vision viewer の分割表示・重ね表示の通常表示では、未加工の SSL-Vision 入力、自前トラッカー、外部トラッカーのパケット内の時刻が厳密に同一であることは比較条件にしない。",
+        "[^receive-callback]: 受信時の処理呼び出し: パケット到着時に呼び出される受信処理。通常表示では、すべての表示元が同じ受信時の処理呼び出しで更新されたことを Layer A/B の比較条件にしない。",
+        "[^ui-render-tick]: UI render tick: Blazor UI が 1 回の表示更新を行う単位。この更新内で各表示元の最新スナップショットを固定し、分割表示・重ね表示へ渡す。",
+        "[^immutable-snapshot]: 変更不能なスナップショット: 複製や DTO 化により、描画中に内容が変わらないようにした読み取り専用のスナップショット。後続の保存状態の更新で、描画中のスナップショットが変化しないことを保証するために使う。",
+        "[^render-tick-id]: 描画更新の識別子: `UI render tick` ごとの表示更新単位を識別する ID。Layer A/B が同じ表示更新で固定されたスナップショットを見ていることを説明するために使う。",
+        "[^source-key]: source key: raw vision viewer の表示元を識別する内部キー。`Raw Camera` ではカメラ ID を含め、画面上の表示名だけで表示元を取り違えないようにする。",
+        "[^display-label]: 画面上の表示名: UI に出す名前。source key とは違い、内部識別には使わず、詳細表示や選択肢でユーザーに表示元を示すために使う。",
+        "[^receive-timestamp]: 受信時刻: パケットを受け取った時刻。詳細表示で表示元間の時刻差を確認し、`latest-before snapshot` が選択時点からどれだけ古いかを説明するために使う。",
+        "[^frame-timestamp]: 検出情報や追跡フレームの時刻: 検出情報や追跡フレームに記録された時刻。受信時刻と併せて、表示元同士の比較がどの時刻情報に基づくかを詳細表示で説明する。",
+        "[^geometry-reference]: フィールド形状の参照: フィールド描画に使う形状情報の参照。重ね表示では未加工入力のフィールド形状を優先し、無い場合だけ `Tracked` の形状で代用するため、表示元同士の座標比較の基準を示す。",
+        "[^source-label]: 表示元名: 凡例や詳細表示に出す名前。ユーザーが Layer A/B で、どの未加工入力、自前の追跡結果、外部トラッカーを選んでいるか確認するために使う。",
+        "[^live-store]: ライブ表示で使う状態保存先: 通常の raw vision viewer の現在表示を更新するための保存先。CaptureOn の記録単位を保存する `TrackerPacketSnapshotLogWriter` や補助ファイルの書き込み処理は、この役割に使わない。",
+        "[^accent-color]: 強調色: Layer A/B を見分けるために、マーカーの線や凡例の色見本に使う色。課題 #10 の raw vision viewer の重ね表示では、診断画面の重ね表示と同じ考え方で、重なった層を色で判別できるようにする。",
+        "[^field-rendering-part]: フィールド描画部: フィールドの背景、外周、フィールドの線、ボールとロボットのマーカーを SVG に描く部品の境界。表示元の選択や付随情報の詳細表示ではなく、フィールド上に何をどう描くかを担当する部分を指す。",
+        "[^split-field-component]: 分割表示用のフィールド表示コンポーネント: 分割表示の左右それぞれのフィールドを描くコンポーネント。左右の表示位置と倍率は独立させるが、raw vision のライブ表示と診断画面は同じコンポーネント境界を使う。",
+        "[^overlay-field-component]: 重ね表示用のフィールド表示コンポーネント: 1 つのフィールド上に Layer A/B を重ねて描くコンポーネント。フィールドとフィールド形状を層ごとに描き直さず、物体のマーカーだけを Layer A/B の描画グループとして重ねる。",
+        "[^overlay-field-rendering]: 重ね表示のフィールド描画部: 重ね表示用のフィールド表示コンポーネントと同じ責務範囲を指す。フィールドとフィールド形状を層ごとに描き直さず、物体のマーカーだけを Layer A/B の描画グループとして重ねる。",
+        "[^layer-group]: 描画グループ: 同じフィールド上で Layer A または Layer B に属するボール・ロボットをまとめる SVG の描画要素。各描画要素に表示・非表示や強調色を持たせるが、表示位置の移動・拡大縮小の基準は、重ね表示のフィールド描画部のものを共有する。",
+        "[^viewport-state]: viewport state: フィールドの拡大縮小、表示位置の移動、ドラッグ中の移動量など、画面上でフィールドをどの位置と倍率で見るかを表す状態。重ね表示では層ごとに別々に持たず、1 つの状態を共有する。",
+        "[^split-independent-viewport]: 分割表示の独立した表示位置・倍率: 左右のフィールドが、それぞれ別の表示位置と倍率を持つこと。左右は比較対象を並べる表示なので、片方をドラッグしても、もう片方を自動追従させる要件ではない。",
+        "[^same-source]: 同じ表示元を選んだ状態: Layer A/B が同じ表示元を選んだ状態。raw vision viewer の重ね表示では、重複描画で誤差があるように見せないため、1 層の表示にまとめる。",
+        "[^multi-tracker-manager]: `MultiTrackerManager` / `TrackerPacketAdapter`: `MultiTrackerManager` は `TrackerConnectionLib` の追跡状態を管理するコンポーネントで、自前・外部・不明のトラッカーの最新状態を保持する。`TrackerPacketAdapter` は、外部トラッカーのパケットを `MultiTrackerManager` で扱うための変換用部品。",
+        "[^selected-replay-timeline-tick]: selected replay timeline tick: 診断再生でユーザーが現在選択している、replay timeline 上の基準時点。raw vision、自前トラッカー、外部トラッカーを比較するとき、この時点は表示元ごとに移動させない。",
+        "[^replay-timeline-index]: ReplayTimelineIndex: 診断再生の選択時点を識別する位置番号。`saved-session-alignment` の対応記録と結び付けて、どの時点の比較かを特定する。",
+        "[^saved-session-alignment]: saved-session-alignment: CaptureOn の記録単位に保存された、replay timeline 上の時点と tracker source snapshot の対応記録群。診断再生で外部トラッカーのスナップショットを、同じ選択時点に合わせるために使う。",
+        "[^alignment-sidecar]: alignment sidecar: CaptureOn の記録単位の主ログとは別に保存されるファイル。診断再生で、選択中の replay timeline tick と tracker source snapshot の関係を後から復元するために使う。",
+        "[^alignment-record]: 対応記録: alignment sidecar 内の 1 件の対応付け。診断再生で特定の時点を選んだとき、どの tracker source snapshot を比較に使うかを示す。",
+        "[^selected-tick]: 選択時点: selected replay timeline tick の短縮表現。本文で「選択時点」と書く場合も同じ意味を指す。",
+        "[^latest-before-snapshot]: latest-before snapshot: selected replay timeline tick に対象表示元の対応記録が無い場合に使う、同じ表示元で選択時点以前に存在する最新スナップショット。選択時点より後のものは含めない。再生位置は選択時点のまま固定し、このスナップショットは直前の記録を保持したものとして扱う。",
+        "[^timeline-cursor]: 再生位置: 診断再生画面で現在選ばれている replay timeline 上の位置。`latest-before snapshot` を使う場合でも、再生位置は選択時点のまま動かさない。",
+        "[^candidate-missing]: CandidateMissing: Field source として選択した表示元の候補スナップショットが無いことを示す欠落状態。フィールド全体は消さず、準備済みの層は残し、凡例と詳細表示に欠落理由を出す。",
+        "[^no-candidate-snapshot]: NoCandidateSnapshot: 比較に選択した表示元の候補スナップショットが無いことを示す欠落状態。比較対象が無い理由を UI に出すための状態であり、選択時点より後のスナップショットを代わりに使う合図ではない。",
+        "[^future-later-snapshot]: 選択時点より後のスナップショット: selected replay timeline tick より後に存在するスナップショット。課題 #10 の診断画面では、未来の追跡状態を現在時点の比較に混ぜないため、Field source や比較の代替候補にしない。",
+        "[^diagnostics-line-alignment]: 診断ログ行との対応付け: 診断ログ行と tracker source snapshot の対応付け。選択時点以前の同じ表示元のスナップショットを探す補助情報としてだけ使い、選択時点より後のスナップショットを候補にするためには使わない。",
+        "[^nearest-timestamp]: 近傍時刻の検索: 選択時点に近い時刻を探す検索方法。課題 #10 では、近さだけで選択時点より後のスナップショットを選ばず、同じ表示元の選択時点以前のスナップショットだけを候補にする。",
+        "[^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、render snapshot ごとの補助ファイルに依存している状態。新規キャプチャーの目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。",
+        "[^legacy-render-snapshot-sidecar]: 旧形式の render snapshot の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの render snapshot ごとに保存した補助ファイル。処理周期の分離後の新規キャプチャーでは、主要な `Vision Input` の復元元にしない。",
+        "[^world-frame-committed]: WorldFrameCommitted: 自前トラッカーがフィールド全体の追跡結果を確定した時点を表す処理結果。既存の描画記録の保存はこの通知処理に結合しており、raw vision の保存周期としては遅くなり得る。",
+        "[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を送信する周期。raw vision の新規保存周期として扱わない。",
+        "[^new-capture]: 新規キャプチャー: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧形式の render snapshot の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。",
+        "[^diagnostics-sample-tick]: diagnostics sample tick: 診断ログの保存・再生処理が、最新の未加工入力と追跡結果のスナップショットを同じ保存単位として固定する時点。トラッカーの追跡結果の確定と同義にしない。",
+        "[^latest-raw-snapshot]: 最新の未加工入力のスナップショット: `VisionPacketStore` 相当の未加工 SSL-Vision 入力の最新検出情報とフィールド形状をスナップショット化したもの。診断画面の `Vision Input` は、新規記録ではこのスナップショットから復元する。",
+        "[^latest-tracker-snapshot]: 最新の追跡スナップショット: 自前トラッカーまたは外部トラッカーの最新出力を、診断の採取記録に含めるためにスナップショット化したもの。",
+        "[^diagnostics-sample-timeline]: 診断データの採取時系列: diagnostics sample tick を時系列に並べた再生用の時系列。selected replay timeline tick の考え方を維持しつつ、render snapshot ではなく診断データの採取記録を基準にする。",
+        "[^loop-isolation]: 処理周期の分離: トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生の周期と責務を分け、片方の周期や負荷が別の処理の表示や保存を支配しないようにする方針。",
+        "[^tracker-operation-loop]: トラッカーの周期処理: 未加工の入力パケットや設定プロファイルと制御入力を追跡エンジンに渡し、追跡状態の更新、送信、最新の追跡スナップショットの公開までを担当する周期処理。",
+        "[^web-server-live-display-processing]: Web UI を提供するサーバーのライブ表示の処理: 通常の raw vision viewer が `UI render tick` ごとに最新の変更不能なスナップショットを固定して描画する処理。診断ログの保存・再生とは別扱いにする。",
+        "[^diagnostics-logging-replay-processing]: 診断ログの保存・再生処理: CaptureOn 中に最新の未加工入力と追跡結果のスナップショットを独立した記録として保存し、診断画面でその採取時系列を再生する処理。",
+        "[^ui-only-display-correction]: 表示だけの補正: 保存済みデータの周期は変えず、描画時の補正だけで遅延を隠そうとする修正方針。`RAW-VISION-017` の処理周期の分離では不採用とする。",
+        "[^diagnostics-sample-sidecar]: diagnostics sample sidecar: 処理周期の分離後に診断ログの保存・再生処理が保存する、最新の未加工入力と追跡結果のスナップショットの補助ファイル。`RUNTIME-HOST-007` では `diagnostics-samples.jsonl` として固定し、記録は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本の項目とする。",
+        "[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧形式の render snapshot の補助ファイルしか持たないキャプチャー。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。",
+        "[^raw-snapshot-cadence]: 未加工入力の更新周期: SSL-Vision パケットや、未加工入力の最新スナップショットが更新される周期。診断画面の `Vision Input` 表示は、新規記録でこの周期を失わない保存経路を持つ。",
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    }
+  ]
+}

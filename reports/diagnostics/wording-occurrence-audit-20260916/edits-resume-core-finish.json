@@ -1,0 +1,191 @@
+[
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 7,
+    "before": "## 当時の現在作業",
+    "after": "## 当時の作業状態",
+    "reason": "履歴内の時点を示す自然な見出しにする。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 67,
+    "before": "比較ログの工程と後続作業を追加した。`TrackerConnectionLib` を トラッカーのパケット のキャプチャーを統合する第一候補、旧 `Tracker.Server` を CaptureOn の比較ログを統合する場所とし、`Tracker.Core` はキャプチャーと比較用保存の対象外とした。",
+    "after": "比較ログの工程と後続作業を追加した。トラッカーのパケットをキャプチャーする処理の接続先の第一候補を `TrackerConnectionLib` とし、旧 `Tracker.Server` で CaptureOn の比較ログへ統合する設計とした。`Tracker.Core` はキャプチャーと比較用保存の対象外とした。",
+    "reason": "処理の接続先と統合先を文として分け、取得・保存とCoreの対象外という責務境界を維持する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 69,
+    "before": "snapshot sidecar の JSONL を主記録とし、診断機能からの互換参照、入力元の識別、近い時刻での比較、Capture Off 後の再開、他のトラッカーがない場合の扱いを文書化した。同じ CaptureOn のキャプチャー、capture metadata、トラッカーの診断ログ、render snapshot、tracker snapshot の JSONL を1つの session folder にまとめる仕様とした。",
+    "after": "snapshot sidecar の JSONL を主記録とし、診断機能からの互換参照、入力元の識別、近い時刻での比較、Capture Off 後の再開、他のトラッカーがない場合の扱いを文書化した。同じ CaptureOn のキャプチャー、capture metadata、トラッカーの診断ログ、render snapshot、tracker packet snapshot の JSONL を1つの session folder にまとめる仕様とした。",
+    "reason": "保存するパケットの記録を指す許可済みの設計語へ戻す。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 91,
+    "before": "自分自身・外部・不明という区分は、保存を除外するためではなく後の表示・比較で使う役割・表示名などの情報として保持する。判別できない場合も保存を省略しない。",
+    "after": "自分自身・外部・不明という区分は、保存を除外するためではなく後の表示・比較で使う source role / source label などの情報として保持する。判別できない場合も保存を省略しない。",
+    "reason": "許可済みの役割・表示名の設計語を保持する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 93,
+    "before": "外部の tracker snapshot は、比較元の パケットのバイト列 または復元可能な情報、入力元の `uuid` / `sourceName` / 送信元の通信アドレスと通信ポート、`receivedAt`、tracked frame number と tracked frame timestamp、集計情報を持つ。`Tracker.CaptureReplay`、診断画面、再生機能は session folder 内の記録から再生・比較できる設計へ変更した。設計修正と設計・実装の監査結果を下記に保持する。",
+    "after": "外部の tracker snapshot は、比較元のパケットのバイト列または復元可能な情報、入力元の `uuid` / `sourceName` / 送信元の通信アドレスと通信ポート、`receivedAt`、tracked frame number と tracked frame timestamp、集計情報を持つ。`Tracker.CaptureReplay`、診断画面、再生機能は session folder 内の記録から再生・比較できる設計へ変更した。設計修正と設計・実装の監査結果を下記に保持する。",
+    "reason": "日本語の修飾と目的語の間の不要な空白を除く。比較元の意味は維持する。 復元可能情報との選択条件を変えず、文中の空白を整理する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 107,
+    "before": "自分自身と外部のパケットを `uuid` / `sourceName` / 送信元の通信アドレスと通信ポート ごとに観測状態と tracker snapshot として保持し、保存した状態から元の official tracker packet の内容を復元できるようにした。対象の `TrackerConnectionLibAllTrackerSnapshotContractTests` は5件、全体の `Tracker.Tests` は163件成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。",
+    "after": "自分自身と外部のパケットを `uuid` / `sourceName` / 送信元の通信アドレスと通信ポートごとに観測状態と tracker snapshot として保持し、保存した状態から元の official tracker packet の内容を復元できるようにした。対象の `TrackerConnectionLibAllTrackerSnapshotContractTests` は5件、全体の `Tracker.Tests` は163件成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。",
+    "reason": "識別単位の列挙の末尾を自然な文章にする。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 127,
+    "before": "表示用データとしての tracker snapshot 自体は問題ないが、比較元データを保持することは `TRACKER-044` の通常の処理経路で必須とした。従来の同名ファイルを対応付ける考え方は session folder 名とその中のファイル名で維持する。入力元ごとに利用中のトラッカーを取得する API と、同じ `uuid` の衝突は次作業の入力元集計・役割判定で扱うリスクとし、パケットのバイト列 と source identity を失わない限り、この作業の完了を妨げる条件とはしない。",
+    "after": "表示用データとしての tracker snapshot 自体は問題ないが、比較元データを保持することは `TRACKER-044` の通常の処理経路で必須とした。関連ファイルを名前で対応付ける従来の考え方は session folder 名とその中のファイル名で維持する。入力元ごとに利用中のトラッカーを取得する API と、同じ `uuid` の衝突は次作業の入力元集計・役割判定で扱うリスクとし、パケットのバイト列と source identity を失わない限り、この作業の完了を妨げる条件とはしない。",
+    "reason": "同一ディレクトリに同名ファイルがあるような誤読を避け、名前による関連付けを説明する。 パケット本体とsource identityを保持する条件を維持する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 140,
+    "before": "`TrackerPacketSnapshotLogWriter` を追加し、パケットのバイト列 を持つ JSONL への追記と書き出し、元データからの `SemanticSummary` 作成、読み取り時の不足情報の補完、capture metadata の `RecordCount` / `SkippedRecordCount` / `ErrorCount` と入力元集計の更新を実装した。対象の `TrackerComparisonSourceTddTests` は7件、関連30件、全体の `Tracker.Tests` は175件成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。",
+    "after": "`TrackerPacketSnapshotLogWriter` を追加し、パケットのバイト列を持つ JSONL への追記と書き出し、元データからの `SemanticSummary` 作成、読み取り時の不足情報の補完、capture metadata の `RecordCount` / `SkippedRecordCount` / `ErrorCount` と入力元集計の更新を実装した。対象の `TrackerComparisonSourceTddTests` は7件、関連30件、全体の `Tracker.Tests` は175件成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。",
+    "reason": "助詞の前の不要な空白を除く。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 142,
+    "before": "レビュー後に `SemanticSummary` のボール数、ロボット数、tracked frame、入力元集計の値が一致する検証を追加した。追加後も対象7件、関連30件が成功した。実行中の外部トラッカー受信との接続は次作業とした。`Append` を直接使った際の不正な パケットのバイト列 への対策は通常の処理経路外の追加課題として保持する。",
+    "after": "レビュー後に `SemanticSummary` のボール数、ロボット数、tracked frame、入力元集計の値が一致する検証を追加した。追加後も対象7件、関連30件が成功した。実行中の外部トラッカー受信との接続は次作業とした。`Append` を直接使った際の不正なパケットのバイト列への対策は通常の処理経路外の追加課題として保持する。",
+    "reason": "通常経路外の不正入力という条件を維持し、文章の空白を整理する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 153,
+    "before": "先に失敗するテストを作成した。`TrackerLiveExternalTrackerReceiverTddTests` で、CaptureOn 中の `TrackerConnectionLib` の受信から書き込みへの接続、自分自身・外部・不明の全保存、CaptureOff 中は書き込まないこと、再開時に別の session folder を使うこと、比較元の パケットのバイト列 / `SemanticSummary` の保持を固定した。",
+    "after": "先に失敗するテストを作成した。`TrackerLiveExternalTrackerReceiverTddTests` で、CaptureOn 中の `TrackerConnectionLib` の受信から書き込みへの接続、自分自身・外部・不明の全保存、CaptureOff 中は書き込まないこと、再開時に別の session folder を使うこと、比較元のパケットのバイト列 / `SemanticSummary` の保持を固定した。",
+    "reason": "日本語の修飾と目的語の間の不要な空白を除く。比較元の意味は維持する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 188,
+    "before": "先に失敗するテストを作成して `TrackerSnapshotReplayReader` を実装した。既存の診断ログ読み取りとの互換性を保ち、capture metadata の相対パスから session folder 内の snapshot sidecar を取得できることを確認した。自分自身・外部・不明の tracker snapshot を時刻順の再生入力にし、表示用の tracker snapshot と比較元の パケットのバイト列 / `SemanticSummary` を区別する。`ibis` の詳細ログと tracker snapshot を重複して保持しても、時刻が最も近い記録との比較結果の概要 を取得できることを確認した。",
+    "after": "先に失敗するテストを作成して `TrackerSnapshotReplayReader` を実装した。既存の診断ログ読み取りとの互換性を保ち、capture metadata の相対パスから session folder 内の snapshot sidecar を取得できることを確認した。自分自身・外部・不明の tracker snapshot を時刻順の再生入力にし、表示用の tracker snapshot と比較元のパケットのバイト列 / `SemanticSummary` を区別する。`ibis` の詳細ログと tracker snapshot を重複して保持しても、時刻が最も近い記録との比較結果の概要を取得できることを確認した。",
+    "reason": "日本語の修飾と目的語の間の不要な空白を除く。比較元の意味は維持する。 修正後の文全体を読み直し、助詞の前の空白を除く。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 192,
+    "before": "修正では `ibis` の `TrackerFrame.data_timestamp_ns` と tracker snapshot の `TrackedFrame.timestamp` を同じ時間軸で照合するようにした。また、公開する再生用 DTOの位置引数に対応するプロパティへ XML documentation comment を追加した。修正後は対象テスト5件、関連40件、全体192件が成功し、r2 レビューは完了を妨げる指摘なし。",
+    "after": "修正では `ibis` の `TrackerFrame.data_timestamp_ns` と tracker snapshot の `TrackedFrame.timestamp` を同じ時間軸で照合するようにした。また、公開する再生用 DTO の位置引数に対応するプロパティへ XML documentation comment を追加した。修正後は対象テスト5件、関連40件、全体192件が成功し、r2 レビューは完了を妨げる指摘なし。",
+    "reason": "許可済みDTOを保持し、型の説明との区切りを揃える。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 207,
+    "before": "`Tracker.CaptureReplay` が capture metadata の相対パスから snapshot sidecar を読み、`trackerSnapshot` / `trackerComparison` として入力元の役割と表示名、tracked frame timestamp、ボール数とロボット数、パケットのバイト列 の復元結果、時刻が最も近い記録との比較結果の概要 を出力できるようにした。snapshot sidecar を持たない旧形式の capture metadata では従来の再生結果の概要を維持する再発防止テストを追加した。",
+    "after": "`Tracker.CaptureReplay` が capture metadata の相対パスから snapshot sidecar を読み、`trackerSnapshot` / `trackerComparison` として入力元の役割と表示名、tracked frame timestamp、ボール数とロボット数、パケットのバイト列の復元結果、時刻が最も近い記録との比較結果の概要を出力できるようにした。snapshot sidecar を持たない旧形式の capture metadata では従来の再生結果の概要を維持する再発防止テストを追加した。",
+    "reason": "復元結果と表示対象の意味を維持し、助詞の前の空白を除く。 修正後の文全体を読み直し、助詞の前の空白を除く。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 255,
+    "before": "`Diagnostics.razor` / `Diagnostics.razor.cs` で、選択中のログ・記録・再生時点と比較用の表示状態を同期した。入力元の役割と表示名、tracked frame number と tracked frame timestamp、比較する tracker snapshot の tracked frame number、時刻差、対応付け規則、ボール数・ロボット数、パケットのバイト列 の復元結果、snapshot sidecar の欠損・空・エラーを表示できるようにした。",
+    "after": "`Diagnostics.razor` / `Diagnostics.razor.cs` で、選択中のログ・記録・再生時点と比較用の表示状態を同期した。入力元の役割と表示名、tracked frame number と tracked frame timestamp、比較する tracker snapshot の tracked frame number、時刻差、対応付け規則、ボール数・ロボット数、パケットのバイト列の復元結果、snapshot sidecar の欠損・空・エラーを表示できるようにした。",
+    "reason": "復元結果と表示対象の意味を維持し、助詞の前の空白を除く。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 275,
+    "before": "snapshot sidecar がない場合、記録が0件の場合、省略・エラーがある場合の読み方を記載した。手動検証では、選択した追跡フレームと時刻、入力元の絞り込み、snapshot sidecar の状態、記録数・省略数・エラー数、選択中の記録の状態、入力元の役割と表示名、tracker snapshot の tracked frame number、自分自身と最も近い比較対象の時刻・その差、ボール数・ロボット数、パケットのバイト列 の表示を証跡として残す。",
+    "after": "snapshot sidecar がない場合、記録が0件の場合、省略・エラーがある場合の読み方を記載した。手動検証では、選択した追跡フレームと時刻、入力元の絞り込み、snapshot sidecar の状態、記録数・省略数・エラー数、選択中の記録の状態、入力元の役割と表示名、tracker snapshot の tracked frame number、自分自身と最も近い比較対象の時刻・その差、ボール数・ロボット数、パケットのバイト列の表示を証跡として残す。",
+    "reason": "復元結果と表示対象の意味を維持し、助詞の前の空白を除く。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 371,
+    "before": "利用者が指定した再生不具合として追加した。直近のキャプチャーに `ER-FORCE` の tracker snapshot が含まれることを確認し、`ibis` と `ER-FORCE` の `TrackedFrame.timestamp` が同じ時刻系ではないことを、フィールド表示不具合の主な原因候補として記録した。既存ログの救済は不要という利用者方針に従い、新しいキャプチャーの保存時に時刻を対応付ける snapshot sidecar を追加した。",
+    "after": "利用者が指定した再生不具合として追加した。直近のキャプチャーに `ER-FORCE` の tracker snapshot が含まれることを確認し、`ibis` と `ER-FORCE` の `TrackedFrame.timestamp` が同じ時刻系ではないことを、フィールド表示不具合の主な原因候補として記録した。既存ログの救済は不要という利用者方針に従い、新しいキャプチャーの保存時に時刻を対応付ける alignment sidecar を追加した。",
+    "reason": "パケットを保存するsnapshot sidecarと時刻対応を保存するalignment sidecarを区別する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 410,
+    "before": "利用者の追加要望として、等倍速の `Play` は replay timeline の全時点を順番に表示するのではなく、30fps相当の表示更新で実際の経過時間に追従させることとした。再生開始時の wall-clock と選択中の時点の `ReceivedAt` からキャプチャー内の再生対象時刻 を計算し、その時刻以下で最も新しい replay timeline の時点を表示する。`Fast Forward` とは処理の役割を分け、200Hzの入力と30fpsの表示更新を TDD の受け入れ条件として固定した。",
+    "after": "利用者の追加要望として、等倍速の `Play` は replay timeline の全時点を順番に表示するのではなく、30fps相当の表示更新で実際の経過時間に追従させることとした。再生開始時の wall-clock と選択中の時点の `ReceivedAt` からキャプチャー内の再生対象時刻を計算し、その時刻以下で最も新しい replay timeline の時点を表示する。`Fast Forward` とは処理の役割を分け、200Hzの入力と30fpsの表示更新を TDD の受け入れ条件として固定した。",
+    "reason": "wall-clockから求める対象時刻の説明を維持する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "line": 448,
+    "before": "`FastForward` 中に `等倍速` を選ぶと `Play` へ、`Play` 中に倍率を選ぶと `FastForward` へ切り替え、表示と実際の再生モードを一致させる。`TRACKER-059` の早送り時の非間引き、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付け と任意の時点を比較する経路を維持した。",
+    "after": "`FastForward` 中に `等倍速` を選ぶと `Play` へ、`Play` 中に倍率を選ぶと `FastForward` へ切り替え、表示と実際の再生モードを一致させる。`TRACKER-059` の早送り時の非間引き、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。",
+    "reason": "保存形式と任意時点比較の保持条件を維持する。",
+    "before_sha256": "802dc82b8b748d55311c3ff6039e83cff457fb8fcaadfa41e8540d25f67fd5e2",
+    "after_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "line": 19,
+    "before": "CaptureOn 中に受信できた トラッカーのパケット を session folder 配下の snapshot sidecar の JSONL に保存する。capture metadata から、各ファイルの相対パス、source identity、役割、比較元の パケットのバイト列 または復元可能な参照をたどれる。公式のマルチキャスト受信は、明示的に有効化された場合だけマルチキャストグループへ参加する。",
+    "after": "CaptureOn 中に受信できたトラッカーのパケットを session folder 配下の snapshot sidecar の JSONL に保存する。capture metadata から、各ファイルの相対パス、source identity、source role、比較元のパケットのバイト列または復元可能な参照をたどれる。公式のマルチキャスト受信は、明示的に有効化された場合だけマルチキャストグループへ参加する。",
+    "reason": "全保存の対象は変えず、日本語の語句の区切りを整理する。 元データまたは復元可能参照という条件を保持する。 入力元の役割を表す許可済みの設計語を保持する。",
+    "before_sha256": "d7a7ffbc256bf9e520b81c7b3652ee28d8f40e2cbd97a9f100c0106b10affbe9",
+    "after_sha256": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "line": 21,
+    "before": "外部の tracker snapshot は、`Tracker.CaptureReplay` の CLI 出力、`/diagnostics` の比較表示・再生・Field source の切り替え・重ね合わせ表示で再生・比較できる。`ER-Force` のように `ibis` と tracked frame timestamp の時刻系が異なる場合も、新しいキャプチャーの保存時の対応付けを使って描画する。既存ログの救済は対象外であり、`SchemaVersion = 1` との互換性より、`SchemaVersion = 2` の索引による性能を優先する。",
+    "after": "外部の tracker snapshot は、`Tracker.CaptureReplay` の CLI 出力、`/diagnostics` の比較表示、再生、Field source の切り替え、重ね合わせ表示で再生・比較できる。`ER-Force` のように `ibis` と tracked frame timestamp の時刻系が異なる場合も、新しいキャプチャーの保存時の対応付けを使って描画する。既存ログの救済は対象外であり、`SchemaVersion = 1` との互換性より、`SchemaVersion = 2` の索引による性能を優先する。",
+    "reason": "各機能を読点で列挙し、許可済みField sourceを名称のまま保持する。中黒に接する許可語の誤検出も解消する。",
+    "before_sha256": "d7a7ffbc256bf9e520b81c7b3652ee28d8f40e2cbd97a9f100c0106b10affbe9",
+    "after_sha256": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61"
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "line": 25,
+    "before": "等倍速の `Play` だけは、30fps相当の表示更新で wall-clock と 受信時刻 `ReceivedAt` に追従する。高頻度の観測は保存・比較用に保持したまま、表示では途中の時点を必要に応じて省略する。200Hzの入力と30fpsの表示でも実時間での遅れを確認できることを検証した。早送りは観測時点を間引かない。",
+    "after": "等倍速の `Play` だけは、30fps相当で表示を更新する。再生開始からの wall-clock の経過時間を、開始時に選択した記録の受信時刻 `ReceivedAt` に加えて表示位置を決める。高頻度の観測は保存・比較用に保持したまま、表示では途中の時点を必要に応じて省略する。200Hzの入力と30fpsの表示でも実時間での遅れを確認できることを検証した。早送りは観測時点を間引かない。",
+    "reason": "2種類の時計に同時に追従するという曖昧な表現を、変更前の時刻計算の関係へ戻す。",
+    "before_sha256": "d7a7ffbc256bf9e520b81c7b3652ee28d8f40e2cbd97a9f100c0106b10affbe9",
+    "after_sha256": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61"
+  }
+]

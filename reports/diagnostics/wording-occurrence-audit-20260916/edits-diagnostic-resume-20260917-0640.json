@@ -1,0 +1,56 @@
+{
+  "time": "2026-09-17T06:39:14.751318+09:00",
+  "before_sha256": "6a291a2529a94e026de65ed3c021c1ec711a0596545f8d6d015d5555bbfcc74b",
+  "after_sha256": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894",
+  "edits": [
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "表示元ごとに利用中のトラッカーを取得する API と、同じ `uuid` が衝突する場合は、表示元の概要と source role の判定に関して後続で確認するリスクとする。",
+      "new": "表示元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、表示元の概要と source role の判定に関するリスクとして、引き続き確認する。",
+      "reason": "D11-B024: 原文のAPIと衝突ケースは二つの確認事項。API自体とUUIDが衝突するように読めた修正を訂正する。",
+      "line_before_edit": 94
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "トラッカーの受信処理のネットワーク処理は、明示設定で有効化する。",
+      "new": "トラッカーのパケットをネットワークから受信する処理は、明示設定で有効化する。",
+      "reason": "D11-B032: 受信処理のネットワーク処理という重複を除き、既定無効の条件は維持する。",
+      "line_before_edit": 110
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "任意の定型値の選択ボタンに留める。",
+      "new": "あらかじめ決めた倍率を数値入力へ入れる任意の補助ボタンに留める。",
+      "reason": "D11-B075: 本文156行と同じ入力補助の操作を自然に説明する。",
+      "line_before_edit": 248
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "左右 Field source を `Vision Input`、自前トラッカー、外部、不明、表示元名から選べるようにする。",
+      "new": "左右の Field source を `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label から選べるようにする。",
+      "reason": "D11-B089: 選択肢の一覧は実表示名で記載し、source labelを他の識別情報と区別する。",
+      "line_before_edit": 301
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "左右のフィールド表示で `Vision Input`、自前トラッカー、外部、不明、source label を選択でき、",
+      "new": "左右のフィールド表示で `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label を選択でき、",
+      "reason": "D11-B090: 完了条件の選択肢も実UI名とする。",
+      "line_before_edit": 321
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "再生操作は`Play`",
+      "new": "再生操作は `Play`",
+      "reason": "D11-B075: 実UI名の前の空白を整える。",
+      "line_before_edit": 242
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "old": "操作部は従来どおり`Play`",
+      "new": "操作部は従来どおり `Play`",
+      "reason": "D11-B048: 実UI名の前の空白を整える。",
+      "line_before_edit": 146
+    }
+  ]
+}

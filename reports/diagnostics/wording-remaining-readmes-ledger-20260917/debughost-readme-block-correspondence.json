@@ -1,0 +1,1102 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T21:53:39+09:00",
+  "document": "Tracker/Tracker.DebugHost/README.md",
+  "final_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+  "count": 75,
+  "blocks": [
+    {
+      "block": "D18-B001",
+      "baseline_start": 3,
+      "baseline_end": 3,
+      "final_start": 3,
+      "final_end": 3,
+      "final_text": [
+        "`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信する ASP.NET Core アプリケーションです。"
+      ],
+      "decision": "fixed",
+      "reason": "SSL-Vision入力、ブラウザー表示、UDP配信の責務を保持し、送信形式を実装型 `TrackerWrapperPacket` と具体化した。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B002",
+      "baseline_start": 5,
+      "baseline_end": 4,
+      "final_start": 5,
+      "final_end": 6,
+      "final_text": [
+        "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+        ""
+      ],
+      "decision": "fixed",
+      "reason": "raw visionはSSL-Visionの検出情報であり画像・動画そのものではないという定義を保持。見出し前の空行を整え、編集時に重複した定義を最終自己点検で除く。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B003",
+      "baseline_start": 7,
+      "baseline_end": 12,
+      "final_start": 9,
+      "final_end": 14,
+      "final_text": [
+        "- `VisionReceiver` 設定に従って SSL-Vision パケットを受信する",
+        "- `Raw` 表示でカメラごとの検出結果と集約表示を確認する",
+        "- `Tracked` 表示でトラッカーの統合結果、キック・接触・フィールドの状態、送信関連カウンタを確認する",
+        "- 複数の設定プロファイルを定義し、UI または API から実行中の設定プロファイルを切り替える",
+        "- `Tracker:PublishUdp` が有効なら公式形式の `TrackerWrapperPacket` を UDP のマルチキャストまたはユニキャストで送信する",
+        "- CaptureOn 中に受信した公式形式の `TrackerWrapperPacket` を同じ session folder へ保存し、後から自前トラッカー出力と比較する"
+      ],
+      "decision": "accepted",
+      "reason": "送受信条件を保持し、CaptureOn中に保存・比較する公式形式を `TrackerWrapperPacket` と具体化した。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B004",
+      "baseline_start": 17,
+      "baseline_end": 19,
+      "final_start": 19,
+      "final_end": 21,
+      "final_text": [
+        "- SSL-Vision パケットを送る送信元",
+        "- CaptureOn 比較ログを取る場合は、公式形式のトラッカーパケットが流れているマルチキャスト接続先",
+        "- ブラウザで `Tracker.DebugHost` の HTTP 接続先に接続できること"
+      ],
+      "decision": "fixed",
+      "reason": "SSL-Vision送信元、CaptureOn時の公式tracker multicast、ブラウザーからHTTP接続可能という3前提を保持。HTTPの語の区切りを整える。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B005",
+      "baseline_start": 23,
+      "baseline_end": 23,
+      "final_start": 25,
+      "final_end": 25,
+      "final_text": [
+        "リポジトリ直下から実行します。"
+      ],
+      "decision": "accepted",
+      "reason": "リポジトリ直下で実行するという作業ディレクトリの条件を保持。dotnet runのコマンドは変更しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B006",
+      "baseline_start": 29,
+      "baseline_end": 29,
+      "final_start": 31,
+      "final_end": 31,
+      "final_text": [
+        "既定の起動設定は次の URL を使います。"
+      ],
+      "decision": "accepted",
+      "reason": "launch profileを起動設定と説明。https/httpの2URLと自動起動抑止の選択肢、ASPNETCORE_URLSの例は保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B007",
+      "baseline_start": 44,
+      "baseline_end": 44,
+      "final_start": 46,
+      "final_end": 46,
+      "final_text": [
+        "### 画面ヘッダー"
+      ],
+      "decision": "accepted",
+      "reason": "ヘッダーを画面ヘッダーとし、HTTPヘッダーでなく画面の領域と明示。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B008",
+      "baseline_start": 46,
+      "baseline_end": 48,
+      "final_start": 48,
+      "final_end": 50,
+      "final_text": [
+        "- `Packets`: 受信した未加工パケット数です",
+        "- `Errors`: 受信・デコード・ソケット処理で記録されたエラー数です",
+        "- `Remote`: 直近のパケットの送信元の通信アドレスと通信ポートです"
+      ],
+      "decision": "fixed",
+      "reason": "Packets/Errors/Remoteの実UI名と意味を保持。Remoteは送信元接続先という不自然な語でなく、送信元の通信アドレスと通信ポートと具体化。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B009",
+      "baseline_start": 54,
+      "baseline_end": 56,
+      "final_start": 56,
+      "final_end": 58,
+      "final_text": [
+        "- フィールドに未加工の検出結果を描画します",
+        "- `Aggregate` とカメラごとの表示を切り替えられます",
+        "- 右側の表示領域で観測フレームの番号、カメラ ID、表示元、未加工 JSON を確認できます"
+      ],
+      "decision": "accepted",
+      "reason": "Rawは未加工検出をfield表示し、Aggregate/camera切替と右側の入力観測フレーム番号・camera ID・source・JSONを確認する条件を保持。出力の追跡番号に変えない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B010",
+      "baseline_start": 60,
+      "baseline_end": 67,
+      "final_start": 62,
+      "final_end": 69,
+      "final_text": [
+        "- トラッカーが確定した追跡フレームを描画します",
+        "- 右側の表示領域で次を確認できます",
+        "- 有効な設定プロファイルの名前",
+        "- 送信成功数 / 失敗数",
+        "- 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻",
+        "- キック / 接触 / フィールドの状態",
+        "- primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）",
+        "- 黄色 / 青色チームのロボット"
+      ],
+      "decision": "fixed",
+      "reason": "確定tracked frame、active profile、送信成否、data/processed時刻、kick/contact/field、primary/secondary、黄青robotという表示項目を全保持。2時刻の基準とボール区分の名称を明示。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B011",
+      "baseline_start": 69,
+      "baseline_end": 69,
+      "final_start": 71,
+      "final_end": 71,
+      "final_text": [
+        "トラッカー側で追跡フレームがまだ確定していない場合は `No tracked frame` が表示されます。"
+      ],
+      "decision": "accepted",
+      "reason": "まだ確定frameがない場合の実UI表示No tracked frameを変更せず保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B012",
+      "baseline_start": 71,
+      "baseline_end": 71,
+      "final_start": 73,
+      "final_end": 73,
+      "final_text": [
+        "`Publish OK` / `Publish Fail` は現在実装の内部カウンタです。`PublishUdp=false` のときも追跡フレームの処理自体は成功扱いになり、`Publish OK` が増えることがあります。実送信の有無は `Tracker:PublishUdp` と送信先設定を合わせて判断してください。"
+      ],
+      "decision": "accepted",
+      "reason": "PublishUdp=falseでも内部処理成功としてPublish OKが増え得るという注意と、実送信は設定と送信先で判断する条件を保持。送信成功の保証へ読み替えない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B013",
+      "baseline_start": 73,
+      "baseline_end": 73,
+      "final_start": 75,
+      "final_end": 75,
+      "final_text": [
+        "### 実行時の設定プロファイルの切り替え"
+      ],
+      "decision": "accepted",
+      "reason": "runtime profile switchの見出しを、承認済みの設定プロファイルを使う自然な日本語で表す。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B014",
+      "baseline_start": 75,
+      "baseline_end": 78,
+      "final_start": 77,
+      "final_end": 80,
+      "final_text": [
+        "- `Tracked` モードの `Profile Control` から定義済みの設定プロファイルを選べます",
+        "- 切り替えを要求すると有効な設定プロファイルが切り替わり、古い追跡フレームは一度消去されます",
+        "- `VisionReceiver:Profiles` に同名の設定プロファイルがある場合は、受信処理のマルチキャスト用の通信アドレス、通信ポート、使用する IPv4 の通信アドレスもその設定プロファイルに追従します",
+        "- 新しい入力から追跡フレームが確定すると、新しい設定プロファイルに基づく追跡結果が再表示されます"
+      ],
+      "decision": "fixed",
+      "reason": "Profile Controlの選択、旧frame消去、同名受信設定追従、新profileで再表示という4規則を保持。確定するのはpacketでなく入力から生成する追跡フレームと自然に説明。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B015",
+      "baseline_start": 82,
+      "baseline_end": 94,
+      "final_start": 84,
+      "final_end": 96,
+      "final_text": [
+        "- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の `*.tracker-diagnostics.log`、既定の `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます",
+        "- 上部の timeline scrubber をドラッグすると、選択中の再生時点が連続的に切り替わります",
+        "- 左側の replay timeline でログ行を時系列にスクロールできます",
+        "- 新規キャプチャーでは `diagnostics-samples.jsonl` の選択中の採取記録から `Vision Input` と `ibis tracker` のボール・ロボットを描画します。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示の代わりには使いません。",
+        "- 左右の `Field` 見出し行で `Field source` を `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label から選択できます。`Field source` には曖昧な `All` は含めず、ログ変更時は左 `Vision Input` / 右 `ibis tracker` に戻ります。",
+        "- 新規キャプチャーの `External` / `Unknown` / source label の `Field source` は、`tracker-snapshot-alignment.jsonl` の保存時対応表を優先し、選択中の diagnostics sample tick に対応する tracker snapshot、またはその時点以前の latest-before snapshot を描画します。対応付けがない旧形式では、外部トラッカーの時刻対応は非対応または「正確な対応を保証しない推定」として表示します。",
+        "- 右側で選択行の未加工入力と追跡結果について、ボール、ロボット、観測フレーム / 追跡フレームの情報を比較できます",
+        "- キャプチャーの診断ログを選ぶと、`Settings` から capture metadata に保存された定義済みの設定プロファイルと解決済みの設定を確認できます",
+        "- キャプチャーの診断ログとトラッカーパケットの snapshot sidecar が揃っている場合は、折り畳み可能な `Tracker Comparison` 表示領域で自前トラッカーと外部トラッカーの差分を確認できます",
+        "- `Tracker Comparison` 表示領域の表示元の絞り込みは `All`、`External`、`Own`、`Unknown`、source label ごとで切り替えられます。通常確認では `External` または対象の表示元名を選び、新規キャプチャーでは保存済みの alignment sidecar に対応する外部トラッカーのスナップショットと比較します。対応付けがない既存キャプチャーで最も近い時刻を使う場合は「正確な対応を保証しない推定」として表示されます。",
+        "- 新規キャプチャーの replay timeline は `diagnostics-samples.jsonl` の採取時系列を使います。`Tracker Comparison` は tracker packet snapshot と alignment sidecar を外部トラッカーの比較用に索引化し、選択中の diagnostics sample tick に対応する tracker snapshot を参照します。再生位置や再生時点を変更しても外部トラッカーの補助ファイルを全件再読込せず、100MB を超える補助ファイルでも再生位置の変更ごとの I/O と解析量がファイルサイズに比例しない構成を維持します。",
+        "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。",
+        "- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。"
+      ],
+      "decision": "fixed",
+      "reason": "F1対応: 新規 Vision Input / ibis tracker の物体表示を diagnostics-samples.jsonl から復元し、render snapshot は旧形式・形状補助へ限定。 F1対応: 外部 Field source を diagnostics sample tick に対する alignment / latest-before tracker snapshot で描画する実装へ同期。 F1対応: 新規 replay timeline を diagnostics-samples.jsonl の採取時系列へ同期し、外部比較索引と性能条件を維持。 F1対応: diagnostics sample / tracker snapshot / alignment の状態と採取番号を画面表示項目へ反映。",
+      "review_kind": "implementation_worker_f1_fix_sync"
+    },
+    {
+      "block": "D18-B016",
+      "baseline_start": 98,
+      "baseline_end": 98,
+      "final_start": 100,
+      "final_end": 100,
+      "final_text": [
+        "設定プロファイルの切り替えは HTTP API からも要求できます。既定の起動設定では `UseHttpsRedirection()` が有効なため、通常は HTTPS の接続先を使ってください。"
+      ],
+      "decision": "accepted",
+      "reason": "HTTP APIでも設定切替可能、既定のUseHttpsRedirection有効時は通常HTTPSを使う条件を保持。curlコマンドは変更しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B017",
+      "baseline_start": 104,
+      "baseline_end": 106,
+      "final_start": 106,
+      "final_end": 108,
+      "final_text": [
+        "- URL 内のパラメータ `{profileName}` は `Tracker:Profiles` に定義した名前です",
+        "- 既定の起動設定の通常系では `202 Accepted` が返ります",
+        "- 存在しない設定プロファイルの名前を指定すると `Tracker:Profiles` の解決に失敗し、現状実装では 4xx ではなくサーバーエラーになります"
+      ],
+      "decision": "accepted",
+      "reason": "pathのprofileNameは設定定義名、正常は202 Accepted、未知名は現実装で4xxでなくserver errorという3条件を保持。エラーを正常扱いしない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B018",
+      "baseline_start": 110,
+      "baseline_end": 110,
+      "final_start": 112,
+      "final_end": 112,
+      "final_text": [
+        "主な設定は [`appsettings.json`](./appsettings.json) にあります。"
+      ],
+      "decision": "fixed",
+      "reason": "リンク先の実ファイル名appsettings.jsonをリンク表示にも戻す。設定ファイル一般に名称をぼかさない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B019",
+      "baseline_start": 114,
+      "baseline_end": 114,
+      "final_start": 116,
+      "final_end": 116,
+      "final_text": [
+        "未加工の SSL-Vision パケットの受信設定です。"
+      ],
+      "decision": "accepted",
+      "reason": "VisionReceiverがraw SSL-Vision packetの受信設定である意味を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B020",
+      "baseline_start": 118,
+      "baseline_end": 122,
+      "final_start": 120,
+      "final_end": 124,
+      "final_text": [
+        "| `MulticastAddress` | 受信対象のマルチキャスト宛先です。値がマルチキャスト範囲ならその宛先へ参加します。通常は SSL-Vision 側のマルチキャスト宛先を指定します。 |",
+        "| `Port` | SSL-Vision パケットの受信に使う通信ポートです。 |",
+        "| `InterfaceAddress` | マルチキャスト参加に使う、この端末の IPv4 の通信アドレスです。`null` の場合はこの端末で利用可能な IPv4 の通信アドレスを自動探索します。ネットワーク接続が複数ある環境や参加に失敗する場合は、明示指定すると安定します。 |",
+        "| `PacketCapture` | 受信した UDP パケットを後で再生できるように圧縮保存する設定です。 |",
+        "| `Profiles` | 設定プロファイルごとの受信処理の上書き設定です。`Tracker` 側の有効な設定プロファイルの名前と同名の項目があれば、起動時と実行中の設定プロファイルの切り替え後にその受信設定へ追従します。 |"
+      ],
+      "decision": "fixed",
+      "reason": "5設定を照合。multicast group判定、Port、local IPv4/null自動探索/複数NIC、圧縮capture、同名profileの起動/切替後追従を保持。localはこの端末のアドレスでありmulticast宛先でないと明記。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B021",
+      "baseline_start": 126,
+      "baseline_end": 126,
+      "final_start": 128,
+      "final_end": 128,
+      "final_text": [
+        "SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。"
+      ],
+      "decision": "fixed",
+      "reason": "decode前bytesをjsonl.gzへ保存、receivedAt/endpoint/Base64、同順序で復元再投入、decode失敗packetも保存という条件を保持。ユーザー承認のUDPパケット表記を使用。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B022",
+      "baseline_start": 128,
+      "baseline_end": 128,
+      "final_start": 130,
+      "final_end": 130,
+      "final_text": [
+        "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。"
+      ],
+      "decision": "fixed",
+      "reason": "CaptureOnごとにprefix-timestamp-guidのfolderを作る命名と、共通名の補助ファイルを作る意味を保持。basenameを基本名という曖昧な語にせずファイル名の共通部分と説明。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B023",
+      "baseline_start": 130,
+      "baseline_end": 136,
+      "final_start": 132,
+      "final_end": 138,
+      "final_text": [
+        "- `<prefix>-<timestamp>-<guid>.jsonl.gz`: パケットキャプチャーの本体",
+        "- `<prefix>-<timestamp>-<guid>.metadata.json`: キャプチャー時の `Tracker` 設定と解決済みの設定プロファイル",
+        "- `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: キャプチャーと対応するトラッカー診断ログ。`Tracker:Diagnostics:FilePath` が指定されていても、キャプチャーが有効なときは補助ファイルとして同時に出力します。",
+        "- `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: 旧形式の診断表示やフィールド形状などの補助に使う render snapshot。新規キャプチャーの `Vision Input` / `ibis tracker` の物体表示や replay timeline の主な入力には使いません。",
+        "- `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の受信処理が受信した公式形式の `TrackerWrapperPacket` の snapshot sidecar です。",
+        "- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断側の選択時点と tracker source snapshot を対応付ける補助ファイルです。新規キャプチャーでは replay timeline 自体は diagnostics sample tick を使い、最速の source cadence を再生位置の選択軸にはしません。alignment sidecar は外部トラッカーの tracker snapshot を選択時点へ対応付けるために使い、対応記録がない場合は選択時点以前の同じ表示元の latest-before snapshot を使います。render snapshot は新規記録の `Vision Input` / `ibis tracker` の復元元にはしません。",
+        "- `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecar です。"
+      ],
+      "decision": "fixed",
+      "reason": "F1対応: render snapshot を旧形式・形状補助へ位置付け、新規既定表示元の主入力から除外。 F1対応: alignment sidecar を外部 tracker snapshot の対応付けへ限定し、新規 replay timeline は diagnostics sample tick とする実装へ同期。",
+      "review_kind": "implementation_worker_f1_fix_sync"
+    },
+    {
+      "block": "D18-B024",
+      "baseline_start": 138,
+      "baseline_end": 138,
+      "final_start": 140,
+      "final_end": 140,
+      "final_text": [
+        "`metadata.json` には有効な設定プロファイルの名前だけではなく、`Tracker:Profiles` 配下の設定プロファイルの値と、実行時の上書き適用後に解決した設定も保存します。CaptureOn の記録では、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` をここから辿ります。"
+      ],
+      "decision": "fixed",
+      "reason": "F1対応: metadata の DiagnosticsSampleSidecarPath / DiagnosticsSampleLog を含む実際の保存項目へ同期。",
+      "review_kind": "implementation_worker_f1_fix_sync"
+    },
+    {
+      "block": "D18-B025",
+      "baseline_start": 142,
+      "baseline_end": 146,
+      "final_start": 144,
+      "final_end": 148,
+      "final_text": [
+        "| `Enabled` | 起動時のパケットキャプチャーの初期値です。起動後は画面の `Capture On/Off` ボタンで切り替えできます。 |",
+        "| `DirectoryPath` | キャプチャーファイルの出力ディレクトリです。相対パスは実行ファイルのディレクトリから解決します。 |",
+        "| `FilePrefix` | キャプチャーファイル名の接頭辞です。実際のファイル名は `<prefix>-<timestamp>-<guid>.jsonl.gz` になります。 |",
+        "| `FlushEachPacket` | `true` ならパケットごとに、バッファに残っているデータを書き出します。異常終了時の欠落は減りますが、入出力負荷は上がります。 |",
+        "| `DiagnosticsSampleIntervalMilliseconds` | CaptureOn 中に `diagnostics-samples.jsonl` へ最新の未加工入力と追跡結果のスナップショットを固定保存する周期です。0 以下の場合は既定値 `100` ms を使います。 |"
+      ],
+      "decision": "fixed",
+      "reason": "captureの5設定と単位/既定を保持。相対パスを承認済み表記で示し実行ファイルディレクトリを基準とする。Flushは通常保存でなくバッファ内データの書き出しと説明し、欠落減少と負荷増加の対比を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B026",
+      "baseline_start": 148,
+      "baseline_end": 148,
+      "final_start": 150,
+      "final_end": 150,
+      "final_text": [
+        "現在の `appsettings.json` では起動時のキャプチャーは無効ですが、画面で `Capture On` にした後はパケットごとに、バッファに残っているデータを書き出します。"
+      ],
+      "decision": "fixed",
+      "reason": "現在設定は起動時capture無効、UI On後は各packetでflushするという2条件を保持。書き出す対象をバッファ内データと明示。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B027",
+      "baseline_start": 172,
+      "baseline_end": 172,
+      "final_start": 174,
+      "final_end": 174,
+      "final_text": [
+        "保存されたキャプチャーは `Tracker.CaptureReplay` で再生・分析できます。通常のユーザー確認は `/diagnostics` の `Tracker Comparison` 表示領域を主経路にし、この CLI はエージェント / 自動検証 / 回帰調査で同じキャプチャーを再現するために残します。詳細は [CaptureReplay の利用手順](../Tracker.CaptureReplay/README.md) を参照してください。"
+      ],
+      "decision": "fixed",
+      "reason": "通常確認は診断UI、CLIはagent/自動検証/回帰調査で同じcaptureを再現するため保持する境界を保持。参照READMEリンクとコマンド例も保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B028",
+      "baseline_start": 183,
+      "baseline_end": 183,
+      "final_start": 185,
+      "final_end": 185,
+      "final_text": [
+        "CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder またはその中の `*.jsonl.gz` を渡します。フォルダを渡した場合、CLI は同じフォルダの `*.metadata.json` からキャプチャーと解決済みのトラッカー設定を読み取ります。再生には記録時点で解決済みのトラッカー設定を使い、capture metadata に記録された相対パスから `tracker-packet-snapshots.jsonl` と `tracker-snapshot-alignment.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=saved-session-alignment ...` が出れば、保存時対応表に基づく比較まで読み取れています。対応付けがない既存キャプチャーでは `legacy-nearest-timestamp` または非対応状態を確認してください。"
+      ],
+      "decision": "fixed",
+      "reason": "capture引数のfolderまたはファイル、同folder metadataからcapture/settings/2sidecar解決、保存時設定、2出力確認、旧形式の推定/非対応という条件を保持。metadata名と相対パスを明示。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B029",
+      "baseline_start": 185,
+      "baseline_end": 185,
+      "final_start": 187,
+      "final_end": 187,
+      "final_text": [
+        "raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを手作業で読む代わりに `--analyze-latency` を使います。これは未加工の検出結果の受信周期と、再生後に自前トラッカーの追跡フレームが確定されるまでのキャプチャー上の遅れを出力します。capture metadata 由来のスナップショット行が多いキャプチャーでは `--skip-tracker-snapshots` と `--max-latency-frames` で出力量を絞れます。"
+      ],
+      "decision": "fixed",
+      "reason": "遅延分析はraw受信周期とtracker確定までのcapture-time lagを出し、2optionsで出力量を絞る意味を保持。再生処理の実行時間そのものへ読み替えず、metadataとcaptureの単位を明記。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B030",
+      "baseline_start": 195,
+      "baseline_end": 195,
+      "final_start": 197,
+      "final_end": 197,
+      "final_text": [
+        "ER-Force 外部トラッカーを手動検証に使う場合は、`Tracker/Design/Core/Ref/ibis` 配下の Docker 開発環境を使えます。CI や通常の単体テストは Docker に依存させず、手元の再現確認だけで使ってください。"
+      ],
+      "decision": "fixed",
+      "reason": "ER-Force Docker環境は手元の再現専用で、CI/通常unit testをDocker依存させない条件を保持。承認済みの単体テスト表記を復元。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B031",
+      "baseline_start": 202,
+      "baseline_end": 202,
+      "final_start": 204,
+      "final_end": 204,
+      "final_text": [
+        "ER-Force の設定プロファイルは同じリポジトリの `docker/dev/README.md` に従います。`Tracker.DebugHost` 側は `Tracker:Receive:Enabled=true` とし、外部トラッカーが送るマルチキャスト接続先と `Tracker:Receive:MulticastAddress` / `Port` / `InterfaceAddress` が合っていることを確認してから CaptureOn します。検証後の停止は同じディレクトリで `./scripts/docker-dev.sh down` を使います。"
+      ],
+      "decision": "accepted",
+      "reason": "Docker README、Receive有効化、外部送信先/受信設定一致確認後にCaptureOn、同じdirectoryで停止という手順を保持。手動確認したとは主張しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B032",
+      "baseline_start": 204,
+      "baseline_end": 204,
+      "final_start": 206,
+      "final_end": 206,
+      "final_text": [
+        "自動テストや回帰検証では exit code を使えます。"
+      ],
+      "decision": "accepted",
+      "reason": "自動テストと回帰検証ではexit codeを使える説明を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B033",
+      "baseline_start": 214,
+      "baseline_end": 215,
+      "final_start": 216,
+      "final_end": 217,
+      "final_text": [
+        "- `--expect <condition>`: 集計指標の期待条件です。失敗すると exit code `1` になります。",
+        "- `--detail-filter <condition>`: 条件に一致する確定済みの追跡フレームの詳細を出力します。複数指定した場合は、すべてを満たす条件として扱います。"
+      ],
+      "decision": "accepted",
+      "reason": "expect失敗時exit1と、detail-filter複数時ANDという条件を保持。期待失敗を成功にしない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B034",
+      "baseline_start": 217,
+      "baseline_end": 217,
+      "final_start": 219,
+      "final_end": 219,
+      "final_text": [
+        "- `--settings <file>`: `Tracker.DebugHost/appsettings.json` 形式、またはキャプチャーの `metadata.json` 形式からトラッカー設定を読み込みます。`Tracker.DebugHost/appsettings.json` 形式では `Tracker:RuntimeOverrides` も設定プロファイルへ反映します。"
+      ],
+      "decision": "accepted",
+      "reason": "settingsはappsettings形式またはcapture metadata形式の2入力、前者はRuntimeOverrides反映という条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B035",
+      "baseline_start": 219,
+      "baseline_end": 219,
+      "final_start": 221,
+      "final_end": 221,
+      "final_text": [
+        "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。"
+      ],
+      "decision": "fixed",
+      "reason": "F1対応: 手書き metadata の必要項目へ diagnostics sample / tracker snapshot / alignment のパスとログ情報を追加し、既存設定再評価条件を維持。",
+      "review_kind": "implementation_worker_f1_fix_sync"
+    },
+    {
+      "block": "D18-B036",
+      "baseline_start": 221,
+      "baseline_end": 221,
+      "final_start": 223,
+      "final_end": 223,
+      "final_text": [
+        "利用できる集計指標は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。追跡フレームの詳細の絞り込みでは `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。未加工系の集計指標は、その確定済みの追跡フレームの元になった検出結果群から集計します。"
+      ],
+      "decision": "accepted",
+      "reason": "9summary metricsと5detail filtersの実識別子を全保持。raw metricsは当該確定frameのsource detectionsから集計する条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B037",
+      "baseline_start": 223,
+      "baseline_end": 223,
+      "final_start": 225,
+      "final_end": 225,
+      "final_text": [
+        "例えば、未加工入力ではボールが 1 個なのに再生後の追跡フレームでボールが 2 個以上になる箇所を確認する場合は次のようにします。"
+      ],
+      "decision": "accepted",
+      "reason": "rawボール1個なのに再生後frameが2個以上という例の数量/対象を保持。対応する条件式も変更しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B038",
+      "baseline_start": 234,
+      "baseline_end": 234,
+      "final_start": 236,
+      "final_end": 236,
+      "final_text": [
+        "テスト用のソースコードから直接扱う場合は `VisionPacketCaptureFile.ReadRecords(path)` で読み戻し、各記録の `ParsePacket()` を `TrackerCoordinator.ProcessPacket(packet, record.ReceivedAt)` または `TrackerEngine.Update(...)` へ順番に渡すことで再生できます。"
+      ],
+      "decision": "accepted",
+      "reason": "ReadRecords→各ParsePacket→Coordinator.ProcessPacketまたはEngine.Updateを順に呼ぶ2経路を保持。受信時刻を渡す契約も保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B039",
+      "baseline_start": 236,
+      "baseline_end": 236,
+      "final_start": 238,
+      "final_end": 238,
+      "final_text": [
+        "### CaptureOn 比較ログの手動検証"
+      ],
+      "decision": "accepted",
+      "reason": "CaptureOn比較ログのmanual evidenceという見出しを手動検証と説明。次の証跡保存の順序を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B040",
+      "baseline_start": 240,
+      "baseline_end": 247,
+      "final_start": 242,
+      "final_end": 249,
+      "final_text": [
+        "1. `Tracker:Receive:Enabled=true` にし、受信処理が監視する接続先を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した自前トラッカーの送信先を使います。既定の `sim` 設定プロファイルは `224.5.23.2:11010`、`default` 設定プロファイルは `224.5.23.2:10010` です。外部トラッカーが別の接続先に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。ネットワーク接続が複数ある環境では `Tracker:Receive:InterfaceAddress` を明示します。",
+        "2. `Tracker.DebugHost` を起動し、画面で `Capture On` にしてから SSL-Vision パケットと公式形式の `TrackerWrapperPacket` を流します。`Tracker:Receive:Enabled=false` のままではトラッカー受信処理が起動しないため、キャプチャーと診断ログは残ってもトラッカーパケットの snapshot sidecar は増えません。",
+        "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`diagnostics-samples.jsonl`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では各ファイルの相対パスと、`DiagnosticsSampleLog` / `TrackerSnapshotLog` / `TrackerSnapshotAlignmentLog` の `IsCreated`、`RecordCount`、`SkippedRecordCount`、`ErrorCount` を確認します。",
+        "4. `/diagnostics` を開き、同じ session folder の診断記録を選びます。新規キャプチャーでは replay timeline が diagnostics sample tick で構成され、左 `Vision Input` と右 `ibis tracker` が同じ diagnostics sample tick の採取記録にある未加工入力・追跡結果から描画されることを確認します。`External` / `Unknown` / source label の `Field source` は保存済みの alignment sidecar、または選択時点以前の latest-before snapshot を使います。`Play` / `Fast Forward` / `Stop`、速度選択の `等倍速` / `4x` / `16x` / `64x`、timeline scrubber を操作し、ER-FORCE など外部トラッカーが高頻度でも再生位置自体は diagnostics sample tick のまま進むことを確認します。",
+        "5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。",
+        "6. `Tracker Comparison` 表示領域では、新規キャプチャーで diagnostics sample sidecar を読み取れる場合に `Vision Input` / `ibis tracker` の Field source が利用できることを確認します。外部トラッカーの比較では tracker packet snapshot / alignment sidecar を読み、条件を満たす場合に `Status` が `Ready` になることを確認します。",
+        "7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。",
+        "8. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`saved-session-alignment` の比較概要をエージェント / 検証 / 回帰用の検証記録として残します。CLI の検証記録は UI の検証記録の補助であり、通常確認の主経路ではありません。"
+      ],
+      "decision": "fixed",
+      "reason": "F1対応: 手動確認成果物へ diagnostics-samples.jsonl と DiagnosticsSampleLog の件数・エラー状態を追加。 F1対応: 手動診断手順を diagnostics sample tick と同一採取記録の Vision Input / ibis tracker に同期し、再生操作の既存確認項目を維持。 F1対応: diagnostics sample sidecar だけでも既定2 Field source を利用でき、外部比較時は tracker snapshot/alignment を追加利用する条件へ同期。 F1対応: 報告項目へ diagnostics sample tick と各補助ファイルの状態を追加し、既存の時刻・source・復元情報を維持。",
+      "review_kind": "implementation_worker_f1_fix_sync"
+    },
+    {
+      "block": "D18-B041",
+      "baseline_start": 249,
+      "baseline_end": 249,
+      "final_start": 251,
+      "final_end": 251,
+      "final_text": [
+        "`Tracker Comparison` 表示領域の補助ファイル状態は次のように読みます。"
+      ],
+      "decision": "accepted",
+      "reason": "sidecar statusの読解を補助ファイル状態の説明として保持。次の9行と対応。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B042",
+      "baseline_start": 251,
+      "baseline_end": 259,
+      "final_start": 253,
+      "final_end": 261,
+      "final_text": [
+        "- `Ready`: 新規キャプチャーでは読み取り可能な `diagnostics-samples.jsonl` だけでも `Vision Input` / `ibis tracker` の replay timeline と Field source を構成できる状態です。外部トラッカーの比較を行う場合は、`tracker-packet-snapshots.jsonl` と alignment sidecar の利用可能な情報も組み合わせます。",
+        "- `NoLogSelected`: 診断ログがまだ選択されていません。",
+        "- `MetadataMissing` / `MetadataCorrupt`: 選択したログに対応する `*.metadata.json` がない、または JSON を読み取れません。古い診断ログや壊れた capture metadata の可能性があります。",
+        "- `SnapshotMetadataMissing`: diagnostics sample sidecar が利用できず、capture metadata にトラッカーのスナップショットのログ情報もないため、新規記録の比較経路を構成できない状態です。CaptureOn 比較ログ導入前や旧 render snapshot だけのキャプチャーではこの状態になり得るため、非対応または機能制限付きの旧形式として扱います。",
+        "- `SidecarNotCreated`: capture metadata は snapshot sidecar が未作成であることを示します。`Tracker:Receive:Enabled=false`、受信処理未起動、または CaptureOn 中に書き込み処理が開始されなかった場合を疑います。",
+        "- `SidecarPathMissing` / `SidecarMissing`: capture metadata に補助ファイルのファイルパスがない、または capture metadata が指すファイルが存在しません。session folder の移動や部分コピーを疑います。",
+        "- `SidecarEmpty` または `RecordCount=0`: 補助ファイルは作成されていますが、保存済みのトラッカーパケットがありません。公式形式の `TrackerWrapperPacket` が接続先に流れていない、マルチキャスト受信に使うネットワーク接続が違う、表示元がまだ見えていない場合を確認します。",
+        "- `SidecarCorrupt`: diagnostics sample sidecar または tracker snapshot / alignment sidecar の JSONL を読み取れません。壊れたファイル、途中書き込み、手動編集を疑います。",
+        "- `Skipped` が 0 より大きい場合は、デコードまたは書き込み失敗でスナップショット記録にできなかったパケットがあることを示します。`Errors` が 0 より大きい場合は書き込み処理側で記録されたエラーがあるため、比較結果の代表性を報告書のリスクに残します。"
+      ],
+      "decision": "fixed",
+      "reason": "F1対応: Ready は diagnostics-samples.jsonl 単独でも Vision Input / ibis tracker を構成できる実装へ同期。 F1対応: SnapshotMetadataMissing を diagnostics sample 不可かつ tracker snapshot metadata 不在の旧形式/機能制限状態として説明。 F1対応: SidecarCorrupt の対象に diagnostics sample sidecar と tracker snapshot / alignment sidecar を明記。",
+      "review_kind": "implementation_worker_f1_fix_sync"
+    },
+    {
+      "block": "D18-B043",
+      "baseline_start": 263,
+      "baseline_end": 263,
+      "final_start": 265,
+      "final_end": 265,
+      "final_text": [
+        "受信処理の設定プロファイルの上書きです。未指定項目は最上位の `VisionReceiver` の値を引き継ぎます。"
+      ],
+      "decision": "accepted",
+      "reason": "receiver profile overrideで未指定項目はtop-level VisionReceiverを継承する条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B044",
+      "baseline_start": 267,
+      "baseline_end": 269,
+      "final_start": 269,
+      "final_end": 271,
+      "final_text": [
+        "| `MulticastAddress` | 設定プロファイルの切り替え後に参加するマルチキャストグループの通信アドレスです。 |",
+        "| `Port` | 設定プロファイルの切り替え後にソケットを割り当て、受信に使う UDP の通信ポートです。 |",
+        "| `InterfaceAddress` | 設定プロファイルの切り替え後にマルチキャスト参加へ使う、この端末の IPv4 の通信アドレスです。 |"
+      ],
+      "decision": "fixed",
+      "reason": "切替後のgroup、bind/receiveのPort、local IPv4の3設定を保持。localはこの端末のアドレスと明記。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B045",
+      "baseline_start": 273,
+      "baseline_end": 273,
+      "final_start": 275,
+      "final_end": 275,
+      "final_text": [
+        "トラッカー全体の設定です。"
+      ],
+      "decision": "accepted",
+      "reason": "Tracker全体の設定であるという導入を自然なカタカナで表す。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B046",
+      "baseline_start": 277,
+      "baseline_end": 282,
+      "final_start": 279,
+      "final_end": 284,
+      "final_text": [
+        "| `Enabled` | `true` なら受信パケットを追跡エンジンに流します。`false` なら未加工入力の表示画面だけ動き、追跡結果の更新は行いません。 |",
+        "| `PublishUdp` | `true` ならトラッカーパケットの送信処理が UDP 送信します。`false` なら追跡結果の計算は続けますが UDP 送信は行いません。なお UI の `Publish OK` は送信保証カウンタではなく、無送信でも増えることがあります。 |",
+        "| `SourceName` | トラッカーパケットの表示元名です。設定プロファイルごとの送信設定と合わせてパケット生成処理に渡されます。 |",
+        "| `Uuid` | トラッカーパケットの UUID です。受信側で表示元の識別に使う値です。 |",
+        "| `ActiveProfileName` | 起動時に使う設定プロファイルの名前です。`Tracker:Profiles` に存在する必要があります。 |",
+        "| `Diagnostics` | トラッカーの未加工入力 / 追跡結果の診断ログ出力設定です。 |"
+      ],
+      "decision": "accepted",
+      "reason": "Enabled=falseはRawのみ、PublishUdp=falseでも計算継続しUI件数は送信保証でない、source name/UUID、起動profileの存在要件、診断設定という6項目を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B047",
+      "baseline_start": 284,
+      "baseline_end": 285,
+      "final_start": 286,
+      "final_end": 287,
+      "final_text": [
+        "| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、一時的な送信設定 / トラッカー調整値を差し込む用途です。 |",
+        "| `Profiles` | 設定プロファイルごとの送信 / 追跡エンジン / 調整値の設定です。UI と API の設定プロファイルの切り替え対象にもなります。 |"
+      ],
+      "decision": "accepted",
+      "reason": "RuntimeOverridesは任意の起動時一時上書きで元profile不変、Profilesはpublish/engine/tuningとUI/API選択対象という2設定を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B048",
+      "baseline_start": 289,
+      "baseline_end": 289,
+      "final_start": 291,
+      "final_end": 291,
+      "final_text": [
+        "CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Enabled=true` のときだけ `TrackerConnectionLib` の受信処理が起動します。`MulticastAddress` / `Port` が未指定なら、起動時に有効な設定プロファイルと `Tracker:RuntimeOverrides:Publish` から解決した自前トラッカーの送信先を監視します。`MulticastAddress` / `Port` を明示した場合は、受信処理独自の接続先を監視します。接続先の解決は起動時固定で、実行時の設定プロファイルの切り替え後に受信ソケットは再構成されません。受信した `TrackerWrapperPacket` は CaptureOn 中だけ `tracker-packet-snapshots.jsonl` へ保存され、Capture Off 中は追記しません。"
+      ],
+      "decision": "accepted",
+      "reason": "受信有効時だけ起動、未指定なら起動profile+overrideから送信先解決、明示独自先、起動時固定で切替後再構成なし、CaptureOnだけ保存という6条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B049",
+      "baseline_start": 291,
+      "baseline_end": 291,
+      "final_start": 293,
+      "final_end": 293,
+      "final_text": [
+        "`Enabled=false` のままでは受信処理が起動しないため、外部トラッカーパケットは記録されません。補助ファイルが空の場合は、監視接続先、`InterfaceAddress`、OS のマルチキャスト経路、外部トラッカーの送信先が一致しているか確認してください。"
+      ],
+      "decision": "accepted",
+      "reason": "Enabled=falseで受信/外部記録なし、空時にendpoint/interface/OS route/外部送信先を確認する切り分けを保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B050",
+      "baseline_start": 295,
+      "baseline_end": 298,
+      "final_start": 297,
+      "final_end": 300,
+      "final_text": [
+        "| `Enabled` | `true` なら公式形式の `TrackerWrapperPacket` の受信処理を起動します。既定は `false` です。 |",
+        "| `MulticastAddress` | 受信処理が監視するマルチキャストグループの通信アドレスです。`null` の場合は起動時に解決済みの自前トラッカー送信先の通信アドレスを使います。 |",
+        "| `Port` | 受信処理が監視する UDP の通信ポートです。`null` の場合は起動時に解決済みの自前トラッカー送信先の通信ポートを使います。 |",
+        "| `InterfaceAddress` | マルチキャスト参加に使う、この端末の IPv4 の通信アドレスです。`null` の場合は受信処理実装の既定に任せます。複数 NIC がある環境では明示指定してください。 |"
+      ],
+      "decision": "fixed",
+      "reason": "受信設定の意味と既定値を保持し、受信対象を `TrackerWrapperPacket` と具体化した。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B051",
+      "baseline_start": 311,
+      "baseline_end": 311,
+      "final_start": 313,
+      "final_end": 313,
+      "final_text": [
+        "トラッカーの調査用診断ログ設定です。診断ログは常に出力され、`FilePath` が `null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。パケットのキャプチャーが有効なときは、キャプチャーに付随する `*.tracker-diagnostics.log` にも同時に出力します。"
+      ],
+      "decision": "accepted",
+      "reason": "診断ログは常時出力、nullならcaptureディレクトリ下に起動ごと新規、capture有効時はsidecarへも同時出力という条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B052",
+      "baseline_start": 325,
+      "baseline_end": 325,
+      "final_start": 327,
+      "final_end": 327,
+      "final_text": [
+        "標準出力に出るトラッカー診断の構造化ログは `Logging:LogLevel` で抑制します。ファイル出力はこの設定とは別に継続します。"
+      ],
+      "decision": "accepted",
+      "reason": "console側structured logはLogLevelで抑制、ファイルは別に継続という2経路の独立を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B053",
+      "baseline_start": 337,
+      "baseline_end": 337,
+      "final_start": 339,
+      "final_end": 339,
+      "final_text": [
+        "全体の `Information` ログも止めたい場合は `Default` を `Warning` にします。"
+      ],
+      "decision": "accepted",
+      "reason": "Information全体も抑える場合にDefaultをWarningへする条件と値を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B054",
+      "baseline_start": 341,
+      "baseline_end": 341,
+      "final_start": 343,
+      "final_end": 343,
+      "final_text": [
+        "設定プロファイルの基本設定に対する「上書き」です。指定しない項目は設定プロファイルの値をそのまま使います。"
+      ],
+      "decision": "accepted",
+      "reason": "profile baseへの上書きであり、未指定項目は元profileの値を使う条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B055",
+      "baseline_start": 345,
+      "baseline_end": 351,
+      "final_start": 347,
+      "final_end": 353,
+      "final_text": [
+        "| `Publish.MulticastAddress` | トラッカーパケットの送信先の通信アドレスを一時的に上書きします。 |",
+        "| `Publish.Port` | トラッカーパケットの送信先の通信ポートを一時的に上書きします。 |",
+        "| `Publish.SourceName` | トラッカーパケットの表示元名を一時的に上書きします。 |",
+        "| `Publish.Uuid` | トラッカーパケットの UUID を一時的に上書きします。 |",
+        "| `RobotTracker.*` | ロボット追跡の調整値を有効な設定プロファイルに対して上書きします。 |",
+        "| `BallTracker.*` | ボール追跡の調整値を有効な設定プロファイルに対して上書きします。 |",
+        "| `KickDetector.*` | キック判定の調整値を有効な設定プロファイルに対して上書きします。 |"
+      ],
+      "decision": "accepted",
+      "reason": "7上書き対象を全保持。publishのaddress/port/source/UUID、robot/ball/kick調整値はいずれも一時上書きであることを保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B056",
+      "baseline_start": 353,
+      "baseline_end": 353,
+      "final_start": 355,
+      "final_end": 355,
+      "final_text": [
+        "現状の UI / HTTP API では個別の上書き値を入力する機能はなく、`appsettings.json` の起動時設定として使う想定です。"
+      ],
+      "decision": "accepted",
+      "reason": "現UI/HTTP APIに個別override値の入力機能はなく起動時appsettings用という制限を保持。将来機能を実装済みにしない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B057",
+      "baseline_start": 357,
+      "baseline_end": 357,
+      "final_start": 359,
+      "final_end": 359,
+      "final_text": [
+        "トラッカーパケットの送信先設定です。"
+      ],
+      "decision": "accepted",
+      "reason": "profile publishがtracker packet送信先設定であることを保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B058",
+      "baseline_start": 361,
+      "baseline_end": 362,
+      "final_start": 363,
+      "final_end": 364,
+      "final_text": [
+        "| `MulticastAddress` |公式形式の `TrackerWrapperPacket` の送信先の通信アドレスです。マルチキャスト / ユニキャストのどちらも指定できます。 |",
+        "| `Port` |公式形式の `TrackerWrapperPacket` の送信先の通信ポートです。設定プロファイルごとに切り替えられます。 |"
+      ],
+      "decision": "accepted",
+      "reason": "送信先アドレス・ポートの意味を保持し、送信対象を `TrackerWrapperPacket` と具体化した。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B059",
+      "baseline_start": 366,
+      "baseline_end": 366,
+      "final_start": 368,
+      "final_end": 368,
+      "final_text": [
+        "追跡エンジンの時系列処理設定です。"
+      ],
+      "decision": "accepted",
+      "reason": "Engineの時系列処理設定という説明を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B060",
+      "baseline_start": 370,
+      "baseline_end": 376,
+      "final_start": 372,
+      "final_end": 378,
+      "final_text": [
+        "| `ReorderWindowNs` | ns | パケットの到着順とイベント時刻順がずれたとき、遅れて届くパケットを待ち、並べ替えるための猶予時間です。大きいほど並べ替えには強くなりますが、追跡フレームの確定は遅れます。 |",
+        "| `MergeWindowNs` | ns | 近接した時刻の検出結果を同じ追跡フレームにまとめる対象時間幅です。大きいほどカメラ間の統合はしやすくなりますが、別の追跡フレームまで混ざりやすくなります。 |",
+        "| `GeometryResetFieldLengthThresholdMm` | mm | フィールドの長さの変化により、追跡状態を初期化する閾値です。 |",
+        "| `GeometryResetFieldWidthThresholdMm` | mm | フィールドの幅の変化により、追跡状態を初期化する閾値です。 |",
+        "| `KalmanInitialVelocityVariance` | 任意係数 | 新規の追跡状態の速度不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |",
+        "| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman filter の予測に用いる分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |",
+        "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど観測値の重みを小さくし、未加工の検出結果の小刻みな揺れの影響を抑えます。 |"
+      ],
+      "decision": "fixed",
+      "reason": "7Engine設定の単位/効果/対価を保持。reorderの猶予時間、merge窓、長幅reset閾値、初期速度分散、process/measurement変換係数を区別。geometry resetは形状でなく追跡状態を初期化することと明記。Kalman方式名を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B061",
+      "baseline_start": 378,
+      "baseline_end": 378,
+      "final_start": 380,
+      "final_end": 380,
+      "final_text": [
+        "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。"
+      ],
+      "decision": "fixed",
+      "reason": "pendingを設定の適用待ちとした誤訳を修正。形状変更時に未処理入力と追跡状態を初期化し、旧形状の保存中frameを破棄することをFrameCommit/Coordinator実装と照合。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B062",
+      "baseline_start": 382,
+      "baseline_end": 382,
+      "final_start": 384,
+      "final_end": 384,
+      "final_text": [
+        "ロボット追跡の調整値です。"
+      ],
+      "decision": "accepted",
+      "reason": "RobotTrackerの調整値の導入をロボット追跡の調整値と自然に説明。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B063",
+      "baseline_start": 386,
+      "baseline_end": 389,
+      "final_start": 388,
+      "final_end": 391,
+      "final_text": [
+        "| `ProcessNoise` | 任意係数 | Kalman filter の予測で見込む process noise の大きさです。大きいほど素早い動きに追従しやすく、安定性は下がります。 |",
+        "| `MeasurementNoise` | 任意係数 | 観測の誤差として見込む measurement noise の大きさです。大きいほど観測値の重みを小さくします。 |",
+        "| `VisibilityHalfLifeSeconds` | s | 観測が来ない追跡状態の可視性をどの速度で減衰させるかです。 |",
+        "| `Gate` | 任意係数 | 既存の追跡状態と新観測を同一対象とみなす近傍判定の厳しさです。小さいほど厳しくなります。 |"
+      ],
+      "decision": "fixed",
+      "reason": "process noiseは予測側、measurement noiseは観測側の不確かさと明示。可視性減衰とgateが小さいほど厳しい規則も保持。一般的な揺らぎへ名称をぼかさない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B064",
+      "baseline_start": 391,
+      "baseline_end": 395,
+      "final_start": 393,
+      "final_end": 397,
+      "final_text": [
+        "| `IdentitySwitchDistanceMm` | mm | 既存の別 ID の追跡状態の近傍へ突然現れたロボット ID 変更候補を抑制する距離です。`0` で無効化できます。 |",
+        "| `OrientationMeasurementNoiseRad` | rad | ロボットの向き観測に見込む観測誤差です。大きいほど向きの観測値の重みを小さくします。 |",
+        "| `OrientationProcessNoise` | 任意係数 | ロボットの向きを推定する Kalman filter で見込む process noise の大きさです。 |",
+        "| `InitialAngularVelocityVariance` | 任意係数 | 新規ロボット追跡状態の初期角速度不確かさです。 |",
+        "| `AngularVelocityLimitRadPerS` | rad/s | ロボット角速度推定の上限です。 |"
+      ],
+      "decision": "fixed",
+      "reason": "5向き/ID設定の単位と0で無効化を保持。OrientationProcessNoiseを向きKalmanの予測側noiseと明記し、観測noise/初期角速度分散/角速度上限と区別。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B065",
+      "baseline_start": 399,
+      "baseline_end": 399,
+      "final_start": 401,
+      "final_end": 401,
+      "final_text": [
+        "ボール追跡の調整値です。意味はロボット追跡とほぼ同じですが、ボール固有に `TrackLifetimeNs` を持ちます。"
+      ],
+      "decision": "accepted",
+      "reason": "BallTrackerはrobotと類似の調整値だが固有のTrackLifetimeNsを持つ条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B066",
+      "baseline_start": 403,
+      "baseline_end": 406,
+      "final_start": 405,
+      "final_end": 408,
+      "final_text": [
+        "| `ProcessNoise` | 任意係数 | ボールの運動を推定する Kalman filter で見込む process noise の大きさです。 |",
+        "| `MeasurementNoise` | 任意係数 | ボールの観測に見込む measurement noise の大きさです。 |",
+        "| `VisibilityHalfLifeSeconds` | s | 観測が消えたボールの追跡状態の可視性をどの速度で減衰させるかです。 |",
+        "| `Gate` | 任意係数 | 既存のボール追跡状態と観測を結び付ける近傍判定の厳しさです。 |"
+      ],
+      "decision": "fixed",
+      "reason": "4ball設定を照合。運動modelと実運動状態を混同せずKalmanのprocess noiseを示し、measurement noiseを保持。半減するのは追跡状態全体でなく可視性であることをプロパティとrobot表に照合。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B067",
+      "baseline_start": 408,
+      "baseline_end": 408,
+      "final_start": 410,
+      "final_end": 410,
+      "final_text": [
+        "| `TrackLifetimeNs` | ns | 観測消失後も追跡状態を保持する最長時間です。 |"
+      ],
+      "decision": "accepted",
+      "reason": "観測消失後もtrackを保持する最長時間で単位nsという契約を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B068",
+      "baseline_start": 412,
+      "baseline_end": 412,
+      "final_start": 414,
+      "final_end": 414,
+      "final_text": [
+        "キック、浮き球、接触周辺の判定設定です。"
+      ],
+      "decision": "accepted",
+      "reason": "kick/chip/contact周辺の判定設定という3対象を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B069",
+      "baseline_start": 416,
+      "baseline_end": 418,
+      "final_start": 418,
+      "final_end": 420,
+      "final_text": [
+        "| `KickSpeedThresholdMmPerS` | mm/s | この速度以上をキック検出候補とみなします。 |",
+        "| `ChipHeightThresholdMm` | mm | ボールの高さがこの値を超えると浮き球の判定に使われます。 |",
+        "| `ContactMarginMm` | mm | ロボットとボールの接触とみなす距離の余裕です。 |"
+      ],
+      "decision": "accepted",
+      "reason": "速度以上、ball高さ超過、robot-ball距離marginという3閾値の対象/単位/比較条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B070",
+      "baseline_start": 420,
+      "baseline_end": 420,
+      "final_start": 422,
+      "final_end": 422,
+      "final_text": [
+        "## 設定プロファイルの考え方"
+      ],
+      "decision": "accepted",
+      "reason": "profileの考え方を承認済みの設定プロファイル表記で示す見出し。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B071",
+      "baseline_start": 422,
+      "baseline_end": 424,
+      "final_start": 424,
+      "final_end": 426,
+      "final_text": [
+        "- `default` と `fast` のように複数の設定プロファイルを置けます",
+        "- 設定プロファイルの切り替えでは、送信先の通信ポートだけでなく、追跡エンジン、ロボット追跡、ボール追跡、キック判定の調整値もまとめて切り替えます",
+        "- 同一の設定プロファイルの名前でも実行時の上書き設定が違えば別設定として適用されます"
+      ],
+      "decision": "accepted",
+      "reason": "複数profile、portだけでなくengine/robot/ball/kickも一括切替、同名でもoverride違えば別設定という3条件を保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B072",
+      "baseline_start": 440,
+      "baseline_end": 440,
+      "final_start": 442,
+      "final_end": 442,
+      "final_text": [
+        "### トラッカーの設定プロファイルに対応する受信処理の設定プロファイルを分ける"
+      ],
+      "decision": "accepted",
+      "reason": "tracker profileに対応するreceiver profileを分ける例の見出しを、承認済み表記で保持。JSON例のキー/値/階層は変更しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B073",
+      "baseline_start": 462,
+      "baseline_end": 462,
+      "final_start": 464,
+      "final_end": 464,
+      "final_text": [
+        "### 追跡結果パケットの送信を止めて表示画面だけ使う"
+      ],
+      "decision": "accepted",
+      "reason": "tracked packet送信を止めviewerのみ使う例を保持。Enabled=true/PublishUdp=falseの組合せは変更しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B074",
+      "baseline_start": 473,
+      "baseline_end": 473,
+      "final_start": 475,
+      "final_end": 475,
+      "final_text": [
+        "### 起動時の設定プロファイルを `fast` にする"
+      ],
+      "decision": "accepted",
+      "reason": "起動profileをfastとする例を保持。ActiveProfileNameの実設定キーを変更しない。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D18-B075",
+      "baseline_start": 485,
+      "baseline_end": 488,
+      "final_start": 487,
+      "final_end": 490,
+      "final_text": [
+        "- `Tracker:ActiveProfileName` や設定プロファイルの切り替え先は、必ず `Tracker:Profiles` に定義した名前にしてください",
+        "- マルチキャスト受信に失敗する場合は `VisionReceiver:InterfaceAddress` の明示指定を優先してください",
+        "- 設定プロファイルの切り替え API は未知の設定プロファイルの名前に対して 4xx を返さずサーバーエラーになるため、呼び出し側で事前に設定プロファイルの一覧を一致させてください",
+        "- この手順を確認した実行環境では、`Duck.slnx` 全体のビルドに `-m:1 -p:BuildInParallel=false` が必要なことがありますが、`Tracker.DebugHost` の実行方法自体は上記のとおりです"
+      ],
+      "decision": "fixed",
+      "reason": "既存profile名必須、multicast失敗時local指定、未知profileは4xxでない、当時のsolution buildに逐次オプションが必要な場合ありという4注意を保持。保存庫全体という誤訳を避け、実在するDuck.slnxを明示し当時の環境に限定する。",
+      "review_kind": "implementation_self_check"
+    }
+  ],
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "role": "implementation_worker_f1_fix_sync",
+  "independent_final_review": false,
+  "f1_affected_blocks": [
+    "D18-B015",
+    "D18-B023",
+    "D18-B024",
+    "D18-B035",
+    "D18-B040",
+    "D18-B042"
+  ]
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "PENDING-UNIT-TEST",
+    "kind": "whitelist_entry",
+    "term": "単体テスト",
+    "aliases": [],
+    "description": "個々の処理や型の動作を、他の部分から切り離して検証するテスト。",
+    "reason": "元のunit/contractの区別を自然に書くための候補。既存のテスト登録だけではSudachiが一語と判定する単体テストは通らない。",
+    "state": "user_approval_required",
+    "configuration_changed": false
+  },
+  {
+    "id": "PENDING-CAPTURE-EXACT",
+    "kind": "checker_behavior",
+    "proposal": "日本語の許可判定では承認された表層形と明示的aliasesを照合し、Sudachiのnormalized_form/reading_formだけの一致で未承認表記を通さない。正規形は未知語の診断情報として保持する。",
+    "state": "proposal_only",
+    "configuration_changed": false
+  },
+  {
+    "id": "PENDING-QUOTATION",
+    "kind": "checker_behavior",
+    "proposal": "出典と引用範囲を明示した直接引用だけを用語制限の例外にする。引用テキストと出典を照合できる方式を別途設計し、すべての括弧句・blockquoteやファイル全体を無条件に除外しない。",
+    "reason": "原文保全のために引用外までサブエージェントを全域許可する必要はない。現行checkerは括弧引用もblockquoteも検査する。",
+    "state": "proposal_only",
+    "configuration_changed": false
+  }
+]

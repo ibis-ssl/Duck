@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-15T19:45:00+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "branch": "docs/runtimehost-readme-appsettings",
+  "technical_head": "c8f256f3e215f125756ed1051a91b6b401971833",
+  "administrative_parent": "05e5eafc0728c7fdc15dfa071d63a3d3300e529b",
+  "approved_change": {
+    "original_whitelist_entries": 170,
+    "final_whitelist_entries": 301,
+    "new_entries": 131,
+    "new_aliases": 6,
+    "new_allowed_spellings": 137,
+    "datagram_policy": "Do not whitelist データグラム; use UDPパケット in normal prose."
+  },
+  "file_blobs_at_technical_head": {
+    "tools/lint/markdown-whitelist.yaml": "beafbe225b720cf29fd17afd138f1ea7e57e91e0",
+    "Tracker/Tracker.DebugHost/README.md": "285aae8dbebf4550b3bc54a192baa5c4327487f9",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "a6f8e957438bdb0b2338d32cf9a386c0fe9ebb55",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "08fb6854f40ddd2998b96911e2d6fcee59c6bd8a",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "feca2e79674c4a4d38b5508e61c15321722133a4",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "55d15efd35d8d19d5f0eb9868dfbf9b9e2e02a46",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "94405b8e2f89e66b07094f4b41a441dd6caf3714",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "f18dcdceba396b616fa7fc842602fd87051876cd",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "86afbf91e83e74c82f5a9fdb96cedd1be93429f2"
+  },
+  "validation": [
+    {
+      "name": "allowed spellings / whitelist checker",
+      "result": "pass",
+      "count": 137,
+      "expected_exit_code": 0
+    },
+    {
+      "name": "allowed spellings / cspell",
+      "result": "pass",
+      "count": 137,
+      "expected_exit_code": 0
+    },
+    {
+      "name": "standalone non-whitelisted spellings / whitelist checker",
+      "result": "pass",
+      "count": 50,
+      "expected_exit_code": 1
+    },
+    {
+      "name": "unregistered English spellings / cspell",
+      "result": "pass",
+      "count": 13,
+      "expected_exit_code": 1
+    },
+    {
+      "name": "focused textlint for 8 changed Markdown documents",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "name": "git diff --check for changed content",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "name": "npm run lint:md",
+      "result": "fail",
+      "exit_code": 123,
+      "note": "Pre-existing/global Markdown lint work remains; this task does not claim full lint success."
+    },
+    {
+      "name": "full whitelist checker",
+      "result": "fail",
+      "exit_code": 1,
+      "note": "SudachiPy input length limit: 80104 bytes > 49149 bytes."
+    },
+    {
+      "name": "local .NET tests",
+      "result": "fail",
+      "total": 328,
+      "passed": 323,
+      "failed": 5,
+      "skipped": 0,
+      "note": "Product code/settings were not changed by this task; baseline comparison was not run, so causality is not claimed."
+    },
+    {
+      "name": "pull_request .NET CI for technical head",
+      "result": "pass",
+      "head_sha": "c8f256f3e215f125756ed1051a91b6b401971833",
+      "run_id": 34956195904
+    }
+  ],
+  "failure_diagnostics": {
+    "root": "/home/ibis/.local/share/duck-doc-lint/approved-whitelist-20260915T180655",
+    "contains": [
+      "per-command stdout",
+      "per-command stderr",
+      "exit codes",
+      "TRX",
+      "VSTest diagnostics",
+      "MSBuild binlog"
+    ]
+  },
+  "intentionally_untouched": [
+    "Tracker/Design/tasks-status.md",
+    "existing reports/lint-dispositions working files",
+    "product C# code",
+    "runtime JSON settings",
+    "lint checker implementation",
+    "prh rules",
+    "Markdown target exclusions"
+  ],
+  "report": "reports/markdown-whitelist-approved-20260915.md"
+}

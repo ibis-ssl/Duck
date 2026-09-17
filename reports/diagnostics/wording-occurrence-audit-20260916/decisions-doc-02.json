@@ -1,0 +1,194 @@
+[
+  {
+    "block": "D02-B001",
+    "file": "tools/lint/README.md",
+    "disposition": "fixed",
+    "reason": "検査する形式はMarkdownなので、許可済みの名称を見出しへ戻す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886872+09:00"
+  },
+  {
+    "block": "D02-B002",
+    "file": "tools/lint/README.md",
+    "disposition": "fixed",
+    "reason": "対象がMarkdown文書であることを明記。textlint/cspellとprhを使う説明を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886878+09:00"
+  },
+  {
+    "block": "D02-B003",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "Setupは通常の環境準備を指し、準備で自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886881+09:00"
+  },
+  {
+    "block": "D02-B004",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "初回と依存ファイル更新後の手順、Python依存も必要という説明は現在の実行構成に対応。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886884+09:00"
+  },
+  {
+    "block": "D02-B005",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "venvとpipによる依存準備の追加は機能上の手順更新。コマンドを保持し、用語の日本語化とは分けて扱う。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886887+09:00"
+  },
+  {
+    "block": "D02-B006",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "ChikkarPyの環境分離の注意、リンク先の実パスとln -s、Git管理外という前提を保持。作業木などの造語は使わない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886890+09:00"
+  },
+  {
+    "block": "D02-B007",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "語彙抽出コマンドの追加を保持。実スクリプト名・パッケージ名は変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886893+09:00"
+  },
+  {
+    "block": "D02-B008",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "3種の検査とprh、標準辞書を使わない条件を保持。文書という語は明示済みのMarkdownの対象範囲を指す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886895+09:00"
+  },
+  {
+    "block": "D02-B009",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "列挙コマンドが返すのは対象文書なので、案内の意味は同一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886898+09:00"
+  },
+  {
+    "block": "D02-B010",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "変更中の文書の列挙という一般的な説明で、--changedのコマンドを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886901+09:00"
+  },
+  {
+    "block": "D02-B011",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "直接指定の--filesという実オプションを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886904+09:00"
+  },
+  {
+    "block": "D02-B012",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "個別検査の起動をnpmの現行Sudachi版コマンドへ合わせた既存変更を保持。旧JavaScript版も比較用として残っている。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886907+09:00"
+  },
+  {
+    "block": "D02-B013",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "語彙抽出と出力形式の説明追加を保持。原文の対象範囲見出しは後段へ移動して存在する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886910+09:00"
+  },
+  {
+    "block": "D02-B014",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "4つの語彙抽出例とJSON形式・同義語なしの指定を保持。原文の対象範囲説明は現在の対象範囲節へ移動している。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886912+09:00"
+  },
+  {
+    "block": "D02-B015",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "同義語候補だけを除くオプションの説明を保持。元の除外設定の説明は後段に保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886915+09:00"
+  },
+  {
+    "block": "D02-B016",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "Sudachiと旧JavaScriptの起動先を区別する説明を保持。元の除外対象の8行は対象範囲節で確認した。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886918+09:00"
+  },
+  {
+    "block": "D02-B017",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "2種類の検査コマンドを保持。原文の許可一覧見出しは後段に存在する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886921+09:00"
+  },
+  {
+    "block": "D02-B018",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "対象範囲の説明は現在の設定と一致。reportsは開始時点で既に除外されており、今回除外を追加・拡張しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886925+09:00"
+  },
+  {
+    "block": "D02-B019",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "除外対象の役割、正本YAML、最小限の項目、利用者承認を保持。構築木などの造語は既にビルド用ディレクトリへ修正されている。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886928+09:00"
+  },
+  {
+    "block": "D02-B020",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "YAML例の説明文でrepositoryを許可済みリポジトリへ変更。例の項目・aliases・description構造を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886931+09:00"
+  },
+  {
+    "block": "D02-B021",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "許可するのはterm/aliases、descriptionも検査するという契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886934+09:00"
+  },
+  {
+    "block": "D02-B022",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "実際の識別子・コマンド・パス・表示名等の例外と、通常の語を記法で逃がさない条件を保持。囲み付き符号片のような造語は既にない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886936+09:00"
+  },
+  {
+    "block": "D02-B023",
+    "file": "tools/lint/README.md",
+    "disposition": "accepted",
+    "reason": "許可語からの一時辞書生成と別表記の明示登録を保持。ハイフン等は記号そのものを示した説明で意味が明確。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886939+09:00"
+  },
+  {
+    "block": "D02-B024",
+    "file": "tools/lint/README.md",
+    "disposition": "fixed",
+    "reason": "全段落と新しい辞書例を読解。日本語化だけを促す本文を、意味保持・許可済み名称・引用保全・設定変更前の利用者承認を明記する説明へ修正。解析方法・候補は自動承認しないこと・prhの承認方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886942+09:00"
+  }
+]

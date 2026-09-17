@@ -1,0 +1,346 @@
+[
+  {
+    "block": "D15-B001",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "raw visionの追加説明は検出情報と画像を正しく区別する。見出し前後の空行だけ整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194805+09:00"
+  },
+  {
+    "block": "D15-B002",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "同一プロセス・低遅延・RuntimeHost/DebugHostの分離を保持し、AutoRef modeとdiagnostics replay、キャプチャーの確認画面の名称を戻す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194824+09:00"
+  },
+  {
+    "block": "D15-B003",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "3実行体の命名と責務を保持。raw vision viewer、AutoRef mode、キャプチャーを一般語に置き換えず残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194828+09:00"
+  },
+  {
+    "block": "D15-B004",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "Executor系の名前を採用しない理由はAutoRef modeも同居するため。固有機能の名称を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194831+09:00"
+  },
+  {
+    "block": "D15-B005",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "受信・周期処理・送信・将来モード・性能という5責務を保持し、将来機能はAutoRef modeと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194834+09:00"
+  },
+  {
+    "block": "D15-B006",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "5つの対象外責務を保持。diagnostics replay、comparison panel、キャプチャーの画面を設計名で特定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194837+09:00"
+  },
+  {
+    "block": "D15-B007",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "DebugHostの4責務を保持し、3rd party trackerの分類、キャプチャーの意味を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194842+09:00"
+  },
+  {
+    "block": "D15-B008",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "同一リポジトリの共通部品を使っても、画面と保存がRuntimeHost周期を支配しない依存境界は維持される。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194845+09:00"
+  },
+  {
+    "block": "D15-B009",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "AutoRef実装自体の対象外条件を保持し、将来の名称はAutoRef modeを使用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194848+09:00"
+  },
+  {
+    "block": "D15-B010",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "トラッカーのみとAutoRef併用という2モードの説明は自然な日本語であり、AutoRefの名も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194851+09:00"
+  },
+  {
+    "block": "D15-B011",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "プロセス外での再購読を前提にしない条件は保持し、AutoRef modeの名称を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194854+09:00"
+  },
+  {
+    "block": "D15-B012",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "OperationLoopIntervalMillisecondsの設定名と0以下を起動時エラーにする条件を保持。数値の埋め込みをしない説明は自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194857+09:00"
+  },
+  {
+    "block": "D15-B013",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "変更可能な調整値だけ設定化し、通信・保存形式の固定値は設定化しない区別を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194860+09:00"
+  },
+  {
+    "block": "D15-B014",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "Loop isolationは一般的な処理分離の説明であり、周期処理の分離方針で自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194863+09:00"
+  },
+  {
+    "block": "D15-B015",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "トラッカー・ライブ表示・診断保存/再生の3処理の分離を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194866+09:00"
+  },
+  {
+    "block": "D15-B016",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "更新・送信優先、最新の不変状態の読み取り、保存周期の独立性を保持。旧形式はrender snapshotと明記し、新規キャプチャーを対象とする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194869+09:00"
+  },
+  {
+    "block": "D15-B017",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "作業IDとTracker.Core共通実行処理の境界を明記した見出しを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194872+09:00"
+  },
+  {
+    "block": "D15-B018",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "R005では新規RuntimeHostを作らずUI非依存の共通処理を先に抽出する作業境界を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194875+09:00"
+  },
+  {
+    "block": "D15-B019",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "共通実行処理という通常の日本語で担当範囲を導入し、直列実行の契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194878+09:00"
+  },
+  {
+    "block": "D15-B020",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "待機・処理中の切替要求と制御だけの更新、イベント順・送信・通知を保持。更新単位を追跡フレームと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194881+09:00"
+  },
+  {
+    "block": "D15-B021",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "Coreが参照しない対象の導入文で、依存禁止の意味を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194884+09:00"
+  },
+  {
+    "block": "D15-B022",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "DebugHost名前空間・プロジェクトの依存禁止を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194886+09:00"
+  },
+  {
+    "block": "D15-B023",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "診断ログ保存、キャプチャー読み書きの依存禁止を保持し、実型名も残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194889+09:00"
+  },
+  {
+    "block": "D15-B024",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "残してよい受信接続処理と2種類の設定型の分離を保持。受信記録ではなくキャプチャーを行うと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194892+09:00"
+  },
+  {
+    "block": "D15-B025",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "ライブ表示の読み取り用スナップショットの境界を示す通常の日本語を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194895+09:00"
+  },
+  {
+    "block": "D15-B026",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "Home.razorで1回取得する契約とUI render tick、raw vision、3rd party trackerの固定済み状態を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194899+09:00"
+  },
+  {
+    "block": "D15-B027",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "合成処理で再読み取りをしない契約を保持。source optionとUI render tick、実表示名Raw/Tracked/Compareを復元し、Home.razorの文字列と照合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194901+09:00"
+  },
+  {
+    "block": "D15-B028",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "外部の可変状態を直接読まず複製済みDTOだけを読むこと、既存受信・記録経路とR006対象外を保持。外部トラッカーはこの説明では通常の日本語で意味が通る。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194904+09:00"
+  },
+  {
+    "block": "D15-B029",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "R007の見出しはdiagnostics sample sidecarを使う保存・再生処理とし、対象を一般の診断記録にぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194907+09:00"
+  },
+  {
+    "block": "D15-B030",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "UI非依存・固定採取・保存先・100ms既定・0以下で既定へ戻すこと、画面更新が保存周期を決めない条件、metadataの実項目をすべて保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194910+09:00"
+  },
+  {
+    "block": "D15-B031",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "diagnostics replay/sample tick、Field source、旧render snapshotを保持。新形式の概要から復元し、旧形式だけなら非対応・縮退とする契約を変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194913+09:00"
+  },
+  {
+    "block": "D15-B032",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "R009の通常処理を示す見出しは自然な日本語で意味が通る。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194916+09:00"
+  },
+  {
+    "block": "D15-B033",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "受信先と端末側IPv4の違いを明記。DebugHostへの依存禁止とSSL_WrapperPacket受信の契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194918+09:00"
+  },
+  {
+    "block": "D15-B034",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "カメラごとの最新パケット・受信時刻順・同一カメラの上書きと別カメラの保持・設定による周期という全条件を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194921+09:00"
+  },
+  {
+    "block": "D15-B035",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "設定の6項目と組み立てる型を保持し、source nameとtracker snapshot、確定済みの追跡フレームの更新単位を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194925+09:00"
+  },
+  {
+    "block": "D15-B036",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "CLI優先順位、2構文、既存設定のみ選択、空・値なしで失敗しdefaultへ代用しない条件を保持。短縮引数対応の説明も維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194928+09:00"
+  },
+  {
+    "block": "D15-B037",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "DebugHostへの直接依存禁止と共有境界の読み取りを保持。tracker snapshot/diagnostics replay/capture対象の名称を戻し、手動検証はR010に残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194930+09:00"
+  },
+  {
+    "block": "D15-B038",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "正本の配置先としてTracker/Design/を示す自然な説明を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194933+09:00"
+  },
+  {
+    "block": "D15-B039",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "4フォルダの責務とArchiveを現行進捗に使わない条件を保持し、raw vision viewerとAutoRef modeを復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194936+09:00"
+  },
+  {
+    "block": "D15-B040",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "accepted",
+    "reason": "非スコープは通常の対象外という見出しで意味が通る。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194939+09:00"
+  },
+  {
+    "block": "D15-B041",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "AutoRefという特定の実装を対象外と明記。他の対象外3項目とBreakingChanges不要は保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194942+09:00"
+  },
+  {
+    "block": "D15-B042",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "依存方向と周期分離の4検証を保持。diagnostics sample tickの名称と追跡フレームとの区別を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194946+09:00"
+  },
+  {
+    "block": "D15-B043",
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "disposition": "fixed",
+    "reason": "11脚注を本文と照合。許可済みAutoRef mode/diagnostics replay/raw vision viewerを戻し、キャプチャーの対象を明示。決定的という語は同じ入力に同じ結果という意味で説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.194949+09:00"
+  }
+]

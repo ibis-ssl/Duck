@@ -1,0 +1,110 @@
+[
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- `Tracker.DebugHost/Vision` の記録、受信、状態の保存に関わる既存の責務境界の確認",
+    "new": "- `Tracker.DebugHost/Vision` のキャプチャー、受信、状態の保存に関わる既存の責務境界の確認",
+    "reason": "capture・receiver・storeの区別を残し、取得と保存を指す箇所に承認済みキャプチャーを用いる。",
+    "blocks": [
+      "D12-B002"
+    ],
+    "line_before_edit": 15,
+    "before_sha256": "d0db8d0bb6ee1a9c42ebd1292d044fb505ae4ad6ff26dec5cc8cbdd170cd1b22",
+    "after_sha256": "498e7ce789da2d2680275ac19e4d1eb923f3e79bff6b8be53d19b0fa78e99ce8"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "旧作業一覧上の位置づけは `tracker-history-000-038.md` の `TRACKER-034` と `maintenance` の段階に退避済み。",
+    "new": "旧作業一覧上の位置づけは、`tracker-history-000-038.md` の `TRACKER-034` と「保守」の段階に記録している。",
+    "reason": "参照先の段階名は保守に変更済み。実在しないmaintenance見出しへの案内を揃える。",
+    "blocks": [
+      "D12-B006"
+    ],
+    "line_before_edit": 37,
+    "before_sha256": "498e7ce789da2d2680275ac19e4d1eb923f3e79bff6b8be53d19b0fa78e99ce8",
+    "after_sha256": "634dad4ff726f2a1b6f13cb5c9c8abccf330cbd420dfbec49a9fc858121318a1"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- partial class を責務別に分ける場合は、type-owned folder を作り、その中のファイル名が責務を表す配置へ寄せる。",
+    "new": "- partial class を責務別に分ける場合は、type-owned folder（型名のフォルダ）を作り、その中のファイル名が責務を表す配置にする。",
+    "reason": "型名をフォルダ名にする条件が本文から落ちていたため、許可済み名称を残して条件を補う。",
+    "blocks": [
+      "D12-B007"
+    ],
+    "line_before_edit": 44,
+    "before_sha256": "634dad4ff726f2a1b6f13cb5c9c8abccf330cbd420dfbec49a9fc858121318a1",
+    "after_sha256": "824188dce94fe50c28878a2e6f6edd07811b7a530be75b107c36d7b24dc664bc"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "C# のクラス、プロパティ、メソッドの契約説明は日本語の XML コメントを基本にする。",
+    "new": "C# のクラス、プロパティ、メソッドの契約説明は、原則として XML documentation comment の形式で日本語を記述する。",
+    "reason": "通常のXML内コメントとC#の文書化コメントを混同しないよう、許可済みの形式名を保持する。",
+    "blocks": [
+      "D12-B009"
+    ],
+    "line_before_edit": 51,
+    "before_sha256": "824188dce94fe50c28878a2e6f6edd07811b7a530be75b107c36d7b24dc664bc",
+    "after_sha256": "8a418579166ad8913c7633b187911c470999e78cf40193d3fe793d22eebd7a5e"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- `--settings` でアプリケーション設定と capture metadata の両方を読める。",
+    "new": "- `--settings` で `appsettings.json` 形式の設定と capture metadata の両方を読める。",
+    "reason": "設定の一般的な説明にぼかさず、CLIが受理する2種類の形式を特定する。",
+    "blocks": [
+      "D12-B013"
+    ],
+    "line_before_edit": 76,
+    "before_sha256": "8a418579166ad8913c7633b187911c470999e78cf40193d3fe793d22eebd7a5e",
+    "after_sha256": "1e7880aab88e2c60a20cc5522eec3a302b58352dec88013ac2470ac2e30b1e2b"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- 診断ログの各行は確定済みの追跡結果の元となった検出情報を使い、未加工の検出件数と追跡結果との対応がずれない。",
+    "new": "- 診断ログの各行は確定済みの追跡フレームの source detections を使い、未加工の検出件数と追跡フレームとの対応がずれない。",
+    "reason": "許可済みsource detectionsと追跡フレームを保持し、元入力と確定出力の対応を明記する。",
+    "blocks": [
+      "D12-B014"
+    ],
+    "line_before_edit": 85,
+    "before_sha256": "1e7880aab88e2c60a20cc5522eec3a302b58352dec88013ac2470ac2e30b1e2b",
+    "after_sha256": "d2cde7f977a631291dd16dd004ce02ad3fdb9ff9bd6799966a1b0b166638ede0"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- render snapshot を保存する補助ファイルは、診断ログと同じ追跡結果の番号で参照できる。",
+    "new": "- render snapshot の補助ファイルは、診断ログと同じ追跡フレームの番号で参照できる。",
+    "reason": "一般的な結果番号ではなく、履歴で扱う追跡フレーム番号を明示する。",
+    "blocks": [
+      "D12-B014"
+    ],
+    "line_before_edit": 86,
+    "before_sha256": "d2cde7f977a631291dd16dd004ce02ad3fdb9ff9bd6799966a1b0b166638ede0",
+    "after_sha256": "4b544d17bbdcc8fdf1d7b6ff4a63e8f006fb95272bd1e7038d8fde84f4b1c7b2"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- 時系列表示のクリック、範囲指定による移動、マウスホイールによる移動で、同じ記録を選択する。",
+    "new": "- 時系列表示のクリック、timeline scrubber の操作、マウスホイールによる移動で、同じ記録を選択する。",
+    "reason": "range入力は範囲選択ではなく再生位置の選択。実装のinput type=rangeと照合し、許可済み画面部品名を用いる。",
+    "blocks": [
+      "D12-B016"
+    ],
+    "line_before_edit": 92,
+    "before_sha256": "4b544d17bbdcc8fdf1d7b6ff4a63e8f006fb95272bd1e7038d8fde84f4b1c7b2",
+    "after_sha256": "f9a3231543fe25e337db472ae0e9f8598cf912e95e212c9ac6ca6e9db646e8d7"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "old": "- 記録に付随する補助ファイルの情報があると、設定プロファイルの内容を示すダイアログを開ける。",
+    "new": "- capture metadata があると、設定プロファイルの内容を示すダイアログを開ける。",
+    "reason": "設定を復元する保存物の名称を一般的な補助情報へぼかさず保持する。",
+    "blocks": [
+      "D12-B016"
+    ],
+    "line_before_edit": 95,
+    "before_sha256": "f9a3231543fe25e337db472ae0e9f8598cf912e95e212c9ac6ca6e9db646e8d7",
+    "after_sha256": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "previous_check_baseline": "a2e63f05345bb4301d6033273910a26ccfb4a1d2",
+  "file": "feedback-points/feedback-points.md",
+  "original_quotes": [
+    "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+    "「サブエージェントにcodex exec実行させるのやめろ」"
+  ],
+  "previous_head_quotes": [
+    "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+    "「委譲先に入れ子実行させるのやめろ」"
+  ],
+  "current_quotes": [
+    "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+    "「サブエージェントにcodex exec実行させるのやめろ」"
+  ],
+  "both_quotes_exactly_preserved": true,
+  "historic_identity_origin_category_count_state_dates_unchanged": true,
+  "current_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+  "prior_limitation": "開始時点とバイト一致することは、用語整理前の原文との一致を証明しない。FP-002の引用改変を今回復元した。"
+}

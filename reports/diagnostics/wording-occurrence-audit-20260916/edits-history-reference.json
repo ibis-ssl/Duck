@@ -1,0 +1,50 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "主な単体テストと契約テストの結果が報告書に存在する。",
+    "new": "主な単体テストと契約テストの結果が `reports/` に保存されている。",
+    "reason": "原文のreportsはリポジトリ内の保存先。一般的な報告書へぼかさず、実在するディレクトリ名を保持する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 31,
+    "before_sha256": "ddc17a260e1f86e7f3a5499965cadde137d13f83946eceae66b1896cc4f79af1",
+    "after_sha256": "76acb4a7e124a03c0d7411be94622995b995406c2599ac8ee8a414588e6da5ed"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "イベントと通知先の契約、表示画面切り替えの確認結果が報告書に存在する。",
+    "new": "イベントと通知先の契約、表示画面切り替えの確認結果が `reports/` に保存されている。",
+    "reason": "統合検証の証拠の保存先を元のディレクトリ名で特定する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 32,
+    "before_sha256": "76acb4a7e124a03c0d7411be94622995b995406c2599ac8ee8a414588e6da5ed",
+    "after_sha256": "9b5aa5d8630ae883e1c5d0065128674b82418dcfc8cc19c6b9349345fc5c66ef"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "のビルド / テスト / レビュー証跡が報告書に存在する。",
+    "new": "のビルド / テスト / レビュー証跡が `reports/` に保存されている。",
+    "reason": "検証段階の原文にあったreportsディレクトリへの参照を維持する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 62,
+    "before_sha256": "9b5aa5d8630ae883e1c5d0065128674b82418dcfc8cc19c6b9349345fc5c66ef",
+    "after_sha256": "9bfdd970097eb093f87f254f8ea4810c319f8b45ef55e3325f5a5c60ccbe5292"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "`TRACKER-028`、`TRACKER-029`、`TRACKER-030`、`TRACKER-031` のレビュー結果は報告書に記録済み。",
+    "new": "`TRACKER-028`、`TRACKER-029`、`TRACKER-030`、`TRACKER-031` のレビュー結果は `reports/` に記録済み。",
+    "reason": "レビュー履歴でも保存先を保持する。既存の個別報告パスは変更しない。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 63,
+    "before_sha256": "9bfdd970097eb093f87f254f8ea4810c319f8b45ef55e3325f5a5c60ccbe5292",
+    "after_sha256": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0"
+  }
+]

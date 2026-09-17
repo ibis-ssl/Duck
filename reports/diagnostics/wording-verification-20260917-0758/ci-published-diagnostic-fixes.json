@@ -1,0 +1,17 @@
+{
+  "time": "2026-09-17T08:24:51.157748+09:00",
+  "actual_pr_head_at_check": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "run_head_sha": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "run_id": 35161773324,
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "workflow": ".github/workflows/dotnet-test.yml",
+  "job_id": 105013926099,
+  "test_step": "success",
+  "diagnostics_collection": "skipped",
+  "diagnostics_upload": "skipped",
+  "markdown_lint": false,
+  "source": "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35161773324",
+  "not_evidence_for": "99929bc以降の未コミット文書修正と、その後の新HEAD"
+}

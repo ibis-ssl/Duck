@@ -1,0 +1,128 @@
+[
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      45
+    ],
+    "old": "  - `Tracker.CaptureReplay` がキャプチャーの保存先を入力として、raw SSL-Vision パケットの受信周期と、`ibis tracker` の出力周期および時刻差を同じ出力で比較できる。",
+    "new": "  - `Tracker.CaptureReplay` がキャプチャーの保存先を入力として、raw vision のパケットの受信周期と、`ibis tracker` の出力周期および時刻差を同じ出力で比較できる。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      92
+    ],
+    "old": "  - 許可一覧は、既存文書の脚注から初版を収集した専用の YAML ファイル1件を正本とし、単語名と説明の対を残す。",
+    "new": "  - 許可一覧は、既存文書の脚注から初版を収集した`tools/lint/markdown-whitelist.yaml` の1ファイルを正本とし、単語名と説明の対を残す。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      143
+    ],
+    "old": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加した。diagnostics sample tick が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が diagnostics sample sidecar から復元されること、旧形式の render snapshot sidecar は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。",
+    "new": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加した。diagnostics sample tick が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が diagnostics sample sidecar から復元されること、旧形式の render snapshot を保存する補助ファイル は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      147
+    ],
+    "old": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`RuntimeHostDiagnosticsSampleBoundaryContractTests` はコンパイル済みで、diagnostics sample sidecar と旧形式の機能制限表示が未実装であることを、検証の失敗として固定している。",
+    "new": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`RuntimeHostDiagnosticsSampleBoundaryContractTests` はビルド済みで、diagnostics sample sidecar と旧形式の機能制限表示が未実装であることを、検証の失敗として固定している。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      161
+    ],
+    "old": "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと render snapshot sidecar の生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。",
+    "new": "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと render snapshot を保存する補助ファイル の生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      180
+    ],
+    "old": "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。旧形式の render snapshot sidecar しか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。",
+    "new": "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。旧形式の render snapshot を保存する補助ファイル しか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      234
+    ],
+    "old": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加する。diagnostics sample tick が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が diagnostics sample sidecar から復元され、旧形式の render snapshot sidecar は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。",
+    "new": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加する。diagnostics sample tick が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が diagnostics sample sidecar から復元され、旧形式の render snapshot を保存する補助ファイル は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      237
+    ],
+    "old": "- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離する。UI の描画更新ごとに raw vision / 自前トラッカー / 外部トラッカーの変更されない最新スナップショットを固定し、Web の描画更新がトラッカーの周期処理を駆動しない構造にする。",
+    "new": "- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離する。UI の描画更新ごとに raw vision / 自前トラッカー / 外部トラッカーの変更されない最新スナップショットを固定し、Web UI の描画更新がトラッカーの周期処理を駆動しない構造にする。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      257
+    ],
+    "old": "| `RUNTIME-HOST-003` | diagnostics sample tick の境界と旧形式の機能制限の契約を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | diagnostics sample tick は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は diagnostics sample sidecar から復元し、旧形式の render snapshot sidecar は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |",
+    "new": "| `RUNTIME-HOST-003` | diagnostics sample tick の境界と旧形式の機能制限の契約を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | diagnostics sample tick は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は diagnostics sample sidecar から復元し、旧形式の render snapshot を保存する補助ファイル は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      260
+    ],
+    "old": "| `RUNTIME-HOST-006` | Tracker.DebugHost のライブ表示をスナップショットの読み取り側へ分離する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により、UI の描画更新ごとに変更されない最新スナップショットを固定し、Web の描画更新がトラッカーの周期処理を駆動しないことを、対象テスト、ビルド、レビューで確認した。 |",
+    "new": "| `RUNTIME-HOST-006` | Tracker.DebugHost のライブ表示をスナップショットの読み取り側へ分離する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により、UI の描画更新ごとに変更されない最新スナップショットを固定し、Web UI の描画更新がトラッカーの周期処理を駆動しないことを、対象テスト、ビルド、レビューで確認した。 |",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "lines": [
+      12
+    ],
+    "old": "- 過去の検証: レビュー前の `42e0637` では、2026-09-16 に全19文書の `npm run lint:md` が終了値0だった。`cspell` 0件、許可一覧違反0件、`textlint` 成功。これは現在のHEADの成功証拠ではない。詳細は `reports/markdown-lint-completion-20260916.md` を参照する。",
+    "new": "- 過去の検証: レビュー前の `42e0637` では、2026-09-16 に全19文書の `npm run lint:md` が終了値0だった。`cspell` 0件、許可一覧違反0件、`textlint` 成功。これは現在の `HEAD`の成功証拠ではない。詳細は `reports/markdown-lint-completion-20260916.md` を参照する。",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "lines": [
+      19
+    ],
+    "old": "| 設計 | 完了、下書き PR #17 | `Tracker/Design/` を設計資料の正本の保存先とし、Core / DebugHost / RuntimeHost の設計範囲をフォルダで分けた。RuntimeHost はトラッカーと将来の自動レフェリーを持つ本番寄りの画面なし実行用、DebugHost は Web UI / 診断 / 再生 / キャプチャー確認用とし、処理周期の分離と旧ログとの互換性を必須としない方針を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で阻害指摘なしを確認した。 |",
+    "new": "| 設計 | 完了、下書き PR #17 | `Tracker/Design/` を設計資料の正本の保存先とし、Tracker.Core / Tracker.DebugHost / Tracker.RuntimeHost の設計範囲をフォルダで分けた。RuntimeHost はトラッカーと将来の自動レフェリーを持つ本番寄りの画面なし実行用、DebugHost は Web UI / 診断 / 再生 / キャプチャー確認用とし、処理周期の分離と旧ログとの互換性を必須としない方針を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で阻害指摘なしを確認した。 |",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "lines": [
+      23
+    ],
+    "old": "| キャプチャー再生の調査 | 当時は PR #19 公開中 | `CAPTURE-REPLAY-001` で raw vision と `ibis tracker` の周期、ReceivedAt を基準とする遅延を比較する汎用出力を追加した。指定キャプチャーの原因は `reports/capture-replay-001-latency-investigation-20260516185833.md` に記録した。対象テスト11件成功、CaptureReplay のビルド成功。専用レビューは `reports/pr19-review-capturereplay-20260516200807.md`、文書と進捗のレビューは `reports/pr19-review-docs-tracking-20260516200807.md` で阻害指摘なし。 |",
+    "new": "| キャプチャー再生の調査 | 当時は PR #19 公開中 | `CAPTURE-REPLAY-001` で raw vision と `ibis tracker` の周期、`ReceivedAt` を基準とする遅延を比較する汎用出力を追加した。指定キャプチャーの原因は `reports/capture-replay-001-latency-investigation-20260516185833.md` に記録した。対象テスト11件成功、CaptureReplay のビルド成功。専用レビューは `reports/pr19-review-capturereplay-20260516200807.md`、文書と進捗のレビューは `reports/pr19-review-docs-tracking-20260516200807.md` で阻害指摘なし。 |",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  },
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "lines": [
+      25
+    ],
+    "old": "| 文書検査整備 | 指摘対応中、PR #20 公開中 | `DOC-LINT-001` でリポジトリの最上位に文書用の textlint / cspell を導入し、利用者の編集対象である `*.md` 全般を品質検査の対象にした。英単語と片仮名語の許可一覧は専用の YAML ファイル1件を正本とする。`DOC-LINT-002` で SudachiPy による語彙抽出と許可一覧検査を追加した。`DOC-LINT-003` は検査器の長文入力、脚注、語境界、日本語に隣接する英語、対象列挙の欠陥を修正し、未承認語の一括許可や検査除外への退避をせずに説明文を整理する。全対象の `npm run lint:md` の終了値0と、PRの最新HEADに一致する `head_sha` のCI成功、および検証証跡の記録を完了条件とする。本文の照合と全体完了は区別し、独立最終レビューの代わりに自己点検を使わない。 |",
+    "new": "| 文書検査整備 | 指摘対応中、PR #20 公開中 | `DOC-LINT-001` でリポジトリの最上位に文書用の `textlint` / `cspell` を導入し、利用者の編集対象である `*.md` 全般を品質検査の対象にした。英単語と片仮名語の許可一覧は`tools/lint/markdown-whitelist.yaml` の1ファイルを正本とする。`DOC-LINT-002` で SudachiPy による語彙抽出と許可一覧検査を追加した。`DOC-LINT-003` は検査器の長文入力、脚注、語境界、日本語に隣接する英語、対象列挙の欠陥を修正し、未承認語の一括許可や検査除外への退避をせずに説明文を整理する。全対象の `npm run lint:md` の終了値0と、PRの最新の `HEAD`に一致する `head_sha` のCI成功、および検証証跡の記録を完了条件とする。本文の照合と全体完了は区別し、独立最終レビューの代わりに自己点検を使わない。 |",
+    "reason": "保存物はrender snapshotを格納する補助ファイルと具体的に説明。Git参照・実設定プロパティ・実行コマンド・正本ファイルは実名として記法を維持し、一般語の除外には使わない。"
+  }
+]

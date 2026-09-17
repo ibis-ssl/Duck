@@ -1,0 +1,17 @@
+# Dependency and generated output.
+node_modules/**
+.git/**
+.codex-dotnet-home/**
+.codex-nuget-packages/**
+**/bin/**
+**/obj/**
+reports/**
+
+# Explicit Markdown lint opt-out files and folder.
+feedback-points/feedback-points.md
+tools/lint/excluded/**
+
+# Vendored or external references.
+Tracker/Design/Core/Ref/**
+SslProto/src/external/ssl-game-controller/**
+SslProto/src/external/ssl-simulation-protocol/**

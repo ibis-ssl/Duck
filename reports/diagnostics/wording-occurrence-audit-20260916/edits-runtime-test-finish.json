@@ -1,0 +1,146 @@
+[
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 3,
+    "before": "",
+    "after": "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+    "reason": "",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 4,
+    "before": "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+    "after": "",
+    "reason": "",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 7,
+    "before": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来のAutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定した画面なしの実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと自動判定の実時間処理へ影響しないようにする。",
+    "after": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定した画面なしの実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと自動判定の実時間処理へ影響しないようにする。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 11,
+    "before": "- `Tracker.RuntimeHost`: トラッカーの実時間処理[^tracker-operation]と将来のAutoRef modeを同一プロセスで実行する、実運用向けの実行体。",
+    "after": "- `Tracker.RuntimeHost`: トラッカーの実時間処理[^tracker-operation]と将来の AutoRef mode を同一プロセスで実行する、実運用向けの実行体。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。 機能名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 15,
+    "before": "`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体はトラッカー専用ではなく、将来のAutoRef modeも同居する試合時の実行環境だからである。",
+    "after": "`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体はトラッカー専用ではなく、将来の AutoRef mode も同居する試合時の実行環境だからである。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。 機能名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 24,
+    "before": "- 将来のAutoRef modeを同一プロセスへ入れるための動作モードの分離。",
+    "after": "- 将来の AutoRef mode を同一プロセスへ入れるための動作モードの分離。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。 機能名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 46,
+    "before": "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来のAutoRef modeを同一プロセスに内包できる名前と責務境界にする。想定する動作モードは次のように扱う。",
+    "after": "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来の AutoRef mode を同一プロセスに内包できる名前と責務境界にする。想定する動作モードは次のように扱う。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。 機能名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 51,
+    "before": "AutoRef modeは、追跡結果をプロセス外通信で再購読する前提にしない。試合時の性能を優先するため、RuntimeHost 内でトラッカーの状態と自動判定の処理を同居できる境界を残す。",
+    "after": "AutoRef mode は、追跡結果をプロセス外通信で再購読する前提にしない。試合時の性能を優先するため、RuntimeHost 内でトラッカーの状態と自動判定の処理を同居できる境界を残す。",
+    "reason": "機能名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 66,
+    "before": "- 旧 render snapshot の補助ファイルとの互換は非要件とし、新規ログ保存と新規記録の性能を優先する。",
+    "after": "- 旧 render snapshot の補助ファイルとの互換は非要件とし、新規ログ保存と新規キャプチャーの性能を優先する。",
+    "reason": "原文new captureを一般的な記録へぼかさず、キャプチャーを指すと明記する。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 77,
+    "before": "- 確定済みの追跡結果ごとの最新スナップショットの更新。",
+    "after": "- 確定済みの追跡フレームごとの最新スナップショットの更新。",
+    "reason": "スナップショット更新と送信を行う単位を追跡フレームとして明示する。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 106,
+    "before": "diagnostics replay・比較は、diagnostics sample sidecar が存在する記録単位では、diagnostics sample tick を replay timeline の主な時点として使う。Field source の `Vision Input` と `ibis tracker` は、旧 render snapshot の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧 render snapshot の補助ファイルだけを持ち、diagnostics sample sidecar を持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。",
+    "after": "diagnostics replay と比較は、diagnostics sample sidecar が存在する記録単位では、diagnostics sample tick を replay timeline の主な時点として使う。Field source の `Vision Input` と `ibis tracker` は、旧 render snapshot の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧 render snapshot の補助ファイルだけを持ち、diagnostics sample sidecar を持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。",
+    "reason": "再生機能の名称を保ち、比較との接続を自然な文章にする。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 114,
+    "before": "RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡結果ごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理の最新の tracker snapshotを更新する。",
+    "after": "RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理の最新の tracker snapshot を更新する。",
+    "reason": "記録名と助詞の区切りをそろえる。 スナップショット更新と送信を行う単位を追跡フレームとして明示する。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 118,
+    "before": "DebugHost が読む最新の tracker snapshotは、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、official tracker packet の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、diagnostics replay、キャプチャーの確認画面の手動検証は `RUNTIME-HOST-010` に残す。",
+    "after": "DebugHost が読む最新の tracker snapshot は、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、official tracker packet の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、diagnostics replay、キャプチャーの確認画面の手動検証は `RUNTIME-HOST-010` に残す。",
+    "reason": "記録名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 126,
+    "before": "- `Tracker/Design/RuntimeHost/`: RuntimeHost、プロセス分離、将来のAutoRef mode。",
+    "after": "- `Tracker/Design/RuntimeHost/`: RuntimeHost、プロセス分離、将来の AutoRef mode。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "line": 143,
+    "before": "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来のAutoRef modeを同一プロセスで動かす、実運用を想定した画面なしの実行体。",
+    "after": "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定した画面なしの実行体。",
+    "reason": "許可済みの名称と日本語の区切りをそろえる。 機能名と助詞の区切りをそろえる。",
+    "before_sha256": "5dfcbdde4a88d76b3b4018ae57f528750e828f3ab8d4983e49a1fdc83ecde5d3",
+    "after_sha256": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "line": 5,
+    "before": "`TRACKER-035` では、既存テストの意味を変えずに巨大なテストファイルを責務別へ分割し、各テストが何を確認しているかを日本語の XML コメントで明示する。",
+    "after": "`TRACKER-035` では、既存テストの意味を変えずに巨大なテストファイルを責務別へ分割し、各テストが何を確認しているかを、日本語の XML documentation comment で明示する。",
+    "reason": "C#の文書化コメントという形式名を明示し、一般のXML内コメントと区別する。",
+    "before_sha256": "9d0374232a4985a50a135a91af08bcaa81568cd1e023d5d173a9297c1aec07c3",
+    "after_sha256": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f"
+  }
+]

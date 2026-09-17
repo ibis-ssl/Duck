@@ -1,0 +1,7 @@
+setuptools<81
+wheel==0.47.0
+vcs-versioning==1.1.1
+sudachipy==0.6.11
+sudachidict_core==20260428
+chikkarpy==0.1.1
+PyYAML==6.0.3

@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T15:38:30+09:00",
+  "document": "Tracker/Tracker.CaptureReplay/README.md",
+  "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+  "count": 14,
+  "blocks": [
+    {
+      "block": "D17-B001",
+      "baseline_start": 3,
+      "baseline_end": 3,
+      "final_start": 3,
+      "final_end": 3,
+      "final_text": [
+        "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。"
+      ],
+      "decision": "fixed",
+      "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B002",
+      "baseline_start": 5,
+      "baseline_end": 4,
+      "final_start": 5,
+      "final_end": 6,
+      "final_text": [
+        "本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。",
+        ""
+      ],
+      "decision": "fixed",
+      "reason": "raw visionと画像・動画の区別は正しい。文体・空行だけ調整。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B003",
+      "baseline_start": 7,
+      "baseline_end": 7,
+      "final_start": 9,
+      "final_end": 9,
+      "final_text": [
+        "session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。"
+      ],
+      "decision": "fixed",
+      "reason": "session folder、capture metadata、保存時設定の関係を実装と照合。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B004",
+      "baseline_start": 14,
+      "baseline_end": 14,
+      "final_start": 16,
+      "final_end": 16,
+      "final_text": [
+        "キャプチャーファイルと設定ファイルを明示する場合:"
+      ],
+      "decision": "accepted",
+      "reason": "capture fileとsettingsは一般的なファイル用途。承認済みキャプチャーと設定ファイルで説明可能。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B005",
+      "baseline_start": 23,
+      "baseline_end": 23,
+      "final_start": 25,
+      "final_end": 25,
+      "final_text": [
+        "## 遅延分析"
+      ],
+      "decision": "accepted",
+      "reason": "latency analysisの見出しは一般機能であり遅延分析で自然。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B006",
+      "baseline_start": 25,
+      "baseline_end": 25,
+      "final_start": 27,
+      "final_end": 27,
+      "final_text": [
+        "raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを直接読む代わりに `--analyze-latency` を使います。未加工の検出情報の受信周期と、再生後に追跡フレームが確定するまでの `ReceivedAt` 基準の遅延を同じ出力で確認できます。"
+      ],
+      "decision": "accepted",
+      "reason": "raw visionを保持し、受信周期・ReceivedAt基準・追跡フレームの確定という計測対象を区別。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B007",
+      "baseline_start": 35,
+      "baseline_end": 35,
+      "final_start": 37,
+      "final_end": 37,
+      "final_text": [
+        "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。"
+      ],
+      "decision": "fixed",
+      "reason": "遅延分析対象の設定語reorder windowを復元。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B008",
+      "baseline_start": 46,
+      "baseline_end": 46,
+      "final_start": 48,
+      "final_end": 48,
+      "final_text": [
+        "## よく使うコマンドラインオプション"
+      ],
+      "decision": "accepted",
+      "reason": "optionの単独語は用途が広い。承認済みコマンドラインオプションで自然かつ明確。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B009",
+      "baseline_start": 48,
+      "baseline_end": 48,
+      "final_start": 50,
+      "final_end": 50,
+      "final_text": [
+        "| コマンドラインオプション | 用途 |"
+      ],
+      "decision": "accepted",
+      "reason": "表の見出しもコマンドラインオプションで統一。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B010",
+      "baseline_start": 50,
+      "baseline_end": 59,
+      "final_start": 52,
+      "final_end": 61,
+      "final_text": [
+        "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+        "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+        "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |",
+        "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |",
+        "| `--max-latency-frames <count>` | 追跡フレームごとの遅延詳細の最大出力数。 |",
+        "| `--skip-tracker-snapshots` | capture metadata に基づく `trackerSnapshot` / `trackerComparison` 行を出力しません。 |",
+        "| `--detail-filter <condition>` | 条件に合う確定済みの追跡フレームの詳細を出力します。複数指定できます。 |",
+        "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+        "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+        "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |"
+      ],
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B011",
+      "baseline_start": 63,
+      "baseline_end": 69,
+      "final_start": 65,
+      "final_end": 71,
+      "final_text": [
+        "- `capture=...`: 実際に再生したキャプチャーファイル。",
+        "- `settingsFile=...`: 実際に使った設定または付随情報。",
+        "- `settings=...`: 再生に適用した主なトラッカー設定。",
+        "- `packets=... committedFrames=...`: 再生結果の概要。",
+        "- `trackerSnapshot ...` / `trackerComparison ...`: capture metadata が参照する補助ファイルから復元した、保存時の tracker snapshot と比較結果。",
+        "- `latencySummary ...`: 未加工入力の受信周期とトラッカーの確定遅延の概要。",
+        "- `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。"
+      ],
+      "decision": "fixed",
+      "reason": "7種類の実出力キーは変更せず、tracker snapshotとcapture metadataを保持。boundedは出力数制限として説明。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B012",
+      "baseline_start": 71,
+      "baseline_end": 71,
+      "final_start": 73,
+      "final_end": 73,
+      "final_text": [
+        "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。"
+      ],
+      "decision": "accepted",
+      "reason": "ReceivedAt差分とevent timestampではない条件、対照実行での因果切り分けを保持。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B013",
+      "baseline_start": 75,
+      "baseline_end": 75,
+      "final_start": 77,
+      "final_end": 77,
+      "final_text": [
+        "`--expect` には、集計指標が満たすべき条件を指定します。条件を満たさない場合は exit code 1 で終了するため、自動検証に利用できます。"
+      ],
+      "decision": "fixed",
+      "reason": "期待条件の検証という重複を、条件指定とexit codeで自然に説明。",
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D17-B014",
+      "baseline_start": 84,
+      "baseline_end": 84,
+      "final_start": 86,
+      "final_end": 86,
+      "final_text": [
+        "利用できる集計指標は `--help` で確認できます。"
+      ],
+      "decision": "accepted",
+      "reason": "summary metricsは固有識別名ではなく集計指標の総称。helpへの案内を保持。",
+      "review_kind": "implementation_self_check"
+    }
+  ]
+}

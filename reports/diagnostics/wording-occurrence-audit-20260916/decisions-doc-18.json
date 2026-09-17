@@ -1,0 +1,602 @@
+[
+  {
+    "block": "D18-B001",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "SSL-Vision UDP受信、ブラウザーのraw/tracked表示、必要時の公式UDP配信というASP.NET Coreアプリの役割を保持。UDP周辺の表記を整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014303+09:00"
+  },
+  {
+    "block": "D18-B002",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "raw visionはSSL-Visionの検出情報であり画像・動画そのものではないという定義を保持。見出し前の空行を整え、編集時に重複した定義を最終自己点検で除く。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014325+09:00"
+  },
+  {
+    "block": "D18-B003",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "6機能を照合。設定に従う受信、Rawのcamera/集約、Trackedの統合/kick/contact/field/送信、UI/APIの設定切替、PublishUdp条件、CaptureOn比較保存を保持。実UI名Raw/Trackedを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014330+09:00"
+  },
+  {
+    "block": "D18-B004",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "SSL-Vision送信元、CaptureOn時の公式tracker multicast、ブラウザーからHTTP接続可能という3前提を保持。HTTPの語の区切りを整える。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014333+09:00"
+  },
+  {
+    "block": "D18-B005",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "リポジトリ直下で実行するという作業ディレクトリの条件を保持。dotnet runのコマンドは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014336+09:00"
+  },
+  {
+    "block": "D18-B006",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "launch profileを起動設定と説明。https/httpの2URLと自動起動抑止の選択肢、ASPNETCORE_URLSの例は保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014339+09:00"
+  },
+  {
+    "block": "D18-B007",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "ヘッダーを画面ヘッダーとし、HTTPヘッダーでなく画面の領域と明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014342+09:00"
+  },
+  {
+    "block": "D18-B008",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "Packets/Errors/Remoteの実UI名と意味を保持。Remoteは送信元接続先という不自然な語でなく、送信元の通信アドレスと通信ポートと具体化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014345+09:00"
+  },
+  {
+    "block": "D18-B009",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Rawは未加工検出をfield表示し、Aggregate/camera切替と右側の入力観測フレーム番号・camera ID・source・JSONを確認する条件を保持。出力の追跡番号に変えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014348+09:00"
+  },
+  {
+    "block": "D18-B010",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "確定tracked frame、active profile、送信成否、data/processed時刻、kick/contact/field、primary/secondary、黄青robotという表示項目を全保持。2時刻の基準とボール区分の名称を明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014351+09:00"
+  },
+  {
+    "block": "D18-B011",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "まだ確定frameがない場合の実UI表示No tracked frameを変更せず保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014354+09:00"
+  },
+  {
+    "block": "D18-B012",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "PublishUdp=falseでも内部処理成功としてPublish OKが増え得るという注意と、実送信は設定と送信先で判断する条件を保持。送信成功の保証へ読み替えない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014358+09:00"
+  },
+  {
+    "block": "D18-B013",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "runtime profile switchの見出しを、承認済みの設定プロファイルを使う自然な日本語で表す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014361+09:00"
+  },
+  {
+    "block": "D18-B014",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "Profile Controlの選択、旧frame消去、同名受信設定追従、新profileで再表示という4規則を保持。確定するのはpacketでなく入力から生成する追跡フレームと自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014364+09:00"
+  },
+  {
+    "block": "D18-B015",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "診断UIの13項目を全文照合。ログ3経路、scrubber/timeline、render保存物、5Field sourceとAll除外、新規保存対応/旧形式推定、比較/設定/絞込、初回索引と100MB性能、3実ボタンと可変倍率/30回秒/間引き禁止/>64、表示状態を全保持。source label、capture単位、timeline位置番号、held renderの追跡番号を特定。プリセットは数値入力への補助と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014367+09:00"
+  },
+  {
+    "block": "D18-B016",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "HTTP APIでも設定切替可能、既定のUseHttpsRedirection有効時は通常HTTPSを使う条件を保持。curlコマンドは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014370+09:00"
+  },
+  {
+    "block": "D18-B017",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "pathのprofileNameは設定定義名、正常は202 Accepted、未知名は現実装で4xxでなくserver errorという3条件を保持。エラーを正常扱いしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014373+09:00"
+  },
+  {
+    "block": "D18-B018",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "リンク先の実ファイル名appsettings.jsonをリンク表示にも戻す。設定ファイル一般に名称をぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014376+09:00"
+  },
+  {
+    "block": "D18-B019",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "VisionReceiverがraw SSL-Vision packetの受信設定である意味を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014379+09:00"
+  },
+  {
+    "block": "D18-B020",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "5設定を照合。multicast group判定、Port、local IPv4/null自動探索/複数NIC、圧縮capture、同名profileの起動/切替後追従を保持。localはこの端末のアドレスでありmulticast宛先でないと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014382+09:00"
+  },
+  {
+    "block": "D18-B021",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "decode前bytesをjsonl.gzへ保存、receivedAt/endpoint/Base64、同順序で復元再投入、decode失敗packetも保存という条件を保持。ユーザー承認のUDPパケット表記を使用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014385+09:00"
+  },
+  {
+    "block": "D18-B022",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "CaptureOnごとにprefix-timestamp-guidのfolderを作る命名と、共通名の補助ファイルを作る意味を保持。basenameを基本名という曖昧な語にせずファイル名の共通部分と説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014387+09:00"
+  },
+  {
+    "block": "D18-B023",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "7保存物のファイル名と役割を照合。元packet、設定metadata、診断、確定TrackerFrameのrender、受信snapshot、ReceivedAt相対timeのv2 alignment、sample tickのraw/trackerを保持。エンジン内部stateではない、v1互換なし、高速source全時点、ログ選択時索引化という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014390+09:00"
+  },
+  {
+    "block": "D18-B024",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "metadataに適用名だけでなくProfilesの値とoverride後設定を保存し、9項目の保存先/状態/sourceへ辿れる条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014393+09:00"
+  },
+  {
+    "block": "D18-B025",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "captureの5設定と単位/既定を保持。相対パスを承認済み表記で示し実行ファイルディレクトリを基準とする。Flushは通常保存でなくバッファ内データの書き出しと説明し、欠落減少と負荷増加の対比を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014396+09:00"
+  },
+  {
+    "block": "D18-B026",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "現在設定は起動時capture無効、UI On後は各packetでflushするという2条件を保持。書き出す対象をバッファ内データと明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014399+09:00"
+  },
+  {
+    "block": "D18-B027",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "通常確認は診断UI、CLIはagent/自動検証/回帰調査で同じcaptureを再現するため保持する境界を保持。参照READMEリンクとコマンド例も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014401+09:00"
+  },
+  {
+    "block": "D18-B028",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "capture引数のfolderまたはファイル、同folder metadataからcapture/settings/2sidecar解決、保存時設定、2出力確認、旧形式の推定/非対応という条件を保持。metadata名と相対パスを明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014405+09:00"
+  },
+  {
+    "block": "D18-B029",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "遅延分析はraw受信周期とtracker確定までのcapture-time lagを出し、2optionsで出力量を絞る意味を保持。再生処理の実行時間そのものへ読み替えず、metadataとcaptureの単位を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014408+09:00"
+  },
+  {
+    "block": "D18-B030",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "ER-Force Docker環境は手元の再現専用で、CI/通常unit testをDocker依存させない条件を保持。承認済みの単体テスト表記を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014411+09:00"
+  },
+  {
+    "block": "D18-B031",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Docker README、Receive有効化、外部送信先/受信設定一致確認後にCaptureOn、同じdirectoryで停止という手順を保持。手動確認したとは主張しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014414+09:00"
+  },
+  {
+    "block": "D18-B032",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "自動テストと回帰検証ではexit codeを使える説明を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014418+09:00"
+  },
+  {
+    "block": "D18-B033",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "expect失敗時exit1と、detail-filter複数時ANDという条件を保持。期待失敗を成功にしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014421+09:00"
+  },
+  {
+    "block": "D18-B034",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "settingsはappsettings形式またはcapture metadata形式の2入力、前者はRuntimeOverrides反映という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014423+09:00"
+  },
+  {
+    "block": "D18-B035",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "通常は保存metadataの解決済み設定/相対パスで当時を再現、現appsettingsは旧capture再評価または意図的別設定に限定、自動sidecar解決なし、手書きmetadataの6項目整合を保持。重複修飾を解きcapture metadataを明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014426+09:00"
+  },
+  {
+    "block": "D18-B036",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "9summary metricsと5detail filtersの実識別子を全保持。raw metricsは当該確定frameのsource detectionsから集計する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014429+09:00"
+  },
+  {
+    "block": "D18-B037",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "rawボール1個なのに再生後frameが2個以上という例の数量/対象を保持。対応する条件式も変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014432+09:00"
+  },
+  {
+    "block": "D18-B038",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "ReadRecords→各ParsePacket→Coordinator.ProcessPacketまたはEngine.Updateを順に呼ぶ2経路を保持。受信時刻を渡す契約も保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014435+09:00"
+  },
+  {
+    "block": "D18-B039",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "CaptureOn比較ログのmanual evidenceという見出しを手動検証と説明。次の証跡保存の順序を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014438+09:00"
+  },
+  {
+    "block": "D18-B040",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "手動8手順を個別照合。起動時受信先と2既定port/明示NIC、受信無効でsnapshotなし、6保存物/metadata、UI/高速tick/30回秒、Split/Overlay/2層/凡例、Ready/source絞込、詳細証跡、CLI補助を保持。7手順の時刻3項目のnsを復元し、layer visibilityは表示/非表示、held renderは追跡frame番号、timelineは位置番号、entry状態/tie-breakも保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014441+09:00"
+  },
+  {
+    "block": "D18-B041",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "sidecar statusの読解を補助ファイル状態の説明として保持。次の9行と対応。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014443+09:00"
+  },
+  {
+    "block": "D18-B042",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "9状態/注意を行ごとに照合。Ready/no log、metadataなし/破損、snapshot情報なし、未作成、path/file欠損、空/0件、JSONL破損、skip/error>0の代表性リスクを保持。multicast interfaceは宛先アドレスでなく受信に使うネットワーク接続。capture metadataの種類も明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014446+09:00"
+  },
+  {
+    "block": "D18-B043",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "receiver profile overrideで未指定項目はtop-level VisionReceiverを継承する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014449+09:00"
+  },
+  {
+    "block": "D18-B044",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "切替後のgroup、bind/receiveのPort、local IPv4の3設定を保持。localはこの端末のアドレスと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014453+09:00"
+  },
+  {
+    "block": "D18-B045",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Tracker全体の設定であるという導入を自然なカタカナで表す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014456+09:00"
+  },
+  {
+    "block": "D18-B046",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Enabled=falseはRawのみ、PublishUdp=falseでも計算継続しUI件数は送信保証でない、source name/UUID、起動profileの存在要件、診断設定という6項目を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014459+09:00"
+  },
+  {
+    "block": "D18-B047",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "RuntimeOverridesは任意の起動時一時上書きで元profile不変、Profilesはpublish/engine/tuningとUI/API選択対象という2設定を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014462+09:00"
+  },
+  {
+    "block": "D18-B048",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "受信有効時だけ起動、未指定なら起動profile+overrideから送信先解決、明示独自先、起動時固定で切替後再構成なし、CaptureOnだけ保存という6条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014465+09:00"
+  },
+  {
+    "block": "D18-B049",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Enabled=falseで受信/外部記録なし、空時にendpoint/interface/OS route/外部送信先を確認する切り分けを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014468+09:00"
+  },
+  {
+    "block": "D18-B050",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "4受信設定の値/既定/null処理を保持。InterfaceAddressのlocal IPv4をこの端末のものと明示し、null時はreceiver既定、複数NICなら明示という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014472+09:00"
+  },
+  {
+    "block": "D18-B051",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "診断ログは常時出力、nullならcaptureディレクトリ下に起動ごと新規、capture有効時はsidecarへも同時出力という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014474+09:00"
+  },
+  {
+    "block": "D18-B052",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "console側structured logはLogLevelで抑制、ファイルは別に継続という2経路の独立を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014478+09:00"
+  },
+  {
+    "block": "D18-B053",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Information全体も抑える場合にDefaultをWarningへする条件と値を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014481+09:00"
+  },
+  {
+    "block": "D18-B054",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "profile baseへの上書きであり、未指定項目は元profileの値を使う条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014486+09:00"
+  },
+  {
+    "block": "D18-B055",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "7上書き対象を全保持。publishのaddress/port/source/UUID、robot/ball/kick調整値はいずれも一時上書きであることを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014489+09:00"
+  },
+  {
+    "block": "D18-B056",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "現UI/HTTP APIに個別override値の入力機能はなく起動時appsettings用という制限を保持。将来機能を実装済みにしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014492+09:00"
+  },
+  {
+    "block": "D18-B057",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "profile publishがtracker packet送信先設定であることを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014495+09:00"
+  },
+  {
+    "block": "D18-B058",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "MulticastAddressはmulticast/unicast両方可、Portはprofileごと切替という可否を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014498+09:00"
+  },
+  {
+    "block": "D18-B059",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "Engineの時系列処理設定という説明を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014501+09:00"
+  },
+  {
+    "block": "D18-B060",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "7Engine設定の単位/効果/対価を保持。reorderの猶予時間、merge窓、長幅reset閾値、初期速度分散、process/measurement変換係数を区別。geometry resetは形状でなく追跡状態を初期化することと明記。Kalman方式名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014505+09:00"
+  },
+  {
+    "block": "D18-B061",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "pendingを設定の適用待ちとした誤訳を修正。形状変更時に未処理入力と追跡状態を初期化し、旧形状の保存中frameを破棄することをFrameCommit/Coordinator実装と照合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014508+09:00"
+  },
+  {
+    "block": "D18-B062",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "RobotTrackerの調整値の導入をロボット追跡の調整値と自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014511+09:00"
+  },
+  {
+    "block": "D18-B063",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "process noiseは予測側、measurement noiseは観測側の不確かさと明示。可視性減衰とgateが小さいほど厳しい規則も保持。一般的な揺らぎへ名称をぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014514+09:00"
+  },
+  {
+    "block": "D18-B064",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "5向き/ID設定の単位と0で無効化を保持。OrientationProcessNoiseを向きKalmanの予測側noiseと明記し、観測noise/初期角速度分散/角速度上限と区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014517+09:00"
+  },
+  {
+    "block": "D18-B065",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "BallTrackerはrobotと類似の調整値だが固有のTrackLifetimeNsを持つ条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014520+09:00"
+  },
+  {
+    "block": "D18-B066",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "4ball設定を照合。運動modelと実運動状態を混同せずKalmanのprocess noiseを示し、measurement noiseを保持。半減するのは追跡状態全体でなく可視性であることをプロパティとrobot表に照合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014523+09:00"
+  },
+  {
+    "block": "D18-B067",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "観測消失後もtrackを保持する最長時間で単位nsという契約を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014526+09:00"
+  },
+  {
+    "block": "D18-B068",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "kick/chip/contact周辺の判定設定という3対象を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014529+09:00"
+  },
+  {
+    "block": "D18-B069",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "速度以上、ball高さ超過、robot-ball距離marginという3閾値の対象/単位/比較条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014532+09:00"
+  },
+  {
+    "block": "D18-B070",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "profileの考え方を承認済みの設定プロファイル表記で示す見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014535+09:00"
+  },
+  {
+    "block": "D18-B071",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "複数profile、portだけでなくengine/robot/ball/kickも一括切替、同名でもoverride違えば別設定という3条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014539+09:00"
+  },
+  {
+    "block": "D18-B072",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "tracker profileに対応するreceiver profileを分ける例の見出しを、承認済み表記で保持。JSON例のキー/値/階層は変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014542+09:00"
+  },
+  {
+    "block": "D18-B073",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "tracked packet送信を止めviewerのみ使う例を保持。Enabled=true/PublishUdp=falseの組合せは変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014545+09:00"
+  },
+  {
+    "block": "D18-B074",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "accepted",
+    "reason": "起動profileをfastとする例を保持。ActiveProfileNameの実設定キーを変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014548+09:00"
+  },
+  {
+    "block": "D18-B075",
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "disposition": "fixed",
+    "reason": "既存profile名必須、multicast失敗時local指定、未知profileは4xxでない、当時のsolution buildに逐次オプションが必要な場合ありという4注意を保持。保存庫全体という誤訳を避け、実在するDuck.slnxを明示し当時の環境に限定する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T07:17:37.014551+09:00"
+  }
+]

@@ -1,0 +1,954 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T12:17:37+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "document": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "technical_parent": "19555135394db736cb8c5eaded0eeec9417cc8c7",
+  "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+  "review_kind": "implementation_self_check",
+  "prior_evidence": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-15.json",
+  "block_count": 43,
+  "occurrence_changed_block_count": 34,
+  "changed_since_prior_self_check": [
+    "D15-B002",
+    "D15-B011",
+    "D15-B016",
+    "D15-B030",
+    "D15-B031",
+    "D15-B033",
+    "D15-B035",
+    "D15-B037",
+    "D15-B043"
+  ],
+  "blocks": [
+    {
+      "block": "D15-B001",
+      "baseline_start": 3,
+      "baseline_end": 2,
+      "baseline_text": [],
+      "final_start": 3,
+      "final_end": 4,
+      "final_text": [
+        "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+        ""
+      ],
+      "disposition": "fixed",
+      "reason": "raw visionの追加説明は検出情報と画像を正しく区別する。見出し前後の空行だけ整える。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B002",
+      "baseline_start": 5,
+      "baseline_end": 5,
+      "baseline_text": [
+        "`Tracker.RuntimeHost`[^tracker-runtime-host] は、tracker と将来の AutoRef mode[^autoref-mode] を同一 process[^same-process] で低遅延に実行する本番寄り headless host[^headless-host] とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、capture viewer[^capture-viewer] は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画や logging の負荷が tracker / AutoRef の実時間処理へ影響しないようにする。"
+      ],
+      "final_start": 7,
+      "final_end": 7,
+      "final_text": [
+        "`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定し、画面を持たない実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。"
+      ],
+      "disposition": "fixed",
+      "reason": "同一プロセス・低遅延・RuntimeHost/DebugHost分離を保持し、AutoRef mode、diagnostics replay、キャプチャーの確認画面を設計名として維持した。一般的な「自動判定」へぼかさずAutoRefと明記し、「画面なしの実行体」を自然な「画面を持たない実行体」へ整えた。",
+      "prior_final_text": [
+        "`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定した画面なしの実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと自動判定の実時間処理へ影響しないようにする。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B003",
+      "baseline_start": 9,
+      "baseline_end": 11,
+      "baseline_text": [
+        "- `Tracker.RuntimeHost`: tracker operation[^tracker-operation] と将来 AutoRef mode を同一 process で実行する runtime host。",
+        "- `Tracker.DebugHost`: 旧 `Tracker.Server` から rename した debug host。Web UI、raw vision viewer[^raw-vision-viewer]、diagnostics、capture / replay、比較表示を担当する。",
+        "- `Tracker.Core`: tracker algorithm[^tracker-algorithm]、contract、pure model、runtime host と debug host の共通ロジックを置く。"
+      ],
+      "final_start": 11,
+      "final_end": 13,
+      "final_text": [
+        "- `Tracker.RuntimeHost`: トラッカーの実時間処理[^tracker-operation]と将来の AutoRef mode を同一プロセスで実行する、実運用向けの実行体。",
+        "- `Tracker.DebugHost`: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision viewer[^raw-vision-viewer]、診断、キャプチャーと再生、比較表示を担当する。",
+        "- `Tracker.Core`: 追跡アルゴリズム[^tracker-algorithm]、契約、副作用のない状態表現、実運用と診断の実行体に共通する処理を置く。"
+      ],
+      "disposition": "fixed",
+      "reason": "3実行体の命名と責務を保持。raw vision viewer、AutoRef mode、キャプチャーを一般語に置き換えず残す。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B004",
+      "baseline_start": 13,
+      "baseline_end": 13,
+      "baseline_text": [
+        "`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体は tracker 専用の executor ではなく、将来 AutoRef mode も同居する試合時 runtime だからである。"
+      ],
+      "final_start": 15,
+      "final_end": 15,
+      "final_text": [
+        "`Tracker.Executer` / `Tracker.Executor` は採用しない。今回の実行体はトラッカー専用ではなく、将来の AutoRef mode も同居する試合時の実行環境だからである。"
+      ],
+      "disposition": "fixed",
+      "reason": "Executor系の名前を採用しない理由はAutoRef modeも同居するため。固有機能の名称を復元。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B005",
+      "baseline_start": 19,
+      "baseline_end": 23,
+      "baseline_text": [
+        "- SSL-Vision input の受信または runtime 用 receiver 境界。",
+        "- tracker operation loop の実行。",
+        "- tracker packet publish。",
+        "- 将来 AutoRef mode を同一 process へ入れるための mode 境界。",
+        "- 実時間処理の performance を優先する設定と起動経路。"
+      ],
+      "final_start": 21,
+      "final_end": 25,
+      "final_text": [
+        "- SSL-Vision 入力の受信、または実運用向けの受信処理との接続。",
+        "- トラッカーの周期処理の実行。",
+        "- 追跡結果のパケット送信。",
+        "- 将来の AutoRef mode を同一プロセスへ入れるための動作モードの分離。",
+        "- 実時間処理の性能を優先する設定と起動経路。"
+      ],
+      "disposition": "fixed",
+      "reason": "受信・周期処理・送信・将来モード・性能という5責務を保持し、将来機能はAutoRef modeと明記。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B006",
+      "baseline_start": 27,
+      "baseline_end": 31,
+      "baseline_text": [
+        "- Web UI rendering。",
+        "- diagnostics replay UI。",
+        "- capture viewer。",
+        "- debug 用 comparison panel。",
+        "- 旧 logging 形式の互換維持。"
+      ],
+      "final_start": 29,
+      "final_end": 33,
+      "final_text": [
+        "- Web UI の描画。",
+        "- diagnostics replay の UI。",
+        "- キャプチャーの確認画面。",
+        "- 診断用の comparison panel。",
+        "- 旧ログ形式の互換維持。"
+      ],
+      "disposition": "fixed",
+      "reason": "5つの対象外責務を保持。diagnostics replay、comparison panel、キャプチャーの画面を設計名で特定。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B007",
+      "baseline_start": 35,
+      "baseline_end": 38,
+      "baseline_text": [
+        "- Web UI と diagnostics 表示。",
+        "- raw vision / tracked / 3rd party tracker の debug visualization。",
+        "- capture / replay / comparison。",
+        "- RuntimeHost または published tracker output の購読と debug 用 sample 保存。"
+      ],
+      "final_start": 37,
+      "final_end": 40,
+      "final_text": [
+        "- Web UI と診断表示。",
+        "- raw vision、自前の追跡結果、3rd party tracker の追跡結果の可視化。",
+        "- キャプチャー、再生、比較。",
+        "- RuntimeHost または送信された追跡結果の購読と、診断用データの採取・保存。"
+      ],
+      "disposition": "fixed",
+      "reason": "DebugHostの4責務を保持し、3rd party trackerの分類、キャプチャーの意味を復元。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B008",
+      "baseline_start": 40,
+      "baseline_end": 40,
+      "baseline_text": [
+        "`Tracker.DebugHost` は tracker operation loop を主実行責務として持たない。debug 用に同一 repository の共通部品を使っても、Web rendering や diagnostics logging が RuntimeHost の処理周期を支配しない構造にする。"
+      ],
+      "final_start": 42,
+      "final_end": 42,
+      "final_text": [
+        "`Tracker.DebugHost` はトラッカーの周期処理を主実行責務として持たない。診断用に同一リポジトリの共通部品を使っても、画面描画や診断ログの保存が RuntimeHost の処理周期を支配しない構造にする。"
+      ],
+      "disposition": "accepted",
+      "reason": "同一リポジトリの共通部品を使っても、画面と保存がRuntimeHost周期を支配しない依存境界は維持される。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B009",
+      "baseline_start": 44,
+      "baseline_end": 44,
+      "baseline_text": [
+        "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来 AutoRef mode を同一 process に内包できる名前と責務境界にする。想定 mode は次のように扱う。"
+      ],
+      "final_start": 46,
+      "final_end": 46,
+      "final_text": [
+        "AutoRef 実装は今回の対象外とする。ただし `Tracker.RuntimeHost` は将来の AutoRef mode を同一プロセスに内包できる名前と責務境界にする。想定する動作モードは次のように扱う。"
+      ],
+      "disposition": "fixed",
+      "reason": "AutoRef実装自体の対象外条件を保持し、将来の名称はAutoRef modeを使用。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B010",
+      "baseline_start": 46,
+      "baseline_end": 47,
+      "baseline_text": [
+        "- tracker only mode。",
+        "- tracker + AutoRef mode。"
+      ],
+      "final_start": 48,
+      "final_end": 49,
+      "final_text": [
+        "- トラッカーのみを動かすモード。",
+        "- トラッカーと AutoRef を動かすモード。"
+      ],
+      "disposition": "accepted",
+      "reason": "トラッカーのみとAutoRef併用という2モードの説明は自然な日本語であり、AutoRefの名も保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B011",
+      "baseline_start": 49,
+      "baseline_end": 49,
+      "baseline_text": [
+        "AutoRef mode は tracker output を process 外通信で再購読する前提にしない。試合時 performance を優先するため、RuntimeHost 内で tracker state と AutoRef logic を同居できる境界を残す。"
+      ],
+      "final_start": 51,
+      "final_end": 51,
+      "final_text": [
+        "AutoRef mode は、追跡結果をプロセス外通信で再購読する前提にしない。試合時の性能を優先するため、RuntimeHost 内でトラッカーの状態と AutoRef の判定処理を同居できる境界を残す。"
+      ],
+      "disposition": "fixed",
+      "reason": "追跡結果をプロセス外通信で再購読しない条件と試合時性能優先を保持し、同居対象が一般的な自動判定ではなくAutoRefの判定処理であることを明記した。",
+      "prior_final_text": [
+        "AutoRef mode は、追跡結果をプロセス外通信で再購読する前提にしない。試合時の性能を優先するため、RuntimeHost 内でトラッカーの状態と自動判定の処理を同居できる境界を残す。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B012",
+      "baseline_start": 53,
+      "baseline_end": 53,
+      "baseline_text": [
+        "RuntimeHost の実行周期は code 内の magic number にしない。`Tracker.RuntimeHost` scaffold では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、RuntimeHost main loop / control loop はこの値を使って周期を決める。0 以下の値は performance tuning の意図を曖昧にするため、既定値 fallback ではなく起動時 validation error とする。"
+      ],
+      "final_start": 55,
+      "final_end": 55,
+      "final_text": [
+        "RuntimeHost の実行周期はソースコード内に数値を直接埋め込まない。`Tracker.RuntimeHost` の初期構成では `RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、主処理と制御処理はこの値を使って周期を決める。0 以下の値は性能調整の意図を曖昧にするため、既定値で代用せず、起動時の設定検証エラーとする。"
+      ],
+      "disposition": "accepted",
+      "reason": "OperationLoopIntervalMillisecondsの設定名と0以下を起動時エラーにする条件を保持。数値の埋め込みをしない説明は自然。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B013",
+      "baseline_start": 55,
+      "baseline_end": 55,
+      "baseline_text": [
+        "`Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを options / appsettings に出す。protocol 名、sidecar 名、metadata field 名など replay / wire contract として固定すべき値は設定化しない。"
+      ],
+      "final_start": 57,
+      "final_end": 57,
+      "final_text": [
+        "`Tracker.RuntimeHost` の実装で追加する調整値は、実運用で変更する可能性があるものを設定オブジェクトや設定ファイルに出す。通信規約の名前、補助ファイル名、記録に付随する情報の項目名など、再生や通信形式の契約として固定すべき値は設定化しない。"
+      ],
+      "disposition": "accepted",
+      "reason": "変更可能な調整値だけ設定化し、通信・保存形式の固定値は設定化しない区別を保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B014",
+      "baseline_start": 57,
+      "baseline_end": 57,
+      "baseline_text": [
+        "## Loop isolation 方針"
+      ],
+      "final_start": 59,
+      "final_end": 59,
+      "final_text": [
+        "## 周期処理の分離方針"
+      ],
+      "disposition": "accepted",
+      "reason": "Loop isolationは一般的な処理分離の説明であり、周期処理の分離方針で自然。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B015",
+      "baseline_start": 59,
+      "baseline_end": 59,
+      "baseline_text": [
+        "tracker operation loop は、Web server live display processing と diagnostics logging / replay processing の両方から切り離す。"
+      ],
+      "final_start": 61,
+      "final_end": 61,
+      "final_text": [
+        "トラッカーの周期処理は、Web UI を提供するサーバーのライブ表示の処理と、診断ログの保存・再生処理の両方から切り離す。"
+      ],
+      "disposition": "accepted",
+      "reason": "トラッカー・ライブ表示・診断保存/再生の3処理の分離を保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B016",
+      "baseline_start": 61,
+      "baseline_end": 64,
+      "baseline_text": [
+        "- tracker operation loop は tracker state update と publish を最優先する。",
+        "- DebugHost live display は latest immutable snapshot または published output を読む側に回る。",
+        "- diagnostics logging / replay は DebugHost 側の sample loop として扱い、tracker committed frame cadence を保存 cadence として要求しない。",
+        "- 旧 render snapshot sidecar 互換は非要件とし、新規 logging / new capture の performance を優先する。"
+      ],
+      "final_start": 63,
+      "final_end": 66,
+      "final_text": [
+        "- トラッカーの周期処理は、追跡状態の更新と送信を最優先する。",
+        "- DebugHost のライブ表示は、変更されない最新のスナップショットまたは送信された出力を読む側に回る。",
+        "- 診断ログの保存・再生は DebugHost 側で一定周期でデータを採取する処理として扱い、トラッカーの追跡結果の確定周期と同じ周期での保存を要求しない。",
+        "- 旧 render snapshot の補助ファイルとの互換は非要件とし、新規ログ保存と新規キャプチャーの性能を優先する。"
+      ],
+      "disposition": "fixed",
+      "reason": "更新・送信優先、最新状態の読み取り、保存周期の独立性、旧render snapshot互換を非要件とする方針を保持し、「変更不能な最新」を「変更されない最新」へ自然化した。",
+      "prior_final_text": [
+        "- トラッカーの周期処理は、追跡状態の更新と送信を最優先する。",
+        "- DebugHost のライブ表示は、変更不能な最新のスナップショットまたは送信された出力を読む側に回る。",
+        "- 診断ログの保存・再生は DebugHost 側で一定周期でデータを採取する処理として扱い、トラッカーの追跡結果の確定周期と同じ周期での保存を要求しない。",
+        "- 旧 render snapshot の補助ファイルとの互換は非要件とし、新規ログ保存と新規キャプチャーの性能を優先する。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B017",
+      "baseline_start": 66,
+      "baseline_end": 66,
+      "baseline_text": [
+        "### RUNTIME-HOST-005: Core shared runtime boundary"
+      ],
+      "final_start": 68,
+      "final_end": 68,
+      "final_text": [
+        "### `RUNTIME-HOST-005`: `Tracker.Core` の共通実行処理の境界"
+      ],
+      "disposition": "accepted",
+      "reason": "作業IDとTracker.Core共通実行処理の境界を明記した見出しを採用。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B018",
+      "baseline_start": 68,
+      "baseline_end": 68,
+      "baseline_text": [
+        "RUNTIME-HOST-005 では新規 `Tracker.RuntimeHost` project scaffold は作らない。先に `Tracker.DebugHost` が持っていた tracker operation loop を `Tracker.Core` 内の UI 非依存 runtime 境界へ抽出し、将来 `Tracker.RuntimeHost` project からそのまま再利用できる形にする。"
+      ],
+      "final_start": 70,
+      "final_end": 70,
+      "final_text": [
+        "`RUNTIME-HOST-005` では新規 `Tracker.RuntimeHost` プロジェクトの初期構成は作らない。先に `Tracker.DebugHost` が持っていたトラッカーの周期処理を `Tracker.Core` 内の UI 非依存の実行処理へ抽出し、将来 `Tracker.RuntimeHost` プロジェクトからそのまま再利用できる形にする。"
+      ],
+      "disposition": "accepted",
+      "reason": "R005では新規RuntimeHostを作らずUI非依存の共通処理を先に抽出する作業境界を保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B019",
+      "baseline_start": 70,
+      "baseline_end": 70,
+      "baseline_text": [
+        "`Tracker.Core` の shared runtime boundary は次を担当する。"
+      ],
+      "final_start": 72,
+      "final_end": 72,
+      "final_text": [
+        "`Tracker.Core` の共通実行処理は次を担当する。"
+      ],
+      "disposition": "accepted",
+      "reason": "共通実行処理という通常の日本語で担当範囲を導入し、直列実行の契約を保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B020",
+      "baseline_start": 73,
+      "baseline_end": 77,
+      "baseline_text": [
+        "- profile switch request の pending / in-flight 管理と control-only update drain。",
+        "- `TrackerUpdateResult.EmittedEvents` 順の dispatch。",
+        "- committed frame ごとの latest snapshot store 更新。",
+        "- official `TrackerWrapperPacket` 生成と `ITrackerPacketPublisher` への publish。",
+        "- publisher 設定反映、publish 成功/失敗統計、observer 通知。"
+      ],
+      "final_start": 75,
+      "final_end": 79,
+      "final_text": [
+        "- 設定プロファイルの切り替え要求の待機中・処理中の管理と、観測データを伴わない制御要求の処理。",
+        "- `TrackerUpdateResult.EmittedEvents` の順でのイベント処理。",
+        "- 確定済みの追跡フレームごとの最新スナップショットの更新。",
+        "- 公式形式の `TrackerWrapperPacket` の生成と、`ITrackerPacketPublisher` への送信依頼。",
+        "- 送信設定の反映、送信成功・失敗の統計、通知先への通知。"
+      ],
+      "disposition": "fixed",
+      "reason": "待機・処理中の切替要求と制御だけの更新、イベント順・送信・通知を保持。更新単位を追跡フレームと明記。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B021",
+      "baseline_start": 79,
+      "baseline_end": 79,
+      "baseline_text": [
+        "`Tracker.Core` の shared runtime boundary は次を参照しない。"
+      ],
+      "final_start": 81,
+      "final_end": 81,
+      "final_text": [
+        "`Tracker.Core` の共通実行処理は次を参照しない。"
+      ],
+      "disposition": "accepted",
+      "reason": "Coreが参照しない対象の導入文で、依存禁止の意味を維持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B022",
+      "baseline_start": 81,
+      "baseline_end": 81,
+      "baseline_text": [
+        "- `Tracker.DebugHost` namespace / project。"
+      ],
+      "final_start": 83,
+      "final_end": 83,
+      "final_text": [
+        "- `Tracker.DebugHost` の名前空間とプロジェクト。"
+      ],
+      "disposition": "accepted",
+      "reason": "DebugHost名前空間・プロジェクトの依存禁止を保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B023",
+      "baseline_start": 83,
+      "baseline_end": 84,
+      "baseline_text": [
+        "- diagnostics file logging。",
+        "- capture writer / reader。"
+      ],
+      "final_start": 85,
+      "final_end": 86,
+      "final_text": [
+        "- 診断ログのファイル保存。",
+        "- キャプチャーの書き込み・読み取り処理。"
+      ],
+      "disposition": "accepted",
+      "reason": "診断ログ保存、キャプチャー読み書きの依存禁止を保持し、実型名も残す。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B024",
+      "baseline_start": 90,
+      "baseline_end": 90,
+      "baseline_text": [
+        "DebugHost の `VisionReceiverService` は UDP decode、raw store、capture の後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ adapter として残してよい。DebugHost 固有の diagnostics 設定解決結果は `TrackerResolvedOptions` として残すが、Core loop が受け取る設定 shape は `TrackerRuntimeResolvedOptions` に分離し、Core が DebugHost 型を参照しないようにする。"
+      ],
+      "final_start": 92,
+      "final_end": 92,
+      "final_text": [
+        "DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入力の状態保存、キャプチャーの後に `Tracker.Core.TrackerCoordinator.ProcessPacket` を呼ぶ接続用の処理として残してよい。DebugHost 固有の診断設定の解決結果は `TrackerResolvedOptions` として残すが、`Tracker.Core` の周期処理が受け取る設定の構造は `TrackerRuntimeResolvedOptions` に分離し、`Tracker.Core` が DebugHost の型を参照しないようにする。"
+      ],
+      "disposition": "fixed",
+      "reason": "残してよい受信接続処理と2種類の設定型の分離を保持。受信記録ではなくキャプチャーを行うと明記。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B025",
+      "baseline_start": 92,
+      "baseline_end": 92,
+      "baseline_text": [
+        "### RUNTIME-HOST-006: DebugHost live display read-side snapshot boundary"
+      ],
+      "final_start": 94,
+      "final_end": 94,
+      "final_text": [
+        "### `RUNTIME-HOST-006`: DebugHost のライブ表示のためのスナップショットの境界"
+      ],
+      "disposition": "accepted",
+      "reason": "ライブ表示の読み取り用スナップショットの境界を示す通常の日本語を採用。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B026",
+      "baseline_start": 94,
+      "baseline_end": 94,
+      "baseline_text": [
+        "RUNTIME-HOST-006 では DebugHost の live display を render tick ごとの composite read-side snapshot 境界へ寄せる。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接 inject せず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。この snapshot は同一 tick の raw SSL-Vision snapshot、ibis tracked snapshot、3rd party tracker read-side snapshot、comparison 用 `VisionLiveComparisonRenderSnapshot` を同時に保持する。"
+      ],
+      "final_start": 96,
+      "final_end": 96,
+      "final_text": [
+        "`RUNTIME-HOST-006` では、DebugHost のライブ表示で必要な状態を、描画更新ごとにまとめて固定する。`Home.razor` は `VisionPacketStore` / `TrackedSnapshotStore` を直接受け取らず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を 1 回取得する。このスナップショットは、同じ UI render tick の raw vision、自前の追跡結果、3rd party tracker の読み取り用のスナップショット、比較用の `VisionLiveComparisonRenderSnapshot` を同時に保持する。"
+      ],
+      "disposition": "fixed",
+      "reason": "Home.razorで1回取得する契約とUI render tick、raw vision、3rd party trackerの固定済み状態を保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B027",
+      "baseline_start": 96,
+      "baseline_end": 96,
+      "baseline_text": [
+        "`VisionLiveComparisonSnapshotComposer` は store を直接読まない。provider が固定済み raw / tracked / external tracker snapshot を渡し、composer はその値から comparison source option、Layer A/B、details を生成する。これにより Raw / Tracked / Compare の表示は同一 render tick snapshot から派生し、comparison のために raw / tracked store を再読取しない。"
+      ],
+      "final_start": 98,
+      "final_end": 98,
+      "final_text": [
+        "`VisionLiveComparisonSnapshotComposer` は状態の保存先を直接読まない。提供側が固定済みの未加工入力、自前の追跡結果、外部トラッカーのスナップショットを渡し、合成処理はその値から比較用の source option、Layer A/B、詳細表示を生成する。これにより、`Raw` / `Tracked` / `Compare` の各表示は同じ UI render tick のスナップショットから派生し、比較のために未加工入力や追跡結果の保存先を再読取しない。"
+      ],
+      "disposition": "fixed",
+      "reason": "合成処理で再読み取りをしない契約を保持。source optionとUI render tick、実表示名Raw/Tracked/Compareを復元し、Home.razorの文字列と照合。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B028",
+      "baseline_start": 98,
+      "baseline_end": 98,
+      "baseline_text": [
+        "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` の mutable state を render path で直接読まない。`ExternalTrackerSnapshotStore` が manager の update event から packet と metadata を clone 済み DTO として保持し、live display provider はその read-side snapshot だけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn recorder は従来どおり manager update path に接続し、RUNTIME-HOST-006 では diagnostics sample sidecar や RuntimeHost scaffold へ踏み込まない。"
+      ],
+      "final_start": 100,
+      "final_end": 100,
+      "final_text": [
+        "外部トラッカーについては、`MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を描画経路で直接読まない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製済み DTO として保持し、ライブ表示への提供側はその読み取り用スナップショットだけを読む。`TrackerConnectionLibReceiverHostedService` と CaptureOn の記録処理は従来どおり管理側の更新経路に接続し、`RUNTIME-HOST-006` では diagnostics sample sidecar や RuntimeHost の初期構成へ踏み込まない。"
+      ],
+      "disposition": "accepted",
+      "reason": "外部の可変状態を直接読まず複製済みDTOだけを読むこと、既存受信・記録経路とR006対象外を保持。外部トラッカーはこの説明では通常の日本語で意味が通る。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B029",
+      "baseline_start": 100,
+      "baseline_end": 100,
+      "baseline_text": [
+        "### RUNTIME-HOST-007: DebugHost diagnostics sample sidecar fast path"
+      ],
+      "final_start": 102,
+      "final_end": 102,
+      "final_text": [
+        "### `RUNTIME-HOST-007`: DebugHost の diagnostics sample sidecar を使う高速な保存・再生処理"
+      ],
+      "disposition": "fixed",
+      "reason": "R007の見出しはdiagnostics sample sidecarを使う保存・再生処理とし、対象を一般の診断記録にぼかさない。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B030",
+      "baseline_start": 102,
+      "baseline_end": 102,
+      "baseline_text": [
+        "RUNTIME-HOST-007 では RuntimeHost scaffold へ踏み込まず、DebugHost の CaptureOn session に diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示有無に依存しない diagnostics sample loop として `VisionLiveDisplaySnapshotProvider` から latest raw snapshot と latest ibis tracker snapshot を固定し、同じ sample record として `diagnostics-samples.jsonl` へ保存する。sample loop の周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の refresh tick は live display の描画更新だけを担当し、diagnostics logging cadence を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。"
+      ],
+      "final_start": 104,
+      "final_end": 104,
+      "final_text": [
+        "`RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost で CaptureOn 中に作成するキャプチャーに diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。キャプチャーの付随情報は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。"
+      ],
+      "disposition": "fixed",
+      "reason": "R007でRuntimeHost初期構成へ踏み込まない条件、CaptureOn中のキャプチャーへdiagnostics sample sidecarを追加すること、UI非依存の採取、100 ms既定、0以下で既定へ戻すこと、画面更新が保存周期を決めないこと、DiagnosticsSampleSidecarPath/DiagnosticsSampleLogを保持。記録単位/capture metadataの混在を自然な日本語へ整理した。",
+      "prior_final_text": [
+        "`RUNTIME-HOST-007` では RuntimeHost の初期構成へ踏み込まず、DebugHost の CaptureOn による記録単位に、diagnostics sample sidecar を追加する。`DiagnosticsSampleHostedService` は UI 表示の有無に依存せず、一定周期で診断用データを採取する処理として動作する。`VisionLiveDisplaySnapshotProvider` から未加工入力と自前の追跡結果の最新スナップショットを固定し、同じ採取時点の記録として `diagnostics-samples.jsonl` へ保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。`Home.razor` の更新処理はライブ表示の描画更新だけを担当し、診断ログの保存周期を決めない。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持つ。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B031",
+      "baseline_start": 104,
+      "baseline_end": 104,
+      "baseline_text": [
+        "Diagnostics replay / comparison は diagnostics sample sidecar が存在する session では sample tick を replay timeline の主経路にする。`Vision Input` field source と `ibis tracker` field source は旧 render snapshot sidecar ではなく diagnostics sample record の semantic summary から復元する。旧 render snapshot sidecar だけを持ち diagnostics sample sidecar を持たない session は unsupported / degraded legacy として扱い、高コストな互換 path は復活させない。"
+      ],
+      "final_start": 106,
+      "final_end": 106,
+      "final_text": [
+        "diagnostics replay と比較は、diagnostics sample sidecar が存在するキャプチャーでは、diagnostics sample tick を replay timeline の主な時点として使う。Field source の `Vision Input` と `ibis tracker` は、旧 render snapshot の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧 render snapshot の補助ファイルだけを持ち、diagnostics sample sidecar を持たないキャプチャーは、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。"
+      ],
+      "disposition": "fixed",
+      "reason": "diagnostics replay/sample tick、Field source、旧render snapshotを保持。diagnostics sample sidecarを持つ対象がキャプチャーであることを明確にし、新形式の概要から復元、旧形式だけなら非対応または機能制限付きとする契約を変更していない。",
+      "prior_final_text": [
+        "diagnostics replay と比較は、diagnostics sample sidecar が存在する記録単位では、diagnostics sample tick を replay timeline の主な時点として使う。Field source の `Vision Input` と `ibis tracker` は、旧 render snapshot の補助ファイルではなく、採取した診断記録に含まれる入力・追跡結果の概要から復元する。旧 render snapshot の補助ファイルだけを持ち、diagnostics sample sidecar を持たない記録単位は、非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換経路は復活させない。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B032",
+      "baseline_start": 106,
+      "baseline_end": 106,
+      "baseline_text": [
+        "### RUNTIME-HOST-009: RuntimeHost normal path"
+      ],
+      "final_start": 108,
+      "final_end": 108,
+      "final_text": [
+        "### `RUNTIME-HOST-009`: RuntimeHost の通常処理"
+      ],
+      "disposition": "accepted",
+      "reason": "R009の通常処理を示す見出しは自然な日本語で意味が通る。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B033",
+      "baseline_start": 108,
+      "baseline_end": 108,
+      "baseline_text": [
+        "RUNTIME-HOST-009 では `Tracker.RuntimeHost` に headless SSL-Vision receiver と tracker operation loop を実装する。RuntimeHost は `VisionReceiver` section から SSL-Vision multicast address、UDP port、任意の local IPv4 interface address を読み取り、DebugHost の `VisionReceiverService` / raw store / capture writer / diagnostics UI に依存せずに `SSL_WrapperPacket` を受信する。"
+      ],
+      "final_start": 110,
+      "final_end": 110,
+      "final_text": [
+        "`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、`MulticastAddress`（SSL-Vision のマルチキャスト通信先）、`Port`（UDP の通信ポート）、必要に応じて指定する `InterfaceAddress`（この端末でマルチキャストグループへ参加するときに使う IPv4 の値）を読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、キャプチャーの書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。"
+      ],
+      "disposition": "fixed",
+      "reason": "VisionReceiverから読む3設定を実装と照合し、MulticastAddressはSSL-Visionのマルチキャスト通信先、PortはUDP通信ポート、InterfaceAddressはこの端末でマルチキャストグループ参加に使うIPv4値であることを明記した。DebugHost非依存とSSL_WrapperPacket受信の契約も保持。",
+      "prior_final_text": [
+        "`RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、SSL-Vision のマルチキャスト用の通信アドレス、UDP の通信ポート、必要に応じて指定する、この端末の IPv4 の通信アドレスを読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、キャプチャーの書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B034",
+      "baseline_start": 110,
+      "baseline_end": 110,
+      "baseline_text": [
+        "受信処理は camera ごとの latest packet buffer へ packet と受信時刻を保存する。tracker operation loop はこの buffer を `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理の camera ごとの latest packet を受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じ camera から tick 間に複数 packet が届いた場合は最新だけを残し、異なる camera の packet は single latest 上書きで落とさない。実行周期は code 内の固定値にせず、`RuntimeHostOptions` の validation 済み設定値だけから決める。"
+      ],
+      "final_start": 112,
+      "final_end": 112,
+      "final_text": [
+        "受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。"
+      ],
+      "disposition": "accepted",
+      "reason": "カメラごとの最新パケット・受信時刻順・同一カメラの上書きと別カメラの保持・設定による周期という全条件を維持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B035",
+      "baseline_start": 112,
+      "baseline_end": 112,
+      "baseline_text": [
+        "RuntimeHost は `Tracker` section から tracker enable、source name、uuid、publish UDP 有効化、profile 単位の publish 宛先、engine 設定を解決して `TrackerRuntimeResolvedOptions` を作る。Core 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、committed frame ごとに official `TrackerWrapperPacket` を publish し、同じ shared boundary の latest tracker snapshot を更新する。"
+      ],
+      "final_start": 114,
+      "final_end": 114,
+      "final_text": [
+        "RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理で最新の追跡スナップショットを更新する。"
+      ],
+      "disposition": "fixed",
+      "reason": "Tracker設定の6項目、TrackerRuntimeResolvedOptions、DIで組み立てる型、確定済み追跡フレームごとのTrackerWrapperPacket送信を保持し、latest tracker snapshotを「最新の追跡スナップショット」として自然化した。",
+      "prior_final_text": [
+        "RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理の最新の tracker snapshot を更新する。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B036",
+      "baseline_start": 114,
+      "baseline_end": 114,
+      "baseline_text": [
+        "起動時の profile 選択は appsettings の `Tracker:ActiveProfileName` を既定にするが、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET の command-line configuration provider と switch mapping を使い、将来の短縮 option 追加時も同じ mapping に増やせる形にする。CLI profile override は `Tracker:Profiles:<name>` の既存 profile だけを選択し、profile 定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示失敗させ、誤って `default` profile へ fallback しない。"
+      ],
+      "final_start": 116,
+      "final_end": 116,
+      "final_text": [
+        "起動時の設定プロファイルの選択は、設定ファイルの `Tracker:ActiveProfileName` を既定にする。ただし、運用時の切り替え確認では `Tracker.RuntimeHost` の CLI 引数 `--profile <name>` または `--profile=<name>` がこれを上書きできるようにする。CLI 引数の解決は .NET のコマンドライン設定を読み込む仕組みと、引数から設定項目への対応表を使い、将来の短縮引数も同じ対応表に追加できる形にする。CLI による設定プロファイルの上書きは `Tracker:Profiles:<name>` の既存の設定プロファイルだけを選択し、設定プロファイルの定義自体は CLI から生成しない。不正な空指定や値なし指定は起動時に明示的に失敗させ、誤って `default` の設定プロファイルで代用しない。"
+      ],
+      "disposition": "accepted",
+      "reason": "CLI優先順位、2構文、既存設定のみ選択、空・値なしで失敗しdefaultへ代用しない条件を保持。短縮引数対応の説明も維持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B037",
+      "baseline_start": 116,
+      "baseline_end": 116,
+      "baseline_text": [
+        "DebugHost が読む latest tracker snapshot は RuntimeHost から DebugHost project へ直接依存して公開しない。DebugHost 側は official tracker packet publish / receive path、または `Tracker.Core` の shared runtime boundary に沿った read-side snapshot を読む側として成立させる。RUNTIME-HOST-009 では RuntimeHost の正常系を executable contract で固定し、DebugHost UI / diagnostics replay / capture viewer の manual evidence は RUNTIME-HOST-010 に残す。"
+      ],
+      "final_start": 118,
+      "final_end": 118,
+      "final_text": [
+        "DebugHost が読む最新の追跡スナップショットは、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、公式形式の `TrackerWrapperPacket` の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、diagnostics replay、キャプチャーの確認画面の手動検証は `RUNTIME-HOST-010` に残す。"
+      ],
+      "disposition": "fixed",
+      "reason": "DebugHostへの直接依存禁止と読み取り側の境界、R009の契約テスト、R010の手動検証範囲を保持。latest tracker snapshotを自然化し、official tracker packetを実型TrackerWrapperPacketの公式形式として明確化した。",
+      "prior_final_text": [
+        "DebugHost が読む最新の tracker snapshot は、RuntimeHost から DebugHost プロジェクトへ直接依存して公開しない。DebugHost 側は、official tracker packet の送受信経路、または `Tracker.Core` の共通実行処理の境界に沿った読み取り用スナップショットを読む側として成立させる。`RUNTIME-HOST-009` では RuntimeHost の正常系を実行可能な契約テストで固定し、DebugHost の UI、diagnostics replay、キャプチャーの確認画面の手動検証は `RUNTIME-HOST-010` に残す。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B038",
+      "baseline_start": 120,
+      "baseline_end": 120,
+      "baseline_text": [
+        "設計資料は `Tracker/Design/` を canonical root とする。"
+      ],
+      "final_start": 122,
+      "final_end": 122,
+      "final_text": [
+        "設計資料は `Tracker/Design/` を正本の配置先とする。"
+      ],
+      "disposition": "accepted",
+      "reason": "正本の配置先としてTracker/Design/を示す自然な説明を採用。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B039",
+      "baseline_start": 122,
+      "baseline_end": 125,
+      "baseline_text": [
+        "- `Tracker/Design/Core/`: tracker algorithm / contract / pure logic。",
+        "- `Tracker/Design/DebugHost/`: Web UI、diagnostics、raw vision viewer、capture / replay。",
+        "- `Tracker/Design/RuntimeHost/`: RuntimeHost、process 分離、将来 AutoRef mode。",
+        "- `Tracker/Design/Archive/`: 旧 tracking file の保存先。active tracking ではない。"
+      ],
+      "final_start": 124,
+      "final_end": 127,
+      "final_text": [
+        "- `Tracker/Design/Core/`: 追跡アルゴリズム、契約、副作用のない処理。",
+        "- `Tracker/Design/DebugHost/`: Web UI、診断、raw vision viewer、キャプチャーと再生。",
+        "- `Tracker/Design/RuntimeHost/`: RuntimeHost、プロセス分離、将来の AutoRef mode。",
+        "- `Tracker/Design/Archive/`: 旧進捗管理ファイルの保存先。現在の進捗管理には使わない。"
+      ],
+      "disposition": "fixed",
+      "reason": "4フォルダの責務とArchiveを現行進捗に使わない条件を保持し、raw vision viewerとAutoRef modeを復元。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B040",
+      "baseline_start": 127,
+      "baseline_end": 127,
+      "baseline_text": [
+        "## 非スコープ"
+      ],
+      "final_start": 129,
+      "final_end": 129,
+      "final_text": [
+        "## 対象外"
+      ],
+      "disposition": "accepted",
+      "reason": "非スコープは通常の対象外という見出しで意味が通る。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B041",
+      "baseline_start": 129,
+      "baseline_end": 131,
+      "baseline_text": [
+        "- AutoRef logic の実装。",
+        "- Referee program の rule engine 実装。",
+        "- 旧 diagnostics logging 形式の完全互換。"
+      ],
+      "final_start": 131,
+      "final_end": 133,
+      "final_text": [
+        "- AutoRef の判定処理の実装。",
+        "- レフェリープログラムの判定規則を実行する処理の実装。",
+        "- 旧診断ログ形式の完全互換。"
+      ],
+      "disposition": "fixed",
+      "reason": "AutoRefという特定の実装を対象外と明記。他の対象外3項目とBreakingChanges不要は保持。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B042",
+      "baseline_start": 136,
+      "baseline_end": 139,
+      "baseline_text": [
+        "- RuntimeHost が Web UI project を参照しないことを project reference / dependency test で固定する。",
+        "- RuntimeHost の tracker operation loop が diagnostics logging / replay API を直接呼ばないことを contract test で固定する。",
+        "- DebugHost が tracker output を読む側であり、tracker operation loop を Web rendering tick から駆動しないことを contract test で固定する。",
+        "- diagnostics sample tick が tracker committed frame cadence に依存しないことを regression test で固定する。"
+      ],
+      "final_start": 138,
+      "final_end": 141,
+      "final_text": [
+        "- RuntimeHost が Web UI プロジェクトを参照しないことを、プロジェクト参照・依存関係のテストで固定する。",
+        "- RuntimeHost のトラッカーの周期処理が、診断ログの保存・再生 API を直接呼ばないことを契約テストで固定する。",
+        "- DebugHost が追跡結果を読む側であり、トラッカーの周期処理を画面描画の更新周期から駆動しないことを契約テストで固定する。",
+        "- diagnostics sample tick がトラッカーの追跡フレームの確定周期に依存しないことを回帰検証で固定する。"
+      ],
+      "disposition": "fixed",
+      "reason": "依存方向と周期分離の4検証を保持。diagnostics sample tickの名称と追跡フレームとの区別を復元。",
+      "prior_final_text": null,
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": false,
+      "review_kind": "implementation_self_check"
+    },
+    {
+      "block": "D15-B043",
+      "baseline_start": 141,
+      "baseline_end": 151,
+      "baseline_text": [
+        "[^tracker-runtime-host]: Tracker.RuntimeHost: tracker operation と将来 AutoRef mode を同一 process で動かす本番寄り headless 実行体。",
+        "[^autoref-mode]: AutoRef mode: referee program 相当の判定処理を tracker と同一 process で動かす将来 mode。今回の実装対象ではない。",
+        "[^same-process]: same process: tracker と将来 AutoRef logic を process 外通信なしで同じ OS process 内に置く実行形態。",
+        "[^headless-host]: headless host: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。",
+        "[^web-ui]: Web UI: browser で見る debug / diagnostics 画面。RuntimeHost の実時間処理から分離する。",
+        "[^diagnostics-replay]: diagnostics replay: 保存済み sample / log を DebugHost 側で再生し、raw / tracker 出力を比較する debug 機能。",
+        "[^capture-viewer]: capture viewer: 保存済み capture session の内容を確認する debug 表示機能。",
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から rename した debug 用 host。Web UI、diagnostics、capture / replay、比較表示を担当する。",
+        "[^tracker-operation]: tracker operation: SSL-Vision input から tracker state を更新し、official tracker packet を publish する実時間処理。",
+        "[^raw-vision-viewer]: raw vision viewer: SSL-Vision detection / geometry を field 上に表示する DebugHost の viewer。",
+        "[^tracker-algorithm]: tracker algorithm: raw detection から balls / robots の tracked state を決定的に生成する Core 側の追跡ロジック。"
+      ],
+      "final_start": 143,
+      "final_end": 153,
+      "final_text": [
+        "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。",
+        "[^autoref-mode]: AutoRef mode: レフェリープログラム相当の判定処理をトラッカーと同一プロセスで動かす将来のモード。今回の実装対象ではない。",
+        "[^same-process]: 同一プロセス: トラッカーと将来の AutoRef の判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。",
+        "[^headless-host]: 画面を持たない実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。",
+        "[^web-ui]: Web UI: ブラウザーで見る診断画面。RuntimeHost の実時間処理から分離する。",
+        "[^diagnostics-replay]: diagnostics replay: 採取した診断データやログを DebugHost 側で再生し、未加工入力と追跡結果を比較する診断機能。",
+        "[^capture-viewer]: キャプチャーの確認画面: 保存済みのキャプチャーの内容を確認する診断用の表示機能。",
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、診断、キャプチャーと再生、比較表示を担当する。",
+        "[^tracker-operation]: トラッカーの実時間処理: SSL-Vision 入力から追跡状態を更新し、公式形式の `TrackerWrapperPacket` を送信する処理。",
+        "[^raw-vision-viewer]: raw vision viewer: SSL-Vision の検出情報とフィールド形状をフィールド上に表示する DebugHost の画面。",
+        "[^tracker-algorithm]: 追跡アルゴリズム: 未加工の検出情報からボールとロボットの追跡状態を、同じ入力に対して同じ結果になるよう生成する `Tracker.Core` 側の処理。"
+      ],
+      "disposition": "fixed",
+      "reason": "11脚注を本文と照合。AutoRef mode、diagnostics replay、raw vision viewerを維持し、同一プロセスの説明をAutoRef判定処理へ戻し、headless hostを「画面を持たない実行体」、tracker operationの送信対象を公式形式のTrackerWrapperPacketとして明確化した。",
+      "prior_final_text": [
+        "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定した画面なしの実行体。",
+        "[^autoref-mode]: AutoRef mode: レフェリープログラム相当の判定処理をトラッカーと同一プロセスで動かす将来のモード。今回の実装対象ではない。",
+        "[^same-process]: 同一プロセス: トラッカーと将来の自動判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。",
+        "[^headless-host]: 画面なしの実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。",
+        "[^web-ui]: Web UI: ブラウザーで見る診断画面。RuntimeHost の実時間処理から分離する。",
+        "[^diagnostics-replay]: diagnostics replay: 採取した診断データやログを DebugHost 側で再生し、未加工入力と追跡結果を比較する診断機能。",
+        "[^capture-viewer]: キャプチャーの確認画面: 保存済みのキャプチャーの内容を確認する診断用の表示機能。",
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、診断、キャプチャーと再生、比較表示を担当する。",
+        "[^tracker-operation]: トラッカーの実時間処理: SSL-Vision 入力から追跡状態を更新し、official tracker packet を送信する処理。",
+        "[^raw-vision-viewer]: raw vision viewer: SSL-Vision の検出情報とフィールド形状をフィールド上に表示する DebugHost の画面。",
+        "[^tracker-algorithm]: 追跡アルゴリズム: 未加工の検出情報からボールとロボットの追跡状態を、同じ入力に対して同じ結果になるよう生成する `Tracker.Core` 側の処理。"
+      ],
+      "final_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "changed_since_prior_self_check": true,
+      "review_kind": "implementation_self_check"
+    }
+  ]
+}

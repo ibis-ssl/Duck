@@ -1,0 +1,171 @@
+{
+  "reviewed_at": "2026-09-17T07:35:36.408962+09:00",
+  "technical_parent": "74631ef4bf42345819893b08d984de79ac733650",
+  "role": "implementation_worker_self_check",
+  "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_read_lines": [
+    1,
+    310
+  ],
+  "final_read_lines": [
+    1,
+    329
+  ],
+  "final_sha256": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894",
+  "input_correspondence": "reports/diagnostics/wording-occurrence-audit-20260916/diagnostic-block-correspondence-20260917.json",
+  "input_correspondence_sha256": "025b6f1dd7e0bddbaa3b79e4cdabdaa7187f3e6f69bf39cfcb1c5e31cdf5c0cf",
+  "whole_context_assessment": "本文と原文を通読して比較し、90差分の採否記録の対象・理由を照合した。文字列一致による自動一括承認ではない。",
+  "sections": [
+    {
+      "baseline_lines": [
+        1,
+        32
+      ],
+      "final_lines": [
+        1,
+        34
+      ],
+      "reason": "CaptureOnの同じ記録単位への保存、Core対象外、公式マルチキャスト・同端末内ユニキャストだけでは正常証跡にしない条件、起動時の受信先とNIC指定の独立性、実行中のprofile切替でもソケットを再構成しない境界を保持。"
+    },
+    {
+      "baseline_lines": [
+        34,
+        68
+      ],
+      "final_lines": [
+        36,
+        70
+      ],
+      "reason": "共通名と用途名の二択、metadataからの相対パス、6種の成果物、未作成と0件の区別、旧形式の完全互換非要件と高コスト救済禁止を保持。round-tripで元バイト列の復元・再decodeが可能という契約を表示snapshotの保存に弱めていない。"
+    },
+    {
+      "baseline_lines": [
+        70,
+        84
+      ],
+      "final_lines": [
+        72,
+        86
+      ],
+      "reason": "snapshotとalignmentは別ファイル・破損も独立診断。原文の安定キー、renderのフレーム番号と保存位置、相対時間、source key、受信時刻、対応規則、差、集約/tie理由を維持し、100MB以上で全読込しない条件を保持。"
+    },
+    {
+      "baseline_lines": [
+        86,
+        94
+      ],
+      "final_lines": [
+        88,
+        96
+      ],
+      "reason": "自前/外部/unknownは保存除外でなく表示分類。identityの不足や衝突でも元データを保存する条件を保持。APIの扱いとUUID衝突の扱いを自然に並列化。aggregateのendpoint別候補、絶対差→同tracked frame timestamp内record index→ordinalの原文条件を保持し、実装との既存差は未解消として別記。"
+    },
+    {
+      "baseline_lines": [
+        96,
+        104
+      ],
+      "final_lines": [
+        98,
+        106
+      ],
+      "reason": "追跡フレーム番号・送信周期は同じと仮定しない。初期nearestかlatest-beforeの選択、許容幅の記録、異なる時計起点でも保存済みreceivedAt対応を優先、missing alignmentは非保証であり新経路へ昇格しないという条件を維持。"
+    },
+    {
+      "baseline_lines": [
+        106,
+        118
+      ],
+      "final_lines": [
+        108,
+        120
+      ],
+      "reason": "受信は明示設定でのみ有効化、CaptureOnは受信の開始条件でなく書込条件、CaptureOff/再Onでは別folderとwriter、初回の遅延作成・外部不在時の既存挙動維持を保持。"
+    },
+    {
+      "baseline_lines": [
+        120,
+        138
+      ],
+      "final_lines": [
+        122,
+        142
+      ],
+      "reason": "CLIの検証用経路維持とUI側の比較、sample/alignment優先、legacyだけown.timestamp利用、ログ選択時index/cache、100MBは上限でないこと、ReceivedAt統合timeline、通常Playの30fpsと任意時点比較データ非削除を保持。"
+    },
+    {
+      "baseline_lines": [
+        140,
+        148
+      ],
+      "final_lines": [
+        144,
+        162
+      ],
+      "reason": "062時点のPlayで等倍に戻る契約と063で選択速度維持への変更を時点別に示す。停止・mode/multiplier両方のstale guard、2..1024の目安と16x既定、optional preset、64倍超の実効速度、1ms程度の小下限と30ms再拡大禁止を保持。"
+    },
+    {
+      "baseline_lines": [
+        150,
+        170
+      ],
+      "final_lines": [
+        165,
+        189
+      ],
+      "reason": "先頭だけnearest-afterを許容する例外と0/20/40/60/80/100msの保持例、source sampleをキャプチャー全体でなく更新ごとの記録とする意味を保持。v2同名ファイルと互換fallback禁止、全明示フィールド、8種の欠損/空/error区別を保持。"
+    },
+    {
+      "baseline_lines": [
+        172,
+        212
+      ],
+      "final_lines": [
+        191,
+        231
+      ],
+      "reason": "左右selector/初期Vision Inputとibis、panel折畳みと独立、page stateのみ、ログ切替とscrubの選択維持の差、Allは数値比較だけ、共通alignmentとown baseline、ns単位、geometryはrender由来のみ、yellow/blue不明は無理に描かない、overlayは056対象外を維持。"
+    },
+    {
+      "baseline_lines": [
+        214,
+        241
+      ],
+      "final_lines": [
+        233,
+        260
+      ],
+      "reason": "最速周期を含むtimeline・v2records・非重複時計・30fpsと200Hz・途中時点比較・早送り・倍率・stale guard・source選択・Red先行・許容誤差・全読込禁止・欠落状態・mapper変換の26条件を原文と照合。数量・否定・限定条件を保持。"
+    },
+    {
+      "baseline_lines": [
+        243,
+        270
+      ],
+      "final_lines": [
+        262,
+        289
+      ],
+      "reason": "overlayはwantで左右2sourceのみ。Split/OverlayとLayer A/Bの実名、同sourceなら1層、cyan/magentaと黄青の意味を独立、visibilityとsource選択の独立、描画部品の追加と既存Canvas維持、ready層の表示保持、6テスト条件と対象外一覧を保持。"
+    },
+    {
+      "baseline_lines": [
+        272,
+        310
+      ],
+      "final_lines": [
+        291,
+        329
+      ],
+      "reason": "固定作業047〜063と053の順序、4/39/191の当時値、054起動時固定、057の延期明示、059のsource sample・v2・boundedlookup、060等倍のみ30fps、061/062/063の変更経過、追加hardening承認境界、最終17条件を保持。原文からある固定tabと063可変入力の記載差は今回の改変で作られたものではない。"
+    }
+  ],
+  "existing_gap": {
+    "block": "D11-B025",
+    "description": "原文の同じtracked frame timestamp条件は、現在のalignmentのOrderBy/ThenByには見当たらない。今回条件を追加・削除せず原文の意味を保持。独立した仕様一致判断は未完了。",
+    "source": "Tracker/Tracker.DebugHost/Tracking/TrackerDiagnosticsComparisonViewStateReader.cs:1375-1387"
+  },
+  "new_body_edits": [],
+  "independent_final_review": false
+}

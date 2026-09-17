@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T21:56:17+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "documents": [
+    {
+      "document": "Tracker/Tracker.CaptureReplay/README.md",
+      "expected": 43,
+      "mapped": 43,
+      "unique_ids": 43,
+      "changed_source": 28,
+      "text_identical_source": 15,
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "errors": [],
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Tracker.DebugHost/README.md",
+      "expected": 423,
+      "mapped": 423,
+      "unique_ids": 423,
+      "changed_source": 345,
+      "text_identical_source": 78,
+      "final_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+      "errors": [],
+      "result": "pass"
+    }
+  ],
+  "expected_total": 466,
+  "mapped_total": 466,
+  "result": "pass",
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "f1_fix": {
+    "source_review": "reports/pr20-independent-final-review-20260917.md",
+    "reviewed_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+    "document_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+    "occurrence_ledger_sha256": "6a401a724e5a6cbd0194893a6806050da60350f44c26165767797ba1332bb68b",
+    "block_ledger_sha256": "f33a619275e45be2030b19e0314189a4fcbf6b85e9bcdebd464380ed58c7368b",
+    "affected_occurrence_rows": 78,
+    "affected_blocks": 6,
+    "structure_errors": [],
+    "focused_validation": {
+      "textlint": 0,
+      "cspell": 0,
+      "whitelist": 0,
+      "git_diff_check": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/"
+    },
+    "implementation_contract_test": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests",
+      "exit_code": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/"
+    },
+    "independent_rereview_required": true
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "time": "2026-09-17T08:49:29.115915+09:00",
+  "technical_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+  "tracked_diff_sha256": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+  "results": [
+    {
+      "name": "terminal-textlint",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:text"
+      ],
+      "exit_code": 0,
+      "stdout": "terminal-textlint.stdout",
+      "stderr": "terminal-textlint.stderr",
+      "exit_file": "terminal-textlint.exit"
+    },
+    {
+      "name": "terminal-cspell",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:spell"
+      ],
+      "exit_code": 123,
+      "stdout": "terminal-cspell.stdout",
+      "stderr": "terminal-cspell.stderr",
+      "exit_file": "terminal-cspell.exit"
+    },
+    {
+      "name": "terminal-whitelist",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:whitelist"
+      ],
+      "exit_code": 1,
+      "stdout": "terminal-whitelist.stdout",
+      "stderr": "terminal-whitelist.stderr",
+      "exit_file": "terminal-whitelist.exit"
+    },
+    {
+      "name": "terminal-ledger",
+      "command": [
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+        "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/diagnostics/wording-integrity-20260917-0827/build_engine_correspondence.py"
+      ],
+      "exit_code": 0,
+      "stdout": "terminal-ledger.stdout",
+      "stderr": "terminal-ledger.stderr",
+      "exit_file": "terminal-ledger.exit"
+    },
+    {
+      "name": "terminal-diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "terminal-diff.stdout",
+      "stderr": "terminal-diff.stderr",
+      "exit_file": "terminal-diff.exit"
+    }
+  ],
+  "all_target_hashes": {
+    "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+    "tools/lint/README.md": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+    "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "Tracker/Design/Archive/Core/tasks-status.md": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "9bfa207c07ea317cb8a32b075a24ce4f9e8e8456140f2b98a006c0e37afb27b3",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+    "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "416fd7d0692a324164b631e480e510f65bcda6052452b802db066950c75b1b3a",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "da14baa2e2de802d034a3b6521272bbeb93c4de0557b005c386e837cafc41395",
+    "Tracker/Design/phases-status.md": "adec26a0a227b998fa98e699d90f7b64359e170a2d23306bcdfab6dccbd3a9ec",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+    "Tracker/Design/tasks-status.md": "9b6bd3cfa1dccd59e1845376409884e4dca8cd7cf2d5635a5a812072d8940a17",
+    "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "Tracker/Tracker.DebugHost/README.md": "ae2664ce14d4edd11ef0d38dc7a775aaae4504d7abc1ca876ef3f33f05ddb0eb"
+  },
+  "inputs_unchanged": true,
+  "validation": "reports/diagnostics/wording-occurrence-audit-20260916/validation-integrity-report-r2-20260917-084903.json",
+  "checker_hashes_still_match": true
+}

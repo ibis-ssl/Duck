@@ -1,0 +1,398 @@
+[
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 128,
+    "old": "- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了した。`Tracker/Design/` へ設計資料と 有効 進捗管理を統合し、`Tracker.RuntimeHost` / `Tracker.DebugHost` の命名、責務境界、AutoRef 将来内包、実行周回分離、旧記録互換非要件、`BreakingChanges` 不要を設計へ固定した。高精度確認 は初回 阻害 2 件を修正し、r2 で 指摘なしを確認した。下書き PR #17 を作成した。",
+    "new": "- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針と設計資料の統合を完了した。設計資料と進行中の作業を管理する文書を `Tracker/Design/` へ統合し、両者の命名、責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としないこと、`BreakingChanges` が不要であることを設計に固定した。`gpt-5.5 high` による初回レビューの阻害指摘2件を修正し、2回目には指摘なしを確認した。下書き PR #17 を作成した。",
+    "reason": "D16-B012: active trackingは有効進捗管理ではなく現行の管理文書。実際のレビュー設定名と初回2指摘→修正→再レビューを保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 129,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 133,
+    "old": "- `RUNTIME-HOST-002`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 依存境界契約 を追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / `Web UI` / 診断再生 UI 計画 を参照しないこと、Tracker.RuntimeHost のソースコードが 診断記録 / 再生 / Blazor UI 名前空間 を直接参照しないこと、Tracker.DebugHost が 読み取り側 実行体 であることを 失敗先行 契約 として固定した。",
+    "new": "- `RUNTIME-HOST-002`: 両プロジェクトの依存境界を検査する契約テストを追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / Web UI / 診断再生 UI のプロジェクトを参照しないこと、そのソースコードが診断ログ / 再生 / Blazor UI の名前空間を直接参照しないこと、`Tracker.DebugHost` が読み取りを担当することを、実装に先行する失敗テストで固定した。",
+    "reason": "D16-B013: projectを計画、rootを根とする誤訳を修正。プロジェクト/ソース参照境界と先行失敗を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 137,
+    "old": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は 3 件失敗 / 0 件成功。現時点では `Tracker.RuntimeHost` 計画とソースコードの根 と `Tracker.DebugHost` 根 が未存在のため、意図した 失敗先行 契約 として 検証失敗 になっている。",
+    "new": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。当時は `Tracker.RuntimeHost` のプロジェクトとソースコードのディレクトリ、および `Tracker.DebugHost` のディレクトリが存在せず、意図した契約テストの検証失敗になっていた。",
+    "reason": "D16-B014: テストはビルド済みで検証が失敗したという原文の意味。3失敗0成功と当時の未存在条件を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 138,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 142,
+    "old": "    - r2 確認 で 阻害指摘 なし。Tracker.DebugHost 実行周回所有目印 の将来 誤検出 可能性は 保留 として記録した。",
+    "new": "    - 2回目のレビューで阻害指摘なし。`Tracker.DebugHost` が追跡処理の周期を担当するかの検査に使う目印については、将来の誤検出の可能性を保留事項として記録した。",
+    "reason": "D16-B015: loop ownership markerを過剰漢字連結にせず、何を判定する目印か説明。将来懸念は保留のまま。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 143,
+    "old": "- `RUNTIME-HOST-003`: 診断標本 境界 と 旧形式縮退 契約 を追加した。診断標本 時点 が 自前追跡 確定枠 周期 / `WorldFrameCommitted` に依存しないこと、診断 `Vision Input` が 診断標本補助記録 から復元されること、旧 描画 時点記録 補助記録 が 非対応 / 縮退 旧形式 であることを 失敗先行 契約 として固定し、設計文書の 作業参照 を固定一覧へ同期した。",
+    "new": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加した。diagnostics sample tick が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が diagnostics sample sidecar から復元されること、旧形式の render snapshot sidecar は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。",
+    "reason": "D16-B015: diagnostics sample/render snapshotの別、非依存周期、旧形式非対応/制限というORを保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 147,
+    "old": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は 3 件失敗 / 0 件成功。`RuntimeHostDiagnosticsSampleBoundaryContractTests` は 構築済み 済みで、診断標本補助記録 未実装と 旧形式縮退 表示未実装を 検証失敗 として固定している。",
+    "new": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`RuntimeHostDiagnosticsSampleBoundaryContractTests` はコンパイル済みで、diagnostics sample sidecar と旧形式の機能制限表示が未実装であることを、検証の失敗として固定している。",
+    "reason": "D16-B016: 構築済み済みの重複を除き、コンパイル成功と契約失敗を区別。3失敗0成功を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 148,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 150,
+    "old": "    - 確認 で 阻害指摘 なし。診断標本補助記録 構造 と 未加工 映像 内容 DTO の詳細は `RUNTIME-HOST-007` の 成功 実装側で確認する 保留 として記録した。",
+    "new": "    - レビューで阻害指摘なし。diagnostics sample sidecar の保存形式と、raw vision の入力データを表す DTO の詳細は、`RUNTIME-HOST-007` で実装を成功させる際に確認する保留事項として記録した。",
+    "reason": "D16-B017: 未加工映像という誤訳を除く。schema/payload詳細は後続保留であり実装済みとしない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 151,
+    "old": "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` 計画 / 名前空間 / 起動経路へ 改名 した。有効 計画、名前空間、起動経路、`README`、構成 / 計画 参照、Tracker.CaptureReplay / 試験 の参照を `Tracker.DebugHost` へ揃え、既存診断正常系 を維持した。",
+    "new": "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` というプロジェクト名、名前空間、起動経路へ変更した。使用中のプロジェクト、名前空間、起動経路、README、`Duck.slnx` とプロジェクトの参照、`Tracker.CaptureReplay` とテストからの参照を `Tracker.DebugHost` に揃え、既存の診断用機能の正常動作を維持した。",
+    "reason": "D16-B017: project/solution参照を実在する開発単位で示し、計画という別の意味にしない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 156,
+    "old": "    - 失敗先行: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDebugHostRenameContractTests -m:1 /nr:false` は 3 件失敗 / 0 件成功。`Tracker.DebugHost` 保管場所/計画 未存在と 有効 参照 未更新を 検証失敗 として確認した。",
+    "new": "    - 実装前: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDebugHostRenameContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`Tracker.DebugHost` のフォルダとプロジェクトが存在せず、使用中の参照も未更新であることを、検証の失敗として確認した。",
+    "reason": "D16-B018: Redの3失敗0成功と2失敗理由を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 157,
+    "old": "    - 成功: 同 対象試験 は 3 件成功。`dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false`、`dotnet build Duck.slnx -m:1 /nr:false` は成功した。",
+    "new": "    - 実装後: 同じ対象のテストは 3 件成功。`dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false`、`dotnet build Duck.slnx -m:1 /nr:false` は成功した。",
+    "reason": "D16-B018: 3成功と3build成功を保持し、実装前後の時系列を明示。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 158,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 160,
+    "old": "    - 確認 で 阻害指摘 なし。全体 `Tracker.Tests` は `RUNTIME-HOST-002` / `RUNTIME-HOST-003` の既存 失敗先行 契約 があるため未実行とした。",
+    "new": "    - レビューで阻害指摘なし。`Tracker.Tests` 全体は、`RUNTIME-HOST-002` / `RUNTIME-HOST-003` の既存の失敗テストがあるため、当時は未実行とした。",
+    "reason": "D16-B019: 未実行を成功扱いしない。当時の理由を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 161,
+    "old": "- `RUNTIME-HOST-005`: 自前追跡 実行周回 の共有 実行時 境界 を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI 非依存 `Core` 実行時 境界へ寄せ、Tracker.DebugHost は UDP 復号 / 未加工 保存 / 記録 後に `Core` 調整役 を呼ぶ 適合層 とした。旧 診断記録 / 描画 時点記録 補助記録 生成は `Core` 実行周回 から外し、性能 優先と Tracker.RuntimeHost 再利用境界を固定した。",
+    "new": "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと render snapshot sidecar の生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。",
+    "reason": "D16-B019: decodeを復号という暗号概念にせず、rawstore/captureの別、6型の境界、診断保存除外を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 167,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 169,
+    "old": "    - 確認 で 阻害指摘 なし。Tracker.DebugHost 読み取り側 UI 化、診断標本補助記録、Tracker.RuntimeHost 骨組み は `RUNTIME-HOST-006` 以降へ残す。",
+    "new": "    - レビューで阻害指摘なし。`Tracker.DebugHost` の UI を読み取り側へ分離すること、diagnostics sample sidecar、`Tracker.RuntimeHost` の起動に必要な最小構成は、`RUNTIME-HOST-006` 以降へ残す。",
+    "reason": "D16-B022: 後続の3対象を当時実装済みにしない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 170,
+    "old": "- `RUNTIME-HOST-006`: Tracker.DebugHost 実時表示 を 読み取り側 時点記録 境界へ寄せた。`VisionLiveDisplaySnapshotProvider` が 1 描画 時点 で 未加工 / 追跡済み / 外部 自前追跡 時点記録 を固定し、`Home.razor` は 未加工 / 追跡済み 保存 を直接 注入 せず同一 合成 時点記録 から 未加工 / Tracked 表示 / 比較 を派生する。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` 更新通知 から 入力包 / 付随情報 を 複製 済み DTO として保持し、描画経路 が 可変管理状態 を直接読まない構造にした。",
+    "new": "- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離した。`VisionLiveDisplaySnapshotProvider` が1回の描画更新で raw vision / 自前トラッカー / 外部トラッカーのスナップショットを固定する。`Home.razor` は未加工入力と追跡結果の保存先を直接受け取らず、同じ合成スナップショットから `Raw` / `Tracked` / `Compare` を作る。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` の更新通知からパケットと付随情報を複製した DTO を保持し、描画処理が管理処理の変更可能な状態を直接読まない構造にした。",
+    "reason": "D16-B022: 外部自前追跡という矛盾を修正。3sourceと実UI名、複製済みDTO、直接参照禁止を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 177,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 179,
+    "old": "    - 確認 で 阻害指摘 なし。診断標本補助記録 と Tracker.RuntimeHost 骨組み は `RUNTIME-HOST-007` 以降へ残す。",
+    "new": "    - レビューで阻害指摘なし。diagnostics sample sidecar と `Tracker.RuntimeHost` の起動に必要な最小構成は、`RUNTIME-HOST-007` 以降へ残す。",
+    "reason": "D16-B025: 後続に残した2対象を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 180,
+    "old": "- `RUNTIME-HOST-007`: Tracker.DebugHost 診断標本補助記録 高速経路 を実装した。UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って 最新 未加工 / 自前追跡 時点記録 を `diagnostics-samples.jsonl` へ保存し、診断 再生 / `Field` は 標本補助記録 の 上限付き探索 と 意味 概要 を主経路にする。旧 描画 時点記録 補助記録 だけの 記録 は 非対応 / 縮退 旧形式 として扱い、高負荷な互換 経路 は復活させない。",
+    "new": "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。旧形式の render snapshot sidecar しか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。",
+    "reason": "D16-B025: 保存対象・設定・boundedlookup/semantic summary・旧形式制限を保ち、記録一般や意味概要の造語を除く。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 186,
+    "old": "    - 対象 / 影響範囲 試験、`Tracker.DebugHost` 構築、`Tracker.Tests` 構築、`git diff --check` は 委任実行 報告 で成功を確認した。",
+    "new": "    - 対象と影響範囲を絞ったテスト、`Tracker.DebugHost` と `Tracker.Tests` のビルド、`git diff --check` は、委任した担当者の報告で成功を確認した。",
+    "reason": "D16-B026: sub-agent reportによる確認という証拠の出所を保持。今回の実行結果としない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 187,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 192,
+    "old": "    - 初回 確認 の 阻害 2 件を修正し、r2 / r3 / r4 で 指摘なしを確認した。",
+    "new": "    - 初回レビューの阻害指摘2件を修正し、2回目・3回目・4回目のレビューでは指摘なしを確認した。",
+    "reason": "D16-B027: 指摘数と3回の後続レビューを全て保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 193,
+    "old": "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` 画面なし 計画 骨組み と 設定 を追加した。`Tracker.RuntimeHost` 計画、`Program`、選択肢 / `DI` 起動処理、構成 項目 を追加し、`Web UI` / 診断再生 / 記録 確認画面 を持たない 画面なし 実行体 として起動できる 骨組み を作った。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は 実行体 起動 検証 失敗 になる 契約 を追加した。",
+    "new": "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` が画面なしで起動するための最小構成と設定を追加した。プロジェクト、`Program`、設定と DI の初期化処理、`Duck.slnx` への登録を追加し、Web UI / 診断再生 / キャプチャー確認画面を持たずに起動できる構成を作った。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0以下では起動時の設定検証が失敗する契約を追加した。",
+    "reason": "D16-B027: optionsを選択肢と誤訳しない。5開発構成と3非対象機能、0以下の起動失敗を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 196,
+    "old": "    - 調整後 R008 対象 は 7 件成功。広めの 対象 は 23 件成功 / 1 件失敗 で、失敗は R008 範囲外の既存 Tracker.DebugHost 実行周回 所有 検証 として 確認 で確認した。",
+    "new": "    - `RUNTIME-HOST-008` に対象を調整したテストは7件成功。広い範囲のテストは23件成功 / 1件失敗で、失敗した1件は、この作業の範囲外にある既存の `Tracker.DebugHost` の周期処理の責務に関する検証だと、レビューで確認した。",
+    "reason": "D16-B028: 7成功と23成功1失敗を別実行として保持。全体成功へ読み替えない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 197,
+    "old": "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は 委任実行 報告 で成功を確認した。",
+    "new": "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は、委任した担当者の報告で成功を確認した。",
+    "reason": "D16-B028/B030: 2buildとdiff確認は委任した担当者の報告を出所とする。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 198,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 202,
+    "old": "    - 初回 確認 の `XML` 概要 阻害 を修正し、r2 で 指摘なしを確認した。",
+    "new": "    - 初回レビューで完了を妨げていた XML の概要コメントを修正し、2回目のレビューで指摘なしを確認した。",
+    "reason": "D16-B029: XML summaryは概要コメントであり、単なる概要阻害とぼかさない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 203,
+    "old": "- `RUNTIME-HOST-009`: Tracker.RuntimeHost 自前追跡 実行周回 と 公式 入力包 送信 正常系 を実装した。Tracker.RuntimeHost は 画面なし SSL-Vision 受信部、最新 入力包 保管領域、`RuntimeHost:OperationLoopIntervalMilliseconds` に従う 実行周回、`Core` `TrackerCoordinator` / `TrackedSnapshotStore` / `UdpTrackerPacketPublisher` を `DI` で組み立て、擬似 SSL-Vision 入力 が 調整役 / 送信部 / 最新 時点記録 保存 へ届く 正常系 を固定した。欠落 有効設定 は Tracker.DebugHost と同じく明示失敗に揃えた。",
+    "new": "- `RUNTIME-HOST-009`: `Tracker.RuntimeHost` の周期処理と公式パケット送信の正常経路を実装した。画面なしで動く SSL-Vision 受信処理、最新パケットを保持するバッファ、`RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期処理、`Tracker.Core` の `TrackerCoordinator` / `TrackedSnapshotStore` / `UdpTrackerPacketPublisher` を DI で組み合わせた。テスト用の SSL-Vision 入力が調停処理、送信処理、最新スナップショットの保存先に届く正常経路を固定した。指定された設定プロファイルが存在しない場合は、`Tracker.DebugHost` と同じく明示的に失敗する。",
+    "reason": "D16-B029: official packetは入力包でなく出力。latest buffer・DI・fakeinput・missingprofileの失敗条件を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 207,
+    "old": "    - R009 対象 は 3 件成功、確認-修正 後 `RuntimeHostOperationLoopTests` は 5 件成功。広めの 対象 は 26 件成功 / 1 件失敗 で、失敗は R009 範囲外の既存 Tracker.DebugHost 所有 検証 として 確認 で確認した。調整後 対象 は 26 件成功。",
+    "new": "    - `RUNTIME-HOST-009` の対象テストは3件成功。レビュー指摘の修正後、`RuntimeHostOperationLoopTests` は5件成功。広い範囲では26件成功 / 1件失敗で、失敗した1件は、この作業の範囲外にある既存の `Tracker.DebugHost` の責務に関する検証だと、レビューで確認した。対象を調整したテストでは26件成功。",
+    "reason": "D16-B030: 3/5/26+1/26という4実行の時点・対象・結果を全て保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 208,
+    "old": "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は 委任実行 報告 で成功を確認した。",
+    "new": "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は、委任した担当者の報告で成功を確認した。",
+    "reason": "D16-B028/B030: 2buildとdiff確認は委任した担当者の報告を出所とする。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 209,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 212,
+    "old": "    - 初回 確認 の 欠落 有効設定 代替 阻害 を修正し、r2 で 指摘なしを確認した。最新 入力包 保管領域 は 最新 優先のまま R010 手動証跡 後判断の 保留 とした。",
+    "new": "    - 初回レビューで、指定された設定プロファイルが存在しない場合の代用処理に阻害指摘があり、修正後の2回目には指摘なしを確認した。最新パケットを保持するバッファは最新優先のままとし、`RUNTIME-HOST-010` の手動証跡を得てから判断する保留事項とした。",
+    "reason": "D16-B031: fallbackの失敗修正とlatest優先方針の保留を区別。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 213,
+    "old": "- `RUNTIME-HOST-010`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 対象 検証 と 手動証跡 を揃えた。`Tracker.RuntimeHost` / `Tracker.DebugHost` の 対象試験 と 構築、診断標本 証跡、旧形式縮退 証跡、Tracker.DebugHost UI 正常系、Tracker.RuntimeHost 画面なし 正常系 を 委任実行 報告に残し、`.gitignore` に 実行時 / 診断 記録 生成物 を追加して手元生成物が通常差分へ混入しないことを確認した。",
+    "new": "- `RUNTIME-HOST-010`: `Tracker.RuntimeHost` / `Tracker.DebugHost` の分離について、対象を絞った検証と手動証跡を揃えた。両者のテストとビルド、diagnostics sample の証跡、旧形式での機能制限の証跡、`Tracker.DebugHost` の UI の正常動作、`Tracker.RuntimeHost` の画面なしの正常動作を、委任した担当者の報告に残した。`.gitignore` に実行時と診断用キャプチャーの生成物を追加し、手元の生成物が通常の差分へ混入しないことを確認した。",
+    "reason": "D16-B031: 検証範囲と証拠の出所、ignore目的を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 216,
+    "old": "    - Tracker.RuntimeHost 対象試験 は 10 件成功、調整後 境界 対象 は 10 件成功、診断 対象 は 15 件成功。",
+    "new": "    - `Tracker.RuntimeHost` の対象テストは10件成功。境界の確認対象を調整したテストは10件成功。診断機能の対象テストは15件成功。",
+    "reason": "D16-B032: 10/10/15を別対象の結果として保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 217,
+    "old": "    - `Tracker.RuntimeHost` / `Tracker.DebugHost` / `Tracker.Tests` 構築、Tracker.RuntimeHost 短時間 画面なし 起動、Tracker.DebugHost HTTP 200 起動確認、`git diff --check`、`.gitignore` 生成物除外 確認は 委任実行 報告 で成功を確認した。",
+    "new": "    - `Tracker.RuntimeHost` / `Tracker.DebugHost` / `Tracker.Tests` のビルド、画面なしでの短時間起動、`Tracker.DebugHost` の HTTP 200 応答、`git diff --check`、`.gitignore` の生成物除外は、委任した担当者の報告で成功を確認した。",
+    "reason": "D16-B032: buildと2起動確認と2検査、報告由来という事実を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 218,
+    "old": "    - 広めの 対象 は既知の `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` 1 件のみ 失敗。現設計では Tracker.DebugHost の `Core` 実行周回 適合層 残存を許容しているため、R010 阻害 ではなく R011 最終 確認 で扱う 保留 とした。",
+    "new": "    - 広い範囲のテストでは、既知の `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` の1件だけが失敗した。当時の設計は `Tracker.DebugHost` から `Tracker.Core` の周期処理への接続部分を残すことを許容していたため、この作業の完了を妨げるものではなく、`RUNTIME-HOST-011` の最終レビューで扱う保留事項とした。",
+    "reason": "D16-B032: 既知1失敗を合格へ変更せず、当時だけの保留理由を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 219,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 221,
+    "old": "    - 確認 で 阻害指摘 なし。既知 Tracker.DebugHost 所有 検証失敗 は 保留 継続が妥当と確認した。",
+    "new": "    - レビューで阻害指摘なし。既知の `Tracker.DebugHost` の責務に関する検証失敗は、保留を続けることが妥当と確認した。",
+    "reason": "D16-B033: レビュー合格とテスト保留を区別。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 222,
+    "old": "- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 最終 確認 / 進捗管理 同期 / PR 提出可能 を完了した。最終 確認 で 取り込み済み 失敗先行 契約 が 阻害 と判定されたため、`RuntimeHostDependencyBoundaryContractTests` を現設計に合わせ、Tracker.DebugHost 全体の `Core` 実行周回 適合層 を禁止する 契約 から UI / 診断再生 / 描画ソースコード が 実行周回 を直接駆動しない 契約 へ狭めた。r2 確認 で 阻害指摘 なし、PR 提出可能 可を確認した。",
+    "new": "- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離の最終レビュー、進捗同期、PR の提出準備を完了した。最終レビューで、リポジトリに残る失敗した契約テストが完了を妨げると判定されたため、`RuntimeHostDependencyBoundaryContractTests` を当時の設計へ合わせた。`Tracker.DebugHost` 全体から `Tracker.Core` の周期処理への接続を禁止する契約ではなく、UI / 診断再生 / 描画元のソースコードが周期処理を直接駆動しない契約に限定した。2回目のレビューで阻害指摘なしとなり、PR を提出できると確認した。",
+    "reason": "D16-B033: 失敗契約の残存→指摘→設計に沿った範囲限定→再レビューという経緯を保持。今回の完了条件緩和ではない。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 223,
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "原文Review Evidenceに対応。実装/検証証跡とは区別して保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 227,
+    "old": "    - 初回 最終 確認 は 取り込み済み 失敗先行 契約 を 阻害 と判定した。確認-修正 後、`RuntimeHostDependencyBoundaryContractTests` は 3 件成功、分離/境界 対象 は 11 件成功、`Tracker.Tests` 構築 と `git diff --check` は 成功。r2 確認 で 指摘なし / PR 提出可能 可を確認した。",
+    "new": "    - 初回の最終レビューでは、リポジトリに残る失敗した契約テストが完了を妨げると判定された。修正後、`RuntimeHostDependencyBoundaryContractTests` は3件成功、分離と境界の対象テストは11件成功、`Tracker.Tests` のビルドと `git diff --check` は成功。2回目のレビューで指摘がなく、PR を提出できると確認した。",
+    "reason": "D16-B034: 3/11成功とbuild/diff成功、r2判断を保持。",
+    "before_sha256": "e9c9cb49c88a8def92c58c615df85e672d12f3bb09ec5896e79335e444797f87",
+    "after_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "full-md",
+    "command": [
+      "npm",
+      "run",
+      "lint:md"
+    ],
+    "exit_code": 1,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "4781625da63e7738918fb84102b379a6d982e36c81c29732e391f01867da5cc9",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:28:18.271513+09:00",
+    "stdout": "before-full-md.stdout.log",
+    "stderr": "before-full-md.stderr.log"
+  }
+]

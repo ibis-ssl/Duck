@@ -1,0 +1,442 @@
+{
+  "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+  "terms": [
+    "capture metadata",
+    "snapshot sidecar",
+    "sidecar JSONL",
+    "tracker snapshot",
+    "tracker packet snapshot",
+    "alignment sidecar",
+    "alignment record",
+    "source identity",
+    "source role",
+    "source label",
+    "source metadata",
+    "source option",
+    "source detections",
+    "source key",
+    "source sample",
+    "source cadence",
+    "aggregate source",
+    "Field source selector",
+    "comparison panel",
+    "render snapshot",
+    "render snapshot geometry",
+    "tracked frame number",
+    "wall-clock",
+    "JSONL",
+    "UI"
+  ],
+  "before_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41",
+  "after_sha256": "6a291a2529a94e026de65ed3c021c1ec711a0596545f8d6d015d5555bbfcc74b",
+  "non_whitespace_unchanged": true,
+  "protected_spans_unchanged": true,
+  "paragraphs": [
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 33,
+      "before": "- `Tracker.DebugHost` は、CaptureOn の記録単位と tracker packet snapshot の記録を紐付ける統合層にする。キャプチャー本体、capture metadata、診断用の補助ファイル、render snapshot、tracker packet snapshot の snapshot sidecarを、同じ session folder 配下の成果物として扱う。",
+      "after": "- `Tracker.DebugHost` は、CaptureOn の記録単位と tracker packet snapshot の記録を紐付ける統合層にする。キャプチャー本体、capture metadata、診断用の補助ファイル、render snapshot、tracker packet snapshot の snapshot sidecar を、同じ session folder 配下の成果物として扱う。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 38,
+      "before": "tracker packet snapshot の主記録は、既存の `.tracker-diagnostics.log` の破壊的拡張ではなく、CaptureOn の session folder 配下のsidecar JSONLとする。異なる CaptureOn の開始時点に属するログは別フォルダへ分け、同じ階層に多数のログファイルを横並びにしない。",
+      "after": "tracker packet snapshot の主記録は、既存の `.tracker-diagnostics.log` の破壊的拡張ではなく、CaptureOn の session folder 配下の sidecar JSONL とする。異なる CaptureOn の開始時点に属するログは別フォルダへ分け、同じ階層に多数のログファイルを横並びにしない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 40,
+      "before": "session folder は `VisionReceiver:PacketCapture:DirectoryPath` 配下に作成し、名前には既存の `<prefix>-<timestamp>-<guid>` 形式の共通名を使う。フォルダ内のファイル名も同じ共通名を含めるか、または `packets.jsonl.gz` のような用途名を使う。どちらの場合もcapture metadataから相対パスで辿れるようにし、既存の共通名を揃える考え方は、session folder 名またはフォルダ内のファイル名で維持する。",
+      "after": "session folder は `VisionReceiver:PacketCapture:DirectoryPath` 配下に作成し、名前には既存の `<prefix>-<timestamp>-<guid>` 形式の共通名を使う。フォルダ内のファイル名も同じ共通名を含めるか、または `packets.jsonl.gz` のような用途名を使う。どちらの場合も capture metadata から相対パスで辿れるようにし、既存の共通名を揃える考え方は、session folder 名またはフォルダ内のファイル名で維持する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 51,
+      "before": "capture metadataには session folder の保存先と、キャプチャー本体、トラッカーの診断記録、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）などの、各ファイルへの相対パスを記録する。snapshot sidecar や alignment sidecar が未作成、または記録 0 件の場合も、その状態をcapture metadataで表現できるようにする。",
+      "after": "capture metadata には session folder の保存先と、キャプチャー本体、トラッカーの診断記録、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）などの、各ファイルへの相対パスを記録する。snapshot sidecar や alignment sidecar が未作成、または記録 0 件の場合も、その状態を capture metadata で表現できるようにする。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 53,
+      "before": "診断ログの保存・再生の主経路は、capture metadataから解決する新規の補助ファイル群と、ログを開くときに構築する索引を使う。既存の `.tracker-diagnostics.log` のデータ構造の破壊的変更は避けるが、旧診断ログや旧 render snapshot の補助ファイルの完全互換は要件にしない。旧形式を読む場合は、旧形式としての表示、正確な対応を保証しない推定表示、機能を制限した表示に留める。新規記録の書き込み周期、探索量を制限した参照、RuntimeHost / DebugHost の分離、diagnostics sample sidecar の設計を犠牲にしない。",
+      "after": "診断ログの保存・再生の主経路は、capture metadata から解決する新規の補助ファイル群と、ログを開くときに構築する索引を使う。既存の `.tracker-diagnostics.log` のデータ構造の破壊的変更は避けるが、旧診断ログや旧 render snapshot の補助ファイルの完全互換は要件にしない。旧形式を読む場合は、旧形式としての表示、正確な対応を保証しない推定表示、機能を制限した表示に留める。新規記録の書き込み周期、探索量を制限した参照、RuntimeHost / DebugHost の分離、diagnostics sample sidecar の設計を犠牲にしない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 56,
+      "before": "- capture metadataから解決できる snapshot sidecar の相対パス、表示元数、分類別件数、近傍比較の概要などを省略可能な項目として追加する",
+      "after": "- capture metadata から解決できる snapshot sidecar の相対パス、表示元数、分類別件数、近傍比較の概要などを省略可能な項目として追加する",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 72,
+      "before": "tracker snapshotの alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate sourceから参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "after": "tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate source から参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 80,
+      "before": "- 選択したtracker snapshotへの参照: tracker snapshot の保存順の位置番号、tracker snapshotの `receivedAt`、tracked frame number、tracked frame timestamp、比較や描画に使う概要情報の有無",
+      "after": "- 選択した tracker snapshot への参照: tracker snapshot の保存順の位置番号、tracker snapshot の `receivedAt`、tracked frame number、tracked frame timestamp、比較や描画に使う概要情報の有無",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 82,
+      "before": "- 時刻差: 診断記録または収録時刻とtracker snapshotの `receivedAt` との差。必要なら自前トラッカーのデータ時刻と外部トラッカーの時刻との差",
+      "after": "- 時刻差: 診断記録または収録時刻と tracker snapshot の `receivedAt` との差。必要なら自前トラッカーのデータ時刻と外部トラッカーの時刻との差",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 90,
+      "before": "`Tracker:Uuid` と `Tracker:SourceName` は保存除外の条件ではなく、後続の表示・比較用にsource role、source label、source metadataを付与するために使う。自前トラッカーの実行時の識別情報と一致する `TrackerWrapperPacket` も追跡パケットの補助ファイルへ保存してよく、自前トラッカーの詳細ログや render snapshot との重複保持を仕様として許容する。",
+      "after": "`Tracker:Uuid` と `Tracker:SourceName` は保存除外の条件ではなく、後続の表示・比較用に source role、source label、source metadata を付与するために使う。自前トラッカーの実行時の識別情報と一致する `TrackerWrapperPacket` も追跡パケットの補助ファイルへ保存してよく、自前トラッカーの詳細ログや render snapshot との重複保持を仕様として許容する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 94,
+      "before": "同じ `uuid` で `sourceName` が異なる場合や、`sourceName` が空の場合も、記録を破棄せず、source identityの不足として保存する。表示元ごとに利用中のトラッカーを取得する API と、同じ `uuid` が衝突する場合は、表示元の概要と source role の判定に関して後続で確認するリスクとする。通常経路では元データとsource identityを落とさず、衝突時も `unknown` / `ambiguous` として保存できれば比較元データは保持されるため、保存処理を止める理由にはしない。",
+      "after": "同じ `uuid` で `sourceName` が異なる場合や、`sourceName` が空の場合も、記録を破棄せず、source identity の不足として保存する。表示元ごとに利用中のトラッカーを取得する API と、同じ `uuid` が衝突する場合は、表示元の概要と source role の判定に関して後続で確認するリスクとする。通常経路では元データと source identity を落とさず、衝突時も `unknown` / `ambiguous` として保存できれば比較元データは保持されるため、保存処理を止める理由にはしない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 102,
+      "before": "初期実装では、時刻が最も近いものを使うか、latest-before snapshot を使うかを、作業内で固定する。採用した対応規則、許容する時間幅、該当するsource identityは、出力と補助ファイルから後で確認できるようにする。",
+      "after": "初期実装では、時刻が最も近いものを使うか、latest-before snapshot を使うかを、作業内で固定する。採用した対応規則、許容する時間幅、該当する source identity は、出力と補助ファイルから後で確認できるようにする。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 120,
+      "before": "他のトラッカーが存在しない場合、既存のキャプチャー、診断ログ、render snapshot の内容上の挙動は変えない。capture metadataには、snapshot sidecar が未作成、または記録 0 件である状態を明示できるようにする。",
+      "after": "他のトラッカーが存在しない場合、既存のキャプチャー、診断ログ、render snapshot の内容上の挙動は変えない。capture metadata には、snapshot sidecar が未作成、または記録 0 件である状態を明示できるようにする。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 124,
+      "before": "診断ログの読み取り処理、`Tracker.CaptureReplay`、診断画面の再生は、capture metadataにある相対パスから、tracker packet snapshot の snapshot sidecar と diagnostics sample sidecar を取得する。新規記録では、最新の未加工入力と追跡結果のスナップショットを基準に追加情報を読む。既存のキャプチャーや診断ログで、session folder、snapshot sidecar、diagnostics sample sidecar が欠落する場合は、新規経路の正常系ではなく、旧形式、推定、機能制限付きの表示として扱う。",
+      "after": "診断ログの読み取り処理、`Tracker.CaptureReplay`、診断画面の再生は、capture metadata にある相対パスから、tracker packet snapshot の snapshot sidecar と diagnostics sample sidecar を取得する。新規記録では、最新の未加工入力と追跡結果のスナップショットを基準に追加情報を読む。既存のキャプチャーや診断ログで、session folder、snapshot sidecar、diagnostics sample sidecar が欠落する場合は、新規経路の正常系ではなく、旧形式、推定、機能制限付きの表示として扱う。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 128,
+      "before": "`/diagnostics` はユーザー向けに同じ比較を画面上で確認できるようにする。診断画面の再生は、選択中の replay timeline tick に合わせてtracker snapshotの比較を更新し、source identity、source role、source label で対象を切り替えられる comparison panelを持つ。新規記録では、保存済みの alignment sidecar と diagnostics sample sidecar を基準にする。旧形式で対応を推定する場合だけ、render snapshot ではなく、自前トラッカーのスナップショットの `TrackedFrame.timestamp` を比較基準の時刻とする。この推定表示は旧形式の救済であり、最新の記録方式の性能、探索量を制限した参照、RuntimeHost / DebugHost の分離を弱める要求にはしない。",
+      "after": "`/diagnostics` はユーザー向けに同じ比較を画面上で確認できるようにする。診断画面の再生は、選択中の replay timeline tick に合わせて tracker snapshot の比較を更新し、source identity、source role、source label で対象を切り替えられる comparison panel を持つ。新規記録では、保存済みの alignment sidecar と diagnostics sample sidecar を基準にする。旧形式で対応を推定する場合だけ、render snapshot ではなく、自前トラッカーのスナップショットの `TrackedFrame.timestamp` を比較基準の時刻とする。この推定表示は旧形式の救済であり、最新の記録方式の性能、探索量を制限した参照、RuntimeHost / DebugHost の分離を弱める要求にはしない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 130,
+      "before": "新規記録の `/diagnostics` におけるtracker snapshotの比較と Field source は、capture metadataから解決した diagnostics sample sidecar と `tracker-snapshot-alignment.jsonl` を優先する。alignment sidecar が準備済みなら、selected replay timeline tick と Field source 識別子から保存済みの tracker snapshot の保存順の位置番号を引き、対応規則を `saved-session-alignment` として表示する。この補助ファイルがない、capture metadataにファイルパスがない、または破損している場合は、旧診断ログや旧 render snapshot の補助ファイルを新規経路へ昇格させない。外部トラッカーや表示元名によるフィールド選択は、`unsupported-alignment-missing`、または `legacy-nearest-timestamp` と推定であることを明示した表示として扱う。旧形式を表示できる場合も、再生更新や位置のドラッグごとに補助ファイル全体を読み直す互換処理は作らない。",
+      "after": "新規記録の `/diagnostics` における tracker snapshot の比較と Field source は、capture metadata から解決した diagnostics sample sidecar と `tracker-snapshot-alignment.jsonl` を優先する。alignment sidecar が準備済みなら、selected replay timeline tick と Field source 識別子から保存済みの tracker snapshot の保存順の位置番号を引き、対応規則を `saved-session-alignment` として表示する。この補助ファイルがない、capture metadata にファイルパスがない、または破損している場合は、旧診断ログや旧 render snapshot の補助ファイルを新規経路へ昇格させない。外部トラッカーや表示元名によるフィールド選択は、`unsupported-alignment-missing`、または `legacy-nearest-timestamp` と推定であることを明示した表示として扱う。旧形式を表示できる場合も、再生更新や位置のドラッグごとに補助ファイル全体を読み直す互換処理は作らない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 132,
+      "before": "tracker snapshotの比較は、timeline scrubber の操作や playback tick のたびに、snapshot sidecar や alignment sidecar の JSONLを再読込しない。ログ選択時に、capture metadata、snapshot sidecar、alignment sidecar、diagnostics log の各ファイルパスと、各ファイルの最終更新時刻・長さをキーにした軽量な索引を作成またはキャッシュする。選択中の診断記録や replay timeline tick が変わるときは、この索引からsource option、保存済みの対応付け、または推定であることを明示した比較を生成する。",
+      "after": "tracker snapshot の比較は、timeline scrubber の操作や playback tick のたびに、snapshot sidecar や alignment sidecar の JSONL を再読込しない。ログ選択時に、capture metadata、snapshot sidecar、alignment sidecar、diagnostics log の各ファイルパスと、各ファイルの最終更新時刻・長さをキーにした軽量な索引を作成またはキャッシュする。選択中の診断記録や replay timeline tick が変わるときは、この索引から source option、保存済みの対応付け、または推定であることを明示した比較を生成する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 138,
+      "before": "`TRACKER-059` 以降の `/diagnostics` の再生、早送り、位置のドラッグは、診断記録の件数ではなく統合した replay timeline を選択軸にする。時刻軸は収録時の `ReceivedAt` とし、診断記録、render snapshot、tracker packet snapshotの時点を合わせた集合、または同等に利用可能な表示元のうち最速の source cadenceを含む索引とする。外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと時刻系が違う場合があるため、この時刻軸には使わない。`TrackedFrame.timestamp` は各表示元内の表示・比較値として保持し、収録時刻での順序は `ReceivedAt` または記録開始からの相対受信時間で固定する。",
+      "after": "`TRACKER-059` 以降の `/diagnostics` の再生、早送り、位置のドラッグは、診断記録の件数ではなく統合した replay timeline を選択軸にする。時刻軸は収録時の `ReceivedAt` とし、診断記録、render snapshot、tracker packet snapshot の時点を合わせた集合、または同等に利用可能な表示元のうち最速の source cadence を含む索引とする。外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと時刻系が違う場合があるため、この時刻軸には使わない。`TrackedFrame.timestamp` は各表示元内の表示・比較値として保持し、収録時刻での順序は `ReceivedAt` または記録開始からの相対受信時間で固定する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 140,
+      "before": "通常再生は、統合した replay timeline の全時点を順番に描画しない。再生開始時に、開始時のwall-clockと、selected replay timeline tick の収録時刻 `ReceivedAt` を基準として保持する。表示更新は毎秒30回相当、つまり約33.3 msごとの描画間隔を目標に行い、各更新時に `targetReceivedAt = startTick.ReceivedAt + (currentWallClock - startWallClock)` を計算する。UI は replay timeline から `ReceivedAt <= targetReceivedAt` を満たす最新時点を選択し、そこへ直接追従する。トラッカーの更新が 100 Hz / 200 Hz 相当で存在する場合でも、通常再生では中間時点の表示を省略してよく、wall-clockに対する等倍速の再生位置を優先する。",
+      "after": "通常再生は、統合した replay timeline の全時点を順番に描画しない。再生開始時に、開始時の wall-clock と、selected replay timeline tick の収録時刻 `ReceivedAt` を基準として保持する。表示更新は毎秒30回相当、つまり約33.3 msごとの描画間隔を目標に行い、各更新時に `targetReceivedAt = startTick.ReceivedAt + (currentWallClock - startWallClock)` を計算する。UI は replay timeline から `ReceivedAt <= targetReceivedAt` を満たす最新時点を選択し、そこへ直接追従する。トラッカーの更新が 100 Hz / 200 Hz 相当で存在する場合でも、通常再生では中間時点の表示を省略してよく、wall-clock に対する等倍速の再生位置を優先する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 142,
+      "before": "この表示省略は通常再生専用の表示対象の選択であり、保存済みの第2版の対応付け、統合した replay timeline、tracker packet snapshot、比較用データを削らない。timeline scrubber の操作、Field source selector、`Tracker Comparison` 領域、`Tracker.CaptureReplay` は、引き続き任意の再生時点を選べる経路として維持する。ユーザーが重視する、保存済みの対応付け、再生位置、Field source、比較機能によって「確実に比較できる」能力を落とさない。毎秒30回の通常再生で描画しなかった中間時点でも、位置のドラッグや比較では、保存済みの alignment recordから選択・比較できる必要がある。",
+      "after": "この表示省略は通常再生専用の表示対象の選択であり、保存済みの第2版の対応付け、統合した replay timeline、tracker packet snapshot、比較用データを削らない。timeline scrubber の操作、Field source selector、`Tracker Comparison` 領域、`Tracker.CaptureReplay` は、引き続き任意の再生時点を選べる経路として維持する。ユーザーが重視する、保存済みの対応付け、再生位置、Field source、比較機能によって「確実に比較できる」能力を落とさない。毎秒30回の通常再生で描画しなかった中間時点でも、位置のドラッグや比較では、保存済みの alignment record から選択・比較できる必要がある。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 167,
+      "before": "高速なトラッカーの更新時点では、raw vision と render snapshot は、その時点以前の最新のものを保持する。先頭だけ、それ以前の render snapshot がない場合は、後続で最も近いものを代用することを許容する。例えば、raw vision と render snapshot が 0 ms / 100 ms、ER-FORCE のスナップショットが 0 / 20 / 40 / 60 / 80 / 100 ms の場合、20 / 40 / 60 / 80 ms の再生時点は同じ 0 ms の raw vision と render snapshotを参照し、100 ms で 100 ms の raw vision と render snapshotへ進む。これにより再生は高速なトラッカーの更新周期に合わせて進み、低速な raw vision 側は同じ描画内容を保持して段階的に動いて見える。",
+      "after": "高速なトラッカーの更新時点では、raw vision と render snapshot は、その時点以前の最新のものを保持する。先頭だけ、それ以前の render snapshot がない場合は、後続で最も近いものを代用することを許容する。例えば、raw vision と render snapshot が 0 ms / 100 ms、ER-FORCE のスナップショットが 0 / 20 / 40 / 60 / 80 / 100 ms の場合、20 / 40 / 60 / 80 ms の再生時点は同じ 0 ms の raw vision と render snapshot を参照し、100 ms で 100 ms の raw vision と render snapshot へ進む。これにより再生は高速なトラッカーの更新周期に合わせて進み、低速な raw vision 側は同じ描画内容を保持して段階的に動いて見える。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 169,
+      "before": "保存時の alignment sidecarは、診断ログ行単位だけでは不足する。新規記録では、ER-FORCE のような高速トラッカーの各 source sample に対する alignment recordも `tracker-snapshot-alignment.jsonl` に保存し、同じ raw vision と render snapshotを複数の高速トラッカーの記録から参照できるようにする。低速な raw vision と render snapshot の更新時点でも、その時点の最新のtracker snapshotに対応する記録を残す。これにより、UI が後から補助ファイルを使って推定するだけでなく、保存済みの比較点として、最速の source cadenceに応じた比較根拠を再現できる。",
+      "after": "保存時の alignment sidecar は、診断ログ行単位だけでは不足する。新規記録では、ER-FORCE のような高速トラッカーの各 source sample に対する alignment record も `tracker-snapshot-alignment.jsonl` に保存し、同じ raw vision と render snapshot を複数の高速トラッカーの記録から参照できるようにする。低速な raw vision と render snapshot の更新時点でも、その時点の最新の tracker snapshot に対応する記録を残す。これにより、UI が後から補助ファイルを使って推定するだけでなく、保存済みの比較点として、最速の source cadence に応じた比較根拠を再現できる。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 178,
+      "before": "- 対応するsource identity、source role、source label",
+      "after": "- 対応する source identity、source role、source label",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 187,
+      "before": "外部トラッカーのパケットはスナップショットとして保持する。`Tracker.CaptureReplay` と `/diagnostics` の再生は、session folder 内の snapshot log と alignment sidecarを読み、保存時の対応規則で自前トラッカーの確定済みの追跡フレームと並べて再生・比較表示できるようにする。再生は未加工入力・追跡結果の render snapshot だけに依存せず、source identity / source role ごとの tracker packet snapshot の時系列と、診断記録の対応付けを入力として扱える必要がある。",
+      "after": "外部トラッカーのパケットはスナップショットとして保持する。`Tracker.CaptureReplay` と `/diagnostics` の再生は、session folder 内の snapshot log と alignment sidecar を読み、保存時の対応規則で自前トラッカーの確定済みの追跡フレームと並べて再生・比較表示できるようにする。再生は未加工入力・追跡結果の render snapshot だけに依存せず、source identity / source role ごとの tracker packet snapshot の時系列と、診断記録の対応付けを入力として扱える必要がある。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 189,
+      "before": "capture metadataがない、capture metadataにsnapshot sidecar や alignment sidecar のファイルパスがない、補助ファイルがない、capture metadataの `TrackerSnapshotLog.IsCreated=false`、記録件数0、対応記録0、読み取りエラーは、それぞれ UI 上の状態として区別する。これらは、既存の診断ログや render snapshot の表示を壊す理由にはしない。",
+      "after": "capture metadata がない、capture metadata に snapshot sidecar や alignment sidecar のファイルパスがない、補助ファイルがない、capture metadata の `TrackerSnapshotLog.IsCreated=false`、記録件数0、対応記録0、読み取りエラーは、それぞれ UI 上の状態として区別する。これらは、既存の診断ログや render snapshot の表示を壊す理由にはしない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 193,
+      "before": "`TRACKER-056` では、`/diagnostics` の下部フィールド表示を、左右それぞれ独立した Field source selectorで切り替えられるようにする。既定は現在の表示を維持し、左は `Vision Input`、右は自前トラッカーの出力とする。右側は既存の render snapshot の補助ファイルから作る `TrackedVisionViewState` を優先して使い、追跡パケットの補助ファイルに `own` の記録がなくても現行の表示を維持する。",
+      "after": "`TRACKER-056` では、`/diagnostics` の下部フィールド表示を、左右それぞれ独立した Field source selector で切り替えられるようにする。既定は現在の表示を維持し、左は `Vision Input`、右は自前トラッカーの出力とする。右側は既存の render snapshot の補助ファイルから作る `TrackedVisionViewState` を優先して使い、追跡パケットの補助ファイルに `own` の記録がなくても現行の表示を維持する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 201,
+      "before": "- `External`: 保存済みの alignment sidecarがある場合は、分類が `external` の表示元を集約した代表スナップショットを描画する。対応付けのない既存記録では `unsupported-alignment-missing` とするか、推定であることを明示して既存の近傍時刻の選択を使う。",
+      "after": "- `External`: 保存済みの alignment sidecar がある場合は、分類が `external` の表示元を集約した代表スナップショットを描画する。対応付けのない既存記録では `unsupported-alignment-missing` とするか、推定であることを明示して既存の近傍時刻の選択を使う。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 202,
+      "before": "- `Unknown`: 保存済みの alignment sidecarがある場合は、分類が `unknown` の表示元を集約した代表スナップショットを描画する。対応付けのない既存記録では `External` と同じ状態表示の方針を使う。",
+      "after": "- `Unknown`: 保存済みの alignment sidecar がある場合は、分類が `unknown` の表示元を集約した代表スナップショットを描画する。対応付けのない既存記録では `External` と同じ状態表示の方針を使う。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 203,
+      "before": "- source label: snapshot sidecar 内の正規化済みの source labelと完全一致するスナップショット群から、保存済みの対応付けが示す代表を描画する。同じ表示名・UUID に複数の送信元の通信アドレスと通信ポートがある場合は、同条件の候補から代表を選んだ理由を対応記録に残す。",
+      "after": "- source label: snapshot sidecar 内の正規化済みの source label と完全一致するスナップショット群から、保存済みの対応付けが示す代表を描画する。同じ表示名・UUID に複数の送信元の通信アドレスと通信ポートがある場合は、同条件の候補から代表を選んだ理由を対応記録に残す。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 217,
+      "before": "- 対応付けに使った source keyと、同条件の候補から代表を選んだ理由",
+      "after": "- 対応付けに使った source key と、同条件の候補から代表を選んだ理由",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 221,
+      "before": "新規記録での表示元選択は、selected replay timeline tick の安定した識別子から保存済みの alignment recordを引き、その記録が参照するtracker snapshotを、source role / source label 別の候補として使う。フィールドと比較領域で別々の規則によってスナップショットを選ばないよう、対応付けの検索と旧形式の近傍選択は、キャッシュ済み索引内の共通処理を使う。対応付けのない既存記録で近傍選択を許可する場合だけ、保持中の診断記録のtracked frame numberから自前の `own` スナップショットを引き、その `TrackedFrame.timestamp` を基準時刻として、source role / source label 別の候補から最も近いものを選ぶ。",
+      "after": "新規記録での表示元選択は、selected replay timeline tick の安定した識別子から保存済みの alignment record を引き、その記録が参照する tracker snapshot を、source role / source label 別の候補として使う。フィールドと比較領域で別々の規則によってスナップショットを選ばないよう、対応付けの検索と旧形式の近傍選択は、キャッシュ済み索引内の共通処理を使う。対応付けのない既存記録で近傍選択を許可する場合だけ、保持中の診断記録の tracked frame number から自前の `own` スナップショットを引き、その `TrackedFrame.timestamp` を基準時刻として、source role / source label 別の候補から最も近いものを選ぶ。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 223,
+      "before": "`TRACKER-055` のキャッシュと索引の経路を維持するため、timeline scrubber の操作、playback tick、Field source selector の変更で、snapshot sidecar や alignment sidecar の JSONL全体を再読込しない。索引構築は、diagnostics log、capture metadata、snapshot sidecar、alignment sidecar の各ファイルパス、最終更新時刻、長さをキーにした既存のキャッシュ経路へ統合する。フィールド用には元データ全体ではなく、描画に必要な概要情報または最小限の描画用データだけを索引に保持する。通常の書き込み処理が作る記録では `SemanticSummary` を使い、古い記録などで概要情報がない場合だけ、索引構築時に元データから復元する。統合した replay timeline もログ選択時の索引構築で作成し、更新や位置のドラッグごとに補助ファイルを全件再読込しない。",
+      "after": "`TRACKER-055` のキャッシュと索引の経路を維持するため、timeline scrubber の操作、playback tick、Field source selector の変更で、snapshot sidecar や alignment sidecar の JSONL 全体を再読込しない。索引構築は、diagnostics log、capture metadata、snapshot sidecar、alignment sidecar の各ファイルパス、最終更新時刻、長さをキーにした既存のキャッシュ経路へ統合する。フィールド用には元データ全体ではなく、描画に必要な概要情報または最小限の描画用データだけを索引に保持する。通常の書き込み処理が作る記録では `SemanticSummary` を使い、古い記録などで概要情報がない場合だけ、索引構築時に元データから復元する。統合した replay timeline もログ選択時の索引構築で作成し、更新や位置のドラッグごとに補助ファイルを全件再読込しない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 225,
+      "before": "ただし、`TRACKER-059` は性能第一とし、既存の `TrackerDiagnosticsComparisonViewStateReader`、対応付けの読み取り処理、選択中の診断記録を前提とする状態表現が、統合した replay timeline の性能を制限する場合は温存しない。必要なら `TrackerDiagnosticsReplayTimelineIndex` 相当のUI やファイルの入出力から独立した索引を主経路にし、既存の読み取り処理は削除するか、必要最小限の接続処理へ縮小する。判断基準は、ログを開くときに一度だけ構築し、再生・早送り・位置のドラッグ・表示元変更では、補助ファイルの再読込なしで探索量を制限して参照できるかどうかとする。",
+      "after": "ただし、`TRACKER-059` は性能第一とし、既存の `TrackerDiagnosticsComparisonViewStateReader`、対応付けの読み取り処理、選択中の診断記録を前提とする状態表現が、統合した replay timeline の性能を制限する場合は温存しない。必要なら `TrackerDiagnosticsReplayTimelineIndex` 相当の UI やファイルの入出力から独立した索引を主経路にし、既存の読み取り処理は削除するか、必要最小限の接続処理へ縮小する。判断基準は、ログを開くときに一度だけ構築し、再生・早送り・位置のドラッグ・表示元変更では、補助ファイルの再読込なしで探索量を制限して参照できるかどうかとする。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 229,
+      "before": "欠落・空・エラー時もフィールド表示領域は消さず、空の `VisionFieldCanvas` または同等の空表示を出し、見出し付近に状態を示す。`Vision Input` / `ibis tracker` で render snapshot がない場合は、既存のrender snapshotのエラーを優先する。トラッカーの表示元では、capture metadataなし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、近傍スナップショットに描画対象なしを区別し、既存の診断ログやrender snapshotの表示を壊す理由にはしない。",
+      "after": "欠落・空・エラー時もフィールド表示領域は消さず、空の `VisionFieldCanvas` または同等の空表示を出し、見出し付近に状態を示す。`Vision Input` / `ibis tracker` で render snapshot がない場合は、既存の render snapshot のエラーを優先する。トラッカーの表示元では、capture metadata なし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、近傍スナップショットに描画対象なしを区別し、既存の診断ログや render snapshot の表示を壊す理由にはしない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 235,
+      "before": "- 統合した replay timeline は診断記録の件数ではなく、利用可能な表示元のうち最速の source cadenceを含む。raw vision と render snapshot を 0 ms / 100 ms、ER-FORCE のスナップショットを 0 / 20 / 40 / 60 / 80 / 100 ms にしたテストデータで、20 / 40 / 60 / 80 ms の再生時点を含むことを固定する。",
+      "after": "- 統合した replay timeline は診断記録の件数ではなく、利用可能な表示元のうち最速の source cadence を含む。raw vision と render snapshot を 0 ms / 100 ms、ER-FORCE のスナップショットを 0 / 20 / 40 / 60 / 80 / 100 ms にしたテストデータで、20 / 40 / 60 / 80 ms の再生時点を含むことを固定する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 236,
+      "before": "- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment recordを持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshotを参照し、100 ms の記録は 100 ms の render snapshotを参照する。",
+      "after": "- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment record を持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshot を参照し、100 ms の記録は 100 ms の render snapshot を参照する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 239,
+      "before": "- 等倍速の `Play` は毎秒30回相当の表示更新で、開始時のwall-clockと開始時点の `ReceivedAt` から目標の収録時刻を計算し、その時刻以下の最新再生時点へ追従する。200 Hz の更新を持つテストデータでは、開始から1秒後に約30個目の逐次更新位置ではなく、wall-clockで1秒相当の時点へ進むことを固定する。",
+      "after": "- 等倍速の `Play` は毎秒30回相当の表示更新で、開始時の wall-clock と開始時点の `ReceivedAt` から目標の収録時刻を計算し、その時刻以下の最新再生時点へ追従する。200 Hz の更新を持つテストデータでは、開始から1秒後に約30個目の逐次更新位置ではなく、wall-clock で1秒相当の時点へ進むことを固定する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 240,
+      "before": "- 通常再生で表示を省略した中間時点でも、timeline scrubber の操作、Field source selector、比較は、selected replay timeline tick と保存済みの第2版の alignment recordから、任意時点を選択・比較できることを固定する。",
+      "after": "- 通常再生で表示を省略した中間時点でも、timeline scrubber の操作、Field source selector、比較は、selected replay timeline tick と保存済みの第2版の alignment record から、任意時点を選択・比較できることを固定する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 250,
+      "before": "- Field source の選択肢は `Vision Input`、`ibis tracker`、`External`、`Unknown`、source labelを持ち、`All` を含めない。",
+      "after": "- Field source の選択肢は `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label を持ち、`All` を含めない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 252,
+      "before": "- selected replay timeline tick と source label / source roleから、比較と同じ対応付け、または推定であることを明示したスナップショットの概要情報が、`TrackerDiagnosticsFieldSourceFrame` に返る。",
+      "after": "- selected replay timeline tick と source label / source role から、比較と同じ対応付け、または推定であることを明示したスナップショットの概要情報が、`TrackerDiagnosticsFieldSourceFrame` に返る。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 253,
+      "before": "- 新規記録では、selected replay timeline tick と source label / source roleから、保存済みの alignment sidecar が参照する tracker snapshotの概要情報が、`TrackerDiagnosticsFieldSourceFrame` に返る。",
+      "after": "- 新規記録では、selected replay timeline tick と source label / source role から、保存済みの alignment sidecar が参照する tracker snapshot の概要情報が、`TrackerDiagnosticsFieldSourceFrame` に返る。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 257,
+      "before": "- alignment sidecarがない既存記録では、外部トラッカーや表示元名で選ぶフィールドの状態が、非対応または推定であることを明示した状態になる。",
+      "after": "- alignment sidecar がない既存記録では、外部トラッカーや表示元名で選ぶフィールドの状態が、非対応または推定であることを明示した状態になる。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 264,
+      "before": "`TRACKER-057` では、`TRACKER-056` の左右の Field source selectorと `TrackerDiagnosticsFieldSourceFrame` を再利用し、選択中の診断記録に対する 2 つの表示元の重ね表示を追加する。必須ではない要望として扱うため、選択欄を別体系に増やす実装や、任意個数の表示元を重ねる機能は、この PR の最小実装に含めない。",
+      "after": "`TRACKER-057` では、`TRACKER-056` の左右の Field source selector と `TrackerDiagnosticsFieldSourceFrame` を再利用し、選択中の診断記録に対する 2 つの表示元の重ね表示を追加する。必須ではない要望として扱うため、選択欄を別体系に増やす実装や、任意個数の表示元を重ねる機能は、この PR の最小実装に含めない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 268,
+      "before": "重ねる対象は追加の複数選択ではなく、現在の左右のフィールド表示の 2 つの表示元に限定する。既定は左 `Vision Input`、右が自前トラッカーの出力であるため、初期の重ね表示は両者の重ね合わせになる。`External`、`Unknown`、source labelは `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を使い、新規記録では保存済みの対応付け、既存記録では非対応または推定であることを明示した経路で解決する。`All` は引き続き使わない。左右が同じ表示元なら 1 層として扱い、凡例に同一の表示元であることを示す。",
+      "after": "重ねる対象は追加の複数選択ではなく、現在の左右のフィールド表示の 2 つの表示元に限定する。既定は左 `Vision Input`、右が自前トラッカーの出力であるため、初期の重ね表示は両者の重ね合わせになる。`External`、`Unknown`、source label は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を使い、新規記録では保存済みの対応付け、既存記録では非対応または推定であることを明示した経路で解決する。`All` は引き続き使わない。左右が同じ表示元なら 1 層として扱い、凡例に同一の表示元であることを示す。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 276,
+      "before": "重ね表示用の状態表現は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を直接再利用し、未加工の `Vision Input` と自前トラッカーの出力も同じ表示層へ変換できる小さな表示用の状態表現を `Diagnostics.razor.cs` または専用の生成処理で作る。トラッカーの層は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の変換処理で、ボール・黄色チームのロボット・青色チームのロボットへ変換する。render snapshot 由来の層は、既存の source detectionsと `TrackedVisionViewState.FromSnapshot(...)` を使う。近傍の選択、自前の比較基準時刻、比較候補なし等の状態判定は、`TrackerDiagnosticsComparisonViewStateReader.LoadFieldSourceFrame(...)` とキャッシュ済み索引を使い、重ね表示専用に補助 JSONL ファイルを再読込しない。",
+      "after": "重ね表示用の状態表現は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を直接再利用し、未加工の `Vision Input` と自前トラッカーの出力も同じ表示層へ変換できる小さな表示用の状態表現を `Diagnostics.razor.cs` または専用の生成処理で作る。トラッカーの層は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の変換処理で、ボール・黄色チームのロボット・青色チームのロボットへ変換する。render snapshot 由来の層は、既存の source detections と `TrackedVisionViewState.FromSnapshot(...)` を使う。近傍の選択、自前の比較基準時刻、比較候補なし等の状態判定は、`TrackerDiagnosticsComparisonViewStateReader.LoadFieldSourceFrame(...)` とキャッシュ済み索引を使い、重ね表示専用に補助 JSONL ファイルを再読込しない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 278,
+      "before": "欠落、空、フィールド形状なし、比較候補なしの扱いは `TRACKER-056` と揃える。render snapshot geometryがない場合は、形状なしの空表示とし、トラッカーの表示元の補助ファイルだけから形状を復元しない。capture metadataなし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、描画対象なしは、層の状態として凡例へ示す。他に準備済みの層があれば、その層だけを描画する。両層とも描画不可でも領域は消さず、空のフィールドと状態を表示する。",
+      "after": "欠落、空、フィールド形状なし、比較候補なしの扱いは `TRACKER-056` と揃える。render snapshot geometry がない場合は、形状なしの空表示とし、トラッカーの表示元の補助ファイルだけから形状を復元しない。capture metadata なし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、描画対象なしは、層の状態として凡例へ示す。他に準備済みの層があれば、その層だけを描画する。両層とも描画不可でも領域は消さず、空のフィールドと状態を表示する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 284,
+      "before": "- 表示層は `Vision Input`、自前トラッカー、`External`、`Unknown`、source labelを混在できる。トラッカーの表示元は `TRACKER-056` と同じ `TrackerDiagnosticsFieldSourceFrame`、対応付けの検索、キャッシュ済み索引を使う。",
+      "after": "- 表示層は `Vision Input`、自前トラッカー、`External`、`Unknown`、source label を混在できる。トラッカーの表示元は `TRACKER-056` と同じ `TrackerDiagnosticsFieldSourceFrame`、対応付けの検索、キャッシュ済み索引を使う。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 294,
+      "before": "- `TRACKER-048` では、診断ログ・再生の比較表示と出力へ接続する。capture metadataの相対パスからsnapshot sidecarを読み、source role / source label、tracked frame timestamp、ボール・ロボット数、元データの復元状態、近傍時刻の比較概要を、`Tracker.CaptureReplay` または診断再生で確認可能にする。既存のキャプチャー・診断・ render snapshot の表示を壊さない。",
+      "after": "- `TRACKER-048` では、診断ログ・再生の比較表示と出力へ接続する。capture metadata の相対パスから snapshot sidecar を読み、source role / source label、tracked frame timestamp、ボール・ロボット数、元データの復元状態、近傍時刻の比較概要を、`Tracker.CaptureReplay` または診断再生で確認可能にする。既存のキャプチャー・診断・ render snapshot の表示を壊さない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 296,
+      "before": "- `TRACKER-050` では、診断比較の読み取り処理と表示状態の契約を追加する。診断ログのファイルパスからcapture metadataと補助ファイルを解決し、表示元一覧、選択中の表示元の絞り込み、選択中の記録の比較、補助ファイルの状態、省略・エラー件数を、UI から独立した状態表現として固定する。",
+      "after": "- `TRACKER-050` では、診断比較の読み取り処理と表示状態の契約を追加する。診断ログのファイルパスから capture metadata と補助ファイルを解決し、表示元一覧、選択中の表示元の絞り込み、選択中の記録の比較、補助ファイルの状態、省略・エラー件数を、UI から独立した状態表現として固定する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 298,
+      "before": "- `TRACKER-052` では、CaptureOn 比較ログの運用文書と手動検証の証跡を、UI 比較完了後の実態へ更新する。CLI はエージェント・検証用、通常確認は `/diagnostics` のcomparison panelを主経路として説明する。",
+      "after": "- `TRACKER-052` では、CaptureOn 比較ログの運用文書と手動検証の証跡を、UI 比較完了後の実態へ更新する。CLI はエージェント・検証用、通常確認は `/diagnostics` の comparison panel を主経路として説明する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 302,
+      "before": "- `TRACKER-057` では、必須ではない要望としてフィールドの重ね合わせ表示を追加し、`TRACKER-056` の左右の Field source selectorと `TrackerDiagnosticsFieldSourceFrame` を再利用する。最小実装は左右2つの表示元の重ね合わせ、層の色分け、凡例、表示・非表示に限定し、任意個数の重ね合わせや設定の永続化は含めない。実装が複雑化する場合は、PR のレビュー準備完了前に延期の判断を報告書へ明記する。",
+      "after": "- `TRACKER-057` では、必須ではない要望としてフィールドの重ね合わせ表示を追加し、`TRACKER-056` の左右の Field source selector と `TrackerDiagnosticsFieldSourceFrame` を再利用する。最小実装は左右2つの表示元の重ね合わせ、層の色分け、凡例、表示・非表示に限定し、任意個数の重ね合わせや設定の永続化は含めない。実装が複雑化する場合は、PR のレビュー準備完了前に延期の判断を報告書へ明記する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 304,
+      "before": "- `TRACKER-058` では、新規キャプチャーの保存時の alignment sidecarを追加し、外部トラッカーの時刻が自前と異なる時刻系でも、Field source と CLI 比較が保存済みの対応付けを優先できるようにする。",
+      "after": "- `TRACKER-058` では、新規キャプチャーの保存時の alignment sidecar を追加し、外部トラッカーの時刻が自前と異なる時刻系でも、Field source と CLI 比較が保存済みの対応付けを優先できるようにする。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 305,
+      "before": "- `TRACKER-059` では、診断再生の時系列を利用可能な最速の source cadenceへ合わせる。再生・早送り・位置のドラッグは診断記録の件数ではなく統合した replay timeline を使い、高速トラッカーの時点では、raw vision と render snapshot をその時点以前の最新のもので保持する。対応付け用の補助ファイルは既存ファイル名のまま第2版の整理された記録へ置き換え、診断ログ行だけでなく高速トラッカーの source sample ごとの alignment recordを残す。互換用の代用処理は入れず、ログを開くときの索引構築と、更新・位置移動時の `O(1)` または探索量を制限した参照を優先する。",
+      "after": "- `TRACKER-059` では、診断再生の時系列を利用可能な最速の source cadence へ合わせる。再生・早送り・位置のドラッグは診断記録の件数ではなく統合した replay timeline を使い、高速トラッカーの時点では、raw vision と render snapshot をその時点以前の最新のもので保持する。対応付け用の補助ファイルは既存ファイル名のまま第2版の整理された記録へ置き換え、診断ログ行だけでなく高速トラッカーの source sample ごとの alignment record を残す。互換用の代用処理は入れず、ログを開くときの索引構築と、更新・位置移動時の `O(1)` または探索量を制限した参照を優先する。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 306,
+      "before": "- `TRACKER-060` では、等倍速の `Play` だけを毎秒30回相当の表示更新でwall-clock の経過時間へ追従させる。開始時点の `ReceivedAt` と開始時の wall-clockから目標の収録時刻を計算し、その時刻以下の最新再生時点を表示対象にする。保存済みの第2版の対応付け、位置の操作、Field source 選択、比較は任意時点を比較できる経路として維持し、早送りでは既存の調査用の収録時刻差を倍率で割る挙動を壊さない。",
+      "after": "- `TRACKER-060` では、等倍速の `Play` だけを毎秒30回相当の表示更新で wall-clock の経過時間へ追従させる。開始時点の `ReceivedAt` と開始時の wall-clock から目標の収録時刻を計算し、その時刻以下の最新再生時点を表示対象にする。保存済みの第2版の対応付け、位置の操作、Field source 選択、比較は任意時点を比較できる経路として維持し、早送りでは既存の調査用の収録時刻差を倍率で割る挙動を壊さない。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 316,
+      "before": "- capture metadataから session folder と、各ファイルへの相対パスを辿れる。",
+      "after": "- capture metadata から session folder と、各ファイルへの相対パスを辿れる。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 321,
+      "before": "- `/diagnostics` の左右のフィールド表示で `Vision Input`、自前トラッカー、外部、不明、source labelを選択でき、既定は左 `Vision Input`、右が自前トラッカーの出力のまま維持される。",
+      "after": "- `/diagnostics` の左右のフィールド表示で `Vision Input`、自前トラッカー、外部、不明、source label を選択でき、既定は左 `Vision Input`、右が自前トラッカーの出力のまま維持される。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 322,
+      "before": "- `Tracker Comparison` 領域を折りたたんでも、Field source selectorとフィールド描画を使える。",
+      "after": "- `Tracker Comparison` 領域を折りたたんでも、Field source selector とフィールド描画を使える。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "line": 327,
+      "before": "- 保存時の alignment sidecar は、最速の source cadenceに応じた比較記録を持ち、複数の高速トラッカーの記録が同じ raw vision と render snapshotを参照できる。",
+      "after": "- 保存時の alignment sidecar は、最速の source cadence に応じた比較記録を持ち、複数の高速トラッカーの記録が同じ raw vision と render snapshot を参照できる。",
+      "reason": "文脈確認済みの名称を変えず、日本語との間の空白だけを追加する。"
+    }
+  ]
+}

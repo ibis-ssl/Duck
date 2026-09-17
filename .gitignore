@@ -482,11 +482,15 @@ $RECYCLE.BIN/
 *.swp
 
 # codex
+# Codex local working files
+/.codex/
 .agents/
 AGENTS.md
 .serena/
+.venv/
 .codex-dotnet-home/
 .codex-nuget-packages/
+.codex-doc-lint-venv/
 
 # Local runtime and diagnostics capture artifacts
 packet-captures/

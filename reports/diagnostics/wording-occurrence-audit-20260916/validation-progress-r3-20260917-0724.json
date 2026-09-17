@@ -1,0 +1,115 @@
+{
+  "time": "2026-09-17T07:23:25.793823+09:00",
+  "technical_parent": "162f4894d8ca4dbd6b69828f9a359181a1bf35fb",
+  "focused_files": [
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "all_target_files": [
+    "feedback-points/feedback-points.md",
+    "README.md",
+    "tools/lint/README.md",
+    "Tracker/Design/Archive/Core/phases-status.md",
+    "Tracker/Design/Archive/Core/tasks-status.md",
+    "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "Tracker/Design/Core/tracker-architecture-plan.md",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "Tracker/Design/Core/tracker-history-000-038.md",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Tracker.CaptureReplay/README.md",
+    "Tracker/Tracker.DebugHost/README.md"
+  ],
+  "file_hashes": {
+    "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+    "tools/lint/README.md": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646",
+    "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "Tracker/Design/Archive/Core/tasks-status.md": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "e97db48c46cc89d3d3e518c9e32385b554a70e38bf95740f930b2247d4d6f342",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6",
+    "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "80b316ca08b744f2c7567f94840c88469625605f0d5f20120ab76627ae7dae09",
+    "Tracker/Design/phases-status.md": "a165e3c5d1b505c77f2d26c3793c0436c0a68067f2e31ef84f732043d9fa408d",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+    "Tracker/Design/tasks-status.md": "8645972a354415126025d414fae8f578e4f0a68949f2f6a81124023a43c1f1c0",
+    "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "Tracker/Tracker.DebugHost/README.md": "ebaa2c2eeabe715c2a9c9eab734b31200ab113bbee1f583ff0631521fe1e6141"
+  },
+  "inputs_unchanged_during_validation": true,
+  "results": [
+    {
+      "name": "focused-textlint",
+      "command": [
+        "./node_modules/.bin/textlint",
+        "--config",
+        ".textlintrc.json",
+        "--rulesdir",
+        ".agents/skills/review-enforcer/scripts/textlint-rules",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Design/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/progress-r3-20260917-0724-focused-textlint.stdout",
+      "stderr": "logs/progress-r3-20260917-0724-focused-textlint.stderr"
+    },
+    {
+      "name": "focused-cspell",
+      "command": [
+        "node",
+        ".agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Design/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/progress-r3-20260917-0724-focused-cspell.stdout",
+      "stderr": "logs/progress-r3-20260917-0724-focused-cspell.stderr"
+    },
+    {
+      "name": "focused-whitelist",
+      "command": [
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+        ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Design/phases-status.md"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/progress-r3-20260917-0724-focused-whitelist.stdout",
+      "stderr": "logs/progress-r3-20260917-0724-focused-whitelist.stderr"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/progress-r3-20260917-0724-diff-check.stdout",
+      "stderr": "logs/progress-r3-20260917-0724-diff-check.stderr"
+    },
+    {
+      "name": "full-lint",
+      "command": [
+        "npm",
+        "run",
+        "lint:md"
+      ],
+      "exit_code": 123,
+      "stdout": "logs/progress-r3-20260917-0724-full-lint.stdout",
+      "stderr": "logs/progress-r3-20260917-0724-full-lint.stderr"
+    }
+  ]
+}

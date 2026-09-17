@@ -1,0 +1,195 @@
+{
+  "time": "2026-09-17T08:31:31.440151+09:00",
+  "technical_parent": "978369a6df97975a5b0cecc1944bca4e113b946c",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+  "before_sha256": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843",
+  "after_sha256": "9bfa207c07ea317cb8a32b075a24ce4f9e8e8456140f2b98a006c0e37afb27b3",
+  "line_count_before": 1172,
+  "line_count_after": 1172,
+  "current_body_read": [
+    1,
+    1172
+  ],
+  "baseline_scope": "変更する6ブロックと関連する契約の文脈を読んだ。他の241ブロックを今回原文まで再読したとはしない。",
+  "inherited_record_matches_before_change": true,
+  "edits": [
+    {
+      "block": "D07-B058",
+      "line": 271,
+      "before": "- 確定したフィールド全体の追跡フレームとトラッカーの通知を、送信順で返す",
+      "after": "- 確定したフィールド全体の追跡フレームとトラッカーの通知を、出力順で返す",
+      "decision": "自然な日本語として修正",
+      "reason": "エンジンの返却列の順序であり、実際のUDP送信順へ限定しない。",
+      "baseline_start": 268,
+      "baseline_end": 270,
+      "baseline_text": [
+        "- raw vision 入力を 1 件受け取り、event time で再順序化したうえで内部追跡状態を進める",
+        "- 確定した world frame 群と tracker event 群を publish 順で返す",
+        "- geometry 更新だけの packet でも内部状態を壊さない"
+      ],
+      "final_start": 270,
+      "final_end": 272,
+      "final_text": [
+        "- raw vision を 1 件受け取り、観測時刻で並べ替えたうえで内部の追跡状態を進める",
+        "- 確定したフィールド全体の追跡フレームとトラッカーの通知を、出力順で返す",
+        "- フィールド形状更新だけのパケットでも内部状態を壊さない"
+      ]
+    },
+    {
+      "block": "D07-B061",
+      "line": 293,
+      "before": "    - 送信順に並ぶ",
+      "after": "    - 出力順に並ぶ",
+      "decision": "自然な日本語として修正",
+      "reason": "CommittedFramesは生成され返却される追跡フレームの列。配信の実施・成否とは別に順序を持つ。",
+      "baseline_start": 291,
+      "baseline_end": 291,
+      "baseline_text": [
+        "    - publish 順に並ぶ"
+      ],
+      "final_start": 293,
+      "final_end": 293,
+      "final_text": [
+        "    - 出力順に並ぶ"
+      ]
+    },
+    {
+      "block": "D07-B062",
+      "line": 296,
+      "before": "    - 送信順に並ぶ",
+      "after": "    - 通知順に並ぶ",
+      "decision": "自然な日本語として修正",
+      "reason": "EmittedEventsは制御通知と追跡通知の列。Observerへの通知順であり、UDPパケット列ではない。",
+      "baseline_start": 294,
+      "baseline_end": 295,
+      "baseline_text": [
+        "    - publish 順に並ぶ",
+        "    - event は必要に応じて対象 `frame_number` を参照する"
+      ],
+      "final_start": 296,
+      "final_end": 297,
+      "final_text": [
+        "    - 通知順に並ぶ",
+        "    - 通知は必要に応じて対象 `frame_number` を参照する"
+      ]
+    },
+    {
+      "block": "D07-B217",
+      "line": 1013,
+      "before": "- 競技規則を判定する順序に依存しないよう、通知はトラッカーで確定した順に送信する",
+      "after": "- 競技規則を判定する順序に依存しないよう、トラッカーで確定した順に通知する",
+      "decision": "自然な日本語として修正",
+      "reason": "競技規則の判定側への通知の順序という原文の責務を保ち、ネットワーク送信と混同させない。",
+      "baseline_start": 1009,
+      "baseline_end": 1014,
+      "baseline_text": [
+        "- rule ごとに observer を持てる構造にする",
+        "- observer は raw vision packet を直接 subscribe しない",
+        "- observer は `TrackerFrame` と domain event を入力にする",
+        "- kick / contact / ball left field の計算は tracker 側で責務を持ち、rule 側で同じ前提計算を重複させない",
+        "- rule 順序依存を避けるため、event は tracker で確定した順に publish する",
+        "- rule が追加されても tracking core の数値処理へ影響しない境界を保つ"
+      ],
+      "final_start": 1009,
+      "final_end": 1014,
+      "final_text": [
+        "- 競技規則の判定処理ごとに、通知を受け取る処理を持てる構造にする",
+        "- 通知を受け取る処理は raw vision パケットを直接購読しない",
+        "- 通知を受け取る処理は `TrackerFrame` と、`TrackerEvent` で表すキックや接触などの通知を入力にする",
+        "- キック / 接触 / ボールの場外退出の計算はトラッカー側で担当し、競技規則の判定側で同じ計算を重複させない",
+        "- 競技規則を判定する順序に依存しないよう、トラッカーで確定した順に通知する",
+        "- 競技規則の判定処理が追加されても、追跡処理の中核となる数値処理へ影響しない責務境界を保つ"
+      ]
+    },
+    {
+      "block": "D07-B218",
+      "line": 1016,
+      "before": "送信順は次で固定する。",
+      "after": "通知順は次で固定する。",
+      "decision": "自然な日本語として修正",
+      "reason": "直後のProfileSwitched、GeometryReset、WorldFrameCommitted、派生通知の順番を指す。",
+      "baseline_start": 1016,
+      "baseline_end": 1016,
+      "baseline_text": [
+        "publish 順は次で固定する。"
+      ],
+      "final_start": 1016,
+      "final_end": 1016,
+      "final_text": [
+        "通知順は次で固定する。"
+      ]
+    },
+    {
+      "block": "D07-B241",
+      "line": 1135,
+      "before": "- `TRACKER-007`: `TrackerEngine` の設定プロファイルの切り替え / フィールド形状の変化による初期化 / 通知送信順を実装する",
+      "after": "- `TRACKER-007`: `TrackerEngine` の設定プロファイルの切り替え / フィールド形状の変化による初期化 / 通知順を実装する",
+      "decision": "自然な日本語として修正",
+      "reason": "作業分割の表現を本文の通知順と一致させる。UDP送信統合の作業TRACKER-012へ責務を混ぜない。",
+      "baseline_start": 1134,
+      "baseline_end": 1149,
+      "baseline_text": [
+        "- `TRACKER-006`: `TrackerEngine` の reorder buffer と flush pipeline を実装する",
+        "- `TRACKER-007`: `TrackerEngine` の profile switch / geometry reset / event publish 順を実装する",
+        "- `TRACKER-008`: robot tracking と robot merge を実装する",
+        "- `TRACKER-009`: ball tracking と primary/secondary ball 選定を実装する",
+        "- `TRACKER-010`: kick と contact metadata を実装する",
+        "- `TRACKER-011`: ball left field metadata を実装する",
+        "- `TRACKER-012`: 旧 `Tracker.Server` へ engine と packet 配信を統合する",
+        "- `TRACKER-013`: tracker/network 設定束縛を統合する",
+        "- `TRACKER-014`: profile 切替要求経路を統合する",
+        "- `TRACKER-015`: tracked viewer と raw/tracked toggle を追加する",
+        "- `TRACKER-016`: tracked diagnostics 表示を追加する",
+        "- `TRACKER-017`: runtime profile 表示・操作 UI を追加する",
+        "- `TRACKER-018`: Tracker v1 の build/test 証跡を取得する",
+        "- `TRACKER-019`: Tracker v1 の integration 観点検証を行う",
+        "- `TRACKER-020`: Tracker v1 の最終レビューと追跡ファイル同期を行う",
+        "- `TRACKER-027`: Tigers 由来の近接重複 robot / 短命 ball 抑制を追加する"
+      ],
+      "final_start": 1134,
+      "final_end": 1149,
+      "final_text": [
+        "- `TRACKER-006`: `TrackerEngine` の順序を並べ替えるバッファと確定可能な入力を順に処理する仕組みを実装する",
+        "- `TRACKER-007`: `TrackerEngine` の設定プロファイルの切り替え / フィールド形状の変化による初期化 / 通知順を実装する",
+        "- `TRACKER-008`: ロボットの追跡とロボット追跡結果の統合を実装する",
+        "- `TRACKER-009`: ボールの追跡と主対象・補助対象のボール選定を実装する",
+        "- `TRACKER-010`: キックと接触に関する情報を実装する",
+        "- `TRACKER-011`: ボールの場外退出に関する情報を実装する",
+        "- `TRACKER-012`: 旧 `Tracker.Server` へ追跡エンジンとパケット配信を統合する",
+        "- `TRACKER-013`: トラッカーとネットワークの設定値のバインドを統合する",
+        "- `TRACKER-014`: 設定プロファイルの切り替え要求経路を統合する",
+        "- `TRACKER-015`: 追跡結果の表示画面と未加工入力・追跡結果切り替えを追加する",
+        "- `TRACKER-016`: 追跡結果の診断表示を追加する",
+        "- `TRACKER-017`: 実行中の設定プロファイルの表示・操作 UI を追加する",
+        "- `TRACKER-018`: トラッカー初期版のビルドとテスト証跡を取得する",
+        "- `TRACKER-019`: トラッカー初期版の統合観点検証を行う",
+        "- `TRACKER-020`: トラッカー初期版の最終レビューと進捗管理ファイルの同期を行う",
+        "- `TRACKER-027`: TIGERs 由来の近接重複ロボット / 短命ボール抑制を追加する"
+      ]
+    }
+  ],
+  "implementation_evidence": [
+    {
+      "file": "Tracker/Tracker.Core/Engine/ITrackerEngine.cs",
+      "lines": [
+        8,
+        15
+      ]
+    },
+    {
+      "file": "Tracker/Tracker.Core/Engine/TrackerUpdateResult.cs",
+      "lines": [
+        4,
+        17
+      ]
+    },
+    {
+      "file": "Tracker/Tracker.Core/Runtime/TrackerCoordinator.Dispatch.cs",
+      "lines": [
+        11,
+        80
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "block": "D07-B011",
+    "draft_reason": "公式形式との互換とraw/trackedの観察性という3・4番の優先順位を保持。",
+    "corrected_reason": "品質優先順位4番のraw/trackedの観察性を未加工入力・追跡結果の観察性と説明。直前の公式形式との互換は未変更で、優先順も保持。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B013",
+    "draft_reason": "採用しないJava構造、TIGERs固有分割/命名、完全一致前提の最適化を保持。",
+    "corrected_reason": "TIGERs固有の構成分割と命名へ追従しない条件を保持。前後のJava実装構造や完全一致前提の最適化も対象外のまま。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B023",
+    "draft_reason": "field寸法とline/arcをフィールド寸法と線分/円弧と説明。13メンバーの実名は変更せず保持。",
+    "corrected_reason": "field寸法とline/arcをフィールド寸法と線分/円弧と説明。直後の12メンバーの実名を変更せず保持。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B049",
+    "draft_reason": "processed_at_nsの型名見出しとdata timestampとの区別を保持。",
+    "corrected_reason": "受信時刻と処理時刻をdata timestampとして使わないという否定条件を、そのまま保持。processed_at_nsの説明とは別の行として対応付ける。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B051",
+    "draft_reason": "TrackerPacketGeneratorがdata_timestamp_nsをTrackedFrame.timestampへ変換する型とメンバーの対応を保持。",
+    "corrected_reason": "TrackedBallStateのvisibilityを可視性、参照元camera範囲を参照元のカメラの範囲と説明。ロボットや時刻変換の説明へ誤って対応付けない。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B052",
+    "draft_reason": "TrackedBallStateの位置/速度/高さ、可視性、参照カメラ範囲、浮遊、最終観測時刻、品質を保持。",
+    "corrected_reason": "TrackedRobotStateのteam/robot idをチーム/ロボットIDと説明。ボール状態の説明とは区別。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B053",
+    "draft_reason": "TrackedRobotStateのteam/id、位置/向き、並進/角速度、可視性、品質の状態量を保持。",
+    "corrected_reason": "TrackedRobotStateのvisibilityを可視性とする自然な日本語を採用。前後の速度・品質値は変更されていない。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B055",
+    "draft_reason": "KickEventStateの追跡ball内部ID、still moving用の最新速度/更新時刻、任意の停止予測・kicker、キック種別候補を保持。判定用の漢字連結を解く。",
+    "corrected_reason": "キックで追跡するボールの内部追跡IDと、still moving判定用の最新速度/最新更新時刻を保持。不自然な漢字連結を解く。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B056",
+    "draft_reason": "BallLeftFieldStateの線分種別を自然な日本語にし、内外・位置・時刻を保持。",
+    "corrected_reason": "任意のkicker robot idは必要に応じてキックしたロボットのIDと説明し、kick種別候補も保持。任意要件を必須にはしない。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B057",
+    "draft_reason": "契約詳細の見出し/型の区切りを保持。前後の状態型とITrackerEngineの説明を混同しない。",
+    "corrected_reason": "BallLeftFieldStateの横切ったline種別を横切った線分種別と説明。キックの型や契約見出しとは別に対応付ける。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B067",
+    "draft_reason": "uuid/source_name、単位変換、複数ballという生成器の責務を保持。",
+    "corrected_reason": "内部から公式形式への単位変換、複数ball出力、primary ball先頭化という3責務を保持。前後のuuid/source_nameとkicked_ballは未変更。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B068",
+    "draft_reason": "primary先頭、kicked_ball構築、capabilities設定という生成器の責務を保持。",
+    "corrected_reason": "capabilitiesの設定を対応機能の設定と説明。primary先頭化やkicked_ballの隣接行と混同しない。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B073",
+    "draft_reason": "Coordinatorの16処理規則を行ごとに照合。全frame処理/最終store、各packet、event順、state遷移後の公開、即時drain、in-flight不変、切替後の設定反映・clear・通知、old/new分離を保持。",
+    "corrected_reason": "差分13行と直前の未変更3行を一緒に照合。全frame処理/最終store/各packet、event順、state遷移後の公開、即時drain、in-flight不変、設定反映・clear・通知、old/new分離を全て保持。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  },
+  {
+    "block": "D07-B077",
+    "draft_reason": "active表示の正本プロパティ、候補0なら現在1件disabled、frameがclearされても操作UIは独立という3条件を保持。表示の正とする値という不自然な表現を除く。",
+    "corrected_reason": "4つのUI規則を照合。active表示と切替操作、正本のActiveProfileName、候補0なら現在1件disabled、frame有無と独立の描画を保持。不自然な表示の正とする値を修正。",
+    "cause": "採否記録の作成時に原文の差分範囲と再照合した。草稿の位置ずれや件数を確定版の前に修正。"
+  }
+]
