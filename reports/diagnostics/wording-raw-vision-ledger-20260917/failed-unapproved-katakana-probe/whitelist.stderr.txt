@@ -1,0 +1,7 @@
+Markdown whitelist violations:
+- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:12: 'アドレス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:32: 'アドレス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:32: 'インターフェース' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:46: 'アドレス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:47: 'ポート' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:47: 'バインド' (katakana) is not in tools/lint/markdown-whitelist.yaml.
