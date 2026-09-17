@@ -11,10 +11,10 @@
 - 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する
 - マルチキャスト用の通信アドレスが設定されている場合はマルチキャストグループへの参加を行う
 - `SSL_WrapperPacket.Parser.ParseFrom` でパケットをデコードする
-- 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、単一のインスタンスを共有する状態保存先に保持する
+- 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、アプリケーション内で単一インスタンスとして共有する状態保存先に保持する
 - `/` にフィールドを描く SVG、検出情報、カメラの校正情報、受信パケットの JSON を表示する
-- 画面移動は raw vision viewer を中心に保つ
-- 集約表示と、カメラごとの最新の観測結果表示の両方を raw vision viewer で扱う
+- 画面遷移は raw vision viewer を中心にする
+- 集約表示と、カメラごとの最新の検出情報表示の両方を raw vision viewer で扱う
 
 ## 対象外
 
@@ -121,7 +121,7 @@ raw vision viewer の主要コンポーネントは次の通り。
   - 拡大縮小と表示位置の状態、外周の背景、フィールド本体、子マーカーの配置、座標軸とカーソル座標の重ね表示を担当する
 - `VisionFieldLines.razor`
   - フィールドの線分、円弧、ゴールの描画を担当する
-  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時はフィールドの寸法から代わりの描画を行う
+  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時はフィールドの寸法から補完して描画する
 - `VisionBallMarker.razor`
   - `SSL_DetectionBall` 1 件を SVG の円として描く
 - `VisionRobotMarker.razor`
@@ -132,7 +132,7 @@ raw vision viewer の主要コンポーネントは次の通り。
 - `VisionPalette.cs`
   - チームの色とマーカーの線の色の定義を一箇所に集約する
 - `VisionRenderOptions.cs`
-  - ロボットの半径など、将来設定から変更したい描画パラメータの受け口
+  - ロボットの半径など、将来設定から変更可能にする描画パラメータをまとめる
 
 ## コンポーネント入力
 
@@ -153,7 +153,7 @@ raw vision viewer の主要コンポーネントは次の通り。
 - `IReadOnlyList<SSL_DetectionRobot> RobotsYellow`
 - `IReadOnlyList<SSL_DetectionRobot> RobotsBlue`
 - `VisionRenderOptions RenderOptions`
-- カーソル座標の表示に必要な、カーソルが重なっている状態と描画領域の大きさ
+- カーソル座標の表示に必要な、カーソルが描画領域内にあるかどうかと描画領域の大きさ
 
 ### `VisionFieldLines.razor`
 
@@ -215,7 +215,7 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 - 表示元ごとの受信時刻[^receive-timestamp]、検出情報や追跡フレームに記録された時刻[^frame-timestamp]、パケット数など、時刻差を説明する付随情報
 - ボール、ロボット、フィールド形状の参照[^geometry-reference]、欠落理由を含む、変更不能な表示元のスナップショット
 
-外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。
+外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元の識別と集約では UUID を優先する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID を持つ候補の中で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が `MultiTrackerManager` の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。
 
 フィールド形状の基準は未加工入力の形状を優先する。`Raw Aggregate` または選択中の `Raw Camera` で得られる最新の `SSL_GeometryData` を重ね表示全体のフィールド基準に使い、未加工入力の形状がまだ無い場合のみ `Tracked` の形状で代用する。`3rd party tracker` のパケットからフィールド形状を復元する方針は不採用とする。外部トラッカーのパケットは比較対象の物体の状態を表すものであり、フィールドの校正の責任を持たせると、表示元ごとの座標比較の意味が曖昧になる。
 
@@ -223,7 +223,7 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 
 - 分割表示では Layer A と Layer B を左右に並べる
 - 重ね表示では 1 つのフィールドに Layer A/B を重ねる
-- 重ね表示と分割表示を相互に共通化するのではなく、それぞれに必要な画面構造は分けて保つ。そのうえで、raw vision のライブ表示と診断画面のフィールド描画部[^field-rendering-part]は、同じ責務境界に揃える
+- 重ね表示と分割表示を 1 つの画面構造へ無理に共通化せず、それぞれに必要な画面構造は分けて保つ。そのうえで、raw vision のライブ表示と診断画面のフィールド描画部[^field-rendering-part]は、同じ責務境界に揃える
 - 分割表示用のフィールド表示コンポーネント[^split-field-component]と重ね表示用のフィールド表示コンポーネント[^overlay-field-component]は、別物として切り出す。重ね表示と分割表示を 1 つのコンポーネントへ統合する意味ではない
 - raw vision のライブ表示と診断画面は、分割表示では同じ分割表示用のフィールド表示コンポーネントを使い、重ね表示では同じ重ね表示用のフィールド表示コンポーネントを使う
 - フィールド、外周、フィールド形状、マーカーの描画責務は、分割表示用・重ね表示用のフィールド表示コンポーネントへ置く。表示元の選択欄、時刻に関する情報、欠落理由、凡例、レイアウトを構成する外枠は、raw vision のライブ表示と診断画面のページ、外枠、付加コンポーネント側に持たせる
@@ -243,7 +243,7 @@ raw vision viewer の分割表示・重ね表示で選択できる表示元[^sou
 
 新規キャプチャーの診断再生・比較は、diagnostics sample tick[^diagnostics-sample-tick]を保存単位にする。診断画面の `Vision Input` は選択時点の render snapshot ではなく、diagnostics sample tick で保存された最新の未加工入力のスナップショット[^latest-raw-snapshot]から復元する。自前トラッカーと外部トラッカーの比較対象には、同じ diagnostics sample tick で保存された最新の追跡スナップショット[^latest-tracker-snapshot]、または同時点以前の `latest-before snapshot` を使う。このため、新規キャプチャーでは raw vision、自前トラッカー、外部トラッカーを、トラッカーの追跡結果の確定周期ではなく診断データの採取時系列[^diagnostics-sample-timeline]上で比較する。
 
-選択時点[^selected-tick]に、対象の `3rd party tracker` の表示元に対する対応記録が無い場合でも、表示と比較を消さない。採用方針は、同じ表示元について選択時点以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を、Field source と比較に使うことである。UI と比較結果には、対応規則が `latest-before` であること、表示元のスナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を明示する。これにより、対象の表示元が選択時点で未更新でも、ユーザーは直前まで得られていた追跡状態を、未加工入力や自前トラッカーと比較できる。
+選択時点[^selected-tick]に、対象の `3rd party tracker` の表示元に対する対応記録が無い場合でも、表示と比較を消さない。採用方針は、同じ表示元について選択時点以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を、Field source と比較に使うことである。UI と比較結果には、対応規則が `latest-before` であること、表示元のスナップショットの実際の `receivedAt`、選択時点との差、選択時点より古い状態と `latest-before snapshot` を使用していることを明示する。これにより、対象の表示元が選択時点で未更新でも、ユーザーは直前まで得られていた追跡状態を、未加工入力や自前トラッカーと比較できる。
 
 `latest-before snapshot` を使う場合も、再生・比較の基準時系列は selected replay timeline tick のまま固定する。表示元ごとに再生位置[^timeline-cursor]をずらしたり、画面上の選択時刻をトラッカー側の時刻へ移動したりしない。フィールド表示と比較は「選択時点に対して、この表示元は直前の記録を保持している」として表示し、時刻差は選択時点と保持した表示元のスナップショットとの差として扱う。これにより、表示が消えることを避けつつ、時間軸が表示元ごとにずれ、異なる時刻のものを同時刻として表示しているように見える状態を避ける。
 
@@ -294,8 +294,8 @@ diagnostics sample tick の周期は、トラッカーの追跡結果の確定�
 - 詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列の確認を壊さない
 - `Diagnostics.razor` の左側の追跡フレームの時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする
 - 追跡フレームの時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも追跡フレームの選択操作と省略表示を維持する
-- `MainLayout.razor.css` と `NavMenu.razor.css` は、raw vision viewer や診断画面の濃い緑色の UI と同じ配色・密度を使い、Blazor の既定テンプレート由来の青紫色のグラデーションや、周囲から浮いた画面移動用の表示を残さない
-- 側面の画面移動メニューの選択中・カーソルが重なった状態・折りたたみ・モバイル向けの切り替えは、既存操作を維持しつつ、表示画面と同じ枠線、背景、文字色の階調で表現する
+- `MainLayout.razor.css` と `NavMenu.razor.css` は、raw vision viewer や診断画面の濃い緑色の UI と同じ配色・密度を使い、Blazor の既定テンプレート由来の青紫色のグラデーションや、周囲の配色から浮いた画面遷移用の表示を残さない
+- 側面の画面遷移メニューは、選択中、カーソルを重ねたとき、折りたたみ時、モバイル向け切り替え時の既存操作を維持しつつ、表示画面と同じ枠線、背景、文字色の階調で表現する
 - `Diagnostics.razor` の timeline scrubber には、再生、停止、早送りの操作部を置き、選択する記録を順方向に進める
 - 通常再生はログ記録の時刻差を使い、間隔を上限で制限せず、実際の記録速度に合わせて進める
 - 再生中は再生ボタンを停止ボタン表示へ切り替え、早送り中は早送りボタンを停止ボタン表示へ切り替える
