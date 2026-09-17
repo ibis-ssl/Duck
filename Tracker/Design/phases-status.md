@@ -31,3 +31,9 @@
 ## 追跡エンジンの照合記録（2026-09-17）
 
 追跡エンジンの詳細設計について、原文133出現と最終表現の対応を記録し、`summary` 要素の指定を復元した。文脈を読んだ86行の判断と、入力番号・時刻・初期化対象・追跡の確立条件を実装と照合した証拠は、`reports/task-doc-lint-003-engine-correspondence-20260917084612.md` に記録した。全出現箇所の最終台帳、全体の文書検査、独立最終レビューは未完了のままである。
+
+## 独立最終レビュー F1 対応（2026-09-17）
+
+独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明に不整合があるF1が見つかり、完了判定は保留となった。構成設計、DebugHost詳細設計、DebugHost READMEを実装へ同期し、新規記録の再生位置と `Vision Input` / `ibis tracker` の復元元を diagnostics sample sidecar に統一した。外部トラッカーは tracker packet snapshot と alignment sidecar、または latest-before snapshot を使い、render snapshot は旧形式・補助用途として区別する。
+
+関連する原出現台帳と変更単位の台帳を修正後本文へ同期し、独立レビュー対象8文書の2,670件について構造自己点検は欠落・重複・本文内容不一致0。対象3文書の検査と `RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。修正後の独立再レビューは未実施であり、工程は引き続き「指摘対応中」とする。証跡は `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` とF1対応報告書を参照する。

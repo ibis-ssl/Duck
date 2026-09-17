@@ -292,3 +292,15 @@
 入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。全体の文書検査は、原文を保持した引用内の違反で未通過のままである。
 
 証跡: `reports/task-doc-lint-003-engine-correspondence-20260917084612.md` と `reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json`。元の完了条件、過去の採否、検証記録は変更していない。
+
+## 独立最終レビュー F1 対応（2026-09-17）
+
+PR #20 の独立最終レビューは、レビュー対象の `HEAD` `4d253f2892f58ef9fdba64cc81b21f9ccab5ca42` に対して、diagnostics sample sidecar 導入後の仕様が構成設計、DebugHost 詳細設計、DebugHost README へ十分同期されていない点を F1 として指摘し、完了判定を保留した。レビュー記録は `reports/pr20-independent-final-review-20260917.md`。
+
+F1 対応では `Tracker/Design/Core/tracker-architecture-plan.md`、`Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md`、`Tracker/Tracker.DebugHost/README.md` を実装と再照合した。新規キャプチャーの replay timeline は diagnostics sample tick を選択軸とし、`Vision Input` と `ibis tracker` は同じ `diagnostics-samples.jsonl` の採取記録から復元する。外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。render snapshot は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示や replay timeline の主な入力にはしない。
+
+3文書の原出現台帳と変更単位の台帳をF1修正後本文へ同期した。構成設計565件、CLI/UI 724件、DebugHost README 423件は、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲の構造検証でエラー0。今回の独立レビュー対象8文書では2,670 / 2,670件、ID重複0、構造エラー0を自己点検した。これは修正担当の自己点検であり、独立再レビューの合格証明には扱わない。
+
+対象3文書の検証では、初回に新規文章の英語複合語を単独語へ分解したため、綴り検査と許可一覧検査が失敗した。許可一覧は変更せず、承認済み複合語・正式識別子・自然な日本語へ整理し、最終的に3文書の文章検査、綴り検査、許可一覧検査、`git diff --check` は終了値0。`RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。失敗・成功ログは `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` に保存する。
+
+F1 の本文修正と台帳同期後も、別の独立レビュー担当による再レビューが必要である。修正担当自身の確認だけで `DOC-LINT-003` やPR #20の最終レビュー完了とは扱わない。
