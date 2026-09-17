@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T22:04:48+09:00",
+  "generated_at": "2026-09-17T22:05:15+09:00",
   "content_commit": "f9f798f302a2b87f0bcad02714403b07df24a90f",
+  "report_commit": "1aca92958fd08ce745964c05c08a9fe3bcac773f",
   "files": [
     {
       "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/cspell.exit-code.txt",
@@ -149,9 +150,9 @@
       "sha256": "80970b840555265be232bb763d5d4aff54a3846d69e0b73b3ff13cb2bf256872"
     },
     {
-      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/lint.stdout.txt",
-      "bytes": 694,
-      "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/lint.stdout.txt.gz",
+      "bytes": 249,
+      "sha256": "cf70694b281a4d877a446e801090ca7bbf3e7d5390552cb8f1e78fe578610eb2"
     },
     {
       "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/diff-check.exit-code.txt",
@@ -179,9 +180,9 @@
       "sha256": "fe535abdba6d89f99f410de2080419f9595900704f8e87c71dfbd8dacf703dbf"
     },
     {
-      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/lint.stdout.txt",
-      "bytes": 694,
-      "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/lint.stdout.txt.gz",
+      "bytes": 249,
+      "sha256": "cf70694b281a4d877a446e801090ca7bbf3e7d5390552cb8f1e78fe578610eb2"
     },
     {
       "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/diff-check.exit-code.txt",
@@ -209,9 +210,9 @@
       "sha256": "44fedb76109e358641fc5f079eb5c5dc10016172a17c078e6a95839c0465dc27"
     },
     {
-      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/lint.stdout.txt",
-      "bytes": 694,
-      "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/lint.stdout.txt.gz",
+      "bytes": 249,
+      "sha256": "cf70694b281a4d877a446e801090ca7bbf3e7d5390552cb8f1e78fe578610eb2"
     },
     {
       "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/diff-check.exit-code.txt",
