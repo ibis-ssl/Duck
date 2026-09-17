@@ -5,7 +5,7 @@ pull_request: 20
 work_unit: RAW-VISION
 document: Tracker/Design/DebugHost/raw-vision-viewer-plan.md
 baseline_sha: f5482ab85d49832a21ef6029d6aa3354f6c7c4f4
-technical_parent: 185d22c9e79663991c71e9b8bbe474c1d99688fb
+technical_parent: b4711f00d1a9eb45dd8ff6c908737840daa2a5da
 status: complete_for_worker_scope
 results:
   occurrence_total: 524

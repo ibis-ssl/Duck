@@ -1,2 +1,0 @@
-Markdown whitelist violations:
-- Tracker/Design/DebugHost/raw-vision-viewer-plan.md:47: 'バインド' (katakana) is not in tools/lint/markdown-whitelist.yaml.

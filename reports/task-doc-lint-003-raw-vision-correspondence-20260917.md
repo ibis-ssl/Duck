@@ -5,8 +5,8 @@
 - PR: `ibis-ssl/Duck#20`
 - 文書: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md`
 - 用語整理前: `f5482ab85d49832a21ef6029d6aa3354f6c7c4f4`
-- 対応表が読解した本文: `185d22c9e79663991c71e9b8bbe474c1d99688fb`
-- 本文 SHA-256: `c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c`
+- 対応表が読解した本文: `b4711f00d1a9eb45dd8ff6c908737840daa2a5da`
+- 本文 SHA-256: `4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641`
 
 ## 実施内容
 
@@ -17,7 +17,7 @@ RAW-VISION に割り当てられた524原出現IDを全件対応表へ統合し�
 ## 台帳
 
 - `reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json`: 524 / 524件、未解決0
-- `reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-block-correspondence-r2.json`: 85ブロック、現行本文との差があった9ブロックを再記録
+- `reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-block-correspondence-r2.json`: 85ブロック、現行本文との差があった13ブロックを再記録
 - `reports/diagnostics/wording-raw-vision-ledger-20260917/validation.json`: ID集合・件数・最終行範囲・focused lint の構造検証
 
 ## 検証

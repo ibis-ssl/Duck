@@ -1,53 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T11:42:19+09:00",
+  "generated_at": "2026-09-17T11:50:09+09:00",
   "document": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
-  "technical_parent": "185d22c9e79663991c71e9b8bbe474c1d99688fb",
-  "document_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+  "technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
+  "document_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
   "expected_occurrences": 524,
   "actual_occurrences": 524,
   "unique_ids": 524,
   "changed_occurrences": 504,
   "text_identical_occurrences": 20,
   "reviewed_changed_blocks": 45,
-  "current_revised_blocks": 9,
+  "current_revised_blocks": 13,
   "unresolved": [],
   "validation_errors": [],
-  "result": "pass",
-  "independent_structure_check": {
-    "source_occurrences": 524,
-    "ledger_rows": 524,
-    "unique_ids": 524,
-    "missing_ids": 0,
-    "extra_ids": 0,
-    "block_count": 85,
-    "revised_blocks": 9,
-    "scope_completed_before_sync": 1422,
-    "scope_pending_before_sync": 720,
-    "document_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
-    "technical_parent_document_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c"
-  },
-  "focused_validation": {
-    "textlint": {
-      "exit_code": 0,
-      "stdout": "textlint.stdout.txt",
-      "stderr": "textlint.stderr.txt"
-    },
-    "cspell": {
-      "exit_code": 0,
-      "stdout": "cspell.stdout.txt",
-      "stderr": "cspell.stderr.txt"
-    },
-    "whitelist": {
-      "exit_code": 0,
-      "stdout": "whitelist.stdout.txt",
-      "stderr": "whitelist.stderr.txt"
-    },
-    "diff-check": {
-      "exit_code": 0,
-      "stdout": "diff-check.stdout.txt",
-      "stderr": "diff-check.stderr.txt"
-    }
-  },
-  "failed_probe_preserved": "failed-unapproved-katakana-probe/"
+  "result": "pass"
 }

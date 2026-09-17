@@ -1,18 +1,22 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T11:42:19+09:00",
+  "generated_at": "2026-09-17T11:50:09+09:00",
   "repository": "ibis-ssl/Duck",
   "pr": 20,
   "document": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
   "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
-  "technical_parent": "185d22c9e79663991c71e9b8bbe474c1d99688fb",
-  "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+  "technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
+  "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
   "review_kind": "implementation_self_check",
   "prior_evidence": "reports/diagnostics/wording-ledger-20260917-0709/raw-viewer-final-correspondence.json",
   "block_count": 85,
   "occurrence_changed_block_count": 45,
   "changed_since_prior_self_check": [
     "D13-B005",
+    "D13-B009",
+    "D13-B013",
+    "D13-B015",
+    "D13-B016",
     "D13-B036",
     "D13-B041",
     "D13-B046",
@@ -38,7 +42,7 @@
       "disposition": "accepted",
       "reason": "SSL_WrapperPacketという入力型とraw vision表示設計という用途を保持。型名をコード記法にし、一般的な動画表示にはしない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -56,7 +60,7 @@
       "disposition": "accepted",
       "reason": "raw visionはSSL-Visionの検出情報であり画像/動画そのものではないという定義を追加した既存文を確認。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -75,7 +79,7 @@
       "disposition": "fixed",
       "reason": "SslProto生成型でUDPを直接受信し検出/形状をBlazorで可視化、旧Serverと現DebugHostのプロジェクト/名前空間/起動経路を保持。UDPの区切りを整える。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -94,7 +98,7 @@
       "disposition": "accepted",
       "reason": "スコープを対象範囲とする自然な見出し。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -115,7 +119,7 @@
       "final_end": 17,
       "final_text": [
         "- 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する",
-        "- マルチキャスト用の通信アドレスが設定されている場合はマルチキャストグループへの参加を行う",
+        "- マルチキャストの通信アドレスが設定されている場合は、マルチキャストグループへ参加する",
         "- `SSL_WrapperPacket.Parser.ParseFrom` でパケットをデコードする",
         "- 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、アプリケーション内で単一インスタンスとして共有する状態保存先に保持する",
         "- `/` にフィールドを描く SVG、検出情報、カメラの校正情報、受信パケットの JSON を表示する",
@@ -133,7 +137,7 @@
         "- 画面移動は raw vision viewer を中心に保つ",
         "- 集約表示と、カメラごとの最新の観測結果表示の両方を raw vision viewer で扱う"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -152,7 +156,7 @@
       "disposition": "accepted",
       "reason": "非スコープを対象外とする自然な見出し。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -175,7 +179,7 @@
       "disposition": "fixed",
       "reason": "永続化なし、rawを超えるtracking/filtering/world解釈なし、RuntimeHostの本番寄り実行と将来AutoRef責務をWeb/診断から分離する条件を保持。自動判定一般でなく自動レフェリーと特定。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -194,7 +198,7 @@
       "disposition": "accepted",
       "reason": "appsettingsのVisionReceiver sectionを設定階層と説明し、設定名を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -211,14 +215,18 @@
       "final_end": 33,
       "final_text": [
         "- `Port`: 受信に使う通信ポート",
-        "- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 の通信アドレス。未設定時はこの端末で利用候補となるネットワーク接続を自動解決する",
+        "- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 通信アドレス。未設定時は、この端末で利用可能な IPv4 通信アドレスから候補を自動解決する",
         "- `Profiles.<name>`: 設定プロファイルごとの受信設定の上書き。`MulticastAddress` / `Port` / `InterfaceAddress` を同名のトラッカーの設定プロファイルに追従させたい場合に使う"
       ],
       "disposition": "fixed",
       "reason": "Port、InterfaceAddress、Profiles overrideの3設定を保持。local IPv4と候補interfaceがこの端末のものという限定を復元。未設定時自動解決と同名tracker設定追従の条件も保持。",
-      "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
-      "changed_since_prior_self_check": false,
+      "prior_final_text": [
+        "- `Port`: 受信に使う通信ポート",
+        "- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 の通信アドレス。未設定時はこの端末で利用候補となるネットワーク接続を自動解決する",
+        "- `Profiles.<name>`: 設定プロファイルごとの受信設定の上書き。`MulticastAddress` / `Port` / `InterfaceAddress` を同名のトラッカーの設定プロファイルに追従させたい場合に使う"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
     {
@@ -236,7 +244,7 @@
       "disposition": "accepted",
       "reason": "resolver規則を設定の解決規則と説明。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -257,7 +265,7 @@
       "disposition": "accepted",
       "reason": "同名設定なしはtop-level値、実行時のtracker切替完了後に同名受信設定を再解決し必要時socket再作成という2条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -276,7 +284,7 @@
       "disposition": "fixed",
       "reason": "hosted background serviceをアプリケーションの起動・停止に合わせて動作するバックグラウンド処理と説明。単なる独立した非同期処理に広げない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -296,15 +304,21 @@
       "final_text": [
         "- IPv4 UDP ソケットを作成する",
         "- 通信アドレスの再利用を有効にする",
-        "- ソケットを `IPAddress.Any` と設定した通信ポートに割り当てる",
+        "- ソケットのバインドでは、`IPAddress.Any` と設定した通信ポートを使う",
         "- 取り消し要求が来るまで UDP パケットを継続受信する",
         "- 受信設定が切り替わったら現在の受信処理を取り消し、新しい設定でソケットを開き直す"
       ],
       "disposition": "fixed",
       "reason": "IPv4 UDP、address reuse、AnyとPortへのbind、cancelまで継続、設定切替で受信cancelとsocket再作成という5規則を保持。割り当てる対象をソケットと明記。",
-      "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
-      "changed_since_prior_self_check": false,
+      "prior_final_text": [
+        "- IPv4 UDP ソケットを作成する",
+        "- 通信アドレスの再利用を有効にする",
+        "- ソケットを `IPAddress.Any` と設定した通信ポートに割り当てる",
+        "- 取り消し要求が来るまで UDP パケットを継続受信する",
+        "- 受信設定が切り替わったら現在の受信処理を取り消し、新しい設定でソケットを開き直す"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
     {
@@ -322,7 +336,7 @@
       "disposition": "accepted",
       "reason": "通信先がmulticastの場合だけgroup membershipを解決する条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -337,14 +351,17 @@
       "final_start": 53,
       "final_end": 54,
       "final_text": [
-        "- `InterfaceAddress` が設定されている場合、その IPv4 の通信アドレスのみを使う",
-        "- 未設定の場合、この端末で利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する"
+        "- `InterfaceAddress` が設定されている場合、その IPv4 通信アドレスだけを使う",
+        "- 未設定の場合、この端末で利用可能な IPv4 通信アドレスを列挙し、順に参加を試行する"
       ],
       "disposition": "fixed",
       "reason": "明示InterfaceAddressならそのIPv4だけ、未設定なら利用可能なlocal IPv4を列挙してjoinする条件を保持。端末内の接続という限定を復元。",
-      "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
-      "changed_since_prior_self_check": false,
+      "prior_final_text": [
+        "- `InterfaceAddress` が設定されている場合、その IPv4 の通信アドレスのみを使う",
+        "- 未設定の場合、この端末で利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
     {
@@ -357,13 +374,15 @@
       "final_start": 56,
       "final_end": 56,
       "final_text": [
-        "- 一部のネットワーク接続の失敗は警告ログに残す"
+        "- 一部の通信アドレスでの参加失敗は警告ログに残す"
       ],
       "disposition": "accepted",
       "reason": "一部interfaceの失敗は警告ログに残すこと、直前行の1つ以上成功なら受信継続という条件を保持。",
-      "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
-      "changed_since_prior_self_check": false,
+      "prior_final_text": [
+        "- 一部のネットワーク接続の失敗は警告ログに残す"
+      ],
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
     {
@@ -381,7 +400,7 @@
       "disposition": "accepted",
       "reason": "decode成功でstore更新、失敗でerror count増加と直前正常state保持という可否を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -400,7 +419,7 @@
       "disposition": "accepted",
       "reason": "Store設計を状態の保持とする見出し。次のVisionPacketStoreの役割を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -419,7 +438,7 @@
       "disposition": "accepted",
       "reason": "UI参照用stateをthread-safeに保持する条件を複数スレッドから安全に利用できる形として説明。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -456,7 +475,7 @@
       "disposition": "fixed",
       "reason": "最新wrapper/detection/camera別snapshot/aggregateの黄青robotとball/geometry、packet/error件数、送信元、受信時刻、parse errorの10項目を保持。latest detection frameはSSL_DetectionFrame型として特定。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -475,7 +494,7 @@
       "disposition": "accepted",
       "reason": "UIへimmutable snapshotを返し、描画中にlockを保持しないという2条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -494,7 +513,7 @@
       "disposition": "accepted",
       "reason": "Proto入力を入力する通信データとする見出し。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -513,7 +532,7 @@
       "disposition": "accepted",
       "reason": "raw vision viewerが直接使う主なproto入力型の導入を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -534,7 +553,7 @@
       "disposition": "fixed",
       "reason": "WrapperPacketは受信UDPデータ全体、Detection/Geometryを内包する最上位packetであることを保持。UDP表記の区切りを整える。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -553,7 +572,7 @@
       "disposition": "accepted",
       "reason": "SSL_DetectionFrameはカメラ単位のraw detectionであり、後続の5メンバーをそのまま保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -572,7 +591,7 @@
       "disposition": "accepted",
       "reason": "SSL_DetectionBallをボール描画と詳細表示へ使う用途を保持。座標/信頼度のメンバーは変更しない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -591,7 +610,7 @@
       "disposition": "accepted",
       "reason": "SSL_DetectionRobotをロボット描画と詳細表示へ使う用途を保持。ID/座標/向き等のメンバーは変更しない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -610,7 +629,7 @@
       "disposition": "accepted",
       "reason": "SSL_GeometryDataがfield geometry全体を表すこととField/Calibの参照を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -629,7 +648,7 @@
       "disposition": "accepted",
       "reason": "SSL_GeometryFieldSizeは寸法と線分/円弧を表す。直後の12メンバーを保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -648,7 +667,7 @@
       "disposition": "accepted",
       "reason": "SSL_GeometryCameraCalibrationを校正情報の一覧表示に使う用途を保持。6メンバーを保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -667,7 +686,7 @@
       "disposition": "accepted",
       "reason": "Field投影をフィールドへの投影とする見出し。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -686,7 +705,7 @@
       "disposition": "accepted",
       "reason": "VisionFieldProjectionがmm単位の座標をSVG表示領域へ写像することを保持。単位変更なし。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -711,7 +730,7 @@
       "disposition": "accepted",
       "reason": "geometryあればその寸法、なければ既定寸法、原点は中央、boundary/goal depthまで含む外周余白という4規則を保持。競技場をフィールドに揃える。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -730,7 +749,7 @@
       "disposition": "accepted",
       "reason": "Homeがstore snapshotを定期取得しcompact headerと左右領域を構成する責務を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -751,7 +770,7 @@
       "disposition": "accepted",
       "reason": "Canvasがfield SVG親で、zoom/pan、背景、field、子marker、軸/cursor座標重ね表示を担当する範囲を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -775,7 +794,7 @@
         "  - フィールドの線分、円弧、ゴールの描画を担当する",
         "  - `FieldLines` / `FieldArcs` がある場合はそれを優先し、不足時はフィールドの寸法から代わりの描画を行う"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -794,7 +813,7 @@
       "disposition": "accepted",
       "reason": "DetectionBall1件をSVGの円として描く数量と形状を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -815,7 +834,7 @@
       "disposition": "accepted",
       "reason": "DetectionRobot1件をrobot形状で描き、team色/前面gap/nose/labelを担当する4要素を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -834,7 +853,7 @@
       "disposition": "accepted",
       "reason": "DetailsPanelの右側にはJSON/ball/robot/calibrationを表示する役割を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -853,7 +872,7 @@
       "disposition": "accepted",
       "reason": "team色とmarker線色の定義をPalette一箇所に集約する責務を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -874,7 +893,7 @@
       "prior_final_text": [
         "  - ロボットの半径など、将来設定から変更したい描画パラメータの受け口"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -893,7 +912,7 @@
       "disposition": "accepted",
       "reason": "Home.razor見出しを実ファイル名のコード記法にする。内容の除外目的ではない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -912,7 +931,7 @@
       "disposition": "accepted",
       "reason": "VisionPacketSnapshotがstoreから得るUI用snapshotであることを保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -933,7 +952,7 @@
       "disposition": "accepted",
       "reason": "selectedViewKeyがaggregate/camera選択状態であり、sidebar折りたたみ前提のfield中心主表示とする条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -952,7 +971,7 @@
       "disposition": "accepted",
       "reason": "Canvasの実ファイル名見出しをコード記法にし、Geometry/ball/黄青robot/RenderOptionsの5入力を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -973,7 +992,7 @@
       "prior_final_text": [
         "- カーソル座標の表示に必要な、カーソルが重なっている状態と描画領域の大きさ"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -992,7 +1011,7 @@
       "disposition": "accepted",
       "reason": "Linesの実ファイル名見出しとProjection/Fieldの型付き入力を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1011,7 +1030,7 @@
       "disposition": "accepted",
       "reason": "BallMarkerの実ファイル名見出しとProjection/Ballの型付き入力を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1030,7 +1049,7 @@
       "disposition": "accepted",
       "reason": "RobotMarkerの実ファイル名見出しとProjection/Robot/ClassName/RenderOptionsの入力を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1049,7 +1068,7 @@
       "disposition": "accepted",
       "reason": "DetailsPanelの実ファイル名見出しと12個の型付き入力を保持。表示名や選択通知を省略しない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1068,7 +1087,7 @@
       "disposition": "accepted",
       "reason": "既存課題番号の参照を保持し、split/overlay/sourceの設計対象を分割/重ね表示の表示元として説明。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1087,7 +1106,7 @@
       "disposition": "accepted",
       "reason": "選択肢を4種類に固定する条件を保持。以下の実UI名は翻訳しない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1108,7 +1127,7 @@
       "disposition": "accepted",
       "reason": "Raw Aggregateはcameraごとのlatest detectionをUI表示用にまとめたraw SSL-Vision source。個別camera表示との違いを保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1129,7 +1148,7 @@
       "disposition": "accepted",
       "reason": "Raw Cameraはcamera別latest snapshotを使い、内部keyにcamera IDを含め表示labelだけで識別しない条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1150,7 +1169,7 @@
       "disposition": "accepted",
       "reason": "Trackedは自前の最新TrackerFrameをTrackedVisionViewState相当DTOへ変換し、rawでなくtracker出力として扱う条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1171,7 +1190,7 @@
       "disposition": "accepted",
       "reason": "外部live stateをManagerから受け、UIがmutable stateを直接読まずimmutable storeまたはcomposerを必ず挟む条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1190,7 +1209,7 @@
       "disposition": "accepted",
       "reason": "厳密同timestamp/同callbackを要求しない理由、1 UI render tickで全source最新immutable値を固定し合成してLayer A/Bへ渡す契約を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1209,7 +1228,7 @@
       "disposition": "fixed",
       "reason": "006以降はHomeがraw/tracked storeを直接injectせずProviderから固定snapshot取得、Composerは再読込なし、Raw/Tracked/Compareが同一tick派生という3境界を保持。実UI名を復元。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1228,7 +1247,7 @@
       "disposition": "accepted",
       "reason": "UI render tickのcomposite snapshotの項目を導く文を、1回にまとめるスナップショットとして説明。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1253,7 +1272,7 @@
       "disposition": "fixed",
       "reason": "tick IDまたはSampledAt、source key/表示名、受信/frame時刻/packet件数、ball/robot/geometry参照/欠落理由という4項目を保持。frame時刻を入力観測時刻だけへ限定しない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1274,7 +1293,7 @@
       "prior_final_text": [
         "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -1293,7 +1312,7 @@
       "disposition": "accepted",
       "reason": "raw geometry優先、未取得時だけTracked fallback、外部packetからgeometry復元なしという基準と、その座標比較上の理由を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1312,7 +1331,7 @@
       "disposition": "fixed",
       "reason": "split/overlay UIを診断画面に寄せるという原文を、合わせると明確化。次の15規則との関係を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1375,7 +1394,7 @@
         "- 片方の層が欠落していても、準備済みの層は残して表示する",
         "- 欠落した層があってもフィールド全体を空にせず、凡例と詳細表示に欠落理由を出す"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -1394,7 +1413,7 @@
       "disposition": "accepted",
       "reason": "Diagnostics time-syncを診断再生での時刻の対応付けと説明。ライブ表示の同時取得契約とは区別。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1413,7 +1432,7 @@
       "disposition": "fixed",
       "reason": "旧形式はselected tickのrender由来と同ReplayTimelineIndex対応、WorldFrameCommitted周期制限で新規目標ではないという条件を保持。Vision Input実UI名/render snapshot名/キャプチャー単位を明示。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1432,7 +1451,7 @@
       "disposition": "fixed",
       "reason": "新規はdiagnostics sample tickで保存したraw/trackerまたは同tick以前のlatest-beforeを使用し、確定周期でなくsample timelineで比較する条件を保持。render snapshotとの違いとcapture単位を明記。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1453,7 +1472,7 @@
       "prior_final_text": [
         "選択時点[^selected-tick]に、対象の `3rd party tracker` の表示元に対する対応記録が無い場合でも、表示と比較を消さない。採用方針は、同じ表示元について選択時点以前に存在する最新の `latest-before snapshot`[^latest-before-snapshot] を、Field source と比較に使うことである。UI と比較結果には、対応規則が `latest-before` であること、表示元のスナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を明示する。これにより、対象の表示元が選択時点で未更新でも、ユーザーは直前まで得られていた追跡状態を、未加工入力や自前トラッカーと比較できる。"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -1472,7 +1491,7 @@
       "disposition": "accepted",
       "reason": "latest-beforeでも基準timeline/cursor/selected timeを動かさず、直前sampleを保持している表示と選択時点との差を示す条件を保持。異時刻を同時刻に見せない理由も保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1491,7 +1510,7 @@
       "disposition": "accepted",
       "reason": "選択以前の同sourceが一切ない場合だけ2missing状態、ready層保持、未来fallback禁止、補助indexでも未来除外、既存回帰契約で新RAW作業を追加しないという条件と理由を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1510,7 +1529,7 @@
       "disposition": "accepted",
       "reason": "Diagnostics loop isolationを診断処理の周期の分離と説明する見出し。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1529,7 +1548,7 @@
       "disposition": "accepted",
       "reason": "中心目的はtrackerをWebライブと診断保存/再生の両方から分離することであり、UIだけの補正でなく保存/再生入力周期の分離であるという対比を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1548,7 +1567,7 @@
       "disposition": "accepted",
       "reason": "3つのloopを分ける数量と後続3責務を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1571,7 +1590,7 @@
       "disposition": "fixed",
       "reason": "trackerの更新/配信、UI tickの固定/描画、独立diagnostics sampleの保存/再生という3責務を保持。render保存callbackとの非結合、100ms既定/0以下復帰、metadata2属性、Vision Input/ibis trackerの通常復元元を保持し設計名を明記。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1590,7 +1609,7 @@
       "disposition": "fixed",
       "reason": "logging互換は必須でない、新規性能/周期優先、高コスト互換なし、旧renderのみはunsupported/degradedでよい、読む場合も周期制限説明で足りるという条件を保持。保存物とcapture単位を明記。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1609,7 +1628,7 @@
       "disposition": "fixed",
       "reason": "sample周期をtracker確定周期と同義にせず、rawが速い場合の保存境界、sampleからtrackerを駆動しない、3処理の負荷/周期非支配という条件を保持。diagnostics sample tick名を復元。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1628,7 +1647,7 @@
       "disposition": "accepted",
       "reason": "root pageを開始画面とし、パス/表示対象は前段の/と整合。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1653,7 +1672,7 @@
       "disposition": "accepted",
       "reason": "受信状態と情報、field SVG、raw JSON、ball/robot/calibration詳細という4表示を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1672,7 +1691,7 @@
       "disposition": "accepted",
       "reason": "参照リポジトリのfield presentation方針へ従うことを保持。外部最新版を調査したとは主張しない。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1703,7 +1722,7 @@
       "disposition": "accepted",
       "reason": "7表示方針を照合。field中心/外周/wheel-drag/title省略-selector位置/+X+Y/cursor上下/sidebar折りたたみを保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1763,7 +1782,7 @@
         "- `Diagnostics.razor` の timeline scrubber には、再生、停止、早送りの操作部を置き、選択する記録を順方向に進める",
         "- 通常再生はログ記録の時刻差を使い、間隔を上限で制限せず、実際の記録速度に合わせて進める"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     },
@@ -1782,7 +1801,7 @@
       "disposition": "accepted",
       "reason": "最後で停止し先頭へ戻る、log切替/entryなしで停止状態へ戻すという条件を保持。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1839,7 +1858,7 @@
       "disposition": "fixed",
       "reason": "20テスト項目を行ごとに照合。store/受信/投影/可変高さ幅/再生/split-overlay/色/共通部品/tick固定/外部読取/時刻対応/missing/依存境界/sample旧形式の全範囲を保持。明記された単体テストを復元し、render snapshotとframe単位を明確化。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1862,7 +1881,7 @@
       "disposition": "fixed",
       "reason": "raw visionの型、既定224.5.23.2:10006は実行設定で変更可能、無関係worktree変更保護という3前提を保持。変更にある変更という重複表現を直す。",
       "prior_final_text": null,
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": false,
       "review_kind": "implementation_self_check"
     },
@@ -1998,7 +2017,7 @@
         "[^diagnostics-sample-sidecar]: diagnostics sample sidecar: 処理周期の分離後に診断ログの保存・再生処理が保存する、最新の未加工入力と追跡結果のスナップショットの補助ファイル。`RUNTIME-HOST-007` では `diagnostics-samples.jsonl` として固定し、記録は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本の項目とする。",
         "[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧形式の render snapshot の補助ファイルしか持たないキャプチャー。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。",
         "[^raw-snapshot-cadence]: 未加工入力の更新周期: SSL-Vision パケットや、未加工入力の最新スナップショットが更新される周期。診断画面の `Vision Input` 表示は、新規記録でこの周期を失わない保存経路を持つ。",
-        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。"
+        "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用アプリケーション。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。"
       ],
       "disposition": "fixed",
       "reason": "脚注の表示元、スナップショット、時刻、識別、描画、対応付け、旧形式、採取周期の定義を保持した。既存補正に加え、`TrackerFrame` は通信送信に限定せず出力周期であることを維持した。",
@@ -2066,7 +2085,7 @@
         "[^raw-snapshot-cadence]: 未加工入力の更新周期: SSL-Vision パケットや、未加工入力の最新スナップショットが更新される周期。診断画面の `Vision Input` 表示は、新規記録でこの周期を失わない保存経路を持つ。",
         "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。"
       ],
-      "final_sha256": "c197f26a47ff9194cc4dfa881ffe8380000f4fe43dd8fd913d60fc3963e2b11c",
+      "final_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
       "changed_since_prior_self_check": true,
       "review_kind": "implementation_self_check"
     }
