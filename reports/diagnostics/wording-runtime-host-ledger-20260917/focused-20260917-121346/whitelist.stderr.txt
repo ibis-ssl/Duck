@@ -1,0 +1,2 @@
+Markdown whitelist violations:
+- Tracker/Design/RuntimeHost/runtime-host-plan.md:110: 'アドレス' (katakana) is not in tools/lint/markdown-whitelist.yaml.

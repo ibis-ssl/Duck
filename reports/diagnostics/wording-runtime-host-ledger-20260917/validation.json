@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T12:17:37+09:00",
+  "document": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+  "technical_parent": "19555135394db736cb8c5eaded0eeec9417cc8c7",
+  "document_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+  "expected_occurrences": 196,
+  "actual_occurrences": 196,
+  "unique_ids": 196,
+  "changed_occurrences": 186,
+  "text_identical_occurrences": 10,
+  "reviewed_changed_blocks": 34,
+  "current_revised_blocks": 9,
+  "unresolved": [],
+  "validation_errors": [],
+  "result": "pass"
+}
