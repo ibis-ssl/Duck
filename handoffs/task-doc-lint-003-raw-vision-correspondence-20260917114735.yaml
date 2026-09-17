@@ -6,7 +6,7 @@ work_unit: RAW-VISION
 document: Tracker/Design/DebugHost/raw-vision-viewer-plan.md
 baseline_sha: f5482ab85d49832a21ef6029d6aa3354f6c7c4f4
 technical_parent: b4711f00d1a9eb45dd8ff6c908737840daa2a5da
-status: complete_for_worker_scope
+status: complete_for_worker_scope_and_central_ledger_synced
 results:
   occurrence_total: 524
   occurrence_mapped: 524
@@ -20,16 +20,31 @@ validation:
   cspell_exit: 0
   whitelist_exit: 0
   diff_check_exit: 0
+central_ledger:
+  completed_occurrences: 1946
+  total_occurrences: 2142
+  pending_occurrences: 196
+  raw_vision_completed: 524
+  raw_vision_pending: 0
+  scope_occurrences: reports/diagnostics/wording-human-design-scope-20260917-1011/scope-occurrences.json
+  scope_summary: reports/diagnostics/wording-human-design-scope-20260917-1011/scope-summary.json
 evidence:
   occurrence_ledger: reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json
   block_review: reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-block-correspondence-r2.json
   validation: reports/diagnostics/wording-raw-vision-ledger-20260917/validation.json
   report: reports/task-doc-lint-003-raw-vision-correspondence-20260917.md
+final_sync_validation:
+  success_path: reports/diagnostics/wording-raw-vision-ledger-20260917/final-sync-20260917-115837
+  textlint_exit: 0
+  cspell_exit: 0
+  whitelist_exit: 0
+  diff_check_exit: 0
+  ledger_structure_exit: 0
+  preserved_failed_attempt: reports/diagnostics/wording-raw-vision-ledger-20260917/final-sync-20260917-115742
 failed_probe:
   path: reports/diagnostics/wording-raw-vision-ledger-20260917/failed-unapproved-katakana-probe
   resolution: whitelist/prh/exclusions unchanged; approved wording restored
 next_action:
-  - sync RAW-VISION completion into the human-design central ledger
   - continue RUNTIME-HOST 196 occurrences in a separate worker scope
   - after all design units complete, run integrated lint and independent final review
 constraints:

@@ -36,7 +36,7 @@
 - 2026-09-17 の証跡: `reports/task-doc-lint-003-diagnostic-handoff-20260917064359.md`。診断設計の追加照合で、比較領域のボタン位置、テスト範囲、100 ms 時点の参照対象を修正し、`99929bc` で公開した。相対位置の参照範囲もキャプチャー単位へ戻した。追加照合は `reports/task-doc-lint-003-diagnostic-scope-followup-20260917082311.md` に記録する。作業担当の自己点検であり、独立最終レビューは未実施。
 
 - 2026-09-17 の raw vision 表示設計照合: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md` の原文524出現を全件中央台帳へ統合した。変更箇所504件と原文同一20件を確認し、未解決0。本文では不自然な日本語とネットワーク受信の説明を整理し、型名・設定名・実UI名は維持した。
-- 2026-09-17 の raw vision 検証: 対象文書の textlint、cspell、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。
+- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。
 
 - ID: `CAPTURE-REPLAY-001`
 - 題名: `Tracker.CaptureReplay` に raw vision と `ibis tracker` の遅延分析出力を追加する

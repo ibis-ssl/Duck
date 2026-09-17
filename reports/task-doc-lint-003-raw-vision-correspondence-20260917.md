@@ -33,10 +33,13 @@ RAW-VISION に割り当てられた524原出現IDを全件対応表へ統合し�
 - cspell: 終了値0、1ファイル検査、Issues 0
 - 許可一覧検査: 終了値0
 - `git diff --check`: 終了値0
-- 構造検証: 524件、重複0、欠落0、未解決0、`validation.json` = `pass`
+- 中央台帳同期後の再検査: `raw-vision-viewer-plan.md` と `tasks-status.md` の textlint / cspell / 許可一覧検査 / `git diff --check` はすべて終了値0
+- 構造検証: 524件、重複0、欠落0、未解決0、`validation.json` = `pass`。中央台帳も1,946 / 2,142件、残り196件で整合
 - .NETテスト: 文書のみの変更のため、この作業単位では未実行
 
 検証途中に `アドレス`、`インターフェース`、`ポート`、`バインド` を単独語として使う表現を試したが、未承認片仮名語として許可一覧検査が失敗した。失敗ログは `failed-unapproved-katakana-probe/` に保存した。許可一覧・prh・検査除外は変更せず、既存の許可表現で技術的意味を保つ文へ修正し、再検証で全4検査の終了値0を確認した。
+
+中央台帳同期後の初回再検査では、`tasks-status.md` に追記した `textlint` / `cspell` がコード記法でなかったため cspell 2件が失敗し、system Python では SudachiPy が見つからず許可一覧検査を実行できなかった。この失敗は `final-sync-20260917-115742/` に保存した。表記をコード記法へ修正し、既存の検証用 Python 環境で再実行した `final-sync-20260917-115837/` では、textlint / cspell / 許可一覧検査 / `git diff --check` / 中央台帳構造検証がすべて終了値0となった。
 
 ## 境界
 
