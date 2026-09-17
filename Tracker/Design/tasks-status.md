@@ -7,7 +7,7 @@
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
 - 段階: 文書検査整備
-- 状態: レビュー指摘への対応中。診断設計、構成設計、表示画面設計、raw vision 表示設計、利用手順、進捗2文書の本文と原文を照合し、採否を記録した。人が読む設計書の中央台帳は1,946 / 2,142件まで完了し、残りは RuntimeHost 設計196件。全出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
+- 状態: レビュー指摘への対応中。診断設計、構成設計、表示画面設計、raw vision 表示設計、RuntimeHost 設計、利用手順、進捗2文書の本文と原文を照合し、採否を記録した。人が読む設計書の中央台帳は2,142 / 2,142件完了。4,336出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
 - 規模: 中
 - 依存関係: `DOC-LINT-002`、承認済み許可語、共有文書検査器の修正。
 - 完了条件:
@@ -37,6 +37,9 @@
 
 - 2026-09-17 の raw vision 表示設計照合: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md` の原文524出現を全件中央台帳へ統合した。変更箇所504件と原文同一20件を確認し、未解決0。本文では不自然な日本語とネットワーク受信の説明を整理し、型名・設定名・実UI名は維持した。
 - 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。
+
+- 2026-09-17 の RuntimeHost 設計照合: `Tracker/Design/RuntimeHost/runtime-host-plan.md` の原文196出現を全件中央台帳へ統合した。変更箇所186件と原文同一10件を確認し、未解決0。本文では AutoRef の意味、`InterfaceAddress` の用途、CaptureOn 中のキャプチャー、追跡スナップショット、公式形式の `TrackerWrapperPacket` の説明を原文と実装に合わせて整理した。
+- 2026-09-17 の RuntimeHost 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。人が読む設計書の中央台帳は2,142 / 2,142件完了、残り0。証跡は `reports/task-doc-lint-003-runtime-host-correspondence-20260917.md` と `reports/diagnostics/wording-runtime-host-ledger-20260917/`。4,336出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
 
 - ID: `CAPTURE-REPLAY-001`
 - 題名: `Tracker.CaptureReplay` に raw vision と `ibis tracker` の遅延分析出力を追加する
