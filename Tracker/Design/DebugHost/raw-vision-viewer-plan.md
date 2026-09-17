@@ -9,7 +9,7 @@
 ## 対象範囲
 
 - 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する
-- マルチキャスト用の通信アドレスが設定されている場合はマルチキャストグループへの参加を行う
+- マルチキャストの通信アドレスが設定されている場合は、マルチキャストグループへ参加する
 - `SSL_WrapperPacket.Parser.ParseFrom` でパケットをデコードする
 - 最新のパケット、検出情報、フィールド形状、受信に付随する情報、パケット数、エラー数を、アプリケーション内で単一インスタンスとして共有する状態保存先に保持する
 - `/` にフィールドを描く SVG、検出情報、カメラの校正情報、受信パケットの JSON を表示する
@@ -29,7 +29,7 @@
 
 - `MulticastAddress`: 既定値 `224.5.23.2`
 - `Port`: 受信に使う通信ポート
-- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 の通信アドレス。未設定時はこの端末で利用候補となるネットワーク接続を自動解決する
+- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 通信アドレス。未設定時は、この端末で利用可能な IPv4 通信アドレスから候補を自動解決する
 - `Profiles.<name>`: 設定プロファイルごとの受信設定の上書き。`MulticastAddress` / `Port` / `InterfaceAddress` を同名のトラッカーの設定プロファイルに追従させたい場合に使う
 
 設定の解決規則:
@@ -44,16 +44,16 @@
 
 - IPv4 UDP ソケットを作成する
 - 通信アドレスの再利用を有効にする
-- ソケットを `IPAddress.Any` と設定した通信ポートに割り当てる
+- ソケットのバインドでは、`IPAddress.Any` と設定した通信ポートを使う
 - 取り消し要求が来るまで UDP パケットを継続受信する
 - 受信設定が切り替わったら現在の受信処理を取り消し、新しい設定でソケットを開き直す
 
 設定された通信アドレスがマルチキャストの場合、参加するマルチキャストグループは次の規則で解決する。
 
-- `InterfaceAddress` が設定されている場合、その IPv4 の通信アドレスのみを使う
-- 未設定の場合、この端末で利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する
+- `InterfaceAddress` が設定されている場合、その IPv4 通信アドレスだけを使う
+- 未設定の場合、この端末で利用可能な IPv4 通信アドレスを列挙し、順に参加を試行する
 - 少なくとも 1 つ成功すれば受信開始を継続する
-- 一部のネットワーク接続の失敗は警告ログに残す
+- 一部の通信アドレスでの参加失敗は警告ログに残す
 
 デコード成功時は `VisionPacketStore` を更新し、失敗時はエラー数を増やし、直前の正常状態を保持する。
 
@@ -391,4 +391,4 @@ diagnostics sample tick の周期は、トラッカーの追跡結果の確定�
 [^diagnostics-sample-sidecar]: diagnostics sample sidecar: 処理周期の分離後に診断ログの保存・再生処理が保存する、最新の未加工入力と追跡結果のスナップショットの補助ファイル。`RUNTIME-HOST-007` では `diagnostics-samples.jsonl` として固定し、記録は `schemaVersion`、`sampleIndex`、`sampleReceivedAt`、`sampleKind`、`rawFrameNumber`、`rawCameraId`、`worldFrameCommitted`、`renderFrameNumber`、`rawSemanticSummary`、`trackedSemanticSummary` を基本の項目とする。
 [^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧形式の render snapshot の補助ファイルしか持たないキャプチャー。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。
 [^raw-snapshot-cadence]: 未加工入力の更新周期: SSL-Vision パケットや、未加工入力の最新スナップショットが更新される周期。診断画面の `Vision Input` 表示は、新規記録でこの周期を失わない保存経路を持つ。
-[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。
+[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用アプリケーション。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。
