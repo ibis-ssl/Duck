@@ -4,6 +4,22 @@
 
 ## 現在の作業
 
+- ID: `ASPIRE-001`
+- 題名: シミュレーション試験環境の Aspire 設計を確定する
+- 段階: 設計
+- 状態: Issue #18 の設計作成中。シミュレータと AI を Docker、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成を定義した。
+- 規模: 中
+- 依存関係: Issue #18、Issue #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
+- 完了条件:
+  - シミュレータ、AI、Duck の実行形態と責務を固定する。
+  - ER-Force の SSL-Vision と SSL simulation protocol の通信経路を固定する。
+  - Docker とホスト間の UDP 通信方式を固定する。
+  - AppHost の配置、設定、起動順、テスト方針、診断方針を設計書へ残す。
+  - 実装作業をレビュー可能な単位へ分割する。
+- 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
+- 次作業: `ASPIRE-002` で AppHost の骨格とアプリケーションモデルの失敗テストから実装を開始する。
+- 対象外: 今回は設計のみ。AppHost、Dockerfile、AI 接続、製品コードの実装は行わない。
+
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
 - 段階: 文書検査整備
