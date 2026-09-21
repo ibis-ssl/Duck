@@ -7,7 +7,7 @@
 - ID: `ASPIRE-001`
 - 題名: シミュレーション試験環境の Aspire 設計を確定する
 - 段階: 設計
-- 状態: Issue #18 の設計作成中。シミュレータと AI を Docker、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成を定義した。
+- 状態: 設計完了。PR #28 でレビュー待ち。シミュレータと AI を Docker、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成を定義した。
 - 規模: 中
 - 依存関係: Issue #18、Issue #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
 - 完了条件:
@@ -17,6 +17,8 @@
   - AppHost の配置、設定、起動順、テスト方針、診断方針を設計書へ残す。
   - 実装作業をレビュー可能な単位へ分割する。
 - 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
+- 報告: `reports/issue18-aspire-simulation-test-environment-design.md`
+- 検証: 新規設計書の CSpell は指摘 0。`git diff --cached --check` 成功。全体 `npm run lint:md` は現行 `main` に `.agents/skills/review-enforcer` が存在しないため実行経路で阻害。
 - 次作業: `ASPIRE-002` で AppHost の骨格とアプリケーションモデルの失敗テストから実装を開始する。
 - 対象外: 今回は設計のみ。AppHost、Dockerfile、AI 接続、製品コードの実装は行わない。
 
