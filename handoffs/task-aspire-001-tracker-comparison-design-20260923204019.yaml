@@ -1,0 +1,242 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: design_only
+  generated_at: 2026-09-23T20:40:19+09:00
+
+repository: ibis-ssl/Duck
+issue_or_pr: "Issue #18 / PR #28"
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  current_head: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+  reviewed_head: null
+  commit_range: a23521bd825ab370edd5c55cbbab6911cf8b87ab..31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: FA780
+  connection: available
+  os: Windows
+  shell: PowerShell / cmd / Git Bash
+  working_directory: 'C:\Users\donabe\Project\Duck-issue18-aspire-design'
+  repository: ibis-ssl/Duck
+  branch: design/issue18-aspire-test-orchestration
+  head_sha: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+  source_state: dirty
+  source_fingerprint: administrative-report-and-handoff-only
+  ownership: current_task
+  writable_paths:
+    - Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - Tracker/Design/Testing/tracker-comparison-debug-design.md
+    - Tracker/Design/tasks-status.md
+    - reports/issue18-tracker-comparison-debug-design-20260923.md
+    - handoffs/task-aspire-001-tracker-comparison-design-20260923204019.yaml
+  dependencies:
+    - name: git
+      status: available
+      evidence: technical design commit was committed and pushed through RDC
+    - name: node
+      status: available
+      evidence: Node.js v24.20.0
+    - name: npm
+      status: available
+      evidence: npm 11.19.0
+    - name: dotnet
+      status: missing
+      evidence: dotnet command not found on FA780
+    - name: docker
+      status: missing
+      evidence: docker command not found on FA780
+    - name: aspire
+      status: missing
+      evidence: aspire command not found on FA780
+  evidence:
+    - PR #28 branch matched origin before work
+    - Duck existing external tracker receiver and DebugHost comparison paths were inspected
+    - TIGERs Sumatra and ER-Force tracker container configurations were inspected through GitHub connector
+
+authoritative_requirements:
+  - source: user_instruction
+    reference: current request
+    summary: allow debugging differences between Duck, TIGERs, and ER-Force trackers
+  - source: existing_design
+    reference: Tracker/Design/Testing/aspire-simulation-test-environment.md
+    summary: Aspire starts simulator, Crane, helper resources, and Duck
+  - source: repository_instruction
+    reference: project worker instructions
+    summary: use RDC for git, GitHub connector for PR/comments, exact-HEAD CI only, do not merge
+
+development_policy:
+  method: design-only update; later implementation uses TDD
+  testing_order: comparison implementation begins with application-model and focused failing tests
+  governing_source: project instructions and updated design
+
+scope:
+  - feed the same raw SSL-Vision stream to Duck, TIGERs, and ER-Force trackers
+  - receive the three official tracker sources in Tracker.DebugHost
+  - support live Split/Overlay and numeric object differences
+  - support CaptureOn and replay comparison on one diagnostics sample timeline
+non_goals:
+  - modify external tracker algorithms
+  - rank tracker quality
+  - use raw vision or simulator state as automatic ground truth
+  - implement comparison code in this design-only task
+
+design_contract:
+  raw_vision_endpoint: 224.5.23.2:10020
+  tracker_endpoint: 224.5.23.2:11010
+  referee_endpoint: 224.5.23.1:11003
+  sources:
+    - Duck Tracker.RuntimeHost
+    - TIGERs Sumatra world predictor / tracker
+    - ER-Force AutoRef tracker source
+  observer: Tracker.DebugHost
+  live_alignment: same UI render tick with per-source timestamp and age metadata
+  replay_alignment: same diagnostics sample tick; saved alignment first, latest-before fallback, never future snapshots
+  robot_matching: team color plus robot id
+  ball_matching: do not use tracker-specific track id; one-to-one position matching with configurable distance gate
+
+validation_plan:
+  commands:
+    - npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md
+    - git diff --check
+    - npm run lint:md
+  required_failure_diagnostics:
+    - test results
+    - standard output
+    - standard error
+    - diagnostic logs
+    - simulator and tracker container logs when integration tests are implemented
+
+blocked:
+  - item: full repository Markdown lint
+    reason: .agents/skills/review-enforcer/scripts/list-markdown-targets.js is absent from the PR-base checkout
+    required_input_or_decision: restore or land repository Markdown lint tooling
+  - item: runtime integration validation
+    reason: dotnet, docker, and aspire are not installed on FA780
+    required_input_or_decision: execute implementation validation on an environment with required runtimes
+
+files:
+  changed:
+    - path: Tracker/Design/Testing/tracker-comparison-debug-design.md
+      purpose: authoritative external tracker comparison design
+    - path: Tracker/Design/Testing/aspire-simulation-test-environment.md
+      purpose: connect ASPIRE-006 comparison mode into the main Aspire design
+    - path: Tracker/Design/tasks-status.md
+      purpose: record comparison design, validation, and implementation split
+    - path: reports/issue18-tracker-comparison-debug-design-20260923.md
+      purpose: detailed report
+    - path: handoffs/task-aspire-001-tracker-comparison-design-20260923204019.yaml
+      purpose: continuation handoff
+  intentionally_untouched:
+    - path_or_area: Duck product code
+      reason: design-only request
+    - path_or_area: .github/workflows
+      reason: existing .NET workflow already stores required failure diagnostics
+
+commands:
+  - command: npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md
+    purpose: spelling validation
+    exit_code: 0
+    result: passed
+    head_sha: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+    evidence: 2 files checked, 0 issues
+    execution_environment: null
+    source_fingerprint: validated-design-delta
+  - command: git diff --check
+    purpose: whitespace validation
+    exit_code: 0
+    result: passed
+    head_sha: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+    evidence: no diff errors
+    execution_environment: null
+    source_fingerprint: validated-design-delta
+  - command: npm run lint:md
+    purpose: repository Markdown validation
+    exit_code: 1
+    result: blocked
+    head_sha: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+    evidence: MODULE_NOT_FOUND for .agents/skills/review-enforcer/scripts/list-markdown-targets.js
+    execution_environment: null
+    source_fingerprint: validated-design-delta
+
+implementation:
+  outcome: completed
+  final_head: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+  commits:
+    - sha: 31b61ee59ecae8c0eb185a258c01fb9c21f4b008
+      purpose: add external tracker comparison mode design
+  addressed_findings: []
+  failure_diagnostics:
+    - full Markdown lint failure recorded as repository tooling blockage
+  blocked_items:
+    - item: full Markdown lint
+      reason: repository-local lint scripts are missing from checkout
+      required_input_or_decision: restore tooling before full lint can run
+  summary:
+    - comparison mode uses one raw vision input and three independent tracker sources
+    - DebugHost is reused for live and replay comparison
+    - object-level difference semantics are defined
+
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: null
+  head_sha: unknown
+  conclusion: unknown
+  artifacts: []
+
+review:
+  mode: not_applicable
+  reviewed_head: unknown
+  reviewer:
+    identity: unknown
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: null
+    independence:
+      implemented_change: unknown
+      implemented_review_fix: unknown
+      served_as_normal_reviewer: unknown
+      inherited_conversation: unknown
+      evidence: []
+  verdict: not_applicable
+  required_coverage: []
+  independent_closure:
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    reviewer_continuity: null
+    closure_scope: []
+    completeness_matrix: []
+  validation_assessment: []
+  reserved_report_paths: []
+  report_attestation:
+    allowed: not_applicable
+    reviewed_implementation_head: null
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence: []
+  summary: []
+
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/issue18-tracker-comparison-debug-design-20260923.md
+  reviewed_head: null
+  attestation_head: null
+  pr_comments: []
+  summary:
+    - detailed report records external tracker comparison design and validation
+
+findings: []
