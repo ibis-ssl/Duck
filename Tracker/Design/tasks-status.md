@@ -20,6 +20,7 @@
   - 実装作業をレビュー可能な単位へ分割する。
 - 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
 - 比較デバッグ設計: `Tracker/Design/Testing/tracker-comparison-debug-design.md`
+- 比較デバッグ報告: `reports/issue18-tracker-comparison-debug-design-20260923.md`
 - 報告: `reports/issue18-aspire-simulation-test-environment-design.md`
 - 追加報告: `reports/issue18-aspire-crane-image-design-update-20260923.md`
 - 2026-09-23 の設計更新: `ibis-ssl/crane` の現行 `docker/Dockerfile`、Docker image 公開 workflow、シナリオ構成を照合し、Crane を GHCR image から起動する方針へ固定した。`visibility_graph` の mode 4 指令を維持するため、既存の `cm4-sim` image を介して simulator へ mode 3 を渡す経路も設計へ反映した。Simulator も Crane の現行シナリオで使う `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を利用する。
