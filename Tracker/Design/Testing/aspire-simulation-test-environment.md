@@ -188,6 +188,12 @@ AppHost の全資源を一括起動し、シミュレータからの SSL-Vision 
 
 Crane を動かした場合は、Crane の指令が `cm4-sim` を経由してシミュレータへ入り、その結果が SSL-Vision と Duck の出力へ反映されることまで確認する。
 
+### `ASPIRE-006`: 外部トラッカー比較デバッグ
+
+TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、Duck と同じ raw vision `224.5.23.2:10020` を入力する。三つの tracker 出力を official tracker multicast `224.5.23.2:11010` へ集約し、`Tracker.DebugHost` が source identity ごとに分離して受信する。
+
+ライブでは既存の Split / Overlay を使い、保存後は diagnostics sample tick を共通の選択時点として比較する。物体単位の位置・速度・角度・存在差を数値で確認する詳細設計は `Tracker/Design/Testing/tracker-comparison-debug-design.md` を正本とする。
+
 ## テスト方針
 
 実装では TDD を使う。
@@ -207,6 +213,14 @@ Crane を動かした場合は、Crane の指令が `cm4-sim` を経由してシ
 Docker を必要とする一括起動試験は、AppHost のモデル検査と分離する。Docker が利用できない環境でも、アプリケーションモデルの退行を検出できるようにする。
 
 一括起動試験では、単に全資源が `Running` になっただけで成功としない。SSL-Vision の受信と Duck のトラッカーパケット出力までを試験証跡に含める。
+
+## トラッカー比較デバッグ
+
+通常の Duck + Crane シミュレーションとは別に comparison mode を用意し、TIGERs / ER-Force の tracker source と `Tracker.DebugHost` を追加起動できるようにする。
+
+comparison mode は同じ raw vision を Duck / TIGERs / ER-Force へ与え、`Tracker.DebugHost` で三者の official tracker packet を比較する。外部 tracker が利用できない場合に通常のシミュレーション試験まで停止させない。
+
+比較の詳細、source identity、時刻対応、ball / robot の対応付け、数値差分、CaptureOn / replay の契約は `Tracker/Design/Testing/tracker-comparison-debug-design.md` に定義する。
 
 ## 診断
 
@@ -242,6 +256,7 @@ Issue #14 の比較試験を行うときは、`tigers-tracker` と `erforce-trac
 本設計の実装完了条件は次のとおりとする。
 
 - 一つの Aspire AppHost 起動でシミュレータ、Crane、必要な `cm4-sim`、Duck を管理できる。
+- comparison mode では TIGERs tracker、ER-Force tracker、`Tracker.DebugHost` を追加し、Duck を含む三 tracker の差を同じ raw vision 入力に対して確認できる。
 - シミュレータと Crane は Docker コンテナ、Duck はホスト上の .NET プロセスとして起動する。
 - Crane は `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` の固定 image tag から起動し、Duck 側ではビルドしない。
 - Duck は既存の `sim` 設定と SSL-Vision 契約を維持する。
@@ -256,7 +271,8 @@ Issue #14 の比較試験を行うときは、`tigers-tracker` と `erforce-trac
 - `Tracker/Design/RuntimeHost/runtime-host-plan.md`。
 - `Tracker/Tracker.RuntimeHost/appsettings.json`。
 - ER-Force Framework の `simulator-cli` 実装と README。
-- `ibis-ssl/crane` の `docker/Dockerfile`、`.github/workflows/docker_build.yaml`、`docker/scenario/docker-compose.yaml`。
+- `ibis-ssl/crane` の `docker/Dockerfile`、`.github/workflows/docker_build.yaml`、`docker/scenario/docker-compose.yaml`、`docker/dev/docker-compose.yaml`、`docker/match-vs-tigers/docker-compose.yaml`。
+- `Tracker/Design/Testing/tracker-comparison-debug-design.md`。
 - RoboCup SSL simulation protocol。
 - Aspire の AppHost、コンテナ、.NET プロジェクト資源、コンテナ実行引数の公式文書。
 - Docker の host network driver の公式文書。
