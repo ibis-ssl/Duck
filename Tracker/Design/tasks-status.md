@@ -7,20 +7,24 @@
 - ID: `ASPIRE-001`
 - 題名: シミュレーション試験環境の Aspire 設計を確定する
 - 段階: 設計
-- 状態: 設計完了。PR #28 でレビュー待ち。シミュレータと AI を Docker、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成を定義した。
+- 状態: 設計更新完了。PR #28 でレビュー待ち。シミュレータと Crane を既存 Docker image、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成を定義した。Crane の現行 `visibility_graph` 経路を維持するため `cm4-sim` も補助資源として管理する。
 - 規模: 中
 - 依存関係: Issue #18、Issue #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
 - 完了条件:
-  - シミュレータ、AI、Duck の実行形態と責務を固定する。
-  - ER-Force の SSL-Vision と SSL simulation protocol の通信経路を固定する。
+  - シミュレータ、Crane、`cm4-sim`、Duck の実行形態と責務を固定する。
+  - Crane は `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` の固定 image tag を使い、Duck 側ではビルドしない。
+  - ER-Force の SSL-Vision と Crane の現在の制御経路を固定する。
   - Docker とホスト間の UDP 通信方式を固定する。
   - AppHost の配置、設定、起動順、テスト方針、診断方針を設計書へ残す。
   - 実装作業をレビュー可能な単位へ分割する。
 - 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
 - 報告: `reports/issue18-aspire-simulation-test-environment-design.md`
+- 追加報告: `reports/issue18-aspire-crane-image-design-update-20260923.md`
+- 2026-09-23 の設計更新: `ibis-ssl/crane` の現行 `docker/Dockerfile`、Docker image 公開 workflow、シナリオ構成を照合し、Crane を GHCR image から起動する方針へ固定した。`visibility_graph` の mode 4 指令を維持するため、既存の `cm4-sim` image を介して simulator へ mode 3 を渡す経路も設計へ反映した。Simulator も Crane の現行シナリオで使う `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を利用する。
+- 2026-09-23 の検証: 更新後の設計書は CSpell 指摘 0、`git diff --check` 成功。全体 `npm run lint:md` は `.agents/skills/review-enforcer/scripts/list-markdown-targets.js` が checkout に存在しないため終了値 1 で阻害され、文書違反の結果としては扱わない。
 - 検証: 新規設計書の CSpell は指摘 0。`git diff --cached --check` 成功。全体 `npm run lint:md` は現行 `main` に `.agents/skills/review-enforcer` が存在しないため実行経路で阻害。
 - 次作業: `ASPIRE-002` で AppHost の骨格とアプリケーションモデルの失敗テストから実装を開始する。
-- 対象外: 今回は設計のみ。AppHost、Dockerfile、AI 接続、製品コードの実装は行わない。
+- 対象外: 今回は設計のみ。AppHost、image 接続、製品コードの実装は行わない。
 
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
