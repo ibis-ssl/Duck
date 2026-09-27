@@ -4,8 +4,10 @@
 - mode: review follow-up
 - publication 基点 HEAD: `e39ee1ebb3c930d0f67105b98ced70ce6e71d45b`
 - 作業開始時に確認した HEAD: `ccfd9f2fb3649196a8e01fcdc4e6a0d22b06cff7`
-- 対象 finding: I28-DR-001 / I28-DR-002 / I28-DR-003
+- 対象 finding: I28-DR-001 / I28-DR-002 / I28-DR-003 / I28-DR-004
 - 作成時刻: 2026-09-27 13:24:59 +09:00
+- I28-DR-004 対応開始 HEAD: `a0d5391d7ee11395234e6498bcc2d9ffcf16fdd7`
+- I28-DR-004 設計修正 commit: `2052d1f294e770c8d52323098666e686af493216`
 - merge: 実施しない
 
 ## 変更
@@ -41,13 +43,25 @@ RuntimeHost 自身が受信した packet count を取得できる production dia
 - 外部 packet sniffer の count は補助証跡に限定し、RuntimeHost 受信数の代用にしない。
 - DebugHost 側は既存 raw input snapshot の packet count を使う。
 
+### I28-DR-004
+
+`aspire-simulation-test-environment.md` の起動順序を Aspire の開始依存として一意にした。
+
+- `WithReference` は接続情報の参照に限定し、起動順序の根拠にしない。
+- 既定 `visibility_graph` 構成は `simulator` を先行させ、`cm4-sim` と `duck` がそれぞれ `simulator` へ `WaitForStart` する。
+- `cm4-sim` と `duck` の間には開始依存を置かず、`simulator` 開始後の並行起動を許可する。
+- `crane` は `cm4-sim` と `duck` の両方へ `WaitForStart` する。
+- `cm4-sim` を使わない planner では、`crane` は `duck` のみに `WaitForStart` し、存在しない `cm4-sim` への依存を作らない。
+- `WaitForStart` は起動済み状態だけを保証し、UDP 正常性は保証しない。正常性確認を導入する場合は観測可能な条件を定義したうえで `WaitFor` を使う。
+- AppHost のアプリケーションモデル検査へ、上記 `WaitForStart` 依存の既定構成と `cm4-sim` 無効構成を追加した。
+
 ## 検証
 
 - `git diff --check`: success
 - 対象2設計書 CSpell: 2 files / 0 issues
-- `npm run lint:md`: blocked。Windows 実行環境に `xargs` が無く `lint:md:text` で停止した。
-- workflow 相当 `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj`: not run。接続先に `dotnet` が存在せず exit 9009 で起動前に停止した。
-- .NET test の stdout / stderr / exit code は `artifacts/pr28-design-fix/` に保存した。
+- `npm run lint:md`: blocked（exit 255）。Windows 実行環境に `xargs` が無く `lint:md:text` で停止した。stdout / stderr / exit code は `artifacts/pr28-design-fix/i28-dr-004-lint-md.*` に保存した。
+- workflow 相当 `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`: blocked（exit 9009）。接続先に `dotnet` が存在せず、テスト開始前に停止した。stdout / stderr / exit code は `artifacts/pr28-design-fix/i28-dr-004-dotnet-test.*` に保存した。
+- ローカルで .NET test の合否は得られていない。最終判定には push 後の current HEAD と一致する GitHub Actions run だけを使用する。
 
 ## 変更していない範囲
 

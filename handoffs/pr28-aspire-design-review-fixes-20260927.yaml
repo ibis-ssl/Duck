@@ -2,7 +2,7 @@ schema_version: 3
 producer:
   skill: chat-implementation-worker
   mode: review_follow_up
-  generated_at: 2026-09-27T13:28:41+09:00
+  generated_at: 2026-09-27T14:28:00+09:00
 repository: ibis-ssl/Duck
 pull_request: 28
 task_id: ASPIRE-001
@@ -12,6 +12,7 @@ target:
   initial_observed_head: ccfd9f2fb3649196a8e01fcdc4e6a0d22b06cff7
   publication_base_head: e39ee1ebb3c930d0f67105b98ced70ce6e71d45b
   reviewed_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  implementation_head: 2052d1f294e770c8d52323098666e686af493216
 execution_environment:
   kind: connected_computer
   tool: RemoteDesktopMCP
@@ -22,6 +23,7 @@ scope:
   - I28-DR-001 source identity contract
   - I28-DR-002 multicast port sharing and stack ownership contract
   - I28-DR-003 RuntimeHost receive-count observability contract
+  - I28-DR-004 Aspire startup dependency contract
 non_goals:
   - Aspire product implementation
   - RuntimeHost product-code implementation
@@ -52,6 +54,10 @@ findings:
     severity: medium
     disposition: addressed
     summary: define RuntimeHost-owned VisionPacketsReceivedTotal and diagnostic log as ASPIRE-NET-002/003 evidence; independent sniffer is supplemental only
+  - id: I28-DR-004
+    severity: low
+    disposition: addressed
+    summary: define WaitForStart dependency graph; simulator starts first, cm4-sim and duck may start in parallel, crane waits for both in the default visibility_graph configuration, and model tests assert these dependencies
 validation:
   - command: git diff --check
     result: passed
@@ -60,23 +66,30 @@ validation:
     evidence: 2 files, 0 issues
   - command: npm.cmd run lint:md
     result: blocked
+    exit_code: 255
     reason: xargs is unavailable in the Windows execution environment
-  - command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj
+    diagnostics:
+      - artifacts/pr28-design-fix/i28-dr-004-lint-md.stdout.log
+      - artifacts/pr28-design-fix/i28-dr-004-lint-md.stderr.log
+      - artifacts/pr28-design-fix/i28-dr-004-lint-md.exit-code
+  - command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false
     result: blocked
     exit_code: 9009
-    reason: dotnet is not installed on the connected computer
+    reason: dotnet is not installed on the connected computer; test execution did not start
     diagnostics:
-      - artifacts/pr28-design-fix/dotnet-test.stdout.log
-      - artifacts/pr28-design-fix/dotnet-test.stderr.log
-      - artifacts/pr28-design-fix/dotnet-test.exit-code
+      - artifacts/pr28-design-fix/i28-dr-004-dotnet-test.stdout.log
+      - artifacts/pr28-design-fix/i28-dr-004-dotnet-test.stderr.log
+      - artifacts/pr28-design-fix/i28-dr-004-dotnet-test.exit-code
 ci:
   required: true
   workflow: .NET tests
   exact_head_only: true
-  state: pending_push
+  state: pending_final_push
 publication:
-  commit: pending
-  push: pending
+  implementation_commit: 2052d1f294e770c8d52323098666e686af493216
+  implementation_push: pushed
+  report_and_handoff_commit: pending
+  final_push: pending
   pr_update: pending
   pr_comment: pending
   merge: forbidden
@@ -84,4 +97,4 @@ report:
   path: reports/pr28-aspire-design-review-fixes-20260927.md
 next_action:
   mode: fix_verification
-  summary: after push, verify only the PR workflow run whose head_sha equals the new current HEAD, then return I28-DR-001 through I28-DR-003 to the same normal review flow
+  summary: after push, verify only the PR workflow run whose head_sha equals the new current HEAD, then return I28-DR-001 through I28-DR-004 to the same normal review flow
