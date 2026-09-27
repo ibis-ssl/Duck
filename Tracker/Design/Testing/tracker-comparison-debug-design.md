@@ -84,7 +84,9 @@ AppHost から最低限、次を上書きする。
 
 `debug-host-observer` を DebugHost 自身の identity とすることで、Duck の `uuid=ibis` を DebugHost 自身と誤って同一視しない。TIGERs / ER-Force は packet の UUID を優先し、UUID が無い場合だけ source name と remote endpoint を補助識別に使う。
 
-source identity が衝突して複数 tracker を一意に分離できない場合は、異なる tracker の物体を一つの source に混ぜず、比較準備未完了として表示する。
+`Tracker.DebugHost` の既存契約を維持し、外部 tracker の source identity は UUID を優先する。同じ UUID が複数の remote endpoint から届いても一つの source として集約し、候補のうち `ReceivedAt` が最新の snapshot を代表にする。endpoint ごとの物体を寄せ集めて一つの snapshot を合成しない。UUID が空または不明な場合だけ source name と remote endpoint を代用して source を分ける。
+
+comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の要求した三つの source role が互いに別の source identity へ解決できたかで判定する。同じ UUID に二つ以上の要求 role が対応して三者を区別できない場合は、その UUID を endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。source option も通常は UUID ごとの集約 source を一つだけ表示し、endpoint は衝突診断用の付随情報として表示する。
 
 ## 比較の時刻基準
 
@@ -171,7 +173,7 @@ tracker ごとの ball track id は同一性を保証しないため、異なる
 
 TIGERs または ER-Force tracker の一方が起動できなくても Duck と Simulator の通常試験まで巻き込んで停止させない。
 
-ただし比較モードの状態は、要求した tracker source が受信できていない場合に `Ready` としない。Aspire の resource 状態と DebugHost の source 一覧の両方で欠落を確認できるようにする。
+ただし比較モードの状態は、要求した tracker source が受信できていない場合、または Duck / TIGERs / ER-Force の三つの source role を別 source identity へ解決できない場合に `Ready` としない。同一 UUID の複数 endpoint は一つの source として扱い、endpoint 数だけで `Ready` を落とさない。Aspire の resource 状態と DebugHost の source 一覧の両方で欠落または role 解決不足を確認できるようにする。
 
 ## OS 別ネットワーク動作確認
 
@@ -204,7 +206,9 @@ AppHost の application model test で次を先に固定する。
 DebugHost の focused test では次を固定する。
 
 - UUID が異なる Duck / TIGERs / ER-Force を別 source として保持する。
-- source identity が不足する場合も異なる endpoint を勝手に一つへ混ぜない。
+- 同一 UUID が複数 endpoint から届く場合は既存契約どおり一つの source option に集約し、`ReceivedAt` が最新の snapshot だけを代表にする。
+- 同一 UUID に複数の要求 source role が対応する場合は endpoint ごとに別 source とせず、role 解決不足として comparison mode を `Ready` にしない。
+- UUID が空または不明な場合は source name と remote endpoint の代用 identity で分離し、異なる endpoint の packet を一つの snapshot へ混ぜない。
 - robot は team + id で対応付ける。
 - ball track id を tracker 間対応付けに使わない。
 - missing / unmatched object をゼロ差分として扱わない。
