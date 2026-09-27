@@ -1,0 +1,336 @@
+schema_version: 3
+producer:
+  skill: chat-review-worker
+  mode: initial_review
+  generated_at: 2026-09-27T13:01:53+09:00
+
+repository: ibis-ssl/Duck
+issue_or_pr: "PR #28 / Issue #18 / related Issue #14"
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  current_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  reviewed_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  commit_range: 449296725fc69dc004818ede2e8ad59a52ef2d27..7a58472d527d52efceccd21b55bfde0b9d0b82db
+
+execution_environment:
+  kind: connected_computer
+  tool: RemoteDesktopMCP
+  machine_id: local
+  connection: available
+  os: Windows
+  shell: cmd.exe / PowerShell
+  working_directory: 'C:\Users\donabe\Project\Duck-pr28-design-review-20260927'
+  repository: ibis-ssl/Duck
+  branch: detached-review-worktree
+  head_sha: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  source_state: clean
+  source_fingerprint: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  ownership: current_task
+  writable_paths:
+    - reports/pr28-aspire-design-review-20260927.md
+    - handoffs/pr28-aspire-design-review-20260927.yaml
+  dependencies:
+    - name: git
+      status: available
+      evidence: exact reviewed HEAD fetched and detached worktree created
+    - name: node/npm
+      status: available
+      evidence: npx cspell executed
+    - name: docker
+      status: missing
+      evidence: docker command not found on connected PC
+    - name: dotnet/aspire
+      status: not_checked
+      evidence: local runtime execution was not required for this design-only review; exact-head CI supplied .NET test evidence
+  evidence:
+    - existing task worktree was left untouched because its HEAD did not match PR current HEAD
+    - dedicated review worktree was pinned to 7a58472d527d52efceccd21b55bfde0b9d0b82db
+    - validation outputs were stored outside reviewed source under C:\Users\donabe\Project\_review-evidence\Duck-pr28-20260927
+
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - git and documentation checks are executable on the connected PC
+    - exact-head GitHub Actions evidence is available for .NET tests
+    - Docker runtime is unavailable on the connected PC
+  technical_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  administrative_parent: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  commit:
+    state: commit_pending
+    review_target_sha: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  push:
+    state: push_pending
+    head_sha: unknown
+  ci_wait:
+    state: ci_wait_pending
+    required_for: post-review administrative commit current HEAD
+  final_publication:
+    sequence: commit review report and handoff, push through RemoteDesktopMCP, then inspect only workflow runs whose head_sha equals the new PR current HEAD
+    pr_action: comment
+
+authoritative_requirements:
+  - source: user_instruction
+    reference: current request
+    summary: review PR #28 design and keep reporting work progress
+  - source: Issue
+    reference: '#18 Aspire対応'
+    summary: Docker ER-Force tracker / TIGERs tracker, Crane execution, Duck orchestration
+  - source: Issue
+    reference: '#14 dockerでシミュレーターのケースを追加'
+    summary: use ER-Force simulator and compare TIGERs / ER-Force trackers
+  - source: repository/project instructions
+    reference: current project instructions
+    summary: use RDMCP for git, GitHub connector for PR comments, exact-head CI only, persist detailed report, never merge
+
+development_policy:
+  method: review-only; implementation remains TDD
+  testing_order: future ASPIRE implementation must add failing tests before implementation
+
+validation:
+  commands:
+    - git diff --check 449296725fc69dc004818ede2e8ad59a52ef2d27..7a58472d527d52efceccd21b55bfde0b9d0b82db
+    - npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md
+    - npm run lint:md
+  required_failure_diagnostics:
+    - test results
+    - stdout
+    - stderr
+    - diagnostic logs
+    - future Aspire/container logs for runtime integration failures
+
+commands:
+  - command: git diff --check 449296...7a58472...
+    result: passed
+    exit_code: 0
+    source_fingerprint: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+    evidence_path: 'C:\Users\donabe\Project\_review-evidence\Duck-pr28-20260927\diff-check.*'
+  - command: npx cspell --config cspell.config.jsonc <two design files>
+    result: passed
+    exit_code: 0
+    source_fingerprint: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+    evidence_path: 'C:\Users\donabe\Project\_review-evidence\Duck-pr28-20260927\cspell.*'
+  - command: npm run lint:md
+    result: blocked
+    exit_code: 255
+    source_fingerprint: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+    evidence: Windows environment has no xargs, so lint:md:text stopped before repository Markdown lint completed
+    evidence_path: 'C:\Users\donabe\Project\_review-evidence\Duck-pr28-20260927\lint-md.*'
+
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: 36291598405
+  run_number: 141
+  head_sha: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  status: completed
+  conclusion: success
+  artifacts: []
+
+review:
+  mode: initial_review
+  reviewed_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  reviewer:
+    identity: ChatGPT current review chat
+    role: normal_reviewer
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: initial review
+    independence:
+      implemented_change: false
+      implemented_review_fix: false
+      served_as_normal_reviewer: true
+      inherited_conversation: true
+      evidence:
+        - current chat performed review only and made no design/product fix
+  verdict: fail
+  required_coverage:
+    - criterion: requirement and design conformance
+      disposition: checked_finding
+      evidence: I28-DR-001, I28-DR-002, I28-DR-003
+    - criterion: correctness and edge cases
+      disposition: checked_finding
+      evidence: source collision, multicast port sharing, packet-count observability
+    - criterion: scope discipline
+      disposition: checked_no_finding
+      evidence: PR changes are design, tracking, reports and handoffs only
+    - criterion: changed files and direct dependencies
+      disposition: checked_no_finding
+      evidence: all 11 changed files and RuntimeHost/DebugHost/TrackerConnectionLib plus external tracker contracts inspected
+    - criterion: API data configuration workflow compatibility
+      disposition: checked_finding
+      evidence: I28-DR-001 and I28-DR-002
+    - criterion: error handling and failure diagnostics
+      disposition: checked_no_finding
+      evidence: dotnet-test workflow preserves required failure diagnostics
+    - criterion: security and secret handling
+      disposition: not_applicable
+      evidence: design-only change adds no secret handling
+    - criterion: tests and validation adequacy
+      disposition: checked_finding
+      evidence: I28-DR-003
+    - criterion: current-head CI
+      disposition: checked_no_finding
+      evidence: .NET tests run 141 matches reviewed HEAD and succeeded
+    - criterion: report tracking documentation accuracy
+      disposition: checked_no_finding
+      evidence: ASPIRE-001 tracking and historical reports/handoffs inspected
+    - criterion: regression and maintainability
+      disposition: checked_finding
+      evidence: I28-DR-001 and I28-DR-002
+  validation_assessment:
+    - item: exact-head .NET tests
+      result: supported
+      evidence: run 36291598405, head 7a58472d..., conclusion success
+    - item: diff whitespace
+      result: supported
+      evidence: git diff --check exit 0
+    - item: targeted design CSpell
+      result: supported
+      evidence: 2 files, 0 issues, exit 0
+    - item: full Markdown lint
+      result: unavailable
+      evidence: Windows environment lacks xargs; exit 255 before lint completion
+    - item: cross-platform Aspire runtime
+      result: not_applicable
+      evidence: AppHost not implemented; design explicitly makes OS runtime acceptance a later gate
+  reserved_report_paths: []
+  report_attestation:
+    allowed: false
+    reviewed_implementation_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence:
+      - normal review, not independent final review
+  summary:
+    - 3 medium findings; no blocking/high findings
+    - design needs rework before ASPIRE-002 implementation
+
+report:
+  report_type: review_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/pr28-aspire-design-review-20260927.md
+  reviewed_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  attestation_head: null
+  pr_comments: []
+  summary:
+    - detailed report generated for repository persistence
+    - concise PR comment pending publication after push
+
+findings:
+  - id: I28-DR-001
+    severity: medium
+    origin: introduced_by_change
+    location: Tracker/Design/Testing/tracker-comparison-debug-design.md:85-87; Tracker/Design/DebugHost/raw-vision-viewer-plan.md:218; Tracker/Tracker.Tests/VisionLiveComparisonViewStateTests.cs:263
+    description: new comparison design treats ambiguous/colliding identity as comparison-not-ready while existing DebugHost contract collapses identical UUID across endpoints to one representative source
+    impact: ASPIRE-006B has two incompatible source-identity contracts
+    evidence: existing design and regression test explicitly collapse same UUID; new design says collision must not be merged and must be not-ready
+    required_action: choose one contract, update the authoritative design(s), and fix TDD expectations for collision Ready/source-option behavior
+  - id: I28-DR-002
+    severity: medium
+    origin: introduced_by_change
+    location: Tracker/Design/Testing/aspire-simulation-test-environment.md:65,234-241; RuntimeVisionReceiverService.cs:113-115; UdpTrackerReceiver.cs:40-46
+    description: ASPIRE-NET-009 uses port-in-use preflight although required multicast ports intentionally support multiple receivers with SO_REUSEADDR
+    impact: second-stack detection can false-positive or false-negative depending OS/socket probe semantics
+    evidence: NET-003/005/006 require sharing 10020/11010; Duck receivers use ReuseAddress
+    required_action: classify exclusive vs shareable ports and define an unambiguous second-stack ownership check
+  - id: I28-DR-003
+    severity: medium
+    origin: coverage_miss
+    location: Tracker/Design/Testing/aspire-simulation-test-environment.md:234-235,243,256; RuntimeVisionReceiverService.cs:41-58; RuntimeVisionPacketBuffer.cs:9-51
+    description: NET-002/003 require RuntimeHost received-packet counts but RuntimeHost exposes no cumulative receive counter and its buffer only retains latest packets
+    impact: acceptance evidence cannot prove the stated RuntimeHost count using the existing observable contract
+    evidence: receiver only stores packets; buffer overwrites per camera and clears batches
+    required_action: define a RuntimeHost receiver counter/log/test seam and evidence collection path; do not substitute an independent sniffer count
+
+held:
+  - item: Linux/Windows/macOS ASPIRE-NET runtime packet tests
+    reason: AppHost and runtime integration are not implemented yet
+    owner: future ASPIRE implementation
+    remaining_risk: host-network multicast behavior remains to be proven per OS
+    verdict_impact: does not add another design finding because the design explicitly records untested OS as unverified
+
+unexplored: []
+unknown: []
+not_applicable:
+  - field_or_area: report attestation
+    reason: this is normal initial review, not independent final review
+remaining_risks:
+  - cross-platform host-network multicast support still requires real packet evidence during implementation
+  - startup ordering must be encoded and tested during AppHost implementation
+
+source_payloads:
+  - source_skill: review-worker
+    output_contract_version: current installed skill
+    content_type: application/yaml
+    payload:
+      reviewed_implementation_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+      verdict: fail
+      finding_ids:
+        - I28-DR-001
+        - I28-DR-002
+        - I28-DR-003
+      held:
+        - cross-platform runtime checks deferred until implementation
+      unexplored: []
+      next_action: design_rework then fix_verification in same normal review chat
+  - source_skill: report-writer
+    output_contract_version: current installed skill
+    content_type: application/yaml
+    payload:
+      report_type: review_report
+      complete_body_reference: reports/pr28-aspire-design-review-20260927.md
+      target_identity:
+        branch: design/issue18-aspire-test-orchestration
+        base_ref: main
+        current_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+        reviewed_implementation_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+      verification:
+        capability: local_execution_available
+        technical_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+        administrative_parent: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+        commit_state: commit_pending
+        push_state: push_pending
+        ci_wait_state: ci_wait_pending
+      persistence:
+        mode: repository_file
+        reserved_paths: []
+        report_attestation_head: null
+
+next_action:
+  type: design_rework
+  target_skill: implementation-worker
+  mode: review_follow_up
+  summary: resolve I28-DR-001 through I28-DR-003, then return to this same normal review chat for fix verification
+  instructions:
+    - preserve finding IDs and severities
+    - update authoritative design contracts, not only reports/handoffs
+    - add or update the planned TDD acceptance contract for each finding
+    - provide focused evidence for each required action before fix verification
+    - do not merge
+  required_attachments_or_references:
+    - reports/pr28-aspire-design-review-20260927.md
+    - PR #28
+  requested_authorized_actions:
+    - read_repository
+    - edit_documentation
+    - write_report
+    - write_handoff
+    - commit
+    - push
+    - update_pr
+    - comment_pr
+
+transport:
+  method: repository_file
+  packet_path: handoffs/pr28-aspire-design-review-20260927.yaml
+  packet_url: null
+  transport_note: normal-review handoff persisted with the review report; reconnecting chat must re-resolve current HEAD and authorization before reuse
