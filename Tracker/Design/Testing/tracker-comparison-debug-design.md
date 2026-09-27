@@ -36,6 +36,8 @@ raw vision は共通の比較入力として扱うが、シミュレータの真
 
 Duck `Tracker.RuntimeHost` も `sim` profile で `224.5.23.2:11010` へ出力する。三つの tracker source は同じ official tracker multicast endpoint を共有し、`Tracker.DebugHost` 側で source identity により分離する。
 
+comparison mode でも referee / game-state の authoritative producer は基底構成の `game-controller` 一つだけとする。`tracker-tigers` は Sumatra の referee module を `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` に固定した外部 Game Controller 用設定を使い、`224.5.23.1:11003` を consumer として受信する。標準 `simulation_protocol.xml` のように Sumatra 内蔵 Game Controller を有効にする構成は使わない。`tracker-erforce` の `--gc-port 11003` も consumer とし、11003 を publish させない。`tracker-tigers` / `tracker-erforce` は `simulator` と `game-controller` の開始後に起動する。
+
 ## TIGERs tracker
 
 TIGERs は `tigersmannheim/sumatra` image を使用する。Sumatra の `simulation_protocol` 構成は raw SSL-Vision `224.5.23.2:10020` を受信し、vision tracking data を `224.5.23.2:11010` へ送信する。
@@ -213,6 +215,8 @@ Windows / macOS で multicast が成立しない場合は comparison mode を Re
 AppHost の application model test で次を先に固定する。
 
 - `tracker-tigers`、`tracker-erforce`、`debug-host` が比較モードに存在する。
+- `tracker-tigers` と `tracker-erforce` が基底構成の `game-controller` に `WaitForStart` し、11003 の producer を追加しない。
+- `tracker-tigers` が `gameController=false`、`publishRefereeMessages=false` の外部 Game Controller 用設定を使う。
 - TIGERs / ER-Force tracker が host network を使う。
 - TIGERs が raw vision 10020 を入力し tracker 11010 を出力する設定である。
 - ER-Force が `--vision-port 10020 --tracker-port 11010` で起動する。

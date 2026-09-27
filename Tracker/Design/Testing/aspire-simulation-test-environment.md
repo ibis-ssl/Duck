@@ -38,11 +38,12 @@ AppHost は `Testing/Duck.Testing.AppHost` に置く。Duck は既存の `Duck.s
 シミュレータと Crane はコンテナ資源として AppHost に登録する。Crane は Duck 側でビルドせず、`ibis-ssl/crane` が GitHub Container Registry へ公開する `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を `AddContainer` で起動する。`scenario-develop` は動作確認用の移動タグとして明示指定時だけ利用し、再現可能な試験では使用する Crane のコミット SHA に対応するイメージタグを固定する。
 ## 資源構成
 
-AppHost では三つの主要資源と、Crane の現在のシミュレーション経路を維持する場合に一つの補助資源を管理する。
+AppHost では三つの主要資源に加え、レフェリー / game-state を供給する一つの試験資源と、Crane の現在のシミュレーション経路を維持する場合に一つの補助資源を管理する。
 
 | 資源名 | 実行形態 | 責務 |
 | --- | --- | --- |
 | `simulator` | Docker image | Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` から ER-Force `simulator-cli` を起動し、物理シミュレーションと SSL-Vision 出力を行う。 |
+| `game-controller` | Docker image | `robocupssl/ssl-game-controller:<fixed tag or digest>` を host network で起動し、通常 mode / comparison mode の両方で `224.5.23.1:11003` の referee message を生成する唯一の authoritative producer とする。制御 API は `127.0.0.1:8082` を使う。 |
 | `crane` | Docker image | `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` から Crane を起動し、ロボット制御指令を生成する。 |
 | `cm4-sim` | Docker image | `ghcr.io/ibis-ssl/orion-cm4-sim:<commit SHA>` を使い、Crane が `visibility_graph` で出す mode 4 の位置指令を現在の Crane シナリオ構成と同じ経路で mode 3 の速度指令へ変換する補助資源。 |
 | `duck` | .NET プロセス | `Tracker.RuntimeHost` を `sim` 設定で起動し、SSL-Vision を追跡してトラッカーパケットを出力する。 |
@@ -57,7 +58,7 @@ Aspire のダッシュボードは、AppHost が管理する各資源の起動�
 
 シミュレータを通常の Docker bridge network に置いた場合、`--localhost` はコンテナ自身を指し、ホストで動く Duck には届かない。マルチキャストを bridge network とホスト間で透過させる構成にも依存しない。
 
-そのため `simulator`、`crane`、`cm4-sim` は Docker の host network で起動し、Duck はホスト上で従来どおり SSL-Vision のマルチキャストへ参加する。
+そのため `simulator`、`game-controller`、`crane`、`cm4-sim` は Docker の host network で起動し、Duck はホスト上で従来どおり SSL-Vision のマルチキャストへ参加する。
 Linux の Docker Engine では host network はコンテナとホストのネットワーク名前空間を共有するため、UDP のポート公開や変換を挟まずに通信できる。
 
 Docker Desktop を使う場合は host networking の有効化が必要である。初期受入環境は Linux の Docker Engine とし、Docker Desktop での動作は別途確認項目とする。
@@ -88,7 +89,7 @@ Tracker.RuntimeHost (host process)
 試験用の確認先
 ```
 
-シミュレーション制御を行う試験ツールが必要な場合は UDP 10300 を使用する。初期 AppHost 自身は試験シナリオを生成しない。
+シミュレーション制御を行う試験ツールが必要な場合は UDP 10300 を使用する。初期 AppHost 自身は自律的な試験シナリオを生成しないが、`ASPIRE-005` / `ASPIRE-NET-007` の active motion 確認では専用の `referee-driver` 試験 fixture を使う。`referee-driver` は `224.5.23.1:11003` を直接 publish せず、`game-controller` の `ws://127.0.0.1:8082/api/control` へ continue action を送る。最初に 11003 で `HALT` を確認し、`NEXT_COMMAND` を送り、遷移後も `HALT` / `STOP` なら `FORCE_START`、それ以外の準備状態なら `NORMAL_START` を送る。11003 で active command への遷移を確認してから Crane の指令と SSL-Vision の位置変化を検査する。
 
 ## Duck の起動
 
@@ -133,17 +134,26 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 
 `team` と `planner` は AppHost の設定から変更可能にする。既定 planner は Crane の現行シナリオ構成と同じ `visibility_graph` とし、その場合は `cm4-sim` を同時に起動する。Crane、`cm4-sim`、シミュレータは ROS 2 / UDP / multicast の通信要件を保つため host network を使う。
 
+## レフェリー / game-state の所有権
+
+`224.5.23.1:11003` の referee message は、通常 mode / comparison mode の両方で `game-controller` だけが生成する。11003 は複数 consumer が受信する multicast endpoint であり、socket の bind 可否では producer の一意性を判定しない。AppHost の構成上、11003 を publish する資源を `game-controller` 一つに限定する。
+
+通常 mode では standalone の `game-controller` が authoritative producer になる。comparison mode でも同じ `game-controller` を使い、`tracker-tigers` は Sumatra の referee module を `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` に固定した外部 Game Controller 用設定で起動する。標準の `simulation_protocol.xml` のように内蔵 Game Controller を有効にする構成は使わない。`tracker-erforce` の `--gc-port 11003` も consumer として扱い、referee message を publish させない。
+
+`game-controller` の制御 API `127.0.0.1:8082` はこの stack の `game-controller` が占有する。`referee-driver` は API client としてだけ動作し、11003 の producer にはならない。再現可能な試験では Game Controller image を固定 tag または digest で指定し、初期 referee command が `HALT` である fixture を固定する。
+
 ## 起動順序
 
 Aspire の起動順序は `WaitForStart` による開始依存として明示する。`WithReference` は接続情報の参照を構成するために使い、起動順序の根拠にはしない。UDP サービスに HTTP のような既存の正常性確認先はないため、開始依存と正常性確認を分けて扱う。
 
 既定の `visibility_graph` 構成では次の依存グラフを使う。
 
-1. `simulator` は開始依存を持たずに起動する。
+1. `simulator` と `game-controller` は開始依存を持たずに起動し、互いに並行起動を許可する。
 2. `cm4-sim` と `duck` はそれぞれ `simulator` に `WaitForStart` し、`simulator` の開始後は互いの順序を要求せず並行起動を許可する。
-3. `crane` は `cm4-sim` と `duck` の両方に `WaitForStart` してから起動する。
+3. `crane` は `cm4-sim`、`duck`、`game-controller` に `WaitForStart` してから起動する。
+4. comparison mode の `tracker-tigers` と `tracker-erforce` は `simulator` と `game-controller` に `WaitForStart` してから起動する。
 
-`cm4-sim` を使わない planner を選択した場合、`crane` は存在しない `cm4-sim` への依存を作らず、`duck` に `WaitForStart` する。`duck` 自身が `simulator` に `WaitForStart` するため、この構成でも `simulator` の開始後に `crane` を起動する。
+`cm4-sim` を使わない planner を選択した場合、`crane` は存在しない `cm4-sim` への依存を作らず、`duck` と `game-controller` に `WaitForStart` する。`duck` 自身が `simulator` に `WaitForStart` するため、この構成でも `simulator` と `game-controller` の開始後に `crane` を起動する。
 
 `WaitForStart` が保証するのは対象資源が起動済み状態になったことまでであり、UDP を正常に処理できることまでは保証しない。`WaitFor` による正常性確認を導入する場合は、確認可能な正常性条件を追加してから使う。正常性確認がない段階では、存在しない正常性確認を成功条件として扱わない。
 
@@ -186,9 +196,9 @@ Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulator
 
 ### `ASPIRE-005`: 起動試験
 
-AppHost の全資源を一括起動し、シミュレータからの SSL-Vision を Duck が受信し、Duck が `TrackerWrapperPacket` を出力する正常経路を確認する。
+AppHost の全資源を一括起動し、`game-controller` が 11003 の唯一の referee producer として動作し、シミュレータからの SSL-Vision を Duck が受信し、Duck が `TrackerWrapperPacket` を出力する正常経路を確認する。
 
-Crane を動かした場合は、Crane の指令が `cm4-sim` を経由してシミュレータへ入り、その結果が SSL-Vision と Duck の出力へ反映されることまで確認する。
+Crane を動かす試験では、`referee-driver` が `game-controller` を `HALT` から active command へ遷移させたことを 11003 で確認した後、Crane の指令が `cm4-sim` を経由してシミュレータへ入り、その結果が SSL-Vision と Duck の出力へ反映されることまで確認する。referee 遷移を確認できない場合は game-state fixture の失敗として扱い、UDP 12345 / 12346 の失敗と混同しない。
 
 ### `ASPIRE-006`: 外部トラッカー比較デバッグ
 
@@ -203,16 +213,19 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 最初に AppHost のアプリケーションモデルを検査するテストを追加し、未実装状態で失敗することを確認する。
 最低限、次を自動検査する。
 
-- `simulator`、`crane`、`cm4-sim`、`duck` の資源が存在する。
+- `simulator`、`game-controller`、`crane`、`cm4-sim`、`duck` の資源が存在する。
 - `duck` が `Tracker.RuntimeHost` を参照する .NET プロジェクト資源である。
 - `crane` が `ghcr.io/ibis-ssl/crane` の `scenario-<commit SHA>` image を参照する。
 - `simulator` が `ghcr.io/ibis-ssl/framework-simulatorcli`、`cm4-sim` が `ghcr.io/ibis-ssl/orion-cm4-sim` の固定タグを参照する。
-- `simulator`、`crane`、`cm4-sim` へ host network の実行引数が設定される。
+- `simulator`、`game-controller`、`crane`、`cm4-sim` へ host network の実行引数が設定される。
 - Duck に `sim` 用の VisionReceiver 設定が渡される。
 - シミュレータの geometry と realism が明示される。
 - Crane の `team`、`planner` と `cm4-sim` の接続ポートが明示される。
-- 既定の `visibility_graph` 構成で、`cm4-sim` と `duck` が `simulator` への `WaitForStart` 依存を持ち、`crane` が `cm4-sim` と `duck` への `WaitForStart` 依存を持つ。
-- `cm4-sim` を使わない planner 構成では、`crane` が `duck` への `WaitForStart` 依存を持ち、存在しない `cm4-sim` への待機依存を持たない。
+- `game-controller` が固定 tag または digest の image を参照し、11003 の唯一の referee producer として構成される。
+- comparison mode の `tracker-tigers` が外部 Game Controller 用設定を使い、`gameController=false` と `publishRefereeMessages=false` で 11003 を受信専用にする。
+- `referee-driver` の integration fixture が 11003 の `HALT` を確認してから Game Controller API へ continue action を送り、active command への遷移を確認できる。
+- 既定の `visibility_graph` 構成で、`cm4-sim` と `duck` が `simulator` への `WaitForStart` 依存を持ち、`crane` が `cm4-sim`、`duck`、`game-controller` への `WaitForStart` 依存を持つ。
+- `cm4-sim` を使わない planner 構成では、`crane` が `duck` と `game-controller` への `WaitForStart` 依存を持ち、存在しない `cm4-sim` への待機依存を持たない。
 
 Docker を必要とする一括起動試験は、AppHost のモデル検査と分離する。Docker が利用できない環境でも、アプリケーションモデルの退行を検出できるようにする。
 
@@ -238,13 +251,13 @@ stack ownership の focused test では、一つ目の AppHost が lock を保�
 
 | ID | 経路 | 合格条件 |
 | --- | --- | --- |
-| `ASPIRE-NET-001` | AppHost 起動 | Simulator、Crane、`cm4-sim`、Duck が起動し、要求した比較資源も起動できる。 |
+| `ASPIRE-NET-001` | AppHost 起動 | Simulator、`game-controller`、Crane、`cm4-sim`、Duck が起動し、要求した比較資源も起動できる。 |
 | `ASPIRE-NET-002` | container → host SSL-Vision multicast | Simulator が `224.5.23.2:10020` へ送信し、ホスト上の `Tracker.RuntimeHost` が継続受信する。安定起動後5秒以内に RuntimeHost receiver 自身の `VisionPacketsReceivedTotal` が10件以上増加する。 |
 | `ASPIRE-NET-003` | 同一 multicast の複数受信 | comparison mode では `Tracker.RuntimeHost` と `Tracker.DebugHost` が同時に `224.5.23.2:10020` を受信し、RuntimeHost の `VisionPacketsReceivedTotal` と DebugHost の raw input packet count が同じ確認窓でともに増加する。 |
 | `ASPIRE-NET-004` | container → container SSL-Vision multicast | TIGERs と ER-Force が同じ `224.5.23.2:10020` を受信し、それぞれ tracker output を生成する。 |
 | `ASPIRE-NET-005` | container → host tracker multicast | TIGERs / ER-Force が `224.5.23.2:11010` へ送信し、`Tracker.DebugHost` が両者を別 source として受信する。 |
 | `ASPIRE-NET-006` | host → host tracker multicast | Duck が `224.5.23.2:11010` へ送信し、`Tracker.DebugHost` が Duck source として受信する。 |
-| `ASPIRE-NET-007` | host network の制御 UDP | Crane → `cm4-sim` の UDP 12345 と `cm4-sim` → Simulator の UDP 12346 が通り、ロボット指令の結果が SSL-Vision の位置変化へ反映される。 |
+| `ASPIRE-NET-007` | host network の制御 UDP | `referee-driver` が 11003 の command を `HALT` から active state へ遷移させたことを確認した後、Crane → `cm4-sim` の UDP 12345 と `cm4-sim` → Simulator の UDP 12346 が通り、ロボット指令の結果が SSL-Vision の位置変化へ反映される。referee 遷移未成立はこの UDP 経路の成功証跡にしない。 |
 | `ASPIRE-NET-008` | multicast interface 選択 | `InterfaceAddress` 未指定の通常経路を確認し、複数 NIC / VPN 等で自動選択が成立しない場合は明示 IPv4 address の指定で受信できることを確認する。 |
 | `ASPIRE-NET-009` | stack ownership / 固定 port 競合 | 同一ホストで二つ目の stack を起動しようとした場合は AppHost の stack ownership lock を resource 起動前に取得できず明示的に失敗する。外部プロセスとの port 競合は占有制御 port だけを事前確認し、共有 multicast port `10020` / `11010` の in-use 判定は失敗条件にしない。 |
 
@@ -261,7 +274,8 @@ packet count の条件は、単に socket が作成できたことではなく�
 - Docker Desktop の場合は host networking の有効状態。
 - 使用した IPv4 interface 一覧と、明示した `InterfaceAddress`。
 - Aspire の resource 状態。
-- Simulator、Crane、`cm4-sim`、TIGERs、ER-Force の標準出力・標準エラー。
+- Simulator、`game-controller`、Crane、`cm4-sim`、TIGERs、ER-Force の標準出力・標準エラー。
+- `referee-driver` が観測した 11003 の遷移前後 command と Game Controller API へ送った continue action。
 - `Tracker.RuntimeHost` / `Tracker.DebugHost` の標準出力・標準エラー。
 - RuntimeHost の `VisionPacketsReceivedTotal` と DebugHost の raw input packet count の確認前後値。tracker packet は DebugHost の source ごとの受信数を併記する。
 - DebugHost が認識した tracker source identity。
@@ -285,7 +299,7 @@ Aspire ダッシュボードの資源別ログを一次確認に使う。
 
 自動試験を CI へ追加する場合は、既存の `.NET tests` と同様に、失敗時の標準出力、標準エラー、テスト結果、Aspire とコンテナのログを artifact として保存する。
 
-シミュレータ、Crane、`cm4-sim` のコンテナログは資源名が分かる形で分離する。
+シミュレータ、`game-controller`、Crane、`cm4-sim` のコンテナログは資源名が分かる形で分離する。`ASPIRE-NET-007` では `referee-driver` の操作ログと 11003 の command 遷移も同じ試験証跡へ保存する。
 
 ## 対象外
 
@@ -312,7 +326,7 @@ Issue #14 の比較試験を行うときは、`tigers-tracker` と `erforce-trac
 
 本設計の実装完了条件は次のとおりとする。
 
-- 一つの Aspire AppHost 起動でシミュレータ、Crane、必要な `cm4-sim`、Duck を管理できる。
+- 一つの Aspire AppHost 起動でシミュレータ、`game-controller`、Crane、必要な `cm4-sim`、Duck を管理できる。
 - comparison mode では TIGERs tracker、ER-Force tracker、`Tracker.DebugHost` を追加し、Duck を含む三 tracker の差を同じ raw vision 入力に対して確認できる。
 - シミュレータと Crane は Docker コンテナ、Duck はホスト上の .NET プロセスとして起動する。
 - Crane は `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` の固定 image tag から起動し、Duck 側ではビルドしない。
