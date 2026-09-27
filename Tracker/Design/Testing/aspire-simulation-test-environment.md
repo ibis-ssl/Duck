@@ -316,7 +316,7 @@ Aspire ダッシュボードの資源別ログを一次確認に使う。
 
 ## 将来拡張
 
-Issue #14 の比較試験を行うときは、`tigers-tracker` と `erforce-tracker` を追加のコンテナ資源として AppHost へ登録する。
+Issue #14 の比較試験を行うときは、`tracker-tigers` と `tracker-erforce` を追加のコンテナ資源として AppHost へ登録する。
 
 比較用トラッカーを追加しても `duck`、`simulator`、`crane`、`cm4-sim` の初期構成の契約は変えない。
 
