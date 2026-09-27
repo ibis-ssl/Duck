@@ -149,10 +149,10 @@ review:
   required_coverage:
     - criterion: requirement and design conformance
       disposition: checked_finding
-      evidence: I28-DR-001, I28-DR-002, I28-DR-003
+      evidence: I28-DR-001, I28-DR-002, I28-DR-003, I28-DR-004
     - criterion: correctness and edge cases
       disposition: checked_finding
-      evidence: source collision, multicast port sharing, packet-count observability
+      evidence: source collision, multicast port sharing, packet-count observability, startup ordering
     - criterion: scope discipline
       disposition: checked_no_finding
       evidence: PR changes are design, tracking, reports and handoffs only
@@ -161,7 +161,7 @@ review:
       evidence: all 11 changed files and RuntimeHost/DebugHost/TrackerConnectionLib plus external tracker contracts inspected
     - criterion: API data configuration workflow compatibility
       disposition: checked_finding
-      evidence: I28-DR-001 and I28-DR-002
+      evidence: I28-DR-001, I28-DR-002 and I28-DR-004
     - criterion: error handling and failure diagnostics
       disposition: checked_no_finding
       evidence: dotnet-test workflow preserves required failure diagnostics
@@ -170,7 +170,7 @@ review:
       evidence: design-only change adds no secret handling
     - criterion: tests and validation adequacy
       disposition: checked_finding
-      evidence: I28-DR-003
+      evidence: I28-DR-003 and I28-DR-004
     - criterion: current-head CI
       disposition: checked_no_finding
       evidence: .NET tests run 141 matches reviewed HEAD and succeeded
@@ -179,7 +179,7 @@ review:
       evidence: ASPIRE-001 tracking and historical reports/handoffs inspected
     - criterion: regression and maintainability
       disposition: checked_finding
-      evidence: I28-DR-001 and I28-DR-002
+      evidence: I28-DR-001, I28-DR-002 and I28-DR-004
   validation_assessment:
     - item: exact-head .NET tests
       result: supported
@@ -209,7 +209,7 @@ review:
     validation_evidence:
       - normal review, not independent final review
   summary:
-    - 3 medium findings; no blocking/high findings
+    - 3 medium findings and 1 low finding; no blocking/high findings
     - design needs rework before ASPIRE-002 implementation
 
 report:
@@ -251,6 +251,15 @@ findings:
     evidence: receiver only stores packets; buffer overwrites per camera and clears batches
     required_action: define a RuntimeHost receiver counter/log/test seam and evidence collection path; do not substitute an independent sniffer count
 
+  - id: I28-DR-004
+    severity: low
+    origin: coverage_miss
+    location: Tracker/Design/Testing/aspire-simulation-test-environment.md:134-146,204-211
+    description: the design requires a simulator-to-crane startup order but the AppHost model contract and planned tests do not define any wait dependency; WithReference alone does not order startup
+    impact: an implementation can satisfy all listed model checks while starting resources concurrently and violating the stated ordering contract
+    evidence: current Aspire documents startup ordering through WaitForStart/WaitFor annotations; the design only discusses WaitFor health readiness and has no wait-dependency test item
+    required_action: either define WaitForStart-style dependency edges and model-test them, or remove the startup-order requirement and explicitly allow parallel startup
+
 held:
   - item: Linux/Windows/macOS ASPIRE-NET runtime packet tests
     reason: AppHost and runtime integration are not implemented yet
@@ -278,6 +287,7 @@ source_payloads:
         - I28-DR-001
         - I28-DR-002
         - I28-DR-003
+        - I28-DR-004
       held:
         - cross-platform runtime checks deferred until implementation
       unexplored: []
@@ -309,7 +319,7 @@ next_action:
   type: design_rework
   target_skill: implementation-worker
   mode: review_follow_up
-  summary: resolve I28-DR-001 through I28-DR-003, then return to this same normal review chat for fix verification
+  summary: resolve I28-DR-001 through I28-DR-004, then return to this same normal review chat for fix verification
   instructions:
     - preserve finding IDs and severities
     - update authoritative design contracts, not only reports/handoffs

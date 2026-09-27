@@ -96,21 +96,39 @@ ASPIRE-NET-002/003 は RuntimeHost の受信 packet count 増加を合格条件�
 
 ASPIRE-NET-002/003 の packet count を取得する production path を設計で固定する。RuntimeHost receiver 自身の受信を証明できる counter / diagnostic log / integration-test seam のいずれかを定義し、独立 sniffer の count を RuntimeHost 受信数として代用しない。
 
+### I28-DR-004 / Low / coverage_miss
+
+**場所**
+- `Tracker/Design/Testing/aspire-simulation-test-environment.md:134-146`
+- `Tracker/Design/Testing/aspire-simulation-test-environment.md:204-211`
+
+**内容**
+
+設計は `simulator` → `cm4-sim` → `duck` → `crane` の起動順序を要求するが、AppHost のアプリケーションモデル検査項目には待機依存の契約がない。Aspire の `WithReference` は接続情報の参照を構成するもので起動順序を制御せず、起動済み状態だけを待つ場合は `WaitForStart`、正常性まで待つ場合は `WaitFor` を使う必要がある。
+
+**影響**
+
+列挙済みのモデル検査をすべて満たしても各資源を並行起動する AppHost が成立し、設計が要求する起動順序を回帰テストで固定できない。UDP の正常性確認を後段へ保留することと、プロセス開始順序を固定することも区別されていない。
+
+**必須対応**
+
+この順序が必要なら `WaitForStart` などでどの資源間に開始依存を置くかを正本設計へ明記し、AppHost のモデル検査でその待機依存を固定する。順序が不要なら、順序を成功条件として読める記述を削除し、並行起動を許容する契約へ変更する。`WaitFor` を使う正常性確認は、現行方針どおり観測可能な正常性条件を定義してから別途導入する。
+
 ## Coverage
 
 | 観点 | disposition | 根拠 |
 | --- | --- | --- |
-| requirement / design conformance | checked_finding | I28-DR-001、002、003 |
-| correctness / edge cases | checked_finding | source collision、UDP port reuse、受信証跡 |
+| requirement / design conformance | checked_finding | I28-DR-001、002、003、004 |
+| correctness / edge cases | checked_finding | source collision、UDP port reuse、受信証跡、起動順序 |
 | scope discipline | checked_no_finding | 変更は設計・台帳・report・handoff に限定 |
 | changed files / direct dependencies | checked_no_finding | 変更11ファイルと直接依存を確認 |
-| API / config / compatibility | checked_finding | I28-DR-001、002 |
+| API / config / compatibility | checked_finding | I28-DR-001、002、004 |
 | failure diagnostics | checked_no_finding | `.github/workflows/dotnet-test.yml` は失敗時 artifact を保存 |
 | security / secrets | not_applicable | 設計文書のみ |
-| tests / validation adequacy | checked_finding | I28-DR-003 |
+| tests / validation adequacy | checked_finding | I28-DR-003、004 |
 | current-HEAD CI | checked_no_finding | reviewed HEAD と一致する run #141 success |
 | report / tracking accuracy | checked_no_finding | ASPIRE-001 台帳と段階別 report / handoff を確認 |
-| regression / maintainability | checked_finding | I28-DR-001、002 |
+| regression / maintainability | checked_finding | I28-DR-001、002、004 |
 
 ## 検証
 
@@ -132,11 +150,11 @@ reviewed HEAD `7a58472d527d52efceccd21b55bfde0b9d0b82db` に対する `.NET test
 
 **fail**
 
-Medium finding 3 件。設計上の解釈分岐、port 競合判定の未定義、受入証跡の不可観測性を設計段階で解消してから ASPIRE-002 以降へ進む必要がある。blocking / high finding はない。
+Medium finding 3 件、Low finding 1 件。設計上の解釈分岐、port 競合判定の未定義、受入証跡の不可観測性、起動順序の契約不足を設計段階で解消してから ASPIRE-002 以降へ進む必要がある。blocking / high finding はない。
 
 ## 次の作業
 
-I28-DR-001 から I28-DR-003 を設計へ反映する。修正後は同じ normal review chat で fix verification を行い、各 finding の required action、正本設計変更、対応 test 契約、focused evidence を確認する。
+I28-DR-001 から I28-DR-004 を設計へ反映する。修正後は同じ normal review chat で fix verification を行い、各 finding の required action、正本設計変更、対応 test 契約、focused evidence を確認する。
 
 ## Merge 境界
 
