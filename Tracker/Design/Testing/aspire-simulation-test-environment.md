@@ -62,7 +62,9 @@ Linux の Docker Engine では host network はコンテナとホストのネッ
 
 Docker Desktop を使う場合は host networking の有効化が必要である。初期受入環境は Linux の Docker Engine とし、Docker Desktop での動作は別途確認項目とする。
 
-host network では SSL-Vision の UDP 10020 に加え、採用するシミュレータ構成が使う制御ポートをホスト全体で共有する。このため初期構成は同一ホストで同時に一組だけ起動し、利用ポートを使う別プロセスとの競合を起動前に検出する。Aspire の `--isolated` を指定しても、この固定 UDP ポートは分離されないものとして扱う。
+host network では SSL-Vision と tracker multicast、採用するシミュレータ構成の制御ポートをホスト全体で共有する。ポートは用途で分け、`10020` と `11010` は複数 receiver が `SO_REUSEADDR` を使って同時受信する共有 multicast port とする。一方、UDP 10300 / 10301 / 10302 のうち構成で有効にする listener と、Crane 経路の UDP 12345 / 12346 は一つの stack が占有する制御 port とする。`10020` / `11010` の単純な bind 可否や in-use 判定を二重 stack の検出には使わない。
+
+同一ホストで同じ Duck Aspire stack を二つ起動すること自体は、AppHost が resource 起動前に取得して終了まで保持する host-local の stack ownership lock で拒否する。初期実装は一意な lock file を `FileShare.None` で開いた handle を保持する方式とし、ファイルの存在だけでは失敗としない。二つ目の AppHost が lock を取得できなければ resource を起動せず明示的に失敗する。別プロセスとの競合確認は占有制御 port だけを対象とし、共有 multicast port は実 packet の複数受信試験で検証する。Aspire の `--isolated` を指定しても、この ownership と固定 UDP port は分離されないものとして扱う。
 
 Crane の現在のシナリオ構成では、`visibility_graph` を使う場合に `crane` が mode 4 の位置指令を UDP 12345 へ送り、`cm4-sim` が実機 CM4 相当の位置制御を行って mode 3 の速度指令を UDP 12346 へ転送する。したがって Crane を既存 image の現在の挙動のまま組み込む初期構成では、汎用 SSL simulation protocol の 10301 / 10302 へ直接送る経路へ置き換えない。
 
@@ -214,6 +216,10 @@ Docker を必要とする一括起動試験は、AppHost のモデル検査と�
 
 一括起動試験では、単に全資源が `Running` になっただけで成功としない。SSL-Vision の受信と Duck のトラッカーパケット出力までを試験証跡に含める。
 
+stack ownership の focused test では、一つ目の AppHost が lock を保持している間は二つ目が resource 起動前に失敗し、最初の AppHost 終了後は同じ lock file が残っていても次の起動が成功することを固定する。`10020` / `11010` の bind 可否はこの判定に使わない。占有制御 port の外部競合は別テストで事前検出を固定する。
+
+`RuntimeVisionReceiverService` の focused test では、有効な SSL-Vision packet を decode して buffer へ渡すたびに `VisionPacketsReceivedTotal` が増加し、診断ログから endpoint、interface、累積値を取得できることを先に固定する。decode に失敗した UDP packet はこの正常受信 counter へ加算しない。
+
 ## 対応 OS の動作確認仕様
 
 クロスプラットフォーム対応は、.NET のビルド成功だけでは完了としない。Docker の host network と UDP multicast が実際の開発ホストで成立することを確認してから、その OS を対応済みとして扱う。
@@ -231,14 +237,16 @@ Docker を必要とする一括起動試験は、AppHost のモデル検査と�
 | ID | 経路 | 合格条件 |
 | --- | --- | --- |
 | `ASPIRE-NET-001` | AppHost 起動 | Simulator、Crane、`cm4-sim`、Duck が起動し、要求した比較資源も起動できる。 |
-| `ASPIRE-NET-002` | container → host SSL-Vision multicast | Simulator が `224.5.23.2:10020` へ送信し、ホスト上の `Tracker.RuntimeHost` が継続受信する。安定起動後5秒以内に受信 packet count が10件以上増加する。 |
-| `ASPIRE-NET-003` | 同一 multicast の複数受信 | comparison mode では `Tracker.RuntimeHost` と `Tracker.DebugHost` が同時に `224.5.23.2:10020` を受信し、双方の packet count が増加する。 |
+| `ASPIRE-NET-002` | container → host SSL-Vision multicast | Simulator が `224.5.23.2:10020` へ送信し、ホスト上の `Tracker.RuntimeHost` が継続受信する。安定起動後5秒以内に RuntimeHost receiver 自身の `VisionPacketsReceivedTotal` が10件以上増加する。 |
+| `ASPIRE-NET-003` | 同一 multicast の複数受信 | comparison mode では `Tracker.RuntimeHost` と `Tracker.DebugHost` が同時に `224.5.23.2:10020` を受信し、RuntimeHost の `VisionPacketsReceivedTotal` と DebugHost の raw input packet count が同じ確認窓でともに増加する。 |
 | `ASPIRE-NET-004` | container → container SSL-Vision multicast | TIGERs と ER-Force が同じ `224.5.23.2:10020` を受信し、それぞれ tracker output を生成する。 |
 | `ASPIRE-NET-005` | container → host tracker multicast | TIGERs / ER-Force が `224.5.23.2:11010` へ送信し、`Tracker.DebugHost` が両者を別 source として受信する。 |
 | `ASPIRE-NET-006` | host → host tracker multicast | Duck が `224.5.23.2:11010` へ送信し、`Tracker.DebugHost` が Duck source として受信する。 |
 | `ASPIRE-NET-007` | host network の制御 UDP | Crane → `cm4-sim` の UDP 12345 と `cm4-sim` → Simulator の UDP 12346 が通り、ロボット指令の結果が SSL-Vision の位置変化へ反映される。 |
 | `ASPIRE-NET-008` | multicast interface 選択 | `InterfaceAddress` 未指定の通常経路を確認し、複数 NIC / VPN 等で自動選択が成立しない場合は明示 IPv4 address の指定で受信できることを確認する。 |
-| `ASPIRE-NET-009` | 固定 port 競合 | 同一ホストで二つ目の stack を起動しようとした場合、利用中 port を起動前に検出して明示的に失敗する。 |
+| `ASPIRE-NET-009` | stack ownership / 固定 port 競合 | 同一ホストで二つ目の stack を起動しようとした場合は AppHost の stack ownership lock を resource 起動前に取得できず明示的に失敗する。外部プロセスとの port 競合は占有制御 port だけを事前確認し、共有 multicast port `10020` / `11010` の in-use 判定は失敗条件にしない。 |
+
+`Tracker.RuntimeHost` には OS 受入用の production diagnostics として、正常に decode して `RuntimeVisionPacketBuffer` へ渡した SSL-Vision packet の累積値 `VisionPacketsReceivedTotal` を追加する。receiver service が値を単調増加させ、起動時と一定間隔の診断ログに endpoint、選択 interface、累積値を出力する。`ASPIRE-NET-002/003` はこのログの確認前後差分を RuntimeHost の受信数として使う。独立 packet sniffer の count はネットワーク補助証跡には使えるが、RuntimeHost が受信した packet count の代用にはしない。DebugHost 側は既存の raw input snapshot が持つ packet count を使う。
 
 packet count の条件は、単に socket が作成できたことではなく実 packet が継続して届いていることを確認するための最低条件とする。
 
@@ -253,9 +261,9 @@ packet count の条件は、単に socket が作成できたことではなく�
 - Aspire の resource 状態。
 - Simulator、Crane、`cm4-sim`、TIGERs、ER-Force の標準出力・標準エラー。
 - `Tracker.RuntimeHost` / `Tracker.DebugHost` の標準出力・標準エラー。
-- SSL-Vision と tracker packet の確認前後の packet count。
+- RuntimeHost の `VisionPacketsReceivedTotal` と DebugHost の raw input packet count の確認前後値。tracker packet は DebugHost の source ごとの受信数を併記する。
 - DebugHost が認識した tracker source identity。
-- 使用中 port と競合検出結果。
+- stack ownership lock の取得結果と、占有制御 port の競合検出結果。共有 multicast port `10020` / `11010` は in-use 判定の対象外であることも記録する。
 
 Linux は自動統合試験を基本とする。Windows / macOS は Docker Desktop が必要なため、専用 runner または手動の受入試験でもよいが、実機の成功証跡を残すまで対応済みとは扱わない。
 
