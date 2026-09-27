@@ -214,6 +214,53 @@ Docker を必要とする一括起動試験は、AppHost のモデル検査と�
 
 一括起動試験では、単に全資源が `Running` になっただけで成功としない。SSL-Vision の受信と Duck のトラッカーパケット出力までを試験証跡に含める。
 
+## 対応 OS の動作確認仕様
+
+クロスプラットフォーム対応は、.NET のビルド成功だけでは完了としない。Docker の host network と UDP multicast が実際の開発ホストで成立することを確認してから、その OS を対応済みとして扱う。
+
+確認対象は次の三環境とする。
+
+- Linux + Docker Engine。
+- Windows + Docker Desktop の Linux containers。host networking を有効にする。
+- macOS + Docker Desktop の Linux containers。host networking を有効にする。
+
+未実施の OS は「未確認」とし、他 OS の成功結果を代用しない。
+
+### 必須確認項目
+
+| ID | 経路 | 合格条件 |
+| --- | --- | --- |
+| `ASPIRE-NET-001` | AppHost 起動 | Simulator、Crane、`cm4-sim`、Duck が起動し、要求した比較資源も起動できる。 |
+| `ASPIRE-NET-002` | container → host SSL-Vision multicast | Simulator が `224.5.23.2:10020` へ送信し、ホスト上の `Tracker.RuntimeHost` が継続受信する。安定起動後5秒以内に受信 packet count が10件以上増加する。 |
+| `ASPIRE-NET-003` | 同一 multicast の複数受信 | comparison mode では `Tracker.RuntimeHost` と `Tracker.DebugHost` が同時に `224.5.23.2:10020` を受信し、双方の packet count が増加する。 |
+| `ASPIRE-NET-004` | container → container SSL-Vision multicast | TIGERs と ER-Force が同じ `224.5.23.2:10020` を受信し、それぞれ tracker output を生成する。 |
+| `ASPIRE-NET-005` | container → host tracker multicast | TIGERs / ER-Force が `224.5.23.2:11010` へ送信し、`Tracker.DebugHost` が両者を別 source として受信する。 |
+| `ASPIRE-NET-006` | host → host tracker multicast | Duck が `224.5.23.2:11010` へ送信し、`Tracker.DebugHost` が Duck source として受信する。 |
+| `ASPIRE-NET-007` | host network の制御 UDP | Crane → `cm4-sim` の UDP 12345 と `cm4-sim` → Simulator の UDP 12346 が通り、ロボット指令の結果が SSL-Vision の位置変化へ反映される。 |
+| `ASPIRE-NET-008` | multicast interface 選択 | `InterfaceAddress` 未指定の通常経路を確認し、複数 NIC / VPN 等で自動選択が成立しない場合は明示 IPv4 address の指定で受信できることを確認する。 |
+| `ASPIRE-NET-009` | 固定 port 競合 | 同一ホストで二つ目の stack を起動しようとした場合、利用中 port を起動前に検出して明示的に失敗する。 |
+
+packet count の条件は、単に socket が作成できたことではなく実 packet が継続して届いていることを確認するための最低条件とする。
+
+### OS ごとの証跡
+
+各 OS の確認では、少なくとも次を記録する。
+
+- OS 名と version。
+- Docker Engine / Docker Desktop の version。
+- Docker Desktop の場合は host networking の有効状態。
+- 使用した IPv4 interface 一覧と、明示した `InterfaceAddress`。
+- Aspire の resource 状態。
+- Simulator、Crane、`cm4-sim`、TIGERs、ER-Force の標準出力・標準エラー。
+- `Tracker.RuntimeHost` / `Tracker.DebugHost` の標準出力・標準エラー。
+- SSL-Vision と tracker packet の確認前後の packet count。
+- DebugHost が認識した tracker source identity。
+- 使用中 port と競合検出結果。
+
+Linux は自動統合試験を基本とする。Windows / macOS は Docker Desktop が必要なため、専用 runner または手動の受入試験でもよいが、実機の成功証跡を残すまで対応済みとは扱わない。
+
+Windows / macOS で container と host の multicast が成立しない場合、別 OS の成功を代用せず失敗として記録する。UDP relay / gateway や unicast 化は後続設計として検討し、試験中に暗黙の fallback を入れない。
+
 ## トラッカー比較デバッグ
 
 通常の Duck + Crane シミュレーションとは別に comparison mode を用意し、TIGERs / ER-Force の tracker source と `Tracker.DebugHost` を追加起動できるようにする。
@@ -263,6 +310,7 @@ Issue #14 の比較試験を行うときは、`tigers-tracker` と `erforce-trac
 - 開発者が各資源の起動コマンドを個別に管理しなくてよい。
 - AppHost が管理する全資源の標準出力と標準エラーを Aspire から確認できる。
 - SSL-Vision 受信と Duck のトラッカーパケット出力を含む正常経路を確認できる。
+- Linux、Windows Docker Desktop、macOS Docker Desktop について `ASPIRE-NET-001` から `ASPIRE-NET-009` の適用項目を確認し、未確認 OS を対応済みと表現しない。
 - 実装と試験の証跡を報告書へ残し、PR の最新コミットと同じ SHA の CI だけを最終確認に使う。
 ## 参照
 

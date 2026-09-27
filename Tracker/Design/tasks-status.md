@@ -17,10 +17,12 @@
   - Docker とホスト間の UDP 通信方式を固定する。
   - AppHost の配置、設定、起動順、テスト方針、診断方針を設計書へ残す。
   - 同じ raw vision を Duck / TIGERs / ER-Force tracker へ与え、`Tracker.DebugHost` で source identity、時刻差、物体差を比較できる設計を残す。
+  - Linux / Windows Docker Desktop / macOS Docker Desktop で host network と multicast を実 packet で確認する受入仕様を固定する。
   - 実装作業をレビュー可能な単位へ分割する。
 - 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
 - 比較デバッグ設計: `Tracker/Design/Testing/tracker-comparison-debug-design.md`
 - 比較デバッグ報告: `reports/issue18-tracker-comparison-debug-design-20260923.md`
+- OS別ネットワーク確認報告: `reports/issue18-cross-platform-network-verification-design-20260927.md`
 - 報告: `reports/issue18-aspire-simulation-test-environment-design.md`
 - 追加報告: `reports/issue18-aspire-crane-image-design-update-20260923.md`
 - 2026-09-23 の設計更新: `ibis-ssl/crane` の現行 `docker/Dockerfile`、Docker image 公開 workflow、シナリオ構成を照合し、Crane を GHCR image から起動する方針へ固定した。`visibility_graph` の mode 4 指令を維持するため、既存の `cm4-sim` image を介して simulator へ mode 3 を渡す経路も設計へ反映した。Simulator も Crane の現行シナリオで使う `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を利用する。
@@ -28,7 +30,8 @@
 - 2026-09-23 の比較デバッグ設計: Duck / TIGERs / ER-Force を同じ raw vision `224.5.23.2:10020` へ接続し、三者の official tracker packet を `224.5.23.2:11010` へ集約して `Tracker.DebugHost` で分離受信する。live は同一 UI render tick、replay は同一 diagnostics sample tick を共通基準とし、robot は team + id、ball は tracker 固有 track id に依存しない対応付けで位置・速度・角度・存在差を確認する。
 - 2026-09-23 の比較設計検証: `aspire-simulation-test-environment.md` と `tracker-comparison-debug-design.md` の CSpell は指摘 0、`git diff --check` 成功。全体 `npm run lint:md` は同じ `.agents` 欠落で終了値 1。
 - 検証: 新規設計書の CSpell は指摘 0。`git diff --cached --check` 成功。全体 `npm run lint:md` は現行 `main` に `.agents/skills/review-enforcer` が存在しないため実行経路で阻害。
-- 次作業: `ASPIRE-002` で AppHost の骨格とアプリケーションモデルの失敗テストから実装を開始する。通常シミュレーションの `ASPIRE-002` から `ASPIRE-005` の後、`ASPIRE-006A` から `ASPIRE-006E` で TIGERs / ER-Force tracker の比較デバッグを追加する。
+- 2026-09-27 の OS 別確認仕様: `ASPIRE-NET-001` から `ASPIRE-NET-009` を追加し、Linux / Windows Docker Desktop / macOS Docker Desktop の container → host、container → container multicast、同一 group / port の複数受信、interface 明示 fallback、固定 port 競合を受入条件として固定した。未確認 OS は対応済みと扱わない。
+- 次作業: `ASPIRE-002` で AppHost の骨格とアプリケーションモデルの失敗テストから実装を開始する。通常シミュレーションの `ASPIRE-002` から `ASPIRE-005` の後、`ASPIRE-006A` から `ASPIRE-006E` で TIGERs / ER-Force tracker の比較デバッグを追加し、各段階の統合確認で `ASPIRE-NET-*` を実施する。
 - 対象外: 今回は設計のみ。AppHost、image 接続、製品コードの実装は行わない。
 
 - ID: `DOC-LINT-003`

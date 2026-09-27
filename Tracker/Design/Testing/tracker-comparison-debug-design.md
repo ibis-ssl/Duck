@@ -173,6 +173,21 @@ TIGERs または ER-Force tracker の一方が起動できなくても Duck と 
 
 ただし比較モードの状態は、要求した tracker source が受信できていない場合に `Ready` としない。Aspire の resource 状態と DebugHost の source 一覧の両方で欠落を確認できるようにする。
 
+## OS 別ネットワーク動作確認
+
+比較モードは `Tracker/Design/Testing/aspire-simulation-test-environment.md` の `ASPIRE-NET-001` から `ASPIRE-NET-009` に従って Linux、Windows Docker Desktop、macOS Docker Desktop を個別に確認する。
+
+特に比較モードでは次を必須とする。
+
+- Simulator container の `224.5.23.2:10020` を、TIGERs container、ER-Force container、ホスト上の `Tracker.RuntimeHost`、`Tracker.DebugHost` が同時に受信できる。
+- TIGERs / ER-Force container の `224.5.23.2:11010` をホスト上の `Tracker.DebugHost` が受信できる。
+- Duck の `224.5.23.2:11010` も同じ DebugHost が同時に受信し、Duck / TIGERs / ER-Force を別 source として保持できる。
+- 同一 multicast group / port の複数受信で、一つの受信者を起動したことにより他の受信者の packet count が停止しない。
+- `InterfaceAddress` 未指定時と、明示 IPv4 address を指定した fallback の両方を確認する。
+- VPN、Tailscale、複数 NIC がある環境では interface 一覧と選択結果を証跡へ残す。
+
+Windows / macOS で multicast が成立しない場合は comparison mode を Ready とせず、relay などの別方式へ自動的に切り替えない。
+
 ## テスト方針
 
 実装は TDD で行う。
@@ -223,3 +238,4 @@ DebugHost の focused test では次を固定する。
 - robot の位置・速度・角度・存在差と、ball の対応・位置・速度・存在差を追跡できる。
 - 時刻差が物体差と分離して表示され、古い snapshot を同時刻の結果と誤認しない。
 - 比較機能が利用できない場合でも通常の Duck + Crane シミュレーション試験は維持される。
+- 対応対象 OS ごとに container → host / container → container の multicast と同一 group / port の複数受信を実機で確認し、未確認 OS を対応済みと扱わない。
