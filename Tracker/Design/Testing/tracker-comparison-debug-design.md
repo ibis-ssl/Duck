@@ -149,7 +149,9 @@ tracker ごとの ball track id は同一性を保証しないため、異なる
 
 両 source が単一ボールだけを出している場合はその二つを比較する。
 
-複数ボールが存在する場合は位置距離に基づく一対一対応を行い、対応しないボールは unmatched として表示する。対応距離の上限は設定可能にし、上限を越えたボールを無理に同一物体へ対応付けない。
+複数ボールが存在する場合は XY 平面の位置距離に基づく一対一対応を行う。各 source の `TrackedFrame.balls` に現れる順序を source-local index として保持し、track id は対応付けに使わない。有限な XY 座標を持つ二つのボールについて、ユーザー設定の距離上限以下の組だけを候補 edge とする。距離が上限と等しい組は候補に含め、上限を越える組は候補に含めない。
+
+assignment の結果は、まず候補 edge 内で対応する pair 数を最大化し、次に全 pair の XY 距離合計を最小化する。同じ pair 数かつ同じ距離合計になる解が複数ある場合は、`(reference source-local index, comparison source-local index)` の pair を reference index、comparison index の順に並べた列を辞書順比較し、最小の列を採用する。特定の assignment algorithm は要求しないが、この優先順位と tie-break から得られる結果は実装によらず同一でなければならない。候補へ使えない位置のボールと、採用した pair に含まれないボールは unmatched とする。
 
 対応したボールについて、存在する項目だけを比較する。
 
@@ -228,6 +230,10 @@ DebugHost の focused test では次を固定する。
 - 同じ保存済み source metadata を live と replay の resolver へ与えると同じ logical role と comparison source identity に解決され、通常の diagnostics replay の source label aggregate は変更されない。
 - robot は team + id で対応付ける。
 - ball track id を tracker 間対応付けに使わない。
+- 2 対 1 と 1 対 2 の ball fixture で、pair 数最大化後に距離合計最小化で対応相手を決め、残りを unmatched にする。
+- 2 対 2 で局所的な最近傍選択では pair 数が減る fixture を使い、pair 数最大化を距離最小化より優先する。
+- 2 対 2 で pair 数と距離合計が同じになる fixture を使い、source-local index の辞書順 tie-break で結果が固定される。
+- ball 距離が gate と等しい fixture は matched、gate を越える fixture は unmatched とする。
 - missing / unmatched object をゼロ差分として扱わない。
 - live の Overlay と数値差分が同じ snapshot pair を使う。
 - replay の三 source が同じ selected diagnostics sample tick を基準にし、future snapshot を使わない。
