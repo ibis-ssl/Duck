@@ -135,17 +135,17 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 
 ## 起動順序
 
-Aspire は依存関係と起動順を管理するが、UDP サービスに HTTP のような既存の正常性確認先はない。
+Aspire の起動順序は `WaitForStart` による開始依存として明示する。`WithReference` は接続情報の参照を構成するために使い、起動順序の根拠にはしない。UDP サービスに HTTP のような既存の正常性確認先はないため、開始依存と正常性確認を分けて扱う。
 
-初期実装では次の順序を使う。
+既定の `visibility_graph` 構成では次の依存グラフを使う。
 
-1. `simulator` を起動する。
-2. `cm4-sim` を起動する。
-3. `duck` を起動する。
-4. `crane` を起動する。
-単にプロセスが起動したことと、UDP を正常に処理できることは区別する。`WaitFor` による正常性確認を導入する場合は、確認可能な正常性条件を追加してから使う。
+1. `simulator` は開始依存を持たずに起動する。
+2. `cm4-sim` と `duck` はそれぞれ `simulator` に `WaitForStart` し、`simulator` の開始後は互いの順序を要求せず並行起動を許可する。
+3. `crane` は `cm4-sim` と `duck` の両方に `WaitForStart` してから起動する。
 
-正常性確認がない段階では、存在しない正常性確認を成功条件として扱わない。
+`cm4-sim` を使わない planner を選択した場合、`crane` は存在しない `cm4-sim` への依存を作らず、`duck` に `WaitForStart` する。`duck` 自身が `simulator` に `WaitForStart` するため、この構成でも `simulator` の開始後に `crane` を起動する。
+
+`WaitForStart` が保証するのは対象資源が起動済み状態になったことまでであり、UDP を正常に処理できることまでは保証しない。`WaitFor` による正常性確認を導入する場合は、確認可能な正常性条件を追加してから使う。正常性確認がない段階では、存在しない正常性確認を成功条件として扱わない。
 
 ## 操作
 
@@ -211,6 +211,8 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 - Duck に `sim` 用の VisionReceiver 設定が渡される。
 - シミュレータの geometry と realism が明示される。
 - Crane の `team`、`planner` と `cm4-sim` の接続ポートが明示される。
+- 既定の `visibility_graph` 構成で、`cm4-sim` と `duck` が `simulator` への `WaitForStart` 依存を持ち、`crane` が `cm4-sim` と `duck` への `WaitForStart` 依存を持つ。
+- `cm4-sim` を使わない planner 構成では、`crane` が `duck` への `WaitForStart` 依存を持ち、存在しない `cm4-sim` への待機依存を持たない。
 
 Docker を必要とする一括起動試験は、AppHost のモデル検査と分離する。Docker が利用できない環境でも、アプリケーションモデルの退行を検出できるようにする。
 
