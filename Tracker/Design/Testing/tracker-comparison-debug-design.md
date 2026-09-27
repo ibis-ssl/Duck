@@ -86,7 +86,21 @@ AppHost から最低限、次を上書きする。
 
 `Tracker.DebugHost` の既存契約を維持し、外部 tracker の source identity は UUID を優先する。同じ UUID が複数の remote endpoint から届いても一つの source として集約し、候補のうち `ReceivedAt` が最新の snapshot を代表にする。endpoint ごとの物体を寄せ集めて一つの snapshot を合成しない。UUID が空または不明な場合だけ source name と remote endpoint を代用して source を分ける。
 
-comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の要求した三つの source role が互いに別の source identity へ解決できたかで判定する。同じ UUID に二つ以上の要求 role が対応して三者を区別できない場合は、その UUID を endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。source option も通常は UUID ごとの集約 source を一つだけ表示し、endpoint は衝突診断用の付随情報として表示する。
+comparison mode では、既存の `SourceRole` (`own` / `external` / `unknown`) と、比較対象を表す logical role (`Duck` / `TIGERs` / `ER-Force`) を別概念として扱う。既存の `SourceRole` は変更せず、logical role の解決には packet の source name を使う。
+
+| logical role | Aspire resource | 必須 source name |
+| --- | --- | --- |
+| `Duck` | `duck` | `ibis` |
+| `TIGERs` | `tracker-tigers` | `TIGERs` |
+| `ER-Force` | `tracker-erforce` | `ER-FORCE` |
+
+source name は `StringComparison.Ordinal` で完全一致させる。UUID は source identity の判定には使うが、logical role の判定には使わない。固定した image または Duck の `sim` profile を更新して source name が変わる場合は、この対応表と focused test を同じ変更で更新し、未定義の名称を推測して role へ割り当てない。
+
+logical role resolver は、代表 snapshot へ集約する前の受信 source metadata を入力にする。各 packet を上表の logical role 候補へ割り当てた後、既存の UUID 優先規則で comparison source identity を求める。UUID がある場合は UUID が identity を決め、UUID が無い場合だけ source name と remote endpoint を代用する。
+
+comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。
+
+live comparison の role selector は `Duck` / `TIGERs` / `ER-Force` を固定の選択肢とし、各 role から一意な comparison source identity を参照する。CaptureOn の保存では既存の endpoint-sensitive source key を維持し、通常の diagnostics replay にある `External` / `Unknown` / source label の aggregate source option も変更しない。comparison mode の replay だけが、保存済みの source name / UUID / remote endpoint に同じ logical role resolver と UUID 優先 identity 規則を再適用して三 role を解決する。したがって live と replay の role 判定は同じ契約を使いながら、既存 DebugHost の汎用 source-label replay 契約は維持する。
 
 ## 比較の時刻基準
 
@@ -205,10 +219,13 @@ AppHost の application model test で次を先に固定する。
 
 DebugHost の focused test では次を固定する。
 
-- UUID が異なる Duck / TIGERs / ER-Force を別 source として保持する。
-- 同一 UUID が複数 endpoint から届く場合は既存契約どおり一つの source option に集約し、`ReceivedAt` が最新の snapshot だけを代表にする。
-- 同一 UUID に複数の要求 source role が対応する場合は endpoint ごとに別 source とせず、role 解決不足として comparison mode を `Ready` にしない。
+- source name `ibis` / `TIGERs` / `ER-FORCE` がそれぞれ logical role `Duck` / `TIGERs` / `ER-Force` にだけ解決され、既存 `SourceRole` は三者とも `external` のままでも comparison role を識別できる。
+- UUID が異なる Duck / TIGERs / ER-Force を別 comparison source identity として保持する。
+- 同一 logical role と UUID が複数 endpoint から届く場合は既存契約どおり一つの identity に集約し、`ReceivedAt` が最新の snapshot だけを代表にする。
+- 同一 UUID に複数 logical role の source name が対応する場合は endpoint ごとに別 source とせず、role 解決不足として comparison mode を `Ready` にしない。
+- 同一 logical role に異なる UUID が同時に対応する場合も role 解決不足として `Ready` にしない。
 - UUID が空または不明な場合は source name と remote endpoint の代用 identity で分離し、異なる endpoint の packet を一つの snapshot へ混ぜない。
+- 同じ保存済み source metadata を live と replay の resolver へ与えると同じ logical role と comparison source identity に解決され、通常の diagnostics replay の source label aggregate は変更されない。
 - robot は team + id で対応付ける。
 - ball track id を tracker 間対応付けに使わない。
 - missing / unmatched object をゼロ差分として扱わない。
