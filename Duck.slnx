@@ -5,4 +5,5 @@
   <Project Path="Tracker/Tracker.Core/Tracker.Core.csproj" />
   <Project Path="Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj" />
   <Project Path="Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj" />
+  <Project Path="Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj" />
 </Solution>
