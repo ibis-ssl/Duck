@@ -13,7 +13,7 @@ namespace Tracker.RuntimeHost;
 /// </summary>
 internal sealed class RuntimeVisionReceiverService : BackgroundService
 {
-    private static readonly TimeSpan DiagnosticsLogInterval = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan DiagnosticsLogInterval = TimeSpan.FromSeconds(4);
 
     private readonly IOptions<RuntimeVisionReceiverOptions> options;
     private readonly RuntimeVisionPacketBuffer packetBuffer;
