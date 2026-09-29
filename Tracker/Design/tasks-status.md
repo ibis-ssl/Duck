@@ -1,4 +1,4 @@
-# 作業状況
+﻿# 作業状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
 
@@ -37,8 +37,12 @@
 - 対戦タスク分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
 - `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
 - 2026-09-30 の `ASPIRE-002` Windows 実機確認: .NET SDK 10.0.401 で application model test 1 / 1 成功。AppHost 13.5.4 から `Tracker.RuntimeHost.exe` が起動し UDP 10020 を bind、AppHost 停止後に子プロセスと bind が解放されることを確認した。Docker / Simulator / multicast packet の OS 別受入確認は後続タスクのまま。
-- 次作業: 実装タスク分割に従い `ASPIRE-003A` の RuntimeHost SSL-Vision 受信診断へ進む。各実装タスクは TDD の失敗確認と実装を分けて記録し、クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
-- 今回の実装範囲: `ASPIRE-002` の AppHost 骨格と application model 契約まで。Simulator / Game Controller / Crane / `cm4-sim` / comparison / match 資源、RuntimeHost 受信診断、OS 別実 packet 受入は後続タスクで扱う。
+- `ASPIRE-003` 実装報告: `reports/pr28-aspire-003-implementation-20260930.md`
+- 2026-09-30 の `ASPIRE-003A` 完了: `VisionPacketsReceivedTotal`、endpoint / interface / 累積値の周期診断、decode 失敗非加算を TDD で固定した。赤 commit `4245400` の同一 SHA CI は failure、緑 commit `efdcd79` の同一 SHA CI は success。Windows focused test は 3 / 3 成功。
+- 2026-09-30 の `ASPIRE-003B` 完了: ER-Force Simulator を `ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd`、host network、Crane 基準の geometry / realism / IBIS 引数で追加し、Duck の sim 用 `224.5.23.2:10020` 設定を application model test で固定した。赤 commit `2cbab11` の同一 SHA CI は failure、緑 commit `067be55` の同一 SHA CI は success。
+- 2026-09-30 の Linux `ASPIRE-NET-002`: Ubuntu 24.04 / Docker Engine 28.0.4 の run `36625776852` で RuntimeHost が `224.5.23.2:10020` を受信し、`VisionPacketsReceivedTotal` は 0 から 232 へ 3960 ms で増加した。run の `headSha` は検証時の PR HEAD `5c110dd` と一致し、`.NET tests` と Linux packet flow はともに success。成功 artifact `aspire-net-002-36625776852-1` に判定結果、標準出力、標準エラー、RuntimeHost / Simulator / Docker / network 診断を保存した。
+- 次作業: `ASPIRE-003A/B` は完了。`ASPIRE-004B` の依存のうち `ASPIRE-003B` 側は解消済みで、開始には `ASPIRE-004A` の完了も必要。クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
+- 今回の実装範囲: `ASPIRE-003A` の RuntimeHost SSL-Vision 受信診断、`ASPIRE-003B` の ER-Force Simulator resource、Linux `ASPIRE-NET-002` の実 packet 受入まで。Game Controller / Crane / `cm4-sim` / comparison / match 資源と残りの OS 別受入は後続タスクで扱う。
 
 ## ASPIRE 実装タスク分割（2026-09-29）
 
