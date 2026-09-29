@@ -34,7 +34,7 @@ public sealed class RefereeDriverNetworkAdapterTests
         await client.SendContinueActionAsync(action, CancellationToken.None);
 
         var sent = Assert.Single(transport.Messages);
-        Assert.Equal(GameControllerControlClient.DefaultEndpoint, sent.Endpoint);
+        Assert.Equal(GameControllerWebSocketControlClient.DefaultEndpoint, sent.Endpoint);
         Assert.Equal(
             $"{{\"continue_action\":{{\"type\":\"{expectedType}\",\"for_team\":\"UNKNOWN\"}}}}",
             sent.Json);
