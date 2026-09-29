@@ -43,7 +43,7 @@ AppHost では三つの主要資源に加え、レフェリー / game-state を�
 | 資源名 | 実行形態 | 責務 |
 | --- | --- | --- |
 | `simulator` | Docker image | Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` から ER-Force `simulator-cli` を起動し、物理シミュレーションと SSL-Vision 出力を行う。 |
-| `game-controller` | Docker image | `robocupssl/ssl-game-controller:<fixed tag or digest>` を host network で起動し、通常 mode / comparison mode の両方で `224.5.23.1:11003` の referee message を生成する唯一の authoritative producer とする。制御 API は `127.0.0.1:8082` を使う。 |
+| `game-controller` | Docker image | `robocupssl/ssl-game-controller:<fixed tag or digest>` を host network で起動し、通常 mode / comparison mode / match mode のすべてで `224.5.23.1:11003` の referee message を生成する唯一の authoritative producer とする。制御 API は `127.0.0.1:8082` を使う。 |
 | `crane` | Docker image | `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` から Crane を起動し、ロボット制御指令を生成する。 |
 | `cm4-sim` | Docker image | `ghcr.io/ibis-ssl/orion-cm4-sim:<commit SHA>` を使い、Crane が `visibility_graph` で出す mode 4 の位置指令を現在の Crane シナリオ構成と同じ経路で mode 3 の速度指令へ変換する補助資源。 |
 | `duck` | .NET プロセス | `Tracker.RuntimeHost` を `sim` 設定で起動し、SSL-Vision を追跡してトラッカーパケットを出力する。 |
@@ -136,11 +136,13 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 
 ## レフェリー / game-state の所有権
 
-`224.5.23.1:11003` の referee message は、通常 mode / comparison mode の両方で `game-controller` だけが生成する。11003 は複数 consumer が受信する multicast endpoint であり、socket の bind 可否では producer の一意性を判定しない。AppHost の構成上、11003 を publish する資源を `game-controller` 一つに限定する。
+`224.5.23.1:11003` の referee message は、通常 mode / comparison mode / 対戦モードのすべてで `game-controller` だけが生成する。11003 は複数 consumer が受信する multicast endpoint であり、socket の bind 可否では producer の一意性を判定しない。AppHost の構成上、11003 を publish する資源を `game-controller` 一つに限定する。
 
 通常 mode では standalone の `game-controller` が authoritative producer になる。comparison mode でも同じ `game-controller` を使い、`tracker-tigers` は Sumatra の referee module を `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` に固定した外部 Game Controller 用設定で起動する。標準の `simulation_protocol.xml` のように内蔵 Game Controller を有効にする構成は使わない。`tracker-erforce` の `--gc-port 11003` も consumer として扱い、referee message を publish させない。
 
-`game-controller` の制御 API `127.0.0.1:8082` はこの stack の `game-controller` が占有する。`referee-driver` は API client としてだけ動作し、11003 の producer にはならない。再現可能な試験では Game Controller image を固定 tag または digest で指定し、初期 referee command が `HALT` である fixture を固定する。
+対戦モードも同じ `game-controller` を使う。`tigers-blue` は Duck 側で固定する対戦用 `simulation_protocol_fixed.xml` 相当の設定により `source=NETWORK`、`port=11003`、`gameController=false` とし、`autoref-tigers` は referee consumer / Game Controller client として動作する。対戦の進行操作を行う `match-controller` も API client に限定し、11003 を直接 publish しない。
+
+`game-controller` の制御 API `127.0.0.1:8082` はこの stack の `game-controller` が占有する。通常 mode / comparison mode の `referee-driver` は API client としてだけ動作し、11003 の producer にはならない。これらの active-motion 試験では初期 referee command が `HALT` である fixture を固定する。対戦モードでは Crane の現行対戦構成を基準に Blue=`TIGERs Mannheim`、Yellow=`ibis`、初期 command=`STOP` の対戦 fixture を別に使い、`match-controller` が API client として試合を進行させる。どちらも再現可能な試験では Game Controller image を固定 tag または digest で指定する。
 
 ## 起動順序
 
@@ -168,6 +170,16 @@ aspire run --apphost Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
 停止は Aspire の通常の停止操作に従い、AppHost の終了時に `simulator`、`cm4-sim`、`crane` の各コンテナと Duck の子プロセスを終了する。
 
 個別資源の再起動とログ確認は Aspire ダッシュボードから行える構成にする。
+
+### 実行モードの選択
+
+AppHost 自身の設定 `Testing:Mode` で起動構成を選ぶ。値は `base`、`comparison`、`match` の三つに限定し、未指定時は `base` とする。未知の値は resource を起動する前に設定エラーとして失敗させる。
+
+- `base`: Simulator、Game Controller、Crane、必要な `cm4-sim`、Duck を起動する。
+- `comparison`: `base` に `tracker-tigers`、`tracker-erforce`、`debug-host` を追加する。
+- `match`: 対戦用 Simulator / Game Controller fixture、Crane、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、Duck を起動し、`cm4-sim`、`tracker-tigers`、`tracker-erforce`、`debug-host` は起動しない。
+
+`match` は `comparison` の追加オプションではなく排他的な構成とする。これにより、比較用 tracker と対戦用 Sumatra AI を同時に起動して 11010 やチーム制御の意味を混在させない。
 
 ## 設定の責務
 
@@ -206,6 +218,16 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 
 ライブでは既存の Split / Overlay を使い、保存後は diagnostics sample tick を共通の選択時点として比較する。物体単位の位置・速度・角度・存在差を数値で確認する詳細設計は `Tracker/Design/Testing/tracker-comparison-debug-design.md` を正本とする。
 
+`ASPIRE-006A` から `ASPIRE-006E` はこのトラッカー比較を実装単位へ分ける。
+
+### `ASPIRE-006F`: TIGERs vs Crane 対戦資源
+
+`ASPIRE-005` の基本 stack を基礎に、対戦用 Simulator 設定、対戦用 Game Controller fixture、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` を追加する。対戦モードでは `cm4-sim` を除外し、Crane は `team:=ibis`、Sumatra は `--aiBlue`、Duck は 11010 publish 無効として application model test で固定する。
+
+### `ASPIRE-006G`: TIGERs vs Crane 一括対戦試験
+
+`ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` を Linux の実 packet で確認し、双方の active motion、AutoRef / tracker 経路、試合終了、結果・SSL log・Crane の記録データ・resource log を証跡化する。勝敗は合否条件にしない。
+
 ## テスト方針
 
 実装では TDD を使う。
@@ -226,6 +248,11 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 - `referee-driver` の integration fixture が 11003 の `HALT` を確認してから Game Controller API へ continue action を送り、active command への遷移を確認できる。
 - 既定の `visibility_graph` 構成で、`cm4-sim` と `duck` が `simulator` への `WaitForStart` 依存を持ち、`crane` が `cm4-sim`、`duck`、`game-controller` への `WaitForStart` 依存を持つ。
 - `cm4-sim` を使わない planner 構成では、`crane` が `duck` と `game-controller` への `WaitForStart` 依存を持ち、存在しない `cm4-sim` への待機依存を持たない。
+- 対戦モードでは `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` が追加され、`cm4-sim` と比較専用 `tracker-tigers` は存在しない。
+- 対戦モードの Simulator 起動引数、Blue=`TIGERs Mannheim` / Yellow=`ibis` の team mapping、Crane の `team:=ibis`、Sumatra の `--aiBlue` が一組の設定として固定される。
+- 対戦用 Sumatra 設定が 10020 の vision、11003 の external referee、`gameController=false`、11010 の tracker output を持つ。
+- 対戦モードの Duck は 11010 への tracker publish が無効で、AutoRef の tracker 入力へ Duck source を混在させない。
+- `match-controller` が参加資源の開始後に起動し、Game Controller API、11003、10020 の実データを確認してから試合を開始する。
 
 Docker を必要とする一括起動試験は、AppHost のモデル検査と分離する。Docker が利用できない環境でも、アプリケーションモデルの退行を検出できるようにする。
 
@@ -293,6 +320,55 @@ comparison mode は同じ raw vision を Duck / TIGERs / ER-Force へ与え、`T
 
 比較の詳細、source identity、時刻対応、ball / robot の対応付け、数値差分、CaptureOn / replay の契約は `Tracker/Design/Testing/tracker-comparison-debug-design.md` に定義する。
 
+## TIGERs vs Crane 対戦モード
+
+TIGERs の AI と Crane を実際に対戦させる対戦モードを、トラッカー比較とは独立した AppHost の構成として用意する。設計の基準は 2026-09-29 時点の `ibis-ssl/crane` develop `af6e0d3dec745415ce060ff5de2042afd3ec5145` にある `docker/match-vs-tigers/docker-compose.yaml`、`simulation_protocol_fixed.xml`、`match_controller_pb.py` とする。
+
+トラッカー比較の `tracker-tigers` は AI を起動しないため、対戦モードには流用しない。対戦用 Sumatra は別資源 `tigers-blue` とし、Crane の現行対戦構成と同じく Blue 側 AI として起動する。
+
+| 資源名 | 実行形態 | 対戦モードでの責務 |
+| --- | --- | --- |
+| `simulator` | Docker image | ER-Force `simulator-cli` を host network で起動する。対戦用起動引数は Crane の現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003` を使う。 |
+| `game-controller` | Docker image | 11003 の唯一の referee producer とし、対戦用の初期状態を読み込む。 |
+| `crane` | Docker image | 固定した `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を使い、`sim:=true speak:=false team:=ibis` で Yellow 側を制御する。 |
+| `tigers-blue` | Docker image | 固定 tag または digest の `tigersmannheim/sumatra` を `--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol` で起動する。 |
+| `autoref-tigers` | Docker image | `tigersmannheim/auto-referee:1.2.0` を active / headless で起動し、vision 10020、referee 11003、tracker 11010 を使って試合判定を Game Controller へ返す。 |
+| `ssl-log-recorder` | Docker image | referee 11003、vision 10020、tracker 11010 を対戦証跡として保存する。 |
+| `match-controller` | 試験 fixture | Game Controller API、referee、vision の準備完了を確認し、試合開始・停止状態からの継続・終了監視・結果保存を行う。 |
+| `duck` | .NET プロセス | SSL-Vision の観測と Duck 側デバッグを継続する。ただし対戦判定へ影響を与えないよう、対戦モードでは official tracker multicast 11010 への publish を無効にする。 |
+
+対戦モードでは基本 stack の `visibility_graph` 用 `cm4-sim` を起動しない。Crane の現行 `match-vs-tigers` 構成は `cm4-sim` を含まず、対戦用 Simulator と Sumatra 設定を一体として使っているため、基本 mode の `--ibis-port 12346` / UDP 12345 / 12346 の経路を対戦モードへ混在させない。
+
+Sumatra へ渡す `simulation_protocol_fixed.xml` 相当の fixture は Duck 側で版管理し、少なくとも raw vision `224.5.23.2:10020`、referee `source=NETWORK` / port `11003` / `gameController=false`、`SumatraSimBotManager`、tracker output `224.5.23.2:11010` を固定する。Crane リポジトリを AppHost 起動時に clone して fixture を取得する方式にはしない。
+
+Game Controller の初期状態も Duck 側の対戦 fixture として版管理する。初期対戦は Crane の現行構成に合わせ、Blue team name を `TIGERs Mannheim`、Yellow team name を `ibis`、match type を `FRIENDLY` とする。Crane の `team:=ibis` と Sumatra の `--aiBlue` はこの team mapping と一組の契約として扱い、一方だけを変更しない。
+
+Crane の現行 compose は Sumatra、Game Controller、SSL log recorder に移動タグを含むが、Duck の再現可能な試験では暗黙の `latest` を使わない。AppHost 設定で image tag または digest を明示し、実行証跡へ解決済み image reference を保存する。Crane image は既存の `scenario-<commit SHA>` を既定とし、Crane の match workflow が同じ scenario image を `match-<commit SHA>` へ再タグ付けして利用できる構成と整合させる。
+
+### 対戦モードの起動順序
+
+1. `simulator` と `game-controller` を開始する。
+2. `duck`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder` は必要な `simulator` / `game-controller` に `WaitForStart` して起動する。
+3. `crane` は `simulator` と `game-controller` に `WaitForStart` して起動する。対戦モードでは存在しない `cm4-sim` への依存を作らない。
+4. `match-controller` は `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers` の開始後に起動する。
+5. `match-controller` は resource の Started 状態だけで試合を開始せず、Game Controller API 接続、11003 の referee message、10020 の SSL-Vision を実際に確認してから continue action を送る。
+
+`match-controller` は Crane の現行試合 controller を基準に、`HALT` / `STOP` から利用可能な continue action を選び、必要に応じて `NEXT_COMMAND`、`NORMAL_START`、`FORCE_START` を使って試合を進行させる。終了条件は `POST_GAME` または設定した最大試合時間とし、結果には少なくとも両チームの得点、終了理由、`CRANE WIN` / `TIGERs WIN` / `DRAW` のいずれかを保存する。
+
+勝敗そのものは CI の合否条件にしない。両 AI が同一試合へ参加し、試合が規定の終了条件まで進行し、結果と診断証跡を生成できることを対戦機能の正常条件とする。
+
+### 対戦モードの受入項目
+
+| ID | 確認内容 | 合格条件 |
+| --- | --- | --- |
+| `ASPIRE-MATCH-001` | resource model | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` が存在し、`cm4-sim` と比較専用 `tracker-tigers` は起動対象に入らない。 |
+| `ASPIRE-MATCH-002` | team / referee 契約 | Blue=`TIGERs Mannheim`、Yellow=`ibis`、Crane=`team:=ibis`、Sumatra=`--aiBlue` が一致し、11003 の producer は `game-controller` 一つだけである。 |
+| `ASPIRE-MATCH-003` | 双方の active motion | active referee state の同一確認窓で、SSL-Vision 上に Yellow の Crane robot と Blue の TIGERs robot の位置変化がそれぞれ観測できる。片側だけの移動では合格にしない。 |
+| `ASPIRE-MATCH-004` | AutoRef / tracker 経路 | `tigers-blue` が 11010 へ tracker packet を出力し、`autoref-tigers` が 10020 / 11003 / 11010 を使って active に動作する。Duck は 11010 へ publish せず、AutoRef の tracker 入力へ別 source を混在させない。 |
+| `ASPIRE-MATCH-005` | 試合完了と証跡 | `POST_GAME` または最大試合時間で終了し、対戦結果、全 resource の stdout / stderr、SSL log、Crane の記録データ、Game Controller / AutoRef / Sumatra の診断情報を保存できる。 |
+
+Linux の自動統合試験では `ASPIRE-MATCH-001` から `005` を対戦モードの受入条件とする。Windows / macOS で対戦モード対応を表明する場合も、各 OS 上で同じ受入項目を実 packet で確認するまで対応済みとは扱わない。
+
 ## 診断
 
 Aspire ダッシュボードの資源別ログを一次確認に使う。
@@ -300,6 +376,8 @@ Aspire ダッシュボードの資源別ログを一次確認に使う。
 自動試験を CI へ追加する場合は、既存の `.NET tests` と同様に、失敗時の標準出力、標準エラー、テスト結果、Aspire とコンテナのログを artifact として保存する。
 
 シミュレータ、`game-controller`、Crane、`cm4-sim` のコンテナログは資源名が分かる形で分離する。`ASPIRE-NET-007` では `referee-driver` の操作ログと 11003 の command 遷移も同じ試験証跡へ保存する。
+
+対戦モードではこれに加えて `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` の標準出力・標準エラー、対戦結果、SSL log、Crane の記録データ、解決済み image reference、team mapping、試合時間設定を保存する。失敗時も途中まで生成された結果と各 resource のログを破棄しない。
 
 ## 対象外
 
@@ -328,6 +406,9 @@ Issue #14 の比較試験を行うときは、`tracker-tigers` と `tracker-erfo
 
 - 一つの Aspire AppHost 起動でシミュレータ、`game-controller`、Crane、必要な `cm4-sim`、Duck を管理できる。
 - comparison mode では TIGERs tracker、ER-Force tracker、`Tracker.DebugHost` を追加し、Duck を含む三 tracker の差を同じ raw vision 入力に対して確認できる。
+- 対戦モードでは `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` を追加し、Blue の TIGERs AI と Yellow の Crane を同じ Game Controller / Simulator 上で対戦させられる。
+- 対戦モードでは `cm4-sim` を起動せず、Duck の 11010 publish を無効にして AutoRef の tracker 入力へ干渉しない。
+- `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` により、両チームの active motion、AutoRef / tracker 経路、試合終了、結果と診断 artifact を確認できる。
 - シミュレータと Crane は Docker コンテナ、Duck はホスト上の .NET プロセスとして起動する。
 - Crane は `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` の固定 image tag から起動し、Duck 側ではビルドしない。
 - Duck は既存の `sim` 設定と SSL-Vision 契約を維持する。
@@ -343,7 +424,7 @@ Issue #14 の比較試験を行うときは、`tracker-tigers` と `tracker-erfo
 - `Tracker/Design/RuntimeHost/runtime-host-plan.md`。
 - `Tracker/Tracker.RuntimeHost/appsettings.json`。
 - ER-Force Framework の `simulator-cli` 実装と README。
-- `ibis-ssl/crane` の `docker/Dockerfile`、`.github/workflows/docker_build.yaml`、`docker/scenario/docker-compose.yaml`、`docker/dev/docker-compose.yaml`、`docker/match-vs-tigers/docker-compose.yaml`。
+- `ibis-ssl/crane` の `docker/Dockerfile`、`.github/workflows/docker_build.yaml`、`docker/scenario/docker-compose.yaml`、`docker/dev/docker-compose.yaml`、`docker/match-vs-tigers/docker-compose.yaml`、`docker/match-vs-tigers/config/simulation_protocol_fixed.xml`、`docker/match-vs-tigers/config/state-store-initial.json.stream`、`docker/match-vs-tigers/scripts/match_controller_pb.py`、`.github/workflows/match-vs-tigers.yaml`。対戦モード設計の確認時点は develop `af6e0d3dec745415ce060ff5de2042afd3ec5145`。
 - `Tracker/Design/Testing/tracker-comparison-debug-design.md`。
 - RoboCup SSL simulation protocol。
 - Aspire の AppHost、コンテナ、.NET プロジェクト資源、コンテナ実行引数の公式文書。
