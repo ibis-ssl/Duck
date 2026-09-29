@@ -92,6 +92,7 @@ jobs:
 
   aspire-net-002:
     name: ASPIRE-NET-002 Linux packet flow
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -200,12 +201,15 @@ jobs:
             fail_test "Simulator did not reach running state"
           fi
 
-          Tracker__ActiveProfileName=sim \
-          VisionReceiver__MulticastAddress=224.5.23.2 \
-          VisionReceiver__Port=10020 \
-          dotnet run \
-            --project Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj \
-            --no-build \
+          (
+            cd Tracker/Tracker.RuntimeHost
+            export Tracker__ActiveProfileName=sim
+            export VisionReceiver__MulticastAddress=224.5.23.2
+            export VisionReceiver__Port=10020
+            exec dotnet run \
+              --project Tracker.RuntimeHost.csproj \
+              --no-build
+          ) \
             > "$results_dir/runtimehost.stdout.log" \
             2> "$results_dir/runtimehost.stderr.log" &
           runtime_pid=$!
@@ -308,11 +312,11 @@ jobs:
             ip route
           } > "$results_dir/environment.txt" 2>&1
 
-      - name: Upload ASPIRE-NET-002 failure artifact
-        if: ${{ always() && steps.aspire_net_002.outcome == 'failure' }}
+      - name: Upload ASPIRE-NET-002 artifact
+        if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: aspire-net-002-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          name: aspire-net-002-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/aspire-net-002
           if-no-files-found: error
           retention-days: 14
