@@ -200,6 +200,9 @@ jobs:
             fail_test "Simulator did not reach running state"
           fi
 
+          Tracker__ActiveProfileName=sim \
+          VisionReceiver__MulticastAddress=224.5.23.2 \
+          VisionReceiver__Port=10020 \
           dotnet run \
             --project Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj \
             --no-build \
