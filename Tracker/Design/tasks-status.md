@@ -39,7 +39,7 @@
 
 ## ASPIRE 実装タスク分割（2026-09-29）
 
-PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位へ分割する。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装タスクにはしない。
+PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位へ分割する。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。TIGERs vs Crane 対戦は `ASPIRE-006F` を `ASPIRE-006F1`〜`006F6`、`ASPIRE-006G` を `ASPIRE-006G1`〜`006G4` へ分ける。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装タスクにはしない。
 
 各実装タスクは、先に focused test または application model test を追加して未実装状態で失敗することを確認し、その後に実装する。失敗確認と実装はレビュー可能な論理単位で commit / push する。CI に Docker/Aspire 統合試験を追加する場合は、テスト結果、標準出力、標準エラー、Aspire と各コンテナの調査ログを失敗時 artifact へ保存する。
 
@@ -56,8 +56,18 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-006C` | Tracker Difference の対応付けと数値差分 | 中 | `ASPIRE-006B` | robot の team+id、ball の最大 pair 数→距離合計最小→辞書順 tie-break、gate 境界、missing / unmatched を TDD で固定する。 |
 | `ASPIRE-006D` | live Split / Overlay と数値差分 | 小 | `ASPIRE-006C` | 1 UI render tick で固定した同じ snapshot pair を Split / Overlay と数値差分が共有し、時刻差を別表示できる。 |
 | `ASPIRE-006E` | CaptureOn / replay 比較 | 中 | `ASPIRE-006D` | 同じ diagnostics sample tick、saved alignment 優先、latest-before fallback、future snapshot 不使用を focused test と replay 証跡で固定する。 |
-| `ASPIRE-006F` | TIGERs vs Crane 対戦資源 | 中 | `ASPIRE-005` | 対戦用 Simulator / Game Controller fixture、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` を追加し、`cm4-sim` 非起動、team mapping、Sumatra 外部 referee、Duck 11010 publish 無効を model test で固定する。 |
-| `ASPIRE-006G` | TIGERs vs Crane 一括対戦試験 | 中 | `ASPIRE-006F` | Linux で `ASPIRE-MATCH-001`〜`005` を実 packet で確認し、両 team の active motion、AutoRef / tracker 経路、試合終了、結果・SSL log・Crane の記録データ・resource log を証跡化する。勝敗自体は合否条件にしない。 |
+| `ASPIRE-006F` | TIGERs vs Crane 対戦資源（親） | 中 | `ASPIRE-005` | `ASPIRE-006F1`〜`006F6` が完了し、対戦用 resource model と lifecycle が設計どおり固定される。 |
+| `ASPIRE-006F1` | 対戦 fixture の版管理 | 小 | `ASPIRE-005` | Sumatra 設定、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
+| `ASPIRE-006F2` | `match` mode と resource topology | 小 | `ASPIRE-005` | `Testing:Mode=match`、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
+| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 小 | `ASPIRE-006F1`, `ASPIRE-006F2` | 対戦用 Simulator 引数、11003 の単一 producer、GC API、fixture mount、固定 image reference を model test で固定する。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | 中 | `ASPIRE-006F1`, `ASPIRE-006F2` | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 契約を model test で固定する。 |
+| `ASPIRE-006F5` | Crane / Duck 対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Crane `team:=ibis`、`cm4-sim` 非依存、Duck 11010 publish 無効、必要な `WaitForStart` を model test で固定する。 |
+| `ASPIRE-006F6` | `match-controller` と試合 lifecycle | 中 | `ASPIRE-006F3`, `ASPIRE-006F4`, `ASPIRE-006F5` | GC API / referee / vision readiness、STOP / HALT の継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
+| `ASPIRE-006G` | TIGERs vs Crane 一括対戦試験（親） | 中 | `ASPIRE-006F6` | `ASPIRE-006G1`〜`006G4` が完了し、`ASPIRE-MATCH-001`〜`005` の Linux 実 packet 証跡が揃う。 |
+| `ASPIRE-006G1` | topology / team / referee 受入 | 小 | `ASPIRE-006F6` | Linux で `ASPIRE-MATCH-001` / `002` を確認し、resource 一覧、team mapping、11003 producer の一意性を保存する。 |
+| `ASPIRE-006G2` | 双方 active motion 受入 | 小 | `ASPIRE-006G1` | `ASPIRE-MATCH-003` を実行し、同一 active referee 窓で Crane と TIGERs の双方の位置変化を実 packet で確認する。 |
+| `ASPIRE-006G3` | AutoRef / tracker 経路受入 | 小 | `ASPIRE-006G2` | `ASPIRE-MATCH-004` を実行し、Sumatra 11010、AutoRef 10020 / 11003 / 11010、Duck 11010 非送信を packet count とログで確認する。 |
+| `ASPIRE-006G4` | 試合完了 / 証跡受入 | 小 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL log、Crane の記録データ、全 resource の標準出力・標準エラーを失敗時も保存する。 |
 | `ASPIRE-007A` | Linux 実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | Linux + Docker Engine で適用 `ASPIRE-NET-001`〜`009` と対戦モードの `ASPIRE-MATCH-001`〜`005` を実 packet で確認し、指定されたログ・packet count・source identity を保存する。 |
 | `ASPIRE-007B` | Windows Docker Desktop 実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | host networking 有効の Windows Docker Desktop で適用 `ASPIRE-NET-001`〜`009` を確認する。対戦モード対応を表明する場合は `ASPIRE-MATCH-001`〜`005` も確認し、失敗時に Linux の結果や unicast fallback で代用しない。 |
 | `ASPIRE-007C` | macOS Docker Desktop 実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | host networking 有効の macOS Docker Desktop で適用 `ASPIRE-NET-001`〜`009` を確認する。対戦モード対応を表明する場合は `ASPIRE-MATCH-001`〜`005` も確認し、失敗時に他 OS の結果や暗黙 fallback で代用しない。 |

@@ -224,9 +224,29 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 
 `ASPIRE-005` の基本 stack を基礎に、対戦用 Simulator 設定、対戦用 Game Controller fixture、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` を追加する。対戦モードでは `cm4-sim` を除外し、Crane は `team:=ibis`、Sumatra は `--aiBlue`、Duck は 11010 publish 無効として application model test で固定する。
 
+実装は次の子タスクへ分割する。
+
+| ID | 作業 | 主な完了条件 |
+| --- | --- | --- |
+| `ASPIRE-006F1` | 対戦 fixture の版管理 | Sumatra の `simulation_protocol_fixed.xml` 相当、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
+| `ASPIRE-006F2` | `match` mode と resource topology | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
+| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一 producer、Game Controller API、fixture mount、固定 image reference を application model test で固定する。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定を model test で固定する。 |
+| `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 publish 無効、必要な `WaitForStart` を model test で固定する。 |
+| `ASPIRE-006F6` | `match-controller` と試合 lifecycle | GC API / referee / vision の readiness、STOP / HALT からの継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
+
 ### `ASPIRE-006G`: TIGERs vs Crane 一括対戦試験
 
 `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` を Linux の実 packet で確認し、双方の active motion、AutoRef / tracker 経路、試合終了、結果・SSL log・Crane の記録データ・resource log を証跡化する。勝敗は合否条件にしない。
+
+一括試験は次の子タスクへ分割する。
+
+| ID | 作業 | 主な完了条件 |
+| --- | --- | --- |
+| `ASPIRE-006G1` | topology / team / referee 受入 | Linux 上で `ASPIRE-MATCH-001` / `002` を実 packet と実 resource で確認し、resource 一覧、team mapping、11003 producer の一意性を保存する。 |
+| `ASPIRE-006G2` | 双方 active motion 受入 | `ASPIRE-MATCH-003` を実行し、同一 active referee 窓で Yellow の Crane と Blue の TIGERs の双方に位置変化があることを確認する。 |
+| `ASPIRE-006G3` | AutoRef / tracker 経路受入 | `ASPIRE-MATCH-004` を実行し、Sumatra 11010 出力、AutoRef の 10020 / 11003 / 11010 利用、Duck 11010 非送信を packet count とログで確認する。 |
+| `ASPIRE-006G4` | 試合完了 / 証跡受入 | `ASPIRE-MATCH-005` を実行し、`POST_GAME` または最大時間での終了、対戦結果、SSL log、Crane の記録データ、各 resource の標準出力・標準エラーを失敗時も保存する。 |
 
 ## テスト方針
 
