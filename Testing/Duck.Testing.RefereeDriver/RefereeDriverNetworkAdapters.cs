@@ -14,6 +14,7 @@ public sealed class UdpRefereeCommandSource(IRefereePacketReceiver receiver) : I
         uint? previousCommandCounter,
         CancellationToken cancellationToken)
     {
+        _ = receiver;
         throw new NotImplementedException();
     }
 
@@ -37,6 +38,8 @@ public sealed class GameControllerWebSocketControlClient(
         GameControllerContinueAction action,
         CancellationToken cancellationToken)
     {
+        _ = transport;
+        _ = endpoint;
         throw new NotImplementedException();
     }
 }
