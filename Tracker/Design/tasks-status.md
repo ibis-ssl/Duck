@@ -7,7 +7,7 @@
 - ID: `ASPIRE-001`
 - 題名: シミュレーション試験環境の Aspire 設計を確定する
 - 段階: 設計
-- 状態: 設計更新済み。シミュレータと Crane を既存 Docker image、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成、TIGERs / ER-Force tracker と `Tracker.DebugHost` を追加する comparison mode に加え、TIGERs AI と Crane を対戦させる対戦モードを設計した。PR #28 の独立最終レビュー合格は対戦モード追加前の HEAD に対する結果であり、追加差分は再レビュー対象とする。実装は未着手。
+- 状態: 設計更新済み。シミュレータと Crane を既存 Docker image、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成、TIGERs / ER-Force tracker と `Tracker.DebugHost` を追加する comparison mode に加え、TIGERs AI と Crane を対戦させる対戦モードを設計した。PR #28 の独立最終レビュー合格は対戦モード追加前の HEAD に対する結果であり、追加差分は再レビュー対象とする。`ASPIRE-002` は実装済みで、AppHost 骨格と `duck` = `Tracker.RuntimeHost` の application model 契約を TDD で固定した。後続の実装は未着手。
 - 規模: 中
 - 依存関係: Issue #18、Issue #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
 - 完了条件:
@@ -35,8 +35,9 @@
 - 2026-09-29 の TIGERs 対戦設計: Crane develop `af6e0d3dec745415ce060ff5de2042afd3ec5145` の `docker/match-vs-tigers` を基準に、対戦用 `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、Blue=`TIGERs Mannheim` / Yellow=`ibis` の team mapping、対戦用 Simulator / Game Controller fixture、Duck の 11010 publish 無効化、`ASPIRE-MATCH-001`〜`005` を追加した。対戦モードは tracker comparison と分離し、`cm4-sim` を起動しない。
 - 対戦設計報告: `reports/pr28-tigers-vs-crane-design-update-20260929.md`
 - 対戦タスク分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
-- 次作業: 対戦モード追加差分を独立レビューした後、下記の実装タスク分割に従い `ASPIRE-002` の AppHost アプリケーションモデルの失敗テストから開始する。各実装タスクは TDD の失敗確認と実装を分けて記録し、クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
-- 対象外: 今回は設計のみ。AppHost、image 接続、製品コードの実装は行わない。
+- `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
+- 次作業: 実装タスク分割に従い `ASPIRE-003A` の RuntimeHost SSL-Vision 受信診断へ進む。各実装タスクは TDD の失敗確認と実装を分けて記録し、クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
+- 今回の実装範囲: `ASPIRE-002` の AppHost 骨格と application model 契約まで。Simulator / Game Controller / Crane / `cm4-sim` / comparison / match 資源、RuntimeHost 受信診断、OS 別実 packet 受入は後続タスクで扱う。
 
 ## ASPIRE 実装タスク分割（2026-09-29）
 
