@@ -34,6 +34,7 @@
 - 2026-09-27 の OS 別確認仕様: `ASPIRE-NET-001` から `ASPIRE-NET-009` を追加し、Linux / Windows Docker Desktop / macOS Docker Desktop の container → host、container → container multicast、同一 group / port の複数受信、interface 明示 fallback、固定 port 競合を受入条件として固定した。未確認 OS は対応済みと扱わない。
 - 2026-09-29 の TIGERs 対戦設計: Crane develop `af6e0d3dec745415ce060ff5de2042afd3ec5145` の `docker/match-vs-tigers` を基準に、対戦用 `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、Blue=`TIGERs Mannheim` / Yellow=`ibis` の team mapping、対戦用 Simulator / Game Controller fixture、Duck の 11010 publish 無効化、`ASPIRE-MATCH-001`〜`005` を追加した。対戦モードは tracker comparison と分離し、`cm4-sim` を起動しない。
 - 対戦設計報告: `reports/pr28-tigers-vs-crane-design-update-20260929.md`
+- 対戦タスク分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
 - 次作業: 対戦モード追加差分を独立レビューした後、下記の実装タスク分割に従い `ASPIRE-002` の AppHost アプリケーションモデルの失敗テストから開始する。各実装タスクは TDD の失敗確認と実装を分けて記録し、クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
 - 対象外: 今回は設計のみ。AppHost、image 接続、製品コードの実装は行わない。
 
