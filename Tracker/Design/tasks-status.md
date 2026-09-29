@@ -7,7 +7,7 @@
 - ID: `ASPIRE-001`
 - 題名: シミュレーション試験環境の Aspire 設計を確定する
 - 段階: 設計
-- 状態: 設計更新完了。PR #28 でレビュー待ち。シミュレータと Crane を既存 Docker image、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成に加え、TIGERs / ER-Force tracker と `Tracker.DebugHost` を追加する comparison mode を設計した。
+- 状態: 設計完了。PR #28 の独立最終レビューは合格済みで、実装は未着手。シミュレータと Crane を既存 Docker image、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成に加え、TIGERs / ER-Force tracker と `Tracker.DebugHost` を追加する comparison mode を設計した。
 - 規模: 中
 - 依存関係: Issue #18、Issue #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
 - 完了条件:
@@ -31,8 +31,32 @@
 - 2026-09-23 の比較設計検証: `aspire-simulation-test-environment.md` と `tracker-comparison-debug-design.md` の CSpell は指摘 0、`git diff --check` 成功。全体 `npm run lint:md` は同じ `.agents` 欠落で終了値 1。
 - 検証: 新規設計書の CSpell は指摘 0。`git diff --cached --check` 成功。全体 `npm run lint:md` は現行 `main` に `.agents/skills/review-enforcer` が存在しないため実行経路で阻害。
 - 2026-09-27 の OS 別確認仕様: `ASPIRE-NET-001` から `ASPIRE-NET-009` を追加し、Linux / Windows Docker Desktop / macOS Docker Desktop の container → host、container → container multicast、同一 group / port の複数受信、interface 明示 fallback、固定 port 競合を受入条件として固定した。未確認 OS は対応済みと扱わない。
-- 次作業: `ASPIRE-002` で AppHost の骨格とアプリケーションモデルの失敗テストから実装を開始する。通常シミュレーションの `ASPIRE-002` から `ASPIRE-005` の後、`ASPIRE-006A` から `ASPIRE-006E` で TIGERs / ER-Force tracker の比較デバッグを追加し、各段階の統合確認で `ASPIRE-NET-*` を実施する。
+- 次作業: 下記の実装タスク分割に従い、`ASPIRE-002` の AppHost アプリケーションモデルの失敗テストから開始する。各実装タスクは TDD の失敗確認と実装を分けて記録し、クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
 - 対象外: 今回は設計のみ。AppHost、image 接続、製品コードの実装は行わない。
+
+## ASPIRE 実装タスク分割（2026-09-29）
+
+PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006E` を実装・レビュー単位へ分割する。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。`ASPIRE-NET-001` から `ASPIRE-NET-009` は受入項目であり、独立した製品実装タスクにはしない。
+
+各実装タスクは、先に focused test または application model test を追加して未実装状態で失敗することを確認し、その後に実装する。失敗確認と実装はレビュー可能な論理単位で commit / push する。CI に Docker/Aspire 統合試験を追加する場合は、テスト結果、標準出力、標準エラー、Aspire と各コンテナの調査ログを失敗時 artifact へ保存する。
+
+| ID | 作業 | 規模 | 依存関係 | 完了条件 |
+| --- | --- | --- | --- | --- |
+| `ASPIRE-002` | AppHost 骨格と application model 契約 | 小 | `ASPIRE-001` | `Testing/Duck.Testing.AppHost` を追加し、失敗テストを先行させた上で `duck` を `Tracker.RuntimeHost` として単独起動できる。Docker 不要の model test が通る。 |
+| `ASPIRE-003A` | RuntimeHost の SSL-Vision 受信診断 | 小 | `ASPIRE-002` | `VisionPacketsReceivedTotal`、endpoint / interface / 累積値の診断ログ、decode 失敗を加算しない focused test を TDD で実装する。 |
+| `ASPIRE-003B` | ER-Force Simulator 資源 | 小 | `ASPIRE-003A` | 固定 tag の `simulator-cli`、host network、geometry / realism、Duck の sim 設定を model test で固定し、Linux で `ASPIRE-NET-002` の受信を確認する。 |
+| `ASPIRE-004A` | Game Controller と referee-driver fixture | 小 | `ASPIRE-002` | `game-controller` を 11003 の唯一の producer とし、`referee-driver` が HALT 確認後に API を操作して active command へ遷移できることを focused test で固定する。 |
+| `ASPIRE-004B` | Crane / cm4-sim 資源と起動依存 | 中 | `ASPIRE-003B`, `ASPIRE-004A` | 固定 image tag、host network、mode 4→3 経路、planner ごとの `WaitForStart` 依存を application model test で固定する。 |
+| `ASPIRE-005` | 基本 stack の一括起動試験 | 中 | `ASPIRE-004B` | Simulator / game-controller / Crane / cm4-sim / Duck を一括起動し、SSL-Vision 受信、Duck tracker 出力、active motion、stack ownership を確認する。Linux で比較資源を除く適用 `ASPIRE-NET-*` を証跡化する。 |
+| `ASPIRE-006A` | comparison mode の外部 tracker 資源 | 中 | `ASPIRE-005` | `tracker-tigers`、`tracker-erforce`、`debug-host` を追加し、Game Controller 排他、host network、10020 入力 / 11010 出力を model test で固定する。 |
+| `ASPIRE-006B` | source identity と三 tracker 同時受信 | 中 | `ASPIRE-006A` | logical role、UUID / endpoint fallback、衝突時 Ready 判定、live / replay の同一 resolver 契約を focused test で固定し、`ASPIRE-NET-003`〜`005` の Linux 証跡を得る。 |
+| `ASPIRE-006C` | Tracker Difference の対応付けと数値差分 | 中 | `ASPIRE-006B` | robot の team+id、ball の最大 pair 数→距離合計最小→辞書順 tie-break、gate 境界、missing / unmatched を TDD で固定する。 |
+| `ASPIRE-006D` | live Split / Overlay と数値差分 | 小 | `ASPIRE-006C` | 1 UI render tick で固定した同じ snapshot pair を Split / Overlay と数値差分が共有し、時刻差を別表示できる。 |
+| `ASPIRE-006E` | CaptureOn / replay 比較 | 中 | `ASPIRE-006D` | 同じ diagnostics sample tick、saved alignment 優先、latest-before fallback、future snapshot 不使用を focused test と replay 証跡で固定する。 |
+| `ASPIRE-007A` | Linux 実機ネットワーク受入 | 小 | `ASPIRE-006E` | Linux + Docker Engine で適用 `ASPIRE-NET-001`〜`009` を実 packet で確認し、指定されたログ・packet count・source identity を保存する。 |
+| `ASPIRE-007B` | Windows Docker Desktop 実機ネットワーク受入 | 小 | `ASPIRE-006E` | host networking 有効の Windows Docker Desktop で適用 `ASPIRE-NET-001`〜`009` を確認する。失敗時に Linux の結果や unicast fallback で代用しない。 |
+| `ASPIRE-007C` | macOS Docker Desktop 実機ネットワーク受入 | 小 | `ASPIRE-006E` | host networking 有効の macOS Docker Desktop で適用 `ASPIRE-NET-001`〜`009` を確認する。失敗時に他 OS の結果や暗黙 fallback で代用しない。 |
+| `ASPIRE-008` | 最終レビュー、進捗同期、PR 提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B`, `ASPIRE-007C` | 独立レビュー、阻害指摘の修正、詳細 report、台帳同期、PR コメント、PR current HEAD と head SHA が一致する CI 確認を完了する。 |
 
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
