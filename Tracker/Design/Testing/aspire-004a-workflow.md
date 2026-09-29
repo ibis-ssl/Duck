@@ -17,7 +17,7 @@ PR #28 の `ASPIRE-004A`「Game Controller と referee-driver fixture」を、RE
 
 ## セッション分離
 
-`ASPIRE-004A` は専用worktreeと専用RDMCPセッションで作業し、並行する `ASPIRE-003A/B` のworktreeを共有しない。PR #28 へ合流する直前に current HEAD を取得し、必要ならrebaseする。
+`ASPIRE-004A` は専用worktreeと専用のリモートデスクトップ作業セッションで作業し、並行する `ASPIRE-003A/B` のworktreeを共有しない。PR #28 へ合流する直前に current HEAD を取得し、必要なら最新ベースを取り込む。
 
 ## 共通ゲート
 

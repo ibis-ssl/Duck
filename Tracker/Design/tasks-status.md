@@ -41,8 +41,11 @@
 - 2026-09-30 の `ASPIRE-003A` 完了: `VisionPacketsReceivedTotal`、endpoint / interface / 累積値の周期診断、decode 失敗非加算を TDD で固定した。赤 commit `4245400` の同一 SHA CI は failure、緑 commit `efdcd79` の同一 SHA CI は success。Windows focused test は 3 / 3 成功。
 - 2026-09-30 の `ASPIRE-003B` 完了: ER-Force Simulator を `ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd`、host network、Crane 基準の geometry / realism / IBIS 引数で追加し、Duck の sim 用 `224.5.23.2:10020` 設定を application model test で固定した。赤 commit `2cbab11` の同一 SHA CI は failure、緑 commit `067be55` の同一 SHA CI は success。
 - 2026-09-30 の Linux `ASPIRE-NET-002`: Ubuntu 24.04 / Docker Engine 28.0.4 の run `36625776852` で RuntimeHost が `224.5.23.2:10020` を受信し、`VisionPacketsReceivedTotal` は 0 から 232 へ 3960 ms で増加した。run の `headSha` は検証時の PR HEAD `5c110dd` と一致し、`.NET tests` と Linux packet flow はともに success。成功 artifact `aspire-net-002-36625776852-1` に判定結果、標準出力、標準エラー、RuntimeHost / Simulator / Docker / network 診断を保存した。
-- 次作業: `ASPIRE-003A/B` は完了。`ASPIRE-004B` の依存のうち `ASPIRE-003B` 側は解消済みで、開始には `ASPIRE-004A` の完了も必要。クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
-- 今回の実装範囲: `ASPIRE-003A` の RuntimeHost SSL-Vision 受信診断、`ASPIRE-003B` の ER-Force Simulator resource、Linux `ASPIRE-NET-002` の実 packet 受入まで。Game Controller / Crane / `cm4-sim` / comparison / match 資源と残りの OS 別受入は後続タスクで扱う。
+- `ASPIRE-004A` 実装報告: `reports/pr28-aspire-004a-implementation-20260930.md`
+- 2026-09-30 の `ASPIRE-004A` 完了: `game-controller` を `robocupssl/ssl-game-controller:3.20.3`、host network、`224.5.23.1:11003` の単一 producer として AppHost に追加した。`referee-driver` は 11003 を受信して初期 `HALT` と command counter の変化を確認し、`ws://127.0.0.1:8082/api/control` へ `NEXT_COMMAND`、必要に応じて `FORCE_START` / `NORMAL_START` を送信して active command を確認する。Docker 不要の関連 focused / application model test は最新ベース統合後 17 / 17 成功。
+- 2026-09-30 の `ASPIRE-004A` 回帰確認: `Tracker.Tests` 全体は最新ベース統合後 346 件中 335 件成功、11 件失敗。失敗 11 件は `ASPIRE-004A` 差分を含まない設計ブランチ HEAD `65ff0bc` でも同じ 11 件が失敗し、代表例は CaptureOn の sidecar 読み取り時のファイルロックだったため、`ASPIRE-004A` 起因の新規回帰とは判定しない。
+- 次作業: `ASPIRE-003B` と `ASPIRE-004A` がともに完了したため、`ASPIRE-004B` の Crane / `cm4-sim` 資源と起動依存へ進める。クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
+- 今回の実装範囲: `ASPIRE-004A` の Game Controller resource、referee-driver 状態遷移、11003 UDP 受信 adapter、Game Controller WebSocket 制御 client、Docker 不要の focused / application model test まで。Simulator / Crane / `cm4-sim` を含む一括起動と実 packet active-motion 受入は後続タスクで扱う。
 
 ## ASPIRE 実装タスク分割（2026-09-29）
 
