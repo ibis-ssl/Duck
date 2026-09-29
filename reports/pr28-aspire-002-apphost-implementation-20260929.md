@@ -91,4 +91,3 @@ CI の AppHost build では `ASPIRE010` が warning として出ている。
 ## 完了状態
 
 `ASPIRE-002` の AppHost 骨格と application model 契約は実装済み。次の実装単位は `ASPIRE-003A` の RuntimeHost SSL-Vision 受信診断である。
-
