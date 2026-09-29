@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/Testing/">
     <Project Path="Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj" />
   </Folder>
