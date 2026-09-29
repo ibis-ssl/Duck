@@ -36,6 +36,7 @@
 - 対戦設計報告: `reports/pr28-tigers-vs-crane-design-update-20260929.md`
 - 対戦タスク分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
 - `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
+- 2026-09-30 の `ASPIRE-002` Windows 実機確認: .NET SDK 10.0.401 で application model test 1 / 1 成功。AppHost 13.5.4 から `Tracker.RuntimeHost.exe` が起動し UDP 10020 を bind、AppHost 停止後に子プロセスと bind が解放されることを確認した。Docker / Simulator / multicast packet の OS 別受入確認は後続タスクのまま。
 - 次作業: 実装タスク分割に従い `ASPIRE-003A` の RuntimeHost SSL-Vision 受信診断へ進む。各実装タスクは TDD の失敗確認と実装を分けて記録し、クロスプラットフォーム実機確認は `ASPIRE-007A` から `ASPIRE-007C` で OS ごとに独立して完了判定する。
 - 今回の実装範囲: `ASPIRE-002` の AppHost 骨格と application model 契約まで。Simulator / Game Controller / Crane / `cm4-sim` / comparison / match 資源、RuntimeHost 受信診断、OS 別実 packet 受入は後続タスクで扱う。
 

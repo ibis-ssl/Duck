@@ -59,7 +59,11 @@ PR #28 current HEAD が上記 commit と一致することを確認し、同じ 
 
 ## ローカル検証環境
 
-RDMCP の作業環境では `dotnet` が PATH に存在せず、`C:\Program Files\dotnet\dotnet.exe` にも存在しなかった。このためローカルで `dotnet test` は実行できず、TDD の赤・緑は各 commit の current HEAD SHA と一致する GitHub Actions run で確認した。
+初回作業時は RDMCP の PATH から `dotnet` を解決できなかったため、TDD の赤・緑は各 commit の current HEAD SHA と一致する GitHub Actions run で確認した。その後 .NET SDK 10.0.401 を導入し、RDMCP 再起動後の 2026-09-30 に Windows 実機確認を追加した。
+
+ローカル worktree は `SslProto` の submodule が未初期化だったため最初の focused test が既存 Protobuf 生成型不足でビルド失敗した。`git submodule update --init --recursive` で CI と同じ submodule SHA へ揃えた後、`AppHostApplicationModelTests` は 1 / 1 件成功した。
+
+続いて `dotnet run --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-build` で AppHost 13.5.4 を起動し、`duck` 資源から `Tracker.RuntimeHost.exe` が子プロセスとして起動することを確認した。RuntimeHost の PID 24612 が `0.0.0.0:10020` を bind しており、AppHost 停止後は `Tracker.RuntimeHost.exe` とその `dotnet` wrapper が終了し、UDP 10020 も解放された。これは `ASPIRE-002` の単独 Duck 起動範囲の確認であり、Docker / Simulator / multicast packet の OS 別受入確認ではない。
 
 `git diff --check` は赤コミット前と実装コミット前に成功している。
 
