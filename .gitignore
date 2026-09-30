@@ -484,7 +484,11 @@ $RECYCLE.BIN/
 # codex
 # Codex local working files
 /.codex/
-.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/review-enforcer/
+!.agents/skills/review-enforcer/**
 AGENTS.md
 .serena/
 .venv/
