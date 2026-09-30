@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "description": "Repository-local Markdown lint and spellcheck tooling for IbisDuck.",
   "scripts": {
+    "lint:md:link-skills": "node tools/lint/scripts/run-python-script.js ../CodexSkill/scripts/link_consumer_skills.py .",
     "lint:md:setup": "npm ci && node tools/lint/scripts/setup-python-lint.js",
     "lint:md": "npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist",
     "lint:md:targets": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js",

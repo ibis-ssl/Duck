@@ -12,7 +12,15 @@ npm run lint:md:setup
 
 このコマンドは `npm ci` を実行した後、リポジトリ直下の `.venv` を作成し、`tools/lint/requirements.txt` の Python 依存を導入する。対応環境では同じコマンドを使う。
 
-文書検査は、このリポジトリに含める `.agents/skills/review-enforcer` を使う。`review-enforcer` の実行物を外部シンボリックリンクへ依存させず、OS 差がある起動処理だけを `tools/lint/scripts/` で吸収する。
+文書検査は `CodexSkill` の `review-enforcer` を使う。`CodexSkill` をこのリポジトリと同じ親ディレクトリへ取得し、次のコマンドで `.agents/skills` を `CodexSkill` の `skills/` へディレクトリ `symlink` として接続する。
+
+```bash
+git clone https://github.com/ssaattww/CodexSkill.git ../CodexSkill
+npm run lint:md:link-skills
+npm run lint:md:setup
+```
+
+`lint:md:link-skills` は `CodexSkill` 側の `scripts/link_consumer_skills.py` を呼ぶ。機能本体はこのリポジトリへ複製しない。`symlink` 作成処理は Python の OS 共通 API を使い、OS 固有の `ln -s` や `mklink` を直接使わない。
 
 通常の検証は次を実行する。
 

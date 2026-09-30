@@ -39,6 +39,16 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Check out CodexSkill dependency
+        shell: pwsh
+        env:
+          CODEX_SKILL_REF: 583a9594d8157fc101dff3c6b3338238809d9779
+        run: |
+          $codexSkill = Join-Path (Split-Path $env:GITHUB_WORKSPACE -Parent) "CodexSkill"
+          git clone https://github.com/ssaattww/CodexSkill.git $codexSkill
+          git -C $codexSkill checkout $env:CODEX_SKILL_REF
+          npm run lint:md:link-skills
+
       - name: Run Markdown lint
         id: markdown_lint
         run: node tools/lint/scripts/run-markdown-lint-ci.js
