@@ -4,18 +4,23 @@
 
 ## 準備
 
-初回、`package-lock.json` 更新後、または `tools/lint/requirements.txt` 更新後はリポジトリの最上位で次を実行する。標準の `npm run lint:md` は SudachiPy 版の許可一覧検査も実行するため、`npm install` だけでは足りない。
+初回、`package-lock.json` 更新後、または `tools/lint/requirements.txt` 更新後はリポジトリの最上位で次を実行する。
 
 ```bash
-npm install
-python3 -m venv .venv
-. .venv/bin/activate
-PIP_NO_BUILD_ISOLATION=1 python3 -m pip install -r tools/lint/requirements.txt
+npm run lint:md:setup
 ```
 
-`ChikkarPy` は現在の `Python` 環境ではビルド時の環境分離を有効にした通常のインストールに失敗することがあるため、文書検査用環境では `PIP_NO_BUILD_ISOLATION=1` を付ける。`tools/lint/requirements.txt` には、その前提で必要なビルド用の補助パッケージも含めている。
+このコマンドは `npm ci` を実行した後、リポジトリ直下の `.venv` を作成し、`tools/lint/requirements.txt` の Python 依存を導入する。対応環境では同じコマンドを使う。
 
-この検査は `.agents/skills/review-enforcer/scripts/` にある共通処理を使う。`.agents/skills` は `ln -s` で作成するリンクとし、`~/AI/CodexSkill/skills` を参照させる。このリンクは Git の管理対象に含めない。
+文書検査は `CodexSkill` の `review-enforcer` を使う。`CodexSkill` をこのリポジトリと同じ親ディレクトリへ取得し、次のコマンドで `.agents/skills` を `CodexSkill` の `skills/` へディレクトリ `symlink` として接続する。
+
+```bash
+git clone https://github.com/ssaattww/CodexSkill.git ../CodexSkill
+npm run lint:md:link-skills
+npm run lint:md:setup
+```
+
+`lint:md:link-skills` は `CodexSkill` 側の `scripts/link_consumer_skills.py` を呼ぶ。機能本体はこのリポジトリへ複製しない。`symlink` 作成処理は Python の OS 共通 API を使い、OS 固有の `ln -s` や `mklink` を直接使わない。
 
 通常の検証は次を実行する。
 
@@ -49,22 +54,21 @@ npm run lint:md:targets -- --changed
 対象文書を直接指定したい場合は `--files` を使う。
 
 ```bash
-node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/Tracker.DebugHost/README.md
-node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
-node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+npm run lint:md:targets -- --files README.md Tracker/Tracker.DebugHost/README.md
+npm run lint:md:text -- --files README.md
+npm run lint:md:spell -- --files README.md
 npm run lint:md:whitelist -- --files README.md
 ```
 
-SudachiPy と ChikkarPy を使って既存文書から語彙と同義語候補を抽出する場合は次を使う。出力は `TSV` が既定で、必要なら `--format json` も指定できる。
+SudachiPy を使って既存文書から語彙を抽出する場合は次を使う。出力は `TSV` が既定で、必要なら `--format json` も指定できる。
 
 ```bash
 npm run lint:md:vocab
 npm run lint:md:vocab -- --files README.md tools/lint/README.md
 npm run lint:md:vocab -- --format json
-npm run lint:md:vocab -- --synonyms none
 ```
 
-`--synonyms none` は、ChikkarPy の同義語候補だけを外して SudachiPy の読み、正規形、品詞、頻度を確認したい場合に使う。
+標準の `lint:md:vocab` は同義語候補を使わず、SudachiPy の読み、正規形、品詞、頻度を出力する。許可一覧の強制検査は同義語候補に依存しない。
 
 SudachiPy 版の許可一覧検査は `npm run lint:md:whitelist` から実行する。従来の JavaScript 版と比較したい場合は `npm run lint:md:whitelist:legacy` を使う。
 
@@ -113,7 +117,7 @@ entries:
 
 `cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。未登録語が見つかった場合は、読みやすさと意味を保った本文修正で解消できるか確認する。許可済みの技術用語、実際の画面名、設定名、直接引用を、検査を通すためだけに別表現へ変えない。登録や検査条件の変更が必要な場合は、候補と理由を提示し、利用者の承認を受けてから変更する。
 
-SudachiPy 版の抽出と検査では、日本語を文字種だけではなく形態素として扱う。漢字語、片仮名語、混在語を `surface`、正規形、読み、品詞、候補集合、頻度、出現元で集計し、許可一覧再構築の候補にする。英字語は従来どおり専用の厳しい抽出規則で扱う。ChikkarPy が返す同義語候補は、候補集合を作るための補助情報として `synonyms` に出力する。SudachiPy の正規形や読みが同じ語、または ChikkarPy の同義語候補に入った語は近くに出せるが、`namespace`、`ネームスペース`、`名前空間` のような英日意味対応は自動確定しない。最終的に許可する語と説明は利用者の明示確認を受けて `tools/lint/markdown-whitelist.yaml` に反映する。
+SudachiPy 版の抽出と検査では、日本語を文字種だけではなく形態素として扱う。漢字語、片仮名語、混在語を `surface`、正規形、読み、品詞、頻度、出現元で集計し、許可一覧再構築の候補にする。英字語は専用の厳しい抽出規則で扱う。`namespace`、`ネームスペース`、`名前空間` のような英日意味対応は自動確定しない。最終的に許可する語と説明は利用者の明示確認を受けて `tools/lint/markdown-whitelist.yaml` に反映する。
 
 ## 表記揺れ辞書
 
