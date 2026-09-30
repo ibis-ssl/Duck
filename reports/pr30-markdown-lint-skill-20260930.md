@@ -1,18 +1,18 @@
-﻿# PR #30 Markdown lint skill 導入報告
+﻿# PR #30 Markdown lint skill 参照導入報告
 
-日付: 2026-09-30
+日付: 2026-10-01
 
 ## 目的
 
-Markdown 文書の厳格な許可一覧検査を、外部シンボリックリンクや Unix 固有コマンドへ依存せず、Duck リポジトリ単体で実行できるようにする。
+Markdown 文書の厳格な許可一覧検査を、`CodexSkill` を単一の正本として参照しながら Windows と Linux の両方で同じ手順で実行できるようにする。Duck へ skill 本体は複製せず、`.agents/skills` のディレクトリ `symlink` で接続する。
 
 ## 構成
 
-- `.agents/skills/review-enforcer`
-  - CodexSkill `origin/main` の `review-enforcer` をリポジトリ内へ配置した。
-  - 長文 Markdown を SudachiPy の入力上限内へ分割する修正を含む。
-  - CSpell は `--no-default-configuration` を使用し、標準英語辞書を許可根拠にしない。
-  - Windows で `.cmd` へ依存しないよう、CSpell の JavaScript CLI を Node から直接起動する。
+- `.agents/skills`
+  - 隣接して取得した `CodexSkill` の `skills/` をディレクトリ `symlink` で参照する。
+  - `review-enforcer` の実体は Duck に複製せず、`CodexSkill` を正本とする。
+  - `CodexSkill` PR #89 の `scripts/link_consumer_skills.py` が OS 共通のリンク作成入口を担当する。
+  - CSpell は `review-enforcer` 側で `--no-default-configuration` を使用し、Windows でも JavaScript CLI を Node から直接起動する。
 - `tools/lint/scripts`
   - `run-markdown-targets.js`: 対象列挙後に textlint / CSpell を OS 非依存で起動する。
   - `run-python-script.js`: `.venv` を優先し、利用可能な Python 3 を OS ごとに解決する。
@@ -20,17 +20,19 @@ Markdown 文書の厳格な許可一覧検査を、外部シンボリックリ�
   - `run-markdown-lint-ci.js`: セットアップと lint の標準出力・標準エラー・終了値・判定結果を artifact 用に保存する。
 - `package.json`
   - `npm run lint:md:setup` を追加した。
-  - `lint:md:text` / `lint:md:spell` / `lint:md:whitelist` はリポジトリ内 skill と OS 非依存ラッパーを使用する。
+  - `lint:md:link-skills` を追加し、隣接する `CodexSkill` checkout から `.agents/skills` を作成する。
+  - `lint:md:text` / `lint:md:spell` / `lint:md:whitelist` は symlink 先の `review-enforcer` と OS 共通ラッパーを使用する。
 - `tools/lint/requirements.txt`
   - 厳格 lint に必要な `sudachipy==0.6.11`、`sudachidict_core==20260428`、`PyYAML==6.0.3` に限定した。
   - ChikkarPy は許可一覧検査に不要で、現行 Python で配布物の問題により導入できないため必須依存から外した。
 - `.github/workflows/markdown-lint.yml`
   - Ubuntu と Windows の両方で同じ Markdown lint を実行する。
+  - `CodexSkill` の CSpell Windows 修正を含む commit `583a9594d8157fc101dff3c6b3338238809d9779` を取得し、`.agents/skills` を作成してから lint を実行する。
   - 成否にかかわらず、判定結果、セットアップと lint の標準出力・標準エラー、終了値、Node / npm / Python / Git / npm / pip の診断情報を artifact として保存する。
 
 ## 対象範囲
 
-`.agents` はプロジェクト Markdown 文書の検査対象から除外する。`review-enforcer` は検査器そのものであり、Duck の設計書・README と同じ許可一覧を重ねて適用しない。
+`.agents` はローカル参照用のため Git 管理とプロジェクト Markdown 文書の検査対象から除外する。`review-enforcer` は `CodexSkill` 側の検査器そのものであり、Duck の設計書・README と同じ許可一覧を重ねて適用しない。
 
 `.venv` も依存物の保存先であるため対象外とする。
 
@@ -38,6 +40,8 @@ Markdown 文書の厳格な許可一覧検査を、外部シンボリックリ�
 
 Windows 実機で次を確認した。
 
+- `npm run lint:md:link-skills`: 成功。
+- `.agents/skills` は `C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills` を指す `symlink` であることを確認。
 - `npm run lint:md:setup`: 成功。
 - `npm run lint:md`: 終了値 0。
 - Markdown 対象: 18 文書。
@@ -49,9 +53,10 @@ Windows 実機で次を確認した。
 
 ## コミット
 
-- `12fa959` `chore: vendor review-enforcer skill`
+- `12fa959` `chore: vendor review-enforcer skill`（後続の symlink 化で取り消し）
 - `319c010` `chore: make markdown lint cross-platform`
 - `e90cbc5` `ci: verify markdown lint on Windows and Linux`
+- `3e19024` `chore: link markdown lint skill from CodexSkill`
 
 ## PR 初回 CI
 
@@ -69,4 +74,4 @@ PR #30 の HEAD `e90cbc51767647129973e3fb275c055931dea948` と head SHA が一�
 
 ## 完了状態
 
-review-enforcer skill を Duck 内に保持したまま、Windows と Linux の両方で厳格 Markdown lint を実行できる構成になった。最終 report 追加後に HEAD が変わるため、最終 HEAD と一致する CI は PR コメントへ記録する。
+`review-enforcer` を Duck 内へ複製せず、`CodexSkill` clone を `.agents/skills` symlink で参照して Windows と Linux の両方で厳格 Markdown lint を実行する構成になった。最終 report 追加後に HEAD が変わるため、最終 HEAD と一致する CI は PR コメントへ記録する。
