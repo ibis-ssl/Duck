@@ -30,7 +30,7 @@ git diff design/issue18-aspire-test-orchestration --check
 ## I29-004A-REV-003 Markdown 文書検査
 
 PR #30 `chore: link review-enforcer skill for Markdown lint` の検査器を一時作業ツリーへ重ね、PR #29 本体へ lint 基盤を重複追加せず検証した。
-利用した PR #30 HEAD は `eeac918f2601f6e8c985c388e2915ec903bbd11f`。
+利用した PR #30 HEAD は `eeac918f2601f6e8c985c388e2915ec903bbd11f`。さらに PR #30 の CI が固定している `CodexSkill` commit `583a9594d8157fc101dff3c6b3338238809d9779` へ symlink 参照を張り替えて再確認した。
 
 `Tracker/Design/Testing/aspire-004a-workflow.md` は次の3検査すべて成功した。
 
