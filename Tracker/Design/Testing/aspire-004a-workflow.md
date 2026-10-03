@@ -1,75 +1,75 @@
-﻿# ASPIRE-004A 作業フロー
+﻿# `ASPIRE-004A` 作業手順
 
 ## 目的
 
-PR #28 の `ASPIRE-004A`「Game Controller と referee-driver fixture」を、RED、GREEN、回帰確認、報告の順に分離して進める。
+PR #28 の `ASPIRE-004A` `Game Controller` と `referee-driver` の試験補助を、失敗確認、成功確認、回帰確認、報告の順に分離して進める。
 
 この文書は製品仕様ではなく作業手順を定義する。製品仕様は `aspire-simulation-test-environment.md` を正とする。
 
 ## 作業境界
 
-- `game-controller` を Aspire AppHost の Docker image 資源として追加する。
-- Game Controller は固定 tag、host network、`224.5.23.1:11003` の唯一の referee producer とする。
+- `game-controller` を `Aspire AppHost` の Docker 実行画像資源として追加する。
+- `Game Controller` は固定版、Docker の `--network host` 指定、`224.5.23.1:11003` の唯一の審判情報送信元とする。
 - 制御 API は `127.0.0.1:8082/api/control` を使う。
-- `referee-driver` は 11003 を publish せず、`HALT` 確認後に API を操作して active command への遷移を確認する。
-- 上記契約を Docker 不要の application model test と focused test で固定する。
-- Simulator、Crane、`cm4-sim`、comparison / match mode、実 packet 受入は後続タスクとする。
+- `referee-driver` は 11003 へ送信せず、`HALT` 確認後に API を操作して有効な命令への遷移を確認する。
+- 上記契約を Docker を使わない `AppHost` 資源構成の試験と対象試験で固定する。
+- `simulator`、`Crane`、`cm4-sim`、比較構成 / 対戦構成、実通信の受入は後続作業とする。
 
-## セッション分離
+## 作業領域の分離
 
-`ASPIRE-004A` は専用worktreeと専用のリモートデスクトップ作業セッションで作業し、並行する `ASPIRE-003A/B` のworktreeを共有しない。PR #28 へ合流する直前に current HEAD を取得し、必要なら最新ベースを取り込む。
+`ASPIRE-004A` は専用作業領域と専用の遠隔操作接続で作業し、並行する `ASPIRE-003A/B` の作業領域を共有しない。PR #28 へ合流する直前に現在の `HEAD` を取得し、必要なら最新の基点を取り込む。
 
-## 共通ゲート
+## 共通条件
 
-作業開始時に `.github/workflows/dotnet-test.yml` を確認する。既存workflowがテスト結果、標準出力、標準エラー、失敗原因調査用ログを失敗時artifactへ保存する限り、診断目的だけの重複workflowは追加しない。
+作業開始時に `.github/workflows/dotnet-test.yml` を確認する。既存の自動処理が試験結果、標準出力、標準エラー、失敗原因調査用ログを失敗時の成果物へ保存する限り、診断目的だけの重複処理は追加しない。
 
 実装はTDDで進める。
 
 1. 対象契約を固定するテストを追加する。
 2. 未実装状態で期待理由により失敗することを確認する。
-3. REDだけをcommit / pushする。
-4. 最小実装でGREENにする。
-5. 関連回帰、lint、`git diff --check` を実行する。
-6. GREENを別commit / pushする。
+3. 失敗確認だけをコミットし、`git push` する。
+4. 最小実装で成功確認にする。
+5. 関連回帰、文書検査、`git diff --check` を実行する。
+6. 成功確認を別コミットにし、`git push` する。
 
-CI確認ではPR #28のcurrent HEAD SHAとworkflow runの `head_sha` が完全一致するrunだけを使用し、別SHAのrunは代用しない。
+CI確認では PR #28 の現在の `HEAD` のコミット識別子と自動処理の `head_sha` が完全一致する実行だけを使用し、別のコミット識別子の実行は代用しない。
 
-## WF28-004A-01 Game Controller model RED
+## WF28-004A-01 `Game Controller` 資源構成の失敗確認
 
 - 資源名は `game-controller`。
-- image repositoryと固定tagを検査する。
-- host networkを検査する。
+- Docker 画像名と固定版を検査する。
+- Docker の `--network host` 指定を検査する。
 - `-visionAddress 224.5.23.2:10020` を検査する。
 - `-trackerAddress 224.5.23.2:11010` を検査する。
 - `-publishAddress 224.5.23.1:11003` を検査する。
 - `-address :8082` を検査する。
-- AppHost内に11003をpublishする別資源を作らない。
+- `AppHost` 内に 11003 へ送信する別資源を作らない。
 
-## WF28-004A-02 Game Controller model GREEN
+## WF28-004A-02 `Game Controller` 資源構成の成功確認
 
-AppHostへ `game-controller` を追加する。Crane基準構成のCLI引数を維持し、`latest` ではなく実在確認済みの固定tagを使う。
+`AppHost` へ `game-controller` を追加する。`Crane` 基準構成の CLI 引数を維持し、`latest` ではなく実在確認済みの固定版を使う。
 
-## WF28-004A-03 referee-driver RED
+## WF28-004A-03 `referee-driver` 失敗確認
 
-focused testで次を固定する。
+対象試験で次を固定する。
 
-1. 最初のcommandが `HALT` でなければ失敗し、API操作しない。
-2. `HALT` 確認後の最初のactionは `NEXT_COMMAND`。
-3. 次のcommandが `HALT` / `STOP` なら `FORCE_START`。
+1. 最初の命令が `HALT` でなければ失敗し、API を操作しない。
+2. `HALT` 確認後の最初の操作は `NEXT_COMMAND`。
+3. 次の命令が `HALT` / `STOP` なら `FORCE_START`。
 4. 準備状態なら `NORMAL_START`。
-5. active commandを観測した時点で成功する。
-6. active commandを確認できなければ失敗する。
-7. fixture自身は11003へ送信しない。
+5. 有効な命令を観測した時点で成功する。
+6. 有効な命令を確認できなければ失敗する。
+7. `referee-driver` 自身は 11003 へ送信しない。
 
-## WF28-004A-04 referee-driver GREEN
+## WF28-004A-04 `referee-driver` 成功確認
 
-状態遷移ロジックとnetwork adapter境界を分離する。今回のfocused testでは観測command列と送信action列の契約をDocker不要で固定し、実network adapterは後続の一括起動試験から再利用できる形にする。
+状態遷移処理と通信接続層の境界を分離する。今回の対象試験では観測した命令列と送信した操作列の契約を Docker を使わず固定し、実通信接続層は後続の一括起動試験から再利用できる形にする。
 
 ## WF28-004A-05 検証・報告
 
-- `AppHostApplicationModelTests` と referee-driver focused testを実行する。
-- `Tracker.Tests` の関連回帰、Markdown / 用語lint、`git diff --check` を実行する。
+- `AppHostApplicationModelTests` と `referee-driver` の対象試験を実行する。
+- `Tracker.Tests` の関連回帰、Markdown / 用語検査、`git diff --check` を実行する。
 - `Tracker/Design/tasks-status.md` を更新する。
-- 詳細reportを `reports/` へ保存する。
-- PR #28 current HEADへ合流後、同一SHAのCIだけを確認する。
-- PR #28へ簡易reportをコメントする。mergeは行わない。
+- 詳細報告書を `reports/` へ保存する。
+- PR #28 の現在の `HEAD` へ合流後、同一コミット識別子の CI だけを確認する。
+- PR #28 へ簡易報告を投稿する。取り込みは行わない。

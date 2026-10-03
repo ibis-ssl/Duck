@@ -138,4 +138,3 @@ current HEAD で次を確認した。
 - 更新後の PR #29 current HEAD と完全一致する CI run だけを確認する。
 
 merge は利用者判断とし、レビュー担当では行わない。
-
