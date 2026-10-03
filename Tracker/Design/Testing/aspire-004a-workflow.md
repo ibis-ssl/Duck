@@ -8,7 +8,7 @@ PR #28 の `ASPIRE-004A` `Game Controller` と `referee-driver` の試験補助�
 
 ## 作業境界
 
-- `game-controller` を `Aspire AppHost` の `Docker image` 資源として追加する。
+- `game-controller` を `Aspire AppHost` から Docker で起動する資源として追加する。
 - `Game Controller` は `ContainerImageAnnotation.Tag` を固定し、Docker の `--network host` 指定で起動して、`224.5.23.1:11003` の唯一の審判情報送信元とする。
 - 制御 API は `127.0.0.1:8082/api/control` を使う。
 - `referee-driver` は 11003 へ送信せず、`HALT` 確認後に API を操作して、試合進行中を示す `NORMAL_START` / `FORCE_START` への遷移を確認する。
@@ -17,7 +17,7 @@ PR #28 の `ASPIRE-004A` `Game Controller` と `referee-driver` の試験補助�
 
 ## 作業領域の分離
 
-`ASPIRE-004A` は専用の Git `worktree` と専用の操作接続で作業し、並行する `ASPIRE-003A/B` の `worktree` を共有しない。PR #28 へ合流する直前に現在の `HEAD` を取得し、必要なら親側の最新履歴を取り込む。
+`ASPIRE-004A` は専用の Git `worktree` を使い、`RemoteDesktopMCP` の `session_id` もこの作業専用に1つ確保する。並行する `ASPIRE-003A/B` とは `worktree` と `session_id` を共有しない。PR #28 へ合流する直前に現在の `HEAD` を取得し、必要なら親側の最新履歴を取り込む。
 
 ## 共通条件
 
@@ -37,7 +37,7 @@ CI確認では PR #28 の現在の `HEAD SHA` と `GitHub Actions` 実行の `he
 ## WF28-004A-01 `Game Controller` 資源構成の失敗確認
 
 - 資源名は `game-controller`。
-- `Docker image` 名と `ContainerImageAnnotation.Tag` の固定値を検査する。
+- `ContainerImageAnnotation.Image` と `ContainerImageAnnotation.Tag` の固定値を検査する。
 - Docker の `--network host` 指定を検査する。
 - `-visionAddress 224.5.23.2:10020` を検査する。
 - `-trackerAddress 224.5.23.2:11010` を検査する。
