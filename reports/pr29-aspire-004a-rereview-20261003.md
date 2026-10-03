@@ -144,4 +144,3 @@ current HEAD で対象テストを再実行した。
 - 更新後 current HEAD と完全一致する CI run だけを最終判定に使う。
 
 merge は行わない。
-
