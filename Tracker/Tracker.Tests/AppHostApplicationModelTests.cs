@@ -1,6 +1,7 @@
 ﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tracker.Tests;
 
@@ -35,7 +36,15 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("a52b6bd", image.Tag);
         Assert.Equal("tini", simulator.Entrypoint);
 
-        var args = await simulator.GetArgumentValuesAsync(DistributedApplicationOperation.Run);
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(simulator)
+            .WithArgumentsConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var args = executionConfiguration.Arguments
+            .Select(argument => argument.Value?.ToString() ?? string.Empty)
+            .ToArray();
         Assert.Equal(
             [
                 "--",
@@ -64,7 +73,13 @@ public sealed class AppHostApplicationModelTests
         var simulator = Assert.Single(appHost.Resources, resource => resource.Name == "simulator");
         var duck = Assert.IsType<ProjectResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "duck"));
-        var environment = await duck.GetEnvironmentVariableValuesAsync(DistributedApplicationOperation.Run);
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(duck)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var environment = executionConfiguration.EnvironmentVariables.ToDictionary();
         var wait = Assert.Single(duck.Annotations.OfType<WaitAnnotation>());
 
         Assert.Equal("sim", environment["Tracker__ActiveProfileName"]);
@@ -91,7 +106,15 @@ public sealed class AppHostApplicationModelTests
         var simulator = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
         var image = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
-        var containerArgs = await simulator.GetArgumentValuesAsync(DistributedApplicationOperation.Run);
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(simulator)
+            .WithArgumentsConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var containerArgs = executionConfiguration.Arguments
+            .Select(argument => argument.Value?.ToString() ?? string.Empty)
+            .ToArray();
 
         Assert.Equal("custom-tag", image.Tag);
         Assert.Equal(
@@ -151,6 +174,81 @@ public sealed class AppHostApplicationModelTests
         }
 
         Assert.Equal(["game-controller"], refereeProducers);
+    }
+
+    [Fact]
+    public async Task BaseModelContainsPinnedCraneAndCm4SimulatorWithHostNetworking()
+    {
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io", craneImage.Registry);
+        Assert.Equal("ibis-ssl/crane", craneImage.Image);
+        Assert.Matches("^scenario-[0-9a-f]{7,40}$", craneImage.Tag);
+        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(crane));
+
+        var cm4Simulator = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "cm4-sim"));
+        var cm4Image = Assert.Single(cm4Simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io", cm4Image.Registry);
+        Assert.Equal("ibis-ssl/orion-cm4-sim", cm4Image.Image);
+        Assert.Matches("^[0-9a-f]{7,40}$", cm4Image.Tag);
+        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(cm4Simulator));
+    }
+
+    [Fact]
+    public async Task VisibilityGraphCraneUsesModeFourPathAndWaitsForItsPrerequisites()
+    {
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var cm4Simulator = Assert.Single(appHost.Resources, resource => resource.Name == "cm4-sim");
+        var duck = Assert.Single(appHost.Resources, resource => resource.Name == "duck");
+        var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
+
+        var craneArgs = await GetArgumentsAsync(crane);
+        Assert.Contains("planner:=visibility_graph", craneArgs);
+        Assert.Contains("12345", craneArgs);
+
+        var cm4Args = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(cm4Simulator));
+        Assert.Contains("12345", cm4Args);
+        Assert.Contains("12346", cm4Args);
+
+        AssertWaitsFor(crane, cm4Simulator, duck, gameController);
+        AssertWaitsFor(cm4Simulator, Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
+    }
+
+    [Fact]
+    public async Task PlannerWithoutCm4SimulatorDoesNotCreateThatResourceOrDependency()
+    {
+        string[] args = ["--Testing:Crane:Planner=direct"];
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var duck = Assert.Single(appHost.Resources, resource => resource.Name == "duck");
+        var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
+
+        Assert.Contains("planner:=direct", await GetArgumentsAsync(crane));
+        AssertWaitsFor(crane, duck, gameController);
+    }
+
+    private static void AssertWaitsFor(IResource resource, params IResource[] dependencies)
+    {
+        var waits = resource.Annotations.OfType<WaitAnnotation>().ToArray();
+        Assert.Equal(dependencies.Length, waits.Length);
+        foreach (var dependency in dependencies)
+        {
+            var wait = Assert.Single(waits, annotation => ReferenceEquals(annotation.Resource, dependency));
+            Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
+        }
     }
 
     private static async Task<string[]> GetArgumentsAsync(IResourceWithArgs resource)
