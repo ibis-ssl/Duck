@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import socket
+import subprocess
 import sys
 import time
 from typing import Callable
@@ -52,6 +53,55 @@ def process_is_alive(pid: int) -> bool:
         return False
 
 
+def verify_owned_stack(stack_id: str, run=subprocess.run) -> tuple[bool, str | None]:
+    """Require exactly one live, correctly labelled host-network container per wrapper."""
+    for resource in REQUIRED_RESOURCES:
+        listed = run(
+            [
+                "docker", "ps", "-aq", "--no-trunc",
+                "--filter", "label=duck.aspire.owner=duck-apphost",
+                "--filter", f"label=duck.aspire.stack={stack_id}",
+                "--filter", f"label=duck.aspire.resource={resource}",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if listed.returncode != 0:
+            return False, f"Could not list owned {resource} containers."
+        container_ids = [line.strip() for line in listed.stdout.splitlines() if line.strip()]
+        if len(container_ids) != 1:
+            return False, f"Expected one owned {resource} container; found {len(container_ids)}."
+
+        inspected = run(
+            ["docker", "inspect", container_ids[0]],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if inspected.returncode != 0:
+            return False, f"Could not inspect owned {resource} container."
+        try:
+            container = json.loads(inspected.stdout)[0]
+            labels = container["Config"]["Labels"] or {}
+            correct = (
+                labels.get("duck.aspire.owner") == "duck-apphost"
+                and labels.get("duck.aspire.stack") == stack_id
+                and labels.get("duck.aspire.resource") == resource
+                and bool(labels.get("duck.aspire.run"))
+                and container["Name"] == f"/duck-{stack_id}-{resource}"
+                and container["HostConfig"]["NetworkMode"] == "host"
+            )
+            running = container["State"]["Running"] is True
+        except (IndexError, KeyError, TypeError, json.JSONDecodeError):
+            return False, f"Could not validate owned {resource} container metadata."
+        if not correct:
+            return False, f"Owned {resource} container metadata did not match this stack."
+        if not running:
+            return False, f"Owned {resource} container is not running."
+    return True, None
+
+
 def wait_for_readiness(
     apphost_pid: int,
     *,
@@ -60,6 +110,8 @@ def wait_for_readiness(
     request_timeout_seconds: float = 2,
     probe: Callable[[int, float], int | str] = probe_health,
     is_alive: Callable[[int], bool] = process_is_alive,
+    verify_stack: Callable[[str], tuple[bool, str | None]] | None = None,
+    stack_id: str | None = None,
     clock: Callable[[], float] = time.monotonic,
     sleep: Callable[[float], None] = time.sleep,
 ) -> ReadinessResult:
@@ -93,6 +145,18 @@ def wait_for_readiness(
                 polls,
             )
         if all(status == 200 for status in statuses.values()):
+            if verify_stack is not None:
+                if not stack_id:
+                    raise ValueError("Stack ID is required when verifying owned containers.")
+                stack_valid, stack_reason = verify_stack(stack_id)
+                polls[-1]["owned_stack_valid"] = stack_valid
+                if not stack_valid:
+                    return ReadinessResult(
+                        "failed",
+                        "owned_stack_mismatch",
+                        stack_reason or "Current AppHost stack ownership could not be verified.",
+                        polls,
+                    )
             return ReadinessResult("ready", None, None, polls)
 
         now = clock()
@@ -115,12 +179,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apphost-pid", type=int, required=True)
     parser.add_argument("--report-file", type=Path, required=True)
+    parser.add_argument("--stack-id", required=True)
     parser.add_argument("--timeout-seconds", type=float, default=300)
     parser.add_argument("--poll-interval-seconds", type=float, default=2)
     args = parser.parse_args()
 
     result = wait_for_readiness(
         args.apphost_pid,
+        verify_stack=verify_owned_stack,
+        stack_id=args.stack_id,
         timeout_seconds=args.timeout_seconds,
         poll_interval_seconds=args.poll_interval_seconds,
     )

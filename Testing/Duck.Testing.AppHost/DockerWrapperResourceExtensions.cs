@@ -13,7 +13,8 @@ public static class DockerWrapperResourceExtensions
         DockerContainerSpec spec,
         int healthPort,
         string expectedProcessName,
-        string readinessProfile = "process")
+        string readinessProfile = "process",
+        int startupTimeoutSeconds = 180)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(spec);
@@ -27,7 +28,8 @@ public static class DockerWrapperResourceExtensions
             spec.RunId,
             healthPort,
             ExpectedProcessName: expectedProcessName,
-            ReadinessProfile: readinessProfile);
+            ReadinessProfile: readinessProfile,
+            StartupTimeoutSeconds: startupTimeoutSeconds);
         var healthCheckName = $"{spec.ResourceName}-docker-wrapper-ready";
         builder.Services.AddHealthChecks().AddCheck(
             healthCheckName,

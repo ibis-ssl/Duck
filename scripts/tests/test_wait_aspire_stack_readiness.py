@@ -5,7 +5,12 @@ from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from wait_aspire_stack_readiness import REQUIRED_RESOURCES, probe_health, wait_for_readiness
+from wait_aspire_stack_readiness import (
+    REQUIRED_RESOURCES,
+    probe_health,
+    verify_owned_stack,
+    wait_for_readiness,
+)
 
 
 class FakeClock:
@@ -25,7 +30,7 @@ class AspireStackReadinessTests(unittest.TestCase):
         apphost = (repository / "Testing" / "Duck.Testing.AppHost" / "Program.cs").read_text(encoding="utf-8")
 
         for resource, port in REQUIRED_RESOURCES.items():
-            self.assertRegex(apphost, rf"\b{port},\s+\"[^\"]+\",\s+\"{resource}\"\)")
+            self.assertRegex(apphost, rf"\b{port},\s+\"[^\"]+\",\s+\"{resource}\"")
         self.assertIn('?? "visibility_graph"', apphost)
 
     def test_workflow_gates_motion_acceptance_on_the_full_stack_readiness_probe(self):
@@ -39,6 +44,8 @@ class AspireStackReadinessTests(unittest.TestCase):
         acceptance_step = workflow[acceptance_start:]
 
         self.assertIn("scripts/wait_aspire_stack_readiness.py", readiness_step)
+        self.assertIn('--stack-id "$stack_id"', readiness_step)
+        self.assertIn("--timeout-seconds 300", readiness_step)
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", acceptance_step)
         self.assertNotIn("ancestor=robocupssl/ssl-game-controller", readiness_step)
 
@@ -46,6 +53,7 @@ class AspireStackReadinessTests(unittest.TestCase):
         repository = Path(__file__).resolve().parents[2]
         workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
         cleanup_start = workflow.index("- name: Collect logs and clean up this run's containers")
+        self.assertIn("if: ${{ always() }}", workflow[cleanup_start:])
         cleanup_step = workflow[cleanup_start:]
 
         self.assertIn('stack_id="gha-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"', workflow)
@@ -134,6 +142,96 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertEqual("failed", result.status)
         self.assertEqual("apphost_exited", result.failure_category)
         self.assertEqual(1, len(result.polls))
+
+    def test_stale_health_200_without_this_runs_owned_stack_blocks_readiness(self):
+        calls = []
+
+        def docker_run(command, **_kwargs):
+            calls.append(command)
+            from subprocess import CompletedProcess
+            return CompletedProcess(command, 0, "", "")
+
+        stack_valid, reason = verify_owned_stack("gha-123-1", run=docker_run)
+        self.assertFalse(stack_valid)
+        self.assertIn("simulator", reason)
+
+        result = wait_for_readiness(
+            42,
+            probe=lambda _port, _timeout: 200,
+            is_alive=lambda _pid: True,
+            verify_stack=lambda stack: verify_owned_stack(stack, run=docker_run),
+            stack_id="gha-123-1",
+        )
+        self.assertEqual("failed", result.status)
+        self.assertEqual("owned_stack_mismatch", result.failure_category)
+        self.assertFalse(result.polls[0]["owned_stack_valid"])
+        self.assertEqual(2, len(calls))
+
+    def test_current_stack_all_resources_must_be_unique_running_and_host_networked(self):
+        inspections = {
+            resource: {
+                "Name": f"/duck-gha-123-1-{resource}",
+                "Config": {"Labels": {
+                    "duck.aspire.owner": "duck-apphost",
+                    "duck.aspire.stack": "gha-123-1",
+                    "duck.aspire.resource": resource,
+                    "duck.aspire.run": f"run-{resource}",
+                }},
+                "State": {"Running": True},
+                "HostConfig": {"NetworkMode": "host"},
+            }
+            for resource in REQUIRED_RESOURCES
+        }
+
+        def make_docker_runner(*, duplicate=None, stopped=None, wrong_stack=None):
+            def docker_run(command, **_kwargs):
+                if command[1] == "ps":
+                    resource = command[-1].split("=")[-1]
+                    if duplicate == resource:
+                        return type("Result", (), {"returncode": 0, "stdout": "id-a\nid-b\n"})()
+                    return type("Result", (), {"returncode": 0, "stdout": "id-" + resource + "\n"})()
+                resource = command[-1].removeprefix("id-")
+                container = inspections[resource]
+                if stopped == resource:
+                    container["State"]["Running"] = False
+                if wrong_stack == resource:
+                    container["Config"]["Labels"]["duck.aspire.stack"] = "old-stack"
+                return type("Result", (), {"returncode": 0, "stdout": __import__("json").dumps([container])})()
+            return docker_run
+
+        # Restore shared fixture mutations between each case.
+        import copy
+        pristine = copy.deepcopy(inspections)
+        valid_runner = make_docker_runner()
+        self.assertEqual((True, None), verify_owned_stack("gha-123-1", run=valid_runner))
+        valid_result = wait_for_readiness(
+            42,
+            probe=lambda _port, _timeout: 200,
+            is_alive=lambda _pid: True,
+            verify_stack=lambda stack: verify_owned_stack(stack, run=valid_runner),
+            stack_id="gha-123-1",
+        )
+        self.assertEqual("ready", valid_result.status)
+        self.assertTrue(valid_result.polls[0]["owned_stack_valid"])
+
+        for case in ("duplicate", "stopped", "wrong_stack"):
+            inspections.clear()
+            inspections.update(copy.deepcopy(pristine))
+            kwargs = {case: "cm4-sim"}
+            invalid_runner = make_docker_runner(**kwargs)
+            accepted, reason = verify_owned_stack("gha-123-1", run=invalid_runner)
+            self.assertFalse(accepted)
+            self.assertIn("cm4-sim", reason)
+            result = wait_for_readiness(
+                42,
+                probe=lambda _port, _timeout: 200,
+                is_alive=lambda _pid: True,
+                verify_stack=lambda stack: verify_owned_stack(stack, run=invalid_runner),
+                stack_id="gha-123-1",
+            )
+            self.assertEqual("failed", result.status)
+            self.assertEqual("owned_stack_mismatch", result.failure_category)
+            self.assertFalse(result.polls[0]["owned_stack_valid"])
 
 
 if __name__ == "__main__":

@@ -63,6 +63,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("team:=Yellow", crane.ContainerArguments[^1]);
         Assert.Equal("visibility_graph", crane.Environment["PLANNER"]);
         Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
+        Assert.Equal(360, crane.StartupTimeoutSeconds);
         Assert.DoesNotContain(crane.Environment, item => item.Key == "FEEDBACK_SIM_MODE");
     }
 

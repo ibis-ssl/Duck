@@ -114,7 +114,8 @@ var craneBuilder = builder
             stackId),
         39104,
         "ros2",
-        "crane");
+        "crane",
+        startupTimeoutSeconds: 360);
 
 var crane = craneBuilder
     .WaitForStart(duck)
