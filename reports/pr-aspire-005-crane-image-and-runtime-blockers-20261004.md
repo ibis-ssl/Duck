@@ -11,7 +11,7 @@
 
 AppHost の既定値 `scenario-a544db92b72b137c8974285b36940d0d4b5e7e69` は registry に存在しない。Crane の `a544db92b72b137c8974285b36940d0d4b5e7e69` は `[skip ci]` 付きのリリースコミットであり、[Docker workflow](https://github.com/ibis-ssl/crane/blob/a544db92b72b137c8974285b36940d0d4b5e7e69/.github/workflows/docker_build.yaml) は `develop` への push または手動実行でのみ image を構築し、コミットSHAのタグを付ける。このSHAでの build run はなく、`scenario-a544...` は `manifest unknown` となる。
 
-最新の成功 build は [run 36966869325](https://github.com/ibis-ssl/crane/actions/runs/36966869325) で、ソースSHAは `4063cd31cd5b11b1cc919003907f5f4c527b252d`。対応する固定タグ `ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` は存在し、linux/amd64 manifest digest は `sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac`。`4063cd31` から `a544db92` までの差分はREADME badgeとpackage version metadata (`1.0.563` から `1.0.564`) で、scenario構成・実行コードの差分はない。したがって同じ設計意図のシナリオを実行する既存の最新固定参照として、AppHost既定値とモデルテストを `scenario-4063cd31...` に更新した。設定によるtag上書きは引き続き可能。
+最新の成功 build は [run 36966869325](https://github.com/ibis-ssl/crane/actions/runs/36966869325) で、ソースSHAは `4063cd31cd5b11b1cc919003907f5f4c527b252d`。対応する固定タグ `ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` は存在し、linux/amd64 manifest digest は `sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac`。`4063cd31` から `a544db92` までの差分はpackage version metadata (`1.0.563` から `1.0.564`) のみで、scenario構成・実行コードの差分はない。したがって同じ設計意図のシナリオを実行する既存の最新固定参照として、AppHost既定値とモデルテストを `scenario-4063cd31...` に更新した。設定によるtag上書きは引き続き可能。
 
 ## Docker daemon の観測
 
