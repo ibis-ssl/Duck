@@ -49,7 +49,7 @@
 
 ## ASPIRE 実装タスク分割（2026-09-29）
 
-PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位へ分割する。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。TIGERs vs Crane 対戦は `ASPIRE-006F` を `ASPIRE-006F1`〜`006F6`、`ASPIRE-006G` を `ASPIRE-006G1`〜`006G4` へ分ける。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装タスクにはしない。
+PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位へ分割する。`ASPIRE-005` は base-mode stack の移行と一括受入に限定し、comparison mode の実装境界は `ASPIRE-006A/B`、比較 UI / replay は `ASPIRE-006C`〜`006E`、実 packet の OS 受入は `ASPIRE-007A` とする。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。TIGERs vs Crane 対戦は `ASPIRE-006F` を `ASPIRE-006F1`〜`006F6`、`ASPIRE-006G` を `ASPIRE-006G1`〜`006G4` へ分ける。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装タスクにはしない。
 
 各実装タスクは、先に focused test または application model test を追加して未実装状態で失敗することを確認し、その後に実装する。失敗確認と実装はレビュー可能な論理単位で commit / push する。CI に Docker/Aspire 統合試験を追加する場合は、テスト結果、標準出力、標準エラー、Aspire と各コンテナの調査ログを失敗時 artifact へ保存する。
 
@@ -59,10 +59,10 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-003A` | RuntimeHost の SSL-Vision 受信診断 | 小 | `ASPIRE-002` | `VisionPacketsReceivedTotal`、endpoint / interface / 累積値の診断ログ、decode 失敗を加算しない focused test を TDD で実装する。 |
 | `ASPIRE-003B` | ER-Force Simulator 資源 | 小 | `ASPIRE-003A` | 固定 tag の `simulator-cli`、host network、geometry / realism、Duck の sim 設定を model test で固定し、Linux で `ASPIRE-NET-002` の受信を確認する。 |
 | `ASPIRE-004A` | Game Controller と referee-driver fixture | 小 | `ASPIRE-002` | `game-controller` を 11003 の唯一の producer とし、`referee-driver` が HALT 確認後に API を操作して active command へ遷移できることを focused test で固定する。 |
-| `ASPIRE-004B` | Crane / cm4-sim 資源と起動依存 | 中 | `ASPIRE-003B`, `ASPIRE-004A` | 固定 image tag、host network、mode 4→3 経路、planner ごとの `WaitForStart` 依存を application model test で固定する。 |
-| `ASPIRE-005` | 基本 stack の一括起動試験 | 中 | `ASPIRE-004B` | Simulator / game-controller / Crane / cm4-sim / Duck を一括起動し、SSL-Vision 受信、Duck tracker 出力、active motion、stack ownership を確認する。Linux で比較資源を除く適用 `ASPIRE-NET-*` を証跡化する。 |
-| `ASPIRE-006A` | comparison mode の外部 tracker 資源 | 中 | `ASPIRE-005` | `tracker-tigers`、`tracker-erforce`、`debug-host` を追加し、Game Controller 排他、host network、10020 入力 / 11010 出力を model test で固定する。 |
-| `ASPIRE-006B` | source identity と三 tracker 同時受信 | 中 | `ASPIRE-006A` | logical role、UUID / endpoint fallback、衝突時 Ready 判定、live / replay の同一 resolver 契約を focused test で固定し、`ASPIRE-NET-003`〜`005` の Linux 証跡を得る。 |
+| `ASPIRE-004B` | Crane / cm4-sim 資源と起動依存 | 中 | `ASPIRE-003B`, `ASPIRE-004A` | 固定 image tag、host network、mode 4→3 経路、planner ごとの readiness 条件付き `WaitFor` 依存を application model test で固定する。Duck の project-start 通知はサービス準備完了と区別し、Crane が依存する資源だけを待つ。 |
+| `ASPIRE-005` | 基本構成の一括起動・生存確認試験 | 中 | `ASPIRE-004B` | 基本構成の Simulator / game-controller / Crane / cm4-sim / Duck を一括起動し、SSL-Vision 受信、Duck の tracker 出力、active motion、stack ownership を確認する。Game Controller の初期 HALT を起動世代ごとに検証し、正常 active 遷移後の継続正常性、審判/API 通信断やプロセス終了時の異常判定、再起動時の初期検証やり直しを対象試験で確認する。比較資源を含めず、比較の実 packet 受入は `ASPIRE-007A` に分ける。 |
+| `ASPIRE-006A` | 比較モードのtracker wrapper / DebugHost 構成 | 中 | `ASPIRE-005` | `tracker-tigers` / `tracker-erforce` を完全な所有者照合と資源固有の準備確認を持つ wrapper executable resource、`debug-host` を .NET project resource とする。両 tracker は準備完了した Simulator / Game Controller を待ち、DebugHost は Duck の起動通知と両 tracker の準備完了を待つ。資源種別、送信元固有の準備条件、正常性確認付き依存関係、11003送信元の排他を model / wrapper test で固定する。 |
+| `ASPIRE-006B` | 送信元識別と三 tracker の準備確認 | 中 | `ASPIRE-006A` | 論理役割、UUID / endpoint fallback、衝突時の準備判定、Duck / TIGERs / ER-Force の同じ確認窓内の新しいパケット条件、DebugHost の比較用正常性確認を対象試験で固定する。実 packet の Linux acceptance は `ASPIRE-007A` で行う。 |
 | `ASPIRE-006C` | Tracker Difference の対応付けと数値差分 | 中 | `ASPIRE-006B` | robot の team+id、ball の最大 pair 数→距離合計最小→辞書順 tie-break、gate 境界、missing / unmatched を TDD で固定する。 |
 | `ASPIRE-006D` | live Split / Overlay と数値差分 | 小 | `ASPIRE-006C` | 1 UI render tick で固定した同じ snapshot pair を Split / Overlay と数値差分が共有し、時刻差を別表示できる。 |
 | `ASPIRE-006E` | CaptureOn / replay 比較 | 中 | `ASPIRE-006D` | 同じ diagnostics sample tick、saved alignment 優先、latest-before fallback、future snapshot 不使用を focused test と replay 証跡で固定する。 |
@@ -71,8 +71,8 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-006F2` | `match` mode と resource topology | 小 | `ASPIRE-005` | `Testing:Mode=match`、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
 | `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 小 | `ASPIRE-006F1`, `ASPIRE-006F2` | 対戦用 Simulator 引数、11003 の単一 producer、GC API、fixture mount、固定 image reference を model test で固定する。 |
 | `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | 中 | `ASPIRE-006F1`, `ASPIRE-006F2` | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 契約を model test で固定する。 |
-| `ASPIRE-006F5` | Crane / Duck 対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Crane `team:=ibis`、`cm4-sim` 非依存、Duck 11010 publish 無効、必要な `WaitForStart` を model test で固定する。 |
-| `ASPIRE-006F6` | `match-controller` と試合 lifecycle | 中 | `ASPIRE-006F3`, `ASPIRE-006F4`, `ASPIRE-006F5` | GC API / referee / vision readiness、STOP / HALT の継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
+| `ASPIRE-006F5` | Crane / Duck 対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Crane `team:=ibis`、`cm4-sim` 非依存、Duck 11010 publish 無効、Simulator / Game Controller に対する readiness 条件付き `WaitFor` と Duck project-start 通知の区別を model test で固定する。 |
+| `ASPIRE-006F6` | `match-controller` と試合 lifecycle | 中 | `ASPIRE-006F3`, `ASPIRE-006F4`, `ASPIRE-006F5` | GC API / referee / vision readiness、STOP / HALT の継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。Game Controller の STOP 起動検証後も正常 command 遷移で ready を維持し、resource 再起動後は STOP 検証をやり直す。 |
 | `ASPIRE-006G` | TIGERs vs Crane 一括対戦試験（親） | 中 | `ASPIRE-006F6` | `ASPIRE-006G1`〜`006G4` が完了し、`ASPIRE-MATCH-001`〜`005` の Linux 実 packet 証跡が揃う。 |
 | `ASPIRE-006G1` | topology / team / referee 受入 | 小 | `ASPIRE-006F6` | Linux で `ASPIRE-MATCH-001` / `002` を確認し、resource 一覧、team mapping、11003 producer の一意性を保存する。 |
 | `ASPIRE-006G2` | 双方 active motion 受入 | 小 | `ASPIRE-006G1` | `ASPIRE-MATCH-003` を実行し、同一 active referee 窓で Crane と TIGERs の双方の位置変化を実 packet で確認する。 |
