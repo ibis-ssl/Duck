@@ -3,6 +3,7 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Xml.Linq;
 
 namespace Tracker.Tests;
 
@@ -37,6 +38,106 @@ public sealed class AppHostApplicationModelTests
 
         Assert.Equal("Tracker.RuntimeHost.csproj", Path.GetFileName(metadata.ProjectPath));
         Assert.Equal("Tracker.RuntimeHost", Path.GetFileName(Path.GetDirectoryName(metadata.ProjectPath)));
+    }
+
+    [Fact]
+    public async Task ComparisonModeAddsPinnedExternalTrackersAndObserverWithoutAnotherRefereeProducer()
+    {
+        using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+            ["--Testing:Mode=comparison", CreateIsolatedOwnershipLockArgument()]);
+
+        var simulator = Assert.Single(appHost.Resources, resource => resource.Name == "simulator");
+        var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
+        var tigers = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "tracker-tigers"));
+        var erForce = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "tracker-erforce"));
+        var debugHost = Assert.IsType<ProjectResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "debug-host"));
+
+        AssertContainerImage(tigers, "tigersmannheim/sumatra", "2025");
+        AssertContainerImage(erForce, "roboticserlangen/autoref", "2025.1.0");
+        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(tigers));
+        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(erForce));
+        AssertWaitsFor(tigers, simulator, gameController);
+        AssertWaitsFor(erForce, simulator, gameController);
+
+        Assert.Equal(
+            ["--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--moduli", "simulation_protocol_comparison"],
+            await GetArgumentsAsync(tigers));
+        var protocolMount = Assert.Single(tigers.Annotations.OfType<ContainerMountAnnotation>());
+        Assert.Equal(ContainerMountType.BindMount, protocolMount.Type);
+        Assert.Equal("/Sumatra/config/moduli/simulation_protocol_comparison.xml", protocolMount.Target);
+        Assert.True(protocolMount.IsReadOnly);
+
+        var protocol = XDocument.Load(Assert.IsType<string>(protocolMount.Source));
+        var refereeProperties = protocol.Descendants("module")
+            .Single(module => (string?)module.Attribute("id") == "edu.tigers.sumatra.referee.AReferee")
+            .Element("properties");
+        Assert.Equal("NETWORK", (string?)refereeProperties?.Element("source"));
+        Assert.Equal("11003", (string?)refereeProperties?.Element("port"));
+        Assert.Equal("false", (string?)refereeProperties?.Element("gameController"));
+        Assert.Equal("false", (string?)refereeProperties?.Element("publishRefereeMessages"));
+
+        var cameraProperties = protocol.Descendants("module")
+            .Single(module => (string?)module.Attribute("id") == "edu.tigers.sumatra.cam.ACam")
+            .Element("properties");
+        Assert.Equal("10020", (string?)cameraProperties?.Element("port"));
+
+        var trackerProperties = protocol.Descendants("module")
+            .Single(module => (string?)module.Attribute("id") == "edu.tigers.sumatra.wp.exporter.VisionTrackerSender")
+            .Element("properties");
+        Assert.Equal("224.5.23.2", (string?)trackerProperties?.Element("address"));
+        Assert.Equal("11010", (string?)trackerProperties?.Element("port"));
+        Assert.Equal(
+            ["--vision-port", "10020", "--tracker-port", "11010", "--gc-port", "11003"],
+            await GetArgumentsAsync(erForce));
+
+        var debugHostEnvironment = await GetResourceEnvironmentAsync(debugHost);
+        Assert.Equal("224.5.23.2", debugHostEnvironment["VisionReceiver__MulticastAddress"]);
+        Assert.Equal("10020", debugHostEnvironment["VisionReceiver__Port"]);
+        Assert.Equal("false", debugHostEnvironment["Tracker__Enabled"]);
+        Assert.Equal("false", debugHostEnvironment["Tracker__PublishUdp"]);
+        Assert.Equal("true", debugHostEnvironment["Tracker__Receive__Enabled"]);
+        Assert.Equal("224.5.23.2", debugHostEnvironment["Tracker__Receive__MulticastAddress"]);
+        Assert.Equal("11010", debugHostEnvironment["Tracker__Receive__Port"]);
+        Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__Uuid"]);
+        Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__SourceName"]);
+        AssertWaitsFor(debugHost, simulator, tigers, erForce);
+
+        var refereeProducers = new List<string>();
+        foreach (var resource in appHost.Resources.OfType<ContainerResource>())
+        {
+            if (PublishesRefereeEndpoint(await GetArgumentsAsync(resource)))
+            {
+                refereeProducers.Add(resource.Name);
+            }
+        }
+
+        Assert.Equal(["game-controller"], refereeProducers);
+    }
+
+    [Fact]
+    public async Task BaseModeDoesNotAddComparisonOnlyResources()
+    {
+        using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+            [CreateIsolatedOwnershipLockArgument()]);
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce" or "debug-host");
+    }
+
+    [Theory]
+    [InlineData("comparision")]
+    [InlineData("match")]
+    public async Task UnsupportedModeFailsDuringAppHostCreation(string mode)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [$"--Testing:Mode={mode}", CreateIsolatedOwnershipLockArgument()]);
+        });
+
+        Assert.Contains("Unsupported Testing:Mode", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -315,6 +416,30 @@ public sealed class AppHostApplicationModelTests
                 NullLogger.Instance,
                 CancellationToken.None);
         return executionConfiguration.EnvironmentVariables.ToDictionary();
+    }
+
+    private static async Task<Dictionary<string, object>> GetResourceEnvironmentAsync(IResourceWithEnvironment resource)
+    {
+        var environmentVariables = new Dictionary<string, object>(StringComparer.Ordinal);
+        var context = new EnvironmentCallbackContext(
+            new DistributedApplicationExecutionContext(DistributedApplicationOperation.Run),
+            resource,
+            environmentVariables,
+            CancellationToken.None);
+
+        foreach (var annotation in resource.Annotations.OfType<EnvironmentCallbackAnnotation>())
+        {
+            await annotation.Callback(context);
+        }
+
+        return environmentVariables;
+    }
+
+    private static void AssertContainerImage(ContainerResource container, string expectedImage, string expectedTag)
+    {
+        var image = Assert.Single(container.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal(expectedImage, image.Image);
+        Assert.Equal(expectedTag, image.Tag);
     }
 
     private static string CreateIsolatedOwnershipLockArgument() =>
