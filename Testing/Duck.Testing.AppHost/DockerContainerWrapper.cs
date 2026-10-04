@@ -362,9 +362,9 @@ public static class DockerContainerWrapper
             {
                 var graph = await RunDockerAsync(
                     options.DockerExecutable,
-                    ["exec", containerId, "bash", "-lc", "source /root/ibis_ws/install/setup.bash && ros2 node list"],
+                    DockerServiceReadiness.CreateCraneReadinessProbeArguments(containerId),
                     cancellationToken);
-                return graph.ExitCode == 0 && DockerServiceReadiness.CraneHasCoordinator(graph.StandardOutput);
+                return DockerServiceReadiness.CraneProbeSucceeded(graph.ExitCode, graph.StandardOutput);
             }
             case "cm4-sim":
             {

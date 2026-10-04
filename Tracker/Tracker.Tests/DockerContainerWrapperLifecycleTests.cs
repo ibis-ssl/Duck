@@ -133,7 +133,7 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Theory]
-    [InlineData("crane", "ros2", "exec container-id bash -lc")]
+    [InlineData("crane", "ros2", "exec container-id timeout --signal=TERM --kill-after=2s 10s bash -lc source /root/ibis_ws/install/setup.bash && exec ros2 node list")]
     [InlineData("cm4-sim", "cm4_sim", "exec container-id sh -c")]
     public async Task ExpectedProcessWithoutServicePredicatePreventsReadiness(
         string profile,
@@ -168,6 +168,18 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.True(DockerServiceReadiness.CraneHasCoordinator("/crane_session_coordinator\n"));
         Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("port 12345 open"));
         Assert.True(DockerServiceReadiness.Cm4SimOwnsListener("cm4_sim-listening-12345"));
+    }
+
+    [Fact]
+    public void CraneReadinessProbeIsBoundedAndPreservesTheCoordinatorGraphCheck()
+    {
+        Assert.Equal(
+            ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc",
+                "source /root/ibis_ws/install/setup.bash && exec ros2 node list"],
+            DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id"));
+        Assert.False(DockerServiceReadiness.CraneProbeSucceeded(124, "/crane_session_coordinator\n"));
+        Assert.False(DockerServiceReadiness.CraneProbeSucceeded(0, "/other_node\n"));
+        Assert.True(DockerServiceReadiness.CraneProbeSucceeded(0, "/crane_session_coordinator\n"));
     }
 
     [Fact]
