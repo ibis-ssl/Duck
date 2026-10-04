@@ -65,7 +65,7 @@ var gameController = builder.AddDockerWrapper(
         new Dictionary<string, string>(StringComparer.Ordinal),
         stackId),
     39102,
-    "java",
+    "app",
     "game-controller");
 
 var useCm4Simulator = string.Equals(cranePlanner, "visibility_graph", StringComparison.Ordinal);
