@@ -16,11 +16,11 @@ Issue #18 の Aspire 対応として、シミュレーション試験に必要�
 
 ## 現状
 
-`Testing/Duck.Testing.AppHost` は実装済みであり、`duck` は `Tracker.RuntimeHost` の project resource、`simulator`、`game-controller`、`crane`、必要な場合の `cm4-sim` は Aspire の container resource として登録されている。したがって「AppHost は存在しない」は設計開始時点の背景であり、現状説明としては使わない。
+`Testing/Duck.Testing.AppHost` は実装済みである。`duck` は `Tracker.RuntimeHost` の `ProjectResource`、`simulator`、`game-controller`、`crane`、必要な場合の `cm4-sim` は Aspire の `ContainerResource` として登録されている。「AppHost は存在しない」は設計開始時点の背景であり、現在の状態ではない。
 
-現行 AppHost は `AddContainer` と `WithContainerRuntimeArgs("--network", "host")` 相当で host network を指定している。この方式は当初設計に沿った実装だが、Aspire AppHost SDK 13.5.4 / DCP 0.25.13 の hosted run では DCP が user-defined network を設定した後に host network 引数も Docker へ渡し、Docker が `cannot attach both user-defined and non-user-defined network-modes` で container create を拒否した。したがってこの方式は現行コードの記録であり、受入可能な最終方式として扱わない。
+現行 AppHost は `AddContainer` と `WithContainerRuntimeArgs("--network", "host")` 相当でホストネットワークを指定している。この方式は当初設計に沿った実装だが、Aspire AppHost SDK 13.5.4 / DCP 0.25.13 の GitHub Actions 実行では、DCP が利用者定義ネットワークを設定した後にホストネットワーク引数も Docker へ渡していた。Docker は `cannot attach both user-defined and non-user-defined network-modes` によりコンテナ作成を拒否した。この方式は現行コードの記録であり、最終的な受入方式として扱わない。
 
-本書の移行提案は、サービスごとの host wrapper executable resource から固定 image の Docker container を `--network host` で起動する方式である。Duck は引き続き `AddProject<Projects.Tracker_RuntimeHost>` とする。これは設計提案であり、wrapper 実装・設計承認・実通信の成功を意味しない。移行が完了するまで、現行 container resource の host network 起動は失敗状態として扱う。
+本書は、サービスごとの外部実行資源から起動管理プログラムを立ち上げ、固定版の Docker コンテナを `--network host` で起動する方式を提案する。Duck は引き続き `AddProject<Projects.Tracker_RuntimeHost>` とする。これは設計提案であり、起動管理プログラムの実装・設計承認・実通信の成功を意味しない。移行完了までは、現行コンテナ資源によるホストネットワーク起動を失敗状態として扱う。
 
 `Tracker.RuntimeHost` は `VisionReceiver` 設定から SSL-Vision の UDP 入力を受け、既定の `sim` 設定では `224.5.23.2:10020` を受信する。
 ER-Force の `simulator-cli` は SSL simulation protocol の制御入力を受け、SSL-Vision の状態を UDP 10020 へ送信する。通常時の送信先は `224.5.23.2` で、`--localhost` 指定時は `127.0.0.1` となる。
@@ -40,30 +40,30 @@ AppHost は `Testing/Duck.Testing.AppHost` に置く。Duck は既存の `Duck.s
 
 パス指定の `AddDotnetProject` は現行 Aspire では試験的 API のため、初期実装では採用しない。
 
-シミュレータ、Game Controller、Crane、cm4-sim はサービスごとの Aspire executable resource として専用 wrapper を起動し、wrapper が固定 image の Docker container を所有する。Crane は Duck 側でビルドせず、`ibis-ssl/crane` が GitHub Container Registry へ公開する `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を wrapper 経由で起動する。`scenario-develop` は動作確認用の移動タグとして明示指定時だけ利用し、再現可能な試験では使用する Crane のコミット SHA に対応するイメージタグを固定する。
+シミュレータ、Game Controller、Crane、cm4-sim はサービスごとの Aspire 外部実行資源として個別の起動管理プログラムを立ち上げ、それぞれが固定版の Docker コンテナを所有する。Crane は Duck 側でビルドせず、`ibis-ssl/crane` が GitHub Container Registry へ公開する `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を起動管理プログラム経由で起動する。`scenario-develop` は動作確認用の移動タグとして明示指定時だけ利用し、再現可能な試験では Crane のコミット SHA に対応するタグを固定する。
 ## 資源構成
 
 AppHost では三つの主要資源に加え、レフェリー / game-state を供給する一つの試験資源と、Crane の現在のシミュレーション経路を維持する場合に一つの補助資源を管理する。
 
 | 資源名 | 実行形態 | 責務 |
 | --- | --- | --- |
-| `simulator` | Aspire executable wrapper + Docker container | Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` から ER-Force `simulator-cli` を起動し、物理シミュレーションと SSL-Vision 出力を行う。 |
-| `game-controller` | Aspire executable wrapper + Docker container | `robocupssl/ssl-game-controller:<fixed tag or digest>` を host network で起動し、通常 mode / comparison mode / match mode のすべてで `224.5.23.1:11003` の referee message を生成する唯一の authoritative producer とする。制御 API は `127.0.0.1:8082` を使う。 |
-| `crane` | Aspire executable wrapper + Docker container | `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` から Crane を起動し、ロボット制御指令を生成する。 |
-| `cm4-sim` | Aspire executable wrapper + Docker container | `ghcr.io/ibis-ssl/orion-cm4-sim:<commit SHA>` を使い、Crane が `visibility_graph` で出す mode 4 の位置指令を現在の Crane シナリオ構成と同じ経路で mode 3 の速度指令へ変換する補助資源。 |
+| `simulator` | Aspire 外部実行資源＋Docker コンテナ | Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` から ER-Force `simulator-cli` を起動し、物理シミュレーションと SSL-Vision 出力を行う。 |
+| `game-controller` | Aspire 外部実行資源＋Docker コンテナ | `robocupssl/ssl-game-controller:<fixed tag or digest>` をホストネットワークで起動し、各 mode で `224.5.23.1:11003` の referee message を生成する唯一の送信元とする。制御 API は `127.0.0.1:8082` を使う。 |
+| `crane` | Aspire 外部実行資源＋Docker コンテナ | `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` から Crane を起動し、ロボット制御指令を生成する。 |
+| `cm4-sim` | Aspire 外部実行資源＋Docker コンテナ | `ghcr.io/ibis-ssl/orion-cm4-sim:<commit SHA>` を使い、Crane の `visibility_graph` が出す mode 4 の位置指令を mode 3 の速度指令へ変換する。 |
 | `duck` | .NET プロセス | `Tracker.RuntimeHost` を `sim` 設定で起動し、SSL-Vision を追跡してトラッカーパケットを出力する。 |
 
-Aspire のダッシュボードは、AppHost が管理する各 wrapper の起動状態、終了状態、標準出力、標準エラーを一か所で確認する用途に使う。DCP が Docker container 自体を管理しないため、container の inspect 状態・ID・最終ログは wrapper の構造化ログと受入 artifact に記録する。この方式では DCP の first-class container detail 表示は得られない。
+Aspire のダッシュボードでは、AppHost が管理する各起動管理プログラムの状態と標準出力・標準エラーを確認する。DCP は Docker コンテナを直接管理しないため、コンテナの状態・ID・最終ログは起動管理プログラムの記録と受入証跡に残す。この方式では DCP のコンテナ詳細表示は得られない。
 
 ## ネットワーク方針
 
-通信要件は host network を前提とする。container は per-service wrapper が Docker CLI から `--network host` で起動する。Aspire の `AddContainer` に runtime args として host network を加える方式は現行実装の履歴であり、Aspire/DCP が別の user-defined network を同時指定して create に失敗したため、移行先では使用しない。
+通信要件はホストネットワークを前提とする。サービスごとの起動管理プログラムが Docker CLI から `--network host` を指定してコンテナを起動する。Aspire の `AddContainer` に実行引数としてホストネットワークを加える方式は現行実装の履歴であり、Aspire/DCP が利用者定義ネットワークも同時指定してコンテナ作成に失敗したため、移行先では使わない。
 
 理由は、ER-Force の `simulator-cli` が SSL-Vision の送信先として任意の IP アドレスを指定する起動引数を持たず、通常のマルチキャスト送信か `127.0.0.1` 送信だけを選べるためである。
 
 シミュレータを通常の Docker bridge network に置いた場合、`--localhost` はコンテナ自身を指し、ホストで動く Duck には届かない。マルチキャストを bridge network とホスト間で透過させる構成にも依存しない。
 
-そのため `simulator`、`game-controller`、`crane`、`cm4-sim` は Docker の host network で起動し、Duck はホスト上で従来どおり SSL-Vision のマルチキャストへ参加する。wrapper はサービスごとに分かれ、各 wrapper が一つのコンテナのみを所有する。Duck の project resource と AppHost の stack ownership lock は維持する。
+そのため `simulator`、`game-controller`、`crane`、`cm4-sim` は Docker のホストネットワークで起動し、Duck はホスト上で従来どおり SSL-Vision のマルチキャストへ参加する。起動管理プログラムはサービスごとに分け、それぞれ一つのコンテナだけを所有する。Duck のプロジェクト資源と AppHost の多重起動防止 lock は維持する。
 Linux の Docker Engine では host network はコンテナとホストのネットワーク名前空間を共有するため、UDP のポート公開や変換を挟まずに通信できる。
 
 Docker Desktop を使う場合は host networking の有効化が必要である。初期受入環境は Linux の Docker Engine とし、Docker Desktop での動作は別途確認項目とする。
@@ -74,7 +74,7 @@ host network では SSL-Vision と tracker multicast、採用するシミュレ�
 
 Crane の現在のシナリオ構成では、`visibility_graph` を使う場合に `crane` が mode 4 の位置指令を UDP 12345 へ送り、`cm4-sim` が実機 CM4 相当の位置制御を行って mode 3 の速度指令を UDP 12346 へ転送する。したがって Crane を既存 image の現在の挙動のまま組み込む初期構成では、汎用 SSL simulation protocol の 10301 / 10302 へ直接送る経路へ置き換えない。
 
-host network 使用時は Docker の `-p` 相当のポート公開を併用しない。wrapper は shell command string や `bash -c` を使わず、直接引数配列で Docker CLI を実行し、子プロセスを監督する。
+ホストネットワーク使用時は Docker の `-p` 相当のポート公開を併用しない。起動管理プログラムは shell command string や `bash -c` を使わず、引数配列を直接渡して Docker CLI を実行し、子プロセスを監督する。
 
 ### 通信経路
 
@@ -151,40 +151,40 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 
 ## 準備完了と起動順序
 
-現行コードの `WaitForStart` は対象 resource の起動済み状態だけを示し、サービスの UDP/ROS 準備完了を示さない。移行後は各 wrapper が `/health/live` と `/health/ready` を提供する。`ready` は container の Running 状態だけでは成功せず、サービスごとの準備完了 probe を満たした場合に限り成功する。AppHost は readiness が依存上必要な辺に health-based `WaitFor` を使い、`WithReference` は接続情報の参照だけに使う。
+現行コードの `WaitForStart` は対象資源の起動だけを示し、UDP/ROS の準備完了を示さない。移行後は各起動管理プログラムが `/health/live` と `/health/ready` を提供する。コンテナの稼働だけでは準備完了とせず、各サービスの確認条件を満たした場合に限って成功とする。AppHost は準備完了を待つ依存関係に正常性確認付きの `WaitFor` を使い、`WithReference` は接続情報の参照に限る。
 
-初期 readiness 契約は次のとおり。
+初期の準備完了条件は次のとおり。
 
-| Resource | `ready` の条件 |
+| 資源名 | 準備完了条件 |
 | --- | --- |
-| `simulator` | 所有 container が Running で、wrapper が `224.5.23.2:10020` の SSL-Vision detection packet を受信・decode できる。継続 traffic と robot motion は end-to-end acceptance の責務とする。 |
-| `game-controller` | 所有 container が Running で、`224.5.23.1:11003` の初期 referee state を decode し、mode 固有の期待状態と一致する。`base` / `comparison` は `HALT`、`match` は `STOP`。未知または想定外の command は not-ready とし、active transition は acceptance が別途検証する。 |
-| `cm4-sim` | 所有 container が Running で、UDP 12345 listener が当該 container 内のプロセスに所有されていることを確認できる。port の使用中判定だけでは ready としない。 |
-| `crane` | 所有 container が Running で、container 内 ROS graph に `crane_session_coordinator` が存在することを確認できる。command と motion は acceptance が別途検証する。 |
-| `tigers-blue` | 所有 container が Running で、Sumatra の起動完了診断と、この実行で生成された decodable tracker packet を `224.5.23.2:11010` で確認する。 |
-| `autoref-tigers` | 所有 container が Running で、AutoRef 自身の diagnostics が起動完了を示し、この実行で受信・decode した vision `10020`、referee `11003`、tracker `11010` の各入力 count が増えたことを確認する。単なる multicast packet の外部観測では代用しない。image にその証跡がない場合は adapter を実装するまで ready にしない。 |
-| `ssl-log-recorder` | 所有 container が Running で、この実行が作成した log file が存在し、後続 reader が少なくとも一件の vision / referee / tracker record を decode できる。 |
+| `simulator` | 所有コンテナが稼働し、起動管理プログラムが `224.5.23.2:10020` の SSL-Vision 検出パケットを受信して復号できる。継続受信とロボット移動は一括受入試験で確認する。 |
+| `game-controller` | 所有コンテナが稼働し、`224.5.23.1:11003` の初期審判状態を復号して、実行 mode の期待状態と照合できる。`base` / `comparison` は `HALT`、`match` は `STOP`。未知または想定外の指令では準備完了にせず、試合開始後の状態遷移は受入試験で確認する。 |
+| `cm4-sim` | 所有コンテナが稼働し、UDP 12345 の待受 socket が当該コンテナ内のプロセスに属すると確認できる。ポートが使用中というだけでは準備完了にしない。 |
+| `crane` | 所有コンテナが稼働し、コンテナ内の ROS graph に `crane_session_coordinator` があると確認できる。指令と移動は受入試験で別途確認する。 |
+| `tigers-blue` | 所有コンテナが稼働し、Sumatra の起動完了記録と、この実行で生成した tracker packet の復号結果を `224.5.23.2:11010` で確認する。 |
+| `autoref-tigers` | 所有コンテナが稼働し、AutoRef 自身の診断が起動完了を示す。また、この実行で受信・復号した vision `10020`、referee `11003`、tracker `11010` の各入力数が増えたことを確認する。外部から multicast packet を観測しただけでは代用しない。image に受信証跡がなければ、確認用 adapter を実装するまで準備完了にしない。 |
+| `ssl-log-recorder` | 所有コンテナが稼働し、この実行で作成した log file があり、後続 reader が vision / referee / tracker の各記録を少なくとも一件ずつ復号できる。 |
 
-probe は finite deadline を持つ。timeout、container exit、decode failure は not-ready のまま失敗し、失敗 predicate と inspect/log diagnostics を記録する。multicast probe は選択した IPv4 interface で group join し `SO_REUSEADDR` を使い、受入 harness の consumer を奪わない。listener process identity probe は Linux 初期 target で実証する gate であり、実装可能性が確認できない platform では weaker predicate へ落とさず明示的に未対応とする。
+各確認には有限の期限を設ける。期限超過、コンテナ終了、復号失敗では準備未完了のまま失敗し、失敗条件と inspect / log 診断を記録する。multicast の確認は選択した IPv4 interface で group join し `SO_REUSEADDR` を使って、受入試験側の受信を妨げない。待受 socket の所有者を確認する方法は初期対象 Linux 上で実証する必要がある。実証できない OS では確認条件を弱めず、未対応として明示する。
 
 既定の `visibility_graph` 構成では次の依存グラフを使う。
 
-1. `simulator` と `game-controller` は依存なしで起動し、互いに並行して readiness probe を満たす。
-2. `cm4-sim` と `duck` はそれぞれ ready な `simulator` を待つ。両者はその後並行起動できる。
-3. `crane` は ready な `cm4-sim`、`game-controller`、および既存の Duck project-start signal を待つ。
-4. comparison mode の `tracker-tigers` と `tracker-erforce` は ready な `simulator` と `game-controller` を待つ。
+1. `simulator` と `game-controller` は依存なしで起動し、並行して準備完了条件を満たす。
+2. `cm4-sim` と `duck` はそれぞれ準備完了した `simulator` を待つ。その後は並行して起動できる。
+3. `crane` は準備完了した `cm4-sim` と `game-controller`、および既存の Duck 起動通知を待つ。
+4. comparison mode の `tracker-tigers` と `tracker-erforce` は準備完了した `simulator` と `game-controller` を待つ。
 
-`cm4-sim` を使わない planner を選択した場合、`crane` は存在しない `cm4-sim` への依存を作らず、`duck` と `game-controller` の既定依存だけを持つ。`duck` は ready な `simulator` を待つ。Duck の project-start signal は project が起動状態になったことだけを示すので、Crane の依存条件に service readiness として流用しない。
+`cm4-sim` を使わない planner を選択した場合、`crane` は存在しない `cm4-sim` への依存を作らず、`duck` と `game-controller` の既定依存だけを持つ。`duck` は準備完了した `simulator` を待つ。Duck の起動通知はプロジェクトが起動したことだけを示すため、サービス準備完了の根拠には使わない。
 
-移行前の `WaitForStart` と移行後の readiness-based `WaitFor` を混同しない。モデル試験は依存グラフと health check の resource ごとの付与を検証し、wrapper 試験は predicate と timeout を検証する。実ネットワーク受入は実際の packet / referee / motion を確認する別工程である。
+移行前の `WaitForStart` と移行後の準備完了確認付き `WaitFor` を混同しない。モデル試験では依存関係と資源ごとの正常性確認を検証し、起動管理プログラムの試験では各条件と期限超過時の動作を検証する。実ネットワーク受入では実際の packet / referee / motion を別途確認する。
 
-## Wrapper 所有権と停止契約
+## コンテナ所有権と停止契約
 
-AppHost は起動時に stack-run ID を生成し、各 wrapper は一意な resource-run ID を受け取る。container はこれらの値、resource 名、期待 image、生成 name がすべて一致した場合だけ当該 wrapper の所有物とみなす。起動は `docker run --detach --cidfile ... --name ... --label ... --network host ...` とし、`--rm`、image filter、wildcard cleanup、stack ID だけの広範な削除は使わない。image cache は削除しない。
+AppHost は起動時に stack-run ID を生成し、各起動管理プログラムに一意な resource-run ID を渡す。コンテナはこれらの値、資源名、期待する image、生成した name がすべて一致する場合だけ当該起動管理プログラムの所有物とみなす。起動には `docker run --detach --cidfile ... --name ... --label ... --network host ...` を使う。`--rm`、image filter、wildcard cleanup、stack ID だけを使った広範な削除は使用せず、image cache も削除しない。
 
-wrapper は Docker CLI と log follower の全 child process を直接起動し、stdout / stderr を drain する。cancel 時は CLI child の cancel/kill と wait を完了してから後始末する。`docker run` が ID を返す前に cancel された場合、daemon 側の遅延 create を考慮し、厳密な owner/resource labels に限定した bounded discovery retry を行う。deadline までに create 状態を確定できない場合は cleanup failure として非ゼロ終了し、可能な残留を記録する。単発 label query だけで cleanup 完了を宣言しない。失敗注入試験に遅延 create 可視化を含める。
+起動管理プログラムは Docker CLI と log follower の子プロセスをすべて直接起動し、標準出力・標準エラーを読み切る。取消時は CLI 子プロセスの取消・強制終了と終了待ちを済ませてから後始末する。`docker run` が ID を返す前に取消された場合、daemon 側で作成完了の反映が遅れる可能性を考慮し、所有者・資源ラベルを厳密に指定して期限付きの再検索を行う。期限までに作成状態を確定できない場合は後始末失敗として非ゼロ終了し、残留の可能性を記録する。一度だけのラベル検索で後始末完了とはしない。失敗注入試験には作成反映が遅れるケースを含める。
 
-通常終了、startup failure、readiness timeout、container early exit では、readiness を false にし、所有 container を停止、inspect / exit status / 最終 log を収集した後、完全一致を再検証した exact container ID だけを削除する。shutdown 全体の deadline は DCP executable stop の 15 秒より短く設定し、その内側に Docker child の終了、`docker stop`、`docker rm` の上限を割り当てる。cleanup の遅延・失敗は記録し、成功扱いにしない。SIGKILL、host crash、電源断、daemon outage に対する自動 cleanup は保証しない。これらの場合も label により残留 owner を識別可能とし、無関係な container には触れない。
+通常終了、起動失敗、準備完了期限超過、コンテナの予期しない終了では、準備完了を解除し、所有コンテナを停止する。状態・終了値・最終ログを収集した後、所有者情報を再検証した完全なコンテナ ID だけを削除する。停止全体の期限は DCP の実行資源停止上限 15 秒より短くし、子プロセス終了、`docker stop`、`docker rm` に個別の上限を配分する。後始末の遅延・失敗は記録し、成功扱いにしない。SIGKILL、ホスト障害、電源断、Docker daemon 停止時の自動後始末は保証しない。その場合もラベルで残留所有者を識別し、無関係なコンテナには触れない。
 
 ## 操作
 
@@ -194,7 +194,7 @@ wrapper は Docker CLI と log follower の全 child process を直接起動し�
 aspire run --apphost Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
 ```
 
-停止は Aspire の通常の停止操作に従う。SIGINT/SIGTERM による通常停止では各 wrapper が上記 deadline 内に所有 container を停止・削除し、Duck の子プロセスも終了する。強制 kill / host loss / Docker daemon 不通時の container cleanup は保証外であり、残留 resource は exact owner label で後から識別する。AppHost の dashboard には wrapper の health と転送 log を表示し、Docker inspect と最終状態は acceptance artifact に残す。
+停止は Aspire の通常操作に従う。SIGINT/SIGTERM による通常停止では各起動管理プログラムが上記期限内に所有コンテナを停止・削除し、Duck の子プロセスも終了する。強制終了、ホスト障害、Docker daemon 不通時のコンテナ後始末は保証しない。残留資源は所有者ラベルで後から識別する。AppHost の dashboard には起動管理プログラムの正常性と転送ログを表示し、Docker inspect と最終状態は受入証跡に残す。
 
 個別資源の再起動とログ確認は Aspire ダッシュボードから行える構成にする。
 
@@ -235,7 +235,7 @@ Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulator
 
 ### `ASPIRE-005`: 起動試験
 
-この hosted acceptance は、container-resource から per-service wrapper への移行、model / wrapper focused tests、独立通常レビューが完了するまで実行しない。現行 AddContainer 方式の Docker create failure を再試行で回避した結果を受入成功として記録しない。
+この GitHub Actions 上の受入試験は、コンテナ資源からサービス別起動管理プログラムへの移行、モデル試験と起動管理プログラムの対象試験、独立通常レビューが完了するまで実行しない。現行 `AddContainer` 方式のコンテナ作成失敗を再試行で回避した結果を受入成功として記録しない。
 
 AppHost の全資源を一括起動し、`game-controller` が 11003 の唯一の referee producer として動作し、シミュレータからの SSL-Vision を Duck が受信し、Duck が `TrackerWrapperPacket` を出力する正常経路を確認する。
 
@@ -259,10 +259,10 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 | --- | --- | --- |
 | `ASPIRE-006F1` | 対戦 fixture の版管理 | Sumatra の `simulation_protocol_fixed.xml` 相当、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
 | `ASPIRE-006F2` | `match` mode と resource topology | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
-| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一 producer、Game Controller API、fixture mount、固定 image reference を application model test で固定する。Game Controller readiness test は `base` / `comparison` の `HALT` と `match` の `STOP` を受理し、未知または想定外の command を not-ready とする。 |
-| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` を wrapper executable resource として登録し、image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定、各サービス readiness profile と `WaitFor` 辺を model test で固定する。wrapper focused test は readiness の成功・timeout と診断根拠を検証する。 |
-| `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 publish 無効、および wrapper の readiness-based dependency graph を model test で固定する。 |
-| `ASPIRE-006F6` | `match-controller` と試合 lifecycle | GC API / referee / vision の readiness、STOP / HALT からの継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
+| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一送信元、Game Controller API、fixture mount、固定イメージ参照をアプリケーションモデル試験で固定する。Game Controller の準備完了試験は `base` / `comparison` の `HALT` と `match` の `STOP` を受理し、未知または想定外の指令では未完了とする。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` を個別の Aspire 外部実行資源として登録し、イメージ、ホストネットワーク、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定、各サービスの準備完了条件と `WaitFor` 依存をアプリケーションモデル試験で固定する。起動管理プログラムの対象試験では条件成立・期限超過と診断根拠を検証する。 |
+| `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 送信無効、および起動管理プログラムの準備完了に基づく依存関係をアプリケーションモデル試験で固定する。 |
+| `ASPIRE-006F6` | `match-controller` と試合進行 | GC API / referee / vision の準備完了、STOP / HALT からの継続操作、`POST_GAME` / 最大時間での終了、結果保存を対象試験で固定する。 |
 
 ### `ASPIRE-006G`: TIGERs vs Crane 一括対戦試験
 
@@ -397,12 +397,12 @@ TIGERs の AI と Crane を実際に対戦させる対戦モードを、トラ�
 
 | 資源名 | 実行形態 | 対戦モードでの責務 |
 | --- | --- | --- |
-| `simulator` | Aspire executable wrapper + Docker container | ER-Force `simulator-cli` を host network で起動する。対戦用起動引数は Crane の現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003` を使う。 |
-| `game-controller` | Aspire executable wrapper + Docker container | 11003 の唯一の referee producer とし、対戦用の初期状態を読み込む。 |
-| `crane` | Aspire executable wrapper + Docker container | 固定した `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を使い、`sim:=true speak:=false team:=ibis` で Yellow 側を制御する。 |
-| `tigers-blue` | Aspire executable wrapper + Docker container | 固定 tag または digest の `tigersmannheim/sumatra` を `--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol` で起動する。 |
-| `autoref-tigers` | Aspire executable wrapper + Docker container | `tigersmannheim/auto-referee:1.2.0` を active / headless で起動し、vision 10020、referee 11003、tracker 11010 を使って試合判定を Game Controller へ返す。 |
-| `ssl-log-recorder` | Aspire executable wrapper + Docker container | referee 11003、vision 10020、tracker 11010 を対戦証跡として保存する。 |
+| `simulator` | Aspire 外部実行資源＋Docker コンテナ | ER-Force `simulator-cli` をホストネットワークで起動する。対戦用引数は Crane の現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003` を使う。 |
+| `game-controller` | Aspire 外部実行資源＋Docker コンテナ | 11003 の唯一の referee 送信元とし、対戦用の初期状態を読み込む。 |
+| `crane` | Aspire 外部実行資源＋Docker コンテナ | 固定した `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を使い、`sim:=true speak:=false team:=ibis` で Yellow 側を制御する。 |
+| `tigers-blue` | Aspire 外部実行資源＋Docker コンテナ | 固定した tag または digest の `tigersmannheim/sumatra` を `--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol` で起動する。 |
+| `autoref-tigers` | Aspire 外部実行資源＋Docker コンテナ | `tigersmannheim/auto-referee:1.2.0` を起動し、vision 10020、referee 11003、tracker 11010 を使って試合判定を Game Controller へ返す。 |
+| `ssl-log-recorder` | Aspire 外部実行資源＋Docker コンテナ | referee 11003、vision 10020、tracker 11010 を対戦記録として保存する。 |
 | `match-controller` | 試験 fixture | Game Controller API、referee、vision の準備完了を確認し、試合開始・停止状態からの継続・終了監視・結果保存を行う。 |
 | `duck` | .NET プロセス | SSL-Vision の観測と Duck 側デバッグを継続する。ただし対戦判定へ影響を与えないよう、対戦モードでは official tracker multicast 11010 への publish を無効にする。 |
 
@@ -417,11 +417,11 @@ Crane の現行 compose は Sumatra、Game Controller、SSL log recorder に移�
 ### 対戦モードの起動順序
 
 1. `simulator` と `game-controller` を開始する。
-2. `duck` は project-start signal を公開する。`tigers-blue` と `ssl-log-recorder` は ready な `simulator` / `game-controller` を待つ。
-3. `autoref-tigers` は ready な `simulator`、`game-controller`、`tigers-blue` を待つ。
-4. `crane` は ready な `simulator` と `game-controller` を待つ。対戦モードでは存在しない `cm4-sim` への依存を作らない。
-5. `match-controller` は ready な `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder` と Duck project-start 後に起動する。
-6. 依存待機の後も `match-controller` は Game Controller API 接続、11003 referee state、10020 SSL-Vision、tracker `11010` を実測し、HALT/STOP の初期状態を確認してから continue action を送る。起動済みだけで試合を開始しない。
+2. `duck` はプロジェクト起動通知を公開する。`tigers-blue` と `ssl-log-recorder` は準備完了した `simulator` / `game-controller` を待つ。
+3. `autoref-tigers` は準備完了した `simulator`、`game-controller`、`tigers-blue` を待つ。
+4. `crane` は準備完了した `simulator` と `game-controller` を待つ。対戦モードでは存在しない `cm4-sim` への依存を作らない。
+5. `match-controller` は準備完了した `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder` と Duck のプロジェクト起動後に起動する。
+6. 依存を満たした後も `match-controller` は Game Controller API 接続、11003 の referee state、10020 の SSL-Vision、tracker `11010` を実測し、HALT/STOP の初期状態を確認してから試合継続指令を送る。資源が起動しただけでは試合を開始しない。
 
 `match-controller` は Crane の現行試合 controller を基準に、`HALT` / `STOP` から利用可能な continue action を選び、必要に応じて `NEXT_COMMAND`、`NORMAL_START`、`FORCE_START` を使って試合を進行させる。終了条件は `POST_GAME` または設定した最大試合時間とし、結果には少なくとも両チームの得点、終了理由、`CRANE WIN` / `TIGERs WIN` / `DRAW` のいずれかを保存する。
 
