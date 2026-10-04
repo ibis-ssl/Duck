@@ -162,6 +162,32 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Fact]
+    public void PinnedCraneCoordinatorUsesSessionControllerGraphName()
+    {
+        // Crane 4063cd31: SessionCoordinatorComponent derives from Node("session_controller").
+        // crane.launch.xml and crane_session_coordinator_node.cpp do not rename that node.
+        var graph = "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n";
+        Assert.True(CraneProbeDiagnostics.Evaluate(0, graph, "", TimeSpan.Zero).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(124, graph, "", TimeSpan.Zero).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(1, graph, "", TimeSpan.Zero).Ready);
+        Assert.False(DockerServiceReadiness.CraneHasCoordinator("/crane_session_coordinator\n"));
+        Assert.False(DockerServiceReadiness.CraneHasCoordinator("/other/session_controller\n"));
+        Assert.False(DockerServiceReadiness.CraneHasCoordinator("/session_controller_extra\n"));
+        Assert.False(DockerServiceReadiness.CraneHasCoordinator("process session_controller is running\n"));
+    }
+
+    [Fact]
+    public void CraneKilledProbeIsNotReportedAsAnOrdinaryNonzeroExit()
+    {
+        var setup = CraneProbeDiagnostics.Evaluate(137, "", "", TimeSpan.FromSeconds(12));
+        var graph = CraneProbeDiagnostics.Evaluate(137, "DUCK_CRANE_ROS_SETUP_OK\n", "", TimeSpan.FromSeconds(12));
+        Assert.Equal("setup_killed", setup.Classification);
+        Assert.Equal("ros_graph_killed", graph.Classification);
+        Assert.False(setup.Ready);
+        Assert.False(graph.Ready);
+    }
+
+    [Fact]
     public void ServiceReadinessPredicatesRequireTheirServiceEvidence()
     {
         Assert.False(DockerServiceReadiness.CraneHasCoordinator("/other_node\n"));

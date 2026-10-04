@@ -10,6 +10,41 @@ from sanitize_aspire_artifacts import sanitize_tree
 
 
 class CaptureAspireDcpLogsTests(unittest.TestCase):
+    def test_workflow_persists_crane_probe_outside_dcp_logs(self):
+        workflow = Path(__file__).resolve().parents[2] / ".github/workflows/dotnet-test.yml"
+        text = workflow.read_text(encoding="utf-8-sig")
+        self.assertIn('export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"', text)
+        self.assertIn('python3 scripts/sanitize_aspire_artifacts.py "$results_dir"', text)
+        self.assertIn('path: artifacts/aspire-full-stack', text)
+
+    def test_jsonl_sanitization_preserves_records_and_escaped_secret_boundaries(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts" / "aspire-full-stack"
+            root.mkdir(parents=True)
+            path = root / "crane-probe.jsonl"
+            records = [
+                {"event_name": "duck_crane_probe_progress", "attempt": 1,
+                 "Outcome": {"Ready": False, "StandardErrorExcerpt": 'password="JSONL_SENTINEL"\nnext line'}},
+                {"event_name": "duck_crane_probe_progress", "attempt": 2,
+                 "Outcome": {"Ready": True, "StandardOutputExcerpt": "/session_controller\n"}},
+            ]
+            path.write_text("\n".join(json.dumps(item) for item in records) + "\n", encoding="utf-8")
+            self.assertEqual([], sanitize_tree(root))
+            result = path.read_text(encoding="utf-8")
+            self.assertNotIn("JSONL_SENTINEL", result)
+            decoded = [json.loads(line) for line in result.splitlines()]
+            self.assertEqual(2, len(decoded))
+            self.assertEqual('password="[REDACTED]"\nnext line', decoded[0]["Outcome"]["StandardErrorExcerpt"])
+            self.assertTrue(decoded[1]["Outcome"]["Ready"])
+            self.assertEqual(2, decoded[1]["attempt"])
+
+    def test_incomplete_jsonl_prevents_upload_instead_of_becoming_valid_evidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "crane-probe.jsonl"
+            path.write_text('{"event_name":', encoding="utf-8")
+            self.assertEqual([path], sanitize_tree(root))
+
     def test_crane_probe_sanitizer_shared_fixtures(self):
         fixtures_path = Path(__file__).with_name("crane_probe_sanitizer_fixtures.json")
         fixtures = json.loads(fixtures_path.read_text(encoding="utf-8"))
