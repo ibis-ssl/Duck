@@ -212,8 +212,11 @@ public sealed class AppHostApplicationModelTests
         var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
 
         var craneArgs = await GetArgumentsAsync(crane);
-        Assert.Contains("planner:=visibility_graph", craneArgs);
-        Assert.Contains("12345", craneArgs);
+        Assert.Contains(craneArgs, argument =>
+            argument.Contains("planner:=${PLANNER}", StringComparison.Ordinal));
+        var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
+        Assert.Equal("visibility_graph", craneEnvironment["PLANNER"]);
+        Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"]);
 
         var cm4Args = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(cm4Simulator));
         Assert.Contains("12345", cm4Args);
@@ -226,7 +229,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task PlannerWithoutCm4SimulatorDoesNotCreateThatResourceOrDependency()
     {
-        string[] args = ["--Testing:Crane:Planner=direct"];
+        string[] args = ["--Testing:Crane:Planner=rvo2"];
         using var appHost =
             await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
 
@@ -236,8 +239,24 @@ public sealed class AppHostApplicationModelTests
         var duck = Assert.Single(appHost.Resources, resource => resource.Name == "duck");
         var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
 
-        Assert.Contains("planner:=direct", await GetArgumentsAsync(crane));
+        var craneArgs = await GetArgumentsAsync(crane);
+        Assert.Contains(craneArgs, argument => argument.Contains("planner:=${PLANNER}", StringComparison.Ordinal));
+        var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
+        Assert.Equal("rvo2", craneEnvironment["PLANNER"]);
+        Assert.Equal("12346", craneEnvironment["CRANE_TARGET_PORT"]);
+        Assert.Equal("true", craneEnvironment["FEEDBACK_SIM_MODE"]);
         AssertWaitsFor(crane, duck, gameController);
+    }
+
+    private static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(IResourceWithEnvironment resource)
+    {
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(resource)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        return executionConfiguration.EnvironmentVariables.ToDictionary();
     }
 
     private static void AssertWaitsFor(IResource resource, params IResource[] dependencies)
