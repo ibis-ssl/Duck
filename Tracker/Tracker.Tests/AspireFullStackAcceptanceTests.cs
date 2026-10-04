@@ -106,7 +106,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 {
                     var datagram = await visionReceiver.ReceiveAsync(motionTimeout.Token);
                     var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.ToArray());
-                    if (!packet.HasDetection)
+                    if (packet.Detection is null)
                     {
                         continue;
                     }
@@ -138,10 +138,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             output.WriteLine(
                 $"Duck tracker packet verified: uuid={tracker.Uuid}; source={tracker.SourceName}; " +
-                $"frame={tracker.TrackedFrame.FrameNumber}; robots={tracker.TrackedFrame.Robots.Count}");
+                $"frame={tracker.TrackedFrame!.FrameNumber}; robots={tracker.TrackedFrame.Robots.Count}");
             Assert.Equal("ibis", tracker.Uuid);
             Assert.Equal("ibis", tracker.SourceName);
-            Assert.True(tracker.HasTrackedFrame);
+            Assert.NotNull(tracker.TrackedFrame);
         }
         catch (Exception exception)
         {
@@ -186,7 +186,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         while (true)
         {
             var packet = SSL_WrapperPacket.Parser.ParseFrom((await receiver.ReceiveAsync(cancellationToken)).ToArray());
-            if (packet.HasDetection && packet.Detection.RobotsYellow.Count > 0)
+            if (packet.Detection is not null && packet.Detection.RobotsYellow.Count > 0)
             {
                 return packet;
             }
@@ -200,7 +200,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         while (true)
         {
             var packet = TrackerWrapperPacket.Parser.ParseFrom((await receiver.ReceiveAsync(cancellationToken)).ToArray());
-            if (packet.Uuid == "ibis" && packet.SourceName == "ibis" && packet.HasTrackedFrame)
+            if (packet.Uuid == "ibis" && packet.SourceName == "ibis" && packet.TrackedFrame is not null)
             {
                 return packet;
             }
