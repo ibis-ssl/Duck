@@ -199,6 +199,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         var options = fake.Options(FindOpenPort()) with
         {
             ReadinessProfile = "crane",
+            ExpectedProcessName = "ros2",
             StartupTimeoutSeconds = 10,
         };
         var run = DockerContainerWrapper.RunAsync(options, cancellation.Token);
