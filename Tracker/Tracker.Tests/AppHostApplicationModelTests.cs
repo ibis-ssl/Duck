@@ -29,7 +29,7 @@ public sealed class AppHostApplicationModelTests
     public async Task BaseModelContainsDuckRuntimeHostProject()
     {
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([CreateIsolatedOwnershipLockArgument()]);
 
         var duck = Assert.Single(appHost.Resources, resource => resource.Name == "duck");
         var project = Assert.IsType<ProjectResource>(duck);
@@ -43,7 +43,7 @@ public sealed class AppHostApplicationModelTests
     public async Task BaseModelContainsPinnedSimulatorWithCraneScenarioDefaults()
     {
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([CreateIsolatedOwnershipLockArgument()]);
 
         var simulator = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
@@ -86,7 +86,7 @@ public sealed class AppHostApplicationModelTests
     public async Task BaseModelPassesSimVisionSettingsToDuckAndWaitsForSimulatorStart()
     {
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([CreateIsolatedOwnershipLockArgument()]);
 
         var simulator = Assert.Single(appHost.Resources, resource => resource.Name == "simulator");
         var duck = Assert.IsType<ProjectResource>(
@@ -119,7 +119,7 @@ public sealed class AppHostApplicationModelTests
             "--Testing:Simulator:IbisTeamColor=blue",
         ];
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([.. args, CreateIsolatedOwnershipLockArgument()]);
 
         var simulator = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
@@ -155,7 +155,7 @@ public sealed class AppHostApplicationModelTests
     public async Task BaseModelContainsSingleGameControllerRefereeProducer()
     {
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([CreateIsolatedOwnershipLockArgument()]);
 
         var gameController = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "game-controller"));
@@ -198,7 +198,7 @@ public sealed class AppHostApplicationModelTests
     public async Task BaseModelContainsPinnedCraneAndCm4SimulatorWithHostNetworking()
     {
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([CreateIsolatedOwnershipLockArgument()]);
 
         var crane = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
@@ -221,7 +221,7 @@ public sealed class AppHostApplicationModelTests
     public async Task VisibilityGraphCraneUsesModeFourPathAndWaitsForItsPrerequisites()
     {
         using var appHost =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([CreateIsolatedOwnershipLockArgument()]);
 
         var crane = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
@@ -247,7 +247,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task PlannerWithoutCm4SimulatorDoesNotCreateThatResourceOrDependency()
     {
-        string[] args = ["--Testing:Crane:Planner=rvo2"];
+        string[] args = ["--Testing:Crane:Planner=rvo2", CreateIsolatedOwnershipLockArgument()];
         using var appHost =
             await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
 
@@ -275,6 +275,7 @@ public sealed class AppHostApplicationModelTests
         [
             "--Testing:Crane:Planner=" + planner,
             "--Testing:Simulator:IbisPort=22346",
+            CreateIsolatedOwnershipLockArgument(),
         ];
         using var appHost =
             await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
@@ -315,6 +316,9 @@ public sealed class AppHostApplicationModelTests
                 CancellationToken.None);
         return executionConfiguration.EnvironmentVariables.ToDictionary();
     }
+
+    private static string CreateIsolatedOwnershipLockArgument() =>
+        $"--Testing:StackOwnership:LockPath={Path.Combine(Path.GetTempPath(), $"duck-aspire-model-{Guid.NewGuid():N}.lock")}";
 
     private static void AssertWaitsFor(IResource resource, params IResource[] dependencies)
     {

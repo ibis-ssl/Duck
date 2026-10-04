@@ -15,10 +15,11 @@ lock file path は `Testing:StackOwnership:LockPath` で上書き可能とし、
 
 ## TDD / 検証
 
-- テスト先行 commit: `682de96`。Docker 上の .NET SDK 10.0.401 で focused test を実行し、2つ目の取得が拒否されないため期待どおり失敗した。
-- 実装 commit: `475b38c`。同じ focused test は成功した。テストはlock fileの残存後の再取得も確認する。
-- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false`: SDKコンテナ内で exit code 0。
-- `git diff --check`: 成功。
+- テスト先行 commit: `3c634ddbaba769890ab545b3552da234a6dc6eb3`。Docker 上の .NET SDK 10.0.401 で focused test を実行し、2つ目の取得が拒否されないため期待どおり失敗した。
+- 実装 commit: `a38c1061ff7421804e213b41bb94ae34769f1fa6`。同じ focused test は成功した。テストはlock fileの残存後の再取得も確認する。
+- Draft PR head `d2b8dabb1f3dbe6c35801d401184c1c0e8312499` のCI run `37177317149` は失敗した。352件中348件成功、4件失敗。原因は複数のAppHost application-model testが並行実行され、同じ既定lock pathを実stackとして取り合ったこと。
+- この問題を避けるため、model testは各AppHostに一意な一時lock pathを渡す修正を追加した。修正後の focused / exact-head CI は未完了。
+- この環境でのfocused ownership testと`git diff --check`は成功した。
 - ローカルには .NET SDK がないため、公式 `mcr.microsoft.com/dotnet/sdk:10.0` コンテナを使用した。NuGet接続にはホストの信頼済み証明書束をread-only mountした。
 
 ## 未完了の受入項目
@@ -29,4 +30,3 @@ lock file path は `Testing:StackOwnership:LockPath` で上書き可能とし、
 - 代替の `scenario-develop` は manifest を取得できたが、Docker daemon が image layer 展開時に `no space left on device` を返した。ホストの `/workspace` には23GBの空きが報告されるため、これはDocker daemon側の利用可能容量制限とみられる。既存image削除やdaemon設定変更は行っていない。
 - そのため、Simulator / Game Controller / Crane / cm4-sim / Duck の一括起動、実SSL-Vision受信と tracker UDP出力、HALT→active referee遷移、active motion、Crane→cm4-sim→Simulatorの位置変化、2つ目のAppHost processの起動前拒否をこのHEADでは実測していない。
 - このPRの通常CIでテスト結果を確認し、Docker対応環境で上記のLinux `ASPIRE-NET-*` を実施する必要がある。`scenario-develop` による試験を行う場合は、既定の固定tagを検証した結果と混同しない。
-
