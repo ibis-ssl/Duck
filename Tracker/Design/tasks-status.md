@@ -49,6 +49,8 @@
 
 ## ASPIRE 実装タスク分割（2026-09-29）
 
+2026-10-05 の再調査: `ASPIRE-005` は継続中。固定版の実ノード名 `/session_controller` と準備判定の不一致を修正し、診断を専用ファイルへ直接保存する経路を追加した。対象の .NET 試験15件と Python 試験19件、秘匿後の診断成果物の再読込を確認した。Windows 全体試験の11件のファイル共有例外は別件とする。追加確認では実行 `37244425991` が成功し、4資源の同時準備完了、審判遷移、黄色2番の108.118965mm移動、トラッカー1件受信を成果物で確認した。検証した版は `06794bf5e4a6a51242e9dcb74c418489113d2d89`。受入成功と独立レビュー・文書検査・マージは区別し、作業全体の完了は別途判定する。保全、原因の根拠、試験結果、再現手順は [再調査記録](../../reports/crane-readiness-reinvestigation-20261005.md) にまとめる。
+
 PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位へ分割する。`ASPIRE-005` は base-mode stack の移行と一括受入に限定し、comparison mode の実装境界は `ASPIRE-006A/B`、比較 UI / replay は `ASPIRE-006C`〜`006E`、実 packet の OS 受入は `ASPIRE-007A` とする。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。TIGERs vs Crane 対戦は `ASPIRE-006F` を `ASPIRE-006F1`〜`006F6`、`ASPIRE-006G` を `ASPIRE-006G1`〜`006G4` へ分ける。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装タスクにはしない。
 
 各実装タスクは、先に focused test または application model test を追加して未実装状態で失敗することを確認し、その後に実装する。失敗確認と実装はレビュー可能な論理単位で commit / push する。CI に Docker/Aspire 統合試験を追加する場合は、テスト結果、標準出力、標準エラー、Aspire と各コンテナの調査ログを失敗時 artifact へ保存する。

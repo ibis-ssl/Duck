@@ -166,10 +166,20 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 | `tracker-erforce` | 所有者ラベル / 資源名 / 期待イメージ / ホストネットワーク / 完全なコンテナID / 稼働状態を確認し、コンテナ内の ER-Force tracker プロセスと起動完了診断、および比較実行開始後に `224.5.23.2:11010` で受信した期待送信元識別子の復号可能なトラッカーパケットを確認する。コンテナ稼働だけでは準備完了としない。 |
 | `debug-host` | `Tracker.DebugHost` の .NET プロジェクト資源として起動する。Duck の起動通知と両外部トラッカーの準備完了を待ち、比較用正常性確認が Duck / TIGERs / ER-Force の三つの論理役割をそれぞれ別の送信元識別子に解決し、同じ確認窓で三者の新しいトラッカーパケットを受信した場合に準備完了とする。 |
 | `cm4-sim` | 所有コンテナが稼働し、UDP 12345 の待受 socket が当該コンテナ内のプロセスに属すると確認できる。ポートが使用中というだけでは準備完了にしない。 |
-| `crane` | 所有コンテナが稼働し、コンテナ内の ROS graph に `crane_session_coordinator` があると確認できる。指令と移動は受入試験で別途確認する。 |
+| `crane` | 所有コンテナが稼働し、コンテナ内で ROS の準備が完了した後の一覧取得が終了値0となり、`/session_controller` の行が完全一致する。指令と移動は受入試験で別途確認する。 |
 | `tigers-blue` | 所有コンテナが稼働し、Sumatra の起動完了記録と、この実行で生成した tracker packet の復号結果を `224.5.23.2:11010` で確認する。 |
 | `autoref-tigers` | 所有コンテナが稼働し、AutoRef 自身の診断が起動完了を示す。また、この実行で受信・復号した vision `10020`、referee `11003`、tracker `11010` の各入力数が増えたことを確認する。外部から multicast packet を観測しただけでは代用しない。image に受信証跡がなければ、確認用 adapter を実装するまで準備完了にしない。 |
 | `ssl-log-recorder` | 所有コンテナが稼働し、この実行で作成した log file があり、後続 reader が vision / referee / tracker の各記録を少なくとも一件ずつ復号できる。 |
+
+Crane の固定版 `4063cd31cd5b11b1cc919003907f5f4c527b252d` では、[起動するクラス](https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_session_coordinator/src/crane_session_coordinator.cpp#L21-L22) が `session_controller` を登録する。[起動定義](https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_bringup/launch/crane.launch.xml#L104) に名前変更はない。パッケージ名や実行ファイル名を ROS の一覧照合に用いない。
+
+Crane の確認処理は、ROS の準備完了を示す固定行 `DUCK_CRANE_ROS_SETUP_OK` と、その後の `ros2 node list` の出力を区別する。終了値、所要時間、試行番号、固定行の有無、対象行の一致、秘匿後の出力抜粋を記録する。抜粋は各512文字までとし、省略前の全出力で照合する。終了値124は期限超過、137は強制終了として区別する。137だけでは期限超過による強制終了と断定しない。実行中の試行には終了値を補わない。
+
+診断の保存先は `Testing:Crane:DiagnosticsPath` で指定し、AppHost が絶対パスに解決して Crane の起動管理プログラムへ渡す。コンテナの環境変数には渡さない。確認処理の開始、完了結果、終了時の集計を専用の改行区切り JSON ファイルへ追記し、各記録で書込みを完了する。書込み失敗は固定のエラー記録で示し、準備判定や再試行、所有コンテナの片付けを変更しない。
+
+一括試験では保存先を `artifacts/aspire-full-stack/crane-probe.jsonl` とする。標準エラーからの間接採取だけには依存しない。片付け後に JSON を解析して文字列中の秘密情報を除去し、再び一行一記録として保存する。解析または秘匿処理に失敗した場合は成果物をアップロードしない。保存先の欠落、完了した試行の欠落、実行中の中断は区別し、成功や受信0件に置き換えない。
+
+確認処理の上限10秒、終了要求後2秒の強制終了、一括開始待ち300秒、60秒以内に100 mm以上の移動という条件は変更しない。準備完了後に審判遷移、Crane から cm4-sim と Simulator への移動、Duck のトラッカーを順に検証する。公式のシナリオ試験と異なり、本構成では Game Controller だけが審判情報を送信する。
 
 各確認には有限の期限を設ける。期限超過、コンテナ終了、復号失敗では準備未完了のまま失敗し、失敗条件と調査ログを記録する。wrapper は各health確認で inspect により所有者ラベル、資源名、期待イメージ、ホストネットワーク、コンテナID、稼働状態を完全照合する。コンテナ内プロセス / サービス診断と新しいパケットはサービス準備の証拠とし、所有権の証拠は当該 inspect 照合とする。外部パケットの受信だけでは送信コンテナの所有証明に代用しない。multicast の確認は選択した IPv4 interface で group join し `SO_REUSEADDR` を使って、受入試験側の受信を妨げない。待受 socket の所有者を確認する方法は初期対象 Linux 上で実証する必要がある。実証できない OS では確認条件を弱めず、未対応として明示する。
 
