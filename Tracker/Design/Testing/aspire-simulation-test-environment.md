@@ -332,6 +332,21 @@ Linux は自動統合試験を基本とする。Windows / macOS は Docker Deskt
 
 Windows / macOS で container と host の multicast が成立しない場合、別 OS の成功を代用せず失敗として記録する。UDP relay / gateway や unicast 化は後続設計として検討し、試験中に暗黙の fallback を入れない。
 
+
+### GitHub Actions の full-stack 受入
+
+`ASPIRE-NET-002` の手動 workflow は Simulator と RuntimeHost の packet flow だけを検査する。`ASPIRE-NET-001` と `ASPIRE-NET-007` を受け入れる full-stack job は別の手動実行 job とし、既存の `.github/workflows/dotnet-test.yml` に追加する。workflow ファイル自体が既定 branch に存在する前でも dispatch できるよう、新しい workflow ファイルは作らない。
+
+この job は標準 Linux x64 hosted runner 上で Docker Engine と host network を使う。GitHub が公開する標準 Ubuntu x64 runner の仕様は 4 CPU、16 GB RAM、14 GB SSD であり、slim runner は Docker のような低レベル kernel 操作をサポートしないため対象外とする。現在の job 成功は容量の十分性を証明しない。最初の full-stack 実行で pull 前・pull 後・終了時の空き容量と Docker image/container の容量を必ず記録する。
+
+CI は checkout SHA の AppHost を実行する。`Testing:StackOwnership:LockPath` は `$RUNNER_TEMP` 配下の run ID と attempt を含む一意な値にする。AppHost が起動した resource だけを停止・削除し、daemon 全体の prune は行わない。cleanup と診断収集は成功・失敗どちらでも実行し、AppHost の出力、Docker の info / system df、全 resource の inspect と logs、Harness が観測した referee command と Vision / tracker packet count、試験結果を artifact に保存する。各 timeout は有限にし、runner の空き容量が不足した場合も広域 cleanup により SDK や runner toolchain を壊さない。
+
+Game Controller 3.20.3 の source revision `8050f232c3130323bbd91d1d3d56e9553506c8e4` では、新規 state の command と game state はともに `HALT` で初期化される。起動時に `config/state-store.json.stream` の保存状態があれば復元されるため、毎回一意な container 名で新規 container を作り、config/state を bind mount または volume で永続化しないことを fixture 契約とする。したがって `HALT` は起動フラグで注入する fixture ではなく、空の state store に対する初期化結果として referee packet 11003 で確認する。Harness は期待値と異なる初期 command を観測した場合、UDP 12345 / 12346 の検査へ進めず、Game Controller fixture の失敗として報告する。
+
+GitHub-hosted Linux runner の容量は固定で、利用可否や費用を確認せずに larger runner を前提にしない。Crane image を含む全 image の展開後サイズは圧縮 layer 合計からは分からないため、初回実測値、ピーク時の空き容量、実行時間を artifact に記録し、繰り返し測定してから runner 選択を決める。Docker daemon 設定変更はこの job に含めない。
+
+根拠: [GitHub-hosted runner specifications](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)、[GitHub-hosted larger runners overview](https://docs.github.com/en/actions/concepts/runners/github-hosted-runners)、[Game Controller 3.20.3 main.go](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/cmd/ssl-game-controller/main.go)、[state.go](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/state/state.go)、[engine.go](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/engine/engine.go)。
+
 ## トラッカー比較デバッグ
 
 通常の Duck + Crane シミュレーションとは別に comparison mode を用意し、TIGERs / ER-Force の tracker source と `Tracker.DebugHost` を追加起動できるようにする。
