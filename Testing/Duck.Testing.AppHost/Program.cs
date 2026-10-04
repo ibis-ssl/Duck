@@ -2,6 +2,12 @@
 using Duck.Testing.AppHost;
 
 var builder = DistributedApplication.CreateBuilder(args);
+var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
+if (testingMode is not "base" and not "comparison")
+{
+    throw new InvalidOperationException($"Unsupported Testing:Mode '{testingMode}'. Supported modes are 'base' and 'comparison'.");
+}
+
 var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
@@ -19,6 +25,8 @@ var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
+var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
+var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
 var craneTeam = builder.Configuration["Testing:Crane:Team"] ?? "Yellow";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
 var cm4SimulatorImageTag =
@@ -109,6 +117,53 @@ var crane = craneBuilder
 if (cm4Simulator is not null)
 {
     crane.WaitForStart(cm4Simulator);
+}
+
+if (testingMode == "comparison")
+{
+    var sumatraProtocolPath = Path.Combine(
+        AppContext.BaseDirectory,
+        "Fixtures",
+        "simulation_protocol_comparison.xml");
+    var trackerTigers = builder
+        .AddContainer("tracker-tigers", "tigersmannheim/sumatra", tigersImageTag)
+        .WithBindMount(
+            sumatraProtocolPath,
+            "/Sumatra/config/moduli/simulation_protocol_comparison.xml",
+            isReadOnly: true)
+        .WithArgs(
+            "--headless",
+            "--visionAddress", "224.5.23.2:10020",
+            "--refereeAddress", "224.5.23.1:11003",
+            "--moduli", "simulation_protocol_comparison")
+        .WithContainerRuntimeArgs("--network", "host")
+        .WaitForStart(simulator)
+        .WaitForStart(gameController);
+
+    var trackerErForce = builder
+        .AddContainer("tracker-erforce", "roboticserlangen/autoref", erForceImageTag)
+        .WithArgs(
+            "--vision-port", "10020",
+            "--tracker-port", "11010",
+            "--gc-port", "11003")
+        .WithContainerRuntimeArgs("--network", "host")
+        .WaitForStart(simulator)
+        .WaitForStart(gameController);
+
+    builder
+        .AddProject<Projects.Tracker_DebugHost>("debug-host")
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithEnvironment("Tracker__Enabled", "false")
+        .WithEnvironment("Tracker__PublishUdp", "false")
+        .WithEnvironment("Tracker__Receive__Enabled", "true")
+        .WithEnvironment("Tracker__Receive__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("Tracker__Receive__Port", "11010")
+        .WithEnvironment("Tracker__Uuid", "debug-host-observer")
+        .WithEnvironment("Tracker__SourceName", "debug-host-observer")
+        .WaitForStart(simulator)
+        .WaitForStart(trackerTigers)
+        .WaitForStart(trackerErForce);
 }
 
 builder.Build().Run();

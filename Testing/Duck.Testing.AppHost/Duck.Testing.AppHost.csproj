@@ -7,5 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Tracker\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
+    <ProjectReference Include="..\..\Tracker\Tracker.DebugHost\Tracker.DebugHost.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures\simulation_protocol_comparison.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
