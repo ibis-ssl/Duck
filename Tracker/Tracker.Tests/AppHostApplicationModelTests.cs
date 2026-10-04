@@ -1,6 +1,7 @@
 ﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tracker.Tests;
 
@@ -35,7 +36,15 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("a52b6bd", image.Tag);
         Assert.Equal("tini", simulator.Entrypoint);
 
-        var args = await simulator.GetArgumentValuesAsync(DistributedApplicationOperation.Run);
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(simulator)
+            .WithArgumentsConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var args = executionConfiguration.Arguments
+            .Select(argument => argument.Value?.ToString() ?? string.Empty)
+            .ToArray();
         Assert.Equal(
             [
                 "--",
@@ -64,7 +73,13 @@ public sealed class AppHostApplicationModelTests
         var simulator = Assert.Single(appHost.Resources, resource => resource.Name == "simulator");
         var duck = Assert.IsType<ProjectResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "duck"));
-        var environment = await duck.GetEnvironmentVariableValuesAsync(DistributedApplicationOperation.Run);
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(duck)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var environment = executionConfiguration.EnvironmentVariables.ToDictionary();
         var wait = Assert.Single(duck.Annotations.OfType<WaitAnnotation>());
 
         Assert.Equal("sim", environment["Tracker__ActiveProfileName"]);
@@ -91,7 +106,15 @@ public sealed class AppHostApplicationModelTests
         var simulator = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
         var image = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
-        var containerArgs = await simulator.GetArgumentValuesAsync(DistributedApplicationOperation.Run);
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(simulator)
+            .WithArgumentsConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var containerArgs = executionConfiguration.Arguments
+            .Select(argument => argument.Value?.ToString() ?? string.Empty)
+            .ToArray();
 
         Assert.Equal("custom-tag", image.Tag);
         Assert.Equal(
