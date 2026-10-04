@@ -183,6 +183,38 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Fact]
+    public async Task CraneReadinessRetriesTimeoutsUntilCoordinatorAppearsThenCleansUp()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        using var fake = new FakeDockerClient(
+            slowCreate: false,
+            foreignImage: false,
+            processName: "ros2",
+            craneProbeTimeoutResponses: 2);
+        using var cancellation = new CancellationTokenSource();
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ReadinessProfile = "crane",
+            StartupTimeoutSeconds = 10,
+        };
+        var run = DockerContainerWrapper.RunAsync(options, cancellation.Token);
+
+        await WaitForReadyAsync(options.HealthPort);
+        using var response = await new HttpClient().GetAsync($"http://127.0.0.1:{options.HealthPort}/health/ready");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        cancellation.Cancel();
+        Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(10)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Equal(3, commands.Split("exec container-id timeout --signal=TERM", StringSplitOptions.None).Length - 1);
+        Assert.Contains("rm --force container-id", commands);
+    }
+
+    [Fact]
     public async Task SimulatorProcessWithoutDecodedVisionDoesNotBecomeReady()
     {
         if (OperatingSystem.IsWindows())
@@ -369,7 +401,8 @@ public sealed class DockerContainerWrapperLifecycleTests
             bool slowStop = false,
             bool emptyDiscovery = false,
             bool rejectRemove = false,
-            bool delayedDiscovery = false)
+            bool delayedDiscovery = false,
+            int craneProbeTimeoutResponses = 0)
         {
             Directory.CreateDirectory(directory);
             TracePath = Path.Combine(directory, "docker-trace.log");
@@ -395,6 +428,13 @@ public sealed class DockerContainerWrapperLifecycleTests
             var inspectionPath = Path.Combine(directory, "inspection.json");
             File.WriteAllText(inspectionPath, JsonSerializer.Serialize(inspection));
             var discoveryMarkerPath = Path.Combine(directory, "discovery-seen");
+            var craneProbeCountPath = Path.Combine(directory, "crane-probe-count");
+            var craneProbeCommand = craneProbeTimeoutResponses == 0
+                ? "  exec) exit 9 ;;"
+                : "  exec) count=$(cat '" + craneProbeCountPath + "' 2>/dev/null || echo 0); " +
+                    "count=$((count + 1)); echo \"$count\" > '" + craneProbeCountPath + "'; " +
+                    "if [ \"$count\" -le " + craneProbeTimeoutResponses + " ]; then exit 124; fi; " +
+                    "echo '/crane_session_coordinator' ;;";
             ExecutablePath = Path.Combine(directory, "docker-fake");
             var createDelay = slowCreate ? "sleep 20" : ":";
             File.WriteAllText(ExecutablePath, string.Join('\n',
@@ -406,6 +446,7 @@ public sealed class DockerContainerWrapperLifecycleTests
                 $"  ps) {(emptyDiscovery ? ":" : delayedDiscovery ? $"if [ -f '{discoveryMarkerPath}' ]; then echo container-id; else touch '{discoveryMarkerPath}'; fi" : "echo container-id")} ;;",
                 $"  inspect) cat '{inspectionPath}' ;;",
                 $"  top) echo 'PID USER COMMAND'; echo '1 root {processName}' ;;",
+                craneProbeCommand,
                 "  logs) exec sleep 120 ;;",
                 $"  stop) {(slowStop ? "sleep 20" : ":")}; exit 0 ;;",
                 $"  rm) {(rejectRemove ? "echo remove rejected >&2; exit 7" : "exit 0")} ;;",
