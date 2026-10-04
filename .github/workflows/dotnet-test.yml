@@ -583,6 +583,7 @@ jobs:
           exit "$test_exit_code"
 
       - name: Collect logs and clean up this run's containers
+        id: cleanup_full_stack
         if: ${{ always() }}
         shell: bash
         run: |
@@ -622,23 +623,6 @@ jobs:
               wait "$apphost_pid" 2>/dev/null
             fi
           fi
-
-          for artifact_log in \
-            "$results_dir/apphost.stdout-stderr.log" \
-            "$results_dir/acceptance.stdout.log" \
-            "$results_dir/acceptance.stderr.log" \
-            "$results_dir/acceptance-result.json"; do
-            if [[ -f "$artifact_log" ]]; then
-              python3 -c 'import sys; from pathlib import Path; from scripts.capture_aspire_dcp_logs import sanitize; path=Path(sys.argv[1]); path.write_text(sanitize(path.read_text(encoding="utf-8", errors="replace")), encoding="utf-8")' \
-                "$artifact_log"
-            fi
-          done
-          for artifact_log in "$results_dir"/test-results/*.trx; do
-            if [[ -f "$artifact_log" ]]; then
-              python3 -c 'import sys; from pathlib import Path; from scripts.capture_aspire_dcp_logs import sanitize; path=Path(sys.argv[1]); path.write_text(sanitize(path.read_text(encoding="utf-8", errors="replace")), encoding="utf-8")' \
-                "$artifact_log"
-            fi
-          done
 
           docker info > "$results_dir/docker-info-after.txt" 2>&1
           docker system df -v > "$results_dir/docker-system-df-after.txt" 2>&1
@@ -715,8 +699,15 @@ jobs:
             docker system df -v
           } > "$results_dir/cleanup-result.txt" 2>&1
 
+          sanitization_success=true
+          if ! python3 scripts/sanitize_aspire_artifacts.py "$results_dir"; then
+            sanitization_success=false
+          fi
+          printf 'sanitization_success=%s\n' "$sanitization_success" > "$RUNNER_TEMP/duck-aspire-sanitization-status.txt"
+          echo "sanitization_success=$sanitization_success" >> "$GITHUB_OUTPUT"
+
       - name: Upload full-stack acceptance evidence
-        if: ${{ always() }}
+        if: ${{ always() && steps.cleanup_full_stack.outputs.sanitization_success == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: aspire-full-stack-${{ github.run_id }}-${{ github.run_attempt }}

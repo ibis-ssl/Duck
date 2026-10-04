@@ -175,11 +175,64 @@ public sealed class DockerContainerWrapperLifecycleTests
     {
         Assert.Equal(
             ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc",
-                "source /root/ibis_ws/install/setup.bash && exec ros2 node list"],
+                "source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list"],
             DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id"));
-        Assert.False(DockerServiceReadiness.CraneProbeSucceeded(124, "/crane_session_coordinator\n"));
-        Assert.False(DockerServiceReadiness.CraneProbeSucceeded(0, "/other_node\n"));
-        Assert.True(DockerServiceReadiness.CraneProbeSucceeded(0, "/crane_session_coordinator\n"));
+        Assert.False(CraneProbeDiagnostics.Evaluate(124, "/crane_session_coordinator\n", "", TimeSpan.FromSeconds(10)).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(0, "/crane_session_coordinator\n", "", TimeSpan.Zero).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(0,
+            "error DUCK_CRANE_ROS_SETUP_OK appears here\n/crane_session_coordinator\n", "", TimeSpan.Zero).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(0,
+            "/crane_session_coordinator\nDUCK_CRANE_ROS_SETUP_OK\n/other_node\n", "", TimeSpan.Zero).Ready);
+        Assert.True(CraneProbeDiagnostics.Evaluate(0,
+            "DUCK_CRANE_ROS_SETUP_OK\n/crane_session_coordinator\n", "", TimeSpan.Zero).Ready);
+        var beyondCap = "DUCK_CRANE_ROS_SETUP_OK\n" + new string('x', 600) + "\n/crane_session_coordinator\n";
+        var beyondCapResult = CraneProbeDiagnostics.Evaluate(0, beyondCap, "", TimeSpan.Zero);
+        Assert.True(beyondCapResult.Ready);
+        Assert.True(beyondCapResult.StandardOutputTruncated);
+        Assert.DoesNotContain("crane_session_coordinator", beyondCapResult.StandardOutputExcerpt);
+    }
+
+    [Fact]
+    public void CraneProbeSanitizerMatchesSharedPythonFixturesBeforeApplyingExcerptLimit()
+    {
+        var fixturePath = Path.Combine(AppContext.BaseDirectory, "crane_probe_sanitizer_fixtures.json");
+        using var fixtures = System.Text.Json.JsonDocument.Parse(File.ReadAllText(fixturePath));
+        foreach (var fixture in fixtures.RootElement.EnumerateArray())
+        {
+            Assert.Equal(
+                fixture.GetProperty("expected").GetString(),
+                CraneProbeDiagnostics.Sanitize(fixture.GetProperty("input").GetString()!));
+        }
+
+        var privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" + new string('x', 600) +
+            "PRIVATE_KEY_SENTINEL\n-----END RSA PRIVATE KEY-----\n" + new string('z', 600);
+        var result = CraneProbeDiagnostics.Evaluate(124, "", privateKey, TimeSpan.FromSeconds(10));
+        Assert.True(result.StandardErrorTruncated);
+        Assert.DoesNotContain("PRIVATE_KEY_SENTINEL", result.StandardErrorExcerpt);
+        Assert.DoesNotContain("-----BEGIN", result.StandardErrorExcerpt);
+    }
+
+    [Fact]
+    public void CraneProbeProgressCountsEveryAttemptAndThrottlesUnchangedResults()
+    {
+        var state = new CraneProbeDiagnosticState();
+        var failed = CraneProbeDiagnostics.Evaluate(124, "", "temporary", TimeSpan.FromSeconds(10));
+
+        Assert.NotNull(state.Record(failed, TimeSpan.Zero));
+        Assert.Null(state.Record(failed, TimeSpan.FromSeconds(1)));
+        var heartbeat = state.Record(failed, TimeSpan.FromSeconds(2));
+        Assert.NotNull(heartbeat);
+        Assert.Equal(3, heartbeat!.Attempt);
+        Assert.Equal(3, state.AttemptCount);
+        Assert.Equal(failed, state.Latest);
+        Assert.Contains("\"attempts\":3", state.CreateFinalSummary());
+
+        var ready = CraneProbeDiagnostics.Evaluate(0,
+            "DUCK_CRANE_ROS_SETUP_OK\n/crane_session_coordinator\n", "", TimeSpan.FromMilliseconds(25));
+        var transition = state.Record(ready, TimeSpan.FromMilliseconds(2100));
+        Assert.NotNull(transition);
+        Assert.Equal(4, transition!.Attempt);
+        Assert.True(transition.Outcome.Ready);
     }
 
     [Fact]
@@ -196,13 +249,15 @@ public sealed class DockerContainerWrapperLifecycleTests
             processName: "ros2",
             craneProbeTimeoutResponses: 2);
         using var cancellation = new CancellationTokenSource();
+        var diagnostics = new List<string>();
         var options = fake.Options(FindOpenPort()) with
         {
             ReadinessProfile = "crane",
             ExpectedProcessName = "ros2",
             StartupTimeoutSeconds = 10,
         };
-        var run = DockerContainerWrapper.RunAsync(options, cancellation.Token);
+        var run = DockerContainerWrapper.RunAsync(options, cancellation.Token, StopTestChildProcessAsync,
+            diagnostics.Add);
 
         await WaitForReadyAsync(options.HealthPort);
         using var response = await new HttpClient().GetAsync($"http://127.0.0.1:{options.HealthPort}/health/ready");
@@ -213,6 +268,54 @@ public sealed class DockerContainerWrapperLifecycleTests
         var commands = File.ReadAllText(fake.TracePath);
         Assert.Equal(3, commands.Split("exec container-id timeout --signal=TERM", StringSplitOptions.None).Length - 1);
         Assert.Contains("rm --force container-id", commands);
+        Assert.True(diagnostics.Count >= 2);
+        Assert.DoesNotContain("CRANE_DIAGNOSTIC_SENTINEL", string.Join('\n', diagnostics));
+        using var first = System.Text.Json.JsonDocument.Parse(diagnostics[0]);
+        Assert.Equal("duck_crane_probe_progress", first.RootElement.GetProperty("event_name").GetString());
+        Assert.Equal(1, first.RootElement.GetProperty("attempt").GetInt32());
+        Assert.Equal("setup_timeout", first.RootElement.GetProperty("Outcome").GetProperty("Classification").GetString());
+        Assert.Equal("password=[REDACTED]", first.RootElement.GetProperty("Outcome").GetProperty("StandardErrorExcerpt").GetString());
+        Assert.Contains(diagnostics, line => line.Contains("\"attempt\":3", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task CraneTimeoutFinalDiagnosticRetainsLatestFailureAndCleansOwnedContainer()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        using var fake = new FakeDockerClient(
+            slowCreate: false,
+            foreignImage: false,
+            processName: "ros2",
+            craneProbeTimeoutResponses: 100);
+        var diagnostics = new List<string>();
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ReadinessProfile = "crane",
+            ExpectedProcessName = "ros2",
+            StartupTimeoutSeconds = 1,
+        };
+
+        Assert.NotEqual(0, await DockerContainerWrapper.RunAsync(
+            options, CancellationToken.None, StopTestChildProcessAsync, diagnostics.Add).WaitAsync(TimeSpan.FromSeconds(8)));
+        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains(diagnostics, line => line.Contains("duck_crane_probe_final", StringComparison.Ordinal));
+        Assert.DoesNotContain("CRANE_DIAGNOSTIC_SENTINEL", string.Join('\n', diagnostics));
+    }
+
+    private static async Task<bool> StopTestChildProcessAsync(System.Diagnostics.Process process, TimeSpan wait)
+    {
+        if (!process.HasExited)
+        {
+            process.Kill(entireProcessTree: true);
+        }
+
+        await process.WaitForExitAsync();
+        process.Dispose();
+        return true;
     }
 
     [Fact]
@@ -433,9 +536,9 @@ public sealed class DockerContainerWrapperLifecycleTests
             var craneProbeCommand = craneProbeTimeoutResponses == 0
                 ? "  exec) exit 9 ;;"
                 : "  exec) count=$(cat '" + craneProbeCountPath + "' 2>/dev/null || echo 0); " +
-                    "count=$((count + 1)); echo \"$count\" > '" + craneProbeCountPath + "'; " +
-                    "if [ \"$count\" -le " + craneProbeTimeoutResponses + " ]; then exit 124; fi; " +
-                    "echo '/crane_session_coordinator' ;;";
+                "count=$((count + 1)); echo \"$count\" > '" + craneProbeCountPath + "'; " +
+                    "if [ \"$count\" -le " + craneProbeTimeoutResponses + " ]; then echo 'password=CRANE_DIAGNOSTIC_SENTINEL' >&2; exit 124; fi; " +
+                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\n/crane_session_coordinator\\n' ;;";
             ExecutablePath = Path.Combine(directory, "docker-fake");
             var createDelay = slowCreate ? "sleep 20" : ":";
             File.WriteAllText(ExecutablePath, string.Join('\n',

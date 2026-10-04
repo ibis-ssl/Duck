@@ -2,16 +2,8 @@ namespace Duck.Testing.AppHost;
 
 public static class DockerServiceReadiness
 {
-    public static string[] CreateCraneReadinessProbeArguments(string containerId)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(containerId);
-        return
-        [
-            "exec", containerId,
-            "timeout", "--signal=TERM", "--kill-after=2s", "10s",
-            "bash", "-lc", "source /root/ibis_ws/install/setup.bash && exec ros2 node list",
-        ];
-    }
+    public static string[] CreateCraneReadinessProbeArguments(string containerId) =>
+        CraneProbeDiagnostics.CreateCraneReadinessProbeArguments(containerId);
 
     public static readonly string Cm4SimListenerScript = """
         port_inodes=$(awk '$2 ~ /:3039$/ { print $10 }' /proc/net/udp /proc/net/udp6 2>/dev/null)
@@ -33,7 +25,7 @@ public static class DockerServiceReadiness
             .Any(line => line.Equals("crane_session_coordinator", StringComparison.Ordinal));
 
     public static bool CraneProbeSucceeded(int exitCode, string output) =>
-        exitCode == 0 && CraneHasCoordinator(output);
+        CraneProbeDiagnostics.Evaluate(exitCode, output, string.Empty, TimeSpan.Zero).Ready;
 
     public static bool Cm4SimOwnsListener(string output) =>
         output.Contains("cm4_sim-listening-12345", StringComparison.Ordinal);

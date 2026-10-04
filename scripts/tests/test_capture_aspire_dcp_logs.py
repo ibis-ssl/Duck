@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -5,9 +6,49 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from capture_aspire_dcp_logs import capture, sanitize
+from sanitize_aspire_artifacts import sanitize_tree
 
 
 class CaptureAspireDcpLogsTests(unittest.TestCase):
+    def test_crane_probe_sanitizer_shared_fixtures(self):
+        fixtures_path = Path(__file__).with_name("crane_probe_sanitizer_fixtures.json")
+        fixtures = json.loads(fixtures_path.read_text(encoding="utf-8"))
+        for fixture in fixtures:
+            with self.subTest(input=fixture["input"]):
+                self.assertEqual(fixture["expected"], sanitize(fixture["input"]))
+
+    def test_artifact_sanitizer_fails_closed_and_leaves_failed_file_unmodified(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts"
+            root.mkdir()
+            protected = root / "unsafe.log"
+            protected.write_text("api_token=UPLOAD_SENTINEL", encoding="utf-8")
+
+            def fail_for_sentinel(text):
+                if "UPLOAD_SENTINEL" in text:
+                    raise RuntimeError("forced sanitizer failure")
+                return sanitize(text)
+
+            failures = sanitize_tree(root, fail_for_sentinel)
+
+            self.assertEqual([protected], failures)
+            self.assertIn("UPLOAD_SENTINEL", protected.read_text(encoding="utf-8"))
+
+    def test_artifact_sanitizer_redacts_all_files_before_upload(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts"
+            root.mkdir()
+            diagnostic = root / "dcp" / "dcp-log-tails.txt"
+            diagnostic.parent.mkdir()
+            diagnostic.write_text('{"StandardErrorExcerpt":"password=ARTIFACT_SENTINEL"}', encoding="utf-8")
+
+            failures = sanitize_tree(root)
+
+            self.assertEqual([], failures)
+            result = diagnostic.read_text(encoding="utf-8")
+            self.assertNotIn("ARTIFACT_SENTINEL", result)
+            self.assertIn("[REDACTED]", result)
+
     def test_sanitize_redacts_aspire_dashboard_login_query_token(self):
         token = "DASHBOARD_LOGIN_TOKEN_SENTINEL"
 
