@@ -161,6 +161,9 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 | `game-controller` | 所有 container が Running で、`224.5.23.1:11003` の初期 `HALT` referee state を decode できる。active transition は acceptance が別途検証する。 |
 | `cm4-sim` | 所有 container が Running で、UDP 12345 listener が当該 container 内のプロセスに所有されていることを確認できる。port の使用中判定だけでは ready としない。 |
 | `crane` | 所有 container が Running で、container 内 ROS graph に `crane_session_coordinator` が存在することを確認できる。command と motion は acceptance が別途検証する。 |
+| `tigers-blue` | 所有 container が Running で、Sumatra の起動完了診断と、この実行で生成された decodable tracker packet を `224.5.23.2:11010` で確認する。 |
+| `autoref-tigers` | 所有 container が Running で、AutoRef 自身の diagnostics が起動完了を示し、この実行で受信・decode した vision `10020`、referee `11003`、tracker `11010` の各入力 count が増えたことを確認する。単なる multicast packet の外部観測では代用しない。image にその証跡がない場合は adapter を実装するまで ready にしない。 |
+| `ssl-log-recorder` | 所有 container が Running で、この実行が作成した log file が存在し、後続 reader が少なくとも一件の vision / referee / tracker record を decode できる。 |
 
 probe は finite deadline を持つ。timeout、container exit、decode failure は not-ready のまま失敗し、失敗 predicate と inspect/log diagnostics を記録する。multicast probe は選択した IPv4 interface で group join し `SO_REUSEADDR` を使い、受入 harness の consumer を奪わない。listener process identity probe は Linux 初期 target で実証する gate であり、実装可能性が確認できない platform では weaker predicate へ落とさず明示的に未対応とする。
 
@@ -257,7 +260,7 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 | `ASPIRE-006F1` | 対戦 fixture の版管理 | Sumatra の `simulation_protocol_fixed.xml` 相当、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
 | `ASPIRE-006F2` | `match` mode と resource topology | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
 | `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一 producer、Game Controller API、fixture mount、固定 image reference を application model test で固定する。 |
-| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定を model test で固定する。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` を wrapper executable resource として登録し、image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定、各サービス readiness profile と `WaitFor` 辺を model test で固定する。wrapper focused test は readiness の成功・timeout と診断根拠を検証する。 |
 | `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 publish 無効、および wrapper の readiness-based dependency graph を model test で固定する。 |
 | `ASPIRE-006F6` | `match-controller` と試合 lifecycle | GC API / referee / vision の readiness、STOP / HALT からの継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
 
@@ -301,7 +304,7 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 - 対戦モードの Duck は 11010 への tracker publish が無効で、AutoRef の tracker 入力へ Duck source を混在させない。
 - `match-controller` が参加資源の開始後に起動し、Game Controller API、11003、10020 の実データを確認してから試合を開始する。
 
-Wrapper unit test は fake Docker executable を使い、cancellation 中の遅延 create、CID 未取得時の exact-owner bounded discovery、ラベル不一致、child-process reap、log follower cancellation、foreign container 非変更を検証する。model test は resource topology と health-based dependency graph を固定する。実ネットワーク・active motion の acceptance は model test で代用しない。
+Wrapper unit test は fake Docker executable を使い、cancellation 中の遅延 create、CID 未取得時の exact-owner bounded discovery、ラベル不一致、child-process reap、log follower cancellation、foreign container 非変更、match-only wrapper の readiness 成功・timeout・入力 count 根拠を検証する。model test は resource topology、readiness profile、health-based dependency graph を全 mode で固定する。実ネットワーク・active motion の acceptance は model test で代用しない。
 
 Docker を必要とする一括起動試験は、AppHost のモデル検査と分離する。Docker が利用できない環境でも、アプリケーションモデルの退行を検出できるようにする。
 
@@ -414,10 +417,11 @@ Crane の現行 compose は Sumatra、Game Controller、SSL log recorder に移�
 ### 対戦モードの起動順序
 
 1. `simulator` と `game-controller` を開始する。
-2. `duck`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder` は必要な ready `simulator` / `game-controller` を待つ。Duck 自身は project-start signal のみを公開する。
-3. `crane` は ready な `simulator` と `game-controller` を待つ。対戦モードでは存在しない `cm4-sim` への依存を作らない。
-4. `match-controller` は対象 wrapper の readiness と Duck の project-start 後に起動する。
-5. `match-controller` は resource の Started 状態だけで試合を開始せず、Game Controller API 接続、11003 の referee message、10020 の SSL-Vision を実際に確認してから continue action を送る。
+2. `duck` は project-start signal を公開する。`tigers-blue` と `ssl-log-recorder` は ready な `simulator` / `game-controller` を待つ。
+3. `autoref-tigers` は ready な `simulator`、`game-controller`、`tigers-blue` を待つ。
+4. `crane` は ready な `simulator` と `game-controller` を待つ。対戦モードでは存在しない `cm4-sim` への依存を作らない。
+5. `match-controller` は ready な `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder` と Duck project-start 後に起動する。
+6. 依存待機の後も `match-controller` は Game Controller API 接続、11003 referee state、10020 SSL-Vision、tracker `11010` を実測し、HALT/STOP の初期状態を確認してから continue action を送る。起動済みだけで試合を開始しない。
 
 `match-controller` は Crane の現行試合 controller を基準に、`HALT` / `STOP` から利用可能な continue action を選び、必要に応じて `NEXT_COMMAND`、`NORMAL_START`、`FORCE_START` を使って試合を進行させる。終了条件は `POST_GAME` または設定した最大試合時間とし、結果には少なくとも両チームの得点、終了理由、`CRANE WIN` / `TIGERs WIN` / `DRAW` のいずれかを保存する。
 
@@ -427,7 +431,7 @@ Crane の現行 compose は Sumatra、Game Controller、SSL log recorder に移�
 
 | ID | 確認内容 | 合格条件 |
 | --- | --- | --- |
-| `ASPIRE-MATCH-001` | resource model | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` が存在し、`cm4-sim` と比較専用 `tracker-tigers` は起動対象に入らない。 |
+| `ASPIRE-MATCH-001` | resource model | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` が存在し、各 Docker resource は wrapper / readiness profile を持つ。model test は readiness-based `WaitFor` 辺を固定し、`cm4-sim` と比較専用 `tracker-tigers` は起動対象に入らない。 |
 | `ASPIRE-MATCH-002` | team / referee 契約 | Blue=`TIGERs Mannheim`、Yellow=`ibis`、Crane=`team:=ibis`、Sumatra=`--aiBlue` が一致し、11003 の producer は `game-controller` 一つだけである。 |
 | `ASPIRE-MATCH-003` | 双方の active motion | active referee state の同一確認窓で、SSL-Vision 上に Yellow の Crane robot と Blue の TIGERs robot の位置変化がそれぞれ観測できる。片側だけの移動では合格にしない。 |
 | `ASPIRE-MATCH-004` | AutoRef / tracker 経路 | `tigers-blue` が 11010 へ tracker packet を出力し、`autoref-tigers` が 10020 / 11003 / 11010 を使って active に動作する。Duck は 11010 へ publish せず、AutoRef の tracker 入力へ別 source を混在させない。 |
