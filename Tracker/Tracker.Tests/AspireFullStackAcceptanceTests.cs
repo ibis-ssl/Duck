@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Duck.Testing.RefereeDriver;
 using Google.Protobuf;
@@ -9,7 +10,7 @@ namespace Tracker.Tests;
 
 public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 {
-    private static readonly TimeSpan StackSignalTimeout = TimeSpan.FromMinutes(20);
+    private static readonly TimeSpan StackSignalTimeout = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan MotionTimeout = TimeSpan.FromSeconds(60);
 
     [Fact]
@@ -20,24 +21,34 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Directory.CreateDirectory(artifactsDirectory);
 
         var refereeSnapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
-        var visionPacketCount = 0;
-        var trackerPacketCount = 0;
+        var stageReached = "test_setup";
+        var refereeRawDatagramCount = 0;
+        int? visionPacketsConsumed = null;
+        int? trackerPacketsConsumed = null;
         string? failure = null;
         RobotMotionDelta? observedMovement = null;
+        MulticastInterface? selectedMulticastInterface = null;
+        UdpMulticastReceiver? refereeReceiver = null;
         UdpMulticastReceiver? visionReceiver = null;
         UdpMulticastReceiver? trackerReceiver = null;
 
         try
         {
             using var timeout = new CancellationTokenSource(StackSignalTimeout);
+            var multicastInterface = FindMulticastInterface();
+            selectedMulticastInterface = multicastInterface;
+            output.WriteLine(
+                $"multicast interface={multicastInterface.Name}; ipv4={multicastInterface.Address}");
+            refereeReceiver = new UdpMulticastReceiver("224.5.23.1", 11003, multicastInterface.Address);
             using var refereeSource = new RecordingRefereeCommandSource(
-                new UdpRefereeCommandSource(),
+                new UdpRefereeCommandSource(refereeReceiver),
                 refereeSnapshots,
                 output);
-            visionReceiver = new UdpMulticastReceiver("224.5.23.2", 10020);
-            trackerReceiver = new UdpMulticastReceiver("224.5.23.2", 11010);
+            visionReceiver = new UdpMulticastReceiver("224.5.23.2", 10020, multicastInterface.Address);
+            trackerReceiver = new UdpMulticastReceiver("224.5.23.2", 11010, multicastInterface.Address);
 
             RefereeCommandSnapshot initial;
+            stageReached = "initial_referee_wait";
             try
             {
                 initial = await refereeSource.WaitForChangeAsync(null, timeout.Token);
@@ -56,6 +67,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
             SSL_WrapperPacket initialVision;
+            stageReached = "initial_vision_wait";
             try
             {
                 initialVision = await ReadVisionFrameWithYellowRobotsAsync(visionReceiver, timeout.Token);
@@ -66,6 +78,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     "VISION_INGRESS_FAILURE: no SSL-Vision detection frame with Yellow robots arrived on UDP 10020 before the deadline.",
                     exception);
             }
+            visionPacketsConsumed = visionReceiver.PacketCount;
+            stageReached = "active_referee_transition";
             var motionVerifier = new RobotMotionAcceptanceVerifier(minimumDistanceMm: 100);
             motionVerifier.CaptureBaseline(initialVision.Detection);
             output.WriteLine(
@@ -95,6 +109,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "REFEREE_FIXTURE_FAILURE: Game Controller did not publish an active command on UDP 11003.");
             output.WriteLine($"active referee={active!.Command} counter={active.CommandCounter}");
 
+            stageReached = "active_robot_motion_wait";
             var discardedPreMotionPackets = visionReceiver.DrainPendingPackets();
             output.WriteLine($"discarded queued vision packets before active-motion window={discardedPreMotionPackets}");
 
@@ -126,6 +141,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 $"robotId={observedMovement.RobotId}; distanceMm={observedMovement.DistanceMm:F1}");
 
             TrackerWrapperPacket tracker;
+            stageReached = "duck_tracker_output_wait";
             try
             {
                 tracker = await ReadDuckTrackerPacketAsync(trackerReceiver, timeout.Token);
@@ -136,6 +152,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     "DUCK_TRACKER_OUTPUT_FAILURE: no ibis TrackerWrapperPacket was received on UDP 11010 before the deadline.",
                     exception);
             }
+            trackerPacketsConsumed = trackerReceiver.PacketCount;
             output.WriteLine(
                 $"Duck tracker packet verified: uuid={tracker.Uuid}; source={tracker.SourceName}; " +
                 $"frame={tracker.TrackedFrame!.FrameNumber}; robots={tracker.TrackedFrame.Robots.Count}");
@@ -150,21 +167,46 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         finally
         {
-            visionPacketCount = visionReceiver?.PacketCount ?? 0;
-            trackerPacketCount = trackerReceiver?.PacketCount ?? 0;
+            refereeRawDatagramCount = refereeReceiver?.PacketCount ?? 0;
+            if (stageReached is "initial_vision_wait" or "active_referee_transition" or "active_robot_motion_wait" or "duck_tracker_output_wait")
+            {
+                visionPacketsConsumed = visionReceiver?.PacketCount ?? visionPacketsConsumed;
+            }
+
+            if (stageReached == "duck_tracker_output_wait")
+            {
+                trackerPacketsConsumed = trackerReceiver?.PacketCount;
+            }
+
+            var linuxMulticastMemberships = ReadLinuxMulticastMemberships();
+            refereeReceiver?.Dispose();
             visionReceiver?.Dispose();
             trackerReceiver?.Dispose();
             var evidence = new
             {
                 status = failure is null ? "passed" : "failed",
                 failure,
+                stageReached,
                 refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
                 {
                     command = snapshot.Command.ToString(),
                     snapshot.CommandCounter,
                 }),
-                visionPacketCount,
-                trackerPacketCount,
+                refereeRawDatagramCount,
+                visionPacketsConsumed,
+                trackerPacketsConsumed,
+                packetCountSemantics = "Consumed counts record datagrams read by the harness; null means that reader stage was not reached and does not imply network ingress was zero.",
+                receiverSockets = new
+                {
+                    interfaceName = selectedMulticastInterface?.Name,
+                    interfaceAddress = selectedMulticastInterface?.Address.ToString(),
+                    bindAddress = IPAddress.Any.ToString(),
+                    reuseAddress = true,
+                    referee = new { group = "224.5.23.1", port = 11003 },
+                    sslVision = new { group = "224.5.23.2", port = 10020 },
+                    duckTracker = new { group = "224.5.23.2", port = 11010 },
+                    linuxMemberships = linuxMulticastMemberships,
+                },
                 movement = observedMovement,
                 runner = Environment.GetEnvironmentVariable("RUNNER_OS"),
                 sha = Environment.GetEnvironmentVariable("GITHUB_SHA"),
@@ -205,6 +247,38 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 return packet;
             }
         }
+    }
+
+    private static MulticastInterface FindMulticastInterface()
+    {
+        var interfaces = NetworkInterface.GetAllNetworkInterfaces()
+            .Where(networkInterface =>
+                networkInterface.OperationalStatus == OperationalStatus.Up &&
+                networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+            .SelectMany(networkInterface =>
+            {
+                var properties = networkInterface.GetIPProperties();
+                var hasDefaultGateway = properties.GatewayAddresses.Any(gateway =>
+                    gateway.Address.AddressFamily == AddressFamily.InterNetwork &&
+                    !gateway.Address.Equals(IPAddress.Any));
+                return properties.UnicastAddresses
+                    .Where(unicast => unicast.Address.AddressFamily == AddressFamily.InterNetwork)
+                    .Select(unicast => new MulticastInterface(
+                        networkInterface.Name,
+                        unicast.Address,
+                        hasDefaultGateway));
+            })
+            .OrderByDescending(candidate => candidate.HasDefaultGateway)
+            .FirstOrDefault();
+
+        return interfaces ?? throw new InvalidOperationException(
+            "MULTICAST_INTERFACE_FAILURE: no operational non-loopback IPv4 interface was found.");
+    }
+
+    private static string? ReadLinuxMulticastMemberships()
+    {
+        const string membershipPath = "/proc/net/igmp";
+        return File.Exists(membershipPath) ? File.ReadAllText(membershipPath) : null;
     }
 
     private sealed class RecordingRefereeCommandSource(
@@ -248,14 +322,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
-    private sealed class UdpMulticastReceiver : IDisposable
+    private sealed class UdpMulticastReceiver : IRefereePacketReceiver, IDisposable
     {
         private readonly UdpClient client;
         private int packetCount;
 
         public int PacketCount => Volatile.Read(ref packetCount);
 
-        public UdpMulticastReceiver(string address, int port)
+        public UdpMulticastReceiver(string address, int port, IPAddress interfaceAddress)
         {
             var group = IPAddress.Parse(address);
             client = new UdpClient(AddressFamily.InterNetwork)
@@ -264,7 +338,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             };
             client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             client.Client.Bind(new IPEndPoint(IPAddress.Any, port));
-            client.JoinMulticastGroup(group);
+            client.JoinMulticastGroup(group, interfaceAddress);
         }
 
         public async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken cancellationToken)
@@ -290,4 +364,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         public void Dispose() => client.Dispose();
     }
+
+    private sealed record MulticastInterface(string Name, IPAddress Address, bool HasDefaultGateway);
 }
