@@ -205,7 +205,7 @@ public sealed class AppHostApplicationModelTests
         var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("ghcr.io", craneImage.Registry);
         Assert.Equal("ibis-ssl/crane", craneImage.Image);
-        Assert.Matches("^scenario-[0-9a-f]{7,40}$", craneImage.Tag);
+        Assert.Equal("scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", craneImage.Tag);
         Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(crane));
 
         var cm4Simulator = Assert.IsType<ContainerResource>(
