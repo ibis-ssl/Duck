@@ -1,6 +1,11 @@
 ﻿using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.AppHost;
 
 var builder = DistributedApplication.CreateBuilder(args);
+var ownershipLockPath =
+    builder.Configuration["Testing:StackOwnership:LockPath"] ??
+    Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 
 var simulatorImageTag =
     builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";

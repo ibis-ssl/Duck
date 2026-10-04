@@ -13,7 +13,7 @@ public sealed class StackOwnershipLease : IDisposable
     }
 
     /// <summary>
-    /// Opens an ownership marker without exclusive acquisition.
+    /// Acquires the host-local stack ownership marker and holds it until this lease is disposed.
     /// </summary>
     public static StackOwnershipLease Acquire(string path)
     {
@@ -21,11 +21,20 @@ public sealed class StackOwnershipLease : IDisposable
         var fullPath = Path.GetFullPath(path);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
-        return new StackOwnershipLease(new FileStream(
-            fullPath,
-            FileMode.OpenOrCreate,
-            FileAccess.ReadWrite,
-            FileShare.ReadWrite));
+        try
+        {
+            return new StackOwnershipLease(new FileStream(
+                fullPath,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite,
+                FileShare.None));
+        }
+        catch (IOException exception)
+        {
+            throw new InvalidOperationException(
+                $"Another Duck Aspire stack already owns '{fullPath}'.",
+                exception);
+        }
     }
 
     public void Dispose()
