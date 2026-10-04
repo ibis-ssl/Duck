@@ -248,6 +248,45 @@ public sealed class AppHostApplicationModelTests
         AssertWaitsFor(crane, duck, gameController);
     }
 
+    [Theory]
+    [InlineData("visibility_graph")]
+    [InlineData("rvo2")]
+    public async Task SimulatorIbisPortOverridePropagatesToCranePath(string planner)
+    {
+        string[] args =
+        [
+            "--Testing:Crane:Planner=" + planner,
+            "--Testing:Simulator:IbisPort=22346",
+        ];
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
+
+        var simulator = Assert.Single(appHost.Resources, resource => resource.Name == "simulator");
+        var simulatorArgs = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(simulator));
+        var ibisPortIndex = Array.IndexOf(simulatorArgs, "--ibis-port");
+        Assert.True(ibisPortIndex >= 0 && ibisPortIndex + 1 < simulatorArgs.Length);
+        Assert.Equal("22346", simulatorArgs[ibisPortIndex + 1]);
+
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
+
+        if (planner == "visibility_graph")
+        {
+            var cm4Simulator = Assert.Single(appHost.Resources, resource => resource.Name == "cm4-sim");
+            var cm4Args = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(cm4Simulator));
+            var outPortIndex = Array.IndexOf(cm4Args, "--out-port");
+            Assert.True(outPortIndex >= 0 && outPortIndex + 1 < cm4Args.Length);
+            Assert.Equal("22346", cm4Args[outPortIndex + 1]);
+            Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"]);
+        }
+        else
+        {
+            Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+            Assert.Equal("22346", craneEnvironment["CRANE_TARGET_PORT"]);
+        }
+    }
+
     private static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(IResourceWithEnvironment resource)
     {
         var executionConfiguration = await ExecutionConfigurationBuilder.Create(resource)
