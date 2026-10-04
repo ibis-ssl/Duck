@@ -158,7 +158,7 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 | Resource | `ready` の条件 |
 | --- | --- |
 | `simulator` | 所有 container が Running で、wrapper が `224.5.23.2:10020` の SSL-Vision detection packet を受信・decode できる。継続 traffic と robot motion は end-to-end acceptance の責務とする。 |
-| `game-controller` | 所有 container が Running で、`224.5.23.1:11003` の初期 `HALT` referee state を decode できる。active transition は acceptance が別途検証する。 |
+| `game-controller` | 所有 container が Running で、`224.5.23.1:11003` の初期 referee state を decode し、mode 固有の期待状態と一致する。`base` / `comparison` は `HALT`、`match` は `STOP`。未知または想定外の command は not-ready とし、active transition は acceptance が別途検証する。 |
 | `cm4-sim` | 所有 container が Running で、UDP 12345 listener が当該 container 内のプロセスに所有されていることを確認できる。port の使用中判定だけでは ready としない。 |
 | `crane` | 所有 container が Running で、container 内 ROS graph に `crane_session_coordinator` が存在することを確認できる。command と motion は acceptance が別途検証する。 |
 | `tigers-blue` | 所有 container が Running で、Sumatra の起動完了診断と、この実行で生成された decodable tracker packet を `224.5.23.2:11010` で確認する。 |
@@ -259,7 +259,7 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 | --- | --- | --- |
 | `ASPIRE-006F1` | 対戦 fixture の版管理 | Sumatra の `simulation_protocol_fixed.xml` 相当、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
 | `ASPIRE-006F2` | `match` mode と resource topology | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
-| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一 producer、Game Controller API、fixture mount、固定 image reference を application model test で固定する。 |
+| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一 producer、Game Controller API、fixture mount、固定 image reference を application model test で固定する。Game Controller readiness test は `base` / `comparison` の `HALT` と `match` の `STOP` を受理し、未知または想定外の command を not-ready とする。 |
 | `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` を wrapper executable resource として登録し、image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定、各サービス readiness profile と `WaitFor` 辺を model test で固定する。wrapper focused test は readiness の成功・timeout と診断根拠を検証する。 |
 | `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 publish 無効、および wrapper の readiness-based dependency graph を model test で固定する。 |
 | `ASPIRE-006F6` | `match-controller` と試合 lifecycle | GC API / referee / vision の readiness、STOP / HALT からの継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
@@ -375,7 +375,7 @@ Windows / macOS で container と host の multicast が成立しない場合、
 
 CI では検証対象の管理プログラムを実行する。`Testing:StackOwnership:LockPath` は `$RUNNER_TEMP` 配下に置き、実行識別番号と再試行回数を含める。この試験が起動した資源だけを停止・削除し、Docker 全体へ作用する一括削除はしない。後片付けと診断収集は成功・失敗どちらでも実施する。管理プログラムの出力、Docker の情報、各資源の設定情報とログ、受入テストが観測した審判状態・操作と映像・追跡データの受信数、試験結果を成果物として保存する。各待機には有限の時間制限を設ける。空き容量が不足した場合も、広範囲な削除で .NET SDK などの開発ツールを壊さない。
 
-審判管理プログラム 3.20.3 の Git 固定版 `8050f232c3130323bbd91d1d3d56e9553506c8e4` では、新規の試合状態と指令は `HALT` で初期化される。起動時に `config/state-store.json.stream` が存在すれば、その保存状態が復元される。このため毎回新しい実行単位を作り、設定や状態を外部保存領域へ永続化しないことを試験用初期条件とする。`HALT` は起動設定から読み込む値ではなく、空の状態保存先に対する初期化結果として UDP 11003 で実測する。受入テストが別の初期指令を観測した場合は、UDP 12345 / 12346 の確認へ進まず、審判状態の準備失敗として報告する。
+審判管理プログラム 3.20.3 の Git 固定版 `8050f232c3130323bbd91d1d3d56e9553506c8e4` では、新規の試合状態と指令は `HALT` で初期化される。起動時に `config/state-store.json.stream` が存在すれば、その保存状態が復元される。このため毎回新しい実行単位を作り、設定や状態を外部保存領域へ永続化しないことを試験用初期条件とする。base / comparison mode の期待初期状態は空の保存先からの `HALT`、match mode は版管理した対戦 fixture の `STOP` とし、いずれも UDP 11003 で実測する。`game-controller` readiness は mode ごとの期待 command と一致したときだけ成功し、未知状態・保存状態の混入は not-ready とする。受入テストが期待状態と異なる初期指令を観測した場合は、UDP 12345 / 12346 の確認へ進まず、審判状態の準備失敗として報告する。
 
 実行環境の容量は固定で、利用可否や費用を確認せずに大容量環境を前提にしない。Docker の配布物を展開した後の容量は、圧縮状態の合計からは分からないため、初回実測値、最小空き容量、実行時間を成果物へ記録する。複数回の測定後に実行環境を決める。Docker の常駐処理の設定変更はこの試験に含めない。
 
@@ -432,7 +432,7 @@ Crane の現行 compose は Sumatra、Game Controller、SSL log recorder に移�
 | ID | 確認内容 | 合格条件 |
 | --- | --- | --- |
 | `ASPIRE-MATCH-001` | resource model | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` が存在し、各 Docker resource は wrapper / readiness profile を持つ。model test は readiness-based `WaitFor` 辺を固定し、`cm4-sim` と比較専用 `tracker-tigers` は起動対象に入らない。 |
-| `ASPIRE-MATCH-002` | team / referee 契約 | Blue=`TIGERs Mannheim`、Yellow=`ibis`、Crane=`team:=ibis`、Sumatra=`--aiBlue` が一致し、11003 の producer は `game-controller` 一つだけである。 |
+| `ASPIRE-MATCH-002` | team / referee 契約 | Blue=`TIGERs Mannheim`、Yellow=`ibis`、Crane=`team:=ibis`、Sumatra=`--aiBlue` が一致し、11003 の producer は `game-controller` 一つだけである。mode-specific readiness は `match` の初期 `STOP` を確認する。 |
 | `ASPIRE-MATCH-003` | 双方の active motion | active referee state の同一確認窓で、SSL-Vision 上に Yellow の Crane robot と Blue の TIGERs robot の位置変化がそれぞれ観測できる。片側だけの移動では合格にしない。 |
 | `ASPIRE-MATCH-004` | AutoRef / tracker 経路 | `tigers-blue` が 11010 へ tracker packet を出力し、`autoref-tigers` が 10020 / 11003 / 11010 を使って active に動作する。Duck は 11010 へ publish せず、AutoRef の tracker 入力へ別 source を混在させない。 |
 | `ASPIRE-MATCH-005` | 試合完了と証跡 | `POST_GAME` または最大試合時間で終了し、対戦結果、全 resource の stdout / stderr、SSL log、Crane の記録データ、Game Controller / AutoRef / Sumatra の診断情報を保存できる。 |
