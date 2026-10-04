@@ -1,4 +1,7 @@
-<Solution>
+﻿<Solution>
+  <Folder Name="/Testing/">
+    <Project Path="Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj" />
+  </Folder>
   <Project Path="SslProto/SslProto.csproj" />
   <Project Path="TrackerConnectionLib/TrackerConnectionLib.csproj" />
   <Project Path="TrackerConnectionLibExample/TrackerConnectionLibExample.csproj" />

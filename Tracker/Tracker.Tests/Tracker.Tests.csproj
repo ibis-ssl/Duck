@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Tracker.DebugHost\Tracker.DebugHost.csproj" />
     <ProjectReference Include="..\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
     <ProjectReference Include="..\..\Testing\Duck.Testing.AppHost\Duck.Testing.AppHost.csproj" />
+    <ProjectReference Include="..\..\Testing\Duck.Testing.RefereeDriver\Duck.Testing.RefereeDriver.csproj" />
     <ProjectReference Include="..\Tracker.CaptureReplay\Tracker.CaptureReplay.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
