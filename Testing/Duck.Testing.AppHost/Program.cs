@@ -18,7 +18,7 @@ var simulatorIbisPort =
 var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
-    builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-a544db92b72b137c8974285b36940d0d4b5e7e69";
+    builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
 var craneTeam = builder.Configuration["Testing:Crane:Team"] ?? "Yellow";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
 var cm4SimulatorImageTag =
