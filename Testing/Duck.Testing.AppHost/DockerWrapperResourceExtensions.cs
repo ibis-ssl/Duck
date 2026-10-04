@@ -41,7 +41,7 @@ public static class DockerWrapperResourceExtensions
                 wrapperExecutable,
                 AppContext.BaseDirectory)
             .WithArgs("--docker-wrapper", JsonSerializer.Serialize(launch))
-            .WithHttpEndpoint(port: healthPort, name: "health")
+            .WithHttpEndpoint(port: healthPort, targetPort: healthPort, name: "health")
             .WithHealthCheck(healthCheckName);
         executable.Resource.Annotations.Add(new DockerWrapperLaunchOptionsAnnotation(launch));
 

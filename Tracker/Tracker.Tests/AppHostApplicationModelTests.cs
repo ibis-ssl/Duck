@@ -32,9 +32,11 @@ public sealed class AppHostApplicationModelTests
         {
             var resource = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, item => item.Name == name));
             Assert.Single(resource.Annotations.OfType<HealthCheckAnnotation>());
-            Assert.Contains(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "health");
-
+            var endpoint = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "health");
             var launch = await GetLaunchOptionsAsync(resource);
+            Assert.Equal(launch.HealthPort, endpoint.TargetPort);
+            Assert.Equal("http", endpoint.UriScheme);
+
             Assert.Equal(name, launch.ResourceName);
             Assert.NotEmpty(launch.RunId);
             Assert.InRange(launch.HealthPort, 1, 65535);
