@@ -325,7 +325,7 @@ jobs:
   aspire-full-stack:
     name: ASPIRE full-stack Linux acceptance
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/task/pr28-aspire-005') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/task/pr28-aspire-005') || (github.event_name == 'pull_request' && github.head_ref == 'task/pr28-aspire-005') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
