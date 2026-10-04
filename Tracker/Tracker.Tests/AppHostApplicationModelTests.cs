@@ -232,6 +232,7 @@ public sealed class AppHostApplicationModelTests
         var craneArgs = await GetArgumentsAsync(crane);
         Assert.Contains(craneArgs, argument =>
             argument.Contains("planner:=${PLANNER}", StringComparison.Ordinal));
+        Assert.Contains(craneArgs, argument => argument.Contains("team:=Yellow", StringComparison.Ordinal));
         var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
         Assert.Equal("visibility_graph", craneEnvironment["PLANNER"]);
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"]);

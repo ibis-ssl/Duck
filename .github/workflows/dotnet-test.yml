@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - task/pr28-aspire-005
   workflow_dispatch:
 
 permissions:
@@ -318,5 +319,223 @@ jobs:
         with:
           name: aspire-net-002-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/aspire-net-002
+          if-no-files-found: error
+          retention-days: 14
+
+  aspire-full-stack:
+    name: ASPIRE full-stack Linux acceptance
+    needs: test
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/task/pr28-aspire-005') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: ga
+
+      - name: Record runner and Docker capacity before pulls
+        id: aspire_full_stack_preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          mkdir -p "$results_dir"
+          if ! docker ps -aq --no-trunc | sort -u \
+            > "$RUNNER_TEMP/aspire-full-stack-containers-before.txt"; then
+            printf 'Could not snapshot initial Docker containers; refusing to run acceptance.\n' >&2
+            exit 1
+          fi
+          touch "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete"
+
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'sha=%s\n' "$GITHUB_SHA"
+            printf 'ref=%s\n' "$GITHUB_REF"
+            printf 'run_id=%s\n' "$GITHUB_RUN_ID"
+            printf 'run_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
+            printf 'runner_os=%s\n' "$RUNNER_OS"
+            printf '\n## df -B1\n'
+            df -B1 -h
+            printf '\n## docker info\n'
+            docker info
+            printf '\n## docker system df -v before pulls\n'
+            docker system df -v
+            printf '\n## initial containers\n'
+            docker ps -a --no-trunc
+          } > "$results_dir/environment-before.txt" 2>&1
+
+      - name: Build AppHost and full-stack acceptance test
+        id: aspire_full_stack_build
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj \
+            -m:1 /nr:false \
+            > "$results_dir/apphost-build.stdout.log" \
+            2> "$results_dir/apphost-build.stderr.log"
+          apphost_build_exit_code=$?
+          printf '%s\n' "$apphost_build_exit_code" > "$results_dir/apphost-build.exit-code"
+          if [[ "$apphost_build_exit_code" -ne 0 ]]; then
+            exit "$apphost_build_exit_code"
+          fi
+
+          dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj \
+            -p:RunAspireFullStackAcceptance=true \
+            -m:1 /nr:false \
+            > "$results_dir/harness-build.stdout.log" \
+            2> "$results_dir/harness-build.stderr.log"
+          harness_build_exit_code=$?
+          printf '%s\n' "$harness_build_exit_code" > "$results_dir/harness-build.exit-code"
+          exit "$harness_build_exit_code"
+
+      - name: Start the AppHost
+        id: aspire_full_stack_start
+        if: ${{ steps.aspire_full_stack_build.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          apphost_log="$results_dir/apphost.stdout-stderr.log"
+          stack_lock="$RUNNER_TEMP/duck-aspire-stack-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.lock"
+          export Testing__StackOwnership__LockPath="$stack_lock"
+
+          {
+            printf '## Docker storage immediately before resource start\n'
+            docker system df -v
+            printf '\n## available filesystem capacity\n'
+            df -B1 -h
+          } > "$results_dir/storage-before-image-pulls.txt" 2>&1
+
+          dotnet run --no-build \
+            --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj \
+            > "$apphost_log" 2>&1 &
+          apphost_pid=$!
+          printf '%s\n' "$apphost_pid" > "$RUNNER_TEMP/aspire-full-stack-apphost.pid"
+          printf 'apphost_pid=%s\nstack_lock=%s\n' "$apphost_pid" "$stack_lock" \
+            > "$results_dir/apphost-process.txt"
+
+      - name: Run full-stack packet and active-motion acceptance
+        id: aspire_full_stack_test
+        if: ${{ steps.aspire_full_stack_start.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          storage_samples="$results_dir/storage-samples.csv"
+          printf 'sampled_at_utc,available_bytes\n' > "$storage_samples"
+          DUCK_ASPIRE_ARTIFACTS="$results_dir" \
+            dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \
+              --no-build \
+              -p:RunAspireFullStackAcceptance=true \
+              --filter 'FullyQualifiedName~Tracker.Tests.AspireFullStackAcceptanceTests' \
+              --logger "trx;LogFileName=aspire-full-stack.trx" \
+              --results-directory "$results_dir/test-results" \
+              --logger "console;verbosity=normal" \
+              > "$results_dir/acceptance.stdout.log" \
+              2> "$results_dir/acceptance.stderr.log" &
+          test_pid=$!
+          printf 'test_pid=%s\n' "$test_pid" > "$results_dir/acceptance-process.txt"
+          while kill -0 "$test_pid" 2>/dev/null; do
+            available_bytes="$(df -B1 --output=avail "$RUNNER_TEMP" | tail -n 1 | tr -d ' ')"
+            printf '%s,%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$available_bytes" \
+              >> "$storage_samples"
+            sleep 5
+          done
+          wait "$test_pid"
+          test_exit_code=$?
+          printf '%s\n' "$test_exit_code" > "$results_dir/acceptance.exit-code"
+          exit "$test_exit_code"
+
+      - name: Collect logs and clean up this run's containers
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set +e
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          mkdir -p "$results_dir/resource-logs"
+          pid_file="$RUNNER_TEMP/aspire-full-stack-apphost.pid"
+          before_file="$RUNNER_TEMP/aspire-full-stack-containers-before.txt"
+
+          if [[ -f "$pid_file" ]]; then
+            apphost_pid="$(cat "$pid_file")"
+            if kill -0 "$apphost_pid" 2>/dev/null; then
+              kill -INT "$apphost_pid" 2>/dev/null
+              for _ in {1..300}; do
+                if ! kill -0 "$apphost_pid" 2>/dev/null; then
+                  break
+                fi
+                sleep 0.1
+              done
+              if kill -0 "$apphost_pid" 2>/dev/null; then
+                kill -TERM "$apphost_pid" 2>/dev/null
+                for _ in {1..100}; do
+                  if ! kill -0 "$apphost_pid" 2>/dev/null; then
+                    break
+                  fi
+                  sleep 0.1
+                done
+              fi
+              if kill -0 "$apphost_pid" 2>/dev/null; then
+                kill -KILL "$apphost_pid" 2>/dev/null
+              fi
+              wait "$apphost_pid" 2>/dev/null
+            fi
+          fi
+
+          docker info > "$results_dir/docker-info-after.txt" 2>&1
+          docker system df -v > "$results_dir/docker-system-df-after.txt" 2>&1
+          df -B1 -h > "$results_dir/df-after.txt" 2>&1
+          docker ps -a --no-trunc > "$results_dir/docker-containers-after.txt" 2>&1
+          docker image ls --digests --no-trunc > "$results_dir/docker-images-after.txt" 2>&1
+
+          : > "$results_dir/created-container-ids.txt"
+          docker ps -aq --no-trunc | sort -u | while IFS= read -r container_id; do
+            [[ -n "$container_id" ]] || continue
+            if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
+              [[ ! -f "$before_file" ]] || grep -Fxq "$container_id" "$before_file"; then
+              continue
+            fi
+
+            printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
+            container_name="$(docker inspect --format '{{.Name}}' "$container_id" 2>/dev/null | tr -d '/')"
+            container_name="${container_name:-$container_id}"
+            docker inspect "$container_id" \
+              > "$results_dir/resource-logs/$container_name.inspect.json" 2>&1
+            docker logs --timestamps "$container_id" \
+              > "$results_dir/resource-logs/$container_name.stdout-stderr.log" 2>&1
+            docker rm -f "$container_id" \
+              > "$results_dir/resource-logs/$container_name.remove.log" 2>&1
+          done
+
+          {
+            printf 'created_containers_removed_only=true\n'
+            printf 'images_removed=false\n'
+            printf 'daemon_settings_changed=false\n'
+            printf '\n## storage after scoped cleanup\n'
+            df -B1 -h
+            docker system df -v
+          } > "$results_dir/cleanup-result.txt" 2>&1
+
+      - name: Upload full-stack acceptance evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: aspire-full-stack-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/aspire-full-stack
           if-no-files-found: error
           retention-days: 14

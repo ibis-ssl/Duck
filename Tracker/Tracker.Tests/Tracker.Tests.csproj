@@ -30,4 +30,8 @@
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(RunAspireFullStackAcceptance)' != 'true'">
+    <Compile Remove="AspireFullStackAcceptanceTests.cs" />
+  </ItemGroup>
+
 </Project>
