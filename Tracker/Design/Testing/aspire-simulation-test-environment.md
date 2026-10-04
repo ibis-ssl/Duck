@@ -256,7 +256,7 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 | `ASPIRE-006F2` | `match` mode と resource topology | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
 | `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一 producer、Game Controller API、fixture mount、固定 image reference を application model test で固定する。 |
 | `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定を model test で固定する。 |
-| `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 publish 無効、必要な `WaitForStart` を model test で固定する。 |
+| `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 publish 無効、および wrapper の readiness-based dependency graph を model test で固定する。 |
 | `ASPIRE-006F6` | `match-controller` と試合 lifecycle | GC API / referee / vision の readiness、STOP / HALT からの継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
 
 ### `ASPIRE-006G`: TIGERs vs Crane 一括対戦試験
@@ -392,12 +392,12 @@ TIGERs の AI と Crane を実際に対戦させる対戦モードを、トラ�
 
 | 資源名 | 実行形態 | 対戦モードでの責務 |
 | --- | --- | --- |
-| `simulator` | Docker image | ER-Force `simulator-cli` を host network で起動する。対戦用起動引数は Crane の現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003` を使う。 |
-| `game-controller` | Docker image | 11003 の唯一の referee producer とし、対戦用の初期状態を読み込む。 |
-| `crane` | Docker image | 固定した `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を使い、`sim:=true speak:=false team:=ibis` で Yellow 側を制御する。 |
-| `tigers-blue` | Docker image | 固定 tag または digest の `tigersmannheim/sumatra` を `--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol` で起動する。 |
-| `autoref-tigers` | Docker image | `tigersmannheim/auto-referee:1.2.0` を active / headless で起動し、vision 10020、referee 11003、tracker 11010 を使って試合判定を Game Controller へ返す。 |
-| `ssl-log-recorder` | Docker image | referee 11003、vision 10020、tracker 11010 を対戦証跡として保存する。 |
+| `simulator` | Aspire executable wrapper + Docker container | ER-Force `simulator-cli` を host network で起動する。対戦用起動引数は Crane の現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003` を使う。 |
+| `game-controller` | Aspire executable wrapper + Docker container | 11003 の唯一の referee producer とし、対戦用の初期状態を読み込む。 |
+| `crane` | Aspire executable wrapper + Docker container | 固定した `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を使い、`sim:=true speak:=false team:=ibis` で Yellow 側を制御する。 |
+| `tigers-blue` | Aspire executable wrapper + Docker container | 固定 tag または digest の `tigersmannheim/sumatra` を `--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol` で起動する。 |
+| `autoref-tigers` | Aspire executable wrapper + Docker container | `tigersmannheim/auto-referee:1.2.0` を active / headless で起動し、vision 10020、referee 11003、tracker 11010 を使って試合判定を Game Controller へ返す。 |
+| `ssl-log-recorder` | Aspire executable wrapper + Docker container | referee 11003、vision 10020、tracker 11010 を対戦証跡として保存する。 |
 | `match-controller` | 試験 fixture | Game Controller API、referee、vision の準備完了を確認し、試合開始・停止状態からの継続・終了監視・結果保存を行う。 |
 | `duck` | .NET プロセス | SSL-Vision の観測と Duck 側デバッグを継続する。ただし対戦判定へ影響を与えないよう、対戦モードでは official tracker multicast 11010 への publish を無効にする。 |
 
