@@ -24,6 +24,7 @@ PRIVATE_KEY_BLOCK = re.compile(
     r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----",
     re.S,
 )
+DASHBOARD_LOGIN_TOKEN = re.compile(r"(?i)([?&]t=)[A-Za-z0-9._~+/-]+={0,2}")
 
 
 def _excluded(path: Path) -> bool:
@@ -47,6 +48,7 @@ def _redact_value(match: re.Match[str]) -> str:
 def sanitize(text: str) -> str:
     text = PRIVATE_KEY_BLOCK.sub("[REDACTED PRIVATE KEY BLOCK]", text)
     text = BEARER.sub("Bearer [REDACTED]", text)
+    text = DASHBOARD_LOGIN_TOKEN.sub(r"\1[REDACTED]", text)
     return SECRET_FIELD.sub(_redact_value, text)
 
 

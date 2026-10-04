@@ -4,10 +4,18 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from capture_aspire_dcp_logs import capture
+from capture_aspire_dcp_logs import capture, sanitize
 
 
 class CaptureAspireDcpLogsTests(unittest.TestCase):
+    def test_sanitize_redacts_aspire_dashboard_login_query_token(self):
+        token = "DASHBOARD_LOGIN_TOKEN_SENTINEL"
+
+        sanitized = sanitize(f"Login to the dashboard at https://localhost:45611/login?t={token}")
+
+        self.assertNotIn(token, sanitized)
+        self.assertIn("?t=[REDACTED]", sanitized)
+
     def test_capture_redacts_secret_value_forms_and_excludes_sensitive_files(self):
         sentinels = [
             "JSON_PASSWORD_SENTINEL",

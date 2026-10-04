@@ -420,7 +420,10 @@ jobs:
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
           apphost_log="$results_dir/apphost.stdout-stderr.log"
           stack_lock="$RUNNER_TEMP/duck-aspire-stack-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.lock"
+          stack_id="gha-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           export Testing__StackOwnership__LockPath="$stack_lock"
+          export Testing__StackOwnership__StackId="$stack_id"
+          printf '%s\n' "$stack_id" > "$RUNNER_TEMP/aspire-full-stack-stack-id"
 
           {
             printf '## Docker storage immediately before resource start\n'
@@ -434,11 +437,11 @@ jobs:
             > "$apphost_log" 2>&1 &
           apphost_pid=$!
           printf '%s\n' "$apphost_pid" > "$RUNNER_TEMP/aspire-full-stack-apphost.pid"
-          printf 'apphost_pid=%s\nstack_lock=%s\n' "$apphost_pid" "$stack_lock" \
+          printf 'apphost_pid=%s\nstack_lock=%s\nstack_id=%s\n' "$apphost_pid" "$stack_lock" "$stack_id" \
             > "$results_dir/apphost-process.txt"
 
-      - name: Wait for Game Controller resource to start
-        id: aspire_game_controller_ready
+      - name: Wait for all full-stack resources to report ready
+        id: aspire_full_stack_ready
         if: ${{ steps.aspire_full_stack_start.outcome == 'success' }}
         shell: bash
         run: |
@@ -446,7 +449,7 @@ jobs:
 
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
           apphost_pid="$(cat "$RUNNER_TEMP/aspire-full-stack-apphost.pid")"
-          controller_image="robocupssl/ssl-game-controller:3.20.3"
+          stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id")"
 
           collect_startup_diagnostics() {
             python3 scripts/capture_aspire_dcp_logs.py \
@@ -455,12 +458,38 @@ jobs:
               printf 'reason=%s\n' "$1"
               printf 'captured_at_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
               printf 'apphost_pid=%s\n' "$apphost_pid"
-              ps -eo pid,ppid,stat,etime,args
+              printf 'stack_id=%s\n' "$stack_id"
+              printf '\n## Processes (arguments omitted)\n'
+              ps -eo pid,ppid,stat,etime,comm
               printf '\n## AppHost log tail\n'
-              tail -n 250 "$results_dir/apphost.stdout-stderr.log" 2>/dev/null || true
-              printf '\n## Docker containers and images\n'
-              docker ps -a --no-trunc
-              docker image ls --digests --no-trunc
+              tail -n 250 "$results_dir/apphost.stdout-stderr.log" 2>/dev/null \
+                | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+              printf '\n## Same-stack owned Docker containers\n'
+              docker ps -a --no-trunc \
+                --filter 'label=duck.aspire.owner=duck-apphost' \
+                --filter "label=duck.aspire.stack=$stack_id"
+              printf '\n## Wrapper readiness probe history\n'
+              cat "$results_dir/wrapper-readiness.json" 2>/dev/null || true
+              for resource in simulator game-controller cm4-sim crane; do
+                mapfile -t resource_ids < <(docker ps -aq \
+                  --filter 'label=duck.aspire.owner=duck-apphost' \
+                  --filter "label=duck.aspire.stack=$stack_id" \
+                  --filter "label=duck.aspire.resource=$resource")
+                for resource_id in "${resource_ids[@]}"; do
+                  [[ -n "$resource_id" ]] || continue
+                  docker inspect --format \
+                    'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
+                    "$resource_id" 2>&1 \
+                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                    > "$results_dir/$resource.inspect.txt" 2>&1 || true
+                  docker top "$resource_id" 2>&1 \
+                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                    > "$results_dir/$resource.processes.txt" 2>&1 || true
+                  docker logs --timestamps --tail 250 "$resource_id" 2>&1 \
+                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                    > "$results_dir/$resource.startup.log" 2>&1 || true
+                done
+              done
               printf '\n## IPv4 addresses and routes\n'
               ip -4 address
               ip -4 route
@@ -475,52 +504,53 @@ jobs:
           }
 
           fail_startup() {
-            printf 'status=failed\nreason=%s\n' "$1" \
+            printf 'status=failed\nfailure_category=STARTUP_READINESS_FAILURE\nreason=%s\n' "$1" \
               > "$results_dir/startup-status.txt"
             collect_startup_diagnostics "$1"
             exit 1
           }
 
-          for _ in {1..150}; do
-            if ! kill -0 "$apphost_pid" 2>/dev/null; then
-              fail_startup "AppHost process exited before the Game Controller container became ready."
-            fi
-            if grep -q 'Hosting failed to start' "$results_dir/apphost.stdout-stderr.log" 2>/dev/null; then
-              fail_startup "AppHost logged Hosting failed to start before the Game Controller container became ready."
-            fi
+          if ! python3 scripts/wait_aspire_stack_readiness.py \
+            --apphost-pid "$apphost_pid" \
+            --report-file "$results_dir/wrapper-readiness.json" \
+            --timeout-seconds 300 \
+            --poll-interval-seconds 2 \
+            > "$results_dir/wrapper-readiness.stdout.log" 2>&1; then
+            fail_startup "$(tail -n 20 "$results_dir/wrapper-readiness.stdout.log" 2>/dev/null || printf 'STARTUP_READINESS_FAILURE: readiness helper failed.')"
+          fi
 
-            mapfile -t controller_ids < <(docker ps -aq --filter "ancestor=$controller_image")
-            for controller_id in "${controller_ids[@]}"; do
-              [[ -n "$controller_id" ]] || continue
-              controller_state="$(docker inspect --format '{{.State.Status}}' "$controller_id" 2>/dev/null)"
-              if [[ "$controller_state" == "running" ]]; then
-                docker inspect --format \
-                  'id={{.Id}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}}' \
-                  "$controller_id" > "$results_dir/game-controller.inspect.txt" 2>&1
-                docker logs --timestamps --tail 250 "$controller_id" \
-                  > "$results_dir/game-controller.startup.log" 2>&1 || true
-                printf 'status=ready\ncontainer_id=%s\nstate=%s\n' \
-                  "$controller_id" "$controller_state" \
-                  > "$results_dir/startup-status.txt"
-                exit 0
-              fi
-              if [[ "$controller_state" == "exited" || "$controller_state" == "dead" ]]; then
-                docker inspect --format \
-                  'id={{.Id}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}}' \
-                  "$controller_id" > "$results_dir/game-controller.inspect.txt" 2>&1
-                docker logs --timestamps --tail 250 "$controller_id" \
-                  > "$results_dir/game-controller.startup.log" 2>&1 || true
-                fail_startup "Game Controller container entered state $controller_state before becoming ready."
-              fi
-            done
-            sleep 2
+          for resource in simulator game-controller cm4-sim crane; do
+            mapfile -t resource_ids < <(docker ps -aq \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" \
+              --filter "label=duck.aspire.resource=$resource")
+            if [[ "${#resource_ids[@]}" -ne 1 ]]; then
+              fail_startup "STARTUP_READINESS_FAILURE: expected one $resource container owned by stack $stack_id; found ${#resource_ids[@]}."
+            fi
+            resource_id="${resource_ids[0]}"
+            resource_state="$(docker inspect --format '{{.State.Status}}' "$resource_id" 2>/dev/null)"
+            if [[ "$resource_state" != "running" ]]; then
+              fail_startup "STARTUP_READINESS_FAILURE: owned $resource container entered state $resource_state after readiness was reported."
+            fi
+            docker inspect --format \
+              'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
+              "$resource_id" 2>&1 \
+              | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+              > "$results_dir/$resource.inspect.txt" 2>&1 || true
+            docker top "$resource_id" 2>&1 \
+              | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+              > "$results_dir/$resource.processes.txt" 2>&1 || true
+            docker logs --timestamps --tail 250 "$resource_id" 2>&1 \
+              | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+              > "$results_dir/$resource.startup.log" 2>&1 || true
           done
 
-          fail_startup "No running Game Controller container using $controller_image appeared within 5 minutes."
+          printf 'status=ready\nstack_id=%s\nreadiness_source=all wrapper /health/ready endpoints\n' "$stack_id" \
+            > "$results_dir/startup-status.txt"
 
       - name: Run full-stack packet and active-motion acceptance
         id: aspire_full_stack_test
-        if: ${{ steps.aspire_game_controller_ready.outcome == 'success' }}
+        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -561,6 +591,7 @@ jobs:
           mkdir -p "$results_dir/resource-logs"
           pid_file="$RUNNER_TEMP/aspire-full-stack-apphost.pid"
           before_file="$RUNNER_TEMP/aspire-full-stack-containers-before.txt"
+          stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id" 2>/dev/null || true)"
 
           python3 scripts/capture_aspire_dcp_logs.py \
             "$results_dir/dcp-cleanup" --phase before-apphost-shutdown
@@ -591,32 +622,90 @@ jobs:
             fi
           fi
 
+          for artifact_log in \
+            "$results_dir/apphost.stdout-stderr.log" \
+            "$results_dir/acceptance.stdout.log" \
+            "$results_dir/acceptance.stderr.log" \
+            "$results_dir/acceptance-result.json"; do
+            if [[ -f "$artifact_log" ]]; then
+              python3 -c 'import sys; from pathlib import Path; from scripts.capture_aspire_dcp_logs import sanitize; path=Path(sys.argv[1]); path.write_text(sanitize(path.read_text(encoding="utf-8", errors="replace")), encoding="utf-8")' \
+                "$artifact_log"
+            fi
+          done
+          for artifact_log in "$results_dir"/test-results/*.trx; do
+            if [[ -f "$artifact_log" ]]; then
+              python3 -c 'import sys; from pathlib import Path; from scripts.capture_aspire_dcp_logs import sanitize; path=Path(sys.argv[1]); path.write_text(sanitize(path.read_text(encoding="utf-8", errors="replace")), encoding="utf-8")' \
+                "$artifact_log"
+            fi
+          done
+
           docker info > "$results_dir/docker-info-after.txt" 2>&1
           docker system df -v > "$results_dir/docker-system-df-after.txt" 2>&1
           df -B1 -h > "$results_dir/df-after.txt" 2>&1
-          docker ps -a --no-trunc > "$results_dir/docker-containers-after.txt" 2>&1
-          docker image ls --digests --no-trunc > "$results_dir/docker-images-after.txt" 2>&1
+          if [[ -n "$stack_id" ]]; then
+            docker ps -a --no-trunc \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" \
+              > "$results_dir/docker-containers-before-cleanup.txt" 2>&1
+          else
+            printf 'No AppHost stack identity was recorded; no containers will be selected for cleanup.\n' \
+              > "$results_dir/docker-containers-before-cleanup.txt"
+          fi
 
           : > "$results_dir/created-container-ids.txt"
-          docker ps -aq --no-trunc | sort -u | while IFS= read -r container_id; do
-            [[ -n "$container_id" ]] || continue
-            if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
-              [[ ! -f "$before_file" ]] || grep -Fxq "$container_id" "$before_file"; then
-              continue
-            fi
+          if [[ -n "$stack_id" ]]; then
+            docker ps -aq --no-trunc \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" \
+              | sort -u | while IFS= read -r container_id; do
+                [[ -n "$container_id" ]] || continue
+                if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
+                  [[ ! -f "$before_file" ]] || grep -Fxq "$container_id" "$before_file"; then
+                  continue
+                fi
 
-            printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
-            container_name="$(docker inspect --format '{{.Name}}' "$container_id" 2>/dev/null | tr -d '/')"
-            container_name="${container_name:-$container_id}"
-            docker inspect "$container_id" \
-              > "$results_dir/resource-logs/$container_name.inspect.json" 2>&1
-            docker logs --timestamps "$container_id" \
-              > "$results_dir/resource-logs/$container_name.stdout-stderr.log" 2>&1
-            docker rm -f "$container_id" \
-              > "$results_dir/resource-logs/$container_name.remove.log" 2>&1
-          done
+                owner="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.owner" }}' "$container_id" 2>/dev/null)"
+                inspected_stack="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.stack" }}' "$container_id" 2>/dev/null)"
+                resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$container_id" 2>/dev/null)"
+                run_id="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$container_id" 2>/dev/null)"
+                inspected_name="$(docker inspect --format '{{.Name}}' "$container_id" 2>/dev/null)"
+                network_mode="$(docker inspect --format '{{.HostConfig.NetworkMode}}' "$container_id" 2>/dev/null)"
+                expected_name="/duck-$stack_id-$resource"
+                case "$resource" in
+                  simulator|game-controller|cm4-sim|crane) ;;
+                  *) continue ;;
+                esac
+                if [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
+                  -z "$run_id" || "$inspected_name" != "$expected_name" || "$network_mode" != "host" ]]; then
+                  continue
+                fi
+
+                container_name="${inspected_name#/}"
+                printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
+                docker inspect --format \
+                  'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
+                  "$container_id" 2>&1 \
+                  | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                  > "$results_dir/resource-logs/$container_name.inspect.txt" 2>&1
+                docker logs --timestamps "$container_id" 2>&1 \
+                  | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                  > "$results_dir/resource-logs/$container_name.stdout-stderr.log" 2>&1
+                docker rm -f "$container_id" \
+                  > "$results_dir/resource-logs/$container_name.remove.log" 2>&1
+              done
+          fi
+
+          if [[ -n "$stack_id" ]]; then
+            docker ps -a --no-trunc \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" \
+              > "$results_dir/docker-containers-after.txt" 2>&1
+          else
+            printf 'No AppHost stack identity was recorded.\n' > "$results_dir/docker-containers-after.txt"
+          fi
 
           {
+            printf 'cleanup_scope=duck.aspire.owner=duck-apphost AND stack=%s\n' "$stack_id"
             printf 'created_containers_removed_only=true\n'
             printf 'images_removed=false\n'
             printf 'daemon_settings_changed=false\n'
