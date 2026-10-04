@@ -35,6 +35,7 @@ public sealed class AppHostApplicationModelTests
             var endpoint = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "health");
             var launch = await GetLaunchOptionsAsync(resource);
             Assert.Equal(launch.HealthPort, endpoint.TargetPort);
+            Assert.False(endpoint.IsProxied);
             Assert.Equal("http", endpoint.UriScheme);
 
             Assert.Equal(name, launch.ResourceName);
