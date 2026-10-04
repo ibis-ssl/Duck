@@ -69,7 +69,7 @@ if (useCm4Simulator)
             "--robot-ids", "0,1,2,3,4,5,6,7,8,9,10",
             "--in-port", "12345",
             "--out-addr", "127.0.0.1",
-            "--out-port", "12346",
+            "--out-port", simulatorIbisPort,
             "--feedback-port-base", "50100",
             "--multicast-if", "127.0.0.1",
             "--rate-hz", "1000",
@@ -85,7 +85,7 @@ var craneBuilder = builder
     .AddContainer("crane", "ibis-ssl/crane", craneImageTag)
     .WithImageRegistry("ghcr.io")
     .WithEnvironment("PLANNER", cranePlanner)
-    .WithEnvironment("CRANE_TARGET_PORT", useCm4Simulator ? "12345" : "12346")
+    .WithEnvironment("CRANE_TARGET_PORT", useCm4Simulator ? "12345" : simulatorIbisPort)
     .WithArgs(
         "bash",
         "-c",
