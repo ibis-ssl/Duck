@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 18009)
+Total output lines: 519
+
 # Aspire シミュレーション試験環境 設計
 
 ## 目的
@@ -74,7 +77,7 @@ host network では SSL-Vision と tracker multicast、採用するシミュレ�
 
 Crane の現在のシナリオ構成では、`visibility_graph` を使う場合に `crane` が mode 4 の位置指令を UDP 12345 へ送り、`cm4-sim` が実機 CM4 相当の位置制御を行って mode 3 の速度指令を UDP 12346 へ転送する。したがって Crane を既存 image の現在の挙動のまま組み込む初期構成では、汎用 SSL simulation protocol の 10301 / 10302 へ直接送る経路へ置き換えない。
 
-ホストネットワーク使用時は Docker の `-p` 相当のポート公開を併用しない。起動管理プログラムは shell command string や `bash -c` を使わず、引数配列を直接渡して Docker CLI を実行し、子プロセスを監督する。
+ホストネットワーク使用時は Docker の `-p` 相当のポート公開を併用しない。ホスト上で Docker CLI を開始する起動管理プログラムは shell command string や `bash -c` を使わず、引数配列を直接渡して Docker CLI を実行し、子プロセスを監督する。Crane 構成に記録した `bash -c` 例は、Crane image 内部で ROS 環境を読み込んで launch するコンテナ内 command の記録であり、ホスト側 wrapper / Docker CLI の起動方式を許可するものではない。実装時は image の entrypoint / command 契約を確認し、ホスト側で shell を挟まない。
 
 ### 通信経路
 
@@ -94,7 +97,7 @@ Tracker.RuntimeHost (host process)
 試験用の確認先
 ```
 
-シミュレーション制御を行う試験ツールが必要な場合は UDP 10300 を使用する。初期 AppHost 自身は自律的な試験シナリオを生成しないが、`ASPIRE-005` / `ASPIRE-NET-007` の active motion 確認では専用の `referee-driver` 試験 fixture を使う。`referee-driver` は `224.5.23.1:11003` を直接 publish せず、`game-controller` の `ws://127.0.0.1:8082/api/control` へ continue action を送る。最初に 11003 で `HALT` を確認し、`NEXT_COMMAND` を送り、遷移後も `HALT` / `STOP` なら `FORCE_START`、それ以外の準備状態なら `NORMAL_START` を送る。11003 で active command への遷移を確認してから Crane の指令と SSL-Vision の位置変化を検査する。
+シミュレーション制御を行う試験ツールが必要な場合は UDP 10300 を使用する。初期 AppHost 自身は自律的な試験シナリオを生成しないが、`ASPIRE-005` / `ASPIRE-NET-007` の active motion 確認では専用の `referee-driver` 試験 fixture を使う。`referee-driver` は `224.5.23.1:11003` を直接 publish せず、`game-controller` の `ws://127.0.0.1:8082/api/control` へ continue action を送る。起動世代ごとに mode 固有の初期 command（base / comparison は `HALT`、match は `STOP`）が検証済みであることを前提に `NEXT_COMMAND` を送り、遷移後も `HALT` / `STOP` なら `FORCE_START`、それ以外の準備状態なら `NORMAL_START` を送る。11003 で active command への遷移を確認してから Crane の指令と SSL-Vision の位置変化を検査する。active 遷移後も初期 command との不一致だけでは Game Controller readiness が落ちず、通信/API health が継続することを確認する。
 
 ## Duck の起動
 
@@ -158,25 +161,31 @@ bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup cr
 | 資源名 | 準備完了条件 |
 | --- | --- |
 | `simulator` | 所有コンテナが稼働し、起動管理プログラムが `224.5.23.2:10020` の SSL-Vision 検出パケットを受信して復号できる。継続受信とロボット移動は一括受入試験で確認する。 |
-| `game-controller` | 所有コンテナが稼働し、`224.5.23.1:11003` の初期審判状態を復号して、実行 mode の期待状態と照合できる。`base` / `comparison` は `HALT`、`match` は `STOP`。未知または想定外の指令では準備完了にせず、試合開始後の状態遷移は受入試験で確認する。 |
+| `game-controller` | 起動世代ごとに mode 固有の初期状態を検証する。初期化中は `base` / `comparison` の `HALT`、`match` の `STOP` を11003で確認するまで未準備とする。初期状態確認後は、有効な審判指令の状態遷移を許容し、初期指令との一致を継続準備条件にしない。各health確認では所有者情報が完全一致するコンテナ、Game Controller プロセスと API の応答、期限内に復号できる既知の審判指令を確かめる。通信断、API不通、未知指令、プロセス / コンテナ終了は未準備とする。 |
+| `tracker-tigers` | 所有者ラベル / 資源名 / 期待イメージ / ホストネットワーク / 完全なコンテナID / 稼働状態を確認し、コンテナ内の Sumatra プロセスと起動完了診断、および比較実行開始後に `224.5.23.2:11010` で受信した期待送信元識別子の復号可能なトラッカーパケットを確認する。コンテナ稼働だけでは準備完了としない。 |
+| `tracker-erforce` | 所有者ラベル / 資源名 / 期待イメージ / ホストネットワーク / 完全なコンテナID / 稼働状態を確認し、コンテナ内の ER-Force tracker プロセスと起動完了診断、および比較実行開始後に `224.5.23.2:11010` で受信した期待送信元識別子の復号可能なトラッカーパケットを確認する。コンテナ稼働だけでは準備完了としない。 |
+| `debug-host` | `Tracker.DebugHost` の .NET プロジェクト資源として起動する。Duck の起動通知と両外部トラッカーの準備完了を待ち、比較用正常性確認が Duck / TIGERs / ER-Force の三つの論理役割をそれぞれ別の送信元識別子に解決し、同じ確認窓で三者の新しいトラッカーパケットを受信した場合に準備完了とする。 |
 | `cm4-sim` | 所有コンテナが稼働し、UDP 12345 の待受 socket が当該コンテナ内のプロセスに属すると確認できる。ポートが使用中というだけでは準備完了にしない。 |
 | `crane` | 所有コンテナが稼働し、コンテナ内の ROS graph に `crane_session_coordinator` があると確認できる。指令と移動は受入試験で別途確認する。 |
 | `tigers-blue` | 所有コンテナが稼働し、Sumatra の起動完了記録と、この実行で生成した tracker packet の復号結果を `224.5.23.2:11010` で確認する。 |
 | `autoref-tigers` | 所有コンテナが稼働し、AutoRef 自身の診断が起動完了を示す。また、この実行で受信・復号した vision `10020`、referee `11003`、tracker `11010` の各入力数が増えたことを確認する。外部から multicast packet を観測しただけでは代用しない。image に受信証跡がなければ、確認用 adapter を実装するまで準備完了にしない。 |
 | `ssl-log-recorder` | 所有コンテナが稼働し、この実行で作成した log file があり、後続 reader が vision / referee / tracker の各記録を少なくとも一件ずつ復号できる。 |
 
-各確認には有限の期限を設ける。期限超過、コンテナ終了、復号失敗では準備未完了のまま失敗し、失敗条件と inspect / log 診断を記録する。multicast の確認は選択した IPv4 interface で group join し `SO_REUSEADDR` を使って、受入試験側の受信を妨げない。待受 socket の所有者を確認する方法は初期対象 Linux 上で実証する必要がある。実証できない OS では確認条件を弱めず、未対応として明示する。
+各確認には有限の期限を設ける。期限超過、コンテナ終了、復号失敗では準備未完了のまま失敗し、失敗条件と調査ログを記録する。wrapper は各health確認で inspect により所有者ラベル、資源名、期待イメージ、ホストネットワーク、コンテナID、稼働状態を完全照合する。コンテナ内プロセス / サービス診断と新しいパケットはサービス準備の証拠とし、所有権の証拠は当該 inspect 照合とする。外部パケットの受信だけでは送信コンテナの所有証明に代用しない。multicast の確認は選択した IPv4 interface で group join し `SO_REUSEADDR` を使って、受入試験側の受信を妨げない。待受 socket の所有者を確認する方法は初期対象 Linux 上で実証する必要がある。実証できない OS では確認条件を弱めず、未対応として明示する。
+
+Game Controller の準備確認は起動世代内で段階を持つ。初期化中は mode 固有の初期指令を一度観測するまで未準備とし、確認後は「初期状態確認済み」をその資源世代で保持する。起動後は有効な既知の審判指令への遷移を許容し、HALT / STOP へ戻ることは要求しない。継続正常性は所有コンテナと Game Controller プロセスが稼働し、API が応答し、期限内に11003の既知指令を復号受信できることを確認する。未知指令、審判通信 / API 通信断、プロセス / コンテナ終了は未準備とする。container ID または起動時刻が変わる再起動は新世代であり、初期状態確認済みを破棄する。新世代は外部永続状態を使わない一時設定で起動し、mode 固有の初期指令を再確認するまで依存資源を準備完了にしない。
 
 既定の `visibility_graph` 構成では次の依存グラフを使う。
 
 1. `simulator` と `game-controller` は依存なしで起動し、並行して準備完了条件を満たす。
 2. `cm4-sim` と `duck` はそれぞれ準備完了した `simulator` を待つ。その後は並行して起動できる。
 3. `crane` は準備完了した `cm4-sim` と `game-controller`、および既存の Duck 起動通知を待つ。
-4. comparison mode の `tracker-tigers` と `tracker-erforce` は準備完了した `simulator` と `game-controller` を待つ。
+4. comparison mode の `tracker-tigers` と `tracker-erforce` は個別の wrapper executable resource とし、準備完了した `simulator` と `game-controller` を待つ。各々は owner inspection と固有 process / packet probe の両方を満たす。
+5. comparison mode の `debug-host` は Duck の project-start 通知と両 tracker wrapper の ready を待つ。その起動後も、DebugHost comparison health が Duck / TIGERs / ER-Force の三 logical role を別 source identity に解決し、確認窓内の新しい packet を受信するまでは未準備とする。
 
 `cm4-sim` を使わない planner を選択した場合、`crane` は存在しない `cm4-sim` への依存を作らず、`duck` と `game-controller` の既定依存だけを持つ。`duck` は準備完了した `simulator` を待つ。Duck の起動通知はプロジェクトが起動したことだけを示すため、サービス準備完了の根拠には使わない。
 
-移行前の `WaitForStart` と移行後の準備完了確認付き `WaitFor` を混同しない。モデル試験では依存関係と資源ごとの正常性確認を検証し、起動管理プログラムの試験では各条件と期限超過時の動作を検証する。実ネットワーク受入では実際の packet / referee / motion を別途確認する。
+移行前の `WaitForStart` と移行後の準備完了確認付き `WaitFor` を混同しない。モデル試験では依存関係と資源ごとの正常性確認を検証し、起動管理プログラムの試験では各条件と期限超過時の動作を検証する。Game Controller は起動時の初期状態検証、初期化後の正常 command 遷移、通信断、process 終了、resource 再起動を別シナリオで検証する。実ネットワーク受入では実際の packet / referee / motion を別途確認する。
 
 ## コンテナ所有権と停止契約
 
@@ -233,21 +242,23 @@ Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulator
 
 現在の実装では `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` と `cm4-sim` を container resource として接続し、model contract を固定している。最終 topology では各々を個別 wrapper executable resource へ移行し、`visibility_graph` の既存経路を維持する。Crane の mode 4 指令は cm4-sim で simulator 向け mode 3 指令へ変換する。
 
-### `ASPIRE-005`: 起動試験
+### `ASPIRE-005`: base-mode 起動試験
 
-この GitHub Actions 上の受入試験は、コンテナ資源からサービス別起動管理プログラムへの移行、モデル試験と起動管理プログラムの対象試験、独立通常レビューが完了するまで実行しない。現行 `AddContainer` 方式のコンテナ作成失敗を再試行で回避した結果を受入成功として記録しない。
+この GitHub Actions 上の `ASPIRE-005` 受入試験は base mode に限定し、Simulator、Game Controller、Crane、必要な `cm4-sim`、Duck を対象とする。個別 wrapper への移行、model test / wrapper focused test、独立通常レビューが完了するまで実行しない。comparison mode の tracker / DebugHost 実装・受入は `ASPIRE-006A` 以降と適用される `ASPIRE-NET-003`〜`006` の作業境界とし、`ASPIRE-005` の成功に含めない。現行 `AddContainer` 方式のコンテナ作成失敗を再試行で回避した結果を受入成功として記録しない。
 
-AppHost の全資源を一括起動し、`game-controller` が 11003 の唯一の referee producer として動作し、シミュレータからの SSL-Vision を Duck が受信し、Duck が `TrackerWrapperPacket` を出力する正常経路を確認する。
+base mode の資源を一括起動し、`game-controller` が 11003 の唯一の referee producer として動作し、シミュレータからの SSL-Vision を Duck が受信し、Duck が `TrackerWrapperPacket` を出力する正常経路を確認する。comparison mode は別の後続 acceptance とする。
 
-Crane を動かす試験では、`referee-driver` が `game-controller` を `HALT` から active command へ遷移させたことを 11003 で確認した後、Crane の指令が `cm4-sim` を経由してシミュレータへ入り、その結果が SSL-Vision と Duck の出力へ反映されることまで確認する。referee 遷移を確認できない場合は game-state fixture の失敗として扱い、UDP 12345 / 12346 の失敗と混同しない。
+Crane を動かす base-mode 試験では、`referee-driver` が `game-controller` の検証済み初期 `HALT` から active command へ遷移させたことを 11003 で確認した後、Crane の指令が `cm4-sim` を経由してシミュレータへ入り、その結果が SSL-Vision と Duck の出力へ反映されることまで確認する。referee 遷移を確認できない場合は game-state fixture の失敗として扱い、UDP 12345 / 12346 の失敗と混同しない。正常遷移後も Game Controller readiness が維持されること、referee/API 通信断で readiness が落ちること、Game Controller resource 再起動後は `HALT` を再検証するまで dependent resource が待機することを focused test で別々に確認する。
 
 ### `ASPIRE-006`: 外部トラッカー比較デバッグ
 
-TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、Duck と同じ raw vision `224.5.23.2:10020` を入力する。三つの tracker 出力を official tracker multicast `224.5.23.2:11010` へ集約し、`Tracker.DebugHost` が source identity ごとに分離して受信する。
+comparison mode の topology、wrapper 資源種別、readiness、依存関係は本設計で定義するが、その実装・受入は base-mode `ASPIRE-005` には含めない。後続 `ASPIRE-006A`〜`006E` が個別 wrapper tracker、DebugHost health / source identity、比較 UI / replay を実装する。TIGERs Sumatra と ER-Force tracker source を Duck と同じ raw vision `224.5.23.2:10020` で動かし、三つの tracker 出力を official tracker multicast `224.5.23.2:11010` へ集約する。
+
+comparison mode では `tracker-tigers` / `tracker-erforce` を完全な owner inspection とサービス固有 readiness を持つ個別 wrapper executable resource とする。`debug-host` は `Tracker.DebugHost` の .NET project resource とし、Duck project-start と両 tracker wrapper ready に依存する。DebugHost 自身の comparison health は Duck / TIGERs / ER-Force の三 logical role の別 source identity と新しい packet を確認するまで not-ready とする。外部 packet の受信だけでは wrapper の所有コンテナ証拠にしない。
 
 ライブでは既存の Split / Overlay を使い、保存後は diagnostics sample tick を共通の選択時点として比較する。物体単位の位置・速度・角度・存在差を数値で確認する詳細設計は `Tracker/Design/Testing/tracker-comparison-debug-design.md` を正本とする。
 
-`ASPIRE-006A` から `ASPIRE-006E` はこのトラッカー比較を実装単位へ分ける。
+comparison mode の topology、wrapper 資源種別、readiness、依存関係は本設計で定義するが、その実装・受入は base-mode `ASPIRE-005` には含めない。後続 `ASPIRE-006A`〜`006E` が個別 wrapper tracker、DebugHost health / source identity、比較 UI / replay を実装する。`ASPIRE-006A` は wrapper topology / service readiness / dependency model を固定し、`ASPIRE-006B` は三 role の source identity と同時 packet 到着を focused test で固定する。
 
 ### `ASPIRE-006F`: TIGERs vs Crane 対戦資源
 
@@ -260,8 +271,7 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 | `ASPIRE-006F1` | 対戦 fixture の版管理 | Sumatra の `simulation_protocol_fixed.xml` 相当、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
 | `ASPIRE-006F2` | `match` mode と resource topology | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
 | `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 対戦用 Simulator 引数、11003 の単一送信元、Game Controller API、fixture mount、固定イメージ参照をアプリケーションモデル試験で固定する。Game Controller の準備完了試験は `base` / `comparison` の `HALT` と `match` の `STOP` を受理し、未知または想定外の指令では未完了とする。 |
-| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` を個別の Aspire 外部実行資源として登録し、イメージ、ホストネットワーク、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定、各サービスの準備完了条件と `WaitFor` 依存をアプリケーションモデル試験で固定する。起動管理プログラムの対象試験では条件成立・期限超過と診断根拠を検証する。 |
-| `ASPIRE-006F5` | Crane / Duck 対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 送信無効、および起動管理プログラムの準備完了に基づく依存関係をアプリケーションモデル試験で固定する。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` を個別の Aspire 外部実行資源として登録し、イメージ、ホストネットワーク、10020 / 11003 / 11010、`--aiBlue`、外部 referee 設定、各サービスの準備完了条件と `WaitFor` 依存をアプリケーションモデル試験で固定する。起動管理プログラムの対象試験では条件成立・期限超過と診断根拠を検証する。 |…9 tokens truncated…対戦設定 | Crane の `team:=ibis`、`cm4-sim` 非依存、Duck の 11010 送信無効、および起動管理プログラムの準備完了に基づく依存関係をアプリケーションモデル試験で固定する。 |
 | `ASPIRE-006F6` | `match-controller` と試合進行 | GC API / referee / vision の準備完了、STOP / HALT からの継続操作、`POST_GAME` / 最大時間での終了、結果保存を対象試験で固定する。 |
 
 ### `ASPIRE-006G`: TIGERs vs Crane 一括対戦試験
@@ -294,7 +304,10 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 - Crane の `team`、`planner` と `cm4-sim` の接続ポートが明示される。
 - `game-controller` が固定 tag または digest の image を参照し、11003 の唯一の referee producer として構成される。
 - comparison mode の `tracker-tigers` が外部 Game Controller 用設定を使い、`gameController=false` と `publishRefereeMessages=false` で 11003 を受信専用にする。
-- `referee-driver` の integration fixture が 11003 の `HALT` を確認してから Game Controller API へ continue action を送り、active command への遷移を確認できる。
+- comparison mode の `tracker-tigers` / `tracker-erforce` が個別 wrapper executable resource として登録される。両者は期待 owner labels、resource 名、image、host network、完全 container ID、Running 状態を inspect で一致確認し、コンテナ内の期待 process / service 起動診断 / source identity に対応する新しい tracker packet を確認するまで ready にならない。
+- comparison mode で両 tracker が ready な Simulator と Game Controller に health-based `WaitFor` し、11003 producer を追加しない。`debug-host` は Duck project-start と両 tracker ready を待つ。DebugHost 自身の comparison health は Duck / TIGERs / ER-Force の三 source identity を区別して新 packet を確認するまで ready としない。
+- `referee-driver` の integration fixture が起動世代ごとの mode 固有初期 command（base / comparison は `HALT`、match は `STOP`）を確認してから Game Controller API へ continue action を送り、active command への遷移後も正常 health が続くことを確認できる。
+- Game Controller readiness は初期状態を世代ごとに一度確認する。その後の有効な referee command 遷移を許容し、referee / API 通信断、未知 command、process / container 終了では not-ready となる。resource 再起動時は初期検証状態を reset し、期待 command の再確認まで downstream を待たせる。
 - 各 wrapper に `/health/live` とサービス固有 predicate の `/health/ready` check が設定される。開始依存だけの `WaitForStart` を readiness 条件として使わない。
 - 既定の `visibility_graph` 構成で、`cm4-sim` と `duck` が ready な `simulator` を待ち、`crane` が ready な `cm4-sim` / `game-controller` と Duck project-start を待つ。
 - `cm4-sim` を使わない planner 構成では、`crane` が `duck` と `game-controller` の必要な依存だけを持ち、存在しない `cm4-sim` への待機依存を持たない。
@@ -303,8 +316,10 @@ TIGERs Sumatra と ER-Force AutoRef の tracker source を追加で起動し、D
 - 対戦用 Sumatra 設定が 10020 の vision、11003 の external referee、`gameController=false`、11010 の tracker output を持つ。
 - 対戦モードの Duck は 11010 への tracker publish が無効で、AutoRef の tracker 入力へ Duck source を混在させない。
 - `match-controller` が参加資源の開始後に起動し、Game Controller API、11003、10020 の実データを確認してから試合を開始する。
+- comparison mode の `tracker-tigers` / `tracker-erforce` は各 owner labels、資源名、image、network、container ID、Running 状態を確認し、コンテナ内の期待 process / 起動診断と identity-matched の新しい tracker packet が揃うまで ready にならない。
+- comparison mode の `debug-host` は Duck project-start と両 tracker ready を待つ。さらに DebugHost 自身の comparison health が Duck / TIGERs / ER-Force の三 role を異なる source identity として解決し、新しい packet を受信するまで ready にしない。
 
-Wrapper unit test は fake Docker executable を使い、cancellation 中の遅延 create、CID 未取得時の exact-owner bounded discovery、ラベル不一致、child-process reap、log follower cancellation、foreign container 非変更、match-only wrapper の readiness 成功・timeout・入力 count 根拠を検証する。model test は resource topology、readiness profile、health-based dependency graph を全 mode で固定する。実ネットワーク・active motion の acceptance は model test で代用しない。
+Wrapper unit test は fake Docker executable を使い、cancellation 中の遅延 create、CID 未取得時の exact-owner bounded discovery、ラベル不一致、child-process reap、log follower cancellation、foreign container 非変更、base / match / comparison wrapper の readiness 成功・timeout・service 診断根拠を検証する。Game Controller は startup baseline latch と継続 health、正常 active 遷移、通信断・process 終了、resource 再起動後の初期状態再検証を別シナリオで検証する。Comparison model test は tracker wrapper / DebugHost の resource kind、完全 owner inspection と固有 readiness profile、Simulator / Game Controller / Duck / tracker readiness に対する依存辺を固定する。DebugHost focused test は三 role の source 解決と同時 packet 到着を検証する。実ネットワーク・active motion の acceptance は model test で代用しない。
 
 Docker を必要とする一括起動試験は、AppHost のモデル検査と分離する。Docker が利用できない環境でも、アプリケーションモデルの退行を検出できるようにする。
 
@@ -375,7 +390,7 @@ Windows / macOS で container と host の multicast が成立しない場合、
 
 CI では検証対象の管理プログラムを実行する。`Testing:StackOwnership:LockPath` は `$RUNNER_TEMP` 配下に置き、実行識別番号と再試行回数を含める。この試験が起動した資源だけを停止・削除し、Docker 全体へ作用する一括削除はしない。後片付けと診断収集は成功・失敗どちらでも実施する。管理プログラムの出力、Docker の情報、各資源の設定情報とログ、受入テストが観測した審判状態・操作と映像・追跡データの受信数、試験結果を成果物として保存する。各待機には有限の時間制限を設ける。空き容量が不足した場合も、広範囲な削除で .NET SDK などの開発ツールを壊さない。
 
-審判管理プログラム 3.20.3 の Git 固定版 `8050f232c3130323bbd91d1d3d56e9553506c8e4` では、新規の試合状態と指令は `HALT` で初期化される。起動時に `config/state-store.json.stream` が存在すれば、その保存状態が復元される。このため毎回新しい実行単位を作り、設定や状態を外部保存領域へ永続化しないことを試験用初期条件とする。base / comparison mode の期待初期状態は空の保存先からの `HALT`、match mode は版管理した対戦 fixture の `STOP` とし、いずれも UDP 11003 で実測する。`game-controller` readiness は mode ごとの期待 command と一致したときだけ成功し、未知状態・保存状態の混入は not-ready とする。受入テストが期待状態と異なる初期指令を観測した場合は、UDP 12345 / 12346 の確認へ進まず、審判状態の準備失敗として報告する。
+審判管理プログラム 3.20.3 の Git 固定版 `8050f232c3130323bbd91d1d3d56e9553506c8e4` では、新規の試合状態と指令は `HALT` で初期化される。起動時に `config/state-store.json.stream` が存在すれば、その保存状態が復元される。このため各 resource 世代で新しい実行単位を作り、設定や状態を外部保存領域へ永続化しないことを試験用初期条件とする。base / comparison mode の期待初期状態は空の保存先からの `HALT`、match mode は版管理した対戦 fixture の `STOP` とし、いずれも UDP 11003 で実測する。startup readiness は mode 固有の期待 command を世代ごとに一度確認し、初期化後の継続 health はこの command との一致を要求せず、known referee command の期限内受信、API 応答、process / owner container 稼働を確認する。active command へ遷移した後に初期 command 不一致だけで not-ready にしない。通信断、API 不通、未知 command、process / container 終了は not-ready とする。resource 再起動では前世代の初期確認を破棄し、次世代の期待初期 command を再検証する。受入テストが期待状態と異なる初期指令を観測した場合は、UDP 12345 / 12346 の確認へ進まず、審判状態の準備失敗として報告する。
 
 実行環境の容量は固定で、利用可否や費用を確認せずに大容量環境を前提にしない。Docker の配布物を展開した後の容量は、圧縮状態の合計からは分からないため、初回実測値、最小空き容量、実行時間を成果物へ記録する。複数回の測定後に実行環境を決める。Docker の常駐処理の設定変更はこの試験に含めない。
 
@@ -383,9 +398,9 @@ CI では検証対象の管理プログラムを実行する。`Testing:StackOwn
 
 ## トラッカー比較デバッグ
 
-通常の Duck + Crane シミュレーションとは別に comparison mode を用意し、TIGERs / ER-Force の tracker source と `Tracker.DebugHost` を追加起動できるようにする。
+通常の Duck + Crane base mode とは別に comparison mode を用意する。比較用 tracker は後続 `ASPIRE-006A` で個別 wrapper resource として追加し、`Tracker.DebugHost` は .NET project resource とする。
 
-comparison mode は同じ raw vision を Duck / TIGERs / ER-Force へ与え、`Tracker.DebugHost` で三者の official tracker packet を比較する。外部 tracker が利用できない場合に通常のシミュレーション試験まで停止させない。
+comparison mode は同じ raw vision を Duck / TIGERs / ER-Force へ与え、`Tracker.DebugHost` で三者の official tracker packet を比較する。両外部 tracker wrapper の owner inspection / 固有 readiness と DebugHost の Duck project-start / tracker-ready dependency、三 source comparison health を要求する。外部 tracker が利用できない場合に通常の base-mode simulation acceptance まで停止させない。
 
 比較の詳細、source identity、時刻対応、ball / robot の対応付け、数値差分、CaptureOn / replay の契約は `Tracker/Design/Testing/tracker-comparison-debug-design.md` に定義する。
 
@@ -449,24 +464,24 @@ Aspire ダッシュボードの資源別ログを一次確認に使う。
 
 対戦モードではこれに加えて `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` の標準出力・標準エラー、対戦結果、SSL log、Crane の記録データ、解決済み image reference、team mapping、試合時間設定を保存する。失敗時も途中まで生成された結果と各 resource のログを破棄しない。
 
-## 対象外
+## 対象外と段階境界
 
-初期実装には次を含めない。
+初期 `ASPIRE-005` base-mode 実装・受入には次を含めない。
 
 - Duck 自体の Docker 化。
 - 本番環境の配置方式。
 - Kubernetes への配置。
-- Tigers Tracker と ER-Force Tracker の比較起動。これは Issue #14 の比較試験として別段階で追加する。
+- Issue #14 の comparison mode 実装・実 packet 受入。comparison の topology / readiness 契約は本設計で定義し、wrapper / DebugHost 実装は `ASPIRE-006A` 以降、source identity / UI / replay は `ASPIRE-006B`〜`006E`、Linux 実 packet 受入は `ASPIRE-007A` で行う。
 - 自動レフェリーの実装。
 - AI のアルゴリズム変更。
 - 既存の `Tracker.RuntimeHost` の通信形式変更。
 - Docker bridge network 越しの SSL-Vision マルチキャスト対応。
 
-## 将来拡張
+## 後続段階での comparison mode
 
-Issue #14 の比較試験を行うときは、`tracker-tigers` と `tracker-erforce` を追加のコンテナ資源として AppHost へ登録する。
+Issue #14 の比較試験では、`tracker-tigers` と `tracker-erforce` を Aspire の個別 wrapper executable resource とし、各 wrapper が固定 image の host-network container を所有する。DCP `ContainerResource` へ戻さない。各資源は完全な owner inspection、コンテナ内の期待 process / 起動診断、期待 source identity の新しい packet を ready 条件とする。`debug-host` は `Tracker.DebugHost` の .NET project resource として Duck project-start と両 tracker wrapper ready を待つ。自身の comparison health も三 role の source identity と packet arrival を確認するまで ready としない。
 
-比較用トラッカーを追加しても `duck`、`simulator`、`crane`、`cm4-sim` の初期構成の契約は変えない。
+`ASPIRE-006A` は topology / health model、`006B` は source identity と三者同時受信、`006C`〜`006E` は差分・表示・replay、`ASPIRE-007A` は Linux 実 packet acceptance を担当する。比較用 tracker を追加しても base-mode の `duck`、`simulator`、`crane`、`cm4-sim` 契約は変えない。
 
 将来 bridge network へ移行する必要が出た場合は、ER-Force の SSL-Vision を任意の宛先へ転送する明示的な中継資源を追加するか、シミュレータ側の送信先指定機能を追加する。暗黙のマルチキャスト転送には依存しない。
 
@@ -475,7 +490,7 @@ Issue #14 の比較試験を行うときは、`tracker-tigers` と `tracker-erfo
 この設計の移行完了条件は次のとおりとする。既存 `AddContainer` 実装が存在することや、model test で resource が登録されたことだけでは完了としない。
 
 - 一つの Aspire AppHost 起動でシミュレータ、`game-controller`、Crane、必要な `cm4-sim`、Duck を管理できる。四つの Docker service は個別の executable wrapper resource であり、wrapper が host network container を所有する。Duck は `AddProject` のままとする。
-- comparison mode では TIGERs tracker、ER-Force tracker、`Tracker.DebugHost` を追加し、Duck を含む三 tracker の差を同じ raw vision 入力に対して確認できる。
+- `ASPIRE-005` の完了は base mode のみを意味する。comparison mode の完了は `ASPIRE-006A`〜`006E` および適用される `ASPIRE-007A` の受入後に別判定する。comparison mode では TIGERs / ER-Force を個別 wrapper resource、`Tracker.DebugHost` を .NET project resource とし、各 tracker の owner evidence / service readiness、Duck 起動通知・両 tracker ready への DebugHost 依存、三 source identity と新 packet を用いる comparison health を満たす。
 - 対戦モードでは `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller` を追加し、Blue の TIGERs AI と Yellow の Crane を同じ Game Controller / Simulator 上で対戦させられる。
 - 対戦モードでは `cm4-sim` を起動せず、Duck の 11010 publish を無効にして AutoRef の tracker 入力へ干渉しない。
 - `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` により、両チームの active motion、AutoRef / tracker 経路、試合終了、結果と診断 artifact を確認できる。
@@ -485,6 +500,8 @@ Issue #14 の比較試験を行うときは、`tracker-tigers` と `tracker-erfo
 - 開発者が各資源の起動コマンドを個別に管理しなくてよい。
 - 全 wrapper の live/ready/failed state と stdout/stderr を Aspire dashboard で確認でき、container inspect・ID・最終 log は acceptance artifact から確認できる。DCP first-class container details の欠如は文書化されている。
 - Fake Docker CLI による wrapper test が create/start、遅延 cidfile、ownership mismatch、unexpected exit、startup/readiness/log-follow cancellation、遅延 create race、foreign container 非変更、15秒未満の正常停止・cleanup を検証する。
+- Game Controller focused tests は mode 固有の初期 `HALT` / `STOP` を世代ごとに一度検証する。その後の正常 active 遷移は health failure とせず、通信断・API 不通・未知 command・process 終了では unhealthy とする。resource 再起動時には初期検証を reset する。
+- comparison model / wrapper / DebugHost tests は `ASPIRE-006A` / `006B` の resource kind、owner evidence、service readiness、依存 graph、三 source identity / packet health を固定する。Linux の比較 packet 受入は `ASPIRE-007A` まで未完了とし、`ASPIRE-005` をもって comparison 完了とはしない。
 - Linux hosted acceptance で cm4-sim UDP 12345 listener を正確な container process に結び付ける readiness probe を実証する。実装できない場合は設計 gate を解除せず、readiness を弱めない。
 - SIGINT/SIGTERM の各停止経路で wrapper が DCP の15秒 stop ceiling 内に cleanup を完了する。SIGKILL、host loss、daemon outage は保証外として記録する。
 - SSL-Vision 受信と Duck のトラッカーパケット出力を含む正常経路を確認できる。
