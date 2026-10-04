@@ -73,6 +73,7 @@ public sealed class AppHostApplicationModelTests
         var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
 
         Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameController.Image);
+        Assert.Equal("app", gameController.ExpectedProcessName);
         Assert.Equal(
             ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
             gameController.ContainerArguments);
