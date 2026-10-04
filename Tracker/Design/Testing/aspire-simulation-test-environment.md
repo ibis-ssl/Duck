@@ -224,13 +224,15 @@ AppHost は「何を一緒に起動するか」と「試験環境でどの接続
 
 ### `ASPIRE-003`: ER-Force シミュレータ image
 
-Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を接続し、host network で `simulator-cli` を起動する。UDP 10020 の SSL-Vision がホスト上の受信処理へ届くことを確認する。
+Crane の現行シナリオ構成と同じ `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を使う。これは現在の container-resource 実装で image と simulator 契約を追加した作業を指し、host-network runtime args で動作することを受け入れた意味ではない。移行後は `simulator` wrapper が同じ image を host network で起動し、UDP 10020 の SSL-Vision がホスト上の受信処理へ届くことを確認する。
 
 ### `ASPIRE-004`: Crane image と制御経路
 
-`ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` を `crane` 資源として接続する。`visibility_graph` の既存挙動を維持するため `cm4-sim` も image から起動し、Crane の mode 4 指令をシミュレータ向け mode 3 指令へ変換する現在の経路を再現する。
+現在の実装では `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` と `cm4-sim` を container resource として接続し、model contract を固定している。最終 topology では各々を個別 wrapper executable resource へ移行し、`visibility_graph` の既存経路を維持する。Crane の mode 4 指令は cm4-sim で simulator 向け mode 3 指令へ変換する。
 
 ### `ASPIRE-005`: 起動試験
+
+この hosted acceptance は、container-resource から per-service wrapper への移行、model / wrapper focused tests、独立通常レビューが完了するまで実行しない。現行 AddContainer 方式の Docker create failure を再試行で回避した結果を受入成功として記録しない。
 
 AppHost の全資源を一括起動し、`game-controller` が 11003 の唯一の referee producer として動作し、シミュレータからの SSL-Vision を Duck が受信し、Duck が `TrackerWrapperPacket` を出力する正常経路を確認する。
 
