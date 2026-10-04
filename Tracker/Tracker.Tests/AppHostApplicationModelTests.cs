@@ -176,6 +176,139 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(["game-controller"], refereeProducers);
     }
 
+    [Fact]
+    public async Task BaseModelContainsPinnedCraneAndCm4SimulatorWithHostNetworking()
+    {
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io", craneImage.Registry);
+        Assert.Equal("ibis-ssl/crane", craneImage.Image);
+        Assert.Matches("^scenario-[0-9a-f]{7,40}$", craneImage.Tag);
+        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(crane));
+
+        var cm4Simulator = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "cm4-sim"));
+        var cm4Image = Assert.Single(cm4Simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io", cm4Image.Registry);
+        Assert.Equal("ibis-ssl/orion-cm4-sim", cm4Image.Image);
+        Assert.Matches("^[0-9a-f]{7,40}$", cm4Image.Tag);
+        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(cm4Simulator));
+    }
+
+    [Fact]
+    public async Task VisibilityGraphCraneUsesModeFourPathAndWaitsForItsPrerequisites()
+    {
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>();
+
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var cm4Simulator = Assert.Single(appHost.Resources, resource => resource.Name == "cm4-sim");
+        var duck = Assert.Single(appHost.Resources, resource => resource.Name == "duck");
+        var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
+
+        var craneArgs = await GetArgumentsAsync(crane);
+        Assert.Contains(craneArgs, argument =>
+            argument.Contains("planner:=${PLANNER}", StringComparison.Ordinal));
+        var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
+        Assert.Equal("visibility_graph", craneEnvironment["PLANNER"]);
+        Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"]);
+
+        var cm4Args = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(cm4Simulator));
+        Assert.Contains("12345", cm4Args);
+        Assert.Contains("12346", cm4Args);
+
+        AssertWaitsFor(crane, cm4Simulator, duck, gameController);
+        AssertWaitsFor(cm4Simulator, Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
+    }
+
+    [Fact]
+    public async Task PlannerWithoutCm4SimulatorDoesNotCreateThatResourceOrDependency()
+    {
+        string[] args = ["--Testing:Crane:Planner=rvo2"];
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var duck = Assert.Single(appHost.Resources, resource => resource.Name == "duck");
+        var gameController = Assert.Single(appHost.Resources, resource => resource.Name == "game-controller");
+
+        var craneArgs = await GetArgumentsAsync(crane);
+        Assert.Contains(craneArgs, argument => argument.Contains("planner:=${PLANNER}", StringComparison.Ordinal));
+        var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
+        Assert.Equal("rvo2", craneEnvironment["PLANNER"]);
+        Assert.Equal("12346", craneEnvironment["CRANE_TARGET_PORT"]);
+        Assert.Equal("true", craneEnvironment["FEEDBACK_SIM_MODE"]);
+        AssertWaitsFor(crane, duck, gameController);
+    }
+
+    [Theory]
+    [InlineData("visibility_graph")]
+    [InlineData("rvo2")]
+    public async Task SimulatorIbisPortOverridePropagatesToCranePath(string planner)
+    {
+        string[] args =
+        [
+            "--Testing:Crane:Planner=" + planner,
+            "--Testing:Simulator:IbisPort=22346",
+        ];
+        using var appHost =
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(args);
+
+        var simulator = Assert.Single(appHost.Resources, resource => resource.Name == "simulator");
+        var simulatorArgs = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(simulator));
+        var ibisPortIndex = Array.IndexOf(simulatorArgs, "--ibis-port");
+        Assert.True(ibisPortIndex >= 0 && ibisPortIndex + 1 < simulatorArgs.Length);
+        Assert.Equal("22346", simulatorArgs[ibisPortIndex + 1]);
+
+        var crane = Assert.IsType<ContainerResource>(
+            Assert.Single(appHost.Resources, resource => resource.Name == "crane"));
+        var craneEnvironment = await GetEnvironmentVariablesAsync(crane);
+
+        if (planner == "visibility_graph")
+        {
+            var cm4Simulator = Assert.Single(appHost.Resources, resource => resource.Name == "cm4-sim");
+            var cm4Args = await GetArgumentsAsync(Assert.IsAssignableFrom<IResourceWithArgs>(cm4Simulator));
+            var outPortIndex = Array.IndexOf(cm4Args, "--out-port");
+            Assert.True(outPortIndex >= 0 && outPortIndex + 1 < cm4Args.Length);
+            Assert.Equal("22346", cm4Args[outPortIndex + 1]);
+            Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"]);
+        }
+        else
+        {
+            Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+            Assert.Equal("22346", craneEnvironment["CRANE_TARGET_PORT"]);
+        }
+    }
+
+    private static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(IResourceWithEnvironment resource)
+    {
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(resource)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                NullLogger.Instance,
+                CancellationToken.None);
+        return executionConfiguration.EnvironmentVariables.ToDictionary();
+    }
+
+    private static void AssertWaitsFor(IResource resource, params IResource[] dependencies)
+    {
+        var waits = resource.Annotations.OfType<WaitAnnotation>().ToArray();
+        Assert.Equal(dependencies.Length, waits.Length);
+        foreach (var dependency in dependencies)
+        {
+            var wait = Assert.Single(waits, annotation => ReferenceEquals(annotation.Resource, dependency));
+            Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
+        }
+    }
+
     private static async Task<string[]> GetArgumentsAsync(IResourceWithArgs resource)
     {
         var args = new List<object>();
