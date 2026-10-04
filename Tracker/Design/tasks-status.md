@@ -1,8 +1,87 @@
-# 作業状況
+﻿# 作業状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
 
 ## 現在の作業
+
+- ID: `ASPIRE-001`
+- 題名: シミュレーション試験環境の Aspire 設計を確定する
+- 段階: 設計
+- 状態: 設計更新済み。シミュレータと Crane を既存 Docker image、Duck をホスト上の `Tracker.RuntimeHost` として Aspire から一括起動する構成、TIGERs / ER-Force tracker と `Tracker.DebugHost` を追加する comparison mode に加え、TIGERs AI と Crane を対戦させる対戦モードを設計した。PR #28 の独立最終レビュー合格は対戦モード追加前の HEAD に対する結果であり、追加差分は再レビュー対象とする。`ASPIRE-002` は実装済みで、AppHost 骨格と `duck` = `Tracker.RuntimeHost` の application model 契約を TDD で固定した。後続の実装は未着手。
+- 規模: 中
+- 依存関係: Issue #18、Issue #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
+- 完了条件:
+  - シミュレータ、Crane、`cm4-sim`、Duck の実行形態と責務を固定する。
+  - Crane は `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` の固定 image tag を使い、Duck 側ではビルドしない。
+  - ER-Force の SSL-Vision と Crane の現在の制御経路を固定する。
+  - Docker とホスト間の UDP 通信方式を固定する。
+  - AppHost の配置、設定、起動順、テスト方針、診断方針を設計書へ残す。
+  - 同じ raw vision を Duck / TIGERs / ER-Force tracker へ与え、`Tracker.DebugHost` で source identity、時刻差、物体差を比較できる設計を残す。
+  - Crane の `match-vs-tigers` を基準に、Blue の TIGERs AI と Yellow の Crane を同一 Simulator / Game Controller 上で対戦させ、双方の active motion、AutoRef、結果・ログ保存まで確認できる設計を残す。
+  - Linux / Windows Docker Desktop / macOS Docker Desktop で host network と multicast を実 packet で確認する受入仕様を固定する。
+  - 実装作業をレビュー可能な単位へ分割する。
+- 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
+- 比較デバッグ設計: `Tracker/Design/Testing/tracker-comparison-debug-design.md`
+- 比較デバッグ報告: `reports/issue18-tracker-comparison-debug-design-20260923.md`
+- OS別ネットワーク確認報告: `reports/issue18-cross-platform-network-verification-design-20260927.md`
+- 報告: `reports/issue18-aspire-simulation-test-environment-design.md`
+- 追加報告: `reports/issue18-aspire-crane-image-design-update-20260923.md`
+- 2026-09-23 の設計更新: `ibis-ssl/crane` の現行 `docker/Dockerfile`、Docker image 公開 workflow、シナリオ構成を照合し、Crane を GHCR image から起動する方針へ固定した。`visibility_graph` の mode 4 指令を維持するため、既存の `cm4-sim` image を介して simulator へ mode 3 を渡す経路も設計へ反映した。Simulator も Crane の現行シナリオで使う `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を利用する。
+- 2026-09-23 の検証: 更新後の設計書は CSpell 指摘 0、`git diff --check` 成功。全体 `npm run lint:md` は `.agents/skills/review-enforcer/scripts/list-markdown-targets.js` が checkout に存在しないため終了値 1 で阻害され、文書違反の結果としては扱わない。
+- 2026-09-23 の比較デバッグ設計: Duck / TIGERs / ER-Force を同じ raw vision `224.5.23.2:10020` へ接続し、三者の official tracker packet を `224.5.23.2:11010` へ集約して `Tracker.DebugHost` で分離受信する。live は同一 UI render tick、replay は同一 diagnostics sample tick を共通基準とし、robot は team + id、ball は tracker 固有 track id に依存しない対応付けで位置・速度・角度・存在差を確認する。
+- 2026-09-23 の比較設計検証: `aspire-simulation-test-environment.md` と `tracker-comparison-debug-design.md` の CSpell は指摘 0、`git diff --check` 成功。全体 `npm run lint:md` は同じ `.agents` 欠落で終了値 1。
+- 検証: 新規設計書の CSpell は指摘 0。`git diff --cached --check` 成功。全体 `npm run lint:md` は現行 `main` に `.agents/skills/review-enforcer` が存在しないため実行経路で阻害。
+- 2026-09-27 の OS 別確認仕様: `ASPIRE-NET-001` から `ASPIRE-NET-009` を追加し、Linux / Windows Docker Desktop / macOS Docker Desktop の container → host、container → container multicast、同一 group / port の複数受信、interface 明示 fallback、固定 port 競合を受入条件として固定した。未確認 OS は対応済みと扱わない。
+- 2026-09-29 の TIGERs 対戦設計: Crane develop `af6e0d3dec745415ce060ff5de2042afd3ec5145` の `docker/match-vs-tigers` を基準に、対戦用 `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、Blue=`TIGERs Mannheim` / Yellow=`ibis` の team mapping、対戦用 Simulator / Game Controller fixture、Duck の 11010 publish 無効化、`ASPIRE-MATCH-001`〜`005` を追加した。対戦モードは tracker comparison と分離し、`cm4-sim` を起動しない。
+- 対戦設計報告: `reports/pr28-tigers-vs-crane-design-update-20260929.md`
+- 対戦タスク分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
+- `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
+- 2026-09-30 の `ASPIRE-002` Windows 実機確認: .NET SDK 10.0.401 で application model test 1 / 1 成功。AppHost 13.5.4 から `Tracker.RuntimeHost.exe` が起動し UDP 10020 を bind、AppHost 停止後に子プロセスと bind が解放されることを確認した。Docker / Simulator / multicast packet の OS 別受入確認は後続タスクのまま。
+- `ASPIRE-003` 実装報告: `reports/pr28-aspire-003-implementation-20260930.md`
+- 2026-09-30 の `ASPIRE-003A` 完了: `VisionPacketsReceivedTotal`、endpoint / interface / 累積値の周期診断、decode 失敗非加算を TDD で固定した。赤 commit `4245400` の同一 SHA CI は failure、緑 commit `efdcd79` の同一 SHA CI は success。Windows focused test は 3 / 3 成功。
+- 2026-09-30 の `ASPIRE-003B` 完了: ER-Force Simulator を `ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd`、host network、Crane 基準の geometry / realism / IBIS 引数で追加し、Duck の sim 用 `224.5.23.2:10020` 設定を application model test で固定した。赤 commit `2cbab11` の同一 SHA CI は failure、緑 commit `067be55` の同一 SHA CI は success。
+- 2026-09-30 の Linux `ASPIRE-NET-002`: Ubuntu 24.04 / Docker Engine 28.0.4 の run `36625776852` で RuntimeHost が `224.5.23.2:10020` を受信し、`VisionPacketsReceivedTotal` は 0 から 232 へ 3960 ms で増加した。run の `headSha` は検証時の PR HEAD `5c110dd` と一致し、`.NET tests` と Linux packet flow はともに success。成功 artifact `aspire-net-002-36625776852-1` に判定結果、標準出力、標準エラー、RuntimeHost / Simulator / Docker / network 診断を保存した。
+- `ASPIRE-004A` 実装報告書: `reports/pr28-aspire-004a-implementation-20260930.md`
+- 2026-09-30 の `ASPIRE-004A` 完了: `game-controller` を `robocupssl/ssl-game-controller:3.20.3`、Docker の `--network host` 指定、固定 `ContainerImageAnnotation.Tag`、`224.5.23.1:11003` の単一送信元として `AppHost` に追加した。`referee-driver` は 11003 を受信して初期 `HALT` と命令番号 `CommandCounter` の変化を確認し、`ws://127.0.0.1:8082/api/control` へ `NEXT_COMMAND`、必要に応じて `FORCE_START` / `NORMAL_START` を送信し、試合進行中を示す `NORMAL_START` / `FORCE_START` への遷移を確認する。Docker を使わない関連対象試験 / `AppHostApplicationModelTests` は親側の最新履歴取り込み後 17 / 17 成功。
+- 2026-09-30 の `ASPIRE-004A` 回帰確認: `Tracker.Tests` 全体は親側の最新履歴取り込み後 346 件中 335 件成功、11 件失敗。失敗 11 件は `ASPIRE-004A` 差分を含まない設計側の `HEAD` `65ff0bc` でも同じ 11 件が失敗し、代表例は `CaptureOn` の `tracker-snapshot-alignment.jsonl` を使う tracker snapshot alignment sidecar の読み取り時に別処理が使用中だったため、`ASPIRE-004A` 起因の新規回帰とは判定しない。
+- 次作業: `ASPIRE-003B` と `ASPIRE-004A` がともに完了したため、`ASPIRE-004B` の `Crane` / `cm4-sim` 資源と起動依存へ進める。実機確認は `ASPIRE-007A` から `ASPIRE-007C` で `OS` ごとに独立して完了判定する。
+- 今回の実装範囲: `ASPIRE-004A` の `Game Controller` 資源、`referee-driver` の状態遷移、11003 `UDP` 受信を担当する `UdpRefereeCommandSource`、`GameControllerWebSocketControlClient` による制御、Docker を使わない対象試験 / `AppHostApplicationModelTests` まで。`simulator` / `Crane` / `cm4-sim` を含む一括起動と実通信による動作確認は後続作業で扱う。
+
+## ASPIRE 実装タスク分割（2026-09-29）
+
+PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位へ分割する。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。TIGERs vs Crane 対戦は `ASPIRE-006F` を `ASPIRE-006F1`〜`006F6`、`ASPIRE-006G` を `ASPIRE-006G1`〜`006G4` へ分ける。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装タスクにはしない。
+
+各実装タスクは、先に focused test または application model test を追加して未実装状態で失敗することを確認し、その後に実装する。失敗確認と実装はレビュー可能な論理単位で commit / push する。CI に Docker/Aspire 統合試験を追加する場合は、テスト結果、標準出力、標準エラー、Aspire と各コンテナの調査ログを失敗時 artifact へ保存する。
+
+| ID | 作業 | 規模 | 依存関係 | 完了条件 |
+| --- | --- | --- | --- | --- |
+| `ASPIRE-002` | AppHost 骨格と application model 契約 | 小 | `ASPIRE-001` | `Testing/Duck.Testing.AppHost` を追加し、失敗テストを先行させた上で `duck` を `Tracker.RuntimeHost` として単独起動できる。Docker 不要の model test が通る。 |
+| `ASPIRE-003A` | RuntimeHost の SSL-Vision 受信診断 | 小 | `ASPIRE-002` | `VisionPacketsReceivedTotal`、endpoint / interface / 累積値の診断ログ、decode 失敗を加算しない focused test を TDD で実装する。 |
+| `ASPIRE-003B` | ER-Force Simulator 資源 | 小 | `ASPIRE-003A` | 固定 tag の `simulator-cli`、host network、geometry / realism、Duck の sim 設定を model test で固定し、Linux で `ASPIRE-NET-002` の受信を確認する。 |
+| `ASPIRE-004A` | Game Controller と referee-driver fixture | 小 | `ASPIRE-002` | `game-controller` を 11003 の唯一の producer とし、`referee-driver` が HALT 確認後に API を操作して active command へ遷移できることを focused test で固定する。 |
+| `ASPIRE-004B` | Crane / cm4-sim 資源と起動依存 | 中 | `ASPIRE-003B`, `ASPIRE-004A` | 固定 image tag、host network、mode 4→3 経路、planner ごとの `WaitForStart` 依存を application model test で固定する。 |
+| `ASPIRE-005` | 基本 stack の一括起動試験 | 中 | `ASPIRE-004B` | Simulator / game-controller / Crane / cm4-sim / Duck を一括起動し、SSL-Vision 受信、Duck tracker 出力、active motion、stack ownership を確認する。Linux で比較資源を除く適用 `ASPIRE-NET-*` を証跡化する。 |
+| `ASPIRE-006A` | comparison mode の外部 tracker 資源 | 中 | `ASPIRE-005` | `tracker-tigers`、`tracker-erforce`、`debug-host` を追加し、Game Controller 排他、host network、10020 入力 / 11010 出力を model test で固定する。 |
+| `ASPIRE-006B` | source identity と三 tracker 同時受信 | 中 | `ASPIRE-006A` | logical role、UUID / endpoint fallback、衝突時 Ready 判定、live / replay の同一 resolver 契約を focused test で固定し、`ASPIRE-NET-003`〜`005` の Linux 証跡を得る。 |
+| `ASPIRE-006C` | Tracker Difference の対応付けと数値差分 | 中 | `ASPIRE-006B` | robot の team+id、ball の最大 pair 数→距離合計最小→辞書順 tie-break、gate 境界、missing / unmatched を TDD で固定する。 |
+| `ASPIRE-006D` | live Split / Overlay と数値差分 | 小 | `ASPIRE-006C` | 1 UI render tick で固定した同じ snapshot pair を Split / Overlay と数値差分が共有し、時刻差を別表示できる。 |
+| `ASPIRE-006E` | CaptureOn / replay 比較 | 中 | `ASPIRE-006D` | 同じ diagnostics sample tick、saved alignment 優先、latest-before fallback、future snapshot 不使用を focused test と replay 証跡で固定する。 |
+| `ASPIRE-006F` | TIGERs vs Crane 対戦資源（親） | 中 | `ASPIRE-005` | `ASPIRE-006F1`〜`006F6` が完了し、対戦用 resource model と lifecycle が設計どおり固定される。 |
+| `ASPIRE-006F1` | 対戦 fixture の版管理 | 小 | `ASPIRE-005` | Sumatra 設定、Game Controller 初期状態、試合時間設定を Duck 側 fixture として追加し、Blue=`TIGERs Mannheim` / Yellow=`ibis` / `FRIENDLY` / 初期 `STOP` を focused test で固定する。 |
+| `ASPIRE-006F2` | `match` mode と resource topology | 小 | `ASPIRE-005` | `Testing:Mode=match`、`base` / `comparison` との排他、対戦資源の存在、`cm4-sim` / 比較専用 tracker の非存在を application model test で固定する。 |
+| `ASPIRE-006F3` | Simulator / Game Controller 対戦資源 | 小 | `ASPIRE-006F1`, `ASPIRE-006F2` | 対戦用 Simulator 引数、11003 の単一 producer、GC API、fixture mount、固定 image reference を model test で固定する。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL log 資源 | 中 | `ASPIRE-006F1`, `ASPIRE-006F2` | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の image、host network、10020 / 11003 / 11010、`--aiBlue`、外部 referee 契約を model test で固定する。 |
+| `ASPIRE-006F5` | Crane / Duck 対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Crane `team:=ibis`、`cm4-sim` 非依存、Duck 11010 publish 無効、必要な `WaitForStart` を model test で固定する。 |
+| `ASPIRE-006F6` | `match-controller` と試合 lifecycle | 中 | `ASPIRE-006F3`, `ASPIRE-006F4`, `ASPIRE-006F5` | GC API / referee / vision readiness、STOP / HALT の継続操作、`POST_GAME` / 最大時間終了、結果保存を focused test で固定する。 |
+| `ASPIRE-006G` | TIGERs vs Crane 一括対戦試験（親） | 中 | `ASPIRE-006F6` | `ASPIRE-006G1`〜`006G4` が完了し、`ASPIRE-MATCH-001`〜`005` の Linux 実 packet 証跡が揃う。 |
+| `ASPIRE-006G1` | topology / team / referee 受入 | 小 | `ASPIRE-006F6` | Linux で `ASPIRE-MATCH-001` / `002` を確認し、resource 一覧、team mapping、11003 producer の一意性を保存する。 |
+| `ASPIRE-006G2` | 双方 active motion 受入 | 小 | `ASPIRE-006G1` | `ASPIRE-MATCH-003` を実行し、同一 active referee 窓で Crane と TIGERs の双方の位置変化を実 packet で確認する。 |
+| `ASPIRE-006G3` | AutoRef / tracker 経路受入 | 小 | `ASPIRE-006G2` | `ASPIRE-MATCH-004` を実行し、Sumatra 11010、AutoRef 10020 / 11003 / 11010、Duck 11010 非送信を packet count とログで確認する。 |
+| `ASPIRE-006G4` | 試合完了 / 証跡受入 | 小 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL log、Crane の記録データ、全 resource の標準出力・標準エラーを失敗時も保存する。 |
+| `ASPIRE-007A` | Linux 実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | Linux + Docker Engine で適用 `ASPIRE-NET-001`〜`009` と対戦モードの `ASPIRE-MATCH-001`〜`005` を実 packet で確認し、指定されたログ・packet count・source identity を保存する。 |
+| `ASPIRE-007B` | Windows Docker Desktop 実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | host networking 有効の Windows Docker Desktop で適用 `ASPIRE-NET-001`〜`009` を確認する。対戦モード対応を表明する場合は `ASPIRE-MATCH-001`〜`005` も確認し、失敗時に Linux の結果や unicast fallback で代用しない。 |
+| `ASPIRE-007C` | macOS Docker Desktop 実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | host networking 有効の macOS Docker Desktop で適用 `ASPIRE-NET-001`〜`009` を確認する。対戦モード対応を表明する場合は `ASPIRE-MATCH-001`〜`005` も確認し、失敗時に他 OS の結果や暗黙 fallback で代用しない。 |
+| `ASPIRE-008` | 最終レビュー、進捗同期、PR 提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B`, `ASPIRE-007C` | 独立レビュー、阻害指摘の修正、詳細 report、台帳同期、PR コメント、PR current HEAD と head SHA が一致する CI 確認を完了する。 |
 
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する

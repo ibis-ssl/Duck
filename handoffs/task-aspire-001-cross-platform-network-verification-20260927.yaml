@@ -1,0 +1,48 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: design_only
+  generated_at: 2026-09-27T12:12:00+09:00
+repository: ibis-ssl/Duck
+issue_or_pr: "Issue #18 / PR #28"
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  parent_head: a9ab7f08d2eee5541083265276920d1c23680628
+execution_environment:
+  kind: github_connector_fallback
+  rdc_status: unavailable
+  evidence: all configured RDC devices were offline
+scope:
+  - define OS-specific host-network and multicast acceptance tests
+  - cover Linux Docker Engine, Windows Docker Desktop, and macOS Docker Desktop
+  - require actual packet flow evidence before claiming OS support
+design_contract:
+  acceptance_test_ids:
+    - ASPIRE-NET-001
+    - ASPIRE-NET-002
+    - ASPIRE-NET-003
+    - ASPIRE-NET-004
+    - ASPIRE-NET-005
+    - ASPIRE-NET-006
+    - ASPIRE-NET-007
+    - ASPIRE-NET-008
+    - ASPIRE-NET-009
+  unsupported_substitution: do not substitute another OS result
+  multicast_failure_policy: record failure; do not silently fall back to unicast
+files:
+  changed:
+    - Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - Tracker/Design/Testing/tracker-comparison-debug-design.md
+    - Tracker/Design/tasks-status.md
+    - reports/issue18-cross-platform-network-verification-design-20260927.md
+    - handoffs/task-aspire-001-cross-platform-network-verification-20260927.yaml
+validation:
+  diagnostic_workflow: existing .github/workflows/dotnet-test.yml preserves test results, stdout, stderr, and diagnostic logs
+  local_document_checks: not_run
+  local_document_checks_reason: RDC devices offline and no repository worktree available through RDC
+  exact_head_ci: pending
+report:
+  path: reports/issue18-cross-platform-network-verification-design-20260927.md
+merge: forbidden

@@ -1,4 +1,4 @@
-name: .NET tests
+﻿name: .NET tests
 
 on:
   pull_request:
@@ -87,5 +87,236 @@ jobs:
         with:
           name: dotnet-test-failure-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/test-results
+          if-no-files-found: error
+          retention-days: 14
+
+  aspire-net-002:
+    name: ASPIRE-NET-002 Linux packet flow
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: ga
+
+      - name: Run ASPIRE-NET-002
+        id: aspire_net_002
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-net-002"
+          mkdir -p "$results_dir"
+
+          simulator_name="duck-aspire-net-002-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          simulator_pid=""
+          runtime_pid=""
+
+          cleanup() {
+            set +e
+
+            if [[ -n "$runtime_pid" ]] && kill -0 "$runtime_pid" 2>/dev/null; then
+              kill "$runtime_pid" 2>/dev/null
+              wait "$runtime_pid" 2>/dev/null
+            fi
+
+            docker inspect "$simulator_name" > "$results_dir/simulator-inspect.json" 2>&1
+            docker rm -f "$simulator_name" > "$results_dir/simulator-remove.log" 2>&1
+
+            if [[ -n "$simulator_pid" ]]; then
+              wait "$simulator_pid" 2>/dev/null
+            fi
+
+            ss -uapn > "$results_dir/udp-sockets-after.txt" 2>&1
+          }
+          trap cleanup EXIT
+
+          fail_test() {
+            printf 'status=failed\nreason=%s\n' "$1" > "$results_dir/test-result.txt"
+            exit 1
+          }
+
+          dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj \
+            -m:1 /nr:false \
+            > "$results_dir/runtimehost-build.stdout.log" \
+            2> "$results_dir/runtimehost-build.stderr.log"
+          build_exit_code=$?
+          printf '%s\n' "$build_exit_code" > "$results_dir/runtimehost-build.exit-code"
+          if [[ "$build_exit_code" -ne 0 ]]; then
+            fail_test "RuntimeHost build failed"
+          fi
+
+          docker info > "$results_dir/docker-info.txt" 2>&1
+          ip -4 address > "$results_dir/ip-address.txt" 2>&1
+          ip route > "$results_dir/ip-route.txt" 2>&1
+          ss -uapn > "$results_dir/udp-sockets-before.txt" 2>&1
+
+          docker pull ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd \
+            > "$results_dir/simulator-pull.stdout.log" \
+            2> "$results_dir/simulator-pull.stderr.log"
+          pull_exit_code=$?
+          printf '%s\n' "$pull_exit_code" > "$results_dir/simulator-pull.exit-code"
+          if [[ "$pull_exit_code" -ne 0 ]]; then
+            fail_test "Simulator image pull failed"
+          fi
+
+          docker run \
+            --name "$simulator_name" \
+            --network host \
+            --entrypoint tini \
+            ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd \
+            -- \
+            ./bin/simulator-cli \
+            -g 2020B \
+            --realism None \
+            --ibis-port 12346 \
+            --ibis-team-color yellow \
+            > "$results_dir/simulator.stdout.log" \
+            2> "$results_dir/simulator.stderr.log" &
+          simulator_pid=$!
+
+          simulator_running=false
+          for _ in {1..100}; do
+            if [[ "$(docker inspect --format '{{.State.Running}}' "$simulator_name" 2>/dev/null)" == "true" ]]; then
+              simulator_running=true
+              break
+            fi
+            if ! kill -0 "$simulator_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 0.1
+          done
+
+          if [[ "$simulator_running" != "true" ]]; then
+            fail_test "Simulator did not reach running state"
+          fi
+
+          (
+            cd Tracker/Tracker.RuntimeHost
+            export Tracker__ActiveProfileName=sim
+            export VisionReceiver__MulticastAddress=224.5.23.2
+            export VisionReceiver__Port=10020
+            exec dotnet run \
+              --project Tracker.RuntimeHost.csproj \
+              --no-build
+          ) \
+            > "$results_dir/runtimehost.stdout.log" \
+            2> "$results_dir/runtimehost.stderr.log" &
+          runtime_pid=$!
+
+          diagnostics_pattern='VisionPacketsReceivedTotal=[0-9]+'
+          baseline=""
+
+          for _ in {1..100}; do
+            if grep -Eq "$diagnostics_pattern" "$results_dir/runtimehost.stdout.log" 2>/dev/null; then
+              baseline="$(
+                grep -Eo "$diagnostics_pattern" "$results_dir/runtimehost.stdout.log" \
+                  | head -n 1 \
+                  | cut -d= -f2
+              )"
+              break
+            fi
+            if ! kill -0 "$runtime_pid" 2>/dev/null; then
+              fail_test "RuntimeHost exited before receiver diagnostics appeared"
+            fi
+            sleep 0.1
+          done
+
+          if [[ -z "$baseline" ]]; then
+            fail_test "RuntimeHost startup receiver diagnostics were not observed"
+          fi
+
+          started_ms="$(date +%s%3N)"
+          deadline_ms=$((started_ms + 5000))
+          latest="$baseline"
+
+          while true; do
+            latest="$(
+              grep -Eo "$diagnostics_pattern" "$results_dir/runtimehost.stdout.log" 2>/dev/null \
+                | tail -n 1 \
+                | cut -d= -f2
+            )"
+            latest="${latest:-$baseline}"
+            delta=$((latest - baseline))
+            now_ms="$(date +%s%3N)"
+
+            if (( delta >= 10 )); then
+              elapsed_ms=$((now_ms - started_ms))
+              {
+                printf 'status=passed\n'
+                printf 'baseline=%s\n' "$baseline"
+                printf 'latest=%s\n' "$latest"
+                printf 'delta=%s\n' "$delta"
+                printf 'elapsed_ms=%s\n' "$elapsed_ms"
+              } > "$results_dir/test-result.txt"
+              break
+            fi
+
+            if (( now_ms > deadline_ms )); then
+              {
+                printf 'baseline=%s\n' "$baseline"
+                printf 'latest=%s\n' "$latest"
+                printf 'delta=%s\n' "$delta"
+                printf 'elapsed_ms=%s\n' "$((now_ms - started_ms))"
+              } > "$results_dir/count-window.txt"
+              fail_test "VisionPacketsReceivedTotal did not increase by 10 within 5 seconds"
+            fi
+
+            if ! kill -0 "$runtime_pid" 2>/dev/null; then
+              fail_test "RuntimeHost exited during packet-flow verification"
+            fi
+            if ! kill -0 "$simulator_pid" 2>/dev/null; then
+              fail_test "Simulator exited during packet-flow verification"
+            fi
+
+            sleep 0.1
+          done
+
+      - name: Collect ASPIRE-NET-002 diagnostics
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set +e
+
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-net-002"
+          mkdir -p "$results_dir"
+
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'sha=%s\n' "$GITHUB_SHA"
+            printf 'ref=%s\n' "$GITHUB_REF"
+            printf 'run_id=%s\n' "$GITHUB_RUN_ID"
+            printf 'run_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
+            printf 'runner_os=%s\n' "$RUNNER_OS"
+            printf '\n## dotnet --info\n'
+            dotnet --info
+            printf '\n## docker info\n'
+            docker info
+            printf '\n## git status --short\n'
+            git status --short
+            printf '\n## git submodule status --recursive\n'
+            git submodule status --recursive
+            printf '\n## ip -4 address\n'
+            ip -4 address
+            printf '\n## ip route\n'
+            ip route
+          } > "$results_dir/environment.txt" 2>&1
+
+      - name: Upload ASPIRE-NET-002 artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: aspire-net-002-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/aspire-net-002
           if-no-files-found: error
           retention-days: 14
