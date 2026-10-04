@@ -29,7 +29,11 @@ public static class DockerWrapperResourceExtensions
             healthPort,
             ExpectedProcessName: expectedProcessName,
             ReadinessProfile: readinessProfile,
-            StartupTimeoutSeconds: startupTimeoutSeconds);
+            StartupTimeoutSeconds: startupTimeoutSeconds,
+            CraneDiagnosticsPath: readinessProfile == "crane" &&
+                !string.IsNullOrWhiteSpace(builder.Configuration["Testing:Crane:DiagnosticsPath"])
+                ? Path.GetFullPath(builder.Configuration["Testing:Crane:DiagnosticsPath"]!)
+                : null);
         var healthCheckName = $"{spec.ResourceName}-docker-wrapper-ready";
         builder.Services.AddHealthChecks().AddCheck(
             healthCheckName,

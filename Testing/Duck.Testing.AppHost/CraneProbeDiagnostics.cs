@@ -46,9 +46,12 @@ public sealed class CraneProbeDiagnosticState
         return new CraneProbeProgress(AttemptCount, outcome);
     }
 
-    public string CreateFinalSummary() => JsonSerializer.Serialize(new
+    public string CreateFinalSummary(bool shutdownRequested = false) => JsonSerializer.Serialize(new
     {
         event_name = "duck_crane_probe_final",
+        recorded_at_utc = DateTimeOffset.UtcNow,
+        shutdown_requested = shutdownRequested,
+        completed_attempts = AttemptCount,
         attempts = AttemptCount,
         latest_attempt = AttemptCount,
         latest = Latest,
@@ -90,6 +93,8 @@ public static partial class CraneProbeDiagnostics
         var ready = exitCode == 0 && coordinatorFound;
         var classification = exitCode == 124
             ? markerFound ? "ros_graph_timeout" : "setup_timeout"
+            : exitCode == 137
+                ? markerFound ? "ros_graph_killed" : "setup_killed"
             : exitCode != 0
                 ? markerFound ? "ros_graph_nonzero" : "setup_nonzero"
                 : !markerFound ? "setup_marker_missing"
@@ -130,9 +135,49 @@ public static partial class CraneProbeDiagnostics
     public static string SerializeProgress(CraneProbeProgress progress) => JsonSerializer.Serialize(new
     {
         event_name = "duck_crane_probe_progress",
+        recorded_at_utc = DateTimeOffset.UtcNow,
         attempt = progress.Attempt,
         progress.Outcome,
     });
+
+    public static string SerializeAttemptStarted(int attempt) => JsonSerializer.Serialize(new
+    {
+        event_name = "duck_crane_probe_started",
+        recorded_at_utc = DateTimeOffset.UtcNow,
+        attempt,
+    });
+
+    internal static void WriteRecord(string? path, string jsonLine, Action<string> secondaryWriter)
+    {
+        // The producer sanitizes full probe output before serializing bounded excerpts.
+        // Open/append/close for each record so cancellation cannot strand a buffered record.
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+                File.AppendAllText(path, jsonLine + "\n", new System.Text.UTF8Encoding(false));
+            }
+            catch (Exception)
+            {
+                TryWriteSecondary(secondaryWriter, "{\"event_name\":\"duck_crane_diagnostics_write_failed\"}");
+            }
+        }
+
+        TryWriteSecondary(secondaryWriter, jsonLine);
+    }
+
+    private static void TryWriteSecondary(Action<string> writer, string jsonLine)
+    {
+        try
+        {
+            writer(jsonLine);
+        }
+        catch (Exception)
+        {
+            // Diagnostic transport must not change readiness, retries, or owned cleanup.
+        }
+    }
 
     private static string OutputAfterExactMarker(string output, out bool markerFound)
     {

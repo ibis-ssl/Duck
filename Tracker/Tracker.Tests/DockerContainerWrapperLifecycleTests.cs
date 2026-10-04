@@ -133,7 +133,7 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Theory]
-    [InlineData("crane", "ros2", "exec container-id timeout --signal=TERM --kill-after=2s 10s bash -lc source /root/ibis_ws/install/setup.bash && exec ros2 node list")]
+    [InlineData("crane", "ros2", "exec container-id timeout --signal=TERM --kill-after=2s 10s bash -lc source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list")]
     [InlineData("cm4-sim", "cm4_sim", "exec container-id sh -c")]
     public async Task ExpectedProcessWithoutServicePredicatePreventsReadiness(
         string profile,
@@ -159,6 +159,75 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Contains($"top container-id", commands);
         Assert.Contains(probeCommand, commands);
         Assert.Contains("rm --force container-id", commands);
+    }
+
+    [Fact]
+    public void CraneDiagnosticFileSurvivesLostConsoleAndRoundTrips()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "duck-crane-transport-" + Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(directory, "artifacts", "aspire-full-stack", "crane-probe.jsonl");
+        try
+        {
+            var state = new CraneProbeDiagnosticState();
+            Action<string> lostConsole = _ => throw new IOException("simulated missing console transport");
+            CraneProbeDiagnostics.WriteRecord(path, CraneProbeDiagnostics.SerializeAttemptStarted(1), lostConsole);
+            var timeout = CraneProbeDiagnostics.Evaluate(124, "DUCK_CRANE_ROS_SETUP_OK\n", "password=FILE_SECRET_SENTINEL", TimeSpan.FromSeconds(10));
+            CraneProbeDiagnostics.WriteRecord(path, CraneProbeDiagnostics.SerializeProgress(state.Record(timeout)!), lostConsole);
+            CraneProbeDiagnostics.WriteRecord(path, CraneProbeDiagnostics.SerializeAttemptStarted(2), lostConsole);
+            var ready = CraneProbeDiagnostics.Evaluate(0, "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n", "", TimeSpan.FromMilliseconds(25));
+            CraneProbeDiagnostics.WriteRecord(path, CraneProbeDiagnostics.SerializeProgress(state.Record(ready)!), lostConsole);
+            CraneProbeDiagnostics.WriteRecord(path, state.CreateFinalSummary(shutdownRequested: true), lostConsole);
+
+            var lines = File.ReadAllLines(path);
+            Assert.Equal(5, lines.Length);
+            Assert.DoesNotContain("FILE_SECRET_SENTINEL", File.ReadAllText(path));
+            Assert.Contains("[REDACTED]", File.ReadAllText(path));
+            using var first = System.Text.Json.JsonDocument.Parse(lines[0]);
+            Assert.Equal("duck_crane_probe_started", first.RootElement.GetProperty("event_name").GetString());
+            Assert.False(first.RootElement.TryGetProperty("Outcome", out _));
+            using var completed = System.Text.Json.JsonDocument.Parse(lines[1]);
+            Assert.Equal("ros_graph_timeout", completed.RootElement.GetProperty("Outcome").GetProperty("Classification").GetString());
+            using var final = System.Text.Json.JsonDocument.Parse(lines[4]);
+            Assert.Equal(2, final.RootElement.GetProperty("completed_attempts").GetInt32());
+            Assert.True(final.RootElement.GetProperty("shutdown_requested").GetBoolean());
+            Assert.True(final.RootElement.GetProperty("latest").GetProperty("Ready").GetBoolean());
+
+            // Optional local verification output, never evidence of a live Crane run.
+            var retained = Environment.GetEnvironmentVariable("DUCK_CRANE_DIAGNOSTIC_TEST_OUTPUT");
+            if (!string.IsNullOrWhiteSpace(retained))
+            {
+                Directory.CreateDirectory(retained);
+                File.Copy(path, Path.Combine(retained, "crane-probe.jsonl"), overwrite: true);
+                File.WriteAllText(Path.Combine(retained, "test-origin.txt"), "Synthetic unit-test probe records; not a live full-stack run.\n");
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void CraneDiagnosticWriteFailureDoesNotEscapeOrDiscloseThePath()
+    {
+        var parent = Path.Combine(Path.GetTempPath(), "duck-crane-sink-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(parent);
+        var file = Path.Combine(parent, "blocked");
+        File.WriteAllText(file, "not a directory");
+        try
+        {
+            var messages = new List<string>();
+            var record = CraneProbeDiagnostics.SerializeAttemptStarted(1);
+            CraneProbeDiagnostics.WriteRecord(Path.Combine(file, "private-location.jsonl"), record, messages.Add);
+            Assert.Equal(2, messages.Count);
+            Assert.Contains("duck_crane_diagnostics_write_failed", messages[0]);
+            Assert.Equal(record, messages[1]);
+            Assert.DoesNotContain(parent, string.Join("\n", messages));
+        }
+        finally
+        {
+            Directory.Delete(parent, recursive: true);
+        }
     }
 
     [Fact]
@@ -191,7 +260,7 @@ public sealed class DockerContainerWrapperLifecycleTests
     public void ServiceReadinessPredicatesRequireTheirServiceEvidence()
     {
         Assert.False(DockerServiceReadiness.CraneHasCoordinator("/other_node\n"));
-        Assert.True(DockerServiceReadiness.CraneHasCoordinator("/crane_session_coordinator\n"));
+        Assert.True(DockerServiceReadiness.CraneHasCoordinator("/session_controller\n"));
         Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("port 12345 open"));
         Assert.True(DockerServiceReadiness.Cm4SimOwnsListener("cm4_sim-listening-12345"));
     }
@@ -203,19 +272,19 @@ public sealed class DockerContainerWrapperLifecycleTests
             ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc",
                 "source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list"],
             DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id"));
-        Assert.False(CraneProbeDiagnostics.Evaluate(124, "/crane_session_coordinator\n", "", TimeSpan.FromSeconds(10)).Ready);
-        Assert.False(CraneProbeDiagnostics.Evaluate(0, "/crane_session_coordinator\n", "", TimeSpan.Zero).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(124, "/session_controller\n", "", TimeSpan.FromSeconds(10)).Ready);
+        Assert.False(CraneProbeDiagnostics.Evaluate(0, "/session_controller\n", "", TimeSpan.Zero).Ready);
         Assert.False(CraneProbeDiagnostics.Evaluate(0,
-            "error DUCK_CRANE_ROS_SETUP_OK appears here\n/crane_session_coordinator\n", "", TimeSpan.Zero).Ready);
+            "error DUCK_CRANE_ROS_SETUP_OK appears here\n/session_controller\n", "", TimeSpan.Zero).Ready);
         Assert.False(CraneProbeDiagnostics.Evaluate(0,
-            "/crane_session_coordinator\nDUCK_CRANE_ROS_SETUP_OK\n/other_node\n", "", TimeSpan.Zero).Ready);
+            "/session_controller\nDUCK_CRANE_ROS_SETUP_OK\n/other_node\n", "", TimeSpan.Zero).Ready);
         Assert.True(CraneProbeDiagnostics.Evaluate(0,
-            "DUCK_CRANE_ROS_SETUP_OK\n/crane_session_coordinator\n", "", TimeSpan.Zero).Ready);
-        var beyondCap = "DUCK_CRANE_ROS_SETUP_OK\n" + new string('x', 600) + "\n/crane_session_coordinator\n";
+            "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n", "", TimeSpan.Zero).Ready);
+        var beyondCap = "DUCK_CRANE_ROS_SETUP_OK\n" + new string('x', 600) + "\n/session_controller\n";
         var beyondCapResult = CraneProbeDiagnostics.Evaluate(0, beyondCap, "", TimeSpan.Zero);
         Assert.True(beyondCapResult.Ready);
         Assert.True(beyondCapResult.StandardOutputTruncated);
-        Assert.DoesNotContain("crane_session_coordinator", beyondCapResult.StandardOutputExcerpt);
+        Assert.DoesNotContain("session_controller", beyondCapResult.StandardOutputExcerpt);
     }
 
     [Fact]
@@ -254,7 +323,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Contains("\"attempts\":3", state.CreateFinalSummary());
 
         var ready = CraneProbeDiagnostics.Evaluate(0,
-            "DUCK_CRANE_ROS_SETUP_OK\n/crane_session_coordinator\n", "", TimeSpan.FromMilliseconds(25));
+            "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n", "", TimeSpan.FromMilliseconds(25));
         var transition = state.Record(ready, TimeSpan.FromMilliseconds(2100));
         Assert.NotNull(transition);
         Assert.Equal(4, transition!.Attempt);
@@ -296,7 +365,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Contains("rm --force container-id", commands);
         Assert.True(diagnostics.Count >= 2);
         Assert.DoesNotContain("CRANE_DIAGNOSTIC_SENTINEL", string.Join('\n', diagnostics));
-        using var first = System.Text.Json.JsonDocument.Parse(diagnostics[0]);
+        using var first = System.Text.Json.JsonDocument.Parse(diagnostics.First(line => line.Contains("duck_crane_probe_progress", StringComparison.Ordinal)));
         Assert.Equal("duck_crane_probe_progress", first.RootElement.GetProperty("event_name").GetString());
         Assert.Equal(1, first.RootElement.GetProperty("attempt").GetInt32());
         Assert.Equal("setup_timeout", first.RootElement.GetProperty("Outcome").GetProperty("Classification").GetString());
@@ -564,7 +633,7 @@ public sealed class DockerContainerWrapperLifecycleTests
                 : "  exec) count=$(cat '" + craneProbeCountPath + "' 2>/dev/null || echo 0); " +
                 "count=$((count + 1)); echo \"$count\" > '" + craneProbeCountPath + "'; " +
                     "if [ \"$count\" -le " + craneProbeTimeoutResponses + " ]; then echo 'password=CRANE_DIAGNOSTIC_SENTINEL' >&2; exit 124; fi; " +
-                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\n/crane_session_coordinator\\n' ;;";
+                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\n/session_controller\\n' ;;";
             ExecutablePath = Path.Combine(directory, "docker-fake");
             var createDelay = slowCreate ? "sleep 20" : ":";
             File.WriteAllText(ExecutablePath, string.Join('\n',

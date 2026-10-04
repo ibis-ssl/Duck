@@ -8,7 +8,29 @@ import os
 from pathlib import Path
 import tempfile
 
-from capture_aspire_dcp_logs import sanitize
+import json
+from capture_aspire_dcp_logs import SECRET_FIELD, sanitize
+
+
+def sanitize_json_value(value, sanitizer):
+    if isinstance(value, str):
+        return sanitizer(value)
+    if isinstance(value, list):
+        return [sanitize_json_value(item, sanitizer) for item in value]
+    if isinstance(value, dict):
+        return {
+            key: "[REDACTED]" if SECRET_FIELD.fullmatch(f'{key}=""')
+            else sanitize_json_value(item, sanitizer)
+            for key, item in value.items()
+        }
+    return value
+
+
+def sanitize_jsonl(content, sanitizer):
+    # Decode strings first; regex over escaped JSON can erase record boundaries.
+    records = [json.loads(line) for line in content.splitlines() if line.strip()]
+    return "".join(json.dumps(sanitize_json_value(record, sanitizer), ensure_ascii=True) + "\n"
+                   for record in records)
 
 
 def sanitize_tree(root: Path, sanitizer=sanitize) -> list[Path]:
@@ -22,7 +44,7 @@ def sanitize_tree(root: Path, sanitizer=sanitize) -> list[Path]:
         temporary_path: Path | None = None
         try:
             content = path.read_text(encoding="utf-8", errors="replace")
-            redacted = sanitizer(content)
+            redacted = sanitize_jsonl(content, sanitizer) if path.suffix.lower() == ".jsonl" else sanitizer(content)
             with tempfile.NamedTemporaryFile(
                 mode="w", encoding="utf-8", newline="", dir=path.parent, delete=False
             ) as temporary:

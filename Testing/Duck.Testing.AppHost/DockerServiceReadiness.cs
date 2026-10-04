@@ -21,8 +21,7 @@ public static class DockerServiceReadiness
 
     public static bool CraneHasCoordinator(string output) =>
         output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim().TrimStart('/'))
-            .Any(line => line.Equals("crane_session_coordinator", StringComparison.Ordinal));
+            .Any(line => line.Trim().Equals("/session_controller", StringComparison.Ordinal));
 
     public static bool CraneProbeSucceeded(int exitCode, string output) =>
         CraneProbeDiagnostics.Evaluate(exitCode, output, string.Empty, TimeSpan.Zero).Ready;

@@ -423,6 +423,7 @@ jobs:
           stack_id="gha-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           export Testing__StackOwnership__LockPath="$stack_lock"
           export Testing__StackOwnership__StackId="$stack_id"
+          export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           printf '%s\n' "$stack_id" > "$RUNNER_TEMP/aspire-full-stack-stack-id"
 
           {

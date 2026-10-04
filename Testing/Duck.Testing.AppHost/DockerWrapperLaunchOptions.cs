@@ -13,7 +13,8 @@ public sealed record DockerWrapperLaunchOptions(
     string ReadinessProfile = "process",
     int StartupTimeoutSeconds = 180,
     int ShutdownTimeoutSeconds = 14,
-    int LogFollowerReapTimeoutMilliseconds = 2000);
+    int LogFollowerReapTimeoutMilliseconds = 2000,
+    string? CraneDiagnosticsPath = null);
 
 public sealed record DockerWrapperLaunchOptionsAnnotation(DockerWrapperLaunchOptions Options)
     : Aspire.Hosting.ApplicationModel.IResourceAnnotation;

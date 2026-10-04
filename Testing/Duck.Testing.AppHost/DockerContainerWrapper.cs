@@ -49,6 +49,9 @@ public static class DockerContainerWrapper
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(stopChildProcessAsync);
         ArgumentNullException.ThrowIfNull(diagnosticWriter);
+        var secondaryDiagnosticWriter = diagnosticWriter;
+        diagnosticWriter = line => CraneProbeDiagnostics.WriteRecord(
+            options.CraneDiagnosticsPath, line, secondaryDiagnosticWriter);
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(shutdownToken);
         ConsoleCancelEventHandler cancelHandler = (_, eventArgs) =>
         {
@@ -138,9 +141,9 @@ public static class DockerContainerWrapper
         }
         finally
         {
-            if (!cancellation.IsCancellationRequested && craneProbeDiagnostics is { AttemptCount: > 0 })
+            if (craneProbeDiagnostics is not null)
             {
-                TryWriteCraneDiagnostic(diagnosticWriter, craneProbeDiagnostics.CreateFinalSummary());
+                TryWriteCraneDiagnostic(diagnosticWriter, craneProbeDiagnostics.CreateFinalSummary(cancellation.IsCancellationRequested));
             }
 
             var shutdownTimer = Stopwatch.StartNew();
@@ -395,6 +398,8 @@ public static class DockerContainerWrapper
                 return visionReadiness?.IsReady == true;
             case "crane":
             {
+                TryWriteCraneDiagnostic(diagnosticWriter,
+                    CraneProbeDiagnostics.SerializeAttemptStarted((craneProbeDiagnostics?.AttemptCount ?? 0) + 1));
                 var probeTimer = Stopwatch.StartNew();
                 var graph = await RunDockerAsync(
                     options.DockerExecutable,
