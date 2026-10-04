@@ -290,6 +290,7 @@ public sealed class DockerContainerWrapperLifecycleTests
     [Fact]
     public void CraneProbeSanitizerMatchesSharedPythonFixturesBeforeApplyingExcerptLimit()
     {
+        Assert.Equal("password=[REDACTED]\n", CraneProbeDiagnostics.Sanitize("password=CRANE_DIAGNOSTIC_SENTINEL\n"));
         var fixturePath = Path.Combine(AppContext.BaseDirectory, "crane_probe_sanitizer_fixtures.json");
         using var fixtures = System.Text.Json.JsonDocument.Parse(File.ReadAllText(fixturePath));
         foreach (var fixture in fixtures.RootElement.EnumerateArray())
@@ -369,7 +370,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Equal("duck_crane_probe_progress", first.RootElement.GetProperty("event_name").GetString());
         Assert.Equal(1, first.RootElement.GetProperty("attempt").GetInt32());
         Assert.Equal("setup_timeout", first.RootElement.GetProperty("Outcome").GetProperty("Classification").GetString());
-        Assert.Equal("password=[REDACTED]", first.RootElement.GetProperty("Outcome").GetProperty("StandardErrorExcerpt").GetString());
+        Assert.Equal("password=[REDACTED]\n", first.RootElement.GetProperty("Outcome").GetProperty("StandardErrorExcerpt").GetString());
         Assert.Contains(diagnostics, line => line.Contains("\"attempt\":3", StringComparison.Ordinal));
     }
 
