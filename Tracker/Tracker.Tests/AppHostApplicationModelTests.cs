@@ -1,12 +1,30 @@
 ﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Duck.Testing.AppHost;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tracker.Tests;
 
 public sealed class AppHostApplicationModelTests
 {
+    [Fact]
+    public void StackOwnershipLeaseRejectsSecondOwnerAndAllowsReuseWithExistingMarker()
+    {
+        var lockPath = Path.Combine(Path.GetTempPath(), $"duck-aspire-stack-{Guid.NewGuid():N}.lock");
+        File.WriteAllText(lockPath, "stale-owner=previous-run");
+
+        using (StackOwnershipLease.Acquire(lockPath))
+        {
+            var exception = Assert.Throws<InvalidOperationException>(
+                () => StackOwnershipLease.Acquire(lockPath));
+
+            Assert.Contains("already owns", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        using var nextOwner = StackOwnershipLease.Acquire(lockPath);
+    }
+
     [Fact]
     public async Task BaseModelContainsDuckRuntimeHostProject()
     {
