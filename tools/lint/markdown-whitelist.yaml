@@ -8,6 +8,18 @@ entries:
     description: 語彙抽出と形態素検査を実行する処理系名。
   - term: JavaScript
     description: 従来の許可一覧検査で使っている処理系名。
+  - term: ROS
+    description: ロボット制御に用いる名称。
+  - term: AppHost
+    description: 実行資源の起動を管理する名称。
+  - term: Crane
+    description: ロボット制御の正式名称。
+  - term: Game Controller
+    description: 審判情報を送信する機能の名称。
+  - term: Windows
+    description: 計算機の実行環境を示す名称。
+  - term: シミュレータ
+    description: 仮想上の動作を計算する実行資源。
   - term: Markdown
     description: 文書構造と記法を持つ軽量記述形式名。
   - term: リンク

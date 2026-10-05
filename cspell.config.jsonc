@@ -4,6 +4,12 @@
   "language": "en,ja",
   "useGitignore": false,
   "globRoot": ".",
+  "words": [
+    "ROS",
+    "AppHost",
+    "Crane",
+    "Windows"
+  ],
   "files": [
     "**/*.md"
   ],
