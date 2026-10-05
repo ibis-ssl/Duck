@@ -18,5 +18,21 @@
   {
     "input": "api_token=UNQUOTED_SENTINEL",
     "expected": "api_token=[REDACTED]"
+  },
+  {
+    "input": "password=\"first\nMULTILINE_QUOTED_SENTINEL\"",
+    "expected": "password=\"[REDACTED]\""
+  },
+  {
+    "input": "password=\"first\\\nBACKSLASH_NEWLINE_SENTINEL\"",
+    "expected": "password=\"[REDACTED]\""
+  },
+  {
+    "input": "password=\"escaped\\\"QUOTE_SENTINEL\"",
+    "expected": "password=\"[REDACTED]\""
+  },
+  {
+    "input": "password='first''quoted\nSINGLE_QUOTE_SENTINEL'",
+    "expected": "password='[REDACTED]'"
   }
 ]
