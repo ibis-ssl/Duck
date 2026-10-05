@@ -18,8 +18,6 @@ entries:
     description: 審判情報を送信する機能の名称。
   - term: Windows
     description: 計算機の実行環境を示す名称。
-  - term: シミュレータ
-    description: 仮想上の動作を計算する実行資源。
   - term: Markdown
     description: 文書構造と記法を持つ軽量記述形式名。
   - term: リンク
