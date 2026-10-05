@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 18009)
-Total output lines: 519
-
 # Aspire シミュレーション試験環境 設計
 
 ## 目的
