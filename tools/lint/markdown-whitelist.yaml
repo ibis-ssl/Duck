@@ -18,6 +18,86 @@ entries:
     description: 審判情報を送信する機能の名称。
   - term: Windows
     description: 計算機の実行環境を示す名称。
+  - term: Aspire
+    description: 複数の処理をまとめて起動し、状態を管理する製品名。
+  - term: GitHub
+    description: 開発成果を保存し、共有する場の名称。
+  - term: GitHub Actions
+    description: GitHub上で処理を自動実行する機能名。
+  - term: DCP
+    description: Aspireの試験環境を起動・管理する機能の略称。
+  - term: Docker Desktop
+    description: 開発用計算機でDockerを利用するための製品名。
+  - term: Docker Engine
+    description: Docker上で処理を実行する基盤名。
+  - term: Linux
+    description: 計算機の基本動作を担う基盤名。
+  - term: macOS
+    description: 計算機を動かす基本環境の名称。
+  - term: Ubuntu
+    description: Linuxを基にした実行環境の名称。
+  - term: Kubernetes
+    description: 複数の実行環境をまとめて管理する基盤名。
+  - term: RoboCup SSL
+    description: 小型機を使うサッカー競技部門の名称。
+  - term: Sumatra
+    description: 競技用の制御プログラム名。
+  - term: ROS 2 Foxy
+    description: ROS 2の版名。
+  - term: ROS 2 Jazzy
+    description: ROS 2の版名。
+  - term: シミュレータ
+    description: 実際の機器や環境の動作を模擬するプログラム。
+  - term: シミュレーション
+    description: 実際の動作や状況を模擬して確かめる処理。
+  - term: コンテナ
+    description: Dockerなどが提供する隔離された実行環境。
+  - term: イメージ
+    description: コンテナを作成するときに使うファイルと設定のまとまり。
+  - term: ホスト
+    description: コンテナを実行する側の計算機または環境。
+  - term: ポート
+    description: 通信先のアプリケーションを識別する番号。
+  - term: インターフェース
+    description: 機器やプログラム間で情報をやり取りする接点。
+  - term: サービス
+    description: 特定の機能を提供するプログラムまたは処理。
+  - term: シェル
+    description: コマンドを解釈して実行するプログラム。
+  - term: デーモン
+    description: 利用者から見えないところで動作する常駐プログラム。
+  - term: ドライバー
+    description: 機器やプログラムを操作するための仕組み。
+  - term: アダプター
+    description: 異なる形式や接続方式の間を取り持つ仕組み。
+  - term: ハンドル
+    description: プログラムが操作対象の資源を識別するために使う値。
+  - term: ブリッジ
+    description: 異なるネットワークや通信区間を接続する仕組み。
+  - term: デバッガー
+    description: プログラムの実行状態を調べるための開発用プログラム。
+  - term: ブレークポイント
+    description: デバッガーでプログラムの実行を一時停止する位置。
+  - term: ハッシュ
+    description: 入力から計算される固定長の値。
+  - term: ダイジェスト
+    description: データを識別するために計算した要約値。
+  - term: 絶対パス
+    description: 起点からの位置を省略せずに表したファイルやディレクトリの経路。
+  - term: AI
+    description: 人工知能を表す略称。
+  - term: CPU
+    description: 計算機の命令を実行する中央処理装置の略称。
+  - term: IP
+    description: ネットワーク間でデータを届ける通信規約の略称。
+  - term: SDK
+    description: プログラムの作成に使うツール一式の略称。
+  - term: VPN
+    description: 公衆網などを介して仮想的な専用通信路を作る方式の略称。
+  - term: ビジョン
+    description: SSL-Visionの検出データを扱う機能や処理の呼称。
+  - term: リソース
+    description: Aspireが管理するプログラム、サービス、接続対象などの単位。
   - term: Markdown
     description: 文書構造と記法を持つ軽量記述形式名。
   - term: リンク
@@ -720,6 +800,8 @@ entries:
     description: 1970年1月1日00時00分00秒の協定世界時を基準とする時刻表現。実際の値の単位は本文で明記する。
   - term: 通信アドレス
     description: 通信相手や通信に使う接続先を指定する値。
+  - term: アドレス
+    description: 通信相手や接続先を指定するための情報。
   - term: 通信ポート
     description: 通信の送受信先を分ける番号。
   - term: URLクエリ
@@ -776,3 +858,5 @@ entries:
     description: 基準となるディレクトリから見たファイルやディレクトリの位置を示す表記。
   - term: コミット
     description: Git で変更内容を履歴の一単位として保存する操作、または保存された変更。
+  - term: ブランチ
+    description: Gitで履歴を分けて並行して作業する系列。
