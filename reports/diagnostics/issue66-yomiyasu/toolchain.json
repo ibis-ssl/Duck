@@ -1,0 +1,102 @@
+﻿{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-07T22:47:01.223027+00:00",
+  "os": "Windows-11-10.0.22631-SP0",
+  "shell": "C:\\WINDOWS\\system32\\cmd.exe",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "python_executable": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+  "node": "v24.20.0",
+  "dependencies": {
+    "SudachiPy": "0.6.11",
+    "SudachiDict-core": "20260428",
+    "PyYAML": "6.0.3",
+    "setuptools": "80.10.2",
+    "wheel": "0.47.0"
+  },
+  "yomiyasu": {
+    "repository": "https://github.com/nanaism/yomiyasu",
+    "version": "v1.1.0",
+    "commit": "0df47749139dfd64ad3d55e7d53d3839e5874848",
+    "placement": "artifacts/issue66/yomiyasu",
+    "activation": "この作業でSKILL.mdを読み、明示したファイルに同梱スクリプトを実行。共通設定への登録と自動更新なし。",
+    "script_audit": [
+      {
+        "path": "skills/yomiyasu/scripts/markdown_visibility.py",
+        "sha256": "83bf059078eebd005f6ad1e1ec58415a90749f2ae308bea05bf20f912b4de4cf",
+        "imports": [
+          "bisect",
+          "re",
+          "unicodedata"
+        ],
+        "manual_inspection": "標準ライブラリと同梱のmarkdown_visibilityのみ。指定ファイルの読取と標準出力。ネットワーク、外部モデル、子プロセス、対象ファイルへの書込を行わない。隣接モジュールを読むimportlib経路も確認した。"
+      },
+      {
+        "path": "skills/yomiyasu/scripts/yomiyasu_diff.py",
+        "sha256": "0ec2cc9b660b4afcbc43ce555dcbe9b8b1e8e1d90a282a538a9a9877a700d9be",
+        "imports": [
+          "bisect",
+          "collections",
+          "difflib",
+          "importlib.util",
+          "json",
+          "markdown_visibility",
+          "pathlib",
+          "re",
+          "sys",
+          "unicodedata"
+        ],
+        "manual_inspection": "標準ライブラリと同梱のmarkdown_visibilityのみ。指定ファイルの読取と標準出力。ネットワーク、外部モデル、子プロセス、対象ファイルへの書込を行わない。隣接モジュールを読むimportlib経路も確認した。"
+      },
+      {
+        "path": "skills/yomiyasu/scripts/yomiyasu_lint.py",
+        "sha256": "61f0b0b1dcfc8cc734c69fc1f4aa2546d36ed846d42e3efceea1379b389e3e21",
+        "imports": [
+          "argparse",
+          "bisect",
+          "importlib.util",
+          "json",
+          "markdown_visibility",
+          "pathlib",
+          "re",
+          "sys",
+          "typing",
+          "unicodedata"
+        ],
+        "manual_inspection": "標準ライブラリと同梱のmarkdown_visibilityのみ。指定ファイルの読取と標準出力。ネットワーク、外部モデル、子プロセス、対象ファイルへの書込を行わない。隣接モジュールを読むimportlib経路も確認した。"
+      }
+    ],
+    "licenses": [
+      {
+        "path": "LICENSE",
+        "sha256": "abc58e9ffca473c9c673aedb70af4f3c1c0994767ae1fbbfd18ec860dfbf85e8"
+      },
+      {
+        "path": "UNICODE-LICENSE.txt",
+        "sha256": "8437ba5f4e4c8ae0268c3df5cf106006f2d045ff3452eedd1f27e8eb26c5f327"
+      }
+    ],
+    "removal_executed": false,
+    "removal_reason": "監査用実体を保持。明示的な呼出しを止め、必要ならこの作業用配置のみ削除する。"
+  },
+  "shared_lint": {
+    "repository": "https://github.com/ssaattww/CodexSkill",
+    "commit": "9ebde2cecc272bf65754f36628f1072805272117",
+    "source_clean": true,
+    "link": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.agents\\skills",
+    "target": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills"
+  },
+  "setup_failure": {
+    "command": ".venv/Scripts/python.exe -m pip install -r tools/lint/requirements.txt",
+    "exit_code": 1,
+    "reason": "ChikkarPy 0.1.1 の配布物メタデータが0.0.0のためpipが拒否した。",
+    "logs": [
+      "artifacts/issue66/python-lint-deps.stdout.log",
+      "artifacts/issue66/python-lint-deps.stderr.log"
+    ],
+    "recovery": "全文許可一覧検査が実際にimportするSudachiPy 0.6.11、SudachiDict-core 20260428、PyYAML 6.0.3を作業用venvへ導入。任意の語彙抽出器は未実行。共通設定は変更していない。"
+  },
+  "preservation_probe": {
+    "first_exit_code": 1,
+    "reason": "ASCII名称の出現順まで固定した照合が、ASP.NET Coreという定義の移動を検出した。名称・数値は同じ個数、コードとURLは同じ順序という照合へ修正した。本文全体の一致確認は維持。最終照合は終了値0。"
+  }
+}
