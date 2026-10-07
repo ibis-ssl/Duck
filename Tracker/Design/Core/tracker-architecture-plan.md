@@ -1,10 +1,10 @@
-# 自動レフェリー向けトラッカー設計
+﻿# 自動レフェリー向けトラッカー設計
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 
 ## 目的
 
-`Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。
+`Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装する。本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。
 
 初期目標は次の 4 点に置く。
 
@@ -116,7 +116,7 @@ TIGERs および公式の通信形式の調査結果は次を参照する。
 
 ### tracker packet snapshot 比較ログ
 
-CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように、別系統で保存する。
+CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` を、別系統で保存する。これにより、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるようにする。
 
 DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイルの分割や追跡処理の軽量化などの保守・運用作業は、この機能仕様に含めない。
 

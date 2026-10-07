@@ -1,6 +1,6 @@
-# Tracker.DebugHost
+﻿# Tracker.DebugHost
 
-`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信する ASP.NET Core アプリケーションです。
+`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信する ASP.NET Core アプリケーションです。ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信します。
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 
