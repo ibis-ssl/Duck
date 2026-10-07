@@ -1,0 +1,73 @@
+﻿{
+  "schema_version": 1,
+  "issue": "https://github.com/ibis-ssl/Duck/issues/66",
+  "baseline_head": "449296725fc69dc004818ede2e8ad59a52ef2d27",
+  "fixed_at_utc": "2026-10-07T22:14:08Z",
+  "limit_per_document": 10,
+  "limit_total": 20,
+  "yomiyasu_commit": "0df47749139dfd64ad3d55e7d53d3839e5874848",
+  "documents": [
+    {
+      "key": "architecture",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_sha256": "3b8627f554add31662cb479c5f102f7a9f806fa2ae6f57882ca0c9af720337ae",
+      "paragraphs": [
+        {
+          "id": "architecture-01",
+          "original_line": 7,
+          "original_text": "`Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。",
+          "sha256_utf8": "63d291c008df9b501576543a0c7ce7b9a18241dc83d2d79c431f3aad1e2227dd"
+        },
+        {
+          "id": "architecture-02",
+          "original_line": 119,
+          "original_text": "CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように、別系統で保存する。",
+          "sha256_utf8": "4c0d6d38a08926560c865dcd427e4b73ee156ce4e34611a4d36a6aa8da5bf3d7"
+        },
+        {
+          "id": "architecture-03",
+          "original_line": 133,
+          "original_text": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）で、保存済み記録から元のバイト列を復元または再デコードできるようにする。",
+          "sha256_utf8": "6a29c4c3de8182a71b3f5ad98387c8da0fe9e74836e4269fc8dc9aafd57c7f11"
+        },
+        {
+          "id": "architecture-04",
+          "original_line": 162,
+          "original_text": "公式の通信形式だけでは自動レフェリーに必要な情報が不足するため、`Tracker.Core` はより豊かな内部の追跡フレームを持つ。",
+          "sha256_utf8": "558a9d9b70bf3fe5dea6a176b3e69fa7e43d46b5da8df64064c7e0046742aba5"
+        }
+      ]
+    },
+    {
+      "key": "debughost",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_sha256": "2ad27bdd55c000dc2c34b9d1b940b80350264e7a7f3f3bdf331aadeab980b2cb",
+      "paragraphs": [
+        {
+          "id": "debughost-01",
+          "original_line": 3,
+          "original_text": "`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信する ASP.NET Core アプリケーションです。",
+          "sha256_utf8": "fbe2672b666d022d80b227f3aafca7116b77b0105eda0ca4faa2c7daeb21cbdf"
+        },
+        {
+          "id": "debughost-02",
+          "original_line": 73,
+          "original_text": "`Publish OK` / `Publish Fail` は現在実装の内部カウンタです。`PublishUdp=false` のときも追跡フレームの処理自体は成功扱いになり、`Publish OK` が増えることがあります。実送信の有無は `Tracker:PublishUdp` と送信先設定を合わせて判断してください。",
+          "sha256_utf8": "382e47d006e2f8b4887c5007fa9123ab92ecd624c0195840cd17714510393231"
+        },
+        {
+          "id": "debughost-03",
+          "original_line": 100,
+          "original_text": "設定プロファイルの切り替えは HTTP API からも要求できます。既定の起動設定では `UseHttpsRedirection()` が有効なため、通常は HTTPS の接続先を使ってください。",
+          "sha256_utf8": "efb7810d45e8478a87683cde075d214b21a20111027a34fd18fab6be109773e4"
+        },
+        {
+          "id": "debughost-04",
+          "original_line": 128,
+          "original_text": "SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。",
+          "sha256_utf8": "fc29459c74ad72b100b721d1b7866ba840aaf7f87a11ac468026a3a3c046eeb1"
+        }
+      ]
+    }
+  ]
+}
