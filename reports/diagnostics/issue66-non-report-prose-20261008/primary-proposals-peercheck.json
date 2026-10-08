@@ -1,0 +1,127 @@
+﻿{
+  "scope": "編集前の実装補助点検。通常レビュー・独立レビュー・受入判定ではない。原本・元提案・PCは変更していない。",
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "input_path": "/workspace/scratch/158688634caf/duck-prose-expansion/primary-proposals.json",
+  "input_sha256": "2b43bd223754a997e0dbd534d2406e95f30b96ea1baa87c1ce011d4671f7f2a6",
+  "checked_ids": [
+    "PRIMARY-CAPTURE-01",
+    "PRIMARY-RUNTIME-01",
+    "PRIMARY-RUNTIME-02",
+    "PRIMARY-RUNTIME-03",
+    "PRIMARY-DEBUG-01",
+    "PRIMARY-DEBUG-02",
+    "PRIMARY-DEBUG-03",
+    "PRIMARY-DEBUG-04",
+    "PRIMARY-DEBUG-05",
+    "PRIMARY-DEBUG-06",
+    "PRIMARY-DEBUG-07",
+    "PRIMARY-DEBUG-08"
+  ],
+  "accepted_ids": [
+    "PRIMARY-CAPTURE-01",
+    "PRIMARY-RUNTIME-01",
+    "PRIMARY-RUNTIME-02",
+    "PRIMARY-DEBUG-01",
+    "PRIMARY-DEBUG-02",
+    "PRIMARY-DEBUG-04",
+    "PRIMARY-DEBUG-05",
+    "PRIMARY-DEBUG-07",
+    "PRIMARY-DEBUG-08"
+  ],
+  "adjustments": [
+    {
+      "id": "PRIMARY-RUNTIME-03",
+      "reason": "原文は同一プロセスで動かす対象を「トラッカーの実時間処理と将来の AutoRef mode」と定義している。案では「トラッカーと将来の AutoRef mode」となり、「実時間処理」が脱落している。本文の命名にも同じ限定があるため、この語を戻す。",
+      "suggested_replacement": "[^tracker-runtime-host]: Tracker.RuntimeHost: 実運用を想定した、画面を持たない実行体。トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす。",
+      "source_context": [
+        {
+          "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+          "line_start": 9,
+          "line_end": 12,
+          "text": "## 命名\n\n- `Tracker.RuntimeHost`: トラッカーの実時間処理[^tracker-operation]と将来の AutoRef mode を同一プロセスで実行する、実運用向けの実行体。\n- `Tracker.DebugHost`: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision viewer[^raw-vision-viewer]、診断、キャプチャーと再生、比較表示を担当する。"
+        },
+        {
+          "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+          "line_start": 143,
+          "line_end": 146,
+          "text": "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。\n[^autoref-mode]: AutoRef mode: レフェリープログラム相当の判定処理をトラッカーと同一プロセスで動かす将来のモード。今回の実装対象ではない。\n[^same-process]: 同一プロセス: トラッカーと将来の AutoRef の判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。\n[^headless-host]: 画面を持たない実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。"
+        }
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "reason": "原文の「状態と記録 / 省略 / エラー件数」は、先頭に並ぶ3種類の補助ファイルを受ける。案では最初の2種類を名前だけの別項目にしたため、状態・件数が alignment sidecar だけに掛かる構造になっている。手動検証の手順3・7にも各補助ファイルの状態・件数を確認・記録することが明記されている。先頭3種類と共通の修飾を1つの小項目にまとめて保持する。",
+      "suggested_replacement": "- 表示領域には次の情報が表示されます。\n  - diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数\n  - 選択中の replay timeline の位置番号 / 時刻\n  - diagnostics sample tick の番号\n  - 比較状態\n  - 対応規則\n  - source role / source label\n  - source key / 送信元の通信アドレスと通信ポート\n  - スナップショット側の追跡フレームの番号\n  - 自前 / 対応付け済みスナップショットの時刻と時刻差\n  - ボール / ロボット\n  - 受信データの元のバイト列を復元できるか",
+      "source_context": [
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 94,
+          "line_end": 96,
+          "text": "- 新規キャプチャーの replay timeline は `diagnostics-samples.jsonl` の採取時系列を使います。`Tracker Comparison` は tracker packet snapshot と alignment sidecar を外部トラッカーの比較用に索引化し、選択中の diagnostics sample tick に対応する tracker snapshot を参照します。再生位置や再生時点を変更しても外部トラッカーの補助ファイルを全件再読込せず、100MB を超える補助ファイルでも再生位置の変更ごとの I/O と解析量がファイルサイズに比例しない構成を維持します。\n- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。\n- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。"
+        },
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 244,
+          "line_end": 244,
+          "text": "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`diagnostics-samples.jsonl`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では各ファイルの相対パスと、`DiagnosticsSampleLog` / `TrackerSnapshotLog` / `TrackerSnapshotAlignmentLog` の `IsCreated`、`RecordCount`、`SkippedRecordCount`、`ErrorCount` を確認します。"
+        },
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 248,
+          "line_end": 248,
+          "text": "7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。"
+        }
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "reason": "案の最後の小項目に「を残します。UI の Restored / Missing の意味も従来どおり記録します。」が残り、その後の段落にも同じUIの記録文が重複している。最後の小項目は復元可否だけにし、UIの記録文を手順7の本文として1回だけ残す。列挙した15項目、単位ns、元の順序は保持する。",
+      "suggested_replacement": "7. 報告書には次の情報を残します。\n   - 選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号\n   - `Play` の表示更新で到達した選択時刻\n   - `Field` の表示モード\n   - `Layer A` / `Layer B` の `Field source` と表示 / 非表示\n   - 表示元の絞り込み\n   - diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数\n   - 比較対象の状態\n   - source role / source label\n   - source key / 送信元の通信アドレスと通信ポート\n   - 集約時の選択規則\n   - スナップショット側の追跡フレームの番号\n   - 自前側 / 対応付け側の時刻（ns）\n   - 時刻差（ns）\n   - ボール / ロボット\n   - 受信データの元のバイト列を復元できるか\n\n   UI の `Restored` / `Missing` の意味も従来どおり記録します。",
+      "source_context": [
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 246,
+          "line_end": 249,
+          "text": "5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。\n6. `Tracker Comparison` 表示領域では、新規キャプチャーで diagnostics sample sidecar を読み取れる場合に `Vision Input` / `ibis tracker` の Field source が利用できることを確認します。外部トラッカーの比較では tracker packet snapshot / alignment sidecar を読み、条件を満たす場合に `Status` が `Ready` になることを確認します。\n7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。\n8. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`saved-session-alignment` の比較概要をエージェント / 検証 / 回帰用の検証記録として残します。CLI の検証記録は UI の検証記録の補助であり、通常確認の主経路ではありません。"
+        }
+      ]
+    }
+  ],
+  "accepted_notes": {
+    "PRIMARY-CAPTURE-01": "通常の目視確認とCLIによる再現の役割を保った文分割。対象と用途の追加・削除なし。",
+    "PRIMARY-RUNTIME-01": "実運用向けという位置付けは原文の目的と命名にあり、画面を持たない実行体という脚注定義も維持されている。将来のAutoRef mode、同一プロセス、低遅延、UI等の分離、実時間処理への影響抑制を保持する。",
+    "PRIMARY-RUNTIME-02": "未処理という条件をカメラごとの最新パケットに掛けており、受信時刻順、カメラごとの保持、同じカメラの最新のみ保持、異なるカメラの入力の非上書き、設定値の限定を保持する。",
+    "PRIMARY-DEBUG-01": "原文の「右側の表示領域で次を確認できます」に続く6項目だけをその子にしている。直前の追跡フレーム描画と、直後の未確定時の表示やカウンタの注意は取り込まない。",
+    "PRIMARY-DEBUG-02": "全ての元の文と順序を保持し、兄弟項目へ分割する。毎秒30回、早送り倍率選択中のPlay、64x超の非制限、再生時点を間引かない条件を保持する。",
+    "PRIMARY-DEBUG-04": "session folderを作成し、その中に共通のファイル名部分を使うファイルを作成する関係を保持する。直後のファイル名例とも対応する。",
+    "PRIMARY-DEBUG-05": "手書きのcapture metadataを作る場合という条件から段落を分けている。通常経路、現在設定を使う限定、相対パス基準、列挙項目と依頼の強さを保持する。",
+    "PRIMARY-DEBUG-07": "同じ表セルの第1文で上書きする設定群と定義済み。第2文の送信設定／トラッカー調整値、任意性、一時性、設定プロファイル定義を変えない条件を保持する。",
+    "PRIMARY-DEBUG-08": "形状変更により追跡状態を初期化するときという条件の下に、未処理の検出情報と、TrackedSnapshotStore内の旧形状を前提とする最新の追跡フレームが並ぶ。原文にない消去対象や別の初期化条件を追加していない。構成設計のGeometryReset時の消去と入力バッファ消去の説明にも合う。2対象の順を保ち、同時実行や逆順の保証は加えていない。"
+  },
+  "additional_context_for_debug_08": [
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "line_start": 380,
+      "line_end": 380,
+      "text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "line_start": 376,
+      "line_end": 378,
+      "text": "- `ProfileSwitched` を受け取った時点で、その処理中の要求に対応する適用済み設定のスナップショット、送信先、適用中の設定名の表示、`TrackedSnapshotStore` の現在の設定名を先に更新する。その後、`TrackedSnapshotStore` の最新の追跡フレームと受信時刻を消去する\n- 通知先への `ProfileSwitched` の通知は、上記の状態更新と処理中の要求の解放が完了した後に行う\n- `GeometryReset` を受け取った時点でも `TrackedSnapshotStore` の最新の追跡フレームと受信時刻を消去し、その消去完了後に `OnGeometryReset` を通知する"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "line_start": 466,
+      "line_end": 469,
+      "text": "- 既存追跡状態はフィールド形状更新で捨てない\n- ただしフィールドの長さ・幅やゴールの形状が設定閾値以上に変化した場合は、camera-local track、キック・接触の状態、フィールド全体の状態のスナップショットを初期化する。現行実装の `ClearPendingStateAndAdvanceLateCutoff` は、カメラごとのボール・ロボット追跡状態、ボールの接触・場外退出・統合後の識別状態、継続中のキック、直前の primary ball を消去する。また、ボール追跡 ID の採番とキック停止判定の回数を初期化する。`TrackerCoordinator` は `GeometryReset` を受けて、保存中の最新の `TrackerFrame` と受信時刻を消去する\n- フィールド形状の大幅な変更による初期化時は、未処理の入力バッファも同時に消去し、旧形状に属する未確定の検出情報を次の追跡フレームへ持ち越さない\n- フィールド形状の変更による初期化でも、`frame_number` と実行中のトラッカーの識別情報は維持する"
+    }
+  ],
+  "static_checks": {
+    "all_original_texts_unique": true,
+    "adjustment_inline_code_and_numbers_preserved": true,
+    "debug_06_child_items": 15,
+    "debug_06_restored_missing_sentence_count": 1
+  }
+}

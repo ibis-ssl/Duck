@@ -1,4 +1,4 @@
-# 過去の作業状況
+﻿# 過去の作業状況
 
 この文書は当時の作業と完了判断を記録した履歴である。現在の状態は[現行の作業一覧](../../tasks-status.md)を参照する。変更前の文章は[原文の保存版](../../../../reports/history/core-tasks-before-terminology.md)に保持する。検証結果・条件・対象外事項・判断根拠は、この本文にも記載する。
 
@@ -50,7 +50,7 @@ ID、表題、状態、TDD・設計・実装・レビューの記録、規模、
 
 診断ログの `trackedFrame` 3448 付近では、raw vision に青1番と青11番が同じ位置付近で重複し、青1番が別のロボットの位置にも現れていた。同じ追跡フレームにまとめる時間幅（`MergeWindowNs`）内で、後続の同一 ID 候補が既存の追跡位置に近い候補を上書きし、突然の ID 変更を位置ずれより起こりにくい事象として扱っていなかったことが原因だった。
 
-同じ ID の既存の追跡位置に近い候補を優先し、別 ID の既存の追跡位置付近への突然の ID 変更を抑制した。調整値は `RobotTracker.IdentitySwitchDistanceMm` として外部設定にした。ID が突然変わることを失敗条件とした再発防止テストは、当時の `git stash` による旧実装との比較で失敗し、修正後に成功した。
+同じ ID の既存の追跡位置に近い候補を優先し、別 ID の既存の追跡位置付近への突然の ID 変更を抑制した。調整値は `RobotTracker.IdentitySwitchDistanceMm` として外部設定にした。ID が突然変わることを失敗条件とした再発防止テストは、当時 `git stash` を使って比較した旧実装では失敗し、修正後に成功した。
 
 初回レビューの中程度の指摘は進捗文書の同期漏れであり、対応済み。r2 レビューは指摘なし。PR #8（`https://github.com/ibis-ssl/Duck/pull/8`）は `2026-05-12T00:06:33Z` に統合済み。
 
@@ -88,7 +88,7 @@ snapshot sidecar の JSONL を主記録とし、診断機能からの互換参�
 
 自分自身のパケットを保存対象から除外する前提を撤回した。受信できた `TrackerWrapperPacket` はすべて snapshot sidecar に保存し、`ibis` 自身の official tracker packet と詳細ログが重複して保存されることを許容する。
 
-自分自身・外部・不明という区分は、保存を除外するためではなく後の表示・比較で使う source role / source label などの情報として保持する。判別できない場合も保存を省略しない。
+自分自身・外部・不明という区分は、保存対象から除外するためではなく、後の表示・比較で使う source role / source label などの情報として保持する。判別できない場合も保存を省略しない。
 
 外部の tracker snapshot は、比較元のパケットのバイト列または復元可能な情報、入力元の `uuid` / `sourceName` / 送信元の通信アドレスと通信ポート、`receivedAt`、tracked frame number と tracked frame timestamp、集計情報を持つ。`Tracker.CaptureReplay`、診断画面、再生機能は session folder 内の記録から再生・比較できる設計へ変更した。設計修正と設計・実装の監査結果を下記に保持する。
 
@@ -102,7 +102,7 @@ snapshot sidecar の JSONL を主記録とし、診断機能からの互換参�
 
 全トラッカーのパケットを保持する契約を実装する。
 
-`TrackerConnectionLibAllTrackerSnapshotContractTests.cs` の契約に合わせ、`MultiTrackerManager` が自分自身のパケットを直ちに処理対象外とする分岐を廃止した。自分自身・外部・不明を保存除外条件にせず、`TrackerState` の `SourceRole` / `SourceLabel` に保持した。
+`TrackerConnectionLibAllTrackerSnapshotContractTests.cs` の契約に合わせ、`MultiTrackerManager` が自分自身のパケットを直ちに処理対象外とする分岐を廃止した。自分自身・外部・不明という区分を保存の除外条件にせず、`TrackerState` の `SourceRole` / `SourceLabel` に保持した。
 
 自分自身と外部のパケットを `uuid` / `sourceName` / 送信元の通信アドレスと通信ポートごとに観測状態と tracker snapshot として保持し、保存した状態から元の official tracker packet の内容を復元できるようにした。対象の `TrackerConnectionLibAllTrackerSnapshotContractTests` は5件、全体の `Tracker.Tests` は163件成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。
 
@@ -166,7 +166,7 @@ CaptureOn中の全トラッカーのパケットを保存する。
 
 トラッカー受信処理を起動時に登録する。
 
-先に失敗するテストを作成し、`TrackerConnectionLibReceiverHostedService` と DI 登録を追加した。役割が不明のパケットも捨てずに復元し、1件の処理で発生した例外が受信処理全体を停止させないよう `UdpTrackerReceiver` を修正した。通常の起動時に `MultiTrackerManager<TrackerPacketAdapter>`、`TrackerConnectionLibSnapshotRecorder`、`UdpTrackerReceiver` を接続し、CaptureOn 中の実際の UDP 受信から自分自身・外部・不明のパケットが session folder 内の snapshot sidecar に流れることを確認した。初回の対象テスト3件、関連38件、全体の `Tracker.Tests` 183件が成功した。
+先に失敗するテストを作成し、`TrackerConnectionLibReceiverHostedService` と DI 登録を追加した。役割が不明のパケットも捨てずに復元し、1件の処理で発生した例外が受信処理全体を停止させないよう `UdpTrackerReceiver` を修正した。通常の起動時に `MultiTrackerManager<TrackerPacketAdapter>`、`TrackerConnectionLibSnapshotRecorder`、`UdpTrackerReceiver` を接続し、CaptureOn 中に実際の UDP 受信で得た自分自身・外部・不明のパケットが session folder 内の snapshot sidecar に保存されることを確認した。初回の対象テスト3件、関連38件、全体の `Tracker.Tests` 183件が成功した。
 
 `gpt-5.5 high` の初回レビューで、公式のマルチキャスト受信が通常の処理経路で動作しない指摘が出た。`TrackerMulticastReceiverReviewFixTddTests` を追加し、マルチキャストグループへの参加、起動時の受信先の受け渡し、明示的に有効化したときだけ受信することと既定の無効状態、CaptureOff 中に書き込まないことを固定した。
 
@@ -388,7 +388,7 @@ replay timelineを最も更新頻度が高いトラッカーに合わせる。
 
 利用者の追加要望として、診断記録の件数・選択中の記録を中心にした従来の `Play` / `Fast Forward` / timeline scrubber では、高頻度トラッカーの観測が再生時点にならないことを調査した。受信時刻 `ReceivedAt` を軸とする統一された replay timeline、raw vision と render snapshot は対象時刻以前の最新状態を保持すること、既存の `tracker-snapshot-alignment.jsonl` を `SchemaVersion` が2の記録へ置き換えること、最速の入力元の周期で保存時の対応付けを記録すること、TDD の受け入れ条件を設計した。
 
-`SchemaVersion = 1` との互換性は要件とせず、`SchemaVersion = 2` の索引による性能を優先した。ログを開く時点で索引を作成し、再生位置を更新するときは索引から高速に取得する。raw vision よりトラッカーの更新が速い場合、raw vision が低い更新頻度で見えることは期待動作である。
+`SchemaVersion = 1` との互換性は要件とせず、`SchemaVersion = 2` の索引による性能を優先した。ログを開く時点で索引を作成し、再生位置を更新するときは索引から高速に取得する。raw vision よりトラッカーの更新が速い場合、raw vision の表示が低い頻度で更新されることは期待動作である。
 
 `TrackerDiagnosticsReplayTimelineIndex` を追加し、最も更新頻度が高い入力元の周期で保存時の対応付けを出力した。`/diagnostics` の `Play` / `Fast Forward` / timeline scrubber / Field source / 比較表示を、選択中の replay timeline の時点を基準とする処理へ接続した。`Fast Forward` は途中の時点を間引かず、時刻の差を倍率で割って高速化する。
 
@@ -445,7 +445,7 @@ replay timelineを最も更新頻度が高いトラッカーに合わせる。
 
 利用者の確認により `TRACKER-061` の UI を再調整した。`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側に小さなタブとして `等倍速`、`4x`、`16x`、`64x` を並べた。`等倍速` は30fps相当で実時間に追従する `Play`、各倍率は対応する倍率の `FastForward` で開始する。
 
-`FastForward` 中に `等倍速` を選ぶと `Play` へ、`Play` 中に倍率を選ぶと `FastForward` へ切り替え、表示と実際の再生モードを一致させる。`TRACKER-059` の早送り時の非間引き、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。
+`FastForward` 中に `等倍速` を選ぶと `Play` へ、`Play` 中に倍率を選ぶと `FastForward` へ切り替え、表示と実際の再生モードを一致させる。`TRACKER-059` の早送り時に時点を間引かないこと、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。
 
 対象の `DiagnosticsPlaybackStateTests` は27件、関連56件が成功し、`git diff --check` は成功。初回レビューの B1 は追加修正で解消し、`gpt-5.5 high` の r2 レビューは指摘なし。
 
@@ -461,11 +461,11 @@ replay timelineを最も更新頻度が高いトラッカーに合わせる。
 
 再生開始時の速度選択を維持し、早送り倍率を可変にする。
 
-再生ボタンを押すと選択速度が `等倍速` に戻る不具合の修正と、固定の `64x` では不足する早送り倍率の可変化を、同じ再生速度制御の作業として追加した。`Play` / `Fast Forward` / `Stop` の従来配置を維持し、速度選択を `等倍速` と可変の `早送り倍率` に変更した。再生ボタンは選択速度を尊重し、倍率を選択している場合は `FastForward` として開始する。
+再生ボタンを押すと選択速度が `等倍速` に戻る不具合の修正と、固定の `64x` では不足する早送り倍率の可変化を、同じ再生速度制御の作業として追加した。`Play` / `Fast Forward` / `Stop` の従来配置を維持し、速度選択を `等倍速` と可変の `早送り倍率` に変更した。再生ボタンを押したときも選択した速度を維持し、倍率を選択している場合は `FastForward` として開始する。
 
 可変の早送り倍率は `2x..1024x` の範囲に制限する。固定の `4x` / `16x` / `64x` に依存せず、64倍を超える倍率も UI と状態の契約で扱う。タイマー間隔や状態の正規化で64倍超を無効にせず、実効速度を上げられるようにした。`FastForward` の更新間隔には30msという固定の下限ではなく、より小さいタイマー間隔の下限を使う。
 
-`等倍速` の開始では `TRACKER-060` の実時間追従を維持し、`TRACKER-059` の早送り時の非間引き、`SchemaVersion` が2の保存済みの対応付け、timeline scrubber、Field source、任意の時点の比較を壊さない。対象の `DiagnosticsPlaybackStateTests` は44件、関連73件が成功し、`git diff --check` は成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。実画面での小さな UI の見え方は未確認であり、タイマーの分解能とともに保留事項として保持する。
+`等倍速` の開始では `TRACKER-060` の実時間追従を維持し、`TRACKER-059` の早送り時に時点を間引かないこと、`SchemaVersion` が2の保存済みの対応付け、timeline scrubber、Field source、任意の時点の比較も維持する。対象の `DiagnosticsPlaybackStateTests` は44件、関連73件が成功し、`git diff --check` は成功。`gpt-5.5 high` のレビューは完了を妨げる指摘なし。実画面での小さな UI の見え方は未確認であり、タイマーの分解能とともに保留事項として保持する。
 
 詳細レポート:
 

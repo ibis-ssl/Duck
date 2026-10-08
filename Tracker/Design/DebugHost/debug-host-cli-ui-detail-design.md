@@ -1,4 +1,4 @@
-# Tracker DebugHost / CLI / UI CaptureOn 比較ログ 詳細設計
+﻿# Tracker DebugHost / CLI / UI CaptureOn 比較ログ 詳細設計
 
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
@@ -69,7 +69,7 @@ sidecar JSONL の各記録は、後から外部トラッカーの追跡結果を
 - 元データから作れるボール・ロボット数、チーム・ロボット ID、代表位置、表示元情報の概要など、比較・一覧表示用の概要情報
 - デコード失敗、追跡フレームの欠落、時刻の欠落などを示す、処理を省略した理由やエラーの情報
 
-tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate source から参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。
+tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate source から参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、snapshot sidecar が受信パケットの主記録を、alignment sidecar が再生用の索引を担う構成に分ける。これにより、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。
 
 alignment sidecar の各記録は、CaptureOn 中の diagnostics sample tick または旧形式の診断記録と tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar 自体から復元し、alignment sidecar は主に外部トラッカーの tracker snapshot を選択時点へ対応付けるために使う。
 
@@ -113,7 +113,7 @@ ER-FORCE のように同じ source label と UUID が複数の送信元の通信
 
 CaptureOn は受信処理の起動条件ではなく、記録用の補助ファイルへの書き込み条件を制御する。Capture Off 中に受信処理がパケットを受けても、snapshot sidecar を作成・追記しない。
 
-Capture Off 中は snapshot sidecar を作成・追記しない。Capture Off から再度記録を開始するときは session folder を更新し、前の session folder の snapshot sidecar へ追記しない。
+Capture Off から再度記録を開始するときは session folder を更新し、前の session folder の snapshot sidecar へ追記しない。
 
 CaptureOn 直後、キャプチャー本体の保存先がまだ作成されていない場合は、最初の保存対象パケットが来た時点で同一の session folder を確定し、snapshot sidecar をその配下へ関連付ける。
 
@@ -147,7 +147,7 @@ tracker snapshot の比較は、timeline scrubber の操作や playback tick の
 
 `TRACKER-062` における速度選択と再生操作の対応は、次の通り固定する。`等倍速` は `DiagnosticsPlaybackMode.Play` と、`TRACKER-060` の毎秒30回相当の実時間追従に対応する。`4x` / `16x` / `64x` は `DiagnosticsPlaybackMode.FastForward` と該当倍率に対応し、`TRACKER-059` の時点を間引かない挙動を維持する。この段階では、再生ボタンを押すと `等倍速` を選択して再生を開始する。早送りボタンは選択中の早送り倍率で開始し、現在の選択が `等倍速` の場合は既定の早送り倍率へ切り替えて開始する。
 
-動作中のモードは、対応する再生・早送りの操作部が停止ボタンへ入れ替わるか、同じ位置の停止ボタンで止める構成とし、速度タブ自体を停止操作に変えない。停止、末尾到達時の先頭戻り、モード切り替え、速度切り替えでは、古い更新要求を破棄する保護を通常再生・早送りの両方で維持する。旧モードまたは旧倍率で待機していた更新要求が選択位置を進めないことを契約にする。保存済みの第2版の対応付け、timeline scrubber、Field source selector、`Tracker Comparison` 領域、`Tracker.CaptureReplay` による任意時点の比較経路は変更しない。
+モードの動作中は、対応する再生・早送りの操作部を停止ボタンへ入れ替えるか、同じ位置の停止ボタンで止められる構成とする。速度タブ自体を停止操作に変えない。停止、末尾到達時の先頭戻り、モード切り替え、速度切り替えでは、古い更新要求を破棄する保護を通常再生・早送りの両方で維持する。旧モードまたは旧倍率で待機していた更新要求が選択位置を進めないことを契約にする。保存済みの第2版の対応付け、timeline scrubber、Field source selector、`Tracker Comparison` 領域、`Tracker.CaptureReplay` による任意時点の比較経路は変更しない。
 
 `TRACKER-063` では、上記の `TRACKER-062` のボタン配置を維持したまま、再生ボタンの意味を「現在選択中の速度で再生開始」に補正する。選択中の速度が `等倍速` なら `DiagnosticsPlaybackMode.Play`、早送り倍率なら再生ボタンでも `DiagnosticsPlaybackMode.FastForward` とその倍率で開始する。これにより、早送り速度の選択中に再生ボタンを押しても、選択速度を `等倍速` へ戻さない。
 
@@ -168,7 +168,7 @@ tracker snapshot の比較は、timeline scrubber の操作や playback tick の
 
 保存時の alignment sidecar は、外部トラッカーを含む tracker source snapshot を diagnostics sample tick などの診断側の選択時点へ対応付ける補助索引として使う。高頻度な外部トラッカーの各 tracker snapshot は失わず保存するが、新規記録の replay timeline の選択軸は diagnostics sample sidecar とし、`Vision Input` / `ibis tracker` を render snapshot から復元するためには使わない。
 
-保存形式は既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持し、第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルは、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利なため作らない。互換性は `TRACKER-059` の非要件とし、第1版の読み取りによる代用、省略可能な項目による代用、旧位置引数のコンストラクターを維持するための分岐は入れない。
+既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持したまま、保存形式を第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルを作ると、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利になるため、作らない。互換性は `TRACKER-059` の非要件とし、第1版の読み取りによる代用、省略可能な項目による代用、旧位置引数のコンストラクターを維持するための分岐は入れない。
 
 第2版の記録は、`replayTimelineIndex`、`replayTimelineReceivedAt`、`replayTimelineKind`、`diagnosticsLineNumber?`、`renderFrameNumber?`、`renderReceivedAt?`、`renderMatchRule`、`sourceKey`、`sourceRole`、`sourceLabel`、`remoteEndpoint`、`trackerSnapshotRecordIndex?`、`trackerSnapshotReceivedAt?`、`receivedAtDeltaTicks`、`status` を明示的な項目として持つ。読み取り処理はログを開くときに第2版の JSONL を 1 回だけ読み、再生時点の配列、表示元識別子の索引、基準時点以前の最新描画を探す索引、トラッカーの表示元の索引を構築する。
 
@@ -186,7 +186,16 @@ tracker snapshot の比較は、timeline scrubber の操作や playback tick の
 
 外部トラッカーのパケットはスナップショットとして保持する。新規記録の `/diagnostics` は diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の読み取り元にし、tracker packet snapshot と alignment sidecar を外部トラッカーの比較・フィールド表示元に使う。`Tracker.CaptureReplay` は保存済みの tracker packet snapshot と alignment sidecar を用いた外部トラッカー比較を継続し、旧 render snapshot だけに依存する経路を新規記録の正常系にはしない。
 
-capture metadata がない、`DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない、diagnostics sample sidecar が未作成・欠落・空・破損している、tracker snapshot / alignment sidecar の情報やファイルがない、記録件数0、読み取りエラーは、それぞれ UI 上の状態として区別する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。
+UI 上では、次の状態をそれぞれ区別する。
+
+- capture metadata がない
+- `DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない
+- diagnostics sample sidecar が未作成・欠落・空・破損している
+- tracker snapshot / alignment sidecar の情報やファイルがない
+- 記録件数0
+- 読み取りエラー
+
+新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。
 
 ## 診断画面の Field source の切り替え
 
@@ -238,7 +247,7 @@ Field source の選択肢は次の通りとする。
 - `/diagnostics` の再生・早送り・位置のドラッグは diagnostics sample tick の時系列 を使い、`Vision Input` / `ibis tracker` は選択中の採取記録 から復元する。外部トラッカーだけ tracker packet snapshot / alignment sidecar または latest-before snapshot を使う。
 - 等倍速の `Play` は毎秒30回相当の表示更新で、開始時の wall-clock と開始時点の `ReceivedAt` から目標の収録時刻を計算し、その時刻以下の最新再生時点へ追従する。200 Hz の更新を持つテストデータでは、開始から 1 秒後に約 30 回分だけ進んだ逐次更新位置ではなく、wall-clock で 1 秒相当の時点へ進むことを固定する。
 - 通常再生で表示を省略した diagnostics sample tick も、timeline scrubber、Field source selector、比較から選択できることを固定する。外部トラッカーの高頻度な tracker snapshot は比較候補として保持し、再生位置を外部側の時刻へ動かさない。
-- 早送りは通常再生専用の実時間追従へ巻き込まず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。
+- 早送りには通常再生専用の実時間追従を適用せず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。
 - 再生操作は `Play` / `Fast Forward` のアイコンボタンと `Stop` ボタンの従来配置を持ち、`等倍速` / `4x` / `16x` / `64x` を巨大な操作ボタンとして描画しないことを固定する。
 - 速度選択は小さなタブ、または同等の選択部として `等倍速`、`4x`、`16x`、`64x` を並べ、数値の等倍ラベルを表示しないことを固定する。
 - `等倍速` の選択は `DiagnosticsPlaybackMode.Play` と `TRACKER-060` の毎秒30回相当の実時間追従に対応し、早送り倍率を変更しないことを、UI の状態とコンポーネントの契約で固定する。
@@ -263,17 +272,17 @@ Field source の選択肢は次の通りとする。
 
 `TRACKER-057` では、`TRACKER-056` の左右の Field source selector と `TrackerDiagnosticsFieldSourceFrame` を再利用し、選択中の診断記録に対する 2 つの表示元の重ね表示を追加する。必須ではない要望として扱うため、重ね表示専用の表示元選択を別に追加する実装や、任意個数の表示元を重ねる機能は、この PR の最小実装に含めない。
 
-重ね表示の切り替えは、フィールド表示領域の見出し行へ置く。左右の表示元選択は維持し、表示方式は、`Split` / `Overlay` を選ぶ操作部または同等の二択操作で、フィールド表示領域全体を切り替える。`Split` は現行どおり左右のフィールドを並べ、`Overlay` は同じ左右の選択結果を `Layer A` / `Layer B` として 1 枚のフィールドに重ねる。`Tracker Comparison` 領域の折りたたみ状態とは独立させ、折りたたみ中も表示方式の切り替え、左右の選択欄、重ね表示の凡例と表示・非表示操作を使えるようにする。
+重ね表示を切り替える操作部は、フィールド表示領域の見出し行へ置く。左右の表示元選択は維持し、表示方式は、`Split` / `Overlay` を選ぶ操作部または同等の二択操作で、フィールド表示領域全体を切り替える。`Split` は現行どおり左右のフィールドを並べ、`Overlay` は同じ左右の選択結果を `Layer A` / `Layer B` として 1 枚のフィールドに重ねる。`Tracker Comparison` 領域の折りたたみ状態とは独立させ、折りたたみ中も表示方式の切り替え、左右の選択欄、重ね表示の凡例と表示・非表示操作を使えるようにする。
 
 重ねる対象は追加の複数選択ではなく、現在の左右のフィールド表示の 2 つの表示元に限定する。既定は左 `Vision Input`、右が自前トラッカーの出力であるため、初期の重ね表示は両者の重ね合わせになる。`External`、`Unknown`、source label は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を使い、新規記録では保存済みの対応付け、既存記録では非対応または推定であることを明示した経路で解決する。`All` は引き続き使わない。左右が同じ表示元なら 1 層として扱い、凡例に同一の表示元であることを示す。
 
-色分けは表示層の識別用であり、黄色・青色チームの意味を置き換えない。最小仕様では、`Layer A` をシアン系の線と表示名、`Layer B` をマゼンタ系の線と表示名とし、ロボット本体の黄色・青色の塗りは維持する。ボールは層の色の円形の目印または線で区別する。重なりを読めるように、`Layer B` は破線または半透明の線を使う。凡例は重ねたフィールドの近くへ置き、各層の表示名、source role / source label、状態、対応付けの時刻差または推定比較の時刻差、記録件数または描画対象数を最小限表示する。
+色分けは表示層の識別用であり、黄色・青色チームの意味を置き換えない。最小仕様では、`Layer A` の線と表示名をシアン系、`Layer B` の線と表示名をマゼンタ系にし、ロボット本体の黄色・青色の塗りは維持する。ボールは層の色の円形の目印または線で区別する。重なりを見分けられるように、`Layer B` は破線または半透明の線を使う。凡例は重ねたフィールドの近くへ置き、各層の表示名、source role / source label、状態、対応付けの時刻差または推定比較の時刻差、記録件数または描画対象数を最小限表示する。
 
 表示・非表示は凡例内の層ごとのチェックボックスまたは切り替え操作で制御し、既定は両層とも表示とする。この状態は `Diagnostics.razor.cs` のページ状態に保持し、URLクエリ、`sessionStorage`、`localStorage`には保存しない。ログファイルの変更時は両層とも表示へ戻し、再生位置のドラッグ、再生更新、表示元変更では現在の表示・非表示を維持する。片方を非表示にしても、表示元の選択自体は変えない。
 
 描画部品は、既存の `VisionFieldCanvas` を複数表示元の入力へ拡張するのではなく、`Tracker.DebugHost` の診断用の重ね表示コンポーネントを追加する。`VisionFieldCanvas` は raw vision や単一表示元の汎用コンポーネントとして維持する。重ね表示側は `VisionFieldProjection`、`VisionFieldLines`、`VisionRenderOptions`、既存のフィールド形状 DTO を再利用する。層別のマーカーの見た目が必要な場合は、`VisionBallMarker` / `VisionRobotMarker` に任意の `class` と `stroke` の指定を最小限追加するか、重ね表示側で層のマーカーを直接描く。既存の単一表示元の表示、拡大縮小、表示位置の移動、カーソル座標の重ね表示を壊さない範囲に留める。
 
-重ね表示用の状態表現は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を直接再利用し、`Vision Input` と自前トラッカーの出力も同じ表示層へ変換できる小さな表示用の状態表現を `Diagnostics.razor.cs` または専用の生成処理で作る。トラッカーの層は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の変換処理で、ボール・黄色チームのロボット・青色チームのロボットへ変換する。render snapshot 由来の層は、既存の source detections と `TrackedVisionViewState.FromSnapshot(...)` を使う。近傍の選択、自前の比較基準時刻、比較候補なし等の状態判定は、`TrackerDiagnosticsComparisonViewStateReader.LoadFieldSourceFrame(...)` とキャッシュ済み索引を使い、重ね表示専用に補助 JSONL ファイルを再読込しない。
+重ね表示用の状態表現は `TRACKER-056` の `TrackerDiagnosticsFieldSourceFrame` を直接再利用し、`Vision Input` と自前トラッカーの出力も同じ表示層へ変換できる小さな表示用の状態表現を `Diagnostics.razor.cs` または専用の生成処理で作る。トラッカーの層では、`DiagnosticsFieldViewFactory` の変換処理を使い、`TrackerPacketSnapshotSemanticSummary` をボール・黄色チームのロボット・青色チームのロボットへ変換する。render snapshot 由来の層は、既存の source detections と `TrackedVisionViewState.FromSnapshot(...)` を使う。近傍の選択、自前の比較基準時刻、比較候補なし等の状態判定は、`TrackerDiagnosticsComparisonViewStateReader.LoadFieldSourceFrame(...)` とキャッシュ済み索引を使い、重ね表示専用に補助 JSONL ファイルを再読込しない。
 
 欠落、空、フィールド形状なし、比較候補なしの扱いは `TRACKER-056` と揃える。render snapshot geometry がない場合は、形状なしの空表示とし、トラッカーの表示元の補助ファイルだけから形状を復元しない。capture metadata なし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、描画対象なしは、層の状態として凡例へ示す。他に準備済みの層があれば、その層だけを描画する。両層とも描画不可でも領域は消さず、空のフィールドと状態を表示する。
 

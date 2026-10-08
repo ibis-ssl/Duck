@@ -1,10 +1,10 @@
-# `Tracker.Tests` 保守性改善 詳細設計
+﻿# `Tracker.Tests` 保守性改善 詳細設計
 
 ## 目的
 
 `TRACKER-035` では、既存テストの意味を変えずに巨大なテストファイルを責務別へ分割し、各テストが何を確認しているかを、日本語の XML documentation comment で明示する。
 
-この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。追跡処理、サーバー、CLI、UI の製品のソースコードの分割方針は別の詳細設計で扱う。
+この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。製品側の追跡処理、サーバー、CLI、UI のソースコードを分割する方針は、別の詳細設計で扱う。
 
 ## 現状
 
@@ -16,7 +16,7 @@
   - `TRACKER-003` 由来の時系列契約テストから、`TRACKER-031` までの回帰検証が同じクラスに追加され続けているため、変更箇所を探す負荷が高い。
 - `Tracker/Tracker.Tests/TrackerCoordinatorTests.cs`
   - 613 行、10 個の `[Fact]` と補助クラス `RecordingTrackerPacketPublisher` / `RecordingTrackerObserver` が同居している。
-  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスの責務境界がテスト本体から見えにくい。
+  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスが担う範囲をテスト本体から読み取りにくい。
 - `Tracker/Tracker.Tests/TrackerRenderSnapshotLogReaderTests.cs`
   - 291 行、読み取りのテストと gzip / JSONL 用の補助処理が同居している。
   - 巨大ではないが、render snapshot を用意する処理を他の診断ログ読み取りテストと共有できる形に分離すると、今後の追加テストが読みやすくなる。
@@ -97,7 +97,7 @@
   - `ITrackerPacketPublisher` 実装を移動する。
 - `Tracker/Tracker.Tests/Support/RecordingTrackerObserver.cs`
   - `ITrackerObserver` 実装を移動する。
-  - `TrackedSnapshotStore` 参照を使った保存状態の消去済み判定は現状のまま維持する。
+  - `TrackedSnapshotStore` を参照して、保存状態が消去済みかを判定する処理は現状のまま維持する。
 
 ### 診断・キャプチャーのテストの扱い
 
@@ -140,7 +140,7 @@ XML の `summary` 要素は次を満たす。
 
 - 複数のパケットを順に投入し、どのパケットが追跡結果の確定のきっかけになるか分かりにくい。
 - 設定プロファイルの切り替えや形状変更に伴う追跡状態の初期化のように、イベント順序と内部状態の消去の両方を同時に確認している。
-- 繰り返し処理で、観測の揺れ、可視性の減衰、secondary ball を複数回継続して観測した状態などの状態を作っている。
+- 繰り返し処理で、観測の揺れや可視性の減衰を再現したり、secondary ball を複数回継続して観測した状態を作ったりしている。
 
 ### 避けるコメント
 
@@ -180,7 +180,7 @@ XML の `summary` 要素は次を満たす。
 
 ## 検証観点
 
-`TRACKER-035` の検証は次を最低限にする。
+`TRACKER-035` の検証には、少なくとも次を含める。
 
 - 分割前後で `Tracker.Tests` のテスト数が減っていない。
 - 追跡エンジンの契約テストがすべて通る。

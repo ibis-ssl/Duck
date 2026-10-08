@@ -1,0 +1,119 @@
+﻿{
+  "head_before": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "started_at": "2026-10-08T12:22:26.363567+00:00",
+  "accepted_changes": 84,
+  "progress_changes": 2,
+  "files": [
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "before_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77",
+      "after_sha256": "9dcd4dd388b8b2bb7277cae76e861d14fd7106e6fe73c8bd4f2f58858296b415",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "before_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929",
+      "after_sha256": "3321dcb7d6366e7a1eef16ce69ba6c126c8c896d5099e9b6c57784fb18535070",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "before_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6",
+      "after_sha256": "3c3334b70614aa4c9ee116c0427eaac2520f3b014190bf177c61b225a1b3f4f4",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "before_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "after_sha256": "c635691713044d48fb95f37bffde5f7b5eedeba3cc76e0a2c2ec654813a726ff",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "before_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "after_sha256": "ae696dc4c250bd09b003565e1b69a7f228803176ee4c53583c86673eac87f829",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "before_sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "after_sha256": "534ac2a866766c3d5e0dac9be89798b237e9c0787de3fd4ff5668f97259701fb",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "before_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "after_sha256": "2a15b57772fc209f4a53cd361d099674005de5eeba9c21e68c288269fcce9927",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "before_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101",
+      "after_sha256": "abc3aa5fd163deddd4643d493ac9a55668859a90bd3ea6605cef826c3fe17146",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "before_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa",
+      "after_sha256": "642bcf1b0e3647740aef4ab71f149003b13263e104915c5aff5e094c5bd92650",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "before_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86",
+      "after_sha256": "e2a6a658b0b27c7f3b50d2687bda79875e42c494dae71dce03cfa4efa831ce4b",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "before_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a",
+      "after_sha256": "c442f43ba068fae23de74e2c9971fceb30894891025aa2ae6c5f70c4b4395475",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "before_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed",
+      "after_sha256": "5e51d3562a7b81d92cbdfee2e42583a2ed01c3fdd90e5cd0f43fb64741f3a242",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "before_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2",
+      "after_sha256": "8f29d4c1f8eefadb5d0695fad95f71f83a0e6a21c4aed4f3abb33ac1460bc21c",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_sha256": "de3993dafb1bcaefc5153806fb4ad0e42f2440c51d4b5a60ff7aa5767015b31d",
+      "after_sha256": "30678b561253fc5368d3b71b6f14d3cfd9244c5a658d60d634bf087a79c994a3",
+      "newline": "CRLF",
+      "utf8_bom": true
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "before_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559",
+      "after_sha256": "3999f505f2951dae35b690cf87aba76e1479e18afac370f3e5bea978bfe40533",
+      "newline": "CRLF",
+      "utf8_bom": true
+    }
+  ],
+  "root_decision": {
+    "status": "accepted_for_application",
+    "basis": "User requested non-report prose improvements in Duck; root reviewed all history proposals and technical changes with contextual semantic assistance. Four corrections are included. No repository writes or validation results implied."
+  },
+  "git_status": "M Tracker/Design/Archive/Core/phases-status.md\n M Tracker/Design/Archive/Core/tasks-status.md\n M Tracker/Design/Archive/DebugHost/tasks-status.md\n M Tracker/Design/Core/tracker-architecture-plan.md\n M Tracker/Design/Core/tracker-core-engine-detail-design.md\n M Tracker/Design/Core/tracker-history-000-038.md\n M Tracker/Design/Core/tracker-test-maintainability-detail-design.md\n M Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md\n M Tracker/Design/DebugHost/debug-host-maintainability-design.md\n M Tracker/Design/DebugHost/raw-vision-viewer-plan.md\n M Tracker/Design/RuntimeHost/runtime-host-plan.md\n M Tracker/Design/phases-status.md\n M Tracker/Design/tasks-status.md\n M Tracker/Tracker.CaptureReplay/README.md\n M Tracker/Tracker.DebugHost/README.md",
+  "finished_at": "2026-10-08T12:22:26.418944+00:00"
+}

@@ -1,0 +1,187 @@
+﻿[
+  {
+    "file": "README.md",
+    "before": 5,
+    "after": 5,
+    "new_findings": []
+  },
+  {
+    "file": "tools/lint/README.md",
+    "before": 4,
+    "after": 4,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "before": 1,
+    "after": 1,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "before": 32,
+    "after": 32,
+    "new_findings": [
+      {
+        "rule": "negative_parallelism",
+        "line": 91,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "自分自身・外部・不明という区分は、保存対象から除外するためではなく、後の表示・比較で使う source role / source label などの情報として保持する。判別できない場合も保存を省略しない。"
+      }
+    ]
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "before": 0,
+    "after": 0,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "before": 14,
+    "after": 14,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "before": 61,
+    "after": 61,
+    "new_findings": [
+      {
+        "rule": "excess_list",
+        "line": 1,
+        "severity": "warn",
+        "message": "箇条書きの比率（78.4%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+        "snippet": "リスト行: 702 / 全非空行: 895"
+      },
+      {
+        "rule": "negative_parallelism",
+        "line": 586,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI の概要出力には、未加工の SSL-Vision パケットを収録した際の受信周期を載せる。同じ出力に、再生で確定された自前トラッカーの追跡結果について、収録時の受信時刻、観測データの時刻、確定の契機となった入力位置も載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。"
+      }
+    ]
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "before": 7,
+    "after": 7,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "before": 0,
+    "after": 0,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "before": 3,
+    "after": 3,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "before": 18,
+    "after": 18,
+    "new_findings": [
+      {
+        "rule": "excess_list",
+        "line": 1,
+        "severity": "warn",
+        "message": "箇条書きの比率（60.8%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+        "snippet": "リスト行: 141 / 全非空行: 232"
+      }
+    ]
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "before": 8,
+    "after": 8,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "before": 14,
+    "after": 14,
+    "new_findings": [
+      {
+        "rule": "excess_list",
+        "line": 1,
+        "severity": "warn",
+        "message": "箇条書きの比率（62.3%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+        "snippet": "リスト行: 197 / 全非空行: 316"
+      },
+      {
+        "rule": "negative_parallelism",
+        "line": 264,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "- 診断ログの保存・再生処理は、トラッカーの周期処理から直接書き込まれた render snapshot を読むのではなく、DebugHost のバックグラウンド処理による独立した diagnostics sample tick で、最新の未加工入力と追跡結果のスナップショットを固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] `diagnostics-samples.jsonl` に保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定する。既定値は `100` ms とし、0 以下が指定された場合は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、通常の再生では、この採取時系列に保存した検出情報と追跡結果の概要から、`Vision Input` と `ibis tracker` の表示を復元する。"
+      }
+    ]
+  },
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "before": 1,
+    "after": 1,
+    "new_findings": [
+      {
+        "rule": "excess_list",
+        "line": 1,
+        "severity": "warn",
+        "message": "箇条書きの比率（50.0%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+        "snippet": "リスト行: 17 / 全非空行: 34"
+      }
+    ]
+  },
+  {
+    "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "before": 4,
+    "after": 4,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "before": 40,
+    "after": 41,
+    "new_findings": [
+      {
+        "rule": "excess_list",
+        "line": 1,
+        "severity": "warn",
+        "message": "箇条書きの比率（90.0%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+        "snippet": "リスト行: 269 / 全非空行: 299"
+      }
+    ]
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "before": 3,
+    "after": 3,
+    "new_findings": []
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "before": 9,
+    "after": 9,
+    "new_findings": [
+      {
+        "rule": "excess_list",
+        "line": 1,
+        "severity": "warn",
+        "message": "箇条書きの比率（58.7%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+        "snippet": "リスト行: 111 / 全非空行: 189"
+      },
+      {
+        "rule": "negative_parallelism",
+        "line": 95,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。"
+      }
+    ]
+  }
+]

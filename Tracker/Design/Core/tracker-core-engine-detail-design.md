@@ -1,10 +1,10 @@
-# `Tracker.Core` 追跡エンジンの詳細設計
+﻿# `Tracker.Core` 追跡エンジンの詳細設計
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 
 ## 目的
 
-`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンの分割境界、実行順序、挙動維持の確認観点を固定する。
+`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンを分割する箇所、実行順序、挙動が変わっていないことを確認する観点を定める。
 
 この設計は保守性改善の詳細設計であり、`TRACKER-033` ではトラッカーの追跡挙動、公開契約、通信形式での出力、設定値の意味を変更しない。
 
@@ -116,7 +116,7 @@
 
 `.` 区切りのファイル名は、フレームワークや開発ツールの慣習に限って許容する。例: `.csproj`、`.sln`、`.razor.cs`、`.razor.css`、`.g.cs`、`.Designer.cs`、`.AssemblyInfo.cs`、自動生成物やビルド出力。
 
-手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をファイルパスで読める。
+手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダ名が型名、ファイル名が責務名を表すため、名前空間と公開契約を維持したまま、各ファイルの責務をファイルパスから読み取れる。
 
 `public` / `internal` の最上位の型 1 つにつき、1 ファイルを基本にする。複数の最上位の型を同居させるのは、親子 DTO、密結合した小さな列挙型や拡張処理、同じ外部データ形式の一部で単独参照されない型の場合に限る。
 
@@ -262,7 +262,7 @@
 - `Tracker/Tracker.Core/Proto/TrackerPacketGenerator.cs`
   - `TrackerPacketGenerator`
 
-`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。
+`TrackerPacketGenerator` は現状どおり 1 ファイルのまま維持してよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。
 
 ## 日本語コメント追加基準
 
@@ -326,11 +326,11 @@
 - フィールド形状の大幅変更に伴う追跡状態の初期化で未処理の検出情報を捨てる箇所
 - primary ball の継続を、secondary ball の並べ替えより優先する箇所
 - Kalman filter の更新で予測状態と前回の位置を併用する箇所
-- ロボットの遠方外れ値を同一ロボット ID の近傍観測で落とす箇所
+- 同一ロボット ID の近傍観測に基づいて、ロボットの遠方外れ値を除外する箇所
 
 ## `TRACKER-033` 実行順序
 
-1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。
+1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上、変更してはならない挙動を確認する。
 2. `TrackerExecutionContracts.cs` から公開契約を先に分離する。`ITrackerEngine`、結果とイベント、通知先、設定プロファイルの切り替え要求の型名と名前空間を変えない。
 3. `TrackerEngine` を `partial sealed class` にして、最上位の `Update` と状態を保持する変数を `Engine/TrackerEngine/TrackerEngine.cs` に残す。
 4. 検出情報を保持するバッファと追跡結果の確定処理を分離する。ここで `CommittedFrames` と `EmittedEvents` の順序が変わらないことを、対象を絞ったテストで確認する。
@@ -361,7 +361,7 @@
 - `nextCommittedFrameNumber` は状態の消去で戻さない。
 - primary ball の継続判定を、secondary ball の並べ替えより優先する。
 - secondary ball は、可視性の降順、最後に観測できた時刻の降順、内部追跡 ID の昇順という安定した順序を維持する。
-- secondary ball の出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。
+- secondary ball の出力では、新しい観測に関する条件と、追跡の確立に必要な観測回数の条件を維持する。
 - ボールとロボットの Kalman filter の更新は予測状態を基準にし、観測値から速度を算出する際には前回の位置を使う。
 - Kalman filter の向きの軸では、位置（mm）用の共分散を流用しない。角度（rad）用の measurement noise と process noise に対応する分散と、角速度の範囲制限を使う。設定プロファイルの Kalman filter の倍率設定は、既定値との比で rad 用の基準値へ反映する。
 - ロボットの観測収集では、統合する時間範囲内でカメラ、チーム、ロボット ID が同じ候補について、既存の同一 ID の追跡位置への近さを優先する。さらに、既存の別 ID の追跡位置の近傍への突然の ID 変更候補を `RobotTracker.IdentitySwitchDistanceMm` で抑制する。ID が急に入れ替わることは小さな位置ずれより起きづらいという前提を、対応付けに反映する。
@@ -428,5 +428,5 @@ dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false
 ## 残るリスク
 
 - 非公開の補助処理の分割だけでも、`partial` 化の際に非公開の入れ子の `record` の参照順やファイル配置を誤るとコンパイルエラーになりやすい。
-- コメント追加量が多いため、実装移動とコメント追加を同時に広く行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。
+- コメント追加量が多いため、広い範囲で実装の移動とコメントの追加を同時に行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。
 - `TrackerPacketGenerator` は行数が小さいため、過剰分割すると可読性が下がる。`TRACKER-033` では移動とコメント追加を優先し、partial class の分割は必要になった場合だけ行う。
