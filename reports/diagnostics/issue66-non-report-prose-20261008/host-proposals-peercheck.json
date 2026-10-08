@@ -1,0 +1,105 @@
+﻿{
+  "role": "implementation_assistance_not_normal_or_independent_review",
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "source_proposals_sha256": "b423d81e17d2fd52d0308b148c681a15243ade45a1491970ae06504b061feb7d",
+  "checked_ids": [
+    "DH-C01",
+    "DH-C02",
+    "DH-C03",
+    "DH-C04",
+    "DH-C05",
+    "DH-C06",
+    "DH-C07",
+    "DH-C08",
+    "DH-C09",
+    "DH-C10",
+    "DH-M01",
+    "DH-M02",
+    "DH-M03",
+    "DH-R01",
+    "DH-R02",
+    "DH-R04",
+    "DH-R05",
+    "DH-R06",
+    "DH-R07",
+    "DH-R08"
+  ],
+  "accepted_ids": [
+    "DH-C02",
+    "DH-C03",
+    "DH-C04",
+    "DH-C05",
+    "DH-C06",
+    "DH-C07",
+    "DH-C08",
+    "DH-C09",
+    "DH-C10",
+    "DH-M01",
+    "DH-M02",
+    "DH-M03",
+    "DH-R01",
+    "DH-R02",
+    "DH-R04",
+    "DH-R05",
+    "DH-R06",
+    "DH-R07",
+    "DH-R08"
+  ],
+  "adjustments": [
+    {
+      "id": "DH-C01",
+      "reason": "原文は、二つのファイルを主記録と再生用索引として分ける設計上の取扱いを述べている。提案の「構成に分けられる」は分離が可能だという説明へ弱まるため、「構成に分ける」として元の文の働きを保つ。前者・後者の明示と二文への分割はそのまま採用できる。",
+      "suggested_replacement": "別ファイルにすることで、snapshot sidecar が受信パケットの主記録を、alignment sidecar が再生用の索引を担う構成に分ける。これにより、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "source_context": {
+        "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+        "excerpts": [
+          {
+            "line": 38,
+            "text": "tracker packet snapshot の主記録は、既存の `.tracker-diagnostics.log` の破壊的拡張ではなく、CaptureOn の session folder 配下の sidecar JSONL とする。異なる CaptureOn の開始時点に属するログは別フォルダへ分け、同じ階層に多数のログファイルを横並びにしない。"
+          },
+          {
+            "line": 72,
+            "text": "tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate source から参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。"
+          },
+          {
+            "line": 74,
+            "text": "alignment sidecar の各記録は、CaptureOn 中の diagnostics sample tick または旧形式の診断記録と tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar 自体から復元し、alignment sidecar は主に外部トラッカーの tracker snapshot を選択時点へ対応付けるために使う。"
+          }
+        ],
+        "reading": "保存形式節は、snapshot sidecar を主記録、alignment sidecar を再生用索引として扱い、別ファイルとする取扱いを定めている。可能性や任意の構成案を列挙する段落ではない。"
+      }
+    }
+  ],
+  "source_files": [
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    }
+  ],
+  "verification": {
+    "all_20_original_texts_unique_match_after_line_ending_normalization": true,
+    "source_hashes_match_author_manifest": true,
+    "scope": "全20案の変更前後と周辺の定義を点検した。全文に対する通常レビューまたは独立レビューの判定ではない。",
+    "checked_dimensions": [
+      "条件・例外・否定",
+      "許可・義務・推奨と確度",
+      "主体・対象・原因",
+      "時刻・数量・単位",
+      "技術用語・識別子",
+      "文の分割による適用範囲",
+      "指示語と参照先",
+      "情報の過剰な削除"
+    ],
+    "PC_operations": "none",
+    "original_and_source_proposals": "not_modified",
+    "lint_or_runtime_test": "not_run"
+  }
+}

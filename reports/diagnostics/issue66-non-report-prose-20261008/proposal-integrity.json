@@ -1,0 +1,5161 @@
+﻿{
+  "schema_version": 1,
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "status": "pass",
+  "root_selection_status": "pending_root_decision",
+  "approved_proposals": {
+    "path": "approved-proposals.json",
+    "sha256": "1d5575cbab9e577b8ba06957bc585aec124a42df59182689ec5d7668f699d136",
+    "bytes": 175703
+  },
+  "summary": {
+    "source_manifest_files": 29,
+    "source_documents": 19,
+    "candidate_proposals": 84,
+    "peercheck_adjustments_applied": 4,
+    "documents_with_candidates": 15,
+    "documents_without_changes": 4,
+    "held": 10,
+    "hard_failure_count": 0
+  },
+  "source_files": [
+    {
+      "path": "README.md",
+      "sha256": "6892b7d542d9cb032911fb8eda1cbbb09432a3130af43c7b265b00ba0f0129de",
+      "manifest_sha256": "6892b7d542d9cb032911fb8eda1cbbb09432a3130af43c7b265b00ba0f0129de",
+      "bytes": 3525,
+      "manifest_bytes": 3525,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77",
+      "manifest_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77",
+      "bytes": 5982,
+      "manifest_bytes": 5982,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929",
+      "manifest_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929",
+      "bytes": 46782,
+      "manifest_bytes": 46782,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "sha256": "43557863586e6d16cfa3641e946c40254bc0de83e32aa6db4e4d1d4a2c389617",
+      "manifest_sha256": "43557863586e6d16cfa3641e946c40254bc0de83e32aa6db4e4d1d4a2c389617",
+      "bytes": 2735,
+      "manifest_bytes": 2735,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6",
+      "manifest_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6",
+      "bytes": 23206,
+      "manifest_bytes": 23206,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "manifest_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "bytes": 84899,
+      "manifest_bytes": 84899,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "manifest_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "bytes": 25799,
+      "manifest_bytes": 25799,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "manifest_sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "bytes": 21788,
+      "manifest_bytes": 21788,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "manifest_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "bytes": 18019,
+      "manifest_bytes": 18019,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101",
+      "manifest_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101",
+      "bytes": 69728,
+      "manifest_bytes": 69728,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa",
+      "manifest_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa",
+      "bytes": 7697,
+      "manifest_bytes": 7697,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86",
+      "manifest_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86",
+      "bytes": 54071,
+      "manifest_bytes": 54071,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a",
+      "manifest_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a",
+      "bytes": 17126,
+      "manifest_bytes": 17126,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed",
+      "manifest_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed",
+      "bytes": 10355,
+      "manifest_bytes": 10355,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2",
+      "manifest_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2",
+      "bytes": 53562,
+      "manifest_bytes": 53562,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "sha256": "de3993dafb1bcaefc5153806fb4ad0e42f2440c51d4b5a60ff7aa5767015b31d",
+      "manifest_sha256": "de3993dafb1bcaefc5153806fb4ad0e42f2440c51d4b5a60ff7aa5767015b31d",
+      "bytes": 5206,
+      "manifest_bytes": 5206,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559",
+      "manifest_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559",
+      "bytes": 44657,
+      "manifest_bytes": 44657,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "feedback-points/feedback-points.md",
+      "sha256": "03e7b7cc7f0f4d7b4cd795dc2ded5e6791d68d3d435d01a655e727966e2769e9",
+      "manifest_sha256": "03e7b7cc7f0f4d7b4cd795dc2ded5e6791d68d3d435d01a655e727966e2769e9",
+      "bytes": 2010,
+      "manifest_bytes": 2010,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "tools/lint/README.md",
+      "sha256": "855786e438a49ac3f2358e85bcb76bf619755f5cceb09235db828ca3c00ea533",
+      "manifest_sha256": "855786e438a49ac3f2358e85bcb76bf619755f5cceb09235db828ca3c00ea533",
+      "bytes": 9815,
+      "manifest_bytes": 9815,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "e416b73426cc9a18d434dd61c82c661cb168fd7c2d34ac360c22de262a006e3f",
+      "manifest_sha256": "e416b73426cc9a18d434dd61c82c661cb168fd7c2d34ac360c22de262a006e3f",
+      "bytes": 1255,
+      "manifest_bytes": 1255,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "07d78c7a1fa97e8cc7d917737d7c7dcf520eb4ab062cbfeb976c5d24b1d7679c",
+      "manifest_sha256": "07d78c7a1fa97e8cc7d917737d7c7dcf520eb4ab062cbfeb976c5d24b1d7679c",
+      "bytes": 171719,
+      "manifest_bytes": 171719,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": ".textlintrc.json",
+      "sha256": "26da8b930eef202a6527676e1a781f0806d555883e3cbbe1dba72a8aba1ae158",
+      "manifest_sha256": "26da8b930eef202a6527676e1a781f0806d555883e3cbbe1dba72a8aba1ae158",
+      "bytes": 253,
+      "manifest_bytes": 253,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": ".textlintignore",
+      "sha256": "4657336426ff664e68ce5185b2a5b9b967c6d4eb3119c67ff281cc35d79c971a",
+      "manifest_sha256": "4657336426ff664e68ce5185b2a5b9b967c6d4eb3119c67ff281cc35d79c971a",
+      "bytes": 421,
+      "manifest_bytes": 421,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sha256": "19ad2fbd07bec4e78b85ba888e6bb3eec188214ef41be0fc809ab3d2c42886ed",
+      "manifest_sha256": "19ad2fbd07bec4e78b85ba888e6bb3eec188214ef41be0fc809ab3d2c42886ed",
+      "bytes": 1118,
+      "manifest_bytes": 1118,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sha256": "14ac55636a931575b5228ef3aab87ae843ddea41507cc5acbfc4a89adca51124",
+      "manifest_sha256": "14ac55636a931575b5228ef3aab87ae843ddea41507cc5acbfc4a89adca51124",
+      "bytes": 407,
+      "manifest_bytes": 407,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sha256": "901e038430caae6b46ec2c5fbc940bd994cb9af6c23e1246f725fb52d4352b1f",
+      "manifest_sha256": "901e038430caae6b46ec2c5fbc940bd994cb9af6c23e1246f725fb52d4352b1f",
+      "bytes": 34991,
+      "manifest_bytes": 34991,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "tools/lint/prh.yml",
+      "sha256": "a959f7b011c92f0deacf179bf8e783a3a2a7b9b8fde575a2b27807c39882cc10",
+      "manifest_sha256": "a959f7b011c92f0deacf179bf8e783a3a2a7b9b8fde575a2b27807c39882cc10",
+      "bytes": 23,
+      "manifest_bytes": 23,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": "tools/lint/requirements.txt",
+      "sha256": "92ad1d3ec4b98156b5b09e058bcbb68d8294000f0a4ae4c1f693a3810b447376",
+      "manifest_sha256": "92ad1d3ec4b98156b5b09e058bcbb68d8294000f0a4ae4c1f693a3810b447376",
+      "bytes": 133,
+      "manifest_bytes": 133,
+      "sha256_matches": true,
+      "size_matches": true
+    },
+    {
+      "path": ".github/workflows/dotnet-test.yml",
+      "sha256": "4468c99cd21a680a339c8b3ab1e8ae086d2d8f40653dfa372c9e35b40f3700c9",
+      "manifest_sha256": "4468c99cd21a680a339c8b3ab1e8ae086d2d8f40653dfa372c9e35b40f3700c9",
+      "bytes": 2936,
+      "manifest_bytes": 2936,
+      "sha256_matches": true,
+      "size_matches": true
+    }
+  ],
+  "source_proposal_files": [
+    {
+      "path": "core-proposals.json",
+      "sha256": "cde1fdb2d0d5c9f835eb368fb5a296599d754ac7152a199f2a7d56ef99694a74",
+      "document_count": 4,
+      "proposal_count": 31,
+      "held_count": 2
+    },
+    {
+      "path": "host-proposals.json",
+      "sha256": "b423d81e17d2fd52d0308b148c681a15243ade45a1491970ae06504b061feb7d",
+      "document_count": 3,
+      "proposal_count": 20,
+      "held_count": 5
+    },
+    {
+      "path": "primary-proposals.json",
+      "sha256": "2b43bd223754a997e0dbd534d2406e95f30b96ea1baa87c1ce011d4671f7f2a6",
+      "document_count": 6,
+      "proposal_count": 12,
+      "held_count": 0
+    },
+    {
+      "path": "history-proposals.json",
+      "sha256": "47ced0a24ac67407b82e85b026d2e7f70d943c8e8cc49a0f73a42c2b5758620a",
+      "document_count": 6,
+      "proposal_count": 21,
+      "held_count": 3
+    }
+  ],
+  "proposal_checks": [
+    {
+      "id": "CORE-ARCH-001",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        377,
+        436
+      ],
+      "original_line_start": 14,
+      "original_line_end": 14,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-002",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        1847,
+        1889
+      ],
+      "original_line_start": 68,
+      "original_line_end": 68,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-003",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        5828,
+        6391
+      ],
+      "original_line_start": 148,
+      "original_line_end": 148,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 5,
+          "after_count": 5
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-004",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        6740,
+        7246
+      ],
+      "original_line_start": 152,
+      "original_line_end": 152,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 11,
+          "after_count": 11
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 5,
+          "after_count": 5
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-005",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        14197,
+        14327
+      ],
+      "original_line_start": 374,
+      "original_line_end": 374,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-006",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        16024,
+        16076
+      ],
+      "original_line_start": 419,
+      "original_line_end": 419,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-007",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        16167,
+        16216
+      ],
+      "original_line_start": 422,
+      "original_line_end": 422,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-008",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        20403,
+        20927
+      ],
+      "original_line_start": 574,
+      "original_line_end": 574,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 6,
+          "after_count": 6
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-009",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        21337,
+        21708
+      ],
+      "original_line_start": 578,
+      "original_line_end": 578,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-010",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        22041,
+        22711
+      ],
+      "original_line_start": 582,
+      "original_line_end": 582,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-011",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        22862,
+        23277
+      ],
+      "original_line_start": 586,
+      "original_line_end": 586,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 5,
+          "after_count": 5
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-012",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        27927,
+        27973
+      ],
+      "original_line_start": 728,
+      "original_line_end": 728,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-013",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        31427,
+        31592
+      ],
+      "original_line_start": 832,
+      "original_line_end": 833,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-014",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        31653,
+        31679
+      ],
+      "original_line_start": 839,
+      "original_line_end": 839,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-015",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        33042,
+        33232
+      ],
+      "original_line_start": 888,
+      "original_line_end": 889,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-016",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        33809,
+        33844
+      ],
+      "original_line_start": 907,
+      "original_line_end": 907,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-017",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        37046,
+        37125
+      ],
+      "original_line_start": 1057,
+      "original_line_end": 1057,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ARCH-018",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        39940,
+        40009
+      ],
+      "original_line_start": 1134,
+      "original_line_end": 1134,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-001",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        94,
+        208
+      ],
+      "original_line_start": 7,
+      "original_line_end": 7,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-002",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        3509,
+        3701
+      ],
+      "original_line_start": 119,
+      "original_line_end": 119,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-003",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        8524,
+        8720
+      ],
+      "original_line_start": 265,
+      "original_line_end": 265,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-004",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        10425,
+        10459
+      ],
+      "original_line_start": 329,
+      "original_line_end": 329,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-005",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        10484,
+        10623
+      ],
+      "original_line_start": 333,
+      "original_line_end": 333,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-006",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        12861,
+        12912
+      ],
+      "original_line_start": 364,
+      "original_line_end": 364,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-ENGINE-007",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        15114,
+        15204
+      ],
+      "original_line_start": 431,
+      "original_line_end": 431,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-HISTORY-001",
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        124,
+        180
+      ],
+      "original_line_start": 5,
+      "original_line_end": 5,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-TEST-001",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        141,
+        223
+      ],
+      "original_line_start": 7,
+      "original_line_end": 7,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-TEST-002",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        707,
+        810
+      ],
+      "original_line_start": 19,
+      "original_line_end": 19,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-TEST-003",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        6998,
+        7053
+      ],
+      "original_line_start": 100,
+      "original_line_end": 100,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-TEST-004",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        8369,
+        8433
+      ],
+      "original_line_start": 143,
+      "original_line_end": 143,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "CORE-TEST-005",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        10274,
+        10301
+      ],
+      "original_line_start": 183,
+      "original_line_end": 183,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        4857,
+        4942
+      ],
+      "original_line_start": 72,
+      "original_line_end": 72,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C02",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        9069,
+        9309
+      ],
+      "original_line_start": 114,
+      "original_line_end": 116,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C03",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        13413,
+        13486
+      ],
+      "original_line_start": 150,
+      "original_line_end": 150,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C04",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        15669,
+        15810
+      ],
+      "original_line_start": 171,
+      "original_line_end": 171,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        16966,
+        17284
+      ],
+      "original_line_start": 189,
+      "original_line_end": 189,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C06",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        26466,
+        26541
+      ],
+      "original_line_start": 270,
+      "original_line_end": 270,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C07",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        26564,
+        26600
+      ],
+      "original_line_start": 270,
+      "original_line_end": 270,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C08",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        27488,
+        27606
+      ],
+      "original_line_start": 276,
+      "original_line_end": 276,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": false,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C09",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        23431,
+        23480
+      ],
+      "original_line_start": 241,
+      "original_line_end": 241,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-C10",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        25849,
+        25878
+      ],
+      "original_line_start": 266,
+      "original_line_end": 266,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-M01",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        48,
+        151
+      ],
+      "original_line_start": 5,
+      "original_line_end": 5,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-M02",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        1563,
+        1607
+      ],
+      "original_line_start": 45,
+      "original_line_end": 45,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-M03",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        3367,
+        3421
+      ],
+      "original_line_start": 101,
+      "original_line_end": 101,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R01",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        1844,
+        1867
+      ],
+      "original_line_start": 55,
+      "original_line_end": 55,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R02",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        7154,
+        7940
+      ],
+      "original_line_start": 218,
+      "original_line_end": 218,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 10,
+          "after_count": 10
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R04",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        11110,
+        11177
+      ],
+      "original_line_start": 248,
+      "original_line_end": 248,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R05",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        12582,
+        12688
+      ],
+      "original_line_start": 260,
+      "original_line_end": 260,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R06",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        12948,
+        13052
+      ],
+      "original_line_start": 262,
+      "original_line_end": 262,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R07",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        14088,
+        14129
+      ],
+      "original_line_start": 291,
+      "original_line_end": 291,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DH-R08",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        14328,
+        14398
+      ],
+      "original_line_start": 294,
+      "original_line_end": 294,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-CAPTURE-01",
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        25,
+        229
+      ],
+      "original_line_start": 3,
+      "original_line_end": 3,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-RUNTIME-01",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        90,
+        420
+      ],
+      "original_line_start": 7,
+      "original_line_end": 7,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": false,
+          "before_count": 8,
+          "after_count": 8
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-RUNTIME-02",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        5796,
+        6104
+      ],
+      "original_line_start": 112,
+      "original_line_end": 112,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-RUNTIME-03",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        7850,
+        7956
+      ],
+      "original_line_start": 143,
+      "original_line_end": 143,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-01",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        1480,
+        1667
+      ],
+      "original_line_start": 63,
+      "original_line_end": 69,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-02",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        3912,
+        4283
+      ],
+      "original_line_start": 95,
+      "original_line_end": 95,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 13,
+          "after_count": 13
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 6,
+          "after_count": 6
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        4284,
+        4603
+      ],
+      "original_line_start": 96,
+      "original_line_end": 96,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-04",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        5819,
+        5930
+      ],
+      "original_line_start": 130,
+      "original_line_end": 130,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-05",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        11335,
+        11889
+      ],
+      "original_line_start": 221,
+      "original_line_end": 221,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 12,
+          "after_count": 12
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        14826,
+        15284
+      ],
+      "original_line_start": 248,
+      "original_line_end": 248,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 7,
+          "after_count": 7
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-07",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        17938,
+        18039
+      ],
+      "original_line_start": 286,
+      "original_line_end": 286,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "PRIMARY-DEBUG-08",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        21681,
+        21777
+      ],
+      "original_line_start": 380,
+      "original_line_end": 380,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-001",
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        1477,
+        1535
+      ],
+      "original_line_start": 23,
+      "original_line_end": 23,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-002",
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        2491,
+        2578
+      ],
+      "original_line_start": 35,
+      "original_line_end": 35,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-003",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        3646,
+        3714
+      ],
+      "original_line_start": 53,
+      "original_line_end": 53,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-004",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        5534,
+        5615
+      ],
+      "original_line_start": 91,
+      "original_line_end": 91,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-005",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        6276,
+        6349
+      ],
+      "original_line_start": 105,
+      "original_line_end": 105,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-006",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        10032,
+        10237
+      ],
+      "original_line_start": 169,
+      "original_line_end": 169,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-007",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        22216,
+        22276
+      ],
+      "original_line_start": 391,
+      "original_line_end": 391,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-008",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        25586,
+        25679
+      ],
+      "original_line_start": 448,
+      "original_line_end": 448,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-009",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        26337,
+        26387
+      ],
+      "original_line_start": 464,
+      "original_line_end": 464,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-010",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        26574,
+        26710
+      ],
+      "original_line_start": 468,
+      "original_line_end": 468,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-011",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        3379,
+        3419
+      ],
+      "original_line_start": 71,
+      "original_line_end": 71,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-012",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        4511,
+        4613
+      ],
+      "original_line_start": 117,
+      "original_line_end": 117,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-013",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        5962,
+        6004
+      ],
+      "original_line_start": 158,
+      "original_line_end": 158,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-014",
+      "path": "Tracker/Design/phases-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        4482,
+        4558
+      ],
+      "original_line_start": 47,
+      "original_line_end": 47,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-015",
+      "path": "Tracker/Design/phases-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        4802,
+        4874
+      ],
+      "original_line_start": 49,
+      "original_line_end": 49,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-016",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        1815,
+        1869
+      ],
+      "original_line_start": 41,
+      "original_line_end": 41,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-017",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        3689,
+        3954
+      ],
+      "original_line_start": 59,
+      "original_line_end": 59,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 5,
+          "after_count": 5
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 10,
+          "after_count": 10
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-018",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        27363,
+        27407
+      ],
+      "original_line_start": 304,
+      "original_line_end": 304,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-019",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        27797,
+        27842
+      ],
+      "original_line_start": 312,
+      "original_line_end": 312,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-020",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        28860,
+        28946
+      ],
+      "original_line_start": 322,
+      "original_line_end": 322,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    },
+    {
+      "id": "DHP-021",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_match_count": 1,
+      "original_character_range_lf": [
+        28997,
+        29032
+      ],
+      "original_line_start": 322,
+      "original_line_end": 322,
+      "replacement_is_different": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      }
+    }
+  ],
+  "file_checks": [
+    {
+      "path": "README.md",
+      "source_sha256": "6892b7d542d9cb032911fb8eda1cbbb09432a3130af43c7b265b00ba0f0129de",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 0,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "82c4d69d29c56a61e39f642b0977a727f291b26625b02d9caf755ba1e3a26a9d",
+      "candidate_lf_utf8_sha256": "82c4d69d29c56a61e39f642b0977a727f291b26625b02d9caf755ba1e3a26a9d",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 33,
+          "after_count": 33
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 9,
+          "after_count": 9
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 6,
+          "after_count": 6
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "source_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 2,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+      "candidate_lf_utf8_sha256": "fe69469907f77393dfadece315121cdda28c37ebe7acadd20bc6ffb333eb6921",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 51,
+          "after_count": 51
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 57,
+          "after_count": 57
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 8,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+      "candidate_lf_utf8_sha256": "78f67ef9b5a110d631e4e2cbc21c360b6bc34661e64b08fb4ea14e2c925c1c42",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 478,
+          "after_count": 478
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 529,
+          "after_count": 529
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "source_sha256": "43557863586e6d16cfa3641e946c40254bc0de83e32aa6db4e4d1d4a2c389617",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 0,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+      "candidate_lf_utf8_sha256": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 14,
+          "after_count": 14
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 19,
+          "after_count": 19
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "source_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 3,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+      "candidate_lf_utf8_sha256": "ef977ca3f691dd1093e266b15790620538a5f33cfb9b830751eef4558a61ef19",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 180,
+          "after_count": 180
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 2,
+          "after_count": 2
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 282,
+          "after_count": 282
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 18,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "309f77f7c47605113ce614f8e7204430ca3940edb40320047b1d8c9708229129",
+      "candidate_lf_utf8_sha256": "d92c28a4b115a46266ece5dd118754e8e05d449ed897f2b55831b8437e26f09d",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 669,
+          "after_count": 669
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 162,
+          "after_count": 162
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 7,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+      "candidate_lf_utf8_sha256": "fc1ae777cca53f8951183bdf0ae8264f5fc0632e7033508fb5fba7896ec7e4a1",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 308,
+          "after_count": 308
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 39,
+          "after_count": 39
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 3,
+          "after_count": 3
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "source_sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 1,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+      "candidate_lf_utf8_sha256": "7601aaecccab6ad8454c3916d801f4b1ce58cc7985c4f75378f954b5f1a84974",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 235,
+          "after_count": 235
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 240,
+          "after_count": 240
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 5,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+      "candidate_lf_utf8_sha256": "2868d1365d4428b7e7041ade9d19daf5e298180dea125ac63e3036f60ab83383",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 158,
+          "after_count": 158
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 42,
+          "after_count": 42
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 10,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+      "candidate_lf_utf8_sha256": "c436bb38b6b6269efca341bc9db9fae503083b799a56502729f1490f45976cbb",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": false,
+          "before_count": 457,
+          "after_count": 457
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 175,
+          "after_count": 175
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "source_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 3,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+      "candidate_lf_utf8_sha256": "b0bc0e2df5e3cb17d81d8570c329b492d1490b0514cf21dd893a7b757b0826c1",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 60,
+          "after_count": 60
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 23,
+          "after_count": 23
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 7,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+      "candidate_lf_utf8_sha256": "54d5f0b0f92cd2bfbf9080005acae6b04d6447d4355ac33f29384a3ab84ab339",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 270,
+          "after_count": 270
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 120,
+          "after_count": 120
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 52,
+          "after_count": 52
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "source_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 3,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+      "candidate_lf_utf8_sha256": "3bf70e3326c5e5a91c57b54165b78a94b9138589d0b94371eea027d8abb016d0",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 108,
+          "after_count": 108
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": false,
+          "before_count": 22,
+          "after_count": 22
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 18,
+          "after_count": 18
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "source_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 2,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "e78fe694fc9fd042c7f93cbe1ff8cc304ec82998ca45072424b794cbcd8c7e5e",
+      "candidate_lf_utf8_sha256": "9db9635526888d767934f278b8801d42ed3c3ea3d54c6d10c1d8bc95fbd9661f",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 73,
+          "after_count": 73
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 147,
+          "after_count": 147
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 6,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "99be36c7f6b1553111739b92bbcbbb75283e800fa508552041a269f1eb0db42c",
+      "candidate_lf_utf8_sha256": "bbf22eb9d4b886b60fd81d55d3c3546b9c0f9d24d7af70abc92bdeed2491a746",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 443,
+          "after_count": 443
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 1,
+          "after_count": 1
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 644,
+          "after_count": 644
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "source_sha256": "de3993dafb1bcaefc5153806fb4ad0e42f2440c51d4b5a60ff7aa5767015b31d",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 1,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "candidate_lf_utf8_sha256": "b28deaed8dc163d4e5be1cb83ffc43ce31e19c5e2b55842a0e18d81a20e1c3c6",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 38,
+          "after_count": 38
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 8,
+          "after_count": 8
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 5,
+          "after_count": 5
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 8,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "7241e820092ed553becb6eb052ac0386d01130995ca8aa81d617475516fc9985",
+      "candidate_lf_utf8_sha256": "ec4918c822f3145fd9ce5508687db6a521c9c460b9a852951cfa3c4f6cda190f",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 415,
+          "after_count": 415
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 4,
+          "after_count": 4
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 66,
+          "after_count": 66
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 17,
+          "after_count": 17
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "feedback-points/feedback-points.md",
+      "source_sha256": "03e7b7cc7f0f4d7b4cd795dc2ded5e6791d68d3d435d01a655e727966e2769e9",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 0,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+      "candidate_lf_utf8_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 11,
+          "after_count": 11
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 28,
+          "after_count": 28
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    },
+    {
+      "path": "tools/lint/README.md",
+      "source_sha256": "855786e438a49ac3f2358e85bcb76bf619755f5cceb09235db828ca3c00ea533",
+      "source_sha256_matches_manifest": true,
+      "proposal_count": 0,
+      "ranges_non_overlapping": true,
+      "original_lf_utf8_sha256": "b22e8f9e82e6d1f3a53f634d5fab4f391c6ff831319f7a284cf4c6c95ad9f4a6",
+      "candidate_lf_utf8_sha256": "b22e8f9e82e6d1f3a53f634d5fab4f391c6ff831319f7a284cf4c6c95ad9f4a6",
+      "candidate_created_only_in_memory": true,
+      "protected": {
+        "inline_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 84,
+          "after_count": 84
+        },
+        "urls": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "footnote_ids": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 0,
+          "after_count": 0
+        },
+        "numbers": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 10,
+          "after_count": 10
+        },
+        "fenced_code": {
+          "same_values_and_counts": true,
+          "same_order": true,
+          "before_count": 10,
+          "after_count": 10
+        }
+      },
+      "headings_unchanged": true,
+      "markdown_link_targets_unchanged": true
+    }
+  ],
+  "held_checks": [
+    {
+      "id": "CORE-HOLD-001",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "source_occurrences": 1,
+      "candidate_occurrences": 1,
+      "held_text_preserved": true
+    },
+    {
+      "id": "CORE-HOLD-002",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "source_occurrences": 1,
+      "candidate_occurrences": 1,
+      "held_text_preserved": true
+    },
+    {
+      "id": "DH-H01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "verification": "location_and_reason_retained; no_exact_text_was_supplied"
+    },
+    {
+      "id": "DH-H02",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "verification": "location_and_reason_retained; no_exact_text_was_supplied"
+    },
+    {
+      "id": "DH-H03",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "verification": "location_and_reason_retained; no_exact_text_was_supplied"
+    },
+    {
+      "id": "DH-H04",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "verification": "location_and_reason_retained; no_exact_text_was_supplied"
+    },
+    {
+      "id": "DH-H05",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "verification": "location_and_reason_retained; no_exact_text_was_supplied"
+    },
+    {
+      "id": "DHH-001",
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "source_occurrences": 1,
+      "candidate_occurrences": 1,
+      "held_text_preserved": true
+    },
+    {
+      "id": "DHH-002",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "source_occurrences": 1,
+      "candidate_occurrences": 1,
+      "held_text_preserved": true
+    },
+    {
+      "id": "DHH-003",
+      "path": "Tracker/Design/tasks-status.md",
+      "source_occurrences": 1,
+      "candidate_occurrences": 1,
+      "held_text_preserved": true
+    }
+  ],
+  "intentional_structure_changes": [
+    {
+      "id": "CORE-ARCH-003",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "時刻と送信頻度の前提、再生時の選択規則、確認用に残す情報を段落で分ける。文と条件の順序は変えない。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-004",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "再生時の時刻追従・省略規則と、画面のボタン・速度タブの仕様を別段落にする。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-008",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "再生時に調整値を復元するための設定保存と、CaptureOn に属する関連ファイル・件数の保存を別段落にする。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-010",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "再生情報の復元元、画面で確認する情報と欠落表示、等倍速と任意時点選択を段落で分ける。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-011",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "新旧記録の描画元・代用禁止の規則と、フィールド操作時の画面配置の規則を別段落にする。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "kind": "list_structure",
+      "before_markers": [],
+      "after_markers": [
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-"
+      ],
+      "reason": "UIで区別する既存の状態列挙を6つの箇条書きへ分けた。各状態の区別と新規記録の優先規則を維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "状態の列挙が長い主語になっているため、UI で区別する状態を箇条書きにし、その後に新規経路の判断方針を置く。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-C08",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "kind": "inline_code_order",
+      "before": [
+        "`TrackerPacketSnapshotSemanticSummary`",
+        "`DiagnosticsFieldViewFactory`"
+      ],
+      "after": [
+        "`DiagnosticsFieldViewFactory`",
+        "`TrackerPacketSnapshotSemanticSummary`"
+      ],
+      "reason": "変換処理名を先に置き、次に変換対象を置いた語順変更。変換処理、対象、変換先の対応は維持し、実行手順を並べ替えていない。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-R02",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "表示元の識別・集約、UI に渡す参照の扱い、CaptureOn の保存物をライブ表示へ流用しない理由を、それぞれのまとまりで段落分けする。語句と文順は変えない。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-RUNTIME-01",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "kind": "footnote_ids_order",
+      "before": [
+        "tracker-runtime-host",
+        "autoref-mode",
+        "same-process",
+        "headless-host",
+        "web-ui",
+        "diagnostics-replay",
+        "capture-viewer",
+        "tracker-debug-host"
+      ],
+      "after": [
+        "tracker-runtime-host",
+        "headless-host",
+        "autoref-mode",
+        "same-process",
+        "web-ui",
+        "diagnostics-replay",
+        "capture-viewer",
+        "tracker-debug-host"
+      ],
+      "reason": "実行体の位置付けを先に述べたため、headless-host の脚注参照が autoref-mode と same-process の前へ移動した。脚注IDと参照対象は同じ。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-01",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-"
+      ],
+      "after_markers": [
+        "-",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -"
+      ],
+      "reason": "右側の表示領域で確認する6項目を、元の案内文の子項目にした。列挙の所属を明確にし、順序を維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-02",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "-"
+      ],
+      "after_markers": [
+        "-",
+        "-",
+        "-"
+      ],
+      "reason": "操作部構成、等倍速、早送りを3つの兄弟項目へ分けた。各文と順序は維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "-"
+      ],
+      "after_markers": [
+        "-",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -"
+      ],
+      "reason": "表示情報の列挙を11の子項目へ分けた。3種の補助ファイルに共通する状態・件数を一つの子項目にまとめ、修飾範囲を維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-05",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "通常の設定読込と、手書きの付随情報を作る場合の注意を段落で分ける。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "7."
+      ],
+      "after_markers": [
+        "7.",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -"
+      ],
+      "reason": "手順7で報告する15項目を子項目にした。順序とns単位を維持し、UIのRestored/Missingの説明を手順7の本文に1回残す。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "手動検証で報告する情報を小項目に分け、確認項目を読み飛ばしにくくする。",
+      "technical_execution_order_changed": false
+    }
+  ],
+  "peercheck_adjustment_ids": [
+    "DH-C01",
+    "PRIMARY-DEBUG-03",
+    "PRIMARY-DEBUG-06",
+    "PRIMARY-RUNTIME-03"
+  ],
+  "scope_limits": [
+    "字句の値・個数・参照の一致は構造検査であり、意味保持の機械的証明ではない。",
+    "行内コードと脚注の2件の順序変更は、説明の語順変更として記録し、技術的な実行順序の変更とは扱わない。",
+    "原本へ適用したファイルは作成していない。候補本文はメモリ上だけで構築した。",
+    "PC操作、元JSON/原本の書換え、git操作、lint、製品テストは実施していない。",
+    "全19文書の全文確認は各元担当者の記録を保持している。集約担当が全19文書を改めて全文レビューしたという意味ではない。"
+  ],
+  "unchanged_inputs_verified": true,
+  "unchanged_original_files_verified": true,
+  "errors": []
+}

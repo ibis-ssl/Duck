@@ -1,0 +1,441 @@
+﻿{
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "role": "implementation_assistance_not_independent_review",
+  "files": [
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "reviewed_entire_file": true,
+      "notes": "全1,172行を確認。長い再生・比較説明の話題分割、修飾と対象の対応、名詞の連続を局所的に改善する。列挙された仕様、API、識別子、数値、コード、図、引用、見出し、並び順は維持する。意味を具体化できない2箇所は held に記録し、原文を残す。その他の自然な説明や仕様箇条書きは変更不要。",
+      "original_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "proposal_count": 18
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "reviewed_entire_file": true,
+      "notes": "全432行を確認。分割方針、確認対象、参照関係の説明を局所的に改善する。公開契約、設定値、パス一覧、実行順序、コード例、コマンドは維持する。その他の説明は変更不要。",
+      "original_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "proposal_count": 7
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "reviewed_entire_file": true,
+      "notes": "全191行を確認。対象範囲、補助クラスの役割、判定処理、任意コメントの例、最低限の検証項目を読み取りやすくする。テスト名、数量、期待値、実行順序、コード例、必須/任意区分は維持する。その他の説明は変更不要。",
+      "original_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "proposal_count": 5
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "reviewed_entire_file": true,
+      "notes": "全66行を確認。冒頭の文書の位置付けに関する一文のみ改善する。作業履歴表と段階履歴表は全行変更不要。ID、依存関係、状態、完了条件、完了/予定の時制、件数、報告書パス、モデル名、調査原因はすべて維持する。",
+      "original_sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "proposal_count": 1
+    }
+  ],
+  "proposals": [
+    {
+      "id": "CORE-ARCH-001",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 将来の自動レフェリー判定はフィールド全体の状態のスナップショットとキックや接触などの通知から記述しやすい構造にする",
+      "replacement_text": "- フィールド全体の状態のスナップショットとキックや接触などの通知を使って、将来の自動レフェリー判定を記述しやすい構造にする",
+      "reason": "判定を記述するために使う情報と、構造の目的との関係が分かるよう語順を整理する。",
+      "preserved_facts": [
+        "将来の自動レフェリー判定を記述しやすくする目標",
+        "入力に使うスナップショットとキック・接触などの通知"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-002",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモ側に寄せる。",
+      "replacement_text": "この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモに記載する。",
+      "reason": "記述先を「寄せる」という比喩で表さず、どの文書に記載するかを直接書く。",
+      "preserved_facts": [
+        "設計書には要点のみを記載する",
+        "クラス名ごとの根拠と読み取り結果の記述先は調査メモ"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-003",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。新規キャプチャーの再生、診断、Field source の表示では、`diagnostics-samples.jsonl` の diagnostics sample tick を選択時点とし、`Vision Input` はその記録の未加工入力の概要、自前トラッカーは同じ記録の追跡結果の概要から復元する。外部トラッカーは、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、対応記録がなければ選択時点以前の同じ表示元の latest-before snapshot を使う。diagnostics sample sidecar がない旧形式だけは、既存の近傍時刻の選択を推定表示として使ってよい。採用した対応規則、許容する時間幅、`uuid` / `sourceName` / 送信元の通信アドレスと通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。",
+      "replacement_text": "自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。\n\n新規キャプチャーの再生、診断、Field source の表示では、`diagnostics-samples.jsonl` の diagnostics sample tick を選択時点とし、`Vision Input` はその記録の未加工入力の概要、自前トラッカーは同じ記録の追跡結果の概要から復元する。外部トラッカーは、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、対応記録がなければ選択時点以前の同じ表示元の latest-before snapshot を使う。diagnostics sample sidecar がない旧形式だけは、既存の近傍時刻の選択を推定表示として使ってよい。\n\n採用した対応規則、許容する時間幅、`uuid` / `sourceName` / 送信元の通信アドレスと通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。",
+      "reason": "時刻と送信頻度の前提、再生時の選択規則、確認用に残す情報を段落で分ける。文と条件の順序は変えない。",
+      "preserved_facts": [
+        "送信頻度は一致を前提にしない",
+        "外部の timestamp は同じ時刻系とは限らない",
+        "新規記録では diagnostics sample tick を選択時点にする",
+        "外部記録は保存済み対応付けを優先し、対応なしの場合は同じ表示元の選択時点以前の latest-before snapshot を使う",
+        "diagnostics sample sidecar がない旧形式だけ近傍時刻の推定表示を許可する",
+        "採用規則・許容時間幅・識別情報・対応状態を保存または表示する"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-004",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。",
+      "replacement_text": "等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。\n\n診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。",
+      "reason": "再生時の時刻追従・省略規則と、画面のボタン・速度タブの仕様を別段落にする。",
+      "preserved_facts": [
+        "逐次描画は保証しない",
+        "wall-clock と選択時点の ReceivedAt を基準に目標収録時刻を計算する",
+        "毎秒30回相当で ReceivedAt <= target の最新時点へ追従する",
+        "中間時点の省略は表示だけで、保存済み対応付けと比較精度を落とさない",
+        "任意の再生時点を選ぶ各経路を維持する",
+        "Play / Fast Forward / Stop の配置、等倍速・4x・16x・64x のタブ、数値の等倍ラベル不使用を維持する"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-005",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- `TrackerCoordinator` は設定プロファイルの切り替え要求の受付、`Update` の呼び出し、`TrackerUpdateResult` の処理を同じ直列化区間で扱い、1 回の `Update` の処理中に、その処理中の要求を上書きしない",
+      "replacement_text": "- `TrackerCoordinator` は設定プロファイルの切り替え要求の受付、`Update` の呼び出し、`TrackerUpdateResult` の処理を同じ直列化区間で扱い、1 回の `Update` の処理中は、その処理で扱う要求を上書きしない",
+      "reason": "「処理中」の重複を整理し、上書きを禁止する対象が当該処理で扱う要求であることを読み取りやすくする。",
+      "preserved_facts": [
+        "受付・Update 呼び出し・結果処理は同じ直列化区間",
+        "1 回の Update の処理中にその要求を上書きしない"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-006",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 最新に見えた観測時刻から `ReorderWindow` を越えた検出情報の集合を確定処理対象にする",
+      "replacement_text": "- これまでに得た最新の観測時刻から `ReorderWindow` を越えた検出情報の集合を確定処理対象にする",
+      "reason": "「最新に見えた」を、入力から得た観測時刻を指す表現に整える。時刻と時間幅の比較条件は変えない。",
+      "preserved_facts": [
+        "基準は最新の観測時刻",
+        "ReorderWindow を越えた検出情報の集合が確定処理対象"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-007",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- すでに確定処理済みの観測時刻より古い遅れて到着したパケットは診断に記録し、状態更新には使わない",
+      "replacement_text": "- 遅れて到着したパケットの観測時刻が、すでに確定処理した観測時刻より古い場合は、そのパケットを診断に記録し、状態更新には使わない",
+      "reason": "「古い」が比較する対象をパケットの観測時刻として明記し、遅延到着と時刻比較の条件を追いやすくする。",
+      "preserved_facts": [
+        "遅れて到着したパケットが対象",
+        "確定処理済みの観測時刻より古い場合の扱い",
+        "診断には記録する",
+        "状態更新には使わない"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-008",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定値を含める。CaptureOn の記録では、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、`diagnostics-samples.jsonl`、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を保持し、source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。",
+      "replacement_text": "capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定値を含める。\n\nCaptureOn の記録では、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、`diagnostics-samples.jsonl`、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を保持し、source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。",
+      "reason": "再生時に調整値を復元するための設定保存と、CaptureOn に属する関連ファイル・件数の保存を別段落にする。",
+      "preserved_facts": [
+        "プロファイル名だけでなく Profiles と上書き適用後の解決済み設定を保存する",
+        "キャプチャーと同時点の設定値を保持する",
+        "列挙された関連ファイルの相対パスを保存する",
+        "各 Log の作成状態・記録/省略/エラー件数と、識別情報・対応状態・時刻規則を保存する"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-009",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI は、未加工の SSL-Vision パケットの収録時の受信周期と、再生で確定された自前トラッカーの追跡結果の収録時の受信時刻、観測データの時刻、確定の契機となった入力位置を同じ概要出力に載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。",
+      "replacement_text": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI の概要出力には、未加工の SSL-Vision パケットを収録した際の受信周期を載せる。同じ出力に、再生で確定された自前トラッカーの追跡結果について、収録時の受信時刻、観測データの時刻、確定の契機となった入力位置も載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。",
+      "reason": "受信周期と追跡結果に関する時刻・入力位置を一続きに列挙した長い文を分け、同じ概要出力へ載せる関係を残す。",
+      "preserved_facts": [
+        "手作業でのキャプチャー読取ではなく汎用 CLI 分析出力を使う",
+        "収録時の未加工パケット受信周期と、再生で確定した追跡結果の収録時受信時刻・観測データ時刻・確定契機の入力位置を同じ概要へ出す",
+        "並べ替え猶予・統合幅・欠落・確定保留の遅延原因を報告できるようにする",
+        "特定の共通名や表示元名に依存させない",
+        "--analyze-latency のような明示オプションによる後続調査への再利用"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-010",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "診断画面と再生操作は、新規キャプチャーでは diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の主な読み取り元にする。`Vision Input` は diagnostics sample sidecar の採取記録にある未加工入力の概要、自前トラッカーは同じ diagnostics sample tick の追跡結果の概要から復元し、外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。表示元の識別情報・分類・表示名、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。capture metadata、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の欠落・空・読み取りエラーは区別して表示し、旧 render snapshot しかない記録は旧形式または機能制限付きの表示として扱う。等倍速の通常再生は表示更新を毎秒30回相当に抑えて実行環境側の経過時間へ追従する一方、replay timeline の選択、Field source、比較では任意の diagnostics sample tick を選べる経路を維持する。",
+      "replacement_text": "診断画面と再生操作は、新規キャプチャーでは diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の主な読み取り元にする。`Vision Input` は diagnostics sample sidecar の採取記録にある未加工入力の概要、自前トラッカーは同じ diagnostics sample tick の追跡結果の概要から復元し、外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。\n\n表示元の識別情報・分類・表示名、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。capture metadata、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の欠落・空・読み取りエラーは区別して表示し、旧 render snapshot しかない記録は旧形式または機能制限付きの表示として扱う。\n\n等倍速の通常再生は表示更新を毎秒30回相当に抑えて実行環境側の経過時間へ追従する一方、replay timeline の選択、Field source、比較では任意の diagnostics sample tick を選べる経路を維持する。",
+      "reason": "再生情報の復元元、画面で確認する情報と欠落表示、等倍速と任意時点選択を段落で分ける。",
+      "preserved_facts": [
+        "新規キャプチャーの主な読取元は diagnostics sample sidecar",
+        "Vision Input と自前トラッカーの復元元は同じ diagnostics sample tick",
+        "外部トラッカーの対応付けと latest-before の選択規則",
+        "識別・時刻・件数・元データ復元状態を画面で確認する",
+        "欠落・空・読み取りエラーを区別し、旧形式の制限を明示する",
+        "通常再生は毎秒30回相当とし、各選択経路では任意の diagnostics sample tick を選べる"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-011",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "`Tracker.DebugHost` の診断画面は、新規キャプチャーでは `diagnostics-samples.jsonl` に保存した同一採取時点の未加工入力と自前トラッカーの追跡結果を `Vision Input` / `ibis tracker` の描画元にする。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として残してよいが、新規記録の物体表示や replay timeline の主な入力にはしない。diagnostics sample sidecar がない旧記録は非対応または機能制限付きの旧形式として明示し、timeline scrubber の操作でも新規経路へ render snapshot を代用しない。フィールドの操作ではページ全体をスクロールさせず、フィールドの拡大縮小・表示位置の移動と画面スクロールが干渉しないレイアウトを維持する。",
+      "replacement_text": "`Tracker.DebugHost` の診断画面は、新規キャプチャーでは `diagnostics-samples.jsonl` に保存した同一採取時点の未加工入力と自前トラッカーの追跡結果を `Vision Input` / `ibis tracker` の描画元にする。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として残してよいが、新規記録の物体表示や replay timeline の主な入力にはしない。diagnostics sample sidecar がない旧記録は非対応または機能制限付きの旧形式として明示し、timeline scrubber の操作でも新規経路へ render snapshot を代用しない。\n\nフィールドの操作ではページ全体をスクロールさせず、フィールドの拡大縮小・表示位置の移動と画面スクロールが干渉しないレイアウトを維持する。",
+      "reason": "新旧記録の描画元・代用禁止の規則と、フィールド操作時の画面配置の規則を別段落にする。",
+      "preserved_facts": [
+        "新規記録の描画元は同一採取時点の未加工入力と追跡結果",
+        "旧 render snapshot は補助情報として残してよいが、新規の物体表示や時刻軸の主入力にはしない",
+        "旧形式の制限を明示し、scrubber 操作でも新規経路への代用はしない",
+        "フィールド操作でページ全体をスクロールさせず、拡大縮小・表示位置移動と画面スクロールの干渉を避ける"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-012",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "寄せる対象は「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。",
+      "replacement_text": "参考にするのは「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。",
+      "reason": "参考実装から採用する範囲を「寄せる対象」という比喩を使わずに示す。",
+      "preserved_facts": [
+        "参考とするのは考え方と責務分離",
+        "Java の構造そのものを複製することは対象ではない"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-013",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定し、TIGERs のロボットの品質判定の初期閾値 `0.05` を設定値の基準とする",
+      "replacement_text": "- 更新が途絶え、欠測により可視性が十分低下した追跡状態は、内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定し、TIGERs のロボットの品質判定の初期閾値 `0.05` を設定値の基準とする",
+      "reason": "追跡状態を修飾する「更新の途絶えた」と「欠測により可視性が十分低下した」を整理し、内部保持の許可と出力継続の禁止を追いやすくする。後続行は同一文の2出現を識別するため含め、変更しない。",
+      "preserved_facts": [
+        "更新が途絶え、欠測で可視性が十分低下した追跡状態が対象",
+        "内部状態として短時間残すことは可能",
+        "追跡フレーム・表示画面・公式形式のパケットへの出力継続は禁止",
+        "ロボットの外部出力は OutputVisibilityThreshold で判定し、0.05 を設定値の基準とする"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-014",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "ボールは ID がないため、対応付けを明示設計する。",
+      "replacement_text": "ボールには ID がないため、対応付けの方法を明示的に設計する。",
+      "reason": "「明示設計」という名詞の連結を、何を設計するか分かる表現にする。",
+      "preserved_facts": [
+        "ボールには ID がない",
+        "そのため対応付けの方法を明示的に設計する"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-015",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定可能とし、TIGERs のボールが見えなくなった場合の寿命の初期値 `1.0s` を、`TrackLifetimeNs` の基準とする",
+      "replacement_text": "- 更新が途絶え、欠測により可視性が十分低下した追跡状態は、内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定可能とし、TIGERs のボールが見えなくなった場合の寿命の初期値 `1.0s` を、`TrackLifetimeNs` の基準とする",
+      "reason": "追跡状態を修飾する「更新の途絶えた」と「欠測により可視性が十分低下した」を整理し、内部保持の許可と出力継続の禁止を追いやすくする。後続行は同一文の2出現を識別するため含め、変更しない。",
+      "preserved_facts": [
+        "更新が途絶え、欠測で可視性が十分低下した追跡状態が対象",
+        "内部状態として短時間残すことは可能",
+        "追跡フレーム・表示画面・公式形式のパケットへの出力継続は禁止",
+        "ボールの外部出力は OutputVisibilityThreshold で判定可能とし、1.0s を TrackLifetimeNs の基準とする"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-016",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 統合自体はカメラごとの状態推定の内部状態の不確かさを重みとして使う",
+      "replacement_text": "- 統合では、カメラごとの状態推定で持つ内部状態の不確かさを重みに使う",
+      "reason": "「の」が連続する箇所を整理し、統合の重みがどの状態の不確かさかを読み取りやすくする。",
+      "preserved_facts": [
+        "統合の重みはカメラごとの状態推定の内部状態の不確かさ"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-017",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` がデバッグ起動時の設定供給責務を持つ。",
+      "replacement_text": "設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` がデバッグ起動時に設定を渡す責務を持つ。",
+      "reason": "「設定供給責務」を動作として書き、設定を受け取る側と渡す側を対応付ける。",
+      "preserved_facts": [
+        "設定源は固定しない",
+        "Core が設定オブジェクトを受け取る",
+        "DebugHost がデバッグ起動時に設定を供給する責務を持つ"
+      ]
+    },
+    {
+      "id": "CORE-ARCH-018",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- `TRACKER-006`: `TrackerEngine` の順序を並べ替えるバッファと確定可能な入力を順に処理する仕組みを実装する",
+      "replacement_text": "- `TRACKER-006`: `TrackerEngine` で入力の順序を並べ替えるバッファと、確定可能な入力を順に処理する仕組みを実装する",
+      "reason": "「TrackerEngine の順序」と読める修飾を直し、本文で定義済みの入力の並べ替えを明記する。",
+      "preserved_facts": [
+        "TRACKER-006 で並べ替え用バッファを実装する",
+        "並べ替え対象は追跡エンジンへの入力",
+        "確定可能な入力を順に処理する仕組みを実装する"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-001",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンの分割境界、実行順序、挙動維持の確認観点を固定する。",
+      "replacement_text": "`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンを分割する箇所、実行順序、挙動が変わっていないことを確認する観点を定める。",
+      "reason": "分割境界と挙動維持という名詞の連結を、分割する箇所と確認する内容として書く。",
+      "preserved_facts": [
+        "TRACKER-033 の責務別分割と主要な型・プロパティ・メソッドへの日本語コメント追加が目的",
+        "分割箇所・実行順序・挙動維持の確認観点を定める"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-002",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をファイルパスで読める。",
+      "replacement_text": "手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダ名が型名、ファイル名が責務名を表すため、名前空間と公開契約を維持したまま、各ファイルの責務をファイルパスから読み取れる。",
+      "reason": "フォルダとファイルの名前が何を表すかを明記し、「責務境界を読める」を具体的な読み取り対象で表す。",
+      "preserved_facts": [
+        "手書き C# に TypeName.Responsibility.cs を使わない",
+        "partial class の責務別分割には type-owned folder と TypeName/Responsibility.cs を基本にする",
+        "名前空間と公開契約を維持する",
+        "型名と責務名をパスから読み取る構造"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-003",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。",
+      "replacement_text": "`TrackerPacketGenerator` は現状どおり 1 ファイルのまま維持してよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。",
+      "reason": "「1 ファイル維持」という名詞の連結を、現在の構成を維持してよいという許可の文にする。",
+      "preserved_facts": [
+        "現在の 1 ファイル構成を維持してよい",
+        "将来さらに肥大化した場合のみ partial class 分割を検討する",
+        "例示ファイルパスは変更しない"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-004",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "- ロボットの遠方外れ値を同一ロボット ID の近傍観測で落とす箇所",
+      "replacement_text": "- 同一ロボット ID の近傍観測に基づいて、ロボットの遠方外れ値を除外する箇所",
+      "reason": "「落とす」という比喩を除外の動作として書き、判断に使う観測と除外対象を対応付ける。",
+      "preserved_facts": [
+        "通常コメントを追加する箇所の例",
+        "同一ロボット ID の近傍観測を使う",
+        "遠方外れ値を除外する"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-005",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。",
+      "replacement_text": "1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上、変更してはならない挙動を確認する。",
+      "reason": "「挙動固定点」を、作業者が何を確認するか分かる表現にする。",
+      "preserved_facts": [
+        "作業前に指定された2設計書を読む",
+        "設計上の挙動を変えない箇所を確認する",
+        "実行順序の第1手順であること"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-006",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "- secondary ball の出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。",
+      "replacement_text": "- secondary ball の出力では、新しい観測に関する条件と、追跡の確立に必要な観測回数の条件を維持する。",
+      "reason": "維持する条件が「新しい観測」と「観測回数」の両方に掛かることを明記する。観測の新しさを有無や具体的な時間幅へ置き換えない。",
+      "preserved_facts": [
+        "secondary ball の出力条件を維持する",
+        "新しい観測に関する条件を維持する",
+        "追跡の確立に必要な観測回数の条件を維持する"
+      ]
+    },
+    {
+      "id": "CORE-ENGINE-007",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "- コメント追加量が多いため、実装移動とコメント追加を同時に広く行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。",
+      "replacement_text": "- コメント追加量が多いため、広い範囲で実装の移動とコメントの追加を同時に行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。",
+      "reason": "「同時に広く」の掛かり方を整理し、広い範囲で二つの作業を同時に行う条件を読み取りやすくする。",
+      "preserved_facts": [
+        "コメント追加量が多いことが理由",
+        "広範囲で実装移動とコメント追加を同時に行うとレビューが難しくなる",
+        "TRACKER-033 は責務単位に分割し、各単位で対象を絞ったテストを挟む"
+      ]
+    },
+    {
+      "id": "CORE-HISTORY-001",
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "original_text": "進捗管理の軽量化と履歴退避は PR 準備の保守・運用作業であり、CaptureOn 比較ログの機能仕様ではない。",
+      "replacement_text": "進捗管理ファイルを簡潔に保ち、履歴を別に保存する作業は、PR 準備の保守・運用作業であり、CaptureOn 比較ログの機能仕様ではない。",
+      "reason": "直前の説明を踏まえ、「軽量化と履歴退避」を進捗管理ファイルに対する作業として直接書く。履歴表は変更しない。",
+      "preserved_facts": [
+        "進捗管理の簡潔化と履歴の分離保存が対象",
+        "PR 準備の保守・運用作業",
+        "CaptureOn 比較ログの機能仕様ではない"
+      ]
+    },
+    {
+      "id": "CORE-TEST-001",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。追跡処理、サーバー、CLI、UI の製品のソースコードの分割方針は別の詳細設計で扱う。",
+      "replacement_text": "この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。製品側の追跡処理、サーバー、CLI、UI のソースコードを分割する方針は、別の詳細設計で扱う。",
+      "reason": "「の」が連続する製品のソースコードの説明を整理し、対象となるテストと別設計で扱う製品側を読み分けやすくする。",
+      "preserved_facts": [
+        "この設計は Tracker.Tests のテスト保守性改善に限定",
+        "追跡処理・サーバー・CLI・UI の製品ソース分割は別の詳細設計"
+      ]
+    },
+    {
+      "id": "CORE-TEST-002",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスの責務境界がテスト本体から見えにくい。",
+      "replacement_text": "  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスが担う範囲をテスト本体から読み取りにくい。",
+      "reason": "「責務境界が見えにくい」を、テストを読む際に分かりにくい内容として述べる。",
+      "preserved_facts": [
+        "列挙されたテストが同じクラスに並ぶ現状",
+        "補助クラスの責務をテスト本体から把握しにくいという問題"
+      ]
+    },
+    {
+      "id": "CORE-TEST-003",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "  - `TrackedSnapshotStore` 参照を使った保存状態の消去済み判定は現状のまま維持する。",
+      "replacement_text": "  - `TrackedSnapshotStore` を参照して、保存状態が消去済みかを判定する処理は現状のまま維持する。",
+      "reason": "参照・保存状態・消去済み判定という名詞の連続を、参照する対象と判定する内容に分けて書く。",
+      "preserved_facts": [
+        "TrackedSnapshotStore への参照を使う",
+        "保存状態が消去済みかを判定する",
+        "その処理を現状のまま維持する"
+      ]
+    },
+    {
+      "id": "CORE-TEST-004",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "- 繰り返し処理で、観測の揺れ、可視性の減衰、secondary ball を複数回継続して観測した状態などの状態を作っている。",
+      "replacement_text": "- 繰り返し処理で、観測の揺れや可視性の減衰を再現したり、secondary ball を複数回継続して観測した状態を作ったりしている。",
+      "reason": "「状態などの状態」という重複を整理し、繰り返し処理で作るテスト条件を並列に示す。",
+      "preserved_facts": [
+        "通常コメントを任意で置いてよい条件の例",
+        "繰り返し処理が対象",
+        "観測の揺れ・可視性の減衰・secondary ball の複数回の継続観測という例を維持する"
+      ]
+    },
+    {
+      "id": "CORE-TEST-005",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "`TRACKER-035` の検証は次を最低限にする。",
+      "replacement_text": "`TRACKER-035` の検証には、少なくとも次を含める。",
+      "reason": "「検証を最低限にする」と読める表現を、後続の項目が検証の下限であると分かる表現にする。",
+      "preserved_facts": [
+        "TRACKER-035 の検証に後続の全項目を最低限含める"
+      ]
+    }
+  ],
+  "held": [
+    {
+      "id": "CORE-HOLD-001",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "6. 状態推定処理で得られた直前のボール位置の近くを優先する探索半径で、主対象の候補を絞る",
+      "reason": "「近くを優先する探索半径」は読み取りにくいが、範囲制限と候補の優先順位の関係を本文だけでさらに具体化すると条件を変える可能性があるため、原文を維持する。",
+      "disposition": "preserve_original"
+    },
+    {
+      "id": "CORE-HOLD-002",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "他のトラッカーが存在しない場合でも diagnostics sample sidecar は `Vision Input` と自前トラッカーの診断再生に使え、既存のキャプチャーと診断ログの内容上の挙動を壊さない。",
+      "reason": "「内容上の挙動を壊さない」を内容不変や形式不変へ言い換えると保証範囲を限定または強化してしまうため、原文を維持する。",
+      "disposition": "preserve_original"
+    }
+  ],
+  "validation": {
+    "original_exact_match_and_unique": true,
+    "proposal_ranges_non_overlapping": true,
+    "inline_code_sequence_unchanged": true,
+    "number_sequence_unchanged": true,
+    "quote_sequence_unchanged": true,
+    "heading_sequence_unchanged": true,
+    "fenced_code_sequence_unchanged": true,
+    "url_sequence_unchanged": true,
+    "semantic_review": "performed_manually_for_each_proposal",
+    "repository_lint": "not_run_by_assistant_subagent; parent owns PC validation",
+    "original_files_and_PC": "not_modified"
+  }
+}

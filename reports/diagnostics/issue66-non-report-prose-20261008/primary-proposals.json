@@ -1,0 +1,190 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "reviewed_entire_file": true,
+      "notes": "全文確認。短い概要、構成一覧、起動例と数値の説明は明確なため原文維持。"
+    },
+    {
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "reviewed_entire_file": true,
+      "notes": "全文を確認し、具体的な読みづらさがある箇所のみを提案。"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "reviewed_entire_file": true,
+      "notes": "全文を確認し、具体的な読みづらさがある箇所のみを提案。"
+    },
+    {
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "reviewed_entire_file": true,
+      "notes": "全文を確認し、具体的な読みづらさがある箇所のみを提案。"
+    },
+    {
+      "path": "tools/lint/README.md",
+      "reviewed_entire_file": true,
+      "notes": "全文確認。既存検査の範囲と承認手順を維持。OS別の実行方法の更新は文章の推敲の範囲で行わない。"
+    },
+    {
+      "path": "feedback-points/feedback-points.md",
+      "reviewed_entire_file": true,
+      "notes": "全文確認。利用者の直接引用と記録の意味を保持。専用Skill経由の更新指定があり、説明は明確なため原文維持。"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "PRIMARY-CAPTURE-01",
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "original_text": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "replacement_text": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認には `Tracker.DebugHost` の `/diagnostics` を使います。このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "reason": "目視確認とCLIを使う場面を二つの文に分け、用途の対応を読み取りやすくする。",
+      "preserved_facts": [
+        "CLIの再投入・概要/詳細/遅延分析",
+        "通常確認はDebugHost",
+        "エージェント調査・自動検証・変更に伴う不具合調査という利用範囲"
+      ]
+    },
+    {
+      "id": "PRIMARY-RUNTIME-01",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定し、画面を持たない実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。",
+      "replacement_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、実運用向けの画面を持たない実行体[^headless-host]とする。トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。",
+      "reason": "実行体の位置付けと、同一プロセスで実行する処理を分け、修飾の途中に別の述語が入る構造を整理する。",
+      "preserved_facts": [
+        "実運用を想定",
+        "画面なし",
+        "将来のAutoRef mode",
+        "同一プロセス・低遅延",
+        "Web UI等の分離と実時間処理への負荷抑制"
+      ]
+    },
+    {
+      "id": "PRIMARY-RUNTIME-02",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_text": "受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。",
+      "replacement_text": "受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、カメラごとの最新パケットのうち、未処理のものを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。",
+      "reason": "未処理という条件がカメラではなくパケットに掛かることを明確にする。",
+      "preserved_facts": [
+        "受信時刻順",
+        "カメラごとに最新だけを保持",
+        "異なるカメラの入力を単一保存先で上書きしない",
+        "検証済み設定値による周期"
+      ]
+    },
+    {
+      "id": "PRIMARY-RUNTIME-03",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。",
+      "replacement_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: 実運用を想定した、画面を持たない実行体。トラッカーと将来の AutoRef mode を同一プロセスで動かす。",
+      "reason": "定義の長い修飾を位置付けと動作に分け、本文の目的説明と対応させる。",
+      "preserved_facts": [
+        "実運用を想定",
+        "画面なし",
+        "トラッカーと将来のAutoRef mode",
+        "同一プロセス"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-01",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "- 右側の表示領域で次を確認できます\n- 有効な設定プロファイルの名前\n- 送信成功数 / 失敗数\n- 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻\n- キック / 接触 / フィールドの状態\n- primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）\n- 黄色 / 青色チームのロボット",
+      "replacement_text": "- 右側の表示領域で次を確認できます\n  - 有効な設定プロファイルの名前\n  - 送信成功数 / 失敗数\n  - 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻\n  - キック / 接触 / フィールドの状態\n  - primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）\n  - 黄色 / 青色チームのロボット",
+      "reason": "右側の表示領域で確認する項目を、その説明の下へ入れ子にし、列挙の所属を示す。",
+      "preserved_facts": [
+        "全6項目の文言",
+        "Tracked表示の機能",
+        "入力時刻と確定処理中の時刻の区別"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-02",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。",
+      "replacement_text": "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。\n- `等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。\n- `Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。",
+      "reason": "操作部の構成、等倍速、早送りの説明を別項目に分け、各操作の条件を追いやすくする。",
+      "preserved_facts": [
+        "全ての元の文を順序ごと保持",
+        "毎秒30回相当",
+        "Playの倍率保持",
+        "64x超を64x相当に制限しない"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。",
+      "replacement_text": "- 表示領域には次の情報が表示されます。\n  - diagnostics sample sidecar\n  - `tracker-packet-snapshots.jsonl`\n  - alignment sidecar の状態と記録 / 省略 / エラー件数\n  - 選択中の replay timeline の位置番号 / 時刻\n  - diagnostics sample tick の番号\n  - 比較状態\n  - 対応規則\n  - source role / source label\n  - source key / 送信元の通信アドレスと通信ポート\n  - スナップショット側の追跡フレームの番号\n  - 自前 / 対応付け済みスナップショットの時刻と時刻差\n  - ボール / ロボット\n  - 受信データの元のバイト列を復元できるか",
+      "reason": "長い一文に並ぶ表示情報を小項目に分け、確認する値を見つけやすくする。",
+      "preserved_facts": [
+        "列挙された全情報",
+        "対応付け時刻と時刻差",
+        "元のバイト列を復元できるか",
+        "並び順"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-04",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。",
+      "replacement_text": "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に、共通のファイル名部分を使った次の補助ファイルも作成します。",
+      "reason": "フォルダ作成と補助ファイル作成の動作を整理し、共通のファイル名部分が修飾する対象を明確にする。",
+      "preserved_facts": [
+        "CaptureOnのsession folder名",
+        "同じフォルダ内の補助ファイル",
+        "共通のファイル名部分"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-05",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。",
+      "replacement_text": "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。\n\n手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。",
+      "reason": "通常の設定読込と、手書きの付随情報を作る場合の注意を段落で分ける。",
+      "preserved_facts": [
+        "文言・順序の全保持",
+        "現在設定を使う条件",
+        "相対パスの基準",
+        "必須の全項目"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。",
+      "replacement_text": "7. 報告書には次の情報を残します。\n   - 選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号\n   - `Play` の表示更新で到達した選択時刻\n   - `Field` の表示モード\n   - `Layer A` / `Layer B` の `Field source` と表示 / 非表示\n   - 表示元の絞り込み\n   - diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数\n   - 比較対象の状態\n   - source role / source label\n   - source key / 送信元の通信アドレスと通信ポート\n   - 集約時の選択規則\n   - スナップショット側の追跡フレームの番号\n   - 自前側 / 対応付け側の時刻（ns）\n   - 時刻差（ns）\n   - ボール / ロボット\n   - 受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。\n\n   UI の `Restored` / `Missing` の意味も従来どおり記録します。\n",
+      "reason": "手動検証で報告する情報を小項目に分け、確認項目を読み飛ばしにくくする。",
+      "preserved_facts": [
+        "手順7という位置",
+        "列挙した全情報と単位",
+        "表示/非表示や採取件数",
+        "Restored/Missingの意味も残す義務"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-07",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、一時的な送信設定 / トラッカー調整値を差し込む用途です。 |",
+      "replacement_text": "| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、送信設定 / トラッカー調整値を一時的に上書きする用途です。 |",
+      "reason": "差し込むという比喩を、同じ項目で定義された上書きの動作として説明する。",
+      "preserved_facts": [
+        "起動時の有効な設定プロファイル",
+        "任意の設定群",
+        "定義不変",
+        "一時的な送信設定/調整値の上書き"
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-08",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。",
+      "replacement_text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報と、`TrackedSnapshotStore` に保持している旧形状を前提とする最新の追跡フレームを消去します。",
+      "reason": "同じ条件で消去する二つの対象を並べ、重複する述語を整理する。",
+      "preserved_facts": [
+        "形状変更による初期化という条件",
+        "未処理の検出情報の消去",
+        "旧形状を前提とする最新の追跡フレームの消去"
+      ]
+    }
+  ],
+  "held": []
+}
