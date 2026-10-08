@@ -11,7 +11,7 @@
 - `SSL-Vision` の未加工の検出情報とフィールド形状から決定的に追跡結果を生成できる
 - 公式形式の `TrackerWrapperPacket / TrackedFrame` をマルチキャスト配信できる
 - 公式の通信形式より豊富な内部情報を保持し、将来の自動レフェリー判定に再利用できる
-- 将来の自動レフェリー判定はフィールド全体の状態のスナップショットとキックや接触などの通知から記述しやすい構造にする
+- フィールド全体の状態のスナップショットとキックや接触などの通知を使って、将来の自動レフェリー判定を記述しやすい構造にする
 
 ## 対象範囲
 
@@ -65,7 +65,7 @@ TIGERs および公式の通信形式の調査結果は次を参照する。
 
 - [TIGERs と公式通信形式の調査結果](../../../reports/TRACKER-000-tigers-investigation-20260501115618.md)
 
-この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモ側に寄せる。
+この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモに記載する。
 
 ## 入力する通信データ
 
@@ -145,11 +145,17 @@ session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通�
 
 自前トラッカーの `Uuid` / `SourceName` は自前のパケットを保存対象から外す条件ではなく、後続表示・比較用の source role、source label、source metadata を付与するために使う。自前トラッカー自身の公式形式のパケットも snapshot sidecar へ保存してよく、詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他のトラッカーと衝突する場合も記録は落とさず、送信元の通信アドレスと通信ポートに加え、送信ソケットの自己受信の扱いも診断に記録し、source role を `unknown` や `ambiguous` として扱う。表示元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、表示元の概要と source role の判定に関する確認事項である。元のパケットと source identity を落とさない限り、保存処理を止める理由にはしない。
 
-自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。新規キャプチャーの再生、診断、Field source の表示では、`diagnostics-samples.jsonl` の diagnostics sample tick を選択時点とし、`Vision Input` はその記録の未加工入力の概要、自前トラッカーは同じ記録の追跡結果の概要から復元する。外部トラッカーは、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、対応記録がなければ選択時点以前の同じ表示元の latest-before snapshot を使う。diagnostics sample sidecar がない旧形式だけは、既存の近傍時刻の選択を推定表示として使ってよい。採用した対応規則、許容する時間幅、`uuid` / `sourceName` / 送信元の通信アドレスと通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。
+自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。
+
+新規キャプチャーの再生、診断、Field source の表示では、`diagnostics-samples.jsonl` の diagnostics sample tick を選択時点とし、`Vision Input` はその記録の未加工入力の概要、自前トラッカーは同じ記録の追跡結果の概要から復元する。外部トラッカーは、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、対応記録がなければ選択時点以前の同じ表示元の latest-before snapshot を使う。diagnostics sample sidecar がない旧形式だけは、既存の近傍時刻の選択を推定表示として使ってよい。
+
+採用した対応規則、許容する時間幅、`uuid` / `sourceName` / 送信元の通信アドレスと通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。
 
 新規キャプチャーの replay timeline は `diagnostics-samples.jsonl` の `sampleReceivedAt` を時刻軸とし、diagnostics sample tick を選択単位にする。外部トラッカーの高頻度な受信記録は tracker packet snapshot と alignment sidecar に保持するが、それ自体を新規記録の再生位置として追加せず、選択中の diagnostics sample tick に対する保存済みの対応付け、または latest-before snapshot として比較・描画する。`TrackedFrame.timestamp` は表示元間で時刻系が違う場合があるため、再生順序には使わない。
 
-等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。
+等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。
+
+診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。
 
 alignment sidecar は `tracker-packet-snapshots.jsonl` へ埋め込まず、別ファイルとする。snapshot sidecar は受信パケットの主記録、alignment sidecar は診断記録の再生用索引として分けることで、対応付けの欠落や破損を既存スナップショット保存の破損と区別できる。source key は `sourceRole + sourceLabel + sourceUuid + remoteEndpoint` を基本とする。同じ source label / UUID が複数の送信元の通信アドレスと通信ポートに分かれる場合、UI で集約する代表の tracker snapshot は、記録開始からの相対的な `receivedAt` に最も近いものを選ぶ。同条件の候補から選ぶ規則も固定し、選択結果が一意に決まるようにする。
 
@@ -371,7 +377,7 @@ Capture Off 中は `tracker-packet-snapshots.jsonl`、alignment sidecar、diagno
 - 設定プロファイルの切り替え要求を受けたら、`TrackerCoordinator` は要求内容を保持したまま次の `Update` に 1 回だけ渡す
 - 未加工の入力パケットが来ていなくても適用待ちの要求がある場合は、`TrackerCoordinator` は観測入力を伴わない制御専用の `Update` を即時呼び出し、その要求を処理しなければならない
 - 設定プロファイルの切り替え要求に伴う追跡エンジンの状態の消去や `ProfileSwitched` の発火順制御は `TrackerCoordinator` 側で再実装しない
-- `TrackerCoordinator` は設定プロファイルの切り替え要求の受付、`Update` の呼び出し、`TrackerUpdateResult` の処理を同じ直列化区間で扱い、1 回の `Update` の処理中に、その処理中の要求を上書きしない
+- `TrackerCoordinator` は設定プロファイルの切り替え要求の受付、`Update` の呼び出し、`TrackerUpdateResult` の処理を同じ直列化区間で扱い、1 回の `Update` の処理中は、その処理で扱う要求を上書きしない
 - `TrackerCoordinator` は設定プロファイルの切り替え要求を受け取った時点では、送信先や UI に表示する設定名を即時に反映しない
 - `ProfileSwitched` を受け取った時点で、その処理中の要求に対応する適用済み設定のスナップショット、送信先、適用中の設定名の表示、`TrackedSnapshotStore` の現在の設定名を先に更新する。その後、`TrackedSnapshotStore` の最新の追跡フレームと受信時刻を消去する
 - 通知先への `ProfileSwitched` の通知は、上記の状態更新と処理中の要求の解放が完了した後に行う
@@ -416,10 +422,10 @@ Capture Off 中は `tracker-packet-snapshots.jsonl`、alignment sidecar、diagno
 - フィールド形状があれば、まずフィールド形状のスナップショットを更新する
 - 検出情報があれば、`TCapture` を第 1 優先、`TSent` を第 2 優先の観測時刻として未処理の入力バッファに積む
 - 未処理の入力バッファは、観測時刻、カメラ ID、観測フレームの番号の順で安定して並べ替え、処理する
-- 最新に見えた観測時刻から `ReorderWindow` を越えた検出情報の集合を確定処理対象にする
+- これまでに得た最新の観測時刻から `ReorderWindow` を越えた検出情報の集合を確定処理対象にする
 - 検出情報の確定処理時は、その時点のフィールド形状のスナップショットを参照しつつ追跡処理を進める
 - 検出情報がないパケットでは `frame_number` を無理に進めない
-- すでに確定処理済みの観測時刻より古い遅れて到着したパケットは診断に記録し、状態更新には使わない
+- 遅れて到着したパケットの観測時刻が、すでに確定処理した観測時刻より古い場合は、そのパケットを診断に記録し、状態更新には使わない
 - フィールド形状の大幅な変更による初期化が発生した場合、未処理の入力バッファに残っている旧形状に属する検出情報は確定処理せず破棄する
 - 観測入力を伴わない制御専用の `Update` では検出情報 / フィールド形状を追加せず、適用待ちの要求の消費と通知生成だけを行う
 
@@ -571,19 +577,27 @@ CaptureOn の比較ログを有効にする場合は、上記の自前トラッ�
 
 キャプチャーは protobuf デコード前の UDP パケットの元データのバイト列を `jsonl.gz` に保存し、`receivedAt` と送信元の通信アドレスと通信ポートを同じ記録に持つ。保存された記録は順序通りに読み戻し、`SSL_WrapperPacket` へ復元してトラッカーへ再投入できるようにする。
 
-capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定値を含める。CaptureOn の記録では、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、`diagnostics-samples.jsonl`、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を保持し、source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。
+capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定値を含める。
+
+CaptureOn の記録では、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、`diagnostics-samples.jsonl`、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を保持し、source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。
 
 `Tracker.CaptureReplay` は、保存済みキャプチャーを `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの集計指標と、追跡結果の詳細の絞り込み条件式で自動テストや調査に使えるようにする。詳細は `frame` の番号でも絞り込めるようにし、ロボットの詳細には位置だけでなく向き・角速度も出して、未加工の検出情報と追跡結果の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.DebugHost/appsettings.json` を読む場合は、適用中の設定プロファイルに `Tracker:RuntimeOverrides` を反映した追跡エンジンの設定を使う。
 
-raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI は、未加工の SSL-Vision パケットの収録時の受信周期と、再生で確定された自前トラッカーの追跡結果の収録時の受信時刻、観測データの時刻、確定の契機となった入力位置を同じ概要出力に載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。
+raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI の概要出力には、未加工の SSL-Vision パケットを収録した際の受信周期を載せる。同じ出力に、再生で確定された自前トラッカーの追跡結果について、収録時の受信時刻、観測データの時刻、確定の契機となった入力位置も載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。
 
 CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot を保存する sidecar JSONL と alignment sidecar を capture metadata から読む。外部トラッカーのスナップショットを保存時の対応付けに従って自前トラッカーの確定済み追跡フレームと並べて再生・比較できるようにする。対応付けがない既存キャプチャーでは、時刻が近い記録を選ぶ規則を使い、正確な対応を保証しない推定であることを明示する。この CLI 比較経路はエージェント / 自動検証 / 調査用に保持し、診断 UI の実装後も削除しない。
 
-診断画面と再生操作は、新規キャプチャーでは diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の主な読み取り元にする。`Vision Input` は diagnostics sample sidecar の採取記録にある未加工入力の概要、自前トラッカーは同じ diagnostics sample tick の追跡結果の概要から復元し、外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。表示元の識別情報・分類・表示名、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。capture metadata、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の欠落・空・読み取りエラーは区別して表示し、旧 render snapshot しかない記録は旧形式または機能制限付きの表示として扱う。等倍速の通常再生は表示更新を毎秒30回相当に抑えて実行環境側の経過時間へ追従する一方、replay timeline の選択、Field source、比較では任意の diagnostics sample tick を選べる経路を維持する。
+診断画面と再生操作は、新規キャプチャーでは diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の主な読み取り元にする。`Vision Input` は diagnostics sample sidecar の採取記録にある未加工入力の概要、自前トラッカーは同じ diagnostics sample tick の追跡結果の概要から復元し、外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。
+
+表示元の識別情報・分類・表示名、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。capture metadata、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の欠落・空・読み取りエラーは区別して表示し、旧 render snapshot しかない記録は旧形式または機能制限付きの表示として扱う。
+
+等倍速の通常再生は表示更新を毎秒30回相当に抑えて実行環境側の経過時間へ追従する一方、replay timeline の選択、Field source、比較では任意の diagnostics sample tick を選べる経路を維持する。
 
 未加工入力と追跡結果の診断で比較する検出情報は、現在届いたパケットではなく、確定済みの `TrackerFrame` を生成した元の検出情報群に結び付ける。これにより、並べ替えや統合の猶予時間で確定が遅れた追跡フレームと、未加工入力の件数、入力元の観測フレームの番号、カメラとの対応がずれない。
 
-`Tracker.DebugHost` の診断画面は、新規キャプチャーでは `diagnostics-samples.jsonl` に保存した同一採取時点の未加工入力と自前トラッカーの追跡結果を `Vision Input` / `ibis tracker` の描画元にする。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として残してよいが、新規記録の物体表示や replay timeline の主な入力にはしない。diagnostics sample sidecar がない旧記録は非対応または機能制限付きの旧形式として明示し、timeline scrubber の操作でも新規経路へ render snapshot を代用しない。フィールドの操作ではページ全体をスクロールさせず、フィールドの拡大縮小・表示位置の移動と画面スクロールが干渉しないレイアウトを維持する。
+`Tracker.DebugHost` の診断画面は、新規キャプチャーでは `diagnostics-samples.jsonl` に保存した同一採取時点の未加工入力と自前トラッカーの追跡結果を `Vision Input` / `ibis tracker` の描画元にする。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として残してよいが、新規記録の物体表示や replay timeline の主な入力にはしない。diagnostics sample sidecar がない旧記録は非対応または機能制限付きの旧形式として明示し、timeline scrubber の操作でも新規経路へ render snapshot を代用しない。
+
+フィールドの操作ではページ全体をスクロールさせず、フィールドの拡大縮小・表示位置の移動と画面スクロールが干渉しないレイアウトを維持する。
 
 既定配信先は公式形式のトラッカーの慣例値に合わせる。
 
@@ -725,7 +739,7 @@ CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session f
   - フィールド全体の状態表現から official tracker proto への専用変換
   - 競技規則の判定側が、未加工の入力パケットを直接扱わずに済む責務境界を保つ
 
-寄せる対象は「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。
+参考にするのは「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。
 
 ### TIGERs との対応関係
 
@@ -829,14 +843,14 @@ TIGERs 由来で重視する点:
 - 対応付けの判定は、生の観測値との差分だけではなく、予測状態に対する対応付け規則として使う
 - 観測が欠けた場合は予測のみを行い、可視性減衰と追跡状態削除判定は別責務として扱う
 - 統合に使う不確かさは、最新の観測の信頼度だけでなく、状態推定処理後の位置の不確かさを基準にする
-- 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない
+- 更新が途絶え、欠測により可視性が十分低下した追跡状態は、内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない
 - 外部出力の可否は `OutputVisibilityThreshold` で判定し、TIGERs のロボットの品質判定の初期閾値 `0.05` を設定値の基準とする
 
 向きを連続した角度として扱い、`-pi` / `pi` 境界での跳びを状態管理側で吸収する。
 
 ### ボール追跡
 
-ボールは ID がないため、対応付けを明示設計する。
+ボールには ID がないため、対応付けの方法を明示的に設計する。
 
 TIGERs の `BallTracker` と `BallFilterPreprocessor` に合わせ、ボールの処理は、個別の追跡状態群を扱う段階と、主対象のボールを決めてキックを推定する段階の 2 段に分ける。
 
@@ -885,7 +899,7 @@ TIGERs 由来で重視する点:
 - 追跡状態の不確かさは、観測の信頼度の単純な逆数ではなく、Kalman filter の観測更新後の共分散から導く
 - カメラをまたぐ重み付き統合では、ボールの Kalman filter の観測更新後の不確かさを重みに使う
 - 追跡状態の健全度、追跡状態の確立、可視性の管理は、Kalman filter による更新とは別の責務とし、状態推定の代わりにはしない
-- 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない
+- 更新が途絶え、欠測により可視性が十分低下した追跡状態は、内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない
 - 外部出力の可否は `OutputVisibilityThreshold` で判定可能とし、TIGERs のボールが見えなくなった場合の寿命の初期値 `1.0s` を、`TrackLifetimeNs` の基準とする
 
 複数のボール対応:
@@ -904,7 +918,7 @@ TIGERs 由来で重視する点:
 - ボールでは、状態推定処理で得られた直前のボール位置、または浮き球キックの投影位置の近くにある camera-local track だけを、主対象の候補に残す
 - ボールはカメラごとに代表追跡状態を 1 つ選んでから統合する
 - ロボットは同一 `team + robot id` の camera-local track だけを束ねる
-- 統合自体はカメラごとの状態推定の内部状態の不確かさを重みとして使う
+- 統合では、カメラごとの状態推定で持つ内部状態の不確かさを重みに使う
 - 検出の信頼度やカメラ固有品質は不確かさ補正係数として将来拡張できるようにする
 - 視線角やカメラ固有品質を後で入れられるよう拡張点を持つ
 - 初期版では統合後のフィールド全体を扱う側に別の状態推定をもう 1 段かけない
@@ -1054,7 +1068,7 @@ TIGERs 由来で重視する点:
 - キック閾値
 - 浮き球キック閾値
 
-設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` がデバッグ起動時の設定供給責務を持つ。
+設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` がデバッグ起動時に設定を渡す責務を持つ。
 
 ## UI 方針
 
@@ -1131,7 +1145,7 @@ TDD の最初の対象は `Tracker.Core` の中核契約に限定する。
 - `TRACKER-003`: 追跡エンジンの時系列契約テストを追加する
 - `TRACKER-004`: `TrackerFrame` / 状態型 / `TrackerUpdateResult` / イベントと通知先の契約を実装する
 - `TRACKER-005`: `TrackerPacketGenerator` を実装する
-- `TRACKER-006`: `TrackerEngine` の順序を並べ替えるバッファと確定可能な入力を順に処理する仕組みを実装する
+- `TRACKER-006`: `TrackerEngine` で入力の順序を並べ替えるバッファと、確定可能な入力を順に処理する仕組みを実装する
 - `TRACKER-007`: `TrackerEngine` の設定プロファイルの切り替え / フィールド形状の変化による初期化 / 通知順を実装する
 - `TRACKER-008`: ロボットの追跡とロボット追跡結果の統合を実装する
 - `TRACKER-009`: ボールの追跡と主対象・補助対象のボール選定を実装する

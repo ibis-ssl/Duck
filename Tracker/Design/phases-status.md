@@ -4,12 +4,16 @@
 
 ## 全体状況
 
-- 現在の段階: 課題 #66 の小範囲の推敲を実装し、下書き [PR #67](https://github.com/ibis-ssl/Duck/pull/67) を作成した。
-- 現在の作業: `DOC-PROSE-001`
-- 実装範囲: 設計書と README から合計8段落を選定した。3段落を修正し、5段落は原文を維持した。
-- 検証: 対象2文書の全文で既存の文書検査3種が成功した。変更範囲と原文の意味を作業担当が照合した。
-- 残りの作業: 公開後のPRの最新コミットに対応するCIを確認し、依頼元が自然さと意味の保持、および継続利用を判断する。独立レビューと人による受入は未完了であり、統合は利用者が行う。
-- 証跡: `reports/issue66-yomiyasu-pilot-20261008.md`。
+- 現在の段階: 課題 #66 の初回試行に続き、利用者の追加依頼による Duck 内の説明文の推敲を進めている。
+- 現在の作業: `DOC-PROSE-002`
+- 追加対象: レポート以外の19文書。初回の選定8段落とは分けて記録する。
+- 追加分の状態: 文書の推敲と検証の途中。追加分のコミット、PRへの反映、CI確認は未完了。
+- 初回の実装範囲: 設計書と README から合計8段落を選定した。3段落を修正し、5段落は原文を維持した。
+- 初回の検証: 対象2文書の全文で既存の文書検査3種が成功した。変更範囲と原文の意味を作業担当が照合した。
+- 残りの作業: 追加分の推敲と検証を終え、結果を記録してコミットし、PRへ反映する。公開後のPRの最新コミットに対応するCIを確認する。独立レビューと人による受入は未完了であり、統合は利用者が行う。
+- 公開先: [PR #67](https://github.com/ibis-ssl/Duck/pull/67) は下書き。追加対応分は未反映。
+- 初回の証跡: `reports/issue66-yomiyasu-pilot-20261008.md`。
+- 追加分の証跡: 報告書と検証記録の作成後に追記する。
 - 関連作業: 課題 #31、#64、PR #65 の完了判定は、この文書推敲の評価に含めない。
 
 ## 過去の全体状況（2026-09-18）
@@ -44,9 +48,9 @@
 
 ## 独立最終レビュー F1 対応（2026-09-17）
 
-独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明に不整合があるF1が見つかり、完了判定は保留となった。構成設計、DebugHost詳細設計、DebugHost READMEを実装へ同期し、新規記録の再生位置と `Vision Input` / `ibis tracker` の復元元を diagnostics sample sidecar に統一した。外部トラッカーは tracker packet snapshot と alignment sidecar、または latest-before snapshot を使い、render snapshot は旧形式・補助用途として区別する。
+独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明の不整合がF1として指摘され、完了判定は保留となった。構成設計、DebugHost詳細設計、DebugHost READMEを実装へ同期し、新規記録の再生位置と `Vision Input` / `ibis tracker` の復元元を diagnostics sample sidecar に統一した。外部トラッカーは tracker packet snapshot と alignment sidecar、または latest-before snapshot を使い、render snapshot は旧形式・補助用途として区別する。
 
-関連する原出現台帳と変更単位の台帳を修正後本文へ同期し、独立レビュー対象8文書の2,670件について構造自己点検は欠落・重複・本文内容不一致0。対象3文書の検査と `RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。修正後の独立再レビューは未実施であり、工程は引き続き「指摘対応中」とする。証跡は `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` とF1対応報告書を参照する。
+関連する原出現台帳と変更単位の台帳を修正後本文へ同期した。独立レビュー対象8文書の2,670件について構造を自己点検した結果、欠落・重複・本文内容不一致はいずれも0だった。対象3文書の検査と `RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。修正後の独立再レビューは未実施であり、工程は引き続き「指摘対応中」とする。証跡は `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` とF1対応報告書を参照する。
 
 ## 実装修正の分離（2026-09-18）
 

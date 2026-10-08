@@ -1,10 +1,10 @@
-# Tracker.RuntimeHost 設計
+﻿# Tracker.RuntimeHost 設計
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 
 ## 目的
 
-`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定し、画面を持たない実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。
+`Tracker.RuntimeHost`[^tracker-runtime-host] は、実運用向けの画面を持たない実行体[^headless-host]とする。トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。
 
 ## 命名
 
@@ -109,7 +109,7 @@ diagnostics replay と比較は、diagnostics sample sidecar が存在するキ�
 
 `RUNTIME-HOST-009` では `Tracker.RuntimeHost` に画面なしで動作する SSL-Vision 受信処理とトラッカーの周期処理を実装する。RuntimeHost は `VisionReceiver` の設定階層から、`MulticastAddress`（SSL-Vision のマルチキャスト通信先）、`Port`（UDP の通信ポート）、必要に応じて指定する `InterfaceAddress`（この端末でマルチキャストグループへ参加するときに使う IPv4 の値）を読み取り、DebugHost の `VisionReceiverService`、未加工入力の保存処理、キャプチャーの書き込み処理、診断画面に依存せずに `SSL_WrapperPacket` を受信する。
 
-受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
+受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、カメラごとの最新パケットのうち、未処理のものを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。
 
 RuntimeHost は `Tracker` の設定階層から、追跡の有効化、source name（追跡結果の送信元名）、UUID、UDP 送信の有効化、設定プロファイルごとの送信先、追跡エンジンの設定を解決して `TrackerRuntimeResolvedOptions` を作る。`Tracker.Core` 側の `TrackerCoordinator`、`TrackedSnapshotStore`、`ITrackerPacketPublisher` / `UdpTrackerPacketPublisher`、`TrackerPacketGenerator` を DI で組み立て、確定済みの追跡フレームごとに公式形式の `TrackerWrapperPacket` を送信し、同じ共通実行処理で最新の追跡スナップショットを更新する。
 
@@ -140,7 +140,7 @@ DebugHost が読む最新の追跡スナップショットは、RuntimeHost か�
 - DebugHost が追跡結果を読む側であり、トラッカーの周期処理を画面描画の更新周期から駆動しないことを契約テストで固定する。
 - diagnostics sample tick がトラッカーの追跡フレームの確定周期に依存しないことを回帰検証で固定する。
 
-[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。
+[^tracker-runtime-host]: Tracker.RuntimeHost: 実運用を想定した、画面を持たない実行体。トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす。
 [^autoref-mode]: AutoRef mode: レフェリープログラム相当の判定処理をトラッカーと同一プロセスで動かす将来のモード。今回の実装対象ではない。
 [^same-process]: 同一プロセス: トラッカーと将来の AutoRef の判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。
 [^headless-host]: 画面を持たない実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。

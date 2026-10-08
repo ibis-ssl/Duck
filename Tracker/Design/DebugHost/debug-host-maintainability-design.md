@@ -1,8 +1,8 @@
-# Tracker DebugHost / CLI / UI 保守性改善 設計
+﻿# Tracker DebugHost / CLI / UI 保守性改善 設計
 
 ## 目的
 
-この文書は `TRACKER-034` で実施した旧 `Tracker.Server`、`Tracker.CaptureReplay`、診断画面の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。現行のプロジェクト、名前空間、起動経路では、旧 `Tracker.Server` の Web UI と診断機能を担当する実行体を `Tracker.DebugHost` と呼ぶ。
+この文書は `TRACKER-034` で実施した保守性改善を記録する。旧 `Tracker.Server`、`Tracker.CaptureReplay`、診断画面の巨大なファイルを分割し、日本語コメントを追加した。現行のプロジェクト、名前空間、起動経路では、旧 `Tracker.Server` の Web UI と診断機能を担当する実行体を `Tracker.DebugHost` と呼ぶ。
 
 CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` に分離し、この文書では扱わない。
 
@@ -42,7 +42,7 @@ CaptureOn 比較ログの機能仕様は `debug-host-cli-ui-detail-design.md` �
 - `public` / `internal` の既存型名は可能な限り維持し、外部参照がある型の名前変更は避ける。
 - `.` 区切りのファイル名はフレームワークや開発ツールの慣習に限って許容する。手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。
 - partial class を責務別に分ける場合は、type-owned folder（型名のフォルダ）を作り、その中のファイル名が責務を表す配置にする。
-- 挙動維持のため、分割前後で同じ入力から外部に観測できる同じ出力を返すことを最優先にする。
+- 挙動維持のため、分割前後で同じ入力を与えたときに、外部から観測できる出力が変わらないことを最優先にする。
 
 ## コメント追加基準
 
@@ -98,7 +98,7 @@ TrackerCoordinator:
 ## リスク
 
 - `TrackerCoordinator` は順序制御が密なため、責務分離でメソッドの呼び出し順を読み違えると、設定プロファイルの切り替えと送信設定の切り替え時点がずれる。
-- CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言の整理でも互換性リスクがある。
+- CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言を整理するだけでも互換性を損なうリスクがある。
 - 診断画面は画面構造の記述と状態更新が結びついているため、partial class に分割する際に `selectedEntry`、`profileMetadata`、`selectedRenderSnapshot` の同期順序を崩しやすい。
 - コメント追加時に設計意図を広げすぎると、実装契約と異なる将来仕様を書いてしまう。
 

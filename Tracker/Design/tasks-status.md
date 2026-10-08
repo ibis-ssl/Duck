@@ -4,6 +4,22 @@
 
 ## 現在の作業
 
+- ID: `DOC-PROSE-002`
+- 題名: レポート以外の説明文を追加で推敲する
+- 段階: 文書の推敲と評価
+- 状態: 利用者の追加依頼に基づく推敲を進めている。追加分の検証、コミット、PRへの反映、CI確認は未完了。
+- 規模: 中
+- 依存関係: `DOC-PROSE-001` の試行結果と、Duck 内のレポート以外の文章も扱う利用者の追加依頼を基準にする。課題 #31、#64、PR #65 の作業は別範囲として扱う。
+- 対象: Duck 内のレポート以外の19文書。初回の2文書・8段落とは別に、今回の対象一覧と変更前後の対応を記録する。
+- 完了条件:
+  - 原文の意味、条件、否定、数値、名称、識別子、コマンド、ソースコード、URLを保持し、説明文の読みやすさを改善する。
+  - 変更した文書の全文と、既存設定が定める全対象に文書検査3種を実行し、結果を記録する。許可一覧と検査の除外設定は変更しない。
+  - 変更した箇所、原文を維持した箇所、意味を変えずに修正できないため維持した箇所の判断を、追加対応分の記録に残す。
+- 検証: 未完了。変更文書の全文検査、全対象の文書検査、最終本文と原文の照合結果は、確認後に記録する。
+- 証跡: 追加対応分の報告書と検証記録は作成後に追記する。
+- 公開先: 下書き [PR #67](https://github.com/ibis-ssl/Duck/pull/67) へ追加対応分を反映予定。追加分のコミットは未作成。
+- 残りの作業: 推敲、検証、結果の記録、コミット、PRへの反映、CI確認。独立レビューと人による受入は未完了。統合は利用者が行う。
+
 - ID: `DOC-PROSE-001`
 - 題名: 設計書と README の説明文を小範囲で推敲する
 - 段階: 文書の推敲と評価
@@ -38,7 +54,7 @@
   - 最終 PR の `PRの最新コミット` と同じ `head_sha` の CI を確認し、成功結果と検証証跡を記録する。
 - 証跡: `reports/doc-lint-resume-20260915.md`
 - 完了前証跡: `reports/markdown-lint-completion-20260916.md`
-- 残課題: PR #20 の文書範囲に阻害残件はない。`#25`の製品実装課題は別作業として保持する。この追跡更新を公開した後、PRのPRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。
+- 残課題: PR #20 の文書範囲に阻害残件はない。`#25`の製品実装課題は別作業として保持する。この追跡更新を公開した後、PRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。
 - 追加承認: 利用者が `ChikkarPy` と提示済み説明文の登録を承認した。用語登録専用担当が登録と対象検査を行い、別担当が確認する。
 - 追加証跡: `reports/doc-lint-chikkarpy-registration-20260915.md`
 - 2026-09-15 時点の検証: `ChikkarPy` の許可判定と文書検査手順の綴り検査は成功したが、全範囲の検査は未登録語で失敗していた。
@@ -56,7 +72,7 @@
 - 2026-09-17 の証跡: `reports/task-doc-lint-003-diagnostic-handoff-20260917064359.md`。診断設計の追加照合で、比較領域のボタン位置、テスト範囲、100 ms 時点の参照対象を修正し、`99929bc` で公開した。相対位置の参照範囲もキャプチャー単位へ戻した。追加照合は `reports/task-doc-lint-003-diagnostic-scope-followup-20260917082311.md` に記録する。作業担当の自己点検であり、独立最終レビューは未実施。
 
 - 2026-09-17 の raw vision 表示設計照合: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md` の原文524出現を全件中央台帳へ統合した。変更箇所504件と原文同一20件を確認し、未解決0。本文では不自然な日本語とネットワーク受信の説明を整理し、型名・設定名・実UI名は維持した。
-- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。
+- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格とは扱わない。
 
 - 2026-09-17 の RuntimeHost 設計照合: `Tracker/Design/RuntimeHost/runtime-host-plan.md` の原文196出現を全件中央台帳へ統合した。変更箇所186件と原文同一10件を確認し、未解決0。本文では AutoRef の意味、`InterfaceAddress` の用途、CaptureOn 中のキャプチャー、追跡スナップショット、公式形式の `TrackerWrapperPacket` の説明を原文と実装に合わせて整理した。
 - 2026-09-17 の RuntimeHost 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。人が読む設計書の中央台帳は2,142 / 2,142件完了、残り0。証跡は `reports/task-doc-lint-003-runtime-host-correspondence-20260917.md` と `reports/diagnostics/wording-runtime-host-ledger-20260917/`。4,336出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
@@ -301,7 +317,7 @@
 
 `DOC-LINT-003` の補足として、公開済みのMarkdown差分96文書を検査対象と照合した。本文19文書は比較元の一覧と一致し、報告書77文書は既存設定による対象外だった。検査手順の実行例を、存在する2文書を指定する例へ訂正した。関連する原出現3件の最終位置と理由を記録した。
 
-4,336出現箇所の原文・行・列・表記と、履歴保存版4文書の内容は比較元と一致した。この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格には扱わない。全体の文書検査は引用内の違反で未通過のままである。
+4,336出現箇所の原文・行・列・表記と、履歴保存版4文書の内容は比較元と一致した。この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格とは扱わない。全体の文書検査は引用内の違反で未通過のままである。
 
 証跡: `reports/task-doc-lint-003-scope-check-20260917082040.md`。元の完了条件と過去の検証結果は変更していない。
 
@@ -309,7 +325,7 @@
 
 `DOC-LINT-003` の補足として、追跡エンジンの詳細設計にある原文133出現を、最終表現の行・列・前後の文脈・判断理由へ対応付けた。86行の文脈を読み、変更のない行の23出現も記録した。曖昧になっていた XML documentation comment の `summary` 要素の指定を復元した。
 
-入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。全体の文書検査は、原文を保持した引用内の違反で未通過のままである。
+入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了とは扱わない。全体の文書検査は、原文を保持した引用内の違反で未通過のままである。
 
 証跡: `reports/task-doc-lint-003-engine-correspondence-20260917084612.md` と `reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json`。元の完了条件、過去の採否、検証記録は変更していない。
 
@@ -319,7 +335,7 @@ PR #20 の独立最終レビューは、レビュー対象の `HEAD` `4d253f2892
 
 F1 対応では `Tracker/Design/Core/tracker-architecture-plan.md`、`Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md`、`Tracker/Tracker.DebugHost/README.md` を実装と再照合した。新規キャプチャーの replay timeline は diagnostics sample tick を選択軸とし、`Vision Input` と `ibis tracker` は同じ `diagnostics-samples.jsonl` の採取記録から復元する。外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。render snapshot は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示や replay timeline の主な入力にはしない。
 
-3文書の原出現台帳と変更単位の台帳をF1修正後本文へ同期した。構成設計565件、CLI/UI 724件、DebugHost README 423件は、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲の構造検証でエラー0。今回の独立レビュー対象8文書では2,670 / 2,670件、ID重複0、構造エラー0を自己点検した。これは修正担当の自己点検であり、独立再レビューの合格証明には扱わない。
+3文書の原出現台帳と変更単位の台帳をF1修正後本文へ同期した。構成設計565件、CLI/UI 724件、DebugHost README 423件について、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲を構造検証し、エラーは0だった。今回の独立レビュー対象8文書では2,670 / 2,670件、ID重複0、構造エラー0を自己点検した。これは修正担当の自己点検であり、独立再レビューの合格証明とは扱わない。
 
 対象3文書の検証では、初回に新規文章の英語複合語を単独語へ分解したため、綴り検査と許可一覧検査が失敗した。許可一覧は変更せず、承認済み複合語・正式識別子・自然な日本語へ整理し、最終的に3文書の文章検査、綴り検査、許可一覧検査、`git diff --check` は終了値0。`RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。失敗・成功ログは `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` に保存する。
 
