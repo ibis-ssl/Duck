@@ -1,4 +1,4 @@
-# Aspire シミュレーション試験環境の設計
+﻿# Aspire シミュレーション試験環境の設計
 
 ## 目的
 
@@ -285,7 +285,7 @@ GitHub Actions上の`ASPIRE-005`受入試験は基本方式に限定し、シミ
 
 ### `ASPIRE-006G`: TIGERs対Craneの一括対戦試験
 
-`ASPIRE-MATCH-001`から`ASPIRE-MATCH-005`までをLinux上の実パケットで確認する。両チームの実際の動き、AutoRefとトラッカーの通信経路、試合終了、結果、SSLログ、Craneの記録データ、各起動対象のログを証跡として残す。勝敗は合否条件にしない。
+`ASPIRE-MATCH-001`から`ASPIRE-MATCH-006`までをLinux上で確認する。通常対戦の実パケット確認と、得点提案の自動承認を調べる制御試験は別に実行する。両チームの実際の動き、AutoRefとトラッカーの通信経路、試合終了、結果、SSLログ、Craneの記録データ、各起動対象のログを証跡として残す。通常対戦では勝敗や得点を合否条件にしない。
 
 一括試験は次の子作業項目に分ける。
 
@@ -294,7 +294,7 @@ GitHub Actions上の`ASPIRE-005`受入試験は基本方式に限定し、シミ
 | `ASPIRE-006G1` | 構成・チーム・審判情報の受入 | Linux上で`ASPIRE-MATCH-001` / `002`を実パケットと実際の起動対象で確認し、起動対象一覧、チーム対応、11003の送信元が一つであることを記録する。 |
 | `ASPIRE-006G2` | 両チームの動作確認 | `ASPIRE-MATCH-003`を実行し、同じ進行中の審判指令の間に黄側のCraneと青側のTIGERs双方の位置が変化することを確認する。 |
 | `ASPIRE-006G3` | AutoRef・トラッカー経路の受入 | `ASPIRE-MATCH-004`を実行し、Sumatraからの11010送信、AutoRefによる10020 / 11003 / 11010の利用、Duckが11010へ送信しないことをパケット数とログで確認する。 |
-| `ASPIRE-006G4` | 試合終了と証跡の受入 | `ASPIRE-MATCH-005`を実行し、`POST_GAME`または最大時間での終了、対戦結果、SSLログ、Craneの記録データ、各起動対象の標準出力と標準エラーを失敗時も保存する。 |
+| `ASPIRE-006G4` | 試合終了・証跡・得点提案の制御試験 | 通常対戦では`ASPIRE-MATCH-005`を実行し、`POST_GAME`または最大時間での終了、対戦結果、SSLログ、Craneの記録データ、各起動対象の標準出力と標準エラーを失敗時も保存する。これとは別に`ASPIRE-MATCH-006`の制御試験を実施し、得点提案から承認結果までの順序と証跡を記録する。 |
 
 ## テスト方針
 
@@ -428,12 +428,12 @@ TIGERsの制御用人工知能とCraneを実際に対戦させる方式を、ト
 | 起動対象名 | 実行形態 | 対戦方式での責務 |
 | --- | --- | --- |
 | `simulator` | Aspire 外部実行資源＋Docker コンテナ | ER-Force `simulator-cli` をホストネットワークで起動する。対戦用引数はCraneの現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003`を使う。 |
-| `game-controller` | Aspire外部実行資源＋Dockerコンテナ | 11003の唯一の審判情報送信元とし、対戦用の初期状態を読み込む。 |
+| `game-controller` | Aspire外部実行資源＋Dockerコンテナ | 11003の唯一の審判情報送信元とする。対戦用の初期状態を読み込み、対戦方式だけで専用設定の`AutoApproveGoals`を有効にする。既定値が無効である通常設定や、`base` / `comparison`方式の設定は変更しない。 |
 | `crane` | Aspire 外部実行資源＋Docker コンテナ | 固定した`ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`を使い、`sim:=true speak:=false team:=ibis`で黄チームを制御する。 |
 | `tigers-blue` | Aspire外部実行資源＋Dockerコンテナ | 固定した版識別子またはダイジェスト値を指定した`tigersmannheim/sumatra`を`--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol`で起動する。 |
 | `autoref-tigers` | Aspire外部実行資源＋Dockerコンテナ | `tigersmannheim/auto-referee:1.2.0`を起動し、SSL-Vision検出データ10020、審判情報11003、トラッカー情報11010を使って試合判定を試合管理機能へ返す。 |
 | `ssl-log-recorder` | Aspire外部実行資源＋Dockerコンテナ | 審判情報11003、ビジョン情報10020、トラッカー情報11010を対戦記録として保存する。 |
-| `match-controller` | 試験用設定 | 試合管理API、審判情報、SSL-Vision検出データの準備完了を確認し、試合開始、停止状態からの続行、終了監視、結果保存を行う。 |
+| `match-controller` | Aspire外部実行資源＋.NET 10コンテナ | 既存の`Testing/Duck.Testing.RefereeDriver`にある審判情報の受信と制御API接続の部品、および`SslProto`を再利用する.NET 10の試験用プログラム。初期`STOP`を確かめてから試合を進行し、`POST_GAME`または最大時間で終了して結果と診断記録を保存する。実通信の受入確認には`Tracker.Tests`を使い、試合制御プログラムには含めない。実行環境イメージの基盤と固定ダイジェストは未確定であり、実装前に確定する。新しいNuGet依存は加えない。 |
 | `duck` | .NETプロセス | SSL-Visionの観測とDuck側のデバッグを続ける。ただし対戦判定に影響しないよう、対戦方式では正式なトラッカーマルチキャスト11010への送信を無効にする。 |
 
 対戦方式では、基本構成の`visibility_graph`用`cm4-sim`を起動しない。Craneの現行`match-vs-tigers`構成は`cm4-sim`を含まず、対戦用シミュレータとSumatraの設定を一体で使うため、基本方式の`--ibis-port 12346`およびUDP 12345 / 12346の経路を混在させない。
@@ -441,6 +441,12 @@ TIGERsの制御用人工知能とCraneを実際に対戦させる方式を、ト
 Sumatraへ渡す`simulation_protocol_fixed.xml`相当の設定ファイルはDuck側で版管理し、少なくともSSL-Vision検出データ`224.5.23.2:10020`、審判情報の`source=NETWORK` / ポート`11003` / `gameController=false`、`SumatraSimBotManager`、トラッカーの送信先`224.5.23.2:11010`を指定する。AppHost起動時にCraneリポジトリを複製して設定ファイルを取得する方式にはしない。
 
 試合管理機能の初期状態もDuck側の対戦用設定として版管理する。初期対戦はCraneの現行構成に合わせ、青チーム名を`TIGERs Mannheim`、黄チーム名を`ibis`、試合種別を`FRIENDLY`とする。Craneの`team:=ibis`とSumatraの`--aiBlue`でチーム対応を定め、片方だけの設定を変更しない。
+
+Game Controller 3.20.3では`AutoApproveGoals`の既定値は無効である。対戦方式の専用設定だけでこれを有効にし、通常方式と比較方式の設定には反映しない。設定対象は固定版`8050f232c3130323bbd91d1d3d56e9553506c8e4`のGame Controllerとする。
+
+この設定は、AutoRefの`PossibleGoal`提案を受け取った時点で得点が承認されたことを意味しない。Game Controllerの応答`OK`は提案を受信して処理待ちに入れたことを示す。その後、提案の一括処理を経て公開審判情報に`POSSIBLE_GOAL`が記録され、審判指令が`HALT`になる。有効な提案なら、続いて`GOAL`が記録され、対象チームの得点が1点増える。この順序で観測し、これらの情報が同一パケットに含まれることは要求しない。
+
+制御試験の入力では、固定版の提案検査が対象とするチーム、選手番号、人数、高さ、最後に触れた選手をそれぞれ明示し、期待値と照合する。選手番号と人数を混同せず、任意項目の欠落によって妥当性確認を通り抜けた提案を成功として扱わない。
 
 Crane が現在使う構成ファイルでは、Sumatra、試合管理機能、SSLログ記録器のイメージの版識別子が更新される。そのためDuckの再現可能な試験では暗黙の`latest`を使わず、AppHostの設定でイメージの版識別子またはダイジェスト値を明示し、実行証跡に解決済みのイメージ参照を保存する。Craneのイメージは既存の`scenario-<対象コミットのハッシュ値>`を既定とし、Craneの対戦処理が同じCraneイメージに`match-<commit SHA>`という版識別子を付けて利用できる構成と整合させる。
 
@@ -457,17 +463,20 @@ Crane が現在使う構成ファイルでは、Sumatra、試合管理機能、S
 
 勝敗そのものはCIの合否条件にしない。両チームの人工知能が同じ試合に参加し、規定の終了条件まで進行し、結果と診断証跡を生成できることを対戦機能の正常条件とする。
 
+AutoRef 1.2.0の調査基準はコミット`1cb2545b81f3568767139a145e3c1aa062399848`とする。この版で再現可能かつ妥当な得点提案を発生させる試験条件は未確定であり、再現試験も未実施である。固定した試験配置、発生させる提案、判定に使う入力値を特定するまでは、自動承認の受入を完了扱いにしない。実装前に具体的な再現手順を確認する。
+
 ### 対戦方式の受入項目
 
 | ID | 確認内容 | 合格条件 |
 | --- | --- | --- |
-| `ASPIRE-MATCH-001` | 資源構成 | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`が存在し、各Docker資源に起動管理処理と準備完了条件がある。構成試験では準備完了を待つ`WaitFor`の依存関係を固定し、`cm4-sim`と比較専用の`tracker-tigers`を起動対象に含めない。 |
+| `ASPIRE-MATCH-001` | 資源構成 | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`が存在し、各Docker資源に起動管理処理と準備完了条件がある。構成試験では準備完了を待つ`WaitFor`の依存関係を固定し、`cm4-sim`、`tracker-tigers`、`tracker-erforce`、`debug-host`を起動対象に含めない。 |
 | `ASPIRE-MATCH-002` | チームと審判情報の契約 | 青チーム=`TIGERs Mannheim`、黄チーム=`ibis`、Crane=`team:=ibis`、Sumatra=`--aiBlue`が一致し、11003の送信元は`game-controller`一つだけである。方式固有の準備確認で`match`の初期`STOP`を確かめる。 |
 | `ASPIRE-MATCH-003` | 両チームの実動作 | 同じ進行中の審判状態の確認時間内に、SSL-Vision上で黄側のCraneロボットと青側のTIGERsロボット双方の位置変化を観測できる。片側だけの移動では合格にしない。 |
-| `ASPIRE-MATCH-004` | AutoRefとトラッカーの経路 | `tigers-blue`が11010へトラッカーパケットを出力し、`autoref-tigers`が10020 / 11003 / 11010を使って動作する。Duckは11010へ送信せず、AutoRefのトラッカー入力に別の送信元を混在させない。 |
-| `ASPIRE-MATCH-005` | 試合終了と証跡 | `POST_GAME`または最大試合時間で終了し、対戦結果、全起動対象の標準出力・標準エラー、SSLログ、Craneの記録データ、試合管理機能 / AutoRef / Sumatraの診断情報を保存できる。 |
+| `ASPIRE-MATCH-004` | AutoRefとトラッカーの経路 | `tigers-blue`が11010へトラッカーパケットを出力し、`autoref-tigers`が10020 / 11003 / 11010を使って動作する。Duckは11010へ送信せず、AutoRefのトラッカー入力に別の送信元を混在させない。通常対戦で得点が発生することは合格条件にしない。 |
+| `ASPIRE-MATCH-005` | 試合終了と証跡 | `POST_GAME`または最大試合時間で終了し、対戦結果、全起動対象の標準出力・標準エラー、SSLログ、Craneの記録データ、試合管理機能 / AutoRef / Sumatraの診断情報を保存できる。通常対戦で得点が発生することは合格条件にしない。 |
+| `ASPIRE-MATCH-006` | 得点提案の制御試験 | 通常対戦とは分けた固定環境で、固定版AutoRefが妥当な`PossibleGoal`提案を再現する。対戦専用の`AutoApproveGoals`設定を使い、提案への`OK`、提案の一括処理後の`POSSIBLE_GOAL`と`HALT`、その後の`GOAL`と対象チームの1点加算を順に確認する。選手番号、人数、高さ、最後に触れた選手など、固定版の検査対象を正確に設定する。出力が同一パケットに含まれることは要求しない。AutoRef提案、各段階の審判情報、審判指令、得点を証跡として保存する。再現条件が確定するまでは未完了とする。 |
 
-Linuxの自動結合試験では`ASPIRE-MATCH-001`から`005`までを対戦方式の受入条件とする。Windows / macOSでの対応を表明する場合も、各OS上で同じ項目を実際のパケットで確認するまでは対応済みと扱わない。
+Linuxの自動結合試験では`ASPIRE-MATCH-001`から`006`までを対戦方式の受入条件とする。`ASPIRE-MATCH-006`は通常対戦と分けて実行する。Windows / macOSでの対応を表明する場合も、各OS上で同じ項目を実際のパケットで確認するまでは対応済みと扱わない。
 
 ## 診断
 
@@ -509,7 +518,9 @@ Linuxの自動結合試験では`ASPIRE-MATCH-001`から`005`までを対戦方�
 - `comparison`方式ではTIGERs / ER-Forceを個別の起動管理資源、`Tracker.DebugHost`を.NETプロジェクト資源とする。各トラッカーの所有者確認とサービス準備を行い、DebugHostはDuckの起動通知と両トラッカーの準備完了を待つ。三つの送信元識別と新しいパケットを使う比較用正常性確認を満たす。
 - 対戦方式では`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`を追加し、青チームのTIGERs制御用人工知能と黄チームのCraneを同じ試合管理機能とシミュレータで対戦させられる。
 - 対戦方式では`cm4-sim`を起動せず、Duckから11010への送信を無効にしてAutoRefのトラッカー入力に干渉しない。
-- `ASPIRE-MATCH-001`から`ASPIRE-MATCH-005`により、両チームの実動作、AutoRefとトラッカーの経路、試合終了、結果と診断成果物を確認できる。
+- `ASPIRE-MATCH-001`から`ASPIRE-MATCH-006`により、両チームの実動作、AutoRefとトラッカーの経路、通常対戦の終了と証跡、分離した得点提案の制御試験を確認できる。通常対戦で得点が発生することは合格条件にしない。
+- 対戦方式のGame Controllerだけで`AutoApproveGoals`を有効にし、通常方式と比較方式の設定は変えない。制御試験では`OK`、`POSSIBLE_GOAL`と`HALT`、有効判定後の`GOAL`と得点加算を順に確認し、同一パケット内の一致は求めない。再現条件が確定するまではこの受入を未完了とする。
+- `match-controller`は既存の`Testing/Duck.Testing.RefereeDriver`と`SslProto`を使う.NET 10コンテナとして設計する。新しいNuGet依存を導入しない。実行環境イメージと配布経路は未確定のため、実装前に基盤イメージ、固定ダイジェスト、導入方法を確認する。
 - シミュレータと Crane は Docker コンテナ、Duck はホスト上の .NET プロセスとして起動する。
 - Craneは`ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`の固定した識別子で起動し、Duck側ではビルドしない。
 - Duck は既存の `sim` 設定と SSL-Vision 契約を維持する。
@@ -527,6 +538,8 @@ Linuxの自動結合試験では`ASPIRE-MATCH-001`から`005`までを対戦方�
 
 - GitHub課題 #18 `Aspire対応`。
 - GitHub課題 #14 `dockerでシミュレーターのケースを追加`。
+- [Game Controller 3.20.3のAutoRef提案受信処理](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/rcon/server_autoref.go)、[提案の処理](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/engine/process_proposals.go)、[試合事象への反映](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/statemachine/change_gameevent.go)、[設定と既定値](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/config/config.go)。
+- [Craneの対戦用Docker起動設定](https://github.com/ibis-ssl/crane/blob/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/docker-compose.yaml)に記載されたAutoRefイメージと起動引数。AutoRefの調査基準はコミット`1cb2545b81f3568767139a145e3c1aa062399848`であり、その固定版での得点提案の再現試験は未実施である。
 - `Tracker/Design/RuntimeHost/runtime-host-plan.md`。
 - `Tracker/Tracker.RuntimeHost/appsettings.json`。
 - ER-Forceの`simulator-cli`実装とREADME。
