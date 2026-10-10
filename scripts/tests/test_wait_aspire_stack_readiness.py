@@ -63,6 +63,19 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertNotIn('docker inspect "$container_id"', cleanup_step)
         self.assertNotIn("docker image ls", cleanup_step)
 
+    def test_workflow_skips_full_stack_artifact_upload_when_sanitization_fails(self):
+        repository = Path(__file__).resolve().parents[2]
+        workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
+        cleanup_start = workflow.index("- name: Collect logs and clean up this run's containers")
+        upload_start = workflow.index("- name: Upload full-stack acceptance evidence")
+        cleanup_step = workflow[cleanup_start:upload_start]
+        upload_step = workflow[upload_start:]
+
+        self.assertIn("id: cleanup_full_stack", cleanup_step)
+        self.assertIn("scripts/sanitize_aspire_artifacts.py", cleanup_step)
+        self.assertIn('echo \"sanitization_success=$sanitization_success\" >> \"$GITHUB_OUTPUT\"', cleanup_step)
+        self.assertIn("steps.cleanup_full_stack.outputs.sanitization_success == 'true'", upload_step)
+
     def test_probe_returns_status_without_reading_response_body(self):
         response = MagicMock()
         response.status = 200

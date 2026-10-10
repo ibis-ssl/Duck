@@ -17,7 +17,8 @@ SECRET_FIELD = re.compile(
     r"(?ix)"
     r"(?P<key>['\"]?[A-Za-z0-9_.-]*(?:token|password|passwd|secret|credential|private[_-]?key|client[_-]?key|api[_-]?key|access[_-]?key|authorization)[A-Za-z0-9_.-]*['\"]?)"
     r"(?P<separator>\s*[:=]\s*)"
-    r"(?P<value>\"(?:\\.|[^\"\\])*\"|'(?:''|\\.|[^'])*'|[^\s,;}\]]+)"
+    r"(?P<value>\"(?:\\.|[^\"\\])*\"|'(?:''|\\.|[^'])*'|[^\s,;}\]]+)",
+    re.S,
 )
 BEARER = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]+=*")
 PRIVATE_KEY_BLOCK = re.compile(

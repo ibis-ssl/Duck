@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -5,9 +6,84 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from capture_aspire_dcp_logs import capture, sanitize
+from sanitize_aspire_artifacts import sanitize_tree
 
 
 class CaptureAspireDcpLogsTests(unittest.TestCase):
+    def test_workflow_persists_crane_probe_outside_dcp_logs(self):
+        workflow = Path(__file__).resolve().parents[2] / ".github/workflows/dotnet-test.yml"
+        text = workflow.read_text(encoding="utf-8-sig")
+        self.assertIn('export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"', text)
+        self.assertIn('python3 scripts/sanitize_aspire_artifacts.py "$results_dir"', text)
+        self.assertIn('path: artifacts/aspire-full-stack', text)
+
+    def test_jsonl_sanitization_preserves_records_and_escaped_secret_boundaries(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts" / "aspire-full-stack"
+            root.mkdir(parents=True)
+            path = root / "crane-probe.jsonl"
+            records = [
+                {"event_name": "duck_crane_probe_progress", "attempt": 1,
+                 "Outcome": {"Ready": False, "StandardErrorExcerpt": 'password="JSONL_SENTINEL"\nnext line'}},
+                {"event_name": "duck_crane_probe_progress", "attempt": 2,
+                 "Outcome": {"Ready": True, "StandardOutputExcerpt": "/session_controller\n"}},
+            ]
+            path.write_text("\n".join(json.dumps(item) for item in records) + "\n", encoding="utf-8")
+            self.assertEqual([], sanitize_tree(root))
+            result = path.read_text(encoding="utf-8")
+            self.assertNotIn("JSONL_SENTINEL", result)
+            decoded = [json.loads(line) for line in result.splitlines()]
+            self.assertEqual(2, len(decoded))
+            self.assertEqual('password="[REDACTED]"\nnext line', decoded[0]["Outcome"]["StandardErrorExcerpt"])
+            self.assertTrue(decoded[1]["Outcome"]["Ready"])
+            self.assertEqual(2, decoded[1]["attempt"])
+
+    def test_incomplete_jsonl_prevents_upload_instead_of_becoming_valid_evidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "crane-probe.jsonl"
+            path.write_text('{"event_name":', encoding="utf-8")
+            self.assertEqual([path], sanitize_tree(root))
+
+    def test_crane_probe_sanitizer_shared_fixtures(self):
+        fixtures_path = Path(__file__).with_name("crane_probe_sanitizer_fixtures.json")
+        fixtures = json.loads(fixtures_path.read_text(encoding="utf-8"))
+        for fixture in fixtures:
+            with self.subTest(input=fixture["input"]):
+                self.assertEqual(fixture["expected"], sanitize(fixture["input"]))
+
+    def test_artifact_sanitizer_fails_closed_and_leaves_failed_file_unmodified(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts"
+            root.mkdir()
+            protected = root / "unsafe.log"
+            protected.write_text("api_token=UPLOAD_SENTINEL", encoding="utf-8")
+
+            def fail_for_sentinel(text):
+                if "UPLOAD_SENTINEL" in text:
+                    raise RuntimeError("forced sanitizer failure")
+                return sanitize(text)
+
+            failures = sanitize_tree(root, fail_for_sentinel)
+
+            self.assertEqual([protected], failures)
+            self.assertIn("UPLOAD_SENTINEL", protected.read_text(encoding="utf-8"))
+
+    def test_artifact_sanitizer_redacts_all_files_before_upload(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts"
+            root.mkdir()
+            diagnostic = root / "dcp" / "dcp-log-tails.txt"
+            diagnostic.parent.mkdir()
+            diagnostic.write_text('{"StandardErrorExcerpt":"password=ARTIFACT_SENTINEL"}', encoding="utf-8")
+
+            failures = sanitize_tree(root)
+
+            self.assertEqual([], failures)
+            result = diagnostic.read_text(encoding="utf-8")
+            self.assertNotIn("ARTIFACT_SENTINEL", result)
+            self.assertIn("[REDACTED]", result)
+
     def test_sanitize_redacts_aspire_dashboard_login_query_token(self):
         token = "DASHBOARD_LOGIN_TOKEN_SENTINEL"
 

@@ -135,6 +135,20 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(craneResource, (Find(appHost, "duck"), WaitType.WaitUntilStarted), (Find(appHost, "game-controller"), WaitType.WaitUntilHealthy));
     }
 
+    [Fact]
+    public async Task CraneDiagnosticsPathReachesOnlyItsWrapperAndNotTheContainer()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "duck-crane-model-" + Guid.NewGuid().ToString("N"), "crane-probe.jsonl");
+        using var appHost = await CreateAppHostAsync("--Testing:Crane:DiagnosticsPath=" + path);
+        foreach (var name in new[] { "simulator", "game-controller", "crane", "cm4-sim" })
+        {
+            var launch = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, name)));
+            Assert.Equal(name == "crane" ? Path.GetFullPath(path) : null, launch.CraneDiagnosticsPath);
+            Assert.DoesNotContain(launch.Environment, entry => entry.Key.Contains("DiagnosticsPath", StringComparison.Ordinal));
+            Assert.DoesNotContain(ToSpec(launch).CreateRunArguments(), argument => argument.Contains(path, StringComparison.Ordinal));
+        }
+    }
+
     private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs) =>
         await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
             [.. additionalArgs, CreateIsolatedOwnershipLockArgument()]);

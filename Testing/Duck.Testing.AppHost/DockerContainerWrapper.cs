@@ -32,15 +32,26 @@ public static class DockerContainerWrapper
     }
 
     public static Task<int> RunAsync(DockerWrapperLaunchOptions options, CancellationToken shutdownToken = default) =>
-        RunAsync(options, shutdownToken, StopChildProcessAsync);
+        RunAsync(options, shutdownToken, StopChildProcessAsync, Console.Error.WriteLine);
+
+    internal static Task<int> RunAsync(
+        DockerWrapperLaunchOptions options,
+        CancellationToken shutdownToken,
+        Func<Process, TimeSpan, Task<bool>> stopChildProcessAsync) =>
+        RunAsync(options, shutdownToken, stopChildProcessAsync, Console.Error.WriteLine);
 
     internal static async Task<int> RunAsync(
         DockerWrapperLaunchOptions options,
         CancellationToken shutdownToken,
-        Func<Process, TimeSpan, Task<bool>> stopChildProcessAsync)
+        Func<Process, TimeSpan, Task<bool>> stopChildProcessAsync,
+        Action<string> diagnosticWriter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(stopChildProcessAsync);
+        ArgumentNullException.ThrowIfNull(diagnosticWriter);
+        var secondaryDiagnosticWriter = diagnosticWriter;
+        diagnosticWriter = line => CraneProbeDiagnostics.WriteRecord(
+            options.CraneDiagnosticsPath, line, secondaryDiagnosticWriter);
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(shutdownToken);
         ConsoleCancelEventHandler cancelHandler = (_, eventArgs) =>
         {
@@ -74,6 +85,9 @@ public static class DockerContainerWrapper
         await using var visionReadiness = options.ReadinessProfile == "simulator"
             ? new VisionServiceReadiness()
             : null;
+        var craneProbeDiagnostics = options.ReadinessProfile == "crane"
+            ? new CraneProbeDiagnosticState()
+            : null;
         Process? logProcess = null;
         string? containerId = null;
         var cleanupCompleted = true;
@@ -95,7 +109,8 @@ public static class DockerContainerWrapper
             await EnsureExactRunningOwnerAsync(spec, containerId, options.DockerExecutable, cancellation.Token);
             logProcess = StartLogFollower(options.DockerExecutable, containerId);
             await WaitForServiceReadinessAsync(
-                spec, containerId, options, gameControllerReadiness, visionReadiness, cancellation.Token);
+                spec, containerId, options, gameControllerReadiness, visionReadiness, craneProbeDiagnostics,
+                diagnosticWriter, cancellation.Token);
             ready.Set();
 
             while (!cancellation.IsCancellationRequested)
@@ -103,7 +118,8 @@ public static class DockerContainerWrapper
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellation.Token);
                 await EnsureExactRunningOwnerAsync(spec, containerId, options.DockerExecutable, cancellation.Token);
                 await EnsureExpectedProcessAsync(containerId, options, cancellation.Token);
-                if (!await IsServiceReadyAsync(containerId, options, gameControllerReadiness, visionReadiness, cancellation.Token))
+                if (!await IsServiceReadyAsync(containerId, options, gameControllerReadiness, visionReadiness,
+                    craneProbeDiagnostics, diagnosticWriter, cancellation.Token))
                 {
                     throw new InvalidOperationException($"Service readiness became unhealthy for {spec.ResourceName}.");
                 }
@@ -125,6 +141,11 @@ public static class DockerContainerWrapper
         }
         finally
         {
+            if (craneProbeDiagnostics is not null)
+            {
+                TryWriteCraneDiagnostic(diagnosticWriter, craneProbeDiagnostics.CreateFinalSummary(cancellation.IsCancellationRequested));
+            }
+
             var shutdownTimer = Stopwatch.StartNew();
             try
             {
@@ -256,6 +277,18 @@ public static class DockerContainerWrapper
         return process;
     }
 
+    private static void TryWriteCraneDiagnostic(Action<string> diagnosticWriter, string jsonLine)
+    {
+        try
+        {
+            diagnosticWriter(jsonLine);
+        }
+        catch (Exception)
+        {
+            // Diagnostics must not prevent readiness retries or scoped cleanup.
+        }
+    }
+
     private static async Task ForwardOutputAsync(StreamReader source, TextWriter destination)
     {
         try
@@ -304,6 +337,8 @@ public static class DockerContainerWrapper
         DockerWrapperLaunchOptions options,
         GameControllerReadinessMonitor? gameControllerReadiness,
         VisionServiceReadiness? visionReadiness,
+        CraneProbeDiagnosticState? craneProbeDiagnostics,
+        Action<string> diagnosticWriter,
         CancellationToken cancellationToken)
     {
         var deadline = Stopwatch.StartNew();
@@ -313,7 +348,8 @@ public static class DockerContainerWrapper
             await EnsureExactRunningOwnerAsync(spec, containerId, options.DockerExecutable, cancellationToken);
             var processReady = await EnsureExpectedProcessAsync(containerId, options, cancellationToken);
             var serviceReady = await IsServiceReadyAsync(
-                containerId, options, gameControllerReadiness, visionReadiness, cancellationToken);
+                containerId, options, gameControllerReadiness, visionReadiness, craneProbeDiagnostics,
+                diagnosticWriter, cancellationToken);
             if (processReady && serviceReady)
             {
                 return;
@@ -349,6 +385,8 @@ public static class DockerContainerWrapper
         DockerWrapperLaunchOptions options,
         GameControllerReadinessMonitor? gameControllerReadiness,
         VisionServiceReadiness? visionReadiness,
+        CraneProbeDiagnosticState? craneProbeDiagnostics,
+        Action<string> diagnosticWriter,
         CancellationToken cancellationToken)
     {
         switch (options.ReadinessProfile)
@@ -360,11 +398,28 @@ public static class DockerContainerWrapper
                 return visionReadiness?.IsReady == true;
             case "crane":
             {
+                TryWriteCraneDiagnostic(diagnosticWriter,
+                    CraneProbeDiagnostics.SerializeAttemptStarted((craneProbeDiagnostics?.AttemptCount ?? 0) + 1));
+                var probeTimer = Stopwatch.StartNew();
                 var graph = await RunDockerAsync(
                     options.DockerExecutable,
                     DockerServiceReadiness.CreateCraneReadinessProbeArguments(containerId),
                     cancellationToken);
-                return DockerServiceReadiness.CraneProbeSucceeded(graph.ExitCode, graph.StandardOutput);
+                if (craneProbeDiagnostics is null)
+                {
+                    return CraneProbeDiagnostics.Evaluate(graph.ExitCode, graph.StandardOutput, graph.StandardError,
+                        probeTimer.Elapsed).Ready;
+                }
+
+                var outcome = CraneProbeDiagnostics.Evaluate(
+                    graph.ExitCode, graph.StandardOutput, graph.StandardError, probeTimer.Elapsed);
+                var progress = craneProbeDiagnostics.Record(outcome);
+                if (progress is not null)
+                {
+                    TryWriteCraneDiagnostic(diagnosticWriter, CraneProbeDiagnostics.SerializeProgress(progress));
+                }
+
+                return outcome.Ready;
             }
             case "cm4-sim":
             {
