@@ -293,6 +293,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var combinedOutput = stdout + Environment.NewLine + stderr;
             Assert.NotEqual(0, secondAppHost.ExitCode);
             Assert.Contains($"Another Duck Aspire stack already owns '{Path.GetFullPath(lockPath)}'.", combinedOutput, StringComparison.Ordinal);
+            Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId));
         }
         finally
         {
