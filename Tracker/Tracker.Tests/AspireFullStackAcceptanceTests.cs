@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -220,6 +221,183 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             output.WriteLine($"Acceptance evidence: {path}");
         }
     }
+
+    [Fact]
+    public async Task SecondAppHostWithSameLockIsRejectedWithoutDisruptingFirstStack()
+    {
+        var artifactsDirectory = Environment.GetEnvironmentVariable("DUCK_ASPIRE_ARTIFACTS")
+            ?? Path.Combine(Path.GetTempPath(), "duck-aspire-full-stack-artifacts");
+        var processInfoPath = Path.Combine(artifactsDirectory, "apphost-process.txt");
+        Assert.True(File.Exists(processInfoPath), $"Full-stack AppHost process record was not found: {processInfoPath}");
+
+        var processInfo = File.ReadAllLines(processInfoPath)
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .Select(line => line.Split('=', 2))
+            .Where(parts => parts.Length == 2)
+            .ToDictionary(parts => parts[0], parts => parts[1], StringComparer.Ordinal);
+        Assert.True(processInfo.TryGetValue("apphost_pid", out var firstPidText), "apphost_pid is missing from apphost-process.txt.");
+        Assert.True(processInfo.TryGetValue("stack_lock", out var lockPath), "stack_lock is missing from apphost-process.txt.");
+        Assert.True(processInfo.TryGetValue("stack_id", out var firstStackId), "stack_id is missing from apphost-process.txt.");
+        Assert.True(int.TryParse(firstPidText, out var firstPid), $"Invalid apphost_pid in {processInfoPath}.");
+        Assert.True(File.Exists(lockPath), $"The first AppHost lock file does not exist: {lockPath}");
+
+        using var firstAppHost = Process.GetProcessById(firstPid);
+        Assert.False(firstAppHost.HasExited, "The first AppHost process exited before the second-owner check.");
+        var firstContainerIds = await GetOwnedContainerIdsAsync(firstStackId);
+        Assert.NotEmpty(firstContainerIds);
+
+        var secondStackId = $"second-owner-{Guid.NewGuid():N}";
+        var repositoryRoot = FindRepositoryRoot();
+        var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj");
+        using var secondAppHost = new Process
+        {
+            StartInfo = new ProcessStartInfo("dotnet")
+            {
+                WorkingDirectory = repositoryRoot,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            },
+        };
+        secondAppHost.StartInfo.ArgumentList.Add("run");
+        secondAppHost.StartInfo.ArgumentList.Add("--no-build");
+        secondAppHost.StartInfo.ArgumentList.Add("--project");
+        secondAppHost.StartInfo.ArgumentList.Add(appHostProject);
+        secondAppHost.StartInfo.Environment["Testing__StackOwnership__LockPath"] = lockPath;
+        secondAppHost.StartInfo.Environment["Testing__StackOwnership__StackId"] = secondStackId;
+
+        string stdout = string.Empty;
+        string stderr = string.Empty;
+        var secondExited = false;
+        var secondStarted = false;
+        try
+        {
+            Assert.True(secondAppHost.Start(), "Could not start the second AppHost process.");
+            secondStarted = true;
+            var stdoutTask = secondAppHost.StandardOutput.ReadToEndAsync();
+            var stderrTask = secondAppHost.StandardError.ReadToEndAsync();
+            using var exitTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            try
+            {
+                await secondAppHost.WaitForExitAsync(exitTimeout.Token);
+                secondExited = true;
+            }
+            catch (OperationCanceledException)
+            {
+                throw new InvalidOperationException("The second AppHost did not exit within 30 seconds; a timeout is not accepted as lock rejection.");
+            }
+
+            stdout = await stdoutTask;
+            stderr = await stderrTask;
+            var combinedOutput = stdout + Environment.NewLine + stderr;
+            Assert.NotEqual(0, secondAppHost.ExitCode);
+            Assert.Contains($"Another Duck Aspire stack already owns '{Path.GetFullPath(lockPath)}'.", combinedOutput, StringComparison.Ordinal);
+        }
+        finally
+        {
+            if (secondStarted && !secondExited && !secondAppHost.HasExited)
+            {
+                secondAppHost.Kill(entireProcessTree: true);
+                using var cleanupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                await secondAppHost.WaitForExitAsync(cleanupTimeout.Token);
+            }
+
+            await RemoveOnlySecondStackContainersAsync(secondStackId);
+            Assert.False(firstAppHost.HasExited, "The first AppHost exited during the second-owner check.");
+            Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId));
+        }
+
+        Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId));
+        Assert.False(firstAppHost.HasExited, "The first AppHost exited during the second-owner check.");
+        Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId));
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        foreach (var start in new[] { Environment.CurrentDirectory, AppContext.BaseDirectory })
+        {
+            var directory = new DirectoryInfo(start);
+            while (directory is not null)
+            {
+                if (File.Exists(Path.Combine(directory.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+                {
+                    return directory.FullName;
+                }
+
+                directory = directory.Parent;
+            }
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the Duck repository root from the test process.");
+    }
+
+    private static async Task<string[]> GetOwnedContainerIdsAsync(string stackId)
+    {
+        var result = await RunProcessAsync("docker", [
+            "ps", "-aq", "--no-trunc",
+            "--filter", "label=duck.aspire.owner=duck-apphost",
+            "--filter", $"label=duck.aspire.stack={stackId}",
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, result.ExitCode);
+        return result.StandardOutput
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static async Task RemoveOnlySecondStackContainersAsync(string stackId)
+    {
+        var containerIds = await GetOwnedContainerIdsAsync(stackId);
+        foreach (var containerId in containerIds)
+        {
+            var inspection = await RunProcessAsync("docker", [
+                "inspect", "--format", "{{index .Config.Labels \"duck.aspire.owner\"}} {{index .Config.Labels \"duck.aspire.stack\"}}", containerId,
+            ], TimeSpan.FromSeconds(15));
+            Assert.Equal(0, inspection.ExitCode);
+            Assert.Equal($"duck-apphost {stackId}", inspection.StandardOutput.Trim());
+            var removal = await RunProcessAsync("docker", ["rm", "--force", containerId], TimeSpan.FromSeconds(15));
+            Assert.Equal(0, removal.ExitCode);
+        }
+    }
+
+    private static async Task<ProcessResult> RunProcessAsync(string fileName, IEnumerable<string> arguments, TimeSpan timeout)
+    {
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo(fileName)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            },
+        };
+        foreach (var argument in arguments)
+        {
+            process.StartInfo.ArgumentList.Add(argument);
+        }
+
+        Assert.True(process.Start(), $"Could not start {fileName}.");
+        var stdoutTask = process.StandardOutput.ReadToEndAsync();
+        var stderrTask = process.StandardError.ReadToEndAsync();
+        using var timeoutSource = new CancellationTokenSource(timeout);
+        try
+        {
+            await process.WaitForExitAsync(timeoutSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            process.Kill(entireProcessTree: true);
+            using var cleanupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            await process.WaitForExitAsync(cleanupTimeout.Token);
+            throw;
+        }
+
+        return new ProcessResult(process.ExitCode, await stdoutTask, await stderrTask);
+    }
+
+    private sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
 
     private static async Task<SSL_WrapperPacket> ReadVisionFrameWithYellowRobotsAsync(
         UdpMulticastReceiver receiver,
