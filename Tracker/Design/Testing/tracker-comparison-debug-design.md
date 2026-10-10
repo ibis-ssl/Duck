@@ -30,13 +30,13 @@ raw vision は共通の比較入力として扱うが、シミュレータの真
 
 | 資源名 | 実行形態 | 役割 |
 | --- | --- | --- |
-| `tracker-tigers` | Docker image | raw vision `224.5.23.2:10020` を受信し、TIGERs の tracker 出力を `224.5.23.2:11010` へ送信する。 |
-| `tracker-erforce` | Docker image | raw vision `224.5.23.2:10020` を受信し、ER-Force の tracker 出力を `224.5.23.2:11010` へ送信する。 |
+| `tracker-tigers` | Aspire wrapper executable resource + owned Docker container | raw vision `224.5.23.2:10020` を受信し、TIGERs の tracker 出力を `224.5.23.2:11010` へ送信する。wrapper は owner labels / resource name / expected image / host network / exact container ID / Running 状態を inspect で照合し、container 内 Sumatra process / 起動診断と期待 identity の新しい tracker packet を確認するまで ready にしない。 |
+| `tracker-erforce` | Aspire wrapper executable resource + owned Docker container | raw vision `224.5.23.2:10020` を受信し、ER-Force の tracker 出力を `224.5.23.2:11010` へ送信する。wrapper は owner labels / resource name / expected image / host network / exact container ID / Running 状態を inspect で照合し、container 内 ER-Force tracker process / 起動診断と期待 identity の新しい tracker packet を確認するまで ready にしない。 |
 | `debug-host` | .NET プロセス | raw vision と `224.5.23.2:11010` の全 tracker packet を受信し、ライブ比較と CaptureOn / replay を提供する。 |
 
 Duck `Tracker.RuntimeHost` も `sim` profile で `224.5.23.2:11010` へ出力する。三つの tracker source は同じ official tracker multicast endpoint を共有し、`Tracker.DebugHost` 側で source identity により分離する。
 
-comparison mode でも referee / game-state の authoritative producer は基底構成の `game-controller` 一つだけとする。`tracker-tigers` は Sumatra の referee module を `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` に固定した外部 Game Controller 用設定を使い、`224.5.23.1:11003` を consumer として受信する。標準 `simulation_protocol.xml` のように Sumatra 内蔵 Game Controller を有効にする構成は使わない。`tracker-erforce` の `--gc-port 11003` も consumer とし、11003 を publish させない。`tracker-tigers` / `tracker-erforce` は `simulator` と `game-controller` の開始後に起動する。
+comparison mode でも referee / game-state の authoritative producer は基底構成の `game-controller` 一つだけとする。`tracker-tigers` は Sumatra の referee module を `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` に固定した外部 Game Controller 用設定を使い、`224.5.23.1:11003` を consumer として受信する。標準 `simulation_protocol.xml` のように Sumatra 内蔵 Game Controller を有効にする構成は使わない。`tracker-erforce` の `--gc-port 11003` も consumer とし、11003 を publish させない。`tracker-tigers` / `tracker-erforce` は個別 wrapper executable resource として登録し、準備完了した `simulator` と `game-controller` を health-based `WaitFor` して起動する。
 
 ## TIGERs tracker
 
@@ -71,7 +71,7 @@ ER-Force は Crane の開発用 compose で利用実績がある `roboticserlang
 
 ## DebugHost の起動設定
 
-`debug-host` は `Tracker.DebugHost` をホスト上の .NET project resource として起動する。比較専用 observer とし、DebugHost 自身の tracker は動かさない。
+`debug-host` は `Tracker.DebugHost` をホスト上の .NET project resource として起動する。比較専用 observer とし、DebugHost 自身の tracker は動かさない。AppHost の依存グラフでは Duck project-start 通知と両外部 tracker wrapper の ready を待つ。project process の起動だけでは DebugHost を ready としない。comparison health が Duck / TIGERs / ER-Force の三 logical role を別 source identity へ解決し、同じ有限の確認窓で各 source の新しい tracker packet を受信した場合だけ ready とする。外部 multicast packet は Docker container の所有証拠に用いず、wrapper が別途 exact owner inspection と container 内 service readiness を確認する。
 
 AppHost から最低限、次を上書きする。
 
@@ -191,7 +191,7 @@ assignment の結果は、まず候補 edge 内で対応する pair 数を最大
 
 TIGERs または ER-Force tracker の一方が起動できなくても Duck と Simulator の通常試験まで巻き込んで停止させない。
 
-ただし比較モードの状態は、要求した tracker source が受信できていない場合、または Duck / TIGERs / ER-Force の三つの logical role を別 comparison source identity へ解決できない場合に `Ready` としない。同一 UUID の複数 endpoint は一つの source として扱い、endpoint 数だけで `Ready` を落とさない。Aspire の resource 状態と DebugHost の source 一覧の両方で欠落または role 解決不足を確認できるようにする。
+ただし比較モードの状態は、要求した tracker source が受信できていない場合、または Duck / TIGERs / ER-Force の三つの logical role を別 comparison source identity へ解決できない場合に `Ready` としない。同一 UUID の複数 endpoint は一つの source として扱い、endpoint 数だけで `Ready` を落とさない。Aspire の resource 状態と DebugHost の source 一覧の両方で欠落または role 解決不足を確認できるようにする。source が一時的に消失したときは DebugHost comparison health も not-ready とし、resource status と表示 state を一致させる。
 
 ## OS 別ネットワーク動作確認
 
@@ -215,13 +215,16 @@ Windows / macOS で multicast が成立しない場合は comparison mode を Re
 AppHost の application model test で次を先に固定する。
 
 - `tracker-tigers`、`tracker-erforce`、`debug-host` が比較モードに存在する。
-- `tracker-tigers` と `tracker-erforce` が基底構成の `game-controller` に `WaitForStart` し、11003 の producer を追加しない。
+- `tracker-tigers` / `tracker-erforce` が wrapper executable resource として登録され、owner inspection と service readiness predicate を持つ。
+- 両 tracker が基底構成の ready な `simulator` / `game-controller` に health-based `WaitFor` し、11003 の producer を追加しない。
 - `tracker-tigers` が `gameController=false`、`publishRefereeMessages=false` の外部 Game Controller 用設定を使う。
 - TIGERs / ER-Force tracker が host network を使う。
 - TIGERs が raw vision 10020 を入力し tracker 11010 を出力する設定である。
 - ER-Force が `--vision-port 10020 --tracker-port 11010` で起動する。
 - DebugHost の tracker receiver が 11010 で有効になる。
 - DebugHost 自身の tracker が無効である。
+- `debug-host` が `Tracker.DebugHost` project resource で、Duck project-start と両 tracker wrapper ready に依存する。
+- DebugHost comparison health が三 source identity の個別解決と同じ確認窓の新しい packet を要求する。tracker resource ready と DebugHost source readiness を別々に model / focused test で固定する。
 
 DebugHost の focused test では次を固定する。
 
@@ -244,8 +247,8 @@ DebugHost の focused test では次を固定する。
 
 ## 実装単位
 
-- `ASPIRE-006A`: TIGERs / ER-Force tracker と DebugHost を Aspire comparison mode に追加する。
-- `ASPIRE-006B`: source identity と三 tracker 同時受信の回帰テストを追加する。
+- `ASPIRE-006A`: tracker 二資源を個別 wrapper executable resource、DebugHost を .NET project resource として追加する。owner inspection / 固有 readiness / health-based 依存辺を model / wrapper test で固定する。
+- `ASPIRE-006B`: source identity、三 tracker の同時 packet readiness、DebugHost comparison health の回帰 test を追加する。
 - `ASPIRE-006C`: `Tracker Difference` の物体対応付けと数値差分モデルを TDD で追加する。
 - `ASPIRE-006D`: live Split / Overlay と数値差分を同じ snapshot pair へ接続する。
 - `ASPIRE-006E`: CaptureOn / replay で三 tracker を同じ diagnostics sample tick に揃える比較を確認する。
@@ -261,7 +264,8 @@ DebugHost の focused test では次を固定する。
 
 ## 完了条件
 
-- 一回の Aspire 起動で Duck / TIGERs / ER-Force tracker と DebugHost を比較モードとして起動できる。
+- 一回の Aspire 起動で Duck / TIGERs / ER-Force tracker と DebugHost を比較モードとして起動できる。tracker 二資源は owner inspection と固有 readiness を持つ wrapper container、DebugHost は project resource である。
+- tracker 二資源は ready な Simulator / Game Controller を待つ。DebugHost は Duck project-start と両 tracker ready を待ち、三 role の別 identity と新しい packet を確認する自身の comparison health を持つ。
 - 三 tracker が同じ raw vision stream を入力として使用する。
 - DebugHost が三 source の official tracker packet を別 source として識別できる。
 - live で Split / Overlay と数値差分を確認できる。

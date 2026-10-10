@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\scripts\tests\crane_probe_sanitizer_fixtures.json"
+          Link="crane_probe_sanitizer_fixtures.json"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
     <ProjectReference Include="..\Tracker.DebugHost\Tracker.DebugHost.csproj" />
     <ProjectReference Include="..\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
@@ -28,6 +34,10 @@
     <ProjectReference Include="..\Tracker.CaptureReplay\Tracker.CaptureReplay.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RunAspireFullStackAcceptance)' != 'true'">
+    <Compile Remove="AspireFullStackAcceptanceTests.cs" />
   </ItemGroup>
 
 </Project>
