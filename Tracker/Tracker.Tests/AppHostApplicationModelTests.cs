@@ -65,6 +65,12 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
         Assert.Equal(360, crane.StartupTimeoutSeconds);
         Assert.DoesNotContain(crane.Environment, item => item.Key == "FEEDBACK_SIM_MODE");
+
+        var cm4Simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "cm4-sim")));
+        Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Simulator.Image);
+        AssertArgumentValue(ToSpec(cm4Simulator).CreateRunArguments(), "--network", "host");
+        AssertArgumentValue(cm4Simulator.ContainerArguments, "--in-port", "12345");
+        AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "12346");
     }
 
     [Fact]
@@ -136,6 +142,55 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task DuckUsesTheSimVisionProfileAndWaitsForSimulatorHealth()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var simulator = Find(appHost, "simulator");
+        var duck = Assert.IsType<ProjectResource>(Find(appHost, "duck"));
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(duck)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new(DistributedApplicationOperation.Run),
+                Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance,
+                CancellationToken.None);
+        var environment = executionConfiguration.EnvironmentVariables.ToDictionary();
+        var wait = Assert.Single(duck.Annotations.OfType<WaitAnnotation>());
+
+        Assert.Equal("sim", environment["Tracker__ActiveProfileName"]);
+        Assert.Equal("224.5.23.2", environment["VisionReceiver__MulticastAddress"]);
+        Assert.Equal("10020", environment["VisionReceiver__Port"]);
+        Assert.Same(simulator, wait.Resource);
+        Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
+    }
+
+    [Theory]
+    [InlineData("visibility_graph")]
+    [InlineData("rvo2")]
+    public async Task SimulatorIbisPortOverridePropagatesToCranePath(string planner)
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Simulator:IbisPort=22346",
+            "--Testing:Crane:Planner=" + planner);
+
+        var simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "simulator")));
+        AssertArgumentValue(simulator.ContainerArguments, "--ibis-port", "22346");
+
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        Assert.Equal(planner, crane.Environment["PLANNER"]);
+        if (planner == "visibility_graph")
+        {
+            var cm4Simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "cm4-sim")));
+            AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "22346");
+            Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
+        }
+        else
+        {
+            Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+            Assert.Equal("22346", crane.Environment["CRANE_TARGET_PORT"]);
+        }
+    }
+
+    [Fact]
     public async Task CraneDiagnosticsPathReachesOnlyItsWrapperAndNotTheContainer()
     {
         var path = Path.Combine(Path.GetTempPath(), "duck-crane-model-" + Guid.NewGuid().ToString("N"), "crane-probe.jsonl");
@@ -172,6 +227,13 @@ public sealed class AppHostApplicationModelTests
 
     private static DockerContainerSpec ToSpec(DockerWrapperLaunchOptions launch) =>
         new(launch.ResourceName, launch.Image, launch.ContainerArguments, launch.Environment, launch.StackId, launch.RunId);
+
+    private static void AssertArgumentValue(IReadOnlyList<string> arguments, string name, string expectedValue)
+    {
+        var index = Array.IndexOf(arguments.ToArray(), name);
+        Assert.True(index >= 0 && index + 1 < arguments.Count, $"Missing value for {name}: {string.Join(" | ", arguments)}");
+        Assert.Equal(expectedValue, arguments[index + 1]);
+    }
 
     private static string CreateIsolatedOwnershipLockArgument() =>
         $"--Testing:StackOwnership:LockPath={Path.Combine(Path.GetTempPath(), $"duck-aspire-model-{Guid.NewGuid():N}.lock")}";
