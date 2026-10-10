@@ -8,7 +8,20 @@
     "ROS",
     "AppHost",
     "Crane",
-    "Windows"
+    "Windows",
+    "Aspire",
+    "GitHub",
+    "DCP",
+    "Linux",
+    "macOS",
+    "Ubuntu",
+    "Kubernetes",
+    "Sumatra",
+    "AI",
+    "CPU",
+    "IP",
+    "SDK",
+    "VPN"
   ],
   "files": [
     "**/*.md"
