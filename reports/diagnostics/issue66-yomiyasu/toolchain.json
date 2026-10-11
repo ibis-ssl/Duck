@@ -4,7 +4,7 @@
   "os": "Windows-11-10.0.22631-SP0",
   "shell": "C:\\WINDOWS\\system32\\cmd.exe",
   "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
-  "python_executable": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+  "python_executable": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
   "node": "v24.20.0",
   "dependencies": {
     "SudachiPy": "0.6.11",
@@ -82,8 +82,8 @@
     "repository": "https://github.com/ssaattww/CodexSkill",
     "commit": "9ebde2cecc272bf65754f36628f1072805272117",
     "source_clean": true,
-    "link": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.agents\\skills",
-    "target": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills"
+    "link": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.agents\\skills",
+    "target": "<USER_HOME>\\RemoteDesktopWorkspace\\CodexSkill\\skills"
   },
   "setup_failure": {
     "command": ".venv/Scripts/python.exe -m pip install -r tools/lint/requirements.txt",

@@ -1,7 +1,7 @@
 ﻿{
   "head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
   "branch": "",
-  "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\baseline-product-source",
+  "cwd": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\baseline-product-source",
   "git_status": "",
   "started_at": "2026-10-08T12:55:41.199739+00:00",
   "files_sha256": {
@@ -1550,12 +1550,12 @@
         "C:\\Program Files\\dotnet\\dotnet.exe",
         "--info"
       ],
-      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\baseline-product-source",
+      "cwd": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\baseline-product-source",
       "head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
       "source_fingerprint": "8a60f29852d32fb23f4d2bafba6010a70c3db363ceced1c3fc19067e998134f4",
       "started_at": "2026-10-08T12:55:41.906765+00:00",
-      "stdout": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stdout.log",
-      "stderr": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stderr.log",
+      "stdout": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stdout.log",
+      "stderr": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stderr.log",
       "exit_code": 0,
       "result": "passed",
       "finished_at": "2026-10-08T12:55:42.184744+00:00"
@@ -1569,32 +1569,32 @@
         "--logger",
         "trx;LogFileName=dotnet-test.trx",
         "--results-directory",
-        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final",
+        "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final",
         "--diag",
-        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.log",
+        "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.log",
         "--blame",
         "-m:1",
         "/nr:false",
-        "-bl:C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.binlog"
+        "-bl:<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.binlog"
       ],
-      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\baseline-product-source",
+      "cwd": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\baseline-product-source",
       "head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
       "source_fingerprint": "8a60f29852d32fb23f4d2bafba6010a70c3db363ceced1c3fc19067e998134f4",
       "started_at": "2026-10-08T12:55:42.193495+00:00",
-      "stdout": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stdout.log",
-      "stderr": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stderr.log",
+      "stdout": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stdout.log",
+      "stderr": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stderr.log",
       "exit_code": 1,
       "result": "failed",
       "finished_at": "2026-10-08T12:55:55.509342+00:00"
     }
   ],
-  "submodule_status_cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu",
+  "submodule_status_cwd": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu",
   "git_status_scope": "parent tracked content; submodule content is pinned and recorded from the reused original source directory",
-  "nuget_packages": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-gate-retry\\dotnet-home\\.nuget\\packages",
+  "nuget_packages": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-gate-retry\\dotnet-home\\.nuget\\packages",
   "dependency_reuse": "Pinned and clean submodule sources reused through directory junctions; baseline build outputs are isolated.",
   "submodules_before": "9b0765fe7a07a55124f6ee957d4559348462d227 SslProto/src/external/ssl-game-controller (v2.7.1-762-g9b0765f)\n 1e719a8d410cc84847ec69104da44fed13738291 SslProto/src/external/ssl-simulation-protocol (1e719a8)",
   "task_environment_overrides": {
-    "DOTNET_CLI_HOME": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-home",
+    "DOTNET_CLI_HOME": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-home",
     "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
     "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1"
   },
@@ -1603,52 +1603,52 @@
   "finished_at": "2026-10-08T12:55:55.696560+00:00",
   "diagnostics": [
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stderr.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stderr.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size": 0
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stdout.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-info.stdout.log",
       "sha256": "ad3f3ae0e0f960bfac064983697e3d734fa25e9d02ab069db0f92d9f9a14a50f",
       "size": 1737
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.binlog",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.binlog",
       "sha256": "d873c42205e590ef8dd589e8e754d4e194aac89b741cc4821e6e9507ea72f685",
       "size": 1170774
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.exit-code",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.exit-code",
       "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
       "size": 3
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stderr.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stderr.log",
       "sha256": "b5951c63820fe7f9bc3c921fefb99546c855d20095bda11d7d6d47b188f0f39b",
       "size": 2533
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stdout.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.stdout.log",
       "sha256": "30ea84fdc59cc3bd129a50d0685669737ccd89d8223238cb805287392d19ff3a",
       "size": 29988
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.trx",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\dotnet-test.trx",
       "sha256": "a396193664966a0d96022cfa912166c6d14339122683d2fd4496dba2c84cb282",
       "size": 571302
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.datacollector.26-10-08_21-55-52_46102_5.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.datacollector.26-10-08_21-55-52_46102_5.log",
       "sha256": "0fed2f686dfc598149c32bed75574ecbdbf3ff6cc97c79d738f5e25e918f2c34",
       "size": 610698
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.host.26-10-08_21-55-52_69902_5.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.host.26-10-08_21-55-52_69902_5.log",
       "sha256": "183577f8e9b46504acf1b794072a1f0381840c14359c2afbc0f76f0954411612",
       "size": 1708933
     },
     {
-      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.log",
+      "path": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-prose-evidence-20261008\\product-baseline-final\\vstest-diagnostics.log",
       "sha256": "938c7ed4880a16135359dc640eb7a8481018ed741bd985ee313784a62011f665",
       "size": 1633112
     }

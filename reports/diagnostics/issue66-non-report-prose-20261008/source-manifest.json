@@ -2,7 +2,7 @@
   "head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
   "branch": "docs/issue66-yomiyasu-pilot",
   "main": "449296725fc69dc004818ede2e8ad59a52ef2d27\trefs/heads/main",
-  "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu",
+  "cwd": "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu",
   "files": [
     {
       "path": "README.md",
@@ -180,11 +180,11 @@
     }
   ],
   "instruction_files": {
-    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\AGENTS.md": false,
-    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\AGENTS.md": false
+    "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\AGENTS.md": false,
+    "<USER_HOME>\\RemoteDesktopWorkspace\\AGENTS.md": false
   },
-  "skill_link": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills",
+  "skill_link": "<USER_HOME>\\RemoteDesktopWorkspace\\CodexSkill\\skills",
   "python_dirs": [
-    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv"
+    "<USER_HOME>\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv"
   ]
 }

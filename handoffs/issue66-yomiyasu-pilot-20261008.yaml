@@ -19,7 +19,7 @@ execution_environment: &id005
   connection: available
   os: Windows-11-10.0.22631-SP0
   shell: C:\WINDOWS\system32\cmd.exe
-  working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+  working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
   repository: ibis-ssl/Duck
   branch: docs/issue66-yomiyasu-pilot
   head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -27,7 +27,7 @@ execution_environment: &id005
   source_fingerprint: 7ef04be43bf77d049e88aec2e4ec51e9edbfe5afce5e4f5972ab44b76aacb54f
   ownership: current_task
   writable_paths: &id001
-  - C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+  - <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
   dependencies: &id002
   - name: SudachiPy
     status: available
@@ -84,12 +84,12 @@ development_policy:
   governing_source: 'Issue #66、tools/lint/README.md、添付Worker Skills'
 validation_plan: &id008
   commands:
-  - node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
+  - node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
     --format json Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md
     Tracker/Design/phases-status.md
-  - node C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
+  - node <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
     Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md Tracker/Design/phases-status.md
-  - C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
+  - <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
     --files Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md
     Tracker/Design/phases-status.md
   - git diff --check
@@ -170,7 +170,7 @@ files:
   - path_or_area: 'Issue #31、#64、PR #65の作業、マージ、依頼元の受入判断の代行'
     reason: 今回の限定評価の対象外
 commands: &id012
-- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
+- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
     --format json Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'before: textlint'
   exit_code: 0
@@ -184,7 +184,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
@@ -195,7 +195,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: e7c831133340606a59ad1367a2f1696ae011417273894cf5bc94b7af22ae7c5a
-- command: node C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
+- command: node <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
     Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'before: cspell'
   exit_code: 0
@@ -209,7 +209,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
@@ -220,7 +220,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: e7c831133340606a59ad1367a2f1696ae011417273894cf5bc94b7af22ae7c5a
-- command: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
+- command: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
     --files Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'before: whitelist'
   exit_code: 0
@@ -234,7 +234,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
@@ -245,8 +245,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: e7c831133340606a59ad1367a2f1696ae011417273894cf5bc94b7af22ae7c5a
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\architecture.md --json
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\architecture.md --json
   purpose: 'before: yomiyasu-lint-architecture'
   exit_code: 0
   result: passed
@@ -260,7 +260,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
@@ -271,8 +271,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: e7c831133340606a59ad1367a2f1696ae011417273894cf5bc94b7af22ae7c5a
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\debughost.md --json
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\debughost.md --json
   purpose: 'before: yomiyasu-lint-debughost'
   exit_code: 0
   result: passed
@@ -286,7 +286,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
@@ -310,7 +310,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
@@ -321,7 +321,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: e7c831133340606a59ad1367a2f1696ae011417273894cf5bc94b7af22ae7c5a
-- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
+- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
     --format json Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'after: textlint'
   exit_code: 0
@@ -335,7 +335,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -346,7 +346,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: node C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
+- command: node <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
     Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'after: cspell'
   exit_code: 0
@@ -360,7 +360,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -371,7 +371,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
+- command: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
     --files Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'after: whitelist'
   exit_code: 0
@@ -385,7 +385,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -396,8 +396,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\architecture.md --json
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\architecture.md --json
   purpose: 'after: yomiyasu-lint-architecture'
   exit_code: 0
   result: passed
@@ -411,7 +411,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -422,8 +422,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\architecture.md C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\architecture.md
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\architecture.md <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\architecture.md
     --stance=説明 --json
   purpose: 'after: yomiyasu-diff-architecture'
   exit_code: 0
@@ -438,7 +438,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -449,8 +449,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\debughost.md --json
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\debughost.md --json
   purpose: 'after: yomiyasu-lint-debughost'
   exit_code: 0
   result: passed
@@ -464,7 +464,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -475,8 +475,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\debughost.md C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\debughost.md
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\debughost.md <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\after\debughost.md
     --stance=説明 --json
   purpose: 'after: yomiyasu-diff-debughost'
   exit_code: 0
@@ -491,7 +491,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -515,7 +515,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -526,7 +526,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 1a0040bae5dc00bc699f0320d1a1e303db7a2a586bd53772ad8d32682b7b3683
-- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
+- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
     --format json Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'final: textlint'
   exit_code: 0
@@ -540,7 +540,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -551,7 +551,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: node C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
+- command: node <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
     Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'final: cspell'
   exit_code: 0
@@ -565,7 +565,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -576,7 +576,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
+- command: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
     --files Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md
   purpose: 'final: whitelist'
   exit_code: 0
@@ -590,7 +590,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -601,8 +601,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\architecture.md --json
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\architecture.md --json
   purpose: 'final: yomiyasu-lint-architecture'
   exit_code: 0
   result: passed
@@ -616,7 +616,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -627,8 +627,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\architecture.md C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\architecture.md
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\architecture.md <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\architecture.md
     --stance=説明 --json
   purpose: 'final: yomiyasu-diff-architecture'
   exit_code: 0
@@ -643,7 +643,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -654,8 +654,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\debughost.md --json
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_lint.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\debughost.md --json
   purpose: 'final: yomiyasu-lint-debughost'
   exit_code: 0
   result: passed
@@ -669,7 +669,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -680,8 +680,8 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: C:\Python314\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
-    C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\debughost.md C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\debughost.md
+- command: C:\Python314\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\yomiyasu\skills\yomiyasu\scripts\yomiyasu_diff.py
+    <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\before\debughost.md <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\artifacts\issue66\final\debughost.md
     --stance=説明 --json
   purpose: 'final: yomiyasu-diff-debughost'
   exit_code: 0
@@ -696,7 +696,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -720,7 +720,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 9a0c7519cba3d242ccfb68b4b74546ddd6274cc6
@@ -731,7 +731,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: d9f9d9ead7cee72d514cfe871169e770a01bae0dbb88f3dea265e378a3e5a8c3
-- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
+- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
     --format json Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md
     Tracker/Design/phases-status.md
   purpose: 'publication: textlint'
@@ -746,7 +746,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -757,7 +757,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 842052efbdbb69a5e3c281340978891a6025319ddd8a3ef8716c13feb1628f91
-- command: node C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
+- command: node <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
     Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md Tracker/Design/phases-status.md
   purpose: 'publication: cspell'
   exit_code: 0
@@ -771,7 +771,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -782,7 +782,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 842052efbdbb69a5e3c281340978891a6025319ddd8a3ef8716c13feb1628f91
-- command: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
+- command: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
     --files Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md
     Tracker/Design/phases-status.md
   purpose: 'publication: whitelist'
@@ -797,7 +797,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -822,7 +822,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -833,7 +833,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 842052efbdbb69a5e3c281340978891a6025319ddd8a3ef8716c13feb1628f91
-- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
+- command: node node_modules/textlint/bin/textlint.js --config .textlintrc.json --rulesdir <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\textlint-rules
     --format json Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md
     Tracker/Design/phases-status.md
   purpose: 'publication-final: textlint'
@@ -849,7 +849,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -860,7 +860,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 7ef04be43bf77d049e88aec2e4ec51e9edbfe5afce5e4f5972ab44b76aacb54f
-- command: node C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
+- command: node <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\run-cspell-markdown.js
     Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md Tracker/Design/phases-status.md
   purpose: 'publication-final: cspell'
   exit_code: 0
@@ -875,7 +875,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -886,7 +886,7 @@ commands: &id012
     dependencies: *id002
     evidence: *id003
   source_fingerprint: 7ef04be43bf77d049e88aec2e4ec51e9edbfe5afce5e4f5972ab44b76aacb54f
-- command: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
+- command: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.venv\Scripts\python.exe <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu\.agents\skills\review-enforcer\scripts\check-markdown-whitelist-sudachi.py
     --files Tracker/Design/Core/tracker-architecture-plan.md Tracker/Tracker.DebugHost/README.md Tracker/Design/tasks-status.md
     Tracker/Design/phases-status.md
   purpose: 'publication-final: whitelist'
@@ -902,7 +902,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -927,7 +927,7 @@ commands: &id012
     connection: available
     os: Windows-11-10.0.22631-SP0
     shell: C:\WINDOWS\system32\cmd.exe
-    working_directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
+    working_directory: <USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu
     repository: ibis-ssl/Duck
     branch: docs/issue66-yomiyasu-pilot
     head_sha: 3d4ae941cb807ba1aacd4d92cfc877d388cd889d
@@ -1360,7 +1360,7 @@ source_payloads:
 
       - 作業環境: `Windows-11-10.0.22631-SP0`、`C:\WINDOWS\system32\cmd.exe`
 
-      - 実行場所: `C:\Users\donabe\RemoteDesktopWorkspace\Duck-issue66-yomiyasu`
+      - 実行場所: `<USER_HOME>\RemoteDesktopWorkspace\Duck-issue66-yomiyasu`
 
       - Node: `v24.20.0`、Python: `3.14.7`
 
