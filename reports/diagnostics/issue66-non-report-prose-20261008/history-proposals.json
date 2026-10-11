@@ -1,0 +1,336 @@
+﻿{
+  "files": [
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "reviewed_entire_file": true,
+      "notes": [
+        "全37行を通読した。成立条件・作業固定順・保留事項・成功件数と失敗件数は維持する。表示頻度の説明と手動検証未取得時の完了判断に2件提案する。"
+      ],
+      "source_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77"
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "reviewed_entire_file": true,
+      "notes": [
+        "全474行を通読した。TRACKER-039〜063の各本文・表・参照先を確認した。状態・日付・作業順・テスト件数・保留事項・対象外条件は変更しない。名詞の連続や動作の比喩を局所的に直す。"
+      ],
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "reviewed_entire_file": true,
+      "notes": [
+        "全23行を通読した。意味を確定したまま明確に改善できる箇所は見つからなかったため原文を維持する。当時の設計中／未着手とPR #15までの完了を区別したまま残す。"
+      ],
+      "source_sha256": "43557863586e6d16cfa3641e946c40254bc0de83e32aa6db4e4d1d4a2c389617"
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "reviewed_entire_file": true,
+      "notes": [
+        "全293行を通読した。RAW-VISION-000〜020の各本文・表・参照先を確認した。実施済み・未着手・実画面未確認、37件中26件成功／11件失敗、当時の統合日時は変更しない。動作と条件の並列を明確にする3件を提案する。"
+      ],
+      "source_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "reviewed_entire_file": true,
+      "notes": [
+        "全59行を通読した。現在の全体状況は親担当の進捗追記と競合させないため、提案から除いた。過去のF1指摘と構造自己点検の説明を整える。"
+      ],
+      "source_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "reviewed_entire_file": true,
+      "notes": [
+        "全342行を通読した。現在の作業は親担当の進捗追記と競合させないため、提案から除いた。過去の残課題の重複語、自己点検とレビュー合格を区別する文の助詞、構造検証の説明を整える。既存の行内コード・コマンド・数値・URLは維持する。"
+      ],
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "DHP-001",
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "original_text": "raw vision は対象時刻以前の最新の観測フレームを保持するため、低い頻度で更新される見え方が期待動作となる。",
+      "replacement_text": "raw vision は対象時刻以前の最新の観測フレームを保持するため、表示が低い頻度で更新されることは期待動作となる。",
+      "reason": "「低い頻度で更新される見え方」を、表示の更新を説明する文にする。",
+      "preserved_facts": [
+        "対象時刻以前の最新の観測フレームを保持する。",
+        "保持により表示が低い頻度で更新されることは期待動作である。",
+        "直前のトラッカーの更新頻度がraw visionより高い場合という文脈は変更しない。"
+      ]
+    },
+    {
+      "id": "DHP-002",
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "original_text": "`TRACKER-053` の全体テストは227件成功だが、ブラウザでの手動検証の証跡は未取得であり、当時の利用者指示に基づいて、それだけでは完了を妨げない残るリスクとした。",
+      "replacement_text": "`TRACKER-053` の全体テストは227件成功だが、ブラウザでの手動検証の証跡は未取得であり、当時の利用者指示に基づき、証跡が未取得であることだけでは完了を妨げないと判断し、残るリスクとして扱った。",
+      "reason": "重なった修飾を、完了判断と残るリスクの扱いに分けて書く。",
+      "preserved_facts": [
+        "TRACKER-053の全体テストは227件成功した。",
+        "ブラウザでの手動検証の証跡は未取得である。",
+        "当時の利用者指示を根拠に、未取得だけでは完了を妨げないとした。",
+        "証跡を取得済みとせず、残るリスクとして扱う。"
+      ]
+    },
+    {
+      "id": "DHP-003",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "ID が突然変わることを失敗条件とした再発防止テストは、当時の `git stash` による旧実装との比較で失敗し、修正後に成功した。",
+      "replacement_text": "ID が突然変わることを失敗条件とした再発防止テストは、当時 `git stash` を使って比較した旧実装では失敗し、修正後に成功した。",
+      "reason": "比較作業の失敗とも読める修飾を直し、旧実装での失敗と修正後の成功を明確にする。",
+      "preserved_facts": [
+        "失敗条件はIDが突然変わること。",
+        "当時git stashを使って旧実装と比較した。",
+        "再発防止テストは旧実装では失敗し修正後に成功した。"
+      ]
+    },
+    {
+      "id": "DHP-004",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "自分自身・外部・不明という区分は、保存を除外するためではなく後の表示・比較で使う source role / source label などの情報として保持する。",
+      "replacement_text": "自分自身・外部・不明という区分は、保存対象から除外するためではなく、後の表示・比較で使う source role / source label などの情報として保持する。",
+      "reason": "除外する対象と否定の範囲を読み取れるようにする。",
+      "preserved_facts": [
+        "自分自身・外部・不明の区分を理由に保存対象から除外しない。",
+        "区分は後の表示・比較で使うsource role / source labelなどの情報として保持する。",
+        "直後の判別できない場合も保存を省略しない条件を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-005",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "自分自身・外部・不明を保存除外条件にせず、`TrackerState` の `SourceRole` / `SourceLabel` に保持した。",
+      "replacement_text": "自分自身・外部・不明という区分を保存の除外条件にせず、`TrackerState` の `SourceRole` / `SourceLabel` に保持した。",
+      "reason": "保持対象が区分であることを示し、名詞の連続を整理する。区分は直前のTRACKER-041本文に明記されている。",
+      "preserved_facts": [
+        "自分自身・外部・不明の区分は保存の除外条件にしない。",
+        "保持先はTrackerStateのSourceRole / SourceLabel。",
+        "実装済みの記録として過去形を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-006",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "通常の起動時に `MultiTrackerManager<TrackerPacketAdapter>`、`TrackerConnectionLibSnapshotRecorder`、`UdpTrackerReceiver` を接続し、CaptureOn 中の実際の UDP 受信から自分自身・外部・不明のパケットが session folder 内の snapshot sidecar に流れることを確認した。",
+      "replacement_text": "通常の起動時に `MultiTrackerManager<TrackerPacketAdapter>`、`TrackerConnectionLibSnapshotRecorder`、`UdpTrackerReceiver` を接続し、CaptureOn 中に実際の UDP 受信で得た自分自身・外部・不明のパケットが session folder 内の snapshot sidecar に保存されることを確認した。",
+      "reason": "パケットが「流れる」を当該作業で確認した保存動作として明記する。",
+      "preserved_facts": [
+        "通常起動時に指定の3部品を接続する。",
+        "対象はCaptureOn中に実際のUDP受信で得た自分自身・外部・不明のパケット。",
+        "保存先はsession folder内のsnapshot sidecar。",
+        "確認済みの時制を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-007",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "raw vision よりトラッカーの更新が速い場合、raw vision が低い更新頻度で見えることは期待動作である。",
+      "replacement_text": "raw vision よりトラッカーの更新が速い場合、raw vision の表示が低い頻度で更新されることは期待動作である。",
+      "reason": "「低い更新頻度で見える」の対象を表示として明記する。",
+      "preserved_facts": [
+        "条件はraw visionよりトラッカーの更新が速い場合。",
+        "raw visionの表示が低い頻度で更新されることを期待動作として扱う。",
+        "入力の周期を変更する仕様は追加しない。"
+      ]
+    },
+    {
+      "id": "DHP-008",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "`TRACKER-059` の早送り時の非間引き、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。",
+      "replacement_text": "`TRACKER-059` の早送り時に時点を間引かないこと、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。",
+      "reason": "「非間引き」を対象と動作で書く。時点が対象であることはTRACKER-059本文に明記されている。",
+      "preserved_facts": [
+        "TRACKER-059の早送り時は時点を間引かない。",
+        "TRACKER-060の実時間追従を維持する。",
+        "SchemaVersionが2の保存済み対応付けと任意時点の比較経路を維持した。"
+      ]
+    },
+    {
+      "id": "DHP-009",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "再生ボタンは選択速度を尊重し、倍率を選択している場合は `FastForward` として開始する。",
+      "replacement_text": "再生ボタンを押したときも選択した速度を維持し、倍率を選択している場合は `FastForward` として開始する。",
+      "reason": "ボタンが速度を「尊重する」を、押したときに速度を維持する動作にする。",
+      "preserved_facts": [
+        "再生ボタンを押しても選択速度を維持する。",
+        "倍率を選択している場合はFastForwardとして開始する。",
+        "等倍速へ勝手に戻さないという同段落の修正内容を保持する。"
+      ]
+    },
+    {
+      "id": "DHP-010",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "`等倍速` の開始では `TRACKER-060` の実時間追従を維持し、`TRACKER-059` の早送り時の非間引き、`SchemaVersion` が2の保存済みの対応付け、timeline scrubber、Field source、任意の時点の比較を壊さない。",
+      "replacement_text": "`等倍速` の開始では `TRACKER-060` の実時間追従を維持し、`TRACKER-059` の早送り時に時点を間引かないこと、`SchemaVersion` が2の保存済みの対応付け、timeline scrubber、Field source、任意の時点の比較も維持する。",
+      "reason": "「非間引き」を動作として書き、列挙した機能を「壊さない」を維持する説明にする。",
+      "preserved_facts": [
+        "等倍速開始時のTRACKER-060の実時間追従を維持する。",
+        "TRACKER-059の早送り時は時点を間引かない。",
+        "SchemaVersionが2の保存済み対応付け、timeline scrubber、Field source、任意時点の比較を維持する。",
+        "未確認のUI表示とタイマーの分解能の保留は同段落に残る。"
+      ]
+    },
+    {
+      "id": "DHP-011",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "保存処理と座標変換の期待する動作を確認できる、意味のある条件のテストを追加した。",
+      "replacement_text": "保存処理と座標変換が期待どおりに動作することを確認できる、意味のある条件のテストを追加した。",
+      "reason": "保存処理と座標変換が動作の主体であることを示し、不自然な係り方を直す。",
+      "preserved_facts": [
+        "テスト対象は保存処理と座標変換。",
+        "期待する動作を確認できるテストを追加した。",
+        "条件が意味のあるものだという評価を保持する。",
+        "テスト成功の結果は追加しない。"
+      ]
+    },
+    {
+      "id": "DHP-012",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "詳細領域の最低限の表示とスクロールを維持し、高さの変更の境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。",
+      "replacement_text": "詳細領域の最低限の表示とスクロールを維持し、高さを変更するときの境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。",
+      "reason": "「高さの変更の境界値テスト」の名詞の連続を、操作とテストの関係が読める形にする。",
+      "preserved_facts": [
+        "詳細領域の最低限の表示とスクロールを維持する。",
+        "高さ変更の境界値テストが成功した。",
+        "同じdotnet buildコマンドが成功した。"
+      ]
+    },
+    {
+      "id": "DHP-013",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "ログの切り替え、記録がない場合、停止直後に届く古い更新でも状態の不整合を起こさない。",
+      "replacement_text": "ログを切り替えた場合、記録がない場合、停止直後に古い更新が届いた場合も、状態の不整合を起こさない。",
+      "reason": "操作・状態・入力が混在した並列を3つの場合にそろえ、条件と結果の対応を読みやすくする。",
+      "preserved_facts": [
+        "ログを切り替えた場合でも状態の不整合を起こさない。",
+        "記録がない場合でも状態の不整合を起こさない。",
+        "停止直後に古い更新が届いた場合でも状態の不整合を起こさない。",
+        "条件の順序と否定の範囲を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-014",
+      "path": "Tracker/Design/phases-status.md",
+      "original_text": "独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明に不整合があるF1が見つかり、完了判定は保留となった。",
+      "replacement_text": "独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明の不整合がF1として指摘され、完了判定は保留となった。",
+      "reason": "F1を不整合の指摘として書き、不自然な修飾を直す。",
+      "preserved_facts": [
+        "独立最終レビューでの指摘。",
+        "diagnostics sample sidecarの現在仕様と3文書の説明の不整合。",
+        "指摘IDはF1。",
+        "当時の完了判定は保留となった。"
+      ]
+    },
+    {
+      "id": "DHP-015",
+      "path": "Tracker/Design/phases-status.md",
+      "original_text": "関連する原出現台帳と変更単位の台帳を修正後本文へ同期し、独立レビュー対象8文書の2,670件について構造自己点検は欠落・重複・本文内容不一致0。",
+      "replacement_text": "関連する原出現台帳と変更単位の台帳を修正後本文へ同期した。独立レビュー対象8文書の2,670件について構造を自己点検した結果、欠落・重複・本文内容不一致はいずれも0だった。",
+      "reason": "同期と自己点検の結果を分け、途中で変わっていた主題を整理する。",
+      "preserved_facts": [
+        "原出現台帳と変更単位の台帳を修正後本文へ同期した。",
+        "自己点検の対象は独立レビュー対象8文書の2,670件。",
+        "欠落・重複・本文内容不一致はいずれも0。",
+        "直後の独立再レビュー未実施を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-016",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "この追跡更新を公開した後、PRのPRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。",
+      "replacement_text": "この追跡更新を公開した後、PRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。",
+      "reason": "「PRのPRの」の重複を解消する。",
+      "preserved_facts": [
+        "追跡更新を公開した後に確認する。",
+        "確認対象はPRの最新コミットと一致するCI。",
+        "結果をPRコメントに記録する。"
+      ]
+    },
+    {
+      "id": "DHP-017",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。",
+      "replacement_text": "- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格とは扱わない。",
+      "reason": "合格として扱わないという否定を表す助詞に直す。同じ短文が別の段落末尾にも現れるため、この箇条書きの1行全体を照合対象とする。",
+      "preserved_facts": [
+        "対象文書の検査とgit diff --checkは終了値0。",
+        "共有集計は1,946 / 2,142件完了、残り196件。",
+        "2つの証跡参照を維持する。",
+        "検証と集計の結果を独立最終レビューの合格とはしない。"
+      ]
+    },
+    {
+      "id": "DHP-018",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格には扱わない。",
+      "replacement_text": "この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格とは扱わない。",
+      "reason": "位置情報・原文保全の確認と全件確認・レビュー合格を区別する助詞を直す。",
+      "preserved_facts": [
+        "位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格とは扱わない。",
+        "直後の全体の文書検査未通過という記録を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-019",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。",
+      "replacement_text": "この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了とは扱わない。",
+      "reason": "照合結果を全体統合やレビュー完了と同一視しない文の助詞を直す。",
+      "preserved_facts": [
+        "照合結果を全4,336出現の台帳への統合とは扱わない。",
+        "独立最終レビューの完了とは扱わない。",
+        "4,336件と未完了の区別を保持する。"
+      ]
+    },
+    {
+      "id": "DHP-020",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "構成設計565件、CLI/UI 724件、DebugHost README 423件は、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲の構造検証でエラー0。",
+      "replacement_text": "構成設計565件、CLI/UI 724件、DebugHost README 423件について、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲を構造検証し、エラーは0だった。",
+      "reason": "件数の列挙と構造検証の結果を述語で結び、名詞の連続を整理する。",
+      "preserved_facts": [
+        "構成設計565件、CLI/UI 724件、DebugHost README 423件が対象。",
+        "対象は基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲。",
+        "構造検証のエラーは0。",
+        "後続の自己点検と独立再レビューの区別を維持する。"
+      ]
+    },
+    {
+      "id": "DHP-021",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "これは修正担当の自己点検であり、独立再レビューの合格証明には扱わない。",
+      "replacement_text": "これは修正担当の自己点検であり、独立再レビューの合格証明とは扱わない。",
+      "reason": "自己点検を独立再レビューの合格証明と同一視しない助詞を直す。",
+      "preserved_facts": [
+        "修正担当の自己点検である。",
+        "独立再レビューの合格証明とは扱わない。"
+      ]
+    }
+  ],
+  "held": [
+    {
+      "id": "DHH-001",
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "original_text": "`RAW-VISION-018` で診断保存の周期と最新のスナップショットの境界を TDD で固定する。",
+      "reason": "「境界」が区別するものを細分化すると、当時の完了条件へ仕様を足すおそれがある。RAW-VISION-018本文には追跡フレーム確定周期への非依存などが書かれているが、この短い表セルへ新しい条件を加えず維持する。",
+      "disposition": "unchanged"
+    },
+    {
+      "id": "DHH-002",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から、内容を固定して保持する保存処理と表示の合成処理を通して接続する。",
+      "reason": "接続対象と接続先の具体化には、省略された実装上の対応を別途確定する必要がある。現在の資料内の語から推測して補わず、接続元と経由する処理を保持する。",
+      "disposition": "unchanged"
+    },
+    {
+      "id": "DHH-003",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "`textlint` が利用者編集対象の `*.md` 全般に実行され、文書の表記揺れや文章規則を検出できる。",
+      "reason": "「文章規則を検出」が規則違反の検出を意図しているようには読めるが、当時の完了条件を変更しない補助点検として、検出対象を言い換える提案は保留する。",
+      "disposition": "unchanged"
+    }
+  ]
+}

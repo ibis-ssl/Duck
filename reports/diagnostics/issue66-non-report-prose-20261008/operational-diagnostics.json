@@ -1,0 +1,44 @@
+﻿{
+  "preparation_events": [
+    {
+      "operation": "baseline product second attempt",
+      "result": "failed",
+      "exit_code": 1,
+      "reason": "MSB3030: the baseline-specific NuGet cache lacked Microsoft.Extensions.Configuration.EnvironmentVariables.dll. No unit tests ran. The final attempt used the actual complete package cache observed in the tested worktree project.assets.json; no package version or configuration was changed."
+    },
+    {
+      "operation": "dependency discovery via dotnet on PATH",
+      "result": "not_run",
+      "reason": "dotnet was not on PATH; explicit C:/Program Files/dotnet/dotnet.exe used subsequently."
+    },
+    {
+      "operation": "baseline product setup",
+      "result": "failed",
+      "exit_code": 128,
+      "reason": "Git status followed reused submodule junctions and resolved relative Git metadata under the wrong worktree. Parent-source status and dependency-source status were then read at their actual locations. No product test was executed in that failed preparation."
+    },
+    {
+      "operation": "RDMCP helper upload",
+      "result": "failed",
+      "reason": "Internal tool error. Read-only verification showed the file absent; retry saved the same verified payload."
+    },
+    {
+      "operation": "Todo freshness guarded reads",
+      "result": "blocked",
+      "reason": "Stale Todo prevented a read/summary operation. Progress was refreshed before retry; no source mutation occurred in the rejected operations."
+    },
+    {
+      "operation": "scratch helper preparation",
+      "result": "failed_then_corrected",
+      "reason": "BOM decoding, helper staging imports and syntax, and a diagnostic filename selection were corrected before the corresponding publication helper was used."
+    }
+  ],
+  "repository_validation_failures_preserved": [
+    "before",
+    "final-clean",
+    "product-gate",
+    "product-gate-retry",
+    "product-baseline-retry",
+    "product-baseline-final"
+  ]
+}

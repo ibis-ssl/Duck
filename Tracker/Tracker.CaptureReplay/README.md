@@ -1,6 +1,6 @@
-# Tracker.CaptureReplay
+﻿# Tracker.CaptureReplay
 
-`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。
+`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認には `Tracker.DebugHost` の `/diagnostics` を使います。このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。
 
 本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。
 

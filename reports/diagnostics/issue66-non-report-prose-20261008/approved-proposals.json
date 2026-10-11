@@ -1,0 +1,2247 @@
+﻿{
+  "schema_version": 1,
+  "purpose": "Duck non-report prose expansion candidate consolidation",
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "root_approval": {
+    "status": "pending_root_decision",
+    "final_selection_owner": "root",
+    "filename_does_not_mean_final_approval": true
+  },
+  "normalization": {
+    "comparison": "UTF-8 decoded, leading BOM removed, CRLF/CR normalized to LF",
+    "proposal_text": "LF",
+    "original_bytes": "preserved"
+  },
+  "coverage": {
+    "document_count": 19,
+    "proposal_count": 84,
+    "documents_with_candidates": 15,
+    "documents_without_changes": 4,
+    "held_count": 10,
+    "source_manifest_markdown_coverage_complete": true
+  },
+  "source_proposal_files": [
+    {
+      "path": "core-proposals.json",
+      "sha256": "cde1fdb2d0d5c9f835eb368fb5a296599d754ac7152a199f2a7d56ef99694a74",
+      "document_count": 4,
+      "proposal_count": 31,
+      "held_count": 2
+    },
+    {
+      "path": "host-proposals.json",
+      "sha256": "b423d81e17d2fd52d0308b148c681a15243ade45a1491970ae06504b061feb7d",
+      "document_count": 3,
+      "proposal_count": 20,
+      "held_count": 5
+    },
+    {
+      "path": "primary-proposals.json",
+      "sha256": "2b43bd223754a997e0dbd534d2406e95f30b96ea1baa87c1ce011d4671f7f2a6",
+      "document_count": 6,
+      "proposal_count": 12,
+      "held_count": 0
+    },
+    {
+      "path": "history-proposals.json",
+      "sha256": "47ced0a24ac67407b82e85b026d2e7f70d943c8e8cc49a0f73a42c2b5758620a",
+      "document_count": 6,
+      "proposal_count": 21,
+      "held_count": 3
+    }
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "primary-proposals.json",
+      "notes": [
+        "全文確認。短い概要、構成一覧、起動例と数値の説明は明確なため原文維持。"
+      ],
+      "source_sha256": "6892b7d542d9cb032911fb8eda1cbbb09432a3130af43c7b265b00ba0f0129de",
+      "source_byte_count": 3525,
+      "source_line_count": 76,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 0,
+      "held_count": 0,
+      "coverage_status": "reviewed_no_change"
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "history-proposals.json",
+      "notes": [
+        "全37行を通読した。成立条件・作業固定順・保留事項・成功件数と失敗件数は維持する。表示頻度の説明と手動検証未取得時の完了判断に2件提案する。"
+      ],
+      "source_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77",
+      "source_byte_count": 5982,
+      "source_line_count": 37,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 2,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "history-proposals.json",
+      "notes": [
+        "全474行を通読した。TRACKER-039〜063の各本文・表・参照先を確認した。状態・日付・作業順・テスト件数・保留事項・対象外条件は変更しない。名詞の連続や動作の比喩を局所的に直す。"
+      ],
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929",
+      "source_byte_count": 46782,
+      "source_line_count": 474,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 8,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "history-proposals.json",
+      "notes": [
+        "全23行を通読した。意味を確定したまま明確に改善できる箇所は見つからなかったため原文を維持する。当時の設計中／未着手とPR #15までの完了を区別したまま残す。"
+      ],
+      "source_sha256": "43557863586e6d16cfa3641e946c40254bc0de83e32aa6db4e4d1d4a2c389617",
+      "source_byte_count": 2735,
+      "source_line_count": 23,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 0,
+      "held_count": 1,
+      "coverage_status": "reviewed_no_change"
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "history-proposals.json",
+      "notes": [
+        "全293行を通読した。RAW-VISION-000〜020の各本文・表・参照先を確認した。実施済み・未着手・実画面未確認、37件中26件成功／11件失敗、当時の統合日時は変更しない。動作と条件の並列を明確にする3件を提案する。"
+      ],
+      "source_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6",
+      "source_byte_count": 23206,
+      "source_line_count": 293,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 3,
+      "held_count": 1,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "core-proposals.json",
+      "notes": [
+        "全1,172行を確認。長い再生・比較説明の話題分割、修飾と対象の対応、名詞の連続を局所的に改善する。列挙された仕様、API、識別子、数値、コード、図、引用、見出し、並び順は維持する。意味を具体化できない2箇所は held に記録し、原文を残す。その他の自然な説明や仕様箇条書きは変更不要。"
+      ],
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "source_byte_count": 84899,
+      "source_line_count": 1172,
+      "source_bom": true,
+      "source_line_endings": "CRLF",
+      "proposal_count": 18,
+      "held_count": 2,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "core-proposals.json",
+      "notes": [
+        "全432行を確認。分割方針、確認対象、参照関係の説明を局所的に改善する。公開契約、設定値、パス一覧、実行順序、コード例、コマンドは維持する。その他の説明は変更不要。"
+      ],
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "source_byte_count": 25799,
+      "source_line_count": 432,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 7,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "core-proposals.json",
+      "notes": [
+        "全66行を確認。冒頭の文書の位置付けに関する一文のみ改善する。作業履歴表と段階履歴表は全行変更不要。ID、依存関係、状態、完了条件、完了/予定の時制、件数、報告書パス、モデル名、調査原因はすべて維持する。"
+      ],
+      "source_sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "source_byte_count": 21788,
+      "source_line_count": 66,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 1,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "core-proposals.json",
+      "notes": [
+        "全191行を確認。対象範囲、補助クラスの役割、判定処理、任意コメントの例、最低限の検証項目を読み取りやすくする。テスト名、数量、期待値、実行順序、コード例、必須/任意区分は維持する。その他の説明は変更不要。"
+      ],
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "source_byte_count": 18019,
+      "source_line_count": 191,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 5,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "host-proposals.json",
+      "notes": [
+        "本文、箇条書き、コード識別子、見出し、脚注を含め全文確認した。提案以外の箇所は原文を維持する。許可済みの技術用語、履歴ごとの仕様、数値と否定条件は変更しない。"
+      ],
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101",
+      "source_byte_count": 69728,
+      "source_line_count": 329,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 10,
+      "held_count": 2,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "host-proposals.json",
+      "notes": [
+        "本文、箇条書き、コード識別子、見出し、脚注を含め全文確認した。提案以外の箇所は原文を維持する。許可済みの技術用語、履歴ごとの仕様、数値と否定条件は変更しない。"
+      ],
+      "source_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa",
+      "source_byte_count": 7697,
+      "source_line_count": 109,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 3,
+      "held_count": 1,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "host-proposals.json",
+      "notes": [
+        "本文、箇条書き、コード識別子、見出し、脚注を含め全文確認した。提案以外の箇所は原文を維持する。許可済みの技術用語、履歴ごとの仕様、数値と否定条件は変更しない。"
+      ],
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86",
+      "source_byte_count": 54071,
+      "source_line_count": 394,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 7,
+      "held_count": 2,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "primary-proposals.json",
+      "notes": [
+        "全文を確認し、具体的な読みづらさがある箇所のみを提案。"
+      ],
+      "source_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a",
+      "source_byte_count": 17126,
+      "source_line_count": 153,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 3,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "history-proposals.json",
+      "notes": [
+        "全59行を通読した。現在の全体状況は親担当の進捗追記と競合させないため、提案から除いた。過去のF1指摘と構造自己点検の説明を整える。"
+      ],
+      "source_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed",
+      "source_byte_count": 10355,
+      "source_line_count": 59,
+      "source_bom": true,
+      "source_line_endings": "CRLF",
+      "proposal_count": 2,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "history-proposals.json",
+      "notes": [
+        "全342行を通読した。現在の作業は親担当の進捗追記と競合させないため、提案から除いた。過去の残課題の重複語、自己点検とレビュー合格を区別する文の助詞、構造検証の説明を整える。既存の行内コード・コマンド・数値・URLは維持する。"
+      ],
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2",
+      "source_byte_count": 53562,
+      "source_line_count": 342,
+      "source_bom": true,
+      "source_line_endings": "CRLF",
+      "proposal_count": 6,
+      "held_count": 1,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "primary-proposals.json",
+      "notes": [
+        "全文を確認し、具体的な読みづらさがある箇所のみを提案。"
+      ],
+      "source_sha256": "de3993dafb1bcaefc5153806fb4ad0e42f2440c51d4b5a60ff7aa5767015b31d",
+      "source_byte_count": 5206,
+      "source_line_count": 86,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 1,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "primary-proposals.json",
+      "notes": [
+        "全文を確認し、具体的な読みづらさがある箇所のみを提案。"
+      ],
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559",
+      "source_byte_count": 44657,
+      "source_line_count": 490,
+      "source_bom": true,
+      "source_line_endings": "CRLF",
+      "proposal_count": 8,
+      "held_count": 0,
+      "coverage_status": "reviewed_with_candidates"
+    },
+    {
+      "path": "feedback-points/feedback-points.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "primary-proposals.json",
+      "notes": [
+        "全文確認。利用者の直接引用と記録の意味を保持。専用Skill経由の更新指定があり、説明は明確なため原文維持。"
+      ],
+      "source_sha256": "03e7b7cc7f0f4d7b4cd795dc2ded5e6791d68d3d435d01a655e727966e2769e9",
+      "source_byte_count": 2010,
+      "source_line_count": 13,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 0,
+      "held_count": 0,
+      "coverage_status": "reviewed_no_change"
+    },
+    {
+      "path": "tools/lint/README.md",
+      "reviewed_entire_file": true,
+      "review_claim_origin": "primary-proposals.json",
+      "notes": [
+        "全文確認。既存検査の範囲と承認手順を維持。OS別の実行方法の更新は文章の推敲の範囲で行わない。"
+      ],
+      "source_sha256": "855786e438a49ac3f2358e85bcb76bf619755f5cceb09235db828ca3c00ea533",
+      "source_byte_count": 9815,
+      "source_line_count": 130,
+      "source_bom": false,
+      "source_line_endings": "CRLF",
+      "proposal_count": 0,
+      "held_count": 0,
+      "coverage_status": "reviewed_no_change"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "DHP-001",
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "original_text": "raw vision は対象時刻以前の最新の観測フレームを保持するため、低い頻度で更新される見え方が期待動作となる。",
+      "replacement_text": "raw vision は対象時刻以前の最新の観測フレームを保持するため、表示が低い頻度で更新されることは期待動作となる。",
+      "reason": "「低い頻度で更新される見え方」を、表示の更新を説明する文にする。",
+      "preserved_facts": [
+        "対象時刻以前の最新の観測フレームを保持する。",
+        "保持により表示が低い頻度で更新されることは期待動作である。",
+        "直前のトラッカーの更新頻度がraw visionより高い場合という文脈は変更しない。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 23,
+      "original_line_end": 23,
+      "source_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77"
+    },
+    {
+      "id": "DHP-002",
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "original_text": "`TRACKER-053` の全体テストは227件成功だが、ブラウザでの手動検証の証跡は未取得であり、当時の利用者指示に基づいて、それだけでは完了を妨げない残るリスクとした。",
+      "replacement_text": "`TRACKER-053` の全体テストは227件成功だが、ブラウザでの手動検証の証跡は未取得であり、当時の利用者指示に基づき、証跡が未取得であることだけでは完了を妨げないと判断し、残るリスクとして扱った。",
+      "reason": "重なった修飾を、完了判断と残るリスクの扱いに分けて書く。",
+      "preserved_facts": [
+        "TRACKER-053の全体テストは227件成功した。",
+        "ブラウザでの手動検証の証跡は未取得である。",
+        "当時の利用者指示を根拠に、未取得だけでは完了を妨げないとした。",
+        "証跡を取得済みとせず、残るリスクとして扱う。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 35,
+      "original_line_end": 35,
+      "source_sha256": "33aece554b8c3bd85679f5bee7eb95cd7189044ac3698d77b4eee7784a1e6f77"
+    },
+    {
+      "id": "DHP-003",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "ID が突然変わることを失敗条件とした再発防止テストは、当時の `git stash` による旧実装との比較で失敗し、修正後に成功した。",
+      "replacement_text": "ID が突然変わることを失敗条件とした再発防止テストは、当時 `git stash` を使って比較した旧実装では失敗し、修正後に成功した。",
+      "reason": "比較作業の失敗とも読める修飾を直し、旧実装での失敗と修正後の成功を明確にする。",
+      "preserved_facts": [
+        "失敗条件はIDが突然変わること。",
+        "当時git stashを使って旧実装と比較した。",
+        "再発防止テストは旧実装では失敗し修正後に成功した。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 53,
+      "original_line_end": 53,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-004",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "自分自身・外部・不明という区分は、保存を除外するためではなく後の表示・比較で使う source role / source label などの情報として保持する。",
+      "replacement_text": "自分自身・外部・不明という区分は、保存対象から除外するためではなく、後の表示・比較で使う source role / source label などの情報として保持する。",
+      "reason": "除外する対象と否定の範囲を読み取れるようにする。",
+      "preserved_facts": [
+        "自分自身・外部・不明の区分を理由に保存対象から除外しない。",
+        "区分は後の表示・比較で使うsource role / source labelなどの情報として保持する。",
+        "直後の判別できない場合も保存を省略しない条件を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 91,
+      "original_line_end": 91,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-005",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "自分自身・外部・不明を保存除外条件にせず、`TrackerState` の `SourceRole` / `SourceLabel` に保持した。",
+      "replacement_text": "自分自身・外部・不明という区分を保存の除外条件にせず、`TrackerState` の `SourceRole` / `SourceLabel` に保持した。",
+      "reason": "保持対象が区分であることを示し、名詞の連続を整理する。区分は直前のTRACKER-041本文に明記されている。",
+      "preserved_facts": [
+        "自分自身・外部・不明の区分は保存の除外条件にしない。",
+        "保持先はTrackerStateのSourceRole / SourceLabel。",
+        "実装済みの記録として過去形を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 105,
+      "original_line_end": 105,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-006",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "通常の起動時に `MultiTrackerManager<TrackerPacketAdapter>`、`TrackerConnectionLibSnapshotRecorder`、`UdpTrackerReceiver` を接続し、CaptureOn 中の実際の UDP 受信から自分自身・外部・不明のパケットが session folder 内の snapshot sidecar に流れることを確認した。",
+      "replacement_text": "通常の起動時に `MultiTrackerManager<TrackerPacketAdapter>`、`TrackerConnectionLibSnapshotRecorder`、`UdpTrackerReceiver` を接続し、CaptureOn 中に実際の UDP 受信で得た自分自身・外部・不明のパケットが session folder 内の snapshot sidecar に保存されることを確認した。",
+      "reason": "パケットが「流れる」を当該作業で確認した保存動作として明記する。",
+      "preserved_facts": [
+        "通常起動時に指定の3部品を接続する。",
+        "対象はCaptureOn中に実際のUDP受信で得た自分自身・外部・不明のパケット。",
+        "保存先はsession folder内のsnapshot sidecar。",
+        "確認済みの時制を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 169,
+      "original_line_end": 169,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-007",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "raw vision よりトラッカーの更新が速い場合、raw vision が低い更新頻度で見えることは期待動作である。",
+      "replacement_text": "raw vision よりトラッカーの更新が速い場合、raw vision の表示が低い頻度で更新されることは期待動作である。",
+      "reason": "「低い更新頻度で見える」の対象を表示として明記する。",
+      "preserved_facts": [
+        "条件はraw visionよりトラッカーの更新が速い場合。",
+        "raw visionの表示が低い頻度で更新されることを期待動作として扱う。",
+        "入力の周期を変更する仕様は追加しない。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 391,
+      "original_line_end": 391,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-008",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "`TRACKER-059` の早送り時の非間引き、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。",
+      "replacement_text": "`TRACKER-059` の早送り時に時点を間引かないこと、`TRACKER-060` の実時間追従、`SchemaVersion` が2の保存済みの対応付けと任意の時点を比較する経路を維持した。",
+      "reason": "「非間引き」を対象と動作で書く。時点が対象であることはTRACKER-059本文に明記されている。",
+      "preserved_facts": [
+        "TRACKER-059の早送り時は時点を間引かない。",
+        "TRACKER-060の実時間追従を維持する。",
+        "SchemaVersionが2の保存済み対応付けと任意時点の比較経路を維持した。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 448,
+      "original_line_end": 448,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-009",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "再生ボタンは選択速度を尊重し、倍率を選択している場合は `FastForward` として開始する。",
+      "replacement_text": "再生ボタンを押したときも選択した速度を維持し、倍率を選択している場合は `FastForward` として開始する。",
+      "reason": "ボタンが速度を「尊重する」を、押したときに速度を維持する動作にする。",
+      "preserved_facts": [
+        "再生ボタンを押しても選択速度を維持する。",
+        "倍率を選択している場合はFastForwardとして開始する。",
+        "等倍速へ勝手に戻さないという同段落の修正内容を保持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 464,
+      "original_line_end": 464,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-010",
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "original_text": "`等倍速` の開始では `TRACKER-060` の実時間追従を維持し、`TRACKER-059` の早送り時の非間引き、`SchemaVersion` が2の保存済みの対応付け、timeline scrubber、Field source、任意の時点の比較を壊さない。",
+      "replacement_text": "`等倍速` の開始では `TRACKER-060` の実時間追従を維持し、`TRACKER-059` の早送り時に時点を間引かないこと、`SchemaVersion` が2の保存済みの対応付け、timeline scrubber、Field source、任意の時点の比較も維持する。",
+      "reason": "「非間引き」を動作として書き、列挙した機能を「壊さない」を維持する説明にする。",
+      "preserved_facts": [
+        "等倍速開始時のTRACKER-060の実時間追従を維持する。",
+        "TRACKER-059の早送り時は時点を間引かない。",
+        "SchemaVersionが2の保存済み対応付け、timeline scrubber、Field source、任意時点の比較を維持する。",
+        "未確認のUI表示とタイマーの分解能の保留は同段落に残る。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 468,
+      "original_line_end": 468,
+      "source_sha256": "7d19d879a579e9563a39208c047cc58a8bb38eef610ddf9a8f7d2b55d4f68929"
+    },
+    {
+      "id": "DHP-011",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "保存処理と座標変換の期待する動作を確認できる、意味のある条件のテストを追加した。",
+      "replacement_text": "保存処理と座標変換が期待どおりに動作することを確認できる、意味のある条件のテストを追加した。",
+      "reason": "保存処理と座標変換が動作の主体であることを示し、不自然な係り方を直す。",
+      "preserved_facts": [
+        "テスト対象は保存処理と座標変換。",
+        "期待する動作を確認できるテストを追加した。",
+        "条件が意味のあるものだという評価を保持する。",
+        "テスト成功の結果は追加しない。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 71,
+      "original_line_end": 71,
+      "source_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6"
+    },
+    {
+      "id": "DHP-012",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "詳細領域の最低限の表示とスクロールを維持し、高さの変更の境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。",
+      "replacement_text": "詳細領域の最低限の表示とスクロールを維持し、高さを変更するときの境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。",
+      "reason": "「高さの変更の境界値テスト」の名詞の連続を、操作とテストの関係が読める形にする。",
+      "preserved_facts": [
+        "詳細領域の最低限の表示とスクロールを維持する。",
+        "高さ変更の境界値テストが成功した。",
+        "同じdotnet buildコマンドが成功した。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 117,
+      "original_line_end": 117,
+      "source_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6"
+    },
+    {
+      "id": "DHP-013",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "ログの切り替え、記録がない場合、停止直後に届く古い更新でも状態の不整合を起こさない。",
+      "replacement_text": "ログを切り替えた場合、記録がない場合、停止直後に古い更新が届いた場合も、状態の不整合を起こさない。",
+      "reason": "操作・状態・入力が混在した並列を3つの場合にそろえ、条件と結果の対応を読みやすくする。",
+      "preserved_facts": [
+        "ログを切り替えた場合でも状態の不整合を起こさない。",
+        "記録がない場合でも状態の不整合を起こさない。",
+        "停止直後に古い更新が届いた場合でも状態の不整合を起こさない。",
+        "条件の順序と否定の範囲を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 158,
+      "original_line_end": 158,
+      "source_sha256": "fec491e9b8dd50b37fa6a7115b0b4c5b2b0ac8b75ee74f16616ab507ceb0fdb6"
+    },
+    {
+      "id": "CORE-ARCH-001",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 将来の自動レフェリー判定はフィールド全体の状態のスナップショットとキックや接触などの通知から記述しやすい構造にする",
+      "replacement_text": "- フィールド全体の状態のスナップショットとキックや接触などの通知を使って、将来の自動レフェリー判定を記述しやすい構造にする",
+      "reason": "判定を記述するために使う情報と、構造の目的との関係が分かるよう語順を整理する。",
+      "preserved_facts": [
+        "将来の自動レフェリー判定を記述しやすくする目標",
+        "入力に使うスナップショットとキック・接触などの通知"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 14,
+      "original_line_end": 14,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-002",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモ側に寄せる。",
+      "replacement_text": "この設計書では要点のみを書く。クラス名ごとの根拠や読み取り結果は調査メモに記載する。",
+      "reason": "記述先を「寄せる」という比喩で表さず、どの文書に記載するかを直接書く。",
+      "preserved_facts": [
+        "設計書には要点のみを記載する",
+        "クラス名ごとの根拠と読み取り結果の記述先は調査メモ"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 68,
+      "original_line_end": 68,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-003",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。新規キャプチャーの再生、診断、Field source の表示では、`diagnostics-samples.jsonl` の diagnostics sample tick を選択時点とし、`Vision Input` はその記録の未加工入力の概要、自前トラッカーは同じ記録の追跡結果の概要から復元する。外部トラッカーは、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、対応記録がなければ選択時点以前の同じ表示元の latest-before snapshot を使う。diagnostics sample sidecar がない旧形式だけは、既存の近傍時刻の選択を推定表示として使ってよい。採用した対応規則、許容する時間幅、`uuid` / `sourceName` / 送信元の通信アドレスと通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。",
+      "replacement_text": "自前トラッカーの確定済み追跡フレームと tracker packet snapshot は、送信頻度が一致しない前提で扱う。さらに、外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと同じ時刻系とは限らない。\n\n新規キャプチャーの再生、診断、Field source の表示では、`diagnostics-samples.jsonl` の diagnostics sample tick を選択時点とし、`Vision Input` はその記録の未加工入力の概要、自前トラッカーは同じ記録の追跡結果の概要から復元する。外部トラッカーは、同じ選択時点に保存済みの alignment sidecar の対応記録があればその tracker snapshot を使い、対応記録がなければ選択時点以前の同じ表示元の latest-before snapshot を使う。diagnostics sample sidecar がない旧形式だけは、既存の近傍時刻の選択を推定表示として使ってよい。\n\n採用した対応規則、許容する時間幅、`uuid` / `sourceName` / 送信元の通信アドレスと通信ポート / source role、および対応付けの状態は、後から確認できるように保存または表示する。",
+      "reason": "時刻と送信頻度の前提、再生時の選択規則、確認用に残す情報を段落で分ける。文と条件の順序は変えない。",
+      "preserved_facts": [
+        "送信頻度は一致を前提にしない",
+        "外部の timestamp は同じ時刻系とは限らない",
+        "新規記録では diagnostics sample tick を選択時点にする",
+        "外部記録は保存済み対応付けを優先し、対応なしの場合は同じ表示元の選択時点以前の latest-before snapshot を使う",
+        "diagnostics sample sidecar がない旧形式だけ近傍時刻の推定表示を許可する",
+        "採用規則・許容時間幅・識別情報・対応状態を保存または表示する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 148,
+      "original_line_end": 148,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-004",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。",
+      "replacement_text": "等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。\n\n診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。",
+      "reason": "再生時の時刻追従・省略規則と、画面のボタン・速度タブの仕様を別段落にする。",
+      "preserved_facts": [
+        "逐次描画は保証しない",
+        "wall-clock と選択時点の ReceivedAt を基準に目標収録時刻を計算する",
+        "毎秒30回相当で ReceivedAt <= target の最新時点へ追従する",
+        "中間時点の省略は表示だけで、保存済み対応付けと比較精度を落とさない",
+        "任意の再生時点を選ぶ各経路を維持する",
+        "Play / Fast Forward / Stop の配置、等倍速・4x・16x・64x のタブ、数値の等倍ラベル不使用を維持する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 152,
+      "original_line_end": 152,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-005",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- `TrackerCoordinator` は設定プロファイルの切り替え要求の受付、`Update` の呼び出し、`TrackerUpdateResult` の処理を同じ直列化区間で扱い、1 回の `Update` の処理中に、その処理中の要求を上書きしない",
+      "replacement_text": "- `TrackerCoordinator` は設定プロファイルの切り替え要求の受付、`Update` の呼び出し、`TrackerUpdateResult` の処理を同じ直列化区間で扱い、1 回の `Update` の処理中は、その処理で扱う要求を上書きしない",
+      "reason": "「処理中」の重複を整理し、上書きを禁止する対象が当該処理で扱う要求であることを読み取りやすくする。",
+      "preserved_facts": [
+        "受付・Update 呼び出し・結果処理は同じ直列化区間",
+        "1 回の Update の処理中にその要求を上書きしない"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 374,
+      "original_line_end": 374,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-006",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 最新に見えた観測時刻から `ReorderWindow` を越えた検出情報の集合を確定処理対象にする",
+      "replacement_text": "- これまでに得た最新の観測時刻から `ReorderWindow` を越えた検出情報の集合を確定処理対象にする",
+      "reason": "「最新に見えた」を、入力から得た観測時刻を指す表現に整える。時刻と時間幅の比較条件は変えない。",
+      "preserved_facts": [
+        "基準は最新の観測時刻",
+        "ReorderWindow を越えた検出情報の集合が確定処理対象"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 419,
+      "original_line_end": 419,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-007",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- すでに確定処理済みの観測時刻より古い遅れて到着したパケットは診断に記録し、状態更新には使わない",
+      "replacement_text": "- 遅れて到着したパケットの観測時刻が、すでに確定処理した観測時刻より古い場合は、そのパケットを診断に記録し、状態更新には使わない",
+      "reason": "「古い」が比較する対象をパケットの観測時刻として明記し、遅延到着と時刻比較の条件を追いやすくする。",
+      "preserved_facts": [
+        "遅れて到着したパケットが対象",
+        "確定処理済みの観測時刻より古い場合の扱い",
+        "診断には記録する",
+        "状態更新には使わない"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 422,
+      "original_line_end": 422,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-008",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定値を含める。CaptureOn の記録では、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、`diagnostics-samples.jsonl`、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を保持し、source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。",
+      "replacement_text": "capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定値を含める。\n\nCaptureOn の記録では、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、`diagnostics-samples.jsonl`、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を保持し、source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。",
+      "reason": "再生時に調整値を復元するための設定保存と、CaptureOn に属する関連ファイル・件数の保存を別段落にする。",
+      "preserved_facts": [
+        "プロファイル名だけでなく Profiles と上書き適用後の解決済み設定を保存する",
+        "キャプチャーと同時点の設定値を保持する",
+        "列挙された関連ファイルの相対パスを保存する",
+        "各 Log の作成状態・記録/省略/エラー件数と、識別情報・対応状態・時刻規則を保存する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 574,
+      "original_line_end": 574,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-009",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI は、未加工の SSL-Vision パケットの収録時の受信周期と、再生で確定された自前トラッカーの追跡結果の収録時の受信時刻、観測データの時刻、確定の契機となった入力位置を同じ概要出力に載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。",
+      "replacement_text": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI の概要出力には、未加工の SSL-Vision パケットを収録した際の受信周期を載せる。同じ出力に、再生で確定された自前トラッカーの追跡結果について、収録時の受信時刻、観測データの時刻、確定の契機となった入力位置も載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。",
+      "reason": "受信周期と追跡結果に関する時刻・入力位置を一続きに列挙した長い文を分け、同じ概要出力へ載せる関係を残す。",
+      "preserved_facts": [
+        "手作業でのキャプチャー読取ではなく汎用 CLI 分析出力を使う",
+        "収録時の未加工パケット受信周期と、再生で確定した追跡結果の収録時受信時刻・観測データ時刻・確定契機の入力位置を同じ概要へ出す",
+        "並べ替え猶予・統合幅・欠落・確定保留の遅延原因を報告できるようにする",
+        "特定の共通名や表示元名に依存させない",
+        "--analyze-latency のような明示オプションによる後続調査への再利用"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 578,
+      "original_line_end": 578,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-010",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "診断画面と再生操作は、新規キャプチャーでは diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の主な読み取り元にする。`Vision Input` は diagnostics sample sidecar の採取記録にある未加工入力の概要、自前トラッカーは同じ diagnostics sample tick の追跡結果の概要から復元し、外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。表示元の識別情報・分類・表示名、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。capture metadata、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の欠落・空・読み取りエラーは区別して表示し、旧 render snapshot しかない記録は旧形式または機能制限付きの表示として扱う。等倍速の通常再生は表示更新を毎秒30回相当に抑えて実行環境側の経過時間へ追従する一方、replay timeline の選択、Field source、比較では任意の diagnostics sample tick を選べる経路を維持する。",
+      "replacement_text": "診断画面と再生操作は、新規キャプチャーでは diagnostics sample sidecar を replay timeline と `Vision Input` / `ibis tracker` の主な読み取り元にする。`Vision Input` は diagnostics sample sidecar の採取記録にある未加工入力の概要、自前トラッカーは同じ diagnostics sample tick の追跡結果の概要から復元し、外部トラッカーは tracker packet snapshot と alignment sidecar、または選択時点以前の latest-before snapshot を使う。\n\n表示元の識別情報・分類・表示名、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。capture metadata、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の欠落・空・読み取りエラーは区別して表示し、旧 render snapshot しかない記録は旧形式または機能制限付きの表示として扱う。\n\n等倍速の通常再生は表示更新を毎秒30回相当に抑えて実行環境側の経過時間へ追従する一方、replay timeline の選択、Field source、比較では任意の diagnostics sample tick を選べる経路を維持する。",
+      "reason": "再生情報の復元元、画面で確認する情報と欠落表示、等倍速と任意時点選択を段落で分ける。",
+      "preserved_facts": [
+        "新規キャプチャーの主な読取元は diagnostics sample sidecar",
+        "Vision Input と自前トラッカーの復元元は同じ diagnostics sample tick",
+        "外部トラッカーの対応付けと latest-before の選択規則",
+        "識別・時刻・件数・元データ復元状態を画面で確認する",
+        "欠落・空・読み取りエラーを区別し、旧形式の制限を明示する",
+        "通常再生は毎秒30回相当とし、各選択経路では任意の diagnostics sample tick を選べる"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 582,
+      "original_line_end": 582,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-011",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "`Tracker.DebugHost` の診断画面は、新規キャプチャーでは `diagnostics-samples.jsonl` に保存した同一採取時点の未加工入力と自前トラッカーの追跡結果を `Vision Input` / `ibis tracker` の描画元にする。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として残してよいが、新規記録の物体表示や replay timeline の主な入力にはしない。diagnostics sample sidecar がない旧記録は非対応または機能制限付きの旧形式として明示し、timeline scrubber の操作でも新規経路へ render snapshot を代用しない。フィールドの操作ではページ全体をスクロールさせず、フィールドの拡大縮小・表示位置の移動と画面スクロールが干渉しないレイアウトを維持する。",
+      "replacement_text": "`Tracker.DebugHost` の診断画面は、新規キャプチャーでは `diagnostics-samples.jsonl` に保存した同一採取時点の未加工入力と自前トラッカーの追跡結果を `Vision Input` / `ibis tracker` の描画元にする。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として残してよいが、新規記録の物体表示や replay timeline の主な入力にはしない。diagnostics sample sidecar がない旧記録は非対応または機能制限付きの旧形式として明示し、timeline scrubber の操作でも新規経路へ render snapshot を代用しない。\n\nフィールドの操作ではページ全体をスクロールさせず、フィールドの拡大縮小・表示位置の移動と画面スクロールが干渉しないレイアウトを維持する。",
+      "reason": "新旧記録の描画元・代用禁止の規則と、フィールド操作時の画面配置の規則を別段落にする。",
+      "preserved_facts": [
+        "新規記録の描画元は同一採取時点の未加工入力と追跡結果",
+        "旧 render snapshot は補助情報として残してよいが、新規の物体表示や時刻軸の主入力にはしない",
+        "旧形式の制限を明示し、scrubber 操作でも新規経路への代用はしない",
+        "フィールド操作でページ全体をスクロールさせず、拡大縮小・表示位置移動と画面スクロールの干渉を避ける"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 586,
+      "original_line_end": 586,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-012",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "寄せる対象は「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。",
+      "replacement_text": "参考にするのは「考え方」と「責務分離」であり、Java の構造そのものを複製することではない。",
+      "reason": "参考実装から採用する範囲を「寄せる対象」という比喩を使わずに示す。",
+      "preserved_facts": [
+        "参考とするのは考え方と責務分離",
+        "Java の構造そのものを複製することは対象ではない"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 728,
+      "original_line_end": 728,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-013",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定し、TIGERs のロボットの品質判定の初期閾値 `0.05` を設定値の基準とする",
+      "replacement_text": "- 更新が途絶え、欠測により可視性が十分低下した追跡状態は、内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定し、TIGERs のロボットの品質判定の初期閾値 `0.05` を設定値の基準とする",
+      "reason": "追跡状態を修飾する「更新の途絶えた」と「欠測により可視性が十分低下した」を整理し、内部保持の許可と出力継続の禁止を追いやすくする。後続行は同一文の2出現を識別するため含め、変更しない。",
+      "preserved_facts": [
+        "更新が途絶え、欠測で可視性が十分低下した追跡状態が対象",
+        "内部状態として短時間残すことは可能",
+        "追跡フレーム・表示画面・公式形式のパケットへの出力継続は禁止",
+        "ロボットの外部出力は OutputVisibilityThreshold で判定し、0.05 を設定値の基準とする"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 832,
+      "original_line_end": 833,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-014",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "ボールは ID がないため、対応付けを明示設計する。",
+      "replacement_text": "ボールには ID がないため、対応付けの方法を明示的に設計する。",
+      "reason": "「明示設計」という名詞の連結を、何を設計するか分かる表現にする。",
+      "preserved_facts": [
+        "ボールには ID がない",
+        "そのため対応付けの方法を明示的に設計する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 839,
+      "original_line_end": 839,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-015",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 欠測により可視性が十分低下した更新の途絶えた追跡状態は内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定可能とし、TIGERs のボールが見えなくなった場合の寿命の初期値 `1.0s` を、`TrackLifetimeNs` の基準とする",
+      "replacement_text": "- 更新が途絶え、欠測により可視性が十分低下した追跡状態は、内部状態として短時間残せるが、追跡フレーム / 表示画面 / 公式形式のパケットへ出し続けてはならない\n- 外部出力の可否は `OutputVisibilityThreshold` で判定可能とし、TIGERs のボールが見えなくなった場合の寿命の初期値 `1.0s` を、`TrackLifetimeNs` の基準とする",
+      "reason": "追跡状態を修飾する「更新の途絶えた」と「欠測により可視性が十分低下した」を整理し、内部保持の許可と出力継続の禁止を追いやすくする。後続行は同一文の2出現を識別するため含め、変更しない。",
+      "preserved_facts": [
+        "更新が途絶え、欠測で可視性が十分低下した追跡状態が対象",
+        "内部状態として短時間残すことは可能",
+        "追跡フレーム・表示画面・公式形式のパケットへの出力継続は禁止",
+        "ボールの外部出力は OutputVisibilityThreshold で判定可能とし、1.0s を TrackLifetimeNs の基準とする"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 888,
+      "original_line_end": 889,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-016",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- 統合自体はカメラごとの状態推定の内部状態の不確かさを重みとして使う",
+      "replacement_text": "- 統合では、カメラごとの状態推定で持つ内部状態の不確かさを重みに使う",
+      "reason": "「の」が連続する箇所を整理し、統合の重みがどの状態の不確かさかを読み取りやすくする。",
+      "preserved_facts": [
+        "統合の重みはカメラごとの状態推定の内部状態の不確かさ"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 907,
+      "original_line_end": 907,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-017",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` がデバッグ起動時の設定供給責務を持つ。",
+      "replacement_text": "設定源は固定しない。`Tracker.Core` は設定オブジェクトを受け取り、`Tracker.DebugHost` がデバッグ起動時に設定を渡す責務を持つ。",
+      "reason": "「設定供給責務」を動作として書き、設定を受け取る側と渡す側を対応付ける。",
+      "preserved_facts": [
+        "設定源は固定しない",
+        "Core が設定オブジェクトを受け取る",
+        "DebugHost がデバッグ起動時に設定を供給する責務を持つ"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 1057,
+      "original_line_end": 1057,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ARCH-018",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "- `TRACKER-006`: `TrackerEngine` の順序を並べ替えるバッファと確定可能な入力を順に処理する仕組みを実装する",
+      "replacement_text": "- `TRACKER-006`: `TrackerEngine` で入力の順序を並べ替えるバッファと、確定可能な入力を順に処理する仕組みを実装する",
+      "reason": "「TrackerEngine の順序」と読める修飾を直し、本文で定義済みの入力の並べ替えを明記する。",
+      "preserved_facts": [
+        "TRACKER-006 で並べ替え用バッファを実装する",
+        "並べ替え対象は追跡エンジンへの入力",
+        "確定可能な入力を順に処理する仕組みを実装する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 1134,
+      "original_line_end": 1134,
+      "source_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9"
+    },
+    {
+      "id": "CORE-ENGINE-001",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンの分割境界、実行順序、挙動維持の確認観点を固定する。",
+      "replacement_text": "`TRACKER-033` で `Tracker.Core` の巨大ファイルを責務別に分割し、主要なクラス、プロパティ、メソッドに日本語コメントを追加できるように、追跡エンジンを分割する箇所、実行順序、挙動が変わっていないことを確認する観点を定める。",
+      "reason": "分割境界と挙動維持という名詞の連結を、分割する箇所と確認する内容として書く。",
+      "preserved_facts": [
+        "TRACKER-033 の責務別分割と主要な型・プロパティ・メソッドへの日本語コメント追加が目的",
+        "分割箇所・実行順序・挙動維持の確認観点を定める"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 7,
+      "original_line_end": 7,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-ENGINE-002",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダが型名、ファイルが責務名を表すため、名前空間と公開契約を維持したまま責務境界をファイルパスで読める。",
+      "replacement_text": "手書き C# の責務を示すために `TypeName.Responsibility.cs` を使わない。partial class を責務別に分ける場合は type-owned folder を作り、`TypeName/Responsibility.cs` 形式を基本にする。フォルダ名が型名、ファイル名が責務名を表すため、名前空間と公開契約を維持したまま、各ファイルの責務をファイルパスから読み取れる。",
+      "reason": "フォルダとファイルの名前が何を表すかを明記し、「責務境界を読める」を具体的な読み取り対象で表す。",
+      "preserved_facts": [
+        "手書き C# に TypeName.Responsibility.cs を使わない",
+        "partial class の責務別分割には type-owned folder と TypeName/Responsibility.cs を基本にする",
+        "名前空間と公開契約を維持する",
+        "型名と責務名をパスから読み取る構造"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 119,
+      "original_line_end": 119,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-ENGINE-003",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "`TrackerPacketGenerator` は現状の 1 ファイル維持でよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。",
+      "replacement_text": "`TrackerPacketGenerator` は現状どおり 1 ファイルのまま維持してよい。将来さらに肥大化した場合のみ、`Tracker/Tracker.Core/Proto/TrackerPacketGenerator/Balls.cs`、`Robots.cs`、`KickedBall.cs` のような type-owned folder による partial class の分割を検討する。",
+      "reason": "「1 ファイル維持」という名詞の連結を、現在の構成を維持してよいという許可の文にする。",
+      "preserved_facts": [
+        "現在の 1 ファイル構成を維持してよい",
+        "将来さらに肥大化した場合のみ partial class 分割を検討する",
+        "例示ファイルパスは変更しない"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 265,
+      "original_line_end": 265,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-ENGINE-004",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "- ロボットの遠方外れ値を同一ロボット ID の近傍観測で落とす箇所",
+      "replacement_text": "- 同一ロボット ID の近傍観測に基づいて、ロボットの遠方外れ値を除外する箇所",
+      "reason": "「落とす」という比喩を除外の動作として書き、判断に使う観測と除外対象を対応付ける。",
+      "preserved_facts": [
+        "通常コメントを追加する箇所の例",
+        "同一ロボット ID の近傍観測を使う",
+        "遠方外れ値を除外する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 329,
+      "original_line_end": 329,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-ENGINE-005",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上の挙動固定点を確認する。",
+      "replacement_text": "1. 作業前に `Tracker/Design/Core/tracker-core-engine-detail-design.md` と `Tracker/Design/Core/tracker-architecture-plan.md` を読み、設計上、変更してはならない挙動を確認する。",
+      "reason": "「挙動固定点」を、作業者が何を確認するか分かる表現にする。",
+      "preserved_facts": [
+        "作業前に指定された2設計書を読む",
+        "設計上の挙動を変えない箇所を確認する",
+        "実行順序の第1手順であること"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 333,
+      "original_line_end": 333,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-ENGINE-006",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "- secondary ball の出力は、新しい観測と、追跡の確立に必要な観測回数の条件を維持する。",
+      "replacement_text": "- secondary ball の出力では、新しい観測に関する条件と、追跡の確立に必要な観測回数の条件を維持する。",
+      "reason": "維持する条件が「新しい観測」と「観測回数」の両方に掛かることを明記する。観測の新しさを有無や具体的な時間幅へ置き換えない。",
+      "preserved_facts": [
+        "secondary ball の出力条件を維持する",
+        "新しい観測に関する条件を維持する",
+        "追跡の確立に必要な観測回数の条件を維持する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 364,
+      "original_line_end": 364,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-ENGINE-007",
+      "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "original_text": "- コメント追加量が多いため、実装移動とコメント追加を同時に広く行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。",
+      "replacement_text": "- コメント追加量が多いため、広い範囲で実装の移動とコメントの追加を同時に行うとレビューが難しくなる。`TRACKER-033` では責務単位で分割し、各単位ごとに対象を絞ったテストを挟む。",
+      "reason": "「同時に広く」の掛かり方を整理し、広い範囲で二つの作業を同時に行う条件を読み取りやすくする。",
+      "preserved_facts": [
+        "コメント追加量が多いことが理由",
+        "広範囲で実装移動とコメント追加を同時に行うとレビューが難しくなる",
+        "TRACKER-033 は責務単位に分割し、各単位で対象を絞ったテストを挟む"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 431,
+      "original_line_end": 431,
+      "source_sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec"
+    },
+    {
+      "id": "CORE-HISTORY-001",
+      "path": "Tracker/Design/Core/tracker-history-000-038.md",
+      "original_text": "進捗管理の軽量化と履歴退避は PR 準備の保守・運用作業であり、CaptureOn 比較ログの機能仕様ではない。",
+      "replacement_text": "進捗管理ファイルを簡潔に保ち、履歴を別に保存する作業は、PR 準備の保守・運用作業であり、CaptureOn 比較ログの機能仕様ではない。",
+      "reason": "直前の説明を踏まえ、「軽量化と履歴退避」を進捗管理ファイルに対する作業として直接書く。履歴表は変更しない。",
+      "preserved_facts": [
+        "進捗管理の簡潔化と履歴の分離保存が対象",
+        "PR 準備の保守・運用作業",
+        "CaptureOn 比較ログの機能仕様ではない"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 5,
+      "original_line_end": 5,
+      "source_sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42"
+    },
+    {
+      "id": "CORE-TEST-001",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。追跡処理、サーバー、CLI、UI の製品のソースコードの分割方針は別の詳細設計で扱う。",
+      "replacement_text": "この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。製品側の追跡処理、サーバー、CLI、UI のソースコードを分割する方針は、別の詳細設計で扱う。",
+      "reason": "「の」が連続する製品のソースコードの説明を整理し、対象となるテストと別設計で扱う製品側を読み分けやすくする。",
+      "preserved_facts": [
+        "この設計は Tracker.Tests のテスト保守性改善に限定",
+        "追跡処理・サーバー・CLI・UI の製品ソース分割は別の詳細設計"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 7,
+      "original_line_end": 7,
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac"
+    },
+    {
+      "id": "CORE-TEST-002",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスの責務境界がテスト本体から見えにくい。",
+      "replacement_text": "  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスが担う範囲をテスト本体から読み取りにくい。",
+      "reason": "「責務境界が見えにくい」を、テストを読む際に分かりにくい内容として述べる。",
+      "preserved_facts": [
+        "列挙されたテストが同じクラスに並ぶ現状",
+        "補助クラスの責務をテスト本体から把握しにくいという問題"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 19,
+      "original_line_end": 19,
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac"
+    },
+    {
+      "id": "CORE-TEST-003",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "  - `TrackedSnapshotStore` 参照を使った保存状態の消去済み判定は現状のまま維持する。",
+      "replacement_text": "  - `TrackedSnapshotStore` を参照して、保存状態が消去済みかを判定する処理は現状のまま維持する。",
+      "reason": "参照・保存状態・消去済み判定という名詞の連続を、参照する対象と判定する内容に分けて書く。",
+      "preserved_facts": [
+        "TrackedSnapshotStore への参照を使う",
+        "保存状態が消去済みかを判定する",
+        "その処理を現状のまま維持する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 100,
+      "original_line_end": 100,
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac"
+    },
+    {
+      "id": "CORE-TEST-004",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "- 繰り返し処理で、観測の揺れ、可視性の減衰、secondary ball を複数回継続して観測した状態などの状態を作っている。",
+      "replacement_text": "- 繰り返し処理で、観測の揺れや可視性の減衰を再現したり、secondary ball を複数回継続して観測した状態を作ったりしている。",
+      "reason": "「状態などの状態」という重複を整理し、繰り返し処理で作るテスト条件を並列に示す。",
+      "preserved_facts": [
+        "通常コメントを任意で置いてよい条件の例",
+        "繰り返し処理が対象",
+        "観測の揺れ・可視性の減衰・secondary ball の複数回の継続観測という例を維持する"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 143,
+      "original_line_end": 143,
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac"
+    },
+    {
+      "id": "CORE-TEST-005",
+      "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+      "original_text": "`TRACKER-035` の検証は次を最低限にする。",
+      "replacement_text": "`TRACKER-035` の検証には、少なくとも次を含める。",
+      "reason": "「検証を最低限にする」と読める表現を、後続の項目が検証の下限であると分かる表現にする。",
+      "preserved_facts": [
+        "TRACKER-035 の検証に後続の全項目を最低限含める"
+      ],
+      "source_proposal_file": "core-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 183,
+      "original_line_end": 183,
+      "source_sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac"
+    },
+    {
+      "id": "DH-C01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "replacement_text": "別ファイルにすることで、snapshot sidecar が受信パケットの主記録を、alignment sidecar が再生用の索引を担う構成に分ける。これにより、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "reason": "前者・後者が指すファイルを明示し、責務分離と障害診断の関係を二つの文で追えるようにする。",
+      "preserved_facts": [
+        "snapshot sidecar が受信パケットの主記録を担当する。",
+        "alignment sidecar が再生用の索引を担当する。",
+        "対応付けの欠落・破損時も、スナップショット保存の成否を独立に診断できる。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "peercheck_adjustment": {
+        "source": "host-proposals-peercheck.json",
+        "reason": "原文は、二つのファイルを主記録と再生用索引として分ける設計上の取扱いを述べている。提案の「構成に分けられる」は分離が可能だという説明へ弱まるため、「構成に分ける」として元の文の働きを保つ。前者・後者の明示と二文への分割はそのまま採用できる。"
+      },
+      "original_line_start": 72,
+      "original_line_end": 72,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C02",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "CaptureOn は受信処理の起動条件ではなく、記録用の補助ファイルへの書き込み条件を制御する。Capture Off 中に受信処理がパケットを受けても、snapshot sidecar を作成・追記しない。\n\nCapture Off 中は snapshot sidecar を作成・追記しない。Capture Off から再度記録を開始するときは session folder を更新し、前の session folder の snapshot sidecar へ追記しない。",
+      "replacement_text": "CaptureOn は受信処理の起動条件ではなく、記録用の補助ファイルへの書き込み条件を制御する。Capture Off 中に受信処理がパケットを受けても、snapshot sidecar を作成・追記しない。\n\nCapture Off から再度記録を開始するときは session folder を更新し、前の session folder の snapshot sidecar へ追記しない。",
+      "reason": "直前の文と同じ作成・追記禁止を繰り返している一文を除き、停止中の扱いから再開時の扱いへ進める。",
+      "preserved_facts": [
+        "CaptureOn は受信の起動条件ではなく補助ファイルの書き込み条件を制御する。",
+        "Capture Off 中は、受信しても snapshot sidecar を作成・追記しない。",
+        "再開時は session folder を更新し、前のフォルダの snapshot sidecar へ追記しない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 114,
+      "original_line_end": 116,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C03",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "動作中のモードは、対応する再生・早送りの操作部が停止ボタンへ入れ替わるか、同じ位置の停止ボタンで止める構成とし、速度タブ自体を停止操作に変えない。",
+      "replacement_text": "モードの動作中は、対応する再生・早送りの操作部を停止ボタンへ入れ替えるか、同じ位置の停止ボタンで止められる構成とする。速度タブ自体を停止操作に変えない。",
+      "reason": "モードと操作部が一つの主述に混在していたため、動作中という条件と操作部の構成を対応させ、速度タブの禁止事項を別文にする。",
+      "preserved_facts": [
+        "動作中のモードに対応する再生・早送りの操作部を停止ボタンへ入れ替える構成、または同じ位置の停止ボタンで止める構成とする。",
+        "速度タブ自体は停止操作へ変えない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 150,
+      "original_line_end": 150,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C04",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "保存形式は既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持し、第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルは、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利なため作らない。",
+      "replacement_text": "既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持したまま、保存形式を第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルを作ると、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利になるため、作らない。",
+      "reason": "維持するファイル名と置き換える保存形式を分け、別ファイルを作らない理由の条件と結果を明確にする。",
+      "preserved_facts": [
+        "既存ファイル名 tracker-snapshot-alignment.jsonl を維持する。",
+        "第2版の記録への置き換えは推奨であり、必須へ強めない。",
+        "別ファイルは分岐増加と性能上の不利があるため作らない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 171,
+      "original_line_end": 171,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "capture metadata がない、`DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない、diagnostics sample sidecar が未作成・欠落・空・破損している、tracker snapshot / alignment sidecar の情報やファイルがない、記録件数0、読み取りエラーは、それぞれ UI 上の状態として区別する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。",
+      "replacement_text": "UI 上では、次の状態をそれぞれ区別する。\n\n- capture metadata がない\n- `DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない\n- diagnostics sample sidecar が未作成・欠落・空・破損している\n- tracker snapshot / alignment sidecar の情報やファイルがない\n- 記録件数0\n- 読み取りエラー\n\n新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。",
+      "reason": "状態の列挙が長い主語になっているため、UI で区別する状態を箇条書きにし、その後に新規経路の判断方針を置く。",
+      "preserved_facts": [
+        "元の六つの列挙項目を保持し、未作成・欠落・空・破損もそれぞれ区別する。",
+        "新規記録の Vision Input / ibis tracker は diagnostics sample sidecar の状態を優先する。",
+        "旧 render snapshot だけで新規経路を正常扱いしない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 189,
+      "original_line_end": 189,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C09",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "早送りは通常再生専用の実時間追従へ巻き込まず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。",
+      "replacement_text": "早送りには通常再生専用の実時間追従を適用せず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。",
+      "reason": "「巻き込まず」を、早送りへ適用しないという処理方針で表す。",
+      "preserved_facts": [
+        "通常再生専用の実時間追従を早送りへ適用しない。",
+        "既存の調査用の収録時刻差を倍率で割る挙動を維持する。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 241,
+      "original_line_end": 241,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C10",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "重ね表示の切り替えは、フィールド表示領域の見出し行へ置く。",
+      "replacement_text": "重ね表示を切り替える操作部は、フィールド表示領域の見出し行へ置く。",
+      "reason": "配置する対象が操作そのものではなく操作部であることを、直後の操作部の説明に合わせて明示する。",
+      "preserved_facts": [
+        "重ね表示の切り替え操作を配置する。",
+        "配置先はフィールド表示領域の見出し行である。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 266,
+      "original_line_end": 266,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C06",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "最小仕様では、`Layer A` をシアン系の線と表示名、`Layer B` をマゼンタ系の線と表示名とし、ロボット本体の黄色・青色の塗りは維持する。",
+      "replacement_text": "最小仕様では、`Layer A` の線と表示名をシアン系、`Layer B` の線と表示名をマゼンタ系にし、ロボット本体の黄色・青色の塗りは維持する。",
+      "reason": "層そのものを線と表示名にする読みを避け、層ごとの色を付ける対象を明示する。",
+      "preserved_facts": [
+        "Layer A の線と表示名はシアン系にする。",
+        "Layer B の線と表示名はマゼンタ系にする。",
+        "ロボット本体の黄色・青色の塗りは維持する。",
+        "最小仕様であることを保持する。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 270,
+      "original_line_end": 270,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C07",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "重なりを読めるように、`Layer B` は破線または半透明の線を使う。",
+      "replacement_text": "重なりを見分けられるように、`Layer B` は破線または半透明の線を使う。",
+      "reason": "図形の重なりに対する「読む」を、見分けるという画面上の働きで表す。",
+      "preserved_facts": [
+        "Layer B に破線または半透明の線を使う。",
+        "重なりを判別できるようにする目的と、二つの選択肢を保持する。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 270,
+      "original_line_end": 270,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-C08",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "トラッカーの層は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の変換処理で、ボール・黄色チームのロボット・青色チームのロボットへ変換する。",
+      "replacement_text": "トラッカーの層では、`DiagnosticsFieldViewFactory` の変換処理を使い、`TrackerPacketSnapshotSemanticSummary` をボール・黄色チームのロボット・青色チームのロボットへ変換する。",
+      "reason": "変換処理と変換対象を近づけ、層自体が変換の動作主に見える主述を整える。",
+      "preserved_facts": [
+        "トラッカーの層についての変換である。",
+        "DiagnosticsFieldViewFactory の変換処理を使う。",
+        "TrackerPacketSnapshotSemanticSummary をボール・黄色チームのロボット・青色チームのロボットへ変換する。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 276,
+      "original_line_end": 276,
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101"
+    },
+    {
+      "id": "DH-M01",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_text": "この文書は `TRACKER-034` で実施した旧 `Tracker.Server`、`Tracker.CaptureReplay`、診断画面の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。",
+      "replacement_text": "この文書は `TRACKER-034` で実施した保守性改善を記録する。旧 `Tracker.Server`、`Tracker.CaptureReplay`、診断画面の巨大なファイルを分割し、日本語コメントを追加した。",
+      "reason": "実施した改善の名詞が連続していたため、文書の役割と実施済みの変更を分けて述べる。",
+      "preserved_facts": [
+        "TRACKER-034 で実施済みの保守性改善を記録する文書である。",
+        "旧 Tracker.Server、Tracker.CaptureReplay、診断画面の巨大ファイル分割と日本語コメント追加を保持する。",
+        "実施済みの変更を予定や現行の動作保証へ変えない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 5,
+      "original_line_end": 5,
+      "source_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa"
+    },
+    {
+      "id": "DH-M02",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_text": "挙動維持のため、分割前後で同じ入力から外部に観測できる同じ出力を返すことを最優先にする。",
+      "replacement_text": "挙動維持のため、分割前後で同じ入力を与えたときに、外部から観測できる出力が変わらないことを最優先にする。",
+      "reason": "同じ入力と同じ出力の関係を条件として述べ、「外部に観測できる」の助詞を整える。",
+      "preserved_facts": [
+        "挙動維持のための方針である。",
+        "分割前後で入力が同じなら、外部から観測できる出力も同じであることを最優先にする。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 45,
+      "original_line_end": 45,
+      "source_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa"
+    },
+    {
+      "id": "DH-M03",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_text": "CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言の整理でも互換性リスクがある。",
+      "replacement_text": "CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言を整理するだけでも互換性を損なうリスクがある。",
+      "reason": "表示文言の整理が何に影響し得るかを動詞で表し、リスクの内容を読み取りやすくする。",
+      "preserved_facts": [
+        "CaptureReplay の標準出力は調査・自動検証で使われる。",
+        "表示文言の整理だけでも互換性へのリスクがある。",
+        "リスクを障害の確定事実へ強めない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 101,
+      "original_line_end": 101,
+      "source_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa"
+    },
+    {
+      "id": "DH-R01",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "少なくとも 1 つ成功すれば受信開始を継続する",
+      "replacement_text": "少なくとも 1 つの通信アドレスで参加に成功すれば、受信開始の処理を続ける",
+      "reason": "直前の参加試行の説明を受けて、成功対象を明示し、「開始を継続する」を処理の続行として書く。",
+      "preserved_facts": [
+        "設定された通信アドレスがマルチキャストの場合の参加規則である。",
+        "少なくとも 1 つの通信アドレスで参加に成功すれば、受信開始の処理を続ける。",
+        "すべての通信アドレスでの参加成功を要求しない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 55,
+      "original_line_end": 55,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "DH-R02",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元の識別と集約では UUID を優先する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID を持つ候補の中で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が `MultiTrackerManager` の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+      "replacement_text": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元の識別と集約では UUID を優先する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID を持つ候補の中で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。\n\nただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が `MultiTrackerManager` の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。\n\n`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+      "reason": "表示元の識別・集約、UI に渡す参照の扱い、CaptureOn の保存物をライブ表示へ流用しない理由を、それぞれのまとまりで段落分けする。語句と文順は変えない。",
+      "preserved_facts": [
+        "UUID 優先、同じ UUID の受信時刻が最新の候補の採用、異なる UUID と表示名の扱いをそのまま保持する。",
+        "複数送信元のボール・ロボット情報を寄せ集めない。",
+        "UI は TrackerState や protobuf パケットの参照を直接保持しない。",
+        "ExternalTrackerSnapshotStore が複製し、VisionLiveDisplaySnapshotProvider が描画更新時に読み取り用 DTO を固定する。",
+        "CaptureOn の書き込み処理を CaptureOff のライブ表示の更新元に使わない理由を保持する。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 218,
+      "original_line_end": 218,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "DH-R04",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "これにより、表示が消えることを避けつつ、時間軸が表示元ごとにずれ、異なる時刻のものを同時刻として表示しているように見える状態を避ける。",
+      "replacement_text": "これにより、表示を残しつつ、表示元ごとに時間軸がずれて、異なる時刻のものを同時刻として表示しているように見える状態を避ける。",
+      "reason": "同じ文内の「避ける」の反復を減らし、表示元ごとの時間軸のずれと見え方の関係をつなげる。",
+      "preserved_facts": [
+        "latest-before snapshot を使っても再生・比較の基準時系列を固定する前段の方針を受ける。",
+        "表示を消さず、表示元ごとの時間軸のずれによる誤認を避ける。",
+        "異なる時刻のものを同時刻として見せる表示へ変更しない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 248,
+      "original_line_end": 248,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "DH-R05",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。",
+      "replacement_text": "採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定する。既定値は `100` ms とし、0 以下が指定された場合は既定値へ戻す。",
+      "reason": "設定方法と値の扱いを分け、0 以下という条件が指定値に掛かることを明示する。",
+      "preserved_facts": [
+        "採取周期の設定キーを変更しない。",
+        "既定値は 100 ms である。",
+        "0 以下が指定された場合は既定値へ戻す。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 260,
+      "original_line_end": 260,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "DH-R06",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。",
+      "replacement_text": "この補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。",
+      "reason": "直前の文にある旧形式の render snapshot を保存した補助ファイルを指示語で受け、同じ長い修飾を繰り返さない。",
+      "preserved_facts": [
+        "直前に述べた旧形式の render snapshot の補助ファイルしか持たないキャプチャーに限定する。",
+        "この新機能では非対応または機能を制限した旧形式として扱ってよい。",
+        "許容を必須へ変えず、脚注の識別子も保持する。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 262,
+      "original_line_end": 262,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "DH-R07",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントへ閉じ込めない",
+      "replacement_text": "サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントの内部だけで処理しない",
+      "reason": "「閉じ込めない」という比喩を、処理を担当する範囲の説明にする。",
+      "preserved_facts": [
+        "サイドバーの折りたたみをレイアウト全体で扱う。",
+        "表示専用コンポーネントの内部だけで扱う構成にしない。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 291,
+      "original_line_end": 291,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "DH-R08",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列の確認を壊さない",
+      "replacement_text": "詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列を確認できる状態を保つ",
+      "reason": "「確認を壊さない」を、縮小後も文字列を確認できるという利用上の条件で表す。",
+      "preserved_facts": [
+        "詳細領域は縮小時も最低高さとスクロールを維持する。",
+        "Vision Input と Tracker Output の文字列を確認できる状態を保つ。"
+      ],
+      "source_proposal_file": "host-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 294,
+      "original_line_end": 294,
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86"
+    },
+    {
+      "id": "PRIMARY-RUNTIME-01",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する、実運用を想定し、画面を持たない実行体[^headless-host]とする。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。",
+      "replacement_text": "`Tracker.RuntimeHost`[^tracker-runtime-host] は、実運用向けの画面を持たない実行体[^headless-host]とする。トラッカーと将来の AutoRef mode[^autoref-mode]を同一プロセス[^same-process]で低遅延に実行する。Web UI[^web-ui]、diagnostics replay[^diagnostics-replay]、キャプチャーの確認画面[^capture-viewer]は `Tracker.DebugHost`[^tracker-debug-host] へ分離し、描画やログ保存の負荷がトラッカーと AutoRef の実時間処理へ影響しないようにする。",
+      "reason": "実行体の位置付けと、同一プロセスで実行する処理を分け、修飾の途中に別の述語が入る構造を整理する。",
+      "preserved_facts": [
+        "実運用を想定",
+        "画面なし",
+        "将来のAutoRef mode",
+        "同一プロセス・低遅延",
+        "Web UI等の分離と実時間処理への負荷抑制"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 7,
+      "original_line_end": 7,
+      "source_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a"
+    },
+    {
+      "id": "PRIMARY-RUNTIME-02",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_text": "受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、未処理のカメラごとの最新パケットを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。",
+      "replacement_text": "受信処理は、カメラごとに最新パケットを保持するバッファへ、パケットと受信時刻を保存する。トラッカーの周期処理は、このバッファを `RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期で読み取り、カメラごとの最新パケットのうち、未処理のものを受信時刻順に `TrackerCoordinator.ProcessPacket` へ渡す。同じカメラから処理周期の間に複数パケットが届いた場合は最新だけを残し、異なるカメラのパケットを単一の保存先への上書きで落とさない。実行周期はソースコード内の固定値にせず、`RuntimeHostOptions` の検証済み設定値だけから決める。",
+      "reason": "未処理という条件がカメラではなくパケットに掛かることを明確にする。",
+      "preserved_facts": [
+        "受信時刻順",
+        "カメラごとに最新だけを保持",
+        "異なるカメラの入力を単一保存先で上書きしない",
+        "検証済み設定値による周期"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 112,
+      "original_line_end": 112,
+      "source_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a"
+    },
+    {
+      "id": "PRIMARY-RUNTIME-03",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "original_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。",
+      "replacement_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: 実運用を想定した、画面を持たない実行体。トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす。",
+      "reason": "定義の長い修飾を位置付けと動作に分け、本文の目的説明と対応させる。",
+      "preserved_facts": [
+        "実運用を想定",
+        "画面なし",
+        "トラッカーと将来のAutoRef mode",
+        "同一プロセス"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "peercheck_adjustment": {
+        "source": "primary-proposals-peercheck.json",
+        "reason": "原文は同一プロセスで動かす対象を「トラッカーの実時間処理と将来の AutoRef mode」と定義している。案では「トラッカーと将来の AutoRef mode」となり、「実時間処理」が脱落している。本文の命名にも同じ限定があるため、この語を戻す。"
+      },
+      "original_line_start": 143,
+      "original_line_end": 143,
+      "source_sha256": "8d175baf711299381fb74f71a627ed92aa921ac433b39e9e0fe181541909bd0a"
+    },
+    {
+      "id": "DHP-014",
+      "path": "Tracker/Design/phases-status.md",
+      "original_text": "独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明に不整合があるF1が見つかり、完了判定は保留となった。",
+      "replacement_text": "独立最終レビューで、diagnostics sample sidecar の現在仕様と3文書の説明の不整合がF1として指摘され、完了判定は保留となった。",
+      "reason": "F1を不整合の指摘として書き、不自然な修飾を直す。",
+      "preserved_facts": [
+        "独立最終レビューでの指摘。",
+        "diagnostics sample sidecarの現在仕様と3文書の説明の不整合。",
+        "指摘IDはF1。",
+        "当時の完了判定は保留となった。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 47,
+      "original_line_end": 47,
+      "source_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed"
+    },
+    {
+      "id": "DHP-015",
+      "path": "Tracker/Design/phases-status.md",
+      "original_text": "関連する原出現台帳と変更単位の台帳を修正後本文へ同期し、独立レビュー対象8文書の2,670件について構造自己点検は欠落・重複・本文内容不一致0。",
+      "replacement_text": "関連する原出現台帳と変更単位の台帳を修正後本文へ同期した。独立レビュー対象8文書の2,670件について構造を自己点検した結果、欠落・重複・本文内容不一致はいずれも0だった。",
+      "reason": "同期と自己点検の結果を分け、途中で変わっていた主題を整理する。",
+      "preserved_facts": [
+        "原出現台帳と変更単位の台帳を修正後本文へ同期した。",
+        "自己点検の対象は独立レビュー対象8文書の2,670件。",
+        "欠落・重複・本文内容不一致はいずれも0。",
+        "直後の独立再レビュー未実施を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 49,
+      "original_line_end": 49,
+      "source_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed"
+    },
+    {
+      "id": "DHP-016",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "この追跡更新を公開した後、PRのPRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。",
+      "replacement_text": "この追跡更新を公開した後、PRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。",
+      "reason": "「PRのPRの」の重複を解消する。",
+      "preserved_facts": [
+        "追跡更新を公開した後に確認する。",
+        "確認対象はPRの最新コミットと一致するCI。",
+        "結果をPRコメントに記録する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 41,
+      "original_line_end": 41,
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    },
+    {
+      "id": "DHP-017",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。",
+      "replacement_text": "- 2026-09-17 の raw vision 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格とは扱わない。",
+      "reason": "合格として扱わないという否定を表す助詞に直す。同じ短文が別の段落末尾にも現れるため、この箇条書きの1行全体を照合対象とする。",
+      "preserved_facts": [
+        "対象文書の検査とgit diff --checkは終了値0。",
+        "共有集計は1,946 / 2,142件完了、残り196件。",
+        "2つの証跡参照を維持する。",
+        "検証と集計の結果を独立最終レビューの合格とはしない。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 59,
+      "original_line_end": 59,
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    },
+    {
+      "id": "DHP-018",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格には扱わない。",
+      "replacement_text": "この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格とは扱わない。",
+      "reason": "位置情報・原文保全の確認と全件確認・レビュー合格を区別する助詞を直す。",
+      "preserved_facts": [
+        "位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格とは扱わない。",
+        "直後の全体の文書検査未通過という記録を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 304,
+      "original_line_end": 304,
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    },
+    {
+      "id": "DHP-019",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。",
+      "replacement_text": "この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了とは扱わない。",
+      "reason": "照合結果を全体統合やレビュー完了と同一視しない文の助詞を直す。",
+      "preserved_facts": [
+        "照合結果を全4,336出現の台帳への統合とは扱わない。",
+        "独立最終レビューの完了とは扱わない。",
+        "4,336件と未完了の区別を保持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 312,
+      "original_line_end": 312,
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    },
+    {
+      "id": "DHP-020",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "構成設計565件、CLI/UI 724件、DebugHost README 423件は、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲の構造検証でエラー0。",
+      "replacement_text": "構成設計565件、CLI/UI 724件、DebugHost README 423件について、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲を構造検証し、エラーは0だった。",
+      "reason": "件数の列挙と構造検証の結果を述語で結び、名詞の連続を整理する。",
+      "preserved_facts": [
+        "構成設計565件、CLI/UI 724件、DebugHost README 423件が対象。",
+        "対象は基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲。",
+        "構造検証のエラーは0。",
+        "後続の自己点検と独立再レビューの区別を維持する。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 322,
+      "original_line_end": 322,
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    },
+    {
+      "id": "DHP-021",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "これは修正担当の自己点検であり、独立再レビューの合格証明には扱わない。",
+      "replacement_text": "これは修正担当の自己点検であり、独立再レビューの合格証明とは扱わない。",
+      "reason": "自己点検を独立再レビューの合格証明と同一視しない助詞を直す。",
+      "preserved_facts": [
+        "修正担当の自己点検である。",
+        "独立再レビューの合格証明とは扱わない。"
+      ],
+      "source_proposal_file": "history-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 322,
+      "original_line_end": 322,
+      "source_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2"
+    },
+    {
+      "id": "PRIMARY-CAPTURE-01",
+      "path": "Tracker/Tracker.CaptureReplay/README.md",
+      "original_text": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "replacement_text": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認には `Tracker.DebugHost` の `/diagnostics` を使います。このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "reason": "目視確認とCLIを使う場面を二つの文に分け、用途の対応を読み取りやすくする。",
+      "preserved_facts": [
+        "CLIの再投入・概要/詳細/遅延分析",
+        "通常確認はDebugHost",
+        "エージェント調査・自動検証・変更に伴う不具合調査という利用範囲"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 3,
+      "original_line_end": 3,
+      "source_sha256": "de3993dafb1bcaefc5153806fb4ad0e42f2440c51d4b5a60ff7aa5767015b31d"
+    },
+    {
+      "id": "PRIMARY-DEBUG-01",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "- 右側の表示領域で次を確認できます\n- 有効な設定プロファイルの名前\n- 送信成功数 / 失敗数\n- 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻\n- キック / 接触 / フィールドの状態\n- primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）\n- 黄色 / 青色チームのロボット",
+      "replacement_text": "- 右側の表示領域で次を確認できます\n  - 有効な設定プロファイルの名前\n  - 送信成功数 / 失敗数\n  - 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻\n  - キック / 接触 / フィールドの状態\n  - primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）\n  - 黄色 / 青色チームのロボット",
+      "reason": "右側の表示領域で確認する項目を、その説明の下へ入れ子にし、列挙の所属を示す。",
+      "preserved_facts": [
+        "全6項目の文言",
+        "Tracked表示の機能",
+        "入力時刻と確定処理中の時刻の区別"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 63,
+      "original_line_end": 69,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-02",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。",
+      "replacement_text": "- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。\n- `等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。\n- `Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。",
+      "reason": "操作部の構成、等倍速、早送りの説明を別項目に分け、各操作の条件を追いやすくする。",
+      "preserved_facts": [
+        "全ての元の文を順序ごと保持",
+        "毎秒30回相当",
+        "Playの倍率保持",
+        "64x超を64x相当に制限しない"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 95,
+      "original_line_end": 95,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。",
+      "replacement_text": "- 表示領域には次の情報が表示されます。\n  - diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数\n  - 選択中の replay timeline の位置番号 / 時刻\n  - diagnostics sample tick の番号\n  - 比較状態\n  - 対応規則\n  - source role / source label\n  - source key / 送信元の通信アドレスと通信ポート\n  - スナップショット側の追跡フレームの番号\n  - 自前 / 対応付け済みスナップショットの時刻と時刻差\n  - ボール / ロボット\n  - 受信データの元のバイト列を復元できるか",
+      "reason": "長い一文に並ぶ表示情報を小項目に分け、確認する値を見つけやすくする。",
+      "preserved_facts": [
+        "列挙された全情報",
+        "対応付け時刻と時刻差",
+        "元のバイト列を復元できるか",
+        "並び順"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "peercheck_adjustment": {
+        "source": "primary-proposals-peercheck.json",
+        "reason": "原文の「状態と記録 / 省略 / エラー件数」は、先頭に並ぶ3種類の補助ファイルを受ける。案では最初の2種類を名前だけの別項目にしたため、状態・件数が alignment sidecar だけに掛かる構造になっている。手動検証の手順3・7にも各補助ファイルの状態・件数を確認・記録することが明記されている。先頭3種類と共通の修飾を1つの小項目にまとめて保持する。"
+      },
+      "original_line_start": 96,
+      "original_line_end": 96,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-04",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。",
+      "replacement_text": "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に、共通のファイル名部分を使った次の補助ファイルも作成します。",
+      "reason": "フォルダ作成と補助ファイル作成の動作を整理し、共通のファイル名部分が修飾する対象を明確にする。",
+      "preserved_facts": [
+        "CaptureOnのsession folder名",
+        "同じフォルダ内の補助ファイル",
+        "共通のファイル名部分"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 130,
+      "original_line_end": 130,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-05",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。",
+      "replacement_text": "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。\n\n手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。",
+      "reason": "通常の設定読込と、手書きの付随情報を作る場合の注意を段落で分ける。",
+      "preserved_facts": [
+        "文言・順序の全保持",
+        "現在設定を使う条件",
+        "相対パスの基準",
+        "必須の全項目"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 221,
+      "original_line_end": 221,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。",
+      "replacement_text": "7. 報告書には次の情報を残します。\n   - 選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号\n   - `Play` の表示更新で到達した選択時刻\n   - `Field` の表示モード\n   - `Layer A` / `Layer B` の `Field source` と表示 / 非表示\n   - 表示元の絞り込み\n   - diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数\n   - 比較対象の状態\n   - source role / source label\n   - source key / 送信元の通信アドレスと通信ポート\n   - 集約時の選択規則\n   - スナップショット側の追跡フレームの番号\n   - 自前側 / 対応付け側の時刻（ns）\n   - 時刻差（ns）\n   - ボール / ロボット\n   - 受信データの元のバイト列を復元できるか\n\n   UI の `Restored` / `Missing` の意味も従来どおり記録します。",
+      "reason": "手動検証で報告する情報を小項目に分け、確認項目を読み飛ばしにくくする。",
+      "preserved_facts": [
+        "手順7という位置",
+        "列挙した全情報と単位",
+        "表示/非表示や採取件数",
+        "Restored/Missingの意味も残す義務"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "peercheck_adjustment": {
+        "source": "primary-proposals-peercheck.json",
+        "reason": "案の最後の小項目に「を残します。UI の Restored / Missing の意味も従来どおり記録します。」が残り、その後の段落にも同じUIの記録文が重複している。最後の小項目は復元可否だけにし、UIの記録文を手順7の本文として1回だけ残す。列挙した15項目、単位ns、元の順序は保持する。"
+      },
+      "original_line_start": 248,
+      "original_line_end": 248,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-07",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、一時的な送信設定 / トラッカー調整値を差し込む用途です。 |",
+      "replacement_text": "| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、送信設定 / トラッカー調整値を一時的に上書きする用途です。 |",
+      "reason": "差し込むという比喩を、同じ項目で定義された上書きの動作として説明する。",
+      "preserved_facts": [
+        "起動時の有効な設定プロファイル",
+        "任意の設定群",
+        "定義不変",
+        "一時的な送信設定/調整値の上書き"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 286,
+      "original_line_end": 286,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    },
+    {
+      "id": "PRIMARY-DEBUG-08",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。",
+      "replacement_text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報と、`TrackedSnapshotStore` に保持している旧形状を前提とする最新の追跡フレームを消去します。",
+      "reason": "同じ条件で消去する二つの対象を並べ、重複する述語を整理する。",
+      "preserved_facts": [
+        "形状変更による初期化という条件",
+        "未処理の検出情報の消去",
+        "旧形状を前提とする最新の追跡フレームの消去"
+      ],
+      "source_proposal_file": "primary-proposals.json",
+      "selection_status": "pending_root_decision",
+      "original_line_start": 380,
+      "original_line_end": 380,
+      "source_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559"
+    }
+  ],
+  "held": [
+    {
+      "id": "CORE-HOLD-001",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "6. 状態推定処理で得られた直前のボール位置の近くを優先する探索半径で、主対象の候補を絞る",
+      "reason": "「近くを優先する探索半径」は読み取りにくいが、範囲制限と候補の優先順位の関係を本文だけでさらに具体化すると条件を変える可能性があるため、原文を維持する。",
+      "disposition": "preserve_original",
+      "source_proposal_file": "core-proposals.json"
+    },
+    {
+      "id": "CORE-HOLD-002",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_text": "他のトラッカーが存在しない場合でも diagnostics sample sidecar は `Vision Input` と自前トラッカーの診断再生に使え、既存のキャプチャーと診断ログの内容上の挙動を壊さない。",
+      "reason": "「内容上の挙動を壊さない」を内容不変や形式不変へ言い換えると保証範囲を限定または強化してしまうため、原文を維持する。",
+      "disposition": "preserve_original",
+      "source_proposal_file": "core-proposals.json"
+    },
+    {
+      "id": "DH-H01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "location": "再生操作と速度選択の変更履歴／完了条件",
+      "reason": "TRACKER-062 の固定速度タブと TRACKER-063 の可変倍率入力が履歴別に記載され、完了条件にも固定タブ表現がある。現行仕様へ一本化するには履歴・仕様の判断が必要なため、文章改善では変更しない。",
+      "disposition": "原文維持。文章品質の未解消指摘としてではなく、仕様を変えないための保持事項。",
+      "source_proposal_file": "host-proposals.json"
+    },
+    {
+      "id": "DH-H02",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "location": "後続作業への固定事項（TRACKER-059）",
+      "reason": "最速の source cadence へ合わせる履歴記載と、RUNTIME-HOST-007 以降の diagnostics sample tick を使う記載を、文体整理を理由に統合しない。",
+      "disposition": "原文維持。履歴と適用時期を保持。",
+      "source_proposal_file": "host-proposals.json"
+    },
+    {
+      "id": "DH-H03",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "location": "診断処理の周期の分離方針",
+      "reason": "「未加工入力の更新周期を失わない保存境界」は、100 ms の既定値との関係を文章だけから一意に具体化できない。全入力の保存やイベント駆動など、新しい仕様を補わない。",
+      "disposition": "原文維持。既存仕様を具体化する変更は提案しない。",
+      "source_proposal_file": "host-proposals.json"
+    },
+    {
+      "id": "DH-H04",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "location": "リスク（TrackerCoordinator）",
+      "reason": "「順序制御が密」を複雑さや特定の依存関係へ置き換えると、元の説明の意味を狭める可能性があるため維持する。",
+      "disposition": "原文維持。実装にない原因を補わない。",
+      "source_proposal_file": "host-proposals.json"
+    },
+    {
+      "id": "DH-H05",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "location": "見出し・脚注・表示元の定義",
+      "reason": "課題番号入りの既存見出し、脚注識別子、表示名、許可済みの英語技術用語は参照と意味を保持するため変更しない。",
+      "disposition": "原文維持。見出しアンカーと技術用語を保持。",
+      "source_proposal_file": "host-proposals.json"
+    },
+    {
+      "id": "DHH-001",
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "original_text": "`RAW-VISION-018` で診断保存の周期と最新のスナップショットの境界を TDD で固定する。",
+      "reason": "「境界」が区別するものを細分化すると、当時の完了条件へ仕様を足すおそれがある。RAW-VISION-018本文には追跡フレーム確定周期への非依存などが書かれているが、この短い表セルへ新しい条件を加えず維持する。",
+      "disposition": "unchanged",
+      "source_proposal_file": "history-proposals.json"
+    },
+    {
+      "id": "DHH-002",
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "original_text": "3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から、内容を固定して保持する保存処理と表示の合成処理を通して接続する。",
+      "reason": "接続対象と接続先の具体化には、省略された実装上の対応を別途確定する必要がある。現在の資料内の語から推測して補わず、接続元と経由する処理を保持する。",
+      "disposition": "unchanged",
+      "source_proposal_file": "history-proposals.json"
+    },
+    {
+      "id": "DHH-003",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "`textlint` が利用者編集対象の `*.md` 全般に実行され、文書の表記揺れや文章規則を検出できる。",
+      "reason": "「文章規則を検出」が規則違反の検出を意図しているようには読めるが、当時の完了条件を変更しない補助点検として、検出対象を言い換える提案は保留する。",
+      "disposition": "unchanged",
+      "source_proposal_file": "history-proposals.json"
+    }
+  ],
+  "applied_peercheck_adjustments": [
+    {
+      "id": "DH-C01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "source_peercheck_file": "host-proposals-peercheck.json",
+      "source_peercheck_sha256": "4715e1a3e20f4779e40a46b27599de22800a4d7b5a7c7bd5aea4d1a7f463f890",
+      "prior_replacement_text": "別ファイルにすることで、snapshot sidecar が受信パケットの主記録を、alignment sidecar が再生用の索引を担う構成に分けられる。これにより、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "replacement_text": "別ファイルにすることで、snapshot sidecar が受信パケットの主記録を、alignment sidecar が再生用の索引を担う構成に分ける。これにより、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "reason": "原文は、二つのファイルを主記録と再生用索引として分ける設計上の取扱いを述べている。提案の「構成に分けられる」は分離が可能だという説明へ弱まるため、「構成に分ける」として元の文の働きを保つ。前者・後者の明示と二文への分割はそのまま採用できる。",
+      "source_context": {
+        "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+        "excerpts": [
+          {
+            "line": 38,
+            "text": "tracker packet snapshot の主記録は、既存の `.tracker-diagnostics.log` の破壊的拡張ではなく、CaptureOn の session folder 配下の sidecar JSONL とする。異なる CaptureOn の開始時点に属するログは別フォルダへ分け、同じ階層に多数のログファイルを横並びにしない。"
+          },
+          {
+            "line": 72,
+            "text": "tracker snapshot の alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate source から参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。"
+          },
+          {
+            "line": 74,
+            "text": "alignment sidecar の各記録は、CaptureOn 中の diagnostics sample tick または旧形式の診断記録と tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar 自体から復元し、alignment sidecar は主に外部トラッカーの tracker snapshot を選択時点へ対応付けるために使う。"
+          }
+        ],
+        "reading": "保存形式節は、snapshot sidecar を主記録、alignment sidecar を再生用索引として扱い、別ファイルとする取扱いを定めている。可能性や任意の構成案を列挙する段落ではない。"
+      }
+    },
+    {
+      "id": "PRIMARY-RUNTIME-03",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "source_peercheck_file": "primary-proposals-peercheck.json",
+      "source_peercheck_sha256": "3d77df45871203060fc17d78d7207570aaa4fcdd480c1a736079f22286543573",
+      "prior_replacement_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: 実運用を想定した、画面を持たない実行体。トラッカーと将来の AutoRef mode を同一プロセスで動かす。",
+      "replacement_text": "[^tracker-runtime-host]: Tracker.RuntimeHost: 実運用を想定した、画面を持たない実行体。トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす。",
+      "reason": "原文は同一プロセスで動かす対象を「トラッカーの実時間処理と将来の AutoRef mode」と定義している。案では「トラッカーと将来の AutoRef mode」となり、「実時間処理」が脱落している。本文の命名にも同じ限定があるため、この語を戻す。",
+      "source_context": [
+        {
+          "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+          "line_start": 9,
+          "line_end": 12,
+          "text": "## 命名\n\n- `Tracker.RuntimeHost`: トラッカーの実時間処理[^tracker-operation]と将来の AutoRef mode を同一プロセスで実行する、実運用向けの実行体。\n- `Tracker.DebugHost`: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision viewer[^raw-vision-viewer]、診断、キャプチャーと再生、比較表示を担当する。"
+        },
+        {
+          "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+          "line_start": 143,
+          "line_end": 146,
+          "text": "[^tracker-runtime-host]: Tracker.RuntimeHost: トラッカーの実時間処理と将来の AutoRef mode を同一プロセスで動かす、実運用を想定し、画面を持たない実行体。\n[^autoref-mode]: AutoRef mode: レフェリープログラム相当の判定処理をトラッカーと同一プロセスで動かす将来のモード。今回の実装対象ではない。\n[^same-process]: 同一プロセス: トラッカーと将来の AutoRef の判定処理を、プロセス外通信なしで同じ OS プロセス内に置く実行形態。\n[^headless-host]: 画面を持たない実行体: Web UI を持たず、入出力と実時間処理を主目的に起動する実行体。"
+        }
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "source_peercheck_file": "primary-proposals-peercheck.json",
+      "source_peercheck_sha256": "3d77df45871203060fc17d78d7207570aaa4fcdd480c1a736079f22286543573",
+      "prior_replacement_text": "- 表示領域には次の情報が表示されます。\n  - diagnostics sample sidecar\n  - `tracker-packet-snapshots.jsonl`\n  - alignment sidecar の状態と記録 / 省略 / エラー件数\n  - 選択中の replay timeline の位置番号 / 時刻\n  - diagnostics sample tick の番号\n  - 比較状態\n  - 対応規則\n  - source role / source label\n  - source key / 送信元の通信アドレスと通信ポート\n  - スナップショット側の追跡フレームの番号\n  - 自前 / 対応付け済みスナップショットの時刻と時刻差\n  - ボール / ロボット\n  - 受信データの元のバイト列を復元できるか",
+      "replacement_text": "- 表示領域には次の情報が表示されます。\n  - diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数\n  - 選択中の replay timeline の位置番号 / 時刻\n  - diagnostics sample tick の番号\n  - 比較状態\n  - 対応規則\n  - source role / source label\n  - source key / 送信元の通信アドレスと通信ポート\n  - スナップショット側の追跡フレームの番号\n  - 自前 / 対応付け済みスナップショットの時刻と時刻差\n  - ボール / ロボット\n  - 受信データの元のバイト列を復元できるか",
+      "reason": "原文の「状態と記録 / 省略 / エラー件数」は、先頭に並ぶ3種類の補助ファイルを受ける。案では最初の2種類を名前だけの別項目にしたため、状態・件数が alignment sidecar だけに掛かる構造になっている。手動検証の手順3・7にも各補助ファイルの状態・件数を確認・記録することが明記されている。先頭3種類と共通の修飾を1つの小項目にまとめて保持する。",
+      "source_context": [
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 94,
+          "line_end": 96,
+          "text": "- 新規キャプチャーの replay timeline は `diagnostics-samples.jsonl` の採取時系列を使います。`Tracker Comparison` は tracker packet snapshot と alignment sidecar を外部トラッカーの比較用に索引化し、選択中の diagnostics sample tick に対応する tracker snapshot を参照します。再生位置や再生時点を変更しても外部トラッカーの補助ファイルを全件再読込せず、100MB を超える補助ファイルでも再生位置の変更ごとの I/O と解析量がファイルサイズに比例しない構成を維持します。\n- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。\n- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。"
+        },
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 244,
+          "line_end": 244,
+          "text": "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`diagnostics-samples.jsonl`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では各ファイルの相対パスと、`DiagnosticsSampleLog` / `TrackerSnapshotLog` / `TrackerSnapshotAlignmentLog` の `IsCreated`、`RecordCount`、`SkippedRecordCount`、`ErrorCount` を確認します。"
+        },
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 248,
+          "line_end": 248,
+          "text": "7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。"
+        }
+      ]
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "source_peercheck_file": "primary-proposals-peercheck.json",
+      "source_peercheck_sha256": "3d77df45871203060fc17d78d7207570aaa4fcdd480c1a736079f22286543573",
+      "prior_replacement_text": "7. 報告書には次の情報を残します。\n   - 選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号\n   - `Play` の表示更新で到達した選択時刻\n   - `Field` の表示モード\n   - `Layer A` / `Layer B` の `Field source` と表示 / 非表示\n   - 表示元の絞り込み\n   - diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数\n   - 比較対象の状態\n   - source role / source label\n   - source key / 送信元の通信アドレスと通信ポート\n   - 集約時の選択規則\n   - スナップショット側の追跡フレームの番号\n   - 自前側 / 対応付け側の時刻（ns）\n   - 時刻差（ns）\n   - ボール / ロボット\n   - 受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。\n\n   UI の `Restored` / `Missing` の意味も従来どおり記録します。\n",
+      "replacement_text": "7. 報告書には次の情報を残します。\n   - 選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号\n   - `Play` の表示更新で到達した選択時刻\n   - `Field` の表示モード\n   - `Layer A` / `Layer B` の `Field source` と表示 / 非表示\n   - 表示元の絞り込み\n   - diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数\n   - 比較対象の状態\n   - source role / source label\n   - source key / 送信元の通信アドレスと通信ポート\n   - 集約時の選択規則\n   - スナップショット側の追跡フレームの番号\n   - 自前側 / 対応付け側の時刻（ns）\n   - 時刻差（ns）\n   - ボール / ロボット\n   - 受信データの元のバイト列を復元できるか\n\n   UI の `Restored` / `Missing` の意味も従来どおり記録します。",
+      "reason": "案の最後の小項目に「を残します。UI の Restored / Missing の意味も従来どおり記録します。」が残り、その後の段落にも同じUIの記録文が重複している。最後の小項目は復元可否だけにし、UIの記録文を手順7の本文として1回だけ残す。列挙した15項目、単位ns、元の順序は保持する。",
+      "source_context": [
+        {
+          "path": "Tracker/Tracker.DebugHost/README.md",
+          "line_start": 246,
+          "line_end": 249,
+          "text": "5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。\n6. `Tracker Comparison` 表示領域では、新規キャプチャーで diagnostics sample sidecar を読み取れる場合に `Vision Input` / `ibis tracker` の Field source が利用できることを確認します。外部トラッカーの比較では tracker packet snapshot / alignment sidecar を読み、条件を満たす場合に `Status` が `Ready` になることを確認します。\n7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。\n8. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`saved-session-alignment` の比較概要をエージェント / 検証 / 回帰用の検証記録として残します。CLI の検証記録は UI の検証記録の補助であり、通常確認の主経路ではありません。"
+        }
+      ]
+    }
+  ],
+  "intentional_structure_changes": [
+    {
+      "id": "CORE-ARCH-003",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "時刻と送信頻度の前提、再生時の選択規則、確認用に残す情報を段落で分ける。文と条件の順序は変えない。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-004",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "再生時の時刻追従・省略規則と、画面のボタン・速度タブの仕様を別段落にする。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-008",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "再生時に調整値を復元するための設定保存と、CaptureOn に属する関連ファイル・件数の保存を別段落にする。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-010",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "再生情報の復元元、画面で確認する情報と欠落表示、等倍速と任意時点選択を段落で分ける。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "CORE-ARCH-011",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "新旧記録の描画元・代用禁止の規則と、フィールド操作時の画面配置の規則を別段落にする。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "kind": "list_structure",
+      "before_markers": [],
+      "after_markers": [
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-"
+      ],
+      "reason": "UIで区別する既存の状態列挙を6つの箇条書きへ分けた。各状態の区別と新規記録の優先規則を維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "状態の列挙が長い主語になっているため、UI で区別する状態を箇条書きにし、その後に新規経路の判断方針を置く。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-C08",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "kind": "inline_code_order",
+      "before": [
+        "`TrackerPacketSnapshotSemanticSummary`",
+        "`DiagnosticsFieldViewFactory`"
+      ],
+      "after": [
+        "`DiagnosticsFieldViewFactory`",
+        "`TrackerPacketSnapshotSemanticSummary`"
+      ],
+      "reason": "変換処理名を先に置き、次に変換対象を置いた語順変更。変換処理、対象、変換先の対応は維持し、実行手順を並べ替えていない。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "DH-R02",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 2,
+      "reason": "表示元の識別・集約、UI に渡す参照の扱い、CaptureOn の保存物をライブ表示へ流用しない理由を、それぞれのまとまりで段落分けする。語句と文順は変えない。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-RUNTIME-01",
+      "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "kind": "footnote_ids_order",
+      "before": [
+        "tracker-runtime-host",
+        "autoref-mode",
+        "same-process",
+        "headless-host",
+        "web-ui",
+        "diagnostics-replay",
+        "capture-viewer",
+        "tracker-debug-host"
+      ],
+      "after": [
+        "tracker-runtime-host",
+        "headless-host",
+        "autoref-mode",
+        "same-process",
+        "web-ui",
+        "diagnostics-replay",
+        "capture-viewer",
+        "tracker-debug-host"
+      ],
+      "reason": "実行体の位置付けを先に述べたため、headless-host の脚注参照が autoref-mode と same-process の前へ移動した。脚注IDと参照対象は同じ。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-01",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-"
+      ],
+      "after_markers": [
+        "-",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -"
+      ],
+      "reason": "右側の表示領域で確認する6項目を、元の案内文の子項目にした。列挙の所属を明確にし、順序を維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-02",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "-"
+      ],
+      "after_markers": [
+        "-",
+        "-",
+        "-"
+      ],
+      "reason": "操作部構成、等倍速、早送りを3つの兄弟項目へ分けた。各文と順序は維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "-"
+      ],
+      "after_markers": [
+        "-",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -",
+        "  -"
+      ],
+      "reason": "表示情報の列挙を11の子項目へ分けた。3種の補助ファイルに共通する状態・件数を一つの子項目にまとめ、修飾範囲を維持する。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-05",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "通常の設定読込と、手書きの付随情報を作る場合の注意を段落で分ける。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "list_structure",
+      "before_markers": [
+        "7."
+      ],
+      "after_markers": [
+        "7.",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -",
+        "   -"
+      ],
+      "reason": "手順7で報告する15項目を子項目にした。順序とns単位を維持し、UIのRestored/Missingの説明を手順7の本文に1回残す。",
+      "technical_execution_order_changed": false
+    },
+    {
+      "id": "PRIMARY-DEBUG-06",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "kind": "paragraph_boundaries",
+      "before_blank_line_boundaries": 0,
+      "after_blank_line_boundaries": 1,
+      "reason": "手動検証で報告する情報を小項目に分け、確認項目を読み飛ばしにくくする。",
+      "technical_execution_order_changed": false
+    }
+  ],
+  "semantic_recheck": {
+    "scope": "全84案の変更前後と、今回適用した4修正を再点検した。元担当者の全文確認記録と補助点検を統合したもので、通常/独立レビューやrootの最終採否を代行しない。",
+    "new_concerns": [],
+    "notes": [
+      "PRIMARY-RUNTIME-03は実時間処理を戻し、定義の限定を保持した。",
+      "PRIMARY-DEBUG-03は3種の補助ファイルへ掛かる状態と件数を同じ子項目に保持した。",
+      "PRIMARY-DEBUG-06は既存15項目・ns単位・順序を保持し、UI状態名の説明を1回だけ残した。",
+      "DH-C01は責務を分ける設計記述の働きを保ち、可能表現への変更を取り除いた。",
+      "履歴案の実施済み/予定、成功/失敗/未取得、自己点検とレビュー合格の区別を保持している。",
+      "引き続きheldに記録した10件を原文維持とし、未定義の関係を新たに具体化しない。"
+    ]
+  },
+  "validation_status": "pass"
+}

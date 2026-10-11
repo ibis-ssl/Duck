@@ -1,0 +1,81 @@
+{
+  "kind": "progress_update_draft",
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "status": "推敲・検証・公開が未完了の時点の草案。実際の進捗に合わせて可変欄を確定してから反映する。",
+  "task_id": "DOC-PROSE-002",
+  "numbering_check": "参照原本の tasks-status.md と phases-status.md にある DOC-PROSE 系は001のみ。追加分の次番号として002を提案する。",
+  "update_route": "原本冒頭の規則に従い、実反映は task-breakdown-planner / task-consistency-manager / progress-sync-manager による更新へ渡す。本担当は提案JSONのみ作成し、進捗文書は変更していない。",
+  "files": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "original_sha256": "c654b6fc08795e7bede6b4aaa73fa3b45d8bb6e25f18c989c78d55f8c46798d2",
+      "scope": "現在の作業／全体状況のみ。過去の記録と表は対象外。"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "original_sha256": "ef9f42c7223b30995a1e6a0bbf3e02bd818b335b71dde9c407046c34642775ed",
+      "scope": "現在の作業／全体状況のみ。過去の記録と表は対象外。"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "PROGRESS-ADD-001",
+      "path": "Tracker/Design/tasks-status.md",
+      "original_text": "## 現在の作業\r\n\r\n",
+      "replacement_text": "## 現在の作業\r\n\r\n- ID: `DOC-PROSE-002`\r\n- 題名: レポート以外の説明文を追加で推敲する\r\n- 段階: 文書の推敲と評価\r\n- 状態: 利用者の追加依頼に基づく推敲を進めている。追加分の検証、コミット、PRへの反映、CI確認は未完了。\r\n- 規模: 中\r\n- 依存関係: `DOC-PROSE-001` の試行結果と、Duck 内のレポート以外の文章も扱う利用者の追加依頼を基準にする。課題 #31、#64、PR #65 の作業は別範囲として扱う。\r\n- 対象: Duck 内のレポート以外の19文書。初回の2文書・8段落とは別に、今回の対象一覧と変更前後の対応を記録する。\r\n- 完了条件:\r\n  - 原文の意味、条件、否定、数値、名称、識別子、コマンド、ソースコード、URLを保持し、説明文の読みやすさを改善する。\r\n  - 変更した文書の全文と、既存設定が定める全対象に文書検査3種を実行し、結果を記録する。許可一覧と検査の除外設定は変更しない。\r\n  - 変更した箇所、原文を維持した箇所、意味を変えずに修正できないため維持した箇所の判断を、追加対応分の記録に残す。\r\n- 検証: 未完了。変更文書の全文検査、全対象の文書検査、最終本文と原文の照合結果は、確認後に記録する。\r\n- 証跡: 追加対応分の報告書と検証記録は作成後に追記する。\r\n- 公開先: 下書き [PR #67](https://github.com/ibis-ssl/Duck/pull/67) へ追加対応分を反映予定。追加分のコミットは未作成。\r\n- 残りの作業: 推敲、検証、結果の記録、コミット、PRへの反映、CI確認。独立レビューと人による受入は未完了。統合は利用者が行う。\r\n\r\n",
+      "reason": "現在の作業欄へ DOC-PROSE-002 を追加する。初回 DOC-PROSE-001 の本文、採番、件数、検証・公開・残作業の記録は変更しない。"
+    },
+    {
+      "id": "PROGRESS-ADD-002",
+      "path": "Tracker/Design/phases-status.md",
+      "original_text": "- 現在の段階: 課題 #66 の小範囲の推敲を実装し、下書き [PR #67](https://github.com/ibis-ssl/Duck/pull/67) を作成した。\r\n- 現在の作業: `DOC-PROSE-001`\r\n- 実装範囲: 設計書と README から合計8段落を選定した。3段落を修正し、5段落は原文を維持した。\r\n- 検証: 対象2文書の全文で既存の文書検査3種が成功した。変更範囲と原文の意味を作業担当が照合した。\r\n- 残りの作業: 公開後のPRの最新コミットに対応するCIを確認し、依頼元が自然さと意味の保持、および継続利用を判断する。独立レビューと人による受入は未完了であり、統合は利用者が行う。\r\n- 証跡: `reports/issue66-yomiyasu-pilot-20261008.md`。\r\n- 関連作業: 課題 #31、#64、PR #65 の完了判定は、この文書推敲の評価に含めない。",
+      "replacement_text": "- 現在の段階: 課題 #66 の初回試行に続き、利用者の追加依頼による Duck 内の説明文の推敲を進めている。\r\n- 現在の作業: `DOC-PROSE-002`\r\n- 追加対象: レポート以外の19文書。初回の選定8段落とは分けて記録する。\r\n- 追加分の状態: 文書の推敲と検証の途中。追加分のコミット、PRへの反映、CI確認は未完了。\r\n- 初回の実装範囲: 設計書と README から合計8段落を選定した。3段落を修正し、5段落は原文を維持した。\r\n- 初回の検証: 対象2文書の全文で既存の文書検査3種が成功した。変更範囲と原文の意味を作業担当が照合した。\r\n- 残りの作業: 追加分の推敲と検証を終え、結果を記録してコミットし、PRへ反映する。公開後のPRの最新コミットに対応するCIを確認する。独立レビューと人による受入は未完了であり、統合は利用者が行う。\r\n- 公開先: [PR #67](https://github.com/ibis-ssl/Duck/pull/67) は下書き。追加対応分は未反映。\r\n- 初回の証跡: `reports/issue66-yomiyasu-pilot-20261008.md`。\r\n- 追加分の証跡: 報告書と検証記録の作成後に追記する。\r\n- 関連作業: 課題 #31、#64、PR #65 の完了判定は、この文書推敲の評価に含めない。",
+      "reason": "現在の作業を追加対応の DOC-PROSE-002 とし、初回の範囲と検証を明示して19文書の追加分と区別する。過去の全体状況と工程一覧は変更しない。"
+    }
+  ],
+  "variable_fields": [
+    {
+      "field": "tasks: DOC-PROSE-002 の状態／phases: 追加分の状態",
+      "draft_value": "追加分の検証・コミット・PR反映・CI確認は未完了。",
+      "finalize_when": "最終本文の照合と各検証の実結果が得られた時点で、完了した範囲だけに更新する。"
+    },
+    {
+      "field": "追加対象の件数",
+      "draft_value": 19,
+      "finalize_when": "親担当が確定した追加対応の対象一覧と照合する。初回の2文書・8段落へ合算しない。"
+    },
+    {
+      "field": "tasks: 追加分の検証",
+      "draft_value": "未完了。",
+      "finalize_when": "各文書の全文検査、全対象の検査、最終本文の照合の実結果を記載する。失敗や未実行を成功に置き換えない。"
+    },
+    {
+      "field": "tasks/phases: 追加分の証跡",
+      "draft_value": "報告書と検証記録は作成後に追記。",
+      "finalize_when": "実際に保存・検証した報告書と診断記録のリポジトリ内パスへ置き換える。予定パスを保存済みとして記載しない。"
+    },
+    {
+      "field": "tasks/phases: 公開先",
+      "draft_value": "PR #67 へ反映予定、追加分のコミット未作成・未反映。",
+      "finalize_when": "実際のコミット・PR反映結果で更新する。自分自身の未確定コミットSHAを予想して書かない。公開後の結果はPRコメントで確定してよい。"
+    },
+    {
+      "field": "tasks/phases: 残りの作業",
+      "draft_value": "推敲・検証・記録・コミット・PR反映・CI確認が残る。独立レビュー・人による受入は未完了。",
+      "finalize_when": "実行済みの作業を除き、実際に残る作業だけを記載する。初回試行の読み直しや継続利用の受入を推測で完了にしない。"
+    }
+  ],
+  "verification": {
+    "exact_match": true,
+    "pilot_task_block_preserved_verbatim": true,
+    "past_task_history_preserved_verbatim": true,
+    "past_phase_history_and_table_preserved_verbatim": true,
+    "pilot_counts_preserved": true,
+    "line_endings": "original_text と replacement_text は CRLF。JSON 自体は UTF-8/BOMなし。"
+  },
+  "notes": [
+    "19文書という件数は親担当が提示した今回の追加範囲を使用した。個別ファイル一覧と最終採用件数は、この担当では独自に推定していない。",
+    "新規の課題・PR・工程表の行は作らず、現在の作業欄の採番と箇条書き形式を使った。",
+    "原本、元提案JSON、接続PCは変更していない。"
+  ]
+}

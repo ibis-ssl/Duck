@@ -1,0 +1,311 @@
+{
+  "files": [
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "reviewed_entire_file": true,
+      "notes": "本文、箇条書き、コード識別子、見出し、脚注を含め全文確認した。提案以外の箇所は原文を維持する。許可済みの技術用語、履歴ごとの仕様、数値と否定条件は変更しない。",
+      "source_sha256": "dfd274fd49735ff0b2a55325b2d7d01dcebe798b4a59cac246d3091d53f4e101",
+      "source_line_count": 329,
+      "proposal_count": 10
+    },
+    {
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "reviewed_entire_file": true,
+      "notes": "本文、箇条書き、コード識別子、見出し、脚注を含め全文確認した。提案以外の箇所は原文を維持する。許可済みの技術用語、履歴ごとの仕様、数値と否定条件は変更しない。",
+      "source_sha256": "b2bc07c2f1b40639a61c2924727763dfab265f34c969c8c0eaa7664cc33188aa",
+      "source_line_count": 109,
+      "proposal_count": 3
+    },
+    {
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "reviewed_entire_file": true,
+      "notes": "本文、箇条書き、コード識別子、見出し、脚注を含め全文確認した。提案以外の箇所は原文を維持する。許可済みの技術用語、履歴ごとの仕様、数値と否定条件は変更しない。",
+      "source_sha256": "e3541a9e4e5590f52af46340437de073c736e2d29e9c3880a8d1352318e32f86",
+      "source_line_count": 394,
+      "proposal_count": 7
+    }
+  ],
+  "proposals": [
+    {
+      "id": "DH-C01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "replacement_text": "別ファイルにすることで、snapshot sidecar が受信パケットの主記録を、alignment sidecar が再生用の索引を担う構成に分けられる。これにより、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+      "reason": "前者・後者が指すファイルを明示し、責務分離と障害診断の関係を二つの文で追えるようにする。",
+      "preserved_facts": [
+        "snapshot sidecar が受信パケットの主記録を担当する。",
+        "alignment sidecar が再生用の索引を担当する。",
+        "対応付けの欠落・破損時も、スナップショット保存の成否を独立に診断できる。"
+      ]
+    },
+    {
+      "id": "DH-C02",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "CaptureOn は受信処理の起動条件ではなく、記録用の補助ファイルへの書き込み条件を制御する。Capture Off 中に受信処理がパケットを受けても、snapshot sidecar を作成・追記しない。\r\n\r\nCapture Off 中は snapshot sidecar を作成・追記しない。Capture Off から再度記録を開始するときは session folder を更新し、前の session folder の snapshot sidecar へ追記しない。",
+      "replacement_text": "CaptureOn は受信処理の起動条件ではなく、記録用の補助ファイルへの書き込み条件を制御する。Capture Off 中に受信処理がパケットを受けても、snapshot sidecar を作成・追記しない。\r\n\r\nCapture Off から再度記録を開始するときは session folder を更新し、前の session folder の snapshot sidecar へ追記しない。",
+      "reason": "直前の文と同じ作成・追記禁止を繰り返している一文を除き、停止中の扱いから再開時の扱いへ進める。",
+      "preserved_facts": [
+        "CaptureOn は受信の起動条件ではなく補助ファイルの書き込み条件を制御する。",
+        "Capture Off 中は、受信しても snapshot sidecar を作成・追記しない。",
+        "再開時は session folder を更新し、前のフォルダの snapshot sidecar へ追記しない。"
+      ]
+    },
+    {
+      "id": "DH-C03",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "動作中のモードは、対応する再生・早送りの操作部が停止ボタンへ入れ替わるか、同じ位置の停止ボタンで止める構成とし、速度タブ自体を停止操作に変えない。",
+      "replacement_text": "モードの動作中は、対応する再生・早送りの操作部を停止ボタンへ入れ替えるか、同じ位置の停止ボタンで止められる構成とする。速度タブ自体を停止操作に変えない。",
+      "reason": "モードと操作部が一つの主述に混在していたため、動作中という条件と操作部の構成を対応させ、速度タブの禁止事項を別文にする。",
+      "preserved_facts": [
+        "動作中のモードに対応する再生・早送りの操作部を停止ボタンへ入れ替える構成、または同じ位置の停止ボタンで止める構成とする。",
+        "速度タブ自体は停止操作へ変えない。"
+      ]
+    },
+    {
+      "id": "DH-C04",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "保存形式は既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持し、第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルは、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利なため作らない。",
+      "replacement_text": "既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持したまま、保存形式を第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルを作ると、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利になるため、作らない。",
+      "reason": "維持するファイル名と置き換える保存形式を分け、別ファイルを作らない理由の条件と結果を明確にする。",
+      "preserved_facts": [
+        "既存ファイル名 tracker-snapshot-alignment.jsonl を維持する。",
+        "第2版の記録への置き換えは推奨であり、必須へ強めない。",
+        "別ファイルは分岐増加と性能上の不利があるため作らない。"
+      ]
+    },
+    {
+      "id": "DH-C05",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "capture metadata がない、`DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない、diagnostics sample sidecar が未作成・欠落・空・破損している、tracker snapshot / alignment sidecar の情報やファイルがない、記録件数0、読み取りエラーは、それぞれ UI 上の状態として区別する。新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。",
+      "replacement_text": "UI 上では、次の状態をそれぞれ区別する。\r\n\r\n- capture metadata がない\r\n- `DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog` がない\r\n- diagnostics sample sidecar が未作成・欠落・空・破損している\r\n- tracker snapshot / alignment sidecar の情報やファイルがない\r\n- 記録件数0\r\n- 読み取りエラー\r\n\r\n新規記録の `Vision Input` / `ibis tracker` は diagnostics sample sidecar の状態を優先し、旧 render snapshot だけで新規経路を正常扱いしない。",
+      "reason": "状態の列挙が長い主語になっているため、UI で区別する状態を箇条書きにし、その後に新規経路の判断方針を置く。",
+      "preserved_facts": [
+        "元の六つの列挙項目を保持し、未作成・欠落・空・破損もそれぞれ区別する。",
+        "新規記録の Vision Input / ibis tracker は diagnostics sample sidecar の状態を優先する。",
+        "旧 render snapshot だけで新規経路を正常扱いしない。"
+      ]
+    },
+    {
+      "id": "DH-C06",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "最小仕様では、`Layer A` をシアン系の線と表示名、`Layer B` をマゼンタ系の線と表示名とし、ロボット本体の黄色・青色の塗りは維持する。",
+      "replacement_text": "最小仕様では、`Layer A` の線と表示名をシアン系、`Layer B` の線と表示名をマゼンタ系にし、ロボット本体の黄色・青色の塗りは維持する。",
+      "reason": "層そのものを線と表示名にする読みを避け、層ごとの色を付ける対象を明示する。",
+      "preserved_facts": [
+        "Layer A の線と表示名はシアン系にする。",
+        "Layer B の線と表示名はマゼンタ系にする。",
+        "ロボット本体の黄色・青色の塗りは維持する。",
+        "最小仕様であることを保持する。"
+      ]
+    },
+    {
+      "id": "DH-C07",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "重なりを読めるように、`Layer B` は破線または半透明の線を使う。",
+      "replacement_text": "重なりを見分けられるように、`Layer B` は破線または半透明の線を使う。",
+      "reason": "図形の重なりに対する「読む」を、見分けるという画面上の働きで表す。",
+      "preserved_facts": [
+        "Layer B に破線または半透明の線を使う。",
+        "重なりを判別できるようにする目的と、二つの選択肢を保持する。"
+      ]
+    },
+    {
+      "id": "DH-C08",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "トラッカーの層は `TrackerPacketSnapshotSemanticSummary` を `DiagnosticsFieldViewFactory` の変換処理で、ボール・黄色チームのロボット・青色チームのロボットへ変換する。",
+      "replacement_text": "トラッカーの層では、`DiagnosticsFieldViewFactory` の変換処理を使い、`TrackerPacketSnapshotSemanticSummary` をボール・黄色チームのロボット・青色チームのロボットへ変換する。",
+      "reason": "変換処理と変換対象を近づけ、層自体が変換の動作主に見える主述を整える。",
+      "preserved_facts": [
+        "トラッカーの層についての変換である。",
+        "DiagnosticsFieldViewFactory の変換処理を使う。",
+        "TrackerPacketSnapshotSemanticSummary をボール・黄色チームのロボット・青色チームのロボットへ変換する。"
+      ]
+    },
+    {
+      "id": "DH-C09",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "早送りは通常再生専用の実時間追従へ巻き込まず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。",
+      "replacement_text": "早送りには通常再生専用の実時間追従を適用せず、既存の調査用の収録時刻差を倍率で割る挙動を維持する。",
+      "reason": "「巻き込まず」を、早送りへ適用しないという処理方針で表す。",
+      "preserved_facts": [
+        "通常再生専用の実時間追従を早送りへ適用しない。",
+        "既存の調査用の収録時刻差を倍率で割る挙動を維持する。"
+      ]
+    },
+    {
+      "id": "DH-C10",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "original_text": "重ね表示の切り替えは、フィールド表示領域の見出し行へ置く。",
+      "replacement_text": "重ね表示を切り替える操作部は、フィールド表示領域の見出し行へ置く。",
+      "reason": "配置する対象が操作そのものではなく操作部であることを、直後の操作部の説明に合わせて明示する。",
+      "preserved_facts": [
+        "重ね表示の切り替え操作を配置する。",
+        "配置先はフィールド表示領域の見出し行である。"
+      ]
+    },
+    {
+      "id": "DH-M01",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_text": "この文書は `TRACKER-034` で実施した旧 `Tracker.Server`、`Tracker.CaptureReplay`、診断画面の巨大ファイル分割と日本語コメント追加の保守性改善を記録する。",
+      "replacement_text": "この文書は `TRACKER-034` で実施した保守性改善を記録する。旧 `Tracker.Server`、`Tracker.CaptureReplay`、診断画面の巨大なファイルを分割し、日本語コメントを追加した。",
+      "reason": "実施した改善の名詞が連続していたため、文書の役割と実施済みの変更を分けて述べる。",
+      "preserved_facts": [
+        "TRACKER-034 で実施済みの保守性改善を記録する文書である。",
+        "旧 Tracker.Server、Tracker.CaptureReplay、診断画面の巨大ファイル分割と日本語コメント追加を保持する。",
+        "実施済みの変更を予定や現行の動作保証へ変えない。"
+      ]
+    },
+    {
+      "id": "DH-M02",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_text": "挙動維持のため、分割前後で同じ入力から外部に観測できる同じ出力を返すことを最優先にする。",
+      "replacement_text": "挙動維持のため、分割前後で同じ入力を与えたときに、外部から観測できる出力が変わらないことを最優先にする。",
+      "reason": "同じ入力と同じ出力の関係を条件として述べ、「外部に観測できる」の助詞を整える。",
+      "preserved_facts": [
+        "挙動維持のための方針である。",
+        "分割前後で入力が同じなら、外部から観測できる出力も同じであることを最優先にする。"
+      ]
+    },
+    {
+      "id": "DH-M03",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "original_text": "CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言の整理でも互換性リスクがある。",
+      "replacement_text": "CaptureReplay の標準出力は調査・自動検証で使われるため、表示文言を整理するだけでも互換性を損なうリスクがある。",
+      "reason": "表示文言の整理が何に影響し得るかを動詞で表し、リスクの内容を読み取りやすくする。",
+      "preserved_facts": [
+        "CaptureReplay の標準出力は調査・自動検証で使われる。",
+        "表示文言の整理だけでも互換性へのリスクがある。",
+        "リスクを障害の確定事実へ強めない。"
+      ]
+    },
+    {
+      "id": "DH-R01",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "少なくとも 1 つ成功すれば受信開始を継続する",
+      "replacement_text": "少なくとも 1 つの通信アドレスで参加に成功すれば、受信開始の処理を続ける",
+      "reason": "直前の参加試行の説明を受けて、成功対象を明示し、「開始を継続する」を処理の続行として書く。",
+      "preserved_facts": [
+        "設定された通信アドレスがマルチキャストの場合の参加規則である。",
+        "少なくとも 1 つの通信アドレスで参加に成功すれば、受信開始の処理を続ける。",
+        "すべての通信アドレスでの参加成功を要求しない。"
+      ]
+    },
+    {
+      "id": "DH-R02",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元の識別と集約では UUID を優先する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID を持つ候補の中で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が `MultiTrackerManager` の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+      "replacement_text": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元の識別と集約では UUID を優先する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID を持つ候補の中で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは表示元の名前が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。\r\n\r\nただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が `MultiTrackerManager` の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。\r\n\r\n`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+      "reason": "表示元の識別・集約、UI に渡す参照の扱い、CaptureOn の保存物をライブ表示へ流用しない理由を、それぞれのまとまりで段落分けする。語句と文順は変えない。",
+      "preserved_facts": [
+        "UUID 優先、同じ UUID の受信時刻が最新の候補の採用、異なる UUID と表示名の扱いをそのまま保持する。",
+        "複数送信元のボール・ロボット情報を寄せ集めない。",
+        "UI は TrackerState や protobuf パケットの参照を直接保持しない。",
+        "ExternalTrackerSnapshotStore が複製し、VisionLiveDisplaySnapshotProvider が描画更新時に読み取り用 DTO を固定する。",
+        "CaptureOn の書き込み処理を CaptureOff のライブ表示の更新元に使わない理由を保持する。"
+      ]
+    },
+    {
+      "id": "DH-R04",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "これにより、表示が消えることを避けつつ、時間軸が表示元ごとにずれ、異なる時刻のものを同時刻として表示しているように見える状態を避ける。",
+      "replacement_text": "これにより、表示を残しつつ、表示元ごとに時間軸がずれて、異なる時刻のものを同時刻として表示しているように見える状態を避ける。",
+      "reason": "同じ文内の「避ける」の反復を減らし、表示元ごとの時間軸のずれと見え方の関係をつなげる。",
+      "preserved_facts": [
+        "latest-before snapshot を使っても再生・比較の基準時系列を固定する前段の方針を受ける。",
+        "表示を消さず、表示元ごとの時間軸のずれによる誤認を避ける。",
+        "異なる時刻のものを同時刻として見せる表示へ変更しない。"
+      ]
+    },
+    {
+      "id": "DH-R05",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。",
+      "replacement_text": "採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定する。既定値は `100` ms とし、0 以下が指定された場合は既定値へ戻す。",
+      "reason": "設定方法と値の扱いを分け、0 以下という条件が指定値に掛かることを明示する。",
+      "preserved_facts": [
+        "採取周期の設定キーを変更しない。",
+        "既定値は 100 ms である。",
+        "0 以下が指定された場合は既定値へ戻す。"
+      ]
+    },
+    {
+      "id": "DH-R06",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。",
+      "replacement_text": "この補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。",
+      "reason": "直前の文にある旧形式の render snapshot を保存した補助ファイルを指示語で受け、同じ長い修飾を繰り返さない。",
+      "preserved_facts": [
+        "直前に述べた旧形式の render snapshot の補助ファイルしか持たないキャプチャーに限定する。",
+        "この新機能では非対応または機能を制限した旧形式として扱ってよい。",
+        "許容を必須へ変えず、脚注の識別子も保持する。"
+      ]
+    },
+    {
+      "id": "DH-R07",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントへ閉じ込めない",
+      "replacement_text": "サイドバーの折りたたみはレイアウト全体で扱い、表示専用コンポーネントの内部だけで処理しない",
+      "reason": "「閉じ込めない」という比喩を、処理を担当する範囲の説明にする。",
+      "preserved_facts": [
+        "サイドバーの折りたたみをレイアウト全体で扱う。",
+        "表示専用コンポーネントの内部だけで扱う構成にしない。"
+      ]
+    },
+    {
+      "id": "DH-R08",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "original_text": "詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列の確認を壊さない",
+      "replacement_text": "詳細領域は縮小時も最低高さとスクロールを維持し、`Vision Input` と `Tracker Output` の文字列を確認できる状態を保つ",
+      "reason": "「確認を壊さない」を、縮小後も文字列を確認できるという利用上の条件で表す。",
+      "preserved_facts": [
+        "詳細領域は縮小時も最低高さとスクロールを維持する。",
+        "Vision Input と Tracker Output の文字列を確認できる状態を保つ。"
+      ]
+    }
+  ],
+  "held": [
+    {
+      "id": "DH-H01",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "location": "再生操作と速度選択の変更履歴／完了条件",
+      "reason": "TRACKER-062 の固定速度タブと TRACKER-063 の可変倍率入力が履歴別に記載され、完了条件にも固定タブ表現がある。現行仕様へ一本化するには履歴・仕様の判断が必要なため、文章改善では変更しない。",
+      "disposition": "原文維持。文章品質の未解消指摘としてではなく、仕様を変えないための保持事項。"
+    },
+    {
+      "id": "DH-H02",
+      "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "location": "後続作業への固定事項（TRACKER-059）",
+      "reason": "最速の source cadence へ合わせる履歴記載と、RUNTIME-HOST-007 以降の diagnostics sample tick を使う記載を、文体整理を理由に統合しない。",
+      "disposition": "原文維持。履歴と適用時期を保持。"
+    },
+    {
+      "id": "DH-H03",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "location": "診断処理の周期の分離方針",
+      "reason": "「未加工入力の更新周期を失わない保存境界」は、100 ms の既定値との関係を文章だけから一意に具体化できない。全入力の保存やイベント駆動など、新しい仕様を補わない。",
+      "disposition": "原文維持。既存仕様を具体化する変更は提案しない。"
+    },
+    {
+      "id": "DH-H04",
+      "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+      "location": "リスク（TrackerCoordinator）",
+      "reason": "「順序制御が密」を複雑さや特定の依存関係へ置き換えると、元の説明の意味を狭める可能性があるため維持する。",
+      "disposition": "原文維持。実装にない原因を補わない。"
+    },
+    {
+      "id": "DH-H05",
+      "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "location": "見出し・脚注・表示元の定義",
+      "reason": "課題番号入りの既存見出し、脚注識別子、表示名、許可済みの英語技術用語は参照と意味を保持するため変更しない。",
+      "disposition": "原文維持。見出しアンカーと技術用語を保持。"
+    }
+  ],
+  "verification": {
+    "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+    "scope": "実装の補助点検。原本と接続 PC は変更していない。正式な lint・yomiyasu 実行は親担当が行う。",
+    "exact_original_match": true,
+    "non_overlapping_ranges": true,
+    "inline_code_footnotes_numbers_preserved": true,
+    "original_text_line_endings": "CRLF（原本のバイト列を UTF-8 として復号した文字列と一致）"
+  }
+}

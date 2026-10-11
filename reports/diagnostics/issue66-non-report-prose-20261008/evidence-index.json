@@ -1,0 +1,183 @@
+﻿{
+  "generated_at": "2026-10-08T13:04:20.784981+00:00",
+  "validated_source_fingerprint": "b72b345b431a1b8fee9e1d8a4be91096108f249bb641a3e6576de9b9f268be90",
+  "source_unchanged_before_publication": true,
+  "report_relative_links_checked": 86,
+  "files": [
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/apply-results.json",
+      "sha256": "0038348d59b4769c91fa900caee48390d56e334cb8dbd3aca584cfcb32f12e3a",
+      "size": 6070
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/approved-proposals.json",
+      "sha256": "1d5575cbab9e577b8ba06957bc585aec124a42df59182689ec5d7668f699d136",
+      "size": 175703
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/baseline-clean/results.json",
+      "sha256": "dcb76dab67aa1c9d3f7929d1415e707db622abefc4ee74e3cb24f84ca434c304",
+      "size": 261908
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/baseline-comparison.json",
+      "sha256": "aaff226f850f54c9cf72a8b30fce2457d6120c3b4e2a0cffdc97612c24c116d5",
+      "size": 54427
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/before/results.json",
+      "sha256": "ba7c0a64d070fa124e575a4773dddb4baf4546f529b7cf3dc214f511d63dde99",
+      "size": 299508
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/candidate-clean/results.json",
+      "sha256": "695d0e4c0d2135cde02cf78e84d5b6c1f25f6593693b857b0be249d9051fca81",
+      "size": 283704
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/core-proposals-peercheck.json",
+      "sha256": "276e05d0f86185ecd0126669cc0a29a2c66f14e503fa031d6e647b3804ffb3d3",
+      "size": 4239
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/core-proposals.json",
+      "sha256": "cde1fdb2d0d5c9f835eb368fb5a296599d754ac7152a199f2a7d56ef99694a74",
+      "size": 45843
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/final-clean/results.json",
+      "sha256": "8c08facbba94ca6a5d0d638050e7f4bf0f9320e799561243d1b4874594068337",
+      "size": 282398
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/final-fixed/results.json",
+      "sha256": "abd87a703ac25ece0a016e7bf5b4ebbbf5f7e8c305c9fe02d3d8ae90b0c6e83b",
+      "size": 282398
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/history-proposals-check.json",
+      "sha256": "5ea812c6cf77f7b23a66138bdcab2079e4f509a27a7add823d4218b98bd5f886",
+      "size": 1471
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/history-proposals.json",
+      "sha256": "47ced0a24ac67407b82e85b026d2e7f70d943c8e8cc49a0f73a42c2b5758620a",
+      "size": 24245
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/host-proposals-peercheck.json",
+      "sha256": "4715e1a3e20f4779e40a46b27599de22800a4d7b5a7c7bd5aea4d1a7f463f890",
+      "size": 5045
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/host-proposals.json",
+      "sha256": "b423d81e17d2fd52d0308b148c681a15243ade45a1491970ae06504b061feb7d",
+      "size": 28090
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/operational-diagnostics.json",
+      "sha256": "f1b47efa64f317ed672de8febe8a0085249b6162e0c97b9ede98840b446822ef",
+      "size": 2013
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/original-source.zip",
+      "sha256": "7f5ed477f0f7e687adcf775041a83da3c519c68193135258db58dac25bcf5199",
+      "size": 209981
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/primary-proposals-peercheck.json",
+      "sha256": "3d77df45871203060fc17d78d7207570aaa4fcdd480c1a736079f22286543573",
+      "size": 17457
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/primary-proposals.json",
+      "sha256": "2b43bd223754a997e0dbd534d2406e95f30b96ea1baa87c1ce011d4671f7f2a6",
+      "size": 20167
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/product-baseline-final/results.json",
+      "sha256": "423d5cebe139751a57b010cebec8613cfcabcecd239817f218cae1f42616c384",
+      "size": 237195
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/product-baseline-retry/results.json",
+      "sha256": "8016d4b07586a4cfea74e2926ec062f9292ee1bd9a060430d0b87b700c19bc14",
+      "size": 235900
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/product-failures.json",
+      "sha256": "a3282f2e47b9413265209ec8ba16b66721a8b10c10678004357bfab8e0804254",
+      "size": 25744
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/product-gate/results.json",
+      "sha256": "8bf5b61a3774b6a5f5d1aac640d471718d2dce29a60e29e21a69a526af7a8501",
+      "size": 235142
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/product-gate-retry/results.json",
+      "sha256": "a5f4bea0fae7a509f6d0e283780ed523ece1bfdecfbf2b9b2c51255f0aeba4fc",
+      "size": 236581
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/progress-addition-proposals.json",
+      "sha256": "817696d2c2ad193735a5010f12bde7f4744f5c4250689a206e02cbfd425fc198",
+      "size": 8727
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/proposal-integrity.json",
+      "sha256": "8332be4ab126f739122e8860c1738e1e9ac3182e28c8bca12d729241a61bd2dc",
+      "size": 147766
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/selected-proposals.json",
+      "sha256": "cf6f38aaaf16678cd339369434f43a28753aba2248e58c86c3afea001927f7f7",
+      "size": 176118
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/source-manifest.json",
+      "sha256": "35222b957d4a4ac1df026accda3ca3e6c1d01535143eb5c676e0e62ec0df9b63",
+      "size": 6324
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/submodule-init.json",
+      "sha256": "3b8b1d51125f6bd2f76a3f3b627ab8e460280819b217f69287be6bdaaed0b38a",
+      "size": 553
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/submodule-init.stderr.log",
+      "sha256": "baf715fc1e86cdd6e8a7f84f8aa9fdc3effc390593f4753a05d375070ac8fcd8",
+      "size": 246
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/submodule-init.stdout.log",
+      "sha256": "070cc2d37e994e656905b3d0fd509ec7a620ae029ab4b963eaf098b539f3f3ce",
+      "size": 234
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/submodules-after.log",
+      "sha256": "bd40895108de44420c37f71136072d8a71fe79c5e9d203992707f5c68cf172ad",
+      "size": 204
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/submodules-before.log",
+      "sha256": "9b0a97e3e21e77f418ae669c4b92e962fd92c95fdb00359796cd71b3e887dc77",
+      "size": 172
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/technical-commit.json",
+      "sha256": "b36df743efbd43c376bb13838ce3e1e3f8c8e78277d44a1c407288462edd370b",
+      "size": 976
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/validation-logs.zip",
+      "sha256": "f5c47367e25e2eb5d1fdd021712eeb690f85165130a33f174dc9ae13eb5cfd6e",
+      "size": 14045659
+    },
+    {
+      "path": "reports/diagnostics/issue66-non-report-prose-20261008/yomiyasu-summary.json",
+      "sha256": "8de517604fe7cef0b7486dce5996db5fc6a9a38ea12464e51a8b7764145c1f75",
+      "size": 8923
+    }
+  ]
+}
