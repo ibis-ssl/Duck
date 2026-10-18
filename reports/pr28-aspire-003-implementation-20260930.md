@@ -202,4 +202,3 @@ CSpell 本体を直接実行した時点では、`Tracker/Design/tasks-status.md
 `ASPIRE-003A` と `ASPIRE-003B` の完了条件を満たした。
 
 `ASPIRE-003B` 完了により `ASPIRE-004B` の依存関係のうち `ASPIRE-003B` 側は解消した。`ASPIRE-004B` の開始には、もう一方の依存である `ASPIRE-004A` の完了も必要である。
-

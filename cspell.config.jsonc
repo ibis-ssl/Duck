@@ -4,6 +4,25 @@
   "language": "en,ja",
   "useGitignore": false,
   "globRoot": ".",
+  "words": [
+    "ROS",
+    "AppHost",
+    "Crane",
+    "Windows",
+    "Aspire",
+    "GitHub",
+    "DCP",
+    "Linux",
+    "macOS",
+    "Ubuntu",
+    "Kubernetes",
+    "Sumatra",
+    "AI",
+    "CPU",
+    "IP",
+    "SDK",
+    "VPN"
+  ],
   "files": [
     "**/*.md"
   ],
