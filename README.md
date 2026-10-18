@@ -16,7 +16,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 
 ## 参考仕様資料
 
-- [references/specs](references/specs): ibis-ssl の仕様資料を参照用のGit submoduleとして置きます。Duckの実行時依存関係には含めず、必要に応じてsubmoduleの固定commitを更新します。
+- [reference/specs](reference/specs): ibis-ssl の仕様資料を参照用のGit submoduleとして置きます。Duckの実行時依存関係には含めず、必要に応じてsubmoduleの固定commitを更新します。
 
 ## 前提
 
