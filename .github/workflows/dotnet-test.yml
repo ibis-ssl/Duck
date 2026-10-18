@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - task/pr28-aspire-005
+      - task/pr28-aspire-006a
   workflow_dispatch:
 
 permissions:
@@ -325,7 +326,7 @@ jobs:
   aspire-full-stack:
     name: ASPIRE full-stack Linux acceptance
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/task/pr28-aspire-005') || (github.event_name == 'pull_request' && github.head_ref == 'task/pr28-aspire-005') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -424,6 +425,12 @@ jobs:
           export Testing__StackOwnership__LockPath="$stack_lock"
           export Testing__StackOwnership__StackId="$stack_id"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
+          apphost_mode="base"
+          if [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" ]]; then
+            apphost_mode="comparison"
+            export Testing__Mode=comparison
+          fi
+          printf '%s\n' "$apphost_mode" > "$RUNNER_TEMP/aspire-full-stack-mode"
           printf '%s\n' "$stack_id" > "$RUNNER_TEMP/aspire-full-stack-stack-id"
 
           {
@@ -451,6 +458,7 @@ jobs:
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
           apphost_pid="$(cat "$RUNNER_TEMP/aspire-full-stack-apphost.pid")"
           stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id")"
+          apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
 
           collect_startup_diagnostics() {
             python3 scripts/capture_aspire_dcp_logs.py \
@@ -471,7 +479,7 @@ jobs:
                 --filter "label=duck.aspire.stack=$stack_id"
               printf '\n## Wrapper readiness probe history\n'
               cat "$results_dir/wrapper-readiness.json" 2>/dev/null || true
-              for resource in simulator game-controller cm4-sim crane; do
+              for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce; do
                 mapfile -t resource_ids < <(docker ps -aq \
                   --filter 'label=duck.aspire.owner=duck-apphost' \
                   --filter "label=duck.aspire.stack=$stack_id" \
@@ -511,17 +519,22 @@ jobs:
             exit 1
           }
 
+          readiness_args=()
+          if [[ "$apphost_mode" == "comparison" ]]; then
+            readiness_args+=(--comparison)
+          fi
           if ! python3 scripts/wait_aspire_stack_readiness.py \
             --apphost-pid "$apphost_pid" \
             --stack-id "$stack_id" \
             --report-file "$results_dir/wrapper-readiness.json" \
             --timeout-seconds 300 \
             --poll-interval-seconds 2 \
+            "${readiness_args[@]}" \
             > "$results_dir/wrapper-readiness.stdout.log" 2>&1; then
             fail_startup "$(tail -n 20 "$results_dir/wrapper-readiness.stdout.log" 2>/dev/null || printf 'STARTUP_READINESS_FAILURE: readiness helper failed.')"
           fi
 
-          for resource in simulator game-controller cm4-sim crane; do
+          for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce; do
             mapfile -t resource_ids < <(docker ps -aq \
               --filter 'label=duck.aspire.owner=duck-apphost' \
               --filter "label=duck.aspire.stack=$stack_id" \
@@ -547,7 +560,7 @@ jobs:
               > "$results_dir/$resource.startup.log" 2>&1 || true
           done
 
-          printf 'status=ready\nstack_id=%s\nreadiness_source=all wrapper /health/ready endpoints\n' "$stack_id" \
+          printf 'status=ready\nstack_id=%s\nreadiness_source=all required wrapper and comparison endpoints; comparison mode also requires both Vision counters to advance in one five-second window\nmode=%s\n' "$stack_id" "$apphost_mode" \
             > "$results_dir/startup-status.txt"
 
       - name: Run full-stack packet and active-motion acceptance
@@ -658,7 +671,7 @@ jobs:
                 network_mode="$(docker inspect --format '{{.HostConfig.NetworkMode}}' "$container_id" 2>/dev/null)"
                 expected_name="/duck-$stack_id-$resource"
                 case "$resource" in
-                  simulator|game-controller|cm4-sim|crane) ;;
+                  simulator|game-controller|cm4-sim|crane|tracker-tigers|tracker-erforce) ;;
                   *) continue ;;
                 esac
                 if [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \

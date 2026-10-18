@@ -11,6 +11,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Tracker\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
+    <ProjectReference Include="..\..\Tracker\Tracker.DebugHost\Tracker.DebugHost.csproj" />
+    <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" IsAspireProjectResource="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures\simulation_protocol_comparison.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

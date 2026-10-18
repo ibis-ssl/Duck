@@ -112,5 +112,13 @@ app.MapPost(
         profileRequestService.RequestProfileSwitch(profileName);
         return Results.Accepted($"/api/tracker/profile-switch/{profileName}");
     });
+app.MapGet(
+    "/health/comparison",
+    (ExternalTrackerSnapshotStore trackerSnapshots,
+        VisionPacketStore visionPackets,
+        IConfiguration configuration) =>
+        DebugHostHealthEndpoints.GetComparisonHealthResult(trackerSnapshots, visionPackets, configuration));
+app.MapGet("/health/vision", (VisionPacketStore snapshots) =>
+    Results.Ok(new { VisionPacketsReceived = snapshots.GetSnapshot().PacketCount }));
 
 app.Run();

@@ -73,7 +73,8 @@ public static class DockerContainerWrapper
             options.ContainerArguments,
             options.Environment,
             options.StackId,
-            options.RunId);
+            options.RunId,
+            options.Mounts);
         using var health = StartHealthListener(options.HealthPort);
         using var ready = new ManualResetEventSlim(false);
         using var live = new ManualResetEventSlim(true);
@@ -88,6 +89,9 @@ public static class DockerContainerWrapper
         var craneProbeDiagnostics = options.ReadinessProfile == "crane"
             ? new CraneProbeDiagnosticState()
             : null;
+        using var trackerPacketReadiness = options.ExpectedTrackerSourceName is null
+            ? null
+            : new TrackerPacketReadinessMonitor(options.ExpectedTrackerSourceName);
         Process? logProcess = null;
         string? containerId = null;
         var cleanupCompleted = true;
@@ -110,7 +114,7 @@ public static class DockerContainerWrapper
             logProcess = StartLogFollower(options.DockerExecutable, containerId);
             await WaitForServiceReadinessAsync(
                 spec, containerId, options, gameControllerReadiness, visionReadiness, craneProbeDiagnostics,
-                diagnosticWriter, cancellation.Token);
+                trackerPacketReadiness, diagnosticWriter, cancellation.Token);
             ready.Set();
 
             while (!cancellation.IsCancellationRequested)
@@ -119,7 +123,7 @@ public static class DockerContainerWrapper
                 await EnsureExactRunningOwnerAsync(spec, containerId, options.DockerExecutable, cancellation.Token);
                 await EnsureExpectedProcessAsync(containerId, options, cancellation.Token);
                 if (!await IsServiceReadyAsync(containerId, options, gameControllerReadiness, visionReadiness,
-                    craneProbeDiagnostics, diagnosticWriter, cancellation.Token))
+                    craneProbeDiagnostics, trackerPacketReadiness, diagnosticWriter, cancellation.Token))
                 {
                     throw new InvalidOperationException($"Service readiness became unhealthy for {spec.ResourceName}.");
                 }
@@ -338,6 +342,7 @@ public static class DockerContainerWrapper
         GameControllerReadinessMonitor? gameControllerReadiness,
         VisionServiceReadiness? visionReadiness,
         CraneProbeDiagnosticState? craneProbeDiagnostics,
+        TrackerPacketReadinessMonitor? trackerPacketReadiness,
         Action<string> diagnosticWriter,
         CancellationToken cancellationToken)
     {
@@ -349,7 +354,7 @@ public static class DockerContainerWrapper
             var processReady = await EnsureExpectedProcessAsync(containerId, options, cancellationToken);
             var serviceReady = await IsServiceReadyAsync(
                 containerId, options, gameControllerReadiness, visionReadiness, craneProbeDiagnostics,
-                diagnosticWriter, cancellationToken);
+                trackerPacketReadiness, diagnosticWriter, cancellationToken);
             if (processReady && serviceReady)
             {
                 return;
@@ -386,6 +391,7 @@ public static class DockerContainerWrapper
         GameControllerReadinessMonitor? gameControllerReadiness,
         VisionServiceReadiness? visionReadiness,
         CraneProbeDiagnosticState? craneProbeDiagnostics,
+        TrackerPacketReadinessMonitor? trackerPacketReadiness,
         Action<string> diagnosticWriter,
         CancellationToken cancellationToken)
     {
@@ -429,6 +435,9 @@ public static class DockerContainerWrapper
                     cancellationToken);
                 return listener.ExitCode == 0 && DockerServiceReadiness.Cm4SimOwnsListener(listener.StandardOutput);
             }
+            case "tracker-tigers":
+            case "tracker-erforce":
+                return trackerPacketReadiness?.IsFresh == true;
             default:
                 return gameControllerReadiness is null ||
                     await gameControllerReadiness.IsHealthyAsync(cancellationToken);
