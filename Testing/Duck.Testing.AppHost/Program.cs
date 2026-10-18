@@ -7,10 +7,20 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
 }
 
 var builder = DistributedApplication.CreateBuilder(args);
+var simulatorIbisPort =
+    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
+var useCm4Simulator = string.Equals(cranePlanner, "visibility_graph", StringComparison.Ordinal);
+if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber))
+{
+    throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
+}
 var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
+ExclusiveControlPortPreflight.EnsureAvailable(
+    ExclusiveControlPortPreflight.CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator));
 
 var simulatorImageTag =
     builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
@@ -18,14 +28,11 @@ var simulatorGeometry =
     builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
 var simulatorRealism =
     builder.Configuration["Testing:Simulator:Realism"] ?? "None";
-var simulatorIbisPort =
-    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
 var craneTeam = builder.Configuration["Testing:Crane:Team"] ?? "Yellow";
-var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
 var cm4SimulatorImageTag =
     builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
 var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");
@@ -67,8 +74,6 @@ var gameController = builder.AddDockerWrapper(
     39102,
     "app",
     "game-controller");
-
-var useCm4Simulator = string.Equals(cranePlanner, "visibility_graph", StringComparison.Ordinal);
 
 IResourceBuilder<ExecutableResource>? cm4Simulator = null;
 if (useCm4Simulator)
