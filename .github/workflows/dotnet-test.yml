@@ -327,7 +327,7 @@ jobs:
   aspire-full-stack:
     name: ASPIRE full-stack Linux acceptance
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b' || github.head_ref == 'task/issue72-aspire-006c-integration')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -430,7 +430,9 @@ jobs:
           if [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" || \
                 "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006b" || \
-                "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006b" ]]; then
+                "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006b" || \
+                "${GITHUB_HEAD_REF:-}" == "task/issue72-aspire-006c-integration" || \
+                "${GITHUB_REF:-}" == "refs/heads/task/issue72-aspire-006c-integration" ]]; then
             apphost_mode="comparison"
             export Testing__Mode=comparison
           fi

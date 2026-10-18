@@ -1,7 +1,11 @@
 using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
+using TrackerConnectionLib;
 using Xunit.Abstractions;
 
 namespace Tracker.Tests;
@@ -102,7 +106,73 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests(ITestOutputHelper ou
     }
 
     [Fact]
-    public void Evaluate_ReportsRepresentativeThreeSourceTimeAndAllocationCost()
+    public void Evaluate_RejectsResolvedRoleIdentityConflictBeforeCreatingPairs()
+    {
+        var result = TrackerDifferenceSnapshotEvaluator.Evaluate(
+            [Source("ibis", "shared-id", Frame(11, 1, 2)),
+             Source("TIGERs", "shared-id", Frame(12, 3, 4)),
+             Source("ER-FORCE", "erforce-id", Frame(13, 5, 6))],
+            Now,
+            freshnessWindow: TimeSpan.FromSeconds(5),
+            ballDistanceGateMeters: 1);
+
+        Assert.False(result.Readiness.IsReady);
+        Assert.Contains("Duck", result.Readiness.ConflictingRoles);
+        Assert.Contains("TIGERs", result.Readiness.ConflictingRoles);
+        Assert.Empty(result.Pairs);
+    }
+
+    [Fact]
+    public void Evaluate_RejectsResolvedRoleWithMultipleIdentityKeysBeforeCreatingPairs()
+    {
+        var result = TrackerDifferenceSnapshotEvaluator.Evaluate(
+            [Source("ibis", "duck-id", Frame(11, 1, 2)),
+             Source("TIGERs", "tigers-a", Frame(12, 3, 4)),
+             Source("TIGERs", "tigers-b", Frame(14, 4, 5), endpointPort: 11011),
+             Source("ER-FORCE", "erforce-id", Frame(13, 5, 6))],
+            Now,
+            freshnessWindow: TimeSpan.FromSeconds(5),
+            ballDistanceGateMeters: 1);
+
+        Assert.False(result.Readiness.IsReady);
+        Assert.Contains("TIGERs", result.Readiness.ConflictingRoles);
+        Assert.Empty(result.Pairs);
+    }
+
+    [Theory]
+    [InlineData(false, true, TrackerDifferencePairStatus.MissingReferenceFrame)]
+    [InlineData(true, false, TrackerDifferencePairStatus.MissingComparisonFrame)]
+    [InlineData(false, false, TrackerDifferencePairStatus.MissingBothFrames)]
+    public void Evaluate_ReportsMissingFramesAfterResolvingThreeRoles(
+        bool referenceHasFrame,
+        bool comparisonHasFrame,
+        TrackerDifferencePairStatus expectedStatus)
+    {
+        var snapshots = new[]
+        {
+            Source("ibis", "duck-id", referenceHasFrame ? Frame(11, 1, 2) : null),
+            Source("TIGERs", "tigers-id", comparisonHasFrame ? Frame(12, 3, 4) : null),
+            Source("ER-FORCE", "erforce-id", Frame(13, 5, 6)),
+        };
+
+        var result = TrackerDifferenceSnapshotEvaluator.Evaluate(
+            snapshots,
+            Now,
+            freshnessWindow: TimeSpan.FromSeconds(5),
+            ballDistanceGateMeters: 1);
+
+        Assert.True(result.Readiness.IsReady);
+        Assert.Equal(3, result.Readiness.Sources.Count);
+        var duckTigers = Assert.Single(result.Pairs,
+            pair => pair.ReferenceRole == "Duck" && pair.ComparisonRole == "TIGERs");
+        Assert.Equal(expectedStatus, duckTigers.Status);
+        Assert.Null(duckTigers.Difference);
+        Assert.Equal(referenceHasFrame ? 11u : null, duckTigers.ReferenceFrameNumber);
+        Assert.Equal(comparisonHasFrame ? 12u : null, duckTigers.ComparisonFrameNumber);
+    }
+
+    [Fact]
+    public void HealthEndpoint_ReportsSyntheticStoreToEvaluatorTimeAndAllocationCost()
     {
         var snapshots = new[]
         {
@@ -110,15 +180,33 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests(ITestOutputHelper ou
             Source("TIGERs", "tigers-id", RepresentativeFrame(102, 0.05)),
             Source("ER-FORCE", "erforce-id", RepresentativeFrame(103, 0.10)),
         };
-        TrackerDifferenceSnapshotResult? lastResult = null;
+        var measuredAt = DateTimeOffset.UtcNow;
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>();
+        foreach (var snapshot in snapshots)
+        {
+            manager.ProcessPacket(
+                new TrackerPacketAdapter(snapshot.Packet),
+                new IPEndPoint(IPAddress.Loopback, 11010),
+                measuredAt);
+        }
+
+        using var trackerSnapshotStore = new ExternalTrackerSnapshotStore(manager);
+        var visionPacketStore = new VisionPacketStore();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Testing:Mode"] = "comparison",
+                ["TrackerComparison:BallDistanceGateMeters"] = "0.5",
+            })
+            .Build();
+        IResult? lastResult = null;
 
         for (var index = 0; index < MeasurementWarmupCalls; index++)
         {
-            lastResult = TrackerDifferenceSnapshotEvaluator.Evaluate(
-                snapshots,
-                Now,
-                TimeSpan.FromSeconds(5),
-                ballDistanceGateMeters: 0.5);
+            lastResult = DebugHostHealthEndpoints.GetComparisonHealthResult(
+                trackerSnapshotStore,
+                visionPacketStore,
+                configuration);
         }
 
         GC.Collect();
@@ -130,11 +218,10 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests(ITestOutputHelper ou
         for (var index = 0; index < MeasurementIterations; index++)
         {
             var callStart = Stopwatch.GetTimestamp();
-            lastResult = TrackerDifferenceSnapshotEvaluator.Evaluate(
-                snapshots,
-                Now,
-                TimeSpan.FromSeconds(5),
-                ballDistanceGateMeters: 0.5);
+            lastResult = DebugHostHealthEndpoints.GetComparisonHealthResult(
+                trackerSnapshotStore,
+                visionPacketStore,
+                configuration);
             elapsedTicksByCall[index] = Stopwatch.GetTimestamp() - callStart;
         }
 
@@ -145,17 +232,18 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests(ITestOutputHelper ou
             (totalElapsedTicks / (double)Stopwatch.Frequency);
         var p50Microseconds = ToMicroseconds(elapsedTicksByCall[PercentileIndex(0.50)]);
         var p95Microseconds = ToMicroseconds(elapsedTicksByCall[PercentileIndex(0.95)]);
-        const double ScenarioCallsPerSecond = 60;
-
-        Assert.True(lastResult!.Readiness.IsReady);
-        Assert.Equal(3, lastResult.Pairs.Count);
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(lastResult);
+        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
+        var response = Assert.IsAssignableFrom<IValueHttpResult>(lastResult).Value;
+        Assert.NotNull(response);
+        Assert.Equal(3, Assert.IsAssignableFrom<IEnumerable<TrackerDifferencePairResult>>(
+            response.GetType().GetProperty("Pairs")?.GetValue(response)).Count());
         output.WriteLine(
-            $"snapshot difference measurement: sources=3; robots/source=12; balls/source=1; " +
-            $"pairs/call=3; calls/s scenario={ScenarioCallsPerSecond:F0}; measured throughput={measuredCallsPerSecond:F0}/s; " +
-            $"calls={MeasurementIterations}; warmup={MeasurementWarmupCalls}; " +
+            $"synthetic store-to-evaluator measurement: sources=3; robots/source=12; balls/source=1; " +
+            $"pairs/call=3; path=ExternalTrackerSnapshotStore.GetSnapshot+resolver+evaluator+health-result; " +
+            $"measured throughput={measuredCallsPerSecond:F0}/s; calls={MeasurementIterations}; warmup={MeasurementWarmupCalls}; " +
             $"p50={p50Microseconds:F2} us; p95={p95Microseconds:F2} us; " +
             $"allocated/call={allocatedBytes / (double)MeasurementIterations:F0} bytes; " +
-            $"p95-at-60Hz-budget={p95Microseconds * ScenarioCallsPerSecond / 1_000_000:P3}; " +
             $"runtime={RuntimeInformation.FrameworkDescription}; os={RuntimeInformation.OSDescription}; " +
             $"arch={RuntimeInformation.ProcessArchitecture}; processors={Environment.ProcessorCount}");
     }
@@ -187,7 +275,7 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests(ITestOutputHelper ou
     private static ExternalTrackerReadSideSnapshot Source(
         string sourceName,
         string uuid,
-        TrackedFrame frame,
+        TrackedFrame? frame,
         int endpointPort = 11010,
         DateTimeOffset? receivedAt = null)
     {
