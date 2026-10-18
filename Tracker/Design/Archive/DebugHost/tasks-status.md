@@ -1,4 +1,4 @@
-# 過去の作業状況
+﻿# 過去の作業状況
 
 この文書は、当時の作業と完了条件を記録した履歴である。現在の状態は[現行の作業一覧](../../tasks-status.md)を参照する。[変更前の原文](../../../../reports/history/debughost-tasks-before-terminology.md)は照合用に保持し、検証結果・条件・対象外事項・完了判断はこの本文にも記載する。
 
@@ -68,7 +68,7 @@ Blazorでraw visionを表示する。
 
 保存と座標変換のテストを追加する。
 
-保存処理と座標変換の期待する動作を確認できる、意味のある条件のテストを追加した。
+保存処理と座標変換が期待どおりに動作することを確認できる、意味のある条件のテストを追加した。
 
 ### `RAW-VISION-005`
 
@@ -114,7 +114,7 @@ raw visionの集約表示とカメラ別表示を追加する。
 
 render snapshotのフィールドと詳細の表示比率をドラッグで変更する。
 
-`/diagnostics` の render snapshot 表示で、フィールドと詳細領域の境界をドラッグして表示比率を変更できるようにした。4Kの表示領域でもフィールドを大きく表示できる。詳細領域の最低限の表示とスクロールを維持し、高さの変更の境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。PR は `https://github.com/ibis-ssl/Duck/pull/7`。
+`/diagnostics` の render snapshot 表示で、フィールドと詳細領域の境界をドラッグして表示比率を変更できるようにした。4Kの表示領域でもフィールドを大きく表示できる。詳細領域の最低限の表示とスクロールを維持し、高さを変更するときの境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。PR は `https://github.com/ibis-ssl/Duck/pull/7`。
 
 記録の保存先:
 
@@ -155,7 +155,7 @@ render snapshotのフィールドと詳細の表示比率をドラッグで変�
 
 `/diagnostics` の timeline scrubber 付近へ、再生、停止、早送りの操作を追加した。通常再生はログの時刻差に従って追跡フレームを順方向へ進め、末尾に到達すると停止して先頭の記録へ戻る。再生中・早送り中はそれぞれのボタンが停止ボタンに切り替わり、停止を押した場合は現在の選択位置を維持する。
 
-ログの切り替え、記録がない場合、停止直後に届く古い更新でも状態の不整合を起こさない。再生位置、更新間隔、古い更新を無視する条件のテストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。初回から r5 までのレビューを下記に記録した。
+ログを切り替えた場合、記録がない場合、停止直後に古い更新が届いた場合も、状態の不整合を起こさない。再生位置、更新間隔、古い更新を無視する条件のテストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。初回から r5 までのレビューを下記に記録した。
 
 記録の保存先:
 

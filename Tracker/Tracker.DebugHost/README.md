@@ -1,6 +1,6 @@
-# Tracker.DebugHost
+﻿# Tracker.DebugHost
 
-`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信する ASP.NET Core アプリケーションです。
+`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信する ASP.NET Core アプリケーションです。ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信します。
 
 本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。
 
@@ -61,12 +61,12 @@ ASPNETCORE_URLS=http://0.0.0.0:5289 dotnet run --project Tracker/Tracker.DebugHo
 
 - トラッカーが確定した追跡フレームを描画します
 - 右側の表示領域で次を確認できます
-- 有効な設定プロファイルの名前
-- 送信成功数 / 失敗数
-- 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻
-- キック / 接触 / フィールドの状態
-- primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）
-- 黄色 / 青色チームのロボット
+  - 有効な設定プロファイルの名前
+  - 送信成功数 / 失敗数
+  - 入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻
+  - キック / 接触 / フィールドの状態
+  - primary ball（主対象のボール）/ secondary ball（主対象以外で追跡を続けるボール）
+  - 黄色 / 青色チームのロボット
 
 トラッカー側で追跡フレームがまだ確定していない場合は `No tracked frame` が表示されます。
 
@@ -92,8 +92,21 @@ ASPNETCORE_URLS=http://0.0.0.0:5289 dotnet run --project Tracker/Tracker.DebugHo
 - キャプチャーの診断ログとトラッカーパケットの snapshot sidecar が揃っている場合は、折り畳み可能な `Tracker Comparison` 表示領域で自前トラッカーと外部トラッカーの差分を確認できます
 - `Tracker Comparison` 表示領域の表示元の絞り込みは `All`、`External`、`Own`、`Unknown`、source label ごとで切り替えられます。通常確認では `External` または対象の表示元名を選び、新規キャプチャーでは保存済みの alignment sidecar に対応する外部トラッカーのスナップショットと比較します。対応付けがない既存キャプチャーで最も近い時刻を使う場合は「正確な対応を保証しない推定」として表示されます。
 - 新規キャプチャーの replay timeline は `diagnostics-samples.jsonl` の採取時系列を使います。`Tracker Comparison` は tracker packet snapshot と alignment sidecar を外部トラッカーの比較用に索引化し、選択中の diagnostics sample tick に対応する tracker snapshot を参照します。再生位置や再生時点を変更しても外部トラッカーの補助ファイルを全件再読込せず、100MB を超える補助ファイルでも再生位置の変更ごとの I/O と解析量がファイルサイズに比例しない構成を維持します。
-- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。`等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。`Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。
-- 表示領域には、diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、diagnostics sample tick の番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻と時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。
+- 再生操作部は従来どおり `Play`、`Fast Forward`、`Stop` のアイコンボタン配置です。速度選択側には `等倍速` と可変の `早送り倍率` 操作部を小さく表示します。`4x` / `16x` / `64x` は固定上限ではなくあらかじめ決めた倍率を数値入力へ入れる補助ボタンです。
+- `等倍速` は全再生時点を逐次描画せず、毎秒 30 回相当の表示更新で実時間の経過に対応する最新の再生時点へ追従します。早送り倍率の選択中に `Play` を押した場合は `等倍速` へ戻さず、選択中倍率の `Fast Forward` として開始します。
+- `Fast Forward` は再生時点を間引かず収録時の受信時刻差と倍率で進み、64x 超の倍率も正規化やタイマーの下限によって 64x 相当に制限しないことを動作条件にします。
+- 表示領域には次の情報が表示されます。
+  - diagnostics sample sidecar、`tracker-packet-snapshots.jsonl`、alignment sidecar の状態と記録 / 省略 / エラー件数
+  - 選択中の replay timeline の位置番号 / 時刻
+  - diagnostics sample tick の番号
+  - 比較状態
+  - 対応規則
+  - source role / source label
+  - source key / 送信元の通信アドレスと通信ポート
+  - スナップショット側の追跡フレームの番号
+  - 自前 / 対応付け済みスナップショットの時刻と時刻差
+  - ボール / ロボット
+  - 受信データの元のバイト列を復元できるか
 
 ## API
 
@@ -127,7 +140,7 @@ curl -k -X POST https://localhost:7042/api/tracker/profile-switch/fast
 
 SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。
 
-キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。
+キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に、共通のファイル名部分を使った次の補助ファイルも作成します。
 
 - `<prefix>-<timestamp>-<guid>.jsonl.gz`: パケットキャプチャーの本体
 - `<prefix>-<timestamp>-<guid>.metadata.json`: キャプチャー時の `Tracker` 設定と解決済みの設定プロファイル
@@ -218,7 +231,9 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 - `--max-details <count>`: 詳細出力数を制限します。
 - `--settings <file>`: `Tracker.DebugHost/appsettings.json` 形式、またはキャプチャーの `metadata.json` 形式からトラッカー設定を読み込みます。`Tracker.DebugHost/appsettings.json` 形式では `Tracker:RuntimeOverrides` も設定プロファイルへ反映します。
 
-`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。
+`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイルと上書き設定を再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。
+
+手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` を矛盾なく入れてください。
 
 利用できる集計指標は `packets`, `detections`, `geometries`, `committed-frames`, `max-balls`, `max-robots`, `max-raw-balls`, `max-raw-yellow`, `max-raw-blue` です。追跡フレームの詳細の絞り込みでは `balls`, `robots`, `raw-balls`, `raw-yellow`, `raw-blue` を使えます。未加工系の集計指標は、その確定済みの追跡フレームの元になった検出結果群から集計します。
 
@@ -245,7 +260,24 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 4. `/diagnostics` を開き、同じ session folder の診断記録を選びます。新規キャプチャーでは replay timeline が diagnostics sample tick で構成され、左 `Vision Input` と右 `ibis tracker` が同じ diagnostics sample tick の採取記録にある未加工入力・追跡結果から描画されることを確認します。`External` / `Unknown` / source label の `Field source` は保存済みの alignment sidecar、または選択時点以前の latest-before snapshot を使います。`Play` / `Fast Forward` / `Stop`、速度選択の `等倍速` / `4x` / `16x` / `64x`、timeline scrubber を操作し、ER-FORCE など外部トラッカーが高頻度でも再生位置自体は diagnostics sample tick のまま進むことを確認します。
 5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。
 6. `Tracker Comparison` 表示領域では、新規キャプチャーで diagnostics sample sidecar を読み取れる場合に `Vision Input` / `ibis tracker` の Field source が利用できることを確認します。外部トラッカーの比較では tracker packet snapshot / alignment sidecar を読み、条件を満たす場合に `Status` が `Ready` になることを確認します。
-7. 報告書には、選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号、`Play` の表示更新で到達した選択時刻、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数、比較対象の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時の選択規則、スナップショット側の追跡フレームの番号、自前側 / 対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列を復元できるかを残します。UI の `Restored` / `Missing` の意味も従来どおり記録します。
+7. 報告書には次の情報を残します。
+   - 選択中の replay timeline の位置番号 / 時刻と diagnostics sample tick の番号
+   - `Play` の表示更新で到達した選択時刻
+   - `Field` の表示モード
+   - `Layer A` / `Layer B` の `Field source` と表示 / 非表示
+   - 表示元の絞り込み
+   - diagnostics sample sidecar / tracker snapshot / alignment sidecar 各補助ファイルの状態と記録 / 省略 / エラー件数
+   - 比較対象の状態
+   - source role / source label
+   - source key / 送信元の通信アドレスと通信ポート
+   - 集約時の選択規則
+   - スナップショット側の追跡フレームの番号
+   - 自前側 / 対応付け側の時刻（ns）
+   - 時刻差（ns）
+   - ボール / ロボット
+   - 受信データの元のバイト列を復元できるか
+
+   UI の `Restored` / `Missing` の意味も従来どおり記録します。
 8. 必要に応じて `Tracker.CaptureReplay` を `--capture <session>/<capture>.jsonl.gz --settings <session>/<capture>.metadata.json --profile <capture時のprofile>` で実行し、`trackerSnapshot` と `trackerComparison` 行、`rawPayloadRestored=True`、`saved-session-alignment` の比較概要をエージェント / 検証 / 回帰用の検証記録として残します。CLI の検証記録は UI の検証記録の補助であり、通常確認の主経路ではありません。
 
 `Tracker Comparison` 表示領域の補助ファイル状態は次のように読みます。
@@ -283,7 +315,7 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 | `ActiveProfileName` | 起動時に使う設定プロファイルの名前です。`Tracker:Profiles` に存在する必要があります。 |
 | `Diagnostics` | トラッカーの未加工入力 / 追跡結果の診断ログ出力設定です。 |
 | `Receive` | CaptureOn 比較ログ用に公式形式の `TrackerWrapperPacket` を受信する設定です。既定は無効です。 |
-| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、一時的な送信設定 / トラッカー調整値を差し込む用途です。 |
+| `RuntimeOverrides` | 起動時に有効な設定プロファイルへ上書きする任意の設定群です。設定プロファイルの定義を変えずに、送信設定 / トラッカー調整値を一時的に上書きする用途です。 |
 | `Profiles` | 設定プロファイルごとの送信 / 追跡エンジン / 調整値の設定です。UI と API の設定プロファイルの切り替え対象にもなります。 |
 
 ### `Tracker:Receive`
@@ -377,7 +409,7 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 | `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman filter の予測に用いる分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |
 | `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど観測値の重みを小さくし、未加工の検出結果の小刻みな揺れの影響を抑えます。 |
 
-フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。
+フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報と、`TrackedSnapshotStore` に保持している旧形状を前提とする最新の追跡フレームを消去します。
 
 ### `Tracker:Profiles:<name>:RobotTracker`
 

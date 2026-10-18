@@ -1,0 +1,89 @@
+﻿{
+  "schema_version": 1,
+  "verified_at_utc": "2026-10-07T22:30:09.506938+00:00",
+  "baseline_head": "449296725fc69dc004818ede2e8ad59a52ef2d27",
+  "head_at_verification": "9a0c7519cba3d242ccfb68b4b74546ddd6274cc6",
+  "selected_count": 8,
+  "changed_count": 3,
+  "unchanged_count": 5,
+  "scope_note": "本文の変更は選定段落の3行のみ。変更文書には利用者指定のUTF-8 BOMを付け、改行形式を保持した。",
+  "documents": [
+    {
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "baseline_git_blob_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+      "baseline_worktree_sha256": "3b8627f554add31662cb479c5f102f7a9f806fa2ae6f57882ca0c9af720337ae",
+      "final_worktree_sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "content_sha256_normalized_lf_without_bom": "309f77f7c47605113ce614f8e7204430ca3940edb40320047b1d8c9708229129",
+      "selected_count": 4,
+      "changed_lines": [
+        7,
+        119
+      ],
+      "unchanged_outside_selected_lines": true,
+      "line_count": 1172,
+      "bom": true,
+      "crlf_count": 1172,
+      "lf_count": 1172,
+      "protected_content": {
+        "inline_code": {
+          "unchanged": true,
+          "count": 669,
+          "comparison": "sequence"
+        },
+        "fenced_code": {
+          "unchanged": true,
+          "count": 0,
+          "comparison": "sequence"
+        },
+        "urls": {
+          "unchanged": true,
+          "count": 0,
+          "comparison": "sequence"
+        },
+        "ascii_identifiers_and_numbers": {
+          "unchanged": true,
+          "count": 1431,
+          "comparison": "multiset"
+        }
+      }
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "baseline_git_blob_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+      "baseline_worktree_sha256": "2ad27bdd55c000dc2c34b9d1b940b80350264e7a7f3f3bdf331aadeab980b2cb",
+      "final_worktree_sha256": "60a2616dcf71f7151c1b6834d67beb267b3bd474a3375870967101d6e62a0559",
+      "content_sha256_normalized_lf_without_bom": "7241e820092ed553becb6eb052ac0386d01130995ca8aa81d617475516fc9985",
+      "selected_count": 4,
+      "changed_lines": [
+        3
+      ],
+      "unchanged_outside_selected_lines": true,
+      "line_count": 490,
+      "bom": true,
+      "crlf_count": 490,
+      "lf_count": 490,
+      "protected_content": {
+        "inline_code": {
+          "unchanged": true,
+          "count": 415,
+          "comparison": "sequence"
+        },
+        "fenced_code": {
+          "unchanged": true,
+          "count": 17,
+          "comparison": "sequence"
+        },
+        "urls": {
+          "unchanged": true,
+          "count": 4,
+          "comparison": "sequence"
+        },
+        "ascii_identifiers_and_numbers": {
+          "unchanged": true,
+          "count": 990,
+          "comparison": "multiset"
+        }
+      }
+    }
+  ]
+}

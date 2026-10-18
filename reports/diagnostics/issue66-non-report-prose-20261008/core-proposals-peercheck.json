@@ -1,0 +1,101 @@
+{
+  "scope": "原本編集前の実装補助点検。通常レビュー・独立レビューの判定ではない。",
+  "source_head": "c9c44913d443410ae4768b26faafd48fa367b2e2",
+  "proposal_file": "/workspace/scratch/158688634caf/duck-prose-expansion/core-proposals.json",
+  "proposal_file_sha256": "cde1fdb2d0d5c9f835eb368fb5a296599d754ac7152a199f2a7d56ef99694a74",
+  "checked_ids": [
+    "CORE-ARCH-001",
+    "CORE-ARCH-002",
+    "CORE-ARCH-003",
+    "CORE-ARCH-004",
+    "CORE-ARCH-005",
+    "CORE-ARCH-006",
+    "CORE-ARCH-007",
+    "CORE-ARCH-008",
+    "CORE-ARCH-009",
+    "CORE-ARCH-010",
+    "CORE-ARCH-011",
+    "CORE-ARCH-012",
+    "CORE-ARCH-013",
+    "CORE-ARCH-014",
+    "CORE-ARCH-015",
+    "CORE-ARCH-016",
+    "CORE-ARCH-017",
+    "CORE-ARCH-018",
+    "CORE-ENGINE-001",
+    "CORE-ENGINE-002",
+    "CORE-ENGINE-003",
+    "CORE-ENGINE-004",
+    "CORE-ENGINE-005",
+    "CORE-ENGINE-006",
+    "CORE-ENGINE-007",
+    "CORE-HISTORY-001",
+    "CORE-TEST-001",
+    "CORE-TEST-002",
+    "CORE-TEST-003",
+    "CORE-TEST-004",
+    "CORE-TEST-005"
+  ],
+  "accepted_ids": [
+    "CORE-ARCH-001",
+    "CORE-ARCH-002",
+    "CORE-ARCH-003",
+    "CORE-ARCH-004",
+    "CORE-ARCH-005",
+    "CORE-ARCH-006",
+    "CORE-ARCH-007",
+    "CORE-ARCH-008",
+    "CORE-ARCH-009",
+    "CORE-ARCH-010",
+    "CORE-ARCH-011",
+    "CORE-ARCH-012",
+    "CORE-ARCH-013",
+    "CORE-ARCH-014",
+    "CORE-ARCH-015",
+    "CORE-ARCH-016",
+    "CORE-ARCH-017",
+    "CORE-ARCH-018",
+    "CORE-ENGINE-001",
+    "CORE-ENGINE-002",
+    "CORE-ENGINE-003",
+    "CORE-ENGINE-004",
+    "CORE-ENGINE-005",
+    "CORE-ENGINE-006",
+    "CORE-ENGINE-007",
+    "CORE-HISTORY-001",
+    "CORE-TEST-001",
+    "CORE-TEST-002",
+    "CORE-TEST-003",
+    "CORE-TEST-004",
+    "CORE-TEST-005"
+  ],
+  "adjustments": [],
+  "checked_sources": {
+    "Tracker/Design/Core/tracker-architecture-plan.md": {
+      "sha256": "56340a4de38d89a51d8bf540f225b6c000bffbc56d03ab9cf85ca734a28b3ea9",
+      "line_count": 1172
+    },
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": {
+      "sha256": "3e43b720dd54f5a4e0e0b1906a4c90c36982878a09085a867bdcd8e2ffd404ec",
+      "line_count": 432
+    },
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": {
+      "sha256": "4ae3d33b5991f3f5b96b0be4a09b8a4d0010cda4531816177d0b0190683443ac",
+      "line_count": 191
+    },
+    "Tracker/Design/Core/tracker-history-000-038.md": {
+      "sha256": "247dc5ca7b5be38ad4a8ad441e778f9f30243872170c6e15e55d99de73c2dc42",
+      "line_count": 66
+    }
+  },
+  "notes": [
+    "31案すべてについて変更前後の本文を読み、原本の直前・直後の段落、箇条書き、関連する定義と照合した。4文書全体の再レビューではない。",
+    "CORE-ARCH-003/004/008/010/011 は話題ごとの段落分けであり、各文の条件、選択順序、例外、数値、原文の順序を保持している。",
+    "CORE-ARCH-005 の処理中の要求は、同文書の切替責務で Update 直前に適用待ちから移し、結果処理完了まで固定する要求と対応する。",
+    "CORE-ARCH-012 の参考にするという表現は、同節の冒頭にある「TIGERs の次の実装を参考にする」と、その後の考え方・責務分離の対応表に整合する。Java の構造そのものを複製しないという否定も保持する。",
+    "CORE-ARCH-013/015 の内部保持の許可と出力継続禁止、CORE-ENGINE-003 の現状維持の許可と将来肥大化時だけ検討する条件は強さを変えていない。",
+    "CORE-ENGINE-005 の「変更してはならない挙動」は、同文書の対象作業では追跡挙動・公開契約・出力・設定値の意味を変更しないという目的に整合する。",
+    "CORE-ENGINE-006 は観測の新しさを特定の時間幅や有無へ変換していない。CORE-TEST-004 のや・たりによる例示は、元の「など」の非限定性と、通常コメントを置いてよいという前段の許可を保持する。",
+    "元提案と原本は変更していない。原文一意一致、行内コード、脚注識別子、数字の保持も機械的に確認した。lint や製品テストは実行していない。"
+  ]
+}

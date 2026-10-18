@@ -1,0 +1,93 @@
+﻿{
+  "schema_version": 1,
+  "paragraphs": [
+    {
+      "id": "architecture-01",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_line": 7,
+      "decision": "changed",
+      "before": "`Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装し、本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。",
+      "candidate_1": "`Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装する。本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。",
+      "final": "`Tracker.Core` に自動レフェリー向けの高品質な追跡エンジンを分離実装する。本番寄りの実行体は `Tracker.RuntimeHost`、デバッグ・診断用の Web UI は `Tracker.DebugHost` として分ける。",
+      "reason": "追跡エンジンの分離と実行体の役割分担を別文にした。構成名と役割は保持した。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "architecture-02",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_line": 119,
+      "decision": "changed",
+      "before": "CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように、別系統で保存する。",
+      "candidate_1": "CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` を、別系統で保存する。これにより、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるようにする。",
+      "final": "CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` を、別系統で保存する。これにより、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるようにする。",
+      "reason": "受信条件を保存対象に掛けたまま、別系統での保存と再生・比較の目的を順に示した。『これにより』は直前の保存を指す。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "architecture-03",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_line": 133,
+      "decision": "retained",
+      "before": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）で、保存済み記録から元のバイト列を復元または再デコードできるようにする。",
+      "candidate_1": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）で、保存済み記録から元のバイト列を復元または再デコードできるようにする。",
+      "final": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）で、保存済み記録から元のバイト列を復元または再デコードできるようにする。",
+      "reason": "少なくとも、通常経路、必ず、元のバイト列か復元可能な参照、という範囲と強さが重要なため原文を維持した。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "architecture-04",
+      "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "original_line": 162,
+      "decision": "retained",
+      "before": "公式の通信形式だけでは自動レフェリーに必要な情報が不足するため、`Tracker.Core` はより豊かな内部の追跡フレームを持つ。",
+      "candidate_1": "公式の通信形式だけでは自動レフェリーに必要な情報が不足するため、`Tracker.Core` はより豊かな内部の追跡フレームを持つ。",
+      "final": "公式の通信形式だけでは自動レフェリーに必要な情報が不足するため、`Tracker.Core` はより豊かな内部の追跡フレームを持つ。",
+      "reason": "公式の通信形式の不足と内部フレームの必要性の関係が明確なため原文を維持した。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "debughost-01",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_line": 3,
+      "decision": "changed",
+      "before": "`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信し、ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信する ASP.NET Core アプリケーションです。",
+      "candidate_1": "`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信する ASP.NET Core アプリケーションです。ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信します。",
+      "final": "`Tracker.DebugHost` は SSL-Vision の UDP パケットを受信する ASP.NET Core アプリケーションです。ブラウザで未加工入力と追跡結果の表示を確認しながら、必要に応じて公式形式の `TrackerWrapperPacket` を UDP で配信します。",
+      "reason": "アプリケーションの定義と表示確認・任意配信を別文にした。必要に応じて、確認しながら、という条件を保持した。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "debughost-02",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_line": 73,
+      "decision": "retained",
+      "before": "`Publish OK` / `Publish Fail` は現在実装の内部カウンタです。`PublishUdp=false` のときも追跡フレームの処理自体は成功扱いになり、`Publish OK` が増えることがあります。実送信の有無は `Tracker:PublishUdp` と送信先設定を合わせて判断してください。",
+      "candidate_1": "`Publish OK` / `Publish Fail` は現在実装の内部カウンタです。`PublishUdp=false` のときも追跡フレームの処理自体は成功扱いになり、`Publish OK` が増えることがあります。実送信の有無は `Tracker:PublishUdp` と送信先設定を合わせて判断してください。",
+      "final": "`Publish OK` / `Publish Fail` は現在実装の内部カウンタです。`PublishUdp=false` のときも追跡フレームの処理自体は成功扱いになり、`Publish OK` が増えることがあります。実送信の有無は `Tracker:PublishUdp` と送信先設定を合わせて判断してください。",
+      "reason": "内部カウンタの成功とUDP実送信の違い、および設定を併せて判断する依頼を保持した。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "debughost-03",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_line": 100,
+      "decision": "retained",
+      "before": "設定プロファイルの切り替えは HTTP API からも要求できます。既定の起動設定では `UseHttpsRedirection()` が有効なため、通常は HTTPS の接続先を使ってください。",
+      "candidate_1": "設定プロファイルの切り替えは HTTP API からも要求できます。既定の起動設定では `UseHttpsRedirection()` が有効なため、通常は HTTPS の接続先を使ってください。",
+      "final": "設定プロファイルの切り替えは HTTP API からも要求できます。既定の起動設定では `UseHttpsRedirection()` が有効なため、通常は HTTPS の接続先を使ってください。",
+      "reason": "要求できること、既定の起動設定、通常はHTTPS、という限定を保持した。",
+      "human_acceptance": "pending"
+    },
+    {
+      "id": "debughost-04",
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "original_line": 128,
+      "decision": "retained",
+      "before": "SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。",
+      "candidate_1": "SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入ります。そのため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。",
+      "final": "SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。",
+      "reason": "試案では文を分けた結果『ます』が3回連続した。原文の因果関係と自然な文末を優先して試案を不採用にした。",
+      "human_acceptance": "pending"
+    }
+  ]
+}

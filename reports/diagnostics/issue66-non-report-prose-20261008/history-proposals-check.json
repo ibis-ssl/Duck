@@ -1,0 +1,42 @@
+﻿{
+  "all_original_texts_unique": true,
+  "nonoverlap": true,
+  "inline_code_and_numbers_preserved": true,
+  "prior_attempt": {
+    "status": "failed_before_save",
+    "reason": "DHP-017の短い原文が別文の末尾を含め2箇所に一致した。対象の箇条書き1行全体へ広げて照合し直した。"
+  },
+  "in_memory_application_checks": [
+    {
+      "path": "Tracker/Design/Archive/Core/phases-status.md",
+      "source_hash_preserved": true,
+      "headings_table_structure_links_inline_code_preserved": true
+    },
+    {
+      "path": "Tracker/Design/Archive/Core/tasks-status.md",
+      "source_hash_preserved": true,
+      "headings_table_structure_links_inline_code_preserved": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+      "source_hash_preserved": true,
+      "headings_table_structure_links_inline_code_preserved": true
+    },
+    {
+      "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "source_hash_preserved": true,
+      "headings_table_structure_links_inline_code_preserved": true
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "source_hash_preserved": true,
+      "headings_table_structure_links_inline_code_preserved": true
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "source_hash_preserved": true,
+      "headings_table_structure_links_inline_code_preserved": true
+    }
+  ],
+  "repository_or_original_files_written": false
+}
