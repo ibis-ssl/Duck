@@ -123,6 +123,15 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__SourceName"]);
         Assert.Equal("comparison", debugHostEnvironment["Testing__Mode"]);
         Assert.Single(debugHost.Annotations.OfType<HealthCheckAnnotation>());
+        foreach (var (name, port) in new[] { ("comparison-health", 39107), ("vision-health", 39109) })
+        {
+            var endpoint = Assert.Single(
+                debugHost.Annotations.OfType<EndpointAnnotation>(),
+                candidate => candidate.Name == name);
+            Assert.Equal(port, endpoint.Port);
+            Assert.Equal(port, endpoint.TargetPort);
+            Assert.False(endpoint.IsProxied);
+        }
         AssertWaits(debugHost, (simulator, WaitType.WaitUntilStarted), (Find(appHost, "duck"), WaitType.WaitUntilStarted), (tigers, WaitType.WaitUntilHealthy), (erForce, WaitType.WaitUntilHealthy));
 
         var gameControllerLaunch = await GetLaunchOptionsAsync(gameController);
