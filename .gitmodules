@@ -4,3 +4,6 @@
 [submodule "SslProto/src/external/ssl-simulation-protocol"]
 	path = SslProto/src/external/ssl-simulation-protocol
 	url = https://github.com/RoboCup-SSL/ssl-simulation-protocol
+[submodule "references/specs"]
+	path = references/specs
+	url = https://github.com/ibis-ssl/specs.git
