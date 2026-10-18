@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-09-18T08:20:23+09:00",
+  "base": "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+  "branch": "fix/diagnostics-sample-runtime-issue25",
+  "implementation_commits": [
+    "08ed52e",
+    "2369bca"
+  ],
+  "focused_tests": {
+    "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~Tracker.Tests.VisionPacketCaptureTests.DiagnosticsReader_",
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "full_tests": {
+    "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "passed": 334,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "diff_files": [
+    "Tracker/Tracker.DebugHost/Tracking/TrackerDiagnosticsComparisonViewStateReader.cs",
+    "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs"
+  ],
+  "failure_diagnostics_workflow": true
+}
