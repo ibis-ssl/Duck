@@ -49,19 +49,19 @@ public static class TrackerDifferenceCalculator
                     key.Id,
                     TrackerRobotDifferenceStatus.Matched,
                     PositionDelta: new Vector2Difference(
-                        comparisonRobot!.Pos.X - referenceRobot!.Pos.X,
-                        comparisonRobot.Pos.Y - referenceRobot.Pos.Y),
+                        (double)comparisonRobot!.Pos.X - referenceRobot!.Pos.X,
+                        (double)comparisonRobot.Pos.Y - referenceRobot.Pos.Y),
                     VelocityDelta: referenceRobot.Vel is not null && comparisonRobot!.Vel is not null
                         ? new Vector2Difference(
-                            comparisonRobot.Vel.X - referenceRobot.Vel.X,
-                            comparisonRobot.Vel.Y - referenceRobot.Vel.Y)
+                            (double)comparisonRobot.Vel.X - referenceRobot.Vel.X,
+                            (double)comparisonRobot.Vel.Y - referenceRobot.Vel.Y)
                         : null,
                     OrientationDeltaRadians: ShortestAngleDelta(
                         referenceRobot!.Orientation,
                         comparisonRobot!.Orientation),
                     AngularVelocityDeltaRadiansPerSecond:
                         referenceRobot.HasVelAngular && comparisonRobot.HasVelAngular
-                            ? comparisonRobot.VelAngular - referenceRobot.VelAngular
+                            ? (double)comparisonRobot.VelAngular - referenceRobot.VelAngular
                             : null));
             }
             else
@@ -129,14 +129,14 @@ public static class TrackerDifferenceCalculator
                     match.ComparisonIndex,
                     match.DistanceMeters,
                     new Vector3Difference(
-                        comparisonBall.Pos.X - referenceBall.Pos.X,
-                        comparisonBall.Pos.Y - referenceBall.Pos.Y,
-                        comparisonBall.Pos.Z - referenceBall.Pos.Z),
+                        (double)comparisonBall.Pos.X - referenceBall.Pos.X,
+                        (double)comparisonBall.Pos.Y - referenceBall.Pos.Y,
+                        (double)comparisonBall.Pos.Z - referenceBall.Pos.Z),
                     referenceBall.Vel is not null && comparisonBall.Vel is not null
                         ? new Vector3Difference(
-                            comparisonBall.Vel.X - referenceBall.Vel.X,
-                            comparisonBall.Vel.Y - referenceBall.Vel.Y,
-                            comparisonBall.Vel.Z - referenceBall.Vel.Z)
+                            (double)comparisonBall.Vel.X - referenceBall.Vel.X,
+                            (double)comparisonBall.Vel.Y - referenceBall.Vel.Y,
+                            (double)comparisonBall.Vel.Z - referenceBall.Vel.Z)
                         : null);
             })
             .ToArray();
@@ -162,31 +162,40 @@ public static class TrackerDifferenceCalculator
         var comparisonBase = referenceBase + referenceCount;
         var sink = comparisonBase + comparisonCount;
         var graph = Enumerable.Range(0, sink + 1).Select(_ => new List<FlowEdge>()).ToArray();
+        var lexicographicWeights = new BigInteger[referenceCount];
+        var weight = BigInteger.One;
+        var weightBase = new BigInteger(comparisonCount) + BigInteger.One;
+        for (var index = referenceCount - 1; index >= 0; index--)
+        {
+            lexicographicWeights[index] = weight;
+            weight *= weightBase;
+        }
+
         for (var index = 0; index < referenceCount; index++)
         {
-            AddEdge(graph, source, referenceBase + index, AssignmentCost.Zero);
+            AddEdge(graph, source, referenceBase + index, 0, -1, 0);
         }
 
         for (var index = 0; index < comparisonCount; index++)
         {
-            AddEdge(graph, comparisonBase + index, sink, AssignmentCost.Zero);
+            AddEdge(graph, comparisonBase + index, sink, 0, -1, 0);
         }
 
         var assignmentEdges = new List<(BallCandidate Candidate, FlowEdge Edge)>(candidates.Count);
-        for (var rank = 0; rank < candidates.Count; rank++)
+        foreach (var candidate in candidates)
         {
-            var candidate = candidates[rank];
-            var lexicographicWeight = BigInteger.One << (candidates.Count - rank - 1);
-            var cost = new AssignmentCost(candidate.DistanceMeters, -lexicographicWeight);
             var edge = AddEdge(
                 graph,
                 referenceBase + candidate.ReferenceIndex,
                 comparisonBase + candidate.ComparisonIndex,
-                cost);
+                candidate.DistanceMeters,
+                candidate.ReferenceIndex,
+                candidate.ComparisonIndex - comparisonCount);
             assignmentEdges.Add((candidate, edge));
         }
 
-        while (TryFindShortestAugmentingPath(graph, source, sink, out var previousNode, out var previousEdge))
+        while (TryFindShortestAugmentingPath(
+            graph, source, sink, lexicographicWeights, out var previousNode, out var previousEdge))
         {
             for (var node = sink; node != source; node = previousNode[node])
             {
@@ -209,6 +218,7 @@ public static class TrackerDifferenceCalculator
         IReadOnlyList<List<FlowEdge>> graph,
         int source,
         int sink,
+        IReadOnlyList<BigInteger> lexicographicWeights,
         out int[] previousNode,
         out int[] previousEdge)
     {
@@ -235,7 +245,7 @@ public static class TrackerDifferenceCalculator
                         continue;
                     }
 
-                    var candidateDistance = distance + edge.Cost;
+                    var candidateDistance = distance.Add(edge, lexicographicWeights);
                     if (distances[edge.To] is { } current && candidateDistance.CompareTo(current) >= 0)
                     {
                         continue;
@@ -261,10 +271,12 @@ public static class TrackerDifferenceCalculator
         IReadOnlyList<List<FlowEdge>> graph,
         int from,
         int to,
-        AssignmentCost cost)
+        double distanceCost,
+        int lexicographicIndex,
+        int lexicographicDelta)
     {
-        var forward = new FlowEdge(to, graph[to].Count, 1, cost);
-        var reverse = new FlowEdge(from, graph[from].Count, 0, -cost);
+        var forward = new FlowEdge(to, graph[to].Count, 1, distanceCost, lexicographicIndex, lexicographicDelta);
+        var reverse = new FlowEdge(from, graph[from].Count, 0, -distanceCost, lexicographicIndex, -lexicographicDelta);
         graph[from].Add(forward);
         graph[to].Add(reverse);
         return forward;
@@ -298,7 +310,13 @@ public static class TrackerDifferenceCalculator
 
     private sealed record BallAssignment(int ReferenceIndex, int ComparisonIndex, double DistanceMeters);
 
-    private sealed class FlowEdge(int to, int reverseIndex, int capacity, AssignmentCost cost)
+    private sealed class FlowEdge(
+        int to,
+        int reverseIndex,
+        int capacity,
+        double distanceCost,
+        int lexicographicIndex,
+        int lexicographicDelta)
     {
         public int To { get; } = to;
 
@@ -306,7 +324,11 @@ public static class TrackerDifferenceCalculator
 
         public int Capacity { get; set; } = capacity;
 
-        public AssignmentCost Cost { get; } = cost;
+        public double DistanceCost { get; } = distanceCost;
+
+        public int LexicographicIndex { get; } = lexicographicIndex;
+
+        public int LexicographicDelta { get; } = lexicographicDelta;
     }
 
     private readonly record struct AssignmentCost(double Distance, BigInteger Lexicographic)
@@ -314,17 +336,19 @@ public static class TrackerDifferenceCalculator
     {
         public static AssignmentCost Zero => new(0, BigInteger.Zero);
 
+        public AssignmentCost Add(FlowEdge edge, IReadOnlyList<BigInteger> lexicographicWeights) =>
+            new(
+                Distance + edge.DistanceCost,
+                edge.LexicographicIndex < 0
+                    ? Lexicographic
+                    : Lexicographic + (edge.LexicographicDelta * lexicographicWeights[edge.LexicographicIndex]));
+
         public int CompareTo(AssignmentCost other)
         {
             var distanceComparison = Distance.CompareTo(other.Distance);
             return distanceComparison != 0 ? distanceComparison : Lexicographic.CompareTo(other.Lexicographic);
         }
 
-        public static AssignmentCost operator +(AssignmentCost left, AssignmentCost right) =>
-            new(left.Distance + right.Distance, left.Lexicographic + right.Lexicographic);
-
-        public static AssignmentCost operator -(AssignmentCost value) =>
-            new(-value.Distance, -value.Lexicographic);
     }
 }
 
