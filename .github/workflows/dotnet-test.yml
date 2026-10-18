@@ -567,6 +567,25 @@ jobs:
           printf 'status=ready\nstack_id=%s\nreadiness_source=all required wrapper and comparison endpoints; comparison mode also requires both Vision counters to advance in one five-second window\nmode=%s\n' "$stack_id" "$apphost_mode" \
             > "$results_dir/startup-status.txt"
 
+      - name: Capture direct tracker Vision inputs
+        id: aspire_tracker_vision_inputs
+        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode")"
+          if [[ "$apphost_mode" == "comparison" ]]; then
+            stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id")"
+            python3 scripts/capture_tracker_vision_inputs.py \
+              --stack-id "$stack_id" \
+              --report-file "$results_dir/tracker-vision-inputs.json" \
+              --window-seconds 5
+          else
+            printf 'status=not-applicable\nmode=%s\n' "$apphost_mode" \
+              > "$results_dir/tracker-vision-inputs.txt"
+          fi
+
       - name: Run full-stack packet and active-motion acceptance
         id: aspire_full_stack_test
         if: ${{ steps.aspire_full_stack_ready.outcome == 'success' }}

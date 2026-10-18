@@ -25,6 +25,7 @@ internal static class DebugHostHealthEndpoints
             readiness.IsReady,
             readiness.MissingRoles,
             readiness.ConflictingRoles,
+            readiness.Sources,
             VisionPacketsReceived = visionPackets.GetSnapshot().PacketCount,
         };
         return readiness.IsReady

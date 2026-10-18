@@ -38,5 +38,7 @@ public sealed class DebugHostHealthEndpointTests
         var response = Assert.IsAssignableFrom<IValueHttpResult>(result).Value;
         Assert.NotNull(response);
         Assert.Equal(2L, response.GetType().GetProperty("VisionPacketsReceived")?.GetValue(response));
+        Assert.Empty(Assert.IsAssignableFrom<IEnumerable<TrackerComparisonSourceStatus>>(
+            response.GetType().GetProperty("Sources")?.GetValue(response)));
     }
 }

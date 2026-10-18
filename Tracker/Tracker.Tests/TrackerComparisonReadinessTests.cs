@@ -18,6 +18,8 @@ public sealed class TrackerComparisonReadinessTests
         Assert.True(result.IsReady);
         Assert.Empty(result.MissingRoles);
         Assert.Empty(result.ConflictingRoles);
+        Assert.Equal(new[] { "Duck", "ER-Force", "TIGERs" }, result.Sources.Select(source => source.LogicalRole).Order(StringComparer.Ordinal));
+        Assert.Contains(result.Sources, source => source.LogicalRole == "TIGERs" && source.SourceUuid == "tigers-id");
     }
 
     [Theory]
