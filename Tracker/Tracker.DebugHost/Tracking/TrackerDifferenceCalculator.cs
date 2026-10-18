@@ -167,6 +167,8 @@ public static class TrackerDifferenceCalculator
         var weightBase = new BigInteger(comparisonCount) + BigInteger.One;
         for (var index = referenceCount - 1; index >= 0; index--)
         {
+            // A matched row contributes a negative digit; an unmatched row contributes zero.
+            // Base comparisonCount + 1 makes every earlier row dominate all later rows.
             lexicographicWeights[index] = weight;
             weight *= weightBase;
         }
@@ -194,8 +196,15 @@ public static class TrackerDifferenceCalculator
             assignmentEdges.Add((candidate, edge));
         }
 
+        var potentials = InitializePotentials(
+            referenceCount,
+            comparisonCount,
+            candidates,
+            lexicographicWeights,
+            graph.Length,
+            sink);
         while (TryFindShortestAugmentingPath(
-            graph, source, sink, lexicographicWeights, out var previousNode, out var previousEdge))
+            graph, source, sink, lexicographicWeights, potentials, out var previousNode, out var previousEdge))
         {
             for (var node = sink; node != source; node = previousNode[node])
             {
@@ -219,6 +228,76 @@ public static class TrackerDifferenceCalculator
         int source,
         int sink,
         IReadOnlyList<BigInteger> lexicographicWeights,
+        AssignmentCost[] potentials,
+        out int[] previousNode,
+        out int[] previousEdge)
+    {
+        var distances = new AssignmentCost?[graph.Count];
+        previousNode = Enumerable.Repeat(-1, graph.Count).ToArray();
+        previousEdge = Enumerable.Repeat(-1, graph.Count).ToArray();
+        distances[source] = AssignmentCost.Zero;
+        var queue = new PriorityQueue<int, AssignmentCost>();
+        queue.Enqueue(source, AssignmentCost.Zero);
+
+        while (queue.TryDequeue(out var from, out var queuedDistance))
+        {
+            if (distances[from] is not { } distance || queuedDistance.CompareTo(distance) != 0)
+            {
+                continue;
+            }
+
+            for (var edgeIndex = 0; edgeIndex < graph[from].Count; edgeIndex++)
+            {
+                var edge = graph[from][edgeIndex];
+                if (edge.Capacity == 0)
+                {
+                    continue;
+                }
+
+                var reducedCost = edge.ToCost(lexicographicWeights) + potentials[from] - potentials[edge.To];
+                if (reducedCost.CompareTo(AssignmentCost.Zero) < 0)
+                {
+                    // Floating-point path sums can invalidate reduced-cost non-negativity.
+                    // Keep exact ordering semantics by falling back to Bellman-Ford for this augmentation.
+                    return TryFindShortestAugmentingPathBellmanFord(
+                        graph, source, sink, lexicographicWeights, potentials, out previousNode, out previousEdge);
+                }
+
+                var candidateDistance = distance + reducedCost;
+                if (distances[edge.To] is { } current && candidateDistance.CompareTo(current) >= 0)
+                {
+                    continue;
+                }
+
+                distances[edge.To] = candidateDistance;
+                previousNode[edge.To] = from;
+                previousEdge[edge.To] = edgeIndex;
+                queue.Enqueue(edge.To, candidateDistance);
+            }
+        }
+
+        if (previousNode[sink] < 0)
+        {
+            return false;
+        }
+
+        for (var node = 0; node < graph.Count; node++)
+        {
+            if (distances[node] is { } distance)
+            {
+                potentials[node] = potentials[node] + distance;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TryFindShortestAugmentingPathBellmanFord(
+        IReadOnlyList<List<FlowEdge>> graph,
+        int source,
+        int sink,
+        IReadOnlyList<BigInteger> lexicographicWeights,
+        AssignmentCost[] potentials,
         out int[] previousNode,
         out int[] previousEdge)
     {
@@ -245,7 +324,8 @@ public static class TrackerDifferenceCalculator
                         continue;
                     }
 
-                    var candidateDistance = distance.Add(edge, lexicographicWeights);
+                    var reducedCost = edge.ToCost(lexicographicWeights) + potentials[from] - potentials[edge.To];
+                    var candidateDistance = distance + reducedCost;
                     if (distances[edge.To] is { } current && candidateDistance.CompareTo(current) >= 0)
                     {
                         continue;
@@ -264,7 +344,67 @@ public static class TrackerDifferenceCalculator
             }
         }
 
-        return previousNode[sink] >= 0;
+        if (previousNode[sink] < 0)
+        {
+            return false;
+        }
+
+        for (var node = 0; node < graph.Count; node++)
+        {
+            if (distances[node] is { } distance)
+            {
+                potentials[node] = potentials[node] + distance;
+            }
+        }
+
+        return true;
+    }
+
+    private static AssignmentCost[] InitializePotentials(
+        int referenceCount,
+        int comparisonCount,
+        IReadOnlyList<BallCandidate> candidates,
+        IReadOnlyList<BigInteger> lexicographicWeights,
+        int nodeCount,
+        int sink)
+    {
+        var potentials = Enumerable.Repeat(AssignmentCost.Zero, nodeCount).ToArray();
+        var comparisonBase = 1 + referenceCount;
+        var hasIncomingCandidate = new bool[comparisonCount];
+        foreach (var candidate in candidates)
+        {
+            var comparisonIndex = candidate.ComparisonIndex;
+            var cost = new AssignmentCost(
+                candidate.DistanceMeters,
+                (candidate.ComparisonIndex - comparisonCount) * lexicographicWeights[candidate.ReferenceIndex]);
+            if (hasIncomingCandidate[comparisonIndex] && cost.CompareTo(potentials[comparisonBase + comparisonIndex]) >= 0)
+            {
+                continue;
+            }
+
+            hasIncomingCandidate[comparisonIndex] = true;
+            potentials[comparisonBase + comparisonIndex] = cost;
+        }
+
+        var hasSinkPath = false;
+        for (var comparisonIndex = 0; comparisonIndex < comparisonCount; comparisonIndex++)
+        {
+            if (!hasIncomingCandidate[comparisonIndex])
+            {
+                continue;
+            }
+
+            var cost = potentials[comparisonBase + comparisonIndex];
+            if (hasSinkPath && cost.CompareTo(potentials[sink]) >= 0)
+            {
+                continue;
+            }
+
+            hasSinkPath = true;
+            potentials[sink] = cost;
+        }
+
+        return potentials;
     }
 
     private static FlowEdge AddEdge(
@@ -329,6 +469,13 @@ public static class TrackerDifferenceCalculator
         public int LexicographicIndex { get; } = lexicographicIndex;
 
         public int LexicographicDelta { get; } = lexicographicDelta;
+
+        public AssignmentCost ToCost(IReadOnlyList<BigInteger> lexicographicWeights) =>
+            new(
+                DistanceCost,
+                LexicographicIndex < 0
+                    ? BigInteger.Zero
+                    : LexicographicDelta * lexicographicWeights[LexicographicIndex]);
     }
 
     private readonly record struct AssignmentCost(double Distance, BigInteger Lexicographic)
@@ -336,19 +483,17 @@ public static class TrackerDifferenceCalculator
     {
         public static AssignmentCost Zero => new(0, BigInteger.Zero);
 
-        public AssignmentCost Add(FlowEdge edge, IReadOnlyList<BigInteger> lexicographicWeights) =>
-            new(
-                Distance + edge.DistanceCost,
-                edge.LexicographicIndex < 0
-                    ? Lexicographic
-                    : Lexicographic + (edge.LexicographicDelta * lexicographicWeights[edge.LexicographicIndex]));
-
         public int CompareTo(AssignmentCost other)
         {
             var distanceComparison = Distance.CompareTo(other.Distance);
             return distanceComparison != 0 ? distanceComparison : Lexicographic.CompareTo(other.Lexicographic);
         }
 
+        public static AssignmentCost operator +(AssignmentCost left, AssignmentCost right) =>
+            new(left.Distance + right.Distance, left.Lexicographic + right.Lexicographic);
+
+        public static AssignmentCost operator -(AssignmentCost left, AssignmentCost right) =>
+            new(left.Distance - right.Distance, left.Lexicographic - right.Lexicographic);
     }
 }
 
