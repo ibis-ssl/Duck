@@ -1,11 +1,16 @@
+using System.Diagnostics;
 using System.Net;
+using System.Runtime.InteropServices;
 using Tracker.DebugHost.Tracking;
+using Xunit.Abstractions;
 
 namespace Tracker.Tests;
 
-public sealed class TrackerDifferenceSnapshotEvaluatorTests
+public sealed class TrackerDifferenceSnapshotEvaluatorTests(ITestOutputHelper output)
 {
     private static readonly DateTimeOffset Now = new(2026, 10, 18, 12, 0, 0, TimeSpan.Zero);
+    private const int MeasurementWarmupCalls = 500;
+    private const int MeasurementIterations = 3_000;
 
     [Fact]
     public void Evaluate_UsesResolvedThreeTrackerSnapshotsAndPropagatesObjectDifferences()
@@ -96,6 +101,65 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests
         Assert.Empty(pair.Difference.Balls.UnmatchedComparisonIndices);
     }
 
+    [Fact]
+    public void Evaluate_ReportsRepresentativeThreeSourceTimeAndAllocationCost()
+    {
+        var snapshots = new[]
+        {
+            Source("ibis", "duck-id", RepresentativeFrame(101, 0.00)),
+            Source("TIGERs", "tigers-id", RepresentativeFrame(102, 0.05)),
+            Source("ER-FORCE", "erforce-id", RepresentativeFrame(103, 0.10)),
+        };
+        TrackerDifferenceSnapshotResult? lastResult = null;
+
+        for (var index = 0; index < MeasurementWarmupCalls; index++)
+        {
+            lastResult = TrackerDifferenceSnapshotEvaluator.Evaluate(
+                snapshots,
+                Now,
+                TimeSpan.FromSeconds(5),
+                ballDistanceGateMeters: 0.5);
+        }
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        var elapsedTicksByCall = new long[MeasurementIterations];
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        var totalStart = Stopwatch.GetTimestamp();
+        for (var index = 0; index < MeasurementIterations; index++)
+        {
+            var callStart = Stopwatch.GetTimestamp();
+            lastResult = TrackerDifferenceSnapshotEvaluator.Evaluate(
+                snapshots,
+                Now,
+                TimeSpan.FromSeconds(5),
+                ballDistanceGateMeters: 0.5);
+            elapsedTicksByCall[index] = Stopwatch.GetTimestamp() - callStart;
+        }
+
+        var totalElapsedTicks = Stopwatch.GetTimestamp() - totalStart;
+        var allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+        Array.Sort(elapsedTicksByCall);
+        var measuredCallsPerSecond = MeasurementIterations /
+            (totalElapsedTicks / (double)Stopwatch.Frequency);
+        var p50Microseconds = ToMicroseconds(elapsedTicksByCall[PercentileIndex(0.50)]);
+        var p95Microseconds = ToMicroseconds(elapsedTicksByCall[PercentileIndex(0.95)]);
+        const double ScenarioCallsPerSecond = 60;
+
+        Assert.True(lastResult!.Readiness.IsReady);
+        Assert.Equal(3, lastResult.Pairs.Count);
+        output.WriteLine(
+            $"snapshot difference measurement: sources=3; robots/source=12; balls/source=1; " +
+            $"pairs/call=3; calls/s scenario={ScenarioCallsPerSecond:F0}; measured throughput={measuredCallsPerSecond:F0}/s; " +
+            $"calls={MeasurementIterations}; warmup={MeasurementWarmupCalls}; " +
+            $"p50={p50Microseconds:F2} us; p95={p95Microseconds:F2} us; " +
+            $"allocated/call={allocatedBytes / (double)MeasurementIterations:F0} bytes; " +
+            $"p95-at-60Hz-budget={p95Microseconds * ScenarioCallsPerSecond / 1_000_000:P3}; " +
+            $"runtime={RuntimeInformation.FrameworkDescription}; os={RuntimeInformation.OSDescription}; " +
+            $"arch={RuntimeInformation.ProcessArchitecture}; processors={Environment.ProcessorCount}");
+    }
+
     private static void AssertPair(
         TrackerDifferencePairResult pair,
         string referenceRole,
@@ -146,10 +210,45 @@ public sealed class TrackerDifferenceSnapshotEvaluatorTests
         return frame;
     }
 
+    private static TrackedFrame RepresentativeFrame(uint frameNumber, double offset)
+    {
+        var frame = new TrackedFrame { FrameNumber = frameNumber, Timestamp = frameNumber };
+        foreach (var team in new[] { Team.Blue, Team.Yellow })
+        {
+            for (uint robotId = 0; robotId < 6; robotId++)
+            {
+                frame.Robots.Add(Robot(
+                    team,
+                    robotId,
+                    offset + robotId * 0.2,
+                    team == Team.Blue ? 1 : -1));
+            }
+        }
+
+        frame.Balls.Add(new TrackedBall
+        {
+            Pos = new Vector3 { X = (float)offset, Y = 0, Z = 0 },
+        });
+        return frame;
+    }
+
     private static TrackedRobot Robot(Team team, uint id, double x) => new()
     {
         RobotId = new RobotId { Team = team, Id = id },
         Pos = new Vector2 { X = (float)x, Y = 0 },
         Orientation = 0,
     };
+
+    private static TrackedRobot Robot(Team team, uint id, double x, float y) => new()
+    {
+        RobotId = new RobotId { Team = team, Id = id },
+        Pos = new Vector2 { X = (float)x, Y = y },
+        Orientation = 0,
+    };
+
+    private static int PercentileIndex(double percentile) =>
+        Math.Clamp((int)Math.Ceiling(percentile * MeasurementIterations) - 1, 0, MeasurementIterations - 1);
+
+    private static double ToMicroseconds(long stopwatchTicks) =>
+        stopwatchTicks * (1_000_000d / Stopwatch.Frequency);
 }
