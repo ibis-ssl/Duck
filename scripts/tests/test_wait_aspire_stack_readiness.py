@@ -61,11 +61,12 @@ class AspireStackReadinessTests(unittest.TestCase):
             '{sa_family=AF_INET, sin_port=htons(11010), sin_addr=inet_addr("224.5.23.2")}, 16) = -1 EAGAIN\n'
             'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
             '{sa_family=AF_INET, sin_port=htons(11011), sin_addr=inet_addr("224.5.23.2")}, 16) = 48\n'
+            'writev(13<UDP:[10.1.0.70:42495->224.5.23.2:11010]>, [{...}], 1) = 36\n'
         )
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "trace.txt"
             path.write_text(trace, encoding="utf-8")
-            self.assertEqual({39265: 1}, tracker_output_ports(path))
+            self.assertEqual({39265: 1, 42495: 1}, tracker_output_ports(path))
 
     def test_required_readiness_ports_match_the_default_apphost_resources(self):
         repository = Path(__file__).resolve().parents[2]

@@ -24,6 +24,7 @@ TARGETS = {
 VISION_SOCKET = re.compile(r"UDP:\[[^]]*:10020\]")
 SUCCESSFUL_RECEIVE = re.compile(r"\)\s+=\s+([1-9][0-9]*)\s*$")
 LOCAL_UDP_PORT = re.compile(r"UDP:\[[^]]*:(\d+)(?:->[^]]*)?\]")
+CONNECTED_TRACKER_SOCKET = re.compile(r"UDP:\[[^]]*:(\d+)->224\.5\.23\.2:11010\]")
 
 
 def run(command: list[str]) -> subprocess.CompletedProcess[str]:
@@ -66,13 +67,16 @@ def tracker_output_ports(trace_path: Path) -> Counter[int]:
     """Count successful sends to the tracker multicast endpoint by each socket's source port."""
     counts: Counter[int] = Counter()
     for line in trace_path.read_text(encoding="utf-8", errors="replace").splitlines():
-        if not any(f"{call}(" in line for call in ("sendto", "sendmsg", "sendmmsg")):
+        if not any(f"{call}(" in line for call in ("sendto", "sendmsg", "sendmmsg", "write", "writev")):
             continue
-        if "htons(11010)" not in line or 'inet_addr("224.5.23.2")' not in line:
+        destination_matches = (
+            "htons(11010)" in line and 'inet_addr("224.5.23.2")' in line
+        ) or CONNECTED_TRACKER_SOCKET.search(line)
+        if not destination_matches:
             continue
         if not SUCCESSFUL_RECEIVE.search(line):
             continue
-        descriptor = LOCAL_UDP_PORT.search(line)
+        descriptor = CONNECTED_TRACKER_SOCKET.search(line) or LOCAL_UDP_PORT.search(line)
         if descriptor:
             counts[int(descriptor.group(1))] += 1
     return counts
@@ -113,7 +117,7 @@ def capture(report_path: Path, stack_id: str, window_seconds: float) -> int:
         for role, process in processes.items():
             tracer = subprocess.Popen(
                 ["sudo", "-n", "strace", "-f", "-yy", "-s", "0", "-e",
-                 "trace=recvfrom,recvmsg,recvmmsg,sendto,sendmsg,sendmmsg", "-p", str(process["pid"]), "-o", str(traces[role])],
+                 "trace=recvfrom,recvmsg,recvmmsg,sendto,sendmsg,sendmmsg,write,writev", "-p", str(process["pid"]), "-o", str(traces[role])],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -184,7 +188,7 @@ def capture(report_path: Path, stack_id: str, window_seconds: float) -> int:
         elif not all(item["successful_vision_receive_calls"] > 0 for item in report["processes"].values()):
             report["reason"] = "At least one tracker process had no observed successful receive syscall on UDP/10020."
         elif not all(item["successful_tracker_multicast_send_calls"] > 0 for item in report["processes"].values()):
-            report["reason"] = "At least one tracker process had no observed successful send syscall to 224.5.23.2:11010."
+            report["reason"] = "At least one tracker process had no observed successful send/write syscall to 224.5.23.2:11010."
         elif not all(item["matched_health_sources"] for item in report["processes"].values()):
             report["reason"] = "A tracker process's output socket port did not match its fresh logical-role source in DebugHost health."
         return 0 if passed else 1
