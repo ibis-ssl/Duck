@@ -14,6 +14,10 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 - `SslProto`: トラッカーのコンポーネントが使う通信形式の生成型。
 - `reports`: 調査、レビュー、引き継ぎ、検証レポート。
 
+## 参考仕様資料
+
+- [reference/specs](reference/specs): ibis-ssl の仕様資料を参照用のGit submoduleとして置きます。Duckの実行時依存関係には含めず、必要に応じてsubmoduleの固定commitを更新します。
+
 ## 前提
 
 - .NET SDK 10.0
