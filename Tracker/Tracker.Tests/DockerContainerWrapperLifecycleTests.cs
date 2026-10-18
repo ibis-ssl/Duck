@@ -263,6 +263,10 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.False(DockerServiceReadiness.CraneHasCoordinator("/other_node\n"));
         Assert.True(DockerServiceReadiness.CraneHasCoordinator("/session_controller\n"));
         Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("port 12345 open"));
+        Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("UDP port 12345 is listening"));
+        Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("cm4_sim process found, but no owned UDP socket"));
+        Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("cm4_sim-listening-12346"));
+        Assert.False(DockerServiceReadiness.Cm4SimOwnsListener(string.Empty));
         Assert.True(DockerServiceReadiness.Cm4SimOwnsListener("cm4_sim-listening-12345"));
         Assert.True(DockerServiceReadiness.TrackerPacketMatchesExpectedSource("TIGERs", "TIGERs"));
         Assert.False(DockerServiceReadiness.TrackerPacketMatchesExpectedSource("tigers", "TIGERs"));
@@ -273,6 +277,27 @@ public sealed class DockerContainerWrapperLifecycleTests
         }.ToByteArray()));
         Assert.False(DockerServiceReadiness.IsDecodableVisionPacket([0xff]));
         Assert.False(DockerServiceReadiness.IsDecodableVisionPacket([]));
+    }
+
+    [Fact]
+    public void Cm4ListenerProbeNormalizesLineEndingsAndRetainsProcessOwnedSocketChecks()
+    {
+        var arguments = DockerServiceReadiness.CreateCm4SimListenerProbeArguments("container-id");
+        var actualScript = arguments[^1];
+        var lfScript = DockerServiceReadiness.NormalizeShellScriptLineEndings(
+            DockerServiceReadiness.Cm4SimListenerScript);
+        var crlfScript = lfScript.Replace("\n", "\r\n", StringComparison.Ordinal);
+
+        Assert.Equal(["exec", "container-id", "sh", "-c"], arguments[..^1]);
+        Assert.Equal(lfScript, actualScript);
+        Assert.Equal(lfScript,
+            DockerServiceReadiness.NormalizeShellScriptLineEndings(crlfScript));
+        Assert.DoesNotContain('\r', actualScript);
+        Assert.Contains("awk '$2 ~ /:3039$/", actualScript);
+        Assert.Contains("= cm4_sim ]", actualScript);
+        Assert.Contains("[ \"$link\" = \"socket:[$inode]\" ]", actualScript);
+        Assert.Contains("echo cm4_sim-listening-12345", actualScript);
+        Assert.EndsWith("exit 1", actualScript, StringComparison.Ordinal);
     }
 
     [Fact]
