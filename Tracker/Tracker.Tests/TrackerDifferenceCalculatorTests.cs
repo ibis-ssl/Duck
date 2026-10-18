@@ -1,9 +1,13 @@
+using System.Diagnostics;
 using Tracker.DebugHost.Tracking;
+using Xunit.Abstractions;
 
 namespace Tracker.Tests;
 
-public sealed class TrackerDifferenceCalculatorTests
+public sealed class TrackerDifferenceCalculatorTests(ITestOutputHelper output)
 {
+    private const int DenseBallCount = 48;
+
     [Fact]
     public void Calculate_RobotsMatchesByTeamAndIdAndReportsMissingWithoutZeroDelta()
     {
@@ -108,6 +112,53 @@ public sealed class TrackerDifferenceCalculatorTests
         var match = Assert.Single(result.Balls.Matches);
         Assert.Equal(new Vector3Difference(1, 2, 3), match.PositionDelta);
         Assert.Equal(new Vector3Difference(4, 5, 6), match.VelocityDelta);
+    }
+
+    [Fact]
+    public void Calculate_PreservesFloatSourcePrecisionWhenComputingNumericDeltas()
+    {
+        var reference = Frame(
+            balls: [Ball(1, y: 2, z: 3, vx: 1, vy: 2, vz: 3)],
+            robots: [Robot(Team.Blue, 1, x: 1, y: 2, vx: 1, vy: 2, angularVelocity: 1)]);
+        var comparison = Frame(
+            balls: [Ball(100_000_000, y: 100_000_000, z: 100_000_000, vx: 100_000_000, vy: 100_000_000, vz: 100_000_000)],
+            robots: [Robot(Team.Blue, 1, x: 100_000_000, y: 100_000_000, vx: 100_000_000, vy: 100_000_000, angularVelocity: 100_000_000)]);
+
+        var result = TrackerDifferenceCalculator.Calculate(reference, comparison, ballDistanceGateMeters: 200_000_000);
+
+        var robot = Assert.Single(result.Robots);
+        Assert.Equal(99_999_999d, robot.PositionDelta!.Value.X);
+        Assert.Equal(99_999_998d, robot.PositionDelta.Value.Y);
+        Assert.Equal(99_999_999d, robot.VelocityDelta!.Value.X);
+        Assert.Equal(99_999_998d, robot.VelocityDelta.Value.Y);
+        Assert.Equal(99_999_999d, robot.AngularVelocityDeltaRadiansPerSecond);
+
+        var ball = Assert.Single(result.Balls.Matches);
+        Assert.Equal(new Vector3Difference(99_999_999, 99_999_998, 99_999_997), ball.PositionDelta);
+        Assert.Equal(new Vector3Difference(99_999_999, 99_999_998, 99_999_997), ball.VelocityDelta);
+    }
+
+    [Fact]
+    public void Calculate_DenseEqualCostBallMatrixPreservesLexicographicTieBreak()
+    {
+        var balls = Enumerable.Range(0, DenseBallCount).Select(_ => Ball(0)).ToArray();
+        var reference = Frame(balls: balls);
+        var comparison = Frame(balls: balls);
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        var stopwatch = Stopwatch.StartNew();
+
+        var result = TrackerDifferenceCalculator.Calculate(reference, comparison, ballDistanceGateMeters: 0);
+
+        stopwatch.Stop();
+        var allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+        output.WriteLine(
+            $"dense tie case: {DenseBallCount}x{DenseBallCount}, {DenseBallCount * DenseBallCount} candidate edges, " +
+            $"elapsed {stopwatch.Elapsed.TotalMilliseconds:F1} ms, allocated {allocatedBytes:N0} bytes");
+        Assert.Equal(
+            Enumerable.Range(0, DenseBallCount).Select(index => (index, index)),
+            result.Balls.Matches.Select(match => (match.ReferenceIndex, match.ComparisonIndex)));
+        Assert.Empty(result.Balls.UnmatchedReferenceIndices);
+        Assert.Empty(result.Balls.UnmatchedComparisonIndices);
     }
 
     private static TrackedFrame Frame(
