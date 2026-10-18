@@ -20,29 +20,44 @@ public static class TrackerComparisonReadiness
         var candidates = snapshots
             .Where(snapshot => snapshot.ReceivedAt is { } receivedAt &&
                 receivedAt <= now && now - receivedAt <= freshnessWindow)
-            .Select(snapshot => (Role: ResolveRole(snapshot.SourceName), Snapshot: snapshot))
-            .Where(item => item.Role is not null)
-            .Select(item => (Role: item.Role!, Identity: TrackerSourceIdentity.CreateUuidPreferredKey(
-                "comparison",
-                item.Snapshot.SourceLabel,
-                item.Snapshot.SourceName,
-                item.Snapshot.Packet.Uuid ?? item.Snapshot.SourceUuid,
+            .Select(snapshot =>
+            {
+                var sourceName = string.IsNullOrWhiteSpace(snapshot.Packet.SourceName)
+                    ? snapshot.SourceName
+                    : snapshot.Packet.SourceName;
+                var sourceUuid = string.IsNullOrWhiteSpace(snapshot.Packet.Uuid)
+                    ? snapshot.SourceUuid
+                    : snapshot.Packet.Uuid;
+                var resolution = TrackerComparisonSourceResolver.Resolve(
+                    sourceName,
+                    snapshot.SourceLabel,
+                    sourceUuid,
+                    snapshot.RemoteEndpoint,
+                    snapshot.SourceRole);
+                return (Resolution: resolution, Snapshot: snapshot, SourceName: sourceName, SourceUuid: sourceUuid);
+            })
+            .Where(item => item.Resolution.LogicalRole is not null)
+            .Select(item => new TrackerComparisonSourceStatus(
+                item.Resolution.LogicalRole!,
+                item.Resolution.IdentityKey,
+                item.SourceName,
+                item.SourceUuid,
                 item.Snapshot.RemoteEndpoint,
-                item.Snapshot.SourceRole)))
+                item.Snapshot.ReceivedAt!.Value))
             .ToArray();
 
         var missingRoles = RequiredRoles
-            .Where(role => !candidates.Any(item => item.Role == role))
+            .Where(role => !candidates.Any(item => item.LogicalRole == role))
             .ToArray();
         var conflictingRoles = candidates
-            .GroupBy(item => item.Role, StringComparer.Ordinal)
-            .Where(group => group.Select(item => item.Identity).Distinct(StringComparer.Ordinal).Count() != 1)
+            .GroupBy(item => item.LogicalRole, StringComparer.Ordinal)
+            .Where(group => group.Select(item => item.IdentityKey).Distinct(StringComparer.Ordinal).Count() != 1)
             .Select(group => group.Key)
             .ToHashSet(StringComparer.Ordinal);
 
-        foreach (var identityGroup in candidates.GroupBy(item => item.Identity, StringComparer.Ordinal))
+        foreach (var identityGroup in candidates.GroupBy(item => item.IdentityKey, StringComparer.Ordinal))
         {
-            var roles = identityGroup.Select(item => item.Role).Distinct(StringComparer.Ordinal).ToArray();
+            var roles = identityGroup.Select(item => item.LogicalRole).Distinct(StringComparer.Ordinal).ToArray();
             if (roles.Length > 1)
             {
                 foreach (var role in roles)
@@ -55,19 +70,21 @@ public static class TrackerComparisonReadiness
         return new TrackerComparisonReadinessResult(
             IsReady: missingRoles.Length == 0 && conflictingRoles.Count == 0,
             MissingRoles: missingRoles,
-            ConflictingRoles: RequiredRoles.Where(conflictingRoles.Contains).ToArray());
+            ConflictingRoles: RequiredRoles.Where(conflictingRoles.Contains).ToArray(),
+            Sources: candidates);
     }
-
-    private static string? ResolveRole(string? sourceName) => sourceName switch
-    {
-        "ibis" => "Duck",
-        "TIGERs" => "TIGERs",
-        "ER-FORCE" => "ER-Force",
-        _ => null,
-    };
 }
 
 public sealed record TrackerComparisonReadinessResult(
     bool IsReady,
     IReadOnlyList<string> MissingRoles,
-    IReadOnlyList<string> ConflictingRoles);
+    IReadOnlyList<string> ConflictingRoles,
+    IReadOnlyList<TrackerComparisonSourceStatus> Sources);
+
+public sealed record TrackerComparisonSourceStatus(
+    string LogicalRole,
+    string IdentityKey,
+    string SourceName,
+    string SourceUuid,
+    string RemoteEndpoint,
+    DateTimeOffset ReceivedAt);

@@ -1,4 +1,5 @@
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -10,10 +11,12 @@ from wait_aspire_stack_readiness import (
     COMPARISON_RESOURCES,
     REQUIRED_RESOURCES,
     probe_health,
+    read_comparison_health,
     verify_owned_stack,
     wait_for_readiness,
     _read_vision_count,
 )
+from capture_tracker_vision_inputs import count_vision_receives, tracker_output_ports
 
 
 class FakeClock:
@@ -28,6 +31,43 @@ class FakeClock:
 
 
 class AspireStackReadinessTests(unittest.TestCase):
+    def test_comparison_health_probe_preserves_decoded_response_body(self):
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = b'{"isReady":true,"sources":[]}'
+        response.__enter__.return_value.status = 200
+        with patch("wait_aspire_stack_readiness.urlopen", return_value=response):
+            self.assertEqual(
+                {"status": 200, "body": {"isReady": True, "sources": []}},
+                read_comparison_health(39107, 0.5),
+            )
+
+    def test_tracker_input_parser_counts_successful_vision_socket_receives_only(self):
+        trace = (
+            'recvmsg(7<UDP:[0.0.0.0:10020]>, {msg_name=NULL}, 0) = 48\n'
+            'recvfrom(8<UDP:[0.0.0.0:11010]>, "", 131072, 0, NULL, NULL) = 48\n'
+            'recvfrom(7<UDP:[0.0.0.0:10020]>, "", 131072, 0, NULL, NULL) = -1 EAGAIN\n'
+            'recvmmsg(7<UDP:[0.0.0.0:10020]>, msgvec, 16, 0, NULL) = 2\n'
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "trace.txt"
+            path.write_text(trace, encoding="utf-8")
+            self.assertEqual(2, count_vision_receives(path))
+
+    def test_tracker_output_parser_matches_successful_multicast_sends_to_source_ports(self):
+        trace = (
+            'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
+            '{sa_family=AF_INET, sin_port=htons(11010), sin_addr=inet_addr("224.5.23.2")}, 16) = 48\n'
+            'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
+            '{sa_family=AF_INET, sin_port=htons(11010), sin_addr=inet_addr("224.5.23.2")}, 16) = -1 EAGAIN\n'
+            'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
+            '{sa_family=AF_INET, sin_port=htons(11011), sin_addr=inet_addr("224.5.23.2")}, 16) = 48\n'
+            'writev(13<UDP:[10.1.0.70:42495->224.5.23.2:11010]>, [{...}], 1) = 36\n'
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "trace.txt"
+            path.write_text(trace, encoding="utf-8")
+            self.assertEqual({39265: 1, 42495: 1}, tracker_output_ports(path))
+
     def test_required_readiness_ports_match_the_default_apphost_resources(self):
         repository = Path(__file__).resolve().parents[2]
         apphost = (repository / "Testing" / "Duck.Testing.AppHost" / "Program.cs").read_text(encoding="utf-8")
@@ -54,6 +94,16 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("/health/comparison", (repository / "Tracker" / "Tracker.DebugHost" / "Program.cs").read_text(encoding="utf-8"))
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", acceptance_step)
         self.assertNotIn("ancestor=robocupssl/ssl-game-controller", readiness_step)
+
+    def test_workflow_captures_direct_tracker_inputs_before_acceptance(self):
+        repository = Path(__file__).resolve().parents[2]
+        workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
+        capture_start = workflow.index("- name: Capture direct tracker Vision inputs")
+        acceptance_start = workflow.index("- name: Run full-stack packet and active-motion acceptance")
+        capture_step = workflow[capture_start:acceptance_start]
+        self.assertIn("scripts/capture_tracker_vision_inputs.py", capture_step)
+        self.assertIn("tracker-vision-inputs.json", capture_step)
+        self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", capture_step)
 
     def test_workflow_diagnostics_and_cleanup_are_limited_to_the_run_owned_stack(self):
         repository = Path(__file__).resolve().parents[2]
@@ -99,6 +149,10 @@ class AspireStackReadinessTests(unittest.TestCase):
                 probe=probe,
                 is_alive=lambda _pid: True,
                 verify_stack=lambda _stack, _comparison: (True, None),
+                comparison_health=lambda _port, _timeout: {
+                    "status": 200,
+                    "body": {"isReady": True, "sources": [{"logicalRole": "TIGERs", "sourceUuid": "tigers-ci"}]},
+                },
                 stack_id="gha-123-1",
                 comparison=True,
                 clock=clock,
@@ -114,6 +168,8 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertEqual(200, result.comparison_vision_count_window["runtimehost-vision_after"])
         self.assertEqual(80, result.comparison_vision_count_window["debughost-vision_before"])
         self.assertEqual(81, result.comparison_vision_count_window["debughost-vision_after"])
+        final_poll = result.polls[-1]
+        self.assertEqual("tigers-ci", final_poll["comparison_health_after"]["body"]["sources"][0]["sourceUuid"])
 
     def test_comparison_mode_fails_when_either_host_vision_counter_stalls(self):
         counts = iter([100, 200, 101, 200])

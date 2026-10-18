@@ -7,6 +7,7 @@ on:
       - main
       - task/pr28-aspire-005
       - task/pr28-aspire-006a
+      - task/pr28-aspire-006b
   workflow_dispatch:
 
 permissions:
@@ -326,7 +327,7 @@ jobs:
   aspire-full-stack:
     name: ASPIRE full-stack Linux acceptance
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -426,7 +427,10 @@ jobs:
           export Testing__StackOwnership__StackId="$stack_id"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           apphost_mode="base"
-          if [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" ]]; then
+          if [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
+                "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" || \
+                "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006b" || \
+                "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006b" ]]; then
             apphost_mode="comparison"
             export Testing__Mode=comparison
           fi
@@ -562,6 +566,25 @@ jobs:
 
           printf 'status=ready\nstack_id=%s\nreadiness_source=all required wrapper and comparison endpoints; comparison mode also requires both Vision counters to advance in one five-second window\nmode=%s\n' "$stack_id" "$apphost_mode" \
             > "$results_dir/startup-status.txt"
+
+      - name: Capture direct tracker Vision inputs
+        id: aspire_tracker_vision_inputs
+        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode")"
+          if [[ "$apphost_mode" == "comparison" ]]; then
+            stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id")"
+            python3 scripts/capture_tracker_vision_inputs.py \
+              --stack-id "$stack_id" \
+              --report-file "$results_dir/tracker-vision-inputs.json" \
+              --window-seconds 5
+          else
+            printf 'status=not-applicable\nmode=%s\n' "$apphost_mode" \
+              > "$results_dir/tracker-vision-inputs.txt"
+          fi
 
       - name: Run full-stack packet and active-motion acceptance
         id: aspire_full_stack_test

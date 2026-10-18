@@ -55,6 +55,26 @@ def probe_health(port: int, timeout_seconds: float, path: str = "/health/ready")
         return "unreachable"
 
 
+def read_comparison_health(port: int, timeout_seconds: float) -> dict[str, object]:
+    """Keep the comparison endpoint payload alongside its HTTP status as CI evidence."""
+    try:
+        with urlopen(f"http://127.0.0.1:{port}/health/comparison", timeout=timeout_seconds) as response:
+            body = response.read().decode("utf-8")
+            return {"status": response.status, "body": _decode_health_body(body)}
+    except HTTPError as error:
+        body = error.read().decode("utf-8", errors="replace")
+        return {"status": error.code, "body": _decode_health_body(body)}
+    except (URLError, TimeoutError, socket.timeout, OSError):
+        return {"status": "unreachable", "body": None}
+
+
+def _decode_health_body(body: str) -> object:
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError:
+        return body
+
+
 def process_is_alive(pid: int) -> bool:
     try:
         os.kill(pid, 0)
@@ -120,6 +140,7 @@ def wait_for_readiness(
     poll_interval_seconds: float = 2,
     request_timeout_seconds: float = 2,
     probe: Callable[..., int | str] = probe_health,
+    comparison_health: Callable[[int, float], dict[str, object]] = read_comparison_health,
     is_alive: Callable[[int], bool] = process_is_alive,
     verify_stack: Callable[..., tuple[bool, str | None]] | None = None,
     comparison: bool = False,
@@ -177,9 +198,11 @@ def wait_for_readiness(
                     )
             comparison_counts = None
             if comparison:
+                comparison_body_before = comparison_health(39107, request_timeout_seconds)
                 before = {key: _read_vision_count(port, request_timeout_seconds) for key, (port, _) in http_endpoints.items() if key != "debug-host-comparison"}
                 sleep(5)
                 after = {key: _read_vision_count(port, request_timeout_seconds) for key, (port, _) in http_endpoints.items() if key != "debug-host-comparison"}
+                comparison_body_after = comparison_health(39107, request_timeout_seconds)
                 comparison_counts = {}
                 for name in before:
                     comparison_counts[f"{name}_before"] = before[name]  # type: ignore[assignment]
@@ -198,6 +221,8 @@ def wait_for_readiness(
                     "phase": "comparison_window_end",
                     "apphost_alive": final_apphost_alive,
                     "resources": final_statuses,
+                    "comparison_health_before": comparison_body_before,
+                    "comparison_health_after": comparison_body_after,
                 }
                 polls.append(final_poll)
                 stack_valid = True

@@ -75,6 +75,12 @@ public sealed class TrackerSnapshotReplayReader
             rawPayloadRestored,
             normalizedRecord.PayloadBase64,
             semanticSummary);
+        var comparisonResolution = TrackerComparisonSourceResolver.Resolve(
+            normalizedRecord.SourceName,
+            normalizedRecord.SourceLabel,
+            normalizedRecord.SourceUuid,
+            normalizedRecord.RemoteEndpoint,
+            normalizedRecord.SourceRole);
 
         return new TrackerSnapshotReplayInput(
             recordIndex,
@@ -92,7 +98,9 @@ public sealed class TrackerSnapshotReplayReader
             normalizedRecord.TrackedFrameNumber,
             normalizedRecord.TrackedFrameTimestampNs,
             displaySnapshot,
-            comparisonSource);
+            comparisonSource,
+            comparisonResolution.LogicalRole,
+            comparisonResolution.IdentityKey);
     }
 
     private static IReadOnlyList<TrackerSnapshotComparisonSummary> BuildComparisonSummaries(
@@ -310,7 +318,9 @@ public sealed record TrackerSnapshotReplayInput(
     uint TrackedFrameNumber,
     long TrackedFrameTimestampNs,
     TrackerSnapshotDisplaySnapshot DisplaySnapshot,
-    TrackerSnapshotComparisonSource ComparisonSource);
+    TrackerSnapshotComparisonSource ComparisonSource,
+    string? ComparisonLogicalRole = null,
+    string? ComparisonSourceIdentityKey = null);
 
 /// <summary>
 /// 画面表示用に整形済みの tracker snapshot summary。

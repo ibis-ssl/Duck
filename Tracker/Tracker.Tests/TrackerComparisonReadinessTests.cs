@@ -18,6 +18,8 @@ public sealed class TrackerComparisonReadinessTests
         Assert.True(result.IsReady);
         Assert.Empty(result.MissingRoles);
         Assert.Empty(result.ConflictingRoles);
+        Assert.Equal(new[] { "Duck", "ER-Force", "TIGERs" }, result.Sources.Select(source => source.LogicalRole).Order(StringComparer.Ordinal));
+        Assert.Contains(result.Sources, source => source.LogicalRole == "TIGERs" && source.SourceUuid == "tigers-id");
     }
 
     [Theory]
@@ -66,6 +68,21 @@ public sealed class TrackerComparisonReadinessTests
 
         result = TrackerComparisonReadiness.Evaluate(
             [Source("ibis", "duck-id"), Source("TIGERs", "tigers-a"), Source("TIGERs", "tigers-b"), Source("ER-FORCE", "erforce-id")],
+            Now,
+            TimeSpan.FromSeconds(5));
+
+        Assert.False(result.IsReady);
+        Assert.Contains("TIGERs", result.ConflictingRoles);
+    }
+
+    [Fact]
+    public void Evaluate_RejectsOneRoleClaimedByMultipleUuidlessEndpoints()
+    {
+        var result = TrackerComparisonReadiness.Evaluate(
+            [Source("ibis", "duck-id"),
+             Source("TIGERs", string.Empty, endpoint: "192.0.2.2:11010"),
+             Source("TIGERs", string.Empty, endpoint: "192.0.2.3:11010"),
+             Source("ER-FORCE", "erforce-id")],
             Now,
             TimeSpan.FromSeconds(5));
 
