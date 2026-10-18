@@ -42,13 +42,12 @@ public sealed class TrackerComparisonSourceResolverTests
     }
 
     [Fact]
-    public void Resolve_UsesSameContractForLiveAndSavedSnapshotMetadata()
+    public void Resolve_ProducesTheComparisonRoleAndEndpointFallbackFromSavedSourceMetadata()
     {
-        var live = TrackerComparisonSourceResolver.Resolve(
-            "TIGERs", "TIGERs", string.Empty, "192.0.2.77:11010", "external");
         var saved = TrackerComparisonSourceResolver.Resolve(
             "TIGERs", "TIGERs", string.Empty, "192.0.2.77:11010", "external");
 
-        Assert.Equal(live, saved);
+        Assert.Equal("TIGERs", saved.LogicalRole);
+        Assert.Equal("comparison:fallback:TIGERs\u001f192.0.2.77:11010", saved.IdentityKey);
     }
 }

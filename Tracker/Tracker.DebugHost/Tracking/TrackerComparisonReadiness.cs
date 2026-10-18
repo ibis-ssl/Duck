@@ -20,15 +20,24 @@ public static class TrackerComparisonReadiness
         var candidates = snapshots
             .Where(snapshot => snapshot.ReceivedAt is { } receivedAt &&
                 receivedAt <= now && now - receivedAt <= freshnessWindow)
-            .Select(snapshot => (Role: ResolveRole(snapshot.SourceName), Snapshot: snapshot))
-            .Where(item => item.Role is not null)
-            .Select(item => (Role: item.Role!, Identity: TrackerSourceIdentity.CreateUuidPreferredKey(
-                "comparison",
-                item.Snapshot.SourceLabel,
-                item.Snapshot.SourceName,
-                item.Snapshot.Packet.Uuid ?? item.Snapshot.SourceUuid,
-                item.Snapshot.RemoteEndpoint,
-                item.Snapshot.SourceRole)))
+            .Select(snapshot =>
+            {
+                var sourceName = string.IsNullOrWhiteSpace(snapshot.Packet.SourceName)
+                    ? snapshot.SourceName
+                    : snapshot.Packet.SourceName;
+                var sourceUuid = string.IsNullOrWhiteSpace(snapshot.Packet.Uuid)
+                    ? snapshot.SourceUuid
+                    : snapshot.Packet.Uuid;
+                var resolution = TrackerComparisonSourceResolver.Resolve(
+                    sourceName,
+                    snapshot.SourceLabel,
+                    sourceUuid,
+                    snapshot.RemoteEndpoint,
+                    snapshot.SourceRole);
+                return (Resolution: resolution, Snapshot: snapshot);
+            })
+            .Where(item => item.Resolution.LogicalRole is not null)
+            .Select(item => (Role: item.Resolution.LogicalRole!, Identity: item.Resolution.IdentityKey))
             .ToArray();
 
         var missingRoles = RequiredRoles
@@ -57,14 +66,6 @@ public static class TrackerComparisonReadiness
             MissingRoles: missingRoles,
             ConflictingRoles: RequiredRoles.Where(conflictingRoles.Contains).ToArray());
     }
-
-    private static string? ResolveRole(string? sourceName) => sourceName switch
-    {
-        "ibis" => "Duck",
-        "TIGERs" => "TIGERs",
-        "ER-FORCE" => "ER-Force",
-        _ => null,
-    };
 }
 
 public sealed record TrackerComparisonReadinessResult(

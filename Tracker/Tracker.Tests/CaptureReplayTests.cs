@@ -315,6 +315,7 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(live.LogicalRole, input.ComparisonLogicalRole);
         Assert.Equal(live.IdentityKey, input.ComparisonSourceIdentityKey);
         Assert.Equal("TIGERs", input.ComparisonLogicalRole);
+        Assert.Equal("comparison:fallback:TIGERs\u001f192.0.2.77:10010", input.ComparisonSourceIdentityKey);
     }
 
     /// <summary>
