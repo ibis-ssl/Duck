@@ -16,7 +16,7 @@ from wait_aspire_stack_readiness import (
     wait_for_readiness,
     _read_vision_count,
 )
-from capture_tracker_vision_inputs import count_vision_receives
+from capture_tracker_vision_inputs import count_vision_receives, tracker_output_ports
 
 
 class FakeClock:
@@ -52,6 +52,20 @@ class AspireStackReadinessTests(unittest.TestCase):
             path = Path(directory) / "trace.txt"
             path.write_text(trace, encoding="utf-8")
             self.assertEqual(2, count_vision_receives(path))
+
+    def test_tracker_output_parser_matches_successful_multicast_sends_to_source_ports(self):
+        trace = (
+            'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
+            '{sa_family=AF_INET, sin_port=htons(11010), sin_addr=inet_addr("224.5.23.2")}, 16) = 48\n'
+            'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
+            '{sa_family=AF_INET, sin_port=htons(11010), sin_addr=inet_addr("224.5.23.2")}, 16) = -1 EAGAIN\n'
+            'sendto(12<UDP:[10.1.0.70:39265]>, ""..., 1024, 0, '
+            '{sa_family=AF_INET, sin_port=htons(11011), sin_addr=inet_addr("224.5.23.2")}, 16) = 48\n'
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "trace.txt"
+            path.write_text(trace, encoding="utf-8")
+            self.assertEqual({39265: 1}, tracker_output_ports(path))
 
     def test_required_readiness_ports_match_the_default_apphost_resources(self):
         repository = Path(__file__).resolve().parents[2]

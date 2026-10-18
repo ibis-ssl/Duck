@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -22,6 +23,7 @@ TARGETS = {
 }
 VISION_SOCKET = re.compile(r"UDP:\[[^]]*:10020\]")
 SUCCESSFUL_RECEIVE = re.compile(r"\)\s+=\s+([1-9][0-9]*)\s*$")
+LOCAL_UDP_PORT = re.compile(r"UDP:\[[^]]*:(\d+)(?:->[^]]*)?\]")
 
 
 def run(command: list[str]) -> subprocess.CompletedProcess[str]:
@@ -60,12 +62,33 @@ def count_vision_receives(trace_path: Path) -> int:
     return count
 
 
+def tracker_output_ports(trace_path: Path) -> Counter[int]:
+    """Count successful sends to the tracker multicast endpoint by each socket's source port."""
+    counts: Counter[int] = Counter()
+    for line in trace_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if not any(f"{call}(" in line for call in ("sendto", "sendmsg", "sendmmsg")):
+            continue
+        if "htons(11010)" not in line or 'inet_addr("224.5.23.2")' not in line:
+            continue
+        if not SUCCESSFUL_RECEIVE.search(line):
+            continue
+        descriptor = LOCAL_UDP_PORT.search(line)
+        if descriptor:
+            counts[int(descriptor.group(1))] += 1
+    return counts
+
+
+def _source_field(source: dict[str, object], camel_case: str, pascal_case: str) -> str:
+    value = source.get(camel_case, source.get(pascal_case, ""))
+    return value if isinstance(value, str) else ""
+
+
 def capture(report_path: Path, stack_id: str, window_seconds: float) -> int:
     report: dict[str, object] = {
         "stack_id": stack_id,
         "captured_at_utc": datetime.now(timezone.utc).isoformat(),
         "observation_window_seconds": window_seconds,
-        "evidence_method": "strace successful recvfrom/recvmsg/recvmmsg calls on each tracker PID's local UDP port 10020; payloads are not captured",
+        "evidence_method": "strace successful Vision receives and tracker-multicast sends on each tracker PID; source UDP ports are matched to fresh DebugHost comparison sources; payloads are not captured",
         "processes": {},
     }
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -90,7 +113,7 @@ def capture(report_path: Path, stack_id: str, window_seconds: float) -> int:
         for role, process in processes.items():
             tracer = subprocess.Popen(
                 ["sudo", "-n", "strace", "-f", "-yy", "-s", "0", "-e",
-                 "trace=recvfrom,recvmsg,recvmmsg", "-p", str(process["pid"]), "-o", str(traces[role])],
+                 "trace=recvfrom,recvmsg,recvmmsg,sendto,sendmsg,sendmmsg", "-p", str(process["pid"]), "-o", str(traces[role])],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -121,20 +144,37 @@ def capture(report_path: Path, stack_id: str, window_seconds: float) -> int:
         report["window_ended_at_utc"] = ended_at
         report["comparison_health_before"] = health_before
         report["comparison_health_after"] = health_after
-        report["processes"] = {
-            role: {**process, "successful_vision_receive_calls": count_vision_receives(traces[role]),
-                   "trace_file": traces[role].name}
-            for role, process in processes.items()
-        }
         expected_roles = {"Duck", "TIGERs", "ER-Force"}
         health_body = health_after.get("body")
-        roles = {entry.get("LogicalRole") or entry.get("logicalRole")
-                 for entry in health_body.get("Sources", health_body.get("sources", []))} if isinstance(health_body, dict) else set()
+        health_sources = (health_body.get("Sources", health_body.get("sources", []))
+                          if isinstance(health_body, dict) else [])
+        health_sources = [source for source in health_sources if isinstance(source, dict)]
+        roles = {_source_field(source, "logicalRole", "LogicalRole") for source in health_sources}
+        observed = {}
+        for role, process in processes.items():
+            output_counts = tracker_output_ports(traces[role])
+            matched_sources = [
+                source for source in health_sources
+                if _source_field(source, "logicalRole", "LogicalRole") == role
+                and _source_field(source, "remoteEndpoint", "RemoteEndpoint").rpartition(":")[2].isdigit()
+                and int(_source_field(source, "remoteEndpoint", "RemoteEndpoint").rpartition(":")[2]) in output_counts
+            ]
+            observed[role] = {
+                **process,
+                "successful_vision_receive_calls": count_vision_receives(traces[role]),
+                "successful_tracker_multicast_send_calls": sum(output_counts.values()),
+                "tracker_multicast_source_ports": sorted(output_counts),
+                "matched_health_sources": matched_sources,
+                "trace_file": traces[role].name,
+            }
+        report["processes"] = observed
         passed = (
             health_after.get("status") == 200
             and expected_roles.issubset(roles)
             and not errors
-            and all(item["successful_vision_receive_calls"] > 0 for item in report["processes"].values())
+            and all(item["successful_vision_receive_calls"] > 0 for item in observed.values())
+            and all(item["successful_tracker_multicast_send_calls"] > 0 for item in observed.values())
+            and all(item["matched_health_sources"] for item in observed.values())
         )
         report["status"] = "passed" if passed else "failed"
         if errors:
@@ -143,6 +183,10 @@ def capture(report_path: Path, stack_id: str, window_seconds: float) -> int:
             report["reason"] = "Comparison health response did not report all three logical roles after the capture window."
         elif not all(item["successful_vision_receive_calls"] > 0 for item in report["processes"].values()):
             report["reason"] = "At least one tracker process had no observed successful receive syscall on UDP/10020."
+        elif not all(item["successful_tracker_multicast_send_calls"] > 0 for item in report["processes"].values()):
+            report["reason"] = "At least one tracker process had no observed successful send syscall to 224.5.23.2:11010."
+        elif not all(item["matched_health_sources"] for item in report["processes"].values()):
+            report["reason"] = "A tracker process's output socket port did not match its fresh logical-role source in DebugHost health."
         return 0 if passed else 1
     except (OSError, RuntimeError, subprocess.SubprocessError) as error:
         report["status"] = "failed"
