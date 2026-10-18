@@ -131,6 +131,128 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertEqual("failed", result.status)
         self.assertEqual("comparison_vision_count_stalled", result.failure_category)
 
+    def test_comparison_mode_rechecks_apphost_after_vision_count_window(self):
+        clock = FakeClock()
+        alive_calls = 0
+        stack_checks = 0
+
+        def is_alive(_pid):
+            nonlocal alive_calls
+            alive_calls += 1
+            return alive_calls == 1
+
+        def verify_stack(_stack, _comparison):
+            nonlocal stack_checks
+            stack_checks += 1
+            return True, None
+
+        with patch("wait_aspire_stack_readiness._read_vision_count", side_effect=[100, 80, 200, 81]):
+            result = wait_for_readiness(
+                42,
+                timeout_seconds=10,
+                probe=lambda _port, _timeout, _path="/health/ready": 200,
+                is_alive=is_alive,
+                verify_stack=verify_stack,
+                stack_id="gha-123-1",
+                comparison=True,
+                clock=clock,
+                sleep=clock.sleep,
+            )
+
+        self.assertEqual("failed", result.status)
+        self.assertEqual("apphost_exited", result.failure_category)
+        self.assertEqual(2, alive_calls)
+        self.assertEqual(2, stack_checks)
+
+    def test_comparison_mode_rechecks_resource_health_after_vision_count_window(self):
+        clock = FakeClock()
+        probe_calls = {}
+        stack_checks = 0
+
+        def probe(port, _timeout, path="/health/ready"):
+            key = (port, path)
+            probe_calls[key] = probe_calls.get(key, 0) + 1
+            if key == (39106, "/health/ready") and probe_calls[key] > 1:
+                return 503
+            return 200
+
+        def verify_stack(_stack, _comparison):
+            nonlocal stack_checks
+            stack_checks += 1
+            return True, None
+
+        with patch("wait_aspire_stack_readiness._read_vision_count", side_effect=[100, 80, 200, 81]):
+            result = wait_for_readiness(
+                42,
+                timeout_seconds=10,
+                probe=probe,
+                is_alive=lambda _pid: True,
+                verify_stack=verify_stack,
+                stack_id="gha-123-1",
+                comparison=True,
+                clock=clock,
+                sleep=clock.sleep,
+            )
+
+        self.assertEqual("failed", result.status)
+        self.assertEqual("comparison_readiness_interrupted", result.failure_category)
+        self.assertGreater(probe_calls[(39106, "/health/ready")], 1)
+        self.assertEqual(2, stack_checks)
+
+    def test_comparison_mode_rechecks_debughost_health_after_vision_count_window(self):
+        clock = FakeClock()
+        probe_calls = {}
+
+        def probe(port, _timeout, path="/health/ready"):
+            key = (port, path)
+            probe_calls[key] = probe_calls.get(key, 0) + 1
+            if key == (39107, "/health/comparison") and probe_calls[key] > 1:
+                return 503
+            return 200
+
+        with patch("wait_aspire_stack_readiness._read_vision_count", side_effect=[100, 80, 200, 81]):
+            result = wait_for_readiness(
+                42,
+                timeout_seconds=10,
+                probe=probe,
+                is_alive=lambda _pid: True,
+                verify_stack=lambda _stack, _comparison: (True, None),
+                stack_id="gha-123-1",
+                comparison=True,
+                clock=clock,
+                sleep=clock.sleep,
+            )
+
+        self.assertEqual("failed", result.status)
+        self.assertEqual("comparison_readiness_interrupted", result.failure_category)
+        self.assertGreater(probe_calls[(39107, "/health/comparison")], 1)
+
+    def test_comparison_mode_rechecks_owned_stack_after_vision_count_window(self):
+        clock = FakeClock()
+        checks = 0
+
+        def verify_stack(_stack, _comparison):
+            nonlocal checks
+            checks += 1
+            return (checks == 1, None if checks == 1 else "tracker-erforce is no longer running")
+
+        with patch("wait_aspire_stack_readiness._read_vision_count", side_effect=[100, 80, 200, 81]):
+            result = wait_for_readiness(
+                42,
+                timeout_seconds=10,
+                probe=lambda _port, _timeout, _path="/health/ready": 200,
+                is_alive=lambda _pid: True,
+                verify_stack=verify_stack,
+                stack_id="gha-123-1",
+                comparison=True,
+                clock=clock,
+                sleep=clock.sleep,
+            )
+
+        self.assertEqual("failed", result.status)
+        self.assertEqual("owned_stack_mismatch", result.failure_category)
+        self.assertEqual(2, checks)
+
     def test_probe_returns_status_without_reading_response_body(self):
         response = MagicMock()
         response.status = 200

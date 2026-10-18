@@ -184,6 +184,53 @@ def wait_for_readiness(
                 for name in before:
                     comparison_counts[f"{name}_before"] = before[name]  # type: ignore[assignment]
                     comparison_counts[f"{name}_after"] = after[name]  # type: ignore[assignment]
+                final_apphost_alive = is_alive(apphost_pid)
+                final_statuses = {
+                    name: probe(port, request_timeout_seconds)
+                    for name, port in required_resources.items()
+                }
+                final_statuses.update({
+                    name: probe(port, request_timeout_seconds, path)
+                    for name, (port, path) in http_endpoints.items()
+                })
+                final_poll: dict[str, object] = {
+                    "observed_at_utc": datetime.now(timezone.utc).isoformat(),
+                    "phase": "comparison_window_end",
+                    "apphost_alive": final_apphost_alive,
+                    "resources": final_statuses,
+                }
+                polls.append(final_poll)
+                stack_valid = True
+                stack_reason = None
+                if verify_stack is not None:
+                    stack_valid, stack_reason = verify_stack(stack_id, True) if stack_id else (False, "Stack ID is required.")
+                    final_poll["owned_stack_valid"] = stack_valid
+                if not final_apphost_alive:
+                    return ReadinessResult(
+                        "failed",
+                        "apphost_exited",
+                        "AppHost exited during the comparison Vision receive-count window.",
+                        polls,
+                        comparison_counts,
+                    )
+                unavailable = [f"{name}:{status}" for name, status in final_statuses.items() if status != 200]
+                if unavailable:
+                    return ReadinessResult(
+                        "failed",
+                        "comparison_readiness_interrupted",
+                        "Comparison readiness endpoints stopped reporting HTTP 200 during the Vision receive-count window: "
+                        + ", ".join(unavailable),
+                        polls,
+                        comparison_counts,
+                    )
+                if not stack_valid:
+                    return ReadinessResult(
+                        "failed",
+                        "owned_stack_mismatch",
+                        stack_reason or "Current AppHost stack ownership could not be verified after the comparison window.",
+                        polls,
+                        comparison_counts,
+                    )
                 if any(not isinstance(before[name], int) or not isinstance(after[name], int) or after[name] <= before[name] for name in before):
                     return ReadinessResult(
                         "failed", "comparison_vision_count_stalled",

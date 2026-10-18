@@ -114,28 +114,10 @@ app.MapPost(
     });
 app.MapGet(
     "/health/comparison",
-    (ExternalTrackerSnapshotStore snapshots, IConfiguration configuration) =>
-    {
-        if (!string.Equals(configuration["Testing:Mode"], "comparison", StringComparison.Ordinal))
-        {
-            return Results.Ok(new { mode = "disabled", ready = true });
-        }
-
-        var readiness = TrackerComparisonReadiness.Evaluate(
-            snapshots.GetSnapshot(),
-            DateTimeOffset.UtcNow,
-            TrackerComparisonReadiness.DefaultFreshnessWindow);
-        var response = new
-        {
-            readiness.IsReady,
-            readiness.MissingRoles,
-            readiness.ConflictingRoles,
-            VisionPacketsReceived = snapshots.GetSnapshot().Count,
-        };
-        return readiness.IsReady
-            ? Results.Ok(response)
-            : Results.Json(response, statusCode: StatusCodes.Status503ServiceUnavailable);
-    });
+    (ExternalTrackerSnapshotStore trackerSnapshots,
+        VisionPacketStore visionPackets,
+        IConfiguration configuration) =>
+        DebugHostHealthEndpoints.GetComparisonHealthResult(trackerSnapshots, visionPackets, configuration));
 app.MapGet("/health/vision", (VisionPacketStore snapshots) =>
     Results.Ok(new { VisionPacketsReceived = snapshots.GetSnapshot().PacketCount }));
 
