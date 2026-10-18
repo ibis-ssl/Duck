@@ -73,6 +73,21 @@ public sealed class TrackerComparisonReadinessTests
         Assert.Contains("TIGERs", result.ConflictingRoles);
     }
 
+    [Fact]
+    public void Evaluate_RejectsOneRoleClaimedByMultipleUuidlessEndpoints()
+    {
+        var result = TrackerComparisonReadiness.Evaluate(
+            [Source("ibis", "duck-id"),
+             Source("TIGERs", string.Empty, endpoint: "192.0.2.2:11010"),
+             Source("TIGERs", string.Empty, endpoint: "192.0.2.3:11010"),
+             Source("ER-FORCE", "erforce-id")],
+            Now,
+            TimeSpan.FromSeconds(5));
+
+        Assert.False(result.IsReady);
+        Assert.Contains("TIGERs", result.ConflictingRoles);
+    }
+
     private static ExternalTrackerReadSideSnapshot Source(
         string sourceName,
         string uuid,
