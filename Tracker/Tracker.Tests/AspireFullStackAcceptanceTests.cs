@@ -551,7 +551,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(3, pairs.Count());
         var sources = Assert.IsAssignableFrom<IEnumerable<TrackerComparisonSourceStatus>>(
             response.GetType().GetProperty("Sources")?.GetValue(response));
-        Assert.Equal(3, sources.Count());
+        var resolvedRoles = sources.Select(source => source.LogicalRole).ToHashSet(StringComparer.Ordinal);
+        Assert.Contains("Duck", resolvedRoles);
+        Assert.Contains("TIGERs", resolvedRoles);
+        Assert.Contains("ER-Force", resolvedRoles);
 
         var windowSeconds = inputTimer.Elapsed.TotalSeconds;
         var inputs = trackerCounts.Select(entry => new TrackerSourceTrafficEvidence(
