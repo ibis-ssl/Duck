@@ -57,29 +57,38 @@ public sealed class AppHostApplicationModelTests
 
         var simulator = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
         var gameController = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, resource => resource.Name == "game-controller"));
-        var tigers = Assert.IsType<ContainerResource>(
+        var tigers = Assert.IsType<ExecutableResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "tracker-tigers"));
-        var erForce = Assert.IsType<ContainerResource>(
+        var erForce = Assert.IsType<ExecutableResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "tracker-erforce"));
         var debugHost = Assert.IsType<ProjectResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "debug-host"));
 
-        AssertContainerImage(tigers, "tigersmannheim/sumatra", "2025");
-        AssertContainerImage(erForce, "roboticserlangen/autoref", "2025.1.0");
-        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(tigers));
-        Assert.Equal(["--network", "host"], await GetContainerRuntimeArgsAsync(erForce));
-        AssertWaits(tigers, (simulator, WaitType.WaitUntilStarted), (gameController, WaitType.WaitUntilStarted));
-        AssertWaits(erForce, (simulator, WaitType.WaitUntilStarted), (gameController, WaitType.WaitUntilStarted));
+        var tigersLaunch = await GetLaunchOptionsAsync(tigers);
+        var erForceLaunch = await GetLaunchOptionsAsync(erForce);
+        Assert.Equal("tigersmannheim/sumatra:2025", tigersLaunch.Image);
+        Assert.Equal("roboticserlangen/autoref:2025.1.0", erForceLaunch.Image);
+        Assert.Contains("host", ToSpec(tigersLaunch).CreateRunArguments());
+        Assert.Contains("host", ToSpec(erForceLaunch).CreateRunArguments());
+        Assert.Equal("tracker-tigers", tigersLaunch.ReadinessProfile);
+        Assert.Equal("TIGERs", tigersLaunch.ExpectedTrackerSourceName);
+        Assert.Equal("tracker-erforce", erForceLaunch.ReadinessProfile);
+        Assert.Equal("ER-FORCE", erForceLaunch.ExpectedTrackerSourceName);
+        AssertWaits(tigers, (simulator, WaitType.WaitUntilHealthy), (gameController, WaitType.WaitUntilHealthy));
+        AssertWaits(erForce, (simulator, WaitType.WaitUntilHealthy), (gameController, WaitType.WaitUntilHealthy));
 
         Assert.Equal(
             ["--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--moduli", "simulation_protocol_comparison"],
-            await GetArgumentsAsync(tigers));
-        var protocolMount = Assert.Single(tigers.Annotations.OfType<ContainerMountAnnotation>());
-        Assert.Equal(ContainerMountType.BindMount, protocolMount.Type);
+            tigersLaunch.ContainerArguments);
+        var protocolMount = Assert.Single(tigersLaunch.Mounts ?? []);
         Assert.Equal("/Sumatra/config/moduli/simulation_protocol_comparison.xml", protocolMount.Target);
-        Assert.True(protocolMount.IsReadOnly);
+        Assert.True(protocolMount.ReadOnly);
+        var mountArguments = ToSpec(tigersLaunch).CreateRunArguments();
+        var volumeIndex = Array.IndexOf(mountArguments, "--volume");
+        Assert.True(volumeIndex >= 0);
+        Assert.EndsWith(":/Sumatra/config/moduli/simulation_protocol_comparison.xml:ro", mountArguments[volumeIndex + 1], StringComparison.Ordinal);
 
-        var protocol = XDocument.Load(Assert.IsType<string>(protocolMount.Source));
+        var protocol = XDocument.Load(protocolMount.Source);
         var refereeProperties = protocol.Descendants("module")
             .Single(module => (string?)module.Attribute("id") == "edu.tigers.sumatra.referee.AReferee")
             .Element("properties");
@@ -100,7 +109,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("11010", (string?)trackerProperties?.Element("port"));
         Assert.Equal(
             ["--vision-port", "10020", "--tracker-port", "11010", "--gc-port", "11003"],
-            await GetArgumentsAsync(erForce));
+            erForceLaunch.ContainerArguments);
 
         var debugHostEnvironment = await GetResourceEnvironmentAsync(debugHost);
         Assert.Equal("224.5.23.2", debugHostEnvironment["VisionReceiver__MulticastAddress"]);
@@ -112,12 +121,14 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("11010", debugHostEnvironment["Tracker__Receive__Port"]);
         Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__Uuid"]);
         Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__SourceName"]);
-        AssertWaits(debugHost, (simulator, WaitType.WaitUntilStarted), (tigers, WaitType.WaitUntilStarted), (erForce, WaitType.WaitUntilStarted));
+        Assert.Equal("comparison", debugHostEnvironment["Testing__Mode"]);
+        Assert.Single(debugHost.Annotations.OfType<HealthCheckAnnotation>());
+        AssertWaits(debugHost, (simulator, WaitType.WaitUntilStarted), (Find(appHost, "duck"), WaitType.WaitUntilStarted), (tigers, WaitType.WaitUntilHealthy), (erForce, WaitType.WaitUntilHealthy));
 
         var gameControllerLaunch = await GetLaunchOptionsAsync(gameController);
         Assert.True(PublishesRefereeEndpoint(gameControllerLaunch.ContainerArguments));
-        Assert.False(PublishesRefereeEndpoint(await GetArgumentsAsync(tigers)));
-        Assert.False(PublishesRefereeEndpoint(await GetArgumentsAsync(erForce)));
+        Assert.False(PublishesRefereeEndpoint(tigersLaunch.ContainerArguments));
+        Assert.False(PublishesRefereeEndpoint(erForceLaunch.ContainerArguments));
     }
 
     [Fact]
@@ -321,7 +332,7 @@ public sealed class AppHostApplicationModelTests
     }
 
     private static DockerContainerSpec ToSpec(DockerWrapperLaunchOptions launch) =>
-        new(launch.ResourceName, launch.Image, launch.ContainerArguments, launch.Environment, launch.StackId, launch.RunId);
+        new(launch.ResourceName, launch.Image, launch.ContainerArguments, launch.Environment, launch.StackId, launch.RunId, launch.Mounts);
 
     private static void AssertArgumentValue(IReadOnlyList<string> arguments, string name, string expectedValue)
     {

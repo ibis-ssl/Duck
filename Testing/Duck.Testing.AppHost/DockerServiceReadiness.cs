@@ -28,4 +28,21 @@ public static class DockerServiceReadiness
 
     public static bool Cm4SimOwnsListener(string output) =>
         output.Contains("cm4_sim-listening-12345", StringComparison.Ordinal);
+
+    public static bool TrackerPacketMatchesExpectedSource(string? packetSourceName, string expectedSourceName) =>
+        !string.IsNullOrWhiteSpace(packetSourceName) &&
+        string.Equals(packetSourceName, expectedSourceName, StringComparison.Ordinal);
+
+    public static bool IsDecodableVisionPacket(ReadOnlySpan<byte> payload)
+    {
+        try
+        {
+            var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
+            return packet.Detection is not null || packet.Geometry is not null;
+        }
+        catch (Google.Protobuf.InvalidProtocolBufferException)
+        {
+            return false;
+        }
+    }
 }

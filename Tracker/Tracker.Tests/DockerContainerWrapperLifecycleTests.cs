@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using Duck.Testing.AppHost;
+using Google.Protobuf;
 
 namespace Tracker.Tests;
 
@@ -263,6 +264,15 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.True(DockerServiceReadiness.CraneHasCoordinator("/session_controller\n"));
         Assert.False(DockerServiceReadiness.Cm4SimOwnsListener("port 12345 open"));
         Assert.True(DockerServiceReadiness.Cm4SimOwnsListener("cm4_sim-listening-12345"));
+        Assert.True(DockerServiceReadiness.TrackerPacketMatchesExpectedSource("TIGERs", "TIGERs"));
+        Assert.False(DockerServiceReadiness.TrackerPacketMatchesExpectedSource("tigers", "TIGERs"));
+        Assert.False(DockerServiceReadiness.TrackerPacketMatchesExpectedSource("ER-FORCE", "TIGERs"));
+        Assert.True(DockerServiceReadiness.IsDecodableVisionPacket(new SSL_WrapperPacket
+        {
+            Detection = new SSL_DetectionFrame(),
+        }.ToByteArray()));
+        Assert.False(DockerServiceReadiness.IsDecodableVisionPacket([0xff]));
+        Assert.False(DockerServiceReadiness.IsDecodableVisionPacket([]));
     }
 
     [Fact]

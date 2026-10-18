@@ -20,6 +20,7 @@ public sealed class DockerContainerSpec
 
     private readonly string[] containerArguments;
     private readonly KeyValuePair<string, string>[] environment;
+    private readonly DockerContainerMount[] mounts;
 
     public DockerContainerSpec(
         string resourceName,
@@ -27,7 +28,8 @@ public sealed class DockerContainerSpec
         IEnumerable<string> containerArguments,
         IReadOnlyDictionary<string, string> environment,
         string stackId,
-        string? runId = null)
+        string? runId = null,
+        IEnumerable<DockerContainerMount>? mounts = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(resourceName);
         ArgumentException.ThrowIfNullOrWhiteSpace(image);
@@ -41,6 +43,7 @@ public sealed class DockerContainerSpec
         Image = image;
         this.containerArguments = containerArguments.ToArray();
         this.environment = environment.OrderBy(item => item.Key, StringComparer.Ordinal).ToArray();
+        this.mounts = mounts?.ToArray() ?? [];
 
         if (this.containerArguments.Any(argument =>
                 string.IsNullOrWhiteSpace(argument) || ReservedDockerOptions.Contains(argument)))
@@ -54,6 +57,12 @@ public sealed class DockerContainerSpec
                 string.IsNullOrWhiteSpace(item.Key) || item.Key.Contains('=') || item.Value is null))
         {
             throw new ArgumentException("Environment entries must have valid keys and non-null values.", nameof(environment));
+        }
+
+        if (this.mounts.Any(mount => string.IsNullOrWhiteSpace(mount.Source) ||
+                string.IsNullOrWhiteSpace(mount.Target) || !mount.Target.StartsWith("/", StringComparison.Ordinal)))
+        {
+            throw new ArgumentException("Container mounts require a source and an absolute target.", nameof(mounts));
         }
     }
 
@@ -69,6 +78,8 @@ public sealed class DockerContainerSpec
 
     public IReadOnlyDictionary<string, string> Environment =>
         environment.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
+
+    public IReadOnlyList<DockerContainerMount> Mounts => Array.AsReadOnly(mounts);
 
     public string ContainerName => $"duck-{StackId}-{ResourceName}";
 
@@ -91,6 +102,12 @@ public sealed class DockerContainerSpec
         {
             arguments.Add("--env");
             arguments.Add($"{key}={value}");
+        }
+
+        foreach (var mount in mounts)
+        {
+            arguments.Add("--volume");
+            arguments.Add($"{mount.Source}:{mount.Target}{(mount.ReadOnly ? ":ro" : string.Empty)}");
         }
 
         arguments.Add(Image);
@@ -160,3 +177,5 @@ public sealed class DockerContainerSpec
         return value;
     }
 }
+
+public sealed record DockerContainerMount(string Source, string Target, bool ReadOnly = false);

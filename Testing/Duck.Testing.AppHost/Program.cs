@@ -25,8 +25,16 @@ var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
-ExclusiveControlPortPreflight.EnsureAvailable(
-    ExclusiveControlPortPreflight.CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator));
+var preflightPorts = ExclusiveControlPortPreflight
+    .CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator)
+    .ToList();
+if (testingMode == "comparison")
+{
+    preflightPorts.Add(new("DebugHost comparison health", System.Net.Sockets.ProtocolType.Tcp, 39107));
+    preflightPorts.Add(new("RuntimeHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39108));
+    preflightPorts.Add(new("DebugHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39109));
+}
+ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
 
 var simulatorImageTag =
     builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
@@ -60,9 +68,16 @@ var simulator = builder.AddDockerWrapper(
     "simulator-cli",
     "simulator");
 
-var duck = builder
+var duckBuilder = builder
     .AddProject<Projects.Tracker_RuntimeHost>("duck")
     .WithEnvironment("Tracker__ActiveProfileName", "sim")
+    .WithEnvironment("Testing__Mode", testingMode);
+if (testingMode == "comparison")
+{
+    duckBuilder.WithHttpEndpoint(port: 39108, targetPort: 39108, name: "vision-health", isProxied: false);
+}
+
+var duck = duckBuilder
     .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
     .WithEnvironment("VisionReceiver__Port", "10020")
     .WaitFor(simulator);
@@ -145,33 +160,47 @@ if (testingMode == "comparison")
         AppContext.BaseDirectory,
         "Fixtures",
         "simulation_protocol_comparison.xml");
-    var trackerTigers = builder
-        .AddContainer("tracker-tigers", "tigersmannheim/sumatra", tigersImageTag)
-        .WithBindMount(
-            sumatraProtocolPath,
-            "/Sumatra/config/moduli/simulation_protocol_comparison.xml",
-            isReadOnly: true)
-        .WithArgs(
+    var trackerTigers = builder.AddDockerWrapper(
+        new DockerContainerSpec(
+            "tracker-tigers",
+            $"tigersmannheim/sumatra:{tigersImageTag}",
+            [
             "--headless",
             "--visionAddress", "224.5.23.2:10020",
             "--refereeAddress", "224.5.23.1:11003",
-            "--moduli", "simulation_protocol_comparison")
-        .WithContainerRuntimeArgs("--network", "host")
-        .WaitForStart(simulator)
-        .WaitForStart(gameController);
+            "--moduli", "simulation_protocol_comparison",
+            ],
+            new Dictionary<string, string>(StringComparer.Ordinal),
+            stackId,
+            mounts: [new DockerContainerMount(sumatraProtocolPath, "/Sumatra/config/moduli/simulation_protocol_comparison.xml", ReadOnly: true)]),
+        39105,
+        "java",
+        "tracker-tigers",
+        expectedTrackerSourceName: "TIGERs")
+        .WaitFor(simulator)
+        .WaitFor(gameController);
 
-    var trackerErForce = builder
-        .AddContainer("tracker-erforce", "roboticserlangen/autoref", erForceImageTag)
-        .WithArgs(
+    var trackerErForce = builder.AddDockerWrapper(
+        new DockerContainerSpec(
+            "tracker-erforce",
+            $"roboticserlangen/autoref:{erForceImageTag}",
+            [
             "--vision-port", "10020",
             "--tracker-port", "11010",
-            "--gc-port", "11003")
-        .WithContainerRuntimeArgs("--network", "host")
-        .WaitForStart(simulator)
-        .WaitForStart(gameController);
+            "--gc-port", "11003",
+            ],
+            new Dictionary<string, string>(StringComparer.Ordinal),
+            stackId),
+        39106,
+        "autoref",
+        "tracker-erforce",
+        expectedTrackerSourceName: "ER-FORCE")
+        .WaitFor(simulator)
+        .WaitFor(gameController);
 
     builder
         .AddProject<Projects.Tracker_DebugHost>("debug-host")
+        .WithEnvironment("Testing__Mode", "comparison")
         .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
         .WithEnvironment("VisionReceiver__Port", "10020")
         .WithEnvironment("Tracker__Enabled", "false")
@@ -181,9 +210,13 @@ if (testingMode == "comparison")
         .WithEnvironment("Tracker__Receive__Port", "11010")
         .WithEnvironment("Tracker__Uuid", "debug-host-observer")
         .WithEnvironment("Tracker__SourceName", "debug-host-observer")
+        .WithHttpEndpoint(port: 39107, targetPort: 8080, name: "comparison-health", isProxied: false)
+        .WithHttpEndpoint(port: 39109, targetPort: 8080, name: "vision-health", isProxied: false)
         .WaitForStart(simulator)
-        .WaitForStart(trackerTigers)
-        .WaitForStart(trackerErForce);
+        .WaitForStart(duck)
+        .WaitFor(trackerTigers)
+        .WaitFor(trackerErForce)
+        .WithHttpHealthCheck("/health/comparison");
 }
 
 builder.Build().Run();

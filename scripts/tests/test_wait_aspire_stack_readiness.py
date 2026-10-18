@@ -6,6 +6,8 @@ from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from wait_aspire_stack_readiness import (
+    COMPARISON_HTTP_ENDPOINTS,
+    COMPARISON_RESOURCES,
     REQUIRED_RESOURCES,
     probe_health,
     verify_owned_stack,
@@ -46,6 +48,9 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("scripts/wait_aspire_stack_readiness.py", readiness_step)
         self.assertIn('--stack-id "$stack_id"', readiness_step)
         self.assertIn("--timeout-seconds 300", readiness_step)
+        self.assertIn("readiness_args+=(--comparison)", readiness_step)
+        self.assertIn("Testing__Mode=comparison", workflow)
+        self.assertIn("/health/comparison", (repository / "Tracker" / "Tracker.DebugHost" / "Program.cs").read_text(encoding="utf-8"))
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", acceptance_step)
         self.assertNotIn("ancestor=robocupssl/ssl-game-controller", readiness_step)
 
@@ -75,6 +80,55 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("scripts/sanitize_aspire_artifacts.py", cleanup_step)
         self.assertIn('echo \"sanitization_success=$sanitization_success\" >> \"$GITHUB_OUTPUT\"', cleanup_step)
         self.assertIn("steps.cleanup_full_stack.outputs.sanitization_success == 'true'", upload_step)
+
+    def test_comparison_mode_probes_owned_trackers_health_and_shared_vision_count_window(self):
+        clock = FakeClock()
+        observed_paths = []
+
+        def probe(port, _timeout, path="/health/ready"):
+            observed_paths.append((port, path))
+            return 200
+
+        counts = iter([100, 80, 200, 81])
+        with patch("wait_aspire_stack_readiness._read_vision_count", side_effect=lambda *_args: next(counts)):
+            result = wait_for_readiness(
+                42,
+                timeout_seconds=10,
+                poll_interval_seconds=1,
+                probe=probe,
+                is_alive=lambda _pid: True,
+                verify_stack=lambda _stack, _comparison: (True, None),
+                stack_id="gha-123-1",
+                comparison=True,
+                clock=clock,
+                sleep=clock.sleep,
+            )
+
+        self.assertEqual("ready", result.status)
+        self.assertEqual(5.0, clock.now)
+        self.assertIn((39107, "/health/comparison"), observed_paths)
+        self.assertEqual(200, result.polls[0]["resources"]["tracker-tigers"])
+        self.assertEqual(200, result.polls[0]["resources"]["tracker-erforce"])
+        self.assertEqual(100, result.comparison_vision_count_window["runtimehost-vision_before"])
+        self.assertEqual(200, result.comparison_vision_count_window["runtimehost-vision_after"])
+        self.assertEqual(80, result.comparison_vision_count_window["debughost-vision_before"])
+        self.assertEqual(81, result.comparison_vision_count_window["debughost-vision_after"])
+
+    def test_comparison_mode_fails_when_either_host_vision_counter_stalls(self):
+        counts = iter([100, 200, 101, 200])
+        with patch("wait_aspire_stack_readiness._read_vision_count", side_effect=lambda *_args: next(counts)):
+            result = wait_for_readiness(
+                42,
+                probe=lambda _port, _timeout, _path="/health/ready": 200,
+                is_alive=lambda _pid: True,
+                stack_id="gha-123-1",
+                comparison=True,
+                clock=FakeClock(),
+                sleep=lambda _seconds: None,
+            )
+
+        self.assertEqual("failed", result.status)
+        self.assertEqual("comparison_vision_count_stalled", result.failure_category)
 
     def test_probe_returns_status_without_reading_response_body(self):
         response = MagicMock()
