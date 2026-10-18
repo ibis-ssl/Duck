@@ -12,6 +12,7 @@ from wait_aspire_stack_readiness import (
     probe_health,
     verify_owned_stack,
     wait_for_readiness,
+    _read_vision_count,
 )
 
 
@@ -147,6 +148,14 @@ class AspireStackReadinessTests(unittest.TestCase):
             self.assertEqual(503, probe_health(39104, 0.5))
         with patch("wait_aspire_stack_readiness.urlopen", side_effect=OSError("private detail")):
             self.assertEqual("unreachable", probe_health(39104, 0.5))
+
+    def test_vision_count_reads_aspnet_camel_case_json_property(self):
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b'{"visionPacketsReceived": 123}'
+
+        with patch("wait_aspire_stack_readiness.urlopen", return_value=response):
+            self.assertEqual(123, _read_vision_count(39109, 0.5))
 
     def test_waits_until_every_resource_is_ready_in_the_same_poll_cycle(self):
         clock = FakeClock()

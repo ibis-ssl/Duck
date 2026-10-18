@@ -258,7 +258,7 @@ def _read_vision_count(port: int, timeout_seconds: float) -> int | str:
     try:
         with urlopen(f"http://127.0.0.1:{port}/health/vision", timeout=timeout_seconds) as response:
             payload = json.loads(response.read().decode("utf-8"))
-        value = payload.get("VisionPacketsReceived")
+        value = payload.get("VisionPacketsReceived", payload.get("visionPacketsReceived"))
         return value if isinstance(value, int) else "invalid"
     except (HTTPError, URLError, TimeoutError, socket.timeout, OSError, ValueError, json.JSONDecodeError):
         return "unreachable"
