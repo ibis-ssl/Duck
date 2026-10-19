@@ -294,6 +294,30 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
             summary.TrackerSnapshotLines);
     }
 
+    [Fact]
+    public void SnapshotReplayInput_ResolvesComparisonIdentityWithTheLiveSourceContract()
+    {
+        var session = CreateSnapshotReplaySession(
+            replaySourceUuid: string.Empty,
+            replaySourceName: "TIGERs");
+
+        var replay = new TrackerSnapshotReplayReader().ReadSession(session.MetadataPath);
+        var input = Assert.Single(replay.SnapshotInputs, item => item.SourceName == "TIGERs");
+        var live = TrackerComparisonSourceResolver.Resolve(
+            input.SourceName,
+            input.SourceLabel,
+            input.SourceUuid,
+            input.RemoteEndpoint,
+            input.SourceRole);
+
+        Assert.Equal("TIGERs", input.SourceName);
+        Assert.Equal("external", input.SourceRole);
+        Assert.Equal(live.LogicalRole, input.ComparisonLogicalRole);
+        Assert.Equal(live.IdentityKey, input.ComparisonSourceIdentityKey);
+        Assert.Equal("TIGERs", input.ComparisonLogicalRole);
+        Assert.Equal("comparison:fallback:TIGERs\u001f192.0.2.77:10010", input.ComparisonSourceIdentityKey);
+    }
+
     /// <summary>
     /// 何を確認しているか: CaptureReplay が raw detection cadence と ibis tracker commit lag を汎用行として返すことを確認する。
     /// </summary>
@@ -433,7 +457,9 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
         Assert.Empty(summary.TrackerSnapshotLines);
     }
 
-    private SnapshotReplaySession CreateSnapshotReplaySession()
+    private SnapshotReplaySession CreateSnapshotReplaySession(
+        string replaySourceUuid = "external-replay",
+        string replaySourceName = "thirdparty-replay")
     {
         var captureDirectory = Path.Combine(Path.GetTempPath(), $"capture-replay-snapshot-{Guid.NewGuid():N}");
         var sessionFolder = "snapshot-session";
@@ -444,7 +470,7 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
         WriteEmptyCapture(capturePath);
 
         var ownPacket = CreateTrackerPacket("ibis-runtime", "ibis", 8100, 88_000_000_000);
-        var externalPacket = CreateTrackerPacket("external-replay", "thirdparty-replay", 8101, 88_001_000_000);
+        var externalPacket = CreateTrackerPacket(replaySourceUuid, replaySourceName, 8101, 88_001_000_000);
         var sidecarPath = Path.Combine(sessionFolderPath, TrackerPacketSnapshotLogReader.SidecarFileName);
         File.WriteAllLines(
             sidecarPath,
@@ -460,7 +486,7 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
                     new DateTimeOffset(2026, 5, 12, 12, 0, 1, TimeSpan.Zero),
                     remoteEndpoint: "192.0.2.77:10010",
                     sourceRole: "external",
-                    sourceLabel: "thirdparty-replay")),
+                    sourceLabel: replaySourceName)),
             ]);
 
         var diagnosticsPath = Path.Combine(sessionFolderPath, "snapshot-session.tracker-diagnostics.log");
@@ -483,12 +509,12 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
                 renderMatchRule = "exact",
                 sourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey(
                     "external",
-                    "thirdparty-replay",
-                    "external-replay",
+                    replaySourceName,
+                    replaySourceUuid,
                     "192.0.2.77:10010"),
                 sourceRole = "external",
-                sourceLabel = "thirdparty-replay",
-                sourceUuid = "external-replay",
+                sourceLabel = replaySourceName,
+                sourceUuid = replaySourceUuid,
                 remoteEndpoint = "192.0.2.77:10010",
                 trackerSnapshotRecordIndex = 1,
                 trackerSnapshotReceivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 1, TimeSpan.Zero),

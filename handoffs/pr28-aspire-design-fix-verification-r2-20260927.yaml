@@ -1,0 +1,150 @@
+schema_version: 3
+producer:
+  skill: review-worker
+  mode: fix_verification
+  generated_at: "2026-09-27T22:08:00+09:00"
+
+repository: ibis-ssl/Duck
+issue_or_pr: "PR #28"
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  current_head: 78959b5675aa52c310ec1776c2db5688b9cd5252
+  reviewed_head: 78959b5675aa52c310ec1776c2db5688b9cd5252
+  commit_range: "3c5b90ee6858558f9cfb37bdff55adff13a46a14..78959b5675aa52c310ec1776c2db5688b9cd5252"
+
+execution_environment:
+  kind: connected_computer
+  tool: RemoteDesktopMCP
+  machine_id: FA780
+  connection: available
+  os: Windows
+  shell: cmd.exe / PowerShell
+  working_directory: 'C:\Users\donabe\Project\Duck-issue18-aspire-design'
+  repository: ibis-ssl/Duck
+  branch: design/issue18-aspire-test-orchestration
+  head_sha: 78959b5675aa52c310ec1776c2db5688b9cd5252
+  source_state: clean
+  source_fingerprint: "HEAD 78959b5675aa52c310ec1776c2db5688b9cd5252; range 3c5b90e..78959b5"
+  ownership: current_task
+  writable_paths:
+    - reports/pr28-aspire-design-fix-verification-r2-20260927.md
+    - handoffs/pr28-aspire-design-fix-verification-r2-20260927.yaml
+  dependencies:
+    - name: git
+      status: available
+      evidence: C:\Program Files\Git\cmd\git.exe
+    - name: gh
+      status: available
+      evidence: authenticated as ssaattww; repo/workflow scopes available
+    - name: node
+      status: available
+      evidence: C:\Program Files\nodejs\node.exe
+    - name: cspell
+      status: available
+      evidence: repository node_modules binary
+    - name: dotnet
+      status: missing
+      evidence: where.exe dotnet returned no executable
+    - name: xargs
+      status: missing
+      evidence: where.exe xargs returned no executable
+  evidence:
+    - source worktree clean before report persistence
+    - GitHub remote evidence obtained with gh CLI only
+    - TIGERs upstream default source-name verified as TIGERs
+    - ER-Force framework tracker source name verified as ER-FORCE
+
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - git, node, cspell and gh are executable on FA780
+    - dotnet and xargs are unavailable locally
+  technical_head: 78959b5675aa52c310ec1776c2db5688b9cd5252
+  administrative_parent: 78959b5675aa52c310ec1776c2db5688b9cd5252
+  commit_state: commit_pending
+  push_state: push_pending
+  ci_wait_state: ci_wait_completed
+  current_head_ci:
+    workflow: ".NET tests"
+    run_id: 36321258365
+    head_sha: 78959b5675aa52c310ec1776c2db5688b9cd5252
+    status: completed
+    conclusion: success
+  local_validation:
+    - command: git diff --check 3c5b90e..78959b5
+      result: success
+      exit_code: 0
+    - command: cspell tracker-comparison-debug-design.md
+      result: success
+      exit_code: 0
+      evidence: 1 file / 0 issues
+    - command: npm run lint:md
+      result: unavailable
+      evidence: xargs is not available in the connected Windows environment
+    - command: local dotnet validation
+      result: unavailable
+      evidence: dotnet executable is not available
+
+review:
+  mode: fix_verification
+  reviewer:
+    identity: ChatGPT normal reviewer in the PR #28 review chat
+    continuity:
+      previous_reviewer_identity: ChatGPT normal reviewer in the PR #28 review chat
+      changed: false
+    independence:
+      independent_final_review: false
+      note: normal bounded fix verification; not an independent final review
+  verdict: pass
+  finding_completeness:
+    - finding_id: I28-DR-001
+      severity: medium
+      disposition: closed
+      required_action: define comparison logical-role resolution separately from SourceRole and make live/replay identity contract unambiguous
+      production_path: Tracker/Design/Testing/tracker-comparison-debug-design.md lines 89-103 and 192
+      actual_composition_fixture: planned focused tests at lines 224-230
+      focused_evidence: source-name defaults verified; UUID collision, role ambiguity, multi-endpoint and live/replay contracts specified
+    - finding_id: I28-DR-005
+      severity: medium
+      disposition: closed
+      required_action: define gate, assignment objective, deterministic tie-break, unmatched rules and focused fixtures
+      production_path: Tracker/Design/Testing/tracker-comparison-debug-design.md lines 148-156
+      actual_composition_fixture: planned focused tests at lines 233-236
+      focused_evidence: max-cardinality then min-distance then source-local-index lexicographic tie-break specified
+  carried_findings:
+    - id: I28-DR-002
+      severity: medium
+      disposition: closed
+    - id: I28-DR-003
+      severity: medium
+      disposition: closed
+    - id: I28-DR-004
+      severity: low
+      disposition: closed
+  new_findings: []
+  held: []
+  unexplored: []
+  remaining_risks:
+    - cross-platform multicast acceptance remains implementation-stage work
+    - full Markdown lint is unavailable on this Windows environment because xargs is missing
+
+report:
+  report_type: verification_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/pr28-aspire-design-fix-verification-r2-20260927.md
+  reviewed_head: 78959b5675aa52c310ec1776c2db5688b9cd5252
+  attestation_head: null
+
+next_action:
+  type: independent_final_review
+  summary: if required by repository workflow, use a separate reviewer/chat that did not implement this change; do not merge in this worker
+
+transport:
+  method: repository_file
+  packet_path: handoffs/pr28-aspire-design-fix-verification-r2-20260927.yaml
+  packet_url: null
+  transport_note: GitHub updates use gh/git commands; merge remains user-controlled

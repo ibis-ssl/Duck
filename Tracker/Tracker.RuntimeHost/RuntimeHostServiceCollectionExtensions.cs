@@ -61,6 +61,7 @@ public static class RuntimeHostServiceCollectionExtensions
             return new UdpTrackerPacketPublisher(resolvedOptions.PublisherOptions);
         });
         services.AddSingleton<TrackerCoordinator>();
+        services.AddSingleton<RuntimeVisionReceiverDiagnostics>();
         services.AddSingleton<RuntimeVisionPacketBuffer>();
         services.AddSingleton<RuntimeHostOperationLoop>();
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();

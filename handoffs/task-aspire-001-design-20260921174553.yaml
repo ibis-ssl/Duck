@@ -1,0 +1,312 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: design_only
+  generated_at: 2026-09-21T17:45:53+09:00
+
+repository: ibis-ssl/Duck
+issue_or_pr: "Issue #18 / PR #28"
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  current_head: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  reviewed_head: null
+  commit_range: 449296725fc69dc004818ede2e8ad59a52ef2d27..63e3647667dc4bda06b2eb38e5abecad88042dc8
+
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: FA780
+  connection: available
+  os: Windows
+  shell: PowerShell / cmd / Git Bash
+  working_directory: 'C:\Users\donabe\Project\Duck-issue18-aspire-design'
+  repository: ibis-ssl/Duck
+  branch: design/issue18-aspire-test-orchestration
+  head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  source_state: clean
+  source_fingerprint: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  ownership: current_task
+  writable_paths:
+    - Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - Tracker/Design/tasks-status.md
+    - reports/issue18-aspire-simulation-test-environment-design.md
+    - handoffs/task-aspire-001-design-20260921174553.yaml
+  dependencies:
+    - name: git
+      status: available
+      evidence: clone, branch, commit, and push succeeded through RDC
+    - name: node
+      status: available
+      evidence: Node.js v24.20.0
+    - name: npm
+      status: available
+      evidence: npm 11.19.0 via npm.cmd
+    - name: python
+      status: available
+      evidence: Python 3.14.7
+    - name: dotnet
+      status: missing
+      evidence: dotnet command not found on FA780
+    - name: docker
+      status: missing
+      evidence: docker command not found on FA780
+    - name: aspire
+      status: missing
+      evidence: aspire command not found on FA780
+  evidence:
+    - local clone was clean at origin/main 449296725fc69dc004818ede2e8ad59a52ef2d27 before work
+    - first design commit 63e3647667dc4bda06b2eb38e5abecad88042dc8 was pushed
+    - PR #28 was created with GitHub connector
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - documentation checks can run locally
+    - .NET, Docker, and Aspire runtime checks are unavailable on FA780
+  technical_head: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  administrative_parent: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  commit:
+    state: commit_pending
+    review_target_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  push:
+    state: push_pending
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  ci_wait:
+    state: ci_wait_pending
+    required_for: route_verification
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+
+authoritative_requirements:
+  - source: user_instruction
+    reference: current request
+    summary: use Aspire or similar to make simulator startup easy; simulator and AI in Docker; start Duck too; begin from design
+  - source: issue
+    reference: '#18 Aspire対応'
+    summary: Aspire orchestration work for Duck test environment
+  - source: issue
+    reference: '#14 dockerでシミュレーターのケースを追加'
+    summary: ER-Force simulator and tracker comparison is a later related extension
+  - source: repository_instruction
+    reference: project worker instructions
+    summary: use RDC for git, GitHub connector for PR and comments, preserve failure diagnostics, exact-HEAD CI only, do not merge
+development_policy:
+  method: TDD for implementation; current work is design only
+  testing_order: ASPIRE-002 starts with failing AppHost application-model tests before implementation
+  governing_source: project instructions and design
+
+validation_plan:
+  commands:
+    - git diff --cached --check
+    - npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - npm run lint:md
+  required_failure_diagnostics:
+    - test results
+    - standard output
+    - standard error
+    - diagnostic logs
+    - simulator and AI container logs when Docker integration tests are added
+
+blocked:
+  - item: full repository Markdown lint
+    reason: package scripts reference missing .agents/skills/review-enforcer scripts on current main; plain Windows also lacks xargs
+    required_input_or_decision: restore or land the repository Markdown lint tooling before requiring full lint from this base
+  - item: AI concrete container contract
+    reason: image or Dockerfile, repository, and launch command were not specified
+    required_input_or_decision: select the AI image or Dockerfile before ASPIRE-004
+  - item: local AppHost and Docker runtime verification
+    reason: dotnet, docker, and aspire are missing on FA780
+    required_input_or_decision: run implementation validation on an environment with .NET 10, Docker, and Aspire
+authorized_actions:
+  - read_repository
+  - edit_documentation
+  - write_handoff
+  - write_report
+  - create_branch
+  - commit
+  - push
+  - update_issue
+  - create_pr
+  - update_pr
+  - comment_pr
+
+write_boundary:
+  allowed:
+    - path_or_operation: Tracker/Design/Testing/aspire-simulation-test-environment.md
+      reason: authoritative design for this task
+    - path_or_operation: Tracker/Design/tasks-status.md
+      reason: task tracking
+    - path_or_operation: reports/issue18-aspire-simulation-test-environment-design.md
+      reason: required detailed report
+    - path_or_operation: handoffs/task-aspire-001-design-20260921174553.yaml
+      reason: transportable continuation state
+  forbidden:
+    - path_or_operation: Tracker product code
+      reason: user requested design first
+    - path_or_operation: Dockerfile and AppHost implementation
+      reason: implementation is ASPIRE-002 and later
+    - path_or_operation: merge
+      reason: merge is reserved for the user
+
+scope:
+  - design one-command Aspire orchestration for ER-Force simulator, AI, and Duck
+  - simulator and AI are Docker containers
+  - Duck is host Tracker.RuntimeHost project
+  - define networking, settings, startup, testing, and diagnostics
+non_goals:
+  - implement AppHost
+  - Dockerize Duck
+  - implement AI
+  - implement tracker comparison from Issue #14
+files:
+  changed:
+    - path: Tracker/Design/Testing/aspire-simulation-test-environment.md
+      purpose: new Aspire simulation test environment design
+    - path: Tracker/Design/tasks-status.md
+      purpose: ASPIRE-001 status and follow-up tasks
+    - path: reports/issue18-aspire-simulation-test-environment-design.md
+      purpose: detailed work report
+    - path: handoffs/task-aspire-001-design-20260921174553.yaml
+      purpose: continuation handoff
+  inspected:
+    - path: Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverService.cs
+      purpose: confirm multicast and non-multicast UDP behavior
+    - path: Tracker/Tracker.RuntimeHost/appsettings.json
+      purpose: confirm sim profile and UDP ports
+    - path: Tracker/Design/RuntimeHost/runtime-host-plan.md
+      purpose: preserve RuntimeHost responsibility boundary
+    - path: .github/workflows/dotnet-test.yml
+      purpose: verify failure-diagnostic artifact coverage
+    - path: package.json
+      purpose: inspect Markdown validation entry points
+  intentionally_untouched:
+    - path_or_area: Tracker product code
+      reason: design-only scope
+    - path_or_area: .github/workflows
+      reason: existing dotnet-test workflow already stores required failure diagnostics
+
+commands:
+  - command: git clone --recurse-submodules https://github.com/ibis-ssl/Duck.git
+    purpose: create clean task worktree
+    exit_code: 0
+    result: passed
+    head_sha: 449296725fc69dc004818ede2e8ad59a52ef2d27
+    evidence: clone and both submodules completed
+    execution_environment: null
+    source_fingerprint: 449296725fc69dc004818ede2e8ad59a52ef2d27
+  - command: git diff --cached --check
+    purpose: whitespace validation
+    exit_code: 0
+    result: passed
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+    evidence: no output
+    execution_environment: null
+    source_fingerprint: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  - command: npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md
+    purpose: spelling validation of new design
+    exit_code: 0
+    result: passed
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+    evidence: Files checked 1, Issues found 0
+    execution_environment: null
+    source_fingerprint: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  - command: npm run lint:md
+    purpose: repository Markdown validation
+    exit_code: unknown
+    result: blocked
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+    evidence: Windows shell lacked xargs; Git Bash then failed because .agents/skills/review-enforcer scripts are absent on current main
+    execution_environment: null
+    source_fingerprint: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+
+tests:
+  - name: design document CSpell
+    phase: verification
+    result: passed
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+    evidence: zero CSpell issues in new design
+  - name: full Markdown lint
+    phase: verification
+    result: blocked
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+    evidence: repository lint scripts missing from base
+  - name: AppHost build and Docker startup
+    phase: not_applicable
+    result: not_run
+    head_sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+    evidence: design-only scope and dependencies are not installed on FA780
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: null
+  head_sha: unknown
+  conclusion: unknown
+  artifacts: []
+
+implementation:
+  outcome: not_applicable
+  final_head: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+  commits:
+    - sha: 63e3647667dc4bda06b2eb38e5abecad88042dc8
+      purpose: add Aspire simulation test environment design and task entry
+  addressed_findings: []
+  failure_diagnostics: []
+  blocked_items:
+    - item: AI concrete image and command
+      reason: not specified
+      required_input_or_decision: decide before ASPIRE-004
+  summary:
+    - design is complete for simulator + AI containers and host-based Duck orchestration
+
+review:
+  mode: not_applicable
+  reviewed_head: unknown
+  reviewer:
+    identity: unknown
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: null
+    independence:
+      implemented_change: unknown
+      implemented_review_fix: unknown
+      served_as_normal_reviewer: unknown
+      inherited_conversation: unknown
+      evidence: []
+  verdict: not_applicable
+  required_coverage: []
+  independent_closure:
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    reviewer_continuity: null
+    closure_scope: []
+    completeness_matrix: []
+  validation_assessment: []
+  reserved_report_paths: []
+  report_attestation:
+    allowed: not_applicable
+    reviewed_implementation_head: null
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence: []
+  summary: []
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/issue18-aspire-simulation-test-environment-design.md
+  reviewed_head: null
+  attestation_head: null
+  pr_comments: []
+  summary:
+    - detailed design report created before final administrative commit
+
+findings: []

@@ -1,0 +1,286 @@
+schema_version: 3
+created_at: "2026-09-27T14:55:21+09:00"
+repository: ibis-ssl/Duck
+issue_or_pr: "PR #28"
+task_id: ASPIRE-001
+mode: review
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+current_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+reviewed_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+
+execution_environment:
+  kind: connected_computer
+  tool: RemoteDesktopMCP
+  machine_id: FA780
+  connection: available
+  os: Windows
+  shell: cmd.exe / PowerShell
+  working_directory: 'C:\Users\donabe\Project\Duck-pr28-rereview-20260927'
+  repository: ibis-ssl/Duck
+  branch: detached
+  head_sha: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+  source_state: clean
+  source_fingerprint: "HEAD f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33; fix range e39ee1e..f5950cbd"
+  ownership: current_task
+  writable_paths:
+    - reports/pr28-aspire-design-fix-verification-20260927.md
+    - handoffs/pr28-aspire-design-fix-verification-20260927.yaml
+  dependencies:
+    - name: node
+      status: available
+      evidence: 'C:\Program Files\nodejs\node.exe'
+    - name: cspell
+      status: available
+      evidence: reused repository-compatible node_modules binary from Duck-issue18-aspire-design; targeted files only
+    - name: dotnet
+      status: missing
+      evidence: where dotnet returned no executable
+    - name: docker
+      status: missing
+      evidence: where docker returned no executable
+    - name: aspire
+      status: missing
+      evidence: where aspire returned no executable
+  evidence:
+    - separate detached worktree created from exact PR current HEAD
+    - implementation worktree was not modified
+
+verification:
+  capability: remote_ci_only
+  technical_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+  administrative_parent: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+  commit_state: commit_pending
+  push_state: push_pending
+  ci_wait_state: ci_wait_completed
+  current_head_ci:
+    workflow: ".NET tests"
+    run_number: 148
+    run_id: 36297572886
+    conclusion: success
+    head_sha: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+  local_validation:
+    - command: "git diff --check 449296725fc69dc004818ede2e8ad59a52ef2d27..f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33"
+      result: success
+      exit_code: 0
+    - command: "cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md"
+      result: success
+      exit_code: 0
+      evidence: "2 files / 0 issues"
+    - command: "npm run lint:md"
+      result: unavailable
+      evidence: ".agents/skills/review-enforcer/scripts/list-markdown-targets.js is absent from reviewed checkout"
+    - command: "dotnet / Docker / Aspire runtime validation"
+      result: unavailable
+      evidence: required executables are absent on connected PC
+  diagnostic_path: 'C:\Users\donabe\Project\_review-evidence\Duck-pr28-fixverify-20260927'
+
+review:
+  mode: fix_verification
+  reviewed_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+  reviewer:
+    identity: ChatGPT normal reviewer in same PR #28 review chat
+    role: normal_reviewer
+    continuity:
+      previous_reviewer_identity: ChatGPT normal reviewer in same PR #28 review chat
+      changed: false
+      reason: null
+    independence:
+      implemented_change: false
+      implemented_review_fix: false
+      served_as_normal_reviewer: true
+      inherited_conversation: true
+      evidence:
+        - same chat created I28-DR-001 through I28-DR-004
+        - this round only reviewed fix content and persisted review records
+  verdict: fail
+  required_coverage:
+    - criterion: previous finding closure
+      disposition: checked_finding
+      evidence: I28-DR-001 remains open; I28-DR-002, I28-DR-003, I28-DR-004 closed
+    - criterion: requirement and design conformance
+      disposition: checked_finding
+      evidence: I28-DR-001 and I28-DR-005
+    - criterion: correctness and edge cases
+      disposition: checked_finding
+      evidence: logical role mapping, live/replay identity aggregation, multiple-ball assignment
+    - criterion: changed files and direct dependencies
+      disposition: checked_finding
+      evidence: four-file fix diff plus MultiTrackerManager, live comparison, diagnostics replay, VisionPacketStore
+    - criterion: network acceptance and observability
+      disposition: checked_no_finding
+      evidence: I28-DR-002 and I28-DR-003 required actions are reflected in design and focused-test contracts
+    - criterion: startup dependency
+      disposition: checked_no_finding
+      evidence: I28-DR-004 WaitForStart graph and application-model tests are defined
+    - criterion: tests and validation adequacy
+      disposition: checked_finding
+      evidence: I28-DR-001 logical-role resolver fixture and I28-DR-005 deterministic ball matching fixture are missing
+    - criterion: current-head CI
+      disposition: checked_no_finding
+      evidence: exact-head .NET tests run 148 succeeded
+    - criterion: scope discipline
+      disposition: checked_no_finding
+      evidence: fix changes are design, report, and handoff only
+    - criterion: security and secrets
+      disposition: not_applicable
+      evidence: design-only change
+  validation_assessment:
+    - item: exact-head .NET tests
+      result: supported
+      evidence: run 36297572886, head f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33, success
+    - item: git diff check
+      result: supported
+      evidence: exit 0
+    - item: targeted design CSpell
+      result: supported
+      evidence: 2 files / 0 issues / exit 0
+    - item: full Markdown lint
+      result: unavailable
+      evidence: required review-enforcer script absent from reviewed checkout
+    - item: local runtime tests
+      result: unavailable
+      evidence: dotnet, Docker, Aspire CLI unavailable
+  reserved_report_paths: []
+  report_attestation:
+    allowed: false
+    reviewed_implementation_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence:
+      - normal fix verification, not independent final review
+  summary:
+    - I28-DR-001 remains open
+    - I28-DR-002 through I28-DR-004 are closed
+    - I28-DR-005 Medium added for under-specified multiple-ball matching
+    - verdict remains fail
+
+report:
+  report_type: verification_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/pr28-aspire-design-fix-verification-20260927.md
+  reviewed_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+  attestation_head: null
+  pr_comments: []
+  summary:
+    - detailed fix verification report prepared for repository persistence
+
+findings:
+  - id: I28-DR-001
+    severity: medium
+    origin: introduced_by_change
+    location: "Tracker/Design/Testing/tracker-comparison-debug-design.md:87-89,176,208-211; TrackerConnectionLib/src/MultiTrackerManager.cs:78-93; Tracker/Tracker.DebugHost/Vision/VisionLiveComparisonViewState.cs:598-633; Tracker/Tracker.DebugHost/Tracking/TrackerDiagnosticsComparisonViewStateReader.cs:1361-1366,1558-1593"
+    description: "UUID collision policy was updated, but comparison logical roles Duck/TIGERs/ER-Force have no resolver contract and live/replay source-option aggregation still uses different keys."
+    impact: "Ready state and source selection remain implementation-dependent; ASPIRE-006B/006E cannot be implemented from one authoritative identity contract."
+    evidence: "In comparison mode existing SourceRole classifies all three tracker packets as external; live aggregates by UUID while diagnostics replay groups source options by SourceLabel."
+    required_action: "Define logical-role resolution separately from existing SourceRole, pin role-identification inputs, and define live/replay aggregation keys; update authoritative DebugHost design/tests if replay behavior changes."
+  - id: I28-DR-002
+    severity: medium
+    origin: introduced_by_change
+    location: "Tracker/Design/Testing/aspire-simulation-test-environment.md:65-67,221,249"
+    description: "Shared multicast and exclusive stack/port detection contract."
+    impact: "closed"
+    evidence: "10020/11010 excluded from in-use detection; ownership lock and exclusive control-port checks defined."
+    required_action: "closed"
+  - id: I28-DR-003
+    severity: medium
+    origin: coverage_miss
+    location: "Tracker/Design/Testing/aspire-simulation-test-environment.md:223,242-243,251,266"
+    description: "RuntimeHost receive-count observability contract."
+    impact: "closed"
+    evidence: "VisionPacketsReceivedTotal production diagnostics and DebugHost existing PacketCount defined."
+    required_action: "closed"
+  - id: I28-DR-004
+    severity: low
+    origin: coverage_miss
+    location: "Tracker/Design/Testing/aspire-simulation-test-environment.md:136-148,214-215"
+    description: "Aspire startup-order dependency contract."
+    impact: "closed"
+    evidence: "WaitForStart graph and application-model test contract defined."
+    required_action: "closed"
+  - id: I28-DR-005
+    severity: medium
+    origin: introduced_by_change
+    location: "Tracker/Design/Testing/tracker-comparison-debug-design.md:132-140,212-216"
+    description: "Multiple-ball one-to-one spatial matching has no assignment objective or deterministic tie-break."
+    impact: "matched/unmatched objects and numeric differences can depend on iteration order, so ASPIRE-006C expected results are not unique."
+    evidence: "design specifies only one-to-one distance matching and configurable gate; official TrackedFrame supports repeated balls and multiple-ball capability."
+    required_action: "Define gate application, matching objective, deterministic tie-break, unmatched rules, and focused 2-to-1 / 1-to-2 / tie / boundary fixtures."
+
+held:
+  - item: Linux/Windows/macOS ASPIRE-NET runtime packet tests
+    reason: AppHost is not implemented yet
+    owner: future ASPIRE implementation
+    remaining_risk: host-network multicast remains unverified per OS
+    verdict_impact: no additional finding because the design explicitly keeps untested OS unverified
+
+unexplored: []
+unknown: []
+not_applicable:
+  - field_or_area: independent final review attestation
+    reason: this is normal fix verification
+remaining_risks:
+  - cross-platform host-network multicast must still be proven during implementation
+  - full Markdown lint cannot run from the reviewed checkout because the repository-local review-enforcer script is absent
+
+source_payloads:
+  - source_skill: review-worker
+    output_contract_version: current installed skill
+    content_type: application/yaml
+    payload:
+      mode: fix_verification
+      reviewed_implementation_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+      verdict: fail
+      source_findings:
+        I28-DR-001: not_closed
+        I28-DR-002: closed
+        I28-DR-003: closed
+        I28-DR-004: closed
+      new_findings:
+        - I28-DR-005
+      held:
+        - cross-platform runtime checks deferred until implementation
+      unexplored: []
+  - source_skill: report-writer
+    output_contract_version: current installed skill
+    content_type: application/yaml
+    payload:
+      report_type: verification_report
+      complete_body_reference: reports/pr28-aspire-design-fix-verification-20260927.md
+      reviewed_head: f5950cbd5f830d2b87c8eb77fde2e9f7aef66d33
+      verdict: fail
+
+next_action:
+  type: design_rework
+  target_skill: implementation-worker
+  mode: review_follow_up
+  summary: resolve I28-DR-001 and I28-DR-005, then return to this same normal review chat for bounded fix verification
+  instructions:
+    - preserve I28-DR-001 severity Medium
+    - preserve I28-DR-005 severity Medium
+    - update authoritative design contracts, not only reports/handoffs
+    - define executable TDD fixtures for logical-role resolution and deterministic multiple-ball matching
+    - do not merge
+  required_attachments_or_references:
+    - reports/pr28-aspire-design-fix-verification-20260927.md
+    - PR #28
+  requested_authorized_actions:
+    - read_repository
+    - edit_documentation
+    - write_report
+    - write_handoff
+    - commit
+    - push
+    - comment_pr
+
+transport:
+  method: repository_file
+  packet_path: handoffs/pr28-aspire-design-fix-verification-20260927.yaml
+  packet_url: null
+  transport_note: normal review handoff persisted with report; merge remains user-controlled
