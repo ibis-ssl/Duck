@@ -46,7 +46,7 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
             await webSocket.ConnectAsync(new Uri("ws://127.0.0.1:8082/api/control"), timeout.Token);
             if (!state.HasExpectedYellowTeamName)
             {
-                if (teamNameConfigurationRetry.TryBeginSend(DateTimeOffset.UtcNow, expectedNameObserved: false))
+                if (teamNameConfigurationRetry.TryBeginSend(DateTimeOffset.UtcNow, state.HasExpectedYellowTeamName))
                 {
                     await new Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient()
                         .SendYellowTeamNameAsync(expectedYellowTeamName, timeout.Token);
