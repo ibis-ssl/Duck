@@ -4,9 +4,11 @@
 
 全体受入試験では、ロボット移動の開始前に、Game ControllerとCraneが同じチーム名を扱っていることを確認する。移動中の試合状態も監視し、試合状態の喪失を移動失敗と区別して報告する。
 
-対象は試験用構成と受入検証である。本番の試合設定、Game Controller/AutoRef本体、`Tracker UI`は変更しない。
+対象は試験用構成と受入検証である。本番の試合設定、Game Controller/AutoRef本体、追跡画面は変更しない。
 
 ## 実装範囲
+
+今回実装したのは移動前のチーム認識までである。移動中の審判状態監視とAutoRef対策は未実装である。
 
 チーム名は設定値として管理し、Game Controllerの`Yellow`チーム状態とCraneの起動引数へ同じ値を伝える。色設定はチーム名と独立させる。
 
@@ -21,7 +23,7 @@
 | `Testing:Crane:TeamName` | `crane` | Game Controllerの`Yellow`チーム名とCraneの`team`引数に同じ値を使う。 |
 | `Testing:Crane:TeamColor` | `YELLOW` | Craneの`team_color`引数へ渡す初期色。チーム名とは別に扱う。 |
 
-`TeamName`は空でない`ASCII`英数字、`_`、`-`だけを許可する（`[A-Za-z0-9_-]+`）。それ以外はAppHost起動時に拒否し、`shell`構文を起動引数へ渡さない。`TeamColor`は`YELLOW`または`BLUE`だけを許可する。`TeamName`から色を推定しない。
+`TeamName`は空でない`ASCII`英数字、`_`、`-`だけを許可する（`[A-Za-z0-9_-]+`）。それ以外はAppHost起動時に拒否し、シェル構文を起動引数へ渡さない。`TeamColor`は`YELLOW`または`BLUE`だけを許可する。`TeamName`から色を推定しない。
 
 ## 値の伝播と準備完了
 
@@ -33,7 +35,7 @@ Craneには `team:=<TeamName>` を渡し、色は独立して `team_color:=<Team
 
 Game Controllerの`Yellow`側 `team_name` が期待値でない間、設定要求を1秒間隔で最大3回送る。期待値が配信されている間は再送しない。後続の配信情報で値が不一致になった場合は、残り回数の範囲で再送する。
 
-`Yellow`側の審判情報が欠落した場合は準備状態を不健康にする。`Yellow`情報を含む有効な配信情報が再び届き、チーム名が期待値と一致すれば準備状態を回復する。チーム名を確認できない場合は準備完了にしない。
+`Yellow`側の審判情報が欠落した場合は準備未完了とする。`Yellow`情報を含む有効な配信情報が再び届き、チーム名が期待値と一致すれば準備状態を回復する。チーム名を確認できない場合は準備完了にしない。
 
 ## 受入条件
 
@@ -54,7 +56,7 @@ Game Controllerの`Yellow`側 `team_name` が期待値でない間、設定要�
 
 ## 対象外
 
-比較UIの`snapshot` `pair`、`Split`/`Overlay`と数値差分の共有、時刻差表示は対象外とする。依存追加、権限変更、ネットワーク設定変更、Game Controller/AutoRef本体の改変も対象外とする。
+比較UIのスナップショットの組、`Split`/`Overlay`と数値差分の共有、時刻差表示は対象外とする。依存追加、権限変更、ネットワーク設定変更、Game Controller/AutoRef本体の改変も対象外とする。
 
 ## 実装状況
 
