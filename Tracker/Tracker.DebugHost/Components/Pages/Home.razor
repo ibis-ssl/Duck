@@ -697,7 +697,9 @@
             layerBSourceKey,
             layerAVisible,
             layerBVisible,
-            Configuration.GetValue<double>("Tracker:Comparison:BallDistanceGateMeters", 0.5));
+            Configuration.GetValue<double>("TrackerComparison:BallDistanceGateMeters", 0.5),
+            fallbackLayerASource: comparisonViewState.LayerASelection.Source,
+            fallbackLayerBSource: comparisonViewState.LayerBSelection.Source);
     }
 
     private void CaptureLiveDisplaySnapshot()

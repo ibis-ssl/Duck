@@ -67,16 +67,21 @@ public sealed class VisionLiveDisplaySnapshotProvider
         string layerBSourceKey,
         bool layerAVisible,
         bool layerBVisible,
-        double ballDistanceGateMeters = 0.5)
+        double ballDistanceGateMeters = 0.5,
+        VisionLiveComparisonSourceOption? fallbackLayerASource = null,
+        VisionLiveComparisonSourceOption? fallbackLayerBSource = null)
     {
         var defaultViewState = comparisonSnapshotComposer.CreateViewState(renderSnapshot.ComparisonSnapshot);
-        var layerA = FindSourceOption(defaultViewState.SourceOptions, layerASourceKey);
-        var layerB = FindSourceOption(defaultViewState.SourceOptions, layerBSourceKey);
+        var sourceOptions = defaultViewState.SourceOptions.ToList();
+        var layerA = FindSourceOption(sourceOptions, layerASourceKey, fallbackLayerASource);
+        var layerB = FindSourceOption(sourceOptions, layerBSourceKey, fallbackLayerBSource);
+        IncludeRetainedMissingTrackerOption(sourceOptions, layerA);
+        IncludeRetainedMissingTrackerOption(sourceOptions, layerB);
 
         return new VisionLiveComparisonViewState(
             comparisonMode,
             renderSnapshot.ComparisonSnapshot,
-            defaultViewState.SourceOptions,
+            sourceOptions,
             new VisionLiveComparisonLayerSelection(layerA, layerAVisible),
             new VisionLiveComparisonLayerSelection(layerB, layerBVisible),
             ballDistanceGateMeters);
@@ -84,10 +89,39 @@ public sealed class VisionLiveDisplaySnapshotProvider
 
     private static VisionLiveComparisonSourceOption FindSourceOption(
         IReadOnlyList<VisionLiveComparisonSourceOption> options,
-        string key)
+        string key,
+        VisionLiveComparisonSourceOption? fallbackSource)
     {
-        return options.FirstOrDefault(option => string.Equals(option.Key, key, StringComparison.Ordinal))
-            ?? options.First();
+        var currentSource = options.FirstOrDefault(option => string.Equals(option.Key, key, StringComparison.Ordinal));
+        if (currentSource is not null)
+        {
+            return currentSource;
+        }
+
+        if (fallbackSource is not null
+            && string.Equals(fallbackSource.Key, key, StringComparison.Ordinal)
+            && (fallbackSource.Kind is VisionLiveComparisonSourceKind.Tracked or VisionLiveComparisonSourceKind.ThirdPartyTracker))
+        {
+            return fallbackSource with
+            {
+                IsAvailable = false,
+                MissingReason = "The selected tracker source was not present in the current render tick.",
+            };
+        }
+
+        return options.First();
+    }
+
+    private static void IncludeRetainedMissingTrackerOption(
+        List<VisionLiveComparisonSourceOption> options,
+        VisionLiveComparisonSourceOption source)
+    {
+        if (!source.IsAvailable
+            && (source.Kind is VisionLiveComparisonSourceKind.Tracked or VisionLiveComparisonSourceKind.ThirdPartyTracker)
+            && !options.Any(option => string.Equals(option.Key, source.Key, StringComparison.Ordinal)))
+        {
+            options.Add(source);
+        }
     }
 }
 
