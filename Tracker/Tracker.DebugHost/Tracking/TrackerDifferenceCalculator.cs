@@ -1,4 +1,5 @@
 using System.Numerics;
+using Tracker.Core;
 
 namespace Tracker.DebugHost.Tracking;
 
@@ -25,6 +26,117 @@ public static class TrackerDifferenceCalculator
             CompareRobots(reference.Robots, comparison.Robots),
             CompareBalls(reference.Balls, comparison.Balls, ballDistanceGateMeters));
     }
+
+    /// <summary>Compares a Duck core frame with an externally received tracker packet frame.</summary>
+    public static TrackerDifferenceResult Calculate(
+        TrackerFrame reference,
+        TrackedFrame comparison,
+        double ballDistanceGateMeters) =>
+        Calculate(ToPacketFrame(reference), comparison, ballDistanceGateMeters);
+
+    /// <summary>Compares an externally received tracker packet frame with a Duck core frame.</summary>
+    public static TrackerDifferenceResult Calculate(
+        TrackedFrame reference,
+        TrackerFrame comparison,
+        double ballDistanceGateMeters) =>
+        Calculate(reference, ToPacketFrame(comparison), ballDistanceGateMeters);
+
+    /// <summary>Compares two Duck core frames after projecting them to official tracker units and ordering.</summary>
+    public static TrackerDifferenceResult Calculate(
+        TrackerFrame reference,
+        TrackerFrame comparison,
+        double ballDistanceGateMeters) =>
+        Calculate(ToPacketFrame(reference), ToPacketFrame(comparison), ballDistanceGateMeters);
+
+    private static TrackedFrame ToPacketFrame(TrackerFrame source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        var frame = new TrackedFrame
+        {
+            FrameNumber = source.FrameNumber,
+            Timestamp = source.DataTimestampNs / 1_000_000_000.0,
+        };
+        frame.Balls.AddRange(OrderBalls(source).Select(ball => new TrackedBall
+        {
+            Pos = new global::Vector3
+            {
+                X = ToMeters(ball.XMm),
+                Y = ToMeters(ball.YMm),
+                Z = ToMeters(ball.ZMm),
+            },
+            Vel = new global::Vector3
+            {
+                X = ToMeters(ball.VXMmPerS),
+                Y = ToMeters(ball.VYMmPerS),
+                Z = ToMeters(ball.VZMmPerS),
+            },
+            Visibility = ball.Visibility,
+        }));
+        frame.Robots.AddRange(source.Robots
+            .OrderBy(robot => GetRobotSortKey(robot.Team))
+            .ThenBy(robot => robot.RobotId)
+            .Select(robot => new TrackedRobot
+            {
+                RobotId = new global::RobotId
+                {
+                    Id = robot.RobotId,
+                    Team = ToProtoTeam(robot.Team),
+                },
+                Pos = new global::Vector2
+                {
+                    X = ToMeters(robot.XMm),
+                    Y = ToMeters(robot.YMm),
+                },
+                Orientation = (float)robot.OrientationRad,
+                Vel = new global::Vector2
+                {
+                    X = ToMeters(robot.VXMmPerS),
+                    Y = ToMeters(robot.VYMmPerS),
+                },
+                VelAngular = (float)robot.AngularVelocityRadPerS,
+                Visibility = robot.Visibility,
+            }));
+        return frame;
+    }
+
+    private static IEnumerable<TrackedBallState> OrderBalls(TrackerFrame frame)
+    {
+        if (frame.PrimaryBallTrackId is { } primaryTrackId)
+        {
+            var primaryBall = frame.Balls.FirstOrDefault(ball => ball.InternalTrackId == primaryTrackId);
+            if (primaryBall is not null)
+            {
+                yield return primaryBall;
+            }
+        }
+
+        foreach (var secondaryBall in frame.Balls
+                     .Where(ball => ball.InternalTrackId != frame.PrimaryBallTrackId)
+                     .OrderByDescending(ball => ball.Visibility)
+                     .ThenByDescending(ball => ball.LastVisibleTimestampNs)
+                     .ThenBy(ball => ball.InternalTrackId))
+        {
+            yield return secondaryBall;
+        }
+    }
+
+    private static Team ToProtoTeam(TrackerTeam team) =>
+        team switch
+        {
+            TrackerTeam.Yellow => Team.Yellow,
+            TrackerTeam.Blue => Team.Blue,
+            _ => Team.Unknown,
+        };
+
+    private static int GetRobotSortKey(TrackerTeam team) =>
+        team switch
+        {
+            TrackerTeam.Yellow => 0,
+            TrackerTeam.Blue => 1,
+            _ => 2,
+        };
+
+    private static float ToMeters(double millimeters) => (float)(millimeters / 1000.0);
 
     private static IReadOnlyList<TrackerRobotDifference> CompareRobots(
         IEnumerable<TrackedRobot> reference,

@@ -113,7 +113,8 @@ public sealed record VisionLiveComparisonTrackedSnapshot(
     long? TimestampNs,
     IReadOnlyList<SSL_DetectionBall> Balls,
     IReadOnlyList<SSL_DetectionRobot> RobotsYellow,
-    IReadOnlyList<SSL_DetectionRobot> RobotsBlue);
+    IReadOnlyList<SSL_DetectionRobot> RobotsBlue,
+    TrackerFrame Frame);
 
 /// <summary>
 /// 3rd party tracker source の immutable snapshot。
@@ -223,9 +224,6 @@ public sealed record VisionLiveComparisonLayer(
     VisionLiveComparisonLegendItem Legend,
     VisionLiveComparisonLayerDetails Details);
 
-/// <summary>
-/// Vision live comparison の UI 非依存 view-state。
-/// </summary>
 /// <summary>Numeric tracker difference and timestamp metadata for the selected live render pair.</summary>
 public sealed record VisionLiveComparisonTrackerDifference(
     long RenderTickId,
@@ -244,6 +242,10 @@ public sealed record VisionLiveComparisonTrackerDifference(
     long? TimestampDeltaNs,
     TrackerDifferencePairStatus Status,
     TrackerDifferenceResult? Difference);
+
+/// <summary>
+/// Vision live comparison の UI 非依存 view-state。
+/// </summary>
 public sealed record VisionLiveComparisonViewState(
     VisionLiveComparisonMode Mode,
     VisionLiveComparisonRenderSnapshot RenderSnapshot,
@@ -263,12 +265,11 @@ public sealed record VisionLiveComparisonViewState(
         var comparisonSource = LayerBSelection.Source;
         var reference = ResolveTrackerSnapshot(referenceSource);
         var comparison = ResolveTrackerSnapshot(comparisonSource);
-        var referenceFrame = reference?.Packet.TrackedFrame;
-        var comparisonFrame = comparison?.Packet.TrackedFrame;
-        var status = referenceSource.Kind != VisionLiveComparisonSourceKind.ThirdPartyTracker ||
-                comparisonSource.Kind != VisionLiveComparisonSourceKind.ThirdPartyTracker
+        var referenceHasFrame = reference?.HasFrame == true;
+        var comparisonHasFrame = comparison?.HasFrame == true;
+        var status = !IsTrackerSource(referenceSource) || !IsTrackerSource(comparisonSource)
             ? TrackerDifferencePairStatus.UnsupportedSource
-            : (referenceFrame is not null, comparisonFrame is not null) switch
+            : (referenceHasFrame, comparisonHasFrame) switch
             {
                 (true, true) => TrackerDifferencePairStatus.Compared,
                 (false, true) => TrackerDifferencePairStatus.MissingReferenceFrame,
@@ -276,10 +277,7 @@ public sealed record VisionLiveComparisonViewState(
                 (false, false) => TrackerDifferencePairStatus.MissingBothFrames,
             };
         var difference = status == TrackerDifferencePairStatus.Compared
-            ? TrackerDifferenceCalculator.Calculate(
-                referenceFrame!,
-                comparisonFrame!,
-                BallDistanceGateMeters)
+            ? reference!.CalculateDifference(comparison!, BallDistanceGateMeters)
             : null;
         var referenceTimestampNs = reference?.TimestampNs;
         var comparisonTimestampNs = comparison?.TimestampNs;
@@ -288,13 +286,13 @@ public sealed record VisionLiveComparisonViewState(
             RenderSnapshot.RenderTickId,
             referenceSource.Key,
             reference?.Label ?? referenceSource.Label,
-            referenceFrame?.FrameNumber,
+            reference?.FrameNumber,
             referenceTimestampNs,
             reference?.ReceivedAt,
             GetSnapshotAge(reference?.ReceivedAt),
             comparisonSource.Key,
             comparison?.Label ?? comparisonSource.Label,
-            comparisonFrame?.FrameNumber,
+            comparison?.FrameNumber,
             comparisonTimestampNs,
             comparison?.ReceivedAt,
             GetSnapshotAge(comparison?.ReceivedAt),
@@ -305,16 +303,47 @@ public sealed record VisionLiveComparisonViewState(
             difference);
     }
 
-    private VisionLiveComparisonThirdPartyTrackerSnapshot? ResolveTrackerSnapshot(
+    private static bool IsTrackerSource(VisionLiveComparisonSourceOption source)
+    {
+        return source.Kind is VisionLiveComparisonSourceKind.Tracked or VisionLiveComparisonSourceKind.ThirdPartyTracker;
+    }
+
+    private VisionLiveComparisonTrackerSourceSnapshot? ResolveTrackerSnapshot(
         VisionLiveComparisonSourceOption source)
     {
-        if (source.Kind != VisionLiveComparisonSourceKind.ThirdPartyTracker || !source.IsAvailable)
+        if (!source.IsAvailable)
         {
             return null;
         }
 
-        return RenderSnapshot.ThirdPartyTrackerSnapshots.FirstOrDefault(snapshot =>
+        if (source.Kind == VisionLiveComparisonSourceKind.Tracked)
+        {
+            var snapshot = RenderSnapshot.TrackedSnapshot;
+            return snapshot is null || !string.Equals(snapshot.Key, source.Key, StringComparison.Ordinal)
+                ? null
+                : new VisionLiveComparisonTrackerSourceSnapshot(
+                    snapshot.Label,
+                    snapshot.ReceivedAt,
+                    snapshot.TimestampNs,
+                    snapshot.Frame,
+                    null);
+        }
+
+        if (source.Kind != VisionLiveComparisonSourceKind.ThirdPartyTracker)
+        {
+            return null;
+        }
+
+        var thirdParty = RenderSnapshot.ThirdPartyTrackerSnapshots.FirstOrDefault(snapshot =>
             string.Equals(snapshot.Key, source.Key, StringComparison.Ordinal));
+        return thirdParty is null
+            ? null
+            : new VisionLiveComparisonTrackerSourceSnapshot(
+                thirdParty.Label,
+                thirdParty.ReceivedAt,
+                thirdParty.TimestampNs,
+                null,
+                thirdParty.Packet.TrackedFrame);
     }
 
     private TimeSpan? GetSnapshotAge(DateTimeOffset? receivedAt)
@@ -322,6 +351,33 @@ public sealed record VisionLiveComparisonViewState(
         return receivedAt is { } value
             ? RenderSnapshot.SampledAt - value
             : null;
+    }
+
+    private sealed record VisionLiveComparisonTrackerSourceSnapshot(
+        string Label,
+        DateTimeOffset? ReceivedAt,
+        long? TimestampNs,
+        TrackerFrame? InternalFrame,
+        TrackedFrame? PacketFrame)
+    {
+        public bool HasFrame => InternalFrame is not null || PacketFrame is not null;
+        public uint? FrameNumber => InternalFrame?.FrameNumber ?? PacketFrame?.FrameNumber;
+
+        public TrackerDifferenceResult CalculateDifference(
+            VisionLiveComparisonTrackerSourceSnapshot comparison,
+            double ballDistanceGateMeters)
+        {
+            if (InternalFrame is { } internalFrame)
+            {
+                return comparison.InternalFrame is { } comparisonInternalFrame
+                    ? TrackerDifferenceCalculator.Calculate(internalFrame, comparisonInternalFrame, ballDistanceGateMeters)
+                    : TrackerDifferenceCalculator.Calculate(internalFrame, comparison.PacketFrame!, ballDistanceGateMeters);
+            }
+
+            return comparison.InternalFrame is { } comparisonFrame
+                ? TrackerDifferenceCalculator.Calculate(PacketFrame!, comparisonFrame, ballDistanceGateMeters)
+                : TrackerDifferenceCalculator.Calculate(PacketFrame!, comparison.PacketFrame!, ballDistanceGateMeters);
+        }
     }
     private const string LayerAAccentColor = "#68d8ff";
     private const string LayerBAccentColor = "#ff7ad9";
@@ -588,12 +644,13 @@ public sealed class VisionLiveComparisonSnapshotComposer
             trackedView.HasFrame
                 ? new VisionLiveComparisonTrackedSnapshot(
                     "tracked:ibis",
-                    "Tracked",
+                    "Duck",
                     trackedView.ReceivedAt,
                     trackedView.Diagnostics.DataTimestampNs,
                     trackedView.Balls.Select(ball => ball.Clone()).ToArray(),
                     trackedView.RobotsYellow.Select(robot => robot.Clone()).ToArray(),
-                    trackedView.RobotsBlue.Select(robot => robot.Clone()).ToArray())
+                    trackedView.RobotsBlue.Select(robot => robot.Clone()).ToArray(),
+                    trackedSnapshot.LatestFrame ?? throw new InvalidOperationException("Tracked Duck frame was missing from the render snapshot."))
                 : null,
             thirdPartySnapshots,
             geometry,
@@ -653,14 +710,14 @@ public sealed class VisionLiveComparisonSnapshotComposer
             ? new VisionLiveComparisonSourceOption(
                 VisionLiveComparisonSourceKind.Tracked,
                 "tracked:ibis",
-                "Tracked",
+                "Duck",
                 CameraId: null,
                 IsAvailable: false,
-                MissingReason: "No tracked snapshot in current render tick.")
+                MissingReason: "No Duck tracker snapshot in current render tick.")
             : new VisionLiveComparisonSourceOption(
                 VisionLiveComparisonSourceKind.Tracked,
                 "tracked:ibis",
-                "Tracked",
+                "Duck",
                 CameraId: null,
                 IsAvailable: true,
                 MissingReason: string.Empty));
