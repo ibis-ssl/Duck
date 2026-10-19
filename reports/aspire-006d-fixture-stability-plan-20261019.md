@@ -37,7 +37,7 @@ HEAD `96b70b648c9341a6c349bedc90182219e3afb8f7`で確認しました。AppHost�
 
 受入ではHALT→PrepareKickoffYellow→NormalStartを確認し、Yellowロボットは112.08897 mm移動しました。5秒の比較測定でDuck 156フレーム、TIGERs 812フレーム、ER-Force 1000フレーム、Vision 313データグラムを取得しました。評価1000回のP50は179.923 µs、P95は298.002 µsでした。終了後、対象スタックのコンテナは0件、AppHostプロセスは終了しました。
 
-ビルド警告はNU1902（MessagePack 2.5.302）とASPIRE010（Aspire CLI bundle無効）です。正式なMarkdown lintは未完了です。既存venvのyomiyasu_lint.pyでは100/100、指摘なしでした。WSLのnpmがWindows shimへ解決され、同一HEADのWindows作業場所にも`node_modules`と`textlint`がないため、依存を追加せず実行を見送っています。`git diff --check`は成功しました。
+ビルド警告はNU1902（MessagePack 2.5.302）とASPIRE010（Aspire CLI bundle無効）です。正式lintの対象設定では`reports/`は`markdown-targets.json`の除外対象で、公式lintの検査成功とは扱いません。既存Duck作業ツリーのnode_modulesは最終HEADとpackage-lockが一致し（SHA-256 `0bc0bf02…edaa4b87`）、textlint 15.7.0を含みます。Windows Node 24.20.0/npm 11.19.0を使い、一時ステージで直接検査しました。textlintは成功、CSpellは未登録語51件、Sudachi whitelistは未登録語で失敗しました。既存venvのyomiyasu_lint.pyは100/100で指摘なしです。依存導入はなく、元の作業ツリーは変更していません。`git diff --check`は成功しました。
 
 追加の`capture_tracker_vision_inputs.py`はTIGERsプロセスへの`strace`接続にsudoの対話認証を要求したため実行していません。受入テスト内の比較測定は完了しています。
 
