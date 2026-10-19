@@ -1,4 +1,4 @@
-﻿using Aspire.Hosting;
+using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
@@ -197,6 +197,33 @@ public sealed class AppHostApplicationModelTests
 
         Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
         Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
+    }
+
+    [Fact]
+    public async Task CustomCraneTeamNameIsSharedByCraneAndGameController()
+    {
+        const string teamName = "custom_crane_team";
+        using var appHost = await CreateAppHostAsync("--Testing:Crane:TeamName=" + teamName);
+
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
+
+        Assert.Contains($"team:={teamName}", crane.ContainerArguments[^1]);
+        Assert.Equal(teamName, gameController.ExpectedCraneTeamName);
+    }
+
+    [Theory]
+    [InlineData("crane team")]
+    [InlineData("crane;touch_tmp")]
+    [InlineData("crane$(id)")]
+    public async Task CraneTeamNameRejectsWhitespaceAndShellSyntax(string teamName)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            using var appHost = await CreateAppHostAsync("--Testing:Crane:TeamName=" + teamName);
+        });
+
+        Assert.Contains("Testing:Crane:TeamName", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

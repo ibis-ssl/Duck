@@ -15,7 +15,7 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
     private readonly RefereeReadinessState state;
     private readonly string expectedYellowTeamName;
     private readonly Task receiveLoop;
-    private bool teamNameConfigurationSent;
+    private readonly GameControllerTeamNameRetryPolicy teamNameConfigurationRetry = new();
 
     public GameControllerReadinessMonitor(int expectedInitialCommand, string expectedYellowTeamName)
     {
@@ -46,11 +46,10 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
             await webSocket.ConnectAsync(new Uri("ws://127.0.0.1:8082/api/control"), timeout.Token);
             if (!state.HasExpectedYellowTeamName)
             {
-                if (!teamNameConfigurationSent)
+                if (teamNameConfigurationRetry.TryBeginSend(DateTimeOffset.UtcNow, expectedNameObserved: false))
                 {
                     await new Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient()
                         .SendYellowTeamNameAsync(expectedYellowTeamName, timeout.Token);
-                    teamNameConfigurationSent = true;
                 }
 
                 return false;
@@ -80,6 +79,27 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
         cancellation.Dispose();
     }
 
+    internal static void ObserveRefereePacket(
+        RefereeReadinessState readinessState,
+        global::Referee referee,
+        DateTimeOffset receivedAt)
+    {
+        ArgumentNullException.ThrowIfNull(readinessState);
+        ArgumentNullException.ThrowIfNull(referee);
+
+        if (referee.HasCommand)
+        {
+            readinessState.Observe(
+                (int)referee.Command,
+                receivedAt,
+                referee.Yellow?.Name ?? string.Empty);
+        }
+        else
+        {
+            readinessState.Observe(-1, receivedAt);
+        }
+    }
+
     private async Task ReceiveAsync(CancellationToken cancellationToken)
     {
         var buffer = new byte[65_535];
@@ -90,14 +110,7 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
             {
                 var result = await socket.ReceiveFromAsync(buffer, SocketFlags.None, remote, cancellationToken);
                 var referee = global::Referee.Parser.ParseFrom(buffer.AsSpan(0, result.ReceivedBytes));
-                if (referee.HasCommand)
-                {
-                    state.Observe((int)referee.Command, DateTimeOffset.UtcNow, referee.Yellow.Name);
-                }
-                else
-                {
-                    state.Observe(-1, DateTimeOffset.UtcNow);
-                }
+                ObserveRefereePacket(state, referee, DateTimeOffset.UtcNow);
             }
             catch (InvalidProtocolBufferException)
             {
@@ -111,6 +124,32 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
             {
                 return;
             }
+        }
+    }
+}
+
+internal sealed class GameControllerTeamNameRetryPolicy(
+    int maximumAttempts = 3,
+    TimeSpan? retryInterval = null)
+{
+    private readonly object gate = new();
+    private readonly TimeSpan retryInterval = retryInterval ?? TimeSpan.FromSeconds(1);
+    private DateTimeOffset? lastAttemptAt;
+    private int attempts;
+
+    public bool TryBeginSend(DateTimeOffset now, bool expectedNameObserved)
+    {
+        lock (gate)
+        {
+            if (expectedNameObserved || attempts >= maximumAttempts ||
+                (lastAttemptAt is { } previous && now - previous < retryInterval))
+            {
+                return false;
+            }
+
+            attempts++;
+            lastAttemptAt = now;
+            return true;
         }
     }
 }

@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using Duck.Testing.AppHost;
 
 namespace Tracker.Tests;
@@ -44,6 +45,47 @@ public sealed class RefereeReadinessStateTests
         state.Observe(command: 1, now.AddSeconds(2), yellowTeamName: "crane");
         Assert.True(state.HasExpectedYellowTeamName);
         Assert.True(state.IsHealthy(now.AddSeconds(2)));
+    }
+
+    [Fact]
+    public void MissingYellowTeamPacketIsUnhealthyAndAValidPacketRecoversReadiness()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var state = new RefereeReadinessState(
+            expectedInitialCommand: (int)Referee.Types.Command.Halt,
+            expectedYellowTeamName: "crane");
+        var missingYellowPacket = global::Referee.Parser.ParseFrom(
+            new global::Referee { Command = Referee.Types.Command.Halt }.ToByteArray());
+
+        GameControllerReadinessMonitor.ObserveRefereePacket(state, missingYellowPacket, now);
+
+        Assert.True(state.IsCommandHealthy(now));
+        Assert.False(state.HasExpectedYellowTeamName);
+        Assert.False(state.IsHealthy(now));
+
+        var validPacket = new global::Referee
+        {
+            Command = Referee.Types.Command.NormalStart,
+            Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+        };
+        GameControllerReadinessMonitor.ObserveRefereePacket(state, validPacket, now.AddSeconds(1));
+
+        Assert.True(state.HasExpectedYellowTeamName);
+        Assert.True(state.IsHealthy(now.AddSeconds(1)));
+    }
+
+    [Fact]
+    public void TeamNameConfigurationRetriesAtIntervalsThenStopsAndConfirmationSuppressesFurtherSends()
+    {
+        var policy = new GameControllerTeamNameRetryPolicy();
+        var now = DateTimeOffset.UtcNow;
+
+        Assert.True(policy.TryBeginSend(now, expectedNameObserved: false));
+        Assert.False(policy.TryBeginSend(now.AddMilliseconds(999), expectedNameObserved: false));
+        Assert.True(policy.TryBeginSend(now.AddSeconds(1), expectedNameObserved: false));
+        Assert.True(policy.TryBeginSend(now.AddSeconds(2), expectedNameObserved: false));
+        Assert.False(policy.TryBeginSend(now.AddSeconds(3), expectedNameObserved: false));
+        Assert.False(policy.TryBeginSend(now.AddSeconds(4), expectedNameObserved: true));
     }
 
     [Fact]

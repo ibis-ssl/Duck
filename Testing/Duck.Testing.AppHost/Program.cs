@@ -49,6 +49,13 @@ var craneImageTag =
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
 var craneTeamName = builder.Configuration["Testing:Crane:TeamName"] ?? "crane";
+if (string.IsNullOrWhiteSpace(craneTeamName) ||
+    craneTeamName.Any(character =>
+        !char.IsAsciiLetterOrDigit(character) && character is not '_' and not '-'))
+{
+    throw new InvalidOperationException(
+        "Testing:Crane:TeamName must contain only ASCII letters, digits, underscores, or hyphens.");
+}
 var craneTeamColor = builder.Configuration["Testing:Crane:TeamColor"] ?? "YELLOW";
 if (craneTeamColor is not "YELLOW" and not "BLUE")
 {
@@ -101,7 +108,8 @@ var gameController = builder.AddDockerWrapper(
         stackId),
     39102,
     "app",
-    "game-controller");
+    "game-controller",
+    expectedCraneTeamName: craneTeamName);
 
 IResourceBuilder<ExecutableResource>? cm4Simulator = null;
 if (useCm4Simulator)
