@@ -81,7 +81,9 @@ public static class DockerContainerWrapper
         using var healthCancellation = new CancellationTokenSource();
         var healthTask = ServeHealthAsync(health, live, ready, healthCancellation.Token);
         await using var gameControllerReadiness = options.ReadinessProfile == "game-controller"
-            ? new GameControllerReadinessMonitor(expectedInitialCommand: 0)
+            ? new GameControllerReadinessMonitor(
+                expectedInitialCommand: 0,
+                expectedYellowTeamName: options.ExpectedCraneTeamName ?? "crane")
             : null;
         await using var visionReadiness = options.ReadinessProfile == "simulator"
             ? new VisionServiceReadiness()
@@ -409,7 +411,9 @@ public static class DockerContainerWrapper
                 var probeTimer = Stopwatch.StartNew();
                 var graph = await RunDockerAsync(
                     options.DockerExecutable,
-                    DockerServiceReadiness.CreateCraneReadinessProbeArguments(containerId),
+                    DockerServiceReadiness.CreateCraneReadinessProbeArguments(
+                        containerId,
+                        options.ExpectedCraneTeamName ?? "crane"),
                     cancellationToken);
                 if (craneProbeDiagnostics is null)
                 {

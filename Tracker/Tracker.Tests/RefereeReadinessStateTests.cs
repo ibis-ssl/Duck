@@ -24,6 +24,29 @@ public sealed class RefereeReadinessStateTests
     }
 
     [Fact]
+    public void GameControllerWaitsForExactYellowTeamNameBeforeReportingHealthy()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var state = new RefereeReadinessState(
+            expectedInitialCommand: 0,
+            freshnessWindow: TimeSpan.FromSeconds(3),
+            expectedYellowTeamName: "crane");
+
+        state.Observe(command: 0, now, yellowTeamName: "Unknown");
+        Assert.True(state.IsCommandHealthy(now));
+        Assert.False(state.HasExpectedYellowTeamName);
+        Assert.False(state.IsHealthy(now));
+
+        state.Observe(command: 0, now.AddSeconds(1), yellowTeamName: "Crane");
+        Assert.False(state.HasExpectedYellowTeamName);
+        Assert.False(state.IsHealthy(now.AddSeconds(1)));
+
+        state.Observe(command: 1, now.AddSeconds(2), yellowTeamName: "crane");
+        Assert.True(state.HasExpectedYellowTeamName);
+        Assert.True(state.IsHealthy(now.AddSeconds(2)));
+    }
+
+    [Fact]
     public void UnknownOrStaleCommandIsUnhealthyAndNewGenerationMustSeeHaltAgain()
     {
         var now = DateTimeOffset.UtcNow;

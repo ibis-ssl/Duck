@@ -1,6 +1,6 @@
 # 全体試験でCraneのチーム認識と審判の動作状態を安定させる
 
-- 状態: 実装予定／未実装／未検証（このPRの初期Draft時点）
+- 状態: 実装済み。AppHost build、全体受入テストbuild、Focused 47/47、Tracker.Tests 440/440、全体受入2/2を確認。
 - Issue: #75（親 #18）
 - 関連: #37、#41、PR #74
 - base: `design/issue18-aspire-test-orchestration`
@@ -9,30 +9,30 @@
 
 ## 変更前の困り事
 
-全体受入テストは `Halt → PrepareKickoffYellow → NormalStart` を一度確認した後、Vision入力からYellowロボットが100 mm以上動くまで待つ。今回の保存ログではGame Controllerが配信するチーム名が `Unknown` のままで、Craneが自チームを認識したことを確かめないまま試験が進んだ。また、AutoRefの提案適用後にGame ControllerがHaltへ戻ったが、試験はactive状態の中断を捉えず、最後に `UDP_MOTION_FAILURE` を記録した。
+全体受入テストは初期HALTを確認した後、GameControllerのチーム名が `Unknown` のままCraneを起動し、Vision入力からYellowロボットが100 mm以上動くまで待っていた。以前の保存ログには、ER-Force AutoRefの提案適用後にGameControllerがHaltへ戻り、最後に `UDP_MOTION_FAILURE` が記録された形跡もある。
 
 ## できること
 
-試験開始前に、Game Controllerが配信するチーム情報にチーム名 `crane` があり、Craneが自チームとして認識したことを確認する。チーム色の設定はチーム名とは別の条件として扱う。移動試験中はactive審判状態を監視し、AutoRef提案によるHaltを試験用設定で避ける。active状態が失われた場合は移動タイムアウトと区別して記録する。
+試験用構成ではCraneのteam引数をチーム名 `crane` にし、色は別の `team_color` 引数で指定する。GameControllerのreferee datagramでYellowのチーム名が `crane` になるまでreadyとせず、Crane側のROS parameterも確認する。受入テストは移動を始める前にGameControllerのチーム名を検証する。
 
 ## 動作の要点
 
-1. 固定Game Controller 3.20.3イメージでチーム名の設定方法とAutoRef提案の制御方法を確認する。既存checkoutのGame Controller submoduleは `v3.20.3-5-g9b0765f` で、イメージと一致するか未確認である。既存Crane実装の大小文字・照合仕様も未確認なので、推測でAPIや名前を決めない。
-2. チーム情報に `crane` が含まれること、審判データグラムで配信されること、Craneが自チームを認識することを試験前に実測する。認識できなければ移動試験を開始しない。`team:=Yellow` 等の色設定とは分ける。
-3. AutoRef提案でactive状態が終了しないよう、実イメージでサポートを確認した試験専用設定を使う。
-4. Yellowロボットの100 mm条件を確認する間、active審判状態とVisionを継続観測する。状態が失われた場合はreferee command/counterとともに専用の失敗理由を残す。
-5. Duck tracker受信、既存の比較測定、今回の試験用stackのcleanupも確認する。
+1. 固定版GameController 3.20.3の公式APIと固定Craneイメージのlaunch helpを確認した。以前の `team:=Yellow` は色指定ではなく、チーム名に `Yellow` を設定する誤設定だった。Craneの `team` はチーム名、`team_color` は初期色であり、今回の起動値は `team:=crane team_color:=YELLOW` とした。
+2. AppHostは `Testing:Crane:TeamName` と `Testing:Crane:TeamColor` を分けて読み、既定値を `crane` と `YELLOW` にした。起動後のprobeは `/world_model_publisher` の `team_name` が期待値に一致することと既存coordinatorを確認する。
+3. GameController readiness monitorはHALTを受信した後に公式 `UpdateTeamState` control APIでYellowの名前を設定し、配信datagramに期待名が現れるまでhealthyにしない。
+4. UDP adapterはYellowのteam nameをsnapshotに保持する。全体受入テストは初期HALT後、active状態へ進む前にチーム名 `crane` をassertする。
+5. 手動base-mode起動ではcomparison resourcesがなく、TIGERs/ER-Forceの入力検査とAppHost process recordの検査が失敗した。AppHostをcomparison modeで起動し、必要なprocess recordも作成して再実行すると、readiness helperと全体受入2/2が成功した。refereeはHALT→PrepareKickoffYellow→NormalStartへ進み、Yellow robotの移動100.31528 mmとDuck・TIGERs・ER-Forceのtracker入力を記録した。
 
 ## 対象外/後続
 
-本番の試合設定、Game Controller/AutoRef本体、Tracker UI、#41のsnapshot pair・時刻差表示は変更しない。親設計が要求する時刻差警告も対象外。依存、権限、ネットワーク設定を変更しない。
+本番の試合設定、GameController/AutoRef本体、Tracker UI、#41のsnapshot pair・時刻差表示は変更しない。依存、権限、ネットワーク設定も変更しない。AutoRef提案を抑止する設定やactive審判状態を移動中に別途監視する変更は今回実装していない。受入ではAutoRefによるHaltを観測せず、移動条件を達成した。
 
 ## 検証済み/未検証
 
-今回のログにはUnknownチーム名を示すCrane警告、ER-Force AutoRefの提案、提案適用後のHaltが記録されている。PR73の成功記録（親提示のCI39186264332、WSL Yellow 103.76 mm）は参考となる過去証拠であり、この作業ではraw artifact未照合である。
+固定Craneイメージのlaunch helpは `team` をチーム名、`team_color` を初期referee colorと説明する。隔離した実イメージ起動では `/world_model_publisher` の `team_name` が `crane`、`initial_team_color` が `YELLOW` と返ることを実測した。固定GameController v3.20.3のAPIにはYellow向け `UpdateTeamState.team_name` がある。AppHost build、`RunAspireFullStackAcceptance=true` を指定したTracker.Tests build、Focused suite 47/47、Tracker.Tests 440/440、comparison mode readiness、全体受入2/2が成功した。全体受入ではYellow robot 100.31528 mmと3系統のtracker入力を確認した。ビルド警告はNU1902（MessagePack 2.5.302）とASPIRE010（Aspire CLI bundle無効）。
 
-Game Controller 3.20.3イメージのAPI、Craneのチーム名照合仕様、変更後の全体受入成功は未検証。初期Draft PR時点で実装・検証は行っていない。
+比較measurementでは5秒の入力窓でDuck 150 frames、TIGERs 800 frames、ER-Force 1000 frames、Vision 313 packetsを取得した。evaluation 1000 callsのP50は158.173 µs、P95は283.204 µs。実行ログと `acceptance-result.json` は `artifacts/aspire-full-stack-comparison-local` に保存した。AppHost停止後、今回のstackに属するコンテナはDockerから削除され、AppHost PIDは終了した。
 
 ## 必要判断と影響
 
-実イメージ・既存実装で確かめた方法だけを採用する。試験専用構成とコードに限定し、本番試合設定やIssue #41の機能実装へ影響させない。もし固定イメージで必要な制御方法が確認できなければ、推測で設定せず追加調査結果を記録する。
+この変更は試験用構成とreferee test adapterに限定する。全体受入では指定したチーム名、active refereeへの遷移、100 mm以上の移動、比較用tracker/vision経路を確認した。試験専用設定以外の動作は変更していない。

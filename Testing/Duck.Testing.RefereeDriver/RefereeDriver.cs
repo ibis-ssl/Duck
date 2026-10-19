@@ -1,8 +1,9 @@
-﻿namespace Duck.Testing.RefereeDriver;
+namespace Duck.Testing.RefereeDriver;
 
 public sealed record RefereeCommandSnapshot(
     Referee.Types.Command Command,
-    uint CommandCounter);
+    uint CommandCounter,
+    string YellowTeamName = "");
 
 public enum GameControllerContinueAction
 {

@@ -16,7 +16,8 @@ public sealed record DockerWrapperLaunchOptions(
     int LogFollowerReapTimeoutMilliseconds = 2000,
     string? CraneDiagnosticsPath = null,
     string? ExpectedTrackerSourceName = null,
-    DockerContainerMount[]? Mounts = null);
+    DockerContainerMount[]? Mounts = null,
+    string? ExpectedCraneTeamName = null);
 
 public sealed record DockerWrapperLaunchOptionsAnnotation(DockerWrapperLaunchOptions Options)
     : Aspire.Hosting.ApplicationModel.IResourceAnnotation;

@@ -15,7 +15,8 @@ public static class DockerWrapperResourceExtensions
         string expectedProcessName,
         string readinessProfile = "process",
         int startupTimeoutSeconds = 180,
-        string? expectedTrackerSourceName = null)
+        string? expectedTrackerSourceName = null,
+        string? expectedCraneTeamName = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(spec);
@@ -33,6 +34,7 @@ public static class DockerWrapperResourceExtensions
             StartupTimeoutSeconds: startupTimeoutSeconds,
             ExpectedTrackerSourceName: expectedTrackerSourceName,
             Mounts: spec.Mounts.ToArray(),
+            ExpectedCraneTeamName: expectedCraneTeamName,
             CraneDiagnosticsPath: readinessProfile == "crane" &&
                 !string.IsNullOrWhiteSpace(builder.Configuration["Testing:Crane:DiagnosticsPath"])
                 ? Path.GetFullPath(builder.Configuration["Testing:Crane:DiagnosticsPath"]!)

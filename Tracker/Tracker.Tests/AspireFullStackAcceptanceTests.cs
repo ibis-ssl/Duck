@@ -74,6 +74,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     $"REFEREE_FIXTURE_FAILURE: expected initial HALT, observed {initial.Command}.");
             }
 
+            Assert.True(
+                string.Equals(initial.YellowTeamName, "crane", StringComparison.Ordinal),
+                $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name 'crane' before starting motion, observed '{initial.YellowTeamName}'.");
+            output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
+
             SSL_WrapperPacket initialVision;
             stageReached = "initial_vision_wait";
             try

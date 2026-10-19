@@ -2,8 +2,8 @@ namespace Duck.Testing.AppHost;
 
 public static class DockerServiceReadiness
 {
-    public static string[] CreateCraneReadinessProbeArguments(string containerId) =>
-        CraneProbeDiagnostics.CreateCraneReadinessProbeArguments(containerId);
+    public static string[] CreateCraneReadinessProbeArguments(string containerId, string expectedTeamName) =>
+        CraneProbeDiagnostics.CreateCraneReadinessProbeArguments(containerId, expectedTeamName);
 
     public static string[] CreateCm4SimListenerProbeArguments(string containerId) =>
     [

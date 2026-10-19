@@ -134,7 +134,7 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Theory]
-    [InlineData("crane", "ros2", "exec container-id timeout --signal=TERM --kill-after=2s 10s bash -lc source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list")]
+    [InlineData("crane", "ros2", "ros2 param get /world_model_publisher team_name")]
     [InlineData("cm4-sim", "cm4_sim", "exec container-id sh -c")]
     public async Task ExpectedProcessWithoutServicePredicatePreventsReadiness(
         string profile,
@@ -301,12 +301,17 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Fact]
-    public void CraneReadinessProbeIsBoundedAndPreservesTheCoordinatorGraphCheck()
+    public void CraneReadinessProbeIsBoundedAndRequiresTeamIdentityAndCoordinator()
     {
+        var arguments = DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id", "crane");
         Assert.Equal(
-            ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc",
-                "source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list"],
-            DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id"));
+            ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc"],
+            arguments[..^3]);
+        Assert.Contains("DUCK_CRANE_ROS_SETUP_OK", arguments[^3]);
+        Assert.Contains("ros2 param get /world_model_publisher team_name", arguments[^3]);
+        Assert.Contains("DUCK_CRANE_TEAM_NAME_MISMATCH", arguments[^3]);
+        Assert.Contains("exec ros2 node list", arguments[^3]);
+        Assert.Equal(["bash", "crane"], arguments[^2..]);
         Assert.False(CraneProbeDiagnostics.Evaluate(124, "/session_controller\n", "", TimeSpan.FromSeconds(10)).Ready);
         Assert.False(CraneProbeDiagnostics.Evaluate(0, "/session_controller\n", "", TimeSpan.Zero).Ready);
         Assert.False(CraneProbeDiagnostics.Evaluate(0,
@@ -669,7 +674,7 @@ public sealed class DockerContainerWrapperLifecycleTests
                 : "  exec) count=$(cat '" + craneProbeCountPath + "' 2>/dev/null || echo 0); " +
                 "count=$((count + 1)); echo \"$count\" > '" + craneProbeCountPath + "'; " +
                     "if [ \"$count\" -le " + craneProbeTimeoutResponses + " ]; then echo 'password=CRANE_DIAGNOSTIC_SENTINEL' >&2; exit 124; fi; " +
-                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\n/session_controller\\n' ;;";
+                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\nDUCK_CRANE_TEAM_NAME_OK:crane\\n/session_controller\\n' ;;";
             ExecutablePath = Path.Combine(directory, "docker-fake");
             var createDelay = slowCreate ? "sleep 20" : ":";
             File.WriteAllText(ExecutablePath, string.Join('\n',

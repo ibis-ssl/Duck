@@ -175,7 +175,8 @@ public sealed class AppHostApplicationModelTests
 
         var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
         Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", crane.Image);
-        Assert.Contains("team:=Yellow", crane.ContainerArguments[^1]);
+        Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
+        Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
         Assert.Equal("visibility_graph", crane.Environment["PLANNER"]);
         Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
         Assert.Equal(360, crane.StartupTimeoutSeconds);
@@ -186,6 +187,16 @@ public sealed class AppHostApplicationModelTests
         AssertArgumentValue(ToSpec(cm4Simulator).CreateRunArguments(), "--network", "host");
         AssertArgumentValue(cm4Simulator.ContainerArguments, "--in-port", "12345");
         AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "12346");
+    }
+
+    [Fact]
+    public async Task CraneLaunchUsesCraneTeamNameAndSeparateYellowColor()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+
+        Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
+        Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
     }
 
     [Fact]

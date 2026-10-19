@@ -13,11 +13,15 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
     private readonly CancellationTokenSource cancellation = new();
     private readonly Socket socket;
     private readonly RefereeReadinessState state;
+    private readonly string expectedYellowTeamName;
     private readonly Task receiveLoop;
+    private bool teamNameConfigurationSent;
 
-    public GameControllerReadinessMonitor(int expectedInitialCommand)
+    public GameControllerReadinessMonitor(int expectedInitialCommand, string expectedYellowTeamName)
     {
-        state = new RefereeReadinessState(expectedInitialCommand);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedYellowTeamName);
+        this.expectedYellowTeamName = expectedYellowTeamName;
+        state = new RefereeReadinessState(expectedInitialCommand, expectedYellowTeamName: expectedYellowTeamName);
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         socket.Bind(new IPEndPoint(IPAddress.Any, RefereePort));
@@ -29,7 +33,7 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
 
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken)
     {
-        if (!state.IsHealthy(DateTimeOffset.UtcNow))
+        if (!state.IsCommandHealthy(DateTimeOffset.UtcNow))
         {
             return false;
         }
@@ -40,7 +44,19 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
         try
         {
             await webSocket.ConnectAsync(new Uri("ws://127.0.0.1:8082/api/control"), timeout.Token);
-            return webSocket.State == WebSocketState.Open;
+            if (!state.HasExpectedYellowTeamName)
+            {
+                if (!teamNameConfigurationSent)
+                {
+                    await new Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient()
+                        .SendYellowTeamNameAsync(expectedYellowTeamName, timeout.Token);
+                    teamNameConfigurationSent = true;
+                }
+
+                return false;
+            }
+
+            return state.IsHealthy(DateTimeOffset.UtcNow) && webSocket.State == WebSocketState.Open;
         }
         catch (Exception exception) when (exception is WebSocketException or OperationCanceledException)
         {
@@ -76,7 +92,7 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
                 var referee = global::Referee.Parser.ParseFrom(buffer.AsSpan(0, result.ReceivedBytes));
                 if (referee.HasCommand)
                 {
-                    state.Observe((int)referee.Command, DateTimeOffset.UtcNow);
+                    state.Observe((int)referee.Command, DateTimeOffset.UtcNow, referee.Yellow.Name);
                 }
                 else
                 {
