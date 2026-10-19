@@ -89,6 +89,16 @@ public sealed class RefereeReadinessStateTests
     }
 
     [Fact]
+    public void TeamNameConfigurationSuppressesRetryImmediatelyAfterExpectedNameIsObserved()
+    {
+        var policy = new GameControllerTeamNameRetryPolicy();
+        var now = DateTimeOffset.UtcNow;
+
+        Assert.True(policy.TryBeginSend(now, expectedNameObserved: false));
+        Assert.False(policy.TryBeginSend(now.AddSeconds(1), expectedNameObserved: true));
+    }
+
+    [Fact]
     public void UnknownOrStaleCommandIsUnhealthyAndNewGenerationMustSeeHaltAgain()
     {
         var now = DateTimeOffset.UtcNow;
