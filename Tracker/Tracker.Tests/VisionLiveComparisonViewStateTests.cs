@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Net;
 using System.Reflection;
 using Tracker.Core;
@@ -1046,6 +1046,10 @@ public class VisionLiveComparisonViewStateTests
 
         var composer = new VisionLiveComparisonSnapshotComposer();
         var renderSnapshot = CaptureRenderSnapshot(store, externalTrackerManager: manager);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("TIGERs", "tigers-id", frameNumber: 31, timestampNs: 30_000, ballCount: 2, robotCount: 2),
+            new IPEndPoint(IPAddress.Parse("192.0.2.41"), 12010),
+            sampledAt);
         var initialViewState = composer.CreateViewState(renderSnapshot);
         var tigers = Assert.Single(initialViewState.SourceOptions, option => option.Label == "TIGERs");
         var erForce = Assert.Single(initialViewState.SourceOptions, option => option.Label == "ER-FORCE");
@@ -1068,6 +1072,10 @@ public class VisionLiveComparisonViewStateTests
         Assert.Equal(20_000L, GetValue(difference!, "ReferenceTimestampNs"));
         Assert.Equal(25_000L, GetValue(difference!, "ComparisonTimestampNs"));
         Assert.Equal(5_000L, GetValue(difference!, "TimestampDeltaNs"));
+        Assert.Equal(TimeSpan.FromMilliseconds(20), GetValue(difference!, "ReferenceSnapshotAge"));
+        Assert.Equal(TimeSpan.FromMilliseconds(10), GetValue(difference!, "ComparisonSnapshotAge"));
+        Assert.Equal(TrackerDifferencePairStatus.Compared, GetValue(difference!, "Status"));
+        Assert.NotNull(GetValue(difference!, "Difference"));
         Assert.Equal(sampledAt.AddMilliseconds(-20), GetValue(difference!, "ReferenceReceivedAt"));
         Assert.Equal(sampledAt.AddMilliseconds(-10), GetValue(difference!, "ComparisonReceivedAt"));
 
@@ -1076,10 +1084,17 @@ public class VisionLiveComparisonViewStateTests
         Assert.Equal(renderSnapshot.RenderTickId, GetValue(difference!, "RenderTickId"));
         Assert.Equal("TIGERs", splitLayers[0].SourceLabel);
         Assert.Equal("ER-FORCE", splitLayers[1].SourceLabel);
-        Assert.Single(overlayLayers);
+        Assert.Equal(20_000L, splitLayers[0].Details.TimestampNs);
+        Assert.Equal(25_000L, splitLayers[1].Details.TimestampNs);
+        Assert.Equal(sampledAt.AddMilliseconds(-20), splitLayers[0].SourceReceivedAt);
+        Assert.Equal(sampledAt.AddMilliseconds(-10), splitLayers[1].SourceReceivedAt);
+        Assert.Collection(overlayLayers,
+            layer => Assert.Equal("TIGERs", layer.SourceLabel),
+            layer => Assert.Equal("ER-FORCE", layer.SourceLabel));
         Assert.Single(splitLayers[0].Field.Balls);
         Assert.Single(splitLayers[1].Field.Balls);
     }
+
     private sealed record VisionLayerContract(
         Type SourceKindType,
         Type SourceOptionType,
