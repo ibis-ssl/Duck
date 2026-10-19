@@ -1,5 +1,35 @@
 ﻿# PR #74 独立レビュー報告
 
+## 再レビュー（2026-10-19 21時 JST）
+
+- 対象PR: https://github.com/ibis-ssl/Duck/pull/74
+- 再レビュー時の対象HEAD: `9ebd2d8a03ff6a785cc21d7add0cef1fe2216801`。初回 `845b08b4ad9ae057213640de31946e7627a2de06` からの追加コミット `fix: preserve configured live comparison selections` を独立確認。
+- 差分: 新コミットは `Home.razor` / `VisionLiveDisplaySnapshotProvider.cs` / `RuntimeHostDebugHostReadSideSnapshotBoundaryTests.cs` の3ファイル、追加156行・削除8行。
+- **再レビュー判定: 前回P2指摘2件の修正を確認。新たなコード上の確定指摘なし。** ただし設計の時刻差警告は未実装、実入力UIとLinux full-stackは未検証であり、マージ判断上の留保として明記する。
+
+### 前回指摘との照合
+
+1. **距離ゲート設定キー [P2→解消]**: `Home.razor` の読み込み先を `TrackerComparison:BallDistanceGateMeters` に統一。`appsettings.json` と比較healthで使う既存キーに一致。追加の `HomeLiveComparison_UsesTheConfiguredTrackerComparisonGate` はソースで同じキーを検査し、`LiveComparisonProvider_UsesConfiguredNonDefaultBallDistanceGate` は5 m指定と3 m離れた球のマッチングをプロバイダーで確認する。ホーム側の値渡しも差分で照合。
+2. **外部tracker消失時のRawフォールバック [P2→解消]**: `VisionLiveDisplaySnapshotProvider.FindSourceOption` が前回選択キーと一致するtracked/third-party sourceを、`IsAvailable=false` のmissingとして維持し選択肢へ追加する。`Home.razor` は前回のA/B選択をfallbackとして渡す。追加の `LiveComparisonProvider_PreservesSelectedThirdPartySourceWhenUnavailableAndRestoresIt` はTIGERsだけ不在・ER-FORCE生存と、その後の復帰を検査し、`MissingComparisonFrame`→`Compared` を確認する。
+
+### 検証
+
+- 指定HEAD一致CI: [run 39248430370](https://github.com/ibis-ssl/Duck/actions/runs/39248430370), `headSha=9ebd2d8a03ff6a785cc21d7add0cef1fe2216801`, `test=success`, `ASPIRE-NET-002 Linux packet flow=skipped`, `ASPIRE full-stack Linux acceptance=skipped`。
+- 独立ローカルテスト: submoduleが既に揃ったレビュー専用クローンを指定HEADのdetached checkoutにし、`.NET 10` のReleaseで `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests|FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~TrackerDifferenceCalculatorTests"` を実行。TRXに **29成功、0失敗、0skip** を確認。出力記録: `Duck-pr74-rereview-test.stdout.log` / `Duck-pr74-rereview-test.stderr.log` / `Duck-pr74-test-results/pr74-rereview-9ebd2d8.trx`（ローカル作業ディレクトリ）。
+- 診断artifact: 指定HEADの `.github/workflows/dotnet-test.yml` にテスト結果・stdout・stderr・診断ログを保存する既存の `upload-artifact` があるため追記不要。
+- Markdown: 変更ファイルの `reports/issue41-aspire-006d-plan-20261019.md` は前回から差分なし。固定版 `yomiyasu_lint.py --json` で再実行し **95/100**、`excess_list` 警告1件（箇条書き8/14行、57.1%）を確認。設計書ではなくreportファイルであり、従来の正式Markdown lintの対象外。
+- 差分静的確認: 修正コミットの `git diff --check` で空白エラーなし。
+
+### 未解消事項・判定の留保
+
+- `Tracker/Design/Testing/tracker-comparison-debug-design.md` の『時刻差を設定閾値で評価して警告する』は今回の変更でも未実装。Issue検索では新規専用Issueを確認できず、関連追跡の整理が必要。親設計上の残件として範囲切り分けを求める。
+- 実際のライブ受信を伴うブラウザUI一致とLinux full-stack acceptanceは独立検証未実施。CI skipを成功扱いしない。
+- これは実装担当の自己レビューではなく、対象HEADと修正差分・前回報告との照合結果。レビュー本体PRへ製品コードの編集やマージはしていない。
+
+---
+
+## 初回レビュー（対象 `845b08b4...`）
+
 - 実施日: 2026-10-19 (JST)
 - 対象: https://github.com/ibis-ssl/Duck/pull/74
 - 固定 HEAD: `845b08b4ad9ae057213640de31946e7627a2de06`
