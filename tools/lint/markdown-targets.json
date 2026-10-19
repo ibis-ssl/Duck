@@ -1,8 +1,10 @@
 {
   "ignoreDirectories": [
+    ".agents",
     ".git",
     ".codex-dotnet-home",
     ".codex-nuget-packages",
+    ".venv",
     "bin",
     "node_modules",
     "obj",
