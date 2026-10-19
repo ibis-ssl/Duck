@@ -1026,6 +1026,60 @@ public class VisionLiveComparisonViewStateTests
         return new TrackerPacketAdapter(packet);
     }
 
+    /// <summary>
+    /// Numeric comparison uses the same selected tracker pair and render tick as Split / Overlay.
+    /// </summary>
+    [Fact]
+    public void VisionLiveComparisonViewState_TrackerDifferenceUsesSelectedSnapshotsAndShowsTimestampDelta()
+    {
+        var store = new VisionPacketStore();
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis");
+        var sampledAt = new DateTimeOffset(2026, 5, 14, 8, 0, 0, TimeSpan.Zero);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("TIGERs", "tigers-id", frameNumber: 11, timestampNs: 20_000, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.41"), 12010),
+            sampledAt.AddMilliseconds(-20));
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", "erforce-id", frameNumber: 21, timestampNs: 25_000, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.42"), 12010),
+            sampledAt.AddMilliseconds(-10));
+
+        var composer = new VisionLiveComparisonSnapshotComposer();
+        var renderSnapshot = CaptureRenderSnapshot(store, externalTrackerManager: manager);
+        var initialViewState = composer.CreateViewState(renderSnapshot);
+        var tigers = Assert.Single(initialViewState.SourceOptions, option => option.Label == "TIGERs");
+        var erForce = Assert.Single(initialViewState.SourceOptions, option => option.Label == "ER-FORCE");
+        var selectedViewState = initialViewState with
+        {
+            Mode = VisionLiveComparisonMode.Overlay,
+            LayerASelection = new VisionLiveComparisonLayerSelection(tigers, IsVisible: true),
+            LayerBSelection = new VisionLiveComparisonLayerSelection(erForce, IsVisible: true),
+        };
+
+        var differenceProperty = typeof(VisionLiveComparisonViewState).GetProperty("TrackerDifference");
+        Assert.NotNull(differenceProperty);
+        var difference = differenceProperty!.GetValue(selectedViewState);
+        Assert.NotNull(difference);
+        Assert.Equal(renderSnapshot.RenderTickId, GetValue(difference!, "RenderTickId"));
+        Assert.Equal("TIGERs", GetValue(difference!, "ReferenceLabel"));
+        Assert.Equal("ER-FORCE", GetValue(difference!, "ComparisonLabel"));
+        Assert.Equal(11u, GetValue(difference!, "ReferenceFrameNumber"));
+        Assert.Equal(21u, GetValue(difference!, "ComparisonFrameNumber"));
+        Assert.Equal(20_000L, GetValue(difference!, "ReferenceTimestampNs"));
+        Assert.Equal(25_000L, GetValue(difference!, "ComparisonTimestampNs"));
+        Assert.Equal(5_000L, GetValue(difference!, "TimestampDeltaNs"));
+        Assert.Equal(sampledAt.AddMilliseconds(-20), GetValue(difference!, "ReferenceReceivedAt"));
+        Assert.Equal(sampledAt.AddMilliseconds(-10), GetValue(difference!, "ComparisonReceivedAt"));
+
+        var splitLayers = selectedViewState.CreateSplitLayers();
+        var overlayLayers = selectedViewState.CreateOverlayLayers();
+        Assert.Equal(renderSnapshot.RenderTickId, GetValue(difference!, "RenderTickId"));
+        Assert.Equal("TIGERs", splitLayers[0].SourceLabel);
+        Assert.Equal("ER-FORCE", splitLayers[1].SourceLabel);
+        Assert.Single(overlayLayers);
+        Assert.Single(splitLayers[0].Field.Balls);
+        Assert.Single(splitLayers[1].Field.Balls);
+    }
     private sealed record VisionLayerContract(
         Type SourceKindType,
         Type SourceOptionType,
