@@ -16,16 +16,19 @@ internal static class DebugHostHealthEndpoints
         }
 
         var snapshots = trackerSnapshots.GetSnapshot();
-        var readiness = TrackerComparisonReadiness.Evaluate(
+        var comparison = TrackerDifferenceSnapshotEvaluator.Evaluate(
             snapshots,
             DateTimeOffset.UtcNow,
-            TrackerComparisonReadiness.DefaultFreshnessWindow);
+            TrackerComparisonReadiness.DefaultFreshnessWindow,
+            configuration.GetValue<double>("TrackerComparison:BallDistanceGateMeters", 0.5));
+        var readiness = comparison.Readiness;
         var response = new
         {
             readiness.IsReady,
             readiness.MissingRoles,
             readiness.ConflictingRoles,
             readiness.Sources,
+            comparison.Pairs,
             VisionPacketsReceived = visionPackets.GetSnapshot().PacketCount,
         };
         return readiness.IsReady

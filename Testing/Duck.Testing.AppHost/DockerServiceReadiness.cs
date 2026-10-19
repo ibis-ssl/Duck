@@ -5,6 +5,15 @@ public static class DockerServiceReadiness
     public static string[] CreateCraneReadinessProbeArguments(string containerId) =>
         CraneProbeDiagnostics.CreateCraneReadinessProbeArguments(containerId);
 
+    public static string[] CreateCm4SimListenerProbeArguments(string containerId) =>
+    [
+        "exec", containerId, "sh", "-c",
+        NormalizeShellScriptLineEndings(Cm4SimListenerScript),
+    ];
+
+    public static string NormalizeShellScriptLineEndings(string script) =>
+        script.ReplaceLineEndings("\n");
+
     public static readonly string Cm4SimListenerScript = """
         port_inodes=$(awk '$2 ~ /:3039$/ { print $10 }' /proc/net/udp /proc/net/udp6 2>/dev/null)
         for pid_dir in /proc/[0-9]*; do

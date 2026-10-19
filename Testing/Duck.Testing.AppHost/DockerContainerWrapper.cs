@@ -431,7 +431,7 @@ public static class DockerContainerWrapper
             {
                 var listener = await RunDockerAsync(
                     options.DockerExecutable,
-                    ["exec", containerId, "sh", "-c", DockerServiceReadiness.Cm4SimListenerScript],
+                    DockerServiceReadiness.CreateCm4SimListenerProbeArguments(containerId),
                     cancellationToken);
                 return listener.ExitCode == 0 && DockerServiceReadiness.Cm4SimOwnsListener(listener.StandardOutput);
             }

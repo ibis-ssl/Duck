@@ -3,8 +3,14 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Duck.Testing.RefereeDriver;
 using Google.Protobuf;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Tracker.DebugHost.Tracking;
+using Tracker.DebugHost.Vision;
+using TrackerConnectionLib;
 using Xunit.Abstractions;
 
 namespace Tracker.Tests;
@@ -28,6 +34,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         int? trackerPacketsConsumed = null;
         string? failure = null;
         RobotMotionDelta? observedMovement = null;
+        TrackerComparisonMeasurementEvidence? comparisonMeasurement = null;
         MulticastInterface? selectedMulticastInterface = null;
         UdpMulticastReceiver? refereeReceiver = null;
         UdpMulticastReceiver? visionReceiver = null;
@@ -160,6 +167,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.Equal("ibis", tracker.Uuid);
             Assert.Equal("ibis", tracker.SourceName);
             Assert.NotNull(tracker.TrackedFrame);
+
+            stageReached = "tracker_comparison_measurement";
+            comparisonMeasurement = await MeasureLiveTrackerDifferencePathAsync(
+                trackerReceiver,
+                visionReceiver,
+                timeout.Token);
+            output.WriteLine(
+                $"live tracker comparison measurement: {System.Text.Json.JsonSerializer.Serialize(comparisonMeasurement)}");
         }
         catch (Exception exception)
         {
@@ -169,12 +184,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         finally
         {
             refereeRawDatagramCount = refereeReceiver?.PacketCount ?? 0;
-            if (stageReached is "initial_vision_wait" or "active_referee_transition" or "active_robot_motion_wait" or "duck_tracker_output_wait")
+            if (stageReached is "initial_vision_wait" or "active_referee_transition" or "active_robot_motion_wait" or "duck_tracker_output_wait" or "tracker_comparison_measurement")
             {
                 visionPacketsConsumed = visionReceiver?.PacketCount ?? visionPacketsConsumed;
             }
 
-            if (stageReached == "duck_tracker_output_wait")
+            if (stageReached is "duck_tracker_output_wait" or "tracker_comparison_measurement")
             {
                 trackerPacketsConsumed = trackerReceiver?.PacketCount;
             }
@@ -196,6 +211,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 refereeRawDatagramCount,
                 visionPacketsConsumed,
                 trackerPacketsConsumed,
+                comparisonMeasurement,
                 packetCountSemantics = "Consumed counts record datagrams read by the harness; null means that reader stage was not reached and does not imply network ingress was zero.",
                 receiverSockets = new
                 {
@@ -428,6 +444,185 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    private static async Task<TrackerComparisonMeasurementEvidence> MeasureLiveTrackerDifferencePathAsync(
+        UdpMulticastReceiver trackerReceiver,
+        UdpMulticastReceiver visionReceiver,
+        CancellationToken cancellationToken)
+    {
+        const int measurementWarmupCalls = 100;
+        const int measurementIterations = 1_000;
+        var requestedInputWindow = TimeSpan.FromSeconds(5);
+        var discardedTrackerDatagrams = trackerReceiver.DrainPendingPackets();
+        var discardedVisionDatagrams = visionReceiver.DrainPendingPackets();
+        var trackerCounts = new Dictionary<string, TrackerTrafficCounter>(StringComparer.Ordinal)
+        {
+            ["Duck"] = new(),
+            ["TIGERs"] = new(),
+            ["ER-Force"] = new(),
+        };
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>();
+        using var trackerSnapshotStore = new ExternalTrackerSnapshotStore(manager);
+        var visionPacketStore = new VisionPacketStore();
+        using var inputWindow = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        inputWindow.CancelAfter(requestedInputWindow);
+        var inputTimer = Stopwatch.StartNew();
+        var visionCapture = CaptureVisionPacketsForWindowAsync(
+            visionReceiver,
+            visionPacketStore,
+            inputWindow.Token);
+
+        try
+        {
+            while (true)
+            {
+                var datagram = await trackerReceiver.ReceiveDatagramAsync(inputWindow.Token);
+                var packet = TrackerWrapperPacket.Parser.ParseFrom(datagram.Buffer);
+                var role = ResolveComparisonRole(packet.SourceName);
+                if (role is null)
+                {
+                    continue;
+                }
+
+                trackerCounts[role].Record(packet.TrackedFrame);
+                manager.ProcessPacket(
+                    new TrackerPacketAdapter(packet),
+                    datagram.RemoteEndPoint,
+                    DateTimeOffset.UtcNow);
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            // The fixed live-input sampling window completed.
+        }
+        finally
+        {
+            inputWindow.Cancel();
+            inputTimer.Stop();
+        }
+
+        await visionCapture;
+        cancellationToken.ThrowIfCancellationRequested();
+        Assert.True(inputTimer.Elapsed > TimeSpan.Zero);
+        Assert.All(trackerCounts, entry => Assert.True(
+            entry.Value.TrackedFrameCount > 0,
+            $"No live {entry.Key} tracker frames were captured during the {inputTimer.Elapsed.TotalMilliseconds:F0} ms input window."));
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Testing:Mode"] = "comparison",
+                ["TrackerComparison:BallDistanceGateMeters"] = "0.5",
+            })
+            .Build();
+
+        IResult EvaluateStoreToHealthResult() => DebugHostHealthEndpoints.GetComparisonHealthResult(
+            trackerSnapshotStore,
+            visionPacketStore,
+            configuration);
+
+        IResult? lastResult = null;
+        for (var index = 0; index < measurementWarmupCalls; index++)
+        {
+            lastResult = EvaluateStoreToHealthResult();
+        }
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        var elapsedTicksByCall = new long[measurementIterations];
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        var evaluationTimer = Stopwatch.StartNew();
+        for (var index = 0; index < measurementIterations; index++)
+        {
+            var callStart = Stopwatch.GetTimestamp();
+            lastResult = EvaluateStoreToHealthResult();
+            elapsedTicksByCall[index] = Stopwatch.GetTimestamp() - callStart;
+        }
+
+        evaluationTimer.Stop();
+        var allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+        Array.Sort(elapsedTicksByCall);
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(lastResult);
+        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
+        var response = Assert.IsAssignableFrom<IValueHttpResult>(lastResult).Value;
+        Assert.NotNull(response);
+        var pairs = Assert.IsAssignableFrom<IEnumerable<TrackerDifferencePairResult>>(
+            response.GetType().GetProperty("Pairs")?.GetValue(response));
+        Assert.Equal(3, pairs.Count());
+        var sources = Assert.IsAssignableFrom<IEnumerable<TrackerComparisonSourceStatus>>(
+            response.GetType().GetProperty("Sources")?.GetValue(response));
+        var resolvedRoles = sources.Select(source => source.LogicalRole).ToHashSet(StringComparer.Ordinal);
+        Assert.Contains("Duck", resolvedRoles);
+        Assert.Contains("TIGERs", resolvedRoles);
+        Assert.Contains("ER-Force", resolvedRoles);
+
+        var windowSeconds = inputTimer.Elapsed.TotalSeconds;
+        var inputs = trackerCounts.Select(entry => new TrackerSourceTrafficEvidence(
+            entry.Key,
+            entry.Value.PacketCount,
+            entry.Value.TrackedFrameCount,
+            entry.Value.PacketCount / windowSeconds,
+            entry.Value.TrackedFrameCount / windowSeconds,
+            entry.Value.TrackedFrameCount == 0 ? 0 : entry.Value.RobotCountTotal / (double)entry.Value.TrackedFrameCount,
+            entry.Value.TrackedFrameCount == 0 ? 0 : entry.Value.BallCountTotal / (double)entry.Value.TrackedFrameCount,
+            entry.Value.FirstFrameNumber,
+            entry.Value.LastFrameNumber)).ToArray();
+
+        return new TrackerComparisonMeasurementEvidence(
+            "live multicast packets fed into the comparison endpoint method; includes ExternalTrackerSnapshotStore.GetSnapshot protobuf clones, resolver, evaluator, VisionPacketStore.GetSnapshot clones, and IResult construction; excludes HTTP serialization and network request/response",
+            DateTimeOffset.UtcNow,
+            requestedInputWindow.TotalMilliseconds,
+            inputTimer.Elapsed.TotalMilliseconds,
+            discardedTrackerDatagrams,
+            discardedVisionDatagrams,
+            inputs,
+            visionPacketStore.GetSnapshot().PacketCount,
+            measurementWarmupCalls,
+            measurementIterations,
+            evaluationTimer.Elapsed.TotalMilliseconds,
+            ToMicroseconds(elapsedTicksByCall[PercentileIndex(elapsedTicksByCall, 0.50)]),
+            ToMicroseconds(elapsedTicksByCall[PercentileIndex(elapsedTicksByCall, 0.95)]),
+            allocatedBytes / (double)measurementIterations,
+            RuntimeInformation.FrameworkDescription,
+            RuntimeInformation.OSDescription,
+            RuntimeInformation.ProcessArchitecture.ToString(),
+            Environment.ProcessorCount);
+    }
+
+    private static async Task CaptureVisionPacketsForWindowAsync(
+        UdpMulticastReceiver receiver,
+        VisionPacketStore store,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (true)
+            {
+                var datagram = await receiver.ReceiveDatagramAsync(cancellationToken);
+                var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.Buffer);
+                store.StorePacket(packet, datagram.RemoteEndPoint, DateTimeOffset.UtcNow);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // The fixed live-input sampling window completed.
+        }
+    }
+
+    private static string? ResolveComparisonRole(string sourceName) => sourceName switch
+    {
+        "ibis" => "Duck",
+        "TIGERs" => "TIGERs",
+        "ER-FORCE" => "ER-Force",
+        _ => null,
+    };
+
+    private static int PercentileIndex(long[] sortedTicks, double percentile) =>
+        Math.Clamp((int)Math.Ceiling(percentile * sortedTicks.Length) - 1, 0, sortedTicks.Length - 1);
+
+    private static double ToMicroseconds(long stopwatchTicks) =>
+        stopwatchTicks * (1_000_000d / Stopwatch.Frequency);
+
     private static MulticastInterface FindMulticastInterface()
     {
         var interfaces = NetworkInterface.GetAllNetworkInterfaces()
@@ -522,9 +717,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         public async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken cancellationToken)
         {
+            return (await ReceiveDatagramAsync(cancellationToken)).Buffer;
+        }
+
+        public async ValueTask<UdpReceiveResult> ReceiveDatagramAsync(CancellationToken cancellationToken)
+        {
             var datagram = await client.ReceiveAsync(cancellationToken);
             Interlocked.Increment(ref packetCount);
-            return datagram.Buffer;
+            return datagram;
         }
 
         public int DrainPendingPackets()
@@ -543,6 +743,62 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         public void Dispose() => client.Dispose();
     }
+
+    private sealed class TrackerTrafficCounter
+    {
+        public int PacketCount { get; private set; }
+        public int TrackedFrameCount { get; private set; }
+        public long RobotCountTotal { get; private set; }
+        public long BallCountTotal { get; private set; }
+        public uint? FirstFrameNumber { get; private set; }
+        public uint? LastFrameNumber { get; private set; }
+
+        public void Record(TrackedFrame? frame)
+        {
+            PacketCount++;
+            if (frame is null)
+            {
+                return;
+            }
+
+            TrackedFrameCount++;
+            RobotCountTotal += frame.Robots.Count;
+            BallCountTotal += frame.Balls.Count;
+            FirstFrameNumber ??= frame.FrameNumber;
+            LastFrameNumber = frame.FrameNumber;
+        }
+    }
+
+    private sealed record TrackerSourceTrafficEvidence(
+        string Role,
+        int ReceivedPackets,
+        int TrackedFrames,
+        double PacketsPerSecond,
+        double TrackedFramesPerSecond,
+        double MeanRobotsPerFrame,
+        double MeanBallsPerFrame,
+        uint? FirstFrameNumber,
+        uint? LastFrameNumber);
+
+    private sealed record TrackerComparisonMeasurementEvidence(
+        string MeasurementBoundary,
+        DateTimeOffset MeasuredAtUtc,
+        double RequestedInputWindowMilliseconds,
+        double ActualInputWindowMilliseconds,
+        int TrackerDatagramsDiscardedBeforeWindow,
+        int VisionDatagramsDiscardedBeforeWindow,
+        IReadOnlyList<TrackerSourceTrafficEvidence> TrackerInputs,
+        long VisionPacketsReceived,
+        int EvaluationWarmupCalls,
+        int EvaluationCalls,
+        double EvaluationIntervalMilliseconds,
+        double EvaluationP50Microseconds,
+        double EvaluationP95Microseconds,
+        double AllocatedBytesPerEndpointCall,
+        string Runtime,
+        string OperatingSystem,
+        string Architecture,
+        int ProcessorCount);
 
     private sealed record MulticastInterface(string Name, IPAddress Address, bool HasDefaultGateway);
 }

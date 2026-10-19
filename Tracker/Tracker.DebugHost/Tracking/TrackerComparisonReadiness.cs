@@ -17,7 +17,7 @@ public static class TrackerComparisonReadiness
             throw new ArgumentOutOfRangeException(nameof(freshnessWindow));
         }
 
-        var candidates = snapshots
+        var resolvedSources = snapshots
             .Where(snapshot => snapshot.ReceivedAt is { } receivedAt &&
                 receivedAt <= now && now - receivedAt <= freshnessWindow)
             .Select(snapshot =>
@@ -37,27 +37,31 @@ public static class TrackerComparisonReadiness
                 return (Resolution: resolution, Snapshot: snapshot, SourceName: sourceName, SourceUuid: sourceUuid);
             })
             .Where(item => item.Resolution.LogicalRole is not null)
-            .Select(item => new TrackerComparisonSourceStatus(
-                item.Resolution.LogicalRole!,
-                item.Resolution.IdentityKey,
-                item.SourceName,
-                item.SourceUuid,
-                item.Snapshot.RemoteEndpoint,
-                item.Snapshot.ReceivedAt!.Value))
+            .Select(item =>
+            {
+                var status = new TrackerComparisonSourceStatus(
+                    item.Resolution.LogicalRole!,
+                    item.Resolution.IdentityKey,
+                    item.SourceName,
+                    item.SourceUuid,
+                    item.Snapshot.RemoteEndpoint,
+                    item.Snapshot.ReceivedAt!.Value);
+                return new TrackerComparisonResolvedSnapshot(status, item.Snapshot);
+            })
             .ToArray();
 
         var missingRoles = RequiredRoles
-            .Where(role => !candidates.Any(item => item.LogicalRole == role))
+            .Where(role => !resolvedSources.Any(item => item.Status.LogicalRole == role))
             .ToArray();
-        var conflictingRoles = candidates
-            .GroupBy(item => item.LogicalRole, StringComparer.Ordinal)
-            .Where(group => group.Select(item => item.IdentityKey).Distinct(StringComparer.Ordinal).Count() != 1)
+        var conflictingRoles = resolvedSources
+            .GroupBy(item => item.Status.LogicalRole, StringComparer.Ordinal)
+            .Where(group => group.Select(item => item.Status.IdentityKey).Distinct(StringComparer.Ordinal).Count() != 1)
             .Select(group => group.Key)
             .ToHashSet(StringComparer.Ordinal);
 
-        foreach (var identityGroup in candidates.GroupBy(item => item.IdentityKey, StringComparer.Ordinal))
+        foreach (var identityGroup in resolvedSources.GroupBy(item => item.Status.IdentityKey, StringComparer.Ordinal))
         {
-            var roles = identityGroup.Select(item => item.LogicalRole).Distinct(StringComparer.Ordinal).ToArray();
+            var roles = identityGroup.Select(item => item.Status.LogicalRole).Distinct(StringComparer.Ordinal).ToArray();
             if (roles.Length > 1)
             {
                 foreach (var role in roles)
@@ -71,7 +75,10 @@ public static class TrackerComparisonReadiness
             IsReady: missingRoles.Length == 0 && conflictingRoles.Count == 0,
             MissingRoles: missingRoles,
             ConflictingRoles: RequiredRoles.Where(conflictingRoles.Contains).ToArray(),
-            Sources: candidates);
+            Sources: resolvedSources.Select(source => source.Status).ToArray())
+        {
+            ResolvedSnapshots = resolvedSources,
+        };
     }
 }
 
@@ -79,7 +86,14 @@ public sealed record TrackerComparisonReadinessResult(
     bool IsReady,
     IReadOnlyList<string> MissingRoles,
     IReadOnlyList<string> ConflictingRoles,
-    IReadOnlyList<TrackerComparisonSourceStatus> Sources);
+    IReadOnlyList<TrackerComparisonSourceStatus> Sources)
+{
+    internal IReadOnlyList<TrackerComparisonResolvedSnapshot> ResolvedSnapshots { get; init; } = [];
+}
+
+internal sealed record TrackerComparisonResolvedSnapshot(
+    TrackerComparisonSourceStatus Status,
+    ExternalTrackerReadSideSnapshot Snapshot);
 
 public sealed record TrackerComparisonSourceStatus(
     string LogicalRole,
