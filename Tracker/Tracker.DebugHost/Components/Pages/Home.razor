@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using System.Globalization
 @using System.Text.Json
 @using Google.Protobuf
@@ -8,6 +8,7 @@
 @using Tracker.DebugHost.Vision
 @inject VisionLiveDisplaySnapshotProvider LiveDisplaySnapshotProvider
 @inject IOptions<TrackerOptions> TrackerOptionsAccessor
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @inject TrackerProfileRequestService ProfileRequestService
 @inject VisionPacketCaptureRuntimeControl CaptureControl
 @inject VisionPacketCaptureWriter PacketCaptureWriter
@@ -71,6 +72,10 @@
         var selectedView = ResolveSelectedView(rawSnapshot);
         var trackedView = TrackedVisionViewState.FromSnapshot(trackedSnapshot);
         var profileControl = TrackerProfileControlViewState.FromOptions(TrackerOptionsAccessor.Value, trackedSnapshot);
+        var comparisonLayers = comparisonViewState.Mode == VisionLiveComparisonMode.Overlay
+            ? comparisonViewState.CreateOverlayLayers()
+            : comparisonViewState.CreateSplitLayers();
+        var trackerDifference = comparisonViewState.TrackerDifference;
     }
 
     <div class="vision-grid">
@@ -161,16 +166,16 @@
                         </header>
                         <div class="vision-comparison-overlay-stack">
                             <VisionFieldOverlayCanvas Geometry="comparisonViewState.RenderSnapshot.Geometry"
-                                                      Layers="CreateVisionOverlayFieldLayers(ComparisonLayers)"
+                                                      Layers="CreateVisionOverlayFieldLayers(comparisonLayers)"
                                                       ToolbarLabel="Overlay"
                                                       AriaLabel="Vision comparison overlay field" />
-                            @if (!ComparisonLayers.Any(layer => layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible))
+                            @if (!comparisonLayers.Any(layer => layer.Status == VisionLiveComparisonLayerStatus.Ready && layer.IsVisible))
                             {
                                 <div class="vision-comparison-missing">No visible ready layer.</div>
                             }
                         </div>
                         <div class="vision-comparison-overlay-legend">
-                            @foreach (var layer in ComparisonLayers)
+                            @foreach (var layer in comparisonLayers)
                             {
                                 <span class="@ComparisonOverlayLegendClass(layer)">
                                     <span class="vision-comparison-overlay-legend__swatch"
@@ -184,7 +189,7 @@
                 else
                 {
                     <div class="vision-comparison-fields">
-                        @foreach (var layer in ComparisonLayers)
+                        @foreach (var layer in comparisonLayers)
                         {
                             <section class="@ComparisonLayerClass(layer)">
                                 <header>
@@ -240,6 +245,75 @@
                         <dd>@(detail.RobotCount?.ToString(CultureInfo.InvariantCulture) ?? "-")</dd>
                     </dl>
                 }
+                <section class="vision-comparison-tracker-difference" aria-label="Tracker differences">
+                    <h2>Tracker Difference</h2>
+                    <p>Render tick @trackerDifference.RenderTickId: @trackerDifference.ReferenceLabel vs @trackerDifference.ComparisonLabel</p>
+                    <h3>Time alignment</h3>
+                    <dl>
+                        <dt>Render sampled</dt>
+                        <dd>@FormatTimestamp(comparisonViewState.RenderSnapshot.SampledAt)</dd>
+                        <dt>@trackerDifference.ReferenceLabel tracker time</dt>
+                        <dd>@(trackerDifference.ReferenceTimestampNs?.ToString(CultureInfo.InvariantCulture) ?? "-") ns</dd>
+                        <dt>@trackerDifference.ReferenceLabel received / age</dt>
+                        <dd>@FormatTimestamp(trackerDifference.ReferenceReceivedAt) / @FormatDuration(trackerDifference.ReferenceSnapshotAge)</dd>
+                        <dt>@trackerDifference.ComparisonLabel tracker time</dt>
+                        <dd>@(trackerDifference.ComparisonTimestampNs?.ToString(CultureInfo.InvariantCulture) ?? "-") ns</dd>
+                        <dt>@trackerDifference.ComparisonLabel received / age</dt>
+                        <dd>@FormatTimestamp(trackerDifference.ComparisonReceivedAt) / @FormatDuration(trackerDifference.ComparisonSnapshotAge)</dd>
+                        <dt>Timestamp delta (comparison - reference)</dt>
+                        <dd>@FormatTimestampDelta(trackerDifference.TimestampDeltaNs)</dd>
+                    </dl>
+                    @if (trackerDifference.Status != TrackerDifferencePairStatus.Compared || trackerDifference.Difference is null)
+                    {
+                        <p>Numeric differences unavailable: @trackerDifference.Status. Select two tracker packet sources.</p>
+                    }
+                    else
+                    {
+                        <h3>Robots</h3>
+                        <div class="vision-comparison-difference-table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>Robot</th><th>Status</th><th>Position delta (m)</th><th>Velocity delta (m/s)</th><th>Angle delta (rad)</th><th>Angular velocity delta (rad/s)</th></tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var robot in trackerDifference.Difference.Robots)
+                                    {
+                                        <tr>
+                                            <td>@robot.Team / @robot.RobotId</td>
+                                            <td>@robot.Status</td>
+                                            <td>@FormatVector2(robot.PositionDelta)</td>
+                                            <td>@FormatVector2(robot.VelocityDelta)</td>
+                                            <td>@FormatNumber(robot.OrientationDeltaRadians)</td>
+                                            <td>@FormatNumber(robot.AngularVelocityDeltaRadiansPerSecond)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <h3>Balls</h3>
+                        <div class="vision-comparison-difference-table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>Reference index</th><th>Comparison index</th><th>Match distance (m)</th><th>Position delta (m)</th><th>Velocity delta (m/s)</th></tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ball in trackerDifference.Difference.Balls.Matches)
+                                    {
+                                        <tr>
+                                            <td>@ball.ReferenceIndex</td>
+                                            <td>@ball.ComparisonIndex</td>
+                                            <td>@FormatNumber(ball.DistanceMeters)</td>
+                                            <td>@FormatVector3(ball.PositionDelta)</td>
+                                            <td>@FormatVector3(ball.VelocityDelta)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <p>Unmatched reference balls: @FormatIndices(trackerDifference.Difference.Balls.UnmatchedReferenceIndices)</p>
+                        <p>Unmatched comparison balls: @FormatIndices(trackerDifference.Difference.Balls.UnmatchedComparisonIndices)</p>
+                    }
+                </section>
                 <p>Geometry: @comparisonViewState.RenderSnapshot.GeometrySourceLabel</p>
             </aside>
         }
@@ -294,6 +368,52 @@
         return timestamp?.ToLocalTime().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture) ?? "-";
     }
 
+    private static string FormatDuration(TimeSpan? duration)
+    {
+        return duration is { } value
+            ? $"{value.TotalMilliseconds.ToString("+0.000;-0.000;0.000", CultureInfo.InvariantCulture)} ms"
+            : "-";
+    }
+
+    private static string FormatTimestampDelta(long? timestampDeltaNs)
+    {
+        return timestampDeltaNs is { } value
+            ? $"{value.ToString("+#,0;-#,0;0", CultureInfo.InvariantCulture)} ns"
+            : "-";
+    }
+
+    private static string FormatNumber(double? value)
+    {
+        return value is { } number
+            ? number.ToString("+0.000;-0.000;0.000", CultureInfo.InvariantCulture)
+            : "-";
+    }
+
+    private static string FormatVector2(Vector2Difference? value)
+    {
+        return value is { } vector
+            ? $"({FormatNumber(vector.X)}, {FormatNumber(vector.Y)})"
+            : "-";
+    }
+
+    private static string FormatVector3(Vector3Difference? value)
+    {
+        return value is { } vector
+            ? $"({FormatNumber(vector.X)}, {FormatNumber(vector.Y)}, {FormatNumber(vector.Z)})"
+            : "-";
+    }
+
+    private static string FormatVector3(Vector3Difference value)
+    {
+        return $"({FormatNumber(value.X)}, {FormatNumber(value.Y)}, {FormatNumber(value.Z)})";
+    }
+
+    private static string FormatIndices(IReadOnlyList<int> indices)
+    {
+        return indices.Count == 0
+            ? "none"
+            : string.Join(", ", indices.Select(index => index.ToString(CultureInfo.InvariantCulture)));
+    }
     private static string FormatJson(IMessage? message)
     {
         return message is null ? "{}" : JsonFormatter.Default.Format(message);
@@ -576,7 +696,8 @@
             layerASourceKey,
             layerBSourceKey,
             layerAVisible,
-            layerBVisible);
+            layerBVisible,
+            Configuration.GetValue<double>("Tracker:Comparison:BallDistanceGateMeters", 0.5));
     }
 
     private void CaptureLiveDisplaySnapshot()

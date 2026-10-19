@@ -66,7 +66,8 @@ public sealed class VisionLiveDisplaySnapshotProvider
         string layerASourceKey,
         string layerBSourceKey,
         bool layerAVisible,
-        bool layerBVisible)
+        bool layerBVisible,
+        double ballDistanceGateMeters = 0.5)
     {
         var defaultViewState = comparisonSnapshotComposer.CreateViewState(renderSnapshot.ComparisonSnapshot);
         var layerA = FindSourceOption(defaultViewState.SourceOptions, layerASourceKey);
@@ -77,7 +78,8 @@ public sealed class VisionLiveDisplaySnapshotProvider
             renderSnapshot.ComparisonSnapshot,
             defaultViewState.SourceOptions,
             new VisionLiveComparisonLayerSelection(layerA, layerAVisible),
-            new VisionLiveComparisonLayerSelection(layerB, layerBVisible));
+            new VisionLiveComparisonLayerSelection(layerB, layerBVisible),
+            ballDistanceGateMeters);
     }
 
     private static VisionLiveComparisonSourceOption FindSourceOption(

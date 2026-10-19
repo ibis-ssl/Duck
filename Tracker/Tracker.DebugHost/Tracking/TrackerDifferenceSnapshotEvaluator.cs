@@ -109,4 +109,5 @@ public enum TrackerDifferencePairStatus
     MissingReferenceFrame,
     MissingComparisonFrame,
     MissingBothFrames,
+    UnsupportedSource,
 }
