@@ -48,19 +48,9 @@ var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
-var craneTeamName = builder.Configuration["Testing:Crane:TeamName"] ?? "crane";
-if (string.IsNullOrWhiteSpace(craneTeamName) ||
-    craneTeamName.Any(character =>
-        !char.IsAsciiLetterOrDigit(character) && character is not '_' and not '-'))
-{
-    throw new InvalidOperationException(
-        "Testing:Crane:TeamName must contain only ASCII letters, digits, underscores, or hyphens.");
-}
-var craneTeamColor = builder.Configuration["Testing:Crane:TeamColor"] ?? "YELLOW";
-if (craneTeamColor is not "YELLOW" and not "BLUE")
-{
-    throw new InvalidOperationException($"Testing:Crane:TeamColor must be YELLOW or BLUE; received '{craneTeamColor}'.");
-}
+var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(builder.Configuration);
+var craneTeamName = craneFixtureSettings.TeamName;
+var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =
     builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
 var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");

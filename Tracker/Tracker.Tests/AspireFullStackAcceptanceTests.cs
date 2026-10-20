@@ -23,6 +23,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     [Fact]
     public async Task FullStack_ReachesActiveRefereeAndMovesCraneRobot()
     {
+        var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
+            new ConfigurationBuilder().AddEnvironmentVariables().Build());
         var artifactsDirectory = Environment.GetEnvironmentVariable("DUCK_ASPIRE_ARTIFACTS")
             ?? Path.Combine(Path.GetTempPath(), "duck-aspire-full-stack-artifacts");
         Directory.CreateDirectory(artifactsDirectory);
@@ -75,8 +77,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
             Assert.True(
-                string.Equals(initial.YellowTeamName, "crane", StringComparison.Ordinal),
-                $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name 'crane' before starting motion, observed '{initial.YellowTeamName}'.");
+                craneFixtureSettings.MatchesExpectedYellowTeamName(initial.YellowTeamName),
+                $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name '{craneFixtureSettings.TeamName}' before starting motion, observed '{initial.YellowTeamName}'.");
             output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
 
             SSL_WrapperPacket initialVision;

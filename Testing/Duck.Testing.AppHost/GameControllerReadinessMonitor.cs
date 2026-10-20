@@ -5,8 +5,21 @@ using Google.Protobuf;
 
 namespace Duck.Testing.AppHost;
 
+internal enum GameControllerRuntimeReadiness
+{
+    Healthy,
+    Recovering,
+    Failed,
+}
+
+internal interface IGameControllerReadinessMonitor : IAsyncDisposable
+{
+    Task<bool> IsHealthyAsync(CancellationToken cancellationToken);
+    Task<GameControllerRuntimeReadiness> GetRuntimeReadinessAsync(CancellationToken cancellationToken);
+}
+
 /// <summary>Receives referee multicast updates and checks the Game Controller's control API.</summary>
-public sealed class GameControllerReadinessMonitor : IAsyncDisposable
+public sealed class GameControllerReadinessMonitor : IGameControllerReadinessMonitor
 {
     private static readonly IPAddress RefereeGroup = IPAddress.Parse("224.5.23.1");
     private const int RefereePort = 11003;
@@ -16,6 +29,8 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
     private readonly string expectedYellowTeamName;
     private readonly Task receiveLoop;
     private readonly GameControllerTeamNameRetryPolicy teamNameConfigurationRetry = new();
+    private DateTimeOffset? runtimeRecoveryStartedAt;
+    private bool hasBeenHealthy;
 
     public GameControllerReadinessMonitor(int expectedInitialCommand, string expectedYellowTeamName)
     {
@@ -30,6 +45,25 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
     }
 
     public RefereeReadinessState State => state;
+
+    async Task<GameControllerRuntimeReadiness> IGameControllerReadinessMonitor.GetRuntimeReadinessAsync(CancellationToken cancellationToken)
+    {
+        var checkedAt = DateTimeOffset.UtcNow;
+        if (await IsHealthyAsync(cancellationToken))
+        {
+            return GameControllerRuntimeReadiness.Healthy;
+        }
+
+        if (!hasBeenHealthy)
+        {
+            return GameControllerRuntimeReadiness.Recovering;
+        }
+
+        runtimeRecoveryStartedAt ??= checkedAt;
+        return teamNameConfigurationRetry.IsRecoveryExpired(runtimeRecoveryStartedAt.Value, DateTimeOffset.UtcNow)
+            ? GameControllerRuntimeReadiness.Failed
+            : GameControllerRuntimeReadiness.Recovering;
+    }
 
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken)
     {
@@ -48,16 +82,30 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
             {
                 if (teamNameConfigurationRetry.TryBeginSend(DateTimeOffset.UtcNow, state.HasExpectedYellowTeamName))
                 {
-                    await new Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient()
-                        .SendYellowTeamNameAsync(expectedYellowTeamName, timeout.Token);
+                    try
+                    {
+                        await new Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient()
+                            .SendYellowTeamNameAsync(expectedYellowTeamName, timeout.Token);
+                    }
+                    finally
+                    {
+                        teamNameConfigurationRetry.RecordSendCompleted(DateTimeOffset.UtcNow);
+                    }
                 }
 
                 return false;
             }
 
-            return state.IsHealthy(DateTimeOffset.UtcNow) && webSocket.State == WebSocketState.Open;
+            var healthy = state.IsHealthy(DateTimeOffset.UtcNow) && webSocket.State == WebSocketState.Open;
+            if (healthy)
+            {
+                hasBeenHealthy = true;
+                runtimeRecoveryStartedAt = null;
+            }
+
+            return healthy;
         }
-        catch (Exception exception) when (exception is WebSocketException or OperationCanceledException)
+        catch (Exception exception) when (exception is WebSocketException or OperationCanceledException or InvalidOperationException)
         {
             return false;
         }
@@ -130,12 +178,19 @@ public sealed class GameControllerReadinessMonitor : IAsyncDisposable
 
 internal sealed class GameControllerTeamNameRetryPolicy(
     int maximumAttempts = 3,
-    TimeSpan? retryInterval = null)
+    TimeSpan? retryInterval = null,
+    TimeSpan? requestTimeout = null)
 {
     private readonly object gate = new();
     private readonly TimeSpan retryInterval = retryInterval ?? TimeSpan.FromSeconds(1);
+    private readonly TimeSpan requestTimeout = requestTimeout ?? TimeSpan.FromSeconds(2);
     private DateTimeOffset? lastAttemptAt;
     private int attempts;
+
+    public TimeSpan RequestTimeout => requestTimeout;
+
+    public TimeSpan MaximumRecoveryDuration =>
+        TimeSpan.FromTicks((requestTimeout.Ticks + retryInterval.Ticks) * maximumAttempts + retryInterval.Ticks);
 
     public bool TryBeginSend(DateTimeOffset now, bool expectedNameObserved)
     {
@@ -150,6 +205,38 @@ internal sealed class GameControllerTeamNameRetryPolicy(
             attempts++;
             lastAttemptAt = now;
             return true;
+        }
+    }
+
+    public void RecordSendCompleted(DateTimeOffset completedAt)
+    {
+        lock (gate)
+        {
+            if (attempts > 0)
+            {
+                lastAttemptAt = completedAt;
+            }
+        }
+    }
+
+    public bool IsRecoveryExpired(DateTimeOffset recoveryStartedAt, DateTimeOffset now)
+    {
+        lock (gate)
+        {
+            if (now - recoveryStartedAt >= MaximumRecoveryDuration)
+            {
+                return true;
+            }
+
+            if (attempts < maximumAttempts)
+            {
+                return false;
+            }
+
+            var confirmationStartedAt = lastAttemptAt is { } lastAttempt && lastAttempt >= recoveryStartedAt
+                ? lastAttempt
+                : recoveryStartedAt;
+            return now - confirmationStartedAt >= retryInterval;
         }
     }
 }
