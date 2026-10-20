@@ -13,6 +13,9 @@
 - 現状観測: Linux環境でのDocker接続先は`default`（`unix:///var/run/docker.sock`）、実行環境は`FA780` / Docker Engine 29.9.0 / Ubuntu 26.04.1。Windows側Docker CLIは検出されなかった。Docker Desktop 4.96の導入は本人報告であり、この読み取りでは実測確認していない。
 - 受入条件: Docker Desktop導入だけでコンテナ起動競合が直ると仮定しない。UDPと`multicast`の互換性を実測し、自身が起動したコンテナだけを後片付けする。既存環境の削除・停止、接続先や通信設定の変更は別確認なしに行わない。
 - 未実施: 実装、Docker起動/停止、Docker設定変更、実通信検証。計画文書の検証後に下書きPRを作成する。
+- 次作業: 子課題 #80 の現状調査・設計を先行する。現行のコンテナ起動・停止経路、利用者報告版と実測版、UDP / `multicast` の互換性、起動所有者の識別と後片付け、旧 `AddContainer` および `host network` 指定の問題を根拠付きで整理し、#81 の実装前提を確定する。調査ではDocker設定変更、環境の起動・停止・削除を行わない。
+- 配置規約: `CodexSkill`の複製先とDuckの各 `worktree` を `/home/donabe` 直下の兄弟に置く。新しいリポジトリ作業領域は `git worktree add --relative-paths /home/donabe/<作業領域名>` で作り、各作業領域の `.agents/skills` を相対シンボリックリンク `../../CodexSkill/skills` としてGitの `mode 120000` で追跡する。公式の `link_consumer_skills.py` は絶対リンクを作るため、作成後に相対先へ正規化して解決先を確認する。`CodexSkill`の複製先を移動・削除しない。
+- 作業分岐: `task/aspire-docker-desktop-496` の現在の作業場所は `/home/donabe/Duck-aspire-docker-desktop-496`。元の `/mnt/c/Users/donabe/Documents/Codex/2026-10-21/task-8` は同じ `HEAD` で `detached` 状態のまま保持し、削除していない。統合先は `c72939ec076ec3261357ba16e61fc5140de2b3d4`。
 
 - ID: `ASPIRE-001`
 - 題名: 模擬試験環境の起動構成を決める
