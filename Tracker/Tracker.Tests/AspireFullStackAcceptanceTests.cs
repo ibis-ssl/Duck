@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using Duck.Testing.AppHost;
 using Duck.Testing.RefereeDriver;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Http;
