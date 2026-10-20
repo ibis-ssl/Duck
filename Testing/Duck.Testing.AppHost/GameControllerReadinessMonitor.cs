@@ -91,18 +91,29 @@ public sealed class GameControllerReadinessMonitor : IGameControllerReadinessMon
             runtimeRecoveryStartedAt ??= checkedAt;
         }
 
-        if (runtimeRecoveryStartedAt is { } recoveryStart &&
+        var recoveryStartedAt = runtimeRecoveryStartedAt;
+        if (recoveryStartedAt is { } recoveryStart &&
             teamNameConfigurationRetry.IsRecoveryExpired(recoveryStart, checkedAt))
         {
             return GameControllerRuntimeReadiness.Failed;
         }
 
-        if (await IsHealthyAsync(cancellationToken))
+        var healthy = await IsHealthyAsync(cancellationToken);
+        var completedAt = timeProvider.GetUtcNow();
+        if (recoveryStartedAt is { } startedAt &&
+            teamNameConfigurationRetry.IsRecoveryExpired(startedAt, completedAt))
         {
-            return runtimeRecoveryStartedAt is { } completedRecoveryStart &&
-                   teamNameConfigurationRetry.IsRecoveryExpired(completedRecoveryStart, timeProvider.GetUtcNow())
-                ? GameControllerRuntimeReadiness.Failed
-                : GameControllerRuntimeReadiness.Healthy;
+            return GameControllerRuntimeReadiness.Failed;
+        }
+
+        if (healthy)
+        {
+            if (recoveryStartedAt is not null)
+            {
+                runtimeRecoveryStartedAt = null;
+            }
+
+            return GameControllerRuntimeReadiness.Healthy;
         }
 
         if (!hasBeenHealthy)
@@ -111,7 +122,7 @@ public sealed class GameControllerReadinessMonitor : IGameControllerReadinessMon
         }
 
         runtimeRecoveryStartedAt ??= checkedAt;
-        return teamNameConfigurationRetry.IsRecoveryExpired(runtimeRecoveryStartedAt.Value, timeProvider.GetUtcNow())
+        return teamNameConfigurationRetry.IsRecoveryExpired(runtimeRecoveryStartedAt.Value, completedAt)
             ? GameControllerRuntimeReadiness.Failed
             : GameControllerRuntimeReadiness.Recovering;
     }
@@ -184,7 +195,6 @@ public sealed class GameControllerReadinessMonitor : IGameControllerReadinessMon
             if (healthy)
             {
                 hasBeenHealthy = true;
-                runtimeRecoveryStartedAt = null;
             }
 
             return healthy;

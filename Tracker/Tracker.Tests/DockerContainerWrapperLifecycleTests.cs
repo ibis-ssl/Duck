@@ -729,6 +729,70 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Contains("rm --force container-id", commands);
     }
 
+    [Theory]
+    [InlineData(9999, true)]
+    [InlineData(10000, false)]
+    [InlineData(10001, false)]
+    public async Task RecoveryProbeSuccessIsRejectedAtOrAfterTheTenSecondDeadline(
+        int elapsedMilliseconds,
+        bool shouldBeHealthy)
+    {
+        var clock = new ManualTimeProvider(DateTimeOffset.UtcNow);
+        var packetTransport = new ScriptedRefereePacketTransport();
+        var controlTransport = new RecordingYellowTeamTransport();
+        var advanceProbe = false;
+        var monitor = new GameControllerReadinessMonitor(
+            (int)Referee.Types.Command.Halt,
+            "crane",
+            clock,
+            packetTransport,
+            controlTransport,
+            _ =>
+            {
+                if (advanceProbe)
+                {
+                    clock.Advance(TimeSpan.FromMilliseconds(elapsedMilliseconds - 9000));
+                    packetTransport.Publish(new global::Referee
+                    {
+                        Command = Referee.Types.Command.Halt,
+                        Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+                    });
+                }
+
+                return Task.FromResult(true);
+            });
+
+        await using (monitor)
+        {
+            packetTransport.Publish(new global::Referee
+            {
+                Command = Referee.Types.Command.Halt,
+                Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+            });
+            Assert.Equal(
+                GameControllerRuntimeReadiness.Healthy,
+                await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+
+            packetTransport.Publish(new global::Referee { Command = Referee.Types.Command.Halt });
+            Assert.Equal(
+                GameControllerRuntimeReadiness.Recovering,
+                await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+            Assert.Single(controlTransport.Messages);
+
+            clock.Advance(TimeSpan.FromSeconds(9));
+            packetTransport.Publish(new global::Referee
+            {
+                Command = Referee.Types.Command.Halt,
+                Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+            });
+            advanceProbe = true;
+
+            Assert.Equal(
+                shouldBeHealthy ? GameControllerRuntimeReadiness.Healthy : GameControllerRuntimeReadiness.Failed,
+                await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        }
+    }
+
     [Fact]
     public async Task GameControllerRuntimeReadinessRecoversAfterYellowTeamInformationReturns()
     {
