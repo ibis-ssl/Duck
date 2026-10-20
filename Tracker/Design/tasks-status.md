@@ -4,6 +4,16 @@
 
 ## 現在の作業
 
+- ID: `ASPIRE-007D`（課題 #79、親課題 #18「Aspire対応」）
+- 題名: FA780のDocker開発環境を利用者単位のDocker Desktop 4.96へ統一する
+- 子課題: #80 設計・現状調査、#81 Aspire運用の移行、#82 起動停止・通信受入検証。すべて課題 #79の正式な子課題として作成し、`Project16`へ追加した。
+- 段階: 計画
+- 状態: 登録済み。課題 #79〜#82は`Project16`の`Backlog`。`Priority`フィールドは存在するが選択肢が返らず、既存項目の値も空欄のためP0を設定できない。フィールド設定は変更していない。
+- 作業分岐: `task/aspire-docker-desktop-496`を作成。統合先の識別値は`c72939ec076ec3261357ba16e61fc5140de2b3d4`。
+- 現状観測: Linux環境でのDocker接続先は`default`（`unix:///var/run/docker.sock`）、実行環境は`FA780` / Docker Engine 29.9.0 / Ubuntu 26.04.1。Windows側Docker CLIは検出されなかった。Docker Desktop 4.96の導入は本人報告であり、この読み取りでは実測確認していない。
+- 受入条件: Docker Desktop導入だけでコンテナ起動競合が直ると仮定しない。UDPと`multicast`の互換性を実測し、自身が起動したコンテナだけを後片付けする。既存環境の削除・停止、接続先や通信設定の変更は別確認なしに行わない。
+- 未実施: 実装、Docker起動/停止、Docker設定変更、実通信検証。計画文書の検証後に下書きPRを作成する。
+
 - ID: `ASPIRE-001`
 - 題名: 模擬試験環境の起動構成を決める
 - 段階: 設計
@@ -38,7 +48,7 @@
 - `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
 - 2026-09-30 の `ASPIRE-002` Windows実機確認: .NET SDK 10.0.401 で起動構成の試験が1件中1件成功。AppHost 13.5.4から `Tracker.RuntimeHost.exe` が起動し、UDP 10020を使用する。AppHostの停止後に子プロセスが終了し、UDPポートが解放されることを確認した。Docker、模擬環境、複数受信先への送信を各OSで確かめる作業は後続に残る。
 - `ASPIRE-003` 実装報告: `reports/pr28-aspire-003-implementation-20260930.md`
-- 2026-10-04 の `ASPIRE-004B` 実装（PR #59）: Crane / `cm4-sim` の固定イメージ、planner 別の UDP 経路と起動依存を追加した。Simulator の `IbisPort` 上書きを `cm4-sim` または Crane の送信先へ伝播させる修正では、両 planner の非既定ポートを試験し、CI run `37175785019` の `.NET tests` は 351 / 351 成功、`ASPIRE-NET-002` はスキップだった。実装と修正の記録は [ASPIRE-004B 実装報告](../../reports/pr28-aspire-004b-implementation-20261004.md) と [ポート上書き修正報告](../../reports/pr59-kero-004b-001-fix-20261004.md)。PR #61 では固定 Crane tag を検証済みの `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` に更新している。
+- 2026-10-04 の `ASPIRE-004B` 実装（PR #59）: Crane / `cm4-sim` の固定イメージ、計画方式別の UDP 経路と起動依存を追加した。模擬環境の `IbisPort` 上書きを `cm4-sim` または Crane の送信先へ伝播させる修正では、両計画方式の非既定ポートを試験し、CI実行 `37175785019` の `.NET tests` は 351 / 351 成功、`ASPIRE-NET-002` は実行対象外だった。実装と修正の記録は [ASPIRE-004B 実装報告](../../reports/pr28-aspire-004b-implementation-20261004.md) と [ポート上書き修正報告](../../reports/pr59-kero-004b-001-fix-20261004.md)。PR #61 では固定したCraneイメージの版を検証済みの `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` に更新している。
 - 2026-09-30 の `ASPIRE-003A` 完了: `VisionPacketsReceivedTotal`、接続先・通信経路・累積値の定期診断、復号失敗を件数に加えない条件を試験駆動開発で定めた。赤のコミット `4245400` と同じ版での統合試験は失敗し、緑のコミット `efdcd79` では成功した。Windowsで対象を絞った試験は3件中3件成功。
 - 2026-09-30 の `ASPIRE-003B` 完了: ER-Forceの模擬環境を `ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd` で追加し、計算機を介した通信と、Craneの競技場寸法・物理条件・チーム名指定用の起動引数を設定した。Duckの模擬用 `224.5.23.2:10020` 設定は起動構成の試験で固定した。赤のコミット `2cbab11` と同じ版での継続的な統合試験は失敗し、緑のコミット `067be55` では成功した。
 - 2026-09-30 のLinux `ASPIRE-NET-002`: Ubuntu 24.04 / Docker 28.0.4での実行 `36625776852` では、RuntimeHostが `224.5.23.2:10020` を受信し、`VisionPacketsReceivedTotal` が0から232へ3960 msで増加した。実行記録の `headSha` は検証時のPR先頭 `5c110dd` と一致し、.NETの試験とLinuxでの通信経路確認はともに成功した。成功した実行の成果物 `aspire-net-002-36625776852-1` に判定結果、標準出力、標準エラー、RuntimeHost・模擬環境・Docker・通信の診断情報を保存した。
