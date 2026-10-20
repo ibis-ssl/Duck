@@ -1,4 +1,4 @@
-﻿using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver;
 using Google.Protobuf;
 
 namespace Tracker.Tests;
@@ -17,6 +17,7 @@ public sealed class RefereeDriverNetworkAdapterTests
 
         Assert.Equal(Referee.Types.Command.ForceStart, snapshot.Command);
         Assert.Equal((uint)8, snapshot.CommandCounter);
+        Assert.Equal("yellow", snapshot.YellowTeamName);
         Assert.Equal(2, receiver.ReceiveCount);
     }
 
@@ -38,6 +39,24 @@ public sealed class RefereeDriverNetworkAdapterTests
         Assert.Equal(
             $"{{\"continue_action\":{{\"type\":\"{expectedType}\",\"for_team\":\"UNKNOWN\"}}}}",
             sent.Json);
+    }
+
+    [Fact]
+    public async Task ControlClientSetsYellowTeamNameUsingGameControllerUpdateTeamState()
+    {
+        var transport = new RecordingWebSocketTransport();
+        var client = new GameControllerWebSocketControlClient(transport);
+
+        await client.SendYellowTeamNameAsync("crane", CancellationToken.None);
+
+        var sent = Assert.Single(transport.Messages);
+        Assert.Equal(GameControllerWebSocketControlClient.DefaultEndpoint, sent.Endpoint);
+        using var json = System.Text.Json.JsonDocument.Parse(sent.Json);
+        var teamChange = json.RootElement
+            .GetProperty("change")
+            .GetProperty("update_team_state_change");
+        Assert.Equal("YELLOW", teamChange.GetProperty("for_team").GetString());
+        Assert.Equal("crane", teamChange.GetProperty("team_name").GetString());
     }
 
     private static ReadOnlyMemory<byte> CreatePacket(Referee.Types.Command command, uint commandCounter)

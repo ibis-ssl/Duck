@@ -100,6 +100,8 @@ entries:
     description: Aspireが管理するプログラム、サービス、接続対象などの単位。
   - term: Markdown
     description: 文書構造と記法を持つ軽量記述形式名。
+  - term: サブモジュール
+    description: 仕様資料を参照するための管理方法。
   - term: リンク
     description: 文書内から別の場所や参照先を指す記法名。
   - term: CandidateMissing

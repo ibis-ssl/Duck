@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
@@ -43,7 +43,10 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
             var referee = Referee.Parser.ParseFrom(packet.ToArray());
             if (previousCommandCounter is null || referee.CommandCounter != previousCommandCounter)
             {
-                return new RefereeCommandSnapshot(referee.Command, referee.CommandCounter);
+                return new RefereeCommandSnapshot(
+                    referee.Command,
+                    referee.CommandCounter,
+                    referee.Yellow?.Name ?? string.Empty);
             }
         }
     }
@@ -136,6 +139,31 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
             endpoint,
             CreateContinueActionMessage(action),
             cancellationToken);
+    }
+
+    public Task SendYellowTeamNameAsync(string teamName, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(teamName);
+        return transport.SendJsonAsync(
+            endpoint,
+            CreateYellowTeamNameMessage(teamName),
+            cancellationToken);
+    }
+
+    public static string CreateYellowTeamNameMessage(string teamName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(teamName);
+        return System.Text.Json.JsonSerializer.Serialize(new
+        {
+            change = new
+            {
+                update_team_state_change = new
+                {
+                    for_team = "YELLOW",
+                    team_name = teamName,
+                },
+            },
+        });
     }
 
     public static string CreateContinueActionMessage(GameControllerContinueAction action)

@@ -72,14 +72,27 @@ public static partial class CraneProbeDiagnostics
         RegexOptions.Singleline | RegexOptions.CultureInvariant);
     private static readonly Regex DashboardToken = new(@"([?&]t=)[A-Za-z0-9._~+/-]+={0,2}", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-    public static string[] CreateCraneReadinessProbeArguments(string containerId)
+    public static string[] CreateCraneReadinessProbeArguments(string containerId, string expectedTeamName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(containerId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedTeamName);
+        var script = $$"""
+            source /root/ibis_ws/install/setup.bash
+            printf '{{SetupMarker}}\n'
+            team_name=$(ros2 param get /world_model_publisher team_name) || exit $?
+            if [ "$team_name" != "String value is: $1" ]; then
+              printf 'DUCK_CRANE_TEAM_NAME_MISMATCH expected=%s observed=%s\n' "$1" "$team_name"
+              exit 1
+            fi
+            printf 'DUCK_CRANE_TEAM_NAME_OK:%s\n' "$1"
+            exec ros2 node list
+            """;
         return
         [
             "exec", containerId,
             "timeout", "--signal=TERM", "--kill-after=2s", "10s",
-            "bash", "-lc", $"source /root/ibis_ws/install/setup.bash && printf '{SetupMarker}\\n' && exec ros2 node list",
+            "bash", "-lc", DockerServiceReadiness.NormalizeShellScriptLineEndings(script),
+            "bash", expectedTeamName,
         ];
     }
 

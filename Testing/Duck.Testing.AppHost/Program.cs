@@ -1,4 +1,4 @@
-﻿using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 
 if (args.Length > 0 && args[0] == "--docker-wrapper")
@@ -48,10 +48,16 @@ var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
-var craneTeam = builder.Configuration["Testing:Crane:Team"] ?? "Yellow";
+var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(builder.Configuration);
+var craneTeamName = craneFixtureSettings.TeamName;
+var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =
     builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
 var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");
+var fixtureManifestPath =
+    builder.Configuration["Testing:Crane:FixtureManifestPath"] ??
+    CraneFixtureManifest.GetDefaultPath(stackId);
+CraneFixtureManifest.WriteAtomically(fixtureManifestPath, stackId, craneFixtureSettings);
 
 var simulator = builder.AddDockerWrapper(
     new DockerContainerSpec(
@@ -96,7 +102,8 @@ var gameController = builder.AddDockerWrapper(
         stackId),
     39102,
     "app",
-    "game-controller");
+    "game-controller",
+    expectedCraneTeamName: craneTeamName);
 
 IResourceBuilder<ExecutableResource>? cm4Simulator = null;
 if (useCm4Simulator)
@@ -136,14 +143,15 @@ var craneBuilder = builder
             $"ghcr.io/ibis-ssl/crane:{craneImageTag}",
             [
                 "bash", "-c",
-                $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={craneTeam} planner:=${{PLANNER}}",
+                $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={craneTeamName} team_color:={craneTeamColor} planner:=${{PLANNER}}",
             ],
             craneEnvironment,
             stackId),
         39104,
         "ros2",
         "crane",
-        startupTimeoutSeconds: 360);
+        startupTimeoutSeconds: 360,
+        expectedCraneTeamName: craneTeamName);
 
 var crane = craneBuilder
     .WaitForStart(duck)

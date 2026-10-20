@@ -1,4 +1,4 @@
-﻿using Aspire.Hosting;
+using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
@@ -175,7 +175,8 @@ public sealed class AppHostApplicationModelTests
 
         var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
         Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", crane.Image);
-        Assert.Contains("team:=Yellow", crane.ContainerArguments[^1]);
+        Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
+        Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
         Assert.Equal("visibility_graph", crane.Environment["PLANNER"]);
         Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
         Assert.Equal(360, crane.StartupTimeoutSeconds);
@@ -186,6 +187,65 @@ public sealed class AppHostApplicationModelTests
         AssertArgumentValue(ToSpec(cm4Simulator).CreateRunArguments(), "--network", "host");
         AssertArgumentValue(cm4Simulator.ContainerArguments, "--in-port", "12345");
         AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "12346");
+    }
+
+    [Fact]
+    public async Task CraneLaunchUsesCraneTeamNameAndSeparateYellowColor()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+
+        Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
+        Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
+    }
+
+    [Fact]
+    public async Task CustomCraneTeamNameIsSharedByCraneAndGameController()
+    {
+        const string teamName = "custom_crane_team";
+        using var appHost = await CreateAppHostAsync("--Testing:Crane:TeamName=" + teamName);
+
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
+
+        Assert.Contains($"team:={teamName}", crane.ContainerArguments[^1]);
+        Assert.Equal(teamName, gameController.ExpectedCraneTeamName);
+    }
+
+    [Fact]
+    public async Task AppHostWritesResolvedCliTeamSettingsToAnOwnedManifest()
+    {
+        var stackId = "manifest-" + Guid.NewGuid().ToString("N");
+        var directory = Path.Combine(Path.GetTempPath(), "duck-crane-model-" + Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(directory, "fixture.json");
+        try
+        {
+            using var appHost = await CreateAppHostAsync(
+                "--Testing:Crane:TeamName=custom_from_cli",
+                "--Testing:Crane:FixtureManifestPath=" + path,
+                "--Testing:StackOwnership:StackId=" + stackId);
+            var settings = CraneFixtureManifest.ReadForStack(path, stackId);
+            Assert.Equal("custom_from_cli", settings.TeamName);
+            Assert.Equal(CraneFixtureSettings.YellowTeamColor, settings.TeamColor);
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Theory]
+    [InlineData("crane team")]
+    [InlineData("crane;touch_tmp")]
+    [InlineData("crane$(id)")]
+    public async Task CraneTeamNameRejectsWhitespaceAndShellSyntax(string teamName)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            using var appHost = await CreateAppHostAsync("--Testing:Crane:TeamName=" + teamName);
+        });
+
+        Assert.Contains("Testing:Crane:TeamName", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

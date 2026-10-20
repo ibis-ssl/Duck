@@ -16,7 +16,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 
 ## 参考仕様資料
 
-- [reference/specs](reference/specs): ibis-ssl の仕様資料を参照用のGit submoduleとして置きます。Duckの実行時依存関係には含めず、必要に応じてsubmoduleの固定commitを更新します。
+- [仕様資料](reference/specs): Gitサブモジュールとして配置しています。親リポジトリは参照する固定コミットを記録し、仕様資料を更新する際はサブモジュールを更新してそのコミットを変更します。Duckの実行時依存には含みません。
 
 ## 前提
 
@@ -46,6 +46,24 @@ dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-cache --force
 ```bash
 dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
 ```
+
+## Aspire全体受入の起動設定
+
+全体受入試験では、AppHostと受入試験に同じ識別子と設定ファイルの場所を渡します。設定ファイルは実行ごとに別の名前を使い、既存のものを再利用しません。AppHostの起動前に次を設定してください。
+
+```bash
+stack_id="local-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+results_dir="$PWD/artifacts/aspire-full-stack"
+mkdir -p "$results_dir"
+manifest_path="$results_dir/crane-fixture-$stack_id.json"
+export Testing__StackOwnership__StackId="$stack_id"
+export Testing__StackOwnership__LockPath="${TMPDIR:-/tmp}/duck-aspire-$stack_id.lock"
+export Testing__Crane__FixtureManifestPath="$manifest_path"
+export DUCK_ASPIRE_STACK_ID="$stack_id"
+export DUCK_ASPIRE_FIXTURE_MANIFEST="$manifest_path"
+```
+
+起動から全資源の準備完了、所有者と識別子の確認、受入試験、所有資源の後始末まで、CIと同じ順序で行います。手順と後始末の対象は[CIの設定](.github/workflows/dotnet-test.yml)を参照してください。準備完了前に全体受入試験を開始しません。
 
 ## Tracker.DebugHost の起動
 

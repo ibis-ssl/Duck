@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Duck.Testing.AppHost;
 using Google.Protobuf;
 
@@ -134,7 +135,7 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Theory]
-    [InlineData("crane", "ros2", "exec container-id timeout --signal=TERM --kill-after=2s 10s bash -lc source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list")]
+    [InlineData("crane", "ros2", "ros2 param get /world_model_publisher team_name")]
     [InlineData("cm4-sim", "cm4_sim", "exec container-id sh -c")]
     public async Task ExpectedProcessWithoutServicePredicatePreventsReadiness(
         string profile,
@@ -301,12 +302,17 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Fact]
-    public void CraneReadinessProbeIsBoundedAndPreservesTheCoordinatorGraphCheck()
+    public void CraneReadinessProbeIsBoundedAndRequiresTeamIdentityAndCoordinator()
     {
+        var arguments = DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id", "crane");
         Assert.Equal(
-            ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc",
-                "source /root/ibis_ws/install/setup.bash && printf 'DUCK_CRANE_ROS_SETUP_OK\\n' && exec ros2 node list"],
-            DockerServiceReadiness.CreateCraneReadinessProbeArguments("container-id"));
+            ["exec", "container-id", "timeout", "--signal=TERM", "--kill-after=2s", "10s", "bash", "-lc"],
+            arguments[..^3]);
+        Assert.Contains("DUCK_CRANE_ROS_SETUP_OK", arguments[^3]);
+        Assert.Contains("ros2 param get /world_model_publisher team_name", arguments[^3]);
+        Assert.Contains("DUCK_CRANE_TEAM_NAME_MISMATCH", arguments[^3]);
+        Assert.Contains("exec ros2 node list", arguments[^3]);
+        Assert.Equal(["bash", "crane"], arguments[^2..]);
         Assert.False(CraneProbeDiagnostics.Evaluate(124, "/session_controller\n", "", TimeSpan.FromSeconds(10)).Ready);
         Assert.False(CraneProbeDiagnostics.Evaluate(0, "/session_controller\n", "", TimeSpan.Zero).Ready);
         Assert.False(CraneProbeDiagnostics.Evaluate(0,
@@ -583,6 +589,349 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.DoesNotContain("rm --force", commands);
     }
 
+    [Fact]
+    public async Task RealGameControllerMonitorDrivesWrapperThroughMissingMismatchRecoveryAndCancellationCleanup()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        using var cancellation = new CancellationTokenSource();
+        var now = DateTimeOffset.UtcNow;
+        var clock = new ManualTimeProvider(now);
+        var packetTransport = new ScriptedRefereePacketTransport();
+        var controlTransport = new RecordingYellowTeamTransport();
+        var monitor = new GameControllerReadinessMonitor(
+            (int)Referee.Types.Command.Halt,
+            "crane",
+            clock,
+            packetTransport,
+            controlTransport,
+            _ => Task.FromResult(true));
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ExpectedProcessName = string.Empty,
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var run = DockerContainerWrapper.RunAsync(
+            options, cancellation.Token, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        packetTransport.Publish(new global::Referee
+        {
+            Command = Referee.Types.Command.Halt,
+            Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+        });
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.OK);
+
+        packetTransport.Publish(new global::Referee { Command = Referee.Types.Command.Halt });
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Recovering,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Single(controlTransport.Messages);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+        using (var live = await new HttpClient().GetAsync($"http://127.0.0.1:{options.HealthPort}/health/live"))
+        {
+            Assert.Equal(HttpStatusCode.OK, live.StatusCode);
+        }
+
+        clock.Advance(TimeSpan.FromSeconds(1));
+        packetTransport.Publish(new global::Referee
+        {
+            Command = Referee.Types.Command.Halt,
+            Yellow = new global::Referee.Types.TeamInfo { Name = "different" },
+        });
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Recovering,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Equal(2, controlTransport.Messages.Count);
+
+        packetTransport.Publish(new global::Referee
+        {
+            Command = Referee.Types.Command.Halt,
+            Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+        });
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.OK);
+
+        cancellation.Cancel();
+        Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains("stop --time 3 container-id", commands);
+        Assert.Contains("rm --force container-id", commands);
+    }
+
+    [Fact]
+    public async Task RealGameControllerMonitorKeepsWrapperRecoveringUntilTenSecondDeadline()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        var clock = new ManualTimeProvider(DateTimeOffset.UtcNow);
+        var packetTransport = new ScriptedRefereePacketTransport();
+        var controlTransport = new RecordingYellowTeamTransport();
+        var monitor = new GameControllerReadinessMonitor(
+            (int)Referee.Types.Command.Halt,
+            "crane",
+            clock,
+            packetTransport,
+            controlTransport,
+            _ => Task.FromResult(true));
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ExpectedProcessName = string.Empty,
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var run = DockerContainerWrapper.RunAsync(
+            options, CancellationToken.None, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        packetTransport.Publish(new global::Referee
+        {
+            Command = Referee.Types.Command.Halt,
+            Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+        });
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.OK);
+        packetTransport.Publish(new global::Referee
+        {
+            Command = Referee.Types.Command.Halt,
+            Yellow = new global::Referee.Types.TeamInfo { Name = "wrong" },
+        });
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Recovering,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Single(controlTransport.Messages);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+
+        clock.Advance(TimeSpan.FromSeconds(1));
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Recovering,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Equal(2, controlTransport.Messages.Count);
+
+        clock.Advance(TimeSpan.FromSeconds(1));
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Recovering,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Equal(3, controlTransport.Messages.Count);
+
+        clock.Advance(TimeSpan.FromSeconds(7));
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Recovering,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Equal(3, controlTransport.Messages.Count);
+
+        clock.Advance(TimeSpan.FromSeconds(1));
+        Assert.Equal(
+            GameControllerRuntimeReadiness.Failed,
+            await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains("stop --time 3 container-id", commands);
+        Assert.Contains("rm --force container-id", commands);
+    }
+
+    [Theory]
+    [InlineData(9999, true)]
+    [InlineData(10000, false)]
+    [InlineData(10001, false)]
+    public async Task RecoveryProbeSuccessIsRejectedAtOrAfterTheTenSecondDeadline(
+        int elapsedMilliseconds,
+        bool shouldBeHealthy)
+    {
+        var clock = new ManualTimeProvider(DateTimeOffset.UtcNow);
+        var packetTransport = new ScriptedRefereePacketTransport();
+        var controlTransport = new RecordingYellowTeamTransport();
+        var advanceProbe = false;
+        var monitor = new GameControllerReadinessMonitor(
+            (int)Referee.Types.Command.Halt,
+            "crane",
+            clock,
+            packetTransport,
+            controlTransport,
+            _ =>
+            {
+                if (advanceProbe)
+                {
+                    clock.Advance(TimeSpan.FromMilliseconds(elapsedMilliseconds - 9000));
+                    packetTransport.Publish(new global::Referee
+                    {
+                        Command = Referee.Types.Command.Halt,
+                        Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+                    });
+                }
+
+                return Task.FromResult(true);
+            });
+
+        await using (monitor)
+        {
+            packetTransport.Publish(new global::Referee
+            {
+                Command = Referee.Types.Command.Halt,
+                Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+            });
+            Assert.Equal(
+                GameControllerRuntimeReadiness.Healthy,
+                await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+
+            packetTransport.Publish(new global::Referee { Command = Referee.Types.Command.Halt });
+            Assert.Equal(
+                GameControllerRuntimeReadiness.Recovering,
+                await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+            Assert.Single(controlTransport.Messages);
+
+            clock.Advance(TimeSpan.FromSeconds(9));
+            packetTransport.Publish(new global::Referee
+            {
+                Command = Referee.Types.Command.Halt,
+                Yellow = new global::Referee.Types.TeamInfo { Name = "crane" },
+            });
+            advanceProbe = true;
+
+            Assert.Equal(
+                shouldBeHealthy ? GameControllerRuntimeReadiness.Healthy : GameControllerRuntimeReadiness.Failed,
+                await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
+        }
+    }
+
+    [Fact]
+    public async Task GameControllerRuntimeReadinessRecoversAfterYellowTeamInformationReturns()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        using var cancellation = new CancellationTokenSource();
+        var monitor = new ScriptedGameControllerReadinessMonitor(
+            GameControllerRuntimeReadiness.Recovering,
+            GameControllerRuntimeReadiness.Healthy);
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ExpectedProcessName = string.Empty,
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var run = DockerContainerWrapper.RunAsync(
+            options, cancellation.Token, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        await WaitForReadyAsync(options.HealthPort);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+        using (var live = await new HttpClient().GetAsync($"http://127.0.0.1:{options.HealthPort}/health/live"))
+        {
+            Assert.Equal(HttpStatusCode.OK, live.StatusCode);
+        }
+        await WaitForReadyAsync(options.HealthPort);
+
+        cancellation.Cancel();
+        Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains("stop --time 3 container-id", commands);
+        Assert.Contains("rm --force container-id", commands);
+    }
+
+    [Fact]
+    public async Task PersistentGameControllerTeamMismatchFailsOnlyAfterRuntimeRecoveryWindow()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        var monitor = new ScriptedGameControllerReadinessMonitor(
+            GameControllerRuntimeReadiness.Recovering,
+            GameControllerRuntimeReadiness.Recovering,
+            GameControllerRuntimeReadiness.Recovering,
+            GameControllerRuntimeReadiness.Failed);
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ExpectedProcessName = string.Empty,
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        var run = DockerContainerWrapper.RunAsync(
+            options, CancellationToken.None, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        await WaitForReadyAsync(options.HealthPort);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        Assert.True(elapsed.Elapsed >= TimeSpan.FromSeconds(2), $"Wrapper failed before its recovery checks: {elapsed.Elapsed}.");
+        Assert.Contains("stop --time 3 container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+    }
+
+    [Fact]
+    public async Task ExpectedProcessExitDuringGameControllerRecoveryStillFailsAndCleansUp()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        var monitor = new ScriptedGameControllerReadinessMonitor(GameControllerRuntimeReadiness.Recovering);
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var run = DockerContainerWrapper.RunAsync(
+            options, CancellationToken.None, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        await WaitForReadyAsync(options.HealthPort);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+        fake.MarkExpectedProcessExited();
+
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+    }
+
+    [Fact]
+    public async Task OwnerMismatchDuringGameControllerRecoveryFailsAndLeavesForeignContainerUntouched()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        var monitor = new ScriptedGameControllerReadinessMonitor(GameControllerRuntimeReadiness.Recovering);
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ExpectedProcessName = string.Empty,
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var run = DockerContainerWrapper.RunAsync(
+            options, CancellationToken.None, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        await WaitForReadyAsync(options.HealthPort);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+        fake.MarkContainerForeign();
+
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.DoesNotContain("stop --time", commands);
+        Assert.DoesNotContain("rm --force", commands);
+    }
+
+    [Fact]
+    public async Task CancellationDuringGameControllerRecoveryCleansTheOwnedContainer()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        using var fake = new FakeDockerClient(slowCreate: false, foreignImage: false);
+        using var cancellation = new CancellationTokenSource();
+        var monitor = new ScriptedGameControllerReadinessMonitor(GameControllerRuntimeReadiness.Recovering);
+        var options = fake.Options(FindOpenPort()) with
+        {
+            ExpectedProcessName = string.Empty,
+            ReadinessProfile = "game-controller",
+            ExpectedCraneTeamName = "crane",
+        };
+        var run = DockerContainerWrapper.RunAsync(
+            options, cancellation.Token, StopTestChildProcessAsync, _ => { }, _ => monitor);
+
+        await WaitForReadyAsync(options.HealthPort);
+        await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
+        cancellation.Cancel();
+
+        Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains("stop --time 3 container-id", commands);
+        Assert.Contains("rm --force container-id", commands);
+    }
+
     private static async Task WaitForReadyAsync(int port) =>
         await WaitUntilAsync(async () =>
         {
@@ -590,6 +939,20 @@ public sealed class DockerContainerWrapperLifecycleTests
             {
                 using var response = await new HttpClient().GetAsync($"http://127.0.0.1:{port}/health/ready");
                 return response.StatusCode == HttpStatusCode.OK;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        });
+
+    private static async Task WaitForHealthStatusAsync(int port, HttpStatusCode expectedStatus) =>
+        await WaitUntilAsync(async () =>
+        {
+            try
+            {
+                using var response = await new HttpClient().GetAsync($"http://127.0.0.1:{port}/health/ready");
+                return response.StatusCode == expectedStatus;
             }
             catch (HttpRequestException)
             {
@@ -623,6 +986,63 @@ public sealed class DockerContainerWrapperLifecycleTests
         using var listener = new TcpListener(IPAddress.Loopback, 0);
         listener.Start();
         return ((IPEndPoint)listener.LocalEndpoint).Port;
+    }
+
+    private sealed class ManualTimeProvider(DateTimeOffset initialTime) : TimeProvider
+    {
+        private DateTimeOffset currentTime = initialTime;
+        public override DateTimeOffset GetUtcNow() => currentTime;
+        public void Advance(TimeSpan amount) => currentTime += amount;
+    }
+
+    private sealed class ScriptedRefereePacketTransport : IGameControllerRefereePacketTransport
+    {
+        private Action<global::Referee, DateTimeOffset>? onPacket;
+        private TimeProvider? timeProvider;
+
+        public void Start(
+            Action<global::Referee, DateTimeOffset> packetObserver,
+            TimeProvider provider,
+            CancellationToken cancellationToken)
+        {
+            onPacket = packetObserver;
+            timeProvider = provider;
+        }
+
+        public void Publish(global::Referee referee) =>
+            (onPacket ?? throw new InvalidOperationException("Packet transport has not started."))(
+                referee,
+                (timeProvider ?? throw new InvalidOperationException("Packet transport has not started.")).GetUtcNow());
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
+
+    private sealed class RecordingYellowTeamTransport : Duck.Testing.RefereeDriver.IGameControllerWebSocketTransport
+    {
+        public List<string> Messages { get; } = [];
+
+        public Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken)
+        {
+            Messages.Add(json);
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class ScriptedGameControllerReadinessMonitor(
+        params GameControllerRuntimeReadiness[] runtimeStates) : IGameControllerReadinessMonitor
+    {
+        private readonly Queue<GameControllerRuntimeReadiness> states = new(runtimeStates);
+        private GameControllerRuntimeReadiness lastState = GameControllerRuntimeReadiness.Healthy;
+
+        public Task<bool> IsHealthyAsync(CancellationToken cancellationToken) => Task.FromResult(true);
+
+        public Task<GameControllerRuntimeReadiness> GetRuntimeReadinessAsync(CancellationToken cancellationToken)
+        {
+            if (states.TryDequeue(out var nextState)) lastState = nextState;
+            return Task.FromResult(lastState);
+        }
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 
     private sealed class FakeDockerClient : IDisposable
@@ -660,8 +1080,9 @@ public sealed class DockerContainerWrapperLifecycleTests
                 HostConfig = new { NetworkMode = "host" },
                 State = new { Running = true },
             };
-            var inspectionPath = Path.Combine(directory, "inspection.json");
-            File.WriteAllText(inspectionPath, JsonSerializer.Serialize(inspection));
+            InspectionPath = Path.Combine(directory, "inspection.json");
+            File.WriteAllText(InspectionPath, JsonSerializer.Serialize(inspection));
+            ExpectedProcessExitedPath = Path.Combine(directory, "process-exited");
             var discoveryMarkerPath = Path.Combine(directory, "discovery-seen");
             var craneProbeCountPath = Path.Combine(directory, "crane-probe-count");
             var craneProbeCommand = craneProbeTimeoutResponses == 0
@@ -669,7 +1090,7 @@ public sealed class DockerContainerWrapperLifecycleTests
                 : "  exec) count=$(cat '" + craneProbeCountPath + "' 2>/dev/null || echo 0); " +
                 "count=$((count + 1)); echo \"$count\" > '" + craneProbeCountPath + "'; " +
                     "if [ \"$count\" -le " + craneProbeTimeoutResponses + " ]; then echo 'password=CRANE_DIAGNOSTIC_SENTINEL' >&2; exit 124; fi; " +
-                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\n/session_controller\\n' ;;";
+                    "printf 'DUCK_CRANE_ROS_SETUP_OK\\nDUCK_CRANE_TEAM_NAME_OK:crane\\n/session_controller\\n' ;;";
             ExecutablePath = Path.Combine(directory, "docker-fake");
             var createDelay = slowCreate ? "sleep 20" : ":";
             File.WriteAllText(ExecutablePath, string.Join('\n',
@@ -679,8 +1100,8 @@ public sealed class DockerContainerWrapperLifecycleTests
                 "case \"$1\" in",
                 $"  run) {createDelay}; echo container-id ;;",
                 $"  ps) {(emptyDiscovery ? ":" : delayedDiscovery ? $"if [ -f '{discoveryMarkerPath}' ]; then echo container-id; else touch '{discoveryMarkerPath}'; fi" : "echo container-id")} ;;",
-                $"  inspect) cat '{inspectionPath}' ;;",
-                $"  top) echo 'PID USER COMMAND'; echo '1 root {processName}' ;;",
+                $"  inspect) cat '{InspectionPath}' ;;",
+                $"  top) echo 'PID USER COMMAND'; if [ -f '{ExpectedProcessExitedPath}' ]; then echo '1 root exited-process'; else echo '1 root {processName}'; fi ;;",
                 craneProbeCommand,
                 "  logs) exec sleep 120 ;;",
                 $"  stop) {(slowStop ? "sleep 20" : ":")}; exit 0 ;;",
@@ -697,6 +1118,22 @@ public sealed class DockerContainerWrapperLifecycleTests
         public string ExecutablePath { get; }
 
         public string TracePath { get; }
+
+        private string InspectionPath { get; }
+
+        private string ExpectedProcessExitedPath { get; }
+
+        public void MarkExpectedProcessExited() => File.WriteAllText(ExpectedProcessExitedPath, "exited");
+
+        public void MarkContainerForeign()
+        {
+            var inspection = JsonNode.Parse(File.ReadAllText(InspectionPath))?.AsObject()
+                ?? throw new InvalidOperationException("Fake inspection did not contain an object.");
+            var labels = inspection["Config"]?["Labels"]?.AsObject()
+                ?? throw new InvalidOperationException("Fake inspection did not contain labels.");
+            labels[DockerContainerSpec.RunLabel] = "foreign-run";
+            File.WriteAllText(InspectionPath, inspection.ToJsonString());
+        }
 
         public DockerWrapperLaunchOptions Options(int port) => new(
             "simulator", "test/image:tag", ["tini", "--", "simulator"], new(), "stack-17", "run-17", port,

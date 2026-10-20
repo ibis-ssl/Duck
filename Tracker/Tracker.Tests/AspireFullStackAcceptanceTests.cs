@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using Duck.Testing.AppHost;
 using Duck.Testing.RefereeDriver;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     [Fact]
     public async Task FullStack_ReachesActiveRefereeAndMovesCraneRobot()
     {
+        var stackId = Environment.GetEnvironmentVariable("DUCK_ASPIRE_STACK_ID");
+        if (string.IsNullOrWhiteSpace(stackId))
+        {
+            throw new InvalidOperationException("DUCK_ASPIRE_STACK_ID must identify the AppHost stack under test.");
+        }
+
+        var manifestPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_FIXTURE_MANIFEST")
+            ?? CraneFixtureManifest.GetDefaultPath(stackId);
+        var craneFixtureSettings = CraneFixtureManifest.ReadForStack(manifestPath, stackId);
         var artifactsDirectory = Environment.GetEnvironmentVariable("DUCK_ASPIRE_ARTIFACTS")
             ?? Path.Combine(Path.GetTempPath(), "duck-aspire-full-stack-artifacts");
         Directory.CreateDirectory(artifactsDirectory);
@@ -73,6 +83,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 throw new InvalidOperationException(
                     $"REFEREE_FIXTURE_FAILURE: expected initial HALT, observed {initial.Command}.");
             }
+
+            Assert.True(
+                craneFixtureSettings.MatchesExpectedYellowTeamName(initial.YellowTeamName),
+                $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name '{craneFixtureSettings.TeamName}' before starting motion, observed '{initial.YellowTeamName}'.");
+            output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
 
             SSL_WrapperPacket initialVision;
             stageReached = "initial_vision_wait";

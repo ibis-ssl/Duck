@@ -44,7 +44,8 @@ public static class DockerContainerWrapper
         DockerWrapperLaunchOptions options,
         CancellationToken shutdownToken,
         Func<Process, TimeSpan, Task<bool>> stopChildProcessAsync,
-        Action<string> diagnosticWriter)
+        Action<string> diagnosticWriter,
+        Func<DockerWrapperLaunchOptions, IGameControllerReadinessMonitor>? readinessMonitorFactory = null)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(stopChildProcessAsync);
@@ -81,7 +82,9 @@ public static class DockerContainerWrapper
         using var healthCancellation = new CancellationTokenSource();
         var healthTask = ServeHealthAsync(health, live, ready, healthCancellation.Token);
         await using var gameControllerReadiness = options.ReadinessProfile == "game-controller"
-            ? new GameControllerReadinessMonitor(expectedInitialCommand: 0)
+            ? readinessMonitorFactory?.Invoke(options) ?? new GameControllerReadinessMonitor(
+                expectedInitialCommand: 0,
+                expectedYellowTeamName: options.ExpectedCraneTeamName ?? "crane")
             : null;
         await using var visionReadiness = options.ReadinessProfile == "simulator"
             ? new VisionServiceReadiness()
@@ -117,12 +120,35 @@ public static class DockerContainerWrapper
                 trackerPacketReadiness, diagnosticWriter, cancellation.Token);
             ready.Set();
 
+            var runtimeProbeInterval = options.ReadinessProfile == "game-controller"
+                ? TimeSpan.FromSeconds(1)
+                : TimeSpan.FromSeconds(2);
             while (!cancellation.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellation.Token);
+                await Task.Delay(runtimeProbeInterval, cancellation.Token);
                 await EnsureExactRunningOwnerAsync(spec, containerId, options.DockerExecutable, cancellation.Token);
-                await EnsureExpectedProcessAsync(containerId, options, cancellation.Token);
-                if (!await IsServiceReadyAsync(containerId, options, gameControllerReadiness, visionReadiness,
+                if (!await EnsureExpectedProcessAsync(containerId, options, cancellation.Token))
+                {
+                    throw new InvalidOperationException($"Expected process {options.ExpectedProcessName} is no longer running in owned container {containerId}.");
+                }
+                if (options.ReadinessProfile == "game-controller" && gameControllerReadiness is not null)
+                {
+                    switch (await gameControllerReadiness.GetRuntimeReadinessAsync(cancellation.Token))
+                    {
+                        case GameControllerRuntimeReadiness.Healthy:
+                            ready.Set();
+                            break;
+                        case GameControllerRuntimeReadiness.Recovering:
+                            ready.Reset();
+                            break;
+                        case GameControllerRuntimeReadiness.Failed:
+                            throw new InvalidOperationException(
+                                "Game Controller team identity/readiness did not recover within its bounded retry window.");
+                        default:
+                            throw new InvalidOperationException("Game Controller returned an unknown readiness state.");
+                    }
+                }
+                else if (!await IsServiceReadyAsync(containerId, options, gameControllerReadiness, visionReadiness,
                     craneProbeDiagnostics, trackerPacketReadiness, diagnosticWriter, cancellation.Token))
                 {
                     throw new InvalidOperationException($"Service readiness became unhealthy for {spec.ResourceName}.");
@@ -339,7 +365,7 @@ public static class DockerContainerWrapper
         DockerContainerSpec spec,
         string containerId,
         DockerWrapperLaunchOptions options,
-        GameControllerReadinessMonitor? gameControllerReadiness,
+        IGameControllerReadinessMonitor? gameControllerReadiness,
         VisionServiceReadiness? visionReadiness,
         CraneProbeDiagnosticState? craneProbeDiagnostics,
         TrackerPacketReadinessMonitor? trackerPacketReadiness,
@@ -388,7 +414,7 @@ public static class DockerContainerWrapper
     private static async Task<bool> IsServiceReadyAsync(
         string containerId,
         DockerWrapperLaunchOptions options,
-        GameControllerReadinessMonitor? gameControllerReadiness,
+        IGameControllerReadinessMonitor? gameControllerReadiness,
         VisionServiceReadiness? visionReadiness,
         CraneProbeDiagnosticState? craneProbeDiagnostics,
         TrackerPacketReadinessMonitor? trackerPacketReadiness,
@@ -409,7 +435,9 @@ public static class DockerContainerWrapper
                 var probeTimer = Stopwatch.StartNew();
                 var graph = await RunDockerAsync(
                     options.DockerExecutable,
-                    DockerServiceReadiness.CreateCraneReadinessProbeArguments(containerId),
+                    DockerServiceReadiness.CreateCraneReadinessProbeArguments(
+                        containerId,
+                        options.ExpectedCraneTeamName ?? "crane"),
                     cancellationToken);
                 if (craneProbeDiagnostics is null)
                 {
