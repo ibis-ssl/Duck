@@ -16,7 +16,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 
 ## 参考仕様資料
 
-- [reference/specs](reference/specs): ibis-ssl の仕様資料を参照用のGit submoduleとして置きます。Duckの実行時依存関係には含めず、必要に応じてsubmoduleの固定commitを更新します。
+- [仕様資料](reference/specs): SSLの仕様資料をGitの外部参照として配置します。Duckの実行時依存には含めず、必要なときに参照先を更新します。
 
 ## 前提
 
@@ -49,7 +49,7 @@ dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
 
 ## Aspire全体受入の起動設定
 
-全体受入試験では、AppHostと受入試験に同じstack IDとmanifest pathを渡します。manifestはrunごとに一意なファイル名を使い、既存ファイルを再利用しません。AppHost起動前に次を設定してください。
+全体受入試験では、AppHostと受入試験に同じ識別子と設定ファイルの場所を渡します。設定ファイルは実行ごとに別の名前を使い、既存のものを再利用しません。AppHostの起動前に次を設定してください。
 
 ```bash
 stack_id="local-$(date -u +%Y%m%dT%H%M%SZ)-$$"
@@ -63,7 +63,7 @@ export DUCK_ASPIRE_STACK_ID="$stack_id"
 export DUCK_ASPIRE_FIXTURE_MANIFEST="$manifest_path"
 ```
 
-起動、全resourceのreadiness待ち、owner/stack一致確認、opt-inの受入試験、所有stackだけのcleanupは、CIと同じ順序で行います。実行手順とcleanup範囲の正本は [.github/workflows/dotnet-test.yml](.github/workflows/dotnet-test.yml) です。readiness成功前に全体受入試験を開始しません。
+起動から全資源の準備完了、所有者と識別子の確認、受入試験、所有資源の後始末まで、CIと同じ順序で行います。手順と後始末の対象は[CIの設定](.github/workflows/dotnet-test.yml)を参照してください。準備完了前に全体受入試験を開始しません。
 
 ## Tracker.DebugHost の起動
 
