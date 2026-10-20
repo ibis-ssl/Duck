@@ -35,3 +35,13 @@ The successful .NET builds reported the existing NU1902 MessagePack advisory and
 ## Publication state
 
 Commits `13b62b1995b21a626bcdfb9ae17a2518b1b70489`, `eccfcb02d5ed6fab60dcdc2e68d0a4107e7791a9`, and `3e2f93e38003a850fdf5f9fa02265f6c88611d64` were pushed by normal fast-forward to `origin/task/aspire-fullstack-fixture-stability`; each explicit push exited 0. This report was then corrected with the final per-document lint results and pushed by another normal fast-forward. Final remote readback confirmed the requested branch at the current pushed HEAD. The local branch's configured upstream remains `origin/design/issue18-aspire-test-orchestration`; pushes targeted the requested PR branch explicitly. No new PR, issue, or branch was created.
+
+
+## Final review follow-up — validation worktree based at HEAD 8457fb3c300b5c65b64a7b1fbc79b024ef81ca94
+
+- After explicit user approval, added only サブモジュール to tools/lint/markdown-whitelist.yaml; no other allowlist terms changed.
+- SudachiPy 0.6.11 / SudachiDict-core 20260428, using /home/donabe/venvs/duck-pr73-r04-ff50682/bin/python: the README and fixture-stability design document whitelist check both passed (exit 0).
+- Textlint 15.7.0 with the repository config and CSpell 9.8.0 with the repository wrapper/config each passed on README.md and the design document (exit 0; CSpell found 0 issues).
+- Yomiyasu 0df47749139dfd64ad3d55e7d53d3839e5874848, non-strict JSON mode after these report contents were finalized: README 75/100 with five warnings (excess_list line 1; sentence_end_repetition line 90; trailing_colon lines 74, 83, 92); design 100/100 with no warnings; this report 95/100 with one excess_list warning at line 1. Each file exited 0.
+- dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj -m:1 /nr:false and dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false both succeeded (exit 0). Existing warnings: NU1902 for MessagePack 2.5.302 and ASPIRE010 because Aspire CLI bundle is disabled.
+- Before the new manual run, CI run 39444258169 matched the prior HEAD; test passed while ASPIRE-NET-002 and full-stack acceptance were skipped. The requested workflow_dispatch will be run against the final pushed HEAD with no inputs; its result will be reported separately.
