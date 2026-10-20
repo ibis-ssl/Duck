@@ -212,6 +212,28 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(teamName, gameController.ExpectedCraneTeamName);
     }
 
+    [Fact]
+    public async Task AppHostWritesResolvedCliTeamSettingsToAnOwnedManifest()
+    {
+        var stackId = "manifest-" + Guid.NewGuid().ToString("N");
+        var directory = Path.Combine(Path.GetTempPath(), "duck-crane-model-" + Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(directory, "fixture.json");
+        try
+        {
+            using var appHost = await CreateAppHostAsync(
+                "--Testing:Crane:TeamName=custom_from_cli",
+                "--Testing:Crane:FixtureManifestPath=" + path,
+                "--Testing:StackOwnership:StackId=" + stackId);
+            var settings = CraneFixtureManifest.ReadForStack(path, stackId);
+            Assert.Equal("custom_from_cli", settings.TeamName);
+            Assert.Equal(CraneFixtureSettings.YellowTeamColor, settings.TeamColor);
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
+    }
+
     [Theory]
     [InlineData("crane team")]
     [InlineData("crane;touch_tmp")]

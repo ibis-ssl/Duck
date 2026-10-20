@@ -24,8 +24,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     [Fact]
     public async Task FullStack_ReachesActiveRefereeAndMovesCraneRobot()
     {
-        var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
-            new ConfigurationBuilder().AddEnvironmentVariables().Build());
+        var stackId = Environment.GetEnvironmentVariable("DUCK_ASPIRE_STACK_ID");
+        if (string.IsNullOrWhiteSpace(stackId))
+        {
+            throw new InvalidOperationException("DUCK_ASPIRE_STACK_ID must identify the AppHost stack under test.");
+        }
+
+        var manifestPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_FIXTURE_MANIFEST")
+            ?? CraneFixtureManifest.GetDefaultPath(stackId);
+        var craneFixtureSettings = CraneFixtureManifest.ReadForStack(manifestPath, stackId);
         var artifactsDirectory = Environment.GetEnvironmentVariable("DUCK_ASPIRE_ARTIFACTS")
             ?? Path.Combine(Path.GetTempPath(), "duck-aspire-full-stack-artifacts");
         Directory.CreateDirectory(artifactsDirectory);

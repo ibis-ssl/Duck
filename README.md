@@ -47,6 +47,24 @@ dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-cache --force
 dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
 ```
 
+## Aspire全体受入の起動設定
+
+全体受入試験では、AppHostと受入試験に同じstack IDとmanifest pathを渡します。manifestはrunごとに一意なファイル名を使い、既存ファイルを再利用しません。AppHost起動前に次を設定してください。
+
+```bash
+stack_id="local-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+results_dir="$PWD/artifacts/aspire-full-stack"
+mkdir -p "$results_dir"
+manifest_path="$results_dir/crane-fixture-$stack_id.json"
+export Testing__StackOwnership__StackId="$stack_id"
+export Testing__StackOwnership__LockPath="${TMPDIR:-/tmp}/duck-aspire-$stack_id.lock"
+export Testing__Crane__FixtureManifestPath="$manifest_path"
+export DUCK_ASPIRE_STACK_ID="$stack_id"
+export DUCK_ASPIRE_FIXTURE_MANIFEST="$manifest_path"
+```
+
+起動、全resourceのreadiness待ち、owner/stack一致確認、opt-inの受入試験、所有stackだけのcleanupは、CIと同じ順序で行います。実行手順とcleanup範囲の正本は [.github/workflows/dotnet-test.yml](.github/workflows/dotnet-test.yml) です。readiness成功前に全体受入試験を開始しません。
+
 ## Tracker.DebugHost の起動
 
 ```bash

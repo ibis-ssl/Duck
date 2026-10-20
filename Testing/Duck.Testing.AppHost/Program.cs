@@ -54,6 +54,10 @@ var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =
     builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
 var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");
+var fixtureManifestPath =
+    builder.Configuration["Testing:Crane:FixtureManifestPath"] ??
+    CraneFixtureManifest.GetDefaultPath(stackId);
+CraneFixtureManifest.WriteAtomically(fixtureManifestPath, stackId, craneFixtureSettings);
 
 var simulator = builder.AddDockerWrapper(
     new DockerContainerSpec(

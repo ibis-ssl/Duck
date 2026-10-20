@@ -3,6 +3,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Tracker.Tests;
 
+[CollectionDefinition("Process environment", DisableParallelization = true)]
+public sealed class ProcessEnvironmentTestCollection
+{
+}
+
+[Collection("Process environment")]
 public sealed class CraneFixtureSettingsTests
 {
     [Fact]
@@ -30,6 +36,33 @@ public sealed class CraneFixtureSettingsTests
         Assert.Equal("custom-team_7", settings.TeamName);
         Assert.True(settings.MatchesExpectedYellowTeamName("custom-team_7"));
         Assert.False(settings.MatchesExpectedYellowTeamName("crane"));
+    }
+
+    [Fact]
+    public void ResolvesNondefaultTeamNameFromJsonConfiguration()
+    {
+        using var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(
+            """{"Testing":{"Crane":{"TeamName":"json_crane"}}}"""));
+        var configuration = new ConfigurationBuilder().AddJsonStream(json).Build();
+
+        Assert.Equal("json_crane", CraneFixtureSettings.FromConfiguration(configuration).TeamName);
+    }
+
+    [Fact]
+    public void ResolvesNondefaultTeamNameFromEnvironmentConfiguration()
+    {
+        const string variable = "Testing__Crane__TeamName";
+        var previous = Environment.GetEnvironmentVariable(variable);
+        try
+        {
+            Environment.SetEnvironmentVariable(variable, "environment_crane");
+            var configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            Assert.Equal("environment_crane", CraneFixtureSettings.FromConfiguration(configuration).TeamName);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variable, previous);
+        }
     }
 
     [Fact]

@@ -12,7 +12,13 @@ public sealed record CraneFixtureSettings(string TeamName, string TeamColor)
     public static CraneFixtureSettings FromConfiguration(IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        var teamName = configuration[TeamNameConfigurationKey] ?? DefaultTeamName;
+        return FromValues(
+            configuration[TeamNameConfigurationKey] ?? DefaultTeamName,
+            configuration[TeamColorConfigurationKey] ?? YellowTeamColor);
+    }
+
+    public static CraneFixtureSettings FromValues(string teamName, string teamColor)
+    {
         if (string.IsNullOrWhiteSpace(teamName) || teamName.Any(character =>
                 !char.IsAsciiLetterOrDigit(character) && character is not '_' and not '-'))
         {
@@ -20,7 +26,6 @@ public sealed record CraneFixtureSettings(string TeamName, string TeamColor)
                 $"{TeamNameConfigurationKey} must contain only ASCII letters, digits, underscores, or hyphens.");
         }
 
-        var teamColor = configuration[TeamColorConfigurationKey] ?? YellowTeamColor;
         if (teamColor != YellowTeamColor)
         {
             throw new InvalidOperationException(

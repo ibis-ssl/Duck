@@ -425,6 +425,11 @@ jobs:
           stack_id="gha-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           export Testing__StackOwnership__LockPath="$stack_lock"
           export Testing__StackOwnership__StackId="$stack_id"
+          export DUCK_ASPIRE_STACK_ID="$stack_id"
+          export DUCK_ASPIRE_FIXTURE_MANIFEST="$results_dir/crane-fixture-$stack_id.json"
+          export Testing__Crane__FixtureManifestPath="$DUCK_ASPIRE_FIXTURE_MANIFEST"
+          printf 'DUCK_ASPIRE_STACK_ID=%s\nDUCK_ASPIRE_FIXTURE_MANIFEST=%s\n' \
+            "$DUCK_ASPIRE_STACK_ID" "$DUCK_ASPIRE_FIXTURE_MANIFEST" >> "$GITHUB_ENV"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           apphost_mode="base"
           if [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \

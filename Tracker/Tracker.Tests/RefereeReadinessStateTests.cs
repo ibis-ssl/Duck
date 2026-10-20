@@ -113,16 +113,51 @@ public sealed class RefereeReadinessStateTests
         policy.RecordSendCompleted(firstRecovery.AddSeconds(1));
         Assert.True(policy.TryBeginSend(firstRecovery.AddSeconds(2), expectedNameObserved: false));
         policy.RecordSendCompleted(firstRecovery.AddSeconds(2));
-        Assert.False(policy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(2.999)));
-        Assert.True(policy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(3)));
+        Assert.False(policy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(3)));
+        Assert.False(policy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(9.999)));
+        Assert.True(policy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(10)));
 
-        var laterRecovery = firstRecovery.AddSeconds(10);
+        var laterRecovery = firstRecovery.AddSeconds(20);
         Assert.False(policy.IsRecoveryExpired(laterRecovery, laterRecovery.AddMilliseconds(999)));
-        Assert.True(policy.IsRecoveryExpired(laterRecovery, laterRecovery.AddSeconds(1)));
+        Assert.False(policy.IsRecoveryExpired(laterRecovery, laterRecovery.AddSeconds(9)));
 
         var noRequestPolicy = new GameControllerTeamNameRetryPolicy();
         Assert.False(noRequestPolicy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(9.999)));
         Assert.True(noRequestPolicy.IsRecoveryExpired(firstRecovery, firstRecovery.AddSeconds(10)));
+    }
+
+    [Fact]
+    public void StartupAttemptsConsumeTheSameBudgetUsedByLaterRecovery()
+    {
+        var policy = new GameControllerTeamNameRetryPolicy();
+        var startup = DateTimeOffset.UtcNow;
+        Assert.True(policy.TryBeginSend(startup, expectedNameObserved: false));
+        policy.RecordSendCompleted(startup);
+        Assert.True(policy.TryBeginSend(startup.AddSeconds(1), expectedNameObserved: false));
+        policy.RecordSendCompleted(startup.AddSeconds(1));
+
+        var recovery = startup.AddSeconds(3);
+        Assert.True(policy.TryBeginSend(recovery, expectedNameObserved: false, recovery));
+        policy.RecordSendCompleted(recovery);
+        Assert.False(policy.TryBeginSend(recovery.AddSeconds(1), expectedNameObserved: false, recovery));
+        Assert.False(policy.IsRecoveryExpired(recovery, recovery.AddSeconds(9)));
+        Assert.True(policy.IsRecoveryExpired(recovery, recovery.AddSeconds(10)));
+    }
+
+    [Fact]
+    public void RecoveryDoesNotStartARequestThatCannotFinishWithConfirmationGrace()
+    {
+        var policy = new GameControllerTeamNameRetryPolicy();
+        var started = DateTimeOffset.UtcNow;
+        Assert.True(policy.TryBeginSend(started, expectedNameObserved: false, started));
+        policy.RecordSendCompleted(started.AddSeconds(2));
+
+        Assert.True(policy.TryBeginSend(started.AddSeconds(3), expectedNameObserved: false, started));
+
+        var nearDeadlinePolicy = new GameControllerTeamNameRetryPolicy();
+        Assert.True(nearDeadlinePolicy.TryBeginSend(started, expectedNameObserved: false, started));
+        nearDeadlinePolicy.RecordSendCompleted(started.AddSeconds(2));
+        Assert.False(nearDeadlinePolicy.TryBeginSend(started.AddSeconds(7.001), expectedNameObserved: false, started));
     }
 
     [Fact]
