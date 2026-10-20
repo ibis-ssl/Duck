@@ -432,7 +432,8 @@ jobs:
             "$DUCK_ASPIRE_STACK_ID" "$DUCK_ASPIRE_FIXTURE_MANIFEST" >> "$GITHUB_ENV"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           apphost_mode="base"
-          if [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
+          if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" || \
+                "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" || \
                 "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006b" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006b" || \
