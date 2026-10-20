@@ -24,6 +24,14 @@ Target: ibis-ssl/Duck PR 76, branch task/aspire-fullstack-fixture-stability. Val
 
 The successful .NET builds reported the existing NU1902 MessagePack advisory and ASPIRE010 disabled Aspire CLI bundle warnings.
 
+## Documentation checks
+
+- `npm run lint:md`: exit 1 because the worktree has no local `node_modules` and the wrapper could not find `textlint`; no dependencies were installed.
+- Textlint 15.7.0, run directly against README, this design document, and this report using the existing local dependency tree: exit 0 for all three files.
+- CSpell 9.8.0, using the repository wrapper and existing config/dictionary against the same three files: exit 0, 0 findings in README and the design document; the report was skipped by the existing `reports/**` ignore rule.
+- SudachiPy 0.6.11 / SudachiDict-core 20260428: exit 0 for README and the design document. The report is excluded by the existing Markdown target configuration.
+- Yomiyasu checkout `0df47749139dfd64ad3d55e7d53d3839e5874848`, run in JSON mode against all three files: exit 0. Its non-strict advisories include list-heavy content and existing sentence-ending/colon patterns; no strict mode was used.
+
 ## Publication state
 
-Implementation commit 13b62b1 (fix: align full-stack fixture manifest and recovery) was created locally on task/aspire-fullstack-fixture-stability after the 465-test run. No push has been made. The configured upstream is origin/design/issue18-aspire-test-orchestration, while a read-only git ls-remote confirmed origin/task/aspire-fullstack-fixture-stability points to base HEAD 7dc7b79b250af62268f34009bf3e0dea01fbae75. The bridge checkout reflog confirms previous fast-forward merges from a bundle ref, but the exact required WSL bundle creation, transfer, and Windows push command sequence is not present in accessible work records. This task has not inferred or run an unconfirmed transfer procedure.
+Commits `13b62b1995b21a626bcdfb9ae17a2518b1b70489`, `eccfcb02d5ed6fab60dcdc2e68d0a4107e7791a9`, and `3e2f93e38003a850fdf5f9fa02265f6c88611d64` were pushed by normal fast-forward to `origin/task/aspire-fullstack-fixture-stability`. The explicit push command exited 0. Remote readback confirms the branch points to `3e2f93e38003a850fdf5f9fa02265f6c88611d64`. The local branch's configured upstream remains `origin/design/issue18-aspire-test-orchestration`; the push targeted the requested PR branch explicitly. No new PR, issue, or branch was created.
