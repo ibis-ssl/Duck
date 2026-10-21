@@ -8,12 +8,12 @@
 - 題名: FA780のDocker開発環境を利用者単位のDocker Desktop 4.96へ統一する
 - 子課題: #80 設計・現状調査、#81 Aspire運用の移行、#82 起動停止・通信受入検証。すべて課題 #79の正式な子課題として作成し、`Project16`へ追加した。
 - 段階: 実装
-- 状態: 課題 #79〜#82は`Project16`で着手中。`Priority`は既存の最上位`Urgent`を設定済み。#80の設計レビューは受理済みだが実機測定は未完了。#81の実装・回帰試験・対象ビルドと通常レビューは完了し、コミット6c552a6の.NET試験も成功。#82の受入確認を開始し、Docker Desktopの実測情報を確認中。
+- 状態: GitHubプロジェクト16では、課題 #79 と #81 は着手中、#80 と #82 はDocker Desktopの実機受入に必要な既存イメージの複製と一時的なDockerコマンド転送経路の明示承認待ちで停止中（承認待ち）。#80の設計レビューは受理済みで、Docker Desktopの実測情報を設計記録へ反映した。#81の実装・回帰試験・対象ビルド・通常レビューは完了し、現在は追跡文書の同期後に行う独立最終レビューの準備中。#79は子課題のレビューと受入が残るため着手中。優先度は既存の最上位に設定済み。
 - 作業分岐: `task/aspire-docker-desktop-496`を作成。統合先の識別値は`c72939ec076ec3261357ba16e61fc5140de2b3d4`。
 - 現状観測: Linux環境のDocker接続先は`unix:///var/run/docker.sock`、環境は`FA780` / Docker 29.9.0 / Ubuntu 26.04.1。Windows側のコマンド検索範囲からDockerコマンドは見つからなかったが、利用者領域にDocker Desktop実行ファイルと同梱コマンドを確認した。製品版4.96.0.243774を実測し起動。同梱コマンドで`desktop-linux`接続先を選ぶと、Docker Desktopのサーバー版29.9.1へ接続し、コンテナ・イメージはともに0件。Linuxの既定接続先は別のDocker 29.9.0であり、変更していない。Linuxから同梱コマンドを明示接続先で呼び出せるが、Docker Desktopが提供するLinux連携口への接続は現在の利用者では拒否された。
 - 受入条件: Docker Desktop導入だけでコンテナ起動競合が直ると仮定しない。UDPと`multicast`の互換性を実測し、自身が起動したコンテナだけを後片付けする。既存環境の削除・停止、接続先や通信設定の変更は別確認なしに行わない。
-- 未実施: 今回のコンテナ作成・起動・停止・通信試験、UDP/マルチキャスト互換性と所有者限定の後片付けの実測。Docker Desktop側に必要なイメージがなく、Linux連携口への接続も拒否されたため、イメージ取得またはLinux連携設定の変更なしにはAspire受入を実行できない。これらの変更は未承認なので実施していない。既存Linux側のDocker環境・コンテナの停止や削除、Docker設定変更も実施していない。CI実行`39521219913`はコミット`6c552a6`で完了し.NET試験は成功したが、ASPIRE-NET-002のLinuxパケット通信試験とAspire全体構成のLinux受入試験は未実行であり、実機受入成功とは扱わない。
-- 次作業: #82の実機受入には、必要なイメージをDocker Desktopへ取得または移行する許可、もしくはLinux連携設定を有効にして接続権限を変える具体的な許可が必要。承認済みのコンテナ起動・停止試験では、起動元と完全IDを記録し、自分が所有することを再確認してから後片付けする。通信やホストネットワーク設定の変更が必要な場合は操作と影響を分けて報告する。#80の未完了実機情報もこの環境制約を記録し、設計・実装・CIの結果と未検証事項を区別する。
+- 未実施: Docker Desktopでの今回のコンテナ作成・起動・停止・通信試験、UDP/マルチキャスト互換性と所有者限定の後片付けの実機確認。その環境側に必要な4イメージがなく、Linux連携口への接続も拒否された。既存Linux側にあるイメージをDocker Desktopへ既存イメージの転送し、一時的にDockerコマンドをWindows側へ転送する案は、明示承認待ちのため未実行。Linux連携・権限・接続先・ネットワーク設定の変更、既存Linux側の実行環境や無関係なコンテナの停止・削除も行っていない。変更前コミットdafdbb55d6ec2bf36d4c3ef1232a0a6464a1b9a5のCI実行39523463243は.NETのテスト処理が成功、Linux通信経路検証と全体受入試験は実行されずであり、実機受入成功とは扱わない。
+- 次作業: #80/#82を再開するには、既存Linux環境の保存済みイメージにある4イメージをDocker Desktopへ既存イメージの転送し、一時的にDockerコマンドをWindows側へ転送する案への明示承認が必要。承認前はイメージの取得・移行、転送経路の作成・実行、コンテナ起動を行わない。承認後は4イメージと今回の試験用コンテナに限定して、起動・停止とUDP/マルチキャスト受入を試す。ホストネットワークや他の永続設定変更が必要になれば、その操作と影響について別途許可を求める。#81の独立最終レビューは、状態文書の同期、検証、コミット公開後の新しいコミットを対象にする。独立レビューと実機受入を終えるまで#79/#80/#81/#82を完了扱いにしない。
 - 配置規約: `CodexSkill`の複製先とDuckの各 `worktree` を `/home/donabe` 直下の兄弟に置く。新しいリポジトリ作業領域は `git worktree add --relative-paths /home/donabe/<作業領域名>` で作り、各作業領域の `.agents/skills` を相対シンボリックリンク `../../CodexSkill/skills` としてGitの `mode 120000` で追跡する。公式の `link_consumer_skills.py` は絶対リンクを作るため、作成後に相対先へ正規化して解決先を確認する。`CodexSkill`の複製先を移動・削除しない。
 - 作業分岐: `task/aspire-docker-desktop-496` の現在の作業場所は `/home/donabe/Duck-aspire-docker-desktop-496`。元の `/mnt/c/Users/donabe/Documents/Codex/2026-10-21/task-8` は同じ `HEAD` で `detached` 状態のまま保持し、削除していない。統合先は `c72939ec076ec3261357ba16e61fc5140de2b3d4`。
 
@@ -351,7 +351,7 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 
 ## 統合した履歴
 
-- `Tracker.Core` と追跡エンジンの旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。
+- `Tracker.Core` と追跡実行環境の旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。
 - `Tracker.DebugHost`、SSL-Vision検出データの表示、診断機能を扱った旧進捗文書は、`Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。
 - 旧 `RAW-VISION-013` から `RAW-VISION-016` は、PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に取り込み済み。
 - `RAW-VISION-017` として開始した処理周期の分離設計は、`Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針へ対象を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。
@@ -380,9 +380,9 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 
 証跡: `reports/task-doc-lint-003-scope-check-20260917082040.md`。元の完了条件と過去の検証結果は変更していない。
 
-## 追跡エンジンの本文照合（2026-09-17）
+## 追跡実行環境の本文照合（2026-09-17）
 
-`DOC-LINT-003` の補足として、追跡エンジンの詳細設計にある原文133出現を、最終表現の行・列・前後の文脈・判断理由へ対応付けた。86行の文脈を読み、変更のない行の23出現も記録した。曖昧になっていた XML documentation comment の `summary` 要素の指定を復元した。
+`DOC-LINT-003` の補足として、追跡実行環境の詳細設計にある原文133出現を、最終表現の行・列・前後の文脈・判断理由へ対応付けた。86行の文脈を読み、変更のない行の23出現も記録した。曖昧になっていた XML documentation comment の `summary` 要素の指定を復元した。
 
 入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。全体の文書検査は、原文を保持した引用内の違反で未通過のままである。
 
