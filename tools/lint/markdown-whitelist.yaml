@@ -16,6 +16,15 @@ entries:
     description: ロボット制御の正式名称。
   - term: Game Controller
     description: 審判情報を送信する機能の名称。
+  - term: WSL
+    aliases: Windows Subsystem for Linux
+    description: Windows 上で Linux 環境を実行する機能名。
+  - term: simulator
+    description: AppHost が管理する資源の識別名。
+  - term: orion-cm4-sim
+    description: シミュレーション通信に使う外部資源の製品名。
+  - term: RefereeDriver
+    description: 試合制御用の API クライアント資源名。
   - term: Windows
     description: 計算機の実行環境を示す名称。
   - term: Aspire
