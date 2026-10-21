@@ -84,7 +84,7 @@ flowchart LR
   simulator -. SSL-Vision マルチキャスト .-> duck
   simulator -. 同じパケット .-> compare
   simulator -. UDP マルチキャスト .-> tracker
-  gameController -. 224.5.23.1:11003/UDP .-> refereeReceiver
+  gameController -. 審判マルチキャスト .-> refereeReceiver
   refereeDriver -. API 制御 .-> api
   api -. API 応答と状態確認 .-> refereeDriver
   crane -. UDP ユニキャスト .-> cm4
