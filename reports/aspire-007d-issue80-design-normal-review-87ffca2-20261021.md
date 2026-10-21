@@ -39,7 +39,7 @@
 - role config evidence / profile effect (parent, pre-dispatch): role configuration/profile impact is not exposed by the available spawn interface; user-approved capability-gap handling applies.
 - planned runtime profile after known role constraints (parent, pre-dispatch): gpt-6.1-sol / high requested, actual runtime unverified.
 - applied profile (parent, post-runtime exact evidence only; null when unverified): null.
-- application status (parent, post-runtime evidence only): pending spawn.
+- application status (parent, post-runtime evidence only): spawn_succeeded_profile_unverified.
 - runtime profile observability (parent, post-runtime): final profile metadata unavailable to caller.
 - reviewer continuity (parent, if applicable): new normal reviewer, not reused.
 - fork policy (parent): none.
