@@ -346,7 +346,7 @@ Dockerを必要とする一括起動試験は、AppHostの構成検査と分け�
 
 ### #80 の調査状況
 
-利用者は Docker Desktop 4.96 を使用中と報告している。この版番号は利用者報告であり、本作業で実機を読み取って測定した値ではない。`Tracker/Design/tasks-status.md`に記録された Docker Engine 29.9.0、Ubuntu 26.04.1、Linux の既定接続先、Windows 用操作プログラム未検出も過去の調査結果であり、現在の Docker Desktop、現在有効な接続先、常駐機能、Linux環境との連携、OS の測定値として扱わない。
+利用者は Docker Desktop 4.96 を使用中と報告していた。本作業ではWindows上の利用者領域にある実行ファイルから製品版4.96.0.243774を実測し、起動した。同梱コマンドで明示的に`desktop-linux`接続先を選ぶとDocker Desktopのサーバー版29.9.1へ接続し、コンテナとイメージがないことを確認した。Windowsの通常検索範囲にはDockerコマンドがなかったが、同梱の`docker.exe`はLinux環境から呼び出せる。Linux側の既定接続先は`unix:///var/run/docker.sock`のままで、FA780 / Docker 29.9.0 / Ubuntu 26.04.1の別環境へ接続し、設定変更していない。Docker DesktopのLinux連携口は現在の利用者で接続を拒否された。これらは2026-10-21の読み取り結果であり、UDP / マルチキャスト、コンテナの起動停止、Linux連携設定、ホストネットワークの実測結果を示さない。
 
 初期の `AddContainer` とホスト通信方式指定の競合は、Aspire AppHost SDK 13.5.4 / DCP 0.25.13 で DCP が利用者定義ネットワークとホスト通信方式を同時に渡した履歴として残す。これは当時の失敗記録であり、現在の `ExecutableResource` とDocker起動管理プログラム経路の結果を示すものではない。Docker Desktop への移行だけでこの競合やパケット経路が解消したとは仮定しない。
 

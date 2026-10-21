@@ -8,12 +8,12 @@
 - 題名: FA780のDocker開発環境を利用者単位のDocker Desktop 4.96へ統一する
 - 子課題: #80 設計・現状調査、#81 Aspire運用の移行、#82 起動停止・通信受入検証。すべて課題 #79の正式な子課題として作成し、`Project16`へ追加した。
 - 段階: 実装
-- 状態: 課題 #79〜#81は`Project16`で着手中、#82は未着手。`Priority`は既存の最上位`Urgent`を設定済み。#80の設計レビューは受理済みだが実機測定は未完了。#81は実装・回帰試験・対象ビルドが完了し、通常確認とブランチ反映待ち。
+- 状態: 課題 #79〜#82は`Project16`で着手中。`Priority`は既存の最上位`Urgent`を設定済み。#80の設計レビューは受理済みだが実機測定は未完了。#81の実装・回帰試験・対象ビルドと通常レビューは完了し、コミット6c552a6の.NET試験も成功。#82の受入確認を開始し、Docker Desktopの実測情報を確認中。
 - 作業分岐: `task/aspire-docker-desktop-496`を作成。統合先の識別値は`c72939ec076ec3261357ba16e61fc5140de2b3d4`。
-- 現状観測: Linux環境でのDocker接続先は`default`（`unix:///var/run/docker.sock`）、実行環境は`FA780` / Docker Engine 29.9.0 / Ubuntu 26.04.1。Windows側Docker CLIは検出されなかった。Docker Desktop 4.96は本人報告、製品の版4.96.0.243774はWindows側での実測。
+- 現状観測: Linux環境のDocker接続先は`unix:///var/run/docker.sock`、環境は`FA780` / Docker 29.9.0 / Ubuntu 26.04.1。Windows側のコマンド検索範囲からDockerコマンドは見つからなかったが、利用者領域にDocker Desktop実行ファイルと同梱コマンドを確認した。製品版4.96.0.243774を実測し起動。同梱コマンドで`desktop-linux`接続先を選ぶと、Docker Desktopのサーバー版29.9.1へ接続し、コンテナ・イメージはともに0件。Linuxの既定接続先は別のDocker 29.9.0であり、変更していない。Linuxから同梱コマンドを明示接続先で呼び出せるが、Docker Desktopが提供するLinux連携口への接続は現在の利用者では拒否された。
 - 受入条件: Docker Desktop導入だけでコンテナ起動競合が直ると仮定しない。UDPと`multicast`の互換性を実測し、自身が起動したコンテナだけを後片付けする。既存環境の削除・停止、接続先や通信設定の変更は別確認なしに行わない。
-- 未実施: Docker実機の起動・停止、Docker設定変更、実通信検証。
-- 次作業: 親が#81の実装差分を既存の下書きPRへ反映し、ブランチ先頭を読み戻して通常確認を行う。指摘への対応と独立最終確認は別工程。実機起動・通信検証と#82は未着手。
+- 未実施: 今回のコンテナ作成・起動・停止・通信試験、UDP/マルチキャスト互換性と所有者限定の後片付けの実測。Docker Desktop側に必要なイメージがなく、Linux連携口への接続も拒否されたため、イメージ取得またはLinux連携設定の変更なしにはAspire受入を実行できない。これらの変更は未承認なので実施していない。既存Linux側のDocker環境・コンテナの停止や削除、Docker設定変更も実施していない。CI実行`39521219913`はコミット`6c552a6`で完了し.NET試験は成功したが、ASPIRE-NET-002のLinuxパケット通信試験とAspire全体構成のLinux受入試験は未実行であり、実機受入成功とは扱わない。
+- 次作業: #82の実機受入には、必要なイメージをDocker Desktopへ取得または移行する許可、もしくはLinux連携設定を有効にして接続権限を変える具体的な許可が必要。承認済みのコンテナ起動・停止試験では、起動元と完全IDを記録し、自分が所有することを再確認してから後片付けする。通信やホストネットワーク設定の変更が必要な場合は操作と影響を分けて報告する。#80の未完了実機情報もこの環境制約を記録し、設計・実装・CIの結果と未検証事項を区別する。
 - 配置規約: `CodexSkill`の複製先とDuckの各 `worktree` を `/home/donabe` 直下の兄弟に置く。新しいリポジトリ作業領域は `git worktree add --relative-paths /home/donabe/<作業領域名>` で作り、各作業領域の `.agents/skills` を相対シンボリックリンク `../../CodexSkill/skills` としてGitの `mode 120000` で追跡する。公式の `link_consumer_skills.py` は絶対リンクを作るため、作成後に相対先へ正規化して解決先を確認する。`CodexSkill`の複製先を移動・削除しない。
 - 作業分岐: `task/aspire-docker-desktop-496` の現在の作業場所は `/home/donabe/Duck-aspire-docker-desktop-496`。元の `/mnt/c/Users/donabe/Documents/Codex/2026-10-21/task-8` は同じ `HEAD` で `detached` 状態のまま保持し、削除していない。統合先は `c72939ec076ec3261357ba16e61fc5140de2b3d4`。
 
