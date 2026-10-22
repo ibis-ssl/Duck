@@ -1,0 +1,3 @@
+ M reports/issue81-referee-driver-host-implementation-20261022.md
+?? Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs
+?? Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs

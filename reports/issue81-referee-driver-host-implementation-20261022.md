@@ -45,6 +45,11 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - 既存Roslyn構文解析: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax-input.json /tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax-result.json — exit0（C#2file）。csproj3/slnx1のXML parse成功、git diff --check exit0。他41sourceのbyte不変と固定16test SHA64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6を確認。
 - work-context/implementation/TDD/report系の実ファイルを再読して継続適用。最初のshell読取loopはPowerShell変数展開で空pathとなりexit1、その後明示pathのPython読取exit0で解消。新build/test/restore/開発機Host/外部サービス起動・CI操作なし。構文はsemantic compileやruntimeGreenと区別する。
 
+### 明示AutoDriveと既定観測：先行試験準備（2026-10-22）
+
+- 既読のwork-context/implementation/TDD/report各Skillを同一担当で継続適用。HEAD1c8c8270f85a63f8f7d7f76ff2996854ff53600c。scope89-94行、比較設計260行、既存Driver/制御adapter/fixture/旧AppHostの明示team設定経路を読取し、先行試験の期待値を固定。
+- 構文: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax-result.json — exit0（新C#2file）。XML4件parse成功、git diff --check exit0。既存source42はbyte不変。新build/test/restore/開発機Host/実GC/CI操作なし。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj: net10.0/通常SDK、Microsoft.AspNetCore.App FrameworkReferenceと既存core参照だけ。追加NuGetなし。現時点はLibraryでProgramなし。
@@ -71,6 +76,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 
 - 製品変更はTesting/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.csの1file。Buildの標準DI/設定検査、RunAsyncの既存Programからの委譲先、同fileのBackgroundServiceを実装。source SHA256 b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4。Program.csは既存の薄い委譲を維持し、旧core csproj/runtime条件・全旧test/固定67/race・今回16test・新Host csprojを変更していない。
 - 本報告の子5欄だけへ履歴追記。親prefix/Dispatch・親tracking・親の未追跡RedCI evidenceを保護。証拠: /tmp/issue81-referee-driver-host-composition-green-candidate-20261022/ のbefore/after、source-manifest.json、other41-source-guards.json、production-path-composition-matrix.json、command/exit。
+
+### 明示AutoDriveと既定観測：先行試験準備（2026-10-22）
+
+- 新規Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs：7メソッド/15case。SHA256 fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e。標準Build/DI/workerと実Driver/既存control client/HTTPを使う組成、および注入可能JSON transportの単体境界を先行固定。
+- 新規Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs：IGameControllerWebSocketTransportの最小内部宣言。constructorのnull検査だけ、SendJsonAsyncはTask.CompletedTask。SHA256 b641e28e6495795d36a5ad2a5e91026ddb182516a3af3ee7f9f43b82ee5ac8ac。接続/初期Output受信/送信/取消/破棄behaviorは未実装、標準Build/workerへの登録も未実装。
+- 旧761/独立67/race/Host11/composition16のsourceと期待値・既存HTTP/DI/Program/旧CLI実行条件を変更しない。本報告の子5欄だけへ追記、親prefix/Dispatch/台帳を保護。
 
 ## 指摘事項
 
@@ -103,6 +114,14 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - BackgroundServiceは単一Runと順次matcher.ReadAsyncを所有し、内部再観測間隔は100ms（新設定キーなし）。HTTP pollは既存readonly handlerのままAPI取得やage延命をしない。API接続は読取ごとに新ClientWebSocketをhostname URIから接続し、失敗時もsocketを破棄する。観測write0、制御登録/AutoDrive behaviorは次単位へ残す。
 - 受信または観測の終端で共通取消を通知し、両Taskの結果をWhenAllで回収して実受信serviceの明示ownerを破棄する。取消は正常停止へ限定して扱い、非取消faultはHostへ伝播する。await中のlockや別UDP Receiveなし。既存serviceの冪等Dispose/epoch終了を再利用し、再Stop時に所有資源を重複破棄しない。
 
+### 明示AutoDriveと既定観測：先行試験準備（2026-10-22）
+
+- 15caseは明示trueでHALT→NEXT→FORCE/NORMAL/既にactiveの3経路、既定/false/不正bool/Enabled無効の観測専用5、pending制御の停止1、自己URI拒否2、単一/分割初期Output後送信2、明示team JSON1、初期Output待ち取消1。expectations.jsonへ独立期待値と最初の不足assertion/行を固定。
+- 想定8runtime不足/7回帰。標準DIの正制御3件は既存clientが未登録のAssert.IsType(null)、停止1件はDriver未登録のAssert.NotNull(null)。transport2/取消1は接続URI列のAssert.Single(empty)、team1は送信列Assert.Single(empty)を想定する。未実行見込みであり、compileerror・watchdogtimeoutをRedに数えない。
+- 内部URIはcontrol側にも同じ値を使い、既存GameControllerWebSocketControlClientが作るNEXT_COMMAND/FORCE_START/NORMAL_STARTとUNKNOWNを独立期待値に固定。既存Driverが同じIRefereeCommandSourceを使い、単一受信・同counter診断件数・HTTP一致を保持する。制御JSONへの反応として入力を進めるfakeであり、外部GCや新UDP producerを起動しない。
+- team設定の新しい自動キー/自動改名は追加しない。既存public SendYellowTeamNameAsync(crane)のYELLOW/team_name JSONと注入URIを同transportで確認し、既定観測やAutoDrive組成から暗黙のteam変更を要求しない。旧AppHostのteam設定と旧fixture/API既定は不変。
+- 全fixtureは正常停止のassertion後にもfinallyで安全取消/Stop/Disposeを回収する。取消送信は完了書込みと区別し、既定観測は接続によるAPI読取が進んでも制御書込み0を固定。5秒watchdogは回収用であり、Redはその前の具体assertionを予定する。
+
 ## 結果
 
 - 先行11caseと空body scaffoldを保存・source/hash/readback確認。構文exit0/XML4成功/diff-check exit0。source34は33byte不変とcore metadata1件の正確な追加を分類して保護、旧734/固定67/raceの期待値/既存source bodyを変更していない。
@@ -125,6 +144,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 
 - 最小製品1file候補と本報告子欄を保存。構文exit0/XML4成功/diff-check exit0、他41source/固定16test不変。report親prefix/Dispatchを保持して保存後読戻しする。正式検証能力はremote_ci_only、runtimeGreen/全761回帰は親commit/push後のexact-SHA PR CI待ち。自己review合格判定はしない。
 - Red証拠は/tmp/issue81-referee-driver-host-composition-red-ci-20261022/ci-evidence.json（SHA256 d87ac51bcc2db11d4d72e585de62dd484c12d835fafdf5d3f2606d2efdf7e8f8）。TRX SHA2561db4812527ac35483bd2526ac8fecfd89d3d4de1d4797a808bcc0d42ccbe26bb。packet/fullstack jobskipを実機成功としない。全発行process終端・exit回収済み。子commit/push/GitHub操作なし。
+
+### 明示AutoDriveと既定観測：先行試験準備（2026-10-22）
+
+- 先行15case＋未実装scaffoldを保存し、構文exit0/XML4成功/diff-check exit0、既存42source不変を確認。runtime Red/Greenは未観測。予定total776と8不足/7回帰は見込みで実測優先。親commit/push/exact-SHA PR CIでruntime不足が採用されるまでAutoDrivebehaviorを実装しない。
+- 直前の標準構成exact1c8c8270 / CI39851820995はrun全体success、761pass/0fail/testskip0。成功artifact0/個別TRXなし、packet/fullstack jobskip。source42固定を確認済みだが、新15caseの未実行結果へ転用しない。
+- 証拠: /tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/。expectations/scaffold-boundary/work-context、source snapshot/hash、既存42guard、構文/XML/diff command/exit、report読戻しを保存。全process終端・exit回収済み。子commit/push/GitHub操作なし。
 
 ## リスク
 
@@ -151,3 +176,8 @@ HTTP内部待受と将来Windowsの動的localhost公開を区別する。DCP所
 - この履歴は先行scaffold段階の記載を上書きせず、今回の標準構成/起動停止候補を区別する。実Runtime/HTTP組成のGreenは未確認。明示AutoDrive/既存controlJSONの構成、実Program取消の追加実行証拠、構成/HTTP文書同期と通常レビューは後続。
 - 新ClientWebSocketへのhostname URI引渡しは静的実装であり、実GC/DNS再解決/実Desktop multicast/DCP所有/Windows公開の成功証拠ではない。完全IDの構造検査と自己診断をDCP実所有証明へ昇格しない。AppHost/DCP配線・Dockerfile/配布物・外部G3・実機・全文文書gate既知不合格を保持する。
 - 新依存/install/設定/環境/auth/network/外部変更・新agentなし。元gpt-6.1-sol/high継続/applied:null。後続機能を先回り実装せず、親のexact-SHA CIへ候補を返す。
+
+### 明示AutoDriveと既定観測：先行試験準備（2026-10-22）
+
+- 今回のscaffoldは呼出可能なだけで制御を一切しない。標準DIへの既存Driver/client登録、明示AutoDrive worker、初期Output後の実送信/取消/破棄behaviorはruntimeRed採用後の後続。旧761/固定67/race/Host11/composition16のsource/期待値を保持。
+- 隔離fixtureの動的loopback HTTP・fake WS/受信口は実GC/Desktop multicast/DCP所有/Windows公開の成功証拠ではない。実Programの起動取消、文書同期、通常レビュー、外部G3/配布物/実機/全文文書gate不合格を保持。新agent/依存install/環境/auth/network/外部変更なし、元Solhigh/applied:null。
