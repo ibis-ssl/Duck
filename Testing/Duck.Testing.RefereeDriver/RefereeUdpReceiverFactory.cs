@@ -51,7 +51,7 @@ internal static class RefereeUdpReceiverFactory
     }
 
     /// <summary>OSのUDP socketへ設定を適用する。受信は単一pump側に任せる。</summary>
-    private sealed class UdpSocketSetup(AddressFamily family) : IRefereeUdpSocketSetup
+    internal sealed class UdpSocketSetup(AddressFamily family) : IRefereeUdpSocketSetup
     {
         public UdpClient Client { get; } = new(family);
         public void SetExclusiveAddressUse(bool exclusive) => Client.ExclusiveAddressUse = exclusive;

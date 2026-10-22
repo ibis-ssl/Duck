@@ -1,0 +1,87 @@
+[
+  {
+    "path": "RefereeUdpFactoryBoundaryTests.api.txt",
+    "bytes": 901,
+    "sha256": "c412a5b47c7ff53d436ed65d2a271daf182cc72f88a973246accf3c5d1636b36"
+  },
+  {
+    "path": "RefereeUdpFactoryBoundaryTests.cs",
+    "bytes": 8117,
+    "sha256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617"
+  },
+  {
+    "path": "RefereeUdpReceiverFactory.after.cs",
+    "bytes": 3191,
+    "sha256": "a8c701397242ba6d02101ed77f3b0df49d968af086b110fcf57ee481b10e3689"
+  },
+  {
+    "path": "RefereeUdpReceiverFactory.before.cs",
+    "bytes": 3190,
+    "sha256": "a94159a4ad74c40a571b746bdc8c9b6f61bdf8fd36c6c85661551b12fab1ea74"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 47,
+    "sha256": "400400653218437206c5d8a29bcbe238fcce1710da0bc9068b0e5fe29d33d96a"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "expectations.json",
+    "bytes": 1910,
+    "sha256": "6d387f4726ddd382353bcd4c29e415ca7ba746a8dc8bcdb25dbea11ff0cdbb3e"
+  },
+  {
+    "path": "factory-visibility.diff",
+    "bytes": 840,
+    "sha256": "2b01b1cc496e742591880786ae34bab8766782fae8557d3f37cd5cb7551f54f7"
+  },
+  {
+    "path": "remaining-03A.json",
+    "bytes": 636,
+    "sha256": "4c23be537cf1e353bcce2f9997036e077a2a2f989c1a996ca9260c8bef111edb"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 1328,
+    "sha256": "43a86f2bff23687ce48db18c5dede92b8a004b4bb24fdb936f022fe61deafca5"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 525,
+    "sha256": "cd3ca49ae4b332bee3f054289891402253f25323dabd08c1fb22f47cb38ebb2d"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 913,
+    "sha256": "5768a53a8ce5cbf8a946aae331a02dd7810b3deee12de42b6d142905ee3a78c8"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 336,
+    "sha256": "391ffa0844fdb0a672945daa293e2e4a74d31fa04f2d4f90ca411ece2458fc0d"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "unchanged21-source-checks.json",
+    "bytes": 4312,
+    "sha256": "47c2cff32261ad6fbc417c9e7fd02896d8a3521a5af2a80b1f353a4b25c38c33"
+  }
+]

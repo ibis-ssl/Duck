@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "view",
+    "39809637502",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--log"
+  ],
+  "exit": 0,
+  "utc": "2026-10-22T16:00:14.322915+00:00"
+}

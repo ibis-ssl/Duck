@@ -1,0 +1,10 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "Output": "/tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/RefereeUdpReceiverFactory.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs",
+    "Output": "/tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/RefereeUdpFactoryBoundaryTests.api.txt"
+  }
+]

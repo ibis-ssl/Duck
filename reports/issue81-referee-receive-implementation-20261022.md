@@ -161,6 +161,14 @@ exact8837cccc332d55ad9573b5e217498aa61f0b65b1のpull_request run39808111037を�
 
 親がexact8837ccc/CI39808111037の設定2case・30行Expected5操作/Actual[]を有効Red採用後に実装。既存SDK Declarations.dllによる最終factory構文抽出exit0。/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false はexit1、生成Referee不足CS0246x2/CS0400x2、0warnings/4errors。git diff --check exit0。全argv/exit/生stdout/stderrとsource前後/diffを /tmp/issue81-referee-receive-udp-settings-green-candidate-20261022/ に保存。
 
+### production UDP factoryの同SHA Green CI収集
+
+exact 51e70db52c18d30aa291d046801d0ce40b3d3604 のpull_request CI39809637502を公式RESTで確認、初回からcompleted/successのためwatch未起動。gh run view --json/--logとartifact REST GETは全exit0。実command dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger "trx;LogFileName=dotnet-test.trx" --results-directory "$results_dir" --diag "$results_dir/vstest-diagnostics.log" --blame -m:1 /nr:false -bl:"$results_dir/dotnet-test.binlog"、test step successでexit0、単独exit-code artifactは未公開。argv/exit/生stdout/stderrを /tmp/issue81-referee-receive-udp-settings-green-ci-20261022/ に保存。
+
+### factory入力・部分失敗cleanup・実設定組成の先行11case
+
+640Green収集/report保存後、親採用の11caseをexpectations.jsonへ先に固定しactiveへ配置。既存SDK /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/syntax-result.json はexit0（新test/可視性変更factoryの構文抽出のみ）。git diff --check exit0。semantic compile/実parser testは未実行、生成Referee不足の既知制約により正式routeはremote_ci_only。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -301,6 +309,14 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### production UDP factoryの最小Green候補（親のRed採用後）
 
 製品変更は Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs のみ、SHA256 a94159a4ad74c40a571b746bdc8c9b6f61bdf8fd36c6c85661551b12fab1ea74。固定7case/既存633/独立67関連を含む他21sourceはhash不変。legacy RefereeDriverNetworkAdapters.csもHEAD/current byte一致、SHA256 888d40d56f74ebd3b532d3f2cb90f280e50de3cfa65921c593acc5f1fa1b35e4。既存公開UDP/default非container経路・service/adapter受信/Disposeは無変更。source-manifest.json SHA256 f772018a8a707f5719c86b2843aaf4beb92c23cab13c8a47a2a54cc9e04ea99c。親prefix/Dispatch/tasks/phases/他report・旧証拠保持。
+
+### production UDP factoryの同SHA Green CI収集
+
+製品/test変更なしの時点で22sourceをHEAD/current/最終候補hashと照合し全一致。factory SHA256 a94159a4ad74c40a571b746bdc8c9b6f61bdf8fd36c6c85661551b12fab1ea74、7case testfile SHA256 82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83。固定source/期待値を保持。CI checkoutはexactHEADを含むPR merge1985ca9、成功source archiveは非公開。親prefix/Dispatch/tracking/他report保持。
+
+### factory入力・部分失敗cleanup・実設定組成の先行11case
+
+新規Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs SHA256 419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617。既存RefereeUdpReceiverFactory.csはUdpSocketSetupのprivate→internal可視性だけ、SHA256 a8c701397242ba6d02101ed77f3b0df49d968af086b110fcf57ee481b10e3689、逆置換でbaseline sourceと完全一致し設定/受信/Dispose behavior無変更。既存25case/固定67関連を含む他21sourceのhash不変。source-manifest.json SHA256 43a86f2bff23687ce48db18c5dede92b8a004b4bb24fdb936f022fe61deafca5。親prefix/Dispatch/tasks/phases/他report保持。
 
 ## 指摘事項
 
@@ -453,6 +469,14 @@ adapterは注入UdpClient.ReceiveAsync(token)直後にcaptureReceiveを呼び、
 
 options既定を使い、旧receiverと同じIPv4 parse/family境界を保つ。注入または実OSのsocket setupをInterNetworkで生成し、ExclusiveAddressUse=false→ReuseAddress=true→IPAddress.Any/指定port bind→groupへIF未指定または明示参加を順に適用。取得したclientをownsClient:trueのadapterへ渡す。client取得後のどの設定段階で失敗しても捕捉した所有clientをDisposeして例外を再送出し、失敗を正常結果にしない。socket生成callback自体がclientを返す前に失敗した場合の未知資源所有は推測しない。新しい入力機能や03B/Cは追加しない。
 
+### production UDP factoryの同SHA Green CI収集
+
+factory設定2caseの採用Redに対応する同じ固定7caseを維持した640集計Greenを取得。個別TRXが非公開のため新7case/既存633/固定67の今回個別結果を直接照合したとはしない。次の11caseは不正入力を正常資源にしない・途中設定失敗の所有cleanup・同じproduction実装を使う動的port実設定組成に限定し、allocation前拒否は条件に加えない。
+
+### factory入力・部分失敗cleanup・実設定組成の先行11case
+
+不正options6caseはIPv4 unicast127.0.0.1、IPv6 groupff02::1、不正文字列、port-1/65536、IPv6 IF::1を正常資源にしない。例外型と事前allocation0は条件にしない。部分設定失敗4caseはExclusive/Reuse/Bind/Joinへの注入失敗で正常resourceを返さず取得済み所有socket handleが閉じることを固定。実設定組成1caseはproduction UdpSocketSetupそのものをfactoryへ注入し（実装をfixtureへ複製しない）、IPv4/Any/動的port/Exclusivefalse/Reuse1を実socketから観測。loopback IFでgroup join後、送信側はunicast loopbackの正常Referee2packetを送り、単一service count2/ready/実endpoint/age0/購読counter7と、caller取消なしDispose→Run終端/notready/所有socket閉鎖を確認する。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -598,6 +622,14 @@ CI39808111037 completed/failure、test job119926676108 completed/failure。TRX64
 
 最小Green候補を保存。構文exit0/diffcheck0、no-restorebuildは既存proto不足exit1。テスト実行0、semantic compile/Green未観測で、固定7caseの正式CI再実行は親commit/push後。全証拠一覧 /tmp/issue81-referee-receive-udp-settings-green-candidate-20261022/evidence-files-manifest.json SHA256 63d06315775f8974fb74cea272650c3ba1434ab288013092de251f7e91e58c5b（17file）。
 
+### production UDP factoryの同SHA Green CI収集
+
+CI39809637502 completed/success、test job119932083248 completed/success。正式ログ640total/640passed/0failed/0skipped、packet/full-stack job skip。artifact0/個別TRX未取得。ci-evidence.json SHA256 4dcc19682ffa1a9d8f29c6ee0329704f75a9a687680be65b91d6f362789a42f4、全証拠一覧 /tmp/issue81-referee-receive-udp-settings-green-ci-20261022/evidence-files-manifest.json SHA256 06c0171ff1cf83e90dedf858ddc4818017f2512a1a47c34de2d390996dc278f7（19file）。
+
+### factory入力・部分失敗cleanup・実設定組成の先行11case
+
+11case（Theory6+4、Fact1）と必要最小可視性変更を保存、構文exit0/diffcheck0。新test実行0/semantic compile・Red・Green未観測。既存動作で通るcaseはregression成功として扱い人工Redなし。全証拠一覧 /tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/evidence-files-manifest.json SHA256 548614c95e5f35a5982341bcca7e43b1a87fe89bc50f74b023f6715877fea1c8。次CIは640+11の651見込み、実測優先。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -733,6 +765,14 @@ production factory動作は未実装のまま。fake設定操作の不足とloop
 ### production UDP factoryの最小Green候補（親のRed採用後）
 
 不正multicast/port/IF options、部分設定失敗時cleanup、実生成socket設定組成は次の必要最小先行testで確認予定で、現時点で個別runtime成功とはしない。factoryのfake操作順やloopback受信をDocker Desktop multicast/Windows/DCP/G3/実機受入へ昇格しない。既存期待値緩和/skip化、外部/配置/依存/設定/環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更なし。全syntax/build/read/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
+
+### production UDP factoryの同SHA Green CI収集
+
+fake設定順のGreenと実Desktopmulticast受入を分ける。不正options/部分失敗cleanup/実生成socket組成の次先行test、Windows/DCP/G3/実機受入は未検証。外部/配置/依存/環境変更・サービス起動・commit/push/GitHub変更なし。CI収集processは全終端/exit回収済み。新watch/旧monitor再開なし。
+
+### factory入力・部分失敗cleanup・実設定組成の先行11case
+
+実socket fixtureも今回未実行。loopback IF joinとunicast受信の成功を実Desktopmulticast配送、Windows NIC/IF、DCP配置/完全所有証明/G3/実機受入へ流用しない。全socketはusing/所有Dispose、Runはfinally安全caller取消と期限付き回収。実組成の環境/setup/production失敗は分け、timeoutを有効Redへ変換しない。03A内残件は新11caseのCI実測、不足時の親Red採用→最小修正、必要ならpending-owned receive/dispose境界確認、通常review前の契約完全性照合。03B/C、既存期待値/skip・外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全read/edit/構文抽出/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
 
 ## 親による公開準備記録
 
