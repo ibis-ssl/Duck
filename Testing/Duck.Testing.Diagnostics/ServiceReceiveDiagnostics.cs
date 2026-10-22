@@ -78,10 +78,16 @@ public sealed class ServiceReceiveDiagnostics(
     }
 
     public bool RecordSuccess(ReceiveAttempt attempt, string sourceKey = "",
+        string? sourceName = null, string? sourceUuid = null, string? remoteEndpoint = null) =>
+        RecordSuccess(attempt, out _, sourceKey, sourceName, sourceUuid, remoteEndpoint);
+
+    /// <summary>正常な復号を記録し、同じ診断lock内でこのpacketに割り当てた成功件数を返す。</summary>
+    public bool RecordSuccess(ReceiveAttempt attempt, out long acceptedCount, string sourceKey = "",
         string? sourceName = null, string? sourceUuid = null, string? remoteEndpoint = null)
     {
         ArgumentNullException.ThrowIfNull(attempt);
         ArgumentNullException.ThrowIfNull(sourceKey);
+        acceptedCount = 0;
         lock (gate)
         {
             if (!TryInput(attempt, out var input)) return false;
@@ -96,6 +102,7 @@ public sealed class ServiceReceiveDiagnostics(
             source.LastReceivedAt = attempt.ReceivedAt;
             source.Stamp = attempt.ClockWasValid && attempt.ClockVersion == clockVersion && validClock && now >= attempt.Timestamp ? attempt.Timestamp : null;
             Observe(input, source, now);
+            acceptedCount = source.Count;
             return true;
         }
     }

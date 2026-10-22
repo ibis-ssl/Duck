@@ -1,0 +1,46 @@
+{
+  "finding": "I81-NR-002",
+  "sourceSeverity": "medium(P2)",
+  "baseline": "cd7760fde7ec54d2fc69d157af61dc1a68d810ac",
+  "acceptedRed": {
+    "runId": 39820168338,
+    "headSha": "cd7760fde7ec54d2fc69d157af61dc1a68d810ac",
+    "assertion": "RefereeReceiveCacheRaceTests.cs:89 Assert.False(subscription.IsCompleted)",
+    "outcome": "runtime assertion failure; no timeout/compile failure",
+    "counts": {
+      "total": 652,
+      "passed": 651,
+      "failed": 1,
+      "skipped": 0
+    }
+  },
+  "completeness": [
+    {
+      "requiredAction": "Bind command cache to exact accepted packet diagnostics",
+      "productionPath": "ServiceReceiveDiagnostics.RecordSuccess(out acceptedCount) under gate → RefereeReceiveService.PublishCommand(acceptedCount) → ReceivedCommand.AcceptedCount",
+      "actualCompositionFixture": "real service/default Referee.Parser/ServiceReceiveDiagnostics/manual clock and fixed boundary observer",
+      "focusedEvidence": "Red CI39820168338 line89; candidate code + Diagnostics build0; fixed runtime Green pending parent exactSHA CI"
+    },
+    {
+      "requiredAction": "Reject A before B publish; return B after publish",
+      "productionPath": "WaitForChangeAsync requires source/epoch/count match and existing status/known age bounds",
+      "actualCompositionFixture": "same fixed NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication; test SHA4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+      "focusedEvidence": "same test byte unchanged; prepublication pending assertion and postpublication counter8/STOP assertions remain; unexecuted against candidate"
+    },
+    {
+      "requiredAction": "Preserve single pump, samecounter counts, epoch/cancel/restart/failure/default",
+      "productionPath": "old RecordSuccess signature delegates to new overload; no extra clock samples or lock changes; ClearCommand/Run/Dispose/UDP unchanged",
+      "actualCompositionFixture": "existing03A36 + fixed67 + full standard target on subsequent exactSHA CI",
+      "focusedEvidence": "other22 source hashes and all tracked tests unchanged; prior Red CI old651 individually Passed; candidate regression runtime pending"
+    }
+  ],
+  "lockOrder": "Wait holds commandGate then diagnostics gate as before. Receive records under diagnostics gate, releases it before acquiring commandGate. No nested reverse order added.",
+  "ageBinding": "success count is monotonically incremented per input/source under diagnostics lock on every accepted packet. Combine source+epoch+count so current age/status belong to the same accepted packet. Existing invalid/unknown/rollback age remains rejected.",
+  "compatibility": "old bool RecordSuccess signature and defaults retained; additive BCL overload only. No external schema/HTTP/DCP types. BoundaryObserver remains default null and unchanged.",
+  "newNonGoals": [
+    "03B/C",
+    "external repositories/placement",
+    "environment/dependency changes"
+  ],
+  "runtimeGreen": "not_observed"
+}

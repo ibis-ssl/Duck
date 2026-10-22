@@ -1,0 +1,137 @@
+[
+  {
+    "path": "RefereeReceiveService.after.cs",
+    "bytes": 10071,
+    "sha256": "c571b48745f7748235527e1a588cba46099a673487bd154bb44a836740af74a4"
+  },
+  {
+    "path": "RefereeReceiveService.before.cs",
+    "bytes": 9857,
+    "sha256": "0c045bf368621f7e3341cd4276cf401b4bb857e0666fd406fa6e7cbf6514ba5f"
+  },
+  {
+    "path": "ServiceReceiveDiagnostics.after.cs",
+    "bytes": 11074,
+    "sha256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2"
+  },
+  {
+    "path": "ServiceReceiveDiagnostics.api.txt",
+    "bytes": 1580,
+    "sha256": "38b8a3003468844ec17e022409cf677c620f2383939c88cf5594a4b7d9b25320"
+  },
+  {
+    "path": "ServiceReceiveDiagnostics.before.cs",
+    "bytes": 10583,
+    "sha256": "86aa44082a0945ddeac957e8fa8a1ee823223b7e6afc82c11ca132b7e8ab1223"
+  },
+  {
+    "path": "diagnostics-build.command.json",
+    "bytes": 313,
+    "sha256": "30e763f13e8633b8dab8667e9f3be39a13788c60ee9f40ead485dd8afd78f327"
+  },
+  {
+    "path": "diagnostics-build.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diagnostics-build.stdout.log",
+    "bytes": 234,
+    "sha256": "d95863ec08a8fc0ed46d3bf77aaf95b98c3bfb2172b20a07e062d41a9d903f78"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 137,
+    "sha256": "684cecd0f08282dff3e225a92490f74de0b407b81d191b0f0a27f20f79d942c9"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "bytes": 77,
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "finding-completeness-matrix.json",
+    "bytes": 2994,
+    "sha256": "0c5a31e63b9d3f1146e1c8b924e19b620f54a9315e982f6dcd2cca6c15cddcd0"
+  },
+  {
+    "path": "git-status.txt",
+    "bytes": 262,
+    "sha256": "78d904b15e5e53b2f0b095a37a0dfdd183c6544a13d7fc0a4fbb251d0e6b592c"
+  },
+  {
+    "path": "process-state.json",
+    "bytes": 115,
+    "sha256": "5e4c76a5e71cd114987780cadfe75ed1d88b5b8403ca1df2ffa44e3a7241e7ea"
+  },
+  {
+    "path": "production.diff",
+    "bytes": 4743,
+    "sha256": "f28adc4f6b38ceb73b1ab958ed864d3198eb7e53d934f8cd550883d6933e270a"
+  },
+  {
+    "path": "report-guards.json",
+    "bytes": 240,
+    "sha256": "bd04239f84ee3029045c70aad9802a4c76b108599c81bc3eb9d60cd80af8fba3"
+  },
+  {
+    "path": "report-readback.md",
+    "bytes": 4412,
+    "sha256": "65f06fa37d4de71c5f29f463bdcbf2bea11a82c305b4bad096743e66a879a389"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 1285,
+    "sha256": "2cf0f373f7410639025e05d05eccf5e45b40cd9adb0a7404956ca616984f8372"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 498,
+    "sha256": "5bf978ef4ba6d3cd9a12628b5e79f758bc04f85e43bc96328da1c7adf5f1300b"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 1111,
+    "sha256": "87e717511c5d1ed412b1d0f2ddfa5d71d97c13e8d0d3e553280532e0e3856b16"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 384,
+    "sha256": "0a6213d5fad9115e90a53dc5daa2f78fe9e266644985c89c5aca0fc51006ee03"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "unchanged22-source-checks.json",
+    "bytes": 4114,
+    "sha256": "7c5fcea75106ce5a25d5c1ae510bf8a283db10946b81622a71174fd8fa4b0b6d"
+  }
+]

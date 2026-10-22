@@ -90,11 +90,12 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                 var endpoint = datagram.RemoteEndpoint.ToString();
                 if (diagnostics.RecordSuccess(
                     datagram.ReceiveAttempt,
+                    out var acceptedCount,
                     sourceKey: endpoint,
                     remoteEndpoint: endpoint))
                 {
                     PublishCommand(new(packet.Command, packet.CommandCounter, packet.Yellow?.Name ?? ""),
-                        endpoint, epoch.Number);
+                        endpoint, epoch.Number, acceptedCount);
                 }
             }
         }
@@ -125,6 +126,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                         snapshot.SourceKey == latest.SourceKey &&
                         snapshot.ReceiverEpoch == latest.ReceiverEpoch);
                     if (current is { DecodeStatus: DiagnosticDecodeStatus.Succeeded } &&
+                        current.SuccessfullyDecodedCount == latest.AcceptedCount &&
                         current.DecodeAgeUpperBound is { } age &&
                         age >= TimeSpan.Zero && age <= ServiceReceiveDiagnostics.FreshnessWindow)
                     {
@@ -138,14 +140,14 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         }
     }
 
-    /// <summary>診断に受理されたcommandを保持し、購読へ変更の再確認を通知する。</summary>
-    private void PublishCommand(RefereeCommandSnapshot snapshot, string sourceKey, long receiverEpoch)
+    /// <summary>同packetの受理件数とcommandを保持し、別packetの新しさを旧値へ流用しない。</summary>
+    private void PublishCommand(RefereeCommandSnapshot snapshot, string sourceKey, long receiverEpoch, long acceptedCount)
     {
         BoundaryObserver?.Invoke(RefereeReceiveBoundary.BeforeCommandPublish);
         TaskCompletionSource changed;
         lock (commandGate)
         {
-            latestCommand = new(snapshot, sourceKey, receiverEpoch);
+            latestCommand = new(snapshot, sourceKey, receiverEpoch, acceptedCount);
             changed = commandChanged;
             commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
         }
@@ -162,7 +164,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private sealed record ReceivedCommand(
         RefereeCommandSnapshot Snapshot,
         string SourceKey,
-        long ReceiverEpoch);
+        long ReceiverEpoch,
+        long AcceptedCount);
 
     /// <summary>一度だけ内部停止を開始し、明示所有資源の破棄と実Runの終端を待つ。</summary>
     public ValueTask DisposeAsync()

@@ -1,0 +1,338 @@
+[
+  {
+    "path": "all-test-outcomes.json",
+    "sha256": "7344d7b58a123876a6a1f5d6a834b4c2f207c5138a332e2cf0c8105123ed28c0",
+    "bytes": 132045,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/all-test-outcomes.json"
+  },
+  {
+    "path": "artifact-location-recovery.json",
+    "sha256": "ed72a811979885e3aee215b0043141cee7c00410968ecf10553ed6f850478d78",
+    "bytes": 3329,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifact-location-recovery.json"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/dotnet-test.binlog",
+    "sha256": "18a0a3af4aeca650def21feca27eefdf386c997c077e47952e7360c8239bbe99",
+    "bytes": 1508096,
+    "stored": false,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/dotnet-test.binlog"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/dotnet-test.exit-code",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "bytes": 2,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/dotnet-test.exit-code"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/dotnet-test.stderr.log",
+    "sha256": "03a2899ff935e40734202db166821afef66d3d7ad5e35ebf64b7917510c95611",
+    "bytes": 147,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/dotnet-test.stderr.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/dotnet-test.stdout.log",
+    "sha256": "0ef20dff36a10e9067ed10878a419d5192fb80c6d620aceb67472497e62ef290",
+    "bytes": 6286,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/dotnet-test.stdout.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/dotnet-test.trx",
+    "sha256": "fbad3a9a2e5552fbc0167e57dabd2ac34074352677e3ae9d2372d2e3ce6e071a",
+    "bytes": 924504,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/dotnet-test.trx"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/environment.txt",
+    "sha256": "1c9b5a586bb7885d1e126ff8822a30d3f81234d2ba55350188db55f23f3c0352",
+    "bytes": 3259,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/environment.txt"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/source.tar.gz",
+    "sha256": "f96ffbf38471ed153c8d56495a82ae519318c6f307a189cdfcd2d02a8125a836",
+    "bytes": 14995813,
+    "stored": false,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/source.tar.gz"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/vstest-diagnostics.datacollector.26-10-22_17-10-04_04713_5.log",
+    "sha256": "58d8596b0bcb79c1f2f7fcf473023655d7ac08cd8504923ed6f8ce5e5f2963d4",
+    "bytes": 1154183,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/vstest-diagnostics.datacollector.26-10-22_17-10-04_04713_5.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/vstest-diagnostics.host.26-10-22_17-10-04_30940_5.log",
+    "sha256": "972fe3f42b95d539bce52fc0585e60bd8b8c861217d6b4159acc7c75d0702f71",
+    "bytes": 2587847,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/vstest-diagnostics.host.26-10-22_17-10-04_30940_5.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39820168338-1/vstest-diagnostics.log",
+    "sha256": "3c5ce10a1249809769f7ff180c977c57bcbf63412da8b4da27c5f7aa4f8b4eee",
+    "bytes": 1991113,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1/vstest-diagnostics.log"
+  },
+  {
+    "path": "artifacts.command.json",
+    "sha256": "6de891d9b10d75d6de82390cddaae24502338e63bfd4014cb91c90cb24b08e66",
+    "bytes": 230,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.started.json",
+    "sha256": "6e58cfb7e202ebce81b3d5a5559364965c25cfe2470cc2d5542818b951a507dd",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts.started.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "ab4d7477c628f6fb131794a545103702d10cff1d239f4d15dcd3eb53eb86fead",
+    "bytes": 751,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "2779921305926ea568d9daba3a6fb403231a9355d7fb5fedc1e9b71292f6a3c7",
+    "bytes": 6657,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-failure-lines.txt",
+    "sha256": "001dc45bb990734e2813f1e6f4f7c79de5ec8670d7323a3b79b2975e9203cdae",
+    "bytes": 1660,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/ci-identity-failure-lines.txt"
+  },
+  {
+    "path": "cleanup-expanded-artifact.command.json",
+    "sha256": "f33fe1c72e75fbfc76444badee2b71d40d8a90ccfbf64ae0c448d0b200150f6d",
+    "bytes": 534,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/cleanup-expanded-artifact.command.json"
+  },
+  {
+    "path": "cleanup-expanded-artifact.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/cleanup-expanded-artifact.stderr.log"
+  },
+  {
+    "path": "cleanup-expanded-artifact.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/cleanup-expanded-artifact.stdout.log"
+  },
+  {
+    "path": "download-12444626087.command.json",
+    "sha256": "269a350d5557ab034b5f459484c46a8913874f0472d6ea21425012b4a842e0f0",
+    "bytes": 386,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/download-12444626087.command.json"
+  },
+  {
+    "path": "download-12444626087.started.json",
+    "sha256": "530ab09ef74f8ff861965a0141c8d54bafc8aa05a7c215bb24d8c042f5a18fdd",
+    "bytes": 368,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/download-12444626087.started.json"
+  },
+  {
+    "path": "download-12444626087.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/download-12444626087.stderr.log"
+  },
+  {
+    "path": "download-12444626087.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/download-12444626087.stdout.log"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "0b6f5b9070e8a6066580b406af96034efc8a58e3fee662423edbef43a9731bcc",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.started.json",
+    "sha256": "bc6465add2a7553abea489c8053a2a7fc1c914d0ef32141eae86f31a131706b1",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/final-view.started.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "e162f37fb68c997d6922248f51a67c90c9651ea03296cfd32aa7c7c6b6d23b2b",
+    "bytes": 2461,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/git-status-final.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "7c625aeb13c4be76fe0bd9c6af8d76f1fa8f5289aa3dacb9a8cbc084282e1af6",
+    "bytes": 7108,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "d872140b0b6fae1e881ddadef2dd75092103e1916a918515d7d8e1c0a0c6f776",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.started.json",
+    "sha256": "a8c4315d26437a53f778da90f6db43f2fbd5477f7479b42113b04006586cd3ad",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/initial-view.started.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "9c12f5ee76ae7b5e197476b5929130d75fdb6d12ddea54f3b45c0b23eac5d3b7",
+    "bytes": 1976,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "ff094e7ae2a481a18b9e3ad6d201606f50aca541f1c95fb9a36f83195dfb0d54",
+    "bytes": 7431,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "adc72b66b22c43ee5408cc9a63faf71717feab01d83d9b05fe93e46371590220",
+    "bytes": 168,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/process-state.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "549b6431994412ed36000fe42c521f2b50d5ce55e09d5e588956cc72817ea3a9",
+    "bytes": 220,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.started.json",
+    "sha256": "d09f21d9d1534933245e72304fa4835cff10b131eabe71c93e2f32cf83b7fa97",
+    "bytes": 202,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/run-log.started.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "4da005cd195ed8d0ebffc0ad1ff73f921a67d08c61ad4809c21ddd8796d10b38",
+    "bytes": 56162,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "sha256": "a29e0d71d08c4a16d60a547e8fb54642115180e6fdffb3556042182d141cc07d",
+    "bytes": 289,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/runs-initial.command.json"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/runs-initial.stderr.log"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "sha256": "e5a573d3f526861fa3979306c705b6f9c4026567842096f2deea92fca11b39b6",
+    "bytes": 12085,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/runs-initial.stdout.log"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "16156c37b7c7c8bb44617d522f1ca56c197cd858de6b1d67e2467379dcf987f5",
+    "bytes": 257,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.started.json",
+    "sha256": "96f07e12860a33b9a65b7f58194fbb8ebd54a1bf0b659c49828e5972a1111c91",
+    "bytes": 239,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/watch.started.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "7267531800b2cba5a6d4cb0627720223f18e8c479718d19f7230a70689a5db26",
+    "bytes": 1485,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/watch.stdout.log"
+  }
+]
