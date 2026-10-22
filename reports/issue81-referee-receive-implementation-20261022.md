@@ -43,6 +43,16 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 - 新sourceのRoslyn構文parseはexit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1。既存RefereeDriver.csのCS0246×2、新sourceも不足global Referee型のCS0400×2。ローカルGreenに数えない。
 - 実引数/出力/exit/source before-after/diffを `/tmp/issue81-referee-receive-first-green-candidate-20261022/` へ保存。testは未実行、CI操作/待機は今回行っていない。
 
+### 最初のGreen候補の同SHA CI収集
+
+- 親がpushしたHEAD a38422004406edba7931e023fb17b6847d61d9c2、開始時worktree clean。同SHA/event=pull_requestをrun listで確認（exit0）。CI39785567950のrun watch --exit-status --interval5はexit0、completed/successで終端。
+- run view --json、test job119847724417の--log、actions/runs/39785567950/artifactsのGETは全exit0。sourceのHEAD照合、固定source hash、Red→Green間のTracker.Tests差分なしをreadbackした。
+- 全引数/exitは `/tmp/issue81-referee-receive-first-green-ci-20261022/commands-summary.json`、各stdout/stderr/raw job log、metadata、source/固定manifest検査を同dirへ保存。今回はdotnet testをローカル実行せず、CI結果収集だけを行った。
+
+### 次の03Aテスト準備（最初のGreen後）
+
+次の03A先行テスト準備（不正入力）: 既存SDK `dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll` へ evidence dirのsyntax-input.json / syntax-result.jsonを渡しexit0。完全な引数はsyntax-command.jsonへ保存。これは構文抽出でありsemantic compileではない。`git diff --check` exit0。未追跡testの `git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs` はexit1・stdout/stderr空（/dev/nullとの差分あり、空白指摘なし）。保存scriptはこの1を0と仮定したassertで一度exit1となり、検査結果を正確に区別して保存を完了した。新test build/test/CIは未実行。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -66,6 +76,16 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 - 製品変更はTesting/Duck.Testing.RefereeDriver/RefereeReceiveService.csの1fileだけ。差分量はgit diff --numstatで `26	3	Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs`。
 - receiver/diagnostics/decodeを保持し、1つのRun内で1つのepochを開始して逐次Receive→parse→成功記録を行う。transportへ渡すcallbackで既存BeginReceiveをparse前に呼ぶ。sourceKey/RemoteEndpointは観測endpointを使い、owner IDをproducer UUIDへ流用しない。
 - 同command counterのpacketを除外しない。既存WaitForChangeAsyncはNotImplemented、DisposeAsyncは前scaffoldのまま。public API/型/既存test/csproj/共通Diagnosticsを変更していない。新規説明コメントは日本語。
+
+### Green CI収集の対象・保存
+
+- source/test/csprojはa384220のgit showとローカルbyteが一致。source SHA256=3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2、test=ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1、csproj=ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c。
+- 固定v1/v2 manifestと各sourceのhash不変を再照合。Tracker.TestsはRedの8b9a1cfからGreen候補a384220まで差分なし。既存67件や03A先行testを編集していない。
+- 今回repository書込みは本report子5欄だけ。CI metadata/raw log、head-source-manifest.json、tests-source-delta.txt、ci-evidence.jsonは/tmp証拠dirへ保存。
+
+### 次の03Aテスト準備（最初のGreen後）
+
+次の03A候補は新規 `Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs` のみ。SHA256 `e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116`。behavior/scaffold追加なし。製品source・既存positive・csprojはHEAD a384220とのbyte一致、固定v1の11file/v2の9fileとrepo内対応sourceも不変。親tasks/phases差分は保持。証拠dir: `/tmp/issue81-referee-receive-failure-red-preparation-20261022/`、source-manifest.json / expectations.json / 構文抽出log / check-commands.json / evidence-files-manifest.jsonを保存。
 
 ## 指摘事項
 
@@ -94,6 +114,17 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 - epoch開始は共通診断がReceiveAttemptを発行するために必要な初期化。再起動/取消の状態無効化、同時Runの排他、遅いcallbackへの独自対策を完成したものではない。
 - 不明command/意味欠落の検査、decode失敗の記録と継続、subscriberの変更待機/重複抑制、停止/再起動の契約は未Redの後続機能として残す。外部へ公開するProgram/HTTPや実UDP transportはまだなく、03A全体readyは主張しない。
 
+### 集計Greenと個別結果の区別
+
+- test job logは `Passed! - Failed:0, Passed:616, Skipped:0, Total:616`。同一test sourceとRed時の616件構成を保った標準全体の集計Greenを確認した。
+- 成功runのartifacts APIはtotal_count=0。既存workflowは失敗時だけdiagnostics/TRXをuploadするため、runner内にResults File: .../dotnet-test.trxというlogはあるが、その個別TRXは取得できていない。個別test名も成功logに出ていない。
+- 最初の03A testと固定67件はsource不変・同じ標準target・616全成功という対応から集計に含まれるGreenとして扱う。新test名のPassed行や固定67件の個別TRX行を今回直接読戻したとは記録しない。
+- dotnet stepはsuccessで既存workflowがtest終了値をそのままexitするため成功終了と整合。生dotnet-test.exit-code artifactは未取得であり、toolのwatch exit0とは証拠の種類を分ける。
+
+### 次の03Aテスト準備（最初のGreen後）
+
+次の先行期待値は採用scope report89行・tasks-status28行の03Aに対応。4ケースを独立fixtureで実行するTheory: malformed / unknown-command / missing-command / missing-counter。正常2packet後count2/error0/ready → 不正packet後pump継続/count2/error1/Failed/not-ready → 次の同counter正常packet後pump継続/count3/error1/Succeeded/ready。実Referee.Parserと隔離raw受信seamを用いる。受信call3/4/5のTask signalとrun終了を観測し、pump停止は明示assertで検出する（任意sleepなし）。取消は後始末であり取消契約の検証へ数えない。現実装のpump停止/意味不正packet計上は失敗候補だが、CI未実行なので実測assert位置/値は未確定。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -118,6 +149,17 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 - source-results-manifest.json SHA256 `82844d8f2af325c430497846a8cc6f1586c7034fac9339a363fcfd62def8797f`。baseline/採用Red/差分量/実行結果/source hashを保持。Greenは未観測、親の非main commit/push後exact-SHA PR CIへ渡す候補である。
 - Red実測の実行時assertとTRXは前節のまま保持する。今のローカルcompile-errorをRed/Greenへ置換しない。最初の同一testがGreenになった後に、03Aの次の小さい機能の先行Redを得る。
 
+### 最初のRed→GreenのCI結果
+
+- `https://github.com/ibis-ssl/Duck/actions/runs/39785567950`。headSha=a38422004406edba7931e023fb17b6847d61d9c2 / pull_request / completed / success。test job119847724417 success、標準616/616成功・0失敗・0skip。packet/fullstack jobsはSkipped。
+- RedはCI39784129851 exact8b9a1cfの新test件数assert Expected2/Actual0、Greenは同じtest byteを持つexacta384220の標準集計成功。最初の正常packet/count/時刻の最小実装ステップの結果として親へ返し、個別TRX未取得の限界を上記に保持する。
+- CI/source/結果対応表 `/tmp/issue81-referee-receive-first-green-ci-20261022/ci-evidence.json`、SHA256 `0dcd74a1f0c7858a1c2951fa210df690375a4d5b45dc47d90197bba8b0623564`。
+- subscriber、未知/欠落/破損、取消/再起動/旧callback等の残03A機能へは今回は着手していない。03A全体完了・通常review合格・実機受入とはしない。
+
+### 次の03Aテスト準備（最初のGreen後）
+
+次の4ケースは実行前にexpectations.jsonへ固定済み。実行件数0、semantic compile未確認、functional Red pending。親のtest-only commit/push後exact-SHA PR CIで実assertion/TRXを回収し、有効Red採用後だけ同じtest byteで最小実装へ戻る。前節CI39785567950の616集計Greenと、今回の未実行4ケースは分離する。構文抽出成功・compile error・未実行をfunctional Redへ数えない。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -136,6 +178,15 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 - ローカルproto不足の制約がありsemantic compile/testは今回未完了。実parser型を持つCIで同一testのGreen確認が必要。構文parse成功をGreenへ昇格しない。
 - 未Red機能の先回り実装なし。03B/C、外部/依存/設定、環境/auth/network、host/実機、commit/push/GitHub操作へ進んでいない。親の追跡/report差分は保持。
 - 全process終端、buildのexit1と構文parseのexit0を回収済み。実行中process・未回収結果・保留approvalなし。
+
+### Green収集の限界・終端
+
+- 現runの個別TRX/成功test名行は未取得。集計616成功と固定source/以前のdiscoveryの対応を、個別TRXによる直接照合と区別した。成功artifactがないことはpermission denialではなくworkflowの保存条件による。
+- 本taskで追加test/behavior、既存615件、固定67件、環境/外部/依存/設定を変更せず、CI再実行・commit/push/GitHub変更なし。全process終端、exitcode回収済み、保留approval/実行中process/未回収結果なし。
+
+### 次の03Aテスト準備（最初のGreen後）
+
+今回未対応の03A契約: owner欠落/短ID、freshness期限/再poll非延命、取消無効化、旧callback/再起動epoch、同時Run排他、subscriber重複抑制と診断件数の分離/受信奪い合い防止、実transport lifecycle。既存positiveの同counter件数/受信時計検証をsubscriber完成の証拠へ流用しない。03B/C、製品behavior、外部/依存/設定/環境/auth/network、実host/Docker/実機、commit/push/GitHub変更なし。新4ケースはCI待ち。全読取/構文抽出/保存/diffcheck process終端、未回収exit・保留approval・実行中processなし。
 
 ## 親による公開準備記録
 
