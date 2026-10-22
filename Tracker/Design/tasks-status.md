@@ -4,6 +4,19 @@
 
 ## 現在の作業
 
+- ID: `ASPIRE-007D`（課題 `#79`、親課題 #18「Aspire対応」）
+- 題名: FA780のDocker開発環境を利用者単位のDocker Desktop 4.96へ統一する
+- 子課題: `#80` 設計・現状調査、`#81` Aspire運用の移行、`#82` 起動停止・通信受入検証。すべて課題 #79の正式な子課題として作成し、`Project16`へ追加した。
+- 段階: 実装
+- 状態: #79は停止中、#80は進行中、#81は旧Docker起動管理の実装だけ本人レビュー待ち（Aspire/DCPへの新方式は未実装・未レビュー）、#82は#80の設計判断待ちで停止中。#80は2026-10-22に全UDP参加者を同じDocker Desktop内のDCP管理ブリッジへ置く方式Bを設計文書へ反映済みで、文書検査と独立レビューを継続中。#81の既存レビューは新方式を対象としていない。
+- 作業分岐: `task/aspire-docker-desktop-496`を作成。統合先の識別値は`c72939ec076ec3261357ba16e61fc5140de2b3d4`。
+- 現状観測: Windows上のDocker 4.96.0.243774 / Docker Engine 29.9.1は以前の読取で起動・接続確認済み。デスクトップ仮想環境内のイメージとコンテナは当時0件。別`WSL` Docker Engine 29.9.0は製品実行経路に含めない。過去の診断では、仮想環境内の観測器がSSL規約の検出データを1031パケット、審判マルチキャストを446パケット受信し、`WSL`側は各0パケットだった。これはネットワーク境界の観測で、新Aspireブリッジの成功証拠ではない。
+- 受入条件: Aspire/DCPがコンテナ起動・停止・削除の唯一の管理者であること、Docker Desktop内ブリッジでUDPとマルチキャストを複数受信側が実受信すること、今回の実行が所有する資源だけを起動・取消・失敗・再起動後に後始末することを実証する。UDP公開、ホストネットワーク、恒久設定変更を前提にしない。
+- 未実施: Windows AppHostからDocker DCPへの接続、ブリッジ内マルチキャスト、DCPの所有者限定後始末、停止状態から試合進行状態への制御、Crane/cm4/模擬環境応答、100 mm移動は未実測。数値IP・`localhost`固定の外部契約、必要な`TCP`公開先、Aspire 13.5.4準備確認APIは未確定。HTTP `GET` 400と一時中継は準備完了を示さず、中継案は不採用。
+- 次作業: #80設計改訂を独立レビューで確認し、外部数値IP契約と13.5.4/Docker Desktop接続条件を明確化する。設計受理後に限り#81でDCP管理への移行を別途実装し、#82はWindows実機で通信・API・所有者限定後始末を受け入れる。完了まで#79〜#82を閉じない。イメージの取得・複製やコンテナ起動、`WSL`連携、接続先・ホストネットワーク・ポート・認証・権限変更は本設計作業では実施しない。
+- 配置規約: `CodexSkill`の複製先とDuckの各 `worktree` を `/home/donabe` 直下の兄弟に置く。新しいリポジトリ作業領域は `git worktree add --relative-paths /home/donabe/<作業領域名>` で作り、各作業領域の `.agents/skills` を相対シンボリックリンク `../../CodexSkill/skills` としてGitの `mode 120000` で追跡する。公式の `link_consumer_skills.py` は絶対リンクを作るため、作成後に相対先へ正規化して解決先を確認する。`CodexSkill`の複製先を移動・削除しない。
+- 作業分岐: `task/aspire-docker-desktop-496` の現在の作業場所は `/home/donabe/Duck-aspire-docker-desktop-496`。元の `/mnt/c/Users/donabe/Documents/Codex/2026-10-21/task-8` は同じ `HEAD` で `detached` 状態のまま保持し、削除していない。統合先は `c72939ec076ec3261357ba16e61fc5140de2b3d4`。
+
 - ID: `ASPIRE-001`
 - 題名: 模擬試験環境の起動構成を決める
 - 段階: 設計
@@ -38,7 +51,7 @@
 - `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
 - 2026-09-30 の `ASPIRE-002` Windows実機確認: .NET SDK 10.0.401 で起動構成の試験が1件中1件成功。AppHost 13.5.4から `Tracker.RuntimeHost.exe` が起動し、UDP 10020を使用する。AppHostの停止後に子プロセスが終了し、UDPポートが解放されることを確認した。Docker、模擬環境、複数受信先への送信を各OSで確かめる作業は後続に残る。
 - `ASPIRE-003` 実装報告: `reports/pr28-aspire-003-implementation-20260930.md`
-- 2026-10-04 の `ASPIRE-004B` 実装（PR #59）: Crane / `cm4-sim` の固定イメージ、planner 別の UDP 経路と起動依存を追加した。Simulator の `IbisPort` 上書きを `cm4-sim` または Crane の送信先へ伝播させる修正では、両 planner の非既定ポートを試験し、CI run `37175785019` の `.NET tests` は 351 / 351 成功、`ASPIRE-NET-002` はスキップだった。実装と修正の記録は [ASPIRE-004B 実装報告](../../reports/pr28-aspire-004b-implementation-20261004.md) と [ポート上書き修正報告](../../reports/pr59-kero-004b-001-fix-20261004.md)。PR #61 では固定 Crane tag を検証済みの `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` に更新している。
+- 2026-10-04 の `ASPIRE-004B` 実装（PR #59）: Crane / `cm4-sim` の固定イメージ、計画方式別の UDP 経路と起動依存を追加した。模擬環境の `IbisPort` 上書きを `cm4-sim` または Crane の送信先へ伝播させる修正では、両計画方式の非既定ポートを試験し、CI実行 `37175785019` の `.NET tests` は 351 / 351 成功、`ASPIRE-NET-002` は実行対象外だった。実装と修正の記録は [ASPIRE-004B 実装報告](../../reports/pr28-aspire-004b-implementation-20261004.md) と [ポート上書き修正報告](../../reports/pr59-kero-004b-001-fix-20261004.md)。PR #61 では固定したCraneイメージの版を検証済みの `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` に更新している。
 - 2026-09-30 の `ASPIRE-003A` 完了: `VisionPacketsReceivedTotal`、接続先・通信経路・累積値の定期診断、復号失敗を件数に加えない条件を試験駆動開発で定めた。赤のコミット `4245400` と同じ版での統合試験は失敗し、緑のコミット `efdcd79` では成功した。Windowsで対象を絞った試験は3件中3件成功。
 - 2026-09-30 の `ASPIRE-003B` 完了: ER-Forceの模擬環境を `ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd` で追加し、計算機を介した通信と、Craneの競技場寸法・物理条件・チーム名指定用の起動引数を設定した。Duckの模擬用 `224.5.23.2:10020` 設定は起動構成の試験で固定した。赤のコミット `2cbab11` と同じ版での継続的な統合試験は失敗し、緑のコミット `067be55` では成功した。
 - 2026-09-30 のLinux `ASPIRE-NET-002`: Ubuntu 24.04 / Docker 28.0.4での実行 `36625776852` では、RuntimeHostが `224.5.23.2:10020` を受信し、`VisionPacketsReceivedTotal` が0から232へ3960 msで増加した。実行記録の `headSha` は検証時のPR先頭 `5c110dd` と一致し、.NETの試験とLinuxでの通信経路確認はともに成功した。成功した実行の成果物 `aspire-net-002-36625776852-1` に判定結果、標準出力、標準エラー、RuntimeHost・模擬環境・Docker・通信の診断情報を保存した。
@@ -338,7 +351,7 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 
 ## 統合した履歴
 
-- `Tracker.Core` と追跡エンジンの旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。
+- `Tracker.Core` と追跡実行環境の旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。
 - `Tracker.DebugHost`、SSL-Vision検出データの表示、診断機能を扱った旧進捗文書は、`Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。
 - 旧 `RAW-VISION-013` から `RAW-VISION-016` は、PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に取り込み済み。
 - `RAW-VISION-017` として開始した処理周期の分離設計は、`Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針へ対象を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。
@@ -367,9 +380,9 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 
 証跡: `reports/task-doc-lint-003-scope-check-20260917082040.md`。元の完了条件と過去の検証結果は変更していない。
 
-## 追跡エンジンの本文照合（2026-09-17）
+## 追跡実行環境の本文照合（2026-09-17）
 
-`DOC-LINT-003` の補足として、追跡エンジンの詳細設計にある原文133出現を、最終表現の行・列・前後の文脈・判断理由へ対応付けた。86行の文脈を読み、変更のない行の23出現も記録した。曖昧になっていた XML documentation comment の `summary` 要素の指定を復元した。
+`DOC-LINT-003` の補足として、追跡実行環境の詳細設計にある原文133出現を、最終表現の行・列・前後の文脈・判断理由へ対応付けた。86行の文脈を読み、変更のない行の23出現も記録した。曖昧になっていた XML documentation comment の `summary` 要素の指定を復元した。
 
 入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。全体の文書検査は、原文を保持した引用内の違反で未通過のままである。
 

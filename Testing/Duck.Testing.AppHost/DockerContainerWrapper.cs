@@ -518,43 +518,52 @@ public static class DockerContainerWrapper
         }
 
         var inspectedOwnerFound = false;
-        foreach (var id in ids)
+        foreach (var candidateId in ids)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var inspect = await RunDockerAsync(
-                dockerExecutable,
-                DockerContainerSpec.CreateInspectArguments(id),
-                cancellationToken);
-            if (inspect.ExitCode != 0)
+            var candidate = await InspectContainerAsync(
+                spec, dockerExecutable, candidateId, allowAbbreviatedId: true, cancellationToken);
+            if (candidate is null)
             {
+                Console.Error.WriteLine($"Leaving container {candidateId} untouched because its exact owner inspection did not match.");
                 continue;
             }
 
-            using var json = JsonDocument.Parse(inspect.StandardOutput);
-            if (!spec.IsExactOwner(json.RootElement, id))
-            {
-                Console.Error.WriteLine($"Leaving container {id} untouched because exact owner inspection did not match.");
-                continue;
-            }
+            var containerId = candidate.Id;
             inspectedOwnerFound = true;
-
-            var running = json.RootElement.GetProperty("State").GetProperty("Running").GetBoolean();
-            if (running)
+            if (candidate.Running)
             {
-                var stop = await RunDockerAsync(dockerExecutable, ["stop", "--time", "3", id], cancellationToken);
-                if (stop.ExitCode != 0)
+                var beforeStop = await InspectContainerAsync(
+                    spec, dockerExecutable, containerId, allowAbbreviatedId: false, cancellationToken);
+                if (beforeStop is null)
                 {
-                    Console.Error.WriteLine($"docker stop failed for owned container {id}: {stop.StandardError.Trim()}");
+                    throw new InvalidOperationException($"Could not revalidate exact owner of container {containerId} before stop.");
                 }
+
+                if (beforeStop.Running)
+                {
+                    var stop = await RunDockerAsync(dockerExecutable, ["stop", "--time", "3", containerId], cancellationToken);
+                    if (stop.ExitCode != 0)
+                    {
+                        Console.Error.WriteLine($"docker stop failed for owned container {containerId}: {stop.StandardError.Trim()}");
+                    }
+                }
+            }
+
+            var beforeRemove = await InspectContainerAsync(
+                spec, dockerExecutable, containerId, allowAbbreviatedId: false, cancellationToken);
+            if (beforeRemove is null)
+            {
+                throw new InvalidOperationException($"Could not revalidate exact owner of container {containerId} before removal.");
             }
 
             var remove = await RunDockerAsync(
                 dockerExecutable,
-                DockerContainerSpec.CreateRemoveArguments(id),
+                DockerContainerSpec.CreateRemoveArguments(containerId),
                 cancellationToken);
             if (remove.ExitCode != 0)
             {
-                throw new InvalidOperationException($"docker rm failed for owned container {id}: {remove.StandardError.Trim()}");
+                throw new InvalidOperationException($"docker rm failed for owned container {containerId}: {remove.StandardError.Trim()}");
             }
         }
 
@@ -563,6 +572,49 @@ public static class DockerContainerWrapper
             throw new InvalidOperationException("A candidate container was discovered, but its exact owner could not be verified; cleanup remains unresolved.");
         }
     }
+
+    private static async Task<OwnedContainerState?> InspectContainerAsync(
+        DockerContainerSpec spec,
+        string dockerExecutable,
+        string expectedId,
+        bool allowAbbreviatedId,
+        CancellationToken cancellationToken)
+    {
+        var inspect = await RunDockerAsync(
+            dockerExecutable,
+            DockerContainerSpec.CreateInspectArguments(expectedId),
+            cancellationToken);
+        if (inspect.ExitCode != 0)
+        {
+            Console.Error.WriteLine($"Could not inspect container {expectedId}: {inspect.StandardError.Trim()}");
+            return null;
+        }
+
+        try
+        {
+            using var json = JsonDocument.Parse(inspect.StandardOutput);
+            var fullId = json.RootElement.GetProperty("Id").GetString();
+            if (fullId is null || fullId.Length != 64 ||
+                fullId.Any(character => !Uri.IsHexDigit(character)) ||
+                (allowAbbreviatedId
+                    ? !fullId.StartsWith(expectedId, StringComparison.Ordinal)
+                    : fullId != expectedId) ||
+                !spec.IsExactOwner(json.RootElement, fullId))
+            {
+                return null;
+            }
+
+            var running = json.RootElement.GetProperty("State").GetProperty("Running").GetBoolean();
+            return new OwnedContainerState(fullId, running);
+        }
+        catch (Exception exception) when (exception is JsonException or KeyNotFoundException or InvalidOperationException)
+        {
+            Console.Error.WriteLine($"Could not verify container {expectedId}: {exception.Message}");
+            return null;
+        }
+    }
+
+    private sealed record OwnedContainerState(string Id, bool Running);
 
     private static async Task<ProcessResult> RunDockerAsync(
         string executable,
