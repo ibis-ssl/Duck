@@ -108,15 +108,15 @@ flowchart LR
  refereeDriver[RefereeDriver / Game Controller API クライアント]
  api[Game Controller 制御 API]
  issue[未解決: 数値 IP / localhost / 名前解決の契約]
- simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> duck
- simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> debug
- simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> tigers
- simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> erforce
- duck -. Duck 追跡パケット 224.5.23.2:11010 / UDP .-> debug
- tigers -. TIGERs 追跡パケット 224.5.23.2:11010 / UDP .-> debug
- erforce -. ER-Force 追跡パケット 224.5.23.2:11010 / UDP .-> debug
- gameController -. 審判情報 224.5.23.1:11003 / 受信側 .-> tigers
- gameController -. 審判情報 224.5.23.1:11003 / 受信側 .-> erforce
+ simulator -. SSL-Vision マルチキャスト .-> duck
+ simulator -. SSL-Vision マルチキャスト .-> debug
+ simulator -. SSL-Vision マルチキャスト .-> tigers
+ simulator -. SSL-Vision マルチキャスト .-> erforce
+ duck -. Duck 追跡パケット .-> debug
+ tigers -. TIGERs 追跡パケット .-> debug
+ erforce -. ER-Force 追跡パケット .-> debug
+ gameController -. 審判情報 .-> tigers
+ gameController -. 審判情報 .-> erforce
  gameController -. 審判マルチキャスト .-> refereeReceiver
  refereeDriver -. API 制御 .-> api
  api -. API 応答と状態確認 .-> refereeDriver
