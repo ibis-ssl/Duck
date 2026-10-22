@@ -3,10 +3,13 @@ using Duck.Testing.Diagnostics;
 
 namespace Duck.Testing.RefereeDriver;
 
-/// <summary>同じ受信処理で診断とcommandの購読を供給するための、03A先行試験用の契約。</summary>
+/// <summary>単一の受信処理から、自身が復号したpacketの診断を更新する。</summary>
 internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDisposable
 {
     internal const string InputId = "referee";
+    private readonly IRefereeDatagramReceiver receiver;
+    private readonly ServiceReceiveDiagnostics diagnostics;
+    private readonly Func<ReadOnlyMemory<byte>, global::Referee> decode;
 
     internal RefereeReceiveService(
         IRefereeDatagramReceiver receiver,
@@ -15,10 +18,30 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     {
         ArgumentNullException.ThrowIfNull(receiver);
         ArgumentNullException.ThrowIfNull(diagnostics);
+        this.receiver = receiver;
+        this.diagnostics = diagnostics;
+        this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
     }
 
-    /// <summary>受信処理は未実装。先行試験の実行時失敗を得るまでpacketを処理しない。</summary>
-    internal Task RunAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    /// <summary>同じcounterも毎packet復号し、parse前に採った受信時計とendpointで件数を更新する。</summary>
+    internal async Task RunAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var epoch = diagnostics.BeginEpoch(InputId);
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var datagram = await receiver.ReceiveAsync(
+                () => diagnostics.BeginReceive(epoch),
+                cancellationToken);
+            _ = decode(datagram.Payload);
+            var endpoint = datagram.RemoteEndpoint.ToString();
+            diagnostics.RecordSuccess(
+                datagram.ReceiveAttempt,
+                sourceKey: endpoint,
+                remoteEndpoint: endpoint);
+        }
+    }
 
     /// <summary>command変更の購読は未実装であり、診断用の受信を別に開始しない。</summary>
     public ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
