@@ -40,10 +40,12 @@ flowchart LR
   subgraph projects[ホスト上の ProjectResource]
    duck[duck / Tracker.RuntimeHost]
    debug[debug-host / Tracker.DebugHost 監視役]
+   ref[referee-driver / RefereeDriver]
   end
   app -. 起動制御 .-> dcp
   app -. ProjectResource 起動 .-> duck
   app -. ProjectResource 起動 .-> debug
+  app -. ProjectResource 起動 .-> ref
  end
  subgraph desktop[Docker Desktop]
   engine[Docker Engine]
@@ -52,7 +54,6 @@ flowchart LR
    gc[game-controller]
    crane[crane]
    cm4[cm4-sim]
-   ref[referee-driver]
    subgraph optional[比較モード選択時のみ]
     tigers[tracker-tigers / Sumatra tracker]
     erforce[tracker-erforce / ER-Force AutoRef tracker]
@@ -65,7 +66,6 @@ flowchart LR
  engine -. 選択されたコンテナ資源 .-> gc
  engine -. 選択されたコンテナ資源 .-> crane
  engine -. 選択されたコンテナ資源 .-> cm4
- engine -. 選択されたコンテナ資源 .-> ref
  engine -. 比較モードで選択された資源 .-> tigers
  engine -. 比較モードで選択された資源 .-> erforce
  legend[破線: 提案する資源管理 / 起動経路。未実装・未検証]
@@ -170,9 +170,9 @@ sequenceDiagram
   User-->>AppHost: 選択した資源を起動
   AppHost-->>DCP: 標準コンテナ資源を登録
   DCP-->>Desktop: 選択資源と専用ブリッジネットワークを作成
-  Desktop-->>Duck: プロセス開始
+  AppHost-->>Duck: プロセス開始（ProjectResource）
   Desktop-->>Sim: プロセス開始
-  Desktop-->>Ref: 選択時にプロセス開始
+  AppHost-->>Ref: 選択時にプロセス開始（ProjectResource）
   AppHost-->>GC: TCP 8082 を内部ポートとする HTTP 接続先を割り当てる
   AppHost-->>User: Aspire Dashboard に動的な URL を表示
   User-->>Browser: Aspire Dashboard の URL を開く（127.0.0.1 だけを想定）
