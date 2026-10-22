@@ -1,0 +1,10 @@
+{
+  "productBehavior": "RefereeDriverApplication.Build calls framework builder.Build only; no standardregistrations/configvalidation/HTTPmapping/workers. RunAsync returnsTask.CompletedTask. Program delegates only; no productionhoststart implemented.",
+  "declarations": [
+    "RefereeDriverReceiverLease(receiver,explicitowner)",
+    "RefereeDriverTransportFactories(createReceiver(options),connectWebSocket(uri,token))"
+  ],
+  "changedMetadata": "newHostOutputTypeExe only; existingcorepublicAPI/frameworkruntimeunchanged",
+  "newPackages": 0,
+  "fixtureComposition": "productionBuild + realDI/HTTP/startstop. Once implementation exists, only rawUDPcreationandWebSocketconnection/clock overridden; testsdo nothand-registerservice/parser/diagnostics/observer/matcher or manualRun."
+}

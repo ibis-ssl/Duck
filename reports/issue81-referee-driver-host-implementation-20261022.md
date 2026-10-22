@@ -33,6 +33,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - 既存Roslyn構文解析: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-initial-green-candidate-20261022/syntax-input.json /tmp/issue81-referee-driver-host-initial-green-candidate-20261022/syntax-result.json — exit0。csproj3/slnx1 XML parse成功、git diff --check exit0。構文はsemantic compile/runtimeGreenと区別。
 - Red source39のうち今回変更するHost helper以外38fileのbyte不変、固定Host11test SHA a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13を確認。新build/test/restore/host/サービス起動・CI操作なし。
 
+### 標準構成・起動停止の組成：先行試験準備（2026-10-22）
+
+- 既読のimplementation-executor / implementation-worker / work-context-manager / tdd-executor / report系を同一担当で継続適用。HEAD503dcab1389f4c0e477c8abc8b1b7c040bf4510a、比較設計260行TDD、tasks03C/scope91/93行に従い先行試験と最小scaffoldだけを保存。
+- 既存Roslyn構文解析: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-composition-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-driver-host-composition-red-preparation-20261022/syntax-result.json — exit0。新C#3file、XML4件parse成功、git diff --check exit0。
+- 旧source39は38byte不変と新Host csprojのOutputType Exe1行だけに分類。Host11/旧745/独立67/raceの既存test body不変。新build/restore/test/開発機Host/実サービス/CI操作なし。構文はsemantic compile・runtimeRedの代用としない。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj: net10.0/通常SDK、Microsoft.AspNetCore.App FrameworkReferenceと既存core参照だけ。追加NuGetなし。現時点はLibraryでProgramなし。
@@ -46,6 +52,14 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - 製品変更はTesting/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.csだけ。SHA256 680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34。ConfigureHttp/MapHealthへ最小behaviorを追加し、関数説明/XMLコメントは日本語。
 - 既存core・全旧test/固定67/race・新Host11test・csproj/solutionは不変。本報告子5欄へ履歴追記し、親prefix/Dispatch・親の未追跡RedCI証拠を保持。
 - 証拠: /tmp/issue81-referee-driver-host-initial-green-candidate-20261022/。before/after、production.diff、source-manifest.json、unchanged38-source-guards.json、completeness-matrix.json、構文/XML/diffのcommand/exitを保存。
+
+### 標準構成・起動停止の組成：先行試験準備（2026-10-22）
+
+- 新規Testing/Duck.Testing.RefereeDriver.Host/Program.cs: RefereeDriverApplication.RunAsync(args)へ委譲する薄い入口。RunAsyncはTask.CompletedTaskのscaffoldで実Hostを起動しない。
+- 新規Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs: Buildはframeworkのbuilder.Buildだけ。標準DI/validation/health登録/workerをまだ実装しない。受信口＋明示owner、受信factory(options)/WebSocket接続(uri,token)の最小内部宣言を追加。
+- 新Host csprojにOutputType Exeだけを追加。旧core/CLIのFrameworkReference・公開API/runtime条件を変更せず、HTTP依存は既存新Host内だけ。新package/install/version変更なし。
+- 新規Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs: 16case、最終SHA256 64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6。実coreを手登録せず本番Build/DI/startstop/HTTPを通し、通信生成/接続と時計だけを置換する。
+- 本報告子5欄追記。親prefix/Dispatch・親tracking差分を保持。正確な4source path/hashはsource-manifest.json/source-snapshotへ保存。
 
 ## 指摘事項
 
@@ -63,6 +77,13 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - HTTP取得はAPI ReadAsyncやUDP Receiveを呼ばず、時計/UTC/countを更新しない。handlerに新lock/await/transport所有なし。reasonは現在のmatcher判断であり、失敗で保持値が解除された後はNoObservationとなり得る。最後の失敗要求履歴を新たに保持したとはしない。
 - completeness-matrix.jsonへ要求・production path・実組成fixture・正確なRed・候補Green待ちを対応付けた。HTTP依存は新Hostだけに隔離したまま、旧coreのCLI/runtime条件は変えていない。
 
+### 標準構成・起動停止の組成：先行試験準備（2026-10-22）
+
+- 自然単位を「標準構成/起動停止」と「明示AutoDrive」に分けた。今回16caseは正常設定2、無効default3、不正/自己URI7、非container明示loopback1、owner欠落/短ID2、取消停止/所有破棄1。expectations.jsonへ正本・独立期待値・行・想定不足を固定。
+- 正常は224.5.23.1:11003/既定または明示IPv4IF、単一service/pump、DIの同ledger、実parser/Client/Observer/Matcher→HTTP200、完全ID/世代2/count2/UTC、2回目以降のAPI要求、観測write0/制御0。無効defaultはURI/owner未指定でもUDP/GC/制御を始めずroute404。不正URIは構成エラーとして拒否し、固定loopback/自己39110をcontainer内GCと誤認しない。未指定/短ownerは復号しても503で自己申告所有証明にしない。
+- 最初のpositive不足はtest32行StartAsync後の受信factory生成Expected1/Actual0。非container/owner/停止を含む6caseは同じ生成不足、不正URI7caseは106行Assert.NotNull(error)に対するnullを想定。計13runtime不足/3既定回帰は未観測の見込みで、実CI結果を優先する。
+- 鮮度/UTCは同じ固定時計、待機timerはBCL実時間を使う。周期取得と停止の深い検証には5秒の回収用watchdogを置くが、そのtimeoutはfunctionalRedではない。停止はhost側取消を確認してから、finallyの試験側安全取消で残る通信Taskを回収する。無関係なallocation0条件/例外型1種類/複数購読仕様は追加しない。
+
 ## 結果
 
 - 先行11caseと空body scaffoldを保存・source/hash/readback確認。構文exit0/XML4成功/diff-check exit0。source34は33byte不変とcore metadata1件の正確な追加を分類して保護、旧734/固定67/raceの期待値/既存source bodyを変更していない。
@@ -73,6 +94,13 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 
 - 最小Host1file候補を保存・構文exit0/XML4成功/diff-check exit0と他38file/固定test不変を確認。本報告子5欄へRed→候補を追記・読戻し、親prefix/Dispatch保持。
 - runtimeGreenと全745回帰は未確認で、親commit/push後のexact-SHA PR CI待ち。全process終端・exit回収済み。子commit/push/GitHub操作なし。
+
+### 標準構成・起動停止の組成：先行試験準備（2026-10-22）
+
+- 先行16case＋未実装scaffoldを保存・構文/XML/diffと旧sourceguardを確認し、親prefix/Dispatchを保持して子5欄を追記・読戻し。runtimeRed/Green未観測、予定total761は実測優先。
+- 先行HTTP単位のexact503dcab / CI39847942308はrun全体success、745pass/0fail/試験skip0。成功artifact0/個別TRXなし、packet/full-stack jobskip。固定Host11/source39一致を保存済みで、今回の未実行16caseへ結果を転用しない。
+- 証拠: /tmp/issue81-referee-driver-host-composition-red-preparation-20261022/。expectations.json/scaffold-boundary.json/remaining03C.json、source/hash、構文/XML/diff command/exit、生出力と報告readbackを保存。親commit/push/exactCIで実assertion不足を採用してから本実装する。
+- 全process終端・exit回収済み。子commit/push/GitHub操作なし。
 
 ## リスク
 
@@ -87,3 +115,9 @@ HTTP内部待受と将来Windowsの動的localhost公開を区別する。DCP所
 - 本unitは薄いHTTP設定/射影まで。Program・標準DI登録・worker・実接続factory・AutoDrive構成は未実装の後続に保持する。未指定Enabledで実受信/workerを作らない最終組成はこのunitの空route/設定保持だけでは実証しない。
 - HTTPの完全IDは構造検査済みの帰属入力であり実DCP所有証明ではない。現在判断のreasonと最後の失敗履歴を混同せず、API窓・UDP単調ageをpollで延命しない。実hostname/GC/Desktop/Windows/DCP/外部G3・実機は未検証。
 - 既知全文文書gate不合格を保持。新依存/package/install/設定/環境/auth/network/外部変更・新agentなし。元Solhigh継続/applied:null。runtimeGreenや自己review合格を主張しない。
+
+### 標準構成・起動停止の組成：先行試験準備（2026-10-22）
+
+- Exe化は呼出可能な入口だけで、RunAsyncはno-op、標準DI/worker/validation/起動停止behaviorは未実装。fixtureは実行前で、構文成功を本番Host成立としない。
+- 明示AutoDrive/controlJSON・TeamName制御は次の自然単位へ分離し、現試験は既定観測の制御0だけを固定。実BCL接続/DNS再解決の証明、Program実行取消、HTTP/構成文書同期、通常レビューも残る。通信境界を置換した隔離試験はDesktop multicast/外部GC/実DCP所有/実機成功ではない。
+- AppHost/DCP配線・Dockerfile/配布物・Windows動的localhost公開・外部G3は対象外。全文文書gate既知不合格と過去TDD履歴を保持。新agent/外部/依存install/環境/auth/network変更なし、元Solhigh/fork none/applied:null。自己review判定なし。
