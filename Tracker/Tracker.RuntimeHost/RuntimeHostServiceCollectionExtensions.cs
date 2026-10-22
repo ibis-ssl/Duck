@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
+using Duck.Testing.Diagnostics;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Tracker.RuntimeHost;
 
@@ -61,6 +63,12 @@ public static class RuntimeHostServiceCollectionExtensions
             return new UdpTrackerPacketPublisher(resolvedOptions.PublisherOptions);
         });
         services.AddSingleton<TrackerCoordinator>();
+        services.TryAddSingleton<TimeProvider>(TimeProvider.System);
+        services.AddSingleton(serviceProvider => new ServiceReceiveDiagnostics(
+            ServiceReceiveDiagnostics.ParseIdentity(
+                configuration["Testing:Diagnostics:RunId"], configuration["Testing:Diagnostics:ResourceId"],
+                configuration["Testing:Diagnostics:ContainerId"], configuration["Testing:Diagnostics:Generation"]),
+            serviceProvider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<RuntimeVisionReceiverDiagnostics>();
         services.AddSingleton<RuntimeVisionPacketBuffer>();
         services.AddSingleton<RuntimeHostOperationLoop>();

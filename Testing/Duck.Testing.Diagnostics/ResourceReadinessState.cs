@@ -15,12 +15,12 @@ public enum ResourceReadinessReason
     InvalidClock,
 }
 
-/// <summary>A diagnostic eligibility result, not proof of ownership or whole-service health.</summary>
+/// <summary>診断上の準備条件の判定結果。所有証明やサービス全体の正常性は示さない。</summary>
 public sealed record ResourceReadinessResult(bool IsReady, ResourceReadinessReason Reason);
 
 /// <summary>
-/// Evaluates normalized decode progress for one input. It has no transport or resource
-/// owner integration. Re-reading an unchanged counter never renews the progress lease.
+/// 一つの入力について、正規化された復号の進捗を判定する。
+/// 通信や資源の所有者とは連携しない。同じ件数を再取得しても進捗の有効期間を延長しない。
 /// </summary>
 public sealed class ResourceReadinessState
 {
@@ -57,8 +57,8 @@ public sealed class ResourceReadinessState
     }
 
     /// <summary>
-    /// Starts a newer incarnation of the same run/resource. The owner, not the diagnostic
-    /// payload, authorizes this change. A process restart may keep the container ID.
+    /// 同じ実行と資源の新しい起動世代へ切り替える。変更を許可するのは診断データではなく所有者。
+    /// プロセスの再起動では、コンテナ ID が同じままの場合もある。
     /// </summary>
     public void AdvanceGeneration(ResourceDiagnosticIdentity nextIdentity)
     {
@@ -81,9 +81,9 @@ public sealed class ResourceReadinessState
     }
 
     /// <summary>
-    /// Returns false for a foreign input/identity or a nonpositive, duplicate, or older sequence.
-    /// Rejected observations cannot overwrite a newer state. Matching newer observations
-    /// return true even when their evidence invalidates diagnostic readiness.
+    /// 入力または識別子の不一致、非正・重複・過去の番号は false として拒否する。
+    /// 拒否した観測で新しい状態を上書きしない。一致する新しい観測は、
+    /// その内容で準備未完了へ戻る場合も、受理を表す true を返す。
     /// </summary>
     public bool Observe(ResourceDiagnosticSnapshot snapshot)
     {
@@ -170,7 +170,7 @@ public sealed class ResourceReadinessState
                 return new(false, reason);
             }
 
-            // Subtract before comparing, so an untrusted large age cannot overflow a sum.
+            // 大きな経過時間を足して桁あふれしないよう、差分を先に求めて比較する。
             if (elapsed > freshnessWindow || progressAge > freshnessWindow - elapsed)
             {
                 Invalidate(ResourceReadinessReason.Expired);
@@ -181,8 +181,8 @@ public sealed class ResourceReadinessState
         }
     }
 
-    // Called only while holding gate. Reads and observations share one high-water mark,
-    // retained after invalidation so clock catch-up alone cannot restore progress.
+    // gate の保持中だけ呼ぶ。読取りと観測で時計の高水位を共有し、無効化しても保持する。
+    // 時計が追いついただけでは進捗を復活させない。
     private bool TryReadTimestamp(out long now)
     {
         now = timeProvider.GetTimestamp();

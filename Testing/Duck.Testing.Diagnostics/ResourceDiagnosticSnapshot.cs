@@ -15,19 +15,19 @@ public enum DiagnosticDecodeStatus
 }
 
 /// <summary>
-/// An in-memory, normalized observation of one input in one resource incarnation.
-/// This is not an external service's payload or a wire format.
+/// 一つの資源の起動世代と入力に対応する、メモリ内の正規化済み観測値。
+/// 外部サービスの応答データや通信形式は表さない。
 /// </summary>
-/// <param name="Identity">The identity associated with the observation, checked against the expected owner identity.</param>
-/// <param name="InputId">The caller's input key, kept separate from other counters in the same resource.</param>
-/// <param name="ObservationSequence">A positive, increasing sequence assigned by the local collector before acquisition.</param>
-/// <param name="EvidenceKind">Whether the counter belongs to the service's own successful decoding.</param>
-/// <param name="DecodeStatus">The latest decode outcome represented by this observation.</param>
-/// <param name="SuccessfullyDecodedCount">A nonnegative cumulative count within this identity and input.</param>
+/// <param name="Identity">観測に対応する識別子。期待する所有者の識別子と照合する。</param>
+/// <param name="InputId">呼出側の入力キー。同じ資源の他の入力件数と区別する。</param>
+/// <param name="ObservationSequence">ローカルの収集側が取得開始前に割り当てる、正の単調増加番号。</param>
+/// <param name="EvidenceKind">サービス自身の正常な復号で増えた件数かどうか。</param>
+/// <param name="DecodeStatus">この観測が表す最新の復号結果。</param>
+/// <param name="SuccessfullyDecodedCount">この識別子と入力における、非負の累積件数。</param>
 /// <param name="DecodeAgeUpperBound">
-/// A justified upper bound on time since the latest successful decode when Observe is called,
-/// including acquisition delay. Null means the age cannot be established. A poll timestamp,
-/// an unverified remote timestamp, or a packet capture timestamp cannot supply this value.
+/// Observe 呼出時点で、最後の正常な復号から経過した時間の根拠ある上限。取得の遅延も含める。
+/// 経過時間を確定できない場合は null とする。状態の取得時刻、未検証の外部時刻、
+/// パケット記録の時刻を、この値の代用にしてはならない。
 /// </param>
 public sealed record ResourceDiagnosticSnapshot(
     ResourceDiagnosticIdentity Identity,

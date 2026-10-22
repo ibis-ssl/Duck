@@ -12,14 +12,15 @@
 - #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。
 - #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のDuck内純粋契約を先行実装し、通常レビューのI81-NR-001 P2は同じreviewerがclosed、限定unitはpass_with_held。外部接続は未実装で、G1の外部宛先再解決・応答受信とG3の自サービス診断に外部変更または供給証拠が必要。#82の実機受入は着手しない。新しい環境・依存・認証・ネットワーク設定や外部リポジトリを変更しない。
 - 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。
+- 今回追加・変更する関数の説明コメントとXMLドキュメントコメントは日本語とする。I81-01の追加分も対象にし、識別子・API名は保持して通常レビューで確認する。
 - 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。
-- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01のDuck内純粋契約だけを先行し、外部schema・HTTP・DCP連携と後続資源接続はG1/G3の供給要求解消まで待機する。調査完了を実装完了にしない。現technical HEADは9852e67bfe194296763d143418f0b4e0858ba7e5、今回の台帳・報告はcommit_pending。
+- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。現在差分の基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06、今回の台帳・報告はcommit_pending。
 
 | 単位 / 規模 | 依存 | 変更と完了条件 | 状態 |
 | --- | --- | --- | --- |
 | I81-G / 中 | 正式PRリンク確認済み | 固定外部版の数値IP・loopback・再解決、実サービス自身の受信診断、Aspire13.5.4のlocalhost限定bindを一次ソースで確定。Duck内で完結するか外部変更が必要か明示し、未確定契約を推測で実装しない。 | 調査完了・G1/G3阻害でゲート未通過 |
-| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build成功、修正前回帰6件失敗・修正後harness46件成功。標準Tracker.Tests・全体統合・独立finalは未完了 |
-| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 待機 |
+| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |
+| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 実装済み・正式CI/通常レビュー待ち。明示ContainerModeだけstrict診断、legacy health互換、Detection計数・自身診断、所有ID不足503。BCL補助55件成功、host組成17ケース未実行。実hostは対象SHA一致PR CIで確認。根拠はreports/issue81-host-diagnostics-implementation-20261022.md |
 | I81-03 / 中 | I81-01、外部診断契約 | RefereeDriverの実行入口・内部GC URI・11003観測・診断口を実装。GC唯一producerと手動操作を保つ。 | 待機 |
 | I81-04 / 中 | I81-02、I81-03 | Linux配布・静的資産・診断・デバッグ用の構成を定義。外部成果物とdigestを確定し、無許可の取得・起動をしない。 | 待機 |
 | I81-05 / 中 | I81-04、bind契約 | 全UDP資源を標準AddContainerと同一DCPブリッジへ移行し、localhost動的TCPだけ公開。資源モデルの試験で旧構成・UDP公開・host networkを拒否する。 | 待機 |

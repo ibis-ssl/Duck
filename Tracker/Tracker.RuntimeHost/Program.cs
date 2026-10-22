@@ -5,7 +5,7 @@ using Tracker.RuntimeHost;
 var builder = Host.CreateApplicationBuilder(args);
 RuntimeHostCommandLine.ApplyOverrides(builder.Configuration, args);
 builder.Services.AddRuntimeHost(builder.Configuration);
-if (string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.Ordinal))
+if (RuntimeVisionDiagnosticsHttpService.IsEnabled(builder.Configuration))
 {
     builder.Services.AddHostedService<RuntimeVisionDiagnosticsHttpService>();
 }

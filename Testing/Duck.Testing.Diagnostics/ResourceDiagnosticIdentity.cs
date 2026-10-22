@@ -1,9 +1,9 @@
 namespace Duck.Testing.Diagnostics;
 
 /// <summary>
-/// Identifies the resource incarnation expected by the caller. This value does not
-/// discover a container or prove ownership; callers must obtain the expected identity
-/// from their trusted resource owner.
+/// 呼出側が期待する資源の起動世代を識別する値。
+/// コンテナの探索や所有証明は行わないため、期待する識別子は
+/// 信頼できる資源の所有者から呼出側が取得する。
 /// </summary>
 public sealed record ResourceDiagnosticIdentity
 {
