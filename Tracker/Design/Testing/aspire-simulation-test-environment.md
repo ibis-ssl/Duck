@@ -1,230 +1,248 @@
 # Aspire シミュレーション試験環境
 
-> **現行設計案 — 未実装・未受入。** Windows の AppHost と利用者ごとの Docker Desktop を使う提案を示す。ユーザーが管理する Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop が内部で使う WSL 2 の仕組みは別の構成要素であり、本設計はその変更や削除を求めない。実装、DCP の Windows 上の挙動、専用ブリッジネットワーク内の UDP 通信とマルチキャスト、準備完了判定、受入試験は未検証である。
+> **現行設計案・未実装・未受入。** Windows の AppHost と利用者ごとの Docker Desktop を使う。UDP とマルチキャストの参加者は、すべて同じ DCP 管理のブリッジネットワーク内へ配置する。Windows 上には AppHost、DCP、利用者のブラウザーを置く。利用者管理の Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop 内部の Linux 仮想環境 や WSL 2 は製品の基盤であり、その変更や削除は求めない。
 >
-> [2026-10-21 の再編前の設計記録](aspire-simulation-test-environment-history.md)には、元の全内容をそのまま残している。過去の状態や方式は記録時点だけに適用する。
+> [2026-10-21 の再編前の設計記録](aspire-simulation-test-environment-history.md)は当時の内容を保持する。本書の方式への移行、Windows 上の DCP、ブリッジ内の通信、準備完了判定は未検証である。
 
 ## 目的と設計判断
 
-Windows 上の AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い、利用者自身の Docker Desktop に試験資源を登録する。DCP が Aspire の実行単位を接続する機能を通じ、資源の作成、監視、記録、停止、削除を一元管理する。コンテナの作成から後始末まで DCP だけが管理し、別の Docker コマンド管理プログラムと二重に管理しない。
+Windows AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い、利用者自身の Docker Desktop に試験資源を登録する。DCP が資源の作成、状態監視、記録、停止、削除を管理する。別の Docker コマンド管理プログラムとコンテナの所有権を二重に持たない。
 
-DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost は資源の定義を DCP に渡し、サービスやコンテナを直接起動しない。通常の実行では DCP がプロジェクト資源に対応するプロセスを起動して状態を管理する。統合開発環境での実行を選んだ資源は起動をその環境へ委ねるが、DCP は実行状態を追跡する。DCP がコンテナ資源を管理し、Docker Engine がコンテナを実行する。DCP は資源の起動管理を担い、ネットワーク通信の方式とは役割が異なる。通常の利用者が DCP を直接操作する必要はない。この資料で示す Windows 上の実行経路は提案であり未検証である。詳しくは [DCP の公式リポジトリ](https://github.com/microsoft/dcp)、[AppHost の構成資料](https://learn.microsoft.com/en-us/dotnet/aspire/app-host/configuration)、および [Aspire 13.5.4 の実行仕様](https://github.com/microsoft/aspire/blob/v13.5.4/docs/specs/IDE-execution.md) を参照する。
+DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost は資源資源定義を DCP に渡し、Docker Engine がコンテナを実行する。DCP はネットワークの転送機能ではない。[DCP 公式リポジトリ](https://github.com/microsoft/dcp)と[Aspire 13.5.4 のコンテナ作成処理](https://github.com/microsoft/aspire/blob/v13.5.4/src/Aspire.Hosting/Dcp/ContainerCreator.cs#L109-L204)を根拠とする。当該版が作る既定の Aspire ネットワークをこの実行の専用ブリッジとする。任意の別ネットワークを追加指定できるとは仮定しない。
 
-これは提案であり現行実装とは区別する。現在の `Testing/Duck.Testing.AppHost` は `duck` を `Tracker.RuntimeHost` の `ProjectResource` とし、`simulator`、`game-controller`、`crane`、必要な `cm4-sim` を Docker コマンドライン起動管理プログラムを介した `ExecutableResource` として扱う。旧 `AddContainer` では、DCP が割り当てた利用者定義ネットワークと `--network host` を同時に Docker へ渡したため、Docker は `cannot attach both user-defined and non-user-defined network-modes` としてコンテナ作成を拒否した。この競合を解消する設計案では、標準 `AddContainer` に明示的な `--network host` を渡さず、Aspire/DCP が管理する実行ネットワークを使う必要がある。これは提案する修正方針であり、標準 `AddContainer` と専用ブリッジネットワークの実装・試験・受入が済んだことを示さない。
+課題 #80 の I80-NR-001 に対応し、Duck、DebugHost のサーバー、RefereeDriver の審判情報受信機能、準備確認の受信機能もコンテナ側へ置く。Windows のプロセスにブリッジ内のマルチキャストを直接受信させる経路は要求しない。これは配置の設計変更であり、UDP の公開、中継、ホストネットワークは使わない。Docker Desktop の公式資料は、ブリッジが 仮想環境 内にあり Windows ホストから直接到達できないことを示す（[既知制限](https://docs.docker.com/desktop/features/networking/networking-how-tos/#known-limitations)、[通信の構造](https://docs.docker.com/desktop/features/networking/)）。同じブリッジ内に配置しても、複数受信や外部イメージとの通信の実測は必要である。
+
+現行 `Testing/Duck.Testing.AppHost` の実装はこの設計と異なる。Duck と DebugHost はホスト上の `ProjectResource`、外部資源は Docker コマンド起動管理を介した `ExecutableResource` で、後者は `--network host` を使う。旧 `AddContainer` は DCP の利用者定義ネットワークと `--network host` が競合し、Docker に `cannot attach both user-defined and non-user-defined network-modes` と拒否された。移行時は標準コンテナ資源だけに所有権を集め、同じ引数を戻さない。現行実装や過去の受入証拠を、新配置の実装済み・受入済みの根拠にしない。
 
 ## 対象資源
 
-AppHost の一回の実行で必要な資源を選択して起動する。基礎資源は simulator、Game Controller、crane、必要に応じた cm4-sim、および Duck の `Tracker.RuntimeHost`。試合制御用 RefereeDriver、比較用追跡器、比較表示用 DebugHost は試験に応じて加える。固定イメージ版を使い、受入時にイメージのハッシュ値と対応するコンテナ ID を記録する。
+すべての UDP 送受信機能を同じブリッジ内に置く。各イメージの版とハッシュ値を固定し、起動時には完全なコンテナ ID、DCP 資源 ID、実行 ID、ネットワーク ID を記録する。Duck と DebugHost の Linux 向け配布イメージ、準備確認機能を含む各起動構成は後続実装の対象である。
 
-比較モードは任意選択とし、選択時は同じ AppHost 実行に加え、提案中の Aspire/DCP/Docker Desktop 管理対象として扱う。これは移行後の構成目標であり、実装や受入の証拠ではない。資源の役割と比較契約は[トラッカー比較デバッグ設計](tracker-comparison-debug-design.md)を参照する。
-
-| 資源 | 役割とデータ |
+| 資源 | 配置と役割 |
 | --- | --- |
-| `simulator` | SSL-Vision マルチキャスト `224.5.23.2:10020` の送信者。別の SSL-Vision プロセスは起動しない。 |
-| `duck` | ホスト上の `Tracker.RuntimeHost` をプロジェクト資源として起動する。SSL-Vision を受信し、Duck の追跡結果を含む公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
-| `tracker-tigers` | 比較時だけ使う Sumatra の追跡機能コンテナ。SSL-Vision `224.5.23.2:10020` と Game Controller の審判情報 `224.5.23.1:11003` を受信し、追跡結果を含む公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。比較起動では TIGERs AI を起動しない。 |
-| `tracker-erforce` | 比較時だけ使う ER-Force AutoRef の追跡機能コンテナ。同じ SSL-Vision と審判情報を受信し、追跡結果を含む公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
-| `debug-host` | ホスト上の `Tracker.DebugHost` をプロジェクト資源として起動する。自身の追跡機能を無効にし、SSL-Vision と `224.5.23.2:11010` の Duck / TIGERs / ER-Force の公式形式 `TrackerWrapperPacket` を受信して比較する。 |
+| `simulator` | コンテナ。SSL-Vision `224.5.23.2:10020` の送信者。別の SSL-Vision プロセスは起動しない。 |
+| `duck` | `Tracker.RuntimeHost` のコンテナ。視覚検出を受信し、`sim` 設定で公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
+| `game-controller` | コンテナ。審判情報 `224.5.23.1:11003` の唯一の送信者。視覚検出と追跡情報も入力する。画面と制御 API は内部 TCP 8082。 |
+| `crane`、`cm4-sim` | コンテナ。必要なロボット制御と応答を同じブリッジ内で送受信する。`cm4-sim` は構成に応じて選ぶ。 |
+| `referee-driver` | 選択時に起動するコンテナ。双方向API 制御と `UdpRefereeCommandSource` の11003受信を同じ資源内で行う。Windows に UDP 受信部を残さない。 |
+| `tracker-tigers` | 比較時の Sumatra 追跡機能コンテナ。10020と11003を受信し、11010へ公式形式の追跡情報を送る。TIGERs AI と内蔵 Game Controller は起動しない。 |
+| `tracker-erforce` | 比較時の ER-Force AutoRef 追跡機能コンテナ。同じ入力から11010へ公式形式の追跡情報を送る。 |
+| `debug-host` | 比較時の `Tracker.DebugHost` コンテナ。自身の追跡・UDP送信を無効にし、10020と Duck / TIGERs / ER-Force の11010を受信する。表示・記録・再生をサーバー内で行い、Windows ブラウザーへ画面を返す。 |
+| 各資源の準備確認機能 | 対象コンテナ内で UDP を受信し、対象サービス自身の復号件数と新しさを確認する。ホスト上の旧起動管理プログラムの受信数は代用しない。 |
 
-Duck と DebugHost はホスト上の `ProjectResource` であり、専用ブリッジネットワーク内のコンテナではない。ホスト上の `ProjectResource` とブリッジ上のコンテナ間でマルチキャストを送受信できるかは未検証で、図の経路を実通信の成立とみなさない。Crane はロボット制御資源であり、追跡資源ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 の範囲で、本比較モードは起動しない。
+比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
 ## 配置案
 
-図中の破線矢印は提案経路を示し、未実装・未検証である。矢印は実行済みの通信成功を意味しない。専用ブリッジネットワークにはこの AppHost が所有する資源だけを接続する。
+図の破線は未実装の管理・起動経路を表す。各資源内の UDP 準備確認機能もブリッジ内で動く。別所有者のコンテナはネットワークに加えない。
 
 ```mermaid
 flowchart LR
- subgraph win[Windows / AppHost]
-  app[Windows AppHost]
+ subgraph win[Windows]
+  browser[利用者のブラウザー]
+  app[AppHost]
   dcp[DCP]
-  subgraph projects[ホスト上の ProjectResource]
-   duck[duck / Tracker.RuntimeHost]
-   debug[debug-host / Tracker.DebugHost 監視役]
-   ref[referee-driver / RefereeDriver]
-  end
-  app -. 資源モデルを送信 .-> dcp
-  dcp -. ProjectResource を起動・状態監視 .-> duck
-  dcp -. ProjectResource を起動・状態監視 .-> debug
-  dcp -. ProjectResource を起動・状態監視 .-> ref
+  ports[127.0.0.1 / 動的 TCP 接続先]
+  app -. 資源モデル .-> dcp
+  browser -. HTTP / WebSocket .-> ports
  end
  subgraph desktop[Docker Desktop]
   engine[Docker Engine]
-  subgraph bridge[専用ブリッジネットワーク / コンテナ]
+  subgraph bridge[当該実行の DCP 管理ブリッジ]
    sim[simulator]
-   gc[game-controller]
-   crane[crane]
-   cm4[cm4-sim]
-   subgraph optional[比較モード選択時のみ]
-    tigers[tracker-tigers / Sumatra tracker]
-    erforce[tracker-erforce / ER-Force AutoRef tracker]
+   gc[Game Controller]
+   duck[Duck / RuntimeHost]
+   ref[RefereeDriver / 11003 受信を含む]
+   crane[Crane]
+   cm4[cm4-sim / 選択時]
+   checks[各資源内の UDP 準備確認機能]
+   subgraph optional[比較モード]
+    tigers[TIGERs tracker]
+    erforce[ER-Force tracker]
+    debug[DebugHost サーバー]
    end
   end
-  foreign[他所有者のコンテナ / 保護対象]
+  foreign[別所有者のコンテナ / 保護対象]
  end
- dcp -. DCP による資源管理 .-> engine
- engine -. 選択されたコンテナ資源 .-> sim
- engine -. 選択されたコンテナ資源 .-> gc
- engine -. 選択されたコンテナ資源 .-> crane
- engine -. 選択されたコンテナ資源 .-> cm4
- engine -. 比較モードで選択された資源 .-> tigers
- engine -. 比較モードで選択された資源 .-> erforce
- legend[破線: 提案する資源管理 / 起動経路。未実装・未検証]
+ dcp -. 全選択コンテナの作成・監視・停止 .-> engine
+ engine -. 選択資源を同じブリッジで実行 .-> bridge
+ ports -. GC 内部 TCP 8082 .-> gc
+ ports -. DebugHost 内部 TCP 8080 .-> debug
+ ports -. 用途を限定した HTTP 準備確認 .-> checks
 ```
 
-DCP の管理対象はこの実行で登録した資源に限る。異なる所有者の既存コンテナは保護する。ユーザーが管理する Ubuntu 上の別の Docker Engine を製品実行に使う構成や、ホストのネットワーク設定変更は前提にしない。
+## 通信契約
 
-## 通信要件と未解決の接続先
+UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資源名から接続先を解決する。マルチキャストは マルチキャストの宛先 と ポート を維持し、各受信側はコンテナ内の IPv4 インターフェースで参加する。Windows の NIC を `InterfaceAddress` に渡さない。送信側のインターフェース、同時受信、再参加の挙動は実機受入で確認する。
 
-コンテナ間の UDP とマルチキャストは専用ブリッジネットワーク内で使い、UDP ポートを Windows ホストへ公開しない。コンテナ IP は固定せず、資源名で通信する。表は既存の通信規約／設定で報告されているポート契約であり、新しいネットワークでの到達性は未検証である。ホスト上のプロセス資源とコンテナ間のマルチキャスト経路も未検証である。
-
-| 用途 | 既存契約 |
+| 用途 | 送受信と接続先 |
 | --- | --- |
-| 視覚検出 | `224.5.23.2:10020/UDP` |
-| 審判情報 | `224.5.23.1:11003/UDP` |
-| トラッカー | `224.5.23.2:11010/UDP` |
-| シミュレーション／チーム制御 | `10300/UDP`、`10301/UDP`、`10302/UDP` |
-| Crane、cm4-sim、simulator 間 | `12345/UDP`、`12346/UDP`。実構成では `12350/UDP` も報告あり |
-| simulator からのロボット応答 | `50100 + robot-id/UDP` |
-| ロボットからの応答 | `224.5.20.(100 + robot-id):50100 + robot-id/UDP` |
-| コンテナ内 Game Controller API | `ws://game-controller:8082/api/control`。コンテナ間の名前解決に使う内部接続先であり、Windows ホストからは使わない。 |
-| Windows 上の RefereeDriver 制御 API | `ws://127.0.0.1:<Aspire 割当ポート>/api/control`。AppHost が割り当てる Game Controller のホスト側 HTTP 接続先と同じポートを使う案。127.0.0.1 のみの待受と接続は未検証。 |
-| Windows ブラウザーの操作画面 | `http://127.0.0.1:<Aspire 割当ポート>/` を候補とする。Game Controller の公式 README は画面と API が同じポートであることを示すが、固定イメージの画面 URL の末尾部分と実到達性は未検証。 |
-
-通信図は主要な経路を示す。表にある 10300/UDP、10301/UDP、10302/UDP の制御契約と各 UDP ポート番号の割当ては、接続先や対応関係を確定できないため図に割り当てていない。通信図の破線は既存契約を踏まえた提案であり、新ネットワークでの到達性を示さない。数値 IP／`localhost` の契約が解決するまで、該当する接続は阻害状態として扱う。
-
-RefereeDriver はホスト上の `ProjectResource` なので、コンテナ内の名前 `game-controller` を接続先には使わない。現行 `Testing/Duck.Testing.RefereeDriver/RefereeDriverNetworkAdapters.cs` の `DefaultEndpoint` は `ws://127.0.0.1:8082/api/control` 固定である。移行後は AppHost が割り当てたホスト側ポートを RefereeDriver に渡し、`127.0.0.1:<割当ポート>` 経由で API に接続する案とする。ポートの受け渡し方法と自端末だけで待ち受ける設定は未確定・未検証。利用者の操作画面とホスト上の制御 API は、コンテナ間の内部接続や審判情報 UDP マルチキャストとは別の入口として扱う。Game Controller の UI と `/api/control` は同じコンテナポート 8082 を使う。AppHost はそのポートを対象に HTTP 接続先を定義し、動的に割り当てられたホスト側 URL を Aspire Dashboard に表示する案とする。利用者は AppHost 起動後、Aspire Dashboard に表示された Game Controller の URL を開く。表示する URL は `http://127.0.0.1:<割当ポート>/` を想定するが、固定イメージでの画面 URL の末尾部分、ポート割当て、127.0.0.1 だけで待ち受ける設定は未検証である。実装は 127.0.0.1 以外の待受や実行ホスト外からの到達を許さないことを確認してから採用する。実現方法を確認できない場合はホスト側の通信を有効にせず、受入を阻害として残す。
-
-Game Controller API のホスト上の利用者は同じ割当ポートの `ws://127.0.0.1:<割当ポート>/api/control` に接続する。コンテナ内のクライアントだけが `ws://game-controller:8082/api/control` を使う。審判情報の `224.5.23.1:11003/UDP` は Game Controller から試験資源へ流す内部マルチキャストであり、ブラウザー操作用の接続先ではない。利用者が実行ホスト上で操作する範囲を今回の対象とし、同一ネットワーク内の別端末からの操作は対象外。
+| 視覚検出 | simulator → Duck / DebugHost / TIGERs / ER-Force / Game Controller。 `224.5.23.2:10020/UDP`。選択資源が同じ新しい入力を受ける。 |
+| 審判情報 | Game Controller のみ → 比較追跡器、Crane、RefereeDriver、および必要な準備確認機能。 `224.5.23.1:11003/UDP`。各受信機能の実装は確認対象とする。 |
+| 追跡情報 | Duck / TIGERs / ER-Force → DebugHost と Game Controller 等の必要受信側。 `224.5.23.2:11010/UDP`。三者は公式形式と独立した送信元識別を保持する。 |
+| シミュレーション／チーム制御 | `10300/UDP`、`10301/UDP`、`10302/UDP`。構成で使う送信者・受信者を外部契約確認で確定する。 |
+| Crane 経路 | `12345/UDP`、`12346/UDP`。報告された `12350/UDP` の使用有無も確認する。 |
+| ロボット応答 | simulator の `50100 + robot-id/UDP` と、`224.5.20.(100 + robot-id):50100 + robot-id/UDP` の使用経路を確認する。 |
+| 内部 Game Controller 制御 | RefereeDriver 等のコンテナ内利用者 → `ws://game-controller:8082/api/control`。 |
+| Windows の Game Controller 画面・制御 | `http://127.0.0.1:<GC割当ポート>/` と同じポートの `ws://127.0.0.1:<GC割当ポート>/api/control`。 |
+| Windows の比較画面 | `http://127.0.0.1:<DebugHost割当ポート>/`。DebugHost 内部は HTTP 8080 を設計値とする。既存の HTTPS 転送・待受設定の対応は実装前に確認する。 |
+| HTTP 準備確認 | 各資源の限定された検証口を127.0.0.1の動的 TCP ポートへ対応付ける。UDP をホストで受信しない。後述の確認契約が成立するまで公開しない。 |
 
 ```mermaid
 flowchart LR
- subgraph host[Windows ホスト]
-  browser[利用者のブラウザー]
-  hostPort[127.0.0.1 / Aspire 割当 TCP ポート]
-  duck[Duck / Tracker.RuntimeHost]
-  debug[DebugHost 監視役 / Tracker.DebugHost]
-  refereeDriver[RefereeDriver / Game Controller API クライアント]
+ subgraph win[Windows]
+  browser[ブラウザー]
+  gcPort[127.0.0.1 / GC 割当 TCP]
+  debugPort[127.0.0.1 / DebugHost 割当 TCP]
  end
- subgraph desktop[Docker Desktop / 専用ブリッジネットワーク]
-  simulator[simulator / SSL-Vision パケット送信者]
-  gameController[Game Controller / 審判情報の唯一の送信者]
-  api[画面と同じ TCP 8082 / WebSocket API]
-  tigers[tracker-tigers / Sumatra 追跡機能のみ]
-  erforce[tracker-erforce / ER-Force AutoRef tracker]
-  crane[Crane / ロボット制御]
+ subgraph bridge[Docker Desktop / 同じ DCP 管理ブリッジ]
+  sim[simulator]
+  gc[Game Controller / 唯一の 11003 送信者]
+  duck[Duck]
+  debug[DebugHost / 追跡無効]
+  tigers[TIGERs tracker / AI 無効]
+  erforce[ER-Force tracker]
+  ref[RefereeDriver / 審判観測]
+  crane[Crane]
   cm4[cm4-sim]
-  refereeReceiver[その他の審判情報受信先 / 所有者未確定]
+  checks[各資源内の準備確認]
+  sim -. 10020 / SSL-Vision .-> duck
+  sim -. 10020 .-> debug
+  sim -. 10020 .-> tigers
+  sim -. 10020 .-> erforce
+  sim -. 10020 .-> gc
+  duck -. 11010 .-> debug
+  tigers -. 11010 .-> debug
+  erforce -. 11010 .-> debug
+  duck -. 11010 .-> gc
+  tigers -. 11010 .-> gc
+  erforce -. 11010 .-> gc
+  gc -. 11003 .-> tigers
+  gc -. 11003 .-> erforce
+  gc -. 11003 .-> ref
+  gc -. 11003 .-> crane
+  sim -. 10020 の受信証跡 .-> checks
+  gc -. 11003 の受信証跡 .-> checks
+  duck -. 11010 の受信証跡 .-> checks
+  crane -. 制御 UDP / 契約確認対象 .-> cm4
+  cm4 -. 制御 UDP / 契約確認対象 .-> sim
+  sim -. 応答 UDP / 契約確認対象 .-> cm4
+  cm4 -. 応答 UDP / 契約確認対象 .-> crane
+  ref -. WebSocket /api/control / 8082 .-> gc
  end
- issue[未解決: 数値 IP / localhost / 名前解決の契約]
- simulator -. SSL-Vision マルチキャスト .-> duck
- simulator -. SSL-Vision マルチキャスト .-> debug
- simulator -. SSL-Vision マルチキャスト .-> tigers
- simulator -. SSL-Vision マルチキャスト .-> erforce
- duck -. Duck 追跡パケット .-> debug
- tigers -. TIGERs 追跡パケット .-> debug
- erforce -. ER-Force 追跡パケット .-> debug
- browser -. HTTP / 画面 URL の末尾部分は未検証 .-> hostPort
- hostPort -. Aspire 接続先 / 動的ホストポート .-> api
- browser -. WebSocket /api/control 操作 .-> hostPort
- refereeDriver -. WebSocket /api/control .-> hostPort
- gameController -. TCP 8082 の UI / API .-> api
-gameController -. 審判情報 .-> tigers
- gameController -. 審判情報 .-> erforce
- gameController -. 審判マルチキャスト .-> refereeReceiver
- crane -. UDP ユニキャスト .-> cm4
- cm4 -. UDP ユニキャスト .-> simulator
- simulator -. UDP 応答 .-> cm4
- cm4 -. UDP 応答 .-> crane
- crane ---|未解決事項の注記| issue
- cm4 ---|未解決事項の注記| issue
- simulator ---|未解決事項の注記| issue
- legendComm[破線: 提案経路。画面・API の待受範囲、ホスト資源との通信、ブリッジ内UDPは未検証]
- legendNote[実線の注記線: 未解決事項の説明（実通信ではない）]
+ browser -. HTTP / WebSocket .-> gcPort
+ gcPort -. TCP 8082 .-> gc
+ browser -. HTTP / 比較画面 .-> debugPort
+ debugPort -. TCP 8080 .-> debug
 ```
 
-外部実装との接続には名前解決上の阻害要因がある。Crane は `127.0.0.1` と数値 IP を使う。orion-cm4-sim は `inet_addr` を使い、応答先を `127.0.0.1` に固定する。simulator の応答先も数値 `QHostAddress` を要求する。起動時に名前を一度だけ IP に変換する方法では、コンテナ再作成後の IP 変更に追従できない。外部契約の修正または安定した接続先が必要であり、本案では解決済みとみなさない。記述は既存資料からの報告で、今回再検証していない。
+破線は設計上の通信で、実測済みを示さない。準備確認は対応する資源内で行い、独立観測器の受信だけでサービス自身の受信を代用しない。10300、10301、10302等の未確定の制御契約を、図の既知経路へ推測で割り当てない。
 
-画面と制御 API の入口は実行ホスト内の利用者に限り、Aspire が割り当てる動的ポートを 127.0.0.1 のみで待ち受ける案とする。起動後は Aspire Dashboard の資源一覧で Game Controller の HTTP URL を確認し、その URL を開く。実行ホスト外への公開、ホストの通信規則変更、UDP ホスト公開、マルチキャスト中継は行わない。標準のコンテナ登録機能と DCP で 127.0.0.1 だけの待受を保証できるかは未確認であり、保証できるまで実装・公開しない。Game Controller v3.20.3 の README は画面と `/api/control` が同じポートを使うこと、Aspire の公式資料はコンテナのホスト側ポート割当てと Dashboard 表示方法を説明する。資料だけでは本構成の 127.0.0.1 だけの待受や画面操作の状態反映を保証しない（[Game Controller v3.20.3 README](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/README.md)、[Aspire のネットワーク概要](https://aspire.dev/fundamentals/networking-overview/)、[Aspire のリソース URL](https://aspire.dev/fundamentals/custom-resource-urls/)）。
+### 外部接続先と再作成
+
+Crane、cm4-sim、simulator を同じブリッジへ移しても、別コンテナの `127.0.0.1` は共有しない。既存資料は、Crane の数値 IP、cm4-sim の `inet_addr` と 127.0.0.1 固定応答、simulator の数値 `QHostAddress` を報告している。固定した外部イメージで次の確認を終えることを、設計段階の検証契約とする。確認が終わるまで当該経路と全体受入を阻害として扱う。
+
+| 対象 | 必要な確認と変更判断 |
+| --- | --- |
+| Crane → cm4-sim／simulator | 送信先を資源名で設定できるか確認する。数値 IP だけを受ける場合は、接続時の名前解決と再接続を外部実装へ加える変更を特定する。 |
+| cm4-sim → simulator と応答 | 他コンテナへの送信・応答先に127.0.0.1を使わず、simulator／Craneの資源名へ対応させる。送信先、応答先、待受 ポート、マルチキャスト用インターフェース の設定箇所を固定版で確認する。 |
+| simulator → cm4-sim | 数値宛先しか渡せない場合は資源名を再解決する変更を特定する。起動時に一度だけ解決した IP の永続利用は採らない。 |
+| 個別再作成 | DCP の資源名から現在の接続先を取得し直す。UDP は送信先と応答先を更新し、マルチキャスト は新しいコンテナのインターフェースで参加し直す。古い接続先は無効化し、通信準備を未完了へ戻す。 |
+
+外部契約を変更できない場合は、固定 IP、暗黙の中継、同一コンテナ化へ自動変更せず、#80 の設計判断へ戻す。後続実装の開始前に、対応する版・変更先・受入条件を記録する。この文書変更では外部イメージを変更しない。
+
+### Windows の TCP 待受
+
+AppHost は Game Controller の8082、DebugHost の8080、必要な HTTP 準備確認口に名前付きの接続先を定義し、動的なホストポートを Dashboard に示す。Windows ブラウザーは Dashboard の `game-controller` と `debug-host` の URL を開く。コンテナ内では対象のネットワークインターフェースで HTTP を待ち受け、ホスト側は127.0.0.1だけとする。コンテナ内の待受と Windows の待受範囲を混同しない。
+
+準備確認口は simulator=39101、Game Controller=39102、cm4-sim=39103、Crane=39104、TIGERs=39105、ER-Force=39106、Duck=39108、RefereeDriver=39110 の内部 TCP ポートを設計値とする。DebugHost は8080の `/health/vision` と `/health/comparison` を使う。各外部サービスに既存の検証口があるとは仮定せず、必要な受信・復号診断を当該コンテナ内へ実装する。検証口はデータ中継をせず、実行 ID、資源 ID、対象の完全なコンテナ ID と結び付けた件数・受信時刻・状態を返す。
+
+Aspire 13.5.4／Windows DCP の 127.0.0.1 待受は**設計段階の確認事項**である。実装前に当該版の 接続先 定義から Docker の ホスト側の待受アドレス までを追跡し、127.0.0.1の指定方法、動的 ポート、HTTP／双方向API、Dashboard表示、再起動時の再割当てを確定する。標準 `AddContainer` で限定できることを確認できなければ、接続先を有効にせず設計を阻害とする。全インターフェース公開、Docker Desktop設定変更、別の起動管理へ切り替えない。
+
+Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の設定で保証できた証拠にはしない（[Docker 公開ポート](https://docs.docker.com/engine/network/port-publishing/)、[Aspire ネットワーク概要](https://aspire.dev/fundamentals/networking-overview/)）。Game Controller の UI と `/api/control` が同じ ポート を使うことは[v3.20.3 README](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/README.md)を根拠とする。画面の URL 末尾と実到達性は固定イメージで確認する。
+
+## DebugHost のデバッグと記録
+
+Windows の開発環境から、DCP が起動した `debug-host` に接続する。デバッグ用イメージには同じ版のソースコードから作成した実行ファイル、対応する移植可能なデバッグ情報ファイル、`/vsdbg/vsdbg` を事前に含める。実行中のコンテナへの依存追加やデバッグ用 TCP ポート公開を前提にしない。
+
+1. Dashboard／DCP の資源情報から、当該実行の `debug-host` の完全なコンテナ ID と イメージのハッシュ値 を取得する。期待する実行 ID・資源 ID・イメージと照合し、名前だけで対象を選ばない。
+2. Windows の .NET デバッグ環境で、Docker Desktop の明示的な `desktop-linux` 接続先を指定した `docker.exe --context desktop-linux exec -i <完全ID> /vsdbg/vsdbg --interpreter=vscode` を接続用の標準入出力として使う。コンテナ内の `dotnet Tracker.DebugHost.dll` のプロセスIDを選ぶ。デバッグ環境の `pipeTransport`、`processId`、`sourceFileMap` に、この接続と `/src` → Windows の同じ版のソースコードの絶対パスを設定する。
+3. 停止位置とソースコード／デバッグ情報ファイルの一致を確認する。停止中は受信の新しさが失われ得るため、通信受入の計測時間から除き、再開後に準備確認をやり直す。切断はデバッグ接続だけを終え、コンテナの作成・停止・削除は DCP に任せる。
+4. 再作成後は新しい完全 ID とプロセスIDを取得し直す。旧 ID へ再接続しない。Windows の開発環境、事前配布したデバッガー、同じ版のソースコード対応の成立は後続の確認対象である。
+
+記録は `%LOCALAPPDATA%\Duck\Aspire\<run-id>\captures` を実行ごとの Windows 保存先とし、DCP が `debug-host` の `/data/captures` へ読み書き可能で割り当てる。AppHost は所有する実行の保存先だけを作成し、記録先を Dashboard の資源説明とログへ示す。`VisionReceiver__PacketCapture__DirectoryPath=/data/captures` を渡す。現在の設定キーは存在するが、この割当てと読み書きの権限は未実装・未検証である。
+
+利用者はブラウザーで CaptureOn を開始し、終了時に CaptureOff とファイルの書き出し完了を確認する。raw vision、診断、三つの追跡情報、送信元情報、時刻対応、記録の一覧を同じ記録保存先に残す。Windows の保存先から保存先全体を複製して取り出し、関連ファイルを分離しない。DCP の通常停止・後始末は Windows の記録を削除しない。記録の削除は利用者の別操作とする。
+
+同じ起動中は `/diagnostics` で再生する。後日の再生専用起動では、保存した保存先を `/data/replay` へ読み取り専用で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/replay`、記録無効の設定で開く。記録と再生が相互に書き換えないこと、終了後の再読と 送信元識別子 の保持を後続実装・受入で確認する。
 
 ## 準備完了、依存、停止
 
-プロセス開始を通信準備完了とみなさない。Duck 自身が有効な新しい視覚検出データを含むパケットを受信・復号したことを確認し、比較モードでは DebugHost の監視役が同じ入力を受け、Duck / TIGERs / ER-Force の追跡パケットを各送信元から受信した証拠も記録する。ホスト上の `ProjectResource` とコンテナネットワーク間の到達性が未確認なら、比較モードは準備完了としない。RefereeDriver は Game Controller の制御 API と `HALT` から `running` への状態遷移を確認する。HTTP `GET` の応答や起動通知だけでは準備完了としない。simulator の起動を Duck の受信に依存させず、循環依存を作らない。Aspire の `WaitFor` は起動依存を表し、障害後の自動再起動は保証しない。プロジェクトが固定するのは `Aspire.AppHost.Sdk` 13.5.4 である。過去に確認された DCP 0.25.13 は当時の実行時観測に限る。現在の Windows 上の DCP 実行時と版の挙動は未検証である。
+コンテナの開始は通信準備完了ではない。simulatorを先に起動可能にし、その受信者を同時に動かす。Duck／DebugHostの受信を simulator の起動条件にしない。比較追跡器は simulator と Game Controller の準備を待つ。DebugHost の起動を三つの追跡結果受信の後にせず、起動後の比較準備確認で三者の別 識別子 と同じ有限窓内の新しい パケット を要求する。
 
-起動、通信準備完了、停止の図も提案であり未検証である。プロセス起動と通信準備完了は別の状態として扱う。Game Controller の状態確認結果を AppHost が受け取る証跡連携方式は未確定であり、図の連携線は提案である。利用者のブラウザー入口は実行ホストの 127.0.0.1 だけを使う接続先とし、画面/API のポートは Game Controller 内部ポート 8082 に対応させる。Aspire Dashboard に示す実際の URL と 127.0.0.1 だけで待ち受ける設定は実行時に確認する。
+RefereeDriver は内部 API に接続し、API の状態と11003の審判情報を照合する。各資源の準備確認はブリッジ内で採取した診断を HTTP で DCP／AppHostへ伝える。ホストの旧起動管理で動く `VisionServiceReadiness`、`TrackerPacketReadinessMonitor`、`GameControllerReadinessMonitor` の マルチキャスト受信を残さない。診断の期限切れ、復号失敗、対象IDの変更では準備未完了へ戻す。`WaitFor` は開始順を定め、障害後の自動再起動を保証しない。
 
 ```mermaid
 sequenceDiagram
-  participant User as 利用者
-  participant AppHost as Windows AppHost
-  participant DCP as DCP
-  participant Engine as Docker Engine（Docker Desktop 内）
-  participant Duck as Duck
-  participant Debug as DebugHost
-  participant Sim as Simulator（SSL-Vision 送信機能）
-  participant Compare as 比較受信側
-  participant Ref as RefereeDriver
-  participant GC as Game Controller API
-  participant Browser as 実行ホストのブラウザー
-  participant HostPort as 127.0.0.1 接続先
-  participant Receiver as 審判情報受信側
-  Note over User,Receiver: すべての矢印は提案経路で、未実装・未検証。通信成功を示さない。
-  User-->>AppHost: 選択した資源を起動
-  AppHost-->>DCP: ProjectResource とコンテナ資源のモデルを送信
-  DCP-->>Duck: ProjectResource を起動・状態監視
-  DCP-->>Debug: ProjectResource を起動・状態監視
-  DCP-->>Ref: 選択時に ProjectResource を起動・状態監視
-  DCP-->>Engine: 選択資源と専用ブリッジネットワークの作成・監視を要求
-  Engine-->>Sim: 選択されたコンテナ資源を実行（他も同様）
-  AppHost-->>GC: TCP 8082 を内部ポートとする HTTP 接続先を割り当てる
-  AppHost-->>User: Aspire Dashboard に動的な URL を表示
-  User-->>Browser: Aspire Dashboard の URL を開く（127.0.0.1 だけを想定）
-  Browser-->>HostPort: HTTP で Game Controller 画面を要求
-  HostPort-->>GC: コンテナ内 TCP 8082 へ転送（127.0.0.1 の待受 未検証）
-  Browser-->>HostPort: 同じポートの双方向 API /api/control に接続
-  HostPort-->>GC: 操作要求を Game Controller API へ転送
-  Note over Duck,Sim: プロセス開始は通信準備完了ではない。Duck の受信を待つ循環依存を作らない。
-  Sim-->>Duck: 新しい有効な SSL-Vision UDP パケット
-  Duck-->>AppHost: パケットを受信して復号した証拠
-  opt 比較受信側を使う場合
-    Sim-->>Compare: Duck と同じパケットを送信
-    Compare-->>AppHost: 同じパケットを受信した証拠
-  end
-  User-->>Browser: 画面から試合状態の操作を行う
-  GC-->>HostPort: WebSocket 経由で更新状態を返す
-  HostPort-->>Browser: UI に更新状態を表示
-  GC-->>Receiver: 審判情報を内部 UDP マルチキャスト
-  Ref-->>HostPort: 制御 API 要求と状態確認
-  HostPort-->>GC: Game Controller API へ転送
-  GC-->>HostPort: API 応答と状態遷移
-  HostPort-->>Ref: API 応答を返す
-  Ref-->>AppHost: API 状態確認結果を証跡として連携（方式未確定）
-  Receiver-->>AppHost: 審判マルチキャスト受信の証拠
-  AppHost-->>User: 画面操作後の状態遷移と必要な通信証拠を表示
-  User-->>AppHost: 停止または起動取消
-  AppHost-->>DCP: 所有資源の停止を要求
-  DCP-->>Engine: 自身が所有するコンテナ資源だけ停止・削除を要求
-  Note over DCP,Engine: DCP だけがライフサイクルと後始末を管理。他所有者のコンテナは保護する。
-  DCP-->>AppHost: 停止結果と証跡
+ participant User as 利用者 / Windows ブラウザー
+ participant App as Windows AppHost
+ participant DCP as Windows DCP
+ participant Engine as Docker Desktop Engine
+ participant Sim as simulator / ブリッジ
+ participant Receivers as Duck・比較追跡器・DebugHost / ブリッジ
+ participant GC as Game Controller / ブリッジ
+ participant Ref as RefereeDriver・準備確認 / ブリッジ
+ Note over User,Ref: 設計上の経路。未実装・未受入。
+ User-->>App: 選択資源を起動
+ App-->>DCP: 全コンテナと接続先のモデル
+ DCP-->>Engine: 同じ実行ネットワークで作成・監視
+ Engine-->>Sim: 起動
+ Engine-->>Receivers: 起動して受信を開始
+ Engine-->>GC: 起動
+ Engine-->>Ref: 起動
+ Note over Sim,Receivers: 開始と通信準備を分け、受信待ちの循環依存を作らない
+ Sim-->>Receivers: 10020 / 同じ視覚検出
+ Receivers-->>GC: 11010 / 追跡情報
+ Receivers-->>Ref: 資源内で採取した受信・復号診断
+ Ref-->>App: 限定 HTTP 接続先で準備証跡
+ App-->>User: Dashboard に GC と DebugHost の localhost URL
+ User-->>GC: 127.0.0.1 動的 TCP 経由の UI / API 操作
+ Ref-->>GC: 内部 WebSocket /api/control
+ GC-->>Ref: API 状態と内部 11003 審判情報
+ Ref-->>App: 同じ状態遷移を確認した証跡
+ User-->>Receivers: localhost TCP 経由の比較画面・CaptureOn / Off
+ User-->>App: 停止・取消
+ App-->>DCP: 所有資源だけ停止
+ DCP-->>Engine: 所有 ID を照合して停止・削除
+ Note over DCP,Engine: 別所有者と Windows 保存記録は保護する
+ DCP-->>App: 停止結果と証跡
 ```
 
-DCP だけが対象コンテナを所有・停止・削除・後始末する。起動取消、部分起動失敗、通常停止、個別再起動、一括停止の各経路で、この AppHost 実行の資源だけを操作し、異なる所有者の既存コンテナを保護する。正常停止は 15 秒以内とする。証跡には完全なコンテナ ID、イメージのハッシュ値、DCP 資源 ID、実行 ID、ネットワークとの対応、前後の所有者状態、関連ログを含める。失敗や未観測を合格に置き換えない。
+図の利用者からコンテナへの TCP 線は、前述の Windows 127.0.0.1 動的接続先を経由する。製品の UDP が Windows へ出る経路を表さない。正常停止は15秒以内とし、取消、部分失敗、個別再作成、一括停止で当該実行の資源だけを後始末する。固定する SDK は13.5.4であり、過去に観測した DCP 0.25.13を現在の Windows 実行版とみなさない。
 
 ## 優先受入条件
 
-以下は受入目標であり、実施済みの結果ではない。各項目は 合格、失敗、未実施、阻害、未検証 のいずれかを証拠とともに記録する。まだ確認できない条件は未実施または阻害として残す。
+すべて将来の受入目標であり、実施済みの結果ではない。項目ごとに合格、失敗、未実施、阻害、未検証を記録する。Windows 上の AppHost と利用者の Docker Desktop で、対象の版と全選択資源を記録して実施する。
 
-1. Windows 起動と所有権: Windows AppHost がユーザーの Docker Desktop に接続し、選択資源を同じブリッジネットワークで DCP 資源として管理する。開始、取消、途中失敗、二重起動、個別再起動、一括停止で他所有者のコンテナを変更せず、正常停止が 15 秒以内であることを完全 ID と所有者の前後比較で示す。
-2. 実 UDP／マルチキャスト通信: Duck が 5 秒以内に新しい視覚検出データを含むパケットを 10 件以上復号し、比較受信側も同じパケットを受ける。審判・追跡マルチキャスト、必要な UDP 制御とロボット応答往復も実パケットで示す。
-3. 試合制御と動作: Game Controller の双方向制御 API で停止から稼働への遷移を確認する。Crane／cm4-sim／simulator の応答往復、および視覚検出データで 100 mm 以上の移動を確認する。
-4. 利用者の試合操作: AppHost 起動後に Aspire Dashboard が Game Controller の URL と割当ポートを表示する。URL から実行ホスト内のブラウザーで画面を開き、画面と制御 API の双方向接続が成功することを確認する。画面から停止状態を稼働状態へ変更し、画面表示の更新に加え、API 状態確認と審判情報の内部 UDP マルチキャスト受信側で同じ状態遷移を照合する。`127.0.0.1` 経由の到達、127.0.0.1 以外から到達しないこと、操作による状態反映はいずれも未検証。ネットワーク内の別端末からの接続は受入対象にしない。
-5. 再作成と名前解決: 資源名の再解決、個別コンテナ再作成後の通信、応答待受、所有資源の後始末を確認する。数値 IP 依存は阻害事項として記録し、合格判定を保留する。
+| ID | 必須条件 |
+| --- | --- |
+| `ASPIRE-NET-001` | 全選択資源、Duck、DebugHost、RefereeDriver、準備確認機能が同じ DCP ブリッジ内で動く。AppHost／DCPだけが所有・管理し、開始、取消、途中失敗、二重起動、個別再起動、一括停止でも別所有者を変えず、正常停止15秒以内を完全IDの前後比較で示す。 |
+| `ASPIRE-NET-002` | 安定起動後5秒以内に Duck 自身の `VisionPacketsReceivedTotal` が新しい検出データ10件以上の復号を示す。Windows上の観測器や仮想環境内の独立観測器だけでは代用しない。 |
+| `ASPIRE-NET-003` | Duck と DebugHost が同じ確認窓で同じ10020入力を受信する。受信件数、入力時刻、検出内容を記録する。 |
+| `ASPIRE-NET-004` | TIGERs と ER-Force が同じ10020と Game Controller の11003を受信し、独立した追跡結果を生成する。Game Controller以外が11003を生成しない。 |
+| `ASPIRE-NET-005` | DebugHost が TIGERs / ER-Force の11010を別 識別子 として受信し、同じ有限窓の新しさを確認する。 |
+| `ASPIRE-NET-006` | Duck の11010も同じ DebugHost が同時受信し、三つの 比較対象の役割 が互いに別の 識別子 へ一意に対応する。Game Controller等の必要受信側にも届く。 |
+| `ASPIRE-NET-007` | Windows ブラウザーの Game Controller UI操作で `HALT` から `running` へ遷移し、API応答と内部11003受信で同じ遷移を確認する。Crane／cm4-sim／simulatorの必要UDP往復と、視覚検出データ上の100 mm以上の移動を示す。 |
+| `ASPIRE-NET-008` | コンテナ内 `InterfaceAddress` 未指定と明示IPv4の両方で受信する。一受信者の開始・停止が他の件数を止めない。VPN、Tailscale、複数NIC等のホスト条件とコンテナ内の選択結果を分けて記録する。 |
+| `ASPIRE-NET-009` | 単一AppHostの排他と制御ポート競合を確認する。共有マルチキャスト ポートの使用中判定だけで失敗にしない。個別再作成で新ID・接続先の再解決・応答先更新・マルチキャストの宛先再参加・準備復帰を示す。古いIPを使い続ける場合は失敗とする。 |
+| `ASPIRE-HOST-001` | DashboardのGame Controller／DebugHost URLから画面と双方向接続が成立する。Game Controllerの操作、DebugHostの三者比較、127.0.0.1からの到達、127.0.0.1以外での待受なしを確認する。準備確認口を含む全ホストTCP接続先の待受範囲・割当・再割当てを記録する。 |
+| `ASPIRE-DEBUG-001` | Windowsから当該所有IDのDebugHostへ標準入出力で接続し、同じ版のソースコード・デバッグ情報ファイルで停止／再開する。デバッグTCP公開なし、再作成後の対象更新、切断後のDCP管理を示す。 |
+| `ASPIRE-CAPTURE-001` | CaptureOff後にWindows保存先へ全関連ファイルが残る。停止・再作成後も取り出して再生でき、三者の識別子と時刻対応を保持する。読み取り専用再生が元記録を変えない。 |
 
-ソケットの待受だけ、`HTTP 400`、ホスト上だけのパケット観測、WSL 内での継続的検証は Windows 実機の合格証拠ではない。必要な通信経路全体または DCP の挙動が未実行なら受入未完了である。
+HTTP `GET` の400応答、ソケットの待受だけ、Linux別Docker Engineでの成功、WSL内での継続検証は Windows Docker Desktop の合格証拠ではない。Linux／macOSの対応も同じ配置契約で個別に確認し、Windowsの成功や未実施を代用しない。選択した版の外部接続契約、127.0.0.1限定待受、必要経路のいずれかが未確定なら受入を保留する。
 
 ## 安全境界と関連課題
 
-ユーザー管理 Ubuntu 上の別の Docker Engine で製品資源を実行しない。審判情報とその他 UDP ポートをホストへ公開しない。画面/API 用の通信ポートは実行ホストの 127.0.0.1 だけに割り当てる。実装でその待受範囲を保証できるまでは接続先の公開を行わない。他の利用者または別実行のコンテナに触れない。Docker Desktop、WSL、Docker の接続先設定、`PATH`、認証、ネットワーク設定、ホスト設定を永続的に変更しない。
+UDP公開、マルチキャスト中継、ホストネットワーク、固定コンテナIPを前提にしない。TCPの公開は127.0.0.1の画面・制御・用途を確定した準備確認だけとする。利用者管理Ubuntuの別Docker Engine、別所有者のコンテナ、既存の記録を変更しない。Docker Desktop、WSL、Docker接続先、`PATH`、認証、ネットワーク、ホスト設定の恒久変更は本設計の作業に含めない。
 
-課題 #81 の旧 Docker コマンドライン実装とそのレビューは、当該実装の証拠に限る。新しい標準 `AddContainer`／DCP の所有権、ネットワーク、停止契約を保証しない。関連する課題 #79–#82 の完了条件は独立しており、この文書変更で閉じない。過去の設計検証とレビューの記録は[再編前の設計記録](aspire-simulation-test-environment-history.md)を参照する。以前の証拠は現行設計を検証しないため、本書の再レビューが必要である。
-
-2026-10-21 に記録された Docker Desktop 版、Docker Engine 版、空のイメージ／コンテナ一覧、旧環境のパケット観測は、その時点の履歴に限る。その後、四つのイメージが環境に取り込まれたため、これらを現在の環境一覧として扱わない。根拠と旧主張は[再編前の設計記録](aspire-simulation-test-environment-history.md)を参照する。外部実装や通信契約の記述も報告済みの前提であり、再検証が必要である。
+#80はこの配置・外部接続契約・127.0.0.1待受の設計とレビューを扱う。設計受理後の#81で標準コンテナ資源への移行を実装し、#82でWindows実機の受入を行う。この文書変更で#79〜#82を閉じない。旧Docker起動管理のレビュー、過去の環境一覧やパケット観測は当時の証拠に限り、新配置の成立を保証しない。旧履歴は変更せず、本書と比較設計を再レビューする。
