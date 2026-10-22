@@ -97,6 +97,14 @@ HEAD `6b09edaf30d905f0e322650ed9f18906bca0950a`、PR84、開始時worktree clean
 
 親がexact6b09edaf CI39792254453の最大同時Receive1→2を有効Redに採用した後、同じ担当/既存Skillsで最小実装。既存SDK宣言抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1、既存生成Referee型不足のCS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exit/source before-after/diffは `/tmp/issue81-referee-receive-single-run-green-candidate-20261022/` へ保存。今回test/CIなし。
 
+### 単一Run排他のGreen CI収集・再開候補
+
+HEAD `5811bd88210c46ad89d49590d74e2d42c14af643`、開始時worktree clean。既存Skills/remote_ci_only継続。`run list --commit <同SHA> --event pull_request`、`run watch 39793648955 --repo ibis-ssl/Duck --exit-status --interval 5`、終端view/log/artifacts GETは全exit0。長い待機中のview1回でrun/test queued・step未開始を確認しview-waiting.*へ保存、重複watch/rerunなし。同watchから最終successを回収。全引数/exitはcommands-summary.json、標準CIコマンドはci-test-command.txt。成功runのdotnet生exit artifactは未取得。
+
+### 再開・owner・freshness回帰の先行テスト準備
+
+親採用の03A回帰単位として期待値をsource配置前にexpectations.jsonへ固定。既存/tmp再開候補をbyte同一でTracker.Testsへ配置し、owner/freshnessの2 Factを追加。既存SDK宣言抽出は新2fileでexit0、正確な引数はsyntax.command.json。新build/test/CIは未実行、次のexact-SHA PR CI待ち。`git diff --check` exit0、各未追跡testの`git diff --no-index --check -- /dev/null <file>` はexit1・stdout/stderr空（新fileとの差分、空白指摘なし）。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -173,6 +181,14 @@ HEAD `6b09edaf30d905f0e322650ed9f18906bca0950a`、PR84、開始時worktree clean
 ### 単一Run排他の最小Green候補
 
 製品変更は`Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs`のみ、SHA256 `cbe85435fe44f74513b025ac6aa8bd34285029521b615425808769c0f9a9cbf2`。単一Run test `1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71`、既存6case/Diagnostics source/csprojはHEAD byte不変。固定v1の11file/v2の9file・repo対応sourceも元hash不変。既存report子5欄のみ追記、親prefix/Dispatch/履歴と親tracking/evidence差分を保持。
+
+### 単一Run排他のGreen CI収集・再開候補
+
+今回active branchの製品/test変更なし、既存report子5欄のみ追記。候補/current/HEADの対象7file、固定v1の11file/v2の9file・repo対応sourceのbyte/hash一致、Red6b09edaf→当HEADのTracker.Tests差分なしを確認。証拠dir `/tmp/issue81-referee-receive-single-run-green-ci-20261022/`。待機中の親追加許可で`/tmp/issue81-referee-receive-restart-test-candidate-20261022/RefereeReceiveRestartTests.cs`を別dirへ準備。active repoには未配置、SHA256 `ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879`、構文抽出exit0、semantic compile/test未実行。
+
+### 再開・owner・freshness回帰の先行テスト準備
+
+新規`Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs`（1 Fact、SHA256 `ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879`）と`Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs`（2 Fact、SHA256 `4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924`）。製品/scaffold変更なし。既存7case/固定67/製品2source/csprojはHEAD byte/hash不変。証拠dir `/tmp/issue81-referee-receive-regression-preparation-20261022/` に実source copy、期待値、manifest、syntax/check生log/exit、残件一覧を保存。
 
 ## 指摘事項
 
@@ -261,6 +277,14 @@ scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止
 
 取消済みtokenを先に確認し、`Interlocked.CompareExchange`で同じserviceの実行所有をBeginEpoch前に取得する。既に所有中なら第二Runを拒否し、既存epoch/receiverへ触れない。取得後は外側finallyで`Interlocked.Exchange`により解放するため、BeginEpochの失敗や内側EndEpochの例外でも所有解放を通る。元の受信loop/不正入力処理/EndEpochの本体は字下げ以外不変で照合済み。例外型をtest期待値へ追加せず、広いcatch/取消の成功変換も追加しない。関数説明は日本語。再起動/購読/transportを先回り実装していない。
 
+### 単一Run排他のGreen CI収集・再開候補
+
+直接証拠は標準622件の全成功。artifacts API total_count=0、runner内TRX生成logはあるが個別TRX/成功test名は未取得。単一Run/既存6case/固定67のGreenは同一test byte/標準target/以前の622件構成と今回622集計成功の対応から確認し、個別Passed行の直接readbackとは区別する。成功時artifactを保存しない既存workflow条件の限界を保持。
+
+### 再開・owner・freshness回帰の先行テスト準備
+
+scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開testは旧/tmp候補とbyte同一で、旧callbackのReceiveAttemptを実decoderへ渡す。owner欠落testは正常復号2件・既知age・producer endpointがあってもIdentity=null/IsReady=falseを要求し、endpointを資源所有者へ代用しない。freshness testはt0の正常2件でready、t2の反復pollで件数/最終受信UTC/ageを維持、期限ちょうどはready、1tick超でnot-ready、その後の反復pollでも延命しない。すべて隔離receiver/実parser/手動時計を使い、finallyでRunを取消・終端回収する。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -341,6 +365,15 @@ scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止
 
 単一Runの最小Green候補を保存。source-results-manifest.json SHA256 `3b8d7ba9c899a560cf0528f2fe70d738ca2e2f238398ecf7ef3e70262a9a55cd` に採用Red/変更source/不変test/hash/検査結果を保持。構文抽出成功だがDriver semantic compileは既存proto不足で未確認、test実行0件、Green未観測。親の非main commit/push後exact-SHA PR CIで同じ単一Run test・既存621/固定67を確認する。初回実runtime Redを保持し、ローカルcompile-errorをGreenへ転記しない。
 
+### 単一Run排他のGreen CI収集・再開候補
+
+`https://github.com/ibis-ssl/Duck/actions/runs/39793648955`、exact5811bd88210c46ad89d49590d74e2d42c14af643 / pull_request / completed / success。test job119875539485で622/622成功・0失敗・0skip、packet/fullstack jobsはSkipped。RedはCI39792254453 exact6b09edafのMaxActiveReceives Expected1/Actual2 line44。同じtest byteで最小排他のGreenを標準集計で確認。ci-evidence.json SHA256 `5449dfdfc2d72736b98ad9c55da9ad7417fdd58c4f0743b507ddedb043ae8ea7`、証拠一覧manifest SHA256 `f3abcbc39ffee479a079e5a105c31aeee86f0a07d8c835fb706831600118c066`。
+次候補は、同じserviceを取消/終端後に再開→無受信ならcount2/not-ready→旧captureReceive callback由来のReceiveAttemptを実decoder経路へ渡してもcount2/not-ready→新epoch正常1packetはbaseline(count3/not-ready)、次正常packetで増分(count4/ready)を確認する1件。時計固定、旧callbackは共通RecordSuccessをtestから直接呼ばずtransport seamへ渡す。候補は現在のepoch/終了処理で通り得る回帰検証として分類し、未知の不足や人工Redを捏造しない。candidate-manifest.json SHA256 `40901ae4238b7a269a5a886bc15bc789a2c5ae1ace15531f76c88f6e4a466e9c`、期待値はsource作成前にexpectations.jsonへ固定。
+
+### 再開・owner・freshness回帰の先行テスト準備
+
+新3 Factの回帰候補を保存・構文抽出exit0。実行0件、semantic compile未確認、Red/Green未観測。既存挙動で通る場合は回帰Greenとして受け取り、不要な人工Red/製品修正を加えない。不足が実runtime failureになった場合だけ、親のCI証拠採用後に修正する。source-manifest.json SHA256 `c7763e6e06a897f1352a1017771b3475e0b7ff07671b6e7fa790f6f7e723a7fe`、expectations.json SHA256 `dd91cc0e8b351464e9e9adc0b6ab41e277b0bd5eda94c0e32bb985dbda174691`。前節622集計Greenを新3件へ転記しない。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -412,6 +445,14 @@ scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止
 ### 単一Run排他の最小Green候補
 
 同時Runの最小排他以外の再開/旧epoch/遅延callback/購読/実transport検証は未完了。開始前取消/BeginEpoch失敗/EndEpoch失敗の所有解放はコード境界として扱い、今回それぞれのruntime test成功を主張しない。03B/C・外部G1/G3・実機受入も保留。既存期待値緩和/skip化、外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `e912ef9250130e0264d2e427fdee1ab21b53ac700f38716eeaa53e83ea09e66f`（17file）に生logを含む。全build/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 単一Run排他のGreen CI収集・再開候補
+
+次候補は/tmpのみ・構文抽出のみで、実semantic compile/実parser実行/RedまたはGreenは未観測。親が採用/配置して同SHA CIで実測するまで成功を断定しない。既存再開/epoch実装が期待どおりなら回帰成功として扱い、不要なbehaviorを追加しない。subscriber/owner/freshness実統合/実UDP transport、03B/C、DCP配置・実機受入は未完了。外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更/再実行なし。生logを各dirのevidence-files-manifest.jsonへ列挙。全watch/view/log/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 再開・owner・freshness回帰の先行テスト準備
+
+03A残件はremaining-03A.jsonへ記録。購読/同counter変更待機の重複抑制、実11003 UDP transport/options/lifecycle、現在no-opのDispose/停止所有・受信資源解放の契約と回帰、必要な開始失敗/終端境界検証を残す。今回3件もCI未実行で完了扱いにしない。03B/C・DCP配置・実機受入は後続。既存期待値緩和/skip化、製品behavior・外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `9f22e889f8f74078efed0e09dcccd3933429897e447530da7e4c66b8618205c1`（23file）。全構文抽出/read/save/check process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
 
 ## 親による公開準備記録
 
