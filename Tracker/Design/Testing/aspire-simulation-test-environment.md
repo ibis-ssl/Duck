@@ -32,6 +32,18 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
+### Linux 向けアプリケーションの配布出力（I81-04A）
+
+次の既存プロジェクトを、既存の復元済み依存を使って  .NET 10 の共有ランタイムで動かす配布出力として発行する。各出力はマネージド DLL で起動し、OS に固有の実行ファイルとランタイム資材を含めない。実行時は後続の I81-04B で確定する .NET 10 ランタイムを使う。コンテナーイメージの基底、外部イメージ、デバッグ専用資材の版とダイジェストは I81-04B で別に確定する。
+
+| プロジェクト | 固定する配布出力 |
+| --- | --- |
+| `Tracker/Tracker.RuntimeHost` | `Tracker.RuntimeHost.dll`、対応する `.deps.json` と `.runtimeconfig.json`、`appsettings.json`。 |
+| `Tracker/Tracker.DebugHost` | `Tracker.DebugHost.dll`、対応する `.deps.json` と `.runtimeconfig.json`、`appsettings.json`、`wwwroot/app.css`、`wwwroot/favicon.png`。画面に使う静的ファイルを配布先へ含める。 |
+| `Testing/Duck.Testing.RefereeDriver.Host` | `Duck.Testing.RefereeDriver.Host.dll`、対応する `.deps.json` と `.runtimeconfig.json`。設定は環境変数で渡すため、配布用 appsettings ファイルを要求しない。 |
+
+自動検査では既存プロジェクトを実際に発行し、生成先の各ファイルと `.runtimeconfig.json` の .NET 10 共有ランタイムを使う設定を検査する。新しい配布一覧だけの自己検査で代用しない。ここではイメージの取得・作成・起動、外部成果物の取得、実行中の依存導入、デバッグ資材の追加を行わない。
+
 ## 配置案
 
 図の破線は未実装の管理・起動経路を表す。各資源内の UDP 準備確認機能もブリッジ内で動く。別所有者のコンテナはネットワークに加えない。
