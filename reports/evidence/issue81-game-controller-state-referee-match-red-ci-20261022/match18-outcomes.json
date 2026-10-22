@@ -1,0 +1,164 @@
+[
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"FORCE_START\", apiPhase: \"RUNNING\", command: ForceStart)",
+    "testId": "6cfb1ab3-b1ac-bb71-d00d-a6051ed479af",
+    "executionId": "38267af8-9448-4a26-80fe-936ad8a70e50",
+    "outcome": "Failed",
+    "duration": "00:00:00.0050549",
+    "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"NoInput\")",
+    "testId": "2fc2ae23-bcd5-50c6-f228-0686307f780f",
+    "executionId": "2944b68e-92e7-466f-90a4-83c372167139",
+    "outcome": "Passed",
+    "duration": "00:00:00.0076797",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch",
+    "testId": "3eb207aa-7a87-bb03-bcfa-de948d705c2b",
+    "executionId": "6e6c6f3d-54ae-4844-a275-f7bf65643c4e",
+    "outcome": "Failed",
+    "duration": "00:00:00.0061029",
+    "message": "照合は注入されたAPI観測を開始する。",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 187\n   at Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 201\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: True)",
+    "testId": "d6d66967-d57a-c854-67ef-98e314475a78",
+    "executionId": "78b58cfe-ca60-46d0-915e-7adeefca2a50",
+    "outcome": "Failed",
+    "duration": "00:00:00.0961179",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 98\n   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 100\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"HALT\", apiPhase: \"HALT\", command: Halt)",
+    "testId": "d99b84f5-65e2-edbb-d25e-376444e83b77",
+    "executionId": "d8f3c305-19c6-45f7-81ea-5756cca3e2b2",
+    "outcome": "Failed",
+    "duration": "00:00:00.0130825",
+    "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair",
+    "testId": "c4885dc3-0ff8-1f06-21b1-43cabf78bc48",
+    "executionId": "390a4a29-ecb5-4456-9a4e-cc021645d265",
+    "outcome": "Failed",
+    "duration": "00:00:00.0565491",
+    "message": "照合は注入されたAPI観測を開始する。",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 171\n   at Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 176\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.DifferentApiCommandIsNotReady",
+    "testId": "d371d6bf-1466-e328-6267-9b3ce37c019a",
+    "executionId": "e41e2d18-c2ba-4024-8c35-dc640a857d2a",
+    "outcome": "Passed",
+    "duration": "00:00:00.0063868",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: False)",
+    "testId": "dfe9bdf7-623d-ea79-c387-8bd336af70b6",
+    "executionId": "99396b68-6997-4753-9dab-110aea727051",
+    "outcome": "Failed",
+    "duration": "00:00:00.0119724",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 98\n   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 100\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair",
+    "testId": "a41cd013-449d-1dbe-bb48-3676afc083c1",
+    "executionId": "081d026e-914f-4e29-bb8e-9f0e2a96a9e3",
+    "outcome": "Failed",
+    "duration": "00:00:00.0074882",
+    "message": "照合は注入されたAPI観測を開始する。",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 152\n   at Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 160\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence",
+    "testId": "9e29eeee-8520-25b2-8f13-4bb563ffb5a4",
+    "executionId": "bfc03382-437b-497f-b9d4-7e802ded38c8",
+    "outcome": "Failed",
+    "duration": "00:00:00.0092753",
+    "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 108\n   at Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 120\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"UnknownAge\")",
+    "testId": "2c0c48af-770c-9cc2-0608-9793296e1bdf",
+    "executionId": "90ee2721-2b75-44f8-b1df-6a7e0eb4dcd5",
+    "outcome": "Passed",
+    "duration": "00:00:00.0946632",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics",
+    "testId": "9ee101e7-94aa-1bd3-4d73-1ff08e561cb7",
+    "executionId": "9043acfa-6120-4ae8-9410-03b6c11c497b",
+    "outcome": "Failed",
+    "duration": "00:00:00.0448444",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 212\n   at Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 240\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: False)",
+    "testId": "e190b39e-8025-41c1-e8d6-625dc186f65c",
+    "executionId": "db495f3f-52c3-4fa5-a801-cf6e0100088f",
+    "outcome": "Failed",
+    "duration": "00:00:00.0040391",
+    "message": "照合は注入されたAPI観測を開始する。",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 133\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 141\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"DecodeFailure\")",
+    "testId": "c4f63ec4-aeb3-1918-c53c-d12ed2534a54",
+    "executionId": "894bbbc0-d567-4eda-9820-a5d9d32229e4",
+    "outcome": "Passed",
+    "duration": "00:00:00.0337590",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"MissingOwner\")",
+    "testId": "518aa6cd-a85b-80b5-e0e1-dedb6dbe61f2",
+    "executionId": "a5571747-0e4f-4463-a147-6122a2c96399",
+    "outcome": "Passed",
+    "duration": "00:00:00.0821338",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: True)",
+    "testId": "6aceb062-ea09-468f-60a6-0eb888398446",
+    "executionId": "30269549-c9a3-4cbd-b694-fc1c8f76c542",
+    "outcome": "Failed",
+    "duration": "00:00:00.0163920",
+    "message": "照合は注入されたAPI観測を開始する。",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 133\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 141\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"STOP\", apiPhase: \"STOP\", command: Stop)",
+    "testId": "de05d27a-f1a6-116c-9c11-7bce8ec613a2",
+    "executionId": "73564b70-c617-4a87-83b3-397c9c2cf409",
+    "outcome": "Failed",
+    "duration": "00:00:00.0084704",
+    "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"NORMAL_START\", apiPhase: \"RUNNING\", command: NormalStart)",
+    "testId": "8ad8614d-989e-51c8-a6ca-98047e260620",
+    "executionId": "67c251d1-d957-4d1e-a8ab-7f778bd76b8a",
+    "outcome": "Failed",
+    "duration": "00:00:00.0032318",
+    "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "observedAtUtc": "2026-10-22T19:26:08.150847+00:00",
+  "status": "in_progress",
+  "conclusion": "",
+  "updatedAt": "2026-10-22T19:22:05Z",
+  "allJobsCompleted": true,
+  "latestJobCompletedAt": "2026-10-22T19:23:37+00:00",
+  "observedRunFinalizationDelaySeconds": 151.150847
+}

@@ -106,8 +106,23 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         }
     }
 
-    /// <summary>同packetの指令と診断を取得する先行試験用の未実装入口。</summary>
-    internal RefereeReceiveObservation? GetCurrentObservation() => null;
+    /// <summary>commandを保持したまま同source・受信世代・受理件数の正常診断を取得し、別packetとの混在を拒否する。</summary>
+    internal RefereeReceiveObservation? GetCurrentObservation()
+    {
+        lock (commandGate)
+        {
+            if (latestCommand is not { } latest)
+                return null;
+            var diagnostic = diagnostics.GetSnapshots(InputId).FirstOrDefault(snapshot =>
+                snapshot.SourceKey == latest.SourceKey &&
+                snapshot.ReceiverEpoch == latest.ReceiverEpoch);
+            if (diagnostic is null ||
+                diagnostic.DecodeStatus != DiagnosticDecodeStatus.Succeeded ||
+                diagnostic.SuccessfullyDecodedCount != latest.AcceptedCount)
+                return null;
+            return new(latest.Snapshot, diagnostic);
+        }
+    }
 
     /// <summary>単一pumpの新しい正常commandを待つ。同counterでは完了せず、自身では受信しない。</summary>
     public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
