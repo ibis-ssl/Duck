@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpLifecycleTests.DisposeStopsRunAndDisposesExplicitlyOwnedReceiverWithoutCallerCancellation",
+    "outcome": "Failed",
+    "duration": "00:00:00.0213038",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveUdpLifecycleTests.DisposeStopsRunAndDisposesExplicitlyOwnedReceiverWithoutCallerCancellation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs:line 59\n   at Tracker.Tests.RefereeReceiveUdpLifecycleTests.DisposeStopsRunAndDisposesExplicitlyOwnedReceiverWithoutCallerCancellation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs:line 73\n--- End of stack trace from previous location ---"
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpLifecycleTests.UdpAdapterReturnsActualDatagramEndpointAndReceiveStamp",
+    "outcome": "Failed",
+    "duration": "00:00:00.0270143",
+    "message": "Assert.Equal() Failure: Collections differ\n           ↓ (pos 0)\nExpected: [34, 51, 68]\nActual:   []",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveUdpLifecycleTests.UdpAdapterReturnsActualDatagramEndpointAndReceiveStamp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs:line 31\n   at Tracker.Tests.RefereeReceiveUdpLifecycleTests.UdpAdapterReturnsActualDatagramEndpointAndReceiveStamp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs:line 38\n--- End of stack trace from previous location ---"
+  }
+]

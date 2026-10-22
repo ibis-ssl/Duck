@@ -10,7 +10,11 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private readonly IRefereeDatagramReceiver receiver;
     private readonly ServiceReceiveDiagnostics diagnostics;
     private readonly Func<ReadOnlyMemory<byte>, global::Referee> decode;
-    private int isRunning;
+    private readonly IAsyncDisposable? ownedReceiver;
+    private readonly object lifecycleGate = new();
+    private readonly CancellationTokenSource stop = new();
+    private Task? activeRun;
+    private Task? disposal;
     private readonly object commandGate = new();
     private ReceivedCommand? latestCommand;
     private TaskCompletionSource commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -25,64 +29,76 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         ArgumentNullException.ThrowIfNull(diagnostics);
         this.receiver = receiver;
         this.diagnostics = diagnostics;
+        this.ownedReceiver = ownedReceiver;
         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
     }
 
     /// <summary>同時Runを拒否して単一pumpを保ち、終端時に当該世代の準備と実行所有を解除する。</summary>
-    internal async Task RunAsync(CancellationToken cancellationToken)
+    internal Task RunAsync(CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        if (Interlocked.CompareExchange(ref isRunning, 1, 0) != 0)
-            throw new InvalidOperationException("この受信機は既に実行中です。");
+        TaskCompletionSource start;
+        Task run;
+        lock (lifecycleGate)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ObjectDisposedException.ThrowIf(disposal is not null, this);
+            if (activeRun is { IsCompleted: false })
+                throw new InvalidOperationException("この受信機は既に実行中です。");
+            start = new(TaskCreationOptions.RunContinuationsAsynchronously);
+            activeRun = run = RunCoreAsync(cancellationToken, start.Task);
+        }
+        start.TrySetResult();
+        return run;
+    }
+
+    /// <summary>Runの公開後に受信を開始し、呼出し元または内部停止で同じ世代を解除する。</summary>
+    private async Task RunCoreAsync(CancellationToken cancellationToken, Task start)
+    {
+        await start.ConfigureAwait(false);
+        using var runCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, stop.Token);
+        var receiveCancellation = runCancellation.Token;
+        var epoch = diagnostics.BeginEpoch(InputId);
+        ClearCommand();
         try
         {
-            var epoch = diagnostics.BeginEpoch(InputId);
-            ClearCommand();
-            try
+            while (true)
             {
-                while (true)
+                receiveCancellation.ThrowIfCancellationRequested();
+                var datagram = await receiver.ReceiveAsync(
+                    () => diagnostics.BeginReceive(epoch),
+                    receiveCancellation);
+                global::Referee packet;
+                try
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    var datagram = await receiver.ReceiveAsync(
-                        () => diagnostics.BeginReceive(epoch),
-                        cancellationToken);
-                    global::Referee packet;
-                    try
-                    {
-                        packet = decode(datagram.Payload);
-                    }
-                    catch (Google.Protobuf.InvalidProtocolBufferException)
-                    {
-                        if (diagnostics.RecordFailure(datagram.ReceiveAttempt))
-                            ClearCommand();
-                        continue;
-                    }
-                    if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
-                    {
-                        if (diagnostics.RecordFailure(datagram.ReceiveAttempt))
-                            ClearCommand();
-                        continue;
-                    }
-                    var endpoint = datagram.RemoteEndpoint.ToString();
-                    if (diagnostics.RecordSuccess(
-                        datagram.ReceiveAttempt,
-                        sourceKey: endpoint,
-                        remoteEndpoint: endpoint))
-                    {
-                        PublishCommand(new(packet.Command, packet.CommandCounter, packet.Yellow?.Name ?? ""),
-                            endpoint, epoch.Number);
-                    }
+                    packet = decode(datagram.Payload);
                 }
-            }
-            finally
-            {
-                try { diagnostics.EndEpoch(epoch); }
-                finally { ClearCommand(); }
+                catch (Google.Protobuf.InvalidProtocolBufferException)
+                {
+                    if (diagnostics.RecordFailure(datagram.ReceiveAttempt))
+                        ClearCommand();
+                    continue;
+                }
+                if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
+                {
+                    if (diagnostics.RecordFailure(datagram.ReceiveAttempt))
+                        ClearCommand();
+                    continue;
+                }
+                var endpoint = datagram.RemoteEndpoint.ToString();
+                if (diagnostics.RecordSuccess(
+                    datagram.ReceiveAttempt,
+                    sourceKey: endpoint,
+                    remoteEndpoint: endpoint))
+                {
+                    PublishCommand(new(packet.Command, packet.CommandCounter, packet.Yellow?.Name ?? ""),
+                        endpoint, epoch.Number);
+                }
             }
         }
         finally
         {
-            Interlocked.Exchange(ref isRunning, 0);
+            try { diagnostics.EndEpoch(epoch); }
+            finally { ClearCommand(); }
         }
     }
 
@@ -142,7 +158,63 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         string SourceKey,
         long ReceiverEpoch);
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    /// <summary>一度だけ内部停止を開始し、明示所有資源の破棄と実Runの終端を待つ。</summary>
+    public ValueTask DisposeAsync()
+    {
+        TaskCompletionSource completed;
+        Task? run;
+        lock (lifecycleGate)
+        {
+            if (disposal is not null)
+                return new(disposal);
+            completed = new(TaskCreationOptions.RunContinuationsAsynchronously);
+            disposal = completed.Task;
+            run = activeRun;
+        }
+        _ = CompleteDisposeAsync(run, completed);
+        return new(completed.Task);
+    }
+
+    /// <summary>取消と資源破棄の失敗時もRunを回収し、失敗を同じDispose結果へ伝える。</summary>
+    private async Task CompleteDisposeAsync(Task? run, TaskCompletionSource completed)
+    {
+        Exception? failure = null;
+        try
+        {
+            try
+            {
+                await stop.CancelAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                try
+                {
+                    if (ownedReceiver is not null)
+                        await ownedReceiver.DisposeAsync().ConfigureAwait(false);
+                }
+                finally
+                {
+                    if (run is not null)
+                    {
+                        try { await run.ConfigureAwait(false); }
+                        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+                    }
+                }
+            }
+        }
+        catch (Exception error)
+        {
+            failure = error;
+        }
+        finally
+        {
+            stop.Dispose();
+        }
+        if (failure is null)
+            completed.TrySetResult();
+        else
+            completed.TrySetException(failure);
+    }
 }
 
 /// <summary>実際の受信直後、復号前に時計を採取するtransportの境界。</summary>

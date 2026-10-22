@@ -1,23 +1,49 @@
-using System.Net;
 using System.Net.Sockets;
 using Duck.Testing.Diagnostics;
 
 namespace Duck.Testing.RefereeDriver;
 
-/// <summary>単一pumpへUDP受信を渡す境界。先行テスト用で実受信と資源破棄は未実装。</summary>
+/// <summary>注入されたUDP socketの受信結果と復号前の時計を単一pumpへ渡す。</summary>
 internal sealed class UdpRefereeDatagramReceiver : IRefereeDatagramReceiver, IAsyncDisposable
 {
-    internal UdpRefereeDatagramReceiver(UdpClient client)
+    private readonly UdpClient client;
+    private readonly bool ownsClient;
+    private int disposed;
+
+    internal UdpRefereeDatagramReceiver(UdpClient client, bool ownsClient = false)
     {
+        ArgumentNullException.ThrowIfNull(client);
+        this.client = client;
+        this.ownsClient = ownsClient;
     }
 
-    /// <summary>呼出し可能な最小scaffoldとして空の受信結果を返す。</summary>
-    public ValueTask<RefereeReceivedDatagram> ReceiveAsync(
+    /// <summary>取消可能な受信の直後に時計を採り、payloadと実送信元を保持する。</summary>
+    public async ValueTask<RefereeReceivedDatagram> ReceiveAsync(
         Func<ServiceReceiveDiagnostics.ReceiveAttempt> captureReceive,
-        CancellationToken cancellationToken) =>
-        ValueTask.FromResult(new RefereeReceivedDatagram(
-            ReadOnlyMemory<byte>.Empty, new IPEndPoint(IPAddress.None, 0), captureReceive()));
+        CancellationToken cancellationToken)
+    {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed) != 0, this);
+        try
+        {
+            var datagram = await client.ReceiveAsync(cancellationToken).ConfigureAwait(false);
+            var attempt = captureReceive();
+            return new(datagram.Buffer, datagram.RemoteEndPoint, attempt);
+        }
+        catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw new OperationCanceledException(cancellationToken);
+        }
+        catch (SocketException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
 
-    /// <summary>資源破棄の実装前に呼出し境界だけを用意する。</summary>
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    /// <summary>明示的に所有するsocketだけを一度破棄する。</summary>
+    public ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref disposed, 1) == 0 && ownsClient)
+            client.Dispose();
+        return ValueTask.CompletedTask;
+    }
 }
