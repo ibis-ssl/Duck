@@ -171,6 +171,22 @@ exit 0。46 ケースの列挙を読戻した。
 
 **残る gate:** 標準 Tracker.Tests は初回記録の relativeworktrees / CS0246 の制約で未完了を維持し、今回再実行していない。harness 46 件は標準 gate/全体受入/Windows/DCP/外部 G1/G3 の成立証拠ではない。追加外部編集・導入・実機は未着手。commit=commit_pending（子は禁止）、push=unauthorized、matching_ci=null（未照会）、full_local_equivalence_gate=not_started。通常 reviewer による I81-NR-001 の fix 検証が次工程であり、実装側から合格/closure は宣言しない。
 
+### 通常 push 前の最小再検証（4569fec）
+
+親指定の現在 HEAD `4569fec54be4e640eba8bad3fb951bfabc6986dc` で実施した。親からは I81-NR-001 が同じ通常 reviewer により `9852e67` で closed/pass_with_held と報告されている。本作業は再レビューではなく、既存の最終純粋契約の最小再検証である。同じ gpt-6.1-sol/high 指定の担当を継続、applied=null。
+
+既存 `i81-nr-001/final-inputs.json` の全 7 source/project SHA256 と現在 disk が一致し、同じ harness project hash も一致した。既存 no-restore / コマンド限定 SCM queries 無効化で以下を再実行した。新たな restore・source 編集・設定/依存/環境変更はない。
+
+| command | exit | 結果 |
+| --- | ---: | --- |
+| `dotnet build Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj --no-restore`（既存の MSBuild/SCM 限定引数を使用） | 0 | warnings 0 / errors 0 |
+| 同じ実 test source と実 library を直接参照する既存 harness の `dotnet test --no-restore` | 0 | TRX total/executed/passed 46、failed/notExecuted 0、UnitTestResult 46 件を XML で確認 |
+| `git diff --check` | 0 | 診断なし。report 追記後も再確認 |
+
+新しい証拠は `/tmp/issue81-readiness-validation-20261022/pre-push-4569fec/`。正確な全引数・HEAD・cwd・exit は `commands.json`、source/harness/保護対象の SHA256 は `inputs.json`、stdout/stderr/exit-code/binlog と TRX は同ディレクトリへ保存した。TRX `results/pre-push.trx` の SHA256 は `fad892bfef2bd12d3f558e0ae172b0c72fa7b2693b70020f708924e4a6fd1964`。旧39件/46件の履歴証拠は保持した。
+
+標準 Tracker.Tests の SDK/CS0246 による未完了、外部 G1/G3、Windows/DCP/実機、全体 gate の未検証は継続する。本再検証の成功でそれらを成功に変更しない。子の repo 編集は本 report の追記のみ。normal-review report と親 tasks は保持。commit/push/GitHub 操作は行わず、当該検証 process と終了コード未回収は 0 件、承認待ち/結果不明なし。
+
 ## リスク
 
 - 標準 Tracker.Tests/solution gate は CS0246 で未完了。harness の成功から標準 gate 成功を推論しない。
