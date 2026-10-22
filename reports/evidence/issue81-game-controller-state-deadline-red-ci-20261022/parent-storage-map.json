@@ -38,8 +38,9 @@
     "path": "artifact-download.stdout.log",
     "sha256": "ceedfa6fd629298447bc853b58634ebea6136cd68e4686c3a4db6fdf3eaf6ae7",
     "bytes": 19001296,
-    "stored": true,
-    "original": "/tmp/issue81-game-controller-state-deadline-red-ci-20261022/artifact-download.stdout.log"
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-ci-20261022/artifact-download.stdout.log",
+    "reason": "ZIP payload saved as .log; duplicate removed from repository tree after normal review. Original bytes and SHA256 remain at original /tmp path; historical commits unchanged."
   },
   {
     "path": "artifact-integrity.json",

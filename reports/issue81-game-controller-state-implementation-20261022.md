@@ -86,6 +86,11 @@ work-context-manager/implementation-executor/implementation-worker/tdd-executor/
 - node tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md: exit0。spellも同対象でexit0、Files checked2/Issues0。既存Sudachi環境の同scriptを--stdinで各断片へ実行し双方exit0/新語0。
 - 実効辞書255語/hash d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7は既存検査と同一。importsなし、globRoot「.」/files「**/*.md」。監査helper初回のpackage export解決exit1は生出力保持し、helperの実体path参照補正後exit0。検査config/辞書/依存は変更していない。
 
+### 03B通常レビュー後の記録同期・文書検証（2026-10-22）
+
+- 既存Windows Node24.20.0/cache、同configと辞書255語でtasks-status.md:29/phases-status.md:14の変更行断片2文書を検査。textlint exit0、CSpell exit0/Files checked2/Issues0、既存Sudachi各exit0/新語0。元行位置・全文/断片hash・実効設定/辞書hashはfragment-manifest.json/config-integrity.json/effective-audit.stdout.logへ保存。
+- 辞書hash d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7、importsなし、globRoot「.」/files「**/*.md」は既存と同じ。語彙・辞書・検査設定変更なし。新build/test/CIは実行していない。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -156,6 +161,12 @@ RefereeReceiveService.csはGetCurrentObservation()=>nullと同packet証跡record
 - 検査対象は親変更のTracker/Design/tasks-status.md:29とTracker/Design/phases-status.md:14だけの断片2文書。親所有trackingは編集していない。
 - 子のrepo編集は本報告の子5欄への統合追記のみ。新通常レビュー報告と製品/test34fileを不変guard。親prefix/Dispatchと既往履歴を保持。
 - 証拠は /tmp/issue81-game-controller-state-review-preparation-validation-20261022/。config-integrity.json、fragment-manifest.json、source34-guards.json、review-guard.json、03B-tdd-summary.json、validation-summary.json、生commands/exits/stdout/stderrを保存。
+
+### 03B通常レビュー後の記録同期・文書検証（2026-10-22）
+
+- 子のrepo編集は本報告の子5欄追記だけ。製品/test34と通常レビュー報告の不変guard、親prefix/Dispatch・過去履歴の保全を確認。
+- 検査対象は親所有trackingの変更行断片2文書で、台帳自体は編集しない。通常レビュー報告SHA256 5d887bacde6e8c0ac32cc7eed66a7d817454c6b244c9ea4c5f6466d213574fedを保持。
+- 証拠は /tmp/issue81-game-controller-state-closure-sync-validation-20261022/。commands/exits/元行mappingとhash/config proof/guard/収納読戻し/本報告読戻し/inventoryを保存。
 
 ## 指摘事項
 
@@ -230,6 +241,12 @@ APIのHALT/STOP/NORMAL_START/FORCE_STARTとHALT/STOP/RUNNINGの名前を明示sw
 - 最終exact51bdd74723a06cde21adf734f5b1d4a40b48b8f8のPR CI39841590121はrun全体completed/success、734pass/0fail/試験skip0。packet/full-stack jobはskip。成功artifact0のため個別TRX/CI source archiveは取得不可で、固定18/旧716/独立67/raceの再観測は集計成功とsource34不変証拠に限定する。
 - 今回変更行のtextlint/CSpell/Sudachi指摘0。新たな日本語修正案は不要。全文gateは再実行しておらず既知不合格を維持する。
 
+### 03B通常レビュー後の記録同期・文書検証（2026-10-22）
+
+- 同じ通常レビュアーの03B判定はpass_with_held、必須製品finding0。reviewed HEAD06d734e62f81b8d0d09c8ddcea529d181cc5b7f4のCI39842783583は734pass/0fail/試験skip0。成功artifact0で個別TRX/source archiveなし、packet/full-stack jobはskip。
+- 非阻害P3 OBS-I81-03B-01はdeadline-red/mapping-redのZIP内容を持つartifact-download.stdout.log重複2件。親が/tmp原本hash一致を確認して現在treeから除去し、各収納mapへstored:falseと理由を追記した状態を読戻した。子は収納map/raw/TRXを編集していない。原本と過去commitは保持し、先行context重複1件の整理履歴と区別する。
+- 今回変更行の新指摘は0で日本語修正案不要。断片合格を全文gate合格に変換しない。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
@@ -296,6 +313,11 @@ test保存・構文/diff/hash確認を完了、runtime Red/Greenは未観測。�
 
 - 変更行断片2文書の検査、同辞書/config/元行指紋、製品/test34と通常review報告不変を確認。親prefix/Dispatchと旧履歴を保持し子5欄へ追記・読戻し。
 - 03B実装は固定Green734の証拠を保存した段階で、通常レビューは未実施・未判定。新build/test/CI・製品編集・commit/pushなし。所有mirror/junctionを清掃し、発行process全終端・exit回収済み。
+
+### 03B通常レビュー後の記録同期・文書検証（2026-10-22）
+
+- 通常レビュー条件付き合格・必須製品0、非阻害収納所見と親の現在tree整理を履歴追記した。製品/test34・通常review報告・親prefix/Dispatch不変を確認し子5欄を読戻した。
+- 所有mirror/junction清掃済み、発行process全終端・exit回収済み。新build/test/CI/サービス・実機起動、製品編集・commit/pushなし。親tracking/収納差分を保持。
 
 ## リスク
 
@@ -364,3 +386,9 @@ URL設定世代はローカルcontextでDCP所有世代ではない。UDP受信e
 - 断片合格は全文2文書や全文24文書gate合格ではない。既知全文CSpell232/Sudachi890不合格を保持する。語彙一覧/辞書/設定変更や製品名quote逃げなし。
 - 03Cの実接続factory/HTTP/DI/内部URI設定、Enabled/AutoDrive明示有効化構成は未実装。旧Driver/制御adapter/fixtureはbase88cb20fからbyte不変で、明示DriveToActiveAsyncとHALT→NEXT→FORCE/NORMAL契約を保持するが、今回成功は個別TRX未取得。実hostname再解決・実GC/Desktop/DCP所有実証・外部G3・実機を成功扱いしない。
 - 過去mappingCI39833466268と統合RedCI39839435897のrun全体最終表示は未確定の履歴を保持。各test jobの確定結果と所有localwatch終了255を分離し、GHcancel/rerunは行っていない。新agent/外部/依存/環境変更なし、元Solhigh継続/applied:null。自己review合格判定なし。
+
+### 03B通常レビュー後の記録同期・文書検証（2026-10-22）
+
+- pass_with_heldは03B通常技術判定で、独立最終レビューではない。全文文書gate既知不合格（CSpell232/Sudachi890）を保持。今回検査は変更行断片2文書のみ。
+- 03CのHTTP/DI/入口・内部URIと実接続factory・Enabled/ContainerMode/AutoDrive明示構成は未着手。実hostname再解決・実GC/Desktop/Windows/DCP所有実証・外部G3・実機・図最終確認は未検証。旧commandfixture/default制御契約は保持するが成功個別TRXは未取得。
+- 過去mapping/統合Redのrun全体未確定とtest job確定、所有localwatch終了255の履歴を保持する。GHcancel/rerunなし。P3収納整理は親の未commit tree同期で、review対象06d734eの当時の2重複をなかったことにしない。新agent/依存/環境/外部変更なし、元Solhigh/applied:null。
