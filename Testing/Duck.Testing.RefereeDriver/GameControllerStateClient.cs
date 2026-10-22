@@ -116,6 +116,9 @@ internal enum GameControllerCommandKind
 {
     Unknown,
     Halt,
+    Stop,
+    NormalStart,
+    ForceStart,
 }
 
 /// <summary>公開matchStateから正規化する試合状態。未確認は成功状態にしない。</summary>
@@ -123,6 +126,8 @@ internal enum GameControllerMatchPhase
 {
     Unknown,
     Halt,
+    Stop,
+    Running,
 }
 
 /// <summary>API公開状態の正規化結果。UDP件数・受信時刻・所有証明は含めない。</summary>
