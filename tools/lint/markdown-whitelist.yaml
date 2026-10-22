@@ -873,3 +873,7 @@ entries:
     description: Git で変更内容を履歴の一単位として保存する操作、または保存された変更。
   - term: ブランチ
     description: Gitで履歴を分けて並行して作業する系列。
+  - term: Aspire Dashboard
+    aliases:
+      - Dashboard
+    description: Aspire が表示する資源の起動状態と接続先を確認する開発用画面。
