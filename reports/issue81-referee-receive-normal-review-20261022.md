@@ -30,6 +30,16 @@ Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=me
 - exact target CIの/tmp証拠をread-only確認。inventory 29 entry、source23ファイルのdisk/95ce780/381dcb6一致、raw metadata/log/commands/終了値を確認した。reviewerから新build/test/lint/host/UDP受信/CI待機/再実行/GitHub操作は実行していない。
 - 本findingは静的な通常競合順序から導いたもので、reviewerが新たな再現testを実行して得たRedではない。全reviewer commandは同期終端、exit回収済み。実行中process/未回収session/保留approval/拒否はない。
 
+### I81-NR-002 bounded fix検証（2026-10-22、同じ通常レビュアー）
+
+- reviewed HEAD: `08d49cdf270ea5ab090a211c84d43190710cd3c9`。元のfail対象 `95ce7801224f6d2a77fc2ab6487675fe44fcb433` と先行test/scaffold `cd7760fde7ec54d2fc69d157af61dc1a68d810ac` を保持する。同じ gpt-6.1-sol/high 要求・fork none・applied:null・application_status=reused_existing_agent_profile の通常review継続であり、独立finalではない。
+- 必須5 Skillを再適用し、既存reportを最初に読み、git rev-parse/status/diff、修正2file・固定競合test全文、required-action matrix全3行、Red/候補/Greenの既存JSON・rawlog・TRX・source archiveを読取照合した。全操作はPowerShell single quoted here-stringからPython stdinへ転送した。
+- 読取wrapperの1件は誤った `Testing/tasks-status.md` を参照して FileNotFoundError / exit1。先行する読取は完了、write/build/testは発行していない。正しい `Tracker/Design/tasks-status.md` をgit ls-filesで確認し後続読取exit0。その他の今回読取・hash・git wrapperはexit0。新規build/test/lint・GitHub操作なし。
+- inventory照合はRed準備24、Red CI47、候補27、Green CI28 entry。Red CIのrepository省略binlog/source.tar.gz計2件はparent-storage-mapの元/tmpに存在しSHA一致。他は各保存先のhash一致。Red source archiveの対象24fileをexact member pathで直接照合し、Red commit・manifest一致。Green24sourceは候補/disk/exact HEAD一致。Redからのsource変更はDiagnosticsとRefereeReceiveServiceの2fileだけ。
+- 固定race test SHA256 `4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02` はRed commit/Green commit/disk/保存sourceで一致。候補Diagnostics buildは既存commandのexit0・0warning/0errorを読取確認したもので、reviewerの新規実行ではない。
+- exact Green CI証拠: `/tmp/issue81-referee-receive-cache-race-green-ci-20261022/ci-evidence.json` SHA256 `c1a9e9150d72e0ad20fa94fc7d90f6fbd84e925296b2b42a33b1aacc5d0067cd`。rawlogのcheckoutは対象08d49cdfを88cb20fへmergeしたff89acf、無filterの標準Tracker.Tests実行と652成功を確認。成功artifact0、個別TRX/source archiveなしを区別。
+- 今回の全review commandは同期終端・exit回収済み。Red収集watch exit1、取得exit0、Green収集watch/取得exit0とprocess-stateのactive/pending空を確認。新規watch/session・保留approval・未回収processなし。保存後に親prefix不変・report以外差分なし・全文readback・末尾1newlineを確認済み。
+
 ## 対象ファイル
 
 - reviewed implementation HEAD=95ce7801224f6d2a77fc2ab6487675fe44fcb433、baseline=234067d3cc3027a20f3794a7ce8fea75f26220ca、Issue81/PR84、branch=task/issue81-aspire-desktop-bridge。commit/push済みの固定対象をレビューし、途中の製品/test/HEAD変更はない。
@@ -40,6 +50,15 @@ Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=me
 - 要求根拠: reports/issue81-referee-driver-scope-20261022.md の親採用03Aと末尾訂正、tasks-status I81-03A、主設計の自身診断/有限freshness、比較設計260のTDD。03B API照合、03C HTTP、後続Desktop/DCPは合格条件へ追加していない。
 - exactCI証拠=/tmp/issue81-referee-receive-review-target-ci-20261022/。ci-evidence.json SHA256 07d538e172b590421335596837ecdf4bb268364c47722d230152e0d001b3b159、inventory.json SHA256 6d662deb5bee0cd524da5ebcb752212e3fdc2a37a1c052ada35e381f6c02d215。成功時artifact0のため、当該runの個別TRX/source archiveなし。
 - 親prefix/Dispatchの保存前SHA256=b314b68ff41769b01213d27bb89518612fbaeea996b7fe4f56ed212cfae98788。本report5子欄だけをnormal_persistenceで記入し、他report・tracking・製品・testは編集しない。
+
+### I81-NR-002 fix検証のcoverage delta
+
+- `Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs:80–107`: 旧bool署名と既定引数を維持した委譲、out acceptedCount overload、診断gate内でのchecked count増加と返値の同一packet対応、失敗時0、epoch参照照合、既存clock採取回数/age処理を確認。追加XML説明は日本語。
+- `Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs:90–99,118–155,164–168`: 同じacceptedCountの受渡し/cache保持、source+epoch+count一致、既存status/既知age/5秒境界、commandChanged通知、取消/再開/破損時cache解除、単一pump、default-null内部observerを確認。source countは累積かつchecked増加、epochは再開ごとに増加し、countの同値再利用で旧cacheへ新しいstampを借用しない。
+- `Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:12–113` と補助receiver/時計: 実service/default Referee.Parser/実Diagnostics/manual clockを使用。t0で同counter Aを2packet計数、t6でexpired、subscriberがcommandGateを保持したままBの診断count3/age0のみ更新、publicationをgate外で止めて89行でA非返却を要求。解放後は同じ購読がB counter8/STOP/yellowを返し、受信並列1とcount3を確認。5秒watchdogはsetup/回収用でfunctional Redとして採用していない。finallyでbarrier解放・run/subscriber取消とTask回収。
+- 購読はcommandGate→diagnostic gate、producerはdiagnostic gateを解放してからcommandGateであり、新たな逆順の入れ子なし。新observerは既定null、Red準備時にobserver宣言/呼出しを除くと元serviceとbyte同一で、失敗を作るbehavior変更ではない。
+- 他22sourceの不変をmanifest/commit/diskで確認。既存36case、blind仕様67case、旧公開defaults/UDP factory/ownedDisposeの前回coverageを保持し、全面再レビューや後続03B/Cの追加条件へ広げない。
+- 今回証拠: `reports/evidence/issue81-referee-receive-cache-race-red-preparation-20261022/`、`...cache-race-red-ci-20261022/`、`...cache-race-green-candidate-20261022/`、および上記exact Green /tmp。候補matrix内のGreen pendingは候補作成当時の履歴であり、今回のexact Greenと下記closure matrixで補完する。
 
 ## 指摘事項
 
@@ -75,6 +94,18 @@ Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=me
 - 新関数説明/XMLコメントは日本語。legacy public receiver/control/client/default/既存JSONと旧AppHostは未変更。新NuGet/version/外部wire/HTTP/DCP契約を推測していない。
 - 文書gate不合格は別の既存制約。表示上限由来の旧行誤判定は訂正済みで、今回のP2と混ぜない。03B/C・実機等はscope外held。
 
+### I81-NR-002（medium / P2）bounded closure
+
+**現在状態: closed。新規必須findingなし。** 元の95ce780でのfail、severity、位置、影響は上記の履歴として保持する。今回の閉鎖対象は「Bの診断をAの鮮度として借用する」通常経路の競合である。
+
+| 必要変更 | production path / actual composition fixture | focused evidence / 現在判定 |
+| --- | --- | --- |
+| cacheを同じ受理packetの診断へ結び付ける | Diagnostics:85–105の同lock内acceptedCount → Service:91–98 → ReceivedCommand:164–168。source/epoch/countの一致を128–131で要求。 | 修正2file全文・diff・候補hash・Green24source一致。満たす。 |
+| B公開前はexpired Aを返さず、公開後Bを返す | 実service+default parser+実diagnostics+manual時計+制御datagram receiver。境界observer以外の実経路を通す固定race fixture:64–102。 | Red CI39820168338のTRXは89行のAssert.Falseで具体的に失敗。固定test不変、exact08d49 CI39821519633は無filter/同652件すべて成功。Green個別TRXなしの限界を保持し、静的対応と合わせて満たす。 |
+| 既存単一pump・同counter計数/購読dedup・epoch/取消/再開/破損・既定/所有境界を保つ | 旧RecordSuccess APIは同じ処理へ委譲。Run/ClearCommand/Dispose/UDP本体は修正なし、追加observer既定null。race末尾でもMaxActiveReceives=1、既存36とblind67は不変。 | 他22source不変、Red旧651/固定67は個別Passed、Green exact全652成功（旧651の個別Greenへ転記しない）。満たす。 |
+
+単にCI集計が成功したために閉鎖したのではなく、同packet対応とlock順の静的検証、再現する固定fixture、実行時Red→同source Green、既存経路の不変を合わせて閉鎖する。追加の製品変更要求なし。I81-NR-001のclosedは維持する。
+
 ## 結果
 
 **通常技術判定: fail。I81-NR-002 medium(P2)が1件open。** reviewed implementation HEAD=95ce7801224f6d2a77fc2ab6487675fe44fcb433。全差分/直接依存/証拠の確認を終え、実装担当へ上記required actionを返す。独立finalではない。
@@ -107,6 +138,14 @@ Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=me
 - original_actual_requested=gpt-6.1-sol/high、original fork none、applied:null、application_status=reused_existing_agent_profile、final profile非公開。report_attestation_allowed:false、独立final予約/freeze/attestationなし。
 - 本report5子欄だけ保存、親prefix/Dispatch保持、製品/test/他report/trackingのhash guard不変を確認し、全文readbackして返す。reviewerはcommit/push/merge/closeなし。全command終了コード回収済み、実行中process/未回収session/保留approvalなし。
 
+### 現在の通常review判定（fix後）
+
+- **技術unit I81-03A: pass_with_held。必須finding0、I81-NR-002 medium(P2) closed。** reviewed HEAD `08d49cdf270ea5ab090a211c84d43190710cd3c9`。元95ce780のfail判定を履歴から消さない。同じ通常review lifecycleによるbounded fix検証であり、独立final/全Issue完了/merge許可ではない。
+- TDD fix連鎖: cd7760fd / CI39820168338は652中651passed・1failed・0skip。唯一失敗は固定race test:89の具体的A返却assertion、compile/timeout失敗ではない。TRX SHA256 `fbad3a9a2e5552fbc0167e57dabd2ac34074352677e3ae9d2372d2e3ce6e071a`。旧651件と固定blind67はこのRed runで個別Passedを確認。
+- 修正08d49cdf / CI39821519633（test job119973741509）はcompleted/success、652passed/0failed/0testskip。race1件追加により前回651→652。source24一致・固定test不変・無filter標準実行から同じ固定raceを含むsuite全体成功を支持する。成功時個別TRX/artifactはなく、このrunのrace/旧36/旧67の個別Passedを直接取得したとは主張しない。packet/full-stack jobsはskip。
+- completeness全3行を上記の通りclosedへ更新。候補実装reportやtrackingの「Green待ち/通常review未解消」は保存時の履歴・親同期前状態であり、親が本結果を受領後に現在状態を同期する。reviewerは他report/trackingを編集しない。
+- 親prefix/Dispatchと初回95ceレビューを保持し、既存5子欄へ追記した。report_persistence_mode=normal_persistence、report_attestation_allowed:false。新しいbuild/test/CI実行、code/test変更、commit/pushなし。
+
 ## リスク
 
 - I81-NR-002が未修正であり、現HEADの通常技術reviewは合格ではない。次は同じ実装担当が固定の競合testでruntime Redを取得し、修正と同一test Green、production path/actual composition/focused証拠のcompleteness matrixを満たして同じ通常reviewerへ戻す。
@@ -115,3 +154,11 @@ Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=me
 - 実Desktop multicast/Windows/DCP/実機は未検証。03Aの隔離UDP組成成功を、固定11003への現実配置、外部資源自己復号、完全所有ID取得、GC producer認証、03B API一致や03C HTTPへ拡大しない。
 - 外部3repo改変必須という以前の前提は撤回された。既存送信先設定・namespace共有等は未採用候補で、port競合、再作成時の追従、DCP NetworksとRunArgsの矛盾等は未解決。外部ソース変更ゼロ候補を適用/成功したとは扱わず、03Aの追加合格条件にも加えない。
 - exactCI証拠は/tmpにidentity/hash付きで保存されている。今後のrepository保存は親所有であり、報告/追跡変更と製品/test修正を区別して次のreview targetを固定する。今回のnormal reportは独立finalやIssue全体完了の代替ではない。
+
+### fix後に保持するheldと証拠限界
+
+- 図の本人確認、既存全文Markdown gate不合格（textlint0/CSpell232/Sudachi890）、CSpell表示上限訂正と変更断片0指摘の区別を保持。今回新lintなし、辞書/旧行変更なし。
+- 03B API状態照合・03C HTTP、実Desktop multicast/Windows/DCP/実所有照合/外部G3・配置は未検証/後続。namespace共有等は未採用候補で、外部3repo変更必須の旧前提は撤回済み。これらを03A今回技術unitの追加合格条件にしない。
+- 旧I81-01/02の実装前Red欠落（PD-I81-02-TDD）は履歴として残し、この競合fixのRed/Greenで解消した扱いにしない。本人11:54訂正に従い追加検証/承認済実装の再承認ゲートへ戻さない。
+- Green成功個別TRX/source archiveなしは証拠粒度の限界。今回current HEADについてはcommit/disk/24source manifestとCI checkout/command/集計を照合した。Red個別結果や以前の実UDP組成成功を別runの個別Green、実機成立、所有証明へ移転しない。
+- 現在の親tracking/実装reportはclosure同期待ち。技術findingではなく親の報告統合作業として返す。独立final予約/freeze/attestationは許可していない。今回review commandは全終端・exit回収済み、保留approval/未回収processなし。

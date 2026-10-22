@@ -203,6 +203,10 @@ exactc2767f8684f6280cc65e25c8992cbc857a8d85efのpull_request CI39811429720を公
 - 親が採用した exact cd7760fd / CI39820168338 のfunctional Redを受け、同じ実装/TDD/report Skillの適用を継続。先行固定testの89行 Assert.False(subscription.IsCompleted) が実行時に失敗し、652件中旧651件は個別Passed、timeout/compile failureではないというTRX/source照合を保持した。
 - Roslyn構文解析（候補2file）exit0。/usr/lib/dotnet/dotnet build Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false はexit0、0警告/0エラー。SCM照会抑止はcommand-localのみ。git diff --check exit0。新runtime test実行は0件で、実parser/serviceの正式Greenは親のexact-SHA CI待ち。
 
+### 03A通常修正確認後の最終同期検証（2026-10-22）
+
+- 既存Windows Node/cacheと同じconfig/whitelistを使い、tasks03/03A行（27/28）・phases現在位置（14）だけを同相対pathの2断片文書へ抜粋して既存textlint/CSpell/Sudachiを実行。対象数2、textlint exit0、CSpell exit0/0件、Sudachi両断片exit0/0件。新build/test/CIは実行していない。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -385,6 +389,10 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 - ServiceReceiveDiagnostics.cs: 既存bool RecordSuccessのsignature/defaultを保持し、out acceptedCount overloadへ委譲。同じ診断lock内で受理したpacketの成功件数を返す。SHA256 2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2。
 - RefereeReceiveService.cs: そのacceptedCountをcommand cacheへ保持し、購読時にsource/epochに加えて現在診断の成功件数一致を要求。SHA256 c571b48745f7748235527e1a588cba46099a673487bd154bb44a836740af74a4。既定nullの内部観測seamは変更していない。
 - 固定race testのSHA256 4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02を保持。全既存tracked test差分0、他22sourceもhash不変。既存通常review report/親tracking/保存済CI証拠は編集していない。新候補証拠: /tmp/issue81-referee-receive-cache-race-green-candidate-20261022/。
+
+### 03A通常修正確認後の最終同期検証（2026-10-22）
+
+- 元全文hash・選択行・断片hash・元行位置を fragment-manifest.json に保存。未選択行を空行にして位置を保持し、全文gateと分離した。config/scriptのsource/mirror hashと実効辞書255語の同一性を確認。製品/test24sourceと通常review report（SHA256 f10f202d786e9c4279c8d9959e06418303503bbc85718de5962b52d2bbfa8355）は前後不変。親trackingは編集していない。
 
 ## 指摘事項
 
@@ -584,6 +592,10 @@ IPv4 familyに加え宛先先頭octetが224〜239のmulticast範囲であるこ�
 - lock順を変更していない。購読は従来どおりcommandGate→diagnostics gate。受信はdiagnostics gateを解放してからcommandGateへ進むため、逆向きのnested lockを追加しない。時計の追加採取もない。失敗/未知age/時計逆行は従来条件で拒否し、ClearCommand/epoch/取消/再開/Dispose/defaultは変更していない。新規関数説明/XMLコメントは日本語。
 - I81-NR-002のrequired action / production path / actual composition fixture / focused evidenceを finding-completeness-matrix.json に記録した。候補は静的・BCL build確認までであり、finding closedや通常review合格とは判断していない。
 
+### 03A通常修正確認後の最終同期検証（2026-10-22）
+
+- 今回同期した3行の新CSpell/Sudachi指摘は0、日本語修正文の追加提案は不要。断片0件を全文合格へ変換しない。全文既知結果は24文書textlint0/CSpell1（232件）/Sudachi1（890件）で不合格のまま、今回再実行していない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -772,6 +784,11 @@ CI39811429720 completed/failure、test job119938411206 completed/failure。TRX65
 - 最小製品候補2fileを保存し、構文/Diagnostics単独build/diff-checkと固定hash guardを回収した。source-manifest.json、production.diff、finding-completeness-matrix.json、before/after source、生command/stdout/stderrを保存した。候補Greenは未観測で、先行testも期待値も変更していない。
 - 親がcommit/pushして同じ固定race testと旧651件のexact-SHA PR CIを実行し、Greenと全回帰を確認してから同じ通常reviewerへ戻す。実装担当はcommit/push/CI操作を行っていない。親prefix/Dispatchを保護し子5欄に履歴追記・読戻しした。全process終端、未回収exitなし。
 
+### 03A通常修正確認後の最終同期検証（2026-10-22）
+
+- I81-NR-002は、固定race testでRed CI39820168338（652中651成功/1実assertion失敗）→同じtest SHAを保ったGreen exact08d49cdf / CI39821519633（652成功/0失敗）→同じ通常reviewerによるclosed / pass_with_held / 必須指摘0を記録した。Greenはartifact0で個別TRXなし、RedのTRX個別結果をGreenへ付け替えていない。
+- 最終同期の検証/全command/exit/hash/readbackは /tmp/issue81-referee-receive-closure-sync-validation-20261022/ に保存。親prefix/Dispatchを保持して子5欄へ追記。自身のmirror/junction削除とcache保持を確認、全process終端・未回収exitなし。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -947,6 +964,10 @@ fake設定順のGreenと実Desktopmulticast受入を分ける。不正options/�
 
 - BCL単独build成功は実service/parser・競合fixtureのGreenではない。I81-NR-002は候補修正済みだが未検証、正式CI/同reviewer確認待ち。固定36/67および全標準回帰も次の同SHA CIで確認する。
 - 既存full Markdown gate不合格、実Desktop/Windows/DCP/外部診断・配置未検証、03B/C未着手の制約は保持。外部/依存/環境変更なし、原要求Solhigh継続/applied:null、新agentなし。
+
+### 03A通常修正確認後の最終同期検証（2026-10-22）
+
+- 通常reviewの条件付き合格はIssue81全体完了ではない。全文文書gate・図の本人確認・Desktop/Windows/DCP実機・外部診断/配置はheld、03B/Cと独立最終reviewは未着手。新機能や外部/依存/環境変更、commit/push、新agentは実行していない。元Solhigh継続、applied:null。
 
 ## 親による公開準備記録
 
