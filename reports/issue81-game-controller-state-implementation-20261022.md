@@ -55,6 +55,11 @@ work-context-manager/implementation-executor/implementation-worker/tdd-executor/
 
 既存implementation/TDD/report Skillを継続適用。開始exact1da5d9f9のCI39831152989は677成功、artifact0で個別TRXなし。固定8050公開protoと既得CI archive内UDP protoを読取り、30caseと最小宣言scaffoldを先行保存。初回構文検査は新testのJSON文字列記法でexit-6、test記法だけ修正後のRoslyn構文解析はexit0。git diff --check exit0。build/test/CI未実行、remote_ci_onlyを保持し構文成功をcompile/Redにしない。
 
+
+### 公開状態の正規化とUDP対応：7件runtime Red後の最小候補（2026-10-22）
+
+親が採用した exactf936f183 / CI39832411588 は707実行/700成功/7実assertion失敗、error/timeout0。固定mapping30件は7失敗/23成功、旧677/固定67/raceは個別Passed。既存implementation/TDD/report Skillを継続し、固定試験を変えず最小2製品fileを修正。Roslyn構文解析exit0、git diff --check exit0。build/test/CI未実行、remote_ci_onlyを保持し候補Greenは未観測。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -93,6 +98,11 @@ GameControllerStateClient.cs のみ製品変更。SHA256 bcaa34adf425e25cee62b4f
 ### 公開状態の正規化とUDP対応：先行試験準備（2026-10-22）
 
 GameControllerStateClient.csは内部enumへStop/NormalStart/ForceStartとStop/Runningを追加する宣言のみ。新GameControllerStateMapping.csは内部MatchesUdpCommandが常にfalseの未実装scaffold。新GameControllerStateMappingTests.csは正規化4/使用不能12/対応表14の計30case。全file指紋はsource-manifest.json。旧clientは追加enum宣言を除去するとbyte同一、他27sourceと期限11/transport13/初回test/固定67/raceは全byte不変。証拠 /tmp/issue81-game-controller-state-mapping-red-preparation-20261022/。
+
+
+### 公開状態の正規化とUDP対応：7件runtime Red後の最小候補（2026-10-22）
+
+GameControllerStateClient.cs SHA256 20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0 とGameControllerStateMapping.cs SHA256 ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4 のみ製品変更。固定mapping30test SHA256 7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb、旧期限11/transport13/初回test/固定67/raceと他28sourceは不変。親tracking/review/保存済Red証拠へ編集なし。証拠 /tmp/issue81-game-controller-state-mapping-green-candidate-20261022/ にbefore/after source、差分、生command/exit/stdout/stderr、指紋/guard/対応表を保存。
 
 ## 指摘事項
 
@@ -134,6 +144,11 @@ HALTだけのreader単位を03B全体完了としない。fragment/close/binary/
 
 固定APIのCommandはHALT1/STOP2/NORMAL_START3/FORCE_START4、UDPはHalt0/Stop1/NormalStart2/ForceStart3。整数castせず名前から指令と試合状態を正規化し、HALT/HALT・STOP/STOP・NORMAL_START/RUNNING・FORCE_START/RUNNINGを各対応するUDP定数へ明示照合する期待値。StateにUDP command_counterはなく追加しない。JSONは固定serverの名前表現を使い、既知数値JSON受理という新機能は増やさない。未取得/欠落/未知/未対応/型不正はnull、対応側の未知・矛盾・別指令はfalse。予想Redは非HALT正規化3件の27行NotNullと、scaffold対応4件の81行Assert.Equal(true,false)、残23はregression見込み。固定期待値詳細/数値根拠/行mappingはexpectations-and-matrix.json。GameControllerMatchSnapshotはCommand/Phaseだけで、鮮度/受信世代/応答順序は次単位の責務。
 
+
+### 公開状態の正規化とUDP対応：7件runtime Red後の最小候補（2026-10-22）
+
+APIのHALT/STOP/NORMAL_START/FORCE_STARTとHALT/STOP/RUNNINGの名前を明示switchで内部値へ正規化し、欠落/未知/未対応/型不正はnull。readerは正規化値を既存期限/取消確認後に返す。MatchesUdpCommandは指令/試合状態/UDP定数の明示4組だけtrue、それ以外（null・未知・不一致・矛盾）はfalse。整数castやAPI command_counterの仮定は追加しない。指令と試合状態は別々の最小値として保持し、矛盾組はUDP一致にならない。URI/既定3秒/自前期限CTS/caller取消/UTF8組立/byte上限/初期Output/write0/socket破棄は維持。新lock/age/epoch/応答順序の状態は追加していない。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
@@ -170,6 +185,11 @@ test保存・構文/diff/hash確認を完了、runtime Red/Greenは未観測。�
 
 30先行case/最小scaffoldを保存し、構文/diff/既存28guardを確認・親prefix/Dispatchを保って子5欄へ追記し読戻し。runtime Red/Green未観測、全707件は見込み。親commit/push後のexact-SHA CIで実assertion不足を回収してから同じ担当が最小behaviorを追加する。全process終端/exit回収済み、子commit/push/GitHub操作なし。
 
+
+### 公開状態の正規化とUDP対応：7件runtime Red後の最小候補（2026-10-22）
+
+最小2file候補を保存し構文/diff/他28sourceguard確認。source-manifest.jsonとcompleteness-matrix.jsonにRed→製品経路→固定fixture→候補Green待ちを対応付けた。runtimeGreenと全707回帰は親commit/push後exact-SHA PR CI待ち。親prefix/Dispatchを保持し子5欄へ追記・読戻し。全process終端/exit回収済み、子commit/push/GitHub操作なし。
+
 ## リスク
 
 API StateにUDP command_counterはなく、列挙値の数値も異なる。状態照合は有限窓の新しい観測として扱い、原子的同期やGC自身の受信診断を捏造しない。Desktop/DCP/実機は未検証。全文文書gateは不合格のまま。
@@ -205,3 +225,8 @@ BCL型の取消へ協調するfactory/受信口を対象とする。取消を無
 ### 公開状態の正規化とUDP対応：先行試験準備（2026-10-22）
 
 現reader bodyはHALTだけ、対応scaffoldは常にfalseで未実装。正規化/対応の候補をAPI/UDP readiness完成とはしない。age/epoch/sequence/旧応答・有限窓のAPI/UDP統合照合、AutoDrive/03C/実image接続/外部配置/Desktop/DCP/実機は未実装/未検証の後続。新依存/環境/外部変更・新agentなし。全文文書gate既知不合格、原Solhigh/applied:nullを保持。
+
+
+### 公開状態の正規化とUDP対応：7件runtime Red後の最小候補（2026-10-22）
+
+純粋な状態正規化/対応だけでAPI/UDP readinessは成立しない。age/epoch/sequence/遅い旧応答・API/UDP有限鮮度統合・AutoDrive/03C・実image/外部配置/Desktop/DCP/実機は後続未実装/未検証。runtimeGreen未確認。新依存/環境/外部変更・新agentなし。既存全文文書gate不合格、原Solhigh/applied:nullを保持。

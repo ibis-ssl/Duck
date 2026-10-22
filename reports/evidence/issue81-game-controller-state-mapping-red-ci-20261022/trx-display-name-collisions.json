@@ -1,0 +1,48 @@
+{
+  "initialParserAssertionFailure": "required unique displaynames707; actual704 because one truncated displayname covers4 invalidJSON cases",
+  "resolution": "707 unique executionIDs; preserve testId/executionId and exact displaynames; do not invent ID-to-full-JSON association; all12 invalid cases Passed",
+  "collisions": [
+    {
+      "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+      "count": 4,
+      "results": [
+        {
+          "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+          "testId": "56111d14-e048-2b60-13f2-e9e9884f33f7",
+          "executionId": "ee39e923-9ef7-444a-b3c1-82fffa35d944",
+          "outcome": "Passed",
+          "duration": "00:00:00.0000056",
+          "message": null,
+          "stackTrace": null
+        },
+        {
+          "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+          "testId": "bfe3b402-f42f-d5ba-1fdf-783528582137",
+          "executionId": "fd264b02-d93a-447a-abe7-1faf021c3d3d",
+          "outcome": "Passed",
+          "duration": "00:00:00.0000046",
+          "message": null,
+          "stackTrace": null
+        },
+        {
+          "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+          "testId": "0224f59b-28d6-dfea-6715-964782f0c9ae",
+          "executionId": "a2f16925-2585-4925-b56a-87b8d2a8a132",
+          "outcome": "Passed",
+          "duration": "00:00:00.0000105",
+          "message": null,
+          "stackTrace": null
+        },
+        {
+          "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+          "testId": "74db8466-e64d-4891-0d0e-24e153c86980",
+          "executionId": "dbbdc4a0-7016-4ff2-af1d-9a8dbc8e19f5",
+          "outcome": "Passed",
+          "duration": "00:00:00.0148500",
+          "message": null,
+          "stackTrace": null
+        }
+      ]
+    }
+  ]
+}

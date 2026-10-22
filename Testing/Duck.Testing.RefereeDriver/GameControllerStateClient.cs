@@ -25,7 +25,7 @@ internal sealed class GameControllerStateClient
         clock = timeProvider ?? TimeProvider.System;
     }
 
-    /// <summary>接続と受信に同じ有限期限を適用し、初期Outputの後にHALTを観測する。呼出取消は伝播する。</summary>
+    /// <summary>接続と受信に同じ有限期限を適用し、初期Outputの後に対応済みの公開状態を観測する。呼出取消は伝播する。</summary>
     internal async Task<GameControllerMatchSnapshot?> ReadMatchStateAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -68,14 +68,9 @@ internal sealed class GameControllerStateClient
                 if (matchState.ValueKind != JsonValueKind.Object)
                     return null;
 
-                if (IsHalt(matchState, "command") && IsHalt(matchState, "gameState"))
-                {
-                    operationToken.ThrowIfCancellationRequested();
-                    return ReadWindowExpired(started)
-                        ? null
-                        : new(GameControllerCommandKind.Halt, GameControllerMatchPhase.Halt);
-                }
-                return null;
+                var normalized = GameControllerStateMapping.Normalize(matchState);
+                operationToken.ThrowIfCancellationRequested();
+                return ReadWindowExpired(started) ? null : normalized;
             }
         }
         catch (OperationCanceledException) when (deadline.IsCancellationRequested)
@@ -101,14 +96,6 @@ internal sealed class GameControllerStateClient
         var elapsed = clock.GetElapsedTime(started, clock.GetTimestamp());
         return elapsed < TimeSpan.Zero || elapsed >= options.Timeout;
     }
-
-    /// <summary>APIのHALT文字列だけを明示確認し、別の列挙体系へ整数変換しない。</summary>
-    private static bool IsHalt(JsonElement matchState, string propertyName) =>
-        matchState.TryGetProperty(propertyName, out var state) &&
-        state.ValueKind == JsonValueKind.Object &&
-        state.TryGetProperty("type", out var type) &&
-        type.ValueKind == JsonValueKind.String &&
-        type.GetString() == "HALT";
 }
 
 /// <summary>APIの数値列挙やUDPの整数値を直接使わない、明示的な指令区分。</summary>

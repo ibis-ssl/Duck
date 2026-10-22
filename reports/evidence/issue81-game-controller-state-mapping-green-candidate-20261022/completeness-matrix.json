@@ -1,0 +1,42 @@
+{
+  "acceptedRed": {
+    "runId": 39832411588,
+    "head": "f936f1837422f85698cadb95f7b1929bb54474b6",
+    "total": 707,
+    "passed": 700,
+    "failed": 7,
+    "errors": 0,
+    "timeouts": 0,
+    "ciEvidenceSHA256": "c9ca8fd3f80a0eb0c7371a22dd94b1f24305c08c63e73725265592f458a0e838"
+  },
+  "cells": [
+    {
+      "requiredAction": "STOP/NORMAL_START/FORCE_START正規化",
+      "productionPath": "GameControllerStateMapping.Normalize + reader returnnormalized",
+      "actualFixture": "NormalizesSupportedApiNames STOP/STOP,NORMAL_START/RUNNING,FORCE_START/RUNNING",
+      "focusedEvidence": "fixedsource27行NotNull実値null Red3; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "HALT/STOP/RUNNING指令とUDPの明示対応",
+      "productionPath": "MatchesUdpCommand tuple switch exactfourpairs",
+      "actualFixture": "MatchesOnlyExplicitCommandAndPhasePairs fourexpectedtrue rows",
+      "focusedEvidence": "fixedsource81行ExpectedTrue/ActualFalse Red4; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "未知/欠落/型不正/矛盾不一致を成功へ補完しない",
+      "productionPath": "ReadTypeName requiresObject/String; Normalize unsupported→null; tuple defaultfalse",
+      "actualFixture": "UnusableApiStateReturnsNoObservation12 + matcherfalse10 + HALTpositive1",
+      "focusedEvidence": "23regressionPassed in RedTRX; candidate regression notrun"
+    }
+  ],
+  "normalization": "HALT/STOP/NORMAL_START/FORCE_START names map to internalCommand; HALT/STOP/RUNNING names map to internalPhase; command/phase remain independently represented; inconsistent pairs cannot matchUDP",
+  "numericContract": "API HALT1/STOP2/NORMAL_START3/FORCE_START4 differ from UDP0/1/2/3; no enumcast; no numericJSON acceptance expansion; no UDPcounter in API State",
+  "compatibility": "same options/default3sec, TimeProviderCTSandcaller/deadline distinction, message UTF8fragment/bytebound/initialOutput handling, noSend/socketusing, no newlock",
+  "deferred": [
+    "age/epoch/sequence/late-response handling",
+    "integratedAPIUDPfreshnessreadiness",
+    "AutoDrive",
+    "03C",
+    "realimage/Desktop/DCP/hardware"
+  ]
+}
