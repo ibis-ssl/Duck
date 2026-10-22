@@ -63,6 +63,16 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 
 親がexact8dfa1e03 CI39787367706の4runtime failureを有効Redに採用した後、同じ担当/既存Skillsで最小実装。`dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll <syntax-input.json> <syntax-result.json>` の構文抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1、既存生成Referee型不足のCS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exitは `/tmp/issue81-referee-receive-failure-green-candidate-20261022/` に保存。今回test/CIは実行していない。
 
+### 不正入力4ケースのGreen CI収集
+
+- 対象HEAD `9791c234009091940e9dd0c95f905c063e7385e6`、開始時worktree clean。既存6Skill/remote_ci_onlyを継続し、CI収集だけ実施。`run list --commit <同SHA> --event pull_request` exit0。`run watch 39788803859 --repo ibis-ssl/Duck --exit-status --interval 5` は終端success、exit0。
+- `run view --json headSha,event,status,conclusion,jobs,url`、test job119858998456の`--log`、`api repos/ibis-ssl/Duck/actions/runs/39788803859/artifacts` は全exit0。正確な全引数/exitは証拠dirのcommands-summary.json、raw stdout/stderr/exitも保存。
+- CIの標準dotnet testの実コマンドをci-test-command.txtへ保存。test step successとworkflowの終了値伝播は確認したが、dotnet生exitcode artifactは成功runでは取得できていない。watch exit0と同一証拠として混同しない。
+
+### 取消の先行テスト準備（4ケースGreen後）
+
+親の継続指示で取消1件の先行testだけを追加。expectations.jsonをsource作成前に保存。既存SDK宣言抽出の正確な引数はsyntax.command.json、exit0（semantic compileではない）。新build/test/CIは未実行、functional Red pending。`git diff --check` exit0。未追跡testの`git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs` はexit1・stdout/stderr空（新fileとの差分、空白指摘なし）。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -106,6 +116,15 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 ### 4ケースの最小Green候補（親のRed採用後）
 
 製品変更は `Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs` のみ（16 / 2 / Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs）。SHA256 `7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d`。新4case test `e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116`、既存positive `ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1`、csprojはHEAD byte不変。固定v1の11file/v2の9fileとrepo対応sourceも再照合し不変。報告は既存子5欄だけへ追記、親prefix/Dispatch/既存履歴を保持。
+
+### 不正入力4ケースのGreen CI収集
+
+- 今回製品/test編集なし、報告は既存子5欄のみ追記。source `7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d`、4case test `e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116`、positive `ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1`、csprojは候補/current/HEADで一致。Red8dfa1e03→当HEADのTracker.Tests差分は空。
+- 固定v1の11file/v2の9fileとrepo対応sourceをhash再照合し不変。証拠dir `/tmp/issue81-referee-receive-failure-green-ci-20261022/` のhead-source-manifest.jsonに保持。成功artifactなしのため、今回CI実行環境のsource archiveは取得していない。
+
+### 取消の先行テスト準備（4ケースGreen後）
+
+新規`Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs`、1 Factのみ。SHA256 `76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f`。製品behavior/scaffold追加なし、既存positive/不正4case/csprojと固定v1の11file/v2の9file・repo対応sourceはbyte/hash不変。証拠dir `/tmp/issue81-referee-receive-cancel-red-preparation-20261022/` にexpectations.json / source-manifest.json / remaining-03A.json / 構文抽出log / check-commands.json / evidence-files-manifest.jsonを保存。親tasks/phasesの差分は保持。
 
 ## 指摘事項
 
@@ -161,6 +180,15 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 
 decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、同じReceiveAttemptでRecordFailureを記録して同じpumpの次受信へ進む。復号できても`HasCommand`/`HasCommandCounter`が欠落、または`Enum.IsDefined(packet.Command)`が偽なら同じ失敗経路へ進める。正常packetは既存の受信stamp/endpointによるRecordSuccessのまま。共通診断の失敗無効化と次count増分による復帰を利用する。取消/OOM/想定外例外を広いcatchで正常扱いにせず伝播させる。変更関数XML説明は日本語。subscriber/restart/transport等の未Red契約を先回り実装していない。
 
+### 不正入力4ケースのGreen CI収集
+
+- logの直接証拠は標準620件の全成功。artifacts APIはtotal_count=0、成功testの個別名行も0。runner内TRX生成のResults File行はあるが、アップロードされた個別TRXは取得していない。これはworkflowの失敗時限定保存による限界であり、権限拒否ではない。
+- 新4ケース/既存positive/固定67のGreenは、Red時に確認した620件構成・同じtest byte・同じ標準target・今回620全成功の対応から扱う。今回それぞれのPassed行を個別TRXで直接読戻したとはしない。固定test期待値/skip変更なし。
+
+### 取消の先行テスト準備（4ケースGreen後）
+
+最小まとまりはRun所有の終了時無効化1件に限定。完全owner、実Referee.Parser、同counter正常2packetでcount2/readyを先に確認し、第三受信待機のsignal後に取消してpump終端を待つ。時計は常に同じ値なので期限切れと区別し、終端後`IsReady=false`（42行）・count2維持・受信呼出し3を期待する。取消完了が例外か正常returnかは追加の仕様にしない。現在の旧ready残留はruntime Red候補であり、未実行の失敗を実測扱いにしない。同時Run/restart/遅延callbackを一度にfixtureへ詰め込まず、後続caseへ残す。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -207,6 +235,16 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 
 最小Green候補を保存。`source-results-manifest.json` SHA256 `79b84592223ccfa1e23568505560592e4e0ffb3462fd591684c5961d5e9f6360`、採用Red/source before-after/不変test/差分/実行結果を保持。候補のsemantic compileと実parser testはローカルproto不足で未確認、実行件数0、Green未観測。次は親の非main commit/push後exact-SHA PR CIで、固定4case/positive/固定67を保持して結果を回収する。今回build exit1をRed/Greenへ数えず、前節の実runtime Redを保持。
 
+### 不正入力4ケースのGreen CI収集
+
+- `https://github.com/ibis-ssl/Duck/actions/runs/39788803859`、exactHEAD9791c234009091940e9dd0c95f905c063e7385e6 / pull_request / completed / success。test job119858998456のlogは620/620成功・0失敗・0skip。packet jobはSkipped、実機/packet flow受入の成功ではない。
+- RedはCI39787367706 exact8dfa1e03の4runtime failure（破損pump停止line39、他3caseの件数Expected2/Actual3 line41）。同じtest byteを保持した最小不正入力処理のGreenを今回の標準集計で確認した。
+- `ci-evidence.json` SHA256 `b737328a3bbcda7e8fc782e41e79115a32a6c7192fa53e451e1787d6914d0f81`。次単位案は正常受信でreadyになった後の取消→pump終端後not-ready。手動時計を固定し、期限切れと取消の無効化を区別してassertする。先行caseを最小にし、必要なら開始前取消で受信/復号0という独立境界caseを続ける。期待/停止条件案はnext-unit-proposal.jsonへ保存。今回はtest/behaviorを作らず、親へ案だけ返す。
+
+### 取消の先行テスト準備（4ケースGreen後）
+
+取消先行testを保存・構文抽出exit0、実行件数0、semantic compile未確認。expectations SHA256 `da6ed1a5d235e4bb3385d5a2787759ebd244fd19608231a04bc8350d842acd46`、source-manifest SHA256 `e22ebbd36194f034bd143145c3de5618bf8af0b3e95859151d54084b0bc6655d`。親が非main commit/push→exact-SHA PR CIでcompileと実assertionを回収して有効Redを採用した後だけ、同一testで最小実装へ戻る。今回正常取消動作の実装を先行していない。前節620集計Greenの証拠は保持し、新しい未実行1件へ転記しない。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -244,6 +282,16 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 ### 4ケースの最小Green候補（親のRed採用後）
 
 4case候補以外の03A契約、03B/C、外部G1/G3、実機受入は未完了。個別testの期待値緩和/skip変更、依存/設定/環境/auth/network/外部repo変更、host/Docker/実機起動なし。commit/push/GitHub操作なし。全証拠一覧`evidence-files-manifest.json` SHA256 `c20fbdb8e57a3873adb508f61c74216936c25f99ecfd971b974ad29d87d70e5b`（17file）に生logを含む。全構文抽出/build/read/save process終端、exit回収済み、実行中process/session・保留approval・未回収結果なし。
+
+### 不正入力4ケースのGreen CI収集
+
+- 成功runの個別TRX未取得を保持。03Aの取消/epoch/restart/owner/freshness/single-run/subscriber/実transport等は未完了、03B/Cや全体受入へ広げない。新しいRedを未実行のまま断定せず、次behaviorは親が先行testの実runtime Redを採用した後に進める。
+- 全file一覧 `/tmp/issue81-referee-receive-failure-green-ci-20261022/evidence-files-manifest.json`（26file、SHA256 `faff7c6e0836ac25f921d9da957f63d173281ef39ae8e09264895a716ac35bc0`）。生logを含め保存し、親のrepository保存時はgitignore対象の保存漏れを防ぐ。
+- 全list/watch/view/log/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。製品/test/依存/設定/環境/auth/network/外部repo変更、host/Docker/実機起動、commit/push/GitHub変更/再実行なし。
+
+### 取消の先行テスト準備（4ケースGreen後）
+
+03A完了前の残件をremaining-03A.jsonに仕様根拠付きで列挙。取消終端、単一Run排他、再開/旧epoch/遅いcallback拒否、subscriber重複抑制と毎packet診断の分離、owner欠落not-ready/freshness非延命、実11003 UDP transport/options/lifecycleが必要。fake受信seamだけを実UDP完了にしない。03CのProgram/DI/HTTPや後続DCP配置・Issue82実機受入とは分ける。既存testの期待値緩和/skip化なし、03B/C・外部/依存/設定・環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更なし。全process終端、未回収exit/保留approvalなし。
 
 ## 親による公開準備記録
 
