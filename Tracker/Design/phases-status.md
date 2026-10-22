@@ -2,7 +2,19 @@
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
 
-## 全体状況
+## 現在の工程（Issue #81）
+
+- 作業: ASPIRE-007D-2。正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。
+- 作業分岐: task/issue81-aspire-desktop-bridge。起点88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先はPR #83の分岐。
+- 残り3工程: 契約確認、移行実装、検証とレビュー。完了見積りは外部契約の確定後に更新する。
+- 契約確認: I81-G。正式PRリンクの読戻し後、外部接続・実サービス診断・localhost限定bindを確定する。未確定契約を推測で実装しない。
+- 移行実装: I81-01～I81-08。契約確認後、単位ごとに検証と通常レビューを完了して次へ進む。
+- 検証とレビュー: I81-09。全体回帰、必要文書検査、通常レビューの収束、独立レビューと公開HEAD一致CIを記録する。
+- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。
+- #80は承認済み設計をDraft PR #83へ公開した。未統合・lint未合格・図本人確認・実機未検証を保持し、Issue closeやmergeは行っていない。#82の実機受入には着手しない。
+
+
+## 過去の全体状況（当時の記録）
 
 - 現在の段階: PR #20 の文書範囲は独立最終レビュー完了（`pass_with_held`）、PR公開中。保留の製品実装課題は`#25`へ分離済み。
 - 現在の作業: `DOC-LINT-003`
