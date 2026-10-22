@@ -1,0 +1,51 @@
+{
+  "mode": "bounded_normal_review_record_sync",
+  "reviewedImplementationHead": "618df8d5bec7240aa612c2c42092095c9376e8a5",
+  "technicalVerdictUnchanged": "pass_with_held",
+  "requiredOutstandingFindings": 0,
+  "productDesignImplementationReportFixedTestsUnchanged": true,
+  "normalChildFiveSectionsUnchanged": true,
+  "parentDispatch": "completed with exact reviewed_head",
+  "recordContent": "03A/B/C normal pass_with_held; 618df8d exact CI776 aggregate; later integration/distribution/DCP/real-world/final incomplete; full document gate failed",
+  "initialFailure": {
+    "CSpell": 1,
+    "Sudachi": 2,
+    "token": "Issue",
+    "sourceLine": 27,
+    "wrapperExit": 1
+  },
+  "parentCorrection": "Issue全体の統合 -> 課題全体の統合",
+  "correctedFragments": {
+    "documents": 2,
+    "sourceLines": {
+      "tasks-status.md": [
+        27,
+        30
+      ],
+      "phases-status.md": [
+        14
+      ]
+    },
+    "textlint": {
+      "exit": 0,
+      "issues": 0
+    },
+    "CSpell": {
+      "exit": 0,
+      "issues": 0
+    },
+    "Sudachi": {
+      "tasksExit": 0,
+      "phasesExit": 0,
+      "violations": 0
+    }
+  },
+  "notFullDocumentValidation": true,
+  "knownFullGateFailed": true,
+  "repositoryEditsByReviewer": false,
+  "newBuildTest": false,
+  "newCI": false,
+  "applied": null,
+  "application_status": "reused_existing_agent_profile",
+  "reportAttestationAllowed": false
+}
