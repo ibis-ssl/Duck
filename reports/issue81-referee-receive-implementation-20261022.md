@@ -169,6 +169,14 @@ exact 51e70db52c18d30aa291d046801d0ce40b3d3604 のpull_request CI39809637502を�
 
 640Green収集/report保存後、親採用の11caseをexpectations.jsonへ先に固定しactiveへ配置。既存SDK /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/syntax-result.json はexit0（新test/可視性変更factoryの構文抽出のみ）。git diff --check exit0。semantic compile/実parser testは未実行、生成Referee不足の既知制約により正式routeはremote_ci_only。
 
+### factory境界11caseのCI実測（入力2件失敗・実組成成功）
+
+exactc2767f8684f6280cc65e25c8992cbc857a8d85efのpull_request CI39811429720を公式RESTで確認。gh run watch --exit-status --interval 10を1件起動、actual exit1。gh run view --json/--log、artifact list REST GET、artifact12440925593/zip GET（--allow-escape-sequences、stdoutをbinaryfileへ捕捉）は全exit0。実command dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger "trx;LogFileName=dotnet-test.trx" --results-directory "$results_dir" --diag "$results_dir/vstest-diagnostics.log" --blame -m:1 /nr:false -bl:"$results_dir/dotnet-test.binlog"、dotnet-test.exit-codeは1。TRX/source.tar.gz/binlog/生stdout/stderr/vstest診断とargv/exitは /tmp/issue81-referee-receive-udp-factory-boundary-ci-20261022/ に保存。
+
+### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
+
+親がexactc2767f8/CI39811429720のunicast127.0.0.1・IF::1受理による29行Assert.NotNull失敗を有効Red採用後に最小fix。既存SDK Declarations.dll構文抽出exit0。/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false はexit1、既存生成Referee不足CS0246x2/CS0400x2、0warnings/4errors。git diff --check exit0。全argv/exit/生stdout/stderr/source前後/diffを /tmp/issue81-referee-receive-udp-input-fix-green-candidate-20261022/ に保存。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -317,6 +325,14 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### factory入力・部分失敗cleanup・実設定組成の先行11case
 
 新規Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs SHA256 419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617。既存RefereeUdpReceiverFactory.csはUdpSocketSetupのprivate→internal可視性だけ、SHA256 a8c701397242ba6d02101ed77f3b0df49d968af086b110fcf57ee481b10e3689、逆置換でbaseline sourceと完全一致し設定/受信/Dispose behavior無変更。既存25case/固定67関連を含む他21sourceのhash不変。source-manifest.json SHA256 43a86f2bff23687ce48db18c5dede92b8a004b4bb24fdb936f022fe61deafca5。親prefix/Dispatch/tasks/phases/他report保持。
+
+### factory境界11caseのCI実測（入力2件失敗・実組成成功）
+
+製品/test編集なし。source archive23fileをHEAD/current/準備hashと全件byte一致確認しci-sourceへ保存。factory SHA256 a8c701397242ba6d02101ed77f3b0df49d968af086b110fcf57ee481b10e3689、11case source SHA256 419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617。既存640と固定独立67のsource/期待値を保持。親prefix/Dispatch/tasks/phases/他reportを変更しない。
+
+### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
+
+製品変更は Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs のみ、SHA256 66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6。固定11case/既存640/独立67を含む他22sourceはhash不変。service/adapter/既存public UDP/default非container経路は無変更。source-manifest.json SHA256 43863a0d93dd7b668686df88e9d9abf07f78b336355d7654c9191206cf36c8e4。親prefix/Dispatch/tasks/phases/他report、親所有未追跡reports/issue81-referee-receive-normal-review-20261022.mdを保持し編集しない。
 
 ## 指摘事項
 
@@ -477,6 +493,14 @@ factory設定2caseの採用Redに対応する同じ固定7caseを維持した640
 
 不正options6caseはIPv4 unicast127.0.0.1、IPv6 groupff02::1、不正文字列、port-1/65536、IPv6 IF::1を正常資源にしない。例外型と事前allocation0は条件にしない。部分設定失敗4caseはExclusive/Reuse/Bind/Joinへの注入失敗で正常resourceを返さず取得済み所有socket handleが閉じることを固定。実設定組成1caseはproduction UdpSocketSetupそのものをfactoryへ注入し（実装をfixtureへ複製しない）、IPv4/Any/動的port/Exclusivefalse/Reuse1を実socketから観測。loopback IFでgroup join後、送信側はunicast loopbackの正常Referee2packetを送り、単一service count2/ready/実endpoint/age0/購読counter7と、caller取消なしDispose→Run終端/notready/所有socket閉鎖を確認する。
 
+### factory境界11caseのCI実測（入力2件失敗・実組成成功）
+
+失敗2件はInvalidOptionsDoNotProduceNormalReceiverのgroup127.0.0.1/port11003/IFnullと、group224.5.23.1/port11003/IF::1。両方とも29行Assert.NotNull(failure)で実値null、durationは0.0001258秒/0.0013274秒。Createが拒否せず正常に返るため例外観測がnullとなった。source上、groupはIPv4 familyだけを検査しmulticast範囲を検査せず、明示IF familyも検査せずsetupへ渡している。fake側に依存する入力拒否の不足を示す実測として保存し、親の判断前にbehaviorを変更しない。compileerror/timeoutではない。
+
+### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
+
+IPv4 familyに加え宛先先頭octetが224〜239のmulticast範囲であること、明示IFがInterNetworkであることだけを確認し、不成立ならArgumentExceptionで正常資源生成へ進めない。IF未指定/明示IPv4、既定224.5.23.1:11003、dynamicport0、既存設定順/所有cleanupを変えない。新しいIPv6/設定機能やNIC探索を追加しない。guardが生成前に置かれることは今回の最小実装順であり、事前allocation0を新しい合格条件へ加えない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -630,6 +654,14 @@ CI39809637502 completed/success、test job119932083248 completed/success。正�
 
 11case（Theory6+4、Fact1）と必要最小可視性変更を保存、構文exit0/diffcheck0。新test実行0/semantic compile・Red・Green未観測。既存動作で通るcaseはregression成功として扱い人工Redなし。全証拠一覧 /tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/evidence-files-manifest.json SHA256 548614c95e5f35a5982341bcca7e43b1a87fe89bc50f74b023f6715877fea1c8。次CIは640+11の651見込み、実測優先。
 
+### factory境界11caseのCI実測（入力2件失敗・実組成成功）
+
+CI39811429720 completed/failure、test job119938411206 completed/failure。TRX651executed/649passed/2failed/0notExecuted、error/timeout/aborted各0。新11caseは9成功/2失敗。既存640は前633+設定7の名前集合一致かつ全個別Passed、固定67も名前一致/全個別Passed。新境界の不正入力残4件、部分設定失敗cleanup4件、実production Setupを注入した動的port/loopback/単一service decode・購読・所有停止1件も全個別Passed（実組成duration0.0690539秒）。TRX SHA256 30145d637ba13acb1f46cf596d9562baa32affe7e7d31eb26ecc3bf599351d2d、zip SHA256 55bde1631d4671ee5ada7a9c4019e6d4f71a27d42295f4778d38eaf161e52087は公式digest一致。ci-evidence.json SHA256 232aaa5844d5baa3e1680920a21124178c168f932547a88d3c305081dae1043a、全証拠一覧 /tmp/issue81-referee-receive-udp-factory-boundary-ci-20261022/evidence-files-manifest.json SHA256 42f812b064ad8b1c1c2161f140408621a2f8f776af1f38119453ac12d74efa81（68file）。
+
+### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
+
+最小Green候補を保存、構文exit0/diffcheck0、no-restorebuildは既存proto不足exit1。テスト実行0、semantic compile/固定11caseのGreenは未観測。親commit/push後のexactSHA PR CIで再検証する。全証拠一覧 /tmp/issue81-referee-receive-udp-input-fix-green-candidate-20261022/evidence-files-manifest.json SHA256 fd8bd4d08c9737c5125dd9dc3d8bfa524f06227623c08fa9435a6946c7f64f2b（17file）。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -773,6 +805,14 @@ fake設定順のGreenと実Desktopmulticast受入を分ける。不正options/�
 ### factory入力・部分失敗cleanup・実設定組成の先行11case
 
 実socket fixtureも今回未実行。loopback IF joinとunicast受信の成功を実Desktopmulticast配送、Windows NIC/IF、DCP配置/完全所有証明/G3/実機受入へ流用しない。全socketはusing/所有Dispose、Runはfinally安全caller取消と期限付き回収。実組成の環境/setup/production失敗は分け、timeoutを有効Redへ変換しない。03A内残件は新11caseのCI実測、不足時の親Red採用→最小修正、必要ならpending-owned receive/dispose境界確認、通常review前の契約完全性照合。03B/C、既存期待値/skip・外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全read/edit/構文抽出/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
+
+### factory境界11caseのCI実測（入力2件失敗・実組成成功）
+
+実組成の成功範囲はLinux CI内でのOS membership設定・動的portのunicast loopback正常受信・service診断/購読・所有cleanupまで。実Desktopmulticast配送/Windows IF/DCP所有/G3/実機受入には広げない。入力2件のruntime不足は親tdd-executorの採用と最小修正判断へ返し、03A検証/既存Markdown gate/通常review整理より先に未解決状態を保持。新機能、期待値緩和/skip化、製品behavior・外部/配置/依存/設定/環境/auth/network変更・外部service/Docker/実機起動・commit/push/GitHub変更/再実行なし。全watch（exit1）/取得/download/read/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
+
+### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
+
+実行時Greenと通常review判定は未取得。651全体/固定11/67の再検証後に03A検証・既存Markdown gate・報告/台帳整理から同じ通常reviewerへ進む予定で、本担当は未完了gateを成功にしない。Desktopmulticast/Windows/DCP/G3/実機受入は引き続き未検証。期待値緩和/skip化、外部/配置/依存/設定/環境/auth/network変更・外部service/Docker/実機起動・commit/push/GitHub変更なし。全syntax/build/read/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
 
 ## 親による公開準備記録
 

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Join\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002163",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Exclusive\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000386",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Reuse\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002694",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Bind\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0034333",
+    "message": "",
+    "stackTrace": ""
+  }
+]
