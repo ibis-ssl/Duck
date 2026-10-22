@@ -20,6 +20,8 @@ Issue81 I81-01の純粋診断契約・先行範囲・検証証拠の通常レビ
 
 Parent-owned. review_mode=normal; task_kind=review; work_class=judgment_heavy; uncertainty=medium; change_radius=cross_module; criticality=high; decomposability=independent_workstreams; decomposition_policy=forbidden; decomposition_disposition=prohibited_by_review_lifecycle; parallelism_mode=single_agent; context_need=fresh. User explicit requested=gpt-6.1-sol/high, planned_runtime_profile=same, default role effect hidden per current-task authorized exception; applied=null; profile_observability=final_profile_hidden; application_status=spawn_succeeded_profile_unverified; reviewer=/root/issue81_normal_review; fork_policy=none. No Sol xhigh/max/Astra. normal_persistence.
 
+Parent continuation evidence: reviewer=/root/issue81_normal_review; reviewed_head=9852e67bfe194296763d143418f0b4e0858ba7e5; requested original gpt-6.1-sol/high; application_status=reused_existing_agent_profile; applied=null; profile_observability=final_profile_hidden. Initial spawn evidence above retained.
+
 ## 実行コマンド
 
 - review_mode=normal / initial review、report_persistence_mode=normal_persistence。reviewer=/root/issue81_normal_review。実装担当ではなく、本レビューで製品修正をしていない。built-in code reviewとして自ら差分・対象ソース・直接依存・現設計・証拠を読んで判断した。nested Codex、orchestrator再入場、別agentは使用していない。
@@ -109,6 +111,61 @@ verification_capability=local_execution_available（同machine/worktreeの既存
 次アクションは実装担当がI81-NR-001を純粋契約範囲で修正し、必要な局所的回帰証拠と新review-target commitを用意すること。標準gateと外部契約の未成立状態は保持し、独立finalへは進めない。
 
 本reportはnormal_persistenceとして親予約済みpathに保存した。保存後に5子欄を全文readbackし、親所有prefixのbyte一致、HEAD不変、製品tracked diffなし、git statusの未追跡が本reportだけであることを確認済み。発行したexecは全件exit code/終端結果を回収し、実行中process、承認待ち、結果不明の操作はない。
+
+
+### I81-NR-001 fix検証履歴（2026-10-22、同一通常reviewer）
+
+**現在の通常レビュー判定は pass_with_held。I81-NR-001はclosed。** 上記の初回fail、指摘本文、39件の証拠、旧HEADでのcoverageは履歴としてそのまま保持する。本追記は通常reviewのfix検証であり、独立finalレビューではない。report_attestation_allowed=false。
+
+#### Identity・手順・範囲
+
+- reviewer=/root/issue81_normal_reviewを継続。review_mode=normal / fix_verification、report_persistence_mode=normal_persistence。初回reviewed_head=e1376bdcec4bf062de20dac18e336ea72dcc4cc9、今回reviewed_implementation_head/current_head=9852e67bfe194296763d143418f0b4e0858ba7e5、今回range=e1376bd..9852e67b。branch、worktree、PR base_refは初回と同じ。machine=FA780、PowerShell login=false / require_escalated → wsl.exe -d Ubuntu。
+- continuity application_status=reused_existing_agent_profile。元のrequested/planned=gpt-6.1-sol/high、applied=null、profile_observability=final_profile_hiddenを維持。親所有Dispatch欄は変更しない。新reviewer・新profile適用・nested agent・orchestrator再入場なし。
+- 最初に本normal report全文を読んだ。前回実読したwork-context-manager、review-enforcer、review-worker、report-writer、report-output-managerを同じ通常review lifecycleに再適用した。実装reportのI81-NR-001 completeness matrixを全4行読み、required action / production path / actual composition fixture / focused evidenceに欠落欄がないことを確認してからbounded closureを開始した。
+- 対象deltaはState、Tests、tasks-status、実装report、および今回commitへ保存された旧normal reportの計5paths。製品差分はStateとTestsのみ。State全204行、追加試験7展開ケース、matrix、実装追記、tasks差分を自ら読んだ。旧normal reportのSHA256=a05a186dafe9a3350a7699602fe223505d9dc09038a2267bbb96cedcc07788c8を確認し、前回保存内容がそのままcommitされたことを確認した。新規基準の独立総当たりreviewへ拡張しない。
+
+#### Finding disposition・completeness照合
+
+I81-NR-001、source_severity=medium（P2）、origin=通常レビューを保持し、severity再分類なし。今回の新規修正必須指摘は0件、remaining required action=なし。
+
+| required action | production path（今回HEAD） | actual composition fixture | focused evidenceと判定 |
+| --- | --- | --- | --- |
+| read→readのt4→t3とt6 Expired→t4で進捗復活を拒否 | ResourceReadinessState.cs:157 GetReadinessが同:186 TryReadTimestampを呼ぶ。最新readも高水位へ記録し、逆行はInvalidClockで進捗無効化 | ResourceReadinessStateTests.cs:273 ReadToReadClockRegressionInvalidatesProgressの2ケース。実State＋既存ManualTimeProvider | 赤2失敗→緑2成功。時計が追いつくだけ／同countではfalse、新count11でtrue。closed |
+| read→Observeとnot-ready readでも同じ高水位を使う | State:88 Observeと同:157 GetReadinessが同gate内で共通helperを使用。readはhasProgress確認より先に時計を読む。逆行時は高水位を下げない | Tests:294 ObserveRejectsClockEarlierThanLastReadの2ケース、同:315 NonReadyReadAdvancesClockHighWaterMark | 赤3失敗→緑3成功。新sequenceの時計不成立で進捗を作らず、同sequence再利用拒否、追いつきだけの非復活、count増分で回復。Observeのtrueは新sequence受理でありReadyではない既存API契約も維持。closed |
+| 新世代でclock/count/sequence/進捗を整合reset | State:63 AdvanceGeneration、同:76–79でsequence/count/clock高水位と進捗をreset | Tests:334 NewGenerationResetsClockHighWaterMarkAndProgress。実State＋ManualTimeProvider、新完全container ID/世代2 | 最終passed。旧ID拒否、新世代最初のcountはbaselineのみ、0→1でReady。赤での当ケース失敗位置はresetより前のInvalidClock確認であり、reset単独の赤実証とはしない。closed |
+| 期限切れ進捗を消し、新countだけで回復 | State:174–177でInvalidate(Expired)、同:145–150で増分時だけ新進捗 | Tests:353 ExpiredReadNeedsNewCountBeforeReady。実State＋ManualTimeProvider | 赤でもpassedのsibling guard、緑でもpassed。期限切れ後同countではfalse、新count11でtrue。closed |
+
+同じlock内での共通高水位、逆行後の維持、readが非Readyでも時計を進める順序、明示世代だけでのreset、Expiredの進捗消去を確認した。古いidentity/input/sequenceの拒否がclock helperより前にあり、新しい正当状態を遅着値で壊さない既存契約も維持される。count/age/出所の判定、既存の有限lease比較、公開API署名に変更はなく、deltaに新たな欠陥は認めない。
+
+#### 証拠照合・コマンド結果
+
+証拠root=/tmp/issue81-readiness-validation-20261022/i81-nr-001/。
+
+- commands.json、baseline.json、red-inputs.json、final-inputs.json、赤/緑TRX、全5段階のexit-code/stdout/stderr、harness-discoveryを読取。最終harnessは以前と同じ実TestsのCompile Linkと実libraryのProjectReferenceを使用する。
+- final-inputs.jsonの7 source/project pathsは、diskおよびgit show 9852e67b:<path>とのSHA256比較で7/7一致。harnessProjectも一致。State SHA256=ad2cc33e8216b41b070050b8deb0237c3ea38ca298f31849cf12c1df86b1d26c、Tests SHA256=f2dce7e46325a457ba19b2021fc690748c1509780bd5430db22041ea36e7edea。
+- 赤入力StateのSHA256はe1376bdの実Stateと一致、赤入力Testsは今回最終Testsと一致。テスト追加後・製品修正前の実失敗である。赤TRX=46 executed / 40 passed / 6 failed / 0 notExecuted、SHA256=f6cd789b9b264f2dc008373cd15737692be1b6a6e244cf4acea321e0a23477cf。7追加ケースすべてが赤ではなく、上記Expired sibling1件は赤からpassedである。
+- 緑TRX=46 total / 46 executed / 46 passed / 0 failed / 0 notExecuted、UnitTestResultも46件。discovery=46件。最終TRX SHA256=98700c5d21b05fd8378ee009b4398a7f7a3553819b9e04b3984c063502133717で実装reportと一致。
+- 保存済みdotnet test赤=exit1、library build=exit0 / warnings0 / errors0、最終harness test=exit0、list-tests=exit0、diff-check=exit0。各stdout/stderrとexit-codeを照合した。正確な既存dotnet引数は当該commands.jsonに保持され、--no-restore、単一worker、/nr:false、コマンド限定EnableSourceControlManagerQueries=falseを使用している。設定へ保存されたものとは扱わない。
+- 旧39件TRXのSHA256=2461799fd6f00232db69d60b4407a175de06954cecc4bb8ca4edf4f1b6898d6fを再確認。旧manifest/TRXは初回履歴で、修正後の証拠へ置換していない。Tests差分は既存ケースを保持した94行追加である。
+- 今回reviewer発行のgit status/log/diff/stat、Python標準libraryによるmanifest/TRX/保存log読取・SHA照合、hostname/branch確認はすべてexit0。read-onlyの git diff --check e1376bd..9852e67bもexit0 / 診断なし。新しいbuild/test/restore/lint・network/GitHub照会は未実行。
+
+#### Coverage delta・現在の判定
+
+| criterion | 今回disposition | 初回からのdelta |
+| --- | --- | --- |
+| I81-NR-001の要求・正しさ・clock境界 | checked_no_finding | 初回checked_findingからclosed。read→read、read→Observe、非Ready read、expiry、catch-up、新count、新世代を確認 |
+| error handling/保守性/thread safety | checked_no_finding | 共通helperを同gate内だけで使用。InvalidClockとExpiredが進捗を消去し、clock高水位を保持 |
+| Tests・source-bound evidence | checked_no_finding | 追加7ケースと旧39ケースの回帰、赤6失敗→最終46成功、sourceとcommit一致 |
+| delta全paths・scope・report/tracking | checked_no_finding | 製品2pathsの時計修正のみ。親tasksは同reviewer確認待ちと記載、実装reportはclosureを自己宣言していない。旧fail/report保存も保持 |
+| その他の初回coverage | checked_no_finding / heldを継承 | identity/age/出所/所有信頼境界/依存APIに新変更なし。初回確認内容を後続の全体成立へ拡張しない |
+| 標準Tracker.Tests/full regression/current-HEAD CI | held | CG-01/H-01を維持。relativeworktrees/SslProto不足CS0246の旧阻害は今回再検証・解消していない |
+| G1/G3・実サービス接続/所有証明・Windows/G2実測・文書/図 | held | CG-02/H-02～04を維持。純粋契約unitのclosureに追加外部改修を要求しない |
+
+本bounded fix検証は完了。I81-NR-001は今回reviewed_implementation_headでclosed、修正必須残件0、verdict=pass_with_held（I81-01の通常review範囲）。初回failは当時のe1376bdへ付いた履歴であり、今回の9852e67bに対する判定と区別する。標準gate、全Issue81、実サービスReady、Windows受入、独立finalの合格へ転換しない。
+
+verification_capability=local_execution_availableを維持（既存SDK/cacheと今回入力に一致するlibrary/harnessの保存実行証拠）。本reviewerのcommit=not_required、push=unauthorized、ci_wait=not_required、matching_ci=null、full_local_equivalence_gate=not_started。reserved independent-final path=なし、report_attestation_allowed=false。次の範囲採用・標準gateの処置・外部供給・必要な独立final lifecycleは親の判断へ返す。
+
+保存は本normal reportの子所有「結果」欄への本追記だけ。親所有prefix/Dispatchと初回全履歴を保持し、保存後に追記全文readback、HEAD不変、git statusが本reportだけの変更、その他tracked diffなしを確認済み。今回発行したexecは全件終端結果を回収済みで、実行中process・未回収終了コード・承認待ち・不明結果はない。
 
 ## リスク
 
