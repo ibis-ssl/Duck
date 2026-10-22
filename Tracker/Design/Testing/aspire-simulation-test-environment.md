@@ -8,7 +8,7 @@
 
 Windows 上の AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い、利用者自身の Docker Desktop に試験資源を登録する。DCP が Aspire の実行単位を接続する機能を通じ、資源の作成、監視、記録、停止、削除を一元管理する。コンテナの作成から後始末まで DCP だけが管理し、別の Docker コマンド管理プログラムと二重に管理しない。
 
-DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost が起動する資源とその関係を定義し、DCP が資源の起動、監視、停止、後始末を管理し、Docker Engine がコンテナを実行する。DCP は資源の起動管理を担い、ネットワーク通信の方式とは役割が異なる。通常の利用者が DCP を直接操作する必要はない。詳しくは [DCP の公式リポジトリ](https://github.com/microsoft/dcp) と [AppHost の構成資料](https://learn.microsoft.com/en-us/dotnet/aspire/app-host/configuration) を参照する。
+DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost は資源の定義を DCP に渡し、サービスやコンテナを直接起動しない。通常の実行では DCP がプロジェクト資源に対応するプロセスを起動して状態を管理する。統合開発環境での実行を選んだ資源は起動をその環境へ委ねるが、DCP は実行状態を追跡する。DCP がコンテナ資源を管理し、Docker Engine がコンテナを実行する。DCP は資源の起動管理を担い、ネットワーク通信の方式とは役割が異なる。通常の利用者が DCP を直接操作する必要はない。この資料で示す Windows 上の実行経路は提案であり未検証である。詳しくは [DCP の公式リポジトリ](https://github.com/microsoft/dcp)、[AppHost の構成資料](https://learn.microsoft.com/en-us/dotnet/aspire/app-host/configuration)、および [Aspire 13.5.4 の実行仕様](https://github.com/microsoft/aspire/blob/v13.5.4/docs/specs/IDE-execution.md) を参照する。
 
 これは提案であり現行実装とは区別する。現在の `Testing/Duck.Testing.AppHost` は `duck` を `Tracker.RuntimeHost` の `ProjectResource` とし、`simulator`、`game-controller`、`crane`、必要な `cm4-sim` を Docker コマンドライン起動管理プログラムを介した `ExecutableResource` として扱う。旧 `AddContainer` では、DCP が割り当てた利用者定義ネットワークと `--network host` を同時に Docker へ渡したため、Docker は `cannot attach both user-defined and non-user-defined network-modes` としてコンテナ作成を拒否した。この競合を解消する設計案では、標準 `AddContainer` に明示的な `--network host` を渡さず、Aspire/DCP が管理する実行ネットワークを使う必要がある。これは提案する修正方針であり、標準 `AddContainer` と専用ブリッジネットワークの実装・試験・受入が済んだことを示さない。
 
@@ -42,10 +42,10 @@ flowchart LR
    debug[debug-host / Tracker.DebugHost 監視役]
    ref[referee-driver / RefereeDriver]
   end
-  app -. 起動制御 .-> dcp
-  app -. ProjectResource 起動 .-> duck
-  app -. ProjectResource 起動 .-> debug
-  app -. ProjectResource 起動 .-> ref
+  app -. 資源モデルを送信 .-> dcp
+  dcp -. ProjectResource を起動・状態監視 .-> duck
+  dcp -. ProjectResource を起動・状態監視 .-> debug
+  dcp -. ProjectResource を起動・状態監視 .-> ref
  end
  subgraph desktop[Docker Desktop]
   engine[Docker Engine]
@@ -103,6 +103,7 @@ flowchart LR
   hostPort[127.0.0.1 / Aspire 割当 TCP ポート]
   duck[Duck / Tracker.RuntimeHost]
   debug[DebugHost 監視役 / Tracker.DebugHost]
+  refereeDriver[RefereeDriver / Game Controller API クライアント]
  end
  subgraph desktop[Docker Desktop / 専用ブリッジネットワーク]
   simulator[simulator / SSL-Vision パケット送信者]
@@ -114,7 +115,6 @@ flowchart LR
   cm4[cm4-sim]
   refereeReceiver[その他の審判情報受信先 / 所有者未確定]
  end
- refereeDriver[RefereeDriver / Game Controller API クライアント]
  issue[未解決: 数値 IP / localhost / 名前解決の契約]
  simulator -. SSL-Vision マルチキャスト .-> duck
  simulator -. SSL-Vision マルチキャスト .-> debug
@@ -157,8 +157,9 @@ sequenceDiagram
   participant User as 利用者
   participant AppHost as Windows AppHost
   participant DCP as DCP
-  participant Desktop as Docker Desktop
+  participant Engine as Docker Engine（Docker Desktop 内）
   participant Duck as Duck
+  participant Debug as DebugHost
   participant Sim as Simulator（SSL-Vision 送信機能）
   participant Compare as 比較受信側
   participant Ref as RefereeDriver
@@ -168,11 +169,12 @@ sequenceDiagram
   participant Receiver as 審判情報受信側
   Note over User,Receiver: すべての矢印は提案経路で、未実装・未検証。通信成功を示さない。
   User-->>AppHost: 選択した資源を起動
-  AppHost-->>DCP: 標準コンテナ資源を登録
-  DCP-->>Desktop: 選択資源と専用ブリッジネットワークを作成
-  AppHost-->>Duck: プロセス開始（ProjectResource）
-  Desktop-->>Sim: プロセス開始
-  AppHost-->>Ref: 選択時にプロセス開始（ProjectResource）
+  AppHost-->>DCP: ProjectResource とコンテナ資源のモデルを送信
+  DCP-->>Duck: ProjectResource を起動・状態監視
+  DCP-->>Debug: ProjectResource を起動・状態監視
+  DCP-->>Ref: 選択時に ProjectResource を起動・状態監視
+  DCP-->>Engine: 選択資源と専用ブリッジネットワークの作成・監視を要求
+  Engine-->>Sim: 選択されたコンテナ資源を実行（他も同様）
   AppHost-->>GC: TCP 8082 を内部ポートとする HTTP 接続先を割り当てる
   AppHost-->>User: Aspire Dashboard に動的な URL を表示
   User-->>Browser: Aspire Dashboard の URL を開く（127.0.0.1 だけを想定）
@@ -200,8 +202,8 @@ sequenceDiagram
   AppHost-->>User: 画面操作後の状態遷移と必要な通信証拠を表示
   User-->>AppHost: 停止または起動取消
   AppHost-->>DCP: 所有資源の停止を要求
-  DCP-->>Desktop: 自身が所有する資源だけを停止・削除
-  Note over DCP,Desktop: DCP だけがライフサイクルと後始末を管理。他所有者のコンテナは保護する。
+  DCP-->>Engine: 自身が所有するコンテナ資源だけ停止・削除を要求
+  Note over DCP,Engine: DCP だけがライフサイクルと後始末を管理。他所有者のコンテナは保護する。
   DCP-->>AppHost: 停止結果と証跡
 ```
 
