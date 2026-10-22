@@ -25,25 +25,29 @@ internal sealed class GameControllerStateClient
         clock = timeProvider ?? TimeProvider.System;
     }
 
-    /// <summary>完成messageごとに初期Outputを読み飛ばし、有限読取窓内のHALTを観測する。</summary>
+    /// <summary>接続と受信に同じ有限期限を適用し、初期Outputの後にHALTを観測する。呼出取消は伝播する。</summary>
     internal async Task<GameControllerMatchSnapshot?> ReadMatchStateAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (options.MaximumMessageBytes <= 0 || options.Timeout <= TimeSpan.Zero)
+        if (options.MaximumMessageBytes <= 0 || options.Timeout <= TimeSpan.Zero ||
+            options.Timeout > TimeSpan.FromMilliseconds(uint.MaxValue - 1))
             return null;
         var started = clock.GetTimestamp();
+        using var deadline = new CancellationTokenSource(options.Timeout, clock);
+        using var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
+        var operationToken = operation.Token;
         try
         {
-            using var socket = await connect(endpoint, cancellationToken).ConfigureAwait(false);
+            using var socket = await connect(endpoint, operationToken).ConfigureAwait(false);
             using var message = new MemoryStream();
             var buffer = new byte[4096];
             while (true)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                operationToken.ThrowIfCancellationRequested();
                 if (ReadWindowExpired(started))
                     return null;
-                var received = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken).ConfigureAwait(false);
-                cancellationToken.ThrowIfCancellationRequested();
+                var received = await socket.ReceiveAsync(buffer.AsMemory(), operationToken).ConfigureAwait(false);
+                operationToken.ThrowIfCancellationRequested();
                 if (ReadWindowExpired(started) || received.MessageType != WebSocketMessageType.Text)
                     return null;
                 if (message.Length + received.Count > options.MaximumMessageBytes)
@@ -66,13 +70,18 @@ internal sealed class GameControllerStateClient
 
                 if (IsHalt(matchState, "command") && IsHalt(matchState, "gameState"))
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    operationToken.ThrowIfCancellationRequested();
                     return ReadWindowExpired(started)
                         ? null
                         : new(GameControllerCommandKind.Halt, GameControllerMatchPhase.Halt);
                 }
                 return null;
             }
+        }
+        catch (OperationCanceledException) when (deadline.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
         }
         catch (JsonException)
         {

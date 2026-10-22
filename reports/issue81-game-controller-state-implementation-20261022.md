@@ -45,6 +45,11 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 
 work-context-manager/implementation-executor/implementation-worker/tdd-executor/report系を継続適用。exact9d82af8fの前unit CI39828984971は666/666成功・artifact0で個別TRXなし。今回は手動時計/取消協調fakeで期限11caseだけを先行追加。既存Roslyn構文解析exit0、git diff --check exit0。build/test/CI実行0、formalはremote_ci_only。構文成功をcompileやRedとしない。
 
+
+### 有限読取窓：4件runtime Red後の最小候補（2026-10-22）
+
+親が採用した exact4958ed9f / CI39830103395 は677実行/673成功/4実assertion失敗・error/timeout0。固定期限11件は4失敗/7成功、旧666/固定67/raceは個別Passed。既存implementation/TDD/report Skillを継続し、固定試験を変えず最小製品修正。Roslyn構文解析exit0、git diff --check exit0。新build/test/CI未実行、formalはremote_ci_only、候補Green未観測。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -73,6 +78,11 @@ work-context-manager/implementation-executor/implementation-worker/tdd-executor/
 ### 有限読取窓の自動終了：先行試験準備（2026-10-22）
 
 新規 Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs だけ。SHA256 30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0。製品/scaffold変更なし。旧source27件・初回test・transport13case・固定67/raceはHEAD/期待hash/現file一致。親tracking/review/Dispatchを保持。証拠 /tmp/issue81-game-controller-state-deadline-red-preparation-20261022/ にsource/期待値対応表/command/stdout/stderr/hash guardを保存。
+
+
+### 有限読取窓：4件runtime Red後の最小候補（2026-10-22）
+
+GameControllerStateClient.cs のみ製品変更。SHA256 bcaa34adf425e25cee62b4f4eeeb63aabe1970dfc394374447aba12e02272381。期限11case SHA256 30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0、transport13case/初回test/他27sourceは不変。親tracking/review/保存済Red証拠へ編集なし。証拠 /tmp/issue81-game-controller-state-deadline-green-candidate-20261022/ にbefore/after source、差分、command/exit、生stdout/stderr、hash guardとcompleteness-matrix.jsonを保存。
 
 ## 指摘事項
 
@@ -104,6 +114,11 @@ HALTだけのreader単位を03B全体完了としない。fragment/close/binary/
 
 期待値は接続待ち・無入力受信待ち・初期gcState後待ち3caseで期限1tick前はpending、満了時の内部token取消を40行で具体assertし、その後null/呼出token未取消/socket破棄/write0を確認。同期取消へ協調するfakeに限定し、非同期継続の即時実行を要求せず、5秒watchdog自体をRedにしない。caller取消の接続/受信2caseはOCEを保持。不正options6caseはbyte上限0/-1、期限ticks0/-1/-10000/long.MaxValueを接続せずnullにする。default3秒を保持し明示2秒も検証。MaxValueはBCL timer有限範囲外として拒否する判断で、将来の許容上限はtimer最大4294967294msに整合させる。現在は期限3caseとMaxValue1caseの計4runtime不足を予想し、残7caseはregression見込み。期待値詳細/行mappingはexpectations-and-matrix.json。
 
+
+### 有限読取窓：4件runtime Red後の最小候補（2026-10-22）
+
+接続前に正の有限期限とtimer上限4294967294msを確認し、MaxValue等は接続せずnull。TimeProvider付き期限CTSを一回の読取開始時に作り、caller tokenとの連結tokenを接続/受信/各取消確認へ通す。接続待ち/無入力受信/初期Output後待ちも期限に協調して終端する。OperationCanceledExceptionは期限CTS取消時だけ捕捉し、その中でcaller取消を優先確認してからnullに戻す。無関係なOCE/OOMを通常結果へ変換しない。socket/期限CTSとそのtimer/連結CTSをusingで解放。既存の受信後経過確認・UTF8組立/上限/観測write0/既定3秒を保持し、lockや共有読取状態は追加しない。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
@@ -130,6 +145,11 @@ test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件�
 
 test保存・構文/diff/hash確認を完了、runtime Red/Greenは未観測。全677件は見込みで実測を優先する。親がtest候補をcommit/pushしexact-SHA PR CIで実assertion不足を採用してから、同じ担当が最小behaviorへ進む。親prefixを保持し子5欄へ追記・読戻し。全process終了/exit回収済み、子commit/push/GitHub操作なし。
 
+
+### 有限読取窓：4件runtime Red後の最小候補（2026-10-22）
+
+最小候補を保存・構文/diff/固定sourceguard確認。source-manifest.jsonとcompleteness-matrix.jsonにRed→製品経路→固定fixture→候補Green待ちを対応付けた。runtimeGreenと全677回帰は親commit/push後のexact-SHA PR CI待ち。親prefix/Dispatchを保持し子5欄へ履歴追記・読戻し。全process終端/exit回収、子commit/push/GitHub操作なし。
+
 ## リスク
 
 API StateにUDP command_counterはなく、列挙値の数値も異なる。状態照合は有限窓の新しい観測として扱い、原子的同期やGC自身の受信診断を捏造しない。Desktop/DCP/実機は未検証。全文文書gateは不合格のまま。
@@ -155,3 +175,8 @@ API StateにUDP command_counterはなく、列挙値の数値も異なる。状�
 ### 有限読取窓の自動終了：先行試験準備（2026-10-22）
 
 取消に協調するBCL型の接続/受信境界のみを保証対象とする。取消を無視する任意delegateの強制終了や、clientへ未譲渡のsocket破棄は保証しない。STOP/RUNNING明示map・epoch/sequence/旧応答・API/UDP鮮度照合・AutoDrive/03C・Desktop/DCP/実機は未実装/未検証の後続。全文文書gate既知不合格を保持、新依存/設定/環境/外部変更なし。
+
+
+### 有限読取窓：4件runtime Red後の最小候補（2026-10-22）
+
+BCL型の取消へ協調するfactory/受信口を対象とする。取消を無視する任意delegateや未譲渡socketの強制終端/破棄を保証しない。STOP/RUNNING map、epoch/sequence/遅い旧応答、API/UDP鮮度照合、実adapter/AutoDrive/03C・Desktop/DCP/実機は後続未実装/未検証。runtimeGreenは未確認。全文文書gate既知不合格、新依存/設定/環境/外部変更なし、原Solhigh継続/applied:null。

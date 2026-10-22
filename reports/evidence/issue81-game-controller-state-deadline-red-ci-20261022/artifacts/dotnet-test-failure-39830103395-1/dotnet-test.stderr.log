@@ -1,0 +1,4 @@
+[xUnit.net 00:00:04.55]     Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: 4096, timeoutTicks: 9223372036854775807) [FAIL]
+[xUnit.net 00:00:04.61]     Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage: 0) [FAIL]
+[xUnit.net 00:00:04.63]     Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage: 2) [FAIL]
+[xUnit.net 00:00:04.66]     Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage: 1) [FAIL]
