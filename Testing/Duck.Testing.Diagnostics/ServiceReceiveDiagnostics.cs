@@ -34,7 +34,8 @@ public sealed class ServiceReceiveDiagnostics(
         {
             if (!inputs.TryGetValue(inputId, out var input))
                 inputs.Add(inputId, input = new Input(inputId));
-            input.Epoch = new ReceiveEpoch(inputId, checked(++input.EpochNumber));
+            var epoch = new ReceiveEpoch(inputId, checked(++input.EpochNumber));
+            input.Epoch = epoch;
             foreach (var source in input.Sources.Values)
             {
                 source.Stamp = null;
@@ -42,7 +43,26 @@ public sealed class ServiceReceiveDiagnostics(
                 source.Status = DiagnosticDecodeStatus.Unknown;
                 source.Readiness = CreateReadiness(inputId, source.Key);
             }
-            return input.Epoch;
+            return epoch;
+        }
+    }
+
+    /// <summary>一致する受信世代を終了し、累積件数と最終受信UTCを保ったまま準備を解除する。</summary>
+    public bool EndEpoch(ReceiveEpoch epoch)
+    {
+        ArgumentNullException.ThrowIfNull(epoch);
+        lock (gate)
+        {
+            if (!inputs.TryGetValue(epoch.InputId, out var input) || !ReferenceEquals(input.Epoch, epoch))
+                return false;
+            input.Epoch = null;
+            foreach (var source in input.Sources.Values)
+            {
+                source.Stamp = null;
+                source.Status = DiagnosticDecodeStatus.Unknown;
+                source.Readiness = CreateReadiness(input.Id, source.Key);
+            }
+            return true;
         }
     }
 
@@ -194,7 +214,7 @@ public sealed class ServiceReceiveDiagnostics(
     private sealed class Input(string id)
     {
         public string Id { get; } = id;
-        public ReceiveEpoch Epoch { get; set; } = null!;
+        public ReceiveEpoch? Epoch { get; set; }
         public long ErrorCount { get; set; }
         public long EpochNumber { get; set; }
         public Dictionary<string, Source> Sources { get; } = new(StringComparer.Ordinal);

@@ -73,6 +73,14 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 
 親の継続指示で取消1件の先行testだけを追加。expectations.jsonをsource作成前に保存。既存SDK宣言抽出の正確な引数はsyntax.command.json、exit0（semantic compileではない）。新build/test/CIは未実行、functional Red pending。`git diff --check` exit0。未追跡testの`git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs` はexit1・stdout/stderr空（新fileとの差分、空白指摘なし）。
 
+### 取消testの同SHA runtime Red収集
+
+HEAD `be8bd84519bb04ac1aba858ed46268b64c0e56d0`、PR84、開始時worktree clean。既存Skills/remote_ci_only継続のCI収集のみ。`run list --commit <同SHA> --event pull_request` exit0、`run watch 39789901203 --repo ibis-ssl/Duck --exit-status --interval 5` は終端failure・exit1。`run view --json`、test job119862857801の`--log`、artifacts一覧GET、artifact12429644430のzip GETは全exit0。正確な引数/exitをcommands-summary.json、各stdout/stderr/exitを証拠dirへ保存。CIの標準dotnet testコマンドはci-test-command.txt、実dotnet-test.exit-code=1。ローカルbuild/testは今回実行していない。
+
+### 取消後準備解除の最小Green候補
+
+親tdd-executorがexactbe8bd845 CI39789901203の取消後ready残留を有効Redに採用した後、同じ担当/既存Skillsで最小実装。2sourceの既存SDK宣言抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit0・警告0・エラー0。同じ引数のDriver project buildはexit1、既存生成Referee不足のCS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exit/source差分は `/tmp/issue81-referee-receive-cancel-green-candidate-20261022/` に保存。今回test実行/CI操作なし。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -125,6 +133,14 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 ### 取消の先行テスト準備（4ケースGreen後）
 
 新規`Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs`、1 Factのみ。SHA256 `76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f`。製品behavior/scaffold追加なし、既存positive/不正4case/csprojと固定v1の11file/v2の9file・repo対応sourceはbyte/hash不変。証拠dir `/tmp/issue81-referee-receive-cancel-red-preparation-20261022/` にexpectations.json / source-manifest.json / remaining-03A.json / 構文抽出log / check-commands.json / evidence-files-manifest.jsonを保存。親tasks/phasesの差分は保持。
+
+### 取消testの同SHA runtime Red収集
+
+今回製品/test/期待値の変更なし、既存report子5欄のみ追記。証拠dir `/tmp/issue81-referee-receive-cancel-red-ci-20261022/` に生log/TRX/binlog/exit/source archiveと照合copyを保持。取消test SHA256 `76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f`、製品source `7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d`。対象5fileと固定独立source7fileの全12fileをCI archive/HEAD/currentのbyte/hashへ照合。固定v1の11file/v2の9fileも元hash不変。ZIP SHA256 `702b436fbcd4442068b3f4b118c590dead834ae1193daed0ba64f88ed167c057` はAPI digest一致。
+
+### 取消後準備解除の最小Green候補
+
+製品変更は`Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs` SHA256 `d908ba59f7d0895f9cb6536cd2db803b6e5b214c13637a1cdc986fd50bee6920` と`Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs` SHA256 `86aa44082a0945ddeac957e8fa8a1ee823223b7e6afc82c11ca132b7e8ab1223` の2file。取消test `76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f`、既存positive/不正4case/csprojはHEAD byte不変。固定v1の11file/v2の9fileとrepo対応sourceも元hash不変。既存report子5欄へ追記し親prefix/Dispatch/履歴・親tasks/phases/evidence差分を保持。
 
 ## 指摘事項
 
@@ -189,6 +205,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 
 最小まとまりはRun所有の終了時無効化1件に限定。完全owner、実Referee.Parser、同counter正常2packetでcount2/readyを先に確認し、第三受信待機のsignal後に取消してpump終端を待つ。時計は常に同じ値なので期限切れと区別し、終端後`IsReady=false`（42行）・count2維持・受信呼出し3を期待する。取消完了が例外か正常returnかは追加の仕様にしない。現在の旧ready残留はruntime Red候補であり、未実行の失敗を実測扱いにしない。同時Run/restart/遅延callbackを一度にfixtureへ詰め込まず、後続caseへ残す。
 
+### 取消testの同SHA runtime Red収集
+
+唯一のfailureは`Tracker.Tests.RefereeReceiveCancellationTests.CancellationAfterSuccessfulReceivesInvalidatesReadinessWithoutClockExpiry`。TRX messageは`Assert.False() Failure / Expected: False / Actual: True`、最初の位置はRefereeReceiveCancellationTests.cs:42（`Assert.False(stopped.IsReady)`）、duration=00:00:00.0104426。初期count2/readyと取消後pump終端の検査を通過し、固定時計のままreadyが残る実行時assertionを確認した。compile failure/型解決/timeoutではない。42行より後の件数維持/受信回数assertは未到達であり、それらの成功を主張しない。
+
+### 取消後準備解除の最小Green候補
+
+既存Diagnosticsには終了APIがなく、取消をdecode失敗件数へ混ぜず、世代を余分に増やさずに準備解除するため`EndEpoch(ReceiveEpoch)`を追加。lock内で現在epochの参照一致を確認し、active epochを終了、各sourceのstamp/status/readinessを無効化する。正常件数/失敗件数/最終受信UTCは保持する。既存public signatureは変更せず追加APIだけ、private epochをnullableへ変更しBeginEpochは生成した同じepochを返す。Runの`finally`から当該epochを終了し、取消/想定外例外は捕捉して成功へ変換しない。epoch照合は古い終端による他世代への副作用を防ぐ必要境界であり、再開/並行Run全体を完成したものではない。関数/XML説明は日本語。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -245,6 +269,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 
 取消先行testを保存・構文抽出exit0、実行件数0、semantic compile未確認。expectations SHA256 `da6ed1a5d235e4bb3385d5a2787759ebd244fd19608231a04bc8350d842acd46`、source-manifest SHA256 `e22ebbd36194f034bd143145c3de5618bf8af0b3e95859151d54084b0bc6655d`。親が非main commit/push→exact-SHA PR CIでcompileと実assertionを回収して有効Redを採用した後だけ、同一testで最小実装へ戻る。今回正常取消動作の実装を先行していない。前節620集計Greenの証拠は保持し、新しい未実行1件へ転記しない。
 
+### 取消testの同SHA runtime Red収集
+
+`https://github.com/ibis-ssl/Duck/actions/runs/39789901203`、exactHEADbe8bd84519bb04ac1aba858ed46268b64c0e56d0 / pull_request / completed / failure。TRXは621実行・620成功・1失敗・0skip、error/timeout/abortedも0。新取消testだけが失敗。残620件の名前集合は前回620件と完全一致し全Passed（existing620-results.json）、既存positive/不正4caseと固定独立67件も個別TRXで全Passed（fixed67-results.json）。packet/fullstack jobsはSkipped。TRX SHA256 `4e5e96b367262480bcc0f2f08968e9ad2808023a1b923e6f2856f52d57dc8c71`、ci-evidence.json SHA256 `7efd518b1a098c1fbef5b9988aba58bcf836fc79adacbaf335b7d7c219b3703b`。有効Redの親採用判断へ証拠を返す段階で、本behaviorは変更しない。
+
+### 取消後準備解除の最小Green候補
+
+取消後not-readyの最小Green候補を保存。source-results-manifest.json SHA256 `e69978f44d776b6ba3ff18a7ef4d968db835687dafca6b11c0bbce6140d9b9e3` に採用Red/source before-after/不変test/検査結果を保持。BCL診断libraryのbuildは成功したが、実Driver semantic compileと同一取消testのGreenはローカルproto不足で未確認。実行test0件。親の非main commit/push後exact-SHA PR CIで、同じ取消testと既存620/固定67の結果を回収する。build制約をGreenへ数えず、元のruntime Redと旧成功履歴は保持。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -292,6 +324,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 ### 取消の先行テスト準備（4ケースGreen後）
 
 03A完了前の残件をremaining-03A.jsonに仕様根拠付きで列挙。取消終端、単一Run排他、再開/旧epoch/遅いcallback拒否、subscriber重複抑制と毎packet診断の分離、owner欠落not-ready/freshness非延命、実11003 UDP transport/options/lifecycleが必要。fake受信seamだけを実UDP完了にしない。03CのProgram/DI/HTTPや後続DCP配置・Issue82実機受入とは分ける。既存testの期待値緩和/skip化なし、03B/C・外部/依存/設定・環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更なし。全process終端、未回収exit/保留approvalなし。
+
+### 取消testの同SHA runtime Red収集
+
+取消の無効化/再開epoch/同時Run排他等を完成したとはしない。既存test期待値緩和/skip化なし、03B/C・外部/依存/設定/環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更/再実行なし。全file一覧`/tmp/issue81-referee-receive-cancel-red-ci-20261022/evidence-files-manifest.json`（55file、SHA256 `6078e873cbb529e612e8238fb7ce29f6828c7c8126001ff723c6c43aa156d518`）に生log/TRX/zip/source archiveを含む。親の保存時はgitignore対象のraw logも省略しない。全list/watch/view/log/download/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 取消後準備解除の最小Green候補
+
+未Redのsubscriber/再起動手順/並行Run排他/実transportは今回実装していない。追加EndEpochの旧世代・反復終了等を含む広い生命周期検証も今回実行したとは主張しない。03A残件、03B/C、外部G1/G3、実機受入は未完了。期待値緩和/skip変更、外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `55489db007859284f8a06bccb27aca9f3d287e34b227b5ce600d0749fefe1070`（24file）に生logを含む。全build/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
 
 ## 親による公開準備記録
 

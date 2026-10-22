@@ -23,37 +23,44 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
     }
 
-    /// <summary>同じcounterも正常件数へ数え、不正入力は失敗として記録して受信を続ける。</summary>
+    /// <summary>正常受信と不正入力を同じpumpで記録し、終端時に当該世代の準備を解除する。</summary>
     internal async Task RunAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var epoch = diagnostics.BeginEpoch(InputId);
-        while (true)
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var datagram = await receiver.ReceiveAsync(
-                () => diagnostics.BeginReceive(epoch),
-                cancellationToken);
-            global::Referee packet;
-            try
+            while (true)
             {
-                packet = decode(datagram.Payload);
+                cancellationToken.ThrowIfCancellationRequested();
+                var datagram = await receiver.ReceiveAsync(
+                    () => diagnostics.BeginReceive(epoch),
+                    cancellationToken);
+                global::Referee packet;
+                try
+                {
+                    packet = decode(datagram.Payload);
+                }
+                catch (Google.Protobuf.InvalidProtocolBufferException)
+                {
+                    diagnostics.RecordFailure(datagram.ReceiveAttempt);
+                    continue;
+                }
+                if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
+                {
+                    diagnostics.RecordFailure(datagram.ReceiveAttempt);
+                    continue;
+                }
+                var endpoint = datagram.RemoteEndpoint.ToString();
+                diagnostics.RecordSuccess(
+                    datagram.ReceiveAttempt,
+                    sourceKey: endpoint,
+                    remoteEndpoint: endpoint);
             }
-            catch (Google.Protobuf.InvalidProtocolBufferException)
-            {
-                diagnostics.RecordFailure(datagram.ReceiveAttempt);
-                continue;
-            }
-            if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
-            {
-                diagnostics.RecordFailure(datagram.ReceiveAttempt);
-                continue;
-            }
-            var endpoint = datagram.RemoteEndpoint.ToString();
-            diagnostics.RecordSuccess(
-                datagram.ReceiveAttempt,
-                sourceKey: endpoint,
-                remoteEndpoint: endpoint);
+        }
+        finally
+        {
+            diagnostics.EndEpoch(epoch);
         }
     }
 

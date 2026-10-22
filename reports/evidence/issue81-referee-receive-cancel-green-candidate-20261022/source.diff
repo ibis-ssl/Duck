@@ -1,0 +1,124 @@
+diff --git a/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs b/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs
+index 5d9bf85..da451b1 100644
+--- a/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs
++++ b/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs
+@@ -34,7 +34,8 @@ public sealed class ServiceReceiveDiagnostics(
+         {
+             if (!inputs.TryGetValue(inputId, out var input))
+                 inputs.Add(inputId, input = new Input(inputId));
+-            input.Epoch = new ReceiveEpoch(inputId, checked(++input.EpochNumber));
++            var epoch = new ReceiveEpoch(inputId, checked(++input.EpochNumber));
++            input.Epoch = epoch;
+             foreach (var source in input.Sources.Values)
+             {
+                 source.Stamp = null;
+@@ -42,7 +43,26 @@ public sealed class ServiceReceiveDiagnostics(
+                 source.Status = DiagnosticDecodeStatus.Unknown;
+                 source.Readiness = CreateReadiness(inputId, source.Key);
+             }
+-            return input.Epoch;
++            return epoch;
++        }
++    }
++
++    /// <summary>一致する受信世代を終了し、累積件数と最終受信UTCを保ったまま準備を解除する。</summary>
++    public bool EndEpoch(ReceiveEpoch epoch)
++    {
++        ArgumentNullException.ThrowIfNull(epoch);
++        lock (gate)
++        {
++            if (!inputs.TryGetValue(epoch.InputId, out var input) || !ReferenceEquals(input.Epoch, epoch))
++                return false;
++            input.Epoch = null;
++            foreach (var source in input.Sources.Values)
++            {
++                source.Stamp = null;
++                source.Status = DiagnosticDecodeStatus.Unknown;
++                source.Readiness = CreateReadiness(input.Id, source.Key);
++            }
++            return true;
+         }
+     }
+ 
+@@ -194,7 +214,7 @@ public sealed class ServiceReceiveDiagnostics(
+     private sealed class Input(string id)
+     {
+         public string Id { get; } = id;
+-        public ReceiveEpoch Epoch { get; set; } = null!;
++        public ReceiveEpoch? Epoch { get; set; }
+         public long ErrorCount { get; set; }
+         public long EpochNumber { get; set; }
+         public Dictionary<string, Source> Sources { get; } = new(StringComparer.Ordinal);
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+index d49144a..4b4f37d 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+@@ -23,37 +23,44 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
+     }
+ 
+-    /// <summary>同じcounterも正常件数へ数え、不正入力は失敗として記録して受信を続ける。</summary>
++    /// <summary>正常受信と不正入力を同じpumpで記録し、終端時に当該世代の準備を解除する。</summary>
+     internal async Task RunAsync(CancellationToken cancellationToken)
+     {
+         cancellationToken.ThrowIfCancellationRequested();
+         var epoch = diagnostics.BeginEpoch(InputId);
+-        while (true)
++        try
+         {
+-            cancellationToken.ThrowIfCancellationRequested();
+-            var datagram = await receiver.ReceiveAsync(
+-                () => diagnostics.BeginReceive(epoch),
+-                cancellationToken);
+-            global::Referee packet;
+-            try
++            while (true)
+             {
+-                packet = decode(datagram.Payload);
++                cancellationToken.ThrowIfCancellationRequested();
++                var datagram = await receiver.ReceiveAsync(
++                    () => diagnostics.BeginReceive(epoch),
++                    cancellationToken);
++                global::Referee packet;
++                try
++                {
++                    packet = decode(datagram.Payload);
++                }
++                catch (Google.Protobuf.InvalidProtocolBufferException)
++                {
++                    diagnostics.RecordFailure(datagram.ReceiveAttempt);
++                    continue;
++                }
++                if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
++                {
++                    diagnostics.RecordFailure(datagram.ReceiveAttempt);
++                    continue;
++                }
++                var endpoint = datagram.RemoteEndpoint.ToString();
++                diagnostics.RecordSuccess(
++                    datagram.ReceiveAttempt,
++                    sourceKey: endpoint,
++                    remoteEndpoint: endpoint);
+             }
+-            catch (Google.Protobuf.InvalidProtocolBufferException)
+-            {
+-                diagnostics.RecordFailure(datagram.ReceiveAttempt);
+-                continue;
+-            }
+-            if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
+-            {
+-                diagnostics.RecordFailure(datagram.ReceiveAttempt);
+-                continue;
+-            }
+-            var endpoint = datagram.RemoteEndpoint.ToString();
+-            diagnostics.RecordSuccess(
+-                datagram.ReceiveAttempt,
+-                sourceKey: endpoint,
+-                remoteEndpoint: endpoint);
++        }
++        finally
++        {
++            diagnostics.EndEpoch(epoch);
+         }
+     }
+ 
