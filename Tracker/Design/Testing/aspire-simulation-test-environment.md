@@ -16,46 +16,66 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 AppHost の一回の実行で必要な資源を選択して起動する。基礎資源は simulator、Game Controller、crane、必要に応じた cm4-sim、および Duck の `Tracker.RuntimeHost`。試合制御用 RefereeDriver、比較用追跡器、比較表示用 DebugHost は試験に応じて加える。固定イメージ版を使い、受入時にイメージのハッシュ値と対応するコンテナ ID を記録する。
 
+比較モードは任意選択とし、選択時は同じ AppHost 実行に加え、提案中の Aspire/DCP/Docker Desktop 管理対象として扱う。これは移行後の構成目標であり、実装や受入の証拠ではない。資源の役割と比較契約は[トラッカー比較デバッグ設計](tracker-comparison-debug-design.md)を参照する。
+
+| 資源 | 役割とデータ |
+| --- | --- |
+| `simulator` | SSL-Vision マルチキャスト `224.5.23.2:10020` の送信者。別の SSL-Vision プロセスは起動しない。 |
+| `duck` | ホスト上の `Tracker.RuntimeHost` をプロジェクト資源として起動する。SSL-Vision を受信し、Duck の追跡結果を含む公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
+| `tracker-tigers` | 比較時だけ使う Sumatra の追跡機能コンテナ。SSL-Vision `224.5.23.2:10020` と Game Controller の審判情報 `224.5.23.1:11003` を受信し、追跡結果を含む公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。比較起動では TIGERs AI を起動しない。 |
+| `tracker-erforce` | 比較時だけ使う ER-Force AutoRef の追跡機能コンテナ。同じ SSL-Vision と審判情報を受信し、追跡結果を含む公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
+| `debug-host` | ホスト上の `Tracker.DebugHost` をプロジェクト資源として起動する。自身の追跡機能を無効にし、SSL-Vision と `224.5.23.2:11010` の Duck / TIGERs / ER-Force の公式形式 `TrackerWrapperPacket` を受信して比較する。 |
+
+Duck と DebugHost はホスト上の `ProjectResource` であり、専用ブリッジネットワーク内のコンテナではない。ホスト上の `ProjectResource` とブリッジ上のコンテナ間でマルチキャストを送受信できるかは未検証で、図の経路を実通信の成立とみなさない。Crane はロボット制御資源であり、追跡資源ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 の範囲で、本比較モードは起動しない。
+
 ## 配置案
 
 図中の破線矢印は提案経路を示し、未実装・未検証である。矢印は実行済みの通信成功を意味しない。専用ブリッジネットワークにはこの AppHost が所有する資源だけを接続する。
 
 ```mermaid
 flowchart LR
-  subgraph win[Windows]
-    app[Windows AppHost]
-    dcp[DCP]
-    app -. 起動制御 .-> dcp
+ subgraph win[Windows / AppHost]
+  app[Windows AppHost]
+  dcp[DCP]
+  subgraph projects[ホスト上の ProjectResource]
+   duck[duck / Tracker.RuntimeHost]
+   debug[debug-host / Tracker.DebugHost 監視役]
   end
-  subgraph desktop[Docker Desktop]
-    engine[Docker Engine]
-    subgraph bridge[専用ブリッジネットワーク]
-      duck[Duck]
-      sim[simulator]
-      gc[Game Controller]
-      crane[Crane]
-      cm4[cm4-sim]
-      ref[referee-driver]
-      compare[任意の比較受信側]
-    end
-    foreign[他所有者のコンテナ / 保護対象]
+  app -. 起動制御 .-> dcp
+  app -. ProjectResource 起動 .-> duck
+  app -. ProjectResource 起動 .-> debug
+ end
+ subgraph desktop[Docker Desktop]
+  engine[Docker Engine]
+  subgraph bridge[専用ブリッジネットワーク / コンテナ]
+   sim[simulator]
+   gc[game-controller]
+   crane[crane]
+   cm4[cm4-sim]
+   ref[referee-driver]
+   subgraph optional[比較モード選択時のみ]
+    tigers[tracker-tigers / Sumatra tracker]
+    erforce[tracker-erforce / ER-Force AutoRef tracker]
+   end
   end
-  dcp -. DCP による資源管理 .-> engine
-  engine -. 選択された資源 .-> duck
-  engine -. 選択された資源 .-> sim
-  engine -. 選択された資源 .-> gc
-  engine -. 選択された資源 .-> crane
-  engine -. 選択された資源 .-> cm4
-  engine -. 選択された資源 .-> ref
-  engine -. 選択された資源 .-> compare
-  legend[破線矢印: 提案経路 / 未実装 / 未検証]
+  foreign[他所有者のコンテナ / 保護対象]
+ end
+ dcp -. DCP による資源管理 .-> engine
+ engine -. 選択されたコンテナ資源 .-> sim
+ engine -. 選択されたコンテナ資源 .-> gc
+ engine -. 選択されたコンテナ資源 .-> crane
+ engine -. 選択されたコンテナ資源 .-> cm4
+ engine -. 選択されたコンテナ資源 .-> ref
+ engine -. 比較モードで選択された資源 .-> tigers
+ engine -. 比較モードで選択された資源 .-> erforce
+ legend[破線: 提案する資源管理 / 起動経路。未実装・未検証]
 ```
 
 DCP の管理対象はこの実行で登録した資源に限る。異なる所有者の既存コンテナは保護する。ユーザーが管理する Ubuntu 上の別の Docker Engine を製品実行に使う構成や、ホストのネットワーク設定変更は前提にしない。
 
 ## 通信要件と未解決の接続先
 
-UDP とマルチキャストは専用ブリッジネットワーク内だけで使い、UDP ポートを Windows ホストへ公開しない。コンテナ IP は固定せず、資源名で通信する。表は既存の通信規約／設定で報告されているポート契約であり、新しいネットワークでの到達性は未検証である。
+コンテナ間の UDP とマルチキャストは専用ブリッジネットワーク内で使い、UDP ポートを Windows ホストへ公開しない。コンテナ IP は固定せず、資源名で通信する。表は既存の通信規約／設定で報告されているポート契約であり、新しいネットワークでの到達性は未検証である。ホスト上のプロセス資源とコンテナ間のマルチキャスト経路も未検証である。
 
 | 用途 | 既存契約 |
 | --- | --- |
@@ -72,32 +92,43 @@ UDP とマルチキャストは専用ブリッジネットワーク内だけで�
 
 ```mermaid
 flowchart LR
+ subgraph host[Windows ホスト / ProjectResource]
+  duck[Duck / Tracker.RuntimeHost]
+  debug[DebugHost 監視役 / Tracker.DebugHost]
+ end
+ subgraph desktop[Docker Desktop / 専用ブリッジネットワーク]
   simulator[simulator / SSL-Vision パケット送信者]
-  gameController[Game Controller / 審判マルチキャスト送信者]
-  refereeReceiver[審判情報受信先 / 資源と所有者は未確定]
-  duck[Duck 受信側]
-  tracker[Tracker 受信側]
-  compare[任意の比較受信側]
-  crane[Crane]
+  gameController[Game Controller / 審判情報の唯一の送信者]
+  tigers[tracker-tigers / Sumatra 追跡機能のみ]
+  erforce[tracker-erforce / ER-Force AutoRef tracker]
+  crane[Crane / ロボット制御]
   cm4[cm4-sim]
-  refereeDriver[RefereeDriver / 制御 API クライアント]
-  api[Game Controller 制御 API]
-  issue[未解決: 数値 IP / localhost / 名前解決の契約]
-  simulator -. SSL-Vision マルチキャスト .-> duck
-  simulator -. 同じパケット .-> compare
-  simulator -. UDP マルチキャスト .-> tracker
-  gameController -. 審判マルチキャスト .-> refereeReceiver
-  refereeDriver -. API 制御 .-> api
-  api -. API 応答と状態確認 .-> refereeDriver
-  crane -. UDP ユニキャスト .-> cm4
-  cm4 -. UDP ユニキャスト .-> simulator
-  simulator -. UDP 応答 .-> cm4
-  cm4 -. UDP 応答 .-> crane
-  crane ---|未解決事項の注記| issue
-  cm4 ---|未解決事項の注記| issue
-  simulator ---|未解決事項の注記| issue
-  legendComm[破線: 提案する通信経路（未実装・未検証）]
-  legendNote[実線の注記線: 未解決事項の説明（実通信ではない）]
+  refereeReceiver[その他の審判情報受信先 / 所有者未確定]
+ end
+ refereeDriver[RefereeDriver / Game Controller API クライアント]
+ api[Game Controller 制御 API]
+ issue[未解決: 数値 IP / localhost / 名前解決の契約]
+ simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> duck
+ simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> debug
+ simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> tigers
+ simulator -. SSL-Vision 224.5.23.2:10020 / UDP .-> erforce
+ duck -. Duck 追跡パケット 224.5.23.2:11010 / UDP .-> debug
+ tigers -. TIGERs 追跡パケット 224.5.23.2:11010 / UDP .-> debug
+ erforce -. ER-Force 追跡パケット 224.5.23.2:11010 / UDP .-> debug
+ gameController -. 審判情報 224.5.23.1:11003 / 受信側 .-> tigers
+ gameController -. 審判情報 224.5.23.1:11003 / 受信側 .-> erforce
+ gameController -. 審判マルチキャスト .-> refereeReceiver
+ refereeDriver -. API 制御 .-> api
+ api -. API 応答と状態確認 .-> refereeDriver
+ crane -. UDP ユニキャスト .-> cm4
+ cm4 -. UDP ユニキャスト .-> simulator
+ simulator -. UDP 応答 .-> cm4
+ cm4 -. UDP 応答 .-> crane
+ crane ---|未解決事項の注記| issue
+ cm4 ---|未解決事項の注記| issue
+ simulator ---|未解決事項の注記| issue
+ legendComm[破線: 提案通信。ホスト ProjectResource とブリッジ間のマルチキャストは未検証]
+ legendNote[実線の注記線: 未解決事項の説明（実通信ではない）]
 ```
 
 外部実装との接続には名前解決上の阻害要因がある。Crane は `127.0.0.1` と数値 IP を使う。orion-cm4-sim は `inet_addr` を使い、応答先を `127.0.0.1` に固定する。simulator の応答先も数値 `QHostAddress` を要求する。起動時に名前を一度だけ IP に変換する方法では、コンテナ再作成後の IP 変更に追従できない。外部契約の修正または安定した接続先が必要であり、本案では解決済みとみなさない。記述は既存資料からの報告で、今回再検証していない。
@@ -106,7 +137,7 @@ Windows から利用する画面や API 用のポートを公開するかは別�
 
 ## 準備完了、依存、停止
 
-プロセス開始を通信準備完了とみなさない。Duck 自身が有効な新しい視覚検出データを含むパケットを受信・復号したことを確認し、比較受信側がある場合は同じ新しいパケットを受けた証拠も記録する。RefereeDriver は Game Controller の制御 API と `HALT` から `running` への状態遷移を確認する。HTTP `GET` の応答や起動通知だけでは準備完了としない。simulator の起動を Duck の受信に依存させず、循環依存を作らない。Aspire の `WaitFor` は起動依存を表し、障害後の自動再起動は保証しない。プロジェクトが固定するのは `Aspire.AppHost.Sdk` 13.5.4 である。過去に確認された DCP 0.25.13 は当時の実行時観測に限る。現在の Windows 上の DCP 実行時と版の挙動は未検証である。
+プロセス開始を通信準備完了とみなさない。Duck 自身が有効な新しい視覚検出データを含むパケットを受信・復号したことを確認し、比較モードでは DebugHost の監視役が同じ入力を受け、Duck / TIGERs / ER-Force の追跡パケットを各送信元から受信した証拠も記録する。ホスト上の `ProjectResource` とコンテナネットワーク間の到達性が未確認なら、比較モードは準備完了としない。RefereeDriver は Game Controller の制御 API と `HALT` から `running` への状態遷移を確認する。HTTP `GET` の応答や起動通知だけでは準備完了としない。simulator の起動を Duck の受信に依存させず、循環依存を作らない。Aspire の `WaitFor` は起動依存を表し、障害後の自動再起動は保証しない。プロジェクトが固定するのは `Aspire.AppHost.Sdk` 13.5.4 である。過去に確認された DCP 0.25.13 は当時の実行時観測に限る。現在の Windows 上の DCP 実行時と版の挙動は未検証である。
 
 起動、通信準備完了、停止の図も提案であり未検証である。プロセス起動と通信準備完了は別の状態として扱う。Game Controller の状態確認結果を AppHost が受け取る証跡連携方式は未確定であり、図の連携線は提案である。
 
