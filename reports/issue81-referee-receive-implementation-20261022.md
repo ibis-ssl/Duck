@@ -81,6 +81,14 @@ HEAD `be8bd84519bb04ac1aba858ed46268b64c0e56d0`、PR84、開始時worktree clean
 
 親tdd-executorがexactbe8bd845 CI39789901203の取消後ready残留を有効Redに採用した後、同じ担当/既存Skillsで最小実装。2sourceの既存SDK宣言抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit0・警告0・エラー0。同じ引数のDriver project buildはexit1、既存生成Referee不足のCS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exit/source差分は `/tmp/issue81-referee-receive-cancel-green-candidate-20261022/` に保存。今回test実行/CI操作なし。
 
+### 取消後準備解除のGreen CI収集
+
+HEAD cc771ba36de6045148f720d398fdef6fe2b8805d、開始時worktree clean。既存Skills/remote_ci_only継続のCI収集のみ。`run list --commit <同SHA> --event pull_request`、`run watch 39791056335 --repo ibis-ssl/Duck --exit-status --interval 5`、`run view --json`、test job119866873891の`--log`、artifacts GETは全exit0。正確な引数/exit/raw logは証拠dircommands-summary.json等へ保存。test step successとworkflowの終了値伝播を確認、成功runのdotnet生exitcode artifactは未取得。
+
+### 単一Runの先行テスト準備（取消Green後）
+
+親継続指示で単一Runの1先行testだけを追加。expectations.jsonをsource保存前に固定。既存SDK宣言抽出の正確な引数はsyntax.command.json、exit0（semantic compileではない）。新build/test/CIは未実行でfunctional Red pending。`git diff --check` exit0、未追跡testの`git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs` はexit1・stdout/stderr空（新fileとの差分、空白指摘なし）。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -141,6 +149,14 @@ HEAD `be8bd84519bb04ac1aba858ed46268b64c0e56d0`、PR84、開始時worktree clean
 ### 取消後準備解除の最小Green候補
 
 製品変更は`Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs` SHA256 `d908ba59f7d0895f9cb6536cd2db803b6e5b214c13637a1cdc986fd50bee6920` と`Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs` SHA256 `86aa44082a0945ddeac957e8fa8a1ee823223b7e6afc82c11ca132b7e8ab1223` の2file。取消test `76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f`、既存positive/不正4case/csprojはHEAD byte不変。固定v1の11file/v2の9fileとrepo対応sourceも元hash不変。既存report子5欄へ追記し親prefix/Dispatch/履歴・親tasks/phases/evidence差分を保持。
+
+### 取消後準備解除のGreen CI収集
+
+今回製品/test変更なし。取消候補2source/取消test/既存positive/不正4case/csprojの全6fileがcandidate/HEAD/currentで一致。固定v1の11file/v2の9file・repo対応sourceも元hash不変、Redbe8bd845→当HEADのTracker.Tests差分は空。証拠dir `/tmp/issue81-referee-receive-cancel-green-ci-20261022/` のhead-source-manifest.jsonへ保持。成功runのsource archiveは未取得。
+
+### 単一Runの先行テスト準備（取消Green後）
+
+新規`Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs`、1 Factのみ。SHA256 `1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71`。製品/scaffold追加なし。既存6case/固定67と製品2source/csprojはbyte/hash不変。証拠dir `/tmp/issue81-referee-receive-single-run-red-preparation-20261022/` にexpectations.json / source-manifest.json / remaining-03A.json / syntax/checkの生log/exit / evidence-files-manifest.jsonを保存。
 
 ## 指摘事項
 
@@ -213,6 +229,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 
 既存Diagnosticsには終了APIがなく、取消をdecode失敗件数へ混ぜず、世代を余分に増やさずに準備解除するため`EndEpoch(ReceiveEpoch)`を追加。lock内で現在epochの参照一致を確認し、active epochを終了、各sourceのstamp/status/readinessを無効化する。正常件数/失敗件数/最終受信UTCは保持する。既存public signatureは変更せず追加APIだけ、private epochをnullableへ変更しBeginEpochは生成した同じepochを返す。Runの`finally`から当該epochを終了し、取消/想定外例外は捕捉して成功へ変換しない。epoch照合は古い終端による他世代への副作用を防ぐ必要境界であり、再開/並行Run全体を完成したものではない。関数/XML説明は日本語。
 
+### 取消後準備解除のGreen CI収集
+
+直接証拠は標準621件の全成功。artifacts API total_count=0、個別TRX/成功test名は未取得。取消1件・既存5case・固定67のGreenは同一test byte/標準target/Red時621件構成と今回621集計成功の対応から確認し、今回個別Passed行を読戻したとはしない。成功時artifact非保存という既存workflow条件の限界を保持する。
+
+### 単一Runの先行テスト準備（取消Green後）
+
+scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止に対応。実parserと隔離receiverで第一Runの正常2packet/count2/ready/第三受信待機を確認後、同じserviceの第二Runを呼ぶ。同期拒否の例外型やTask参照同一性を固定しない。両tokenを取消し、返された全Taskの終端を有界に待って例外も回収する。第一Runがfaultしていないことと、receiver最大同時受信数が1であること（44行）をassertする。現実装で最大2が候補だが未実行なので断定しない。timeout/compile-errorを単一pump契約のRedにしない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -277,6 +301,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 
 取消後not-readyの最小Green候補を保存。source-results-manifest.json SHA256 `e69978f44d776b6ba3ff18a7ef4d968db835687dafca6b11c0bbce6140d9b9e3` に採用Red/source before-after/不変test/検査結果を保持。BCL診断libraryのbuildは成功したが、実Driver semantic compileと同一取消testのGreenはローカルproto不足で未確認。実行test0件。親の非main commit/push後exact-SHA PR CIで、同じ取消testと既存620/固定67の結果を回収する。build制約をGreenへ数えず、元のruntime Redと旧成功履歴は保持。
 
+### 取消後準備解除のGreen CI収集
+
+`https://github.com/ibis-ssl/Duck/actions/runs/39791056335`、exactcc771ba36de6045148f720d398fdef6fe2b8805d / pull_request / completed / success。test job119866873891ログで621/621成功・0失敗・0skip。packet/fullstack jobsはSkipped。RedはCI39789901203 exactbe8bd845の取消後IsReady true（line42）。同じtest byteで終端準備解除の最小Greenを標準集計で確認。ci-evidence.json SHA256 `c831020c297a577e67e6767f02f653e7ac7487121cbf9c99fcd0697498dfe88d`。
+
+### 単一Runの先行テスト準備（取消Green後）
+
+単一Runの先行test候補保存済み。syntax exit0、実行0件、semantic compile未確認、CI Red待ち。expectations SHA256 `10a3b74b6eaecc58227452a4a69342fc314fa8edeb61038017dfcfa1eeb6896d`、source-manifest SHA256 `67652d6526e5e14710647c49b47b40fe1a6d4c04fee789eed0d3ebd5cb9290b0`。親の非main commit/push後exact-SHA PR CIで実assertionと全体回帰を確認し、有効Red採用後だけ最小behaviorを実装する。621集計Greenは前節へ保存済みで、この新1件へ転記しない。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -332,6 +364,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 ### 取消後準備解除の最小Green候補
 
 未Redのsubscriber/再起動手順/並行Run排他/実transportは今回実装していない。追加EndEpochの旧世代・反復終了等を含む広い生命周期検証も今回実行したとは主張しない。03A残件、03B/C、外部G1/G3、実機受入は未完了。期待値緩和/skip変更、外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `55489db007859284f8a06bccb27aca9f3d287e34b227b5ce600d0749fefe1070`（24file）に生logを含む。全build/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 取消後準備解除のGreen CI収集
+
+個別TRX未取得を保持。03A全体完了や実機受入は主張しない。次の最小案は重なるRun呼出しでもactive Receiveが2本にならないことの先行test。二重Run拒否/同じTask再利用のどちらかへ例外型/戻り値を過剰固定せず、両taskを取消して終端回収し、隔離receiverの最大同時受信数を検証する。全file一覧evidence-files-manifest.json SHA256 `755bb1c3d099cd56bea5ced52f5424af6ae06bf89c391bd70af22648e9e273d7`（25file）。今回CI収集の全process終端・exit回収済み。commit/push/GitHub変更・次behavior・外部/環境/依存変更なし。
+
+### 単一Runの先行テスト準備（取消Green後）
+
+単一Run testは準備段階で未完了。再開/旧epoch/遅延callback、subscriber重複抑制と診断分離、owner欠落/source帰属/freshness、実11003 UDP transport/options/lifecycleはremaining-03A.jsonの残件。03B/C・DCP配置・実機受入へ広げない。既存期待値緩和/skip化なし、製品behavior・外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `0101c3e560594097af771b3634a2984785b12fbcb5dc3627e2052f1f37abf5c2`（17file）。全process終端、未回収exit/保留approval/実行中processなし。
 
 ## 親による公開準備記録
 
