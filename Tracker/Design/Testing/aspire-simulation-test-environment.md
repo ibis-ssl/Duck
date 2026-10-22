@@ -10,7 +10,7 @@ Windows 上の AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い�
 
 DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost が起動する資源とその関係を定義し、DCP が資源の起動、監視、停止、後始末を管理し、Docker Engine がコンテナを実行する。DCP は資源の起動管理を担い、ネットワーク通信の方式とは役割が異なる。通常の利用者が DCP を直接操作する必要はない。詳しくは [DCP の公式リポジトリ](https://github.com/microsoft/dcp) と [AppHost の構成資料](https://learn.microsoft.com/en-us/dotnet/aspire/app-host/configuration) を参照する。
 
-これは提案であり現行実装とは区別する。現在の `Testing/Duck.Testing.AppHost` は `duck` を `Tracker.RuntimeHost` の `ProjectResource` とし、`simulator`、`game-controller`、`crane`、必要な `cm4-sim` を Docker コマンドライン起動管理プログラムを介した `ExecutableResource` として扱う。旧 `AddContainer` と `--network host` の競合はその実装履歴であり、標準 `AddContainer` と専用ブリッジネットワークの試験結果ではない。
+これは提案であり現行実装とは区別する。現在の `Testing/Duck.Testing.AppHost` は `duck` を `Tracker.RuntimeHost` の `ProjectResource` とし、`simulator`、`game-controller`、`crane`、必要な `cm4-sim` を Docker コマンドライン起動管理プログラムを介した `ExecutableResource` として扱う。旧 `AddContainer` では、DCP が割り当てた利用者定義ネットワークと `--network host` を同時に Docker へ渡したため、Docker は `cannot attach both user-defined and non-user-defined network-modes` としてコンテナ作成を拒否した。この競合を解消する設計案では、標準 `AddContainer` に明示的な `--network host` を渡さず、Aspire/DCP が管理する実行ネットワークを使う必要がある。これは提案する修正方針であり、標準 `AddContainer` と専用ブリッジネットワークの実装・試験・受入が済んだことを示さない。
 
 ## 対象資源
 
