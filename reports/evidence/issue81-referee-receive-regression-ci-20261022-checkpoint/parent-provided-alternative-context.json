@@ -1,0 +1,20 @@
+{
+  "authority": "parent relayed upper root read-only findings; not independently verified in this unit",
+  "applied": false,
+  "authorization": "No external repo edits or layout switch authorized",
+  "provided_findings": [
+    "fixed Crane ibis_sender_node.cpp nearL123 target_address/target_port",
+    "fixed Orion_CM4 cm4_sim.cpp --out-addr/--in-port/--feedback-port-base",
+    "fixed framework simulator.cpp nearL1227 --ibis-feedback-addr",
+    "CM4 feedback bind fixed127.0.0.1"
+  ],
+  "alternative": "Separate containers sharing a network namespace via --network container:<name|id>; retain loopback assumptions; publication handled by sharing source",
+  "provided_official_url": "https://docs.docker.com/engine/network/#container-networks",
+  "aspire": "WithContainerRuntimeArgs exists in13.5.4 per parent findings",
+  "unverified": [
+    "DCP automatic-network compatibility",
+    "recreation following",
+    "port conflict"
+  ],
+  "disposition": "External source modification is not established mandatory; current-path gaps with alternatives under investigation."
+}

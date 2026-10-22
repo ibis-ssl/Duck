@@ -117,3 +117,24 @@ Parent-owned. task_kind=investigation_and_implementation_planning; work_class=ju
 - Driverの11003観測はDriver自身の正常復号であり、GC producerの所有認証や他trackerの受信証明ではない。UDP endpoint・container環境変数・HTTP自己申告をDCP所有証明にしない。
 - 提案URI再接続はDuck内実装で先行できるが、再作成後のDocker DNS/実WebSocket/Windows経路は未検証。旧AppHost monitor除去やbridge配線を先行しない。
 - 書込みは本report子5欄と/tmpの読取証拠だけ。製品/tests/設計/tasks/phases・環境/auth/network/依存変更・実サービス起動・CI待機/操作・commit/push・新branch/PR/Issue/merge/closeなし。全読取/保存processは終端、GET終了値全回収。保留approval・未回収結果・実行中processなし。
+## 親による外部変更前提の訂正（2026-10-22）
+
+上位親の直接読取調査とユーザーの非破壊方針を受領した記録。ここで新たな外部調査・配置変更は行っていない。外部3リポジトリは未変更・変更未承認であり、外部ソース変更ゼロの選択肢を先に評価する。「宛先指定機能を追加するため外部3repo改変が必須」という説明は不正確で、従前の不足説明をそのような確定結論へ使わない。
+
+- [crane 4063cd31 の ibis_sender_node.cpp](https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_sender/src/ibis_sender_node.cpp#L123-L149): 既存 target_address / target_port があり、起動時に数値IPを読む。
+- [Orion_CM4 d7a2e07 の cm4_sim.cpp](https://github.com/ibis-ssl/Orion_CM4/blob/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a/cm4/bridge/cm4_sim.cpp#L541): 既存 --out-addr / --in-port / --feedback-port-base がある一方、feedback受信bindは127.0.0.1固定。
+- [framework a52b6bd の simulator.cpp](https://github.com/ibis-ssl/framework/blob/a52b6bdecd97a277544dd6f275afbf4483781e12/src/simulator/simulator.cpp#L1227): 既存 --ibis-feedback-addr（1227/1321行）が数値アドレスの送信先指定に使える。
+
+第一評価候補は、crane / cm4-sim / simulatorを別コンテナのまま同じnetwork namespaceへ置き、loopback前提を保つ方式。[Docker公式 container networks](https://docs.docker.com/engine/network/#container-networks) の --network container:<name|id> が根拠。同じbridgeだけの場合とは異なり、loopbackとポート空間も共有する。共有先は --publish / --hostname / --dns 等が非対応で、公開ポートは共有元へ集約する必要がある。相互通信先をloopbackのままにできれば、各製品への相手IP再解決の追加は不要にできる余地があるが、全体要件適合は未確認。
+
+未検証: ポート競合、multicast送受信IFと他containerへの経路、共有元再作成時の参加container再作成/停止順、DCP自動network指定との競合、所有者/stack限定cleanup、診断帰属。独立再起動の制約変化を明示し、Windows localhost UI到達と既存security境界を保つ。安定共有元containerは候補に過ぎず、未採用・未作成。Aspire v13.5.4 ContainerResourceBuilderExtensions.csのWithContainerRuntimeArgs存在は上位親が直接確認したが、API存在とDCP共存の実証は別である。
+
+外部サービス自身の復号成功数などの診断供給は通信到達性と別契約で、namespace共有だけでG3等を解消とはしない。現在は独立して進められるDuck I81-03Aを継続し、外部ソース変更や配置切替は開始しない。必要な設計比較は既存の設計/タスク範囲で後続判断する。新しい調査agentは起動していない。
+### 上位親の追加静的確認（2026-10-22、構成は未変更）
+
+1. ポート: CM4既定in_port=12345/out_addr=127.0.0.1/out_port=12346/feedback_port_base=50100と、frameworkのIBIS_DEFAULT_PORT=12345は、共有namespace内で両方Anyへbindすると競合する。simulator既存 --ibis-port 12346 でCM4送信先と合わせる余地がある。crane既存target_address=127.0.0.1/target_port=12345、position_control.config_portとCM4 --config-portも一致が必要。Duckの実際の起動値と全socketの最終割当は未確認であり、全ポート検証済みとはしない。
+2. feedback: CM4の127.0.0.1:50100+idはSO_REUSEADDR=true、既存コメントに同一ホストcrane multicast受信との同居意図がある。crane AsyncUdpReceiverはSO_REUSEADDR/SO_REUSEPORT、multicastはAny:portと全IPv4 IF membershipを使用し、CM4 relay既定IFは127.0.0.1、IP_MULTICAST_LOOP有効。この既存同居構造は候補の根拠だが、reuseだけで全受信者配送を保証しない。vision/referee/ROS DDS/複数instanceは別途確認、複数試合はnamespaceごと分離する。
+3. 再作成: [Moby v28.5.1 getNetworkedContainer](https://github.com/moby/moby/blob/v28.5.1/daemon/container_operations.go#L899-L934) は起動時にrunningな共有元を解決し、restart中も拒否する。同名共有元再作成へ既存参加者が自動追従する前提は置かない。anchor存続中のアプリ再作成とanchor再作成を分け、後者は参加者停止→新anchor確認→全参加者再作成を所有者/世代管理で行う案。停止は参加者→anchor、起動は逆、旧固定container IDを再使用しない。未採用で作成許可ではない。
+4. Aspire/DCP: [v13.5.4 ContainerCreator.cs L178-195](https://github.com/dotnet/aspire/blob/v13.5.4/src/Aspire.Hosting/Dcp/ContainerCreator.cs#L178-L195) は各Spec.NetworksへDefaultAspireContainerNetwork/aliasesを設定し、311-316行のRunArgs設定はこれを除去しない。329行はendpointからPortsも生成する。Moby同版のErrConflictSharedNetworkとDocker公式のcontainer mode制約より、通常AddContainerへWithContainerRuntimeArgsの --network container:... を足すだけの方式を検証済み解としない。DCP binaryの引数優先順位は未確認だが、Aspireモデル上で矛盾する要求を生成する点を区別する。公開入口はanchor側へ集約が必要で、Aspire作成user-defined bridgeとDocker built-in bridgeを混同しない。
+
+結論: 外部3repoの改変は必須とせず、外部ソース無変更を優先評価する一方、Duck側group lifecycle/network/ports所有の設計が必要。通常DCP AddContainerで保持できなければ既存wrapper管理との整合を検討する。内部DCPモデルの無理な書換えやhost network変更は実行しない。同一アプリcontainer内loopback UDP adapterへDNS再解決を集約する案も未設計候補であり、遅延/送信元の意味/終了管理の別コストがある。共有方式の採用・切替はしていない。外部自己復号診断は別問題のまま。上位親は静的読取だけを実施し、新agent/コンテナ起動/環境変更なし。

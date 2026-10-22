@@ -105,6 +105,14 @@ HEAD `5811bd88210c46ad89d49590d74e2d42c14af643`、開始時worktree clean。既�
 
 親採用の03A回帰単位として期待値をsource配置前にexpectations.jsonへ固定。既存/tmp再開候補をbyte同一でTracker.Testsへ配置し、owner/freshnessの2 Factを追加。既存SDK宣言抽出は新2fileでexit0、正確な引数はsyntax.command.json。新build/test/CIは未実行、次のexact-SHA PR CI待ち。`git diff --check` exit0、各未追跡testの`git diff --no-index --check -- /dev/null <file>` はexit1・stdout/stderr空（新fileとの差分、空白指摘なし）。
 
+### 回帰CIの待機checkpoint・購読/tmp候補
+
+CI39795794024 exactba2ba820のwatch1件を継続。14:34:32 UTCのviewはexit0、run/test queued・step未開始。watch exit未回収、重複watch/rerunなし。/tmp購読候補の既存SDK宣言抽出exit0、semantic compile/test未実行。
+
+### 回帰job集計・購読test配置（run終端と分離）
+
+旧run全体未終端で`gh run view --log`はexit1。公式job REST GET初回もgh端末escape出力保護でexit1/stdout0。親許可で`gh api --allow-escape-sequences --method GET repos/ibis-ssl/Duck/actions/jobs/119882661137/logs`を1回、stdout=PIPEからbinary fileへ捕捉してexit0。生制御文字を端末へ出さず除去済み集計だけ解析。恒久設定変更なし。初回0byte履歴と全引数/exitを保持。exec-server切断でmanifest/reportの1scriptは作成前失敗、read-only再接続で未保存を照合して保存再開、watch重複起動なし。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -189,6 +197,14 @@ HEAD `5811bd88210c46ad89d49590d74e2d42c14af643`、開始時worktree clean。既�
 ### 再開・owner・freshness回帰の先行テスト準備
 
 新規`Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs`（1 Fact、SHA256 `ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879`）と`Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs`（2 Fact、SHA256 `4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924`）。製品/scaffold変更なし。既存7case/固定67/製品2source/csprojはHEAD byte/hash不変。証拠dir `/tmp/issue81-referee-receive-regression-preparation-20261022/` に実source copy、期待値、manifest、syntax/check生log/exit、残件一覧を保存。
+
+### 回帰CIの待機checkpoint・購読/tmp候補
+
+active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-receive-subscriber-expectations-20261022/RefereeReceiveSubscriberTests.cs のみ、SHA256 00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b。candidate-manifest/evidence-files-manifestとsource前の期待値を同dirへ保存。
+
+### 回帰job集計・購読test配置（run終端と分離）
+
+親採用で新規`Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs`を既存/tmp候補とbyte同一で配置、SHA256 `00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b`。active path構文抽出exit0/diffcheck0、新file no-index checkはexit1・出力空（差分あり/空白指摘なし）。製品/scaffold変更なし、旧CI対象9source/固定manifest不変。`/tmp/issue81-referee-receive-subscriber-red-preparation-20261022/source-manifest.json` SHA256 `ed2800c8f24040d7b7744ac541e81883fdab1541dad15d1bed056ed54932aa5d`。親scope report末尾の訂正/追加静的確認は読取り保持。
 
 ## 指摘事項
 
@@ -285,6 +301,14 @@ scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止
 
 scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開testは旧/tmp候補とbyte同一で、旧callbackのReceiveAttemptを実decoderへ渡す。owner欠落testは正常復号2件・既知age・producer endpointがあってもIdentity=null/IsReady=falseを要求し、endpointを資源所有者へ代用しない。freshness testはt0の正常2件でready、t2の反復pollで件数/最終受信UTC/ageを維持、期限ちょうどはready、1tick超でnot-ready、その後の反復pollでも延命しない。すべて隔離receiver/実parser/手動時計を使い、finallyでRunを取消・終端回収する。
 
+### 回帰CIの待機checkpoint・購読/tmp候補
+
+現在CI pendingで625総数は見込みのみ、実測/Green/Redなし。購読候補はIRefereeCommandSource経由の1subscriberに限定。同counterは診断件数を増やし購読pending、新counterで該当snapshot、最大active Receive1と受信回数をassertする。多subscriber仕様・例外型/Task同一性を追加しない。
+
+### 回帰job集計・購読test配置（run終端と分離）
+
+旧CI39795794024 exactba2ba820の完了済みtest jobの公式ログで625/625成功・0失敗・0skipを直接確認。生42342bytes SHA256 `ba9cf64fd853a637a26a028b3a6a73b270cd2462955df586affa2025d18dcf11`。run全体は14:47:46 UTC viewでin_progress、個別TRXはartifacts0で未取得。回帰3件/旧7case/固定67の対応は同一source/target/625集計から確認し、個別TRX Passed行の直接readbackとはしない。新購読testは旧runに含めない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -374,6 +398,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 
 新3 Factの回帰候補を保存・構文抽出exit0。実行0件、semantic compile未確認、Red/Green未観測。既存挙動で通る場合は回帰Greenとして受け取り、不要な人工Red/製品修正を加えない。不足が実runtime failureになった場合だけ、親のCI証拠採用後に修正する。source-manifest.json SHA256 `c7763e6e06a897f1352a1017771b3475e0b7ff07671b6e7fa790f6f7e723a7fe`、expectations.json SHA256 `dd91cc0e8b351464e9e9adc0b6ab41e277b0bd5eda94c0e32bb985dbda174691`。前節622集計Greenを新3件へ転記しない。
 
+### 回帰CIの待機checkpoint・購読/tmp候補
+
+対象9source/固定manifestは準備/HEAD/current一致。CIはqueuedのままで結果未確定。ci-pending.jsonへ時刻/状態を保存。購読sourceは/tmp候補のみでactive repo未配置、構文抽出0、実行0件。
+
+### 回帰job集計・購読test配置（run終端と分離）
+
+旧job集計は625成功、旧run全体の終端/元watch exitはまだpending（ci-evidence.json SHA256 `d8cafda44ca7c93d0e03e43077b1eeb27a4b364ee420853018f11af9cdba5a73`）。新購読test配置は完了、実compile/test0件・Red未観測。1subscriberだけをIRefereeCommandSource経由で検証し、同counterで診断count3/購読pending、新counter8でSTOP返却/count4、最大Receive1を期待する。多subscriber/例外型/Task参照同一性の未合意仕様は追加しない。次commit/pushのexact-SHA CIへ渡すtest-only候補であり、製品behavior未実装。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -453,6 +485,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 ### 再開・owner・freshness回帰の先行テスト準備
 
 03A残件はremaining-03A.jsonへ記録。購読/同counter変更待機の重複抑制、実11003 UDP transport/options/lifecycle、現在no-opのDispose/停止所有・受信資源解放の契約と回帰、必要な開始失敗/終端境界検証を残す。今回3件もCI未実行で完了扱いにしない。03B/C・DCP配置・実機受入は後続。既存期待値緩和/skip化、製品behavior・外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `9f22e889f8f74078efed0e09dcccd3933429897e447530da7e4c66b8618205c1`（23file）。全構文抽出/read/save/check process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 回帰CIの待機checkpoint・購読/tmp候補
+
+稼働は既存watch session17234だけ、watch exit未回収。他の候補生成/構文抽出/read/save processは終端。CI結果を取得するまで回帰3件の成功や失敗を断定しない。製品behavior/外部/依存/環境変更なし。
+
+### 回帰job集計・購読test配置（run終端と分離）
+
+稼働は既存watch17234のみ、exit未回収。他のGET/構文抽出/read/save/check processは終端。旧run全体完了をjob集計成功へ読み替えない。親scope末尾の外部前提訂正を保持し、外部ソース変更ゼロnamespace共有は第一評価候補だが未採用/未適用。既存args/loopback維持余地、anchor再作成責務、DCP Networks+RunArgs共存等は上位親の静的判断材料で、このunitでは適用/検証しない。外部改変必須とせず現経路不足/代替調査中を分ける。購読behavior・実UDP・Dispose等は未完了。既存期待値緩和/skip化、外部/依存/環境変更・commit/pushなし。
 
 ## 親による公開準備記録
 
