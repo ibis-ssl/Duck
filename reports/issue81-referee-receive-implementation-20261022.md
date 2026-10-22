@@ -53,6 +53,16 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 
 次の03A先行テスト準備（不正入力）: 既存SDK `dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll` へ evidence dirのsyntax-input.json / syntax-result.jsonを渡しexit0。完全な引数はsyntax-command.jsonへ保存。これは構文抽出でありsemantic compileではない。`git diff --check` exit0。未追跡testの `git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs` はexit1・stdout/stderr空（/dev/nullとの差分あり、空白指摘なし）。保存scriptはこの1を0と仮定したassertで一度exit1となり、検査結果を正確に区別して保存を完了した。新test build/test/CIは未実行。
 
+### 次の4ケースの同SHA CI収集（behavior実装前）
+
+- HEAD `8dfa1e03a12f2a3eb6e23bdf8dfe44423a06dbef`、PR84、開始時worktree clean。既存6Skillとremote_ci_onlyを継続し、CI収集だけ実施。Windows ghの `run list --commit <同SHA> --event pull_request` exit0でCI39787367706を同定。`run watch 39787367706 --repo ibis-ssl/Duck --exit-status --interval 5` は終端failure、exit1。
+- `run view --json headSha,event,status,conclusion,jobs,url`、test job119854012067の`--log`、`api repos/ibis-ssl/Duck/actions/runs/39787367706/artifacts`、artifact12429468437のzip GETは各exit0。正確な全引数/exitは証拠dirのcommands-summary.json、各stdout/stderr/exitも保存。
+- CIの標準`dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj` は実Referee型を含めcompile後に実行され、dotnet-test.exit-code=1。logger/TRX/diag/blame/binlog/結果dirの実コマンドをci-test-command.txtへ保存。compile-errorをRedにしたものではない。
+
+### 4ケースの最小Green候補（親のRed採用後）
+
+親がexact8dfa1e03 CI39787367706の4runtime failureを有効Redに採用した後、同じ担当/既存Skillsで最小実装。`dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll <syntax-input.json> <syntax-result.json>` の構文抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1、既存生成Referee型不足のCS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exitは `/tmp/issue81-referee-receive-failure-green-candidate-20261022/` に保存。今回test/CIは実行していない。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -86,6 +96,16 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 ### 次の03Aテスト準備（最初のGreen後）
 
 次の03A候補は新規 `Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs` のみ。SHA256 `e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116`。behavior/scaffold追加なし。製品source・既存positive・csprojはHEAD a384220とのbyte一致、固定v1の11file/v2の9fileとrepo内対応sourceも不変。親tasks/phases差分は保持。証拠dir: `/tmp/issue81-referee-receive-failure-red-preparation-20261022/`、source-manifest.json / expectations.json / 構文抽出log / check-commands.json / evidence-files-manifest.jsonを保存。
+
+### 4ケースのCI source・成果物照合
+
+- 新test SHA256 `e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116`、製品source `3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2`、既存positive `ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1`、csproj `ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c`。
+- artifact内source.tar.gzから対象4fileと固定独立source7fileを読み、全11fileをHEAD/currentのbyte/hashへ照合。source-archive-check.jsonと/tmp内ci-sourceへ保持。既存固定manifest v1の11file/v2の9fileも元hash不変。製品・test・期待値への書込みなし。
+- 証拠dir `/tmp/issue81-referee-receive-failure-red-ci-20261022/`。ZIP digest `89acf6673523b083a19618d16ceb099dfb993343d9b7bd0d4ec622c676bcfb84` はAPI digest一致。成果物はdiagnostics/binlog/stdout/stderr/exit/TRX/source archiveを含む。
+
+### 4ケースの最小Green候補（親のRed採用後）
+
+製品変更は `Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs` のみ（16 / 2 / Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs）。SHA256 `7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d`。新4case test `e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116`、既存positive `ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1`、csprojはHEAD byte不変。固定v1の11file/v2の9fileとrepo対応sourceも再照合し不変。報告は既存子5欄だけへ追記、親prefix/Dispatch/既存履歴を保持。
 
 ## 指摘事項
 
@@ -125,6 +145,22 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 
 次の先行期待値は採用scope report89行・tasks-status28行の03Aに対応。4ケースを独立fixtureで実行するTheory: malformed / unknown-command / missing-command / missing-counter。正常2packet後count2/error0/ready → 不正packet後pump継続/count2/error1/Failed/not-ready → 次の同counter正常packet後pump継続/count3/error1/Succeeded/ready。実Referee.Parserと隔離raw受信seamを用いる。受信call3/4/5のTask signalとrun終了を観測し、pump停止は明示assertで検出する（任意sleepなし）。取消は後始末であり取消契約の検証へ数えない。現実装のpump停止/意味不正packet計上は失敗候補だが、CI未実行なので実測assert位置/値は未確定。
 
+### 4ケースの実行時failure（予定ではなくTRX実測）
+
+| 入力 | 実測failure | 最初の位置 |
+| --- | --- | --- |
+| malformed | `Assert.False(run.IsCompleted)`、メッセージ「破損や意味の欠落があっても受信pumpを停止しない。」 | RefereeReceiveFailureTests.cs:39 |
+| unknown-command | `Assert.Equal` 正常件数 Expected2 / Actual3 | 同file:41 |
+| missing-command | `Assert.Equal` 正常件数 Expected2 / Actual3 | 同file:41 |
+| missing-counter | `Assert.Equal` 正常件数 Expected2 / Actual3 | 同file:41 |
+
+- 各caseは初期正常2packetのassertを通過してから失敗。破損入力はpump停止、意味不正3入力は正常件数への混入を示す実行時assertionである。型解決/未実行/timeoutの失敗ではない。
+- この失敗で後続のerror count/status/not-ready/正常入力による復帰assertは未到達。今回Redをそれらの成功や03A全体完成へ置換しない。
+
+### 4ケースの最小Green候補（親のRed採用後）
+
+decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、同じReceiveAttemptでRecordFailureを記録して同じpumpの次受信へ進む。復号できても`HasCommand`/`HasCommandCounter`が欠落、または`Enum.IsDefined(packet.Command)`が偽なら同じ失敗経路へ進める。正常packetは既存の受信stamp/endpointによるRecordSuccessのまま。共通診断の失敗無効化と次count増分による復帰を利用する。取消/OOM/想定外例外を広いcatchで正常扱いにせず伝播させる。変更関数XML説明は日本語。subscriber/restart/transport等の未Red契約を先回り実装していない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -160,6 +196,17 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 
 次の4ケースは実行前にexpectations.jsonへ固定済み。実行件数0、semantic compile未確認、functional Red pending。親のtest-only commit/push後exact-SHA PR CIで実assertion/TRXを回収し、有効Red採用後だけ同じtest byteで最小実装へ戻る。前節CI39785567950の616集計Greenと、今回の未実行4ケースは分離する。構文抽出成功・compile error・未実行をfunctional Redへ数えない。
 
+### 次の03A functional Red収集結果（親採用待ち）
+
+- `https://github.com/ibis-ssl/Duck/actions/runs/39787367706`、exactHEAD8dfa1e03a12f2a3eb6e23bdf8dfe44423a06dbef / pull_request / completed / failure。標準TRXは620実行・616成功・4失敗・0skip、error/timeout/abortedも0。
+- 新4ケースだけが上表の実行時failure。既存positiveはTRXでPassed、他616件すべてPassed、固定独立67件も個別TRX行を照合し全Passed（fixed67-results.json）。packet/fullstack jobsはSkipped、実機証拠ではない。
+- TRX `/tmp/issue81-referee-receive-failure-red-ci-20261022/dotnet-test.trx` SHA256 `f10ccf4263d2e1c3c24029deacab7a082aca915d2b7d5aed4c0a278f4e613964`。CI/source/各assertion対応表ci-evidence.json SHA256 `1afcbe5a31a5a5bf970faaff4d177fcce85a6f4b6238aff44db117425edbb799`。
+- 親へ有効Red採用判断の証拠を返す段階であり、本behaviorは変更していない。同じtest byteを保持して、親の採用後だけ最小実装へ戻る。初回positiveのRed→Green履歴は保持。
+
+### 4ケースの最小Green候補（親のRed採用後）
+
+最小Green候補を保存。`source-results-manifest.json` SHA256 `79b84592223ccfa1e23568505560592e4e0ffb3462fd591684c5961d5e9f6360`、採用Red/source before-after/不変test/差分/実行結果を保持。候補のsemantic compileと実parser testはローカルproto不足で未確認、実行件数0、Green未観測。次は親の非main commit/push後exact-SHA PR CIで、固定4case/positive/固定67を保持して結果を回収する。今回build exit1をRed/Greenへ数えず、前節の実runtime Redを保持。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -187,6 +234,16 @@ Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgm
 ### 次の03Aテスト準備（最初のGreen後）
 
 今回未対応の03A契約: owner欠落/短ID、freshness期限/再poll非延命、取消無効化、旧callback/再起動epoch、同時Run排他、subscriber重複抑制と診断件数の分離/受信奪い合い防止、実transport lifecycle。既存positiveの同counter件数/受信時計検証をsubscriber完成の証拠へ流用しない。03B/C、製品behavior、外部/依存/設定/環境/auth/network、実host/Docker/実機、commit/push/GitHub変更なし。新4ケースはCI待ち。全読取/構文抽出/保存/diffcheck process終端、未回収exit・保留approval・実行中processなし。
+
+### 4ケースCI収集の終端
+
+- 不正入力後の失敗診断/復帰を完成したとはしない。03Aのowner/freshness/epoch/cancel/single-run/subscriber等の残項目、03B/C、外部G1/G3、実機受入は保留のまま。test期待値緩和/skip化、behavior追加、自己レビュー合格判定なし。
+- 全file一覧は`/tmp/issue81-referee-receive-failure-red-ci-20261022/evidence-files-manifest.json`（全57file、SHA256 `a884a9f9d7e8760b7a9b7a6af2019f815db8f7a50143aab1783a9708d2051c4f`）。生log/TRX/zip/source archiveを省略せず、親のrepository保存時はgitignore対象も必要に応じforce-addする。本担当のstage/commit/push/GitHub変更/再実行はなし。
+- 全list/watch/view/log/artifact download/read/save process終端、exitcode回収済み。実行中process/session、未回収exit、保留approvalなし。製品/test/設定/依存/環境/auth/network/外部repoに変更なし、host/Docker/実機起動なし。
+
+### 4ケースの最小Green候補（親のRed採用後）
+
+4case候補以外の03A契約、03B/C、外部G1/G3、実機受入は未完了。個別testの期待値緩和/skip変更、依存/設定/環境/auth/network/外部repo変更、host/Docker/実機起動なし。commit/push/GitHub操作なし。全証拠一覧`evidence-files-manifest.json` SHA256 `c20fbdb8e57a3873adb508f61c74216936c25f99ecfd971b974ad29d87d70e5b`（17file）に生logを含む。全構文抽出/build/read/save process終端、exit回収済み、実行中process/session・保留approval・未回収結果なし。
 
 ## 親による公開準備記録
 
