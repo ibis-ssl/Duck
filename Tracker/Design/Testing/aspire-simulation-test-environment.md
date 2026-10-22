@@ -34,15 +34,15 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 ### Linux 向けアプリケーションの配布出力（I81-04A）
 
-次の既存プロジェクトを、既存の復元済み依存を使って  .NET 10 の共有ランタイムで動かす配布出力として発行する。各出力はマネージド DLL で起動し、OS に固有の実行ファイルとランタイム資材を含めない。実行時は後続の I81-04B で確定する .NET 10 ランタイムを使う。コンテナーイメージの基底、外部イメージ、デバッグ専用資材の版とダイジェストは I81-04B で別に確定する。
+次の既存プロジェクトを、復元済み依存を使い、.NET 10 の共有実行環境で動かす配布物として発行する。各出力は .NET アセンブリから起動し、OS 固有の実行ファイルと実行基盤資材を含めない。実行時は後続の I81-04B で確定する .NET 10 実行環境を使う。コンテナイメージの基底、外部イメージ、デバッグ専用資材の版とダイジェストは I81-04B で別に確定する。
 
 | プロジェクト | 固定する配布出力 |
 | --- | --- |
 | `Tracker/Tracker.RuntimeHost` | `Tracker.RuntimeHost.dll`、対応する `.deps.json` と `.runtimeconfig.json`、`appsettings.json`。 |
 | `Tracker/Tracker.DebugHost` | `Tracker.DebugHost.dll`、対応する `.deps.json` と `.runtimeconfig.json`、`appsettings.json`、`wwwroot/app.css`、`wwwroot/favicon.png`。画面に使う静的ファイルを配布先へ含める。 |
-| `Testing/Duck.Testing.RefereeDriver.Host` | `Duck.Testing.RefereeDriver.Host.dll`、対応する `.deps.json` と `.runtimeconfig.json`。設定は環境変数で渡すため、配布用 appsettings ファイルを要求しない。 |
+| `Testing/Duck.Testing.RefereeDriver.Host` | `Duck.Testing.RefereeDriver.Host.dll`、対応する `.deps.json` と `.runtimeconfig.json`。設定は環境変数で渡すため、追加の設定ファイルを要求しない。 |
 
-自動検査では既存プロジェクトを実際に発行し、生成先の各ファイルと `.runtimeconfig.json` の .NET 10 共有ランタイムを使う設定を検査する。新しい配布一覧だけの自己検査で代用しない。ここではイメージの取得・作成・起動、外部成果物の取得、実行中の依存導入、デバッグ資材の追加を行わない。
+自動検査では既存プロジェクトを実際に発行し、生成先の各ファイルと `.runtimeconfig.json` の .NET 10 の共有実行基盤を使う設定を検査する。新しい配布一覧だけの自己検査で代用しない。ここではイメージの取得・作成・起動、外部成果物の取得、実行中の依存導入、デバッグ資材の追加を行わない。
 
 ## 配置案
 
