@@ -1,0 +1,107 @@
+{
+  "head": "a0566cd6c49601fb28cc8d766f8afb1bcaf862a2",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "sourceFiles": [
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs",
+      "sha256": "f7f51e3a918dcb5e864f4c3fa325e9d4afd0733824e2fb2f3b54e531421274d2"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerSourceIdentity.cs",
+      "sha256": "4dce664384ccf9682224bbe4f8165edf27424b0f0197b5db3263b14d1a7a9fdc"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+      "sha256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/TrackerComparisonSourceResolverTests.cs",
+      "sha256": "03073378a124f68aa17db886a240e622cd39a85355c2905f9abd4f5c96ea5a0e"
+    },
+    {
+      "path": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "sha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9"
+    },
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/matrix-v2.md",
+      "sha256": "1edfa97ecd38b44f97c95bee4fea1f793c8bda5cd55f211f871459e5f1c34d9e"
+    },
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/expectations-v2.json",
+      "sha256": "e376a7da8536e8f28af4e45b6a4f57f88782e2ae9d1e0a2da4295f591408cdec"
+    }
+  ],
+  "harnessCsproj": {
+    "path": "/tmp/issue81-independent-specification-fix-20261022/FocusedComparison.csproj",
+    "sha256": "fd221bf4c5c5e7a0ea4d595b6a3cc8a9782c234a71e9dde8da982c8b01f85cb8"
+  },
+  "redTrx": {
+    "path": "/tmp/issue81-independent-specification-fix-20261022/red-artifact-0-dotnet-test.trx",
+    "sha256": "3ef9ea1fccf8a8b3c8f8efa0e205a1278f2b728fc6dd7f0dd105f89ded3b010d",
+    "counters": {
+      "total": "615",
+      "executed": "615",
+      "passed": "611",
+      "failed": "4",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "supplementalGreenTrx": {
+    "path": "/tmp/issue81-independent-specification-fix-20261022/results/focused-comparison.trx",
+    "sha256": "62e24e7816fded7e0c5738203bb9647ba5f6d9c1cad8461dddd31b9f5b5a45e0",
+    "counters": {
+      "total": "35",
+      "executed": "35",
+      "passed": "35",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "fourFailuresMatched": [
+    {
+      "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: \"\")",
+      "redOutcome": "Failed",
+      "greenOutcome": "Passed"
+    },
+    {
+      "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)",
+      "redOutcome": "Failed",
+      "greenOutcome": "Passed"
+    },
+    {
+      "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)",
+      "redOutcome": "Failed",
+      "greenOutcome": "Passed"
+    },
+    {
+      "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: \"\")",
+      "redOutcome": "Failed",
+      "greenOutcome": "Passed"
+    }
+  ],
+  "v2ManifestSha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+  "verificationCapability": "remote_ci_only for full host/standard; linked-source supplemental local comparison-only harness",
+  "processState": "All issued restore/test subprocesses terminated; exit codes collected"
+}

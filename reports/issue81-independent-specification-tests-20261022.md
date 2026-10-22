@@ -111,6 +111,18 @@ UseArtifactsOutput/ArtifactsPathにより全build出力をworker内へ向けた�
 
 追加v2の実行経路確認: 親がmanifestと9entry全hashを照合し、3sourceをTracker/Tracker.Testsへ同一byte配置したとの通知を受領。remote_ci_onlyの承認済みcommit/push後、33ケースを初回CIで実行予定。ローカル標準hostのproto不足という既知制約があるため、追加版の成功を補助harnessで代用しない。現時点で追加版build/test未実行。
 
+追加v2初回CI回収（このrunだけ、既存Windows gh read-only）:
+
+    gh run view 39775288708 --repo ibis-ssl/Duck --json headSha,event,status,conclusion,jobs,url
+    gh run watch 39775288708 --repo ibis-ssl/Duck --interval 30 --exit-status
+    gh run view 39775288708 --repo ibis-ssl/Duck --job 119812563633 --log
+    gh api repos/ibis-ssl/Duck/actions/runs/39775288708/artifacts
+    gh api repos/ibis-ssl/Duck/actions/artifacts/12423474953/zip
+
+view/joblog/artifact取得exit0。watchはCI失敗を表すexit1、結果保存runnerはexit0であり区別する。
+watch回収session3215とartifact回収session60187は終端・回収済み。zip内はdotnet-test.trxだけを読み、その他entryの本文・製品source/ILは読んでいない。
+新規ローカルbuild/test、製品原因調査、確定テスト変更はしていない。
+
 ## 対象ファイル
 
 読んだ資料の全27path（元pack21、指定Skill5、許可report初期版）とSHA256は /tmp/issue81-independent-spec-tests-worker-20261022/read-ledger.json に記録。設計2文書は全文読取し、行番号で期待値へ対応付けた。API/metadataは形だけに使用。
@@ -175,6 +187,20 @@ deltaの全21読取path/hashはread-ledger-v2.json、設計行/節の根拠はma
 | read-ledger-v2.json | 958c59c14021c04e6579459a7c60a9da20cf27ac72ff0f12f97cd36353fb6d45 |
 | freeze-manifest-v2.json | aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be |
 
+追加v2初回CI証拠: /tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/
+
+| file | SHA256 |
+| --- | --- |
+| trx-evidence.json | 7c1a7ce971e0e0ab0f3b7b879bbd0d780626efe31bb41ec886a9788235626fc9 |
+| own-case-results.json | 5be1022b95c286300d101d0234f7a3dc16547b424b71d159df09f2ddb31b488a |
+| artifact-0-dotnet-test.trx | 3ef9ea1fccf8a8b3c8f8efa0e205a1278f2b728fc6dd7f0dd105f89ded3b010d |
+| failure-artifact.zip | da890016aac7af977277150c7f02202bd07a7c432ad4fdf84bff03ae9ca5fa3e |
+| test-job-log.stdout.log | 952363acc421f8e255932786eabd3cff51d4b32b56543093b938b2e47a69a559 |
+| final-view.stdout.log | 285fff57e01719ea25f093ba7e752da7889324795014b219027eb68d89d8f977 |
+
+実引数/exit/stdout/stderr、artifact metadata、TRX抽出範囲、全自作case名/結果/失敗message/stackを保存。
+v1の11fileとv2の9fileのSHA256不変を照合済み。元manifestのhashも不変。
+
 ## 指摘事項
 
 - 対応表matrix.mdと期待値expectations.jsonは承認設計の行/節と導出理由を保持。対象ID、サービス自身の復号、新しさ、失敗、対象更新、無効証跡、送信元別診断、固定proto復号を選定した。
@@ -212,6 +238,51 @@ v2で解消した境界と残る技術境界:
 
 fixture範囲の明確化: 今回はpure resolver/store fixtureを選択した。禁止される無許可起動は実環境/Docker/外部サービスの起動・設定変更であり、独立テスト内のfixture一般やBackgroundService fixtureを将来一律禁止する追加条件は設けていない。本版の限定範囲と残る未検証だけを示す。
 
+追加v2初回の観測失敗（実装原因の断定・調査ではない）:
+
+- C08_MissingUuidUsesStableNameAndEndpointIdentity：uuid null/空の2ケース失敗。設計tracker-comparison-debug-design.md:136,148,285ではUUID欠落時source name+remote endpointによるidentity。fixtureはname/endpointを固定して表示labelだけ変更し、IdentityKey一致を期待した。
+- C10_FallbackIdentitySeparatesSourceNames：uuid null/空の2ケース失敗。同設計根拠から、fixtureはlabel/endpoint固定・source name変更でIdentityKey相違を期待した。
+- 下記はTRXのassertion原文。内部IdentityKeyの字面は観測出力として保持するだけで、期待値に追加していない。実装原因調査は既存実装担当へ戻し、本担当は本体を読まない。
+
+
+Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: "")
+
+```text
+Assert.Equal() Failure: Strings differ
+                                      ↓ (pos 26)
+Expected: ···"mparison:fallback:label-a\u001f192.0.2.1:11010"
+Actual:   ···"mparison:fallback:label-b\u001f192.0.2.1:11010"
+                                      ↑ (pos 26)
+```
+
+Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)
+
+```text
+Assert.Equal() Failure: Strings differ
+                                      ↓ (pos 26)
+Expected: ···"mparison:fallback:label-a\u001f192.0.2.1:11010"
+Actual:   ···"mparison:fallback:label-b\u001f192.0.2.1:11010"
+                                      ↑ (pos 26)
+```
+
+Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)
+
+```text
+Assert.NotEqual() Failure: Strings are equal
+Expected: Not "comparison:fallback:label\x1f192.0.2.1:11010"
+Actual:       "comparison:fallback:label\x1f192.0.2.1:11010"
+```
+
+Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: "")
+
+```text
+Assert.NotEqual() Failure: Strings are equal
+Expected: Not "comparison:fallback:label\x1f192.0.2.1:11010"
+Actual:       "comparison:fallback:label\x1f192.0.2.1:11010"
+```
+
+上記4件を含む凍結テスト/期待値を変更・緩和・skip化していない。親が既存実装担当へ固定matrix/source/結果を渡したとの通知を受領。原因判断は親/実装担当の工程であり、テスト訂正が必要なら承認設計根拠と新旧hashを別途記録する。
+
 ## 結果
 
 仕様・期待値・テストを実装への初回実行前に凍結した。xUnit/net10.0、日本語XMLコメント、独立時計・wire fixtureの23メソッド/34ケース相当。
@@ -237,6 +308,18 @@ manifest SHA256: aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642b
 過去Red欠落を履歴として保持し、本追加版の再承認待ち条件にはしない。事後独立仕様テストでありTDD waiver・独立最終レビューの代替ではない。
 requested gpt-6.1-sol/high、fork none、applied:nullを継続。親所有prefix/Dispatchを変更していない。
 
+追加v2初回CI39775288708: head a0566cd6c49601fb28cc8d766f8afb1bcaf862a2 / event pull_request一致、run/test job conclusion failure。
+suiteは615 total / 611 passed / 4 failed / 0 skipped。失敗artifact12423474953のTRXにより、自作namespaceの67ケースを個別識別した。
+
+- v2初回33件: 29 passed / 4 failed / 0 skipped。失敗はC08とC10の各null/空2件。
+- 同じa0566cd runでのv1後続実行34件: 34 passed / 0 failed / 0 skipped。
+- v1初回BCL28/28と過去CIの個別名/TRX未取得という履歴は保持する。今回TRXのv1個別成功を過去runへ遡及して付け替えない。
+- 今回はTRXが存在するため自作67件の個別結果を直接確認できた。過去成功runの個別証拠欠如と区別する。
+- packet flow / full-stack acceptanceの2jobはskipped。pure resolver/store fixture成功を実受信結線/HTTP/集約health/実機受入へ代用しない。
+- 追加delta読取拒否は本人訂正後の再審査で解消済みとして履歴保持。今回の4失敗を読取拒否や過去Red欠落の問題へ置換しない。
+
+全processを回収し、元v1/v2source・期待値・manifestは不変。本担当は既存実装担当の原因調査/修正後、同じ凍結テストへの再実行指示を待つ。requested high/applied:null継続。
+
 ## リスク
 
 - 元packで完結する限定検証であり、I81-01/I81-02全体の網羅済み・合格を主張しない。実受信結線・HTTP・比較resolverの不足/拒否範囲を明示。
@@ -245,4 +328,6 @@ requested gpt-6.1-sol/high、fork none、applied:nullを継続。親所有prefix
 - SDK10.0.113、net10.0/xUnitの限定実行と既存cacheのoffline restoreは確認済み。製品の実際のsource fingerprint/HEADは本担当未調査のため、親提供baselineに結び付く証拠として扱う。exact-HEAD CIのsuite成功は取得済み。個別成功名/TRXがなく自作34件の個別識別は直接確認できない。
 - 製品原因の調査・実装修正・独立最終レビューは本担当の対象外。
 
-追加v2時点: 読取拒否は解消したが、追加試験結果は未取得。実受信結線/HTTP/集約healthと後続DCP配置・所有ID取得・Windows実機・外部tracker・全体受入の未検証は保持する。
+追加v2凍結時点では読取拒否解消・追加試験未実行だった。その後の初回CIは上記4失敗であり、現時点でv2全件合格ではない。実受信結線/HTTP/集約healthと後続DCP配置・所有ID取得・Windows実機・外部tracker・全体受入の未検証は保持する。
+
+追加v2初回CI後: C08/C10の4失敗は未解消。実装原因調査・修正は既存担当へ返し、本担当は固定テスト/期待値を変更しない。
