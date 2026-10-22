@@ -1,0 +1,111 @@
+[
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39776500808",
+      "--jq",
+      "{id,head_sha,event,status,conclusion,run_attempt}"
+    ],
+    "started_utc": "2026-10-22T12:22:28.031354+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-metadata.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-metadata.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39776500808",
+      "--attempt",
+      "2",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "started_utc": "2026-10-22T12:22:28.513622+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-view.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-view.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "watch",
+      "39776500808",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--interval",
+      "30",
+      "--exit-status"
+    ],
+    "started_utc": "2026-10-22T12:22:29.666950+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/watch.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/watch.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39776500808",
+      "--attempt",
+      "2",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "started_utc": "2026-10-22T12:23:04.228294+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-view.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-view.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39776500808",
+      "--jq",
+      "{id,head_sha,event,status,conclusion,run_attempt}"
+    ],
+    "started_utc": "2026-10-22T12:23:05.421414+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-metadata.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-metadata.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39776500808",
+      "--attempt",
+      "2",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--job",
+      "119820587864",
+      "--log"
+    ],
+    "started_utc": "2026-10-22T12:23:05.900844+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/test-job-log.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/test-job-log.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39776500808/artifacts"
+    ],
+    "started_utc": "2026-10-22T12:23:08.141719+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/artifacts.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/artifacts.stderr.log"
+  }
+]

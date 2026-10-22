@@ -1,0 +1,1 @@
+["dotnet", "run", "--project", "/tmp/issue81-captureoff-regression-investigation-20261022/ReceiverProbe.csproj", "--no-restore", "-p:EnableSourceControlManagerQueries=false"]

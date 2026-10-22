@@ -123,6 +123,28 @@ view/joblog/artifact取得exit0。watchはCI失敗を表すexit1、結果保存r
 watch回収session3215とartifact回収session60187は終端・回収済み。zip内はdotnet-test.trxだけを読み、その他entryの本文・製品source/ILは読んでいない。
 新規ローカルbuild/test、製品原因調査、確定テスト変更はしていない。
 
+追加v2修正後・同じ凍結テストのCI結果回収:
+
+    gh run view 39776500808 --repo ibis-ssl/Duck --json headSha,event,status,conclusion,jobs,url
+    gh run watch 39776500808 --repo ibis-ssl/Duck --interval 30 --exit-status
+    gh run view 39776500808 --repo ibis-ssl/Duck --job 119816674528 --log
+    gh api repos/ibis-ssl/Duck/actions/runs/39776500808/artifacts
+    gh api repos/ibis-ssl/Duck/actions/artifacts/12424593092/zip
+
+exact HEAD 2ff2b1facaf8c8e4664ca6141f02944e0b74f89b / pull_requestを確認。watch exit1（suite失敗）、view/log/artifact取得exit0、保存runner exit0を区別。
+session63322と8609は全process終端・回収済み。zipはTRXだけ読取。製品修正内容・既存テスト本文は読まず、新規ローカルbuild/testや環境変更をしていない。
+
+修正後同HEAD・同run attempt2の回収（親が --failed rerunを一度実施、本担当はread-only）:
+
+    gh api repos/ibis-ssl/Duck/actions/runs/39776500808 --jq '{id,head_sha,event,status,conclusion,run_attempt}'
+    gh run view 39776500808 --attempt 2 --repo ibis-ssl/Duck --json headSha,event,status,conclusion,jobs,url
+    gh run watch 39776500808 --repo ibis-ssl/Duck --interval 30 --exit-status
+    gh run view 39776500808 --attempt 2 --repo ibis-ssl/Duck --job 119820587864 --log
+    gh api repos/ibis-ssl/Duck/actions/runs/39776500808/artifacts
+
+run_attempt=2 / head2ff2b1facaf8c8e4664ca6141f02944e0b74f89b / event pull_requestを初回/終端APIで確認。watch/view/joblog/API取得は各exit0。session20075を終端回収。
+本担当はrerunを発行しておらず、無断再々実行・設定変更・製品/既存試験本文閲覧なし。
+
 ## 対象ファイル
 
 読んだ資料の全27path（元pack21、指定Skill5、許可report初期版）とSHA256は /tmp/issue81-independent-spec-tests-worker-20261022/read-ledger.json に記録。設計2文書は全文読取し、行番号で期待値へ対応付けた。API/metadataは形だけに使用。
@@ -200,6 +222,29 @@ deltaの全21読取path/hashはread-ledger-v2.json、設計行/節の根拠はma
 
 実引数/exit/stdout/stderr、artifact metadata、TRX抽出範囲、全自作case名/結果/失敗message/stackを保存。
 v1の11fileとv2の9fileのSHA256不変を照合済み。元manifestのhashも不変。
+
+修正後証拠保存先: /tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/
+
+| file | SHA256 |
+| --- | --- |
+| fixed-trx-evidence.json | 6810370ccb1ead0919af55253dc9f4c5f0351a7694ec70815184d33c86b0e8df |
+| own-case-results.json | c82ddb461257ea25d5f1139f5bac3a4c817c4ef4c18347527ac76a3eb681c367 |
+| artifact-0-dotnet-test.trx | efb4d82ae76ce9ae194e55291eabba9c8de6a0e4e8120f26a1956bfeed258904 |
+| failure-artifact.zip | d700239a7ae6875c56b145a10823c3065e7e159de457f29b346f4d1decbbc808 |
+
+全コマンド・JSON/log/exit・TRX自作case一覧・初回4失敗と同名caseの修正後結果を保持。元v1の11file/v2の9fileと両manifestは不変を照合。
+
+同run attempt2保存先: /tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/
+
+| file | SHA256 |
+| --- | --- |
+| attempt2-evidence.json | 0017800bb9a2c1b4ae872c347f6ba0058975644b9c0e79013474547d56788aa9 |
+| ci-evidence.json | c32ad10232cdf6f7cd2202100da94d72859a9e469a3b13fe2713919311520f47 |
+| final-metadata.stdout.log | e61c09728cb7509693009440533ba35051192b8c754478229d660e8d5dccf282 |
+| test-job-log.stdout.log | 00299472d25bd685348e08b96f103c1abcaf90f2bf074b3c41042418ea5867f2 |
+| artifacts.stdout.log | 3a16cf19543f44b327338cc361cac552c26b53da81d50c3ef67522a5a04d3e4d |
+
+attempt1と別ディレクトリに全コマンド/exit/metadata/logを保存。固定v1/v2全source/期待値/manifestのhash不変を再照合。
 
 ## 指摘事項
 
@@ -283,6 +328,20 @@ Actual:       "comparison:fallback:label\x1f192.0.2.1:11010"
 
 上記4件を含む凍結テスト/期待値を変更・緩和・skip化していない。親が既存実装担当へ固定matrix/source/結果を渡したとの通知を受領。原因判断は親/実装担当の工程であり、テスト訂正が必要なら承認設計根拠と新旧hashを別途記録する。
 
+修正後の観測結果（製品修正の内容・原因を説明しない）:
+
+- 初回CI39775288708で失敗したC08(uuid null/空)とC10(uuid null/空)の4件は、修正後CI39776500808のTRXに同じ確定case名でPassedと記録されている。
+- 自作namespace67件は全Passed。凍結テスト/期待値を緩和・skip化していない。
+- suiteは別の1件によりfailure。自作namespace外の失敗名がTRX結果metadataにあることだけ確認し、本文や原因は読まず親へ返した。自作67合格とsuite全体失敗を混同しない。
+- 初回4失敗のTRX/原文/結果は履歴として保持し、修正後成功で置換しない。
+
+attempt2の観測範囲:
+
+- run39776500808 attempt2は成功。suite615/615 Passed、Failed0、Skipped0を当該attemptのtest jobログで確認。
+- 当該attemptに個別成功名/TRXはない。artifact一覧の1件はattempt1の dotnet-test-failure-39776500808-1 / id12424593092だけで、attempt2のTRXへ付け替えない。
+- attempt1で固定67件を個別Passedと確認した証拠は保持。attempt2のsuite成功と個別直接証拠を区別する。
+- 同じHEAD/テスト/期待値での再実行成功は、attempt1の自作外suite1失敗について原因確定・修復済みを意味しない。本担当は原因を調査・断定していない。
+
 ## 結果
 
 仕様・期待値・テストを実装への初回実行前に凍結した。xUnit/net10.0、日本語XMLコメント、独立時計・wire fixtureの23メソッド/34ケース相当。
@@ -320,6 +379,21 @@ suiteは615 total / 611 passed / 4 failed / 0 skipped。失敗artifact1242347495
 
 全processを回収し、元v1/v2source・期待値・manifestは不変。本担当は既存実装担当の原因調査/修正後、同じ凍結テストへの再実行指示を待つ。requested high/applied:null継続。
 
+修正後PR CI39776500808（HEAD2ff2b1facaf8c8e4664ca6141f02944e0b74f89b）: run/test job failure、suite615 total / 614 passed / 1 failed / 0 skipped。
+一方、失敗artifactのTRXで本担当の固定試験はv1 34/34 Passed、v2 33/33 Passed、計67/67 Passedを個別名で直接確認した。C08/C10の初回4失敗も同名caseでPassed。
+これを自作固定仕様テストの修正後結果として保存し、CI全体成功とは主張しない。自作namespace外のsuite1失敗は親/既存担当の別調査へ返した。
+
+初回v2 29合格/4失敗、過去v1初回BCL28/28、過去runの個別名/TRX欠如と今回の直接証拠を区別し履歴を保持する。
+両版のテスト/期待値/manifest不変を照合済み。実装body/既存試験本文未読を維持し、製品修正内容は本報告に記載しない。
+packet flow/full-stack受入2jobはskip。実受信結線/HTTP/集約health/実機受入の未検証は残る。
+requested high/applied:null。追加delta拒否は解消済みの過去履歴であり再試行なし。全process回収済み。
+
+同run39776500808 attempt2（同HEAD2ff2b1facaf8c8e4664ca6141f02944e0b74f89b）終端: conclusion success、test job119820587864成功、suite615 passed / 0 failed / 0 skipped。
+attempt1のsuite614 passed+1 failedと固定v1/v2計67件の個別Passed証拠を保持し、別の再実行結果として追記した。初回v2の4失敗履歴も不変。
+attempt2には新TRX/個別成功名がないため、当該attemptの自作67件個別結果を直接取得済みとは主張しない。
+packet flow/full-stack受入2jobはskipを維持。実受信結線/HTTP/集約health/実機受入の未検証は解消していない。
+全process回収済み。製品・確定テスト/期待値/manifestへの変更なし、元profilehigh/applied:null継続。本担当から無断再々実行はしない。
+
 ## リスク
 
 - 元packで完結する限定検証であり、I81-01/I81-02全体の網羅済み・合格を主張しない。実受信結線・HTTP・比較resolverの不足/拒否範囲を明示。
@@ -330,4 +404,8 @@ suiteは615 total / 611 passed / 4 failed / 0 skipped。失敗artifact1242347495
 
 追加v2凍結時点では読取拒否解消・追加試験未実行だった。その後の初回CIは上記4失敗であり、現時点でv2全件合格ではない。実受信結線/HTTP/集約healthと後続DCP配置・所有ID取得・Windows実機・外部tracker・全体受入の未検証は保持する。
 
-追加v2初回CI後: C08/C10の4失敗は未解消。実装原因調査・修正は既存担当へ返し、本担当は固定テスト/期待値を変更しない。
+追加v2初回CI時点でC08/C10の4失敗は未解消だった。修正後CIの同名4case合格は上記の別履歴として保持。本担当は固定テスト/期待値を変更していない。
+
+修正後attempt1時点: 自作固定67caseはTRXで全合格だがsuite自作外1失敗があり親へ返した。attempt2のsuite成功は上記別履歴として記録し、attempt1の失敗原因確定/修復済みとは扱わない。
+
+attempt2後: 現在の同HEAD再実行はsuite615全合格。attempt1で観測した既存suite失敗の原因は本担当未確定のまま保持する。
