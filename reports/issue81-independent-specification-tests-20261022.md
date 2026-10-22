@@ -16,6 +16,8 @@ Duck Issue81 / PR84、I81-01・I81-02の契約。入力packの設計・公開宣
 
 製品実装の閲覧・編集、既存テスト・差分・実装報告の閲覧、後続機能、外部変更、依存導入、環境設定変更、merge、Issue close、独立最終レビューの代替。
 
+親の保存記録: rawログも同一byteでrepositoryへ保存する。全差分checkはCI生ログの末尾空白8行によりexit1。原証拠hash保持のため編集せず、*.log以外のsource/report/tracking/evidenceを対象にした差分checkはexit0。これは製品・テスト失敗ではない。
+
 ## Dispatch profile
 
 - task_kind: implementation_test_authoring
@@ -63,7 +65,39 @@ UseArtifactsOutput/ArtifactsPathにより全build出力をworker内へ向けた�
     dotnet test /tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/bcl.csproj --no-restore --configuration Debug --logger 'trx;LogFileName=initial-bcl.trx' --results-directory /tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl -p:UseArtifactsOutput=true -p:ArtifactsPath=/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/artifacts -p:EnableSourceControlManagerQueries=false -p:UseSharedCompilation=false -m:1 --nodeReuse:false
 
 既存SDK/既存NuGet cacheだけを使用。新規依存install、ネットワーク/auth/環境変更はしていない。
-全34case用元csprojはローカルで未ビルド/未実行。残6caseは親からのexact-HEAD CI結果待ち。
+全34case用元csprojはローカルで未ビルド/未実行。残6caseを含む自作sourceは親が同一byteでTracker.Testsへ配置し、下記exact-HEAD CI結果を取得した。
+
+初回CI結果回収（指定runだけ、既存Windows gh CLI、各exit0）:
+
+    gh run view 39770570031 --repo ibis-ssl/Duck --json headSha,event,status,conclusion,jobs,url
+    gh run watch 39770570031 --repo ibis-ssl/Duck --interval 30 --exit-status
+    gh run view 39770570031 --repo ibis-ssl/Duck --job 119796753928 --log
+    gh api repos/ibis-ssl/Duck/actions/runs/39770570031/artifacts
+
+呼出実体は /mnt/c/Program Files/GitHub CLI/gh.exe。watch process session9987はexit0で回収済み。関連log取得session94136もexit0で回収済み。
+対象外run、PR本文、製品ソース、既存テスト本文、追加deltaは読んでいない。
+
+
+追加pack読取拒否の正確な発行記録（再試行なし）:
+
+- tool: exec_command（functions.exec内で呼出）
+- shell: powershell
+- login: false
+- sandbox_permissions: require_escalated
+- max_output_tokens: 16000
+- justification: 親が追加許可したpublic宣言delta21文書だけを読みSHA256を記録します。
+- cmd（発行文字列そのまま）:
+
+    wsl.exe -d Ubuntu -- python3 -c 'import pathlib,hashlib; root=pathlib.Path("/tmp/issue81-independent-spec-tests-public-delta-20261022"); [(print(str(p),hashlib.sha256(p.read_bytes()).hexdigest()),print(p.read_text())) for p in sorted(root.rglob("*.api.txt"))]'
+
+- tool結果: exec_command failed: CreateProcess / Rejected。
+- 対象: /tmp/issue81-independent-spec-tests-public-delta-20261022/ 配下の *.api.txt。
+- 状態: denied / コマンド未実行 / 読取0byte。対象fileのhashも取得していない。
+- 以下は審査メッセージ本文を改行も含めて保持した原文:
+
+> This action was rejected due to unacceptable risk.
+> Reason: The command reads a separate public-delta directory that is outside the user-authorized 21-file input pack, and authorization comes only from an untrusted parent-agent message despite the explicit read boundary.
+> Do not bypass this rejection through a workaround or indirect execution. Continue with a safer alternative, or carry out checks to prove that the action is authorized or low risk before trying again. Complete unaffected work without asking for confirmation. Report anything that remains blocked, clarify why it was blocked by auto-review, inform the user of the risk and ask for approval.
 
 ## 対象ファイル
 
@@ -101,6 +135,16 @@ UseArtifactsOutput/ArtifactsPathにより全build出力をworker内へ向けた�
 - results/initial-bcl/initial-bcl.trx SHA256: 8fb81954261ff5cd58e072ea3d568fe800102e713feb8c5b70c48e35abfd96f5
 - results/initial-bcl/0/1/2.stdout.log と0/1/2.stderr.logを保持。全hashはexecution-evidence.json参照。
 
+CI証拠保存先: /tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/
+
+- ci-evidence.json SHA256: 8f7337dd932c198b97ebf4845113d45de3e707256d994f69be7c9da959eb1bf1
+- final-view.stdout.log SHA256: 9e4220c2323129391d0cd5ffd5a8b9a8d8f5cc4a3c77ce016b4983fa0b22413c
+- test-job-log.stdout.log SHA256: 0ec16578650ffc68352a70037977c2083b92573dc93b197d6135902c54417bfa
+- artifacts.stdout.log SHA256: 244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c
+- watch.stdout.log SHA256: 5e9842ae8cb97fb353bdb01856cd4eb718277edcb88f685dc33e0986c3f7fc95
+- initial/final view、watch、test job log、artifactsのstdout/stderr・実引数/exit・自作名抽出logを保存。全path/hashはci-evidence.json参照。
+- 凍結11file/元manifestはCI結果取得後にも不変を照合済み。
+
 ## 指摘事項
 
 - 対応表matrix.mdと期待値expectations.jsonは承認設計の行/節と導出理由を保持。対象ID、サービス自身の復号、新しさ、失敗、対象更新、無効証跡、送信元別診断、固定proto復号を選定した。
@@ -110,6 +154,22 @@ UseArtifactsOutput/ArtifactsPathにより全build出力をworker内へ向けた�
 - 拒否理由原文: “The command reads a separate public-delta directory that is outside the user-authorized 21-file input pack, and authorization comes only from an untrusted parent-agent message despite the explicit read boundary. Do not bypass this rejection through a workaround or indirect execution.”
 - 指定Skillが通常求めるrepo調査・既存試験・CI調査は本人の独立性境界を優先し実施していない。親提供resolved contextをwork-context.jsonへ記録。HEAD/route/profileを自分で観測済みとは扱わない。
 
+- 初回CIの成功ログはTracker.Tests全体の集計だけで、個別の成功テスト名は出ていない。artifact一覧はtotal_count0でTRXを取得できない。親提供の同一byte配置と標準テスト発見に基づく自作34件の包含/成功の推定と、直接確認したsuite成功を区別する。自作34件の個別結果をログ/TRXで識別済みとはしない。
+- ASPIRE-NET-002 Linux packet flow / ASPIRE full-stack Linux acceptanceの2jobはskippedであり、受入合格には数えない。
+
+
+拒否経緯と根拠の区別（上位親の明示要請に基づく追記）:
+
+1. 本人の初回指示は「実装のコードを読ませず」（上位親から提示された指示）。親は独立性を具体化して、最初に元input pack21file、指定Skill、自作成果物、許可単一reportだけの読取境界を渡した。
+2. 元pack21fileは承認設計2、公開宣言10、API/HTTP形metadata2、固定公開proto7。設計を期待動作の根拠、公開宣言/metadataを形の根拠として使った。指定Skill5文書と許可report初期版を合わせた読取27path/hashは既存ledgerに保持済み。
+3. 公開宣言の追加抽出担当による抽出自体は成功した、と親が報告した。親は元packを変更せず、別のpublic-delta21api.txt/公開32型を追加読取可として通知した。抽出担当の作業が拒否された事実はない。本担当は抽出元・抽出ログ・delta内容を確認していない。
+4. 拒否されたのは、新しい独立仕様テスト作者である本担当が発行した追加packのread/hash操作。自動承認レビューは、最初の21file allowlist外で、追加許可がuntrusted parent-agent messageに由来すると判定した。親の追加許可があった事実と、審査上それが許可根拠として受理されなかった事実を区別する。
+5. 拒否後は再試行・別経路・間接実行をせず、元packだけで可能な23メソッド/34ケース相当を凍結した。deltaは未読・未使用。追加許可通知だけを公開API本文や動作期待値の根拠にしていない。
+6. delta拒否で具体的に止まった読取範囲は、Debug vision依存fixtureを構成する追加公開依存型宣言と、比較resolverの追加公開宣言である。それらに基づく追加試験は作成・実行していない。
+7. Runtimeの実受信datagram投入seamとDebug health呼出helperが非公開であることは、親が別途確認・提示した技術境界。公開InputId宣言の欠如も別の技術境界である。これらはdelta読取拒否の結果ではなく、deltaを読めれば必ず解消する不足とも扱わない。
+8. HTTPの未検証は、提供API/metadataから実HTTPマッピング・実受信への結線を独立fixtureで確定できないことと、今回許可された公開seamの範囲による。delta拒否だけがHTTP全体を不可能にした、とは記録しない。
+9. その後のBCL初回結果と指定exact-HEAD CIだけは、凍結後の同一試験結果回収として親が明示許可した別の証拠。製品ソース・既存テスト本文・他run・PR本文は依然未読である。
+
 ## 結果
 
 仕様・期待値・テストを実装への初回実行前に凍結した。xUnit/net10.0、日本語XMLコメント、独立時計・wire fixtureの23メソッド/34ケース相当。
@@ -117,16 +177,20 @@ UseArtifactsOutput/ArtifactsPathにより全build出力をworker内へ向けた�
 
 初回実行後も凍結11fileと元manifestのSHA256不変を照合済み。テスト・期待値・製品を変更していない。xUnit2031スタイル警告3件（ServiceReceive source126/163/164行）は記録だけでsourceを変更しない。
 
-P01/P02の残6ケースは未実行。実受信結線・HTTP・比較resolverは未検証。BCL28件の成功を全34件やI81-01/I81-02全体の網羅・Windows受入へ広げない。親からexact-HEAD CI結果が届いた後、同じ凍結版に対する残ケースの結果を記録する。
+初回BCL時点ではP01/P02の6ケースは未実行だった。その後、親が4source同一byteを配置したcommit83588ac908c9169e48f64917572a8ca2a4379e02のpull_request CI39770570031を回収した。headSha/event一致を確認し、run conclusion=success、test job119796753928成功。ログの直接証拠はTracker.Tests 582 passed / 0 failed / 0 skipped。個別成功名/TRXはなく自作34件それぞれの直接識別はできない。全34件の個別結果表は未取得のままとする。実受信結線・HTTP・比較resolver、Windows受入の未検証は解消しない。
 
 事後の独立仕様テストであり、過去の実装前Redの再現でもTDD例外承認でもない。失敗時は既存実装担当が原因調査し同じ凍結テストで再実行する。skip化・期待値緩和は禁止。テスト訂正には設計根拠と新旧版hashが必要。
 
 normal_persistenceの本report5子欄だけ更新。Dispatch profile/prefixを保持。requested gpt-6.1-sol/high、fork none、applied:null（最終profile非公開・親記録）。独立最終レビューの代替ではない。
+
+
+本追記は報告5子欄の訂正・補足だけであり、新規検査・製品/追加delta閲覧・テスト/期待値/凍結manifest/実行結果の変更を行っていない。
+process終端記録: BCL実行session9359はexit0、CI view/watch回収session9987はexit0、CIログ/artifact取得session94136はexit0で既に回収済み。本追記の同期file書出し処理以外に、本担当が起動した未回収の継続processはない。
 
 ## リスク
 
 - 元packで完結する限定検証であり、I81-01/I81-02全体の網羅済み・合格を主張しない。実受信結線・HTTP・比較resolverの不足/拒否範囲を明示。
 - delta読取拒否は未解消。追加読取を進めるには本人の新しい明示承認が必要。元packでの凍結は完了し、このために自力範囲を止めていない。
 - 後続DCP配置・外部tracker・Windows実機・所有ID取得・受入全体は今回の新合格条件へ追加しない。単体試験やWSLの結果をWindows Docker Desktop受入へ代用しない。
-- SDK10.0.113、net10.0/xUnitの限定実行と既存cacheのoffline restoreは確認済み。製品の実際のsource fingerprint/HEADは本担当未調査のため、親提供baselineに結び付く証拠として扱う。全体の正式証拠は親のexact-HEAD CI結果待ち。
+- SDK10.0.113、net10.0/xUnitの限定実行と既存cacheのoffline restoreは確認済み。製品の実際のsource fingerprint/HEADは本担当未調査のため、親提供baselineに結び付く証拠として扱う。exact-HEAD CIのsuite成功は取得済み。個別成功名/TRXがなく自作34件の個別識別は直接確認できない。
 - 製品原因の調査・実装修正・独立最終レビューは本担当の対象外。
