@@ -121,6 +121,14 @@ exact e68ead6873c8a940fce27b7745ac63a2e959b075のPR CI39799276013を収集。run
 
 親tdd-executorがexacte68ead68 CI39799276013の購読pending assertion失敗を有効Redに採用した後、同じ担当/既存Skillsで最小実装。既存SDK宣言抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1、既存生成Referee型不足CS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exit/source before-after/diffは`/tmp/issue81-referee-receive-subscriber-green-candidate-20261022/`へ保存。test/CIは今回実行していない。
 
+### 購読のGreen CI収集・追加回帰/tmp候補
+
+同一HEAD 0037ef0aa200cbd5d702ba17aace5b04c5f8dd2b のpull_request run39802072353をgh run view/watch --exit-status --interval 10で取得。watch exit0、view/log/artifacts/job REST GETは全exit0。実CI commandはdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger "trx;LogFileName=dotnet-test.trx" --results-directory "$results_dir" --diag "$results_dir/vstest-diagnostics.log" --blame -m:1 /nr:false -bl:"$results_dir/dotnet-test.binlog"（redirectを含む原文はrun-log.stdout.log）。test step successでexit0、単独exit-code artifactは非公開。候補は既存Declarations.dllによる構文抽出exit0のみ。証拠 /tmp/issue81-referee-receive-subscriber-green-ci-20261022/ci-evidence.json SHA256 4312d06b43bd664c3fef5aac5b1a3011a4f75f647c4b45aeefc78c8efb1d120d、コマンド引数/exit・生logを同dirへ保存。
+
+### 購読追加回帰5件の先行準備（626Green後）
+
+既存SDK /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/syntax-input.json /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/syntax-result.json はexit0（syntax.command.json/生stdout/stderr保存）。git diff --check exit0。実parserのsemantic compile/testは未実行、既知のローカル生成Referee不足を再実行や導入で埋めずremote_ci_onlyを維持。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -221,6 +229,14 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### 購読の最小Green候補（親のRed採用後）
 
 製品変更は`Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs`のみ、SHA256 `c9c20cfb444e187a7ee6ae6c851f3667447548911b7824dc5961aa6c0c0a2751`。固定購読test `00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b`と既存群/固定67/共通Diagnostics source/csprojはHEAD byte不変。Tracker.Tests tracked差分なし。既存report子5欄へ追記し、親prefix/Dispatch/履歴・親tasks/phases/evidence差分を保持。
+
+### 購読のGreen CI収集・追加回帰/tmp候補
+
+製品/testのactivebranch変更なし。17sourceをHEAD/current/既定hashと照合し全一致。service SHA256 c9c20cfb444e187a7ee6ae6c851f3667447548911b7824dc5961aa6c0c0a2751、固定購読test SHA256 00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b。固定v1/v2 manifestと関連sourceも不変。追加候補は/tmpのみ /tmp/issue81-referee-receive-subscriber-regression-preparation-20261022/RefereeReceiveSubscriberRegressionTests.cs SHA256 f5f25efa6efeee627071247237ee864322ba785f2cf6f49a7a0a4d78121a5ea4、期待値はexpectations.json。親prefix/Dispatch/tasks/phases/他report保持。
+
+### 購読追加回帰5件の先行準備（626Green後）
+
+新規testだけ Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs（5 Fact、SHA256 c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98）。/tmp5件snapshotとbyte一致。既存positive/4failure/cancel/single-run/再開ownerfreshness/subscriberの11case、固定独立67を含む17sourceはHEAD/現在/hash一致。製品変更なし。元/tmp2件候補は全9fileの元manifest hash一致を確認して保持、5件版は別dir /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/ へ保存。親tracking/Dispatch/prefix/他report保持。
 
 ## 指摘事項
 
@@ -333,6 +349,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 
 同じpumpのRecordSuccessが受理した正常commandだけをsourceKey/receiverEpochと一緒に保持し、非同期signalで購読へ再確認を通知する。WaitForChangeはprevCounterと違うcommandだけを、現在の同source/同epoch・正常decode・既知ageが期限内であることへ再照合して返す。購読側にReceive呼出しはなく、同counterもpumpの診断件数へ計上し続ける。待機はcaller tokenをWaitAsyncへ渡す。受理された不正入力/Run終端ではcacheを解除、RecordSuccess=falseの旧attemptはpublishしない。constructor/公開signatureは不変。多subscriberの順序/公平性等の未合意契約は定義していない。新規関数説明は日本語。
 
+### 購読のGreen CI収集・追加回帰/tmp候補
+
+先の採用Red（NotImplementedでsubscription.IsCompleted true）に対応する最小実装の同一SHA集計Greenを取得。今回個別TRXは非公開なので、購読1件/既存625/固定67の現在の個別結果照合をしたとはしない。追加回帰候補はcaller取消でpump継続/Receive競合なし、previous=nullでexact freshnessのcache返却と+1tick後の非返却・poll非延命の2件。期待値/仕様対応をexpectations.jsonへ固定し、未実行のまま成功/Redと扱わない。
+
+### 購読追加回帰5件の先行準備（626Green後）
+
+accepted03Aの取消・Run所有/世代・不正入力failclosed・受信freshness、およびIRefereeCommandSourceのpreviousCounter/caller取消から期待値を固定。caller取消だけでpumpを止めない、previous=nullのcacheはexact freshnessで返し+1tick後は返さない、Run終了後/破損packet後/再開後の旧cacheを返さない、遅延旧epochを購読成功へ変換しない。正常復帰では現epochの新counterだけ取得。Run終端例外型や複数購読仕様を固定せず、全fixtureはcaller取消でRun/購読Taskを回収する。追加期待値5件はexpectations.jsonに保存。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -438,6 +462,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 
 購読の最小Green候補を保存。source-results-manifest.json SHA256 `79f36cdf7a9aae977a8101a11466eba2da984a1a2b70dd64078edd47aab6c811` に採用Red/source hash/不変test/検査結果を保持。実Driver semantic compileは既存proto不足で未完了、実行test0件、Green未観測。親の非main commit/push後exact-SHA PR CIで同じ購読testと既存625/固定67を確認する。元runtime Redと回帰3件成功の履歴は保持し、ローカルcompile-errorをGreenへ転記しない。
 
+### 購読のGreen CI収集・追加回帰/tmp候補
+
+run39802072353はcompleted/success、正式ログ実測626total/626passed/0failed/0skipped。test job119905199613もRESTでcompleted/success。packet/full-stack acceptance jobはskip。artifact API total_count0、個別TRX未取得。source17一致と同SHA checkout logを保持。追加2caseは構文exit0、semantic compile/実parser実行なし・activebranch未配置。CI全証拠一覧 /tmp/issue81-referee-receive-subscriber-green-ci-20261022/evidence-files-manifest.json SHA256 c21c4f7cd91d6c66c1ad866a376df9d18d1b060fc5e7d42ef4d546c469d1c71f、候補一覧 /tmp/issue81-referee-receive-subscriber-regression-preparation-20261022/evidence-files-manifest.json SHA256 72fb8fab2fb262474281d77d3796c2e496b84b67c8344838e07b73a780b4b5f9。
+
+### 購読追加回帰5件の先行準備（626Green後）
+
+5件sourceをactiveへ配置済み、構文抽出exit0/diffcheck0。テスト実行0件、compile成功/Red/Green未観測。既存behaviorで通ればregression成功として扱い、人工Redなし。source-manifest.json SHA256 8133268ba2d2dc53c2c83a168e9f7d18e41a5531843b5136395b3379a261699a、全証拠一覧 /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/evidence-files-manifest.json SHA256 91cc68864215545af9379ae57ccab724b0de6ad8119f3674759cdd7e5fc0dc3a。先の626集計Greenと新5件の未実行状態を区別。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -533,6 +565,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 ### 購読の最小Green候補（親のRed採用後）
 
 待機取消、Run終了、旧epoch、不正入力、cached commandの新鮮度等を個別runtime testで確認したとはしない。remaining-03A.jsonへ次のregression/test-first残件として保持。実UDP/Dispose、03B/C、外部の非破壊代替評価・DCP配置/実機受入も未完了。既存期待値緩和/skip化、外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧manifest SHA256 `443ea36ddd2ff71343df4acba6001c19b03526163eee9dd987bcfed962fc1252`（19file）。全build/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 購読のGreen CI収集・追加回帰/tmp候補
+
+旧run39795794024の全体in_progress履歴/job625成功/ローカルmonitor exit255を維持し、新watch/再実行/状態成功への変換なし。購読のRun終了/不正packet/旧epoch cache拒否、実UDP/Dispose等は個別回帰と後続実装が残る。03B/C、外部/配置/依存/設定/環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更なし。全watch/GET/log/構文抽出/read/save process終端、exit回収済み、実行中session・未回収exit・保留approvalなし。
+
+### 購読追加回帰5件の先行準備（626Green後）
+
+5件は実parser CI待ち。実UDP transport/options/lifecycle、no-op Disposeと停止資源解放のtest-first検証は次の未完了として保持し、03A全完了や03B/C/外部接続/実機成功とはしない。製品behavior・既存期待値/skip・外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全読取/構文抽出/保存/check process終端、exit回収済み、稼働watch/session・未回収exit・保留approvalなし。
 
 ## 親による公開準備記録
 
