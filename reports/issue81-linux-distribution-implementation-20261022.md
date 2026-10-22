@@ -19,49 +19,52 @@
 - execution_environment: FA780、fa780\donabe、PowerShell7 login:falseから承認付きWSL Ubuntu donabe、/home/donabe/Duck-issue81-aspire-desktop-bridge。
 - verification_capability: remote_ci_only。標準.NET試験はローカルの生成済みSslProto不足を補修せず、既存遠隔CIで検証する。
 - governing_policy: 比較設計のTDD要求を適用。実行時Red前の本実装をしない。過去のPD-I81-02-TDD未充足を今回の証拠で遡及充足しない。
-- publication_state: 先行試験aaa903db2b4b6da8645df4c6e321e3f117cbdd6e commit/push完了、CI39865903670終端失敗。標準776件成功、配布定義欠落による構成Redを確認。実装候補はcommit_pending。
+- publication_state: 先行版aaa903d公開・CI39865903670構成Red。候補fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9公開・CI39867225445初回775成功/1失敗/発行skip、同HEADの2回目は776成功と3アプリ実発行・出力検査成功。初回原因未確定。通常レビュー対象の記録同期はcommit_pending。
 - authorization_boundary: 同課題の配布定義・試験・必要設計同期。外部ソース・設定変更、依存導入、配布物取得、コンテナ作成起動、mergeなし。
 - continuity: 旧実装担当は終端のまま保持。通常レビューは既存担当を継続しSol/high、独立最終レビューは未開始。
+- evidence_storage: reports/evidence/issue81-linux-distribution-validation-20261022。テキスト211件収納、重複展開・ソース原本9件は接続先に保持。parent-storage-map.json SHA256 4a042739e9f0e989344a820d4beb77136100e0abb4aefc0f03ad0cf7cf56a95e。旧38件は03C履歴参照のみ。
+- preflight: 公開対象の追跡状態、検査入力と対象数、指定済みghのlogin:false/require_escalated経路を実行前にまとめて確認し、記録更新と証拠収納を一まとまりにする。
 
 
 ## 実行コマンド
 
-- bash -n scripts/tests/verify-linux-publish-outputs.sh — exit 0（shell 構文確認）。
-- git diff --check — exit 0。
-- scripts/tests/verify-linux-publish-outputs.sh の mode は 755。
-- sha256sum scripts/tests/verify-linux-publish-outputs.sh — adfe7cd88a943a93bf59afc515b71f178b05d4255761280548d07ecd1cc2704f。先行検査の固定期待値とスクリプトは変更していない。
-- PR #84 CI run 39865903670、head aaa903db2b4b6da8645df4c6e321e3f117cbdd6e、event pull_request — 終端 failure。Run dotnet test は 776 passed / 0 failed / 0 skipped。別step Verify Linux application publish outputs は RuntimeHost profile 欠落で exit 1。linux-publish-failure-39865903670-1 artifact ID 12463912638（7ファイル、2,286 bytes、https://github.com/ibis-ssl/Duck/actions/runs/39865903670/artifacts/12463912638）から stderr・check exit 1・publish exit not-run・環境情報を読取済み。ログは Tracker/Tracker.RuntimeHost/Properties/PublishProfiles/LinuxContainer.pubxml が存在しないと報告。実際に測れた構成Redはこの最初のprofile欠落だけで、後続二つのprofileや発行出力はまだ測定していない。
-- CI artifact の環境: Ubuntu 24.04、.NET SDK 10.0.402、linux-x64。packet-flow と full-stack job は skipped。
-- Windows Node focused textlint: exit 0。既存cache C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules へのjunctionを使い、新しい一時mirror issue81-04a-lint-20261022で同じリポジトリ設定を実行した。npm install は行っていない。
-- 同じfocused cspell: exit 1、既存行296の Tailscale のみ。追加した説明文の appsettings / DLL などは一般語を日本語にし、実ファイル名はコード表記のまま保持。
-- Yomiyasu focused strict: exit 0、score 100、is_clean true、findings 0。
-- Sudachi whitelist focused: exit 1。既存の10件（TCP 9件、Tailscale 1件）だけで、追加した節の新規指摘はない。語彙辞書や全体設定は変更していない。
-- 全文gateは再実行せず、既知のcspell 232件 / 5文書、Sudachi 890件 / 5文書の不合格状態を維持。
-- ローカル dotnet publish と.NET標準試験は実行していない。remote_ci_onlyを維持し、profile実装後の実発行Greenは親のcommit/push後にCIで確認する。
+- `bash -n scripts/tests/verify-linux-publish-outputs.sh` は exit 0。スクリプトは mode 100755、SHA-256 `adfe7cd88a943a93bf59afc515b71f178b05d4255761280548d07ecd1cc2704f`。
+- `gh run view 39867225445 -R ibis-ssl/Duck --json ...` を実行前確認と完了確認に使用。初回の通常権限実行は api.github.com:443 の socket access error。親の承認済み経路 `login:false + require_escalated` で読み直し、attempt 1 が fdff6ec の終端failureであることを確認した。
+- 承認された再実行は `gh run rerun 39867225445 --failed -R ibis-ssl/Duck` の一度だけ。exit 0。実行後のstatus readと `gh run view ... --log --job 120136505328` も exit 0、attempt 2 の終端結果を保存した。
+- attempt 2 の標準試験は 776 passed / 0 failed / 0 skipped。後続 `scripts/tests/verify-linux-publish-outputs.sh` は RuntimeHost、DebugHost、RefereeDriver.Host を各 `LinuxContainer` profile で発行し、`Linux publish output contract passed for all three managed applications.` を出した。
+- CIのsource archiveから得た対象4ファイルと、Python `subprocess.run(["git","show",ref+":"+path], check=True)` で baseline `4e3099e75c4afab8ba1f11c67500ebe29f17fed3` / candidate `fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9` を比較。exit 0、test fixture / wrapper / launch options / test csproj は全てbyte-equal。過去のprocess substitution比較ログは空blobを含むため失敗証拠として保持し、比較根拠には使用しない。
+- 現04A設計docのsource/config/runtime/dictionary同一性とbaseline・追加12行の比較結果、及びcurrent-source lint rawは `C:\Users\donabe\AppData\Local\Temp\issue81-04a-evidence-20261022\04a-lint-source-context.json`、`04a-lint-runtime-context.txt`、`04a-lint-results-summary.txt` と同rootの `text-current.*` / `spell-*.{command.txt,stdout.log,stderr.log,exit-code}` / `yomiyasu-04a-*.{command.txt,stdout.log,stderr.log,exit-code}` / `sudachi-04a-*-captured.*` に保存。実行は既存Windows Node v24.20.0 / npm 11.19.0 と既存cache junctionで、依存導入なし。全体文書gateは新たに実行していない。
+- 以前の `/tmp/issue81-referee-driver-host-design-sync-20261022/final/` 等を指す38件の `prior-lint-reference.sha256` は03Cの歴史的参照のみで、04Aの結果根拠には使わない。Sudachiの最初のstdinなしcaptureはraw保持の上invalid扱いとし、stdinを渡した `*-captured.*` のみを有効結果に使う。
+- 親所有trackingの新規行は2ファイル/2行を抽出して個別確認。最終textlint/CSpell/Sudachiは各ファイル exit 0。断片SHA-256は tasks `4801438f2f4a9a1386e9a5ae8953a62541d2b56f5db0c8ce5f439538f7f1fd58`、phases `a350e836b82627bb51e6c7e77143dfc0fa732f4f7a10e17a2fad000ef06d134e`。
+- 全ログ・command・exit・source hashは `C:\Users\donabe\AppData\Local\Temp\issue81-04a-evidence-20261022` に保存。218ファイル/39,625,450 bytes。inventory manifest `evidence-files.sha256` SHA-256 `8a1e01df1f6715b1e7b9bca4d67662dad3c6b8026ea55278365b5409953b134e`。ZIP拡張子・PK magicは0件、gzip source archiveはTemp原本のみ、展開コピーとbinlog重複は除外。
 
 ## 対象ファイル
 
-- Tracker/Tracker.RuntimeHost/Properties/PublishProfiles/LinuxContainer.pubxml — Release/net10.0/FileSystem、SelfContained=false、UseAppHost=false、単一ファイル/R2R無効、RIDなし。
-- Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml — 同じ明示profile。
-- Testing/Duck.Testing.RefereeDriver.Host/Properties/PublishProfiles/LinuxContainer.pubxml — 同じ明示profile。各profile SHA-256は 54179c597446fe7382c2c80c38b1c005c71fa8014a12f5d0541bf605081dd1ab。
-- Tracker/Design/Testing/aspire-simulation-test-environment.md — 04A配布契約の説明文を自然な日本語にし、固定期待値を変えずに用語を修正。
-- scripts/tests/verify-linux-publish-outputs.sh と .github/workflows/dotnet-test.yml — 親の公開済み先行試験・CI配線を保持、変更なし。
-- 3つの.pubxmlは .gitignore:195:*.pubxml でignoreされる。.gitignoreは変えず、commit時に正確な3パスをforce-addする必要がある。
+- `Tracker/Tracker.RuntimeHost/Properties/PublishProfiles/LinuxContainer.pubxml`
+- `Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml`
+- `Testing/Duck.Testing.RefereeDriver.Host/Properties/PublishProfiles/LinuxContainer.pubxml`
+- `scripts/tests/verify-linux-publish-outputs.sh`
+- `Tracker/Design/Testing/aspire-simulation-test-environment.md`
+- 親所有の `Tracker/Design/tasks-status.md` と `Tracker/Design/phases-status.md` は読み取り・changed-line lintのみ。今回このworkerからは編集していない。
 
 ## 指摘事項
 
-- observed 04A Red は最初のprofile不在だけ。Run 39865903670は通常テスト成功後に検査stepが止まった。DebugHost / RefereeDriver.Host のprofile不在や各出力の不足を、このrunで測定したとは扱わない。
-- 3 profile はいずれもRIDなし・framework-dependentで、CIの既存restoreと --no-restore に合わせている。外部image・runtime・debug資材の版とdigestは今回確定しない。
-- CSpell と Sudachi のfocused実行は既存語彙項目のため不合格。該当行は既存TCP/Tailscale記述で、辞書追加・製品名を引用符で隠す回避はしていない。
-- 自分の通常レビューは未実施。別担当の通常レビューplaceholderは親が作成済みで、レビュー未開始。
+- aaa903d / CI 39865903670 で最初に測定された構成RedはRuntimeHost Linux publish profileの欠落だけ。標準776件成功、publish check exit 1。
+- fdff6ec / CI 39867225445 attempt 1 は標準試験775 passed / 1 failed / 0 skipped。`DockerContainerWrapperLifecycleTests.LogFollowerReapTimeoutReturnsFailureAndStillCleansContainer` が期待1・実際0で失敗し、publish stepは未到達。artifact `12463689590` を保持。
+- attempt 2 は同じheadで標準776件成功後、3アプリの実publish出力契約も成功。初回の終了処理試験失敗は再現しなかった。原因は未確定であり、タイミング依存は推測に留める。
+- packet-flowとfull-stack CI jobは両attemptでskip。04Bの外部成果物digest/Debug専用構成は未着手。
+- 現04A設計docは基準版と現行版の差分を比較し、現行mirrorと `fdff6ec...` の同文書がbyte一致することを確認（36,178 bytes / SHA-256 `98424b1d...`）。基準版との差分は追加12行（1,632 bytes / `b0f4978b...`）。textlint currentはexit 0。CSpell baseline/currentは同じ `Tailscale` 1件だけ（line 284/296）でexit 1、追加12行はexit 0。Yomiyasu strict baseline/current/追加行は全てexit 0、score 100、clean、findings 0。Sudachiのstdinあり正規captureではbaseline/currentが各10件（TCP 9、Tailscale 1）でexit 1、追加行は0件/exit 0。既存source/configとSudachiPy 0.6.11 / SudachiDict-core 20260428 / system.dic SHAを `04a-lint-results-summary.txt` に記録。全文gateは既知のCSpell 232件/5文書、Sudachi 890件/5文書の不合格状態を維持。
+- tracking changed-line Sudachi初回は追加語 `アプリ` でexit 1。親が語を置換し、最新2行の最終再検査は3 lint全てexit 0。
 
 ## 結果
 
-先行検査の観測Redを受け、3個の明示Linux publish profileと04A設計の用語修正を追加した。固定期待値は維持し、DebugHostの wwwroot/app.css、wwwroot/favicon.png を含む実際のpublish出力検査を緩和していない。標準テスト結果（776 pass）と構成Red（RuntimeHost profile欠落）を区別して記録した。設計文書のfocused textlint/Yomiyasuは通過し、既存のspell/whitelist gate指摘を保持した。
+- 04Aの3つのLinux配布profileは実際の遠隔 `dotnet publish` と固定期待値の出力検査に結び付き、CI attempt 2で3アプリ全てpassした。
+- 固定先行試験scriptは編集前後同一hash・実行modeで、期待値は緩和していない。標準 `dotnet test` も776件成功。
+- exact CI source archive hashは `candidate-source-hashes.txt` と `source.tar.gz` に記録。展開したソース重複はhash記録後に削除、archive原本はTempに保持。
+- 現04Aのsource/config/runtime/dictionaryとlint結果のcommand/stdout/stderr/exitをTemp evidence root内に保存し、baseline・追加12行との差分結果と照合した。prior-lint-reference.sha256の38件は旧03C歴史参照であり、04Aの検証根拠として扱わない。歴史的な最初の直接UNC失敗は保存rawから発見できておらず、その詳細を再構成せず欠落として記録。
 
 ## リスク
 
-- profileがGit ignore対象のためforce-addされなければCIに含まれず、同じ構成Redが継続する。
-- profile追加後の3プロジェクト全ての実publish出力、.runtimeconfig.json framework、静的資産同梱はCI Greenで未確認。
-- profileファイルの出力定義SHA-256は各ファイル同一の 54179c597446fe7382c2c80c38b1c005c71fa8014a12f5d0541bf605081dd1ab。固定検査スクリプトは adfe7cd88a943a93bf59afc515b71f178b05d4255761280548d07ecd1cc2704f のまま。
-- fixed base image/digest、外部成果物とdebugger供給物はI81-04B待機。取得、コンテナ作成起動、外部repo変更、依存追加、実機起動は行っていない。
+- attempt 1 のlifecycle failureはattempt 2で再現しなかったが、原因解明には至っていない。成功した再実行を原因修正の証拠にしない。
+- passは標準776件と3アプリのmanaged publish output contractに限る。packet-flow、full-stack、実機、通常review、独立最終reviewは別途未完了。container imageの取得・build・起動はしていない。
+- 全文文書lintは既知の未解消baseline findingで失敗を保つ。図の最終視認も未完了。

@@ -1,0 +1,2 @@
+command=wsl.exe -d Ubuntu -- /home/donabe/venvs/duck-pr73-r04-ff50682/bin/python -c 'import hashlib,importlib.metadata,pathlib; import sudachidict_core; p=pathlib.Path(sudachidict_core.__file__).parent; print(SudachiPy version, SudachiDict-core version, system.dic size and sha256)'
+shell=powershell; login=false; sandbox_permissions=require_escalated

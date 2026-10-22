@@ -1,0 +1,11 @@
+M	.github/workflows/dotnet-test.yml
+A	Testing/Duck.Testing.RefereeDriver.Host/Properties/PublishProfiles/LinuxContainer.pubxml
+M	Tracker/Design/Testing/aspire-simulation-test-environment.md
+M	Tracker/Design/phases-status.md
+M	Tracker/Design/tasks-status.md
+A	Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml
+A	Tracker/Tracker.RuntimeHost/Properties/PublishProfiles/LinuxContainer.pubxml
+A	reports/issue81-linux-distribution-implementation-20261022.md
+A	reports/issue81-linux-distribution-normal-review-20261022.md
+A	scripts/tests/verify-linux-publish-outputs.sh
+dependency_or_test_project_diff_exit=0
