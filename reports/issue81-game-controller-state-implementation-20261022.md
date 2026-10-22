@@ -80,6 +80,12 @@ work-context-manager/implementation-executor/implementation-worker/tdd-executor/
 - 既存Roslyn構文解析: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-game-controller-state-referee-match-green-candidate-20261022/syntax-input.json /tmp/issue81-game-controller-state-referee-match-green-candidate-20261022/syntax-result.json — exit0。これはsemantic compile/runtime Greenではない。
 - git diff --check — exit0。Red source34に対し候補2file以外32fileと固定match18 testのSHA256不変を照合。新build/test/CIは実行していない。command/stdout/stderr/exitは同候補証拠dirへ保存。
 
+### 03B実装の文書同期・通常レビュー前検証（2026-10-22）
+
+- 既存Windows Node24.20.0/CSpell9.8.0/textlint15.7.0/cacheを用い、同じ相対path/config/辞書で変更行断片2文書を検査。tasks-status.md:29、phases-status.md:14を元行byteのまま保持し、非選択行を空行にして行位置を保った。fragment-manifest.jsonに全文hash・断片hash・元行を保存。
+- node tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md: exit0。spellも同対象でexit0、Files checked2/Issues0。既存Sudachi環境の同scriptを--stdinで各断片へ実行し双方exit0/新語0。
+- 実効辞書255語/hash d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7は既存検査と同一。importsなし、globRoot「.」/files「**/*.md」。監査helper初回のpackage export解決exit1は生出力保持し、helperの実体path参照補正後exit0。検査config/辞書/依存は変更していない。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -144,6 +150,12 @@ RefereeReceiveService.csはGetCurrentObservation()=>nullと同packet証跡record
 - Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs: 同packet accessorをcommandGate内で実装。SHA256 7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4。
 - Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs: 開始UDP証跡→既存Observer API取得→完了/poll証跡照合。SHA256 70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c。
 - 本報告の子5欄のみ履歴追記。親prefix/Dispatch、固定test18/旧716/独立67/race、親tracking/他report/evidenceを保持。source-manifest.json、unchanged32-source-guards.json、production.diffに正確な差分/指紋を保存。
+
+### 03B実装の文書同期・通常レビュー前検証（2026-10-22）
+
+- 検査対象は親変更のTracker/Design/tasks-status.md:29とTracker/Design/phases-status.md:14だけの断片2文書。親所有trackingは編集していない。
+- 子のrepo編集は本報告の子5欄への統合追記のみ。新通常レビュー報告と製品/test34fileを不変guard。親prefix/Dispatchと既往履歴を保持。
+- 証拠は /tmp/issue81-game-controller-state-review-preparation-validation-20261022/。config-integrity.json、fragment-manifest.json、source34-guards.json、review-guard.json、03B-tdd-summary.json、validation-summary.json、生commands/exits/stdout/stderrを保存。
 
 ## 指摘事項
 
@@ -212,6 +224,12 @@ APIのHALT/STOP/NORMAL_START/FORCE_STARTとHALT/STOP/RUNNINGの名前を明示sw
 - commandGate→診断lockは既存購読経路と同順。pumpは診断lockを解放してからcommandGateへ進む。matcher自身lock中に他component呼出し/awaitを行わない。正常同counterのcount更新と購読の重複抑制は変更しない。
 - completeness-matrix.jsonに各要求→製品path→実service/parser/Observer/client組成fixture→実Red→候補CI待ちを対応付けた。
 
+### 03B実装の文書同期・通常レビュー前検証（2026-10-22）
+
+- 全03B小単位は固定試験の実行時不足を受け最小実装へ進めた。初回653中1失敗→653成功、通信666中6失敗→666成功、期限677中4失敗→677成功、明示対応707中7失敗→test job707成功、API観測716中9失敗→716成功、統合734中13失敗→734成功。各exact HEAD/runは03B-tdd-summary.jsonへ対応付けた。compile failure/timeoutをRedと扱っていない。
+- 最終exact51bdd74723a06cde21adf734f5b1d4a40b48b8f8のPR CI39841590121はrun全体completed/success、734pass/0fail/試験skip0。packet/full-stack jobはskip。成功artifact0のため個別TRX/CI source archiveは取得不可で、固定18/旧716/独立67/raceの再観測は集計成功とsource34不変証拠に限定する。
+- 今回変更行のtextlint/CSpell/Sudachi指摘0。新たな日本語修正案は不要。全文gateは再実行しておらず既知不合格を維持する。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
@@ -274,6 +292,11 @@ test保存・構文/diff/hash確認を完了、runtime Red/Greenは未観測。�
 - 証拠: /tmp/issue81-game-controller-state-referee-match-green-candidate-20261022/。親prefix/Dispatchと既往履歴を保持して子5欄へ追記・読戻し。runtime Green/全734回帰は親commit/push後のexact-SHA PR CIまで未確認。
 - 発行した構文/読取/保存/diff検査processは全終端・exit回収済み。新watch/build/test/サービス起動・commit/push/GitHub操作なし。旧Red監視は親許可で局所終了済み（gh255/wrapper0）、GH run cancel/rerunなし。
 
+### 03B実装の文書同期・通常レビュー前検証（2026-10-22）
+
+- 変更行断片2文書の検査、同辞書/config/元行指紋、製品/test34と通常review報告不変を確認。親prefix/Dispatchと旧履歴を保持し子5欄へ追記・読戻し。
+- 03B実装は固定Green734の証拠を保存した段階で、通常レビューは未実施・未判定。新build/test/CI・製品編集・commit/pushなし。所有mirror/junctionを清掃し、発行process全終端・exit回収済み。
+
 ## リスク
 
 API StateにUDP command_counterはなく、列挙値の数値も異なる。状態照合は有限窓の新しい観測として扱い、原子的同期やGC自身の受信診断を捏造しない。Desktop/DCP/実機は未検証。全文文書gateは不合格のまま。
@@ -335,3 +358,9 @@ URL設定世代はローカルcontextでDCP所有世代ではない。UDP受信e
 - 同packet証跡はローカル受信/診断とAPI有限窓の保守的照合で、API側counterや原子的cross-protocol同期を仮定しない。同commandでも取得中に新packet/countが進めば拒否するため、連続入力時の可用性/再試行頻度は実接続未検証。
 - APIageは既存Observerの取得開始からの上界を使用しpollで延命しない。DCP所有実証・GC自身受信診断・03CHTTP/DI/配線・明示AutoDrive統合・実image/Windows/Desktop/実機は未完了/未検証。既存明示AutoDrive/default pathとobserver write0を変更しない。全文文書gate既知不合格を保持。
 - 新依存/環境/auth/network/外部repo/配置変更・新agentなし。元Solhigh継続/applied:null、runtime Greenや自己review合格を主張しない。
+
+### 03B実装の文書同期・通常レビュー前検証（2026-10-22）
+
+- 断片合格は全文2文書や全文24文書gate合格ではない。既知全文CSpell232/Sudachi890不合格を保持する。語彙一覧/辞書/設定変更や製品名quote逃げなし。
+- 03Cの実接続factory/HTTP/DI/内部URI設定、Enabled/AutoDrive明示有効化構成は未実装。旧Driver/制御adapter/fixtureはbase88cb20fからbyte不変で、明示DriveToActiveAsyncとHALT→NEXT→FORCE/NORMAL契約を保持するが、今回成功は個別TRX未取得。実hostname再解決・実GC/Desktop/DCP所有実証・外部G3・実機を成功扱いしない。
+- 過去mappingCI39833466268と統合RedCI39839435897のrun全体最終表示は未確定の履歴を保持。各test jobの確定結果と所有localwatch終了255を分離し、GHcancel/rerunは行っていない。新agent/外部/依存/環境変更なし、元Solhigh継続/applied:null。自己review合格判定なし。

@@ -1,0 +1,33 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeDriver.cs",
+    "base": "88cb20f2b5cea46eb90bff80ba8d535639625de0",
+    "baseReadExit": 0,
+    "baseSHA256": "92748bc02e6c2dae5822ab4176ac3f25f29ed24002ae58eb940d806098aa1eac",
+    "headSHA256": "92748bc02e6c2dae5822ab4176ac3f25f29ed24002ae58eb940d806098aa1eac",
+    "byteUnchangedSinceBase": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeDriverNetworkAdapters.cs",
+    "base": "88cb20f2b5cea46eb90bff80ba8d535639625de0",
+    "baseReadExit": 0,
+    "baseSHA256": "888d40d56f74ebd3b532d3f2cb90f280e50de3cfa65921c593acc5f1fa1b35e4",
+    "headSHA256": "888d40d56f74ebd3b532d3f2cb90f280e50de3cfa65921c593acc5f1fa1b35e4",
+    "byteUnchangedSinceBase": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverFixtureTests.cs",
+    "base": "88cb20f2b5cea46eb90bff80ba8d535639625de0",
+    "baseReadExit": 0,
+    "baseSHA256": "53adc3db0d148f00e09faf58093c1ce7a87c5226f2142755004134164d66fc6b",
+    "headSHA256": "53adc3db0d148f00e09faf58093c1ce7a87c5226f2142755004134164d66fc6b",
+    "byteUnchangedSinceBase": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverNetworkAdapterTests.cs",
+    "base": "88cb20f2b5cea46eb90bff80ba8d535639625de0",
+    "baseSHA256": "e64edafd0e508784fb13936b206987550e9f4c94c7ea85310ef1ff4da4c45467",
+    "headSHA256": "e64edafd0e508784fb13936b206987550e9f4c94c7ea85310ef1ff4da4c45467",
+    "byteUnchangedSinceBase": true
+  }
+]
