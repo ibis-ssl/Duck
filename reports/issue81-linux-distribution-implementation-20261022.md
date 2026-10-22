@@ -25,6 +25,10 @@
 - evidence_storage: reports/evidence/issue81-linux-distribution-validation-20261022。テキスト211件収納、重複展開・ソース原本9件は接続先に保持。parent-storage-map.json SHA256 4a042739e9f0e989344a820d4beb77136100e0abb4aefc0f03ad0cf7cf56a95e。旧38件は03C履歴参照のみ。
 - preflight: 公開対象の追跡状態、検査入力と対象数、指定済みghのlogin:false/require_escalated経路を実行前にまとめて確認し、記録更新と証拠収納を一まとまりにする。
 
+- evidence_erratum: 通常レビューで、最終trackingのSudachi引数が後指定で上書きされphase断片のみを検査していたと判明。従来のtasks側成功は未裏付け、変更4行のうち未検査行もあった。既存証拠を保持し、4行を対象に補完済み。通常レビューでEV-I81-04A-01はclosed、残る必須修正0。製品と配布出力のCI成功とは分ける。
+- normal_review: 対象5f280e33da9f0e93d7396373c9573b0f21424582と限定文書追補、pass_with_held、必須製品0・証拠所見closed。記録のcommit/pushはcommit_pending。
+- supplemental_evidence: reports/evidence/issue81-linux-distribution-tracking-lint-20261022 と issue81-linux-distribution-review-target-ci-20261022。原本manifest3492d0a6と63d5565aを照合収納済み。
+- publication_blocker: 一括記録のcommit/pushは自動承認のCreateProcess拒否でコマンド全体未実行。理由は初期禁止に対する後続承認が見えないとの判定。PR84本文と既存自担当comment6336270248の状態更新も別途実行前拒否、理由は未公開結果の外部共有承認が確認できないとの判定。両操作とも再試行・別経路なし。local/remote HEADは5f280e3、index空、本人が実際に許可していないとの断定はしない。
 
 ## 実行コマンド
 
@@ -35,7 +39,7 @@
 - CIのsource archiveから得た対象4ファイルと、Python `subprocess.run(["git","show",ref+":"+path], check=True)` で baseline `4e3099e75c4afab8ba1f11c67500ebe29f17fed3` / candidate `fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9` を比較。exit 0、test fixture / wrapper / launch options / test csproj は全てbyte-equal。過去のprocess substitution比較ログは空blobを含むため失敗証拠として保持し、比較根拠には使用しない。
 - 現04A設計docのsource/config/runtime/dictionary同一性とbaseline・追加12行の比較結果、及びcurrent-source lint rawは `C:\Users\donabe\AppData\Local\Temp\issue81-04a-evidence-20261022\04a-lint-source-context.json`、`04a-lint-runtime-context.txt`、`04a-lint-results-summary.txt` と同rootの `text-current.*` / `spell-*.{command.txt,stdout.log,stderr.log,exit-code}` / `yomiyasu-04a-*.{command.txt,stdout.log,stderr.log,exit-code}` / `sudachi-04a-*-captured.*` に保存。実行は既存Windows Node v24.20.0 / npm 11.19.0 と既存cache junctionで、依存導入なし。全体文書gateは新たに実行していない。
 - 以前の `/tmp/issue81-referee-driver-host-design-sync-20261022/final/` 等を指す38件の `prior-lint-reference.sha256` は03Cの歴史的参照のみで、04Aの結果根拠には使わない。Sudachiの最初のstdinなしcaptureはraw保持の上invalid扱いとし、stdinを渡した `*-captured.*` のみを有効結果に使う。
-- 親所有trackingの新規行は2ファイル/2行を抽出して個別確認。最終textlint/CSpell/Sudachiは各ファイル exit 0。断片SHA-256は tasks `4801438f2f4a9a1386e9a5ae8953a62541d2b56f5db0c8ce5f439538f7f1fd58`、phases `a350e836b82627bb51e6c7e77143dfc0fa732f4f7a10e17a2fad000ef06d134e`。
+- 4e3099e75c4afab8ba1f11c67500ebe29f17fed3→5f280e33da9f0e93d7396373c9573b0f21424582の4行差分（tasks 31〜33 / phases 19）を保存し、当初5f版のtextlint 0・CSpell 1・Sudachi 1を個別記録。親がtasks 33を修正したworking treeでもbaselineとの差分を再抽出し、final fragmentは2ファイル/4行。最終textlint、CSpell、Sudachiは全てexit 0。Sudachiは単一の `--files` と2ファイルパスで実行。最終source hash、行/fragment hash、config/checker hash、Sudachi辞書hash、全raw command/stdout/stderr/exitは追補bundle `C:\Users\donabe\AppData\Local\Temp\issue81-tracking-lint-5f280e3-20261022\final` に保存。
 - 全ログ・command・exit・source hashは `C:\Users\donabe\AppData\Local\Temp\issue81-04a-evidence-20261022` に保存。218ファイル/39,625,450 bytes。inventory manifest `evidence-files.sha256` SHA-256 `8a1e01df1f6715b1e7b9bca4d67662dad3c6b8026ea55278365b5409953b134e`。ZIP拡張子・PK magicは0件、gzip source archiveはTemp原本のみ、展開コピーとbinlog重複は除外。
 
 ## 対象ファイル
@@ -54,7 +58,8 @@
 - attempt 2 は同じheadで標準776件成功後、3アプリの実publish出力契約も成功。初回の終了処理試験失敗は再現しなかった。原因は未確定であり、タイミング依存は推測に留める。
 - packet-flowとfull-stack CI jobは両attemptでskip。04Bの外部成果物digest/Debug専用構成は未着手。
 - 現04A設計docは基準版と現行版の差分を比較し、現行mirrorと `fdff6ec...` の同文書がbyte一致することを確認（36,178 bytes / SHA-256 `98424b1d...`）。基準版との差分は追加12行（1,632 bytes / `b0f4978b...`）。textlint currentはexit 0。CSpell baseline/currentは同じ `Tailscale` 1件だけ（line 284/296）でexit 1、追加12行はexit 0。Yomiyasu strict baseline/current/追加行は全てexit 0、score 100、clean、findings 0。Sudachiのstdinあり正規captureではbaseline/currentが各10件（TCP 9、Tailscale 1）でexit 1、追加行は0件/exit 0。既存source/configとSudachiPy 0.6.11 / SudachiDict-core 20260428 / system.dic SHAを `04a-lint-results-summary.txt` に記録。全文gateは既知のCSpell 232件/5文書、Sudachi 890件/5文書の不合格状態を維持。
-- tracking changed-line Sudachi初回は追加語 `アプリ` でexit 1。親が語を置換し、最新2行の最終再検査は3 lint全てexit 0。
+- 以前のSudachi最終コマンドは `--files tasks --files phases` とnargs+引数を重ねていた。後段指定が先行指定を上書きするため、exit 0で確認できたのはphases断片のみ。tasksも成功したという過去の主張は未裏付けとして訂正し、正しい引数契約と元command/exitを追補bundleに保存。
+- 親修正後の4行で最終再検査を実施。tasks-status.md 31〜33行、phases-status.md 19行をそれぞれ含む2ファイルを入力し、textlint exit 0、CSpell exit 0（2 files / 0 issues）、Sudachi exit 0（findings 0）。先行版5fの失敗rawと修正途中の `シンボル` / `コード` 指摘は履歴として残し、最終結果と区別。
 
 ## 結果
 
@@ -62,6 +67,7 @@
 - 固定先行試験scriptは編集前後同一hash・実行modeで、期待値は緩和していない。標準 `dotnet test` も776件成功。
 - exact CI source archive hashは `candidate-source-hashes.txt` と `source.tar.gz` に記録。展開したソース重複はhash記録後に削除、archive原本はTempに保持。
 - 現04Aのsource/config/runtime/dictionaryとlint結果のcommand/stdout/stderr/exitをTemp evidence root内に保存し、baseline・追加12行との差分結果と照合した。prior-lint-reference.sha256の38件は旧03C歴史参照であり、04Aの検証根拠として扱わない。歴史的な最初の直接UNC失敗は保存rawから発見できておらず、その詳細を再構成せず欠落として記録。
+- 追補bundle `C:\Users\donabe\AppData\Local\Temp\issue81-tracking-lint-5f280e3-20261022` に5f版失敗raw、親修正diff/source hash、最終4行入力、3検査のraw command/stdout/stderr/exitを保存。current inventoryは77ファイル/61,655 bytes、manifest SHA-256 `3492d0a6284c624ab5a47e0d85b92627d53abc0f975e15abc69e6d2c44cd3efa`（不一致/未登録0）。初回56-file manifest SHA-256 `2762e36dbba12106646edbe3044bcc105744e086a350265e4f0b811c8b21d0b8` とそのinventoryを `initial-56/` に原本hashのまま保存。04Aの既存218-file bundleも不変。
 
 ## リスク
 

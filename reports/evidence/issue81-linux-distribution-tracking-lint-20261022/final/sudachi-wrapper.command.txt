@@ -1,0 +1,1 @@
+wsl.exe -d Ubuntu -- /home/donabe/venvs/duck-pr73-r04-ff50682/bin/python /mnt/c/Users/donabe/AppData/Local/Temp/issue81-tracking-lint-5f280e3-20261022/final/run-final-sudachi.py

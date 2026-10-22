@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--name-only",
+    "HEAD",
+    "--",
+    "Testing",
+    "Tracker/Tracker.RuntimeHost",
+    "Tracker/Tracker.DebugHost",
+    "Tracker/Tracker.Tests",
+    "scripts",
+    ".github",
+    "Tracker/Design/Testing"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0,
+  "finishedUTC": "2026-10-22T23:48:40.439162+00:00"
+}
