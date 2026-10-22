@@ -57,6 +57,20 @@ internal static class RefereeDriverApplication
             provider.GetRequiredService<RefereeReceiveService>(),
             provider.GetRequiredService<GameControllerStateObserver>()));
         builder.Services.AddHostedService<RefereeObservationWorker>();
+        if (bool.TryParse(configuration["RefereeDriver:AutoDriveToActive"], out var autoDrive) && autoDrive)
+        {
+            builder.Services.TryAddSingleton<IGameControllerWebSocketTransport>(provider =>
+                new RefereeDriverWebSocketTransport(
+                    provider.GetRequiredService<RefereeDriverTransportFactories>().ConnectWebSocket));
+            builder.Services.TryAddSingleton(provider => new GameControllerWebSocketControlClient(
+                provider.GetRequiredService<IGameControllerWebSocketTransport>(), endpoint));
+            builder.Services.TryAddSingleton<IGameControllerControlClient>(provider =>
+                provider.GetRequiredService<GameControllerWebSocketControlClient>());
+            builder.Services.AddSingleton(provider => new RefereeDriverFixture(
+                provider.GetRequiredService<IRefereeCommandSource>(),
+                provider.GetRequiredService<IGameControllerControlClient>()));
+            builder.Services.AddHostedService<RefereeAutoDriveWorker>();
+        }
         RefereeDriverHost.ConfigureHttp(builder);
         var app = builder.Build();
         RefereeDriverHost.MapHealth(app);
@@ -155,6 +169,14 @@ internal sealed class RefereeObservationWorker(
             await Task.Delay(TimeSpan.FromMilliseconds(100), clock, cancellationToken).ConfigureAwait(false);
         }
     }
+}
+
+/// <summary>明示選択された既存Driverだけを実行し、受信や観測の処理を重複生成しない。</summary>
+internal sealed class RefereeAutoDriveWorker(RefereeDriverFixture driver) : BackgroundService
+{
+    /// <summary>既存の制御順序を一度実行する。正常完了後も観測は継続し、停止時は保留制御を取消す。</summary>
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        driver.DriveToActiveAsync(stoppingToken);
 }
 
 /// <summary>単一受信処理へ渡す受信口と、その処理が明示的に破棄すべき所有資源。</summary>
