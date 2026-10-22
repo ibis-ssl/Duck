@@ -1,0 +1,25 @@
+ 1/24 README.md 26.04ms
+ 2/24 tools/lint/README.md 4.86ms
+ 3/24 Tracker/Design/Archive/Core/phases-status.md 2.53ms
+ 4/24 Tracker/Design/Archive/Core/tasks-status.md 12.62ms
+ 5/24 Tracker/Design/Archive/DebugHost/phases-status.md 1.56ms
+ 6/24 Tracker/Design/Archive/DebugHost/tasks-status.md 5.35ms
+ 7/24 Tracker/Design/Core/tracker-architecture-plan.md 17.42ms
+ 8/24 Tracker/Design/Core/tracker-core-engine-detail-design.md 5.79ms
+ 9/24 Tracker/Design/Core/tracker-history-000-038.md 3.84ms
+10/24 Tracker/Design/Core/tracker-test-maintainability-detail-design.md 5.35ms
+11/24 Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md 14.02ms
+12/24 Tracker/Design/DebugHost/debug-host-maintainability-design.md 2.15ms
+13/24 Tracker/Design/DebugHost/raw-vision-viewer-plan.md 9.48ms
+14/24 Tracker/Design/phases-status.md 7.92ms X
+15/24 Tracker/Design/RuntimeHost/runtime-host-plan.md 3.54ms
+16/24 Tracker/Design/tasks-status.md 14.21ms X
+17/24 Tracker/Design/Testing/aspire-004a-workflow.md 1.93ms
+18/24 Tracker/Design/Testing/aspire-006c2-integration-plan.md 1.10ms
+19/24 Tracker/Design/Testing/aspire-fullstack-fixture-stability-design.md 1.78ms
+20/24 Tracker/Design/Testing/aspire-simulation-test-environment-history.md 14.60ms X
+21/24 Tracker/Design/Testing/aspire-simulation-test-environment.md 4.58ms X
+22/24 Tracker/Design/Testing/tracker-comparison-debug-design.md 5.26ms X
+23/24 Tracker/Tracker.CaptureReplay/README.md 1.76ms
+24/24 Tracker/Tracker.DebugHost/README.md 9.70ms
+CSpell: Files checked: 24, Issues found: 232 in 5 files.

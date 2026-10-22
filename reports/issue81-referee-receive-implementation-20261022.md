@@ -177,6 +177,22 @@ exactc2767f8684f6280cc65e25c8992cbc857a8d85efのpull_request CI39811429720を公
 
 親がexactc2767f8/CI39811429720のunicast127.0.0.1・IF::1受理による29行Assert.NotNull失敗を有効Red採用後に最小fix。既存SDK Declarations.dll構文抽出exit0。/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false はexit1、既存生成Referee不足CS0246x2/CS0400x2、0warnings/4errors。git diff --check exit0。全argv/exit/生stdout/stderr/source前後/diffを /tmp/issue81-referee-receive-udp-input-fix-green-candidate-20261022/ に保存。
 
+### 381dcb6 の最終 CI・既存 Markdown gate（2026-10-22）
+
+- gh run view 39812786126 --repo ibis-ssl/Duck --json databaseId,event,headSha,status,conclusion,url,jobs、同 --log、gh api --method GET repos/ibis-ssl/Duck/actions/runs/39812786126/artifacts は全て exit 0。watch は作成していない。CI の実行コマンドは既存 dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj と TRX/diag/blame/binlog オプションで、生ログと command JSON を下記証拠に保存した。
+- 旧 run 39795794024 は許可された GET 1回のみ exit 0。現在 completed/success（updated_at 2026-10-22T15:40:23Z）で、以前の未終端表示・monitor 停止履歴は変更していない。
+- Windows Node v24.20.0、既存 cache の CSpell 9.8.0/textlint 15.7.0/yaml 2.9.0 を使用。Windows Temp の同内容 mirror を cwd とし、node tools/lint/scripts/list-markdown-targets.js、node tools/lint/scripts/run-markdown-targets.js text / spell を実行。対象24文書、明示指定 phases-status.md / tasks-status.md の対象2文書を列挙確認した。0文書の結果は採用していない。
+- Sudachi は既存 /home/donabe/venvs/duck-pr73-r04-ff50682/bin/python から既存 check-markdown-whitelist-sudachi.py を実行。全体と --stdin による同一相対pathの baseline/current を検査し、200件表示上限を超える位置は同スクリプトの記録関数を一時ラッパーで観測した JSON に保持した。標準 Node の Python 自動選択とは別経路であり、単一 npm コマンドの成功とはしていない。
+- 初期 mirror 検証の並び順 assertion と node -e の引数 quote による監査失敗は準備エラーとして保持した。対象集合一致と一時 .cjs による監査で修正し、検査結果へ混入していない。インストール・設定保存・語彙追加は行っていない。
+
+### 親による日本語整理後の Markdown 再検査（2026-10-22）
+
+- CI651成功は再実行していない。Windows Node v24.20.0 と既存 CSpell 9.8.0/textlint 15.7.0/yaml 2.9.0 cache、別の同内容 mirror cwd で既存 list-markdown-targets.js / run-markdown-targets.js text・spell を実行。full24・focus2を確認し、0文書結果は使用していない。Sudachiは同じ既存venvと既存scriptを使用した。各実command/cwd/exit・生出力は新証拠の *.command.json と *.stdout.log / *.stderr.log に保存。
+
+### CSpell 表示上限と旧行の判定訂正（2026-10-22）
+
+- 全gateを再実行せず、保存済stdoutと既存CSpell cache sourceを読取確認した。上限未観測だった今回の親変更行だけを、同じconfig/辞書/相対pathの別一時mirrorへ抜粋し、既存 run-markdown-targets.js spell --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md で限定検査した。対象2断片文書、exit0、指摘0。元の行位置を空行で保持し、全文検査とは区別。実commandと出典行/全文hash/断片hashを edited-lines-proof に保存した。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -333,6 +349,20 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
 
 製品変更は Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs のみ、SHA256 66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6。固定11case/既存640/独立67を含む他22sourceはhash不変。service/adapter/既存public UDP/default非container経路は無変更。source-manifest.json SHA256 43863a0d93dd7b668686df88e9d9abf07f78b336355d7654c9191206cf36c8e4。親prefix/Dispatch/tasks/phases/他report、親所有未追跡reports/issue81-referee-receive-normal-review-20261022.mdを保持し編集しない。
+
+### 381dcb6 の最終 CI・既存 Markdown gate（2026-10-22）
+
+- 製品・試験ファイルは変更していない。HEAD 381dcb6b788ecee2aeec0bf1077069102d34bd55 と作業木の source 23ファイルを既存 manifest と照合し、factory 以外の固定 source および固定独立67件の source byte を保持。factory SHA256 は 66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6。
+- 文書の baseline は03A開始 HEAD 234067d3cc3027a20f3794a7ce8fea75f26220ca。初回 committed tracking 検査後、親が整理した最新 tasks/phases を再同期した。初回と最終の文書 byte・hash・出力を別保存している。親所有 tracking / normal review report は編集していない。
+- 証拠ディレクトリ: /tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/。ci-evidence.json、head-source-manifest.json、markdown-gate-summary.json、mirror-files.json、cspell-baseline-final-delta.json、sudachi-baseline-final-delta.json に対象・出力・位置・hash を保存。*.command.json と生 *.stdout.log / *.stderr.log を inventory.json に収録する。
+
+### 親による日本語整理後の Markdown 再検査（2026-10-22）
+
+- 親が固定した tasks/phases の最新byteを使用。途中の「アプリ」版と最終「アプリケーション」版はhashと結果を分けて保存した。最終source/mirrorの同一性を確認し、既存config・辞書・script10ファイルも前回/baselineと同じhash。子は製品・試験・親tracking・normalreview prefixを編集していない。新証拠: /tmp/issue81-referee-receive-markdown-regate-20261022/。
+
+### CSpell 表示上限と旧行の判定訂正（2026-10-22）
+
+- tasks:25（I81-02）はbaseline/currentとも SHA256 154a2d35fc70714e760d323a49c4580a56797808582066bb89eb23844ca1a58d、tasks:26（I81-V）はともに f805b8398383e7bcaa9a86ad0bde5ab4e7711f1d22c784abdd6c2ea770b18846。いずれも改行を除く行byte完全同一。全文の保存hash・raw旧結果を保持し、製品/試験/trackingは編集していない。
 
 ## 指摘事項
 
@@ -501,6 +531,25 @@ factory設定2caseの採用Redに対応する同じ固定7caseを維持した640
 
 IPv4 familyに加え宛先先頭octetが224〜239のmulticast範囲であること、明示IFがInterNetworkであることだけを確認し、不成立ならArgumentExceptionで正常資源生成へ進めない。IF未指定/明示IPv4、既定224.5.23.1:11003、dynamicport0、既存設定順/所有cleanupを変えない。新しいIPv6/設定機能やNIC探索を追加しない。guardが生成前に置かれることは今回の最小実装順であり、事前allocation0を新しい合格条件へ加えない。
 
+### 381dcb6 の最終 CI・既存 Markdown gate（2026-10-22）
+
+- 最終 full gate は不合格。24文書 textlint exit 0、CSpell exit 1（249指摘/5文書）、Sudachi exit 1（1107件、24 Markdown と whitelist 説明359入力）。初回の旧 tracking では CSpell 264件だったため、最終結果249件と混同しない。
+- 最新 tracking 2文書の CSpell は baseline 119件→最終136件。最終のうち95件は byte が同じ baseline 行に同位置・同語で存在し、41件は変更/追加行上にある。41件を全て新語とは扱わない。語・列・行・当該文は cspell-baseline-final-delta.json に列挙した。例として completed/success/owner 等の通常語と Dispose/HEAD 等の API・記録語、裸の hash の断片、混在表記を区別して親へ返す。辞書・引用による回避は行わない。
+- Sudachi は phases 30→60件（同じ baseline 行30件）、tasks 239→398件（同じ baseline 行210件）。変更行の全語と最終行配列、byte同一行との照合、当該文を sudachi-baseline-final-delta.json に保持した。単純なカテゴリ一致で既存扱いしていない。
+- 残る CSpell 指摘3文書（main/comparison design と過去 design history）は03A開始 baseline と byte が同じであることを hash で確認した。履歴は修正していない。設定/script/辞書10ファイルは baseline・repo・mirror が同じ byte。cspell config の import はなく、globRoot「.」、files「**/*.md」、ignorePaths/words が生成実効設定へ保持され、生成辞書255語は whitelist からの導出と一致した。
+
+### 親による日本語整理後の Markdown 再検査（2026-10-22）
+
+- 最終full24は textlint exit0、CSpell exit1/232件・5文書、Sudachi exit1/890件（24Markdownとwhitelist説明359入力）。直前の「アプリ」版はSudachi891件で、最終890件と区別。全体gateは引き続き不合格。
+- focus2のCSpellはbaseline234067d=119件、最終119件（同一baseline行104件、変更行15件）。具体位置は tasks:25 の issue、tasks:26 の sourceを同一byteで配置 / skip / HEAD / case / pass / with / held / finding / read / exit / resolver / vision / store。既存I81-02/I81-V記録の語であり、今回親が整理した03A等の説明行へ新規不合格を帰属させていない。語/列/当該文と新旧照合は final-cspell-delta.json。
+- Sudachiはphases30→30件（全30件は同じbaseline行）、tasks239→211件（同じbaseline行210件）。残る変更行の語はtasks:19のTCPのみで、baseline:19/29にも存在する実protocol名。tasks:30「アプリ」は親が「アプリケーション」へ訂正済み。最終の新規正規化語は0。正確な語/行配列/当該文は final-sudachi-delta.json。製品名やprotocol名の引用回避・辞書変更は行っていない。
+- CSpellの前回gateとの差分語と全位置は final-cspell-delta.json の newTokenLocationsVsPriorGate に別記した。通常説明の修正候補はtasks:26の sourceを同一byteで配置→「ソースを同じバイト列で配置」、case→「件」、finding→「指摘」、read→「読戻し」、exit→「終了コード」。実際の状態値・API・識別子との対応を親が判断するため提案に留め、子は既存記録を変更していない。Sudachiの新規語0をCSpellの新規語0と読み替えない。
+
+### CSpell 表示上限と旧行の判定訂正（2026-10-22）
+
+- 先の newTokenStrings 差分を新本文の追加と解釈するのは誤りのため訂正する。既存CSpellの DefaultSettings.js:77 は maxNumberOfProblems:100、docValidator.js:322-326 は重複語制限と1文書上限到達で出力を打ち切る。baseline/finalのrawはともにphases19/tasks100。前方の指摘減少により後方の旧語が表示範囲へ入り、同一語の重複制限でも表示位置が変化した。difflibの同一行対応自体はtasks25/26を正しく対応していた。これらは追加本文ではなく既存記録の表示差であり、旧I81-02/I81-V行の翻訳提案を撤回する。
+- 新規本文の未観測解消は限定断片検査で確認した。tasks13/19/27-30とphases14のCSpell指摘は0。Sudachi保存JSONでもこれらの新規語は0で、実指摘はtasks19のTCPのみ（baseline19/29にも存在する実protocol名）。CSpell全文の後半が未観測だったことを、全文無指摘と読み替えていない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -662,6 +711,22 @@ CI39811429720 completed/failure、test job119938411206 completed/failure。TRX65
 
 最小Green候補を保存、構文exit0/diffcheck0、no-restorebuildは既存proto不足exit1。テスト実行0、semantic compile/固定11caseのGreenは未観測。親commit/push後のexactSHA PR CIで再検証する。全証拠一覧 /tmp/issue81-referee-receive-udp-input-fix-green-candidate-20261022/evidence-files-manifest.json SHA256 fd8bd4d08c9737c5125dd9dc3d8bfa524f06227623c08fa9435a6946c7f64f2b（17file）。
 
+### 381dcb6 の最終 CI・既存 Markdown gate（2026-10-22）
+
+- https://github.com/ibis-ssl/Duck/actions/runs/39812786126 は exact HEAD / pull_request / completed / success。test job 119943228411 の実測は total 651 / passed 651 / failed 0 / skipped 0。checkout log は merge 2f50bda に対象381dcb6を含む。packet/full-stack jobs は skipped。artifact は0件で、成功 run の個別 TRX・source archive は取得できていない。固定67件・新11件の個別 Passed をこの成功集計から捏造していない。
+- 03Aの対応範囲: 正常同counter2packetの受信時刻と件数、破損/未知/必須値欠落で失敗・pump継続、取消時not-ready、単一Run、再開/旧callback/owner欠落/freshness境界、診断と購読の分離・古cache拒否、注入socket受信と取消、owned/borrowedおよび反復/並行Dispose、IPv4/Any/reuse/membership生成、不成立group/IF/port、部分失敗cleanup、同じproduction設定実装の動的port組成を順次固定testで扱っている。直前の不成立group/IPv6 IFのruntime Red2件に対する最小fix後、今回全651件がGreenとなった。通常reviewの合否判定は行っていない。
+- 自分が作成した Windows Temp mirror/junction は削除し、既存 node_modules cache の package hash 保持を確認。ドライブ mapping は作成していない。今回の CI 取得・文書検査 process は全て終了コードを回収した。
+
+### 親による日本語整理後の Markdown 再検査（2026-10-22）
+
+- 最終full/focusとbaseline検査を終端回収し、final-gate-summary.json / final-cspell-delta.json / final-sudachi-delta.json / mirror-files.json と inventory.json に保存した。旧gate・CI651成功証拠は保持。今回の文言整理で全体gate合格とは判定していない。
+- 新mirror/junctionは削除、既存cacheのpackage hash保持、ドライブmapping作成なし。全検査processの終了コード回収済み。git diff --check とreport読戻し結果は同ディレクトリへ保存。
+
+### CSpell 表示上限と旧行の判定訂正（2026-10-22）
+
+- 訂正の一次証拠は cspell-display-limit-correction.json。行同一hash、cache sourceの該当行/hash、raw上限件数、断片2文書の0指摘、現在編集行ごとのSudachi指摘を記録した。最終full24のCSpell232件/Sudachi890件と既存不合格判定は変えていない。旧JSON/rawは履歴として残す。
+- 限定検査session84074はexit0で終端回収済み。一時mirror/junction削除、既存cache保持。CIは再実行していない。report親prefix/normalreview prefixは保持した。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -813,6 +878,20 @@ fake設定順のGreenと実Desktopmulticast受入を分ける。不正options/�
 ### IPv4 multicast宛先・明示IFの最小fix（親のruntime Red採用後）
 
 実行時Greenと通常review判定は未取得。651全体/固定11/67の再検証後に03A検証・既存Markdown gate・報告/台帳整理から同じ通常reviewerへ進む予定で、本担当は未完了gateを成功にしない。Desktopmulticast/Windows/DCP/G3/実機受入は引き続き未検証。期待値緩和/skip化、外部/配置/依存/設定/環境/auth/network変更・外部service/Docker/実機起動・commit/push/GitHub変更なし。全syntax/build/read/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
+
+### 381dcb6 の最終 CI・既存 Markdown gate（2026-10-22）
+
+- Markdown full gate の不合格は未解消。親所有 tracking の新旧指摘は正確な位置付きで返し、無断の語彙設定変更や一括改稿をしていない。report 自体は既存 selector の reports 除外に従い検査対象外であり、除外設定を変更していない。
+- 成功CIは集計のみで個別TRX不在。ローカル標準 parser/host build は既知の生成source不足により remote_ci_only のまま、今回再実行していない。補助buildや構文検査を正式CIの代用とはしない。
+- Linux隔離socketのmembership設定・loopback受信/cleanupを Desktop multicast・Windows実機・DCP配置の成立へ広げない。03B/C、実所有ID取得、外部診断と配置は対象外。外部ソース変更ゼロのnamespace共有は親の第一評価候補であり、未採用/未適用の判断材料である。
+
+### 親による日本語整理後の Markdown 再検査（2026-10-22）
+
+- 残るCSpell・Sudachi既存不合格は未解消。過去記録の一括改稿/設定変更はしていない。最終語彙差とbaselineの語数差を混同しない。CI個別TRX不在、Desktop multicast実機未検証、03B/C未着手という前回の制約は保持。今回も通常reviewの合否判定を行っていない。
+
+### CSpell 表示上限と旧行の判定訂正（2026-10-22）
+
+- 上限付き診断の件数や語集合は全本文の未知語一覧ではない。旧行byte同一の直接証拠を優先し、表示差だけで新規本文や改稿必要性を断定しない。今回変更行の断片検査は全文gate不合格を解消するものではない。
 
 ## 親による公開準備記録
 

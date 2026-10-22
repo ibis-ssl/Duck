@@ -2,7 +2,7 @@
 
 ## タスク
 
-Issue81 / PR84 の I81-03A 通常レビュー。単一常駐受信・自身の診断・購読分離・epoch/鮮度・UDP設定と所有Disposeを、設計・固定テスト・実測証拠と照合する。レビューは未開始。
+Issue81 / PR84 の I81-03A 通常レビュー。単一常駐受信・自身の診断・購読分離・epoch/鮮度・UDP設定と所有Disposeを、設計・固定テスト・実測証拠と照合する。本書は通常レビューの記録先として準備した。
 
 ## sub-agentを使う理由
 
@@ -10,7 +10,7 @@ Issue81 / PR84 の I81-03A 通常レビュー。単一常駐受信・自身の�
 
 ## 対象範囲
 
-repo=/home/donabe/Duck-issue81-aspire-desktop-bridge、branch=task/issue81-aspire-desktop-bridge、Issue81/PR84。I81-03A開始基準234067d3cc3027a20f3794a7ce8fea75f26220caからの該当製品/test/report/tracking/evidenceと直接依存。review-target HEADは開始時に親が別途通知する。現時点では候補検証中で、技術判定は未作成。
+repo=/home/donabe/Duck-issue81-aspire-desktop-bridge、branch=task/issue81-aspire-desktop-bridge、Issue81/PR84。I81-03A開始基準234067d3cc3027a20f3794a7ce8fea75f26220caからの該当製品/test/report/tracking/evidenceと直接依存。review-target HEADは開始時に親が別途通知する。コード候補381dcb6のCI39812786126は651件成功。今回の記録保存commitをレビュー対象として開始時に親が通知する。技術判定は担当が記入する。
 
 ## 対象外
 
@@ -18,7 +18,7 @@ repo=/home/donabe/Duck-issue81-aspire-desktop-bridge、branch=task/issue81-aspir
 
 ## Dispatch profile
 
-Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=medium; change_radius=cross_module; criticality=high; repetition=single; decomposability=independent_workstreams; decomposition_policy=forbidden; decomposition_disposition=prohibited_by_review_lifecycle; parallelism_mode=single_agent; context_need=bounded_history. existing_reviewer=/root/issue81_normal_review; original_actual_requested=gpt-6.1-sol/high; original_fork=none; role_plan=original default role reused; applied=null; application_status=not_started_reuse_planned; profile_observability=final_profile_hidden; report_persistence_mode=normal_persistence. verification_capability=remote_ci_only for real parser/standard suite. parent supplies exact target HEAD/current CI and report evidence before review starts. report_attestation_allowed=false.
+Parent-owned. task_kind=normal_review; work_class=judgment_heavy; uncertainty=medium; change_radius=cross_module; criticality=high; repetition=single; decomposability=independent_workstreams; decomposition_policy=forbidden; decomposition_disposition=prohibited_by_review_lifecycle; parallelism_mode=single_agent; context_need=bounded_history. existing_reviewer=/root/issue81_normal_review; original_actual_requested=gpt-6.1-sol/high; original_fork=none; role_plan=original default role reused; applied=null; application_status=reused_existing_agent_profile; profile_observability=final_profile_hidden; report_persistence_mode=normal_persistence. verification_capability=remote_ci_only for real parser/standard suite. parent supplies exact target HEAD/current CI and report evidence before review starts. report_attestation_allowed=false.
 
 ## 実行コマンド
 
