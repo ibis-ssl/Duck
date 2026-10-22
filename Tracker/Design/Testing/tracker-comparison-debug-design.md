@@ -55,7 +55,7 @@ flowchart LR
   tigers[TIGERs tracker / AI 無効]
   erforce[ER-Force tracker]
   debug[DebugHost / 追跡・UDP送信無効]
-  ref[RefereeDriver / 審判観測]
+  ref[RefereeDriver / 単一受信・自身診断]
   checks[各資源内の準備確認]
   sim -. 10020 .-> duck
   sim -. 10020 .-> tigers
@@ -72,15 +72,31 @@ flowchart LR
   tigers -. 11010 .-> gc
   erforce -. 11010 .-> gc
   debug -. 三者の受信・新しさ .-> checks
-  ref -. WebSocket /api/control .-> gc
+  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
+  ref -. 自身の診断 / 内部39110 .-> checks
  end
  app -. 選択コンテナの管理 .-> bridge
  browser -. HTTP / WebSocket .-> host
  host -. TCP 8082 / GC UI・API .-> gc
  host -. TCP 8080 / 比較画面 .-> debug
+ host -. TCP 39110 / RefereeDriver 診断 .-> ref
 ```
 
 破線は未実装・未受入の経路を表す。Crane と cm4-sim の制御は主設計の通信契約に従う。コンテナの名前解決、数値 IP、127.0.0.1、再作成後の接続先更新と、Aspire 13.5.4 の 127.0.0.1 待受は主設計の確認契約を満たすまで阻害として残す。
+
+## RefereeDriver の共通契約
+
+比較時も[主設計の実行・内部診断](aspire-simulation-test-environment.md#refereedriver-の実行と内部診断)を使う。`Testing/Duck.Testing.RefereeDriver.Host` にHTTP依存を分離し、既存の受信・制御ライブラリと利用側の実行条件を維持する。`Program` は標準の依存登録と起動へ委譲し、単一の受信処理を観測と明示制御で共有する。比較追跡器やGame Controllerの代わりに11003を送信しない。
+
+構成は起動時に読み取る。`RefereeDriver:Enabled=true` と `Testing:ContainerMode=true` で内部HTTP39110を待ち受け、`RefereeDriver:GameControllerUri=ws://game-controller:8082/api/control` を観測と明示制御へ渡す。`RefereeDriver:InterfaceAddress` は任意のコンテナ内IPv4で、`Testing:Diagnostics:RunId`、`Testing:Diagnostics:ResourceId`、`Testing:Diagnostics:ContainerId`、`Testing:Diagnostics:Generation` を明示する。完全IDの構造検査をDCP所有証明とはみなさない。
+
+自動制御は `RefereeDriver:AutoDriveToActive=true` を追加で明示した場合だけ選ぶ。既定の観測専用は書込みを行わず、Windowsブラウザーの手動操作を保持する。自動改名設定を追加せず、既存の制御JSONと明示的なチーム名設定を維持する。無効時はUDP受信・Game Controller接続・制御・診断経路の登録を行わず、診断は404となる。HTTPサーバー自体を起動しない契約ではない。
+
+`GET /health/referee` は `isReady`、現在の `reason`、自身の `diagnostic`、有効なAPI観測の `api` を返す。正常な復号と進捗、完全ID、同じ受信世代・送信元・件数に対応する証跡、UDPの5秒以内とAPI取得開始から3秒以内の新しさ、状態一致が揃う場合だけ200とする。欠落・未知の経過時間・古入力・不一致は503で、再取得により新しさを延命しない。協定世界時の受信日時は時差を含む形式で表示し、単調時刻を異なるプロセス間で比較しない。APIの指令番号を仮定せず、異なる通信規約の原子的な同期とはしない。
+
+応答の全項目と設定の型・既定値は主設計に従う。失敗後の理由は `NoObservation` となり得て、最後の失敗履歴を保持する契約ではない。内部39110の待受、コンテナ用でない127.0.0.1待受、将来のWindows動的127.0.0.1公開を分ける。
+
+標準のUDP生成処理と要求ごとの `ClientWebSocket` 生成を本番経路へ登録する。CIの組成試験は通信口と時計を置換して実復号・依存登録・常駐処理・HTTP・停止・制御順を確認し、実ソケット設定は別の動的ポート試験で確認する。薄い入口の単独起動、すべての標準通信口を使う実行、実Game Controllerと名前の再解決、Docker Desktop／Windows／DCP所有の受入は未検証である。資源配線や配布物、名前空間共有候補の採用・適用を完了扱いにしない。
 
 ## TIGERs tracker
 
@@ -251,6 +267,7 @@ TIGERs または ER-Force tracker の一方が起動できなくても Duck と 
 - Game Controller が唯一生成する `224.5.23.1:11003` を両比較追跡器と必要な観測機能が受信し、Windows画面操作、API状態、内部審判情報で同じ試合遷移を確認する。
 - 同じマルチキャストの宛先／ポートの受信者を開始・停止しても、他の受信件数が止まらない。コンテナ内の `InterfaceAddress` 未指定と明示IPv4の双方を確認する。
 - 個別再作成後に新しい完全IDと接続先を取得し、応答先の更新、マルチキャストの宛先への再参加、三者の新しさに基づく準備復帰を確認する。
+- RefereeDriverの既定観測は書込み0を維持し、Windows画面の手動操作と明示自動制御を分ける。自身の `GET /health/referee` で完全ID、受信世代、件数、協定世界時の受信日時、単調経過時間、API照合を確認し、無効404／準備不足503／一致200を区別する。
 - WindowsブラウザーからGame ControllerとDebugHostへ到達し、127.0.0.1以外の待受がないことを準備確認口も含めて確認する。記録の取り出し・再生とデバッグ接続も別条件として記録する。
 
 ブリッジ内の独立観測器の件数だけ、Windowsホストだけの観測、別Docker Engineや別OSでの成功は対象サービス自身とWindows Docker Desktopの受入に代用しない。通信が成立しない場合は `Ready` とせず、UDP公開、中継、ホストネットワークへ自動変更しない。
@@ -272,6 +289,7 @@ AppHost の application model test で次を先に固定する。
 - DebugHost 自身の tracker が無効である。
 - `debug-host` はコンテナ資源で、受信開始後に三者の準備を判定する。simulatorと受信側の起動に循環依存を作らない。
 - Game ControllerとDebugHostのUI、HTTP準備確認は、主設計の内部ポートから127.0.0.1の動的TCPへ対応付け、再作成後に更新する。
+- RefereeDriverの明示設定、既定観測の書込み0、内部接続先の自己宛先拒否、同じ受信処理を使う明示制御、停止と所有資源回収、診断本文と200／503／無効404を標準組成試験で固定する。
 - RefereeDriverのUDP観測と旧準備確認の受信をWindowsに残さない。記録のWindows保存先、デバッグ接続の対象IDを実行IDと結び付ける。
 - DebugHost comparison health が三 source identity の個別解決と同じ確認窓の新しい packet を要求する。tracker resource ready と DebugHost source readiness を別々に model / focused test で固定する。
 

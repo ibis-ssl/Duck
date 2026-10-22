@@ -1,0 +1,4 @@
+ .../Testing/aspire-simulation-test-environment.md  | 70 ++++++++++++++++++----
+ .../Testing/tracker-comparison-debug-design.md     | 22 ++++++-
+ ...-referee-driver-host-implementation-20261022.md | 36 +++++++++++
+ 3 files changed, 116 insertions(+), 12 deletions(-)

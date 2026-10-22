@@ -1,0 +1,11 @@
+{
+  "allIssuedProcessesTerminated": true,
+  "reapedSessions": {
+    "86190": 0,
+    "51399": 0
+  },
+  "activeOwnedProcesses": [],
+  "uncollectedExitCodes": [],
+  "innerGateExitCodes": "npm1, supplemental Sudachi1, fragment checks0; wrapper0 does not imply gate pass",
+  "mirrorRemoved": true
+}
