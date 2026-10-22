@@ -129,6 +129,14 @@ exact e68ead6873c8a940fce27b7745ac63a2e959b075のPR CI39799276013を収集。run
 
 既存SDK /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/syntax-input.json /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/syntax-result.json はexit0（syntax.command.json/生stdout/stderr保存）。git diff --check exit0。実parserのsemantic compile/testは未実行、既知のローカル生成Referee不足を再実行や導入で埋めずremote_ci_onlyを維持。
 
+### 購読追加回帰5件の同SHA Green CI収集
+
+gh run list --repo ibis-ssl/Duck --commit b67a3a42535acc58e11625bc0a8f2731a1902d15は初回/2回目ともexit0で[]。公式REST GET actions/runs?head_sha=...&event=pull_requestはexit0でrun39803325487を確認。gh run watch 39803325487 --exit-status --interval 10 は1件だけ起動しexit0。run view --json / --logとartifacts REST GETはいずれもexit0。実CI commandは dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger "trx;LogFileName=dotnet-test.trx" --results-directory "$results_dir" --diag "$results_dir/vstest-diagnostics.log" --blame -m:1 /nr:false -bl:"$results_dir/dotnet-test.binlog"。test step successでexit0、別のexit-code artifactは未公開。コマンド/終了値/生stdout/stderrを /tmp/issue81-referee-receive-subscriber-regression-ci-20261022/ に保存。
+
+### 実UDP adapter・Disposeの最初の先行2test/scaffold
+
+比較設計 tracker-comparison-debug-design.md:260 のTDD、scope report:42/89/99と親の03A続行指示に従い、expectations.jsonを先に固定して2test/scaffoldを準備。既存SDK /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-receive-udp-dispose-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-receive-udp-dispose-red-preparation-20261022/syntax-result.json はexit0（3fileの構文抽出のみ）。git diff --check exit0。既知の生成Referee不足に対してlocal build/testは再実行せず、実parserのsemantic compile/functional Redは親commit/push後のexactSHA PR CI待ち。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -237,6 +245,14 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### 購読追加回帰5件の先行準備（626Green後）
 
 新規testだけ Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs（5 Fact、SHA256 c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98）。/tmp5件snapshotとbyte一致。既存positive/4failure/cancel/single-run/再開ownerfreshness/subscriberの11case、固定独立67を含む17sourceはHEAD/現在/hash一致。製品変更なし。元/tmp2件候補は全9fileの元manifest hash一致を確認して保持、5件版は別dir /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/ へ保存。親tracking/Dispatch/prefix/他report保持。
+
+### 購読追加回帰5件の同SHA Green CI収集
+
+製品/test変更なし。HEAD b67a3a42535acc58e11625bc0a8f2731a1902d15、新5件file SHA256 c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98を含む18sourceをHEAD/current/既定hashと照合し全一致。service SHA256 c9c20cfb444e187a7ee6ae6c851f3667447548911b7824dc5961aa6c0c0a2751、既存11caseと固定独立67関連source/凍結manifestも不変。checkoutはexactHEADを含むPR merge ref6c6fde7、ログを保持。親prefix/Dispatch/tracking/他report保持。
+
+### 実UDP adapter・Disposeの最初の先行2test/scaffold
+
+変更はRefereeReceiveService.csの既存internal constructor末尾へoptional IAsyncDisposable? ownedReceiver=nullを足す宣言だけ、新規Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs、新規Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs。hashは /tmp/issue81-referee-receive-udp-dispose-red-preparation-20261022/source-manifest.json（SHA256 dd0089fce10725ab27f96f156f60b2cd8167e7763e9a35e0f57cea58262086ae）へ固定。constructor宣言を逆置換するとbaseline本文と完全一致し、既存behavior変更なし。既存UdpRefereeCommandSource/public constructor/defaults/noncontainer動作は不変。既存16case/固定67関連を含む他17sourceのhash不変、親prefix/Dispatch/tasks/phases/他report保持。
 
 ## 指摘事項
 
@@ -357,6 +373,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 
 accepted03Aの取消・Run所有/世代・不正入力failclosed・受信freshness、およびIRefereeCommandSourceのpreviousCounter/caller取消から期待値を固定。caller取消だけでpumpを止めない、previous=nullのcacheはexact freshnessで返し+1tick後は返さない、Run終了後/破損packet後/再開後の旧cacheを返さない、遅延旧epochを購読成功へ変換しない。正常復帰では現epochの新counterだけ取得。Run終端例外型や複数購読仕様を固定せず、全fixtureはcaller取消でRun/購読Taskを回収する。追加期待値5件はexpectations.jsonに保存。
 
+### 購読追加回帰5件の同SHA Green CI収集
+
+追加5件を実行前の期待値のまま集計Greenとして扱い、人工Redや製品変更は行わない。成功runに個別TRX artifactがないため、新5件/既存626/固定67それぞれの現在の個別結果を読んだとはしない。631全件成功とsource固定の対応を記録。実UDP adapter/Disposeは未完了。既存UdpRefereeCommandSourceの公開constructor/default/APIと非container挙動は保持し、後続は新service内部の単一pumpへdatagram/endpoint/復号前stampを供給する境界のtest-first単位として切り出す必要がある。
+
+### 実UDP adapter・Disposeの最初の先行2test/scaffold
+
+最初のpositiveは既にbind済みのloopback:0 UdpClientへ1packetを送る隔離fixtureで、payload一致（line31）を最初のassertとし、endpoint/capture1回/後段3秒経過ageも期待する。adapter scaffoldは空datagramを即時返すため、見込みはpayload assertion不足でありtimeout/compileerrorをRedとしない。Dispose testは正常2packet/固定時計/3回目受信待機からcallerCancel前にservice.DisposeAsyncし、所有receiver DisposeCalls=1（line59）→Run終端→count2維持/notready→caller未取消をassert。現no-opの見込みはDisposeCalls0。loopback socket/senderはusingで失敗時も破棄、Dispose fixture finallyは安全caller取消と期限付きRun回収、service/fake破棄を実施。実測前の予想とRedを区別する。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -470,6 +494,14 @@ run39802072353はcompleted/success、正式ログ実測626total/626passed/0faile
 
 5件sourceをactiveへ配置済み、構文抽出exit0/diffcheck0。テスト実行0件、compile成功/Red/Green未観測。既存behaviorで通ればregression成功として扱い、人工Redなし。source-manifest.json SHA256 8133268ba2d2dc53c2c83a168e9f7d18e41a5531843b5136395b3379a261699a、全証拠一覧 /tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/evidence-files-manifest.json SHA256 91cc68864215545af9379ae57ccab724b0de6ad8119f3674759cdd7e5fc0dc3a。先の626集計Greenと新5件の未実行状態を区別。
 
+### 購読追加回帰5件の同SHA Green CI収集
+
+PR CI39803325487（exact b67a3a42535acc58e11625bc0a8f2731a1902d15）はcompleted/success、test job119909817057 completed/success。正式ログ実測631total/631passed/0failed/0skipped。packet/full-stack jobはskip。artifact API total_count0、個別TRX未取得。ci-evidence.json SHA256 643e6d8dba8d78f481bc884803a62d1334d03059f3334d179f4960d44a1e6ec6。全証拠一覧 /tmp/issue81-referee-receive-subscriber-regression-ci-20261022/evidence-files-manifest.json SHA256 387c3d52b1c96c076edb84f7f41a95d6eb25e83688c9c2adeb8183486bdfb804（29file、生log含む）。
+
+### 実UDP adapter・Disposeの最初の先行2test/scaffold
+
+2先行testとcompile最小宣言を保存済み、構文exit0/diffcheck0。adapterは注入UdpClientを受け取る型だけで実socket Receive/設定/Disposeなし、service ownedReceiver引数は未使用、Disposeは既存no-opのまま。新test実行0、semantic compile/functional Red未観測。本behaviorを先行実装せず次の正式CIへ渡す状態。source snapshots/期待値/境界/残件/生構文log一覧は /tmp/issue81-referee-receive-udp-dispose-red-preparation-20261022/evidence-files-manifest.json SHA256 17584463d84c576a2d3bab3f84f2429f6bfab3429f343df5ad2f0d3cdb2ad727。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -573,6 +605,14 @@ run39802072353はcompleted/success、正式ログ実測626total/626passed/0faile
 ### 購読追加回帰5件の先行準備（626Green後）
 
 5件は実parser CI待ち。実UDP transport/options/lifecycle、no-op Disposeと停止資源解放のtest-first検証は次の未完了として保持し、03A全完了や03B/C/外部接続/実機成功とはしない。製品behavior・既存期待値/skip・外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全読取/構文抽出/保存/check process終端、exit回収済み、稼働watch/session・未回収exit・保留approvalなし。
+
+### 購読追加回帰5件の同SHA Green CI収集
+
+03A実UDP/Disposeと後続03B/C、DCP配置/実機受入は未完了。今回runはin_progressで確認後に終端したため、追加UDP/Dispose test/scaffold候補は作成していない。旧run39795794024の全体未終端履歴とmonitor停止exit255は変更せず、新watch/再試行なし。製品/test/期待値/skip、外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全watch/取得/read/save/check process終端、exit回収済み、稼働session・未回収exit・保留approvalなし。
+
+### 実UDP adapter・Disposeの最初の先行2test/scaffold
+
+設定契約は主設計:76/81/236/237と既存NetworkAdapters:IPv4/Any bind/ExclusiveAddressUse=false/ReuseAddress=true/任意IPv4 membershipを対応根拠として保持し、production group224.5.23.1/port11003生成・設定注入factory検証、adapter取消/所有・非所有socket破棄、実adapterと実parserの統合、反復Dispose/Dispose後開始は次の小単位として未着手。今回loopback raw fixtureをDesktop multicast/固定11003/Windows/DCP/G3成功へ流用しない。03B/C・外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全read/edit/構文抽出/save/check process終端・exit回収済み、実行中session/未回収exit/保留approvalなし。
 
 ## 親による公開準備記録
 

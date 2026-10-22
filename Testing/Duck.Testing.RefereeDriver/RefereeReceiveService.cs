@@ -18,7 +18,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     internal RefereeReceiveService(
         IRefereeDatagramReceiver receiver,
         ServiceReceiveDiagnostics diagnostics,
-        Func<ReadOnlyMemory<byte>, global::Referee>? decode = null)
+        Func<ReadOnlyMemory<byte>, global::Referee>? decode = null,
+        IAsyncDisposable? ownedReceiver = null)
     {
         ArgumentNullException.ThrowIfNull(receiver);
         ArgumentNullException.ThrowIfNull(diagnostics);
