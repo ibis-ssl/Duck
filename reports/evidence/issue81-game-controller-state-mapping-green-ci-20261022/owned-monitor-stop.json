@@ -1,0 +1,17 @@
+{
+  "action": "local monitor stop only",
+  "command": "Stop-Process -Id 15004 -Force -ErrorAction Stop",
+  "targetWindowsPID": 15004,
+  "parentWindowsPID": 5592,
+  "parentName": "wsl.exe",
+  "exactCommandLine": "gh.exe run watch 39833466268 --repo ibis-ssl/Duck --interval 20 --exit-status",
+  "creationDateUtc": "2026-10-22T18:41:07.9326590Z",
+  "observedStoppedAtUtc": "2026-10-22T18:52:15.7737881Z",
+  "WSLmonitorPID": 1126814,
+  "WSLparentPID": 1126767,
+  "identityGuard": "PID/PPID/exactcommandline/creationsecond rechecked before Stop-Process; post read PID absent",
+  "stopToolExit": 0,
+  "watchGhExit": 255,
+  "watchSession60043WrapperExit": 0,
+  "GitHubRunCancelOrRerun": false
+}
