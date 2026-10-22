@@ -16,7 +16,7 @@ Duck Issue81 / PR84、I81-01・I81-02の契約。入力packの設計・公開宣
 
 製品実装の閲覧・編集、既存テスト・差分・実装報告の閲覧、後続機能、外部変更、依存導入、環境設定変更、merge、Issue close、独立最終レビューの代替。
 
-親の保存記録: rawログも同一byteでrepositoryへ保存する。全差分checkはCI生ログの末尾空白8行によりexit1。原証拠hash保持のため編集せず、*.log以外のsource/report/tracking/evidenceを対象にした差分checkはexit0。これは製品・テスト失敗ではない。
+親の保存記録: rawログも同一byteでrepositoryへ保存する。全差分checkはCI生ログの末尾空白8行により非0（親Python wrapperはAssertionErrorでexit1、同じgit diff --checkの通常reviewer再確認はexit2）。原証拠hash保持のため編集せず、*.log以外のsource/report/tracking/evidenceを対象にした差分checkはexit0。これは製品・テスト失敗ではない。
 
 ## Dispatch profile
 
