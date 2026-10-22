@@ -10,6 +10,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private readonly IRefereeDatagramReceiver receiver;
     private readonly ServiceReceiveDiagnostics diagnostics;
     private readonly Func<ReadOnlyMemory<byte>, global::Referee> decode;
+    private int isRunning;
 
     internal RefereeReceiveService(
         IRefereeDatagramReceiver receiver,
@@ -23,44 +24,53 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
     }
 
-    /// <summary>正常受信と不正入力を同じpumpで記録し、終端時に当該世代の準備を解除する。</summary>
+    /// <summary>同時Runを拒否して単一pumpを保ち、終端時に当該世代の準備と実行所有を解除する。</summary>
     internal async Task RunAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var epoch = diagnostics.BeginEpoch(InputId);
+        if (Interlocked.CompareExchange(ref isRunning, 1, 0) != 0)
+            throw new InvalidOperationException("この受信機は既に実行中です。");
         try
         {
-            while (true)
+            var epoch = diagnostics.BeginEpoch(InputId);
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var datagram = await receiver.ReceiveAsync(
-                    () => diagnostics.BeginReceive(epoch),
-                    cancellationToken);
-                global::Referee packet;
-                try
+                while (true)
                 {
-                    packet = decode(datagram.Payload);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var datagram = await receiver.ReceiveAsync(
+                        () => diagnostics.BeginReceive(epoch),
+                        cancellationToken);
+                    global::Referee packet;
+                    try
+                    {
+                        packet = decode(datagram.Payload);
+                    }
+                    catch (Google.Protobuf.InvalidProtocolBufferException)
+                    {
+                        diagnostics.RecordFailure(datagram.ReceiveAttempt);
+                        continue;
+                    }
+                    if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
+                    {
+                        diagnostics.RecordFailure(datagram.ReceiveAttempt);
+                        continue;
+                    }
+                    var endpoint = datagram.RemoteEndpoint.ToString();
+                    diagnostics.RecordSuccess(
+                        datagram.ReceiveAttempt,
+                        sourceKey: endpoint,
+                        remoteEndpoint: endpoint);
                 }
-                catch (Google.Protobuf.InvalidProtocolBufferException)
-                {
-                    diagnostics.RecordFailure(datagram.ReceiveAttempt);
-                    continue;
-                }
-                if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
-                {
-                    diagnostics.RecordFailure(datagram.ReceiveAttempt);
-                    continue;
-                }
-                var endpoint = datagram.RemoteEndpoint.ToString();
-                diagnostics.RecordSuccess(
-                    datagram.ReceiveAttempt,
-                    sourceKey: endpoint,
-                    remoteEndpoint: endpoint);
+            }
+            finally
+            {
+                diagnostics.EndEpoch(epoch);
             }
         }
         finally
         {
-            diagnostics.EndEpoch(epoch);
+            Interlocked.Exchange(ref isRunning, 0);
         }
     }
 

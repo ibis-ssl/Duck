@@ -89,6 +89,14 @@ HEAD cc771ba36de6045148f720d398fdef6fe2b8805d、開始時worktree clean。既存
 
 親継続指示で単一Runの1先行testだけを追加。expectations.jsonをsource保存前に固定。既存SDK宣言抽出の正確な引数はsyntax.command.json、exit0（semantic compileではない）。新build/test/CIは未実行でfunctional Red pending。`git diff --check` exit0、未追跡testの`git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs` はexit1・stdout/stderr空（新fileとの差分、空白指摘なし）。
 
+### 単一Run testの同SHA runtime Red収集
+
+HEAD `6b09edaf30d905f0e322650ed9f18906bca0950a`、PR84、開始時worktree clean。既存Skills/remote_ci_only継続のCI収集のみ。`run list --commit <同SHA> --event pull_request` exit0、`run watch 39792254453 --repo ibis-ssl/Duck --exit-status --interval 5` は終端failure・exit1。view/artifacts GET/zip GETはexit0。終端前job log取得は`job ... is still in progress`でexit1、初回履歴をtest-log-before-terminal.*へ保持。watch終端回収後の同job log取得はexit0。全引数/exitはcommands-summary.json。CIの実dotnet testコマンドはci-test-command.txt、dotnet-test.exit-code=1。今回ローカルbuild/testなし。
+
+### 単一Run排他の最小Green候補
+
+親がexact6b09edaf CI39792254453の最大同時Receive1→2を有効Redに採用した後、同じ担当/既存Skillsで最小実装。既存SDK宣言抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1、既存生成Referee型不足のCS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exit/source before-after/diffは `/tmp/issue81-referee-receive-single-run-green-candidate-20261022/` へ保存。今回test/CIなし。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -157,6 +165,14 @@ HEAD cc771ba36de6045148f720d398fdef6fe2b8805d、開始時worktree clean。既存
 ### 単一Runの先行テスト準備（取消Green後）
 
 新規`Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs`、1 Factのみ。SHA256 `1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71`。製品/scaffold追加なし。既存6case/固定67と製品2source/csprojはbyte/hash不変。証拠dir `/tmp/issue81-referee-receive-single-run-red-preparation-20261022/` にexpectations.json / source-manifest.json / remaining-03A.json / syntax/checkの生log/exit / evidence-files-manifest.jsonを保存。
+
+### 単一Run testの同SHA runtime Red収集
+
+製品/test/期待値の変更なし、既存report子5欄のみ追記。証拠dir `/tmp/issue81-referee-receive-single-run-red-ci-20261022/` に生log/TRX/binlog/exit/source archiveを保持。新test SHA256 `1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71`。対象7fileと固定独立source7fileの全14fileをCI archive/HEAD/currentへbyte/hash照合。固定v1の11file/v2の9fileも元hash不変。ZIP SHA256 `4e567615116007bd592f1a93d3cf850611681517d57a73860d12870e046cfe3d` はAPI digest一致。
+
+### 単一Run排他の最小Green候補
+
+製品変更は`Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs`のみ、SHA256 `cbe85435fe44f74513b025ac6aa8bd34285029521b615425808769c0f9a9cbf2`。単一Run test `1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71`、既存6case/Diagnostics source/csprojはHEAD byte不変。固定v1の11file/v2の9file・repo対応sourceも元hash不変。既存report子5欄のみ追記、親prefix/Dispatch/履歴と親tracking/evidence差分を保持。
 
 ## 指摘事項
 
@@ -237,6 +253,14 @@ decodeだけを`Google.Protobuf.InvalidProtocolBufferException`で捕捉し、�
 
 scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止に対応。実parserと隔離receiverで第一Runの正常2packet/count2/ready/第三受信待機を確認後、同じserviceの第二Runを呼ぶ。同期拒否の例外型やTask参照同一性を固定しない。両tokenを取消し、返された全Taskの終端を有界に待って例外も回収する。第一Runがfaultしていないことと、receiver最大同時受信数が1であること（44行）をassertする。現実装で最大2が候補だが未実行なので断定しない。timeout/compile-errorを単一pump契約のRedにしない。
 
+### 単一Run testの同SHA runtime Red収集
+
+唯一のfailureは`Tracker.Tests.RefereeReceiveSingleRunTests.OverlappingRunsNeverCreateConcurrentReceives`。TRXは`Assert.Equal() Failure: Values differ / Expected: 1 / Actual: 2`、最初の位置RefereeReceiveSingleRunTests.cs:44（MaxActiveReceives）、duration=00:00:00.1682063。初期正常受信/ready、両Task終端、第一Run非faultの検査後に、最大同時Receiveが2本となる実runtime assertionを確認。型解決/compile failure/timeoutではない。第二Runの例外型やTask同一性は固定していない。
+
+### 単一Run排他の最小Green候補
+
+取消済みtokenを先に確認し、`Interlocked.CompareExchange`で同じserviceの実行所有をBeginEpoch前に取得する。既に所有中なら第二Runを拒否し、既存epoch/receiverへ触れない。取得後は外側finallyで`Interlocked.Exchange`により解放するため、BeginEpochの失敗や内側EndEpochの例外でも所有解放を通る。元の受信loop/不正入力処理/EndEpochの本体は字下げ以外不変で照合済み。例外型をtest期待値へ追加せず、広いcatch/取消の成功変換も追加しない。関数説明は日本語。再起動/購読/transportを先回り実装していない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -309,6 +333,14 @@ scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止
 
 単一Runの先行test候補保存済み。syntax exit0、実行0件、semantic compile未確認、CI Red待ち。expectations SHA256 `10a3b74b6eaecc58227452a4a69342fc314fa8edeb61038017dfcfa1eeb6896d`、source-manifest SHA256 `67652d6526e5e14710647c49b47b40fe1a6d4c04fee789eed0d3ebd5cb9290b0`。親の非main commit/push後exact-SHA PR CIで実assertionと全体回帰を確認し、有効Red採用後だけ最小behaviorを実装する。621集計Greenは前節へ保存済みで、この新1件へ転記しない。
 
+### 単一Run testの同SHA runtime Red収集
+
+`https://github.com/ibis-ssl/Duck/actions/runs/39792254453`、exact6b09edaf30d905f0e322650ed9f18906bca0950a / pull_request / completed / failure。TRXは622実行・621成功・1失敗・0skip、error/timeout/abortedも0。新単一Run testだけ失敗。残621件は前回621件と名前集合完全一致・全Passed（existing621-results.json）、既存6case/固定67も個別TRXで全Passed。packet/fullstack jobsはSkipped。TRX SHA256 `f8c8c7a68c298e5a8842d2b7b9683e68928a77633a98030c2cdf1ffba08fd7e0`、ci-evidence.json SHA256 `8734ad7f50f699b2e2a039f74358545256a5fff60bb490a95be6afa73eb06a83`。有効Red採用判断のため親へ返し、behaviorを実装していない。
+
+### 単一Run排他の最小Green候補
+
+単一Runの最小Green候補を保存。source-results-manifest.json SHA256 `3b8d7ba9c899a560cf0528f2fe70d738ca2e2f238398ecf7ef3e70262a9a55cd` に採用Red/変更source/不変test/hash/検査結果を保持。構文抽出成功だがDriver semantic compileは既存proto不足で未確認、test実行0件、Green未観測。親の非main commit/push後exact-SHA PR CIで同じ単一Run test・既存621/固定67を確認する。初回実runtime Redを保持し、ローカルcompile-errorをGreenへ転記しない。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -372,6 +404,14 @@ scope report89行・台帳I81-03Aの単一常駐受信/Receive奪い合い禁止
 ### 単一Runの先行テスト準備（取消Green後）
 
 単一Run testは準備段階で未完了。再開/旧epoch/遅延callback、subscriber重複抑制と診断分離、owner欠落/source帰属/freshness、実11003 UDP transport/options/lifecycleはremaining-03A.jsonの残件。03B/C・DCP配置・実機受入へ広げない。既存期待値緩和/skip化なし、製品behavior・外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `0101c3e560594097af771b3634a2984785b12fbcb5dc3627e2052f1f37abf5c2`（17file）。全process終端、未回収exit/保留approval/実行中processなし。
+
+### 単一Run testの同SHA runtime Red収集
+
+単一Run排他、再開/旧epoch/遅延callback、subscriber/実transport等を完成したものではない。既存期待値緩和/skip化、03B/C・外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更/再実行なし。全証拠一覧`evidence-files-manifest.json` SHA256 `7d0bb100e2b959f5d9e543d766bd9bbb7c15f139c72f6624d7bc93b9369ec50e`（65file）に生log/TRX/zip/source archiveを含む。親の保存時はgitignore対象のraw logも省略しない。全watch/view/log/download/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
+
+### 単一Run排他の最小Green候補
+
+同時Runの最小排他以外の再開/旧epoch/遅延callback/購読/実transport検証は未完了。開始前取消/BeginEpoch失敗/EndEpoch失敗の所有解放はコード境界として扱い、今回それぞれのruntime test成功を主張しない。03B/C・外部G1/G3・実機受入も保留。既存期待値緩和/skip化、外部/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧evidence-files-manifest.json SHA256 `e912ef9250130e0264d2e427fdee1ab21b53ac700f38716eeaa53e83ea09e66f`（17file）に生logを含む。全build/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
 
 ## 親による公開準備記録
 
