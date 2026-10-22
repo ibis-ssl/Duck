@@ -1,21 +1,59 @@
 using System.Net.WebSockets;
+using System.Text.Json;
 
 namespace Duck.Testing.RefereeDriver;
 
 /// <summary>注入された内部接続先から試合状態だけを読む観測専用clientの境界。</summary>
 internal sealed class GameControllerStateClient
 {
+    private readonly Uri endpoint;
+    private readonly Func<Uri, CancellationToken, Task<WebSocket>> connect;
+
     internal GameControllerStateClient(
         Uri endpoint,
         Func<Uri, CancellationToken, Task<WebSocket>> connect)
     {
         ArgumentNullException.ThrowIfNull(endpoint);
         ArgumentNullException.ThrowIfNull(connect);
+        this.endpoint = endpoint;
+        this.connect = connect;
     }
 
-    /// <summary>公開matchStateを読む。先行試験用scaffoldではまだ観測値を供給しない。</summary>
-    internal Task<GameControllerMatchSnapshot?> ReadMatchStateAsync(CancellationToken cancellationToken) =>
-        Task.FromResult<GameControllerMatchSnapshot?>(null);
+    /// <summary>初期の別Outputを読み飛ばし、公開matchStateのHALTを観測専用接続から読む。</summary>
+    internal async Task<GameControllerMatchSnapshot?> ReadMatchStateAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using var socket = await connect(endpoint, cancellationToken).ConfigureAwait(false);
+        var buffer = new byte[4096];
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var received = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken).ConfigureAwait(false);
+            if (received.MessageType != WebSocketMessageType.Text || !received.EndOfMessage)
+                return null;
+
+            using var output = JsonDocument.Parse(buffer.AsMemory(0, received.Count));
+            if (output.RootElement.ValueKind != JsonValueKind.Object)
+                return null;
+            if (!output.RootElement.TryGetProperty("matchState", out var matchState) ||
+                matchState.ValueKind == JsonValueKind.Null)
+                continue;
+            if (matchState.ValueKind != JsonValueKind.Object)
+                return null;
+
+            if (IsHalt(matchState, "command") && IsHalt(matchState, "gameState"))
+                return new(GameControllerCommandKind.Halt, GameControllerMatchPhase.Halt);
+            return null;
+        }
+    }
+
+    /// <summary>APIのHALT文字列だけを明示確認し、別の列挙体系へ整数変換しない。</summary>
+    private static bool IsHalt(JsonElement matchState, string propertyName) =>
+        matchState.TryGetProperty(propertyName, out var state) &&
+        state.ValueKind == JsonValueKind.Object &&
+        state.TryGetProperty("type", out var type) &&
+        type.ValueKind == JsonValueKind.String &&
+        type.GetString() == "HALT";
 }
 
 /// <summary>APIの数値列挙やUDPの整数値を直接使わない、明示的な指令区分。</summary>

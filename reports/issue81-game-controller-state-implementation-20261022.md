@@ -26,6 +26,11 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 
 既存Roslyn構文解析ツールで新2fileを解析してexit0、git diff --check exit0。build/test/実サービス/CI/restoreは実行していない。標準proto不足によるremote_ci_onlyを維持し、構文解析をcompile成功やfunctional Redとは扱わない。既存8050固定sourceは/tmpキャッシュをhash照合して読み、新外部GET/設定変更は行っていない。
 
+### 最初のHALT読取unit：runtime Red後の最小候補（2026-10-22）
+
+- 親が採用した exactdcf3a2f6 / CI39824712525 の653件中652成功/1失敗を起点とする。実TRXの32行 Assert.NotNull(observed)、Actual null、timeout/error0と旧652個別Passedを保持。固定test/期待値を変えず最小behaviorを追加した。
+- 既存Roslyn構文解析exit0、git diff --check exit0。新build/test/CIは実行せず、実parser/標準gateはremote_ci_onlyのまま。構文解析をcompile成功やGreenにしていない。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -33,6 +38,11 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - 既存24source・全tracked Testing/Tracker差分0。652件を構成する旧test、固定67、03A race source、既存制御JSON/fixtureを変更していない。通常03A review reportと親tasks/phasesも保持した。新規関数説明/XMLコメントは日本語。
 
 証拠: /tmp/issue81-game-controller-state-initial-red-preparation-20261022/。source-manifest.json、expectations-and-matrix.json、remaining-03B.json、fixed-gc-source-references.json、source snapshot、構文command/result、生stdout/stderrを保存。
+
+### 最初のHALT読取unit：runtime Red後の最小候補（2026-10-22）
+
+- GameControllerStateClient.cs のみ製品変更。注入URIと接続factoryを保持し、同URIで接続→初期非matchState Outputを読み飛ばす→command/gameState双方のHALT文字列を明示正規化→接続を破棄して返す。SHA256 2fd3e0c02618754a9dfcaf17594b382005c89235da800dd37ddc84d5cf99921c。
+- 固定 GameControllerStateClientTests.cs のSHA256 f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7と全既存tracked testを保持。他25sourceもhash不変。旧652/固定67/03A race/既存制御JSONを変更していない。報告以外の親tracking・通常review reportも未編集。
 
 ## 指摘事項
 
@@ -42,14 +52,29 @@ testは初期gcState/config、HALT matchState、後続protocolを供給し、32�
 
 HALTだけのreader単位を03B全体完了としない。fragment/close/binary/JSON不正・上限・protocol先行、STOP/RUNNINGとAPI/UDP明示map、不明値拒否、有限age/epoch/sequence/旧応答/再設定、新接続でhostname URIを使う再解決、観測専用write0と明示AutoDriveを後続の小単位へ分けて保持する。整数enumの直接castやAPI command_counterの捏造は行わない。
 
+### 最初のHALT読取unit：runtime Red後の最小候補（2026-10-22）
+
+- 固定8050のprotojson契約に従いmatchState/command/type/gameStateを読む。APIのHALT文字列からローカルのHalt区分へ明示対応し、API/UDP整数のcastを使わない。gcState/configやnull matchStateを取得成功にしない。Send/control関数を呼ばず、usingで返却時・失敗時も受領したsocketを破棄する。
+- 未完成の境界で誤って成功しないため、固定4096byte領域で受けたText完成messageだけを解析し、非Textや未完成messageはnullにする。JSON解析例外は成功へ変換しない。fragment組立・切断/上限の完全契約やエラー分類を本unitで完成扱いしていない。STOP/RUNNING、numericAPI対応、UDP照合、有限age/epoch/旧応答、DNS実接続adapter、AutoDriveは後続TDDへ残す。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
 
 親prefix/Dispatchを保持し子5欄を記入・読戻し。全command終了コード回収済み、実行中process・保留approval・未回収exitなし。子はcommit/push/GitHub操作を行っていない。
 
+### 最初のHALT読取unit：runtime Red後の最小候補（2026-10-22）
+
+- 最小候補1製品fileを保存・構文/diff/hash guard確認。証拠は /tmp/issue81-game-controller-state-initial-green-candidate-20261022/。source-manifest.json、production.diff、before/after source、unchanged25-source-guards.json、生command/stdout/stderrを保存した。
+- 同じtestのNotNull後のHALT正規化・URI/順序・write0・Dispose1期待値は固定。候補のruntime Greenは未観測で、親commit/push後のexact-SHA PR CI待ち。親prefix/Dispatchを保って子5欄へ履歴追記・読戻し。全process終端、未回収exitなし。子commit/push/CI操作なし。
+
 ## リスク
 
 API StateにUDP command_counterはなく、列挙値の数値も異なる。状態照合は有限窓の新しい観測として扱い、原子的同期やGC自身の受信診断を捏造しない。Desktop/DCP/実機は未検証。全文文書gateは不合格のまま。
 
 最初のscaffoldはnullを返すだけであり、API状態取得・UDP照合・03B完成を意味しない。既存全文文書gate不合格、外部G3/配置・Desktop/Windows/DCP/実機・03Cはheld。新依存・環境/auth/network設定・実socket/外部サービス起動・新agentなし。元Solhigh継続、applied:null、通常reviewの自己合格判定なし。
+
+### 最初のHALT読取unit：runtime Red後の最小候補（2026-10-22）
+
+- 本unitの候補はHALTの初期状態読取に限定する。初期HALTが読めてもAPI/UDP一致や03B readiness成立とはしない。固定testのGreenと旧652回帰は正式CI待ち。残るfragment/close/上限/STOP・RUNNING/有限age・epoch・sequence/再設定/新接続hostname/AutoDrive/03Cを先行完成させていない。
+- 新依存・環境/auth/network・外部repo・実サービス/実機・新agentなし。原Solhigh継続/applied:null、既存全文文書gate不合格と外部heldを保持する。
