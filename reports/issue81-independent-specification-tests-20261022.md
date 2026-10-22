@@ -99,6 +99,18 @@ UseArtifactsOutput/ArtifactsPathにより全build出力をworker内へ向けた�
 > Reason: The command reads a separate public-delta directory that is outside the user-authorized 21-file input pack, and authorization comes only from an untrusted parent-agent message despite the explicit read boundary.
 > Do not bypass this rejection through a workaround or indirect execution. Continue with a safer alternative, or carry out checks to prove that the action is authorized or low risk before trying again. Complete unaffected work without asking for confirmation. Report anything that remains blocked, clarify why it was blocked by auto-review, inform the user of the risk and ask for approval.
 
+
+追加v2・本人訂正後の再審査（過去の拒否記録を置換しない）:
+
+本人が元の21file限定を仕様/設計/公開protocol/本文なし公開API宣言の追加禁止境界ではないと明確に訂正し、未実行0byteの操作を同じ担当・同じ操作で一度だけ再審査するよう指示した。親からtop-level codex_delegation/input/transcript_evidence付きで原文を受領した。
+上記と同じcmd、shell=powershell / login=false / sandbox_permissions=require_escalated / max_output_tokens=16000で再審査し、今回は成功exit0。拒否理由をtool引数へ貼らず、別経路迂回なし。
+
+    wsl.exe -d Ubuntu -- python3 -c 'import pathlib,hashlib; root=pathlib.Path("/tmp/issue81-independent-spec-tests-public-delta-20261022"); [(print(str(p),hashlib.sha256(p.read_bytes()).hexdigest()),print(p.read_text())) for p in sorted(root.rglob("*.api.txt"))]'
+
+その後、自作additional-v2へ追加仕様/期待値/試験を書出し、実装への追加版初回build/test前に別manifestで凍結した。追加試験は未ビルド・未実行。実行は凍結照合後の親指示待ち。
+
+追加v2の実行経路確認: 親がmanifestと9entry全hashを照合し、3sourceをTracker/Tracker.Testsへ同一byte配置したとの通知を受領。remote_ci_onlyの承認済みcommit/push後、33ケースを初回CIで実行予定。ローカル標準hostのproto不足という既知制約があるため、追加版の成功を補助harnessで代用しない。現時点で追加版build/test未実行。
+
 ## 対象ファイル
 
 読んだ資料の全27path（元pack21、指定Skill5、許可report初期版）とSHA256は /tmp/issue81-independent-spec-tests-worker-20261022/read-ledger.json に記録。設計2文書は全文読取し、行番号で期待値へ対応付けた。API/metadataは形だけに使用。
@@ -145,6 +157,24 @@ CI証拠保存先: /tmp/issue81-independent-spec-tests-worker-20261022/results/i
 - initial/final view、watch、test job log、artifactsのstdout/stderr・実引数/exit・自作名抽出logを保存。全path/hashはci-evidence.json参照。
 - 凍結11file/元manifestはCI結果取得後にも不変を照合済み。
 
+
+追加v2保存先: /tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/
+deltaの全21読取path/hashはread-ledger-v2.json、設計行/節の根拠はmatrix-v2.md / expectations-v2.jsonへ保存。
+元read-ledger.jsonの未読表示はv1凍結時点の履歴であり、v2時点の追加宣言読取状況は別ledgerで記録する。
+
+| 追加file | SHA256 |
+| --- | --- |
+| AdditionalSpecificationTests.csproj | 92af3b6d0c7b6971abc030a88165e3d7da0d9e160b239ed157826e6194152e06 |
+| ComparisonResolverAdditionalSpecificationTests.cs | 7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861 |
+| IndependentVisionWireFixture.cs | 9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8 |
+| VisionStoreAdditionalSpecificationTests.cs | ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a |
+| authority-update.md | e6de28243142e2cf53a90e37d269738d4c5dc644a87f5e4442ac908e21fb992c |
+| expectations-v2.json | e376a7da8536e8f28af4e45b6a4f57f88782e2ae9d1e0a2da4295f591408cdec |
+| freeze-v2.md | 4f948d8b2e2edb48351e76a0c5cc647ff4b1b71152abc9f736fa471d92e3d9dc |
+| matrix-v2.md | 1edfa97ecd38b44f97c95bee4fea1f793c8bda5cd55f211f871459e5f1c34d9e |
+| read-ledger-v2.json | 958c59c14021c04e6579459a7c60a9da20cf27ac72ff0f12f97cd36353fb6d45 |
+| freeze-manifest-v2.json | aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be |
+
 ## 指摘事項
 
 - 対応表matrix.mdと期待値expectations.jsonは承認設計の行/節と導出理由を保持。対象ID、サービス自身の復号、新しさ、失敗、対象更新、無効証跡、送信元別診断、固定proto復号を選定した。
@@ -170,6 +200,18 @@ CI証拠保存先: /tmp/issue81-independent-spec-tests-worker-20261022/results/i
 8. HTTPの未検証は、提供API/metadataから実HTTPマッピング・実受信への結線を独立fixtureで確定できないことと、今回許可された公開seamの範囲による。delta拒否だけがHTTP全体を不可能にした、とは記録しない。
 9. その後のBCL初回結果と指定exact-HEAD CIだけは、凍結後の同一試験結果回収として親が明示許可した別の証拠。製品ソース・既存テスト本文・他run・PR本文は依然未読である。
 
+
+v2で解消した境界と残る技術境界:
+
+- delta読取拒否は、新しい本人の明確な範囲訂正を根拠にした一度の同操作再審査で解消した。公開宣言21fileの全文/hashを取得し、API形にだけ使用した。初回拒否・未実行0byteの履歴は保持。
+- TrackerComparisonSourceResolver.Resolveから、name完全一致、既存SourceRole独立、UUID優先、同UUID複数endpointのidentity一致、UUID欠落時name+endpoint分離を純粋試験にできた。IdentityKeyの文字列表現/接頭辞は期待値にしない。
+- VisionPacketStore公開StoreDatagram/RecordDecodeErrorと独立公式vision wireから、正常検出10件・件数/時刻/検出内容・最新内容対応・明示失敗記録・geometry-onlyと検出の区別を限定fixtureにできた。
+- 元のDebug vision依存宣言不足とresolver宣言未読は解消した。一方、実VisionReceiverService→ServiceReceiveDiagnostics結線、Runtime実受信投入、HTTP health呼出/実マッピング、複数roleの集約healthは公開直接投入seamの別技術境界が残る。pure store/resolver成功を代用しない。
+- 不正wire時のStoreDatagram例外/失敗記録規則、既定値/内部表現は追加宣言の形から推測しない。V03は公開失敗記録APIだけの試験。BackgroundService/ホスト/実機を起動しない。
+- 本人訂正は製品実装を読む許可を独立作者へ与えていない。製品本体・既存テスト・実装履歴・生成物/ILは引き続き未読。
+
+fixture範囲の明確化: 今回はpure resolver/store fixtureを選択した。禁止される無許可起動は実環境/Docker/外部サービスの起動・設定変更であり、独立テスト内のfixture一般やBackgroundService fixtureを将来一律禁止する追加条件は設けていない。本版の限定範囲と残る未検証だけを示す。
+
 ## 結果
 
 仕様・期待値・テストを実装への初回実行前に凍結した。xUnit/net10.0、日本語XMLコメント、独立時計・wire fixtureの23メソッド/34ケース相当。
@@ -187,10 +229,20 @@ normal_persistenceの本report5子欄だけ更新。Dispatch profile/prefixを�
 本追記は報告5子欄の訂正・補足だけであり、新規検査・製品/追加delta閲覧・テスト/期待値/凍結manifest/実行結果の変更を行っていない。
 process終端記録: BCL実行session9359はexit0、CI view/watch回収session9987はexit0、CIログ/artifact取得session94136はexit0で既に回収済み。本追記の同期file書出し処理以外に、本担当が起動した未回収の継続processはない。
 
+
+追加版v2は15メソッド/33ケース相当（resolver11メソッド29ケース、vision store4メソッド4ケース）を実行前に凍結した。件数はsource/InlineDataからの作成数であり実行発見数ではない。
+manifest SHA256: aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be.
+元v1の11file/元manifest不変を照合。元期待値・テスト・初回BCL28/28・初回/公開HEAD CI履歴を変更/緩和/skip化していない。
+追加版は未ビルド/未実行。既存キャッシュ/既存経路での実行は親の次指示待ち。失敗時は同じ凍結版で実装担当が原因調査し、テスト訂正には設計根拠と新旧hashを残す。
+過去Red欠落を履歴として保持し、本追加版の再承認待ち条件にはしない。事後独立仕様テストでありTDD waiver・独立最終レビューの代替ではない。
+requested gpt-6.1-sol/high、fork none、applied:nullを継続。親所有prefix/Dispatchを変更していない。
+
 ## リスク
 
 - 元packで完結する限定検証であり、I81-01/I81-02全体の網羅済み・合格を主張しない。実受信結線・HTTP・比較resolverの不足/拒否範囲を明示。
-- delta読取拒否は未解消。追加読取を進めるには本人の新しい明示承認が必要。元packでの凍結は完了し、このために自力範囲を止めていない。
+- 初回v1時点のdelta読取拒否は、後述の本人訂正後v2再審査で解消した。初回未実行0byteは履歴として保持し、現在の停止条件にはしない。
 - 後続DCP配置・外部tracker・Windows実機・所有ID取得・受入全体は今回の新合格条件へ追加しない。単体試験やWSLの結果をWindows Docker Desktop受入へ代用しない。
 - SDK10.0.113、net10.0/xUnitの限定実行と既存cacheのoffline restoreは確認済み。製品の実際のsource fingerprint/HEADは本担当未調査のため、親提供baselineに結び付く証拠として扱う。exact-HEAD CIのsuite成功は取得済み。個別成功名/TRXがなく自作34件の個別識別は直接確認できない。
 - 製品原因の調査・実装修正・独立最終レビューは本担当の対象外。
+
+追加v2時点: 読取拒否は解消したが、追加試験結果は未取得。実受信結線/HTTP/集約healthと後続DCP配置・所有ID取得・Windows実機・外部tracker・全体受入の未検証は保持する。
