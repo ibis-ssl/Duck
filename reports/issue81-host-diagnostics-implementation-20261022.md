@@ -22,6 +22,8 @@ Parent-owned. task_kind=investigation; work_class=judgment_heavy; uncertainty=me
 
 Parent adoption: initial investigation retained below. Next operation task_kind=implementation; work_class=judgment_heavy; uncertainty=medium; change_radius=cross_module; criticality=high; same-agent requested gpt-6.1-sol/high, applied=null, reused_existing_agent_profile. Adopt Testing:ContainerMode explicit opt-in, Detection counter clarification separate from raw storage, service-owned local receive clock, incomplete owner attribution=503, remote_ci_only for actual host composition; BCL ledger local evidence supplementary. Existing non-main commit/push authorization is parent-owned; child does not publish. No TDD mandate established from project instructions; do not require a failing CI push.
 
+親による適用判断の訂正: 比較設計 tracker-comparison-debug-design.md:260 に「実装はTDDで行う」と明示されている。上の初回adoptionの No TDD mandate established は親の誤判断で、本人の免除指示はない。I81-02の実装前機能Red証拠はなく、CI548件/BCL55件成功からTDD準拠を推論しない。PD-I81-02-TDDとして手順未充足を保持する。I81-01初期実装全体についてもTDD充足は主張せず、時計修正で実回収したRed/Greenだけを保持する。通常技術reviewのpass_with_heldはb641cf125c5c6d7266ad94998975c28733e49d11の製品範囲に限り、Issue/手順全体の完了ではない。
+
 ## 実行コマンド
 
 - mode=I81-02 preimplementation investigation、normal_persistence。PowerShell login=false / require_escalated → wsl.exe -d Ubuntu の Python/pathlib・cat・git 読取経路。cwd=/home/donabe/Duck-issue81-aspire-desktop-bridge、branch=task/issue81-aspire-desktop-bridge、base_ref=task/aspire-docker-desktop-496、HEAD=d7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06。製品変更なし。
@@ -203,4 +205,3 @@ G1/G3、実所有ID取得/照合、HTTP取得往復を含むageの正規化とco
 - 現local source不足、親許可前のCI push不可を維持。CIの標準testもWindowsの同一DCP bridge/HTTP公開/双方向接続の受入は証明しない。
 - 外部3repo変更は未承認で未着手。G1/G3、配布、container/DCP起動、実機受入、commit/push、canonical trackingは今回の担当範囲外。
 - 初回の実装前確認では読取と報告保存だけを行った。現在はBCLの補助build/testを実行済みで、最終55件成功を回収した。host build/testと製品サービス起動は未実施。全発行コマンド・検証processは終端し、終了コード未回収・承認待ち・結果不明の操作はない。
-
