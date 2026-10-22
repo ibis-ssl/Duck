@@ -34,6 +34,8 @@ entries:
   - term: GitHub Actions
     description: GitHub上で処理を自動実行する機能名。
   - term: DCP
+    aliases:
+      - Developer Control Plane
     description: Aspireの試験環境を起動・管理する機能の略称。
   - term: Docker Desktop
     description: 開発用計算機でDockerを利用するための製品名。

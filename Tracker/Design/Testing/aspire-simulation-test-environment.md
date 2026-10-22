@@ -8,6 +8,8 @@
 
 Windows 上の AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い、利用者自身の Docker Desktop に試験資源を登録する。DCP が Aspire の実行単位を接続する機能を通じ、資源の作成、監視、記録、停止、削除を一元管理する。コンテナの作成から後始末まで DCP だけが管理し、別の Docker コマンド管理プログラムと二重に管理しない。
 
+DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost が起動する資源とその関係を定義し、DCP が資源の起動、監視、停止、後始末を管理し、Docker Engine がコンテナを実行する。DCP は資源の起動管理を担い、ネットワーク通信の方式とは役割が異なる。通常の利用者が DCP を直接操作する必要はない。詳しくは [DCP の公式リポジトリ](https://github.com/microsoft/dcp) と [AppHost の構成資料](https://learn.microsoft.com/en-us/dotnet/aspire/app-host/configuration) を参照する。
+
 これは提案であり現行実装とは区別する。現在の `Testing/Duck.Testing.AppHost` は `duck` を `Tracker.RuntimeHost` の `ProjectResource` とし、`simulator`、`game-controller`、`crane`、必要な `cm4-sim` を Docker コマンドライン起動管理プログラムを介した `ExecutableResource` として扱う。旧 `AddContainer` と `--network host` の競合はその実装履歴であり、標準 `AddContainer` と専用ブリッジネットワークの試験結果ではない。
 
 ## 対象資源
