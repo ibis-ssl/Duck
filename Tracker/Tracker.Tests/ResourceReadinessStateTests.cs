@@ -267,6 +267,100 @@ public sealed class ResourceReadinessStateTests
         Assert.True(state.GetReadiness().IsReady);
     }
 
+    [Theory]
+    [InlineData(4, 3)]
+    [InlineData(6, 4)]
+    public void ReadToReadClockRegressionInvalidatesProgress(int firstReadSeconds, int secondReadSeconds)
+    {
+        var state = Ready(out var clock);
+        clock.Advance(TimeSpan.FromSeconds(firstReadSeconds));
+        Assert.Equal(firstReadSeconds <= 5, state.GetReadiness().IsReady);
+
+        clock.Advance(TimeSpan.FromSeconds(secondReadSeconds - firstReadSeconds));
+        Assert.False(state.GetReadiness().IsReady);
+        Assert.Equal(ResourceReadinessReason.InvalidClock, state.GetReadiness().Reason);
+
+        clock.Advance(TimeSpan.FromSeconds(firstReadSeconds - secondReadSeconds));
+        Assert.False(state.GetReadiness().IsReady);
+        state.Observe(Snapshot(3, 10));
+        Assert.False(state.GetReadiness().IsReady);
+        state.Observe(Snapshot(4, 11));
+        Assert.True(state.GetReadiness().IsReady);
+    }
+
+    [Theory]
+    [InlineData(4, 3)]
+    [InlineData(6, 4)]
+    public void ObserveRejectsClockEarlierThanLastRead(int readSeconds, int observeSeconds)
+    {
+        var state = Ready(out var clock);
+        clock.Advance(TimeSpan.FromSeconds(readSeconds));
+        state.GetReadiness();
+
+        clock.Advance(TimeSpan.FromSeconds(observeSeconds - readSeconds));
+        Assert.True(state.Observe(Snapshot(3, 11)));
+        Assert.False(state.GetReadiness().IsReady);
+        Assert.Equal(ResourceReadinessReason.InvalidClock, state.GetReadiness().Reason);
+
+        clock.Advance(TimeSpan.FromSeconds(readSeconds - observeSeconds));
+        Assert.False(state.GetReadiness().IsReady);
+        Assert.False(state.Observe(Snapshot(3, 11)));
+        state.Observe(Snapshot(4, 10));
+        Assert.False(state.GetReadiness().IsReady);
+        state.Observe(Snapshot(5, 11));
+        Assert.True(state.GetReadiness().IsReady);
+    }
+
+    [Fact]
+    public void NonReadyReadAdvancesClockHighWaterMark()
+    {
+        var state = Create(out var clock);
+        clock.Advance(TimeSpan.FromSeconds(6));
+        Assert.Equal(ResourceReadinessReason.NoObservation, state.GetReadiness().Reason);
+
+        clock.Advance(TimeSpan.FromSeconds(-2));
+        state.Observe(Snapshot(1, 10));
+        Assert.False(state.GetReadiness().IsReady);
+        Assert.Equal(ResourceReadinessReason.InvalidClock, state.GetReadiness().Reason);
+
+        clock.Advance(TimeSpan.FromSeconds(2));
+        state.Observe(Snapshot(2, 10));
+        Assert.False(state.GetReadiness().IsReady);
+        state.Observe(Snapshot(3, 11));
+        Assert.True(state.GetReadiness().IsReady);
+    }
+
+    [Fact]
+    public void NewGenerationResetsClockHighWaterMarkAndProgress()
+    {
+        var state = Ready(out var clock);
+        clock.Advance(TimeSpan.FromSeconds(6));
+        Assert.Equal(ResourceReadinessReason.Expired, state.GetReadiness().Reason);
+        clock.Advance(TimeSpan.FromSeconds(-2));
+        Assert.Equal(ResourceReadinessReason.InvalidClock, state.GetReadiness().Reason);
+
+        var next = new ResourceDiagnosticIdentity("run-a", "duck", new string('b', 64), 2);
+        state.AdvanceGeneration(next);
+        Assert.Equal(ResourceReadinessReason.NoObservation, state.GetReadiness().Reason);
+        Assert.False(state.Observe(Snapshot(100, 100)));
+        state.Observe(Snapshot(1, 0, identity: next));
+        Assert.False(state.GetReadiness().IsReady);
+        state.Observe(Snapshot(2, 1, identity: next));
+        Assert.True(state.GetReadiness().IsReady);
+    }
+
+    [Fact]
+    public void ExpiredReadNeedsNewCountBeforeReady()
+    {
+        var state = Ready(out var clock);
+        clock.Advance(TimeSpan.FromSeconds(6));
+        Assert.Equal(ResourceReadinessReason.Expired, state.GetReadiness().Reason);
+        state.Observe(Snapshot(3, 10));
+        Assert.False(state.GetReadiness().IsReady);
+        state.Observe(Snapshot(4, 11));
+        Assert.True(state.GetReadiness().IsReady);
+    }
+
     [Fact]
     public void FreshnessAdditionDoesNotOverflow()
     {

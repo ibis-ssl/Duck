@@ -31,7 +31,7 @@ public sealed class ResourceReadinessState
     private ResourceDiagnosticIdentity expectedIdentity;
     private long lastSequence;
     private long? lastCount;
-    private long? lastObservationTimestamp;
+    private long? timestampHighWaterMark;
     private bool hasProgress;
     private long progressTimestamp;
     private TimeSpan progressAge;
@@ -75,7 +75,7 @@ public sealed class ResourceReadinessState
             expectedIdentity = nextIdentity;
             lastSequence = 0;
             lastCount = null;
-            lastObservationTimestamp = null;
+            timestampHighWaterMark = null;
             Invalidate(ResourceReadinessReason.NoObservation);
         }
     }
@@ -98,13 +98,10 @@ public sealed class ResourceReadinessState
             }
 
             lastSequence = snapshot.ObservationSequence;
-            var now = timeProvider.GetTimestamp();
-            if (lastObservationTimestamp is { } previousTimestamp && now < previousTimestamp)
+            if (!TryReadTimestamp(out var now))
             {
-                Invalidate(ResourceReadinessReason.InvalidClock);
                 return true;
             }
-            lastObservationTimestamp = now;
 
             if (snapshot.EvidenceKind != DiagnosticEvidenceKind.ServiceDecode)
             {
@@ -161,15 +158,8 @@ public sealed class ResourceReadinessState
     {
         lock (gate)
         {
-            if (!hasProgress)
+            if (!TryReadTimestamp(out var now) || !hasProgress)
             {
-                return new(false, reason);
-            }
-
-            var now = timeProvider.GetTimestamp();
-            if (lastObservationTimestamp is { } previousTimestamp && now < previousTimestamp)
-            {
-                Invalidate(ResourceReadinessReason.InvalidClock);
                 return new(false, reason);
             }
 
@@ -183,11 +173,27 @@ public sealed class ResourceReadinessState
             // Subtract before comparing, so an untrusted large age cannot overflow a sum.
             if (elapsed > freshnessWindow || progressAge > freshnessWindow - elapsed)
             {
-                return new(false, ResourceReadinessReason.Expired);
+                Invalidate(ResourceReadinessReason.Expired);
+                return new(false, reason);
             }
 
             return new(true, ResourceReadinessReason.Ready);
         }
+    }
+
+    // Called only while holding gate. Reads and observations share one high-water mark,
+    // retained after invalidation so clock catch-up alone cannot restore progress.
+    private bool TryReadTimestamp(out long now)
+    {
+        now = timeProvider.GetTimestamp();
+        if (timestampHighWaterMark is { } highWaterMark && now < highWaterMark)
+        {
+            Invalidate(ResourceReadinessReason.InvalidClock);
+            return false;
+        }
+
+        timestampHighWaterMark = now;
+        return true;
     }
 
     private void Invalidate(ResourceReadinessReason failure)

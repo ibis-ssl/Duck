@@ -106,6 +106,71 @@ HTTP/JSON/DCP 型や外部 schema、adapter、実サービスの時刻変換・�
 
 全発行コマンドの終了コードを回収済み。確認時に当該 dotnet build/test/restore、testhost、MSBuild の実行中 process は 0 件。承認待ち・結果不明の操作はない。commit/push/PR/Issue 操作はしていない。
 
+### I81-NR-001修正（通常レビュー後の追記）
+
+本追記が現在の修正・検証結果であり、上記 39 件および旧 manifest/TRX は初回実装時の履歴としてそのまま保持する。mode=review_followup / report_persistence=normal_persistence。通常レビュー対象 HEAD は `e1376bdcec4bf062de20dac18e336ea72dcc4cc9`、本修正の baseline/current HEAD も同 SHA で、検証対象はその上の未コミット差分。branch=`task/issue81-aspire-desktop-bridge`、base_ref=`task/aspire-docker-desktop-496`。既存の同一担当・gpt-6.1-sol/high 指定を継続し、applied=null。実適用の再観測や別 agent 起動はしていない。
+
+通常 review report `reports/issue81-i81-01-normal-review-20261022.md` 全文と、work-context-manager / implementation-executor / implementation-worker / report-output-manager / report-writer の実 Skill ファイルを再読し、限定 follow-up と証拠保持に適用した。環境は前述と同じ PowerShell login=false / require_escalated → WSL Ubuntu の当該 worktree、既存 SDK/cache/harness。verification_capability=local_execution_available。
+
+**指摘と修正範囲:** I81-NR-001、source_severity=medium（P2）、origin=通常レビュー。指摘時 location は `ResourceReadinessState.cs:169–174,184–186`。Observe だけが記録する時刻を使っていたため、read 間の t4→t3、t6 Expired→t4 で古い進捗を Ready として返せる欠陥。共有 lock 内で全 read/有効な Observe の時計高水位を保持し、逆行で進捗を無効化すること、時計が追いついただけでは復活させず正当な新 count 増分または所有者による新世代を必要とすることが required action だった。
+
+変更した製品/試験は次の 2 file のみ。報告は本 report のこの子所有追記のみ。
+
+- `Testing/Duck.Testing.Diagnostics/ResourceReadinessState.cs`: `timestampHighWaterMark` と `TryReadTimestamp` を共有し、両 caller の同じ gate 内で使用。not-ready の GetReadiness も高水位を進め、逆行時は高水位を保持したまま InvalidClock にする。期限超過でも進捗を無効化。AdvanceGeneration は時刻高水位、count、sequence、進捗を整合して reset。
+- `Tracker/Tracker.Tests/ResourceReadinessStateTests.cs`: 実 ResourceReadinessState と既存 ManualTimeProvider を使う 7 ケース（5 methods、theory 展開を含む）を追加。初回 39 ケースは保持。
+
+**Finding completeness matrix（実装側の証拠。reviewer の closure 判定は未実施）:**
+
+| finding / required action | production path | actual composition fixture | focused evidence |
+| --- | --- | --- | --- |
+| I81-NR-001: read 間 t4→t3 / t6 Expired→t4 を拒否 | `Testing/Duck.Testing.Diagnostics/ResourceReadinessState.cs:157` GetReadiness → 同:186 TryReadTimestamp、同:176 Expired 無効化 | `Tracker/Tracker.Tests/ResourceReadinessStateTests.cs:273` ReadToReadClockRegressionInvalidatesProgress(4,3)/(6,4)。実 State＋同 file の ManualTimeProvider、5 秒 window、同時点 count9→10 | nr-red.trx はこの 2 ケース failed、nr-final.trx は同 2 ケース passed。InvalidClock、追いつき後 false、同 count false、新 count11 true を実 assert |
+| I81-NR-001: read/Observe の共通高水位と非 Ready read の整合 | 同 State:88 Observe → 同:186 TryReadTimestamp、同:161 GetReadiness は hasProgress より先に時計検査 | 同 Tests:294 ObserveRejectsClockEarlierThanLastRead(4,3)/(6,4)、同:315 NonReadyReadAdvancesClockHighWaterMark。実 State＋ManualTimeProvider | nr-red.trx はこの 3 ケース failed、nr-final.trx は同 3 ケース passed。逆行中の新 sequence の拒否、再利用拒否、追いつきだけの非復活、count10→11 回復を assert |
+| I81-NR-001: 所有者の新世代で時刻状態を含め reset | 同 State:63 AdvanceGeneration、同:78 timestampHighWaterMark=null、基準 count/sequence の reset | 同 Tests:334 NewGenerationResetsClockHighWaterMarkAndProgress。t6→t4 逆行後、新しい完全 container ID/世代2、旧 ID と新世代 baseline0→1 | nr-red.trx は当ケース failed、nr-final.trx は当ケース passed。NoObservation、旧 ID 拒否、最初の count 非 Ready、新世代内増分で Ready を assert |
+| I81-NR-001: 期限切れ進捗の消去と新 count による回復 | 同 State:176 Invalidate(Expired)、同:145–150 増分でのみ進捗設定 | 同 Tests:353 ExpiredReadNeedsNewCountBeforeReady。実 State＋ManualTimeProvider、t6 Expired、count10 再取得、count11 | nr-red.trx / nr-final.trx とも当ケース passed。修正前に通る sibling guard も明示保持。全46件再実行で他の identity/世代/age/count/sequence 契約の回帰を確認 |
+
+**コマンド・出力:** 新しい証拠は `/tmp/issue81-readiness-validation-20261022/i81-nr-001/` に分離した。旧 `final-results/focused-final.trx`、`final-inputs.json`、`commands.json` は上書きしない。今回の全引数/exit は新ディレクトリの `commands.json`、入力は `red-inputs.json` / `final-inputs.json`、各実行の stdout/stderr、exit-code、binlog を保持。restore、依存取得、標準 project の修復はしていない。
+
+
+```text
+dotnet test /tmp/issue81-readiness-validation-20261022/focused-harness/Focus.Tests.csproj --no-restore -m:1 /nr:false -p:UseSharedCompilation=false -p:EnableSourceControlManagerQueries=false --logger 'trx;LogFileName=nr-red.trx' --results-directory /tmp/issue81-readiness-validation-20261022/i81-nr-001/red-results -bl:/tmp/issue81-readiness-validation-20261022/i81-nr-001/red.binlog
+```
+
+exit 1。46 executed / 40 passed / 6 failed / 0 skipped。テスト追加後・製品修正前の実失敗を保存した。
+
+```text
+dotnet build Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj --no-restore -m:1 /nr:false -p:UseSharedCompilation=false -p:EnableSourceControlManagerQueries=false -bl:/tmp/issue81-readiness-validation-20261022/i81-nr-001/library-build.binlog
+```
+
+exit 0。Build succeeded、warnings 0 / errors 0。
+
+```text
+dotnet test /tmp/issue81-readiness-validation-20261022/focused-harness/Focus.Tests.csproj --no-restore -m:1 /nr:false -p:UseSharedCompilation=false -p:EnableSourceControlManagerQueries=false --logger 'trx;LogFileName=nr-final.trx' --results-directory /tmp/issue81-readiness-validation-20261022/i81-nr-001/final-results -bl:/tmp/issue81-readiness-validation-20261022/i81-nr-001/harness-test.binlog
+```
+
+exit 0。46 executed / 46 passed / 0 failed / 0 skipped。
+
+```text
+dotnet test /tmp/issue81-readiness-validation-20261022/focused-harness/Focus.Tests.csproj --no-restore --no-build --list-tests -m:1 /nr:false -p:EnableSourceControlManagerQueries=false
+```
+
+exit 0。46 ケースの列挙を読戻した。
+
+`EnableSourceControlManagerQueries=false` は今回もコマンド限定。製品設定へ保存せず、SourceLink/Git metadata の検証成功とはしない。一時 harness は既存の `/tmp/issue81-readiness-validation-20261022/focused-harness/Focus.Tests.csproj` をそのまま使い、実 test source の Compile Link と実 library の ProjectReference を維持した。ネットワーク利用、設定/環境/依存変更、外部 repo 編集はしていない。
+
+| 最終入力/証拠 | SHA256 |
+| --- | --- |
+| `Testing/Duck.Testing.Diagnostics/ResourceReadinessState.cs` | `ad2cc33e8216b41b070050b8deb0237c3ea38ca298f31849cf12c1df86b1d26c` |
+| `Tracker/Tracker.Tests/ResourceReadinessStateTests.cs` | `f2dce7e46325a457ba19b2021fc690748c1509780bd5430db22041ea36e7edea` |
+| `harnessProject` | `a73932c060ef6490004fca88d84ad8e5e19eea96a23b767d35dab433504f370f` |
+| `i81-nr-001/red-results/nr-red.trx` | `f6cd789b9b264f2dc008373cd15737692be1b6a6e244cf4acea321e0a23477cf` |
+| `i81-nr-001/final-results/nr-final.trx` | `98700c5d21b05fd8378ee009b4398a7f7a3553819b9e04b3984c063502133717` |
+
+最終 TRX `i81-nr-001/final-results/nr-final.trx` を XML で読み、Counters total/executed/passed=46、failed/notExecuted=0、UnitTestResult 46 件を確認した。discovery も 46 件。final-inputs.json は 7 source/project file と harness project を網羅し、ディスク実体と再照合した。
+
+`git diff --check` は exit 0 / 診断なし。親の tasks-status と第三者所有 normal-review report は開始時 SHA256 と一致し、編集していない。旧 report の全内容と Dispatch を保持した。実行中の当該 dotnet build/test/restore、testhost、MSBuild は 0 件、全終了コード回収済み、承認待ち/結果不明なし。
+
+**残る gate:** 標準 Tracker.Tests は初回記録の relativeworktrees / CS0246 の制約で未完了を維持し、今回再実行していない。harness 46 件は標準 gate/全体受入/Windows/DCP/外部 G1/G3 の成立証拠ではない。追加外部編集・導入・実機は未着手。commit=commit_pending（子は禁止）、push=unauthorized、matching_ci=null（未照会）、full_local_equivalence_gate=not_started。通常 reviewer による I81-NR-001 の fix 検証が次工程であり、実装側から合格/closure は宣言しない。
+
 ## リスク
 
 - 標準 Tracker.Tests/solution gate は CS0246 で未完了。harness の成功から標準 gate 成功を推論しない。
