@@ -145,6 +145,14 @@ exact 8b2d7bb8a2903c89fd960a3c006c88b91b7d6647 のpull_request CI39804723964を�
 
 親採用Redはexact8b2d7bb/CI39804723964のpayload[]・DisposeCalls0。既存SDK Declarations.dllによる最終2file構文抽出exit0。/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false はexit1、生成Referee不足CS0246x2/CS0400x2、0warnings/4errors。git diff --check exit0。初回検査後のRun公開/start lock境界調整を最終sourceへ反映し、構文/buildを再実行した。初回ログはinitial-接頭辞と当時sourcehashを保持。全コマンド引数/終了値/生stdout/stderrは /tmp/issue81-referee-receive-udp-dispose-green-candidate-20261022/ に保存。
 
+### 実UDP受信・Disposeの同SHA Green CI収集
+
+exact 3d5cf425ea75718b865b8deb6d3b4e2d9e4011a1 のpull_request CI39806540458を公式REST GETで確認。gh run watch --exit-status --interval 10を1件起動しexit0。gh run view --json/--logとartifact REST GETも全exit0。実CI commandは dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger "trx;LogFileName=dotnet-test.trx" --results-directory "$results_dir" --diag "$results_dir/vstest-diagnostics.log" --blame -m:1 /nr:false -bl:"$results_dir/dotnet-test.binlog"。Run dotnet test step successに基づくexit0で、単独exit-code artifactは公開されていない。全argv/exit/生stdout/stderrを /tmp/issue81-referee-receive-udp-dispose-green-ci-20261022/ に保存。
+
+### production UDP設定生成・取消/所有/反復Disposeの先行7case
+
+比較設計:260のTDDと親の03A続行指示に従い、expectations.jsonへ設定2case/境界回帰5caseを先に固定。既存SDK /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-receive-udp-settings-regression-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-receive-udp-settings-regression-red-preparation-20261022/syntax-result.json はexit0（新2fileの構文抽出のみ）。git diff --check exit0。既知の生成Referee不足のためsemantic compile/実parser testは未実行、remote_ci_only維持。生stdout/stderr/argv/exitを同dirに保持。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -269,6 +277,14 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### 実UDP受信・service Disposeの最小Green候補（親のRed採用後）
 
 製品変更はTesting/Duck.Testing.RefereeDriver/RefereeReceiveService.cs（SHA256 084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0）と同UdpRefereeDatagramReceiver.cs（SHA256 d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133）のみ。固定2test/既存631/独立67関連を含む他18sourceのhash一致。既存公開UdpRefereeCommandSource/default/noncontainer経路は変更なし。source-manifest.json SHA256 99767a7b4af6f75d5a0045110c997a5620ea8ccc183fc008a1306354f00f9e98。親prefix/Dispatch/tasks/phases/他report・既存証拠を保持。
+
+### 実UDP受信・Disposeの同SHA Green CI収集
+
+製品/test変更なし。20sourceはHEAD/current/最終候補hashと一致。service SHA256 084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0、adapter SHA256 d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133、固定2testfile SHA256 9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f。既存631/固定独立67関連source/凍結manifestも不変。CI checkout logは同HEADを含むPR merge c992dbbを示す。成功source archiveは非公開でactualarchiveとのbyte照合は未実施。親prefix/Dispatch/tracking/他report保持。
+
+### production UDP設定生成・取消/所有/反復Disposeの先行7case
+
+新規Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs SHA256 95ba1286513657c4be5fa8315131f07133cd2152f94f11ebb301a6cb172f0594、新規Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs SHA256 82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83のみ。前者はinternal options record/socket設定interface/Create=>null!だけ。既存service/adapter/public UDP/default非container経路は無変更。既存18case/固定独立67関連を含む20sourceのhash一致、snapshotも新2fileとbyte一致。source-manifest.json SHA256 bb5899bacbd309a6923d0c268d2055992a8195c5c805e96a6f842a94a5008a90。親prefix/Dispatch/tasks/phases/他report保持。
 
 ## 指摘事項
 
@@ -405,6 +421,14 @@ accepted03Aの取消・Run所有/世代・不正入力failclosed・受信freshne
 
 adapterは注入UdpClient.ReceiveAsync(token)直後にcaptureReceiveを呼び、payload/実producer endpoint/同受信stampを返す。ownsClient既定false、明示所有socketだけInterlockedで一度破棄し、取消済tokenでのsocket破棄例外だけ取消へ伝える。serviceはcaller+内部停止tokenをリンクし、Run/Dispose admissionを同じlockで扱い、実Run Task公開後にlock外でpump開始。Disposeは同じTaskを返して一度だけ内部取消・明示ownedReceiver破棄・実Run終端awaitを行い、EndEpoch/cache解除完了後に終了する。取消/破棄失敗時もRun回収をfinallyで行い、不明な例外を成功へ変換しない。正常caller取消後の再開と既存購読処理を保持する。
 
+### 実UDP受信・Disposeの同SHA Green CI収集
+
+採用済みpayload[]/DisposeCalls0のRedに対する同一固定2testを保持し、633全体の集計Greenを取得。成功runの個別TRXがないため、新2件/既存631/固定67の現在の個別結果を直接照合したとはしない。production11003/Any/reuse/任意IPv4 membership生成、adapter取消/owned-vs-borrowed/反復Disposeは次の先行testで個別確認する残件。既存公開UDP/default非container経路の変更や人工Redは行わない。
+
+### production UDP設定生成・取消/所有/反復Disposeの先行7case
+
+設定2caseは主設計:76/81/236/237、scope:42/89、既存UdpMulticastPacketReceiverのIPv4/reuse/Any/join順に対応。fakeへCreate InterNetwork→ExclusiveAddressUse false→ReuseAddress true→0.0.0.0:11003 bind→224.5.23.1へIF未指定または192.0.2.80明示joinを期待し、最初のAssert.Equalは30行の5項目sequence（現scaffold見込みは空記録）。固定11003を実bindせず、fakeは設定を記録するだけ。回帰5caseは未受信token取消でcapture0/借用socket開存、ownsClient false/trueの並行反復Dispose後handle状態、service並行反復Disposeが同じ所有cleanup完了を待ちRun終端/count2/notready/caller未取消、破棄後Run拒否/Receive0。例外型/Task形を過剰固定せず、timeoutは拒否成功と扱わない。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -534,6 +558,14 @@ run39804723964 completed/failure、test job119914751037 completed/failure。TRX6
 
 最小Green候補sourceを保存、構文exit0/diffcheck0、no-restore buildは既存proto不足exit1。テスト実行0件、semantic compile/実parserのGreenは未観測。新2testもbyte不変、親のexactSHA PR CIが次の正式検証。全証拠一覧 /tmp/issue81-referee-receive-udp-dispose-green-candidate-20261022/evidence-files-manifest.json SHA256 0b0ae306c919f1886aa1833ea4d1cb3c098470e9aa702646fe8ec724a8fa5d2a（26file、source前後/diff/初回と最終の検査logを含む）。
 
+### 実UDP受信・Disposeの同SHA Green CI収集
+
+run39806540458 completed/success、test job119921156136 completed/success。正式ログ実測633total/633passed/0failed/0skipped。packet/full-stack acceptance jobはskip。artifact API total_count0、成功個別TRX未取得。ci-evidence.json SHA256 e870f0f9a6bb134918f5a42e2ea9a8089f3e34c7f2dd8fe58bd78865d9939aa3。全証拠一覧 /tmp/issue81-referee-receive-udp-dispose-green-ci-20261022/evidence-files-manifest.json SHA256 410ce988e9ef1be8aa73240605c1d2606ca3da7b7315ff34c6c361047dd292ea（27file、生log含む）。
+
+### production UDP設定生成・取消/所有/反復Disposeの先行7case
+
+新7case（Theory2+2、Fact3）とcompile最小scaffoldを保存。構文exit0/diffcheck0、semantic compile/test実行0、runtime Red/Green未観測。設定Createはnull返却のみで本factory生成動作は実装せず、先行Red採用待ち。境界回帰5件は既存behaviorで通ればそのまま成功と扱い人工Redなし。全証拠一覧 /tmp/issue81-referee-receive-udp-settings-regression-red-preparation-20261022/evidence-files-manifest.json SHA256 db66763f544faa9260dc53ec02a0baffa75233877de57d16a2acb561ee4e6da7。次の正式CIは既存633+7の640見込みだが実測を優先。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -653,6 +685,14 @@ run39804723964 completed/failure、test job119914751037 completed/failure。TRX6
 ### 実UDP受信・service Disposeの最小Green候補（親のRed採用後）
 
 反復Dispose/並行終端の安全境界はコードへ含めたが、それぞれ個別runtime成功とはしない。production11003/Any bind/reuse/任意IPv4 membership factory、adapter取消/owned・nonowned socket破棄の追加回帰、実adapter+parser統合は次単位でtest-first確認。今回loopback以外のDesktopmulticast/Windows/DCP/G3/実機成功は未検証。03B/C、外部/配置/依存/設定/環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更なし。全syntax/build/read/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
+
+### 実UDP受信・Disposeの同SHA Green CI収集
+
+production multicast設定factory、実UDP取消/所有/反復破棄の個別runtime回帰、実Desktopmulticast/Windows/DCP/G3/実機受入、03B/Cは未完了。runはin_progressで確認後に正常終端し、今回/tmp次候補のsource/scaffoldは作成していない。旧run全体未終端の履歴は新Greenへ変換せず、旧watch再開/再試行なし。製品/test/期待値/skip、外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全watch/取得/read/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
+
+### production UDP設定生成・取消/所有/反復Disposeの先行7case
+
+fakeの設定依頼検証はreal socketのmembership/配送成功やDesktopmulticast受入を証明しない。loopback取消/所有fixtureは動的portのみ、全socketはusing/finallyで破棄、pending receive/Run/Disposeは安全caller取消・解除・期限付き待機で回収する。factory本実装、生成失敗時cleanup/invalid optionsの必要境界、owned socketのpending receive-dispose競合、生成adapter+service統合、Windows/Desktop/DCP/G3/実機受入は残件。03B/C、既存期待値/skip変更、外部/配置/依存/設定/環境/auth/network変更・host/Docker/実機起動・commit/push/GitHub変更なし。全read/edit/構文抽出/save/check process終端、exit回収済み、稼働session/未回収exit/保留approvalなし。
 
 ## 親による公開準備記録
 
