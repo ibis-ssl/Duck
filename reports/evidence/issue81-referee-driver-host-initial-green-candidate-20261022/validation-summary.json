@@ -1,0 +1,23 @@
+{
+  "head": "0316e326aa881fd03f65f8bb9b625bd042ee9bd1",
+  "acceptedRedRun": 39846734850,
+  "acceptedRedCounts": {
+    "total": 745,
+    "passed": 738,
+    "failed": 7,
+    "error": 0,
+    "timeout": 0
+  },
+  "newHostBuildSucceededOnRed": true,
+  "candidateSyntaxExit": 0,
+  "candidateXmlParses": 4,
+  "candidateDiffExit": 0,
+  "source39": {
+    "changed": 1,
+    "unchanged": 38
+  },
+  "fixedHost11SHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+  "runtimeGreen": "not executed; parent exactSHA PR CI pending",
+  "noNewBuildTestRestoreHostStart": true,
+  "noCommitPush": true
+}

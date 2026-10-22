@@ -1,0 +1,44 @@
+[
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth",
+    "actualMessage": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "firstAssertionLine": 129,
+    "executionId": "7b86db21-addb-4019-81e5-e126b0680a2f"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: null)",
+    "actualMessage": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "firstAssertionLine": 98,
+    "executionId": "a5c6ef8f-09b7-4d62-9576-e87b4014ce7e"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: True, expected: \"http://0.0.0.0:39110\")",
+    "actualMessage": "Assert.Equal() Failure: Strings differ\nExpected: \"http://0.0.0.0:39110\"\nActual:   null",
+    "firstAssertionLine": 32,
+    "executionId": "1f183d67-7a01-4d9d-9b9b-43f9c84154ef"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: \"short-id\")",
+    "actualMessage": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "firstAssertionLine": 98,
+    "executionId": "1690d6ae-a8a2-44c9-81f9-4dbf41787247"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: False, expected: \"http://127.0.0.1:39110\")",
+    "actualMessage": "Assert.Equal() Failure: Strings differ\nExpected: \"http://127.0.0.1:39110\"\nActual:   null",
+    "firstAssertionLine": 32,
+    "executionId": "3e283deb-d0ed-412d-a33b-dad922b306b7"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput",
+    "actualMessage": "Assert.Equal() Failure: Values differ\nExpected: OK\nActual:   NotFound",
+    "firstAssertionLine": 54,
+    "executionId": "80ab3c80-e729-4dbd-9603-38d2e5b2bc31"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth",
+    "actualMessage": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "firstAssertionLine": 115,
+    "executionId": "5c174e0c-6f80-42de-9602-a90b0c87190e"
+  }
+]

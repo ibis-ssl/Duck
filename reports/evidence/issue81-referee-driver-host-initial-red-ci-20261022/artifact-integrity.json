@@ -1,0 +1,21 @@
+{
+  "id": 12454799622,
+  "expectedDigest": "sha256:5a2d8a488994e6571b9b2b4386f8d6acee297d48a8000b2dba1aae347bbf258d",
+  "actualDigest": "sha256:5a2d8a488994e6571b9b2b4386f8d6acee297d48a8000b2dba1aae347bbf258d",
+  "match": true,
+  "bytes": 22715483,
+  "singleRawBinaryPath": "artifact-12454799622.zip",
+  "duplicateBinaryStdoutLogCreated": false,
+  "files": [
+    "dotnet-test.binlog",
+    "dotnet-test.stderr.log",
+    "dotnet-test.exit-code",
+    "dotnet-test.stdout.log",
+    "dotnet-test.trx",
+    "environment.txt",
+    "source.tar.gz",
+    "vstest-diagnostics.datacollector.26-10-22_20-12-54_65524_5.log",
+    "vstest-diagnostics.host.26-10-22_20-12-54_97426_5.log",
+    "vstest-diagnostics.log"
+  ]
+}
