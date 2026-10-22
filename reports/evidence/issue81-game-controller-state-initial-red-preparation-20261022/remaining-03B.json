@@ -1,0 +1,31 @@
+{
+  "current": "first HALT reader positive test/scaffold only",
+  "subsequentSmallUnits": [
+    {
+      "scope": "message boundaries and failure",
+      "tests": "fragmented Text, initial protocol skip, Close/binary/invalid/missing matchState, bounded message bytes, cancellation; no initial gcState/config/protocol success"
+    },
+    {
+      "scope": "state normalization and UDP comparison",
+      "tests": "STOP/RUNNING; API string/numeric enums with explicit mapping (API HALT1 differs from UDP HALT); unknown/unhandled/contradictory values failclosed; no integer cast"
+    },
+    {
+      "scope": "finite observation ownership",
+      "tests": "local monotonic start/complete age, input/source epoch and sequence, expiry/poll nonextension, late old response rejection, same-valued old observation not renewed by poll"
+    },
+    {
+      "scope": "new connection and reconfiguration",
+      "tests": "invalidate old state/attempt on endpoint change/disconnect, fresh hostname URI on each new connection, cancellation/disposal; no retained numeric resolved IP"
+    },
+    {
+      "scope": "observe-only and explicit drive",
+      "tests": "read path writes0; existing control JSON/HALT→NEXT→FORCE/NORMAL regressions; only explicit AutoDrive invokes control"
+    }
+  ],
+  "held": [
+    "03C HTTP/DI/Program/config hosting",
+    "externalG3/placement/DesktopWindowsDCP/hardware",
+    "full existing Markdown gate failure"
+  ],
+  "noBehaviorBeforeParentRed": true
+}

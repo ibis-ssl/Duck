@@ -1,0 +1,10 @@
+using System.Net.WebSockets;
+using System.Text;
+using Duck.Testing.RefereeDriver;
+
+namespace Tracker.Tests;
+public sealed class GameControllerStateClientTests
+{
+    [Fact]
+    public async Task ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting();
+}
