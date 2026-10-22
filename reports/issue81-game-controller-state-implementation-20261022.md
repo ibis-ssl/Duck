@@ -31,6 +31,10 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 - 親が採用した exactdcf3a2f6 / CI39824712525 の653件中652成功/1失敗を起点とする。実TRXの32行 Assert.NotNull(observed)、Actual null、timeout/error0と旧652個別Passedを保持。固定test/期待値を変えず最小behaviorを追加した。
 - 既存Roslyn構文解析exit0、git diff --check exit0。新build/test/CIは実行せず、実parser/標準gateはremote_ci_onlyのまま。構文解析をcompile成功やGreenにしていない。
 
+### 通信・JSON境界unitの先行試験準備（2026-10-22）
+
+- HEAD38bb4890f988d5d42155750452cc9d23d4f86881で現client・既存固定契約を確認し、TDD/implementation/report Skillの適用を継続。通信境界13caseとcompile用宣言だけを保存した。Roslyn構文解析exit0、git diff --check exit0。新runtime実行0件、compile/functional Redは未観測。親がexact-SHA PR CIで正式Redを回収する。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -43,6 +47,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
 
 - GameControllerStateClient.cs のみ製品変更。注入URIと接続factoryを保持し、同URIで接続→初期非matchState Outputを読み飛ばす→command/gameState双方のHALT文字列を明示正規化→接続を破棄して返す。SHA256 2fd3e0c02618754a9dfcaf17594b382005c89235da800dd37ddc84d5cf99921c。
 - 固定 GameControllerStateClientTests.cs のSHA256 f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7と全既存tracked testを保持。他25sourceもhash不変。旧652/固定67/03A race/既存制御JSONを変更していない。報告以外の親tracking・通常review reportも未編集。
+
+### 通信・JSON境界unitの先行試験準備（2026-10-22）
+
+- 新規 GameControllerStateTransportTests.cs：13case、BCL WebSocket fakeと手動TimeProvider/単発ITimer。SHA256 bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764。
+- GameControllerStateClient.cs：optional options/TimeProvider引数、未使用のdiscard、GameControllerStateReadOptions宣言だけ。SHA256 1cd10b71401c41ce6bdca37cb6dc20736c49f79d885734731ee98179ba0ee9a6。追加宣言/引数/discardを除くと旧source（SHA256 2fd3e0c02618754a9dfcaf17594b382005c89235da800dd37ddc84d5cf99921c）とbyte同一。読取body・成功判定・通信behaviorは未修正。
+- 初回固定test SHA256 f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7、他25source、全既存tracked testを保持。親tasks/phasesの進捗更新は対象外として保持。証拠: /tmp/issue81-game-controller-state-transport-red-preparation-20261022/。
 
 ## 指摘事項
 
@@ -57,6 +67,12 @@ HALTだけのreader単位を03B全体完了としない。fragment/close/binary/
 - 固定8050のprotojson契約に従いmatchState/command/type/gameStateを読む。APIのHALT文字列からローカルのHalt区分へ明示対応し、API/UDP整数のcastを使わない。gcState/configやnull matchStateを取得成功にしない。Send/control関数を呼ばず、usingで返却時・失敗時も受領したsocketを破棄する。
 - 未完成の境界で誤って成功しないため、固定4096byte領域で受けたText完成messageだけを解析し、非Textや未完成messageはnullにする。JSON解析例外は成功へ変換しない。fragment組立・切断/上限の完全契約やエラー分類を本unitで完成扱いしていない。STOP/RUNNING、numericAPI対応、UDP照合、有限age/epoch/旧応答、DNS実接続adapter、AutoDriveは後続TDDへ残す。
 
+### 通信・JSON境界unitの先行試験準備（2026-10-22）
+
+- 期待Red6case：UTF8途中分割matchState、分割初期gcStateからの継続、不正JSON、受信切断、正常JSONの合計byte上限1超過、期限後解放の正常frame拒否。実不足をNotNull/Assert.Null(error)/Assert.Null(observed)で確認する。既存regression見込み7case：不正構造2、Close/Binary2、上限ちょうど1、fragment合計超過拒否1、呼出取消1。全部を人工的にRedにしない。合計超過fragmentが現在nullでも、現在の合計上限実装の証明ではなく未対応fragmentの早期拒否だと区別する。
+- 読取窓は既定3秒、上限は既定4096byteの有限値を内部optionsとして宣言。現在buffer4096と同じ規模の論理message上限で、既定値の外部性能保証を主張しない。試験は期限2秒/手動時計と正常JSONの正確なbyte数を明示注入し、期限到達後の正常応答を成功にしない。optionsはまだbehaviorへ適用していない。
+- 通常の不正JSON/切断/期限等はnull観測、呼出元の明示取消はOperationCanceledExceptionという独立期待値を固定。無関係な例外/OOMを成功へ変換する契約ではない。全socketをusingで保持し、待機caseはfinallyで合図解放/取消/Task回収する。5秒watchdogのtimeout自体をRedとは認定しない。無入力のまま期限で終端することは今回の遅延frame試験だけでは証明せず、Green後の追加確認へ残す。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
@@ -68,6 +84,11 @@ test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件�
 - 最小候補1製品fileを保存・構文/diff/hash guard確認。証拠は /tmp/issue81-game-controller-state-initial-green-candidate-20261022/。source-manifest.json、production.diff、before/after source、unchanged25-source-guards.json、生command/stdout/stderrを保存した。
 - 同じtestのNotNull後のHALT正規化・URI/順序・write0・Dispose1期待値は固定。候補のruntime Greenは未観測で、親commit/push後のexact-SHA PR CI待ち。親prefix/Dispatchを保って子5欄へ履歴追記・読戻し。全process終端、未回収exitなし。子commit/push/CI操作なし。
 
+### 通信・JSON境界unitの先行試験準備（2026-10-22）
+
+- first transport unitのtest/scaffold保存・構文/diff/hash確認を完了。expectations-and-matrix.jsonに13case/各期待値/既存挙動との差、source-manifest.jsonに指紋、scaffold-only-identity-proof.jsonにbehavior未修正のbyte証明を保存。見込み全666件は未実測で、runtime Red/Green未観測。
+- 親prefix/Dispatchを保護し子5欄へ追記・読戻し。全process終端、未回収exitなし。製品behavior実装・新build/test・commit/push/CI操作は行っていない。親がこの候補をCIへ渡し、実assertion不足を採用してから最小実装する。
+
 ## リスク
 
 API StateにUDP command_counterはなく、列挙値の数値も異なる。状態照合は有限窓の新しい観測として扱い、原子的同期やGC自身の受信診断を捏造しない。Desktop/DCP/実機は未検証。全文文書gateは不合格のまま。
@@ -78,3 +99,8 @@ API StateにUDP command_counterはなく、列挙値の数値も異なる。状�
 
 - 本unitの候補はHALTの初期状態読取に限定する。初期HALTが読めてもAPI/UDP一致や03B readiness成立とはしない。固定testのGreenと旧652回帰は正式CI待ち。残るfragment/close/上限/STOP・RUNNING/有限age・epoch・sequence/再設定/新接続hostname/AutoDrive/03Cを先行完成させていない。
 - 新依存・環境/auth/network・外部repo・実サービス/実機・新agentなし。原Solhigh継続/applied:null、既存全文文書gate不合格と外部heldを保持する。
+
+### 通信・JSON境界unitの先行試験準備（2026-10-22）
+
+- 期待6失敗/7regressionは静的見込みで、実測ではない。期限は明示注入した読取窓の契約であり、実GC/外部networkの所要時間を仮定していない。STOP/RUNNING/API-UDP明示map・snapshot age/epoch/sequence・遅い旧応答/再設定/hostname再解決・AutoDrive・03Cは未実装の後続として保持。
+- 新依存・環境/auth/network・外部repo・実service/実機・新agentなし。既存全文文書gate不合格を保持。原Solhigh継続/applied:null、自己review合格判定なし。

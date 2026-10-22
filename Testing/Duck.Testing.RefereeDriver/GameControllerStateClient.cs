@@ -11,12 +11,16 @@ internal sealed class GameControllerStateClient
 
     internal GameControllerStateClient(
         Uri endpoint,
-        Func<Uri, CancellationToken, Task<WebSocket>> connect)
+        Func<Uri, CancellationToken, Task<WebSocket>> connect,
+        GameControllerStateReadOptions? options = null,
+        TimeProvider? timeProvider = null)
     {
         ArgumentNullException.ThrowIfNull(endpoint);
         ArgumentNullException.ThrowIfNull(connect);
         this.endpoint = endpoint;
         this.connect = connect;
+        _ = options;
+        _ = timeProvider;
     }
 
     /// <summary>初期の別Outputを読み飛ばし、公開matchStateのHALTを観測専用接続から読む。</summary>
@@ -74,3 +78,10 @@ internal enum GameControllerMatchPhase
 internal sealed record GameControllerMatchSnapshot(
     GameControllerCommandKind Command,
     GameControllerMatchPhase Phase);
+
+/// <summary>一回の状態読取に明示注入する有限窓と、完成message全体のbyte上限。</summary>
+internal sealed record GameControllerStateReadOptions
+{
+    internal int MaximumMessageBytes { get; init; } = 4096;
+    internal TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(3);
+}

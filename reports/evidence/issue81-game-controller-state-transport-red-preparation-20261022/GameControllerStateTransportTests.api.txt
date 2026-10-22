@@ -1,0 +1,33 @@
+using System.Net.WebSockets;
+using System.Text;
+using Duck.Testing.RefereeDriver;
+
+namespace Tracker.Tests;
+public sealed class GameControllerStateTransportTests
+{
+    [Fact]
+    public async Task FragmentedUtf8MatchStateReturnsHalt();
+    [Fact]
+    public async Task FragmentedInitialOutputDoesNotEndMatchStateRead();
+    [Theory]
+    [InlineData("{")]
+    [InlineData("\"not-an-output\"")]
+    [InlineData("{\"matchState\":[]}")]
+    public async Task InvalidOutputReturnsNoObservation(string json);
+    [Theory]
+    [InlineData(WebSocketMessageType.Close)]
+    [InlineData(WebSocketMessageType.Binary)]
+    public async Task NonTextMessageReturnsNoObservation(WebSocketMessageType type);
+    [Fact]
+    public async Task ReceiveDisconnectReturnsNoObservation();
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task LogicalMessageByteLimitHasAnInclusiveBoundary(bool oneByteOver);
+    [Fact]
+    public async Task FragmentedMessageOverTotalByteLimitReturnsNoObservation();
+    [Fact]
+    public async Task DeadlineRejectsValidFrameReleasedAtExpiry();
+    [Fact]
+    public async Task CallerCancellationDuringReceiveRemainsCancellation();
+}
