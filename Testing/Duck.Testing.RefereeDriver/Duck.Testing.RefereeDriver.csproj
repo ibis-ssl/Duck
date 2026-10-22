@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tracker.Tests" />
+    <InternalsVisibleTo Include="Duck.Testing.RefereeDriver.Host" />
   </ItemGroup>
 
 </Project>

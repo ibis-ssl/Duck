@@ -1,0 +1,44 @@
+using System.Collections.Concurrent;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text.Json;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
+using Google.Protobuf;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace Tracker.Tests;
+public sealed class RefereeDriverHostHealthTests
+{
+    [Theory]
+    [InlineData(true, "http://0.0.0.0:39110")]
+    [InlineData(false, "http://127.0.0.1:39110")]
+    public void EnabledBindingFollowsExplicitContainerMode(bool container, string expected);
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    public void DisabledBindingPreservesExistingSettings(string? enabled);
+    [Fact]
+    public async Task HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput();
+    [Theory]
+    [InlineData(null)]
+    [InlineData("short-id")]
+    public async Task MissingOrShortOwnerCannotBecomeReady(string? containerId);
+    [Fact]
+    public async Task DifferentApiCommandCannotPassHttpHealth();
+    [Fact]
+    public async Task NoReceivedPacketCannotPassHttpHealth();
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    public async Task DisabledHealthDoesNotExposeAReadyEndpoint(string? enabled);
+}
