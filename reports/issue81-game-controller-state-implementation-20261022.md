@@ -70,6 +70,11 @@ work-context-manager/implementation-executor/implementation-worker/tdd-executor/
 
 親が採用した exactf5ae4401 / CI39836060621 は716実行/707成功/9実assertion失敗、error/timeout0。旧707/固定67/raceはTRX個別Passed、source32/CI archive一致。既存implementation/TDD/report Skillを継続し固定9test不変でObserver1fileを実装。最終Roslyn構文解析exit0、git diff --check exit0。新build/test/CI未実行、remote_ci_onlyを保持し候補Greenは未観測。
 
+
+### 実受信packet証跡とAPI観測の統合照合：先行試験準備（2026-10-22）
+
+既存implementation/TDD/report Skillを継続。exact5c22501fのCI39837381804は716成功、artifact0で個別TRXなし。今回18caseとcompile用宣言scaffoldだけを先行保存し、最終Roslyn構文解析exit0、git diff --check exit0。build/test/CI未実行、remote_ci_onlyを維持し構文成功をcompile/functionalRedにしない。親所有のevidence重複binary削除/収納mapとtasks/phases差分は保持しsourceguard対象外。
+
 ## 対象ファイル
 
 - 新規 Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs。内部URIとBCL WebSocket接続factoryを注入する最小内部型、正規化HALT/Unknownの宣言とnullable snapshot。constructorの引数検査と結果nullのみで、接続・読取・JSON解析・状態判定は未実装。SHA256 0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740。
@@ -123,6 +128,11 @@ GameControllerStateClient.cs SHA256 20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6
 ### API観測context：9件runtime Red後の最小候補（2026-10-22）
 
 GameControllerStateObserver.csのみ製品変更、SHA256 994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950。固定9test SHA256 210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90adと他31source（既存30＋固定9test file）byte不変。既存client/期限/mapping/固定67/raceを変更していない。親tracking/review/保存済Red証拠を保持。証拠 /tmp/issue81-game-controller-state-context-green-candidate-20261022/ にbefore/after source、差分、構文command/stdout/stderr/exit、指紋/guard/対応表を保存。
+
+
+### 実受信packet証跡とAPI観測の統合照合：先行試験準備（2026-10-22）
+
+RefereeReceiveService.csはGetCurrentObservation()=>nullと同packet証跡record宣言の追加だけ。新RefereeApiMatcher.csはReadAsync/GetCurrentが常にNotReadyでAPI取得/受信/判定未実装。新RefereeApiMatcherTests.cs SHA256 814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec は18case。既存serviceは追加宣言を除くとbyte同一、他31sourceと既存716/固定67/raceは不変。証拠 /tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/ にsource/guard/宣言同一証明/期待値対応表/command/stdout/stderr/exitを保存。
 
 ## 指摘事項
 
@@ -179,6 +189,11 @@ APIのHALT/STOP/NORMAL_START/FORCE_STARTとHALT/STOP/RUNNINGの名前を明示sw
 
 要求開始時に同じlockでrequest番号・URL/設定世代・単調start stampを固定して旧保持値を解除し、readerはlock外でawait。完了時に最新番号/設定世代とclock版を照合してから同じ時計の完了stampを採り公開する。API取得全期間の上界ageはstart基準で、GetCurrentは現在ageを求めるだけでstart/完了stampや期限を延ばさず、窓外は保持解除。最新失敗で旧値を失効し、古い完了は新成功/新失敗を上書きしない。URL変更時はローカル設定世代を進めるがrequest番号は継続。高水位とclock版で逆行/区間不明を拒否し、経過計算overflowも成功にしない。caller取消は取得前後に確認、例外catchは当該最新値の解除後に再throwするだけ。Observerはtransport/CTSを新たに所有せず、変更しないclientが自身のsocket/CTSを破棄する。
 
+
+### 実受信packet証跡とAPI観測の統合照合：先行試験準備（2026-10-22）
+
+実service/実Referee parserと既存client/Observerを同じ手動時計で組成し、一致4、無入力/owner欠落/不明age/復号失敗4、不一致1、Close/実client期限2、poll非延命1、API待ち中の新UDP2、実Run再起動1、URL変更1、旧要求遅着1、原子的取得競合1を固定。新packet診断受理とcommand公開の隙間は既存BeforeCommandPublishで制御し、command/source/epoch/acceptedCountが同packetでなければ取得不可にする。API開始時と完了/poll時のUDP count等を再照合し、同counter packetでもcount更新後の旧APIcontextを対応付けない保守的契約。実流量で再取得が成立する可用性は未検証で、crossprotocol原子的同期を主張しない。APIにcommand_counterを追加せず、endpointをowner証明にしない。予想Red13/回帰5、正常一致は26行IsReadyfalse、原子的取得は212行NotNullnull、pending取得は247行API開始false等の実assertionを予定しtimeoutをRedにしない。
+
 ## 結果
 
 test/scaffoldの保存・構文解析・hash guardを完了。runtime実行0件、functional Red/Green未観測、通信behavior未実装。親が候補をcommit/pushし、exact-SHA PR CIで最初の実assertion失敗を回収してから同じ担当が最小実装へ進む。新1件を加えた653件は見込みであり実測を優先する。
@@ -230,6 +245,11 @@ test保存・構文/diff/hash確認を完了、runtime Red/Greenは未観測。�
 
 最小Observer1fileを保存しsource/syntax/diffと他31guard確認。source-manifest.jsonとcompleteness-matrix.jsonにRed→製品経路→固定fixture→候補Green待ちを対応付けた。runtimeGreenと全716回帰は親commit/push後のexact-SHA CI待ち。親prefix/Dispatchを保持し子5欄へ追記・読戻し。全process終端/exit回収、子commit/push/GitHub変更なし。
 
+
+### 実受信packet証跡とAPI観測の統合照合：先行試験準備（2026-10-22）
+
+先行18case/最小scaffoldを保存しsyntax/diff/既存32guardと親prefix/Dispatchを保護して子5欄へ追記・読戻し。runtimeRed/Green未観測、全734件は見込みで実測を優先。親がcommit/pushしexact-SHA CIで実assertion不足を採用してから同じ担当が最小behaviorを実装する。全process終端/exit回収済み、子commit/push/GitHub変更なし。
+
 ## リスク
 
 API StateにUDP command_counterはなく、列挙値の数値も異なる。状態照合は有限窓の新しい観測として扱い、原子的同期やGC自身の受信診断を捏造しない。Desktop/DCP/実機は未検証。全文文書gateは不合格のまま。
@@ -280,3 +300,8 @@ API取得のcontext/ローカル設定世代だけでUDPとの新しい一致や
 ### API観測context：9件runtime Red後の最小候補（2026-10-22）
 
 URL設定世代はローカルcontextでDCP所有世代ではない。UDP受信epoch/source/同packet commandとacceptedCountのatomic統合、APIUDP有限鮮度一致/理由、AutoDrive/03C/実image/外部配置/Desktop/DCP/実機は後続未実装/未検証。取消を無視する任意delegateを強制終了しない。runtimeGreen未観測。過去mappingrun39833466268の全体未確定とjob707success/localmonitor終了履歴は保持。新依存/環境/外部変更・新agentなし、全文文書gate既知不合格、原Solhigh/applied:null維持。
+
+
+### 実受信packet証跡とAPI観測の統合照合：先行試験準備（2026-10-22）
+
+不一致/失敗caseがNotReady scaffoldで通っても照合実装済みの証拠ではない。固定positiveと競合fixtureでruntime不足を確認する。APIageは新規CurrentState取得のローカル上界でGC自身の入力復号ageではなく、Driver自身UDP診断と有限窓で照合する。DCP所有実証・外部G3・実image/namespace/Windows/Desktop/実機・03CHTTP/DI/配線は未実装/未検証。AutoDriveは既存明示選択のみで観測から送信しない。新依存/環境/外部変更・新agentなし、全文文書gate既知不合格、原Solhigh/applied:null保持。

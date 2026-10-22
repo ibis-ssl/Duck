@@ -1,0 +1,121 @@
+{
+  "governingSources": [
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260 TDD",
+    "reports/issue81-referee-driver-scope-20261022.md:65-66,89-90,94-95,101,116-117",
+    "Tracker/Design/tasks-status.md:I81-03B",
+    "parent accepted actualreceive/APIcontext finite localmatch test-first unit"
+  ],
+  "contract": {
+    "atomicUDP": "internalaccessor returns command and Diagnostic from same sourceKey/ReceiverEpoch/SuccessfullyDecodedCount; if nextpacket diagnostic accepted beforecommandpublication it returnsnull; oldpublic WaitForChange unchanged",
+    "acquisition": "capture UDPcontext beforeAPIread, revalidate epoch/owner/source/count atcompletion and poll; never matcholdAPI to newerUDPcount, including samecounter packet",
+    "API": "existingObserver capturesrequestsequence/URLgeneration/localstart-complete timestamps; matching must stillusecurrentcontext, oldercompletion cannotclearnewermatch",
+    "age": "UDPdecode age is ServiceReceiveDiagnostics age sampledpredecode; APIage from readstart includeslatency; GetCurrent revalidatesboth withoutnewreceive/APIread or lifetimeextension",
+    "identity": "explicitfull ResourceDiagnosticIdentity required; producerendpointnotowner/DCPproof",
+    "mapping": "existingexplicit HALT/Halt STOP/Stop NORMAL_START/Running/NormalStart FORCE_START/Running/ForceStart; APIhasnoUDPcounter",
+    "conservativeSafety": "any acceptedpacket countchange duringAPIread invalidatesoldpair evenunchangedcommandcounter; retryavailability undercontinuousrealtraffic notvalidated; no atomicsynchronization claimedacrossprotocols"
+  },
+  "fixture": "real RefereeReceiveService.RunAsync + real Referee.Parser + real GameControllerStateClient/Observer/Mapping; rawfake channel receiver singlepump and fakeWebSocket only; shared manualtimer clock; no externalsocket/network/containers",
+  "cases": [
+    {
+      "name": "MatchesFreshActualReceiveAndApiPaths",
+      "cases": 4,
+      "expect": "fullowner/count2/epoch1/fresh HALT STOP NORMAL_START FORCE_START pairs Ready/Matched, count+counter+source/APIcontext correct, APIwrite0/dispose1, receivecalls3/maxActive1",
+      "expectedRuntime": "Red IsReadyfalse"
+    },
+    {
+      "name": "UnusableUdpDoesNotMatch",
+      "cases": 4,
+      "inputs": [
+        "NoInput",
+        "MissingOwner",
+        "UnknownAge",
+        "DecodeFailure"
+      ],
+      "expect": "notready/currentnotready/write0/maxActive1",
+      "expectedRuntime": "regressionPass fromNotReady scaffold; not positiveproof"
+    },
+    {
+      "name": "DifferentApiCommandIsNotReady",
+      "cases": 1,
+      "expect": "freshnormalHALT UDP andSTOP API cannotmatch",
+      "expectedRuntime": "regressionPass fromNotReady scaffold"
+    },
+    {
+      "name": "FailedOrExpiredApiReadIsNotReady",
+      "cases": 2,
+      "inputs": [
+        "Close",
+        "realclienttimer3sec"
+      ],
+      "expect": "notready/currentnotready/APIConnect1/Dispose1/write0",
+      "expectedRuntime": "Red ConnectExpected1Actual0"
+    },
+    {
+      "name": "PollingDoesNotRefreshEitherEvidence",
+      "cases": 1,
+      "expect": "initialmatch, APIage3sec boundary valid, +tick notready; UDPcount/lastUTC unchanged, APIConnect1/receivecalls3 unchanged",
+      "expectedRuntime": "Red initialIsReadyfalse"
+    },
+    {
+      "name": "NewUdpPacketDuringApiReadInvalidatesOldPair",
+      "cases": 2,
+      "inputs": [
+        "sameHaltcounter7count3",
+        "newStopcounter8count3"
+      ],
+      "expect": "pendingoldHALT responsecannotmatchnewacceptedpacket; no parallelreceive",
+      "expectedRuntime": "Red APIentryfalse, not timeout"
+    },
+    {
+      "name": "RestartedReceiveEpochRejectsPendingApiPair",
+      "cases": 1,
+      "expect": "realRunstop/restart producesepoch2/count4; pendingepoch1APIresponse rejected",
+      "expectedRuntime": "Red APIentryfalse"
+    },
+    {
+      "name": "ChangedApiEndpointRejectsPendingPair",
+      "cases": 1,
+      "expect": "ObserverURLgenerationchange invalidatespendingoldURLmatch",
+      "expectedRuntime": "Red APIentryfalse"
+    },
+    {
+      "name": "OlderApiCompletionCannotOverwriteNewPacketMatch",
+      "cases": 1,
+      "expect": "newStopcount3/APIseq2Ready surviveslateoldHALT result; oldReadfalsewithoutclearingnewmatch",
+      "expectedRuntime": "Red APIentryfalse"
+    },
+    {
+      "name": "AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics",
+      "cases": 1,
+      "expect": "initialHALTcount2 accessorvalid; diagcount3accepted/Stopnotpublished accessorNull; afterpublish Stopcount3valid/sourceepochsame",
+      "expectedRuntime": "Red initialaccessor NotNullnull"
+    }
+  ],
+  "caseCount": 18,
+  "expectedRed": 13,
+  "expectedRegression": 5,
+  "expectedTotal": 734,
+  "locations": {
+    "MatchesFreshActualReceiveAndApiPaths": 19,
+    "Assert.True(result.IsReady)": 26,
+    "UnusableUdpDoesNotMatch": 52,
+    "FailedOrExpiredApiReadIsNotReady": 91,
+    "PollingDoesNotRefreshEitherEvidence": 105,
+    "NewUdpPacketDuringApiReadInvalidatesOldPair": 127,
+    "RestartedReceiveEpochRejectsPendingApiPair": 146,
+    "ChangedApiEndpointRejectsPendingPair": 165,
+    "OlderApiCompletionCannotOverwriteNewPacketMatch": 181,
+    "AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics": 206,
+    "Assert.NotNull(before)": 212,
+    "Assert.True(socket.Entered.Task.IsCompleted": 247
+  },
+  "fixtureCleanup": "every fixture cancels/reaps realRun and allmatcherTasks, releasesallpendingAPIframes, disposesservice/sockets; atomicpublicationpause alwaysreleasedinfinally; 5sec watchdog failure is not a contractRed",
+  "scaffold": "service newaccessor constantnull+recorddecl only; removeadditions restores oldbytes exactly; newmatcher ReadAsync/GetCurrent constantNotReady withoutread/evaluate/receive; no runtimebehavior implemented",
+  "deferred": [
+    "AutoDrive newwiring",
+    "03CHTTP/DI/Program",
+    "DCPowner verification/namespaceconfiguration",
+    "realimage/Desktop/Windows/hardware",
+    "matcheradditional cancellation/concurrency boundary review asneeded"
+  ]
+}

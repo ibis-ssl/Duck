@@ -38,8 +38,9 @@
     "path": "artifact-download.stdout.log",
     "sha256": "e87eeac387db87f18cfb0f060b2a6ed2eb4c32c67599c70d352a2a0fbf0619c2",
     "bytes": 78427194,
-    "stored": true,
-    "original": "/tmp/issue81-game-controller-state-context-red-ci-20261022/artifact-download.stdout.log"
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-context-red-ci-20261022/artifact-download.stdout.log",
+    "reason": "ZIP payload saved with .log suffix; full bytes preserved at original path and hash. Removed from repository tree after push; existing history unchanged."
   },
   {
     "path": "artifact-integrity.json",
