@@ -1,0 +1,108 @@
+{
+  "files": [
+    {
+      "path": "RefereeReceiveService.after.cs",
+      "bytes": 6621,
+      "sha256": "c9c20cfb444e187a7ee6ae6c851f3667447548911b7824dc5961aa6c0c0a2751"
+    },
+    {
+      "path": "RefereeReceiveService.before.cs",
+      "bytes": 4060,
+      "sha256": "cbe85435fe44f74513b025ac6aa8bd34285029521b615425808769c0f9a9cbf2"
+    },
+    {
+      "path": "diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "local-build.command.json",
+      "bytes": 207,
+      "sha256": "10db2eeb8fd21f0c7028dd5d22edec4959fb58580124234991b71be19b443ab7"
+    },
+    {
+      "path": "local-build.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "local-build.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "local-build.stdout.log",
+      "bytes": 3246,
+      "sha256": "acd4c93769e89fcf598c8dd0f08780dad4c96a11ce19387b002a038186871d0e"
+    },
+    {
+      "path": "remaining-03A.json",
+      "bytes": 848,
+      "sha256": "eee018c6c038cfc9dfb3b0ab6af3220fbf6b2c580bdfb64fc5f10d9d0047ab12"
+    },
+    {
+      "path": "source-results-manifest.json",
+      "bytes": 4106,
+      "sha256": "79f36cdf7a9aae977a8101a11466eba2da984a1a2b70dd64078edd47aab6c811"
+    },
+    {
+      "path": "source.diff",
+      "bytes": 5737,
+      "sha256": "19e9d39a6183cd493e82689afb39bda930f212fca79d25c869cce255f09d48d2"
+    },
+    {
+      "path": "syntax-input.json",
+      "bytes": 224,
+      "sha256": "c25134a924efc460a29da03ba475c915f8ee001b9042c1a115c4382642a10501"
+    },
+    {
+      "path": "syntax-result.json",
+      "bytes": 373,
+      "sha256": "9b70e53666e6cd8efca03db314ac225bb5db99c381d0d6a3f113f5b270943632"
+    },
+    {
+      "path": "syntax.command.json",
+      "bytes": 280,
+      "sha256": "4294b75325f22ff69b34446103066d5c740b64e67c16f6f7763eadd7a1deb565"
+    },
+    {
+      "path": "syntax.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "syntax.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-source-delta.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "raw_logs": [
+    "diff-check.stderr.log",
+    "diff-check.stdout.log",
+    "local-build.stderr.log",
+    "local-build.stdout.log",
+    "syntax.stderr.log",
+    "syntax.stdout.log"
+  ],
+  "note": "Preserve ignored raw logs when parent persists evidence."
+}

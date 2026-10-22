@@ -11,6 +11,9 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private readonly ServiceReceiveDiagnostics diagnostics;
     private readonly Func<ReadOnlyMemory<byte>, global::Referee> decode;
     private int isRunning;
+    private readonly object commandGate = new();
+    private ReceivedCommand? latestCommand;
+    private TaskCompletionSource commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     internal RefereeReceiveService(
         IRefereeDatagramReceiver receiver,
@@ -33,6 +36,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         try
         {
             var epoch = diagnostics.BeginEpoch(InputId);
+            ClearCommand();
             try
             {
                 while (true)
@@ -48,24 +52,31 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                     }
                     catch (Google.Protobuf.InvalidProtocolBufferException)
                     {
-                        diagnostics.RecordFailure(datagram.ReceiveAttempt);
+                        if (diagnostics.RecordFailure(datagram.ReceiveAttempt))
+                            ClearCommand();
                         continue;
                     }
                     if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
                     {
-                        diagnostics.RecordFailure(datagram.ReceiveAttempt);
+                        if (diagnostics.RecordFailure(datagram.ReceiveAttempt))
+                            ClearCommand();
                         continue;
                     }
                     var endpoint = datagram.RemoteEndpoint.ToString();
-                    diagnostics.RecordSuccess(
+                    if (diagnostics.RecordSuccess(
                         datagram.ReceiveAttempt,
                         sourceKey: endpoint,
-                        remoteEndpoint: endpoint);
+                        remoteEndpoint: endpoint))
+                    {
+                        PublishCommand(new(packet.Command, packet.CommandCounter, packet.Yellow?.Name ?? ""),
+                            endpoint, epoch.Number);
+                    }
                 }
             }
             finally
             {
-                diagnostics.EndEpoch(epoch);
+                try { diagnostics.EndEpoch(epoch); }
+                finally { ClearCommand(); }
             }
         }
         finally
@@ -74,11 +85,61 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         }
     }
 
-    /// <summary>command変更の購読は未実装であり、診断用の受信を別に開始しない。</summary>
-    public ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
+    /// <summary>単一pumpの新しい正常commandを待つ。同counterでは完了せず、自身では受信しない。</summary>
+    public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
         uint? previousCommandCounter,
-        CancellationToken cancellationToken) =>
-        ValueTask.FromException<RefereeCommandSnapshot>(new NotImplementedException());
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Task changed;
+            lock (commandGate)
+            {
+                if (latestCommand is { } latest &&
+                    (previousCommandCounter is null ||
+                        latest.Snapshot.CommandCounter != previousCommandCounter.Value))
+                {
+                    var current = diagnostics.GetSnapshots(InputId).FirstOrDefault(snapshot =>
+                        snapshot.SourceKey == latest.SourceKey &&
+                        snapshot.ReceiverEpoch == latest.ReceiverEpoch);
+                    if (current is { DecodeStatus: DiagnosticDecodeStatus.Succeeded } &&
+                        current.DecodeAgeUpperBound is { } age &&
+                        age >= TimeSpan.Zero && age <= ServiceReceiveDiagnostics.FreshnessWindow)
+                    {
+                        return latest.Snapshot;
+                    }
+                }
+                changed = commandChanged.Task;
+            }
+            await changed.WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>診断に受理されたcommandを保持し、購読へ変更の再確認を通知する。</summary>
+    private void PublishCommand(RefereeCommandSnapshot snapshot, string sourceKey, long receiverEpoch)
+    {
+        TaskCompletionSource changed;
+        lock (commandGate)
+        {
+            latestCommand = new(snapshot, sourceKey, receiverEpoch);
+            changed = commandChanged;
+            commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        }
+        changed.TrySetResult();
+    }
+
+    /// <summary>失敗や受信世代の終了で、保持中のcommandを返せないようにする。</summary>
+    private void ClearCommand()
+    {
+        lock (commandGate)
+            latestCommand = null;
+    }
+
+    private sealed record ReceivedCommand(
+        RefereeCommandSnapshot Snapshot,
+        string SourceKey,
+        long ReceiverEpoch);
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

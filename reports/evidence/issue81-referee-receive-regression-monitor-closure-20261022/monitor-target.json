@@ -1,0 +1,11 @@
+{
+  "session": 17234,
+  "pid": 24676,
+  "parent_pid": 9800,
+  "command": "gh.exe run watch 39795794024 --repo ibis-ssl/Duck --exit-status --interval 5",
+  "parent": "wsl.exe -d Ubuntu -- python3 -c import sys,base64;exec(base64.b64decode(sys.stdin.buffer.read()))",
+  "identity": "exactly one Windows gh.exe with original session command and WSL Python parent; not any GitHub runner",
+  "action_authorized_by": "parent explicit instruction: stop only local monitor, no GH cancellation/rerun",
+  "pre_stop_run_status": "in_progress",
+  "pre_stop_run_conclusion": null
+}

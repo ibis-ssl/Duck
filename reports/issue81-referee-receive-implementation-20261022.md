@@ -113,6 +113,14 @@ CI39795794024 exactba2ba820のwatch1件を継続。14:34:32 UTCのviewはexit0�
 
 旧run全体未終端で`gh run view --log`はexit1。公式job REST GET初回もgh端末escape出力保護でexit1/stdout0。親許可で`gh api --allow-escape-sequences --method GET repos/ibis-ssl/Duck/actions/jobs/119882661137/logs`を1回、stdout=PIPEからbinary fileへ捕捉してexit0。生制御文字を端末へ出さず除去済み集計だけ解析。恒久設定変更なし。初回0byte履歴と全引数/exitを保持。exec-server切断でmanifest/reportの1scriptは作成前失敗、read-only再接続で未保存を照合して保存再開、watch重複起動なし。
 
+### 購読testのruntime Red・旧monitor終端
+
+exact e68ead6873c8a940fce27b7745ac63a2e959b075のPR CI39799276013を収集。run list/view/artifacts GET/zip GETはexit0、元watch15135は終端failure・exit1、実dotnet-test.exit-code=1。gh job --logはjob状態反映遅れでexit1を保持し、取得済みartifact内stdout/stderr/exit/TRXで実行結果を確認。正確な全引数/exitはcommands-summary.json、CIコマンドはci-test-command.txt。behavior/ローカルbuild/testなし。
+
+### 購読の最小Green候補（親のRed採用後）
+
+親tdd-executorがexacte68ead68 CI39799276013の購読pending assertion失敗を有効Redに採用した後、同じ担当/既存Skillsで最小実装。既存SDK宣言抽出exit0。`/usr/lib/dotnet/dotnet build Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj --no-restore -m:1 /nr:false -p:EnableSourceControlManagerQueries=false` はexit1、既存生成Referee型不足CS0246×2/CS0400×2。`git diff --check` exit0。実引数/出力/exit/source before-after/diffは`/tmp/issue81-referee-receive-subscriber-green-candidate-20261022/`へ保存。test/CIは今回実行していない。
+
 ## 対象ファイル
 
 | 変更path | 準備内容 |
@@ -205,6 +213,14 @@ active branchの製品/test変更なし。購読候補は /tmp/issue81-referee-r
 ### 回帰job集計・購読test配置（run終端と分離）
 
 親採用で新規`Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs`を既存/tmp候補とbyte同一で配置、SHA256 `00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b`。active path構文抽出exit0/diffcheck0、新file no-index checkはexit1・出力空（差分あり/空白指摘なし）。製品/scaffold変更なし、旧CI対象9source/固定manifest不変。`/tmp/issue81-referee-receive-subscriber-red-preparation-20261022/source-manifest.json` SHA256 `ed2800c8f24040d7b7744ac541e81883fdab1541dad15d1bed056ed54932aa5d`。親scope report末尾の訂正/追加静的確認は読取り保持。
+
+### 購読testのruntime Red・旧monitor終端
+
+今回writeは既存report子5欄のみ。購読test SHA256 `00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b`、対象10file＋固定独立source7fileの全17fileをCI archive/HEAD/currentのbyte/hashへ照合。固定v1の11file/v2の9fileも元hash不変。証拠dir `/tmp/issue81-referee-receive-subscriber-red-ci-20261022/`、ZIP digest `b8b69c43f8d30dafb6092545fb8fe28383f1f9f4222fe1bb3a5945af55b3f84b` はAPI一致。親のscope訂正・checkpoint snapshotは変更せず保持。
+
+### 購読の最小Green候補（親のRed採用後）
+
+製品変更は`Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs`のみ、SHA256 `c9c20cfb444e187a7ee6ae6c851f3667447548911b7824dc5961aa6c0c0a2751`。固定購読test `00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b`と既存群/固定67/共通Diagnostics source/csprojはHEAD byte不変。Tracker.Tests tracked差分なし。既存report子5欄へ追記し、親prefix/Dispatch/履歴・親tasks/phases/evidence差分を保持。
 
 ## 指摘事項
 
@@ -309,6 +325,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 
 旧CI39795794024 exactba2ba820の完了済みtest jobの公式ログで625/625成功・0失敗・0skipを直接確認。生42342bytes SHA256 `ba9cf64fd853a637a26a028b3a6a73b270cd2462955df586affa2025d18dcf11`。run全体は14:47:46 UTC viewでin_progress、個別TRXはartifacts0で未取得。回帰3件/旧7case/固定67の対応は同一source/target/625集計から確認し、個別TRX Passed行の直接readbackとはしない。新購読testは旧runに含めない。
 
+### 購読testのruntime Red・旧monitor終端
+
+唯一のfailureは`Tracker.Tests.RefereeReceiveSubscriberTests.SubscriberWaitsThroughDuplicateCounterWithoutCompetingForReceives`、RefereeReceiveSubscriberTests.cs:42の`Assert.False(subscription.IsCompleted)`。TRX message「同counterは診断へ数えても変更購読を完了させない。」、duration=00:00:00.0604636。診断count3/ready、最大Receive1/受信回数4を通過後の実runtime assertionで、compile/timeoutではない。sourceのWaitForChangeAsyncは未実装NotImplementedExceptionのfaulted ValueTaskを返すため完了扱いになる。成功した同counter値を誤返却した証拠とは区別する。新counter8返却/count4の後続assertは未到達。仕様/fixtureの緩和は不要、受理済み購読契約の実装不足として親のRed採用へ返す。
+
+### 購読の最小Green候補（親のRed採用後）
+
+同じpumpのRecordSuccessが受理した正常commandだけをsourceKey/receiverEpochと一緒に保持し、非同期signalで購読へ再確認を通知する。WaitForChangeはprevCounterと違うcommandだけを、現在の同source/同epoch・正常decode・既知ageが期限内であることへ再照合して返す。購読側にReceive呼出しはなく、同counterもpumpの診断件数へ計上し続ける。待機はcaller tokenをWaitAsyncへ渡す。受理された不正入力/Run終端ではcacheを解除、RecordSuccess=falseの旧attemptはpublishしない。constructor/公開signatureは不変。多subscriberの順序/公平性等の未合意契約は定義していない。新規関数説明は日本語。
+
 ## 結果
 
 - test/scaffold準備完了、functional Redはpending。現在のローカルcompile-errorは既存proto実体不足の証拠であり、Red/Greenの成功履歴ではない。標準real parser/hostのformal routeはremote_ci_only。
@@ -406,6 +430,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 
 旧job集計は625成功、旧run全体の終端/元watch exitはまだpending（ci-evidence.json SHA256 `d8cafda44ca7c93d0e03e43077b1eeb27a4b364ee420853018f11af9cdba5a73`）。新購読test配置は完了、実compile/test0件・Red未観測。1subscriberだけをIRefereeCommandSource経由で検証し、同counterで診断count3/購読pending、新counter8でSTOP返却/count4、最大Receive1を期待する。多subscriber/例外型/Task参照同一性の未合意仕様は追加しない。次commit/pushのexact-SHA CIへ渡すtest-only候補であり、製品behavior未実装。
 
+### 購読testのruntime Red・旧monitor終端
+
+`https://github.com/ibis-ssl/Duck/actions/runs/39799276013`、exacte68ead68 / pull_request / completed / failure。TRXは626実行・625成功・1失敗・0skip、error/timeout/abortedも0。既存625は以前622件＋再開/owner/freshness3件と名前集合一致・全Passed、固定67も個別TRXで全Passed。今回3件の回帰は成功として扱い人工Red/製品変更なし。TRX SHA256 `6b03f8b1138bf260be6c0d25fea75668857738151e954da3d62ff936876926f2`、ci-evidence.json SHA256 `bb010b6ae16cf8a25d7ee360a1c565487ffd5e2a423353da34e1d4dfcd52ae9f`。旧run39795794024は最後の公式REST(14:55:44 UTC)でin_progress/null、旧job625成功とは分離。新TRXは旧625の個別成功を補完するが、旧run全体を終端successへ書換えない。
+
+### 購読の最小Green候補（親のRed採用後）
+
+購読の最小Green候補を保存。source-results-manifest.json SHA256 `79f36cdf7a9aae977a8101a11466eba2da984a1a2b70dd64078edd47aab6c811` に採用Red/source hash/不変test/検査結果を保持。実Driver semantic compileは既存proto不足で未完了、実行test0件、Green未観測。親の非main commit/push後exact-SHA PR CIで同じ購読testと既存625/固定67を確認する。元runtime Redと回帰3件成功の履歴は保持し、ローカルcompile-errorをGreenへ転記しない。
+
 ## リスク
 
 - 新2fileは構文parseのみ成功し、実Referee型を含むsemantic compileはローカルで未完了。CIでのcompile/test実行までコンパイル成功やfunctional Redを断定しない。ローカル不足をsubmodule取得/依存追加/設定修復で埋めない。
@@ -493,6 +525,14 @@ scope report47/78/89行と既存I81-01/02の共通診断契約に対応。再開
 ### 回帰job集計・購読test配置（run終端と分離）
 
 稼働は既存watch17234のみ、exit未回収。他のGET/構文抽出/read/save/check processは終端。旧run全体完了をjob集計成功へ読み替えない。親scope末尾の外部前提訂正を保持し、外部ソース変更ゼロnamespace共有は第一評価候補だが未採用/未適用。既存args/loopback維持余地、anchor再作成責務、DCP Networks+RunArgs共存等は上位親の静的判断材料で、このunitでは適用/検証しない。外部改変必須とせず現経路不足/代替調査中を分ける。購読behavior・実UDP・Dispose等は未完了。既存期待値緩和/skip化、外部/依存/環境変更・commit/pushなし。
+
+### 購読testのruntime Red・旧monitor終端
+
+親許可により旧ローカルmonitorだけ停止。元watch39795794024のgh.exe PID24676/parent9800(wsl.exe Ubuntu Python)を単一特定し、停止直前にcommand/name/parent完全一致を再照合、Stop-Process exit0。session17234からactual watch exit255・wrapper exit0を回収。最初のPID読取scriptはPowerShell構文エラーexit1で停止未実行、訂正版読取exit0を保持。GitHub run cancel/rerunはしていない。新watch/GET/download/read/saveを含め全process終端、未回収exit/保留approvalなし。旧CIの/tmp最終manifestはmonitor終端を反映し、親の既存checkpoint snapshotは不変。新全証拠一覧manifest SHA256 `644cc480be03db93dfcf3c82f55bcdd8b298d3bee631b9310cd3280d727b727b`（62file）に生log/TRX/zip/sourceを含む。subscriber/実UDP/Dispose等の製品behaviorは未実装、外部/環境/依存変更・commit/pushなし。
+
+### 購読の最小Green候補（親のRed採用後）
+
+待機取消、Run終了、旧epoch、不正入力、cached commandの新鮮度等を個別runtime testで確認したとはしない。remaining-03A.jsonへ次のregression/test-first残件として保持。実UDP/Dispose、03B/C、外部の非破壊代替評価・DCP配置/実機受入も未完了。既存期待値緩和/skip化、外部/配置/依存/設定/環境/auth/network変更、host/Docker/実機起動、commit/push/GitHub変更なし。全証拠一覧manifest SHA256 `443ea36ddd2ff71343df4acba6001c19b03526163eee9dd987bcfed962fc1252`（19file）。全build/構文抽出/read/save process終端、exit回収済み、実行中process/session・未回収exit・保留approvalなし。
 
 ## 親による公開準備記録
 
