@@ -89,13 +89,19 @@ cd561edのexact PR CIはGreen。標準776件、3つのLinux publishと出力検�
 - 追跡文書のfocused検査はf92基準でtasks/phases各1本文行、2ファイル・2行のみ抽出。テキストlint exit 0、CSpell 2 files / 0 issue / exit 0、Sudachi exit 0 / violationsなし。config、whitelist、対象config、package.jsonは現行sourceと既存mirrorでbyte一致。raw/source/config/inventoryは `/tmp/issue81-nr003-tracking-lint-20261023` に保存（inventory-v1 SHA-256 `c84827f102f6f29f18da7c7769efba3b67089d0d68f867f50313f0e28b7703f8`）。初回の誤workdir CSpellと全ファイルSudachiはfocused結果に数えずrawを保全。
 - Red/Green raw、同一fixture PE/PDB bytes、source hash比較、syntax結果、各試行を含む証拠は `/tmp/issue81-nr003-red-20261023` に世代別manifestで保存。最終manifest `inventory-v3.tsv` は48 entries、SHA-256 `bd5cd8e11e4fbb8f3754ea33439bc56f5456fef02e04d3933c13f00d3ef306a5`。Red v1/v2/v3および後続Green原本manifestは上書きしていない。
 
-### I81-NR-003 matrixの現在状態
+## fa80b23 exact PR CI（2026-10-23）
 
-| 対応 | 状態 |
+- PR #84のhead `fa80b23aa362ed98c4beaf21605eeb5d1b18cbb2`、base `88cb20f2b5cea46eb90bff80ba8d535639625de0`、attempt 1、run `39885155079` はsuccess。GitHub Actions checkout merge SHAは `9dcc20c0beb6991543d242dc777bd732f76a291b`。run/log/PR/artifact metadataと終了値は [`evidence/issue81-ci-fa80b23-20261023`](evidence/issue81-ci-fa80b23-20261023) に保存。`inventory-v1.tsv` は17 files、hash `0da17eb5c8df5600cba43256f5e459bcaca38b08fa52856729bd824fa869fc24`。
+- 標準 `dotnet test`: 776 passed / 0 failed / 0 skipped。明示profileによる3つの管理プログラム（RuntimeHost、DebugHost、RefereeDriver.Host）のLinux publishと出力契約検査はsuccess。失敗診断・upload各stepは成功時条件でskip、run artifacts APIも0件。
+- 実発行DebugHostのportable PDB verifierは10/10 pass。CodeView GUID16 + little-endian Stamp4の全20-byte identity一致と、112 documentすべての `/src/` 配下をCIで確認。実コンテナ起動・デバッガーattachは行っていない。Linux packet-flowおよびfull-stack acceptance jobsはskip。runはattempt 1のみで、rerunなし。
+
+### I81-NR-003 completeness matrix
+
+| 必須対応 | 結果と根拠 |
 | --- | --- |
-| PE CodeView GUID+Stamp全20 byteを保持し`#Pdb` IDと照合 | 実装済み。`<I` little-endian Stampを含む。 |
-| Stampのみ不一致の実reader先行Red→Green、正常20-byte組も成功 | 先行Redで10件中1件が実行時fail。最小修正後10/10 pass。Age=1/source文書条件を同時に固定。 |
-| 既存標準776件・3発行・CI実PDB照合と既存7ケース維持 | 元7ケースと3発行scriptは不変更。標準/.NET/実publish CIは未実行。親が候補を公開した後のexact PR CIが必要。 |
-| 証拠・記録 | Red/Green・source/fixture hash・追跡2行lintのrawと世代別manifestを保存。親側の公開/CI同期と同じ既存レビュアーによる再確認待ち。 |
+| CodeView GUID+Stamp全20 byteと`#Pdb` ID照合 | 実装・実発行CIでpass。CI raw [`run-log.stdout`](evidence/issue81-ci-fa80b23-20261023/run-log.stdout) にDLL identity matchesを記録。 |
+| Stamp-only mismatch拒否と正常identity受理 | 固定binary fixtureで先行Red 9/10、修正後local 10/10 Green。CIでも追加3 fixture testsを含む10/10 pass。Red/Green rawは`/tmp/issue81-nr003-red-20261023` inventory-v3、CI rawは[`run-log.stdout`](evidence/issue81-ci-fa80b23-20261023/run-log.stdout)。 |
+| 元7試験、標準776、3 publish、実PDBのsource/identity | 元7ケースを含むPDB 10/10、標準776/776、3 publish出力契約pass、実PDBの112 documents `/src/` と完全identity一致。根拠は[`run-view.stdout`](evidence/issue81-ci-fa80b23-20261023/run-view.stdout)と[`run-log.stdout`](evidence/issue81-ci-fa80b23-20261023/run-log.stdout)。 |
+| 証拠と記録の再確認可能性 | command/stdout/stderr/exit、PR/run metadata、0件artifact結果を[`evidence/issue81-ci-fa80b23-20261023`](evidence/issue81-ci-fa80b23-20261023)へ保存。manifest SHA-256 `0da17eb5c8df5600cba43256f5e459bcaca38b08fa52856729bd824fa869fc24`。既存Red/Green bundleと過去manifestは未上書き。 |
 
-- .NET/CIは`remote_ci_only`なのでローカル実行・成功推定をしていない。現在のHEADは親管理の未公開作業treeでcommit/pushは未実施。親による公開後、同一修正に対するexact CIで標準試験・全3発行・実PDBの完全ID/source検査を確認する必要がある。
+- 残る範囲: runtime/container attachとskipされたLinux acceptance jobs。これらは本matrixの成功に含めていない。
