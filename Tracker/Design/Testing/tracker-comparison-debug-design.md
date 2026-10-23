@@ -41,6 +41,10 @@ raw vision は共通の比較入力として扱うが、シミュレータの真
 
 Game Controller は `224.5.23.1:11003` の唯一の送信者とする。TIGERs は `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` の比較用設定を使う。ER-Force の `--gc-port 11003` も受信側の指定であり、審判情報を送信させない。Game Controller の視覚検出／追跡情報の入力、RefereeDriver の11003観測、既存の準備確認機能も同じブリッジ内に置く。
 
+### RuntimeHost 診断 identity の control channel
+
+比較モードでも診断 identity は host HTTP endpoint で対象を選ばず、AppHost が照合した完全なengine ContainerIdを宛先にする。AppHostがその同じcontainer内で `dotnet Tracker.RuntimeHost.dll --identity-control` を実行し、固定UDSで常駐RuntimeHostとprepare/challenge/commitを行う。DCPだけがcontainer lifecycleを管理し、HTTPは利用者向け診断表示に限る。RunId/ResourceId/role/full ContainerId/Generationとprocess BootIdの対応を検査し、受理後に受信状態をリセットする。これはidentityの受渡し契約であり、外部trackerの正常decode、送信packetのcontainer起源、実Docker Desktop上でのexec成功を証明しない。
+
 ```mermaid
 flowchart LR
  subgraph win[Windows]

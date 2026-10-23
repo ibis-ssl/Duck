@@ -401,6 +401,51 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
     }
 
+    [Fact]
+    public async Task DuckPublishesDecodedVisionReadinessOnItsInternalTcpEndpoint()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var simulator = Find(appHost, "simulator");
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var environment = await GetResourceEnvironmentAsync(duck);
+        var endpoint = Assert.Single(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            annotation => annotation.Name == "vision-health");
+        var healthCheck = Assert.Single(duck.Annotations.OfType<HealthCheckAnnotation>());
+        var wait = Assert.Single(duck.Annotations.OfType<WaitAnnotation>());
+
+        Assert.Equal("true", environment["Testing__ContainerMode"].ToString());
+        Assert.Equal("224.5.23.2", environment["VisionReceiver__MulticastAddress"].ToString());
+        Assert.Equal("10020", environment["VisionReceiver__Port"].ToString());
+        Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, endpoint.Protocol);
+        Assert.Equal(39108, endpoint.TargetPort);
+        Assert.Null(endpoint.Port);
+        Assert.Equal("127.0.0.1", endpoint.TargetHost);
+        Assert.False(endpoint.IsProxied);
+        Assert.NotNull(healthCheck);
+        Assert.DoesNotContain(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            annotation => annotation.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        Assert.Same(simulator, wait.Resource);
+        Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
+    }
+
+    [Fact]
+    public async Task ComparisonDuckHealthEndpointDoesNotRequireItsContainerTargetPortOnTheHost()
+    {
+        using var occupiedHostPort = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Any, 39108);
+        occupiedHostPort.Start();
+
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var endpoint = Assert.Single(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            annotation => annotation.Name == "vision-health");
+
+        Assert.Equal(39108, endpoint.TargetPort);
+        Assert.Null(endpoint.Port);
+    }
+
     [Theory]
     [InlineData("visibility_graph")]
     [InlineData("rvo2")]

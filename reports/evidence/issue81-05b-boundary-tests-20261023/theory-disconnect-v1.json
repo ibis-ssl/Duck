@@ -1,0 +1,22 @@
+{
+  "name": "theory-disconnect-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~disconnect-after-challenge"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:11:45.455962+00:00",
+  "runner_pid": 1187982,
+  "child_pid": 1187984,
+  "exit": 1,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "8d998012ac69898259482a202e54f917b5916564f5bcd54fa46fd7f1ef66353a",
+  "stderr_sha256": "7da29bff1693684666c78c98a95ae109d658f91b47bc26b086a1d563f1ca43cf",
+  "stdout_bytes": 3003,
+  "stderr_bytes": 164
+}\n

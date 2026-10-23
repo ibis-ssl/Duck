@@ -75,6 +75,7 @@ public static class RuntimeHostServiceCollectionExtensions
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
         services.AddHostedService<RuntimeVisionReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();
+        services.AddHostedService<RuntimeIdentityControlHostedService>();
 
         return services;
     }

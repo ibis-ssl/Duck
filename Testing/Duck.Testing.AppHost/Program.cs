@@ -53,10 +53,6 @@ using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 var preflightPorts = ExclusiveControlPortPreflight
     .CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator)
     .ToList();
-if (testingMode == "comparison")
-{
-    preflightPorts.Add(new("RuntimeHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39108));
-}
 ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
 
 var simulatorImageTag =
@@ -99,11 +95,15 @@ var simulator = builder.AddDockerWrapper(
 
 var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
     .WithEnvironment("Tracker__ActiveProfileName", "sim")
-    .WithEnvironment("Testing__Mode", testingMode);
-if (testingMode == "comparison")
-{
-    duckBuilder.WithHttpEndpoint(port: 39108, targetPort: 39108, name: "vision-health", isProxied: false);
-}
+    .WithEnvironment("Testing__Mode", testingMode)
+    .WithEnvironment("Testing__ContainerMode", "true")
+    .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+    .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+var visionHealthEndpoint = duckBuilder.Resource.Annotations
+    .OfType<EndpointAnnotation>()
+    .Single(endpoint => endpoint.Name == "vision-health");
+visionHealthEndpoint.Port = null;
+visionHealthEndpoint.TargetHost = "127.0.0.1";
 
 var duck = duckBuilder
     .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")

@@ -1,0 +1,16 @@
+{
+  "command": [
+    "dotnet",
+    "run",
+    "--project",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-aspire-reflection-20261023/inspect.csproj",
+    "--no-restore",
+    "--verbosity",
+    "quiet"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-aspire-reflection-20261023",
+  "network_or_restore": false,
+  "exit": 0,
+  "stdout_sha256": "113f6b19f326c16ef909b0c8cc632061a450e9133f4404a03ca196f18076456c",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

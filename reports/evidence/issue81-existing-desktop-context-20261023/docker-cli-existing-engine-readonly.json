@@ -1,0 +1,14 @@
+{
+  "command": [
+    "C:\\Users\\donabe\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+    "--context",
+    "desktop-linux",
+    "info",
+    "--format",
+    "{{json .ID}}|{{json .OperatingSystem}}|{{json .ServerVersion}}"
+  ],
+  "observed_exit": 0,
+  "observed_stdout": "\"5bc5ab8a-7340-47ba-8b7c-9f645375a54c\"|\"Docker Desktop\"|\"29.9.1\"\n",
+  "saved_utc": "2026-10-23T13:40:16.790601+00:00",
+  "scope": "read-only existing daemon info; no container operation; DCP engine selection not verified"
+}

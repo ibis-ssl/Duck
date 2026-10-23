@@ -12,9 +12,13 @@ public sealed class ServiceReceiveDiagnostics(
     private readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
     private readonly SampledClock readinessClock = new(timeProvider ?? TimeProvider.System);
     private readonly Dictionary<string, Input> inputs = new(StringComparer.Ordinal);
+    private ResourceDiagnosticIdentity? currentIdentity = identity;
     private long? clockHighWaterMark;
     private long clockVersion;
-    public ResourceDiagnosticIdentity? Identity { get; } = identity;
+    public ResourceDiagnosticIdentity? Identity
+    {
+        get { lock (gate) return currentIdentity; }
+    }
     public static readonly TimeSpan FreshnessWindow = TimeSpan.FromSeconds(5);
 
     public static ResourceDiagnosticIdentity? ParseIdentity(
@@ -24,6 +28,44 @@ public sealed class ServiceReceiveDiagnostics(
             return null;
         try { return new(runId!, resourceId!, containerId!, parsedGeneration); }
         catch (ArgumentException) { return null; }
+    }
+
+    /// <summary>識別子を切り替え、旧受信試行を無効化した新しい受信世代を返す。</summary>
+    public ReceiveEpoch ReplaceIdentityAndBeginEpoch(ResourceDiagnosticIdentity newIdentity, string inputId)
+    {
+        ArgumentNullException.ThrowIfNull(newIdentity);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inputId);
+        lock (gate)
+        {
+            if (currentIdentity == newIdentity && inputs.TryGetValue(inputId, out var existing) && existing.Epoch is not null)
+                return existing.Epoch;
+
+            currentIdentity = newIdentity;
+            clockVersion = checked(clockVersion + 1);
+            foreach (var input in inputs.Values)
+            {
+                input.Epoch = null;
+                input.ErrorCount = 0;
+                foreach (var source in input.Sources.Values)
+                {
+                    source.Count = 0;
+                    source.Sequence = 0;
+                    source.Name = null;
+                    source.Uuid = null;
+                    source.RemoteEndpoint = null;
+                    source.Stamp = null;
+                    source.LastReceivedAt = null;
+                    source.Status = DiagnosticDecodeStatus.Unknown;
+                    source.Readiness = CreateReadiness(input.Id, source.Key);
+                }
+            }
+
+            if (!inputs.TryGetValue(inputId, out var target))
+                inputs.Add(inputId, target = new Input(inputId));
+            var epoch = new ReceiveEpoch(inputId, checked(++target.EpochNumber));
+            target.Epoch = epoch;
+            return epoch;
+        }
     }
 
     /// <summary>受信機の再起動で有効な進捗を無効化する。累積件数はリセットしない。</summary>

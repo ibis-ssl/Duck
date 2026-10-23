@@ -327,7 +327,8 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
 public sealed class RuntimeVisionReceiverDiagnostics
 {
     private readonly ServiceReceiveDiagnostics diagnostics;
-    private readonly ServiceReceiveDiagnostics.ReceiveEpoch epoch;
+    private readonly object epochGate = new();
+    private ServiceReceiveDiagnostics.ReceiveEpoch epoch;
     private long decodedWrapperPacketsReceivedTotal;
 
     public RuntimeVisionReceiverDiagnostics() : this(new ServiceReceiveDiagnostics()) { }
@@ -341,7 +342,21 @@ public sealed class RuntimeVisionReceiverDiagnostics
     /// <summary>正常に復号した Detection 付きパケットの件数。geometry だけの入力は除く。</summary>
     public long VisionPacketsReceivedTotal => diagnostics.GetSnapshots("vision").Sum(s => s.SuccessfullyDecodedCount);
     public long DecodedWrapperPacketsReceivedTotal => Interlocked.Read(ref decodedWrapperPacketsReceivedTotal);
-    public ServiceReceiveDiagnostics.ReceiveAttempt BeginReceive() => diagnostics.BeginReceive(epoch);
+    public ServiceReceiveDiagnostics.ReceiveAttempt BeginReceive()
+    {
+        lock (epochGate) return diagnostics.BeginReceive(epoch);
+    }
+
+    public ResourceDiagnosticIdentity? Identity => diagnostics.Identity;
+
+    /// <summary>新しいowner identityに受信世代を同期し、以前の試行を無効化する。</summary>
+    public void ReplaceIdentity(ResourceDiagnosticIdentity identity)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        lock (epochGate)
+            epoch = diagnostics.ReplaceIdentityAndBeginEpoch(identity, "vision");
+    }
+
     public ServiceReceiveSnapshot Snapshot => diagnostics.GetSnapshots("vision").Single();
 
     internal void RecordPacketReceived(ServiceReceiveDiagnostics.ReceiveAttempt attempt, bool hasDetection, string? remoteEndpoint)

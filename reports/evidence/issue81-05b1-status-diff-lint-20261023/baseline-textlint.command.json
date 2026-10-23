@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "text",
+    "--files",
+    "Tracker/Design/tasks-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+  "input_path": "Tracker/Design/tasks-status.md",
+  "input_sha256": "caf3a16fb695bf270bc6c9480fb23b05edab03cf1015abcac773b3ccebbad246",
+  "input_bytes": 272,
+  "source_rows": [
+    39
+  ]
+}

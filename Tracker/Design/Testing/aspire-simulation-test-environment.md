@@ -233,6 +233,18 @@ APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。API
 
 薄い実行入口の単独起動、標準の通信口をすべて使う実行、実Game Controllerへの接続と名前の再解決、Docker Desktopのマルチキャスト、Windowsでの公開、DCP所有照合は別の未検証事項である。実行プロジェクトの実装を、コンテナ配布やAppHost／DCPへの資源配線の完了に置き換えない。名前空間を共有する候補の採用や適用も、この契約の具体化には含めない。
 
+## AppHost から RuntimeHost への診断識別子受渡し（06A1）
+
+AppHost は、DCP の `ResourceNotificationService.WatchAsync` で受け取った登録済み資源イベントを照合し、対象 `IResource` の `ResourceEvent.ResourceId` と `Resource.Name`、snapshot 内の完全な `container.id` を検査する。資源キーと役割名が想定どおりで、完全な engine ContainerId がある場合だけ、その完全 ID を対象に、DCP が実際に選択した Docker engine context を照合した上で `docker --context <verifiedDcpContext> exec -i <containerId> dotnet Tracker.RuntimeHost.dll --identity-control` を実行する。contextとDCPのengineが同一と確認できない場合は実行しない。context名を固定値や利用者の現在選択だけから推測しない。HTTP host endpoint、名前解決、ポート番号は対象選択に使わない。AppHost は利用者のDocker設定やcontextを変更しない。
+
+DCP/AppHost は資源の作成・起動・停止・削除の唯一の所有者のままである。`exec` は既に起動した対象コンテナ内で RuntimeHost の同梱アセンブリを起動し、診断識別子だけを渡す。これは別のライフサイクル管理者を作らず、Dockerイメージ、外部資源、container lifecycleを操作しない。
+
+常駐 RuntimeHost はコンテナ内の固定 Unix domain socket `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同一コンテナ内のこのsocketへ接続し、改行区切りJSONのprepare/challenge/commitを同一接続で中継する。最初のprepareにRunId、ResourceId、完全ContainerId、Generationを含める。常駐プロセスは自身の起動ごとに新しい `BootId` を持ち、challengeで返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へchallengeの `expectedBootId` と同一のidentity tupleをcommitする。常駐側はBootIdとtupleの一致を再確認してから受理する。
+
+AppHostが新たに起動した場合は新RunIdでgeneration状態を開始し、別ownerの資源へexecしない。RuntimeHost起動時点でengine IDはまだ確定していないため、container modeの診断Identityはhandoffまで未帰属とする。受理した新identityは診断状態と受信freshnessを原子的にリセットし、次の正常な受信が観測されるまではstrict readinessを503に保つ。欠落・不正な完全ID、resource/role/run不一致、generation後退、同一generationでの異なるcontainer ID、challenge後のBootId変化は拒否する。同一tupleの再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
+
+このsocketはcontainer内の制御面であり、hostへ公開しない。tokenや識別子をURL、Dashboard、通常ログへ出さない。Docker execの実行、DCP runtime、image取得・起動を行わず、受入はDuckコード内のfixtureでcontrol processと同一container socketの契約まで確認する。実Docker Desktopでのexec、resource eventの実到着、container起動、UDP通信、host port公開は別途未実証のまま記録する。RuntimeHostへのidentity handoffは UDP packetの送信元containerを暗号学的に証明するものではない。
+
 ## DebugHost のデバッグと記録
 
 Windows の開発環境から、DCP が起動した `debug-host` に接続する。デバッグ用イメージには同じ版のソースコードから作成した実行ファイル、対応する移植可能なデバッグ情報ファイル、`/vsdbg/vsdbg` を事前に含める。実行中のコンテナへの依存追加やデバッグ用 TCP ポート公開を前提にしない。
