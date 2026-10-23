@@ -16,10 +16,11 @@ public sealed class ContainerIdentityCurrentResourceKeyTests
             NullLogger<ResourceNotificationService>.Instance, lifetime);
         var registered = new ContainerResource("duck", "duck-runtime");
         var runner = new CapturingDockerRunner();
+        var tracePath = Path.Combine(Path.GetTempPath(), $"duck-current-key-trace-{Guid.NewGuid():N}.jsonl");
         using var stop = new CancellationTokenSource();
         using var service = new ContainerIdentityHandoffService(
             notifications, registered, "duck", "run-current-key", "desktop-linux",
-            "engine-current-key", runner, NullLogger<ContainerIdentityHandoffService>.Instance);
+            "engine-current-key", runner, NullLogger<ContainerIdentityHandoffService>.Instance, tracePath);
 
         await service.StartAsync(stop.Token);
         await notifications.PublishUpdateAsync(registered, "duck-starting-key",
@@ -32,6 +33,14 @@ public sealed class ContainerIdentityCurrentResourceKeyTests
 
         Assert.Single(runner.Identities);
         Assert.Equal("duck-running-key", runner.Identities[0].ResourceId);
+        var traceLines = await File.ReadAllLinesAsync(tracePath);
+        Assert.Contains(traceLines, line => line.Contains("ResourceNotification", StringComparison.Ordinal));
+        Assert.Contains(traceLines, line => line.Contains("CurrentResourceState", StringComparison.Ordinal));
+        Assert.Contains(traceLines, line => line.Contains("ResourceProjection", StringComparison.Ordinal));
+        Assert.Contains(traceLines, line => line.Contains("ContainerInspect", StringComparison.Ordinal));
+        Assert.Contains(traceLines, line => line.Contains("IdentityExec", StringComparison.Ordinal));
+        Assert.All(traceLines, line => Assert.DoesNotContain("duck-running-key", line));
+        File.Delete(tracePath);
     }
 
     private static CustomResourceSnapshot Snapshot(string state, string? containerId) => new()

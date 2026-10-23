@@ -1,0 +1,28 @@
+{
+  "kind": "post-implementation isolated stage-omission sensitivity check; not claimed as pre-implementation TDD Red",
+  "started_utc": "2026-10-23T20:59:58Z",
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "/usr/bin/dotnet",
+    "test",
+    "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName~SafeTracePathFromConfigurationRecordsServiceStartBeforeNotificationsAndStop",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "test_source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs",
+  "test_sha256": "F249124BD36419A4AE1CB1EEFBABE53A693C040FAB2CD93150559A134BA6EC08",
+  "source_file": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+  "source_before_sha256": "6914A48A74B357B692625BCE5F265FBDC884299B8B7029E8EA6AA919D79BD8F8",
+  "temporary_source_sha256": "283E9D6F8BB3594BBC76734DC981401F39692B902B66C28005FFDEB0CD370ADD",
+  "source_restored_sha256": "6914A48A74B357B692625BCE5F265FBDC884299B8B7029E8EA6AA919D79BD8F8",
+  "exit_code": 1,
+  "stdout_sha256": "85DFBE570F09CFDAF1941AFB45D748F4AA52152B579CAF50F51C76B0E91F1CBB",
+  "stderr_sha256": "A18D67A94893253650229632E3BEBFAA1B5917D3B8870BD3B8C78761DFD7DBFA",
+  "timeout_seconds": 90,
+  "raw_files": [
+    "red.stdout.txt",
+    "red.stderr.txt"
+  ]
+}

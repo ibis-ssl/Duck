@@ -23,6 +23,47 @@ internal interface IDockerCommandRunner
 
 internal sealed record ContainerIdentityHandoffState(long Generation, string BootId);
 
+internal enum IdentityHandoffTraceStage
+{
+    EngineCheck,
+    ContainerInspect,
+    IdentityExec,
+    ResourceNotification,
+    CurrentResourceState,
+    ResourceProjection,
+    ServiceStarted,
+    ServiceStopped,
+}
+
+internal enum IdentityHandoffTraceOutcome
+{
+    Started,
+    Accepted,
+    Rejected,
+}
+
+/// <summary>
+/// 実行段階と結果だけを記録する任意の診断出力です。
+/// </summary>
+internal sealed class SafeIdentityHandoffTrace(string filePath)
+{
+    private readonly object sync = new();
+
+    internal void Record(IdentityHandoffTraceStage stage, IdentityHandoffTraceOutcome outcome)
+    {
+        var entry = JsonSerializer.Serialize(new
+        {
+            timestampUtc = DateTimeOffset.UtcNow,
+            stage = stage.ToString(),
+            outcome = outcome.ToString(),
+        });
+        lock (sync)
+        {
+            File.AppendAllText(filePath, entry + Environment.NewLine, new System.Text.UTF8Encoding(false));
+        }
+    }
+}
+
 internal static class ContainerIdentityExecHandoff
 {
     internal const string RunIdLabel = "com.ibis-ssl.duck.run-id";
@@ -39,7 +80,8 @@ internal static class ContainerIdentityExecHandoff
         string contextName,
         string expectedEngineId,
         IDockerCommandRunner runner,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        SafeIdentityHandoffTrace? trace = null)
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(runner);
@@ -56,27 +98,34 @@ internal static class ContainerIdentityExecHandoff
 
         try
         {
+            trace?.Record(IdentityHandoffTraceStage.EngineCheck, IdentityHandoffTraceOutcome.Started);
             var engineId = await runner.CaptureAsync(
                 ["--context", contextName, "info", "--format", "{{.ID}}"],
                 cancellationToken);
             if (!string.Equals(engineId.Trim(), expectedEngineId, StringComparison.Ordinal))
             {
+                trace?.Record(IdentityHandoffTraceStage.EngineCheck, IdentityHandoffTraceOutcome.Rejected);
                 return null;
             }
+            trace?.Record(IdentityHandoffTraceStage.EngineCheck, IdentityHandoffTraceOutcome.Accepted);
 
+            trace?.Record(IdentityHandoffTraceStage.ContainerInspect, IdentityHandoffTraceOutcome.Started);
             var inspectionJson = await runner.CaptureAsync(
                 ["--context", contextName, "inspect", "--format", "{{json .}}", target.ContainerId],
                 cancellationToken);
             if (!MatchesOwnedRunningContainer(inspectionJson, target, runId))
             {
+                trace?.Record(IdentityHandoffTraceStage.ContainerInspect, IdentityHandoffTraceOutcome.Rejected);
                 return null;
             }
+            trace?.Record(IdentityHandoffTraceStage.ContainerInspect, IdentityHandoffTraceOutcome.Accepted);
 
             var arguments = new[]
             {
                 "--context", contextName, "exec", "-i", target.ContainerId,
                 "dotnet", "Tracker.RuntimeHost.dll", "--identity-control",
             };
+            trace?.Record(IdentityHandoffTraceStage.IdentityExec, IdentityHandoffTraceOutcome.Started);
             var identity = new ResourceDiagnosticIdentity(runId, target.ResourceId, target.ContainerId, generation);
             var result = await runner.RelayAsync(arguments, identity, target.RoleName, expectedBootId, cancellationToken);
             if (result.RequiresNewGeneration && !string.IsNullOrWhiteSpace(result.BootId))
@@ -86,9 +135,11 @@ internal static class ContainerIdentityExecHandoff
                 result = await runner.RelayAsync(arguments, identity, target.RoleName, result.BootId, cancellationToken);
             }
 
-            return result.Accepted && !string.IsNullOrWhiteSpace(result.BootId)
-                ? new ContainerIdentityHandoffState(generation, result.BootId)
-                : null;
+            var accepted = result.Accepted && !string.IsNullOrWhiteSpace(result.BootId);
+            trace?.Record(
+                IdentityHandoffTraceStage.IdentityExec,
+                accepted ? IdentityHandoffTraceOutcome.Accepted : IdentityHandoffTraceOutcome.Rejected);
+            return accepted ? new ContainerIdentityHandoffState(generation, result.BootId!) : null;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -281,51 +332,81 @@ internal sealed class ContainerIdentityHandoffService(
     string contextName,
     string expectedEngineId,
     IDockerCommandRunner runner,
-    ILogger<ContainerIdentityHandoffService> logger) : BackgroundService
+    ILogger<ContainerIdentityHandoffService> logger,
+    string? safeTracePath = null) : BackgroundService
 {
+    private readonly SafeIdentityHandoffTrace? trace = string.IsNullOrWhiteSpace(safeTracePath)
+        ? null
+        : new SafeIdentityHandoffTrace(safeTracePath);
+
+    internal bool IsSafeTraceEnabled => trace is not null;
+
     /// <summary>
     /// 資源イベントを監視し、現在も一致する所有コンテナだけへhandoffします。
     /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        string? lastContainerId = null;
-        string? lastBootId = null;
-        long generation = 0;
-        var restartObserved = false;
-        await foreach (var observation in notifications.WatchAsync(stoppingToken))
+        trace?.Record(IdentityHandoffTraceStage.ServiceStarted, IdentityHandoffTraceOutcome.Started);
+        try
         {
-            if (!ReferenceEquals(observation.Resource, registeredResource)) continue;
-            var candidateResourceId = observation.ResourceId;
-            if (!notifications.TryGetCurrentState(candidateResourceId, out var currentState)) continue;
-            if (!string.Equals(currentState.Snapshot.State?.Text, KnownResourceStates.Running, StringComparison.Ordinal))
+            string? lastContainerId = null;
+            string? lastBootId = null;
+            long generation = 0;
+            var restartObserved = false;
+            await foreach (var observation in notifications.WatchAsync(stoppingToken))
             {
-                restartObserved = true;
-                continue;
-            }
+                if (!ReferenceEquals(observation.Resource, registeredResource)) continue;
+                trace?.Record(IdentityHandoffTraceStage.ResourceNotification, IdentityHandoffTraceOutcome.Accepted);
+                var candidateResourceId = observation.ResourceId;
+                if (!notifications.TryGetCurrentState(candidateResourceId, out var currentState))
+                {
+                    trace?.Record(IdentityHandoffTraceStage.CurrentResourceState, IdentityHandoffTraceOutcome.Rejected);
+                    continue;
+                }
+                trace?.Record(IdentityHandoffTraceStage.CurrentResourceState, IdentityHandoffTraceOutcome.Accepted);
+                if (!string.Equals(currentState.Snapshot.State?.Text, KnownResourceStates.Running, StringComparison.Ordinal))
+                {
+                    trace?.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Rejected);
+                    restartObserved = true;
+                    continue;
+                }
 
-            if (!RegisteredContainerEventProjection.TryProject(
-                    registeredResource, candidateResourceId, expectedRole, observation, currentState, out var target))
-                continue;
+                if (!RegisteredContainerEventProjection.TryProject(
+                        registeredResource, candidateResourceId, expectedRole, observation, currentState, out var target))
+                {
+                    trace?.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Rejected);
+                    continue;
+                }
+                trace?.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Accepted);
 
-            if (generation == 0 || restartObserved || !string.Equals(lastContainerId, target!.ContainerId, StringComparison.Ordinal))
-            {
-                generation = checked(generation + 1);
-                lastBootId = null;
-                restartObserved = false;
-            }
+                if (generation == 0 || restartObserved || !string.Equals(lastContainerId, target!.ContainerId, StringComparison.Ordinal))
+                {
+                    generation = checked(generation + 1);
+                    lastBootId = null;
+                    restartObserved = false;
+                }
 
-            var state = await ContainerIdentityExecHandoff.TryHandoffAsync(
-                target!, runId, generation, lastBootId, contextName, expectedEngineId, runner, stoppingToken);
-            if (state is not null)
-            {
-                generation = state.Generation;
-                lastContainerId = target!.ContainerId;
-                lastBootId = state.BootId;
+                var state = await ContainerIdentityExecHandoff.TryHandoffAsync(
+                    target!, runId, generation, lastBootId, contextName, expectedEngineId, runner, stoppingToken, trace);
+                if (state is not null)
+                {
+                    generation = state.Generation;
+                    lastContainerId = target!.ContainerId;
+                    lastBootId = state.BootId;
+                }
+                else
+                {
+                    logger.LogWarning("Duck runtime identity handoff did not complete for the current resource state.");
+                }
             }
-            else
-            {
-                logger.LogWarning("Duck runtime identity handoff did not complete for the current resource state.");
-            }
+        }
+        finally
+        {
+            trace?.Record(
+                IdentityHandoffTraceStage.ServiceStopped,
+                stoppingToken.IsCancellationRequested
+                    ? IdentityHandoffTraceOutcome.Accepted
+                    : IdentityHandoffTraceOutcome.Rejected);
         }
     }
 }

@@ -55,7 +55,8 @@ void EnableDesktopIdentityBridge(IResourceBuilder<ContainerResource> resource, s
         contextName,
         expectedEngineId,
         new DockerCliCommandRunner(dockerExecutable),
-        serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>()));
+        serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
+        builder.Configuration["Testing:IdentityControl:SafeTracePath"]));
 }
 
 static string FindRepositoryRoot()
