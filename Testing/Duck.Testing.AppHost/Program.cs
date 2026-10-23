@@ -179,13 +179,13 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
 
     var gcVisionSimulator = builder.AddContainer(
             "simulator",
-            "ghcr.io/ibis-ssl/framework-gcVisionSimulatorcli",
+            "ghcr.io/ibis-ssl/framework-simulatorcli",
             "a52b6bd")
         .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
         .WithEntrypoint("tini")
         .WithArgs(
             "--",
-            "./bin/gcVisionSimulator-cli",
+            "./bin/simulator-cli",
             "-g", gcVisionSimulatorGeometry,
             "--realism", gcVisionSimulatorRealism,
             "--ibis-port", gcVisionSimulatorIbisPort,
@@ -196,14 +196,14 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
         .WithEnvironment("Testing__Mode", "base")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithEnvironment("Testing__IdentityControl__Enabled", "true")
-        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "gcVisionDuck")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
         .WithEnvironment("Testing__Diagnostics__RunId", gcVisionGameControllerOnlyRunId)
         .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
         .WithEnvironment("VisionReceiver__Port", "10020")
         .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
         .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
         .WaitForStart(gcVisionSimulator);
-    EnableDesktopIdentityBridge(gcVisionDuck, gcVisionGameControllerOnlyRunId, "gcVisionDuck");
+    EnableDesktopIdentityBridge(gcVisionDuck, gcVisionGameControllerOnlyRunId, "duck");
     var gcVisionDuckVisionEndpoint = gcVisionDuck.Resource.Annotations
         .OfType<EndpointAnnotation>()
         .Single(endpoint => endpoint.Name == "vision-health");

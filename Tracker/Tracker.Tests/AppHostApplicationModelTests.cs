@@ -157,6 +157,56 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ExplicitGameControllerVisionModeUsesPinnedSimulatorRepositoryAndEntrypoint()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:GameControllerVisionOnly=true");
+
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var image = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", image.Image);
+        Assert.Null(image.Tag);
+        Assert.Equal("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79", image.SHA256);
+        Assert.Equal(
+            ["--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
+            await GetArgumentsAsync(simulator));
+    }
+
+    [Fact]
+    public async Task ExplicitGameControllerVisionModeUsesDuckRoleForIdentityProjection()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:GameControllerVisionOnly=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=5bc5ab8a-7340-47ba-8b7c-9f645375a54c");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var environment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("duck", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        var runId = Assert.IsType<string>(environment["Testing__Diagnostics__RunId"].ToString());
+        var runtimeArguments = await GetContainerRuntimeArgsAsync(duck);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", runtimeArguments);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=duck", runtimeArguments);
+
+        const string resourceId = "opaque-duck-event-key";
+        var fullContainerId = new string('a', 64);
+        var running = new ResourceEvent(
+            duck,
+            resourceId,
+            new CustomResourceSnapshot
+            {
+                ResourceType = "container",
+                State = new ResourceStateSnapshot(KnownResourceStates.Running, "fixture"),
+                Properties = [new ResourcePropertySnapshot("container.id", fullContainerId)],
+            });
+        Assert.True(RegisteredContainerEventProjection.TryProject(
+            duck, resourceId, "duck", running, running, out var target));
+        Assert.Equal(resourceId, target!.ResourceId);
+        Assert.Equal("duck", target.RoleName);
+        Assert.Equal(fullContainerId, target.ContainerId);
+    }
+
+    [Fact]
     public async Task BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp()
     {
         using var appHost = await CreateAppHostAsync();

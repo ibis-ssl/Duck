@@ -118,6 +118,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 実測manifest SHAbea266f4062a1c0b5ceaf95b290cabecaecad38c403c9b2f6d6a89a4f2d5e64fはworkspace原本と同byte。8entry全size/hash一致、includeInGit=trueの6JSONはcommitと同byte。stdout2038bytes/token可能とstderr0bytesの2entryはworkspaceのみで、本文を表示・転載せずhashだけ照合。Gitに欠けた失敗ではなく明示収納区分。
 - 台帳2行のclosure-current-tracking-v2 manifestは16entry、SHA955f60559d4e09052fd232735eb49fdd7f3e03a4da90db40fe64cb9be26f1b4a。全size/hash、12設定/補助script、source/inputとcommand/exit/raw対応が一致。自己proofは /tmp/issue81-05b2-measurement-normal-review-20261023/。
 
+### 05B3 明示GC視覚構成の初回通常レビュー
+
+- reviewed_commit: 54ef302f199e0dc24e000a6fb0101441af42795d、base: 03f98c986be388d23acd02417bf5b7bf6704b2fe。同じrequested gpt-6.1-sol/high、original applied:null、reused_existing_agent_profile、normal_persistence、single_agent/decomposition forbidden、report_attestation_allowed:false。既読正本review-enforcer/review-worker/work-context-manager等を継続する一人のbuilt-in review。新agent/入れ子/独立finalなし。
+- helper8b9a02/7b5b04/288ef5/86036b/c84fa9は各exit0。固定commitの全製品・試験・設計差分と直接依存、台帳/報告、保存Red/Green/build/文書証拠を読取。大きい出力の省略は必要なprojection/Host/観測worker/最終command/rawの限定読取で補完した。新build/test/lint/CI/実GC/DCP/execは実行していない。
+- reports/evidence/issue81-05b3-gc-standard-resource-20261023/manifest-v3.tsvは71entry、SHAa5a724891567e73538b7c071315d57ace46745aef9ced6253939b929d79f6613。全size/hash一致。自己proofは /tmp/issue81-05b3-normal-review-20261023/。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -222,6 +228,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 実測run68fd7e39e18e4968b18450730eca8651、明示Desktop Engine5bc5ab8a-7340-47ba-8b7c-9f645375a54c。実HTTPのidentity4値をDuck inspect投影と突合し、RunId=所有run label、ResourceId=duck-zhjxnngc（DCP name label）、ContainerId=3b158cd0ca4d1394b66e390c9cd0e6722897d7faae035055d1c5f03e036b6216（完全64桁）、Generation=1が一致する。役割duckと資源キーを同一視しない。
 - 固定simulatorとduckの同じAspire user bridge/network ID、実entrypoint/args、duckの127.0.0.1:16537→39108/tcp、UDP host mappingなしを保存inspect投影から確認。HTTP200/IsReady=true/Reason Ready、VisionPacketsReceived10170を保存health投影から確認した。
 - 実装reportの「両fullIDへのinspectがno such object」という1表現だけを、保存JSONの実際の根拠である「run label query空（duckを含む）＋simulator exactID inspectでno such object」へ直接正確化した。両資源不在という結果・判定・rawは変更しない。
+
+### 05B3 固定対象・直接依存
+
+- Program.cs追加75行（SHAcf6888ceba02dd2776b8ccc189c243054a1ba0ab03c24e73d57fc02d68776fcc）、AppHostApplicationModelTests.cs追加56行（SHA48cf90d3cfe87cb2623e3bbca4becee7d49a1cf8eeb4a675e6414a64ad9e1e9a）、主設計追加4行、tasks/phasesの05B3計画同期、実装report追補・旧report軽微修正、通常report前回保存分、証拠束を確認した。
+- 直接依存はlinux-image-lock.json、既存05B2 simulator実entrypoint/command観測、RegisteredContainerEventProjectionのrole/key/fullID条件、EnableDesktopIdentityBridgeとHandoffService、RefereeDriverApplication/Host/観測worker、既存publish定義。既定base/comparison/RuntimeHostOnly/VisionSimulationOnlyの既存分岐本文は不変。
+- GC固定index/既存3multicast引数、UI target8082/host動的/127.0.0.1/nonproxy、UDP endpoint/host network無しを確認。Driverは内部ws://game-controller:8082/api/controlへ接続し、Enabled/ContainerModeのみ明示する。AutoDriveToActiveをtrueとした場合だけ制御workerを登録する既存Application60–72行を保持し、この分岐は設定を渡さないため既定observe-only。
+- 構成試験は4資源型・GC固定image/args・公開端点・Driver publish/環境・待機辺を検査するが、新分岐simulatorのrepository/binary名、duck環境/owner roleを検査しない。AutoDrive不存在のassert対象はAutoDriveというキーで、実制御キーAutoDriveToActiveはsourceで別途確認した。新しい関数/XML説明の追加・変更はない。
 
 ## 指摘事項
 
@@ -430,6 +443,17 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 外部sender全件のsource identity、他tracker G3、ageの実値、再作成全パターンの実測は元NR005の新たな閉鎖条件へ広げない。NR006/007/008/009/010 closedを維持し、新規必須findingなし。
 - 非阻害held：保存healthはsanitized projectionでSourceKey空/Age null、完全566byte本文は未保存。全source帰属やfreshness境界を実測済みとはしない。停止時AppHost実exit/DCP子exit未取得を成功コードへ補わない。これらは今回のRuntimeHost正常受信・identity供給の事実と分離する。
 
+### 05B3 初回必須所見（正常起動経路）
+
+- **I81-NR-011 / P1 / open / production-path** — Testing/Duck.Testing.AppHost/Program.cs:182（関連188）。新分岐はrepositoryをghcr.io/ibis-ssl/framework-gcVisionSimulatorcli、commandを./bin/gcVisionSimulator-cliへ変えている。承認済みlockはghcr.io/ibis-ssl/framework-simulatorcliの固定index f505fcb1...で、05B2実観測と既存起動契約の実行体は./bin/simulator-cli。ローカル変数名変更が外部repository/binary文字列へ漏れた状態であり、固定simulatorの正常起動契約を実行できない。GC/duckの前段simulatorを止める問題で、実pull/startを試さなくても契約不一致は確定する。
+  - 必要変更：repositoryとbinary literalを既存lock/起動契約へ戻す。digestや起動引数の期待値を新しい誤文字列へ変えない。
+  - 最小fixture：実GameControllerVisionOnly AppHostモデルのsimulator image repository/indexとargs中の./bin/simulator-cliを照合する先行試験。既存4資源fixtureの不変期待値は保持する。新しいimage取得/実起動や汎用registry検査は必須へ追加しない。
+- **I81-NR-012 / P1 / open / production-path** — Testing/Duck.Testing.AppHost/Program.cs:199（関連194/206）。登録資源名duckに対してExpectedRoleとEnableDesktopIdentityBridge引数がgcVisionDuckになっている。既存RegisteredContainerEventProjection.cs:28はregisteredResource.Name==expectedRoleNameを必須とするため、全てのduck候補が投影前に拒否され、実identity受渡しへ進まない。正常Visionを受信してもstrict healthはUnattributed/503となり、221行のGC.WaitFor(duck)が満たされずGC/Driverへ進めない。
+  - 必要変更：登録duckの期待役割・owner role label・bridge serviceの役割をduckへ揃える。projectionのrole条件やstrict判定を緩めず、登録名を誤役割へ変えて固定試験を逃がさない。
+  - 最小fixture：当該実AppHostモデルのExpectedRoleとowner role labelがduck.Resource.Nameへ一致し、その設定で既存production projectionが有効なRunning/current snapshotを受理することを確認する。labelを生成する既存bridge引数もこの確認に含める。実DCP再現や一般的な異常系網羅を追加要求しない。
+- NR005は元RuntimeHost準備経路のclosedを維持する。NR012は今回新モードだけの役割誤設定であり、05B2正常系実測の閉鎖を遡及取消しない。NR006/007/008/009/010もclosed維持。
+- 非阻害の報告整文：実装reportの「公開はGC HTTP8082だけ」を既存Duck診断39108の併存へ、「GC準備完了後Driver」を実sourceの待機辺（Duck healthy→GC start→Driver start）へ直接正確化した。実質検証結果・第三者判定やrawは変更しない。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -620,6 +644,14 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 製品b148のCI40009681845は親のAPI確認でcompleted/success。保存gh表示logでも829pass/0fail/0skip、PDB10件/112documentsの成功を読取。3publish/definitions16成功、packet/full-stack skipを同runの親確認として採用する。表示log SHA78ab62026b27ad73007435d0b87d469c0e58834065df000de45866ab0b98dad9には日本語の変換がありbyte-exact remote rawとはしない。記録HEAD03f98cのexactCI成功へ転用しない。
 - 台帳の実変更2行はb148→03f差分とinputがbyte一致。既存Node/cache/cwdとSudachi環境、12設定/補助script不変。textlint0、CSpell0（2files/0issues）、Sudachi1（モデル/アクセス/コードの計5件）。初回はPython実体のresolveで/usrを探索したpreflight assertion失敗、lint未起動として保存される。全文gate未合格/前の段階の指摘は保持し、新しい全文改稿を必須にしない。
 
+### 05B3 初回通常判定
+
+- **needs_changes / 新規必須2（NR011 P1、NR012 P1）**。最短の正常系へ必要な既存literal/role契約の修正であり、任意異常系や文書磨き込みを理由に停止しているのではない。全Issue/独立final判定なし。
+- 固定test48cf90d3は製品前のruntime Red（4期待/実5、compile済み、exit1）→同test Green1/1を保存。中間CS0136はsetup/compile失敗、次の登録resource名不一致は実照会失敗として別履歴。最終関連filter5/5・skip0/exit0とAppHost no-restore build exit0/ASPIRE010警告1/エラー0を実command/raw/source hashで確認。これらの成功をNR011/012未検査経路の合格へ転用しない。
+- critical production path/completeness：4資源登録/GC固定契約/UI loopback/UDP非公開/Driver observe-only/内部URI/依存グラフ＝source/model確認済み、simulator起動literal＝NR011未充足、duck identity接続＝NR012未充足、同4資源の実DCP/GC画面/Driver実観測/所有cleanup＝未測定。Driver独自のG3帰属や全体準備受入をこの構成reviewへ前倒ししない。
+- 文書v2は主設計4行・tasks追加2行・所有実装report節のみを対象とし、旧reviewerのcleanup整文を混入したv1は旧世代として保存。12設定/補助scriptと3source hashが一致。textlint0/CSpell1（10件）/Sudachi1（raw violation41件）。summary旧39は保存しcorrected summary41へ訂正済み、checker再実行なし。phases計画行を含む全文gate成功とはしない。
+- 旧b148/05B2の実UDP-ready/829成功はその対象に保持し、54ef302のGC実行・全suite/CI成功へ移転しない。NR011/012の修正後は別固定commitで同じ通常担当の限定fix検証へ戻す。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -709,3 +741,10 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - raw stdoutはDashboard tokenを含み得るためworkspace限定・Git除外を保持。新測定やraw本文の公開を要求しない。旧「単一RuntimeHostではUDP未入力503」と今回の「2資源で正常受信200」を別runとして保存し、過去の未測定記録を改稿して成功にしない。
 - AppHost実exit/DCP子exit未取得、既存TDD不足、文書gate不合格、図本人視認、G1/G3・全資源受入・独立finalは未完了。新たな全体gateや任意異常系を正常系の前提へ追加しない。
 - 自己編集は通常report子5欄、根拠明確な実装report1表現、/tmp proofのみ。親prefix/全旧履歴を保持し、製品/test/台帳/raw/第三者の実質結果を変更しない。全自己command終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### 05B3 初回通常レビュー終端
+
+- 今回の1件/関連5件成功はモデルの未検査literal/役割を残したまま成立している。修正前に4資源の実測を始めても、固定simulator起動とduck ready依存で停止する経路を分けて扱う必要がある。提案fixtureはこの2正常起動不足だけに限定する。
+- AutoDriveToActiveの明示true以外は既存Driver制御workerを起動しない。UDP受信/API照合・内部HTTPが動くこと、Driverのstrict health200、GC画面操作の成功は別であり今回は未実測。他資源G3/全体受入を合格にしない。
+- 05B2のage/sourceKey projection限界、AppHost/DCP実exit未取得、既存TDD不足、全文文書gate/図本人視認/全体独立finalのheldは保持する。
+- 親prefix/Dispatchと全旧子欄履歴を保持。自己編集はnormalreport子5欄、根拠明確な実装report2表現、/tmp proofのみ。製品/test/設計/台帳/実質結果/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。

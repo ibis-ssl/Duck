@@ -387,8 +387,19 @@ Evidence inventory for this check is `reports/evidence/issue81-05b2-diff-lint-20
 
 ### I81-05B3 明示的な Game Controller 視覚資源選択（2026-10-23）
 
-`Testing:GameControllerVisionOnly=true` の明示設定で、固定 simulator、Duck RuntimeHost、Game Controller、RefereeDriver の4つを標準 `ContainerResource` として登録する。既定構成と、既存の2資源 `VisionSimulationOnly` は変更しない。simulator の固定ダイジェストと起動引数を維持し、Game Controller は固定 `robocupssl/ssl-game-controller` 参照、既存の視覚・追跡・審判情報の宛先、`:8082` のHTTP待受を使う。ホスト側に出すのは Game Controller のHTTP 8082だけで、`127.0.0.1` の動的TCPポートへ対応付ける。UDP端点とホストネットワークは設定しない。RefereeDriver は内部URI `ws://game-controller:8082/api/control` で観測用に起動し、自動運転設定を渡さない。依存順は simulator の起動、Duck の起動、Game Controller の準備完了、RefereeDriver の起動である。
+`Testing:GameControllerVisionOnly=true` の明示設定で、固定 simulator、Duck RuntimeHost、Game Controller、RefereeDriver の4つを標準 `ContainerResource` として登録する。既定構成と、既存の2資源 `VisionSimulationOnly` は変更しない。simulator の固定ダイジェストと起動引数を維持し、Game Controller は固定 `robocupssl/ssl-game-controller` 参照、既存の視覚・追跡・審判情報の宛先、`:8082` のHTTP待受を使う。ホスト側では既存の Duck 診断HTTP 39108に加え、Game Controller のHTTP 8082を `127.0.0.1` の動的TCPポートへ対応付ける。UDP端点とホストネットワークは設定しない。RefereeDriver は内部URI `ws://game-controller:8082/api/control` で観測用に起動し、自動運転設定を渡さない。依存順は simulator の起動、Duck の準備完了、Game Controller の起動、RefereeDriver の起動である。
 
 固定試験 `ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly` のSHA-256は `48cf90d3cfe87cb2623e3bbca4becee7d49a1cf8eeb4a675e6414a64ad9e1e9a`。製品ブランチ追加前はコンパイル後に実行され、資源数の期待値4に対し実値5で失敗した。これは構成モデルの有効なRedである。製品追加後の最初の実行はローカル変数名の衝突（CS0136）によるコンパイル失敗で、機能結果には含めない。次の実行はコンパイル後、登録名 `gcVisionSimulator` / `gcVisionDuck` と試験が照会する標準名 `simulator` / `duck` の不一致で失敗した。登録名を標準名へ直し、試験の期待値は変更していない。最終の固定試験は1/1成功し、この試験と直接関係する既存AppHostモデル試験4件を合わせて5/5成功、skipなし。AppHostの `--no-restore` build はエラー0で成功し、既存のASPIRE010警告が1件出た。
 
 最終ソースSHA-256: `Testing/Duck.Testing.AppHost/Program.cs` は `cf6888ceba02dd2776b8ccc189c243054a1ba0ab03c24e73d57fc02d68776fcc`、`Tracker/Tracker.Tests/AppHostApplicationModelTests.cs` は `48cf90d3cfe87cb2623e3bbca4becee7d49a1cf8eeb4a675e6414a64ad9e1e9a`。コマンドと生出力は `reports/evidence/issue81-05b3-gc-standard-resource-20261023/` に世代別保存した。`test-stage-red-v1/` は機能Red、`test-stage-green-v1/` はコンパイル失敗、`test-stage-green-v2/` は登録名の照会失敗、`test-stage-green-v3/` はfocused成功、`final-validation-v1/` は関連試験5件とbuildの結果である。ここで確認したのはAppHostモデルとbuildまでであり、DCPでの4資源起動、Windows画面操作、RefereeDriverの観測、実UDP受信、DCP所有の後始末は未検証である。
+
+
+### 05B3 NR-011/012 の固定参照・役割修正（2026-10-23）
+
+54ef302f199e0dc24e000a6fb0101441af42795d の既存4資源モデルテストに対し、simulatorの固定repository/digest/起動引数を確認するテストと、登録名 `duck` に対するExpectedRole/所有role/projection受理を確認するテストを追加した。後者は実AppHostの `duck` Resourceを使い、opaque event key・Running snapshot・64桁container IDの既存projection正例を通すモデル契約である。DCPからの実通知を証明するfixtureではない。
+
+製品変更前、54efのProgram.cs SHA-256 `cf6888ceba02dd2776b8ccc189c243054a1ba0ab03c24e73d57fc02d68776fcc` と固定テストSHA-256 `bf616f532d219872d6183f81257b01383a01edecf48dbac07713a5009c2d2e03` で新2 testを実行した。コンパイルは成立し、2/2が実行時assertionで失敗した（exit 1）。simulator testは期待 `ghcr.io/ibis-ssl/framework-simulatorcli` に対し実値 `ghcr.io/ibis-ssl/framework-gcVisionSimulatorcli`、role testは期待 `duck` に対し実値 `gcVisionDuck` を観測した。後続のowner label/projection正例はrole mismatchで最初のassertが失敗したため未到達である。この実Redはレビュー対象54efの不一致を捉えたもので、54efの以前のCI成功はこの不一致の解消証拠ではない。
+
+最小修正は Program.cs の4つの文字列値のみ: simulator repositoryを `framework-simulatorcli`、実行体を `./bin/simulator-cli`、ExpectedRoleとbridge roleをresource名と同じ `duck` に戻した。変数名、固定digest、他resource、既定構成は変更していない。test sourceはRedからGreenまで同一SHA-256 `bf616f532d219872d6183f81257b01383a01edecf48dbac07713a5009c2d2e03`。修正後の4関連model testは4/4、skipなし、exit 0。AppHost `--no-restore -p:EnableSourceControlManagerQueries=false` buildはexit 0、stderr 0 byte。`git diff --check` もexit 0。修正後Program.cs SHA-256は `7bb54742f1504c02d0f4060adff577d4e28cf5e18f506403d2981faff474167c`。
+
+原command/stdout/stderr/exitとhashは `reports/evidence/issue81-05b3-nr011-nr012-fix-20261023/` に保存。`inventory-v1.tsv` は12 files、SHA-256 `581cc44463c2b5220394b4df0b5ed2c2b5e6a89f408e9aa9d717d0ffae394f92`。今回の新report段落に対するtextlint/CSpell/Sudachi検査は未実行。既存の文書語彙gate不合格は継続しており、ここで成功扱いしない。4資源の実DCP起動、GC画面操作、RefereeDriver観測、Vision UDP受信/healthはまだ実測していない。次のDCP測定はこの修正の通常review/固定後に行う。
