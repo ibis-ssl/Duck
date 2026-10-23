@@ -99,6 +99,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - handshake-completion manifest-v1は58entry、SHA815add3c6eeceec3c837fa943fc67061cc087491339f61c635530f2b834eb886。focused文書inventory-v1は43entry、SHA7cbe79440bff3646ea0b3a2273ef7080e10ac3e94749bc68f009735a2e1d06b5。各entryのsize/hash、実command/exit、current source hashを照合した。新build/test/lint/CI/DCP/execは発行していない。
 - 自己証拠は /tmp/issue81-06a3-normal-review-20261023/。実装reportの空diffに見えるbaseline→同baseline表現だけを、preflightの実際のbaseline→当時の未commit作業木と現在commitへの4source hash対応へ直接訂正した。実質結果・第三者判定・rawは変更しない。
 
+### NR010 単独fix検証（固定commit）
+
+- reviewed_commit: 7cd1c2512872062d80b8d83312f2a19065e81b31。修正前a5672531162da9d398b6348746933d0321a58dc7の初回needs_changes/NR010履歴を保持する。同じgpt-6.1-sol/high要求、applied:null、continuity reuse、normal_persistence、report_attestation_allowed:false。既読review契約を継続し、新agent/入れ子/独立finalなし。
+- helper4329f9/e2c375/644843は各exit0。対象commitの製品1file差分、新fixture全体、保存Red/Green/related/build/restoreの実command配列・exit・raw集計、summaryの世代対応を読取した。新test/build/lint/CI/DCP/execは発行していない。
+- reports/evidence/issue81-nr010-current-resource-key-20261023/manifest-v1.tsvは23entry、SHA5140cb83b1f14ff93deaff5c93ee1b1b35a8d20aaaa18ad05cc1d21f397605ea。全size/hash一致、不一致0。fixtureの証拠コピーとcommit内testは同byte。自己proofは /tmp/issue81-nr010-normal-fix-review-20261023/。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -182,6 +188,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 直接依存として既存RegisteredContainerEventProjection、ResourceDiagnosticIdentity/ServiceReceiveDiagnosticsのidentity/epoch境界、RuntimeHost DI/CLI relay、既存Dockerfile/WORKDIRと公開Aspire v13.5.4のResourceNotificationServiceを確認。ResourceIdを役割名と同一視しない。TryGetCurrentStateはexact key優先、役割名fallback時にも実際のmatched keyを返す。WatchAsyncは初期snapshotも返す。
 - AppHost登録→実HostedService→WatchAsync→current state→投影→明示contextのEngine ID→exact fullID/Running/run-role labels→structured exec→実prepare/challenge/commit clientというコード経路を確認した。RuntimeHostOnly/DesktopBridgeEnabledは明示選択、defaultはbridge未有効化。RuntimeHostの初回未bindはprepareのみでbindせず、commitでkeyを確定し、事前指定keyのstrict動作は保持する。
 - 後続未追跡ContainerIdentityCurrentResourceKeyTests.csは今回の固定commitに含めず、修正前判定へ混ぜない。
+
+### NR010 限定fix対象
+
+- Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs SHA3efc24a224ace87f88065060ec36b467c0f695d41e324feed0bafed8678169a9。最初のresourceId固定を除去し、各observation.ResourceIdからcurrentを取得して同keyでprojectionする298–307行を確認。generation/lastContainerId/lastBootIdは従来どおり有効projection後に進み、handoff受理後に保持する。role/登録参照/fullID両snapshot一致、engine/owner検査を迂回しない。
+- Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs SHAbe11812e9dd0f8645bbde95415f38af7235940ecc5efd15e176d7c4b3a2915d8。実ResourceNotificationServiceと実ContainerIdentityHandoffServiceへ同じ登録IResourceのStarting/ID無しkey A→Running/fullID有りkey Bを公開し、1回だけBのResourceIdでrelayされたことを確認する。Docker runnerだけfakeであり、helper投影だけの試験ではない。
+- a567からの製品/試験差分は上記2path。既存06A3全範囲を再評価せず、raw/summary/製品patchの対応だけを確認した。今回新たな関数説明/XMLコメントの追加・変更はない。
 
 ## 指摘事項
 
@@ -370,6 +382,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 既存NR005/P1/openは実owner→DCP通知→同engine/fullID exec→資源内UDS→実受信の実測未成立として保持。新しいコード接続とfake/channel/model成功だけでは閉じない。NR006/007/008/009はclosed維持、今回の変更で再開する根拠なし。
 - 工程証拠：bootstrap初回f370は元raw未保存、現7737はexpectedRole引数修正後で同byteの先行Redではない。sessionのmissing project reference/DTO/timeoutはsetup、false-scaffoldのAssert.True失敗はpayload assertions前であり最終全assertionのRedではない。PD-I81-06A1-TDD等をwaiveせず、現機能所見から分離する。
 
+### NR010 限定fix処分
+
+- **I81-NR-010 / P2 / closed at 7cd1c251**。初期未完成keyを固定せず、通知Bのkeyでcurrentとprojectionを照合するため、NR010のA→B正常初回経路が通る。実HandoffService fixtureも同じkey Bを捕捉する。必要actionの「各通知keyで取得」「有効候補前の固定除去」「実watcher正常初回fixture」はすべて充足。新規必須findingなし。
+- 有効Red：修正前製品e80df753・固定新test be11812でcompile後にAssert.Singleのcollection empty、1fail/0pass/0skip、exit1。Greenは同testで1pass/0fail/0skip、exit0。summary上の最初のGreen製品c3bd6bと最終3efc24a2を区別し、最終related3件/buildの保存結果を併せて確認した。期待値緩和やskip化なし。
+- NR005/P1/open、NR006/007/008/009 closedを維持。今回の正常系fixtureは実Docker/DCP/exec/UDP-ready成立や旧TDD不足の補填ではない。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -538,6 +556,13 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - focused文書は4pathの実追加/削除片を8設定hashと照合。追加片textlint0/CSpell1（44件）/Sudachi1（83件）、削除片textlint0/CSpell1（13件）/Sudachi1（22件）。追加全件が既存だったとの主張はしない。全文gate未合格を維持する。
 - 現required actionの閉鎖matrix：初回未完成keyの不固定＝未充足、実HostedService正常初回fixture＝不足、実DCP通知頻度＝未実測（修正の静的根拠とは別）。既存正常handshake/owner検査/strict bootstrap/default維持＝確認済み。追加の汎用化・網羅異常系・文書磨き込みは必須へ追加しない。
 
+### NR010 単独fix通常判定
+
+- **NR010 closed / この限定fixはpass_with_held / 新規必須0**。cycle全体はNR005/P1の残必須1を保持しneeds_changesのまま。初回a567のneeds_changesを上書きせず、別固定commitの修正処分として追記した。
+- completeness：製品の通知ごとのcurrent/projection照合＝確認済み、A初期→B Runningの実HandoffService fixture＝確認済み、固定testのruntime Red→Green＝確認済み、最終直接関連filter3/3・skip0・exit0＝確認済み、native AppHost build＝exit0/ASPIRE010警告1/エラー0。保存commandは既存native Windows mirrorの同test project、no-restore、EnableSourceControlManagerQueries=false。restoreは既存C:/Users/donabe/.nuget/packagesをsource/packages双方に指定した保存exit0で、自分は再実行していない。
+- 新testのCS0618は旧形式ResourceNotificationService constructor利用の警告で、実通知/実HostedServiceの使用を阻害していない。150ms待機はfixtureの実行余裕で、実DCP通知の期限保証を主張しない。現在の成功を覆す根拠にはせず、網羅異常系や汎用化の追加必須を設けない。
+- summaryのa567 exactCI39985949526/827成功・3publish/16checkは旧基準の記録で、7cd1c251修正のexactCIや全suite成功へ転用しない。新commitの全suite/CI成功は今回確認していない。限定修正の確認は保存されたlocal関連3件とbuildに基づく。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -607,3 +632,9 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 明示context+Engine ID+exact fullID/Running+fresh Run/role labelsは信頼したlocal Desktop/DCP境界での同target照合であり、DCP daemon endpointの直接証明やclone脅威全般の検証ではない。画像/runtime実行の承認解釈は親工程で、今回実操作なし。
 - 旧TDD不足・全文文書gate不合格・図本人視認・外部G1/G3・Windows/実流量・独立finalを今回fixture成功で解消しない。本人の正常系/費用対効果優先に従い、任意改善と必須正常系不具合を分けた。
 - 親prefix/Dispatchと全旧子欄履歴を保持。自己変更は子5欄、根拠明確な実装reportのbaseline表現1箇所、/tmpの確認証拠のみ。製品/test/設計/台帳/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### NR010 限定fix終端
+
+- 実DCPが初期A→Bを通知する頻度は未実測。静的欠陥と実通知fixtureは閉じたが、明示Desktop context/実Engine/fullID/owner labelsから実exec・資源内UDS・実UDP-readyへ至る正常系E2Eは未確認でNR005を保持する。
+- 既存TDD手順不足、全文文書gate未合格、図本人視認、外部G1/G3、実機/実流量、独立finalは未解消。今回のruntime RedはNR010固定fixtureの修正履歴に限り、06A1/02/03等の過去Red不足へ遡及しない。
+- 親prefix/Dispatchと初回a567を含む全旧子欄履歴を保持。自己編集はこのnormalreport子5欄と/tmp proofのみ。製品/test/第三者結果/raw/台帳を変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。

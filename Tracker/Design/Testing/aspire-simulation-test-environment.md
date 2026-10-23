@@ -32,6 +32,8 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
+Vision 入力から `Tracker.RuntimeHost` の準備完了までを単独で確認する場合は、`Testing:VisionSimulationOnly=true` を明示する。この選択では `simulator` と `duck` の2資源だけを Aspire 標準 `ContainerResource` として登録し、既定の base / comparison モデルは変更しない。既存の `RuntimeHostOnly` は Duck だけの1資源選択として維持する。simulator は `linux-image-lock.json` の `framework-simulator` 一覧ダイジェストを使い、Docker image の `Entrypoint=["tini","--"]` と `Cmd=["./bin/simulator-cli"]` に対応するよう、`tini` と `-- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellow` を指定する。追加の `tini` を command に重ねない。UDP は公開せず、ホストネットワークも使わない。simulator が起動した後に Duck を開始し、Duck 自身の `/health/vision` が復号済み Vision 入力を確認する。これは最小 Vision 入力経路の検証であり、比較資源やその他の外部サービスを含む全体構成の受入を意味しない。固定イメージの実行、同一 DCP bridge 内の multicast 到達、strict health の成功は実測で確認する。
+
 ### Linux 向けアプリケーションの配布出力（I81-04A）
 
 次の既存プロジェクトを、復元済み依存を使い、.NET 10 の共有実行環境で動かす配布物として発行する。各出力は .NET アセンブリから起動し、OS 固有の実行ファイルと実行基盤資材を含めない。実行時は後続の I81-04B で確定する .NET 10 実行環境を使う。コンテナイメージの基底、外部イメージ、デバッグ専用資材の版とダイジェストは I81-04B で別に確定する。

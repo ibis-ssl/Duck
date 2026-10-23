@@ -1,0 +1,11 @@
+{
+  "path": "C:/Users/donabe/Documents/Codex/2026-10-22/task-17/issue81-dcp-runtimehost-run-v2-summary.json",
+  "sha256": "93763AB7276B3B8C1C91B07C7E974179F296ACC18A7FFC8999EEF9FE3FDB142F",
+  "runId": "fed97710c9cc4b0885f6b827b98d0845",
+  "containerFullId": "f3ea729b2c0d22acdae2e6772510a67a6d155ad2218bc2fa53103c88b732e95d",
+  "observed": "same owned RuntimeHost; localhost 39108 -> 127.0.0.1:32003; exec exit 0; no UDP input; /health/vision 503; DCP-owned cleanup completed",
+  "limitations": [
+    "raw event stream/count and exact observation interval not retained",
+    "AppHost wrapper session exit 1 on Ctrl+C; separate AppHost exit not captured"
+  ]
+}

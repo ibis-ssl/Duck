@@ -50,6 +50,57 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ExplicitVisionSimulationModeUsesPinnedSimulatorAndDuckContainersOnly()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:VisionSimulationOnly=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=5bc5ab8a-7340-47ba-8b7c-9f645375a54c");
+
+        Assert.Equal(2, appHost.Resources.Count());
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+
+        var image = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", image.Image);
+        // ダイジェスト指定時は、可変タグをモデルに残さない。
+        Assert.Null(image.Tag);
+        Assert.Equal("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79", image.SHA256);
+
+        Assert.Single(simulator.Annotations.OfType<CommandLineArgsCallbackAnnotation>());
+        Assert.Equal(
+            ["--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
+            await GetArgumentsAsync(simulator));
+
+        Assert.DoesNotContain(
+            simulator.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        Assert.DoesNotContain(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        var simulatorEnvironment = await GetResourceEnvironmentAsync(simulator);
+        Assert.Empty(simulatorEnvironment);
+
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("sim", duckEnvironment["Tracker__ActiveProfileName"].ToString());
+        Assert.Equal("true", duckEnvironment["Testing__ContainerMode"].ToString());
+        Assert.Equal("true", duckEnvironment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("duck", duckEnvironment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.Equal("224.5.23.2", duckEnvironment["VisionReceiver__MulticastAddress"].ToString());
+        Assert.Equal("10020", duckEnvironment["VisionReceiver__Port"].ToString());
+
+        var healthEndpoint = Assert.Single(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Name == "vision-health");
+        Assert.Equal(39108, healthEndpoint.TargetPort);
+        Assert.Null(healthEndpoint.Port);
+        Assert.Equal("127.0.0.1", healthEndpoint.TargetHost);
+        Assert.Single(duck.Annotations.OfType<HealthCheckAnnotation>());
+        AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
+    }
+
+    [Fact]
     public async Task BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp()
     {
         using var appHost = await CreateAppHostAsync();

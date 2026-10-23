@@ -99,6 +99,67 @@ if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]))
     return 0;
 }
 
+if (IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]))
+{
+    var configuredSimulatorTag = builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
+    if (!string.Equals(configuredSimulatorTag, "a52b6bd", StringComparison.Ordinal))
+    {
+        throw new InvalidOperationException(
+            "Testing:VisionSimulationOnly requires the simulator image locked as a52b6bd.");
+    }
+
+    var visionOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var visionOnlyOwnershipLease = StackOwnershipLease.Acquire(visionOnlyLockPath);
+    var visionOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var visionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+    var visionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+    var visionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+    var simulatorTeamColor = builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+    if (!int.TryParse(visionSimulatorIbisPort, out var visionSimulatorIbisPortNumber) ||
+        visionSimulatorIbisPortNumber is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("Testing:Simulator:IbisPort must be a valid UDP port number.");
+    }
+
+    var visionSimulator = builder.AddContainer(
+            "simulator",
+            "ghcr.io/ibis-ssl/framework-simulatorcli",
+            "a52b6bd")
+        .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
+        .WithEntrypoint("tini")
+        .WithArgs(
+            "--",
+            "./bin/simulator-cli",
+            "-g", visionSimulatorGeometry,
+            "--realism", visionSimulatorRealism,
+            "--ibis-port", visionSimulatorIbisPort,
+            "--ibis-team-color", simulatorTeamColor);
+
+    var visionOnlyDuck = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", visionOnlyRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
+        .WaitForStart(visionSimulator);
+    EnableDesktopIdentityBridge(visionOnlyDuck, visionOnlyRunId, "duck");
+    var visionOnlyEndpoint = visionOnlyDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    visionOnlyEndpoint.Port = null;
+    visionOnlyEndpoint.TargetHost = "127.0.0.1";
+
+    builder.Build().Run();
+    return 0;
+}
+
 var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
 if (testingMode is not "base" and not "comparison")
 {
