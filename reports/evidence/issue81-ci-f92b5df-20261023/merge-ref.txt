@@ -1,0 +1,7 @@
+PR merge ref SHA fetched by Actions:
+71e21ca941904f2fb788763015c7db76b2fcc230
+Raw run.log line:
+[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +71e21ca941904f2fb788763015c7db76b2fcc230:refs/remotes/pull/84/merge
+Checkout log short form: HEAD is now at 71e21ca
+Extraction command: Select-String run.log -Pattern "refs/remotes/pull/84/merge|git fetch|HEAD is now at|GITHUB_SHA|refs/pull/84/merge"
+Extraction exit=0

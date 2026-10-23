@@ -132,8 +132,8 @@ def read_portable_pdb(pdb_path: pathlib.Path) -> tuple[bytes, list[str]]:
     return pdb_id, documents
 
 
-def read_codeview_identity(dll_path: pathlib.Path) -> tuple[bytes, int]:
-    """PE debug directoryからCodeViewのGUIDとageを取得する。"""
+def read_codeview_identity(dll_path: pathlib.Path) -> tuple[bytes, int, int]:
+    """PE debug directoryからCodeViewのGUID、Stamp、ageを取得する。"""
     try:
         data = dll_path.read_bytes()
     except OSError as error:
@@ -193,7 +193,7 @@ def read_codeview_identity(dll_path: pathlib.Path) -> tuple[bytes, int]:
         payload = data[payload_offset:payload_offset + payload_size]
         if payload[:4] != b"RSDS":
             raise ContractError("CodeView debug recordがRSDS形式ではありません。")
-        return payload[4:20], struct.unpack_from("<I", payload, 20)[0]
+        return payload[4:20], entry[1], struct.unpack_from("<I", payload, 20)[0]
     raise ContractError("アセンブリにCodeView RSDS recordがありません。")
 
 
@@ -204,12 +204,12 @@ def verify_contract(publish_directory: pathlib.Path, expected_document: str) -> 
     for output_path in (dll_path, pdb_path):
         if not output_path.is_file():
             raise ContractError(f"必要なDebugHost発行物がありません: {output_path}")
-    codeview_guid, codeview_age = read_codeview_identity(dll_path)
+    codeview_guid, codeview_stamp, codeview_age = read_codeview_identity(dll_path)
     if codeview_age != 1:
         raise ContractError(f"portable PDBのCodeView ageは1でなければなりません: {codeview_age}")
     pdb_id, documents = read_portable_pdb(pdb_path)
-    if codeview_guid != pdb_id[:16]:
-        raise ContractError("Tracker.DebugHost.dllのCodeView GUIDとTracker.DebugHost.pdbの識別子が一致しません。")
+    if codeview_guid + struct.pack("<I", codeview_stamp) != pdb_id:
+        raise ContractError("Tracker.DebugHost.dllのCodeView GUID/StampとTracker.DebugHost.pdbの識別子が一致しません。")
     normalized = {document.replace("\\", "/") for document in documents}
     expected = expected_document.replace("\\", "/")
     if expected not in normalized:

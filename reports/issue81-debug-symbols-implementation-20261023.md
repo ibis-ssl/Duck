@@ -18,6 +18,8 @@
 
 - parent_evidence_note: Redのみ31ファイル時点のmanifestは最終統合版へ更新され、旧manifest現物は保存されていない。旧90fe14ffの現物再照合は不可。CI生ファイルは最終55項目のmanifest（33c42136）で親が全件再照合し、reports/evidence/issue81-04b1-red-and-fix-validation-20261023へ保存した。過去manifestの保存不足と実CI Redの生証拠を区別する。
 
+- continuation_mode: review_follow_up / I81-NR-003。20byteの完全ID照合を追加する。先行固定した3hashは過去証拠として保持し、必須findingを検出する追加負例は別hashで先行固定する。実装モデルLuna/highと既存担当を維持、applied:null。
+
 ## 実行コマンド
 ### 最新CI結果（cd561ed、2026-10-23）
 
@@ -69,3 +71,31 @@ cd561edのexact PR CIはGreen。標準776件、3つのLinux publishと出力検�
 
 ## リスク
 発行されたDebugHostのPDB identityと112 documentの /src/ 対応は遠隔CIで検証済み。一方、実コンテナでのデバッガー接続・実機経路はこの単位では未検証で、packet flow/full-stack Linux acceptance jobsもskipされた。これらの結果を04B3/08等の後続受入の代用にしない。
+
+## I81-NR-003 先行負例（2026-10-23）
+
+- 通常レビュー `reports/issue81-debug-symbols-normal-review-20261023.md` の必須対応matrixを受け、検証器を変える前にbinary fixture試験を追加した。元7試験の意味は保持し、標準ライブラリだけのPE/portable PDB fixtureを3試験追加。先行test source hashは `a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7`、検証器は変更前hash `58e0beb075e195fcb9985a109fafe08580d1f83dbbf993945a5cc33d02465a24`。
+- test sourceのfixture生成が実行するPEとportable PDB readerへ渡ることを確認した。正常20-byte identity + Age=1 + `/src/Tracker.cs` は成功し、Age=2は拒否した。同じGUID・Age=1・同一の有効なsource documentでPE `TimeDateStamp`だけが`#Pdb` IDのStampと異なるfixtureは `verify_contract` が受理し、拒否を期待したtestが `ContractError not raised` で失敗した。実行は10試験、9 pass / 1 fail、Python process exit 1。これは有効なruntime Red。
+- binary fixture bytes: 正常PE `eb0b8ebd35fe45ddac444de3841101aea995fa0ce114eb152fc6708ea75d008a`、Stamp-only mismatch PE `37f120bf56340fcb73e67ee417674962009f21dd8d63eaa8bc8a001c950016c3`。各PDBは同一でSHA-256 `5d70f096d0c9e98c1ac7c57d272b60ecae927e530531a1612e82b278d69ca9c1`。Age=2 PEも保存した。fixture bytesとraw command/stdout/stderr/exit、source hashesは `/tmp/issue81-nr003-red-20261023` に世代別保存し、`inventory-v1.tsv`（21 entries）のSHA-256は `41a944c1ccb5f657633e7d5369c5a8878804f1fed85bff51a705c0918373f064`。
+- 初期試行はfixtureのBlob length prefixが一段多い構築不良、その次はDocument.Nameが`src/Tracker.cs`となる先頭空segment不足であり、いずれも検証器のRedではない。両rawを保持し、今回のRedとして数えない。最終Redは正しく `/src/Tracker.cs` を解析している。
+- 次の修正はreaderがCodeView debug directoryのTimeDateStampを保持し、GUID16 byte + little-endian Stamp4 byteを`#Pdb` IDの全20 byteと比較する最小変更。Age=1、GUID不一致、source path、破損/欠落の既存契約を維持する。親の判断で同じfindingの最小修正を開始する段階へ進んだ。固定v3先行試験・fixture bytesは変更せず、修正後の単体Greenと親が公開するexact CIで3発行・実PDBを別に確認する。
+
+## I81-NR-003 最小修正とローカル検証（2026-10-23）
+
+- `read_codeview_identity`はCodeView GUID、debug directory entryの`TimeDateStamp`、Ageを返すようにした。`verify_contract`はGUID16 byteにStamp4 byteをlittle-endianで連結し、`#Pdb` stream先頭20 byte全体と照合する。Age=1および従来の必須source path・全Document `/src/`・欠落/破損診断を維持。エラーもGUIDとStamp両方の不一致を示す。外部仕様資料の根拠はnormal-review reportのI81-NR-003項に保持。
+- 単体試験は同一の凍結PE/PDB fixtureで、20-byte一致の成功、同GUID・Stampだけ不一致・Age=1・有効な`/src/Tracker.cs`の拒否、Age=2の拒否を確認する。Red v3からのtest source変更はreader APIのtuple形変更に伴う既存4 mock戻り値と新しい2 reader assertionだけ。Red v3をその差分だけ正規化したSHA-256は`a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7`と完全一致し、fixture生成・20-byte期待値・元7試験は不変。
+- 現行hash: `scripts/tests/verify-debughost-portable-pdb.py` `b91b4361c3995f9cae0c22e00bc63a10696dd4b2a649f7001042fa62a08ab561`、`scripts/tests/test-debughost-portable-pdb.py` `4c1a1924bc2833a4d16360e5e3d14ceb27af7fe7a05542eb988e9bc42decd18a`。publish shellは不変 hash `7c430e8daaa1ce5aa45e7490cbc7a3e6a25ab04a3144c08de48e120904635500`。
+- ローカル標準Python試験は10件すべてpass / exit 0。`py_compile`、publish shellの`bash -n`、`git diff --check`もexit 0。最初のpost-fix試験はStamp mismatch PE assertionの期待値を1だけ取り違えた単体test修正であり、verifier failureではない。このrawも別attemptとして保存し、修正後の10件passと区別。
+- 追跡文書のfocused検査はf92基準でtasks/phases各1本文行、2ファイル・2行のみ抽出。テキストlint exit 0、CSpell 2 files / 0 issue / exit 0、Sudachi exit 0 / violationsなし。config、whitelist、対象config、package.jsonは現行sourceと既存mirrorでbyte一致。raw/source/config/inventoryは `/tmp/issue81-nr003-tracking-lint-20261023` に保存（inventory-v1 SHA-256 `c84827f102f6f29f18da7c7769efba3b67089d0d68f867f50313f0e28b7703f8`）。初回の誤workdir CSpellと全ファイルSudachiはfocused結果に数えずrawを保全。
+- Red/Green raw、同一fixture PE/PDB bytes、source hash比較、syntax結果、各試行を含む証拠は `/tmp/issue81-nr003-red-20261023` に世代別manifestで保存。最終manifest `inventory-v3.tsv` は48 entries、SHA-256 `bd5cd8e11e4fbb8f3754ea33439bc56f5456fef02e04d3933c13f00d3ef306a5`。Red v1/v2/v3および後続Green原本manifestは上書きしていない。
+
+### I81-NR-003 matrixの現在状態
+
+| 対応 | 状態 |
+| --- | --- |
+| PE CodeView GUID+Stamp全20 byteを保持し`#Pdb` IDと照合 | 実装済み。`<I` little-endian Stampを含む。 |
+| Stampのみ不一致の実reader先行Red→Green、正常20-byte組も成功 | 先行Redで10件中1件が実行時fail。最小修正後10/10 pass。Age=1/source文書条件を同時に固定。 |
+| 既存標準776件・3発行・CI実PDB照合と既存7ケース維持 | 元7ケースと3発行scriptは不変更。標準/.NET/実publish CIは未実行。親が候補を公開した後のexact PR CIが必要。 |
+| 証拠・記録 | Red/Green・source/fixture hash・追跡2行lintのrawと世代別manifestを保存。親側の公開/CI同期と同じ既存レビュアーによる再確認待ち。 |
+
+- .NET/CIは`remote_ci_only`なのでローカル実行・成功推定をしていない。現在のHEADは親管理の未公開作業treeでcommit/pushは未実施。親による公開後、同一修正に対するexact CIで標準試験・全3発行・実PDBの完全ID/source検査を確認する必要がある。
