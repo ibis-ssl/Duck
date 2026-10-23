@@ -251,6 +251,7 @@ assignment の結果は、まず候補 edge 内で対応する pair 数を最大
 6. `/diagnostics` では同じ diagnostics sample tick に三者を合わせる。取り出す場合は Windows の記録保存先全体を複製する。後日の再生専用起動は保存先を `/data/replay` へ読み取り専用で割り当てる。通常停止や再作成で元記録を削除しない。
 
 Windowsでの接続方法、デバッグ用配布物、保存先の読み書きの権限、再生時の読み取り専用動作は未実装・未検証である。操作手順を記述したことは成功の証拠ではない。
+通常用 `DebugHost` の基底、固定参照、発行出力の入力元は[Linux配布設計](aspire-simulation-test-environment.md#linux-向け通常コンテナの配布定義-i81-04b2)のI81-04B2に従う。`/vsdbg/vsdbg` などの追加デバッグ資材とWindowsからの接続はI81-04B3および実機受入で別に確認し、通常用コンテナイメージの定義を成功根拠にしない。
 
 ## 起動失敗と部分起動
 

@@ -44,6 +44,18 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 自動検査では既存プロジェクトを実際に発行し、生成先の各ファイルと `.runtimeconfig.json` の .NET 10 の共有実行基盤を使う設定を検査する。新しい配布一覧だけの自己検査で代用しない。ここではイメージの取得・作成・起動、外部成果物の取得、実行中の依存導入、デバッグ資材の追加を行わない。
 
+### Linux 向け通常コンテナの配布定義（I81-04B2）
+
+`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が既に参照する外部イメージ6件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。`GHCR` の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。
+
+| 管理プログラム | 固定基底 | 定義ファイルと入力元 | 実行入口 |
+| --- | --- | --- | --- |
+| `Tracker.RuntimeHost` | 固定した `mcr.microsoft.com/dotnet/runtime` 参照 | `Tracker/Tracker.RuntimeHost/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Tracker.RuntimeHost.dll` |
+| `Tracker.DebugHost` | 固定した `mcr.microsoft.com/dotnet/aspnet` 参照 | `Tracker/Tracker.DebugHost/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Tracker.DebugHost.dll` |
+| `Duck.Testing.RefereeDriver.Host` | 固定した `mcr.microsoft.com/dotnet/aspnet` 参照 | `Testing/Duck.Testing.RefereeDriver.Host/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Duck.Testing.RefereeDriver.Host.dll` |
+
+3つの `Dockerfile` は `COPY . /app` でそれぞれの発行先を取り込み、実行入口のアセンブリと共有実行基盤を発行出力に合わせる。RuntimeHostは `Microsoft.NETCore.App`、画面プログラムと審判情報受信プログラムは `Microsoft.AspNetCore.App` を使う。DebugHost用の追加デバッグ資材と事前配布するデバッガーはI81-04B3、AppHostから固定参照を選択する接続はI81-05に属する。ここでの検査は固定表と同じCI実行で生成した発行出力を照合するが、コンテナイメージの取得・作成・起動や実行環境での提供成立は証明しない。
+
 ## 配置案
 
 図の破線は未実装の管理・起動経路を表す。各資源内の UDP 準備確認機能もブリッジ内で動く。別所有者のコンテナはネットワークに加えない。

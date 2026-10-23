@@ -1,0 +1,8 @@
+{
+  "command": [
+    "python3",
+    "scripts/tests/test-linux-distribution-definitions.py"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0
+}
