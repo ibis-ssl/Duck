@@ -50,6 +50,70 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp()
+    {
+        using var appHost = await CreateAppHostAsync();
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        AssertLinuxDistribution(
+            duck,
+            "Tracker/Tracker.RuntimeHost",
+            "Tracker.RuntimeHost.dll",
+            "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3");
+        Assert.DoesNotContain(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "referee-driver");
+    }
+
+    [Fact]
+    public async Task ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
+
+        var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
+        AssertLinuxDistribution(
+            debugHost,
+            "Tracker/Tracker.DebugHost",
+            "Tracker.DebugHost.dll",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+        var http = Assert.Single(
+            debugHost.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Tcp && endpoint.TargetPort == 8080);
+
+        Assert.Null(http.Port);
+        Assert.Equal("127.0.0.1", http.TargetHost);
+        Assert.DoesNotContain(
+            debugHost.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+    }
+
+    [Fact]
+    public async Task ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress()
+    {
+        using var defaultAppHost = await CreateAppHostAsync();
+        Assert.DoesNotContain(defaultAppHost.Resources, resource => resource.Name == "referee-driver");
+
+        using var selectedAppHost = await CreateAppHostAsync(
+            "--RefereeDriver:Enabled=true",
+            "--Testing:ContainerMode=true");
+        var refereeDriver = Assert.IsType<ContainerResource>(Find(selectedAppHost, "referee-driver"));
+        AssertLinuxDistribution(
+            refereeDriver,
+            "Testing/Duck.Testing.RefereeDriver.Host",
+            "Duck.Testing.RefereeDriver.Host.dll",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+        var environment = await GetResourceEnvironmentAsync(refereeDriver);
+
+        Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
+        Assert.Equal("ws://game-controller:8082/api/control", environment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.Equal("true", environment["Testing__ContainerMode"].ToString());
+        Assert.DoesNotContain(
+            refereeDriver.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+    }
+
+    [Fact]
     public async Task ComparisonModeAddsPinnedExternalTrackersAndObserverWithoutAnotherRefereeProducer()
     {
         using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
@@ -385,6 +449,41 @@ public sealed class AppHostApplicationModelTests
 
     private static IResource Find(IDistributedApplicationTestingBuilder appHost, string name) =>
         Assert.Single(appHost.Resources, resource => resource.Name == name);
+
+    private static void AssertLinuxDistribution(
+        ContainerResource resource,
+        string projectPath,
+        string entryAssembly,
+        string expectedFrom)
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var projectDirectory = Path.Combine(repositoryRoot, projectPath);
+        var build = Assert.Single(resource.Annotations.OfType<DockerfileBuildAnnotation>());
+
+        Assert.Equal(
+            Path.GetFullPath(Path.Combine(projectDirectory, "bin", "Release", "net10.0", "publish")),
+            Path.GetFullPath(build.ContextPath));
+        Assert.Equal(Path.GetFullPath(Path.Combine(projectDirectory, "Dockerfile")), Path.GetFullPath(build.DockerfilePath));
+        Assert.Contains(
+            File.ReadAllLines(build.DockerfilePath),
+            line => string.Equals(line.Trim(), "FROM " + expectedFrom, StringComparison.Ordinal));
+        Assert.Contains(
+            File.ReadAllLines(build.DockerfilePath),
+            line => string.Equals(line.Trim(), "ENTRYPOINT [\"dotnet\", \"" + entryAssembly + "\"]", StringComparison.Ordinal));
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+            {
+                return directory.FullName;
+            }
+        }
+
+        throw new DirectoryNotFoundException("Duck repository root could not be located from the test output directory.");
+    }
 
     private static async Task<DockerWrapperLaunchOptions> GetLaunchOptionsAsync(ExecutableResource resource)
     {
