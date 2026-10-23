@@ -139,4 +139,10 @@ publish_project \
   "Duck.Testing.RefereeDriver.Host.deps.json" \
   "Duck.Testing.RefereeDriver.Host.runtimeconfig.json"
 
+python3 "$repo_root/scripts/tests/test-debughost-portable-pdb.py"
+
+python3 "$repo_root/scripts/tests/verify-debughost-portable-pdb.py" \
+  --publish-directory "$publish_root/Tracker.DebugHost" \
+  --expected-document "/src/Tracker/Tracker.DebugHost/Program.cs"
+
 printf 'Linux publish output contract passed for all three managed applications.\n'

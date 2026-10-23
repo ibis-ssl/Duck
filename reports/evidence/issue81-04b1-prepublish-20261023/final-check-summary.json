@@ -1,0 +1,31 @@
+{
+  "files": 2,
+  "changed_rows": 5,
+  "config_script_files_identical": 20,
+  "checks": [
+    {
+      "name": "final-target-list",
+      "exit": 0,
+      "stdout": "Tracker/Design/phases-status.md\nTracker/Design/tasks-status.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "final-textlint",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "final-cspell",
+      "exit": 0,
+      "stdout": "",
+      "stderr": "1/2 Tracker/Design/phases-status.md 30.24ms\n2/2 Tracker/Design/tasks-status.md 6.16ms\nCSpell: Files checked: 2, Issues found: 0 in 0 files.\n"
+    },
+    {
+      "name": "final-sudachi",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

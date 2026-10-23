@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "tigersmannheim/sumatra:2025"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "metadata_only": true
+}
