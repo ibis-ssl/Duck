@@ -250,8 +250,13 @@ if (testingMode == "comparison")
         .WithEnvironment("Tracker__Uuid", "debug-host-observer")
         .WithEnvironment("Tracker__SourceName", "debug-host-observer")
         .WithEnvironment("Testing__ContainerMode", "true")
-        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false)
-        .WithHttpEndpointCallback(endpoint => endpoint.TargetHost = "127.0.0.1", name: "http", isProxied: false)
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    var httpEndpoint = debugHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    httpEndpoint.Port = null;
+    httpEndpoint.TargetHost = "127.0.0.1";
+    debugHost
         .WaitForStart(simulator)
         .WaitForStart(duck)
         .WaitFor(trackerTigers)
