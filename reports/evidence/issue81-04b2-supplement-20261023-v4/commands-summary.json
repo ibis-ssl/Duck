@@ -1,0 +1,107 @@
+[
+  {
+    "name": "mcr_runtime",
+    "argv": [
+      "curl",
+      "--silent",
+      "--show-error",
+      "--location",
+      "--head",
+      "--max-time",
+      "30",
+      "--header",
+      "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+      "https://mcr.microsoft.com/v2/dotnet/runtime/manifests/10.0"
+    ],
+    "exit": 0,
+    "url": "https://mcr.microsoft.com/v2/dotnet/runtime/manifests/10.0",
+    "stdout_bytes": 1097,
+    "stderr_bytes": 0,
+    "stdout_sha256": "0c28d8b5ec6ca6dfadb5b18443eaf258166744ef6efe82963fada2c7f4b8c319",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "mcr_aspnet",
+    "argv": [
+      "curl",
+      "--silent",
+      "--show-error",
+      "--location",
+      "--head",
+      "--max-time",
+      "30",
+      "--header",
+      "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+      "https://mcr.microsoft.com/v2/dotnet/aspnet/manifests/10.0"
+    ],
+    "exit": 0,
+    "url": "https://mcr.microsoft.com/v2/dotnet/aspnet/manifests/10.0",
+    "stdout_bytes": 1097,
+    "stderr_bytes": 0,
+    "stdout_sha256": "79f615e3b6d453aa1f6aecab6101ca2544a24fd1241a4598e90f09c842dc92bd",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ghcr_framework",
+    "argv": [
+      "curl",
+      "--silent",
+      "--show-error",
+      "--location",
+      "--head",
+      "--max-time",
+      "30",
+      "--header",
+      "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+      "https://ghcr.io/v2/ibis-ssl/framework-simulatorcli/manifests/a52b6bd"
+    ],
+    "exit": 0,
+    "url": "https://ghcr.io/v2/ibis-ssl/framework-simulatorcli/manifests/a52b6bd",
+    "stdout_bytes": 324,
+    "stderr_bytes": 0,
+    "stdout_sha256": "019af317beb70a0700452534f4a048f6a4fd4cbaf9833485f5a65d02d20f5e31",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ghcr_crane",
+    "argv": [
+      "curl",
+      "--silent",
+      "--show-error",
+      "--location",
+      "--head",
+      "--max-time",
+      "30",
+      "--header",
+      "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+      "https://ghcr.io/v2/ibis-ssl/crane/manifests/scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d"
+    ],
+    "exit": 0,
+    "url": "https://ghcr.io/v2/ibis-ssl/crane/manifests/scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+    "stdout_bytes": 307,
+    "stderr_bytes": 0,
+    "stdout_sha256": "934fa1ba896127e59bb2a934aa86f52fe5e8d6136d4db396900cc125351e5430",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ghcr_orion",
+    "argv": [
+      "curl",
+      "--silent",
+      "--show-error",
+      "--location",
+      "--head",
+      "--max-time",
+      "30",
+      "--header",
+      "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+      "https://ghcr.io/v2/ibis-ssl/orion-cm4-sim/manifests/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"
+    ],
+    "exit": 0,
+    "url": "https://ghcr.io/v2/ibis-ssl/orion-cm4-sim/manifests/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+    "stdout_bytes": 315,
+    "stderr_bytes": 0,
+    "stdout_sha256": "8d167a52d12192297af8af8eb0d5e67d7bd630a39db1e6ab23499e2bfd887a8c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

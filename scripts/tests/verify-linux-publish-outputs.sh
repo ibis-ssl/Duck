@@ -145,4 +145,10 @@ python3 "$repo_root/scripts/tests/verify-debughost-portable-pdb.py" \
   --publish-directory "$publish_root/Tracker.DebugHost" \
   --expected-document "/src/Tracker/Tracker.DebugHost/Program.cs"
 
+python3 "$repo_root/scripts/tests/test-linux-distribution-definitions.py"
+
+python3 "$repo_root/scripts/tests/verify-linux-distribution-definitions.py" \
+  --repo-root "$repo_root" \
+  --publish-root "$publish_root"
+
 printf 'Linux publish output contract passed for all three managed applications.\n'
