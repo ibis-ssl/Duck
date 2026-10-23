@@ -79,6 +79,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - bafbe7/f36eda/60463c/d0dc79の読取はexit0。bc7b47はmanifestをheader付きと仮定したKeyErrorでexit1、cc71c7はrepo:参照をbundle相対と仮定しgit showがexit128（Python helper全体exit1）になった。いずれも読取だけで書込み/試験実行なし。実headerless sha/size/pathとrepo:参照を確認後、d0dc79で85件全照合を完了した。
 - 新build/test/lint/CI/実container/DCP/execは発行していない。既存資材・commit内source/raw/metadataの照合だけを実施。自己証拠は /tmp/issue81-06a1-nr009-commit-review-20261023/。
 
+### NR009 第4回・最小残actionのcommit固定検証
+
+- reviewed_commit: 26c9e8655c0011a0e53628f7291ba86703db5895。Protocol SHA94bcc52414e0802cf049f80427145d663825f801a11d5f88e0ecf0eb2fd57e21。git showで不変commitの製品/新fixture/同commit設計・tracking差分/証拠を読んだ。既存Sol6.1/high要求、applied:null、normal_persistence、report_attestation_allowed:false、新agent/入れ子なし。
+- 読取3577ca/8b955b/4cf933/f7848d/d870f0はexit0。2b5854はmanifest列順の仮定でAssertionError/exit1、acbeb2はGit未追跡のobj/project.assets.jsonをcommit内へ要求してgit exit128/Python exit1となった読取失敗。書込み/試験発行なし。観測したrelative_path/bytes/sha256列順へ合わせ58件全照合後、生成入力は既存diskのhash確認と区別した。
+- 新test/build/lint/CI/実DCP/execは実行していない。通常report子5欄と /tmp/issue81-06a1-nr009-close-review-20261023/ の自己確認証拠のみ保存する。親prefixの更新拒否は親通知として保持し、代行変更しない。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -135,6 +141,16 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - manifest-v3.tsvはheaderなし85件、SHA960df89bad8b4126916e780908ff326d3e11442962fc18235c4b17c4547988d2。bundle相対とrepo:参照をcommit内へ解決し、全size/hash一致。8組の44d8... metadata/source/raw hash/byte数も一致。
 - 現sourceのprotocol5/5、boundary11/11、liveness4/4、noncooperative4/4、無filter805/805・0fail・0skipは各exit0。標準argvはdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -p:EnableSourceControlManagerQueries=false。RuntimeHost build0warning/error0、AppHost build既存ASPIRE010 warning1/error0、両exit0。805結果を旧801世代へも新しいPR CI結果へも移さない。
 - 元5/11/4testのSHAはa9ef455.../58c304.../2d136c...を維持。protocol-suite-v2のmetadata当初対象リストに元5test hashがなかった限界は、後続記録/manifest内repo:sourceと区分する。個別805caseのTRXを確認した主張ではない。
+
+### 第4回の固定対象・source/証拠対応
+
+- Protocol差分はRunWithDeadlineAsyncのoperationTask保持とfinallyのObserveFault呼出し、fault-only continuation追加（391–415行）。既存待機期限/所有UDSのusing/Completion監視/ownsSocketPath条件は変えていない。Program SHA4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117bも不変。
+- 新RuntimeIdentityControlOperationLifetimeTests.cs全162行、SHA30a22fe1c8031f36ea8aec66951555999e0efa7f74d9986fc71dae95f1f9005d。late faultのUnobservedTaskException/GC/WeakReference、timeout後UDS後続接続、実RuntimeHost project outputを起動するchild-process fixtureを全読した。新説明/XMLコメントは日本語。
+- manifest-nr009-close-v2.tsvは58件、SHA0330b12b28618b5e8cb74f54725bed6860ffd827f986743c84f4b303d0e6ecb9。全size/hash一致。red-v2は同fixture SHA、旧Protocol44d8...、2pass/1fail/skip0/exit1でlate fault観測assertだけ失敗。green-v1はProtocol94bcc...、同fixture3pass/skip0/exit0。初期test-bin copy起動のexit134/Microsoft.Extensions.Hosting解決失敗はsetup failureとして分離した。
+- full-suite-v1はfilterなし808pass/0fail/0skip/exit0。RuntimeHost build0warning/0error、AppHost build既存ASPIRE010 warning1/error0、両exit0。標準argvはdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -p:EnableSourceControlManagerQueries=false --verbosity minimal。
+- 単独child-process-project-output-v2は1pass/exit0で、fixtureはstdinを閉じずexpected child exit2を35秒上限で検査し、raw duration30秒。旧単独記録のDLL hash f3a3...は後続buildのDLLとは異なるため、現DLLとの一致や94bcc...の単独binary証拠に転用しない。94bcc...に帰属するGreen3/full808が同じchild fixtureを含むことと、後続build成功を別根拠にする。runtimeconfig/depsと既存assetsの現disk hashは保存値一致、DLLの世代差は保持した。
+- 主/比較設計の語彙置換16追加行は、完全ID/RunId/ResourceId/Generation/BootId、DCP単一owner、host HTTPで選ばない、未帰属/503、外側未実証の意味を維持する。tasks/phasesの2変更行は現94bcc.../808と通常確認後続を記録し、NR005/TDD/実機未完了を保持する。
+- tracking-lint-v2はその2変更行内の追加断片（130/73文字）を2入力にした三検査で、各exit0・timed_out false。preflightのbaseline/current sourcehash、入力hash、9config hashをcommit/保存入力と照合し一致、両断片の現source内連続一致も確認。全文/行全体すべての合格へ拡張しない。全文CSpell/Sudachi未合格と初回語彙指摘rawを保持する。
 
 ## 指摘事項
 
@@ -282,6 +298,20 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - NR006/007/008はclosedを維持。新helper利用でもNR007のCompletion監視/finally cleanupとNR008のownsSocketPath条件は保持される。再openを要する差分は見つからない。
 - NR005/P1/openは外側の実DCP identity供給未実装のため維持。PD-I81-06A1-TDD、旧TDD履歴、文書lint未合格、図/実機/独立finalは別held。新固定4caseの有効Red→Greenで過去の事前Red欠落を補填しない。
 
+### I81-NR-009 / P2 / closed — 有限待機・遅延fault観測・所有境界を確認
+
+- protocol401–415のfinallyは、未成功operationTaskへOnlyOnFaulted/ExecuteSynchronously/TaskScheduler.Defaultのcontinuationを付け、completed.Exceptionを読む。callerがtimeoutで戻った後のfaultを未観測のまま捨てない。成功/cancelはfaultとして偽装せず、強制停止保証も加えていない。
+- 固定late-fault fixtureは旧44d8...でmarker付きUnobservedTaskExceptionを検出して失敗し、94bcc...で不検出かつWeakReference target解放を確認して成功。単なる試験都合のfake Releaseではなく、今回必要だった遅延fault観測に直接対応する。
+- UDS fixtureは取消非協力のNeverCompletingTextWriterを解放せずにrelay exit2を確認し、同じserverへの次のprepare/commitがexit0で成功する。所有UDSはRunAsyncのusingで閉じる。caller所有TextWriterそのものを強制停止した主張ではない。
+- 実CLIはProgramの専用分岐でConsole.In/Outを使い、relayの終了コードを設定して通常hostを起動せず戻る。実project outputのchild fixtureはstdinを開いたまま待ち、約30秒の既定期限でprocess exit2を検査する。この実運用の短命process境界を、内部helperの有限待機と組み合わせて受け入れる。全ての任意TextReader/Writerを停止する新保証は要求しない。
+- 前回required actionの最小範囲である期限後fault観測、所有接続の解放、caller stdio/process lifetimeの具体化とfixtureが揃ったためclosed。実stdout詰まりのchild-process実測、全OS/実DCP execの検証まで拡大していないことは未検証境界として残す。新規必須findingなし。
+
+### 第4回の既存finding・工程
+
+- NR006/007/008closedを維持。今回差分はこれらの所有保護/監視/cleanupを緩めない。NR005/P1/openは外側の実identity供給が未実装であり、NR009closedで代替しない。
+- PD-I81-06A1-TDD（初期Hosted第5testの事前Red欠落）は未充足、waiverなし。今回同3fixtureの有効Red→Greenはこの最小修正に帰属し、過去の欠落を埋めない。旧TDD/全文文書gate/図本人確認/実機/独立finalも保持。
+- 親prefixの旧b96/44d8未評価という記載はそのまま保存する。今回の最新reviewed_commitと閉鎖判断は子欄の本履歴に明記し、親欄の判定を代行編集しない。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -410,6 +440,22 @@ current_verdict: needs_changes。NR009/P2/open（timeout後のtask観測/所有I
 
 reviewed_commitは2a6fd94455978021cd995104751f4f09b0a28dfd。旧未commit b96d255...世代の判定を消さず、新commitの限定結果を追記した。PR CI/実DCP/実exec成功ではなく、通常cycleの結果である。
 
+### 第4回・commit26c9e865の通常判定
+
+NR009_fix_verdict: closed。06A1の今回技術範囲はpass_with_held、製品必須0。ただし05B1を含む通常cycle全体のcurrent_verdictはneeds_changes、NR005/P1/openが1件残る。NR006/007/008/009closed。TDD工程未充足は技術判定と別であり、Issue全体完了/独立finalではない。
+
+| NR009必要対応 | 確認根拠 | 結論 |
+| --- | --- | --- |
+| 有限caller待機 | 既存固定4非協力fixture/共通deadline機構を保持 | 解消済み |
+| timeout後の遅延fault観測 | 同30a22... testのRed2pass1fail→Green3pass、fault continuation | closed |
+| 所有UDSの解放 | NeverCompleting writerを解放せずexit2、次の実UDS handoff成功 | closed |
+| stdioの寿命契約 | 実project output/Program専用入口、stdin未終端のchildが既定期限exit2 | 限定契約で確認 |
+| 回帰/build | 無filter808/0/0、両build exit0、58entry一致 | pass_in_evidence |
+| 文書/tracking | 語彙置換の契約維持、2追加断片三検査0 | 全文gate未合格を維持 |
+| 外側identity/工程/実機 | NR005、PD-I81-06A1-TDD等 | 未完了を保持 |
+
+reviewed_commit: 26c9e8655c0011a0e53628f7291ba86703db5895。local保存証拠を照合した判定であり、このcommitのPR CI成功を新たに確認したものではない。旧b96/44d8等のneeds_changes履歴を消さず、今回の最小閉鎖を追記した。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -458,3 +504,10 @@ reviewed_commitは2a6fd94455978021cd995104751f4f09b0a28dfd。旧未commit b96d25
 - 待機期限で戻ることと基底IOを物理的に停止することを混同しない。任意TextReader/Writerの強制停止は要求せず、内部taskのfault観測と、所有接続/caller stdio/短命CLI processの責任を限定する。未測定のConsole process終了を合格として補わない。
 - 全805は保存raw集計、実CI/実機/個別805TRXの検証ではない。旧metadata companion、旧重複process元exit未回収、旧TDD/文書gate等の履歴は保持。
 - 不変commitからsource/evidenceを読み、後続作業木へ成功を移転しない。自己編集は通常report子5欄と/tmp確認証拠のみ、親prefix/全旧履歴を保持。製品/test/台帳/raw/第三者reportは変更しない。全自己process終端・未回収session/exitなし、applied:null、report_attestation_allowed:false。
+
+### NR009 最小閉鎖の終端
+
+- helperは有限待機と遅延fault観測を保証する内部機構。取消非協力な任意caller IOの強制停止ではない。所有UDSの解放と、caller所有stdioを短命CLI process寿命へ置く境界を分ける。実child証拠はidle stdinの終了で、全種類のstdio詰まりや全OSの測定ではない。
+- NR005実owner/engine ID供給、外側DCP通知/exec、実container/UDP sender所有、実機/独立finalは未実装・未検証。PD-I81-06A1-TDDと全文文書gate不合格を今回成功で消さない。
+- 成功808は保存raw集計、個別808TRX/実機成功ではない。旧test-bin exit134のsetup failure、metadata原本/companion、旧重複processの元exit未回収を別履歴で保持。
+- 親prefix/旧子5欄を保持し、自己変更は通常report子5欄と/tmp確認証拠のみ。製品/test/台帳/第三者report/rawを編集せず、新agent/build/test/lint/CI/実DCPなし。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
