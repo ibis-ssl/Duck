@@ -1,0 +1,8 @@
+{
+  "status": "preflight_failed_before_any_linter",
+  "action": "locate the existing Sudachi system dictionary by searching from pathlib.Path(sudachi_python).resolve().parents[1]",
+  "reason": "python executable resolves through /usr/bin, so the search root was /usr; no system.dic was found",
+  "exit": 1,
+  "stdout": "Traceback (most recent call last):\n  File \"<stdin>\", line 74, in <module>\nAssertionError: expected one existing system.dic, found 0\n",
+  "no_linter_started": true
+}

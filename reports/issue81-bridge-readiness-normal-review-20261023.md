@@ -105,6 +105,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - helper4329f9/e2c375/644843は各exit0。対象commitの製品1file差分、新fixture全体、保存Red/Green/related/build/restoreの実command配列・exit・raw集計、summaryの世代対応を読取した。新test/build/lint/CI/DCP/execは発行していない。
 - reports/evidence/issue81-nr010-current-resource-key-20261023/manifest-v1.tsvは23entry、SHA5140cb83b1f14ff93deaff5c93ee1b1b35a8d20aaaa18ad05cc1d21f397605ea。全size/hash一致、不一致0。fixtureの証拠コピーとcommit内testは同byte。自己proofは /tmp/issue81-nr010-normal-fix-review-20261023/。
 
+### 05B2 明示VisionSimulationOnly構成の通常レビュー
+
+- reviewed_commit: b14800065c93343ef7fef18bba92290f19ca958c、base: 7cd1c2512872062d80b8d83312f2a19065e81b31。同じ通常担当、requested gpt-6.1-sol/high、applied:null、reused_existing_agent_profile、normal_persistence、single_agent/decomposition forbidden、report_attestation_allowed:false。既読の正本review-enforcer/review-worker/work-context-manager等を継続適用し、新agent/独立finalなし。
+- 正規PowerShell login:false / require_escalated→WSL Pythonで固定差分・直接依存・保存証拠を読取。helper4db4e7/a23ab2/88c4cd/c6cdf4/f8d846はexit0。2db84fはmanifestを旧形式と誤認してheaderをpathとして読んだためgit show exit128/読取helper exit1。書込や試験発行はなく、実header path/bytes/sha256を確認後88c4cdで全照合を完了した。
+- vision bundleの21entryとlint bundleの35entryは全size/hash一致。各manifest SHAはf5c3582ec39512ad92579e7d6a488ac9a3d4a9405bac30e3bad6f92e3abcd0ea、7dd0cbb6cab560a6acf4df0fddeabf4b9e01d7e428bef5288b219054defa4303。新build/test/lint/CI/実DCP/exec/画像操作は行っていない。自己proofは /tmp/issue81-05b2-normal-review-20261023/。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -194,6 +200,14 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs SHA3efc24a224ace87f88065060ec36b467c0f695d41e324feed0bafed8678169a9。最初のresourceId固定を除去し、各observation.ResourceIdからcurrentを取得して同keyでprojectionする298–307行を確認。generation/lastContainerId/lastBootIdは従来どおり有効projection後に進み、handoff受理後に保持する。role/登録参照/fullID両snapshot一致、engine/owner検査を迂回しない。
 - Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs SHAbe11812e9dd0f8645bbde95415f38af7235940ecc5efd15e176d7c4b3a2915d8。実ResourceNotificationServiceと実ContainerIdentityHandoffServiceへ同じ登録IResourceのStarting/ID無しkey A→Running/fullID有りkey Bを公開し、1回だけBのResourceIdでrelayされたことを確認する。Docker runnerだけfakeであり、helper投影だけの試験ではない。
 - a567からの製品/試験差分は上記2path。既存06A3全範囲を再評価せず、raw/summary/製品patchの対応だけを確認した。今回新たな関数説明/XMLコメントの追加・変更はない。
+
+### 05B2 対象と直接依存
+
+- Program.csの追加61行、AppHostApplicationModelTests.csの追加51行、主設計の1段落、tasks/phases現在値、実装report追補、前回通常report保存分、2証拠束を確認した。製品SHA63075593c8ab5619d0bd88ed213d9c130b6d8c1c960d58b07df89920593f4d69、試験SHA933d3fcd60e136a7dd2352f7e52439452b175e6ace3ad39ba03fdb77093c8068、主設計SHAd259bcbd3d5722a97da2ff66f2715c7f67b3d2c38c68fc71a9be4f491d80ed1fは成功記録before/afterと一致する。
+- 明示VisionSimulationOnly分岐はRuntimeHostOnly分岐の後、旧base/comparison分岐の前にあり、登録後returnする。2資源はsimulatorとduckのみ。既定/単独選択と従来base/comparisonの本文は変更されない。StackOwnershipLease、AddPublishedContainerの既存Release publish context、既存identity bridgeを再利用する。
+- simulator固定indexはlinux-image-lock.jsonのframework-simulatorと一致し、tag overrideは不一致を拒否する。WithEntrypoint(tini)と引数 -- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellowを確認。既存Aspire.Hosting13.5.4のXMLはWithEntrypointをコンテナentrypoint設定、ContainerResource.Entrypointをその公開propertyとして記載する。専用annotationの不存在はentrypoint指定不能を意味しない。
+- duckはsim profile/ContainerMode/identity control RunId・roleを明示し、VisionReceiverの224.5.23.2:10020を既存options/DIへ渡す。WaitForStart(simulator)で起動順を作り、循環依存なし。TCP target39108/host動的/127.0.0.1/nonproxy、GET /health/visionの既存strict判定を保持。UDP endpoint/host network指定を追加しない。RuntimeHostのreceiver/診断/HTTPは変更されず、新受信を伴わない503をreadyへ読み替えない。
+- 試験は実AppHostモデルを構築して2資源・固定image/digest・args callback・環境・UDP非公開・health/待機依存を確認する。新規関数説明/XMLコメントは追加されず、追加inline説明は日本語。
 
 ## 指摘事項
 
@@ -388,6 +402,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 有効Red：修正前製品e80df753・固定新test be11812でcompile後にAssert.Singleのcollection empty、1fail/0pass/0skip、exit1。Greenは同testで1pass/0fail/0skip、exit0。summary上の最初のGreen製品c3bd6bと最終3efc24a2を区別し、最終related3件/buildの保存結果を併せて確認した。期待値緩和やskip化なし。
 - NR005/P1/open、NR006/007/008/009 closedを維持。今回の正常系fixtureは実Docker/DCP/exec/UDP-ready成立や旧TDD不足の補填ではない。
 
+### 05B2 通常所見
+
+- **新規必須製品findingなし**。この明示構成差分に正常系を止める静的欠陥は認めない。NR010 closedを保持し、NR006/007/008/009を再開する変更なし。NR005/P1/openは正常UDP入力から厳格な準備完了までの実測未成立として保持する。
+- 工程/証拠境界：製品前rawは2資源期待/実5資源のruntime失敗を記録するが、当初test af85af1fと現933d3fcdは同byteではない。追加後のTag=nullと専用Entrypoint annotation不存在は試験のSDK仮定を訂正した履歴であり、固定repository/index digest/引数契約は維持される。初回Red/v2のresult.json・command metadataは未保存で再構成していないため、最終全assertionの固定Red→Green完全証跡とはしない。
+- v3/v4は実際の.NET試験出力とAssert.Single失敗、保存exit1を確認。WSL E_ACCESSDENIEDとしていた報告は別の後続ログ読取失敗との混同として訂正済み。アクセス拒否/追加承認待ちをこの製品結果へ持ち込まない。今回の自分の実行は正規require_escalated経路で終端した。
+- 非阻害held：追加行CSpell14/Sudachi28が残る。全文gateと今回の構成技術判定を分け、本人の正常系/費用対効果優先に従い文書磨き込みや網羅異常系を新必須へ追加しない。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -563,6 +584,13 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 新testのCS0618は旧形式ResourceNotificationService constructor利用の警告で、実通知/実HostedServiceの使用を阻害していない。150ms待機はfixtureの実行余裕で、実DCP通知の期限保証を主張しない。現在の成功を覆す根拠にはせず、網羅異常系や汎用化の追加必須を設けない。
 - summaryのa567 exactCI39985949526/827成功・3publish/16checkは旧基準の記録で、7cd1c251修正のexactCIや全suite成功へ転用しない。新commitの全suite/CI成功は今回確認していない。限定修正の確認は保存されたlocal関連3件とbuildに基づく。
 
+### 05B2 構成差分の通常判定
+
+- **pass_with_held / この単位の新規必須0**。cycle全体はNR005/P1 openの残必須1を保持する。全Issue完了・独立final・attestationではない。
+- completeness：明示2資源/既定非破壊＝確認済み、固定image/entrypoint/argsとpublish context＝静的・SDK契約確認済み、UDP非公開/TCP localhost動的/開始依存/strict health＝構成と直接依存で確認済み、focused1/1・構成26/26・skip0・AppHost build exit0/既存ASPIRE010警告1＝保存実command/rawで確認済み。成功3段階のcwdは本worktree、/usr/bin/dotnetのrealpathは/usr/lib/dotnet/dotnet、no-restoreとEnableSourceControlManagerQueries=falseであり、source before/afterは固定commitと一致する。
+- 文書入力はbase7cd→本commitの追加行からbyte一致で再照合した。tasks4行、phases2行（本文1+空白1）、主設計2行（段落1+空白1）の3入力と8設定hashが一致。textlintは準備不足の失敗v1/v2を経たfinal-v3 exit0、CSpell/Sudachiは同入力のfinal-v2で各exit1・14件/28件。単一--filesに3path、実cwd/config/raw hashを確認した。全体文書gate成功や新規指摘なしへ変換しない。
+- 既存RuntimeHost-only観測summaryの参照SHA93763ab7276b3b8c1c91b07c7e974179f296acc18a7ffc8999eef9fe3fdb142fは実workspace原本と一致。旧7cd/Run fed97710c9cc4b0885f6b827b98d0845に対する単一所有コンテナの完全ID/labels・exec exit0・localhost動的公開・終了後資源不在・UDP無しhealth503の記録である。2資源multicast到達/入力後readyの証拠ではない。旧7cdの828件成功も現在b148 exactCIへ転用しない。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -638,3 +666,10 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 実DCPが初期A→Bを通知する頻度は未実測。静的欠陥と実通知fixtureは閉じたが、明示Desktop context/実Engine/fullID/owner labelsから実exec・資源内UDS・実UDP-readyへ至る正常系E2Eは未確認でNR005を保持する。
 - 既存TDD手順不足、全文文書gate未合格、図本人視認、外部G1/G3、実機/実流量、独立finalは未解消。今回のruntime RedはNR010固定fixtureの修正履歴に限り、06A1/02/03等の過去Red不足へ遡及しない。
 - 親prefix/Dispatchと初回a567を含む全旧子欄履歴を保持。自己編集はこのnormalreport子5欄と/tmp proofのみ。製品/test/第三者結果/raw/台帳を変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### 05B2 通常レビュー終端
+
+- 最短の次確認は明示2資源を実DCPで起動し、既存simulatorの正常Vision入力がduckで復号され、identity供給後のhealthが200になることと所有cleanupを観測する工程。今回は構成/model/buildまでで、実通信の成立は主張しない。DesktopBridgeEnabled/context/Engine IDは別の明示設定であり、VisionSimulationOnlyだけでbridgeを暗黙有効化しない。
+- 参照した単一RuntimeHost観測はsanitized summaryに基づく限定証拠。raw event stream/回数/正確な観測窓は未保存、Ctrl+Cのwrapper session exit1とAppHost自身のexit未取得を保持する。exec反復回数やidentity generation成立を推測しない。
+- 既存TDD不足、全文文書gate未合格、図本人視認、G1/G3・実機/全資源受入・独立finalの未完了を保持する。任意の一般化・異常系拡張・文書整備で正常系を止める条件を追加しない。
+- 親prefix/Dispatchと全旧子欄履歴を保持。自己編集はnormalreport子5欄と/tmp proofのみ。製品/test/設計/台帳/第三者結果/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。requested Sol6.1/high・applied:null、report_attestation_allowed:false。
