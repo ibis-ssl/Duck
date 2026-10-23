@@ -1,0 +1,12 @@
+{
+  "head": "378aa403dafab85b46d243def3eb1a93551f8038",
+  "files": {
+    "Tracker/Tracker.RuntimeHost/Dockerfile": "70846d6a485e77470931e3bce193378b6b577140e9ba0b5233a168b557bf7661",
+    "Tracker/Tracker.DebugHost/Dockerfile": "4c185c0a0f636c7c444de64bac0b884d2f8c795a75ff674d00611d89f4743517",
+    "Testing/Duck.Testing.RefereeDriver.Host/Dockerfile": "9cc4b6eab1a891431fa71110445345bc0210c3b333328d821baab5793cf916e3",
+    "Testing/Duck.Testing.AppHost/linux-image-lock.json": "91492b44d44cd95a67b50d5de2498f464acf87519213d61df000d6b9c41c51d8",
+    "scripts/tests/verify-linux-distribution-definitions.py": "5137277985d3c42b4a3dcb35de5b5a7ddc3ef9d28596072522f2ef0c837cc642",
+    "scripts/tests/test-linux-distribution-definitions.py": "337fb357e67c831b9c6b0b0acde5d0d6490fa292b52864b5330d6ee56b5bfc32",
+    "scripts/tests/verify-linux-publish-outputs.sh": "2701743512d538a437d77de87f14bf9e083c40a316c51389cfaf5d0e65d83dd7"
+  }
+}
