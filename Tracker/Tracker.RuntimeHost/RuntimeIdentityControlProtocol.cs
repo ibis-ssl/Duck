@@ -388,14 +388,30 @@ internal static class RuntimeIdentityControlRelay
     {
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(timeout);
+        Task<T>? operationTask = null;
         try
         {
-            var operationTask = Task.Run(() => operation(deadline.Token));
+            operationTask = Task.Run(() => operation(deadline.Token));
             return await operationTask.WaitAsync(deadline.Token);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             throw new TimeoutException("The identity control relay operation exceeded its deadline.");
         }
+        finally
+        {
+            if (operationTask is { IsCompletedSuccessfully: false })
+                ObserveFault(operationTask);
+        }
+    }
+
+    /// <summary>期限切れ後に完了した処理の例外を観測する。</summary>
+    private static void ObserveFault(Task operationTask)
+    {
+        _ = operationTask.ContinueWith(
+            static completed => _ = completed.Exception,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
     }
 }

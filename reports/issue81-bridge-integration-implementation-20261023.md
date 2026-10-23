@@ -269,3 +269,34 @@ AppHost owner再起動時は新RunIdを使い、旧watchを取消し、旧token/
 ここでの805/805と両buildはローカルの現在dirty sourceの証拠で、Git commit、PR CI、実Docker/DCP/exec/コンテナ起動の証拠ではない。正式review結果は旧source対象とし、このcurrent-source検証結果で旧review報告を上書きしない。外部のDocker daemon/DCP engine一致とNR005の完全ID供給は未確認。既存process auditの時刻表記は原本がtimezoneを示さないためUTCへ換算せず、過去の未回収exit gapは維持する。
 
 本追補時点で、source SHAはProtocol `44d8dc7d15abce2a460b29f6f26e1b460882cbac01f9e267023606181e74c18f`、Program `4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b`、protocol tests `a9ef455a54f5467748d65fa02e86c47f6dbd5fb85586eefa420868e5a1aa7d06`、boundary tests `58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993`、liveness tests `2d136c3d9ad3320c3fcf61fba38e88da56ede44bd309c637b05643b152731745`、noncooperative tests `c8251b75203047b8555d0c649a3d0b4b148e9778e5fc3c4a2535a83671a7c543`。Red/Greenの差、旧process audit gap、metadata companionは別ファイルを保持し、旧世代を改稿していない。
+
+
+### 2a6fd94 設計語彙差分の限定検査（2026-10-23）
+
+対象はbaseline `9284640aaec4af59e44afe7687e4bf8a39494c48` とcurrent `2a6fd94455978021cd995104751f4f09b0a28dfd` の設計追記だけ。実diffは主設計12行、比較設計4行。既存Node/cache/Junction/Pythonと同じ9設定hashを使い、入力byteとmodule解決を実行前に確認した。通常文の `owner`、`role`、`container` 等を日本語へ直し、規約上必要な正式API名・protocol field/step名・Unix socket技術名は保持した。全文の文書gate合格とはしない。
+
+- 主設計のbaseline/current SHA-256: `15205d3b20221336368ea5b2f3375f88e6cc08b22e62371e1f4edb9e80d413d9` / `d50a7a8b2b4fa6ff7c18fe49d69c7fac22912ae1b11411b28cfa8b9da7fb716c`。比較設計: `c1bfa61d4a5267bf4ac429791dbf19ad5c71e247052a461105eafdd69036cc85` / `b983590bb17c4cdedcd7144a3bfb202cef73aa66a4a5dc7bedc1d3b45937993f`。
+- CSpellは既存wrapperで全文を各1ファイルずつ実行。主設計 baseline 1件/current 7件で追加6語 `Unix`, `Resource`, `Container`, `Generation`, `Boot`, `challenge`。比較設計 baseline 43/current 45で追加5語 `Unix`, `Resource`, `Container`, `Generation`, `Boot`、削除3語 `alignment`, `cursor`, `timeline`。追加は正式API/識別フィールド/プロトコル段階・ソケット技術用語で、成功扱いせず原文rawを保持。
+- Sudachiは全文同時入力で既存baseline違反が上限表示を越えるため、同じ設定のまま実diff追加行だけを別入力にして全件出力を取得した。残った新指摘は `RunId`, `ResourceId`, `ContainerId`, `Generation`, `BootId`, `challenge`, `Unix` と `Generation`/`challenge` のカタカナ判定。正式field/protocol/transport名として必要な用語であり、辞書・whitelistは変更していない。一般説明のエンジン/ドメイン/リセット/データグラム/コード表現は日本語へ修正。
+- 全文CSpellと追加行Sudachiは各exit 1。これは未登録語を含む正確な結果で、全体gateの合格ではない。textlint/Yomiyasuは今回対象外。既存baselineの不合格と追加行の指摘を区別した。
+- 生の旧比較結果/失敗、段階ごとの修正後raw、command/config/source hashを `reports/evidence/issue81-2a-design-vocabulary-20261023/` に世代別保存。最終確認metadataは `closure-final-v5.json`。`manifest-v1.tsv` はこのbundleの全filesを列挙し、manifest自身を除外する。
+
+
+### NR009 遅延fault観測・短命制御processの限定修正（2026-10-23）
+
+通常reviewのNR009第3回残actionに対し、別fixture `Tracker/Tracker.Tests/RuntimeIdentityControlOperationLifetimeTests.cs` を追加した。製品変更前の有効な Red は `red-v2` で、Protocol SHA `44d8dc7d15abce2a460b29f6f26e1b460882cbac01f9e267023606181e74c18f`、試験SHA `30a22fe1c8031f36ea8aec66951555999e0efa7f74d9986fc71dae95f1f9005d`。3件中2件pass/1件fail、exit 1: 期限切れ後にtaskが投げた例外が `UnobservedTaskException` として観測され、固定assertが失敗した。実UDSの所有ソケット回復試験はpass。修正後 `green-v1` は Protocol SHA `94bcc52414e0802cf049f80427145d663825f801a11d5f88e0ecf0eb2fd57e21`、同試験SHAのまま3/3 pass、skip 0、exit 0。
+
+最小修正は `RuntimeIdentityControlProtocol.cs` の `RunWithDeadlineAsync` で、成功完了でないtaskへ `OnlyOnFaulted` continuation を登録し、期限後に遅れて完了したfaultも観測する。期限後の任意IOを強制停止する保証は追加していない。短命CLI processの上限確認は、既存ビルド済み `Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll` と同位置の `.runtimeconfig.json` / `.deps.json` を使う。標準入力を閉じず30秒待った後に既定期限で終了し、期待終了コード2を確認する専用process fixtureは1/1 pass。先の test-bin コピーを使った試行はMicrosoft.Extensions.Hosting解決失敗で子process exit 134だったためsetup失敗として分離し、product Redに数えない。実プロジェクト出力へ切替えた試行では解消した。
+
+source/hashの訂正: 直前の記録で「exact source 44d8」とした記述は修正前sourceとの混同で誤り。Red-v2が44d8、Green/full/buildは修正後 `94bcc52414e0802cf049f80427145d663825f801a11d5f88e0ecf0eb2fd57e21` を実測した。Green/full/build command recordsには実行直前source hashを保存し、Protocol SHAは相互一致する。Program.cs `4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b`、試験 `30a22fe1c8031f36ea8aec66951555999e0efa7f74d9986fc71dae95f1f9005d`。RuntimeHost生成DLL SHA `8e7d3cde7bf0d46e2984989bbb64f8642232542f1e36c8af031d1bcfbf715232`。
+
+修正後の無filter標準suiteは808/808、skip 0、exit 0。RuntimeHost no-restore build exit 0、warning/error 0。Testing AppHost no-restore build exit 0、error 0、既存ASPIRE010 warning 1。全て `-p:EnableSourceControlManagerQueries=false`、既存restore/cacheで実行。Red/Green/子process診断/full suite/両buildのcommand、raw stdout/stderr、exitとsource hashesは `reports/evidence/issue81-05b-nr009-lifetime-20261023/` に世代別保存した。`manifest-nr009-close-v1.tsv` が同bundle内全証拠ファイルを列挙する（manifest自身は自己hash列挙から除外）。すべての本試験/build processは終端しexitを回収済み。実Docker/DCP/execは未実施。Git commit/push、CI、通常review後のclose判定は親工程。
+
+この報告以前の `44d8` 時点の805/805/両build記録は、その当時のsource検証として残す。現在版の808と混ぜず、通常review reportの旧target判定を変更しない。設計語彙差分の限定検査は前段の記録どおりCSpell/Sudachi指摘が残り、全文gate成功とはしない。`engineID` の誤称は追補前に「コンテナID」へ修正済み。
+
+
+### 94bcc524 tracking差分の限定文書検査（2026-10-23）
+
+baseline `2a6fd94455978021cd995104751f4f09b0a28dfd` と現行差分から、tasks-status.md line 43 と phases-status.md line 26 の変更2本文行だけを抽出し、追加文がbaselineに無いこと、入力byte/source hashを検査前にassertした。既存Windows Node/cache Junction（node_modulesがissue80既存cacheを指す）と既存Sudachi Python環境を再利用。9設定/whitelist hashはbaseline検査bundleと完全一致、Nodeのtextlint/cspell/yaml module解決exit 0。初回入力のSudachiはtasks文「3アプリ」の `アプリ` を未登録語としてexit 1で指摘。親が所有行を「3つの管理プログラム」へ直した後、最終2入力hash `8da1adf253aa80a7e393d583f17bf9f8e9850513bb4620de4ceae3ffee481060` (tasks) と `ee897c1889ebf6c9905a4c177a3edfb52733a1076ba3a624299c747b5f2cd3ba` (phases) を使って再検査し、textlint/CSpell/Sudachiすべてexit 0。whitelist/辞書/依存は変更していない。全文gateの再実行ではない。
+
+この実装追補と限定文書raw/入力/preflightは `reports/evidence/issue81-05b-nr009-lifetime-20261023/` に統合。初回Sudachi指摘は上書きせず `tracking-lint-v1`、修正後全0は `tracking-lint-v2`、全raw/metadataは `manifest-nr009-close-v2.tsv` に世代別で保持する。

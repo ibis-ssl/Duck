@@ -235,15 +235,15 @@ APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。API
 
 ## AppHost から RuntimeHost への診断識別子受渡し（06A1）
 
-AppHost は、DCP の `ResourceNotificationService.WatchAsync` で受け取った登録済み資源イベントを照合し、対象 `IResource` の `ResourceEvent.ResourceId` と `Resource.Name`、snapshot 内の完全な `container.id` を検査する。資源キーと役割名が想定どおりで、完全な engine ContainerId がある場合だけ、その完全 ID を対象に、DCP が実際に選択した Docker engine context を照合した上で `docker --context <verifiedDcpContext> exec -i <containerId> dotnet Tracker.RuntimeHost.dll --identity-control` を実行する。contextとDCPのengineが同一と確認できない場合は実行しない。context名を固定値や利用者の現在選択だけから推測しない。HTTP host endpoint、名前解決、ポート番号は対象選択に使わない。AppHost は利用者のDocker設定やcontextを変更しない。
+AppHost は、DCP の `ResourceNotificationService.WatchAsync` で受け取った登録済み資源通知を照合し、対象 `IResource` の `ResourceEvent.ResourceId` と `Resource.Name`、`ResourceEvent.Snapshot` 内の完全な `container.id` を検査する。資源キーと役割名が想定どおりで、完全なコンテナ識別子がある場合だけ、そのIDを対象に、DCPが実際に選択したDocker実行環境の接続設定を照合した上で `docker --context <verifiedDcpContext> exec -i <containerId> dotnet Tracker.RuntimeHost.dll --identity-control` を実行する。接続設定がDCPの選ぶDocker実行環境と同一と確認できない場合は実行しない。接続設定名を固定値や利用者の現在選択だけから推測しない。HTTPの宛先、名前解決、ポート番号は対象選択に使わない。AppHostは利用者のDocker設定や接続設定を変更しない。
 
-DCP/AppHost は資源の作成・起動・停止・削除の唯一の所有者のままである。`exec` は既に起動した対象コンテナ内で RuntimeHost の同梱アセンブリを起動し、診断識別子だけを渡す。これは別のライフサイクル管理者を作らず、Dockerイメージ、外部資源、container lifecycleを操作しない。
+DCP/AppHostは資源の作成・起動・停止・削除を引き続き単独で管理する。`exec` は既に起動した対象コンテナ内でRuntimeHostの同梱アセンブリを起動し、診断識別子だけを渡す。別の起動管理者は作らず、Dockerイメージや外部資源、コンテナの起動・停止・削除は操作しない。
 
-常駐 RuntimeHost はコンテナ内の固定 Unix domain socket `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同一コンテナ内のこのsocketへ接続し、改行区切りJSONのprepare/challenge/commitを同一接続で中継する。最初のprepareにRunId、ResourceId、完全ContainerId、Generationを含める。常駐プロセスは自身の起動ごとに新しい `BootId` を持ち、challengeで返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へchallengeの `expectedBootId` と同一のidentity tupleをcommitする。常駐側はBootIdとtupleの一致を再確認してから受理する。
+常駐RuntimeHostはコンテナ内の固定Unixソケット `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。最初の `prepare` にRunId、ResourceId、完全ContainerId、Generationを含める。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側はBootIdと識別情報一式の一致を再確認してから受理する。
 
-AppHostが新たに起動した場合は新RunIdでgeneration状態を開始し、別ownerの資源へexecしない。RuntimeHost起動時点でengine IDはまだ確定していないため、container modeの診断Identityはhandoffまで未帰属とする。受理した新identityは診断状態と受信freshnessを原子的にリセットし、次の正常な受信が観測されるまではstrict readinessを503に保つ。欠落・不正な完全ID、resource/role/run不一致、generation後退、同一generationでの異なるcontainer ID、challenge後のBootId変化は拒否する。同一tupleの再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
+AppHostが新たに起動した場合は新RunIdで世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDがまだ確定していないため、コンテナ動作時の診断識別情報は受渡しが完了するまで未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、challenge後のBootId変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
 
-このsocketはcontainer内の制御面であり、hostへ公開しない。tokenや識別子をURL、Dashboard、通常ログへ出さない。Docker execの実行、DCP runtime、image取得・起動を行わず、受入はDuckコード内のfixtureでcontrol processと同一container socketの契約まで確認する。実Docker Desktopでのexec、resource eventの実到着、container起動、UDP通信、host port公開は別途未実証のまま記録する。RuntimeHostへのidentity handoffは UDP packetの送信元containerを暗号学的に証明するものではない。
+このソケットはコンテナ内の制御面であり、ホストへ公開しない。認証情報や識別子をURL、Dashboard、通常ログへ出さない。Docker `exec`、DCPの実行環境、イメージ取得・起動を行わず、受入はDuckの実装にある試験で制御プロセスと同じコンテナソケットの契約まで確認する。実Docker Desktopでの `exec`、資源通知の実到着、コンテナ起動、UDP通信、ホストポート公開は別途未実証のまま記録する。RuntimeHostへの識別情報受渡しはUDPパケットの送信元コンテナを暗号学的に証明するものではない。
 
 ## DebugHost のデバッグと記録
 

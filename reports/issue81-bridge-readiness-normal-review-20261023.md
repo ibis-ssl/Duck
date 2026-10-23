@@ -73,6 +73,12 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 
 - 保存46705eは書込前のsource hash guardでAssertionError/exit1となり未保存。確認8890e2/exit0で、他担当の後続製品がb96d255...から44d8dc7d15abce2a460b29f6f26e1b460882cbac01f9e267023606181e74c18fへ移動したと確認した。今回の結論は実読済みb96d255...世代に固定し、後続sourceを次targetとして分離する。現在作業木との一致を再主張しない。
 
+### NR009 第3回・不変commit限定fix検証
+
+- reviewed_commit: 2a6fd94455978021cd995104751f4f09b0a28dfd。commit内protocol SHA44d8dc7d15abce2a460b29f6f26e1b460882cbac01f9e267023606181e74c18fをgit showで読み、後続作業木と混同しない。同Sol6.1/high要求・applied:null・normal_persistence・report_attestation_allowed:false、新agent/入れ子なし。
+- bafbe7/f36eda/60463c/d0dc79の読取はexit0。bc7b47はmanifestをheader付きと仮定したKeyErrorでexit1、cc71c7はrepo:参照をbundle相対と仮定しgit showがexit128（Python helper全体exit1）になった。いずれも読取だけで書込み/試験実行なし。実headerless sha/size/pathとrepo:参照を確認後、d0dc79で85件全照合を完了した。
+- 新build/test/lint/CI/実container/DCP/execは発行していない。既存資材・commit内source/raw/metadataの照合だけを実施。自己証拠は /tmp/issue81-06a1-nr009-commit-review-20261023/。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -120,6 +126,15 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - Redの区分: fatal-loop-red-v1/v2はstate-machine反射fixture失敗、hosted-supervision-red-v1はTask派生型をAssert.IsType<Task>で拒否したfixture不備。hosted-supervision-red-v2はExecuteTaskの1秒以内完了assert失敗で有効な監視Red（API seam追加後、監視実装前）。relay-output-red-v2は外部取消前の3秒以内完了assertがwrite/flush両caseで失敗する有効runtime Red。fatal-cleanup-red-v1は旧Assert.Nullが元SocketExceptionを拒否して失敗し、最終fixtureはAssert.IsType<SocketException>へ変更されている。したがって最終4case全てが同一byteの固定期待値Red→Greenとは主張しない。直接cleanupは現sourceと最終Greenで確認する。
 
 - 8組Green/build metadataとb96d255...の対応は0c29b0/263069の読取時に確認した。その後の44d8dc7...は新helper修正中の別世代で、本判定/801成功を移転しない。
+
+### 第3回固定sourceとv3証拠
+
+- protocol全401行、新RuntimeIdentityControlNonCooperativeLivenessTests.cs全136行（SHAc8251b75203047b8555d0c649a3d0b4b148e9778e5fc3c4a2535a83671a7c543）を実読。実RuntimeHost Program4bc18b...の短命relay分岐と入出力・token・終了コード、既存server/HostedService/cleanupへの新helper利用を直接依存として確認した。
+- 新fixtureは同期WriteLine/Flushの2case、tokenを無視する非同期Flush/Readの2case。RelayReturnsWhenInputReadIgnoresCancellationTokenは非協力な非同期readであり、同期read prefixを個別実測したtestではない。4caseとも外部取消なしでrelayが戻ったかを先に記録し、その後fixture自身がReleaseする構成。
+- noncooperative-io-red-v1はb96d255...で4fail/0pass/exit1。各assertは期限内relay完了の失敗で、build/setup失敗ではない。同test SHA c8251b...の44d8... Greenは4pass/exit0。期待値緩和やskip化なし。
+- manifest-v3.tsvはheaderなし85件、SHA960df89bad8b4126916e780908ff326d3e11442962fc18235c4b17c4547988d2。bundle相対とrepo:参照をcommit内へ解決し、全size/hash一致。8組の44d8... metadata/source/raw hash/byte数も一致。
+- 現sourceのprotocol5/5、boundary11/11、liveness4/4、noncooperative4/4、無filter805/805・0fail・0skipは各exit0。標準argvはdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -p:EnableSourceControlManagerQueries=false。RuntimeHost build0warning/error0、AppHost build既存ASPIRE010 warning1/error0、両exit0。805結果を旧801世代へも新しいPR CI結果へも移さない。
+- 元5/11/4testのSHAはa9ef455.../58c304.../2d136c...を維持。protocol-suite-v2のmetadata当初対象リストに元5test hashがなかった限界は、後続記録/manifest内repo:sourceと区分する。個別805caseのTRXを確認した主張ではない。
 
 ## 指摘事項
 
@@ -251,6 +266,22 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - NR008/P2/closed、NR006/P2/closedを維持。NR005/P1/openは実owner→receiver供給未実装のまま。PD-I81-06A1-TDDの第5test事前Red欠落、旧PD-I81-02-TDD、全文文書gate/図/実機は未解消。
 - liveness bundleのcompanionは元boundary metadataのリテラルbackslash+nだけを別記録へ解釈し直し、原本を残す方式。元rawを編集した成功証拠とはしない。旧v4 process終了と元exit未回収も後続成功で埋めない。
 
+### NR009 第3回処分 — 待機期限と基底IOの扱いを分ける
+
+#### I81-NR-009 / P2 / open（残actionを限定）
+
+- 修正済み: protocol393–394は同期prefixをTask.Runへ移し、そのoperationTaskを期限token付きWaitAsyncで待つ。token非協力のTaskでもcallerの待機が有限になる。server137/161のread、215–219の応答write、relay332–365のread/connect/write/output/flushへ同helperを適用した。前回の「server write期限なし」「非協力flushでhelper自体が永久待機」は現commitでは解消した。
+- 残location: Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs:387–399。WaitAsyncがtimeoutした後、operationTaskは保持/追跡/継続観測されない。外部IOが後から失敗する場合、そのtask faultをこの実装は観測しない。relayがusingで所有UDSを閉じた後、遅延したread/writeがObjectDisposedException/IOException等へ至る経路もある。新fixtureは32/60/77行で自分がReleaseし、基底taskを解放しているため、製品による後始末や遅延fault観測を証明しない。
+- 適用境界: helperはinternalであり、一般公開された任意IO停止APIではない。取消を無視する任意のTextReader/Writerを強制停止する保証は要求しない。RuntimeHost Programのrelayは専用短命processとして戻り値をEnvironment.ExitCodeへ設定して通常hostを作らず終了する構造なので、caller所有Console IOの最終収束をprocess lifetimeへ委ねる案は成立候補。ただし実Console IOを詰まらせたCLI processの終了は今回fixtureで測っておらず、成功と扱わない。
+- 最小必要対応: timeout後のoperationTaskを追跡して遅延faultを確実に観測し、終了/取消に伴う想定内IO失敗を明示する。自分が所有するUDS/socket等は中断/解放の責任を持ち、caller所有stdioは停止不能な場合の短命process境界を明記する。helperの保証を「有限の待機」と「基底処理は協力取消または所有process終了まで残り得る」に正確に分ける。新たな全資源leaseや任意オブジェクトの強制killは不要。
+- 必要fixture/証拠: timeout後に遅延faultするoperationが未観測にならないこと、所有接続が解放されることを固定する。Consoleの収束をprocess終了へ委ねる場合は、その実運用境界に限るchild-process/stdioの有界終了fixtureを示す。Releaseでfakeを手動収束させただけの4caseから実CLI cleanup成立を外挿しない。reviewerは追加実行していない。
+- 元要件との関係: 初回NR009の有限IOと第2回required action「timeout後の保留IOの終端・観測を明示、単に未観測worker taskを増やさない」に対応する残りである。待機期限そのものの修正は評価し、新しい一般IO強制停止契約へ拡大しない。
+
+### 他finding/工程の扱い
+
+- NR006/007/008はclosedを維持。新helper利用でもNR007のCompletion監視/finally cleanupとNR008のownsSocketPath条件は保持される。再openを要する差分は見つからない。
+- NR005/P1/openは外側の実DCP identity供給未実装のため維持。PD-I81-06A1-TDD、旧TDD履歴、文書lint未合格、図/実機/独立finalは別held。新固定4caseの有効Red→Greenで過去の事前Red欠落を補填しない。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -363,6 +394,22 @@ current_verdict: needs_changes。I81-NR-007/P2/closed、NR008/P2/closed、NR006/
 
 追加修正を待たず、この限定世代の結果を保存して終端する。今回の4/801成功やNR007閉鎖を、NR009・NR005の合格やIssue全体完了へ移さない。
 
+### NR009 第3回・commit2a6fd944の通常判定
+
+current_verdict: needs_changes。NR009/P2/open（timeout後のtask観測/所有IOとstdio-process lifetimeの限定残action）、NR005/P1/open、残必須2。NR006/007/008closed。新規finding ID追加なし。今回の待機期限修正部分は確認済みで、805成功を否定する判定ではない。
+
+| 確認項目 | 結論 | 実証/限界 |
+| --- | --- | --- |
+| 非協力/同期IOでcaller待機を有限化 | fixed_in_scope | 同c8251b...の4runtime Red→4Green |
+| server read/write期限 | fixed_in_scope | 共通helperと1秒stage deadlineへ接続 |
+| timeout後のtask fault観測/IO責任 | NR009 open | taskが切離され、fixtureが後からRelease。最小の遅延fault観測と所有境界確認が残る |
+| 元5/11/4と追加4 | pass_in_evidence | hash保持、各filter成功、skip0 |
+| 無filter全suite/build | pass_in_evidence | 805/805、両no-restore build exit0、commitの製品/testとhash一致 |
+| NR006/007/008 | closed維持 | 関連保護と監視/cleanup保持 |
+| 外側identity/工程/実機 | 未完了 | NR005、PD-I81-06A1-TDD、文書/実機/独立finalを維持 |
+
+reviewed_commitは2a6fd94455978021cd995104751f4f09b0a28dfd。旧未commit b96d255...世代の判定を消さず、新commitの限定結果を追記した。PR CI/実DCP/実exec成功ではなく、通常cycleの結果である。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -405,3 +452,9 @@ current_verdict: needs_changes。I81-NR-007/P2/closed、NR008/P2/closed、NR006/
 - 親prefix/旧子5欄履歴を保持し、自分の編集は本normalreportと/tmp確認証拠のみ。writer中の実装report/raw/製品/test/台帳は変更しない。後続別fixtureをこの対象hashへ混ぜない。自己process全終端・未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
 
 - source guardが実際の同時更新を検出したため、b96d255...の今回結論と新44d8dc7...の作業木を分けて保存した。新世代のTask.Run/非協力IO対策の成否は今回未評価。
+
+### NR009 commit固定確認の終端
+
+- 待機期限で戻ることと基底IOを物理的に停止することを混同しない。任意TextReader/Writerの強制停止は要求せず、内部taskのfault観測と、所有接続/caller stdio/短命CLI processの責任を限定する。未測定のConsole process終了を合格として補わない。
+- 全805は保存raw集計、実CI/実機/個別805TRXの検証ではない。旧metadata companion、旧重複process元exit未回収、旧TDD/文書gate等の履歴は保持。
+- 不変commitからsource/evidenceを読み、後続作業木へ成功を移転しない。自己編集は通常report子5欄と/tmp確認証拠のみ、親prefix/全旧履歴を保持。製品/test/台帳/raw/第三者reportは変更しない。全自己process終端・未回収session/exitなし、applied:null、report_attestation_allowed:false。

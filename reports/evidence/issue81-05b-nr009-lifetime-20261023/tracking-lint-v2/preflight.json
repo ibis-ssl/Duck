@@ -1,0 +1,34 @@
+{
+  "baseline": "2a6fd94455978021cd995104751f4f09b0a28dfd",
+  "current_source_files": {
+    "Tracker/Design/tasks-status.md": {
+      "sha256": "6b07af3baa33dd8a1e70ed352b0a32410655c01ffb1b618a9de4c91959b392f9",
+      "bytes": 98113
+    },
+    "Tracker/Design/phases-status.md": {
+      "sha256": "5710d070b9b6ea27e07d7307f4377c6e4d2203ae04df65a0fa6494575586d0e6",
+      "bytes": 16774
+    }
+  },
+  "baseline_files": {
+    "Tracker/Design/tasks-status.md": "0b0b637d5ed0c8b5dbb76ec16cc463840a35185ae55a8c5778c6583be134c116",
+    "Tracker/Design/phases-status.md": "c073c1d23325030df90dde412c45b6317bde62bdfe90bd943f3a31b4440c61c1"
+  },
+  "input_hashes": {
+    "Tracker/Design/lint-vocabulary/closure-94bcc-status-final/tasks-status.md": "8da1adf253aa80a7e393d583f17bf9f8e9850513bb4620de4ceae3ffee481060",
+    "Tracker/Design/lint-vocabulary/closure-94bcc-status-final/phases-status.md": "ee897c1889ebf6c9905a4c177a3edfb52733a1076ba3a624299c747b5f2cd3ba"
+  },
+  "input_file_count": 2,
+  "changed_body_line_count": 2,
+  "config_hashes": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/requirements.txt": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "tools/lint/scripts/textlint-rules/no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  }
+}
