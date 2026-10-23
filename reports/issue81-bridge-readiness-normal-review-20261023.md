@@ -92,6 +92,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - e5efb9/beba40/3b998e/a0c61cのgit show/証拠読取・静的照合は各exit0。3b998eのscaffold source照合先を最初は復元用implementation-source.csと取り違えたが、a0c61cで実false scaffoldのred-scaffold.csが記録ed3676...と一致し、復元用は3449ae...であると確認した。製品や証拠の不一致ではない。
 - 新test/build/lint/CI/実DCP/execを実行せず、保存済み結果を照合した。自己保存証拠は /tmp/issue81-06a2-normal-review-20261023/。親prefixは保持し子5欄のみ追記する。
 
+### 06A3 初回通常レビュー（固定commit）
+
+- reviewed_commit: a5672531162da9d398b6348746933d0321a58dc7。基準a2dd3584578d88499c3e52fc0d9d97db164cc5c5。同じgpt-6.1-sol/high/fork none要求、applied:null、continuity reuse、normal_persistence、report_attestation_allowed:false。既読のwork-context-manager/review-enforcer/review-worker/sub-agent-task-manager/report-writer/report-output-managerに従う一人のbuilt-in code review。新agent/入れ子なし。
+- 正規PowerShell login:false / require_escalated→WSL Pythonで固定commitの全製品・試験・project・設計・台帳差分と直接依存、保存command/raw/metadataを読取した。helper 3c018f/528552/ba3f22/6e3419/8d7eaf/0acc67/b106c2/180d32/4aec1c/bad2e6はexit0。producer検索の一致なしから通知順序を推測していない。大きい表示の省略は限定読取で補い、書込前の再読取出力の省略は既読内容の再表示として扱った。
+- handshake-completion manifest-v1は58entry、SHA815add3c6eeceec3c837fa943fc67061cc087491339f61c635530f2b834eb886。focused文書inventory-v1は43entry、SHA7cbe79440bff3646ea0b3a2273ef7080e10ac3e94749bc68f009735a2e1d06b5。各entryのsize/hash、実command/exit、current source hashを照合した。新build/test/lint/CI/DCP/execは発行していない。
+- 自己証拠は /tmp/issue81-06a3-normal-review-20261023/。実装reportの空diffに見えるbaseline→同baseline表現だけを、preflightの実際のbaseline→当時の未commit作業木と現在commitへの4source hash対応へ直接訂正した。実質結果・第三者判定・rawは変更しない。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -168,6 +175,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - focused10pass、既存AppHostApplicationModelTests25pass（旧test fileはbaselineと同byte）、AppHost build error0/既存ASPIRE010 warning1をrawで確認。今回全標準suite/PR CIの成功は主張しない。
 - tasks I81-06A2追加1行と実装reportのscope/TDD/未実装記述を照合。tracking入力は追加行と完全byte一致（756bytes、SHA59d5e6f05bac4244bd4630e93e78e51da0b2dd71097c2484f6a74e3df1913de7）、source hashと9config一致、textlint/CSpell/Sudachi各exit0・raw空。全文gate合格へ拡大しない。
 - reconstructed sensitivity runはrootのred-scaffold.cs（SHAed3676...）と同33493d...のtestで8pass/2fail/exit1。red-scaffold/implementation-source.csは復元用の最終3449ae...であり、false scaffoldとして扱わない。
+
+### 06A3 固定対象と直接依存
+
+- 固定commitの13製品/試験/文書path：AppHostのContainerIdentityControlExecSession.cs、ContainerIdentityExecHandoff.cs、Program.cs、Duck.Testing.AppHost.csproj、RuntimeHostのRuntimeIdentityControlProtocol.csとcsproj、ContainerIdentityControlExecSessionTests.cs、RegisteredContainerExecHandoffTests.cs、RuntimeIdentityBootstrapTests.cs、主設計・比較設計・tasks-status・phases-status。各source hashと差分一覧を自己proofへ保存した。
+- 直接依存として既存RegisteredContainerEventProjection、ResourceDiagnosticIdentity/ServiceReceiveDiagnosticsのidentity/epoch境界、RuntimeHost DI/CLI relay、既存Dockerfile/WORKDIRと公開Aspire v13.5.4のResourceNotificationServiceを確認。ResourceIdを役割名と同一視しない。TryGetCurrentStateはexact key優先、役割名fallback時にも実際のmatched keyを返す。WatchAsyncは初期snapshotも返す。
+- AppHost登録→実HostedService→WatchAsync→current state→投影→明示contextのEngine ID→exact fullID/Running/run-role labels→structured exec→実prepare/challenge/commit clientというコード経路を確認した。RuntimeHostOnly/DesktopBridgeEnabledは明示選択、defaultはbridge未有効化。RuntimeHostの初回未bindはprepareのみでbindせず、commitでkeyを確定し、事前指定keyのstrict動作は保持する。
+- 後続未追跡ContainerIdentityCurrentResourceKeyTests.csは今回の固定commitに含めず、修正前判定へ混ぜない。
 
 ## 指摘事項
 
@@ -348,6 +362,14 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 実ResourceEvent購読、registered keyの実取得、DCP/CLI同engine照合、generation/BootId更新、exec→UDS接続は後続。NR005/P1/openは維持し、正しい形の候補を作れたことだけで閉じない。ここで新たな任意のheartbeat/網羅異常系/全外部診断を要求しない。
 - 任意改善は後続callerが接続された段階の代表的な追加caseに留める。現在の10caseに対して追加試験や再実行の必須要求なし。NR006/007/008/009closedと旧工程/全文文書/実機heldは不変。
 
+### 06A3 初回通常レビュー所見
+
+- **I81-NR-010 / P2 / open / production-path / 必須** — Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs:299。登録資源の最初の通知でresourceIdを固定し、Running確認301およびfullID投影307より前に確定している。初期通知が未Running/ID欠落のkey A、その後のRunning通知がopaque instance key Bなら、以後TryGetCurrentState(A)を読み続ける。Aが残れば未Runningでcontinueし、名前fallbackでBを取得しても投影のkey一致条件で拒否するため、正しいBへhandoffできない。初回正常起動を止め得る分岐であり、公開APIではkeyと役割名の同一性・不変性は保証されない。実DCPが今回A→Bを出す頻度は未実測だが、この入力列での静的な不成立は確定する。
+  - 必要変更：各observation.ResourceIdでcurrentを取得し、registered参照・role・両snapshotのRunning/fullID/key一致を検証してから有効候補を採用する。最初の未完成通知keyを固定しない。役割名をauthoritative ResourceIdへ代用しない。
+  - 最小fixture：同じ登録IResourceへAの未Running/ID欠落初期通知→BのRunning/fullID通知を与え、実ContainerIdentityHandoffServiceを通してBのcurrent/fullIDを使うrelayに到達し、Aからexecしないことを確認する。既存fake runnerの再利用でよい。一般的な異常順序網羅や実DCP実行をこの修正の必須へ追加しない。
+- 既存NR005/P1/openは実owner→DCP通知→同engine/fullID exec→資源内UDS→実受信の実測未成立として保持。新しいコード接続とfake/channel/model成功だけでは閉じない。NR006/007/008/009はclosed維持、今回の変更で再開する根拠なし。
+- 工程証拠：bootstrap初回f370は元raw未保存、現7737はexpectedRole引数修正後で同byteの先行Redではない。sessionのmissing project reference/DTO/timeoutはsetup、false-scaffoldのAssert.True失敗はpayload assertions前であり最終全assertionのRedではない。PD-I81-06A1-TDD等をwaiveせず、現機能所見から分離する。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -508,6 +530,14 @@ reviewed_commit: 26c9e8655c0011a0e53628f7291ba86703db5895。local保存証拠を
 
 reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は実通知の取得と権限内の既存資材・engine接続確認から進める。今回の未接続projectionに実DCP/exec成立を要求して停止させず、外側の未実装を正確に残す。
 
+### 06A3 初回通常判定
+
+- **needs_changes**。この単位の新規必須findingはNR010/P2の1件。cycle全体の残必須はNR005/P1とNR010/P2の2件。NR006/007/008/009 closedは維持する。修正後sourceへの成功移転や独立final/attestationはしない。
+- current handshake-integration-v2は7/7・exit0、AppHost modelは25/25・exit0。RuntimeHost buildはexit0/警告0/エラー0、AppHost buildはexit0/既存ASPIRE010警告1/エラー0。保存before/afterの6製品source hashは対象commitと一致する。7件はduplex client2とfake runner/model5であり、実WatchAsync loopからDockerCliCommandRunner/実UDSまでのE2E成功ではない。
+- 旧combined-focused-v4の6成功には現bootstrap7737/Protocol/Programと一致する2bootstrap試験が含まれるが、他3sourceは旧世代。現7件と合成して同一sourceの完全組成や全suite/CI成功へ読み替えない。
+- focused文書は4pathの実追加/削除片を8設定hashと照合。追加片textlint0/CSpell1（44件）/Sudachi1（83件）、削除片textlint0/CSpell1（13件）/Sudachi1（22件）。追加全件が既存だったとの主張はしない。全文gate未合格を維持する。
+- 現required actionの閉鎖matrix：初回未完成keyの不固定＝未充足、実HostedService正常初回fixture＝不足、実DCP通知頻度＝未実測（修正の静的根拠とは別）。既存正常handshake/owner検査/strict bootstrap/default維持＝確認済み。追加の汎用化・網羅異常系・文書磨き込みは必須へ追加しない。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -570,3 +600,10 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 10/25成功とpublic API確認は保存結果で、実DCPイベント・実container・Windows/UDP通信成立ではない。06A2のTDD欠落、PD-I81-06A1-TDD/過去履歴、全文文書gate未合格、実機/独立final未完了は保持。
 - 最新本人方針に沿い、正常系を進めるための必須安全条件と任意改善を分ける。今回追加の実行/網羅異常系/汎用化/細文書修正を要求しない。
 - 親prefix/全旧子欄履歴を保持。自己変更は通常report子5欄と/tmp証拠のみ、製品/test/台帳/raw/第三者reportを編集しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### 06A3 初回通常レビュー終端
+
+- 最短の正常系に必要なのはNR010の局所修正と実watcher経由の1fixtureであり、未完成key固定を残したまま実DCP実測だけへ進めることは勧めない。実DCPがA→Bを送る実際の順序/頻度、実Engine/exec/UDP-readyは未確認として残す。
+- 明示context+Engine ID+exact fullID/Running+fresh Run/role labelsは信頼したlocal Desktop/DCP境界での同target照合であり、DCP daemon endpointの直接証明やclone脅威全般の検証ではない。画像/runtime実行の承認解釈は親工程で、今回実操作なし。
+- 旧TDD不足・全文文書gate不合格・図本人視認・外部G1/G3・Windows/実流量・独立finalを今回fixture成功で解消しない。本人の正常系/費用対効果優先に従い、任意改善と必須正常系不具合を分けた。
+- 親prefix/Dispatchと全旧子欄履歴を保持。自己変更は子5欄、根拠明確な実装reportのbaseline表現1箇所、/tmpの確認証拠のみ。製品/test/設計/台帳/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
