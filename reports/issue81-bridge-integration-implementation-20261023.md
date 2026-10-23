@@ -439,3 +439,19 @@ Evidence inventory for this check is `reports/evidence/issue81-05b2-diff-lint-20
 - focused commandは `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter 'FullyQualifiedName~ContainerIdentityHandoffLifecycleTests|FullyQualifiedName~ContainerIdentityCurrentResourceKeyTests|FullyQualifiedName~RegisteredContainerExecHandoffTests' -p:EnableSourceControlManagerQueries=false --logger 'console;verbosity=minimal'`。9/9 pass、skip 0、inner exit 0。AppHost command `dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -p:EnableSourceControlManagerQueries=false` はexit 0、error 0、既存ASPIRE010 warning 1件。exact stdout/stderr・argv・sourcehashは同bundleの focused/apphost-build result JSONとraw binaryを参照。
 - bundle `reports/evidence/issue81-05b3-hosted-lifecycle-order-20261023/manifest-v1.tsv` SHA-256 `58597bcd9475e2f47f96f682f8591d83b0a478d83a12bb1a7a20fc0aa8bfb562`。その列挙対象に固定Aspiresource契約、sourcehash、Red派生要約、Green/buildのrawとresultを保存した。
 - この検証は実Hostのlifecycle順とfake DCP待機でのhandoffを確認するもので、Windows Docker Desktop/DCPの実起動、GC UI/RefereeDriver、受信またはhealth 200の実測ではない。新しい実DCP runは行っていない。今回のtest/build processはすべて終端しexit回収済み。既存PR報告拒否/未push履歴への再投稿やpushは行っていない。
+
+
+### 05B3 four-resource safe runtime update (aa43, 2026-10-24)
+
+The c4bccbf run reached all four configured resources. Duck returned HTTP 200/Ready with identity present, 5,341 decoded Vision messages, and zero failures. The safe stage trace records service start/stop and identity handoff stages. GC UI interaction and RefereeDriver application-level health were not performed, so neither is verified. Ctrl+C ended the outer shell with exit 1; the native AppHost exit code was not collected. Safe ownership checks found no remaining containers for this run. This is distinct from a confirmed graceful AppHost exit.
+
+Safe evidence bundle: reports/evidence/issue81-05b3-gcui-driver-run-aa43-20261024/ (manifest SHA-256 3a195e63e2fb51d62c6a3b7707cecc58796edda3b636d1ebdc69e6949a0d00d8). Private AppHost stdout/stderr were excluded and not read. The public CI remains exact c4bccbf run 40033339679: 835 passed, 0 failed, 0 skipped; Linux publish validation succeeded; packet-flow and full-stack acceptance were skipped.
+
+
+### 05B3 tracking wording lint follow-up (2026-10-24)
+
+最終の親所有tracking入力は `Tracker/Design/tasks-status.md` line 42 と `Tracker/Design/phases-status.md` lines 14–15。既存の限定検査では、ひとつ前の入力世代でtextlintはexit 0、CSpellはexit 1（baseline 4件/current 6件。current-onlyは `Driver` x3、`localhost` x2、`GC` x1、baseline-onlyは `referee` x1）、既存venvのSudachiはexit 1（current 23件/baseline 14件）だった。reportsは正本のtarget設定で除外される。これらの結果は各保存済み旧入力hashに対するもので、最終文面の合格を意味しない。
+
+Standalone `Driver` 表記を親の指示に沿って「審判観測」へ修正した。中間入力へのCSpellはexit 1で4件（`Driver` x1、`localhost` x2、`referee` x1）。残る `Driver診断` も「審判観測」へ変更した後、最終CSpellの再実行は実行前に拒否された。拒否理由は、認可済み1回が既に完了しており、追加実行は承認範囲外で不要、迂回・間接実行もしないよう求めるもの。したがって最終3行はCSpell未検証であり、同じ最終入力に対するtextlint/Sudachiも未実行。辞書・whitelist・設定は変更していない。最終入力のSHA-256は `tasks-status` ce706082444f32abecdb40f883f89bed5065a77a693a9419364e96dfbba52c5e、`phases-status` b7246113132e6939a3703d22e81272db2639bb6b671dfab79dc7b86d02d06b06。この拒否はその一回の検査だけに適用し、文書gateは未合格/未検証として保持する。
+
+証拠は `reports/evidence/issue81-05b3-record-lint-20261024/` にあり、元bundle manifest SHA-256 `3a9fd472673f8608ddb22ce20d4da81a594f52bc8da8b5d8a6da4a5f6cbee4ba` を変更していない。最終文面と拒否を記録したfollow-up `followup-japanese-status-v1/manifest.tsv` SHA-256 `1bdee495c544a4bb1a482bc11cc8f8db475b1758d5e240f2d63abc16f5a43af7`。先行の準備失敗と各世代の検査rawは別の履歴として保持した。

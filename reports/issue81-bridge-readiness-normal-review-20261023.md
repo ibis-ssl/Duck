@@ -124,6 +124,25 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - helper8b9a02/7b5b04/288ef5/86036b/c84fa9は各exit0。固定commitの全製品・試験・設計差分と直接依存、台帳/報告、保存Red/Green/build/文書証拠を読取。大きい出力の省略は必要なprojection/Host/観測worker/最終command/rawの限定読取で補完した。新build/test/lint/CI/実GC/DCP/execは実行していない。
 - reports/evidence/issue81-05b3-gc-standard-resource-20261023/manifest-v3.tsvは71entry、SHAa5a724891567e73538b7c071315d57ace46745aef9ced6253939b929d79f6613。全size/hash一致。自己proofは /tmp/issue81-05b3-normal-review-20261023/。
 
+### NR011/012 限定fix通常検証
+
+- reviewed_commit: ecc44670c6099dd70072f269ef5eaf76ab223483、base: 54ef302f199e0dc24e000a6fb0101441af42795d。同じrequested Sol6.1/high・original applied:null・reused_existing_agent_profile、normal_persistence、single_agent/decomposition forbidden、report_attestation_allowed:false。既読正本review契約を継続し、新agent/独立finalなし。
+- 読取73073a/cd5fbcはexit0。4literal製品差分、追加2fixture全体、実Red/Green/buildのcommand/exit/source before-after/raw、台帳/報告の限定差分を確認した。新test/build/lint/CI/実DCP/GC操作なし。
+- reports/evidence/issue81-05b3-nr011-nr012-fix-20261023/inventory-v1.tsvは12entry、SHA581cc44463c2b5220394b4df0b5ed2c2b5e6a89f408e9aa9d717d0ffae394f92。全size/hash一致。自己proofは /tmp/issue81-05b3-nr011-nr012-fix-review-20261023/。
+
+### 0743df7 opt-in safe stage traceのfocused通常レビュー
+
+- reviewed_local_head: 0743df7b06a2a33a679f4f20b86ff1e39f4c7429、parent/base: ecc44670c6099dd70072f269ef5eaf76ab223483。同じrequested gpt-6.1-sol/high・original applied:null・reused_existing_agent_profile、normal_persistence、single_agent/decomposition forbidden、report_attestation_allowed:false。正本review-worker/review-enforcerを再読し、既読work-context/report/dispatch契約を継続する。新agent/入れ子/orchestrator再入場なし。
+- 正規Windows PowerShell login:false / require_escalated→wsl.exe -d Ubuntu -- python3 -でgit/source/保存試験metadataだけを読取。7d4af8/522bd0/43dc09は各exit0。新build/test/lint/CI/実DCP再run・process終了操作は行っていない。既定sandbox経路は混入させず、private runtime stdout/commandの拒否対象へ触れたり別経路で読むことはしない。
+- reports/evidence/issue81-safe-trace-lifecycle-20261023/manifest-lifecycle-v1.tsvは4entry、SHA c459cce1fd7cba3722c3f5b4b429e41030a9a6806ba1f2b1061ed4403193c6f4。全size/hashと対象4source hash、red.metadataの固定test/復元source/raw対応を照合。自己proofは /tmp/issue81-safe-trace-normal-review-20261023/。
+
+### c4bccbf HostedService開始順序のfocused通常確認
+
+- reviewed_local_head: c4bccbf68342e0ff48086a974e34103dbb7fbd04、parent/base: 0743df7b06a2a33a679f4f20b86ff1e39f4c7429。同じrequested gpt-6.1-sol/high・original applied:null・reused_existing_agent_profile、normal_persistence、single_agent/decomposition forbidden、report_attestation_allowed:false。既読正本review契約を継続し、新agent/入れ子/独立finalなし。
+- 正規Windows PowerShell login:false / require_escalated→WSL Pythonで固定製品/fixture・保存証拠を読取。ceb700/2737d1/ee952bはexit0。8e4556はmanifestのsize_bytes列をbytesと仮定したKeyError/読取exit1で、試験発行や書込なし。実headerに合わせ2737d1で9entryの全size/hash照合を完了した。
+- 環境利用不可/復帰の通知時点で今回の保存は未発行。ee952bの一回のread-only確認で既存report SHA4147dc28...・今回見出し無し・自己save proof無しを確認してから、この一回の追記を行う。再試験/実機/強制終了/PR書込・private runtime raw/command読取は行わない。
+- 証拠manifest-v1.tsvは9entry、SHA58597bcd9475e2f47f96f682f8591d83b0a478d83a12bb1a7a20fc0aa8bfb562。source/result/raw対応も一致。自己proofは /tmp/issue81-hosted-lifecycle-normal-review-20261023/。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -235,6 +254,29 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 直接依存はlinux-image-lock.json、既存05B2 simulator実entrypoint/command観測、RegisteredContainerEventProjectionのrole/key/fullID条件、EnableDesktopIdentityBridgeとHandoffService、RefereeDriverApplication/Host/観測worker、既存publish定義。既定base/comparison/RuntimeHostOnly/VisionSimulationOnlyの既存分岐本文は不変。
 - GC固定index/既存3multicast引数、UI target8082/host動的/127.0.0.1/nonproxy、UDP endpoint/host network無しを確認。Driverは内部ws://game-controller:8082/api/controlへ接続し、Enabled/ContainerModeのみ明示する。AutoDriveToActiveをtrueとした場合だけ制御workerを登録する既存Application60–72行を保持し、この分岐は設定を渡さないため既定observe-only。
 - 構成試験は4資源型・GC固定image/args・公開端点・Driver publish/環境・待機辺を検査するが、新分岐simulatorのrepository/binary名、duck環境/owner roleを検査しない。AutoDrive不存在のassert対象はAutoDriveというキーで、実制御キーAutoDriveToActiveはsourceで別途確認した。新しい関数/XML説明の追加・変更はない。
+
+### NR011/012 固定fix範囲
+
+- Program.csはrepositoryをghcr.io/ibis-ssl/framework-simulatorcli、binaryを./bin/simulator-cli、ExpectedRoleとbridge roleをduckへ戻す4literalのみ。最終SHA7bb54742f1504c02d0f4060adff577d4e28cf5e18f506403d2981faff474167c。登録名duck・既存digest・その他の構成/条件/依存・protocol/projection本体は不変。
+- AppHostApplicationModelTests.csへ2test/50行を追加。SHA bf616f532d219872d6183f81257b01383a01edecf48dbac07713a5009c2d2e03はRed前後とGreen/build前後で一致する。既存の48cf90d3の試験内容を緩和していない。
+- simulator fixtureは実AppHostモデルのrepository/index/argsを固定契約へ照合する。role fixtureは同じモデルのduck環境とowner run/role label、実duck ContainerResource参照を渡した既存projectionのopaqueKey/Running/full64正例を確認する。64桁aのfixture入力を製品の実コンテナID供給やDCP実測と混同しない。
+- tasks/phasesは二指摘の検出→最小修正/試験成功→同担当fix確認/実測は後続という状態同期。新報告段落のlint未実施、旧全文gate未合格が明記され、実DCP成功へ拡大していない。
+
+### Safe traceの対象・直接影響
+
+- ContainerIdentityExecHandoff.cs SHA6914a48a74b357b692625bce5f265fbdc884299b8b7029e8ea6aa919d79bd8f8、Program.cs SHAbc19e3fe04be5bcde16d10fd672ae6c3a15f954ca06407b9bff50ebb8d51b57b、RegisteredContainerExecHandoffTests.cs SHAf249124bd36419a4ae1cb1eefbabe53a693c040fab2cd93150559a134ba6ec08、ContainerIdentityCurrentResourceKeyTests.cs SHAc5d4b0e753be8d0dc1e367fa7ba87484689d58b2068bcbc7820e9703468e96b1。ecc→本HEADのtrace全追加/config/test差分と実装report/4証拠を確認した。
+- trace出力はtimestampUtc=DateTimeOffset.UtcNow、stage=internal enum名、outcome=internal enum名のJSON3fieldのみ。RunId/ResourceId/fullID/BootId/nonce/engine/context/command/inspectJSON/任意例外本文を受け取る出力APIは追加しない。UTF-8/BOM無しのappendはtrace instanceのlock内で行う。
+- Programの既存bridge登録へTesting:IdentityControl:SafeTracePathを渡す。非指定/空白はtrace=null、全Recordはnull条件付き、旧TryHandoffAsync呼出は既定trace=nullで維持。DesktopBridge自体も従来の明示選択のまま。identity検証/所有照合/世代・Boot・通知key/取消の既存分岐は緩めない。
+- ServiceStartedはExecuteAsync349行、WatchAsync356行より前。通知なしでも記録される。watch loopはtry内、ServiceStoppedはfinally403–409行。停止outcomeのAcceptedは取消token状態のstage表現であり、AppHost実exit0やDCP全cleanupの証明ではない。追加説明コメントは日本語。
+- 最終lifecycle fixtureは実AppHost登録サービスを解決しconfig有効を確認、通知publish前にStartedだけ、StopAsync後にStoppedを5秒bounded pollingで読む。safe-output fixtureは6段階順序/3field/識別情報等の非包含、既存key fixtureは実通知からprojection/exec stageとkey非出力を確認する。
+
+### 開始順序fixの対象・直接影響
+
+- ContainerIdentityExecHandoff.cs SHA59cf7fc65c1d3081b50aca21ba9e6d8a0d519607d700813625f87f268e34c92b、新ContainerIdentityHandoffLifecycleTests.cs SHAbcc4304f07b5d79fe04efb212822b886a7cdedfff04dafb7191cc3e6c50e93b7、実装report追補と9証拠を確認した。Programはbc19e3feのまま、GC.WaitFor(Duck)とDuck.WaitForStart(simulator)を変更していない。
+- IHostedLifecycleService.StartingAsyncから既存BackgroundService.StartAsyncを先行開始し、通常StartAsyncもstartupLock内の同じstartupTaskを返す。基底StartAsyncへ最初の開始tokenを一回だけ渡し、後続hookから新しいworkerを起動しない。単独StartAsync利用も同じ経路。停止overrideを追加せず基底StopAsyncの取消/待機を維持し、残lifecycle hookはno-op。
+- 実ExecuteAsyncの通知監視と既存runnerへstoppingTokenを渡す経路、既存service finally trace、既存runnerの取消時process回収責任を維持する。新たな独立task/thread/OS資源・global concurrency設定・内部descriptor書換・基盤を追加しない。
+- fixtureは実Hostに先行blocking DCP相当serviceと実handoffを登録し、DCP StartAsync待ち中にRunning eventがhandoffへ届くことを確認。finallyでDCP待ちを解放しstartupをawait後、host.StopAsyncで終了する。実Docker/DCPではなくrunnerのみfakeであり、観測するのはHost lifecycle機構。
+- 保存source-contractは固定Aspire13.5.4のOrchestratorHostService418–434→ApplicationOrchestrator2823–2840→DcpExecutor2586–2597の待機契約とdescriptor12→13の記録を示す。今回その公式ページの再取得やdescriptor再列挙は行わず、実Host fixtureと最小差分を独立に確認した。
 
 ## 指摘事項
 
@@ -454,6 +496,26 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - NR005は元RuntimeHost準備経路のclosedを維持する。NR012は今回新モードだけの役割誤設定であり、05B2正常系実測の閉鎖を遡及取消しない。NR006/007/008/009/010もclosed維持。
 - 非阻害の報告整文：実装reportの「公開はGC HTTP8082だけ」を既存Duck診断39108の併存へ、「GC準備完了後Driver」を実sourceの待機辺（Duck healthy→GC start→Driver start）へ直接正確化した。実質検証結果・第三者判定やrawは変更しない。
 
+### NR011/012 限定fix処分
+
+- **I81-NR-011 / P1 / closed at ecc44670**。requiredの既存simulator repository/binary復元は製品4literal中2値で充足。compositionは当該AppHostモデルの固定repo/digest/args assertionで充足。focused Redは修正前54ef/cf6888ceに対するrepo文字列不一致のruntime failure、同test hashのGreenで残りassertionまで通る。Red時はrepo assertionで止まりbinary assertionへ未到達であり、全assertionが個別に失敗したとは主張しない。
+- **I81-NR-012 / P1 / closed at ecc44670**。requiredの登録名duck/ExpectedRole/bridge roleの一致は残2literalで充足。既存bridge helperは同一role引数からowner labelとservice期待役割を作るため、実モデルのowner label=duckと環境=duckが接続契約を確認する。同ContainerResourceを用いた既存projection正例もGreenで通る。Red時は環境のduck対gcVisionDuck不一致で止まり、owner label/projectionは未到達として保持する。
+- 必要action/composition/focused/証拠の4欄は両findingとも充足。新規必須findingなし。NR005元RuntimeHost準備経路closed、NR006/007/008/009/010 closedを維持し、初回54efのneeds_changes/011・012 openは履歴として保持する。
+
+### Safe trace 通常所見
+
+- **必須製品findingなし**。明示opt-inの正常な書込先について、3field制限・config binding・通知前開始/終了finally・無設定時の旧経路保持をsourceとfixtureから確認した。NR005元scopeとNR006～012のclosedは維持する。
+- 試験感度の区別：初回55a8ec40は即時FileReadのFileNotFound/exit1で、非同期開始との競合を含むため決定的な機能Redではない。最終f249124bを使った一時stage-call omission（source283e9d6f）の保存rawはcompile後Assert.Single collection empty・1fail/exit1。metadataの復元6914a48aは本commitと一致する。これは事後感度検証であり実装前TDD Redではない。最初のStarted assertionで失敗したためStoppedの独立Red感度まで実測したとはしない。
+- 4entry束で直接raw照合できるのはomission sensitivityのRed。Green1/1・Registered7/7・CurrentKey1/1・build0はvalidation-summaryの記録を採用し、この束にGreen raw/個別TRXが同梱されたと主張しない。追加の無駄な試験反復や新global gateは要求しない。
+- 軽微報告修正：実装report末尾の「試験/build以外のprocessは終端済み」は旧sessionの未回収と誤読されるため、「今回の試験/buildは終端済み、旧session実子exit/全cleanupは未回収を保持」へ直接正確化した。実測結果/第三者判定/rawは変更しない。
+
+### 開始順序fixの通常所見
+
+- **必須製品findingなし**。Starting phaseで監視を先行させ、先行Orchestratorの通常StartAsyncが資源準備を待つ間にも通知を処理できる構成になっている。同Task共有/lockによる二重開始防止、最初の開始tokenの引渡し、基底停止責務の維持に新しい破綻を認めない。
+- 起動失敗時の責任境界：新workerも基底BackgroundServiceの取消/Dispose寿命内にあり、watchとrunnerへ同じ停止tokenが伝わる。既存の所有process回収を迂回する新経路は追加されない。一方、専用のstartup failure/実owned-process cleanup fixtureや実DCP終了を測定した証拠はなく、全resource leak無しの実証を主張しない。今回正常系の最小修正へ任意の失敗網羅を追加必須にしない。
+- Redは固定bcc4304fについて事前compile成功・handoff未到達のruntime失敗1件/inner dotnet exit1を記録するが、tool応答からの派生要約でbyte-exact stdout/stderr未保存。outer WSL/Python exit0と混同しない。履歴を再構成・raw化せず、その証拠強度を保持する。
+- 旧NR005元scope、NR006～012 closedを維持し、新しいfindingを追加しない。前回の実DCP失敗がこの循環だったことを直接実測したわけではなく、source/orderからの条件付き説明と今回fixtureの機構確認を分ける。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -652,6 +714,28 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 文書v2は主設計4行・tasks追加2行・所有実装report節のみを対象とし、旧reviewerのcleanup整文を混入したv1は旧世代として保存。12設定/補助scriptと3source hashが一致。textlint0/CSpell1（10件）/Sudachi1（raw violation41件）。summary旧39は保存しcorrected summary41へ訂正済み、checker再実行なし。phases計画行を含む全文gate成功とはしない。
 - 旧b148/05B2の実UDP-ready/829成功はその対象に保持し、54ef302のGC実行・全suite/CI成功へ移転しない。NR011/012の修正後は別固定commitで同じ通常担当の限定fix検証へ戻す。
 
+### NR011/012 fix通常判定
+
+- **closed / pass_with_held / 残必須0**（この通常cycleの製品finding）。全Issue81・05B全資源受入・独立finalの合格ではない。
+- completeness matrix：NR011 required=固定repo/binary復元、production=対象2literal、composition=実AppHost simulator repo/digest/args、focused=repo mismatch runtime Red→同test Green。NR012 required=duck role整合、production=環境/bridgeの2literal、composition=実duck環境/ownerlabel＋同Resourceのprojection正例、focused=role mismatch runtime Red→同test Green。両行すべて確認済み。
+- 保存Redは2fail/0pass/0skip・compile成功・exit1。Greenは新2件＋既存GC構成/2資源Vision構成の明示filter4/4・skip0・exit0。no-restore AppHost buildはexit0/ASPIRE010警告1/エラー0、stderr0bytes。commandのHEAD54efは当時のcommit位置であり、明記されたbefore/after製品7bb54742・test bf616f53が新固定eccと一致するため、そのsourceへ帰属させる。
+- 設計契約は不変。報告されたdiffcheck0は製品修正の整合記録として区別し、新たなlint/fullgate成功とはしない。新report段落と最小台帳同期への追加語彙検査は未実施であり、既存文書不合格を保持する。語彙全面改稿をこの正常系fixの新ゲートへ追加しない。
+- 54ef CI40014899579のsuccessは修正前の記録で、ecc fixの解消/全suite/CI成功へ転用しない。今回の閉鎖は既存基準での4literal静的修正と実AppHostの固定回帰4件/build証拠に基づく。
+
+### Safe trace focused通常判定
+
+- **pass_with_held / 新規必須0**。対象はlocal0743df7のみ。pushは要求されず、旧ecc CI40015877946successを本localHEAD成功へ移転しない。独立final/attestation・全Issue完了ではない。
+- coverage disposition：要求/3field情報制限/UTC/config/API互換/正常pathと取消構造＝checked_no_finding。通知前Startedとfinally Stoppedのsourceおよびbounded fixture感度＝checked_no_finding。安全fieldとno-opt-inの回帰意味＝checked_no_finding。Green raw/個別TRXと本HEAD CI＝held。実GC/DCP4資源正常系/実子exit/全cleanup＝held。新依存/環境変更＝not_applicable。対象外の広域再検査は追加しない。
+- validation-summaryは最終test/sourceに対する1/1・関連7/7＋1/1・skip0、no-restore AppHost build exit0/既存ASPIRE010警告1、diffcheck0を記録する。focused/build command文字列は記録されているが、そのGreenのraw command/exit sidecarを独立照合した主張ではない。ローカル検証可能な経路であることと、今回自分が再実行しなかったことを分ける。
+- 旧run6a12f96e6c2b4e00873e252374c667e1/session10046はtransport断・実子exit未回収・trace未生成。後のAppHost/run-label Duck不在は記録されるが、正常終了/全資源cleanupの証明ではない。今回のstage追加や試験成功によってこの旧runtime試行が修復/成功したとはしない。
+
+### c4bccbf focused通常判定
+
+- **pass_with_held / 新規必須0**。対象はlocal c4bccbfのみ。公開eccのCI成功を本HEADへ移転せず、push/実DCP再run・全Issue完了/独立finalを要求・主張しない。
+- coverage：正常系startup順序/同Task共有/開始token/基底停止・既存取消経路＝checked_no_finding。global設定/API/依存/既存GC待機の非変更＝checked_no_finding。9entry・source hash・Green/build実raw＝checked_no_finding。Redのbyte-exact原本＝held。実startup failure時の全owned-resource cleanup/実GC画面・Driver・実子exit＝held。不要な広域再検査＝not_applicable。
+- 同sourceのfocused filterは新lifecycle1＋CurrentKey1＋Registered7の計9/9、0fail/0skip、exit0。保存resultのproduct59cf7fc6/testbcc4304fと対象commitが一致し、stdout/stderr hashも一致する。AppHost no-restore buildはexit0/既存ASPIRE010警告1/エラー0。報告diffcheck0を新文書gate成功へ変換しない。今回のGreenは前のtrace4entry束とは異なり、実raw/resultが保存されている。
+- 旧force-recovery runのAppHost/wrapper/DCP既知PID不在・runlabel Duck空と、実終了コード未回収/全資源cleanup未証明は別事項。本fix未実測の4資源正常系を成功にしない。次の原因観測/実測は親工程で、この通常確認の追加ゲートにはしない。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -748,3 +832,22 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - AutoDriveToActiveの明示true以外は既存Driver制御workerを起動しない。UDP受信/API照合・内部HTTPが動くこと、Driverのstrict health200、GC画面操作の成功は別であり今回は未実測。他資源G3/全体受入を合格にしない。
 - 05B2のage/sourceKey projection限界、AppHost/DCP実exit未取得、既存TDD不足、全文文書gate/図本人視認/全体独立finalのheldは保持する。
 - 親prefix/Dispatchと全旧子欄履歴を保持。自己編集はnormalreport子5欄、根拠明確な実装report2表現、/tmp proofのみ。製品/test/設計/台帳/実質結果/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### NR011/012 fix検証の終端
+
+- 4資源の実DCP起動、GC画面操作、既存Driverの実観測、UDP/health、所有停止はまだ未測定。次の正常系測定は本fixとは別工程であり、モデル成功だけで成立したと扱わない。元の二障害を閉じるために一般的な異常系や新環境検証を追加しない。
+- 05B2 receiver元scopeのclosedとage/sourceKey projection限界、他資源G3、AppHost/DCP実exit未取得、旧TDD不足、全文gate/図本人視認/全体独立finalの未完了を保持する。
+- 親prefix/Dispatchと全旧子欄を保持し、自己編集はnormalreport子5欄と/tmp proofのみ。製品/test/設計/台帳/第三者結果/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### Safe trace通常レビュー終端
+
+- trace pathは利用者が明示する書込可能な場所を前提とする。同期File.AppendのIOを非阻害化/強制中断する新保証はない。特に開始Recordはtryの前なので、開始記録そのもののIO失敗後にもStoppedが必ず書けるとの保証はしない。今回の有効path正常系を止める追加必須へはしない。
+- stage Acceptedはその段階の条件/取消状態を表す。traceだけでowner全証明、UDP ready、プロセス終了コード、全DCP cleanupを主張しない。任意の識別情報/ログ本文を追加せず安全な原因観測の粒度にとどめる。
+- 未成功GC実測、外部G3/全体受入、age/sourceKeyの旧投影限界、旧TDD不足・全文文書gate未合格・図本人視認・独立finalのheldを保持。今回追加の文書全文改稿や異常系網羅を必須にしない。
+- 親prefix/Dispatchと全旧子欄履歴を保持。自己編集はnormalreport子5欄、実装reportの軽微なprocess説明1箇所、/tmp proofのみ。製品/test/台帳/設計/実質結果/rawは変更しない。全自己command終端、自己の未回収session/exit/承認待ちなし。旧session10046実子exitの未回収は別履歴として残す。applied:null、report_attestation_allowed:false。
+
+### c4bccbf focused通常確認の終端
+
+- first-start tokenと基底停止による寿命維持を静的確認したが、全種類のHost起動失敗・非協力外部IOや全DCP cleanupを実測した保証ではない。普通の開始循環を解くための最小変更として評価し、汎用化や広い異常系fixtureを新必須へ増やさない。
+- 実GC/Driver正常系未証明、旧強制停止/実子exit不明、private runtime rawの読取拒否、他資源G3、旧age/sourceKeyの証拠限界、TDD/全文文書gate/図本人確認/独立finalの未完了を保持する。
+- 自己編集はnormalreport子5欄と/tmp proofのみ。親prefixと全旧履歴、既にdirtyな親tracking/未追跡証拠を保持し、製品/test/第三者の実質結果/rawは変更しない。自己read/write commandは全終端し未回収session/exit/承認待ちなし。旧実測の未回収exitは自己processと区別する。applied:null、report_attestation_allowed:false。
