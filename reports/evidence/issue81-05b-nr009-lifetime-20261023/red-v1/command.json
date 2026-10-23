@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~RuntimeIdentityControlOperationLifetimeTests",
+    "--verbosity",
+    "minimal"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit": 1,
+  "timed_out": false,
+  "elapsed_seconds": 8.231,
+  "stdout_sha256": "8ac6e0287bd72ea33e32233a1d7cca87dd1c83cb5b68e599b591a923bf775152",
+  "stderr_sha256": "bb636c13dd8f0185410f0a7c32a686d3c9f3f8f743f0a634d7b2f188157c23b0",
+  "stdout_bytes": 5399,
+  "stderr_bytes": 285,
+  "source": {
+    "head": "2a6fd94455978021cd995104751f4f09b0a28dfd",
+    "test_sha256": "6c34e4e1a0a2bcc084ed63fd1d9872788f220416280f86b71df47a2c1d815a0f",
+    "protocol_sha256": "44d8dc7d15abce2a460b29f6f26e1b460882cbac01f9e267023606181e74c18f",
+    "program_sha256": "4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b",
+    "project_assets_sha256": "488d87375bbc89e656f555ea31de13b3ae336da22cfe65de24b9015d981e1b23"
+  }
+}

@@ -1,0 +1,46 @@
+test_absolute_document_name_allows_empty_first_segment (__main__.DebugHostPortablePdbTests.test_absolute_document_name_allows_empty_first_segment)
+絶対pathの先頭空要素をportable PDB仕様どおり復号する。 ... ok
+test_assembly_and_pdb_identity_must_match (__main__.DebugHostPortablePdbTests.test_assembly_and_pdb_identity_must_match)
+同じ発行から作られていないPDBをGUID比較で拒否する。 ... ok
+test_corrupt_pdb_is_reported (__main__.DebugHostPortablePdbTests.test_corrupt_pdb_is_reported)
+portable PDB metadata rootの破損を拒否する。 ... ok
+test_corrupt_pe_is_reported (__main__.DebugHostPortablePdbTests.test_corrupt_pe_is_reported)
+破損した実行体をPE解析時に拒否する。 ... ok
+test_documents_outside_src_are_rejected (__main__.DebugHostPortablePdbTests.test_documents_outside_src_are_rejected)
+固定documentがあってもPDB内に/src外のdocumentがあれば拒否する。 ... ok
+test_expected_document_must_be_present_under_src (__main__.DebugHostPortablePdbTests.test_expected_document_must_be_present_under_src)
+固定documentがない場合を検出する。 ... ok
+test_missing_pdb_is_reported (__main__.DebugHostPortablePdbTests.test_missing_pdb_is_reported)
+PDB未発行を明示的な契約違反として報告する。 ... ok
+test_real_binary_fixture_accepts_matching_twenty_byte_identity (__main__.DebugHostPortablePdbTests.test_real_binary_fixture_accepts_matching_twenty_byte_identity)
+GUIDとStampが一致する実reader fixtureを受理する。 ... ok
+test_real_binary_fixture_rejects_nonportable_codeview_age (__main__.DebugHostPortablePdbTests.test_real_binary_fixture_rejects_nonportable_codeview_age)
+portable PDBに許可されないCodeView ageを実reader経路で拒否する。 ... ok
+test_real_binary_fixture_rejects_stamp_only_mismatch (__main__.DebugHostPortablePdbTests.test_real_binary_fixture_rejects_stamp_only_mismatch)
+同じGUID、age 1、有効な/src文書でもStamp不一致を拒否する。 ... FAIL
+
+======================================================================
+FAIL: test_real_binary_fixture_rejects_stamp_only_mismatch (__main__.DebugHostPortablePdbTests.test_real_binary_fixture_rejects_stamp_only_mismatch)
+同じGUID、age 1、有効な/src文書でもStamp不一致を拒否する。
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/donabe/Duck-issue81-aspire-desktop-bridge/scripts/tests/test-debughost-portable-pdb.py", line 100, in test_real_binary_fixture_rejects_stamp_only_mismatch
+    self.assertEqual(CONTRACT.read_codeview_identity(directory / "Tracker.DebugHost.dll"), (bytes(range(16)), 0x12345678, 1))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f', 305419897, 1) != (b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f', 305419896, 1)
+
+First differing element 1:
+305419897
+305419896
+
+- (b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f', 305419897, 1)
+?                                                                         ^
+
++ (b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f', 305419896, 1)
+?                                                                         ^
+
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.003s
+
+FAILED (failures=1)

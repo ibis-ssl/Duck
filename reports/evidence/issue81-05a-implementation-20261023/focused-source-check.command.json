@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-05a-implementation-20261023/focused-source-check.py"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "baseline_head": "f71bb2688caf080382d170937ea932601e0b3c3f"
+}

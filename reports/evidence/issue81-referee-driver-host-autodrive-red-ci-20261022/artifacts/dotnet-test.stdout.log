@@ -1,0 +1,97 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 1.46 sec).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj (in 1.45 sec).
+  Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 1.45 sec).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 3 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 180 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 3 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 7 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 7 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 1.08 sec).
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 2.87 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 2.03 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+  Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll
+  Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs(96,9): warning xUnit2012: Do not use Assert.True() to check if a value exists in a collection. Use Assert.Contains instead. (https://xunit.net/xunit.analyzers/rules/xUnit2012) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: True) [4 ms]
+  Error Message:
+   Assert.Single() Failure: The collection was empty
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(Boolean fragmented) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 129
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: False) [< 1 ms]
+  Error Message:
+   Assert.Single() Failure: The collection was empty
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(Boolean fragmented) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 129
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges [1 ms]
+  Error Message:
+   Assert.Single() Failure: The collection was empty
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 147
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: Stop, secondAction: "FORCE_START", decodedCount: 4) [85 ms]
+  Error Message:
+   Assert.IsType() Failure: Value is null
+Expected: typeof(Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient)
+Actual:   null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 34
+   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 54
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: PrepareKickoffBlue, secondAction: "NORMAL_START", decodedCount: 4) [24 ms]
+  Error Message:
+   Assert.IsType() Failure: Value is null
+Expected: typeof(Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient)
+Actual:   null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 34
+   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 54
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: ForceStart, secondAction: null, decodedCount: 3) [12 ms]
+  Error Message:
+   Assert.IsType() Failure: Value is null
+Expected: typeof(Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient)
+Actual:   null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 34
+   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 54
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket [1 ms]
+  Error Message:
+   Assert.Single() Failure: The collection was empty
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 165
+   at Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 177
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership [8 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 93
+   at Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 103
+--- End of stack trace from previous location ---
+Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+
+Failed!  - Failed:     8, Passed:   768, Skipped:     0, Total:   776, Duration: 29 s - Tracker.Tests.dll (net10.0)

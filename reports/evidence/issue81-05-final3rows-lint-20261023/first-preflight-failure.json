@@ -1,0 +1,6 @@
+{
+  "exit": 1,
+  "reason": "harness populated both variants before starting baseline lint; mirror therefore contained current fragments during baseline byte assertion",
+  "lint_commands_started": false,
+  "source_or_product_changed": false
+}

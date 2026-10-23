@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "$target = 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-closure-record-verification-20261022'; $resolved = (Get-Item -LiteralPath $target).FullName; if ($resolved -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-closure-record-verification-20261022') { throw 'Unexpected mirror target' }; $junction = Join-Path $resolved 'node_modules'; $item = Get-Item -LiteralPath $junction; if ($item.LinkType -ne 'Junction' -or $item.Target -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules') { throw 'Unexpected owned junction' }; [System.IO.Directory]::Delete($junction); Remove-Item -LiteralPath $resolved -Recurse -Force; if (Test-Path -LiteralPath $target) { throw 'Mirror still exists' }"
+  ],
+  "cwd": null,
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T21:53:20.603001+00:00",
+  "finishedUTC": "2026-10-22T21:53:20.799320+00:00"
+}

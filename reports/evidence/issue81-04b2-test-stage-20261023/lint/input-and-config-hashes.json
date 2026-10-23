@@ -1,0 +1,11 @@
+{
+  "input": "Tracker/Design/tasks-status.md",
+  "input_sha256": "d58d6d814ac95dd533d8ed3d9cedb5910890fda5e88f1dbf5e5400a73150f14d",
+  "input_files": 1,
+  "body_rows": 3,
+  "repo_and_mirror_config_match": {
+    "textlint": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "sudachi_dictionary": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8"
+  }
+}

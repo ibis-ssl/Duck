@@ -1,0 +1,229 @@
+[
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry",
+    "method": "DeadlineRejectsValidFrameReleasedAtExpiry",
+    "outcome": "Failed",
+    "duration": "00:00:00.0155578",
+    "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   GameControllerMatchSnapshot { Command = Halt, Phase = Halt }",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 165\n   at Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 174\n--- End of stack trace from previous location ---",
+    "expectedBeforeRun": {
+      "test": "DeadlineRejectsValidFrameReleasedAtExpiry",
+      "caseCount": 1,
+      "expect": "2second injected local read window expires at deadline; a frame released at expiry is not success; normal timeout returns null and disposes",
+      "currentExpected": "clock/options ignored; late Halt returns → Assert.Null(observed) fails",
+      "kind": "expectedRed",
+      "methodLine": 147
+    },
+    "sourceLine": 165,
+    "classification": "runtime assertion failure; no compile/watchdog timeout"
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: \"{\")",
+    "method": "InvalidOutputReturnsNoObservation",
+    "outcome": "Failed",
+    "duration": "00:00:00.0006778",
+    "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   System.Text.Json.JsonReaderException: Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. LineNumber: 0 | BytePositionInLine: 1.\n   at System.Text.Json.ThrowHelper.ThrowJsonReaderException(Utf8JsonReader& json, ExceptionResource resource, Byte nextByte, ReadOnlySpan`1 bytes)\n   at System.Text.Json.Utf8JsonReader.ReadSingleSegment()\n   at System.Text.Json.Utf8JsonReader.Read()\n   at System.Text.Json.JsonDocument.Parse(ReadOnlySpan`1 utf8JsonSpan, JsonReaderOptions readerOptions, MetadataDb& database, StackRowStack& stack)\n   at System.Text.Json.JsonDocument.Parse(ReadOnlyMemory`1 utf8Json, JsonReaderOptions readerOptions, Byte[] extraRentedArrayPoolBytes, PooledByteBufferWriter extraPooledByteBufferWriter, Boolean allowDuplicateProperties)\n   at System.Text.Json.JsonDocument.Parse(ReadOnlyMemory`1 utf8Json, JsonDocumentOptions options)\n   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 39\n   at Tracker.Tests.GameControllerStateTransportTests.<>c__DisplayClass3_0.<<InvalidOutputReturnsNoObservation>b__0>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 62\n--- End of stack trace from previous location ---\n   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(String json) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 65\n--- End of stack trace from previous location ---",
+    "expectedBeforeRun": {
+      "test": "InvalidOutputReturnsNoObservation",
+      "caseCount": 3,
+      "expect": "malformed JSON/scalar root/nonobject matchState return null without escaping ordinary input failure",
+      "currentExpected": "malformed { throws JsonException → Assert.Null(error) fails; other2 pass",
+      "kind": "1expectedRed+2regression",
+      "methodLine": 57
+    },
+    "sourceLine": 65,
+    "classification": "runtime assertion failure; no compile/watchdog timeout"
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(oneByteOver: True)",
+    "method": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+    "outcome": "Failed",
+    "duration": "00:00:00.0005071",
+    "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   GameControllerMatchSnapshot { Command = Halt, Phase = Halt }",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(Boolean oneByteOver) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 117\n--- End of stack trace from previous location ---",
+    "expectedBeforeRun": {
+      "test": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+      "caseCount": 2,
+      "expect": "exact UTF8 byte limit accepts Halt; one byte over even valid trailing JSON whitespace rejects",
+      "currentExpected": "options ignored; overlimit returns Halt → Assert.Null(observed) fails; exactlimit passes",
+      "kind": "1expectedRed+1regression",
+      "methodLine": 104
+    },
+    "sourceLine": 117,
+    "classification": "runtime assertion failure; no compile/watchdog timeout"
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(oneByteOver: False)",
+    "method": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+    "outcome": "Passed",
+    "duration": "00:00:00.0076001",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+      "caseCount": 2,
+      "expect": "exact UTF8 byte limit accepts Halt; one byte over even valid trailing JSON whitespace rejects",
+      "currentExpected": "options ignored; overlimit returns Halt → Assert.Null(observed) fails; exactlimit passes",
+      "kind": "1expectedRed+1regression",
+      "methodLine": 104
+    },
+    "sourceLine": null
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.NonTextMessageReturnsNoObservation(type: Binary)",
+    "method": "NonTextMessageReturnsNoObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0041403",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "NonTextMessageReturnsNoObservation",
+      "caseCount": 2,
+      "expect": "Close/Binary return null, no send, socket disposed",
+      "currentExpected": "existing guard returns null",
+      "kind": "regression",
+      "methodLine": 74
+    },
+    "sourceLine": null
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.NonTextMessageReturnsNoObservation(type: Close)",
+    "method": "NonTextMessageReturnsNoObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003223",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "NonTextMessageReturnsNoObservation",
+      "caseCount": 2,
+      "expect": "Close/Binary return null, no send, socket disposed",
+      "currentExpected": "existing guard returns null",
+      "kind": "regression",
+      "methodLine": 74
+    },
+    "sourceLine": null
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.CallerCancellationDuringReceiveRemainsCancellation",
+    "method": "CallerCancellationDuringReceiveRemainsCancellation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0050156",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "CallerCancellationDuringReceiveRemainsCancellation",
+      "caseCount": 1,
+      "expect": "caller cancellation propagates OperationCanceledException, no send, disposed",
+      "currentExpected": "existing token forwarding and using satisfy it",
+      "kind": "regression",
+      "methodLine": 179
+    },
+    "sourceLine": null
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt",
+    "method": "FragmentedUtf8MatchStateReturnsHalt",
+    "outcome": "Failed",
+    "duration": "00:00:00.0013904",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 28\n--- End of stack trace from previous location ---",
+    "expectedBeforeRun": {
+      "test": "FragmentedUtf8MatchStateReturnsHalt",
+      "caseCount": 1,
+      "expect": "Halt from complete UTF8 bytes split inside a multibyte character; 3 receives/0writes/disposed",
+      "currentExpected": "null on first nonfinal frame; NotNull runtime failure",
+      "kind": "expectedRed",
+      "methodLine": 14
+    },
+    "sourceLine": 28,
+    "classification": "runtime assertion failure; no compile/watchdog timeout"
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: \"{\\\"matchState\\\":[]}\")",
+    "method": "InvalidOutputReturnsNoObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009482",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "InvalidOutputReturnsNoObservation",
+      "caseCount": 3,
+      "expect": "malformed JSON/scalar root/nonobject matchState return null without escaping ordinary input failure",
+      "currentExpected": "malformed { throws JsonException → Assert.Null(error) fails; other2 pass",
+      "kind": "1expectedRed+2regression",
+      "methodLine": 57
+    },
+    "sourceLine": null
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: \"\\\"not-an-output\\\"\")",
+    "method": "InvalidOutputReturnsNoObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001989",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "InvalidOutputReturnsNoObservation",
+      "caseCount": 3,
+      "expect": "malformed JSON/scalar root/nonobject matchState return null without escaping ordinary input failure",
+      "currentExpected": "malformed { throws JsonException → Assert.Null(error) fails; other2 pass",
+      "kind": "1expectedRed+2regression",
+      "methodLine": 57
+    },
+    "sourceLine": null
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead",
+    "method": "FragmentedInitialOutputDoesNotEndMatchStateRead",
+    "outcome": "Failed",
+    "duration": "00:00:00.0223194",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 46\n--- End of stack trace from previous location ---",
+    "expectedBeforeRun": {
+      "test": "FragmentedInitialOutputDoesNotEndMatchStateRead",
+      "caseCount": 1,
+      "expect": "assemble initial gcState, reset message buffer, continue to Halt matchState",
+      "currentExpected": "null at first fragment; NotNull runtime failure",
+      "kind": "expectedRed",
+      "methodLine": 37
+    },
+    "sourceLine": 46,
+    "classification": "runtime assertion failure; no compile/watchdog timeout"
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation",
+    "method": "ReceiveDisconnectReturnsNoObservation",
+    "outcome": "Failed",
+    "duration": "00:00:00.0038633",
+    "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   System.Net.WebSockets.WebSocketException (0x80004005): The remote party closed the WebSocket connection without completing the close handshake.\n   at Tracker.Tests.GameControllerStateTransportTests.ScriptedSocket.ReceiveAsync(ArraySegment`1 buffer, CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 260\n   at System.Net.WebSockets.WebSocket.ReceiveAsync(Memory`1 buffer, CancellationToken cancellationToken)\n   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 35\n   at Tracker.Tests.GameControllerStateTransportTests.<>c__DisplayClass5_0.<<ReceiveDisconnectReturnsNoObservation>b__0>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 92\n--- End of stack trace from previous location ---\n   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 95\n--- End of stack trace from previous location ---",
+    "expectedBeforeRun": {
+      "test": "ReceiveDisconnectReturnsNoObservation",
+      "caseCount": 1,
+      "expect": "expected WebSocket disconnect returns null, no send, disposed",
+      "currentExpected": "WebSocketException escapes → Assert.Null(error) fails",
+      "kind": "expectedRed",
+      "methodLine": 86
+    },
+    "sourceLine": 95,
+    "classification": "runtime assertion failure; no compile/watchdog timeout"
+  },
+  {
+    "name": "Tracker.Tests.GameControllerStateTransportTests.FragmentedMessageOverTotalByteLimitReturnsNoObservation",
+    "method": "FragmentedMessageOverTotalByteLimitReturnsNoObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007523",
+    "message": null,
+    "stackTrace": null,
+    "expectedBeforeRun": {
+      "test": "FragmentedMessageOverTotalByteLimitReturnsNoObservation",
+      "caseCount": 1,
+      "expect": "aggregate completed-message bytes over limit reject",
+      "currentExpected": "already null because fragments unsupported; passing now does not prove current aggregate-size enforcement",
+      "kind": "regressionWithCoverageLimit",
+      "methodLine": 128
+    },
+    "sourceLine": null
+  }
+]

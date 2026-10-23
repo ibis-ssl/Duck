@@ -1,0 +1,31 @@
+3061: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:34.2147911Z #15 exporting manifest sha256:b5d062ff87417a5aa595ef3e0a6c7df2e0a42e6659d45d2ad803a4bd924835c6 done
+3063: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:34.2150747Z #15 exporting attestation manifest sha256:140c0247aaa99d86518f6e2113009b028158eb4d157a43dd2a6b411c271c44f2 done
+3064: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:34.2151656Z #15 exporting manifest list sha256:5b27e864769cb7995b8857b64399f7d821ee4a8d1869242ab27a79eb8b12b3f3 done
+3075: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:35.2232504Z #15 pushing manifest for ghcr.io/ibis-ssl/crane:base@sha256:5b27e864769cb7995b8857b64399f7d821ee4a8d1869242ab27a79eb8b12b3f3
+3076: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.0038702Z #15 pushing manifest for ghcr.io/ibis-ssl/crane:base@sha256:5b27e864769cb7995b8857b64399f7d821ee4a8d1869242ab27a79eb8b12b3f3 0.8s done
+3078: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.2448287Z #15 pushing manifest for ghcr.io/ibis-ssl/crane:base-jazzy-d91b6b0c864a6fb424016263c9a8f8b0440552474d0179abc766a5f3530d5d9b@sha256:5b27e864769cb7995b8857b64399f7d821ee4a8d1869242ab27a79eb8b12b3f3
+3079: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.5178724Z #15 pushing manifest for ghcr.io/ibis-ssl/crane:base-jazzy-d91b6b0c864a6fb424016263c9a8f8b0440552474d0179abc766a5f3530d5d9b@sha256:5b27e864769cb7995b8857b64399f7d821ee4a8d1869242ab27a79eb8b12b3f3 0.4s done
+3093: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.5462825Z   "buildx.build.provenance": {
+3140: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.5483899Z               "vcs:revision": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+3370: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.5625177Z         "github_workflow_sha": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+3382: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:36.5630590Z   "image.name": "ghcr.io/ibis-ssl/crane:base,ghcr.io/ibis-ssl/crane:base-jazzy-d91b6b0c864a6fb424016263c9a8f8b0440552474d0179abc766a5f3530d5d9b"
+3644: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:38.1403770Z #18 exporting manifest sha256:a77099d4599e7943bb3f69300baedce4ca5c1cc5d57e270fe04bc73551de47df done
+3646: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:38.1405499Z #18 exporting attestation manifest sha256:1f63b79bae9a86c42bf97bca58fd5dd8f79c9bbb59535e51af49c586147219b6 done
+3647: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:38.1406428Z #18 exporting manifest list sha256:9e7e3bf65589cde9371fe386401d2f5f8336f65f1f5512e05d16c7d8b033d462 done
+3658: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:39.0888973Z #18 pushing manifest for ghcr.io/ibis-ssl/crane:deps-jazzy@sha256:9e7e3bf65589cde9371fe386401d2f5f8336f65f1f5512e05d16c7d8b033d462
+3659: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:39.7851071Z #18 pushing manifest for ghcr.io/ibis-ssl/crane:deps-jazzy@sha256:9e7e3bf65589cde9371fe386401d2f5f8336f65f1f5512e05d16c7d8b033d462 0.7s done
+3661: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:40.0482495Z #18 pushing manifest for ghcr.io/ibis-ssl/crane:deps-jazzy-d91b6b0c864a6fb424016263c9a8f8b0440552474d0179abc766a5f3530d5d9b@sha256:9e7e3bf65589cde9371fe386401d2f5f8336f65f1f5512e05d16c7d8b033d462
+3662: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:40.5200214Z #18 pushing manifest for ghcr.io/ibis-ssl/crane:deps-jazzy-d91b6b0c864a6fb424016263c9a8f8b0440552474d0179abc766a5f3530d5d9b@sha256:9e7e3bf65589cde9371fe386401d2f5f8336f65f1f5512e05d16c7d8b033d462 0.5s done
+3676: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:40.5517456Z   "buildx.build.provenance": {
+3723: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:40.5542089Z               "vcs:revision": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+3953: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:40.5695328Z         "github_workflow_sha": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+3965: build Docker targets	UNKNOWN STEP	2026-10-02T05:00:40.5700532Z   "image.name": "ghcr.io/ibis-ssl/crane:deps-jazzy,ghcr.io/ibis-ssl/crane:deps-jazzy-d91b6b0c864a6fb424016263c9a8f8b0440552474d0179abc766a5f3530d5d9b"
+8411: build Docker targets	UNKNOWN STEP	2026-10-02T05:17:43.3338347Z #23 exporting manifest sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac done
+8413: build Docker targets	UNKNOWN STEP	2026-10-02T05:17:43.3340162Z #23 exporting attestation manifest sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697 done
+8414: build Docker targets	UNKNOWN STEP	2026-10-02T05:17:43.3341149Z #23 exporting manifest list sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49 done
+8426: build Docker targets	UNKNOWN STEP	2026-10-02T05:17:48.0748790Z #23 pushing manifest for ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49 1.0s done
+8427: build Docker targets	UNKNOWN STEP	2026-10-02T05:17:48.0751856Z #23 pushing manifest for ghcr.io/ibis-ssl/crane:scenario-develop@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49 0.4s done
+8451: build Docker targets	UNKNOWN STEP	2026-10-02T05:18:01.3349420Z   "buildx.build.provenance": {
+8498: build Docker targets	UNKNOWN STEP	2026-10-02T05:18:01.3372074Z               "vcs:revision": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+8728: build Docker targets	UNKNOWN STEP	2026-10-02T05:18:01.3502984Z         "github_workflow_sha": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+8740: build Docker targets	UNKNOWN STEP	2026-10-02T05:18:01.3508209Z   "image.name": "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d,ghcr.io/ibis-ssl/crane:scenario-develop"

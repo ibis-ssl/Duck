@@ -1,0 +1,48 @@
+{
+  "textlint": {
+    "exit": 0,
+    "checkedFiles": 2,
+    "findings": 0
+  },
+  "cspell": {
+    "exit": 1,
+    "currentOccurrences": 6,
+    "baselineOccurrences": 4,
+    "currentOnly": {
+      "Driver": 3
+    },
+    "baselineOnly": {
+      "referee": 1
+    },
+    "locations": [
+      "phases-status.md: current value paragraph, Driver x2",
+      "tasks-status.md: I81-05B3 row, Driver x1"
+    ]
+  },
+  "sudachi": {
+    "exit": 1,
+    "currentOccurrences": 23,
+    "baselineOccurrences": 14,
+    "currentOnly": {
+      "GC english": 2,
+      "Driver english": 3,
+      "Driver katakana": 3,
+      "アプリ katakana": 2,
+      "コード katakana": 2
+    },
+    "baselineOnly": {
+      "referee english": 1,
+      "referee katakana": 1,
+      "アクセス katakana": 1
+    },
+    "rawIsUtf8": true
+  },
+  "scope": "Only the 3 changed status rows in 2 effective files. Reports are excluded by the repository target configuration and were not linted.",
+  "setupHistory": [
+    "Earlier source-path mapping attempt failed before lint; preserved in history.",
+    "Earlier copy to the same path failed with SameFileError before lint; preserved in history.",
+    "An earlier Sudachi invocation included report files excluded by repository targets and exited 2; retained separately.",
+    "The first current Sudachi runner selected system Python without yaml and exited 2; no install was attempted. The existing venv was then called explicitly and the scoped run completed with lint findings, exit 1."
+  ],
+  "overallGate": "Not passed: CSpell and Sudachi report current vocabulary findings. No whitelist/dictionary/config change and no whole-document rewrite."
+}

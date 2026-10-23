@@ -1,0 +1,9 @@
+{
+  "head": "3bbb2a5f0b5a503d173a3da7f2eb4306e4f7d558",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "verification": "remote_ci_only: fixed proto source unavailable locally; no restore/host launch attempted",
+  "requestedProfile": "gpt-6.1-sol/high",
+  "applied": null,
+  "scope": "03C standard configuration minimal behavior after accepted 13 runtime Red; AutoDrive next unit",
+  "redEvidence": "/tmp/issue81-referee-driver-host-composition-red-ci-20261022/ci-evidence.json"
+}

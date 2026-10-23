@@ -1,0 +1,8 @@
+{
+  "timeUTC": "2026-10-22T19:36:05.921922+00:00",
+  "issuedChildCommands": "all synchronous commands exited; no sessions or uncollected exits",
+  "newWatchBuildTestStarted": false,
+  "matchingWatchOrSyntaxProcesses": [],
+  "psExitCode": 0,
+  "priorOwnedRedMonitor": "terminated and reaped previously gh255/wrapper0; GH run last metadata in_progress not overall result"
+}

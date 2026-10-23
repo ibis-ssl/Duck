@@ -1,0 +1,37 @@
+[
+  {
+    "requirement": "Enabled and explicit AutoDrive only; observation write0 otherwise",
+    "production": "RefereeDriverApplication.Build existing Enabled early return, explicit bool AutoDriveToActive block; RefereeAutoDriveWorker",
+    "fixture": "ExplicitAutoDriveUsesExistingDriverAndControlAdapter x3 / ObservationDefaultOrDisabledHostNeverStartsControl x5",
+    "red": "IsType(null) x3; defaults5 passed",
+    "candidate": "registration and worker implemented; runtimeGreen pending"
+  },
+  {
+    "requirement": "Existing Driver sequence and same UDP pump; no implicit team rename",
+    "production": "RefereeDriverFixture DriveToActiveAsync + same IRefereeCommandSource instance; existing GameControllerWebSocketControlClient",
+    "fixture": "HALT→NEXT→STOP/FORCE, PREPARE/NORMAL, alreadyactive3; HTTP counts4/4/3; pump1",
+    "red": "first DI assertion failed, deeper sequence assertions not reached",
+    "candidate": "delegates unchanged core; no extra UDP source or team setting"
+  },
+  {
+    "requirement": "Internal URI also for control; no loopback/self reintroduction",
+    "production": "Build ReadEndpoint before control registration; concrete control client receives same endpoint",
+    "fixture": "selfURI2 regression and positive message Endpoint assertions",
+    "red": "selfURI2 passed; positive deeper assertions not reached",
+    "candidate": "same validated endpoint; legacy default client API unchanged"
+  },
+  {
+    "requirement": "Initial Output complete before exact JSON; socket disposal",
+    "production": "RefereeDriverWebSocketTransport SendJsonAsync connect→text frames until EndOfMessage→Send→using Dispose; existing client serializes JSON",
+    "fixture": "ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket x2 / ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges",
+    "red": "Single(empty) at129/147",
+    "candidate": "implemented; Green pending"
+  },
+  {
+    "requirement": "Caller/Host cancellation and resource ownership",
+    "production": "control worker BackgroundService stoppingToken; transport using socket; receive owned solely by existing ObservationWorker/service",
+    "fixture": "StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership / CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket",
+    "red": "NotNull null93 / Single empty165",
+    "candidate": "implemented; Green pending"
+  }
+]

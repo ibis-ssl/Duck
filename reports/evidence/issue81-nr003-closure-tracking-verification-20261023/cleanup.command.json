@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "$target = 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-nr003-closure-tracking-verification-20261023'; $resolved = (Get-Item -LiteralPath $target).FullName; if ($resolved -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-nr003-closure-tracking-verification-20261023') { throw 'Unexpected mirror target' }; $junction = Join-Path $resolved 'node_modules'; $item = Get-Item -LiteralPath $junction; if ($item.LinkType -ne 'Junction' -or $item.Target -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules') { throw 'Unexpected owned junction' }; [System.IO.Directory]::Delete($junction); Remove-Item -LiteralPath $resolved -Recurse -Force; if (Test-Path -LiteralPath $target) { throw 'Mirror still exists' }"
+  ],
+  "cwd": null,
+  "exit_code": 0,
+  "finishedUTC": "2026-10-23T01:55:00.377752+00:00"
+}

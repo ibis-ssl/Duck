@@ -1,0 +1,177 @@
+{
+  "stage": "additional_v2_same_frozen_tests_after_implementation_fix",
+  "head_sha": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b",
+  "run_id": 39776500808,
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39776500808",
+  "test_job": {
+    "completedAt": "2026-10-22T12:14:20Z",
+    "conclusion": "failure",
+    "databaseId": 119816674528,
+    "name": "test",
+    "startedAt": "2026-10-22T12:12:51Z",
+    "status": "completed",
+    "steps": [
+      {
+        "completedAt": "2026-10-22T12:12:53Z",
+        "conclusion": "success",
+        "name": "Set up job",
+        "number": 1,
+        "startedAt": "2026-10-22T12:12:52Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:12:58Z",
+        "conclusion": "success",
+        "name": "Check out repository",
+        "number": 2,
+        "startedAt": "2026-10-22T12:12:53Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:12:59Z",
+        "conclusion": "success",
+        "name": "Set up .NET SDK",
+        "number": 3,
+        "startedAt": "2026-10-22T12:12:58Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:14:13Z",
+        "conclusion": "failure",
+        "name": "Run dotnet test",
+        "number": 4,
+        "startedAt": "2026-10-22T12:12:59Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:14:15Z",
+        "conclusion": "success",
+        "name": "Collect failure diagnostics",
+        "number": 5,
+        "startedAt": "2026-10-22T12:14:13Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:14:18Z",
+        "conclusion": "success",
+        "name": "Upload test failure artifact",
+        "number": 6,
+        "startedAt": "2026-10-22T12:14:15Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:14:18Z",
+        "conclusion": "skipped",
+        "name": "Post Set up .NET SDK",
+        "number": 11,
+        "startedAt": "2026-10-22T12:14:18Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:14:18Z",
+        "conclusion": "success",
+        "name": "Post Check out repository",
+        "number": 12,
+        "startedAt": "2026-10-22T12:14:18Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:14:18Z",
+        "conclusion": "success",
+        "name": "Complete job",
+        "number": 13,
+        "startedAt": "2026-10-22T12:14:18Z",
+        "status": "completed"
+      }
+    ],
+    "url": "https://github.com/ibis-ssl/Duck/actions/runs/39776500808/job/119816674528"
+  },
+  "artifacts": {
+    "total_count": 1,
+    "artifacts": [
+      {
+        "id": 12424593092,
+        "node_id": "MDg6QXJ0aWZhY3QxMjQyNDU5MzA5Mg==",
+        "name": "dotnet-test-failure-39776500808-1",
+        "size_in_bytes": 11308481,
+        "url": "https://api.github.com/repos/ibis-ssl/Duck/actions/artifacts/12424593092",
+        "archive_download_url": "https://api.github.com/repos/ibis-ssl/Duck/actions/artifacts/12424593092/zip",
+        "expired": false,
+        "digest": "sha256:d700239a7ae6875c56b145a10823c3065e7e159de457f29b346f4d1decbbc808",
+        "created_at": "2026-10-22T12:14:17Z",
+        "updated_at": "2026-10-22T12:14:17Z",
+        "expires_at": "2026-11-05T12:14:15Z",
+        "workflow_run": {
+          "id": 39776500808,
+          "repository_id": 1234440134,
+          "head_repository_id": 1234440134,
+          "head_branch": "task/issue81-aspire-desktop-bridge",
+          "head_sha": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b"
+        }
+      }
+    ]
+  },
+  "processes": "all subprocess.run calls completed",
+  "product_tests_expectations_delta": "none per parent; no product inspection",
+  "initial_history": "v1 BCL28/28 and initial/published-head CI history retained separately; additional-v2 initial CI39775288708 four failures retained; this is fixed-head rerun",
+  "individual_case_limit": "success logs may contain aggregate only; no individual own-case claim without names/TRX",
+  "additional_delta_retry": "not_performed",
+  "repo_writes": "none",
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifacts.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifacts.stdout.log",
+      "sha256": "3a16cf19543f44b327338cc361cac552c26b53da81d50c3ef67522a5a04d3e4d"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/collect-ci.py",
+      "sha256": "388d968a2d2f3c0fb094c4e6b43c1329b25ae6fe537beee8208baad2ae363e4f"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/commands.json",
+      "sha256": "d695cba6ccd1b6733e180f4332141015cf911504ea07f3aa602b155bc9e4cb16"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/final-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/final-view.stdout.log",
+      "sha256": "249d99d0ffd6e89d6a2db40f9f36ea2b1e9ed3dabb9db6152cfc87a4f422f044"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/initial-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/initial-view.stdout.log",
+      "sha256": "11bac6942b2c259024ac0ad9bbe5a547cf40a5231bd8f753fb870a344d5bd968"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/own-test-matches.log",
+      "sha256": "a054c73a122f00a1838e5d6300cb2b24c20db73ae8cbb83d54ff2808673a4e97"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/test-job-log.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/test-job-log.stdout.log",
+      "sha256": "1e03152aaba13015d99b1ccd5fb8c8b0df04b6314115420db1c78c32def74486"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/watch.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/watch.stdout.log",
+      "sha256": "46e61241df98252d4400f72e8a296dae2c4f6c14f5d656543c00aea174e65e7d"
+    }
+  ]
+}

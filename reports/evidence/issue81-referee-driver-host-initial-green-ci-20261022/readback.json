@@ -1,0 +1,11 @@
+{
+  "files": [
+    "ci-evidence.json",
+    "head-source-manifest.json",
+    "checkpoint-view.stdout.log",
+    "artifacts.stdout.log"
+  ],
+  "success": true,
+  "utc": "2026-10-22T20:22:43.470404+00:00",
+  "allIssuedProcessesEnded": true
+}

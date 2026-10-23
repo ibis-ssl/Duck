@@ -1,0 +1,10 @@
+{
+  "cliPath": "C:\\Users\\donabe\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+  "operation": "read-only context show/inspect; no daemon execution",
+  "context": "desktop-linux",
+  "contextExit": 0,
+  "endpointJson": "\"npipe:////./pipe/dockerDesktopLinuxEngine\"",
+  "inspectExit": 0,
+  "dockerHostOverridePresent": false,
+  "dockerContextOverridePresent": false
+}

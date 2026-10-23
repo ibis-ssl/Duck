@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-mdgate-381dcb6-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' -e 'const fs=require(\"fs\"),crypto=require(\"crypto\"); for(const n of [\"cspell\",\"textlint\",\"yaml\"]){const p=require.resolve(n+\"/package.json\");const b=fs.readFileSync(p);console.log(JSON.stringify({name:n,path:p,version:JSON.parse(b).version,sha256:crypto.createHash(\"sha256\").update(b).digest(\"hex\")}));}'"
+  ],
+  "exit_code": 1,
+  "utc": "2026-10-22T16:24:56.434915+00:00"
+}

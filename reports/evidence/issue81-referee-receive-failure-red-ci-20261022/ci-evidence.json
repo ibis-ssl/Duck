@@ -1,0 +1,155 @@
+{
+  "headSha": "8dfa1e03a12f2a3eb6e23bdf8dfe44423a06dbef",
+  "runId": 39787367706,
+  "testJobId": 119854012067,
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39787367706",
+  "watchExitCode": 1,
+  "testExitCode": 1,
+  "counters": {
+    "total": "620",
+    "executed": "620",
+    "passed": "616",
+    "failed": "4",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "newTests": [
+    {
+      "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"malformed\")",
+      "outcome": "Failed",
+      "duration": "00:00:00.0084458",
+      "message": "破損や意味の欠落があっても受信pumpを停止しない。",
+      "stackTrace": "   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 39\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n--- End of stack trace from previous location ---"
+    },
+    {
+      "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"missing-command\")",
+      "outcome": "Failed",
+      "duration": "00:00:00.0324561",
+      "message": "Assert.Equal() Failure: Values differ\nExpected: 2\nActual:   3",
+      "stackTrace": "   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 41\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n--- End of stack trace from previous location ---"
+    },
+    {
+      "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"unknown-command\")",
+      "outcome": "Failed",
+      "duration": "00:00:00.0142944",
+      "message": "Assert.Equal() Failure: Values differ\nExpected: 2\nActual:   3",
+      "stackTrace": "   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 41\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n--- End of stack trace from previous location ---"
+    },
+    {
+      "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"missing-counter\")",
+      "outcome": "Failed",
+      "duration": "00:00:00.0037269",
+      "message": "Assert.Equal() Failure: Values differ\nExpected: 2\nActual:   3",
+      "stackTrace": "   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 41\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n   at Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(String invalidKind) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs:line 74\n--- End of stack trace from previous location ---"
+    }
+  ],
+  "originalPositive": [
+    {
+      "name": "Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock",
+      "outcome": "Passed",
+      "duration": "00:00:00.0471932",
+      "message": "",
+      "stackTrace": ""
+    }
+  ],
+  "otherResults": {
+    "count": 616,
+    "allPassed": true
+  },
+  "fixed67": {
+    "count": 67,
+    "allPassed": true,
+    "individual_results": "fixed67-results.json"
+  },
+  "sourceArchiveChecks": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+      "sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/IndependentClock.cs",
+      "sha256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ResourceReadinessSpecificationTests.cs",
+      "sha256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs",
+      "sha256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/TrackerDatagramSpecificationTests.cs",
+      "sha256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+      "sha256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/IndependentVisionWireFixture.cs",
+      "sha256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+      "ci_archive_matches_head_and_current": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/VisionStoreAdditionalSpecificationTests.cs",
+      "sha256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+      "ci_archive_matches_head_and_current": true
+    }
+  ],
+  "fixedSourceManifestChecks": [
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "files_checked": 11,
+      "unchanged": true
+    },
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "files_checked": 9,
+      "unchanged": true
+    }
+  ],
+  "artifactZipSha256": "89acf6673523b083a19618d16ceb099dfb993343d9b7bd0d4ec622c676bcfb84",
+  "artifactDigestMatches": true,
+  "trxSha256": "f10ccf4263d2e1c3c24029deacab7a082aca915d2b7d5aed4c0a278f4e613964",
+  "compile": "completed; runtime assertions reached",
+  "recoveryAssertions": "not reached after failed assertion; no Green claim",
+  "behaviorEdits": false,
+  "processState": "all read/list/watch/view/log/download processes terminated; exit codes collected"
+}

@@ -1,0 +1,10 @@
+{
+  "cwd": "C:/Users/donabe/AppData/Local/Temp/issue81-04b2-tracking-lint-20261023",
+  "argv": [
+    "C:/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "spell",
+    "--files",
+    "Tracker/Design/tasks-status.md"
+  ]
+}

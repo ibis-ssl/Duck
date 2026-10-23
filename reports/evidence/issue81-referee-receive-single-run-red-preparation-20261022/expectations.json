@@ -1,0 +1,24 @@
+{
+  "state": "fixed_before_test_source_saved_and_execution",
+  "head": "cc771ba36de6045148f720d398fdef6fe2b8805d",
+  "governing_sources": [
+    {
+      "path": "reports/issue81-referee-driver-scope-20261022.md",
+      "line": 89,
+      "contract": "single resident loop; diagnostics and Drive do not compete to Receive"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "task": "I81-03A",
+      "contract": "single persistent 11003 receive"
+    }
+  ],
+  "test": "OverlappingRunsNeverCreateConcurrentReceives",
+  "initial": "real parser, two valid packets, first Run waiting in third Receive",
+  "action": "invoke second Run on the same service; capture synchronous rejection without requiring an exception type; cancel both tokens and await all returned tasks to terminal",
+  "expected": "first Run is not faulted; maximum simultaneous Receive calls is exactly1; both tasks are terminal",
+  "unspecified": "second Run may reject or share the active task; no exact exception type or task reference equality assertion",
+  "red_candidate": "MaxActiveReceives assertion; current implementation may produce2; actual runtime failure remains to be observed from CI",
+  "behavior_edits": false,
+  "execution": "remote_ci_only; syntax extraction not semantic compile or Red"
+}

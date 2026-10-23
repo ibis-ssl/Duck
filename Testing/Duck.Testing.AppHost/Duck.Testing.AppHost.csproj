@@ -10,7 +10,8 @@
     <InternalsVisibleTo Include="Tracker.Tests" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Tracker\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
+    <ProjectReference Include="..\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\..\Tracker\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\Tracker\Tracker.DebugHost\Tracker.DebugHost.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" IsAspireProjectResource="false" />

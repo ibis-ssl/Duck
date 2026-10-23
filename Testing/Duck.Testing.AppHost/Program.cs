@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 
@@ -7,6 +9,233 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
 }
 
 var builder = DistributedApplication.CreateBuilder(args);
+var repositoryRoot = FindRepositoryRoot();
+
+IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, string imageName, string projectPath)
+{
+    var projectDirectory = Path.Combine(repositoryRoot, projectPath);
+    var publishDirectory = Path.Combine(projectDirectory, "bin", "Release", "net10.0", "publish");
+    return builder.AddContainer(resourceName, imageName)
+        .WithDockerfile(publishDirectory, Path.Combine(projectDirectory, "Dockerfile"));
+}
+
+static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
+
+/// <summary>
+/// 明示選択された場合だけ、所有ラベルと診断受渡しの常駐サービスを構成します。
+/// </summary>
+void EnableDesktopIdentityBridge(IResourceBuilder<ContainerResource> resource, string runId, string role)
+{
+    if (!IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        return;
+    }
+
+    var contextName = builder.Configuration["Testing:IdentityControl:DockerContext"];
+    var expectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+    if (string.IsNullOrWhiteSpace(contextName) || string.IsNullOrWhiteSpace(expectedEngineId))
+    {
+        throw new InvalidOperationException(
+            "Testing:IdentityControl:DockerContext and Testing:IdentityControl:ExpectedEngineId are required when the desktop identity bridge is enabled.");
+    }
+
+    resource.WithContainerRuntimeArgs(
+        "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={runId}",
+        "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={role}");
+
+    var dockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
+    builder.Services.AddHostedService(serviceProvider => new ContainerIdentityHandoffService(
+        serviceProvider.GetRequiredService<ResourceNotificationService>(),
+        resource.Resource,
+        role,
+        runId,
+        contextName,
+        expectedEngineId,
+        new DockerCliCommandRunner(dockerExecutable),
+        serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
+        builder.Configuration["Testing:IdentityControl:SafeTracePath"]));
+}
+
+static string FindRepositoryRoot()
+{
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+    {
+        if (File.Exists(Path.Combine(directory.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+        {
+            return directory.FullName;
+        }
+    }
+
+    throw new DirectoryNotFoundException("DuckリポジトリのルートをAppHostの出力先から特定できません。");
+}
+
+if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]))
+{
+    var runtimeOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var runtimeOnlyOwnershipLease = StackOwnershipLease.Acquire(runtimeOnlyLockPath);
+    var runtimeOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var runtimeOnlyDuck = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", runtimeOnlyRunId)
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+    EnableDesktopIdentityBridge(runtimeOnlyDuck, runtimeOnlyRunId, "duck");
+    var runtimeOnlyEndpoint = runtimeOnlyDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    runtimeOnlyEndpoint.Port = null;
+    runtimeOnlyEndpoint.TargetHost = "127.0.0.1";
+
+
+    builder.Build().Run();
+    return 0;
+}
+
+if (IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]))
+{
+    var configuredSimulatorTag = builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
+    if (!string.Equals(configuredSimulatorTag, "a52b6bd", StringComparison.Ordinal))
+    {
+        throw new InvalidOperationException(
+            "Testing:VisionSimulationOnly requires the simulator image locked as a52b6bd.");
+    }
+
+    var visionOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var visionOnlyOwnershipLease = StackOwnershipLease.Acquire(visionOnlyLockPath);
+    var visionOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var visionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+    var visionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+    var visionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+    var simulatorTeamColor = builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+    if (!int.TryParse(visionSimulatorIbisPort, out var visionSimulatorIbisPortNumber) ||
+        visionSimulatorIbisPortNumber is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("Testing:Simulator:IbisPort must be a valid UDP port number.");
+    }
+
+    var visionSimulator = builder.AddContainer(
+            "simulator",
+            "ghcr.io/ibis-ssl/framework-simulatorcli",
+            "a52b6bd")
+        .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
+        .WithEntrypoint("tini")
+        .WithArgs(
+            "--",
+            "./bin/simulator-cli",
+            "-g", visionSimulatorGeometry,
+            "--realism", visionSimulatorRealism,
+            "--ibis-port", visionSimulatorIbisPort,
+            "--ibis-team-color", simulatorTeamColor);
+
+    var visionOnlyDuck = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", visionOnlyRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
+        .WaitForStart(visionSimulator);
+    EnableDesktopIdentityBridge(visionOnlyDuck, visionOnlyRunId, "duck");
+    var visionOnlyEndpoint = visionOnlyDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    visionOnlyEndpoint.Port = null;
+    visionOnlyEndpoint.TargetHost = "127.0.0.1";
+
+    builder.Build().Run();
+    return 0;
+}
+
+if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
+{
+    var gcVisionGameControllerOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "gcVisionDuck-aspire-stack.lock");
+    using var gcVisionGameControllerOnlyOwnershipLease = StackOwnershipLease.Acquire(gcVisionGameControllerOnlyLockPath);
+    var gcVisionGameControllerOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var gcVisionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+    var gcVisionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+    var gcVisionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+    var gcVisionSimulatorTeamColor = builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+    if (!int.TryParse(gcVisionSimulatorIbisPort, out var gcVisionSimulatorIbisPortNumber) ||
+        gcVisionSimulatorIbisPortNumber is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("Testing:Simulator:IbisPort must be a valid UDP port number.");
+    }
+
+    var gcVisionSimulator = builder.AddContainer(
+            "simulator",
+            "ghcr.io/ibis-ssl/framework-simulatorcli",
+            "a52b6bd")
+        .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
+        .WithEntrypoint("tini")
+        .WithArgs(
+            "--",
+            "./bin/simulator-cli",
+            "-g", gcVisionSimulatorGeometry,
+            "--realism", gcVisionSimulatorRealism,
+            "--ibis-port", gcVisionSimulatorIbisPort,
+            "--ibis-team-color", gcVisionSimulatorTeamColor);
+
+    var gcVisionDuck = AddPublishedContainer("duck", "gcVisionDuck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", gcVisionGameControllerOnlyRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
+        .WaitForStart(gcVisionSimulator);
+    EnableDesktopIdentityBridge(gcVisionDuck, gcVisionGameControllerOnlyRunId, "duck");
+    var gcVisionDuckVisionEndpoint = gcVisionDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    gcVisionDuckVisionEndpoint.Port = null;
+    gcVisionDuckVisionEndpoint.TargetHost = "127.0.0.1";
+
+    var gcVisionGameController = builder.AddContainer("game-controller", "robocupssl/ssl-game-controller")
+        .WithImageSHA256("d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7")
+        .WithArgs(
+            "-visionAddress", "224.5.23.2:10020",
+            "-trackerAddress", "224.5.23.2:11010",
+            "-publishAddress", "224.5.23.1:11003",
+            "-address", ":8082")
+        .WithHttpEndpoint(targetPort: 8082, name: "game-controller-ui", isProxied: false)
+        .WaitFor(gcVisionDuck);
+    var gcVisionEndpoint = gcVisionGameController.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "game-controller-ui");
+    gcVisionEndpoint.Port = null;
+    gcVisionEndpoint.TargetHost = "127.0.0.1";
+
+    AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WaitForStart(gcVisionGameController);
+
+    builder.Build().Run();
+    return 0;
+}
+
 var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
 if (testingMode is not "base" and not "comparison")
 {
@@ -28,12 +257,6 @@ using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 var preflightPorts = ExclusiveControlPortPreflight
     .CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator)
     .ToList();
-if (testingMode == "comparison")
-{
-    preflightPorts.Add(new("DebugHost comparison health", System.Net.Sockets.ProtocolType.Tcp, 39107));
-    preflightPorts.Add(new("RuntimeHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39108));
-    preflightPorts.Add(new("DebugHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39109));
-}
 ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
 
 var simulatorImageTag =
@@ -74,14 +297,26 @@ var simulator = builder.AddDockerWrapper(
     "simulator-cli",
     "simulator");
 
-var duckBuilder = builder
-    .AddProject<Projects.Tracker_RuntimeHost>("duck")
+var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
     .WithEnvironment("Tracker__ActiveProfileName", "sim")
-    .WithEnvironment("Testing__Mode", testingMode);
-if (testingMode == "comparison")
+    .WithEnvironment("Testing__Mode", testingMode)
+    .WithEnvironment("Testing__ContainerMode", "true")
+    .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+    .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
 {
-    duckBuilder.WithHttpEndpoint(port: 39108, targetPort: 39108, name: "vision-health", isProxied: false);
+    duckBuilder
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
 }
+EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck");
+var visionHealthEndpoint = duckBuilder.Resource.Annotations
+    .OfType<EndpointAnnotation>()
+    .Single(endpoint => endpoint.Name == "vision-health");
+visionHealthEndpoint.Port = null;
+visionHealthEndpoint.TargetHost = "127.0.0.1";
 
 var duck = duckBuilder
     .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
@@ -104,6 +339,16 @@ var gameController = builder.AddDockerWrapper(
     "app",
     "game-controller",
     expectedCraneTeamName: craneTeamName);
+
+if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+    IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+{
+    AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WaitFor(gameController);
+}
 
 IResourceBuilder<ExecutableResource>? cm4Simulator = null;
 if (useCm4Simulator)
@@ -206,8 +451,7 @@ if (testingMode == "comparison")
         .WaitFor(simulator)
         .WaitFor(gameController);
 
-    builder
-        .AddProject<Projects.Tracker_DebugHost>("debug-host")
+    var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
         .WithEnvironment("Testing__Mode", "comparison")
         .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
         .WithEnvironment("VisionReceiver__Port", "10020")
@@ -218,13 +462,19 @@ if (testingMode == "comparison")
         .WithEnvironment("Tracker__Receive__Port", "11010")
         .WithEnvironment("Tracker__Uuid", "debug-host-observer")
         .WithEnvironment("Tracker__SourceName", "debug-host-observer")
-        .WithHttpEndpoint(port: 39107, targetPort: 39107, name: "comparison-health", isProxied: false)
-        .WithHttpEndpoint(port: 39109, targetPort: 39109, name: "vision-health", isProxied: false)
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    var httpEndpoint = debugHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    httpEndpoint.Port = null;
+    httpEndpoint.TargetHost = "127.0.0.1";
+    debugHost
         .WaitForStart(simulator)
         .WaitForStart(duck)
         .WaitFor(trackerTigers)
         .WaitFor(trackerErForce)
-        .WithHttpHealthCheck("/health/comparison");
+        .WithHttpHealthCheck("/health/comparison", endpointName: "http");
 }
 
 builder.Build().Run();

@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-22T21:32:46.923173+00:00",
+  "head": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+  "reportSHA256": "d45e3d61b4595c3863b110584359562b7b2c366ec82bf591cc8591224bd5a4f6",
+  "parentPrefixAndHistoryPreserved": true,
+  "source44Unchanged": true,
+  "config21Unchanged": true,
+  "normalReviewReportUnchanged": true,
+  "normalReviewSHA256": "fad8e6280531932b90f89e135371466434cbc58e7f8fe9b4c1795df60ddbf868",
+  "allFull24InputHashesRechecked": true,
+  "trackingNewFindingDelta": 0,
+  "fullGate": "failed; actual24 docs/CSpell232/Sudachi890",
+  "finalDiffCheckExit": 0,
+  "allProcessesTerminated": true
+}

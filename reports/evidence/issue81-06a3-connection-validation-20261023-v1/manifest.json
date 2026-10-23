@@ -1,0 +1,16 @@
+{
+  "results": [
+    {
+      "name": "apphost-model",
+      "exit_code": 0
+    },
+    {
+      "name": "runtimehost-build",
+      "exit_code": 0
+    },
+    {
+      "name": "apphost-build",
+      "exit_code": 0
+    }
+  ]
+}

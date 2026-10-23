@@ -1,0 +1,17 @@
+{
+  "head": "8b9a1cf52a6fcf99b3196a81f638264337120143",
+  "redRun": 39784129851,
+  "redTestAssertion": "Expected2 Actual0 at test line38",
+  "redAcceptedBy": "parent tdd-executor",
+  "sourcePath": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+  "sourceSha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2",
+  "unchangedTestPath": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+  "unchangedTestSha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+  "diffNumstat": "26\t3\tTesting/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+  "syntaxExit": 0,
+  "localBuildExit": 1,
+  "testExecuted": false,
+  "greenStatus": "pending exact-SHA PR CI; no Green observed locally",
+  "remaining": "change subscription, semantic failure handling, restart/cancel invalidation and concurrency protections remain for next Red steps",
+  "processState": "all issued subprocesses completed"
+}

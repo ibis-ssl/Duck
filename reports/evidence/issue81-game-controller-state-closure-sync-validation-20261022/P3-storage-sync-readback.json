@@ -1,0 +1,34 @@
+[
+  {
+    "group": "issue81-game-controller-state-deadline-red-ci-20261022",
+    "storageMapSHA256": "609b862858803504e9bbad3dc5620f115d79347aa3e0687ef132fff9a2f65ea4",
+    "entry": {
+      "path": "artifact-download.stdout.log",
+      "sha256": "ceedfa6fd629298447bc853b58634ebea6136cd68e4686c3a4db6fdf3eaf6ae7",
+      "bytes": 19001296,
+      "stored": false,
+      "original": "/tmp/issue81-game-controller-state-deadline-red-ci-20261022/artifact-download.stdout.log",
+      "reason": "ZIP payload saved as .log; duplicate removed from repository tree after normal review. Original bytes and SHA256 remain at original /tmp path; historical commits unchanged."
+    },
+    "tmpOriginalSHA256": "ceedfa6fd629298447bc853b58634ebea6136cd68e4686c3a4db6fdf3eaf6ae7",
+    "repoDuplicateAbsent": true,
+    "owner": "parent",
+    "uncommittedTreeSync": true
+  },
+  {
+    "group": "issue81-game-controller-state-mapping-red-ci-20261022",
+    "storageMapSHA256": "eac26c8feb1a2b0a49ee8e06e0e1efeb54cb16ea2fd2fc23710ee2fd4d56618a",
+    "entry": {
+      "path": "artifact-download.stdout.log",
+      "sha256": "35fde5633d4255a3bf2ef09876389957cb31b7d4148a5b53f957f8ec1715d601",
+      "bytes": 38768036,
+      "stored": false,
+      "original": "/tmp/issue81-game-controller-state-mapping-red-ci-20261022/artifact-download.stdout.log",
+      "reason": "ZIP payload saved as .log; duplicate removed from repository tree after normal review. Original bytes and SHA256 remain at original /tmp path; historical commits unchanged."
+    },
+    "tmpOriginalSHA256": "35fde5633d4255a3bf2ef09876389957cb31b7d4148a5b53f957f8ec1715d601",
+    "repoDuplicateAbsent": true,
+    "owner": "parent",
+    "uncommittedTreeSync": true
+  }
+]

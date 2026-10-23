@@ -1,0 +1,16 @@
+{
+  "name": "ghcr_crane",
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "ghcr.io/ibis-ssl/crane@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49"
+  ],
+  "exit": 0,
+  "reference": "ghcr.io/ibis-ssl/crane@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+  "stdout_bytes": 13188,
+  "stderr_bytes": 0,
+  "stdout_sha256": "f4ab5295a14351f5d1e5ce3e5b2ed274cc770dffc8b4eb1acdf8b3e61dae7cf2",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

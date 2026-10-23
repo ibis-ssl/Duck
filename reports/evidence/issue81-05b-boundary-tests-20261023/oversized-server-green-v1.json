@@ -1,0 +1,22 @@
+{
+  "name": "oversized-server-green-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~OversizedFrameIsRejectedAndLaterHandoffCompletes"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:18:49.711741+00:00",
+  "runner_pid": 1194319,
+  "child_pid": 1194321,
+  "exit": 0,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "9f9b30943d7a0cd60a400090d07905915a689763ede26f2c1bf573b205906ccc",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 2478,
+  "stderr_bytes": 0
+}\n

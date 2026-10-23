@@ -1,0 +1,6 @@
+using System; using System.Linq; using System.Reflection; using System.Runtime.Loader; using System.IO;
+var packages="/home/donabe/.nuget/packages";
+AssemblyLoadContext.Default.Resolving+=(ctx,name)=>{var f=name.Name+".dll"; foreach(var p in Directory.EnumerateFiles(packages,f,SearchOption.AllDirectories)){try{return ctx.LoadFromAssemblyPath(p);}catch{}} return null;};
+var asm=AssemblyLoadContext.Default.LoadFromAssemblyPath("/home/donabe/.nuget/packages/aspire.hosting/13.5.4/lib/net8.0/Aspire.Hosting.dll");
+foreach(var q in new[]{("Aspire.Hosting.ApplicationModel.EndpointAnnotation","TargetHost"),("Aspire.Hosting.ApplicationModel.IResourceBuilder`1","Resource"),("Aspire.Hosting.ApplicationModel.IResource","Annotations")}){var t=asm.GetType(q.Item1);var p=t?.GetProperty(q.Item2,BindingFlags.Public|BindingFlags.Instance|BindingFlags.Static);Console.WriteLine($"{q.Item1}.{q.Item2} type={p?.PropertyType} get={p?.GetMethod?.IsPublic} set={p?.SetMethod?.IsPublic}");}
+var ep=asm.GetType("Aspire.Hosting.ApplicationModel.EndpointAnnotation"); foreach(var p in ep!.GetProperties(BindingFlags.Public|BindingFlags.Instance)) Console.WriteLine("EPROP "+p.Name+" "+p.PropertyType+" set="+p.SetMethod?.IsPublic);

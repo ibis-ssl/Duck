@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python3",
+    "/tmp/issue81-04b1-prepublish-20261023/ast-check.py"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "description": "AST parse both 04B1 Python files",
+  "exit_code": 0,
+  "started_epoch": 1792715299.493636,
+  "finished_epoch": 1792715299.5128553
+}

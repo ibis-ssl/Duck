@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-22T18:52:59.833359+00:00",
+  "sessions": {
+    "60043": 0,
+    "65449": 0,
+    "71833": 0,
+    "32805": 0,
+    "43299": 0
+  },
+  "watchCommandExit": 255,
+  "stopCommandExit": 0,
+  "allOwnedMonitorsTerminated": true,
+  "uncollectedExitCodes": []
+}

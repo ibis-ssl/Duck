@@ -1,0 +1,16 @@
+{
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-03b-review-fragments-20261022",
+  "windowsCwd": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03b-review-fragments-20261022",
+  "cache": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "head": "51bdd74723a06cde21adf734f5b1d4a40b48b8f8",
+  "selectedSourceLines": {
+    "Tracker/Design/tasks-status.md": [
+      29
+    ],
+    "Tracker/Design/phases-status.md": [
+      14
+    ]
+  },
+  "documentFragments": 2,
+  "notFullGate": true
+}

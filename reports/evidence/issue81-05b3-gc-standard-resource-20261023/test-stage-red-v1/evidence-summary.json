@@ -1,0 +1,27 @@
+{
+  "target_head": "03f98c986be388d23acd02417bf5b7bf6704b2fe",
+  "test": "Tracker.Tests.AppHostApplicationModelTests.ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly",
+  "test_source_sha256": "48cf90d3cfe87cb2623e3bbca4becee7d49a1cf8eeb4a675e6414a64ad9e1e9a",
+  "product_Program_sha256_before_product_change": "63075593c8ab5619d0bd88ed213d9c130b6d8c1c960d58b07df89920593f4d69",
+  "setup": "compile succeeded; filtered test executed",
+  "result": "valid runtime Red: resource count assertion failed because explicit mode not implemented/flag fell through to existing default model",
+  "expected": 4,
+  "actual": 5,
+  "exit": 1,
+  "command": [
+    "/usr/lib/dotnet/dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly",
+    "--logger",
+    "console;verbosity=minimal"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "stdout_sha256": "d262f78340372daf4574215cd3b227e53ef66ed314da43be644de3aa38d95a88",
+  "stdout_bytes": 5341,
+  "stderr_sha256": "917ec3ebf20130a6d26c40532bb1564bf1a72312c806d275b24b0d652d41bff3",
+  "stderr_bytes": 155
+}

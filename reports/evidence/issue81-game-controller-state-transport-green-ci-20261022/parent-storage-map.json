@@ -1,0 +1,226 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "sha256": "ddba6cd8dfc21790fd8963018d39b0d6c9759c020dc7b83e1b496c10c8193b24",
+    "bytes": 277,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.exit.json",
+    "sha256": "48f10342d535c9095ac91bbb9c2e616f2947ead72ea28595db9eaacaabdb87c5",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/artifacts.exit.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+    "bytes": 32,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "1da1a5ac4291b56e546c37483c9ebe4db50e7998885df0f09f2fddc5e8eb6eed",
+    "bytes": 5885,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "sha256": "2d9fd27cb994a0e667e67e128f8756c614de5787cbfc6fb722b10b51964cee13",
+    "bytes": 1110,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/ci-identity-and-command-lines.txt"
+  },
+  {
+    "path": "collect.py",
+    "sha256": "5bbe01cb9fcc09e8533292e99d4abac7f6592e6a9a3b1663bf301e6020976f6c",
+    "bytes": 749,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/collect.py"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "bdf2b06372022cfe10f2bcdfef29b021f3b140ae211917e4114d91157e230f2a",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.exit.json",
+    "sha256": "aa52006fd93ce8b36aeea664a7e90a20a6fe036e1ec9e0db65252d3b2c382bf2",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/final-view.exit.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "462122c51c7cfc6550ee9bb0177d6d732991be7ba84b97e22ebd5e2779dd8d56",
+    "bytes": 2531,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/git-status-final.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "75926edc26b1c9c8369e0f9eb85e6df94dda8b721f9272e6dbd4cea3dc8df7c4",
+    "bytes": 15531,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "dd1fe034c9e94d0da986a55650b8c7db12db5236dc16604facacfee279d5af20",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.exit.json",
+    "sha256": "5e26dccbd0e9657840ad86cb87927d8c3a000160e30051dddc1c73772e056c9f",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/initial-view.exit.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "5401d80eee21dd786bc2454a3198097d3e300a1dd7a619e6e883e7342ddd7c52",
+    "bytes": 2046,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "e8630ddb261b18e36a83c6e9cddc43e32907ecbd075ad6a20ac6b9c1f58e8d79",
+    "bytes": 4460,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "51b7c39e4d663920089423bf214000d210492618ad56ef4ece310097cbdace18",
+    "bytes": 215,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/process-state.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "51721b746a9402a83199a995841c80a48475323634334089528d3eba2fc4a2bc",
+    "bytes": 6624,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/readback.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "6aee35d51ceb352033921cfdae35abfa376e684ee5fb25f361ccd266c70007cb",
+    "bytes": 267,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.exit.json",
+    "sha256": "e5e3cd44fbad8c3280b1a50dfed7f35a13bc8ea8d3978fc22119b5f46954ae94",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/run-log.exit.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "5f4f39777c1f150a13d490ac10f96cbf336d5fd13b936bc89c7fd8258127ca48",
+    "bytes": 51537,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "sha256": "da0439066d0d22e1ee3f90d4c31f9f5861c64e813b4bda0738886353fd327146",
+    "bytes": 440,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/runs-initial.command.json"
+  },
+  {
+    "path": "runs-initial.exit.json",
+    "sha256": "b24f3a231954ef6e592936f40fdb2214d78f1d22db133646499a759761289d51",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/runs-initial.exit.json"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/runs-initial.stderr.log"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "sha256": "9eb6adba10c69153f77a75f42e41b392ff1233131f1844fb0ed823bba5d8e6f3",
+    "bytes": 238,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/runs-initial.stdout.log"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "ad3ee5815111683fb0986a6ba8801b977cd025b5fbb685498942153930a2899d",
+    "bytes": 304,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.exit.json",
+    "sha256": "be79046507da2609c42219eb8a1f3d6ae3f6e5c15747e78c960b27cefd68e007",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/watch.exit.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "31b462ff7ae28309afd5d1be0fcc752719f4554b1e326814ec17b4636a2a332b",
+    "bytes": 1484,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-ci-20261022/watch.stdout.log"
+  }
+]

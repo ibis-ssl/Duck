@@ -1,0 +1,7 @@
+[
+  {
+    "source": "/tmp/issue81-captureoff-regression-investigation-20261022/ci39776500808-artifact-0-dotnet-test.trx",
+    "sha256": "efb4d82ae76ce9ae194e55291eabba9c8de6a0e4e8120f26a1956bfeed258904",
+    "canonical_repository_path": "reports/evidence/issue81-independent-specification-tests-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+  }
+]

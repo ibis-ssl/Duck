@@ -1,0 +1,50 @@
+[
+  {
+    "name": "ghcr_framework",
+    "argv": [
+      "docker",
+      "manifest",
+      "inspect",
+      "--verbose",
+      "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79"
+    ],
+    "exit": 0,
+    "reference": "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+    "stdout_bytes": 6777,
+    "stderr_bytes": 0,
+    "stdout_sha256": "fa4431b6a1f07462c72409ecb4b6e1adc03453c44d33330f1e7defd463e64787",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ghcr_crane",
+    "argv": [
+      "docker",
+      "manifest",
+      "inspect",
+      "--verbose",
+      "ghcr.io/ibis-ssl/crane@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49"
+    ],
+    "exit": 0,
+    "reference": "ghcr.io/ibis-ssl/crane@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+    "stdout_bytes": 13188,
+    "stderr_bytes": 0,
+    "stdout_sha256": "f4ab5295a14351f5d1e5ce3e5b2ed274cc770dffc8b4eb1acdf8b3e61dae7cf2",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ghcr_orion",
+    "argv": [
+      "docker",
+      "manifest",
+      "inspect",
+      "--verbose",
+      "ghcr.io/ibis-ssl/orion-cm4-sim@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a"
+    ],
+    "exit": 0,
+    "reference": "ghcr.io/ibis-ssl/orion-cm4-sim@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+    "stdout_bytes": 5244,
+    "stderr_bytes": 0,
+    "stdout_sha256": "695ec97960467df21422d08b3163eaf2c356c5e6905159fea1c80aa46b02692c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

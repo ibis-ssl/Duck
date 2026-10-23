@@ -1,0 +1,7 @@
+Run 39893485438; PR 84; event pull_request; attempt 1; conclusion success; head 378aa403dafab85b46d243def3eb1a93551f8038; synthetic merge SHA 95187f28562e9bc7490b9c2025cea51139cfb933.
+
+Job test (120218412664): all setup/checkout/SDK steps succeeded. Run dotnet test: 776 passed, 0 failed, 0 skipped. Verify Linux application publish outputs succeeded: actual publish of RuntimeHost, DebugHost and RefereeDriver.Host all completed; PDB tests Ran 10 / OK; the real DebugHost portable PDB contract reports 112 documents under /src and matching DLL identity; distribution definition tests Ran 16 / OK; final publish output contract passed for all three managed applications. Failure collection/upload steps skipped on success.
+
+ASPIRE-NET-002 Linux packet flow (120218414239): skipped. ASPIRE full-stack Linux acceptance (120218912479): skipped. Workflow artifacts API total_count=0.
+
+No Docker build, image pull, or container start was performed. No rerun was issued. All local gh commands and watcher process terminated; watcher session 46976 exited 0.

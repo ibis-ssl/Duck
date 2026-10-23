@@ -1,0 +1,1946 @@
+{
+  "base": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+  "current": "2a6fd94455978021cd995104751f4f09b0a28dfd",
+  "preflight": {
+    "mirror": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-05b1-status-diff-lint-20261023",
+    "junctionType": "Junction",
+    "junctionTarget": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+    "nodeTextlintResolve": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\lib\\src\\index.js",
+    "nodeTextlintExit": 0,
+    "nodeCspellResolve": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\dist\\cjs\\commonJsApi.cjs",
+    "nodeCspellExit": 0
+  },
+  "input_source_hashes": {
+    "baseline:Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+      "ref": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+      "sha256": "15205d3b20221336368ea5b2f3375f88e6cc08b22e62371e1f4edb9e80d413d9",
+      "bytes": 38355
+    },
+    "current:Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+      "ref": "2a6fd94455978021cd995104751f4f09b0a28dfd",
+      "sha256": "3437732d3f830cc907ca27cc388f88460772b67c6a69ff38649cb0f0130d554b",
+      "bytes": 41803
+    },
+    "baseline:Tracker/Design/Testing/tracker-comparison-debug-design.md": {
+      "ref": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+      "sha256": "c1bfa61d4a5267bf4ac429791dbf19ad5c71e247052a461105eafdd69036cc85",
+      "bytes": 31965
+    },
+    "current:Tracker/Design/Testing/tracker-comparison-debug-design.md": {
+      "ref": "2a6fd94455978021cd995104751f4f09b0a28dfd",
+      "sha256": "c5513c1a23f40ba77884e1627164ca18b3c32fd2289bcf9a108feb73d4aa09cf",
+      "bytes": 32746
+    }
+  },
+  "config_hashes": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/requirements.txt": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "tools/lint/scripts/textlint-rules/no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  },
+  "cspell": {
+    "baseline:aspire-simulation-test-environment.md": {
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-cspell-markdown.js",
+        "--words-only",
+        "--unique",
+        "--no-progress",
+        "--no-summary",
+        "--no-show-suggestions",
+        "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "fb0863bed11db22be3737384c10146ad384710ad78293e9cf8b4b870e8edf0f8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 10,
+      "stderr_bytes": 0,
+      "words": [
+        "Tailscale"
+      ]
+    },
+    "current:aspire-simulation-test-environment.md": {
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-cspell-markdown.js",
+        "--words-only",
+        "--unique",
+        "--no-progress",
+        "--no-summary",
+        "--no-show-suggestions",
+        "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "05b2fe70a4486f3ad5249c07eb0fee5a03264c68b5f62d0ff75a42097aa43ba9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 674,
+      "stderr_bytes": 0,
+      "words": [
+        "snapshot",
+        "engine",
+        "Container",
+        "context",
+        "contextとDCPのengineが同一と確認できない場合は実行しない",
+        "host",
+        "endpoint",
+        "container",
+        "lifecycle",
+        "Unix",
+        "domain",
+        "socket",
+        "prepare",
+        "challenge",
+        "commit",
+        "Resource",
+        "Generation",
+        "Boot",
+        "identity",
+        "tupleをcommitする",
+        "tuple",
+        "別ownerの資源へexecしない",
+        "modeの診断Identityはhandoffまで未帰属とする",
+        "strict",
+        "readiness",
+        "resource",
+        "role",
+        "generation",
+        "同一generationでの異なるcontainer",
+        "このsocketはcontainer内の制御面であり",
+        "token",
+        "exec",
+        "runtime",
+        "image",
+        "受入はDuckコード内のfixtureでcontrol",
+        "processと同一container",
+        "event",
+        "port",
+        "handoff",
+        "packetの送信元containerを暗号学的に証明するものではない",
+        "Tailscale"
+      ]
+    },
+    "baseline:tracker-comparison-debug-design.md": {
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-cspell-markdown.js",
+        "--words-only",
+        "--unique",
+        "--no-progress",
+        "--no-summary",
+        "--no-show-suggestions",
+        "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "461202a029fc6b6dad8c534c7b877dc34de11f7f91246cadb9c06d33cd1d1f54",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 324,
+      "stderr_bytes": 0,
+      "words": [
+        "world",
+        "predictor",
+        "tracker",
+        "source",
+        "official",
+        "Split",
+        "Overlay",
+        "stream",
+        "image",
+        "vision",
+        "tracking",
+        "data",
+        "version",
+        "digest",
+        "compose",
+        "identity",
+        "packet",
+        "remote",
+        "endpoint",
+        "snapshot",
+        "comparison",
+        "mode",
+        "logical",
+        "role",
+        "resource",
+        "profile",
+        "focused",
+        "test",
+        "resolver",
+        "live",
+        "selector",
+        "sensitive",
+        "replay",
+        "label",
+        "latest",
+        "frame",
+        "timestamp",
+        "render",
+        "tick",
+        "delta",
+        "alignment",
+        "timeline",
+        "cursor"
+      ]
+    },
+    "current:tracker-comparison-debug-design.md": {
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-cspell-markdown.js",
+        "--words-only",
+        "--unique",
+        "--no-progress",
+        "--no-summary",
+        "--no-show-suggestions",
+        "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "b1d069daef3004af1ceaa7b6f4ac4e503a1865ec09260b6c920121cecee3aaee",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 439,
+      "stderr_bytes": 0,
+      "words": [
+        "world",
+        "predictor",
+        "tracker",
+        "source",
+        "official",
+        "Split",
+        "Overlay",
+        "stream",
+        "identity",
+        "control",
+        "channel",
+        "host",
+        "endpoint",
+        "engine",
+        "Container",
+        "container",
+        "prepare",
+        "challenge",
+        "commit",
+        "lifecycle",
+        "Resource",
+        "role",
+        "full",
+        "Generationとprocess",
+        "Boot",
+        "外部trackerの正常decode",
+        "送信packetのcontainer起源",
+        "exec",
+        "image",
+        "vision",
+        "tracking",
+        "data",
+        "version",
+        "digest",
+        "compose",
+        "packet",
+        "remote",
+        "snapshot",
+        "comparison",
+        "mode",
+        "logical",
+        "resource",
+        "profile",
+        "focused",
+        "test",
+        "resolver",
+        "live",
+        "selector",
+        "sensitive",
+        "replay"
+      ]
+    }
+  },
+  "sudachi": {
+    "argv": [
+      "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md",
+      "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md",
+      "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md",
+      "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md",
+      "--list-unknown"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+    "exit": 1,
+    "stdout_sha256": "9f50fd28972b142d8afcb41cbf982105ea1452a7bcf6a403bc2792f2dde928d6",
+    "stderr_sha256": "3faf0e4db29bf11f54339a58ff8c4095e32f3d2da1155680f4be1c7731b45433",
+    "stdout_bytes": 39021,
+    "stderr_bytes": 29511,
+    "unique_tokens_by_path": {
+      "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md": [
+        {
+          "kind": "english",
+          "word": "age",
+          "normalized": "age",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "aggregate",
+          "normalized": "aggregate",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "algorithm",
+          "normalized": "algorithm",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "alignment",
+          "normalized": "alignment",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "angular",
+          "normalized": "angular",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "application",
+          "normalized": "application",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "assignment",
+          "normalized": "assignment",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "ball",
+          "normalized": "ball",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "english",
+          "word": "Compare",
+          "normalized": "compare",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "comparison",
+          "normalized": "comparison",
+          "count": 32,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:16,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:16"
+        },
+        {
+          "kind": "english",
+          "word": "compose",
+          "normalized": "compose",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "count",
+          "normalized": "count",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "CSV",
+          "normalized": "csv",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "cursor",
+          "normalized": "cursor",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "data",
+          "normalized": "data",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "delta",
+          "normalized": "delta",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "digest",
+          "normalized": "digest",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "edge",
+          "normalized": "edge",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "endpoint",
+          "normalized": "endpoint",
+          "count": 32,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:15,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:16"
+        },
+        {
+          "kind": "english",
+          "word": "endpoint-sensitive",
+          "normalized": "endpoint-sensitive",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "export",
+          "normalized": "export",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "fixture",
+          "normalized": "fixture",
+          "count": 11,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "english",
+          "word": "focused",
+          "normalized": "focused",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "frame",
+          "normalized": "frame",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "future",
+          "normalized": "future",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "gate",
+          "normalized": "gate",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "health",
+          "normalized": "health",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "health-based",
+          "normalized": "health-based",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "identity",
+          "normalized": "identity",
+          "count": 25,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:9,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:12"
+        },
+        {
+          "kind": "english",
+          "word": "image",
+          "normalized": "image",
+          "count": 15,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "english",
+          "word": "index",
+          "normalized": "index",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "latest",
+          "normalized": "latest",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "live",
+          "normalized": "live",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "english",
+          "word": "logical",
+          "normalized": "logical",
+          "count": 28,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:14,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:14"
+        },
+        {
+          "kind": "english",
+          "word": "matched",
+          "normalized": "matched",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "missing",
+          "normalized": "missing",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "mode",
+          "normalized": "mode",
+          "count": 9,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "model",
+          "normalized": "model",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "not-ready",
+          "normalized": "not-ready",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "number",
+          "normalized": "number",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "object",
+          "normalized": "object",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "official",
+          "normalized": "official",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "option",
+          "normalized": "option",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "orientation",
+          "normalized": "orientation",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "Overlay",
+          "normalized": "overlay",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "english",
+          "word": "packet",
+          "normalized": "packet",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:6,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "english",
+          "word": "pair",
+          "normalized": "pair",
+          "count": 24,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:12,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:12"
+        },
+        {
+          "kind": "english",
+          "word": "predictor",
+          "normalized": "predictor",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "producer",
+          "normalized": "producer",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "profile",
+          "normalized": "profile",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "ranking",
+          "normalized": "ranking",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "raw",
+          "normalized": "raw",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "readiness",
+          "normalized": "readiness",
+          "count": 5,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "ready",
+          "normalized": "ready",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "received",
+          "normalized": "received",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "receiver",
+          "normalized": "receiver",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "reference",
+          "normalized": "reference",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "remote",
+          "normalized": "remote",
+          "count": 12,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:6,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:6"
+        },
+        {
+          "kind": "english",
+          "word": "render",
+          "normalized": "render",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "replay",
+          "normalized": "replay",
+          "count": 16,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:8,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:8"
+        },
+        {
+          "kind": "english",
+          "word": "resolver",
+          "normalized": "resolver",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "resource",
+          "normalized": "resource",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "robot",
+          "normalized": "robot",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "role",
+          "normalized": "role",
+          "count": 60,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:29,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:30"
+        },
+        {
+          "kind": "english",
+          "word": "selected",
+          "normalized": "selected",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "selector",
+          "normalized": "selector",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "sidecar",
+          "normalized": "sidecar",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "snapshot",
+          "normalized": "snapshot",
+          "count": 27,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:13,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:13"
+        },
+        {
+          "kind": "english",
+          "word": "source",
+          "normalized": "source",
+          "count": 62,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:31,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:31"
+        },
+        {
+          "kind": "english",
+          "word": "source-label",
+          "normalized": "source-label",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "source-local",
+          "normalized": "source-local",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "Split",
+          "normalized": "split",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "english",
+          "word": "state",
+          "normalized": "state",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "status",
+          "normalized": "status",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "stream",
+          "normalized": "stream",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "tag",
+          "normalized": "tag",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "team",
+          "normalized": "team",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "test",
+          "normalized": "test",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "english",
+          "word": "tick",
+          "normalized": "tick",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "time",
+          "normalized": "time",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "timeline",
+          "normalized": "timeline",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "timestamp",
+          "normalized": "timestamp",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "track",
+          "normalized": "track",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "english",
+          "word": "tracker",
+          "normalized": "tracker",
+          "count": 53,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:26,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:27"
+        },
+        {
+          "kind": "english",
+          "word": "tracking",
+          "normalized": "tracking",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "unmatched",
+          "normalized": "unmatched",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "english",
+          "word": "velocity",
+          "normalized": "velocity",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "version",
+          "normalized": "version",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "vision",
+          "normalized": "vision",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "world",
+          "normalized": "world",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "XY",
+          "normalized": "xy",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "katakana",
+          "word": "identity",
+          "normalized": "アイデンティティー",
+          "count": 25,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:9,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:12"
+        },
+        {
+          "kind": "katakana",
+          "word": "assignment",
+          "normalized": "アサインメント",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "alignment",
+          "normalized": "アラインメント",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "algorithm",
+          "normalized": "アルゴリズム",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "angular",
+          "normalized": "アンギュラー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "unmatched",
+          "normalized": "アンマッチド",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "katakana",
+          "word": "image",
+          "normalized": "イメージ",
+          "count": 15,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "katakana",
+          "word": "index",
+          "normalized": "インデックス",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "export",
+          "normalized": "エクスポート",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "edge",
+          "normalized": "エッジ",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "official",
+          "normalized": "オフィシャル",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "object",
+          "normalized": "オブジェクト",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "option",
+          "normalized": "オプション",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "orientation",
+          "normalized": "オリエンテーション",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "Overlay",
+          "normalized": "オーバーレイ",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "katakana",
+          "word": "count",
+          "normalized": "カウント",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "cursor",
+          "normalized": "カーソル",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "gate",
+          "normalized": "ゲート",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "コード",
+          "normalized": "コード",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "sidecar",
+          "normalized": "サイドカー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "status",
+          "normalized": "ステータス",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "state",
+          "normalized": "ステート",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "stream",
+          "normalized": "ストリーム",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "snapshot",
+          "normalized": "スナップショット",
+          "count": 27,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:13,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:13"
+        },
+        {
+          "kind": "katakana",
+          "word": "Split",
+          "normalized": "スプリット",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "katakana",
+          "word": "selector",
+          "normalized": "セレクター",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "selected",
+          "normalized": "セレクテッド",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "ゼロ",
+          "normalized": "ゼロ",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "source",
+          "normalized": "ソース",
+          "count": 68,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:34,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:34"
+        },
+        {
+          "kind": "katakana",
+          "word": "time",
+          "normalized": "タイム",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "timeline",
+          "normalized": "タイムライン",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "タグ",
+          "normalized": "タグ",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "digest",
+          "normalized": "ダイジェスト",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "team",
+          "normalized": "チーム",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "test",
+          "normalized": "テスト",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "katakana",
+          "word": "delta",
+          "normalized": "デルタ",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "data",
+          "normalized": "データ",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "tracking",
+          "normalized": "トラッキング",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "track",
+          "normalized": "トラック",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        },
+        {
+          "kind": "katakana",
+          "word": "number",
+          "normalized": "ナンバー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "not",
+          "normalized": "ノット",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "version",
+          "normalized": "バージョン",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "katakana",
+          "word": "packet",
+          "normalized": "パケット",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:6,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "katakana",
+          "word": "vision",
+          "normalized": "ビジョン",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "future",
+          "normalized": "フューチャー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "predictor",
+          "normalized": "プレディクター",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "producer",
+          "normalized": "プロデューサー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "health",
+          "normalized": "ヘルス",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "velocity",
+          "normalized": "ベロシティー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "based",
+          "normalized": "ベースト",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "pair",
+          "normalized": "ペア",
+          "count": 24,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:12,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:12"
+        },
+        {
+          "kind": "katakana",
+          "word": "ball",
+          "normalized": "ボール",
+          "count": 14,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:7"
+        },
+        {
+          "kind": "katakana",
+          "word": "matched",
+          "normalized": "マッチド",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "katakana",
+          "word": "モデル",
+          "normalized": "モデル",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "mode",
+          "normalized": "モード",
+          "count": 9,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "live",
+          "normalized": "ライブ",
+          "count": 18,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:9,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:9"
+        },
+        {
+          "kind": "katakana",
+          "word": "label",
+          "normalized": "ラベル",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "ranking",
+          "normalized": "ランキング",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "resource",
+          "normalized": "リソース",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "resolver",
+          "normalized": "リゾルバー",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "katakana",
+          "word": "replay",
+          "normalized": "リプレー",
+          "count": 16,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:8,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:8"
+        },
+        {
+          "kind": "katakana",
+          "word": "receiver",
+          "normalized": "レシーバー",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "readiness",
+          "normalized": "レディネス",
+          "count": 5,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "reference",
+          "normalized": "レファレンス",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "logical",
+          "normalized": "ロジカル",
+          "count": 28,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:14,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:14"
+        },
+        {
+          "kind": "katakana",
+          "word": "robot",
+          "normalized": "ロボット",
+          "count": 8,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "local",
+          "normalized": "ローカル",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "role",
+          "normalized": "ロール",
+          "count": 60,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:29,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:30"
+        },
+        {
+          "kind": "katakana",
+          "word": "world",
+          "normalized": "ワールド",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        }
+      ],
+      "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md": [
+        {
+          "kind": "english",
+          "word": "BootId",
+          "normalized": "bootid",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "challenge",
+          "normalized": "challenge",
+          "count": 5,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "commit",
+          "normalized": "commit",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "container",
+          "normalized": "container",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "ContainerId",
+          "normalized": "containerid",
+          "count": 5,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "context",
+          "normalized": "context",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "control",
+          "normalized": "control",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "domain",
+          "normalized": "domain",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "engine",
+          "normalized": "engine",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "event",
+          "normalized": "event",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "exec",
+          "normalized": "exec",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "freshness",
+          "normalized": "freshness",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "Generation",
+          "normalized": "generation",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "handoff",
+          "normalized": "handoff",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2"
+        },
+        {
+          "kind": "english",
+          "word": "host",
+          "normalized": "host",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "lifecycle",
+          "normalized": "lifecycle",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "owner",
+          "normalized": "owner",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "port",
+          "normalized": "port",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "prepare",
+          "normalized": "prepare",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "process",
+          "normalized": "process",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "ResourceId",
+          "normalized": "resourceid",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "run",
+          "normalized": "run",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "RunId",
+          "normalized": "runid",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "runtime",
+          "normalized": "runtime",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "socket",
+          "normalized": "socket",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4"
+        },
+        {
+          "kind": "english",
+          "word": "strict",
+          "normalized": "strict",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "token",
+          "normalized": "token",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "tuple",
+          "normalized": "tuple",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3"
+        },
+        {
+          "kind": "english",
+          "word": "Unix",
+          "normalized": "unix",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "event",
+          "normalized": "イベント",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "engine",
+          "normalized": "エンジン",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "owner",
+          "normalized": "オーナー",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "commit",
+          "normalized": "コミット",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "context",
+          "normalized": "コンテキスト",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "container",
+          "normalized": "コンテナ",
+          "count": 10,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:7,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:3"
+        },
+        {
+          "kind": "katakana",
+          "word": "control",
+          "normalized": "コントロール",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "Generation",
+          "normalized": "ジェネレーション",
+          "count": 6,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:5,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "socket",
+          "normalized": "ソケット",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4"
+        },
+        {
+          "kind": "katakana",
+          "word": "tuple",
+          "normalized": "タプル",
+          "count": 3,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3"
+        },
+        {
+          "kind": "katakana",
+          "word": "challenge",
+          "normalized": "チャレンジ",
+          "count": 5,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:4,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "domain",
+          "normalized": "ドメイン",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "handoff",
+          "normalized": "ハンドオフ",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:2"
+        },
+        {
+          "kind": "katakana",
+          "word": "freshness",
+          "normalized": "フレッシュネス",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "process",
+          "normalized": "プロセス",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "host",
+          "normalized": "ホスト",
+          "count": 4,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:3,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "port",
+          "normalized": "ポート",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "ライフサイクル",
+          "normalized": "ライフサイクル",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "run",
+          "normalized": "ラン",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "リセット",
+          "normalized": "リセット",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "token",
+          "normalized": "東建コーポレーション",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        }
+      ],
+      "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md": [
+        {
+          "kind": "english",
+          "word": "channel",
+          "normalized": "channel",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "decode",
+          "normalized": "decode",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "full",
+          "normalized": "full",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "UDS",
+          "normalized": "uds",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "channel",
+          "normalized": "チャンネル",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        },
+        {
+          "kind": "katakana",
+          "word": "decode",
+          "normalized": "デコード",
+          "count": 1,
+          "location": "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:1"
+        }
+      ],
+      "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md": [
+        {
+          "kind": "english",
+          "word": "Tailscale",
+          "normalized": "tailscale",
+          "count": 2,
+          "location": "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md:1,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:1"
+        },
+        {
+          "kind": "english",
+          "word": "TCP",
+          "normalized": "tcp",
+          "count": 28,
+          "location": "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md:9,Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md:5,Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md:9,Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md:5"
+        }
+      ]
+    }
+  },
+  "cspell_new_unknown_by_doc": {
+    "aspire-simulation-test-environment.md": [
+      "Boot",
+      "Container",
+      "Generation",
+      "Resource",
+      "Unix",
+      "challenge",
+      "commit",
+      "container",
+      "context",
+      "contextとDCPのengineが同一と確認できない場合は実行しない",
+      "domain",
+      "endpoint",
+      "engine",
+      "event",
+      "exec",
+      "generation",
+      "handoff",
+      "host",
+      "identity",
+      "image",
+      "lifecycle",
+      "modeの診断Identityはhandoffまで未帰属とする",
+      "packetの送信元containerを暗号学的に証明するものではない",
+      "port",
+      "prepare",
+      "processと同一container",
+      "readiness",
+      "resource",
+      "role",
+      "runtime",
+      "snapshot",
+      "socket",
+      "strict",
+      "token",
+      "tuple",
+      "tupleをcommitする",
+      "このsocketはcontainer内の制御面であり",
+      "別ownerの資源へexecしない",
+      "受入はDuckコード内のfixtureでcontrol",
+      "同一generationでの異なるcontainer"
+    ],
+    "tracker-comparison-debug-design.md": [
+      "Boot",
+      "Container",
+      "Generationとprocess",
+      "Resource",
+      "challenge",
+      "channel",
+      "commit",
+      "container",
+      "control",
+      "engine",
+      "exec",
+      "full",
+      "host",
+      "lifecycle",
+      "prepare",
+      "外部trackerの正常decode",
+      "送信packetのcontainer起源"
+    ]
+  },
+  "sudachi_new_unknown_by_doc_and_kind": {
+    "aspire-simulation-test-environment.md:english": [
+      "bootid",
+      "challenge",
+      "commit",
+      "container",
+      "containerid",
+      "context",
+      "control",
+      "domain",
+      "engine",
+      "event",
+      "exec",
+      "freshness",
+      "generation",
+      "handoff",
+      "host",
+      "lifecycle",
+      "owner",
+      "port",
+      "prepare",
+      "process",
+      "resourceid",
+      "run",
+      "runid",
+      "runtime",
+      "socket",
+      "strict",
+      "token",
+      "tuple",
+      "unix"
+    ],
+    "aspire-simulation-test-environment.md:katakana": [
+      "イベント",
+      "エンジン",
+      "オーナー",
+      "コミット",
+      "コンテキスト",
+      "コンテナ",
+      "コントロール",
+      "ジェネレーション",
+      "ソケット",
+      "タプル",
+      "チャレンジ",
+      "ドメイン",
+      "ハンドオフ",
+      "フレッシュネス",
+      "プロセス",
+      "ホスト",
+      "ポート",
+      "ライフサイクル",
+      "ラン",
+      "リセット",
+      "東建コーポレーション"
+    ],
+    "tracker-comparison-debug-design.md:english": [
+      "channel",
+      "decode",
+      "full",
+      "uds"
+    ],
+    "tracker-comparison-debug-design.md:katakana": [
+      "チャンネル",
+      "デコード"
+    ]
+  }
+}

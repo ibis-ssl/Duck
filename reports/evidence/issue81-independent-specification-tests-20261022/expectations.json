@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "state": "frozen_v1_before_execution",
+  "task": "I81-V / I81-01 + I81-02",
+  "evidence_policy": "承認設計が動作根拠。API/metadataは形のみ。製品実装・既存テスト未読。事後試験であり過去Red再現/TDD例外承認ではない。",
+  "contracts": [
+    {
+      "id": "R01",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "開始のみ",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:181,183",
+      "derivation": "通信開始とサービス自身の証跡を分ける",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "R02",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "同一対象の新鮮な成功復号10件",
+      "expected": "ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,181,230; designs/tracker-comparison-debug-design.md:249",
+      "derivation": "10件を十分な正の進捗fixtureとして使用。一般状態の最小件数は規定しない",
+      "basis_kind": "direct_plus_fixture"
+    },
+    {
+      "id": "R03",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "run/resource/container/generationの各不一致",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:19,158,183; designs/tracker-comparison-debug-design.md:40",
+      "derivation": "他対象の証跡は対象自身の証跡ではない",
+      "basis_kind": "derived"
+    },
+    {
+      "id": "R04",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "別入力だけの復号",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:80,158,230",
+      "derivation": "必要入力を別用途入力で代用できない",
+      "basis_kind": "derived"
+    },
+    {
+      "id": "R05",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "auxiliary/unknown evidence",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:31,139,230; designs/tracker-comparison-debug-design.md:256",
+      "derivation": "独立観測器だけでは代用できない",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "R06",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "failed/unknown decode",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:183,230",
+      "derivation": "成功未確認は成功復号の証明にならない",
+      "basis_kind": "direct_plus_derived"
+    },
+    {
+      "id": "R07",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "ready後のdecode failure",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:183",
+      "derivation": "復号失敗で準備未完了へ戻す",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "R08",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "窓5秒に対しage6秒",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:181,183; designs/tracker-comparison-debug-design.md:118",
+      "derivation": "等値境界は規定せず十分古い証跡を排除",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "R09",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "fresh ready後6秒無更新",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:183; designs/tracker-comparison-debug-design.md:243",
+      "derivation": "期限切れで準備未完了へ戻す",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "R10",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "age不明/負値",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:181,183; designs/tracker-comparison-debug-design.md:118",
+      "derivation": "新しさを証明できない無効・不明の時間値を認定しない",
+      "basis_kind": "derived"
+    },
+    {
+      "id": "R11",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "新コンテナ/世代へ更新、旧証跡、次に新証跡",
+      "expected": "not-ready / not-ready / ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:150,183; designs/tracker-comparison-debug-design.md:253",
+      "derivation": "対象変更で旧証跡を無効にし新対象の新しさで復帰",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "R12",
+      "test_file": "ResourceReadinessSpecificationTests.cs",
+      "fixture": "成功件数-1/0のみ",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,230",
+      "derivation": "成功復号がない件数は成功証拠にならない",
+      "basis_kind": "derived"
+    },
+    {
+      "id": "S01",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "受信開始だけ",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:181,230",
+      "derivation": "ソケット開始を成功復号とみなさない。snapshot未生成も許容",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "S02",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "10回の公開成功復号記録",
+      "expected": "count10/failure0/ID/input/time/status/ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,230",
+      "derivation": "診断が対象と件数・受信時刻・状態を結び付ける",
+      "basis_kind": "direct_plus_fixture"
+    },
+    {
+      "id": "S03",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "10回失敗だけ",
+      "expected": "success0/failure10/not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,183,230",
+      "derivation": "成功件数と失敗件数を混同しない",
+      "basis_kind": "direct_plus_derived"
+    },
+    {
+      "id": "S04",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "ready後の失敗1回",
+      "expected": "success10/failure1/failed/not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,183",
+      "derivation": "復号失敗を診断と準備解除へ反映",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "S05",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "公開された有限鮮度窓より1秒長く停止",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:181,183; designs/tracker-comparison-debug-design.md:243",
+      "derivation": "閾値の数値を期待値へ取り込まない。任意の有限窓外を検査",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "S06",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "identityなしの成功10件",
+      "expected": "not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158; designs/tracker-comparison-debug-design.md:40",
+      "derivation": "対象自身へ結び付けられない件数だけでは証明できない",
+      "basis_kind": "derived"
+    },
+    {
+      "id": "S07",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "三送信元が各10件",
+      "expected": "key/name/uuid/endpoint/count保持",
+      "design_basis": "designs/tracker-comparison-debug-design.md:136,140-150,249-250",
+      "derivation": "送信元識別情報を保持。role resolverの代用ではない",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "S08",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "古い受信の遅延復号",
+      "expected": "受信時刻保持/not-ready",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,181,183; designs/tracker-comparison-debug-design.md:118",
+      "derivation": "受信時刻と新しさは復号完了で若返らない",
+      "basis_kind": "derived"
+    },
+    {
+      "id": "S09",
+      "test_file": "ServiceReceiveSpecificationTests.cs",
+      "fixture": "期限切れ後、一方の送信元だけ更新",
+      "expected": "更新元ready/無更新元not-ready",
+      "design_basis": "designs/tracker-comparison-debug-design.md:118,243,276",
+      "derivation": "一送信元で他送信元の新しさを代用しない",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "P01",
+      "test_file": "TrackerDatagramSpecificationTests.cs",
+      "fixture": "公式protoのUUID/名称/TrackedFrame",
+      "expected": "TryDeserialize=true / packet非null",
+      "design_basis": "designs/tracker-comparison-debug-design.md:21,35-38,249-250; schemas/ssl-game-controller/proto/tracker/ssl_vision_wrapper_tracked.proto:7-14; schemas/ssl-game-controller/proto/tracker/ssl_vision_detection_tracked.proto:69-88",
+      "derivation": "固定protoから独立した手動wire符号化",
+      "basis_kind": "direct"
+    },
+    {
+      "id": "P02",
+      "test_file": "TrackerDatagramSpecificationTests.cs",
+      "fixture": "途中で切れたlength/varint/fixed64",
+      "expected": "TryDeserialize=false",
+      "design_basis": "designs/aspire-simulation-test-environment.md:183; schemas/ssl-game-controller/proto/tracker/ssl_vision_wrapper_tracked.proto:10-14",
+      "derivation": "不完全wire値は正常復号ではない",
+      "basis_kind": "derived_from_schema"
+    }
+  ],
+  "test_methods": 23,
+  "authored_cases": 34
+}

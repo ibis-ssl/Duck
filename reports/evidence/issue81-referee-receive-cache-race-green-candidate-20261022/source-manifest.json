@@ -1,0 +1,36 @@
+{
+  "baseline": "cd7760fde7ec54d2fc69d157af61dc1a68d810ac",
+  "production": [
+    {
+      "path": "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+      "beforeSHA256": "86aa44082a0945ddeac957e8fa8a1ee823223b7e6afc82c11ca132b7e8ab1223",
+      "afterSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "beforeSHA256": "0c045bf368621f7e3341cd4276cf401b4bb857e0666fd406fa6e7cbf6514ba5f",
+      "afterSHA256": "c571b48745f7748235527e1a588cba46099a673487bd154bb44a836740af74a4"
+    }
+  ],
+  "fixedTest": {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs",
+    "sha256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "unchanged": true
+  },
+  "unchangedSourceCount": 22,
+  "allExistingTrackedTestsUnchanged": true,
+  "validation": {
+    "syntaxExit": 0,
+    "diagnosticsBuildExit": 0,
+    "diagnosticsBuildWarnings": 0,
+    "diagnosticsBuildErrors": 0,
+    "testsExecuted": 0,
+    "fullParserHostCapability": "remote_ci_only",
+    "green": "pending parent exactSHA PR CI"
+  },
+  "model": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  },
+  "processState": "all owned commands terminated"
+}

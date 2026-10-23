@@ -1,0 +1,1 @@
+["dotnet", "restore", "/tmp/issue81-captureoff-regression-investigation-20261022/ReceiverProbe.csproj", "--source", "/home/donabe/.nuget/packages", "-p:NuGetAudit=false", "-p:EnableSourceControlManagerQueries=false"]

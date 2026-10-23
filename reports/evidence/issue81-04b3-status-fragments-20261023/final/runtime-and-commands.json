@@ -1,0 +1,55 @@
+{
+  "repo_head": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+  "mirror_windows": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-04b2-status-fragments-mirror-v4",
+  "mirror_wsl": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+  "node_modules_junction": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+  "node_executable": "C:\\Program Files\\nodejs\\node.exe",
+  "node_version": "v24.20.0",
+  "node_commands": [
+    [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "tools/lint/scripts/run-markdown-targets.js",
+      "text",
+      "--files",
+      "baseline/Tracker/Design/tasks-status.md",
+      "baseline/Tracker/Design/phases-status.md",
+      "current/Tracker/Design/tasks-status.md",
+      "current/Tracker/Design/phases-status.md"
+    ],
+    [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "tools/lint/scripts/run-markdown-targets.js",
+      "spell",
+      "--files",
+      "baseline/Tracker/Design/tasks-status.md",
+      "baseline/Tracker/Design/phases-status.md",
+      "current/Tracker/Design/tasks-status.md",
+      "current/Tracker/Design/phases-status.md"
+    ]
+  ],
+  "node_cwd": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-04b2-status-fragments-mirror-v4",
+  "python_executable": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "python_version": "3.14.4",
+  "python_cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+  "python_command": [
+    "wsl.exe",
+    "-d",
+    "Ubuntu",
+    "--",
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4/tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "baseline/Tracker/Design/tasks-status.md",
+    "baseline/Tracker/Design/phases-status.md",
+    "current/Tracker/Design/tasks-status.md",
+    "current/Tracker/Design/phases-status.md"
+  ],
+  "settings_hash_file": "settings-hashes.tsv",
+  "results": {
+    "textlint_exit": 0,
+    "cspell_exit": 0,
+    "cspell_issues": 0,
+    "sudachi_exit": 1,
+    "sudachi_violations": 2
+  }
+}

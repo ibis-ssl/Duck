@@ -1,0 +1,101 @@
+[
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth",
+    "testId": "c7a47413-439a-6069-a51a-056e2fdf8eac",
+    "executionId": "7b86db21-addb-4019-81e5-e126b0680a2f",
+    "outcome": "Failed",
+    "duration": "00:00:00.0199818",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 129\n   at Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 134\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: null)",
+    "testId": "f2b3779b-e899-fc52-9de7-2e74fbccef38",
+    "executionId": "a5c6ef8f-09b7-4d62-9576-e87b4014ce7e",
+    "outcome": "Failed",
+    "duration": "00:00:00.3293536",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 98\n   at Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 103\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: True, expected: \"http://0.0.0.0:39110\")",
+    "testId": "cadcfcb2-657f-0c9a-d927-2220bbcf57ff",
+    "executionId": "1f183d67-7a01-4d9d-9b9b-43f9c84154ef",
+    "outcome": "Failed",
+    "duration": "00:00:00.0159067",
+    "message": "Assert.Equal() Failure: Strings differ\nExpected: \"http://0.0.0.0:39110\"\nActual:   null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(Boolean container, String expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 32\n   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)\n   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: \"short-id\")",
+    "testId": "9e4343ac-1596-e3a3-c220-788c2c43fd46",
+    "executionId": "1690d6ae-a8a2-44c9-81f9-4dbf41787247",
+    "outcome": "Failed",
+    "duration": "00:00:00.0488004",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 98\n   at Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 103\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: False, expected: \"http://127.0.0.1:39110\")",
+    "testId": "f0dd7a6d-3957-fa97-6d4c-cadf9e8cd066",
+    "executionId": "3e283deb-d0ed-412d-a33b-dad922b306b7",
+    "outcome": "Failed",
+    "duration": "00:00:00.0031834",
+    "message": "Assert.Equal() Failure: Strings differ\nExpected: \"http://127.0.0.1:39110\"\nActual:   null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(Boolean container, String expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 32\n   at InvokeStub_RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledHealthDoesNotExposeAReadyEndpoint(enabled: \"false\")",
+    "testId": "a2237843-f611-0c77-3840-d300997a1dcd",
+    "executionId": "4dfee36c-8530-4de2-868a-788ba51cd4ca",
+    "outcome": "Passed",
+    "duration": "00:00:00.0211056",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledHealthDoesNotExposeAReadyEndpoint(enabled: null)",
+    "testId": "9451ea4c-635d-8ce7-29db-ac008df13c77",
+    "executionId": "394d11ef-af37-467e-bf52-f9fcf895e51d",
+    "outcome": "Passed",
+    "duration": "00:00:00.0246024",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledBindingPreservesExistingSettings(enabled: null)",
+    "testId": "7970d6ff-b1e2-19bf-86b5-911dbb1759f8",
+    "executionId": "133b8f08-a81f-4b76-bfd6-d7083644398f",
+    "outcome": "Passed",
+    "duration": "00:00:00.0028028",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput",
+    "testId": "a6c043e8-c73e-ae6a-9a05-eb469c67e7c6",
+    "executionId": "80ab3c80-e729-4dbd-9603-38d2e5b2bc31",
+    "outcome": "Failed",
+    "duration": "00:00:00.0435924",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: OK\nActual:   NotFound",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 54\n   at Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 86\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledBindingPreservesExistingSettings(enabled: \"false\")",
+    "testId": "b4c000f3-ec96-cb3a-3903-e26a9cd09a3a",
+    "executionId": "2a7bd9c2-b6b6-406e-a632-39fd0d2ce23b",
+    "outcome": "Passed",
+    "duration": "00:00:00.0045001",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth",
+    "testId": "d18ec568-baea-e6a7-a947-e42640646cee",
+    "executionId": "5c174e0c-6f80-42de-9602-a90b0c87190e",
+    "outcome": "Failed",
+    "duration": "00:00:00.0151067",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: ServiceUnavailable\nActual:   NotFound",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 115\n   at Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:line 120\n--- End of stack trace from previous location ---"
+  }
+]

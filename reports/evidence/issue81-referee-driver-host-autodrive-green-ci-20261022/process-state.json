@@ -1,0 +1,14 @@
+{
+  "allIssuedSessionsReaped": true,
+  "sessions": {
+    "20730": {
+      "outerExit": 0,
+      "ghWatchExit": 0
+    },
+    "17526": 0,
+    "4884": 0
+  },
+  "activeOwnedProcesses": [],
+  "uncollectedExits": [],
+  "noGitHubCancelRerun": true
+}

@@ -1,0 +1,12 @@
+{
+  "buildOutputLines": [
+    "test\tRun dotnet test\t2026-10-22T20:57:42.9823570Z   Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll"
+  ],
+  "compileErrorLines": [],
+  "summaryLines": [
+    "test\tRun dotnet test\t2026-10-22T20:58:21.1457411Z Failed!  - Failed:     8, Passed:   768, Skipped:     0, Total:   776, Duration: 29 s - Tracker.Tests.dll (net10.0)"
+  ],
+  "checkoutLines": [
+    "test\tCheck out repository\t2026-10-22T20:57:10.2101961Z HEAD is now at 9e13ba8 Merge 6f39d4c0b324fcdce361c1934c4f0d89b03e5370 into 88cb20f2b5cea46eb90bff80ba8d535639625de0"
+  ]
+}

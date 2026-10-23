@@ -1,0 +1,12 @@
+[
+  {
+    "path": "baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+    "bytes": 986,
+    "sha256": "efdf5bb84edfbb51db8a3e0b7b3103085f9a89b553ed8f52125ddad66099bbdc"
+  },
+  {
+    "path": "baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md",
+    "bytes": 970,
+    "sha256": "30efd35cdab53f1f00853a658627b733f6fd26c3f0e7080fcb30acbe3d3abb56"
+  }
+]

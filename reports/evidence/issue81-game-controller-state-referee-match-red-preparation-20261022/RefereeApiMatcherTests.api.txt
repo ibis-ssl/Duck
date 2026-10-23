@@ -1,0 +1,44 @@
+using System.Collections.Concurrent;
+using System.Net;
+using System.Net.WebSockets;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeApiMatcherTests
+{
+    [Theory]
+    [InlineData("HALT", "HALT", global::Referee.Types.Command.Halt)]
+    [InlineData("STOP", "STOP", global::Referee.Types.Command.Stop)]
+    [InlineData("NORMAL_START", "RUNNING", global::Referee.Types.Command.NormalStart)]
+    [InlineData("FORCE_START", "RUNNING", global::Referee.Types.Command.ForceStart)]
+    public async Task MatchesFreshActualReceiveAndApiPaths(string apiCommand, string apiPhase, global::Referee.Types.Command command);
+    [Theory]
+    [InlineData("NoInput")]
+    [InlineData("MissingOwner")]
+    [InlineData("UnknownAge")]
+    [InlineData("DecodeFailure")]
+    public async Task UnusableUdpDoesNotMatch(string condition);
+    [Fact]
+    public async Task DifferentApiCommandIsNotReady();
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task FailedOrExpiredApiReadIsNotReady(bool expires);
+    [Fact]
+    public async Task PollingDoesNotRefreshEitherEvidence();
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task NewUdpPacketDuringApiReadInvalidatesOldPair(bool changesCommand);
+    [Fact]
+    public async Task RestartedReceiveEpochRejectsPendingApiPair();
+    [Fact]
+    public async Task ChangedApiEndpointRejectsPendingPair();
+    [Fact]
+    public async Task OlderApiCompletionCannotOverwriteNewPacketMatch();
+    [Fact]
+    public async Task AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics();
+}

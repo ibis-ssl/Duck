@@ -1,0 +1,11 @@
+Finding: I81-NR-003/P2, PE CodeView TimeDateStamp was discarded.
+Baseline HEAD: f92b5df2d5ebd4a9269e97e141ca53bb451d10cc
+Verifier SHA-256 (unchanged before fix): 58e0beb075e195fcb9985a109fafe08580d1f83dbbf993945a5cc33d02465a24
+Historical 7-test source SHA-256: a0dc746080a192c162fa5db7d894bb2a3d86906e1133eff9e652af032c7641c8
+Final Red test source SHA-256 (frozen before run): a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7
+Final command: python3 scripts/tests/test-debughost-portable-pdb.py (invoked by the saved Python subprocess runner; no third-party dependencies)
+Final result: 10 tests, 9 passed, 1 failed; process exit 1. The sole failure is test_real_binary_fixture_rejects_stamp_only_mismatch: ContractError not raised.
+The final test used valid synthetic PE and portable PDB bytes, actual read_codeview_identity, actual read_portable_pdb, then verify_contract. The GUID is identical, PE Age=1, the #Pdb ID is valid, and Document.Name decodes to /src/Tracker.cs. The fixture's only identity difference is PE debug-directory TimeDateStamp versus #Pdb ID final four bytes.
+Positive matching 20-byte fixture passed through both real readers and verify_contract. Age=2 rejection passed. The original seven tests all passed unchanged.
+Older attempts are preserved but are not counted as the required Red: the initial fixture had an extra Blob length prefix; a later fixture decoded src/Tracker.cs without the leading slash. They failed fixture assertions, not the contract. Their outputs are unit.stdout/stderr and unit-v2.*.
+No verifier edit was present during the final Red run. No network, dependencies, CI, publish, or container action was run.

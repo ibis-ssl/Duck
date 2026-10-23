@@ -1,0 +1,15 @@
+4230: build-and-push	UNKNOWN STEP	2026-09-17T16:16:08.5209667Z #21 exporting manifest sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554 done
+4232: build-and-push	UNKNOWN STEP	2026-09-17T16:16:10.2425787Z #21 exporting attestation manifest sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d
+4239: build-and-push	UNKNOWN STEP	2026-09-17T16:16:10.4392814Z #21 exporting attestation manifest sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d done
+4240: build-and-push	UNKNOWN STEP	2026-09-17T16:16:10.4393598Z #21 exporting manifest list sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79 done
+4250: build-and-push	UNKNOWN STEP	2026-09-17T16:16:15.1762984Z #21 pushing manifest for ghcr.io/ibis-ssl/framework-simulatorcli:ibis@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79 1.1s done
+4251: build-and-push	UNKNOWN STEP	2026-09-17T16:16:15.1765341Z #21 pushing manifest for ghcr.io/ibis-ssl/framework-simulatorcli:latest@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79 0.4s done
+4252: build-and-push	UNKNOWN STEP	2026-09-17T16:16:15.1767845Z #21 pushing manifest for ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79 0.3s done
+4289: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.0969733Z   "buildx.build.provenance": {
+4348: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.0995325Z               "vcs:revision": "a52b6bdecd97a277544dd6f275afbf4483781e12",
+4585: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.1109748Z         "github_workflow_sha": "a52b6bdecd97a277544dd6f275afbf4483781e12",
+4597: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.1114751Z   "image.name": "ghcr.io/ibis-ssl/framework-simulatorcli:ibis,ghcr.io/ibis-ssl/framework-simulatorcli:latest,ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd"
+4609: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.1207672Z   subject-digest: sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79
+4685: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.4354940Z   subject-digest: sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79
+4687: build-and-push	UNKNOWN STEP	2026-09-17T16:17:06.4355845Z   predicate-type: https://slsa.dev/provenance/v1
+4724: build-and-push	UNKNOWN STEP	2026-09-17T16:17:09.3192880Z Attestation created for ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79

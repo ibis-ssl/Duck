@@ -1,0 +1,33 @@
+flowchart LR
+ subgraph win[Windows]
+  browser[利用者のブラウザー]
+  app[AppHost]
+  dcp[DCP]
+  ports[127.0.0.1 / 動的 TCP 接続先]
+  app -. 資源モデル .-> dcp
+  browser -. HTTP / WebSocket .-> ports
+ end
+ subgraph desktop[Docker Desktop]
+  engine[Docker Engine]
+  subgraph bridge[当該実行の DCP 管理ブリッジ]
+   sim[simulator]
+   gc[Game Controller]
+   duck[Duck / RuntimeHost]
+   ref[RefereeDriver / 11003 受信を含む]
+   crane[Crane]
+   cm4[cm4-sim / 選択時]
+   checks[各資源内の UDP 準備確認機能]
+   subgraph optional[比較モード]
+    tigers[TIGERs tracker]
+    erforce[ER-Force tracker]
+    debug[DebugHost サーバー]
+   end
+  end
+  foreign[別所有者のコンテナ / 保護対象]
+ end
+ dcp -. 全選択コンテナの作成・監視・停止 .-> engine
+ engine -. 選択資源を同じブリッジで実行 .-> bridge
+ ports -. GC 内部 TCP 8082 .-> gc
+ ports -. DebugHost 内部 TCP 8080 .-> debug
+ ports -. RefereeDriver 内部 HTTP 39110 .-> ref
+ ports -. 用途を限定した HTTP 準備確認 .-> checks

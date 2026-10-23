@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/tmp/issue81-referee-receive-cancel-red-ci-20261022/source.tar.gz",
+    "sha256": "9d9121df6f2e240487387124e1897a51fbdebc89dfe4d985dbb08577c03f247e",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-cancel-red-ci-20261022/dotnet-test.binlog",
+    "sha256": "342bcea6329bb41df23836e6e0bfad09cd246c16782e53544a4b8329d5affada",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-cancel-red-ci-20261022/failure-artifact.zip",
+    "sha256": "702b436fbcd4442068b3f4b118c590dead834ae1193daed0ba64f88ed167c057",
+    "reason": "container retained outside branch; individual evidence retained"
+  }
+]

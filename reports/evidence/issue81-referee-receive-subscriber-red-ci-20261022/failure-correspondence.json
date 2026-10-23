@@ -1,0 +1,14 @@
+{
+  "runtime_assertion": {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberTests.SubscriberWaitsThroughDuplicateCounterWithoutCompetingForReceives",
+    "outcome": "Failed",
+    "duration": "00:00:00.0604636",
+    "message": "同counterは診断へ数えても変更購読を完了させない。",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveSubscriberTests.SubscriberWaitsThroughDuplicateCounterWithoutCompetingForReceives() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs:line 42\n   at Tracker.Tests.RefereeReceiveSubscriberTests.SubscriberWaitsThroughDuplicateCounterWithoutCompetingForReceives() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs:line 62\n   at Tracker.Tests.RefereeReceiveSubscriberTests.SubscriberWaitsThroughDuplicateCounterWithoutCompetingForReceives() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs:line 62\n--- End of stack trace from previous location ---"
+  },
+  "classification": "missing implementation of accepted subscriber contract, not fixture compile/timeout",
+  "source_cause": "RefereeReceiveService.WaitForChangeAsync unconditionally returns faulted ValueTask with NotImplementedException, so IsCompleted becomes true; test is not evidence that a successful same-counter value was returned.",
+  "reached": "normal initial count2/ready; duplicate counter count3/ready; MaxReceive1 and ReceiveCalls4; then pending assertion fails",
+  "unreached": "new counter8 snapshot delivery and final count4 assertions",
+  "behavior_fix": "not started; parent Red adoption pending"
+}

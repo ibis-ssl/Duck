@@ -1,0 +1,19 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs b/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs
+index f7a8f59..6b5d5d9 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs
+@@ -30,8 +30,12 @@ internal static class RefereeUdpReceiverFactory
+     {
+         options ??= new();
+         var group = IPAddress.Parse(options.MulticastAddress);
+-        if (group.AddressFamily != AddressFamily.InterNetwork)
+-            throw new ArgumentException("審判情報のmulticast宛先はIPv4で指定する。", nameof(options));
++        if (group.AddressFamily != AddressFamily.InterNetwork ||
++            group.GetAddressBytes()[0] is < 224 or > 239)
++            throw new ArgumentException("審判情報の宛先はIPv4 multicastで指定する。", nameof(options));
++        if (options.InterfaceAddress is not null &&
++            options.InterfaceAddress.AddressFamily != AddressFamily.InterNetwork)
++            throw new ArgumentException("審判情報の参加IFはIPv4で指定する。", nameof(options));
+         createSocket ??= family => new UdpSocketSetup(family);
+         var setup = createSocket(AddressFamily.InterNetwork);
+         var client = setup.Client;

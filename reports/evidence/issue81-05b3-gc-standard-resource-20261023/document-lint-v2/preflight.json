@@ -1,0 +1,54 @@
+{
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "base_head": "03f98c986be388d23acd02417bf5b7bf6704b2fe",
+  "source_hashes": {
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "14c84930062ba8de364ca6710b3532b7186c92abaec784296567c992c89b6df4",
+    "Tracker/Design/tasks-status.md": "f2d3e52995b5d7b2ce705399f58184885a0eac68e6054c88be616e18a86d30df",
+    "reports/issue81-bridge-integration-implementation-20261023.md": "63dc1c6c56d397df67a0338a9062c28f964f1c0f417917ec4faf14f8c03572a1"
+  },
+  "inputs": {
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+      "path": "issue81-05b3-fragments-v2/aspire-simulation-test-environment.md",
+      "lines": 4,
+      "nonblank_lines": 2,
+      "bytes": 972,
+      "sha256": "579f787feddd86b14532763d73f0f4a305eadfffd6e580080f2bfb61f4825321"
+    },
+    "Tracker/Design/tasks-status.md": {
+      "path": "issue81-05b3-fragments-v2/tasks-status.md",
+      "lines": 2,
+      "nonblank_lines": 2,
+      "bytes": 1176,
+      "sha256": "007f8d1b15eda62525dc7e9de80f194e4613088dadfef469862efe80cac61034"
+    },
+    "reports/issue81-bridge-integration-implementation-20261023.md": {
+      "path": "issue81-05b3-fragments-v2/implementation-report.md",
+      "lines": 7,
+      "nonblank_lines": 4,
+      "bytes": 2830,
+      "sha256": "d833be5778eaf96ea7d03fed42e44f9a7632a88b56af4bf1859ed696036f0565"
+    }
+  },
+  "config_script_hashes": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/scripts/run-markdown-targets.js": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+    "tools/lint/scripts/list-markdown-targets.js": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+    "tools/lint/scripts/run-cspell-markdown.js": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+    "tools/lint/scripts/textlint-rules/no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  },
+  "config_script_hashes_match_previous": true,
+  "dictionary_reference": {
+    "sha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+    "bytes": 217374303,
+    "source": "preceding successful 05B2 lint evidence; unchanged environment/config"
+  },
+  "scope": "current 05B3 design paragraph, current tasks added lines, and owned report 05B3 section only; excludes unrelated prior report correction line"
+}

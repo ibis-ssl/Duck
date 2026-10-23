@@ -1,0 +1,98 @@
+{
+  "files": [
+    {
+      "path": "check-commands.json",
+      "bytes": 408,
+      "sha256": "932d3f1b225a0a1deb335e7c8cfa47d660bddc89a3857aea7bc9a7d54e1765f5"
+    },
+    {
+      "path": "diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expectations.json",
+      "bytes": 1300,
+      "sha256": "da6ed1a5d235e4bb3385d5a2787759ebd244fd19608231a04bc8350d842acd46"
+    },
+    {
+      "path": "new-file-diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "new-file-diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "new-file-diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "remaining-03A.json",
+      "bytes": 1577,
+      "sha256": "d30d77cde85c24e29fc6357068c3a683d48cdd2dfeda0add4256b10a637fdaf1"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 1956,
+      "sha256": "e22ebbd36194f034bd143145c3de5618bf8af0b3e95859151d54084b0bc6655d"
+    },
+    {
+      "path": "syntax-input.json",
+      "bytes": 215,
+      "sha256": "ee03f597e93ce8d0e35cce586f99b315676a0bcc922e7904f76f0ae1d4ec774c"
+    },
+    {
+      "path": "syntax-result.json",
+      "bytes": 507,
+      "sha256": "3d11e64ca7aa337c60e13edd43186658ec62faa2f8a06cc6e0aeaf5ff587b7c4"
+    },
+    {
+      "path": "syntax.command.json",
+      "bytes": 272,
+      "sha256": "bd5d008f75cc4653d81fd017f60cf80a1acf8b2ad7072e8415aef67a0dca34f7"
+    },
+    {
+      "path": "syntax.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "syntax.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test.syntax-api.txt",
+      "bytes": 332,
+      "sha256": "8227b421cd7112cc1827c4e645ca0e987b9357f0bc125e2fb3b8f20136fd271a"
+    }
+  ],
+  "raw_logs": [
+    "diff-check.stderr.log",
+    "diff-check.stdout.log",
+    "new-file-diff-check.stderr.log",
+    "new-file-diff-check.stdout.log",
+    "syntax.stderr.log",
+    "syntax.stdout.log"
+  ],
+  "note": "Keep ignored raw logs when parent persists evidence."
+}

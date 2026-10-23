@@ -1,0 +1,8 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "python3",
+    "-c",
+    "compare verifier LOCK constants against saved v4 findings.json (8 refs)"
+  ]
+}

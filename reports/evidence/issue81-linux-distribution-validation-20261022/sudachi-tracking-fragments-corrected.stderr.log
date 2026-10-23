@@ -1,0 +1,3 @@
+Markdown whitelist violations:
+- Tracker/Design/phases-status-new-fragment.md:1: '繧｢繝励Μ' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/phases-status-new-fragment.md:1: '繧｢繝励Μ' (katakana) is not in tools/lint/markdown-whitelist.yaml.

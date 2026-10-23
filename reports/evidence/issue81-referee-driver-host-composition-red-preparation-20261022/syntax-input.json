@@ -1,0 +1,14 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/Program.cs",
+    "Output": "/tmp/issue81-referee-driver-host-composition-red-preparation-20261022/Program.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "Output": "/tmp/issue81-referee-driver-host-composition-red-preparation-20261022/RefereeDriverApplication.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs",
+    "Output": "/tmp/issue81-referee-driver-host-composition-red-preparation-20261022/RefereeDriverHostCompositionTests.api.txt"
+  }
+]

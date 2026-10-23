@@ -1,0 +1,164 @@
+{
+  "files": [
+    {
+      "path": "artifacts.command.json",
+      "bytes": 116,
+      "sha256": "6c59ea7dea974f1d6511a2d40797762277df04b376312cd89e296d5fa838bc20"
+    },
+    {
+      "path": "artifacts.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "artifacts.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts.stdout.log",
+      "bytes": 32,
+      "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c"
+    },
+    {
+      "path": "ci-evidence.json",
+      "bytes": 3249,
+      "sha256": "5449dfdfc2d72736b98ad9c55da9ad7417fdd58c4f0743b507ddedb043ae8ea7"
+    },
+    {
+      "path": "ci-test-command.txt",
+      "bytes": 474,
+      "sha256": "06ac5e881559eb35e1f1b04520378868224ed3e8a9a38629564ff135d8c743b5"
+    },
+    {
+      "path": "commands-summary.json",
+      "bytes": 1664,
+      "sha256": "ede6ae16e1065bbe1f3ff8b28d4e1f56e81a789c2bb135946d4383d8b86c5209"
+    },
+    {
+      "path": "head-source-manifest.json",
+      "bytes": 2174,
+      "sha256": "019236ec8d9197c9085f8c33ca9339448be490d2f8dcceea383d118db593b574"
+    },
+    {
+      "path": "run-list.command.json",
+      "bytes": 278,
+      "sha256": "6e1751e4afb7fb24c3c9408943cdd366333205f504cefed5fedc151baaf3e87e"
+    },
+    {
+      "path": "run-list.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "run-list.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run-list.stdout.log",
+      "bytes": 225,
+      "sha256": "b195b472f9326f9d7b9a659d28a759de5ee12936afe0909163416f6170a5f622"
+    },
+    {
+      "path": "test-log.command.json",
+      "bytes": 154,
+      "sha256": "8a075d4efed692e589e8241aab71ac1202fcbdad7dfdd4ff2140209360bd5937"
+    },
+    {
+      "path": "test-log.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "test-log.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-log.stdout.log",
+      "bytes": 51537,
+      "sha256": "2c5eb42fe0732e41c18a393d4d68037ec6c375ce5ed9f98d1ead8e64b84c2e4d"
+    },
+    {
+      "path": "test-source-delta.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view-waiting.command.json",
+      "bytes": 172,
+      "sha256": "63fceb500f599cb57c1f1ee21639dd19e6a8088d2c0ddff157a3ca730668777e"
+    },
+    {
+      "path": "view-waiting.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "view-waiting.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view-waiting.stdout.log",
+      "bytes": 709,
+      "sha256": "c37e9b22672c27019b0ab6834824e7c24f4c75848db9432e352c384dbb60e795"
+    },
+    {
+      "path": "view.command.json",
+      "bytes": 172,
+      "sha256": "63fceb500f599cb57c1f1ee21639dd19e6a8088d2c0ddff157a3ca730668777e"
+    },
+    {
+      "path": "view.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "view.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view.stdout.log",
+      "bytes": 2436,
+      "sha256": "fdbabfce462ec4e7c9e91d635e867f8088ce8e6d7c5c55452992fdd4afbab14d"
+    },
+    {
+      "path": "watch.command.json",
+      "bytes": 157,
+      "sha256": "6cdd0da3eda94bf21695b71bef83ab42bc1af3cc8efa6db639477d549c8102e4"
+    },
+    {
+      "path": "watch.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "watch.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "watch.stdout.log",
+      "bytes": 21480,
+      "sha256": "e0b2a32e825f3010c6c1394ac1b96893154122e3aec23041cb35bf7cc2e838f2"
+    }
+  ],
+  "raw_logs": [
+    "artifacts.stderr.log",
+    "artifacts.stdout.log",
+    "run-list.stderr.log",
+    "run-list.stdout.log",
+    "test-log.stderr.log",
+    "test-log.stdout.log",
+    "view-waiting.stderr.log",
+    "view-waiting.stdout.log",
+    "view.stderr.log",
+    "view.stdout.log",
+    "watch.stderr.log",
+    "watch.stdout.log"
+  ],
+  "note": "Preserve ignored logs when parent persists evidence."
+}

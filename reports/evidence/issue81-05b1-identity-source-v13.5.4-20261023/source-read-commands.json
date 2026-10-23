@@ -1,0 +1,28 @@
+{
+  "repository": "https://github.com/microsoft/aspire",
+  "tag": "v13.5.4",
+  "commit": "9c1b401dd67746739044f68959cbf4d3d7af93a6",
+  "commands": [
+    {
+      "command": "gh api repos/microsoft/aspire/git/ref/tags/v13.5.4",
+      "exit": 0,
+      "output": "tag ref resolved to commit 9c1b401dd67746739044f68959cbf4d3d7af93a6"
+    },
+    {
+      "command": "gh api repos/microsoft/aspire/git/trees/9c1b401dd67746739044f68959cbf4d3d7af93a6?recursive=1",
+      "exit": 0,
+      "output": "fixed source paths and blob IDs recorded in source-manifest-v1.tsv"
+    },
+    {
+      "command": "gh api repos/microsoft/aspire/git/blobs/<verified-blob-sha> --jq .content (base64 decoded to Temp only)",
+      "exit": 0,
+      "output": "seven source blobs listed in source-manifest-v1.tsv"
+    },
+    {
+      "command": "Aspire.Hosting.dll public-type reflection using package-free Temp project; dotnet run --no-restore",
+      "exit": 0,
+      "output": "public-api-reflection.*"
+    }
+  ],
+  "note": "An initial contents endpoint attempt returned 404; source retrieval succeeded through the fixed commit tree/blob APIs. No DCP was started and source copies were not added as dependencies."
+}

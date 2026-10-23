@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tracker.Tests" />
+    <InternalsVisibleTo Include="Duck.Testing.AppHost" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
     <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
+    <ProjectReference Include="..\..\Testing\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
   </ItemGroup>
 
   <ItemGroup>

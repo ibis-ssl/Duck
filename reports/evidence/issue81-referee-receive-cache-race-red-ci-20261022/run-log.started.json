@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "view",
+    "39820168338",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--log"
+  ],
+  "utc": "2026-10-22T17:11:05.126606+00:00"
+}

@@ -1,0 +1,2216 @@
+{
+  "origin_windows": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-04a-evidence-20261022",
+  "source_manifest_sha256": "8a1e01df1f6715b1e7b9bca4d67662dad3c6b8026ea55278365b5409953b134e",
+  "entries": [
+    {
+      "relative_path": "04a-design-baseline-current.diff",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/04a-design-baseline-current.diff",
+      "bytes": 2043,
+      "sha256": "db513411b9db72674fa962f2f400f14ff25ca4410370629455a4bf30480ace5c",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/04a-design-baseline-current.diff",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "04a-lint-results-summary.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/04a-lint-results-summary.txt",
+      "bytes": 2074,
+      "sha256": "aa43035f356153a1f30340605bde5670d3d775e0688710f44f866b2f84764aa9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/04a-lint-results-summary.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "04a-lint-runtime-context.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/04a-lint-runtime-context.txt",
+      "bytes": 363,
+      "sha256": "e7c993befc2b3b20077a95be8d7a3028ca008ce58d04449f7de52226bca862de",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/04a-lint-runtime-context.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "04a-lint-source-context.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/04a-lint-source-context.json",
+      "bytes": 1473,
+      "sha256": "111e6f5b0b55987a084f4ae7ebc8f0a997d4e231a6d5fecb31aa1be9c3c2d294",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/04a-lint-source-context.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-job-log.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-job-log.command.txt",
+      "bytes": 180,
+      "sha256": "a8efb154f5c0c45f1ea280ab3968dad614c87f1d68e7eb6cb86934937f7360d1",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-job-log.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-job-log.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-job-log.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-job-log.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-job-log.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-job-log.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-job-log.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-job-log.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-job-log.stdout.log",
+      "bytes": 57087,
+      "sha256": "928a518f4414e53296162529628747bf6e74f98a32cf2bc46fca1bbb6b4813d6",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-job-log.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-rerun.action.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-rerun.action.txt",
+      "bytes": 361,
+      "sha256": "48d31938adc5801e9b4fbbf9aeb7f4dcf2eff54dfa99fb4eac53981831744c90",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-rerun.action.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-rerun.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-rerun.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-rerun.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-rerun.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-rerun.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-rerun.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-rerun.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-rerun.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-rerun.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-state.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-state.command.txt",
+      "bytes": 229,
+      "sha256": "f4bd2f21a23b7abaf2074f42a8358992a935de129381730bec8ad0437d138db2",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-state.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-state.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-state.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-state.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-state.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-state.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-state.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "attempt2-state.stdout.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/attempt2-state.stdout.json",
+      "bytes": 3013,
+      "sha256": "8e8fee5d10958c1df1cfbb29bfa72dc2ca178d1873c6b035482e9ede714d5ce5",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/attempt2-state.stdout.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "build-evidence-inventory.py",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/build-evidence-inventory.py",
+      "bytes": 1793,
+      "sha256": "e03136080cb6959a92c5cb152ab20f5c195d4069a48d3799e65fa76d972b9417",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/build-evidence-inventory.py",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-artifact-download.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-artifact-download.command.json",
+      "bytes": 338,
+      "sha256": "ff93652745c70fa320e6321c5a0535350f66dd7fac5f76406ab18c524a5f881e",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-artifact-download.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-artifact-download.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-artifact-download.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-artifact-download.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-artifacts.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-artifacts.command.json",
+      "bytes": 200,
+      "sha256": "13ce928d39bc19e3da2d57f1c89684f9ad989b13a59fe8155d5e2932c632ce98",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-artifacts.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-artifacts.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-artifacts.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-artifacts.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-artifacts.stdout.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-artifacts.stdout.json",
+      "bytes": 752,
+      "sha256": "3f92cf18b955e4953d3d15ae4b26325e81a0610cbf85f214fd97ce7df5739cab",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-artifacts.stdout.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-change-and-dependency-diff.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-change-and-dependency-diff.command.json",
+      "bytes": 415,
+      "sha256": "61374e8a791bc68afa8f6ad4deba3446a98d8015c357cce5825abccdb007bf1a",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-change-and-dependency-diff.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-change-and-dependency-diff.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-change-and-dependency-diff.stdout.log",
+      "bytes": 627,
+      "sha256": "220a548e24ed5971c36e96b23385f195146fc881b7f85945a4c3d6a0671b9acb",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-change-and-dependency-diff.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-source-hashes.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-source-hashes.txt",
+      "bytes": 1369,
+      "sha256": "3cac2364cfd352b352e0e0d2b944ca2098803d744d238816d6c7420212e95a46",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-source-hashes.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/dotnet-test.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/dotnet-test.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/dotnet-test.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/dotnet-test.stderr.log",
+      "bytes": 146,
+      "sha256": "da7fee3dd59febbd18920c4e1aa7e6c96ca2ee88c0361b670b9216d0f0ce8041",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/dotnet-test.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/dotnet-test.stdout.log",
+      "bytes": 6451,
+      "sha256": "60cf52c07060ad6ebe80f3d12d1e24540d57e89ba1f9cd3e70a81ddabebec44a",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/dotnet-test.trx",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/dotnet-test.trx",
+      "bytes": 1098869,
+      "sha256": "55a999a8e4c4f2d72763d285429c77728a713640696af9f5ba6a4f967bf7ed51",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/environment.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/environment.txt",
+      "bytes": 3462,
+      "sha256": "162b3c1d267fdd6f3c8b4ae180251f89f67ecafce87f5161e4c5aed348a2a7d8",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/source.tar.gz",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/source.tar.gz",
+      "bytes": 23658814,
+      "sha256": "84512f80f556c3712a2e69dead6bf2b89e3db238ef8a5aff1b7c881101c70b0b",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/vstest-diagnostics.datacollector.26-10-22_22-46-14_86757_5.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/vstest-diagnostics.datacollector.26-10-22_22-46-14_86757_5.log",
+      "bytes": 1370313,
+      "sha256": "e64c2b20ba3145f2c0bed6da62987e0c244c5a33292cdeb20a3775a8d7077071",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/vstest-diagnostics.host.26-10-22_22-46-15_18566_5.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/vstest-diagnostics.host.26-10-22_22-46-15_18566_5.log",
+      "bytes": 3060957,
+      "sha256": "f6f5ed391d9a60e01f309f8d60f7967d5685063cf91115f5fa3133dceb5ab1be",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-extract/vstest-diagnostics.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-extract/vstest-diagnostics.log",
+      "bytes": 2335989,
+      "sha256": "2e16adfe7a0a780335715baf7cb4269f7147b9cd13387a8027fad9abd60c70e6",
+      "stored": false,
+      "repository_path": null,
+      "reason": "duplicate artifact extraction or original source archive retained on connected machine"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/dotnet-test.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/dotnet-test.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/dotnet-test.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/dotnet-test.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/dotnet-test.stderr.log",
+      "bytes": 146,
+      "sha256": "da7fee3dd59febbd18920c4e1aa7e6c96ca2ee88c0361b670b9216d0f0ce8041",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/dotnet-test.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/dotnet-test.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/dotnet-test.stdout.log",
+      "bytes": 6451,
+      "sha256": "60cf52c07060ad6ebe80f3d12d1e24540d57e89ba1f9cd3e70a81ddabebec44a",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/dotnet-test.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/dotnet-test.trx",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/dotnet-test.trx",
+      "bytes": 1098869,
+      "sha256": "55a999a8e4c4f2d72763d285429c77728a713640696af9f5ba6a4f967bf7ed51",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/dotnet-test.trx",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/environment.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/environment.txt",
+      "bytes": 3462,
+      "sha256": "162b3c1d267fdd6f3c8b4ae180251f89f67ecafce87f5161e4c5aed348a2a7d8",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/environment.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/vstest-diagnostics.datacollector.26-10-22_22-46-14_86757_5.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/vstest-diagnostics.datacollector.26-10-22_22-46-14_86757_5.log",
+      "bytes": 1370313,
+      "sha256": "e64c2b20ba3145f2c0bed6da62987e0c244c5a33292cdeb20a3775a8d7077071",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/vstest-diagnostics.datacollector.26-10-22_22-46-14_86757_5.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/vstest-diagnostics.host.26-10-22_22-46-15_18566_5.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/vstest-diagnostics.host.26-10-22_22-46-15_18566_5.log",
+      "bytes": 3060957,
+      "sha256": "f6f5ed391d9a60e01f309f8d60f7967d5685063cf91115f5fa3133dceb5ab1be",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/vstest-diagnostics.host.26-10-22_22-46-15_18566_5.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "candidate-test-artifact-text/vstest-diagnostics.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/candidate-test-artifact-text/vstest-diagnostics.log",
+      "bytes": 2335989,
+      "sha256": "2e16adfe7a0a780335715baf7cb4269f7147b9cd13387a8027fad9abd60c70e6",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/candidate-test-artifact-text/vstest-diagnostics.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/Tracker.RuntimeHost.check.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/Tracker.RuntimeHost.check.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/Tracker.RuntimeHost.check.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/Tracker.RuntimeHost.check.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/Tracker.RuntimeHost.check.stderr.log",
+      "bytes": 148,
+      "sha256": "f5f9df6260ca741ddfd581c0fec1d9aca738489da5006c28cb611665e3068d76",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/Tracker.RuntimeHost.check.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/Tracker.RuntimeHost.check.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/Tracker.RuntimeHost.check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/Tracker.RuntimeHost.check.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/Tracker.RuntimeHost.publish.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/Tracker.RuntimeHost.publish.exit-code",
+      "bytes": 8,
+      "sha256": "a7e2054a214d80d5baee5f5eb02aced9e78477531285010383809f7d7c055d46",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/Tracker.RuntimeHost.publish.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/Tracker.RuntimeHost.publish.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/Tracker.RuntimeHost.publish.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/Tracker.RuntimeHost.publish.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/Tracker.RuntimeHost.publish.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/Tracker.RuntimeHost.publish.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/Tracker.RuntimeHost.publish.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-artifact-extracted/environment.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-artifact-extracted/environment.txt",
+      "bytes": 3445,
+      "sha256": "3e1d363a3ffbe657da1dc77a50d621b6d9a1f4d88397b38b7246b2c002b3b7e8",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-artifact-extracted/environment.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "ci-attempts-summary.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/ci-attempts-summary.txt",
+      "bytes": 1512,
+      "sha256": "225e67b2a64f9867734158af94c007358f977f0307824a5c59eba40051b261e5",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/ci-attempts-summary.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "default-gh-status-read-failure.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/default-gh-status-read-failure.txt",
+      "bytes": 860,
+      "sha256": "17fea2c31e6cc848ff02128812e75bd6febcedb23da4a90c765a8ba0610ce669",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/default-gh-status-read-failure.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "evidence-files.sha256",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/evidence-files.sha256",
+      "bytes": 22861,
+      "sha256": "8a1e01df1f6715b1e7b9bca4d67662dad3c6b8026ea55278365b5409953b134e",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/evidence-files.sha256",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "evidence-inventory.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/evidence-inventory.json",
+      "bytes": 18259,
+      "sha256": "0d0d8cadc9394a2289873a6d77e9de80c369e99bc092dd4076598dbb7c243ceb",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/evidence-inventory.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "excluded-binary-duplicates.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/excluded-binary-duplicates.txt",
+      "bytes": 121,
+      "sha256": "667ea5941a68f0df8392c26cbc7478808852345156ea8a0a3e28018287fb9126",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/excluded-binary-duplicates.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-job-log.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-job-log.command.json",
+      "bytes": 208,
+      "sha256": "2fff2f503250651b2f224ddb883ccba8cace3a4199010f47748d73d90051fe09",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-job-log.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-job-log.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-job-log.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-job-log.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-job-log.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-job-log.stdout.log",
+      "bytes": 59426,
+      "sha256": "0f821943f2e7171456eb09bbb6a9738bfd5f0633f9eff25a91288ab33d964d49",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-job-log.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-run-list.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-run-list.command.json",
+      "bytes": 285,
+      "sha256": "71062c29d2057adf438c2edc8e1ff8ce72f2e57ad5462bcdd0e0ba62c60c04f1",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-run-list.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-run-list.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-run-list.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-run-list.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-run-list.stdout.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-run-list.stdout.json",
+      "bytes": 4657,
+      "sha256": "810e6b57a6f96733c57c009c06d0518f4c0074c32b1f097329e2d408a24819b9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-run-list.stdout.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-run-watch.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-run-watch.command.json",
+      "bytes": 198,
+      "sha256": "0ba684d831940d3f854282a6e8d3a6d61228735799ca210bfa48b7afada618e1",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-run-watch.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "green-run-watch.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/green-run-watch.log",
+      "bytes": 10307,
+      "sha256": "89458bdfb1eb6c5e038bb666ea7d19388f81b1de6f3fa9e8f35490cb3f869252",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/green-run-watch.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "hash-prior-lint-evidence.py",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/hash-prior-lint-evidence.py",
+      "bytes": 2576,
+      "sha256": "13aed98c856a70ffb8305d66fc7162a34ba7e831f0b6a485861e6cf9fa006225",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/hash-prior-lint-evidence.py",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-spell.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-spell.command.txt",
+      "bytes": 229,
+      "sha256": "c219070cc54955792298c1724659e26ef9de9ca38c9134cdb881f933684e1f6f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-spell.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-spell.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-spell.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-spell.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-spell.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-spell.stderr.log",
+      "bytes": 130,
+      "sha256": "5c228f86834155e00f8a92ea88dd3b2058a36e1a35fc332475406b0e7a3f3ac0",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-spell.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-spell.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-spell.stdout.log",
+      "bytes": 95,
+      "sha256": "6020e9ffb2aeb86347129199c271d348034444ee16155d25e9ac1a814af0f4ef",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-spell.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-text.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-text.command.txt",
+      "bytes": 228,
+      "sha256": "d55ac63353ee29fcd1fe248d2a8349ae59cf1d11854d685e9ee4b77002b11cdd",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-text.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-text.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-text.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-text.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-text.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-text.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-text.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "lint-text.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/lint-text.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/lint-text.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "merged-source-comparison.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/merged-source-comparison.command.json",
+      "bytes": 241,
+      "sha256": "c2fcda3fec80ca7e64329d16efa78960d7872fc862a52c3eccdb28db76b954b9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/merged-source-comparison.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "merged-source-comparison.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/merged-source-comparison.stdout.log",
+      "bytes": 842,
+      "sha256": "805b83cf5db7c73bee4874ca39a01f78409d9fc5e529d5f962c68fe3d5e79e66",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/merged-source-comparison.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "prepare-04a-lint.py",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/prepare-04a-lint.py",
+      "bytes": 2645,
+      "sha256": "7c4b2bc8fe4f9b5f065a13131ed29195407aa04a991457eba647d6f0bcdada18",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/prepare-04a-lint.py",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "prior-lint-reference.map.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/prior-lint-reference.map.txt",
+      "bytes": 802,
+      "sha256": "d3603cfe183760c8554404c3e71f85dcc6fc8b57aaf76953bc60bf033495ce24",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/prior-lint-reference.map.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "prior-lint-reference.sha256",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/prior-lint-reference.sha256",
+      "bytes": 5919,
+      "sha256": "c7275f3dfa78ff9cc90fe1daa30610012601dea5cbe92162323f0bd110fd90da",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/prior-lint-reference.sha256",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "process-check-denied.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/process-check-denied.txt",
+      "bytes": 518,
+      "sha256": "a99efbdd988101a963904ebecab1b0797462a39af8b645d71788ef483d86ec23",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/process-check-denied.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "run-state-before-rerun.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/run-state-before-rerun.txt",
+      "bytes": 449,
+      "sha256": "ffff4d9496adad661c006d3941deb5485ca138a738ab9e7901f38d8333a5698b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/run-state-before-rerun.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-comparison.command.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-comparison.command.json",
+      "bytes": 552,
+      "sha256": "28f9e598b906999eddbb8459edc967fbc5374d2cdef4aeed552d1dc5ed3c7b29",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-comparison.command.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-comparison.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-comparison.stderr.log",
+      "bytes": 396,
+      "sha256": "e7e168f0bc9b71a0e11ae4e087c116a8fe34a2f6c0e074a6fabd7db1de2f1441",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-comparison.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-comparison.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-comparison.stdout.log",
+      "bytes": 662,
+      "sha256": "3d7f1eb600b884c4dd53d3d101303b6da81b691f53d6e412ddcc03903e32eb68",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-comparison.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-git-show-comparison.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-git-show-comparison.command.txt",
+      "bytes": 458,
+      "sha256": "d1a60f4cf5b83421c7741f456d1b6d30bf509d76c24236a135cdbdc3a4a76ff2",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-git-show-comparison.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-git-show-comparison.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-git-show-comparison.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-git-show-comparison.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-git-show-comparison.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-git-show-comparison.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-git-show-comparison.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "source-git-show-comparison.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/source-git-show-comparison.stdout.log",
+      "bytes": 940,
+      "sha256": "0fc047ec5e721b731f04c8d5c95d635e5884343bb6fac10f541de92eb47d8a33",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/source-git-show-comparison.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-added-lines.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-added-lines.command.txt",
+      "bytes": 320,
+      "sha256": "c6bd6f5ee83bad51b9328dbc98987c92be2dee8d26b3466216240b0a1befbd99",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-added-lines.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-added-lines.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-added-lines.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-added-lines.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-added-lines.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-added-lines.stderr.log",
+      "bytes": 128,
+      "sha256": "735967b650228fbb918b611ac778c50faae932e08757cde6f222186f203bc649",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-added-lines.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-added-lines.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-added-lines.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-added-lines.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-phases-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-phases-status-new-fragment.command.txt",
+      "bytes": 213,
+      "sha256": "1c995dc0fcac81d464bfdd3ba041935912161910445d333634663d55283fc276",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-phases-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-phases-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-phases-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-phases-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-phases-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-phases-status-new-fragment.stderr.log",
+      "bytes": 113,
+      "sha256": "b7150c60d8abea2307cb509293c3d6fbee9f94c7118f14ce07bfec91d24d4d29",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-phases-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-phases-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-phases-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-phases-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-tasks-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-tasks-status-new-fragment.command.txt",
+      "bytes": 212,
+      "sha256": "692292a3074cb4adcadb2207fecd9bff7c8fb354c789565686a5318ab7236c4f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-tasks-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-tasks-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-tasks-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-tasks-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-tasks-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-tasks-status-new-fragment.stderr.log",
+      "bytes": 112,
+      "sha256": "68aaa84aec28ed321a8d407a64fbd9f65638790dc9f83a2970868363e1cace04",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-tasks-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-after-fix-tasks-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-after-fix-tasks-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-after-fix-tasks-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-baseline.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-baseline.command.txt",
+      "bytes": 330,
+      "sha256": "2d4aaa534e385a581013a6edb502a149d42acc2d4456bbcd428855983eb07943",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-baseline.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-baseline.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-baseline.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-baseline.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-baseline.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-baseline.stderr.log",
+      "bytes": 139,
+      "sha256": "229b4b370f7c9a86241b4b83592ed9db721369c30db9f1575dd54c84e2a0a4c3",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-baseline.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-baseline.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-baseline.stdout.log",
+      "bytes": 104,
+      "sha256": "dd440a072930e5b1b17b1bfe3237bdb9079db5e49584d847e0d0813603a200b2",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-baseline.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-current.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-current.command.txt",
+      "bytes": 321,
+      "sha256": "fe2d26585c87dcb5eced292b5a6e796c99b300519cb20edf847c2f4301d96969",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-current.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-current.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-current.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-current.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-current.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-current.stderr.log",
+      "bytes": 130,
+      "sha256": "336985fbc4dffa4fe994f0c24abcb284327b9c0c787cdb43239da99191d8a864",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-current.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-current.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-current.stdout.log",
+      "bytes": 95,
+      "sha256": "6020e9ffb2aeb86347129199c271d348034444ee16155d25e9ac1a814af0f4ef",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-current.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-phases-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-phases-status-new-fragment.command.txt",
+      "bytes": 213,
+      "sha256": "1c995dc0fcac81d464bfdd3ba041935912161910445d333634663d55283fc276",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-phases-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-phases-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-phases-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-phases-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-phases-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-phases-status-new-fragment.stderr.log",
+      "bytes": 113,
+      "sha256": "77fb2519c13013601300d99cb3f1da0e89b24df22cb3e76512b5d6fa7f80e8e5",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-phases-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-phases-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-phases-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-phases-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-tasks-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-tasks-status-new-fragment.command.txt",
+      "bytes": 212,
+      "sha256": "692292a3074cb4adcadb2207fecd9bff7c8fb354c789565686a5318ab7236c4f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-tasks-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-tasks-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-tasks-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-tasks-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-tasks-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-tasks-status-new-fragment.stderr.log",
+      "bytes": 112,
+      "sha256": "bd297249934a1184317b7c486dfdb8f60f7af1333582071403e6c58625317cfb",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-tasks-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-final-tasks-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-final-tasks-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-final-tasks-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-phases-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-phases-status-new-fragment.command.txt",
+      "bytes": 213,
+      "sha256": "1c995dc0fcac81d464bfdd3ba041935912161910445d333634663d55283fc276",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-phases-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-phases-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-phases-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-phases-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-phases-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-phases-status-new-fragment.stderr.log",
+      "bytes": 113,
+      "sha256": "d90192b434adfbed87f2bd3b332d1b4b420ed1609b6a461a69165d7346b55469",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-phases-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-phases-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-phases-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-phases-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-tasks-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-tasks-status-new-fragment.command.txt",
+      "bytes": 212,
+      "sha256": "692292a3074cb4adcadb2207fecd9bff7c8fb354c789565686a5318ab7236c4f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-tasks-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-tasks-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-tasks-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-tasks-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-tasks-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-tasks-status-new-fragment.stderr.log",
+      "bytes": 112,
+      "sha256": "ccb308429dfd94cb285b8feeefab97258ce40191d65e0cd8091cf14c53c84dc2",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-tasks-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "spell-tasks-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/spell-tasks-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/spell-tasks-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "storage-map.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/storage-map.txt",
+      "bytes": 2253,
+      "sha256": "59a19e064e53fd133f416625c6887f1c135575ff3ca8d5b027c2572638e4e286",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/storage-map.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines-captured.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines-captured.command.txt",
+      "bytes": 715,
+      "sha256": "0651b39dc44ecc814bac42f74fcf6875cc7e4061ab5c57bdb6bd0a2e13ee7917",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines-captured.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines-captured.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines-captured.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines-captured.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines-captured.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines-captured.json",
+      "bytes": 125,
+      "sha256": "aa4922f0a9e0c05281a425450a2176d38c5e44624e1b2e22705edf2bfab70252",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines-captured.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines-captured.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines-captured.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines-captured.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines-captured.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines-captured.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines-captured.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines.command.txt",
+      "bytes": 644,
+      "sha256": "eafc9891b384a1ae2a9e0a3d77df7a3adabac06cd4ac9d83e6436440887296d6",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines.json",
+      "bytes": 125,
+      "sha256": "aa4922f0a9e0c05281a425450a2176d38c5e44624e1b2e22705edf2bfab70252",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-added-lines.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-added-lines.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-added-lines.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline-captured.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline-captured.command.txt",
+      "bytes": 732,
+      "sha256": "18db8fb4d07d2024d6c0b1f7704da96d368857d6a412519ac0e1ffa7b9c64f56",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline-captured.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline-captured.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline-captured.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline-captured.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline-captured.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline-captured.json",
+      "bytes": 2087,
+      "sha256": "7c56701baddb2cda90c009912f7081257e4d118e728a4402d5f543b9c020400a",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline-captured.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline-captured.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline-captured.stderr.log",
+      "bytes": 1436,
+      "sha256": "da391d1b24da856cb122014e5a1c626ad49bcaea994d29aad2226e34543f6afe",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline-captured.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline-captured.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline-captured.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline-captured.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline.command.txt",
+      "bytes": 651,
+      "sha256": "6e8a5b58800a288281cc4c488854c4b9c1a5db0b3bd5b1dddc490b38b55b9b0a",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline.json",
+      "bytes": 135,
+      "sha256": "441394718a7a7ef52c473bc35391586c9bfa54c9aaa1a26989377faf296dfc0d",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-baseline.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-baseline.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-baseline.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current-captured.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current-captured.command.txt",
+      "bytes": 713,
+      "sha256": "6cb339b2a888a2e3871849b2f2bdd32a22b14d72546eedf5271a38d43f327a42",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current-captured.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current-captured.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current-captured.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current-captured.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current-captured.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current-captured.json",
+      "bytes": 1989,
+      "sha256": "5a9da3d5e47fef0c94e383885f53129cdd8bcceeae6151e12e73c21bcaf27521",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current-captured.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current-captured.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current-captured.stderr.log",
+      "bytes": 1347,
+      "sha256": "f0280bd23caeb2a09e707990fdbcfa487a38f3c8b26c7336809f7f1bb0cc8e7b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current-captured.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current-captured.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current-captured.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current-captured.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current.command.txt",
+      "bytes": 641,
+      "sha256": "7a6908bc2f86602131da03153559e6c7d8991c02b96f1393c1c4a7f3a7c094cc",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current.json",
+      "bytes": 126,
+      "sha256": "1c60cf5e1d7503d6059d0e5a4d613f13ad0b201cf222676360896483d3c41adf",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-04a-current.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-04a-current.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-04a-current.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-runtime-probe.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-runtime-probe.command.txt",
+      "bytes": 353,
+      "sha256": "158e099cae01c9cae47ae770e8f8818db5c2d4dd94cb286508b0f7311eb53870",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-runtime-probe.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-runtime-probe.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-runtime-probe.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-runtime-probe.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-runtime-probe.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-runtime-probe.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-runtime-probe.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-runtime-probe.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-runtime-probe.stdout.log",
+      "bytes": 356,
+      "sha256": "49ee7022f09bfdd04887cc243a6f6d2fc8da5aab011c715337f390840bf03024",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-runtime-probe.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-after-fix.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-after-fix.command.txt",
+      "bytes": 510,
+      "sha256": "3013c56d1fff28621056fcbd5f1271f036e438395d206b63ea16e9b8a54464da",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-after-fix.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-after-fix.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-after-fix.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-after-fix.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-after-fix.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-after-fix.stderr.log",
+      "bytes": 157,
+      "sha256": "62a1336b40578791dc687f62742ee17e2d3cca88f49cdcb926397657ac782a3a",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-after-fix.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-after-fix.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-after-fix.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-after-fix.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-corrected.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-corrected.command.txt",
+      "bytes": 510,
+      "sha256": "3013c56d1fff28621056fcbd5f1271f036e438395d206b63ea16e9b8a54464da",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-corrected.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-corrected.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-corrected.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-corrected.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-corrected.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-corrected.stderr.log",
+      "bytes": 282,
+      "sha256": "2afa1b7ff72b91b2ccc036fa79c42b04c07344dd785621c0446300482efb82ee",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-corrected.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-corrected.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-corrected.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-corrected.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-final.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-final.command.txt",
+      "bytes": 510,
+      "sha256": "3013c56d1fff28621056fcbd5f1271f036e438395d206b63ea16e9b8a54464da",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-final.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-final.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-final.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-final.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-final.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-final.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-final.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments-final.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments-final.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments-final.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments.command.txt",
+      "bytes": 462,
+      "sha256": "3c183382d6bedaa2c6e7f6e7bcb88d928737db9ff1a90b5156d2ad3a7f33504f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments.exit-code",
+      "bytes": 1,
+      "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments.stderr.log",
+      "bytes": 229,
+      "sha256": "35e5b756532de9c2a45e6556d73c7593c40023e843d29536f8f4791eab19c778",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "sudachi-tracking-fragments.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/sudachi-tracking-fragments.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/sudachi-tracking-fragments.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-phases-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-phases-status-new-fragment.command.txt",
+      "bytes": 212,
+      "sha256": "502064921ba7a1eda8b63014e10b3b20fdea40ea56d64ed79697f8cd1c2e4d0c",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-phases-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-phases-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-phases-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-phases-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-phases-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-phases-status-new-fragment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-phases-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-phases-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-phases-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-phases-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-tasks-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-tasks-status-new-fragment.command.txt",
+      "bytes": 211,
+      "sha256": "add5febdc4f973f91ca4bc7517d724f7e9130b9064e29fff7688015b76d0c9ae",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-tasks-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-tasks-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-tasks-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-tasks-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-tasks-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-tasks-status-new-fragment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-tasks-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-after-fix-tasks-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-after-fix-tasks-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-after-fix-tasks-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-current.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-current.command.txt",
+      "bytes": 320,
+      "sha256": "610df9969250512a1b73b9150f56c31c95c7d64a51d97f844e671045c23e272b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-current.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-current.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-current.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-current.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-current.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-current.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-current.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-current.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-current.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-current.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-phases-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-phases-status-new-fragment.command.txt",
+      "bytes": 212,
+      "sha256": "502064921ba7a1eda8b63014e10b3b20fdea40ea56d64ed79697f8cd1c2e4d0c",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-phases-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-phases-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-phases-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-phases-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-phases-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-phases-status-new-fragment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-phases-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-phases-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-phases-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-phases-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-tasks-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-tasks-status-new-fragment.command.txt",
+      "bytes": 211,
+      "sha256": "add5febdc4f973f91ca4bc7517d724f7e9130b9064e29fff7688015b76d0c9ae",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-tasks-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-tasks-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-tasks-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-tasks-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-tasks-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-tasks-status-new-fragment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-tasks-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-final-tasks-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-final-tasks-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-final-tasks-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-phases-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-phases-status-new-fragment.command.txt",
+      "bytes": 212,
+      "sha256": "502064921ba7a1eda8b63014e10b3b20fdea40ea56d64ed79697f8cd1c2e4d0c",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-phases-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-phases-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-phases-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-phases-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-phases-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-phases-status-new-fragment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-phases-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-phases-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-phases-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-phases-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-tasks-status-new-fragment.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-tasks-status-new-fragment.command.txt",
+      "bytes": 211,
+      "sha256": "add5febdc4f973f91ca4bc7517d724f7e9130b9064e29fff7688015b76d0c9ae",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-tasks-status-new-fragment.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-tasks-status-new-fragment.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-tasks-status-new-fragment.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-tasks-status-new-fragment.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-tasks-status-new-fragment.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-tasks-status-new-fragment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-tasks-status-new-fragment.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "text-tasks-status-new-fragment.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/text-tasks-status-new-fragment.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/text-tasks-status-new-fragment.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "tracking-fragment-diff-after-fix.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/tracking-fragment-diff-after-fix.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/tracking-fragment-diff-after-fix.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "tracking-fragment-diff-after-fix.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/tracking-fragment-diff-after-fix.stdout.log",
+      "bytes": 2800,
+      "sha256": "b67d94d13aaa74b339e850207e4d0ec763a07afe45567d87435db37de75b95ee",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/tracking-fragment-diff-after-fix.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "tracking-fragment-diff.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/tracking-fragment-diff.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/tracking-fragment-diff.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "tracking-fragment-diff.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/tracking-fragment-diff.stdout.log",
+      "bytes": 2758,
+      "sha256": "7f393ed65104fd80d99a65cae8fd8af8a107c06b7a98dad190766d462eb5c39c",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/tracking-fragment-diff.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "tracking-fragment-inventory.json",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/tracking-fragment-inventory.json",
+      "bytes": 735,
+      "sha256": "2a522d0b18d58491da3c179351f4f9c1a2a5a44db720ea99aca56a7c7ac5cf00",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/tracking-fragment-inventory.json",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "tracking-fragment-inventory.py",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/tracking-fragment-inventory.py",
+      "bytes": 867,
+      "sha256": "97feb6daee9fdb4ad902572985beb5dc961da3409cf93e5f513ad3cea0f5755d",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/tracking-fragment-inventory.py",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "update-child-report.py",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/update-child-report.py",
+      "bytes": 6692,
+      "sha256": "43c875556572e38de23b46da3a8b469bc03218d6d033f7d85de2272c08a83c09",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/update-child-report.py",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "update-report-current-lint.py",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/update-report-current-lint.py",
+      "bytes": 5024,
+      "sha256": "e171fa859213963ef5370e0a44473444f352ae35088e4f28c8bbb82d2d72a9a5",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/update-report-current-lint.py",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-added-lines.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-added-lines.command.txt",
+      "bytes": 440,
+      "sha256": "2d84926094c61342fd5f50218e32f3989df61e3ffac2a872d1a0708d4039c3b9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-added-lines.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-added-lines.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-added-lines.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-added-lines.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-added-lines.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-added-lines.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-added-lines.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-added-lines.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-added-lines.stdout.log",
+      "bytes": 212,
+      "sha256": "93a867a6499cf51944c27494dd3f35a4da01b9bc54c4eaf4628c3645e5838a21",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-added-lines.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-baseline.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-baseline.command.txt",
+      "bytes": 450,
+      "sha256": "4ae37137d9f8af97c19f6784a235177f6ccb2829d591a8c37ef0fba18c59ad36",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-baseline.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-baseline.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-baseline.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-baseline.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-baseline.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-baseline.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-baseline.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-baseline.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-baseline.stdout.log",
+      "bytes": 216,
+      "sha256": "df8db19ff51a9d7df899105ec80567e8ee8e610b6537a9833d7c4deb82938ed7",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-baseline.stdout.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-current.command.txt",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-current.command.txt",
+      "bytes": 441,
+      "sha256": "d746842260aeb802aa0f9d5dee4ca5ab158b787dfc64abf490210be7a16de43b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-current.command.txt",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-current.exit-code",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-current.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-current.exit-code",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-current.stderr.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-current.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-current.stderr.log",
+      "reason": "text evidence"
+    },
+    {
+      "relative_path": "yomiyasu-04a-current.stdout.log",
+      "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-evidence-20261022/yomiyasu-04a-current.stdout.log",
+      "bytes": 217,
+      "sha256": "0abc7eb9516df0e3221032508e26a7feccd45169dc6fc5ceba88341d9be2ed9b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-validation-20261022/yomiyasu-04a-current.stdout.log",
+      "reason": "text evidence"
+    }
+  ],
+  "historical_references": [
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/junction.command.json",
+      "sha256": "6b870729ebef12861eb857a63cbd54ff4ce224fd1ef29799ce071dd33d95d4a3",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/junction.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/junction.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/junction.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/junction.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/junction.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/tool-versions.command.json",
+      "sha256": "5f8fd0a9e0bf02181c5767e3b091fe597caaa1940622b69702640d18926b0de9",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/tool-versions.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/tool-versions.stdout.log",
+      "sha256": "bab8e32361bba2e3107c0986d42f3ca5455a4bf1afb9aa6e3946e52c62e28134",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/tool-versions.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/tool-versions.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/tool-versions.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/cspell-delta.json",
+      "sha256": "b9ad35335f74ddd6f2b0e247e1bc5d42cbf2f8b2ab82d6e8fa01b3a6a291df9f",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/cspell-delta.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/sudachi-delta.json",
+      "sha256": "946e744f9a273512ec2e741787c91b8fe02d8121ce9e251278d4d4e548804e32",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/sudachi-delta.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/yomiyasu-delta.json",
+      "sha256": "d396eb734c49f88e3cea73ae1a26ce78890703a19e4656ebf281696572a95d30",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/yomiyasu-delta.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/validation-summary.json",
+      "sha256": "793acd6b7302e60af3e6291c764d7a0bc3209baa661314f826ca33d5db8c6b0d",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/validation-summary.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/text.command.json",
+      "sha256": "83a9b7d8c007b16293b122217a189c2a2f284482dc15222f1fdfa0844186b827",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/text.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/text.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/text.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/text.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/text.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/targets.command.json",
+      "sha256": "dc4a871ec3eee4782ff280f4f85c4e5834020fe06575f89d556e47aac799cf64",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/targets.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/targets.stdout.log",
+      "sha256": "1be298c9c246da0c5e72581d705762a60efeb8013b21c645d0e421a743e3c7a2",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/targets.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/targets.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/targets.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/spell.command.json",
+      "sha256": "9ac85b3aee2e95571db559d8425df19d9cb9a80164531158dca27699d47fbaf5",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/spell.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/spell.stdout.log",
+      "sha256": "dcd5914a32b39a246baaa483cc273ef197399cd213f867c2812712e7ff90c7ff",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/spell.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/spell.stderr.log",
+      "sha256": "8e4fd63c7eb36ab6dab7f03b6543209097847ed00ad11a7e34772f88a45d8020",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/spell.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.command.json",
+      "sha256": "51dbf8fdb1096dd6f2b7564d362b194c0c82a31c82166f76146d0cd9ea6c62fc",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.json",
+      "sha256": "b492d76b88cebcf78a6ed1e9ec017e05c676e1ffe6719e7b340b21786a19a322",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.stderr.log",
+      "sha256": "fe3239aed16753eab93aaa1530b6ad26c8ac3e01e0bae30403b43fac03fab3c8",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.command.json",
+      "sha256": "ebffc8a221eebfb94a5b31470e111c02a76fb41f2f5d5d0b7dd4a622deee4fbc",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.stdout.log",
+      "sha256": "df8db19ff51a9d7df899105ec80567e8ee8e610b6537a9833d7c4deb82938ed7",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-npm-lint.command.json",
+      "sha256": "991098817c6db42abbfbb6bbe51d9ee961626e6348491f635aa19ded1b5fbd84",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-npm-lint.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-npm-lint.stdout.log",
+      "sha256": "8ba04787463ccf33c45fa5c62c2560eaf6b076c57b8d12f46d7a2cff36b4f0e0",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-npm-lint.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-npm-lint.stderr.log",
+      "sha256": "2a7a8e18b11ce15cdb7b7da9ffe9c5daae1e2f19c325f906aba626ea719c9eef",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-npm-lint.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.command.json",
+      "sha256": "ea90dd582f06652b1c5bc25fd1b7f2b18ae20bd250284b27180a8d6909efde73",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.json",
+      "sha256": "18b581b6070b9d19ad8ee6de0d130855a88cf0b1f483c6a70181698f4ebe3082",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.stderr.log",
+      "sha256": "cb0ceab031e577dd6bbdafd9e8f2f0cf8fae7888bb15143ba87ab83a124d8212",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-sudachi.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-targets.command.json",
+      "sha256": "e7eddf1301c0175d2ca95b5887b097c7d1517ce220974821755abfc74905e72a",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-targets.command.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-targets.stdout.log",
+      "sha256": "5b1f39223238d39407505b40aef6a463e8a647befc95524767641ec6fe7faf25",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-targets.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-targets.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-targets.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/validation-summary.json",
+      "sha256": "d5be53ba1b0cbfcfaff0a7ee164e5540990100559652694c5d06c910b3af6211",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/validation-summary.json"
+    },
+    {
+      "source": "/tmp/issue81-referee-driver-host-review-preparation-validation-20261022/full-docproof.json",
+      "sha256": "e9d54b5292370c41abd4c6ab268b3e11e4aa42a0fd3a65d83b8f6e952d8cf70e",
+      "historical_only": true,
+      "existing_repository_path": "reports/evidence/issue81-referee-driver-host-review-preparation-validation-20261022/full-docproof.json"
+    }
+  ]
+}

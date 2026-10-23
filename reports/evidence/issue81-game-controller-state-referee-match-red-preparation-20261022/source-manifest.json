@@ -1,0 +1,33 @@
+{
+  "head": "5c22501f9f777db4b68cf8ec36d731e8f38dcc9f",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "674be8de2a729d4b588f3e89fd8dc28bdc479c207cb0b1b07f8981d445524e43"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs",
+      "sha256": "428a8e8e76f403262d26e4e60212bee1f5187774004341c96ea9c8fd5439706e"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs",
+      "sha256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec"
+    }
+  ],
+  "existing32Guard": "31wholefiles unchanged; RefereeReceiveService oldbody byte-identical after only newaccessor/record declarations removed",
+  "existingTestsUnchanged": true,
+  "newCases": 18,
+  "expectedTotal": 734,
+  "expectedRed": 13,
+  "expectedRegression": 5,
+  "syntaxFinalExit": 0,
+  "diffCheckExit": 0,
+  "runtimeExecuted": 0,
+  "behaviorImplemented": false,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "program_sha256": "f438efe6766a72fcba8f550a5c8b13f6dd4c33b04cc738531c85bc869e59ac57",
+  "test_sha256": "a63641ea949a3222fa11cf3934b4b241a137702b917e43e226a2768814fd0d16",
+  "assets_sha256": "6096aee40a1d81d76cfcb1ea790b64a0f9bcda60710bc9c71f60a710737bef92",
+  "command": [
+    "dotnet",
+    "build",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit": 1,
+  "stdout_sha256": "77083ebc1a79b683fe5214629e1ef9b3d3afe9ef74671ac1ff2bf3cba0cdd345",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "finished_utc": "2026-10-23T10:33:47.607241+00:00"
+}

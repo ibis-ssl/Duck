@@ -1,0 +1,695 @@
+{
+  "source": "existing 05b boundary-test JSON metadata; raw files retained unchanged",
+  "entries": [
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/boundary-suite-green-v1.json",
+      "raw_sha256": "d59f56e6aafc399e05cbf77991125ba6d6a987bf647e3b2b876e8d4aa156451e",
+      "raw_bytes": 762,
+      "parse_error": "Extra data at byte 760",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "boundary-suite-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~RuntimeIdentityControlBoundaryTests"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:19:47.948430+00:00",
+        "runner_pid": 1195542,
+        "child_pid": 1195544,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "f4ca00944345dbd45ef4d0de377ff8ad6e169ca66e46b561fc53deec4b921ec7",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 4092,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/client-disconnect-green-v1.json",
+      "raw_sha256": "8d2965178c830fb4b1a5b24c6aadc407e70bd4f58775c4453b109970fd7335d3",
+      "raw_bytes": 803,
+      "parse_error": "Extra data at byte 801",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "client-disconnect-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~disconnect-after-challenge"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:15:45.641270+00:00",
+        "runner_pid": 1191781,
+        "child_pid": 1191782,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "e223d934800943cc5bbf20f8f665c434d0a49f2e28df26c65f894addb3e33ee3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/full-suite-v1.json",
+      "raw_sha256": "273396e9d2ef5de8e1cea204bb7648769ec96948643a88a22e7ac53360222dcb",
+      "raw_bytes": 730,
+      "parse_error": "Extra data at byte 728",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "full-suite-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~Tracker.Tests"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:20:12.092969+00:00",
+        "runner_pid": 1196071,
+        "child_pid": 1196074,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "94018e6433f5406229ca4277eafb5aae688b9f36357ce51f462df149c7287e33",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2477,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/idleclient-green-v1.json",
+      "raw_sha256": "d49ed2035dce40a36a5fe819d0eabc9a3dc3e0c72c697e058e9adda5bd141a6d",
+      "raw_bytes": 772,
+      "parse_error": "Extra data at byte 770",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "idleclient-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~IdleClientHasDeadlineAndDoesNotStarveLaterHandoff"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:18:22.354463+00:00",
+        "runner_pid": 1193511,
+        "child_pid": 1193514,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "14863d60e3f8bd1e6a7fbabea644c27e002b0e60c133ed6ad5ab6eb6e21b1fb3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2476,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/idleclient-red-post007.json",
+      "raw_sha256": "b634a727d7d8cd4e4a4d24b01e4ddf515011c0c3b6a95cd723666e92f202e3e3",
+      "raw_bytes": 777,
+      "parse_error": "Extra data at byte 775",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "idleclient-red-post007",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~IdleClientHasDeadlineAndDoesNotStarveLaterHandoff"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:15:57.695875+00:00",
+        "runner_pid": 1192179,
+        "child_pid": 1192180,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "dca4937c9cbfd4d505b0087c631320db6ec9d37efd98da7a4f35a95a06c1fc3a",
+        "stderr_sha256": "675209926ec15f5e564da17152b152b11a5b513e804a4408cbc49bb71b078c04",
+        "stdout_bytes": 3206,
+        "stderr_bytes": 135
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/idlecommit-green-v1.json",
+      "raw_sha256": "27ab317ef530fb5e6f03692f1649fcf9ecaf07115a8bf40ad0454292ec4070d5",
+      "raw_bytes": 772,
+      "parse_error": "Extra data at byte 770",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "idlecommit-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~IdleCommitHasDeadlineAndDoesNotStarveLaterHandoff"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:18:35.984058+00:00",
+        "runner_pid": 1193916,
+        "child_pid": 1193917,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "14863d60e3f8bd1e6a7fbabea644c27e002b0e60c133ed6ad5ab6eb6e21b1fb3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2476,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/idlecommit-v2.json",
+      "raw_sha256": "0555b3939419e2a8c938f67d9497141e0d63d7889b67f95b8be80ed3805e8b2d",
+      "raw_bytes": 768,
+      "parse_error": "Extra data at byte 766",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "idlecommit-v2",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~IdleCommitHasDeadlineAndDoesNotStarveLaterHandoff"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:12:01.800248+00:00",
+        "runner_pid": 1188386,
+        "child_pid": 1188387,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "b39f7d65907130b8555ca57c251f08520f809425e9a4ad64e599fcb7d8359cf6",
+        "stderr_sha256": "dd155133ebefcae82a91a2928c932bb766d579a2404a2b1ea2502e0d60ffc8bd",
+        "stdout_bytes": 3210,
+        "stderr_bytes": 135
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/malformed-commit-green-v1.json",
+      "raw_sha256": "9df176fab7f60ce5d43e81e97e7ba213fe56d3a48b2a392ae1b85c4ef3c8060b",
+      "raw_bytes": 782,
+      "parse_error": "Extra data at byte 780",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "malformed-commit-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~commit"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:15:34.105390+00:00",
+        "runner_pid": 1191379,
+        "child_pid": 1191382,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "8ed5fda0ee7aa75dc39aa477a065b561e19e1affadd106af4c0280cb791f8135",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/malformed-prepare-green-v1.json",
+      "raw_sha256": "ee5acba7e2e5fa8a93a07ea457bae0e652452a53be83d9eadc8d95e8f05508d2",
+      "raw_bytes": 784,
+      "parse_error": "Extra data at byte 782",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "malformed-prepare-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~prepare"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:15:20.925198+00:00",
+        "runner_pid": 1190925,
+        "child_pid": 1190926,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "168f585f2f89b710f117672b83d385db723fe0da1f1a8dc35718db67494b1820",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/malformed-prepare-green-v2.json",
+      "raw_sha256": "040aeb6749867b18c4ac202311d0661162c04ec3e2b30a2702aa24b901e8b359",
+      "raw_bytes": 784,
+      "parse_error": "Extra data at byte 782",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "malformed-prepare-green-v2",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~prepare"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:17:38.812539+00:00",
+        "runner_pid": 1192648,
+        "child_pid": 1192649,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "5878db2894932e6d71e3b5ad0f869eff15b2d1f0bcc30c99ac053a5e438630f5",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 1966,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/malformed-prepare-green-v3.json",
+      "raw_sha256": "97a10a025e0be6fcd9afb68c16f46bdaf4a34cbf08b4966bfa4f646d1747c284",
+      "raw_bytes": 784,
+      "parse_error": "Extra data at byte 782",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "malformed-prepare-green-v3",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~prepare"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:18:06.949925+00:00",
+        "runner_pid": 1193057,
+        "child_pid": 1193058,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "20151f85fd02fa9558c0567a4713c56ac48546ef4ad0018e14326693dc4301c6",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 4094,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/malformed-prepare-v1.json",
+      "raw_sha256": "02cb278deebf0575bbf4212c8925bf98308d2848126192817d7105245e6bec5c",
+      "raw_bytes": 780,
+      "parse_error": "Extra data at byte 778",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "malformed-prepare-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~prepare"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:13:30.906933+00:00",
+        "runner_pid": 1188819,
+        "child_pid": 1188822,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "02c04358d8b402847846268c80af983171e4ab9a39ab2402e5697d06547662ed",
+        "stderr_sha256": "5f4454d5d7f25cb2ed29c44946d053bc788541a9bb6cf1167db8e2ab3717bf4e",
+        "stdout_bytes": 2984,
+        "stderr_bytes": 145
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/oversized-relay-green-v1.json",
+      "raw_sha256": "706ef17af282970b4707418ca7a73880aa95909308962ed5422243a90a7d98d7",
+      "raw_bytes": 759,
+      "parse_error": "Extra data at byte 757",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "oversized-relay-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~RelayRejectsOversizedInputFrame"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:19:03.344065+00:00",
+        "runner_pid": 1194722,
+        "child_pid": 1194723,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "f948f68c31d4ac1af0265fd2ae34fbf70b5f831e267155c60e9823b4b25412b8",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/oversized-server-green-v1.json",
+      "raw_sha256": "16068f855c8ddc96910f9bb14de2229426a2698fea8bdd57d856c672fba1476c",
+      "raw_bytes": 777,
+      "parse_error": "Extra data at byte 775",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "oversized-server-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~OversizedFrameIsRejectedAndLaterHandoffCompletes"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:18:49.711741+00:00",
+        "runner_pid": 1194319,
+        "child_pid": 1194321,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "9f9b30943d7a0cd60a400090d07905915a689763ede26f2c1bf573b205906ccc",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/own-socket-cleanup-green-v1.json",
+      "raw_sha256": "4a3d77c67c21152391a49fef75e89fe9ea4a9e081aa04f90b71f6331926fdf39",
+      "raw_bytes": 776,
+      "parse_error": "Extra data at byte 774",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "own-socket-cleanup-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~ServerRemovesTheSocketPathItSuccessfullyBound"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:14:55.211373+00:00",
+        "runner_pid": 1190513,
+        "child_pid": 1190515,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "ebe25ffe2fcfa527141f329652532804fc4a903ddbebae09dca682624b931927",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/owner-file-green-v1.json",
+      "raw_sha256": "3ef3216c872d92f83537efc0745cf18a086a886c8c3360cf42c81412f62a3c18",
+      "raw_bytes": 772,
+      "parse_error": "Extra data at byte 770",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "owner-file-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~FailedServerDoesNotDeleteAnotherOwnersRegularFile"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:14:43.711533+00:00",
+        "runner_pid": 1190111,
+        "child_pid": 1190114,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "6f428a05ae30ab50d2bfd16d7f4ce2e407660f25bd44684ef5ee1ca623925b06",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2478,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/owner-socket-green-v1.json",
+      "raw_sha256": "cb0b12e77537a705548762c4b7f793d5cdeb7896497b4f6dcb1247ad51d95bae",
+      "raw_bytes": 773,
+      "parse_error": "Extra data at byte 771",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "owner-socket-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~FailedServerDoesNotDeleteAnotherOwnersSocketPath"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:14:28.247071+00:00",
+        "runner_pid": 1189634,
+        "child_pid": 1189635,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "46d21189856db8f351abec0002872282d731179fa359e865d5477f1335072121",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 4094,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/owner-socket-v1.json",
+      "raw_sha256": "616dbb2359f837a7214e47c5dbd7d018d6d66ac96f9bfc36518ba15d4445204e",
+      "raw_bytes": 769,
+      "parse_error": "Extra data at byte 767",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "owner-socket-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~FailedServerDoesNotDeleteAnotherOwnersSocketPath"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:13:54.437668+00:00",
+        "runner_pid": 1189225,
+        "child_pid": 1189227,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "17043203cc814d51a0051c3ad61997442e11a3c06be9ba0df1d72fc730fafa7e",
+        "stderr_sha256": "4414e5e5d50d58cf0f0f174213fd677e351484b9770586e8b6b38729184ab962",
+        "stdout_bytes": 3214,
+        "stderr_bytes": 134
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/relay-cancel-green-v1.json",
+      "raw_sha256": "0c070f97fa1f78403fa2341654865c8155f44b5d8b1e203aff194e483e8ba97a",
+      "raw_bytes": 768,
+      "parse_error": "Extra data at byte 766",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "relay-cancel-green-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~RelayCancelsWhenOutputWriterDoesNotComplete"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:19:16.791521+00:00",
+        "runner_pid": 1195119,
+        "child_pid": 1195121,
+        "exit": 0,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "d3d7c68eca6dde14e47ed10e4ac5d558ec1d0befd8b86abf4265296732075c76",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 2479,
+        "stderr_bytes": 0
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/theory-commit-v2.json",
+      "raw_sha256": "de303924a473fe89812e061707b94b4c284238b70273bff5f7ef3d61d148576c",
+      "raw_bytes": 775,
+      "parse_error": "Extra data at byte 773",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "theory-commit-v2",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~commit"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:10:51.906182+00:00",
+        "runner_pid": 1187060,
+        "child_pid": 1187061,
+        "exit": 1,
+        "source_sha256": "d27edd024553a3e01593aa79c1a4560aa972f62c44c1174eb5880df56b3a8d63",
+        "stdout_sha256": "4d7908617be76219706ff32d28329b8793343faa8fddff6a37a9827d0afb9fac",
+        "stderr_sha256": "70fbce3c642a3774a69fa56c4ada1ba0ca4a052e3db47b18cad9ce8b2f484138",
+        "stdout_bytes": 4615,
+        "stderr_bytes": 144
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/theory-commit-v3.json",
+      "raw_sha256": "7e376699475bf6cb7c6cf9295f9a72393e8af58ab24a98ea1165875e6a91feed",
+      "raw_bytes": 775,
+      "parse_error": "Extra data at byte 773",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "theory-commit-v3",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~commit"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:11:26.913972+00:00",
+        "runner_pid": 1187528,
+        "child_pid": 1187529,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "7e378258b21e7e0e6d7ce118c75b3e3af774c2b9af7960f95f158dd066f6e561",
+        "stderr_sha256": "aa5ae98b811643670f236750c43c995a36c0d05f75852690a3ea09d8d7e0cdc2",
+        "stdout_bytes": 4599,
+        "stderr_bytes": 144
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/theory-commit.json",
+      "raw_sha256": "be712f4064060e0cbb7d71b79c2e3b0a5b7839a53e94d311bc488a416d5b20d3",
+      "raw_bytes": 772,
+      "parse_error": "Extra data at byte 770",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "theory-commit",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~commit"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:10:02.347855+00:00",
+        "runner_pid": 1186630,
+        "child_pid": 1186633,
+        "exit": 1,
+        "source_sha256": "9f60fbb86bfd27b99c5548dc9e00543a6c95e986f3a911ce22296591cc8ff492",
+        "stdout_sha256": "7f1ef6c01af19234fae5f8cc33226cd11c7ab3820fda38bbc03b3ed3051ee273",
+        "stderr_sha256": "a999b9d848c76879a23eec34c13d11afd5e98a9150b053846159217b8d74e399",
+        "stdout_bytes": 2999,
+        "stderr_bytes": 144
+      }
+    },
+    {
+      "source_path": "reports/evidence/issue81-05b-boundary-tests-20261023/theory-disconnect-v1.json",
+      "raw_sha256": "d123264b5501f570f0cea28cfc625be824765d2cd6b2691bec4338f48b65e624",
+      "raw_bytes": 799,
+      "parse_error": "Extra data at byte 797",
+      "trailing_bytes_hex": "5c6e",
+      "companion_action": "trimmed literal backslash+n only; original unchanged",
+      "parsed": {
+        "name": "theory-disconnect-v1",
+        "argv": [
+          "dotnet",
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "-p:EnableSourceControlManagerQueries=false",
+          "--filter",
+          "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~disconnect-after-challenge"
+        ],
+        "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+        "started_utc": "2026-10-23T13:11:45.455962+00:00",
+        "runner_pid": 1187982,
+        "child_pid": 1187984,
+        "exit": 1,
+        "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+        "stdout_sha256": "8d998012ac69898259482a202e54f917b5916564f5bcd54fa46fd7f1ef66353a",
+        "stderr_sha256": "7da29bff1693684666c78c98a95ae109d658f91b47bc26b086a1d563f1ca43cf",
+        "stdout_bytes": 3003,
+        "stderr_bytes": 164
+      }
+    }
+  ]
+}

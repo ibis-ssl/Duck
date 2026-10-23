@@ -1,0 +1,62 @@
+{
+  "baselineHead": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+  "scope": "focused full2 documents plus separate changed-line fragments2",
+  "targetCount": 2,
+  "baseline": {
+    "text": 0,
+    "spell": 1,
+    "spellIssues": 101,
+    "sudachiMain": {
+      "exit": 1,
+      "issues": 10
+    },
+    "sudachiComparison": {
+      "exit": 1,
+      "issues": 620
+    },
+    "yomiMain": {
+      "exit": 0,
+      "score": 100
+    },
+    "yomiComparison": {
+      "exit": 1,
+      "score": 91
+    }
+  },
+  "final": {
+    "text": 0,
+    "spell": 1,
+    "spellIssues": 101,
+    "sudachiMain": {
+      "exit": 1,
+      "issues": 10
+    },
+    "sudachiComparison": {
+      "exit": 1,
+      "issues": 620
+    },
+    "yomiMain": {
+      "exit": 0,
+      "score": 100
+    },
+    "yomiComparison": {
+      "exit": 1,
+      "score": 91
+    }
+  },
+  "changedLineFragments": {
+    "targets": 2,
+    "text": 0,
+    "spell": 0,
+    "spellIssues": 0,
+    "sudachiMain": 0,
+    "sudachiComparison": 0
+  },
+  "newFindingDelta": 0,
+  "full24Gate": "not rerun/known held failure",
+  "Mermaid": "source semantic inspection only/render deferred",
+  "configurationChanges": false,
+  "productTestChanges": false,
+  "allProcessesTerminated": true,
+  "aggregateGate": "failed gate (existing full2 spell/Sudachi and comparison strict)"
+}

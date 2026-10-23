@@ -1,0 +1,13 @@
+{
+  "requested_url": "https://aka.ms/getvsdbgsh",
+  "method": "HEAD",
+  "status": 200,
+  "final_url_no_query": "https://download.visualstudio.microsoft.com/download/pr/3d0818d7-0504-4554-a9c3-28f1abb2f299/GetVsDbg.sh",
+  "headers": {
+    "Content-Length": "21081",
+    "Content-Type": "application/octet-stream",
+    "Cache-Control": "public, max-age=259200",
+    "ETag": "\"0x85527DC3D1BF670C44FCC9A5E7F827940015FBCF746E6EE158DE92E8B51028B3\"",
+    "Last-Modified": "Thu, 09 Jul 2026 17:34:54 GMT"
+  }
+}

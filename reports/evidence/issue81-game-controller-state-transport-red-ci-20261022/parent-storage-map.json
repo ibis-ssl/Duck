@@ -1,0 +1,317 @@
+[
+  {
+    "path": "all-test-outcomes.json",
+    "sha256": "aac30d7f6a768b4a89e30eb879b01f03a150a635edc403adec1a9ae2aa3832c4",
+    "bytes": 134629,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/all-test-outcomes.json"
+  },
+  {
+    "path": "artifact-12447452443.command.json",
+    "sha256": "2d3505b9b3ca5293dff9705b5cc690487e0568d0d50b5b9dd822c836dbbf5ff6",
+    "bytes": 261,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifact-12447452443.command.json"
+  },
+  {
+    "path": "artifact-12447452443.started.json",
+    "sha256": "cfde2aaf5d324a2bc199f2dfc21376481b8c29435564403eb2c666be6fac6c6a",
+    "bytes": 243,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifact-12447452443.started.json"
+  },
+  {
+    "path": "artifact-12447452443.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifact-12447452443.stderr.log"
+  },
+  {
+    "path": "artifact-12447452443.zip",
+    "sha256": "d8c95e3983f3288c396771d55105115a312b0e82179677f12eecf4f538d2a953",
+    "bytes": 18310823,
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifact-12447452443.zip"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/dotnet-test.binlog",
+    "sha256": "be41dfc8f199faad7f1b5b8090f503a9a080e6689db2edf6210afcc03163f09f",
+    "bytes": 1506709,
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/dotnet-test.binlog"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/dotnet-test.exit-code",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "bytes": 2,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/dotnet-test.exit-code"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/dotnet-test.stderr.log",
+    "sha256": "7a4f39c085ffc8b9c35dee1fb08b63f2e92fd54098b6c426e7338d4016b984d6",
+    "bytes": 772,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/dotnet-test.stderr.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/dotnet-test.stdout.log",
+    "sha256": "5b1c75d796437862886f28afaccfdaf280e1a0d20cce024db213ec3a577e2957",
+    "bytes": 10963,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/dotnet-test.stdout.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/dotnet-test.trx",
+    "sha256": "31c3d03e27d995d63c349958c73c7f1e25dc022ad8c76d42d8a4f3f476341606",
+    "bytes": 954900,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/dotnet-test.trx"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/environment.txt",
+    "sha256": "49de0a42bd7dc7af09204e0b35611b822372f3190f0f12b67165e8d144b83192",
+    "bytes": 3462,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/environment.txt"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/source.tar.gz",
+    "sha256": "5a1dcc3647e1d5db679a6246237c693066eda76436fc6c7ba05227fb57f00eb9",
+    "bytes": 16364257,
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/source.tar.gz"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/vstest-diagnostics.datacollector.26-10-22_17-59-39_88087_5.log",
+    "sha256": "ddfb97e1202840163b7dd7585623fb7119197f5cbb110b0b021a8cd99890fb65",
+    "bytes": 1177835,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/vstest-diagnostics.datacollector.26-10-22_17-59-39_88087_5.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/vstest-diagnostics.host.26-10-22_17-59-40_18658_5.log",
+    "sha256": "88ad16e64b175e8e24c82386fa333377fbd673c234a531dfebc13f775e8fc852",
+    "bytes": 2682787,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/vstest-diagnostics.host.26-10-22_17-59-40_18658_5.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39827360572-1/vstest-diagnostics.log",
+    "sha256": "a0c811006a9cbeb560a01a5f7d664883ea60a2ed0daa9c300e8dfb8cd8156eba",
+    "bytes": 2136983,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts/dotnet-test-failure-39827360572-1/vstest-diagnostics.log"
+  },
+  {
+    "path": "artifacts.command.json",
+    "sha256": "a232b14dcb934c3a6690ccf3c8553ea5aead997e84e71e873d2b916284568ccb",
+    "bytes": 230,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.started.json",
+    "sha256": "0225b29e6c79243675bfc11c028d4c1d9ca2c3069743bcf1a21ebe7e38fc96c0",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts.started.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "45034bb18b3346054768db9780694722e2aae58eb8fc17d2a49621195f32b0f5",
+    "bytes": 751,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "34ad712f41cfd20ecc78d14eb401e1df56995cc7fd744b4d19b9c5d9b6abd59c",
+    "bytes": 14458,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-and-failure-lines.txt",
+    "sha256": "effb0d321566f484e81efeec507641d807bb1d70ab5a0191d3ae60e189294f0b",
+    "bytes": 1409,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/ci-identity-and-failure-lines.txt"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "ffb51d6429cb61992584b91f5282ca2b3bf50895aeb7ebadeef1ce29066b9330",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.started.json",
+    "sha256": "7bcc44fd636e801aeb271e2ac98a45bc9c6a7d18097f29568f0637e0c0f482fa",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/final-view.started.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "f88ee4ed1c2d7a6b7196a06694695dbae2a71cc660a858830d582665dc48ae79",
+    "bytes": 2461,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/git-status-final.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "f1590a82db727698223d2d305a6803d94d9ce8b0575bd7f38d59f43fb5368d3b",
+    "bytes": 11508,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "dbb3bf4c67c52e37a339ddf4755b8c9cf2b74eaed67b1fa4a1f102d7465564fa",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.started.json",
+    "sha256": "cbf397449272e5b0c8ab795bdd8f8aa989042303a2984323db8ff7918529eb9a",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/initial-view.started.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "89bae684690076ce967388d63cb624df82b606d05744d131600960567fa5b267",
+    "bytes": 1976,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "7ccafb86fdfc033eff9171dddb142900dcfec31f562deb1fee937358e53be78b",
+    "bytes": 6955,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "07c8faca5ee3d01180cc5d222c33bc70e1454fcbdf3c3fc91761442f5941e6c8",
+    "bytes": 123,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/process-state.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "a980072e3383db396e68cdfd2e00c79c393f549dde9048f1a51c227b9a215426",
+    "bytes": 220,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.started.json",
+    "sha256": "124daa47b08eaad0ddd9dd800e3cf3bafd97ce6dee1e43919d43dd07cc7e7e30",
+    "bytes": 202,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/run-log.started.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "4389deb8ad73556c20a969951b3b72691c7ccb096dd7d705769ab6d0719a4bc6",
+    "bytes": 67195,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "sha256": "c57f12b4786ab71dee30b8e0ec511af7ce6687f5590eff39c144b6e9c1c631f1",
+    "bytes": 289,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/runs-initial.command.json"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/runs-initial.stderr.log"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "sha256": "eba1daf3b82be1acd33a5befcd2039b31c260ced50eef279e1b123f98335cff9",
+    "bytes": 12090,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/runs-initial.stdout.log"
+  },
+  {
+    "path": "transport13-outcomes.json",
+    "sha256": "febe3b01b65a093489a1da781ad422c6f4b47c985e3d429a8868de0fa6f2a368",
+    "bytes": 14053,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/transport13-outcomes.json"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "1cc5cb9b1c1bda104b0157762924269a0a996c25518407d7a17dfab5d23370fe",
+    "bytes": 257,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.started.json",
+    "sha256": "3fe193d8a853878f13d2d44a83845ae5e85b9022265a46044f867832f6e2e30c",
+    "bytes": 239,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/watch.started.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "cd6439ff01a01cdf4e2766f3dbf1280ab097fe3cf2d31c3f729e76e6ca123d35",
+    "bytes": 1952,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-red-ci-20261022/watch.stdout.log"
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "path": "RefereeReceiveSubscriberRegressionTests.cs",
+    "bytes": 16832,
+    "sha256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98"
+  },
+  {
+    "path": "candidate.api.txt",
+    "bytes": 722,
+    "sha256": "370f4d01ff475260e4b03a3a6415e917d37462268c8600ded2bb285ec44324fd"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 47,
+    "sha256": "400400653218437206c5d8a29bcbe238fcce1710da0bc9068b0e5fe29d33d96a"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "expectations.json",
+    "bytes": 1773,
+    "sha256": "47235712fffc36601b38dc63d70c7538226c6c9f538f439487683b6195ad144d"
+  },
+  {
+    "path": "remaining-03A.json",
+    "bytes": 430,
+    "sha256": "9e37cafd5508d4f00212db68132242f4a803062829f30f67781deb057abf83b1"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 4408,
+    "sha256": "8133268ba2d2dc53c2c83a168e9f7d18e41a5531843b5136395b3379a261699a"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 236,
+    "sha256": "9bd3c8fa2e10ddc93a88f9c519ee8e26a2fe67d1c7d55b0ad60ec7e653dac6d3"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 537,
+    "sha256": "8ea62875c2e61ffea29c64d2ce479548cc06ac57422edb034e8cd71fc02500af"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 340,
+    "sha256": "a804b4e7a0ef493aba793a63b61a155486205b56c45cee05c2947e05588b8586"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "issue81-05b3-fragments-v2/aspire-simulation-test-environment.md",
+    "issue81-05b3-fragments-v2/tasks-status.md",
+    "issue81-05b3-fragments-v2/implementation-report.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "files": [
+    "issue81-05b3-fragments-v2/aspire-simulation-test-environment.md",
+    "issue81-05b3-fragments-v2/tasks-status.md",
+    "issue81-05b3-fragments-v2/implementation-report.md"
+  ],
+  "input_lines": 13
+}

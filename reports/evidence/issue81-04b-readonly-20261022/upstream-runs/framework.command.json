@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "repos/ibis-ssl/framework/actions/runs?head_sha=a52b6bdecd97a277544dd6f275afbf4483781e12&per_page=100"
+  ],
+  "method": "GET",
+  "metadata_only": true
+}
