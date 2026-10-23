@@ -1,0 +1,13 @@
+I81-04B1 exact PR CI evidence
+Run: https://github.com/ibis-ssl/Duck/actions/runs/39878834053
+Attempt: 1; event: pull_request; head: 1e8f624424c80f8015179c7b8437918f250d657a; status: completed; conclusion: failure
+PR: #84 Draft/Open; head 1e8f624424c80f8015179c7b8437918f250d657a; base 88cb20f2b5cea46eb90bff80ba8d535639625de0; PR mergeCommit is null. Workflow merge ref from artifact environment: refs/pull/84/merge at bfee7e4022c96251399dc329f3cdc427e8ee7879.
+Standard dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj: Passed 776, Failed 0, Skipped 0, Total 776; CI step success.
+LinuxContainer publish: Tracker.RuntimeHost, Tracker.DebugHost, Duck.Testing.RefereeDriver.Host all publish exit 0; all three basic output checks exit 0.
+PDB unit tests: 7/7 pass. Actual DebugHost portable PDB verifier exits 1 after publishes. It reports required document /src/Tracker/Tracker.DebugHost/Program.cs absent; examples in PDB retain /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Components/App.razor, Components/Layout/MainLayout.razor, Components/Layout/NavMenu.razor. This is an observed document-path contract Red, not a compile/publish failure.
+Artifact: linux-publish-failure-39878834053-1; id 12469792160; size 4853; API SHA256 c00ea75878073ed8879515a514544c9a895155e90b0f4190455b94d2069a879b. It contains environment, all three publish outputs/exits and output-check logs/exits.
+Fixed test hashes at exact HEAD:
+58e0beb075e195fcb9985a109fafe08580d1f83dbbf993945a5cc33d02465a24  scripts/tests/verify-debughost-portable-pdb.py
+a0dc746080a192c162fa5db7d894bb2a3d86906e1133eff9e652af032c7641c8  scripts/tests/test-debughost-portable-pdb.py
+7c430e8daaa1ce5aa45e7490cbc7a3e6a25ab04a3144c08de48e120904635500  scripts/tests/verify-linux-publish-outputs.sh
+No rerun, workflow dispatch, product edit, or environment change occurred. All local commands ended. gh run watch returned exit 1 because CI concluded failure; evidence collection commands returned 0. No PR merge commit exists because PR is open and draft.
