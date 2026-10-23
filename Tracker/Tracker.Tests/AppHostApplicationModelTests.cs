@@ -101,6 +101,62 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:GameControllerVisionOnly=true",
+            "--RefereeDriver:Enabled=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=5bc5ab8a-7340-47ba-8b7c-9f645375a54c");
+
+        Assert.Equal(4, appHost.Resources.Count());
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+
+        var gameControllerImage = Assert.Single(gameController.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("robocupssl/ssl-game-controller", gameControllerImage.Image);
+        Assert.Null(gameControllerImage.Tag);
+        Assert.Equal("d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7", gameControllerImage.SHA256);
+        Assert.Equal(
+            ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010",
+             "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
+            await GetArgumentsAsync(gameController));
+
+        var gcUi = Assert.Single(
+            gameController.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Tcp &&
+                        endpoint.Name == "game-controller-ui");
+        Assert.Equal(8082, gcUi.TargetPort);
+        Assert.Null(gcUi.Port);
+        Assert.Equal("127.0.0.1", gcUi.TargetHost);
+        Assert.False(gcUi.IsProxied);
+
+        foreach (var resource in new IResource[] { simulator, duck, gameController, refereeDriver })
+        {
+            Assert.DoesNotContain(
+                resource.Annotations.OfType<EndpointAnnotation>(),
+                endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        }
+
+        AssertLinuxDistribution(
+            refereeDriver,
+            "Testing/Duck.Testing.RefereeDriver.Host",
+            "Duck.Testing.RefereeDriver.Host.dll",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+        var refereeEnvironment = await GetResourceEnvironmentAsync(refereeDriver);
+        Assert.Equal("true", refereeEnvironment["RefereeDriver__Enabled"].ToString());
+        Assert.Equal("ws://game-controller:8082/api/control", refereeEnvironment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.False(refereeEnvironment.ContainsKey("RefereeDriver__AutoDrive"));
+
+        AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
+        AssertWaits(gameController, (duck, WaitType.WaitUntilHealthy));
+        AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilStarted));
+    }
+
+    [Fact]
     public async Task BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp()
     {
         using var appHost = await CreateAppHostAsync();

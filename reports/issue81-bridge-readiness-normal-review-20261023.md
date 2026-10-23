@@ -111,6 +111,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 正規PowerShell login:false / require_escalated→WSL Pythonで固定差分・直接依存・保存証拠を読取。helper4db4e7/a23ab2/88c4cd/c6cdf4/f8d846はexit0。2db84fはmanifestを旧形式と誤認してheaderをpathとして読んだためgit show exit128/読取helper exit1。書込や試験発行はなく、実header path/bytes/sha256を確認後88c4cdで全照合を完了した。
 - vision bundleの21entryとlint bundleの35entryは全size/hash一致。各manifest SHAはf5c3582ec39512ad92579e7d6a488ac9a3d4a9405bac30e3bad6f92e3abcd0ea、7dd0cbb6cab560a6acf4df0fddeabf4b9e01d7e428bef5288b219054defa4303。新build/test/lint/CI/実DCP/exec/画像操作は行っていない。自己proofは /tmp/issue81-05b2-normal-review-20261023/。
 
+### 05B2 実測証拠・記録差分の限定通常確認
+
+- reviewed_record_commit: 03f98c986be388d23acd02417bf5b7bf6704b2fe。製品/試験はb14800065c93343ef7fef18bba92290f19ca958cと不変で、git diff --quietの製品/試験対象はexit0。32pathは実測/文書証拠・台帳・報告の差分。同じrequested gpt-6.1-sol/high、applied:null、reused_existing_agent_profile、normal_persistence、single_agent/decomposition forbidden、report_attestation_allowed:false。新agent/独立finalなし。
+- 正規PowerShell login:false / require_escalated→WSL Pythonで限定読取。eb2894/17d23b/50bda7/981b28は各exit0。元NR005のrequired actionを再読し、既存の本番供給・正常受信・strict health基準で判定した。新実測/build/test/lint/CI/外部操作なし。
+- 実測manifest SHAbea266f4062a1c0b5ceaf95b290cabecaecad38c403c9b2f6d6a89a4f2d5e64fはworkspace原本と同byte。8entry全size/hash一致、includeInGit=trueの6JSONはcommitと同byte。stdout2038bytes/token可能とstderr0bytesの2entryはworkspaceのみで、本文を表示・転載せずhashだけ照合。Gitに欠けた失敗ではなく明示収納区分。
+- 台帳2行のclosure-current-tracking-v2 manifestは16entry、SHA955f60559d4e09052fd232735eb49fdd7f3e03a4da90db40fe64cb9be26f1b4a。全size/hash、12設定/補助script、source/inputとcommand/exit/raw対応が一致。自己proofは /tmp/issue81-05b2-measurement-normal-review-20261023/。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -208,6 +215,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - simulator固定indexはlinux-image-lock.jsonのframework-simulatorと一致し、tag overrideは不一致を拒否する。WithEntrypoint(tini)と引数 -- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellowを確認。既存Aspire.Hosting13.5.4のXMLはWithEntrypointをコンテナentrypoint設定、ContainerResource.Entrypointをその公開propertyとして記載する。専用annotationの不存在はentrypoint指定不能を意味しない。
 - duckはsim profile/ContainerMode/identity control RunId・roleを明示し、VisionReceiverの224.5.23.2:10020を既存options/DIへ渡す。WaitForStart(simulator)で起動順を作り、循環依存なし。TCP target39108/host動的/127.0.0.1/nonproxy、GET /health/visionの既存strict判定を保持。UDP endpoint/host network指定を追加しない。RuntimeHostのreceiver/診断/HTTPは変更されず、新受信を伴わない503をreadyへ読み替えない。
 - 試験は実AppHostモデルを構築して2資源・固定image/digest・args callback・環境・UDP非公開・health/待機依存を確認する。新規関数説明/XMLコメントは追加されず、追加inline説明は日本語。
+
+### 05B2 実測・記録の確認範囲
+
+- reports/evidence/issue81-05b2-dcp-vision-run-b148-20261023/のmanifestと6JSON、closure-current-tracking-v2の16entry/初期preflight失敗記録、tasks/phases各変更1本文行、実装report追補、前回通常report保存分を確認した。製品の再網羅や新しい条件を追加しない。
+- 実測run68fd7e39e18e4968b18450730eca8651、明示Desktop Engine5bc5ab8a-7340-47ba-8b7c-9f645375a54c。実HTTPのidentity4値をDuck inspect投影と突合し、RunId=所有run label、ResourceId=duck-zhjxnngc（DCP name label）、ContainerId=3b158cd0ca4d1394b66e390c9cd0e6722897d7faae035055d1c5f03e036b6216（完全64桁）、Generation=1が一致する。役割duckと資源キーを同一視しない。
+- 固定simulatorとduckの同じAspire user bridge/network ID、実entrypoint/args、duckの127.0.0.1:16537→39108/tcp、UDP host mappingなしを保存inspect投影から確認。HTTP200/IsReady=true/Reason Ready、VisionPacketsReceived10170を保存health投影から確認した。
+- 実装reportの「両fullIDへのinspectがno such object」という1表現だけを、保存JSONの実際の根拠である「run label query空（duckを含む）＋simulator exactID inspectでno such object」へ直接正確化した。両資源不在という結果・判定・rawは変更しない。
 
 ## 指摘事項
 
@@ -409,6 +423,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - v3/v4は実際の.NET試験出力とAssert.Single失敗、保存exit1を確認。WSL E_ACCESSDENIEDとしていた報告は別の後続ログ読取失敗との混同として訂正済み。アクセス拒否/追加承認待ちをこの製品結果へ持ち込まない。今回の自分の実行は正規require_escalated経路で終端した。
 - 非阻害held：追加行CSpell14/Sudachi28が残る。全文gateと今回の構成技術判定を分け、本人の正常系/費用対効果優先に従い文書磨き込みや網羅異常系を新必須へ追加しない。
 
+### NR005 元scopeの処分と記録所見
+
+- **I81-NR-005 / P1 / closed at record03f98c（product b148000）**。元指摘は実duckへの完全identity供給が無く、正常受信してもstrict healthが503固定となる欠陥だった。今回の所有側→実DCP通知/fullID/engine照合→資源内受渡しを経たRuntimeHost自身の4値と、実Vision受信後のHTTP200を同runで確認できたため、この供給欠落は解消とする。架空ID注入、役割名代用、strict判定緩和による閉鎖ではない。
+- required action対応：実構成への供給接続＝既存実装と今回実identityで充足、実DI/parser/GetHealthの正常経路＝選択構成の実測で充足、欠落/不正/旧帰属拒否とidentity reset後503＝既に通常確認した既存negative/epoch/UDS/health fixturesを保持。今回の正常composition証拠は自動化一体fixtureの追加ではなく実測による補完である。本人の正常系優先に従い、これを口実に新しい包括fixtureを必須へ追加しない。
+- 外部sender全件のsource identity、他tracker G3、ageの実値、再作成全パターンの実測は元NR005の新たな閉鎖条件へ広げない。NR006/007/008/009/010 closedを維持し、新規必須findingなし。
+- 非阻害held：保存healthはsanitized projectionでSourceKey空/Age null、完全566byte本文は未保存。全source帰属やfreshness境界を実測済みとはしない。停止時AppHost実exit/DCP子exit未取得を成功コードへ補わない。これらは今回のRuntimeHost正常受信・identity供給の事実と分離する。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -591,6 +612,14 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 文書入力はbase7cd→本commitの追加行からbyte一致で再照合した。tasks4行、phases2行（本文1+空白1）、主設計2行（段落1+空白1）の3入力と8設定hashが一致。textlintは準備不足の失敗v1/v2を経たfinal-v3 exit0、CSpell/Sudachiは同入力のfinal-v2で各exit1・14件/28件。単一--filesに3path、実cwd/config/raw hashを確認した。全体文書gate成功や新規指摘なしへ変換しない。
 - 既存RuntimeHost-only観測summaryの参照SHA93763ab7276b3b8c1c91b07c7e974179f296acc18a7ffc8999eef9fe3fdb142fは実workspace原本と一致。旧7cd/Run fed97710c9cc4b0885f6b827b98d0845に対する単一所有コンテナの完全ID/labels・exec exit0・localhost動的公開・終了後資源不在・UDP無しhealth503の記録である。2資源multicast到達/入力後readyの証拠ではない。旧7cdの828件成功も現在b148 exactCIへ転用しない。
 
+### 05B2 実測・記録通常判定
+
+- **pass_with_held / 新規必須0 / NR005元scope closed**。この通常cycleの既存製品findingはclosed、必須修正0。全Issue81/05B全資源移行・全受入・独立finalの合格ではない。旧時点のNR005 open/未実測と親prefixは当時の記録として保持し、現在の処分をこの追補へ明示する。
+- 正常系completeness：実Windows AppHost/DCPの選択2資源＝保存観測で確認、同Engine/fullID/owner run-roleとreceiver identity4値＝投影間突合で確認、正常Vision受信とstrict HTTP200/Ready＝確認、localhost動的TCP/UDP非公開＝確認。これは当該runでの正常系到達であり全パケットの送信者証明ではない。
+- 終了completeness：Ctrl+C後appHostProcessPresent=false、runLabelQueryExit0/結果空、simulator exactID inspect exit1/no such object。これにより当runのduckとsimulatorの不在を確認する。outer session exit1、wrapperの130はsynthetic finally fallbackでAppHost子exitではない。別DCP子process exitも未測定。自分の実行processの回収状況と混同しない。
+- 製品b148のCI40009681845は親のAPI確認でcompleted/success。保存gh表示logでも829pass/0fail/0skip、PDB10件/112documentsの成功を読取。3publish/definitions16成功、packet/full-stack skipを同runの親確認として採用する。表示log SHA78ab62026b27ad73007435d0b87d469c0e58834065df000de45866ab0b98dad9には日本語の変換がありbyte-exact remote rawとはしない。記録HEAD03f98cのexactCI成功へ転用しない。
+- 台帳の実変更2行はb148→03f差分とinputがbyte一致。既存Node/cache/cwdとSudachi環境、12設定/補助script不変。textlint0、CSpell0（2files/0issues）、Sudachi1（モデル/アクセス/コードの計5件）。初回はPython実体のresolveで/usrを探索したpreflight assertion失敗、lint未起動として保存される。全文gate未合格/前の段階の指摘は保持し、新しい全文改稿を必須にしない。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -673,3 +702,10 @@ reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は�
 - 参照した単一RuntimeHost観測はsanitized summaryに基づく限定証拠。raw event stream/回数/正確な観測窓は未保存、Ctrl+Cのwrapper session exit1とAppHost自身のexit未取得を保持する。exec反復回数やidentity generation成立を推測しない。
 - 既存TDD不足、全文文書gate未合格、図本人視認、G1/G3・実機/全資源受入・独立finalの未完了を保持する。任意の一般化・異常系拡張・文書整備で正常系を止める条件を追加しない。
 - 親prefix/Dispatchと全旧子欄履歴を保持。自己編集はnormalreport子5欄と/tmp proofのみ。製品/test/設計/台帳/第三者結果/rawは変更しない。全自己process終端、未回収session/exit/承認待ちなし。requested Sol6.1/high・applied:null、report_attestation_allowed:false。
+
+### 05B2 実測記録の限定終端
+
+- receiver自身の実identity供給と正常準備応答を閉鎖したのであり、SourceKey空/Age nullのprojectionからall-source帰属・鮮度境界の実証を補わない。起動無効化/再作成/Boot世代の全実機回帰や他資源診断は後続scope。
+- raw stdoutはDashboard tokenを含み得るためworkspace限定・Git除外を保持。新測定やraw本文の公開を要求しない。旧「単一RuntimeHostではUDP未入力503」と今回の「2資源で正常受信200」を別runとして保存し、過去の未測定記録を改稿して成功にしない。
+- AppHost実exit/DCP子exit未取得、既存TDD不足、文書gate不合格、図本人視認、G1/G3・全資源受入・独立finalは未完了。新たな全体gateや任意異常系を正常系の前提へ追加しない。
+- 自己編集は通常report子5欄、根拠明確な実装report1表現、/tmp proofのみ。親prefix/全旧履歴を保持し、製品/test/台帳/raw/第三者の実質結果を変更しない。全自己command終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。

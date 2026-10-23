@@ -160,6 +160,81 @@ if (IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]))
     return 0;
 }
 
+if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
+{
+    var gcVisionGameControllerOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "gcVisionDuck-aspire-stack.lock");
+    using var gcVisionGameControllerOnlyOwnershipLease = StackOwnershipLease.Acquire(gcVisionGameControllerOnlyLockPath);
+    var gcVisionGameControllerOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var gcVisionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+    var gcVisionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+    var gcVisionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+    var gcVisionSimulatorTeamColor = builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+    if (!int.TryParse(gcVisionSimulatorIbisPort, out var gcVisionSimulatorIbisPortNumber) ||
+        gcVisionSimulatorIbisPortNumber is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("Testing:Simulator:IbisPort must be a valid UDP port number.");
+    }
+
+    var gcVisionSimulator = builder.AddContainer(
+            "simulator",
+            "ghcr.io/ibis-ssl/framework-gcVisionSimulatorcli",
+            "a52b6bd")
+        .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
+        .WithEntrypoint("tini")
+        .WithArgs(
+            "--",
+            "./bin/gcVisionSimulator-cli",
+            "-g", gcVisionSimulatorGeometry,
+            "--realism", gcVisionSimulatorRealism,
+            "--ibis-port", gcVisionSimulatorIbisPort,
+            "--ibis-team-color", gcVisionSimulatorTeamColor);
+
+    var gcVisionDuck = AddPublishedContainer("duck", "gcVisionDuck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "gcVisionDuck")
+        .WithEnvironment("Testing__Diagnostics__RunId", gcVisionGameControllerOnlyRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
+        .WaitForStart(gcVisionSimulator);
+    EnableDesktopIdentityBridge(gcVisionDuck, gcVisionGameControllerOnlyRunId, "gcVisionDuck");
+    var gcVisionDuckVisionEndpoint = gcVisionDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    gcVisionDuckVisionEndpoint.Port = null;
+    gcVisionDuckVisionEndpoint.TargetHost = "127.0.0.1";
+
+    var gcVisionGameController = builder.AddContainer("game-controller", "robocupssl/ssl-game-controller")
+        .WithImageSHA256("d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7")
+        .WithArgs(
+            "-visionAddress", "224.5.23.2:10020",
+            "-trackerAddress", "224.5.23.2:11010",
+            "-publishAddress", "224.5.23.1:11003",
+            "-address", ":8082")
+        .WithHttpEndpoint(targetPort: 8082, name: "game-controller-ui", isProxied: false)
+        .WaitFor(gcVisionDuck);
+    var gcVisionEndpoint = gcVisionGameController.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "game-controller-ui");
+    gcVisionEndpoint.Port = null;
+    gcVisionEndpoint.TargetHost = "127.0.0.1";
+
+    AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WaitForStart(gcVisionGameController);
+
+    builder.Build().Run();
+    return 0;
+}
+
 var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
 if (testingMode is not "base" and not "comparison")
 {

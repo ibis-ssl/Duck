@@ -115,6 +115,10 @@ UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資
 | Windows の比較画面 | `http://127.0.0.1:<DebugHost割当ポート>/`。DebugHost 内部は HTTP 8080 を設計値とする。既存の HTTPS 転送・待受設定の対応は実装前に確認する。 |
 | HTTP 準備確認 | 各資源の限定された検証口を127.0.0.1の動的 TCP ポートへ対応付ける。UDP をホストで受信しない。後述の確認契約が成立するまで公開しない。 |
 
+### 明示的な Game Controller 視覚検証モード（I81-05B3）
+
+`Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的 TCP ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost モデル試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、このモデル試験では証明しない。
+
 ```mermaid
 flowchart LR
  subgraph win[Windows]
