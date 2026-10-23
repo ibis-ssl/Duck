@@ -333,13 +333,50 @@ internal sealed class ContainerIdentityHandoffService(
     string expectedEngineId,
     IDockerCommandRunner runner,
     ILogger<ContainerIdentityHandoffService> logger,
-    string? safeTracePath = null) : BackgroundService
+    string? safeTracePath = null) : BackgroundService, IHostedLifecycleService
 {
+    private readonly object startupLock = new();
+    private Task? startupTask;
+
     private readonly SafeIdentityHandoffTrace? trace = string.IsNullOrWhiteSpace(safeTracePath)
         ? null
         : new SafeIdentityHandoffTrace(safeTracePath);
 
     internal bool IsSafeTraceEnabled => trace is not null;
+
+    /// <summary>
+    /// Aspireが資源を起動する前に通知監視を開始します。
+    /// </summary>
+    public Task StartingAsync(CancellationToken cancellationToken) => StartExecutionAsync(cancellationToken);
+
+    /// <summary>
+    /// lifecycle開始後の二重起動を避け、単独利用時は通常の開始を維持します。
+    /// </summary>
+    public override Task StartAsync(CancellationToken cancellationToken) => StartExecutionAsync(cancellationToken);
+
+    /// <summary>
+    /// 開始後のlifecycle通知を受け取ります。
+    /// </summary>
+    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    /// <summary>
+    /// 基底サービスの停止処理へ進む前のlifecycle通知を受け取ります。
+    /// </summary>
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    /// <summary>
+    /// 停止後のlifecycle通知を受け取ります。
+    /// </summary>
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    private Task StartExecutionAsync(CancellationToken cancellationToken)
+    {
+        lock (startupLock)
+        {
+            startupTask ??= base.StartAsync(cancellationToken);
+            return startupTask;
+        }
+    }
 
     /// <summary>
     /// 資源イベントを監視し、現在も一致する所有コンテナだけへhandoffします。
