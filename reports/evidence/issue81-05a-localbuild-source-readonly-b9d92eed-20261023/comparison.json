@@ -1,0 +1,72 @@
+{
+  "captured_utc": "2026-10-23T10:47:23.140214+00:00",
+  "current_head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "f71_head": "f71bb2688caf080382d170937ea932601e0b3c3f",
+  "b9_head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "workflow_sha256": "948d2918323872c73d3805c76b332db0ef5957947ddaa9a996ff76c00ff041dd",
+  "workflow_f71_sha256": "948d2918323872c73d3805c76b332db0ef5957947ddaa9a996ff76c00ff041dd",
+  "workflow_b9_sha256": "948d2918323872c73d3805c76b332db0ef5957947ddaa9a996ff76c00ff041dd",
+  "gitmodules_sha256": "3d493f4172bf5473b49d0bd1ec1fe564d6a0a821248aa05dfaea3e172444c3a9",
+  "SslProto_csproj_sha256": "4d72cc0ed1138043ac694d46fedbb5bba9fca0806f534c642f1670b10aa0cf6e",
+  "f71_ci_stdout_sha256": "02d0e247bd7e08c2c801979e632c0e877bf6f75803b1cb071e0df6e2fdb0663f",
+  "f71_ci_environment_sha256": "39ff4ff0a7cc62475bc40b5a0b882f0726a5b14dc0398edfb4768df6a0b9cde5",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "submodule",
+        "status"
+      ],
+      "exit": 0,
+      "stdout_sha256": "787a472c63d647754939950f6ecb99b0c37c3498943edce30c54d1e33796f972",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "git",
+        "ls-files",
+        "SslProto"
+      ],
+      "exit": 0,
+      "stdout_sha256": "25a65117f099a2c91f4cba65e30fb38ec2a4365204400cf5813f133c3ceed353",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "git",
+        "ls-files",
+        "Testing/Duck.Testing.RefereeDriver/obj/Debug/net10.0/ref/Duck.Testing.RefereeDriver.dll",
+        "TrackerConnectionLib/obj/Debug/net10.0/ref/TrackerConnectionLib.dll"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "proto_inputs": [
+    {
+      "path": "SslProto/src/external/ssl-game-controller/proto",
+      "exists": false,
+      "proto_files": []
+    },
+    {
+      "path": "SslProto/src/external/ssl-simulation-protocol/proto",
+      "exists": false,
+      "proto_files": []
+    }
+  ],
+  "project_reference_outputs": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/obj/Debug/net10.0/ref/Duck.Testing.RefereeDriver.dll",
+      "exists": false,
+      "tracked": false
+    },
+    {
+      "path": "TrackerConnectionLib/obj/Debug/net10.0/ref/TrackerConnectionLib.dll",
+      "exists": false,
+      "tracked": false
+    }
+  ],
+  "gitmodules": "[submodule \"SslProto/src/external/ssl-game-controller\"]\n\tpath = SslProto/src/external/ssl-game-controller\n\turl = https://github.com/RoboCup-SSL/ssl-game-controller\n[submodule \"SslProto/src/external/ssl-simulation-protocol\"]\n\tpath = SslProto/src/external/ssl-simulation-protocol\n\turl = https://github.com/RoboCup-SSL/ssl-simulation-protocol\n[submodule \"reference/specs\"]\n\tpath = reference/specs\n\turl = https://github.com/ibis-ssl/specs.git\n",
+  "SslProto_csproj": "\ufeff<Project Sdk=\"Microsoft.NET.Sdk\">\n\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n    <Protobuf_CompileOnBuild>true</Protobuf_CompileOnBuild>\n  </PropertyGroup>\n\n  <ItemGroup>\n    <PackageReference Include=\"Google.Protobuf\"/>\n    <PackageReference Include=\"Grpc.Tools\" PrivateAssets=\"All\" />\n  </ItemGroup>\n  \n  <ItemGroup>\n    <Protobuf\n      Include=\"src/external/ssl-game-controller/proto/**/*.proto\"\n      ProtoRoot=\"src/external/ssl-game-controller/proto\"\n      GrpcServices=\"None\" />\n\n    <Protobuf\n      Include=\"src/external/ssl-simulation-protocol/proto/**/*.proto\"\n      Exclude=\"\n        src/external/ssl-simulation-protocol/proto/ssl_gc_common.proto;\n        src/external/ssl-simulation-protocol/proto/ssl_vision_geometry.proto;\n        src/external/ssl-simulation-protocol/proto/ssl_vision_detection.proto\n      \"\n      ProtoRoot=\"src/external/ssl-simulation-protocol/proto\"\n      AdditionalImportDirs=\"\n        src/external/ssl-game-controller/proto/state;\n        src/external/ssl-game-controller/proto/vision\n      \"\n      GrpcServices=\"None\" />\n  </ItemGroup>\n</Project>\n"
+}

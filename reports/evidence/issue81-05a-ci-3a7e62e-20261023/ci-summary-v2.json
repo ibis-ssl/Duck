@@ -1,0 +1,76 @@
+{
+  "run_id": 39942827459,
+  "attempt": 1,
+  "head": "3a7e62e6e8b3fad156414f47be43963b835298b7",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "merge_sha": "a8b051f4ab743f92fb1f05e2758a719bd2e4fe46",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "createdAt": "2026-10-23T10:58:30Z",
+  "updatedAt": "2026-10-23T11:00:13Z",
+  "job_results": {
+    "test": "success",
+    "ASPIRE-NET-002 Linux packet flow": "skipped",
+    "ASPIRE full-stack Linux acceptance": "skipped"
+  },
+  "standard_dotnet_tests": {
+    "passed": 779,
+    "failed": 0,
+    "skipped": 0
+  },
+  "publish_output_job": "success",
+  "publish_output_contract": {
+    "managed_applications": 3,
+    "python_contract_tests": 16,
+    "result": "passed"
+  },
+  "debughost_pdb_contract": {
+    "pdb_tests": 10,
+    "document_count": 112,
+    "identity": "matching",
+    "path": "/src/",
+    "result": "passed"
+  },
+  "packet_flow": "skipped",
+  "full_stack_linux_acceptance": "skipped",
+  "failure_diagnostics_and_artifacts": "skipped because jobs succeeded",
+  "gh_run_watch_exit": 0,
+  "rerun_or_new_run_started": false,
+  "source_log_sha256": "4f713545979d31ab5fd473cfa72887202a23ca4a90a49f991af33fc6926b90fc",
+  "source_log_bytes": 64946,
+  "watch_exit": 0,
+  "full_tests": {
+    "passed": 779,
+    "failed": 0,
+    "skipped": 0
+  },
+  "publish_outputs": {
+    "managed_applications": 3,
+    "contract_tests": 16,
+    "result": "passed"
+  },
+  "debughost_pdb": {
+    "tests": 10,
+    "documents": 112,
+    "document_paths": "/src/",
+    "complete_portable_pdb_identity": "passed"
+  },
+  "jobs": [
+    {
+      "name": "test",
+      "conclusion": "success",
+      "id": 120378182269
+    },
+    {
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "conclusion": "skipped",
+      "id": 120378184392
+    },
+    {
+      "name": "ASPIRE full-stack Linux acceptance",
+      "conclusion": "skipped",
+      "id": 120378809970
+    }
+  ]
+}
