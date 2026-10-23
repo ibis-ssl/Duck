@@ -24,11 +24,11 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task BaseModelKeepsDuckAsProjectAndEachDockerServiceAsHealthyExecutableWrapper()
+    public async Task BaseModelKeepsDuckAsContainerAndEachDockerServiceAsHealthyExecutableWrapper()
     {
         using var appHost = await CreateAppHostAsync();
 
-        Assert.IsType<ProjectResource>(Assert.Single(appHost.Resources, resource => resource.Name == "duck"));
+        Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources, resource => resource.Name == "duck"));
         foreach (var name in new[] { "simulator", "game-controller", "crane", "cm4-sim" })
         {
             var resource = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, item => item.Name == name));
@@ -125,7 +125,7 @@ public sealed class AppHostApplicationModelTests
             Assert.Single(appHost.Resources, resource => resource.Name == "tracker-tigers"));
         var erForce = Assert.IsType<ExecutableResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "tracker-erforce"));
-        var debugHost = Assert.IsType<ProjectResource>(
+        var debugHost = Assert.IsType<ContainerResource>(
             Assert.Single(appHost.Resources, resource => resource.Name == "debug-host"));
 
         var tigersLaunch = await GetLaunchOptionsAsync(tigers);
@@ -186,16 +186,15 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__Uuid"]);
         Assert.Equal("debug-host-observer", debugHostEnvironment["Tracker__SourceName"]);
         Assert.Equal("comparison", debugHostEnvironment["Testing__Mode"]);
+        Assert.Equal("true", debugHostEnvironment["Testing__ContainerMode"]);
         Assert.Single(debugHost.Annotations.OfType<HealthCheckAnnotation>());
-        foreach (var (name, port) in new[] { ("comparison-health", 39107), ("vision-health", 39109) })
-        {
-            var endpoint = Assert.Single(
-                debugHost.Annotations.OfType<EndpointAnnotation>(),
-                candidate => candidate.Name == name);
-            Assert.Equal(port, endpoint.Port);
-            Assert.Equal(port, endpoint.TargetPort);
-            Assert.False(endpoint.IsProxied);
-        }
+        var debugHttp = Assert.Single(
+            debugHost.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Name == "http");
+        Assert.Null(debugHttp.Port);
+        Assert.Equal(8080, debugHttp.TargetPort);
+        Assert.Equal("127.0.0.1", debugHttp.TargetHost);
+        Assert.False(debugHttp.IsProxied);
         AssertWaits(debugHost, (simulator, WaitType.WaitUntilStarted), (Find(appHost, "duck"), WaitType.WaitUntilStarted), (tigers, WaitType.WaitUntilHealthy), (erForce, WaitType.WaitUntilHealthy));
 
         var gameControllerLaunch = await GetLaunchOptionsAsync(gameController);
@@ -385,7 +384,7 @@ public sealed class AppHostApplicationModelTests
     {
         using var appHost = await CreateAppHostAsync();
         var simulator = Find(appHost, "simulator");
-        var duck = Assert.IsType<ProjectResource>(Find(appHost, "duck"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
         var executionConfiguration = await ExecutionConfigurationBuilder.Create(duck)
             .WithEnvironmentVariablesConfig()
             .BuildAsync(

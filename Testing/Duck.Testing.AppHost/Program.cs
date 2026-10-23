@@ -7,6 +7,31 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
 }
 
 var builder = DistributedApplication.CreateBuilder(args);
+var repositoryRoot = FindRepositoryRoot();
+
+IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, string imageName, string projectPath)
+{
+    var projectDirectory = Path.Combine(repositoryRoot, projectPath);
+    var publishDirectory = Path.Combine(projectDirectory, "bin", "Release", "net10.0", "publish");
+    return builder.AddContainer(resourceName, imageName)
+        .WithDockerfile(publishDirectory, Path.Combine(projectDirectory, "Dockerfile"));
+}
+
+static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
+
+static string FindRepositoryRoot()
+{
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+    {
+        if (File.Exists(Path.Combine(directory.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+        {
+            return directory.FullName;
+        }
+    }
+
+    throw new DirectoryNotFoundException("DuckリポジトリのルートをAppHostの出力先から特定できません。");
+}
+
 var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
 if (testingMode is not "base" and not "comparison")
 {
@@ -30,9 +55,7 @@ var preflightPorts = ExclusiveControlPortPreflight
     .ToList();
 if (testingMode == "comparison")
 {
-    preflightPorts.Add(new("DebugHost comparison health", System.Net.Sockets.ProtocolType.Tcp, 39107));
     preflightPorts.Add(new("RuntimeHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39108));
-    preflightPorts.Add(new("DebugHost vision diagnostics", System.Net.Sockets.ProtocolType.Tcp, 39109));
 }
 ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
 
@@ -74,8 +97,7 @@ var simulator = builder.AddDockerWrapper(
     "simulator-cli",
     "simulator");
 
-var duckBuilder = builder
-    .AddProject<Projects.Tracker_RuntimeHost>("duck")
+var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
     .WithEnvironment("Tracker__ActiveProfileName", "sim")
     .WithEnvironment("Testing__Mode", testingMode);
 if (testingMode == "comparison")
@@ -104,6 +126,16 @@ var gameController = builder.AddDockerWrapper(
     "app",
     "game-controller",
     expectedCraneTeamName: craneTeamName);
+
+if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+    IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+{
+    AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WaitFor(gameController);
+}
 
 IResourceBuilder<ExecutableResource>? cm4Simulator = null;
 if (useCm4Simulator)
@@ -206,8 +238,7 @@ if (testingMode == "comparison")
         .WaitFor(simulator)
         .WaitFor(gameController);
 
-    builder
-        .AddProject<Projects.Tracker_DebugHost>("debug-host")
+    var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
         .WithEnvironment("Testing__Mode", "comparison")
         .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
         .WithEnvironment("VisionReceiver__Port", "10020")
@@ -218,13 +249,14 @@ if (testingMode == "comparison")
         .WithEnvironment("Tracker__Receive__Port", "11010")
         .WithEnvironment("Tracker__Uuid", "debug-host-observer")
         .WithEnvironment("Tracker__SourceName", "debug-host-observer")
-        .WithHttpEndpoint(port: 39107, targetPort: 39107, name: "comparison-health", isProxied: false)
-        .WithHttpEndpoint(port: 39109, targetPort: 39109, name: "vision-health", isProxied: false)
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false)
+        .WithHttpEndpointCallback(endpoint => endpoint.TargetHost = "127.0.0.1", name: "http", isProxied: false)
         .WaitForStart(simulator)
         .WaitForStart(duck)
         .WaitFor(trackerTigers)
         .WaitFor(trackerErForce)
-        .WithHttpHealthCheck("/health/comparison");
+        .WithHttpHealthCheck("/health/comparison", endpointName: "http");
 }
 
 builder.Build().Run();
