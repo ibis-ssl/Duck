@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tracker.Tests" />
+    <InternalsVisibleTo Include="Duck.Testing.AppHost" />
   </ItemGroup>
 
   <ItemGroup>

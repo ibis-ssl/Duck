@@ -43,7 +43,7 @@ Game Controller は `224.5.23.1:11003` の唯一の送信者とする。TIGERs �
 
 ### RuntimeHost診断識別情報の制御経路
 
-比較モードでも、診断識別情報の宛先選択にホスト側HTTPを使わず、AppHostが照合した完全なコンテナ識別子を使う。AppHostは同じコンテナ内で `dotnet Tracker.RuntimeHost.dll --identity-control` を実行し、固定Unixソケットで常駐RuntimeHostと `prepare` / `challenge` / `commit` を行う。コンテナの起動・停止・削除はDCPだけが管理し、HTTPは利用者向け診断表示に限る。RunId/ResourceId/役割名/完全ContainerId/Generationと実行プロセスのBootIdの対応を検査し、受理後に受信状態を初期化する。これは識別情報の受渡し契約であり、外部トラッカーが正常に復号したこと、送信UDPパケットのコンテナ起源、実Docker Desktop上での `exec` 成功を証明しない。
+比較モードでも、診断識別情報の宛先選択にホスト側HTTPを使わず、AppHostが照合した完全なコンテナ識別子を使う。AppHostは `ResourceNotificationService.WatchAsync` の実通知と `TryGetCurrentState` の現在状態について、登録資源参照、不透明なResourceId、役割名、完全なcontainer.idを照合する。明示opt-in時は設定されたDocker contextと期待EngineIDを確認し、完全ID・Running状態・当該RunId/roleラベルをinspectした後だけ同じ完全IDへ `exec` する。検証失敗は `exec` を行わない。これはDocker Desktop context内の当該Run資源照合であり、DCP endpointの直接比較や通知全順序の保証ではない。通常構成とRuntimeHostOnly選択はDesktop bridgeを暗黙に有効化しない。AppHostは同じコンテナ内で `dotnet Tracker.RuntimeHost.dll --identity-control` を実行し、固定Unixソケットで常駐RuntimeHostと `prepare` / `challenge` / `commit` を行う。コンテナの起動・停止・削除はDCPだけが管理し、HTTPは利用者向け診断表示に限る。RunId/ResourceId/役割名/完全ContainerId/Generationと実行プロセスのBootIdの対応を検査し、受理後に受信状態を初期化する。起動時にResourceIdが未確定の経路ではRunIdと期待役割を先に固定し、ResourceIdは未帰属のまま保持する。役割名の一致だけではResourceIdをbindせず、AppHostが対象コンテナを照合した同一UDS接続の初回commit成功で初めて確定する。ResourceIdを起動時に明示する既存経路は厳格一致を維持する。これは識別情報の受渡し契約であり、外部トラッカーが正常に復号したこと、送信UDPパケットのコンテナ起源、実Docker Desktop上での `exec` 成功を証明しない.
 
 ```mermaid
 flowchart LR

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 
@@ -19,6 +21,43 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
 
+/// <summary>
+/// 明示選択された場合だけ、所有ラベルと診断受渡しの常駐サービスを構成します。
+/// </summary>
+void EnableDesktopIdentityBridge(IResourceBuilder<ContainerResource> resource, string runId, string role)
+{
+    if (!IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        return;
+    }
+
+    var contextName = builder.Configuration["Testing:IdentityControl:DockerContext"];
+    var expectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+    if (string.IsNullOrWhiteSpace(contextName) || string.IsNullOrWhiteSpace(expectedEngineId))
+    {
+        throw new InvalidOperationException(
+            "Testing:IdentityControl:DockerContext and Testing:IdentityControl:ExpectedEngineId are required when the desktop identity bridge is enabled.");
+    }
+
+    resource.WithContainerRuntimeArgs(
+        "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={runId}",
+        "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={role}");
+
+    var dockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
+    builder.Services.AddHostedService(serviceProvider => new ContainerIdentityHandoffService(
+        serviceProvider.GetRequiredService<ResourceNotificationService>(),
+        resource.Resource,
+        role,
+        runId,
+        contextName,
+        expectedEngineId,
+        new DockerCliCommandRunner(dockerExecutable),
+        serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>()));
+}
+
 static string FindRepositoryRoot()
 {
     for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
@@ -30,6 +69,34 @@ static string FindRepositoryRoot()
     }
 
     throw new DirectoryNotFoundException("DuckリポジトリのルートをAppHostの出力先から特定できません。");
+}
+
+if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]))
+{
+    var runtimeOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var runtimeOnlyOwnershipLease = StackOwnershipLease.Acquire(runtimeOnlyLockPath);
+    var runtimeOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var runtimeOnlyDuck = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", runtimeOnlyRunId)
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+    EnableDesktopIdentityBridge(runtimeOnlyDuck, runtimeOnlyRunId, "duck");
+    var runtimeOnlyEndpoint = runtimeOnlyDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    runtimeOnlyEndpoint.Port = null;
+    runtimeOnlyEndpoint.TargetHost = "127.0.0.1";
+
+
+    builder.Build().Run();
+    return 0;
 }
 
 var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
@@ -93,12 +160,21 @@ var simulator = builder.AddDockerWrapper(
     "simulator-cli",
     "simulator");
 
+var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
 var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
     .WithEnvironment("Tracker__ActiveProfileName", "sim")
     .WithEnvironment("Testing__Mode", testingMode)
     .WithEnvironment("Testing__ContainerMode", "true")
     .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
     .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+{
+    duckBuilder
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+}
+EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck");
 var visionHealthEndpoint = duckBuilder.Resource.Annotations
     .OfType<EndpointAnnotation>()
     .Single(endpoint => endpoint.Name == "vision-health");

@@ -22,6 +22,7 @@ internal sealed class RuntimeIdentityControlMessage
     public string? ExpectedBootId { get; init; }
     public string? RunId { get; init; }
     public string? ResourceId { get; init; }
+    public string? RoleName { get; init; }
     public string? ContainerId { get; init; }
     public long Generation { get; init; }
     public bool Accepted { get; init; }
@@ -69,23 +70,26 @@ internal sealed class RuntimeIdentityControlServer : IAsyncDisposable
     private readonly string socketPath;
     private readonly RuntimeVisionReceiverDiagnostics diagnostics;
     private readonly string expectedRunId;
-    private readonly string expectedResourceId;
+    private string? expectedResourceId;
+    private readonly string? expectedRole;
     private readonly CancellationTokenSource stop = new();
     private Socket? listener;
     private Task? acceptTask;
     private ResourceDiagnosticIdentity? acceptedIdentity;
     private bool ownsSocketPath;
 
-    public RuntimeIdentityControlServer(string socketPath, RuntimeVisionReceiverDiagnostics diagnostics, string expectedRunId, string expectedResourceId)
+    public RuntimeIdentityControlServer(string socketPath, RuntimeVisionReceiverDiagnostics diagnostics, string expectedRunId, string? expectedResourceId, string? expectedRole = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(socketPath);
         ArgumentNullException.ThrowIfNull(diagnostics);
         ArgumentException.ThrowIfNullOrWhiteSpace(expectedRunId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(expectedResourceId);
+        if (string.IsNullOrWhiteSpace(expectedResourceId) && string.IsNullOrWhiteSpace(expectedRole))
+            throw new ArgumentException("Unbound identity control requires an expected role.", nameof(expectedRole));
         this.socketPath = socketPath;
         this.diagnostics = diagnostics;
         this.expectedRunId = expectedRunId;
-        this.expectedResourceId = expectedResourceId;
+        this.expectedResourceId = string.IsNullOrWhiteSpace(expectedResourceId) ? null : expectedResourceId;
+        this.expectedRole = string.IsNullOrWhiteSpace(expectedRole) ? null : expectedRole;
         acceptedIdentity = diagnostics.Identity;
         BootId = Guid.NewGuid().ToString("N");
     }
@@ -150,7 +154,7 @@ internal sealed class RuntimeIdentityControlServer : IAsyncDisposable
             }
             var prepare = Deserialize(prepareLine);
             var preparedIdentity = ParseIdentity(prepare);
-            if (prepare?.Type != "prepare" || preparedIdentity is null || !IsExpectedResource(preparedIdentity))
+            if (prepare?.Type != "prepare" || preparedIdentity is null || !IsExpectedResource(preparedIdentity, prepare.RoleName))
             {
                 await WriteAsync(writer, new() { Type = "result", Accepted = false, Reason = "invalid-prepare" }, cancellationToken);
                 return;
@@ -177,7 +181,8 @@ internal sealed class RuntimeIdentityControlServer : IAsyncDisposable
             var accepted = commit?.Type == "commit" &&
                 committedIdentity == preparedIdentity &&
                 string.Equals(commit.ExpectedBootId, BootId, StringComparison.Ordinal) &&
-                IsExpectedResource(preparedIdentity) &&
+                string.Equals(commit.RoleName, prepare.RoleName, StringComparison.Ordinal) &&
+                IsExpectedResource(preparedIdentity, commit.RoleName) &&
                 TryAcceptIdentity(preparedIdentity);
             await WriteAsync(writer, new() { Type = "result", Accepted = accepted, Reason = accepted ? null : "identity-not-accepted" }, cancellationToken);
         }
@@ -195,12 +200,14 @@ internal sealed class RuntimeIdentityControlServer : IAsyncDisposable
 
         diagnostics.ReplaceIdentity(identity);
         acceptedIdentity = identity;
+        expectedResourceId ??= identity.ResourceId;
         return true;
     }
 
-    private bool IsExpectedResource(ResourceDiagnosticIdentity identity) =>
+    private bool IsExpectedResource(ResourceDiagnosticIdentity identity, string? roleName) =>
         string.Equals(identity.RunId, expectedRunId, StringComparison.Ordinal) &&
-        string.Equals(identity.ResourceId, expectedResourceId, StringComparison.Ordinal);
+        (expectedResourceId is null || string.Equals(identity.ResourceId, expectedResourceId, StringComparison.Ordinal)) &&
+        (expectedRole is null || string.Equals(roleName, expectedRole, StringComparison.Ordinal));
 
     private static RuntimeIdentityControlMessage? Deserialize(string? line) =>
         string.IsNullOrWhiteSpace(line) ? null : JsonSerializer.Deserialize<RuntimeIdentityControlMessage>(line, JsonOptions);
@@ -290,11 +297,13 @@ internal sealed class RuntimeIdentityControlHostedService : BackgroundService
             }
             var runId = configuration["Testing:Diagnostics:RunId"];
             var resourceId = configuration["Testing:Diagnostics:ResourceId"];
-            if (string.IsNullOrWhiteSpace(runId) || string.IsNullOrWhiteSpace(resourceId))
-                throw new InvalidOperationException("Identity control requires the configured run and resource identifiers.");
+            var expectedRole = configuration["Testing:IdentityControl:ExpectedRole"];
+            if (string.IsNullOrWhiteSpace(runId) ||
+                (string.IsNullOrWhiteSpace(resourceId) && string.IsNullOrWhiteSpace(expectedRole)))
+                throw new InvalidOperationException("Identity control requires a run identifier and either a resource identifier or expected role.");
 
             await using var server = serverFactory?.Invoke() ?? new RuntimeIdentityControlServer(
-                socketPath, diagnostics, runId, resourceId);
+                socketPath, diagnostics, runId, resourceId, expectedRole);
             await server.StartAsync(stoppingToken);
             BootId = server.BootId;
             started.TrySetResult();

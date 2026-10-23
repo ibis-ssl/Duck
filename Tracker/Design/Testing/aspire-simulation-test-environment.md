@@ -201,7 +201,7 @@ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の�
 | `RefereeDriver:GameControllerUri` | 有効時に必須の絶対形式の接続先アドレス。暗黙の既定接続先はない。 | `ws` または `wss` の `/api/control` を指定する。通常の内部値は `ws://game-controller:8082/api/control`。観測と明示制御に同じ検査済み接続先を渡す。 |
 | `RefereeDriver:InterfaceAddress` | 任意のIPv4アドレス。未指定なら既定の受信インターフェース。 | `224.5.23.1:11003` の受信で共有ポートを許可し、IPv4の全アドレスで待ち受け、指定したインターフェースで参加する。 |
 | `RefereeDriver:AutoDriveToActive` | 真偽値。未指定、`false`、解釈できない値は観測専用。 | `Enabled` と本設定がともに明示した `true` の場合だけ、既存の制御処理を一度実行する。 |
-| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` | 空白だけでない文字列。 | 当該実行と資源を識別する。送信元のアドレスやホスト名から補完しない。 |
+| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` / `Testing:IdentityControl:ExpectedRole` | RunIdは空白だけでない文字列。通常の固定ResourceId経路ではResourceIdも必須。起動時に資源キーが未確定の明示制御経路ではExpectedRoleを必須とし、ResourceIdは未設定にする。 | RunIdと役割を起動時に固定し、AppHostが照合したResourceIdだけを同一UDS handoffの初回commitで確定する。送信元アドレスやホスト名から補完しない。 |
 | `Testing:Diagnostics:ContainerId` / `Testing:Diagnostics:Generation` | 完全なコンテナIDを半角16進表記64桁で指定し、起動世代は正の `Int64` で指定する。 | 未指定・不正値は帰属不明とする。正常復号件数は記録するが、準備完了にはしない。 |
 
 無効時の診断経路は404となり、既存の待受設定を保持する。無効設定は、HTTPサーバー自体を起動しないことを意味しない。コンテナ内の39110待受と、後続のDCPによるWindows 127.0.0.1の動的ポート公開は別に確認する。
@@ -235,13 +235,15 @@ APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。API
 
 ## AppHost から RuntimeHost への診断識別子受渡し（06A1）
 
-AppHost は、DCP の `ResourceNotificationService.WatchAsync` で受け取った登録済み資源通知を照合し、対象 `IResource` の `ResourceEvent.ResourceId` と `Resource.Name`、`ResourceEvent.Snapshot` 内の完全な `container.id` を検査する。資源キーと役割名が想定どおりで、完全なコンテナ識別子がある場合だけ、そのIDを対象に、DCPが実際に選択したDocker実行環境の接続設定を照合した上で `docker --context <verifiedDcpContext> exec -i <containerId> dotnet Tracker.RuntimeHost.dll --identity-control` を実行する。接続設定がDCPの選ぶDocker実行環境と同一と確認できない場合は実行しない。接続設定名を固定値や利用者の現在選択だけから推測しない。HTTPの宛先、名前解決、ポート番号は対象選択に使わない。AppHostは利用者のDocker設定や接続設定を変更しない。
+AppHost は `ResourceNotificationService.WatchAsync` で資源通知を受け、登録した `IResource` の参照、イベントの不透明な `ResourceId`、役割を表す `Resource.Name`、完全な `container.id` を照合する。`TryGetCurrentState(ResourceId, out ...)` で取得した現在状態にも同じ資源キーと完全IDがあることを確認し、既知の古い通知から実行先を選ばない。この照合は公開された現在状態との一致を確認するもので、通知の全順序やDCPのDocker接続先との同一性を証明するものではない。
+
+診断ブリッジは `Testing:IdentityControl:DesktopBridgeEnabled=true` の明示選択時だけ有効にする。その場合は `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId` を明示し、同じcontextの `docker --context <context> info --format {{.ID}}` が期待IDと一致することを確認する。さらに `docker --context <context> inspect --format {{json .}} <完全ID>` で完全ID、実行中状態、当該AppHost実行のrun-idラベルと役割ラベルを照合し、すべて一致した完全IDだけに `docker --context <context> exec -i <完全ID> dotnet Tracker.RuntimeHost.dll --identity-control` を行う。確認に失敗した場合は `exec` しない。これは明示したDocker Desktop context内で通知対象と当該実行の所有コンテナを照合する境界であり、DCPが選択したdaemon endpointとの直接比較を行ったという主張ではない。HTTPの宛先、名前解決、ポート番号は対象選択に使わず、AppHostは利用者のDocker設定や接続設定を変更しない。既定構成はブリッジを有効化せず、RuntimeHostOnly選択もブリッジの有効化とは別である。
 
 DCP/AppHostは資源の作成・起動・停止・削除を引き続き単独で管理する。`exec` は既に起動した対象コンテナ内でRuntimeHostの同梱アセンブリを起動し、診断識別子だけを渡す。別の起動管理者は作らず、Dockerイメージや外部資源、コンテナの起動・停止・削除は操作しない。
 
-常駐RuntimeHostはコンテナ内の固定Unixソケット `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。最初の `prepare` にRunId、ResourceId、完全ContainerId、Generationを含める。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側はBootIdと識別情報一式の一致を再確認してから受理する。
+常駐RuntimeHostはコンテナ内の固定Unixソケット `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。 `prepare` と `commit` にはRunId、ResourceId、役割名、完全ContainerId、Generationを含め、両者の識別情報を一致させる。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側はBootIdと識別情報一式の一致を再確認してから受理する。起動時にResourceIdが未確定の経路では、ExpectedRoleだけを事前固定し、ResourceId未設定の間は診断を未帰属として503にする。役割名が一致する `prepare` は候補確認に限り、ResourceIdをbindしない。同じ接続の `commit` が成功した時だけResourceIdを確定する。ResourceIdを起動時に明示する既存経路は従来どおり厳格一致させる。
 
-AppHostが新たに起動した場合は新RunIdで世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDがまだ確定していないため、コンテナ動作時の診断識別情報は受渡しが完了するまで未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、challenge後のBootId変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
+AppHostが新たに起動した場合は新RunIdで世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDと資源キーがまだ確定していない場合があるため、その経路では役割名だけを期待値として保持し、受渡し完了まで診断識別情報を未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、challenge後のBootId変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
 
 このソケットはコンテナ内の制御面であり、ホストへ公開しない。認証情報や識別子をURL、Dashboard、通常ログへ出さない。Docker `exec`、DCPの実行環境、イメージ取得・起動を行わず、受入はDuckの実装にある試験で制御プロセスと同じコンテナソケットの契約まで確認する。実Docker Desktopでの `exec`、資源通知の実到着、コンテナ起動、UDP通信、ホストポート公開は別途未実証のまま記録する。RuntimeHostへの識別情報受渡しはUDPパケットの送信元コンテナを暗号学的に証明するものではない。
 

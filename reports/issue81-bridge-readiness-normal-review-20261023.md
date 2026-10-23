@@ -85,6 +85,13 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 読取3577ca/8b955b/4cf933/f7848d/d870f0はexit0。2b5854はmanifest列順の仮定でAssertionError/exit1、acbeb2はGit未追跡のobj/project.assets.jsonをcommit内へ要求してgit exit128/Python exit1となった読取失敗。書込み/試験発行なし。観測したrelative_path/bytes/sha256列順へ合わせ58件全照合後、生成入力は既存diskのhash確認と区別した。
 - 新test/build/lint/CI/実DCP/execは実行していない。通常report子5欄と /tmp/issue81-06a1-nr009-close-review-20261023/ の自己確認証拠のみ保存する。親prefixの更新拒否は親通知として保持し、代行変更しない。
 
+### 06A2 初回通常レビュー（正常系優先）
+
+- reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5、baseline26c9e8655c0011a0e53628f7291ba86703db5895。最新本人指示「一旦正常系が動くように」「コスパ重視」を適用し、今回の純粋候補投影と既存安全条件を確認した。網羅異常系/汎用化/文書磨き込みを追加必須にしない。
+- 既読review-enforcer/review-worker/work-context-manager/report-output-manager等を継続適用し、同じSol6.1/high要求・applied:null・normal_persistenceでbuilt-in review。新agent/入れ子/独立final/attestationなし。
+- e5efb9/beba40/3b998e/a0c61cのgit show/証拠読取・静的照合は各exit0。3b998eのscaffold source照合先を最初は復元用implementation-source.csと取り違えたが、a0c61cで実false scaffoldのred-scaffold.csが記録ed3676...と一致し、復元用は3449ae...であると確認した。製品や証拠の不一致ではない。
+- 新test/build/lint/CI/実DCP/execを実行せず、保存済み結果を照合した。自己保存証拠は /tmp/issue81-06a2-normal-review-20261023/。親prefixは保持し子5欄のみ追記する。
+
 ## 対象ファイル
 
 - 全製品差分はTesting/Duck.Testing.AppHost/Program.csのduck登録と、Tracker/Tracker.Tests/AppHostApplicationModelTests.csの固定先行1test。Program全272行と追加test全29行、既存モデル入口/比較回帰/待機関係を読んだ。新しい関数説明/XMLコメントの追加はなく、英語識別子は翻訳対象にしていない。
@@ -151,6 +158,16 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - 単独child-process-project-output-v2は1pass/exit0で、fixtureはstdinを閉じずexpected child exit2を35秒上限で検査し、raw duration30秒。旧単独記録のDLL hash f3a3...は後続buildのDLLとは異なるため、現DLLとの一致や94bcc...の単独binary証拠に転用しない。94bcc...に帰属するGreen3/full808が同じchild fixtureを含むことと、後続build成功を別根拠にする。runtimeconfig/depsと既存assetsの現disk hashは保存値一致、DLLの世代差は保持した。
 - 主/比較設計の語彙置換16追加行は、完全ID/RunId/ResourceId/Generation/BootId、DCP単一owner、host HTTPで選ばない、未帰属/503、外側未実証の意味を維持する。tasks/phasesの2変更行は現94bcc.../808と通常確認後続を記録し、NR005/TDD/実機未完了を保持する。
 - tracking-lint-v2はその2変更行内の追加断片（130/73文字）を2入力にした三検査で、各exit0・timed_out false。preflightのbaseline/current sourcehash、入力hash、9config hashをcommit/保存入力と照合し一致、両断片の現source内連続一致も確認。全文/行全体すべての合格へ拡張しない。全文CSpell/Sudachi未合格と初回語彙指摘rawを保持する。
+
+### 06A2 固定対象・直接依存・証拠
+
+- RegisteredContainerEventProjection.cs全107行、SHA3449ae230e73f6dc0315ea4658c9eee22d9e3994613dc85edbcff13e158e1f3dとRegisteredContainerEventProjectionTests.cs全104行、SHA33493d7830dcf88bc375fc1162cb59848c245cccb24e2f52192c159ee9ba8f94を実読。6Fact+theory4caseの計10case。唯一の製品追加はこの純粋class/recordで、Program/DI/外部実行へまだ接続しない。
+- registeredResource参照、登録key、Resource.Nameと期待role、observation/currentStateのRunning、literal container.idの一意なstring/full64hex、両ID一致を確認。識別子を補完せず、候補recordにResourceId/RoleName/ContainerIdを分けて返す。mutable共有state/IO/async副作用なし。新関数説明/XMLは日本語。
+- 直接使用するAspire13.5.4のpublic ResourceEvent/CustomResourceSnapshot/ResourcePropertySnapshot/ResourceStateSnapshot.Text/KnownResourceStatesを保存reflection出力で照合。既読固定source9c1b401...のContainerStatus.ContainerId→container.idとの対応を維持し、非公開Snapshot.Version/KnownPropertiesを製品から使わない。
+- inventory-v2.tsvは42件、SHA05935bc39adfb75158f570e38665770e3fff6c98380d0088a77e2e87df5015ef、全size/hash一致。保存された最終製品/testのcopyはcommit sourceと同byte。Green/regression/build/API確認のcommand/source/raw hashも一致、各exit0。
+- focused10pass、既存AppHostApplicationModelTests25pass（旧test fileはbaselineと同byte）、AppHost build error0/既存ASPIRE010 warning1をrawで確認。今回全標準suite/PR CIの成功は主張しない。
+- tasks I81-06A2追加1行と実装reportのscope/TDD/未実装記述を照合。tracking入力は追加行と完全byte一致（756bytes、SHA59d5e6f05bac4244bd4630e93e78e51da0b2dd71097c2484f6a74e3df1913de7）、source hashと9config一致、textlint/CSpell/Sudachi各exit0・raw空。全文gate合格へ拡大しない。
+- reconstructed sensitivity runはrootのred-scaffold.cs（SHAed3676...）と同33493d...のtestで8pass/2fail/exit1。red-scaffold/implementation-source.csは復元用の最終3449ae...であり、false scaffoldとして扱わない。
 
 ## 指摘事項
 
@@ -312,6 +329,25 @@ Issue81 / PR84 / I81-05B1の通常レビュー。RuntimeHostの既存vision準�
 - PD-I81-06A1-TDD（初期Hosted第5testの事前Red欠落）は未充足、waiverなし。今回同3fixtureの有効Red→Greenはこの最小修正に帰属し、過去の欠落を埋めない。旧TDD/全文文書gate/図本人確認/実機/独立finalも保持。
 - 親prefixの旧b96/44d8未評価という記載はそのまま保存する。今回の最新reviewed_commitと閉鎖判断は子欄の本履歴に明記し、親欄の判定を代行編集しない。
 
+### 06A2 初回所見
+
+#### 必須製品finding: なし
+
+- 正常系では登録済みresource/key/roleが一致し、実行中の両snapshotに同じ一意な完全IDがあると、3識別子を混同せず候補を生成する。Sourceと10caseはこの純粋処理の受入に対応している。既存AppHost登録/既定モード/前単位の制御プロトコルに製品変更はなく、必要な正常系を妨げる欠陥は見つからない。
+- 欠落/短ID/nonhex/非string/重複、非Running、別resource/key、両観測ID不一致の拒否はsourceと既存fixtureで確認。拒否時target=null。追加の対称異常系全組合せ、汎用化、名前の磨き込みは今回の必須へ加えない。
+
+#### 工程未充足: 06A2の実装前Red欠落
+
+- ResourceType必須項目漏れはcompile/setup失敗。資源Nameを登録keyと同一にして期待roleと違わせた初期2失敗は誤fixtureであり、製品不備のRedに数えない。その訂正時点ですでに製品が存在した。
+- 訂正後10caseでfalse scaffoldへ戻した8pass/2failは感度確認として有効だが、事後の再構成であり事前機能Redの証拠ではない。初期raw未保存も実装reportに明記されている。TDD準拠/例外承認/過去の欠落解消とは認定しない。
+- この履歴は機能判定と分けて保持する。新しい失敗再現や履歴の作り直しを要求せず、後続の正常系接続を止める追加条件へしない。
+
+#### 安全境界と任意改善
+
+- currentStateはcallerが渡した公開snapshotであり、projection自身は「現在性」や通知の時系列順序を獲得しない。両者が同じ旧IDなら候補は作り得る。候補投影の契約どおりであり、owner/engine authorityの証明ではない。現unitの未実装scopeを機能欠陥へ混ぜない。
+- 実ResourceEvent購読、registered keyの実取得、DCP/CLI同engine照合、generation/BootId更新、exec→UDS接続は後続。NR005/P1/openは維持し、正しい形の候補を作れたことだけで閉じない。ここで新たな任意のheartbeat/網羅異常系/全外部診断を要求しない。
+- 任意改善は後続callerが接続された段階の代表的な追加caseに留める。現在の10caseに対して追加試験や再実行の必須要求なし。NR006/007/008/009closedと旧工程/全文文書/実機heldは不変。
+
 ## 結果
 
 verdict: needs_changes。I81-NR-005（P1）open、I81-NR-006（P2）open、必須修正2。対象は基準9284640aaec4af59e44afe7687e4bf8a39494c48上の未commit source（Program77734467... / test69d87728...）。製品を変更せず、通常レビューとして保存する。
@@ -456,6 +492,22 @@ NR009_fix_verdict: closed。06A1の今回技術範囲はpass_with_held、製品�
 
 reviewed_commit: 26c9e8655c0011a0e53628f7291ba86703db5895。local保存証拠を照合した判定であり、このcommitのPR CI成功を新たに確認したものではない。旧b96/44d8等のneeds_changes履歴を消さず、今回の最小閉鎖を追記した。
 
+### 06A2 通常判定
+
+06A2_technical_verdict: pass_with_held、今回の必須製品finding0。純粋候補投影の正常系と既存安全条件は確認済み。06A2の実装前Red欠落は工程未充足として分離し、TDD準拠へ読み替えない。通常cycle全体はNR005/P1/openが残るためneeds_changes、Issue全体/実E2E/独立final完了ではない。
+
+| 確認対象 | 結論 | 根拠/残り |
+| --- | --- | --- |
+| 登録対象から候補投影する正常系 | pass_in_scope | 実public API型のfixtureとsource、識別子3種を分離 |
+| 既存の拒否条件 | reviewed | full64hex/一意string/Running/resource/key/role/両ID一致 |
+| focused/regression/build | 保存証拠pass | 10pass/既存25pass/AppHost build exit0 |
+| 現在性/owner/engine/exec | 対象外・未実装 | 候補のshape検証から所有証明へ拡張しない。NR005open |
+| TDD手順 | 未充足 | 初期setup/誤fixtureと事後scaffold感度確認を区別 |
+| tracking文書 | 追加1行の三検査0 | 756bytes入力/source/9config一致、全文gate未合格維持 |
+| 追加改善 | 任意 | 網羅異常系や汎用化を正常系E2E前の追加必須にしない |
+
+reviewed_commit: a2dd3584578d88499c3e52fc0d9d97db164cc5c5。次の正常系は実通知の取得と権限内の既存資材・engine接続確認から進める。今回の未接続projectionに実DCP/exec成立を要求して停止させず、外側の未実装を正確に残す。
+
 ## リスク
 
 - strict healthのfail-closedを維持することと、実duckをhealthyにできる供給があることは別条件。NR005を未実装の外部診断全体に埋めてheldだけにしない。一方実DCP所有証明を模型の正しい64桁値だけで成立扱いにもしない。
@@ -511,3 +563,10 @@ reviewed_commit: 26c9e8655c0011a0e53628f7291ba86703db5895。local保存証拠を
 - NR005実owner/engine ID供給、外側DCP通知/exec、実container/UDP sender所有、実機/独立finalは未実装・未検証。PD-I81-06A1-TDDと全文文書gate不合格を今回成功で消さない。
 - 成功808は保存raw集計、個別808TRX/実機成功ではない。旧test-bin exit134のsetup failure、metadata原本/companion、旧重複processの元exit未回収を別履歴で保持。
 - 親prefix/旧子5欄を保持し、自己変更は通常report子5欄と/tmp確認証拠のみ。製品/test/台帳/第三者report/rawを編集せず、新agent/build/test/lint/CI/実DCPなし。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。
+
+### 06A2 初回通常レビュー終端
+
+- 実snapshot source/engine authority/通知順序はこの純粋関数の入力外で、候補受理はownershipや実行許可ではない。NR005を保持し、実通知/execへの次段階で必要な結合を確認する。
+- 10/25成功とpublic API確認は保存結果で、実DCPイベント・実container・Windows/UDP通信成立ではない。06A2のTDD欠落、PD-I81-06A1-TDD/過去履歴、全文文書gate未合格、実機/独立final未完了は保持。
+- 最新本人方針に沿い、正常系を進めるための必須安全条件と任意改善を分ける。今回追加の実行/網羅異常系/汎用化/細文書修正を要求しない。
+- 親prefix/全旧子欄履歴を保持。自己変更は通常report子5欄と/tmp証拠のみ、製品/test/台帳/raw/第三者reportを編集しない。全自己process終端、未回収session/exit/承認待ちなし。applied:null、report_attestation_allowed:false。

@@ -1,0 +1,332 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Text.Json;
+using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.Diagnostics;
+using Microsoft.Extensions.Hosting;
+using Tracker.RuntimeHost;
+using Microsoft.Extensions.Logging;
+
+namespace Duck.Testing.AppHost;
+
+internal interface IDockerCommandRunner
+{
+    Task<string> CaptureAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken);
+
+    Task<ContainerIdentityControlExecResult> RelayAsync(
+        IReadOnlyList<string> arguments,
+        ResourceDiagnosticIdentity identity,
+        string roleName,
+        string? expectedBootId,
+        CancellationToken cancellationToken);
+}
+
+internal sealed record ContainerIdentityHandoffState(long Generation, string BootId);
+
+internal static class ContainerIdentityExecHandoff
+{
+    internal const string RunIdLabel = "com.ibis-ssl.duck.run-id";
+    internal const string RoleLabel = "com.ibis-ssl.duck.role";
+
+    /// <summary>
+    /// 明示した実行先、所有ラベル、Docker実行環境を照合してから制御接続を中継します。
+    /// </summary>
+    internal static async Task<ContainerIdentityHandoffState?> TryHandoffAsync(
+        RegisteredContainerRuntimeTarget target,
+        string runId,
+        long generation,
+        string? expectedBootId,
+        string contextName,
+        string expectedEngineId,
+        IDockerCommandRunner runner,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(runner);
+        if (!IsFullContainerId(target.ContainerId) ||
+            string.IsNullOrWhiteSpace(target.ResourceId) ||
+            string.IsNullOrWhiteSpace(target.RoleName) ||
+            string.IsNullOrWhiteSpace(runId) ||
+            string.IsNullOrWhiteSpace(contextName) ||
+            string.IsNullOrWhiteSpace(expectedEngineId) ||
+            generation <= 0)
+        {
+            return null;
+        }
+
+        try
+        {
+            var engineId = await runner.CaptureAsync(
+                ["--context", contextName, "info", "--format", "{{.ID}}"],
+                cancellationToken);
+            if (!string.Equals(engineId.Trim(), expectedEngineId, StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            var inspectionJson = await runner.CaptureAsync(
+                ["--context", contextName, "inspect", "--format", "{{json .}}", target.ContainerId],
+                cancellationToken);
+            if (!MatchesOwnedRunningContainer(inspectionJson, target, runId))
+            {
+                return null;
+            }
+
+            var arguments = new[]
+            {
+                "--context", contextName, "exec", "-i", target.ContainerId,
+                "dotnet", "Tracker.RuntimeHost.dll", "--identity-control",
+            };
+            var identity = new ResourceDiagnosticIdentity(runId, target.ResourceId, target.ContainerId, generation);
+            var result = await runner.RelayAsync(arguments, identity, target.RoleName, expectedBootId, cancellationToken);
+            if (result.RequiresNewGeneration && !string.IsNullOrWhiteSpace(result.BootId))
+            {
+                generation = checked(generation + 1);
+                identity = new ResourceDiagnosticIdentity(runId, target.ResourceId, target.ContainerId, generation);
+                result = await runner.RelayAsync(arguments, identity, target.RoleName, result.BootId, cancellationToken);
+            }
+
+            return result.Accepted && !string.IsNullOrWhiteSpace(result.BootId)
+                ? new ContainerIdentityHandoffState(generation, result.BootId)
+                : null;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception) when (
+            exception is IOException or
+            Win32Exception or
+            JsonException or
+            InvalidOperationException or
+            TimeoutException)
+        {
+            return null;
+        }
+    }
+
+    private static bool MatchesOwnedRunningContainer(
+        string inspectionJson,
+        RegisteredContainerRuntimeTarget target,
+        string runId)
+    {
+        using var document = JsonDocument.Parse(inspectionJson);
+        var root = document.RootElement;
+        if (root.ValueKind != JsonValueKind.Object ||
+            !root.TryGetProperty("Id", out var idElement) ||
+            idElement.ValueKind != JsonValueKind.String ||
+            !string.Equals(idElement.GetString(), target.ContainerId, StringComparison.Ordinal) ||
+            !root.TryGetProperty("State", out var stateElement) ||
+            !stateElement.TryGetProperty("Status", out var statusElement) ||
+            statusElement.ValueKind != JsonValueKind.String ||
+            !string.Equals(statusElement.GetString(), "running", StringComparison.Ordinal) ||
+            !root.TryGetProperty("Config", out var configElement) ||
+            !configElement.TryGetProperty("Labels", out var labelsElement) ||
+            labelsElement.ValueKind != JsonValueKind.Object)
+        {
+            return false;
+        }
+
+        return HasLabel(labelsElement, RunIdLabel, runId) &&
+               HasLabel(labelsElement, RoleLabel, target.RoleName);
+    }
+
+    private static bool HasLabel(JsonElement labels, string name, string expectedValue) =>
+        labels.TryGetProperty(name, out var value) &&
+        value.ValueKind == JsonValueKind.String &&
+        string.Equals(value.GetString(), expectedValue, StringComparison.Ordinal);
+
+    private static bool IsFullContainerId(string value)
+    {
+        if (value.Length != 64)
+        {
+            return false;
+        }
+
+        foreach (var character in value)
+        {
+            if (!((character >= '0' && character <= '9') ||
+                  (character >= 'a' && character <= 'f') ||
+                  (character >= 'A' && character <= 'F')))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+/// <summary>
+/// Docker CLIを構造化引数で起動し、メタデータ取得またはUDS中継を行います。
+/// </summary>
+internal sealed class DockerCliCommandRunner(string executablePath) : IDockerCommandRunner
+{
+    /// <summary>
+    /// 指定したメタデータコマンドを実行し、標準出力だけを呼出し元へ返します。
+    /// </summary>
+    public async Task<string> CaptureAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken)
+    {
+        using var process = Start(arguments, redirectInput: false);
+        var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+        await WaitForExitAsync(process, cancellationToken);
+        var output = await outputTask;
+        _ = await errorTask;
+        if (process.ExitCode != 0)
+        {
+            throw new IOException("Docker metadata command failed.");
+        }
+
+        return output;
+    }
+
+    /// <summary>
+    /// 短命なコンテナ内プロセスとローカルUDSの間で制御データを中継します。
+    /// </summary>
+    public async Task<ContainerIdentityControlExecResult> RelayAsync(
+        IReadOnlyList<string> arguments,
+        ResourceDiagnosticIdentity identity,
+        string roleName,
+        string? expectedBootId,
+        CancellationToken cancellationToken)
+    {
+        using var process = Start(arguments, redirectInput: true);
+        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+        try
+        {
+            var result = await ContainerIdentityControlExecSession.RunAsync(
+                process.StandardOutput,
+                process.StandardInput,
+                identity,
+                roleName,
+                expectedBootId,
+                cancellationToken,
+                TimeSpan.FromSeconds(5));
+            if (result.RequiresNewGeneration)
+            {
+                TryKill(process);
+                await WaitForExitAsync(process, cancellationToken);
+                _ = await errorTask;
+                return result;
+            }
+
+            if (!result.Accepted) TryKill(process);
+            await WaitForExitAsync(process, cancellationToken);
+            _ = await errorTask;
+            return process.ExitCode == 0 ? result : result with { Accepted = false, RequiresNewGeneration = false };
+        }
+        catch
+        {
+            TryKill(process);
+            throw;
+        }
+    }
+
+    private Process Start(IReadOnlyList<string> arguments, bool redirectInput)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = executablePath,
+            UseShellExecute = false,
+            RedirectStandardInput = redirectInput,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
+        };
+        foreach (var argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        return Process.Start(startInfo) ?? throw new IOException("Docker process did not start.");
+    }
+
+    private static async Task WaitForExitAsync(Process process, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await process.WaitForExitAsync(cancellationToken).WaitAsync(TimeSpan.FromSeconds(30), cancellationToken);
+        }
+        catch
+        {
+            TryKill(process);
+            throw;
+        }
+    }
+
+    private static void TryKill(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+            }
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+}
+
+/// <summary>
+/// 登録済みコンテナの通知と現在状態を照合し、明示選択時だけ識別情報を受け渡します。
+/// </summary>
+internal sealed class ContainerIdentityHandoffService(
+    ResourceNotificationService notifications,
+    IResource registeredResource,
+    string expectedRole,
+    string runId,
+    string contextName,
+    string expectedEngineId,
+    IDockerCommandRunner runner,
+    ILogger<ContainerIdentityHandoffService> logger) : BackgroundService
+{
+    /// <summary>
+    /// 資源イベントを監視し、現在も一致する所有コンテナだけへhandoffします。
+    /// </summary>
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        string? resourceId = null;
+        string? lastContainerId = null;
+        string? lastBootId = null;
+        long generation = 0;
+        var restartObserved = false;
+        await foreach (var observation in notifications.WatchAsync(stoppingToken))
+        {
+            if (!ReferenceEquals(observation.Resource, registeredResource)) continue;
+            resourceId ??= observation.ResourceId;
+            if (!notifications.TryGetCurrentState(resourceId, out var currentState)) continue;
+            if (!string.Equals(currentState.Snapshot.State?.Text, KnownResourceStates.Running, StringComparison.Ordinal))
+            {
+                restartObserved = true;
+                continue;
+            }
+
+            if (!RegisteredContainerEventProjection.TryProject(
+                    registeredResource, resourceId, expectedRole, observation, currentState, out var target))
+                continue;
+
+            if (generation == 0 || restartObserved || !string.Equals(lastContainerId, target!.ContainerId, StringComparison.Ordinal))
+            {
+                generation = checked(generation + 1);
+                lastBootId = null;
+                restartObserved = false;
+            }
+
+            var state = await ContainerIdentityExecHandoff.TryHandoffAsync(
+                target!, runId, generation, lastBootId, contextName, expectedEngineId, runner, stoppingToken);
+            if (state is not null)
+            {
+                generation = state.Generation;
+                lastContainerId = target!.ContainerId;
+                lastBootId = state.BootId;
+            }
+            else
+            {
+                logger.LogWarning("Duck runtime identity handoff did not complete for the current resource state.");
+            }
+        }
+    }
+}
