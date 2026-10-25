@@ -405,7 +405,7 @@ internal sealed class ContainerIdentityHandoffService(
                     continue;
                 }
                 trace?.Record(IdentityHandoffTraceStage.CurrentResourceState, IdentityHandoffTraceOutcome.Accepted);
-                if (!string.Equals(currentState.Snapshot.State?.Text, KnownResourceStates.Running, StringComparison.Ordinal))
+                if (!RegisteredContainerEventProjection.HasStarted(currentState))
                 {
                     trace?.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Rejected);
                     restartObserved = true;

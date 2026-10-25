@@ -28,8 +28,8 @@ internal static class RegisteredContainerEventProjection
             !string.Equals(registeredResource.Name, expectedRoleName, StringComparison.Ordinal) ||
             !string.Equals(observation.ResourceId, registeredResourceId, StringComparison.Ordinal) ||
             !string.Equals(currentState.ResourceId, registeredResourceId, StringComparison.Ordinal) ||
-            !IsRunning(observation) ||
-            !IsRunning(currentState) ||
+            !HasStarted(observation) ||
+            !HasStarted(currentState) ||
             !TryReadContainerId(observation.Snapshot, out var observedContainerId) ||
             !TryReadContainerId(currentState.Snapshot, out var currentContainerId) ||
             !string.Equals(observedContainerId, currentContainerId, StringComparison.Ordinal))
@@ -44,11 +44,15 @@ internal static class RegisteredContainerEventProjection
         return true;
     }
 
-    private static bool IsRunning(ResourceEvent resourceEvent) =>
-        string.Equals(
-            resourceEvent.Snapshot.State?.Text,
-            KnownResourceStates.Running,
-            StringComparison.Ordinal);
+    /// <summary>
+    /// DCPの起動待ちでも、完全なIDを持つ資源はDocker所有照合へ進めます。
+    /// </summary>
+    internal static bool HasStarted(ResourceEvent resourceEvent)
+    {
+        var state = resourceEvent.Snapshot.State?.Text;
+        return string.Equals(state, KnownResourceStates.Running, StringComparison.Ordinal) ||
+            string.Equals(state, "Starting", StringComparison.Ordinal);
+    }
 
     private static bool TryReadContainerId(CustomResourceSnapshot snapshot, out string containerId)
     {

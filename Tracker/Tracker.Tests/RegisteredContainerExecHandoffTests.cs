@@ -15,6 +15,50 @@ public sealed class RegisteredContainerExecHandoffTests
     private const string ContainerId = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     private const string EngineId = "5bc5ab8a-7340-47ba-8b7c-9f645375a54c";
 
+    /// <summary>
+    /// DCPの準備待ち中でも完全なIDがある起動中の資源はDocker所有照合へ進めます。
+    /// </summary>
+    [Theory]
+    [InlineData("Starting", true)]
+    [InlineData("Running", true)]
+    [InlineData("Failed", false)]
+    [InlineData("Stopped", false)]
+    public void StartingResourceCanProjectOnlyWithActiveStateAndFullId(string state, bool expected)
+    {
+        var registered = new ContainerResource(Role, "duck-runtime");
+        var observation = new ResourceEvent(registered, ResourceId, new CustomResourceSnapshot
+        {
+            ResourceType = "container",
+            State = new ResourceStateSnapshot(state, "fixture"),
+            Properties = [new ResourcePropertySnapshot("container.id", ContainerId)],
+        });
+
+        var projected = RegisteredContainerEventProjection.TryProject(
+            registered, ResourceId, Role, observation, observation, out var target);
+
+        Assert.Equal(expected, projected);
+        Assert.Equal(expected ? ContainerId : null, target?.ContainerId);
+    }
+
+    /// <summary>
+    /// DCPの起動中状態でも完全IDが欠ける資源は選択しません。
+    /// </summary>
+    [Fact]
+    public void StartingResourceWithoutFullIdIsRejected()
+    {
+        var registered = new ContainerResource(Role, "duck-runtime");
+        var observation = new ResourceEvent(registered, ResourceId, new CustomResourceSnapshot
+        {
+            ResourceType = "container",
+            State = new ResourceStateSnapshot("Starting", "fixture"),
+            Properties = [],
+        });
+
+        Assert.False(RegisteredContainerEventProjection.TryProject(
+            registered, ResourceId, Role, observation, observation, out var target));
+        Assert.Null(target);
+    }
+
     [Fact]
     public async Task ChecksExplicitEngineAndOwnedFullIdBeforeStructuredExec()
     {
