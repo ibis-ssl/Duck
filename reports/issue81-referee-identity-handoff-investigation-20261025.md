@@ -94,3 +94,17 @@ Issue #81の残り：全体統合、Windows実機受入、G1/G3外部経路、�
 - 結論：**修正後Windows実機は未起動・実機診断値なし・終了処理未実施**。今回新しく作成・停止したAppHostプロセス/コンテナは0件。起動には「固定digestの.NET基底イメージ2件の取得」と「新規有界AppHost一回起動および停止方式」の操作単位ごとの明示許可と安全な実行スクリプトの用意が必要。既存許可だけで依存の取得・設定変更を進めない。承認を得た場合のみ、固定Engine確認→必要な固定版取得→バイナリーSHA照合→4資源を75秒程度起動→CTRL_BREAK・最大120秒→自己所有コンテナのみ後片付け→GET /health/refereeとAPI/Ready/件数の新実測を保存する。
 
 この追加検証は再開後の観測であり、元のIssue #81全体のG1/G3/試合受入/独立レビューや文書全文lintを完了したものではない。
+
+## 2026-10-25 18:52 JST 固定Docker基底キャッシュと実機起動の追加境界
+
+前節ではdocker image inspectで固定.NET10基底2件が未登録と記した。その後、同じdesktop-linux builderでdocker buildx du --verboseを読み取り実行し、aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398caとruntime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3がBuildKitキャッシュにpulled fromとして記録されていることを確認した。従ってimage storeで不在でも、固定基底の新規取得が必須とは断定しない。ただしキャッシュ記録だけで今後のビルドが外部通信しないことまでは保証しない。
+
+- キャッシュ確認 process_id=9gphVB-rWtOxZlhW46DTwgrJtaxUSK-HtVyHUHuujqw、finished/exit0、固定.NET10基底digestの既存キャッシュ記録6件を確認。
+
+- RefereeDriver単独の固定digest既存キャッシュ利用ビルドは成功した。既存Release publishを入力にdocker --context desktop-linux buildx build --pull=false --network=none --loadを実行し、process_id=qjXHXMartvR1iCAlvsZFdtf7vDnnCWA-ZUZ_6JPePLI、親/子の終了コード0、約4.01秒。BuildKitログには固定ASP.NET基底のメタデータ解決、WORKDIR CACHED、1.25MBのローカルCOPY、image exportを記録し、新規レイヤーダウンロード行なし。Dockerイメージ名duck-issue81-refereedriver:c0d748e、イメージID sha256:d165970598c4a57facf0b57d81ee4569eb93fd4e04c263449b9ca59191ed4d82、entrypointはdotnet Duck.Testing.RefereeDriver.Host.dll。ログはWindows RemoteDesktopWorkspace/Duck-pr84-checks-20261025/offline-driver-image.stdout.log/.stderr.log/.exit。これはローカルイメージ作成であり、実コンテナでのReady成功の証拠ではない。
+
+- Duck RuntimeHost側の同様の既存固定.NET Runtime基底を利用したオフラインイメージビルドは、RDMCP process_startでOpenAI安全性チェックにより実行前拒否された。対象はduck-issue81-runtime:c0d748eのビルド、具体的拒否理由の説明なし、process_idなし、実行なし。拒否された同操作をコマンド変更やAppHost起動などで迂回実行しない。
+
+- この直後もdocker ps -a=コンテナ0件、終了コード0。設定・認証・ネットワーク・権限・WSLは変更していない。既存PRの製品コードにも変更なし。
+
+残る検証は拒否されたRuntimeHostイメージビルドと新規4資源の単発AppHost実行である。実機Runを行う場合は追加の操作承認を確認し、simulator/duck/game-controller/referee-driver、RunIdと固定Engine照合、約75秒後CTRL_BREAK、最大120秒停止期限、自己所有コンテナだけの清掃、RefereeDriver自身のGET /health/refereeのidentity/復号件数/GC API/Ready/HTTP状態を新規収集する。旧受信数値と旧503を新実測に流用しない。現時点の修正後Ready=200とGC API状態は未検証で、Issue全体は未完了。
