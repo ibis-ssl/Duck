@@ -42,10 +42,11 @@ public sealed class RegisteredContainerEventProjectionTests
     }
 
     [Fact]
-    public void RejectsNonRunningOrMismatchedCurrentState()
+    public void RejectsTerminalOrMismatchedCurrentState()
     {
         var resource = new ContainerResource(Role, "example/image");
-        AssertRejected(resource, Event(resource, ResourceId, "Starting", NewId), Event(resource, ResourceId, "Starting", NewId));
+        AssertRejected(resource, Event(resource, ResourceId, "Stopped", NewId), Event(resource, ResourceId, "Stopped", NewId));
+        AssertRejected(resource, Event(resource, ResourceId, "Failed", NewId), Event(resource, ResourceId, "Failed", NewId));
         AssertRejected(resource, Event(resource, ResourceId, "Running", NewId), Event(resource, ResourceId, "Stopped", NewId));
     }
 
