@@ -1,0 +1,36 @@
+[
+  {
+    "args": [
+      "ps",
+      "-a",
+      "--no-trunc",
+      "--format",
+      "{{.ID}}|{{.Names}}"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "inspect",
+      "fb7e991c7f5d2eca69d498908ea41a105508cb352318d10178c49ae8d5b12682",
+      "--format",
+      "{{.Id}}|{{.Name}}|{{.State.Status}}|{{json .Config.Labels}}|{{json .NetworkSettings.Networks}}"
+    ],
+    "exit": 1,
+    "stdout": "\n",
+    "stderr": "error: no such object: fb7e991c7f5d2eca69d498908ea41a105508cb352318d10178c49ae8d5b12682\n"
+  },
+  {
+    "args": [
+      "inspect",
+      "d7f3a1792e5493d84256bc90b888bc195ab6e86917cf6bc85225cb4dc30dc661",
+      "--format",
+      "{{.Id}}|{{.Name}}|{{.State.Status}}|{{json .Config.Labels}}|{{json .NetworkSettings.Networks}}"
+    ],
+    "exit": 1,
+    "stdout": "\n",
+    "stderr": "error: no such object: d7f3a1792e5493d84256bc90b888bc195ab6e86917cf6bc85225cb4dc30dc661\n"
+  }
+]
