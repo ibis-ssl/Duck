@@ -119,6 +119,42 @@ public sealed class RegisteredContainerExecHandoffTests
         }
     }
 
+    /// <summary>
+    /// 2つの独立した監視サービスが同じ診断ログへ同時追記しても破損・例外を出しません。
+    /// </summary>
+    [Fact]
+    public void IndependentSafeTracesAppendConcurrentlyWithoutSharingViolations()
+    {
+        var tracePath = Path.Combine(Path.GetTempPath(), $"duck-concurrent-trace-{Guid.NewGuid():N}.jsonl");
+        try
+        {
+            var duckTrace = new SafeIdentityHandoffTrace(tracePath);
+            var refereeTrace = new SafeIdentityHandoffTrace(tracePath);
+            const int recordCount = 512;
+
+            Parallel.For(0, recordCount, index =>
+            {
+                var trace = index % 2 == 0 ? duckTrace : refereeTrace;
+                trace.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Accepted);
+            });
+
+            var lines = File.ReadAllLines(tracePath);
+            Assert.Equal(recordCount, lines.Length);
+            Assert.All(lines, line =>
+            {
+                using var json = System.Text.Json.JsonDocument.Parse(line);
+                Assert.Equal(3, json.RootElement.EnumerateObject().Count());
+                Assert.Equal("ResourceProjection", json.RootElement.GetProperty("stage").GetString());
+                Assert.Equal("Accepted", json.RootElement.GetProperty("outcome").GetString());
+            });
+            Assert.DoesNotContain("duck-concurrent", string.Join("\n", lines));
+        }
+        finally
+        {
+            if (File.Exists(tracePath)) File.Delete(tracePath);
+        }
+    }
+
     [Fact]
     public async Task RuntimeHostBootChangeRetriesWithTheNextGeneration()
     {

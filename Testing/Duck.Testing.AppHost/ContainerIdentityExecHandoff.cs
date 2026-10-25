@@ -47,7 +47,8 @@ internal enum IdentityHandoffTraceOutcome
 /// </summary>
 internal sealed class SafeIdentityHandoffTrace(string filePath)
 {
-    private readonly object sync = new();
+    // Duck/RefereeDriverの監視インスタンス間でも共有ログへのAppendを直列化します。
+    private static readonly object Sync = new();
 
     internal void Record(IdentityHandoffTraceStage stage, IdentityHandoffTraceOutcome outcome)
     {
@@ -57,7 +58,7 @@ internal sealed class SafeIdentityHandoffTrace(string filePath)
             stage = stage.ToString(),
             outcome = outcome.ToString(),
         });
-        lock (sync)
+        lock (Sync)
         {
             File.AppendAllText(filePath, entry + Environment.NewLine, new System.Text.UTF8Encoding(false));
         }
