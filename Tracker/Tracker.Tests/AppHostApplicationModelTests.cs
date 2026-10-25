@@ -154,7 +154,7 @@ public sealed class AppHostApplicationModelTests
         Assert.False(refereeEnvironment.ContainsKey("RefereeDriver__AutoDrive"));
 
         AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
-        AssertWaits(gameController, (duck, WaitType.WaitUntilHealthy));
+        AssertWaits(gameController, (duck, WaitType.WaitUntilStarted));
         AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilStarted));
     }
 

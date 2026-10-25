@@ -222,8 +222,16 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
             "-trackerAddress", "224.5.23.2:11010",
             "-publishAddress", "224.5.23.1:11003",
             "-address", ":8082")
-        .WithHttpEndpoint(targetPort: 8082, name: "game-controller-ui", isProxied: false)
-        .WaitFor(gcVisionDuck);
+        .WithHttpEndpoint(targetPort: 8082, name: "game-controller-ui", isProxied: false);
+    // 診断IDが未確定でもGCはDuckの起動後に開始できる。ブリッジ無効時は既定の健康待ちを残す。
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        gcVisionGameController.WaitForStart(gcVisionDuck);
+    }
+    else
+    {
+        gcVisionGameController.WaitFor(gcVisionDuck);
+    }
     var gcVisionEndpoint = gcVisionGameController.Resource.Annotations
         .OfType<EndpointAnnotation>()
         .Single(endpoint => endpoint.Name == "game-controller-ui");
