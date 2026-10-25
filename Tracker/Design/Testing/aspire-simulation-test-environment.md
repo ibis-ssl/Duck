@@ -278,7 +278,11 @@ Windows の開発環境から、DCP が起動した `debug-host` に接続する
 
 コンテナの開始は通信準備完了ではない。simulatorを先に起動可能にし、その受信者を同時に動かす。Duck／DebugHostの受信を simulator の起動条件にしない。比較追跡器は simulator と Game Controller の準備を待つ。DebugHost の起動を三つの追跡結果受信の後にせず、起動後の比較準備確認で三者の別 識別子 と同じ有限窓内の新しい パケット を要求する。
 
-RefereeDriver は内部 API に接続し、API の状態と11003の審判情報を照合する。各資源の準備確認はブリッジ内で採取した診断を HTTP で DCP／AppHostへ伝える。ホストの旧起動管理で動く `VisionServiceReadiness`、`TrackerPacketReadinessMonitor`、`GameControllerReadinessMonitor` の マルチキャスト受信を残さない。診断の期限切れ、復号失敗、対象IDの変更では準備未完了へ戻す。`WaitFor` は開始順を定め、障害後の自動再起動を保証しない。
+RefereeDriver は内部 API に接続し、API の状態と11003の審判情報を照合する。
+
+`GameControllerVisionOnly` 構成で `Testing:IdentityControl:DesktopBridgeEnabled=true` を選択した場合、Game Controller は Duck の実行開始だけを待ち（`WaitForStart`）、健康状態の成立までは待たない。Duck の診断識別子が未確定な間は `/health/vision` が準備未完了となり、健康状態待ちにすると Game Controller と RefereeDriver の起動前に依存が止まるためである。RefereeDriver は Game Controller の実行開始を待って起動し、その後の GC API 状態と審判情報の照合によって準備判定を行う。ブリッジを有効にしない従来経路では、Game Controller の Duck 健康状態待ちは変更しない。Docker Desktop での実機受入が未成立の間、起動依存の修正を通信や Ready 成立の実証として扱わない。
+
+各資源の準備確認はブリッジ内で採取した診断を HTTP で DCP／AppHostへ伝える。ホストの旧起動管理で動く `VisionServiceReadiness`、`TrackerPacketReadinessMonitor`、`GameControllerReadinessMonitor` の マルチキャスト受信を残さない。診断の期限切れ、復号失敗、対象IDの変更では準備未完了へ戻す。`WaitFor` は開始順を定め、障害後の自動再起動を保証しない。
 
 ```mermaid
 sequenceDiagram

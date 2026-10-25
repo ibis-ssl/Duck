@@ -108,3 +108,25 @@ Issue #81の残り：全体統合、Windows実機受入、G1/G3外部経路、�
 - この直後もdocker ps -a=コンテナ0件、終了コード0。設定・認証・ネットワーク・権限・WSLは変更していない。既存PRの製品コードにも変更なし。
 
 残る検証は拒否されたRuntimeHostイメージビルドと新規4資源の単発AppHost実行である。実機Runを行う場合は追加の操作承認を確認し、simulator/duck/game-controller/referee-driver、RunIdと固定Engine照合、約75秒後CTRL_BREAK、最大120秒停止期限、自己所有コンテナだけの清掃、RefereeDriver自身のGET /health/refereeのidentity/復号件数/GC API/Ready/HTTP状態を新規収集する。旧受信数値と旧503を新実測に流用しない。現時点の修正後Ready=200とGC API状態は未検証で、Issue全体は未完了。
+
+## 2026-10-25 21:34 JST：Windows実機の安全な停止結果とGC起動依存の修正
+
+上記は旧時点の保留状態である。利用者の個別許可後、Duck RuntimeHostを既存BuildKitの固定.NET10基底だけで画像化し、`duck-issue81-runtime:fe3eeef` のビルド終了コード0を確認した。process_id `IVMN5BpXttJHSLg55HVhiX2I0ec1r1vg8OwdnUXC7T0`。ログはWindows `Duck-pr84-checks-20261025/offline-runtime-image.*`。追加pull指示とDocker Desktop設定変更なし。
+
+実機Runの経過は次のとおり。全て公開HEADを開始前に照合し、独立RunIdでWindows AppHostを起動、約75秒でCTRL_BREAK、強制停止なし・AppHost exit0、最終Dockerコンテナ0件を確認した。
+
+| RunId | HEAD | 実機観測 | 受入結果 |
+| --- | --- | --- | --- |
+| `148e5d137195479d8e2974c47fefe94c` | `fe3eeef` | DCPがDocker CLIをPATH上で検出できずコンテナ0。AppHost PID27380 | 審判診断0、未達 |
+| `758027dbfedc463b8293398d8cb1b2c2` | `fe3eeef` | AppHost子PATHのみにDocker CLI場所を追加。simulatorとDuckは起動、GC/Driverなし。AppHost PID30828 | GET診断0、未達 |
+| `ed66819cec354a5b984d053e0a45bb7e` | `68c7b2d` | DCP Startingを候補にする変更後もsimulator/Duckのみ。AppHost PID31588 | GET診断0、未達 |
+
+各実機Runの証拠はWindows `RemoteDesktopWorkspace/issue81-postfix-acceptance-<RunId>/process-result.safe.json` と `identity.safe.jsonl`。前のRunから審判復号件数やHTTP503を転用していない。
+
+ResourceProjectionの全拒否を受けて、完全IDがあるDCP `Starting` だけを後続のDocker実稼働・固定Engine/所有ラベル照合候補にする変更 `68c7b2d` をTDDで追加。先行REDは5件中1失敗、後続GREEN5件。これにより旧テストのStarting拒否期待だけがCIで失敗したため修正 `2d85fb9` をpush。同HEADのCI `40190674986` はtest成功、packet-flow/full-stackはskipである。
+
+さらに四資源のAppHostモデルを精査すると、Bridge明示選択時にもGCがDuckの健康を待つ `WaitFor(gcVisionDuck)` が残っていた。Duckが識別未帰属で503の間GCと後続のRefereeDriverが起動しない構成上の循環である。モデル試験で期待 `WaitUntilStarted` / 実際 `WaitUntilHealthy` の先行RED1件を保存。明示Bridge時のみ `WaitForStart(gcVisionDuck)`、Bridge無効時の `WaitFor(gcVisionDuck)` は維持した。GCモデル/RefereeDriverモデルの2件Green、TRX `Duck-pr84-checks-20261025/pr84-gc-wait-green.trx`、exit0、修正commit `7134755` を通常pushし、設計書「準備完了、依存、停止」に契約を追補した。
+
+**最新GC起動条件の実Docker Desktop受入は未実施**であり、Ready200、GC API観測、審判UDP復号の修正後実測は存在しない。新たな有界単発起動には別途承認を確認し、固定HEAD/Engine/DLL SHA、事前の資源0、RunId、75秒CTRL_BREAK/最大120秒、自己所有資源のみ後片付けと診断を保存する。Windows全体11件の既存FileShare問題、文書全文lint、独立レビュー、packet-flow/full-stackも未完了である。
+
+追加のモデル回帰はWindowsで `AppHostApplicationModelTests` 全体・`RegisteredContainerEventProjectionTests`・`StartingResource` の計45件を実行し、45成功・失敗0・省略0、保存終了コード0。診断は `RemoteDesktopWorkspace/Duck-pr84-checks-20261025/pr84-apphost-model-group.stdout.log` と同名 `.stderr.log` / `.exit` / `.trx`。今回の変更した Markdown は `git diff --check` で検査するが、Windows作業木には既存の `textlint` / `yomiyasu` CLI および `node_modules` が見つからず、新たな依存を導入しないため正式文書lint/yomiyasuの通過を主張しない。
