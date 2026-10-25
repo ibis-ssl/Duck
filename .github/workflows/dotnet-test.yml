@@ -55,6 +55,33 @@ jobs:
           printf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"
           exit "$test_exit_code"
 
+      - name: Test desktop acceptance policy without Docker
+        id: acceptance_policy
+        shell: bash
+        run: |
+          set +e
+          results_dir="$GITHUB_WORKSPACE/artifacts/desktop-acceptance-policy"
+          mkdir -p "$results_dir"
+          python3 --version > "$results_dir/environment.txt" 2>&1
+          git rev-parse HEAD >> "$results_dir/environment.txt"
+          cp scripts/verify_desktop_referee_acceptance.py "$results_dir/"
+          cp scripts/tests/test_desktop_referee_acceptance.py "$results_dir/"
+          python3 -B scripts/tests/test_desktop_referee_acceptance.py \
+            > >(tee "$results_dir/tests.stdout.log") \
+            2> >(tee "$results_dir/tests.stderr.log" >&2)
+          policy_exit_code=$?
+          printf '%s\n' "$policy_exit_code" > "$results_dir/tests.exit-code"
+          exit "$policy_exit_code"
+
+      - name: Upload desktop acceptance policy failure artifact
+        if: ${{ always() && steps.acceptance_policy.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-acceptance-policy-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/desktop-acceptance-policy
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Verify Linux application publish outputs
         id: linux_publish
         shell: bash

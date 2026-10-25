@@ -227,6 +227,13 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
     if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
     {
         gcVisionGameController.WaitForStart(gcVisionDuck);
+        // 標準資源は識別情報の受渡しを行わず、通常終了時の所有ID照合にだけ使う。
+        gcVisionSimulator.WithContainerRuntimeArgs(
+            "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={gcVisionGameControllerOnlyRunId}",
+            "--label", $"{ContainerIdentityExecHandoff.RoleLabel}=simulator");
+        gcVisionGameController.WithContainerRuntimeArgs(
+            "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={gcVisionGameControllerOnlyRunId}",
+            "--label", $"{ContainerIdentityExecHandoff.RoleLabel}=game-controller");
     }
     else
     {

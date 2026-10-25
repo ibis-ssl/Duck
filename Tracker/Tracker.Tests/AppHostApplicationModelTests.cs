@@ -185,7 +185,8 @@ public sealed class AppHostApplicationModelTests
         Assert.False(refereeEnvironment.ContainsKey("Testing__IdentityControl__Enabled"));
         Assert.False(refereeEnvironment.ContainsKey("Testing__IdentityControl__ExpectedRole"));
         Assert.False(refereeEnvironment.ContainsKey("Testing__Diagnostics__RunId"));
-        foreach (var resource in new[] { duck, referee })
+        foreach (var resource in new[] { duck, referee,
+            Assert.IsType<ContainerResource>(Find(appHost, "simulator")), gameController })
         {
             var runtimeArguments = await GetContainerRuntimeArgsAsync(resource);
             Assert.DoesNotContain(runtimeArguments, argument =>
@@ -198,6 +199,28 @@ public sealed class AppHostApplicationModelTests
     }
 
     /// <summary>四資源構成でもDriver自身の実所有識別情報を渡し、Duckと別のwatcherで扱う。</summary>
+    [Fact]
+    public async Task DesktopBridgeLabelsAllFourOwnedResourcesForShutdownEvidence()
+    {
+        const string runId = "model-owned-run";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:GameControllerVisionOnly=true",
+            "--Testing:Diagnostics:RunId=" + runId,
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=5bc5ab8a-7340-47ba-8b7c-9f645375a54c");
+        foreach (var name in new[] { "simulator", "duck", "game-controller", "referee-driver" })
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            var args = await GetContainerRuntimeArgsAsync(resource);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", args);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}={name}", args);
+        }
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Equal(2, services.GetServices<IHostedService>()
+            .OfType<ContainerIdentityHandoffService>().Count());
+    }
+
     [Fact]
     public async Task GameControllerVisionModeConfiguresRefereeDriverIdentityHandoff()
     {
