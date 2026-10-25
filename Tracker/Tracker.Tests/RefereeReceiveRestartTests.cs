@@ -68,6 +68,56 @@ public sealed class RefereeReceiveRestartTests
         }
     }
 
+    /// <summary>受信中に正しいownerを受け渡しても、旧受信試行を再利用せず新しい二件で準備を確立する。</summary>
+    [Fact]
+    public async Task IdentityHandoffDiscardsPendingOldEpochAndContinuesOneReceiver()
+    {
+        var diagnostics = new ServiceReceiveDiagnostics(identity: null, timeProvider: new FixedReceiveClock());
+        var packet = CreatePacket().ToByteArray();
+        var receiver = new ControlledReceiver(packet);
+        await using var service = new RefereeReceiveService(receiver, diagnostics);
+        using var cancellation = new CancellationTokenSource();
+        var run = service.RunAsync(cancellation.Token);
+        try
+        {
+            await WaitForBoundaryAsync(run, receiver.AtReceiveCall(3));
+            var before = Assert.Single(diagnostics.GetSnapshots(RefereeReceiveService.InputId));
+            Assert.Equal(2, before.SuccessfullyDecodedCount);
+            Assert.Null(before.Identity);
+            Assert.False(before.IsReady);
+
+            var identity = new ResourceDiagnosticIdentity("handoff-run", "opaque-resource", new string('a', 64), 1);
+            service.ReplaceIdentity(identity);
+            var rebound = Assert.Single(diagnostics.GetSnapshots(RefereeReceiveService.InputId));
+            Assert.Equal(identity, rebound.Identity);
+            Assert.Equal(0, rebound.SuccessfullyDecodedCount);
+            Assert.False(rebound.IsReady);
+
+            receiver.SupplyDelayedOldEpoch(packet);
+            await WaitForBoundaryAsync(run, receiver.AtReceiveCall(4));
+            Assert.Equal(0, Assert.Single(diagnostics.GetSnapshots(RefereeReceiveService.InputId)).SuccessfullyDecodedCount);
+
+            receiver.Supply(packet);
+            await WaitForBoundaryAsync(run, receiver.AtReceiveCall(5));
+            var first = Assert.Single(diagnostics.GetSnapshots(RefereeReceiveService.InputId));
+            Assert.Equal(1, first.SuccessfullyDecodedCount);
+            Assert.False(first.IsReady);
+
+            receiver.Supply(packet);
+            await WaitForBoundaryAsync(run, receiver.AtReceiveCall(6));
+            var progressed = Assert.Single(diagnostics.GetSnapshots(RefereeReceiveService.InputId));
+            Assert.Equal(2, progressed.SuccessfullyDecodedCount);
+            Assert.True(progressed.IsReady);
+            Assert.Equal(identity, progressed.Identity);
+            Assert.False(run.IsCompleted);
+        }
+        finally
+        {
+            await cancellation.CancelAsync();
+            await WaitForStoppedRunAsync(run, cancellation.Token);
+        }
+    }
+
     /// <summary>取消の正常完了を待ち、想定外のfaultは失敗として伝える。</summary>
     private static async Task WaitForStoppedRunAsync(Task run, CancellationToken cancellationToken)
     {

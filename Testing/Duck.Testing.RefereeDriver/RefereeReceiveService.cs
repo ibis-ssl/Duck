@@ -12,6 +12,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private readonly Func<ReadOnlyMemory<byte>, global::Referee> decode;
     private readonly IAsyncDisposable? ownedReceiver;
     private readonly object lifecycleGate = new();
+    private readonly object epochGate = new();
+    private ServiceReceiveDiagnostics.ReceiveEpoch? currentEpoch;
     private readonly CancellationTokenSource stop = new();
     private Task? activeRun;
     private Task? disposal;
@@ -34,6 +36,22 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         this.diagnostics = diagnostics;
         this.ownedReceiver = ownedReceiver;
         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
+    }
+
+    /// <summary>認証済みの識別情報へ受信世代を切り替え、切替前の未処理入力と保持commandを失効させる。</summary>
+    internal void ReplaceIdentity(ResourceDiagnosticIdentity identity)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        lock (epochGate)
+        {
+            if (diagnostics.Identity == identity) return;
+            var nextEpoch = diagnostics.ReplaceIdentityAndBeginEpoch(identity, InputId);
+            if (currentEpoch is null)
+                diagnostics.EndEpoch(nextEpoch);
+            else
+                currentEpoch = nextEpoch;
+            ClearCommand();
+        }
     }
 
     /// <summary>同時Runを拒否して単一pumpを保ち、終端時に当該世代の準備と実行所有を解除する。</summary>
@@ -60,15 +78,19 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         await start.ConfigureAwait(false);
         using var runCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, stop.Token);
         var receiveCancellation = runCancellation.Token;
-        var epoch = diagnostics.BeginEpoch(InputId);
+        lock (epochGate)
+            currentEpoch = diagnostics.BeginEpoch(InputId);
         ClearCommand();
         try
         {
             while (true)
             {
                 receiveCancellation.ThrowIfCancellationRequested();
+                ServiceReceiveDiagnostics.ReceiveEpoch receiveEpoch;
+                lock (epochGate)
+                    receiveEpoch = currentEpoch ?? throw new InvalidOperationException("受信世代が開始されていません。");
                 var datagram = await receiver.ReceiveAsync(
-                    () => diagnostics.BeginReceive(epoch),
+                    () => diagnostics.BeginReceive(receiveEpoch),
                     receiveCancellation);
                 global::Referee packet;
                 try
@@ -95,13 +117,21 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                     remoteEndpoint: endpoint))
                 {
                     PublishCommand(new(packet.Command, packet.CommandCounter, packet.Yellow?.Name ?? ""),
-                        endpoint, epoch.Number, acceptedCount);
+                        endpoint, receiveEpoch.Number, acceptedCount);
                 }
             }
         }
         finally
         {
-            try { diagnostics.EndEpoch(epoch); }
+            try
+            {
+                lock (epochGate)
+                {
+                    if (currentEpoch is { } epoch)
+                        diagnostics.EndEpoch(epoch);
+                    currentEpoch = null;
+                }
+            }
             finally { ClearCommand(); }
         }
     }
