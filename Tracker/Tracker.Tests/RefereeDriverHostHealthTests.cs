@@ -147,6 +147,79 @@ public sealed class RefereeDriverHostHealthTests
         Assert.Equal(0, fixture.Core.Api.SendCalls);
     }
 
+    /// <summary>専用Unixソケット上でも正しい役割とBootIdのcommitだけが帰属を確定できる。</summary>
+    [Theory]
+    [InlineData("referee-driver", true, false)]
+    [InlineData("unrelated-service", false, false)]
+    [InlineData("referee-driver", false, true)]
+    public async Task IdentityControlCommitsOnlyTheExpectedRole(
+        string suppliedRole, bool expectedAcceptance, bool invalidBootId)
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"duck-referee-{Guid.NewGuid():N}.sock");
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:Diagnostics:RunId"] = "driver-handoff-run",
+            ["Testing:IdentityControl:ExpectedRole"] = "referee-driver",
+        }).Build();
+        var identity = new ResourceDiagnosticIdentity(
+            "driver-handoff-run", "opaque-driver-resource", new string('c', 64), 1);
+        var diagnostics = new ServiceReceiveDiagnostics();
+        await using var receiver = new RefereeReceiveService(new FixtureReceiver(), diagnostics);
+        using var server = new RefereeIdentityControlHostedService(configuration, receiver, diagnostics, path);
+        await server.StartAsync(CancellationToken.None);
+        try
+        {
+            using var socket = new System.Net.Sockets.Socket(
+                System.Net.Sockets.AddressFamily.Unix,
+                System.Net.Sockets.SocketType.Stream,
+                System.Net.Sockets.ProtocolType.Unspecified);
+            await socket.ConnectAsync(new System.Net.Sockets.UnixDomainSocketEndPoint(path));
+            using var stream = new System.Net.Sockets.NetworkStream(socket, ownsSocket: false);
+            using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, false, 1024, leaveOpen: true);
+            using var writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false), 1024, leaveOpen: true)
+            {
+                AutoFlush = true,
+            };
+            var proposed = new RefereeIdentityControlMessage
+            {
+                Type = "prepare", RunId = identity.RunId, ResourceId = identity.ResourceId,
+                RoleName = suppliedRole, ContainerId = identity.ContainerId, Generation = identity.Generation,
+            };
+            await writer.WriteLineAsync(JsonSerializer.Serialize(proposed,
+                RefereeIdentityControlProtocol.JsonOptions));
+            var firstLine = await reader.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.NotNull(firstLine);
+            var response = JsonSerializer.Deserialize<RefereeIdentityControlMessage>(firstLine,
+                RefereeIdentityControlProtocol.JsonOptions);
+            Assert.NotNull(response);
+            if (suppliedRole == "referee-driver")
+            {
+                Assert.Equal("challenge", response.Type);
+                Assert.False(string.IsNullOrWhiteSpace(response.BootId));
+                var commit = new RefereeIdentityControlMessage
+                {
+                    Type = "commit", ExpectedBootId = invalidBootId ? "stale-boot" : response.BootId,
+                    RunId = identity.RunId, ResourceId = identity.ResourceId,
+                    RoleName = suppliedRole, ContainerId = identity.ContainerId, Generation = identity.Generation,
+                };
+                await writer.WriteLineAsync(JsonSerializer.Serialize(commit,
+                    RefereeIdentityControlProtocol.JsonOptions));
+                var resultLine = await reader.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(5));
+                Assert.NotNull(resultLine);
+                response = JsonSerializer.Deserialize<RefereeIdentityControlMessage>(resultLine,
+                    RefereeIdentityControlProtocol.JsonOptions);
+            }
+            Assert.Equal("result", response!.Type);
+            Assert.Equal(expectedAcceptance, response.Accepted);
+            Assert.Equal(expectedAcceptance ? identity : null, diagnostics.Identity);
+        }
+        finally
+        {
+            await server.StopAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.False(File.Exists(path));
+        }
+    }
+
     private static WebApplicationBuilder CreateBuilder(string? enabled, bool container)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions

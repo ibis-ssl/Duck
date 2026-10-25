@@ -1,5 +1,9 @@
 using System.Net;
+using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using Duck.Testing.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,6 +60,8 @@ internal static class RefereeDriverApplication
         builder.Services.AddSingleton(provider => new RefereeApiMatcher(
             provider.GetRequiredService<RefereeReceiveService>(),
             provider.GetRequiredService<GameControllerStateObserver>()));
+        if (bool.TryParse(configuration["Testing:IdentityControl:Enabled"], out var identityEnabled) && identityEnabled)
+            builder.Services.AddHostedService<RefereeIdentityControlHostedService>();
         builder.Services.AddHostedService<RefereeObservationWorker>();
         if (bool.TryParse(configuration["RefereeDriver:AutoDriveToActive"], out var autoDrive) && autoDrive)
         {
@@ -188,3 +194,259 @@ internal sealed record RefereeDriverReceiverLease(
 internal sealed record RefereeDriverTransportFactories(
     Func<RefereeUdpReceiverOptions, RefereeDriverReceiverLease> CreateReceiver,
     Func<Uri, CancellationToken, Task<WebSocket>> ConnectWebSocket);
+
+/// <summary>RefereeDriver内だけで使う所有情報制御のメッセージ。</summary>
+internal sealed class RefereeIdentityControlMessage
+{
+    public string? Type { get; init; }
+    public string? BootId { get; init; }
+    public string? ExpectedBootId { get; init; }
+    public string? RunId { get; init; }
+    public string? ResourceId { get; init; }
+    public string? RoleName { get; init; }
+    public string? ContainerId { get; init; }
+    public long Generation { get; init; }
+    public bool Accepted { get; init; }
+}
+
+/// <summary>既存のprepare/challenge/commit形式をRefereeDriver専用Unixソケットへ中継する。</summary>
+internal static class RefereeIdentityControlProtocol
+{
+    internal const string SocketPath = "/tmp/duck-referee-identity.sock";
+    internal static readonly JsonSerializerOptions JsonOptions =
+        new(JsonSerializerDefaults.Web);
+    private const int MaxFrameCharacters = 64 * 1024;
+    private static readonly TimeSpan StageDeadline = TimeSpan.FromSeconds(5);
+
+    internal static bool IsRelayCommand(string[] args) =>
+        args.Length == 1 && string.Equals(args[0], "--identity-control", StringComparison.Ordinal);
+
+    /// <summary>全フレームの長さと待機時間を制限し、途中の切断を未完了として返す。</summary>
+    internal static async Task<string?> ReadFrameAsync(TextReader reader, CancellationToken cancellationToken)
+    {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(StageDeadline);
+        var buffer = new char[1];
+        var value = new StringBuilder();
+        try
+        {
+            while (true)
+            {
+                var count = await reader.ReadAsync(buffer.AsMemory(), deadline.Token).ConfigureAwait(false);
+                if (count == 0) return value.Length == 0 ? null : value.ToString();
+                if (buffer[0] == '\n')
+                {
+                    if (value.Length > 0 && value[^1] == '\r') value.Length--;
+                    return value.ToString();
+                }
+                if (value.Length >= MaxFrameCharacters)
+                    throw new InvalidDataException("制御フレームの長さが上限を超えました。");
+                value.Append(buffer[0]);
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException("所有情報制御の応答期限を超えました。");
+        }
+    }
+
+    internal static async Task WriteFrameAsync(TextWriter writer, RefereeIdentityControlMessage message,
+        CancellationToken cancellationToken)
+    {
+        await writer.WriteLineAsync(JsonSerializer.Serialize(message, JsonOptions).AsMemory(), cancellationToken)
+            .ConfigureAwait(false);
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>短命のdocker execプロセスは所有情報を決定せず、同じソケットの入出力だけを中継する。</summary>
+    internal static async Task<int> RelayAsync(TextReader input, TextWriter output,
+        string socketPath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var prepare = await ReadFrameAsync(input, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(prepare)) return 2;
+            using var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            using (var connectionDeadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            {
+                connectionDeadline.CancelAfter(StageDeadline);
+                await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketPath), connectionDeadline.Token)
+                    .ConfigureAwait(false);
+            }
+            using var stream = new NetworkStream(socket, ownsSocket: false);
+            using var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true);
+            using var writer = new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true)
+            {
+                AutoFlush = true,
+            };
+            await writer.WriteLineAsync(prepare.AsMemory(), cancellationToken).ConfigureAwait(false);
+            var challenge = await ReadFrameAsync(reader, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(challenge)) return 3;
+            await output.WriteLineAsync(challenge.AsMemory(), cancellationToken).ConfigureAwait(false);
+            await output.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+            var commit = await ReadFrameAsync(input, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(commit)) return 2;
+            await writer.WriteLineAsync(commit.AsMemory(), cancellationToken).ConfigureAwait(false);
+            var result = await ReadFrameAsync(reader, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(result)) return 3;
+            await output.WriteLineAsync(result.AsMemory(), cancellationToken).ConfigureAwait(false);
+            await output.FlushAsync(cancellationToken).ConfigureAwait(false);
+            return JsonSerializer.Deserialize<RefereeIdentityControlMessage>(result, JsonOptions)?.Accepted == true ? 0 : 1;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return 130; }
+        catch (Exception exception) when (exception is
+            IOException or SocketException or JsonException or TimeoutException or InvalidDataException or OperationCanceledException)
+        {
+            return 1;
+        }
+    }
+}
+
+
+/// <summary>明示したRunIdと役割に対する同一接続のcommitだけでRefereeDriverの帰属を確定する。</summary>
+internal sealed class RefereeIdentityControlHostedService(
+    IConfiguration configuration,
+    RefereeReceiveService receiver,
+    ServiceReceiveDiagnostics diagnostics,
+    string? socketPath = null) : BackgroundService
+{
+    private readonly TaskCompletionSource started = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly string path = socketPath ?? RefereeIdentityControlProtocol.SocketPath;
+    private readonly string bootId = Guid.NewGuid().ToString("N");
+    private ResourceDiagnosticIdentity? acceptedIdentity = diagnostics.Identity;
+    private string? boundResourceId = configuration["Testing:Diagnostics:ResourceId"];
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await base.StartAsync(cancellationToken).ConfigureAwait(false);
+        await started.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>自身のソケットだけを所有し、異常な1接続で受付を止めない。</summary>
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        Socket? listener = null;
+        var ownsPath = false;
+        try
+        {
+            var runId = configuration["Testing:Diagnostics:RunId"];
+            var role = configuration["Testing:IdentityControl:ExpectedRole"];
+            if (string.IsNullOrWhiteSpace(runId) ||
+                (string.IsNullOrWhiteSpace(role) && string.IsNullOrWhiteSpace(boundResourceId)))
+                throw new InvalidOperationException("識別情報制御には実行IDと資源役割または資源IDが必要です。");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            if (File.Exists(path))
+                throw new IOException("所有情報制御ソケットが既に存在します。");
+            listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            listener.Bind(new UnixDomainSocketEndPoint(path));
+            ownsPath = true;
+            listener.Listen(8);
+            started.TrySetResult();
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                Socket client;
+                try { client = await listener.AcceptAsync(stoppingToken).ConfigureAwait(false); }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
+                catch (ObjectDisposedException) when (stoppingToken.IsCancellationRequested) { break; }
+                try { await HandleClientAsync(client, runId!, role, stoppingToken).ConfigureAwait(false); }
+                catch (Exception error) when (error is IOException or SocketException or
+                    JsonException or TimeoutException or InvalidDataException)
+                {
+                    // 個別接続の切断や不正フレームから所有情報を復元しない。
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            started.TrySetException(exception);
+            if (exception is not OperationCanceledException || !stoppingToken.IsCancellationRequested)
+                throw;
+        }
+        finally
+        {
+            listener?.Dispose();
+            if (ownsPath && File.Exists(path))
+                File.Delete(path);
+        }
+    }
+
+    /// <summary>prepareでは帰属を変更せず、challengeで固定したBootIdを同じcommitに要求する。</summary>
+    private async Task HandleClientAsync(Socket client, string expectedRunId,
+        string? expectedRole, CancellationToken cancellationToken)
+    {
+        using (client)
+        using (var stream = new NetworkStream(client, ownsSocket: false))
+        using (var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true))
+        using (var writer = new StreamWriter(stream, new UTF8Encoding(false), 1024, leaveOpen: true)
+        {
+            AutoFlush = true,
+        })
+        {
+            var prepare = Deserialize(await RefereeIdentityControlProtocol.ReadFrameAsync(reader, cancellationToken)
+                .ConfigureAwait(false));
+            var proposed = ParseIdentity(prepare);
+            if (prepare?.Type != "prepare" || proposed is null ||
+                !IsExpected(proposed, prepare.RoleName, expectedRunId, expectedRole))
+            {
+                await RefereeIdentityControlProtocol.WriteFrameAsync(writer,
+                    new() { Type = "result", Accepted = false }, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            await RefereeIdentityControlProtocol.WriteFrameAsync(writer,
+                new() { Type = "challenge", BootId = bootId }, cancellationToken).ConfigureAwait(false);
+            var commit = Deserialize(await RefereeIdentityControlProtocol.ReadFrameAsync(reader, cancellationToken)
+                .ConfigureAwait(false));
+            var committed = ParseIdentity(commit);
+            var accepted = commit?.Type == "commit" && committed == proposed &&
+                string.Equals(commit.ExpectedBootId, bootId, StringComparison.Ordinal) &&
+                string.Equals(commit.RoleName, prepare.RoleName, StringComparison.Ordinal) &&
+                IsExpected(proposed, commit.RoleName, expectedRunId, expectedRole) &&
+                TryAccept(proposed);
+            await RefereeIdentityControlProtocol.WriteFrameAsync(writer,
+                new() { Type = "result", Accepted = accepted }, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>同一識別子の再送は無操作とし、資源切替・世代後退・別実行を拒否する。</summary>
+    private bool TryAccept(ResourceDiagnosticIdentity identity)
+    {
+        if (acceptedIdentity == identity) return true;
+        if (acceptedIdentity is { } previous &&
+            (identity.RunId != previous.RunId ||
+             identity.ResourceId != previous.ResourceId ||
+             identity.Generation <= previous.Generation))
+            return false;
+        receiver.ReplaceIdentity(identity);
+        acceptedIdentity = identity;
+        boundResourceId ??= identity.ResourceId;
+        return true;
+    }
+
+    private bool IsExpected(ResourceDiagnosticIdentity identity, string? roleName,
+        string runId, string? role) =>
+        string.Equals(identity.RunId, runId, StringComparison.Ordinal) &&
+        (boundResourceId is null ||
+         string.Equals(identity.ResourceId, boundResourceId, StringComparison.Ordinal)) &&
+        (string.IsNullOrWhiteSpace(role) ||
+         string.Equals(roleName, role, StringComparison.Ordinal));
+
+    private static RefereeIdentityControlMessage? Deserialize(string? line) =>
+        string.IsNullOrWhiteSpace(line)
+            ? null
+            : JsonSerializer.Deserialize<RefereeIdentityControlMessage>(
+                line, RefereeIdentityControlProtocol.JsonOptions);
+
+    private static ResourceDiagnosticIdentity? ParseIdentity(RefereeIdentityControlMessage? message)
+    {
+        if (message is null) return null;
+        try
+        {
+            return new ResourceDiagnosticIdentity(
+                message.RunId!, message.ResourceId!, message.ContainerId!, message.Generation);
+        }
+        catch (ArgumentException) { return null; }
+    }
+}

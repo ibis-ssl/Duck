@@ -2,6 +2,8 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Xml.Linq;
 
 namespace Tracker.Tests;
@@ -154,6 +156,37 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
         AssertWaits(gameController, (duck, WaitType.WaitUntilHealthy));
         AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilStarted));
+    }
+
+    /// <summary>四資源構成でもDriver自身の実所有識別情報を渡し、Duckと別のwatcherで扱う。</summary>
+    [Fact]
+    public async Task GameControllerVisionModeConfiguresRefereeDriverIdentityHandoff()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:GameControllerVisionOnly=true",
+            "--RefereeDriver:Enabled=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=5bc5ab8a-7340-47ba-8b7c-9f645375a54c");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var referee = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        var environment = await GetResourceEnvironmentAsync(referee);
+        var runId = Assert.IsType<string>(duckEnvironment["Testing__Diagnostics__RunId"].ToString());
+        Assert.Equal(runId, environment["Testing__Diagnostics__RunId"].ToString());
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("referee-driver", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.False(environment.ContainsKey("Testing__Diagnostics__ResourceId"));
+        Assert.False(environment.ContainsKey("Testing__Diagnostics__ContainerId"));
+        Assert.False(environment.ContainsKey("Testing__Diagnostics__Generation"));
+
+        var args = await GetContainerRuntimeArgsAsync(referee);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", args);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=referee-driver", args);
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Equal(2, services.GetServices<IHostedService>()
+            .OfType<ContainerIdentityHandoffService>().Count());
     }
 
     [Fact]

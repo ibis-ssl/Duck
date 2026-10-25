@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
@@ -24,7 +25,9 @@ static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) &&
 /// <summary>
 /// 明示選択された場合だけ、所有ラベルと診断受渡しの常駐サービスを構成します。
 /// </summary>
-void EnableDesktopIdentityBridge(IResourceBuilder<ContainerResource> resource, string runId, string role)
+void EnableDesktopIdentityBridge(
+    IResourceBuilder<ContainerResource> resource, string runId, string role,
+    string executableAssembly = "Tracker.RuntimeHost.dll")
 {
     if (!IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
     {
@@ -47,7 +50,8 @@ void EnableDesktopIdentityBridge(IResourceBuilder<ContainerResource> resource, s
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
-    builder.Services.AddHostedService(serviceProvider => new ContainerIdentityHandoffService(
+    // 同じ具象型のwatcherを複数登録できるよう、資源ごとに独立したIHostedServiceを追加する。
+    builder.Services.AddSingleton<IHostedService>(serviceProvider => new ContainerIdentityHandoffService(
         serviceProvider.GetRequiredService<ResourceNotificationService>(),
         resource.Resource,
         role,
@@ -56,7 +60,7 @@ void EnableDesktopIdentityBridge(IResourceBuilder<ContainerResource> resource, s
         expectedEngineId,
         new DockerCliCommandRunner(dockerExecutable),
         serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
-        builder.Configuration["Testing:IdentityControl:SafeTracePath"]));
+        builder.Configuration["Testing:IdentityControl:SafeTracePath"], executableAssembly));
 }
 
 static string FindRepositoryRoot()
@@ -226,11 +230,20 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
     gcVisionEndpoint.Port = null;
     gcVisionEndpoint.TargetHost = "127.0.0.1";
 
-    AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+    var gcVisionRefereeDriver = AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
         .WithEnvironment("RefereeDriver__Enabled", "true")
         .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WaitForStart(gcVisionGameController);
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        gcVisionRefereeDriver
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
+            .WithEnvironment("Testing__Diagnostics__RunId", gcVisionGameControllerOnlyRunId);
+        EnableDesktopIdentityBridge(gcVisionRefereeDriver, gcVisionGameControllerOnlyRunId,
+            "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
+    }
 
     builder.Build().Run();
     return 0;
@@ -343,11 +356,20 @@ var gameController = builder.AddDockerWrapper(
 if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
     IsEnabled(builder.Configuration["Testing:ContainerMode"]))
 {
-    AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+    var refereeDriver = AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
         .WithEnvironment("RefereeDriver__Enabled", "true")
         .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WaitFor(gameController);
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        refereeDriver
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
+            .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+        EnableDesktopIdentityBridge(refereeDriver, duckRunId,
+            "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
+    }
 }
 
 IResourceBuilder<ExecutableResource>? cm4Simulator = null;

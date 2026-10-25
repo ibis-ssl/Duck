@@ -214,6 +214,12 @@ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の�
 
 接続先に利用者情報や断片識別子を含めない。コンテナ用構成では127.0.0.1や::1等の自身を指す接続先、既知の自身の名前、資源IDと同じホスト名、診断用39110を指す宛先を起動前に拒否する。コンテナ用でない明示構成の127.0.0.1接続と、既存の制御機能の公開既定値は維持する。
 
+### Desktop BridgeでのRefereeDriver帰属確定
+
+四資源構成などで`Testing:IdentityControl:DesktopBridgeEnabled=true`を明示した場合、AppHostはRefereeDriverにもDuckと同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker Engine IDを照合し、対象コンテナだけに`dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control`を実行する。RuntimeHost側と同じprepare/challenge/commitの契約を使い、RefereeDriver側の専用Unixソケット`/tmp/duck-referee-identity.sock`で受け付ける。ソケットはコンテナ外へ公開せず、既存のUDP通信・GC API接続先・Docker Desktop構成を変更しない。
+
+受信開始時点ではコンテナIDと資源キーが未確定でもよいが、帰属は未成立とする。受信中に正しい識別情報がcommitされた時だけ、既存の単一受信処理の世代を切り替え、旧試行と保持中の指令を無効化する。切替後の新しい正常復号件数が増加するまで準備完了にしない。同じ識別情報の再送は冪等とし、RunId・資源キー不一致、世代後退、BootIdの不一致は拒否する。RefereeDriver未選択時またはブリッジ無効時は新しい監視・制御口を起動しない。この受渡しは所有コンテナを照合した実装経路であり、実機でのReady・GC API対応成立は別途検証する。
+
 ### 自身の受信診断と状態照合
 
 `GET /health/referee` は自身の受信証跡とAPI状態の現在の照合を返す。一致して準備完了の場合だけ200とし、帰属不明、入力なし、復号失敗、未知の経過時間、期限切れ、状態不一致では503とする。

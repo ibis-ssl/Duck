@@ -81,7 +81,8 @@ internal static class ContainerIdentityExecHandoff
         string expectedEngineId,
         IDockerCommandRunner runner,
         CancellationToken cancellationToken,
-        SafeIdentityHandoffTrace? trace = null)
+        SafeIdentityHandoffTrace? trace = null,
+        string executableAssembly = "Tracker.RuntimeHost.dll")
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(runner);
@@ -91,7 +92,9 @@ internal static class ContainerIdentityExecHandoff
             string.IsNullOrWhiteSpace(runId) ||
             string.IsNullOrWhiteSpace(contextName) ||
             string.IsNullOrWhiteSpace(expectedEngineId) ||
-            generation <= 0)
+            generation <= 0 ||
+            (executableAssembly != "Tracker.RuntimeHost.dll" &&
+             executableAssembly != "Duck.Testing.RefereeDriver.Host.dll"))
         {
             return null;
         }
@@ -123,7 +126,7 @@ internal static class ContainerIdentityExecHandoff
             var arguments = new[]
             {
                 "--context", contextName, "exec", "-i", target.ContainerId,
-                "dotnet", "Tracker.RuntimeHost.dll", "--identity-control",
+                "dotnet", executableAssembly, "--identity-control",
             };
             trace?.Record(IdentityHandoffTraceStage.IdentityExec, IdentityHandoffTraceOutcome.Started);
             var identity = new ResourceDiagnosticIdentity(runId, target.ResourceId, target.ContainerId, generation);
@@ -333,7 +336,8 @@ internal sealed class ContainerIdentityHandoffService(
     string expectedEngineId,
     IDockerCommandRunner runner,
     ILogger<ContainerIdentityHandoffService> logger,
-    string? safeTracePath = null) : BackgroundService, IHostedLifecycleService
+    string? safeTracePath = null,
+    string executableAssembly = "Tracker.RuntimeHost.dll") : BackgroundService, IHostedLifecycleService
 {
     private readonly object startupLock = new();
     private Task? startupTask;
@@ -424,7 +428,8 @@ internal sealed class ContainerIdentityHandoffService(
                 }
 
                 var state = await ContainerIdentityExecHandoff.TryHandoffAsync(
-                    target!, runId, generation, lastBootId, contextName, expectedEngineId, runner, stoppingToken, trace);
+                    target!, runId, generation, lastBootId, contextName, expectedEngineId, runner,
+                    stoppingToken, trace, executableAssembly);
                 if (state is not null)
                 {
                     generation = state.Generation;
