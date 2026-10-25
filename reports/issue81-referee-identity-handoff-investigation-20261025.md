@@ -60,3 +60,37 @@ Issue #81の残り：全体統合、Windows実機受入、G1/G3外部経路、�
 文書検査：今回の作業ツリーにはtextlintのnode_modulesと対応venvが無いことを確認。既存別配置のlint資材を確認する読取も安全性チェックで実行前拒否されたため、依存インストールや別経路の迂回はせず、今回の追補について正式文書lint合格を主張しない。
 
 拒否があった操作、対象、理由非提示、実行前未実行はTodoに保持。古いRunの成果と新しい修正・局所テストを混同しない。
+
+## 2026-10-25 17:32 JST 再開後追加検証：Windows全体テストの失敗11件
+
+対象HEAD：`b935cd52f91fd4aa12d232bde092cb1c9f8ea154`。開始時に作業木clean、PR #84 Open/Draft、head SHA一致、関係するAppHost/dotnet稼働プロセス0を確認。先行のWindows全体テストは840件中829件成功・11件失敗・0件省略だった。今回は失敗11件だけを全件再実行し、11件すべて失敗を再現した。試験コマンドはWindowsの既存`Tracker.Tests.dll`を用いた`dotnet test --no-build --no-restore --filter （以下11件のOR条件） --logger console;verbosity=detailed`、process_id=`Rp4RD9ZOStfy5YxxEqKRJ6hRgvyiVQ_2e03Ilzsl_6M`、終了コード1。新たな試験stdout/stderrとTRXは、Windows`RemoteDesktopWorkspace/Duck-pr84-checks-20261025/capture-11detail.stdout.log`、`capture-11detail.stderr.log`、`pr84-win11-focused.trx`に保存した。旧TRXの抽出操作（実行前拒否）とは別の新規試験であり、その拒否を無断再試行していない。
+
+| 既存テスト（`Tracker.Tests.`以下） | テストの期待結果 | Windowsでの実際の結果 |
+| --- | --- | --- |
+| `VisionPacketCaptureTests.DiagnosticsSampleCaptureLoop_WhenCaptureEnabled_WritesSamplesWithoutHomeUi` | UIなしCaptureOnで診断サンプルのフレーム・件数を読み戻せる | `diagnostics-samples.jsonl`の読取開始でIOException |
+| `VisionPacketCaptureTests.Capture_WhenEnabled_WritesDiagnosticsSampleSidecarMetadataAndRecords` | metadata件数2・フレーム番号3000/4000などを検証 | `diagnostics-samples.jsonl`読取開始でIOException |
+| `TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary` | own/external/unknownの3記録と集計を検証 | `tracker-packet-snapshots.jsonl`読取開始でIOException |
+| `TrackerRuntimeRegistrationTddTests.CaptureOn_LiveUdpReceiver_WritesOwnExternalAndUnknownPacketsToSessionSidecar` | UDPから3種の追跡記録を読み戻せる | `tracker-packet-snapshots.jsonl`読取開始でIOException |
+| `TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_KeepsOwnExternalAndUnknownPackets` | 3種の送信元を保持・復元できる | `tracker-packet-snapshots.jsonl`読取開始でIOException |
+| `TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_WritesTrackerConnectionLibPacketToSidecar` | 実追跡packetの副記録を読める | `tracker-packet-snapshots.jsonl`読取開始でIOException |
+| `TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_PassesRawPayloadForReplayComparison` | 比較・再生用のraw payloadが一致する | `tracker-packet-snapshots.jsonl`読取開始でIOException |
+| `TrackerLiveExternalTrackerReceiverTddTests.CaptureOnOffReOn_LiveTrackerConnection_WritesDifferentSessionsToDifferentFolders` | Off→Onで2つの別sessionに記録される | `tracker-packet-snapshots.jsonl`読取開始でIOException |
+| `TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesLatestSnapshotForEachSourceOnFastTrackerTick` | 入力元ごとの最新スナップショットを復元できる | `tracker-snapshot-alignment.jsonl`読取開始でIOException |
+| `TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata` | 別sidecar・metadataとその記録が整合する | `tracker-snapshot-alignment.jsonl`読取開始でIOException |
+| `TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesFastestSourceCadenceRecordsWithHeldRenderFrame` | 最速入力周期と表示フレーム保持の記録が一致する | `tracker-snapshot-alignment.jsonl`読取開始でIOException |
+
+上表の11件の実例外はすべて`System.IO.IOException: The process cannot access the file ... because it is being used by another process.`、スタックは`File.ReadLines`から各`ReadRecords`へ遷移する。値・件数・payloadのアサーションに到達していないため、それらの期待値不一致があったと主張しない。`DiagnosticsSampleLogReader`（`DiagnosticsSampleLog.cs:166`）、`TrackerPacketSnapshotLogReader.cs:38`、`TrackerSnapshotAlignmentLogReader.cs:27`の3種は`File.ReadLines`。対応するwriterは`FileStream(FileMode.CreateNew, FileAccess.Write, FileShare.Read)`で開き続ける。Windowsではreader側の共有方式が既存writerの書込アクセスを許可せず開けない。Linux上の同HEAD標準CI成功とも整合する、**既存実装とWindowsファイル共有の組合せ**が原因と判定する。
+
+`git diff 27288a7c1693defa619ce92a25678c92ad6f805f..b935cd52f91fd4aa12d232bde092cb1c9f8ea154`の該当3 reader/writerと旧テスト群は差分0、少なくとも`TrackerPacketSnapshotLogReader`は2026-05-15の既存commit `0e599c0b`から残っている。今回の`RefereeReceiveService`・AppHost識別情報受渡しコミットによる失敗ではない。**今回の機能修正に起因するテスト失敗なし**と判定するが、Windows全体テスト成功とはせず、上記の既存Windows互換性問題は未修正。今回のIssue #81の識別情報受渡しとは独立するDebugHost保存読み戻しの変更を無断で追加しない。
+
+## 2026-10-25 17:32 JST Windows実機受入の実行前照合
+
+- 対象同HEADの標準GitHub CI `40169785227`は`test=success`、`ASPIRE-NET-002 Linux packet flow=skipped`、`ASPIRE full-stack Linux acceptance=skipped`。今回Windows全体テストとCIはOS・検査範囲が異なるため混同しない。
+- 以前の実機run `605d805951d740c6a6c3f87701fa84ee`の保存済`process-result.safe.json`は、Docker Engine一致、75秒CTRL_BREAK、AppHost exit0、forcedTreeStop=false、deadlineObserved=falseを示す。これは修正前の実測で、今回の修正後Readyを示さない。
+- 既存のDocker Desktop実体`C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe`に`--context desktop-linux`を付けた**読み取り専用**確認では、Engine ID `5bc5ab8a-7340-47ba-8b7c-9f645375a54c`、`docker ps -a`は0件、exit0。固定シミュレータ`f505fcb...`とGC`d62d772...`は既存image一覧にある。
+- 実機Docker buildへ供する`Testing/Duck.Testing.RefereeDriver.Host`と`Tracker/Tracker.RuntimeHost`のRelease publishは両方`dotnet publish -c Release --no-restore`で既存キャッシュのみから成功し、終了コード0、標準エラーなし。配布物は各`bin/Release/net10.0/publish`。証拠はWindows`RemoteDesktopWorkspace/Duck-pr84-checks-20261025/{referee,runtime}-release-publish.stdout.log/.stderr.log/.exit`。この生成はコンテナ起動や新規依存取得ではない。
+- Dockerfileに固定された`mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca`と`mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3`の2つは、`docker image inspect`でローカル未発見。既存image一覧にも.NET基底イメージが無い。これらを自動pullするDocker buildは未承認の依存取得となり得るため、**実行していない**。
+- 既存診断取得スクリプト`RemoteDesktopWorkspace/issue81-referee-health-probe-20261025.ps1`は`-RunOnce`を要求し、RefereeDriverコンテナ内の`GET /health/referee`を65秒以内で取得する。旧実機runの有界AppHost起動スクリプトの正確なファイル名・ソースSHAは、既存Todo・既知レポート・Workspace直下のスクリプト・旧run専用フォルダでは特定できなかった。過去の単発許可が消費済みなので新規起動を無制限に許可したと解釈しない。
+- 結論：**修正後Windows実機は未起動・実機診断値なし・終了処理未実施**。今回新しく作成・停止したAppHostプロセス/コンテナは0件。起動には「固定digestの.NET基底イメージ2件の取得」と「新規有界AppHost一回起動および停止方式」の操作単位ごとの明示許可と安全な実行スクリプトの用意が必要。既存許可だけで依存の取得・設定変更を進めない。承認を得た場合のみ、固定Engine確認→必要な固定版取得→バイナリーSHA照合→4資源を75秒程度起動→CTRL_BREAK・最大120秒→自己所有コンテナのみ後片付け→GET /health/refereeとAPI/Ready/件数の新実測を保存する。
+
+この追加検証は再開後の観測であり、元のIssue #81全体のG1/G3/試合受入/独立レビューや文書全文lintを完了したものではない。
