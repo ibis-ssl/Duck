@@ -158,6 +158,45 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilStarted));
     }
 
+    /// <summary>
+    /// ブリッジが未指定または明示的に無効なら、従来の健康待ちと識別情報サービス未登録を維持します。
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task GameControllerVisionModeWithoutDesktopBridgeKeepsHealthWaitAndNoHandoffService(
+        bool explicitlyDisabled)
+    {
+        string[] arguments = explicitlyDisabled
+            ? ["--Testing:GameControllerVisionOnly=true", "--Testing:IdentityControl:DesktopBridgeEnabled=false"]
+            : ["--Testing:GameControllerVisionOnly=true"];
+        using var appHost = await CreateAppHostAsync(arguments);
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        var referee = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+
+        Assert.Equal(4, appHost.Resources.Count());
+        AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
+        AssertWaits(gameController, (duck, WaitType.WaitUntilHealthy));
+        AssertWaits(referee, (gameController, WaitType.WaitUntilStarted));
+
+        var refereeEnvironment = await GetResourceEnvironmentAsync(referee);
+        Assert.False(refereeEnvironment.ContainsKey("Testing__IdentityControl__Enabled"));
+        Assert.False(refereeEnvironment.ContainsKey("Testing__IdentityControl__ExpectedRole"));
+        Assert.False(refereeEnvironment.ContainsKey("Testing__Diagnostics__RunId"));
+        foreach (var resource in new[] { duck, referee })
+        {
+            var runtimeArguments = await GetContainerRuntimeArgsAsync(resource);
+            Assert.DoesNotContain(runtimeArguments, argument =>
+                argument.StartsWith(ContainerIdentityExecHandoff.RunIdLabel + "=", StringComparison.Ordinal) ||
+                argument.StartsWith(ContainerIdentityExecHandoff.RoleLabel + "=", StringComparison.Ordinal));
+        }
+
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Empty(services.GetServices<IHostedService>().OfType<ContainerIdentityHandoffService>());
+    }
+
     /// <summary>四資源構成でもDriver自身の実所有識別情報を渡し、Duckと別のwatcherで扱う。</summary>
     [Fact]
     public async Task GameControllerVisionModeConfiguresRefereeDriverIdentityHandoff()
