@@ -220,6 +220,107 @@ public sealed class RefereeDriverHostHealthTests
         }
     }
 
+
+    /// <summary>継続受信で直前の一致が失効しても、HTTPは次の同一パケット照合を待つ。</summary>
+    [Fact]
+    public async Task HealthWaitsForFreshObservationAfterSuccessiveUdpPackets()
+    {
+        await using var fixture = await HttpFixture.CreateAsync();
+        Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
+        for (var index = 1; index <= 5; index++)
+        {
+            var nextReceive = fixture.Core.Receiver.ReceiveCalls + 1;
+            fixture.Core.Receiver.Supply(Packet().ToByteArray());
+            await fixture.Core.Receiver.AtReceiveCall(nextReceive).WaitAsync(TimeSpan.FromSeconds(5));
+            var request = fixture.Client.GetAsync("/health/referee");
+            await RequireHealthWaitAsync(fixture.Core.Clock.AtTimer(index), request);
+            Assert.False(request.IsCompleted);
+            Assert.Equal(index, fixture.Core.Api.ConnectCalls);
+
+            Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
+            using var response = await request.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            Assert.Equal(index + 2, json.RootElement.GetProperty("diagnostic")
+                .GetProperty("successfullyDecodedCount").GetInt64());
+            Assert.Equal(index + 1, json.RootElement.GetProperty("api")
+                .GetProperty("requestSequence").GetInt64());
+        }
+        Assert.Equal(0, fixture.Core.Api.SendCalls);
+    }
+
+    /// <summary>同時要求は単一の観測結果を待ち、要求数に比例してAPIを取得しない。</summary>
+    [Fact]
+    public async Task ConcurrentHealthWaitsShareTheNextObservation()
+    {
+        await using var fixture = await HttpFixture.CreateAsync();
+        var requests = Enumerable.Range(0, 6)
+            .Select(_ => fixture.Client.GetAsync("/health/referee")).ToArray();
+        await RequireHealthWaitAsync(fixture.Core.Clock.AtTimer(6), Task.WhenAll(requests));
+        Assert.All(requests, request => Assert.False(request.IsCompleted));
+        Assert.Equal(0, fixture.Core.Api.ConnectCalls);
+
+        Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
+        foreach (var response in await Task.WhenAll(requests).WaitAsync(TimeSpan.FromSeconds(5)))
+        {
+            using (response)
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                Assert.Equal(1, json.RootElement.GetProperty("api").GetProperty("requestSequence").GetInt64());
+            }
+        }
+        Assert.Equal(1, fixture.Core.Api.ConnectCalls);
+        Assert.Equal(0, fixture.Core.Api.SendCalls);
+    }
+
+    /// <summary>期限切れのAPI証跡を延命せず、照合完了が来ない要求を有限時間で503にする。</summary>
+    [Fact]
+    public async Task HealthWaitTimeoutDoesNotRefreshStaleEvidence()
+    {
+        await using var fixture = await HttpFixture.CreateAsync();
+        Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
+        var receivedAt = fixture.Core.Diagnostics.GetSnapshots(RefereeReceiveService.InputId)[0].LastReceivedAt;
+        fixture.Core.Clock.Advance(TimeSpan.FromSeconds(3) + TimeSpan.FromTicks(1));
+        var request = fixture.Client.GetAsync("/health/referee");
+        await RequireHealthWaitAsync(fixture.Core.Clock.AtTimer(1), request);
+        using var response = await request.WaitAsync(TimeSpan.FromSeconds(4));
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("ObservationWaitTimedOut", json.RootElement.GetProperty("reason").GetString());
+        Assert.False(json.RootElement.GetProperty("isReady").GetBoolean());
+        Assert.Equal(receivedAt, fixture.Core.Diagnostics.GetSnapshots(RefereeReceiveService.InputId)[0].LastReceivedAt);
+        Assert.Equal(2, fixture.Core.Diagnostics.GetSnapshots(RefereeReceiveService.InputId)[0].SuccessfullyDecodedCount);
+        Assert.Equal(1, fixture.Core.Api.ConnectCalls);
+    }
+
+    /// <summary>一つのHTTP要求の取消は、別要求と共通のAPI観測へ伝播しない。</summary>
+    [Fact]
+    public async Task CancellingOneHealthWaitDoesNotCancelAnother()
+    {
+        await using var fixture = await HttpFixture.CreateAsync();
+        using var cancellation = new CancellationTokenSource();
+        var cancelled = fixture.Client.GetAsync("/health/referee", cancellation.Token);
+        var surviving = fixture.Client.GetAsync("/health/referee");
+        await RequireHealthWaitAsync(fixture.Core.Clock.AtTimer(2), Task.WhenAll(cancelled, surviving));
+        await cancellation.CancelAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await cancelled);
+        Assert.False(surviving.IsCompleted);
+        Assert.Equal(0, fixture.Core.Api.ConnectCalls);
+
+        Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
+        using var response = await surviving.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(1, fixture.Core.Api.ConnectCalls);
+    }
+
+    private static async Task RequireHealthWaitAsync(Task waiting, Task request)
+    {
+        await Task.WhenAny(waiting, request).WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(waiting.IsCompleted, "HTTPは即時503ではなく、期限付きで次の観測を待つ。");
+    }
+
     private static WebApplicationBuilder CreateBuilder(string? enabled, bool container)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -381,6 +482,7 @@ public sealed class RefereeDriverHostHealthTests
             matchState = new { command = new { type = command, forTeam = "UNKNOWN" }, gameState = new { type = phase } },
         });
         private bool disposed;
+        private ApiSocket? owner;
         internal int ConnectCalls { get; private set; }
         internal int SendCalls { get; private set; }
         internal int DisposeCalls { get; private set; }
@@ -389,7 +491,7 @@ public sealed class RefereeDriverHostHealthTests
             token.ThrowIfCancellationRequested();
             Assert.Equal(CoreFixture.ApiEndpoint, endpoint);
             ConnectCalls++;
-            return Task.FromResult<WebSocket>(this);
+            return Task.FromResult<WebSocket>(new ApiSocket(command, phase) { owner = this });
         }
         public override WebSocketCloseStatus? CloseStatus => null;
         public override string? CloseStatusDescription => null;
@@ -404,7 +506,7 @@ public sealed class RefereeDriverHostHealthTests
         public override Task SendAsync(ArraySegment<byte> buffer, WebSocketMessageType type,
             bool endOfMessage, CancellationToken token)
         {
-            SendCalls++;
+            (owner ?? this).SendCalls++;
             throw new InvalidOperationException("観測専用で送信しない。");
         }
         public override void Abort() { }
@@ -416,7 +518,7 @@ public sealed class RefereeDriverHostHealthTests
         {
             if (disposed) return;
             disposed = true;
-            DisposeCalls++;
+            (owner ?? this).DisposeCalls++;
         }
     }
 
@@ -440,6 +542,18 @@ public sealed class RefereeDriverHostHealthTests
     private sealed class FixtureClock : TimeProvider
     {
         private long timestamp;
+        private int timers;
+        private readonly ConcurrentDictionary<int, TaskCompletionSource> timerCalls = new();
+        internal Task AtTimer(int number) => timerCalls.GetOrAdd(number,
+            _ => new(TaskCreationOptions.RunContinuationsAsynchronously)).Task;
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+            var timer = base.CreateTimer(callback, state, dueTime, period);
+            if (dueTime == TimeSpan.FromSeconds(2))
+                timerCalls.GetOrAdd(Interlocked.Increment(ref timers),
+                    _ => new(TaskCreationOptions.RunContinuationsAsynchronously)).TrySetResult();
+            return timer;
+        }
         public override long TimestampFrequency => TimeSpan.TicksPerSecond;
         public override long GetTimestamp() => Interlocked.Read(ref timestamp);
         public override DateTimeOffset GetUtcNow() =>

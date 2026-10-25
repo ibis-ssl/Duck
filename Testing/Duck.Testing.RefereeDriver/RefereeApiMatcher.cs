@@ -10,6 +10,7 @@ internal sealed class RefereeApiMatcher
     private readonly GameControllerStateObserver observer;
     private long requestSequence;
     private RefereeApiMatchResult? current;
+    private TaskCompletionSource observationCompleted = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     internal RefereeApiMatcher(RefereeReceiveService receiver, GameControllerStateObserver observer)
     {
@@ -80,6 +81,43 @@ internal sealed class RefereeApiMatcher
         }
     }
 
+    /// <summary>単一観測の次の完了を期限付きで共有し、返却直前に現在の両証跡を再検証する。</summary>
+    internal async Task<RefereeApiMatchResult> WaitForCurrentAsync(
+        TimeSpan timeout, TimeProvider clock, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(clock);
+        if (timeout <= TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        cancellationToken.ThrowIfCancellationRequested();
+        var immediate = GetCurrent();
+        if (immediate.IsReady)
+            return immediate;
+
+        using var deadline = new CancellationTokenSource(timeout, clock);
+        using var waiting = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
+        try
+        {
+            while (true)
+            {
+                waiting.Token.ThrowIfCancellationRequested();
+                Task completed;
+                // 状態の再検査より先に通知を確保し、両者の間の完了を取りこぼさない。
+                lock (gate)
+                    completed = observationCompleted.Task;
+                var result = GetCurrent();
+                waiting.Token.ThrowIfCancellationRequested();
+                if (result.IsReady)
+                    return result;
+                await completed.WaitAsync(waiting.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (
+            deadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            return GetCurrent() with { IsReady = false, Reason = "ObservationWaitTimedOut" };
+        }
+    }
+
     /// <summary>当該要求がまだ最新の場合だけ結果を保持し、遅い旧結果で新しい一致を上書きしない。</summary>
     private RefereeApiMatchResult Complete(long sequence, RefereeApiMatchResult result)
     {
@@ -88,6 +126,9 @@ internal sealed class RefereeApiMatcher
             if (sequence != requestSequence)
                 return new(false, "Superseded", result.Udp, result.Api);
             current = result.IsReady ? result : null;
+            var completed = observationCompleted;
+            observationCompleted = new(TaskCreationOptions.RunContinuationsAsynchronously);
+            completed.TrySetResult();
             return result;
         }
     }

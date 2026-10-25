@@ -22,9 +22,11 @@ internal static class RefereeDriverHost
     {
         if (!bool.TryParse(app.Configuration["RefereeDriver:Enabled"], out var enabled) || !enabled)
             return;
-        app.MapGet("/health/referee", (RefereeApiMatcher matcher, ServiceReceiveDiagnostics diagnostics) =>
+        app.MapGet("/health/referee", async (RefereeApiMatcher matcher,
+            ServiceReceiveDiagnostics diagnostics, TimeProvider clock, CancellationToken cancellationToken) =>
         {
-            var match = matcher.GetCurrent();
+            var match = await matcher.WaitForCurrentAsync(TimeSpan.FromSeconds(2), clock, cancellationToken)
+                .ConfigureAwait(false);
             var diagnostic = match.Udp?.Diagnostic ?? diagnostics.GetSnapshots(RefereeReceiveService.InputId)[0];
             // 識別子は入力された帰属情報であり、この応答は実DCP所有の証明ではない。
             return Results.Json(new
