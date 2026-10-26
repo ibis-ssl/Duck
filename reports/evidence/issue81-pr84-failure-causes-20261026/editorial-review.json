@@ -1,0 +1,43 @@
+{
+  "stance": "説明",
+  "reviewer": "この作業の実施者本人",
+  "independentReview": false,
+  "numericSequenceUnchanged": true,
+  "externalLinksUnchanged": true,
+  "codeBlocksUnchanged": true,
+  "decisions": [
+    {
+      "candidate": "義務2から1、Windows条件文の文末変更",
+      "resolution": "必要がありますを条件ですへ変更。Windowsの必須の共有条件は維持し、任意・推奨へ弱めていない。"
+    },
+    {
+      "candidate": "単体テストの動作説明から構成説明への変更",
+      "resolution": "同じTrackerComparisonSourceTddTestsの85/105/112行と、書込を保持してFlush後に読む順序を維持した。"
+    },
+    {
+      "candidate": "新規語と削除語",
+      "resolution": "Issue/HEAD/UTC等は課題/版/協定世界時へ置換。DLLは証拠にある実ファイルTracker.DebugHost.dllへ具体化。終了値・配布元・未実行は元の終了コード・レジストリ・スキップと同じ対象を指す。"
+    },
+    {
+      "candidate": "つながり・指示語・予告文",
+      "resolution": "キャッシュとイメージ登録の区別、共有違反の比較、旧版未実行、実機未検証の対応を確認。固定参照の予告は直後の2参照を案内する文として保持。"
+    }
+  ],
+  "technicalClaimChanges": false,
+  "initialFindings": {
+    "textlint": 0,
+    "cspell": 6,
+    "whitelist": 39,
+    "yomiyasu": 2
+  },
+  "finalFindings": {
+    "textlint": 0,
+    "cspell": 0,
+    "whitelist": 0,
+    "yomiyasu": 0
+  },
+  "baselineExistingDocumentsRerun": false,
+  "productSourceOrTestsEdited": false,
+  "formatOnlyFollowup": "メタ情報3行をMarkdownの末尾2空白から空行区切りへ変更。原稿の内容・数値・リンク・コード例は維持。初稿の公開形式は原本バイト列を持つJSONへ変更。",
+  "finalValidatedReportSha256": "0e33ee74c22b39d62ce0d610efba5c72f44515baf38351963c72af8e9cc81313"
+}
