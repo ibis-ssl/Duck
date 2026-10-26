@@ -235,17 +235,91 @@ class DesktopRun:
         require(self.call(["git", "rev-parse", "HEAD"]) == self.args.expected_head, "HeadMismatch")
         require(not self.call(["git", "status", "--porcelain"]), "WorktreeNotClean")
         require(not self.list_ids(), "ExistingContainersRequireSeparateReview")
-        # ローカルに揃った依存だけを使い、欠落時は起動しない。
-        for image in (
+        # 直接実行する画像は登録必須。Dockerfileの基底参照はBuildKit記録と区別する。
+        direct_refs = (
             "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
-            "robocupssl/ssl-game-controller@sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7",
+            "robocupssl/ssl-game-controller@sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7")
+        base_refs = (
             "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
-            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca"):
-            self.docker("image", "inspect", image, "--format", "{{.Id}}")
+            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca")
+        images = {"directImages": [], "buildBaseImages": [], "buildVerified": False, "status": "checking"}
+
+        def persist():
+            save(self.folder / "preflight-images.json", images)
+
+        for ref in direct_refs:
+            try:
+                image_id = self.docker("image", "inspect", ref, "--format", "{{.Id}}")
+                require(bool(image_id), "EmptyImageId")
+                images["directImages"].append({"reference": ref, "state": "registered", "imageId": image_id})
+            except Exception as ex:
+                images["directImages"].append({"reference": ref, "state": "inspect_failed",
+                                               "error": type(ex).__name__ + ": " + str(ex)})
+                images["status"] = "direct_inspect_failed"
+                persist()
+                raise ValueError("DirectImageInspectFailed: " + ref) from ex
+
+        for ref in base_refs:
+            try:
+                image_id = self.docker("image", "inspect", ref, "--format", "{{.Id}}")
+                require(bool(image_id), "EmptyImageId")
+                images["buildBaseImages"].append({"reference": ref, "state": "registered",
+                                                  "imageId": image_id})
+            except Exception as ex:
+                if "no such image" not in str(ex).lower():
+                    images["buildBaseImages"].append({"reference": ref, "state": "inspect_failed",
+                                                      "error": type(ex).__name__ + ": " + str(ex)})
+                    images["status"] = "base_inspect_failed"
+                    persist()
+                    raise ValueError("BuildBaseInspectFailed: " + ref) from ex
+                images["buildBaseImages"].append({"reference": ref, "state": "not_registered"})
+
+        unregistered = [entry for entry in images["buildBaseImages"]
+                        if entry["state"] == "not_registered"]
+        if unregistered:
+            try:
+                output = self.docker("buildx", "du", "--builder", self.args.context,
+                                     "--format=json")
+            except Exception as ex:
+                for entry in unregistered:
+                    entry["state"] = "cache_command_failed"
+                images["status"] = "cache_command_failed"
+                persist()
+                raise ValueError("BuildCacheQueryFailed") from ex
+            try:
+                try:
+                    records = json.loads(output)
+                except json.JSONDecodeError:
+                    records = [json.loads(line) for line in output.splitlines() if line.strip()]
+                require(isinstance(records, list) and
+                        all(isinstance(row, dict) for row in records), "InvalidBuildCacheShape")
+            except (ValueError, TypeError) as ex:
+                for entry in unregistered:
+                    entry["state"] = "cache_unknown"
+                images["status"] = "cache_unknown"
+                persist()
+                raise ValueError("BuildCacheEvidenceUnknown") from ex
+            for entry in unregistered:
+                matches = [row for row in records
+                           if row.get("Description") == "pulled from " + entry["reference"]
+                           and row.get("Mutable") is False and row.get("Shared") is True]
+                entry["state"] = "cache_candidate" if matches else "cache_missing"
+                entry["cacheRecordCount"] = len(matches)
+            if any(entry["state"] == "cache_missing" for entry in unregistered):
+                images["status"] = "cache_missing"
+                persist()
+                raise ValueError("BuildBaseCacheEvidenceMissing")
+
+        # キャッシュの一致は現在の成果物のビルド成功やoffline動作を証明しない。
+        images["status"] = ("cache_candidates_unverified" if unregistered
+                            else "images_registered")
+        persist()
         files = ("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll",
                  "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll",
                  "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll")
-        return {name: hashlib.sha256((self.repo / name).read_bytes()).hexdigest() for name in files}
+        return {"status": images["status"], "buildVerified": False,
+                "artifacts": {name: hashlib.sha256((self.repo / name).read_bytes()).hexdigest()
+                              for name in files}}
 
     def probe(self, cid, begun):
         started = time.monotonic()
@@ -336,6 +410,11 @@ class DesktopRun:
         return 0 if info["passed"] else 2
 
 
+def preflight_exit_code(preflight):
+    """ビルド未実証のキャッシュ候補だけでは事前検査を成功終了にしない。"""
+    return 0 if preflight["status"] == "images_registered" else 4
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -360,7 +439,8 @@ def main():
         save(args.output / "run-meta.safe.json", metadata)
         if args.preflight_only:
             print(json.dumps(metadata, ensure_ascii=False))
-            return 0
+            return preflight_exit_code(metadata["preflight"])
+        # run-onceではこの後の実ビルド・Ready・通常停止が最終判定を担う。
         return runner.execute(metadata)
     except Exception as ex:
         save(args.output / "preflight-failure.json", {"error": type(ex).__name__ + ": " + str(ex)})

@@ -258,5 +258,128 @@ class DockerAdapterTests(unittest.TestCase):
                     self.assertEqual({CID: "referee-driver"}, runner.own_resources(RUN))
 
 
+class ImagePreflightTests(unittest.TestCase):
+    """固定イメージとビルドキャッシュをDockerなしで検証する。"""
+
+    REFS = (
+        "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+        "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+    )
+
+    def setUp(self):
+        import tempfile
+        from types import SimpleNamespace
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name)
+        for name in (
+            "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll",
+            "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll",
+            "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll",
+        ):
+            path = self.path / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"test")
+        self.run = object.__new__(acceptance.DesktopRun)
+        self.run.repo = self.run.folder = self.path
+        self.run.args = SimpleNamespace(expected_head="test-head", context="desktop-linux")
+        self.run.call = lambda args: "test-head" if args[-1] == "HEAD" else ""
+        self.run.list_ids = lambda: []
+        self.calls = []
+
+    def mock_docker(self, cache=None, registered=False, direct_missing=False, base_error=False):
+        import json
+        if cache is None:
+            cache = [{"Description": "pulled from " + ref, "Mutable": False, "Shared": True}
+                     for ref in self.REFS]
+        def docker(*args, **kwargs):
+            self.calls.append(args)
+            if args[:2] == ("image", "inspect"):
+                ref = args[2]
+                if direct_missing and ref.startswith("ghcr.io"):
+                    raise ValueError("CommandFailed: No such image: " + ref)
+                if base_error and ref in self.REFS:
+                    raise ValueError("CommandFailed: access denied")
+                if ref in self.REFS and not registered:
+                    raise ValueError("CommandFailed: No such image: " + ref)
+                return "sha256:" + "a" * 64
+            if args[:2] == ("buildx", "du"):
+                if isinstance(cache, Exception):
+                    raise cache
+                return cache if isinstance(cache, str) else json.dumps(cache)
+            raise AssertionError(str(args))
+        self.run.docker = docker
+
+    def evidence(self):
+        import json
+        return json.loads((self.path / "preflight-images.json").read_text(encoding="utf-8"))
+
+    def test_cache_candidate_is_unverified_and_recorded_separately(self):
+        self.mock_docker()
+        result = self.run.preflight()
+        self.assertEqual("cache_candidates_unverified", result["status"])
+        self.assertFalse(result["buildVerified"])
+        self.assertEqual(4, acceptance.preflight_exit_code(result))
+        self.assertTrue(all(item["state"] == "registered" for item in self.evidence()["directImages"]))
+        self.assertTrue(all(item["state"] == "cache_candidate" for item in self.evidence()["buildBaseImages"]))
+        self.assertIn(("buildx", "du", "--builder", "desktop-linux", "--format=json"), self.calls)
+
+    def test_registered_bases_do_not_require_cache_lookup(self):
+        self.mock_docker(registered=True)
+        result = self.run.preflight()
+        self.assertEqual("images_registered", result["status"])
+        self.assertFalse(result["buildVerified"])
+        self.assertEqual(0, acceptance.preflight_exit_code(result))
+        self.assertFalse(any(args[:2] == ("buildx", "du") for args in self.calls))
+
+    def test_missing_cache_is_blocked(self):
+        self.mock_docker(cache=[])
+        with self.assertRaisesRegex(ValueError, "BuildBaseCacheEvidenceMissing"):
+            self.run.preflight()
+        self.assertTrue(all(item["state"] == "cache_missing" for item in self.evidence()["buildBaseImages"]))
+
+    def test_unparseable_cache_is_unknown(self):
+        self.mock_docker(cache='{"unexpected":"shape"}')
+        with self.assertRaisesRegex(ValueError, "BuildCacheEvidenceUnknown"):
+            self.run.preflight()
+        self.assertTrue(all(item["state"] == "cache_unknown" for item in self.evidence()["buildBaseImages"]))
+
+    def test_cache_command_error_is_distinct(self):
+        self.mock_docker(cache=OSError("cannot query builder"))
+        with self.assertRaisesRegex(ValueError, "BuildCacheQueryFailed"):
+            self.run.preflight()
+        self.assertTrue(all(item["state"] == "cache_command_failed" for item in self.evidence()["buildBaseImages"]))
+
+    def test_direct_image_failure_is_not_masked_by_cache(self):
+        self.mock_docker(direct_missing=True)
+        with self.assertRaisesRegex(ValueError, "DirectImageInspectFailed"):
+            self.run.preflight()
+        self.assertEqual("inspect_failed", self.evidence()["directImages"][0]["state"])
+        self.assertFalse(any(args[:2] == ("buildx", "du") for args in self.calls))
+
+    def test_unexpected_base_inspect_error_stays_error(self):
+        self.mock_docker(base_error=True)
+        with self.assertRaisesRegex(ValueError, "BuildBaseInspectFailed"):
+            self.run.preflight()
+        self.assertEqual("inspect_failed", self.evidence()["buildBaseImages"][0]["state"])
+
+    def test_mutable_cache_and_wrong_digest_are_not_candidates(self):
+        self.mock_docker(cache=[
+            {"Description": "pulled from " + self.REFS[0].replace("0cf09a", "ffffff"),
+             "Mutable": False, "Shared": True},
+            {"Description": "pulled from " + self.REFS[1], "Mutable": True, "Shared": True},
+        ])
+        with self.assertRaisesRegex(ValueError, "BuildBaseCacheEvidenceMissing"):
+            self.run.preflight()
+
+    def test_json_lines_cache_evidence_is_supported(self):
+        import json
+        records = "\n".join(json.dumps({"Description": "pulled from " + ref,
+                                          "Mutable": False, "Shared": True})
+                            for ref in self.REFS)
+        self.mock_docker(cache=records)
+        self.assertEqual("cache_candidates_unverified", self.run.preflight()["status"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
