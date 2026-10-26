@@ -286,6 +286,11 @@ class ImagePreflightTests(unittest.TestCase):
         self.run.call = lambda args: "test-head" if args[-1] == "HEAD" else ""
         self.run.list_ids = lambda: []
         self.calls = []
+        # 製品モジュールの参照だけを置換し、pathlibが使う実OSは変更しない。
+        from unittest.mock import patch
+        platform = patch.object(acceptance, "os", SimpleNamespace(name="nt"))
+        platform.start()
+        self.addCleanup(platform.stop)
 
     def mock_docker(self, cache=None, registered=False, direct_missing=False, base_error=False):
         import json
@@ -379,6 +384,33 @@ class ImagePreflightTests(unittest.TestCase):
                             for ref in self.REFS)
         self.mock_docker(cache=records)
         self.assertEqual("cache_candidates_unverified", self.run.preflight()["status"])
+
+
+class PreflightPlatformTests(unittest.TestCase):
+    """実行OSの制限と、OS非依存で動く模擬試験を別々に確認する。"""
+
+    def test_non_windows_is_rejected_before_external_commands(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+        runner = object.__new__(acceptance.DesktopRun)
+        runner.call = Mock(side_effect=AssertionError("Unexpected command"))
+        runner.list_ids = Mock(side_effect=AssertionError("Unexpected Docker inventory"))
+        with patch.object(acceptance, "os", SimpleNamespace(name="posix")):
+            with self.assertRaisesRegex(ValueError, "^WindowsRequired$"):
+                runner.preflight()
+        runner.call.assert_not_called()
+        runner.list_ids.assert_not_called()
+
+    def test_image_fixtures_do_not_depend_on_host_os(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        suite = unittest.defaultTestLoader.loadTestsFromTestCase(ImagePreflightTests)
+        result = unittest.TestResult()
+        with patch.object(acceptance, "os", SimpleNamespace(name="posix")):
+            suite.run(result)
+        self.assertEqual(9, result.testsRun)
+        self.assertTrue(result.wasSuccessful(), str(result.failures + result.errors))
+        self.assertEqual([], result.skipped)
 
 
 if __name__ == "__main__":
