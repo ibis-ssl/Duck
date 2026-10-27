@@ -83,3 +83,53 @@
 - verification_capability: local_execution_available。実行地点FA780、Windows PowerShell、ユーザーfa780\donabe。build再実行2件は成功、初回のassets不足とlint失敗は上記のとおり保持。
 - technical_head: e82bef6101e6111369f06519eb3910f18515f3d1 + この調査報告と追跡文書の差分。commit: commit_pending / push: push_pending / CI: 新変更に対して未実施。PR96既存CI run40588987224は旧公開HEADのtest成功、full-stack/packet-flowはskipであり今回の実機証拠ではない。
 - 通常/独立レビューとIssue証拠記録は未完了。GC実機確認は#98。親#78とPR96を未完了のまま維持し、merge/closeしない。
+## 通常レビュー修正（2026-10-28）
+
+以下は通常レビュー `reports/issue97-normal-review-20261028.md` のI97-NR-001/002/003に対する追記・訂正である。ここに記したI97-NR-001手順が、前述の#98再現手順、前提、期待状態を置き換える。I97-NR-002の追跡ファイル編集は親担当であり、本追記では変更しない。
+
+### I97-NR-001: stage gateとactive baseline
+
+- 固定版 `engine/proposals.go` はevent behaviorのswitch前に `IsPreStage()` または `IsPausedStage()` を判定し、その場合AutoRefの設定を `IGNORE` に上書きする。したがってpre/paused中は `BEHAVIOR_LOG` のpassive eventが出ない。[実装](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/internal/app/engine/proposals.go#L25-L35)
+- 固定版 `state/stage.go` のpre stagesは `NORMAL_FIRST_HALF_PRE`, `NORMAL_SECOND_HALF_PRE`, `EXTRA_FIRST_HALF_PRE`, `EXTRA_SECOND_HALF_PRE`。paused stagesは `NORMAL_HALF_TIME`, `EXTRA_TIME_BREAK`, `EXTRA_HALF_TIME`, `PENALTY_SHOOTOUT_BREAK`。[分類](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/internal/app/state/stage.go#L25-L39)
+- 新規状態は `NORMAL_FIRST_HALF_PRE` / `Command_HALT` / `GameState_HALT`。[初期化](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/internal/app/state/state.go#L8-L24)よってactive試験を始める前にfixtureを準備する必要がある。GCのactive `GameState.RUNNING` を運用者が確認し、stageが上記pre/pausedでないこと、実際のreferee commandが `HALT` ではないことを確認する。
+- [公式Referee protobuf](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/proto/state/ssl_gc_referee_message.proto#L15-L20)はstageを、同L69-L114は `command` と `command_counter` を定義する。`command_counter` は起動後のコマンド発行数で、mod 2^32。固定の初期command/counter値は決め打ちせず、対象fixtureでevent直前の `stage`, `GameState`, 実際の `Referee.command`, `command_counter` を同じbaselineとして記録する。
+- 修正版#98手順: 1) GC v3.20.3を確認。2) 試験AutoRefを接続し、固有IDと接続状態を確認。3) 対象event (種類不明ならそのAutoRefのAll) をLogにし、画面反映を確認。4) event入力前にstageがpre/pausedでなく、GameStateがRUNNINGで、baseline commandがHALTでないactive fixtureを用意。各値とcounterを記録する。5)対象eventを発生させ、passive event記録とactive/RUNNING維持を観測し、command/counterがbaselineから変わらないことを確認する。異なる場合は発生元を切り分け、未解決なら成功扱いしない。6)試験終了後に試験環境の元configを復元する。実機では未実行。
+- 停止条件にstage pre/paused、GameState非RUNNING、command HALTを追加する。該当時はpassive eventの欠如を設定失敗と誤判定せず、fixture前提不足として入力前に停止する。
+
+### I97-NR-002: lint判断の訂正
+
+- 前回の「子所有レポートはlint対象外でCSpell指摘なし」はそのレポート自体については正しいが、全体lint失敗を今回差分外とみなした説明は誤りだった。通常レビューによるdiff位置照合では、CSpell 382件中40件が今回新規追加の親所有 `Tracker/Design/tasks-status.md` と `phases-status.md` の行にある。既存の別ファイルの指摘と分離し、新規40件は親の変更で修正後に再評価する必要がある。本担当はtrackingを編集しない。
+
+### I97-NR-003: 実施状況の訂正
+
+- 以前の残リスク欄にある「build/test/commit/push/review未実施」は古い記録と現状を混同していたため、現在状態については取り消す。buildは初回失敗後、RefereeDriver既存csprojの限定restoreを経てTracker.Tests/AppHostとも成功。自動testは未実行。通常reviewはfailで現在修正中。親がreview-target commit `6a23b1f78b746871bb062beccb4ee243b865a026` を作成済み、pushはしていない。過去のPID/exitとログは上記のとおり保持する。
+
+### Findings completeness matrix
+
+| ID | required action | production path | actual composition fixture | focused evidence |
+| --- | --- | --- | --- | --- |
+| I97-NR-001 | pre/paused stage gate、active RUNNING fixture、command/counter baselineと観測を記録 | 該当なし（調査文書のみ） | 該当なし（文書修正。実機fixtureは#98） | v3.20.3 proposals.go/stage.go/state.go/Referee protobufを引用。#98実機未実施 |
+| I97-NR-002 | 新規追跡行40件を親が修正し、両文書のtext/spell/whitelistを確認 | `Tracker/Design/tasks-status.md`, `Tracker/Design/phases-status.md` | 該当なし（文書gate） | 全体lintの初回結果は382件/7ファイル。親による修正後のfocused検証待ち |
+| I97-NR-003 | build/test/review/commit/push状態を矛盾なく報告 | 該当なし（調査文書のみ） | 該当なし | 初回build失敗、限定restore後build成功のPID/exitログ、通常review fail、parent commit SHA、pushなしを記録 |
+
+## 修正後の検証結果（2026-10-28）
+
+この節は前記I97-NR-002の未検証行と古い実施状況を更新する。追跡文書の内容は親が修正し、当レポートでは編集していない。
+
+- #97調査手順はpre/pausedの例外を明記し、active GameState.RUNNING、実際のReferee commandとcommand_counterをevent直前に記録して比較する前提を追加した。production path / actual composition fixtureは該当なし（文書のみ、実機fixtureは#98）。根拠はv3.20.3 proposals.go/stage.go/state.go/Referee protobufを参照。
+- `git diff --check` PID 32912/exit 0、親の最終tracking語句修正後の再確認PID 31012/exit 0。
+- `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false` PID 17852/exit 0、`dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -m:1 /nr:false` PID 9348/exit 0。AppHostは既知のASPIRE010 warning 1件、error 0。自動testは実行していない。
+- 全体 `npm run lint:md` PID 27956/exit 1 は親による最後の用語置換より前の実行で、CSpell 342 issues/6 files、whitelist段階未実行だった。その後は親の指示により全体lintを再実行せず、対象2 tracking文書を各段階でfocused確認した。
+- focused `lint:md:text` PID 29972/exit 0。focused `lint:md:spell` PID 14348/exit 1で残る3件は未変更の `Tracker/Design/tasks-status.md:41` (`planner`, `Simulator`, `planner`) のみ。focused whitelist PID 31476/exit 1も未変更の同line 41の既存語のみ。新規追跡行からのCSpell/whitelist違反は0件。whitelistログは別名表記も列挙するが、違反source lineはすべて41。
+- 全体lint初回で今回追加の追跡行にあった40件は、親が該当語を日本語へ修正した。focused checksで新規行0件を確認したので、旧記録の「新規40件が残る」は履歴としてのみ残り、現状の違反として扱わない。
+- I97-NR-003の現在状態: 初回build失敗後の限定restoreと再buildは成功。自動test/GC実機未実施。通常reviewはfailでfix verification待ち。親のreview-target commit `6a23b1f78b746871bb062beccb4ee243b865a026` は存在し、pushは未実施。調査報告の今回追記はworking-tree差分でありcommit/pushしていない。
+
+### Current findings completeness
+
+| ID | required action | production path | actual composition fixture | focused evidence / disposition |
+| --- | --- | --- | --- | --- |
+| I97-NR-001 | pre/paused gate、active fixture、command/counter baselineを調査手順に明記 | 該当なし（文書） | 該当なし（実機は#98） | v3.20.3根拠追記済み、`git diff --check` 31012/0。実機未実施は#98へhandoff |
+| I97-NR-002 | 親が追跡文書を直し、text/spell/whitelistを確認 | `tasks-status.md`, `phases-status.md` | 該当なし（文書gate） | 新規行違反0。text 29972/0。spell 14348/1は既存line 41の3語のみ。whitelist 31476/1は既存line 41のみ |
+| I97-NR-003 | build/test/review/commit/push状態を一貫して報告 | 該当なし（文書） | 該当なし | 2 build成功、test未実行、review fail/fix verification待ち、commit `6a23b1f...` 作成済み、pushなしを明記 |
+
+- 最新review state: #97通常レビューはfailから修正確認へ移行中。I97-NR-001/003の文書修正を同一レビュアーが再確認する必要がある。I97-NR-002の新規文書gate違反は0だが、全体CSpellには既存違反が残るため全体lint passとは扱わない。
