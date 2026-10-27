@@ -129,3 +129,83 @@
 - H2（owner: 親/文書gate担当）: 既存領域にもCSpell違反が残る。新規40件のI97-NR-002と分離し、残件の工程上の扱いを明示する必要がある。全体lintは成功と扱えず、whitelistも未実行。既存残件を自動的に解消済み/承認済みとしない。
 - H3（owner: 親）: 公開後の対象HEAD一致CI、独立レビュー、#97への正式な証拠記録はpending。Issue本文の必要証拠はまだ投稿されておらず、通常レビューの終了がIssue完了にはならない。旧CIは今回変更や実機の成功証拠にしない。
 - 親#78とPR96全体、後続#98〜#103の受入は未完了。merge/closeの許可をこのレビューから導かない。
+
+## Fix verification（2026-10-28）
+
+### 対象・継続性・開始条件
+
+- review mode: `fix verification`。current/reviewed implementation HEAD: `e9e331c4554da595a3300e9f7b61de91bb7ab7c9`、前回reviewed HEAD: `6a23b1f78b746871bb062beccb4ee243b865a026`、元base: `e82bef6101e6111369f06519eb3910f18515f3d1`、branch: `task/issue78-referee-state`。
+- この節は新HEADについての最新判定。上記の初回fail、finding本文、当時の検証結果を歴史証拠として保持する。旧HEADのverdictを新HEADへ流用していない。
+- 同一レビュアー `/root/issue97_normal_review` を再利用。`application_status: reused_existing_agent_profile`（本継続に限る）。元の要求 `gpt-6.1-sol / high`、`applied: null`、`spawn_succeeded_profile_unverified`、`final_profile_hidden` を引き継ぐ。モデル/effortを自称変更せず、親所有Dispatch profileは変更していない。新agent・nested実行なし。
+- closure開始前に調査報告107–113行の初期matrixと、それを更新する115–135行の検証結果・Current findings completenessを実読した。3 IDすべてにrequired action、文書上のproduction pathまたはnot_applicable理由、actual composition fixtureのnot_applicable理由、focused evidenceがある。実機fixtureを#98へ分ける条件も明示されているため、開始条件はcomplete。初期matrixの「focused待ち」は後続更新により置き換えられている。
+- 新差分4文書すべてを点検: 調査報告、追跡2文書、前回通常レビュー報告の追加。追跡の和文化は#101/#102の正式Issue本文とも照合。ID・依存と正式Issueを正本とする方針を保持しており、受入条件を緩和する差分はない。製品、依存、lint定義、許可一覧、CI設定の差分はない。
+
+### Findings completeness / fix disposition
+
+| ID / preserved severity / origin | required actionと修正場所 | composition fixture | focused evidence | disposition |
+| --- | --- | --- | --- | --- |
+| I97-NR-001 / medium / normal review | 調査報告90–97行でpre/pausedのIGNORE上書き、初期PRE/HALT、非pre/非paused・RUNNING・非HALTの開始条件、stage/GameState/command/counter baseline、期待維持と停止条件を明記。88行が旧手順を置換すると宣言 | not_applicable（文書修正。#98の実機fixtureは未実施） | 固定GC commitの既確認proposals/stage/state根拠と新規Referee protobuf/ssl_gc_state.protoを照合。Referee.command/counter定義とGameState.RUNNINGは実在。開始前提不足と設定失敗を分離 | closed_verified |
+| I97-NR-002 / medium / normal review | phases-status.md 51–59行、tasks-status.md 406–420行の新規違反を和文化。対象2文書のtext/spell/whitelistを全て実行し、既存違反と区別 | not_applicable（文書gate） | 親の最終focusedログとレビュアーによるe9e331c上の再実行が一致。新規行CSpell/whitelistは0件。残る失敗位置はbaseから未変更のtasks-status.md:41のみ | closed_verified（新規違反の修正。全体lint成功の意味ではない） |
+| I97-NR-003 / low / normal review | 調査報告103–105行、115–135行で旧build未実施記述を取り消し、初回失敗/限定restore後成功、自動test・実機未実施、通常review failからfix verificationへ進む状態を区別 | not_applicable（文書訂正） | 初回/再buildログ・resultsと整合。過去PID/exitと旧fail記録を保持。追記中のcommit_pending記録は当時の状態であり、今回targetは上記e9e331cとして明確化 | closed_verified |
+
+- required findings remaining: 0。新規required finding: 0。severity reclassification: none（medium/medium/lowをそのまま保持）。旧findingのseverityを閉鎖時に下げていない。
+- sibling risksも確認: pre/pausedの全列挙、初期HALTでの偽成功、command番号の決め打ち、他経路によるcommand変化、旧検証結果の成功への読み替え、和文化での依存/対象の変更を点検。いずれも新たな必須修正なし。引用リンクの範囲より下に定義がある場合も固定commitの該当ファイルを直接読み、command=117行/counter=120行を確認した。
+
+### 検証証拠・実行環境
+
+- 最初の `whoami`: exit 0、`fa780\donabe`。全shellは指定作業場のWindows PowerShell、`sandbox_permissions=require_escalated`。読取/照合shell PID 30472、2360、13680、18780、12524、focused runner PID 28772は各exit 0。
+- 公式source取得の補助探索 `internal/app/state/gameState.go` は404 / gh exit 1だった。必要なRUNNING定義は正しい `proto/state/ssl_gc_state.proto:47` から取得済みであり、未探索またはblockerとして残していない。
+- 親保存証拠 `artifacts/issue97-fix-verification-20261028/` のresults、source identity、build stdout/stderr、全体lint・focused各段階のstdout/stderrを直接照合。source identityは当時のbaseline 6a23b1f、tracked diff SHA-256 `7D08A903FC41EF42130B5F65801627D557ACCA0A589FA94F994861F4C26211AB`、report SHA-256 `038FC530C97C2AC6A4880E4A680DED6AAE12AEB30D36A9A1689A43BB2E3D3562`、runner PID 13636を記録。最終HEAD全体のhash証明とは混同しない。
+
+| 実行 | PID | exit | 結果・制約 |
+| --- | --- | --- | --- |
+| 親 Tracker.Tests build | 17852 | 0 | error 0、既知ASPIRE010 warning 1、自動test未実行 |
+| 親 AppHost build | 9348 | 0 | error 0、既知ASPIRE010 warning 1 |
+| 親 diff check / 最終再確認 | 32912 / 31012 | 0 / 0 | 改行warningのみ |
+| 親 全体lint | 27956 | 1 | 342件/6 files。最後の日本語用語修正前の実行。whitelist未実行 |
+| 親 focused text / spell / whitelist | 29972 / 14348 / 31476 | 0 / 1 / 1 | 新規行違反0、spell/whitelist失敗は未変更41行だけ |
+| レビュアー e9e331c focused text | 4016 | 0 | 追跡2文書、stdout/stderr保存 |
+| レビュアー e9e331c focused spell | 29028 | 1 | planner/Simulator/plannerの3件、全てtasks-status.md:41 |
+| レビュアー e9e331c focused whitelist | 31288 | 1 | 全違反のsource位置はtasks-status.md:41、新規行0 |
+| レビュアー range diff check | shell 2360 / 28772 | 0 | 6a23b1f..e9e331cの差分検査成功、git子PIDは未表示 |
+| 本追記保存 | 35484 | 0 | 既存報告本文をbyte prefixとして保持し追記のみ |
+
+- レビュアー再実行ログ: `C:\Users\donabe\AppData\Local\Temp\duck-issue97-normal-review-e9e331c\{text,spell,whitelist}.{stdout,stderr}.log`。機械ローカルの補助証拠でありrepository登録/アップロードはしていない。
+- buildは前回から製品sourceが一切変わらない範囲の補助証拠として再利用し、再build/test/実機を追加していない。全体lintを現在HEADで成功させたとは主張しない。
+- `git diff --exit-code e9e331c4554da595a3300e9f7b61de91bb7ab7c9` は追記前0。HEAD・対象sourceの固定を確認。既存CIは再取得しても旧e82bef61のrun40588987224のみで、e9e331c一致runなし。
+
+### 更新後coverage
+
+| 必須criterion | disposition | assessment |
+| --- | --- | --- |
+| requirement/design conformance | checked_no_finding | #97の調査条件、修正stage/active前提、#98分離を満たす |
+| correctness / edge cases | checked_no_finding | I97-NR-001 closed、初期PRE/HALT/休憩と入力前停止を区別 |
+| scope discipline / unrelated changes | checked_no_finding | 全4文書の差分のみ、対象外と禁止操作を保持 |
+| changed files / direct dependencies | checked_no_finding | 全新差分、公式baseline定義、前回報告と正式#101/#102を点検 |
+| API / data / configuration / workflow / compatibility | checked_no_finding | 実在field/enumのみ、設定や製品の変更なし |
+| error handling / failure diagnostics | checked_no_finding | fixture不足で入力前停止、予期しない遷移は成功扱いしない。失敗ログ保持 |
+| security / secrets | checked_no_finding | 差分にsecretなし、認証/所有権/ネットワーク等の緩和なし |
+| tests / validation adequacy | held | 新規文書違反0を現在HEADで再確認。既存41行と全体の既存違反が残る。TDD/製品test追加はnot_applicable |
+| current-HEAD CI evidence | held | local通常レビューにpre-review push/CI待ちは不要、HEAD一致run未実施のまま親へ |
+| report / tracking / documentation accuracy | checked_no_finding | I97-NR-003 closed、旧記録の訂正と現在/過去を分離 |
+| regression / maintainability risk | checked_no_finding | 新規実行差分なし、正式Issueを正本とする追跡境界を維持 |
+
+- unexplored: 必須criterionに未探索なし。実機はレビュー漏れではなく#98の明示対象外。
+
+### 最新判定・残held
+
+- verdict: `pass_with_held`。技術判定は `e9e331c4554da595a3300e9f7b61de91bb7ab7c9` に限定。3 findingは全てclosed_verifiedで通常経路の修正blockerなし。
+- H1（owner: #98担当）: 実機passive記録、active維持、元config復元は未実行。#97の一次資料調査の受入を妨げず、#98の実証成功を意味しない。
+- H2（owner: 親/文書gate担当）: 現在HEADのfocused spell/whitelistは既存tasks-status.md:41でexit 1。全体342件/6 filesは最終用語修正前の記録で、全体成功でも最終HEADでの完全再実行でもない。新規行0のI97-NR-002閉鎖と、既存全体gate残件の扱いは分離する。許可一覧/除外を変更していない。この既存残件は今回新規差分のfindingへ再分類せずheldとし、親が後続工程へ持ち越す。
+- H3（owner: 親）: 独立最終レビュー、正式Issue証拠記録、公開後の必要なHEAD一致CIは未完了。通常修正確認のpassがIssue完了/親#78完了/PR96統合を意味しない。
+- execution state: verification_capability `local_execution_available`、technical target committed、レビュー追記commit_pending、push_pending、pre-review CI wait not_required、current-HEAD CI unavailable。全体同等性gateの成功は主張しない。
+- persistenceは `normal_persistence`。親が本追記と必要な追跡・証拠を通常工程で確定してから、別の独立レビュアーへ進める。report_attestation_allowed: false（この報告は通常経路）。本子は調査/追跡/実装修正、commit/push/Issue投稿をしていない。
+
+## 親の再開・工程記録
+
+- 同じ通常レビュアーを継続し、application_status: reused_existing_agent_profile。要求Sol high、applied:null、最終profile非表示を維持。
+- 再開時の調査担当も同一。公開前HEAD e9e331cでTracker.Tests build PID23280/exit0、AppHost build PID13096/exit0。ログは artifacts/issue97-recheck-20261028/。
+- 許可済み小単位の通常pushはe9e331cで成功し、remote読戻し一致。最終独立レビューの公開工程とは区別する。
+- 拒否された編集は、対象見出しから末尾を再構築し後続節を削除しうるもの。自動審査拒否により実行されていない。レビュー指摘位置と既存追加節を照合し、代替は節境界で範囲を限定、全行数保持を検査し、各行の用語のみ置換した。切り詰め処理の再実行・間接実行ではない。
+- Skill-gap: no skill action neededを維持。限定編集と証拠保持は既存規約で扱えており新Skillは不要。feedback-points-managerの親判断として、新たな台帳や別Issueを追加せず今回の拒否と安全な代替をこの記録に保持。既存Skillリポジトリは変更しない。
+- PR96既存自担当コメント6454431329を日本語6項目へ更新し全文読戻し済み。調査/実機/レビュー/検証を区別し、元計画push前のbuild不足を保持。
