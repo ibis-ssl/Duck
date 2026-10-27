@@ -519,5 +519,202 @@ class PreflightPlatformTests(unittest.TestCase):
         self.assertEqual([], result.skipped)
 
 
+class RepoOptionTests(unittest.TestCase):
+    ARTIFACTS = (
+        "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll",
+        "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll",
+        "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll",
+    )
+
+    def create_repo(self, root):
+        root.mkdir(parents=True, exist_ok=True)
+        for index, name in enumerate(self.ARTIFACTS):
+            target = root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(("runtime-artifact-%d" % index).encode("ascii"))
+        return root.resolve()
+
+    def invoke_main(self, repo_option, actual_head="runtime-head", status=""):
+        import contextlib
+        import io
+        import json
+        import subprocess
+        import tempfile
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        temp_root = Path(temp.name)
+        if repo_option is None:
+            runtime = Path(acceptance.__file__).resolve().parents[1]
+        else:
+            runtime = self.create_repo(temp_root / "runtime")
+            (runtime / "nested").mkdir()
+        raw_repo = runtime / "nested" / ".."
+        output = temp_root / "run-output"
+        argv = ["verify", "--preflight-only", "--expected-head", "runtime-head",
+                "--engine-id", "runtime-engine", "--docker", "MOCK-DOCKER",
+                "--output", str(output)]
+        if repo_option is not None:
+            argv.extend(["--repo", str(raw_repo if repo_option == "runtime" else repo_option)])
+        calls = []
+        def fake_run(args, **kwargs):
+            calls.append({"argv": list(map(str, args)), "cwd": str(kwargs["cwd"])})
+            if args[0] == "git" and args[1:] == ["rev-parse", "HEAD"]:
+                value = actual_head
+            elif args[0] == "git" and args[1:] == ["status", "--porcelain"]:
+                value = status
+            elif args[0] == "MOCK-DOCKER" and "info" in args:
+                value = "runtime-engine"
+            elif args[0] == "MOCK-DOCKER" and "ps" in args:
+                value = ""
+            elif args[0] == "MOCK-DOCKER" and "inspect" in args:
+                value = "sha256:" + "a" * 64
+            else:
+                raise AssertionError("unexpected command: " + repr(args))
+            return subprocess.CompletedProcess(args, 0, value.encode("utf-8"), b"")
+        stdout, stderr = io.StringIO(), io.StringIO()
+        read_bytes = Path.read_bytes
+        def fake_read_bytes(path):
+            if repo_option is None and any(path == runtime / name for name in self.ARTIFACTS):
+                return b"default-runtime-artifact"
+            return read_bytes(path)
+        with patch.object(sys, "argv", argv), patch.object(acceptance, "os", SimpleNamespace(name="nt")), \
+             patch.object(acceptance.subprocess, "run", side_effect=fake_run), \
+             patch.object(Path, "read_bytes", new=fake_read_bytes), \
+             contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = acceptance.main()
+        return code, output, calls, stdout.getvalue(), stderr.getvalue(), runtime.resolve()
+
+    def test_default_repo_remains_verifier_script_parent(self):
+        import tempfile
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as folder:
+            runner = acceptance.DesktopRun(SimpleNamespace(repo=None), Path(folder))
+        self.assertEqual(Path(acceptance.__file__).resolve().parents[1], runner.repo)
+
+    def test_omitted_repo_option_keeps_default_main_root(self):
+        code, output, calls, stdout, stderr, runtime = self.invoke_main(None)
+        self.assertEqual(0, code, stderr)
+        expected = Path(acceptance.__file__).resolve().parents[1]
+        metadata = __import__("json").loads((output / "run-meta.safe.json").read_text(encoding="utf-8"))
+        self.assertEqual(expected, runtime)
+        self.assertEqual(str(expected), metadata["runtimeRepo"]["path"])
+        self.assertEqual("runtime-head", metadata["runtimeRepo"]["head"])
+        self.assertTrue(calls)
+        self.assertTrue(all(Path(call["cwd"]) == expected for call in calls))
+
+    def test_main_parses_repo_and_uses_it_for_subprocesses_artifacts_and_metadata(self):
+        import hashlib
+        import json
+        code, output, calls, stdout, stderr, runtime = self.invoke_main("runtime")
+        self.assertEqual(0, code, stderr)
+        self.assertTrue(calls)
+        self.assertTrue(all(Path(call["cwd"]) == runtime for call in calls))
+        metadata = json.loads((output / "run-meta.safe.json").read_text(encoding="utf-8"))
+        self.assertEqual("runtime-head", metadata["head"])
+        self.assertEqual(str(Path(acceptance.__file__).resolve()), metadata["verifier"]["path"])
+        self.assertEqual(hashlib.sha256(Path(acceptance.__file__).read_bytes()).hexdigest(),
+                         metadata["verifier"]["sha256"])
+        self.assertEqual(str(runtime), metadata["runtimeRepo"]["path"])
+        self.assertEqual("runtime-head", metadata["runtimeRepo"]["head"])
+        self.assertEqual("images_registered", metadata["preflight"]["status"])
+        for name in self.ARTIFACTS:
+            expected = hashlib.sha256((runtime / name).read_bytes()).hexdigest()
+            self.assertEqual(expected, metadata["preflight"]["artifacts"][name])
+        self.assertIn('"head": "runtime-head"', stdout)
+
+    def test_main_preserves_head_and_clean_worktree_rejections_for_selected_repo(self):
+        import json
+        for actual_head, status, expected in (
+            ("other-head", "", "HeadMismatch"),
+            ("runtime-head", " M tracked.txt", "WorktreeNotClean"),
+        ):
+            with self.subTest(expected=expected):
+                code, output, calls, stdout, stderr, runtime = self.invoke_main(
+                    "runtime", actual_head=actual_head, status=status)
+                self.assertEqual(3, code)
+                failure = json.loads((output / "preflight-failure.json").read_text(encoding="utf-8"))
+                self.assertIn(expected, failure["error"])
+                self.assertTrue(calls)
+                self.assertTrue(all(Path(call["cwd"]) == runtime for call in calls))
+                self.assertFalse(any("MOCK-DOCKER" in call["argv"] for call in calls))
+                metadata = json.loads((output / "run-meta.safe.json").read_text(encoding="utf-8"))
+                self.assertEqual(actual_head, metadata["runtimeRepo"]["head"])
+                self.assertEqual("runtime-head", metadata["head"])
+
+    def test_main_rejects_missing_and_non_directory_repo_before_creating_output(self):
+        import contextlib
+        import io
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            file_path = root / "not-a-directory.txt"
+            file_path.write_text("x", encoding="utf-8")
+            for invalid in (root / "missing", file_path):
+                with self.subTest(invalid=invalid):
+                    output = root / ("output-" + invalid.name)
+                    argv = ["verify", "--preflight-only", "--expected-head", "head",
+                            "--engine-id", "engine", "--docker", "docker", "--repo", str(invalid),
+                            "--output", str(output)]
+                    stderr = io.StringIO()
+                    with patch.object(sys, "argv", argv), \
+                         patch.object(acceptance.subprocess, "run") as run, \
+                         contextlib.redirect_stderr(stderr):
+                        with self.assertRaises(SystemExit) as raised:
+                            acceptance.main()
+                    self.assertEqual(2, raised.exception.code)
+                    self.assertIn("--repo must name an existing directory", stderr.getvalue())
+                    run.assert_not_called()
+                    self.assertFalse(output.exists())
+
+    def test_execute_uses_selected_repo_for_apphost_path_and_process_cwd(self):
+        import tempfile
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            runtime = self.create_repo(Path(folder) / "runtime")
+            output = Path(folder) / "output"
+            output.mkdir()
+            args = SimpleNamespace(repo=runtime, expected_head="runtime-head", context="desktop-linux",
+                                   engine_id="runtime-engine", docker="MOCK-DOCKER", dotnet="MOCK-DOTNET")
+            runner = acceptance.DesktopRun(args, output)
+            runner.repo_head = "runtime-head"
+            process_calls = []
+            class Process:
+                pid = 1234
+                stopped = False
+                def poll(self):
+                    return 0 if self.stopped else None
+                def send_signal(self, value):
+                    self.stopped = True
+                def wait(self, timeout):
+                    self.stopped = True
+                    return 0
+            def start(argv, **kwargs):
+                process_calls.append((argv, kwargs))
+                return Process()
+            runner.own_resources = lambda run_id, deadline=None: {}
+            runner.check_engine = lambda timeout=5, deadline=None: None
+            with patch.object(acceptance.subprocess, "CREATE_NEW_PROCESS_GROUP", 0, create=True), \
+                 patch.object(acceptance.signal, "CTRL_BREAK_EVENT", 0, create=True), \
+                 patch.object(acceptance.subprocess, "Popen", side_effect=start), \
+                 patch.object(acceptance, "evaluate_readiness", return_value={
+                     "passed": True, "evaluationComplete": True, "evaluationStartedSeconds": 0}), \
+                 patch.object(acceptance, "wait_for_owned_removal", return_value={"status": "complete"}), \
+                 patch.object(acceptance, "assess_run", return_value=True):
+                self.assertEqual(0, runner.execute({"runId": "repo-option-run"}))
+            self.assertEqual(1, len(process_calls))
+            argv, kwargs = process_calls[0]
+            expected_apphost = runtime / self.ARTIFACTS[0]
+            self.assertEqual(str(expected_apphost), argv[1])
+            self.assertEqual(runtime, kwargs["cwd"])
+            result = __import__("json").loads((output / "result.safe.json").read_text(encoding="utf-8"))
+            self.assertEqual("runtime-head", result["head"])
+            self.assertEqual({"path": str(runtime), "head": "runtime-head"}, result["runtimeRepo"])
+            self.assertEqual(str(Path(acceptance.__file__).resolve()), result["verifier"]["path"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

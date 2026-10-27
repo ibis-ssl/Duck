@@ -172,7 +172,12 @@ class DesktopRun:
     """既存のWindows環境だけを使う。Docker設定変更、pull、rm、強制停止は行わない。"""
     def __init__(self, args, folder):
         self.args, self.folder = args, folder
-        self.repo = Path(__file__).resolve().parents[1]
+        requested_repo = getattr(args, "repo", None)
+        if requested_repo is None:
+            requested_repo = Path(__file__).resolve().parents[1]
+        self.repo = Path(requested_repo).expanduser().resolve(strict=True)
+        require(self.repo.is_dir(), "RepositoryDirectoryRequired")
+        self.repo_head = None
         self.deadline = time.monotonic() + POLICY["overallSeconds"]
         self.command_number = 0
 
@@ -255,7 +260,8 @@ class DesktopRun:
 
     def preflight(self):
         require(os.name == "nt", "WindowsRequired")
-        require(self.call(["git", "rev-parse", "HEAD"]) == self.args.expected_head, "HeadMismatch")
+        self.repo_head = self.call(["git", "rev-parse", "HEAD"])
+        require(self.repo_head == self.args.expected_head, "HeadMismatch")
         require(not self.call(["git", "status", "--porcelain"]), "WorktreeNotClean")
         require(not self.list_ids(), "ExistingContainersRequireSeparateReview")
         # 直接実行する画像は登録必須。Dockerfileの基底参照はBuildKit記録と区別する。
@@ -395,7 +401,11 @@ class DesktopRun:
             "Testing__Diagnostics__RunId": run_id})
         # AppHost既定の共通所有ロックを使う。実行ごとの別ロックへ置き換えない。
         env.pop("Testing__StackOwnership__LockPath", None)
+        verifier_path = Path(__file__).resolve()
         info = {"head": self.args.expected_head, "runId": run_id, "errors": [], "ctrlBreakSent": False,
+                "verifier": {"path": str(verifier_path),
+                             "sha256": hashlib.sha256(verifier_path.read_bytes()).hexdigest()},
+                "runtimeRepo": {"path": str(self.repo), "head": getattr(self, "repo_head", None)},
                 "apphostPid": None, "apphostExit": None, "ownedResources": {}, "probes": [],
                 "removal": {"status": "not_started"}, "startedUtc": utc_now()}
         process, begun, cid = None, time.monotonic(), None
@@ -476,22 +486,37 @@ def main():
     mode.add_argument("--preflight-only", action="store_true")
     mode.add_argument("--run-once", action="store_true")
     parser.add_argument("--expected-head", required=True)
+    parser.add_argument("--repo", type=Path, help="Existing runtime repository to validate and run")
     parser.add_argument("--engine-id", required=True)
     parser.add_argument("--docker", required=True)
     parser.add_argument("--dotnet", default=r"C:\Program Files\dotnet\dotnet.exe")
     parser.add_argument("--context", default="desktop-linux")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    requested_repo = args.repo if args.repo is not None else Path(__file__).resolve().parents[1]
+    try:
+        args.repo = requested_repo.expanduser().resolve(strict=True)
+    except (OSError, RuntimeError) as ex:
+        parser.error("--repo must name an existing directory: " + str(ex))
+    if not args.repo.is_dir():
+        parser.error("--repo must name an existing directory")
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=False)
+    verifier_path = Path(__file__).resolve()
     metadata = {"head": args.expected_head, "runId": uuid.uuid4().hex, "policy": POLICY,
                 "context": args.context, "engineId": args.engine_id, "startedUtc": utc_now(),
-                "mode": "run-once" if args.run_once else "preflight-only"}
+                "mode": "run-once" if args.run_once else "preflight-only",
+                "verifier": {"path": str(verifier_path),
+                             "sha256": hashlib.sha256(verifier_path.read_bytes()).hexdigest()},
+                "runtimeRepo": {"path": str(args.repo), "head": None}}
     save(args.output / "run-meta.safe.json", metadata)
     try:
         runner = DesktopRun(args, args.output)
-        metadata["preflight"] = runner.preflight()
-        save(args.output / "run-meta.safe.json", metadata)
+        try:
+            metadata["preflight"] = runner.preflight()
+        finally:
+            metadata["runtimeRepo"]["head"] = runner.repo_head
+            save(args.output / "run-meta.safe.json", metadata)
         if args.preflight_only:
             print(json.dumps(metadata, ensure_ascii=False))
             return preflight_exit_code(metadata["preflight"])
