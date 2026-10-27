@@ -246,6 +246,8 @@ class DockerAdapterTests(unittest.TestCase):
             with self.subTest(wrong=wrong):
                 runner = self.runner()
                 def docker(*args, **kwargs):
+                    if args[0] == "info":
+                        return "expected-engine"
                     if args[0] == "ps":
                         return CID
                     return json.dumps({acceptance.RUN_LABEL: "other" if wrong else RUN,
@@ -256,6 +258,87 @@ class DockerAdapterTests(unittest.TestCase):
                         runner.own_resources(RUN)
                 else:
                     self.assertEqual({CID: "referee-driver"}, runner.own_resources(RUN))
+
+    def test_ownership_snapshot_is_bracketed_by_engine_identity(self):
+        import json
+        runner, calls = self.runner(), []
+        def docker(*args, **kwargs):
+            calls.append(args[0])
+            if args[0] == "info":
+                return "expected-engine"
+            if args[0] == "ps":
+                return CID
+            return json.dumps({acceptance.RUN_LABEL: RUN, acceptance.ROLE_LABEL: "referee-driver"})
+        runner.docker = docker
+        self.assertEqual({CID: "referee-driver"}, runner.own_resources(RUN))
+        self.assertEqual(["info", "ps", "inspect", "info"], calls)
+
+    def test_ownership_snapshot_rejects_engine_change_after_inspect(self):
+        import json
+        runner, engine = self.runner(), iter(("expected-engine", "changed-engine"))
+        def docker(*args, **kwargs):
+            if args[0] == "info":
+                return next(engine)
+            if args[0] == "ps":
+                return CID
+            return json.dumps({acceptance.RUN_LABEL: RUN, acceptance.ROLE_LABEL: "referee-driver"})
+        runner.docker = docker
+        with self.assertRaisesRegex(ValueError, "DockerEngineChanged"):
+            runner.own_resources(RUN)
+
+    def test_ownership_queries_share_shutdown_deadline_budget(self):
+        import json
+        from unittest.mock import patch
+        runner, clock, calls = self.runner(), FakeClock(), []
+        runner.deadline = 20
+        def docker(*args, timeout=5):
+            calls.append((args[0], timeout))
+            clock.sleep(0.05)
+            if args[0] == "info":
+                return "expected-engine"
+            if args[0] == "ps":
+                return CID
+            return json.dumps({acceptance.RUN_LABEL: RUN, acceptance.ROLE_LABEL: "referee-driver"})
+        runner.docker = docker
+        with patch.object(acceptance.time, "monotonic", clock.clock):
+            with self.assertRaisesRegex(ValueError, "OwnershipDeadlineExceeded"):
+                runner.own_resources(RUN, deadline=0.12)
+        self.assertEqual(["info", "ps", "inspect"], [name for name, _ in calls])
+        self.assertTrue(all(0 < timeout <= 0.12 for _, timeout in calls))
+
+
+    def test_only_referee_health_connection_refusal_is_recoverable(self):
+        transient = ValueError(
+            "CommandFailed: /bin/bash: connect: Connection refused; /dev/tcp/127.0.0.1/39110")
+        self.assertTrue(acceptance.DesktopRun.is_recoverable_health_refusal(transient))
+        self.assertTrue(acceptance.DesktopRun.is_recoverable_health_refusal(
+            ConnectionRefusedError(10061, "Connection refused: 127.0.0.1:39110")))
+        for fatal in (ValueError("OwnerLabelMismatch"), ValueError("DockerEngineChanged"),
+                      ValueError("CommandFailed: permission denied"),
+                      ValueError('CommandFailed: error during connect: Get "http://127.0.0.1:39110/v1.47/_ping": dial tcp 127.0.0.1:39110: connect: connection refused'),
+                      ValueError("CommandFailed: /dev/tcp/127.0.0.1/39110: connection refused"),
+                      OSError("Connection refused: docker daemon")):
+            with self.subTest(error=str(fatal)):
+                self.assertFalse(acceptance.DesktopRun.is_recoverable_health_refusal(fatal))
+
+    def test_oserror_command_attempt_preserves_diagnostic_artifacts(self):
+        import tempfile
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        runner = object.__new__(acceptance.DesktopRun)
+        with tempfile.TemporaryDirectory() as folder:
+            runner.folder = Path(folder)
+            runner.repo = Path(folder)
+            runner.command_number = 0
+            runner.deadline = acceptance.time.monotonic() + 20
+            with patch.object(acceptance.subprocess, "run", side_effect=OSError("Connection refused")):
+                with self.assertRaisesRegex(OSError, "Connection refused"):
+                    runner.call(["mock-command"])
+            prefix = Path(folder) / "command-001"
+            self.assertTrue(prefix.with_suffix(".json").exists())
+            self.assertEqual(b"", prefix.with_suffix(".stdout.log").read_bytes())
+            self.assertIn("Connection refused", prefix.with_suffix(".stderr.log").read_text(encoding="utf-8"))
+            self.assertEqual("launch_error", prefix.with_suffix(".exit.txt").read_text())
 
 
 class ImagePreflightTests(unittest.TestCase):
@@ -305,7 +388,9 @@ class ImagePreflightTests(unittest.TestCase):
                     raise ValueError("CommandFailed: No such image: " + ref)
                 if base_error and ref in self.REFS:
                     raise ValueError("CommandFailed: access denied")
-                if ref in self.REFS and not registered:
+                is_registered = registered is True or (isinstance(registered, (list, tuple, set))
+                                                       and ref in registered)
+                if ref in self.REFS and not is_registered:
                     raise ValueError("CommandFailed: No such image: " + ref)
                 return "sha256:" + "a" * 64
             if args[:2] == ("buildx", "du"):
@@ -344,10 +429,31 @@ class ImagePreflightTests(unittest.TestCase):
         self.assertTrue(all(item["state"] == "cache_missing" for item in self.evidence()["buildBaseImages"]))
 
     def test_unparseable_cache_is_unknown(self):
-        self.mock_docker(cache='{"unexpected":"shape"}')
+        self.mock_docker(cache='{"unexpected":')
         with self.assertRaisesRegex(ValueError, "BuildCacheEvidenceUnknown"):
             self.run.preflight()
         self.assertTrue(all(item["state"] == "cache_unknown" for item in self.evidence()["buildBaseImages"]))
+
+    def test_single_object_ndjson_cache_is_one_candidate(self):
+        import json
+        row = {"Description": "pulled from " + self.REFS[1],
+               "Mutable": False, "Shared": True}
+        self.mock_docker(cache=json.dumps(row), registered=(self.REFS[0],))
+        result = self.run.preflight()
+        self.assertEqual("cache_candidates_unverified", result["status"])
+        self.assertFalse(result["buildVerified"])
+        self.assertEqual(4, acceptance.preflight_exit_code(result))
+        states = [item["state"] for item in self.evidence()["buildBaseImages"]]
+        self.assertEqual(["registered", "cache_candidate"], states)
+
+    def test_single_unrelated_object_is_missing_not_unknown(self):
+        import json
+        self.mock_docker(cache=json.dumps({
+            "Description": "pulled from unrelated@sha256:" + "f" * 64,
+            "Mutable": False, "Shared": True}))
+        with self.assertRaisesRegex(ValueError, "BuildBaseCacheEvidenceMissing"):
+            self.run.preflight()
+        self.assertEqual("cache_missing", self.evidence()["buildBaseImages"][0]["state"])
 
     def test_cache_command_error_is_distinct(self):
         self.mock_docker(cache=OSError("cannot query builder"))
@@ -408,7 +514,7 @@ class PreflightPlatformTests(unittest.TestCase):
         result = unittest.TestResult()
         with patch.object(acceptance, "os", SimpleNamespace(name="posix")):
             suite.run(result)
-        self.assertEqual(9, result.testsRun)
+        self.assertEqual(11, result.testsRun)
         self.assertTrue(result.wasSuccessful(), str(result.failures + result.errors))
         self.assertEqual([], result.skipped)
 

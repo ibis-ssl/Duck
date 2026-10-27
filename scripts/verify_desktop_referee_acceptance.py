@@ -188,46 +188,69 @@ class DesktopRun:
             prefix.with_suffix(".stdout.log").write_bytes(completed.stdout)
             prefix.with_suffix(".stderr.log").write_bytes(completed.stderr)
             prefix.with_suffix(".exit.txt").write_text(str(completed.returncode))
-            require(completed.returncode == 0,
-                    "CommandFailed: " + completed.stderr.decode("utf-8", errors="replace")[:300])
+            if completed.returncode != 0:
+                failure = ValueError("CommandFailed: " +
+                                     completed.stderr.decode("utf-8", errors="replace")[:300])
+                failure.returncode = completed.returncode
+                raise failure
             return completed.stdout.decode("utf-8", errors="replace").strip()
         except subprocess.TimeoutExpired as ex:
             prefix.with_suffix(".stdout.log").write_bytes(ex.stdout or b"")
             prefix.with_suffix(".stderr.log").write_bytes(ex.stderr or b"")
             prefix.with_suffix(".exit.txt").write_text("timeout")
             raise
+        except OSError as ex:
+            prefix.with_suffix(".stdout.log").write_bytes(b"")
+            prefix.with_suffix(".stderr.log").write_text(type(ex).__name__ + ": " + str(ex), encoding="utf-8")
+            prefix.with_suffix(".exit.txt").write_text("launch_error")
+            raise
 
     def docker(self, *args, timeout=5):
         return self.call([self.args.docker, "--context", self.args.context, *args], timeout)
 
-    def check_engine(self, timeout=5):
-        require(self.docker("info", "--format", "{{.ID}}", timeout=timeout) == self.args.engine_id,
-                "DockerEngineChanged")
+    def _remaining(self, deadline, reason):
+        available = min(self.deadline, deadline) - time.monotonic()
+        require(available > 0, reason)
+        return available
 
-    def list_ids(self, remaining=5):
+    def check_engine(self, timeout=5, deadline=None):
+        limit = min(self.deadline, deadline) if deadline is not None else self.deadline
+        available = min(timeout, self._remaining(limit, "ShutdownDeadlineExceeded"))
+        require(self.docker("info", "--format", "{{.ID}}", timeout=available) == self.args.engine_id,
+                "DockerEngineChanged")
+        self._remaining(limit, "ShutdownDeadlineExceeded")
+
+    def list_ids(self, remaining=5, deadline=None):
         # 一覧の前後の接続先照合も同じ停止期限に含める。
-        deadline = min(self.deadline, time.monotonic() + remaining)
+        deadline = min(self.deadline, time.monotonic() + remaining,
+                       deadline if deadline is not None else self.deadline)
         def budget():
-            available = deadline - time.monotonic()
+            available = min(self.deadline, deadline) - time.monotonic()
             require(available > 0, "InventoryDeadlineExceeded")
             return available
-        self.check_engine(timeout=budget())
+        self.check_engine(timeout=budget(), deadline=deadline)
         ids = self.docker("ps", "-a", "--no-trunc", "--format", "{{.ID}}",
                           timeout=budget()).splitlines()
         require(all(FULL_ID.fullmatch(cid) for cid in ids), "InvalidContainerInventory")
-        self.check_engine(timeout=budget())
+        self.check_engine(timeout=budget(), deadline=deadline)
         return ids
 
-    def own_resources(self, run_id):
+    def own_resources(self, run_id, deadline=None):
+        limit = min(self.deadline, deadline) if deadline is not None else self.deadline
+        def budget():
+            return min(5, self._remaining(limit, "OwnershipDeadlineExceeded"))
+        self.check_engine(timeout=budget(), deadline=limit)
         ids = self.docker("ps", "-a", "--no-trunc", "--filter", "label=" + RUN_LABEL + "=" + run_id,
-                          "--format", "{{.ID}}").splitlines()
+                          "--format", "{{.ID}}", timeout=budget()).splitlines()
         result = {}
         for cid in ids:
             require(FULL_ID.fullmatch(cid), "IncompleteContainerId")
-            labels = json.loads(self.docker("inspect", cid, "--format", "{{json .Config.Labels}}"))
+            labels = json.loads(self.docker("inspect", cid, "--format", "{{json .Config.Labels}}",
+                                             timeout=budget()))
             require(labels.get(RUN_LABEL) == run_id and labels.get(ROLE_LABEL) in ROLES, "OwnerLabelMismatch")
             require(labels[ROLE_LABEL] not in result.values(), "DuplicateOwnedRole")
             result[cid] = labels[ROLE_LABEL]
+        self.check_engine(timeout=budget(), deadline=limit)
         return result
 
     def preflight(self):
@@ -288,9 +311,13 @@ class DesktopRun:
                 raise ValueError("BuildCacheQueryFailed") from ex
             try:
                 try:
-                    records = json.loads(output)
+                    parsed = json.loads(output)
                 except json.JSONDecodeError:
                     records = [json.loads(line) for line in output.splitlines() if line.strip()]
+                else:
+                    # buildx du emits newline-delimited JSON; one record is also
+                    # valid JSON by itself, so normalize an object as one row.
+                    records = parsed if isinstance(parsed, list) else [parsed]
                 require(isinstance(records, list) and
                         all(isinstance(row, dict) for row in records), "InvalidBuildCacheShape")
             except (ValueError, TypeError) as ex:
@@ -332,6 +359,27 @@ class DesktopRun:
                 "httpStatus": int(status.group(1)) if status else None,
                 "body": json.loads(parts[1]) if len(parts) == 2 else None}
 
+    @staticmethod
+    def is_recoverable_health_refusal(error):
+        """Only the referee health endpoint's connection refusal is transient."""
+        message = str(error).lower()
+        if isinstance(error, ConnectionRefusedError):
+            return "127.0.0.1:39110" in message and "connection refused" in message
+        if type(error) is not ValueError:
+            return False
+        daemon_markers = ("error during connect", "/_ping", "dial tcp", "error response from daemon")
+        if any(marker in message for marker in daemon_markers):
+            return False
+        return ("commandfailed:" in message and "/bin/bash: connect: connection refused" in message
+                and "/dev/tcp/127.0.0.1/39110" in message)
+
+    @staticmethod
+    def failed_probe(error, begun):
+        return {"utc": utc_now(), "elapsedSeconds": time.monotonic() - begun,
+                "durationSeconds": 0.0, "dockerExit": getattr(error, "returncode", None),
+                "error": type(error).__name__ + ": " + str(error),
+                "httpStatus": None, "body": None}
+
     def execute(self, metadata):
         run_id = metadata["runId"]
         env = os.environ.copy()
@@ -366,7 +414,12 @@ class DesktopRun:
                             "OwnedResourceReplaced")
                     cid = next((key for key, role in current.items() if role == "referee-driver"), None)
                     if cid:
-                        probe = self.probe(cid, begun)
+                        try:
+                            probe = self.probe(cid, begun)
+                        except Exception as ex:
+                            if not self.is_recoverable_health_refusal(ex):
+                                raise
+                            probe = self.failed_probe(ex, begun)
                         info["probes"].append(probe)
                         with (self.folder / "health-probes.jsonl").open("a", encoding="utf-8") as log:
                             log.write(json.dumps(probe, ensure_ascii=False) + "\n")
@@ -392,11 +445,13 @@ class DesktopRun:
                             info["errors"].append("NormalStop: " + type(ex).__name__ + ": " + str(ex))
                     info["apphostExit"] = process.poll()
                     info["apphostExitObservedSeconds"] = time.monotonic() - stop_at
-                info["removal"] = wait_for_owned_removal(info["ownedResources"], self.list_ids, stop_deadline)
+                info["removal"] = wait_for_owned_removal(
+                    info["ownedResources"], lambda remaining: self.list_ids(remaining, stop_deadline), stop_deadline)
                 if info["removal"]["status"] == "complete":
                     try:
-                        self.check_engine()
-                        info["lateOwnedResources"] = self.own_resources(run_id)
+                        self.check_engine(deadline=stop_deadline)
+                        info["lateOwnedResources"] = self.own_resources(run_id, stop_deadline)
+                        self._remaining(stop_deadline, "ShutdownDeadlineExceeded")
                         require(not info["lateOwnedResources"], "UnrecordedOwnedResourcesRemain")
                     except Exception as ex:
                         info["errors"].append("FinalOwnershipCheck: " + str(ex))
