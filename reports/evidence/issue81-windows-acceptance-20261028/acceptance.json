@@ -1,0 +1,180 @@
+﻿{
+  "schema": "issue81-windows-acceptance/v1",
+  "target": {
+    "repository": "ibis-ssl/Duck",
+    "technicalHead": "9841d99616795074ac14f95a57dd9b5baa0295ae",
+    "sourceState": "clean at runtime acceptance",
+    "verifierSourceCommit": "d67d2a4d3389445ea387b1935d0c79b411f3adc4",
+    "verifierSourceBlob": "c77acd3036eeb10330de58aa2d0d6acd13ee6b2b",
+    "verifierSha256": "db3101ea23bf8f158b59e791ba6b8aff5e7b1d316d4acf2c04f392c94435825b"
+  },
+  "run": {
+    "mode": "run-once",
+    "count": 1,
+    "startedUtc": "2026-10-28T13:37:41.3346093Z",
+    "endedUtc": "2026-10-28T13:38:41.3602026Z",
+    "exitCode": 0,
+    "policy": {
+      "overallSeconds": 120,
+      "startupSeconds": 45,
+      "evaluationSeconds": 30,
+      "shutdownSeconds": 15,
+      "minimumSamples": 10,
+      "allowedFailures": 0
+    },
+    "result": {
+      "passed": true,
+      "appHostExit": 0,
+      "readinessSamples": 12,
+      "readySamples": 12,
+      "failures": 0,
+      "healthProbes": {
+        "count": 12,
+        "httpStatus200": 12,
+        "dockerExit0": 12,
+        "errors": 0,
+        "firstElapsedSeconds": 14.703832400031388,
+        "lastElapsedSeconds": 45.686267900047824
+      },
+      "ownedContainersCreated": 4,
+      "ownedContainersRemoved": 4,
+      "cleanupPolls": 3,
+      "cleanupElapsedSeconds": 2.497485099826008,
+      "unrelatedContainersPresent": 0,
+      "verifierErrors": 0
+    }
+  },
+  "environment": {
+    "context": "desktop-linux",
+    "engineIdentityMatched": true,
+    "persistentSettingsChanged": false,
+    "finalContainerCount": 0,
+    "unrelatedContainersRemoved": 0
+  },
+  "images": {
+    "simulator": "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+    "gameController": "robocupssl/ssl-game-controller@sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7",
+    "runtimeBase": "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+    "aspnetBase": "mcr.microsoft.com/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+    "pulls": {
+      "runtimeExit": 0,
+      "aspnetExit": 0,
+      "initialRuntimePathResolutionExit": 1,
+      "initialFailure": "credential helper was not resolved on the initial process PATH",
+      "correctedPullScope": "one child process PATH only; no persistent PATH or auth/settings changes"
+    }
+  },
+  "artifacts": {
+    "appHostDebugSha256": "9439310b7eefda0a1e4cd522fa324df598d1bc32c855427194d615410caf9ad8",
+    "refereeDriverReleaseSha256": "f2fde3c7154e8f5929426e92959679c4e26d4809e87eb4eddc06354199c062df",
+    "runtimeHostReleaseSha256": "9699bdb2790eb422c2873fcb1620e98a62368cd2f574a4dbaeed5fc8cdbde931"
+  },
+  "validation": {
+    "textlint": {
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "scriptSha256": "b95cb2ae82d9da6c79ff1646add44a26bc87e1135ff05b2c5ad021cf109baadd",
+      "inputSha256": "bd546db89ab13f25ebd057f739385e1afd98c7ca853901eaa518edf54484bd29"
+    },
+    "yomiyasuStrict": {
+      "exit": 0,
+      "score": 100,
+      "findings": 0,
+      "isClean": true,
+      "scriptSha256": "61f0b0b1dcfc8cc734c69fc1f4aa2546d36ed846d42e3efceea1379b389e3e21",
+      "inputSha256": "bd546db89ab13f25ebd057f739385e1afd98c7ca853901eaa518edf54484bd29"
+    },
+    "standardMarkdownGate": "not run; reports excluded from normal target list",
+    "cspell": "not run",
+    "sudachi": "not run",
+    "wholeRepositoryGate": "not claimed"
+  },
+  "scope": {
+    "runtimeAcceptance": "passed for this single bounded run",
+    "fullIssue81": "not claimed",
+    "issue82": "not claimed",
+    "mergeAuthorization": "not implied",
+    "integration": "not performed"
+  },
+  "evidence": {
+    "report": "reports/issue81-windows-acceptance-20261028.md",
+    "externalDiagnosticsLocallyRetained": true,
+    "externalDiagnosticsUploaded": false,
+    "selectedEvidenceHashes": [
+      {
+        "ref": "run-metadata",
+        "sha256": "1dcfd2f7812331fb12e295b5216f531047e897cc2aedfe7d24599bc9c70189c8",
+        "bytes": 1571
+      },
+      {
+        "ref": "run-result",
+        "sha256": "662513588281981741b6cb4be2b86112a1da616122fd1bfc92247916ae4aff9b",
+        "bytes": 20977
+      },
+      {
+        "ref": "health-probes",
+        "sha256": "01116aff7b42faf81b83ab3a6d06454651a95a8a6e8098958a96541789888596",
+        "bytes": 12815
+      },
+      {
+        "ref": "apphost-stdout",
+        "sha256": "321e602755832694158b25c7f749a102cd7ce06e17410514ecb017fd8c20086e",
+        "bytes": 2024
+      },
+      {
+        "ref": "apphost-stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "ref": "run-invocation",
+        "sha256": "65bac56c4b51f614af6307ea01763f2c4b9ec81250c08fa04cbceeeaae58d403",
+        "bytes": 605
+      },
+      {
+        "ref": "report-validation",
+        "sha256": "20398eb726480db3f4d96f7b24ad5df535d4152f841082538c5bd4e346c2a213",
+        "bytes": 1946
+      },
+      {
+        "ref": "preflight-after-pulls-exit",
+        "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083",
+        "bytes": 4
+      },
+      {
+        "ref": "initial-runtime-pull-exit",
+        "sha256": "5abdb6175f820f0ac3d8647fbb1f7a0bcc91757a782a8a145570944ca6a00c96",
+        "bytes": 4
+      },
+      {
+        "ref": "initial-runtime-pull-error",
+        "sha256": "cfbd93918f6435cbd7b76cc7cbe011538ae8c05a732dd42cc8c95045c6344422",
+        "bytes": 113
+      },
+      {
+        "ref": "runtime-pull-success-output",
+        "sha256": "a29e60e0fb85a22fb540108ab413fcadfc83b4ea40df97ce02828f60e4c22e22",
+        "bytes": 462
+      },
+      {
+        "ref": "runtime-pull-success-exit",
+        "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083",
+        "bytes": 4
+      },
+      {
+        "ref": "aspnet-pull-success-output",
+        "sha256": "5a4927494b3bb16d728697477558b427ff2d35dd62a75575d483a557c4306122",
+        "bytes": 458
+      },
+      {
+        "ref": "aspnet-pull-success-exit",
+        "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083",
+        "bytes": 4
+      }
+    ],
+    "privateFullInventoryEntries": 38,
+    "privateFullInventorySha256": "34f45a37b89a19345bd651352f0c895bc65bed951d4a08436697fec57e4d5490"
+  },
+  "reportSha256": "bd546db89ab13f25ebd057f739385e1afd98c7ca853901eaa518edf54484bd29"
+}
