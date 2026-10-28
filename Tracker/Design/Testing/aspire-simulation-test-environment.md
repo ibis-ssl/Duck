@@ -32,7 +32,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
-Vision 入力から `Tracker.RuntimeHost` の準備完了までを単独で確認する場合は、`Testing:VisionSimulationOnly=true` を明示する。この選択では `simulator` と `duck` の2資源だけを Aspire 標準 `ContainerResource` として登録し、既定の base / comparison モデルは変更しない。既存の `RuntimeHostOnly` は Duck だけの1資源選択として維持する。simulator は `linux-image-lock.json` の `framework-simulator` 一覧ダイジェストを使い、Docker image の `Entrypoint=["tini","--"]` と `Cmd=["./bin/simulator-cli"]` に対応するよう、`tini` と `-- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellow` を指定する。追加の `tini` を command に重ねない。UDP は公開せず、ホストネットワークも使わない。simulator が起動した後に Duck を開始し、Duck 自身の `/health/vision` が復号済み Vision 入力を確認する。これは最小 Vision 入力経路の検証であり、比較資源やその他の外部サービスを含む全体構成の受入を意味しない。固定イメージの実行、同一 DCP bridge 内の multicast 到達、strict health の成功は実測で確認する。
+視覚入力から `Tracker.RuntimeHost` の準備完了までを単独で確認する場合は、`Testing:VisionSimulationOnly=true` を明示する。この選択では `simulator` と `duck` の2資源だけを Aspire 標準 `ContainerResource` として登録し、既定の基本構成・比較構成は変更しない。既存の `RuntimeHostOnly` は Duck だけの1資源選択として維持する。simulator は `linux-image-lock.json` の `framework-simulator` 一覧ダイジェストを使い、Dockerイメージの `Entrypoint=["tini","--"]` と `Cmd=["./bin/simulator-cli"]` に対応するよう、`tini` と `-- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellow` を指定する。追加の `tini` を起動引数に重ねない。UDP は公開せず、ホストネットワークも使わない。simulator が起動した後に Duck を開始し、Duck 自身の `/health/vision` が復号済み視覚入力を確認する。これは最小の視覚入力経路の検証であり、比較資源やその他の外部サービスを含む全体構成の受入を意味しない。固定イメージの実行、同一 DCP ブリッジ内のマルチキャスト到達、厳格な準備確認の成功は実測で確認する。
 
 ### Linux 向けアプリケーションの配布出力（I81-04A）
 
@@ -117,7 +117,7 @@ UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資
 
 ### 明示的な Game Controller 視覚検証モード（I81-05B3）
 
-`Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的 TCP ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost モデル試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、このモデル試験では証明しない。
+`Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的な `TCP` ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost の構成試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、この構成試験では証明しない。
 
 ```mermaid
 flowchart LR
@@ -207,18 +207,18 @@ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の�
 | `RefereeDriver:GameControllerUri` | 有効時に必須の絶対形式の接続先アドレス。暗黙の既定接続先はない。 | `ws` または `wss` の `/api/control` を指定する。通常の内部値は `ws://game-controller:8082/api/control`。観測と明示制御に同じ検査済み接続先を渡す。 |
 | `RefereeDriver:InterfaceAddress` | 任意のIPv4アドレス。未指定なら既定の受信インターフェース。 | `224.5.23.1:11003` の受信で共有ポートを許可し、IPv4の全アドレスで待ち受け、指定したインターフェースで参加する。 |
 | `RefereeDriver:AutoDriveToActive` | 真偽値。未指定、`false`、解釈できない値は観測専用。 | `Enabled` と本設定がともに明示した `true` の場合だけ、既存の制御処理を一度実行する。 |
-| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` / `Testing:IdentityControl:ExpectedRole` | RunIdは空白だけでない文字列。通常の固定ResourceId経路ではResourceIdも必須。起動時に資源キーが未確定の明示制御経路ではExpectedRoleを必須とし、ResourceIdは未設定にする。 | RunIdと役割を起動時に固定し、AppHostが照合したResourceIdだけを同一UDS handoffの初回commitで確定する。送信元アドレスやホスト名から補完しない。 |
+| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` / `Testing:IdentityControl:ExpectedRole` | `RunId` は空白だけでない文字列。通常の固定 `ResourceId` 経路では `ResourceId` も必須。起動時に資源キーが未確定の明示制御経路では `ExpectedRole` を必須とし、`ResourceId` は未設定にする。 | `RunId` と役割を起動時に固定し、AppHost が照合した `ResourceId` だけを同一 `UDS` 上の `handoff` における初回 `commit` で確定する。送信元アドレスやホスト名から補完しない。 |
 | `Testing:Diagnostics:ContainerId` / `Testing:Diagnostics:Generation` | 完全なコンテナIDを半角16進表記64桁で指定し、起動世代は正の `Int64` で指定する。 | 未指定・不正値は帰属不明とする。正常復号件数は記録するが、準備完了にはしない。 |
 
 無効時の診断経路は404となり、既存の待受設定を保持する。無効設定は、HTTPサーバー自体を起動しないことを意味しない。コンテナ内の39110待受と、後続のDCPによるWindows 127.0.0.1の動的ポート公開は別に確認する。
 
 接続先に利用者情報や断片識別子を含めない。コンテナ用構成では127.0.0.1や::1等の自身を指す接続先、既知の自身の名前、資源IDと同じホスト名、診断用39110を指す宛先を起動前に拒否する。コンテナ用でない明示構成の127.0.0.1接続と、既存の制御機能の公開既定値は維持する。
 
-### Desktop BridgeでのRefereeDriver帰属確定
+### デスクトップブリッジでの `RefereeDriver` 帰属確定
 
-四資源構成などで`Testing:IdentityControl:DesktopBridgeEnabled=true`を明示した場合、AppHostはRefereeDriverにもDuckと同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker Engine IDを照合し、対象コンテナだけに`dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control`を実行する。RuntimeHost側と同じprepare/challenge/commitの契約を使い、RefereeDriver側の専用Unixソケット`/tmp/duck-referee-identity.sock`で受け付ける。ソケットはコンテナ外へ公開せず、既存のUDP通信・GC API接続先・Docker Desktop構成を変更しない。
+四資源構成などで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は RefereeDriver にも Duck と同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker Engine IDを照合し、対象コンテナだけに `dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control` を実行する。RuntimeHost 側と同じ `prepare` / `challenge` / `commit` の契約を使い、RefereeDriver 側ではコンテナ内の固定位置 `/tmp/duck-referee-identity.sock` で待ち受ける `Unix` ソケットを使う。ソケットはコンテナ外へ公開せず、既存のUDP通信・Game Controller API接続先・Docker Desktop構成を変更しない。
 
-受信開始時点ではコンテナIDと資源キーが未確定でもよいが、帰属は未成立とする。受信中に正しい識別情報がcommitされた時だけ、既存の単一受信処理の世代を切り替え、旧試行と保持中の指令を無効化する。切替後の新しい正常復号件数が増加するまで準備完了にしない。同じ識別情報の再送は冪等とし、RunId・資源キー不一致、世代後退、BootIdの不一致は拒否する。RefereeDriver未選択時またはブリッジ無効時は新しい監視・制御口を起動しない。この受渡しは所有コンテナを照合した実装経路であり、実機でのReady・GC API対応成立は別途検証する。
+受信開始時点ではコンテナIDと資源キーが未確定でもよいが、帰属は未成立とする。受信中に正しい識別情報が `commit` された時だけ、既存の単一受信処理の世代を切り替え、旧試行と保持中の指令を無効化する。切替後の新しい正常復号件数が増加するまで準備完了にしない。同じ識別情報の再送は冪等とし、`RunId`・資源キー不一致、世代後退、`BootId` の不一致は拒否する。RefereeDriver未選択時またはブリッジ無効時は新しい監視・制御口を起動しない。この受渡しは所有コンテナを照合した実装経路であり、実機での準備完了・Game Controller API対応成立は別途検証する。
 
 ### 診断ログの共有書込み
 
@@ -267,13 +267,13 @@ APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。API
 
 AppHost は `ResourceNotificationService.WatchAsync` で資源通知を受け、登録した `IResource` の参照、イベントの不透明な `ResourceId`、役割を表す `Resource.Name`、完全な `container.id` を照合する。`TryGetCurrentState(ResourceId, out ...)` で取得した現在状態にも同じ資源キーと完全IDがあることを確認し、既知の古い通知から実行先を選ばない。この照合は公開された現在状態との一致を確認するもので、通知の全順序やDCPのDocker接続先との同一性を証明するものではない。
 
-診断ブリッジは `Testing:IdentityControl:DesktopBridgeEnabled=true` の明示選択時だけ有効にする。その場合は `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId` を明示し、同じcontextの `docker --context <context> info --format {{.ID}}` が期待IDと一致することを確認する。さらに `docker --context <context> inspect --format {{json .}} <完全ID>` で完全ID、実行中状態、当該AppHost実行のrun-idラベルと役割ラベルを照合し、すべて一致した完全IDだけに `docker --context <context> exec -i <完全ID> dotnet Tracker.RuntimeHost.dll --identity-control` を行う。確認に失敗した場合は `exec` しない。これは明示したDocker Desktop context内で通知対象と当該実行の所有コンテナを照合する境界であり、DCPが選択したdaemon endpointとの直接比較を行ったという主張ではない。HTTPの宛先、名前解決、ポート番号は対象選択に使わず、AppHostは利用者のDocker設定や接続設定を変更しない。既定構成はブリッジを有効化せず、RuntimeHostOnly選択もブリッジの有効化とは別である。
+診断ブリッジは `Testing:IdentityControl:DesktopBridgeEnabled=true` の明示選択時だけ有効にする。その場合は `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId` を明示し、同じDocker接続先で `docker --context <context> info --format {{.ID}}` が期待IDと一致することを確認する。さらに `docker --context <context> inspect --format {{json .}} <完全ID>` で完全ID、実行中状態、当該AppHostの起動を示す `run-id` ラベルと役割ラベルを照合し、すべて一致した完全IDだけに `docker --context <context> exec -i <完全ID> dotnet Tracker.RuntimeHost.dll --identity-control` を行う。確認に失敗した場合は `exec` しない。これは明示したDocker Desktopの接続先内で通知対象と当該実行の所有コンテナを照合する境界であり、DCPが選択したDocker Engineの接続先との直接比較を行ったという主張ではない。HTTPの宛先、名前解決、ポート番号は対象選択に使わず、AppHostは利用者のDocker設定や接続設定を変更しない。既定構成はブリッジを有効化せず、`RuntimeHostOnly` 選択もブリッジの有効化とは別である。
 
 DCP/AppHostは資源の作成・起動・停止・削除を引き続き単独で管理する。`exec` は既に起動した対象コンテナ内でRuntimeHostの同梱アセンブリを起動し、診断識別子だけを渡す。別の起動管理者は作らず、Dockerイメージや外部資源、コンテナの起動・停止・削除は操作しない。
 
-常駐RuntimeHostはコンテナ内の固定Unixソケット `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。 `prepare` と `commit` にはRunId、ResourceId、役割名、完全ContainerId、Generationを含め、両者の識別情報を一致させる。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側はBootIdと識別情報一式の一致を再確認してから受理する。起動時にResourceIdが未確定の経路では、ExpectedRoleだけを事前固定し、ResourceId未設定の間は診断を未帰属として503にする。役割名が一致する `prepare` は候補確認に限り、ResourceIdをbindしない。同じ接続の `commit` が成功した時だけResourceIdを確定する。ResourceIdを起動時に明示する既存経路は従来どおり厳格一致させる。
+常駐RuntimeHostはコンテナ内の固定位置 `/tmp/duck-runtime-identity.sock` で待ち受ける `Unix` ソケットを使い、診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。`prepare` と `commit` には `RunId`、`ResourceId`、役割名、完全な `ContainerId`、`Generation` を含め、両者の識別情報を一致させる。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理した `BootId` と比較し、同じ `ContainerId` でもRuntimeHostプロセスが再起動していれば `Generation` を増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側は `BootId` と識別情報一式の一致を再確認してから受理する。起動時に `ResourceId` が未確定の経路では `ExpectedRole` だけを事前固定し、`ResourceId` 未設定の間は診断を未帰属として503にする。役割名が一致する `prepare` は候補確認に限り、`ResourceId` を関連付けない。同じ接続の `commit` が成功した時だけ `ResourceId` を確定する。`ResourceId` を起動時に明示する既存経路は従来どおり厳格一致させる。
 
-AppHostが新たに起動した場合は新RunIdで世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDと資源キーがまだ確定していない場合があるため、その経路では役割名だけを期待値として保持し、受渡し完了まで診断識別情報を未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、challenge後のBootId変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
+AppHostが新たに起動した場合は新しい `RunId` で世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDと資源キーがまだ確定していない場合があるため、その経路では役割名だけを期待値として保持し、受渡し完了まで診断識別情報を未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、`challenge` 後の `BootId` 変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
 
 このソケットはコンテナ内の制御面であり、ホストへ公開しない。認証情報や識別子をURL、Dashboard、通常ログへ出さない。単体試験ではDocker `exec`、DCPの実行環境、イメージ取得・起動を使わず、制御プロセスと同じコンテナソケットの契約まで確認する。実Docker Desktopでの `exec`、資源通知、コンテナ起動、UDP通信、ホストポート公開の確認結果は実機の報告に分けて記録する。単体試験の成功をこれらの実証へ置き換えない。RuntimeHostへの識別情報受渡しはUDPパケットの送信元コンテナを暗号学的に証明するものではない。
 
@@ -298,7 +298,7 @@ Windows の開発環境から、DCP が起動した `debug-host` に接続する
 
 RefereeDriver は内部 API に接続し、API の状態と11003の審判情報を照合する。
 
-`GameControllerVisionOnly` 構成で `Testing:IdentityControl:DesktopBridgeEnabled=true` を選択した場合、Game Controller は Duck の実行開始だけを待ち（`WaitForStart`）、健康状態の成立までは待たない。Duck の診断識別子が未確定な間は `/health/vision` が準備未完了となり、健康状態待ちにすると Game Controller と RefereeDriver の起動前に依存が止まるためである。RefereeDriver は Game Controller の実行開始を待って起動し、その後の GC API 状態と審判情報の照合によって準備判定を行う。ブリッジを有効にしない従来経路では、Game Controller の Duck 健康状態待ちは変更しない。Docker Desktop での実機受入が未成立の間、起動依存の修正を通信や Ready 成立の実証として扱わない。
+`GameControllerVisionOnly` 構成で `Testing:IdentityControl:DesktopBridgeEnabled=true` を選択した場合、Game Controller は Duck の実行開始だけを待ち（`WaitForStart`）、健康状態の成立までは待たない。Duck の診断識別子が未確定な間は `/health/vision` が準備未完了となり、健康状態待ちにすると Game Controller と RefereeDriver の起動前に依存が止まるためである。RefereeDriver は Game Controller の実行開始を待って起動し、その後の Game Controller API状態と審判情報の照合によって準備判定を行う。ブリッジを有効にしない従来経路では、Game Controller の Duck 健康状態待ちは変更しない。Docker Desktop での実機受入が未成立の間、起動依存の修正を通信や準備完了の実証として扱わない。
 
 各資源の準備確認はブリッジ内で採取した診断を HTTP で DCP／AppHostへ伝える。ホストの旧起動管理で動く `VisionServiceReadiness`、`TrackerPacketReadinessMonitor`、`GameControllerReadinessMonitor` の マルチキャスト受信を残さない。診断の期限切れ、復号失敗、対象IDの変更では準備未完了へ戻す。`WaitFor` は開始順を定め、障害後の自動再起動を保証しない。
 
