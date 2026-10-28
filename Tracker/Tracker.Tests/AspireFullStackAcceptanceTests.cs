@@ -40,6 +40,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var refereeSnapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
         var stageReached = "test_setup";
         var refereeRawDatagramCount = 0;
+        RefereeStateLossEvent? refereeStateLoss = null;
         int? visionPacketsConsumed = null;
         int? trackerPacketsConsumed = null;
         string? failure = null;
@@ -136,27 +137,45 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var discardedPreMotionPackets = visionReceiver.DrainPendingPackets();
             output.WriteLine($"discarded queued vision packets before active-motion window={discardedPreMotionPackets}");
 
-            using var motionTimeout = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token);
-            motionTimeout.CancelAfter(MotionTimeout);
-            while (observedMovement is null)
+            try
             {
-                try
-                {
-                    var datagram = await visionReceiver.ReceiveAsync(motionTimeout.Token);
-                    var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.ToArray());
-                    if (packet.Detection is null)
+                observedMovement = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
+                    refereeSource,
+                    active!,
+                    MotionTimeout,
+                    async motionToken =>
                     {
-                        continue;
-                    }
+                        while (true)
+                        {
+                            var datagram = await visionReceiver.ReceiveAsync(motionToken);
+                            var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.ToArray());
+                            if (packet.Detection is null)
+                            {
+                                continue;
+                            }
 
-                    observedMovement = motionVerifier.FindMovement(packet.Detection);
-                }
-                catch (OperationCanceledException exception)
-                {
-                    throw new InvalidOperationException(
-                        "UDP_MOTION_FAILURE: no Yellow robot moved at least 100 mm after the active referee transition within 60 seconds.",
-                        exception);
-                }
+                            var movement = motionVerifier.FindMovement(packet.Detection);
+                            if (movement is not null)
+                            {
+                                return movement;
+                            }
+                        }
+                    },
+                    timeout.Token);
+            }
+            catch (RefereeStateLostException exception)
+            {
+                refereeStateLoss = exception.StateLoss;
+                throw new InvalidOperationException(
+                    $"REFEREE_STATE_LOSS: active referee command was lost during Yellow motion; " +
+                    $"observed {exception.StateLoss.Snapshot.Command} at counter {exception.StateLoss.Snapshot.CommandCounter}.",
+                    exception);
+            }
+            catch (OperationCanceledException exception)
+            {
+                throw new InvalidOperationException(
+                    "UDP_MOTION_FAILURE: no Yellow robot moved at least 100 mm after the active referee transition within 60 seconds.",
+                    exception);
             }
 
             output.WriteLine(
@@ -224,6 +243,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     snapshot.CommandCounter,
                 }),
                 refereeRawDatagramCount,
+                refereeStateLoss,
                 visionPacketsConsumed,
                 trackerPacketsConsumed,
                 comparisonMeasurement,
