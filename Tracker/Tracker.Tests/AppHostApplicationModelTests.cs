@@ -103,6 +103,27 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task GameControllerVisionModeUsesSharedDefaultStackOwnershipLease()
+    {
+        var defaultLockPath = Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+
+        using (StackOwnershipLease.Acquire(defaultLockPath))
+        {
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                    ["--Testing:GameControllerVisionOnly=true"]);
+            });
+
+            Assert.Contains("already owns", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        using var nextOwner = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+            ["--Testing:GameControllerVisionOnly=true"]);
+        Assert.Equal(4, nextOwner.Resources.Count());
+    }
+
+    [Fact]
     public async Task ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly()
     {
         using var appHost = await CreateAppHostAsync(

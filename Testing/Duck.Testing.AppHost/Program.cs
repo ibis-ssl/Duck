@@ -212,7 +212,7 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
 {
     var gcVisionGameControllerOnlyLockPath =
         builder.Configuration["Testing:StackOwnership:LockPath"] ??
-        Path.Combine(Path.GetTempPath(), "gcVisionDuck-aspire-stack.lock");
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
     using var gcVisionGameControllerOnlyOwnershipLease = StackOwnershipLease.Acquire(gcVisionGameControllerOnlyLockPath);
     var gcVisionGameControllerOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
     var gcVisionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
