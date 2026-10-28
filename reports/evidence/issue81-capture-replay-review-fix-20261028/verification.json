@@ -1,0 +1,112 @@
+﻿{
+  "baseline": "f5a4cebb24c8901923afe8acacd4e8395eaf24d0",
+  "finding": "I81-08A-NR-001",
+  "source_severity": "P2 medium",
+  "scope": "ancestor link rejection and documentation",
+  "technical_state": "validated working tree; commit_pending",
+  "tests": {
+    "skipped": 0,
+    "regression": 88,
+    "failed": 0,
+    "focused": 10,
+    "runtime": false
+  },
+  "builds": {
+    "debughost_exit": 0,
+    "apphost_exit": 0
+  },
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/DebugHostCaptureMountSettings.cs",
+      "sha256": "faf4ee37416076fcbb3e67569f9b9f0b96702b2c1ec0da3a8518aead4f6b99e5"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "ba175a464cc9de9a2f7b47009dfafa45d9a772886a9187d2183dfbe946aec03b"
+    },
+    {
+      "path": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "sha256": "08c4406f641f8780bddb791934e97ba1553554d584b3b8f48130aaffcd5d19e5"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "07dc3532edbf43965870e31749cda319af372556519a6b166f79a7ca0ab7b0cc"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "06ffb721d2bc04484c23b42eadf80e0b663ffcbe0ef7ae33ed5b31118ac32fac"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "sha256": "65be183fcc5806962ae400b831af9b7c66f3423b66cebc462f6b793e301c05e4"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DebugHostCaptureMountSettingsTests.cs",
+      "sha256": "d954f13769afbfd38d26d8f1b24222bbf7f4b957b52ebff81043ce6325f41915"
+    }
+  ],
+  "documentation": "five final changed fragments textlint,whitelist,Yomiyasu,CSpell passed; whole historical documentation is not claimed clean",
+  "normal_review": "fix verification pending",
+  "private_log_fingerprints": [
+    {
+      "label": "red/exit.txt",
+      "sha256": "5abdb6175f820f0ac3d8647fbb1f7a0bcc91757a782a8a145570944ca6a00c96"
+    },
+    {
+      "label": "red/stderr.txt",
+      "sha256": "527c65243df7a2d2940d6f59eacd191fc9078739f6c3ee76e7993151e1ced457"
+    },
+    {
+      "label": "red/stdout.txt",
+      "sha256": "53a235355da68db29742dafdf1f0db463044469cca3f0a849289e98d3f8d0a9c"
+    },
+    {
+      "label": "green-focused/exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    },
+    {
+      "label": "green-focused/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "green-focused/stdout.txt",
+      "sha256": "b79ddefc401f75f701def8809468a8a6c5537f522dc9d30c7e19ca2640d74aee"
+    },
+    {
+      "label": "regression/exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    },
+    {
+      "label": "regression/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "regression/stdout.txt",
+      "sha256": "50ec86fd0069a9878aa532bad1788c10355ae59e58bb9745e0081b3a1bbf839b"
+    },
+    {
+      "label": "builds/Duck.Testing.AppHost.exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    },
+    {
+      "label": "builds/Duck.Testing.AppHost.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "builds/Duck.Testing.AppHost.stdout.txt",
+      "sha256": "f174029650410e2f558df1df286a764e7ca5fffbc9577a19d3440a95260df009"
+    },
+    {
+      "label": "builds/Tracker.DebugHost.exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    },
+    {
+      "label": "builds/Tracker.DebugHost.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "builds/Tracker.DebugHost.stdout.txt",
+      "sha256": "321e7603acebc5eb336bf2ed119782fae53c8802db63ccada4844f9509d94667"
+    }
+  ]
+}

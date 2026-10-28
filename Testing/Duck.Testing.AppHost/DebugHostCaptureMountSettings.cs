@@ -47,6 +47,7 @@ public sealed class DebugHostCaptureMountSettings
         }
 
         var localAppDataRoot = Path.GetFullPath(localAppDataDirectory);
+        EnsureNoReparsePoints(localAppDataRoot, runId);
         var runDirectory = Path.Combine(localAppDataRoot, "Duck", "Aspire", runId);
         if (Directory.Exists(runDirectory) || File.Exists(runDirectory))
         {
@@ -95,4 +96,38 @@ public sealed class DebugHostCaptureMountSettings
             .WithEnvironment("VisionReceiver__PacketCapture__DirectoryPath", ContainerDirectory)
             .WithEnvironment("VisionReceiver__PacketCapture__Enabled", "false");
     }
+
+    private static void EnsureNoReparsePoints(string localAppDataRoot, string runId)
+    {
+        var path = localAppDataRoot;
+        RejectReparsePoint(path);
+        foreach (var segment in new[] { "Duck", "Aspire", runId })
+        {
+            path = Path.Combine(path, segment);
+            RejectReparsePoint(path);
+        }
+    }
+
+    private static void RejectReparsePoint(string path)
+    {
+        FileAttributes attributes;
+        try
+        {
+            attributes = File.GetAttributes(path);
+        }
+        catch (FileNotFoundException)
+        {
+            return;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return;
+        }
+
+        if ((attributes & FileAttributes.ReparsePoint) != 0)
+        {
+            throw new InvalidOperationException("The capture path must not contain symbolic links or junctions.");
+        }
+    }
+
 }

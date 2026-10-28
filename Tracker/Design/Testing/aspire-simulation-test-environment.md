@@ -292,11 +292,11 @@ Windows の開発環境から、DCP が起動した `debug-host` に接続する
 
 同じ起動中は `/diagnostics` で再生する。後日の再生専用起動では、保存した保存先を `/data/replay` へ読み取り専用で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/replay`、記録無効の設定で開く。記録と再生が相互に書き換えないこと、終了後の再読と 送信元識別子 の保持を後続実装・受入で確認する。
 
-AppHost は通常の比較起動で生成した実行IDを安全な単一パス要素として検証し、`%LOCALAPPDATA%\Duck\Aspire\<run-id>\captures` がまだ存在しないことを確かめてから、その実行だけの保存先として作成する。既に存在する保存先は他の所有者の可能性があるため変更せず、起動前に失敗させる。起動中のDCPによるコンテナ再作成では同じAppHostが保持するmountを再利用する。DebugHost の `/data/captures` へ読み書き可能で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/captures` を渡す。通常停止、再作成、CaptureOff はホスト保存先を削除しない。
+AppHost は通常の比較起動で生成した実行IDが安全な単一値であることを検証し、指定した基準から保存先までの既存要素に `FileAttributes.ReparsePoint` 属性がないことを確認する。`%LOCALAPPDATA%\Duck\Aspire\<run-id>\captures` がまだ存在しないことを確かめてから、その実行だけの保存先として作成する。既に存在する保存先は他の所有者の可能性があるため変更せず、起動前に失敗させる。起動中のDCPによるコンテナ再作成では同じAppHostが保持する割当てを再利用する。`DebugHost` の `/data/captures` へ読み書き可能で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/captures` を渡す。通常停止、再作成、`CaptureOff` はホスト保存先を削除しない。
 
-後日の再生は `Testing:DebugHost:ReplayOnly=true` と既存保存先を指す絶対パス `Testing:DebugHost:ReplayDirectoryPath` の明示選択で起動する。この選択では DebugHost だけを標準コンテナ資源として登録し、再生元を `/data/replay` へ読み取り専用で割り当てる。`VisionReceiver__PacketCapture__DirectoryPath=/data/replay` と記録無効を設定し、Vision UDP受信、tracker UDP受信・送信、自動記録を開始しない。CaptureOn のUI操作と runtime control による有効化要求は明示的な不可結果を返し、状態を変更しない。再生元は作成・書込み・削除せず、読み取りAPIは既存契約を使う。相対パス、存在しない保存先、実行IDとして安全でない値はマウント前に拒否する。ReplayOnly と他の AppHost 選択モードを同時に指定した場合は、別構成へ切り替えず起動前に拒否する。
+`VisionReceiver__PacketCapture__DirectoryPath=/data/replay` と記録無効を設定し、視覚入力のUDP受信、追跡データのUDP受信・送信、自動記録を開始しない。`CaptureOn` のUI操作と実行制御による有効化要求は明示的な不可結果を返し、状態を変更しない。再生元は作成・書込み・削除せず、読み取りAPIは既存契約を使う。相対パス、存在しない保存先、実行IDとして安全でない値は割当て前に拒否する。`ReplayOnly` と他のAppHost選択モードを同時に指定した場合は、別構成へ切り替えず起動前に拒否する。
 
-`Testing:DebugHost:CaptureRootPath` は AppHost モデル試験で基準ディレクトリを一時領域へ注入するための任意設定である。指定値そのものを capture directory として使わず、その配下に `Duck/Aspire/<run-id>/captures` を作る。通常起動では `%LOCALAPPDATA%` を基準にする。
+`Testing:DebugHost:CaptureRootPath` は AppHost 構成試験で一時領域を基準にする任意設定である。指定値を基準の場所として扱い、その配下に `Duck/Aspire/<run-id>/captures` を作成する。通常起動では `%LOCALAPPDATA%` を基準にする。
 
 ## 準備完了、依存、停止
 

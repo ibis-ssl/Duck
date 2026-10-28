@@ -107,6 +107,49 @@ public sealed class DebugHostCaptureMountSettingsTests
         }
     }
 
+    [Fact]
+    public void CreateCapture_RejectsReparsePointAncestorWithoutChangingExternalTarget()
+    {
+        var testRoot = CreateTestRoot();
+        var localAppData = Path.Combine(testRoot, "LocalAppData");
+        var externalTarget = Path.Combine(testRoot, "external-target");
+        Directory.CreateDirectory(localAppData);
+        Directory.CreateDirectory(externalTarget);
+        var sentinelPath = Path.Combine(externalTarget, "owner-data.bin");
+        var sentinel = new byte[] { 13, 17, 19, 23 };
+        File.WriteAllBytes(sentinelPath, sentinel);
+        var linkedDuckDirectory = Path.Combine(localAppData, "Duck");
+
+        try
+        {
+            try
+            {
+                Directory.CreateSymbolicLink(linkedDuckDirectory, externalTarget);
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                throw Xunit.Sdk.SkipException.ForSkip($"Directory symbolic links are unavailable: {exception.Message}");
+            }
+            catch (PlatformNotSupportedException exception)
+            {
+                throw Xunit.Sdk.SkipException.ForSkip($"Directory symbolic links are unavailable: {exception.Message}");
+            }
+
+            Assert.Throws<InvalidOperationException>(() =>
+                DebugHostCaptureMountSettings.CreateCapture(localAppData, Guid.NewGuid().ToString("N")));
+            Assert.Equal(sentinel, File.ReadAllBytes(sentinelPath));
+            Assert.Equal(new[] { sentinelPath }, Directory.GetFileSystemEntries(externalTarget));
+        }
+        finally
+        {
+            if (Directory.Exists(linkedDuckDirectory))
+            {
+                Directory.Delete(linkedDuckDirectory);
+            }
+            Directory.Delete(testRoot, recursive: true);
+        }
+    }
+
     private static string CreateTestRoot()
     {
         var path = Path.Combine(Path.GetTempPath(), "duck-debug-host-capture-mount-" + Guid.NewGuid().ToString("N"));

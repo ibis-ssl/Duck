@@ -256,7 +256,7 @@ assignment の結果は、まず候補 edge 内で対応する pair 数を最大
 
 Windowsでの接続方法、デバッグ用配布物、保存先の読み書きの権限、再生時の読み取り専用動作は未実装・未検証である。操作手順を記述したことは成功の証拠ではない。
 
-再生専用の起動は主設計の `Testing:DebugHost:ReplayOnly=true` と `Testing:DebugHost:ReplayDirectoryPath` を明示し、DebugHost だけを起動する。`/data/replay` はホスト上の既存保存先を読み取り専用で割り当て、CaptureOn/runtime control と UDP送受信・tracker送信を無効にする。保存元は変更・削除しない。
+再生専用の起動は主設計の `Testing:DebugHost:ReplayOnly=true` と `Testing:DebugHost:ReplayDirectoryPath` を明示し、`DebugHost` だけを起動する。`/data/replay` はホスト上の既存保存先を読み取り専用で割り当て、`CaptureOn` と実行制御による記録開始、UDP送受信・追跡データ送信を無効にする。保存元は変更・削除しない。
 通常用 `DebugHost` の基底、固定参照、発行出力の入力元は[Linux配布設計](aspire-simulation-test-environment.md#linux-向け通常コンテナの配布定義-i81-04b2)のI81-04B2に従う。`/vsdbg/vsdbg` などの追加デバッグ資材とWindowsからの接続はI81-04B3および実機受入で別に確認し、通常用コンテナイメージの定義を成功根拠にしない。
 
 ## 起動失敗と部分起動
@@ -298,7 +298,7 @@ AppHost の application model test で次を先に固定する。
 - Game ControllerとDebugHostのUI、HTTP準備確認は、主設計の内部ポートから127.0.0.1の動的TCPへ対応付け、再作成後に更新する。
 - RefereeDriverの明示設定、既定観測の書込み0、内部接続先の自己宛先拒否、同じ受信処理を使う明示制御、停止と所有資源回収、診断本文と200／503／無効404を標準組成試験で固定する。
 - RefereeDriverのUDP観測と旧準備確認の受信をWindowsに残さない。記録のWindows保存先、デバッグ接続の対象IDを実行IDと結び付ける。
-- 通常の比較起動では実行ID別の新規Windows保存先だけを作成して `/data/captures` を読み書き可能で割り当てる。再生専用の明示選択では DebugHost だけを起動し、既存保存先を `/data/replay` に読み取り専用で割り当て、CaptureOnをUI/runtime controlから拒否し、vision/trackerのUDP受信・送信を登録しない。path不正時はmount前に失敗し、既存保存元は作成・変更・削除しない。
+- 通常の比較起動では実行ID別の新規Windows保存先だけを作成して `/data/captures` を読み書き可能で割り当てる。再生専用の明示選択では `DebugHost` だけを起動し、既存保存先を `/data/replay` に読み取り専用で割り当て、`CaptureOn` をUIと実行制御から拒否し、視覚入力と追跡データのUDP受信・送信を登録しない。保存先の指定に問題がある場合は割当て前に失敗し、既存保存元は作成・変更・削除しない。
 - DebugHost comparison health が三 source identity の個別解決と同じ確認窓の新しい packet を要求する。tracker resource ready と DebugHost source readiness を別々に model / focused test で固定する。
 
 DebugHost の focused test では次を固定する。
