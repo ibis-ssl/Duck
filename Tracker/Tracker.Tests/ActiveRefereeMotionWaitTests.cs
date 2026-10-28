@@ -1,10 +1,112 @@
 using System.Threading.Channels;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net;
 using Duck.Testing.RefereeDriver;
+using Xunit.Abstractions;
 
 namespace Tracker.Tests;
 
 public sealed class ActiveRefereeMotionWaitTests
 {
+    private readonly ITestOutputHelper output;
+
+    public ActiveRefereeMotionWaitTests(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
+    [Fact]
+    public async Task InjectedHaltStopsRecordedYellowMotionBeforeTimeoutAndPreservesDiagnosticHistory()
+    {
+        const uint initialCounter = 50;
+        const uint haltCounter = 52;
+        using var packetReceiver = new LoopbackUdpRefereePacketReceiver();
+        Assert.Equal(IPAddress.Loopback, packetReceiver.Endpoint.Address);
+        Assert.InRange(packetReceiver.Endpoint.Port, 1, 65535);
+        using var parsedSource = new UdpRefereeCommandSource(packetReceiver);
+        var snapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        using var recordedSource = new RecordingRefereeCommandSource(parsedSource, snapshots);
+        await packetReceiver.PublishAsync(Referee.Types.Command.NormalStart, initialCounter);
+        var active = await recordedSource.WaitForChangeAsync(null, CancellationToken.None);
+        var motionStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var motionCanceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var testCancellation = new CancellationTokenSource();
+        const int motionTimeoutSeconds = 30;
+        var wait = RefereeDriverFixture.WaitForMotionWhileActiveAsync(
+            recordedSource,
+            active,
+            TimeSpan.FromSeconds(motionTimeoutSeconds),
+            async cancellationToken =>
+            {
+                motionStarted.TrySetResult();
+                try
+                {
+                    await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                    return false;
+                }
+                catch (OperationCanceledException)
+                {
+                    motionCanceled.TrySetResult();
+                    throw;
+                }
+            },
+            testCancellation.Token);
+
+        try
+        {
+            await motionStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+            var injectedAt = Stopwatch.GetTimestamp();
+            await packetReceiver.PublishAsync(Referee.Types.Command.ForceStart, initialCounter + 1);
+            await packetReceiver.PublishAsync(Referee.Types.Command.Halt, haltCounter);
+
+            var exception = await Assert.ThrowsAsync<RefereeStateLostException>(
+                () => wait.WaitAsync(TimeSpan.FromSeconds(3)));
+            var elapsed = Stopwatch.GetElapsedTime(injectedAt);
+            output.WriteLine(
+                $"loopback endpoint={packetReceiver.Endpoint}; Halt response={elapsed.TotalMilliseconds:F3} ms; configured motion timeout={motionTimeoutSeconds} s");
+
+            Assert.True(elapsed < TimeSpan.FromSeconds(motionTimeoutSeconds));
+            Assert.True(motionCanceled.Task.IsCompleted);
+            Assert.Equal(
+                [
+                    new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, initialCounter, "crane"),
+                    new RefereeCommandSnapshot(Referee.Types.Command.ForceStart, initialCounter + 1, "crane"),
+                    new RefereeCommandSnapshot(Referee.Types.Command.Halt, haltCounter, "crane"),
+                ],
+                snapshots.ToArray());
+            Assert.Equal(Referee.Types.Command.Halt, exception.StateLoss.Snapshot.Command);
+            Assert.Equal(haltCounter, exception.StateLoss.Snapshot.CommandCounter);
+            Assert.Equal("REFEREE_STATE_LOSS", exception.StateLoss.FailureReason);
+            Assert.Equal(
+                "REFEREE_STATE_LOSS: active referee command was lost during Yellow motion; observed Halt at counter 52.",
+                exception.StateLoss.ToFailureMessage());
+            using var diagnostic = System.Text.Json.JsonDocument.Parse(
+                System.Text.Json.JsonSerializer.Serialize(exception.StateLoss));
+            Assert.Equal("REFEREE_STATE_LOSS", diagnostic.RootElement.GetProperty("FailureReason").GetString());
+            Assert.Equal((int)Referee.Types.Command.Halt,
+                diagnostic.RootElement.GetProperty("Snapshot").GetProperty("Command").GetInt32());
+            Assert.Equal(haltCounter,
+                diagnostic.RootElement.GetProperty("Snapshot").GetProperty("CommandCounter").GetUInt32());
+        }
+        finally
+        {
+            testCancellation.Cancel();
+            try
+            {
+                await wait;
+            }
+            catch
+            {
+                // The expected referee-loss task faults; cancellation must still join it after assertion failures.
+            }
+        }
+
+        packetReceiver.Dispose();
+        Assert.True(packetReceiver.IsDisposed);
+        output.WriteLine($"test-owned loopback UDP socket disposed={packetReceiver.IsDisposed}");
+    }
+
     [Fact]
     public async Task ReturnsMovementAndCancelsTheRefereeMonitor()
     {

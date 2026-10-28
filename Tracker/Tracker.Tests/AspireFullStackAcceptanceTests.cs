@@ -62,7 +62,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             using var refereeSource = new RecordingRefereeCommandSource(
                 new UdpRefereeCommandSource(refereeReceiver),
                 refereeSnapshots,
-                output);
+                message => output.WriteLine(message));
             visionReceiver = new UdpMulticastReceiver("224.5.23.2", 10020, multicastInterface.Address);
             trackerReceiver = new UdpMulticastReceiver("224.5.23.2", 11010, multicastInterface.Address);
 
@@ -687,27 +687,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     {
         const string membershipPath = "/proc/net/igmp";
         return File.Exists(membershipPath) ? File.ReadAllText(membershipPath) : null;
-    }
-
-    private sealed class RecordingRefereeCommandSource(
-        IRefereeCommandSource inner,
-        ConcurrentQueue<RefereeCommandSnapshot> snapshots,
-        ITestOutputHelper output) : IRefereeCommandSource, IDisposable
-    {
-        public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
-            uint? previousCommandCounter,
-            CancellationToken cancellationToken)
-        {
-            var snapshot = await inner.WaitForChangeAsync(previousCommandCounter, cancellationToken);
-            snapshots.Enqueue(snapshot);
-            output.WriteLine($"referee command={snapshot.Command} counter={snapshot.CommandCounter}");
-            return snapshot;
-        }
-
-        public void Dispose()
-        {
-            (inner as IDisposable)?.Dispose();
-        }
     }
 
     private sealed class InitialSnapshotRefereeCommandSource(
