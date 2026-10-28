@@ -19,7 +19,16 @@ public interface IRefereeCommandSource
         CancellationToken cancellationToken);
 }
 
-public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot);
+public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot)
+{
+    public const string ActiveCommandLostFailureReason = "REFEREE_STATE_LOSS";
+
+    public string FailureReason => ActiveCommandLostFailureReason;
+
+    public string ToFailureMessage() =>
+        $"{FailureReason}: active referee command was lost during Yellow motion; " +
+        $"observed {Snapshot.Command} at counter {Snapshot.CommandCounter}.";
+}
 
 public sealed class RefereeStateLostException(RefereeCommandSnapshot snapshot)
     : InvalidOperationException($"The referee left an active command: {snapshot.Command} ({snapshot.CommandCounter}).")

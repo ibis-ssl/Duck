@@ -55,6 +55,18 @@ public sealed class ActiveRefereeMotionWaitTests
         var exception = await Assert.ThrowsAsync<RefereeStateLostException>(() => wait);
 
         Assert.Equal(lost, exception.StateLoss.Snapshot);
+        Assert.Equal("REFEREE_STATE_LOSS", exception.StateLoss.FailureReason);
+        Assert.Equal(
+            "REFEREE_STATE_LOSS: active referee command was lost during Yellow motion; observed Halt at counter 21.",
+            exception.StateLoss.ToFailureMessage());
+        using var diagnostic = System.Text.Json.JsonDocument.Parse(
+            System.Text.Json.JsonSerializer.Serialize(exception.StateLoss));
+        Assert.Equal(
+            "REFEREE_STATE_LOSS",
+            diagnostic.RootElement.GetProperty("FailureReason").GetString());
+        var snapshot = diagnostic.RootElement.GetProperty("Snapshot");
+        Assert.Equal((int)Referee.Types.Command.Halt, snapshot.GetProperty("Command").GetInt32());
+        Assert.Equal(21u, snapshot.GetProperty("CommandCounter").GetUInt32());
         Assert.True(motionCanceled.Task.IsCompleted);
     }
 

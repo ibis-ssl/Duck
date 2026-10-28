@@ -167,8 +167,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             {
                 refereeStateLoss = exception.StateLoss;
                 throw new InvalidOperationException(
-                    $"REFEREE_STATE_LOSS: active referee command was lost during Yellow motion; " +
-                    $"observed {exception.StateLoss.Snapshot.Command} at counter {exception.StateLoss.Snapshot.CommandCounter}.",
+                    exception.StateLoss.ToFailureMessage(),
                     exception);
             }
             catch (OperationCanceledException exception)
