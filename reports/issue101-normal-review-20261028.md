@@ -23,8 +23,8 @@
 - selection_source:明示ユーザー指定。requested/planned:gpt-6.1-sol/high / proposed:none / Astra:not_applicable。
 - approval:現在の専用Issueごとの実装Luna high、通常/独立review Sol highへの明示承認。
 - observed_decomposability:independent_workstreams / decomposition_policy:forbidden / parallelism_mode:single_agent / disposition:prohibited_by_review_lifecycle。
-- role_plan:runtime default、agent_typeなし、fork noneの明示override対応。applied:null / application_status:spawn_succeeded_profile_unverified / profile_observability:final_profile_hidden。
-- reviewer_continuity:fresh / fork_policy:none / report_persistence_mode:normal_persistence。
+- role_plan:runtime default、agent_typeなし、fork noneの明示override対応。applied:null / application_status:reused_existing_agent_profile（original spawn_succeeded_profile_unverified） / profile_observability:final_profile_hidden。
+- reviewer_continuity:same_identity_fix_verification / fork_policy:none / report_persistence_mode:normal_persistence。
 
 ## 実行コマンドと対象識別
 
@@ -159,3 +159,67 @@ report_persistence_mode: normal_persistence / persistence: repository_file / pat
 - no skill action needed。first Greenとcompile-only失敗の区別、既存Node直接起動、共通compositionの不足指摘は既存skillの適用で対処できる。新規skill/feedback ledgerの変更は不要。
 - 初回fail、NR101-01 medium/NR101-02 lowを保持。実装担当の修正完了申告はreview closureに置き換えない。
 - 保存差分と実装修正の通常再確認後に、現在候補HEADで全体local gateを1回実行する。既存失敗は失敗として保持。独立予約・freeze・判定・attestationはその後のreview-enforcer工程。
+## 通常修正再確認（2026-10-28 / 同一reviewer）
+
+### 対象・continuity・closure readiness
+
+- review_mode: fix verification。reviewer: `/root/issue101_normal_review` を継続。application_status: `reused_existing_agent_profile`、original requested/planned Sol high、applied:null / final_profile_hidden を保持。新規 reviewer、subagent、独立 exhaustive review は作成していない。
+- initial_reviewed_head: `544b97416888b1a7cc53794b8b4c55e00d66eaf2`、closure_reviewed_head / current technical_head: `9d704aa74988e932c64601b33390ee007f7c6264`。対象差分: `544b974..9d704aa`、branchとPR baseは初回から継続。初回 fail と NR101-01 medium / NR101-02 low は歴史として保持。severity再分類・erratumはない。
+- 着手前に実装報告末尾の completeness matrix を読んだ。headingの544b974は元findingの対象であり、今回の修正sourceはmanifestおよび9d704aaのcommitted treeへ結び付けて確認した。全required actionにproduction path、実composition fixture、focused evidenceがあり、closure_readiness: ready として限定再確認を開始した。
+- scopeは既存2findingのactionと修正差分、writer抽出が直接影響するJSON形式/正常/timeout互換、文書/report/tracker差分に限定。初回全criteriaを新規にやり直さず、既存coverageを継承する。
+- Windows PowerShell / 同cwd / `fa780\donabe`（今回最初のwhoami、exit0）。全shellは require_escalated。開始時HEAD9d704aa、dirtyは親がDispatch continuity欄を更新した本normal reportだけ。コード/設計/実装報告/台帳はcommitted sourceと一致。code以外の自分の許可書込みは本reportへの追記のみ。
+
+### finding closure matrix
+
+| finding / source severity / action | production/document path | actual composition fixture | focused evidence | disposition |
+| --- | --- | --- | --- | --- |
+| NR101-01 / medium / 同一loss捕捉・診断組立保存経路 | `AspireAcceptanceResultWriter.CreateMotionFailure`→`RecordFailure`→`WriteAsync`。実受入のloss catch、outer catch、finallyは同じ各methodを使用。writerはinner exception chainから実eventを抽出 | loopback UDP→production parser→shared recorder→実monitorから得た例外を同じwrapper/record/writeに通す。テスト側のDTO再Serializeやwriterの複製ではない | `NR101-related-tests.*` PID14204/exit0、conditional compile PID33464/exit0、source4SHA一致 | closed_verified |
+| NR101-01 / medium / 保存出力のreason/latest/history読戻し | 共用writerが従来の`acceptance-result.json`形式を保存。実fixtureのpath/metadata引数も維持 | 同新規試験がtempの実保存ファイルを読み、status failed、failureのREFEREE_STATE_LOSSメッセージ、refereeStateLoss.FailureReasonとSnapshot.Halt52、refereeCommands.NormalStart50/ForceStart51/Halt52をassert | 新規試験PID34348/exit0/1pass、関連16pass。古いevent直Serialize assertionを置換。保存ファイルはfixture finallyで後処理されるため恒久的raw JSON提出物は残らないが、成功assertionとsourceが証拠 | closed_verified |
+| NR101-02 / low / 設計の同期順序訂正 | design:35を「移動待機と審判監視を並行して開始」「移動開始通知後に注入」へ訂正 | 既存開始通知後Publishの構成。monitor開始自体を遅らせていない | text/spell/whitelist PID32124/26144/236、全exit0、設計source指紋とdiff確認 | closed_verified |
+
+### 直接影響・互換性の確認
+
+- 実受入の旧`failure = exception.ToString()`はwriterへの例外保持に置換され、保存時に同じ`ToString()`を使う。専用catchは同じ`StateLoss.ToFailureMessage()`とinner exceptionを持つInvalidOperationExceptionを生成し、outer catchのRecordFailure後にrethrowする。finallyからwriterをawaitする順序、socket disposeとメタデータ引数、保存先ファイル名は維持する。
+- JSONの既存14プロパティはstatus、failure、stageReached、refereeCommands、refereeRawDatagramCount、refereeStateLoss、visionPacketsConsumed、trackerPacketsConsumed、comparisonMeasurement、packetCountSemantics、receiverSockets、movement、runner、shaで一致。履歴のcommandは文字列、CommandCounterは従来の大文字名と数値、event.Snapshot.Commandは従来どおり数値。WriteIndented=true、null含有とmetadataの値の供給元も保存する。
+- comparisonMeasurement/receiverSockets/movementがwriter引数でobject?になるが、値は元のrecord/anonymous objectをそのまま渡し、標準serializerへ渡す構造を維持する。この互換性はコード差分による静的確認で、全非null実受入出力を今回runtime観測したという主張ではない。
+- 正常時writer.failureはnullでstatus passed、failure/refereeStateLossはnull。timeout catchのUDP_MOTION_FAILUREラップは変更なし、chain内にstate-loss例外がない限りrefereeStateLossはnull。正常、active継続、timeoutの実monitor試験は16passに含まれる。writerの正常/timeout保存ファイルを新規にruntime実行した証拠はなく、ここは既存配線と共用writerの静的確認＋monitor回帰で評価した。
+- #99/#100のRefereeDriver本体、NetworkAdapters、Tracker.Tests.csprojは`git diff --quiet 544b974..9d704aa -- ...`でexit0。CTS cancel/join、30秒期限、Halt注入、socket解放の実挙動を変更していない。temp artifact directoryは新規試験が専用に作成し、finallyでjoin後に削除する。
+- 実装報告には初回証拠を残した追記matrixがあり、firstGreenとcompile-only失敗を混同していない。tasks-statusは「通常指摘2件修正済み、再確認待ち」として修正担当の申告をreview完了と先取りしていない。親のno skill action needed/feedback追加不要/全gate後の独立工程という保存追記を確認した。初回failと重大度も保存されている。
+
+### 検証・source binding
+
+- `source-manifest-before-NR101-validation.json`のコード3ファイルとdesignの4SHAは現在9d704aaのsourceに一致。finalは`source-manifest-final-NR101.json`。head欄544b974はdirty修正時のbaselineであり、review HEADとは区別する。
+- final manifestは58エントリ中57一致。唯一不一致は`reports/issue101-normal-review-20261028.md`で、manifest採取後の親工程判断追記と親所有Dispatch continuity更新を含むreport自身の進行に対応する。今回追記前のworking-tree diffもDispatch2行のみ。この不一致をコード一致と偽らず、実行source4ファイルと全52 evidence artifactsは一致していると評価する。実装報告のmatrix追記によるpre-test report SHA差分もruntimeコード差分と混同しない。
+
+| 保存証拠prefix | PID / exit | 観測結果 |
+| --- | --- | --- |
+| NR101-01-test-first | 27492 / 1 | shared writer未実装のcompile-only失敗、CS0246/CS0103。behavioral Redではない |
+| NR101-01-green | 34348 / 0 | 新規保存出力試験1/1pass |
+| NR101-related-tests | 14204 / 0 | 16pass/0fail、0.6860秒。新規試験67ms、Halt4.522ms/30秒、127.0.0.1:60085、socket disposed=True |
+| NR101-fullstack-compile | 33464 / 0 | `dotnet build Tracker\Tracker.Tests\Tracker.Tests.csproj --no-restore -p:RunAspireFullStackAcceptance=true`。compile成功、0error、既存3warning。runtimeではない |
+| NR101-markdown.processes.json | 32124/26144/236 / 全0 | designのtext/spell/whitelist成功 |
+
+すべて同artifact directoryに存在し、process.jsonのcommand/cwd/start/end/PID/exit、stdout、stderr、各SHAを直接照合した。旧firstGreen、旧compile失敗、旧buildは歴史として保持し、新sourceの成功へ置換しない。AppHost等の直接変更されていない依存buildは初回証拠を継承する。
+
+reviewerのread-only確認はgit rev-parse/status/diff/diff --check、source/manifest/logの読取りとSHA検査、gh run list。`git diff --check 544b974..9d704aa` exit0、直接依存差分exit0。sourceと成功focused証拠が一致し、追加の異常根拠もないため、test/buildは再実行していない。hash照合shell PID18580/exit0。continuationの新規runtime processは起動していない。
+
+CI観測時点では https://github.com/ibis-ssl/Duck/actions/runs/40619442155 がheadSha9d704aaに一致し、pull_request/in_progress/conclusion未確定。ci_wait:not_requiredとしてwait/repeat queryを行わない。旧HEAD544b974のCI成功は新HEADの成功には転用しない。execution_stateはcommit:committed / push:pushed（親申告と同HEAD CIの存在）/ ci_wait:not_required、verification_capabilityはlocal_execution_availableを継承する。
+
+### coverage dispositionと結論
+
+| closure criterion | disposition | 根拠 |
+| --- | --- | --- |
+| NR101-01全required action | checked_no_finding / closed_verified | 同一writerと保存出力readback、source一致のfocused16pass |
+| NR101-02全required action | checked_no_finding / closed_verified | 設計順序訂正、3lint成功 |
+| 新規writerの直接依存/JSON互換/正常・timeout | checked_no_finding | 上記14property/exception/null/既存monitor回帰。静的とruntimeの区別を保持 |
+| 修正差分のreport/tracking/親工程追記 | checked_no_finding | 初回failとseverity保存、再確認待ち、工程boundary妥当 |
+| その他初回coverage | checked_no_finding（継承） | 無関係なcriterionを追加せず、変わらない領域は初回証拠を使用 |
+| 新HEAD CI結論 | held | run40619442155観測時in_progress、通常local loopでwait不要 |
+| 全local gate成功 | held | H101-02継続、#101候補の全gateはまだ未実施 |
+| 実GC/AutoRef/Vision/比較/100mm/総合cleanup | held | H101-01継続、親/#102/#103 |
+
+**verdict: pass_with_held** / required_findings_open:0 / unexplored_in_scope:[] / new_required_findings:[]。NR101-01 medium、NR101-02 lowの全actionをclosed_verifiedとする。技術判定は9d704aa74988e932c64601b33390ee007f7c6264に対する通常fix verificationであり、初回544b974のfailを消去しない。
+
+H101-01/02/03、初期UDP snapshot受信上限の既存残リスク、新HEAD CI結論未確定を保持する。公開操作と全gate/独立最終レビューは親所有。全gateGreen、全体受入成功、GitHub正式Approveを意味しない。次は親がnormal report保存と工程を同期し、最終候補の全local gateとreview-enforcerの独立工程を判断する。report_persistence_mode:normal_persistence / reserved_report_paths:[] / report_attestation_allowed:false / report_attestation_head:null。
+
+この追記以外に実装・設計・台帳・Skill・feedbackを書いていない。commit/push/外部write/merge/closeなし。権限拒否、pending承認、uncertain操作、未回収owned runtime processはない。
