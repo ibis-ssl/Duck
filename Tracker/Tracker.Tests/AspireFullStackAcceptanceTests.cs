@@ -38,11 +38,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Directory.CreateDirectory(artifactsDirectory);
 
         var refereeSnapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        var resultWriter = new AspireAcceptanceResultWriter(refereeSnapshots);
         var stageReached = "test_setup";
         var refereeRawDatagramCount = 0;
         int? visionPacketsConsumed = null;
         int? trackerPacketsConsumed = null;
-        string? failure = null;
         RobotMotionDelta? observedMovement = null;
         TrackerComparisonMeasurementEvidence? comparisonMeasurement = null;
         MulticastInterface? selectedMulticastInterface = null;
@@ -61,7 +61,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             using var refereeSource = new RecordingRefereeCommandSource(
                 new UdpRefereeCommandSource(refereeReceiver),
                 refereeSnapshots,
-                output);
+                message => output.WriteLine(message));
             visionReceiver = new UdpMulticastReceiver("224.5.23.2", 10020, multicastInterface.Address);
             trackerReceiver = new UdpMulticastReceiver("224.5.23.2", 11010, multicastInterface.Address);
 
@@ -136,27 +136,41 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var discardedPreMotionPackets = visionReceiver.DrainPendingPackets();
             output.WriteLine($"discarded queued vision packets before active-motion window={discardedPreMotionPackets}");
 
-            using var motionTimeout = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token);
-            motionTimeout.CancelAfter(MotionTimeout);
-            while (observedMovement is null)
+            try
             {
-                try
-                {
-                    var datagram = await visionReceiver.ReceiveAsync(motionTimeout.Token);
-                    var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.ToArray());
-                    if (packet.Detection is null)
+                observedMovement = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
+                    refereeSource,
+                    active!,
+                    MotionTimeout,
+                    async motionToken =>
                     {
-                        continue;
-                    }
+                        while (true)
+                        {
+                            var datagram = await visionReceiver.ReceiveAsync(motionToken);
+                            var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.ToArray());
+                            if (packet.Detection is null)
+                            {
+                                continue;
+                            }
 
-                    observedMovement = motionVerifier.FindMovement(packet.Detection);
-                }
-                catch (OperationCanceledException exception)
-                {
-                    throw new InvalidOperationException(
-                        "UDP_MOTION_FAILURE: no Yellow robot moved at least 100 mm after the active referee transition within 60 seconds.",
-                        exception);
-                }
+                            var movement = motionVerifier.FindMovement(packet.Detection);
+                            if (movement is not null)
+                            {
+                                return movement;
+                            }
+                        }
+                    },
+                    timeout.Token);
+            }
+            catch (RefereeStateLostException exception)
+            {
+                throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
+            }
+            catch (OperationCanceledException exception)
+            {
+                throw new InvalidOperationException(
+                    "UDP_MOTION_FAILURE: no Yellow robot moved at least 100 mm after the active referee transition within 60 seconds.",
+                    exception);
             }
 
             output.WriteLine(
@@ -193,7 +207,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         catch (Exception exception)
         {
-            failure = exception.ToString();
+            resultWriter.RecordFailure(exception);
             throw;
         }
         finally
@@ -213,22 +227,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             refereeReceiver?.Dispose();
             visionReceiver?.Dispose();
             trackerReceiver?.Dispose();
-            var evidence = new
-            {
-                status = failure is null ? "passed" : "failed",
-                failure,
+            var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
+            await resultWriter.WriteAsync(
+                path,
                 stageReached,
-                refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
-                {
-                    command = snapshot.Command.ToString(),
-                    snapshot.CommandCounter,
-                }),
                 refereeRawDatagramCount,
                 visionPacketsConsumed,
                 trackerPacketsConsumed,
                 comparisonMeasurement,
-                packetCountSemantics = "Consumed counts record datagrams read by the harness; null means that reader stage was not reached and does not imply network ingress was zero.",
-                receiverSockets = new
+                receiverSockets: new
                 {
                     interfaceName = selectedMulticastInterface?.Name,
                     interfaceAddress = selectedMulticastInterface?.Address.ToString(),
@@ -239,16 +246,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     duckTracker = new { group = "224.5.23.2", port = 11010 },
                     linuxMemberships = linuxMulticastMemberships,
                 },
-                movement = observedMovement,
-                runner = Environment.GetEnvironmentVariable("RUNNER_OS"),
-                sha = Environment.GetEnvironmentVariable("GITHUB_SHA"),
-            };
-            var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
-            await File.WriteAllTextAsync(
-                path,
-                System.Text.Json.JsonSerializer.Serialize(
-                    evidence,
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                movement: observedMovement);
             output.WriteLine($"Acceptance evidence: {path}");
         }
     }
@@ -668,27 +666,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     {
         const string membershipPath = "/proc/net/igmp";
         return File.Exists(membershipPath) ? File.ReadAllText(membershipPath) : null;
-    }
-
-    private sealed class RecordingRefereeCommandSource(
-        IRefereeCommandSource inner,
-        ConcurrentQueue<RefereeCommandSnapshot> snapshots,
-        ITestOutputHelper output) : IRefereeCommandSource, IDisposable
-    {
-        public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
-            uint? previousCommandCounter,
-            CancellationToken cancellationToken)
-        {
-            var snapshot = await inner.WaitForChangeAsync(previousCommandCounter, cancellationToken);
-            snapshots.Enqueue(snapshot);
-            output.WriteLine($"referee command={snapshot.Command} counter={snapshot.CommandCounter}");
-            return snapshot;
-        }
-
-        public void Dispose()
-        {
-            (inner as IDisposable)?.Dispose();
-        }
     }
 
     private sealed class InitialSnapshotRefereeCommandSource(

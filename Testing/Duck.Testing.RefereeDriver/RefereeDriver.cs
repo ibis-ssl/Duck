@@ -19,6 +19,23 @@ public interface IRefereeCommandSource
         CancellationToken cancellationToken);
 }
 
+public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot)
+{
+    public const string ActiveCommandLostFailureReason = "REFEREE_STATE_LOSS";
+
+    public string FailureReason => ActiveCommandLostFailureReason;
+
+    public string ToFailureMessage() =>
+        $"{FailureReason}: active referee command was lost during Yellow motion; " +
+        $"observed {Snapshot.Command} at counter {Snapshot.CommandCounter}.";
+}
+
+public sealed class RefereeStateLostException(RefereeCommandSnapshot snapshot)
+    : InvalidOperationException($"The referee left an active command: {snapshot.Command} ({snapshot.CommandCounter}).")
+{
+    public RefereeStateLossEvent StateLoss { get; } = new(snapshot);
+}
+
 public interface IGameControllerControlClient
 {
     Task SendContinueActionAsync(
@@ -82,6 +99,88 @@ public sealed class RefereeDriverFixture
         {
             throw new InvalidOperationException(
                 $"Game Controller did not reach an active referee command; observed {active.Command}.");
+        }
+    }
+
+    public static async Task<T> WaitForMotionWhileActiveAsync<T>(
+        IRefereeCommandSource commandSource,
+        RefereeCommandSnapshot activeSnapshot,
+        TimeSpan motionTimeout,
+        Func<CancellationToken, Task<T>> waitForMotionAsync,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(commandSource);
+        ArgumentNullException.ThrowIfNull(activeSnapshot);
+        ArgumentNullException.ThrowIfNull(waitForMotionAsync);
+        if (motionTimeout <= TimeSpan.Zero || motionTimeout == Timeout.InfiniteTimeSpan)
+        {
+            throw new ArgumentOutOfRangeException(nameof(motionTimeout));
+        }
+
+        if (!IsActive(activeSnapshot.Command))
+        {
+            throw new ArgumentException("The initial referee snapshot must be active.", nameof(activeSnapshot));
+        }
+
+        using var waitCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        using var motionCancellation = CancellationTokenSource.CreateLinkedTokenSource(waitCancellation.Token);
+        motionCancellation.CancelAfter(motionTimeout);
+        var refereeLossTask = WaitForStateLossAsync(commandSource, activeSnapshot, waitCancellation.Token);
+        var motionTask = RunMotionWaitAsync(waitForMotionAsync, motionCancellation.Token);
+
+        try
+        {
+            var completed = await Task.WhenAny(motionTask, refereeLossTask);
+            // Preserve a loss that was already observed when both waits finish concurrently.
+            if (completed == refereeLossTask || refereeLossTask.IsCompleted)
+            {
+                var lostSnapshot = await refereeLossTask;
+                throw new RefereeStateLostException(lostSnapshot);
+            }
+
+            return await motionTask;
+        }
+        finally
+        {
+            waitCancellation.Cancel();
+            await ObserveCompletionAsync(motionTask);
+            await ObserveCompletionAsync(refereeLossTask);
+        }
+    }
+
+    private static async Task<T> RunMotionWaitAsync<T>(
+        Func<CancellationToken, Task<T>> waitForMotionAsync,
+        CancellationToken cancellationToken)
+    {
+        return await waitForMotionAsync(cancellationToken);
+    }
+
+    private static async Task<RefereeCommandSnapshot> WaitForStateLossAsync(
+        IRefereeCommandSource commandSource,
+        RefereeCommandSnapshot activeSnapshot,
+        CancellationToken cancellationToken)
+    {
+        var previousCounter = activeSnapshot.CommandCounter;
+        while (true)
+        {
+            var snapshot = await commandSource.WaitForChangeAsync(previousCounter, cancellationToken);
+            previousCounter = snapshot.CommandCounter;
+            if (!IsActive(snapshot.Command))
+            {
+                return snapshot;
+            }
+        }
+    }
+
+    private static async Task ObserveCompletionAsync(Task task)
+    {
+        try
+        {
+            await task;
+        }
+        catch
+        {
+            // The winning task determines the result; always observe the cancelled peer task.
         }
     }
 
