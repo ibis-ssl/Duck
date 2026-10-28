@@ -125,6 +125,12 @@ curl -k -X POST https://localhost:7042/api/tracker/profile-switch/fast
 
 ### `VisionReceiver:PacketCapture`
 
+AppHost の比較構成では、`Testing:DebugHost:CaptureRootPath` を任意の基準ディレクトリとして指定できます。省略時は `%LOCALAPPDATA%` です。指定値そのものではなく、その下に `Duck/Aspire/<run-id>/captures` を作成します。AppHost のモデル試験では一時ディレクトリを指定し、ホストの既定保存先へ書き込みません。
+
+後日の再生専用構成は `Testing:DebugHost:ReplayOnly=true` と、既存ディレクトリを示す絶対パス `Testing:DebugHost:ReplayDirectoryPath` を指定します。この構成は DebugHost だけを起動し、既存ディレクトリを `/data/replay` へ読み取り専用で割り当てます。capture の有効化と Vision / tracker の UDP 送受信は行いません。再生元は変更・削除されず、ReplayOnly と他の AppHost モードを同時指定した場合は起動を拒否します。
+
+Aspire の比較構成では AppHost が `VisionReceiver:PacketCapture:DirectoryPath` をコンテナ内の `/data/captures` に設定し、Windows 側の実行別保存先を割り当てます。後日の再生専用起動では既存の保存先を `/data/replay` に読み取り専用で割り当て、capture の有効化と UDP 受信・送信を無効にします。保存元は削除・変更されません。
+
 SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。
 
 キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。

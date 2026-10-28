@@ -1,4 +1,5 @@
 using Tracker.Core;
+using Tracker.DebugHost;
 using Duck.Testing.Diagnostics;
 using Tracker.DebugHost.Components;
 using Tracker.DebugHost.Tracking;
@@ -20,6 +21,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.Configure<VisionReceiverOptions>(builder.Configuration.GetSection("VisionReceiver"));
 builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection("Tracker"));
+var replayOnly = builder.Configuration.GetValue<bool>("Testing:DebugHost:ReplayOnly");
+if (replayOnly)
+{
+    DebugHostReplayOnlyConfiguration.Apply(builder.Configuration);
+}
 var startupTrackerOptions = builder.Configuration.GetSection("Tracker").Get<TrackerOptions>() ?? new TrackerOptions();
 builder.Services.AddSingleton(serviceProvider =>
 {
@@ -32,7 +38,8 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 builder.Services.AddSingleton(serviceProvider =>
     new VisionPacketCaptureRuntimeControl(
-        serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value.PacketCapture.Enabled));
+        serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value.PacketCapture.Enabled,
+        allowEnable: !replayOnly));
 builder.Services.AddSingleton(serviceProvider =>
     TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
 builder.Services.AddSingleton<TrackerRuntimeResolvedOptions>(serviceProvider =>
@@ -95,7 +102,10 @@ if (startupTrackerOptions.Receive.Enabled)
     builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();
 }
 
-builder.Services.AddHostedService<VisionReceiverService>();
+if (!replayOnly)
+{
+    builder.Services.AddHostedService<VisionReceiverService>();
+}
 
 var app = builder.Build();
 

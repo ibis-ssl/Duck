@@ -22,6 +22,49 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
 
+if (IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]))
+{
+    var incompatibleModeSelected =
+        IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]) ||
+        string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.OrdinalIgnoreCase);
+    if (incompatibleModeSelected)
+    {
+        throw new InvalidOperationException(
+            "Testing:DebugHost:ReplayOnly cannot be combined with another AppHost mode.");
+    }
+
+    var replayLockPath = builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var replayOwnershipLease = StackOwnershipLease.Acquire(replayLockPath);
+    var replayDirectoryPath = builder.Configuration["Testing:DebugHost:ReplayDirectoryPath"];
+    if (string.IsNullOrWhiteSpace(replayDirectoryPath))
+    {
+        throw new InvalidOperationException(
+            "Testing:DebugHost:ReplayDirectoryPath is required when DebugHost replay-only mode is enabled.");
+    }
+
+    var replaySettings = DebugHostCaptureMountSettings.CreateReplay(replayDirectoryPath);
+    var replayHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
+        .WithEnvironment("Testing__Mode", "comparison")
+        .WithEnvironment("Testing__DebugHost__ReplayOnly", "true")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Tracker__Enabled", "false")
+        .WithEnvironment("Tracker__PublishUdp", "false")
+        .WithEnvironment("Tracker__Receive__Enabled", "false")
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    replaySettings.ApplyTo(replayHost);
+    var replayHttpEndpoint = replayHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    replayHttpEndpoint.Port = null;
+    replayHttpEndpoint.TargetHost = "127.0.0.1";
+
+    builder.Build().Run();
+    return 0;
+}
+
 /// <summary>
 /// 明示選択された場合だけ、所有ラベルと診断受渡しの常駐サービスを構成します。
 /// </summary>
@@ -488,8 +531,12 @@ if (testingMode == "comparison")
         .WaitFor(simulator)
         .WaitFor(gameController);
 
+    var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
     var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
         .WithEnvironment("Testing__Mode", "comparison")
+        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
         .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
         .WithEnvironment("VisionReceiver__Port", "10020")
         .WithEnvironment("Tracker__Enabled", "false")
@@ -501,6 +548,7 @@ if (testingMode == "comparison")
         .WithEnvironment("Tracker__SourceName", "debug-host-observer")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    captureSettings.ApplyTo(debugHost);
     var httpEndpoint = debugHost.Resource.Annotations
         .OfType<EndpointAnnotation>()
         .Single(endpoint => endpoint.Name == "http");

@@ -338,6 +338,74 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(
             debugHost.Annotations.OfType<EndpointAnnotation>(),
             endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        var captureMount = Assert.Single(debugHost.Annotations.OfType<ContainerMountAnnotation>());
+        Assert.Contains(Path.Combine("Duck", "Aspire"), captureMount.Source, StringComparison.OrdinalIgnoreCase);
+        Assert.EndsWith("captures", captureMount.Source, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("/data/captures", captureMount.Target);
+        Assert.False(captureMount.IsReadOnly);
+        var environment = await GetResourceEnvironmentAsync(debugHost);
+        Assert.Equal("/data/captures", environment["VisionReceiver__PacketCapture__DirectoryPath"].ToString());
+        Assert.Equal("false", environment["VisionReceiver__PacketCapture__Enabled"].ToString());
+    }
+
+    [Fact]
+    public async Task DebugHostReplayOnlyUsesExistingDirectoryReadOnlyWithoutStartingNetworkResources()
+    {
+        var replayDirectory = Path.Combine(Path.GetTempPath(), "duck-debug-host-replay-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(replayDirectory);
+        var sentinelPath = Path.Combine(replayDirectory, "capture.metadata.json");
+        var sentinelBytes = System.Text.Encoding.UTF8.GetBytes("{\"saved\":true}");
+        await File.WriteAllBytesAsync(sentinelPath, sentinelBytes);
+
+        try
+        {
+            using var appHost = await CreateAppHostAsync(
+                "--Testing:DebugHost:ReplayOnly=true",
+                "--Testing:DebugHost:ReplayDirectoryPath=" + replayDirectory);
+
+            var debugHost = Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources));
+            Assert.Equal("debug-host", debugHost.Name);
+            AssertLinuxDistribution(
+                debugHost,
+                "Tracker/Tracker.DebugHost",
+                "Tracker.DebugHost.dll",
+                "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+
+            var replayMount = Assert.Single(debugHost.Annotations.OfType<ContainerMountAnnotation>());
+            Assert.Equal(Path.GetFullPath(replayDirectory), replayMount.Source);
+            Assert.Equal("/data/replay", replayMount.Target);
+            Assert.True(replayMount.IsReadOnly);
+
+            var environment = await GetResourceEnvironmentAsync(debugHost);
+            Assert.Equal("true", environment["Testing__DebugHost__ReplayOnly"].ToString());
+            Assert.Equal("/data/replay", environment["VisionReceiver__PacketCapture__DirectoryPath"].ToString());
+            Assert.Equal("false", environment["VisionReceiver__PacketCapture__Enabled"].ToString());
+            Assert.Equal("false", environment["Tracker__Enabled"].ToString());
+            Assert.Equal("false", environment["Tracker__PublishUdp"].ToString());
+            Assert.Equal("false", environment["Tracker__Receive__Enabled"].ToString());
+            Assert.DoesNotContain(
+                debugHost.Annotations.OfType<EndpointAnnotation>(),
+                endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+            Assert.Equal(sentinelBytes, await File.ReadAllBytesAsync(sentinelPath));
+        }
+        finally
+        {
+            Directory.Delete(replayDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task DebugHostReplayOnlyRejectsAnotherSelectedAppHostMode()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [
+                    "--Testing:DebugHost:ReplayOnly=true",
+                    "--Testing:VisionSimulationOnly=true",
+                    CreateIsolatedOwnershipLockArgument(),
+                ]));
+
+        Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -368,8 +436,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task ComparisonModeAddsPinnedExternalTrackersAndObserverWithoutAnotherRefereeProducer()
     {
-        using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-            ["--Testing:Mode=comparison", CreateIsolatedOwnershipLockArgument()]);
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
 
         var simulator = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
         var gameController = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, resource => resource.Name == "game-controller"));
@@ -739,9 +806,22 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
-    private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs) =>
-        await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-            [.. additionalArgs, CreateIsolatedOwnershipLockArgument()]);
+    private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs)
+    {
+        var captureRoot = Path.Combine(Path.GetTempPath(), "duck-debug-host-apphost-model-" + Guid.NewGuid().ToString("N"));
+        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+            [
+                .. additionalArgs,
+                "--Testing:DebugHost:CaptureRootPath=" + captureRoot,
+                CreateIsolatedOwnershipLockArgument(),
+            ]);
+        if (Directory.Exists(captureRoot))
+        {
+            Directory.Delete(captureRoot, recursive: true);
+        }
+
+        return appHost;
+    }
 
     private static IResource Find(IDistributedApplicationTestingBuilder appHost, string name) =>
         Assert.Single(appHost.Resources, resource => resource.Name == name);
