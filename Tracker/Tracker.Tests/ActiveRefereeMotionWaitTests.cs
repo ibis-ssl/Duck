@@ -29,6 +29,9 @@ public sealed class ActiveRefereeMotionWaitTests
         using var recordedSource = new RecordingRefereeCommandSource(parsedSource, snapshots);
         await packetReceiver.PublishAsync(Referee.Types.Command.NormalStart, initialCounter);
         var active = await recordedSource.WaitForChangeAsync(null, CancellationToken.None);
+        var resultWriter = new AspireAcceptanceResultWriter(snapshots);
+        var artifactDirectory = Directory.CreateTempSubdirectory("issue101-acceptance-result-");
+        var resultPath = Path.Combine(artifactDirectory.FullName, "acceptance-result.json");
         var motionStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var motionCanceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         using var testCancellation = new CancellationTokenSource();
@@ -65,29 +68,49 @@ public sealed class ActiveRefereeMotionWaitTests
             var elapsed = Stopwatch.GetElapsedTime(injectedAt);
             output.WriteLine(
                 $"loopback endpoint={packetReceiver.Endpoint}; Halt response={elapsed.TotalMilliseconds:F3} ms; configured motion timeout={motionTimeoutSeconds} s");
+            try
+            {
+                throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
+            }
+            catch (InvalidOperationException acceptanceFailure)
+            {
+                resultWriter.RecordFailure(acceptanceFailure);
+            }
 
             Assert.True(elapsed < TimeSpan.FromSeconds(motionTimeoutSeconds));
             Assert.True(motionCanceled.Task.IsCompleted);
+            await resultWriter.WriteAsync(
+                resultPath,
+                stageReached: "active_robot_motion_wait",
+                refereeRawDatagramCount: snapshots.Count,
+                visionPacketsConsumed: null,
+                trackerPacketsConsumed: null,
+                comparisonMeasurement: null,
+                receiverSockets: null,
+                movement: null);
+
+            using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+            var resultRoot = result.RootElement;
+            Assert.Equal("failed", resultRoot.GetProperty("status").GetString());
+            Assert.Contains(
+                "REFEREE_STATE_LOSS: active referee command was lost during Yellow motion; observed Halt at counter 52.",
+                resultRoot.GetProperty("failure").GetString());
+            var stateLoss = resultRoot.GetProperty("refereeStateLoss");
+            Assert.Equal("REFEREE_STATE_LOSS", stateLoss.GetProperty("FailureReason").GetString());
+            var lostSnapshot = stateLoss.GetProperty("Snapshot");
+            Assert.Equal((int)Referee.Types.Command.Halt, lostSnapshot.GetProperty("Command").GetInt32());
+            Assert.Equal(haltCounter, lostSnapshot.GetProperty("CommandCounter").GetUInt32());
             Assert.Equal(
                 [
-                    new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, initialCounter, "crane"),
-                    new RefereeCommandSnapshot(Referee.Types.Command.ForceStart, initialCounter + 1, "crane"),
-                    new RefereeCommandSnapshot(Referee.Types.Command.Halt, haltCounter, "crane"),
+                    ("NormalStart", initialCounter),
+                    ("ForceStart", initialCounter + 1),
+                    ("Halt", haltCounter),
                 ],
-                snapshots.ToArray());
-            Assert.Equal(Referee.Types.Command.Halt, exception.StateLoss.Snapshot.Command);
-            Assert.Equal(haltCounter, exception.StateLoss.Snapshot.CommandCounter);
-            Assert.Equal("REFEREE_STATE_LOSS", exception.StateLoss.FailureReason);
-            Assert.Equal(
-                "REFEREE_STATE_LOSS: active referee command was lost during Yellow motion; observed Halt at counter 52.",
-                exception.StateLoss.ToFailureMessage());
-            using var diagnostic = System.Text.Json.JsonDocument.Parse(
-                System.Text.Json.JsonSerializer.Serialize(exception.StateLoss));
-            Assert.Equal("REFEREE_STATE_LOSS", diagnostic.RootElement.GetProperty("FailureReason").GetString());
-            Assert.Equal((int)Referee.Types.Command.Halt,
-                diagnostic.RootElement.GetProperty("Snapshot").GetProperty("Command").GetInt32());
-            Assert.Equal(haltCounter,
-                diagnostic.RootElement.GetProperty("Snapshot").GetProperty("CommandCounter").GetUInt32());
+                resultRoot.GetProperty("refereeCommands").EnumerateArray()
+                    .Select(command => (
+                        command.GetProperty("command").GetString()!,
+                        command.GetProperty("CommandCounter").GetUInt32()))
+                    .ToArray());
         }
         finally
         {
@@ -99,6 +122,11 @@ public sealed class ActiveRefereeMotionWaitTests
             catch
             {
                 // The expected referee-loss task faults; cancellation must still join it after assertion failures.
+            }
+
+            if (Directory.Exists(artifactDirectory.FullName))
+            {
+                artifactDirectory.Delete(recursive: true);
             }
         }
 

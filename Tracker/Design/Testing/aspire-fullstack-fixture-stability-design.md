@@ -31,7 +31,7 @@
 
 ## #101: 移動中の停止指令注入に対する回帰試験
 
-自動回帰試験では、試験専用の `127.0.0.1` 上で `UDP` ソケットを空きポートに割り当て、審判 `protobuf` の `packet` を送信する。本番の `UdpRefereeCommandSource` で解析し、既存の受入試験と共用する記録用 `IRefereeCommandSource` 実装を通して履歴を保存する。移動処理が開始を通知した後に監視を始め、`NormalStart` から別の有効指令への変化を記録してから、移動中に新しい `Halt` を注入する。設定した `timeout` より前に移動を停止すること、最後の `command` と `counter` を含む `REFEREE_STATE_LOSS` 診断、指令履歴、ソケットの破棄を検証する。通常の移動完了は既存の移動監視試験で引き続き確認する。この回帰試験では Game Controller、AutoRef、Docker、`multicast`、Aspire 全体、映像、比較機能、100 mm 移動確認を起動せず、これらは個別に確認する証拠として扱う。
+自動回帰試験では、試験専用の `127.0.0.1` 上で `UDP` ソケットを空きポートに割り当て、審判 `protobuf` の `packet` を送信する。本番の `UdpRefereeCommandSource` で解析し、既存の受入試験と共用する記録用 `IRefereeCommandSource` 実装を通して履歴を保存する。移動待機と審判監視を並行して開始し、移動処理から開始通知を受けた後に `NormalStart` から別の有効指令への変化を記録して、移動中に新しい `Halt` を注入する。設定した `timeout` より前に移動を停止すること、最後の `command` と `counter` を含む `REFEREE_STATE_LOSS` 診断、指令履歴、ソケットの破棄を検証する。通常の移動完了は既存の移動監視試験で引き続き確認する。この回帰試験では Game Controller、AutoRef、Docker、`multicast`、Aspire 全体、映像、比較機能、100 mm 移動確認を起動せず、これらは個別に確認する証拠として扱う。
 
 ## 設定契約
 

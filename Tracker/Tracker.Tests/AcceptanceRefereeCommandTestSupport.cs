@@ -27,6 +27,72 @@ internal sealed class RecordingRefereeCommandSource(
     }
 }
 
+internal sealed class AspireAcceptanceResultWriter(
+    ConcurrentQueue<RefereeCommandSnapshot> refereeSnapshots)
+{
+    private Exception? failure;
+
+    public void RecordFailure(Exception exception)
+    {
+        failure = exception ?? throw new ArgumentNullException(nameof(exception));
+    }
+
+    public static InvalidOperationException CreateMotionFailure(RefereeStateLostException exception) =>
+        new(exception.StateLoss.ToFailureMessage(), exception);
+
+    public async Task WriteAsync(
+        string path,
+        string stageReached,
+        int refereeRawDatagramCount,
+        int? visionPacketsConsumed,
+        int? trackerPacketsConsumed,
+        object? comparisonMeasurement,
+        object? receiverSockets,
+        object? movement)
+    {
+        var evidence = new
+        {
+            status = failure is null ? "passed" : "failed",
+            failure = failure?.ToString(),
+            stageReached,
+            refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
+            {
+                command = snapshot.Command.ToString(),
+                snapshot.CommandCounter,
+            }),
+            refereeRawDatagramCount,
+            refereeStateLoss = FindRefereeStateLoss(failure),
+            visionPacketsConsumed,
+            trackerPacketsConsumed,
+            comparisonMeasurement,
+            packetCountSemantics = "Consumed counts record datagrams read by the harness; null means that reader stage was not reached and does not imply network ingress was zero.",
+            receiverSockets,
+            movement,
+            runner = Environment.GetEnvironmentVariable("RUNNER_OS"),
+            sha = Environment.GetEnvironmentVariable("GITHUB_SHA"),
+        };
+
+        await File.WriteAllTextAsync(
+            path,
+            System.Text.Json.JsonSerializer.Serialize(
+                evidence,
+                new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    private static RefereeStateLossEvent? FindRefereeStateLoss(Exception? exception)
+    {
+        for (var current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is RefereeStateLostException stateLost)
+            {
+                return stateLost.StateLoss;
+            }
+        }
+
+        return null;
+    }
+}
+
 internal sealed class LoopbackUdpRefereePacketReceiver : IRefereePacketReceiver, IDisposable
 {
     private readonly UdpClient client = new(AddressFamily.InterNetwork);

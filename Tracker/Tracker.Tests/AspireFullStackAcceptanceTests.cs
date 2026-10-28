@@ -38,12 +38,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Directory.CreateDirectory(artifactsDirectory);
 
         var refereeSnapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        var resultWriter = new AspireAcceptanceResultWriter(refereeSnapshots);
         var stageReached = "test_setup";
         var refereeRawDatagramCount = 0;
-        RefereeStateLossEvent? refereeStateLoss = null;
         int? visionPacketsConsumed = null;
         int? trackerPacketsConsumed = null;
-        string? failure = null;
         RobotMotionDelta? observedMovement = null;
         TrackerComparisonMeasurementEvidence? comparisonMeasurement = null;
         MulticastInterface? selectedMulticastInterface = null;
@@ -165,10 +164,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             catch (RefereeStateLostException exception)
             {
-                refereeStateLoss = exception.StateLoss;
-                throw new InvalidOperationException(
-                    exception.StateLoss.ToFailureMessage(),
-                    exception);
+                throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
             }
             catch (OperationCanceledException exception)
             {
@@ -211,7 +207,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         catch (Exception exception)
         {
-            failure = exception.ToString();
+            resultWriter.RecordFailure(exception);
             throw;
         }
         finally
@@ -231,23 +227,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             refereeReceiver?.Dispose();
             visionReceiver?.Dispose();
             trackerReceiver?.Dispose();
-            var evidence = new
-            {
-                status = failure is null ? "passed" : "failed",
-                failure,
+            var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
+            await resultWriter.WriteAsync(
+                path,
                 stageReached,
-                refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
-                {
-                    command = snapshot.Command.ToString(),
-                    snapshot.CommandCounter,
-                }),
                 refereeRawDatagramCount,
-                refereeStateLoss,
                 visionPacketsConsumed,
                 trackerPacketsConsumed,
                 comparisonMeasurement,
-                packetCountSemantics = "Consumed counts record datagrams read by the harness; null means that reader stage was not reached and does not imply network ingress was zero.",
-                receiverSockets = new
+                receiverSockets: new
                 {
                     interfaceName = selectedMulticastInterface?.Name,
                     interfaceAddress = selectedMulticastInterface?.Address.ToString(),
@@ -258,16 +246,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     duckTracker = new { group = "224.5.23.2", port = 11010 },
                     linuxMemberships = linuxMulticastMemberships,
                 },
-                movement = observedMovement,
-                runner = Environment.GetEnvironmentVariable("RUNNER_OS"),
-                sha = Environment.GetEnvironmentVariable("GITHUB_SHA"),
-            };
-            var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
-            await File.WriteAllTextAsync(
-                path,
-                System.Text.Json.JsonSerializer.Serialize(
-                    evidence,
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                movement: observedMovement);
             output.WriteLine($"Acceptance evidence: {path}");
         }
     }
