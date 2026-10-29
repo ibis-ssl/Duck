@@ -6,6 +6,7 @@ using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit.Abstractions;
 
@@ -904,6 +905,9 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         var resourceStateObservationCounts = new ConcurrentDictionary<string, int>(StringComparer.Ordinal);
         Exception? operationFailure = null;
         Exception? cleanupFailure = null;
+        var hostLogCapture = new NamespaceProbeDcpHostLogCapture(
+            [NamespaceProbeModelFactory.OwnerResourceName, $"duck-namespace-probe-owner-{settings.RunId}"],
+            [NamespaceProbeModelFactory.FollowerResourceName, $"duck-namespace-probe-follower-{settings.RunId}"]);
         var dockerExecutable = GetDockerExecutablePath();
         var publishDirectory = GetExistingPublishDirectory();
 
@@ -929,6 +933,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                 ProjectDirectory = Projects.Duck_Testing_AppHost.ProjectPath,
                 DisableDashboard = true,
             });
+            builder.Services.AddLogging(hostLogCapture.Configure);
             var model = await NamespaceProbeModelFactory.AddResourcesAndProjectAsync(
                 builder,
                 settings.RunId,
@@ -1261,6 +1266,11 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                 resourceLogCaptureStop = null;
             }
 
+            foreach (var capturedLog in hostLogCapture.Snapshot())
+            {
+                Record("dcp.host-log", capturedLog);
+            }
+            Record("dcp.host-log-capture.summary", hostLogCapture.Summary());
             ownershipLease?.Dispose();
             var observedGenerationCount = monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count;
             Record("probe.finished", new { elapsedMilliseconds = stopwatch.ElapsedMilliseconds, observedContainerGenerations = observedGenerationCount, cleanupVerified = cleanupFailure is null });
