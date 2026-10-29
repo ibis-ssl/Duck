@@ -18,16 +18,18 @@ internal interface IOwnedCm4SimulatorReconfigurationAdapter
 internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
     IOwnedCm4SimulatorReconfigurationAdapter adapter,
     IOwnedCm4TransportTargetController? controller,
-    string helperLaunchId)
+    string helperLaunchId,
+    TimeSpan? operationBudget = null)
 {
-    private static readonly TimeSpan OperationLimit = TimeSpan.FromSeconds(45);
+    private static readonly TimeSpan DefaultOperationLimit = TimeSpan.FromSeconds(45);
+    private readonly TimeSpan operationLimit = operationBudget ?? DefaultOperationLimit;
     private readonly SemaphoreSlim operationGate = new(1, 1);
 
     internal async Task<OwnedCm4SimulatorReconfigurationResult> ExecuteAsync(
         CancellationToken cancellationToken)
     {
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        deadline.CancelAfter(OperationLimit);
+        deadline.CancelAfter(operationLimit);
         var token = deadline.Token;
         var entered = false;
         try
@@ -49,6 +51,11 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
             if (snapshot.Phase == Cm4TransportTargetPhase.Initial)
             {
                 var initialApply = await controller.ApplyCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
+                if (token.IsCancellationRequested)
+                {
+                    controller.Invalidate();
+                    token.ThrowIfCancellationRequested();
+                }
                 if (!initialApply.Applied || initialApply.Unknown)
                 {
                     return Failed("The current target is not confirmed applied; simulator restart was not requested.");
@@ -66,6 +73,10 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
             }
 
             var invalidation = await controller.InvalidateCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
+            if (invalidation.Invalidated && !invalidation.Unknown)
+            {
+                token.ThrowIfCancellationRequested();
+            }
             if (!invalidation.Invalidated || invalidation.Unknown ||
                 controller.Snapshot().Phase != Cm4TransportTargetPhase.Invalidated)
             {
@@ -78,12 +89,19 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
                 return Failed("The owned identities changed after invalidation; the old target remains disabled.");
             }
 
+            token.ThrowIfCancellationRequested();
             if (!await adapter.RestartSimulatorAsync(token).ConfigureAwait(false))
             {
                 return Failed("The DCP simulator restart command did not succeed; the old target remains disabled.");
             }
+            if (token.IsCancellationRequested)
+            {
+                controller.Invalidate();
+                token.ThrowIfCancellationRequested();
+            }
 
             var replacement = await adapter.WaitForReplacementAsync(previous, token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
             if (replacement is null || replacement.Cm4 != previous.Cm4 ||
                 replacement.Simulator.Generation <= previous.Simulator.Generation ||
                 replacement.Simulator.ContainerId == previous.Simulator.ContainerId ||
@@ -92,12 +110,19 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
                 return Failed("A new owned simulator generation was not confirmed; no target was applied.");
             }
 
+            token.ThrowIfCancellationRequested();
             var applied = await controller.ApplyCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
+            if (applied.Applied && !applied.Unknown && token.IsCancellationRequested)
+            {
+                controller.Invalidate();
+                token.ThrowIfCancellationRequested();
+            }
             if (!applied.Applied || applied.Unknown)
             {
                 return Failed("The replacement target was not confirmed applied; no prior target was restored.");
             }
 
+            token.ThrowIfCancellationRequested();
             return new(true, "Remote target invalidation, DCP restart, and replacement target application were confirmed.");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

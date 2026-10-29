@@ -1,0 +1,73 @@
+﻿{
+  "schemaVersion": 1,
+  "task": "I81-07J-B3-D-NR001",
+  "baseline": "ba9aa38c12c3f4739d44dcfb5ab8531c0ba94681",
+  "status": "ready_for_parent_commit_review",
+  "changedFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "2805cf613b70188c449e74e85d528ae3dffa0ca122a3b1aa09825b402291099c"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "cd0874c177dd15b7a8e10e773329f735caa604f08911227bb1e105dec196d205"
+    }
+  ],
+  "tdd": {
+    "behaviorRed": {
+      "exit": 1,
+      "compilationAndDiscoverySucceeded": true,
+      "expectedBehaviorFailures": 2
+    },
+    "focusedGreen": {
+      "exit": 0,
+      "passed": 7,
+      "failed": 0
+    }
+  },
+  "validation": {
+    "relatedTests": {
+      "exit": 0,
+      "passed": 142,
+      "failed": 0
+    },
+    "releaseBuild": {
+      "exit": 0,
+      "sourceMatchedBuild": true
+    },
+    "trackingDocumentGates": {
+      "rerun": 8,
+      "passed": 8,
+      "failed": 0,
+      "designUnchangedAndNotRun": true
+    }
+  },
+  "contract": {
+    "productionDefaultDeadlineSeconds": 45,
+    "shortDeadlineTestSeamOnly": true,
+    "cancellationOrExpirySuccess": false,
+    "unknownDoesNotRestoreOldDestination": true
+  },
+  "notValidated": [
+    "Actual Docker/DCP/AppHost startup",
+    "CM4 helper deployment",
+    "UDP communication"
+  ],
+  "documentFingerprints": [
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "worktreeFullSha256": "9ced40001878307988bbbd52b7f5fefd156d4cc176158a733c12b0c0bcda94fb",
+      "addedInputSha256": "ac21c073940cee42f45e4c48700be5d7ed0d234e0f102b7ffdfdeb686118a031",
+      "cspellCopySha256": "ac21c073940cee42f45e4c48700be5d7ed0d234e0f102b7ffdfdeb686118a031",
+      "addedLineCount": 1
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "worktreeFullSha256": "de6623752846f06fb629add265cf9732abd6ef49c6d5bfb8459d9115a184dcee",
+      "addedInputSha256": "692d3731b018806c3b6bcdbabdeb0c082326f2598f77d91e3182a318068834fb",
+      "cspellCopySha256": "692d3731b018806c3b6bcdbabdeb0c082326f2598f77d91e3182a318068834fb",
+      "addedLineCount": 4
+    }
+  ],
+  "fingerprintNote": "Full worktree byte SHA256 differs from Git normalized representation. Added input SHA256 identifies the exact lines given to gates. Full source snapshots retained; prior a589 EOL replay uncertainty unchanged."
+}

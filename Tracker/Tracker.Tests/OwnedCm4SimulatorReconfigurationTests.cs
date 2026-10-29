@@ -61,6 +61,70 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
     }
 
     [Fact]
+    public async Task CancellationAfterInvalidationAckDoesNotDispatchRestart()
+    {
+        var pair = CreatePair(1, "a");
+        using var cancellation = new CancellationTokenSource();
+        var adapter = new FakeAdapter(pair, CreatePair(2, "b"));
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair)
+        {
+            AfterInvalidation = cancellation.Cancel,
+        };
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+
+        var result = await coordinator.ExecuteAsync(cancellation.Token);
+
+        Assert.False(result.Success);
+        Assert.True(result.Canceled);
+        Assert.Equal(0, adapter.RestartDispatchAttempts);
+        Assert.Equal(["invalidate"], adapter.Events);
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task CancellationAfterFinalApplyAckDoesNotReturnSuccess()
+    {
+        var previous = CreatePair(1, "a");
+        var replacement = CreatePair(2, "b");
+        using var cancellation = new CancellationTokenSource();
+        var adapter = new FakeAdapter(previous, replacement);
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair)
+        {
+            AfterApply = cancellation.Cancel,
+        };
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+
+        var result = await coordinator.ExecuteAsync(cancellation.Token);
+
+        Assert.False(result.Success);
+        Assert.True(result.Canceled);
+        Assert.Equal(["invalidate", "restart", "wait-replacement", "apply"], adapter.Events);
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task OperationDeadlineDuringFinalApplyDoesNotReturnSuccess()
+    {
+        var previous = CreatePair(1, "a");
+        var replacement = CreatePair(2, "b");
+        var adapter = new FakeAdapter(previous, replacement);
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair)
+        {
+            BlockApply = true,
+        };
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(
+            adapter, controller, "run-01", TimeSpan.FromMilliseconds(100));
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.False(result.Canceled);
+        Assert.Equal(["invalidate", "restart", "wait-replacement", "apply"], adapter.Events);
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+        Assert.Null(controller.LastAppliedPair);
+    }
+
+    [Fact]
     public async Task UnknownReplacementApplyDoesNotRestorePriorTarget()
     {
         var previous = CreatePair(1, "a");
@@ -89,12 +153,14 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         OwnedCm4TransportIdentityPair replacement) : IOwnedCm4SimulatorReconfigurationAdapter
     {
         internal List<string> Events { get; } = [];
+        internal int RestartDispatchAttempts { get; private set; }
 
         public OwnedCm4TransportIdentityPair? GetCurrentOwnedPair() =>
             Events.Contains("restart", StringComparer.Ordinal) ? replacement : current;
 
         public Task<bool> RestartSimulatorAsync(CancellationToken cancellationToken)
         {
+            RestartDispatchAttempts++;
             cancellationToken.ThrowIfCancellationRequested();
             Events.Add("restart");
             return Task.FromResult(true);
@@ -118,6 +184,8 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         internal Cm4TransportTargetInvalidationResult InvalidationResult { get; init; } = new(true, false, 1, null);
         internal Cm4TransportTargetApplyResult? FinalApplyResult { get; init; }
         internal Action? AfterInvalidation { get; init; }
+        internal Action? AfterApply { get; init; }
+        internal bool BlockApply { get; init; }
         internal OwnedCm4TransportIdentityPair? LastAppliedPair { get; private set; }
 
         public Task<Cm4TransportTargetInvalidationResult> InvalidateCurrentTargetAsync(
@@ -133,21 +201,26 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
             return Task.FromResult(InvalidationResult);
         }
 
-        public Task<Cm4TransportTargetApplyResult> ApplyCurrentTargetAsync(
+        public async Task<Cm4TransportTargetApplyResult> ApplyCurrentTargetAsync(
             string helperLaunchId,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             events.Add("apply");
+            if (BlockApply)
+            {
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            }
             if (FinalApplyResult is not null)
             {
                 phase = Cm4TransportTargetPhase.Unknown;
-                return Task.FromResult(FinalApplyResult);
+                return FinalApplyResult;
             }
 
             LastAppliedPair = getCurrent();
             phase = Cm4TransportTargetPhase.Applied;
-            return Task.FromResult(new Cm4TransportTargetApplyResult(true, false, 2, null));
+            AfterApply?.Invoke();
+            return new Cm4TransportTargetApplyResult(true, false, 2, null);
         }
 
         public long Invalidate()
