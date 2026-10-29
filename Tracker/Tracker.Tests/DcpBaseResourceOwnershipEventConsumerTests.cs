@@ -318,17 +318,47 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
     }
 
     [Fact]
-    public async Task DoesNotInspectUntilEveryStandardCandidateIsRunning()
+    public async Task InspectsCurrentRunningCandidatesWithoutMarkingPendingResourcesReady()
     {
         var fixture = new OwnershipFixture();
         fixture.SetFirstCandidateState("Starting");
 
         var result = await fixture.VerifyAsync();
 
-        Assert.Equal(DcpBaseResourceOwnershipDisposition.CandidatesUnavailable, result.Disposition);
-        Assert.Equal(0, fixture.Runner.EngineReads);
-        Assert.Equal(0, fixture.Runner.InspectReads);
-        Assert.All(fixture.Registry.GetCandidates(), candidate => Assert.False(candidate.IdentityVerified));
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, result.Disposition);
+        Assert.Equal(1, fixture.Runner.EngineReads);
+        Assert.Equal(fixture.Registry.GetCandidates().Count - 1, fixture.Runner.InspectReads);
+        var candidates = fixture.Registry.GetCandidates();
+        Assert.False(candidates[0].IdentityVerified);
+        Assert.False(candidates[0].NetworkVerified);
+        Assert.False(fixture.Registry.Get(candidates[0].Resource)!.IsReady);
+        Assert.All(candidates.Skip(1), candidate =>
+        {
+            Assert.True(candidate.IdentityVerified);
+            Assert.True(candidate.NetworkVerified);
+            Assert.True(candidate.OwnershipVerified);
+            Assert.False(fixture.Registry.Get(candidate.Resource)!.IsReady);
+        });
+    }
+
+    [Fact]
+    public async Task VerifiesSimulatorAndDuckBeforeDownstreamContainersStart()
+    {
+        var fixture = new OwnershipFixture(
+            includeDuck: true,
+            runningRoles: ["simulator", "duck"]);
+
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, result.Disposition);
+        Assert.Equal(1, fixture.Runner.EngineReads);
+        Assert.Equal(2, fixture.Runner.InspectReads);
+        foreach (var candidate in fixture.Registry.GetCandidates())
+        {
+            var expectedOwned = candidate.Role is "simulator" or "duck";
+            Assert.Equal(expectedOwned, candidate.OwnershipVerified);
+            Assert.False(fixture.Registry.Get(candidate.Resource)!.IsReady);
+        }
     }
 
     private sealed class OwnershipFixture
@@ -337,15 +367,23 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
         private readonly DcpBaseResourceReadinessEventConsumer readinessConsumer;
         private readonly Dictionary<IResource, string> roles = new(ReferenceEqualityComparer.Instance);
 
-        internal OwnershipFixture(string? contextName = "desktop-linux", string? expectedEngineId = EngineId)
+        internal OwnershipFixture(
+            string? contextName = "desktop-linux",
+            string? expectedEngineId = EngineId,
+            bool includeDuck = false,
+            IReadOnlyCollection<string>? runningRoles = null)
         {
-            var resources = new (IResource Resource, string Role, string RunId)[]
+            var resources = new List<(IResource Resource, string Role, string RunId)>
             {
                 (new ContainerResource("simulator", "example/simulator:fixed"), "simulator", RunId),
                 (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller", RunId),
                 (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim", RunId),
                 (new ContainerResource("crane", "example/crane:fixed"), "crane", RunId),
             };
+            if (includeDuck)
+            {
+                resources.Add((new ContainerResource("duck", "example/duck:fixed"), "duck", RunId));
+            }
             Registry = new DcpBaseResourceReadinessRegistry(resources, StackId);
             readinessConsumer = new DcpBaseResourceReadinessEventConsumer(Registry);
             Runner = new FakeDockerStdioCommandRunner();
@@ -361,7 +399,8 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
                 roles.Add(resource, role);
                 var containerId = idNumber++.ToString("x64");
                 Runner.Inspections[containerId] = InspectJson(containerId, role, NetworkName, $"172.28.0.{idNumber}");
-                var resourceEvent = Event(resource, role, containerId);
+                var state = runningRoles is null || runningRoles.Contains(role) ? "Running" : "NotStarted";
+                var resourceEvent = Event(resource, role, containerId, state);
                 currentEvents.Add(resource.Name, resourceEvent);
                 readinessConsumer.Observe(resourceEvent, resourceEvent, role, GetCurrent);
             }

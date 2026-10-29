@@ -17,6 +17,8 @@ var identityDockerExecutable = builder.Configuration["Testing:IdentityControl:Do
     Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
+var identityHandoffStates = new ContainerIdentityHandoffStateStore();
+builder.Services.AddSingleton(identityHandoffStates);
 
 IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, string imageName, string projectPath)
 {
@@ -135,9 +137,9 @@ if (IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]))
 /// </summary>
 void EnableDesktopIdentityBridge(
     IResourceBuilder<ContainerResource> resource, string runId, string role,
-    string executableAssembly = "Tracker.RuntimeHost.dll")
+    string executableAssembly = "Tracker.RuntimeHost.dll", bool? enabledOverride = null)
 {
-    if (!IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    if (!(enabledOverride ?? IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"])))
     {
         return;
     }
@@ -168,7 +170,8 @@ void EnableDesktopIdentityBridge(
         expectedEngineId,
         new DockerCliCommandRunner(dockerExecutable),
         serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
-        builder.Configuration["Testing:IdentityControl:SafeTracePath"], executableAssembly));
+        builder.Configuration["Testing:IdentityControl:SafeTracePath"], executableAssembly,
+        serviceProvider.GetRequiredService<ContainerIdentityHandoffStateStore>()));
 }
 
 static string FindRepositoryRoot()
@@ -485,6 +488,13 @@ var fixtureManifestPath =
     CraneFixtureManifest.GetDefaultPath(stackId);
 
 var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
+var enableStandardBaseDuckIdentityBridge =
+    IsEnabled(desktopBridgeSetting) ||
+    testingMode == "base" &&
+    desktopBridgeSetting is null &&
+    !string.IsNullOrWhiteSpace(identityDockerContext) &&
+    !string.IsNullOrWhiteSpace(identityExpectedEngineId);
 var baseResources = BaseSimulationResourceRegistration.Add(
     builder,
     new BaseSimulationRegistrationOptions(
@@ -515,14 +525,14 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .WithEnvironment("Testing__ContainerMode", "true")
             .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
             .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
-        if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+        if (enableStandardBaseDuckIdentityBridge)
         {
             duckBuilder
                 .WithEnvironment("Testing__IdentityControl__Enabled", "true")
                 .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
                 .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
         }
-        EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck");
+        EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck", enabledOverride: enableStandardBaseDuckIdentityBridge);
         var visionHealthEndpoint = duckBuilder.Resource.Annotations
             .OfType<EndpointAnnotation>()
             .Single(endpoint => endpoint.Name == "vision-health");
@@ -550,7 +560,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                     "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
             }
         }
-    });
+    },
+    identityHandoffStates);
 var simulator = baseResources.Simulator;
 var duck = baseResources.Duck;
 var gameController = baseResources.GameController;

@@ -1,8 +1,12 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using System.Net;
+using System.Text.Json;
+using Tracker.RuntimeHost;
 
 namespace Duck.Testing.AppHost;
 
@@ -66,6 +70,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
         internal bool ResourceKeyAmbiguous;
         internal bool HasObservedFullContainerId;
         internal bool IsInitialPlaceholder;
+        internal long VisionGeneration = -1;
+        internal ResourceDiagnosticIdentity? VisionIdentity;
+        internal long VisionReceiverEpoch;
+        internal long VisionCount;
         internal string? AmbiguousActiveResourceId;
         internal readonly HashSet<string> RetiredResourceIds = new(StringComparer.Ordinal);
         internal readonly HashSet<string> PendingResourceIds = new(StringComparer.Ordinal);
@@ -336,8 +344,8 @@ internal sealed class DcpBaseResourceReadinessRegistry
         ArgumentNullException.ThrowIfNull(proofs);
         lock (sync)
         {
-            if (proofs.Count != entries.Count ||
-                proofs.Select(proof => proof.Resource).Distinct(ReferenceEqualityComparer.Instance).Count() != entries.Count ||
+            if (proofs.Count == 0 ||
+                proofs.Select(proof => proof.Resource).Distinct(ReferenceEqualityComparer.Instance).Count() != proofs.Count ||
                 proofs.Select(proof => proof.EngineId).Distinct(StringComparer.Ordinal).Count() != 1 ||
                 sharedStandardDcpNetworkVerified &&
                     (proofs.Any(proof => string.IsNullOrWhiteSpace(proof.NetworkName)) ||
@@ -355,6 +363,18 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.Generation != proof.Generation ||
                     entry.State != "Running" ||
                     !OwnedContainerInspection.IsFullId(entry.ContainerId))
+                {
+                    return false;
+                }
+            }
+
+            if (sharedStandardDcpNetworkVerified)
+            {
+                var incomingNetwork = proofs[0].NetworkName;
+                if (entries.Values.Any(entry =>
+                        entry.State == "Running" && entry.NetworkVerified && entry.OwnershipVerified &&
+                        !proofs.Any(proof => ReferenceEquals(proof.Resource, entry.Resource)) &&
+                        !string.Equals(entry.ObservedNetworkName, incomingNetwork, StringComparison.Ordinal)))
                 {
                     return false;
                 }
@@ -406,7 +426,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
         ArgumentNullException.ThrowIfNull(candidates);
         lock (sync)
         {
-            return candidates.Count == entries.Count &&
+            return candidates.Count > 0 &&
                 candidates.All(candidate =>
                     entries.TryGetValue(candidate.Resource, out var entry) &&
                     !entry.ResourceKeyAmbiguous &&
@@ -417,6 +437,76 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.IdentityVerified &&
                     entry.NetworkVerified &&
                     entry.OwnershipVerified);
+        }
+    }
+
+    internal bool ObserveSimulatorVision(
+        DcpBaseResourceIdentityCandidate candidate,
+        ResourceDiagnosticIdentity receiverIdentity,
+        long receiverEpoch,
+        long successfullyDecodedCount)
+    {
+        ArgumentNullException.ThrowIfNull(candidate);
+        ArgumentNullException.ThrowIfNull(receiverIdentity);
+        lock (sync)
+        {
+            if (!entries.TryGetValue(candidate.Resource, out var entry) ||
+                entry.ResourceKeyAmbiguous ||
+                entry.ResourceId != candidate.ResourceId ||
+                entry.ContainerId != candidate.ContainerId ||
+                entry.Generation != candidate.Generation ||
+                entry.State != "Running" ||
+                !entry.IdentityVerified || !entry.NetworkVerified || !entry.OwnershipVerified ||
+                receiverEpoch <= 0 || successfullyDecodedCount < 0)
+            {
+                return false;
+            }
+
+            if (entry.VisionGeneration != entry.Generation ||
+                entry.VisionIdentity != receiverIdentity ||
+                entry.VisionReceiverEpoch != receiverEpoch)
+            {
+                entry.VisionGeneration = entry.Generation;
+                entry.VisionIdentity = receiverIdentity;
+                entry.VisionReceiverEpoch = receiverEpoch;
+                entry.VisionCount = successfullyDecodedCount;
+                entry.IsReady = false;
+                entry.Reason = "A fresh vision diagnostic baseline was recorded for the current simulator and receiver generation; waiting for new decoded progress.";
+                return false;
+            }
+
+            if (successfullyDecodedCount < entry.VisionCount)
+            {
+                entry.IsReady = false;
+                entry.Reason = "The current receiver's decoded count regressed; simulator service readiness is unverified.";
+                return false;
+            }
+
+            if (successfullyDecodedCount > entry.VisionCount)
+            {
+                entry.VisionCount = successfullyDecodedCount;
+                entry.IsReady = true;
+                entry.Reason = "Current simulator ownership and fresh vision decode progress from the current Duck handoff were verified.";
+            }
+
+            return entry.IsReady;
+        }
+    }
+
+    internal void InvalidateSimulatorVision(DcpBaseResourceIdentityCandidate candidate, string reason)
+    {
+        ArgumentNullException.ThrowIfNull(candidate);
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+        lock (sync)
+        {
+            if (entries.TryGetValue(candidate.Resource, out var entry) &&
+                entry.ResourceId == candidate.ResourceId &&
+                entry.ContainerId == candidate.ContainerId &&
+                entry.Generation == candidate.Generation)
+            {
+                entry.IsReady = false;
+                entry.Reason = reason;
+            }
         }
     }
 
@@ -557,19 +647,26 @@ internal static class DcpBaseResourceReadinessRegistration
         string? dockerContextName,
         string? expectedEngineId,
         string dockerExecutable,
+        IResource duckResource,
+        EndpointReference duckVisionEndpoint,
+        ContainerIdentityHandoffStateStore handoffStates,
         params (IResource Resource, string Role)[] resources)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(runId);
         ArgumentException.ThrowIfNullOrWhiteSpace(stackId);
         ArgumentException.ThrowIfNullOrWhiteSpace(dockerExecutable);
+        ArgumentNullException.ThrowIfNull(duckResource);
+        ArgumentNullException.ThrowIfNull(duckVisionEndpoint);
+        ArgumentNullException.ThrowIfNull(handoffStates);
         ArgumentNullException.ThrowIfNull(resources);
         if (resources.Length == 0)
         {
             throw new ArgumentException("At least one DCP container is required for readiness tracking.", nameof(resources));
         }
 
-        var entries = resources.Select(item => (item.Resource, item.Role, runId)).ToArray();
+        var trackedResources = resources.Concat([(Resource: duckResource, Role: "duck")]).ToArray();
+        var entries = trackedResources.Select(item => (item.Resource, item.Role, runId)).ToArray();
         var registry = new DcpBaseResourceReadinessRegistry(entries, stackId);
         var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
         var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
@@ -578,7 +675,7 @@ internal static class DcpBaseResourceReadinessRegistration
             dockerContextName,
             expectedEngineId);
         var roleMap = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
-        foreach (var (resource, role) in resources)
+        foreach (var (resource, role) in trackedResources)
         {
             roleMap.Add(resource, role);
         }
@@ -591,37 +688,227 @@ internal static class DcpBaseResourceReadinessRegistration
             ownershipConsumer,
             roleMap));
 
-        foreach (var (resource, role) in resources)
+        var visionHttpClient = new HttpClient(new SocketsHttpHandler
         {
-            var checkName = $"dcp-{role}-service-ready";
-            builder.Services.AddHealthChecks().AddCheck(
-                checkName,
-                new DcpBaseResourceReadinessHealthCheck(registry, resource));
+            ConnectTimeout = TimeSpan.FromSeconds(2),
+        })
+        {
+            Timeout = Timeout.InfiniteTimeSpan,
+        };
+        builder.Services.AddSingleton(visionHttpClient);
+
+        foreach (var (resource, role) in trackedResources)
+        {
             if (resource is not ContainerResource container)
             {
                 throw new InvalidOperationException($"DCP readiness resource '{resource.Name}' is not a ContainerResource.");
             }
+
+            if (role == "duck")
+            {
+                continue;
+            }
+
+            var checkName = $"dcp-{role}-service-ready";
+            var visionProbe = role == "simulator"
+                ? new DcpBaseSimulatorVisionReadinessProbe(
+                    registry,
+                    resource,
+                    duckResource,
+                    cancellationToken => ResolveVisionEndpointAsync(duckVisionEndpoint, cancellationToken),
+                    handoffStates,
+                    visionHttpClient)
+                : null;
+            builder.Services.AddHealthChecks().AddCheck(
+                checkName,
+                new DcpBaseResourceReadinessHealthCheck(registry, resource, visionProbe));
             builder.CreateResourceBuilder(container).WithHealthCheck(checkName);
         }
+    }
+
+    private static async Task<Uri> ResolveVisionEndpointAsync(
+        EndpointReference endpoint,
+        CancellationToken cancellationToken)
+    {
+        var value = await endpoint.GetValueAsync(cancellationToken).ConfigureAwait(false);
+        var endpointValue = value?.ToString();
+        if (string.IsNullOrWhiteSpace(endpointValue))
+        {
+            throw new InvalidOperationException("The Duck vision endpoint has not been allocated.");
+        }
+        return new Uri(endpointValue, UriKind.Absolute);
     }
 }
 
 internal sealed class DcpBaseResourceReadinessHealthCheck(
     DcpBaseResourceReadinessRegistry registry,
-    IResource resource) : IHealthCheck
+    IResource resource,
+    DcpBaseSimulatorVisionReadinessProbe? simulatorVisionProbe = null) : IHealthCheck
 {
-    public Task<HealthCheckResult> CheckHealthAsync(
+    public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
+        if (simulatorVisionProbe is not null)
+        {
+            return await simulatorVisionProbe.CheckAsync(cancellationToken).ConfigureAwait(false);
+        }
         cancellationToken.ThrowIfCancellationRequested();
+
         var snapshot = registry.Get(resource);
         if (snapshot is null || !snapshot.IsReady)
         {
             var reason = snapshot?.Reason ?? "The resource is not registered with the DCP readiness observer.";
-            return Task.FromResult(HealthCheckResult.Unhealthy(reason));
+            return HealthCheckResult.Unhealthy(reason);
         }
 
-        return Task.FromResult(HealthCheckResult.Healthy(snapshot.Reason));
+        return HealthCheckResult.Healthy(snapshot.Reason);
+    }
+}
+
+internal sealed class DcpBaseSimulatorVisionReadinessProbe(
+    DcpBaseResourceReadinessRegistry registry,
+    IResource simulator,
+    IResource duck,
+    Func<CancellationToken, Task<Uri>> resolveDuckVisionEndpoint,
+    ContainerIdentityHandoffStateStore handoffStates,
+    HttpClient httpClient)
+{
+    private const int MaximumResponseBytes = 16 * 1024;
+
+    internal async Task<HealthCheckResult> CheckAsync(CancellationToken cancellationToken)
+    {
+        var simulatorCandidate = CurrentCandidate(simulator);
+        if (cancellationToken.IsCancellationRequested)
+        {
+            Invalidate(simulatorCandidate, "The Duck vision diagnostic check was canceled; simulator service readiness is unverified.");
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+        var duckCandidate = CurrentCandidate(duck);
+        var handoffIdentity = handoffStates.GetCurrent(duck);
+        if (!IsOwnedRunning(simulatorCandidate) ||
+            !IsOwnedRunning(duckCandidate) ||
+            handoffIdentity is null ||
+            handoffIdentity.RunId != duckCandidate!.RunId ||
+            handoffIdentity.ResourceId != duckCandidate.ResourceId ||
+            handoffIdentity.ContainerId != duckCandidate.ContainerId)
+        {
+            Invalidate(simulatorCandidate, "The simulator or Duck has no current owned container identity, or the Duck handoff is not current.");
+            return HealthCheckResult.Unhealthy("The simulator or Duck has no current owned container identity, or the Duck handoff is not current.");
+        }
+
+        using var requestBudget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        requestBudget.CancelAfter(TimeSpan.FromSeconds(2));
+        try
+        {
+            var endpointUri = await resolveDuckVisionEndpoint(requestBudget.Token).ConfigureAwait(false);
+            var requestUri = new Uri(endpointUri, "/health/vision");
+            using var response = await httpClient.GetAsync(
+                requestUri, HttpCompletionOption.ResponseHeadersRead, requestBudget.Token).ConfigureAwait(false);
+            if (response.StatusCode != HttpStatusCode.OK ||
+                response.Content.Headers.ContentLength is > MaximumResponseBytes)
+            {
+                return Reject(simulatorCandidate, "The current Duck vision diagnostic endpoint is unavailable or returned an oversized response.");
+            }
+
+            await using var body = await response.Content.ReadAsStreamAsync(requestBudget.Token).ConfigureAwait(false);
+            var buffer = new byte[MaximumResponseBytes + 1];
+            var total = 0;
+            while (total < buffer.Length)
+            {
+                var read = await body.ReadAsync(buffer.AsMemory(total), requestBudget.Token).ConfigureAwait(false);
+                if (read == 0) break;
+                total += read;
+            }
+            if (total > MaximumResponseBytes)
+            {
+                return Reject(simulatorCandidate, "The current Duck vision diagnostic response exceeded the size limit.");
+            }
+
+            var health = JsonSerializer.Deserialize<RuntimeVisionHealthResponse>(buffer.AsSpan(0, total));
+            var diagnostics = health?.Diagnostics;
+            if (health is null || diagnostics is null ||
+                !health.IsReady || !diagnostics.IsReady ||
+                diagnostics.Identity != handoffIdentity ||
+                diagnostics.InputId != "vision" ||
+                diagnostics.ReceiverEpoch <= 0 ||
+                diagnostics.SuccessfullyDecodedCount <= 0 ||
+                diagnostics.DecodeStatus != DiagnosticDecodeStatus.Succeeded ||
+                diagnostics.DecodeAgeUpperBound is not { } age ||
+                age < TimeSpan.Zero || age > ServiceReceiveDiagnostics.FreshnessWindow)
+            {
+                return Reject(simulatorCandidate, "The current Duck vision diagnostic does not prove fresh decoded progress for its current identity handoff.");
+            }
+
+            var currentSimulator = CurrentCandidate(simulator);
+            var currentDuck = CurrentCandidate(duck);
+            if (!SameCurrent(simulatorCandidate, currentSimulator) ||
+                !SameCurrent(duckCandidate, currentDuck) ||
+                handoffStates.GetCurrent(duck) != handoffIdentity)
+            {
+                return Reject(simulatorCandidate, "The simulator or Duck identity changed while the vision diagnostic was being read.");
+            }
+
+            if (!registry.ObserveSimulatorVision(
+                    simulatorCandidate!, handoffIdentity, diagnostics.ReceiverEpoch,
+                    diagnostics.SuccessfullyDecodedCount))
+            {
+                var snapshot = registry.Get(simulator);
+                return HealthCheckResult.Unhealthy(snapshot?.Reason ?? "Fresh vision progress for the current simulator generation has not been observed.");
+            }
+
+            return HealthCheckResult.Healthy(registry.Get(simulator)?.Reason ?? "Current simulator vision readiness was verified.");
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return Reject(simulatorCandidate, "The Duck vision diagnostic request exceeded its bounded check time.");
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            Invalidate(simulatorCandidate, "The Duck vision diagnostic check was canceled; simulator service readiness is unverified.");
+            throw;
+        }
+        catch (Exception exception) when (exception is HttpRequestException or IOException or JsonException or UriFormatException or InvalidOperationException)
+        {
+            return Reject(simulatorCandidate, "The current Duck vision diagnostic could not be read safely.");
+        }
+    }
+
+    private DcpBaseResourceIdentityCandidate? CurrentCandidate(IResource resource) =>
+        registry.GetCandidates().SingleOrDefault(candidate => ReferenceEquals(candidate.Resource, resource));
+
+    private static bool IsOwnedRunning(DcpBaseResourceIdentityCandidate? candidate) =>
+        candidate is not null &&
+        !candidate.ResourceKeyAmbiguous &&
+        !string.IsNullOrWhiteSpace(candidate.ResourceId) &&
+        OwnedContainerInspection.IsFullId(candidate.ContainerId) &&
+        candidate.State == "Running" &&
+        candidate.IdentityVerified &&
+        candidate.NetworkVerified &&
+        candidate.OwnershipVerified;
+
+    private static bool SameCurrent(
+        DcpBaseResourceIdentityCandidate? expected,
+        DcpBaseResourceIdentityCandidate? current) =>
+        expected is not null && current is not null &&
+        ReferenceEquals(expected.Resource, current.Resource) &&
+        expected.ResourceId == current.ResourceId &&
+        expected.ContainerId == current.ContainerId &&
+        expected.Generation == current.Generation &&
+        current.State == "Running" &&
+        current.IdentityVerified && current.NetworkVerified && current.OwnershipVerified;
+
+    private HealthCheckResult Reject(DcpBaseResourceIdentityCandidate? candidate, string reason)
+    {
+        Invalidate(candidate, reason);
+        return HealthCheckResult.Unhealthy(reason);
+    }
+
+    private void Invalidate(DcpBaseResourceIdentityCandidate? candidate, string reason)
+    {
+        if (candidate is not null)
+        {
+            registry.InvalidateSimulatorVision(candidate, reason);
+        }
     }
 }

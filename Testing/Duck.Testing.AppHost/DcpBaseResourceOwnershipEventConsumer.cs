@@ -47,15 +47,16 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
             return Result(DcpBaseResourceOwnershipDisposition.MissingSettings, "Docker context or expected engine ID is not configured.");
         }
 
-        var candidates = registry.GetCandidates();
-        if (candidates.Count == 0 ||
-            candidates.Any(candidate => candidate.ResourceKeyAmbiguous ||
-                string.IsNullOrWhiteSpace(candidate.ResourceId) ||
-                string.IsNullOrWhiteSpace(candidate.StackId) ||
-                candidate.State != "Running" ||
-                !OwnedContainerInspection.IsFullId(candidate.ContainerId)))
+        var candidates = registry.GetCandidates()
+            .Where(candidate => !candidate.ResourceKeyAmbiguous &&
+                !string.IsNullOrWhiteSpace(candidate.ResourceId) &&
+                !string.IsNullOrWhiteSpace(candidate.StackId) &&
+                candidate.State == "Running" &&
+                OwnedContainerInspection.IsFullId(candidate.ContainerId))
+            .ToArray();
+        if (candidates.Length == 0)
         {
-            return Result(DcpBaseResourceOwnershipDisposition.CandidatesUnavailable, "A current unambiguous running full-ID candidate is not available for every standard resource.");
+            return Result(DcpBaseResourceOwnershipDisposition.CandidatesUnavailable, "No current unambiguous running full-ID standard DCP candidate is available for inspection.");
         }
         if (candidates.All(candidate => candidate.IdentityVerified && candidate.NetworkVerified && candidate.OwnershipVerified))
         {
@@ -109,7 +110,7 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
                 return Result(DcpBaseResourceOwnershipDisposition.EngineRejected, "Docker Engine did not match the configured engine ID.");
             }
 
-            var proofs = new List<DcpBaseResourceOwnershipProof>(candidates.Count);
+            var proofs = new List<DcpBaseResourceOwnershipProof>(candidates.Length);
             string? sharedNetworkName = null;
             string? sharedNetworkId = null;
             var networkShapeIsShared = true;

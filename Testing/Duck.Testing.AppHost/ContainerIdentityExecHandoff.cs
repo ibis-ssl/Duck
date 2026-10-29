@@ -61,6 +61,40 @@ internal interface IDockerCliChildProcessFactory
 
 internal sealed record ContainerIdentityHandoffState(long Generation, string BootId);
 
+internal sealed class ContainerIdentityHandoffStateStore
+{
+    private readonly object gate = new();
+    private readonly Dictionary<IResource, ResourceDiagnosticIdentity> current = new(ReferenceEqualityComparer.Instance);
+
+    internal void SetCurrent(IResource resource, ResourceDiagnosticIdentity identity)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+        ArgumentNullException.ThrowIfNull(identity);
+        lock (gate)
+        {
+            current[resource] = identity;
+        }
+    }
+
+    internal void Invalidate(IResource resource)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+        lock (gate)
+        {
+            current.Remove(resource);
+        }
+    }
+
+    internal ResourceDiagnosticIdentity? GetCurrent(IResource resource)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+        lock (gate)
+        {
+            return current.TryGetValue(resource, out var identity) ? identity : null;
+        }
+    }
+}
+
 internal enum IdentityHandoffTraceStage
 {
     EngineCheck,
@@ -713,7 +747,8 @@ internal sealed class ContainerIdentityHandoffService(
     IDockerCommandRunner runner,
     ILogger<ContainerIdentityHandoffService> logger,
     string? safeTracePath = null,
-    string executableAssembly = "Tracker.RuntimeHost.dll") : BackgroundService, IHostedLifecycleService
+    string executableAssembly = "Tracker.RuntimeHost.dll",
+    ContainerIdentityHandoffStateStore? handoffStates = null) : BackgroundService, IHostedLifecycleService
 {
     private readonly object startupLock = new();
     private Task? startupTask;
@@ -763,6 +798,7 @@ internal sealed class ContainerIdentityHandoffService(
     /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        handoffStates?.Invalidate(registeredResource);
         trace?.Record(IdentityHandoffTraceStage.ServiceStarted, IdentityHandoffTraceOutcome.Started);
         try
         {
@@ -783,6 +819,7 @@ internal sealed class ContainerIdentityHandoffService(
                 trace?.Record(IdentityHandoffTraceStage.CurrentResourceState, IdentityHandoffTraceOutcome.Accepted);
                 if (!RegisteredContainerEventProjection.HasStarted(currentState))
                 {
+                    handoffStates?.Invalidate(registeredResource);
                     trace?.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Rejected);
                     restartObserved = true;
                     continue;
@@ -791,6 +828,7 @@ internal sealed class ContainerIdentityHandoffService(
                 if (!RegisteredContainerEventProjection.TryProject(
                         registeredResource, candidateResourceId, expectedRole, observation, currentState, out var target))
                 {
+                    handoffStates?.Invalidate(registeredResource);
                     trace?.Record(IdentityHandoffTraceStage.ResourceProjection, IdentityHandoffTraceOutcome.Rejected);
                     continue;
                 }
@@ -798,6 +836,7 @@ internal sealed class ContainerIdentityHandoffService(
 
                 if (generation == 0 || restartObserved || !string.Equals(lastContainerId, target!.ContainerId, StringComparison.Ordinal))
                 {
+                    handoffStates?.Invalidate(registeredResource);
                     generation = checked(generation + 1);
                     lastBootId = null;
                     restartObserved = false;
@@ -811,15 +850,20 @@ internal sealed class ContainerIdentityHandoffService(
                     generation = state.Generation;
                     lastContainerId = target!.ContainerId;
                     lastBootId = state.BootId;
+                    handoffStates?.SetCurrent(
+                        registeredResource,
+                        new ResourceDiagnosticIdentity(runId, target.ResourceId, target.ContainerId, state.Generation));
                 }
                 else
                 {
+                    handoffStates?.Invalidate(registeredResource);
                     logger.LogWarning("Duck runtime identity handoff did not complete for the current resource state.");
                 }
             }
         }
         finally
         {
+            handoffStates?.Invalidate(registeredResource);
             trace?.Record(
                 IdentityHandoffTraceStage.ServiceStopped,
                 stoppingToken.IsCancellationRequested

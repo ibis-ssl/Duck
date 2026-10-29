@@ -41,7 +41,8 @@ internal static class BaseSimulationResourceRegistration
         IDistributedApplicationBuilder builder,
         BaseSimulationRegistrationOptions options,
         Func<IResourceBuilder<IResource>, IResourceBuilder<ContainerResource>> addDuck,
-        Action<IResourceBuilder<IResource>> addGameControllerDependentResource)
+        Action<IResourceBuilder<IResource>> addGameControllerDependentResource,
+        ContainerIdentityHandoffStateStore? handoffStates = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(options);
@@ -91,8 +92,10 @@ internal static class BaseSimulationResourceRegistration
         var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
         var duck = addDuck(simulatorDependency)
             .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
-            .WithEnvironment("VisionReceiver__Port", "10020")
-            .WaitFor(simulatorDependency);
+            .WithEnvironment("VisionReceiver__Port", "10020");
+        duck = options.UseStandardDcpResources
+            ? duck.WaitForStart(simulatorDependency)
+            : duck.WaitFor(simulatorDependency);
 
         IResourceBuilder<IResourceWithWaitSupport> gameController;
         if (options.UseStandardDcpResources)
@@ -253,6 +256,9 @@ internal static class BaseSimulationResourceRegistration
                 options.DockerContextName,
                 options.ExpectedEngineId,
                 options.DockerExecutable,
+                duck.Resource,
+                duck.Resource.GetEndpoint("vision-health"),
+                handoffStates ?? new ContainerIdentityHandoffStateStore(),
                 readinessResources.ToArray());
         }
 

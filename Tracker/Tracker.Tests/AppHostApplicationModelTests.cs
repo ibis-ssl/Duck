@@ -1,9 +1,11 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System.Xml.Linq;
 
 namespace Tracker.Tests;
@@ -52,6 +54,29 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, controlEndpoint.Protocol);
         Assert.Null(controlEndpoint.Port);
         Assert.Equal("127.0.0.1", controlEndpoint.TargetHost);
+    }
+
+    [Fact]
+    public async Task DisabledIdentityHandoffResolvesTheRegisteredSimulatorHealthCheckAsUnhealthy()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:IdentityControl:DesktopBridgeEnabled=false",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+        using var serviceProvider = appHost.Services.BuildServiceProvider();
+        var healthOptions = serviceProvider.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value;
+        var registration = Assert.Single(
+            healthOptions.Registrations,
+            item => item.Name == "dcp-simulator-service-ready");
+        Assert.DoesNotContain(healthOptions.Registrations, item => item.Name == "dcp-duck-service-ready");
+
+        var healthCheck = registration.Factory(serviceProvider);
+        var result = await healthCheck.CheckHealthAsync(
+            new HealthCheckContext { Registration = registration },
+            CancellationToken.None);
+
+        Assert.Equal(HealthStatus.Unhealthy, result.Status);
+        Assert.Contains("current owned container identity", result.Description, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -1040,9 +1065,9 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task DuckUsesTheSimVisionProfileAndWaitsForSimulatorHealth()
+    public async Task ComparisonDuckUsesTheSimVisionProfileAndWaitsForSimulatorHealth()
     {
-        using var appHost = await CreateAppHostAsync();
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var simulator = Find(appHost, "simulator");
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
         var executionConfiguration = await ExecutionConfigurationBuilder.Create(duck)
@@ -1062,7 +1087,49 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task DuckPublishesDecodedVisionReadinessOnItsInternalTcpEndpoint()
+    public async Task StandardBaseDuckStartsAfterSimulatorStartsBeforeVisionReadiness()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var simulator = Find(appHost, "simulator");
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+
+        AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
+    }
+
+    [Fact]
+    public async Task StandardBaseDuckUsesExistingIdentityHandoffWhenContextIsConfigured()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var environment = await GetResourceEnvironmentAsync(duck);
+        var runtimeArguments = await GetContainerRuntimeArgsAsync(duck);
+
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"]?.ToString());
+        Assert.Equal("duck", environment["Testing__IdentityControl__ExpectedRole"]?.ToString());
+        Assert.False(string.IsNullOrWhiteSpace(environment["Testing__Diagnostics__RunId"]?.ToString()));
+        Assert.Contains(runtimeArguments, argument => argument.StartsWith("com.ibis-ssl.duck.run-id=", StringComparison.Ordinal));
+        Assert.Contains("com.ibis-ssl.duck.role=duck", runtimeArguments);
+    }
+
+    [Fact]
+    public async Task StandardBaseDuckRespectsExplicitlyDisabledIdentityHandoff()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:IdentityControl:DesktopBridgeEnabled=false",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var environment = await GetResourceEnvironmentAsync(duck);
+        var runtimeArguments = await GetContainerRuntimeArgsAsync(duck);
+
+        Assert.DoesNotContain("Testing__IdentityControl__Enabled", environment.Keys);
+        Assert.DoesNotContain(runtimeArguments, argument => argument == "com.ibis-ssl.duck.role=duck");
+    }
+
+    [Fact]
+    public async Task StandardBaseDuckPublishesDecodedVisionReadinessWithoutWaitingOnItsOwnHealth()
     {
         using var appHost = await CreateAppHostAsync();
         var simulator = Find(appHost, "simulator");
@@ -1087,7 +1154,7 @@ public sealed class AppHostApplicationModelTests
             duck.Annotations.OfType<EndpointAnnotation>(),
             annotation => annotation.Protocol == System.Net.Sockets.ProtocolType.Udp);
         Assert.Same(simulator, wait.Resource);
-        Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
+        Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
     }
 
     [Fact]
