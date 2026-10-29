@@ -1,10 +1,14 @@
 {
   "schemaVersion": 1,
-  "phase": "I81-07J-B3-B validation",
   "baseline": "909a12f0fe308246fc19900a46a45f7be691bd70",
-  "status": "validated; commit/push pending parent",
-  "results": {
-    "behaviorRedCases": 2,
+  "state": "technical fixes validated; commit/push pending parent",
+  "reviewDisposition": "both P2 technical fixes closed; NR001 TDD evidence held",
+  "behaviorRedCases": 1,
+  "behaviorReds": {
+    "NR002": "valid: 4.9s age + 300ms response was accepted as Healthy; fixed by counting monotonic request/body elapsed time"
+  },
+  "NR001": "no valid pre-fix behavior Red found; the preserved exit-1 run failed compilation on undefined sharedRunId/sharedStackId and is not classified as behavior Red",
+  "validation": {
     "focusedPassed": 3,
     "relatedPassed": 125,
     "distributionChecksPassed": 20,
@@ -12,11 +16,9 @@
     "documentationGatesPassed": 12,
     "documentationGateFailures": 0
   },
-  "scope": "Duck standard-base ownership labels and bounded vision freshness; comparison behavior retained.",
-  "notEstablished": [
-    "No runtime/container/UDP/helper-placement validation.",
-    "Service readiness remains distinct from ownership verification.",
-    "Other resources and full recreation/reconnect flow remain incomplete."
+  "limitations": [
+    "No container/runtime/UDP/helper-placement validation.",
+    "Ownership verification does not itself establish service readiness."
   ],
   "sourceSha256": {
     "Testing/Duck.Testing.AppHost/Program.cs": "099a66c2782e2d2a5e45c588e64e76d66c0157cd1061666b33539e3dc786700e",
@@ -25,7 +27,7 @@
     "Tracker/Tracker.Tests/DcpBaseResourceOwnershipEventConsumerTests.cs": "676891ebcf82369e98442fe6e8971f5722d34efd118c208cfe4f473b6cf7ca3c",
     "Tracker/Tracker.Tests/DcpBaseSimulatorVisionReadinessProbeTests.cs": "c7181a11d678f14a72e374963b082289a2fab7b25ec9bcd0ab2d4111ddab9adc",
     "Tracker/Design/Testing/aspire-simulation-test-environment.md": "1bbb9ff21e5c7ddb8265c40413e93ccfa8509268dd64f03e28036dc19371074c",
-    "Tracker/Design/tasks-status.md": "3024c385e45b2549155c4660d0b17e79dbc4f41a97b553e1ed13df815e453785",
-    "Tracker/Design/phases-status.md": "4fc9b8cbc35775a3520aa2cfe787fcb14c058bbaba1b8063c362ffd6e2314f6a"
+    "Tracker/Design/tasks-status.md": "c0dfa285ec8b2f67c187d1f757000a66014b481a6765b7790a7d109f3b472adb",
+    "Tracker/Design/phases-status.md": "85674cbe572da41581b89a5bfcead002d06392e61fe1338035f7b321c52c9185"
   }
 }
