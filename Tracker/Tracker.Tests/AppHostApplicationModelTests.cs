@@ -26,29 +26,46 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task BaseModelKeepsDuckAsContainerAndEachDockerServiceAsHealthyExecutableWrapper()
+    public async Task BaseModelRegistersDcpContainersAndFailClosedReadinessChecksForBaseServices()
     {
         using var appHost = await CreateAppHostAsync();
 
         Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources, resource => resource.Name == "duck"));
+        string? sharedRunId = null;
         foreach (var name in new[] { "simulator", "game-controller", "crane", "cm4-sim" })
         {
-            var resource = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, item => item.Name == name));
-            Assert.Single(resource.Annotations.OfType<HealthCheckAnnotation>());
-            var endpoint = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "health");
-            var launch = await GetLaunchOptionsAsync(resource);
-            Assert.Equal(launch.HealthPort, endpoint.TargetPort);
-            Assert.False(endpoint.IsProxied);
-            Assert.Equal("http", endpoint.UriScheme);
+            var resource = Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources, item => item.Name == name));
+            Assert.Contains(resource.Annotations.OfType<HealthCheckAnnotation>(), annotation => annotation.Key == $"dcp-{name}-service-ready");
+            Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
 
-            Assert.Equal(name, launch.ResourceName);
-            Assert.NotEmpty(launch.RunId);
-            Assert.InRange(launch.HealthPort, 1, 65535);
-            var spec = ToSpec(launch);
-            Assert.Contains("--network", spec.CreateRunArguments());
-            Assert.Contains("host", spec.CreateRunArguments());
-            Assert.Contains("duck.aspire.run=" + launch.RunId, spec.CreateRunArguments());
+            var runtimeArgs = await GetContainerRuntimeArgsAsync(resource);
+            var runLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("com.ibis-ssl.duck.run-id=", StringComparison.Ordinal)));
+            sharedRunId ??= runLabel["com.ibis-ssl.duck.run-id=".Length..];
+            Assert.Equal(sharedRunId, runLabel["com.ibis-ssl.duck.run-id=".Length..]);
+            Assert.Contains($"com.ibis-ssl.duck.role={name}", runtimeArgs);
+            Assert.Contains($"duck.aspire.run={sharedRunId}", runtimeArgs);
+            Assert.DoesNotContain("--network", runtimeArgs);
         }
+
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        var controlEndpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "game-controller-control");
+        Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, controlEndpoint.Protocol);
+        Assert.Null(controlEndpoint.Port);
+        Assert.Equal("127.0.0.1", controlEndpoint.TargetHost);
+    }
+
+    [Fact]
+    public async Task BaseCraneDiagnosticsPathDoesNotLeakIntoContainerArgumentsOrEnvironment()
+    {
+        var diagnosticsPath = Path.Combine(Path.GetTempPath(), $"crane-diagnostics-{Guid.NewGuid():N}.json");
+        using var appHost = await CreateAppHostAsync("--Testing:Crane:DiagnosticsPath=" + diagnosticsPath);
+
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var runtimeArguments = await GetContainerRuntimeArgsAsync(crane);
+        var environment = await GetResourceEnvironmentAsync(crane);
+
+        Assert.DoesNotContain(runtimeArguments, argument => argument.Contains(diagnosticsPath, StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(environment.Values, value => value?.ToString()?.Contains(diagnosticsPath, StringComparison.OrdinalIgnoreCase) == true);
     }
 
     [Fact]
@@ -807,7 +824,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task BaseModelKeepsPinnedSimulatorAndCraneArguments()
     {
-        using var appHost = await CreateAppHostAsync();
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "simulator")));
         Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd", simulator.Image);
         Assert.Equal(
@@ -836,7 +853,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task CraneLaunchUsesCraneTeamNameAndSeparateYellowColor()
     {
-        using var appHost = await CreateAppHostAsync();
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
 
         Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
@@ -846,7 +863,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task ExplicitCraneTargetAddressUsesTheOwnedOverlayConsumer()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Crane:TargetAddress=cm4-sim");
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TargetAddress=cm4-sim");
         var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
 
         Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
@@ -884,6 +901,7 @@ public sealed class AppHostApplicationModelTests
     public async Task CraneSimulatorPlannerAcceptsOnlyItsSelectedResourceTarget()
     {
         using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
             "--Testing:Crane:Planner=rvo2",
             "--Testing:Crane:TargetAddress=simulator");
 
@@ -896,7 +914,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task CraneAcceptsExplicitHostNetworkLoopbackAddress()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Crane:TargetAddress=127.0.0.1");
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TargetAddress=127.0.0.1");
         var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
 
         Assert.Equal("127.0.0.1", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
@@ -907,7 +925,7 @@ public sealed class AppHostApplicationModelTests
     public async Task CustomCraneTeamNameIsSharedByCraneAndGameController()
     {
         const string teamName = "custom_crane_team";
-        using var appHost = await CreateAppHostAsync("--Testing:Crane:TeamName=" + teamName);
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TeamName=" + teamName);
 
         var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
         var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
@@ -955,7 +973,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task GameControllerIsTheOnlyRefereeProducerAndUsesPinnedHostNetworkContainerSpec()
     {
-        using var appHost = await CreateAppHostAsync();
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
 
         Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameController.Image);
@@ -981,7 +999,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task WrapperHealthDependenciesWaitForHealthyServicesAndDuckProjectStart()
     {
-        using var appHost = await CreateAppHostAsync();
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var simulator = Find(appHost, "simulator");
         var cm4 = Find(appHost, "cm4-sim");
         var duck = Find(appHost, "duck");
@@ -997,6 +1015,7 @@ public sealed class AppHostApplicationModelTests
     public async Task ConfigOverridesAndNonVisibilityPlannerChangeWrapperSpecAndDependencies()
     {
         using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
             "--Testing:Simulator:ImageTag=custom-tag",
             "--Testing:Simulator:Geometry=custom-geometry",
             "--Testing:Simulator:Realism=Custom",
@@ -1093,6 +1112,7 @@ public sealed class AppHostApplicationModelTests
     public async Task SimulatorIbisPortOverridePropagatesToCranePath(string planner)
     {
         using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
             "--Testing:Simulator:IbisPort=22346",
             "--Testing:Crane:Planner=" + planner);
 
@@ -1118,7 +1138,7 @@ public sealed class AppHostApplicationModelTests
     public async Task CraneDiagnosticsPathReachesOnlyItsWrapperAndNotTheContainer()
     {
         var path = Path.Combine(Path.GetTempPath(), "duck-crane-model-" + Guid.NewGuid().ToString("N"), "crane-probe.jsonl");
-        using var appHost = await CreateAppHostAsync("--Testing:Crane:DiagnosticsPath=" + path);
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:DiagnosticsPath=" + path);
         foreach (var name in new[] { "simulator", "game-controller", "crane", "cm4-sim" })
         {
             var launch = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, name)));

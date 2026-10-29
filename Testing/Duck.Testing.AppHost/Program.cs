@@ -448,10 +448,13 @@ var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
-var preflightPorts = ExclusiveControlPortPreflight
-    .CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator)
-    .ToList();
-ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
+if (testingMode == "comparison")
+{
+    var preflightPorts = ExclusiveControlPortPreflight
+        .CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator)
+        .ToList();
+    ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
+}
 
 var simulatorImageTag =
     builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
@@ -491,9 +494,11 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         craneTeamName,
         craneTeamColor,
         fixtureManifestPath,
+        UseStandardDcpResources: testingMode == "base",
+        DuckRunId: duckRunId,
         craneTargetAddressSettings,
         builder.Configuration["Testing:Crane:DiagnosticsPath"]),
-    simulator =>
+    simulatorResource =>
     {
         var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
             .WithEnvironment("Tracker__ActiveProfileName", "sim")
@@ -542,6 +547,8 @@ var duck = baseResources.Duck;
 var gameController = baseResources.GameController;
 var cm4Simulator = baseResources.Cm4Simulator;
 var crane = baseResources.Crane;
+var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
+var gameControllerDependency = builder.CreateResourceBuilder<IResource>(gameController.Resource);
 
 if (testingMode == "comparison")
 {
@@ -566,8 +573,8 @@ if (testingMode == "comparison")
         "java",
         "tracker-tigers",
         expectedTrackerSourceName: "TIGERs")
-        .WaitFor(simulator)
-        .WaitFor(gameController);
+        .WaitFor(simulatorDependency)
+        .WaitFor(gameControllerDependency);
 
     var trackerErForce = builder.AddDockerWrapper(
         new DockerContainerSpec(
@@ -584,8 +591,8 @@ if (testingMode == "comparison")
         "autoref",
         "tracker-erforce",
         expectedTrackerSourceName: "ER-FORCE")
-        .WaitFor(simulator)
-        .WaitFor(gameController);
+        .WaitFor(simulatorDependency)
+        .WaitFor(gameControllerDependency);
 
     var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -611,8 +618,8 @@ if (testingMode == "comparison")
     httpEndpoint.Port = null;
     httpEndpoint.TargetHost = "127.0.0.1";
     debugHost
-        .WaitForStart(simulator)
-        .WaitForStart(duck)
+        .WaitForStart(simulatorDependency)
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(duck.Resource))
         .WaitFor(trackerTigers)
         .WaitFor(trackerErForce)
         .WithHttpHealthCheck("/health/comparison", endpointName: "http");
