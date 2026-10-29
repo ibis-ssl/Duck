@@ -88,11 +88,22 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.IsType<ContainerResource>(resources.GameController.Resource);
             Assert.IsType<ContainerResource>(resources.Cm4Simulator!.Resource);
             Assert.IsType<ContainerResource>(resources.Crane.Resource);
+            Assert.Contains(
+                resources.Simulator.Resource.Annotations.OfType<ResourceCommandAnnotation>(),
+                command => command.Name == "reconfigure-cm4-transport");
             Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(DcpBaseResourceReadinessRegistry));
             Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(DcpBaseResourceReadinessEventConsumer));
             Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(IHostedService));
             Assert.Contains(builder.Services, descriptor =>
                 descriptor.ServiceType == typeof(DcpBaseResourceOwnershipEventConsumer));
+            Assert.Contains(builder.Services, descriptor =>
+                descriptor.ServiceType == typeof(IOwnedCm4SimulatorReconfigurationAdapter));
+            Assert.Contains(builder.Services, descriptor =>
+                descriptor.ServiceType == typeof(OwnedCm4SimulatorReconfigurationCoordinator));
+            using (var serviceProvider = builder.Services.BuildServiceProvider())
+            {
+                Assert.NotNull(serviceProvider.GetRequiredService<OwnedCm4SimulatorReconfigurationCoordinator>());
+            }
             var resourcesByRole = new Dictionary<string, ContainerResource>(StringComparer.Ordinal)
             {
                 ["simulator"] = Assert.IsType<ContainerResource>(resources.Simulator.Resource),
@@ -196,6 +207,7 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.IsType<ExecutableResource>(resources.GameController.Resource);
             Assert.IsType<ExecutableResource>(resources.Cm4Simulator!.Resource);
             Assert.IsType<ExecutableResource>(resources.Crane.Resource);
+            Assert.Empty(resources.Simulator.Resource.Annotations.OfType<ResourceCommandAnnotation>());
         }
         finally
         {

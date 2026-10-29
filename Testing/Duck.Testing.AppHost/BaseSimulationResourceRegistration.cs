@@ -1,5 +1,6 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Duck.Testing.AppHost;
 
@@ -261,6 +262,61 @@ internal static class BaseSimulationResourceRegistration
                 handoffStates ?? new ContainerIdentityHandoffStateStore(),
                 options.CraneTeamName,
                 readinessResources.ToArray());
+
+            if (cm4Simulator is not null)
+            {
+                var simulatorResource = simulator.Resource;
+                var cm4Resource = cm4Simulator.Resource;
+                builder.Services.AddSingleton<IOwnedCm4SimulatorReconfigurationAdapter>(services =>
+                    new DcpOwnedCm4SimulatorReconfigurationAdapter(
+                        services.GetRequiredService<DcpBaseResourceReadinessRegistry>(),
+                        services.GetRequiredService<DcpBaseResourceOwnershipEventConsumer>(),
+                        services.GetRequiredService<DcpBaseResourceReadinessEventConsumer>(),
+                        services.GetRequiredService<ResourceNotificationService>(),
+                        services.GetRequiredService<ResourceCommandService>(),
+                        simulatorResource,
+                        cm4Resource,
+                        options.ExpectedEngineId));
+                builder.Services.AddSingleton<OwnedCm4SimulatorReconfigurationCoordinator>(services =>
+                {
+                    var adapter = services.GetRequiredService<IOwnedCm4SimulatorReconfigurationAdapter>();
+                    IOwnedCm4TransportTargetController? controller = null;
+                    if (!string.IsNullOrWhiteSpace(options.DockerContextName) &&
+                        !string.IsNullOrWhiteSpace(options.ExpectedEngineId))
+                    {
+                        controller = new OwnedCm4TransportTargetController(
+                            services.GetRequiredService<IDockerStdioCommandRunner>(),
+                            options.DockerContextName,
+                            options.ExpectedEngineId,
+                            options.DuckRunId,
+                            adapter.GetCurrentOwnedPair);
+                    }
+
+                    return new OwnedCm4SimulatorReconfigurationCoordinator(
+                        adapter,
+                        controller,
+                        options.DuckRunId);
+                });
+
+                builder.CreateResourceBuilder<ContainerResource>(
+                        (ContainerResource)simulator.Resource)
+                    .WithCommand(
+                        "reconfigure-cm4-transport",
+                        "無効化確認後に Simulator を再作成し、現世代へ送信先を適用します",
+                        async context =>
+                        {
+                            var result = await context.Services
+                                .GetRequiredService<OwnedCm4SimulatorReconfigurationCoordinator>()
+                                .ExecuteAsync(context.CancellationToken)
+                                .ConfigureAwait(false);
+                            return new ExecuteCommandResult
+                            {
+                                Success = result.Success,
+                                Message = result.Message,
+                                Canceled = result.Canceled,
+                            };
+                        });
+            }
         }
 
         return new BaseSimulationResources(duck, simulator, gameController, cm4Simulator, crane);

@@ -700,6 +700,7 @@ internal static class DcpBaseResourceReadinessRegistration
         var registry = new DcpBaseResourceReadinessRegistry(entries, stackId);
         var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
         var dockerRunner = new DockerCliCommandRunner(dockerExecutable);
+        builder.Services.AddSingleton<IDockerStdioCommandRunner>(dockerRunner);
         var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
             registry,
             dockerRunner,

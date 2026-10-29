@@ -65,12 +65,27 @@ internal sealed record Cm4TransportTargetMessage(
 
 internal sealed record Cm4TransportNetworkEndpoint(string Name, string Id, IPAddress Address);
 
+internal interface IOwnedCm4TransportTargetController
+{
+    Task<Cm4TransportTargetInvalidationResult> InvalidateCurrentTargetAsync(
+        string helperLaunchId,
+        CancellationToken cancellationToken);
+
+    Task<Cm4TransportTargetApplyResult> ApplyCurrentTargetAsync(
+        string helperLaunchId,
+        CancellationToken cancellationToken);
+
+    long Invalidate();
+
+    Cm4TransportTargetSnapshot Snapshot();
+}
+
 internal sealed class OwnedCm4TransportTargetController(
     IDockerStdioCommandRunner runner,
     string dockerContext,
     string expectedEngineId,
     string runId,
-    Func<OwnedCm4TransportIdentityPair?> getCurrent)
+    Func<OwnedCm4TransportIdentityPair?> getCurrent) : IOwnedCm4TransportTargetController
 {
     private const string Cm4ResourceName = "cm4-sim";
     private const string SimulatorResourceName = "simulator";
@@ -102,7 +117,7 @@ internal sealed class OwnedCm4TransportTargetController(
     private string? pendingHelperLaunchId;
     private string? activeTargetAddress;
 
-    internal Task<Cm4TransportTargetInvalidationResult> InvalidateCurrentTargetAsync(
+    public Task<Cm4TransportTargetInvalidationResult> InvalidateCurrentTargetAsync(
         string helperLaunchId,
         CancellationToken cancellationToken)
     {
@@ -137,7 +152,7 @@ internal sealed class OwnedCm4TransportTargetController(
         return InvalidateCoreAsync(requested, helperLaunchId, invalidationEpoch, cancellationToken);
     }
 
-    internal Task<Cm4TransportTargetApplyResult> ApplyCurrentTargetAsync(
+    public Task<Cm4TransportTargetApplyResult> ApplyCurrentTargetAsync(
         string helperLaunchId,
         CancellationToken cancellationToken)
     {
@@ -169,7 +184,7 @@ internal sealed class OwnedCm4TransportTargetController(
         return ApplyCoreAsync(current, helperLaunchId, operationEpoch, cancellationToken);
     }
 
-    internal Cm4TransportTargetSnapshot Snapshot()
+    public Cm4TransportTargetSnapshot Snapshot()
     {
         lock (stateLock)
         {
@@ -182,7 +197,7 @@ internal sealed class OwnedCm4TransportTargetController(
         }
     }
 
-    internal long Invalidate()
+    public long Invalidate()
     {
         lock (stateLock)
         {
