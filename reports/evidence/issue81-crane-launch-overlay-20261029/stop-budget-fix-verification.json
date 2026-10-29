@@ -29,7 +29,13 @@
       "existing_warning": "ASPIRE010",
       "helper_source_sha256": "52fe3ed08c9d52b6d90532429672b0c8d897676b49eabf6340591c0eff6d867e",
       "helper_output_sha256": "52fe3ed08c9d52b6d90532429672b0c8d897676b49eabf6340591c0eff6d867e",
-      "initial_sandbox_obj_write_failure_retained": true
+      "initial_sandbox_obj_write_failure_retained": true,
+      "success_evidence": {
+        "kind": "original synchronous escalated exec tool response, exit_code 0; session ID absent",
+        "command": "dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --configuration Release --no-restore",
+        "raw_success_log_saved": false,
+        "output_source_identity_confirmed": true
+      }
     },
     "csharp_regression": "prior77 pass reused; C# unchanged",
     "documentation": "unchanged; prior exact inputs reused",
@@ -48,7 +54,8 @@
       },
       {
         "name": "issue81-07f-stop-budget-release-build.log",
-        "sha256": "efd0d8bffb5d8c01610f478886e8b6fb408a7c7c1f0698f41ee3cc1ab82bbc0d"
+        "sha256": "efd0d8bffb5d8c01610f478886e8b6fb408a7c7c1f0698f41ee3cc1ab82bbc0d",
+        "classification": "initial failed default-sandbox MSB3491 attempt; not a successful build raw log"
       }
     ]
   },
@@ -61,12 +68,150 @@
       "result": "success; Python11 passed including actual POSIX group; does not cover this new failure-branch test"
     }
   },
-  "normal_bounded_closure": "pending same reviewer",
-  "new_head_ci": "pending",
+  "normal_bounded_closure": {
+    "reviewed_code_head": "cf98c71055dc68c38d750825e8b096e451964a21",
+    "reviewer_continuity": "same Issue81 normal reviewer",
+    "verdict": "pass_with_held",
+    "NR001_P2": "closed",
+    "NR002_P2": "closed",
+    "required_findings_remaining": 0,
+    "private_report_sha256": "E2CC9A40ADEA64A3A63E44E8D27C9F64F6BC03ADB012F8FE534B5D64CD7E3EC4",
+    "held": [
+      "antecedent procedure gaps preserved",
+      "actual fixed image/application communication/wholeIssue not complete"
+    ]
+  },
+  "new_head_ci": {
+    "head": "cf98c71055dc68c38d750825e8b096e451964a21",
+    "run_id": 40868314044,
+    "test": "success",
+    "linux_python": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "owned_group_and_reap_failure_cases": "individual verbose outcomes both ok"
+    },
+    "dotnet": {
+      "passed": 1007,
+      "failed": 0,
+      "skipped": 2,
+      "total": 1009
+    },
+    "acceptance_jobs_skipped": 2,
+    "selected_log_sha256": "6889E3161400D6ED68F589B81644033A63A5C5159CEE74886D0D49B29B2A5C83"
+  },
   "native_container_runtime_executed": false,
   "remaining": [
     "Crane actual image/DNS/UDP unverified",
     "normal base four-resource migration/CM4 loopback unresolved",
     "whole Issue81 independent final not started"
-  ]
+  ],
+  "verified_code_head": "cf98c71055dc68c38d750825e8b096e451964a21",
+  "publication_documentation": {
+    "base_head": "cf98c71055dc68c38d750825e8b096e451964a21",
+    "private_manifest_sha256": "d463fa62f72f06db60f8be8adf6d4b9fee60571048492baaf02c1aa479cc2ab2",
+    "inputs": [
+      {
+        "name": "tasks-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "inputSha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c",
+        "cspellCopySha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c",
+        "addedLineCount": 1,
+        "bytes": 1096
+      },
+      {
+        "name": "phases-added",
+        "source": "Tracker/Design/phases-status.md",
+        "inputSha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c",
+        "cspellCopySha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c",
+        "addedLineCount": 2,
+        "bytes": 472
+      }
+    ],
+    "source_hashes": [
+      {
+        "path": "Tracker/Design/tasks-status.md",
+        "sha256": "3f412440d6c703f6cf3b3c0f21ee8d5f3fabccccaeaf93e34d13a743fa34c4a3"
+      },
+      {
+        "path": "Tracker/Design/phases-status.md",
+        "sha256": "4b2b8fc899f442ff5fcfedb402d0d772d391ada36c3506d71ffeb775b3714543"
+      }
+    ],
+    "gate_count": 8,
+    "gates": [
+      {
+        "input": "tasks-added",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c"
+      },
+      {
+        "input": "tasks-added",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c"
+      },
+      {
+        "input": "tasks-added",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "28ccd86b602cf906b85ea26338faeafa8a22389b087a867615d4c1479d1cd443",
+        "cspellCopySha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c"
+      },
+      {
+        "input": "tasks-added",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c",
+        "stdoutSha256": "a215fc890a9cd23fd5fa05db44f4c5609ae713403be9fcfb3b03d087fdf5bfe8",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "11a07d55f96b569a1ef9e11b27e9925ede3c0eb8e2c058fad009568dddb65f2c"
+      },
+      {
+        "input": "phases-added",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c"
+      },
+      {
+        "input": "phases-added",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c"
+      },
+      {
+        "input": "phases-added",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "1afd95dbb30ef037663fa0ef209dc1a6577cce6914aa835e1e51e011eac8a84e",
+        "cspellCopySha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c"
+      },
+      {
+        "input": "phases-added",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c",
+        "stdoutSha256": "cf0f7d5d1f2f499e701f0c5aa475c482ab484184a0fca1b3cdb1e519298614ed",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "fef39096aebb456b8a32d5acaf5fe76d94a20fb877ff43a16570a1f4db12928c"
+      }
+    ]
+  }
 }
