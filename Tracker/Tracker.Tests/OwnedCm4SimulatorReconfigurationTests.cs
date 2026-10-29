@@ -1,9 +1,45 @@
 using Duck.Testing.AppHost;
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tracker.Tests;
 
 public sealed class OwnedCm4SimulatorReconfigurationTests
 {
+    [Fact]
+    public async Task DcpAdapterDoesNotDispatchRestartWhenCallerIsAlreadyCanceled()
+    {
+        var restartCalls = 0;
+        var builder = DistributedApplication.CreateBuilder([]);
+        var simulator = builder.AddContainer("simulator", "example/simulator")
+            .WithCommand(
+                KnownResourceCommands.RestartCommand,
+                "Restart simulator",
+                _ =>
+                {
+                    Interlocked.Increment(ref restartCalls);
+                    return Task.FromResult(new ExecuteCommandResult { Success = true });
+                })
+            .Resource;
+        await using var application = builder.Build();
+        var adapter = new DcpOwnedCm4SimulatorReconfigurationAdapter(
+            null!,
+            null!,
+            null!,
+            application.Services.GetRequiredService<ResourceNotificationService>(),
+            application.Services.GetRequiredService<ResourceCommandService>(),
+            simulator,
+            simulator,
+            "engine-01");
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            adapter.RestartSimulatorAsync(cancellation.Token));
+        Assert.Equal(0, restartCalls);
+    }
+
     [Fact]
     public async Task ReconfigurationInvalidatesBeforeRestartAndAppliesOnlyTheReplacement()
     {

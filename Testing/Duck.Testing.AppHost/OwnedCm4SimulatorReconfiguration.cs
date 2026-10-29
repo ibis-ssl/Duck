@@ -32,6 +32,7 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
         deadline.CancelAfter(operationLimit);
         var token = deadline.Token;
         var entered = false;
+        var replacementTargetAcknowledged = false;
         try
         {
             await operationGate.WaitAsync(token).ConfigureAwait(false);
@@ -112,21 +113,21 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
 
             token.ThrowIfCancellationRequested();
             var applied = await controller.ApplyCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
-            if (applied.Applied && !applied.Unknown && token.IsCancellationRequested)
-            {
-                controller.Invalidate();
-                token.ThrowIfCancellationRequested();
-            }
             if (!applied.Applied || applied.Unknown)
             {
                 return Failed("The replacement target was not confirmed applied; no prior target was restored.");
             }
 
+            replacementTargetAcknowledged = true;
             token.ThrowIfCancellationRequested();
             return new(true, "Remote target invalidation, DCP restart, and replacement target application were confirmed.");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            if (replacementTargetAcknowledged)
+            {
+                controller?.Invalidate();
+            }
             return new(false, "Reconfiguration was canceled; remote state is not inferred.", Canceled: true);
         }
         catch (OperationCanceledException)
@@ -196,6 +197,7 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
 
     public async Task<bool> RestartSimulatorAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await commands.ExecuteCommandAsync(
             simulator,
             KnownResourceCommands.RestartCommand,
