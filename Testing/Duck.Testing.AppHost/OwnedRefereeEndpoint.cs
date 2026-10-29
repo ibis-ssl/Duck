@@ -370,7 +370,16 @@ internal sealed class AspireOwnedReconfigurationAdapter(
             }
 
             var current = keyState.CurrentId is null ? null : GetCurrent(keyState.CurrentId, observation.Resource);
-            if (current is null || current.IsStopped)
+            var currentIsUnidentifiedStartingPlaceholder = current is not null &&
+                current.ContainerId is null &&
+                string.Equals(current.State, "Starting", StringComparison.Ordinal);
+            var observationIsIdentifiedRunning =
+                string.Equals(observation.State, KnownResourceStates.Running, StringComparison.Ordinal) &&
+                OwnedContainerInspection.IsFullId(observation.ContainerId);
+            var pendingCandidatesMatchObservation = keyState.PendingIds.Count == 0 ||
+                (keyState.PendingIds.Count == 1 && keyState.PendingIds.Contains(observation.ResourceId));
+            if (current is null || current.IsStopped ||
+                (currentIsUnidentifiedStartingPlaceholder && observationIsIdentifiedRunning && pendingCandidatesMatchObservation))
             {
                 if (keyState.CurrentId is not null)
                 {

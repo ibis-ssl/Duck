@@ -140,6 +140,63 @@ public sealed class OwnedRefereeReconfigurationTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await staleMove);
     }
 
+    [Theory]
+    [InlineData("game-controller", null)]
+    [InlineData("game-controller", GcNewId)]
+    [InlineData("game-controller-starting-key", null)]
+    [InlineData("game-controller-starting-key", GcNewId)]
+    public async Task AspireAdapterAdoptsRunningOpaqueKeyAfterIdlessInitialPlaceholder(
+        string initialResourceId,
+        string? candidateStartingContainerId)
+    {
+        var resource = new ContainerResource("game-controller");
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance, lifetime);
+        var adapter = new AspireOwnedReconfigurationAdapter(notifications, null!, null!, string.Empty);
+        using var watchTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        await using var watch = adapter.WatchAsync(watchTimeout.Token).GetAsyncEnumerator(watchTimeout.Token);
+
+        await notifications.PublishUpdateAsync(resource, initialResourceId,
+            _ => Snapshot(KnownResourceStates.Starting, null));
+        Assert.True(await watch.MoveNextAsync());
+        Assert.Equal(initialResourceId, adapter.GetCurrent(resource)!.ResourceId);
+        Assert.Null(adapter.GetCurrent(resource)!.ContainerId);
+
+        await notifications.PublishUpdateAsync(resource, "game-controller-running-key",
+            _ => Snapshot(KnownResourceStates.Starting, candidateStartingContainerId));
+        Assert.True(await watch.MoveNextAsync());
+        Assert.Null(adapter.GetCurrent(resource));
+
+        await notifications.PublishUpdateAsync(resource, "game-controller-running-key",
+            _ => Snapshot(KnownResourceStates.Running, GcNewId));
+        Assert.True(await watch.MoveNextAsync());
+        var adopted = adapter.GetCurrent(resource);
+        Assert.NotNull(adopted);
+        Assert.Equal("game-controller-running-key", adopted.ResourceId);
+        Assert.Equal(GcNewId, adopted.ContainerId);
+
+        await notifications.PublishUpdateAsync(resource, initialResourceId,
+            _ => Snapshot(KnownResourceStates.Starting, null));
+        Assert.Equal("game-controller-running-key", adapter.GetCurrent(resource)!.ResourceId);
+        Assert.Equal(GcNewId, adapter.GetCurrent(resource)!.ContainerId);
+
+        await notifications.PublishUpdateAsync(resource, initialResourceId,
+            _ => Snapshot(KnownResourceStates.Running, null));
+        Assert.Equal("game-controller-running-key", adapter.GetCurrent(resource)!.ResourceId);
+        Assert.Equal(GcNewId, adapter.GetCurrent(resource)!.ContainerId);
+
+        var staleMove = watch.MoveNextAsync().AsTask();
+        await Assert.ThrowsAsync<TimeoutException>(async () => await staleMove.WaitAsync(TimeSpan.FromMilliseconds(100)));
+
+        var current = adapter.GetCurrent(resource);
+        Assert.NotNull(current);
+        Assert.Equal("game-controller-running-key", current.ResourceId);
+        Assert.Equal(GcNewId, current.ContainerId);
+        watchTimeout.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await staleMove);
+    }
+
     private static Task PublishAsync(
         ResourceNotificationService notifications,
         IResource resource,
