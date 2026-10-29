@@ -744,6 +744,83 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         Assert.Equal("inspect-failed", failed.Classification);
     }
 
+    [Fact]
+    public async Task CleanupVerificationWaitsForAnExitedOwnedContainerToDisappear()
+    {
+        var id = new string('a', 64);
+        var inventoryArguments = NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments("run_01");
+        var docker = new FakeReadOnlyDockerCli(
+            (true, inventoryArguments, id),
+            (true, ["inspect", "--format", "{{json .}}", id],
+                CreateInspectJson(id, "run_01", NamespaceProbeModelFactory.OwnerRole, "exited")),
+            (true, inventoryArguments, "\r\n"));
+        var inventoryCount = 0;
+
+        await NamespaceProbeCleanupInventory.VerifyNoOwnedResourcesAsync(
+            docker,
+            "run_01",
+            _ => Task.CompletedTask,
+            (_, _) => inventoryCount++,
+            (_, _, _) => { },
+            CancellationToken.None,
+            TimeSpan.Zero);
+
+        Assert.Equal(2, inventoryCount);
+        Assert.Equal(3, docker.Calls.Count);
+    }
+
+    [Fact]
+    public async Task CleanupVerificationDoesNotSucceedWhileOwnedContainerRemains()
+    {
+        var id = new string('a', 64);
+        var inventoryArguments = NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments("run_01");
+        var docker = new FakeReadOnlyDockerCli(
+            (true, inventoryArguments, id),
+            (true, ["inspect", "--format", "{{json .}}", id],
+                CreateInspectJson(id, "run_01", NamespaceProbeModelFactory.OwnerRole, "exited")),
+            (true, inventoryArguments, id),
+            (true, ["inspect", "--format", "{{json .}}", id],
+                CreateInspectJson(id, "run_01", NamespaceProbeModelFactory.OwnerRole, "exited")));
+        using var cancellation = new CancellationTokenSource();
+        var candidateCount = 0;
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            NamespaceProbeCleanupInventory.VerifyNoOwnedResourcesAsync(
+                docker,
+                "run_01",
+                _ => Task.CompletedTask,
+                (_, _) => { },
+                (_, _, _) =>
+                {
+                    if (++candidateCount == 2)
+                    {
+                        cancellation.Cancel();
+                    }
+                },
+                cancellation.Token,
+                TimeSpan.Zero));
+
+        Assert.Equal(2, candidateCount);
+        Assert.Equal(4, docker.Calls.Count);
+    }
+
+    [Fact]
+    public async Task ResourceLogCaptureCancellationReturnsWhenAReaderDoesNotStop()
+    {
+        using var stop = new CancellationTokenSource();
+        var blockedReader = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var stopped = await NamespaceProbeResourceLogCapture.TryStopAsync(
+            stop,
+            [blockedReader.Task],
+            TimeSpan.FromMilliseconds(25)).WaitAsync(TimeSpan.FromSeconds(2));
+
+        Assert.False(stopped);
+        Assert.True(stop.IsCancellationRequested);
+        blockedReader.SetResult();
+        await blockedReader.Task;
+    }
+
     private static string CreateInspectJson(string id, string runId, string role, string state) =>
         System.Text.Json.JsonSerializer.Serialize(new
         {
@@ -785,6 +862,11 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         ResourceNotificationService? notifications = null;
         ResourceCommandService? commands = null;
         NamespaceProbeNotificationMonitor? monitor = null;
+        CancellationTokenSource? resourceLogCaptureStop = null;
+        Task[] resourceLogCaptureTasks = [];
+        var resourceErrorLogs = new ConcurrentQueue<CapturedResourceErrorLog>();
+        var resourceStateObservations = new ConcurrentQueue<CapturedResourceState>();
+        var resourceStateObservationCounts = new ConcurrentDictionary<string, int>(StringComparer.Ordinal);
         Exception? operationFailure = null;
         Exception? cleanupFailure = null;
         var dockerExecutable = GetDockerExecutablePath();
@@ -828,6 +910,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             application = builder.Build();
             notifications = application.Services.GetRequiredService<ResourceNotificationService>();
             commands = application.Services.GetRequiredService<ResourceCommandService>();
+            var resourceLogger = application.Services.GetRequiredService<ResourceLoggerService>();
             var identityAdapter = new AspireOwnedReconfigurationAdapter(
                 notifications,
                 commands,
@@ -840,7 +923,26 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                     resourceId = observation.ResourceId,
                     containerId = observation.ContainerId,
                     state = observation.State,
-                }), [owner, follower]);
+                }),
+                [owner, follower],
+                observation =>
+                {
+                    var count = resourceStateObservationCounts.AddOrUpdate(observation.Resource.Name, 1, (_, current) => current + 1);
+                    if (count <= 64)
+                    {
+                        resourceStateObservations.Enqueue(new CapturedResourceState(
+                            observation.Resource.Name,
+                            observation.ResourceId,
+                            observation.State));
+                    }
+                });
+            resourceLogCaptureStop = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            resourceLogCaptureTasks =
+            [
+                CaptureResourceErrorLogsAsync(resourceLogger, owner, resourceLogCaptureStop.Token, resourceErrorLogs),
+                CaptureResourceErrorLogsAsync(resourceLogger, follower, resourceLogCaptureStop.Token, resourceErrorLogs),
+            ];
+            Record("resource.error-log-capture.started", new { resources = 2, errorsOnly = true, maxLinesPerResource = 32, maxCharactersPerLine = 2048 });
 
             Record("apphost.starting", new { resources = 2, dashboardDisabled = true });
             await application.StartAsync(cancellationToken).ConfigureAwait(false);
@@ -849,14 +951,15 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             var ownerInitial = await monitor.WaitForRunningAsync(owner, null, cancellationToken).ConfigureAwait(false);
             ownedContainerIds.Add(ownerInitial.ContainerId!);
             Record("resource.running", new { role = NamespaceProbeModelFactory.OwnerRole, resourceId = ownerInitial.ResourceId, containerId = ownerInitial.ContainerId });
+            await AssertOwnedRunningAsync(docker, settings, ownerInitial, NamespaceProbeModelFactory.OwnerRole, cancellationToken)
+                .ConfigureAwait(false);
+            await AssertOwnerEndpointIsLoopbackOnlyAsync(docker, ownerInitial.ContainerId!, cancellationToken).ConfigureAwait(false);
+
             var followerInitial = await monitor.WaitForRunningAsync(follower, null, cancellationToken).ConfigureAwait(false);
             ownedContainerIds.Add(followerInitial.ContainerId!);
             Record("resource.running", new { role = NamespaceProbeModelFactory.FollowerRole, resourceId = followerInitial.ResourceId, containerId = followerInitial.ContainerId });
-            await AssertOwnedRunningAsync(docker, settings, ownerInitial, NamespaceProbeModelFactory.OwnerRole, cancellationToken)
-                .ConfigureAwait(false);
             await AssertOwnedRunningAsync(docker, settings, followerInitial, NamespaceProbeModelFactory.FollowerRole, cancellationToken)
                 .ConfigureAwait(false);
-            await AssertOwnerEndpointIsLoopbackOnlyAsync(docker, ownerInitial.ContainerId!, cancellationToken).ConfigureAwait(false);
             await AssertFollowerSharesCurrentOwnerNamespaceAsync(
                 docker,
                 followerInitial.ContainerId!,
@@ -962,6 +1065,11 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                         state = observation.State,
                     }).ToArray() ?? [],
                 });
+                while (resourceStateObservations.TryDequeue(out var stateObservation))
+                {
+                    Record("resource.state", stateObservation);
+                }
+                Record("resource.state-capture.summary", new { counts = resourceStateObservationCounts });
 
                 if (cleanupDeadline.IsCancellationRequested)
                 {
@@ -1022,66 +1130,43 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                         try
                         {
                             var docker = new ReadOnlyDockerCli(dockerExecutable, settings.Context);
-                            await AssertEngineIdentityAsync(docker, settings, cleanupDeadline.Token).ConfigureAwait(false);
-
-                            var inventory = await docker.RunAsync(
-                                NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments(settings.RunId),
-                                cleanupDeadline.Token).ConfigureAwait(false);
-                            if (inventory.ExitCode != 0)
-                            {
-                                throw new IOException("The run-label inventory could not verify DCP cleanup.");
-                            }
-
-                            var remainingIds = inventory.StandardOutput
-                                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            Record("cleanup.inventory", new
-                            {
-                                exitCode = inventory.ExitCode,
-                                remainingContainerIds = remainingIds,
-                                observedContainerGenerations = monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count,
-                            });
-                            var unverifiedCandidates = false;
-                            var remainingOwnedCount = 0;
-                            foreach (var remainingId in remainingIds)
-                            {
-                                var inspect = await docker.RunAsync(["inspect", "--format", "{{json .}}", remainingId], cleanupDeadline.Token)
-                                    .ConfigureAwait(false);
-                                var evidence = NamespaceProbeCleanupInventory.ParseCandidate(remainingId, inspect, settings.RunId);
-                                Record("cleanup.inventory-candidate", new
+                            await NamespaceProbeCleanupInventory.VerifyNoOwnedResourcesAsync(
+                                docker,
+                                settings.RunId,
+                                token => AssertEngineIdentityAsync(docker, settings, token),
+                                (exitCode, remainingIds) => Record("cleanup.inventory", new
                                 {
-                                    requestedId = remainingId,
-                                    containerId = evidence.ContainerId,
-                                    role = evidence.Role,
-                                    state = evidence.State,
-                                    classification = evidence.Classification,
-                                    exitCode = inspect.ExitCode,
-                                });
-
-                                if (evidence.Classification == "owned")
+                                    exitCode,
+                                    remainingContainerIds = remainingIds,
+                                    observedContainerGenerations = monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count,
+                                }),
+                                (requestedId, inspect, evidence) =>
                                 {
-                                    remainingOwnedCount++;
-                                    Record("cleanup.remaining-owned-resource", new
+                                    Record("cleanup.inventory-candidate", new
                                     {
+                                        requestedId,
                                         containerId = evidence.ContainerId,
                                         role = evidence.Role,
                                         state = evidence.State,
+                                        classification = evidence.Classification,
+                                        exitCode = inspect.ExitCode,
                                     });
-                                }
-                                else if (evidence.Classification == "inspect-failed")
-                                {
-                                    unverifiedCandidates = true;
-                                    Record("cleanup.candidate-inspect-failed", new { requestedId = remainingId, exitCode = inspect.ExitCode });
-                                }
-                                else if (evidence.Classification is not "disappeared")
-                                {
-                                    unverifiedCandidates = true;
-                                }
-                            }
-
-                            if (remainingOwnedCount > 0 || unverifiedCandidates)
-                            {
-                                throw new InvalidOperationException("DCP cleanup left owned or unverified run-labeled resources; no manual removal was attempted.");
-                            }
+                                    if (evidence.Classification == "owned")
+                                    {
+                                        Record("cleanup.remaining-owned-resource", new
+                                        {
+                                            containerId = evidence.ContainerId,
+                                            role = evidence.Role,
+                                            state = evidence.State,
+                                        });
+                                    }
+                                    else if (evidence.Classification == "inspect-failed")
+                                    {
+                                        Record("cleanup.candidate-inspect-failed", new { requestedId, exitCode = inspect.ExitCode });
+                                    }
+                                },
+                                cleanupDeadline.Token,
+                                TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
 
                             Record("cleanup.verified", new { remainingOwnedResources = 0 });
                         }
@@ -1107,6 +1192,38 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                     cleanupFailure ??= new TimeoutException("The cleanup deadline expired before owned-resource inventory verification.");
                     Record("cleanup.inventory-not-verified", new { elapsedMilliseconds = stopwatch.ElapsedMilliseconds });
                 }
+
+            }
+
+            if (resourceLogCaptureStop is not null)
+            {
+                try
+                {
+                    var maxWait = remaining > TimeSpan.Zero
+                        ? TimeSpan.FromMilliseconds(Math.Min(remaining.TotalMilliseconds, 250))
+                        : TimeSpan.Zero;
+                    if (await NamespaceProbeResourceLogCapture.TryStopAsync(
+                        resourceLogCaptureStop,
+                        resourceLogCaptureTasks,
+                        maxWait).ConfigureAwait(false))
+                    {
+                        Record("resource.error-log-capture.stopped", new { });
+                    }
+                    else
+                    {
+                        Record("resource.error-log-capture.stop-failed", new { exceptionType = nameof(TimeoutException), message = "Resource error log capture did not stop within its bounded wait." });
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Record("resource.error-log-capture.stop-failed", new { exceptionType = exception.GetType().FullName, message = exception.Message });
+                }
+                while (resourceErrorLogs.TryDequeue(out var capturedLog))
+                {
+                    Record("resource.error-log", capturedLog);
+                }
+                resourceLogCaptureStop.Dispose();
+                resourceLogCaptureStop = null;
             }
 
             ownershipLease?.Dispose();
@@ -1408,6 +1525,67 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         details,
     }));
 
+    private static async Task CaptureResourceErrorLogsAsync(
+        ResourceLoggerService resourceLogger,
+        IResource resource,
+        CancellationToken cancellationToken,
+        ConcurrentQueue<CapturedResourceErrorLog> capturedLogs)
+    {
+        var capturedForResource = 0;
+        try
+        {
+            await foreach (var batch in resourceLogger.WatchAsync(resource)
+                .WithCancellation(cancellationToken)
+                .ConfigureAwait(false))
+            {
+                foreach (var line in batch)
+                {
+                    if (!line.IsErrorMessage || capturedForResource >= 32)
+                    {
+                        continue;
+                    }
+
+                    var content = line.Content.Length <= 2048 ? line.Content : line.Content[..2048];
+                    capturedLogs.Enqueue(new CapturedResourceErrorLog(resource.Name, line.LineNumber, content));
+                    capturedForResource++;
+                }
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
+    private sealed record CapturedResourceErrorLog(string Resource, int LineNumber, string Content);
+    private sealed record CapturedResourceState(string Resource, string ResourceId, string State);
+
+    private static class NamespaceProbeResourceLogCapture
+    {
+        internal static async Task<bool> TryStopAsync(
+            CancellationTokenSource stop,
+            IReadOnlyList<Task> readers,
+            TimeSpan maxWait)
+        {
+            ArgumentNullException.ThrowIfNull(stop);
+            ArgumentNullException.ThrowIfNull(readers);
+            if (maxWait < TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxWait));
+            }
+
+            stop.Cancel();
+            try
+            {
+                await Task.WhenAll(readers).WaitAsync(maxWait).ConfigureAwait(false);
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            }
+        }
+    }
+
     private static bool HasOwnedProbeLabels(string json, string containerId, string runId)
         => NamespaceProbeCleanupInventory.ParseCandidate(
             containerId,
@@ -1571,6 +1749,7 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
     private readonly IOwnedReconfigurationAdapter adapter;
     private readonly Action<OwnedResourceObservation>? observationRecorded;
     private readonly IResource[]? plannedRecreationOrder;
+    private readonly Action<OwnedResourceObservation>? stateObserved;
     private readonly object generationGate = new();
     private readonly Dictionary<IResource, Dictionary<string, OwnedResourceObservation>> generations = [];
     private InvalidOperationException? generationLimitFailure;
@@ -1584,11 +1763,13 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
     internal NamespaceProbeNotificationMonitor(
         IOwnedReconfigurationAdapter adapter,
         Action<OwnedResourceObservation>? observationRecorded = null,
-        IReadOnlyList<IResource>? plannedRecreationOrder = null)
+        IReadOnlyList<IResource>? plannedRecreationOrder = null,
+        Action<OwnedResourceObservation>? stateObserved = null)
     {
         this.adapter = adapter;
         this.observationRecorded = observationRecorded;
         this.plannedRecreationOrder = plannedRecreationOrder?.ToArray();
+        this.stateObserved = stateObserved;
         if (this.plannedRecreationOrder is { Length: not 2 } ||
             this.plannedRecreationOrder is { Length: 2 } plan && ReferenceEquals(plan[0], plan[1]))
         {
@@ -1600,6 +1781,7 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
             {
                 await foreach (var observation in adapter.WatchAsync(stop.Token).ConfigureAwait(false))
                 {
+                    stateObserved?.Invoke(observation);
                     RecordGeneration(observation);
                     await observations.Writer.WriteAsync(observation, stop.Token).ConfigureAwait(false);
                 }
@@ -1983,6 +2165,72 @@ internal static class NamespaceProbeCleanupInventory
         catch (InvalidOperationException)
         {
             return new NamespaceProbeCleanupCandidateEvidence("malformed-inspection");
+        }
+    }
+
+    internal static async Task VerifyNoOwnedResourcesAsync(
+        IReadOnlyDockerCli docker,
+        string runId,
+        Func<CancellationToken, Task> verifyEngine,
+        Action<int, IReadOnlyList<string>> inventoryObserved,
+        Action<string, ReadOnlyDockerResult, NamespaceProbeCleanupCandidateEvidence> candidateObserved,
+        CancellationToken cancellationToken,
+        TimeSpan pollInterval)
+    {
+        ArgumentNullException.ThrowIfNull(docker);
+        ArgumentNullException.ThrowIfNull(verifyEngine);
+        ArgumentNullException.ThrowIfNull(inventoryObserved);
+        ArgumentNullException.ThrowIfNull(candidateObserved);
+        if (pollInterval < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pollInterval));
+        }
+
+        while (true)
+        {
+            await verifyEngine(cancellationToken).ConfigureAwait(false);
+            var inventory = await docker.RunAsync(BuildRunIdInventoryArguments(runId), cancellationToken).ConfigureAwait(false);
+            if (inventory.ExitCode != 0)
+            {
+                throw new IOException("The run-label inventory could not verify DCP cleanup.");
+            }
+
+            var remainingIds = inventory.StandardOutput
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            inventoryObserved(inventory.ExitCode, remainingIds);
+            if (remainingIds.Length == 0)
+            {
+                return;
+            }
+
+            var remainingOwnedCount = 0;
+            var unverifiedCandidates = false;
+            foreach (var remainingId in remainingIds)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var inspect = await docker.RunAsync(["inspect", "--format", "{{json .}}", remainingId], cancellationToken)
+                    .ConfigureAwait(false);
+                var evidence = ParseCandidate(remainingId, inspect, runId);
+                candidateObserved(remainingId, inspect, evidence);
+                if (evidence.Classification == "owned")
+                {
+                    remainingOwnedCount++;
+                }
+                else if (evidence.Classification is not "disappeared")
+                {
+                    unverifiedCandidates = true;
+                }
+            }
+
+            if (unverifiedCandidates)
+            {
+                throw new InvalidOperationException("DCP cleanup left unverified run-labeled resources; no manual removal was attempted.");
+            }
+
+            if (remainingOwnedCount > 0 || remainingIds.Length > 0)
+            {
+                await Task.Delay(pollInterval, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }
