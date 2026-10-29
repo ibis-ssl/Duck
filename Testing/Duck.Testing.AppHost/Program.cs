@@ -525,6 +525,15 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .WithEnvironment("Testing__ContainerMode", "true")
             .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
             .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+        if (testingMode == "base")
+        {
+            duckBuilder.WithContainerRuntimeArgs(
+            [
+                "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+                "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
+                "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
+            ]);
+        }
         if (enableStandardBaseDuckIdentityBridge)
         {
             duckBuilder

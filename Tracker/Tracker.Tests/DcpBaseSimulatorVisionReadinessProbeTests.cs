@@ -98,6 +98,21 @@ public sealed class DcpBaseSimulatorVisionReadinessProbeTests
     }
 
     [Fact]
+    public async Task RejectsVisionEvidenceThatExpiresWhileTheResponseIsRead()
+    {
+        var fixture = new ProbeFixture();
+        await fixture.CheckHealthAsync();
+        fixture.DecodedCount = 2;
+        fixture.Handler.DecodeAge = TimeSpan.FromMilliseconds(4900);
+        fixture.Handler.ResponseDelay = TimeSpan.FromMilliseconds(300);
+
+        var result = await fixture.CheckHealthAsync();
+
+        Assert.Equal(HealthStatus.Unhealthy, result.Status);
+        Assert.False(fixture.Registry.Get(fixture.Simulator)!.IsReady);
+    }
+
+    [Fact]
     public async Task StaleVisionAndHttpFailureClearPreviouslyReadyState()
     {
         var fixture = new ProbeFixture();
@@ -218,13 +233,18 @@ public sealed class DcpBaseSimulatorVisionReadinessProbeTests
         {
             internal HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
             internal TimeSpan? DecodeAge { get; set; } = TimeSpan.Zero;
+            internal TimeSpan ResponseDelay { get; set; }
             internal Action? BeforeResponse { get; set; }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 fixture.HttpRequests++;
                 fixture.LastRequestUri = request.RequestUri;
                 BeforeResponse?.Invoke();
+                if (ResponseDelay > TimeSpan.Zero)
+                {
+                    await Task.Delay(ResponseDelay, cancellationToken);
+                }
                 var diagnostics = new ServiceReceiveSnapshot(
                     fixture.DiagnosticIdentity,
                     "vision",
@@ -242,7 +262,7 @@ public sealed class DcpBaseSimulatorVisionReadinessProbeTests
                     "ready");
                 var response = new RuntimeVisionHealthResponse(fixture.DecodedCount, true, diagnostics);
                 var content = new StringContent(JsonSerializer.Serialize(response), Encoding.UTF8, "application/json");
-                return Task.FromResult(new HttpResponseMessage(StatusCode) { Content = content });
+                return new HttpResponseMessage(StatusCode) { Content = content };
             }
         }
     }

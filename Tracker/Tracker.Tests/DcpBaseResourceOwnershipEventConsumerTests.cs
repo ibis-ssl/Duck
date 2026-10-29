@@ -361,7 +361,7 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
         }
     }
 
-    private sealed class OwnershipFixture
+    internal sealed class OwnershipFixture
     {
         private readonly Dictionary<string, ResourceEvent> currentEvents = new(StringComparer.Ordinal);
         private readonly DcpBaseResourceReadinessEventConsumer readinessConsumer;
@@ -371,20 +371,23 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             string? contextName = "desktop-linux",
             string? expectedEngineId = EngineId,
             bool includeDuck = false,
-            IReadOnlyCollection<string>? runningRoles = null)
+            IReadOnlyCollection<string>? runningRoles = null,
+            string runId = RunId,
+            string stackId = StackId,
+            IReadOnlyDictionary<string, string>? duckLabels = null)
         {
             var resources = new List<(IResource Resource, string Role, string RunId)>
             {
-                (new ContainerResource("simulator", "example/simulator:fixed"), "simulator", RunId),
-                (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller", RunId),
-                (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim", RunId),
-                (new ContainerResource("crane", "example/crane:fixed"), "crane", RunId),
+                (new ContainerResource("simulator", "example/simulator:fixed"), "simulator", runId),
+                (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller", runId),
+                (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim", runId),
+                (new ContainerResource("crane", "example/crane:fixed"), "crane", runId),
             };
             if (includeDuck)
             {
-                resources.Add((new ContainerResource("duck", "example/duck:fixed"), "duck", RunId));
+                resources.Add((new ContainerResource("duck", "example/duck:fixed"), "duck", runId));
             }
-            Registry = new DcpBaseResourceReadinessRegistry(resources, StackId);
+            Registry = new DcpBaseResourceReadinessRegistry(resources, stackId);
             readinessConsumer = new DcpBaseResourceReadinessEventConsumer(Registry);
             Runner = new FakeDockerStdioCommandRunner();
             OwnershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
@@ -398,7 +401,14 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             {
                 roles.Add(resource, role);
                 var containerId = idNumber++.ToString("x64");
-                Runner.Inspections[containerId] = InspectJson(containerId, role, NetworkName, $"172.28.0.{idNumber}");
+                Runner.Inspections[containerId] = InspectJson(
+                    containerId,
+                    role,
+                    NetworkName,
+                    $"172.28.0.{idNumber}",
+                    runId,
+                    stackId,
+                    role == "duck" ? duckLabels : null);
                 var state = runningRoles is null || runningRoles.Contains(role) ? "Running" : "NotStarted";
                 var resourceEvent = Event(resource, role, containerId, state);
                 currentEvents.Add(resource.Name, resourceEvent);
@@ -464,20 +474,27 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
                 Properties = [new ResourcePropertySnapshot("container.id", containerId)],
             });
 
-        private static string InspectJson(string containerId, string role, string networkName, string address) =>
+        private static string InspectJson(
+            string containerId,
+            string role,
+            string networkName,
+            string address,
+            string runId,
+            string stackId,
+            IReadOnlyDictionary<string, string>? suppliedLabels) =>
             JsonSerializer.Serialize(new
             {
                 Id = containerId,
                 State = new { Status = "running" },
                 Config = new
                 {
-                    Labels = new Dictionary<string, string>(StringComparer.Ordinal)
+                    Labels = suppliedLabels ?? new Dictionary<string, string>(StringComparer.Ordinal)
                     {
-                        [ContainerIdentityExecHandoff.RunIdLabel] = RunId,
+                        [ContainerIdentityExecHandoff.RunIdLabel] = runId,
                         [ContainerIdentityExecHandoff.RoleLabel] = role,
-                        [DockerContainerSpec.StackLabel] = StackId,
+                        [DockerContainerSpec.StackLabel] = stackId,
                         [DockerContainerSpec.ResourceLabel] = role,
-                        [DockerContainerSpec.RunLabel] = RunId,
+                        [DockerContainerSpec.RunLabel] = runId,
                     },
                 },
                 HostConfig = new { NetworkMode = networkName },
@@ -491,7 +508,7 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             });
     }
 
-    private sealed class FakeDockerStdioCommandRunner : IDockerStdioCommandRunner
+    internal sealed class FakeDockerStdioCommandRunner : IDockerStdioCommandRunner
     {
         internal Dictionary<string, string> Inspections { get; } = new(StringComparer.Ordinal);
         internal Dictionary<string, string> NetworkModes { get; } = new(StringComparer.Ordinal);

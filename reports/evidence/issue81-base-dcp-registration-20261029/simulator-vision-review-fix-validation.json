@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "phase": "I81-07J-B3-B validation",
+  "baseline": "909a12f0fe308246fc19900a46a45f7be691bd70",
+  "status": "validated; commit/push pending parent",
+  "results": {
+    "behaviorRedCases": 2,
+    "focusedPassed": 3,
+    "relatedPassed": 125,
+    "distributionChecksPassed": 20,
+    "releaseBuildExit": 0,
+    "documentationGatesPassed": 12,
+    "documentationGateFailures": 0
+  },
+  "scope": "Duck standard-base ownership labels and bounded vision freshness; comparison behavior retained.",
+  "notEstablished": [
+    "No runtime/container/UDP/helper-placement validation.",
+    "Service readiness remains distinct from ownership verification.",
+    "Other resources and full recreation/reconnect flow remain incomplete."
+  ],
+  "sourceSha256": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "099a66c2782e2d2a5e45c588e64e76d66c0157cd1061666b33539e3dc786700e",
+    "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs": "e0961fb61f49bdf6620f0b8f7dd33de1d256e48546a8cf94261b76e3a92323da",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "347f626777b4dfc6c896e088545475ea6495499e929f5f174cd4e0134d2920f7",
+    "Tracker/Tracker.Tests/DcpBaseResourceOwnershipEventConsumerTests.cs": "676891ebcf82369e98442fe6e8971f5722d34efd118c208cfe4f473b6cf7ca3c",
+    "Tracker/Tracker.Tests/DcpBaseSimulatorVisionReadinessProbeTests.cs": "c7181a11d678f14a72e374963b082289a2fab7b25ec9bcd0ab2d4111ddab9adc",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "1bbb9ff21e5c7ddb8265c40413e93ccfa8509268dd64f03e28036dc19371074c",
+    "Tracker/Design/tasks-status.md": "3024c385e45b2549155c4660d0b17e79dbc4f41a97b553e1ed13df815e453785",
+    "Tracker/Design/phases-status.md": "4fc9b8cbc35775a3520aa2cfe787fcb14c058bbaba1b8063c362ffd6e2314f6a"
+  }
+}

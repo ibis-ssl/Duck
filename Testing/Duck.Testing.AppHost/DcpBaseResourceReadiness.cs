@@ -801,6 +801,7 @@ internal sealed class DcpBaseSimulatorVisionReadinessProbe(
         requestBudget.CancelAfter(TimeSpan.FromSeconds(2));
         try
         {
+            var requestStartedAt = System.Diagnostics.Stopwatch.GetTimestamp();
             var endpointUri = await resolveDuckVisionEndpoint(requestBudget.Token).ConfigureAwait(false);
             var requestUri = new Uri(endpointUri, "/health/vision");
             using var response = await httpClient.GetAsync(
@@ -847,6 +848,11 @@ internal sealed class DcpBaseSimulatorVisionReadinessProbe(
                 handoffStates.GetCurrent(duck) != handoffIdentity)
             {
                 return Reject(simulatorCandidate, "The simulator or Duck identity changed while the vision diagnostic was being read.");
+            }
+
+            if (age + System.Diagnostics.Stopwatch.GetElapsedTime(requestStartedAt) > ServiceReceiveDiagnostics.FreshnessWindow)
+            {
+                return Reject(simulatorCandidate, "The current Duck vision diagnostic exceeded the freshness window while the response was being read.");
             }
 
             if (!registry.ObserveSimulatorVision(

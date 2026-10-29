@@ -34,6 +34,7 @@ public sealed class AppHostApplicationModelTests
 
         Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources, resource => resource.Name == "duck"));
         string? sharedRunId = null;
+        string? sharedStackId = null;
         foreach (var name in new[] { "simulator", "game-controller", "crane", "cm4-sim" })
         {
             var resource = Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources, item => item.Name == name));
@@ -41,6 +42,9 @@ public sealed class AppHostApplicationModelTests
             Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
 
             var runtimeArgs = await GetContainerRuntimeArgsAsync(resource);
+            var stackLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.stack=", StringComparison.Ordinal)));
+            sharedStackId ??= stackLabel["duck.aspire.stack=".Length..];
+            Assert.Equal(sharedStackId, stackLabel["duck.aspire.stack=".Length..]);
             var runLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("com.ibis-ssl.duck.run-id=", StringComparison.Ordinal)));
             sharedRunId ??= runLabel["com.ibis-ssl.duck.run-id=".Length..];
             Assert.Equal(sharedRunId, runLabel["com.ibis-ssl.duck.run-id=".Length..]);
@@ -49,11 +53,57 @@ public sealed class AppHostApplicationModelTests
             Assert.DoesNotContain("--network", runtimeArgs);
         }
 
+        Assert.NotNull(sharedRunId);
+        Assert.NotNull(sharedStackId);
+        var duckArgs = await GetContainerRuntimeArgsAsync(Assert.IsType<ContainerResource>(Find(appHost, "duck")));
+        Assert.Contains($"duck.aspire.stack={sharedStackId}", duckArgs);
+        Assert.Contains("duck.aspire.resource=duck", duckArgs);
+        Assert.Contains($"duck.aspire.run={sharedRunId}", duckArgs);
+
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         var controlEndpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "game-controller-control");
         Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, controlEndpoint.Protocol);
         Assert.Null(controlEndpoint.Port);
         Assert.Equal("127.0.0.1", controlEndpoint.TargetHost);
+    }
+
+    [Fact]
+    public async Task StandardDuckRegistrationLabelsAreAcceptedByTheOwnershipConsumer()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var runtimeArgs = await GetContainerRuntimeArgsAsync(duck);
+        var stackLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.stack=", StringComparison.Ordinal)));
+        var resourceLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.resource=", StringComparison.Ordinal)));
+        var runLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.run=", StringComparison.Ordinal)));
+        var identityRunLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith(ContainerIdentityExecHandoff.RunIdLabel + "=", StringComparison.Ordinal)));
+        var identityRoleLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith(ContainerIdentityExecHandoff.RoleLabel + "=", StringComparison.Ordinal)));
+        var stackId = stackLabel["duck.aspire.stack=".Length..];
+        var runId = runLabel["duck.aspire.run=".Length..];
+        Assert.Equal(runId, identityRunLabel[(ContainerIdentityExecHandoff.RunIdLabel.Length + 1)..]);
+        var duckLabels = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            [ContainerIdentityExecHandoff.RunIdLabel] = identityRunLabel[(ContainerIdentityExecHandoff.RunIdLabel.Length + 1)..],
+            [ContainerIdentityExecHandoff.RoleLabel] = identityRoleLabel[(ContainerIdentityExecHandoff.RoleLabel.Length + 1)..],
+            [DockerContainerSpec.StackLabel] = stackId,
+            [DockerContainerSpec.ResourceLabel] = resourceLabel["duck.aspire.resource=".Length..],
+            [DockerContainerSpec.RunLabel] = runId,
+        };
+        var fixture = new DcpBaseResourceOwnershipEventConsumerTests.OwnershipFixture(
+            includeDuck: true,
+            runId: runId,
+            stackId: stackId,
+            duckLabels: duckLabels);
+
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, result.Disposition);
+        var duckCandidate = Assert.Single(fixture.Registry.GetCandidates(), candidate => candidate.ResourceName == "duck");
+        Assert.True(duckCandidate.OwnershipVerified);
+        Assert.False(fixture.Registry.Get(duckCandidate.Resource)!.IsReady);
     }
 
     [Fact]
@@ -178,6 +228,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(4, appHost.Resources.Count());
         var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
 
@@ -279,6 +330,7 @@ public sealed class AppHostApplicationModelTests
         using var appHost = await CreateAppHostAsync(arguments);
         var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         var referee = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
 
