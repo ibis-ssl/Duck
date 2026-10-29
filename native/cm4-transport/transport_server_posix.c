@@ -1,7 +1,9 @@
+#define _GNU_SOURCE
 #define _POSIX_C_SOURCE 200809L
 
 #include "transport_server_posix.h"
 #include "transport_control_frontend.h"
+#include "transport_path_policy.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -29,9 +31,7 @@
 
 typedef struct owned_socket_path {
     int bound;
-    dev_t device;
-    ino_t inode;
-    uid_t owner;
+    cm4_transport_path_identity identity;
 } owned_socket_path;
 
 typedef struct udp_drain_context {
@@ -39,7 +39,43 @@ typedef struct udp_drain_context {
     const struct timespec *deadline;
 } udp_drain_context;
 
+typedef struct server_poll_context {
+    int listener;
+    int cm4_outbound_receive;
+    int cm4_outbound_send;
+    int *feedback;
+    int *udp_receivers;
+    cm4_transport_state *state;
+} server_poll_context;
+
 static volatile sig_atomic_t server_running = 1;
+
+static cm4_transport_path_kind path_kind_from_mode(mode_t mode)
+{
+    if (S_ISLNK(mode)) return CM4_TRANSPORT_PATH_SYMLINK;
+    if (S_ISDIR(mode)) return CM4_TRANSPORT_PATH_DIRECTORY;
+    if (S_ISSOCK(mode)) return CM4_TRANSPORT_PATH_SOCKET;
+    return CM4_TRANSPORT_PATH_OTHER;
+}
+
+static cm4_transport_path_identity path_identity_from_stat(const struct stat *status)
+{
+    cm4_transport_path_identity identity;
+    identity.device = (uint64_t)status->st_dev;
+    identity.inode = (uint64_t)status->st_ino;
+    identity.owner = (uint64_t)status->st_uid;
+    identity.mode = (uint32_t)(status->st_mode & 07777);
+    identity.kind = path_kind_from_mode(status->st_mode);
+    return identity;
+}
+
+static int read_path_identity(const char *path, cm4_transport_path_identity *identity)
+{
+    struct stat status;
+    if (identity == NULL || lstat(path, &status) != 0) return 0;
+    *identity = path_identity_from_stat(&status);
+    return 1;
+}
 
 static void handle_signal(int signal_number)
 {
@@ -93,9 +129,12 @@ static int poll_until(int descriptor, short events, const struct timespec *deadl
     return (poll_descriptor.revents & (events | POLLHUP)) != 0;
 }
 
-static int ensure_control_directory(int *created)
+static int ensure_control_directory(
+    int *created,
+    cm4_transport_path_identity *directory_identity)
 {
     struct stat status;
+    if (directory_identity == NULL) return 0;
     *created = 0;
     if (mkdir(CONTROL_DIRECTORY, 0700) == 0) {
         *created = 1;
@@ -103,14 +142,18 @@ static int ensure_control_directory(int *created)
         return 0;
     }
 
-    if (lstat(CONTROL_DIRECTORY, &status) != 0 || !S_ISDIR(status.st_mode) ||
-        status.st_uid != geteuid() || (status.st_mode & 0777) != 0700) {
+    if (lstat(CONTROL_DIRECTORY, &status) != 0) return 0;
+    *directory_identity = path_identity_from_stat(&status);
+    if (!cm4_transport_owned_directory_matches(directory_identity, (uint64_t)geteuid())) {
         return 0;
     }
     return 1;
 }
 
-static int bind_control_socket(int *created_directory, owned_socket_path *owned_path)
+static int bind_control_socket(
+    int *created_directory,
+    cm4_transport_path_identity *directory_identity,
+    owned_socket_path *owned_path)
 {
     struct sockaddr_un address;
     struct stat existing;
@@ -119,7 +162,7 @@ static int bind_control_socket(int *created_directory, owned_socket_path *owned_
     int descriptor;
 
     memset(owned_path, 0, sizeof(*owned_path));
-    if (!ensure_control_directory(created_directory)) return -1;
+    if (!ensure_control_directory(created_directory, directory_identity)) return -1;
     if (lstat(CONTROL_SOCKET_PATH, &existing) == 0 || errno != ENOENT) return -1;
 
     descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -136,7 +179,7 @@ static int bind_control_socket(int *created_directory, owned_socket_path *owned_
     }
     memcpy(address.sun_path, CONTROL_SOCKET_PATH, strlen(CONTROL_SOCKET_PATH) + 1);
 
-    previous_mask = umask(0077);
+    previous_mask = umask((mode_t)cm4_transport_control_socket_umask());
     if (bind(descriptor, (struct sockaddr *)&address, sizeof(address)) != 0) {
         umask(previous_mask);
         close(descriptor);
@@ -144,21 +187,31 @@ static int bind_control_socket(int *created_directory, owned_socket_path *owned_
     }
     umask(previous_mask);
 
-    if (lstat(CONTROL_SOCKET_PATH, &bound) != 0 || !S_ISSOCK(bound.st_mode) ||
-        bound.st_uid != geteuid()) {
+    if (lstat(CONTROL_SOCKET_PATH, &bound) != 0) {
+        close(descriptor);
+        return -1;
+    }
+    owned_path->identity = path_identity_from_stat(&bound);
+    if (!S_ISSOCK(bound.st_mode) || bound.st_uid != geteuid()) {
         close(descriptor);
         return -1;
     }
     owned_path->bound = 1;
-    owned_path->device = bound.st_dev;
-    owned_path->inode = bound.st_ino;
-    owned_path->owner = bound.st_uid;
-    if (chmod(CONTROL_SOCKET_PATH, 0600) != 0 || listen(descriptor, 4) != 0) {
+    if (!cm4_transport_control_socket_mode_is_private(owned_path->identity.mode)) {
+        close(descriptor);
+        return -1;
+    }
+    if (listen(descriptor, 4) != 0) {
         struct stat current;
         close(descriptor);
-        if (lstat(CONTROL_SOCKET_PATH, &current) == 0 && S_ISSOCK(current.st_mode) &&
-            current.st_dev == owned_path->device && current.st_ino == owned_path->inode &&
-            current.st_uid == owned_path->owner) {
+        if (lstat(CONTROL_SOCKET_PATH, &current) == 0 &&
+            cm4_transport_can_unlink_owned_socket(&owned_path->identity,
+                                                  &(cm4_transport_path_identity){
+                                                      (uint64_t)current.st_dev,
+                                                      (uint64_t)current.st_ino,
+                                                      (uint64_t)current.st_uid,
+                                                      (uint32_t)(current.st_mode & 07777),
+                                                      path_kind_from_mode(current.st_mode) })) {
             (void)unlink(CONTROL_SOCKET_PATH);
         }
         owned_path->bound = 0;
@@ -167,13 +220,17 @@ static int bind_control_socket(int *created_directory, owned_socket_path *owned_
 
     {
         struct stat secured;
-        if (lstat(CONTROL_SOCKET_PATH, &secured) != 0 || !S_ISSOCK(secured.st_mode) ||
-            secured.st_dev != owned_path->device || secured.st_ino != owned_path->inode ||
-            secured.st_uid != owned_path->owner || (secured.st_mode & 0777) != 0600) {
+        cm4_transport_path_identity secured_identity;
+        if (lstat(CONTROL_SOCKET_PATH, &secured) != 0) {
             close(descriptor);
-            if (lstat(CONTROL_SOCKET_PATH, &secured) == 0 && S_ISSOCK(secured.st_mode) &&
-                secured.st_dev == owned_path->device && secured.st_ino == owned_path->inode &&
-                secured.st_uid == owned_path->owner) {
+            owned_path->bound = 0;
+            return -1;
+        }
+        secured_identity = path_identity_from_stat(&secured);
+        if (!cm4_transport_can_unlink_owned_socket(&owned_path->identity, &secured_identity) ||
+            !cm4_transport_control_socket_mode_is_private(secured_identity.mode)) {
+            close(descriptor);
+            if (cm4_transport_can_unlink_owned_socket(&owned_path->identity, &secured_identity)) {
                 (void)unlink(CONTROL_SOCKET_PATH);
             }
             owned_path->bound = 0;
@@ -184,16 +241,44 @@ static int bind_control_socket(int *created_directory, owned_socket_path *owned_
     return descriptor;
 }
 
-static void cleanup_control_socket(int descriptor, const owned_socket_path *owned_path, int created_directory)
+static void unlink_control_socket(void *context)
+{
+    (void)context;
+    (void)unlink(CONTROL_SOCKET_PATH);
+}
+
+static void remove_control_directory(void *context)
+{
+    (void)context;
+    (void)rmdir(CONTROL_DIRECTORY);
+}
+
+static void cleanup_control_socket(
+    int descriptor,
+    const owned_socket_path *owned_path,
+    int created_directory,
+    const cm4_transport_path_identity *owned_directory)
 {
     struct stat current;
+    cm4_transport_path_identity current_socket;
+    cm4_transport_path_identity current_directory;
+    const cm4_transport_path_identity *current_socket_pointer = NULL;
+    const cm4_transport_path_identity *current_directory_pointer = NULL;
     if (descriptor >= 0) close(descriptor);
-    if (owned_path != NULL && owned_path->bound && lstat(CONTROL_SOCKET_PATH, &current) == 0 &&
-        S_ISSOCK(current.st_mode) && current.st_dev == owned_path->device &&
-        current.st_ino == owned_path->inode && current.st_uid == owned_path->owner) {
-        (void)unlink(CONTROL_SOCKET_PATH);
+    if (owned_path != NULL && owned_path->bound && lstat(CONTROL_SOCKET_PATH, &current) == 0) {
+        current_socket = path_identity_from_stat(&current);
+        current_socket_pointer = &current_socket;
     }
-    if (created_directory) (void)rmdir(CONTROL_DIRECTORY);
+    if (created_directory && owned_directory != NULL &&
+        lstat(CONTROL_DIRECTORY, &current) == 0) {
+        current_directory = path_identity_from_stat(&current);
+        current_directory_pointer = &current_directory;
+    }
+    cm4_transport_cleanup_owned_paths(
+        owned_path != NULL && owned_path->bound, created_directory,
+        owned_path != NULL ? &owned_path->identity : NULL, current_socket_pointer,
+        owned_directory, current_directory_pointer,
+        unlink_control_socket, remove_control_directory, NULL);
 }
 
 static int make_udp_socket(const uint8_t ipv4[4], unsigned int port)
@@ -368,9 +453,10 @@ static void forward_datagram(
     struct sockaddr_in source;
     struct sockaddr_in target;
     socklen_t source_length = sizeof(source);
-    ssize_t received = recvfrom(receive_descriptor, packet, sizeof(packet), MSG_TRUNC,
+    ssize_t received = recvfrom(receive_descriptor, packet, sizeof(packet), MSG_TRUNC | MSG_DONTWAIT,
                                 (struct sockaddr *)&source, &source_length);
     cm4_transport_destination destination;
+    if (received < 0 && (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)) return;
     if (received <= 0 || (size_t)received > sizeof(packet) ||
         source.sin_family != AF_INET) return;
 
@@ -390,6 +476,27 @@ static void forward_datagram(
                  (struct sockaddr *)&target, sizeof(target));
 }
 
+static void handle_control_ready(void *context)
+{
+    server_poll_context *server = (server_poll_context *)context;
+    handle_control_connection(server->listener, server->state, server->udp_receivers);
+}
+
+static void handle_datagram_ready(void *context, unsigned int index)
+{
+    server_poll_context *server = (server_poll_context *)context;
+    if (index == 0) {
+        forward_datagram(server->cm4_outbound_receive, server->cm4_outbound_send,
+                         server->state, 0, 0);
+    } else {
+        unsigned int feedback_index = index - 1;
+        if (feedback_index < FEEDBACK_PORT_COUNT) {
+            forward_datagram(server->feedback[feedback_index], server->feedback[feedback_index],
+                             server->state, 1, (uint8_t)feedback_index);
+        }
+    }
+}
+
 int cm4_transport_run_server(
     const cm4_transport_identity *cm4,
     const char *helper_launch_id,
@@ -404,13 +511,16 @@ int cm4_transport_run_server(
     int cm4_outbound_send = -1;
     int listener = -1;
     int created_directory = 0;
+    cm4_transport_path_identity owned_directory;
     owned_socket_path owned_path;
     struct pollfd descriptors[FEEDBACK_PORT_COUNT + 2];
+    server_poll_context poll_context;
     nfds_t descriptor_count;
     unsigned int index;
     int result = 1;
 
     for (index = 0; index < FEEDBACK_PORT_COUNT; ++index) feedback[index] = -1;
+    memset(&owned_directory, 0, sizeof(owned_directory));
     memset(&owned_path, 0, sizeof(owned_path));
     if (cm4_ipv4 == NULL || !cm4_transport_state_init(&state, cm4, helper_launch_id)) return 2;
     if (cm4_ipv4[0] == 0 || cm4_ipv4[0] == 127 || cm4_ipv4[0] >= 224 ||
@@ -422,7 +532,7 @@ int cm4_transport_run_server(
     if (sigaction(SIGINT, &action, NULL) != 0 || sigaction(SIGTERM, &action, NULL) != 0) return 2;
     server_running = 1;
 
-    listener = bind_control_socket(&created_directory, &owned_path);
+    listener = bind_control_socket(&created_directory, &owned_directory, &owned_path);
     if (listener < 0) goto cleanup;
     cm4_outbound_receive = make_udp_socket(loopback, CM4_CONTROL_PORT);
     if (cm4_outbound_receive < 0) goto cleanup;
@@ -444,27 +554,32 @@ int cm4_transport_run_server(
         descriptors[index + 2].events = POLLIN;
     }
     descriptor_count = FEEDBACK_PORT_COUNT + 2;
+    poll_context.listener = listener;
+    poll_context.cm4_outbound_receive = cm4_outbound_receive;
+    poll_context.cm4_outbound_send = cm4_outbound_send;
+    poll_context.feedback = feedback;
+    poll_context.udp_receivers = udp_receivers;
+    poll_context.state = &state;
     result = 0;
 
     while (server_running) {
         int poll_result = poll(descriptors, descriptor_count, 100);
+        uint32_t ready_mask = 0;
         if (poll_result < 0) {
             if (errno == EINTR) continue;
             result = 1;
             break;
         }
         if (poll_result == 0) continue;
-        if (descriptors[0].revents & POLLIN) {
-            handle_control_connection(listener, &state, udp_receivers);
+        if (descriptors[0].revents & POLLIN) ready_mask |= UINT32_C(1);
+        for (index = 1; index < descriptor_count; ++index) {
+            if (descriptors[index].revents & POLLIN) ready_mask |= UINT32_C(1) << index;
         }
-        if (descriptors[1].revents & POLLIN) {
-            forward_datagram(cm4_outbound_receive, cm4_outbound_send, &state, 0, 0);
-        }
-        for (index = 0; index < FEEDBACK_PORT_COUNT; ++index) {
-            if (descriptors[index + 2].revents & POLLIN) {
-                forward_datagram(feedback[index], feedback[index], &state, 1, (uint8_t)index);
-            }
-        }
+        cm4_transport_dispatch_poll_events(
+            ready_mask, UINT32_C(1),
+            ((UINT32_C(1) << (FEEDBACK_PORT_COUNT + 2)) - 1u) & ~UINT32_C(1),
+            1, FEEDBACK_PORT_COUNT + 1, handle_control_ready, handle_datagram_ready,
+            &poll_context);
     }
 
 cleanup:
@@ -474,7 +589,7 @@ cleanup:
     for (index = 0; index < FEEDBACK_PORT_COUNT; ++index) {
         if (feedback[index] >= 0) close(feedback[index]);
     }
-    cleanup_control_socket(listener, &owned_path, created_directory);
+    cleanup_control_socket(listener, &owned_path, created_directory, &owned_directory);
     return result;
 }
 
@@ -512,6 +627,10 @@ static int uds_exchange(
 {
     struct sockaddr_un address;
     struct timespec deadline;
+    cm4_transport_path_identity directory_before;
+    cm4_transport_path_identity directory_after;
+    cm4_transport_path_identity socket_before;
+    cm4_transport_path_identity socket_after;
     size_t used = 0;
     int saw_newline = 0;
     int descriptor = -1;
@@ -520,6 +639,10 @@ static int uds_exchange(
 
     if (request == NULL || response == NULL || response_length == NULL ||
         response_capacity == 0 || !make_deadline(&deadline)) return 0;
+    if (!read_path_identity(CONTROL_DIRECTORY, &directory_before) ||
+        !read_path_identity(CONTROL_SOCKET_PATH, &socket_before) ||
+        !cm4_transport_owned_directory_matches(&directory_before, (uint64_t)geteuid()) ||
+        !cm4_transport_owned_socket_matches(&socket_before, (uint64_t)geteuid())) return 0;
     descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
     if (descriptor < 0 || !set_close_on_exec(descriptor) || !set_nonblocking(descriptor)) goto done;
     memset(&address, 0, sizeof(address));
@@ -532,6 +655,22 @@ static int uds_exchange(
             getsockopt(descriptor, SOL_SOCKET, SO_ERROR, &socket_error, &socket_error_length) != 0 ||
             socket_error != 0) goto done;
     }
+
+#ifdef SO_PEERCRED
+    {
+        struct ucred peer;
+        socklen_t peer_length = sizeof(peer);
+        if (getsockopt(descriptor, SOL_SOCKET, SO_PEERCRED, &peer, &peer_length) != 0 ||
+            peer_length != sizeof(peer) ||
+            !read_path_identity(CONTROL_DIRECTORY, &directory_after) ||
+            !read_path_identity(CONTROL_SOCKET_PATH, &socket_after) ||
+            !cm4_transport_socket_endpoint_matches(
+                &directory_before, &directory_after, &socket_before, &socket_after,
+                (uint64_t)peer.uid, (uint64_t)geteuid())) goto done;
+    }
+#else
+    goto done;
+#endif
     if (!write_all_until(descriptor, request, request_length, &deadline) ||
         !write_all_until(descriptor, "\n", 1, &deadline) || shutdown(descriptor, SHUT_WR) != 0) goto done;
 

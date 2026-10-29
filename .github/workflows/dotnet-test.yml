@@ -112,24 +112,33 @@ jobs:
             -I native/cm4-transport \
             native/cm4-transport/transport_core.c \
             native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
             native/cm4-transport/tests/transport_core_test.c \
             -o "$output_dir/transport_core_test"
           "$output_dir/transport_core_test" \
             native/cm4-transport/tests/fixtures/apply-target.json \
             native/cm4-transport/tests/fixtures/apply-target-ack.json
 
-          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
             -I native/cm4-transport \
             native/cm4-transport/transport_core.c \
             native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
             native/cm4-transport/transport_server_posix.c \
             native/cm4-transport/control_main_posix.c \
             -o "$output_dir/cm4-transport-control"
 
           readelf --file-header "$output_dir/cm4-transport-control" \
             | sed -n '/Class:/p; /Data:/p; /Machine:/p'
-          readelf --dynamic "$output_dir/cm4-transport-control" \
-            | sed -n '/NEEDED/p'
+          if readelf --program-headers "$output_dir/cm4-transport-control" | grep -q 'INTERP'; then
+            echo 'static helper unexpectedly declares an ELF interpreter' >&2
+            exit 1
+          fi
+          dynamic_entries="$(readelf --dynamic "$output_dir/cm4-transport-control" 2>&1 || true)"
+          if grep -q '(NEEDED)' <<< "$dynamic_entries"; then
+            echo 'static helper unexpectedly declares dynamic dependencies' >&2
+            exit 1
+          fi
 
           python3 - "$output_dir/cm4-transport-control" <<'PY'
           import signal

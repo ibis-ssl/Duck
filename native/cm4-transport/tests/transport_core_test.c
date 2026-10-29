@@ -1,5 +1,6 @@
 #include "../transport_core.h"
 #include "../transport_control_frontend.h"
+#include "../transport_path_policy.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +26,48 @@ typedef struct drain_test_state {
     int result;
     int observed_invalidated_state;
 } drain_test_state;
+
+typedef struct poll_dispatch_test_state {
+    int queued_datagrams;
+    unsigned int control_events;
+    unsigned int datagrams_processed;
+} poll_dispatch_test_state;
+
+typedef struct path_cleanup_test_state {
+    unsigned int socket_unlinks;
+    unsigned int directory_removals;
+    uint32_t sentinel_mode;
+    uint8_t sentinel_byte;
+} path_cleanup_test_state;
+
+static void test_unlink_owned_socket(void *context)
+{
+    path_cleanup_test_state *state = (path_cleanup_test_state *)context;
+    ++state->socket_unlinks;
+    state->sentinel_byte = 0;
+}
+
+static void test_remove_owned_directory(void *context)
+{
+    path_cleanup_test_state *state = (path_cleanup_test_state *)context;
+    ++state->directory_removals;
+    state->sentinel_mode = 0;
+}
+
+static void test_control_ready(void *context)
+{
+    poll_dispatch_test_state *state = (poll_dispatch_test_state *)context;
+    ++state->control_events;
+    state->queued_datagrams = 0;
+}
+
+static void test_datagram_ready(void *context, unsigned int index)
+{
+    poll_dispatch_test_state *state = (poll_dispatch_test_state *)context;
+    (void)index;
+    ++state->datagrams_processed;
+    if (state->queued_datagrams > 0) --state->queued_datagrams;
+}
 
 static int test_drain_before_publish(void *context)
 {
@@ -76,6 +119,108 @@ static int parse_rejected(const char *json, size_t length)
     cm4_transport_request request;
     memset(&request, 0x5a, sizeof(request));
     return !cm4_transport_parse_request(json, length, &request);
+}
+
+static int test_control_path_policy(void)
+{
+    const uint64_t owner = 42;
+    cm4_transport_path_identity directory = { 1, 10, owner, 0700, CM4_TRANSPORT_PATH_DIRECTORY };
+    cm4_transport_path_identity socket_path = { 1, 11, owner, 0600, CM4_TRANSPORT_PATH_SOCKET };
+    cm4_transport_path_identity directory_after = directory;
+    cm4_transport_path_identity socket_after = socket_path;
+    cm4_transport_path_identity changed;
+    path_cleanup_test_state cleanup = { 0, 0, 0640, 0x5a };
+
+    CHECK(cm4_transport_socket_endpoint_matches(&directory, &directory_after,
+                                                &socket_path, &socket_after, owner, owner),
+          "accept the current same-owner private control socket");
+
+    changed = directory;
+    changed.kind = CM4_TRANSPORT_PATH_SYMLINK;
+    CHECK(!cm4_transport_owned_directory_matches(&changed, owner),
+          "reject a symlink in the control directory path");
+    changed = directory;
+    changed.owner++;
+    CHECK(!cm4_transport_owned_directory_matches(&changed, owner),
+          "reject a control directory owned by another user");
+    changed = directory;
+    changed.mode = 0777;
+    CHECK(!cm4_transport_owned_directory_matches(&changed, owner),
+          "reject an over-permissive control directory");
+
+    changed = socket_path;
+    changed.kind = CM4_TRANSPORT_PATH_SYMLINK;
+    CHECK(!cm4_transport_owned_socket_matches(&changed, owner),
+          "reject a symlink at the control socket path");
+    changed = socket_path;
+    changed.owner++;
+    CHECK(!cm4_transport_owned_socket_matches(&changed, owner),
+          "reject a control socket owned by another user");
+    changed = socket_path;
+    changed.mode = 0666;
+    CHECK(!cm4_transport_owned_socket_matches(&changed, owner),
+          "reject an over-permissive control socket");
+
+    changed = directory_after;
+    changed.inode++;
+    CHECK(!cm4_transport_socket_endpoint_matches(&directory, &changed,
+                                                &socket_path, &socket_after, owner, owner),
+          "reject replacement of the control directory during connect");
+    changed = socket_after;
+    changed.inode++;
+    CHECK(!cm4_transport_socket_endpoint_matches(&directory, &directory_after,
+                                                &socket_path, &changed, owner, owner),
+          "reject replacement of the control socket during connect");
+    CHECK(!cm4_transport_socket_endpoint_matches(&directory, &directory_after,
+                                                &socket_path, &socket_after, owner + 1, owner),
+          "reject a connected peer with a different effective user");
+
+    changed = socket_path;
+    changed.kind = CM4_TRANSPORT_PATH_SYMLINK;
+    CHECK(!cm4_transport_can_unlink_owned_socket(&socket_path, &changed),
+          "do not unlink a replacement symlink");
+    changed = socket_path;
+    changed.inode++;
+    CHECK(!cm4_transport_can_unlink_owned_socket(&socket_path, &changed),
+          "do not unlink a replacement socket inode");
+    CHECK(cm4_transport_can_unlink_owned_socket(&socket_path, &socket_after),
+          "unlink only the recorded socket inode");
+
+    changed = directory;
+    changed.inode++;
+    CHECK(!cm4_transport_can_remove_owned_directory(1, &directory, &changed),
+          "do not remove a replacement control directory");
+    CHECK(!cm4_transport_can_remove_owned_directory(0, &directory, &directory_after),
+          "do not remove a directory not created by this process");
+    CHECK(cm4_transport_can_remove_owned_directory(1, &directory, &directory_after),
+          "remove the unchanged directory created by this process");
+
+    changed = socket_path;
+    changed.kind = CM4_TRANSPORT_PATH_SYMLINK;
+    directory_after = directory;
+    directory_after.inode++;
+    cm4_transport_cleanup_owned_paths(1, 1, &socket_path, &changed,
+                                      &directory, &directory_after,
+                                      test_unlink_owned_socket, test_remove_owned_directory,
+                                      &cleanup);
+    CHECK(cleanup.socket_unlinks == 0 && cleanup.directory_removals == 0,
+          "do not clean up replacement paths");
+    CHECK(cleanup.sentinel_mode == 0640 && cleanup.sentinel_byte == 0x5a,
+          "leave replacement sentinel mode and content unchanged");
+
+    directory_after = directory;
+    socket_after = socket_path;
+    cm4_transport_cleanup_owned_paths(1, 1, &socket_path, &socket_after,
+                                      &directory, &directory_after,
+                                      test_unlink_owned_socket, test_remove_owned_directory,
+                                      &cleanup);
+    CHECK(cleanup.socket_unlinks == 1 && cleanup.directory_removals == 1,
+          "clean up only the unchanged owned socket and directory");
+    CHECK((0777u & ~cm4_transport_control_socket_umask()) == 0600u,
+          "create the control socket privately without a later path chmod");
+    CHECK(cm4_transport_control_socket_mode_is_private(0600u),
+          "accept only the private socket creation mode");
+    return 0;
 }
 
 static int memory_exchange(
@@ -182,6 +327,7 @@ int main(int argc, char **argv)
     size_t malformed_length;
     size_t fixture_length;
 
+    if (test_control_path_policy() != 0) return 1;
     CHECK(argc == 3, "request and acknowledgement fixture paths required");
     CHECK(read_fixture(argv[1], request_json, sizeof(request_json), &request_length), "read request fixture");
     CHECK(read_fixture(argv[2], expected_ack, sizeof(expected_ack), &expected_ack_length), "read ACK fixture");
@@ -223,10 +369,33 @@ int main(int argc, char **argv)
     CHECK(!cm4_transport_route_simulator_feedback(&state, foreign_source, 10, &destination),
           "reject feedback from a retired Simulator address");
 
+    {
+        poll_dispatch_test_state dispatch = { 1, 0, 0 };
+        cm4_transport_dispatch_poll_events(
+            UINT32_C(0x07), UINT32_C(0x01), UINT32_C(0x06), 1, 2,
+            test_control_ready, test_datagram_ready, &dispatch);
+        CHECK(dispatch.queued_datagrams == 0, "control apply drains queued datagrams");
+        CHECK(dispatch.control_events == 1, "dispatch the control event once");
+        CHECK(dispatch.datagrams_processed == 0,
+              "do not dispatch stale UDP readiness after the control handler drains it");
+        cm4_transport_dispatch_poll_events(
+            UINT32_C(0x01), UINT32_C(0x01), UINT32_C(0x06), 1, 2,
+            test_control_ready, test_datagram_ready, &dispatch);
+        CHECK(dispatch.control_events == 2,
+              "the next control event is handled by a fresh poll dispatch");
+    }
+
     CHECK(cm4_transport_route_cm4_outbound(&state, loopback, 12346, &destination), "route CM4 loopback output");
     CHECK(destination.ipv4[0] == 172 && destination.ipv4[1] == 30 &&
           destination.ipv4[2] == 0 && destination.ipv4[3] == 3 && destination.port == 12346,
           "CM4 output uses current Simulator target");
+    CHECK(cm4_transport_route_cm4_outbound(&state, loopback, 49152, &destination),
+          "route CM4 loopback output from an ephemeral source port");
+    CHECK(destination.ipv4[0] == 172 && destination.ipv4[1] == 30 &&
+          destination.ipv4[2] == 0 && destination.ipv4[3] == 3 && destination.port == 12346,
+          "ephemeral CM4 source port still targets the fixed Simulator listener");
+    CHECK(!cm4_transport_route_cm4_outbound(&state, foreign_source, 49152, &destination),
+          "reject CM4 output from a non-loopback source");
 
     CHECK(cm4_transport_state_init(&drain_state, &request.cm4, request.helper_launch_id),
           "initialize generation-drain state");

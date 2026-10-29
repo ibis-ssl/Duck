@@ -49,6 +49,8 @@ typedef enum cm4_transport_apply_status {
 } cm4_transport_apply_status;
 
 typedef int (*cm4_transport_drain_fn)(void *context);
+typedef void (*cm4_transport_control_ready_fn)(void *context);
+typedef void (*cm4_transport_datagram_ready_fn)(void *context, unsigned int index);
 
 int cm4_transport_state_init(
     cm4_transport_state *state,
@@ -79,6 +81,16 @@ int cm4_transport_write_ack(
     size_t *written);
 
 int cm4_transport_invalidate(cm4_transport_state *state, uint64_t next_epoch);
+
+void cm4_transport_dispatch_poll_events(
+    uint32_t ready_mask,
+    uint32_t control_mask,
+    uint32_t datagram_mask,
+    unsigned int first_datagram_bit,
+    unsigned int datagram_count,
+    cm4_transport_control_ready_fn control_ready,
+    cm4_transport_datagram_ready_fn datagram_ready,
+    void *context);
 
 int cm4_transport_route_simulator_feedback(
     const cm4_transport_state *state,

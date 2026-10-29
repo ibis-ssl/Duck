@@ -446,6 +446,31 @@ int cm4_transport_invalidate(cm4_transport_state *state, uint64_t next_epoch)
     return 1;
 }
 
+void cm4_transport_dispatch_poll_events(
+    uint32_t ready_mask,
+    uint32_t control_mask,
+    uint32_t datagram_mask,
+    unsigned int first_datagram_bit,
+    unsigned int datagram_count,
+    cm4_transport_control_ready_fn control_ready,
+    cm4_transport_datagram_ready_fn datagram_ready,
+    void *context)
+{
+    unsigned int index;
+    if ((ready_mask & control_mask) != 0) {
+        if (control_ready != NULL) control_ready(context);
+        return;
+    }
+    if (datagram_ready == NULL) return;
+    for (index = 0; index < datagram_count; ++index) {
+        unsigned int bit = first_datagram_bit + index;
+        if (bit < 32 && (datagram_mask & (UINT32_C(1) << bit)) != 0 &&
+            (ready_mask & (UINT32_C(1) << bit)) != 0) {
+            datagram_ready(context, index);
+        }
+    }
+}
+
 int cm4_transport_route_simulator_feedback(
     const cm4_transport_state *state,
     const uint8_t source_ipv4[4],
@@ -467,8 +492,9 @@ int cm4_transport_route_cm4_outbound(
     cm4_transport_destination *destination)
 {
     static const uint8_t loopback[4] = { 127, 0, 0, 1 };
+    (void)source_port;
     if (state == NULL || source_ipv4 == NULL || destination == NULL || !state->target_valid ||
-        source_port != 12346 || memcmp(source_ipv4, loopback, sizeof(loopback)) != 0) return 0;
+        memcmp(source_ipv4, loopback, sizeof(loopback)) != 0) return 0;
     memcpy(destination->ipv4, state->simulator_ipv4, sizeof(destination->ipv4));
     destination->port = 12346;
     return 1;
