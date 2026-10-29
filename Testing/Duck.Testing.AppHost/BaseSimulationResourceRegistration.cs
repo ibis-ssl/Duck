@@ -259,6 +259,7 @@ internal static class BaseSimulationResourceRegistration
                 duck.Resource,
                 duck.Resource.GetEndpoint("vision-health"),
                 handoffStates ?? new ContainerIdentityHandoffStateStore(),
+                options.CraneTeamName,
                 readinessResources.ToArray());
         }
 

@@ -440,6 +440,34 @@ internal sealed class DcpBaseResourceReadinessRegistry
         }
     }
 
+    internal bool SetCraneServiceReadiness(
+        DcpBaseResourceIdentityCandidate candidate,
+        bool isReady,
+        string reason)
+    {
+        ArgumentNullException.ThrowIfNull(candidate);
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+        lock (sync)
+        {
+            if (!entries.TryGetValue(candidate.Resource, out var entry) ||
+                entry.Role != "crane" ||
+                entry.ResourceKeyAmbiguous ||
+                entry.ResourceId != candidate.ResourceId ||
+                entry.ContainerId != candidate.ContainerId ||
+                entry.Generation != candidate.Generation ||
+                entry.State != "Running" ||
+                !entry.IdentityVerified || !entry.NetworkVerified || !entry.OwnershipVerified ||
+                !OwnedContainerInspection.IsFullId(entry.ContainerId))
+            {
+                return false;
+            }
+
+            entry.IsReady = isReady;
+            entry.Reason = reason;
+            return true;
+        }
+    }
+
     internal bool ObserveSimulatorVision(
         DcpBaseResourceIdentityCandidate candidate,
         ResourceDiagnosticIdentity receiverIdentity,
@@ -650,6 +678,7 @@ internal static class DcpBaseResourceReadinessRegistration
         IResource duckResource,
         EndpointReference duckVisionEndpoint,
         ContainerIdentityHandoffStateStore handoffStates,
+        string expectedCraneTeamName,
         params (IResource Resource, string Role)[] resources)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -659,6 +688,7 @@ internal static class DcpBaseResourceReadinessRegistration
         ArgumentNullException.ThrowIfNull(duckResource);
         ArgumentNullException.ThrowIfNull(duckVisionEndpoint);
         ArgumentNullException.ThrowIfNull(handoffStates);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedCraneTeamName);
         ArgumentNullException.ThrowIfNull(resources);
         if (resources.Length == 0)
         {
@@ -669,9 +699,10 @@ internal static class DcpBaseResourceReadinessRegistration
         var entries = trackedResources.Select(item => (item.Resource, item.Role, runId)).ToArray();
         var registry = new DcpBaseResourceReadinessRegistry(entries, stackId);
         var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var dockerRunner = new DockerCliCommandRunner(dockerExecutable);
         var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
             registry,
-            new DockerCliCommandRunner(dockerExecutable),
+            dockerRunner,
             dockerContextName,
             expectedEngineId);
         var roleMap = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
@@ -719,9 +750,13 @@ internal static class DcpBaseResourceReadinessRegistration
                     handoffStates,
                     visionHttpClient)
                 : null;
-            builder.Services.AddHealthChecks().AddCheck(
-                checkName,
-                new DcpBaseResourceReadinessHealthCheck(registry, resource, visionProbe));
+            var craneProbe = role == "crane"
+                ? new DcpBaseCraneReadinessProbe(
+                    registry, resource, dockerRunner, dockerContextName, expectedCraneTeamName)
+                : null;
+            IHealthCheck healthCheck = new DcpBaseResourceReadinessHealthCheck(
+                registry, resource, visionProbe, craneProbe);
+            builder.Services.AddHealthChecks().AddCheck(checkName, healthCheck);
             builder.CreateResourceBuilder(container).WithHealthCheck(checkName);
         }
     }
@@ -740,11 +775,109 @@ internal static class DcpBaseResourceReadinessRegistration
     }
 }
 
+/// <summary>現在所有されているCraneへ既存のROS診断を実行し、同じ世代へ準備状態を記録します。</summary>
+internal sealed class DcpBaseCraneReadinessProbe(
+    DcpBaseResourceReadinessRegistry registry,
+    IResource crane,
+    IDockerStdioCommandRunner runner,
+    string? dockerContextName,
+    string expectedTeamName)
+{
+    private static readonly TimeSpan ProbeBudget = TimeSpan.FromSeconds(12);
+    private const int MaximumOutputCharacters = 16 * 1024;
+
+    internal async Task<HealthCheckResult> CheckAsync(CancellationToken cancellationToken)
+    {
+        var candidate = GetCurrentCandidate();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            if (candidate is not null)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The Crane readiness check was canceled; service readiness is unverified.");
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+        if (!IsOwnedRunning(candidate))
+        {
+            return HealthCheckResult.Unhealthy("Crane has no current owned running container identity.");
+        }
+
+        if (string.IsNullOrWhiteSpace(dockerContextName))
+        {
+            registry.SetCraneServiceReadiness(candidate!, false, "The Docker context is not configured for the Crane readiness probe.");
+            return HealthCheckResult.Unhealthy("The Docker context is not configured for the Crane readiness probe.");
+        }
+
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(ProbeBudget);
+        var timer = System.Diagnostics.Stopwatch.StartNew();
+        try
+        {
+            var result = await runner.CaptureBoundedAsync(
+                ["--context", dockerContextName, .. DockerServiceReadiness.CreateCraneReadinessProbeArguments(
+                    candidate!.ContainerId!, expectedTeamName)],
+                MaximumOutputCharacters,
+                ProbeBudget,
+                budget.Token).ConfigureAwait(false);
+            var outcome = CraneProbeDiagnostics.Evaluate(
+                result.ExitCode, result.StandardOutput, result.StandardError, timer.Elapsed);
+            if (!outcome.Ready)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The current Crane ROS diagnostic did not confirm the coordinator and expected team.");
+                return HealthCheckResult.Unhealthy("The current Crane ROS diagnostic did not confirm the coordinator and expected team.");
+            }
+
+            var current = GetCurrentCandidate();
+            if (current is null || !SameIdentity(candidate, current) || !IsOwnedRunning(current) ||
+                !registry.SetCraneServiceReadiness(candidate, true, "The current owned Crane container passed its ROS coordinator and team diagnostic."))
+            {
+                return HealthCheckResult.Unhealthy("The Crane identity or generation changed while its ROS diagnostic was running.");
+            }
+
+            return HealthCheckResult.Healthy("The current owned Crane container passed its ROS coordinator and team diagnostic.");
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            registry.SetCraneServiceReadiness(candidate!, false, "The Crane readiness check was canceled; service readiness is unverified.");
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            registry.SetCraneServiceReadiness(candidate!, false, "The bounded Crane readiness probe expired.");
+            return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+        }
+        catch (Exception exception) when (exception is IOException or TimeoutException or InvalidOperationException)
+        {
+            registry.SetCraneServiceReadiness(candidate!, false, "The current Crane ROS diagnostic could not be completed safely.");
+            return HealthCheckResult.Unhealthy("The current Crane ROS diagnostic could not be completed safely.");
+        }
+    }
+
+    private DcpBaseResourceIdentityCandidate? GetCurrentCandidate() => registry.GetCandidates()
+        .SingleOrDefault(candidate => ReferenceEquals(candidate.Resource, crane));
+
+    private bool IsOwnedRunning(DcpBaseResourceIdentityCandidate? candidate) => candidate is not null &&
+        candidate.Role == "crane" && candidate.State == "Running" && !candidate.ResourceKeyAmbiguous &&
+        !string.IsNullOrWhiteSpace(candidate.ResourceId) && OwnedContainerInspection.IsFullId(candidate.ContainerId) &&
+        candidate.IdentityVerified && candidate.NetworkVerified && candidate.OwnershipVerified &&
+        registry.AreOwnershipProofsCurrent([candidate]);
+
+    private static bool SameIdentity(
+        DcpBaseResourceIdentityCandidate expected,
+        DcpBaseResourceIdentityCandidate actual) =>
+        ReferenceEquals(expected.Resource, actual.Resource) && expected.ResourceId == actual.ResourceId &&
+        expected.ContainerId == actual.ContainerId && expected.Generation == actual.Generation &&
+        expected.RunId == actual.RunId && expected.Role == actual.Role;
+}
+
 internal sealed class DcpBaseResourceReadinessHealthCheck(
     DcpBaseResourceReadinessRegistry registry,
     IResource resource,
-    DcpBaseSimulatorVisionReadinessProbe? simulatorVisionProbe = null) : IHealthCheck
+    DcpBaseSimulatorVisionReadinessProbe? simulatorVisionProbe = null,
+    DcpBaseCraneReadinessProbe? craneReadinessProbe = null) : IHealthCheck
 {
+    internal DcpBaseCraneReadinessProbe? CraneReadinessProbe => craneReadinessProbe;
+
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
@@ -752,6 +885,10 @@ internal sealed class DcpBaseResourceReadinessHealthCheck(
         if (simulatorVisionProbe is not null)
         {
             return await simulatorVisionProbe.CheckAsync(cancellationToken).ConfigureAwait(false);
+        }
+        if (craneReadinessProbe is not null)
+        {
+            return await craneReadinessProbe.CheckAsync(cancellationToken).ConfigureAwait(false);
         }
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -2,12 +2,54 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Tracker.Tests;
 
 public sealed class BaseSimulationResourceRegistrationTests
 {
+    [Fact]
+    public void StandardCraneHealthRegistrationUsesTheCraneServiceConsumer()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-health-model-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+
+        try
+        {
+            _ = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    "base-health-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-base-health-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { });
+
+            using var services = builder.Services.BuildServiceProvider();
+            var registration = Assert.Single(
+                services.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value.Registrations,
+                item => item.Name == "dcp-crane-service-ready");
+            var healthCheck = registration.Factory(services);
+
+            var dcpHealthCheck = Assert.IsType<DcpBaseResourceReadinessHealthCheck>(healthCheck);
+            Assert.NotNull(dcpHealthCheck.CraneReadinessProbe);
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot))
+            {
+                Directory.Delete(fixtureRoot, recursive: true);
+            }
+        }
+    }
+
     [Fact]
     public async Task BaseRegistrationUsesDcpOwnedContainerResourcesForTheSelectedSimulationServices()
     {
