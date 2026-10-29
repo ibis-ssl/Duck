@@ -472,6 +472,138 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData("--Testing:RuntimeHostOnly=true")]
+    [InlineData("--Testing:VisionSimulationOnly=true")]
+    [InlineData("--Testing:GameControllerVisionOnly=true")]
+    [InlineData("--Testing:OwnedReconfiguration:Enabled=true")]
+    [InlineData("--Testing:DebugHost:ReplayOnly=true")]
+    [InlineData("--Testing:Mode=comparison")]
+    public async Task NamespaceProbeGenerationRejectsAnotherSelectedAppHostMode(string otherMode)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [
+                    "--Testing:NamespaceProbe:GenerateModel=true",
+                    otherMode,
+                    CreateIsolatedOwnershipLockArgument(),
+                ]));
+
+        Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("--Testing:NamespaceProbe:GenerateModel=enabled-ish")]
+    [InlineData("--Testing:NamespaceProbe:GenerateModel=")]
+    [InlineData("--Testing:NamespaceProbe:GenerateModel=   ")]
+    public async Task NamespaceProbeGenerationRejectsInvalidSelectionValue(string selection)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [
+                    selection,
+                    CreateIsolatedOwnershipLockArgument(),
+                ]));
+
+        Assert.Contains("true or false", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task NamespaceProbeGenerationProjectsTwoOwnedStandardContainersWithoutHostPaths()
+    {
+        var publishDirectory = Path.Combine(Path.GetTempPath(), $"duck-namespace-probe-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(publishDirectory);
+        try
+        {
+            foreach (var fileName in new[]
+                     {
+                         "Duck.Testing.RefereeDriver.Host.dll",
+                         "Duck.Testing.RefereeDriver.Host.deps.json",
+                         "Duck.Testing.RefereeDriver.Host.runtimeconfig.json",
+                         "Duck.Testing.RefereeDriver.dll",
+                         "Duck.Testing.Diagnostics.dll",
+                         "Google.Protobuf.dll",
+                         "SslProto.dll",
+                     })
+            {
+                await File.WriteAllTextAsync(Path.Combine(publishDirectory, fileName), "fixture");
+            }
+
+            var builder = DistributedApplication.CreateBuilder([]);
+            var model = await NamespaceProbeModelFactory.AddResourcesAndProjectAsync(
+                builder, "model-run_01", publishDirectory);
+
+            Assert.Equal("AppHost resources only; DCP networks are not included", model.ModelStage);
+            Assert.Equal(2, model.Resources.Count);
+            var owner = Assert.Single(model.Resources, resource => resource.ResourceName == NamespaceProbeModelFactory.OwnerResourceName);
+            var follower = Assert.Single(model.Resources, resource => resource.ResourceName == NamespaceProbeModelFactory.FollowerResourceName);
+            foreach (var resource in model.Resources)
+            {
+                Assert.Equal(nameof(ContainerResource), resource.ResourceType);
+                Assert.Equal(NamespaceProbeModelFactory.AspNetImage, resource.Image);
+                Assert.Equal(NamespaceProbeModelFactory.AspNetImageSha256, resource.ImageSha256);
+                Assert.Equal("Never", resource.ImagePullPolicy);
+                Assert.Contains("dotnet", resource.Arguments);
+                Assert.Contains("/app/Duck.Testing.RefereeDriver.Host.dll", resource.Arguments);
+                Assert.Contains("--RefereeDriver:Enabled=false", resource.Arguments);
+                Assert.Single(resource.Mounts);
+                Assert.Equal("/app", resource.Mounts[0].Target);
+                Assert.True(resource.Mounts[0].IsReadOnly);
+            }
+
+            Assert.Contains("--urls=http://0.0.0.0:39110", owner.Arguments);
+            Assert.Contains("--label", owner.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}=model-run_01", owner.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}={NamespaceProbeModelFactory.OwnerRole}", owner.RuntimeArguments);
+            var ownerEndpoint = Assert.Single(owner.Endpoints);
+            Assert.Null(ownerEndpoint.HostPort);
+            Assert.Equal(NamespaceProbeModelFactory.OwnerPort, ownerEndpoint.TargetPort);
+            Assert.Equal("127.0.0.1", ownerEndpoint.TargetHost);
+
+            Assert.Contains("--urls=http://0.0.0.0:39111", follower.Arguments);
+            Assert.Contains("--network", follower.RuntimeArguments);
+            Assert.Contains($"container:{owner.ContainerName}", follower.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}=model-run_01", follower.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}={NamespaceProbeModelFactory.FollowerRole}", follower.RuntimeArguments);
+            Assert.Empty(follower.Endpoints);
+            Assert.Contains(NamespaceProbeModelFactory.OwnerResourceName, follower.WaitForStart);
+
+            var json = NamespaceProbeModelFactory.Serialize(model);
+            Assert.DoesNotContain(publishDirectory, json, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("NetworkSettings", json, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(publishDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task NamespaceProbeGenerationFalseLeavesExistingResourceSelectionUnchanged()
+    {
+        using var defaultAppHost = await CreateAppHostAsync();
+        using var disabledAppHost = await CreateAppHostAsync("--Testing:NamespaceProbe:GenerateModel=false");
+
+        Assert.Equal(
+            defaultAppHost.Resources.Select(resource => (resource.Name, resource.GetType())).OrderBy(resource => resource.Name),
+            disabledAppHost.Resources.Select(resource => (resource.Name, resource.GetType())).OrderBy(resource => resource.Name));
+    }
+
+    [Fact]
+    public async Task NamespaceProbeGenerationRejectsMissingExistingPublishOutputBeforeAddingResources()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            NamespaceProbeModelFactory.AddResourcesAndProjectAsync(
+                builder,
+                "model-run_02",
+                Path.Combine(Path.GetTempPath(), $"missing-namespace-probe-{Guid.NewGuid():N}")));
+
+        Assert.Contains("missing", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Empty(builder.Resources);
+    }
+
     [Fact]
     public async Task ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress()
     {

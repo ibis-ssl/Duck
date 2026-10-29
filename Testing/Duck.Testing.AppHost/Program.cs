@@ -22,6 +22,44 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
 
+const string namespaceProbeSelectionKey = "Testing:NamespaceProbe:GenerateModel";
+var namespaceProbeSelection = builder.Configuration[namespaceProbeSelectionKey];
+if (namespaceProbeSelection is not null &&
+    !bool.TryParse(namespaceProbeSelection, out _))
+{
+    throw new InvalidOperationException(
+        $"{namespaceProbeSelectionKey} must be true or false when specified.");
+}
+
+if (IsEnabled(namespaceProbeSelection))
+{
+    if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]) ||
+        IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]) ||
+        string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.OrdinalIgnoreCase))
+    {
+        throw new InvalidOperationException(
+            "Testing:NamespaceProbe:GenerateModel cannot be combined with another AppHost mode.");
+    }
+
+    var namespaceProbeLockPath = builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var namespaceProbeOwnershipLease = StackOwnershipLease.Acquire(namespaceProbeLockPath);
+    var namespaceProbeRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var refereeDriverPublishDirectory = Path.Combine(
+        repositoryRoot,
+        "Testing", "Duck.Testing.RefereeDriver.Host", "bin", "Release", "net10.0", "publish");
+    var namespaceProbeModel = await NamespaceProbeModelFactory.AddResourcesAndProjectAsync(
+        builder,
+        namespaceProbeRunId,
+        refereeDriverPublishDirectory);
+
+    Console.WriteLine(NamespaceProbeModelFactory.Serialize(namespaceProbeModel));
+    return 0;
+}
+
 var ownedReconfigurationEnabled = IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]);
 if (ownedReconfigurationEnabled && !IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
 {
