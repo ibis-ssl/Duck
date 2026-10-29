@@ -99,6 +99,71 @@ jobs:
           }, ensure_ascii=True, separators=(",", ":")))
           PY
 
+      - name: Build and test CM4 transport native code
+        id: cm4_transport_native
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          output_dir="$RUNNER_TEMP/cm4-transport-native"
+          mkdir -p "$output_dir"
+
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/tests/transport_core_test.c \
+            -o "$output_dir/transport_core_test"
+          "$output_dir/transport_core_test" \
+            native/cm4-transport/tests/fixtures/apply-target.json \
+            native/cm4-transport/tests/fixtures/apply-target-ack.json
+
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_server_posix.c \
+            native/cm4-transport/control_main_posix.c \
+            -o "$output_dir/cm4-transport-control"
+
+          readelf --file-header "$output_dir/cm4-transport-control" \
+            | sed -n '/Class:/p; /Data:/p; /Machine:/p'
+          readelf --dynamic "$output_dir/cm4-transport-control" \
+            | sed -n '/NEEDED/p'
+
+          python3 - "$output_dir/cm4-transport-control" <<'PY'
+          import signal
+          import subprocess
+          import sys
+
+          child = subprocess.Popen(
+              [sys.argv[1], "--protocol", "jsonl-v1"],
+              stdin=subprocess.PIPE,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE,
+          )
+          try:
+              try:
+                  exit_code = child.wait(timeout=6)
+              except subprocess.TimeoutExpired:
+                  child.kill()
+                  child.wait()
+                  raise SystemExit("one-shot CLI did not exit within the watchdog test limit")
+
+              stdout = child.stdout.read()
+              if exit_code != -signal.SIGALRM:
+                  raise SystemExit(f"one-shot CLI exited unexpectedly: {exit_code}")
+              if b"applied" in stdout:
+                  raise SystemExit("one-shot CLI emitted an applied acknowledgement without a request")
+          finally:
+              if child.poll() is None:
+                  child.kill()
+                  child.wait()
+              for stream in (child.stdin, child.stdout, child.stderr):
+                  if stream is not None:
+                      stream.close()
+          PY
+
       - name: Run dotnet test
         id: dotnet_test
         shell: bash

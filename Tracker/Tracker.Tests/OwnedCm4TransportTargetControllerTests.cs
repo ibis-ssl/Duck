@@ -53,6 +53,9 @@ public sealed class OwnedCm4TransportTargetControllerTests
         Assert.Equal(4, request.SimulatorGeneration);
         Assert.Equal(1, request.ConfigEpoch);
         Assert.Equal("172.30.0.3", request.TargetAddress);
+        var sharedWireFixture = File.ReadAllText(
+            Path.Combine(AppContext.BaseDirectory, "cm4-transport-apply-target.json")).TrimEnd('\r', '\n');
+        Assert.Equal(sharedWireFixture, runner.StdioInput!.TrimEnd('\r', '\n'));
         Assert.All(runner.InspectFormats, format =>
         {
             Assert.Contains("NetworkSettings.Networks", format, StringComparison.Ordinal);

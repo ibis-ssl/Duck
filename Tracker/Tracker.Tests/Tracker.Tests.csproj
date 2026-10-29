@@ -23,6 +23,9 @@
     <None Include="..\..\scripts\tests\crane_probe_sanitizer_fixtures.json"
           Link="crane_probe_sanitizer_fixtures.json"
           CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\native\cm4-transport\tests\fixtures\apply-target.json"
+          Link="cm4-transport-apply-target.json"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
