@@ -822,6 +822,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
         Assert.Equal(360, crane.StartupTimeoutSeconds);
         Assert.DoesNotContain(crane.Environment, item => item.Key == "FEEDBACK_SIM_MODE");
+        Assert.DoesNotContain(crane.Environment, item => item.Key.StartsWith("DUCK_CRANE_", StringComparison.Ordinal));
+        Assert.Empty(crane.Mounts ?? []);
+        Assert.DoesNotContain("/duck/crane-launch-overlay.py", crane.ContainerArguments[^1], StringComparison.Ordinal);
 
         var cm4Simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "cm4-sim")));
         Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Simulator.Image);
@@ -838,6 +841,66 @@ public sealed class AppHostApplicationModelTests
 
         Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
         Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
+    }
+
+    [Fact]
+    public async Task ExplicitCraneTargetAddressUsesTheOwnedOverlayConsumer()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Crane:TargetAddress=cm4-sim");
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+
+        Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
+        Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_EXPECTED_RESOURCE"]);
+        Assert.True(
+            crane.ContainerArguments[^1].Contains("/duck/crane-launch-overlay.py", StringComparison.Ordinal),
+            string.Join(" | ", crane.ContainerArguments));
+        var overlayMount = Assert.Single(crane.Mounts!, mount => mount.Target == "/duck/crane-launch-overlay.py");
+        Assert.True(overlayMount.ReadOnly);
+        Assert.True(File.Exists(overlayMount.Source));
+    }
+
+    [Theory]
+    [InlineData("simulator")]
+    [InlineData("outside.example")]
+    [InlineData("::1")]
+    [InlineData("0.0.0.0")]
+    [InlineData("255.255.255.255")]
+    [InlineData("224.0.0.1")]
+    [InlineData("192.0.2.1")]
+    [InlineData("127.0.0.2")]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task CraneTargetAddressRejectsValuesOutsideTheSelectedResourceOrSafeIpv4(string address)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            using var appHost = await CreateAppHostAsync("--Testing:Crane:TargetAddress=" + address);
+        });
+
+        Assert.Contains("Testing:Crane:TargetAddress", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CraneSimulatorPlannerAcceptsOnlyItsSelectedResourceTarget()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Crane:Planner=rvo2",
+            "--Testing:Crane:TargetAddress=simulator");
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        Assert.Equal("simulator", crane.Environment["DUCK_CRANE_EXPECTED_RESOURCE"]);
+        Assert.Equal("simulator", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
+    }
+
+    [Fact]
+    public async Task CraneAcceptsExplicitHostNetworkLoopbackAddress()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Crane:TargetAddress=127.0.0.1");
+        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+
+        Assert.Equal("127.0.0.1", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
+        Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_EXPECTED_RESOURCE"]);
     }
 
     [Fact]

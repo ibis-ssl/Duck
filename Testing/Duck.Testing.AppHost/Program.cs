@@ -436,6 +436,10 @@ var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
 var useCm4Simulator = string.Equals(cranePlanner, "visibility_graph", StringComparison.Ordinal);
+var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
+    builder.Configuration,
+    cranePlanner,
+    AppContext.BaseDirectory);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber))
 {
     throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
@@ -575,6 +579,25 @@ var craneEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
     ["PLANNER"] = cranePlanner,
     ["CRANE_TARGET_PORT"] = useCm4Simulator ? "12345" : simulatorIbisPort,
 };
+var craneCommand =
+    $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={craneTeamName} team_color:={craneTeamColor} planner:=${{PLANNER}}";
+IEnumerable<DockerContainerMount>? craneMounts = null;
+if (craneTargetAddressSettings is not null)
+{
+    craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey] =
+        craneTargetAddressSettings.TargetAddress;
+    craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] =
+        craneTargetAddressSettings.ExpectedResourceName;
+    craneCommand =
+        $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} speak:=false team:={craneTeamName} team_color:={craneTeamColor} planner:=${{PLANNER}}";
+    craneMounts =
+    [
+        new DockerContainerMount(
+            craneTargetAddressSettings.ScriptSource,
+            CraneTargetAddressSettings.ScriptMountTarget,
+            ReadOnly: true),
+    ];
+}
 if (!useCm4Simulator)
 {
     craneEnvironment["FEEDBACK_SIM_MODE"] = "true";
@@ -585,12 +608,10 @@ var craneBuilder = builder
         new DockerContainerSpec(
             "crane",
             $"ghcr.io/ibis-ssl/crane:{craneImageTag}",
-            [
-                "bash", "-c",
-                $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={craneTeamName} team_color:={craneTeamColor} planner:=${{PLANNER}}",
-            ],
+            ["bash", "-c", craneCommand],
             craneEnvironment,
-            stackId),
+            stackId,
+            mounts: craneMounts),
         39104,
         "ros2",
         "crane",
