@@ -45,22 +45,6 @@ static void copy_literal(char *destination, size_t capacity, const char *source)
     memcpy(destination, source, length + 1);
 }
 
-static void set_identity(
-    cm4_transport_identity *identity,
-    const char *run_id,
-    const char *engine_id,
-    const char *resource_id,
-    const char *container_id,
-    uint64_t generation)
-{
-    memset(identity, 0, sizeof(*identity));
-    copy_literal(identity->run_id, sizeof(identity->run_id), run_id);
-    copy_literal(identity->engine_id, sizeof(identity->engine_id), engine_id);
-    copy_literal(identity->resource_id, sizeof(identity->resource_id), resource_id);
-    copy_literal(identity->container_id, sizeof(identity->container_id), container_id);
-    identity->generation = generation;
-}
-
 static int read_fixture(const char *path, char *buffer, size_t capacity, size_t *length)
 {
     FILE *file = fopen(path, "rb");
