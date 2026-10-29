@@ -1,6 +1,7 @@
 import importlib.util
 import signal
 import shutil
+import subprocess
 import sys
 import threading
 import tempfile
