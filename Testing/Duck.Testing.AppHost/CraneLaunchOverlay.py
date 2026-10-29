@@ -6,14 +6,19 @@ import ipaddress
 import json
 import os
 import re
+import signal
 import shutil
 import socket
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import xml.etree.ElementTree as ET
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Iterable
+from xml.parsers import expat
 
 
 EXPECTED_SIM_TARGET = "127.0.0.1"
@@ -51,30 +56,64 @@ def _get_ipv4_addresses(resource_name: str) -> list[str]:
     )
 
 
-def _run_bounded_command(command: list[str], timeout_seconds: float) -> subprocess.CompletedProcess[str]:
+class _StopState:
+    def __init__(self) -> None:
+        self.requested = threading.Event()
+        self.signal_number: int | None = None
+
+
+@contextmanager
+def _capture_stop_signals(state: _StopState):
+    previous_handlers: dict[int, object] = {}
+
+    def request_stop(signum: int, _frame: object) -> None:
+        if state.signal_number is None:
+            state.signal_number = signum
+        state.requested.set()
+
+    if threading.current_thread() is threading.main_thread():
+        for signum in (signal.SIGTERM, signal.SIGINT):
+            previous_handlers[signum] = signal.signal(signum, request_stop)
     try:
-        return subprocess.run(
+        yield state
+    finally:
+        for signum, previous in previous_handlers.items():
+            signal.signal(signum, previous)
+
+
+def _run_bounded_command(
+    command: list[str],
+    timeout_seconds: float,
+    stop_state: _StopState | None = None,
+) -> subprocess.CompletedProcess[str]:
+    state = stop_state or _StopState()
+    if stop_state is None:
+        with _capture_stop_signals(state):
+            return _run_bounded_command(command, timeout_seconds, state)
+    try:
+        return _run_owned_command(
             command,
+            os.environ.copy(),
+            stop_state=state,
+            timeout_seconds=timeout_seconds,
             capture_output=True,
             text=True,
-            timeout=timeout_seconds,
-            check=False,
         )
     except subprocess.TimeoutExpired as error:
-        raise TimeoutError("期限付きの名前解決処理が制限時間を超えました") from error
+        raise TimeoutError("\u63a2\u7d22\u7528\u306e\u5b50\u30d7\u30ed\u30bb\u30b9\u304c\u898f\u5b9a\u6642\u9593\u3092\u8d85\u3048\u307e\u3057\u305f") from error
 
 
-def _resolve_with_deadline(resource_name: str) -> list[str]:
+def _resolve_with_deadline(resource_name: str, stop_state: _StopState | None = None) -> list[str]:
     command = [sys.executable, str(Path(__file__).resolve()), "--resolve-name-worker", resource_name]
-    result = _run_bounded_command(command, DNS_TIMEOUT_SECONDS)
+    result = _run_bounded_command(command, DNS_TIMEOUT_SECONDS, stop_state)
     if result.returncode != 0:
-        raise RuntimeError("資源名のIPv4解決用子プロセスが失敗しました")
+        raise RuntimeError("\u540d\u524d\u89e3\u6c7a\u7528\u306eIPv4\u5b50\u30d7\u30ed\u30bb\u30b9\u304c\u5931\u6557\u3057\u307e\u3057\u305f")
     try:
         addresses = json.loads(result.stdout)
     except json.JSONDecodeError as error:
-        raise RuntimeError("資源名のIPv4解決結果を読み取れません") from error
+        raise RuntimeError("\u540d\u524d\u89e3\u6c7a\u7528\u306eIPv4\u7d50\u679c\u3092\u8aad\u307f\u53d6\u308c\u307e\u305b\u3093") from error
     if not isinstance(addresses, list) or any(not isinstance(value, str) for value in addresses):
-        raise RuntimeError("資源名のIPv4解決結果の形式が不正です")
+        raise RuntimeError("\u540d\u524d\u89e3\u6c7a\u7528\u306eIPv4\u7d50\u679c\u306e\u5f62\u5f0f\u304c\u4e0d\u6b63\u3067\u3059")
     return addresses
 
 
@@ -82,13 +121,14 @@ def resolve_target_address(
     target: str,
     expected_resource: str,
     resolver: Callable[[str], list[str]] | None = None,
+    _stop_state: _StopState | None = None,
 ) -> str:
     if expected_resource not in RESOURCE_NAMES:
         raise ValueError("選択された宛先資源名が許可一覧にありません")
     if target in RESOURCE_NAMES:
         if target != expected_resource:
             raise ValueError("宛先資源名が現在のplanner選択と一致しません")
-        addresses = _resolve_with_deadline(target) if resolver is None else resolver(target)
+        addresses = _resolve_with_deadline(target, _stop_state) if resolver is None else resolver(target)
         unique = sorted(set(addresses))
         if len(unique) != 1 or not _is_unicast_ipv4(unique[0]):
             raise ValueError("選択資源のIPv4アドレスが一意でないか許可されていません")
@@ -102,32 +142,48 @@ def resolve_target_address(
 
 def patch_simulator_target(launch_bytes: bytes, address: str) -> bytes:
     if not _is_allowed_ipv4(address):
-        raise ValueError("起動ファイルへ反映するIPv4アドレスが許可されていません")
-    had_bom = launch_bytes.startswith(b"\xef\xbb\xbf")
-    text = launch_bytes.decode("utf-8-sig")
-    candidates: list[tuple[re.Match[str], ET.Element]] = []
-    for match in re.finditer(r"<let\b[^>]*?/?>", text, flags=re.DOTALL):
-        try:
-            element = ET.fromstring(match.group(0))
-        except ET.ParseError:
-            continue
-        if element.attrib.get("name") == "ibis_target_address" and element.attrib.get("if") == "$(var sim)":
-            candidates.append((match, element))
-    if len(candidates) != 1 or candidates[0][1].attrib.get("value") != EXPECTED_SIM_TARGET:
-        raise ValueError("sim=trueの宛先letが想定した形で一つだけ存在する必要があります")
+        raise ValueError("\u30af\u30e9\u30f3\u30d5\u30a1\u30a4\u30eb\u3078\u53cd\u6620\u3059\u308bIPv4\u30a2\u30c9\u30ec\u30b9\u304c\u8981\u6c42\u3055\u308c\u3066\u3044\u307e\u3059")
 
-    match, _ = candidates[0]
-    tag = match.group(0)
-    value_matches = list(re.finditer(r"(\bvalue\s*=\s*)(['\"])127\.0\.0\.1\2", tag))
+    # XML解析で実要素の位置を特定し、コメントを対象外にします。
+    candidates: list[tuple[int, int, dict[str, str]]] = []
+    parser = expat.ParserCreate()
+
+    def visit_element(name: str, attributes: dict[str, str]) -> None:
+        if name != "let" or attributes.get("name") != "ibis_target_address" or attributes.get("if") != "$(var sim)":
+            return
+        start = parser.CurrentByteIndex
+        quote: int | None = None
+        end = start
+        while end < len(launch_bytes):
+            current = launch_bytes[end]
+            if quote is not None:
+                if current == quote:
+                    quote = None
+            elif current in (ord('"'), ord("'")):
+                quote = current
+            elif current == ord(">"):
+                end += 1
+                break
+            end += 1
+        if end > len(launch_bytes) or launch_bytes[end - 1 : end] != b">":
+            raise ValueError("sim=true\u306e\u5b9f\u884clet\u958b\u59cb\u4f4d\u7f6e\u3092\u7279\u5b9a\u3067\u304d\u307e\u305b\u3093")
+        candidates.append((start, end, dict(attributes)))
+
+    parser.StartElementHandler = visit_element
+    parser.Parse(launch_bytes, True)
+    if len(candidates) != 1 or candidates[0][2].get("value") != EXPECTED_SIM_TARGET:
+        raise ValueError("sim=true\u306e\u5b9b\u5148let\u304c\u4e00\u610f\u3057\u305f\u5f62\u3067\u8a2d\u5b9a\u3055\u308c\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059")
+
+    start, end, _ = candidates[0]
+    tag = launch_bytes[start:end]
+    value_matches = list(re.finditer(rb"(\bvalue\s*=\s*)(['\"])127\.0\.0\.1\2", tag))
     if len(value_matches) != 1:
-        raise ValueError("宛先letのvalue属性が一意でありません")
+        raise ValueError("\u5b9b\u5148let\u306evalue\u304c\u4e00\u610f\u3057\u3066\u3044\u307e\u305b\u3093")
     value_match = value_matches[0]
-    replacement = value_match.group(1) + value_match.group(2) + address + value_match.group(2)
-    updated_tag = tag[: value_match.start()] + replacement + tag[value_match.end() :]
-    updated = text[: match.start()] + updated_tag + text[match.end() :]
+    replacement = value_match.group(1) + value_match.group(2) + address.encode("ascii") + value_match.group(2)
+    updated = launch_bytes[:start] + tag[:value_match.start()] + replacement + tag[value_match.end():] + launch_bytes[end:]
     ET.fromstring(updated)
-    encoded = updated.encode("utf-8")
-    return b"\xef\xbb\xbf" + encoded if had_bom else encoded
+    return updated
 
 
 def _link_original(source: Path, destination: Path) -> None:
@@ -175,6 +231,158 @@ def create_overlay(
         raise
 
 
+class OwnedChildNotReapedError(TimeoutError):
+    """\u6240\u6709\u5b50\u30d7\u30ed\u30bb\u30b9\u306e\u56de\u53ce\u304c\u671f\u9650\u5185\u306b\u5b8c\u4e86\u3057\u306a\u304b\u3063\u305f\u72b6\u614b\u3092\u793a\u3057\u307e\u3059\u3002"""
+
+
+OWNED_CHILD_STOP_SECONDS = 2.35
+OWNED_CHILD_FORCE_REAP_SECONDS = 0.4
+
+
+def _owned_process_group_exists(process_group_id: int) -> bool:
+    if os.name != "posix":
+        return False
+    try:
+        os.killpg(process_group_id, 0)
+        return True
+    except ProcessLookupError:
+        return False
+
+
+def _signal_owned_child(process: subprocess.Popen[object], signum: int) -> None:
+    try:
+        if os.name == "posix":
+            os.killpg(process.pid, signum)
+        elif process.poll() is None:
+            process.send_signal(signum)
+    except ProcessLookupError:
+        pass
+
+
+def _force_stop_owned_child(process: subprocess.Popen[object]) -> None:
+    try:
+        if os.name == "posix":
+            os.killpg(process.pid, signal.SIGKILL)
+        elif process.poll() is None:
+            process.kill()
+    except ProcessLookupError:
+        pass
+
+
+def _wait_owned_child(
+    process: subprocess.Popen[object], timeout: float, capture_output: bool
+) -> tuple[bool, tuple[object, object] | None]:
+    try:
+        if capture_output:
+            stdout, stderr = process.communicate(timeout=timeout)
+            return True, (stdout, stderr)
+        process.wait(timeout=timeout)
+        return True, None
+    except subprocess.TimeoutExpired:
+        return False, None
+
+
+def _wait_owned_tree(
+    process: subprocess.Popen[object], deadline: float, capture_output: bool
+) -> tuple[bool, tuple[object, object] | None]:
+    output: tuple[object, object] | None = None
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return False, output
+        if process.poll() is None or (capture_output and output is None):
+            complete, observed = _wait_owned_child(process, min(0.05, remaining), capture_output)
+            if complete:
+                output = observed
+        if process.poll() is not None and not _owned_process_group_exists(process.pid):
+            return True, output
+        time.sleep(min(0.02, max(0.0, deadline - time.monotonic())))
+
+
+def _stop_and_reap_owned_child(
+    process: subprocess.Popen[object], signum: int, capture_output: bool
+) -> tuple[object, object] | None:
+    _signal_owned_child(process, signum)
+    complete, output = _wait_owned_tree(
+        process, time.monotonic() + OWNED_CHILD_STOP_SECONDS, capture_output
+    )
+    if complete:
+        return output
+    _force_stop_owned_child(process)
+    complete, output = _wait_owned_tree(
+        process, time.monotonic() + OWNED_CHILD_FORCE_REAP_SECONDS, capture_output
+    )
+    if complete:
+        return output
+    raise OwnedChildNotReapedError(
+        f"\u6240\u6709\u5b50\u30d7\u30ed\u30bb\u30b9\u3092\u56de\u53ce\u3067\u304d\u307e\u305b\u3093 (pid={process.pid})"
+    )
+
+
+def _run_owned_command(
+    command: list[str],
+    environment: dict[str, str],
+    *,
+    stop_state: _StopState | None = None,
+    timeout_seconds: float | None = None,
+    capture_output: bool = False,
+    text: bool = False,
+) -> subprocess.CompletedProcess:
+    """\u6240\u6709\u3059\u308b\u5b50\u30d7\u30ed\u30bb\u30b9\u306b\u505c\u6b62\u3092\u8ee2\u9001\u3057\u3001\u6709\u754c\u306b\u56de\u53ce\u3057\u307e\u3059\u3002"""
+    state = stop_state or _StopState()
+    if stop_state is None:
+        with _capture_stop_signals(state):
+            return _run_owned_command(
+                command,
+                environment,
+                stop_state=state,
+                timeout_seconds=timeout_seconds,
+                capture_output=capture_output,
+                text=text,
+            )
+
+    creation_flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) if os.name == "nt" else 0
+    process: subprocess.Popen[object] | None = None
+    deadline = None if timeout_seconds is None else time.monotonic() + timeout_seconds
+    try:
+        process = subprocess.Popen(
+            command,
+            env=environment,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE if capture_output else None,
+            stderr=subprocess.PIPE if capture_output else None,
+            text=text,
+            start_new_session=os.name == "posix",
+            creationflags=creation_flags,
+            close_fds=True,
+        )
+        while True:
+            if state.requested.is_set():
+                output = _stop_and_reap_owned_child(
+                    process, state.signal_number or signal.SIGTERM, capture_output
+                )
+                return subprocess.CompletedProcess(command, process.returncode, *(output or (None, None)))
+            remaining = None if deadline is None else deadline - time.monotonic()
+            if remaining is not None and remaining <= 0:
+                output = _stop_and_reap_owned_child(process, signal.SIGTERM, capture_output)
+                raise subprocess.TimeoutExpired(
+                    command,
+                    timeout_seconds,
+                    output=None if output is None else output[0],
+                    stderr=None if output is None else output[1],
+                )
+            wait_seconds = 0.05 if remaining is None else min(0.05, remaining)
+            complete, output = _wait_owned_child(process, wait_seconds, capture_output)
+            if complete:
+                if _owned_process_group_exists(process.pid):
+                    output = _stop_and_reap_owned_child(process, signal.SIGTERM, capture_output)
+                return subprocess.CompletedProcess(command, process.returncode, *(output or (None, None)))
+    except BaseException:
+        if process is not None and process.poll() is None:
+            _stop_and_reap_owned_child(process, signal.SIGTERM, capture_output)
+        raise
+
+
 def run_with_overlay(
     target: str,
     expected_resource: str,
@@ -183,29 +391,47 @@ def run_with_overlay(
     environment: dict[str, str],
     package_share: Path,
     resolver: Callable[[str], list[str]] | None = None,
-    runner: Callable[..., object] = subprocess.run,
+    runner: Callable[..., object] | None = None,
     temporary_directory: str | None = None,
+    _command_factory: Callable[[list[str]], list[str]] | None = None,
 ) -> int:
-    address = resolve_target_address(target, expected_resource, resolver)
-    temporary, prefix = create_overlay(
-        package_share,
-        address,
-        temporary_directory=temporary_directory,
-    )
-    child_environment = environment.copy()
-    existing_prefix = child_environment.get("AMENT_PREFIX_PATH", "")
-    child_environment["AMENT_PREFIX_PATH"] = os.pathsep.join(
-        value for value in (str(prefix), existing_prefix) if value
-    )
-    try:
-        completed = runner(
-            ["ros2", "launch", "crane_bringup", "crane.launch.xml", *launch_arguments],
-            env=child_environment,
-            check=False,
+    stop_state = _StopState()
+    with _capture_stop_signals(stop_state):
+        address = resolve_target_address(target, expected_resource, resolver, stop_state)
+        if stop_state.requested.is_set():
+            return 128 + (stop_state.signal_number or signal.SIGTERM)
+        temporary, prefix = create_overlay(
+            package_share,
+            address,
+            temporary_directory=temporary_directory,
         )
-        return int(completed.returncode)
-    finally:
-        temporary.cleanup()
+        child_environment = environment.copy()
+        existing_prefix = child_environment.get("AMENT_PREFIX_PATH", "")
+        child_environment["AMENT_PREFIX_PATH"] = os.pathsep.join(
+            value for value in (str(prefix), existing_prefix) if value
+        )
+        release_overlay = True
+        try:
+            if stop_state.requested.is_set():
+                return 128 + (stop_state.signal_number or signal.SIGTERM)
+            command = ["ros2", "launch", "crane_bringup", "crane.launch.xml", *launch_arguments]
+            if runner is not None:
+                completed = runner(command, env=child_environment, check=False)
+                return int(completed.returncode)
+            if _command_factory is not None:
+                command = _command_factory(command)
+            completed = _run_owned_command(command, child_environment, stop_state=stop_state)
+            if stop_state.requested.is_set():
+                return 128 + (stop_state.signal_number or signal.SIGTERM)
+            return int(completed.returncode)
+        except OwnedChildNotReapedError:
+            # \u30d7\u30ed\u30bb\u30b9\u304c\u751f\u5b58\u3057\u3066\u3044\u308b\u9593\u306f\u3001\u305d\u306e\u5b50\u304c\u53c2\u7167\u3059\u308b\u4e00\u6642\u4fdd\u5b58\u5148\u3092\u6d88\u3057\u307e\u305b\u3093\u3002
+            release_overlay = False
+            temporary._finalizer.detach()
+            raise
+        finally:
+            if release_overlay:
+                temporary.cleanup()
 
 
 def main(arguments: list[str] | None = None) -> int:

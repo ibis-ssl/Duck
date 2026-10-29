@@ -1,8 +1,12 @@
 import importlib.util
+import signal
 import shutil
 import sys
+import threading
 import tempfile
+import time
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -85,6 +89,69 @@ class CraneLaunchOverlayTests(unittest.TestCase):
             with self.subTest(launch=value), self.assertRaises(ValueError):
                 overlay.patch_simulator_target(value, "192.0.2.31")
 
+    def test_runner_patches_real_paired_let_without_changing_comment_decoy(self):
+        (self.launch_directory / "crane.launch.xml").write_bytes(
+            b'<launch>\n'
+            b'  <!-- <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" /> -->\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)"></let>\n'
+            b'</launch>\n'
+        )
+        observed = {}
+
+        def runner(arguments, *, env, check):
+            observed["arguments"] = arguments
+            launch = next(
+                Path(part) / "share" / "crane_bringup" / "launch" / "crane.launch.xml"
+                for part in env["AMENT_PREFIX_PATH"].split(overlay.os.pathsep)
+                if (Path(part) / "share" / "crane_bringup" / "launch" / "crane.launch.xml").is_file()
+            ).read_bytes()
+            observed["launch"] = launch
+            observed["sim_value"] = ET.fromstring(launch).find("let").attrib["value"]
+            return SimpleNamespace(returncode=0)
+
+        result = overlay.run_with_overlay(
+            "cm4-sim",
+            "cm4-sim",
+            [],
+            environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+            package_share=self.package_share,
+            resolver=lambda name: ["192.0.2.52"],
+            runner=runner,
+            temporary_directory=str(self.root),
+        )
+
+        self.assertEqual(0, result)
+        self.assertEqual("192.0.2.52", observed["sim_value"])
+        self.assertIn(b'<!-- <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" /> -->', observed["launch"])
+
+    def test_runner_rejects_comment_decoy_when_real_paired_simulator_lets_are_ambiguous(self):
+        (self.launch_directory / "crane.launch.xml").write_bytes(
+            b'<launch>\n'
+            b'  <!-- <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" /> -->\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)"></let>\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)"></let>\n'
+            b'</launch>\n'
+        )
+        runner_calls = []
+
+        def runner(arguments, *, env, check):
+            runner_calls.append(arguments)
+            return SimpleNamespace(returncode=0)
+
+        with self.assertRaises(ValueError):
+            overlay.run_with_overlay(
+                "cm4-sim",
+                "cm4-sim",
+                [],
+                environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                package_share=self.package_share,
+                resolver=lambda name: ["192.0.2.53"],
+                runner=runner,
+                temporary_directory=str(self.root),
+            )
+
+        self.assertEqual([], runner_calls)
+
     def test_overlay_keeps_other_package_files_and_removes_only_its_temporary_prefix(self):
         original_launch = (self.launch_directory / "crane.launch.xml").read_bytes()
         temporary, prefix = overlay.create_overlay(
@@ -138,6 +205,166 @@ class CraneLaunchOverlayTests(unittest.TestCase):
         self.assertTrue(observed["environment"]["AMENT_PREFIX_PATH"].endswith(os_pathsep_join("/original/prefix")))
         self.assertIn(b'value="192.0.2.51" if="$(var sim)"', observed["overlay_launch"])
         self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    def test_owned_command_cleans_overlay_after_success_and_launch_failure(self):
+        observed_prefix = self.root / "owned-prefix.txt"
+        script = "from pathlib import Path; import os,sys; Path(sys.argv[1]).write_text(os.environ['AMENT_PREFIX_PATH'].split(os.pathsep)[0]); sys.exit(int(sys.argv[2]))"
+
+        def command_factory(exit_code):
+            return lambda _arguments: [sys.executable, "-c", script, str(observed_prefix), str(exit_code)]
+
+        for exit_code in (0, 17):
+            with self.subTest(exit_code=exit_code):
+                result = overlay.run_with_overlay(
+                    "cm4-sim",
+                    "cm4-sim",
+                    [],
+                    environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                    package_share=self.package_share,
+                    resolver=lambda name: ["192.0.2.61"],
+                    temporary_directory=str(self.root),
+                    _command_factory=command_factory(exit_code),
+                )
+                self.assertEqual(exit_code, result)
+                prefix = Path(observed_prefix.read_text(encoding="utf-8"))
+                self.assertFalse(prefix.exists())
+                observed_prefix.unlink()
+
+        with self.assertRaises(FileNotFoundError):
+            overlay.run_with_overlay(
+                "cm4-sim",
+                "cm4-sim",
+                [],
+                environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                package_share=self.package_share,
+                resolver=lambda name: ["192.0.2.61"],
+                temporary_directory=str(self.root),
+                _command_factory=lambda _arguments: [str(self.root / "missing-owned-child.exe")],
+            )
+        self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    def test_owned_command_forwards_stop_and_reaps_child_before_overlay_cleanup(self):
+        ready = self.root / "owned-child-ready"
+        stopped = self.root / "owned-child-stopped"
+        observed_prefix = self.root / "owned-child-prefix.txt"
+        script = (
+            "import os,signal,sys,time; from pathlib import Path; "
+            "Path(sys.argv[1]).write_text(os.environ['AMENT_PREFIX_PATH'].split(os.pathsep)[0]); "
+            "Path(sys.argv[2]).write_text('ready'); "
+            "signal.signal(signal.SIGTERM, lambda *_: (Path(sys.argv[3]).write_text('stopped'), sys.exit(0))); "
+            "time.sleep(10)"
+        )
+
+        def request_stop_after_child_starts():
+            deadline = time.monotonic() + 4
+            while time.monotonic() < deadline and not ready.exists():
+                time.sleep(0.01)
+            if ready.exists():
+                signal.raise_signal(signal.SIGTERM)
+
+        stop_sender = threading.Thread(target=request_stop_after_child_starts, daemon=True)
+        stop_sender.start()
+        result = overlay.run_with_overlay(
+            "cm4-sim",
+            "cm4-sim",
+            [],
+            environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+            package_share=self.package_share,
+            resolver=lambda name: ["192.0.2.62"],
+            temporary_directory=str(self.root),
+            _command_factory=lambda _arguments: [sys.executable, "-c", script, str(observed_prefix), str(ready), str(stopped)],
+        )
+        stop_sender.join(timeout=1)
+
+        self.assertIsInstance(result, int)
+        self.assertEqual(128 + signal.SIGTERM, result)
+        self.assertTrue(ready.exists())
+        if overlay.os.name == "posix":
+            self.assertTrue(stopped.exists())
+        prefix = Path(observed_prefix.read_text(encoding="utf-8"))
+        self.assertFalse(prefix.exists())
+        self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    @unittest.skipUnless(overlay.os.name == "posix", "POSIXのプロセスグループ信号伝達専用")
+    def test_owned_command_stops_only_its_process_group(self):
+        ready = self.root / "group-child-ready"
+        grandchild_ready = self.root / "group-grandchild-ready"
+        child_stopped = self.root / "group-child-stopped"
+        grandchild_stopped = self.root / "group-grandchild-stopped"
+        unrelated_release = self.root / "unrelated-release"
+        unrelated_stopped = self.root / "unrelated-stopped"
+        observed_prefix = self.root / "group-child-prefix.txt"
+        grandchild = (
+            "import signal,sys,time; from pathlib import Path; "
+            "Path(sys.argv[1]).write_text('ready'); "
+            "signal.signal(signal.SIGTERM, lambda *_: (Path(sys.argv[2]).write_text('stopped'), sys.exit(0))); "
+            "time.sleep(10)"
+        )
+        parent = (
+            "import os,signal,subprocess,sys,time\nfrom pathlib import Path\n"
+            "signal.signal(signal.SIGTERM, lambda *_: (Path(sys.argv[3]).write_text('stopped'), sys.exit(0)))\n"
+            "Path(sys.argv[6]).write_text(os.environ['AMENT_PREFIX_PATH'].split(os.pathsep)[0])\n"
+            "subprocess.Popen([sys.executable, '-c', sys.argv[1], sys.argv[4], sys.argv[5]], close_fds=True)\n"
+            "deadline=time.monotonic()+3\n"
+            "while time.monotonic()<deadline and not Path(sys.argv[4]).exists():\n time.sleep(.01)\n"
+            "Path(sys.argv[2]).write_text('ready')\ntime.sleep(10)\n"
+        )
+        unrelated = (
+            "import sys,time; from pathlib import Path; release,stopped=map(Path,sys.argv[1:]); "
+            "\nwhile not release.exists():\n time.sleep(.02)\n"
+            "stopped.write_text('stopped')"
+        )
+        unrelated_process = subprocess.Popen(
+            [sys.executable, "-c", unrelated, str(unrelated_release), str(unrelated_stopped)],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+        def request_stop_after_child_starts():
+            deadline = time.monotonic() + 4
+            while time.monotonic() < deadline and not ready.exists():
+                time.sleep(0.01)
+            if ready.exists():
+                signal.raise_signal(signal.SIGTERM)
+
+        stop_sender = threading.Thread(target=request_stop_after_child_starts, daemon=True)
+        stop_sender.start()
+        try:
+            result = overlay.run_with_overlay(
+                "cm4-sim",
+                "cm4-sim",
+                [],
+                environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                package_share=self.package_share,
+                resolver=lambda name: ["192.0.2.63"],
+                temporary_directory=str(self.root),
+                _command_factory=lambda _arguments: [
+                    sys.executable,
+                    "-c",
+                    parent,
+                    grandchild,
+                    str(ready),
+                    str(child_stopped),
+                    str(grandchild_ready),
+                    str(grandchild_stopped),
+                    str(observed_prefix),
+                ],
+            )
+            stop_sender.join(timeout=1)
+
+            self.assertEqual(128 + signal.SIGTERM, result)
+            self.assertTrue(child_stopped.exists())
+            self.assertTrue(grandchild_stopped.exists())
+            self.assertIsNone(unrelated_process.poll())
+        finally:
+            unrelated_release.write_text("release", encoding="utf-8")
+            unrelated_process.wait(timeout=3)
+
+        self.assertTrue(unrelated_stopped.exists())
+        prefix = Path(observed_prefix.read_text(encoding="utf-8")) if observed_prefix.exists() else None
+        if prefix is not None:
+            self.assertFalse(prefix.exists())
 
     def test_deadline_bounds_and_reaps_its_lookup_child(self):
         command = [sys.executable, "-c", "import sys,time; print('child-ready', flush=True); time.sleep(5)"]

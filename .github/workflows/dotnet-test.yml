@@ -31,6 +31,11 @@ jobs:
           dotnet-version: 10.0.x
           dotnet-quality: ga
 
+      - name: Run Crane launch overlay tests
+        id: crane_launch_overlay
+        shell: bash
+        run: python3 -B -m unittest discover -s scripts/tests -p 'test_crane_launch_overlay.py' -v
+
       - name: Run dotnet test
         id: dotnet_test
         shell: bash
