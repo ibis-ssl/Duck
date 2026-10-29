@@ -1328,9 +1328,14 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
         using var owner = await InspectJsonAsync(docker, currentOwnerId, cancellationToken).ConfigureAwait(false);
         using var follower = await InspectJsonAsync(docker, followerId, cancellationToken).ConfigureAwait(false);
-        var proof = NamespaceProbeBridgeNetworkVerifier.Verify(
+        var proof = NamespaceProbeBridgeNetworkVerifier.VerifyWithObservation(
             owner.RootElement.GetRawText(),
-            follower.RootElement.GetRawText());
+            follower.RootElement.GetRawText(),
+            (ownerSummary, followerSummary) => Record("follower.network-observation", new
+            {
+                owner = ownerSummary,
+                follower = followerSummary,
+            }));
         Record("follower.standard-network-verified", new
         {
             ownerContainerId = currentOwnerId,
