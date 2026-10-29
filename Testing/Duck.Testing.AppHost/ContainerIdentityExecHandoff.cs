@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.Diagnostics;
@@ -18,6 +19,18 @@ internal interface IDockerCommandRunner
         ResourceDiagnosticIdentity identity,
         string roleName,
         string? expectedBootId,
+        CancellationToken cancellationToken);
+}
+
+internal sealed record DockerStdioCommandResult(int ExitCode, string StandardOutput, string StandardError);
+
+internal interface IDockerStdioCommandRunner : IDockerCommandRunner
+{
+    Task<DockerStdioCommandResult> ExecuteWithStdioAsync(
+        IReadOnlyList<string> arguments,
+        string standardInput,
+        int maximumOutputCharacters,
+        TimeSpan timeout,
         CancellationToken cancellationToken);
 }
 
@@ -215,7 +228,7 @@ internal static class ContainerIdentityExecHandoff
 /// <summary>
 /// Docker CLIを構造化引数で起動し、メタデータ取得またはUDS中継を行います。
 /// </summary>
-internal sealed class DockerCliCommandRunner(string executablePath) : IDockerCommandRunner
+internal sealed class DockerCliCommandRunner(string executablePath) : IDockerStdioCommandRunner
 {
     /// <summary>
     /// 指定したメタデータコマンドを実行し、標準出力だけを呼出し元へ返します。
@@ -234,6 +247,65 @@ internal sealed class DockerCliCommandRunner(string executablePath) : IDockerCom
         }
 
         return output;
+    }
+
+    public async Task<DockerStdioCommandResult> ExecuteWithStdioAsync(
+        IReadOnlyList<string> arguments,
+        string standardInput,
+        int maximumOutputCharacters,
+        TimeSpan timeout,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+        ArgumentNullException.ThrowIfNull(standardInput);
+        if (maximumOutputCharacters <= 0) throw new ArgumentOutOfRangeException(nameof(maximumOutputCharacters));
+        if (timeout <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeout));
+
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(timeout);
+        using var process = Start(arguments, redirectInput: true);
+        var outputTask = ReadBoundedAsync(process.StandardOutput, maximumOutputCharacters, deadline.Token);
+        var errorTask = ReadBoundedAsync(process.StandardError, maximumOutputCharacters, deadline.Token);
+        try
+        {
+            await process.StandardInput.WriteAsync(standardInput.AsMemory(), deadline.Token);
+            await process.StandardInput.FlushAsync(deadline.Token);
+            process.StandardInput.Close();
+            await process.WaitForExitAsync(deadline.Token);
+            var output = await outputTask;
+            var error = await errorTask;
+            return new(process.ExitCode, output, error);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            TryKill(process);
+            throw new TimeoutException("Docker stdio command exceeded its deadline.");
+        }
+        catch
+        {
+            TryKill(process);
+            throw;
+        }
+    }
+
+    private static async Task<string> ReadBoundedAsync(
+        StreamReader reader,
+        int maximumCharacters,
+        CancellationToken cancellationToken)
+    {
+        var buffer = new char[1024];
+        var output = new StringBuilder(Math.Min(maximumCharacters, buffer.Length));
+        while (true)
+        {
+            var count = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
+            if (count == 0) return output.ToString();
+            if (output.Length + count > maximumCharacters)
+            {
+                throw new IOException("Docker stdio output exceeded its size limit.");
+            }
+
+            output.Append(buffer, 0, count);
+        }
     }
 
     /// <summary>
