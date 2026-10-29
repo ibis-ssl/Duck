@@ -383,7 +383,36 @@
     ],
     "final_report_sha256": "F0C6E75ECF12F929965907E7301CFCB13634CB2D2E6409A59E133B1B48C3ED4A",
     "initial_report_sha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
-    "initial_report_results": [],
+    "initial_report_results": [
+      {
+        "name": "textlint",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "whitelist",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 1,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "61678a2d32556f8087a2dae8b44a9bfdb864c21dd59fd95e552f378d0a15bda5"
+      },
+      {
+        "name": "cspell",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 1,
+        "stdoutSha256": "68582ea6b024a7c272f43a513bc03409d397c360560369757cc9a85f40759a24",
+        "stderrSha256": "c03d5fb5da6611a87f385f27e30f6da9ada78ba8abe292abb743da220b23e5d5"
+      },
+      {
+        "name": "yomiyasu",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 0,
+        "stdoutSha256": "057911fefc3a9e880bc0227e20c735b638d1a84295fc6c7a3630568fcc67230e",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
     "code_source_unchanged": true
   }
 }
