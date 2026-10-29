@@ -240,6 +240,186 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task NotificationMonitorRejectsAnUnexpectedOwnerGenerationBeforeTheFollowerRestartEvenWithinLimit()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var owner = builder.AddContainer("monitor-owner", "example/image").Resource;
+        var follower = builder.AddContainer("monitor-follower", "example/image").Resource;
+        var ownerInitialId = new string('a', 64);
+        var sequence = new[]
+        {
+            new OwnedResourceObservation(owner, "owner-initial", KnownResourceStates.Running, ownerInitialId),
+            new OwnedResourceObservation(follower, "follower-initial", KnownResourceStates.Running, new string('b', 64)),
+            new OwnedResourceObservation(owner, "owner-approved-restart", KnownResourceStates.Running, new string('c', 64)),
+            new OwnedResourceObservation(owner, "owner-unexpected-extra", KnownResourceStates.Running, new string('d', 64)),
+        };
+        var inner = new SequenceOwnedReconfigurationAdapter(sequence);
+        var gated = new GatedOwnedReconfigurationAdapter(inner, eventCount: sequence.Length);
+        await using var monitor = new NamespaceProbeNotificationMonitor(gated, plannedRecreationOrder: [owner, follower]);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+
+        await gated.WaitUntilQueuedAsync(0, timeout.Token);
+        gated.Continue();
+        await gated.WaitUntilQueuedAsync(1, timeout.Token);
+
+        var ownerRestartCalls = 0;
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+            owner,
+            KnownResourceCommands.RestartCommand,
+            _ =>
+            {
+                ownerRestartCalls++;
+                gated.Continue();
+                return Task.CompletedTask;
+            },
+            timeout.Token);
+        await gated.WaitUntilQueuedAsync(2, timeout.Token);
+        _ = await monitor.WaitForRunningAsync(owner, ownerInitialId, timeout.Token);
+        gated.Continue();
+        await gated.WaitUntilQueuedAsync(3, timeout.Token);
+
+        var followerRestartCalls = 0;
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+                follower,
+                KnownResourceCommands.StartCommand,
+                _ =>
+                {
+                    followerRestartCalls++;
+                    return Task.CompletedTask;
+                },
+                timeout.Token));
+
+        Assert.Equal(1, ownerRestartCalls);
+        Assert.Equal(4, monitor.ObservedGenerations.Select(observation => observation.ContainerId).Distinct().Count());
+        Assert.Equal(0, followerRestartCalls);
+    }
+
+    [Fact]
+    public async Task NotificationMonitorRejectsAnotherOwnerRestartAtThreePlannedGenerations()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var owner = builder.AddContainer("monitor-owner", "example/image").Resource;
+        var follower = builder.AddContainer("monitor-follower", "example/image").Resource;
+        var ownerInitialId = new string('a', 64);
+        var sequence = new[]
+        {
+            new OwnedResourceObservation(owner, "owner-initial", KnownResourceStates.Running, ownerInitialId),
+            new OwnedResourceObservation(follower, "follower-initial", KnownResourceStates.Running, new string('b', 64)),
+            new OwnedResourceObservation(owner, "owner-approved-restart", KnownResourceStates.Running, new string('c', 64)),
+        };
+        var inner = new SequenceOwnedReconfigurationAdapter(sequence);
+        var gated = new GatedOwnedReconfigurationAdapter(inner, eventCount: sequence.Length);
+        await using var monitor = new NamespaceProbeNotificationMonitor(gated, plannedRecreationOrder: [owner, follower]);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+
+        await gated.WaitUntilQueuedAsync(0, timeout.Token);
+        gated.Continue();
+        await gated.WaitUntilQueuedAsync(1, timeout.Token);
+
+        var ownerRestartCalls = 0;
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+            owner,
+            KnownResourceCommands.RestartCommand,
+            _ =>
+            {
+                ownerRestartCalls++;
+                gated.Continue();
+                return Task.CompletedTask;
+            },
+            timeout.Token);
+        await gated.WaitUntilQueuedAsync(2, timeout.Token);
+        _ = await monitor.WaitForRunningAsync(owner, ownerInitialId, timeout.Token);
+
+        var unexpectedOwnerRestartCalls = 0;
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+                owner,
+                KnownResourceCommands.RestartCommand,
+                _ =>
+                {
+                    unexpectedOwnerRestartCalls++;
+                    return Task.CompletedTask;
+                },
+                timeout.Token));
+
+        Assert.Equal(1, ownerRestartCalls);
+        Assert.Equal(3, monitor.ObservedGenerations.Select(observation => observation.ContainerId).Distinct().Count());
+        Assert.Equal(0, unexpectedOwnerRestartCalls);
+    }
+
+    [Fact]
+    public async Task NotificationMonitorAllowsThePlannedOwnerThenFollowerRecreationOrder()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var owner = builder.AddContainer("monitor-owner", "example/image").Resource;
+        var follower = builder.AddContainer("monitor-follower", "example/image").Resource;
+        var ownerInitialId = new string('a', 64);
+        var followerInitialId = new string('b', 64);
+        var ownerNextId = new string('c', 64);
+        var followerNextId = new string('d', 64);
+        var sequence = new[]
+        {
+            new OwnedResourceObservation(owner, "owner-initial", KnownResourceStates.Running, ownerInitialId),
+            new OwnedResourceObservation(follower, "follower-initial", KnownResourceStates.Running, followerInitialId),
+            new OwnedResourceObservation(owner, "owner-recreated", KnownResourceStates.Running, ownerNextId),
+            new OwnedResourceObservation(follower, "follower-recreated", KnownResourceStates.Running, followerNextId),
+        };
+        var inner = new SequenceOwnedReconfigurationAdapter(sequence);
+        var gated = new GatedOwnedReconfigurationAdapter(inner, eventCount: sequence.Length);
+        await using var monitor = new NamespaceProbeNotificationMonitor(gated, plannedRecreationOrder: [owner, follower]);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+
+        await gated.WaitUntilQueuedAsync(0, timeout.Token);
+        gated.Continue();
+        await gated.WaitUntilQueuedAsync(1, timeout.Token);
+
+        var followerStopCalls = 0;
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+            follower,
+            KnownResourceCommands.StopCommand,
+            _ =>
+            {
+                followerStopCalls++;
+                return Task.CompletedTask;
+            },
+            timeout.Token);
+
+        var ownerRestartCalls = 0;
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+            owner,
+            KnownResourceCommands.RestartCommand,
+            _ =>
+            {
+                ownerRestartCalls++;
+                gated.Continue();
+                return Task.CompletedTask;
+            },
+            timeout.Token);
+        _ = await monitor.WaitForRunningAsync(owner, ownerInitialId, timeout.Token);
+
+        var followerStartCalls = 0;
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+            follower,
+            KnownResourceCommands.StartCommand,
+            _ =>
+            {
+                followerStartCalls++;
+                gated.Continue();
+                return Task.CompletedTask;
+            },
+            timeout.Token);
+        _ = await monitor.WaitForRunningAsync(follower, followerInitialId, timeout.Token);
+
+        Assert.Contains(monitor.ObservedGenerations, observation => observation.ContainerId == ownerNextId);
+        Assert.Contains(monitor.ObservedGenerations, observation => observation.ContainerId == followerNextId);
+        Assert.Equal(4, monitor.ObservedGenerations.Select(observation => observation.ContainerId).Distinct().Count());
+        Assert.Equal(1, followerStopCalls);
+        Assert.Equal(1, ownerRestartCalls);
+        Assert.Equal(1, followerStartCalls);
+    }
+
+    [Fact]
     public async Task NotificationMonitorRecordsAllGenerationsAndBlocksAnotherCommandAfterTheFourGenerationLimit()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -660,7 +840,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                     resourceId = observation.ResourceId,
                     containerId = observation.ContainerId,
                     state = observation.State,
-                }));
+                }), [owner, follower]);
 
             Record("apphost.starting", new { resources = 2, dashboardDisabled = true });
             await application.StartAsync(cancellationToken).ConfigureAwait(false);
@@ -980,7 +1160,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         string command,
         CancellationToken cancellationToken)
     {
-        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(async token =>
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(resource, command, async token =>
         {
             var result = await commands.ExecuteCommandAsync(resource, command, token).ConfigureAwait(false);
             if (!result.Success)
@@ -1390,19 +1570,30 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
     private readonly CancellationTokenSource stop = new();
     private readonly IOwnedReconfigurationAdapter adapter;
     private readonly Action<OwnedResourceObservation>? observationRecorded;
+    private readonly IResource[]? plannedRecreationOrder;
     private readonly object generationGate = new();
     private readonly Dictionary<IResource, Dictionary<string, OwnedResourceObservation>> generations = [];
     private InvalidOperationException? generationLimitFailure;
+    private InvalidOperationException? generationPlanFailure;
+    private IResource? reservedRecreationResource;
+    private int nextPlannedRecreation;
     private readonly Channel<OwnedResourceObservation> observations = Channel.CreateUnbounded<OwnedResourceObservation>(
         new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
     private readonly Task pump;
 
     internal NamespaceProbeNotificationMonitor(
         IOwnedReconfigurationAdapter adapter,
-        Action<OwnedResourceObservation>? observationRecorded = null)
+        Action<OwnedResourceObservation>? observationRecorded = null,
+        IReadOnlyList<IResource>? plannedRecreationOrder = null)
     {
         this.adapter = adapter;
         this.observationRecorded = observationRecorded;
+        this.plannedRecreationOrder = plannedRecreationOrder?.ToArray();
+        if (this.plannedRecreationOrder is { Length: not 2 } ||
+            this.plannedRecreationOrder is { Length: 2 } plan && ReferenceEquals(plan[0], plan[1]))
+        {
+            throw new ArgumentException("The namespace probe plan requires one recreation for each distinct resource.", nameof(plannedRecreationOrder));
+        }
         pump = Task.Run(async () =>
         {
             try
@@ -1451,6 +1642,11 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
             {
                 throw generationLimitFailure;
             }
+
+            if (generationPlanFailure is not null)
+            {
+                throw generationPlanFailure;
+            }
         }
     }
 
@@ -1461,6 +1657,58 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
         EnsureWithinGenerationLimit();
         await execute(cancellationToken).ConfigureAwait(false);
         EnsureWithinGenerationLimit();
+    }
+
+    internal async Task ExecuteLifecycleCommandWithinGenerationLimitAsync(
+        IResource resource,
+        string commandName,
+        Func<CancellationToken, Task> execute,
+        CancellationToken cancellationToken)
+    {
+        EnsureWithinGenerationLimit();
+        if (plannedRecreationOrder is not null &&
+            (commandName == KnownResourceCommands.StartCommand || commandName == KnownResourceCommands.RestartCommand))
+        {
+            ReserveExpectedRecreation(resource);
+        }
+
+        await execute(cancellationToken).ConfigureAwait(false);
+        EnsureWithinGenerationLimit();
+    }
+
+    private void ReserveExpectedRecreation(IResource resource)
+    {
+        lock (generationGate)
+        {
+            if (generationLimitFailure is not null)
+            {
+                throw generationLimitFailure;
+            }
+
+            if (generationPlanFailure is not null)
+            {
+                throw generationPlanFailure;
+            }
+
+            if (plannedRecreationOrder is null ||
+                reservedRecreationResource is not null ||
+                nextPlannedRecreation >= plannedRecreationOrder.Length ||
+                !ReferenceEquals(plannedRecreationOrder[nextPlannedRecreation], resource))
+            {
+                generationPlanFailure ??= new InvalidOperationException(
+                    "The lifecycle command would recreate a resource outside the namespace probe's planned order.");
+                throw generationPlanFailure;
+            }
+
+            if (generations.Values.Sum(byId => byId.Count) >= 4)
+            {
+                generationLimitFailure ??= new InvalidOperationException(
+                    "The namespace probe has no remaining approved container-generation slot.");
+                throw generationLimitFailure;
+            }
+
+            reservedRecreationResource = resource;
+        }
     }
 
     private void RecordGeneration(OwnedResourceObservation observation)
@@ -1476,6 +1724,32 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
             {
                 byId = new Dictionary<string, OwnedResourceObservation>(StringComparer.OrdinalIgnoreCase);
                 generations.Add(observation.Resource, byId);
+            }
+
+            var isNewGeneration = !byId.ContainsKey(observation.ContainerId!);
+            if (isNewGeneration && plannedRecreationOrder is not null)
+            {
+                if (byId.Count == 0)
+                {
+                    if (reservedRecreationResource is not null)
+                    {
+                        generationPlanFailure ??= new InvalidOperationException(
+                            "An initial resource generation arrived while a different recreation was reserved.");
+                    }
+                }
+                else if (reservedRecreationResource is null ||
+                    !ReferenceEquals(reservedRecreationResource, observation.Resource) ||
+                    nextPlannedRecreation >= plannedRecreationOrder.Length ||
+                    !ReferenceEquals(plannedRecreationOrder[nextPlannedRecreation], observation.Resource))
+                {
+                    generationPlanFailure ??= new InvalidOperationException(
+                        "The namespace probe observed a container generation outside its reserved resource order.");
+                }
+                else
+                {
+                    reservedRecreationResource = null;
+                    nextPlannedRecreation++;
+                }
             }
 
             byId[observation.ContainerId!] = observation;
