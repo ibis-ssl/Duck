@@ -33,6 +33,15 @@ if (ownedReconfigurationEnabled && !IsEnabled(builder.Configuration["Testing:Ide
     throw new InvalidOperationException(
         "Testing:OwnedReconfiguration:Enabled requires Testing:IdentityControl:DesktopBridgeEnabled=true.");
 }
+if (ownedReconfigurationEnabled &&
+    (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]) ||
+     IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]) ||
+     IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]) ||
+     string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.OrdinalIgnoreCase)))
+{
+    throw new InvalidOperationException(
+        "Testing:OwnedReconfiguration:Enabled cannot be combined with another AppHost mode.");
+}
 
 if (IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]))
 {

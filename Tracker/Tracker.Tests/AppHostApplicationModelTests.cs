@@ -199,6 +199,29 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("ws://game-controller:8082/api/control", environment["RefereeDriver__GameControllerUri"].ToString());
     }
 
+    [Theory]
+    [InlineData("--Testing:RuntimeHostOnly=true")]
+    [InlineData("--Testing:VisionSimulationOnly=true")]
+    [InlineData("--Testing:DebugHost:ReplayOnly=true")]
+    [InlineData("--Testing:Mode=comparison")]
+    public async Task OwnedReconfigurationRejectsCompetingEarlyAppHostModes(string competingMode)
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [
+                    "--Testing:GameControllerVisionOnly=true",
+                    "--Testing:OwnedReconfiguration:Enabled=true",
+                    "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+                    "--Testing:IdentityControl:DockerContext=desktop-linux",
+                    "--Testing:IdentityControl:ExpectedEngineId=expected-engine",
+                    competingMode,
+                    CreateIsolatedOwnershipLockArgument(),
+                ]));
+
+        Assert.Contains("OwnedReconfiguration", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// ブリッジが未指定または明示的に無効なら、従来の健康待ちと識別情報サービス未登録を維持します。
     /// </summary>

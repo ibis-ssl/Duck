@@ -225,21 +225,78 @@ internal sealed class AspireOwnedReconfigurationAdapter(
     IDockerCommandRunner dockerRunner,
     string dockerContext) : IOwnedReconfigurationAdapter
 {
+    private readonly object resourceKeyLock = new();
+    private readonly Dictionary<IResource, ResourceKeyState> resourceKeys = new(ReferenceEqualityComparer.Instance);
+
     public OwnedResourceObservation? GetCurrent(IResource resource)
     {
         ArgumentNullException.ThrowIfNull(resource);
-        return notifications.TryGetCurrentState(resource.Name, out var current) &&
-            ReferenceEquals(current.Resource, resource)
-                ? OwnedResourceObservationProjection.TryProject(current)
-                : null;
+        string? resourceId;
+        lock (resourceKeyLock)
+        {
+            if (resourceKeys.TryGetValue(resource, out var keyState))
+            {
+                if (keyState.Ambiguous || keyState.CurrentId is null)
+                {
+                    return null;
+                }
+
+                resourceId = keyState.CurrentId;
+            }
+            else
+            {
+                resourceId = null;
+            }
+        }
+
+        if (resourceId is not null)
+        {
+            return GetCurrent(resourceId, resource);
+        }
+
+        if (!notifications.TryGetCurrentState(resource.Name, out var current) || !ReferenceEquals(current.Resource, resource))
+        {
+            return null;
+        }
+
+        var projected = OwnedResourceObservationProjection.TryProject(current);
+        if (projected is null)
+        {
+            return null;
+        }
+
+        lock (resourceKeyLock)
+        {
+            if (!resourceKeys.TryGetValue(resource, out var keyState))
+            {
+                resourceKeys.Add(resource, new ResourceKeyState(projected.ResourceId));
+            }
+            else if (!string.Equals(keyState.CurrentId, projected.ResourceId, StringComparison.Ordinal))
+            {
+                return null;
+            }
+        }
+
+        return projected;
     }
 
     public OwnedResourceObservation? GetCurrent(string resourceId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(resourceId);
-        return notifications.TryGetCurrentState(resourceId, out var current)
-            ? OwnedResourceObservationProjection.TryProject(current)
-            : null;
+        if (!notifications.TryGetCurrentState(resourceId, out var current))
+        {
+            return null;
+        }
+
+        lock (resourceKeyLock)
+        {
+            if (resourceKeys.TryGetValue(current.Resource, out var keyState) && keyState.RetiredIds.Contains(resourceId))
+            {
+                return null;
+            }
+        }
+
+        return OwnedResourceObservationProjection.TryProject(current);
     }
 
     public async IAsyncEnumerable<OwnedResourceObservation> WatchAsync(
@@ -248,11 +305,96 @@ internal sealed class AspireOwnedReconfigurationAdapter(
         await foreach (var observation in notifications.WatchAsync(cancellationToken).ConfigureAwait(false))
         {
             var projected = OwnedResourceObservationProjection.TryProject(observation);
-            if (projected is not null)
+            if (projected is not null && IsExactCurrent(projected) && TrackResourceKey(projected))
             {
                 yield return projected;
             }
         }
+    }
+
+    private OwnedResourceObservation? GetCurrent(string resourceId, IResource resource)
+    {
+        var current = GetCurrent(resourceId);
+        return current is not null && ReferenceEquals(current.Resource, resource) ? current : null;
+    }
+
+    private bool IsExactCurrent(OwnedResourceObservation observation)
+    {
+        var current = GetCurrent(observation.ResourceId);
+        return current is not null && ReferenceEquals(current.Resource, observation.Resource) &&
+            current.ResourceId == observation.ResourceId && current.State == observation.State &&
+            current.ContainerId == observation.ContainerId;
+    }
+
+    private bool TrackResourceKey(OwnedResourceObservation observation)
+    {
+        lock (resourceKeyLock)
+        {
+            if (!resourceKeys.TryGetValue(observation.Resource, out var keyState))
+            {
+                resourceKeys.Add(observation.Resource, new ResourceKeyState(observation.ResourceId));
+                return true;
+            }
+
+            if (keyState.RetiredIds.Contains(observation.ResourceId))
+            {
+                return false;
+            }
+
+            if (string.Equals(keyState.CurrentId, observation.ResourceId, StringComparison.Ordinal))
+            {
+                if (observation.IsStopped && keyState.PendingIds.Count > 0)
+                {
+                    if (keyState.PendingIds.Count == 1)
+                    {
+                        keyState.RetiredIds.Add(observation.ResourceId);
+                        keyState.CurrentId = keyState.PendingIds.Single();
+                        keyState.PendingIds.Clear();
+                        keyState.Ambiguous = false;
+                    }
+                    else
+                    {
+                        keyState.RetiredIds.Add(observation.ResourceId);
+                        keyState.CurrentId = null;
+                        keyState.Ambiguous = true;
+                    }
+                }
+
+                return true;
+            }
+
+            if (keyState.Ambiguous && keyState.CurrentId is null)
+            {
+                keyState.PendingIds.Add(observation.ResourceId);
+                return true;
+            }
+
+            var current = keyState.CurrentId is null ? null : GetCurrent(keyState.CurrentId, observation.Resource);
+            if (current is null || current.IsStopped)
+            {
+                if (keyState.CurrentId is not null)
+                {
+                    keyState.RetiredIds.Add(keyState.CurrentId);
+                }
+
+                keyState.CurrentId = observation.ResourceId;
+                keyState.PendingIds.Clear();
+                keyState.Ambiguous = false;
+                return true;
+            }
+
+            keyState.PendingIds.Add(observation.ResourceId);
+            keyState.Ambiguous = true;
+            return true;
+        }
+    }
+
+    private sealed class ResourceKeyState(string currentId)
+    {
+        public string? CurrentId { get; set; } = currentId;
+        public HashSet<string> RetiredIds { get; } = new(StringComparer.Ordinal);
+        public HashSet<string> PendingIds { get; } = new(StringComparer.Ordinal);
+        public bool Ambiguous { get; set; }
     }
 
     public async Task<bool> ExecuteLifecycleCommandAsync(
@@ -293,9 +435,12 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
     internal async Task HandleUnexpectedSourceObservationAsync(OwnedResourceObservation observation)
     {
         var current = adapter.GetCurrent(gameController);
-        if (!ReferenceEquals(observation.Resource, gameController) ||
-            !string.Equals(observation.ResourceId, gameController.Name, StringComparison.Ordinal) ||
-            current is null || current.ContainerId != observation.ContainerId || current.State != observation.State ||
+        var exact = adapter.GetCurrent(observation.ResourceId);
+        if (!ReferenceEquals(observation.Resource, gameController) || exact is null ||
+            !ReferenceEquals(exact.Resource, gameController) || exact.ResourceId != observation.ResourceId ||
+            exact.ContainerId != observation.ContainerId || exact.State != observation.State ||
+            current is not null && (current.ResourceId != observation.ResourceId ||
+                current.ContainerId != observation.ContainerId || current.State != observation.State) ||
             !endpointState.SuspendForSourceObservation(observation))
         {
             return;
@@ -398,7 +543,8 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
 
             operationToken.ThrowIfCancellationRequested();
             if (!StillCurrent(source, gameController) || !await IsOwnedAsync(
-                    source.ContainerId!, GameControllerRole, requireRunning: true, operationToken).ConfigureAwait(false))
+                    source.ContainerId!, GameControllerRole, requireRunning: true, operationToken).ConfigureAwait(false) ||
+                !StillCurrent(source, gameController))
             {
                 return await FailAfterMutationAsync(generation, "再起動前に Game Controller の世代または所有者が変わりました。").ConfigureAwait(false);
             }
@@ -449,7 +595,6 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
             var dependentBeforeStart = adapter.GetCurrent(refereeDriver);
             var dependentBeforeStartOwned = dependentBeforeStart is not null &&
                 ReferenceEquals(dependentBeforeStart.Resource, refereeDriver) &&
-                string.Equals(dependentBeforeStart.ResourceId, refereeDriver.Name, StringComparison.Ordinal) &&
                 dependentBeforeStart.IsStopped &&
                 (dependentBeforeStart.ContainerId is null ||
                  OwnedContainerInspection.IsFullId(dependentBeforeStart.ContainerId) &&
@@ -459,7 +604,10 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
                      RefereeDriverRole,
                      requireRunning: dependentBeforeStart.IsRunningOrStarting,
                      operationToken).ConfigureAwait(false));
-            if (!dependentBeforeStartOwned || !SameObservation(adapter.GetCurrent(refereeDriver), dependentBeforeStart!, refereeDriver))
+            if (!dependentBeforeStartOwned ||
+                !SameObservation(adapter.GetCurrent(refereeDriver), dependentBeforeStart!, refereeDriver) ||
+                !endpointState.IsActive(generation, restartedSource.ContainerId!) ||
+                !CurrentMatches(gameController, restartedSource))
             {
                 return await FailAfterMutationAsync(generation, "RefereeDriver の所有者を再作成前に確認できません。").ConfigureAwait(false);
             }
@@ -586,11 +734,11 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
             await foreach (var observation in adapter.WatchAsync(timeoutSource.Token).ConfigureAwait(false))
             {
                 if (ReferenceEquals(observation.Resource, resource) &&
-                    string.Equals(observation.ResourceId, resource.Name, StringComparison.Ordinal) &&
                     predicate(observation))
                 {
                     var latest = adapter.GetCurrent(resource);
-                    if (latest is not null && latest.ContainerId == observation.ContainerId && predicate(latest))
+                    if (latest is not null && latest.ResourceId == observation.ResourceId &&
+                        latest.ContainerId == observation.ContainerId && latest.State == observation.State && predicate(latest))
                     {
                         return latest;
                     }
@@ -610,18 +758,17 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
     private bool CurrentMatches(IResource resource, OwnedResourceObservation expected)
     {
         var current = adapter.GetCurrent(resource);
-        return IsCurrent(current, resource) && current!.ContainerId == expected.ContainerId && current.State == expected.State;
+        return IsCurrent(current, resource) && current!.ResourceId == expected.ResourceId &&
+            current.ContainerId == expected.ContainerId && current.State == expected.State;
     }
 
     private static bool SameObservation(OwnedResourceObservation? current, OwnedResourceObservation expected, IResource resource) =>
         current is not null && ReferenceEquals(current.Resource, resource) &&
-        string.Equals(current.ResourceId, resource.Name, StringComparison.Ordinal) &&
-        current.ContainerId == expected.ContainerId && current.State == expected.State;
+        current.ResourceId == expected.ResourceId && current.ContainerId == expected.ContainerId && current.State == expected.State;
 
     private static bool IsCurrent(OwnedResourceObservation? observation, IResource resource) =>
         observation is not null && ReferenceEquals(observation.Resource, resource) &&
-        string.Equals(observation.ResourceId, resource.Name, StringComparison.Ordinal) &&
-        OwnedContainerInspection.IsFullId(observation.ContainerId);
+        !string.IsNullOrWhiteSpace(observation.ResourceId) && OwnedContainerInspection.IsFullId(observation.ContainerId);
 
     private async Task<OwnedReconfigurationResult> FailAfterMutationAsync(
         long generation,
@@ -631,10 +778,10 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
         bool canceled = false)
     {
         endpointState.Suspend(generation);
-        var dependentStopped = await BestEffortStopOwnedRefereeAsync().ConfigureAwait(false);
+        await BestEffortStopOwnedRefereeAsync().ConfigureAwait(false);
         if (possibleLateStart is not null)
         {
-            lateStartCleanup = ObserveLateDependentAsync(possibleLateStart, runningWasObserved || dependentStopped);
+            lateStartCleanup = ObserveLateDependentAsync(possibleLateStart, runningWasObserved);
         }
         return new OwnedReconfigurationResult(false, message, message, Canceled: canceled);
     }
@@ -664,7 +811,7 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
             {
                 var current = adapter.GetCurrent(refereeDriver);
                 if (current is not null && ReferenceEquals(current.Resource, refereeDriver) &&
-                    current.ResourceId == refereeDriver.Name && current.IsRunningOrStarting &&
+                    current.IsRunningOrStarting &&
                     OwnedContainerInspection.IsFullId(current.ContainerId))
                 {
                     if (!await IsOwnedAsync(current.ContainerId!, RefereeDriverRole, requireRunning: true, timeoutSource.Token).ConfigureAwait(false) ||
@@ -713,7 +860,7 @@ internal sealed class OwnedRefereeReconfigurationCoordinator(
         {
             var current = adapter.GetCurrent(refereeDriver);
             if (current is null || !ReferenceEquals(current.Resource, refereeDriver) ||
-                !string.Equals(current.ResourceId, refereeDriver.Name, StringComparison.Ordinal))
+                string.IsNullOrWhiteSpace(current.ResourceId))
             {
                 return false;
             }
@@ -765,7 +912,7 @@ internal sealed class OwnedSourceGenerationMonitor(
             await foreach (var observation in adapter.WatchAsync(stoppingToken).ConfigureAwait(false))
             {
                 if (ReferenceEquals(observation.Resource, gameController) &&
-                    string.Equals(observation.ResourceId, gameController.Name, StringComparison.Ordinal))
+                    !string.IsNullOrWhiteSpace(observation.ResourceId))
                 {
                     await coordinator.HandleUnexpectedSourceObservationAsync(observation).ConfigureAwait(false);
                 }
