@@ -292,6 +292,7 @@ internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
     private readonly string executablePath;
     private readonly IDockerCliChildProcessFactory childProcessFactory;
     private readonly object processLock = new();
+    private readonly SemaphoreSlim boundedCommandGate = new(1, 1);
     private IDockerCliChildProcess? unreapedChildProcess;
     private Exception? unreapedChildFailure;
 
@@ -337,6 +338,8 @@ internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
         var timer = Stopwatch.StartNew();
         using var operationDeadline = new CancellationTokenSource(GetOperationWindow(timeout));
         using var operationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, operationDeadline.Token);
+        using var commandSlot = await AcquireBoundedCommandSlotAsync(
+            operationSource.Token, cancellationToken).ConfigureAwait(false);
         var process = StartChildProcess(CreateStartInfo(arguments, redirectInput: true));
         var outputTask = ReadBoundedAsync(process.StandardOutput, maximumOutputCharacters, operationSource.Token);
         var errorTask = ReadBoundedAsync(process.StandardError, maximumOutputCharacters, operationSource.Token);
@@ -400,6 +403,8 @@ internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
         var timer = Stopwatch.StartNew();
         using var operationDeadline = new CancellationTokenSource(GetOperationWindow(timeout));
         using var operationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, operationDeadline.Token);
+        using var commandSlot = await AcquireBoundedCommandSlotAsync(
+            operationSource.Token, cancellationToken).ConfigureAwait(false);
         var process = StartChildProcess(CreateStartInfo(arguments, redirectInput: false));
         var outputTask = ReadBoundedAsync(process.StandardOutput, maximumOutputCharacters, operationSource.Token);
         var errorTask = ReadBoundedAsync(process.StandardError, maximumOutputCharacters, operationSource.Token);
@@ -466,6 +471,35 @@ internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
         var cleanupReserve = TimeSpan.FromMilliseconds(Math.Min(250, Math.Max(1, totalBudget.TotalMilliseconds / 4)));
         var operationWindow = totalBudget - cleanupReserve;
         return operationWindow > TimeSpan.Zero ? operationWindow : TimeSpan.FromTicks(1);
+    }
+
+    private async Task<IDisposable> AcquireBoundedCommandSlotAsync(
+        CancellationToken operationToken,
+        CancellationToken callerToken)
+    {
+        try
+        {
+            await boundedCommandGate.WaitAsync(operationToken).ConfigureAwait(false);
+            return new BoundedCommandSlot(boundedCommandGate);
+        }
+        catch (OperationCanceledException exception) when (callerToken.IsCancellationRequested)
+        {
+            throw new OperationCanceledException(
+                "Docker command was canceled while waiting for the shared command slot.",
+                exception,
+                callerToken);
+        }
+        catch (OperationCanceledException exception)
+        {
+            throw new TimeoutException(
+                "Docker command exceeded its deadline while waiting for the shared command slot.",
+                exception);
+        }
+    }
+
+    private sealed class BoundedCommandSlot(SemaphoreSlim gate) : IDisposable
+    {
+        public void Dispose() => gate.Release();
     }
 
     private static async Task RecoverProcessAsync(

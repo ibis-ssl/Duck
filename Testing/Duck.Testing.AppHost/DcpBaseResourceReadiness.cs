@@ -819,6 +819,17 @@ internal sealed class DcpBaseCraneReadinessProbe(
                 MaximumOutputCharacters,
                 ProbeBudget,
                 budget.Token).ConfigureAwait(false);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The Crane readiness check was canceled; service readiness is unverified.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The bounded Crane readiness probe expired.");
+                return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+            }
+
             var outcome = CraneProbeDiagnostics.Evaluate(
                 result.ExitCode, result.StandardOutput, result.StandardError, timer.Elapsed);
             if (!outcome.Ready)
@@ -828,10 +839,34 @@ internal sealed class DcpBaseCraneReadinessProbe(
             }
 
             var current = GetCurrentCandidate();
-            if (current is null || !SameIdentity(candidate, current) || !IsOwnedRunning(current) ||
-                !registry.SetCraneServiceReadiness(candidate, true, "The current owned Crane container passed its ROS coordinator and team diagnostic."))
+            if (current is null || !SameIdentity(candidate, current) || !IsOwnedRunning(current))
             {
                 return HealthCheckResult.Unhealthy("The Crane identity or generation changed while its ROS diagnostic was running.");
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The Crane readiness check was canceled; service readiness is unverified.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The bounded Crane readiness probe expired.");
+                return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+            }
+            if (!registry.SetCraneServiceReadiness(candidate, true, "The current owned Crane container passed its ROS coordinator and team diagnostic."))
+            {
+                return HealthCheckResult.Unhealthy("The Crane identity or generation changed while its ROS diagnostic was running.");
+            }
+            if (cancellationToken.IsCancellationRequested)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The Crane readiness check was canceled; service readiness is unverified.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                registry.SetCraneServiceReadiness(candidate, false, "The bounded Crane readiness probe expired.");
+                return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
             }
 
             return HealthCheckResult.Healthy("The current owned Crane container passed its ROS coordinator and team diagnostic.");

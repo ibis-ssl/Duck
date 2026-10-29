@@ -126,6 +126,65 @@ public sealed class DockerCliCommandRunnerProcessTests
         Assert.Equal(2, factory.StartCalls);
     }
 
+    [Fact]
+    public async Task ConcurrentRecoveryPreventsStartingAnotherChildUntilReaped()
+    {
+        var firstChild = new ControlledChildProcess(
+            standardOutput: new string('x', 100),
+            exitWhenKilled: false);
+        var secondChild = new ControlledChildProcess(
+            standardOutput: new string('y', 100),
+            exitWhenKilled: false);
+        var nextChild = new ControlledChildProcess(standardOutput: "metadata", alreadyExited: true);
+        var factory = new RoutingControlledChildProcessFactory(new Dictionary<string, ControlledChildProcess>
+        {
+            ["first-container"] = firstChild,
+            ["second-container"] = secondChild,
+            ["next-container"] = nextChild,
+        });
+        var runner = new DockerCliCommandRunner("controlled-docker", factory);
+
+        var first = runner.CaptureBoundedAsync(
+            ["inspect", "first-container"],
+            16,
+            TimeSpan.FromMilliseconds(450),
+            CancellationToken.None);
+        await firstChild.KillObserved.Task.WaitAsync(TimeSpan.FromSeconds(1));
+
+        var second = runner.CaptureBoundedAsync(
+            ["inspect", "second-container"],
+            16,
+            TimeSpan.FromMilliseconds(160),
+            CancellationToken.None);
+        await Assert.ThrowsAsync<TimeoutException>(() => second);
+        await Assert.ThrowsAsync<DockerCliProcessRecoveryException>(() => first);
+
+        Assert.Equal(1, factory.StartCalls);
+        Assert.False(firstChild.HasExited);
+        Assert.Equal(0, secondChild.KillCalls);
+
+        var blockedWhileFirstUnreaped = await Assert.ThrowsAsync<DockerCliProcessRecoveryException>(() =>
+            runner.CaptureBoundedAsync(
+                ["inspect", "next-container"],
+                16,
+                TimeSpan.FromSeconds(1),
+                CancellationToken.None));
+
+        Assert.Contains("previous Docker CLI process", blockedWhileFirstUnreaped.Message, StringComparison.Ordinal);
+        Assert.Equal(1, factory.StartCalls);
+
+        firstChild.CompleteExit();
+        var nextResult = await runner.CaptureBoundedAsync(
+            ["inspect", "next-container"],
+            16,
+            TimeSpan.FromSeconds(1),
+            CancellationToken.None);
+
+        Assert.Equal(0, nextResult.ExitCode);
+        Assert.Equal("metadata", nextResult.StandardOutput);
+        Assert.Equal(2, factory.StartCalls);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -170,6 +229,20 @@ public sealed class DockerCliCommandRunnerProcessTests
         }
     }
 
+    private sealed class RoutingControlledChildProcessFactory(
+        IReadOnlyDictionary<string, ControlledChildProcess> children) : IDockerCliChildProcessFactory
+    {
+        public int StartCalls { get; private set; }
+
+        public IDockerCliChildProcess Start(ProcessStartInfo startInfo)
+        {
+            StartCalls++;
+            Assert.Equal("controlled-docker", startInfo.FileName);
+            Assert.False(startInfo.UseShellExecute);
+            return children[startInfo.ArgumentList.Last()];
+        }
+    }
+
     private sealed class ControlledChildProcess(
         string standardOutput = "",
         string standardError = "",
@@ -188,6 +261,7 @@ public sealed class DockerCliCommandRunnerProcessTests
         public int ExitCode => 0;
         public int KillCalls { get; private set; }
         public int WaitCallsAfterKill { get; private set; }
+        public TaskCompletionSource KillObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Task WaitForExitAsync(CancellationToken cancellationToken)
         {
@@ -204,6 +278,7 @@ public sealed class DockerCliCommandRunnerProcessTests
         public void KillEntireProcessTree()
         {
             KillCalls++;
+            KillObserved.TrySetResult();
             if (!exitWhenKilled) return;
             exited.TrySetResult();
         }

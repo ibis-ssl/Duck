@@ -61,6 +61,49 @@ public sealed class DcpBaseCraneReadinessProbeTests
     }
 
     [Fact]
+    public async Task CancellationAfterCommandCompletionCannotPublishReady()
+    {
+        var fixture = new Fixture();
+        Assert.Equal(HealthStatus.Healthy, (await fixture.CheckAsync()).Status);
+
+        var response = new TaskCompletionSource<DockerStdioCommandResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        fixture.Runner.ResponseTask = response.Task;
+        using var cancellation = new CancellationTokenSource();
+        var check = fixture.CheckAsync(cancellation.Token);
+        await fixture.Runner.CaptureStarted.Task.WaitAsync(TimeSpan.FromSeconds(1));
+
+        response.SetResult(new(
+            0,
+            "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n",
+            string.Empty));
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => check);
+        Assert.False(fixture.Registry.Get(fixture.Crane)!.IsReady);
+    }
+
+    [Fact]
+    public async Task SuccessfulCommandCompletedAfterProbeBudgetCannotPublishReady()
+    {
+        var fixture = new Fixture();
+        var response = new TaskCompletionSource<DockerStdioCommandResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        fixture.Runner.ResponseTask = response.Task;
+
+        var check = fixture.CheckAsync();
+        await fixture.Runner.CaptureStarted.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        await Task.Delay(TimeSpan.FromSeconds(12.2));
+        response.SetResult(new(
+            0,
+            "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n",
+            string.Empty));
+
+        var result = await check.WaitAsync(TimeSpan.FromSeconds(2));
+
+        Assert.Equal(HealthStatus.Unhealthy, result.Status);
+        Assert.False(fixture.Registry.Get(fixture.Crane)!.IsReady);
+    }
+
+    [Fact]
     public async Task MissingOwnershipDoesNotInvokeCraneExec()
     {
         var fixture = new Fixture(markOwned: false);
@@ -108,6 +151,8 @@ public sealed class DcpBaseCraneReadinessProbeTests
         internal List<IReadOnlyList<string>> Calls { get; } = [];
         internal int ExitCode { get; set; }
         internal Action? BeforeResponse { get; set; }
+        internal Task<DockerStdioCommandResult>? ResponseTask { get; set; }
+        internal TaskCompletionSource CaptureStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Task<DockerStdioCommandResult> CaptureBoundedAsync(
             IReadOnlyList<string> arguments,
@@ -117,7 +162,9 @@ public sealed class DcpBaseCraneReadinessProbeTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             Calls.Add(arguments.ToArray());
+            CaptureStarted.TrySetResult();
             BeforeResponse?.Invoke();
+            if (ResponseTask is not null) return ResponseTask;
             if (cancellationToken.IsCancellationRequested)
             {
                 throw new OperationCanceledException(cancellationToken);
