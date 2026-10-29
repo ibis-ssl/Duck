@@ -74,6 +74,41 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ReaderJoinUsesNoBudgetAfterCleanupConsumesProbeDeadline()
+    {
+        var remainingCapturedAtCleanupStart = NamespaceProbeCleanupBudget.Remaining(TimeSpan.FromSeconds(59.75));
+        Assert.Equal(TimeSpan.FromMilliseconds(250), remainingCapturedAtCleanupStart);
+
+        var remainingAtReaderJoin = NamespaceProbeCleanupBudget.Remaining(TimeSpan.FromSeconds(60));
+        var maximumWait = NamespaceProbeResourceLogCapture.GetStopWait(
+            remainingCapturedAtCleanupStart,
+            remainingAtReaderJoin);
+
+        Assert.Equal(TimeSpan.Zero, remainingAtReaderJoin);
+        Assert.Equal(TimeSpan.Zero, maximumWait);
+    }
+
+    [Theory]
+    [InlineData(250, 0, 0)]
+    [InlineData(250, 50, 50)]
+    [InlineData(250, 250, 250)]
+    [InlineData(500, 500, 250)]
+    [InlineData(50, 100, 50)]
+    [InlineData(-1, 50, 0)]
+    [InlineData(50, -1, 0)]
+    public void ReaderJoinWaitUsesTightestBudgetAnd250MillisecondCap(
+        double capturedMilliseconds,
+        double currentMilliseconds,
+        double expectedMilliseconds)
+    {
+        var wait = NamespaceProbeResourceLogCapture.GetStopWait(
+            TimeSpan.FromMilliseconds(capturedMilliseconds),
+            TimeSpan.FromMilliseconds(currentMilliseconds));
+
+        Assert.Equal(TimeSpan.FromMilliseconds(expectedMilliseconds), wait);
+    }
+
+    [Fact]
     public async Task ReadOnlyPreflightRejectsAnEffectiveEngineMismatchBeforeInspectingImagesOrContainers()
     {
         var docker = new FakeReadOnlyDockerCli(
@@ -1199,9 +1234,9 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             {
                 try
                 {
-                    var maxWait = remaining > TimeSpan.Zero
-                        ? TimeSpan.FromMilliseconds(Math.Min(remaining.TotalMilliseconds, 250))
-                        : TimeSpan.Zero;
+                    var maxWait = NamespaceProbeResourceLogCapture.GetStopWait(
+                        remaining,
+                        NamespaceProbeCleanupBudget.Remaining(stopwatch.Elapsed));
                     if (await NamespaceProbeResourceLogCapture.TryStopAsync(
                         resourceLogCaptureStop,
                         resourceLogCaptureTasks,
@@ -1561,6 +1596,19 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
     private static class NamespaceProbeResourceLogCapture
     {
+        internal static TimeSpan GetStopWait(TimeSpan remainingAtCleanupStart, TimeSpan remainingAtReaderJoin)
+        {
+            if (remainingAtCleanupStart <= TimeSpan.Zero || remainingAtReaderJoin <= TimeSpan.Zero)
+            {
+                return TimeSpan.Zero;
+            }
+
+            var remainingMilliseconds = Math.Min(
+                remainingAtCleanupStart.TotalMilliseconds,
+                remainingAtReaderJoin.TotalMilliseconds);
+            return TimeSpan.FromMilliseconds(Math.Min(remainingMilliseconds, 250));
+        }
+
         internal static async Task<bool> TryStopAsync(
             CancellationTokenSource stop,
             IReadOnlyList<Task> readers,
