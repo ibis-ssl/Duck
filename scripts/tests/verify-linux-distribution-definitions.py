@@ -24,12 +24,36 @@ LOCK = {
 "crane":("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d","sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac")],[("unknown","unknown","sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697")]),
 "orion-cm4-sim":("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a","sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b")],[("unknown","unknown","sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba")]),
 }
-APPHOST_FRAGMENTS = [
-"robocupssl/ssl-game-controller:3.20.3","tigersmannheim/sumatra:{tigersImageTag}",'builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025"',
-"roboticserlangen/autoref:{erForceImageTag}",'builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0"',
-"ghcr.io/ibis-ssl/framework-simulatorcli:{simulatorImageTag}",'builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd"',
-"ghcr.io/ibis-ssl/crane:{craneImageTag}",'builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d"',
-"ghcr.io/ibis-ssl/orion-cm4-sim:{cm4SimulatorImageTag}",'builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"']
+APPHOST_PROGRAM_FRAGMENTS = [
+    # 比較専用の参照と既定値はProgram.csに残る。
+    "tigersmannheim/sumatra:{tigersImageTag}",
+    "roboticserlangen/autoref:{erForceImageTag}",
+    'builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025"',
+    'builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0"',
+    # 通常構成の既定値は実際の登録処理へ渡される。
+    'builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd"',
+    'builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d"',
+    'builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"',
+]
+APPHOST_REGISTRATION_CALL = (
+    "BaseSimulationResourceRegistration.Add(builder,newBaseSimulationRegistrationOptions("
+    "simulatorIbisPort,simulatorImageTag,simulatorGeometry,simulatorRealism,"
+    "simulatorIbisTeamColor,craneImageTag,cm4SimulatorImageTag,"
+)
+APPHOST_REGISTRATION_OPTION_ORDER = (
+    "stringSimulatorImageTag,stringSimulatorGeometry,stringSimulatorRealism,"
+    "stringSimulatorIbisTeamColor,stringCraneImageTag,stringCm4SimulatorImageTag,"
+)
+APPHOST_REGISTRATION_FRAGMENTS = [
+    "internal sealed record BaseSimulationRegistrationOptions(",
+    "string SimulatorImageTag,",
+    "string CraneImageTag,",
+    "string Cm4SimulatorImageTag,",
+    'ghcr.io/ibis-ssl/framework-simulatorcli:{options.SimulatorImageTag}',
+    "robocupssl/ssl-game-controller:3.20.3",
+    'ghcr.io/ibis-ssl/crane:{options.CraneImageTag}',
+    'ghcr.io/ibis-ssl/orion-cm4-sim:{options.Cm4SimulatorImageTag}',
+]
 
 def parse_dockerfile(text: str) -> dict[str, list[list[str]]]:
     """固定範囲のDockerfile命令を解析する。"""
@@ -94,15 +118,40 @@ def _check_app(root: pathlib.Path, publish: pathlib.Path, name: str, app: dict, 
             if "includedFrameworks" in options: errors.append(f"{name}はframework-dependent publishでなければなりません")
         except (OSError,json.JSONDecodeError) as e: errors.append(f"{name}のruntimeconfigを解析できません: {e}")
 
+def _check_apphost_definitions(repo_root: pathlib.Path, errors: list[str]) -> None:
+    """Program.csから実登録処理まで固定image既定値の接続を検査する。"""
+    program_path = repo_root / "Testing/Duck.Testing.AppHost/Program.cs"
+    registration_path = repo_root / "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs"
+    try:
+        program = program_path.read_text(encoding="utf-8")
+    except OSError as e:
+        errors.append(f"AppHost Program.csを読めません: {e}")
+        return
+    try:
+        registration = registration_path.read_text(encoding="utf-8")
+    except OSError as e:
+        errors.append(f"共通登録処理を読めません: {e}")
+        return
+
+    compact_program = re.sub(r"\s+", "", program)
+    compact_registration = re.sub(r"\s+", "", registration)
+    for fragment in APPHOST_PROGRAM_FRAGMENTS:
+        if fragment not in program:
+            errors.append(f"Program.csの固定AppHost参照がありません: {fragment}")
+    if APPHOST_REGISTRATION_CALL not in compact_program:
+        errors.append("Program.csから共通登録処理へのimage tag引数接続が一致しません")
+    if APPHOST_REGISTRATION_OPTION_ORDER not in compact_registration:
+        errors.append("共通登録処理のimage tag option順がProgram.csと一致しません")
+    for fragment in APPHOST_REGISTRATION_FRAGMENTS:
+        if fragment not in registration:
+            errors.append(f"共通登録処理の固定image参照がありません: {fragment}")
+
+
 def verify_contract(repo_root: pathlib.Path, publish_root: pathlib.Path) -> None:
     """固定供給表、AppHostの既定参照、3つの実発行物を検証する。"""
     errors=[]
     _check_lock(repo_root,errors)
-    try:
-        apphost=(repo_root/"Testing/Duck.Testing.AppHost/Program.cs").read_text(encoding="utf-8")
-        for fragment in APPHOST_FRAGMENTS:
-            if fragment not in apphost: errors.append(f"AppHost image reference evidence is missing: {fragment}")
-    except OSError as e: errors.append(f"AppHost宣言を読めません: {e}")
+    _check_apphost_definitions(repo_root, errors)
     for name,app in APPS.items(): _check_app(repo_root,publish_root,name,app,errors)
     if errors: raise ContractError("\n".join("- "+e for e in errors))
 

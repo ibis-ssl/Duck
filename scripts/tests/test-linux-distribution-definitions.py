@@ -20,7 +20,8 @@ class PublishContractTests(unittest.TestCase):
  def setUp(self):
   self.tmp=tempfile.TemporaryDirectory(); self.root=pathlib.Path(self.tmp.name); self.pub=self.root/"publish"; self.pub.mkdir()
   apphost=self.root/"Testing/Duck.Testing.AppHost"; apphost.mkdir(parents=True)
-  apphost.joinpath("Program.cs").write_text("\n".join(m.APPHOST_FRAGMENTS),encoding="utf-8")
+  apphost.joinpath("Program.cs").write_text("\n".join(m.APPHOST_PROGRAM_FRAGMENTS+[m.APPHOST_REGISTRATION_CALL]),encoding="utf-8")
+  apphost.joinpath("BaseSimulationResourceRegistration.cs").write_text("\n".join(["internal sealed record BaseSimulationRegistrationOptions(",m.APPHOST_REGISTRATION_OPTION_ORDER,*m.APPHOST_REGISTRATION_FRAGMENTS]),encoding="utf-8")
   images={}
   commits={"framework-simulator":"a52b6bdecd97a277544dd6f275afbf4483781e12","crane":"4063cd31cd5b11b1cc919003907f5f4c527b252d","orion-cm4-sim":"d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"}
   for key,(ref,digest,media,plats,others) in m.LOCK.items():
@@ -37,9 +38,37 @@ class PublishContractTests(unittest.TestCase):
     else: f.write_bytes(b"fixture")
  def tearDown(self): self.tmp.cleanup()
  def test_real_apphost_defaults_match_the_fixed_catalog(self):
-  actual=p.parents[2]/"Testing/Duck.Testing.AppHost/Program.cs"
+  errors=[]
+  m._check_apphost_definitions(p.parents[2],errors)
+  self.assertEqual(errors,[])
+ def test_rejects_program_default_tag_mutation(self):
+  actual=self.root/"Testing/Duck.Testing.AppHost/Program.cs"
   source=actual.read_text(encoding="utf-8")
-  self.assertEqual([fragment for fragment in m.APPHOST_FRAGMENTS if fragment not in source],[])
+  actual.write_text(source.replace('Testing:Simulator:ImageTag"] ?? "a52b6bd"','Testing:Simulator:ImageTag"] ?? "latest"'),encoding="utf-8")
+  errors=[]
+  m._check_apphost_definitions(self.root,errors)
+  self.assertTrue(any("Testing:Simulator:ImageTag" in error for error in errors))
+ def test_rejects_registration_image_mutation(self):
+  actual=self.root/"Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs"
+  source=actual.read_text(encoding="utf-8")
+  actual.write_text(source.replace('ghcr.io/ibis-ssl/crane:{options.CraneImageTag}','ghcr.io/ibis-ssl/crane:latest'),encoding="utf-8")
+  errors=[]
+  m._check_apphost_definitions(self.root,errors)
+  self.assertTrue(any("crane:{options.CraneImageTag}" in error for error in errors))
+ def test_rejects_misbound_registration_tag(self):
+  actual=self.root/"Testing/Duck.Testing.AppHost/Program.cs"
+  source=actual.read_text(encoding="utf-8")
+  actual.write_text(source.replace("simulatorIbisTeamColor,craneImageTag,cm4SimulatorImageTag,","simulatorIbisTeamColor,cm4SimulatorImageTag,craneImageTag,"),encoding="utf-8")
+  errors=[]
+  m._check_apphost_definitions(self.root,errors)
+  self.assertTrue(any("image tag引数接続" in error for error in errors))
+ def test_rejects_disconnected_registration_consumer(self):
+  actual=self.root/"Testing/Duck.Testing.AppHost/Program.cs"
+  source=actual.read_text(encoding="utf-8")
+  actual.write_text(source.replace("BaseSimulationResourceRegistration.Add(","BaseSimulationResourceRegistration.Detached("),encoding="utf-8")
+  errors=[]
+  m._check_apphost_definitions(self.root,errors)
+  self.assertTrue(any("image tag引数接続" in error for error in errors))
  def test_accepts_fixed_definition_and_real_publish_contract(self): m.verify_contract(self.root,self.pub)
  def test_missing_reference_lock_is_reported(self):
   (self.root/"Testing/Duck.Testing.AppHost/linux-image-lock.json").unlink()
