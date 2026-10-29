@@ -71,6 +71,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
         var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
 
         Assert.False(result.Applied);
+        Assert.False(result.Unknown);
         Assert.Equal(0, runner.StdioCalls);
         Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
         Assert.Null(controller.Snapshot().TargetAddress);
@@ -109,7 +110,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
         var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
 
         Assert.False(result.Applied);
-        Assert.False(result.Unknown);
+        Assert.True(result.Unknown);
         Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
         Assert.Null(controller.Snapshot().TargetAddress);
     }
@@ -129,7 +130,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
         var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
 
         Assert.False(result.Applied);
-        Assert.False(result.Unknown);
+        Assert.True(result.Unknown);
         Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
     }
 
@@ -175,7 +176,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
         var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
 
         Assert.False(result.Applied);
-        Assert.False(result.Unknown);
+        Assert.True(result.Unknown);
         Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
         Assert.Null(controller.Snapshot().TargetAddress);
     }
@@ -232,10 +233,54 @@ public sealed class OwnedCm4TransportTargetControllerTests
         var secondResult = await second.WaitAsync(TimeSpan.FromSeconds(2));
 
         Assert.False(firstResult.Applied);
+        Assert.True(firstResult.Unknown);
         Assert.True(secondResult.Applied, secondResult.Error);
         Assert.Equal(2, controller.Snapshot().Epoch);
         Assert.Equal(Cm4TransportTargetPhase.Applied, controller.Snapshot().Phase);
         Assert.Equal(SimulatorId, controller.Snapshot().SimulatorContainerId);
+    }
+
+    [Fact]
+    public async Task CancellationAtFinalInspectDoesNotPublishAppliedTarget()
+    {
+        var identities = CreatePair();
+        using var cancellation = new CancellationTokenSource();
+        var runner = new FakeDockerRunner(identities, EngineId)
+        {
+            AfterInspect = inspectCount =>
+            {
+                if (inspectCount == 4) cancellation.Cancel();
+            },
+        };
+        var controller = CreateController(runner, () => identities);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => controller.ApplyCurrentTargetAsync("helper-launch-01", cancellation.Token));
+
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
+    }
+
+    [Fact]
+    public async Task NonzeroRemoteExitLeavesAppliedStateUnknown()
+    {
+        var identities = CreatePair();
+        var runner = new FakeDockerRunner(identities, EngineId)
+        {
+            StdioResultFactory = input =>
+            {
+                var accepted = FakeDockerRunner.CreateAcknowledgement(input);
+                return accepted with { ExitCode = 42 };
+            },
+        };
+        var controller = CreateController(runner, () => identities);
+
+        var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+
+        Assert.False(result.Applied);
+        Assert.True(result.Unknown);
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
     }
 
     private static OwnedCm4TransportIdentityPair CreatePair() => new(
@@ -270,6 +315,8 @@ public sealed class OwnedCm4TransportTargetControllerTests
         internal bool DifferentNetworkIds { get; init; }
         internal bool InvalidSimulatorAddress { get; init; }
         internal Action? AfterStdio { get; set; }
+        internal Action<int>? AfterInspect { get; set; }
+        internal int InspectCalls { get; private set; }
         internal TaskCompletionSource ExecStarted { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal Func<string, CancellationToken, Task<DockerStdioCommandResult>>? StdioHandler { get; set; }
@@ -290,7 +337,24 @@ public sealed class OwnedCm4TransportTargetControllerTests
                 InspectFormats.Add(arguments[formatIndex + 1]);
             }
 
-            return Task.FromResult(InspectSummary(identity));
+            var summary = InspectSummary(identity);
+            if (arguments.Contains("inspect", StringComparer.Ordinal))
+            {
+                InspectCalls++;
+                AfterInspect?.Invoke(InspectCalls);
+            }
+
+            return Task.FromResult(summary);
+        }
+
+        public async Task<DockerStdioCommandResult> CaptureBoundedAsync(
+            IReadOnlyList<string> arguments,
+            int maximumOutputCharacters,
+            TimeSpan timeout,
+            CancellationToken cancellationToken)
+        {
+            var output = await CaptureAsync(arguments, cancellationToken);
+            return new DockerStdioCommandResult(0, output, string.Empty);
         }
 
         public Task<ContainerIdentityControlExecResult> RelayAsync(

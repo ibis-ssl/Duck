@@ -24,14 +24,39 @@ internal interface IDockerCommandRunner
 
 internal sealed record DockerStdioCommandResult(int ExitCode, string StandardOutput, string StandardError);
 
+internal sealed class DockerCliProcessRecoveryException(string message, Exception innerException)
+    : IOException(message, innerException);
+
 internal interface IDockerStdioCommandRunner : IDockerCommandRunner
 {
+    Task<DockerStdioCommandResult> CaptureBoundedAsync(
+        IReadOnlyList<string> arguments,
+        int maximumOutputCharacters,
+        TimeSpan timeout,
+        CancellationToken cancellationToken);
+
     Task<DockerStdioCommandResult> ExecuteWithStdioAsync(
         IReadOnlyList<string> arguments,
         string standardInput,
         int maximumOutputCharacters,
         TimeSpan timeout,
         CancellationToken cancellationToken);
+}
+
+internal interface IDockerCliChildProcess : IDisposable
+{
+    TextWriter StandardInput { get; }
+    TextReader StandardOutput { get; }
+    TextReader StandardError { get; }
+    bool HasExited { get; }
+    int ExitCode { get; }
+    Task WaitForExitAsync(CancellationToken cancellationToken);
+    void KillEntireProcessTree();
+}
+
+internal interface IDockerCliChildProcessFactory
+{
+    IDockerCliChildProcess Start(ProcessStartInfo startInfo);
 }
 
 internal sealed record ContainerIdentityHandoffState(long Generation, string BootId);
@@ -228,8 +253,22 @@ internal static class ContainerIdentityExecHandoff
 /// <summary>
 /// Docker CLIを構造化引数で起動し、メタデータ取得またはUDS中継を行います。
 /// </summary>
-internal sealed class DockerCliCommandRunner(string executablePath) : IDockerStdioCommandRunner
+internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
 {
+    private readonly string executablePath;
+    private readonly IDockerCliChildProcessFactory childProcessFactory;
+    private readonly object processLock = new();
+    private IDockerCliChildProcess? unreapedChildProcess;
+    private Exception? unreapedChildFailure;
+
+    internal DockerCliCommandRunner(
+        string executablePath,
+        IDockerCliChildProcessFactory? childProcessFactory = null)
+    {
+        this.executablePath = executablePath;
+        this.childProcessFactory = childProcessFactory ?? new DockerCliChildProcessFactory();
+    }
+
     /// <summary>
     /// 指定したメタデータコマンドを実行し、標準出力だけを呼出し元へ返します。
     /// </summary>
@@ -261,42 +300,239 @@ internal sealed class DockerCliCommandRunner(string executablePath) : IDockerStd
         if (maximumOutputCharacters <= 0) throw new ArgumentOutOfRangeException(nameof(maximumOutputCharacters));
         if (timeout <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeout));
 
-        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        deadline.CancelAfter(timeout);
-        using var process = Start(arguments, redirectInput: true);
-        var outputTask = ReadBoundedAsync(process.StandardOutput, maximumOutputCharacters, deadline.Token);
-        var errorTask = ReadBoundedAsync(process.StandardError, maximumOutputCharacters, deadline.Token);
+        var timer = Stopwatch.StartNew();
+        using var operationDeadline = new CancellationTokenSource(GetOperationWindow(timeout));
+        using var operationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, operationDeadline.Token);
+        var process = StartChildProcess(CreateStartInfo(arguments, redirectInput: true));
+        var outputTask = ReadBoundedAsync(process.StandardOutput, maximumOutputCharacters, operationSource.Token);
+        var errorTask = ReadBoundedAsync(process.StandardError, maximumOutputCharacters, operationSource.Token);
+        var waitTask = process.WaitForExitAsync(operationSource.Token);
+        var recovered = false;
+        var retainedForRecovery = false;
         try
         {
-            await process.StandardInput.WriteAsync(standardInput.AsMemory(), deadline.Token);
-            await process.StandardInput.FlushAsync(deadline.Token);
+            await process.StandardInput.WriteAsync(standardInput.AsMemory(), operationSource.Token);
+            await process.StandardInput.FlushAsync(operationSource.Token);
             process.StandardInput.Close();
-            await process.WaitForExitAsync(deadline.Token);
+            await AwaitAllProcessTasksAsync(waitTask, outputTask, errorTask, operationSource.Token).ConfigureAwait(false);
             var output = await outputTask;
             var error = await errorTask;
+            recovered = true;
             return new(process.ExitCode, output, error);
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        catch (Exception exception)
         {
-            TryKill(process);
-            throw new TimeoutException("Docker stdio command exceeded its deadline.");
-        }
-        catch
-        {
-            TryKill(process);
+            try
+            {
+                await RecoverProcessAsync(process, waitTask, outputTask, errorTask, timer, timeout, exception)
+                    .ConfigureAwait(false);
+            }
+            catch (DockerCliProcessRecoveryException recoveryException)
+            {
+                RetainUnreapedChild(process, recoveryException);
+                retainedForRecovery = true;
+                throw;
+            }
+
+            recovered = true;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new OperationCanceledException("Docker stdio command was canceled after its child process exited.", exception, cancellationToken);
+            }
+
+            if (operationDeadline.IsCancellationRequested || exception is OperationCanceledException)
+            {
+                throw new TimeoutException("Docker stdio command exceeded its deadline.", exception);
+            }
+
             throw;
+        }
+        finally
+        {
+            if (!retainedForRecovery && (recovered || process.HasExited)) process.Dispose();
         }
     }
 
+    public async Task<DockerStdioCommandResult> CaptureBoundedAsync(
+        IReadOnlyList<string> arguments,
+        int maximumOutputCharacters,
+        TimeSpan timeout,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+        if (maximumOutputCharacters <= 0) throw new ArgumentOutOfRangeException(nameof(maximumOutputCharacters));
+        if (timeout <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeout));
+
+        var timer = Stopwatch.StartNew();
+        using var operationDeadline = new CancellationTokenSource(GetOperationWindow(timeout));
+        using var operationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, operationDeadline.Token);
+        var process = StartChildProcess(CreateStartInfo(arguments, redirectInput: false));
+        var outputTask = ReadBoundedAsync(process.StandardOutput, maximumOutputCharacters, operationSource.Token);
+        var errorTask = ReadBoundedAsync(process.StandardError, maximumOutputCharacters, operationSource.Token);
+        var waitTask = process.WaitForExitAsync(operationSource.Token);
+        var recovered = false;
+        var retainedForRecovery = false;
+        try
+        {
+            await AwaitAllProcessTasksAsync(waitTask, outputTask, errorTask, operationSource.Token).ConfigureAwait(false);
+            recovered = true;
+            return new(process.ExitCode, await outputTask.ConfigureAwait(false), await errorTask.ConfigureAwait(false));
+        }
+        catch (Exception exception)
+        {
+            try
+            {
+                await RecoverProcessAsync(process, waitTask, outputTask, errorTask, timer, timeout, exception)
+                    .ConfigureAwait(false);
+            }
+            catch (DockerCliProcessRecoveryException recoveryException)
+            {
+                RetainUnreapedChild(process, recoveryException);
+                retainedForRecovery = true;
+                throw;
+            }
+
+            recovered = true;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new OperationCanceledException("Docker metadata command was canceled after its child process exited.", exception, cancellationToken);
+            }
+
+            if (operationDeadline.IsCancellationRequested || exception is OperationCanceledException)
+            {
+                throw new TimeoutException("Docker metadata command exceeded its deadline.", exception);
+            }
+
+            throw;
+        }
+        finally
+        {
+            if (!retainedForRecovery && (recovered || process.HasExited)) process.Dispose();
+        }
+    }
+
+    private static async Task AwaitAllProcessTasksAsync(
+        Task waitTask,
+        Task<string> outputTask,
+        Task<string> errorTask,
+        CancellationToken cancellationToken)
+    {
+        var pending = new List<Task> { waitTask, outputTask, errorTask };
+        while (pending.Count > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var completed = await Task.WhenAny(pending).ConfigureAwait(false);
+            await completed.ConfigureAwait(false);
+            pending.Remove(completed);
+        }
+    }
+
+    private static TimeSpan GetOperationWindow(TimeSpan totalBudget)
+    {
+        var cleanupReserve = TimeSpan.FromMilliseconds(Math.Min(250, Math.Max(1, totalBudget.TotalMilliseconds / 4)));
+        var operationWindow = totalBudget - cleanupReserve;
+        return operationWindow > TimeSpan.Zero ? operationWindow : TimeSpan.FromTicks(1);
+    }
+
+    private static async Task RecoverProcessAsync(
+        IDockerCliChildProcess process,
+        Task waitTask,
+        Task<string> outputTask,
+        Task<string> errorTask,
+        Stopwatch timer,
+        TimeSpan timeout,
+        Exception cause)
+    {
+        if (!process.HasExited)
+        {
+            try
+            {
+                process.KillEntireProcessTree();
+            }
+            catch (Exception killException)
+            {
+                cause = new AggregateException(cause, killException);
+            }
+        }
+
+        var remaining = timeout - timer.Elapsed;
+        if (remaining <= TimeSpan.Zero)
+        {
+            if (!process.HasExited)
+            {
+                throw new DockerCliProcessRecoveryException("Docker CLI process exit was not confirmed before the original deadline.", cause);
+            }
+        }
+        else if (!process.HasExited)
+        {
+            using var recoveryDeadline = new CancellationTokenSource(remaining);
+            try
+            {
+                await process.WaitForExitAsync(recoveryDeadline.Token).ConfigureAwait(false);
+            }
+            catch (Exception recoveryException) when (recoveryException is OperationCanceledException or InvalidOperationException)
+            {
+                if (!process.HasExited)
+                {
+                    throw new DockerCliProcessRecoveryException("Docker CLI process exit was not confirmed before the original deadline.",
+                        new AggregateException(cause, recoveryException));
+                }
+            }
+        }
+
+        await ObserveCompletedTaskAsync(waitTask).ConfigureAwait(false);
+        await DrainTaskWithinDeadlineAsync(outputTask, timer, timeout).ConfigureAwait(false);
+        await DrainTaskWithinDeadlineAsync(errorTask, timer, timeout).ConfigureAwait(false);
+    }
+
+    private static async Task ObserveCompletedTaskAsync(Task task)
+    {
+        if (!task.IsCompleted)
+        {
+            return;
+        }
+
+        try { await task.ConfigureAwait(false); }
+        catch (OperationCanceledException) { }
+        catch (IOException) { }
+    }
+
+    private static async Task DrainTaskWithinDeadlineAsync(Task task, Stopwatch timer, TimeSpan timeout)
+    {
+        if (!task.IsCompleted)
+        {
+            var remaining = timeout - timer.Elapsed;
+            if (remaining <= TimeSpan.Zero)
+            {
+                throw new DockerCliProcessRecoveryException("Docker CLI output streams were not drained before the original deadline.",
+                    new TimeoutException("No remaining process recovery budget."));
+            }
+
+            try
+            {
+                await task.WaitAsync(remaining).ConfigureAwait(false);
+            }
+            catch (TimeoutException exception)
+            {
+                throw new DockerCliProcessRecoveryException("Docker CLI output streams were not drained before the original deadline.", exception);
+            }
+            catch (OperationCanceledException) when (task.IsCanceled)
+            {
+            }
+        }
+
+        await ObserveCompletedTaskAsync(task).ConfigureAwait(false);
+    }
+
     private static async Task<string> ReadBoundedAsync(
-        StreamReader reader,
+        TextReader reader,
         int maximumCharacters,
         CancellationToken cancellationToken)
     {
-        var buffer = new char[1024];
-        var output = new StringBuilder(Math.Min(maximumCharacters, buffer.Length));
+        var output = new StringBuilder(Math.Min(maximumCharacters, 1024));
         while (true)
         {
+            var buffer = new char[Math.Min(1024, maximumCharacters - output.Length + 1)];
             var count = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
             if (count == 0) return output.ToString();
             if (output.Length + count > maximumCharacters)
@@ -352,6 +588,48 @@ internal sealed class DockerCliCommandRunner(string executablePath) : IDockerStd
 
     private Process Start(IReadOnlyList<string> arguments, bool redirectInput)
     {
+        lock (processLock)
+        {
+            ClearExitedUnreapedChild();
+            return Process.Start(CreateStartInfo(arguments, redirectInput)) ?? throw new IOException("Docker process did not start.");
+        }
+    }
+
+    private IDockerCliChildProcess StartChildProcess(ProcessStartInfo startInfo)
+    {
+        lock (processLock)
+        {
+            ClearExitedUnreapedChild();
+            return childProcessFactory.Start(startInfo);
+        }
+    }
+
+    private void RetainUnreapedChild(IDockerCliChildProcess process, Exception failure)
+    {
+        lock (processLock)
+        {
+            unreapedChildProcess = process;
+            unreapedChildFailure = failure;
+        }
+    }
+
+    private void ClearExitedUnreapedChild()
+    {
+        if (unreapedChildProcess is null) return;
+        if (!unreapedChildProcess.HasExited)
+        {
+            throw new DockerCliProcessRecoveryException(
+                "A previous Docker CLI process has not been confirmed exited; a new command was not started.",
+                unreapedChildFailure ?? new IOException("The previous process exit is unknown."));
+        }
+
+        unreapedChildProcess.Dispose();
+        unreapedChildProcess = null;
+        unreapedChildFailure = null;
+    }
+
+    private ProcessStartInfo CreateStartInfo(IReadOnlyList<string> arguments, bool redirectInput)
+    {
         var startInfo = new ProcessStartInfo
         {
             FileName = executablePath,
@@ -361,12 +639,8 @@ internal sealed class DockerCliCommandRunner(string executablePath) : IDockerStd
             RedirectStandardError = true,
             CreateNoWindow = true,
         };
-        foreach (var argument in arguments)
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
-
-        return Process.Start(startInfo) ?? throw new IOException("Docker process did not start.");
+        foreach (var argument in arguments) startInfo.ArgumentList.Add(argument);
+        return startInfo;
     }
 
     private static async Task WaitForExitAsync(Process process, CancellationToken cancellationToken)
@@ -394,6 +668,35 @@ internal sealed class DockerCliCommandRunner(string executablePath) : IDockerStd
         catch (InvalidOperationException)
         {
         }
+    }
+
+    private sealed class DockerCliChildProcessFactory : IDockerCliChildProcessFactory
+    {
+        public IDockerCliChildProcess Start(ProcessStartInfo startInfo) =>
+            new DockerCliChildProcess(Process.Start(startInfo) ?? throw new IOException("Docker process did not start."));
+    }
+
+    private sealed class DockerCliChildProcess(Process process) : IDockerCliChildProcess
+    {
+        public TextWriter StandardInput => process.StandardInput;
+        public TextReader StandardOutput => process.StandardOutput;
+        public TextReader StandardError => process.StandardError;
+        public bool HasExited => process.HasExited;
+        public int ExitCode => process.ExitCode;
+        public Task WaitForExitAsync(CancellationToken cancellationToken) => process.WaitForExitAsync(cancellationToken);
+
+        public void KillEntireProcessTree()
+        {
+            try
+            {
+                if (!process.HasExited) process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        public void Dispose() => process.Dispose();
     }
 }
 

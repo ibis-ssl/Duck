@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -154,6 +155,7 @@ internal sealed class OwnedCm4TransportTargetController(
         CancellationToken cancellationToken)
     {
         var acquired = false;
+        var operationTimer = Stopwatch.StartNew();
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(OperationLimit);
         var operationToken = deadline.Token;
@@ -166,19 +168,21 @@ internal sealed class OwnedCm4TransportTargetController(
                 return Rejected(operationEpoch, "The owner generation changed before application.");
             }
 
-            var engineId = await runner.CaptureAsync(
+            var engineId = await CaptureMetadataAsync(
                 ["--context", dockerContext, "info", "--format", "{{.ID}}"],
-                operationToken).ConfigureAwait(false);
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
             if (!string.Equals(engineId.Trim(), expectedEngineId, StringComparison.Ordinal) ||
                 !IsCurrent(operationEpoch, requested))
             {
                 return Rejected(operationEpoch, "The expected engine or current owner generation did not match.");
             }
 
-            var cm4Inspection = await InspectAsync(requested.Cm4, Cm4Role, operationEpoch, requested, operationToken).ConfigureAwait(false);
+            var cm4Inspection = await InspectAsync(requested.Cm4, Cm4Role, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
             if (cm4Inspection is null) return Rejected(operationEpoch, "The owned CM4 inspection did not match.");
             var simulatorInspection = await InspectAsync(
-                requested.Simulator, SimulatorRole, operationEpoch, requested, operationToken).ConfigureAwait(false);
+                requested.Simulator, SimulatorRole, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
             if (simulatorInspection is null ||
                 !string.Equals(cm4Inspection.Name, simulatorInspection.Name, StringComparison.Ordinal) ||
                 !string.Equals(cm4Inspection.Id, simulatorInspection.Id, StringComparison.Ordinal))
@@ -215,22 +219,24 @@ internal sealed class OwnedCm4TransportTargetController(
                 execArguments,
                 requestLine + "\n",
                 MaximumMessageBytes,
-                OperationLimit,
+                RemainingOperationTime(operationTimer),
                 operationToken).ConfigureAwait(false);
             if (response.ExitCode != 0 ||
                 !TryReadSingleAcknowledgement(response.StandardOutput, request, out var acknowledgement) ||
                 acknowledgement != request with { Type = "applied" } ||
                 !IsCurrent(operationEpoch, requested))
             {
-                return Rejected(operationEpoch, "The control acknowledgement or current generation did not match.");
+                return RejectedAfterDispatch(operationEpoch, "The control acknowledgement or current generation did not match.");
             }
 
-            var currentEngineId = await runner.CaptureAsync(
+            var currentEngineId = await CaptureMetadataAsync(
                 ["--context", dockerContext, "info", "--format", "{{.ID}}"],
-                operationToken).ConfigureAwait(false);
-            var latestCm4 = await InspectAsync(requested.Cm4, Cm4Role, operationEpoch, requested, operationToken).ConfigureAwait(false);
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
+            var latestCm4 = await InspectAsync(requested.Cm4, Cm4Role, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
             var latestSimulator = await InspectAsync(
-                requested.Simulator, SimulatorRole, operationEpoch, requested, operationToken).ConfigureAwait(false);
+                requested.Simulator, SimulatorRole, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
             if (!string.Equals(currentEngineId.Trim(), expectedEngineId, StringComparison.Ordinal) ||
                 latestCm4 is null || latestSimulator is null ||
                 !string.Equals(latestCm4.Name, cm4Inspection.Name, StringComparison.Ordinal) ||
@@ -240,14 +246,15 @@ internal sealed class OwnedCm4TransportTargetController(
                 !latestSimulator.Address.Equals(simulatorInspection.Address) ||
                 !IsCurrent(operationEpoch, requested))
             {
-                return Rejected(operationEpoch, "The inspected owner generation changed after acknowledgement.");
+                return RejectedAfterDispatch(operationEpoch, "The inspected owner generation changed after acknowledgement.");
             }
 
             lock (stateLock)
             {
+                operationToken.ThrowIfCancellationRequested();
                 if (epoch != operationEpoch || phase != Cm4TransportTargetPhase.Applying)
                 {
-                    return Rejected(operationEpoch, "A newer configuration epoch superseded this acknowledgement.");
+                    return RejectedAfterDispatch(operationEpoch, "A newer configuration epoch superseded this acknowledgement.");
                 }
 
                 phase = Cm4TransportTargetPhase.Applied;
@@ -292,6 +299,7 @@ internal sealed class OwnedCm4TransportTargetController(
         string role,
         long operationEpoch,
         OwnedCm4TransportIdentityPair requested,
+        TimeSpan remaining,
         CancellationToken cancellationToken)
     {
         if (!OwnedContainerInspection.IsFullId(identity.ContainerId) ||
@@ -300,9 +308,9 @@ internal sealed class OwnedCm4TransportTargetController(
             return null;
         }
 
-        var json = await runner.CaptureAsync(
+        var json = await CaptureMetadataAsync(
             ["--context", dockerContext, "inspect", "--format", SafeInspectFormat, identity.ContainerId],
-            cancellationToken).ConfigureAwait(false);
+            remaining, cancellationToken).ConfigureAwait(false);
         if (!IsCurrent(operationEpoch, requested) ||
             !TryReadOwnedSummary(json, identity, role, out var endpoint))
         {
@@ -360,6 +368,38 @@ internal sealed class OwnedCm4TransportTargetController(
     {
         MarkUnknown(operationEpoch);
         return new Cm4TransportTargetApplyResult(false, false, operationEpoch, error);
+    }
+
+    private Cm4TransportTargetApplyResult RejectedAfterDispatch(long operationEpoch, string error)
+    {
+        MarkUnknown(operationEpoch);
+        return new Cm4TransportTargetApplyResult(false, true, operationEpoch, error);
+    }
+
+    private async Task<string> CaptureMetadataAsync(
+        IReadOnlyList<string> arguments,
+        TimeSpan timeout,
+        CancellationToken cancellationToken)
+    {
+        var result = await runner.CaptureBoundedAsync(
+            arguments, MaximumMessageBytes, timeout, cancellationToken).ConfigureAwait(false);
+        if (result.ExitCode != 0)
+        {
+            throw new IOException("Docker metadata command failed.");
+        }
+
+        return result.StandardOutput;
+    }
+
+    private static TimeSpan RemainingOperationTime(Stopwatch timer)
+    {
+        var remaining = OperationLimit - timer.Elapsed;
+        if (remaining <= TimeSpan.Zero)
+        {
+            throw new TimeoutException("The target application deadline expired.");
+        }
+
+        return remaining;
     }
 
     private bool IsValidIdentityPair(OwnedCm4TransportIdentityPair pair) =>
