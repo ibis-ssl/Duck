@@ -435,7 +435,7 @@ if (testingMode is not "base" and not "comparison")
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
-var useCm4Simulator = string.Equals(cranePlanner, "visibility_graph", StringComparison.Ordinal);
+var useCm4Simulator = BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner);
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
@@ -474,158 +474,74 @@ var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.Ne
 var fixtureManifestPath =
     builder.Configuration["Testing:Crane:FixtureManifestPath"] ??
     CraneFixtureManifest.GetDefaultPath(stackId);
-CraneFixtureManifest.WriteAtomically(fixtureManifestPath, stackId, craneFixtureSettings);
-
-var simulator = builder.AddDockerWrapper(
-    new DockerContainerSpec(
-        "simulator",
-        $"ghcr.io/ibis-ssl/framework-simulatorcli:{simulatorImageTag}",
-        [
-            "tini", "--", "./bin/simulator-cli", "-g", simulatorGeometry,
-            "--realism", simulatorRealism, "--ibis-port", simulatorIbisPort,
-            "--ibis-team-color", simulatorIbisTeamColor,
-        ],
-        new Dictionary<string, string>(StringComparer.Ordinal),
-        stackId),
-    39101,
-    "simulator-cli",
-    "simulator");
 
 var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
-var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
-    .WithEnvironment("Tracker__ActiveProfileName", "sim")
-    .WithEnvironment("Testing__Mode", testingMode)
-    .WithEnvironment("Testing__ContainerMode", "true")
-    .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
-    .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
-if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
-{
-    duckBuilder
-        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
-        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
-        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
-}
-EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck");
-var visionHealthEndpoint = duckBuilder.Resource.Annotations
-    .OfType<EndpointAnnotation>()
-    .Single(endpoint => endpoint.Name == "vision-health");
-visionHealthEndpoint.Port = null;
-visionHealthEndpoint.TargetHost = "127.0.0.1";
-
-var duck = duckBuilder
-    .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
-    .WithEnvironment("VisionReceiver__Port", "10020")
-    .WaitFor(simulator);
-
-var gameController = builder.AddDockerWrapper(
-    new DockerContainerSpec(
-        "game-controller",
-        "robocupssl/ssl-game-controller:3.20.3",
-        [
-            "-visionAddress", "224.5.23.2:10020",
-            "-trackerAddress", "224.5.23.2:11010",
-            "-publishAddress", "224.5.23.1:11003",
-            "-address", ":8082",
-        ],
-        new Dictionary<string, string>(StringComparer.Ordinal),
-        stackId),
-    39102,
-    "app",
-    "game-controller",
-    expectedCraneTeamName: craneTeamName);
-
-if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
-    IsEnabled(builder.Configuration["Testing:ContainerMode"]))
-{
-    var refereeDriver = AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
-        .WithEnvironment("RefereeDriver__Enabled", "true")
-        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
-        .WithEnvironment("Testing__ContainerMode", "true")
-        .WaitFor(gameController);
-    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+var baseResources = BaseSimulationResourceRegistration.Add(
+    builder,
+    new BaseSimulationRegistrationOptions(
+        simulatorIbisPort,
+        simulatorImageTag,
+        simulatorGeometry,
+        simulatorRealism,
+        simulatorIbisTeamColor,
+        craneImageTag,
+        cm4SimulatorImageTag,
+        cranePlanner,
+        stackId,
+        craneTeamName,
+        craneTeamColor,
+        fixtureManifestPath,
+        craneTargetAddressSettings,
+        builder.Configuration["Testing:Crane:DiagnosticsPath"]),
+    simulator =>
     {
-        refereeDriver
-            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
-            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
-            .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
-        EnableDesktopIdentityBridge(refereeDriver, duckRunId,
-            "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
-    }
-}
-
-IResourceBuilder<ExecutableResource>? cm4Simulator = null;
-if (useCm4Simulator)
-{
-    cm4Simulator = builder.AddDockerWrapper(
-        new DockerContainerSpec(
-            "cm4-sim",
-            $"ghcr.io/ibis-ssl/orion-cm4-sim:{cm4SimulatorImageTag}",
-            [
-                "tini", "--", "cm4_sim", "--robot-ids", "0,1,2,3,4,5,6,7,8,9,10",
-                "--in-port", "12345", "--out-addr", "127.0.0.1", "--out-port", simulatorIbisPort,
-                "--feedback-port-base", "50100", "--multicast-if", "127.0.0.1", "--rate-hz", "1000",
-                "--rx-delay-ms", "0", "--rx-jitter-ms", "0", "--rx-loss-rate", "0.0", "--seed", "0",
-            ],
-            new Dictionary<string, string>(StringComparer.Ordinal),
-            stackId),
-        39103,
-        "cm4_sim",
-        "cm4-sim")
-        .WaitFor(simulator);
-}
-
-var craneEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
-{
-    ["PLANNER"] = cranePlanner,
-    ["CRANE_TARGET_PORT"] = useCm4Simulator ? "12345" : simulatorIbisPort,
-};
-var craneCommand =
-    $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={craneTeamName} team_color:={craneTeamColor} planner:=${{PLANNER}}";
-IEnumerable<DockerContainerMount>? craneMounts = null;
-if (craneTargetAddressSettings is not null)
-{
-    craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey] =
-        craneTargetAddressSettings.TargetAddress;
-    craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] =
-        craneTargetAddressSettings.ExpectedResourceName;
-    craneCommand =
-        $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} speak:=false team:={craneTeamName} team_color:={craneTeamColor} planner:=${{PLANNER}}";
-    craneMounts =
-    [
-        new DockerContainerMount(
-            craneTargetAddressSettings.ScriptSource,
-            CraneTargetAddressSettings.ScriptMountTarget,
-            ReadOnly: true),
-    ];
-}
-if (!useCm4Simulator)
-{
-    craneEnvironment["FEEDBACK_SIM_MODE"] = "true";
-}
-
-var craneBuilder = builder
-    .AddDockerWrapper(
-        new DockerContainerSpec(
-            "crane",
-            $"ghcr.io/ibis-ssl/crane:{craneImageTag}",
-            ["bash", "-c", craneCommand],
-            craneEnvironment,
-            stackId,
-            mounts: craneMounts),
-        39104,
-        "ros2",
-        "crane",
-        startupTimeoutSeconds: 360,
-        expectedCraneTeamName: craneTeamName);
-
-var crane = craneBuilder
-    .WaitForStart(duck)
-    .WaitFor(gameController);
-
-if (cm4Simulator is not null)
-{
-    crane.WaitFor(cm4Simulator);
-}
+        var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+            .WithEnvironment("Tracker__ActiveProfileName", "sim")
+            .WithEnvironment("Testing__Mode", testingMode)
+            .WithEnvironment("Testing__ContainerMode", "true")
+            .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+            .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+        if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+        {
+            duckBuilder
+                .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+                .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+                .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+        }
+        EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck");
+        var visionHealthEndpoint = duckBuilder.Resource.Annotations
+            .OfType<EndpointAnnotation>()
+            .Single(endpoint => endpoint.Name == "vision-health");
+        visionHealthEndpoint.Port = null;
+        visionHealthEndpoint.TargetHost = "127.0.0.1";
+        return duckBuilder;
+    },
+    gameController =>
+    {
+        if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+            IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+        {
+            var refereeDriver = AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+                .WithEnvironment("RefereeDriver__Enabled", "true")
+                .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+                .WithEnvironment("Testing__ContainerMode", "true")
+                .WaitFor(gameController);
+            if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+            {
+                refereeDriver
+                    .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+                    .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
+                    .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+                EnableDesktopIdentityBridge(refereeDriver, duckRunId,
+                    "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
+            }
+        }
+    });
+var simulator = baseResources.Simulator;
+var duck = baseResources.Duck;
+var gameController = baseResources.GameController;
+var cm4Simulator = baseResources.Cm4Simulator;
+var crane = baseResources.Crane;
 
 if (testingMode == "comparison")
 {
