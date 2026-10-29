@@ -1,4 +1,4 @@
-{
+﻿{
   "baseline": "963cfbee22943c3414feef197547c75645c532d9",
   "task": "I81-07C",
   "scope": "AppHost model generation only; no DCP or container start",
@@ -224,7 +224,20 @@
   ],
   "private_final_manifest_sha256": "6787CDAD0C72AD98315A0042D7334C7A93260AD0C685EE6EC4405359B8FCE7D1",
   "preserved_intermediate_manifest_sha256": "391B4989DD9049EA50744820BCB598C7E75DDBEDAA4033E6C71CBE58DC4981BD",
-  "normal_review": "pending",
+  "normal_review": {
+    "report_sha256": "D3B8CE03D518C8D9EBF5E64F15319912A6E7CFAA85018E5AF22685F0A7E50B2E",
+    "required_findings": 0,
+    "ci": "40808955710 completed success",
+    "verdict": "pass_with_held",
+    "held": [
+      "DCP network composition",
+      "communication and recreation",
+      "normal/comparison full migration"
+    ],
+    "reviewed_head": "3d926068007f3af433dcccb30e2dd92a9c15e535",
+    "mode": "normal_review",
+    "whole_issue_independent_final": false
+  },
   "documentation": {
     "inputs": [
       {
@@ -392,5 +405,143 @@
   "limits": [
     "No DCP/network composition, container, or runtime test was performed.",
     "No image pull, dependency installation, or environment change was performed."
-  ]
+  ],
+  "model_artifact_formats": {
+    "source_head": "3d926068007f3af433dcccb30e2dd92a9c15e535",
+    "captured_stdout_sha256": "7509002f1d0a72cb04c6ba7a5307bc8ad67d9040b07f976119005fb191a29dc0",
+    "captured_stdout_bytes": 2354,
+    "captured_stdout_bom": true,
+    "git_blob_oid": "b82b55207fc5ef0d00aafa124e00c700cfc0ab89",
+    "git_blob_sha256": "eb8f2e870b39032c3188fd6df959104a122403c3a1d1433719127af1d1cdfe33",
+    "git_blob_bytes": 2277,
+    "git_blob_bom": true,
+    "normalized_content_equal": true
+  },
+  "implementation_verified_head": "3d926068007f3af433dcccb30e2dd92a9c15e535",
+  "entrypoint_provenance": {
+    "resolved_executable_path": "not recorded",
+    "private_report_sha256": "8851274bc0b8ec1fca8698ece9ea48400a6e1d3a03decc1152219b490ebe5d7d",
+    "dll": "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll",
+    "arguments": [
+      "--Testing:NamespaceProbe:GenerateModel=true",
+      "--Testing:Diagnostics:RunId=selector-fix-smoke",
+      "--Testing:StackOwnership:LockPath=<owned temporary lock>"
+    ],
+    "command_token": "dotnet",
+    "cwd": "repository root",
+    "recorded_lock_pattern": "TEMP/duck-namespace-probe-GUID.lock",
+    "exact_temporary_lock_path": "not recorded"
+  },
+  "normal_result_documentation": {
+    "base_head": "3d926068007f3af433dcccb30e2dd92a9c15e535",
+    "gate_count": 12,
+    "source_manifests": [
+      {
+        "sha256": "5729be804c58b5a3e6974a93eeafa9737b00c5a41443606cb5caf9e80ea8af99",
+        "purpose": "tracking final 8 gates; initial report failures retained"
+      },
+      {
+        "sha256": "5f7540cc2e97ad91380a10ea91eaf7241f1c60593c831e1fe634339dae109c0b",
+        "purpose": "corrected full report final 4 gates"
+      }
+    ],
+    "gates": [
+      {
+        "target": "tasks-07c-3d926-added",
+        "name": "textlint",
+        "inputSha256": "5c6a85881918d823276cb30fd48ee7b85996706ed24ea392b348812f17e55483",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07c-3d926-added",
+        "name": "whitelist",
+        "inputSha256": "5c6a85881918d823276cb30fd48ee7b85996706ed24ea392b348812f17e55483",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07c-3d926-added",
+        "name": "cspell",
+        "inputSha256": "5c6a85881918d823276cb30fd48ee7b85996706ed24ea392b348812f17e55483",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "45bf687133439efae52eb00136d6c531952ea2cebcb331a4b93c791e240ae7c9"
+      },
+      {
+        "target": "tasks-07c-3d926-added",
+        "name": "yomiyasu",
+        "inputSha256": "5c6a85881918d823276cb30fd48ee7b85996706ed24ea392b348812f17e55483",
+        "exit": 0,
+        "stdoutSha256": "ad5bad5f0e19bb571196f31ec5cd801434d132f349ddddb9b5756a4ee4c70615",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07c-3d926-added",
+        "name": "textlint",
+        "inputSha256": "7edbd1fcbdb3cc21de45d14c6e86667b1eda3674e719a084b5b18c40e16f8854",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07c-3d926-added",
+        "name": "whitelist",
+        "inputSha256": "7edbd1fcbdb3cc21de45d14c6e86667b1eda3674e719a084b5b18c40e16f8854",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07c-3d926-added",
+        "name": "cspell",
+        "inputSha256": "7edbd1fcbdb3cc21de45d14c6e86667b1eda3674e719a084b5b18c40e16f8854",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "819e57e7fc404777e7823be3d9d9e780aceaa9c6705638ee59f189a763b9f679"
+      },
+      {
+        "target": "phases-07c-3d926-added",
+        "name": "yomiyasu",
+        "inputSha256": "7edbd1fcbdb3cc21de45d14c6e86667b1eda3674e719a084b5b18c40e16f8854",
+        "exit": 0,
+        "stdoutSha256": "f85e2fdb9344fad1d2b12e857914837b3dcd85951d6a299e191b9fa588f02d4f",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-07c-3d926-full",
+        "name": "textlint",
+        "inputSha256": "ba849b0780cea1365bba9facd610952453906ba5f6fd9159e453928ca9343ae7",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-07c-3d926-full",
+        "name": "whitelist",
+        "inputSha256": "ba849b0780cea1365bba9facd610952453906ba5f6fd9159e453928ca9343ae7",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-07c-3d926-full",
+        "name": "cspell",
+        "inputSha256": "ba849b0780cea1365bba9facd610952453906ba5f6fd9159e453928ca9343ae7",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "c8af96f3d10fd943c4a55611687e4c21b3fc75471c5d5a7c9c6b4fa40a2dc3af"
+      },
+      {
+        "target": "public-report-07c-3d926-full",
+        "name": "yomiyasu",
+        "inputSha256": "ba849b0780cea1365bba9facd610952453906ba5f6fd9159e453928ca9343ae7",
+        "exit": 0,
+        "stdoutSha256": "9161cee0476fe3d7d2ebb475edb91363405c284a190cb9d97da5c7db3aab08ec",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
 }
