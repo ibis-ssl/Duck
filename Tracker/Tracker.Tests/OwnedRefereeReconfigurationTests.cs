@@ -1,0 +1,498 @@
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.AppHost;
+
+namespace Tracker.Tests;
+
+public sealed class OwnedRefereeReconfigurationTests
+{
+    private const string RunId = "owned-reconfiguration-test";
+    private const string EngineId = "expected-engine";
+    private const string GcOldId = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private const string GcNewId = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    private const string RefOldId = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+    private const string RefNewId = "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+
+    [Fact]
+    public async Task ForeignOrWrongEnginePreflightExecutesNoLifecycleCommands()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { EngineId = "different-engine" };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Empty(adapter.LifecycleCommands);
+        Assert.Equal(OwnedEndpointPhase.Initial, state.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task WrongOwnerPreflightExecutesNoLifecycleCommands()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { ForeignGameControllerOwner = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Empty(adapter.LifecycleCommands);
+        Assert.Equal(OwnedEndpointPhase.Initial, state.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task SuccessfulReconfigurationStopsRefereeRestartsSourceThenStartsRefereeWithFreshUri()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee);
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.True(result.Success, result.ErrorMessage);
+        Assert.Equal(
+            new[] { ("referee-driver", KnownResourceCommands.StopCommand), ("game-controller", KnownResourceCommands.RestartCommand), ("referee-driver", KnownResourceCommands.StartCommand) },
+            adapter.LifecycleCommands);
+        Assert.Equal("ws://10.0.0.21:8082/api/control", state.GetUriForEnvironment());
+        Assert.Equal(OwnedEndpointPhase.Active, state.Snapshot().Phase);
+        Assert.Equal(RefNewId, adapter.GetCurrent(referee)!.ContainerId);
+    }
+
+    [Fact]
+    public async Task OwnedStoppedRefereeCanRetryWithoutAnUnnecessaryStop()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee, refereeInitiallyRunning: false);
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.True(result.Success, result.ErrorMessage);
+        Assert.Equal(
+            new[] { ("game-controller", KnownResourceCommands.RestartCommand), ("referee-driver", KnownResourceCommands.StartCommand) },
+            adapter.LifecycleCommands);
+        Assert.Equal("ws://10.0.0.21:8082/api/control", state.GetUriForEnvironment());
+    }
+
+    [Fact]
+    public async Task StopNotificationWithoutContainerIdCanContinueUsingPreviouslyVerifiedOwnership()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { RemoveRefereeIdOnStop = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.True(result.Success, result.ErrorMessage);
+        Assert.Equal("ws://10.0.0.21:8082/api/control", state.GetUriForEnvironment());
+        Assert.Equal(RefNewId, adapter.GetCurrent(referee)!.ContainerId);
+    }
+
+    [Fact]
+    public async Task InitiallyStoppedRefereeWithoutFullIdIsRejectedBeforeLifecycleCommands()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee, refereeInitiallyRunning: false, refereeInitiallyHasId: false);
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Empty(adapter.LifecycleCommands);
+        Assert.Equal(OwnedEndpointPhase.Initial, state.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task GameControllerRestartWaitsForRefereeStoppedNotificationAfterStopCommandReturns()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { DelayStopNotification = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var execution = coordinator.ExecuteAsync(CancellationToken.None);
+        await adapter.StopCommandEntered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        await Task.Delay(30);
+        Assert.DoesNotContain(adapter.LifecycleCommands, command => command == ("game-controller", KnownResourceCommands.RestartCommand));
+
+        adapter.PublishReferee(KnownResourceStates.Stopping, RefOldId);
+        await Task.Delay(30);
+        Assert.DoesNotContain(adapter.LifecycleCommands, command => command == ("game-controller", KnownResourceCommands.RestartCommand));
+
+        adapter.PublishReferee(KnownResourceStates.Finished, RefOldId);
+        var result = await execution;
+
+        Assert.True(result.Success, result.ErrorMessage);
+        Assert.Contains(adapter.LifecycleCommands, command => command == ("game-controller", KnownResourceCommands.RestartCommand));
+    }
+
+    [Fact]
+    public async Task StopTimeoutSuspendsWithoutRestartingSourceOrRestoringDnsFallback()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { DelayStopNotification = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state, TimeSpan.FromMilliseconds(100));
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.False(result.Canceled);
+        Assert.Equal(OwnedEndpointPhase.Suspended, state.Snapshot().Phase);
+        Assert.DoesNotContain(adapter.LifecycleCommands, command => command == ("game-controller", KnownResourceCommands.RestartCommand));
+        Assert.DoesNotContain(adapter.LifecycleCommands, command => command == ("referee-driver", KnownResourceCommands.StartCommand));
+        Assert.Throws<InvalidOperationException>(() => state.GetUriForEnvironment());
+    }
+
+    [Fact]
+    public async Task CommandSuccessDoesNotFinishUntilRefereeRunningNotificationArrives()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { DelayStartNotification = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var execution = coordinator.ExecuteAsync(CancellationToken.None);
+        await adapter.StartCommandEntered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        await Task.Delay(30);
+        Assert.False(execution.IsCompleted);
+        Assert.Equal(OwnedEndpointPhase.Active, state.Snapshot().Phase);
+
+        adapter.PublishReferee(KnownResourceStates.Running, RefNewId);
+        Assert.True((await execution).Success);
+    }
+
+    [Fact]
+    public async Task SourceGenerationChangeDuringInspectDoesNotPublishOrStartDependent()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { ChangeSourceDuringNewInspect = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.DoesNotContain(adapter.LifecycleCommands, command => command == ("referee-driver", KnownResourceCommands.StartCommand));
+        Assert.Equal(OwnedEndpointPhase.Suspended, state.Snapshot().Phase);
+        Assert.Throws<InvalidOperationException>(() => state.GetUriForEnvironment());
+    }
+
+    [Fact]
+    public async Task RefereeDriverOnDifferentDcpNetworkIsSuspendedAndStopped()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { MismatchedRefereeNetwork = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Equal(OwnedEndpointPhase.Suspended, state.Snapshot().Phase);
+        Assert.Equal(KnownResourceStates.Finished, adapter.GetCurrent(referee)!.State);
+        Assert.Throws<InvalidOperationException>(() => state.GetUriForEnvironment());
+    }
+
+    [Fact]
+    public async Task StaleSourceNotificationIsIgnoredButCurrentUnexpectedGenerationSuspendsAndStopsOwnedReferee()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee);
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+        Assert.True((await coordinator.ExecuteAsync(CancellationToken.None)).Success);
+
+        var currentSource = adapter.GetCurrent(gc)!;
+        await coordinator.HandleUnexpectedSourceObservationAsync(currentSource with { ContainerId = GcOldId });
+        Assert.Equal(OwnedEndpointPhase.Active, state.Snapshot().Phase);
+        Assert.Single(adapter.LifecycleCommands, command => command == ("referee-driver", KnownResourceCommands.StopCommand));
+
+        var replacement = adapter.PublishSource("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        await coordinator.HandleUnexpectedSourceObservationAsync(replacement);
+
+        Assert.Equal(OwnedEndpointPhase.Suspended, state.Snapshot().Phase);
+        Assert.Equal(KnownResourceStates.Finished, adapter.GetCurrent(referee)!.State);
+        Assert.Equal(2, adapter.LifecycleCommands.Count(command => command == ("referee-driver", KnownResourceCommands.StopCommand)));
+        Assert.Throws<InvalidOperationException>(() => state.GetUriForEnvironment());
+    }
+
+    [Fact]
+    public async Task InitialMissingIdAndFirstRunningNotificationsKeepDnsFallback()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee);
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+
+        await coordinator.HandleUnexpectedSourceObservationAsync(adapter.PublishSource(null, "Starting"));
+        await coordinator.HandleUnexpectedSourceObservationAsync(adapter.PublishSource(GcOldId, KnownResourceStates.Running));
+
+        Assert.Equal(OwnedEndpointPhase.Initial, state.Snapshot().Phase);
+        Assert.Equal("ws://game-controller:8082/api/control", state.GetUriForEnvironment());
+        Assert.Empty(adapter.LifecycleCommands);
+    }
+
+    [Fact]
+    public async Task LateStartAfterCancellationIsObservedAndStopped()
+    {
+        var gc = new ContainerResource("game-controller");
+        var referee = new ContainerResource("referee-driver");
+        var adapter = new FakeAdapter(gc, referee) { DelayStartCompletion = true };
+        var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+        var coordinator = CreateCoordinator(adapter, gc, referee, state);
+        using var cancellation = new CancellationTokenSource();
+
+        var execution = coordinator.ExecuteAsync(cancellation.Token);
+        await adapter.StartCommandEntered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        cancellation.Cancel();
+        var result = await execution;
+        Assert.True(result.Canceled);
+
+        var blockedRetry = await coordinator.ExecuteAsync(CancellationToken.None);
+        Assert.False(blockedRetry.Success);
+        Assert.Single(adapter.LifecycleCommands, command => command == ("referee-driver", KnownResourceCommands.StopCommand));
+
+        adapter.AllowStartCompletion.TrySetResult();
+        await adapter.StartCommandCompleted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        for (var attempt = 0; attempt < 50 && adapter.GetCurrent(referee)!.State != KnownResourceStates.Finished; attempt++)
+        {
+            await Task.Delay(10);
+        }
+
+        Assert.False(result.Success);
+        Assert.Equal(OwnedEndpointPhase.Suspended, state.Snapshot().Phase);
+        Assert.Equal(KnownResourceStates.Finished, adapter.GetCurrent(referee)!.State);
+        Assert.Equal(2, adapter.LifecycleCommands.Count(command => command == ("referee-driver", KnownResourceCommands.StopCommand)));
+    }
+
+    [Theory]
+    [InlineData("duck-net", "duck-net", "10.0.0.21", true)]
+    [InlineData("other-net", "duck-net", "10.0.0.21", false)]
+    [InlineData("duck-net", "duck-net", "127.0.0.1", false)]
+    [InlineData("duck-net", "duck-net", "not-an-ip", false)]
+    [InlineData("duck-net", "duck-net", "2001:db8::1", false)]
+    public void NetworkEndpointRequiresOneMatchingBridgeNetworkAndRoutableIpv4(
+        string networkMode,
+        string networkName,
+        string address,
+        bool expected)
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            HostConfig = new { NetworkMode = networkMode },
+            NetworkSettings = new
+            {
+                Networks = new Dictionary<string, object>
+                {
+                    [networkName] = new { IPAddress = address },
+                },
+            },
+        });
+
+        Assert.Equal(expected, OwnedContainerInspection.TryReadNetworkEndpoint(json, out _));
+    }
+
+    private static OwnedRefereeReconfigurationCoordinator CreateCoordinator(
+        FakeAdapter adapter,
+        IResource gc,
+        IResource referee,
+        OwnedRefereeEndpointState state,
+        TimeSpan? timeout = null) =>
+        new(adapter, gc, referee, state, RunId, EngineId, timeout ?? TimeSpan.FromSeconds(1));
+
+    private sealed class FakeAdapter(
+        ContainerResource gc,
+        ContainerResource referee,
+        bool refereeInitiallyRunning = true,
+        bool refereeInitiallyHasId = true) : IOwnedReconfigurationAdapter
+    {
+        private readonly Dictionary<string, OwnedResourceObservation> current = new(StringComparer.Ordinal)
+        {
+            [gc.Name] = new(gc, gc.Name, KnownResourceStates.Running, GcOldId),
+            [referee.Name] = new(
+                referee,
+                referee.Name,
+                refereeInitiallyRunning ? KnownResourceStates.Running : KnownResourceStates.Finished,
+                refereeInitiallyHasId ? RefOldId : null),
+        };
+        private readonly Dictionary<string, string> inspections = new(StringComparer.Ordinal);
+        private readonly Queue<OwnedResourceObservation> notifications = new();
+
+        public string EngineId { get; init; } = OwnedRefereeReconfigurationTests.EngineId;
+        public bool ForeignGameControllerOwner { get; init; }
+        public bool ChangeSourceDuringNewInspect { get; init; }
+        public bool MismatchedRefereeNetwork { get; init; }
+        public bool RemoveRefereeIdOnStop { get; init; }
+        public bool DelayStartCompletion { get; init; }
+        public bool DelayStartNotification { get; init; }
+        public bool DelayStopNotification { get; init; }
+        public TaskCompletionSource StartCommandEntered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource StartCommandCompleted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource AllowStartCompletion { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource StopCommandEntered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public List<(string Resource, string Command)> LifecycleCommands { get; } = [];
+
+        public OwnedResourceObservation? GetCurrent(IResource resource) =>
+            current.TryGetValue(resource.Name, out var value) && ReferenceEquals(value.Resource, resource) ? value : null;
+
+        public OwnedResourceObservation? GetCurrent(string resourceId) => current.GetValueOrDefault(resourceId);
+
+        public async IAsyncEnumerable<OwnedResourceObservation> WatchAsync(
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (notifications.TryDequeue(out var observation))
+                {
+                    yield return observation;
+                }
+                else
+                {
+                    await Task.Delay(10, cancellationToken);
+                }
+            }
+        }
+
+        public async Task<bool> ExecuteLifecycleCommandAsync(IResource resource, string commandName, CancellationToken cancellationToken)
+        {
+            LifecycleCommands.Add((resource.Name, commandName));
+            if (ReferenceEquals(resource, referee) && commandName == KnownResourceCommands.StopCommand)
+            {
+                if (DelayStopNotification)
+                {
+                    StopCommandEntered.TrySetResult();
+                }
+                else
+                {
+                    Set(referee, KnownResourceStates.Finished, RemoveRefereeIdOnStop ? null : RefOldId);
+                }
+            }
+            else if (ReferenceEquals(resource, gc) && commandName == KnownResourceCommands.RestartCommand)
+            {
+                Set(gc, KnownResourceStates.Running, GcNewId);
+            }
+            else if (ReferenceEquals(resource, referee) && commandName == KnownResourceCommands.StartCommand)
+            {
+                if (DelayStartCompletion)
+                {
+                    StartCommandEntered.TrySetResult();
+                    await AllowStartCompletion.Task;
+                }
+
+                if (DelayStartNotification)
+                {
+                    StartCommandEntered.TrySetResult();
+                }
+                else
+                {
+                    Set(referee, KnownResourceStates.Running, RefNewId);
+                }
+                StartCommandCompleted.TrySetResult();
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public Task<string> CaptureDockerAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken)
+        {
+            if (arguments.Contains("info"))
+            {
+                return Task.FromResult(EngineId);
+            }
+
+            var id = arguments[^1];
+            if (!inspections.TryGetValue(id, out var json))
+            {
+                var observation = current.Values.SingleOrDefault(value => value.ContainerId == id);
+                var role = observation?.Resource.Name == "game-controller" ? "game-controller" : "referee-driver";
+                json = Inspection(
+                    id,
+                    role,
+                    id == GcNewId ? "10.0.0.21" : "10.0.0.20",
+                    ForeignGameControllerOwner && id == GcOldId ? "other-run" : null,
+                    MismatchedRefereeNetwork && id == RefNewId ? "other-net" : "duck-net");
+                inspections[id] = json;
+            }
+
+            if (ChangeSourceDuringNewInspect && id == GcNewId)
+            {
+                Set(gc, KnownResourceStates.Running, "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+            }
+
+            return Task.FromResult(json);
+        }
+
+        private void Set(ContainerResource resource, string state, string? id)
+        {
+            var observation = new OwnedResourceObservation(resource, resource.Name, state, id);
+            current[resource.Name] = observation;
+            notifications.Enqueue(observation);
+        }
+
+        public OwnedResourceObservation PublishSource(string? id, string? state = null)
+        {
+            Set(gc, state ?? KnownResourceStates.Running, id);
+            return current[gc.Name];
+        }
+
+        public OwnedResourceObservation PublishReferee(string state, string? id)
+        {
+            Set(referee, state, id);
+            return current[referee.Name];
+        }
+
+        private static string Inspection(
+            string id,
+            string role,
+            string address,
+            string? runIdOverride = null,
+            string networkName = "duck-net")
+        {
+            var labels = new Dictionary<string, string>
+            {
+                [ContainerIdentityExecHandoff.RunIdLabel] = runIdOverride ?? RunId,
+                [ContainerIdentityExecHandoff.RoleLabel] = role,
+            };
+            return JsonSerializer.Serialize(new
+            {
+                Id = id,
+                State = new { Status = "running" },
+                Config = new { Labels = labels },
+                HostConfig = new { NetworkMode = networkName },
+                NetworkSettings = new
+                {
+                    Networks = new Dictionary<string, object>
+                    {
+                        [networkName] = new { IPAddress = address },
+                    },
+                },
+            });
+        }
+    }
+}

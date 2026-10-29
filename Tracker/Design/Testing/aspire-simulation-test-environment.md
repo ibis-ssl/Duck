@@ -119,6 +119,20 @@ UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資
 
 `Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的な `TCP` ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost の構成試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、この構成試験では証明しない。
 
+### Game Controller と RefereeDriver の所有再構成（I81-07B）
+
+`Testing:OwnedReconfiguration:Enabled=true` は `Testing:GameControllerVisionOnly=true` の場合だけ有効とする。既定値は `false` とし、他のAppHostモードの資源・引数・起動依存・命令を変更しない。有効化には `Testing:IdentityControl:DesktopBridgeEnabled=true`、既存の `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId`、ならびにこの構成で起動する `RefereeDriver` が必要である。前提不足または別モードとの併用は、別構成へ切り替えずAppHost起動前に明示的に失敗させる。初回起動では既存の `ws://game-controller:8082/api/control` を使い、新しい接続先の取得待ちを資源起動依存へ追加しない。
+
+有効時だけGame Controllerに所有実行IDと `game-controller` 役割を示すDockerラベルを付ける。この所有ラベル追加は既存のデスクトップ識別ブリッジ補助処理から分離し、Game Controllerに `RuntimeHost` の `UDS` 識別情報受渡しを設定しない。RefereeDriverには同じ実行IDと `referee-driver` 役割を付ける。通常起動時のRefereeDriver接続先は資源名による既定値を維持する。再構成状態が有効な場合に限り、環境設定値を得る処理からその世代の検証済み接続先を渡す。
+
+Game Controllerの資源に追加する `reconfigure-game-controller-endpoint` 所有再構成命令は、公開されたAspire資源命令APIを使い、既知のGame Controller／RefereeDriver `IResource`だけを操作する。単一の直列化制御下で、最初のDCP停止・再起動命令より前に、同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `Docker Engine ID` と、両資源のDCP登録状態・完全コンテナID・実行ID／役割ラベルを照合する。RefereeDriverがすでに停止済みの場合は、完全IDと所有ラベルを確認し、不要な `Stop` を省略して再試行できる。初期確認時にRefereeDriverが停止済みで、DCP登録から完全IDを得られない場合は、名前で補わず、いずれの命令も実行しない。再試行はDCP登録からその資源の完全IDと所有ラベルを確認できてから行う。別所有者の資源、Docker ID不一致、短縮ID、所有ラベル不一致では `Stop`／`Restart` を一つも実行しない。その後RefereeDriverを先にDCP停止命令で停止し、Game ControllerをDCP再起動命令で再作成する。`ResourceNotificationService`から新しい `Running` 状態と同じ登録資源の新しい完全コンテナIDを得る。Dockerコマンドは同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `info` と、通知から得た完全IDだけを対象にする読み取り専用 `inspect` に限る。Docker ID、DCP登録資源の現在ID、実行ID／役割ラベル、実行状態を照合し、`HostConfig.NetworkMode` と `NetworkSettings.Networks` が同じDCP管理ネットワークを示し、対象ネットワークのIPv4アドレスが一つだけであることを確認する。ネットワーク欠落・複数・不一致、自ホストアドレス、空・不正IP、所有者またはDocker ID不一致は拒否する。コンテナ名や画面表示名から任意の対象を選ばない。
+
+状態は初期（`Initial`）、再構成中（`Reconfiguring`）、有効（`Active`）、停止（`Suspended`）を区別する。初期状態だけは既存の資源名による接続先を利用できる。再構成命令開始時に古い接続先を無効化して `Reconfiguring` へ移り、失敗、取消、時間超過、予期しないGame Controller世代変更では `Suspended` にする。`Reconfiguring` または `Suspended` 時は資源名による接続先や以前の検証済み接続先へ切り替えない。
+
+`inspect` 後に資源通知の現在状態を再取得し、資源参照・資源ID・完全コンテナID・`Running` 状態が `inspect` 前の同じ世代であることを再確認する。確認成功後だけ `ws://<検証済みIPv4>:8082/api/control` を `Active` 状態の接続先として公開し、DCPの開始命令でRefereeDriverを再作成する。開始時に環境設定値を得る処理が `Active` 状態の接続先を使用する。資源開始は通信準備完了を意味せず、この命令成功もGame Controller API応答または実通信の受入証拠にしない。
+
+別所有者・古い通知、世代交代、部分命令失敗、時間超過、取消では新しい接続先を公開せず、停止済みRefereeDriverを古い接続先で再開しない。Game Controllerの予期しない停止または新世代通知でも接続先を直ちに無効化し、DCP通知処理自体を直列化制御の解放待ちにせず、所有確認済みRefereeDriverへDCP停止を要求する。取消・時間超過・失敗で開始命令が保留中または完了結果不明の場合は、後着する `Running` 通知を監視し、停止状態へ戻ったことを確認するまで次の再構成命令を受け付けない。遅れて開始が完了した場合も、同じ実行ID／役割／完全IDの所有確認後にDCP停止し、古い接続先で復帰させない。新世代と接続先を順序付き再構成命令で確認するまで再開しない。Dockerによる直接停止・削除や、他の資源／所有者への操作は行わない。
+
 ```mermaid
 flowchart LR
  subgraph win[Windows]

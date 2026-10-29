@@ -23,8 +23,8 @@ public sealed class ContainerIdentityHandoffLifecycleTests
         using var notifications = new ResourceNotificationService(
             NullLogger<ResourceNotificationService>.Instance, lifetime);
         var resource = new ContainerResource(Role, "duck-runtime");
-        var runner = new CapturingDockerRunner();
         var dcp = new BlockingDcpHostedService();
+        var runner = new CapturingDockerRunner(dcp.StartEntered.Task);
         using var handoff = new ContainerIdentityHandoffService(
             notifications, resource, Role, RunId, "desktop-linux", EngineId,
             runner, NullLogger<ContainerIdentityHandoffService>.Instance);
@@ -40,8 +40,6 @@ public sealed class ContainerIdentityHandoffLifecycleTests
         using var startupTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         try
         {
-            startup = host.StartAsync(startupTimeout.Token);
-            await dcp.StartEntered.Task.WaitAsync(TimeSpan.FromSeconds(2));
             await notifications.PublishUpdateAsync(resource, ResourceId, _ => new CustomResourceSnapshot
             {
                 ResourceType = "container",
@@ -49,10 +47,11 @@ public sealed class ContainerIdentityHandoffLifecycleTests
                 Properties = [new ResourcePropertySnapshot("container.id", ContainerId)],
             });
 
-            var handoffBeforeDcpRelease = await Task.WhenAny(
-                runner.HandoffCalled.Task,
-                Task.Delay(TimeSpan.FromMilliseconds(500)));
-            Assert.Same(runner.HandoffCalled.Task, handoffBeforeDcpRelease);
+            startup = host.StartAsync(startupTimeout.Token);
+            await dcp.StartEntered.Task.WaitAsync(startupTimeout.Token);
+            await runner.HandoffCalled.Task.WaitAsync(startupTimeout.Token);
+            Assert.False(dcp.IsReleased);
+            Assert.False(startup.IsCompleted);
             Assert.Equal(ResourceId, runner.LastIdentity?.ResourceId);
         }
         finally
@@ -70,6 +69,7 @@ public sealed class ContainerIdentityHandoffLifecycleTests
     {
         private readonly TaskCompletionSource release = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public TaskCompletionSource StartEntered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public bool IsReleased => release.Task.IsCompleted;
         public void Release() => release.TrySetResult();
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -87,6 +87,10 @@ public sealed class ContainerIdentityHandoffLifecycleTests
 
     private sealed class CapturingDockerRunner : IDockerCommandRunner
     {
+        private readonly Task dcpStartEntered;
+
+        public CapturingDockerRunner(Task dcpStartEntered) => this.dcpStartEntered = dcpStartEntered;
+
         public TaskCompletionSource HandoffCalled { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public ResourceDiagnosticIdentity? LastIdentity { get; private set; }
 
@@ -102,16 +106,17 @@ public sealed class ContainerIdentityHandoffLifecycleTests
                 } },
             }));
 
-        public Task<ContainerIdentityControlExecResult> RelayAsync(
+        public async Task<ContainerIdentityControlExecResult> RelayAsync(
             IReadOnlyList<string> arguments,
             ResourceDiagnosticIdentity identity,
             string roleName,
             string? expectedBootId,
             CancellationToken cancellationToken)
         {
+            await dcpStartEntered.WaitAsync(cancellationToken);
             LastIdentity = identity;
             HandoffCalled.TrySetResult();
-            return Task.FromResult(new ContainerIdentityControlExecResult(true, "boot-lifecycle", false));
+            return new ContainerIdentityControlExecResult(true, "boot-lifecycle", false);
         }
     }
 

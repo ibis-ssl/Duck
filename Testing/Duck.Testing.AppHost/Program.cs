@@ -22,6 +22,18 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
 
+var ownedReconfigurationEnabled = IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]);
+if (ownedReconfigurationEnabled && !IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
+{
+    throw new InvalidOperationException(
+        "Testing:OwnedReconfiguration:Enabled is supported only with Testing:GameControllerVisionOnly=true.");
+}
+if (ownedReconfigurationEnabled && !IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+{
+    throw new InvalidOperationException(
+        "Testing:OwnedReconfiguration:Enabled requires Testing:IdentityControl:DesktopBridgeEnabled=true.");
+}
+
 if (IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]))
 {
     var incompatibleModeSelected =
@@ -215,6 +227,15 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
         Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
     using var gcVisionGameControllerOnlyOwnershipLease = StackOwnershipLease.Acquire(gcVisionGameControllerOnlyLockPath);
     var gcVisionGameControllerOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var gcVisionOwnedReconfiguration = IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]);
+    var gcVisionDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
+    var gcVisionExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+    if (gcVisionOwnedReconfiguration &&
+        (string.IsNullOrWhiteSpace(gcVisionDockerContext) || string.IsNullOrWhiteSpace(gcVisionExpectedEngineId)))
+    {
+        throw new InvalidOperationException(
+            "Testing:OwnedReconfiguration:Enabled requires Testing:IdentityControl:DockerContext and Testing:IdentityControl:ExpectedEngineId.");
+    }
     var gcVisionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
     var gcVisionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
     var gcVisionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
@@ -290,9 +311,60 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
 
     var gcVisionRefereeDriver = AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
         .WithEnvironment("RefereeDriver__Enabled", "true")
-        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WaitForStart(gcVisionGameController);
+    var gcVisionEndpointState = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+    if (gcVisionOwnedReconfiguration)
+    {
+        gcVisionRefereeDriver.WithEnvironment(context =>
+        {
+            context.EnvironmentVariables["RefereeDriver__GameControllerUri"] = gcVisionEndpointState.GetUriForEnvironment();
+        });
+
+        var dockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
+        builder.Services.AddSingleton<IOwnedReconfigurationAdapter>(serviceProvider =>
+            new AspireOwnedReconfigurationAdapter(
+                serviceProvider.GetRequiredService<ResourceNotificationService>(),
+                serviceProvider.GetRequiredService<ResourceCommandService>(),
+                new DockerCliCommandRunner(dockerExecutable),
+                gcVisionDockerContext!));
+        builder.Services.AddSingleton(serviceProvider => new OwnedRefereeReconfigurationCoordinator(
+            serviceProvider.GetRequiredService<IOwnedReconfigurationAdapter>(),
+            gcVisionGameController.Resource,
+            gcVisionRefereeDriver.Resource,
+            gcVisionEndpointState,
+            gcVisionGameControllerOnlyRunId,
+            gcVisionExpectedEngineId!,
+            TimeSpan.FromSeconds(45),
+            serviceProvider.GetRequiredService<ILogger<OwnedRefereeReconfigurationCoordinator>>()));
+        builder.Services.AddSingleton<IHostedService>(serviceProvider => new OwnedSourceGenerationMonitor(
+            serviceProvider.GetRequiredService<IOwnedReconfigurationAdapter>(),
+            serviceProvider.GetRequiredService<OwnedRefereeReconfigurationCoordinator>(),
+            gcVisionGameController.Resource,
+            serviceProvider.GetRequiredService<ILogger<OwnedSourceGenerationMonitor>>()));
+
+        gcVisionGameController.WithCommand(
+            "reconfigure-game-controller-endpoint",
+            "再作成した Game Controller へ接続先を更新",
+            async context =>
+            {
+                var result = await context.Services.GetRequiredService<OwnedRefereeReconfigurationCoordinator>()
+                    .ExecuteAsync(context.CancellationToken);
+                return new ExecuteCommandResult
+                {
+                    Success = result.Success,
+                    Message = result.Message,
+                    Canceled = result.Canceled,
+                };
+            });
+    }
+    else
+    {
+        gcVisionRefereeDriver.WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control");
+    }
     if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
     {
         gcVisionRefereeDriver

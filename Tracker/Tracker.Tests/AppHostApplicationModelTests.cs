@@ -172,11 +172,31 @@ public sealed class AppHostApplicationModelTests
         var refereeEnvironment = await GetResourceEnvironmentAsync(refereeDriver);
         Assert.Equal("true", refereeEnvironment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("ws://game-controller:8082/api/control", refereeEnvironment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.Empty(gameController.Annotations.OfType<ResourceCommandAnnotation>());
         Assert.False(refereeEnvironment.ContainsKey("RefereeDriver__AutoDrive"));
 
         AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
         AssertWaits(gameController, (duck, WaitType.WaitUntilStarted));
         AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilStarted));
+    }
+
+    [Fact]
+    public async Task OwnedReconfigurationOptInAddsGameControllerResourceCommand()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:GameControllerVisionOnly=true",
+            "--Testing:OwnedReconfiguration:Enabled=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        Assert.Single(
+            gameController.Annotations.OfType<ResourceCommandAnnotation>(),
+            command => command.Name == "reconfigure-game-controller-endpoint");
+        var referee = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+        var environment = await GetResourceEnvironmentAsync(referee);
+        Assert.Equal("ws://game-controller:8082/api/control", environment["RefereeDriver__GameControllerUri"].ToString());
     }
 
     /// <summary>

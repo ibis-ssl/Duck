@@ -264,10 +264,18 @@ public sealed class RegisteredContainerExecHandoffTests
         {
             if (File.Exists(path))
             {
-                var lines = await File.ReadAllLinesAsync(path);
-                if (lines.Length >= count)
+                try
                 {
-                    return lines;
+                    var lines = await File.ReadAllLinesAsync(path);
+                    if (lines.Length >= count)
+                    {
+                        return lines;
+                    }
+                }
+                catch (IOException exception) when (IsFileSharingConflict(exception))
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(20));
+                    continue;
                 }
             }
 
@@ -276,6 +284,9 @@ public sealed class RegisteredContainerExecHandoffTests
 
         return File.Exists(path) ? await File.ReadAllLinesAsync(path) : [];
     }
+
+    private static bool IsFileSharingConflict(IOException exception) =>
+        (exception.HResult & 0xFFFF) is 32 or 33;
 
     private static async Task<List<object>> GetRuntimeArgumentsAsync(ContainerResource resource)
     {
