@@ -36,6 +36,69 @@ jobs:
         shell: bash
         run: python3 -B -m unittest discover -s scripts/tests -p 'test_crane_launch_overlay.py' -v
 
+      - name: Report preinstalled native toolchain (read-only)
+        id: native_toolchain_readonly
+        shell: bash
+        run: |
+          python3 -B - <<'PY'
+          import json
+          import os
+          import pathlib
+          import shutil
+          import subprocess
+
+          def query(executable, *arguments):
+              try:
+                  result = subprocess.run(
+                      [executable, *arguments],
+                      capture_output=True,
+                      check=False,
+                      text=True,
+                      timeout=5,
+                  )
+              except subprocess.TimeoutExpired:
+                  return {"status": "unknown", "reason": "timeout"}
+              except OSError:
+                  return {"status": "unknown", "reason": "unavailable"}
+
+              first_line = result.stdout.splitlines()[0][:256] if result.stdout.splitlines() else ""
+              return {
+                  "status": "ok" if result.returncode == 0 else "error",
+                  "exit_code": result.returncode,
+                  "first_line": first_line,
+              }
+
+          tools = {name: shutil.which(name) is not None for name in ("cc", "gcc", "readelf")}
+          compiler_name = "gcc" if tools["gcc"] else "cc" if tools["cc"] else None
+          compiler_path = shutil.which(compiler_name) if compiler_name else None
+          compiler = {"name": compiler_name, "available": compiler_path is not None}
+          if compiler_path:
+              compiler["version"] = query(compiler_path, "--version")
+              compiler["target"] = query(compiler_path, "-dumpmachine")
+              archive = query(compiler_path, "-print-file-name=libc.a")
+              archive_path = pathlib.Path(archive.get("first_line", ""))
+              readable = False
+              if archive.get("status") == "ok" and archive_path.is_absolute() and archive_path.is_file():
+                  try:
+                      with archive_path.open("rb") as stream:
+                          stream.read(0)
+                      readable = True
+                  except OSError:
+                      pass
+              compiler["libc_archive"] = "readable" if readable else "unknown_or_unavailable"
+          else:
+              compiler["version"] = {"status": "unknown"}
+              compiler["target"] = {"status": "unknown"}
+              compiler["libc_archive"] = "unknown"
+
+          print(json.dumps({
+              "image_os": os.environ.get("ImageOS", "unknown"),
+              "image_version": os.environ.get("ImageVersion", "unknown"),
+              "tools": tools,
+              "compiler": compiler,
+          }, ensure_ascii=True, separators=(",", ":")))
+          PY
+
       - name: Run dotnet test
         id: dotnet_test
         shell: bash
