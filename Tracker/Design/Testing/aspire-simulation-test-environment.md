@@ -208,6 +208,15 @@ I81-07Cでは、明示設定 `Testing:NamespaceProbe:GenerateModel=true` だけ�
 
 生成試験は標準資源型、固定イメージ、取得禁止、読み取り専用割当て、所有名・ラベル、所有元だけの公開、依存側の引数・開始依存と出力を確認する。DCPの既定ネットワーク設定はこの構成段階では注入されないため、`Networks` と `RunArgs` の実際の合成、通信、所有元再作成後の依存再結合を合格とはしない。停止・再作成の順序を表す公開APIの根拠と計画は保持し、実行した証拠とは分ける。
 
+### I81-07D: 明示許可後の名前空間共有組成確認
+
+I81-07Dは `Tracker.Tests` 専用の実機組成検査とし、I81-07Cの `NamespaceProbeModelFactory` を再利用する。AppHostの製品選択肢は追加せず、検査対象の2資源と同じ生成処理を使う。試験実行側で構成を作る場合は `DistributedApplicationOptions.AssemblyName` に `typeof(Projects.Duck_Testing_AppHost).Assembly.GetName().Name` を、`ProjectDirectory` に `Projects.Duck_Testing_AppHost.ProjectPath` を指定し、`Args` も渡す。未指定時の `Assembly.GetEntryAssembly()` は `Tracker.Tests` の試験実行ホストを選ぶため、Aspire 13.5.4 AppHostの参照元型情報に埋め込まれたDCP CLI等の構成組み込み構成情報を解決できない。
+
+通常のテストでは環境変数 `DUCK_I81_NAMESPACE_DCP_PROBE_ENABLED` が未指定なら未実行として記録し、成功に数えない。値が存在する場合は `true` だけを有効値とし、それ以外の値はDCP開始前に失敗させる。有効時は `DUCK_I81_NAMESPACE_DCP_EXPECTED_ENGINE_ID` と一意な `DUCK_I81_NAMESPACE_DCP_RUN_ID` を必須とする。既存のDocker 接続先は変更せず、読み取り専用の実行環境ID、実行IDラベル、固定イメージの固定版識別子/保存済み配布物、既存発行物の必要ファイルを照合する。不一致、値の欠落、既存実行ID衝突、イメージまたは発行物の欠落時は、資源を開始・取得せず失敗させる。新しいイメージ取得・ビルド・依存導入は行わない。
+
+有効な場合だけ同じ生成処理から所有元と依存側の標準 `ContainerResource` を一つずつ登録し、AppHostを明示的に開始する。固定版識別子の既存`ASP.NET`イメージは `ImagePullPolicy.Never`、既存発行物は読み取り専用で割り当てる。所有元は `127.0.0.1` の動的`TCP`公開だけを持ち、依存側にはホスト公開を持たせず、`--network container:<owner>` と既存の開始依存を使う。初回2資源と、所有元・依存側それぞれ1回の再作成を観察し、完全ID、実行ID/役割ラベル、現在の実行環境、所有元IDに対する依存側 `HostConfig.NetworkMode`、公開`TCP`を読み取り専用確認する。最大4つのコンテナ世代を記録する。構成生成だけの検査、構成JSON、プロセス起動、作成成功を、DCPの実合成・再作成追従またはアプリケーション通信の証明に置き換えない。
+
+`StartAsync` から再作成・読み取り検査・後片付けまでの一回の上限を60秒とし、再試行しない。期限・失敗時は追加の再作成を止め、残り時間内にDCP所有の通常停止・後片付けを試みる。後片付けが上限を超えた場合は、残存する所有IDと状態を記録し、失敗／未完了として報告する。強制終了や手動のコンテナ削除はしない。後片付けの確認は当該実行ID/役割ラベルと完全IDに限定し、他所有者の資源には操作しない。ネットワークの転送やアプリケーション通信成功はこの検査の判定対象に含めない。
 ### Windows の TCP 待受
 
 AppHost は Game Controller の8082、DebugHost の8080、必要な HTTP 準備確認口に名前付きの接続先を定義し、動的なホストポートを Dashboard に示す。Windows ブラウザーは Dashboard の `game-controller` と `debug-host` の URL を開く。コンテナ内では対象のネットワークインターフェースで HTTP を待ち受け、ホスト側は127.0.0.1だけとする。コンテナ内の待受と Windows の待受範囲を混同しない。
