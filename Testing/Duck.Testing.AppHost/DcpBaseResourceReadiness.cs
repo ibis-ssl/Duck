@@ -31,6 +31,9 @@ internal sealed class DcpBaseResourceReadinessRegistry
         internal long Generation;
         internal bool IsReady;
         internal bool ResourceKeyAmbiguous;
+        internal bool HasObservedFullContainerId;
+        internal bool IsInitialPlaceholder;
+        internal string? AmbiguousActiveResourceId;
         internal readonly HashSet<string> RetiredResourceIds = new(StringComparer.Ordinal);
         internal readonly HashSet<string> PendingResourceIds = new(StringComparer.Ordinal);
         internal string Reason = "No current DCP container identity has been observed.";
@@ -77,6 +80,11 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     return;
                 }
 
+                if (entry.AmbiguousActiveResourceId is not null)
+                {
+                    return;
+                }
+
                 entry.ResourceKeyAmbiguous = false;
                 entry.PendingResourceIds.Clear();
             }
@@ -88,10 +96,24 @@ internal sealed class DcpBaseResourceReadinessRegistry
                 {
                     entry.RetiredResourceIds.Add(entry.ResourceId);
                 }
+                else if (entry.IsInitialPlaceholder && !entry.HasObservedFullContainerId)
+                {
+                    entry.RetiredResourceIds.Add(entry.ResourceId);
+                    entry.ResourceId = target.ResourceId;
+                    entry.State = state;
+                    entry.ContainerId = target.ContainerId;
+                    entry.IsInitialPlaceholder = false;
+                    entry.HasObservedFullContainerId = true;
+                    entry.IsReady = false;
+                    entry.Generation++;
+                    entry.Reason = "The initial unresolved resource key was replaced by a runtime key with a full container identity; engine ownership and service readiness are unverified.";
+                    return;
+                }
                 else
                 {
                     entry.PendingResourceIds.Add(target.ResourceId);
                     entry.ResourceKeyAmbiguous = true;
+                    entry.AmbiguousActiveResourceId = entry.ResourceId;
                     entry.ContainerId = null;
                     entry.IsReady = false;
                     entry.State = "Unknown";
@@ -112,6 +134,8 @@ internal sealed class DcpBaseResourceReadinessRegistry
             entry.ResourceId = target.ResourceId;
             entry.ContainerId = target.ContainerId;
             entry.State = state;
+            entry.HasObservedFullContainerId = true;
+            entry.IsInitialPlaceholder = false;
         }
     }
 
@@ -137,8 +161,22 @@ internal sealed class DcpBaseResourceReadinessRegistry
             {
                 if (!IsTerminalState(entry.State))
                 {
+                    if (entry.IsInitialPlaceholder && !entry.HasObservedFullContainerId)
+                    {
+                        entry.RetiredResourceIds.Add(entry.ResourceId);
+                        entry.ResourceId = resourceId;
+                        entry.State = state;
+                        entry.ContainerId = null;
+                        entry.IsInitialPlaceholder = false;
+                        entry.IsReady = false;
+                        entry.Generation++;
+                        entry.Reason = "The initial unresolved resource key was replaced by a runtime resource key; awaiting its current full container identity.";
+                        return null;
+                    }
+
                     entry.PendingResourceIds.Add(resourceId);
                     entry.ResourceKeyAmbiguous = true;
+                    entry.AmbiguousActiveResourceId = entry.ResourceId;
                     entry.ContainerId = null;
                     entry.IsReady = false;
                     entry.State = "Unknown";
@@ -154,6 +192,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
             {
                 entry.Generation++;
             }
+            if (entry.ResourceId is null && !entry.HasObservedFullContainerId && state == "Starting")
+            {
+                entry.IsInitialPlaceholder = true;
+            }
             entry.ResourceId = resourceId;
             entry.State = state;
             entry.ContainerId = null;
@@ -168,6 +210,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                 entry.ResourceId = pendingResourceId;
                 entry.State = "Unknown";
                 entry.ResourceKeyAmbiguous = true;
+                entry.AmbiguousActiveResourceId = null;
                 entry.Reason = "A replacement resource key was identified after the prior key stopped; awaiting its current full container identity.";
                 entry.Generation++;
                 return pendingResourceId;
@@ -257,7 +300,7 @@ internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadi
                 current,
                 out var target) || target is null)
         {
-            registry.ObserveUnavailable(current.Resource, observation.ResourceId, "Unknown");
+            registry.ObserveUnavailable(current.Resource, observation.ResourceId, state);
             return;
         }
 

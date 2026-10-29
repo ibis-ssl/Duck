@@ -126,11 +126,153 @@ public sealed class DcpBaseResourceReadinessTests
         Assert.False(snapshot.IsReady);
     }
 
+    [Fact]
+    public void EventConsumerKeepsBothRunningKeysAmbiguousUntilOldKeyStops()
+    {
+        var resource = new ContainerResource("simulator", "example/simulator:fixed");
+        var registry = new DcpBaseResourceReadinessRegistry([(resource, "simulator", "shared-run")]);
+        var consumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var currentByKey = new Dictionary<string, ResourceEvent>(StringComparer.Ordinal);
+        ResourceEvent? GetCurrent(string resourceId) => currentByKey.GetValueOrDefault(resourceId);
+
+        var oldRunning = Event(resource, "simulator-old-key", "Running", FirstContainerId);
+        currentByKey[oldRunning.ResourceId] = oldRunning;
+        consumer.Observe(oldRunning, oldRunning, "simulator", GetCurrent);
+
+        var replacementRunning = Event(resource, "simulator-new-key", "Running", NextContainerId);
+        currentByKey[replacementRunning.ResourceId] = replacementRunning;
+        consumer.Observe(replacementRunning, replacementRunning, "simulator", GetCurrent);
+
+        var lateOldRunning = Event(resource, "simulator-old-key", "Running", FirstContainerId);
+        currentByKey[lateOldRunning.ResourceId] = lateOldRunning;
+        consumer.Observe(lateOldRunning, lateOldRunning, "simulator", GetCurrent);
+
+        var ambiguous = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(resource));
+        Assert.Empty(ambiguous.ResourceId);
+        Assert.Null(ambiguous.ContainerId);
+        Assert.Equal("Unknown", ambiguous.State);
+        Assert.False(ambiguous.IsReady);
+
+        var oldStopped = Event(resource, "simulator-old-key", "Stopped", FirstContainerId);
+        currentByKey[oldStopped.ResourceId] = oldStopped;
+        consumer.Observe(oldStopped, oldStopped, "simulator", GetCurrent);
+
+        var promoted = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(resource));
+        Assert.Equal("simulator-new-key", promoted.ResourceId);
+        Assert.Equal(NextContainerId, promoted.ContainerId);
+        Assert.False(promoted.IsReady);
+    }
+
+    [Theory]
+    [InlineData("simulator", false)]
+    [InlineData("simulator", true)]
+    [InlineData("simulator-placeholder-key", false)]
+    [InlineData("simulator-placeholder-key", true)]
+    public void EventConsumerPromotesInitialPlaceholderToRuntimeKeyWithoutOldTerminal(
+        string placeholderResourceId,
+        bool runtimeStartingHasFullId)
+    {
+        var resource = new ContainerResource("simulator", "example/simulator:fixed");
+        var registry = new DcpBaseResourceReadinessRegistry([(resource, "simulator", "shared-run")]);
+        var consumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var currentByKey = new Dictionary<string, ResourceEvent>(StringComparer.Ordinal);
+        ResourceEvent? GetCurrent(string resourceId) => currentByKey.GetValueOrDefault(resourceId);
+
+        var placeholder = EventWithoutContainerId(resource, placeholderResourceId, "Starting");
+        currentByKey[placeholder.ResourceId] = placeholder;
+        consumer.Observe(placeholder, placeholder, "simulator", GetCurrent);
+
+        var runtimeStarting = runtimeStartingHasFullId
+            ? Event(resource, "simulator-runtime-key", "Starting", FirstContainerId)
+            : EventWithoutContainerId(resource, "simulator-runtime-key", "Starting");
+        currentByKey[runtimeStarting.ResourceId] = runtimeStarting;
+        consumer.Observe(runtimeStarting, runtimeStarting, "simulator", GetCurrent);
+
+        var runtimeRunning = Event(resource, "simulator-runtime-key", "Running", FirstContainerId);
+        currentByKey[runtimeRunning.ResourceId] = runtimeRunning;
+        consumer.Observe(runtimeRunning, runtimeRunning, "simulator", GetCurrent);
+
+        var current = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(resource));
+        Assert.Equal("simulator-runtime-key", current.ResourceId);
+        Assert.Equal(FirstContainerId, current.ContainerId);
+        Assert.Equal("Running", current.State);
+        Assert.False(current.IsReady);
+
+        var latePlaceholder = EventWithoutContainerId(resource, placeholderResourceId, "Starting");
+        currentByKey[latePlaceholder.ResourceId] = latePlaceholder;
+        consumer.Observe(latePlaceholder, latePlaceholder, "simulator", GetCurrent);
+
+        var afterLatePlaceholder = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(resource));
+        Assert.Equal("simulator-runtime-key", afterLatePlaceholder.ResourceId);
+        Assert.Equal(FirstContainerId, afterLatePlaceholder.ContainerId);
+        Assert.Equal("Running", afterLatePlaceholder.State);
+        Assert.False(afterLatePlaceholder.IsReady);
+    }
+
+    [Fact]
+    public void EventConsumerDoesNotPromoteAnotherKeyAfterAFullIdentityWasObserved()
+    {
+        var resource = new ContainerResource("simulator", "example/simulator:fixed");
+        var registry = new DcpBaseResourceReadinessRegistry([(resource, "simulator", "shared-run")]);
+        var consumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var currentByKey = new Dictionary<string, ResourceEvent>(StringComparer.Ordinal);
+        ResourceEvent? GetCurrent(string resourceId) => currentByKey.GetValueOrDefault(resourceId);
+
+        var oldRunning = Event(resource, "simulator-old-key", "Running", FirstContainerId);
+        currentByKey[oldRunning.ResourceId] = oldRunning;
+        consumer.Observe(oldRunning, oldRunning, "simulator", GetCurrent);
+
+        var oldUnknown = EventWithoutContainerId(resource, "simulator-old-key", "Unknown");
+        currentByKey[oldUnknown.ResourceId] = oldUnknown;
+        consumer.Observe(oldUnknown, oldUnknown, "simulator", GetCurrent);
+
+        var replacementRunning = Event(resource, "simulator-new-key", "Running", NextContainerId);
+        currentByKey[replacementRunning.ResourceId] = replacementRunning;
+        consumer.Observe(replacementRunning, replacementRunning, "simulator", GetCurrent);
+
+        var ambiguous = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(resource));
+        Assert.Empty(ambiguous.ResourceId);
+        Assert.Null(ambiguous.ContainerId);
+        Assert.Equal("Unknown", ambiguous.State);
+        Assert.False(ambiguous.IsReady);
+    }
+
+    [Fact]
+    public void EventConsumerKeepsTwoDifferentActiveFullIdentitiesAmbiguous()
+    {
+        var resource = new ContainerResource("simulator", "example/simulator:fixed");
+        var registry = new DcpBaseResourceReadinessRegistry([(resource, "simulator", "shared-run")]);
+        var consumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var currentByKey = new Dictionary<string, ResourceEvent>(StringComparer.Ordinal);
+        ResourceEvent? GetCurrent(string resourceId) => currentByKey.GetValueOrDefault(resourceId);
+
+        var firstRunning = Event(resource, "simulator-first-key", "Running", FirstContainerId);
+        currentByKey[firstRunning.ResourceId] = firstRunning;
+        consumer.Observe(firstRunning, firstRunning, "simulator", GetCurrent);
+
+        var secondRunning = Event(resource, "simulator-second-key", "Running", NextContainerId);
+        currentByKey[secondRunning.ResourceId] = secondRunning;
+        consumer.Observe(secondRunning, secondRunning, "simulator", GetCurrent);
+
+        var ambiguous = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(resource));
+        Assert.Empty(ambiguous.ResourceId);
+        Assert.Null(ambiguous.ContainerId);
+        Assert.False(ambiguous.IsReady);
+    }
+
     private static ResourceEvent Event(IResource resource, string resourceId, string state, string containerId) =>
         new(resource, resourceId, new CustomResourceSnapshot
         {
             ResourceType = "container",
             State = new ResourceStateSnapshot(state, "fixture"),
             Properties = [new ResourcePropertySnapshot("container.id", containerId)],
+        });
+
+    private static ResourceEvent EventWithoutContainerId(IResource resource, string resourceId, string state) =>
+        new(resource, resourceId, new CustomResourceSnapshot
+        {
+            ResourceType = "container",
+            State = new ResourceStateSnapshot(state, "fixture"),
+            Properties = [],
         });
 }
