@@ -938,7 +938,7 @@ internal sealed class OwnedSourceGenerationMonitor(
     }
 }
 
-internal sealed record OwnedContainerNetworkEndpoint(string NetworkName, IPAddress Address);
+internal sealed record OwnedContainerNetworkEndpoint(string NetworkName, string? NetworkId, IPAddress Address);
 
 internal static class OwnedContainerInspection
 {
@@ -1032,6 +1032,15 @@ internal static class OwnedContainerInspection
     }
 
     internal static bool TryReadNetworkEndpoint(string json, out OwnedContainerNetworkEndpoint? endpoint)
+        => TryReadNetworkEndpoint(json, requireNetworkId: false, out endpoint);
+
+    internal static bool TryReadStandardDcpNetworkEndpoint(string json, out OwnedContainerNetworkEndpoint? endpoint)
+        => TryReadNetworkEndpoint(json, requireNetworkId: true, out endpoint);
+
+    private static bool TryReadNetworkEndpoint(
+        string json,
+        bool requireNetworkId,
+        out OwnedContainerNetworkEndpoint? endpoint)
     {
         endpoint = null;
         try
@@ -1048,9 +1057,23 @@ internal static class OwnedContainerInspection
             }
 
             var entries = networks.EnumerateObject().ToArray();
+            JsonElement networkIdElement = default;
+            var hasNetworkId = entries.Length == 1 &&
+                entries[0].Value.ValueKind == JsonValueKind.Object &&
+                entries[0].Value.TryGetProperty("NetworkID", out networkIdElement) &&
+                networkIdElement.ValueKind == JsonValueKind.String &&
+                IsFullNetworkId(networkIdElement.GetString());
+            var networkId = hasNetworkId ? networkIdElement.GetString() : null;
+            var modeMatchesAttachment = string.Equals(networkMode.GetString(), entries.Length == 1 ? entries[0].Name : null, StringComparison.Ordinal);
+            var modeMatchesNetwork = hasNetworkId && IsValidNetworkMode(networkMode.GetString()!, entries[0].Name, networkId!);
             if (entries.Length != 1 ||
-                !string.Equals(networkMode.GetString(), entries[0].Name, StringComparison.Ordinal) ||
+                string.IsNullOrWhiteSpace(entries[0].Name) ||
                 entries[0].Value.ValueKind != JsonValueKind.Object ||
+                string.Equals(networkMode.GetString(), "host", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(networkMode.GetString(), "none", StringComparison.OrdinalIgnoreCase) ||
+                networkMode.GetString()!.StartsWith("container:", StringComparison.OrdinalIgnoreCase) ||
+                (requireNetworkId && (!hasNetworkId || !modeMatchesNetwork)) ||
+                (!requireNetworkId && !modeMatchesAttachment) ||
                 !entries[0].Value.TryGetProperty("IPAddress", out var addressElement) ||
                 addressElement.ValueKind != JsonValueKind.String ||
                 !IPAddress.TryParse(addressElement.GetString(), out var address) ||
@@ -1065,7 +1088,7 @@ internal static class OwnedContainerInspection
                 return false;
             }
 
-            endpoint = new OwnedContainerNetworkEndpoint(entries[0].Name, address);
+            endpoint = new OwnedContainerNetworkEndpoint(entries[0].Name, networkId, address);
             return true;
         }
         catch (JsonException)
@@ -1073,6 +1096,14 @@ internal static class OwnedContainerInspection
             return false;
         }
     }
+
+    private static bool IsFullNetworkId(string? value) =>
+        value is { Length: 64 } && value.All(Uri.IsHexDigit);
+
+    private static bool IsValidNetworkMode(string mode, string networkName, string networkId) =>
+        string.Equals(mode, "default", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(mode, networkName, StringComparison.Ordinal) ||
+        string.Equals(mode, networkId, StringComparison.OrdinalIgnoreCase);
 
     private static bool HasLabel(JsonElement labels, string name, string expectedValue) =>
         labels.TryGetProperty(name, out var value) &&

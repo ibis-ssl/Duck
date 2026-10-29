@@ -59,6 +59,29 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
         }
         if (candidates.All(candidate => candidate.IdentityVerified && candidate.NetworkVerified && candidate.OwnershipVerified))
         {
+            var changedCandidate = candidates.FirstOrDefault(candidate =>
+                !IsCurrentCandidate(candidate, getCurrentByResourceId));
+            if (changedCandidate is not null)
+            {
+                foreach (var candidate in candidates)
+                {
+                    registry.InvalidateOwnershipProof(
+                        candidate,
+                        "The current DCP notification no longer matches cached ownership evidence.");
+                }
+
+                return Result(
+                    DcpBaseResourceOwnershipDisposition.CandidateChanged,
+                    "The current resource key, state, or full container ID no longer matches cached ownership evidence.",
+                    changedCandidate.ResourceName);
+            }
+            if (!registry.AreOwnershipProofsCurrent(candidates))
+            {
+                return Result(
+                    DcpBaseResourceOwnershipDisposition.CandidateChanged,
+                    "The ownership candidate generation changed while cached evidence was being revalidated.");
+            }
+
             var networkName = candidates.Select(candidate => candidate.ObservedNetworkName)
                 .Distinct(StringComparer.Ordinal).Count() == 1
                 ? candidates[0].ObservedNetworkName
@@ -88,6 +111,7 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
 
             var proofs = new List<DcpBaseResourceOwnershipProof>(candidates.Count);
             string? sharedNetworkName = null;
+            string? sharedNetworkId = null;
             var networkShapeIsShared = true;
             foreach (var candidate in candidates)
             {
@@ -114,9 +138,9 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
                         inspectCount: inspectCount);
                 }
 
-                var hasValidNetworkShape = OwnedContainerInspection.TryReadNetworkEndpoint(
+                var hasValidNetworkShape = OwnedContainerInspection.TryReadStandardDcpNetworkEndpoint(
                     inspectResult.StandardOutput,
-                    out var endpoint) && endpoint is not null;
+                    out var endpoint) && endpoint?.NetworkId is not null;
                 if (!hasValidNetworkShape)
                 {
                     networkShapeIsShared = false;
@@ -130,37 +154,27 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
                     continue;
                 }
 
+                var validEndpoint = endpoint!;
                 if (sharedNetworkName is not null &&
-                    !string.Equals(sharedNetworkName, endpoint!.NetworkName, StringComparison.Ordinal))
+                    (!string.Equals(sharedNetworkName, validEndpoint.NetworkName, StringComparison.Ordinal) ||
+                     !string.Equals(sharedNetworkId, validEndpoint.NetworkId, StringComparison.OrdinalIgnoreCase)))
                 {
                     networkShapeIsShared = false;
                 }
-                sharedNetworkName ??= endpoint!.NetworkName;
+                sharedNetworkName ??= validEndpoint.NetworkName;
+                sharedNetworkId ??= validEndpoint.NetworkId;
                 proofs.Add(new DcpBaseResourceOwnershipProof(
                     candidate.Resource,
                     candidate.ResourceId,
                     candidate.ContainerId!,
                     candidate.Generation,
                     engineResult.StandardOutput.Trim(),
-                    endpoint!.NetworkName));
+                    validEndpoint.NetworkName));
             }
 
             foreach (var candidate in candidates)
             {
-                var current = getCurrentByResourceId(candidate.ResourceId);
-                if (current is null ||
-                    !ReferenceEquals(current.Resource, candidate.Resource) ||
-                    current.ResourceId != candidate.ResourceId ||
-                    current.Snapshot.State?.Text != "Running" ||
-                    !RegisteredContainerEventProjection.TryProject(
-                        candidate.Resource,
-                        candidate.ResourceId,
-                        candidate.Role,
-                        current,
-                        current,
-                        out var latest) ||
-                    latest is null ||
-                    latest.ContainerId != candidate.ContainerId)
+                if (!IsCurrentCandidate(candidate, getCurrentByResourceId))
                 {
                     return Result(
                         DcpBaseResourceOwnershipDisposition.CandidateChanged,
@@ -228,6 +242,26 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
         string? observedNetworkName = null,
         int inspectCount = 0) =>
         new(disposition, reason, resourceName, observedNetworkName, inspectCount);
+
+    private static bool IsCurrentCandidate(
+        DcpBaseResourceIdentityCandidate candidate,
+        Func<string, ResourceEvent?> getCurrentByResourceId)
+    {
+        var current = getCurrentByResourceId(candidate.ResourceId);
+        return current is not null &&
+            ReferenceEquals(current.Resource, candidate.Resource) &&
+            current.ResourceId == candidate.ResourceId &&
+            current.Snapshot.State?.Text == "Running" &&
+            RegisteredContainerEventProjection.TryProject(
+                candidate.Resource,
+                candidate.ResourceId,
+                candidate.Role,
+                current,
+                current,
+                out var latest) &&
+            latest is not null &&
+            latest.ContainerId == candidate.ContainerId;
+    }
 
     private static TimeSpan RemainingBudget(Stopwatch timer)
     {

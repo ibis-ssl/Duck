@@ -44,6 +44,158 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
         });
     }
 
+    [Theory]
+    [InlineData("default")]
+    [InlineData("network-id")]
+    [InlineData("mixed")]
+    public async Task AcceptsDefaultOrAttachedNetworkIdModeForTheSameSingleBridge(string mode)
+    {
+        var fixture = new OwnershipFixture();
+        foreach (var (candidate, index) in fixture.Registry.GetCandidates().Select((candidate, index) => (candidate, index)))
+        {
+            fixture.Runner.NetworkModes[candidate.ContainerId!] = mode switch
+            {
+                "default" => "default",
+                "network-id" => new string('b', 64),
+                _ => index switch
+                {
+                    0 => "default",
+                    1 => new string('b', 64),
+                    2 => NetworkName,
+                    _ => "default",
+                },
+            };
+        }
+
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, result.Disposition);
+        Assert.Equal(NetworkName, result.ObservedNetworkName);
+        Assert.All(fixture.Registry.GetCandidates(), candidate =>
+        {
+            Assert.True(candidate.IdentityVerified);
+            Assert.True(candidate.NetworkVerified);
+            Assert.True(candidate.OwnershipVerified);
+            Assert.False(fixture.Registry.Get(candidate.Resource)!.IsReady);
+        });
+    }
+
+    [Theory]
+    [InlineData("host")]
+    [InlineData("none")]
+    [InlineData("container:other")]
+    [InlineData("unknown-network")]
+    public async Task RejectsNonStandardNetworkModes(string mode)
+    {
+        var fixture = new OwnershipFixture();
+        var first = fixture.Registry.GetCandidates()[0];
+        fixture.Runner.NetworkModes[first.ContainerId!] = mode;
+
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.NetworkObservationRejected, result.Disposition);
+        Assert.Null(result.ObservedNetworkName);
+        Assert.False(fixture.Registry.Get(first.Resource)!.NetworkVerified);
+        Assert.False(fixture.Registry.Get(first.Resource)!.OwnershipVerified);
+    }
+
+    [Fact]
+    public async Task RejectsAnUnrelatedFullNetworkIdAsNetworkMode()
+    {
+        var fixture = new OwnershipFixture();
+        var first = fixture.Registry.GetCandidates()[0];
+        fixture.Runner.NetworkModes[first.ContainerId!] = new string('c', 64);
+
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.NetworkObservationRejected, result.Disposition);
+        Assert.Null(result.ObservedNetworkName);
+        Assert.False(fixture.Registry.Get(first.Resource)!.NetworkVerified);
+    }
+
+    [Fact]
+    public async Task StandardDcpOwnershipRequiresACompleteNetworkId()
+    {
+        var fixture = new OwnershipFixture();
+        fixture.Runner.OmitNetworkId = true;
+
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.NetworkObservationRejected, result.Disposition);
+        Assert.Null(result.ObservedNetworkName);
+        Assert.All(fixture.Registry.GetCandidates(), candidate =>
+        {
+            Assert.False(fixture.Registry.Get(candidate.Resource)!.NetworkVerified);
+            Assert.False(fixture.Registry.Get(candidate.Resource)!.OwnershipVerified);
+        });
+    }
+
+    [Fact]
+    public async Task SameIdStartingStateInvalidatesPreviouslyVerifiedOwnership()
+    {
+        var fixture = new OwnershipFixture();
+        var initial = await fixture.VerifyAsync();
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, initial.Disposition);
+
+        fixture.SetFirstCandidateState("Starting");
+
+        var candidate = fixture.Registry.GetCandidates()[0];
+        Assert.False(candidate.IdentityVerified);
+        Assert.False(candidate.NetworkVerified);
+        Assert.False(candidate.OwnershipVerified);
+    }
+
+    [Fact]
+    public async Task SameIdRunningAfterStartingIsInspectedAgain()
+    {
+        var fixture = new OwnershipFixture();
+        var initial = await fixture.VerifyAsync();
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, initial.Disposition);
+
+        fixture.SetFirstCandidateState("Starting");
+        fixture.SetFirstCandidateState("Running");
+        var result = await fixture.VerifyAsync();
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, result.Disposition);
+        Assert.Equal(2, fixture.Runner.EngineReads);
+        Assert.Equal(8, fixture.Runner.InspectReads);
+    }
+
+    [Fact]
+    public async Task CachedOwnershipProofIsNotReturnedForAChangedCurrentFullId()
+    {
+        var fixture = new OwnershipFixture();
+        var initial = await fixture.VerifyAsync();
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, initial.Disposition);
+        var candidate = fixture.Registry.GetCandidates()[0];
+
+        var result = await fixture.VerifyAsync(fixture.CurrentWithFirstCandidateReplacement());
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.CandidateChanged, result.Disposition);
+        Assert.Equal(1, fixture.Runner.EngineReads);
+        Assert.Equal(4, fixture.Runner.InspectReads);
+        Assert.False(fixture.Registry.Get(candidate.Resource)!.OwnershipVerified);
+    }
+
+    [Fact]
+    public async Task CachedOwnershipProofIsNotReturnedWhenCurrentStateIsStopped()
+    {
+        var fixture = new OwnershipFixture();
+        var initial = await fixture.VerifyAsync();
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown, initial.Disposition);
+        var candidate = fixture.Registry.GetCandidates()[0];
+        var stopped = fixture.FirstCandidateStateEvent("Stopped");
+
+        var result = await fixture.VerifyAsync(resourceId => resourceId == candidate.ResourceId
+            ? stopped
+            : fixture.GetCurrent(resourceId));
+
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.CandidateChanged, result.Disposition);
+        Assert.Equal(1, fixture.Runner.EngineReads);
+        Assert.Equal(4, fixture.Runner.InspectReads);
+        Assert.False(fixture.Registry.Get(candidate.Resource)!.OwnershipVerified);
+    }
+
     [Fact]
     public async Task RejectsWrongEngineBeforeInspectingAnyContainer()
     {
@@ -75,6 +227,18 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
         Assert.Equal(DcpBaseResourceOwnershipDisposition.NetworkObservationRejected, networkResult.Disposition);
         Assert.Null(networkResult.ObservedNetworkName);
         Assert.All(wrongNetwork.Registry.GetCandidates(), candidate =>
+        {
+            Assert.True(candidate.IdentityVerified);
+            Assert.False(candidate.NetworkVerified);
+            Assert.False(candidate.OwnershipVerified);
+        });
+
+        var wrongNetworkId = new OwnershipFixture();
+        wrongNetworkId.Runner.DifferentNetworkIdRole = "crane";
+        var networkIdResult = await wrongNetworkId.VerifyAsync();
+        Assert.Equal(DcpBaseResourceOwnershipDisposition.NetworkObservationRejected, networkIdResult.Disposition);
+        Assert.Null(networkIdResult.ObservedNetworkName);
+        Assert.All(wrongNetworkId.Registry.GetCandidates(), candidate =>
         {
             Assert.True(candidate.IdentityVerified);
             Assert.False(candidate.NetworkVerified);
@@ -211,6 +375,27 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             resourceId => currentEvents.Values.SingleOrDefault(resourceEvent => resourceEvent.ResourceId == resourceId),
             cancellationToken);
 
+        internal Task<DcpBaseResourceOwnershipResult> VerifyAsync(
+            Func<string, ResourceEvent?> getCurrentByResourceId,
+            CancellationToken cancellationToken = default) => OwnershipConsumer.VerifyCurrentAsync(
+                getCurrentByResourceId,
+                cancellationToken);
+
+        internal Func<string, ResourceEvent?> CurrentWithFirstCandidateReplacement()
+        {
+            var candidate = Registry.GetCandidates()[0];
+            var replacement = Event(candidate.Resource, candidate.Role, new string('f', 64));
+            return resourceId => resourceId == candidate.ResourceId
+                ? replacement
+                : currentEvents.Values.SingleOrDefault(resourceEvent => resourceEvent.ResourceId == resourceId);
+        }
+
+        internal ResourceEvent FirstCandidateStateEvent(string state)
+        {
+            var candidate = Registry.GetCandidates()[0];
+            return Event(candidate.Resource, candidate.Role, candidate.ContainerId!, state);
+        }
+
         internal void ReplaceFirstCandidate()
         {
             var resource = Registry.GetCandidates()[0].Resource;
@@ -229,7 +414,7 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             readinessConsumer.Observe(replacement, replacement, candidate.Role, GetCurrent);
         }
 
-        private ResourceEvent? GetCurrent(string resourceId) =>
+        internal ResourceEvent? GetCurrent(string resourceId) =>
             currentEvents.Values.SingleOrDefault(resourceEvent => resourceEvent.ResourceId == resourceId);
 
         private static ResourceEvent Event(IResource resource, string role, string containerId, string state = "Running") =>
@@ -261,7 +446,7 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
                 {
                     Networks = new Dictionary<string, object>(StringComparer.Ordinal)
                     {
-                        [networkName] = new { IPAddress = address },
+                        [networkName] = new { IPAddress = address, NetworkID = new string('b', 64) },
                     },
                 },
             });
@@ -270,9 +455,12 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
     private sealed class FakeDockerStdioCommandRunner : IDockerStdioCommandRunner
     {
         internal Dictionary<string, string> Inspections { get; } = new(StringComparer.Ordinal);
+        internal Dictionary<string, string> NetworkModes { get; } = new(StringComparer.Ordinal);
         internal string EngineId { get; set; } = DcpBaseResourceOwnershipEventConsumerTests.EngineId;
         internal string? WrongRunRole { get; set; }
         internal string? DifferentNetworkRole { get; set; }
+        internal string? DifferentNetworkIdRole { get; set; }
+        internal bool OmitNetworkId { get; set; }
         internal Action? AfterFirstInspect { get; set; }
         internal Func<IReadOnlyList<string>, CancellationToken, Task<DockerStdioCommandResult>>? CaptureOverride { get; set; }
         internal int EngineReads { get; private set; }
@@ -300,6 +488,10 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             InspectReads++;
             var containerId = arguments[^1];
             var json = Inspections[containerId];
+            if (NetworkModes.TryGetValue(containerId, out var networkMode))
+            {
+                json = json.Replace($"\"NetworkMode\":\"{NetworkName}\"", $"\"NetworkMode\":\"{networkMode}\"", StringComparison.Ordinal);
+            }
             if (WrongRunRole is not null && json.Contains($"\"{ContainerIdentityExecHandoff.RoleLabel}\":\"{WrongRunRole}\"", StringComparison.Ordinal))
             {
                 json = json.Replace(RunId, "foreign-run", StringComparison.Ordinal);
@@ -307,6 +499,14 @@ public sealed class DcpBaseResourceOwnershipEventConsumerTests
             if (DifferentNetworkRole is not null && json.Contains($"\"{ContainerIdentityExecHandoff.RoleLabel}\":\"{DifferentNetworkRole}\"", StringComparison.Ordinal))
             {
                 json = json.Replace(NetworkName, "other-bridge", StringComparison.Ordinal);
+            }
+            if (DifferentNetworkIdRole is not null && json.Contains($"\"{ContainerIdentityExecHandoff.RoleLabel}\":\"{DifferentNetworkIdRole}\"", StringComparison.Ordinal))
+            {
+                json = json.Replace(new string('b', 64), new string('c', 64), StringComparison.Ordinal);
+            }
+            if (OmitNetworkId)
+            {
+                json = json.Replace($",\"NetworkID\":\"{new string('b', 64)}\"", string.Empty, StringComparison.Ordinal);
             }
 
             if (InspectReads == 1)

@@ -547,6 +547,27 @@ public sealed class OwnedRefereeReconfigurationTests
         Assert.Equal(expected, OwnedContainerInspection.TryReadNetworkEndpoint(json, out _));
     }
 
+    [Fact]
+    public void LegacyNetworkEndpointDoesNotAdoptStandardDcpNetworkModeForms()
+    {
+        foreach (var networkMode in new[] { "default", new string('b', 64) })
+        {
+            var json = JsonSerializer.Serialize(new
+            {
+                HostConfig = new { NetworkMode = networkMode },
+                NetworkSettings = new
+                {
+                    Networks = new Dictionary<string, object>
+                    {
+                        ["duck-net"] = new { IPAddress = "10.0.0.21", NetworkID = new string('b', 64) },
+                    },
+                },
+            });
+
+            Assert.False(OwnedContainerInspection.TryReadNetworkEndpoint(json, out _));
+        }
+    }
+
     private static OwnedRefereeReconfigurationCoordinator CreateCoordinator(
         IOwnedReconfigurationAdapter adapter,
         IResource gc,

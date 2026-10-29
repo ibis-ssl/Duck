@@ -1,0 +1,195 @@
+using System.Text.Json;
+using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.AppHost;
+using Duck.Testing.Diagnostics;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tracker.Tests;
+
+public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
+{
+    [Fact]
+    public async Task ConsumesNewResourceKeyWhilePreviousOwnershipInspectionIsPending()
+    {
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance,
+            lifetime);
+        var runId = "observer-concurrency-run";
+        var stackId = "observer-concurrency-stack";
+        var resources = new (IResource Resource, string Role)[]
+        {
+            (new ContainerResource("simulator", "example/simulator:fixed"), "simulator"),
+            (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller"),
+            (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim"),
+            (new ContainerResource("crane", "example/crane:fixed"), "crane"),
+        };
+        var registry = new DcpBaseResourceReadinessRegistry(
+            resources.Select(item => (item.Resource, item.Role, runId)),
+            stackId);
+        var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var runner = new ObserverDockerRunner(runId, stackId);
+        var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
+            registry,
+            runner,
+            "desktop-linux",
+            "expected-engine");
+        var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
+        foreach (var (resource, role) in resources)
+        {
+            roles.Add(resource, role);
+        }
+        using var observer = new DcpBaseResourceReadinessObserver(notifications, eventConsumer, ownershipConsumer, roles);
+
+        await observer.StartAsync(CancellationToken.None);
+        try
+        {
+            foreach (var (resource, role) in resources)
+            {
+                await notifications.PublishUpdateAsync(resource, $"{role}-key-a", _ => Snapshot("Running", ContainerId(role)));
+            }
+
+            await runner.FirstInspectStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-b", _ => Snapshot("Running", new string('f', 64)));
+
+            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+            var newKeyObserved = false;
+            while (DateTime.UtcNow < deadline)
+            {
+                var candidate = registry.GetCandidates().Single(item => item.Resource == resources[0].Resource);
+                if (candidate.ResourceKeyAmbiguous)
+                {
+                    newKeyObserved = true;
+                    break;
+                }
+
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+            }
+
+            Assert.True(newKeyObserved, "The observer did not consume the new resource key while the prior Docker inspect was pending.");
+            var heldCandidate = registry.GetCandidates().Single(item => item.Resource == resources[0].Resource);
+            Assert.True(heldCandidate.ResourceKeyAmbiguous);
+            Assert.Null(heldCandidate.ContainerId);
+            Assert.False(registry.Get(resources[0].Resource)!.OwnershipVerified);
+        }
+        finally
+        {
+            runner.ReleaseFirstInspect.TrySetResult();
+            using var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            await observer.StopAsync(stopTimeout.Token);
+        }
+    }
+
+    private static string ContainerId(string role) => role switch
+    {
+        "simulator" => new string('1', 64),
+        "game-controller" => new string('2', 64),
+        "cm4-sim" => new string('3', 64),
+        _ => new string('4', 64),
+    };
+
+    private static CustomResourceSnapshot Snapshot(string state, string? containerId) => new()
+    {
+        ResourceType = "container",
+        State = new ResourceStateSnapshot(state, "fixture"),
+        Properties = containerId is null ? [] : [new ResourcePropertySnapshot("container.id", containerId)],
+    };
+
+    private sealed class TestApplicationLifetime : IHostApplicationLifetime, IDisposable
+    {
+        private readonly CancellationTokenSource started = new();
+        private readonly CancellationTokenSource stopping = new();
+        private readonly CancellationTokenSource stopped = new();
+        public CancellationToken ApplicationStarted => started.Token;
+        public CancellationToken ApplicationStopping => stopping.Token;
+        public CancellationToken ApplicationStopped => stopped.Token;
+        public void StopApplication() => stopping.Cancel();
+        public void Dispose()
+        {
+            started.Dispose();
+            stopping.Dispose();
+            stopped.Dispose();
+        }
+    }
+
+    private sealed class ObserverDockerRunner(string runId, string stackId) : IDockerStdioCommandRunner
+    {
+        private int inspectCount;
+
+        internal TaskCompletionSource FirstInspectStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource ReleaseFirstInspect { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public async Task<DockerStdioCommandResult> CaptureBoundedAsync(
+            IReadOnlyList<string> arguments,
+            int maximumOutputCharacters,
+            TimeSpan timeout,
+            CancellationToken cancellationToken)
+        {
+            if (arguments.Contains("info", StringComparer.Ordinal))
+            {
+                return new DockerStdioCommandResult(0, "expected-engine", string.Empty);
+            }
+
+            var currentInspect = Interlocked.Increment(ref inspectCount);
+            if (currentInspect == 1)
+            {
+                FirstInspectStarted.TrySetResult();
+                await ReleaseFirstInspect.Task.WaitAsync(cancellationToken);
+            }
+
+            var containerId = arguments[^1];
+            var role = containerId[0] switch
+            {
+                '1' => "simulator",
+                '2' => "game-controller",
+                '3' => "cm4-sim",
+                _ => "crane",
+            };
+            return new DockerStdioCommandResult(0, InspectJson(containerId, role, runId, stackId), string.Empty);
+        }
+
+        public Task<DockerStdioCommandResult> ExecuteWithStdioAsync(
+            IReadOnlyList<string> arguments,
+            string standardInput,
+            int maximumOutputCharacters,
+            TimeSpan timeout,
+            CancellationToken cancellationToken) => throw new NotSupportedException();
+
+        public Task<string> CaptureAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<ContainerIdentityControlExecResult> RelayAsync(
+            IReadOnlyList<string> arguments,
+            ResourceDiagnosticIdentity identity,
+            string roleName,
+            string? expectedBootId,
+            CancellationToken cancellationToken) => throw new NotSupportedException();
+
+        private static string InspectJson(string containerId, string role, string runId, string stackId) =>
+            JsonSerializer.Serialize(new
+            {
+                Id = containerId,
+                State = new { Status = "running" },
+                Config = new
+                {
+                    Labels = new Dictionary<string, string>(StringComparer.Ordinal)
+                    {
+                        [ContainerIdentityExecHandoff.RunIdLabel] = runId,
+                        [ContainerIdentityExecHandoff.RoleLabel] = role,
+                        [DockerContainerSpec.StackLabel] = stackId,
+                        [DockerContainerSpec.ResourceLabel] = role,
+                        [DockerContainerSpec.RunLabel] = runId,
+                    },
+                },
+                HostConfig = new { NetworkMode = "aspire-default-network" },
+                NetworkSettings = new
+                {
+                    Networks = new Dictionary<string, object>(StringComparer.Ordinal)
+                    {
+                        ["aspire-default-network"] = new { IPAddress = "172.28.0.10" },
+                    },
+                },
+            });
+    }
+}

@@ -168,7 +168,8 @@ internal sealed class DcpBaseResourceReadinessRegistry
             }
 
             var identityChanged = entry.ResourceId != target.ResourceId || entry.ContainerId != target.ContainerId;
-            if (identityChanged)
+            var stateChanged = !string.Equals(entry.State, state, StringComparison.Ordinal);
+            if (identityChanged || stateChanged)
             {
                 entry.Generation++;
                 entry.IsReady = false;
@@ -176,7 +177,9 @@ internal sealed class DcpBaseResourceReadinessRegistry
                 entry.NetworkVerified = false;
                 entry.OwnershipVerified = false;
                 entry.ObservedNetworkName = null;
-                entry.Reason = "A new current DCP identity candidate was observed; engine ownership and service readiness are unverified.";
+                entry.Reason = stateChanged && !identityChanged
+                    ? "The DCP state changed; prior engine ownership evidence is invalid and service readiness remains unverified."
+                    : "A new current DCP identity candidate was observed; engine ownership and service readiness are unverified.";
             }
 
             entry.ResourceId = target.ResourceId;
@@ -373,6 +376,50 @@ internal sealed class DcpBaseResourceReadinessRegistry
         }
     }
 
+    internal bool InvalidateOwnershipProof(DcpBaseResourceIdentityCandidate candidate, string reason)
+    {
+        ArgumentNullException.ThrowIfNull(candidate);
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+        lock (sync)
+        {
+            if (!entries.TryGetValue(candidate.Resource, out var entry) ||
+                entry.ResourceId != candidate.ResourceId ||
+                entry.ContainerId != candidate.ContainerId ||
+                entry.Generation != candidate.Generation)
+            {
+                return false;
+            }
+
+            entry.Generation++;
+            entry.IsReady = false;
+            entry.IdentityVerified = false;
+            entry.NetworkVerified = false;
+            entry.OwnershipVerified = false;
+            entry.ObservedNetworkName = null;
+            entry.Reason = reason;
+            return true;
+        }
+    }
+
+    internal bool AreOwnershipProofsCurrent(IReadOnlyList<DcpBaseResourceIdentityCandidate> candidates)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        lock (sync)
+        {
+            return candidates.Count == entries.Count &&
+                candidates.All(candidate =>
+                    entries.TryGetValue(candidate.Resource, out var entry) &&
+                    !entry.ResourceKeyAmbiguous &&
+                    entry.ResourceId == candidate.ResourceId &&
+                    entry.ContainerId == candidate.ContainerId &&
+                    entry.Generation == candidate.Generation &&
+                    entry.State == "Running" &&
+                    entry.IdentityVerified &&
+                    entry.NetworkVerified &&
+                    entry.OwnershipVerified);
+        }
+    }
+
     private Entry? FindEntry(string roleName) =>
         entries.Values.SingleOrDefault(entry => entry.Resource.Name == roleName);
 
@@ -449,19 +496,54 @@ internal sealed class DcpBaseResourceReadinessObserver(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (var observation in notifications.WatchAsync(stoppingToken).ConfigureAwait(false))
+        using var verificationRequests = new SemaphoreSlim(0, 1);
+        using var verificationStopping = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        var verificationTask = VerifyRequestedOwnershipAsync(verificationRequests, verificationStopping.Token);
+        try
         {
-            if (!roles.TryGetValue(observation.Resource, out var role) ||
-                !notifications.TryGetCurrentState(observation.ResourceId, out var current))
+            await foreach (var observation in notifications.WatchAsync(stoppingToken).ConfigureAwait(false))
             {
-                continue;
-            }
+                if (!roles.TryGetValue(observation.Resource, out var role) ||
+                    !notifications.TryGetCurrentState(observation.ResourceId, out var current))
+                {
+                    continue;
+                }
 
-            consumer.Observe(observation, current, role, resourceId =>
-                notifications.TryGetCurrentState(resourceId, out var state) ? state : null);
-            await ownershipConsumer.VerifyCurrentAsync(
-                resourceId => notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
-                stoppingToken).ConfigureAwait(false);
+                consumer.Observe(observation, current, role, resourceId =>
+                    notifications.TryGetCurrentState(resourceId, out var state) ? state : null);
+                if (verificationRequests.CurrentCount == 0)
+                {
+                    verificationRequests.Release();
+                }
+            }
+        }
+        finally
+        {
+            verificationStopping.Cancel();
+            try
+            {
+                await verificationTask.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (verificationStopping.IsCancellationRequested)
+            {
+            }
+        }
+    }
+
+    private async Task VerifyRequestedOwnershipAsync(SemaphoreSlim requests, CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (true)
+            {
+                await requests.WaitAsync(cancellationToken).ConfigureAwait(false);
+                await ownershipConsumer.VerifyCurrentAsync(
+                    resourceId => notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                    cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
         }
     }
 }
