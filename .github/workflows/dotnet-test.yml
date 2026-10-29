@@ -117,7 +117,9 @@ jobs:
             -o "$output_dir/transport_core_test"
           "$output_dir/transport_core_test" \
             native/cm4-transport/tests/fixtures/apply-target.json \
-            native/cm4-transport/tests/fixtures/apply-target-ack.json
+            native/cm4-transport/tests/fixtures/apply-target-ack.json \
+            native/cm4-transport/tests/fixtures/invalidate-target.json \
+            native/cm4-transport/tests/fixtures/invalidate-target-ack.json
 
           cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
             -I native/cm4-transport \

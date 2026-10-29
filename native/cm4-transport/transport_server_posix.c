@@ -406,6 +406,7 @@ static void handle_control_connection(
     size_t input_length = 0;
     size_t ack_length = 0;
     cm4_transport_request request;
+    cm4_transport_apply_status status = CM4_TRANSPORT_APPLY_REJECTED;
     struct timespec deadline;
     udp_drain_context drain;
     int received_any = 0;
@@ -432,10 +433,19 @@ static void handle_control_connection(
         close(client);
         return;
     }
-    if (cm4_transport_apply_request_after_drain(
-            state, &request, drain_udp_receivers, &drain) == CM4_TRANSPORT_APPLY_APPLIED) {
-        if (!cm4_transport_write_ack(state, &request, ack, sizeof(ack), &ack_length) ||
-            !send_control_ack(client, ack, ack_length, &deadline)) {
+    if (strcmp(request.type, "applyTarget") == 0) {
+        status = cm4_transport_apply_request_after_drain(
+            state, &request, drain_udp_receivers, &drain);
+    } else if (strcmp(request.type, "invalidateTarget") == 0) {
+        status = cm4_transport_invalidate_request_after_drain(
+            state, &request, drain_udp_receivers, &drain);
+    }
+
+    if (status == CM4_TRANSPORT_APPLY_APPLIED) {
+        int ack_written = strcmp(request.type, "invalidateTarget") == 0
+            ? cm4_transport_write_invalidation_ack(state, &request, ack, sizeof(ack), &ack_length)
+            : cm4_transport_write_ack(state, &request, ack, sizeof(ack), &ack_length);
+        if (!ack_written || !send_control_ack(client, ack, ack_length, &deadline)) {
             clear_target(state);
         }
     }

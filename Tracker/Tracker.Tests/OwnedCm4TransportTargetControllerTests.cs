@@ -65,6 +65,118 @@ public sealed class OwnedCm4TransportTargetControllerTests
     }
 
     [Fact]
+    public async Task RemotelyInvalidatesTheOwnedRouteBeforeReturningAStopGate()
+    {
+        var identities = CreatePair();
+        var runner = new FakeDockerRunner(identities, EngineId);
+        var controller = CreateController(runner, () => identities);
+
+        var applied = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+        Assert.True(applied.Applied, applied.Error);
+
+        var invalidation = await controller.InvalidateCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+
+        Assert.True(invalidation.Invalidated, invalidation.Error);
+        Assert.False(invalidation.Unknown);
+        Assert.Equal(2, invalidation.Epoch);
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
+        Assert.Equal(2, runner.StdioCalls);
+        Assert.Equal(
+            new[]
+            {
+                "--context", "desktop-linux", "exec", "-i", Cm4Id,
+                "/opt/duck/cm4-transport-control", "--protocol", "jsonl-v1",
+            },
+            runner.StdioArguments);
+        var request = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(runner.LastStdioInput!, ProtocolJsonOptions);
+        Assert.NotNull(request);
+        Assert.Equal("invalidateTarget", request.Type);
+        Assert.Equal(RunId, request.RunId);
+        Assert.Equal(EngineId, request.EngineId);
+        Assert.Equal(Cm4Id, request.Cm4ContainerId);
+        Assert.Equal(SimulatorId, request.SimulatorContainerId);
+        Assert.Equal(4, request.SimulatorGeneration);
+        Assert.Equal(2, request.ConfigEpoch);
+        Assert.Equal("0.0.0.0", request.TargetAddress);
+        var sharedWireFixture = File.ReadAllText(
+            Path.Combine(AppContext.BaseDirectory, "cm4-transport-invalidate-target.json")).TrimEnd('\r', '\n');
+        Assert.Equal(sharedWireFixture, runner.LastStdioInput!.TrimEnd('\r', '\n'));
+    }
+
+    [Fact]
+    public async Task CancellationAfterRemoteInvalidationDispatchLeavesTheStopGateUnknown()
+    {
+        var identities = CreatePair();
+        var runner = new FakeDockerRunner(identities, EngineId);
+        var invalidationStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        runner.StdioHandler = async (input, cancellationToken) =>
+        {
+            var request = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(input, ProtocolJsonOptions)!;
+            if (request.Type == "invalidateTarget")
+            {
+                invalidationStarted.TrySetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            }
+
+            return FakeDockerRunner.CreateAcknowledgement(input);
+        };
+        var controller = CreateController(runner, () => identities);
+        var applied = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+        Assert.True(applied.Applied, applied.Error);
+
+        using var cancellation = new CancellationTokenSource();
+        var invalidationTask = controller.InvalidateCurrentTargetAsync("helper-launch-01", cancellation.Token);
+        await invalidationStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        cancellation.Cancel();
+
+        var invalidation = await invalidationTask;
+        Assert.False(invalidation.Invalidated);
+        Assert.True(invalidation.Unknown);
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
+        Assert.Equal(2, runner.StdioCalls);
+    }
+
+    [Fact]
+    public async Task LateApplyAcknowledgementCannotReopenRouteAfterInvalidationBegins()
+    {
+        var identities = CreatePair();
+        var runner = new FakeDockerRunner(identities, EngineId);
+        var applyStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseApply = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        runner.StdioHandler = async (input, cancellationToken) =>
+        {
+            var request = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(input, ProtocolJsonOptions)!;
+            if (request.Type == "applyTarget")
+            {
+                applyStarted.TrySetResult();
+                await releaseApply.Task.WaitAsync(cancellationToken);
+            }
+
+            return FakeDockerRunner.CreateAcknowledgement(input);
+        };
+        var controller = CreateController(runner, () => identities);
+
+        var applyTask = controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+        await applyStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        var invalidationTask = controller.InvalidateCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+        await WaitForEpochAsync(controller, 2);
+        releaseApply.TrySetResult();
+
+        var apply = await applyTask.WaitAsync(TimeSpan.FromSeconds(2));
+        var invalidation = await invalidationTask.WaitAsync(TimeSpan.FromSeconds(2));
+
+        Assert.False(apply.Applied);
+        Assert.True(apply.Unknown);
+        Assert.True(invalidation.Invalidated, invalidation.Error);
+        Assert.False(invalidation.Unknown);
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
+        Assert.Equal(2, runner.StdioCalls);
+    }
+
+    [Fact]
     public async Task RejectsForeignOwnerBeforeStartingTheControlCommand()
     {
         var identities = CreatePair();
@@ -313,6 +425,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
         internal int StdioCalls { get; private set; }
         internal IReadOnlyList<string>? StdioArguments { get; private set; }
         internal string? StdioInput { get; private set; }
+        internal string? LastStdioInput { get; private set; }
         internal List<string> InspectFormats { get; } = [];
         internal bool ForeignCm4Owner { get; init; }
         internal bool DifferentNetworkIds { get; init; }
@@ -378,6 +491,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
             StdioCalls++;
             StdioArguments = arguments.ToArray();
             StdioInput = standardInput;
+            LastStdioInput = standardInput;
             ExecStarted.TrySetResult();
             if (StdioHandler is not null) return CompleteStdioAsync(standardInput, cancellationToken);
             AfterStdio?.Invoke();
@@ -396,7 +510,10 @@ public sealed class OwnedCm4TransportTargetControllerTests
         internal static DockerStdioCommandResult CreateAcknowledgement(string standardInput)
         {
             var request = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(standardInput, ProtocolJsonOptions)!;
-            var acknowledgement = request with { Type = "applied" };
+            var acknowledgement = request with
+            {
+                Type = request.Type == "invalidateTarget" ? "invalidated" : "applied",
+            };
             return new DockerStdioCommandResult(
                 0, JsonSerializer.Serialize(acknowledgement, ProtocolJsonOptions), string.Empty);
         }

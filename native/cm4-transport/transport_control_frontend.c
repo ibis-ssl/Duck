@@ -45,11 +45,27 @@ int cm4_transport_run_control_stdio(
 
     if (input == NULL || output == NULL || errors == NULL || exchange == NULL ||
         !read_request_line(input, request_line, sizeof(request_line), &request_length) ||
-        !cm4_transport_parse_request(request_line, request_length, &request) ||
-        !cm4_transport_state_init(&validation_state, &request.cm4, request.helper_launch_id) ||
-        cm4_transport_apply_request(&validation_state, &request) != CM4_TRANSPORT_APPLY_APPLIED ||
-        !cm4_transport_write_ack(&validation_state, &request, expected_ack,
-                                 sizeof(expected_ack), &expected_ack_length)) {
+        !cm4_transport_parse_request(request_line, request_length, &request)) {
+        fputs("control request was rejected\n", errors);
+        return 2;
+    }
+
+    if (strcmp(request.type, "applyTarget") == 0) {
+        if (!cm4_transport_state_init(&validation_state, &request.cm4, request.helper_launch_id) ||
+            cm4_transport_apply_request(&validation_state, &request) != CM4_TRANSPORT_APPLY_APPLIED ||
+            !cm4_transport_write_ack(&validation_state, &request, expected_ack,
+                                     sizeof(expected_ack), &expected_ack_length)) {
+            fputs("control request was rejected\n", errors);
+            return 2;
+        }
+    } else if (strcmp(request.type, "invalidateTarget") == 0) {
+        if (!cm4_transport_validate_invalidation_request(&request) ||
+            !cm4_transport_format_invalidation_ack(&request, expected_ack,
+                                                   sizeof(expected_ack), &expected_ack_length)) {
+            fputs("control request was rejected\n", errors);
+            return 2;
+        }
+    } else {
         fputs("control request was rejected\n", errors);
         return 2;
     }

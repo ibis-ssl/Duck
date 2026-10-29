@@ -232,6 +232,7 @@ cm4_transport_apply_status cm4_transport_apply_request(
     }
 
     state->config_epoch = request->config_epoch;
+    state->invalidation_drained_epoch = 0;
     state->target_valid = 0;
     memset(&state->simulator, 0, sizeof(state->simulator));
     memset(state->simulator_ipv4, 0, sizeof(state->simulator_ipv4));
@@ -256,9 +257,52 @@ cm4_transport_apply_status cm4_transport_apply_request(
     }
     memcpy(state->simulator_ipv4, address, sizeof(address));
     state->last_simulator_generation = request->simulator.generation;
+    memcpy(state->last_simulator_resource_id, request->simulator.resource_id,
+           sizeof(state->last_simulator_resource_id));
     memcpy(state->last_simulator_container_id, request->simulator.container_id,
            sizeof(state->last_simulator_container_id));
     state->target_valid = 1;
+    return CM4_TRANSPORT_APPLY_APPLIED;
+}
+
+int cm4_transport_validate_invalidation_request(const cm4_transport_request *request)
+{
+    return request != NULL && request->version == 1 &&
+        strcmp(request->type, "invalidateTarget") == 0 &&
+        request->config_epoch > 0 && valid_helper_id(request->helper_launch_id) &&
+        is_full_container_id(request->cm4.container_id) && request->cm4.generation > 0 &&
+        is_full_container_id(request->simulator.container_id) && request->simulator.generation > 0 &&
+        strcmp(request->cm4.run_id, request->simulator.run_id) == 0 &&
+        strcmp(request->cm4.engine_id, request->simulator.engine_id) == 0 &&
+        strcmp(request->cm4.container_id, request->simulator.container_id) != 0 &&
+        strcmp(request->cm4.resource_id, request->simulator.resource_id) != 0 &&
+        strcmp(request->target_address, "0.0.0.0") == 0;
+}
+
+cm4_transport_apply_status cm4_transport_invalidate_request_after_drain(
+    cm4_transport_state *state,
+    const cm4_transport_request *request,
+    cm4_transport_drain_fn drain,
+    void *context)
+{
+    if (state == NULL || !cm4_transport_validate_invalidation_request(request) ||
+        !same_identity(&state->cm4, &request->cm4) ||
+        strcmp(state->helper_launch_id, request->helper_launch_id) != 0 ||
+        request->config_epoch <= state->config_epoch ||
+        state->last_simulator_generation != request->simulator.generation ||
+        strcmp(state->last_simulator_resource_id, request->simulator.resource_id) != 0 ||
+        strcmp(state->last_simulator_container_id, request->simulator.container_id) != 0 ||
+        (state->target_valid && !same_identity(&state->simulator, &request->simulator))) {
+        return CM4_TRANSPORT_APPLY_REJECTED;
+    }
+
+    if (!cm4_transport_invalidate(state, request->config_epoch)) {
+        return CM4_TRANSPORT_APPLY_REJECTED;
+    }
+    if (drain == NULL || !drain(context)) {
+        return CM4_TRANSPORT_APPLY_DRAIN_FAILED;
+    }
+    state->invalidation_drained_epoch = request->config_epoch;
     return CM4_TRANSPORT_APPLY_APPLIED;
 }
 
@@ -279,6 +323,7 @@ cm4_transport_apply_status cm4_transport_apply_request_after_drain(
 
     if (candidate.config_epoch > previous_epoch) {
         state->config_epoch = candidate.config_epoch;
+        state->invalidation_drained_epoch = 0;
         state->target_valid = 0;
         memset(&state->simulator, 0, sizeof(state->simulator));
         memset(state->simulator_ipv4, 0, sizeof(state->simulator_ipv4));
@@ -436,10 +481,60 @@ int cm4_transport_write_ack(
     return 1;
 }
 
+int cm4_transport_format_invalidation_ack(
+    const cm4_transport_request *request,
+    char *output,
+    size_t capacity,
+    size_t *written)
+{
+    int count;
+    if (!cm4_transport_validate_invalidation_request(request) || output == NULL ||
+        written == NULL || capacity == 0) {
+        return 0;
+    }
+
+    count = snprintf(output, capacity,
+        "{\"version\":1,\"type\":\"invalidated\",\"runId\":\"%s\",\"engineId\":\"%s\","
+        "\"cm4ResourceId\":\"%s\",\"cm4ContainerId\":\"%s\",\"cm4Generation\":%llu,"
+        "\"helperLaunchId\":\"%s\",\"simulatorResourceId\":\"%s\","
+        "\"simulatorContainerId\":\"%s\",\"simulatorGeneration\":%llu,"
+        "\"configEpoch\":%llu,\"targetAddress\":\"0.0.0.0\"}",
+        request->cm4.run_id, request->cm4.engine_id, request->cm4.resource_id,
+        request->cm4.container_id, (unsigned long long)request->cm4.generation,
+        request->helper_launch_id, request->simulator.resource_id,
+        request->simulator.container_id, (unsigned long long)request->simulator.generation,
+        (unsigned long long)request->config_epoch);
+    if (count < 0 || (size_t)count >= capacity) return 0;
+    *written = (size_t)count;
+    return 1;
+}
+
+int cm4_transport_write_invalidation_ack(
+    const cm4_transport_state *state,
+    const cm4_transport_request *request,
+    char *output,
+    size_t capacity,
+    size_t *written)
+{
+    if (state == NULL || !cm4_transport_validate_invalidation_request(request) ||
+        state->target_valid || state->config_epoch != request->config_epoch ||
+        state->invalidation_drained_epoch != request->config_epoch ||
+        !same_identity(&state->cm4, &request->cm4) ||
+        strcmp(state->helper_launch_id, request->helper_launch_id) != 0 ||
+        state->last_simulator_generation != request->simulator.generation ||
+        strcmp(state->last_simulator_resource_id, request->simulator.resource_id) != 0 ||
+        strcmp(state->last_simulator_container_id, request->simulator.container_id) != 0) {
+        return 0;
+    }
+
+    return cm4_transport_format_invalidation_ack(request, output, capacity, written);
+}
+
 int cm4_transport_invalidate(cm4_transport_state *state, uint64_t next_epoch)
 {
     if (state == NULL || next_epoch <= state->config_epoch) return 0;
     state->config_epoch = next_epoch;
+    state->invalidation_drained_epoch = 0;
     state->target_valid = 0;
     memset(&state->simulator, 0, sizeof(state->simulator));
     memset(state->simulator_ipv4, 0, sizeof(state->simulator_ipv4));

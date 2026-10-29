@@ -24,6 +24,8 @@ internal enum Cm4TransportTargetPhase
     Initial,
     Applying,
     Applied,
+    Invalidating,
+    Invalidated,
     Unknown,
 }
 
@@ -36,6 +38,12 @@ internal sealed record Cm4TransportTargetSnapshot(
 
 internal sealed record Cm4TransportTargetApplyResult(
     bool Applied,
+    bool Unknown,
+    long Epoch,
+    string? Error);
+
+internal sealed record Cm4TransportTargetInvalidationResult(
+    bool Invalidated,
     bool Unknown,
     long Epoch,
     string? Error);
@@ -89,7 +97,45 @@ internal sealed class OwnedCm4TransportTargetController(
     private long epoch;
     private Cm4TransportTargetPhase phase = Cm4TransportTargetPhase.Initial;
     private OwnedCm4TransportIdentityPair? activeIdentities;
+    private OwnedCm4TransportIdentityPair? pendingIdentities;
+    private string? activeHelperLaunchId;
+    private string? pendingHelperLaunchId;
     private string? activeTargetAddress;
+
+    internal Task<Cm4TransportTargetInvalidationResult> InvalidateCurrentTargetAsync(
+        string helperLaunchId,
+        CancellationToken cancellationToken)
+    {
+        var (invalidationEpoch, requested, recordedHelperLaunchId) = BeginRemoteInvalidation();
+        if (requested is null || !string.Equals(recordedHelperLaunchId, helperLaunchId, StringComparison.Ordinal) ||
+            !IsValidIdentityPair(requested) || !IsValidHelperLaunchId(helperLaunchId))
+        {
+            MarkUnknown(invalidationEpoch);
+            return Task.FromResult(new Cm4TransportTargetInvalidationResult(
+                false, true, invalidationEpoch, "The current target identity is unavailable for remote invalidation."));
+        }
+
+        OwnedCm4TransportIdentityPair? current;
+        try
+        {
+            current = getCurrent();
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or ObjectDisposedException)
+        {
+            MarkUnknown(invalidationEpoch);
+            return Task.FromResult(new Cm4TransportTargetInvalidationResult(
+                false, true, invalidationEpoch, "Current owner identity could not be read."));
+        }
+
+        if (!Equals(current, requested))
+        {
+            MarkUnknown(invalidationEpoch);
+            return Task.FromResult(new Cm4TransportTargetInvalidationResult(
+                false, true, invalidationEpoch, "The owner generation changed before remote invalidation."));
+        }
+
+        return InvalidateCoreAsync(requested, helperLaunchId, invalidationEpoch, cancellationToken);
+    }
 
     internal Task<Cm4TransportTargetApplyResult> ApplyCurrentTargetAsync(
         string helperLaunchId,
@@ -114,7 +160,7 @@ internal sealed class OwnedCm4TransportTargetController(
             return Task.FromResult(new Cm4TransportTargetApplyResult(false, false, operationEpoch, "Current owner identity is invalid."));
         }
 
-        if (!MarkApplying(operationEpoch))
+        if (!MarkApplying(operationEpoch, current, helperLaunchId))
         {
             return Task.FromResult(new Cm4TransportTargetApplyResult(
                 false, false, operationEpoch, "A newer configuration epoch superseded this request."));
@@ -143,6 +189,9 @@ internal sealed class OwnedCm4TransportTargetController(
             epoch = checked(epoch + 1);
             phase = Cm4TransportTargetPhase.Unknown;
             activeIdentities = null;
+            pendingIdentities = null;
+            activeHelperLaunchId = null;
+            pendingHelperLaunchId = null;
             activeTargetAddress = null;
             return epoch;
         }
@@ -222,7 +271,7 @@ internal sealed class OwnedCm4TransportTargetController(
                 RemainingOperationTime(operationTimer),
                 operationToken).ConfigureAwait(false);
             if (response.ExitCode != 0 ||
-                !TryReadSingleAcknowledgement(response.StandardOutput, request, out var acknowledgement) ||
+                !TryReadSingleAcknowledgement(response.StandardOutput, request, "applied", out var acknowledgement) ||
                 acknowledgement != request with { Type = "applied" } ||
                 !IsCurrent(operationEpoch, requested))
             {
@@ -259,6 +308,9 @@ internal sealed class OwnedCm4TransportTargetController(
 
                 phase = Cm4TransportTargetPhase.Applied;
                 activeIdentities = requested;
+                pendingIdentities = null;
+                activeHelperLaunchId = helperLaunchId;
+                pendingHelperLaunchId = null;
                 activeTargetAddress = simulatorInspection.Address.ToString();
             }
 
@@ -294,16 +346,181 @@ internal sealed class OwnedCm4TransportTargetController(
         }
     }
 
+    private async Task<Cm4TransportTargetInvalidationResult> InvalidateCoreAsync(
+        OwnedCm4TransportIdentityPair requested,
+        string helperLaunchId,
+        long operationEpoch,
+        CancellationToken cancellationToken)
+    {
+        var acquired = false;
+        var operationTimer = Stopwatch.StartNew();
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(OperationLimit);
+        var operationToken = deadline.Token;
+        try
+        {
+            await applyGate.WaitAsync(operationToken).ConfigureAwait(false);
+            acquired = true;
+            if (!IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
+            {
+                return InvalidationUnknown(operationEpoch, "The owner generation changed before remote invalidation.");
+            }
+
+            var engineId = await CaptureMetadataAsync(
+                ["--context", dockerContext, "info", "--format", "{{.ID}}"],
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
+            if (!string.Equals(engineId.Trim(), expectedEngineId, StringComparison.Ordinal) ||
+                !IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
+            {
+                return InvalidationUnknown(operationEpoch, "The expected engine or current owner generation did not match.");
+            }
+
+            var cm4Inspection = await InspectAsync(requested.Cm4, Cm4Role, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken, Cm4TransportTargetPhase.Invalidating)
+                .ConfigureAwait(false);
+            if (cm4Inspection is null)
+            {
+                return InvalidationUnknown(operationEpoch, "The owned CM4 inspection did not match.");
+            }
+
+            var simulatorInspection = await InspectAsync(
+                requested.Simulator, SimulatorRole, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken, Cm4TransportTargetPhase.Invalidating)
+                .ConfigureAwait(false);
+            if (simulatorInspection is null ||
+                !string.Equals(cm4Inspection.Name, simulatorInspection.Name, StringComparison.Ordinal) ||
+                !string.Equals(cm4Inspection.Id, simulatorInspection.Id, StringComparison.Ordinal))
+            {
+                return InvalidationUnknown(operationEpoch, "The owned containers do not share one inspected network.");
+            }
+
+            var request = new Cm4TransportTargetMessage(
+                ProtocolVersion,
+                "invalidateTarget",
+                runId,
+                expectedEngineId,
+                requested.Cm4.ResourceId,
+                requested.Cm4.ContainerId,
+                requested.Cm4.Generation,
+                helperLaunchId,
+                requested.Simulator.ResourceId,
+                requested.Simulator.ContainerId,
+                requested.Simulator.Generation,
+                operationEpoch,
+                "0.0.0.0");
+            var requestLine = JsonSerializer.Serialize(request, JsonOptions);
+            if (Encoding.UTF8.GetByteCount(requestLine) + 1 > MaximumMessageBytes)
+            {
+                return InvalidationUnknown(operationEpoch, "The remote invalidation request exceeded its size limit.");
+            }
+
+            var execArguments = new[]
+            {
+                "--context", dockerContext, "exec", "-i", requested.Cm4.ContainerId,
+                HelperPath, "--protocol", "jsonl-v1",
+            };
+            var response = await runner.ExecuteWithStdioAsync(
+                execArguments,
+                requestLine + "\n",
+                MaximumMessageBytes,
+                RemainingOperationTime(operationTimer),
+                operationToken).ConfigureAwait(false);
+            if (response.ExitCode != 0 ||
+                !TryReadSingleAcknowledgement(response.StandardOutput, request, "invalidated", out var acknowledgement) ||
+                acknowledgement != request with { Type = "invalidated" } ||
+                !IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
+            {
+                return InvalidationUnknown(operationEpoch,
+                    "The remote invalidation acknowledgement or current generation did not match.");
+            }
+
+            var currentEngineId = await CaptureMetadataAsync(
+                ["--context", dockerContext, "info", "--format", "{{.ID}}"],
+                RemainingOperationTime(operationTimer), operationToken).ConfigureAwait(false);
+            var latestCm4 = await InspectAsync(requested.Cm4, Cm4Role, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken, Cm4TransportTargetPhase.Invalidating)
+                .ConfigureAwait(false);
+            var latestSimulator = await InspectAsync(
+                requested.Simulator, SimulatorRole, operationEpoch, requested,
+                RemainingOperationTime(operationTimer), operationToken, Cm4TransportTargetPhase.Invalidating)
+                .ConfigureAwait(false);
+            if (!string.Equals(currentEngineId.Trim(), expectedEngineId, StringComparison.Ordinal) ||
+                latestCm4 is null || latestSimulator is null ||
+                !string.Equals(latestCm4.Name, cm4Inspection.Name, StringComparison.Ordinal) ||
+                !string.Equals(latestCm4.Id, cm4Inspection.Id, StringComparison.Ordinal) ||
+                !string.Equals(latestSimulator.Name, simulatorInspection.Name, StringComparison.Ordinal) ||
+                !string.Equals(latestSimulator.Id, simulatorInspection.Id, StringComparison.Ordinal) ||
+                !latestSimulator.Address.Equals(simulatorInspection.Address) ||
+                !IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
+            {
+                return InvalidationUnknown(operationEpoch,
+                    "The inspected owner generation changed after invalidation acknowledgement.");
+            }
+
+            lock (stateLock)
+            {
+                if (operationToken.IsCancellationRequested || epoch != operationEpoch ||
+                    phase != Cm4TransportTargetPhase.Invalidating)
+                {
+                    return InvalidationUnknown(operationEpoch,
+                        "A newer operation or cancellation superseded the invalidation acknowledgement.");
+                }
+
+                phase = Cm4TransportTargetPhase.Invalidated;
+                activeIdentities = null;
+                pendingIdentities = null;
+                activeHelperLaunchId = null;
+                pendingHelperLaunchId = null;
+                activeTargetAddress = null;
+            }
+
+            return new Cm4TransportTargetInvalidationResult(true, false, operationEpoch, null);
+        }
+        catch (OperationCanceledException)
+        {
+            MarkUnknown(operationEpoch);
+            return new Cm4TransportTargetInvalidationResult(
+                false, true, operationEpoch, "The remote invalidation was cancelled or its deadline expired.");
+        }
+        catch (TimeoutException)
+        {
+            MarkUnknown(operationEpoch);
+            return new Cm4TransportTargetInvalidationResult(
+                false, true, operationEpoch, "The remote invalidation deadline expired.");
+        }
+        catch (Exception exception) when (
+            exception is IOException or
+            InvalidOperationException or
+            JsonException or
+            ArgumentException)
+        {
+            MarkUnknown(operationEpoch);
+            return new Cm4TransportTargetInvalidationResult(
+                false, true, operationEpoch, "The remote invalidation result is unknown.");
+        }
+        finally
+        {
+            if (acquired) applyGate.Release();
+        }
+    }
+
+    private Cm4TransportTargetInvalidationResult InvalidationUnknown(long operationEpoch, string error)
+    {
+        MarkUnknown(operationEpoch);
+        return new Cm4TransportTargetInvalidationResult(false, true, operationEpoch, error);
+    }
+
     private async Task<Cm4TransportNetworkEndpoint?> InspectAsync(
         OwnedCm4TransportIdentity identity,
         string role,
         long operationEpoch,
         OwnedCm4TransportIdentityPair requested,
         TimeSpan remaining,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Cm4TransportTargetPhase expectedPhase = Cm4TransportTargetPhase.Applying)
     {
         if (!OwnedContainerInspection.IsFullId(identity.ContainerId) ||
-            !IsCurrent(operationEpoch, requested))
+            !IsCurrent(operationEpoch, requested, expectedPhase))
         {
             return null;
         }
@@ -311,7 +528,7 @@ internal sealed class OwnedCm4TransportTargetController(
         var json = await CaptureMetadataAsync(
             ["--context", dockerContext, "inspect", "--format", SafeInspectFormat, identity.ContainerId],
             remaining, cancellationToken).ConfigureAwait(false);
-        if (!IsCurrent(operationEpoch, requested) ||
+        if (!IsCurrent(operationEpoch, requested, expectedPhase) ||
             !TryReadOwnedSummary(json, identity, role, out var endpoint))
         {
             return null;
@@ -327,28 +544,61 @@ internal sealed class OwnedCm4TransportTargetController(
             epoch = checked(epoch + 1);
             phase = Cm4TransportTargetPhase.Unknown;
             activeIdentities = null;
+            pendingIdentities = null;
+            activeHelperLaunchId = null;
+            pendingHelperLaunchId = null;
             activeTargetAddress = null;
             return epoch;
         }
     }
 
-    private bool MarkApplying(long expectedEpoch)
+    private bool MarkApplying(
+        long expectedEpoch,
+        OwnedCm4TransportIdentityPair requested,
+        string helperLaunchId)
     {
         lock (stateLock)
         {
             if (epoch != expectedEpoch || phase != Cm4TransportTargetPhase.Unknown) return false;
             phase = Cm4TransportTargetPhase.Applying;
+            pendingIdentities = requested;
+            pendingHelperLaunchId = helperLaunchId;
             return true;
         }
     }
 
-    private bool IsCurrent(long expectedEpoch, OwnedCm4TransportIdentityPair requested)
+    private (long Epoch, OwnedCm4TransportIdentityPair? Identities, string? HelperLaunchId)
+        BeginRemoteInvalidation()
+    {
+        lock (stateLock)
+        {
+            var identities = phase == Cm4TransportTargetPhase.Applied
+                ? activeIdentities
+                : phase == Cm4TransportTargetPhase.Applying ? pendingIdentities : null;
+            var helperLaunchId = phase == Cm4TransportTargetPhase.Applied
+                ? activeHelperLaunchId
+                : phase == Cm4TransportTargetPhase.Applying ? pendingHelperLaunchId : null;
+            epoch = checked(epoch + 1);
+            phase = Cm4TransportTargetPhase.Invalidating;
+            activeIdentities = null;
+            pendingIdentities = null;
+            activeHelperLaunchId = null;
+            pendingHelperLaunchId = null;
+            activeTargetAddress = null;
+            return (epoch, identities, helperLaunchId);
+        }
+    }
+
+    private bool IsCurrent(
+        long expectedEpoch,
+        OwnedCm4TransportIdentityPair requested,
+        Cm4TransportTargetPhase expectedPhase = Cm4TransportTargetPhase.Applying)
     {
         var current = getCurrent();
         lock (stateLock)
         {
             return epoch == expectedEpoch &&
-                phase == Cm4TransportTargetPhase.Applying &&
+                phase == expectedPhase &&
                 Equals(current, requested);
         }
     }
@@ -360,6 +610,9 @@ internal sealed class OwnedCm4TransportTargetController(
             if (epoch != expectedEpoch) return;
             phase = Cm4TransportTargetPhase.Unknown;
             activeIdentities = null;
+            pendingIdentities = null;
+            activeHelperLaunchId = null;
+            pendingHelperLaunchId = null;
             activeTargetAddress = null;
         }
     }
@@ -431,6 +684,7 @@ internal sealed class OwnedCm4TransportTargetController(
     private static bool TryReadSingleAcknowledgement(
         string output,
         Cm4TransportTargetMessage request,
+        string expectedType,
         out Cm4TransportTargetMessage? acknowledgement)
     {
         acknowledgement = null;
@@ -449,8 +703,8 @@ internal sealed class OwnedCm4TransportTargetController(
         acknowledgement = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(line, JsonOptions);
         return acknowledgement is not null &&
             acknowledgement.Version == ProtocolVersion &&
-            acknowledgement.Type == "applied" &&
-            acknowledgement == request with { Type = "applied" };
+            acknowledgement.Type == expectedType &&
+            acknowledgement == request with { Type = expectedType };
     }
 
     private bool TryReadOwnedSummary(

@@ -30,10 +30,12 @@ typedef struct cm4_transport_state {
     cm4_transport_identity cm4;
     char helper_launch_id[CM4_TRANSPORT_TEXT_CAPACITY];
     uint64_t config_epoch;
+    uint64_t invalidation_drained_epoch;
     int target_valid;
     cm4_transport_identity simulator;
     uint8_t simulator_ipv4[4];
     uint64_t last_simulator_generation;
+    char last_simulator_resource_id[CM4_TRANSPORT_TEXT_CAPACITY];
     char last_simulator_container_id[CM4_TRANSPORT_CONTAINER_ID_LENGTH + 1];
 } cm4_transport_state;
 
@@ -67,6 +69,12 @@ cm4_transport_apply_status cm4_transport_apply_request_after_drain(
     const cm4_transport_request *request,
     cm4_transport_drain_fn drain,
     void *context);
+cm4_transport_apply_status cm4_transport_invalidate_request_after_drain(
+    cm4_transport_state *state,
+    const cm4_transport_request *request,
+    cm4_transport_drain_fn drain,
+    void *context);
+int cm4_transport_validate_invalidation_request(const cm4_transport_request *request);
 
 int cm4_transport_parse_request(
     const char *json_line,
@@ -75,6 +83,17 @@ int cm4_transport_parse_request(
 
 int cm4_transport_write_ack(
     const cm4_transport_state *state,
+    const cm4_transport_request *request,
+    char *output,
+    size_t capacity,
+    size_t *written);
+int cm4_transport_write_invalidation_ack(
+    const cm4_transport_state *state,
+    const cm4_transport_request *request,
+    char *output,
+    size_t capacity,
+    size_t *written);
+int cm4_transport_format_invalidation_ack(
     const cm4_transport_request *request,
     char *output,
     size_t capacity,

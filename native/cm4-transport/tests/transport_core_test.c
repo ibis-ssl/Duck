@@ -235,8 +235,28 @@ static int memory_exchange(
     cm4_transport_request request;
     ++exchange->calls;
     if (!exchange->available ||
-        !cm4_transport_parse_request(request_json, request_length, &request) ||
-        cm4_transport_apply_request(&exchange->target_state, &request) != CM4_TRANSPORT_APPLY_APPLIED) {
+        !cm4_transport_parse_request(request_json, request_length, &request)) {
+        return 0;
+    }
+    if (strcmp(request.type, "invalidateTarget") == 0) {
+        int count;
+        if (!cm4_transport_invalidate(&exchange->target_state, request.config_epoch)) return 0;
+        count = snprintf(response, response_capacity,
+            "{\"version\":1,\"type\":\"invalidated\",\"runId\":\"%s\",\"engineId\":\"%s\","
+            "\"cm4ResourceId\":\"%s\",\"cm4ContainerId\":\"%s\",\"cm4Generation\":%llu,"
+            "\"helperLaunchId\":\"%s\",\"simulatorResourceId\":\"%s\","
+            "\"simulatorContainerId\":\"%s\",\"simulatorGeneration\":%llu,"
+            "\"configEpoch\":%llu,\"targetAddress\":\"%s\"}",
+            request.cm4.run_id, request.cm4.engine_id, request.cm4.resource_id,
+            request.cm4.container_id, (unsigned long long)request.cm4.generation,
+            request.helper_launch_id, request.simulator.resource_id,
+            request.simulator.container_id, (unsigned long long)request.simulator.generation,
+            (unsigned long long)request.config_epoch, request.target_address);
+        if (count < 0 || (size_t)count >= response_capacity) return 0;
+        *response_length = (size_t)count;
+        return 1;
+    }
+    if (cm4_transport_apply_request(&exchange->target_state, &request) != CM4_TRANSPORT_APPLY_APPLIED) {
         return 0;
     }
     if (exchange->malformed_ack) {
@@ -303,11 +323,16 @@ int main(int argc, char **argv)
 {
     char request_json[4097];
     char expected_ack[4097];
+    char invalidation_json[4097];
+    char expected_invalidation_ack[4097];
     char actual_ack[4097];
     size_t request_length = 0;
     size_t expected_ack_length = 0;
+    size_t invalidation_length = 0;
+    size_t expected_invalidation_ack_length = 0;
     size_t actual_ack_length = 0;
     cm4_transport_request request;
+    cm4_transport_request invalidation;
     cm4_transport_state state;
     cm4_transport_destination destination;
     const uint8_t loopback[4] = { 127, 0, 0, 1 };
@@ -328,10 +353,18 @@ int main(int argc, char **argv)
     size_t fixture_length;
 
     if (test_control_path_policy() != 0) return 1;
-    CHECK(argc == 3, "request and acknowledgement fixture paths required");
+    CHECK(argc == 5, "apply and invalidate request/ACK fixture paths required");
     CHECK(read_fixture(argv[1], request_json, sizeof(request_json), &request_length), "read request fixture");
     CHECK(read_fixture(argv[2], expected_ack, sizeof(expected_ack), &expected_ack_length), "read ACK fixture");
+    CHECK(read_fixture(argv[3], invalidation_json, sizeof(invalidation_json), &invalidation_length),
+          "read invalidate request fixture");
+    CHECK(read_fixture(argv[4], expected_invalidation_ack, sizeof(expected_invalidation_ack),
+                       &expected_invalidation_ack_length), "read invalidate ACK fixture");
     CHECK(cm4_transport_parse_request(request_json, request_length, &request), "parse shared JSONL request");
+    CHECK(cm4_transport_parse_request(invalidation_json, invalidation_length, &invalidation),
+          "parse shared JSONL invalidation request");
+    CHECK(cm4_transport_validate_invalidation_request(&invalidation),
+          "validate the existing 13-field invalidation command");
     fixture_length = request_length;
     CHECK(fixture_length > 1 && request_json[fixture_length - 1] == '}', "fixture has one JSON object");
     memcpy(malformed_json, request_json, fixture_length - 1);
@@ -478,6 +511,87 @@ int main(int argc, char **argv)
     CHECK(!state.target_valid && state.config_epoch == 4, "invalidation clears route state");
     CHECK(!cm4_transport_invalidate(&state, 3), "reject stale invalidation");
 
+    CHECK(cm4_transport_state_init(&drain_state, &request.cm4, request.helper_launch_id),
+          "initialize the native state for remote invalidation");
+    CHECK(cm4_transport_apply_request(&drain_state, &request) == CM4_TRANSPORT_APPLY_APPLIED,
+          "apply the route that remote invalidation will retire");
+    drain.published_state = &drain_state;
+    drain.calls = 0;
+    drain.result = 1;
+    drain.observed_invalidated_state = 0;
+    CHECK(cm4_transport_invalidate_request_after_drain(
+              &drain_state, &invalidation, test_drain_before_publish, &drain) == CM4_TRANSPORT_APPLY_APPLIED,
+          "invalidate the owned route through the remote command contract");
+    CHECK(drain.calls == 1 && drain.observed_invalidated_state,
+          "invalidate the old route and advance its epoch before draining");
+    CHECK(!drain_state.target_valid && drain_state.config_epoch == invalidation.config_epoch,
+          "remote invalidation leaves no route at its acknowledged epoch");
+    CHECK(cm4_transport_write_invalidation_ack(&drain_state, &invalidation,
+                                                actual_ack, sizeof(actual_ack), &actual_ack_length),
+          "write the invalidated ACK only after the route is drained");
+    CHECK(actual_ack_length == expected_invalidation_ack_length &&
+          memcmp(actual_ack, expected_invalidation_ack, actual_ack_length) == 0,
+          "native invalidation ACK matches the shared wire fixture");
+    CHECK(cm4_transport_apply_request(&drain_state, &request) == CM4_TRANSPORT_APPLY_REJECTED &&
+          !drain_state.target_valid && drain_state.config_epoch == invalidation.config_epoch,
+          "an old apply request cannot restore the route after remote invalidation");
+    drain.calls = 0;
+    CHECK(cm4_transport_invalidate_request_after_drain(
+              &drain_state, &invalidation, test_drain_before_publish, &drain) == CM4_TRANSPORT_APPLY_REJECTED &&
+          drain.calls == 0 && !drain_state.target_valid,
+          "an equal-epoch repeated invalidation is rejected without another drain");
+
+    CHECK(cm4_transport_state_init(&drain_state, &request.cm4, request.helper_launch_id),
+          "reset the native state for failed invalidation drain");
+    CHECK(cm4_transport_apply_request(&drain_state, &request) == CM4_TRANSPORT_APPLY_APPLIED,
+          "reapply the route before a failed invalidation drain");
+    drain.published_state = &drain_state;
+    drain.calls = 0;
+    drain.result = 0;
+    drain.observed_invalidated_state = 0;
+    CHECK(cm4_transport_invalidate_request_after_drain(
+              &drain_state, &invalidation, test_drain_before_publish, &drain) == CM4_TRANSPORT_APPLY_DRAIN_FAILED,
+          "report a failed invalidation drain without restoring the route");
+    CHECK(drain.calls == 1 && drain.observed_invalidated_state &&
+          !drain_state.target_valid && drain_state.config_epoch == invalidation.config_epoch,
+          "a failed drain remains invalidated at the newer epoch");
+    CHECK(!cm4_transport_write_invalidation_ack(&drain_state, &invalidation,
+                                                 actual_ack, sizeof(actual_ack), &actual_ack_length),
+          "do not acknowledge invalidation when the drain did not complete");
+
+    CHECK(cm4_transport_state_init(&drain_state, &request.cm4, request.helper_launch_id),
+          "reset the native state for rejected invalidation requests");
+    CHECK(cm4_transport_apply_request(&drain_state, &request) == CM4_TRANSPORT_APPLY_APPLIED,
+          "reapply the owned route before checking stale invalidation");
+    updated = invalidation;
+    updated.config_epoch = request.config_epoch;
+    drain.published_state = &drain_state;
+    drain.calls = 0;
+    drain.result = 1;
+    CHECK(cm4_transport_invalidate_request_after_drain(
+              &drain_state, &updated, test_drain_before_publish, &drain) == CM4_TRANSPORT_APPLY_REJECTED,
+          "reject a stale remote invalidation request");
+    CHECK(drain.calls == 0 && drain_state.target_valid && drain_state.config_epoch == request.config_epoch,
+          "a stale invalidation cannot change the current route");
+    updated = invalidation;
+    copy_literal(updated.helper_launch_id, sizeof(updated.helper_launch_id), "foreign-launch");
+    CHECK(cm4_transport_invalidate_request_after_drain(
+              &drain_state, &updated, test_drain_before_publish, &drain) == CM4_TRANSPORT_APPLY_REJECTED,
+          "reject invalidation from a different helper launch");
+    CHECK(drain.calls == 0 && drain_state.target_valid && drain_state.config_epoch == request.config_epoch,
+          "a foreign invalidation cannot change the current route");
+    updated = invalidation;
+    copy_literal(updated.cm4.engine_id, sizeof(updated.cm4.engine_id), "foreign-engine");
+    CHECK(cm4_transport_invalidate_request_after_drain(
+              &drain_state, &updated, test_drain_before_publish, &drain) == CM4_TRANSPORT_APPLY_REJECTED,
+          "reject invalidation for a different owned CM4 identity");
+    CHECK(drain.calls == 0 && drain_state.target_valid && drain_state.config_epoch == request.config_epoch,
+          "a foreign CM4 identity cannot change the current route");
+    updated = invalidation;
+    copy_literal(updated.type, sizeof(updated.type), "unknownCommand");
+    CHECK(!cm4_transport_validate_invalidation_request(&updated),
+          "reject an unknown control command instead of interpreting it as invalidation");
+
     memset(&exchange, 0, sizeof(exchange));
     exchange.available = 1;
     CHECK(cm4_transport_state_init(&exchange.target_state, &request.cm4, request.helper_launch_id),
@@ -536,6 +650,26 @@ int main(int argc, char **argv)
                           &frontend_output_length), "run frontend with an oversized line");
     CHECK(frontend_result != 0 && exchange.calls == 0 && frontend_output_length == 0,
           "oversized input is rejected before exchange");
+
+    memset(&exchange, 0, sizeof(exchange));
+    exchange.available = 1;
+    CHECK(cm4_transport_state_init(&exchange.target_state, &request.cm4, request.helper_launch_id),
+          "initialize the exchange state before remote invalidation");
+    CHECK(cm4_transport_apply_request(&exchange.target_state, &request) == CM4_TRANSPORT_APPLY_APPLIED,
+          "establish the prior owned route before remote invalidation");
+    memcpy(frontend_input, invalidation_json, invalidation_length);
+    frontend_input[invalidation_length] = '\n';
+    frontend_input_length = invalidation_length + 1;
+    frontend_output_length = 0;
+    CHECK(invoke_frontend(frontend_input, frontend_input_length, &exchange,
+                          &frontend_result, frontend_output, sizeof(frontend_output) - 1,
+                          &frontend_output_length), "run actual stdio frontend for remote invalidation");
+    CHECK(frontend_result == 0 && exchange.calls == 1,
+          "frontend accepts the existing 13-field remote invalidate command");
+    CHECK(frontend_output_length == expected_invalidation_ack_length + 1 &&
+          memcmp(frontend_output, expected_invalidation_ack, expected_invalidation_ack_length) == 0 &&
+          frontend_output[frontend_output_length - 1] == '\n',
+          "frontend emits exactly the matching invalidated acknowledgement");
 
     return 0;
 }
