@@ -571,6 +571,69 @@ public sealed class AppHostApplicationModelTests
             var json = NamespaceProbeModelFactory.Serialize(model);
             Assert.DoesNotContain(publishDirectory, json, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("NetworkSettings", json, StringComparison.Ordinal);
+
+        }
+        finally
+        {
+            Directory.Delete(publishDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task BridgeProbeUsesDefaultNetworkWithoutNamespaceArgs()
+    {
+        var publishDirectory = Path.Combine(Path.GetTempPath(), $"duck-bridge-probe-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(publishDirectory);
+        try
+        {
+            foreach (var fileName in new[]
+                     {
+                         "Duck.Testing.RefereeDriver.Host.dll",
+                         "Duck.Testing.RefereeDriver.Host.deps.json",
+                         "Duck.Testing.RefereeDriver.Host.runtimeconfig.json",
+                         "Duck.Testing.RefereeDriver.dll",
+                         "Duck.Testing.Diagnostics.dll",
+                         "Google.Protobuf.dll",
+                         "SslProto.dll",
+                     })
+            {
+                await File.WriteAllTextAsync(Path.Combine(publishDirectory, fileName), "fixture");
+            }
+
+            var builder = DistributedApplication.CreateBuilder([]);
+            var model = await NamespaceProbeModelFactory.AddResourcesAndProjectAsync(
+                builder,
+                "bridge-run_01",
+                publishDirectory,
+                NamespaceProbeModelFactory.NetworkMode.DefaultBridge);
+            var owner = Assert.Single(model.Resources,
+                resource => resource.ResourceName == NamespaceProbeModelFactory.OwnerResourceName);
+            var follower = Assert.Single(model.Resources,
+                resource => resource.ResourceName == NamespaceProbeModelFactory.FollowerResourceName);
+
+            Assert.Equal(2, model.Resources.Count);
+            Assert.Equal(nameof(ContainerResource), owner.ResourceType);
+            Assert.Equal(nameof(ContainerResource), follower.ResourceType);
+            Assert.Equal(NamespaceProbeModelFactory.AspNetImageSha256, owner.ImageSha256);
+            Assert.Equal(NamespaceProbeModelFactory.AspNetImageSha256, follower.ImageSha256);
+            Assert.Equal(NamespaceProbeModelFactory.AspNetImage, owner.Image);
+            Assert.Equal(NamespaceProbeModelFactory.AspNetImage, follower.Image);
+            Assert.Equal("Never", owner.ImagePullPolicy);
+            Assert.Equal("Never", follower.ImagePullPolicy);
+            Assert.Single(owner.Mounts);
+            Assert.True(owner.Mounts[0].IsReadOnly);
+            Assert.Single(follower.Mounts);
+            Assert.True(follower.Mounts[0].IsReadOnly);
+            Assert.Null(owner.Endpoints.Single().HostPort);
+            Assert.Equal("127.0.0.1", owner.Endpoints.Single().TargetHost);
+            Assert.Equal(NamespaceProbeModelFactory.OwnerPort, owner.Endpoints.Single().TargetPort);
+            Assert.Empty(follower.Endpoints);
+            Assert.DoesNotContain("--network", follower.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}=bridge-run_01", owner.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}=bridge-run_01", follower.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}={NamespaceProbeModelFactory.OwnerRole}", owner.RuntimeArguments);
+            Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}={NamespaceProbeModelFactory.FollowerRole}", follower.RuntimeArguments);
+            Assert.Contains(NamespaceProbeModelFactory.OwnerResourceName, follower.WaitForStart);
         }
         finally
         {
@@ -1155,6 +1218,80 @@ public sealed class AppHostApplicationModelTests
             var wait = Assert.Single(waits, annotation => ReferenceEquals(annotation.Resource, dependency));
             Assert.Equal(type, wait.WaitType);
         }
+    }
+
+    [Theory]
+    [InlineData("aspire-probe", "aspire-probe", "10.1.0.2", "10.1.0.3", true)]
+    [InlineData("default", "bridge", "10.1.0.2", "10.1.0.3", true)]
+    [InlineData("host", "bridge", "10.1.0.2", "10.1.0.3", false)]
+    [InlineData("none", "bridge", "10.1.0.2", "10.1.0.3", false)]
+    [InlineData("", "bridge", "10.1.0.2", "10.1.0.3", false)]
+    [InlineData("container:owner", "bridge", "10.1.0.2", "10.1.0.3", false)]
+    [InlineData("unknown-mode", "bridge", "10.1.0.2", "10.1.0.3", false)]
+    [InlineData("aspire-probe", "aspire-probe", "127.0.0.1", "10.1.0.3", false)]
+    [InlineData("aspire-probe", "aspire-probe", "not-an-ip", "10.1.0.3", false)]
+    public void BridgeVerifierRequiresOneSharedStandardNetworkAndRoutableAddresses(
+        string mode,
+        string networkName,
+        string ownerAddress,
+        string followerAddress,
+        bool expected)
+    {
+        var owner = CreateBridgeInspect(mode, networkName, "a", ownerAddress);
+        var follower = CreateBridgeInspect(mode, networkName, "a", followerAddress);
+
+        if (expected)
+        {
+            var proof = NamespaceProbeBridgeNetworkVerifier.Verify(owner, follower);
+            Assert.Equal(networkName, proof.NetworkName);
+            Assert.Equal(ownerAddress, proof.OwnerAddress);
+            Assert.Equal(followerAddress, proof.FollowerAddress);
+        }
+        else
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+                NamespaceProbeBridgeNetworkVerifier.Verify(owner, follower));
+        }
+    }
+
+    [Fact]
+    public void BridgeVerifierRejectsDifferentNetworkIdentitiesAndMultipleAttachments()
+    {
+        var owner = CreateBridgeInspect("aspire-probe", "aspire-probe", "a", "10.1.0.2");
+        var differentNetwork = CreateBridgeInspect("aspire-probe", "aspire-probe", "b", "10.1.0.3");
+        Assert.Throws<InvalidOperationException>(() =>
+            NamespaceProbeBridgeNetworkVerifier.Verify(owner, differentNetwork));
+
+        var duplicateAddress = CreateBridgeInspect("aspire-probe", "aspire-probe", "a", "10.1.0.2");
+        Assert.Throws<InvalidOperationException>(() =>
+            NamespaceProbeBridgeNetworkVerifier.Verify(owner, duplicateAddress));
+
+        var multiple = """
+            {"HostConfig":{"NetworkMode":"aspire-probe"},"NetworkSettings":{"Networks":{
+              "aspire-probe":{"NetworkID":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","IPAddress":"10.1.0.3"},
+              "other":{"NetworkID":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","IPAddress":"10.2.0.3"}
+            }}}
+            """;
+        Assert.Throws<InvalidOperationException>(() =>
+            NamespaceProbeBridgeNetworkVerifier.Verify(owner, multiple));
+    }
+
+    private static string CreateBridgeInspect(string mode, string networkName, string idVariant, string address)
+    {
+        var networkId = idVariant == "a"
+            ? "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            : "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        return System.Text.Json.JsonSerializer.Serialize(new
+        {
+            HostConfig = new { NetworkMode = mode },
+            NetworkSettings = new
+            {
+                Networks = new Dictionary<string, object>
+                {
+                    [networkName] = new { NetworkID = networkId, IPAddress = address },
+                },
+            },
+        });
     }
 
 }

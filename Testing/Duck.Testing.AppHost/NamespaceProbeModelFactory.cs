@@ -17,6 +17,12 @@ internal static class NamespaceProbeModelFactory
     internal const string OwnerRole = "namespace-probe-owner";
     internal const string FollowerRole = "namespace-probe-follower";
 
+    internal enum NetworkMode
+    {
+        SharedNamespace,
+        DefaultBridge,
+    }
+
     private const string EntryAssembly = "Duck.Testing.RefereeDriver.Host.dll";
     private static readonly string[] RequiredPublishFiles =
     [
@@ -38,13 +44,31 @@ internal static class NamespaceProbeModelFactory
     /// 既存配布先を読み取り専用で割り当てた所有元・依存側をbuilderへ登録し、登録済み注釈からJSON用の安全な射影を作る。
     /// DCPの既定Networksはこの段階では生成されず、builderのBuild/Runも呼び出さない。
     /// </summary>
-    internal static async Task<NamespaceProbeModelDto> AddResourcesAndProjectAsync(
+    internal static Task<NamespaceProbeModelDto> AddResourcesAndProjectAsync(
         IDistributedApplicationBuilder builder,
         string runId,
         string publishDirectory,
         CancellationToken cancellationToken = default)
+        => AddResourcesAndProjectAsync(
+            builder,
+            runId,
+            publishDirectory,
+            NetworkMode.SharedNamespace,
+            cancellationToken);
+
+    /// <summary>指定したネットワーク候補で、既存の二資源モデルを登録して射影します。</summary>
+    internal static async Task<NamespaceProbeModelDto> AddResourcesAndProjectAsync(
+        IDistributedApplicationBuilder builder,
+        string runId,
+        string publishDirectory,
+        NetworkMode networkMode,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        if (!Enum.IsDefined(networkMode))
+        {
+            throw new ArgumentOutOfRangeException(nameof(networkMode));
+        }
         var validatedRunId = ValidateRunId(runId);
         ValidateExistingPublishOutput(publishDirectory);
 
@@ -78,7 +102,7 @@ internal static class NamespaceProbeModelFactory
             "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={validatedRunId}",
             "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={OwnerRole}");
 
-        var follower = builder.AddContainer(FollowerResourceName, AspNetImage)
+        var followerBuilder = builder.AddContainer(FollowerResourceName, AspNetImage)
             .WithImageSHA256(AspNetImageSha256)
             .WithImagePullPolicy(ImagePullPolicy.Never)
             .WithContainerName(followerContainerName)
@@ -87,14 +111,25 @@ internal static class NamespaceProbeModelFactory
                 "dotnet",
                 $"{PublishMountTarget}/{EntryAssembly}",
                 "--RefereeDriver:Enabled=false",
-                $"--urls=http://0.0.0.0:{FollowerPort}")
-            .WithContainerRuntimeArgs(
+                $"--urls=http://0.0.0.0:{FollowerPort}");
+
+        if (networkMode == NetworkMode.SharedNamespace)
+        {
+            followerBuilder.WithContainerRuntimeArgs(
                 "--network", $"container:{ownerContainerName}",
                 "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={validatedRunId}",
-                "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={FollowerRole}")
-            .WaitForStart(owner);
+                "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={FollowerRole}");
+        }
+        else
+        {
+            followerBuilder.WithContainerRuntimeArgs(
+                "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={validatedRunId}",
+                "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={FollowerRole}");
+        }
 
-        var resources = new[] { owner.Resource, follower.Resource };
+        followerBuilder.WaitForStart(owner);
+
+        var resources = new[] { owner.Resource, followerBuilder.Resource };
         var projections = new List<NamespaceProbeResourceDto>(resources.Length);
         foreach (var resource in resources)
         {

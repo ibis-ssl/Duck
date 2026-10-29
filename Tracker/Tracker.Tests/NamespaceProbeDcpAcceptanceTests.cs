@@ -887,7 +887,27 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         await RunNativeProbeAsync(settings);
     }
 
-    private async Task RunNativeProbeAsync(NamespaceProbeTestSettings settings)
+    [NativeNamespaceProbeFact]
+    public async Task NativeBridgeProbeRecreatesOnlyItsTwoOwnedContainersOnce()
+    {
+        var settings = NamespaceProbeTestSettings.Parse(
+            Environment.GetEnvironmentVariable(GateVariableName),
+            Environment.GetEnvironmentVariable(EngineVariable),
+            Environment.GetEnvironmentVariable(RunIdVariable));
+        if (!settings.Enabled)
+        {
+            throw new InvalidOperationException("The native bridge probe fact was not skipped even though its gate is absent.");
+        }
+
+        await RunNativeProbeAsync(settings, NamespaceProbeModelFactory.NetworkMode.DefaultBridge);
+    }
+
+    private Task RunNativeProbeAsync(NamespaceProbeTestSettings settings) =>
+        RunNativeProbeAsync(settings, NamespaceProbeModelFactory.NetworkMode.SharedNamespace);
+
+    private async Task RunNativeProbeAsync(
+        NamespaceProbeTestSettings settings,
+        NamespaceProbeModelFactory.NetworkMode networkMode)
     {
         var stopwatch = Stopwatch.StartNew();
         using var operationDeadline = new CancellationTokenSource(OperationBudget);
@@ -938,6 +958,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                 builder,
                 settings.RunId,
                 publishDirectory,
+                networkMode,
                 cancellationToken).ConfigureAwait(false);
             Assert.Equal(2, model.Resources.Count);
 
@@ -1000,8 +1021,9 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             Record("resource.running", new { role = NamespaceProbeModelFactory.FollowerRole, resourceId = followerInitial.ResourceId, containerId = followerInitial.ContainerId });
             await AssertOwnedRunningAsync(docker, settings, followerInitial, NamespaceProbeModelFactory.FollowerRole, cancellationToken)
                 .ConfigureAwait(false);
-            await AssertFollowerSharesCurrentOwnerNamespaceAsync(
+            await AssertFollowerNetworkModeAsync(
                 docker,
+                networkMode,
                 followerInitial.ContainerId!,
                 ownerInitial.ContainerId!,
                 $"duck-namespace-probe-owner-{settings.RunId}",
@@ -1053,8 +1075,9 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             Record("resource.running", new { role = NamespaceProbeModelFactory.FollowerRole, resourceId = followerRestarted.ResourceId, containerId = followerRestarted.ContainerId });
             await AssertOwnedRunningAsync(docker, settings, followerRestarted, NamespaceProbeModelFactory.FollowerRole, cancellationToken)
                 .ConfigureAwait(false);
-            await AssertFollowerSharesCurrentOwnerNamespaceAsync(
+            await AssertFollowerNetworkModeAsync(
                 docker,
+                networkMode,
                 followerRestarted.ContainerId!,
                 ownerRestarted.ContainerId!,
                 $"duck-namespace-probe-owner-{settings.RunId}",
@@ -1282,6 +1305,42 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                 $"The bounded native namespace probe did not complete cleanly. Owned container generations observed: {monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count}; elapsed: {stopwatch.Elapsed}. Cleanup must be reviewed before any retry.",
                 operationFailure ?? cleanupFailure);
         }
+    }
+
+    private async Task AssertFollowerNetworkModeAsync(
+        IReadOnlyDockerCli docker,
+        NamespaceProbeModelFactory.NetworkMode networkMode,
+        string followerId,
+        string currentOwnerId,
+        string ownerContainerName,
+        CancellationToken cancellationToken)
+    {
+        if (networkMode == NamespaceProbeModelFactory.NetworkMode.SharedNamespace)
+        {
+            await AssertFollowerSharesCurrentOwnerNamespaceAsync(
+                docker,
+                followerId,
+                currentOwnerId,
+                ownerContainerName,
+                cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        using var owner = await InspectJsonAsync(docker, currentOwnerId, cancellationToken).ConfigureAwait(false);
+        using var follower = await InspectJsonAsync(docker, followerId, cancellationToken).ConfigureAwait(false);
+        var proof = NamespaceProbeBridgeNetworkVerifier.Verify(
+            owner.RootElement.GetRawText(),
+            follower.RootElement.GetRawText());
+        Record("follower.standard-network-verified", new
+        {
+            ownerContainerId = currentOwnerId,
+            followerContainerId = followerId,
+            proof.NetworkName,
+            proof.NetworkId,
+            proof.OwnerAddress,
+            proof.FollowerAddress,
+            applicationTrafficTested = false,
+        });
     }
 
     internal async Task VerifyReadOnlyPreflightAsync(
