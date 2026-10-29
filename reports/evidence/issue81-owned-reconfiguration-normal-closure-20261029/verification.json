@@ -1,0 +1,194 @@
+{
+  "review_mode": "normal_fix_verification",
+  "reviewed_head": "62d920f5726bfac5f487ef3d5bc54981e4831df1",
+  "verdict": "pass_with_held",
+  "findings": [
+    {
+      "id": "I81-07B-NR-001",
+      "source_severity": "P2 medium",
+      "severity": "P2 medium",
+      "status": "closed",
+      "closure_review_head": "62d920f5726bfac5f487ef3d5bc54981e4831df1"
+    },
+    {
+      "id": "I81-07B-NR-002",
+      "source_severity": "P2 medium",
+      "severity": "P2 medium",
+      "status": "closed",
+      "closure_review_head": "62d920f5726bfac5f487ef3d5bc54981e4831df1"
+    },
+    {
+      "id": "I81-07B-NR-003",
+      "source_severity": "P2 medium",
+      "severity": "P2 medium",
+      "status": "closed",
+      "closure_review_head": "62d920f5726bfac5f487ef3d5bc54981e4831df1"
+    },
+    {
+      "id": "I81-07B-NR-004",
+      "source_severity": "P2 medium",
+      "severity": "P2 medium",
+      "status": "closed",
+      "closure_review_head": "62d920f5726bfac5f487ef3d5bc54981e4831df1"
+    }
+  ],
+  "new_required_findings": 0,
+  "review_source_sha256": "1E34C0A13C5BEDBA9A0DBABBABC20E86CAEC8442FC13626614147C1FB10305B3",
+  "requested_profile": "gpt-6.1-sol high",
+  "applied_profile": null,
+  "profile_observability": "final_profile_hidden",
+  "application_status": "reused_existing_agent_profile",
+  "source_git_blobs": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedRefereeEndpoint.cs",
+      "git_blob_oid": "3a4484ab8b5a58645bd3aff0f4b01a3432e8f8b5"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "git_blob_oid": "7ca06115e72873716a38de2cae15a390c13fd1ce"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs",
+      "git_blob_oid": "7930d655f6456f7bcd1e6f05cae9623cad999b90"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "git_blob_oid": "bd2bcd0d1844a87ed83affa7fd8816247be293fa"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs",
+      "git_blob_oid": "aed9dafdd22b57ef2b7982435c924322bb08e37f"
+    }
+  ],
+  "technical_verification": "85 passed; both builds passed; no new runtime",
+  "terminal_independent_final_review": false,
+  "terminal_attestation": false,
+  "held": [
+    "DCP commands and traffic acceptance",
+    "normal/comparison full DCP migration",
+    "CM4 and namespace feasibility",
+    "whole Issue81 independent final review"
+  ],
+  "documentation": {
+    "targets": [
+      {
+        "slug": "tasks-status-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "feb2604556b9fce21a66d9be9d06b3c0fd9e738d7e4adcd5bd503c631124d119"
+      },
+      {
+        "slug": "phases-status-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "5118c1a6918562f37095c1b36195343cb617ab5723396fcadd6e0eac7714f26d"
+      },
+      {
+        "slug": "normal-closure-full",
+        "source": "reports/issue81-owned-reconfiguration-normal-closure-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "43bbeb2e5afb93fe0ce7d94d8563e66162601cfcb4daf4cb220927d173895e74"
+      }
+    ],
+    "private_manifest_sha256": "99F7A7400C6BF03856871536C341720524AFD4AC2408214A3EC22D120479AAAE",
+    "gates": [
+      {
+        "target": "tasks-status-added",
+        "name": "textlint",
+        "inputSha256": "feb2604556b9fce21a66d9be9d06b3c0fd9e738d7e4adcd5bd503c631124d119",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-status-added",
+        "name": "whitelist",
+        "inputSha256": "feb2604556b9fce21a66d9be9d06b3c0fd9e738d7e4adcd5bd503c631124d119",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-status-added",
+        "name": "cspell",
+        "inputSha256": "feb2604556b9fce21a66d9be9d06b3c0fd9e738d7e4adcd5bd503c631124d119",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "042b08c3c8cbb57b97be65d185c2888ebca463dfdbc0334d8d8e59739a8f9d02"
+      },
+      {
+        "target": "tasks-status-added",
+        "name": "yomiyasu",
+        "inputSha256": "feb2604556b9fce21a66d9be9d06b3c0fd9e738d7e4adcd5bd503c631124d119",
+        "exit": 0,
+        "stdoutSha256": "3c435a017d13f6d76ff48fe533821a34d63893fb023b414605f33199f632c784",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "textlint",
+        "inputSha256": "5118c1a6918562f37095c1b36195343cb617ab5723396fcadd6e0eac7714f26d",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "whitelist",
+        "inputSha256": "5118c1a6918562f37095c1b36195343cb617ab5723396fcadd6e0eac7714f26d",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "cspell",
+        "inputSha256": "5118c1a6918562f37095c1b36195343cb617ab5723396fcadd6e0eac7714f26d",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "58ae1f23d38a1075990275c7e04442e9eac05edaffeb38954a962d2b3d495051"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "yomiyasu",
+        "inputSha256": "5118c1a6918562f37095c1b36195343cb617ab5723396fcadd6e0eac7714f26d",
+        "exit": 0,
+        "stdoutSha256": "9752180f2c185bbfac339d432786dbd93e761a9b194c789b6c22dc8b387c1d86",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "normal-closure-full",
+        "name": "textlint",
+        "inputSha256": "43bbeb2e5afb93fe0ce7d94d8563e66162601cfcb4daf4cb220927d173895e74",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "normal-closure-full",
+        "name": "whitelist",
+        "inputSha256": "43bbeb2e5afb93fe0ce7d94d8563e66162601cfcb4daf4cb220927d173895e74",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "normal-closure-full",
+        "name": "cspell",
+        "inputSha256": "43bbeb2e5afb93fe0ce7d94d8563e66162601cfcb4daf4cb220927d173895e74",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "df729520844b2cb43797962054448b3c7915c8d2f8e70fcc10ea63e895e6b507"
+      },
+      {
+        "target": "normal-closure-full",
+        "name": "yomiyasu",
+        "inputSha256": "43bbeb2e5afb93fe0ce7d94d8563e66162601cfcb4daf4cb220927d173895e74",
+        "exit": 0,
+        "stdoutSha256": "df4ade1534472f0b0157227aa8a5519582e75948988fabf639c65fdaaacf5f22",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "baseline": "62d920f5726bfac5f487ef3d5bc54981e4831df1"
+  }
+}
