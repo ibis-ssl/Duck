@@ -343,6 +343,7 @@ def _run_owned_command(
 
     creation_flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) if os.name == "nt" else 0
     process: subprocess.Popen[object] | None = None
+    stop_attempted = False
     deadline = None if timeout_seconds is None else time.monotonic() + timeout_seconds
     try:
         process = subprocess.Popen(
@@ -358,12 +359,14 @@ def _run_owned_command(
         )
         while True:
             if state.requested.is_set():
+                stop_attempted = True
                 output = _stop_and_reap_owned_child(
                     process, state.signal_number or signal.SIGTERM, capture_output
                 )
                 return subprocess.CompletedProcess(command, process.returncode, *(output or (None, None)))
             remaining = None if deadline is None else deadline - time.monotonic()
             if remaining is not None and remaining <= 0:
+                stop_attempted = True
                 output = _stop_and_reap_owned_child(process, signal.SIGTERM, capture_output)
                 raise subprocess.TimeoutExpired(
                     command,
@@ -375,10 +378,12 @@ def _run_owned_command(
             complete, output = _wait_owned_child(process, wait_seconds, capture_output)
             if complete:
                 if _owned_process_group_exists(process.pid):
+                    stop_attempted = True
                     output = _stop_and_reap_owned_child(process, signal.SIGTERM, capture_output)
                 return subprocess.CompletedProcess(command, process.returncode, *(output or (None, None)))
     except BaseException:
-        if process is not None and process.poll() is None:
+        if process is not None and process.poll() is None and not stop_attempted:
+            stop_attempted = True
             _stop_and_reap_owned_child(process, signal.SIGTERM, capture_output)
         raise
 

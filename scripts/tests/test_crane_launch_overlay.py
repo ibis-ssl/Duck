@@ -10,6 +10,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from types import SimpleNamespace
+from unittest import mock
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -285,6 +286,49 @@ class CraneLaunchOverlayTests(unittest.TestCase):
         prefix = Path(observed_prefix.read_text(encoding="utf-8"))
         self.assertFalse(prefix.exists())
         self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    def test_owned_child_reap_failure_does_not_restart_stop_budget(self):
+        class UnreapedChild:
+            pid = 424242
+            returncode = None
+
+            @staticmethod
+            def poll():
+                return None
+
+        child = UnreapedChild()
+        stop_attempts = []
+        force_attempts = []
+        observed_prefix = []
+        sentinel = self.root / "unrelated-sentinel.txt"
+        sentinel.write_text("keep", encoding="utf-8")
+
+        def start_owned_command(arguments):
+            signal.raise_signal(signal.SIGTERM)
+            return ["controlled-owned-child"]
+
+        with (
+            mock.patch.object(overlay.subprocess, "Popen", return_value=child),
+            mock.patch.object(overlay, "_signal_owned_child", side_effect=lambda *_: stop_attempts.append("signal")),
+            mock.patch.object(overlay, "_force_stop_owned_child", side_effect=lambda *_: force_attempts.append("force")),
+            mock.patch.object(overlay, "_wait_owned_tree", return_value=(False, None)),
+        ):
+            with self.assertRaises(overlay.OwnedChildNotReapedError):
+                overlay.run_with_overlay(
+                    "cm4-sim",
+                    "cm4-sim",
+                    [],
+                    environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                    package_share=self.package_share,
+                    resolver=lambda name: ["192.0.2.64"],
+                    temporary_directory=str(self.root),
+                    _command_factory=start_owned_command,
+                )
+
+        self.assertEqual(["signal"], stop_attempts)
+        self.assertEqual(["force"], force_attempts)
+        self.assertEqual("keep", sentinel.read_text(encoding="utf-8"))
+        self.assertTrue(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
 
     @unittest.skipUnless(overlay.os.name == "posix", "POSIXのプロセスグループ信号伝達専用")
     def test_owned_command_stops_only_its_process_group(self):

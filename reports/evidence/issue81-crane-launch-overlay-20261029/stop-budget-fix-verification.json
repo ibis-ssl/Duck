@@ -1,0 +1,72 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07F NR002/P2 residual stop-budget fix",
+  "base_head": "ae023f36a74ab8a2b43a1c295879ec6ef6913199",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/CraneLaunchOverlay.py",
+      "tested_worktree_sha256": "52fe3ed08c9d52b6d90532429672b0c8d897676b49eabf6340591c0eff6d867e",
+      "normalized_lf_sha256": "52fe3ed08c9d52b6d90532429672b0c8d897676b49eabf6340591c0eff6d867e"
+    },
+    {
+      "path": "scripts/tests/test_crane_launch_overlay.py",
+      "tested_worktree_sha256": "d8c29f18232ff7d536430d82647bb7e3118c4835dd10455a10297a138f7bd4b5",
+      "normalized_lf_sha256": "d8c29f18232ff7d536430d82647bb7e3118c4835dd10455a10297a138f7bd4b5"
+    }
+  ],
+  "verification": {
+    "antecedent_behavior_red": "shared consumer attempts stop twice; expected once; genuine test before this residual fix",
+    "targeted_green": "one stop attempt; unreaped-child failure preserves owned overlay and unrelated sentinel",
+    "windows_python": {
+      "executed": 12,
+      "passed": 11,
+      "skipped": 1,
+      "skip": "POSIX group; next normal Ubuntu CI verifies it",
+      "exit": 0
+    },
+    "release_build": {
+      "exit": 0,
+      "existing_warning": "ASPIRE010",
+      "helper_source_sha256": "52fe3ed08c9d52b6d90532429672b0c8d897676b49eabf6340591c0eff6d867e",
+      "helper_output_sha256": "52fe3ed08c9d52b6d90532429672b0c8d897676b49eabf6340591c0eff6d867e",
+      "initial_sandbox_obj_write_failure_retained": true
+    },
+    "csharp_regression": "prior77 pass reused; C# unchanged",
+    "documentation": "unchanged; prior exact inputs reused",
+    "logs": [
+      {
+        "name": "issue81-07f-stop-budget-red.stderr.txt",
+        "sha256": "09ba38bfcaa2dfd9d2be9cbda023a0fab891380abdbf1dcd79a547dd3bc40897"
+      },
+      {
+        "name": "issue81-07f-stop-budget-green.stderr.txt",
+        "sha256": "0a48fb5632914abcf5f218e278a70ecc0a1ae33b260a64e2244cebabe4fbda93"
+      },
+      {
+        "name": "issue81-07f-stop-budget-suite.stderr.txt",
+        "sha256": "6bc23250f8dfc2f990a997972e561b5242003870bfe88d6bf4fb412f628093fe"
+      },
+      {
+        "name": "issue81-07f-stop-budget-release-build.log",
+        "sha256": "efd0d8bffb5d8c01610f478886e8b6fb408a7c7c1f0698f41ee3cc1ab82bbc0d"
+      }
+    ]
+  },
+  "history": {
+    "initial_NR002_antecedent_TDD": "not fulfilled; post-hoc reconstruction retained; this residual Red does not recover earlier gap",
+    "NR001": "closed on ae023 by same reviewer; XML code unchanged in this residual delta",
+    "previous_linux_ci": {
+      "head": "ae023f36a74ab8a2b43a1c295879ec6ef6913199",
+      "run_id": 40867167679,
+      "result": "success; Python11 passed including actual POSIX group; does not cover this new failure-branch test"
+    }
+  },
+  "normal_bounded_closure": "pending same reviewer",
+  "new_head_ci": "pending",
+  "native_container_runtime_executed": false,
+  "remaining": [
+    "Crane actual image/DNS/UDP unverified",
+    "normal base four-resource migration/CM4 loopback unresolved",
+    "whole Issue81 independent final not started"
+  ]
+}
