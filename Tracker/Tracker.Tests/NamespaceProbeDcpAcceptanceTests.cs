@@ -5,6 +5,8 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit.Abstractions;
 
 namespace Tracker.Tests;
@@ -113,7 +115,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             (false, ["info", "--format", "{{.ID}}"], "expected-engine"),
             (false, ["context", "show"], "desktop-linux"),
             (true, ["image", "inspect", "--format", "{{json .RepoDigests}}", ProbeTestArgument.Any], $"[{System.Text.Json.JsonSerializer.Serialize($"{NamespaceProbeModelFactory.AspNetImage}@sha256:{NamespaceProbeModelFactory.AspNetImageSha256}")}]"),
-            (true, ["ps", "--all", "--quiet", "--filter", $"label={ContainerIdentityExecHandoff.RunIdLabel}=run_01"], "existing-id"));
+            (true, NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments("run_01"), "existing-id"));
         var settings = NamespaceProbeTestSettings.Parse("true", "expected-engine", "run_01");
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -237,6 +239,346 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         Assert.Equal("owner-next-key", observation.ResourceId);
     }
 
+    [Fact]
+    public async Task NotificationMonitorRecordsAllGenerationsAndBlocksAnotherCommandAfterTheFourGenerationLimit()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var owner = builder.AddContainer("monitor-owner", "example/image").Resource;
+        var sequence = Enumerable.Range(0, 5)
+            .Select(index => new OwnedResourceObservation(
+                owner,
+                $"owner-key-{index}",
+                KnownResourceStates.Running,
+                index.ToString("x", System.Globalization.CultureInfo.InvariantCulture).PadLeft(64, '0')))
+            .ToArray();
+        var inner = new SequenceOwnedReconfigurationAdapter(sequence);
+        var gated = new GatedOwnedReconfigurationAdapter(inner, eventCount: sequence.Length);
+        await using var monitor = new NamespaceProbeNotificationMonitor(gated);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+
+        for (var index = 0; index < sequence.Length; index++)
+        {
+            await gated.WaitUntilQueuedAsync(index, timeout.Token);
+            gated.Continue();
+        }
+
+        var commandCalls = 0;
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(
+                _ =>
+                {
+                    commandCalls++;
+                    return Task.CompletedTask;
+                },
+                timeout.Token));
+
+        Assert.Equal(5, monitor.ObservedGenerations.Count);
+        Assert.Equal(5, monitor.ObservedGenerations.Select(observation => observation.ContainerId).Distinct().Count());
+        Assert.Equal(0, commandCalls);
+    }
+
+    [Fact]
+    public async Task NotificationMonitorRejectsQueuedRunningObservationWhenAspireCurrentIsStopped()
+    {
+        var resource = new ContainerResource("monitor-current-owner");
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance, lifetime);
+        var adapter = new AspireOwnedReconfigurationAdapter(notifications, null!, null!, string.Empty);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        var containerId = new string('a', 64);
+
+        await notifications.PublishUpdateAsync(resource, "owner-key",
+            _ => Snapshot(KnownResourceStates.Running, containerId));
+        var oldRunning = Assert.IsType<OwnedResourceObservation>(adapter.GetCurrent(resource));
+        await notifications.PublishUpdateAsync(resource, "owner-key",
+            _ => Snapshot(KnownResourceStates.Stopping, containerId));
+        var currentStopped = Assert.IsType<OwnedResourceObservation>(adapter.GetCurrent(resource));
+        var queuedAdapter = new QueuedCurrentOwnedReconfigurationAdapter(adapter, [oldRunning, currentStopped]);
+        var gatedAdapter = new GatedOwnedReconfigurationAdapter(queuedAdapter, eventCount: 2);
+        await using var monitor = new NamespaceProbeNotificationMonitor(gatedAdapter);
+
+        await gatedAdapter.WaitUntilQueuedAsync(0, timeout.Token);
+        gatedAdapter.Continue();
+        await gatedAdapter.WaitUntilQueuedAsync(1, timeout.Token);
+        gatedAdapter.Continue();
+
+        var current = adapter.GetCurrent(resource);
+        Assert.Equal(KnownResourceStates.Stopping, current?.State);
+        Assert.Equal(containerId, current?.ContainerId);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            monitor.WaitForRunningAsync(resource, null, timeout.Token));
+    }
+
+    [Fact]
+    public async Task NotificationMonitorRejectsQueuedTerminalObservationWhenAspireCurrentIsNextGeneration()
+    {
+        var resource = new ContainerResource("monitor-current-owner");
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance, lifetime);
+        var adapter = new AspireOwnedReconfigurationAdapter(notifications, null!, null!, string.Empty);
+        using var watchTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        await using var actualWatch = adapter.WatchAsync(watchTimeout.Token).GetAsyncEnumerator(watchTimeout.Token);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        var oldId = new string('a', 64);
+        var nextId = new string('b', 64);
+
+        await notifications.PublishUpdateAsync(resource, "owner-key",
+            _ => Snapshot(KnownResourceStates.Running, oldId));
+        Assert.True(await actualWatch.MoveNextAsync());
+        var oldRunning = Assert.IsType<OwnedResourceObservation>(adapter.GetCurrent(resource));
+        await notifications.PublishUpdateAsync(resource, "owner-key",
+            _ => Snapshot(KnownResourceStates.Finished, oldId));
+        Assert.True(await actualWatch.MoveNextAsync());
+        var oldStopped = Assert.IsType<OwnedResourceObservation>(adapter.GetCurrent(resource));
+        await notifications.PublishUpdateAsync(resource, "owner-next-key",
+            _ => Snapshot(KnownResourceStates.Running, nextId));
+        Assert.True(await actualWatch.MoveNextAsync());
+        var nextRunning = Assert.IsType<OwnedResourceObservation>(adapter.GetCurrent(resource));
+        var queuedAdapter = new QueuedCurrentOwnedReconfigurationAdapter(adapter, [oldRunning, oldStopped, nextRunning]);
+        var gatedAdapter = new GatedOwnedReconfigurationAdapter(queuedAdapter, eventCount: 3);
+        await using var monitor = new NamespaceProbeNotificationMonitor(gatedAdapter);
+
+        await gatedAdapter.WaitUntilQueuedAsync(0, timeout.Token);
+        gatedAdapter.Continue();
+        await gatedAdapter.WaitUntilQueuedAsync(1, timeout.Token);
+        gatedAdapter.Continue();
+        await gatedAdapter.WaitUntilQueuedAsync(2, timeout.Token);
+        gatedAdapter.Continue();
+
+        var current = adapter.GetCurrent(resource);
+        Assert.Equal("owner-next-key", current?.ResourceId);
+        Assert.Equal(KnownResourceStates.Running, current?.State);
+        Assert.Equal(nextId, current?.ContainerId);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            monitor.WaitForStoppedAsync(resource, oldId, timeout.Token));
+    }
+
+    [Fact]
+    public async Task CleanupCancellationDuringStopReturnsFailureWithoutStartingDispose()
+    {
+        using var deadline = new CancellationTokenSource();
+        var stopStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var disposeCalls = 0;
+
+        var cleanup = NamespaceProbeCleanup.RunOnlyAfterEngineCheckAsync(
+            _ => Task.CompletedTask,
+            async token =>
+            {
+                stopStarted.SetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+            },
+            _ =>
+            {
+                disposeCalls++;
+                return Task.CompletedTask;
+            },
+            deadline.Token);
+
+        await stopStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        deadline.Cancel();
+        var result = await cleanup;
+
+        Assert.True(result.EngineVerified);
+        Assert.IsAssignableFrom<OperationCanceledException>(result.LifecycleFailure);
+        Assert.Equal("stop", result.FailedStage);
+        Assert.Equal(0, disposeCalls);
+    }
+
+    [Fact]
+    public async Task CleanupChecksCancellationAfterStopCallbackCompletesBeforeStartingDispose()
+    {
+        using var deadline = new CancellationTokenSource();
+        var disposeCalls = 0;
+
+        var result = await NamespaceProbeCleanup.RunOnlyAfterEngineCheckAsync(
+            _ => Task.CompletedTask,
+            _ =>
+            {
+                deadline.Cancel();
+                return Task.CompletedTask;
+            },
+            _ =>
+            {
+                disposeCalls++;
+                return Task.CompletedTask;
+            },
+            deadline.Token);
+
+        Assert.True(result.EngineVerified);
+        Assert.IsAssignableFrom<OperationCanceledException>(result.LifecycleFailure);
+        Assert.Equal("dispose", result.FailedStage);
+        Assert.Equal(0, disposeCalls);
+    }
+
+    [Fact]
+    public async Task CleanupStopFailureReturnsFailureWithoutStartingDispose()
+    {
+        var disposeCalls = 0;
+
+        var result = await NamespaceProbeCleanup.RunOnlyAfterEngineCheckAsync(
+            _ => Task.CompletedTask,
+            _ => Task.FromException(new IOException("stop failed")),
+            _ =>
+            {
+                disposeCalls++;
+                return Task.CompletedTask;
+            },
+            CancellationToken.None);
+
+        Assert.True(result.EngineVerified);
+        Assert.IsType<IOException>(result.LifecycleFailure);
+        Assert.Equal("stop", result.FailedStage);
+        Assert.Equal(0, disposeCalls);
+    }
+
+    [Fact]
+    public async Task CleanupDisposeFailureIsReturnedAfterTheStopCompletes()
+    {
+        var stopCalls = 0;
+
+        var result = await NamespaceProbeCleanup.RunOnlyAfterEngineCheckAsync(
+            _ => Task.CompletedTask,
+            _ =>
+            {
+                stopCalls++;
+                return Task.CompletedTask;
+            },
+            _ => Task.FromException(new IOException("dispose failed")),
+            CancellationToken.None);
+
+        Assert.True(result.EngineVerified);
+        Assert.IsType<IOException>(result.LifecycleFailure);
+        Assert.Equal("dispose", result.FailedStage);
+        Assert.Equal(1, stopCalls);
+    }
+
+    [Fact]
+    public async Task OwnerPortBindingValidationRejectsAnyAdditionalPublishedPort()
+    {
+        var docker = new FakeReadOnlyDockerCli((true,
+            ["inspect", "--format", "{{json .}}", "owner-id"],
+            """{"HostConfig":{"PortBindings":{"39110/tcp":[{"HostIp":"127.0.0.1","HostPort":"40000"}],"1234/tcp":[{"HostIp":"0.0.0.0","HostPort":"1234"}]}}}"""));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            AssertOwnerEndpointIsLoopbackOnlyAsync(docker, "owner-id", CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("""{"HostConfig":{"PortBindings":null}}""")]
+    [InlineData("""{"HostConfig":{"PortBindings":[]}}""")]
+    public async Task OwnerPortBindingValidationRejectsMissingOrUnknownShape(string inspectJson)
+    {
+        var docker = new FakeReadOnlyDockerCli((true,
+            ["inspect", "--format", "{{json .}}", "owner-id"], inspectJson));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            AssertOwnerEndpointIsLoopbackOnlyAsync(docker, "owner-id", CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("""{"HostConfig":{"PortBindings":null}}""")]
+    [InlineData("""{"HostConfig":{"PortBindings":[]}}""")]
+    public async Task FollowerPortBindingValidationRejectsMissingOrUnknownShape(string inspectJson)
+    {
+        var docker = new FakeReadOnlyDockerCli((true,
+            ["inspect", "--format", "{{json .}}", "follower-id"], inspectJson));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            AssertFollowerHasNoPublishedHostPortsAsync(docker, "follower-id", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task RunIdInventoryRequestsNonTruncatedContainerIds()
+    {
+        var docker = new FakeReadOnlyDockerCli(
+            (true, ["info", "--format", "{{.ID}}"], "expected-engine"),
+            (false, ["info", "--format", "{{.ID}}"], "expected-engine"),
+            (false, ["context", "show"], "desktop-linux"),
+            (true, ["image", "inspect", "--format", "{{json .RepoDigests}}", ProbeTestArgument.Any],
+                $"[{System.Text.Json.JsonSerializer.Serialize($"{NamespaceProbeModelFactory.AspNetImage}@sha256:{NamespaceProbeModelFactory.AspNetImageSha256}")}]"),
+            (true, NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments("run_01"), "\r\n"));
+        var settings = NamespaceProbeTestSettings.Parse("true", "expected-engine", "run_01");
+
+        await VerifyReadOnlyPreflightAsync(docker, settings, null, null, CancellationToken.None);
+
+        Assert.Contains("--no-trunc", docker.Calls.Last().Arguments);
+    }
+
+    [Fact]
+    public void RemainingOwnedContainerCannotBeConfirmedWithoutAReadableState()
+    {
+        var id = new string('a', 64);
+        var json = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            Id = id,
+            Config = new
+            {
+                Labels = new Dictionary<string, string>
+                {
+                    [ContainerIdentityExecHandoff.RunIdLabel] = "run_01",
+                    [ContainerIdentityExecHandoff.RoleLabel] = NamespaceProbeModelFactory.OwnerRole,
+                },
+            },
+        });
+
+        Assert.False(HasOwnedProbeLabels(json, id, "run_01"));
+    }
+
+    [Fact]
+    public void CleanupInspectionRecordsFullIdRoleAndStateAndRejectsShortInventoryIds()
+    {
+        var id = new string('a', 64);
+        var json = CreateInspectJson(id, "run_01", NamespaceProbeModelFactory.OwnerRole, "exited");
+
+        var exact = NamespaceProbeCleanupInventory.ParseCandidate(id,
+            new ReadOnlyDockerResult(0, json, string.Empty), "run_01");
+        var truncated = NamespaceProbeCleanupInventory.ParseCandidate(id[..12],
+            new ReadOnlyDockerResult(0, json, string.Empty), "run_01");
+
+        Assert.Equal("owned", exact.Classification);
+        Assert.Equal(id, exact.ContainerId);
+        Assert.Equal(NamespaceProbeModelFactory.OwnerRole, exact.Role);
+        Assert.Equal("exited", exact.State);
+        Assert.Equal("truncated-inventory-id", truncated.Classification);
+        Assert.Equal(id, truncated.ContainerId);
+    }
+
+    [Fact]
+    public void CleanupInspectionDistinguishesForeignLabelsMissingObjectsAndInspectFailures()
+    {
+        var id = new string('b', 64);
+        var foreign = NamespaceProbeCleanupInventory.ParseCandidate(id,
+            new ReadOnlyDockerResult(0, CreateInspectJson(id, "other-run", NamespaceProbeModelFactory.OwnerRole, "running"), string.Empty),
+            "run_01");
+        var disappeared = NamespaceProbeCleanupInventory.ParseCandidate(id,
+            new ReadOnlyDockerResult(1, string.Empty, "Error: No such object: " + id), "run_01");
+        var failed = NamespaceProbeCleanupInventory.ParseCandidate(id,
+            new ReadOnlyDockerResult(1, string.Empty, "permission denied"), "run_01");
+
+        Assert.Equal("foreign-or-unowned", foreign.Classification);
+        Assert.Equal("disappeared", disappeared.Classification);
+        Assert.Equal("inspect-failed", failed.Classification);
+    }
+
+    private static string CreateInspectJson(string id, string runId, string role, string state) =>
+        System.Text.Json.JsonSerializer.Serialize(new
+        {
+            Id = id,
+            Config = new
+            {
+                Labels = new Dictionary<string, string>
+                {
+                    [ContainerIdentityExecHandoff.RunIdLabel] = runId,
+                    [ContainerIdentityExecHandoff.RoleLabel] = role,
+                },
+            },
+            State = new { Status = state },
+        });
+
     [NativeNamespaceProbeFact]
     public async Task NativeNamespaceProbeRecreatesOnlyItsTwoOwnedContainersOnce()
     {
@@ -311,7 +653,14 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                 commands,
                 new DockerCliCommandRunner(dockerExecutable),
                 settings.Context);
-            monitor = new NamespaceProbeNotificationMonitor(identityAdapter);
+            monitor = new NamespaceProbeNotificationMonitor(identityAdapter, observation =>
+                Record("generation.observed", new
+                {
+                    resource = observation.Resource.Name,
+                    resourceId = observation.ResourceId,
+                    containerId = observation.ContainerId,
+                    state = observation.State,
+                }));
 
             Record("apphost.starting", new { resources = 2, dashboardDisabled = true });
             await application.StartAsync(cancellationToken).ConfigureAwait(false);
@@ -339,7 +688,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
             Record("follower.stop.started", new { containerId = followerInitial.ContainerId });
             await AssertEngineIdentityAsync(docker, settings, cancellationToken).ConfigureAwait(false);
-            await ExecuteResourceCommandAsync(commands, follower, KnownResourceCommands.StopCommand, cancellationToken)
+            await ExecuteResourceCommandAsync(monitor, commands, follower, KnownResourceCommands.StopCommand, cancellationToken)
                 .ConfigureAwait(false);
             Record("follower.stop.accepted", new { });
             var followerStopped = await monitor.WaitForStoppedAsync(
@@ -354,7 +703,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
             Record("owner.restart.started", new { containerId = ownerInitial.ContainerId });
             await AssertEngineIdentityAsync(docker, settings, cancellationToken).ConfigureAwait(false);
-            await ExecuteResourceCommandAsync(commands, owner, KnownResourceCommands.RestartCommand, cancellationToken)
+            await ExecuteResourceCommandAsync(monitor, commands, owner, KnownResourceCommands.RestartCommand, cancellationToken)
                 .ConfigureAwait(false);
             Record("owner.restart.accepted", new { });
             var ownerRestarted = await monitor.WaitForRunningAsync(
@@ -370,7 +719,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
             Record("follower.start.started", new { previousContainerId = followerInitial.ContainerId, ownerContainerId = ownerRestarted.ContainerId });
             await AssertEngineIdentityAsync(docker, settings, cancellationToken).ConfigureAwait(false);
-            await ExecuteResourceCommandAsync(commands, follower, KnownResourceCommands.StartCommand, cancellationToken)
+            await ExecuteResourceCommandAsync(monitor, commands, follower, KnownResourceCommands.StartCommand, cancellationToken)
                 .ConfigureAwait(false);
             Record("follower.start.accepted", new { });
             var followerRestarted = await monitor.WaitForRunningAsync(
@@ -407,7 +756,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             else
             {
                 using var cleanupDeadline = new CancellationTokenSource(remaining);
-                Record("cleanup.started", new { remainingMilliseconds = (long)remaining.TotalMilliseconds, observedContainerGenerations = ownedContainerIds.Count });
+                Record("cleanup.started", new { remainingMilliseconds = (long)remaining.TotalMilliseconds, observedContainerGenerations = monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count });
 
                 if (monitor is not null)
                 {
@@ -422,6 +771,17 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                         Record("monitor.stop-failed", new { exceptionType = exception.GetType().FullName, message = exception.Message });
                     }
                 }
+
+                Record("generation.ledger.final", new
+                {
+                    observedContainerGenerations = monitor?.ObservedGenerations.Select(observation => new
+                    {
+                        resource = observation.Resource.Name,
+                        resourceId = observation.ResourceId,
+                        containerId = observation.ContainerId,
+                        state = observation.State,
+                    }).ToArray() ?? [],
+                });
 
                 if (cleanupDeadline.IsCancellationRequested)
                 {
@@ -446,6 +806,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                             {
                                 cleanupFailure ??= exception;
                                 Record("apphost.stop-failed", new { exceptionType = exception.GetType().FullName, message = exception.Message });
+                                throw;
                             }
                         },
                         async token =>
@@ -459,9 +820,22 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                             {
                                 cleanupFailure ??= exception;
                                 Record("apphost.dispose-failed", new { exceptionType = exception.GetType().FullName, message = exception.Message });
+                                throw;
                             }
                         },
                         cleanupDeadline.Token).ConfigureAwait(false);
+
+                    if (cleanupResult.LifecycleFailure is not null)
+                    {
+                        cleanupFailure ??= cleanupResult.LifecycleFailure;
+                        Record("cleanup.lifecycle-failed", new
+                        {
+                            stage = cleanupResult.FailedStage,
+                            exceptionType = cleanupResult.LifecycleFailure.GetType().FullName,
+                            message = cleanupResult.LifecycleFailure.Message,
+                            elapsedMilliseconds = stopwatch.ElapsedMilliseconds,
+                        });
+                    }
 
                     if (cleanupResult.EngineVerified && !cleanupDeadline.IsCancellationRequested)
                     {
@@ -471,10 +845,8 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
                             await AssertEngineIdentityAsync(docker, settings, cleanupDeadline.Token).ConfigureAwait(false);
 
                             var inventory = await docker.RunAsync(
-                            [
-                                "ps", "--all", "--quiet",
-                                "--filter", $"label={ContainerIdentityExecHandoff.RunIdLabel}={settings.RunId}",
-                            ], cleanupDeadline.Token).ConfigureAwait(false);
+                                NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments(settings.RunId),
+                                cleanupDeadline.Token).ConfigureAwait(false);
                             if (inventory.ExitCode != 0)
                             {
                                 throw new IOException("The run-label inventory could not verify DCP cleanup.");
@@ -482,24 +854,53 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
                             var remainingIds = inventory.StandardOutput
                                 .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            Record("cleanup.inventory", new { exitCode = inventory.ExitCode, remainingContainerIds = remainingIds, observedContainerGenerations = ownedContainerIds.Count });
+                            Record("cleanup.inventory", new
+                            {
+                                exitCode = inventory.ExitCode,
+                                remainingContainerIds = remainingIds,
+                                observedContainerGenerations = monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count,
+                            });
+                            var unverifiedCandidates = false;
+                            var remainingOwnedCount = 0;
                             foreach (var remainingId in remainingIds)
                             {
                                 var inspect = await docker.RunAsync(["inspect", "--format", "{{json .}}", remainingId], cleanupDeadline.Token)
                                     .ConfigureAwait(false);
-                                if (!OwnedContainerInspection.IsFullId(remainingId) ||
-                                    inspect.ExitCode != 0 ||
-                                    !HasOwnedProbeLabels(inspect.StandardOutput, remainingId, settings.RunId))
+                                var evidence = NamespaceProbeCleanupInventory.ParseCandidate(remainingId, inspect, settings.RunId);
+                                Record("cleanup.inventory-candidate", new
                                 {
-                                    throw new InvalidOperationException("A remaining run-label container could not be confirmed as an owned probe resource.");
-                                }
+                                    requestedId = remainingId,
+                                    containerId = evidence.ContainerId,
+                                    role = evidence.Role,
+                                    state = evidence.State,
+                                    classification = evidence.Classification,
+                                    exitCode = inspect.ExitCode,
+                                });
 
-                                Record("cleanup.remaining-owned-resource", new { containerId = remainingId });
+                                if (evidence.Classification == "owned")
+                                {
+                                    remainingOwnedCount++;
+                                    Record("cleanup.remaining-owned-resource", new
+                                    {
+                                        containerId = evidence.ContainerId,
+                                        role = evidence.Role,
+                                        state = evidence.State,
+                                    });
+                                }
+                                else if (evidence.Classification == "inspect-failed")
+                                {
+                                    unverifiedCandidates = true;
+                                    Record("cleanup.candidate-inspect-failed", new { requestedId = remainingId, exitCode = inspect.ExitCode });
+                                }
+                                else if (evidence.Classification is not "disappeared")
+                                {
+                                    unverifiedCandidates = true;
+                                }
                             }
 
-                            if (remainingIds.Length > 0)
+                            if (remainingOwnedCount > 0 || unverifiedCandidates)
                             {
-                                throw new InvalidOperationException("DCP cleanup left run-labeled probe resources behind; no manual removal was attempted.");
+                                throw new InvalidOperationException("DCP cleanup left owned or unverified run-labeled resources; no manual removal was attempted.");
                             }
 
                             Record("cleanup.verified", new { remainingOwnedResources = 0 });
@@ -529,13 +930,14 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             }
 
             ownershipLease?.Dispose();
-            Record("probe.finished", new { elapsedMilliseconds = stopwatch.ElapsedMilliseconds, observedContainerGenerations = ownedContainerIds.Count, cleanupVerified = cleanupFailure is null });
+            var observedGenerationCount = monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count;
+            Record("probe.finished", new { elapsedMilliseconds = stopwatch.ElapsedMilliseconds, observedContainerGenerations = observedGenerationCount, cleanupVerified = cleanupFailure is null });
         }
 
         if (operationFailure is not null || cleanupFailure is not null)
         {
             throw new InvalidOperationException(
-                $"The bounded native namespace probe did not complete cleanly. Owned container generations observed: {ownedContainerIds.Count}; elapsed: {stopwatch.Elapsed}. Cleanup must be reviewed before any retry.",
+                $"The bounded native namespace probe did not complete cleanly. Owned container generations observed: {monitor?.ObservedGenerations.Count ?? ownedContainerIds.Count}; elapsed: {stopwatch.Elapsed}. Cleanup must be reviewed before any retry.",
                 operationFailure ?? cleanupFailure);
         }
     }
@@ -562,10 +964,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         Record("preflight.cached-image", new { exitCode = image.ExitCode, imageReference });
 
         var collisions = await docker.RunAsync(
-            [
-                "ps", "--all", "--quiet",
-                "--filter", $"label={ContainerIdentityExecHandoff.RunIdLabel}={settings.RunId}",
-            ],
+            NamespaceProbeCleanupInventory.BuildRunIdInventoryArguments(settings.RunId),
             cancellationToken).ConfigureAwait(false);
         if (collisions.ExitCode != 0 || !string.IsNullOrWhiteSpace(collisions.StandardOutput))
         {
@@ -575,16 +974,20 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
     }
 
     private static async Task ExecuteResourceCommandAsync(
+        NamespaceProbeNotificationMonitor monitor,
         ResourceCommandService commands,
         IResource resource,
         string command,
         CancellationToken cancellationToken)
     {
-        var result = await commands.ExecuteCommandAsync(resource, command, cancellationToken).ConfigureAwait(false);
-        if (!result.Success)
+        await monitor.ExecuteLifecycleCommandWithinGenerationLimitAsync(async token =>
         {
-            throw new InvalidOperationException($"The DCP resource command '{command}' failed for the selected probe resource.");
-        }
+            var result = await commands.ExecuteCommandAsync(resource, command, token).ConfigureAwait(false);
+            if (!result.Success)
+            {
+                throw new InvalidOperationException($"The DCP resource command '{command}' failed for the selected probe resource.");
+            }
+        }, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task AssertOwnedRunningAsync(
@@ -651,6 +1054,8 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         var root = document.RootElement;
         if (!root.TryGetProperty("HostConfig", out var hostConfig) ||
             !hostConfig.TryGetProperty("PortBindings", out var bindings) ||
+            bindings.ValueKind != System.Text.Json.JsonValueKind.Object ||
+            bindings.EnumerateObject().Count() != 1 ||
             !bindings.TryGetProperty($"{NamespaceProbeModelFactory.OwnerPort}/tcp", out var entries) ||
             entries.ValueKind != System.Text.Json.JsonValueKind.Array || entries.GetArrayLength() != 1)
         {
@@ -658,8 +1063,14 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         }
 
         var binding = entries[0];
-        if (binding.GetProperty("HostIp").GetString() != "127.0.0.1" ||
-            !int.TryParse(binding.GetProperty("HostPort").GetString(), out var hostPort) ||
+        if (binding.ValueKind != System.Text.Json.JsonValueKind.Object ||
+            binding.EnumerateObject().Count() != 2 ||
+            !binding.TryGetProperty("HostIp", out var hostIpElement) ||
+            !binding.TryGetProperty("HostPort", out var hostPortElement) ||
+            hostIpElement.ValueKind != System.Text.Json.JsonValueKind.String ||
+            hostPortElement.ValueKind != System.Text.Json.JsonValueKind.String ||
+            hostIpElement.GetString() != "127.0.0.1" ||
+            !int.TryParse(hostPortElement.GetString(), out var hostPort) ||
             hostPort is < 1 or > 65535)
         {
             throw new InvalidOperationException("The owner endpoint was not bound to a dynamic localhost TCP port.");
@@ -723,10 +1134,15 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         CancellationToken cancellationToken)
     {
         using var document = await InspectJsonAsync(docker, containerId, cancellationToken).ConfigureAwait(false);
-        if (document.RootElement.TryGetProperty("HostConfig", out var hostConfig) &&
-            hostConfig.TryGetProperty("PortBindings", out var bindings) &&
-            bindings.ValueKind == System.Text.Json.JsonValueKind.Object &&
-            bindings.EnumerateObject().Any())
+        if (!document.RootElement.TryGetProperty("HostConfig", out var hostConfig) ||
+            hostConfig.ValueKind != System.Text.Json.JsonValueKind.Object ||
+            !hostConfig.TryGetProperty("PortBindings", out var bindings) ||
+            bindings.ValueKind != System.Text.Json.JsonValueKind.Object)
+        {
+            throw new InvalidOperationException("The follower host port bindings could not be verified.");
+        }
+
+        if (bindings.EnumerateObject().Any())
         {
             throw new InvalidOperationException("The follower unexpectedly published a host port.");
         }
@@ -777,6 +1193,34 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
         throw new TimeoutException("A localhost TCP connection to the dynamically published owner endpoint was not established.", lastFailure);
     }
 
+    private static CustomResourceSnapshot Snapshot(string state, string? containerId) => new()
+    {
+        ResourceType = "container",
+        State = new ResourceStateSnapshot(state, "fixture"),
+        Properties = containerId is null
+            ? []
+            : [new ResourcePropertySnapshot("container.id", containerId)],
+    };
+
+    private sealed class TestApplicationLifetime : IHostApplicationLifetime, IDisposable
+    {
+        private readonly CancellationTokenSource started = new();
+        private readonly CancellationTokenSource stopping = new();
+        private readonly CancellationTokenSource stopped = new();
+
+        public CancellationToken ApplicationStarted => started.Token;
+        public CancellationToken ApplicationStopping => stopping.Token;
+        public CancellationToken ApplicationStopped => stopped.Token;
+        public void StopApplication() => stopping.Cancel();
+
+        public void Dispose()
+        {
+            started.Dispose();
+            stopping.Dispose();
+            stopped.Dispose();
+        }
+    }
+
     private void Record(string stage, object details) => output.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
     {
         timestampUtc = DateTimeOffset.UtcNow,
@@ -785,24 +1229,10 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
     }));
 
     private static bool HasOwnedProbeLabels(string json, string containerId, string runId)
-    {
-        try
-        {
-            using var document = System.Text.Json.JsonDocument.Parse(json);
-            var root = document.RootElement;
-            var labels = root.GetProperty("Config").GetProperty("Labels");
-            return string.Equals(root.GetProperty("Id").GetString(), containerId, StringComparison.Ordinal) &&
-                labels.TryGetProperty(ContainerIdentityExecHandoff.RunIdLabel, out var actualRunId) &&
-                string.Equals(actualRunId.GetString(), runId, StringComparison.Ordinal) &&
-                labels.TryGetProperty(ContainerIdentityExecHandoff.RoleLabel, out var role) &&
-                (string.Equals(role.GetString(), NamespaceProbeModelFactory.OwnerRole, StringComparison.Ordinal) ||
-                 string.Equals(role.GetString(), NamespaceProbeModelFactory.FollowerRole, StringComparison.Ordinal));
-        }
-        catch (Exception exception) when (exception is System.Text.Json.JsonException or InvalidOperationException or KeyNotFoundException)
-        {
-            return false;
-        }
-    }
+        => NamespaceProbeCleanupInventory.ParseCandidate(
+            containerId,
+            new ReadOnlyDockerResult(0, json, string.Empty),
+            runId).Classification == "owned";
 
     private static string GetDockerExecutablePath()
     {
@@ -836,6 +1266,80 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
 
         throw new DirectoryNotFoundException("The repository root could not be located from the test output directory.");
     }
+}
+
+internal sealed class GatedOwnedReconfigurationAdapter(IOwnedReconfigurationAdapter inner, int eventCount)
+    : IOwnedReconfigurationAdapter
+{
+    private readonly TaskCompletionSource[] queued = Enumerable.Range(0, eventCount)
+        .Select(_ => new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously))
+        .ToArray();
+    private readonly Channel<bool> continueChannel = Channel.CreateUnbounded<bool>();
+
+    public OwnedResourceObservation? GetCurrent(IResource resource) => inner.GetCurrent(resource);
+    public OwnedResourceObservation? GetCurrent(string resourceId) => inner.GetCurrent(resourceId);
+
+    public async IAsyncEnumerable<OwnedResourceObservation> WatchAsync(
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await using var watch = inner.WatchAsync(cancellationToken).GetAsyncEnumerator(cancellationToken);
+        for (var index = 0; index < queued.Length; index++)
+        {
+            if (!await watch.MoveNextAsync().ConfigureAwait(false))
+            {
+                yield break;
+            }
+
+            yield return watch.Current;
+            queued[index].TrySetResult();
+            if (index < queued.Length - 1)
+            {
+                await continueChannel.Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+    }
+
+    public Task<bool> ExecuteLifecycleCommandAsync(
+        IResource resource,
+        string commandName,
+        CancellationToken cancellationToken) =>
+        inner.ExecuteLifecycleCommandAsync(resource, commandName, cancellationToken);
+
+    public Task<string> CaptureDockerAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken) =>
+        inner.CaptureDockerAsync(arguments, cancellationToken);
+
+    internal Task WaitUntilQueuedAsync(int index, CancellationToken cancellationToken) =>
+        queued[index].Task.WaitAsync(cancellationToken);
+
+    internal void Continue() => continueChannel.Writer.TryWrite(true);
+}
+
+internal sealed class QueuedCurrentOwnedReconfigurationAdapter(
+    IOwnedReconfigurationAdapter currentAdapter,
+    IReadOnlyList<OwnedResourceObservation> queuedObservations) : IOwnedReconfigurationAdapter
+{
+    public OwnedResourceObservation? GetCurrent(IResource resource) => currentAdapter.GetCurrent(resource);
+    public OwnedResourceObservation? GetCurrent(string resourceId) => currentAdapter.GetCurrent(resourceId);
+
+    public async IAsyncEnumerable<OwnedResourceObservation> WatchAsync(
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        foreach (var observation in queuedObservations)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return observation;
+            await Task.Yield();
+        }
+    }
+
+    public Task<bool> ExecuteLifecycleCommandAsync(
+        IResource resource,
+        string commandName,
+        CancellationToken cancellationToken) =>
+        currentAdapter.ExecuteLifecycleCommandAsync(resource, commandName, cancellationToken);
+
+    public Task<string> CaptureDockerAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken) =>
+        currentAdapter.CaptureDockerAsync(arguments, cancellationToken);
 }
 
 internal sealed record NamespaceProbeTestSettings(
@@ -884,20 +1388,28 @@ public sealed class NativeNamespaceProbeFactAttribute : FactAttribute
 internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
 {
     private readonly CancellationTokenSource stop = new();
-    private readonly ConcurrentDictionary<IResource, OwnedResourceObservation> latest = new(ReferenceEqualityComparer.Instance);
+    private readonly IOwnedReconfigurationAdapter adapter;
+    private readonly Action<OwnedResourceObservation>? observationRecorded;
+    private readonly object generationGate = new();
+    private readonly Dictionary<IResource, Dictionary<string, OwnedResourceObservation>> generations = [];
+    private InvalidOperationException? generationLimitFailure;
     private readonly Channel<OwnedResourceObservation> observations = Channel.CreateUnbounded<OwnedResourceObservation>(
         new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
     private readonly Task pump;
 
-    internal NamespaceProbeNotificationMonitor(IOwnedReconfigurationAdapter adapter)
+    internal NamespaceProbeNotificationMonitor(
+        IOwnedReconfigurationAdapter adapter,
+        Action<OwnedResourceObservation>? observationRecorded = null)
     {
+        this.adapter = adapter;
+        this.observationRecorded = observationRecorded;
         pump = Task.Run(async () =>
         {
             try
             {
                 await foreach (var observation in adapter.WatchAsync(stop.Token).ConfigureAwait(false))
                 {
-                    latest[observation.Resource] = observation;
+                    RecordGeneration(observation);
                     await observations.Writer.WriteAsync(observation, stop.Token).ConfigureAwait(false);
                 }
             }
@@ -911,21 +1423,102 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
         });
     }
 
+    internal IReadOnlyList<OwnedResourceObservation> ObservedGenerations
+    {
+        get
+        {
+            lock (generationGate)
+            {
+                return generations.Values.SelectMany(byId => byId.Values).ToArray();
+            }
+        }
+    }
+
+    internal void EnsureWithinGenerationLimit()
+    {
+        foreach (var resource in ObservedGenerations.Select(observation => observation.Resource).Distinct())
+        {
+            var current = adapter.GetCurrent(resource);
+            if (current is not null)
+            {
+                RecordGeneration(current);
+            }
+        }
+
+        lock (generationGate)
+        {
+            if (generationLimitFailure is not null)
+            {
+                throw generationLimitFailure;
+            }
+        }
+    }
+
+    internal async Task ExecuteLifecycleCommandWithinGenerationLimitAsync(
+        Func<CancellationToken, Task> execute,
+        CancellationToken cancellationToken)
+    {
+        EnsureWithinGenerationLimit();
+        await execute(cancellationToken).ConfigureAwait(false);
+        EnsureWithinGenerationLimit();
+    }
+
+    private void RecordGeneration(OwnedResourceObservation observation)
+    {
+        if (!OwnedContainerInspection.IsFullId(observation.ContainerId))
+        {
+            return;
+        }
+
+        lock (generationGate)
+        {
+            if (!generations.TryGetValue(observation.Resource, out var byId))
+            {
+                byId = new Dictionary<string, OwnedResourceObservation>(StringComparer.OrdinalIgnoreCase);
+                generations.Add(observation.Resource, byId);
+            }
+
+            byId[observation.ContainerId!] = observation;
+            if (generations.Values.Sum(values => values.Count) > 4)
+            {
+                generationLimitFailure ??= new InvalidOperationException(
+                    "The namespace probe observed more than its four approved container generations.");
+            }
+        }
+
+        observationRecorded?.Invoke(observation);
+    }
+
     internal async Task<OwnedResourceObservation> WaitForRunningAsync(
         IResource resource,
         string? previousContainerId,
         CancellationToken cancellationToken)
     {
-        if (latest.TryGetValue(resource, out var current) && IsNewRunningContainer(current, previousContainerId))
+        EnsureWithinGenerationLimit();
+        var current = adapter.GetCurrent(resource);
+        if (current is not null)
+        {
+            RecordGeneration(current);
+            EnsureWithinGenerationLimit();
+        }
+        if (current is not null && IsNewRunningContainer(current, previousContainerId))
         {
             return current;
         }
 
         await foreach (var observation in observations.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
         {
-            if (ReferenceEquals(observation.Resource, resource) && IsNewRunningContainer(observation, previousContainerId))
+            EnsureWithinGenerationLimit();
+            if (!ReferenceEquals(observation.Resource, resource))
             {
-                return observation;
+                continue;
+            }
+
+            current = GetExactCurrentObservation(observation);
+            EnsureWithinGenerationLimit();
+            if (current is not null && IsNewRunningContainer(current, previousContainerId))
+            {
+                return current;
             }
         }
 
@@ -937,20 +1530,46 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
         string expectedContainerId,
         CancellationToken cancellationToken)
     {
-        if (latest.TryGetValue(resource, out var current) && IsExpectedStopped(current, expectedContainerId))
+        EnsureWithinGenerationLimit();
+        var current = adapter.GetCurrent(resource);
+        if (current is not null)
+        {
+            RecordGeneration(current);
+            EnsureWithinGenerationLimit();
+        }
+        if (current is not null && IsExpectedStopped(current, expectedContainerId))
         {
             return current;
         }
 
         await foreach (var observation in observations.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
         {
-            if (ReferenceEquals(observation.Resource, resource) && IsExpectedStopped(observation, expectedContainerId))
+            EnsureWithinGenerationLimit();
+            if (!ReferenceEquals(observation.Resource, resource))
             {
-                return observation;
+                continue;
+            }
+
+            current = GetExactCurrentObservation(observation);
+            EnsureWithinGenerationLimit();
+            if (current is not null && IsExpectedStopped(current, expectedContainerId))
+            {
+                return current;
             }
         }
 
         throw new InvalidOperationException($"No terminal observation for the owned container was observed for resource '{resource.Name}'.");
+    }
+
+    private OwnedResourceObservation? GetExactCurrentObservation(OwnedResourceObservation notification)
+    {
+        var current = adapter.GetCurrent(notification.Resource);
+        return current is not null && ReferenceEquals(current.Resource, notification.Resource) &&
+            string.Equals(current.ResourceId, notification.ResourceId, StringComparison.Ordinal) &&
+            string.Equals(current.State, notification.State, StringComparison.Ordinal) &&
+            string.Equals(current.ContainerId, notification.ContainerId, StringComparison.Ordinal)
+            ? current
+            : null;
     }
 
     private static bool IsNewRunningContainer(OwnedResourceObservation observation, string? previousContainerId) =>
@@ -972,9 +1591,12 @@ internal sealed class NamespaceProbeNotificationMonitor : IAsyncDisposable
 internal sealed class SequenceOwnedReconfigurationAdapter(IReadOnlyList<OwnedResourceObservation> sequence)
     : IOwnedReconfigurationAdapter
 {
-    public OwnedResourceObservation? GetCurrent(IResource resource) => null;
+    private readonly ConcurrentDictionary<IResource, OwnedResourceObservation> current = new();
 
-    public OwnedResourceObservation? GetCurrent(string resourceId) => null;
+    public OwnedResourceObservation? GetCurrent(IResource resource) => current.GetValueOrDefault(resource);
+
+    public OwnedResourceObservation? GetCurrent(string resourceId) =>
+        current.Values.LastOrDefault(observation => string.Equals(observation.ResourceId, resourceId, StringComparison.Ordinal));
 
     public async IAsyncEnumerable<OwnedResourceObservation> WatchAsync(
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
@@ -982,6 +1604,7 @@ internal sealed class SequenceOwnedReconfigurationAdapter(IReadOnlyList<OwnedRes
         foreach (var observation in sequence)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            current[observation.Resource] = observation;
             yield return observation;
             await Task.Yield();
         }
@@ -995,6 +1618,100 @@ internal sealed class SequenceOwnedReconfigurationAdapter(IReadOnlyList<OwnedRes
 }
 
 internal sealed record ReadOnlyDockerResult(int ExitCode, string StandardOutput, string StandardError);
+
+internal sealed record NamespaceProbeCleanupCandidateEvidence(
+    string Classification,
+    string? ContainerId = null,
+    string? Role = null,
+    string? State = null);
+
+internal static class NamespaceProbeCleanupInventory
+{
+    internal static string[] BuildRunIdInventoryArguments(string runId) =>
+    [
+        "ps", "--all", "--quiet", "--no-trunc",
+        "--filter", $"label={ContainerIdentityExecHandoff.RunIdLabel}={runId}",
+    ];
+
+    internal static NamespaceProbeCleanupCandidateEvidence ParseCandidate(
+        string inventoryId,
+        ReadOnlyDockerResult inspect,
+        string runId)
+    {
+        if (inspect.ExitCode != 0)
+        {
+            var error = inspect.StandardError;
+            return error.Contains("No such object", StringComparison.OrdinalIgnoreCase) ||
+                error.Contains("No such container", StringComparison.OrdinalIgnoreCase)
+                ? new NamespaceProbeCleanupCandidateEvidence("disappeared")
+                : new NamespaceProbeCleanupCandidateEvidence("inspect-failed");
+        }
+
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(inspect.StandardOutput);
+            var root = document.RootElement;
+            if (!root.TryGetProperty("Id", out var idElement) ||
+                idElement.ValueKind != System.Text.Json.JsonValueKind.String)
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("missing-full-id");
+            }
+
+            var id = idElement.GetString();
+            if (!OwnedContainerInspection.IsFullId(id))
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("invalid-full-id", id);
+            }
+
+            if (!OwnedContainerInspection.IsFullId(inventoryId))
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("truncated-inventory-id", id);
+            }
+
+            if (!string.Equals(id, inventoryId, StringComparison.OrdinalIgnoreCase))
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("id-mismatch", id);
+            }
+
+            if (!root.TryGetProperty("Config", out var config) ||
+                !config.TryGetProperty("Labels", out var labels) ||
+                labels.ValueKind != System.Text.Json.JsonValueKind.Object ||
+                !labels.TryGetProperty(ContainerIdentityExecHandoff.RunIdLabel, out var actualRunIdElement) ||
+                actualRunIdElement.ValueKind != System.Text.Json.JsonValueKind.String ||
+                !labels.TryGetProperty(ContainerIdentityExecHandoff.RoleLabel, out var roleElement) ||
+                roleElement.ValueKind != System.Text.Json.JsonValueKind.String)
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("missing-owner-labels", id);
+            }
+
+            var actualRunId = actualRunIdElement.GetString();
+            var role = roleElement.GetString();
+            if (!string.Equals(actualRunId, runId, StringComparison.Ordinal) ||
+                role is not (NamespaceProbeModelFactory.OwnerRole or NamespaceProbeModelFactory.FollowerRole))
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("foreign-or-unowned", id, role);
+            }
+
+            if (!root.TryGetProperty("State", out var stateElement) ||
+                !stateElement.TryGetProperty("Status", out var statusElement) ||
+                statusElement.ValueKind != System.Text.Json.JsonValueKind.String ||
+                string.IsNullOrWhiteSpace(statusElement.GetString()))
+            {
+                return new NamespaceProbeCleanupCandidateEvidence("missing-state", id, role);
+            }
+
+            return new NamespaceProbeCleanupCandidateEvidence("owned", id, role, statusElement.GetString());
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return new NamespaceProbeCleanupCandidateEvidence("malformed-inspection");
+        }
+        catch (InvalidOperationException)
+        {
+            return new NamespaceProbeCleanupCandidateEvidence("malformed-inspection");
+        }
+    }
+}
 
 internal interface IReadOnlyDockerCli
 {
@@ -1119,7 +1836,11 @@ internal static class NamespaceProbeCleanupBudget
     }
 }
 
-internal sealed record NamespaceProbeCleanupResult(bool EngineVerified, Exception? EngineCheckFailure);
+internal sealed record NamespaceProbeCleanupResult(
+    bool EngineVerified,
+    Exception? EngineCheckFailure,
+    Exception? LifecycleFailure = null,
+    string? FailedStage = null);
 
 internal static class NamespaceProbeCleanup
 {
@@ -1139,8 +1860,26 @@ internal static class NamespaceProbeCleanup
             return new NamespaceProbeCleanupResult(false, exception);
         }
 
-        await stopApplication(cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
-        await disposeApplication(cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await stopApplication(cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            return new NamespaceProbeCleanupResult(true, null, exception, "stop");
+        }
+
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await disposeApplication(cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            return new NamespaceProbeCleanupResult(true, null, exception, "dispose");
+        }
+
         return new NamespaceProbeCleanupResult(true, null);
     }
 }
