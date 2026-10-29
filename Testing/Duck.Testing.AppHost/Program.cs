@@ -11,6 +11,12 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
 
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
+var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
+var identityExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+var identityDockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
+    Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
 
 IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, string imageName, string projectPath)
 {
@@ -497,7 +503,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         UseStandardDcpResources: testingMode == "base",
         DuckRunId: duckRunId,
         craneTargetAddressSettings,
-        builder.Configuration["Testing:Crane:DiagnosticsPath"]),
+        builder.Configuration["Testing:Crane:DiagnosticsPath"],
+        identityDockerContext,
+        identityExpectedEngineId,
+        identityDockerExecutable),
     simulatorResource =>
     {
         var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")

@@ -999,6 +999,38 @@ internal static class OwnedContainerInspection
         }
     }
 
+    internal static bool MatchesStandardBaseResource(
+        string json,
+        string expectedContainerId,
+        string runId,
+        string role,
+        string stackId,
+        string resourceName)
+    {
+        if (!MatchesOwner(json, expectedContainerId, runId, role, requireRunning: true) ||
+            string.IsNullOrWhiteSpace(stackId) ||
+            string.IsNullOrWhiteSpace(resourceName))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            var root = document.RootElement;
+            return root.TryGetProperty("Config", out var config) &&
+                config.TryGetProperty("Labels", out var labels) &&
+                labels.ValueKind == JsonValueKind.Object &&
+                HasLabel(labels, DockerContainerSpec.StackLabel, stackId) &&
+                HasLabel(labels, DockerContainerSpec.ResourceLabel, resourceName) &&
+                HasLabel(labels, DockerContainerSpec.RunLabel, runId);
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
     internal static bool TryReadNetworkEndpoint(string json, out OwnedContainerNetworkEndpoint? endpoint)
     {
         endpoint = null;

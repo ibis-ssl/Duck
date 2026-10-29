@@ -14,22 +14,55 @@ internal sealed record DcpBaseResourceReadinessSnapshot(
     string State,
     string? ContainerId,
     long Generation,
+    bool IdentityVerified,
+    bool NetworkVerified,
+    bool OwnershipVerified,
+    string? ObservedNetworkName,
     bool IsReady,
     string Reason);
+
+internal sealed record DcpBaseResourceIdentityCandidate(
+    IResource Resource,
+    string ResourceId,
+    string ResourceName,
+    string Role,
+    string RunId,
+    string StackId,
+    string State,
+    string? ContainerId,
+    long Generation,
+    bool IdentityVerified,
+    bool NetworkVerified,
+    bool OwnershipVerified,
+    string? ObservedNetworkName,
+    bool ResourceKeyAmbiguous);
+
+internal sealed record DcpBaseResourceOwnershipProof(
+    IResource Resource,
+    string ResourceId,
+    string ContainerId,
+    long Generation,
+    string EngineId,
+    string? NetworkName);
 
 /// <summary>DCP通知から現在候補の識別子を追跡します。この観測だけでは所有とサービス準備完了を確定しません。</summary>
 internal sealed class DcpBaseResourceReadinessRegistry
 {
-    private sealed class Entry(IResource resource, string role, string runId)
+    private sealed class Entry(IResource resource, string role, string runId, string stackId)
     {
         internal readonly IResource Resource = resource;
         internal readonly string Role = role;
         internal readonly string RunId = runId;
+        internal readonly string StackId = stackId;
         internal string? ResourceId;
         internal string State = "NotStarted";
         internal string? ContainerId;
         internal long Generation;
         internal bool IsReady;
+        internal bool IdentityVerified;
+        internal bool NetworkVerified;
+        internal bool OwnershipVerified;
+        internal string? ObservedNetworkName;
         internal bool ResourceKeyAmbiguous;
         internal bool HasObservedFullContainerId;
         internal bool IsInitialPlaceholder;
@@ -42,15 +75,18 @@ internal sealed class DcpBaseResourceReadinessRegistry
     private readonly object sync = new();
     private readonly Dictionary<IResource, Entry> entries = new(ReferenceEqualityComparer.Instance);
 
-    internal DcpBaseResourceReadinessRegistry(IEnumerable<(IResource Resource, string Role, string RunId)> resources)
+    internal DcpBaseResourceReadinessRegistry(
+        IEnumerable<(IResource Resource, string Role, string RunId)> resources,
+        string stackId = "")
     {
         ArgumentNullException.ThrowIfNull(resources);
+        ArgumentNullException.ThrowIfNull(stackId);
         foreach (var (resource, role, runId) in resources)
         {
             ArgumentNullException.ThrowIfNull(resource);
             ArgumentException.ThrowIfNullOrWhiteSpace(role);
             ArgumentException.ThrowIfNullOrWhiteSpace(runId);
-            if (!entries.TryAdd(resource, new Entry(resource, role, runId)))
+            if (!entries.TryAdd(resource, new Entry(resource, role, runId, stackId)))
             {
                 throw new InvalidOperationException($"DCP readiness resource '{resource.Name}' was registered more than once.");
             }
@@ -104,6 +140,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.ContainerId = target.ContainerId;
                     entry.IsInitialPlaceholder = false;
                     entry.HasObservedFullContainerId = true;
+                    entry.IdentityVerified = false;
+                    entry.NetworkVerified = false;
+                    entry.OwnershipVerified = false;
+                    entry.ObservedNetworkName = null;
                     entry.IsReady = false;
                     entry.Generation++;
                     entry.Reason = "The initial unresolved resource key was replaced by a runtime key with a full container identity; engine ownership and service readiness are unverified.";
@@ -115,6 +155,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.ResourceKeyAmbiguous = true;
                     entry.AmbiguousActiveResourceId = entry.ResourceId;
                     entry.ContainerId = null;
+                    entry.IdentityVerified = false;
+                    entry.NetworkVerified = false;
+                    entry.OwnershipVerified = false;
+                    entry.ObservedNetworkName = null;
                     entry.IsReady = false;
                     entry.State = "Unknown";
                     entry.Reason = "Multiple resource keys were observed before the previous key stopped; the current identity is ambiguous.";
@@ -128,6 +172,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
             {
                 entry.Generation++;
                 entry.IsReady = false;
+                entry.IdentityVerified = false;
+                entry.NetworkVerified = false;
+                entry.OwnershipVerified = false;
+                entry.ObservedNetworkName = null;
                 entry.Reason = "A new current DCP identity candidate was observed; engine ownership and service readiness are unverified.";
             }
 
@@ -169,6 +217,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
                         entry.ContainerId = null;
                         entry.IsInitialPlaceholder = false;
                         entry.IsReady = false;
+                        entry.IdentityVerified = false;
+                        entry.NetworkVerified = false;
+                        entry.OwnershipVerified = false;
+                        entry.ObservedNetworkName = null;
                         entry.Generation++;
                         entry.Reason = "The initial unresolved resource key was replaced by a runtime resource key; awaiting its current full container identity.";
                         return null;
@@ -179,6 +231,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.AmbiguousActiveResourceId = entry.ResourceId;
                     entry.ContainerId = null;
                     entry.IsReady = false;
+                    entry.IdentityVerified = false;
+                    entry.NetworkVerified = false;
+                    entry.OwnershipVerified = false;
+                    entry.ObservedNetworkName = null;
                     entry.State = "Unknown";
                     entry.Reason = "Multiple resource keys were observed before the previous key stopped; the current identity is ambiguous.";
                     entry.Generation++;
@@ -200,6 +256,10 @@ internal sealed class DcpBaseResourceReadinessRegistry
             entry.State = state;
             entry.ContainerId = null;
             entry.IsReady = false;
+            entry.IdentityVerified = false;
+            entry.NetworkVerified = false;
+            entry.OwnershipVerified = false;
+            entry.ObservedNetworkName = null;
             entry.Reason = "No current full container identity was projected; engine ownership and service readiness are unverified.";
 
             if (IsTerminalState(state) && entry.ResourceKeyAmbiguous && entry.PendingResourceIds.Count == 1)
@@ -234,9 +294,82 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.State,
                     entry.ContainerId,
                     entry.Generation,
+                    entry.IdentityVerified,
+                    entry.NetworkVerified,
+                    entry.OwnershipVerified,
+                    entry.ObservedNetworkName,
                     entry.IsReady,
                     entry.Reason)
                 : null;
+        }
+    }
+
+    internal IReadOnlyList<DcpBaseResourceIdentityCandidate> GetCandidates()
+    {
+        lock (sync)
+        {
+            return entries.Values.Select(entry => new DcpBaseResourceIdentityCandidate(
+                entry.Resource,
+                entry.ResourceKeyAmbiguous ? string.Empty : entry.ResourceId ?? string.Empty,
+                entry.Resource.Name,
+                entry.Role,
+                entry.RunId,
+                entry.StackId,
+                entry.State,
+                entry.ResourceKeyAmbiguous ? null : entry.ContainerId,
+                entry.Generation,
+                entry.IdentityVerified,
+                entry.NetworkVerified,
+                entry.OwnershipVerified,
+                entry.ObservedNetworkName,
+                entry.ResourceKeyAmbiguous)).ToArray();
+        }
+    }
+
+    internal bool TryMarkIdentityVerified(
+        IReadOnlyList<DcpBaseResourceOwnershipProof> proofs,
+        bool sharedStandardDcpNetworkVerified)
+    {
+        ArgumentNullException.ThrowIfNull(proofs);
+        lock (sync)
+        {
+            if (proofs.Count != entries.Count ||
+                proofs.Select(proof => proof.Resource).Distinct(ReferenceEqualityComparer.Instance).Count() != entries.Count ||
+                proofs.Select(proof => proof.EngineId).Distinct(StringComparer.Ordinal).Count() != 1 ||
+                sharedStandardDcpNetworkVerified &&
+                    (proofs.Any(proof => string.IsNullOrWhiteSpace(proof.NetworkName)) ||
+                     proofs.Select(proof => proof.NetworkName).Distinct(StringComparer.Ordinal).Count() != 1))
+            {
+                return false;
+            }
+
+            foreach (var proof in proofs)
+            {
+                if (!entries.TryGetValue(proof.Resource, out var entry) ||
+                    entry.ResourceKeyAmbiguous ||
+                    entry.ResourceId != proof.ResourceId ||
+                    entry.ContainerId != proof.ContainerId ||
+                    entry.Generation != proof.Generation ||
+                    entry.State != "Running" ||
+                    !OwnedContainerInspection.IsFullId(entry.ContainerId))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var proof in proofs)
+            {
+                var entry = entries[proof.Resource];
+                entry.IdentityVerified = true;
+                entry.NetworkVerified = sharedStandardDcpNetworkVerified;
+                entry.OwnershipVerified = sharedStandardDcpNetworkVerified;
+                entry.ObservedNetworkName = proof.NetworkName;
+                entry.Reason = sharedStandardDcpNetworkVerified
+                    ? "The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified."
+                    : "Docker Engine and container ownership labels were verified; common default-network membership and service readiness remain unverified.";
+            }
+
+            return true;
         }
     }
 
@@ -311,6 +444,7 @@ internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadi
 internal sealed class DcpBaseResourceReadinessObserver(
     ResourceNotificationService notifications,
     DcpBaseResourceReadinessEventConsumer consumer,
+    DcpBaseResourceOwnershipEventConsumer ownershipConsumer,
     IReadOnlyDictionary<IResource, string> roles) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -325,6 +459,9 @@ internal sealed class DcpBaseResourceReadinessObserver(
 
             consumer.Observe(observation, current, role, resourceId =>
                 notifications.TryGetCurrentState(resourceId, out var state) ? state : null);
+            await ownershipConsumer.VerifyCurrentAsync(
+                resourceId => notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                stoppingToken).ConfigureAwait(false);
         }
     }
 }
@@ -334,10 +471,16 @@ internal static class DcpBaseResourceReadinessRegistration
     internal static void Add(
         IDistributedApplicationBuilder builder,
         string runId,
+        string stackId,
+        string? dockerContextName,
+        string? expectedEngineId,
+        string dockerExecutable,
         params (IResource Resource, string Role)[] resources)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(runId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(stackId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dockerExecutable);
         ArgumentNullException.ThrowIfNull(resources);
         if (resources.Length == 0)
         {
@@ -345,8 +488,13 @@ internal static class DcpBaseResourceReadinessRegistration
         }
 
         var entries = resources.Select(item => (item.Resource, item.Role, runId)).ToArray();
-        var registry = new DcpBaseResourceReadinessRegistry(entries);
+        var registry = new DcpBaseResourceReadinessRegistry(entries, stackId);
         var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
+        var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
+            registry,
+            new DockerCliCommandRunner(dockerExecutable),
+            dockerContextName,
+            expectedEngineId);
         var roleMap = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in resources)
         {
@@ -354,9 +502,11 @@ internal static class DcpBaseResourceReadinessRegistration
         }
         builder.Services.AddSingleton(registry);
         builder.Services.AddSingleton(eventConsumer);
+        builder.Services.AddSingleton(ownershipConsumer);
         builder.Services.AddSingleton<IHostedService>(services => new DcpBaseResourceReadinessObserver(
             services.GetRequiredService<ResourceNotificationService>(),
             eventConsumer,
+            ownershipConsumer,
             roleMap));
 
         foreach (var (resource, role) in resources)

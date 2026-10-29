@@ -35,7 +35,10 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true,
                     DuckRunId: "run-base-test",
                     CraneTargetAddressSettings: null,
-                    CraneDiagnosticsPath: null),
+                    CraneDiagnosticsPath: null,
+                    DockerContextName: null,
+                    ExpectedEngineId: null,
+                    DockerExecutable: "docker.exe"),
                 _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
                 _ => { });
 
@@ -46,6 +49,8 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(DcpBaseResourceReadinessRegistry));
             Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(DcpBaseResourceReadinessEventConsumer));
             Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(IHostedService));
+            Assert.Contains(builder.Services, descriptor =>
+                descriptor.ServiceType == typeof(DcpBaseResourceOwnershipEventConsumer));
             var resourcesByRole = new Dictionary<string, ContainerResource>(StringComparer.Ordinal)
             {
                 ["simulator"] = Assert.IsType<ContainerResource>(resources.Simulator.Resource),
@@ -138,7 +143,10 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: false,
                     DuckRunId: "run-comparison-test",
                     CraneTargetAddressSettings: null,
-                    CraneDiagnosticsPath: null),
+                    CraneDiagnosticsPath: null,
+                    DockerContextName: null,
+                    ExpectedEngineId: null,
+                    DockerExecutable: "docker.exe"),
                 _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
                 _ => { });
 

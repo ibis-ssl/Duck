@@ -19,7 +19,10 @@ internal sealed record BaseSimulationRegistrationOptions(
     bool UseStandardDcpResources,
     string DuckRunId,
     CraneTargetAddressSettings? CraneTargetAddressSettings,
-    string? CraneDiagnosticsPath);
+    string? CraneDiagnosticsPath,
+    string? DockerContextName,
+    string? ExpectedEngineId,
+    string DockerExecutable);
 
 internal sealed record BaseSimulationResources(
     IResourceBuilder<ContainerResource> Duck,
@@ -243,7 +246,14 @@ internal static class BaseSimulationResourceRegistration
                 readinessResources.Add((cm4Simulator.Resource, "cm4-sim"));
             }
 
-            DcpBaseResourceReadinessRegistration.Add(builder, options.DuckRunId, readinessResources.ToArray());
+            DcpBaseResourceReadinessRegistration.Add(
+                builder,
+                options.DuckRunId,
+                options.StackId,
+                options.DockerContextName,
+                options.ExpectedEngineId,
+                options.DockerExecutable,
+                readinessResources.ToArray());
         }
 
         return new BaseSimulationResources(duck, simulator, gameController, cm4Simulator, crane);
