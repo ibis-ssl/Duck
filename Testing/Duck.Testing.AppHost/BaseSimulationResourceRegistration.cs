@@ -177,8 +177,14 @@ internal static class BaseSimulationResourceRegistration
             if (options.UseStandardDcpResources)
             {
                 cm4Simulator = AsResourceBuilder(builder, AddStandardContainer(
-                    builder, cm4Spec, options.DuckRunId, "cm4-sim").WaitFor(simulator));
+                    builder, cm4Spec, options.DuckRunId, "cm4-sim"));
                 var cm4Resource = cm4Simulator.Resource;
+                var standardSimulator = builder.CreateResourceBuilder<ContainerResource>(
+                    (ContainerResource)simulator.Resource);
+                standardSimulator.WaitForStart(builder.CreateResourceBuilder<IResource>(cm4Resource));
+                standardSimulator.WithArgs(context =>
+                    AppendCurrentCm4FeedbackAddressAsync(context, cm4Resource));
+                simulator = AsResourceBuilder(builder, standardSimulator);
                 builder.Eventing.Subscribe<BeforeResourceStartedEvent>((@event, _) =>
                 {
                     if (ReferenceEquals(@event.Resource, cm4Resource) && !File.Exists(cm4HelperSource))
@@ -391,6 +397,110 @@ internal static class BaseSimulationResourceRegistration
             "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={runId}",
             "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={role}");
         return resource;
+    }
+
+    /// <summary>現行CM4の所有済みIPv4だけを標準Simulatorの引数へ追加します。</summary>
+    private static async Task AppendCurrentCm4FeedbackAddressAsync(
+        CommandLineArgsCallbackContext context,
+        IResource cm4Resource)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(cm4Resource);
+        var cancellationToken = context.CancellationToken;
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var services = context.ExecutionContext.Services;
+        var notifications = services.GetRequiredService<ResourceNotificationService>();
+        var registry = services.GetRequiredService<DcpBaseResourceReadinessRegistry>();
+        var readinessEvents = services.GetRequiredService<DcpBaseResourceReadinessEventConsumer>();
+        var ownership = services.GetRequiredService<DcpBaseResourceOwnershipEventConsumer>();
+
+        if (!notifications.TryGetCurrentState(cm4Resource.Name, out var currentByName) ||
+            !ReferenceEquals(currentByName.Resource, cm4Resource) ||
+            currentByName.Snapshot.State?.Text != "Running")
+        {
+            throw new InvalidOperationException("The current CM4 container identity is unavailable before Simulator start.");
+        }
+
+        ResourceEvent? GetCurrent(string resourceId) =>
+            notifications.TryGetCurrentState(resourceId, out var current) ? current : null;
+
+        readinessEvents.Observe(currentByName, currentByName, "cm4-sim", GetCurrent);
+        var before = GetCurrentCm4Candidate(registry, cm4Resource);
+        if (!IsCurrentCandidate(before, currentByName, registry, GetCurrent, requireOwnershipProof: false))
+        {
+            throw new InvalidOperationException("The current CM4 resource key or full container identity is not verified.");
+        }
+
+        var verification = await ownership.VerifyCurrentAsync(GetCurrent, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (verification.Disposition != DcpBaseResourceOwnershipDisposition.OwnershipVerifiedServiceReadinessUnknown)
+        {
+            throw new InvalidOperationException("The current standard DCP container ownership and shared network membership could not be verified.");
+        }
+
+        if (!notifications.TryGetCurrentState(cm4Resource.Name, out var currentAfter) ||
+            !ReferenceEquals(currentAfter.Resource, cm4Resource) ||
+            currentAfter.Snapshot.State?.Text != "Running")
+        {
+            throw new InvalidOperationException("The CM4 resource changed while its current feedback address was being verified.");
+        }
+
+        var after = GetCurrentCm4Candidate(registry, cm4Resource);
+        if (before is null || after is null ||
+            before.ResourceId != after.ResourceId ||
+            before.ContainerId != after.ContainerId ||
+            before.Generation != after.Generation ||
+            !IsCurrentCandidate(after, currentAfter, registry, GetCurrent, requireOwnershipProof: true) ||
+            !System.Net.IPAddress.TryParse(after.ObservedNetworkAddress, out var address) ||
+            address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            throw new InvalidOperationException("The current owned CM4 IPv4 feedback address changed or is unavailable.");
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        context.Args.Add("--ibis-feedback-addr");
+        context.Args.Add(address.ToString());
+    }
+
+    /// <summary>登録済みCM4の通知キーに対応する候補を取得します。</summary>
+    private static DcpBaseResourceIdentityCandidate? GetCurrentCm4Candidate(
+        DcpBaseResourceReadinessRegistry registry,
+        IResource cm4Resource) =>
+        registry.GetCandidates().SingleOrDefault(candidate =>
+            ReferenceEquals(candidate.Resource, cm4Resource) && candidate.Role == "cm4-sim");
+
+    /// <summary>現在通知と所有証明が同じCM4候補を示すことを確認します。</summary>
+    private static bool IsCurrentCandidate(
+        DcpBaseResourceIdentityCandidate? candidate,
+        ResourceEvent current,
+        DcpBaseResourceReadinessRegistry registry,
+        Func<string, ResourceEvent?> getCurrent,
+        bool requireOwnershipProof)
+    {
+        if (candidate is null || candidate.State != "Running" || candidate.ResourceKeyAmbiguous ||
+            string.IsNullOrWhiteSpace(candidate.ResourceId) ||
+            !OwnedContainerInspection.IsFullId(candidate.ContainerId) ||
+            requireOwnershipProof &&
+                (!candidate.IdentityVerified || !candidate.NetworkVerified || !candidate.OwnershipVerified) ||
+            !ReferenceEquals(current.Resource, candidate.Resource) ||
+            current.ResourceId != candidate.ResourceId || current.Snapshot.State?.Text != "Running" ||
+            !RegisteredContainerEventProjection.TryProject(
+                candidate.Resource, candidate.ResourceId, "cm4-sim", current, current, out var projected) ||
+            projected is null || projected.ContainerId != candidate.ContainerId)
+        {
+            return false;
+        }
+
+        var currentById = getCurrent(candidate.ResourceId);
+        return currentById is not null &&
+            ReferenceEquals(currentById.Resource, candidate.Resource) &&
+            currentById.ResourceId == candidate.ResourceId &&
+            currentById.Snapshot.State?.Text == "Running" &&
+            RegisteredContainerEventProjection.TryProject(
+                candidate.Resource, candidate.ResourceId, "cm4-sim", currentById, currentById, out var latest) &&
+            latest is not null && latest.ContainerId == candidate.ContainerId &&
+            (!requireOwnershipProof || registry.AreOwnershipProofsCurrent([candidate]));
     }
 
     private static IResourceBuilder<IResourceWithWaitSupport> AsResourceBuilder<TResource>(

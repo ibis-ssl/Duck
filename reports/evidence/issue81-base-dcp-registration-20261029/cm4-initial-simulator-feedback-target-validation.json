@@ -1,0 +1,196 @@
+{
+  "stage": "G5B",
+  "baseline": "68304bec389499824c182631a3e29f9253e58a68",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "8A81AB57E32170B068D101C9F76852B58B1E61F778E106A06290AAA158778E2B"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "CC643EA4D945DCB8B6E92F72B0C1B2D830B500A4F3DDACBD16113255D2ED8D2B"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "EB1E010D9DEF7837250451C4C54CBEEA2A7492C1C6DEF83EAC94B7E774074B7E"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "3C2690013F65955F0D6C387EEC4318346D6B29293248A8D129CB38B6F331615C"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "5CEBD5ABAF47317F8EDB263E554052D79BD6552D73F1D85EC9A7A68D51BA5447"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "0CFC6738CE91D65C9EBC72DD16367C70EF75646CC7ADF75F38A90FC4FAA07282"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "53F09F519DA5DA0F6D0DBF06898AD616D6538CA2A4A66FBA3935ABD94A219710"
+    }
+  ],
+  "validation": {
+    "focusedTests": {
+      "passed": 3,
+      "failed": 0,
+      "exit": 0
+    },
+    "relatedTests": {
+      "passed": 135,
+      "failed": 0,
+      "exit": 0
+    },
+    "releaseBuild": {
+      "exit": 0,
+      "warnings": 25,
+      "errors": 0
+    },
+    "documentationGates": {
+      "passed": 12,
+      "failed": 0,
+      "gates": [
+        {
+          "document": "tasks",
+          "gate": "textlint",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "copySha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "tasks",
+          "gate": "whitelist",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "copySha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "tasks",
+          "gate": "cspell",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "copySha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "0CCB3A3DA3E734FCB48CC702E59B90B136D67C471515ED62F2C12E2584714BE8"
+        },
+        {
+          "document": "tasks",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "copySha256": "B5FDF88738A6723B07ECD6603EBEAC20880E6A3FD9565039796BC5E67ED7CF3B",
+          "stdoutSha256": "C9BB5BAAF64EB0ECFCB3073080753220CA94C0EF00540603BA6D62ABCCFBD6FB",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "phases",
+          "gate": "textlint",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "copySha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "phases",
+          "gate": "whitelist",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "copySha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "phases",
+          "gate": "cspell",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "copySha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "D9D5A23D8EDC41482FB6852772286380A9C4B303B9784CF87ED47D4F2121B653"
+        },
+        {
+          "document": "phases",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "copySha256": "7C1DEF77447A758839CFBAC30A6D5F2F721A0E16BE5EBCC11A02A524153A9523",
+          "stdoutSha256": "5EBEEB9B43612F815E0CCB861D84DB69254D4F13E3D884629412FD185B3F6F8B",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "design",
+          "gate": "textlint",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "copySha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "design",
+          "gate": "whitelist",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "copySha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "document": "design",
+          "gate": "cspell",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "copySha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "0F6412A87F21424FEBC77B0DDE6E983438220859E0D5A1955B76019F2154423C"
+        },
+        {
+          "document": "design",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "timedOut": false,
+          "inputSha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "copySha256": "CD7D9BD55507A0A3167FEB32F8157EA50B999978EF64749BCF4D59D9761D343A",
+          "stdoutSha256": "24002EF2B97A59A4409981DB3A80B01553276C9544C0301B751AED9B20881F01",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        }
+      ]
+    }
+  },
+  "behavior": {
+    "registrationRed": {
+      "exit": 1,
+      "timedOut": false,
+      "classification": "Compile/discovery succeeded; runtime assertions showed missing standard dependency, target argument, and ownership connection."
+    },
+    "lateSimulatorRed": {
+      "exit": 1,
+      "timedOut": false,
+      "classification": "Follow-on behavior failure: the same foreground session skipped initial apply when Simulator ownership arrived later."
+    },
+    "finalGreen": "The current CM4 address is passed only after current ownership verification; if CM4 starts first, the existing Initial phase waits until Simulator ownership is available and then applies once."
+  },
+  "limits": [
+    "No runtime, container, helper, UDP, deployment, or real communication was run.",
+    "CM4 receive/decode, actual runtime argument delivery, service readiness, stability and shutdown acceptance remain unverified.",
+    "G5C CM4 recreation/reconfiguration remains unconnected.",
+    "The first documentation run had 10 passes and 2 vocabulary-gate failures; the corrected design-only rerun passed all four gates. The final 12 comprises that rerun plus eight unchanged tasks/phases gates."
+  ]
+}

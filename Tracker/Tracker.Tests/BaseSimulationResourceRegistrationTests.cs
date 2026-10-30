@@ -1,8 +1,10 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Eventing;
+using System.Text.Json;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -527,7 +529,7 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.Equal("a52b6bd", resourcesByRole["simulator"].Annotations.OfType<ContainerImageAnnotation>().Single().Tag);
             Assert.Equal(
                 ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
-                await GetArgumentsAsync(resourcesByRole["simulator"]));
+                await GetArgumentsAsync(resourcesByRole["simulator"], callbackLimit: 1));
             Assert.Equal(
                 ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
                 await GetArgumentsAsync(resourcesByRole["game-controller"]));
@@ -547,6 +549,173 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    [Fact]
+    public async Task StandardSimulatorStartsAfterCm4AndUsesItsCurrentOwnedAddress()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-simulator-cm4-target-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        const string runId = "run-base-simulator-cm4-target";
+        const string stackId = "base-simulator-cm4-target";
+        const string engineId = "expected-engine";
+        const string networkName = "aspire-default-network";
+        const string cm4Address = "172.28.0.44";
+        var containerId = new string('a', 64);
+        var failures = new List<string>();
+        var runner = new DcpBaseResourceOwnershipEventConsumerTests.FakeDockerStdioCommandRunner
+        {
+            EngineId = engineId,
+        };
+
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    stackId, "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: runId,
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: "desktop-linux", ExpectedEngineId: engineId, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { },
+                appHostAssetRoot: fixtureRoot);
+
+            var simulator = resources.Simulator.Resource;
+            var simulatorContainer = Assert.IsType<ContainerResource>(simulator);
+            var cm4 = resources.Cm4Simulator!.Resource;
+            var simulatorWaits = simulator.Annotations.OfType<WaitAnnotation>().ToArray();
+            if (simulatorWaits.Length != 1 || !ReferenceEquals(simulatorWaits[0].Resource, cm4) ||
+                simulatorWaits[0].WaitType != WaitType.WaitUntilStarted)
+            {
+                failures.Add("The standard Simulator must wait for CM4 start, not CM4 health or Simulator health.");
+            }
+            if (cm4.Annotations.OfType<WaitAnnotation>().Any(wait => ReferenceEquals(wait.Resource, simulator)))
+            {
+                failures.Add("The standard CM4 must not wait for Simulator health.");
+            }
+
+            var registryDescriptor = Assert.Single(builder.Services, descriptor =>
+                descriptor.ServiceType == typeof(DcpBaseResourceReadinessRegistry));
+            var registry = Assert.IsType<DcpBaseResourceReadinessRegistry>(registryDescriptor.ImplementationInstance);
+            builder.Services.RemoveAll<DcpBaseResourceOwnershipEventConsumer>();
+            builder.Services.AddSingleton(new DcpBaseResourceOwnershipEventConsumer(
+                registry, runner, "desktop-linux", engineId));
+
+            using var application = builder.Build();
+            var services = application.Services;
+            var notifications = services.GetRequiredService<ResourceNotificationService>();
+            await notifications.PublishUpdateAsync(cm4, "cm4-runtime-key", snapshot => snapshot with
+            {
+                ResourceType = "container",
+                State = new ResourceStateSnapshot("Running", "fixture"),
+                Properties = [new ResourcePropertySnapshot("container.id", containerId)],
+            });
+
+            runner.Inspections[containerId] = BuildOwnedInspectJson(
+                containerId, "cm4-sim", runId, stackId, networkName, cm4Address);
+
+            using (var canceled = new CancellationTokenSource())
+            {
+                canceled.Cancel();
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+                    GetArgumentsAsync(simulatorContainer, services, canceled.Token));
+            }
+            if (runner.EngineReads != 0 || runner.InspectReads != 0)
+            {
+                failures.Add("A canceled Simulator argument resolution must not inspect or reuse a CM4 target.");
+            }
+
+            runner.EngineId = "different-engine";
+            await Assert.ThrowsAsync<InvalidOperationException>(() => GetArgumentsAsync(simulatorContainer, services));
+            if (runner.EngineReads != 1 || runner.InspectReads != 0)
+            {
+                failures.Add("An unowned Engine must reject the CM4 target before container inspection.");
+            }
+            runner.EngineId = engineId;
+
+            var replacementId = new string('c', 64);
+            runner.AfterFirstInspect = () => notifications.PublishUpdateAsync(
+                cm4,
+                "cm4-runtime-key",
+                snapshot => snapshot with
+                {
+                    Properties = [new ResourcePropertySnapshot("container.id", replacementId)],
+                }).GetAwaiter().GetResult();
+            await Assert.ThrowsAsync<InvalidOperationException>(() => GetArgumentsAsync(simulatorContainer, services));
+            if (runner.InspectReads != 1)
+            {
+                failures.Add("The CM4 identity-change fixture must reach ownership inspection before rejecting the changed ID.");
+            }
+
+            runner.AfterFirstInspect = null;
+            await notifications.PublishUpdateAsync(cm4, "cm4-runtime-key", snapshot => snapshot with
+            {
+                Properties = [new ResourcePropertySnapshot("container.id", containerId)],
+            });
+
+            var arguments = await GetArgumentsAsync(simulatorContainer, services);
+            var feedbackAddressIndex = Array.IndexOf(arguments, "--ibis-feedback-addr");
+            if (feedbackAddressIndex < 0 || feedbackAddressIndex + 1 >= arguments.Length ||
+                arguments[feedbackAddressIndex + 1] != cm4Address)
+            {
+                failures.Add("The standard Simulator must receive the verified current CM4 bridge IPv4 address.");
+            }
+            if (runner.EngineReads != 3 || runner.InspectReads != 2)
+            {
+                failures.Add($"The argument callback must use current ownership verification once after rejected Engine and changed ID (engine={runner.EngineReads}, inspect={runner.InspectReads}).");
+            }
+            var cm4Candidate = registry.GetCandidates().SingleOrDefault(candidate => ReferenceEquals(candidate.Resource, cm4));
+            if (cm4Candidate is not { OwnershipVerified: true } || registry.Get(cm4)?.IsReady != false)
+            {
+                failures.Add("Ownership verification may supply the target but must not claim CM4 service readiness.");
+            }
+
+            Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures));
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot))
+            {
+                Directory.Delete(fixtureRoot, recursive: true);
+            }
+        }
+    }
+
+    private static string BuildOwnedInspectJson(
+        string containerId,
+        string role,
+        string runId,
+        string stackId,
+        string networkName,
+        string networkAddress) =>
+        JsonSerializer.Serialize(new
+        {
+            Id = containerId,
+            State = new { Status = "running" },
+            Config = new
+            {
+                Labels = new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    [ContainerIdentityExecHandoff.RunIdLabel] = runId,
+                    [ContainerIdentityExecHandoff.RoleLabel] = role,
+                    [DockerContainerSpec.StackLabel] = stackId,
+                    [DockerContainerSpec.ResourceLabel] = role,
+                    [DockerContainerSpec.RunLabel] = runId,
+                },
+            },
+            HostConfig = new { NetworkMode = networkName },
+            NetworkSettings = new
+            {
+                Networks = new Dictionary<string, object>(StringComparer.Ordinal)
+                {
+                    [networkName] = new { IPAddress = networkAddress, NetworkID = new string('b', 64) },
+                },
+            },
+        });
+
     private static async Task<string[]> GetRuntimeArgumentsAsync(ContainerResource resource)
     {
         var values = new List<object>();
@@ -558,12 +727,39 @@ public sealed class BaseSimulationResourceRegistrationTests
         return values.Select(value => Assert.IsType<string>(value)).ToArray();
     }
 
-    private static async Task<string[]> GetArgumentsAsync(IResourceWithArgs resource)
+    private static async Task<string[]> GetArgumentsAsync(
+        IResourceWithArgs resource,
+        IServiceProvider? services = null,
+        CancellationToken cancellationToken = default,
+        int? callbackLimit = null)
     {
         var values = new List<object>();
-        foreach (var annotation in resource.Annotations.OfType<CommandLineArgsCallbackAnnotation>())
+        var callbacks = resource.Annotations.OfType<CommandLineArgsCallbackAnnotation>();
+        if (callbackLimit is not null)
         {
-            await annotation.Callback(new CommandLineArgsCallbackContext(values, resource, CancellationToken.None));
+            callbacks = callbacks.Take(callbackLimit.Value);
+        }
+
+        foreach (var annotation in callbacks)
+        {
+            CommandLineArgsCallbackContext context;
+            if (services is null)
+            {
+                context = new CommandLineArgsCallbackContext(values, resource, cancellationToken);
+            }
+            else
+            {
+                context = new CommandLineArgsCallbackContext(values, resource, cancellationToken)
+                {
+                    ExecutionContext = new DistributedApplicationExecutionContext(
+                        new DistributedApplicationExecutionContextOptions(DistributedApplicationOperation.Run)
+                        {
+                            Services = services,
+                        }),
+                };
+            }
+
+            await annotation.Callback(context);
         }
 
         return values.Select(value => value?.ToString() ?? string.Empty).ToArray();

@@ -749,63 +749,90 @@ internal sealed class OwnedCm4TransportServerSessionManager(
 
             lock (sync)
             {
-                if (session is not null || failedStartIdentity is not null ||
-                    string.IsNullOrWhiteSpace(dockerContextName) ||
-                    string.IsNullOrWhiteSpace(expectedEngineId))
+                if (session is not null)
                 {
-                    return;
-                }
-
-                var candidate = registry.GetCandidates().SingleOrDefault(item =>
-                    ReferenceEquals(item.Resource, cm4Resource) && item.Role == "cm4-sim");
-                if (!IsCurrentOwnedCandidate(candidate, getCurrentByResourceId) ||
-                    candidate is null ||
-                    !IPAddress.TryParse(candidate.ObservedNetworkAddress, out var address) ||
-                    address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    return;
-                }
-
-                if (targetController is not null)
-                {
-                    var targetPhase = targetController.Snapshot().Phase;
-                    shouldApplyInitialTargetAfterStart = targetPhase == Cm4TransportTargetPhase.Initial;
-                    if (targetPhase == Cm4TransportTargetPhase.Applied && reapedSessionIdentity is not null)
+                    var currentCm4 = registry.GetCandidates().SingleOrDefault(item =>
+                        ReferenceEquals(item.Resource, cm4Resource) && item.Role == "cm4-sim");
+                    var currentSimulator = registry.GetCandidates().SingleOrDefault(item => item.Role == "simulator");
+                    if (failedStartIdentity is not null || targetController is null ||
+                        targetController.Snapshot().Phase != Cm4TransportTargetPhase.Initial ||
+                        sessionIdentity is null || currentCm4 is null || currentSimulator is null ||
+                        !IsCurrentOwnedCandidate(currentCm4, getCurrentByResourceId) ||
+                        sessionIdentity.ResourceId != currentCm4.ResourceId ||
+                        sessionIdentity.ContainerId != currentCm4.ContainerId ||
+                        sessionIdentity.Generation != currentCm4.Generation ||
+                        !IsCurrentOwnedCandidate(currentSimulator, getCurrentByResourceId))
                     {
-                        var previous = ToTransportIdentity(reapedSessionIdentity);
-                        var replacement = ToTransportIdentity(candidate);
-                        shouldApplyInitialTargetAfterStart = targetController.TryReinitializeAfterConfirmedCm4Replacement(previous, replacement);
-                        if (!shouldApplyInitialTargetAfterStart) return;
+                        return;
                     }
-                }
 
-                cancellationToken.ThrowIfCancellationRequested();
-                var arguments = new[]
-                {
-                    "--context", dockerContextName!, "exec", candidate.ContainerId!, HelperPath, "--server",
-                    "--run-id", runId,
-                    "--engine-id", expectedEngineId!,
-                    "--cm4-resource-id", candidate.ResourceId,
-                    "--cm4-container-id", candidate.ContainerId!,
-                    "--cm4-generation", candidate.Generation.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    "--helper-launch-id", runId,
-                    "--cm4-ip", address.ToString(),
-                };
-
-                try
-                {
-                    var startedSession = runner.StartForegroundSession(arguments);
-                    session = startedSession;
-                    sessionIdentity = candidate;
-                    reapedSessionIdentity = null;
-                    sessionResourceStopped = false;
-                    applyInitialTarget = shouldApplyInitialTargetAfterStart;
-                    startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
+                    // CM4セッション開始時に相手Simulatorが未起動なら初期状態を保ち、後続通知で一度だけ適用します。
+                    applyInitialTarget = true;
                 }
-                catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)
+                else
                 {
-                    failedStartIdentity = candidate;
-                    failedStartResourceStopped = false;
+                    if (failedStartIdentity is not null ||
+                        string.IsNullOrWhiteSpace(dockerContextName) ||
+                        string.IsNullOrWhiteSpace(expectedEngineId))
+                    {
+                        return;
+                    }
+
+                    var candidate = registry.GetCandidates().SingleOrDefault(item =>
+                        ReferenceEquals(item.Resource, cm4Resource) && item.Role == "cm4-sim");
+                    if (!IsCurrentOwnedCandidate(candidate, getCurrentByResourceId) ||
+                        candidate is null ||
+                        !IPAddress.TryParse(candidate.ObservedNetworkAddress, out var address) ||
+                        address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        return;
+                    }
+
+                    if (targetController is not null)
+                    {
+                        var targetPhase = targetController.Snapshot().Phase;
+                        shouldApplyInitialTargetAfterStart = targetPhase == Cm4TransportTargetPhase.Initial;
+                        if (targetPhase == Cm4TransportTargetPhase.Applied && reapedSessionIdentity is not null)
+                        {
+                            var previous = ToTransportIdentity(reapedSessionIdentity);
+                            var replacement = ToTransportIdentity(candidate);
+                            shouldApplyInitialTargetAfterStart = targetController.TryReinitializeAfterConfirmedCm4Replacement(previous, replacement);
+                            if (!shouldApplyInitialTargetAfterStart) return;
+                        }
+                    }
+
+                    var currentSimulator = registry.GetCandidates().SingleOrDefault(item => item.Role == "simulator");
+                    shouldApplyInitialTargetAfterStart &=
+                        IsCurrentOwnedCandidate(currentSimulator, getCurrentByResourceId);
+
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var arguments = new[]
+                    {
+                        "--context", dockerContextName!, "exec", candidate.ContainerId!, HelperPath, "--server",
+                        "--run-id", runId,
+                        "--engine-id", expectedEngineId!,
+                        "--cm4-resource-id", candidate.ResourceId,
+                        "--cm4-container-id", candidate.ContainerId!,
+                        "--cm4-generation", candidate.Generation.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        "--helper-launch-id", runId,
+                        "--cm4-ip", address.ToString(),
+                    };
+
+                    try
+                    {
+                        var startedSession = runner.StartForegroundSession(arguments);
+                        session = startedSession;
+                        sessionIdentity = candidate;
+                        reapedSessionIdentity = null;
+                        sessionResourceStopped = false;
+                        applyInitialTarget = shouldApplyInitialTargetAfterStart;
+                        startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
+                    }
+                    catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)
+                    {
+                        failedStartIdentity = candidate;
+                        failedStartResourceStopped = false;
+                    }
                 }
             }
 
@@ -887,7 +914,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
             RegisteredContainerEventProjection.TryProject(
                 candidate.Resource,
                 candidate.ResourceId,
-                "cm4-sim",
+                candidate.Role,
                 current,
                 current,
                 out var latest) &&
