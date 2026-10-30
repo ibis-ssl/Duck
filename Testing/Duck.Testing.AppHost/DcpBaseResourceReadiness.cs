@@ -684,31 +684,45 @@ internal sealed class OwnedCm4TransportServerSessionManager(
         }
     }
 
+    /// <summary>起動中の補助プロセスが受け取ったCM4の起動時識別情報を返します。</summary>
+    internal OwnedCm4TransportIdentity? GetCurrentSessionIdentity()
+    {
+        lock (sync)
+        {
+            if (session is null || sessionIdentity is null || session.Completion.IsCompleted)
+            {
+                return null;
+            }
+
+            return ToTransportIdentity(sessionIdentity);
+        }
+    }
+
     internal async Task<bool> WaitForSessionStartedAsync(
         DcpBaseResourceIdentityCandidate candidate,
         CancellationToken cancellationToken)
     {
-        if (IsSessionStartedFor(candidate)) return true;
-        if (IsSessionStartFailedFor(candidate)) return false;
+        if (IsSessionStartedForPhysicalIdentity(candidate)) return true;
+        if (IsSessionStartFailedForPhysicalIdentity(candidate)) return false;
 
         var startResult = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         void OnStarted(DcpBaseResourceIdentityCandidate observed)
         {
-            if (SameCandidate(observed, candidate)) startResult.TrySetResult(true);
+            if (SamePhysicalCandidate(observed, candidate)) startResult.TrySetResult(true);
         }
         void OnFailed(DcpBaseResourceIdentityCandidate observed)
         {
-            if (SameCandidate(observed, candidate)) startResult.TrySetResult(false);
+            if (SamePhysicalCandidate(observed, candidate)) startResult.TrySetResult(false);
         }
 
         SessionStarted += OnStarted;
         SessionStartFailed += OnFailed;
         try
         {
-            if (IsSessionStartedFor(candidate)) return true;
-            if (IsSessionStartFailedFor(candidate)) return false;
+            if (IsSessionStartedForPhysicalIdentity(candidate)) return true;
+            if (IsSessionStartFailedForPhysicalIdentity(candidate)) return false;
             return await startResult.Task.WaitAsync(cancellationToken).ConfigureAwait(false) &&
-                IsSessionStartedFor(candidate);
+                IsSessionStartedForPhysicalIdentity(candidate);
         }
         finally
         {
@@ -717,13 +731,28 @@ internal sealed class OwnedCm4TransportServerSessionManager(
         }
     }
 
-    private bool IsSessionStartFailedFor(DcpBaseResourceIdentityCandidate candidate)
+    private bool IsSessionStartedForPhysicalIdentity(DcpBaseResourceIdentityCandidate candidate)
     {
         lock (sync)
         {
-            return failedStartIdentity is not null && SameCandidate(failedStartIdentity, candidate);
+            return session is not null && sessionIdentity is not null && !session.Completion.IsCompleted &&
+                SamePhysicalCandidate(sessionIdentity, candidate);
         }
     }
+
+    private bool IsSessionStartFailedForPhysicalIdentity(DcpBaseResourceIdentityCandidate candidate)
+    {
+        lock (sync)
+        {
+            return failedStartIdentity is not null && SamePhysicalCandidate(failedStartIdentity, candidate);
+        }
+    }
+
+    private static bool SamePhysicalCandidate(
+        DcpBaseResourceIdentityCandidate left,
+        DcpBaseResourceIdentityCandidate right) =>
+        left.RunId == right.RunId && left.ResourceName == right.ResourceName &&
+        left.ResourceId == right.ResourceId && left.ContainerId == right.ContainerId;
 
     /// <summary>DCP の停止通知を記録し、前景セッションの解放可否を追跡します。</summary>
     internal void ObserveResourceEvent(ResourceEvent observation, ResourceEvent current)

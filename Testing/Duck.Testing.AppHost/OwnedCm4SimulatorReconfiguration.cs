@@ -128,7 +128,7 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
 
             var replacement = await adapter.WaitForReplacementAsync(previous, token).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
-            if (replacement is null || replacement.Cm4 != previous.Cm4 ||
+            if (replacement is null || !SamePhysicalIdentity(replacement.Cm4, previous.Cm4) ||
                 replacement.Simulator.Generation <= previous.Simulator.Generation ||
                 replacement.Simulator.ContainerId == previous.Simulator.ContainerId ||
                 !SamePair(replacement, adapter.GetCurrentOwnedPair()))
@@ -220,7 +220,7 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
 
             var afterCm4 = await adapter.WaitForCm4ReplacementAsync(previous, token).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
-            if (afterCm4 is null || afterCm4.Simulator != previous.Simulator ||
+            if (afterCm4 is null || !SamePhysicalIdentity(afterCm4.Simulator, previous.Simulator) ||
                 afterCm4.Cm4.Generation <= previous.Cm4.Generation ||
                 afterCm4.Cm4.ContainerId == previous.Cm4.ContainerId ||
                 !SamePair(afterCm4, adapter.GetCurrentOwnedPair()) ||
@@ -246,7 +246,7 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
 
             var replacement = await adapter.WaitForReplacementAsync(afterCm4, token).ConfigureAwait(false);
             token.ThrowIfCancellationRequested();
-            if (replacement is null || replacement.Cm4 != afterCm4.Cm4 ||
+            if (replacement is null || !SamePhysicalIdentity(replacement.Cm4, afterCm4.Cm4) ||
                 replacement.Simulator.Generation <= afterCm4.Simulator.Generation ||
                 replacement.Simulator.ContainerId == afterCm4.Simulator.ContainerId ||
                 !SamePair(replacement, adapter.GetCurrentOwnedPair()))
@@ -299,6 +299,13 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
         OwnedCm4TransportIdentityPair? expected,
         OwnedCm4TransportIdentityPair? actual) => expected is not null && actual is not null &&
         expected.Cm4 == actual.Cm4 && expected.Simulator == actual.Simulator;
+
+    private static bool SamePhysicalIdentity(OwnedCm4TransportIdentity current, OwnedCm4TransportIdentity expected) =>
+        current.RunId == expected.RunId &&
+        current.EngineId == expected.EngineId &&
+        current.ResourceName == expected.ResourceName &&
+        current.ResourceId == expected.ResourceId &&
+        current.ContainerId == expected.ContainerId;
 }
 
 internal sealed record OwnedCm4SimulatorReconfigurationResult(
@@ -566,7 +573,7 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
                 cancellationToken).ConfigureAwait(false);
 
             var pair = GetCurrentOwnedPair();
-            if (pair is not null && pair.Cm4 == previous.Cm4 &&
+            if (pair is not null && SamePhysicalIdentity(pair.Cm4, previous.Cm4) &&
                 pair.Simulator.Generation > previous.Simulator.Generation &&
                 pair.Simulator.ContainerId != previous.Simulator.ContainerId)
             {
@@ -581,6 +588,24 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
         OwnedCm4TransportIdentityPair previous,
         CancellationToken cancellationToken)
     {
+        var sessionManager = getSessionManager?.Invoke();
+        var currentCandidate = GetCurrentCm4ReplacementCandidate(previous);
+        if (currentCandidate is not null)
+        {
+            if (sessionManager is null ||
+                !await sessionManager.WaitForSessionStartedAsync(currentCandidate, cancellationToken).ConfigureAwait(false))
+            {
+                return null;
+            }
+
+            await ownership.VerifyCurrentAsync(resourceId =>
+                notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                cancellationToken).ConfigureAwait(false);
+            var currentPair = GetCurrentOwnedPair();
+            if (IsCm4ReplacementFor(previous, currentPair)) return currentPair;
+            return null;
+        }
+
         await foreach (var observation in notifications.WatchAsync(cancellationToken).ConfigureAwait(false))
         {
             if (!ReferenceEquals(observation.Resource, cm4) ||
@@ -595,32 +620,54 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
                 notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
                 cancellationToken).ConfigureAwait(false);
 
-            var pair = GetCurrentOwnedPair();
-            if (pair is null || pair.Simulator != previous.Simulator ||
-                pair.Cm4.Generation <= previous.Cm4.Generation ||
-                pair.Cm4.ContainerId == previous.Cm4.ContainerId)
-            {
-                continue;
-            }
-
-            var sessionManager = getSessionManager?.Invoke();
-            var candidate = registry.GetCandidates().SingleOrDefault(item =>
-                ReferenceEquals(item.Resource, cm4) && item.Role == "cm4-sim");
-            if (sessionManager is null || candidate is null ||
+            var candidate = GetCurrentCm4ReplacementCandidate(previous);
+            if (candidate is null) continue;
+            if (sessionManager is null ||
                 !await sessionManager.WaitForSessionStartedAsync(candidate, cancellationToken).ConfigureAwait(false))
             {
                 return null;
             }
 
-            return GetCurrentOwnedPair();
+            await ownership.VerifyCurrentAsync(resourceId =>
+                notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                cancellationToken).ConfigureAwait(false);
+            var pair = GetCurrentOwnedPair();
+            if (IsCm4ReplacementFor(previous, pair)) return pair;
+            return null;
         }
 
         return null;
     }
+
+    private DcpBaseResourceIdentityCandidate? GetCurrentCm4ReplacementCandidate(
+        OwnedCm4TransportIdentityPair previous) => registry.GetCandidates().SingleOrDefault(candidate =>
+        ReferenceEquals(candidate.Resource, cm4) && candidate.Role == "cm4-sim" &&
+        candidate.State == "Running" && !candidate.ResourceKeyAmbiguous &&
+        OwnedContainerInspection.IsFullId(candidate.ContainerId) &&
+        candidate.Generation > previous.Cm4.Generation &&
+        candidate.ContainerId != previous.Cm4.ContainerId);
+
+    private bool IsCm4ReplacementFor(
+        OwnedCm4TransportIdentityPair previous,
+        OwnedCm4TransportIdentityPair? current) => current is not null &&
+        SamePhysicalIdentity(current.Simulator, previous.Simulator) &&
+        current.Cm4.Generation > previous.Cm4.Generation &&
+        current.Cm4.ContainerId != previous.Cm4.ContainerId &&
+        SamePair(current, GetCurrentOwnedPair());
+
+    private static bool SamePair(OwnedCm4TransportIdentityPair? expected, OwnedCm4TransportIdentityPair? actual) =>
+        expected is not null && actual is not null && expected.Cm4 == actual.Cm4 && expected.Simulator == actual.Simulator;
 
     private bool IsOwnedRunning(DcpBaseResourceIdentityCandidate? candidate) =>
         candidate is not null && candidate.State == "Running" && !candidate.ResourceKeyAmbiguous &&
         !string.IsNullOrWhiteSpace(candidate.ResourceId) && OwnedContainerInspection.IsFullId(candidate.ContainerId) &&
         candidate.IdentityVerified && candidate.NetworkVerified && candidate.OwnershipVerified &&
         registry.AreOwnershipProofsCurrent([candidate]);
+
+    private static bool SamePhysicalIdentity(OwnedCm4TransportIdentity current, OwnedCm4TransportIdentity expected) =>
+        current.RunId == expected.RunId &&
+        current.EngineId == expected.EngineId &&
+        current.ResourceName == expected.ResourceName &&
+        current.ResourceId == expected.ResourceId &&
+        current.ContainerId == expected.ContainerId;
 }

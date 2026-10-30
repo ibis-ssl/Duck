@@ -65,6 +65,89 @@ public sealed class OwnedCm4TransportTargetControllerTests
     }
 
     [Fact]
+    public async Task UsesLiveHelperLaunchGenerationWithFreshCurrentOwnershipProof()
+    {
+        var original = CreatePair();
+        var current = original with { Cm4 = original.Cm4 with { Generation = 2 } };
+        var launchIdentity = original.Cm4;
+        var runner = new FakeDockerRunner(current, EngineId);
+        var controller = new OwnedCm4TransportTargetController(
+            runner,
+            "desktop-linux",
+            EngineId,
+            RunId,
+            () => current,
+            () => launchIdentity);
+
+        var applied = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+        Assert.True(applied.Applied, applied.Error);
+        var applyRequest = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(runner.LastStdioInput!, ProtocolJsonOptions);
+        Assert.NotNull(applyRequest);
+        Assert.Equal(launchIdentity.Generation, applyRequest.Cm4Generation);
+        Assert.Equal(2, current.Cm4.Generation);
+        var sharedNativeCoreFixture = File.ReadAllText(
+            Path.Combine(AppContext.BaseDirectory, "cm4-transport-apply-target.json")).TrimEnd('\r', '\n');
+        Assert.Equal(sharedNativeCoreFixture, runner.StdioInput!.TrimEnd('\r', '\n'));
+
+        var invalidated = await controller.InvalidateCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+        Assert.True(invalidated.Invalidated, invalidated.Error);
+        var invalidationRequest = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(runner.LastStdioInput!, ProtocolJsonOptions);
+        Assert.NotNull(invalidationRequest);
+        Assert.Equal(launchIdentity.Generation, invalidationRequest.Cm4Generation);
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+        Assert.Equal(2, current.Cm4.Generation);
+    }
+
+    [Fact]
+    public async Task DoesNotAcceptAnAcknowledgementFromAChangedHelperSession()
+    {
+        var original = CreatePair();
+        var current = original with { Cm4 = original.Cm4 with { Generation = 2 } };
+        var launchIdentity = original.Cm4;
+        var runner = new FakeDockerRunner(current, EngineId);
+        runner.StdioHandler = (input, _) =>
+        {
+            launchIdentity = launchIdentity with { Generation = 2 };
+            return Task.FromResult(FakeDockerRunner.CreateAcknowledgement(input));
+        };
+        var controller = new OwnedCm4TransportTargetController(
+            runner,
+            "desktop-linux",
+            EngineId,
+            RunId,
+            () => current,
+            () => launchIdentity);
+
+        var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+
+        Assert.False(result.Applied);
+        Assert.True(result.Unknown);
+        Assert.Equal(1, runner.StdioCalls);
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task DoesNotDispatchWithoutAStartedHelperSession()
+    {
+        var current = CreatePair();
+        var runner = new FakeDockerRunner(current, EngineId);
+        var controller = new OwnedCm4TransportTargetController(
+            runner,
+            "desktop-linux",
+            EngineId,
+            RunId,
+            () => current,
+            () => null);
+
+        var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+
+        Assert.False(result.Applied);
+        Assert.False(result.Unknown);
+        Assert.Equal(0, runner.StdioCalls);
+        Assert.Equal(Cm4TransportTargetPhase.Unknown, controller.Snapshot().Phase);
+    }
+
+    [Fact]
     public async Task RemotelyInvalidatesTheOwnedRouteBeforeReturningAStopGate()
     {
         var identities = CreatePair();
@@ -114,10 +197,14 @@ public sealed class OwnedCm4TransportTargetControllerTests
         Assert.True((await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Applied);
         Assert.True((await controller.InvalidateCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Invalidated);
 
+        current = new OwnedCm4TransportIdentityPair(
+            previous.Cm4 with { Generation = previous.Cm4.Generation + 1 },
+            previous.Simulator with { Generation = previous.Simulator.Generation + 1 });
+
         var replacementCm4 = previous.Cm4 with
         {
             ContainerId = new string('e', 64),
-            Generation = previous.Cm4.Generation + 1,
+            Generation = current.Cm4.Generation + 1,
         };
         current = new OwnedCm4TransportIdentityPair(
             replacementCm4,
@@ -127,6 +214,30 @@ public sealed class OwnedCm4TransportTargetControllerTests
         Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
         Assert.Null(controller.Snapshot().TargetAddress);
         Assert.True(controller.IsInvalidatedFor(current));
+    }
+
+    [Fact]
+    public async Task AppliedRouteRebindsAfterReapedSessionWhenTheSameCm4HasFreshProof()
+    {
+        var previous = CreatePair();
+        var current = previous;
+        var runner = new FakeDockerRunner(previous, EngineId);
+        var controller = CreateController(runner, () => current);
+        Assert.True((await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Applied);
+
+        current = new OwnedCm4TransportIdentityPair(
+            previous.Cm4 with { Generation = previous.Cm4.Generation + 1 },
+            previous.Simulator with { Generation = previous.Simulator.Generation + 1 });
+        var replacementCm4 = current.Cm4 with
+        {
+            ContainerId = new string('e', 64),
+            Generation = current.Cm4.Generation + 1,
+        };
+        current = new OwnedCm4TransportIdentityPair(replacementCm4, current.Simulator);
+
+        Assert.True(controller.TryReinitializeAfterConfirmedCm4Replacement(previous.Cm4, replacementCm4));
+        Assert.Equal(Cm4TransportTargetPhase.Initial, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
     }
 
     [Fact]

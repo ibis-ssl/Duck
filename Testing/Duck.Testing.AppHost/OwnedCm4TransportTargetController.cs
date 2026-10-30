@@ -92,7 +92,8 @@ internal sealed class OwnedCm4TransportTargetController(
     string dockerContext,
     string expectedEngineId,
     string runId,
-    Func<OwnedCm4TransportIdentityPair?> getCurrent) : IOwnedCm4TransportTargetController
+    Func<OwnedCm4TransportIdentityPair?> getCurrent,
+    Func<OwnedCm4TransportIdentity?>? getCurrentSessionIdentity = null) : IOwnedCm4TransportTargetController
 {
     private const string Cm4ResourceName = "cm4-sim";
     private const string SimulatorResourceName = "simulator";
@@ -215,9 +216,11 @@ internal sealed class OwnedCm4TransportTargetController(
         lock (stateLock)
         {
             var wasApplied = phase == Cm4TransportTargetPhase.Applied &&
-                Equals(activeIdentities?.Cm4, previousCm4);
+                activeIdentities?.Cm4 is { } appliedCm4 &&
+                SamePhysicalIdentity(appliedCm4, previousCm4);
             var wasInvalidated = phase == Cm4TransportTargetPhase.Invalidated &&
-                Equals(pendingIdentities?.Cm4, previousCm4);
+                pendingIdentities?.Cm4 is { } invalidatedCm4 &&
+                SamePhysicalIdentity(invalidatedCm4, previousCm4);
             if (!wasApplied && !wasInvalidated)
             {
                 return false;
@@ -273,7 +276,9 @@ internal sealed class OwnedCm4TransportTargetController(
         lock (stateLock)
         {
             return phase == Cm4TransportTargetPhase.Invalidated &&
-                Equals(pendingIdentities, identities);
+                pendingIdentities is not null &&
+                SamePhysicalIdentity(pendingIdentities.Cm4, identities.Cm4) &&
+                SamePhysicalIdentity(pendingIdentities.Simulator, identities.Simulator);
         }
     }
     public Cm4TransportTargetSnapshot Snapshot()
@@ -346,6 +351,12 @@ internal sealed class OwnedCm4TransportTargetController(
                 return Rejected(operationEpoch, "The owned containers do not share one inspected network.");
             }
 
+            var controlCm4 = GetControlIdentity(requested.Cm4);
+            if (controlCm4 is null)
+            {
+                return Rejected(operationEpoch, "The current CM4 helper session does not match the owned container.");
+            }
+
             var request = new Cm4TransportTargetMessage(
                 ProtocolVersion,
                 "applyTarget",
@@ -353,7 +364,7 @@ internal sealed class OwnedCm4TransportTargetController(
                 expectedEngineId,
                 requested.Cm4.ResourceId,
                 requested.Cm4.ContainerId,
-                requested.Cm4.Generation,
+                controlCm4.Generation,
                 helperLaunchId,
                 requested.Simulator.ResourceId,
                 requested.Simulator.ContainerId,
@@ -364,6 +375,10 @@ internal sealed class OwnedCm4TransportTargetController(
             if (Encoding.UTF8.GetByteCount(requestLine) + 1 > MaximumMessageBytes)
             {
                 return Rejected(operationEpoch, "The control request exceeded its size limit.");
+            }
+            if (!IsControlIdentityCurrent(requested.Cm4, controlCm4) || !IsCurrent(operationEpoch, requested))
+            {
+                return Rejected(operationEpoch, "The current CM4 helper session or owner proof changed before application.");
             }
 
             var execArguments = new[]
@@ -380,6 +395,7 @@ internal sealed class OwnedCm4TransportTargetController(
             if (response.ExitCode != 0 ||
                 !TryReadSingleAcknowledgement(response.StandardOutput, request, "applied", out var acknowledgement) ||
                 acknowledgement != request with { Type = "applied" } ||
+                !IsControlIdentityCurrent(requested.Cm4, controlCm4) ||
                 !IsCurrent(operationEpoch, requested))
             {
                 return RejectedAfterDispatch(operationEpoch, "The control acknowledgement or current generation did not match.");
@@ -400,6 +416,7 @@ internal sealed class OwnedCm4TransportTargetController(
                 !string.Equals(latestSimulator.Name, simulatorInspection.Name, StringComparison.Ordinal) ||
                 !string.Equals(latestSimulator.Id, simulatorInspection.Id, StringComparison.Ordinal) ||
                 !latestSimulator.Address.Equals(simulatorInspection.Address) ||
+                !IsControlIdentityCurrent(requested.Cm4, controlCm4) ||
                 !IsCurrent(operationEpoch, requested))
             {
                 return RejectedAfterDispatch(operationEpoch, "The inspected owner generation changed after acknowledgement.");
@@ -501,6 +518,12 @@ internal sealed class OwnedCm4TransportTargetController(
                 return InvalidationUnknown(operationEpoch, "The owned containers do not share one inspected network.");
             }
 
+            var controlCm4 = GetControlIdentity(requested.Cm4);
+            if (controlCm4 is null)
+            {
+                return InvalidationUnknown(operationEpoch, "The current CM4 helper session does not match the owned container.");
+            }
+
             var request = new Cm4TransportTargetMessage(
                 ProtocolVersion,
                 "invalidateTarget",
@@ -508,7 +531,7 @@ internal sealed class OwnedCm4TransportTargetController(
                 expectedEngineId,
                 requested.Cm4.ResourceId,
                 requested.Cm4.ContainerId,
-                requested.Cm4.Generation,
+                controlCm4.Generation,
                 helperLaunchId,
                 requested.Simulator.ResourceId,
                 requested.Simulator.ContainerId,
@@ -519,6 +542,11 @@ internal sealed class OwnedCm4TransportTargetController(
             if (Encoding.UTF8.GetByteCount(requestLine) + 1 > MaximumMessageBytes)
             {
                 return InvalidationUnknown(operationEpoch, "The remote invalidation request exceeded its size limit.");
+            }
+            if (!IsControlIdentityCurrent(requested.Cm4, controlCm4) ||
+                !IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
+            {
+                return InvalidationUnknown(operationEpoch, "The current CM4 helper session or owner proof changed before invalidation.");
             }
 
             var execArguments = new[]
@@ -535,6 +563,7 @@ internal sealed class OwnedCm4TransportTargetController(
             if (response.ExitCode != 0 ||
                 !TryReadSingleAcknowledgement(response.StandardOutput, request, "invalidated", out var acknowledgement) ||
                 acknowledgement != request with { Type = "invalidated" } ||
+                !IsControlIdentityCurrent(requested.Cm4, controlCm4) ||
                 !IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
             {
                 return InvalidationUnknown(operationEpoch,
@@ -558,6 +587,7 @@ internal sealed class OwnedCm4TransportTargetController(
                 !string.Equals(latestSimulator.Name, simulatorInspection.Name, StringComparison.Ordinal) ||
                 !string.Equals(latestSimulator.Id, simulatorInspection.Id, StringComparison.Ordinal) ||
                 !latestSimulator.Address.Equals(simulatorInspection.Address) ||
+                !IsControlIdentityCurrent(requested.Cm4, controlCm4) ||
                 !IsCurrent(operationEpoch, requested, Cm4TransportTargetPhase.Invalidating))
             {
                 return InvalidationUnknown(operationEpoch,
@@ -709,6 +739,43 @@ internal sealed class OwnedCm4TransportTargetController(
                 Equals(current, requested);
         }
     }
+
+    private bool IsControlIdentityCurrent(
+        OwnedCm4TransportIdentity current,
+        OwnedCm4TransportIdentity controlIdentity)
+    {
+        var latest = GetControlIdentity(current);
+        return latest is not null && SamePhysicalIdentity(latest, controlIdentity) &&
+            latest.Generation == controlIdentity.Generation;
+    }
+
+    private OwnedCm4TransportIdentity? GetControlIdentity(OwnedCm4TransportIdentity current)
+    {
+        if (getCurrentSessionIdentity is null)
+        {
+            return current;
+        }
+
+        OwnedCm4TransportIdentity? launched;
+        try
+        {
+            launched = getCurrentSessionIdentity();
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or ObjectDisposedException)
+        {
+            return null;
+        }
+
+        return launched is not null && SamePhysicalIdentity(launched, current) &&
+            launched.Generation > 0 && launched.Generation <= current.Generation
+            ? current with { Generation = launched.Generation }
+            : null;
+    }
+
+    private static bool SamePhysicalIdentity(OwnedCm4TransportIdentity left, OwnedCm4TransportIdentity right) =>
+        left.RunId == right.RunId && left.EngineId == right.EngineId &&
+        left.ResourceName == right.ResourceName && left.ResourceId == right.ResourceId &&
+        left.ContainerId == right.ContainerId;
 
     private void MarkUnknown(long expectedEpoch)
     {

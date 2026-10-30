@@ -156,6 +156,115 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
     }
 
     [Fact]
+    public async Task Cm4RestartAcceptsFreshProofForSameSimulatorIdentity()
+    {
+        var previous = CreatePair(4, "a");
+        var refreshedSimulator = previous.Simulator with { Generation = previous.Simulator.Generation + 1 };
+        var afterCm4 = new OwnedCm4TransportIdentityPair(
+            new("run-01", "engine-01", "cm4-sim", "cm4-key", new string('c', 63) + "c", 2),
+            refreshedSimulator);
+        var afterSimulator = new OwnedCm4TransportIdentityPair(
+            afterCm4.Cm4,
+            new("run-01", "engine-01", "simulator", "sim-key-b", new string('d', 63) + "d", 6));
+        var adapter = new FakeAdapter(previous, afterSimulator) { Cm4Replacement = afterCm4 };
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair);
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+        var simulatorRestartCalls = 0;
+
+        var result = await coordinator.ExecuteCm4RestartAsync(
+            CreateCommandContext(CancellationToken.None),
+            _ =>
+            {
+                adapter.Events.Add("restart-cm4");
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            },
+            _ =>
+            {
+                simulatorRestartCalls++;
+                adapter.Events.Add("restart-simulator");
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            });
+
+        Assert.True(result.Success, result.Message);
+        Assert.Equal(1, simulatorRestartCalls);
+        Assert.Equal(["invalidate", "restart-cm4", "wait-cm4", "restart-simulator", "wait-replacement", "apply"], adapter.Events);
+        Assert.Equal(afterSimulator, controller.LastAppliedPair);
+    }
+
+    [Fact]
+    public async Task Cm4RestartDoesNotAcceptAReplacementSimulatorIdentityBeforeItsRestart()
+    {
+        var previous = CreatePair(4, "a");
+        var changedSimulator = previous.Simulator with
+        {
+            ResourceId = "different-simulator-key",
+            ContainerId = new string('f', 64),
+            Generation = previous.Simulator.Generation + 1,
+        };
+        var afterCm4 = new OwnedCm4TransportIdentityPair(
+            new("run-01", "engine-01", "cm4-sim", "cm4-key", new string('c', 63) + "c", 2),
+            changedSimulator);
+        var finalPair = new OwnedCm4TransportIdentityPair(afterCm4.Cm4,
+            new("run-01", "engine-01", "simulator", "sim-key-b", new string('d', 63) + "d", 6));
+        var adapter = new FakeAdapter(previous, finalPair) { Cm4Replacement = afterCm4 };
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair);
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+        var simulatorRestartCalls = 0;
+
+        var result = await coordinator.ExecuteCm4RestartAsync(
+            CreateCommandContext(CancellationToken.None),
+            _ =>
+            {
+                adapter.Events.Add("restart-cm4");
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            },
+            _ =>
+            {
+                simulatorRestartCalls++;
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            });
+
+        Assert.False(result.Success);
+        Assert.Equal(0, simulatorRestartCalls);
+        Assert.Equal(["invalidate", "restart-cm4", "wait-cm4"], adapter.Events);
+        Assert.Null(controller.LastAppliedPair);
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+    }
+
+    [Fact]
+    public async Task Cm4RestartAcceptsFreshProofForSameCm4AfterSimulatorReplacement()
+    {
+        var previous = CreatePair(4, "a");
+        var afterCm4 = new OwnedCm4TransportIdentityPair(
+            new("run-01", "engine-01", "cm4-sim", "cm4-key", new string('c', 63) + "c", 2),
+            previous.Simulator);
+        var refreshedCm4 = afterCm4.Cm4 with { Generation = afterCm4.Cm4.Generation + 1 };
+        var replacement = new OwnedCm4TransportIdentityPair(
+            refreshedCm4,
+            new("run-01", "engine-01", "simulator", "sim-key-b", new string('d', 63) + "d", 6));
+        var adapter = new FakeAdapter(previous, replacement) { Cm4Replacement = afterCm4 };
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair);
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+
+        var result = await coordinator.ExecuteCm4RestartAsync(
+            CreateCommandContext(CancellationToken.None),
+            _ =>
+            {
+                adapter.Events.Add("restart-cm4");
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            },
+            _ =>
+            {
+                adapter.Events.Add("restart-simulator");
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            });
+
+        Assert.True(result.Success, result.Message);
+        Assert.Equal(["invalidate", "restart-cm4", "wait-cm4", "restart-simulator", "wait-replacement", "apply"], adapter.Events);
+        Assert.Equal(replacement, controller.LastAppliedPair);
+    }
+
+    [Fact]
     public async Task UnknownCm4InvalidationDoesNotDispatchEitherRestartOrApply()
     {
         var previous = CreatePair(4, "a");

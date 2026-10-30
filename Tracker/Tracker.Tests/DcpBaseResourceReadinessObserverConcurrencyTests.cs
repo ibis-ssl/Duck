@@ -115,6 +115,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             "desktop-linux",
             "expected-engine");
         var cm4Resource = resources.Single(item => item.Role == "cm4-sim").Resource;
+        var simulatorResource = resources.Single(item => item.Role == "simulator").Resource;
         var targetController = new OwnedCm4TransportTargetController(
             runner,
             "desktop-linux",
@@ -129,11 +130,21 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             "expected-engine",
             runId,
             targetController);
+        var readinessEvents = new DcpBaseResourceReadinessEventConsumer(registry);
+        var reconfigurationAdapter = new DcpOwnedCm4SimulatorReconfigurationAdapter(
+            registry,
+            ownershipConsumer,
+            readinessEvents,
+            notifications,
+            simulatorResource,
+            cm4Resource,
+            "expected-engine",
+            () => sessions);
         var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in resources) roles.Add(resource, role);
         var observer = new DcpBaseResourceReadinessObserver(
             notifications,
-            new DcpBaseResourceReadinessEventConsumer(registry),
+            readinessEvents,
             ownershipConsumer,
             roles,
             sessions);
@@ -209,6 +220,17 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             Assert.Equal(1, runner.StdioCalls);
             Assert.False(registry.Get(cm4Resource)!.IsReady);
 
+            Task<OwnedCm4TransportIdentityPair?>? replacementWait = null;
+            if (failedStartAttempt == 0 && !invalidateTargetBeforeReplacement)
+            {
+                var previousPair = GetCurrentOwnedPair();
+                Assert.NotNull(previousPair);
+                runner.HoldInspectContainerId = new string('5', 64);
+                replacementWait = reconfigurationAdapter.WaitForCm4ReplacementAsync(
+                    previousPair,
+                    CancellationToken.None);
+            }
+
             if (invalidateTargetBeforeReplacement)
             {
                 var invalidation = await targetController.InvalidateCurrentTargetAsync(runId, CancellationToken.None);
@@ -238,6 +260,14 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
 
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('5', 64)));
 
+            if (replacementWait is not null)
+            {
+                await runner.HeldInspectStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+                Assert.False(replacementWait.IsCompleted);
+                Assert.Single(runner.ForegroundSessions);
+                runner.ReleaseHeldInspect.TrySetResult();
+            }
+
             if (failedStartAttempt == 2)
             {
                 await WaitUntilAsync(() => runner.ForegroundStartAttempts == 2);
@@ -259,6 +289,13 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             }
 
             await runner.ForegroundSessionCountReached(2).WaitAsync(TimeSpan.FromSeconds(3));
+            if (replacementWait is not null)
+            {
+                var replacedPair = await replacementWait.WaitAsync(TimeSpan.FromSeconds(3));
+                Assert.NotNull(replacedPair);
+                Assert.Equal(new string('5', 64), replacedPair.Cm4.ContainerId);
+                Assert.Equal(GetCurrentOwnedPair()!.Simulator.ContainerId, replacedPair.Simulator.ContainerId);
+            }
             var replacementSession = runner.ForegroundSessions[1];
             Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
             Assert.True(long.Parse(replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture) > firstGeneration);
@@ -660,6 +697,9 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         internal TaskCompletionSource ForegroundSessionStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource TargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource SecondTargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource HeldInspectStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource ReleaseHeldInspect { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal string? HoldInspectContainerId { get; set; }
         internal List<(string[] Arguments, ControlledForegroundSession Session)> ForegroundSessions { get; } = [];
         private int stdioCalls;
         internal int StdioCalls => Volatile.Read(ref stdioCalls);
@@ -740,6 +780,11 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             }
 
             var containerId = arguments[^1];
+            if (containerId == HoldInspectContainerId)
+            {
+                HeldInspectStarted.TrySetResult();
+                await ReleaseHeldInspect.Task.WaitAsync(cancellationToken);
+            }
             var role = containerId[0] switch
             {
                 '1' => "simulator",

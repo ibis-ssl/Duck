@@ -326,7 +326,8 @@ internal static class BaseSimulationResourceRegistration
                             options.DockerContextName,
                             options.ExpectedEngineId,
                             options.DuckRunId,
-                            services.GetRequiredService<IOwnedCm4SimulatorReconfigurationAdapter>().GetCurrentOwnedPair));
+                            services.GetRequiredService<IOwnedCm4SimulatorReconfigurationAdapter>().GetCurrentOwnedPair,
+                            () => services.GetService<OwnedCm4TransportServerSessionManager>()?.GetCurrentSessionIdentity()));
                 }
                 builder.Services.AddSingleton<OwnedCm4SimulatorReconfigurationCoordinator>(services =>
                 {
