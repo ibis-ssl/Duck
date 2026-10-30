@@ -716,6 +716,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
         await reconcileGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            var shouldApplyInitialTargetAfterStart = false;
             var applyInitialTarget = false;
             IDockerCliForegroundSession? completedSession = null;
             lock (sync)
@@ -768,13 +769,13 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                 if (targetController is not null)
                 {
                     var targetPhase = targetController.Snapshot().Phase;
-                    applyInitialTarget = targetPhase == Cm4TransportTargetPhase.Initial;
+                    shouldApplyInitialTargetAfterStart = targetPhase == Cm4TransportTargetPhase.Initial;
                     if (targetPhase == Cm4TransportTargetPhase.Applied && reapedSessionIdentity is not null)
                     {
                         var previous = ToTransportIdentity(reapedSessionIdentity);
                         var replacement = ToTransportIdentity(candidate);
-                        applyInitialTarget = targetController.TryReinitializeAfterConfirmedCm4Replacement(previous, replacement);
-                        if (!applyInitialTarget) return;
+                        shouldApplyInitialTargetAfterStart = targetController.TryReinitializeAfterConfirmedCm4Replacement(previous, replacement);
+                        if (!shouldApplyInitialTargetAfterStart) return;
                     }
                 }
 
@@ -798,6 +799,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                     sessionIdentity = candidate;
                     reapedSessionIdentity = null;
                     sessionResourceStopped = false;
+                    applyInitialTarget = shouldApplyInitialTargetAfterStart;
                     startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
                 }
                 catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)

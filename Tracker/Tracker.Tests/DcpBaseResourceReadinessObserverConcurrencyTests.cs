@@ -81,8 +81,11 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         }
     }
 
-    [Fact]
-    public async Task StartsOnlyTheOwnedCurrentCm4SessionAndReapsItAfterDcpStopAndExecExit()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task StartsOnlyTheOwnedCurrentCm4SessionAndReapsItAfterDcpStopAndExecExit(int failedStartAttempt)
     {
         using var lifetime = new TestApplicationLifetime();
         using var notifications = new ResourceNotificationService(
@@ -101,6 +104,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             resources.Select(item => (item.Resource, item.Role, runId)),
             stackId);
         var runner = new ObserverDockerRunner(runId, stackId);
+        runner.FailForegroundStartAt = failedStartAttempt;
         var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
             registry,
             runner,
@@ -165,6 +169,15 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             await WaitUntilAsync(() => registry.GetCandidates().All(item => item.OwnershipVerified));
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", ContainerId("cm4-sim")));
 
+            if (failedStartAttempt == 1)
+            {
+                await runner.ForegroundStartAttempted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+                Assert.Empty(runner.ForegroundSessions);
+                Assert.Equal(0, runner.StdioCalls);
+                Assert.True(registry.Get(cm4Resource)!.OwnershipVerified);
+                return;
+            }
+
             try
             {
                 await runner.ForegroundSessionStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
@@ -206,6 +219,16 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             await firstSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
 
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('5', 64)));
+
+            if (failedStartAttempt == 2)
+            {
+                await WaitUntilAsync(() => runner.ForegroundStartAttempts == 2);
+                Assert.Single(runner.ForegroundSessions);
+                Assert.Equal(1, runner.StdioCalls);
+                Assert.Equal(Cm4TransportTargetPhase.Initial, targetController.Snapshot().Phase);
+                return;
+            }
+
             await runner.ForegroundSessionCountReached(2).WaitAsync(TimeSpan.FromSeconds(3));
             var replacementSession = runner.ForegroundSessions[1];
             Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
@@ -459,9 +482,11 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
     private sealed class ObserverDockerRunner(string runId, string stackId) : IDockerStdioCommandRunner, IDockerCliForegroundSessionRunner
     {
         private int inspectCount;
+        private int foregroundStartAttempts;
 
         internal TaskCompletionSource FirstInspectStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource ReleaseFirstInspect { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource ForegroundStartAttempted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource ForegroundSessionStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource TargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource SecondTargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -469,6 +494,8 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         private int stdioCalls;
         internal int StdioCalls => Volatile.Read(ref stdioCalls);
         internal int InspectCount => Volatile.Read(ref inspectCount);
+        internal int ForegroundStartAttempts => Volatile.Read(ref foregroundStartAttempts);
+        internal int FailForegroundStartAt { get; set; }
 
         internal Task ForegroundSessionCountReached(int count) => Task.Run(async () =>
         {
@@ -483,6 +510,13 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
 
         public IDockerCliForegroundSession StartForegroundSession(IReadOnlyList<string> arguments)
         {
+            var attempt = Interlocked.Increment(ref foregroundStartAttempts);
+            ForegroundStartAttempted.TrySetResult();
+            if (attempt == FailForegroundStartAt)
+            {
+                throw new IOException("Controlled foreground start failure.");
+            }
+
             var session = new ControlledForegroundSession();
             lock (ForegroundSessions)
             {
