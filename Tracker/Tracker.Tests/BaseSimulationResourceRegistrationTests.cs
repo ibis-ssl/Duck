@@ -51,6 +51,207 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     [Fact]
+    public async Task StandardGameControllerHealthRequiresItsControlApiEndpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-gc-health-model-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        Uri? probedEndpoint = null;
+        IResource? registeredGameController = null;
+        var apiReachable = false;
+        var endpointResolutions = 0;
+        var apiCalls = 0;
+        var cancelOnProbe = false;
+        var delayPastBudget = false;
+        CancellationTokenSource? callerCancellation = null;
+
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    "base-gc-health-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-base-gc-health-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { },
+                gameControllerControlEndpointResolver: (endpoint, _) =>
+                {
+                    endpointResolutions++;
+                    Assert.Equal("game-controller-control", endpoint.EndpointName);
+                    Assert.Same(registeredGameController, endpoint.Resource);
+                    return Task.FromResult(new Uri("http://127.0.0.1:49123/", UriKind.Absolute));
+                },
+                gameControllerControlApiProbe: async (endpoint, _) =>
+                {
+                    apiCalls++;
+                    probedEndpoint = endpoint;
+                    if (cancelOnProbe)
+                    {
+                        callerCancellation!.Cancel();
+                        return true;
+                    }
+                    if (delayPastBudget)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(2100), CancellationToken.None);
+                        return true;
+                    }
+                    return apiReachable;
+                });
+
+            registeredGameController = resources.GameController.Resource;
+            using var services = builder.Services.BuildServiceProvider();
+            var registry = services.GetRequiredService<DcpBaseResourceReadinessRegistry>();
+            var gameController = resources.GameController.Resource;
+            var endpointAnnotation = Assert.Single(
+                gameController.Annotations.OfType<EndpointAnnotation>(),
+                endpoint => endpoint.Name == "game-controller-control");
+            Assert.Null(endpointAnnotation.Port);
+            Assert.Equal("127.0.0.1", endpointAnnotation.TargetHost);
+            registry.ObserveCurrent(new("gc-runtime-key", "game-controller", new string('a', 64)), "Running");
+            var candidate = Assert.Single(registry.GetCandidates(), item => ReferenceEquals(item.Resource, gameController));
+            var registration = Assert.Single(
+                services.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value.Registrations,
+                item => item.Name == "dcp-game-controller-service-ready");
+            var healthCheck = registration.Factory(services);
+
+            var missingOwnership = await healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+            Assert.Equal(HealthStatus.Unhealthy, missingOwnership.Status);
+            Assert.Equal(0, endpointResolutions);
+            Assert.Equal(0, apiCalls);
+
+            Assert.True(registry.TryMarkIdentityVerified(
+                [new DcpBaseResourceOwnershipProof(
+                    gameController, candidate.ResourceId, candidate.ContainerId!, candidate.Generation,
+                    "expected-engine", "aspire-default-network")],
+                sharedStandardDcpNetworkVerified: true));
+            var result = await healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+
+            Assert.Equal(HealthStatus.Unhealthy, result.Status);
+            Assert.Contains("control API", result.Description, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal("ws://127.0.0.1:49123/api/control", probedEndpoint?.AbsoluteUri);
+            Assert.False(registry.Get(gameController)!.IsReady);
+
+            apiReachable = true;
+            var connected = await healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+            Assert.Equal(HealthStatus.Healthy, connected.Status);
+            Assert.True(registry.Get(gameController)!.IsReady);
+
+            apiReachable = false;
+            var disconnected = await healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+            Assert.Equal(HealthStatus.Unhealthy, disconnected.Status);
+            Assert.False(registry.Get(gameController)!.IsReady);
+
+            callerCancellation = new CancellationTokenSource();
+            cancelOnProbe = true;
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                callerCancellation.Token));
+            Assert.False(registry.Get(gameController)!.IsReady);
+
+            cancelOnProbe = false;
+            delayPastBudget = true;
+            var lateSuccess = await healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+            Assert.Equal(HealthStatus.Unhealthy, lateSuccess.Status);
+            Assert.False(registry.Get(gameController)!.IsReady);
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot))
+            {
+                Directory.Delete(fixtureRoot, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task StandardGameControllerHealthOnlyReadiesTheCurrentOwnedGeneration()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-gc-current-model-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        DcpBaseResourceReadinessRegistry? registry = null;
+        IResource? gameController = null;
+
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    "base-gc-current-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-base-gc-current-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { },
+                gameControllerControlEndpointResolver: (endpoint, _) =>
+                {
+                    Assert.Equal("game-controller-control", endpoint.EndpointName);
+                    Assert.Same(gameController, endpoint.Resource);
+                    return Task.FromResult(new Uri("http://127.0.0.1:49124/", UriKind.Absolute));
+                },
+                gameControllerControlApiProbe: (_, _) =>
+                {
+                    registry!.ObserveUnavailable(gameController!, "gc-runtime-key", "Stopped");
+                    registry.ObserveCurrent(new("gc-next-key", "game-controller", new string('b', 64)), "Running");
+                    return Task.FromResult(true);
+                });
+
+            using var services = builder.Services.BuildServiceProvider();
+            registry = services.GetRequiredService<DcpBaseResourceReadinessRegistry>();
+            gameController = resources.GameController.Resource;
+            var endpointAnnotation = Assert.Single(
+                gameController.Annotations.OfType<EndpointAnnotation>(),
+                endpoint => endpoint.Name == "game-controller-control");
+            Assert.Null(endpointAnnotation.Port);
+            registry.ObserveCurrent(new("gc-runtime-key", "game-controller", new string('a', 64)), "Running");
+            var candidate = Assert.Single(registry.GetCandidates(), item => ReferenceEquals(item.Resource, gameController));
+            Assert.True(registry.TryMarkIdentityVerified(
+                [new DcpBaseResourceOwnershipProof(
+                    gameController, candidate.ResourceId, candidate.ContainerId!, candidate.Generation,
+                    "expected-engine", "aspire-default-network")],
+                sharedStandardDcpNetworkVerified: true));
+            var registration = Assert.Single(
+                services.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value.Registrations,
+                item => item.Name == "dcp-game-controller-service-ready");
+
+            var result = await registration.Factory(services).CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+
+            Assert.Equal(HealthStatus.Unhealthy, result.Status);
+            var snapshot = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(gameController));
+            Assert.Equal("gc-next-key", snapshot.ResourceId);
+            Assert.Equal(new string('b', 64), snapshot.ContainerId);
+            Assert.False(snapshot.IsReady);
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot))
+            {
+                Directory.Delete(fixtureRoot, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public async Task BaseRegistrationUsesDcpOwnedContainerResourcesForTheSelectedSimulationServices()
     {
         var builder = DistributedApplication.CreateBuilder([]);

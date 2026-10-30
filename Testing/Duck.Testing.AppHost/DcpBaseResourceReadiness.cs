@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using System.Net;
+using System.Net.WebSockets;
 using System.Text.Json;
 using Tracker.RuntimeHost;
 
@@ -468,6 +469,34 @@ internal sealed class DcpBaseResourceReadinessRegistry
         }
     }
 
+    internal bool SetGameControllerServiceReadiness(
+        DcpBaseResourceIdentityCandidate candidate,
+        bool isReady,
+        string reason)
+    {
+        ArgumentNullException.ThrowIfNull(candidate);
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+        lock (sync)
+        {
+            if (!entries.TryGetValue(candidate.Resource, out var entry) ||
+                entry.Role != "game-controller" ||
+                entry.ResourceKeyAmbiguous ||
+                entry.ResourceId != candidate.ResourceId ||
+                entry.ContainerId != candidate.ContainerId ||
+                entry.Generation != candidate.Generation ||
+                entry.State != "Running" ||
+                !entry.IdentityVerified || !entry.NetworkVerified || !entry.OwnershipVerified ||
+                !OwnedContainerInspection.IsFullId(entry.ContainerId))
+            {
+                return false;
+            }
+
+            entry.IsReady = isReady;
+            entry.Reason = reason;
+            return true;
+        }
+    }
+
     internal bool ObserveSimulatorVision(
         DcpBaseResourceIdentityCandidate candidate,
         ResourceDiagnosticIdentity receiverIdentity,
@@ -679,6 +708,8 @@ internal static class DcpBaseResourceReadinessRegistration
         EndpointReference duckVisionEndpoint,
         ContainerIdentityHandoffStateStore handoffStates,
         string expectedCraneTeamName,
+        Func<EndpointReference, CancellationToken, Task<Uri>>? gameControllerControlEndpointResolver,
+        Func<Uri, CancellationToken, Task<bool>>? gameControllerControlApiProbe,
         params (IResource Resource, string Role)[] resources)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -755,8 +786,18 @@ internal static class DcpBaseResourceReadinessRegistration
                 ? new DcpBaseCraneReadinessProbe(
                     registry, resource, dockerRunner, dockerContextName, expectedCraneTeamName)
                 : null;
+            var gameControllerProbe = role == "game-controller"
+                ? new DcpBaseGameControllerReadinessProbe(
+                    registry,
+                    resource,
+                    cancellationToken => ResolveGameControllerControlEndpointAsync(
+                        container.GetEndpoint("game-controller-control"),
+                        gameControllerControlEndpointResolver,
+                        cancellationToken),
+                    gameControllerControlApiProbe)
+                : null;
             IHealthCheck healthCheck = new DcpBaseResourceReadinessHealthCheck(
-                registry, resource, visionProbe, craneProbe);
+                registry, resource, visionProbe, craneProbe, gameControllerProbe);
             builder.Services.AddHealthChecks().AddCheck(checkName, healthCheck);
             builder.CreateResourceBuilder(container).WithHealthCheck(checkName);
         }
@@ -774,6 +815,27 @@ internal static class DcpBaseResourceReadinessRegistration
         }
         return new Uri(endpointValue, UriKind.Absolute);
     }
+
+    private static async Task<Uri> ResolveControlEndpointAsync(
+        EndpointReference endpoint,
+        CancellationToken cancellationToken)
+    {
+        var value = await endpoint.GetValueAsync(cancellationToken).ConfigureAwait(false);
+        var endpointValue = value?.ToString();
+        if (string.IsNullOrWhiteSpace(endpointValue))
+        {
+            throw new InvalidOperationException("The Game Controller control endpoint has not been allocated.");
+        }
+        return new Uri(endpointValue, UriKind.Absolute);
+    }
+
+    private static Task<Uri> ResolveGameControllerControlEndpointAsync(
+        EndpointReference endpoint,
+        Func<EndpointReference, CancellationToken, Task<Uri>>? endpointResolver,
+        CancellationToken cancellationToken) =>
+        endpointResolver is null
+            ? ResolveControlEndpointAsync(endpoint, cancellationToken)
+            : endpointResolver(endpoint, cancellationToken);
 }
 
 /// <summary>現在所有されているCraneへ既存のROS診断を実行し、同じ世代へ準備状態を記録します。</summary>
@@ -910,9 +972,11 @@ internal sealed class DcpBaseResourceReadinessHealthCheck(
     DcpBaseResourceReadinessRegistry registry,
     IResource resource,
     DcpBaseSimulatorVisionReadinessProbe? simulatorVisionProbe = null,
-    DcpBaseCraneReadinessProbe? craneReadinessProbe = null) : IHealthCheck
+    DcpBaseCraneReadinessProbe? craneReadinessProbe = null,
+    DcpBaseGameControllerReadinessProbe? gameControllerReadinessProbe = null) : IHealthCheck
 {
     internal DcpBaseCraneReadinessProbe? CraneReadinessProbe => craneReadinessProbe;
+    internal DcpBaseGameControllerReadinessProbe? GameControllerReadinessProbe => gameControllerReadinessProbe;
 
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
@@ -926,6 +990,10 @@ internal sealed class DcpBaseResourceReadinessHealthCheck(
         {
             return await craneReadinessProbe.CheckAsync(cancellationToken).ConfigureAwait(false);
         }
+        if (gameControllerReadinessProbe is not null)
+        {
+            return await gameControllerReadinessProbe.CheckAsync(cancellationToken).ConfigureAwait(false);
+        }
         cancellationToken.ThrowIfCancellationRequested();
 
         var snapshot = registry.Get(resource);
@@ -937,6 +1005,164 @@ internal sealed class DcpBaseResourceReadinessHealthCheck(
 
         return HealthCheckResult.Healthy(snapshot.Reason);
     }
+}
+
+internal sealed class DcpBaseGameControllerReadinessProbe(
+    DcpBaseResourceReadinessRegistry registry,
+    IResource gameController,
+    Func<CancellationToken, Task<Uri>> resolveControlEndpoint,
+    Func<Uri, CancellationToken, Task<bool>>? controlApiProbe = null)
+{
+    private static readonly TimeSpan ProbeBudget = TimeSpan.FromSeconds(2);
+
+    internal async Task<HealthCheckResult> CheckAsync(CancellationToken cancellationToken)
+    {
+        var candidate = CurrentCandidate();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            ClearReadiness(candidate, "The Game Controller control API check was canceled.");
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+        if (!IsOwnedRunning(candidate))
+        {
+            ClearReadiness(candidate, "The Game Controller has no current owned running container identity.");
+            return HealthCheckResult.Unhealthy("The Game Controller has no current owned running container identity.");
+        }
+
+        registry.SetGameControllerServiceReadiness(
+            candidate!, false, "The current Game Controller control API has not been checked.");
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(ProbeBudget);
+        var timer = System.Diagnostics.Stopwatch.StartNew();
+        try
+        {
+            var endpoint = await resolveControlEndpoint(budget.Token).ConfigureAwait(false);
+            var controlUri = CreateControlApiUri(endpoint);
+            var reachable = controlApiProbe is not null
+                ? await controlApiProbe(controlUri, budget.Token).ConfigureAwait(false)
+                : await ConnectControlApiAsync(controlUri, budget.Token).ConfigureAwait(false);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                ClearReadiness(candidate, "The Game Controller control API check was canceled.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                ClearReadiness(candidate, "The bounded Game Controller control API check expired.");
+                return HealthCheckResult.Unhealthy("The bounded Game Controller control API check expired.");
+            }
+            if (!reachable)
+            {
+                ClearReadiness(candidate, "The current Game Controller control API did not accept a WebSocket connection.");
+                return HealthCheckResult.Unhealthy("The current Game Controller control API did not accept a WebSocket connection.");
+            }
+
+            var current = CurrentCandidate();
+            if (!SameCurrent(candidate!, current) || !registry.AreOwnershipProofsCurrent([current!]))
+            {
+                ClearReadiness(candidate, "The Game Controller identity changed while its control API was checked.");
+                return HealthCheckResult.Unhealthy("The Game Controller identity changed while its control API was checked.");
+            }
+            if (cancellationToken.IsCancellationRequested)
+            {
+                ClearReadiness(candidate, "The Game Controller control API check was canceled.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                ClearReadiness(candidate, "The bounded Game Controller control API check expired.");
+                return HealthCheckResult.Unhealthy("The bounded Game Controller control API check expired.");
+            }
+            if (!registry.SetGameControllerServiceReadiness(
+                    candidate!, true, "The current owned Game Controller control API accepted a WebSocket connection."))
+            {
+                return HealthCheckResult.Unhealthy("The Game Controller identity or ownership changed before readiness was applied.");
+            }
+            if (cancellationToken.IsCancellationRequested)
+            {
+                ClearReadiness(candidate, "The Game Controller control API check was canceled.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                ClearReadiness(candidate, "The bounded Game Controller control API check expired.");
+                return HealthCheckResult.Unhealthy("The bounded Game Controller control API check expired.");
+            }
+            var final = CurrentCandidate();
+            if (!SameCurrent(candidate!, final) || !registry.AreOwnershipProofsCurrent([final!]))
+            {
+                ClearReadiness(candidate, "The Game Controller identity changed before readiness was returned.");
+                return HealthCheckResult.Unhealthy("The Game Controller identity changed before readiness was returned.");
+            }
+
+            return HealthCheckResult.Healthy("The current owned Game Controller control API accepted a WebSocket connection.");
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            ClearReadiness(candidate, "The Game Controller control API check was canceled.");
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            ClearReadiness(candidate, "The bounded Game Controller control API check expired.");
+            return HealthCheckResult.Unhealthy("The bounded Game Controller control API check expired.");
+        }
+        catch (Exception exception) when (exception is WebSocketException or IOException or InvalidOperationException or UriFormatException)
+        {
+            ClearReadiness(candidate, "The current Game Controller control API endpoint could not be reached safely.");
+            return HealthCheckResult.Unhealthy("The current Game Controller control API endpoint could not be reached safely.");
+        }
+    }
+
+    internal static Uri CreateControlApiUri(Uri endpoint)
+    {
+        ArgumentNullException.ThrowIfNull(endpoint);
+        if (!endpoint.IsAbsoluteUri || !endpoint.IsLoopback || endpoint.Port is < 1 or > 65535 ||
+            endpoint.Scheme is not ("http" or "https"))
+        {
+            throw new InvalidOperationException("The Game Controller control endpoint must be an allocated loopback HTTP endpoint.");
+        }
+
+        return new UriBuilder(endpoint)
+        {
+            Scheme = endpoint.Scheme == "https" ? "wss" : "ws",
+            Path = "/api/control",
+            Query = string.Empty,
+            Fragment = string.Empty,
+        }.Uri;
+    }
+
+    private static async Task<bool> ConnectControlApiAsync(Uri endpoint, CancellationToken cancellationToken)
+    {
+        using var socket = new ClientWebSocket();
+        await socket.ConnectAsync(endpoint, cancellationToken).ConfigureAwait(false);
+        return socket.State == WebSocketState.Open;
+    }
+
+    private DcpBaseResourceIdentityCandidate? CurrentCandidate() => registry.GetCandidates()
+        .SingleOrDefault(candidate => ReferenceEquals(candidate.Resource, gameController));
+
+    private bool IsOwnedRunning(DcpBaseResourceIdentityCandidate? candidate) => candidate is not null &&
+        candidate.Role == "game-controller" && candidate.State == "Running" && !candidate.ResourceKeyAmbiguous &&
+        !string.IsNullOrWhiteSpace(candidate.ResourceId) && OwnedContainerInspection.IsFullId(candidate.ContainerId) &&
+        candidate.IdentityVerified && candidate.NetworkVerified && candidate.OwnershipVerified &&
+        registry.AreOwnershipProofsCurrent([candidate]);
+
+    private void ClearReadiness(DcpBaseResourceIdentityCandidate? candidate, string reason)
+    {
+        if (candidate is not null)
+        {
+            registry.SetGameControllerServiceReadiness(candidate, false, reason);
+        }
+    }
+
+    private static bool SameCurrent(
+        DcpBaseResourceIdentityCandidate expected,
+        DcpBaseResourceIdentityCandidate? current) =>
+        current is not null && ReferenceEquals(expected.Resource, current.Resource) &&
+        expected.ResourceId == current.ResourceId && expected.ContainerId == current.ContainerId &&
+        expected.Generation == current.Generation && current.State == "Running" &&
+        current.IdentityVerified && current.NetworkVerified && current.OwnershipVerified;
 }
 
 internal sealed class DcpBaseSimulatorVisionReadinessProbe(

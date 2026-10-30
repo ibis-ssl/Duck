@@ -43,7 +43,9 @@ internal static class BaseSimulationResourceRegistration
         BaseSimulationRegistrationOptions options,
         Func<IResourceBuilder<IResource>, IResourceBuilder<ContainerResource>> addDuck,
         Action<IResourceBuilder<IResource>> addGameControllerDependentResource,
-        ContainerIdentityHandoffStateStore? handoffStates = null)
+        ContainerIdentityHandoffStateStore? handoffStates = null,
+        Func<EndpointReference, CancellationToken, Task<Uri>>? gameControllerControlEndpointResolver = null,
+        Func<Uri, CancellationToken, Task<bool>>? gameControllerControlApiProbe = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(options);
@@ -261,6 +263,8 @@ internal static class BaseSimulationResourceRegistration
                 duck.Resource.GetEndpoint("vision-health"),
                 handoffStates ?? new ContainerIdentityHandoffStateStore(),
                 options.CraneTeamName,
+                gameControllerControlEndpointResolver,
+                gameControllerControlApiProbe,
                 readinessResources.ToArray());
 
             if (cm4Simulator is not null)
