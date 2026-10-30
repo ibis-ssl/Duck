@@ -81,6 +81,213 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         }
     }
 
+    [Fact]
+    public async Task StartsOnlyTheOwnedCurrentCm4SessionAndReapsItAfterDcpStopAndExecExit()
+    {
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance,
+            lifetime);
+        var runId = "observer-cm4-session-run";
+        var stackId = "observer-cm4-session-stack";
+        var resources = new (IResource Resource, string Role)[]
+        {
+            (new ContainerResource("simulator", "example/simulator:fixed"), "simulator"),
+            (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller"),
+            (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim"),
+            (new ContainerResource("crane", "example/crane:fixed"), "crane"),
+        };
+        var registry = new DcpBaseResourceReadinessRegistry(
+            resources.Select(item => (item.Resource, item.Role, runId)),
+            stackId);
+        var runner = new ObserverDockerRunner(runId, stackId);
+        var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
+            registry,
+            runner,
+            "desktop-linux",
+            "expected-engine");
+        var cm4Resource = resources.Single(item => item.Role == "cm4-sim").Resource;
+        var sessions = new OwnedCm4TransportServerSessionManager(
+            registry,
+            runner,
+            cm4Resource,
+            "desktop-linux",
+            "expected-engine",
+            runId);
+        var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
+        foreach (var (resource, role) in resources) roles.Add(resource, role);
+        var observer = new DcpBaseResourceReadinessObserver(
+            notifications,
+            new DcpBaseResourceReadinessEventConsumer(registry),
+            ownershipConsumer,
+            roles,
+            sessions);
+
+        await observer.StartAsync(CancellationToken.None);
+        var observerStopped = false;
+        try
+        {
+            foreach (var (resource, role) in resources)
+            {
+                await notifications.PublishUpdateAsync(resource, $"{role}-key-a", _ => Snapshot("Running", ContainerId(role)));
+            }
+            await runner.FirstInspectStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            runner.ReleaseFirstInspect.TrySetResult();
+            await WaitUntilAsync(() => registry.GetCandidates().All(item => item.OwnershipVerified));
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", ContainerId("cm4-sim")));
+
+            try
+            {
+                await runner.ForegroundSessionStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            }
+            catch (TimeoutException exception)
+            {
+                var candidates = string.Join("; ", registry.GetCandidates().Select(item =>
+                    $"{item.Role}:{item.State}:{item.ContainerId}:{item.IdentityVerified}/{item.NetworkVerified}/{item.OwnershipVerified}:{item.ObservedNetworkAddress}"));
+                var ownership = await ownershipConsumer.VerifyCurrentAsync(
+                    resourceId => notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                    CancellationToken.None);
+                throw new Xunit.Sdk.XunitException($"No owned CM4 session started. Inspects={runner.InspectCount}; ownership={ownership.Disposition}:{ownership.Reason}; candidates={candidates}; cause={exception.Message}");
+            }
+            var firstSession = Assert.Single(runner.ForegroundSessions);
+            Assert.Equal(new string('3', 64), firstSession.Arguments[firstSession.Arguments.IndexOf("--cm4-container-id") + 1]);
+            var firstGeneration = long.Parse(firstSession.Arguments[firstSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture);
+            Assert.True(firstGeneration > 0);
+            Assert.Contains("--server", firstSession.Arguments);
+            Assert.False(registry.Get(cm4Resource)!.IsReady);
+
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", ContainerId("cm4-sim")));
+            firstSession.Session.CompleteExit();
+            await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
+            await firstSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
+
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('5', 64)));
+            await runner.ForegroundSessionCountReached(2).WaitAsync(TimeSpan.FromSeconds(3));
+            var replacementSession = runner.ForegroundSessions[1];
+            Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
+            Assert.True(long.Parse(replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture) > firstGeneration);
+
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", new string('5', 64)));
+            await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource)).State == "Stopped");
+            replacementSession.Session.CompleteExit();
+            using (var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
+            {
+                await observer.StopAsync(stopTimeout.Token);
+            }
+            observerStopped = true;
+            await replacementSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        }
+        finally
+        {
+            if (!observerStopped)
+            {
+                using var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                await observer.StopAsync(stopTimeout.Token);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DoesNotStartReplacementWhilePriorOwnedExecSessionHasNotExited()
+    {
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance,
+            lifetime);
+        var runId = "observer-cm4-session-run";
+        var stackId = "observer-cm4-session-stack";
+        var resources = new (IResource Resource, string Role)[]
+        {
+            (new ContainerResource("simulator", "example/simulator:fixed"), "simulator"),
+            (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller"),
+            (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim"),
+            (new ContainerResource("crane", "example/crane:fixed"), "crane"),
+        };
+        var registry = new DcpBaseResourceReadinessRegistry(
+            resources.Select(item => (item.Resource, item.Role, runId)),
+            stackId);
+        var runner = new ObserverDockerRunner(runId, stackId);
+        var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(registry, runner, "desktop-linux", "expected-engine");
+        var cm4Resource = resources.Single(item => item.Role == "cm4-sim").Resource;
+        var sessions = new OwnedCm4TransportServerSessionManager(registry, runner, cm4Resource, "desktop-linux", "expected-engine", runId);
+        var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
+        foreach (var (resource, role) in resources) roles.Add(resource, role);
+        var observer = new DcpBaseResourceReadinessObserver(
+            notifications,
+            new DcpBaseResourceReadinessEventConsumer(registry),
+            ownershipConsumer,
+            roles,
+            sessions);
+
+        await observer.StartAsync(CancellationToken.None);
+        var observerStopped = false;
+        try
+        {
+            foreach (var (resource, role) in resources)
+            {
+                await notifications.PublishUpdateAsync(resource, $"{role}-key-a", _ => Snapshot("Running", ContainerId(role)));
+            }
+            await runner.FirstInspectStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            runner.ReleaseFirstInspect.TrySetResult();
+            await WaitUntilAsync(() => registry.GetCandidates().All(item => item.OwnershipVerified));
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", ContainerId("cm4-sim")));
+            try
+            {
+                await runner.ForegroundSessionStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            }
+            catch (TimeoutException exception)
+            {
+                var candidates = string.Join("; ", registry.GetCandidates().Select(item =>
+                    $"{item.Role}:{item.State}:{item.ContainerId}:{item.IdentityVerified}/{item.NetworkVerified}/{item.OwnershipVerified}:{item.ObservedNetworkAddress}"));
+                var ownership = await ownershipConsumer.VerifyCurrentAsync(
+                    resourceId => notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                    CancellationToken.None);
+                throw new Xunit.Sdk.XunitException($"No owned CM4 session started. Inspects={runner.InspectCount}; ownership={ownership.Disposition}:{ownership.Reason}; candidates={candidates}; cause={exception.Message}");
+            }
+
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", ContainerId("cm4-sim")));
+            await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource)).State == "Stopped");
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('5', 64)));
+            await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
+
+            await WaitUntilAsync(() =>
+            {
+                var current = registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource));
+                return current.ContainerId == new string('5', 64) && current.OwnershipVerified;
+            });
+            Assert.Single(runner.ForegroundSessions);
+            Assert.False(runner.ForegroundSessions[0].Session.HasExited);
+
+            runner.ForegroundSessions[0].Session.CompleteExit();
+            await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
+            try
+            {
+                await runner.ForegroundSessionCountReached(2).WaitAsync(TimeSpan.FromSeconds(3));
+            }
+            catch (TimeoutException exception)
+            {
+                var current = registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource));
+                throw new Xunit.Sdk.XunitException($"Replacement session did not start. oldExited={runner.ForegroundSessions[0].Session.HasExited}; oldDisposed={runner.ForegroundSessions[0].Session.Disposed.Task.IsCompleted}; candidate={current.State}:{current.ContainerId}:{current.IdentityVerified}/{current.OwnershipVerified}; observer={observer.ExecuteTask?.Status}; cause={exception.Message}");
+            }
+            using (var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
+            {
+                await observer.StopAsync(stopTimeout.Token);
+            }
+            observerStopped = true;
+            Assert.False(runner.ForegroundSessions[1].Session.HasExited);
+            Assert.False(runner.ForegroundSessions[1].Session.Disposed.Task.IsCompleted);
+            runner.ForegroundSessions[1].Session.CompleteExit();
+        }
+        finally
+        {
+            if (!observerStopped)
+            {
+                using var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                await observer.StopAsync(stopTimeout.Token);
+            }
+        }
+    }
+
     private static string ContainerId(string role) => role switch
     {
         "simulator" => new string('1', 64),
@@ -95,6 +302,18 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         State = new ResourceStateSnapshot(state, "fixture"),
         Properties = containerId is null ? [] : [new ResourcePropertySnapshot("container.id", containerId)],
     };
+
+    private static async Task WaitUntilAsync(Func<bool> condition)
+    {
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(3);
+        while (DateTime.UtcNow < deadline)
+        {
+            if (condition()) return;
+            await Task.Delay(TimeSpan.FromMilliseconds(10));
+        }
+
+        Assert.True(condition(), "The expected DCP ownership state was not observed before the test deadline.");
+    }
 
     private sealed class TestApplicationLifetime : IHostApplicationLifetime, IDisposable
     {
@@ -113,12 +332,37 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         }
     }
 
-    private sealed class ObserverDockerRunner(string runId, string stackId) : IDockerStdioCommandRunner
+    private sealed class ObserverDockerRunner(string runId, string stackId) : IDockerStdioCommandRunner, IDockerCliForegroundSessionRunner
     {
         private int inspectCount;
 
         internal TaskCompletionSource FirstInspectStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource ReleaseFirstInspect { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource ForegroundSessionStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal List<(string[] Arguments, ControlledForegroundSession Session)> ForegroundSessions { get; } = [];
+        internal int InspectCount => Volatile.Read(ref inspectCount);
+
+        internal Task ForegroundSessionCountReached(int count) => Task.Run(async () =>
+        {
+            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(3);
+            while (DateTime.UtcNow < deadline)
+            {
+                if (ForegroundSessions.Count >= count) return;
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+            }
+            throw new TimeoutException($"Expected {count} foreground sessions.");
+        });
+
+        public IDockerCliForegroundSession StartForegroundSession(IReadOnlyList<string> arguments)
+        {
+            var session = new ControlledForegroundSession();
+            lock (ForegroundSessions)
+            {
+                ForegroundSessions.Add((arguments.ToArray(), session));
+                ForegroundSessionStarted.TrySetResult();
+            }
+            return session;
+        }
 
         public async Task<DockerStdioCommandResult> CaptureBoundedAsync(
             IReadOnlyList<string> arguments,
@@ -144,6 +388,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 '1' => "simulator",
                 '2' => "game-controller",
                 '3' => "cm4-sim",
+                '5' => "cm4-sim",
                 _ => "crane",
             };
             return new DockerStdioCommandResult(0, InspectJson(containerId, role, runId, stackId), string.Empty);
@@ -166,6 +411,21 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             string? expectedBootId,
             CancellationToken cancellationToken) => throw new NotSupportedException();
 
+        internal sealed class ControlledForegroundSession : IDockerCliForegroundSession
+        {
+            private readonly TaskCompletionSource<int> completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+            internal TaskCompletionSource Disposed { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+            public bool HasExited => completion.Task.IsCompleted;
+            public Task<int> Completion => completion.Task;
+            internal void CompleteExit(int exitCode = 0) => completion.TrySetResult(exitCode);
+            public ValueTask DisposeAsync()
+            {
+                if (!HasExited) throw new InvalidOperationException("The owned foreground process has not exited.");
+                Disposed.TrySetResult();
+                return ValueTask.CompletedTask;
+            }
+        }
+
         private static string InspectJson(string containerId, string role, string runId, string stackId) =>
             JsonSerializer.Serialize(new
             {
@@ -187,7 +447,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 {
                     Networks = new Dictionary<string, object>(StringComparer.Ordinal)
                     {
-                        ["aspire-default-network"] = new { IPAddress = "172.28.0.10" },
+                        ["aspire-default-network"] = new { IPAddress = "172.28.0.10", NetworkID = new string('a', 64) },
                     },
                 },
             });

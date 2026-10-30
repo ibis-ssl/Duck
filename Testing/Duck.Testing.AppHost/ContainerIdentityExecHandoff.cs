@@ -59,6 +59,19 @@ internal interface IDockerCliChildProcessFactory
     IDockerCliChildProcess Start(ProcessStartInfo startInfo);
 }
 
+/// <summary>所有済み Docker CLI 前景処理の終了確認とローカル資源の解放を表します。</summary>
+internal interface IDockerCliForegroundSession : IAsyncDisposable
+{
+    bool HasExited { get; }
+    Task<int> Completion { get; }
+}
+
+/// <summary>既存の Docker CLI 実行境界で前景処理を起動します。</summary>
+internal interface IDockerCliForegroundSessionRunner
+{
+    IDockerCliForegroundSession StartForegroundSession(IReadOnlyList<string> arguments);
+}
+
 internal sealed record ContainerIdentityHandoffState(long Generation, string BootId);
 
 internal sealed class ContainerIdentityHandoffStateStore
@@ -287,7 +300,7 @@ internal static class ContainerIdentityExecHandoff
 /// <summary>
 /// Docker CLIを構造化引数で起動し、メタデータ取得またはUDS中継を行います。
 /// </summary>
-internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
+internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner, IDockerCliForegroundSessionRunner
 {
     private readonly string executablePath;
     private readonly IDockerCliChildProcessFactory childProcessFactory;
@@ -388,6 +401,14 @@ internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
         {
             if (!retainedForRecovery && (recovered || process.HasExited)) process.Dispose();
         }
+    }
+
+    /// <summary>引数を分割したまま Docker CLI を起動し、終了確認可能な所有済みセッションを返します。</summary>
+    public IDockerCliForegroundSession StartForegroundSession(IReadOnlyList<string> arguments)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+        var process = StartChildProcess(CreateStartInfo(arguments, redirectInput: false));
+        return new DockerCliForegroundSession(process);
     }
 
     public async Task<DockerStdioCommandResult> CaptureBoundedAsync(
@@ -500,6 +521,63 @@ internal sealed class DockerCliCommandRunner : IDockerStdioCommandRunner
     private sealed class BoundedCommandSlot(SemaphoreSlim gate) : IDisposable
     {
         public void Dispose() => gate.Release();
+    }
+
+    private sealed class DockerCliForegroundSession : IDockerCliForegroundSession
+    {
+        private readonly IDockerCliChildProcess process;
+        private readonly Task<int> completion;
+        private int disposed;
+
+        internal DockerCliForegroundSession(IDockerCliChildProcess process)
+        {
+            this.process = process;
+            var standardOutput = DrainOutputAsync(process.StandardOutput);
+            var standardError = DrainOutputAsync(process.StandardError);
+            completion = WaitForExitAndDrainAsync(process, standardOutput, standardError);
+        }
+
+        public bool HasExited => process.HasExited;
+
+        public Task<int> Completion => completion;
+
+        public async ValueTask DisposeAsync()
+        {
+            if (!process.HasExited)
+            {
+                throw new InvalidOperationException("A foreground Docker CLI session cannot be released before its process exit is confirmed.");
+            }
+
+            await completion.ConfigureAwait(false);
+            if (Interlocked.Exchange(ref disposed, 1) == 0)
+            {
+                process.Dispose();
+            }
+        }
+
+        private static async Task<int> WaitForExitAndDrainAsync(
+            IDockerCliChildProcess process,
+            Task standardOutput,
+            Task standardError)
+        {
+            await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
+            await Task.WhenAll(standardOutput, standardError).ConfigureAwait(false);
+            return process.ExitCode;
+        }
+
+        private static async Task DrainOutputAsync(TextReader reader)
+        {
+            var buffer = new char[512];
+            try
+            {
+                while (await reader.ReadAsync(buffer.AsMemory(), CancellationToken.None).ConfigureAwait(false) is > 0)
+                {
+                }
+            }
+            catch (IOException)
+            {
+            }
+        }
     }
 
     private static async Task RecoverProcessAsync(

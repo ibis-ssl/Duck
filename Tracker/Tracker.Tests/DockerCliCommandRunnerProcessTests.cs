@@ -6,6 +6,35 @@ namespace Tracker.Tests;
 public sealed class DockerCliCommandRunnerProcessTests
 {
     [Fact]
+    public async Task ForegroundSessionKeepsItsOwnedCliProcessUntilTheRemoteCommandExits()
+    {
+        var child = new ControlledChildProcess();
+        var factory = new ControlledChildProcessFactory(child);
+        var runner = new DockerCliCommandRunner("controlled-docker", factory);
+        var arguments = new[]
+        {
+            "--context", "desktop-linux", "exec", new string('a', 64),
+            "/opt/duck/cm4-transport-control", "--server",
+            "--run-id", "owned-run", "--engine-id", "owned-engine",
+            "--cm4-resource-id", "opaque-cm4-key", "--cm4-container-id", new string('a', 64),
+            "--cm4-generation", "4", "--helper-launch-id", "owned-run", "--cm4-ip", "172.28.0.4",
+        };
+
+        var session = runner.StartForegroundSession(arguments);
+        await child.StandardOutputReader.ReadStarted.Task.WaitAsync(TimeSpan.FromSeconds(1));
+
+        Assert.False(session.HasExited);
+        Assert.False(session.Completion.IsCompleted);
+        Assert.Equal(arguments, factory.LastArguments);
+        Assert.Equal(0, child.KillCalls);
+
+        child.CompleteExit();
+        Assert.Equal(0, await session.Completion.WaitAsync(TimeSpan.FromSeconds(1)));
+        await session.DisposeAsync();
+        Assert.Equal(0, child.KillCalls);
+    }
+
+    [Fact]
     public async Task CancellationKillsAndWaitsForTheOwnedCliProcess()
     {
         var child = new ControlledChildProcess(blockStandardOutput: true);
@@ -219,12 +248,14 @@ public sealed class DockerCliCommandRunnerProcessTests
         }
 
         public int StartCalls { get; private set; }
+        public string[] LastArguments { get; private set; } = [];
 
         public IDockerCliChildProcess Start(ProcessStartInfo startInfo)
         {
             StartCalls++;
             Assert.Equal("controlled-docker", startInfo.FileName);
             Assert.False(startInfo.UseShellExecute);
+            LastArguments = startInfo.ArgumentList.ToArray();
             return children.Dequeue();
         }
     }

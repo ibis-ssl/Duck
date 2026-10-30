@@ -40,7 +40,8 @@ internal sealed record DcpBaseResourceIdentityCandidate(
     bool NetworkVerified,
     bool OwnershipVerified,
     string? ObservedNetworkName,
-    bool ResourceKeyAmbiguous);
+    bool ResourceKeyAmbiguous,
+    string? ObservedNetworkAddress = null);
 
 internal sealed record DcpBaseResourceOwnershipProof(
     IResource Resource,
@@ -48,7 +49,8 @@ internal sealed record DcpBaseResourceOwnershipProof(
     string ContainerId,
     long Generation,
     string EngineId,
-    string? NetworkName);
+    string? NetworkName,
+    string? NetworkAddress = null);
 
 /// <summary>DCP通知から現在候補の識別子を追跡します。この観測だけでは所有とサービス準備完了を確定しません。</summary>
 internal sealed class DcpBaseResourceReadinessRegistry
@@ -68,6 +70,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
         internal bool NetworkVerified;
         internal bool OwnershipVerified;
         internal string? ObservedNetworkName;
+        internal string? ObservedNetworkAddress;
         internal bool ResourceKeyAmbiguous;
         internal bool HasObservedFullContainerId;
         internal bool IsInitialPlaceholder;
@@ -153,6 +156,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.NetworkVerified = false;
                     entry.OwnershipVerified = false;
                     entry.ObservedNetworkName = null;
+                    entry.ObservedNetworkAddress = null;
                     entry.IsReady = false;
                     entry.Generation++;
                     entry.Reason = "The initial unresolved resource key was replaced by a runtime key with a full container identity; engine ownership and service readiness are unverified.";
@@ -168,6 +172,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.NetworkVerified = false;
                     entry.OwnershipVerified = false;
                     entry.ObservedNetworkName = null;
+                    entry.ObservedNetworkAddress = null;
                     entry.IsReady = false;
                     entry.State = "Unknown";
                     entry.Reason = "Multiple resource keys were observed before the previous key stopped; the current identity is ambiguous.";
@@ -186,6 +191,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                 entry.NetworkVerified = false;
                 entry.OwnershipVerified = false;
                 entry.ObservedNetworkName = null;
+                entry.ObservedNetworkAddress = null;
                 entry.Reason = stateChanged && !identityChanged
                     ? "The DCP state changed; prior engine ownership evidence is invalid and service readiness remains unverified."
                     : "A new current DCP identity candidate was observed; engine ownership and service readiness are unverified.";
@@ -233,6 +239,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                         entry.NetworkVerified = false;
                         entry.OwnershipVerified = false;
                         entry.ObservedNetworkName = null;
+                        entry.ObservedNetworkAddress = null;
                         entry.Generation++;
                         entry.Reason = "The initial unresolved resource key was replaced by a runtime resource key; awaiting its current full container identity.";
                         return null;
@@ -247,6 +254,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                     entry.NetworkVerified = false;
                     entry.OwnershipVerified = false;
                     entry.ObservedNetworkName = null;
+                    entry.ObservedNetworkAddress = null;
                     entry.State = "Unknown";
                     entry.Reason = "Multiple resource keys were observed before the previous key stopped; the current identity is ambiguous.";
                     entry.Generation++;
@@ -272,6 +280,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
             entry.NetworkVerified = false;
             entry.OwnershipVerified = false;
             entry.ObservedNetworkName = null;
+            entry.ObservedNetworkAddress = null;
             entry.Reason = "No current full container identity was projected; engine ownership and service readiness are unverified.";
 
             if (IsTerminalState(state) && entry.ResourceKeyAmbiguous && entry.PendingResourceIds.Count == 1)
@@ -334,7 +343,8 @@ internal sealed class DcpBaseResourceReadinessRegistry
                 entry.NetworkVerified,
                 entry.OwnershipVerified,
                 entry.ObservedNetworkName,
-                entry.ResourceKeyAmbiguous)).ToArray();
+                entry.ResourceKeyAmbiguous,
+                entry.ResourceKeyAmbiguous ? null : entry.ObservedNetworkAddress)).ToArray();
         }
     }
 
@@ -388,6 +398,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
                 entry.NetworkVerified = sharedStandardDcpNetworkVerified;
                 entry.OwnershipVerified = sharedStandardDcpNetworkVerified;
                 entry.ObservedNetworkName = proof.NetworkName;
+                entry.ObservedNetworkAddress = proof.NetworkAddress;
                 entry.Reason = sharedStandardDcpNetworkVerified
                     ? "The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified."
                     : "Docker Engine and container ownership labels were verified; common default-network membership and service readiness remain unverified.";
@@ -417,6 +428,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
             entry.NetworkVerified = false;
             entry.OwnershipVerified = false;
             entry.ObservedNetworkName = null;
+            entry.ObservedNetworkAddress = null;
             entry.Reason = reason;
             return true;
         }
@@ -635,16 +647,246 @@ internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadi
     }
 }
 
+/// <summary>DCP通知で所有が確認された通常CM4資源に前景の補助処理を結び付けます。</summary>
+internal sealed class OwnedCm4TransportServerSessionManager(
+    DcpBaseResourceReadinessRegistry registry,
+    IDockerCliForegroundSessionRunner runner,
+    IResource cm4Resource,
+    string? dockerContextName,
+    string? expectedEngineId,
+    string runId)
+{
+    private const string HelperPath = "/opt/duck/cm4-transport-control";
+    private readonly SemaphoreSlim reconcileGate = new(1, 1);
+    private readonly object sync = new();
+    private IDockerCliForegroundSession? session;
+    private DcpBaseResourceIdentityCandidate? sessionIdentity;
+    private bool sessionResourceStopped;
+    private DcpBaseResourceIdentityCandidate? failedStartIdentity;
+    private bool failedStartResourceStopped;
+
+    /// <summary>前景クライアントの終了後、既存の所有確認を再開する通知です。</summary>
+    internal event Action? SessionCompleted;
+
+    /// <summary>DCP の停止通知を記録し、前景セッションの解放可否を追跡します。</summary>
+    internal void ObserveResourceEvent(ResourceEvent observation, ResourceEvent current)
+    {
+        if (!ReferenceEquals(observation.Resource, cm4Resource) ||
+            !ReferenceEquals(current.Resource, cm4Resource) ||
+            observation.ResourceId != current.ResourceId ||
+            !DcpBaseResourceReadinessRegistry.IsTerminalState(current.Snapshot.State?.Text ?? string.Empty))
+        {
+            return;
+        }
+
+        lock (sync)
+        {
+            if (sessionIdentity?.ResourceId == current.ResourceId)
+            {
+                sessionResourceStopped = true;
+            }
+            if (failedStartIdentity?.ResourceId == current.ResourceId)
+            {
+                failedStartResourceStopped = true;
+            }
+        }
+    }
+
+    /// <summary>現在の所有確認済み CM4 に対し、前景サーバーを一つだけ開始または回収します。</summary>
+    internal async Task ReconcileAsync(
+        Func<string, ResourceEvent?> getCurrentByResourceId,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(getCurrentByResourceId);
+        await reconcileGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            IDockerCliForegroundSession? completedSession = null;
+            lock (sync)
+            {
+                if (session is not null && sessionResourceStopped && session.Completion.IsCompletedSuccessfully)
+                {
+                    completedSession = session;
+                }
+                if (failedStartIdentity is not null && failedStartResourceStopped)
+                {
+                    failedStartIdentity = null;
+                    failedStartResourceStopped = false;
+                }
+            }
+
+            if (completedSession is not null)
+            {
+                await completedSession.DisposeAsync().ConfigureAwait(false);
+                lock (sync)
+                {
+                    if (ReferenceEquals(session, completedSession))
+                    {
+                        session = null;
+                        sessionIdentity = null;
+                        sessionResourceStopped = false;
+                    }
+                }
+            }
+
+            lock (sync)
+            {
+                if (session is not null || failedStartIdentity is not null ||
+                    string.IsNullOrWhiteSpace(dockerContextName) ||
+                    string.IsNullOrWhiteSpace(expectedEngineId))
+                {
+                    return;
+                }
+
+                var candidate = registry.GetCandidates().SingleOrDefault(item =>
+                    ReferenceEquals(item.Resource, cm4Resource) && item.Role == "cm4-sim");
+                if (!IsCurrentOwnedCandidate(candidate, getCurrentByResourceId) ||
+                    candidate is null ||
+                    !IPAddress.TryParse(candidate.ObservedNetworkAddress, out var address) ||
+                    address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return;
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+                var arguments = new[]
+                {
+                    "--context", dockerContextName!, "exec", candidate.ContainerId!, HelperPath, "--server",
+                    "--run-id", runId,
+                    "--engine-id", expectedEngineId!,
+                    "--cm4-resource-id", candidate.ResourceId,
+                    "--cm4-container-id", candidate.ContainerId!,
+                    "--cm4-generation", candidate.Generation.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    "--helper-launch-id", runId,
+                    "--cm4-ip", address.ToString(),
+                };
+
+                try
+                {
+                    var startedSession = runner.StartForegroundSession(arguments);
+                    session = startedSession;
+                    sessionIdentity = candidate;
+                    sessionResourceStopped = false;
+                    startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
+                }
+                catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)
+                {
+                    failedStartIdentity = candidate;
+                    failedStartResourceStopped = false;
+                }
+            }
+        }
+        finally
+        {
+            reconcileGate.Release();
+        }
+    }
+
+    /// <summary>停止通知とローカル実行終了の両方が確認済みの場合だけ、停止時にセッションを解放します。</summary>
+    internal async Task ReapConfirmedStoppedSessionAsync(CancellationToken cancellationToken)
+    {
+        await reconcileGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            IDockerCliForegroundSession? completedSession;
+            lock (sync)
+            {
+                completedSession = session is not null && sessionResourceStopped && session.Completion.IsCompletedSuccessfully
+                    ? session
+                    : null;
+            }
+
+            if (completedSession is null)
+            {
+                return;
+            }
+
+            await completedSession.DisposeAsync().ConfigureAwait(false);
+            lock (sync)
+            {
+                if (ReferenceEquals(session, completedSession))
+                {
+                    session = null;
+                    sessionIdentity = null;
+                    sessionResourceStopped = false;
+                }
+            }
+        }
+        finally
+        {
+            reconcileGate.Release();
+        }
+    }
+
+    private bool IsCurrentOwnedCandidate(
+        DcpBaseResourceIdentityCandidate? candidate,
+        Func<string, ResourceEvent?> getCurrentByResourceId)
+    {
+        if (candidate is null || candidate.ResourceKeyAmbiguous || candidate.State != "Running" ||
+            string.IsNullOrWhiteSpace(candidate.ResourceId) ||
+            !OwnedContainerInspection.IsFullId(candidate.ContainerId) ||
+            !candidate.IdentityVerified || !candidate.NetworkVerified || !candidate.OwnershipVerified ||
+            !registry.AreOwnershipProofsCurrent([candidate]))
+        {
+            return false;
+        }
+
+        var current = getCurrentByResourceId(candidate.ResourceId);
+        return current is not null &&
+            ReferenceEquals(current.Resource, candidate.Resource) &&
+            current.ResourceId == candidate.ResourceId &&
+            current.Snapshot.State?.Text == "Running" &&
+            RegisteredContainerEventProjection.TryProject(
+                candidate.Resource,
+                candidate.ResourceId,
+                "cm4-sim",
+                current,
+                current,
+                out var latest) &&
+            latest is not null &&
+            latest.ContainerId == candidate.ContainerId &&
+            registry.Get(candidate.Resource)?.Generation == candidate.Generation;
+    }
+}
+
 internal sealed class DcpBaseResourceReadinessObserver(
     ResourceNotificationService notifications,
     DcpBaseResourceReadinessEventConsumer consumer,
     DcpBaseResourceOwnershipEventConsumer ownershipConsumer,
-    IReadOnlyDictionary<IResource, string> roles) : BackgroundService
+    IReadOnlyDictionary<IResource, string> roles,
+    OwnedCm4TransportServerSessionManager? cm4TransportSessions = null) : BackgroundService
 {
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await base.StopAsync(cancellationToken).ConfigureAwait(false);
+        if (cm4TransportSessions is not null)
+        {
+            await cm4TransportSessions.ReapConfirmedStoppedSessionAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var verificationRequests = new SemaphoreSlim(0, 1);
         using var verificationStopping = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        void RequestVerification()
+        {
+            try
+            {
+                if (verificationRequests.CurrentCount == 0)
+                {
+                    verificationRequests.Release();
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+        }
+
+        if (cm4TransportSessions is not null)
+        {
+            cm4TransportSessions.SessionCompleted += RequestVerification;
+        }
         var verificationTask = VerifyRequestedOwnershipAsync(verificationRequests, verificationStopping.Token);
         try
         {
@@ -658,14 +900,16 @@ internal sealed class DcpBaseResourceReadinessObserver(
 
                 consumer.Observe(observation, current, role, resourceId =>
                     notifications.TryGetCurrentState(resourceId, out var state) ? state : null);
-                if (verificationRequests.CurrentCount == 0)
-                {
-                    verificationRequests.Release();
-                }
+                cm4TransportSessions?.ObserveResourceEvent(observation, current);
+                RequestVerification();
             }
         }
         finally
         {
+            if (cm4TransportSessions is not null)
+            {
+                cm4TransportSessions.SessionCompleted -= RequestVerification;
+            }
             verificationStopping.Cancel();
             try
             {
@@ -684,9 +928,13 @@ internal sealed class DcpBaseResourceReadinessObserver(
             while (true)
             {
                 await requests.WaitAsync(cancellationToken).ConfigureAwait(false);
-                await ownershipConsumer.VerifyCurrentAsync(
-                    resourceId => notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
-                    cancellationToken).ConfigureAwait(false);
+                ResourceEvent? GetCurrent(string resourceId) =>
+                    notifications.TryGetCurrentState(resourceId, out var state) ? state : null;
+                await ownershipConsumer.VerifyCurrentAsync(GetCurrent, cancellationToken).ConfigureAwait(false);
+                if (cm4TransportSessions is not null)
+                {
+                    await cm4TransportSessions.ReconcileAsync(GetCurrent, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -732,11 +980,26 @@ internal static class DcpBaseResourceReadinessRegistration
         var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
         var dockerRunner = new DockerCliCommandRunner(dockerExecutable);
         builder.Services.AddSingleton<IDockerStdioCommandRunner>(dockerRunner);
+        builder.Services.AddSingleton<IDockerCliForegroundSessionRunner>(dockerRunner);
         var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
             registry,
             dockerRunner,
             dockerContextName,
             expectedEngineId);
+        var cm4Resource = trackedResources
+            .Where(item => item.Role == "cm4-sim")
+            .Select(item => item.Resource)
+            .SingleOrDefault();
+        if (cm4Resource is not null)
+        {
+            builder.Services.AddSingleton(new OwnedCm4TransportServerSessionManager(
+                registry,
+                dockerRunner,
+                cm4Resource,
+                dockerContextName,
+                expectedEngineId,
+                runId));
+        }
         var roleMap = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in trackedResources)
         {
@@ -749,7 +1012,8 @@ internal static class DcpBaseResourceReadinessRegistration
             services.GetRequiredService<ResourceNotificationService>(),
             eventConsumer,
             ownershipConsumer,
-            roleMap));
+            roleMap,
+            services.GetService<OwnedCm4TransportServerSessionManager>()));
 
         var visionHttpClient = new HttpClient(new SocketsHttpHandler
         {

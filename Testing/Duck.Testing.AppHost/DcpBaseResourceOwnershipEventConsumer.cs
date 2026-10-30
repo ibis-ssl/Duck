@@ -151,6 +151,7 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
                         candidate.ContainerId!,
                         candidate.Generation,
                         engineResult.StandardOutput.Trim(),
+                        null,
                         null));
                     continue;
                 }
@@ -170,7 +171,8 @@ internal sealed class DcpBaseResourceOwnershipEventConsumer(
                     candidate.ContainerId!,
                     candidate.Generation,
                     engineResult.StandardOutput.Trim(),
-                    validEndpoint.NetworkName));
+                    validEndpoint.NetworkName,
+                    validEndpoint.Address.ToString()));
             }
 
             foreach (var candidate in candidates)

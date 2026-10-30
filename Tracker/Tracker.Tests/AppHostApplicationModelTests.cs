@@ -13,6 +13,20 @@ namespace Tracker.Tests;
 public sealed class AppHostApplicationModelTests
 {
     [Fact]
+    public async Task StandardBaseRegistersAnOwnedCm4TransportServerSessionLifecycle()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        Assert.Contains(cm4.Annotations.OfType<ContainerImageAnnotation>(), annotation =>
+            annotation.Image == "ghcr.io/ibis-ssl/orion-cm4-sim");
+        Assert.Contains(appHost.Services, descriptor =>
+            descriptor.ServiceType.Name == "OwnedCm4TransportServerSessionManager");
+    }
+
+    [Fact]
     public void StackOwnershipLeaseRejectsSecondOwnerAndAllowsReuseWithExistingMarker()
     {
         var lockPath = Path.Combine(Path.GetTempPath(), $"duck-aspire-stack-{Guid.NewGuid():N}.lock");
