@@ -234,6 +234,11 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
             Assert.True(long.Parse(replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture) > firstGeneration);
             await runner.SecondTargetApplied.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            await WaitUntilAsync(() => targetController.Snapshot() is
+            {
+                Phase: Cm4TransportTargetPhase.Applied,
+                Cm4ContainerId: var containerId,
+            } && containerId == new string('5', 64));
             Assert.Equal(2, runner.StdioCalls);
             Assert.Equal(Cm4TransportTargetPhase.Applied, targetController.Snapshot().Phase);
             Assert.Equal(new string('5', 64), targetController.Snapshot().Cm4ContainerId);
