@@ -654,7 +654,8 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     IResource cm4Resource,
     string? dockerContextName,
     string? expectedEngineId,
-    string runId)
+    string runId,
+    IOwnedCm4TransportTargetController? targetController = null)
 {
     private const string HelperPath = "/opt/duck/cm4-transport-control";
     private readonly SemaphoreSlim reconcileGate = new(1, 1);
@@ -714,6 +715,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
         await reconcileGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            var applyInitialTarget = false;
             IDockerCliForegroundSession? completedSession = null;
             lock (sync)
             {
@@ -781,12 +783,19 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                     sessionIdentity = candidate;
                     sessionResourceStopped = false;
                     startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
+                    applyInitialTarget = targetController?.Snapshot().Phase == Cm4TransportTargetPhase.Initial;
                 }
                 catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)
                 {
                     failedStartIdentity = candidate;
                     failedStartResourceStopped = false;
                 }
+            }
+
+            if (applyInitialTarget && targetController is not null)
+            {
+                // 初回だけ現行所有世代を補助処理へ渡し、失敗時は制御器の Unknown を維持します。
+                await targetController.ApplyCurrentTargetAsync(runId, cancellationToken).ConfigureAwait(false);
             }
         }
         finally
@@ -1006,13 +1015,15 @@ internal static class DcpBaseResourceReadinessRegistration
             .SingleOrDefault();
         if (cm4Resource is not null)
         {
-            builder.Services.AddSingleton(new OwnedCm4TransportServerSessionManager(
-                registry,
-                dockerRunner,
-                cm4Resource,
-                dockerContextName,
-                expectedEngineId,
-                runId));
+            builder.Services.AddSingleton<OwnedCm4TransportServerSessionManager>(services =>
+                new OwnedCm4TransportServerSessionManager(
+                    registry,
+                    services.GetRequiredService<IDockerCliForegroundSessionRunner>(),
+                    cm4Resource,
+                    dockerContextName,
+                    expectedEngineId,
+                    runId,
+                    services.GetService<IOwnedCm4TransportTargetController>()));
         }
         var roleMap = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in trackedResources)

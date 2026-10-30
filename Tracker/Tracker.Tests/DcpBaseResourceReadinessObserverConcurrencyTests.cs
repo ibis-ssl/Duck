@@ -107,13 +107,20 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             "desktop-linux",
             "expected-engine");
         var cm4Resource = resources.Single(item => item.Role == "cm4-sim").Resource;
+        var targetController = new OwnedCm4TransportTargetController(
+            runner,
+            "desktop-linux",
+            "expected-engine",
+            runId,
+            GetCurrentOwnedPair);
         var sessions = new OwnedCm4TransportServerSessionManager(
             registry,
             runner,
             cm4Resource,
             "desktop-linux",
             "expected-engine",
-            runId);
+            runId,
+            targetController);
         var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in resources) roles.Add(resource, role);
         var observer = new DcpBaseResourceReadinessObserver(
@@ -122,6 +129,28 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             ownershipConsumer,
             roles,
             sessions);
+
+        OwnedCm4TransportIdentityPair? GetCurrentOwnedPair()
+        {
+            var simulator = registry.GetCandidates().SingleOrDefault(item => item.Role == "simulator");
+            var cm4 = registry.GetCandidates().SingleOrDefault(item => item.Role == "cm4-sim");
+            if (!IsVerified(simulator) || !IsVerified(cm4)) return null;
+            return new OwnedCm4TransportIdentityPair(ToIdentity(cm4!), ToIdentity(simulator!));
+
+            OwnedCm4TransportIdentity ToIdentity(DcpBaseResourceIdentityCandidate candidate) => new(
+                candidate.RunId,
+                "expected-engine",
+                candidate.ResourceName,
+                candidate.ResourceId,
+                candidate.ContainerId!,
+                candidate.Generation);
+
+            static bool IsVerified(DcpBaseResourceIdentityCandidate? candidate) =>
+                candidate is { IdentityVerified: true, NetworkVerified: true, OwnershipVerified: true } &&
+                !candidate.ResourceKeyAmbiguous &&
+                candidate.State == "Running" &&
+                OwnedContainerInspection.IsFullId(candidate.ContainerId);
+        }
 
         await observer.StartAsync(CancellationToken.None);
         var observerStopped = false;
@@ -154,6 +183,9 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             var firstGeneration = long.Parse(firstSession.Arguments[firstSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture);
             Assert.True(firstGeneration > 0);
             Assert.Contains("--server", firstSession.Arguments);
+            await runner.TargetApplied.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            Assert.Equal(Cm4TransportTargetPhase.Applied, targetController.Snapshot().Phase);
+            Assert.Equal(1, runner.StdioCalls);
             Assert.False(registry.Get(cm4Resource)!.IsReady);
 
             var releaseSignals = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -177,6 +209,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             var replacementSession = runner.ForegroundSessions[1];
             Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
             Assert.True(long.Parse(replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture) > firstGeneration);
+            Assert.Equal(1, runner.StdioCalls);
 
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", new string('5', 64)));
             await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource)).State == "Stopped");
@@ -188,6 +221,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             observerStopped = true;
             await replacementSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
         }
+
         finally
         {
             if (!observerStopped)
@@ -425,7 +459,9 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         internal TaskCompletionSource FirstInspectStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource ReleaseFirstInspect { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource ForegroundSessionStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource TargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal List<(string[] Arguments, ControlledForegroundSession Session)> ForegroundSessions { get; } = [];
+        internal int StdioCalls { get; private set; }
         internal int InspectCount => Volatile.Read(ref inspectCount);
 
         internal Task ForegroundSessionCountReached(int count) => Task.Run(async () =>
@@ -461,6 +497,31 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 return new DockerStdioCommandResult(0, "expected-engine", string.Empty);
             }
 
+            var formatIndex = Array.IndexOf(arguments.ToArray(), "--format");
+            if (formatIndex >= 0 && formatIndex + 1 < arguments.Count &&
+                arguments[formatIndex + 1].Contains("{{.Id}}", StringComparison.Ordinal))
+            {
+                var inspectedId = arguments[^1];
+                var inspectedRole = inspectedId[0] switch
+                {
+                    '1' => "simulator",
+                    '2' => "game-controller",
+                    '3' or '5' or '6' => "cm4-sim",
+                    _ => "crane",
+                };
+                var address = inspectedRole == "simulator" ? "172.28.0.11" : "172.28.0.10";
+                return new DockerStdioCommandResult(
+                    0,
+                    string.Join('\n',
+                        inspectedId,
+                        "running",
+                        "aspire-default-network",
+                        runId,
+                        inspectedRole,
+                        $"aspire-default-network\t{new string('a', 64)}\t{address}"),
+                    string.Empty);
+            }
+
             var currentInspect = Interlocked.Increment(ref inspectCount);
             if (currentInspect == 1)
             {
@@ -486,7 +547,21 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             string standardInput,
             int maximumOutputCharacters,
             TimeSpan timeout,
-            CancellationToken cancellationToken) => throw new NotSupportedException();
+            CancellationToken cancellationToken)
+        {
+            StdioCalls++;
+            var request = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(
+                standardInput.TrimEnd('\r', '\n'),
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            if (request?.Type == "applyTarget") TargetApplied.TrySetResult();
+            var acknowledgement = request is null
+                ? string.Empty
+                : JsonSerializer.Serialize(request with { Type = "applied" }, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                });
+            return Task.FromResult(new DockerStdioCommandResult(0, acknowledgement, string.Empty));
+        }
 
         public Task<string> CaptureAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken) =>
             throw new NotSupportedException();
@@ -534,7 +609,11 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 {
                     Networks = new Dictionary<string, object>(StringComparer.Ordinal)
                     {
-                        ["aspire-default-network"] = new { IPAddress = "172.28.0.10", NetworkID = new string('a', 64) },
+                        ["aspire-default-network"] = new
+                        {
+                            IPAddress = role == "simulator" ? "172.28.0.11" : "172.28.0.10",
+                            NetworkID = new string('a', 64),
+                        },
                     },
                 },
             });

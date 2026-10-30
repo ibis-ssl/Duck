@@ -27,6 +27,17 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task StandardBaseSharesTheCm4TargetControllerWithItsOwnedSessionLifecycle()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        Assert.Single(appHost.Services, descriptor =>
+            descriptor.ServiceType == typeof(IOwnedCm4TransportTargetController));
+    }
+
+    [Fact]
     public void StackOwnershipLeaseRejectsSecondOwnerAndAllowsReuseWithExistingMarker()
     {
         var lockPath = Path.Combine(Path.GetTempPath(), $"duck-aspire-stack-{Guid.NewGuid():N}.lock");
@@ -1161,6 +1172,25 @@ public sealed class AppHostApplicationModelTests
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
 
         AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
+    }
+
+    [Fact]
+    public async Task StandardBaseCraneStartsAfterCm4StartsWithoutWaitingForCm4Readiness()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var crane = Find(appHost, "crane");
+        var duck = Find(appHost, "duck");
+        var gameController = Find(appHost, "game-controller");
+        var cm4 = Find(appHost, "cm4-sim");
+
+        AssertWaits(
+            crane,
+            (duck, WaitType.WaitUntilStarted),
+            (gameController, WaitType.WaitUntilHealthy),
+            (cm4, WaitType.WaitUntilStarted));
+        Assert.Contains(
+            Assert.IsType<ContainerResource>(cm4).Annotations.OfType<HealthCheckAnnotation>(),
+            annotation => annotation.Key == "dcp-cm4-sim-service-ready");
     }
 
     [Fact]

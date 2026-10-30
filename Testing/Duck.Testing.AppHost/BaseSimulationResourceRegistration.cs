@@ -257,7 +257,15 @@ internal static class BaseSimulationResourceRegistration
             .WaitFor(builder.CreateResourceBuilder<IResource>(gameController.Resource));
         if (cm4Simulator is not null)
         {
-            crane.WaitFor(builder.CreateResourceBuilder<IResource>(cm4Simulator.Resource));
+            var cm4Dependency = builder.CreateResourceBuilder<IResource>(cm4Simulator.Resource);
+            if (options.UseStandardDcpResources)
+            {
+                crane.WaitForStart(cm4Dependency);
+            }
+            else
+            {
+                crane.WaitFor(cm4Dependency);
+            }
         }
 
         if (options.UseStandardDcpResources)
@@ -301,24 +309,23 @@ internal static class BaseSimulationResourceRegistration
                         simulatorResource,
                         cm4Resource,
                         options.ExpectedEngineId));
-                builder.Services.AddSingleton<OwnedCm4SimulatorReconfigurationCoordinator>(services =>
+                if (!string.IsNullOrWhiteSpace(options.DockerContextName) &&
+                    !string.IsNullOrWhiteSpace(options.ExpectedEngineId))
                 {
-                    var adapter = services.GetRequiredService<IOwnedCm4SimulatorReconfigurationAdapter>();
-                    IOwnedCm4TransportTargetController? controller = null;
-                    if (!string.IsNullOrWhiteSpace(options.DockerContextName) &&
-                        !string.IsNullOrWhiteSpace(options.ExpectedEngineId))
-                    {
-                        controller = new OwnedCm4TransportTargetController(
+                    builder.Services.AddSingleton<IOwnedCm4TransportTargetController>(services =>
+                        new OwnedCm4TransportTargetController(
                             services.GetRequiredService<IDockerStdioCommandRunner>(),
                             options.DockerContextName,
                             options.ExpectedEngineId,
                             options.DuckRunId,
-                            adapter.GetCurrentOwnedPair);
-                    }
-
+                            services.GetRequiredService<IOwnedCm4SimulatorReconfigurationAdapter>().GetCurrentOwnedPair));
+                }
+                builder.Services.AddSingleton<OwnedCm4SimulatorReconfigurationCoordinator>(services =>
+                {
+                    var adapter = services.GetRequiredService<IOwnedCm4SimulatorReconfigurationAdapter>();
                     return new OwnedCm4SimulatorReconfigurationCoordinator(
                         adapter,
-                        controller,
+                        services.GetService<IOwnedCm4TransportTargetController>(),
                         options.DuckRunId);
                 });
                 builder.Services.AddSingleton<OwnedCm4SimulatorRestartCommandHandler>();

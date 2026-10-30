@@ -20,7 +20,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifndef CONTROL_DIRECTORY
 #define CONTROL_DIRECTORY "/tmp/duck-cm4-transport"
+#endif
 #define CONTROL_SOCKET_PATH CONTROL_DIRECTORY "/control.sock"
 #define MAX_CONTROL_LINE 4096
 #define CONTROL_DEADLINE_MS 3000
@@ -627,6 +629,19 @@ static int write_all_until(
     return 1;
 }
 
+/* 送信前のソケット起動待ちだけを既存の期限内で行う。 */
+static int wait_for_control_socket_startup(const struct timespec *deadline)
+{
+    int timeout = remaining_milliseconds(deadline);
+    int result;
+    if (timeout <= 0) return 0;
+    if (timeout > 10) timeout = 10;
+    do {
+        result = poll(NULL, 0, timeout);
+    } while (result < 0 && errno == EINTR && remaining_milliseconds(deadline) > 0);
+    return result >= 0 && remaining_milliseconds(deadline) > 0;
+}
+
 static int uds_exchange(
     void *context,
     const char *request,
@@ -649,21 +664,41 @@ static int uds_exchange(
 
     if (request == NULL || response == NULL || response_length == NULL ||
         response_capacity == 0 || !make_deadline(&deadline)) return 0;
-    if (!read_path_identity(CONTROL_DIRECTORY, &directory_before) ||
-        !read_path_identity(CONTROL_SOCKET_PATH, &socket_before) ||
-        !cm4_transport_owned_directory_matches(&directory_before, (uint64_t)geteuid()) ||
-        !cm4_transport_owned_socket_matches(&socket_before, (uint64_t)geteuid())) return 0;
-    descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (descriptor < 0 || !set_close_on_exec(descriptor) || !set_nonblocking(descriptor)) goto done;
     memset(&address, 0, sizeof(address));
     address.sun_family = AF_UNIX;
     memcpy(address.sun_path, CONTROL_SOCKET_PATH, sizeof(CONTROL_SOCKET_PATH));
-    if (connect(descriptor, (struct sockaddr *)&address, sizeof(address)) != 0) {
-        int socket_error = 0;
-        socklen_t socket_error_length = sizeof(socket_error);
-        if (errno != EINPROGRESS || !poll_until(descriptor, POLLOUT, &deadline) ||
-            getsockopt(descriptor, SOL_SOCKET, SO_ERROR, &socket_error, &socket_error_length) != 0 ||
-            socket_error != 0) goto done;
+
+    for (;;) {
+        int connect_error = 0;
+        if (!read_path_identity(CONTROL_DIRECTORY, &directory_before)) {
+            if (errno != ENOENT || !wait_for_control_socket_startup(&deadline)) goto done;
+            continue;
+        }
+        if (!cm4_transport_owned_directory_matches(&directory_before, (uint64_t)geteuid())) goto done;
+        if (!read_path_identity(CONTROL_SOCKET_PATH, &socket_before)) {
+            if (errno != ENOENT || !wait_for_control_socket_startup(&deadline)) goto done;
+            continue;
+        }
+        if (!cm4_transport_owned_socket_matches(&socket_before, (uint64_t)geteuid())) goto done;
+
+        descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (descriptor < 0 || !set_close_on_exec(descriptor) || !set_nonblocking(descriptor)) goto done;
+        if (connect(descriptor, (struct sockaddr *)&address, sizeof(address)) != 0) {
+            connect_error = errno;
+            if (connect_error == EINPROGRESS) {
+                int socket_error = 0;
+                socklen_t socket_error_length = sizeof(socket_error);
+                if (!poll_until(descriptor, POLLOUT, &deadline) ||
+                    getsockopt(descriptor, SOL_SOCKET, SO_ERROR, &socket_error,
+                               &socket_error_length) != 0) goto done;
+                connect_error = socket_error;
+            }
+        }
+        if (connect_error == 0) break;
+
+        close(descriptor);
+        descriptor = -1;
+        if (connect_error != ECONNREFUSED || !wait_for_control_socket_startup(&deadline)) goto done;
     }
 
 #ifdef SO_PEERCRED
