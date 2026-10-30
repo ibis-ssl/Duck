@@ -215,6 +215,80 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         Assert.Equal(["invalidate", "restart-cm4", "wait-cm4", "restart-simulator", "wait-replacement", "apply", "restart-crane"], adapter.Events);
     }
 
+    [Theory]
+    [InlineData("Stopped", false, false)]
+    [InlineData("Starting", false, false)]
+    [InlineData("Running", true, false)]
+    [InlineData("Running", false, true)]
+    public async Task DcpAdapterRequiresCurrentCraneNotificationToMatchOwnedCandidate(
+        string currentState,
+        bool expectedCurrent,
+        bool replaceContainerId)
+    {
+        var ownership = new DcpBaseResourceOwnershipEventConsumerTests.OwnershipFixture();
+        await ownership.VerifyAsync();
+        var candidates = ownership.Registry.GetCandidates();
+        var simulatorCandidate = Assert.Single(candidates, candidate => candidate.Role == "simulator");
+        var cm4Candidate = Assert.Single(candidates, candidate => candidate.Role == "cm4-sim");
+        var craneCandidate = Assert.Single(candidates, candidate => candidate.Role == "crane");
+        Assert.True(craneCandidate.OwnershipVerified);
+
+        var builder = DistributedApplication.CreateBuilder([]);
+        await using var application = builder.Build();
+        var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
+        var notifiedContainerId = replaceContainerId ? new string('f', 64) : craneCandidate.ContainerId!;
+        await notifications.PublishUpdateAsync(craneCandidate.Resource, craneCandidate.ResourceId!, snapshot => snapshot with
+        {
+            ResourceType = "container",
+            State = new ResourceStateSnapshot(currentState, "fixture"),
+            Properties = [new ResourcePropertySnapshot("container.id", notifiedContainerId)],
+        });
+
+        var adapter = new DcpOwnedCm4SimulatorReconfigurationAdapter(
+            ownership.Registry,
+            ownership.OwnershipConsumer,
+            new DcpBaseResourceReadinessEventConsumer(ownership.Registry),
+            notifications,
+            simulatorCandidate.Resource,
+            cm4Candidate.Resource,
+            "expected-engine",
+            crane: craneCandidate.Resource);
+
+        Assert.Equal(expectedCurrent, adapter.IsCurrentOwnedCrane());
+        if (expectedCurrent)
+        {
+            return;
+        }
+
+        var controller = new FakeController([], adapter.GetCurrentOwnedPair);
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+        var cm4Calls = 0;
+        var simulatorCalls = 0;
+        var craneCalls = 0;
+        var result = await coordinator.ExecuteCm4RestartAsync(
+            CreateCommandContext(CancellationToken.None),
+            _ =>
+            {
+                cm4Calls++;
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            },
+            _ =>
+            {
+                simulatorCalls++;
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            },
+            _ =>
+            {
+                craneCalls++;
+                return Task.FromResult(new ExecuteCommandResult { Success = true });
+            });
+
+        Assert.False(result.Success);
+        Assert.Equal(0, cm4Calls);
+        Assert.Equal(0, simulatorCalls);
+        Assert.Equal(0, craneCalls);
+    }
+
     [Fact]
     public async Task Cm4RestartDoesNotDispatchCraneRestartWithoutCurrentOwnership()
     {

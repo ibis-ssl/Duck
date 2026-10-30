@@ -630,8 +630,24 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
         var candidate = crane is null
             ? null
             : registry.GetCandidates().SingleOrDefault(item => ReferenceEquals(item.Resource, crane));
-        return pair is not null && candidate is not null && candidate.Role == "crane" &&
-            candidate.RunId == pair.Cm4.RunId && IsOwnedRunning(candidate);
+        if (pair is null || candidate is null || candidate.Role != "crane" ||
+            candidate.RunId != pair.Cm4.RunId || string.IsNullOrWhiteSpace(candidate.ResourceId) ||
+            !IsOwnedRunning(candidate) ||
+            !notifications.TryGetCurrentState(crane!.Name, out var currentByName) ||
+            !ReferenceEquals(currentByName.Resource, crane) ||
+            currentByName.Snapshot.State?.Text != "Running" ||
+            !RegisteredContainerEventProjection.TryProject(
+                crane, candidate.ResourceId, "crane", currentByName, currentByName, out var namedTarget) ||
+            namedTarget is null || namedTarget.ContainerId != candidate.ContainerId ||
+            !notifications.TryGetCurrentState(candidate.ResourceId, out var currentById) ||
+            currentById.Snapshot.State?.Text != "Running" ||
+            !RegisteredContainerEventProjection.TryProject(
+                crane, candidate.ResourceId, "crane", currentById, currentById, out var currentTarget))
+        {
+            return false;
+        }
+
+        return currentTarget is not null && currentTarget.ContainerId == candidate.ContainerId;
     }
 
     public async Task<ExecuteCommandResult> RestartSimulatorAsync(
