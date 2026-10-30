@@ -7,7 +7,10 @@ internal interface IOwnedCm4SimulatorReconfigurationAdapter
 {
     OwnedCm4TransportIdentityPair? GetCurrentOwnedPair();
 
-    Task<bool> RestartSimulatorAsync(CancellationToken cancellationToken);
+    Task<ExecuteCommandResult> RestartSimulatorAsync(
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCommand,
+        ExecuteCommandContext commandContext,
+        CancellationToken cancellationToken);
 
     Task<OwnedCm4TransportIdentityPair?> WaitForReplacementAsync(
         OwnedCm4TransportIdentityPair previous,
@@ -26,9 +29,12 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
     private readonly SemaphoreSlim operationGate = new(1, 1);
 
     internal async Task<OwnedCm4SimulatorReconfigurationResult> ExecuteAsync(
-        CancellationToken cancellationToken)
+        ExecuteCommandContext commandContext,
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCommand)
     {
-        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        ArgumentNullException.ThrowIfNull(commandContext);
+        ArgumentNullException.ThrowIfNull(restartCommand);
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(commandContext.CancellationToken);
         deadline.CancelAfter(operationLimit);
         var token = deadline.Token;
         var entered = false;
@@ -91,9 +97,24 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
             }
 
             token.ThrowIfCancellationRequested();
-            if (!await adapter.RestartSimulatorAsync(token).ConfigureAwait(false))
+            var restartContext = new ExecuteCommandContext
             {
-                return Failed("The DCP simulator restart command did not succeed; the old target remains disabled.");
+                Services = commandContext.Services,
+                ResourceName = commandContext.ResourceName,
+                Logger = commandContext.Logger,
+                Arguments = commandContext.Arguments,
+                CancellationToken = token,
+            };
+            var restartResult = await adapter.RestartSimulatorAsync(
+                restartCommand,
+                restartContext,
+                token).ConfigureAwait(false);
+            if (!restartResult.Success)
+            {
+                return new(false,
+                    restartResult.Message ?? "The DCP simulator restart command did not succeed; the old target remains disabled.",
+                    restartResult.Canceled,
+                    restartResult);
             }
             if (token.IsCancellationRequested)
             {
@@ -120,9 +141,11 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
 
             replacementTargetAcknowledged = true;
             token.ThrowIfCancellationRequested();
-            return new(true, "Remote target invalidation, DCP restart, and replacement target application were confirmed.");
+            return new(true,
+                "Remote target invalidation, DCP restart, and replacement target application were confirmed.",
+                RestartCommandResult: restartResult);
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (commandContext.CancellationToken.IsCancellationRequested)
         {
             if (replacementTargetAcknowledged)
             {
@@ -155,14 +178,115 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
 internal sealed record OwnedCm4SimulatorReconfigurationResult(
     bool Success,
     string Message,
-    bool Canceled = false);
+    bool Canceled = false,
+    ExecuteCommandResult? RestartCommandResult = null);
+
+/// <summary>
+/// 標準CM4 SimulatorのRestart命令に、遠隔宛先の無効化と再適用を接続します。
+/// </summary>
+internal sealed class OwnedCm4SimulatorRestartCommandHandler(
+    OwnedCm4SimulatorReconfigurationCoordinator coordinator)
+{
+    private IResource? boundResource;
+    private ResourceCommandAnnotation? originalCommand;
+    private ResourceCommandAnnotation? guardedCommand;
+
+    /// <summary>
+    /// 作成済み資源のRestart命令を一度だけ捕捉し、公開メタデータを保ったガードへ置き換えます。
+    /// </summary>
+    internal void Install(IResource resource)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+        if (boundResource is not null && !ReferenceEquals(boundResource, resource))
+        {
+            throw new InvalidOperationException("The CM4 restart guard is already bound to another resource.");
+        }
+
+        var restartCommands = resource.Annotations
+            .OfType<ResourceCommandAnnotation>()
+            .Where(command => command.Name == KnownResourceCommands.RestartCommand)
+            .ToArray();
+        if (guardedCommand is not null && restartCommands.Length == 1 &&
+            ReferenceEquals(restartCommands[0], guardedCommand))
+        {
+            return;
+        }
+
+        if (restartCommands.Length != 1)
+        {
+            throw new InvalidOperationException(
+                "The standard CM4 simulator Restart command was not available after resource creation.");
+        }
+
+        var command = restartCommands[0];
+#pragma warning disable CS0618 // The standard Restart command does not use the obsolete parameter.
+        if (command.Parameter is not null || command.Progress is not null)
+        {
+            throw new InvalidOperationException(
+                "The standard CM4 simulator Restart command has metadata that cannot be preserved by the public command API.");
+        }
+#pragma warning restore CS0618
+
+        var guarded = new ResourceCommandAnnotation(
+            command.Name,
+            command.DisplayName,
+            command.UpdateState,
+            ExecuteAsync,
+            command.DisplayDescription,
+            command.Arguments,
+            command.ConfirmationMessage,
+            command.IconName,
+            command.IconVariant,
+            command.IsHighlighted,
+            command.Visibility,
+            command.ValidateArguments);
+
+        if (!resource.Annotations.Remove(command))
+        {
+            throw new InvalidOperationException("The standard CM4 simulator Restart command could not be replaced.");
+        }
+
+        resource.Annotations.Add(guarded);
+        boundResource = resource;
+        originalCommand = command;
+        guardedCommand = guarded;
+    }
+
+    /// <summary>
+    /// 無効化確認後に捕捉した元のRestart処理を呼び、交換後の宛先適用までを実行します。
+    /// </summary>
+    internal async Task<ExecuteCommandResult> ExecuteAsync(ExecuteCommandContext context)
+    {
+        var original = originalCommand?.ExecuteCommand;
+        if (original is null)
+        {
+            return new ExecuteCommandResult
+            {
+                Success = false,
+                Message = "The standard CM4 simulator Restart command is not bound.",
+            };
+        }
+
+        var result = await coordinator.ExecuteAsync(context, original).ConfigureAwait(false);
+        if (result.Success && result.RestartCommandResult is not null)
+        {
+            return result.RestartCommandResult;
+        }
+
+        return new ExecuteCommandResult
+        {
+            Success = false,
+            Message = result.Message,
+            Canceled = result.Canceled,
+        };
+    }
+}
 
 internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
     DcpBaseResourceReadinessRegistry registry,
     DcpBaseResourceOwnershipEventConsumer ownership,
     DcpBaseResourceReadinessEventConsumer events,
     ResourceNotificationService notifications,
-    ResourceCommandService commands,
     IResource simulator,
     IResource cm4,
     string? expectedEngineId) : IOwnedCm4SimulatorReconfigurationAdapter
@@ -195,14 +319,13 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
             candidate.Generation);
     }
 
-    public async Task<bool> RestartSimulatorAsync(CancellationToken cancellationToken)
+    public async Task<ExecuteCommandResult> RestartSimulatorAsync(
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCommand,
+        ExecuteCommandContext commandContext,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var result = await commands.ExecuteCommandAsync(
-            simulator,
-            KnownResourceCommands.RestartCommand,
-            cancellationToken).ConfigureAwait(false);
-        return result.Success;
+        return await restartCommand(commandContext).ConfigureAwait(false);
     }
 
     public async Task<OwnedCm4TransportIdentityPair?> WaitForReplacementAsync(

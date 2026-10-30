@@ -2,6 +2,7 @@ using Duck.Testing.AppHost;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tracker.Tests;
 
@@ -28,7 +29,6 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
             null!,
             null!,
             application.Services.GetRequiredService<ResourceNotificationService>(),
-            application.Services.GetRequiredService<ResourceCommandService>(),
             simulator,
             simulator,
             "engine-01");
@@ -36,8 +36,67 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         cancellation.Cancel();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-            adapter.RestartSimulatorAsync(cancellation.Token));
+            adapter.RestartSimulatorAsync(
+                _ =>
+                {
+                    Interlocked.Increment(ref restartCalls);
+                    return Task.FromResult(new ExecuteCommandResult { Success = true });
+                },
+                CreateCommandContext(cancellation.Token),
+                cancellation.Token));
         Assert.Equal(0, restartCalls);
+    }
+
+    [Fact]
+    public async Task RestartGuardCallsTheCapturedCommandOnceAndReturnsItsResult()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var simulator = builder.AddContainer("simulator", "example/simulator");
+        var previous = CreatePair(1, "a");
+        var replacement = CreatePair(2, "b");
+        var adapter = new FakeAdapter(previous, replacement);
+        var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair);
+        var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
+        var handler = new OwnedCm4SimulatorRestartCommandHandler(coordinator);
+        var restartCalls = 0;
+        var originalCommand = new ResourceCommandAnnotation(
+            KnownResourceCommands.RestartCommand,
+            "Restart simulator",
+            _ => ResourceCommandState.Enabled,
+            context =>
+            {
+                restartCalls++;
+                Assert.Equal("simulator", context.ResourceName);
+                Assert.NotNull(context.Arguments);
+                adapter.Events.Add("original");
+                return Task.FromResult(new ExecuteCommandResult { Success = true, Message = "restart result" });
+            },
+            "Restart the simulator",
+            arguments: null,
+            confirmationMessage: null,
+            iconName: "ArrowCounterclockwise",
+            iconVariant: IconVariant.Regular,
+            isHighlighted: false);
+        simulator.Resource.Annotations.Add(originalCommand);
+
+        await using var application = builder.Build();
+        handler.Install(simulator.Resource);
+        handler.Install(simulator.Resource);
+        var guardedCommand = Assert.Single(
+            simulator.Resource.Annotations.OfType<ResourceCommandAnnotation>(),
+            command => command.Name == KnownResourceCommands.RestartCommand);
+        Assert.NotSame(originalCommand, guardedCommand);
+        Assert.Same(originalCommand.UpdateState, guardedCommand.UpdateState);
+        Assert.Equal(originalCommand.Visibility, guardedCommand.Visibility);
+
+        var result = await application.Services.GetRequiredService<ResourceCommandService>()
+            .ExecuteCommandAsync(simulator.Resource, KnownResourceCommands.RestartCommand, CancellationToken.None);
+
+        Assert.True(result.Success);
+        Assert.Equal("restart result", result.Message);
+        Assert.Equal(1, restartCalls);
+        Assert.Equal(["invalidate", "restart", "original", "wait-replacement", "apply"], adapter.Events);
+        Assert.Equal(replacement, controller.LastAppliedPair);
     }
 
     [Fact]
@@ -49,7 +108,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         var controller = new FakeController(adapter.Events, adapter.GetCurrentOwnedPair);
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
 
-        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+        var result = await ExecuteAsync(coordinator, CancellationToken.None);
 
         Assert.True(result.Success);
         Assert.Equal(["invalidate", "restart", "wait-replacement", "apply"], adapter.Events);
@@ -68,7 +127,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         };
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
 
-        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+        var result = await ExecuteAsync(coordinator, CancellationToken.None);
 
         Assert.False(result.Success);
         Assert.Equal(["invalidate"], adapter.Events);
@@ -87,7 +146,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         };
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
 
-        var result = await coordinator.ExecuteAsync(cancellation.Token);
+        var result = await ExecuteAsync(coordinator, cancellation.Token);
 
         Assert.False(result.Success);
         Assert.True(result.Canceled);
@@ -108,7 +167,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         };
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
 
-        var result = await coordinator.ExecuteAsync(cancellation.Token);
+        var result = await ExecuteAsync(coordinator, cancellation.Token);
 
         Assert.False(result.Success);
         Assert.True(result.Canceled);
@@ -130,7 +189,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         };
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
 
-        var result = await coordinator.ExecuteAsync(cancellation.Token);
+        var result = await ExecuteAsync(coordinator, cancellation.Token);
 
         Assert.False(result.Success);
         Assert.True(result.Canceled);
@@ -151,7 +210,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(
             adapter, controller, "run-01", TimeSpan.FromMilliseconds(100));
 
-        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+        var result = await ExecuteAsync(coordinator, CancellationToken.None);
 
         Assert.False(result.Success);
         Assert.False(result.Canceled);
@@ -172,7 +231,7 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         };
         var coordinator = new OwnedCm4SimulatorReconfigurationCoordinator(adapter, controller, "run-01");
 
-        var result = await coordinator.ExecuteAsync(CancellationToken.None);
+        var result = await ExecuteAsync(coordinator, CancellationToken.None);
 
         Assert.False(result.Success);
         Assert.Equal(["invalidate", "restart", "wait-replacement", "apply"], adapter.Events);
@@ -184,6 +243,21 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         new("run-01", "engine-01", "cm4-sim", "cm4-key", new string('a', 64), 1),
         new("run-01", "engine-01", "simulator", "sim-key-" + suffix, new string('b', 63) + suffix, generation));
 
+    private static Task<OwnedCm4SimulatorReconfigurationResult> ExecuteAsync(
+        OwnedCm4SimulatorReconfigurationCoordinator coordinator,
+        CancellationToken cancellationToken) => coordinator.ExecuteAsync(
+            CreateCommandContext(cancellationToken),
+            _ => Task.FromResult(new ExecuteCommandResult { Success = true }));
+
+    private static ExecuteCommandContext CreateCommandContext(CancellationToken cancellationToken) => new()
+    {
+        Services = new ServiceCollection().BuildServiceProvider(),
+        ResourceName = "simulator",
+        CancellationToken = cancellationToken,
+        Logger = NullLogger.Instance,
+        Arguments = new InteractionInputCollection([]),
+    };
+
     private sealed class FakeAdapter(
         OwnedCm4TransportIdentityPair current,
         OwnedCm4TransportIdentityPair replacement) : IOwnedCm4SimulatorReconfigurationAdapter
@@ -194,12 +268,15 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
         public OwnedCm4TransportIdentityPair? GetCurrentOwnedPair() =>
             Events.Contains("restart", StringComparer.Ordinal) ? replacement : current;
 
-        public Task<bool> RestartSimulatorAsync(CancellationToken cancellationToken)
+        public async Task<ExecuteCommandResult> RestartSimulatorAsync(
+            Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCommand,
+            ExecuteCommandContext commandContext,
+            CancellationToken cancellationToken)
         {
             RestartDispatchAttempts++;
             cancellationToken.ThrowIfCancellationRequested();
             Events.Add("restart");
-            return Task.FromResult(true);
+            return await restartCommand(commandContext);
         }
 
         public Task<OwnedCm4TransportIdentityPair?> WaitForReplacementAsync(

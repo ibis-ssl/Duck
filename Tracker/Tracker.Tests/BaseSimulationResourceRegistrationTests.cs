@@ -1,5 +1,6 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Eventing;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -10,6 +11,85 @@ namespace Tracker.Tests;
 
 public sealed class BaseSimulationResourceRegistrationTests
 {
+    [Fact]
+    public async Task StandardCm4SimulatorRestartIsInterceptedAfterResourcesAreCreated()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-restart-guard-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        var restartCalls = 0;
+
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    "base-restart-guard-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-base-restart-guard-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { });
+
+            var simulator = resources.Simulator.Resource;
+            simulator.Annotations.Add(new ResourceCommandAnnotation(
+                KnownResourceCommands.RestartCommand,
+                "Restart simulator",
+                _ => ResourceCommandState.Enabled,
+                _ =>
+                {
+                    Interlocked.Increment(ref restartCalls);
+                    return Task.FromResult(new ExecuteCommandResult { Success = true });
+                },
+                "Restart the simulator",
+                arguments: null,
+                confirmationMessage: null,
+                iconName: "ArrowCounterclockwise",
+                iconVariant: IconVariant.Regular,
+                isHighlighted: false));
+            var originalCommand = Assert.Single(
+                simulator.Annotations.OfType<ResourceCommandAnnotation>(),
+                command => command.Name == KnownResourceCommands.RestartCommand);
+
+            await using var application = builder.Build();
+            var model = application.Services.GetRequiredService<DistributedApplicationModel>();
+            var eventing = application.Services.GetRequiredService<IDistributedApplicationEventing>();
+            var createdEvent = new AfterResourcesCreatedEvent(application.Services, model);
+            await eventing.PublishAsync(createdEvent, EventDispatchBehavior.BlockingSequential, CancellationToken.None);
+            await eventing.PublishAsync(createdEvent, EventDispatchBehavior.BlockingSequential, CancellationToken.None);
+
+            var guardedCommand = Assert.Single(
+                simulator.Annotations.OfType<ResourceCommandAnnotation>(),
+                command => command.Name == KnownResourceCommands.RestartCommand);
+            Assert.NotSame(originalCommand, guardedCommand);
+            Assert.Same(originalCommand.UpdateState, guardedCommand.UpdateState);
+            Assert.Equal(originalCommand.DisplayName, guardedCommand.DisplayName);
+            Assert.Equal(originalCommand.DisplayDescription, guardedCommand.DisplayDescription);
+            Assert.Equal(originalCommand.IconName, guardedCommand.IconName);
+            Assert.Equal(originalCommand.IconVariant, guardedCommand.IconVariant);
+            Assert.Equal(originalCommand.Visibility, guardedCommand.Visibility);
+            Assert.Null(guardedCommand.Progress);
+
+            var result = await application.Services.GetRequiredService<ResourceCommandService>()
+                .ExecuteCommandAsync(simulator, KnownResourceCommands.RestartCommand, CancellationToken.None);
+
+            Assert.False(result.Success);
+            Assert.Equal(0, restartCalls);
+            Assert.Single(simulator.Annotations.OfType<ResourceCommandAnnotation>(),
+                command => command.Name == KnownResourceCommands.RestartCommand);
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot))
+            {
+                Directory.Delete(fixtureRoot, recursive: true);
+            }
+        }
+    }
+
     [Fact]
     public void StandardCraneHealthRegistrationUsesTheCraneServiceConsumer()
     {

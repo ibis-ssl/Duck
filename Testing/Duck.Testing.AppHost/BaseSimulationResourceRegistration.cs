@@ -277,7 +277,6 @@ internal static class BaseSimulationResourceRegistration
                         services.GetRequiredService<DcpBaseResourceOwnershipEventConsumer>(),
                         services.GetRequiredService<DcpBaseResourceReadinessEventConsumer>(),
                         services.GetRequiredService<ResourceNotificationService>(),
-                        services.GetRequiredService<ResourceCommandService>(),
                         simulatorResource,
                         cm4Resource,
                         options.ExpectedEngineId));
@@ -301,6 +300,13 @@ internal static class BaseSimulationResourceRegistration
                         controller,
                         options.DuckRunId);
                 });
+                builder.Services.AddSingleton<OwnedCm4SimulatorRestartCommandHandler>();
+                builder.Eventing.Subscribe<AfterResourcesCreatedEvent>((@event, _) =>
+                {
+                    @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>()
+                        .Install(simulatorResource);
+                    return Task.CompletedTask;
+                });
 
                 builder.CreateResourceBuilder<ContainerResource>(
                         (ContainerResource)simulator.Resource)
@@ -309,16 +315,10 @@ internal static class BaseSimulationResourceRegistration
                         "無効化確認後に Simulator を再作成し、現世代へ送信先を適用します",
                         async context =>
                         {
-                            var result = await context.Services
-                                .GetRequiredService<OwnedCm4SimulatorReconfigurationCoordinator>()
-                                .ExecuteAsync(context.CancellationToken)
+                            return await context.Services
+                                .GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>()
+                                .ExecuteAsync(context)
                                 .ConfigureAwait(false);
-                            return new ExecuteCommandResult
-                            {
-                                Success = result.Success,
-                                Message = result.Message,
-                                Canceled = result.Canceled,
-                            };
                         });
             }
         }
