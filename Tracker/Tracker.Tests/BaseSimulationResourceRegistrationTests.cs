@@ -32,7 +32,8 @@ public sealed class BaseSimulationResourceRegistrationTests
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
                 _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
-                _ => { });
+                _ => { },
+                appHostAssetRoot: fixtureRoot);
 
             var simulator = resources.Simulator.Resource;
             simulator.Annotations.Add(new ResourceCommandAnnotation(
@@ -57,6 +58,12 @@ public sealed class BaseSimulationResourceRegistrationTests
                 new BeforeResourceStartedEvent(simulator, application.Services),
                 EventDispatchBehavior.BlockingSequential,
                 CancellationToken.None);
+
+            var missingHelper = await Assert.ThrowsAsync<InvalidOperationException>(() => eventing.PublishAsync(
+                new BeforeResourceStartedEvent(resources.Cm4Simulator!.Resource, application.Services),
+                EventDispatchBehavior.BlockingSequential,
+                CancellationToken.None));
+            Assert.Contains("CM4 transport helper is missing", missingHelper.Message, StringComparison.Ordinal);
 
             var result = await application.Services.GetRequiredService<ResourceCommandService>()
                 .ExecuteCommandAsync(simulator, KnownResourceCommands.RestartCommand, CancellationToken.None);
@@ -470,6 +477,13 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.IsType<ContainerResource>(resources.GameController.Resource);
             Assert.IsType<ContainerResource>(resources.Cm4Simulator!.Resource);
             Assert.IsType<ContainerResource>(resources.Crane.Resource);
+            var cm4HelperMount = Assert.Single(
+                resources.Cm4Simulator.Resource.Annotations.OfType<ContainerMountAnnotation>());
+            Assert.Equal(
+                Path.Combine(AppContext.BaseDirectory, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName),
+                cm4HelperMount.Source);
+            Assert.Equal(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4HelperMount.Target);
+            Assert.True(cm4HelperMount.IsReadOnly);
             Assert.Contains(
                 resources.Simulator.Resource.Annotations.OfType<ResourceCommandAnnotation>(),
                 command => command.Name == "reconfigure-cm4-transport");

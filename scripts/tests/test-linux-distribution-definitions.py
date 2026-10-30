@@ -37,6 +37,22 @@ class PublishContractTests(unittest.TestCase):
     if rel.endswith("runtimeconfig.json"): f.write_text(json.dumps({"runtimeOptions":{"framework":{"name":app["framework"],"version":"10.0.0"}}}),encoding="utf-8")
     else: f.write_bytes(b"fixture")
  def tearDown(self): self.tmp.cleanup()
+ def _cm4_helper_paths(self):
+  source=self.root/"native/cm4-transport-control"; source.parent.mkdir(parents=True,exist_ok=True); source.write_bytes(b"static-cm4-helper")
+  output=self.pub/"Duck.Testing.AppHost/cm4-transport-control"; output.parent.mkdir(parents=True,exist_ok=True); output.write_bytes(source.read_bytes()); output.chmod(0o755)
+  return source,output
+ def test_accepts_the_same_cm4_helper_in_apphost_publish_output(self):
+  source,_=self._cm4_helper_paths(); errors=[]
+  m._check_cm4_helper_publish_output(self.pub,source,errors)
+  self.assertEqual(errors,[])
+ def test_rejects_a_missing_cm4_helper_publish_output(self):
+  source,_=self._cm4_helper_paths(); (self.pub/"Duck.Testing.AppHost/cm4-transport-control").unlink(); errors=[]
+  m._check_cm4_helper_publish_output(self.pub,source,errors)
+  self.assertTrue(any("missing from the AppHost publish output" in error for error in errors))
+ def test_rejects_different_cm4_helper_publish_bytes(self):
+  source,output=self._cm4_helper_paths(); output.write_bytes(b"different-helper"); errors=[]
+  m._check_cm4_helper_publish_output(self.pub,source,errors)
+  self.assertTrue(any("differs from the statically verified Linux build" in error for error in errors))
  def test_real_apphost_defaults_match_the_fixed_catalog(self):
   errors=[]
   m._check_apphost_definitions(p.parents[2],errors)

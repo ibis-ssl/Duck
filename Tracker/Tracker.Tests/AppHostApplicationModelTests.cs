@@ -936,6 +936,7 @@ public sealed class AppHostApplicationModelTests
 
         var cm4Simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "cm4-sim")));
         Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Simulator.Image);
+        Assert.Empty(cm4Simulator.Mounts ?? []);
         AssertArgumentValue(ToSpec(cm4Simulator).CreateRunArguments(), "--network", "host");
         AssertArgumentValue(cm4Simulator.ContainerArguments, "--in-port", "12345");
         AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "12346");

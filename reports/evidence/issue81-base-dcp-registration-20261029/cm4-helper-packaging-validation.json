@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "baseline": "aa8f915b6d4ef292752bc27099f69001fc2777d8",
+  "status": "implementation-and-local-checks-complete; CI and runtime interoperability pending",
+  "changes": [
+    {
+      "path": ".github/workflows/dotnet-test.yml",
+      "sha256": "07CA40DE2B9CC3658EC54D7EFF886AD529F006A798EDE8DA529E2EFA380C58E1"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "8D56E9F72C68B8970C386AC27F30AF141E7FC062036234FD1F42F0293C083342"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+      "sha256": "04E4932A5D73FF607EEDE5056083FF69F4552514B3AED1D2DB96C5B8C7A1B4EC"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "A131F83F7C31B60787BA174036659749A7EEF8934B737E0D39BF4DC5593C626A"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "AF4C07900FEC4911D4A7C9AF07C57B379D629CA1BC35499B439517178A57C36B"
+    },
+    {
+      "path": "scripts/tests/test-linux-distribution-definitions.py",
+      "sha256": "BD33E1D4395D340416A45186DF856C5E0CB2F49BB741765F25F0A1004BA847DE"
+    },
+    {
+      "path": "scripts/tests/verify-linux-distribution-definitions.py",
+      "sha256": "621665F7D9CCA5A1880BA19968B0446E9BE112768CC2B9018C803BCC2283AD72"
+    },
+    {
+      "path": "scripts/tests/verify-linux-publish-outputs.sh",
+      "sha256": "AC3AD6EB70283E9EFBC466A3C518F6D58C4F47E7EA4609B65A376ACBCAF28FAD"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "FB0991B7C5AE3FA38D7ECF4F9AB289E3DD63A97ABD4B318A903F762473975EAF"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "98F9953F9F2181C8D133DFC55B3F69842A040EBF95A64F69A56572DF09970CBD"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "A278E1B36AEC2368B9710309DB97D04FBCE998FB9B0DA064A2B3ABA483238D1E"
+    }
+  ],
+  "checks": {
+    "standardRegistrationTests": "7 passed",
+    "comparisonModelTest": "1 passed",
+    "distributionDefinitionTests": "23 passed",
+    "appHostReleaseBuildWithTemporaryFixture": "passed; temporary fixture copied to build output with matching SHA, then removed",
+    "publishOutputScriptSyntax": "passed",
+    "documentGates": {
+      "count": 12,
+      "passed": 12,
+      "failed": 0,
+      "timeout": 0,
+      "inputSha256": {
+        "design": "7BE7AB8C394375CB06566867FD755CBD78322950FF3F58B8F1D0432B3AE3D5FF",
+        "tasks": "402E61597D0B65F70330ED5A0D8D919A2DB126F12CE644B27A7E9BAECF1CD86D",
+        "phases": "C4952DFBA42EC11AB6CDFBE1B32EEF1E264B2809D42B99E2FB6245A8911E1A63"
+      }
+    }
+  },
+  "evidenceNotes": [
+    "The missing-mount configuration Red was a compile/discovery-successful assertion failure.",
+    "The AppHost publish attempt was a no-op because AppHost is non-publishable; no publish success is claimed.",
+    "No real Linux helper, CM4 runtime, deployment, remote mount visibility, or UDP test was performed.",
+    "The helper fixture was synthetic and was not executed.",
+    "The first documentation-gate run had three whitelist failures; the corrected current-input run passed all 12 gates."
+  ]
+}

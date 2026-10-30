@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """固定参照と実際のLinux発行出力の配布定義を照合する。"""
 from __future__ import annotations
-import argparse, json, pathlib, re, sys
+import argparse, hashlib, json, os, pathlib, re, sys
 
 class ContractError(Exception):
     """配布定義または実発行出力が固定契約を満たさない場合の診断。"""
@@ -155,14 +155,35 @@ def verify_contract(repo_root: pathlib.Path, publish_root: pathlib.Path) -> None
     for name,app in APPS.items(): _check_app(repo_root,publish_root,name,app,errors)
     if errors: raise ContractError("\n".join("- "+e for e in errors))
 
+def _check_cm4_helper_publish_output(publish_root: pathlib.Path, native_helper: pathlib.Path, errors: list[str]) -> None:
+    """AppHost公開物に既存Linuxビルドと同じ補助実行物があることを確認する。"""
+    published_helper = publish_root / "Duck.Testing.AppHost" / "cm4-transport-control"
+    if not native_helper.is_file():
+        errors.append(f"CM4 transport helper build output is missing: {native_helper}")
+        return
+    if not published_helper.is_file():
+        errors.append(f"CM4 transport helper is missing from the AppHost publish output: {published_helper}")
+        return
+    native_hash = hashlib.sha256(native_helper.read_bytes()).hexdigest()
+    published_hash = hashlib.sha256(published_helper.read_bytes()).hexdigest()
+    if native_hash != published_hash:
+        errors.append("CM4 transport helper in AppHost publish output differs from the statically verified Linux build.")
+    if os.name == "posix" and not os.access(published_helper, os.X_OK):
+        errors.append("CM4 transport helper in AppHost publish output is not executable.")
+
 def main() -> int:
     """CIが作ったpublish rootを検証し違反を終了コード1で報告する。"""
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root",type=pathlib.Path,required=True)
     parser.add_argument("--publish-root",type=pathlib.Path,required=True)
+    parser.add_argument("--native-helper",type=pathlib.Path,required=True)
     args=parser.parse_args()
-    try: verify_contract(args.repo_root,args.publish_root)
+    try:
+        verify_contract(args.repo_root,args.publish_root)
+        errors=[]
+        _check_cm4_helper_publish_output(args.publish_root,args.native_helper,errors)
+        if errors: raise ContractError("\n".join("- "+error for error in errors))
     except ContractError as e: print(str(e),file=sys.stderr); return 1
-    print("固定参照、AppHost宣言、3つの実publish出力が一致しました。")
+    print("固定参照、AppHost宣言、3つの管理対象出力、CM4補助実行物の同一性を確認しました。")
     return 0
 if __name__=="__main__": raise SystemExit(main())

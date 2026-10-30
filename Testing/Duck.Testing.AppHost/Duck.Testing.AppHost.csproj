@@ -21,4 +21,10 @@
     <Content Include="Fixtures\simulation_protocol_comparison.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="CraneLaunchOverlay.py" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control')">
+    <Content Include="$(IntermediateOutputPath)cm4-transport-control"
+             Link="cm4-transport-control"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

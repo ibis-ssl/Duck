@@ -175,6 +175,10 @@ jobs:
                       stream.close()
           PY
 
+          apphost_debug_assets="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/obj/Debug/net10.0"
+          mkdir -p "$apphost_debug_assets"
+          install -m 0755 "$output_dir/cm4-transport-control" "$apphost_debug_assets/cm4-transport-control"
+
       - name: Run dotnet test
         id: dotnet_test
         shell: bash

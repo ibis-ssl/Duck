@@ -139,6 +139,35 @@ publish_project \
   "Duck.Testing.RefereeDriver.Host.deps.json" \
   "Duck.Testing.RefereeDriver.Host.runtimeconfig.json"
 
+native_helper="${RUNNER_TEMP:?RUNNER_TEMP is required}/cm4-transport-native/cm4-transport-control"
+if [[ ! -f "$native_helper" ]]; then
+  printf 'Required statically verified CM4 transport helper is missing: %s\n' "$native_helper" >&2
+  exit 1
+fi
+
+apphost_project="$repo_root/Testing/Duck.Testing.AppHost"
+apphost_staging="$apphost_project/obj/Release/net10.0"
+apphost_build_output="$apphost_project/bin/Release/net10.0"
+apphost_publish="$publish_root/Duck.Testing.AppHost"
+mkdir -p "$apphost_staging" "$apphost_publish"
+install -m 0755 "$native_helper" "$apphost_staging/cm4-transport-control"
+dotnet build "$apphost_project" \
+  --configuration Release \
+  --no-restore \
+  >"$evidence_root/Duck.Testing.AppHost.build.stdout.log" \
+  2>"$evidence_root/Duck.Testing.AppHost.build.stderr.log"
+
+apphost_helper="$apphost_build_output/cm4-transport-control"
+if [[ ! -f "$apphost_helper" ]]; then
+  printf 'Required helper is missing from the AppHost build output: %s\n' "$apphost_helper" >&2
+  exit 1
+fi
+if ! cmp -s "$native_helper" "$apphost_helper"; then
+  printf 'AppHost build output differs from the statically verified CM4 helper.\n' >&2
+  exit 1
+fi
+cp -- "$apphost_helper" "$apphost_publish/cm4-transport-control"
+
 python3 "$repo_root/scripts/tests/test-debughost-portable-pdb.py"
 
 python3 "$repo_root/scripts/tests/verify-debughost-portable-pdb.py" \
@@ -149,6 +178,7 @@ python3 "$repo_root/scripts/tests/test-linux-distribution-definitions.py"
 
 python3 "$repo_root/scripts/tests/verify-linux-distribution-definitions.py" \
   --repo-root "$repo_root" \
-  --publish-root "$publish_root"
+  --publish-root "$publish_root" \
+  --native-helper "$native_helper"
 
-printf 'Linux publish output contract passed for all three managed applications.\n'
+printf 'Linux publish outputs and the AppHost CM4 helper build output passed.\n'

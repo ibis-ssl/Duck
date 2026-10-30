@@ -35,6 +35,9 @@ internal sealed record BaseSimulationResources(
 /// <summary>通常構成で選択された資源を、AppHostの実登録経路から登録する。</summary>
 internal static class BaseSimulationResourceRegistration
 {
+    internal const string Cm4TransportHelperAssetName = "cm4-transport-control";
+    internal const string Cm4TransportHelperContainerPath = "/opt/duck/cm4-transport-control";
+
     internal static bool UsesCm4Simulator(string planner) =>
         string.Equals(planner, "visibility_graph", StringComparison.Ordinal);
 
@@ -45,7 +48,8 @@ internal static class BaseSimulationResourceRegistration
         Action<IResourceBuilder<IResource>> addGameControllerDependentResource,
         ContainerIdentityHandoffStateStore? handoffStates = null,
         Func<EndpointReference, CancellationToken, Task<Uri>>? gameControllerControlEndpointResolver = null,
-        Func<Uri, CancellationToken, Task<bool>>? gameControllerControlApiProbe = null)
+        Func<Uri, CancellationToken, Task<bool>>? gameControllerControlApiProbe = null,
+        string? appHostAssetRoot = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(options);
@@ -152,6 +156,9 @@ internal static class BaseSimulationResourceRegistration
         IResourceBuilder<IResourceWithWaitSupport>? cm4Simulator = null;
         if (useCm4Simulator)
         {
+            var cm4HelperSource = Path.GetFullPath(Path.Combine(
+                appHostAssetRoot ?? AppContext.BaseDirectory,
+                Cm4TransportHelperAssetName));
             var cm4Spec = new DockerContainerSpec(
                 "cm4-sim",
                 $"ghcr.io/ibis-ssl/orion-cm4-sim:{options.Cm4SimulatorImageTag}",
@@ -162,11 +169,25 @@ internal static class BaseSimulationResourceRegistration
                     "--rx-delay-ms", "0", "--rx-jitter-ms", "0", "--rx-loss-rate", "0.0", "--seed", "0",
                 ],
                 new Dictionary<string, string>(StringComparer.Ordinal),
-                options.StackId);
+                options.StackId,
+                mounts: options.UseStandardDcpResources
+                    ? [new DockerContainerMount(cm4HelperSource, Cm4TransportHelperContainerPath, ReadOnly: true)]
+                    : null);
             if (options.UseStandardDcpResources)
             {
                 cm4Simulator = AsResourceBuilder(builder, AddStandardContainer(
                     builder, cm4Spec, options.DuckRunId, "cm4-sim").WaitFor(simulator));
+                var cm4Resource = cm4Simulator.Resource;
+                builder.Eventing.Subscribe<BeforeResourceStartedEvent>((@event, _) =>
+                {
+                    if (ReferenceEquals(@event.Resource, cm4Resource) && !File.Exists(cm4HelperSource))
+                    {
+                        throw new InvalidOperationException(
+                            $"The CM4 transport helper is missing from the AppHost output: '{cm4HelperSource}'.");
+                    }
+
+                    return Task.CompletedTask;
+                });
             }
             else
             {
