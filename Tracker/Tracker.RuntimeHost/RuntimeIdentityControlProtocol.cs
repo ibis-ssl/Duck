@@ -119,6 +119,9 @@ internal sealed class RuntimeIdentityControlServer : IAsyncDisposable
             try { client = await socket.AcceptAsync(cancellationToken); }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { break; }
             catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) { break; }
+            catch (SocketException exception) when (
+                cancellationToken.IsCancellationRequested &&
+                exception.SocketErrorCode == SocketError.OperationAborted) { break; }
             try
             {
                 await HandleClientAsync(client, cancellationToken);
