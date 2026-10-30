@@ -8,11 +8,49 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Tracker.Tests;
 
 public sealed class BaseSimulationResourceRegistrationTests
 {
+    [Fact]
+    public void StandardVisibilityGraphUsesTheExistingCm4CraneTargetOverlayByDefault()
+    {
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-crane-target-default-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        File.WriteAllText(Path.Combine(fixtureRoot, "CraneLaunchOverlay.py"), "fixture-only");
+
+        try
+        {
+            var settings = CraneTargetAddressSettings.FromConfiguration(
+                new ConfigurationBuilder().Build(),
+                "visibility_graph",
+                fixtureRoot,
+                useStandardBase: true);
+
+            Assert.NotNull(settings);
+            Assert.Equal("cm4-sim", settings!.TargetAddress);
+            Assert.Equal("cm4-sim", settings.ExpectedResourceName);
+
+            Assert.Null(CraneTargetAddressSettings.FromConfiguration(
+                new ConfigurationBuilder().Build(), "visibility_graph", fixtureRoot));
+
+            var explicitConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    [CraneTargetAddressSettings.ConfigurationKey] = "127.0.0.1",
+                })
+                .Build();
+            Assert.Equal("127.0.0.1", CraneTargetAddressSettings.FromConfiguration(
+                explicitConfiguration, "visibility_graph", fixtureRoot, useStandardBase: true)!.TargetAddress);
+        }
+        finally
+        {
+            Directory.Delete(fixtureRoot, recursive: true);
+        }
+    }
+
     [Fact]
     public async Task StandardCm4RestartIsGuardedBeforeCm4Starts()
     {
@@ -525,6 +563,10 @@ public sealed class BaseSimulationResourceRegistrationTests
         var builder = DistributedApplication.CreateBuilder([]);
         var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-model-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(fixtureRoot);
+        File.WriteAllText(Path.Combine(fixtureRoot, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName), "fixture-only");
+        File.WriteAllText(Path.Combine(fixtureRoot, "CraneLaunchOverlay.py"), "fixture-only");
+        var craneTargetSettings = CraneTargetAddressSettings.FromConfiguration(
+            new ConfigurationBuilder().Build(), "visibility_graph", fixtureRoot, useStandardBase: true);
 
         try
         {
@@ -545,13 +587,14 @@ public sealed class BaseSimulationResourceRegistrationTests
                     Path.Combine(fixtureRoot, "fixture.json"),
                     UseStandardDcpResources: true,
                     DuckRunId: "run-base-test",
-                    CraneTargetAddressSettings: null,
+                    CraneTargetAddressSettings: craneTargetSettings,
                     CraneDiagnosticsPath: null,
                     DockerContextName: null,
                     ExpectedEngineId: null,
                     DockerExecutable: "docker.exe"),
                 _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
-                _ => { });
+                _ => { },
+                appHostAssetRoot: fixtureRoot);
 
             Assert.IsType<ContainerResource>(resources.Simulator.Resource);
             Assert.IsType<ContainerResource>(resources.GameController.Resource);
@@ -560,7 +603,7 @@ public sealed class BaseSimulationResourceRegistrationTests
             var cm4HelperMount = Assert.Single(
                 resources.Cm4Simulator.Resource.Annotations.OfType<ContainerMountAnnotation>());
             Assert.Equal(
-                Path.Combine(AppContext.BaseDirectory, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName),
+                Path.Combine(fixtureRoot, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName),
                 cm4HelperMount.Source);
             Assert.Equal(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4HelperMount.Target);
             Assert.True(cm4HelperMount.IsReadOnly);
@@ -616,7 +659,16 @@ public sealed class BaseSimulationResourceRegistrationTests
             var multicastInterfaceIndex = Array.IndexOf(cm4Arguments, "--multicast-if");
             Assert.True(multicastInterfaceIndex >= 0 && multicastInterfaceIndex + 1 < cm4Arguments.Length);
             Assert.Equal("0.0.0.0", cm4Arguments[multicastInterfaceIndex + 1]);
-            Assert.Contains("bash", await GetArgumentsAsync(resourcesByRole["crane"]));
+            var craneArguments = await GetArgumentsAsync(resourcesByRole["crane"]);
+            Assert.Contains("bash", craneArguments);
+            Assert.Contains("/duck/crane-launch-overlay.py", craneArguments[^1], StringComparison.Ordinal);
+            var craneMount = Assert.Single(resources.Crane.Resource.Annotations.OfType<ContainerMountAnnotation>());
+            Assert.Equal(craneTargetSettings!.ScriptSource, craneMount.Source);
+            Assert.Equal(CraneTargetAddressSettings.ScriptMountTarget, craneMount.Target);
+            Assert.True(craneMount.IsReadOnly);
+            var craneEnvironment = await GetResourceEnvironmentAsync(Assert.IsAssignableFrom<IResourceWithEnvironment>(resources.Crane.Resource));
+            Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey]);
+            Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey]);
         }
         finally
         {
@@ -803,6 +855,22 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
 
         return values.Select(value => Assert.IsType<string>(value)).ToArray();
+    }
+
+    private static async Task<Dictionary<string, object>> GetResourceEnvironmentAsync(IResourceWithEnvironment resource)
+    {
+        var values = new Dictionary<string, object>(StringComparer.Ordinal);
+        var context = new EnvironmentCallbackContext(
+            new DistributedApplicationExecutionContext(DistributedApplicationOperation.Run),
+            resource,
+            values,
+            CancellationToken.None);
+        foreach (var annotation in resource.Annotations.OfType<EnvironmentCallbackAnnotation>())
+        {
+            await annotation.Callback(context);
+        }
+
+        return values;
     }
 
     private static async Task<string[]> GetArgumentsAsync(

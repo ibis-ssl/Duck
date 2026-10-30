@@ -7,6 +7,8 @@ internal interface IOwnedCm4SimulatorReconfigurationAdapter
 {
     OwnedCm4TransportIdentityPair? GetCurrentOwnedPair();
 
+    bool IsCurrentOwnedCrane();
+
     Task<ExecuteCommandResult> RestartSimulatorAsync(
         Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCommand,
         ExecuteCommandContext commandContext,
@@ -175,7 +177,8 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
     internal async Task<OwnedCm4SimulatorReconfigurationResult> ExecuteCm4RestartAsync(
         ExecuteCommandContext commandContext,
         Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCm4Command,
-        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartSimulatorCommand)
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartSimulatorCommand,
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>>? restartCraneCommand = null)
     {
         ArgumentNullException.ThrowIfNull(commandContext);
         ArgumentNullException.ThrowIfNull(restartCm4Command);
@@ -195,6 +198,10 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
             if (previous is null || controller.Snapshot().Phase != Cm4TransportTargetPhase.Applied)
             {
                 return Failed("The current owned pair and applied target are required before CM4 restart.");
+            }
+            if (restartCraneCommand is not null && !adapter.IsCurrentOwnedCrane())
+            {
+                return Failed("The current Crane ownership proof is unavailable; CM4 restart was not requested.");
             }
 
             var invalidation = await controller.InvalidateCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
@@ -259,8 +266,33 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
             {
                 return Failed("The final target was not confirmed for the current owned pair.");
             }
-
             replacementTargetAcknowledged = true;
+
+            if (restartCraneCommand is not null)
+            {
+                token.ThrowIfCancellationRequested();
+                if (!SamePair(replacement, adapter.GetCurrentOwnedPair()) || !adapter.IsCurrentOwnedCrane())
+                {
+                    controller.Invalidate();
+                    return Failed("The current owned Crane was not confirmed; Crane restart was not requested.");
+                }
+
+                var craneRestart = await restartCraneCommand(
+                    CreateRestartContext(commandContext, "crane", token)).ConfigureAwait(false);
+                if (!craneRestart.Success)
+                {
+                    return new(false,
+                        craneRestart.Message ?? "Crane restart did not succeed after the CM4 and Simulator reconfiguration.",
+                        craneRestart.Canceled, craneRestart);
+                }
+                token.ThrowIfCancellationRequested();
+                if (!SamePair(replacement, adapter.GetCurrentOwnedPair()))
+                {
+                    controller.Invalidate();
+                    return Failed("The owned CM4 or Simulator identity changed while Crane was restarting.");
+                }
+            }
+
             token.ThrowIfCancellationRequested();
             return new(true, "CM4 and Simulator restart completed with a confirmed current target.",
                 RestartCommandResult: simulatorRestart);
@@ -326,6 +358,9 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
     private IResource? boundCm4Resource;
     private ResourceCommandAnnotation? originalCm4Command;
     private ResourceCommandAnnotation? guardedCm4Command;
+    private IResource? boundCraneResource;
+    private ResourceCommandAnnotation? originalCraneCommand;
+    private bool craneRestartRequired;
 
     /// <summary>
     /// 作成済み資源のRestart命令を一度だけ捕捉し、公開メタデータを保ったガードへ置き換えます。
@@ -389,10 +424,15 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
     }
 
     /// <summary>標準CM4の再起動命令を、Simulatorの元命令と組み合わせるガードへ一度だけ置き換えます。</summary>
-    internal void InstallCm4(IResource cm4Resource, IResource simulatorResource)
+    internal void InstallCm4(IResource cm4Resource, IResource simulatorResource, IResource? craneResource = null)
     {
         ArgumentNullException.ThrowIfNull(cm4Resource);
         ArgumentNullException.ThrowIfNull(simulatorResource);
+        if (craneResource is not null)
+        {
+            craneRestartRequired = true;
+            CaptureCraneRestart(craneResource);
+        }
         if (boundCm4Resource is not null && !ReferenceEquals(boundCm4Resource, cm4Resource))
         {
             throw new InvalidOperationException("The CM4 restart guard is already bound to another resource.");
@@ -461,6 +501,37 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
         guardedCm4Command = guarded;
     }
 
+    /// <summary>既存のCrane再起動処理を捕捉し、再構成成功後に同じ処理を直接呼び出せるようにします。</summary>
+    internal void CaptureCraneRestart(IResource craneResource)
+    {
+        ArgumentNullException.ThrowIfNull(craneResource);
+        if (boundCraneResource is not null && !ReferenceEquals(boundCraneResource, craneResource))
+        {
+            throw new InvalidOperationException("The Crane restart callback is already bound to another resource.");
+        }
+
+        var restartCommands = craneResource.Annotations
+            .OfType<ResourceCommandAnnotation>()
+            .Where(command => command.Name == KnownResourceCommands.RestartCommand)
+            .ToArray();
+        if (restartCommands.Length == 0)
+        {
+            return;
+        }
+        if (restartCommands.Length != 1)
+        {
+            throw new InvalidOperationException("The standard Crane Restart command was not unique.");
+        }
+
+        if (originalCraneCommand is not null && !ReferenceEquals(originalCraneCommand, restartCommands[0]))
+        {
+            throw new InvalidOperationException("The captured Crane Restart command changed after installation.");
+        }
+
+        boundCraneResource = craneResource;
+        originalCraneCommand = restartCommands[0];
+    }
+
     /// <summary>
     /// 無効化確認後に捕捉した元のRestart処理を呼び、交換後の宛先適用までを実行します。
     /// </summary>
@@ -499,9 +570,16 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
         {
             return new ExecuteCommandResult { Success = false, Message = "The standard CM4 Restart command is not bound." };
         }
+        if (craneRestartRequired && originalCraneCommand?.ExecuteCommand is null)
+        {
+            return new ExecuteCommandResult { Success = false, Message = "The standard Crane Restart command is not bound." };
+        }
 
         var result = await coordinator.ExecuteCm4RestartAsync(
-            context, restartCm4Command, restartSimulatorCommand).ConfigureAwait(false);
+            context,
+            restartCm4Command,
+            restartSimulatorCommand,
+            originalCraneCommand?.ExecuteCommand).ConfigureAwait(false);
         if (result.Success && result.RestartCommandResult is not null) return result.RestartCommandResult;
         return new ExecuteCommandResult { Success = false, Message = result.Message, Canceled = result.Canceled };
     }
@@ -515,7 +593,8 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
     IResource simulator,
     IResource cm4,
     string? expectedEngineId,
-    Func<OwnedCm4TransportServerSessionManager?>? getSessionManager = null) : IOwnedCm4SimulatorReconfigurationAdapter
+    Func<OwnedCm4TransportServerSessionManager?>? getSessionManager = null,
+    IResource? crane = null) : IOwnedCm4SimulatorReconfigurationAdapter
 {
     public OwnedCm4TransportIdentityPair? GetCurrentOwnedPair()
     {
@@ -543,6 +622,16 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
             candidate.ResourceId,
             candidate.ContainerId!,
             candidate.Generation);
+    }
+
+    public bool IsCurrentOwnedCrane()
+    {
+        var pair = GetCurrentOwnedPair();
+        var candidate = crane is null
+            ? null
+            : registry.GetCandidates().SingleOrDefault(item => ReferenceEquals(item.Resource, crane));
+        return pair is not null && candidate is not null && candidate.Role == "crane" &&
+            candidate.RunId == pair.Cm4.RunId && IsOwnedRunning(candidate);
     }
 
     public async Task<ExecuteCommandResult> RestartSimulatorAsync(

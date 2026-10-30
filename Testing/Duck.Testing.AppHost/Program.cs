@@ -448,7 +448,8 @@ var useCm4Simulator = BaseSimulationResourceRegistration.UsesCm4Simulator(craneP
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
-    AppContext.BaseDirectory);
+    AppContext.BaseDirectory,
+    useStandardBase: testingMode == "base");
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber))
 {
     throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");

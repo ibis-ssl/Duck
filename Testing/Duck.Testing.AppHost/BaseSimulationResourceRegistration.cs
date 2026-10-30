@@ -307,6 +307,7 @@ internal static class BaseSimulationResourceRegistration
             {
                 var simulatorResource = simulator.Resource;
                 var cm4Resource = cm4Simulator.Resource;
+                var craneResource = crane.Resource;
                 builder.Services.AddSingleton<IOwnedCm4SimulatorReconfigurationAdapter>(services =>
                     new DcpOwnedCm4SimulatorReconfigurationAdapter(
                         services.GetRequiredService<DcpBaseResourceReadinessRegistry>(),
@@ -316,7 +317,8 @@ internal static class BaseSimulationResourceRegistration
                         simulatorResource,
                         cm4Resource,
                         options.ExpectedEngineId,
-                        () => services.GetService<OwnedCm4TransportServerSessionManager>()));
+                        () => services.GetService<OwnedCm4TransportServerSessionManager>(),
+                        craneResource));
                 if (!string.IsNullOrWhiteSpace(options.DockerContextName) &&
                     !string.IsNullOrWhiteSpace(options.ExpectedEngineId))
                 {
@@ -343,11 +345,19 @@ internal static class BaseSimulationResourceRegistration
                     var restartHandler = @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>();
                     if (ReferenceEquals(@event.Resource, cm4Resource))
                     {
-                        restartHandler.InstallCm4(cm4Resource, simulatorResource);
+                        restartHandler.InstallCm4(
+                            cm4Resource,
+                            simulatorResource,
+                            options.CraneTargetAddressSettings is null ? null : craneResource);
                     }
                     else if (ReferenceEquals(@event.Resource, simulatorResource))
                     {
                         restartHandler.Install(simulatorResource);
+                    }
+                    else if (options.CraneTargetAddressSettings is not null &&
+                        ReferenceEquals(@event.Resource, craneResource))
+                    {
+                        restartHandler.CaptureCraneRestart(craneResource);
                     }
 
                     return Task.CompletedTask;
@@ -355,7 +365,10 @@ internal static class BaseSimulationResourceRegistration
                 builder.Eventing.Subscribe<AfterResourcesCreatedEvent>((@event, _) =>
                 {
                     var restartHandler = @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>();
-                    restartHandler.InstallCm4(cm4Resource, simulatorResource);
+                    restartHandler.InstallCm4(
+                        cm4Resource,
+                        simulatorResource,
+                        options.CraneTargetAddressSettings is null ? null : craneResource);
                     restartHandler.Install(simulatorResource);
                     return Task.CompletedTask;
                 });

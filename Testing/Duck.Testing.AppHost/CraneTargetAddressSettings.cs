@@ -15,13 +15,19 @@ internal sealed record CraneTargetAddressSettings(
     internal static CraneTargetAddressSettings? FromConfiguration(
         IConfiguration configuration,
         string planner,
-        string appHostBaseDirectory)
+        string appHostBaseDirectory,
+        bool useStandardBase = false)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(planner);
         ArgumentException.ThrowIfNullOrWhiteSpace(appHostBaseDirectory);
 
         var target = configuration[ConfigurationKey];
+        if (target is null && useStandardBase && planner == "visibility_graph")
+        {
+            target = "cm4-sim";
+        }
+
         if (target is null)
         {
             return null;
