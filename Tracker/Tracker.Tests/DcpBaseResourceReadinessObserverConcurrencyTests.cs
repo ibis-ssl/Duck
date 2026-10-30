@@ -184,6 +184,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             Assert.True(firstGeneration > 0);
             Assert.Contains("--server", firstSession.Arguments);
             await runner.TargetApplied.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            await WaitUntilAsync(() => targetController.Snapshot().Phase == Cm4TransportTargetPhase.Applied);
             Assert.Equal(Cm4TransportTargetPhase.Applied, targetController.Snapshot().Phase);
             Assert.Equal(1, runner.StdioCalls);
             Assert.False(registry.Get(cm4Resource)!.IsReady);
@@ -209,7 +210,10 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             var replacementSession = runner.ForegroundSessions[1];
             Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
             Assert.True(long.Parse(replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture) > firstGeneration);
-            Assert.Equal(1, runner.StdioCalls);
+            await runner.SecondTargetApplied.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            Assert.Equal(2, runner.StdioCalls);
+            Assert.Equal(Cm4TransportTargetPhase.Applied, targetController.Snapshot().Phase);
+            Assert.Equal(new string('5', 64), targetController.Snapshot().Cm4ContainerId);
 
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", new string('5', 64)));
             await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource)).State == "Stopped");
@@ -460,8 +464,10 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         internal TaskCompletionSource ReleaseFirstInspect { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource ForegroundSessionStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal TaskCompletionSource TargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        internal TaskCompletionSource SecondTargetApplied { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal List<(string[] Arguments, ControlledForegroundSession Session)> ForegroundSessions { get; } = [];
-        internal int StdioCalls { get; private set; }
+        private int stdioCalls;
+        internal int StdioCalls => Volatile.Read(ref stdioCalls);
         internal int InspectCount => Volatile.Read(ref inspectCount);
 
         internal Task ForegroundSessionCountReached(int count) => Task.Run(async () =>
@@ -549,11 +555,15 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             TimeSpan timeout,
             CancellationToken cancellationToken)
         {
-            StdioCalls++;
+            var callNumber = Interlocked.Increment(ref stdioCalls);
             var request = JsonSerializer.Deserialize<Cm4TransportTargetMessage>(
                 standardInput.TrimEnd('\r', '\n'),
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-            if (request?.Type == "applyTarget") TargetApplied.TrySetResult();
+            if (request?.Type == "applyTarget")
+            {
+                if (callNumber == 1) TargetApplied.TrySetResult();
+                if (callNumber == 2) SecondTargetApplied.TrySetResult();
+            }
             var acknowledgement = request is null
                 ? string.Empty
                 : JsonSerializer.Serialize(request with { Type = "applied" }, new JsonSerializerOptions

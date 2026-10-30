@@ -662,6 +662,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     private readonly object sync = new();
     private IDockerCliForegroundSession? session;
     private DcpBaseResourceIdentityCandidate? sessionIdentity;
+    private DcpBaseResourceIdentityCandidate? reapedSessionIdentity;
     private bool sessionResourceStopped;
     private DcpBaseResourceIdentityCandidate? failedStartIdentity;
     private bool failedStartResourceStopped;
@@ -738,6 +739,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                     if (ReferenceEquals(session, completedSession))
                     {
                         session = null;
+                        reapedSessionIdentity = sessionIdentity;
                         sessionIdentity = null;
                         sessionResourceStopped = false;
                     }
@@ -763,6 +765,19 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                     return;
                 }
 
+                if (targetController is not null)
+                {
+                    var targetPhase = targetController.Snapshot().Phase;
+                    applyInitialTarget = targetPhase == Cm4TransportTargetPhase.Initial;
+                    if (targetPhase == Cm4TransportTargetPhase.Applied && reapedSessionIdentity is not null)
+                    {
+                        var previous = ToTransportIdentity(reapedSessionIdentity);
+                        var replacement = ToTransportIdentity(candidate);
+                        applyInitialTarget = targetController.TryReinitializeAfterConfirmedCm4Replacement(previous, replacement);
+                        if (!applyInitialTarget) return;
+                    }
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
                 var arguments = new[]
                 {
@@ -781,9 +796,9 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                     var startedSession = runner.StartForegroundSession(arguments);
                     session = startedSession;
                     sessionIdentity = candidate;
+                    reapedSessionIdentity = null;
                     sessionResourceStopped = false;
                     startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
-                    applyInitialTarget = targetController?.Snapshot().Phase == Cm4TransportTargetPhase.Initial;
                 }
                 catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)
                 {
@@ -839,6 +854,15 @@ internal sealed class OwnedCm4TransportServerSessionManager(
             reconcileGate.Release();
         }
     }
+
+    /// <summary>通知で確認した資源の所有情報を、補助制御の既存同一性表現へ移します。</summary>
+    private OwnedCm4TransportIdentity ToTransportIdentity(DcpBaseResourceIdentityCandidate candidate) => new(
+        candidate.RunId,
+        expectedEngineId!,
+        candidate.ResourceName,
+        candidate.ResourceId,
+        candidate.ContainerId!,
+        candidate.Generation);
 
     private bool IsCurrentOwnedCandidate(
         DcpBaseResourceIdentityCandidate? candidate,

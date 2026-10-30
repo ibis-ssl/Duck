@@ -342,6 +342,10 @@ public sealed class OwnedCm4SimulatorReconfigurationTests
             return 3;
         }
 
+        public bool TryReinitializeAfterConfirmedCm4Replacement(
+            OwnedCm4TransportIdentity previousCm4,
+            OwnedCm4TransportIdentity replacementCm4) => false;
+
         public Cm4TransportTargetSnapshot Snapshot() => new(1, phase, null, null, null);
     }
 }

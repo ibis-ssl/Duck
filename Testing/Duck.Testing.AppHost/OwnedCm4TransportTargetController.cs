@@ -77,6 +77,11 @@ internal interface IOwnedCm4TransportTargetController
 
     long Invalidate();
 
+    /// <summary>停止と回収が確定した旧CM4から、現在所有中の交換先へ初期適用を許可します。</summary>
+    bool TryReinitializeAfterConfirmedCm4Replacement(
+        OwnedCm4TransportIdentity previousCm4,
+        OwnedCm4TransportIdentity replacementCm4);
+
     Cm4TransportTargetSnapshot Snapshot();
 }
 
@@ -184,6 +189,61 @@ internal sealed class OwnedCm4TransportTargetController(
         return ApplyCoreAsync(current, helperLaunchId, operationEpoch, cancellationToken);
     }
 
+    /// <summary>旧 CM4 の停止と実行物回収が確認された後だけ、現在所有中の交換先へ初期適用を許可します。</summary>
+    public bool TryReinitializeAfterConfirmedCm4Replacement(
+        OwnedCm4TransportIdentity previousCm4,
+        OwnedCm4TransportIdentity replacementCm4)
+    {
+        ArgumentNullException.ThrowIfNull(previousCm4);
+        ArgumentNullException.ThrowIfNull(replacementCm4);
+        if (!string.Equals(previousCm4.RunId, runId, StringComparison.Ordinal) ||
+            !string.Equals(replacementCm4.RunId, runId, StringComparison.Ordinal) ||
+            !string.Equals(previousCm4.EngineId, expectedEngineId, StringComparison.Ordinal) ||
+            !string.Equals(replacementCm4.EngineId, expectedEngineId, StringComparison.Ordinal) ||
+            !string.Equals(previousCm4.ResourceName, Cm4ResourceName, StringComparison.Ordinal) ||
+            !string.Equals(replacementCm4.ResourceName, Cm4ResourceName, StringComparison.Ordinal) ||
+            string.Equals(previousCm4.ContainerId, replacementCm4.ContainerId, StringComparison.Ordinal) ||
+            replacementCm4.Generation <= previousCm4.Generation ||
+            !OwnedContainerInspection.IsFullId(previousCm4.ContainerId) ||
+            !OwnedContainerInspection.IsFullId(replacementCm4.ContainerId))
+        {
+            return false;
+        }
+
+        lock (stateLock)
+        {
+            if (phase != Cm4TransportTargetPhase.Applied ||
+                !Equals(activeIdentities?.Cm4, previousCm4))
+            {
+                return false;
+            }
+
+            OwnedCm4TransportIdentityPair? current;
+            try
+            {
+                current = getCurrent();
+            }
+            catch (Exception exception) when (exception is InvalidOperationException or ObjectDisposedException)
+            {
+                return false;
+            }
+
+            if (current is null || !IsValidIdentityPair(current) ||
+                !Equals(current.Cm4, replacementCm4))
+            {
+                return false;
+            }
+
+            epoch = checked(epoch + 1);
+            phase = Cm4TransportTargetPhase.Initial;
+            activeIdentities = null;
+            pendingIdentities = null;
+            activeHelperLaunchId = null;
+            pendingHelperLaunchId = null;
+            activeTargetAddress = null;
+            return true;
+        }
+    }
     public Cm4TransportTargetSnapshot Snapshot()
     {
         lock (stateLock)
