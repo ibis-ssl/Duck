@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "unit": "Issue81/PR84 G5C1",
+  "baseline": "2827df434b01bd0f63b93e07d326f0b5eaa1550a",
+  "codeFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "415E3723AEA6849A0F307BAB5324281AB541C68C75970BCEE879BC9BF39FD7A1"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "313C7C171AD5B02EB6CCAEA54B31F12D23B1D2313C34D5CB533091BEE3381BA5"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "B1E3A84289D9D1372EF90333F5EA3FA20EE0A1FA79172869124D00721971F8EB"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "sha256": "C2D51103442C9D8DC580C64EC05B460AF3E8896C5816447D1F3D561746B11BF7"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "AB8584D68B8C9306B43A1C03BAFC505724C33F3A797D740F713E57304D84400F"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "2C10F5C574B6E6A776C4D6AC7E43B5E1CA35E06B40CF40B6B052CC218E1F9DB4"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "165E58EB0AF681DDD8BCFB0318022B485BEBB026DD397B267E00E44E0C10F7C6"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4TransportTargetControllerTests.cs",
+      "sha256": "A2572C3BB2FE1F4460A609D5859EB3C873317D779341B382EC2346EE0B03E760"
+    }
+  ],
+  "documents": [
+    {
+      "name": "design",
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "fullSourceSha256": "59B5B203E4D760B28464C1A35B5B1FD43CD41CB04D66879396F51E1A43A8BA15",
+      "addedInputSha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+      "cspellCopySha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+      "addedLines": 10
+    },
+    {
+      "name": "tasks",
+      "path": "Tracker/Design/tasks-status.md",
+      "fullSourceSha256": "9474BFC8AAEA71F326A9F61F3486D6B76AEB766C6385411938894E9A920A0B3A",
+      "addedInputSha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+      "cspellCopySha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+      "addedLines": 3
+    },
+    {
+      "name": "phases",
+      "path": "Tracker/Design/phases-status.md",
+      "fullSourceSha256": "A9945F0CEC027E407FD30085D1E2F743D08706FA39307FF8F2069C7BC144E286",
+      "addedInputSha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+      "cspellCopySha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+      "addedLines": 4
+    }
+  ],
+  "documentGates": {
+    "count": 12,
+    "allExitZero": true,
+    "allTimedOutFalse": true,
+    "rows": [
+      {
+        "document": "design",
+        "gate": "textlint",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "cspellCopySha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "textlint",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "design-added.md"
+        ]
+      },
+      {
+        "document": "design",
+        "gate": "whitelist",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "cspellCopySha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "design-added.md"
+        ]
+      },
+      {
+        "document": "design",
+        "gate": "cspell",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "cspellCopySha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "47780B35FB2C72CA9A9DA6FEECCD3F2ACCA218ACCF1BB60CD6EF84156BEF2121",
+        "argvSummary": [
+          "node",
+          "run-cspell-markdown.js",
+          "changed/issue81-b3-g5c1-v2-design.md"
+        ]
+      },
+      {
+        "document": "design",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "cspellCopySha256": "A0A371B4522A5304AB1667B68358C84C462C6BBA398B55EE3EC668252915A817",
+        "stdoutSha256": "AB1A0CA7EED3924BCF6D24F77BDD62C7557D89DF91510351D054EB994B1B663F",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "yomiyasu_lint.py",
+          "inputs/design-added.md",
+          "--json",
+          "--strict"
+        ]
+      },
+      {
+        "document": "tasks",
+        "gate": "textlint",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "cspellCopySha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "textlint",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "tasks-added.md"
+        ]
+      },
+      {
+        "document": "tasks",
+        "gate": "whitelist",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "cspellCopySha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "tasks-added.md"
+        ]
+      },
+      {
+        "document": "tasks",
+        "gate": "cspell",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "cspellCopySha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "C2041F3CF36BA5E68299702C5A4774CF7CBEA9DE86D19E12273BF3DAB36E8B6C",
+        "argvSummary": [
+          "node",
+          "run-cspell-markdown.js",
+          "changed/issue81-b3-g5c1-tasks.md"
+        ]
+      },
+      {
+        "document": "tasks",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "cspellCopySha256": "334D3FBD27368E6E3F8603A5322906AF2011CA86165056F33CA02409A201A150",
+        "stdoutSha256": "A5344B5A94D980330552EF308DB67CF99B46A58322703F71297D79425618660B",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "yomiyasu_lint.py",
+          "inputs/tasks-added.md",
+          "--json",
+          "--strict"
+        ]
+      },
+      {
+        "document": "phases",
+        "gate": "textlint",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "cspellCopySha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "textlint",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "phases-added.md"
+        ]
+      },
+      {
+        "document": "phases",
+        "gate": "whitelist",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "cspellCopySha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "phases-added.md"
+        ]
+      },
+      {
+        "document": "phases",
+        "gate": "cspell",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "cspellCopySha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "4B05523F25D44C4F3613ACB629894177ED3EF2635100CE7F3CEB9AA911B39FE0",
+        "argvSummary": [
+          "node",
+          "run-cspell-markdown.js",
+          "changed/issue81-b3-g5c1-phases.md"
+        ]
+      },
+      {
+        "document": "phases",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "cspellCopySha256": "5F2B4A36524EA5DBB6763E0F83AAC234032255915D80FBE65B0CE3FC1B03F2E4",
+        "stdoutSha256": "7245887460E11EA245F9785D0A816E972810D0C66B2316BE4006539F4085ACFC",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "argvSummary": [
+          "python",
+          "-X",
+          "utf8",
+          "-B",
+          "yomiyasu_lint.py",
+          "inputs/phases-added.md",
+          "--json",
+          "--strict"
+        ]
+      }
+    ],
+    "reuse": "tasks/phases inputs and copies matched prior successful hashes; design was rerun against final input."
+  },
+  "tests": {
+    "focused": "5/5",
+    "related": "49/49; overlaps focused and is not additive",
+    "releaseBuild": {
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": [
+        "existing ASPIRE010"
+      ]
+    }
+  },
+  "history": {
+    "registeredRestartRed": {
+      "exit": 1,
+      "timedOut": false,
+      "stdoutSha256": "63318BACD263C05018FD18579314597C6602CA603702582702EBB6E9409CE3B4",
+      "stderrSha256": "514D040E915777352AD66B80182253FFC3A543BD11A23FE48E66DC72DF28B935"
+    },
+    "initialDocRun": "10/12; design whitelist/CSpell rejected two terms; superseded by final mixed-run matrix, original artifacts retained.",
+    "temporaryWatcherAttempt": "test assertion timeout, removed, cause unknown; excluded from passing results."
+  },
+  "limits": [
+    "No actual DCP/AppHost/container runtime, helper deployment, UDP, or end-to-end receive/decode acceptance was performed.",
+    "G5C2 is not covered.",
+    "No commit or push was performed.",
+    "An optional production comment translation was denied by auto-review under source freeze and was not retried."
+  ]
+}

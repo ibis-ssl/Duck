@@ -670,6 +670,61 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     /// <summary>前景クライアントの終了後、既存の所有確認を再開する通知です。</summary>
     internal event Action? SessionCompleted;
 
+    /// <summary>Notifies command coordination after the foreground helper starts for a verified CM4.</summary>
+    internal event Action<DcpBaseResourceIdentityCandidate>? SessionStarted;
+
+    /// <summary>Notifies command coordination when the foreground helper could not start for a verified CM4.</summary>
+    internal event Action<DcpBaseResourceIdentityCandidate>? SessionStartFailed;
+
+    internal bool IsSessionStartedFor(DcpBaseResourceIdentityCandidate candidate)
+    {
+        lock (sync)
+        {
+            return session is not null && sessionIdentity is not null && SameCandidate(sessionIdentity, candidate);
+        }
+    }
+
+    internal async Task<bool> WaitForSessionStartedAsync(
+        DcpBaseResourceIdentityCandidate candidate,
+        CancellationToken cancellationToken)
+    {
+        if (IsSessionStartedFor(candidate)) return true;
+        if (IsSessionStartFailedFor(candidate)) return false;
+
+        var startResult = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        void OnStarted(DcpBaseResourceIdentityCandidate observed)
+        {
+            if (SameCandidate(observed, candidate)) startResult.TrySetResult(true);
+        }
+        void OnFailed(DcpBaseResourceIdentityCandidate observed)
+        {
+            if (SameCandidate(observed, candidate)) startResult.TrySetResult(false);
+        }
+
+        SessionStarted += OnStarted;
+        SessionStartFailed += OnFailed;
+        try
+        {
+            if (IsSessionStartedFor(candidate)) return true;
+            if (IsSessionStartFailedFor(candidate)) return false;
+            return await startResult.Task.WaitAsync(cancellationToken).ConfigureAwait(false) &&
+                IsSessionStartedFor(candidate);
+        }
+        finally
+        {
+            SessionStarted -= OnStarted;
+            SessionStartFailed -= OnFailed;
+        }
+    }
+
+    private bool IsSessionStartFailedFor(DcpBaseResourceIdentityCandidate candidate)
+    {
+        lock (sync)
+        {
+            return failedStartIdentity is not null && SameCandidate(failedStartIdentity, candidate);
+        }
+    }
+
     /// <summary>DCP の停止通知を記録し、前景セッションの解放可否を追跡します。</summary>
     internal void ObserveResourceEvent(ResourceEvent observation, ResourceEvent current)
     {
@@ -718,6 +773,8 @@ internal sealed class OwnedCm4TransportServerSessionManager(
         {
             var shouldApplyInitialTargetAfterStart = false;
             var applyInitialTarget = false;
+            DcpBaseResourceIdentityCandidate? startedSessionIdentity = null;
+            DcpBaseResourceIdentityCandidate? failedSessionIdentity = null;
             IDockerCliForegroundSession? completedSession = null;
             lock (sync)
             {
@@ -792,12 +849,15 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                     {
                         var targetPhase = targetController.Snapshot().Phase;
                         shouldApplyInitialTargetAfterStart = targetPhase == Cm4TransportTargetPhase.Initial;
-                        if (targetPhase == Cm4TransportTargetPhase.Applied && reapedSessionIdentity is not null)
+                        if ((targetPhase == Cm4TransportTargetPhase.Applied ||
+                             targetPhase == Cm4TransportTargetPhase.Invalidated) &&
+                            reapedSessionIdentity is not null)
                         {
                             var previous = ToTransportIdentity(reapedSessionIdentity);
                             var replacement = ToTransportIdentity(candidate);
                             shouldApplyInitialTargetAfterStart = targetController.TryReinitializeAfterConfirmedCm4Replacement(previous, replacement);
                             if (!shouldApplyInitialTargetAfterStart) return;
+                            shouldApplyInitialTargetAfterStart = targetPhase == Cm4TransportTargetPhase.Applied;
                         }
                     }
 
@@ -826,14 +886,25 @@ internal sealed class OwnedCm4TransportServerSessionManager(
                         reapedSessionIdentity = null;
                         sessionResourceStopped = false;
                         applyInitialTarget = shouldApplyInitialTargetAfterStart;
+                        startedSessionIdentity = candidate;
                         startedSession.Completion.GetAwaiter().OnCompleted(() => SessionCompleted?.Invoke());
                     }
                     catch (Exception exception) when (exception is IOException or System.ComponentModel.Win32Exception)
                     {
                         failedStartIdentity = candidate;
                         failedStartResourceStopped = false;
+                        failedSessionIdentity = candidate;
                     }
                 }
+            }
+
+            if (startedSessionIdentity is not null)
+            {
+                SessionStarted?.Invoke(startedSessionIdentity);
+            }
+            else if (failedSessionIdentity is not null)
+            {
+                SessionStartFailed?.Invoke(failedSessionIdentity);
             }
 
             if (applyInitialTarget && targetController is not null)
@@ -885,6 +956,12 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     }
 
     /// <summary>通知で確認した資源の所有情報を、補助制御の既存同一性表現へ移します。</summary>
+    private static bool SameCandidate(
+        DcpBaseResourceIdentityCandidate left,
+        DcpBaseResourceIdentityCandidate right) =>
+        left.ResourceId == right.ResourceId && left.ContainerId == right.ContainerId &&
+        left.Generation == right.Generation;
+
     private OwnedCm4TransportIdentity ToTransportIdentity(DcpBaseResourceIdentityCandidate candidate) => new(
         candidate.RunId,
         expectedEngineId!,

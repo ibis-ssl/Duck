@@ -315,7 +315,8 @@ internal static class BaseSimulationResourceRegistration
                         services.GetRequiredService<ResourceNotificationService>(),
                         simulatorResource,
                         cm4Resource,
-                        options.ExpectedEngineId));
+                        options.ExpectedEngineId,
+                        () => services.GetService<OwnedCm4TransportServerSessionManager>()));
                 if (!string.IsNullOrWhiteSpace(options.DockerContextName) &&
                     !string.IsNullOrWhiteSpace(options.ExpectedEngineId))
                 {
@@ -338,18 +339,23 @@ internal static class BaseSimulationResourceRegistration
                 builder.Services.AddSingleton<OwnedCm4SimulatorRestartCommandHandler>();
                 builder.Eventing.Subscribe<BeforeResourceStartedEvent>((@event, _) =>
                 {
-                    if (ReferenceEquals(@event.Resource, simulatorResource))
+                    var restartHandler = @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>();
+                    if (ReferenceEquals(@event.Resource, cm4Resource))
                     {
-                        @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>()
-                            .Install(simulatorResource);
+                        restartHandler.InstallCm4(cm4Resource, simulatorResource);
+                    }
+                    else if (ReferenceEquals(@event.Resource, simulatorResource))
+                    {
+                        restartHandler.Install(simulatorResource);
                     }
 
                     return Task.CompletedTask;
                 });
                 builder.Eventing.Subscribe<AfterResourcesCreatedEvent>((@event, _) =>
                 {
-                    @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>()
-                        .Install(simulatorResource);
+                    var restartHandler = @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>();
+                    restartHandler.InstallCm4(cm4Resource, simulatorResource);
+                    restartHandler.Install(simulatorResource);
                     return Task.CompletedTask;
                 });
 

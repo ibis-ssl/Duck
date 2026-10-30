@@ -82,10 +82,14 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
     }
 
     [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
-    [InlineData(2)]
-    public async Task StartsOnlyTheOwnedCurrentCm4SessionAndReapsItAfterDcpStopAndExecExit(int failedStartAttempt)
+    [InlineData(0, false)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(0, true)]
+    [InlineData(2, true)]
+    public async Task StartsOnlyTheOwnedCurrentCm4SessionAndReapsItAfterDcpStopAndExecExit(
+        int failedStartAttempt,
+        bool invalidateTargetBeforeReplacement)
     {
         using var lifetime = new TestApplicationLifetime();
         using var notifications = new ResourceNotificationService(
@@ -205,6 +209,14 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             Assert.Equal(1, runner.StdioCalls);
             Assert.False(registry.Get(cm4Resource)!.IsReady);
 
+            if (invalidateTargetBeforeReplacement)
+            {
+                var invalidation = await targetController.InvalidateCurrentTargetAsync(runId, CancellationToken.None);
+                Assert.True(invalidation.Invalidated, invalidation.Error);
+                Assert.Equal(Cm4TransportTargetPhase.Invalidated, targetController.Snapshot().Phase);
+                Assert.Equal(2, runner.StdioCalls);
+            }
+
             var releaseSignals = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var terminalNotification = Task.Run(async () =>
             {
@@ -218,7 +230,10 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             });
             releaseSignals.TrySetResult();
             await Task.WhenAll(terminalNotification, childCompletion);
-            await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
+            if (!invalidateTargetBeforeReplacement)
+            {
+                await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
+            }
             await firstSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
 
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('5', 64)));
@@ -227,8 +242,19 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             {
                 await WaitUntilAsync(() => runner.ForegroundStartAttempts == 2);
                 Assert.Single(runner.ForegroundSessions);
-                Assert.Equal(1, runner.StdioCalls);
-                Assert.Equal(Cm4TransportTargetPhase.Initial, targetController.Snapshot().Phase);
+                Assert.Equal(invalidateTargetBeforeReplacement ? 2 : 1, runner.StdioCalls);
+                Assert.Equal(
+                    invalidateTargetBeforeReplacement ? Cm4TransportTargetPhase.Invalidated : Cm4TransportTargetPhase.Initial,
+                    targetController.Snapshot().Phase);
+                if (invalidateTargetBeforeReplacement)
+                {
+                    var failedCandidate = registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource));
+                    Assert.False(await sessions.WaitForSessionStartedAsync(
+                        failedCandidate,
+                        CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1)));
+                    Assert.Equal(2, runner.StdioCalls);
+                    Assert.Equal(Cm4TransportTargetPhase.Invalidated, targetController.Snapshot().Phase);
+                }
                 return;
             }
 
@@ -236,6 +262,23 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             var replacementSession = runner.ForegroundSessions[1];
             Assert.Equal(new string('5', 64), replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-container-id") + 1]);
             Assert.True(long.Parse(replacementSession.Arguments[replacementSession.Arguments.IndexOf("--cm4-generation") + 1], System.Globalization.CultureInfo.InvariantCulture) > firstGeneration);
+            if (invalidateTargetBeforeReplacement)
+            {
+                var currentPair = GetCurrentOwnedPair();
+                Assert.NotNull(currentPair);
+                Assert.True(targetController.IsInvalidatedFor(currentPair));
+                Assert.Equal(Cm4TransportTargetPhase.Invalidated, targetController.Snapshot().Phase);
+                Assert.Equal(2, runner.StdioCalls);
+
+                await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", new string('5', 64)));
+                await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource)).State == "Stopped");
+                replacementSession.Session.CompleteExit();
+                using var invalidatedStopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                await observer.StopAsync(invalidatedStopTimeout.Token);
+                observerStopped = true;
+                await replacementSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
+                return;
+            }
             await runner.SecondTargetApplied.Task.WaitAsync(TimeSpan.FromSeconds(3));
             await WaitUntilAsync(() => targetController.Snapshot() is
             {
@@ -727,7 +770,10 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             }
             var acknowledgement = request is null
                 ? string.Empty
-                : JsonSerializer.Serialize(request with { Type = "applied" }, new JsonSerializerOptions
+                : JsonSerializer.Serialize(request with
+                {
+                    Type = request.Type == "invalidateTarget" ? "invalidated" : "applied",
+                }, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 });

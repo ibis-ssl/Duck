@@ -14,6 +14,84 @@ namespace Tracker.Tests;
 public sealed class BaseSimulationResourceRegistrationTests
 {
     [Fact]
+    public async Task StandardCm4RestartIsGuardedBeforeCm4Starts()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-cm4-restart-before-start-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        File.WriteAllText(Path.Combine(fixtureRoot, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName), "fixture-only");
+        var restartCalls = 0;
+        var simulatorRestartCalls = 0;
+
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    "base-cm4-restart-before-start-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-base-cm4-restart-before-start-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { },
+                appHostAssetRoot: fixtureRoot);
+            var cm4 = resources.Cm4Simulator!.Resource;
+            cm4.Annotations.Add(new ResourceCommandAnnotation(
+                KnownResourceCommands.RestartCommand,
+                "Restart CM4",
+                _ => ResourceCommandState.Enabled,
+                _ =>
+                {
+                    Interlocked.Increment(ref restartCalls);
+                    return Task.FromResult(new ExecuteCommandResult { Success = true });
+                },
+                "Restart the CM4 simulator",
+                arguments: null,
+                confirmationMessage: null,
+                iconName: "ArrowCounterclockwise",
+                iconVariant: IconVariant.Regular,
+                isHighlighted: false));
+            var simulator = resources.Simulator.Resource;
+            simulator.Annotations.Add(new ResourceCommandAnnotation(
+                KnownResourceCommands.RestartCommand,
+                "Restart simulator",
+                _ => ResourceCommandState.Enabled,
+                _ =>
+                {
+                    Interlocked.Increment(ref simulatorRestartCalls);
+                    return Task.FromResult(new ExecuteCommandResult { Success = true });
+                },
+                "Restart the simulator",
+                arguments: null,
+                confirmationMessage: null,
+                iconName: "ArrowCounterclockwise",
+                iconVariant: IconVariant.Regular,
+                isHighlighted: false));
+
+            await using var application = builder.Build();
+            var eventing = application.Services.GetRequiredService<IDistributedApplicationEventing>();
+            await eventing.PublishAsync(
+                new BeforeResourceStartedEvent(cm4, application.Services),
+                EventDispatchBehavior.BlockingSequential,
+                CancellationToken.None);
+
+            var result = await application.Services.GetRequiredService<ResourceCommandService>()
+                .ExecuteCommandAsync(cm4, KnownResourceCommands.RestartCommand, CancellationToken.None);
+
+            Assert.False(result.Success);
+            Assert.Equal(0, restartCalls);
+            Assert.Equal(0, simulatorRestartCalls);
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot)) Directory.Delete(fixtureRoot, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task StandardCm4RestartGuardIsInstalledBeforeSelectedSimulatorStarts()
     {
         var builder = DistributedApplication.CreateBuilder([]);

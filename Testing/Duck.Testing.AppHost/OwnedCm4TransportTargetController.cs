@@ -82,6 +82,8 @@ internal interface IOwnedCm4TransportTargetController
         OwnedCm4TransportIdentity previousCm4,
         OwnedCm4TransportIdentity replacementCm4);
 
+    bool IsInvalidatedFor(OwnedCm4TransportIdentityPair identities);
+
     Cm4TransportTargetSnapshot Snapshot();
 }
 
@@ -212,8 +214,11 @@ internal sealed class OwnedCm4TransportTargetController(
 
         lock (stateLock)
         {
-            if (phase != Cm4TransportTargetPhase.Applied ||
-                !Equals(activeIdentities?.Cm4, previousCm4))
+            var wasApplied = phase == Cm4TransportTargetPhase.Applied &&
+                Equals(activeIdentities?.Cm4, previousCm4);
+            var wasInvalidated = phase == Cm4TransportTargetPhase.Invalidated &&
+                Equals(pendingIdentities?.Cm4, previousCm4);
+            if (!wasApplied && !wasInvalidated)
             {
                 return false;
             }
@@ -234,14 +239,41 @@ internal sealed class OwnedCm4TransportTargetController(
                 return false;
             }
 
+            if (wasInvalidated)
+            {
+                var priorSimulator = pendingIdentities?.Simulator;
+                if (priorSimulator is null ||
+                    !Equals(current.Simulator, priorSimulator with { Generation = current.Simulator.Generation }))
+                {
+                    return false;
+                }
+            }
+
             epoch = checked(epoch + 1);
-            phase = Cm4TransportTargetPhase.Initial;
             activeIdentities = null;
-            pendingIdentities = null;
             activeHelperLaunchId = null;
-            pendingHelperLaunchId = null;
             activeTargetAddress = null;
+            if (wasApplied)
+            {
+                phase = Cm4TransportTargetPhase.Initial;
+                pendingIdentities = null;
+                pendingHelperLaunchId = null;
+            }
+            else
+            {
+                // Confirmed replacement updates the proof binding without reviving the invalidated route.
+                pendingIdentities = current;
+            }
             return true;
+        }
+    }
+
+    public bool IsInvalidatedFor(OwnedCm4TransportIdentityPair identities)
+    {
+        lock (stateLock)
+        {
+            return phase == Cm4TransportTargetPhase.Invalidated &&
+                Equals(pendingIdentities, identities);
         }
     }
     public Cm4TransportTargetSnapshot Snapshot()
@@ -543,9 +575,9 @@ internal sealed class OwnedCm4TransportTargetController(
 
                 phase = Cm4TransportTargetPhase.Invalidated;
                 activeIdentities = null;
-                pendingIdentities = null;
                 activeHelperLaunchId = null;
-                pendingHelperLaunchId = null;
+                pendingIdentities = requested;
+                pendingHelperLaunchId = helperLaunchId;
                 activeTargetAddress = null;
             }
 
@@ -656,9 +688,9 @@ internal sealed class OwnedCm4TransportTargetController(
             epoch = checked(epoch + 1);
             phase = Cm4TransportTargetPhase.Invalidating;
             activeIdentities = null;
-            pendingIdentities = null;
+            pendingIdentities = identities;
             activeHelperLaunchId = null;
-            pendingHelperLaunchId = null;
+            pendingHelperLaunchId = helperLaunchId;
             activeTargetAddress = null;
             return (epoch, identities, helperLaunchId);
         }

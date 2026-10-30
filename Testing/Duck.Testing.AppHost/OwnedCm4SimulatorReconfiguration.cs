@@ -15,6 +15,10 @@ internal interface IOwnedCm4SimulatorReconfigurationAdapter
     Task<OwnedCm4TransportIdentityPair?> WaitForReplacementAsync(
         OwnedCm4TransportIdentityPair previous,
         CancellationToken cancellationToken);
+
+    Task<OwnedCm4TransportIdentityPair?> WaitForCm4ReplacementAsync(
+        OwnedCm4TransportIdentityPair previous,
+        CancellationToken cancellationToken);
 }
 
 /// <summary>既存の所有確認、無効化、DCP再作成、再適用を順に実行します。</summary>
@@ -167,6 +171,128 @@ internal sealed class OwnedCm4SimulatorReconfigurationCoordinator(
         }
     }
 
+    /// <summary>CM4 再起動を無効化確認、所有世代交換、Simulator 再起動、最終適用の順で実行します。</summary>
+    internal async Task<OwnedCm4SimulatorReconfigurationResult> ExecuteCm4RestartAsync(
+        ExecuteCommandContext commandContext,
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartCm4Command,
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartSimulatorCommand)
+    {
+        ArgumentNullException.ThrowIfNull(commandContext);
+        ArgumentNullException.ThrowIfNull(restartCm4Command);
+        ArgumentNullException.ThrowIfNull(restartSimulatorCommand);
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(commandContext.CancellationToken);
+        deadline.CancelAfter(operationLimit);
+        var token = deadline.Token;
+        var entered = false;
+        var replacementTargetAcknowledged = false;
+        try
+        {
+            await operationGate.WaitAsync(token).ConfigureAwait(false);
+            entered = true;
+            if (controller is null) return Failed("Docker context or expected Engine ID is not configured.");
+
+            var previous = adapter.GetCurrentOwnedPair();
+            if (previous is null || controller.Snapshot().Phase != Cm4TransportTargetPhase.Applied)
+            {
+                return Failed("The current owned pair and applied target are required before CM4 restart.");
+            }
+
+            var invalidation = await controller.InvalidateCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
+            if (!invalidation.Invalidated || invalidation.Unknown ||
+                controller.Snapshot().Phase != Cm4TransportTargetPhase.Invalidated)
+            {
+                return Failed("Remote target invalidation was not confirmed; CM4 restart was not requested.");
+            }
+            token.ThrowIfCancellationRequested();
+            if (!SamePair(previous, adapter.GetCurrentOwnedPair()))
+            {
+                return Failed("The owned pair changed before CM4 restart; no restart was requested.");
+            }
+
+            var cm4Restart = await restartCm4Command(CreateRestartContext(commandContext, previous.Cm4.ResourceName, token))
+                .ConfigureAwait(false);
+            if (!cm4Restart.Success)
+            {
+                return new(false, cm4Restart.Message ?? "CM4 restart did not succeed; the route remains invalidated.",
+                    cm4Restart.Canceled, cm4Restart);
+            }
+            token.ThrowIfCancellationRequested();
+
+            var afterCm4 = await adapter.WaitForCm4ReplacementAsync(previous, token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
+            if (afterCm4 is null || afterCm4.Simulator != previous.Simulator ||
+                afterCm4.Cm4.Generation <= previous.Cm4.Generation ||
+                afterCm4.Cm4.ContainerId == previous.Cm4.ContainerId ||
+                !SamePair(afterCm4, adapter.GetCurrentOwnedPair()) ||
+                !controller.IsInvalidatedFor(afterCm4))
+            {
+                return Failed("A reaped helper session and current owned CM4 replacement were not confirmed.");
+            }
+
+            token.ThrowIfCancellationRequested();
+            if (!SamePair(afterCm4, adapter.GetCurrentOwnedPair()))
+            {
+                return Failed("The owned pair changed before Simulator restart; the route remains invalidated.");
+            }
+            var simulatorRestart = await restartSimulatorCommand(
+                CreateRestartContext(commandContext, afterCm4.Simulator.ResourceName, token)).ConfigureAwait(false);
+            if (!simulatorRestart.Success)
+            {
+                return new(false,
+                    simulatorRestart.Message ?? "Simulator restart did not succeed; the route remains invalidated.",
+                    simulatorRestart.Canceled, simulatorRestart);
+            }
+            token.ThrowIfCancellationRequested();
+
+            var replacement = await adapter.WaitForReplacementAsync(afterCm4, token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
+            if (replacement is null || replacement.Cm4 != afterCm4.Cm4 ||
+                replacement.Simulator.Generation <= afterCm4.Simulator.Generation ||
+                replacement.Simulator.ContainerId == afterCm4.Simulator.ContainerId ||
+                !SamePair(replacement, adapter.GetCurrentOwnedPair()))
+            {
+                return Failed("A current owned Simulator replacement was not confirmed; no target was applied.");
+            }
+
+            var applied = await controller.ApplyCurrentTargetAsync(helperLaunchId, token).ConfigureAwait(false);
+            if (!applied.Applied || applied.Unknown || !SamePair(replacement, adapter.GetCurrentOwnedPair()))
+            {
+                return Failed("The final target was not confirmed for the current owned pair.");
+            }
+
+            replacementTargetAcknowledged = true;
+            token.ThrowIfCancellationRequested();
+            return new(true, "CM4 and Simulator restart completed with a confirmed current target.",
+                RestartCommandResult: simulatorRestart);
+        }
+        catch (OperationCanceledException) when (commandContext.CancellationToken.IsCancellationRequested)
+        {
+            if (replacementTargetAcknowledged) controller?.Invalidate();
+            return new(false, "Reconfiguration was canceled; remote state is not inferred.", Canceled: true);
+        }
+        catch (OperationCanceledException)
+        {
+            controller?.Invalidate();
+            return Failed("The bounded reconfiguration operation expired; remote state is unknown.");
+        }
+        finally
+        {
+            if (entered) operationGate.Release();
+        }
+    }
+
+    private static ExecuteCommandContext CreateRestartContext(
+        ExecuteCommandContext commandContext,
+        string resourceName,
+        CancellationToken cancellationToken) => new()
+    {
+        Services = commandContext.Services,
+        ResourceName = resourceName,
+        Logger = commandContext.Logger,
+        Arguments = commandContext.Arguments,
+        CancellationToken = cancellationToken,
+    };
+
     private static OwnedCm4SimulatorReconfigurationResult Failed(string message) => new(false, message);
 
     private static bool SamePair(
@@ -190,6 +316,9 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
     private IResource? boundResource;
     private ResourceCommandAnnotation? originalCommand;
     private ResourceCommandAnnotation? guardedCommand;
+    private IResource? boundCm4Resource;
+    private ResourceCommandAnnotation? originalCm4Command;
+    private ResourceCommandAnnotation? guardedCm4Command;
 
     /// <summary>
     /// 作成済み資源のRestart命令を一度だけ捕捉し、公開メタデータを保ったガードへ置き換えます。
@@ -252,6 +381,79 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
         guardedCommand = guarded;
     }
 
+    /// <summary>標準CM4の再起動命令を、Simulatorの元命令と組み合わせるガードへ一度だけ置き換えます。</summary>
+    internal void InstallCm4(IResource cm4Resource, IResource simulatorResource)
+    {
+        ArgumentNullException.ThrowIfNull(cm4Resource);
+        ArgumentNullException.ThrowIfNull(simulatorResource);
+        if (boundCm4Resource is not null && !ReferenceEquals(boundCm4Resource, cm4Resource))
+        {
+            throw new InvalidOperationException("The CM4 restart guard is already bound to another resource.");
+        }
+        if (boundCm4Resource is not null && guardedCm4Command is not null &&
+            cm4Resource.Annotations.OfType<ResourceCommandAnnotation>().Any(command =>
+                command.Name == KnownResourceCommands.RestartCommand && ReferenceEquals(command, guardedCm4Command)))
+        {
+            return;
+        }
+
+        if (boundResource is not null && !ReferenceEquals(boundResource, simulatorResource))
+        {
+            throw new InvalidOperationException("The Simulator restart guard is bound to another resource.");
+        }
+        var restartCommands = cm4Resource.Annotations
+            .OfType<ResourceCommandAnnotation>()
+            .Where(command => command.Name == KnownResourceCommands.RestartCommand)
+            .ToArray();
+        if (restartCommands.Length == 0)
+        {
+            return;
+        }
+        if (restartCommands.Length != 1)
+        {
+            throw new InvalidOperationException("The standard CM4 Restart command was not available before startup.");
+        }
+
+        var simulatorRestart = originalCommand ?? simulatorResource.Annotations
+            .OfType<ResourceCommandAnnotation>()
+            .SingleOrDefault(command => command.Name == KnownResourceCommands.RestartCommand);
+        if (simulatorRestart is null)
+        {
+            throw new InvalidOperationException("The captured Simulator Restart command is unavailable.");
+        }
+
+        var command = restartCommands[0];
+#pragma warning disable CS0618 // The standard Restart command does not use the obsolete parameter.
+        if (command.Parameter is not null || command.Progress is not null)
+        {
+            throw new InvalidOperationException("The standard CM4 Restart command has metadata that cannot be preserved by the public command API.");
+        }
+#pragma warning restore CS0618
+
+        var guarded = new ResourceCommandAnnotation(
+            command.Name,
+            command.DisplayName,
+            command.UpdateState,
+            context => ExecuteCm4Async(context, simulatorRestart.ExecuteCommand),
+            command.DisplayDescription,
+            command.Arguments,
+            command.ConfirmationMessage,
+            command.IconName,
+            command.IconVariant,
+            command.IsHighlighted,
+            command.Visibility,
+            command.ValidateArguments);
+        if (!cm4Resource.Annotations.Remove(command))
+        {
+            throw new InvalidOperationException("The standard CM4 Restart command could not be replaced.");
+        }
+
+        cm4Resource.Annotations.Add(guarded);
+        boundCm4Resource = cm4Resource;
+        originalCm4Command = command;
+        guardedCm4Command = guarded;
+    }
+
     /// <summary>
     /// 無効化確認後に捕捉した元のRestart処理を呼び、交換後の宛先適用までを実行します。
     /// </summary>
@@ -280,6 +482,22 @@ internal sealed class OwnedCm4SimulatorRestartCommandHandler(
             Canceled = result.Canceled,
         };
     }
+
+    private async Task<ExecuteCommandResult> ExecuteCm4Async(
+        ExecuteCommandContext context,
+        Func<ExecuteCommandContext, Task<ExecuteCommandResult>> restartSimulatorCommand)
+    {
+        var restartCm4Command = originalCm4Command?.ExecuteCommand;
+        if (restartCm4Command is null)
+        {
+            return new ExecuteCommandResult { Success = false, Message = "The standard CM4 Restart command is not bound." };
+        }
+
+        var result = await coordinator.ExecuteCm4RestartAsync(
+            context, restartCm4Command, restartSimulatorCommand).ConfigureAwait(false);
+        if (result.Success && result.RestartCommandResult is not null) return result.RestartCommandResult;
+        return new ExecuteCommandResult { Success = false, Message = result.Message, Canceled = result.Canceled };
+    }
 }
 
 internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
@@ -289,7 +507,8 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
     ResourceNotificationService notifications,
     IResource simulator,
     IResource cm4,
-    string? expectedEngineId) : IOwnedCm4SimulatorReconfigurationAdapter
+    string? expectedEngineId,
+    Func<OwnedCm4TransportServerSessionManager?>? getSessionManager = null) : IOwnedCm4SimulatorReconfigurationAdapter
 {
     public OwnedCm4TransportIdentityPair? GetCurrentOwnedPair()
     {
@@ -353,6 +572,47 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
             {
                 return pair;
             }
+        }
+
+        return null;
+    }
+
+    public async Task<OwnedCm4TransportIdentityPair?> WaitForCm4ReplacementAsync(
+        OwnedCm4TransportIdentityPair previous,
+        CancellationToken cancellationToken)
+    {
+        await foreach (var observation in notifications.WatchAsync(cancellationToken).ConfigureAwait(false))
+        {
+            if (!ReferenceEquals(observation.Resource, cm4) ||
+                !notifications.TryGetCurrentState(observation.ResourceId, out var current))
+            {
+                continue;
+            }
+
+            events.Observe(observation, current, "cm4-sim", resourceId =>
+                notifications.TryGetCurrentState(resourceId, out var state) ? state : null);
+            await ownership.VerifyCurrentAsync(resourceId =>
+                notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
+                cancellationToken).ConfigureAwait(false);
+
+            var pair = GetCurrentOwnedPair();
+            if (pair is null || pair.Simulator != previous.Simulator ||
+                pair.Cm4.Generation <= previous.Cm4.Generation ||
+                pair.Cm4.ContainerId == previous.Cm4.ContainerId)
+            {
+                continue;
+            }
+
+            var sessionManager = getSessionManager?.Invoke();
+            var candidate = registry.GetCandidates().SingleOrDefault(item =>
+                ReferenceEquals(item.Resource, cm4) && item.Role == "cm4-sim");
+            if (sessionManager is null || candidate is null ||
+                !await sessionManager.WaitForSessionStartedAsync(candidate, cancellationToken).ConfigureAwait(false))
+            {
+                return null;
+            }
+
+            return GetCurrentOwnedPair();
         }
 
         return null;

@@ -105,6 +105,55 @@ public sealed class OwnedCm4TransportTargetControllerTests
     }
 
     [Fact]
+    public async Task InvalidatedRouteRebindsOnlyToTheConfirmedCm4ReplacementWithoutRevivingTheTarget()
+    {
+        var current = CreatePair();
+        var previous = current;
+        var runner = new FakeDockerRunner(previous, EngineId);
+        var controller = CreateController(runner, () => current);
+        Assert.True((await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Applied);
+        Assert.True((await controller.InvalidateCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Invalidated);
+
+        var replacementCm4 = previous.Cm4 with
+        {
+            ContainerId = new string('e', 64),
+            Generation = previous.Cm4.Generation + 1,
+        };
+        current = new OwnedCm4TransportIdentityPair(
+            replacementCm4,
+            previous.Simulator with { Generation = previous.Simulator.Generation + 1 });
+
+        Assert.True(controller.TryReinitializeAfterConfirmedCm4Replacement(previous.Cm4, replacementCm4));
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+        Assert.Null(controller.Snapshot().TargetAddress);
+        Assert.True(controller.IsInvalidatedFor(current));
+    }
+
+    [Fact]
+    public async Task InvalidatedRouteCannotRebindWhenSimulatorOrOldCm4ProofDiffers()
+    {
+        var current = CreatePair();
+        var previous = current;
+        var runner = new FakeDockerRunner(previous, EngineId);
+        var controller = CreateController(runner, () => current);
+        Assert.True((await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Applied);
+        Assert.True((await controller.InvalidateCurrentTargetAsync("helper-launch-01", CancellationToken.None)).Invalidated);
+
+        var replacementCm4 = previous.Cm4 with
+        {
+            ContainerId = new string('e', 64),
+            Generation = previous.Cm4.Generation + 1,
+        };
+        current = new OwnedCm4TransportIdentityPair(replacementCm4,
+            previous.Simulator with { ContainerId = SimulatorReplacementId, Generation = previous.Simulator.Generation + 1 });
+
+        Assert.False(controller.TryReinitializeAfterConfirmedCm4Replacement(previous.Cm4, replacementCm4));
+        Assert.False(controller.TryReinitializeAfterConfirmedCm4Replacement(previous.Cm4 with { ContainerId = SimulatorId }, replacementCm4));
+        Assert.Equal(Cm4TransportTargetPhase.Invalidated, controller.Snapshot().Phase);
+        Assert.False(controller.IsInvalidatedFor(current));
+    }
+
+    [Fact]
     public async Task CancellationAfterRemoteInvalidationDispatchLeavesTheStopGateUnknown()
     {
         var identities = CreatePair();
