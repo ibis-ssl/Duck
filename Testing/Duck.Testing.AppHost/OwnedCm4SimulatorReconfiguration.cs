@@ -602,7 +602,8 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
                 notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
                 cancellationToken).ConfigureAwait(false);
             var currentPair = GetCurrentOwnedPair();
-            if (IsCm4ReplacementFor(previous, currentPair)) return currentPair;
+            if (IsCm4ReplacementFor(previous, currentPair) &&
+                IsCurrentWaitedCm4(currentCandidate, currentPair)) return currentPair;
             return null;
         }
 
@@ -632,7 +633,7 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
                 notifications.TryGetCurrentState(resourceId, out var state) ? state : null,
                 cancellationToken).ConfigureAwait(false);
             var pair = GetCurrentOwnedPair();
-            if (IsCm4ReplacementFor(previous, pair)) return pair;
+            if (IsCm4ReplacementFor(previous, pair) && IsCurrentWaitedCm4(candidate, pair)) return pair;
             return null;
         }
 
@@ -654,6 +655,14 @@ internal sealed class DcpOwnedCm4SimulatorReconfigurationAdapter(
         current.Cm4.Generation > previous.Cm4.Generation &&
         current.Cm4.ContainerId != previous.Cm4.ContainerId &&
         SamePair(current, GetCurrentOwnedPair());
+
+    private static bool IsCurrentWaitedCm4(
+        DcpBaseResourceIdentityCandidate waited,
+        OwnedCm4TransportIdentityPair? current) => current is not null &&
+        current.Cm4.RunId == waited.RunId &&
+        current.Cm4.ResourceName == waited.ResourceName &&
+        current.Cm4.ResourceId == waited.ResourceId &&
+        current.Cm4.ContainerId == waited.ContainerId;
 
     private static bool SamePair(OwnedCm4TransportIdentityPair? expected, OwnedCm4TransportIdentityPair? actual) =>
         expected is not null && actual is not null && expected.Cm4 == actual.Cm4 && expected.Simulator == actual.Simulator;

@@ -82,14 +82,16 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
     }
 
     [Theory]
-    [InlineData(0, false)]
-    [InlineData(1, false)]
-    [InlineData(2, false)]
-    [InlineData(0, true)]
-    [InlineData(2, true)]
+    [InlineData(0, false, false)]
+    [InlineData(1, false, false)]
+    [InlineData(2, false, false)]
+    [InlineData(0, true, false)]
+    [InlineData(2, true, false)]
+    [InlineData(0, false, true)]
     public async Task StartsOnlyTheOwnedCurrentCm4SessionAndReapsItAfterDcpStopAndExecExit(
         int failedStartAttempt,
-        bool invalidateTargetBeforeReplacement)
+        bool invalidateTargetBeforeReplacement,
+        bool replaceSimulatorIdentity)
     {
         using var lifetime = new TestApplicationLifetime();
         using var notifications = new ResourceNotificationService(
@@ -221,13 +223,14 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             Assert.False(registry.Get(cm4Resource)!.IsReady);
 
             Task<OwnedCm4TransportIdentityPair?>? replacementWait = null;
+            OwnedCm4TransportIdentityPair? previousPairForReplacement = null;
             if (failedStartAttempt == 0 && !invalidateTargetBeforeReplacement)
             {
-                var previousPair = GetCurrentOwnedPair();
-                Assert.NotNull(previousPair);
+                previousPairForReplacement = GetCurrentOwnedPair();
+                Assert.NotNull(previousPairForReplacement);
                 runner.HoldInspectContainerId = new string('5', 64);
                 replacementWait = reconfigurationAdapter.WaitForCm4ReplacementAsync(
-                    previousPair,
+                    previousPairForReplacement,
                     CancellationToken.None);
             }
 
@@ -257,6 +260,24 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
             }
             await firstSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            if (replaceSimulatorIdentity)
+            {
+                await notifications.PublishUpdateAsync(
+                    simulatorResource,
+                    "simulator-key-a",
+                    _ => Snapshot("Stopped", ContainerId("simulator")));
+                await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, simulatorResource)).State == "Stopped");
+                var replacementSimulatorId = new string('1', 63) + "2";
+                await notifications.PublishUpdateAsync(
+                    simulatorResource,
+                    "simulator-key-a",
+                    _ => Snapshot("Running", replacementSimulatorId));
+                await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, simulatorResource)) is
+                {
+                    ContainerId: var id,
+                    OwnershipVerified: true,
+                } && id == replacementSimulatorId);
+            }
 
             await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('5', 64)));
 
@@ -289,6 +310,24 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             }
 
             await runner.ForegroundSessionCountReached(2).WaitAsync(TimeSpan.FromSeconds(3));
+
+            if (replaceSimulatorIdentity)
+            {
+                var waitForChangedSimulator = replacementWait ?? throw new Xunit.Sdk.XunitException("Expected a replacement wait task.");
+                var resultForChangedSimulator = await waitForChangedSimulator.WaitAsync(TimeSpan.FromSeconds(3));
+                Assert.Null(resultForChangedSimulator);
+                Assert.Equal(2, runner.ForegroundSessions.Count);
+                var changedSimulatorReplacementSession = runner.ForegroundSessions[1];
+                await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", new string('5', 64)));
+                await WaitUntilAsync(() => registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource)).State == "Stopped");
+                changedSimulatorReplacementSession.Session.CompleteExit();
+                using var changedSimulatorStopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                await observer.StopAsync(changedSimulatorStopTimeout.Token);
+                observerStopped = true;
+                await changedSimulatorReplacementSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
+                return;
+            }
+
             if (replacementWait is not null)
             {
                 var replacedPair = await replacementWait.WaitAsync(TimeSpan.FromSeconds(3));
