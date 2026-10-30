@@ -165,7 +165,8 @@ internal static class BaseSimulationResourceRegistration
                 [
                     "tini", "--", "cm4_sim", "--robot-ids", "0,1,2,3,4,5,6,7,8,9,10",
                     "--in-port", "12345", "--out-addr", "127.0.0.1", "--out-port", options.SimulatorIbisPort,
-                    "--feedback-port-base", "50100", "--multicast-if", "127.0.0.1", "--rate-hz", "1000",
+                    "--feedback-port-base", "50100", "--multicast-if",
+                    options.UseStandardDcpResources ? "0.0.0.0" : "127.0.0.1", "--rate-hz", "1000",
                     "--rx-delay-ms", "0", "--rx-jitter-ms", "0", "--rx-loss-rate", "0.0", "--seed", "0",
                 ],
                 new Dictionary<string, string>(StringComparer.Ordinal),

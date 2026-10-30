@@ -531,7 +531,11 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.Equal(
                 ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
                 await GetArgumentsAsync(resourcesByRole["game-controller"]));
-            Assert.Contains("--robot-ids", await GetArgumentsAsync(resourcesByRole["cm4-sim"]));
+            var cm4Arguments = await GetArgumentsAsync(resourcesByRole["cm4-sim"]);
+            Assert.Contains("--robot-ids", cm4Arguments);
+            var multicastInterfaceIndex = Array.IndexOf(cm4Arguments, "--multicast-if");
+            Assert.True(multicastInterfaceIndex >= 0 && multicastInterfaceIndex + 1 < cm4Arguments.Length);
+            Assert.Equal("0.0.0.0", cm4Arguments[multicastInterfaceIndex + 1]);
             Assert.Contains("bash", await GetArgumentsAsync(resourcesByRole["crane"]));
         }
         finally
