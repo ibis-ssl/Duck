@@ -1038,6 +1038,24 @@ internal sealed class DcpBaseGameControllerReadinessProbe(
         {
             var endpoint = await resolveControlEndpoint(budget.Token).ConfigureAwait(false);
             var controlUri = CreateControlApiUri(endpoint);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                ClearReadiness(candidate, "The Game Controller control API check was canceled.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
+            {
+                ClearReadiness(candidate, "The bounded Game Controller control API check expired.");
+                return HealthCheckResult.Unhealthy("The bounded Game Controller control API check expired.");
+            }
+
+            var dispatchCandidate = CurrentCandidate();
+            if (!SameCurrent(candidate!, dispatchCandidate) || !IsOwnedRunning(dispatchCandidate))
+            {
+                ClearReadiness(candidate, "The Game Controller identity changed before its control API was checked.");
+                return HealthCheckResult.Unhealthy("The Game Controller identity changed before its control API was checked.");
+            }
+
             var reachable = controlApiProbe is not null
                 ? await controlApiProbe(controlUri, budget.Token).ConfigureAwait(false)
                 : await ConnectControlApiAsync(controlUri, budget.Token).ConfigureAwait(false);

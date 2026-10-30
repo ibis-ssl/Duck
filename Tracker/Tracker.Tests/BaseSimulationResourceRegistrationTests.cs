@@ -186,6 +186,11 @@ public sealed class BaseSimulationResourceRegistrationTests
         Directory.CreateDirectory(fixtureRoot);
         DcpBaseResourceReadinessRegistry? registry = null;
         IResource? gameController = null;
+        var apiCalls = 0;
+        var cancelDuringResolve = false;
+        var delayDuringResolve = false;
+        var replaceCandidateDuringResolve = false;
+        CancellationTokenSource? resolverCancellation = null;
 
         try
         {
@@ -201,16 +206,28 @@ public sealed class BaseSimulationResourceRegistrationTests
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
                 _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
                 _ => { },
-                gameControllerControlEndpointResolver: (endpoint, _) =>
+                gameControllerControlEndpointResolver: async (endpoint, _) =>
                 {
                     Assert.Equal("game-controller-control", endpoint.EndpointName);
                     Assert.Same(gameController, endpoint.Resource);
-                    return Task.FromResult(new Uri("http://127.0.0.1:49124/", UriKind.Absolute));
+                    if (cancelDuringResolve)
+                    {
+                        resolverCancellation!.Cancel();
+                    }
+                    if (delayDuringResolve)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(2100), CancellationToken.None);
+                    }
+                    if (replaceCandidateDuringResolve)
+                    {
+                        registry!.ObserveUnavailable(gameController!, "gc-runtime-key", "Stopped");
+                        registry.ObserveCurrent(new("gc-next-key", "game-controller", new string('b', 64)), "Running");
+                    }
+                    return new Uri("http://127.0.0.1:49124/", UriKind.Absolute);
                 },
                 gameControllerControlApiProbe: (_, _) =>
                 {
-                    registry!.ObserveUnavailable(gameController!, "gc-runtime-key", "Stopped");
-                    registry.ObserveCurrent(new("gc-next-key", "game-controller", new string('b', 64)), "Running");
+                    apiCalls++;
                     return Task.FromResult(true);
                 });
 
@@ -232,7 +249,28 @@ public sealed class BaseSimulationResourceRegistrationTests
                 services.GetRequiredService<IOptions<HealthCheckServiceOptions>>().Value.Registrations,
                 item => item.Name == "dcp-game-controller-service-ready");
 
-            var result = await registration.Factory(services).CheckHealthAsync(
+            var healthCheck = registration.Factory(services);
+            using var resolverCancellationSource = new CancellationTokenSource();
+            resolverCancellation = resolverCancellationSource;
+            cancelDuringResolve = true;
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                resolverCancellationSource.Token));
+            Assert.Equal(0, apiCalls);
+            Assert.False(registry.Get(gameController)!.IsReady);
+
+            cancelDuringResolve = false;
+            delayDuringResolve = true;
+            var resolverTimedOut = await healthCheck.CheckHealthAsync(
+                new HealthCheckContext { Registration = registration },
+                CancellationToken.None);
+            Assert.Equal(HealthStatus.Unhealthy, resolverTimedOut.Status);
+            Assert.Equal(0, apiCalls);
+            Assert.False(registry.Get(gameController)!.IsReady);
+
+            delayDuringResolve = false;
+            replaceCandidateDuringResolve = true;
+            var result = await healthCheck.CheckHealthAsync(
                 new HealthCheckContext { Registration = registration },
                 CancellationToken.None);
 
@@ -240,6 +278,7 @@ public sealed class BaseSimulationResourceRegistrationTests
             var snapshot = Assert.IsType<DcpBaseResourceReadinessSnapshot>(registry.Get(gameController));
             Assert.Equal("gc-next-key", snapshot.ResourceId);
             Assert.Equal(new string('b', 64), snapshot.ContainerId);
+            Assert.Equal(0, apiCalls);
             Assert.False(snapshot.IsReady);
         }
         finally
