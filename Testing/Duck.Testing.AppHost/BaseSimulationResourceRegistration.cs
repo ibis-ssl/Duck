@@ -301,6 +301,16 @@ internal static class BaseSimulationResourceRegistration
                         options.DuckRunId);
                 });
                 builder.Services.AddSingleton<OwnedCm4SimulatorRestartCommandHandler>();
+                builder.Eventing.Subscribe<BeforeResourceStartedEvent>((@event, _) =>
+                {
+                    if (ReferenceEquals(@event.Resource, simulatorResource))
+                    {
+                        @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>()
+                            .Install(simulatorResource);
+                    }
+
+                    return Task.CompletedTask;
+                });
                 builder.Eventing.Subscribe<AfterResourcesCreatedEvent>((@event, _) =>
                 {
                     @event.Services.GetRequiredService<OwnedCm4SimulatorRestartCommandHandler>()

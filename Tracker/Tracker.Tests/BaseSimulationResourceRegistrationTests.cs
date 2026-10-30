@@ -12,6 +12,68 @@ namespace Tracker.Tests;
 public sealed class BaseSimulationResourceRegistrationTests
 {
     [Fact]
+    public async Task StandardCm4RestartGuardIsInstalledBeforeSelectedSimulatorStarts()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-restart-before-start-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        var restartCalls = 0;
+
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", "visibility_graph",
+                    "base-restart-before-start-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-base-restart-before-start-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
+                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => { });
+
+            var simulator = resources.Simulator.Resource;
+            simulator.Annotations.Add(new ResourceCommandAnnotation(
+                KnownResourceCommands.RestartCommand,
+                "Restart simulator",
+                _ => ResourceCommandState.Enabled,
+                _ =>
+                {
+                    Interlocked.Increment(ref restartCalls);
+                    return Task.FromResult(new ExecuteCommandResult { Success = true });
+                },
+                "Restart the simulator",
+                arguments: null,
+                confirmationMessage: null,
+                iconName: "ArrowCounterclockwise",
+                iconVariant: IconVariant.Regular,
+                isHighlighted: false));
+
+            await using var application = builder.Build();
+            var eventing = application.Services.GetRequiredService<IDistributedApplicationEventing>();
+            await eventing.PublishAsync(
+                new BeforeResourceStartedEvent(simulator, application.Services),
+                EventDispatchBehavior.BlockingSequential,
+                CancellationToken.None);
+
+            var result = await application.Services.GetRequiredService<ResourceCommandService>()
+                .ExecuteCommandAsync(simulator, KnownResourceCommands.RestartCommand, CancellationToken.None);
+
+            Assert.False(result.Success);
+            Assert.Equal(0, restartCalls);
+        }
+        finally
+        {
+            if (Directory.Exists(fixtureRoot))
+            {
+                Directory.Delete(fixtureRoot, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public async Task StandardCm4SimulatorRestartIsInterceptedAfterResourcesAreCreated()
     {
         var builder = DistributedApplication.CreateBuilder([]);
