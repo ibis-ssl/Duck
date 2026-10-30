@@ -156,8 +156,19 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             Assert.Contains("--server", firstSession.Arguments);
             Assert.False(registry.Get(cm4Resource)!.IsReady);
 
-            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", ContainerId("cm4-sim")));
-            firstSession.Session.CompleteExit();
+            var releaseSignals = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var terminalNotification = Task.Run(async () =>
+            {
+                await releaseSignals.Task.ConfigureAwait(false);
+                await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", ContainerId("cm4-sim")));
+            });
+            var childCompletion = Task.Run(async () =>
+            {
+                await releaseSignals.Task.ConfigureAwait(false);
+                firstSession.Session.CompleteExit();
+            });
+            releaseSignals.TrySetResult();
+            await Task.WhenAll(terminalNotification, childCompletion);
             await notifications.PublishUpdateAsync(resources[0].Resource, "simulator-key-a", _ => Snapshot("Running", ContainerId("simulator")));
             await firstSession.Session.Disposed.Task.WaitAsync(TimeSpan.FromSeconds(3));
 
@@ -288,6 +299,81 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         }
     }
 
+    [Fact]
+    public async Task DoesNotTreatDifferentCurrentContainerAsTheStoppedOwnedSession()
+    {
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance,
+            lifetime);
+        var runId = "observer-cm4-identity-replacement-run";
+        var stackId = "observer-cm4-identity-replacement-stack";
+        var resources = new (IResource Resource, string Role)[]
+        {
+            (new ContainerResource("simulator", "example/simulator:fixed"), "simulator"),
+            (new ContainerResource("game-controller", "example/controller:fixed"), "game-controller"),
+            (new ContainerResource("cm4-sim", "example/cm4:fixed"), "cm4-sim"),
+            (new ContainerResource("crane", "example/crane:fixed"), "crane"),
+        };
+        var registry = new DcpBaseResourceReadinessRegistry(
+            resources.Select(item => (item.Resource, item.Role, runId)),
+            stackId);
+        var runner = new ObserverDockerRunner(runId, stackId);
+        var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(registry, runner, "desktop-linux", "expected-engine");
+        var cm4Resource = resources.Single(item => item.Role == "cm4-sim").Resource;
+        var sessions = new OwnedCm4TransportServerSessionManager(registry, runner, cm4Resource, "desktop-linux", "expected-engine", runId);
+        var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
+        foreach (var (resource, role) in resources) roles.Add(resource, role);
+        var observer = new DcpBaseResourceReadinessObserver(
+            notifications,
+            new DcpBaseResourceReadinessEventConsumer(registry),
+            ownershipConsumer,
+            roles,
+            sessions);
+
+        await observer.StartAsync(CancellationToken.None);
+        try
+        {
+            foreach (var (resource, role) in resources)
+            {
+                await notifications.PublishUpdateAsync(resource, $"{role}-key-a", _ => Snapshot("Running", ContainerId(role)));
+            }
+            await runner.FirstInspectStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            runner.ReleaseFirstInspect.TrySetResult();
+            await WaitUntilAsync(() => registry.GetCandidates().All(item => item.OwnershipVerified));
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", ContainerId("cm4-sim")));
+            await runner.ForegroundSessionStarted.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            var original = Assert.Single(runner.ForegroundSessions);
+            var originalId = new string('3', 64);
+
+            var replacedId = new string('5', 64);
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Stopped", replacedId));
+            Assert.True(notifications.TryGetCurrentState("cm4-sim-key-a", out var terminalNotification));
+            Assert.Equal(replacedId, OwnedResourceObservationProjection.TryProject(terminalNotification!)?.ContainerId);
+            await WaitUntilAsync(() =>
+            {
+                var current = registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource));
+                return current.ResourceId == "cm4-sim-key-a" && current.ContainerId is null && current.State == "Stopped";
+            });
+            original.Session.CompleteExit();
+            await notifications.PublishUpdateAsync(cm4Resource, "cm4-sim-key-a", _ => Snapshot("Running", new string('6', 64)));
+            await WaitUntilAsync(() =>
+            {
+                var current = registry.GetCandidates().Single(item => ReferenceEquals(item.Resource, cm4Resource));
+                return current.ContainerId == new string('6', 64) && current.State == "Running" && current.OwnershipVerified;
+            });
+
+            Assert.Equal(originalId, original.Arguments[original.Arguments.IndexOf("--cm4-container-id") + 1]);
+            Assert.Single(runner.ForegroundSessions);
+            Assert.False(original.Session.Disposed.Task.IsCompleted);
+        }
+        finally
+        {
+            using var stopTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            await observer.StopAsync(stopTimeout.Token);
+        }
+    }
+
     private static string ContainerId(string role) => role switch
     {
         "simulator" => new string('1', 64),
@@ -389,6 +475,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 '2' => "game-controller",
                 '3' => "cm4-sim",
                 '5' => "cm4-sim",
+                '6' => "cm4-sim",
                 _ => "crane",
             };
             return new DockerStdioCommandResult(0, InspectJson(containerId, role, runId, stackId), string.Empty);

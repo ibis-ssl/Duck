@@ -673,19 +673,32 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     {
         if (!ReferenceEquals(observation.Resource, cm4Resource) ||
             !ReferenceEquals(current.Resource, cm4Resource) ||
-            observation.ResourceId != current.ResourceId ||
-            !DcpBaseResourceReadinessRegistry.IsTerminalState(current.Snapshot.State?.Text ?? string.Empty))
+            observation.ResourceId != current.ResourceId)
+        {
+            return;
+        }
+
+        var observedTerminal = OwnedResourceObservationProjection.TryProject(observation);
+        var currentTerminal = OwnedResourceObservationProjection.TryProject(current);
+        if (observedTerminal is null || currentTerminal is null ||
+            observedTerminal.ResourceId != currentTerminal.ResourceId ||
+            observedTerminal.State != currentTerminal.State ||
+            !DcpBaseResourceReadinessRegistry.IsTerminalState(currentTerminal.State) ||
+            !OwnedContainerInspection.IsFullId(currentTerminal.ContainerId) ||
+            observedTerminal.ContainerId != currentTerminal.ContainerId)
         {
             return;
         }
 
         lock (sync)
         {
-            if (sessionIdentity?.ResourceId == current.ResourceId)
+            if (sessionIdentity?.ResourceId == currentTerminal.ResourceId &&
+                sessionIdentity.ContainerId == currentTerminal.ContainerId)
             {
                 sessionResourceStopped = true;
             }
-            if (failedStartIdentity?.ResourceId == current.ResourceId)
+            if (failedStartIdentity?.ResourceId == currentTerminal.ResourceId &&
+                failedStartIdentity.ContainerId == currentTerminal.ContainerId)
             {
                 failedStartResourceStopped = true;
             }
@@ -869,14 +882,15 @@ internal sealed class DcpBaseResourceReadinessObserver(
     {
         using var verificationRequests = new SemaphoreSlim(0, 1);
         using var verificationStopping = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        // 2 つの通知元からの同時要求は、容量 1 の再検証シグナルへまとめます。
         void RequestVerification()
         {
             try
             {
-                if (verificationRequests.CurrentCount == 0)
-                {
-                    verificationRequests.Release();
-                }
+                verificationRequests.Release();
+            }
+            catch (SemaphoreFullException)
+            {
             }
             catch (ObjectDisposedException)
             {
