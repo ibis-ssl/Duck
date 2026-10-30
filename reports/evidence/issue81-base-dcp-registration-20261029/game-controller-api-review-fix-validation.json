@@ -1,8 +1,8 @@
-﻿{
+{
   "issue": "I81-07J-B3-E-NR001/P2",
-  "baselineHead": "5491f3d703973e3f326fb80b72a0534997cca108",
-  "status": "verification complete; parent commit/review pending",
-  "sourceFiles": [
+  "commit": "47ca3696c6101e71387d7db6279b06b7a36c5919",
+  "status": "documentation evidence corrected; product validation unchanged",
+  "productSourceFiles": [
     {
       "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
       "sha256": "d0a45b8e469197ea5d643c1b81dd9d9db527d641de29da68fe797ad476164957"
@@ -12,187 +12,35 @@
       "sha256": "115b5b54ba732e2bd243bbf754205b2afc313bd5c11d98d195594b494ef12886"
     }
   ],
-  "behavior": "The endpoint-resolver result is accepted only after rechecking cancellation, the unchanged two-second budget, current candidate identity/generation/state, and ownership proof. Stale or cancelled results do not dispatch the connector or leave readiness set.",
-  "validation": [
+  "documentationGates": {
+    "total": 8,
+    "confirmedFromPriorEvidence": 6,
+    "correctedCSpellRuns": 2,
+    "passed": 8,
+    "failed": 0,
+    "pending": 0
+  },
+  "cspellRuns": [
     {
-      "name": "resolver-dispatch-red-20261030",
-      "classification": "compile-only failure: apiCalls was out of scope; not a behavior Red",
-      "pid": 15492,
-      "startedUtc": "2026-10-30T09:19:39.392972+09:00",
-      "finishedUtc": "2026-10-30T09:19:50.4230912+09:00",
-      "exitCode": 1,
-      "timedOut": false,
-      "stdoutSha256": "e459e4169dc1368962c2736ee28cb7b2c42502b1cd6ddc79fc3fbec80fc1f7ec",
-      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
-      "name": "resolver-dispatch-red-corrected-20261030",
-      "classification": "pre-fix behavior Red: actual connector count 1; expected 0 after candidate A was replaced during endpoint resolution",
-      "pid": 18084,
-      "startedUtc": "2026-10-30T09:20:28.6164658+09:00",
-      "finishedUtc": "2026-10-30T09:20:35.4187057+09:00",
-      "exitCode": 1,
-      "timedOut": false,
-      "stdoutSha256": "900b614b7cd408a47f459721c7cf98a5ffdafc1605c757f68a9208b4658e708a",
-      "stderrSha256": "e49261ebc4dba663242cc2216483f503d91dbfe196a2675694735374c5fef80e"
-    },
-    {
-      "name": "resolver-dispatch-green-20261030",
-      "classification": "intermediate post-fix Green, before resolver-time cancellation/deadline coverage was added",
-      "pid": 30784,
-      "startedUtc": "2026-10-30T09:21:10.0331596+09:00",
-      "finishedUtc": "2026-10-30T09:21:14.4572452+09:00",
+      "document": "Tracker/Design/tasks-status.md",
+      "inputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
+      "argumentFileSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
       "exitCode": 0,
       "timedOut": false,
-      "stdoutSha256": "a6395bc1f12f9dfb6749b8e2eab1a871b32a4dbbf889a110e43d61421bbb0bf5",
-      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "429d3ccc2b0b0cacdbaf084f914676ab93594e01bb0f52e2fe1cba00ac582750",
+      "stderr": "1/1 changed/issue81-b3-e-nr001-tasks.md 26.64ms\nCSpell: Files checked: 1, Issues found: 0 in 0 files.\n"
     },
     {
-      "name": "resolver-dispatch-final-focused-20261030",
-      "classification": "final focused Green, 1/1, covering resolver-time caller cancellation, original 2s budget expiry, and A-to-B replacement; connector not dispatched in all three",
-      "pid": 14884,
-      "startedUtc": "2026-10-30T09:21:59.613105+09:00",
-      "finishedUtc": "2026-10-30T09:22:06.4715741+09:00",
+      "document": "Tracker/Design/phases-status.md",
+      "inputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
+      "argumentFileSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
       "exitCode": 0,
       "timedOut": false,
-      "stdoutSha256": "edb44030852d65ad0d7e75b94e44bf7c2e2e848f0fb5f04afe889cbe51ae8705",
-      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
-      "name": "related-readiness-registration-20261030",
-      "classification": "related readiness/registration cohort, 18/18",
-      "pid": 8352,
-      "startedUtc": "2026-10-30T09:22:27.2394556+09:00",
-      "finishedUtc": "2026-10-30T09:22:32.7877458+09:00",
-      "exitCode": 0,
-      "timedOut": false,
-      "stdoutSha256": "53fc6c02cb75c1d05479f540fef3d40f2c019d1cf4f5a763f75185f7e71ddd91",
-      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
-      "name": "apphost-release-20261030",
-      "classification": "AppHost Release build, exit 0",
-      "pid": 28828,
-      "startedUtc": "2026-10-30T09:22:47.1740073+09:00",
-      "finishedUtc": "2026-10-30T09:22:51.8941173+09:00",
-      "exitCode": 0,
-      "timedOut": false,
-      "stdoutSha256": "409f42c7b182147461c12eef5b1fd0cbabbb1e09ad912849a1a06cee6bea1fcf",
-      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "57985225d4f905fcf7a14bec62dee2a6830ff02a9aa11755f1e7b6a7e1002257",
+      "stderr": "1/1 changed/issue81-b3-e-nr001-phases.md 24.61ms\nCSpell: Files checked: 1, Issues found: 0 in 0 files.\n"
     }
   ],
-  "documentation": [
-    {
-      "path": "Tracker/Design/tasks-status.md",
-      "fullRawSourceSha256": "07327b9cde2a0fecdaff3d07de6ef42552ef3d0cc130403552a3951bf4685fdb",
-      "addedLinesInputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-      "cspellCopySha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-      "gates": [
-        {
-          "gate": "textlint",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "cspellCopySha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "rawHashesVerified": true
-        },
-        {
-          "gate": "whitelist",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "cspellCopySha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "rawHashesVerified": true
-        },
-        {
-          "gate": "cspell",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "cspellCopySha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderrSha256": "2d8709725a7e8296b34d845d5b56f2701eaa7b6b1484eb6cef0e50384818f8cb",
-          "rawHashesVerified": true
-        },
-        {
-          "gate": "yomiyasu",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "cspellCopySha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
-          "stdoutSha256": "9e12d81ba4f42770bc59bfad5fdae35de37567c967f29f8fdd4047117835d454",
-          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "rawHashesVerified": true
-        }
-      ]
-    },
-    {
-      "path": "Tracker/Design/phases-status.md",
-      "fullRawSourceSha256": "310f3aa09f4528341aedc5db9e3983ee57828d58e93f8fbdf912c446033cf8f6",
-      "addedLinesInputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-      "cspellCopySha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-      "gates": [
-        {
-          "gate": "textlint",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "cspellCopySha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "rawHashesVerified": true
-        },
-        {
-          "gate": "whitelist",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "cspellCopySha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "rawHashesVerified": true
-        },
-        {
-          "gate": "cspell",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "cspellCopySha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stderrSha256": "986a3d74fd8a99f17fb5f665280ed69dd2c2261be0a9aa02c64fb5474e819cde",
-          "rawHashesVerified": true
-        },
-        {
-          "gate": "yomiyasu",
-          "exitCode": 0,
-          "timedOut": false,
-          "inputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "cspellCopySha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
-          "stdoutSha256": "ce70d070a9e42b95392570736cd93b0d04e641a07c6af86b7dbb91f6e9573ecf",
-          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "rawHashesVerified": true
-        }
-      ]
-    }
-  ],
-  "designGates": "not rerun because the design document is unchanged",
-  "runtimeStarted": false,
-  "activeOwnedProcesses": 0,
-  "history": [
-    "One compile-only attempt is retained separately.",
-    "One corrected pre-fix behavior Red observed connector calls 1 when expected 0.",
-    "The first post-fix Green predates the expanded resolver-cancel/deadline fixture and is labeled intermediate.",
-    "The final focused test passed 1/1; related cohort passed 18/18; AppHost Release build exited 0.",
-    "One documentation-runner setup attempt reached zero gates; its original stderr hash is recorded privately, but the raw setup stderr was not retained separately. The final gate run is a distinct successful invocation."
-  ],
-  "documentationRunnerSetupAttempt": {
-    "exitCode": 1,
-    "gatesReached": 0,
-    "stderrRawPreserved": false,
-    "classification": "setup failure before any gate; not a document-gate failure"
-  }
+  "history": "The original validation-public.json and its two mismatched CSpell raw records remain unchanged as historical evidence; this correction supersedes their CSpell pass classification. No product, test, document, build, or runtime changes were made."
 }
