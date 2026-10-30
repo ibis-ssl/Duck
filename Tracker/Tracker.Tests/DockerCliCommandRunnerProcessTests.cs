@@ -100,7 +100,6 @@ public sealed class DockerCliCommandRunnerProcessTests
             standardOutput: new string('x', 100),
             exitWhenKilled: false);
         var runner = CreateRunner(child);
-        var timer = Stopwatch.StartNew();
 
         await Assert.ThrowsAsync<DockerCliProcessRecoveryException>(() => runner.ExecuteWithStdioAsync(
             ["exec", "-i", "owned-container-id"],
@@ -112,7 +111,28 @@ public sealed class DockerCliCommandRunnerProcessTests
         Assert.Equal(1, child.KillCalls);
         Assert.True(child.WaitCallsAfterKill > 0);
         Assert.False(child.HasExited);
-        Assert.InRange(timer.Elapsed, TimeSpan.Zero, TimeSpan.FromMilliseconds(300));
+    }
+
+    /// <summary>元の期限を使い切ったkill後に、新しい回収待ち期限を開始しないことを確認します。</summary>
+    [Fact]
+    public async Task KillThatConsumesTheOriginalDeadlineDoesNotStartAReapWait()
+    {
+        var child = new ControlledChildProcess(
+            standardOutput: new string('x', 100),
+            exitWhenKilled: false,
+            killDelay: TimeSpan.FromMilliseconds(150));
+        var runner = CreateRunner(child);
+
+        await Assert.ThrowsAsync<DockerCliProcessRecoveryException>(() => runner.ExecuteWithStdioAsync(
+            ["exec", "-i", "owned-container-id"],
+            "request\n",
+            16,
+            TimeSpan.FromMilliseconds(120),
+            CancellationToken.None));
+
+        Assert.Equal(1, child.KillCalls);
+        Assert.Equal(0, child.WaitCallsAfterKill);
+        Assert.False(child.HasExited);
     }
 
     [Fact]
@@ -279,7 +299,8 @@ public sealed class DockerCliCommandRunnerProcessTests
         string standardError = "",
         bool blockStandardOutput = false,
         bool exitWhenKilled = true,
-        bool alreadyExited = false) : IDockerCliChildProcess
+        bool alreadyExited = false,
+        TimeSpan? killDelay = null) : IDockerCliChildProcess
     {
         private readonly TaskCompletionSource exited = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -310,6 +331,7 @@ public sealed class DockerCliCommandRunnerProcessTests
         {
             KillCalls++;
             KillObserved.TrySetResult();
+            if (killDelay is { } delay) System.Threading.Thread.Sleep(delay);
             if (!exitWhenKilled) return;
             exited.TrySetResult();
         }

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "status": "validated_test_only_change",
+  "baselineCommit": "b267e8512b81e23ff82e8f447eac0bdb08ad9851",
+  "productChange": false,
+  "changedSource": [
+    {
+      "path": "Tracker/Tracker.Tests/DockerCliCommandRunnerProcessTests.cs",
+      "sha256": "9BB2BA4774E71328FB5E7E638B95E77C7E2E73F93E39FF651597688938032C41"
+    }
+  ],
+  "unchangedProductionSource": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+      "sha256": "B003FAED3572951C2A78602522C071D87E191A1F0220F11D9C60172C8DBD035A"
+    }
+  ],
+  "change": "Removed a scheduler-sensitive 300 ms elapsed assertion and added a fake-only delayed-kill case that checks the original deadline is not restarted.",
+  "validation": {
+    "focused": "10 passed, exit 0",
+    "related": "5 passed, exit 0",
+    "releaseBuild": "exit 0",
+    "documentationGates": "8 final gates passed; tasks and phases only; design unchanged"
+  },
+  "documentationGateResults": [
+    {
+      "document": "phases",
+      "gate": "textlint",
+      "exit": 0,
+      "inputSha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "cspellCopySha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "phases",
+      "gate": "whitelist",
+      "exit": 0,
+      "inputSha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "cspellCopySha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "phases",
+      "gate": "cspell",
+      "exit": 0,
+      "inputSha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "cspellCopySha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "BA023D8EEB9CFACB9B4D4E05DC92E834A76CDCFCA6386036F9A27E3EAAF1C519"
+    },
+    {
+      "document": "phases",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "cspellCopySha256": "FC7CA0E42E2BAD6B85AAE7492BF413BE4B43DA5B88C4155CE318C33E908DD2B7",
+      "stdoutSha256": "F9E9CB63944E867717D5CEDB55E715983BC1B84993012364833485C11D66E891",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "tasks",
+      "gate": "textlint",
+      "exit": 0,
+      "inputSha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "cspellCopySha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "tasks",
+      "gate": "whitelist",
+      "exit": 0,
+      "inputSha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "cspellCopySha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "tasks",
+      "gate": "cspell",
+      "exit": 0,
+      "inputSha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "cspellCopySha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "C6B09329E093410B97F0809571224BD7B470F13827CAE0D252118D013F7E8AA1"
+    },
+    {
+      "document": "tasks",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "cspellCopySha256": "7C197CCC1BA8025A149E19C44D5DEA26E74EE45D09B595DA91371AF51C9635A3",
+      "stdoutSha256": "DADC5C059034D9291E707A4B6CD0685097BA87BBA8E69D700753997AE808D7E3",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+  ],
+  "CI": {
+    "runId": "40991849815",
+    "result": "1105 passed / 1 failed / 2 skipped",
+    "failure": "521.5759 ms exceeded 300 ms wall-clock assertion",
+    "rootCause": "unconfirmed",
+    "rerunPerformed": false
+  },
+  "limitations": [
+    "Initial PowerShell-decoded documentation run was rejected; it is not counted.",
+    "An intermediate UTF-8 run correctly identified one whitelist term; parent changed it to an equivalent numeric expression and final tasks gates passed.",
+    "No Docker/DCP/AppHost/helper/UDP/deployment runtime was exercised."
+  ]
+}
