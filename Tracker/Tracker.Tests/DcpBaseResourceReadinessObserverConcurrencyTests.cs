@@ -2,6 +2,7 @@ using System.Text.Json;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 using Duck.Testing.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -9,6 +10,54 @@ namespace Tracker.Tests;
 
 public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
 {
+    [Fact]
+    public async Task StartsReadinessObserverBeforeEarlierBlockingHostedService()
+    {
+        using var lifetime = new TestApplicationLifetime();
+        using var notifications = new ResourceNotificationService(
+            NullLogger<ResourceNotificationService>.Instance,
+            lifetime);
+        var resource = new ContainerResource("game-controller", "example/controller:fixed");
+        var runId = "observer-start-order-run";
+        var registry = new DcpBaseResourceReadinessRegistry([(resource, "game-controller", runId)], "observer-start-order-stack");
+        var runner = new ObserverDockerRunner(runId, "observer-start-order-stack");
+        var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(registry, runner, "desktop-linux", "expected-engine");
+        var observer = new DcpBaseResourceReadinessObserver(
+            notifications,
+            new DcpBaseResourceReadinessEventConsumer(registry),
+            ownershipConsumer,
+            new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance) { [resource] = "game-controller" });
+        using var host = new HostBuilder()
+            .ConfigureServices(services =>
+            {
+                services.AddSingleton<IHostedService>(new ReadinessObserverStartOrderProbe(() => observer.ExecuteTask));
+                services.AddSingleton<IHostedService>(observer);
+            })
+            .Build();
+
+        try
+        {
+            await host.StartAsync().WaitAsync(TimeSpan.FromSeconds(3));
+            Assert.NotNull(observer.ExecuteTask);
+            Assert.False(observer.ExecuteTask!.IsCompleted);
+        }
+        finally
+        {
+            await host.StopAsync().WaitAsync(TimeSpan.FromSeconds(3));
+        }
+    }
+
+    private sealed class ReadinessObserverStartOrderProbe(Func<Task?> executeTask) : IHostedService
+    {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            Assert.NotNull(executeTask());
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
     [Fact]
     public async Task ConsumesNewResourceKeyWhilePreviousOwnershipInspectionIsPending()
     {

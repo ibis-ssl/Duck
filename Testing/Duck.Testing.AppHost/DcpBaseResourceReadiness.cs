@@ -1035,8 +1035,43 @@ internal sealed class DcpBaseResourceReadinessObserver(
     DcpBaseResourceReadinessEventConsumer consumer,
     DcpBaseResourceOwnershipEventConsumer ownershipConsumer,
     IReadOnlyDictionary<IResource, string> roles,
-    OwnedCm4TransportServerSessionManager? cm4TransportSessions = null) : BackgroundService
+    OwnedCm4TransportServerSessionManager? cm4TransportSessions = null) : BackgroundService, IHostedLifecycleService
 {
+    private int observerStarted;
+
+    /// <summary>資源起動を待つ前に通知監視を開始し、所有候補の更新を受け取れるようにします。</summary>
+    public Task StartingAsync(CancellationToken cancellationToken) => StartObserverAsync(cancellationToken);
+
+    /// <summary>既に起動前処理で開始した同じ通知監視を二重に開始しません。</summary>
+    public override Task StartAsync(CancellationToken cancellationToken) => StartObserverAsync(cancellationToken);
+
+    /// <summary>ホストの開始後処理では追加の処理を行いません。</summary>
+    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    /// <summary>ホストの停止前処理では追加の処理を行いません。</summary>
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    /// <summary>ホストの停止後処理では追加の処理を行いません。</summary>
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    private Task StartObserverAsync(CancellationToken cancellationToken)
+    {
+        if (Interlocked.CompareExchange(ref observerStarted, 1, 0) != 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        try
+        {
+            return base.StartAsync(cancellationToken);
+        }
+        catch
+        {
+            Volatile.Write(ref observerStarted, 0);
+            throw;
+        }
+    }
+
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await base.StopAsync(cancellationToken).ConfigureAwait(false);
