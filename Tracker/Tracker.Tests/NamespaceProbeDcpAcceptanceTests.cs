@@ -1714,7 +1714,7 @@ public sealed class NamespaceProbeDcpAcceptanceTests(ITestOutputHelper output)
             new ReadOnlyDockerResult(0, json, string.Empty),
             runId).Classification == "owned";
 
-    private static string GetDockerExecutablePath()
+    internal static string GetDockerExecutablePath()
     {
         var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var path = Path.Combine(localAppData, "Programs", "DockerDesktop", "resources", "bin", "docker.exe");

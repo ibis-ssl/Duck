@@ -77,6 +77,33 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void InitializesCancellationAcceptanceDockerPathBeforeBareDockerPreflight()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var dockerDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "docker-bin")).FullName;
+        var dockerExecutable = CreateDockerExecutable(dockerDirectory);
+        var originalPath = Environment.GetEnvironmentVariable("PATH");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("PATH", null);
+            var (resolvedExecutable, pathScope) = ResolveAndPrepareDockerExecutable(dockerExecutable, null);
+            using (pathScope)
+            {
+                Assert.Equal(dockerExecutable, resolvedExecutable);
+                Assert.Equal(dockerDirectory, Environment.GetEnvironmentVariable("PATH"));
+                Assert.Equal(dockerExecutable, ResolveDockerExecutable(null, Environment.GetEnvironmentVariable("PATH")));
+            }
+
+            Assert.Null(Environment.GetEnvironmentVariable("PATH"));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("PATH", originalPath);
+        }
+    }
+
+    [Fact]
     public void RestoresPathAfterDockerPathScopeExitsWithAnError()
     {
         using var temporaryDirectory = new TemporaryDirectory();
@@ -550,9 +577,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Directory.CreateDirectory(artifactsDirectory);
         var repositoryRoot = FindRepositoryRoot();
         var originalPath = Environment.GetEnvironmentVariable("PATH");
-        var dockerExecutable = ResolveDockerExecutable(
+        var (dockerExecutable, preparedDockerPathScope) = ResolveAndPrepareDockerExecutable(
             Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"), originalPath);
-        IDisposable? dockerPathScope = null;
+        IDisposable? dockerPathScope = preparedDockerPathScope;
         var stagedAppHostAssets = new List<StagedAppHostAsset>();
         DistributedApplication? application = null;
         var startAttempted = false;
@@ -568,7 +595,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         try
         {
-            dockerPathScope = AddDockerDirectoryToProcessPath(dockerExecutable);
             var (dockerContext, expectedEngineId) = await ResolveDockerIdentityAsync();
             output.WriteLine($"Engine={dockerContext}/{expectedEngineId}; startedAt={startedAt:O}");
 
@@ -789,6 +815,23 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         throw new FileNotFoundException(
             "Docker CLI could not be resolved from PATH; configure Testing__IdentityControl__DockerExecutable or add Docker to this test process PATH.");
+    }
+
+    private static (string DockerExecutable, IDisposable PathScope) ResolveAndPrepareDockerExecutable(
+        string? configuredPath,
+        string? path)
+    {
+        string dockerExecutable;
+        try
+        {
+            dockerExecutable = ResolveDockerExecutable(configuredPath, path);
+        }
+        catch (FileNotFoundException) when (OperatingSystem.IsWindows())
+        {
+            dockerExecutable = NamespaceProbeDcpAcceptanceTests.GetDockerExecutablePath();
+        }
+
+        return (dockerExecutable, AddDockerDirectoryToProcessPath(dockerExecutable));
     }
 
     private static string PrependDockerDirectoryToPath(string dockerExecutable, string? path)
