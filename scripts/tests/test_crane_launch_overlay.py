@@ -1,0 +1,424 @@
+import importlib.util
+import signal
+import shutil
+import subprocess
+import sys
+import threading
+import tempfile
+import time
+import unittest
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+MODULE_PATH = REPOSITORY_ROOT / "Testing" / "Duck.Testing.AppHost" / "CraneLaunchOverlay.py"
+SPEC = importlib.util.spec_from_file_location("crane_launch_overlay", MODULE_PATH)
+assert SPEC is not None and SPEC.loader is not None
+overlay = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(overlay)
+
+
+class CraneLaunchOverlayTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="duck-crane-overlay-test-")
+        self.root = Path(self.temporary.name)
+        self.install_prefix = self.root / "install"
+        self.package_share = self.install_prefix / "share" / "crane_bringup"
+        self.launch_directory = self.package_share / "launch"
+        self.launch_directory.mkdir(parents=True)
+        (self.launch_directory / "crane.launch.xml").write_bytes(self.launch_xml())
+        (self.launch_directory / "foxglove_bridge.launch.xml").write_text("<launch/>", encoding="utf-8")
+        (self.package_share / "config").mkdir()
+        (self.package_share / "config" / "settings.yaml").write_text("mode: fixed\n", encoding="utf-8")
+        self.marker = self.install_prefix / "share" / "ament_index" / "resource_index" / "packages" / "crane_bringup"
+        self.marker.parent.mkdir(parents=True)
+        self.marker.write_text("", encoding="utf-8")
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    @staticmethod
+    def launch_xml():
+        return (
+            b'<launch>\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" />\n'
+            b'  <let name="ibis_target_address" value="192.168.20.255" if="$(var sim) == false" />\n'
+            b'  <let name="unrelated" value="preserve" />\n'
+            b'  <include file="$(find-pkg-share crane_bringup)/launch/foxglove_bridge.launch.xml" />\n'
+            b'</launch>\n'
+        )
+
+    @staticmethod
+    def copy_link(source, destination):
+        if source.is_dir():
+            shutil.copytree(source, destination)
+        else:
+            shutil.copy2(source, destination)
+
+    def test_target_name_must_match_planner_and_resolve_to_one_safe_ipv4(self):
+        self.assertEqual(
+            "192.0.2.8",
+            overlay.resolve_target_address("cm4-sim", "cm4-sim", resolver=lambda name: ["192.0.2.8"]),
+        )
+        self.assertEqual("127.0.0.1", overlay.resolve_target_address("127.0.0.1", "cm4-sim"))
+        with self.assertRaises(ValueError):
+            overlay.resolve_target_address("192.0.2.8", "cm4-sim")
+        with self.assertRaises(ValueError):
+            overlay.resolve_target_address("simulator", "cm4-sim", resolver=lambda name: ["192.0.2.8"])
+        with self.assertRaises(ValueError):
+            overlay.resolve_target_address("cm4-sim", "cm4-sim", resolver=lambda name: ["192.0.2.8", "192.0.2.9"])
+        for address in ("0.0.0.0", "255.255.255.255", "224.0.0.1", "::1", "198.51.100.3.example", "127.0.0.2"):
+            with self.subTest(address=address), self.assertRaises(ValueError):
+                overlay.resolve_target_address(address, "cm4-sim")
+
+    def test_simulator_target_patch_preserves_false_branch_and_unrelated_bytes(self):
+        original = self.launch_xml()
+        updated = overlay.patch_simulator_target(original, "192.0.2.31")
+        self.assertEqual(original, (self.launch_directory / "crane.launch.xml").read_bytes())
+        self.assertIn(b'value="192.0.2.31" if="$(var sim)"', updated)
+        self.assertIn(b'value="192.168.20.255" if="$(var sim) == false"', updated)
+        self.assertIn(b'name="unrelated" value="preserve"', updated)
+        self.assertIn(b'file="$(find-pkg-share crane_bringup)/launch/foxglove_bridge.launch.xml"', updated)
+
+    def test_simulator_target_patch_rejects_missing_or_ambiguous_target_let(self):
+        original = self.launch_xml()
+        missing = original.replace(b'name="ibis_target_address" value="127.0.0.1" if="$(var sim)"', b'name="other" value="127.0.0.1" if="$(var sim)"')
+        duplicate = original.replace(b'</launch>', b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" />\n</launch>')
+        for value in (missing, duplicate):
+            with self.subTest(launch=value), self.assertRaises(ValueError):
+                overlay.patch_simulator_target(value, "192.0.2.31")
+
+    def test_runner_patches_real_paired_let_without_changing_comment_decoy(self):
+        (self.launch_directory / "crane.launch.xml").write_bytes(
+            b'<launch>\n'
+            b'  <!-- <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" /> -->\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)"></let>\n'
+            b'</launch>\n'
+        )
+        observed = {}
+
+        def runner(arguments, *, env, check):
+            observed["arguments"] = arguments
+            launch = next(
+                Path(part) / "share" / "crane_bringup" / "launch" / "crane.launch.xml"
+                for part in env["AMENT_PREFIX_PATH"].split(overlay.os.pathsep)
+                if (Path(part) / "share" / "crane_bringup" / "launch" / "crane.launch.xml").is_file()
+            ).read_bytes()
+            observed["launch"] = launch
+            observed["sim_value"] = ET.fromstring(launch).find("let").attrib["value"]
+            return SimpleNamespace(returncode=0)
+
+        result = overlay.run_with_overlay(
+            "cm4-sim",
+            "cm4-sim",
+            [],
+            environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+            package_share=self.package_share,
+            resolver=lambda name: ["192.0.2.52"],
+            runner=runner,
+            temporary_directory=str(self.root),
+        )
+
+        self.assertEqual(0, result)
+        self.assertEqual("192.0.2.52", observed["sim_value"])
+        self.assertIn(b'<!-- <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" /> -->', observed["launch"])
+
+    def test_runner_rejects_comment_decoy_when_real_paired_simulator_lets_are_ambiguous(self):
+        (self.launch_directory / "crane.launch.xml").write_bytes(
+            b'<launch>\n'
+            b'  <!-- <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)" /> -->\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)"></let>\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1" if="$(var sim)"></let>\n'
+            b'</launch>\n'
+        )
+        runner_calls = []
+
+        def runner(arguments, *, env, check):
+            runner_calls.append(arguments)
+            return SimpleNamespace(returncode=0)
+
+        with self.assertRaises(ValueError):
+            overlay.run_with_overlay(
+                "cm4-sim",
+                "cm4-sim",
+                [],
+                environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                package_share=self.package_share,
+                resolver=lambda name: ["192.0.2.53"],
+                runner=runner,
+                temporary_directory=str(self.root),
+            )
+
+        self.assertEqual([], runner_calls)
+
+    def test_overlay_keeps_other_package_files_and_removes_only_its_temporary_prefix(self):
+        original_launch = (self.launch_directory / "crane.launch.xml").read_bytes()
+        temporary, prefix = overlay.create_overlay(
+            self.package_share,
+            "192.0.2.41",
+            temporary_directory=str(self.root),
+            link_original=self.copy_link,
+        )
+        try:
+            generated = prefix / "share" / "crane_bringup"
+            launch = (generated / "launch" / "crane.launch.xml").read_bytes()
+            self.assertIn(b'value="192.0.2.41" if="$(var sim)"', launch)
+            self.assertEqual(b"<launch/>", (generated / "launch" / "foxglove_bridge.launch.xml").read_bytes())
+            self.assertEqual("mode: fixed\n", (generated / "config" / "settings.yaml").read_text(encoding="utf-8"))
+            self.assertTrue((prefix / "share" / "ament_index" / "resource_index" / "packages" / "crane_bringup").is_file())
+            self.assertEqual(original_launch, (self.launch_directory / "crane.launch.xml").read_bytes())
+        finally:
+            temporary.cleanup()
+        self.assertFalse(prefix.exists())
+
+    def test_runner_uses_package_name_command_child_path_and_cleans_overlay(self):
+        source_environment = {"AMENT_PREFIX_PATH": "/original/prefix", "PLANNER": "visibility_graph"}
+        observed = {}
+
+        def runner(arguments, *, env, check):
+            observed["arguments"] = arguments
+            observed["environment"] = env
+            observed["check"] = check
+            observed["overlay_launch"] = next(
+                Path(part) / "share" / "crane_bringup" / "launch" / "crane.launch.xml"
+                for part in env["AMENT_PREFIX_PATH"].split(overlay.os.pathsep)
+                if part.startswith(str(self.root)) and (Path(part) / "share" / "crane_bringup" / "launch" / "crane.launch.xml").exists()
+            ).read_bytes()
+            return SimpleNamespace(returncode=7)
+
+        result = overlay.run_with_overlay(
+            "cm4-sim",
+            "cm4-sim",
+            ["speak:=false", "planner:=visibility_graph"],
+            environment=source_environment,
+            package_share=self.package_share,
+            resolver=lambda name: ["192.0.2.51"],
+            runner=runner,
+            temporary_directory=str(self.root),
+        )
+
+        self.assertEqual(7, result)
+        self.assertEqual(["ros2", "launch", "crane_bringup", "crane.launch.xml", "speak:=false", "planner:=visibility_graph"], observed["arguments"])
+        self.assertFalse(observed["check"])
+        self.assertEqual("/original/prefix", source_environment["AMENT_PREFIX_PATH"])
+        self.assertTrue(observed["environment"]["AMENT_PREFIX_PATH"].endswith(os_pathsep_join("/original/prefix")))
+        self.assertIn(b'value="192.0.2.51" if="$(var sim)"', observed["overlay_launch"])
+        self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    def test_owned_command_cleans_overlay_after_success_and_launch_failure(self):
+        observed_prefix = self.root / "owned-prefix.txt"
+        script = "from pathlib import Path; import os,sys; Path(sys.argv[1]).write_text(os.environ['AMENT_PREFIX_PATH'].split(os.pathsep)[0]); sys.exit(int(sys.argv[2]))"
+
+        def command_factory(exit_code):
+            return lambda _arguments: [sys.executable, "-c", script, str(observed_prefix), str(exit_code)]
+
+        for exit_code in (0, 17):
+            with self.subTest(exit_code=exit_code):
+                result = overlay.run_with_overlay(
+                    "cm4-sim",
+                    "cm4-sim",
+                    [],
+                    environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                    package_share=self.package_share,
+                    resolver=lambda name: ["192.0.2.61"],
+                    temporary_directory=str(self.root),
+                    _command_factory=command_factory(exit_code),
+                )
+                self.assertEqual(exit_code, result)
+                prefix = Path(observed_prefix.read_text(encoding="utf-8"))
+                self.assertFalse(prefix.exists())
+                observed_prefix.unlink()
+
+        with self.assertRaises(FileNotFoundError):
+            overlay.run_with_overlay(
+                "cm4-sim",
+                "cm4-sim",
+                [],
+                environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                package_share=self.package_share,
+                resolver=lambda name: ["192.0.2.61"],
+                temporary_directory=str(self.root),
+                _command_factory=lambda _arguments: [str(self.root / "missing-owned-child.exe")],
+            )
+        self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    def test_owned_command_forwards_stop_and_reaps_child_before_overlay_cleanup(self):
+        ready = self.root / "owned-child-ready"
+        stopped = self.root / "owned-child-stopped"
+        observed_prefix = self.root / "owned-child-prefix.txt"
+        script = (
+            "import os,signal,sys,time; from pathlib import Path; "
+            "Path(sys.argv[1]).write_text(os.environ['AMENT_PREFIX_PATH'].split(os.pathsep)[0]); "
+            "Path(sys.argv[2]).write_text('ready'); "
+            "signal.signal(signal.SIGTERM, lambda *_: (Path(sys.argv[3]).write_text('stopped'), sys.exit(0))); "
+            "time.sleep(10)"
+        )
+
+        def request_stop_after_child_starts():
+            deadline = time.monotonic() + 4
+            while time.monotonic() < deadline and not ready.exists():
+                time.sleep(0.01)
+            if ready.exists():
+                signal.raise_signal(signal.SIGTERM)
+
+        stop_sender = threading.Thread(target=request_stop_after_child_starts, daemon=True)
+        stop_sender.start()
+        result = overlay.run_with_overlay(
+            "cm4-sim",
+            "cm4-sim",
+            [],
+            environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+            package_share=self.package_share,
+            resolver=lambda name: ["192.0.2.62"],
+            temporary_directory=str(self.root),
+            _command_factory=lambda _arguments: [sys.executable, "-c", script, str(observed_prefix), str(ready), str(stopped)],
+        )
+        stop_sender.join(timeout=1)
+
+        self.assertIsInstance(result, int)
+        self.assertEqual(128 + signal.SIGTERM, result)
+        self.assertTrue(ready.exists())
+        if overlay.os.name == "posix":
+            self.assertTrue(stopped.exists())
+        prefix = Path(observed_prefix.read_text(encoding="utf-8"))
+        self.assertFalse(prefix.exists())
+        self.assertFalse(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    def test_owned_child_reap_failure_does_not_restart_stop_budget(self):
+        class UnreapedChild:
+            pid = 424242
+            returncode = None
+
+            @staticmethod
+            def poll():
+                return None
+
+        child = UnreapedChild()
+        stop_attempts = []
+        force_attempts = []
+        observed_prefix = []
+        sentinel = self.root / "unrelated-sentinel.txt"
+        sentinel.write_text("keep", encoding="utf-8")
+
+        def start_owned_command(arguments):
+            signal.raise_signal(signal.SIGTERM)
+            return ["controlled-owned-child"]
+
+        with (
+            mock.patch.object(overlay.subprocess, "Popen", return_value=child),
+            mock.patch.object(overlay, "_signal_owned_child", side_effect=lambda *_: stop_attempts.append("signal")),
+            mock.patch.object(overlay, "_force_stop_owned_child", side_effect=lambda *_: force_attempts.append("force")),
+            mock.patch.object(overlay, "_wait_owned_tree", return_value=(False, None)),
+        ):
+            with self.assertRaises(overlay.OwnedChildNotReapedError):
+                overlay.run_with_overlay(
+                    "cm4-sim",
+                    "cm4-sim",
+                    [],
+                    environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                    package_share=self.package_share,
+                    resolver=lambda name: ["192.0.2.64"],
+                    temporary_directory=str(self.root),
+                    _command_factory=start_owned_command,
+                )
+
+        self.assertEqual(["signal"], stop_attempts)
+        self.assertEqual(["force"], force_attempts)
+        self.assertEqual("keep", sentinel.read_text(encoding="utf-8"))
+        self.assertTrue(any(path.name.startswith("duck-crane-ament-") for path in self.root.iterdir()))
+
+    @unittest.skipUnless(overlay.os.name == "posix", "POSIXのプロセスグループ信号伝達専用")
+    def test_owned_command_stops_only_its_process_group(self):
+        ready = self.root / "group-child-ready"
+        grandchild_ready = self.root / "group-grandchild-ready"
+        child_stopped = self.root / "group-child-stopped"
+        grandchild_stopped = self.root / "group-grandchild-stopped"
+        unrelated_release = self.root / "unrelated-release"
+        unrelated_stopped = self.root / "unrelated-stopped"
+        observed_prefix = self.root / "group-child-prefix.txt"
+        grandchild = (
+            "import signal,sys,time; from pathlib import Path; "
+            "Path(sys.argv[1]).write_text('ready'); "
+            "signal.signal(signal.SIGTERM, lambda *_: (Path(sys.argv[2]).write_text('stopped'), sys.exit(0))); "
+            "time.sleep(10)"
+        )
+        parent = (
+            "import os,signal,subprocess,sys,time\nfrom pathlib import Path\n"
+            "signal.signal(signal.SIGTERM, lambda *_: (Path(sys.argv[3]).write_text('stopped'), sys.exit(0)))\n"
+            "Path(sys.argv[6]).write_text(os.environ['AMENT_PREFIX_PATH'].split(os.pathsep)[0])\n"
+            "subprocess.Popen([sys.executable, '-c', sys.argv[1], sys.argv[4], sys.argv[5]], close_fds=True)\n"
+            "deadline=time.monotonic()+3\n"
+            "while time.monotonic()<deadline and not Path(sys.argv[4]).exists():\n time.sleep(.01)\n"
+            "Path(sys.argv[2]).write_text('ready')\ntime.sleep(10)\n"
+        )
+        unrelated = (
+            "import sys,time; from pathlib import Path; release,stopped=map(Path,sys.argv[1:]); "
+            "\nwhile not release.exists():\n time.sleep(.02)\n"
+            "stopped.write_text('stopped')"
+        )
+        unrelated_process = subprocess.Popen(
+            [sys.executable, "-c", unrelated, str(unrelated_release), str(unrelated_stopped)],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+        def request_stop_after_child_starts():
+            deadline = time.monotonic() + 4
+            while time.monotonic() < deadline and not ready.exists():
+                time.sleep(0.01)
+            if ready.exists():
+                signal.raise_signal(signal.SIGTERM)
+
+        stop_sender = threading.Thread(target=request_stop_after_child_starts, daemon=True)
+        stop_sender.start()
+        try:
+            result = overlay.run_with_overlay(
+                "cm4-sim",
+                "cm4-sim",
+                [],
+                environment={"AMENT_PREFIX_PATH": "", "PLANNER": "visibility_graph"},
+                package_share=self.package_share,
+                resolver=lambda name: ["192.0.2.63"],
+                temporary_directory=str(self.root),
+                _command_factory=lambda _arguments: [
+                    sys.executable,
+                    "-c",
+                    parent,
+                    grandchild,
+                    str(ready),
+                    str(child_stopped),
+                    str(grandchild_ready),
+                    str(grandchild_stopped),
+                    str(observed_prefix),
+                ],
+            )
+            stop_sender.join(timeout=1)
+
+            self.assertEqual(128 + signal.SIGTERM, result)
+            self.assertTrue(child_stopped.exists())
+            self.assertTrue(grandchild_stopped.exists())
+            self.assertIsNone(unrelated_process.poll())
+        finally:
+            unrelated_release.write_text("release", encoding="utf-8")
+            unrelated_process.wait(timeout=3)
+
+        self.assertTrue(unrelated_stopped.exists())
+        prefix = Path(observed_prefix.read_text(encoding="utf-8")) if observed_prefix.exists() else None
+        if prefix is not None:
+            self.assertFalse(prefix.exists())
+
+    def test_deadline_bounds_and_reaps_its_lookup_child(self):
+        command = [sys.executable, "-c", "import sys,time; print('child-ready', flush=True); time.sleep(5)"]
+        with self.assertRaises(TimeoutError):
+            overlay._run_bounded_command(command, 0.1)
+
+def os_pathsep_join(value):
+    return overlay.os.pathsep + value
+
+
+if __name__ == "__main__":
+    unittest.main()

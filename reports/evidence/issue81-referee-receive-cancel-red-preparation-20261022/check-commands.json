@@ -1,0 +1,26 @@
+[
+  {
+    "args": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout_empty": true,
+    "stderr_empty": true
+  },
+  {
+    "args": [
+      "git",
+      "diff",
+      "--no-index",
+      "--check",
+      "--",
+      "/dev/null",
+      "Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs"
+    ],
+    "exit_code": 1,
+    "stdout_empty": true,
+    "stderr_empty": true
+  }
+]

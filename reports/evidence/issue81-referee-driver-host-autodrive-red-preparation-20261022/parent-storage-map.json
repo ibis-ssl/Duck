@@ -1,0 +1,282 @@
+[
+  {
+    "path": "RefereeDriverHostAutoDriveTests.api.txt",
+    "sha256": "bcb52b8033f7f5a5fc1f43d3bf194c29b9f9ec1e2c61b15f6116cc0619a5e26c",
+    "bytes": 2060,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/RefereeDriverHostAutoDriveTests.api.txt"
+  },
+  {
+    "path": "baseline-head.txt",
+    "sha256": "6d11d9c1263f9ab98025e9fd83e50dbcd5f87fe71f0678ccd391c016b420df20",
+    "bytes": 41,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/baseline-head.txt"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "a9780208a950a524ed790f0badd4dc755dfdeefb955d9280e219e9049d825e6b",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/diff-check.exit.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "existing42-guards.json",
+    "sha256": "b6f8e5accd0cf602be665e074a9df393d7c90f89595e5ab4cf7725c384313dc6",
+    "bytes": 19232,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/existing42-guards.json"
+  },
+  {
+    "path": "expectations.json",
+    "sha256": "9db0b085c134a84dd1a06403e01e9ca5599a90a04d7ab6d1b554304b24067692",
+    "bytes": 4025,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/expectations.json"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "a9780208a950a524ed790f0badd4dc755dfdeefb955d9280e219e9049d825e6b",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-status.command.json",
+    "sha256": "dcbdc29b487c3119acc827897d5bf75cb3df6055c84cf9d2636c9498c3572383",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-status.command.json"
+  },
+  {
+    "path": "final-status.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-status.exit.json"
+  },
+  {
+    "path": "final-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-status.stderr.log"
+  },
+  {
+    "path": "final-status.stdout.log",
+    "sha256": "7a2de93f38455faaffe0318fe03482f0ebc0913aaf5a1e785170ac8e44e36179",
+    "bytes": 204,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/final-status.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "634bf268bdf3f1acac94595a24fa6d33057ca482b2c5ac46e409f8a18659f86b",
+    "bytes": 5750,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/inventory.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "1dce56a5fe7b213384927e693a0d4d603ba23a84acc2634189da9bd2cd32521a",
+    "bytes": 548,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/readback.json"
+  },
+  {
+    "path": "report-diff.command.json",
+    "sha256": "0d1f46c9c0c686f2724d8f839c2f2d83fd2fc1fa886b70330aca2b7263ef9fbc",
+    "bytes": 182,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/report-diff.command.json"
+  },
+  {
+    "path": "report-diff.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/report-diff.exit.json"
+  },
+  {
+    "path": "report-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/report-diff.stderr.log"
+  },
+  {
+    "path": "report-diff.stdout.log",
+    "sha256": "72e711ca3d1122021f9d238f098f751cecdac81494826e2de211da93eed4bb30",
+    "bytes": 11352,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/report-diff.stdout.log"
+  },
+  {
+    "path": "report.after.md",
+    "sha256": "52b3b7ef3827a39cff57a0bf343010ae51415ffe076dd9990001c4344a23a31b",
+    "bytes": 30370,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/report.after.md"
+  },
+  {
+    "path": "report.before.md",
+    "sha256": "d9f13168b30bebc75d610bc5c81bd65c216783cfc96091e31b41e1d8452dfabe",
+    "bytes": 25082,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/report.before.md"
+  },
+  {
+    "path": "scaffold-boundary.json",
+    "sha256": "b9b2718edbdb20da82d4a0636d5c261ad482f86860210263b82502c15ae7faf1",
+    "bytes": 479,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/scaffold-boundary.json"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "2b4b632094feb27f33193481d91b3c017c12e5531dc43f41bd0679cf42e87afa",
+    "bytes": 383,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/source-manifest.json"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "sha256": "b641e28e6495795d36a5ad2a5e91026ddb182516a3af3ee7f9f43b82ee5ac8ac",
+    "bytes": 717,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs"
+  },
+  {
+    "path": "source-snapshot/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs",
+    "sha256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+    "bytes": 24283,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/source-snapshot/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs"
+  },
+  {
+    "path": "status.command.json",
+    "sha256": "dcbdc29b487c3119acc827897d5bf75cb3df6055c84cf9d2636c9498c3572383",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/status.command.json"
+  },
+  {
+    "path": "status.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/status.exit.json"
+  },
+  {
+    "path": "status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/status.stderr.log"
+  },
+  {
+    "path": "status.stdout.log",
+    "sha256": "5a91c53868952b55f53e935faa589dd5c7402db393e8290bb45898d0f14fcf8b",
+    "bytes": 138,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/status.stdout.log"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "721b03baeb663936351210866cb36b84e8ed0bc61ebca20efa0ae549132693c6",
+    "bytes": 530,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "32317559c9ee2cb394393305bdfde15b31d103889b9ec71d7d6be53aab22242a",
+    "bytes": 1101,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "e2986b02b6b14a2c5581c82c64aacce34f11b2fb92c1c6819ad733a5762f5d5e",
+    "bytes": 369,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax.exit.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "work-context.json",
+    "sha256": "18afb793ccc0f42b82a6d22fa80d4752540098bd414e40f2e95c7f40ae8fd45b",
+    "bytes": 698,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/work-context.json"
+  },
+  {
+    "path": "xml-proof.json",
+    "sha256": "9b7a98702973b916416f3604bd913cd5639bce9226d5e662537bc75fe8598309",
+    "bytes": 345,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/xml-proof.json"
+  }
+]

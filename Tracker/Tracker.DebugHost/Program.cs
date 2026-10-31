@@ -1,4 +1,6 @@
 using Tracker.Core;
+using Tracker.DebugHost;
+using Duck.Testing.Diagnostics;
 using Tracker.DebugHost.Components;
 using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
@@ -6,12 +8,24 @@ using Microsoft.Extensions.Options;
 using TrackerConnectionLib;
 
 var builder = WebApplication.CreateBuilder(args);
+DebugHostHealthEndpoints.ConfigureInternalHttp(builder);
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+builder.Services.AddSingleton(serviceProvider => new ServiceReceiveDiagnostics(
+    ServiceReceiveDiagnostics.ParseIdentity(
+        builder.Configuration["Testing:Diagnostics:RunId"], builder.Configuration["Testing:Diagnostics:ResourceId"],
+        builder.Configuration["Testing:Diagnostics:ContainerId"], builder.Configuration["Testing:Diagnostics:Generation"]),
+    serviceProvider.GetRequiredService<TimeProvider>()));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.Configure<VisionReceiverOptions>(builder.Configuration.GetSection("VisionReceiver"));
 builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection("Tracker"));
+var replayOnly = builder.Configuration.GetValue<bool>("Testing:DebugHost:ReplayOnly");
+if (replayOnly)
+{
+    DebugHostReplayOnlyConfiguration.Apply(builder.Configuration);
+}
 var startupTrackerOptions = builder.Configuration.GetSection("Tracker").Get<TrackerOptions>() ?? new TrackerOptions();
 builder.Services.AddSingleton(serviceProvider =>
 {
@@ -24,7 +38,8 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 builder.Services.AddSingleton(serviceProvider =>
     new VisionPacketCaptureRuntimeControl(
-        serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value.PacketCapture.Enabled));
+        serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value.PacketCapture.Enabled,
+        allowEnable: !replayOnly));
 builder.Services.AddSingleton(serviceProvider =>
     TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
 builder.Services.AddSingleton<TrackerRuntimeResolvedOptions>(serviceProvider =>
@@ -69,6 +84,7 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 if (startupTrackerOptions.Receive.Enabled)
 {
+    builder.Services.AddSingleton<DiagnosticTrackerDeserializer>();
     builder.Services.AddSingleton(serviceProvider =>
     {
         var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();
@@ -79,14 +95,17 @@ if (startupTrackerOptions.Receive.Enabled)
         return new UdpTrackerReceiver<TrackerPacketAdapter>(
             receiveEndpoint.Port,
             receiveEndpoint.MulticastAddress,
-            new TrackerWrapperPacketDeserializer(),
+            serviceProvider.GetRequiredService<DiagnosticTrackerDeserializer>(),
             receiveEndpoint.InterfaceAddress);
     });
     builder.Services.AddSingleton<TrackerConnectionLibSnapshotRecorder>();
     builder.Services.AddHostedService<TrackerConnectionLibReceiverHostedService>();
 }
 
-builder.Services.AddHostedService<VisionReceiverService>();
+if (!replayOnly)
+{
+    builder.Services.AddHostedService<VisionReceiverService>();
+}
 
 var app = builder.Build();
 
@@ -94,11 +113,10 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    // コンテナ用の HTTP 待受は、以下で明示的な構成に応じて選択する。
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+DebugHostHealthEndpoints.UseTransportMiddleware(app);
 
 app.UseAntiforgery();
 
@@ -116,9 +134,10 @@ app.MapGet(
     "/health/comparison",
     (ExternalTrackerSnapshotStore trackerSnapshots,
         VisionPacketStore visionPackets,
-        IConfiguration configuration) =>
-        DebugHostHealthEndpoints.GetComparisonHealthResult(trackerSnapshots, visionPackets, configuration));
-app.MapGet("/health/vision", (VisionPacketStore snapshots) =>
-    Results.Ok(new { VisionPacketsReceived = snapshots.GetSnapshot().PacketCount }));
+        IConfiguration configuration,
+        ServiceReceiveDiagnostics diagnostics) =>
+        DebugHostHealthEndpoints.GetComparisonHealthResult(trackerSnapshots, visionPackets, configuration, diagnostics));
+app.MapGet("/health/vision", (ServiceReceiveDiagnostics diagnostics, IConfiguration configuration, VisionPacketStore packets) =>
+    DebugHostHealthEndpoints.GetVisionHealthResult(diagnostics, configuration, packets));
 
 app.Run();

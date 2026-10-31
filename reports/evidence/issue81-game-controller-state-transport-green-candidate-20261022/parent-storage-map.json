@@ -1,0 +1,156 @@
+[
+  {
+    "path": "GameControllerStateClient.after.cs",
+    "sha256": "4f49bceab83d1a7361d410a48843e35a461784adf6a42a5490d8e1532df9a87b",
+    "bytes": 5409,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/GameControllerStateClient.after.cs"
+  },
+  {
+    "path": "GameControllerStateClient.before.cs",
+    "sha256": "1cd10b71401c41ce6bdca37cb6dc20736c49f79d885734731ee98179ba0ee9a6",
+    "bytes": 3626,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/GameControllerStateClient.before.cs"
+  },
+  {
+    "path": "completeness-matrix.json",
+    "sha256": "c2bc6a3152996c4b30b1fd73a033834016109889ea3c4723349e9ac0144f9edb",
+    "bytes": 1866,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/completeness-matrix.json"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "git-status.txt",
+    "sha256": "f73f33f8305bb228fcebc8c251b61203e68b5c590a23eea9caa887f58b55bb25",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/git-status.txt"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "f099055c0c7784adf56763424a62dc494f6389f6de9989f2db7e6a31265afeaf",
+    "bytes": 3061,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "40696218a4552debe8849a602a98a987520fa99093723b7441a1607cd7b1c3f2",
+    "bytes": 121,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/process-state.json"
+  },
+  {
+    "path": "production.diff",
+    "sha256": "a9a6248a000d832280747287ad41a5cf9b2b841c01deb917fcae0b3f23684edc",
+    "bytes": 5620,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/production.diff"
+  },
+  {
+    "path": "report-guards.json",
+    "sha256": "27a3412e85a27311dc3ebcd7fd2f70e76bd05f18668684b8a3dd99119963c23b",
+    "bytes": 240,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/report-guards.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "8bb62dabf3ec326e510daac529690eed7729bd749d0bd25b4ba53b6e4cce8012",
+    "bytes": 3781,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/report-readback.md"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "7ae954d4bc0c361d2ba8dc17e7dd7b6a9036b788be5ca20a402d083f2da2c28d",
+    "bytes": 2227,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "66899c2e42fd0c77ade98bf29bdbcd6f9bce3831cc72715f74819c38f7502349",
+    "bytes": 260,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "cc035efcb22f66695a8b9724ba9af96353021850ef8e004f29499f321a218fc7",
+    "bytes": 377,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "6a729a1f10b89badaedda7235d276f4487623f8d1e246fd0a15d3fcd5766693e",
+    "bytes": 334,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "unchanged26-source-guards.json",
+    "sha256": "f4658ea07cfdcda315ed45926fdd71a4164174f64a02718b5ed6eec9ce214a57",
+    "bytes": 4863,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-transport-green-candidate-20261022/unchanged26-source-guards.json"
+  }
+]

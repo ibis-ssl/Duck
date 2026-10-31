@@ -1,0 +1,100 @@
+{
+  "authority": [
+    "Tracker/Design/tasks-status.md I81-03C",
+    "reports/issue81-referee-driver-scope-20261022.md:91,93",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md:158",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260"
+  ],
+  "test": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+  "cases": [
+    {
+      "name": "EnabledBindingFollowsExplicitContainerMode(true)",
+      "sourceLine": 27,
+      "contract": "Enabled=true + ContainerMode=true selects internal39110 plainHTTP",
+      "expected": "urls=http://0.0.0.0:39110",
+      "anticipatedCurrent": "Assert.Equal expected URL actualnull",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "EnabledBindingFollowsExplicitContainerMode(false)",
+      "sourceLine": 27,
+      "contract": "explicit host in noncontainer mode uses loopback39110",
+      "expected": "urls=http://127.0.0.1:39110",
+      "anticipatedCurrent": "Assert.Equal expected URL actualnull",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "DisabledBindingPreservesExistingSettings(null)",
+      "sourceLine": 38,
+      "contract": "missingEnabled preserves current configured URL",
+      "expected": "http://127.0.0.1:42345 unchanged",
+      "classification": "regression expected pass"
+    },
+    {
+      "name": "DisabledBindingPreservesExistingSettings(false)",
+      "sourceLine": 38,
+      "contract": "falseEnabled preserves current configured URL",
+      "expected": "http://127.0.0.1:42345 unchanged",
+      "classification": "regression expected pass"
+    },
+    {
+      "name": "HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput",
+      "sourceLine": 48,
+      "contract": "real service/parser/observer/client/matcher evidence projection and finite APIwindow, no health action",
+      "expected": "HTTP200, Matched, full identity,epoch1,source192.0.2.70:11003,count2,error0,originalUTC,age0,APIrequest1; at3sec200/+tick503; receive3/connect1/write0/dispose1",
+      "anticipatedCurrent": "line54 HTTP Expected200 Actual404",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "MissingOrShortOwnerCannotBecomeReady(null)",
+      "sourceLine": 92,
+      "contract": "missing full owner must not be inferred from producerendpoint",
+      "expected": "HTTP503/isReadyfalse/diagnostic.identitynull/APIconnect0/write0",
+      "anticipatedCurrent": "line98 Expected503 Actual404",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "MissingOrShortOwnerCannotBecomeReady(short-id)",
+      "sourceLine": 92,
+      "contract": "short owner cannot substitute for complete64hexID",
+      "expected": "HTTP503/isReadyfalse/diagnostic.identitynull/APIconnect0/write0",
+      "anticipatedCurrent": "line98 Expected503 Actual404",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "DifferentApiCommandCannotPassHttpHealth",
+      "sourceLine": 107,
+      "contract": "actual API STOP vs actualUDP HALT failsclosed and observerwrites0",
+      "expected": "matcher reason CommandMismatch; HTTP503/notready with nonempty current decision reason (exact failure retention vocabulary not newly required); APIwrite0/dispose1",
+      "anticipatedCurrent": "line115 Expected503 Actual404",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "NoReceivedPacketCannotPassHttpHealth",
+      "sourceLine": 124,
+      "contract": "no real decoded packet ->notready with0count, no health-triggered API read",
+      "expected": "HTTP503/isReadyfalse/count0/connect0/receive1",
+      "anticipatedCurrent": "line129 Expected503 Actual404",
+      "classification": "runtime gap expected"
+    },
+    {
+      "name": "DisabledHealthDoesNotExposeAReadyEndpoint(null)",
+      "sourceLine": 140,
+      "contract": "missingEnabled exposes no diagnostic route",
+      "expected": "HTTP404/APIconnect0/write0",
+      "classification": "regression expected pass"
+    },
+    {
+      "name": "DisabledHealthDoesNotExposeAReadyEndpoint(false)",
+      "sourceLine": 140,
+      "contract": "falseEnabled exposes no diagnostic route",
+      "expected": "HTTP404/APIconnect0/write0",
+      "classification": "regression expected pass"
+    }
+  ],
+  "caseCount": 11,
+  "anticipatedRuntimeGaps": 7,
+  "anticipatedRegressionPass": 4,
+  "allStatus": "not executed; exact-SHA PR CI required; compileerrors or watchdogtimeouts not functionalRed",
+  "httpShapeSelected": "root isReady/reason, diagnostic(ServiceReceiveSnapshot camelCase with identity), api(GameControllerApiObservation camelCase). owner inputs are structural attribution, not DCP ownership proof."
+}

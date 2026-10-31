@@ -1,0 +1,10 @@
+{
+  "path": "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/issue81-game-controller-state-implementation-20261022.md",
+  "beforeSHA256": "8375a1fdb3e08924db1879357d1516a13382ebca7ee6ec743402fd375c32f089",
+  "afterSHA256": "28bc34494c4dd9333ca594a3726b3850f76300f2b4f478de7c7ab91f9429271b",
+  "prefixSHA256": "c53cd11ec7a8fc978702145c01d2795b7cfd8527e536211a543e794776884750",
+  "prefixUnchanged": true,
+  "addedSubsections": 5,
+  "readbackMatch": true,
+  "firstReportDiffCheck": "exit2 new blank line at EOF; corrected only added EOF newline, initial raw output retained"
+}

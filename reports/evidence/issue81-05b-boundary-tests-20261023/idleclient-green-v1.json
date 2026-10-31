@@ -1,0 +1,22 @@
+{
+  "name": "idleclient-green-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~IdleClientHasDeadlineAndDoesNotStarveLaterHandoff"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:18:22.354463+00:00",
+  "runner_pid": 1193511,
+  "child_pid": 1193514,
+  "exit": 0,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "14863d60e3f8bd1e6a7fbabea644c27e002b0e60c133ed6ad5ab6eb6e21b1fb3",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 2476,
+  "stderr_bytes": 0
+}\n

@@ -1,0 +1,11 @@
+AUDIT: duplicate/hung boundary test invocations; no test output or process exit code was captured before termination.
+
+Inspection command (PowerShell -> WSL; exit 0): ps -o pid,ppid,lstart,etime,args -p [explicit PID list]
+Inspection result: two wrapper trees, both command `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -p:EnableSourceControlManagerQueries=false --filter FullyQualifiedName~RuntimeIdentityControlBoundaryTests`.
+Run A: wrapper PID 1181301 (python script /mnt/c/Users/donabe/AppData/Local/Temp/issue81-run-boundary-red-v4.py), parent 1181300; started Fri Oct 23 22:00:15 2026. dotnet PID 1181303, cwd /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests. vstest PID 1181699 and testhost PID 1181714. MSBuild child PIDs 1181331-1181339; all cwd inside same repository project directories. Full command/cwd inspection confirmed these are the same-source test invocation.
+Run B: wrapper PID 1181817 (same python script), parent 1181814; started Fri Oct 23 22:01:06 2026. dotnet PID 1181821, cwd /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests. vstest PID 1182162 and testhost PID 1182177. MSBuild child PIDs 1181849-1181857; all cwd inside same repository project directories. Full command/cwd inspection confirmed these are the same-source duplicate test invocation.
+
+Termination action: `wsl.exe -d Ubuntu -- kill -TERM 1181301 1181303 1181331 1181332 1181333 1181334 1181335 1181336 1181337 1181338 1181339 1181699 1181714 1181817 1181821 1181849 1181850 1181851 1181852 1181853 1181854 1181855 1181856 1181857 1182162 1182177`; command exit 0.
+Post-termination verification: same exact PID list with `ps -o pid,ppid,lstart,etime,args`; exit 1 and output header only, confirming no listed process remained.
+
+Classification: v4 source hash 9f60fbb86bfd27b99c5548dc9e00543a6c95e986f3a911ce22296591cc8ff492 was the input at both starts. The two invocations produced no recoverable stdout/stderr/TRX/exit code; termination signal outcome only. Do not classify as functional Red/Green or as pass/fail.

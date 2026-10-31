@@ -1,0 +1,338 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "sha256": "e6d655a833eaea44d33c59e4b546f9d25b5b0826426877e319b75b8d76ebd54a",
+    "bytes": 277,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.exit.json",
+    "sha256": "9ffcebdc6110f1d4ae005cb8073343155a36d8fb5a4e669eeb13e728d8935bda",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/artifacts.exit.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+    "bytes": 32,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "binary-magic-inventory.json",
+    "sha256": "6ed9e6a60210ed75266a6dddfba4bed0bfce8d23950003c76be629621d2b2b55",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/binary-magic-inventory.json"
+  },
+  {
+    "path": "checkpoint-view.command.json",
+    "sha256": "17de782a437ea8a786804f85dc31326734c36e8c76095841d1ddeef58c09de0e",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/checkpoint-view.command.json"
+  },
+  {
+    "path": "checkpoint-view.exit.json",
+    "sha256": "5163c8a567f848643762a26302d3068eb4ae72f7e9c377aee02a5f83e22620b6",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/checkpoint-view.exit.json"
+  },
+  {
+    "path": "checkpoint-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/checkpoint-view.stderr.log"
+  },
+  {
+    "path": "checkpoint-view.stdout.log",
+    "sha256": "e32b975ad36c4bb4508fe21d3b62bba7f21ab4c6c06f0ba806acbd6b078abc4a",
+    "bytes": 2046,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/checkpoint-view.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "38d63ac078cf2a4daf3f20068a8a6410a81ebd90369d4c832ee3453510abf4b9",
+    "bytes": 9136,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "collect.py",
+    "sha256": "fb1b01afac61aa9580306df0289c36120f22147d9f86b097773680eab7466a30",
+    "bytes": 750,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/collect.py"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "a9780208a950a524ed790f0badd4dc755dfdeefb955d9280e219e9049d825e6b",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-head.command.json",
+    "sha256": "fb1adab2ea6028fca8c4c49aec9c06f3e2f3e0fd753059e86f9109a640e28e36",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-head.command.json"
+  },
+  {
+    "path": "final-head.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-head.exit.json"
+  },
+  {
+    "path": "final-head.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-head.stderr.log"
+  },
+  {
+    "path": "final-head.stdout.log",
+    "sha256": "6d11d9c1263f9ab98025e9fd83e50dbcd5f87fe71f0678ccd391c016b420df20",
+    "bytes": 41,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-head.stdout.log"
+  },
+  {
+    "path": "final-status.command.json",
+    "sha256": "dcbdc29b487c3119acc827897d5bf75cb3df6055c84cf9d2636c9498c3572383",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-status.command.json"
+  },
+  {
+    "path": "final-status.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-status.exit.json"
+  },
+  {
+    "path": "final-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-status.stderr.log"
+  },
+  {
+    "path": "final-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-status.stdout.log"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "ed8607ada76e9267432c316fdc5ce85d9da490d680581bd0f607923485ea8d9a",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.exit.json",
+    "sha256": "c9002099f518c898af277d448a920ef629978c7b1127b428998cc3606ce8689e",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-view.exit.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "9820dcf6c8cced229878aa243323ba45bbddbb33f75816fd1fb85a441762ab9d",
+    "bytes": 2531,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "604868cc086c8fd1615b6117b2042172585d4b8936488cadfbe307fe062a31e2",
+    "bytes": 14529,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-list.command.json",
+    "sha256": "dce25ca420577c7ce5a167db9ea9e91fceb12987e91c9649763833d7694b5929",
+    "bytes": 404,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-list.command.json"
+  },
+  {
+    "path": "initial-list.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-list.exit.json"
+  },
+  {
+    "path": "initial-list.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-list.stderr.log"
+  },
+  {
+    "path": "initial-list.stdout.log",
+    "sha256": "024d859d7ae50accf88d4f55555f34f5664b457972578a13a1d82f85ba8fa3f6",
+    "bytes": 245,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-list.stdout.log"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "3af933439b9d47a0e028f58ebd3075be47eaf6b16fdecbbd9e57a8aceff45004",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.exit.json",
+    "sha256": "6a7e21d388640de572f7525737c6fa6c7046ae5abe53bbd013274ad052083066",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-view.exit.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "e32b975ad36c4bb4508fe21d3b62bba7f21ab4c6c06f0ba806acbd6b078abc4a",
+    "bytes": 2046,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "5da154d5c19077a17a60b096c36a3baddadc2b54fd763025116a28645ed5363c",
+    "bytes": 6826,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "e6d4572e1f90fb1564c66c646c063bfd95a3e6a91989bb10fcc6177fafb28ea8",
+    "bytes": 251,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/process-state.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "a5eac70b47e82e7316f5cdfb3e0fae0e155e233ad6c7952d91bbc42185c12471",
+    "bytes": 509,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/readback.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "e6a2c8dea652b37104cabe21d76eb587651d4c86cde7e029d63c3798f4d8d009",
+    "bytes": 267,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.exit.json",
+    "sha256": "0826ad04b22e317b569d8225869d24de3667f3924e54cae01a115a201c13f5a6",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/run-log.exit.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "4418c0190a93a4c57ea99168e39bd9ef5f0ee06921e87ed0c33bf6a0f97638bd",
+    "bytes": 51925,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "source-head-disk-manifest.json",
+    "sha256": "dd7e823012f7a698a2d1bf5eec38c5d330e4cabfcc270cd9dcbed9c81391ce4d",
+    "bytes": 23013,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/source-head-disk-manifest.json"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "cf34233d4d00c74477a1427877e7ab205ad511d478e3831f6f2e23eca201b41d",
+    "bytes": 304,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.exit.json",
+    "sha256": "dc4fa899516bddfb6200b89ae5308c89e19aaed71fcceeb0da7c18a2e1c90e9e",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/watch.exit.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "7cc78492177d0e5aecee3b23893b950e3e20ccc53acc4d004a230a707734ce46",
+    "bytes": 1954,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-ci-20261022/watch.stdout.log"
+  }
+]

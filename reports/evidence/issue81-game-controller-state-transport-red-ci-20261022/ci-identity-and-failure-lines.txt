@@ -1,0 +1,8 @@
+test	Check out repository	2026-10-22T17:58:56.3816235Z HEAD is now at 75212f9 Merge becd47ca5ca81b4d0abba538db7560795f60261c into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+test	Run dotnet test	2026-10-22T17:59:44.5992021Z [xUnit.net 00:00:04.03]     Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead [FAIL]
+test	Run dotnet test	2026-10-22T17:59:44.6058368Z [xUnit.net 00:00:04.04]     Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt [FAIL]
+test	Run dotnet test	2026-10-22T17:59:44.6289209Z [xUnit.net 00:00:04.06]     Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry [FAIL]
+test	Run dotnet test	2026-10-22T17:59:44.6785231Z [xUnit.net 00:00:04.07]     Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: "{") [FAIL]
+test	Run dotnet test	2026-10-22T17:59:44.7605663Z [xUnit.net 00:00:04.12]     Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(oneByteOver: True) [FAIL]
+test	Run dotnet test	2026-10-22T17:59:44.7629219Z [xUnit.net 00:00:04.13]     Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation [FAIL]
+test	Run dotnet test	2026-10-22T18:00:09.6757505Z Failed!  - Failed:     6, Passed:   660, Skipped:     0, Total:   666, Duration: 28 s - Tracker.Tests.dll (net10.0)

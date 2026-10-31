@@ -1,0 +1,11 @@
+Error
+ENOENT: no such file or directory, scandir 'C:\Users\donabe\AppData\Local\Temp\issue81-05b2-diff-lint-20261023\tools\lint\scripts\textlint-rules'
+
+Stack trace
+Error: ENOENT: no such file or directory, scandir 'C:\Users\donabe\AppData\Local\Temp\issue81-05b2-diff-lint-20261023\tools\lint\scripts\textlint-rules'
+    at async Object.readdir (node:internal/fs/promises:1661:18)
+    at async loadFromDirAsESM (C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules\textlint\lib\src\engine\rule-loader.js:57:19)
+    at async Promise.all (index 0)
+    at async loadCliDescriptor (C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules\textlint\lib\src\loader\CliLoader.js:49:28)
+    at async loadDescriptor (C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules\textlint\lib\src\cli.js:25:27)
+    at async Object.executeWithOptions (C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules\textlint\lib\src\cli.js:133:28)

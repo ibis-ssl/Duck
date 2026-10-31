@@ -1,0 +1,9 @@
+[
+  "/usr/lib/dotnet/dotnet",
+  "build",
+  "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+  "--no-restore",
+  "-m:1",
+  "/nr:false",
+  "-p:EnableSourceControlManagerQueries=false"
+]

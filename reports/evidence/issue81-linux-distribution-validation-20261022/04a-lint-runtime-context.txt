@@ -1,0 +1,8 @@
+mirror=C:\Users\donabe\AppData\Local\Temp\issue81-04a-lint-20261022
+node_modules attributes=Directory, ReparsePoint
+node_modules linkType=Junction
+node_modules target=C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules
+node=C:\Program Files\nodejs\node.exe
+node_version=v24.20.0
+npm=C:\Program Files\nodejs\npm.cmd
+npm_version=11.19.0

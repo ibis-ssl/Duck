@@ -1,0 +1,9 @@
+{
+  "exit": 1,
+  "stdout_sha256": "180a7be2f406cc23bcd6eb19599c0cf5e474cd43892b8e4dbe4aa7e98c48d893",
+  "stderr_sha256": "70bc3d90eda65cc3fc47e946476ba63aa36f55292dcb2a5e3a11be7406076f69",
+  "stdout_bytes": 765,
+  "stderr_bytes": 251,
+  "stdout": "issue81-05b3-fragments-v2/implementation-report.md:5:451 - Unknown word (skip)\nissue81-05b3-fragments-v2/implementation-report.md:5:482 - Unknown word (build)\nissue81-05b3-fragments-v2/implementation-report.md:7:450 - Unknown word (focused)\nissue81-05b3-fragments-v2/implementation-report.md:7:491 - Unknown word (build)\nissue81-05b3-fragments-v2/implementation-report.md:7:523 - Unknown word (build)\nissue81-05b3-fragments-v2/tasks-status.md:1:121 - Unknown word (localhost)\nissue81-05b3-fragments-v2/tasks-status.md:1:151 - Unknown word (referee)\nissue81-05b3-fragments-v2/tasks-status.md:1:198 - Unknown word (localhost)\nissue81-05b3-fragments-v2/tasks-status.md:2:8 - Unknown word (Issue)\nissue81-05b3-fragments-v2/tasks-status.md:2:28 - Unknown word (referee)\n",
+  "stderr": "1/3 issue81-05b3-fragments-v2/aspire-simulation-test-environment.md 31.57ms\n2/3 issue81-05b3-fragments-v2/implementation-report.md 13.27ms X\n3/3 issue81-05b3-fragments-v2/tasks-status.md 2.16ms X\nCSpell: Files checked: 3, Issues found: 10 in 2 files.\n"
+}

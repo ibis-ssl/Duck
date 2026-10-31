@@ -1,0 +1,16 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs",
+    "output": "/tmp/issue81-referee-receive-subscriber-red-preparation-20261022/test.syntax-api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeReceiveSubscriberTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

@@ -1,0 +1,219 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "sha256": "6080fe8914a33b3a8ce93943e77aa75994dd630bdfa66074b8f266a2ea5b5b9c",
+    "bytes": 277,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.exit.json",
+    "sha256": "40f2eef945cb04184f518e7dc5b0802cfb16989bdb37d19da6a0f54e5c04d45e",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/artifacts.exit.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+    "bytes": 32,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "8c5451ba13bfe517f36b440ccdf5479cbebc303990cba736a90419490e266cf8",
+    "bytes": 5284,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "collect.py",
+    "sha256": "7e57a22e38193b54fb8357b1a0587f7e11917a9578c21dc07b616e1294afd306",
+    "bytes": 753,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/collect.py"
+  },
+  {
+    "path": "final-git-status.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/final-git-status.command.json"
+  },
+  {
+    "path": "final-git-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/final-git-status.stdout.log"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "7a3f2b4bb8351f635439a9096a7070aa7a92443e5d4a723124f45a1fbcbf7ffd",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.exit.json",
+    "sha256": "75e91408b80f5547469de50ea04d5347670e1604009dc94eb6de2619e43de569",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/final-view.exit.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "08294ba38fe27c32f7cc12eef1812cbf18efe50d492cc63a54632dfb5a9a7450",
+    "bytes": 2531,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "38e30af3515857492f19c68a8a69c56588a25a654e00f376b03d884a7583f693",
+    "bytes": 19348,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-list.command.json",
+    "sha256": "efcd05dd9a2fb73502054a834c55772e8f14e0a13bfe572832d2a57101d37314",
+    "bytes": 447,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-list.command.json"
+  },
+  {
+    "path": "initial-list.exit.json",
+    "sha256": "d7c02172bdd3ced9e124af8a2bd5c2c45fb4d0024e5aa6d8a81ba4003e83672a",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-list.exit.json"
+  },
+  {
+    "path": "initial-list.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-list.stderr.log"
+  },
+  {
+    "path": "initial-list.stdout.log",
+    "sha256": "2bdd5f5a61d9fb59c35ed35d91f12999b82ecf0fa5dbec2b6602958088adb955",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-list.stdout.log"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "9d63ed3c21dc74995db953eb6b3c39fbc2ebc243753908ede6c1321302331b58",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.exit.json",
+    "sha256": "7c26f3a2090de3931d2352ea8901b9b69e9298699f57353045203ad280590681",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-view.exit.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "df87a0f04dd9a2a070a251a7590acb5beeb15f538471dd3a37ead84a0db9869b",
+    "bytes": 2037,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "3023171faeab27c162beff0f74f4b57835e1c74f870e023d781c4a7575ef9fa6",
+    "bytes": 4320,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/inventory.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "2210861c8673327d26d2cd9160a96f21f47dcbd430cfeec3517a90db784914b4",
+    "bytes": 244,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/readback.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "c1e413703a7e62643f8111b0df514887d8aa904e6b405c49dfacfa73c1d007d3",
+    "bytes": 267,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.exit.json",
+    "sha256": "e5ffae374274964fb9814cc27a40d31d1eec598a6706a26fe8dbf9e6e7a2e08b",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/run-log.exit.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "0dff7d2d9b1a1face46cc17a4240be6b6d91a23d1d121cba16528872eb389814",
+    "bytes": 51534,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "2c087cb8a444777998ddc8ca02156cf7bc19c2331b5e6facd8ffb7ea44cae07a",
+    "bytes": 304,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.exit.json",
+    "sha256": "a5ed59d5b6c07a61ee149be5b0af320277203699189b0d2ba0cef2dd8aa5bdc6",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/watch.exit.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "a9b2eade9c3898802f7fe96e0021be3442a72e7bed2ccd6f788bc02cf7b835af",
+    "bytes": 1984,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-publication-ci-20261022/watch.stdout.log"
+  }
+]

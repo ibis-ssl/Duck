@@ -1,0 +1,66 @@
+{
+  "inputs": [
+    "current/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+    "current/issue81-record-diff-v1/Tracker/Design/phases-status.md",
+    "current/issue81-record-diff-v1/reports/issue81-bridge-integration-implementation-20261023.md",
+    "current/issue81-record-diff-v1/reports/issue81-bridge-readiness-normal-review-20261023.md"
+  ],
+  "results": {
+    "textlint": {
+      "argv": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "tools/lint/scripts/run-markdown-targets.js",
+        "text",
+        "--files",
+        "current/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+        "current/issue81-record-diff-v1/Tracker/Design/phases-status.md",
+        "current/issue81-record-diff-v1/reports/issue81-bridge-integration-implementation-20261023.md",
+        "current/issue81-record-diff-v1/reports/issue81-bridge-readiness-normal-review-20261023.md"
+      ],
+      "exit": 0,
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cspell": {
+      "argv": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "tools/lint/scripts/run-markdown-targets.js",
+        "spell",
+        "--files",
+        "current/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+        "current/issue81-record-diff-v1/Tracker/Design/phases-status.md",
+        "current/issue81-record-diff-v1/reports/issue81-bridge-integration-implementation-20261023.md",
+        "current/issue81-record-diff-v1/reports/issue81-bridge-readiness-normal-review-20261023.md"
+      ],
+      "exit": 1,
+      "stdoutBytes": 6703,
+      "stderrBytes": 207,
+      "stdoutSha256": "8f3d0dc915cb439d1873c63c27100877add910084f09ccd8c527d610edfdb6a3",
+      "stderrSha256": "f5e86bed3ff800fdc82ac695bbc0d4bebe7e2f795c30a00c986935294ad49dc7"
+    },
+    "sudachi": {
+      "argv": [
+        "wsl.exe",
+        "--distribution",
+        "Ubuntu",
+        "--cd",
+        "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+        "--exec",
+        "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "current/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+        "current/issue81-record-diff-v1/Tracker/Design/phases-status.md",
+        "current/issue81-record-diff-v1/reports/issue81-bridge-integration-implementation-20261023.md",
+        "current/issue81-record-diff-v1/reports/issue81-bridge-readiness-normal-review-20261023.md"
+      ],
+      "exit": 2,
+      "stdoutBytes": 0,
+      "stderrBytes": 341,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "5ba905d83deafa90ef7afda3bea5f5e43b3cd0aad371b1e682cd755421e919ea"
+    }
+  }
+}

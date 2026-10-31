@@ -1,0 +1,46 @@
+test	Verify Linux application publish outputs	・ｿ2026-10-23T00:35:05.8650519Z ##[group]Run scripts/tests/verify-linux-publish-outputs.sh
+test	Verify Linux application publish outputs	2026-10-23T00:35:05.8651013Z ^[[36;1mscripts/tests/verify-linux-publish-outputs.sh^[[0m
+test	Verify Linux application publish outputs	2026-10-23T00:35:05.8712012Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Verify Linux application publish outputs	2026-10-23T00:35:05.8712346Z env:
+test	Verify Linux application publish outputs	2026-10-23T00:35:05.8712549Z   DOTNET_ROOT: /usr/share/dotnet
+test	Verify Linux application publish outputs	2026-10-23T00:35:05.8712787Z ##[endgroup]
+test	Verify Linux application publish outputs	2026-10-23T00:35:05.8864095Z Publishing Tracker/Tracker.RuntimeHost with profile LinuxContainer into /tmp/duck-issue81-linux-publish.5DHuGy/Tracker.RuntimeHost
+test	Verify Linux application publish outputs	2026-10-23T00:35:12.0570081Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:12.0572895Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:12.0574314Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Release/net10.0/Tracker.Core.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:12.0576021Z   Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Release/net10.0/Tracker.RuntimeHost.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:12.0577751Z   Tracker.RuntimeHost -> /tmp/duck-issue81-linux-publish.5DHuGy/Tracker.RuntimeHost/
+test	Verify Linux application publish outputs	2026-10-23T00:35:12.0889360Z Publishing Tracker/Tracker.DebugHost with profile LinuxContainer into /tmp/duck-issue81-linux-publish.5DHuGy/Tracker.DebugHost
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.4764077Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.4765688Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.4767277Z   TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Release/net10.0/TrackerConnectionLib.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.4769057Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Release/net10.0/Tracker.Core.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.4799790Z   Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Release/net10.0/Tracker.DebugHost.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.4801449Z   Tracker.DebugHost -> /tmp/duck-issue81-linux-publish.5DHuGy/Tracker.DebugHost/
+test	Verify Linux application publish outputs	2026-10-23T00:35:27.5217778Z Publishing Testing/Duck.Testing.RefereeDriver.Host with profile LinuxContainer into /tmp/duck-issue81-linux-publish.5DHuGy/Duck.Testing.RefereeDriver.Host
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.5561024Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.5571925Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.5573898Z   Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Release/net10.0/Duck.Testing.RefereeDriver.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.5576439Z   Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/Duck.Testing.RefereeDriver.Host.dll
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.5578561Z   Duck.Testing.RefereeDriver.Host -> /tmp/duck-issue81-linux-publish.5DHuGy/Duck.Testing.RefereeDriver.Host/
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8562200Z test_absolute_document_name_allows_empty_first_segment (__main__.DebugHostPortablePdbTests.test_absolute_document_name_allows_empty_first_segment)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8591554Z 邨ｶ蟇ｾpath縺ｮ蜈磯ｭ遨ｺ隕∫ｴ繧恥ortable PDB莉墓ｧ倥←縺翫ｊ蠕ｩ蜿ｷ縺吶ｋ縲・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8621736Z test_assembly_and_pdb_identity_must_match (__main__.DebugHostPortablePdbTests.test_assembly_and_pdb_identity_must_match)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8651477Z 蜷後§逋ｺ陦後°繧我ｽ懊ｉ繧後※縺・↑縺ПDB繧竪UID豈碑ｼ・〒諡貞凄縺吶ｋ縲・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8681216Z test_corrupt_pdb_is_reported (__main__.DebugHostPortablePdbTests.test_corrupt_pdb_is_reported)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8711510Z portable PDB metadata root縺ｮ遐ｴ謳阪ｒ諡貞凄縺吶ｋ縲・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8712574Z test_corrupt_pe_is_reported (__main__.DebugHostPortablePdbTests.test_corrupt_pe_is_reported)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8741130Z 遐ｴ謳阪＠縺溷ｮ溯｡御ｽ薙ｒPE隗｣譫先凾縺ｫ諡貞凄縺吶ｋ縲・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8761634Z test_documents_outside_src_are_rejected (__main__.DebugHostPortablePdbTests.test_documents_outside_src_are_rejected)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8791369Z 蝗ｺ螳單ocument縺後≠縺｣縺ｦ繧１DB蜀・↓/src螟悶・document縺後≠繧後・諡貞凄縺吶ｋ縲・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8792707Z test_expected_document_must_be_present_under_src (__main__.DebugHostPortablePdbTests.test_expected_document_must_be_present_under_src)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8794043Z 蝗ｺ螳單ocument縺後↑縺・ｴ蜷医ｒ讀懷・縺吶ｋ縲・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8794956Z test_missing_pdb_is_reported (__main__.DebugHostPortablePdbTests.test_missing_pdb_is_reported)
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8795985Z PDB譛ｪ逋ｺ陦後ｒ譏守､ｺ逧・↑螂醍ｴ・＆蜿阪→縺励※蝣ｱ蜻翫☆繧九・... ok
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8796283Z 
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8841044Z ----------------------------------------------------------------------
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8860890Z Ran 7 tests in 0.006s
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8900581Z 
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.8960993Z OK
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.9364550Z DebugHost portable PDB contract failed: portable PDB縺ｫ蝗ｺ螳嘖ource document縺後≠繧翫∪縺帙ｓ: /src/Tracker/Tracker.DebugHost/Program.cs; examples=/home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Components/App.razor, /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Components/Layout/MainLayout.razor, /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Components/Layout/NavMenu.razor
+test	Verify Linux application publish outputs	2026-10-23T00:35:29.9746383Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,184 @@
+[
+  {
+    "path": "GameControllerStateClient.after.cs",
+    "sha256": "bcaa34adf425e25cee62b4f4eeeb63aabe1970dfc394374447aba12e02272381",
+    "bytes": 5930,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/GameControllerStateClient.after.cs"
+  },
+  {
+    "path": "GameControllerStateClient.before.cs",
+    "sha256": "4f49bceab83d1a7361d410a48843e35a461784adf6a42a5490d8e1532df9a87b",
+    "bytes": 5409,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/GameControllerStateClient.before.cs"
+  },
+  {
+    "path": "completeness-matrix.json",
+    "sha256": "732d7bd3d84e0306bb1f715a8a70941b2ce5e61fd82020de458cdf7838a014f5",
+    "bytes": 2431,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/completeness-matrix.json"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "34a07c3a55c18b08280b6d7bec2ad779ba062284a48f8c1682c742e4a9b41e36",
+    "bytes": 161,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/diff-check.exit.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "c6d4b353eda48504942a2acb220dc1f26effaf3170b93ee268480be5cce471ef",
+    "bytes": 94,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "346db4e3a47a9574697c02931731799efd3050d9d0a0dd876e36f5ff56044da0",
+    "bytes": 211,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/git-status-final.txt"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "55d9ac709ae536b9cc189bf3454475b756ff49af96c97f2617803ec80beb9903",
+    "bytes": 3641,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "b4e3d8276a13eb92ebe8558ff1d7c1ef7f04239680b2551003d9b4c1f179906f",
+    "bytes": 157,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/process-state.json"
+  },
+  {
+    "path": "production.diff",
+    "sha256": "aa5781fc9e94f233139c87cc645d46b329e001ba30f85bd56f9d51645d7c68b3",
+    "bytes": 3534,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/production.diff"
+  },
+  {
+    "path": "report-before.md",
+    "sha256": "03eec4205a70e595281d690044f4f1711a8fa8acc76d7d68918656e6a08ca5bc",
+    "bytes": 20579,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/report-before.md"
+  },
+  {
+    "path": "report-guards.json",
+    "sha256": "f876eb393fae7f36fa90139d32449b424af020bd1118de79f5fe6474b8dad13a",
+    "bytes": 231,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/report-guards.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "a2a7b09a8bf9fbbe833f59b9f20d264efd3bd24bbd5bcab737fa1e96cce54e8a",
+    "bytes": 23441,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/report-readback.md"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "014c81016d20cbed902481840e4711d6391844585badb4ce1a6ee29bb4000685",
+    "bytes": 901,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "ac2adf21b9b6aada841ab8d6a2f77460766b5fdf0c0ffd1085623b3fe903e06d",
+    "bytes": 259,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "cc035efcb22f66695a8b9724ba9af96353021850ef8e004f29499f321a218fc7",
+    "bytes": 377,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "f40870171c82bc102e8e97d029fa2cc198fcee12476f799cd43c0d41336cf8b9",
+    "bytes": 416,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/syntax.exit.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "unchanged27-source-guards.json",
+    "sha256": "ac112f162a1793ea7cff2cbdb023773ba4a10b5bbee5641be1a7f3231925c271",
+    "bytes": 7668,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-green-candidate-20261022/unchanged27-source-guards.json"
+  }
+]

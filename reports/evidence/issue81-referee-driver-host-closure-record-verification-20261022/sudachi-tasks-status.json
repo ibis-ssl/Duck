@@ -1,0 +1,22 @@
+{
+  "exit_code": 1,
+  "inputs": [
+    "Tracker/Design/tasks-status.md"
+  ],
+  "violations": [
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 1,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 1,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    }
+  ]
+}

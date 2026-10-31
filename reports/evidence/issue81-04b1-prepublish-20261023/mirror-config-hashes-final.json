@@ -1,0 +1,122 @@
+[
+  {
+    "path": ".textlintrc.json",
+    "source_sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "mirror_sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "byte_equal": true
+  },
+  {
+    "path": "cspell.config.jsonc",
+    "source_sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "mirror_sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "byte_equal": true
+  },
+  {
+    "path": "package.json",
+    "source_sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "mirror_sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/README.md",
+    "source_sha256": "576207d68e67071c875055e62eb99772f80d01acf76052419b186082263ccc67",
+    "mirror_sha256": "576207d68e67071c875055e62eb99772f80d01acf76052419b186082263ccc67",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/excluded/.gitkeep",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mirror_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/markdown-targets.json",
+    "source_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "mirror_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/markdown-whitelist.yaml",
+    "source_sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "mirror_sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/prh.yml",
+    "source_sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "mirror_sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/requirements.txt",
+    "source_sha256": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "mirror_sha256": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/__pycache__/check-markdown-whitelist-sudachi.cpython-314.pyc",
+    "source_sha256": "d4f1201ca3e5639e8366c494f261de230326ff8ca46cd06d32e330ae5cce7247",
+    "mirror_sha256": "d4f1201ca3e5639e8366c494f261de230326ff8ca46cd06d32e330ae5cce7247",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "source_sha256": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+    "mirror_sha256": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/check-markdown-whitelist.js",
+    "source_sha256": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b",
+    "mirror_sha256": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/extract-markdown-vocabulary-sudachi.py",
+    "source_sha256": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8",
+    "mirror_sha256": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/list-markdown-targets.js",
+    "source_sha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+    "mirror_sha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/run-cspell-markdown.js",
+    "source_sha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+    "mirror_sha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/run-markdown-targets.js",
+    "source_sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "mirror_sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/run-python-script.js",
+    "source_sha256": "bdb90333b28e3b2bd3b781ecf8a24de8f7fa973c7d18fa67d18c8cc52a08f45e",
+    "mirror_sha256": "bdb90333b28e3b2bd3b781ecf8a24de8f7fa973c7d18fa67d18c8cc52a08f45e",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/setup-python-lint.js",
+    "source_sha256": "f7e06122015a7ceb1386b9b5fe50584bb173cdca1500ff64eed30a13587667cf",
+    "mirror_sha256": "f7e06122015a7ceb1386b9b5fe50584bb173cdca1500ff64eed30a13587667cf",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/textlint-rules/no-fullwidth-space.js",
+    "source_sha256": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "mirror_sha256": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "byte_equal": true
+  },
+  {
+    "path": "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js",
+    "source_sha256": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757",
+    "mirror_sha256": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757",
+    "byte_equal": true
+  }
+]

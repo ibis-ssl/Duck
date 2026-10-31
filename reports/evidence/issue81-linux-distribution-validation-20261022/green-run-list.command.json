@@ -1,0 +1,6 @@
+{
+  "command": "gh run list --repo ibis-ssl/Duck --branch task/issue81-aspire-desktop-bridge --limit 20 --json databaseId,name,status,conclusion,headSha,event,url",
+  "startedUTC": "2026-10-22T22:45:41.8512421Z",
+  "exit_code": 0,
+  "finishedUTC": "2026-10-22T22:45:43.1150833Z"
+}

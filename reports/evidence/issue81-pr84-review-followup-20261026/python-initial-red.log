@@ -1,0 +1,364 @@
+test_evaluation_requires_full_duration_and_sample_count (__main__.ReadinessTests.test_evaluation_requires_full_duration_and_sample_count) ... FAIL
+test_evidence_must_be_fresh_at_probe_completion (__main__.ReadinessTests.test_evidence_must_be_fresh_at_probe_completion) ...
+  test_evidence_must_be_fresh_at_probe_completion (__main__.ReadinessTests.test_evidence_must_be_fresh_at_probe_completion) (field='diagnostic') ... FAIL
+  test_evidence_must_be_fresh_at_probe_completion (__main__.ReadinessTests.test_evidence_must_be_fresh_at_probe_completion) (field='api') ... FAIL
+test_failure_does_not_restart_evaluation_window (__main__.ReadinessTests.test_failure_does_not_restart_evaluation_window) ... FAIL
+test_first_ready_after_startup_deadline_fails (__main__.ReadinessTests.test_first_ready_after_startup_deadline_fails) ... FAIL
+test_large_gap_is_not_continuous_success (__main__.ReadinessTests.test_large_gap_is_not_continuous_success) ... FAIL
+test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) ...
+  test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=0) ... FAIL
+  test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=1) ... FAIL
+  test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=2) ... FAIL
+  test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=3) ... FAIL
+test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) ...
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=0) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=1) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=2) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=3) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=4) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=5) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=6) ... FAIL
+  test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=7) ... FAIL
+test_single_ready_cannot_pass (__main__.ReadinessTests.test_single_ready_cannot_pass) ... FAIL
+test_startup_is_separate_from_fixed_evaluation_window (__main__.ReadinessTests.test_startup_is_separate_from_fixed_evaluation_window) ... ok
+test_thirty_seconds_of_fresh_matching_samples_passes (__main__.ReadinessTests.test_thirty_seconds_of_fresh_matching_samples_passes) ... ok
+test_two_ready_of_thirty_cannot_pass (__main__.ReadinessTests.test_two_ready_of_thirty_cannot_pass) ... FAIL
+test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) ...
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=0) ... FAIL
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=1) ... FAIL
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=2) ... FAIL
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=3) ... FAIL
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=4) ... FAIL
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=5) ... FAIL
+  test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=6) ... FAIL
+test_abnormal_exit_or_incomplete_ownership_cannot_pass (__main__.RemovalTests.test_abnormal_exit_or_incomplete_ownership_cannot_pass) ... ok
+test_delayed_removal_within_deadline_passes (__main__.RemovalTests.test_delayed_removal_within_deadline_passes) ... FAIL
+test_empty_or_short_owned_id_is_not_cleanup_proof (__main__.RemovalTests.test_empty_or_short_owned_id_is_not_cleanup_proof) ...
+  test_empty_or_short_owned_id_is_not_cleanup_proof (__main__.RemovalTests.test_empty_or_short_owned_id_is_not_cleanup_proof) (owned=set()) ... FAIL
+  test_empty_or_short_owned_id_is_not_cleanup_proof (__main__.RemovalTests.test_empty_or_short_owned_id_is_not_cleanup_proof) (owned={'a'}) ... FAIL
+test_immediate_removal_passes (__main__.RemovalTests.test_immediate_removal_passes) ... ok
+test_list_failure_is_unknown_and_not_retried (__main__.RemovalTests.test_list_failure_is_unknown_and_not_retried) ... ERROR
+test_list_finishing_after_deadline_cannot_pass (__main__.RemovalTests.test_list_finishing_after_deadline_cannot_pass) ... FAIL
+test_residual_owned_id_times_out_with_bounded_wait (__main__.RemovalTests.test_residual_owned_id_times_out_with_bounded_wait) ... FAIL
+test_unrelated_container_is_recorded_but_not_owned (__main__.RemovalTests.test_unrelated_container_is_recorded_but_not_owned) ... ok
+
+======================================================================
+ERROR: test_list_failure_is_unknown_and_not_retried (__main__.RemovalTests.test_list_failure_is_unknown_and_not_retried)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 177, in test_list_failure_is_unknown_and_not_retried
+    result, calls, _ = self.wait([OSError("Access denied"), []])
+                       ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 151, in wait
+    result = acceptance.wait_for_owned_removal({CID}, listing, deadline, clock.clock, clock.sleep)
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\verify_desktop_referee_acceptance.py", line 16, in wait_for_owned_removal
+    current = set(list_ids(max(0.01, deadline - clock())))
+                  ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 149, in listing
+    raise value
+OSError: Access denied
+
+======================================================================
+FAIL: test_evaluation_requires_full_duration_and_sample_count (__main__.ReadinessTests.test_evaluation_requires_full_duration_and_sample_count)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 72, in test_evaluation_requires_full_duration_and_sample_count
+    self.assertFalse(self.evaluate(stable()[:-1]))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_evidence_must_be_fresh_at_probe_completion (__main__.ReadinessTests.test_evidence_must_be_fresh_at_probe_completion) (field='diagnostic')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 85, in test_evidence_must_be_fresh_at_probe_completion
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_evidence_must_be_fresh_at_probe_completion (__main__.ReadinessTests.test_evidence_must_be_fresh_at_probe_completion) (field='api')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 85, in test_evidence_must_be_fresh_at_probe_completion
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_failure_does_not_restart_evaluation_window (__main__.ReadinessTests.test_failure_does_not_restart_evaluation_window)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 69, in test_failure_does_not_restart_evaluation_window
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_first_ready_after_startup_deadline_fails (__main__.ReadinessTests.test_first_ready_after_startup_deadline_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 64, in test_first_ready_after_startup_deadline_fails
+    self.assertFalse(self.evaluate(stable(46)))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_large_gap_is_not_continuous_success (__main__.ReadinessTests.test_large_gap_is_not_continuous_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 77, in test_large_gap_is_not_continuous_success
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 115, in test_old_packet_or_api_read_cannot_be_reused
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 115, in test_old_packet_or_api_read_cannot_be_reused
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 115, in test_old_packet_or_api_read_cannot_be_reused
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) (mutation=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 115, in test_old_packet_or_api_read_cannot_be_reused
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=6)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) (mutation=7)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 102, in test_owner_epoch_source_and_api_generation_cannot_change
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_single_ready_cannot_pass (__main__.ReadinessTests.test_single_ready_cannot_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 48, in test_single_ready_cannot_pass
+    self.assertFalse(self.evaluate([sample(0)]))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_two_ready_of_thirty_cannot_pass (__main__.ReadinessTests.test_two_ready_of_thirty_cannot_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 56, in test_two_ready_of_thirty_cannot_pass
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) (mutation=6)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 131, in test_unmatched_decode_failure_and_transport_error_fail
+    self.assertFalse(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_delayed_removal_within_deadline_passes (__main__.RemovalTests.test_delayed_removal_within_deadline_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 161, in test_delayed_removal_within_deadline_passes
+    self.assertEqual("complete", result["status"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'complete' != 'timeout'
+- complete
++ timeout
+
+
+======================================================================
+FAIL: test_empty_or_short_owned_id_is_not_cleanup_proof (__main__.RemovalTests.test_empty_or_short_owned_id_is_not_cleanup_proof) (owned=set())
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 193, in test_empty_or_short_owned_id_is_not_cleanup_proof
+    self.assertEqual("ownership_unproven", result["status"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'ownership_unproven' != 'complete'
+- ownership_unproven
++ complete
+
+
+======================================================================
+FAIL: test_empty_or_short_owned_id_is_not_cleanup_proof (__main__.RemovalTests.test_empty_or_short_owned_id_is_not_cleanup_proof) (owned={'a'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 193, in test_empty_or_short_owned_id_is_not_cleanup_proof
+    self.assertEqual("ownership_unproven", result["status"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'ownership_unproven' != 'complete'
+- ownership_unproven
++ complete
+
+
+======================================================================
+FAIL: test_list_finishing_after_deadline_cannot_pass (__main__.RemovalTests.test_list_finishing_after_deadline_cannot_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 187, in test_list_finishing_after_deadline_cannot_pass
+    self.assertEqual("timeout", result["status"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'timeout' != 'complete'
+- timeout
++ complete
+
+
+======================================================================
+FAIL: test_residual_owned_id_times_out_with_bounded_wait (__main__.RemovalTests.test_residual_owned_id_times_out_with_bounded_wait)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 168, in test_residual_owned_id_times_out_with_bounded_wait
+    self.assertGreater(len(calls), 1)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 1 not greater than 1
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.009s
+
+FAILED (failures=32, errors=1)

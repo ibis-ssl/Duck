@@ -1,0 +1,3 @@
+Markdown whitelist violations:
+- tracking-evidence-dirty/tasks-status.md:33: 'シンボル' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence-dirty/tasks-status.md:33: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.

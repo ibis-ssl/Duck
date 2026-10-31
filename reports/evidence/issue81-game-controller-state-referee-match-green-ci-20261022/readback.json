@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-22T19:40:02.564373+00:00",
+  "files": [
+    "ci-evidence.json",
+    "head-source-manifest.json",
+    "03B-acceptance-inventory.json",
+    "legacy-default-guards.json"
+  ],
+  "success": true,
+  "noRepoWrites": true,
+  "noActiveOwnedProcessOrUncollectedExit": true
+}

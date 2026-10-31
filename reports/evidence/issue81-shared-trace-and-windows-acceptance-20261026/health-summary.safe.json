@@ -1,0 +1,173 @@
+{
+  "reasons": {
+    "NoObservation": 4,
+    "UdpContextChanged": 24,
+    "Matched": 2
+  },
+  "ready": [
+    {
+      "utc": "2026-10-25T20:33:22.340402+00:00",
+      "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+      "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+      "dockerExit": 0,
+      "error": "",
+      "httpStatus": 200,
+      "body": {
+        "isReady": true,
+        "reason": "Matched",
+        "diagnostic": {
+          "identity": {
+            "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+            "resourceId": "referee-driver-edhsvypy",
+            "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+            "generation": 1
+          },
+          "inputId": "referee",
+          "receiverEpoch": 2,
+          "sourceKey": "172.18.0.4:54211",
+          "sourceName": null,
+          "sourceUuid": null,
+          "remoteEndpoint": "172.18.0.4:54211",
+          "successfullyDecodedCount": 830,
+          "decodeFailureCount": 0,
+          "lastReceivedAt": "2026-10-25T20:33:22.3836188+00:00",
+          "decodeAgeUpperBound": "00:00:00.0201187",
+          "decodeStatus": 1,
+          "isReady": true,
+          "reason": "Ready"
+        },
+        "api": {
+          "state": {
+            "command": 1,
+            "phase": 1
+          },
+          "endpoint": "ws://game-controller:8082/api/control",
+          "endpointGeneration": 1,
+          "requestSequence": 208,
+          "readStartedTimestamp": 598597019677769,
+          "readCompletedTimestamp": 598597020965746,
+          "ageUpperBound": "00:00:00.0105551"
+        }
+      }
+    },
+    {
+      "utc": "2026-10-25T20:33:33.407158+00:00",
+      "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+      "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+      "dockerExit": 0,
+      "error": "",
+      "httpStatus": 200,
+      "body": {
+        "isReady": true,
+        "reason": "Matched",
+        "diagnostic": {
+          "identity": {
+            "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+            "resourceId": "referee-driver-edhsvypy",
+            "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+            "generation": 1
+          },
+          "inputId": "referee",
+          "receiverEpoch": 2,
+          "sourceKey": "172.18.0.4:54211",
+          "sourceName": null,
+          "sourceUuid": null,
+          "remoteEndpoint": "172.18.0.4:54211",
+          "successfullyDecodedCount": 1263,
+          "decodeFailureCount": 0,
+          "lastReceivedAt": "2026-10-25T20:33:33.4655749+00:00",
+          "decodeAgeUpperBound": "00:00:00.0051687",
+          "decodeStatus": 1,
+          "isReady": true,
+          "reason": "Ready"
+        },
+        "api": {
+          "state": {
+            "command": 1,
+            "phase": 1
+          },
+          "endpoint": "ws://game-controller:8082/api/control",
+          "endpointGeneration": 1,
+          "requestSequence": 317,
+          "readStartedTimestamp": 598608093497359,
+          "readCompletedTimestamp": 598608094738697,
+          "ageUpperBound": "00:00:00.0045989"
+        }
+      }
+    }
+  ],
+  "first": {
+    "utc": "2026-10-25T20:33:00.126249+00:00",
+    "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+    "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+    "dockerExit": 0,
+    "error": "",
+    "httpStatus": 503,
+    "body": {
+      "isReady": false,
+      "reason": "NoObservation",
+      "diagnostic": {
+        "identity": null,
+        "inputId": "referee",
+        "receiverEpoch": 1,
+        "sourceKey": "172.18.0.4:54211",
+        "sourceName": null,
+        "sourceUuid": null,
+        "remoteEndpoint": "172.18.0.4:54211",
+        "successfullyDecodedCount": 4,
+        "decodeFailureCount": 0,
+        "lastReceivedAt": "2026-10-25T20:33:00.2456931+00:00",
+        "decodeAgeUpperBound": "00:00:00.0186444",
+        "decodeStatus": 1,
+        "isReady": false,
+        "reason": "Unattributed"
+      },
+      "api": null
+    }
+  },
+  "last": {
+    "utc": "2026-10-25T20:34:04.312470+00:00",
+    "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+    "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+    "dockerExit": 0,
+    "error": "",
+    "httpStatus": 503,
+    "body": {
+      "isReady": false,
+      "reason": "UdpContextChanged",
+      "diagnostic": {
+        "identity": {
+          "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+          "resourceId": "referee-driver-edhsvypy",
+          "containerId": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+          "generation": 1
+        },
+        "inputId": "referee",
+        "receiverEpoch": 2,
+        "sourceKey": "172.18.0.4:54211",
+        "sourceName": null,
+        "sourceUuid": null,
+        "remoteEndpoint": "172.18.0.4:54211",
+        "successfullyDecodedCount": 2471,
+        "decodeFailureCount": 0,
+        "lastReceivedAt": "2026-10-25T20:34:04.3712945+00:00",
+        "decodeAgeUpperBound": "00:00:00.0038364",
+        "decodeStatus": 1,
+        "isReady": true,
+        "reason": "Ready"
+      },
+      "api": {
+        "state": {
+          "command": 1,
+          "phase": 1
+        },
+        "endpoint": "ws://game-controller:8082/api/control",
+        "endpointGeneration": 1,
+        "requestSequence": 621,
+        "readStartedTimestamp": 598638986139408,
+        "readCompletedTimestamp": 598638987324304,
+        "ageUpperBound": "00:00:00.0173746"
+      }
+    }
+  }
+}

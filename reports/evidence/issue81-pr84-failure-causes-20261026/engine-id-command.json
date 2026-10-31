@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "C:\\Users\\donabe\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+    "--context",
+    "desktop-linux",
+    "info",
+    "--format",
+    "{{.ID}}"
+  ],
+  "startedUtc": "2026-10-26T03:58:12.513090+00:00",
+  "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+  "exitCode": 0,
+  "stdoutSha256": "60630b43156074a203dd311f10b74bfae110dab3c6bcc27064bda468b49d5fe2",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

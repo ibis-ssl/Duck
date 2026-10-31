@@ -1,0 +1,36 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+index 01a0792..d49144a 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+@@ -23,7 +23,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
+     }
+ 
+-    /// <summary>同じcounterも毎packet復号し、parse前に採った受信時計とendpointで件数を更新する。</summary>
++    /// <summary>同じcounterも正常件数へ数え、不正入力は失敗として記録して受信を続ける。</summary>
+     internal async Task RunAsync(CancellationToken cancellationToken)
+     {
+         cancellationToken.ThrowIfCancellationRequested();
+@@ -34,7 +34,21 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+             var datagram = await receiver.ReceiveAsync(
+                 () => diagnostics.BeginReceive(epoch),
+                 cancellationToken);
+-            _ = decode(datagram.Payload);
++            global::Referee packet;
++            try
++            {
++                packet = decode(datagram.Payload);
++            }
++            catch (Google.Protobuf.InvalidProtocolBufferException)
++            {
++                diagnostics.RecordFailure(datagram.ReceiveAttempt);
++                continue;
++            }
++            if (!packet.HasCommand || !packet.HasCommandCounter || !Enum.IsDefined(packet.Command))
++            {
++                diagnostics.RecordFailure(datagram.ReceiveAttempt);
++                continue;
++            }
+             var endpoint = datagram.RemoteEndpoint.ToString();
+             diagnostics.RecordSuccess(
+                 datagram.ReceiveAttempt,

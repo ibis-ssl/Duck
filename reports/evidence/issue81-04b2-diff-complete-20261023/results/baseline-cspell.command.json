@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-cspell-markdown.js",
+    "issue81-04b2-diff-complete-20261023/baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "issue81-04b2-diff-complete-20261023/baseline/Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "issue81-04b2-diff-complete-20261023/baseline/Tracker/Design/tasks-status.md",
+    "--no-progress"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023",
+  "exit_code": 0
+}

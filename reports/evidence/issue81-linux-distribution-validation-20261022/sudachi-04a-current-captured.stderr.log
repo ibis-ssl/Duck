@@ -1,0 +1,11 @@
+Markdown whitelist violations:
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:25: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:102: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:167: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:171: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:226: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:281: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:296: 'Tailscale' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:298: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:299: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/Testing/aspire-simulation-test-environment.md:308: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.

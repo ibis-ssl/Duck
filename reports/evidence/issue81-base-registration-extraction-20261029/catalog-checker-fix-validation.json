@@ -1,0 +1,127 @@
+﻿{
+  "commitState": "commit_pending",
+  "documentation": {
+    "changedTrackingGates": 8,
+    "allExitZero": true,
+    "gates": [
+      {
+        "input": "tasks-07j-b1",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "copySha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "tasks-07j-b1",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "copySha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "tasks-07j-b1",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "copySha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "13263cc484ba455d3d28abbbfc396a7d7178d59fe919744c231fe3357e63734f"
+      },
+      {
+        "input": "tasks-07j-b1",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "copySha256": "6210dc47e4f803808f2b346a5956495c15fff66defb0b3686af17d2632f219e4",
+        "stdoutSha256": "2348b4dc4bfd3dea4b1532bc35409e98e602ce2cbd08af8b38fe42978288f7a7",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "phases-07j-b1",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "copySha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "phases-07j-b1",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "copySha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "phases-07j-b1",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "copySha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "ddab7f018af40d998c22e7f907b7b6ec13e62690b9144555ea080075a63595a2"
+      },
+      {
+        "input": "phases-07j-b1",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "copySha256": "3bacc1f8d867a3c5a6e079a4c88bc2133e07585fd80f9c55058ef1737d9f0c8b",
+        "stdoutSha256": "c28f44c7a5adfc91307fd8a7fe14885e5be8837b4b80136d45293f75c8f238a0",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "designUnchanged": true
+  },
+  "workItem": "I81-07J-B1 fixed catalog checker follow-up",
+  "sourceFingerprints": [
+    {
+      "gitBlobOid": "919a47243362ad4b955d9a206415a1f9e29dcf06",
+      "rawWorktreeSha256": "ccee1682ddf8b3185bf486f427fcb32e372456f87dbb1d148e6e805681b8969a",
+      "path": "scripts/tests/test-linux-distribution-definitions.py"
+    },
+    {
+      "gitBlobOid": "d91fb5b5e4fe44e12b4642aac185863a011f1954",
+      "rawWorktreeSha256": "cc425ba4cb62c01ffc08b8adddbc96055286dc5a2658c9a87e10e75bf1e70977",
+      "path": "scripts/tests/verify-linux-distribution-definitions.py"
+    }
+  ],
+  "originalCiFailure": {
+    "passed": 15,
+    "run": 40923511051,
+    "total": 16,
+    "failed": 1
+  },
+  "limits": [
+    "An incorrect unittest discovery invocation ran zero tests and failed; not counted as Green.",
+    "No CI rerun; new commit CI pending.",
+    "Standard DCP ownership/lifecycle and runtime acceptance remain incomplete.",
+    "No deployment, DCP/server/UDP execution, new dependency or environment changes."
+  ],
+  "baselineCommit": "4d6e4e8ab3490a25a6caabdd2fb13eca8ff7fdb1",
+  "localGreen": {
+    "stderrSha256": "8fa5a07d4b9abf2ae6542193b7a83c938cc4f3bd618fd9de9a8c71b34802792e",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit": 0,
+    "passed": 20,
+    "failed": 0,
+    "sourceCopiesRecorded": true
+  },
+  "reuse": "Program/factory unchanged: previous final model77 and AppHost Release build evidence reused by source fingerprint; no new product build claimed.",
+  "requirements": "Follow actual Program defaults, factory call argument binding, option record order and concrete image references; preserve fixed catalog and reject disconnected consumer.",
+  "localRed": {
+    "stderrSha256": "18b838ab251d1ba11796e5e40b6918c0751d09216b4ef0f0ec590dc5cf991737",
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit": 1,
+    "passed": 15,
+    "failed": 1,
+    "sourceCopiesRecorded": true
+  },
+  "schemaVersion": 1
+}

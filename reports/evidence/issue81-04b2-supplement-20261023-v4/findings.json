@@ -1,0 +1,235 @@
+{
+  "scope": "read-only registry metadata; no image/layer pulls, build, or start; no auth configuration changed",
+  "mcr_index_heads": {
+    "runtime:10.0": {
+      "status": 200,
+      "content_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "docker_content_digest": "sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+      "platform_children": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:1bac183f0f5e1b7dd58cf1083fa79e6310d47afe3ca5c9130c910ebba7720929"
+        },
+        {
+          "platform": "linux/arm/v7",
+          "digest": "sha256:0e7e2b03b5f3c3d0546c7d6141f1b75f682b0bac02d11a508a438991ee322b2d"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:9aaf1ab716a4e15a7c8cf773bcf7638ae1b5114bccee5611ce371e1a043d2033"
+        }
+      ]
+    },
+    "aspnet:10.0": {
+      "status": 200,
+      "content_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "docker_content_digest": "sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+      "platform_children": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b"
+        },
+        {
+          "platform": "linux/arm/v7",
+          "digest": "sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+        }
+      ]
+    }
+  },
+  "ghcr_registry_heads": {
+    "framework-simulatorcli:a52b6bd": {
+      "unauthenticated_head": 401,
+      "challenge": "standard Bearer repository pull challenge; no credentials changed",
+      "anonymous_token_request_http": 200,
+      "token_value_saved_or_printed": false,
+      "manifest_head": 200,
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "children": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554"
+        },
+        {
+          "platform": "unknown/unknown",
+          "digest": "sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d"
+        }
+      ]
+    },
+    "crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d": {
+      "unauthenticated_head": 401,
+      "challenge": "standard Bearer repository pull challenge; no credentials changed",
+      "anonymous_token_request_http": 200,
+      "token_value_saved_or_printed": false,
+      "manifest_head": 200,
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+      "children": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac"
+        },
+        {
+          "platform": "unknown/unknown",
+          "digest": "sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697"
+        }
+      ]
+    },
+    "orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a": {
+      "unauthenticated_head": 401,
+      "challenge": "standard Bearer repository pull challenge; no credentials changed",
+      "anonymous_token_request_http": 200,
+      "token_value_saved_or_printed": false,
+      "manifest_head": 200,
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "digest": "sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+      "children": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b"
+        },
+        {
+          "platform": "unknown/unknown",
+          "digest": "sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba"
+        }
+      ]
+    }
+  },
+  "ghcr_source": {
+    "framework": {
+      "commit": "a52b6bdecd97a277544dd6f275afbf4483781e12",
+      "published_list_digest": "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "current_tag_head_digest_matches": true
+    },
+    "crane": {
+      "commit": "4063cd31cd5b11b1cc919003907f5f4c527b252d",
+      "published_list_digest": "sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+      "current_tag_head_digest_matches": true
+    },
+    "orion": {
+      "commit": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+      "published_list_digest": "sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+      "current_tag_head_digest_matches": true
+    },
+    "package_versions_rest_api": "Prior 403 retained and not retried; this distinct public registry metadata query succeeded."
+  },
+  "platform_contract": "Windows development host with per-user Docker Desktop Linux containers; architecture/RID remains unspecified.",
+  "image_digest_policy": "An index digest preserves that index's platform selection; a child digest selects a platform. GHCR indexes currently contain linux/amd64 plus unknown/unknown descriptors, so they do not imply arm64 availability.",
+  "dockerhub": {
+    "sumatra_tag": {
+      "tag": "2025",
+      "digest": "sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1",
+      "media_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "last_updated": "2025-07-22T03:44:53.560452Z",
+      "tag_status": "active",
+      "images": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "variant": null,
+          "digest": "sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c",
+          "status": "active"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "variant": null,
+          "digest": "sha256:e07efb360effb09dc716f37943f46f0ae9eb3569f0c5f9bf4c6be88599c0b5d0",
+          "status": "active"
+        }
+      ]
+    },
+    "autoref_tag": {
+      "tag": "2025.1.0",
+      "digest": "sha256:de4f06a9bcfad524b3bae2015f92bb3fc3a209295eb668a34d5a0b329616bf68",
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "last_updated": "2025-03-20T17:35:27.207939Z",
+      "tag_status": "active",
+      "images": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "variant": null,
+          "digest": "sha256:04067106660f5ff31d1ebe4db9b19b1078a2124db3adabae79f6c9d23fa99317",
+          "status": "active"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "variant": null,
+          "digest": "sha256:3453c128d3242e5a6eabfae53ed5c9a6b9c5a384a8aa9e69e2e4e5d932420373",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:223a37d53f2eaeac74c2d4d044175e9a496854f2936042d5b98495f8e69f0100",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:216845b29c6318850983b182fa12b25f53fba383f7452e0833dc4631f7b6a2b0",
+          "status": "active"
+        }
+      ]
+    },
+    "gamecontroller_tag": {
+      "tag": "3.20.3",
+      "digest": "sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7",
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "last_updated": "2026-04-11T13:50:44.73539Z",
+      "tag_status": "active",
+      "images": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "variant": null,
+          "digest": "sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721",
+          "status": "active"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "variant": null,
+          "digest": "sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849",
+          "status": "active"
+        }
+      ]
+    }
+  },
+  "source_requirement": "Issue/design explicitly require source reference, version, digest, and target environment; they do not explicitly require commit-to-image cryptographic attestation for all vendors. Docker Hub image source fields are absent; GHCR has CI commit-to-list evidence tied to registry index via HEAD.",
+  "remaining_user_decision": "No target CPU matrix has been specified. Do not promote amd64-only to a new requirement. An explicit arm64 full-stack acceptance requirement would require multiarch variants for the existing amd64-only GHCR assets.",
+  "minimal_next_unit": {
+    "paths": [
+      "Tracker/Tracker.RuntimeHost/Dockerfile",
+      "Tracker/Tracker.DebugHost/Dockerfile",
+      "Testing/Duck.Testing.RefereeDriver.Host/Dockerfile",
+      "existing scripts/tests/verify-linux-publish-outputs.sh",
+      "existing Testing/Duck.Testing.AppHost/Program.cs references"
+    ],
+    "definition": "Use existing 04A publish outputs as Dockerfile COPY inputs; pin RuntimeHost and RefereeDriver.Host to the runtime index digest and DebugHost to aspnet index digest; leave vsdbg assets to 04B3 and resource wiring changes to 05.",
+    "test": "Extend existing publish-output validation so each Dockerfile COPY source is an output actually generated by 04A, and check each FROM uses the exact fixed index digest and registry/repository. For external references, validate the current AppHost refs against the digest lock without changing AppHost wiring. Keep runtime-based and debug distribution assertions independent.",
+    "fixed_values": "MCR root index digests above; DockerHub three exact tag index digests in findings-v3.json; GHCR current tag index digests and source commits above. All 8 index digests can be recorded without choosing a platform-specific child."
+  }
+}

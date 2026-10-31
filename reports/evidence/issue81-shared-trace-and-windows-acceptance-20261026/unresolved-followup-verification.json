@@ -1,0 +1,56 @@
+{
+  "checkedHead": "bd850e096a0e67d76dd86473aa7a28c36ff1ba36",
+  "checkedUtc": "2026-10-25T21:24:48.656068+00:00",
+  "reportSha256": "e6312798a6254075b1448e699c460c1eb39aa30b2dc00e7937ebeed497675003",
+  "args": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+    "reports/issue81-shared-trace-and-windows-acceptance-20261026.md",
+    "--json",
+    "--strict"
+  ],
+  "exit": 0,
+  "result": {
+    "score": 94,
+    "is_clean": false,
+    "metrics": {
+      "char_count": 6495,
+      "total_lines": 62,
+      "list_lines": 0,
+      "list_ratio": 0.0,
+      "bold_count": 0,
+      "bold_per_1000": 0.0
+    },
+    "findings": [
+      {
+        "rule": "negative_parallelism",
+        "line": 114,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "この報告を含む最終公開HEADと一致するCI結果は、[既存の自担当報告コメント](https://github.com/ibis-ssl/Duck/pull/84#issuecomment-6336270248)へ記録する。実装版の証拠と、後続の文書保存を含む版のCIを混同しない。独立最終レビューと報告証明のコミットではなく、実装担当による検証・現状報告である。"
+      },
+      {
+        "rule": "negative_parallelism",
+        "line": 120,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "FA780の原本は `C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026` と `C:\\Users\\donabe\\RemoteDesktopWorkspace\\issue81-postfix-acceptance-66e62fcc12d94b8baaa5fbc1e0bdb6c0` に保持する。前担当から回収した試験は `Duck-pr84-checks-20261025/pr84-shared-safetrace-concurrency.*` に保持した。チャットの一時ファイルではなく、指定PC上の保存先である。"
+      },
+      {
+        "rule": "negative_parallelism",
+        "line": 128,
+        "severity": "info",
+        "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+        "snippet": "実機の30回中28回が503だったため、単に未検証なのではなく、継続して準備完了を返せない問題が残っている。`RefereeApiMatcher.cs` の129〜136行では、同じ指令と指令カウンターでも正常復号件数が増えると別パケットと判定する。58〜80行の `GetCurrent` は、以前の一致結果と現在の受信を再検証し、不一致なら保持値を解除する。`RefereeDriverApplication.cs` の168〜176行では、照合完了後に100ミリ秒待つ。この間に新しいパケットが届くと、次の照合完了まで古い組は使えない。"
+      }
+    ]
+  },
+  "stderr": "",
+  "newUnitTestsRun": false,
+  "newAcceptanceRun": false,
+  "formalWordingLint": "report-excluded",
+  "designTaskLint": "not-rerun"
+}

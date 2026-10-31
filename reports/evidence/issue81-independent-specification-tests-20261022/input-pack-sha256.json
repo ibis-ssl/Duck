@@ -1,0 +1,86 @@
+[
+  {
+    "path": "api/Testing/Duck.Testing.Diagnostics/ResourceDiagnosticIdentity.api.txt",
+    "sha256": "a0e2b294182509718cdc05439d8ed41495763b205f1c62a1e07e47aae45cb046"
+  },
+  {
+    "path": "api/Testing/Duck.Testing.Diagnostics/ResourceDiagnosticSnapshot.api.txt",
+    "sha256": "3b459e07baf6775b56f13b60f70ac0134cdabf2e07fee792c704d7acde068848"
+  },
+  {
+    "path": "api/Testing/Duck.Testing.Diagnostics/ResourceReadinessState.api.txt",
+    "sha256": "ebae9bbdcf554d2defd8fc7a4ddfed22a54911b7f805761936df3cc2e9bea1d8"
+  },
+  {
+    "path": "api/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.api.txt",
+    "sha256": "39577867f69a366f74eccd11982efc449c743ee353d2e81c5a013784b832e1f7"
+  },
+  {
+    "path": "api/Tracker/Tracker.DebugHost/Tracking/DiagnosticTrackerDeserializer.api.txt",
+    "sha256": "79dea5071b84d11f8fa020ef56c6589c0c78e48a9022ff7978e157db522a4bcb"
+  },
+  {
+    "path": "api/Tracker/Tracker.DebugHost/Tracking/TrackerConnectionLibReceiverHostedService.api.txt",
+    "sha256": "658c9a11cca9cbfa0cdf6e385e6e427fb469f056b162bda5369d93e3cff566c1"
+  },
+  {
+    "path": "api/Tracker/Tracker.DebugHost/Vision/VisionReceiverService.api.txt",
+    "sha256": "f5353ca3af1f611d27bd8b50deb4f902da3e8319cf36435b50b85baf0298af1c"
+  },
+  {
+    "path": "api/Tracker/Tracker.RuntimeHost/RuntimeHostServiceCollectionExtensions.api.txt",
+    "sha256": "36db8431ecb0216e6fc220bf02e1be9e4aa873b6ad4051fef972db394c6f11f3"
+  },
+  {
+    "path": "api/Tracker/Tracker.RuntimeHost/RuntimeVisionDiagnosticsHttpService.api.txt",
+    "sha256": "b89c7ce0febbbd846e9854c70bbda249c4893a34d80f9674d767f5f14b284d84"
+  },
+  {
+    "path": "api/Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverService.api.txt",
+    "sha256": "1f988fda0336292a8412aba1d929255d9188ec360f3f67be8e91efcdea1cf971"
+  },
+  {
+    "path": "designs/aspire-simulation-test-environment.md",
+    "sha256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c"
+  },
+  {
+    "path": "designs/tracker-comparison-debug-design.md",
+    "sha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9"
+  },
+  {
+    "path": "metadata/http-configuration-shape.json",
+    "sha256": "b948a496237f36d2af7fd330926de5e9fc8a469a18b5d3133831936f5ab1496c"
+  },
+  {
+    "path": "metadata/project-declarations.json",
+    "sha256": "34992e295edf10703d1d082a6a81fdbe46de44454ece02e36ede16d01c3e2638"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/geom/ssl_gc_geometry.proto",
+    "sha256": "38ad536016d9222b93eeca79bbf0e1161af5f60a7de207515cace6b50c163595"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/state/ssl_gc_common.proto",
+    "sha256": "ae89e542534994ff1004b87f3b23e96b2c33bdf9572f28fb23726bb7ca6969db"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/tracker/ssl_vision_detection_tracked.proto",
+    "sha256": "8b7409e8aa9c8a52751cf08535a323c13875b6bcb2ae3fad60ade086cf33662c"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/tracker/ssl_vision_wrapper_tracked.proto",
+    "sha256": "6a6f515fdd476daaa127218f4b338b383d97f08cdb3a5b96240b9bf15e424053"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/vision/ssl_vision_detection.proto",
+    "sha256": "bea5198d504b1a1f57980fc8f8696c9d34022e51e375dedc46ff75937973055d"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/vision/ssl_vision_geometry.proto",
+    "sha256": "b8c9b3a9aabcf3669b34ff3f46a048ab91883cc49d24114b0a5add97ad3ccc37"
+  },
+  {
+    "path": "schemas/ssl-game-controller/proto/vision/ssl_vision_wrapper.proto",
+    "sha256": "1eec99fc59fbb518e4a20633758a1109da18d30579acfbab99e035a8fdd19bab"
+  }
+]

@@ -1,0 +1,266 @@
+[
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs",
+    "expected": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "current": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs",
+    "expected": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "current": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs",
+    "expected": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "current": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "expected": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "current": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs",
+    "expected": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "current": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+    "expected": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "current": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs",
+    "expected": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "current": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+    "expected": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "current": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+    "expected": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "current": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "expected": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "current": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentClock.cs",
+    "expected": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "current": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ResourceReadinessSpecificationTests.cs",
+    "expected": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "current": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs",
+    "expected": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "current": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/TrackerDatagramSpecificationTests.cs",
+    "expected": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "current": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+    "expected": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "current": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentVisionWireFixture.cs",
+    "expected": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "current": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/VisionStoreAdditionalSpecificationTests.cs",
+    "expected": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "current": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs",
+    "expected": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "current": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+    "expected": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "current": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs",
+    "expected": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "current": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "expected": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "current": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs",
+    "expected": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "current": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs",
+    "expected": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "current": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs",
+    "expected": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "current": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "expected": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "current": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+    "expected": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "current": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateTransportTests.cs",
+    "expected": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "current": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs",
+    "expected": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "current": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+    "expected": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "current": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateMappingTests.cs",
+    "expected": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "current": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateObserver.cs",
+    "expected": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "current": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateObserverTests.cs",
+    "expected": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "current": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs",
+    "expected": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "current": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs",
+    "expected": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "current": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "unchanged": true
+  },
+  {
+    "path": "Duck.slnx",
+    "expected": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "current": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "expected": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "current": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "expected": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "current": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "expected": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "current": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "expected": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "current": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Program.cs",
+    "expected": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "current": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "expected": "1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494",
+    "current": "1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs",
+    "expected": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "current": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs",
+    "expected": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+    "current": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "expected": "6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3",
+    "current": "6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3",
+    "unchanged": true
+  }
+]

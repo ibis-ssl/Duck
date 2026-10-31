@@ -1,0 +1,15 @@
+{
+  "name": "mcr_runtime_index",
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "mcr.microsoft.com/dotnet/runtime:10.0"
+  ],
+  "exit": 0,
+  "ref": "mcr.microsoft.com/dotnet/runtime:10.0",
+  "stdout_bytes": 1080,
+  "stderr_bytes": 0,
+  "stdout_sha256": "a01802c1c3fbdfd51c6f97a5c2bca309ad491eead0f632d59fca35c8684f1ac4",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

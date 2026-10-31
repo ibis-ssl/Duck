@@ -1,0 +1,30 @@
+CI: GitHub Actions .NET tests, pull_request for PR #84
+run_id=39880689547
+attempt=1
+head_sha=cd561ed37e7f578d9289af6a392f2cb7333ec983
+result=completed success
+merge_sha=3835d5cd0a06653e7cecf2456a40c01717918950
+gh run watch session_id=41156 exit=0
+No rerun or workflow_dispatch.
+Standard suite: 776 passed, 0 failed, 0 skipped.
+Linux publish:
+- Tracker/Tracker.RuntimeHost: publish and output contract passed
+- Tracker/Tracker.DebugHost: publish and output contract passed
+- Testing/Duck.Testing.RefereeDriver.Host: publish and output contract passed
+PDB unit checks: 7 passed, 0 failed.
+Actual published DebugHost PDB verification: passed; 112 documents under /src, assembly/PDB identity matches.
+Skipped jobs: ASPIRE-NET-002 Linux packet flow; ASPIRE full-stack Linux acceptance.
+Failure-diagnostic collection and upload steps skipped; artifact API total_count=0.
+Technical product diff: only Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml adds repo-root-to-/src PathMap for the explicit DebugHost Linux publish profile. Exact diff is product-profile.diff. No ordinary build/run profile was changed.
+Fixed test hashes (unchanged):
+verify-debughost-portable-pdb.py 58e0beb075e195fcb9985a109fafe08580d1f83dbbf993945a5cc33d02465a24
+test-debughost-portable-pdb.py a0dc746080a192c162fa5db7d894bb2a3d86906e1133eff9e652af032c7641c8
+verify-linux-publish-outputs.sh 7c430e8daaa1ce5aa45e7490cbc7a3e6a25ab04a3144c08de48e120904635500
+Focused parent tracking check: baseline cd561ed; exactly 2 files/2 changed lines. Selector exit=0 with exactly 2 files; textlint exit=0; CSpell exit=0, 2 files/0 issues; Sudachi exit=0, no findings. 19 config/script/dictionary files byte-equal to current source and match prior hashes. See focused-tracking-inputs.json and command/stdout/stderr/exit files.
+All gh/WSL/lint processes terminated. No pending session or uncollected exit.
+
+Supplemental command history:
+- An initial gh run view --json request included unsupported field artifacts and exited 1; the corrected run metadata query omitted that field and the separate artifacts API succeeded (0, total_count=0).
+- A GitHub Contents API read for a fixed test path returned 404 and was not retried. The exact fixed script bytes and hashes were then confirmed from the authorized local checkout.
+- One WSL extraction attempt used rg, which is not installed in that WSL image, and exited 1. No repository writes occurred; the equivalent read was completed with the existing WSL Python interpreter.
+- The first gh commit JSON aggregation returned exit 0 but its PowerShell-captured JSON was malformed. Do not use commit-diff.json as authoritative parsed data. The exact file list is changed-files.tsv and the product patch is product-profile.diff; both were captured from read-only git/API commands.

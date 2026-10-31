@@ -1,0 +1,6 @@
+{
+  "command": "git diff --name-status 4e3099e75c4afab8ba1f11c67500ebe29f17fed3 fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9; git diff --quiet ... -- Tracker/Tracker.Tests/Tracker.Tests.csproj Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj Directory.Packages.props Directory.Build.props",
+  "finishedUTC": "2026-10-22T22:52:36.8455410Z",
+  "startedUTC": "2026-10-22T22:52:36.5540691Z",
+  "exit_code": 0
+}

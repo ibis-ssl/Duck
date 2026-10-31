@@ -1,0 +1,7 @@
+{
+  "source": "/tmp/issue81-nr003-tracking-lint-20261023",
+  "manifest": "inventory-v1.tsv",
+  "sha256": "c84827f102f6f29f18da7c7769efba3b67089d0d68f867f50313f0e28b7703f8",
+  "validated_entries": 12,
+  "raw_binary_fixtures": "synthetic minimal PE/PDB retained as evidence; not downloaded product binary"
+}

@@ -1,0 +1,303 @@
+[
+  {
+    "path": ".textlintrc.json",
+    "source": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "mirror": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "final_source": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "final_mirror": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f"
+  },
+  {
+    "path": "README.md",
+    "source": "d8ac64ea4b4dc68a90053177edfd71d98710bff83f9654d24c4c20cce9b5134c",
+    "mirror": "d8ac64ea4b4dc68a90053177edfd71d98710bff83f9654d24c4c20cce9b5134c",
+    "final_source": "d8ac64ea4b4dc68a90053177edfd71d98710bff83f9654d24c4c20cce9b5134c",
+    "final_mirror": "d8ac64ea4b4dc68a90053177edfd71d98710bff83f9654d24c4c20cce9b5134c"
+  },
+  {
+    "path": "Tracker/Design/Archive/Core/phases-status.md",
+    "source": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "mirror": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "final_source": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "final_mirror": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61"
+  },
+  {
+    "path": "Tracker/Design/Archive/Core/tasks-status.md",
+    "source": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "mirror": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "final_source": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "final_mirror": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3"
+  },
+  {
+    "path": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "source": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "mirror": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "final_source": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "final_mirror": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c"
+  },
+  {
+    "path": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "source": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+    "mirror": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+    "final_source": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+    "final_mirror": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27"
+  },
+  {
+    "path": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "source": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+    "mirror": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+    "final_source": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+    "final_mirror": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f"
+  },
+  {
+    "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "source": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+    "mirror": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+    "final_source": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+    "final_mirror": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1"
+  },
+  {
+    "path": "Tracker/Design/Core/tracker-history-000-038.md",
+    "source": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "mirror": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "final_source": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "final_mirror": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0"
+  },
+  {
+    "path": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "source": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "mirror": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "final_source": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "final_mirror": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f"
+  },
+  {
+    "path": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "source": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+    "mirror": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+    "final_source": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+    "final_mirror": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83"
+  },
+  {
+    "path": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "source": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "mirror": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "final_source": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "final_mirror": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484"
+  },
+  {
+    "path": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "source": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+    "mirror": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+    "final_source": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+    "final_mirror": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641"
+  },
+  {
+    "path": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "source": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+    "mirror": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+    "final_source": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8",
+    "final_mirror": "a237ed17cb59300322787c7decbdd135fd06f541bf6df5663ff750bd4e959ba8"
+  },
+  {
+    "path": "Tracker/Design/Testing/aspire-004a-workflow.md",
+    "source": "3bf1ef44d134d43ba53abc92e85e16cdd4b1ce4b6dcfcb596e10b11302f1614b",
+    "mirror": "3bf1ef44d134d43ba53abc92e85e16cdd4b1ce4b6dcfcb596e10b11302f1614b",
+    "final_source": "3bf1ef44d134d43ba53abc92e85e16cdd4b1ce4b6dcfcb596e10b11302f1614b",
+    "final_mirror": "3bf1ef44d134d43ba53abc92e85e16cdd4b1ce4b6dcfcb596e10b11302f1614b"
+  },
+  {
+    "path": "Tracker/Design/Testing/aspire-006c2-integration-plan.md",
+    "source": "ff2b85c30f2a40e431358fbd9fc3df60052d296e2a925dd435a05bdbb6c65b4f",
+    "mirror": "ff2b85c30f2a40e431358fbd9fc3df60052d296e2a925dd435a05bdbb6c65b4f",
+    "final_source": "ff2b85c30f2a40e431358fbd9fc3df60052d296e2a925dd435a05bdbb6c65b4f",
+    "final_mirror": "ff2b85c30f2a40e431358fbd9fc3df60052d296e2a925dd435a05bdbb6c65b4f"
+  },
+  {
+    "path": "Tracker/Design/Testing/aspire-fullstack-fixture-stability-design.md",
+    "source": "e57bd9f57de06d559597b61a59aaad7ac70f0f8b522f764ca5c2633d949e5dee",
+    "mirror": "e57bd9f57de06d559597b61a59aaad7ac70f0f8b522f764ca5c2633d949e5dee",
+    "final_source": "e57bd9f57de06d559597b61a59aaad7ac70f0f8b522f764ca5c2633d949e5dee",
+    "final_mirror": "e57bd9f57de06d559597b61a59aaad7ac70f0f8b522f764ca5c2633d949e5dee"
+  },
+  {
+    "path": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "source": "dc02919267ca412f6e9741df2d8ec2c5a812653a1ffdd6c5ed33ef588860e2d7",
+    "mirror": "dc02919267ca412f6e9741df2d8ec2c5a812653a1ffdd6c5ed33ef588860e2d7",
+    "final_source": "dc02919267ca412f6e9741df2d8ec2c5a812653a1ffdd6c5ed33ef588860e2d7",
+    "final_mirror": "dc02919267ca412f6e9741df2d8ec2c5a812653a1ffdd6c5ed33ef588860e2d7"
+  },
+  {
+    "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "source": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+    "mirror": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+    "final_source": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+    "final_mirror": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c"
+  },
+  {
+    "path": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "source": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+    "mirror": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+    "final_source": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+    "final_mirror": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9"
+  },
+  {
+    "path": "Tracker/Design/phases-status.md",
+    "source": "2e11f2a9d90375d2bcf1cbf833ed853158cfa01deffd12b1866cb9d443d92303",
+    "mirror": "2e11f2a9d90375d2bcf1cbf833ed853158cfa01deffd12b1866cb9d443d92303",
+    "final_source": "944826a21ed56b2d3da1116c2b42471fb825a682ca84cd30e7b44e9e91ac7dd4",
+    "final_mirror": "944826a21ed56b2d3da1116c2b42471fb825a682ca84cd30e7b44e9e91ac7dd4"
+  },
+  {
+    "path": "Tracker/Design/tasks-status.md",
+    "source": "87055f34ed430a1d255c1b4192f271416246447c2e5bc8b40cae11f899b0147a",
+    "mirror": "87055f34ed430a1d255c1b4192f271416246447c2e5bc8b40cae11f899b0147a",
+    "final_source": "e3e7e811974f2c19668da26779754cf00b300c6df9a9c5db11a0d77752fe4866",
+    "final_mirror": "e3e7e811974f2c19668da26779754cf00b300c6df9a9c5db11a0d77752fe4866"
+  },
+  {
+    "path": "Tracker/Tracker.CaptureReplay/README.md",
+    "source": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "mirror": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "final_source": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "final_mirror": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb"
+  },
+  {
+    "path": "Tracker/Tracker.DebugHost/README.md",
+    "source": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+    "mirror": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+    "final_source": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+    "final_mirror": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354"
+  },
+  {
+    "path": "cspell.config.jsonc",
+    "source": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "mirror": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "final_source": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "final_mirror": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642"
+  },
+  {
+    "path": "package-lock.json",
+    "source": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+    "mirror": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+    "final_source": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+    "final_mirror": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87"
+  },
+  {
+    "path": "package.json",
+    "source": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "mirror": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "final_source": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "final_mirror": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28"
+  },
+  {
+    "path": "tools/lint/README.md",
+    "source": "576207d68e67071c875055e62eb99772f80d01acf76052419b186082263ccc67",
+    "mirror": "576207d68e67071c875055e62eb99772f80d01acf76052419b186082263ccc67",
+    "final_source": "576207d68e67071c875055e62eb99772f80d01acf76052419b186082263ccc67",
+    "final_mirror": "576207d68e67071c875055e62eb99772f80d01acf76052419b186082263ccc67"
+  },
+  {
+    "path": "tools/lint/excluded/.gitkeep",
+    "source": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "mirror": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "final_source": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "final_mirror": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "tools/lint/markdown-targets.json",
+    "source": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "mirror": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "final_source": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "final_mirror": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da"
+  },
+  {
+    "path": "tools/lint/markdown-whitelist.yaml",
+    "source": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "mirror": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "final_source": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "final_mirror": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8"
+  },
+  {
+    "path": "tools/lint/prh.yml",
+    "source": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "mirror": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "final_source": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "final_mirror": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8"
+  },
+  {
+    "path": "tools/lint/requirements.txt",
+    "source": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "mirror": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "final_source": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "final_mirror": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a"
+  },
+  {
+    "path": "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "source": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+    "mirror": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+    "final_source": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+    "final_mirror": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33"
+  },
+  {
+    "path": "tools/lint/scripts/check-markdown-whitelist.js",
+    "source": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b",
+    "mirror": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b",
+    "final_source": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b",
+    "final_mirror": "8aa37976ab109c46696d5c60d01161c449bd7728bc9444f2e39739426ff0657b"
+  },
+  {
+    "path": "tools/lint/scripts/extract-markdown-vocabulary-sudachi.py",
+    "source": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8",
+    "mirror": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8",
+    "final_source": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8",
+    "final_mirror": "edb5bc418d6f57929a6370aef5111601f59f8d3eb2562ce3d3e789e3e36f29b8"
+  },
+  {
+    "path": "tools/lint/scripts/list-markdown-targets.js",
+    "source": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+    "mirror": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+    "final_source": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+    "final_mirror": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429"
+  },
+  {
+    "path": "tools/lint/scripts/run-cspell-markdown.js",
+    "source": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+    "mirror": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+    "final_source": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+    "final_mirror": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307"
+  },
+  {
+    "path": "tools/lint/scripts/run-markdown-targets.js",
+    "source": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "mirror": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "final_source": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "final_mirror": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea"
+  },
+  {
+    "path": "tools/lint/scripts/run-python-script.js",
+    "source": "bdb90333b28e3b2bd3b781ecf8a24de8f7fa973c7d18fa67d18c8cc52a08f45e",
+    "mirror": "bdb90333b28e3b2bd3b781ecf8a24de8f7fa973c7d18fa67d18c8cc52a08f45e",
+    "final_source": "bdb90333b28e3b2bd3b781ecf8a24de8f7fa973c7d18fa67d18c8cc52a08f45e",
+    "final_mirror": "bdb90333b28e3b2bd3b781ecf8a24de8f7fa973c7d18fa67d18c8cc52a08f45e"
+  },
+  {
+    "path": "tools/lint/scripts/setup-python-lint.js",
+    "source": "f7e06122015a7ceb1386b9b5fe50584bb173cdca1500ff64eed30a13587667cf",
+    "mirror": "f7e06122015a7ceb1386b9b5fe50584bb173cdca1500ff64eed30a13587667cf",
+    "final_source": "f7e06122015a7ceb1386b9b5fe50584bb173cdca1500ff64eed30a13587667cf",
+    "final_mirror": "f7e06122015a7ceb1386b9b5fe50584bb173cdca1500ff64eed30a13587667cf"
+  },
+  {
+    "path": "tools/lint/scripts/textlint-rules/no-fullwidth-space.js",
+    "source": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "mirror": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "final_source": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "final_mirror": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92"
+  },
+  {
+    "path": "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js",
+    "source": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757",
+    "mirror": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757",
+    "final_source": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757",
+    "final_mirror": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  }
+]

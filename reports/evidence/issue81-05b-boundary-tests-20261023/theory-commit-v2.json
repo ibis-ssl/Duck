@@ -1,0 +1,22 @@
+{
+  "name": "theory-commit-v2",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~commit"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:10:51.906182+00:00",
+  "runner_pid": 1187060,
+  "child_pid": 1187061,
+  "exit": 1,
+  "source_sha256": "d27edd024553a3e01593aa79c1a4560aa972f62c44c1174eb5880df56b3a8d63",
+  "stdout_sha256": "4d7908617be76219706ff32d28329b8793343faa8fddff6a37a9827d0afb9fac",
+  "stderr_sha256": "70fbce3c642a3774a69fa56c4ada1ba0ca4a052e3db47b18cad9ce8b2f484138",
+  "stdout_bytes": 4615,
+  "stderr_bytes": 144
+}\n

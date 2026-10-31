@@ -1,0 +1,10 @@
+{
+  "parentPrefixSHA256": "8be75f94d3c318cded1e3d5180c0c75277a170298f03d07385ad0bb3316ae85d",
+  "parentPrefixPreserved": true,
+  "allPreviousReportBytesPreserved": true,
+  "onlyTailOfLastChildSectionAppended": true,
+  "otherPathsPreserved": 21,
+  "reportSHA256": "1799a830fa21901bd652cbce5416a27df08d14d89487da224169e2842513dc9c",
+  "reportBytes": 25015,
+  "finalOneNewline": true
+}

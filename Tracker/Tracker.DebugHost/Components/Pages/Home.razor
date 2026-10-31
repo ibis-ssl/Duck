@@ -40,6 +40,8 @@
         <div class="vision-toolbar">
             <button type="button"
                     class="@CaptureButtonClass()"
+                    disabled="@(!CaptureControl.CanEnable)"
+                    title="@(CaptureControl.CanEnable ? null : "Capture is disabled in replay-only mode.")"
                     @onclick="ToggleCaptureAsync">
                 Capture @(CaptureControl.Enabled ? "On" : "Off")
             </button>
@@ -537,7 +539,10 @@
     private Task ToggleCaptureAsync()
     {
         var nextEnabled = !CaptureControl.Enabled;
-        CaptureControl.SetEnabled(nextEnabled);
+        if (!CaptureControl.SetEnabled(nextEnabled))
+        {
+            return Task.CompletedTask;
+        }
 
         if (!nextEnabled)
         {

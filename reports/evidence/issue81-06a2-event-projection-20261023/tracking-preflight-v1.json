@@ -1,0 +1,24 @@
+{
+  "baseline": "26c9e8655c0011a0e53628f7291ba86703db5895",
+  "source_path": "Tracker/Design/tasks-status.md",
+  "source_sha256": "a785479beb5841fdd505a2a7f283352951c41af55ad7faae943348c3ed6b69a8",
+  "added_body_lines": 1,
+  "input_path": "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md",
+  "input_sha256": "59d5e6f05bac4244bd4630e93e78e51da0b2dd71097c2484f6a74e3df1913de7",
+  "input_bytes": 756,
+  "input_byte_equality_asserted": true,
+  "baseline_contains_task": false,
+  "config_hashes": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/requirements.txt": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "tools/lint/scripts/textlint-rules/no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  },
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+  "junction_preflight": "Windows PowerShell Get-Item confirmed Junction; Node module resolution exit 0"
+}

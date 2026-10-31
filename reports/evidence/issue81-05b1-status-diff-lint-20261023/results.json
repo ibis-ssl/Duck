@@ -1,0 +1,50 @@
+[
+  {
+    "label": "baseline",
+    "gate": "textlint",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 844,
+    "duration_s": 0.137
+  },
+  {
+    "label": "baseline",
+    "gate": "cspell",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 1149,
+    "duration_s": 0.134
+  },
+  {
+    "label": "baseline",
+    "gate": "sudachi",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 138,
+    "duration_s": 0.844
+  },
+  {
+    "label": "current",
+    "gate": "textlint",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 844,
+    "duration_s": 0.123
+  },
+  {
+    "label": "current",
+    "gate": "cspell",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 1149,
+    "duration_s": 0.135
+  },
+  {
+    "label": "current",
+    "gate": "sudachi",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 236,
+    "duration_s": 0.711
+  }
+]

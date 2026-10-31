@@ -1,0 +1,16 @@
+{
+  "command": [
+    "dotnet",
+    "build",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "purpose": "AppHost build using pre-existing restore assets/cache; SCM metadata queries disabled for this invocation only",
+  "started_utc": "2026-10-23T10:51:19Z",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "program_sha256": "f438efe6766a72fcba8f550a5c8b13f6dd4c33b04cc738531c85bc869e59ac57"
+}

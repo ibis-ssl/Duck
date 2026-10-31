@@ -1,0 +1,12 @@
+using System.Net;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveCancellationTests
+{
+    [Fact]
+    public async Task CancellationAfterSuccessfulReceivesInvalidatesReadinessWithoutClockExpiry();
+}

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "view",
+    "39936732269",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--log-failed"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit": 0,
+  "stdout_bytes": 17673,
+  "stderr_bytes": 0,
+  "stdout_sha256": "8afa37da63975783ecbfa5ab95292208395dd237f47b4caf6555351670ee4c19",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

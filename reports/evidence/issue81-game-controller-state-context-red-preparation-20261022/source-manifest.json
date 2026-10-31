@@ -1,0 +1,26 @@
+{
+  "head": "d384603e15e0840d67002820830e545771700228",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateObserver.cs",
+      "sha256": "03393621f2ddac88e2f0349c36b4a2ea03fe713a4b28d3edd9ec68d3ca9853e7"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateObserverTests.cs",
+      "sha256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad"
+    }
+  ],
+  "existing30SourcesUnchanged": true,
+  "existingTestsUnchanged": true,
+  "newCases": 9,
+  "expectedTotal": 716,
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "runtimeExecuted": 0,
+  "behaviorImplemented": false,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "head": "1da5d9f9ea6570ffdace620c1617d93e62c10afc",
+  "ciEvidenceSHA256": "e8b838a45f5034cff8201e7995f58980792fd2bfe6f965a4b2479d7187fc1235",
+  "sourceManifestSHA256": "c64652c07ebef0ef0c6bcb92613f279abf36605f320eb684fee0208debf6f6b9",
+  "counts": {
+    "failed": 0,
+    "passed": 677,
+    "skipped": 0,
+    "total": 677
+  },
+  "artifacts": 0,
+  "gitStatus": "",
+  "process": {
+    "utc": "2026-10-22T18:27:23.770838+00:00",
+    "sessions": {
+      "2149": 0,
+      "45947": 0
+    },
+    "watchCommandExit": 0,
+    "allOwnedProcessesTerminated": true,
+    "uncollectedExitCodes": []
+  }
+}

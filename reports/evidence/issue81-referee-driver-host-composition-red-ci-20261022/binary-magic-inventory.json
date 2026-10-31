@@ -1,0 +1,20 @@
+[
+  {
+    "path": "artifact-12455814836.zip",
+    "kind": "ZIP",
+    "bytes": 23613277,
+    "sha256": "3df6470dd35f11549762a7f4c5b249ad94ad80c27c3b241865d5301299b48f33"
+  },
+  {
+    "path": "artifacts/dotnet-test.binlog",
+    "kind": "GZip",
+    "bytes": 1585840,
+    "sha256": "5f11f901a096d8803b60a2361dff29763aea88c54f5520f9fcaea3c0265d4274"
+  },
+  {
+    "path": "artifacts/source.tar.gz",
+    "kind": "GZip",
+    "bytes": 21528858,
+    "sha256": "62d783e570ad6b7e9990556ad72f8c82b5a39bbae104b70826a7b07d97541e54"
+  }
+]

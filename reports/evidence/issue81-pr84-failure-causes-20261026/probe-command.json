@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "C:\\Program Files\\dotnet\\dotnet.exe",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\SharingCauseProbe.dll",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\Tracker\\Tracker.Tests\\bin\\Debug\\net10.0",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\files"
+  ],
+  "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+  "startedUtc": "2026-10-26T04:04:21.952901+00:00",
+  "exitCode": 0
+}

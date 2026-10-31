@@ -1,0 +1,16 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs",
+    "output": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/GameControllerStateDeadlineTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.GameControllerStateDeadlineTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

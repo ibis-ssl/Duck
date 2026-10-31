@@ -1,0 +1,6 @@
+[xUnit.net 00:00:04.03]     Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead [FAIL]
+[xUnit.net 00:00:04.04]     Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt [FAIL]
+[xUnit.net 00:00:04.06]     Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry [FAIL]
+[xUnit.net 00:00:04.07]     Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: "{") [FAIL]
+[xUnit.net 00:00:04.12]     Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(oneByteOver: True) [FAIL]
+[xUnit.net 00:00:04.13]     Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation [FAIL]

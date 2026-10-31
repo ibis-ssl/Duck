@@ -1,0 +1,23 @@
+Exact PR CI result
+repository=ibis-ssl/Duck
+PR=84
+branch=task/issue81-aspire-desktop-bridge
+run_id=39881770413
+attempt=1
+event=pull_request
+head_sha=f92b5df2d5ebd4a9269e97e141ca53bb451d10cc
+conclusion=success
+completed_at=2026-10-23T01:05:12Z
+merge_sha=71e21ca (workflow checkout: Merge f92b5df2d5ebd4a9269e97e141ca53bb451d10cc into 88cb20f2b5cea46eb90bff80ba8d535639625de0)
+standard tests=776 passed, 0 failed, 0 skipped
+publish output check=passed for all 3:
+  Tracker/Tracker.RuntimeHost
+  Tracker/Tracker.DebugHost
+  Testing/Duck.Testing.RefereeDriver.Host
+portable PDB unit tests=7 passed
+real DebugHost PDB contract=passed; 112 documents under /src/ and DLL identity matches
+skipped jobs=ASPIRE-NET-002 Linux packet flow; ASPIRE full-stack Linux acceptance
+failure diagnostic steps=skipped; artifacts API total_count=0
+read-only compare cd561ed...f92b5df confirms no product, publish profile, or test script changes; commit consists of tracking/report/evidence changes.
+No rerun or workflow_dispatch.
+watch session 95355 was interrupted by user while run was in progress. Subsequent terminal run view confirmed completed success. Polling the old session returned Unknown process id 95355, so no watcher remains active; watcher final exit was not captured. Do not represent that watcher as exit 0.

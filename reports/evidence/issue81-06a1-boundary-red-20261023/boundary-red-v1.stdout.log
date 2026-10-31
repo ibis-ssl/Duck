@@ -1,0 +1,100 @@
+/home/donabe/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+  Duck.Testing.Diagnostics -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  SslProto -> /home/donabe/Duck-issue81-aspire-desktop-bridge/SslProto/bin/Debug/net10.0/SslProto.dll
+  Duck.Testing.RefereeDriver -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Tracker.Core -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  TrackerConnectionLib -> /home/donabe/Duck-issue81-aspire-desktop-bridge/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.RuntimeHost -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+  Duck.Testing.RefereeDriver.Host -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll
+  Tracker.DebugHost -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.CaptureReplay -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+  Duck.Testing.AppHost -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs(96,9): warning xUnit2012: Do not use Assert.True() to check if a value exists in a collection. Use Assert.Contains instead. (https://xunit.net/xunit.analyzers/rules/xUnit2012) [/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Tracker.Tests -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.RuntimeIdentityControlBoundaryTests.OversizedFrameIsRejectedAndLaterHandoffCompletes [59 ms]
+  Error Message:
+   A control frame above the fixed size limit must be rejected before identity acceptance.
+  Stack Trace:
+     at Tracker.Tests.RuntimeIdentityControlBoundaryTests.OversizedFrameIsRejectedAndLaterHandoffCompletes() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs:line 119
+   at Tracker.Tests.RuntimeIdentityControlBoundaryTests.OversizedFrameIsRejectedAndLaterHandoffCompletes() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs:line 120
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RuntimeIdentityControlBoundaryTests.IdleClientHasDeadlineAndDoesNotStarveLaterHandoff [5 s]
+  Error Message:
+   System.IO.IOException : Unable to write data to the transport connection: Broken pipe.
+---- System.Net.Sockets.SocketException : Broken pipe
+  Stack Trace:
+     at System.IO.StreamWriter.<FlushAsyncInternal>g__Core|79_0(Boolean flushStream, Boolean flushEncoder, CancellationToken cancellationToken)
+   at System.IO.StreamWriter.WriteAsyncInternal(ReadOnlyMemory`1 source, Boolean appendNewLine, CancellationToken cancellationToken)
+   at Tracker.RuntimeHost.RuntimeIdentityControlServer.HandleClientAsync(Socket client, CancellationToken cancellationToken) in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs:line 96
+   at Tracker.RuntimeHost.RuntimeIdentityControlServer.AcceptLoopAsync(CancellationToken cancellationToken) in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs:line 80
+   at Tracker.RuntimeHost.RuntimeIdentityControlServer.DisposeAsync() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs:line 151
+   at Tracker.Tests.RuntimeIdentityControlBoundaryTests.IdleClientHasDeadlineAndDoesNotStarveLaterHandoff() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs:line 77
+--- End of stack trace from previous location ---
+----- Inner Stack Trace -----
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.CreateException(SocketError error, Boolean forAsyncThrow)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.SendAsyncForNetworkStream(Socket socket, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.SendAsyncForNetworkStream(ReadOnlyMemory`1 buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
+   at System.Net.Sockets.NetworkStream.WriteAsync(ReadOnlyMemory`1 buffer, CancellationToken cancellationToken)
+   at System.IO.StreamWriter.<FlushAsyncInternal>g__Core|79_0(Boolean flushStream, Boolean flushEncoder, CancellationToken cancellationToken)
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at System.IO.StreamWriter.<FlushAsyncInternal>g__Core|79_0(Boolean flushStream, Boolean flushEncoder, CancellationToken cancellationToken)
+   at System.IO.StreamWriter.WriteAsyncInternal(ReadOnlyMemory`1 source, Boolean appendNewLine, CancellationToken cancellationToken)
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at System.IO.StreamWriter.WriteAsyncInternal(ReadOnlyMemory`1 source, Boolean appendNewLine, CancellationToken cancellationToken)
+   at System.IO.StreamWriter.WriteLineAsync(String value)
+   at Tracker.RuntimeHost.RuntimeIdentityControlServer.WriteAsync(StreamWriter writer, RuntimeIdentityControlMessage message) in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs:line 143
+   at Tracker.RuntimeHost.RuntimeIdentityControlServer.HandleClientAsync(Socket client, CancellationToken cancellationToken) in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs:line 96
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(IAsyncStateMachineBox box, Boolean allowInlining)
+   at System.Threading.Tasks.Task.RunContinuations(Object continuationObject)
+   at System.Threading.Tasks.Task`1.TrySetResult(TResult result)
+   at System.Threading.Tasks.Task.CancellationPromise`1.System.Threading.Tasks.ITaskCompletionAction.Invoke(Task completingTask)
+   at System.Threading.Tasks.Task.RunContinuations(Object continuationObject)
+   at System.Threading.Tasks.Task`1.TrySetResult(TResult result)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(Task`1 task, TResult result)
+   at System.IO.StreamReader.ReadLineAsyncInternal(CancellationToken cancellationToken)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(IAsyncStateMachineBox box, Boolean allowInlining)
+   at System.Threading.Tasks.Task.RunContinuations(Object continuationObject)
+   at System.Threading.Tasks.Task`1.TrySetResult(TResult result)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(Task`1 task, TResult result)
+   at System.IO.StreamReader.ReadBufferAsync(CancellationToken cancellationToken)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1.SetResult(TResult result)
+   at System.Net.Sockets.SocketAsyncEventArgs.TransferCompletionCallbackCore(Int32 bytesTransferred, Memory`1 socketAddress, SocketFlags receivedFlags, SocketError socketError)
+   at System.Net.Sockets.SocketAsyncEngine.System.Threading.IThreadPoolWorkItem.Execute()
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+   at System.Threading.Thread.StartCallback()
+--- End of stack trace from previous location ---
+
+  Failed Tracker.Tests.RuntimeIdentityControlBoundaryTests.MalformedClientDoesNotStopAcceptLoop [3 s]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 0
+Actual:   130
+  Stack Trace:
+     at Tracker.Tests.RuntimeIdentityControlBoundaryTests.MalformedClientDoesNotStopAcceptLoop() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs:line 32
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RuntimeIdentityControlBoundaryTests.FailedServerDoesNotDeleteAnotherOwnersSocketPath [4 ms]
+  Error Message:
+   A server that failed to bind must not delete the existing owner's socket path.
+  Stack Trace:
+     at Tracker.Tests.RuntimeIdentityControlBoundaryTests.FailedServerDoesNotDeleteAnotherOwnersSocketPath() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs:line 54
+   at Tracker.Tests.RuntimeIdentityControlBoundaryTests.FailedServerDoesNotDeleteAnotherOwnersSocketPath() in /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs:line 55
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     4, Passed:     0, Skipped:     0, Total:     4, Duration: 8 s - Tracker.Tests.dll (net10.0)

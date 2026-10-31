@@ -1,0 +1,11 @@
+{
+  "command": [
+    "bash",
+    "-n",
+    "scripts/tests/verify-linux-publish-outputs.sh"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0,
+  "started_epoch": 1792715082.6651359,
+  "finished_epoch": 1792715082.6679118
+}

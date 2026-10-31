@@ -1,0 +1,14 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "sha256": "1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494"
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "sha256": "6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3"
+  },
+  {
+    "path": "reports/issue81-referee-driver-host-implementation-20261022.md",
+    "sha256": "8fcfb1b6db651c39b7e221f90e311ff23a3d17cbe8d5c4f35d40fea28b9a7903"
+  }
+]

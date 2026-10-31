@@ -1,0 +1,1066 @@
+[
+  {
+    "path": "__pycache__/run-gates.cpython-314.pyc",
+    "sha256": "7cf98558b8619bd9b4efdedfc32bac5fa26e34f8e5f2347f31db70026d24934c",
+    "bytes": 5813,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/__pycache__/run-gates.cpython-314.pyc"
+  },
+  {
+    "path": "aspire-simulation-test-environment-diagram-1.mmd",
+    "sha256": "fd96799784e7a8b3c2178bc7d319bdd1a3c1e9f227b00e72cfc6754d7fbc4e7e",
+    "bytes": 1073,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/aspire-simulation-test-environment-diagram-1.mmd"
+  },
+  {
+    "path": "aspire-simulation-test-environment-diagram-2.mmd",
+    "sha256": "719850b732798acddc3a34b2076428a956df5f04f424a31c5f39cfe01c7075ed",
+    "bytes": 1444,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/aspire-simulation-test-environment-diagram-2.mmd"
+  },
+  {
+    "path": "aspire-simulation-test-environment-diagram-3.mmd",
+    "sha256": "8450ad300185f22bffca122b6474d23e5435ed17900234bff72e640d03c4eb5f",
+    "bytes": 1671,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/aspire-simulation-test-environment-diagram-3.mmd"
+  },
+  {
+    "path": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "sha256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+    "bytes": 26410,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  },
+  {
+    "path": "baseline/Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "sha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+    "bytes": 27726,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/Tracker/Design/Testing/tracker-comparison-debug-design.md"
+  },
+  {
+    "path": "baseline/source-mirror-proof.json",
+    "sha256": "0661fa44e4088da37a0acb25aef5ed407057af381dfe6b7de6d441c600559e02",
+    "bytes": 559,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/source-mirror-proof.json"
+  },
+  {
+    "path": "baseline/spell.command.json",
+    "sha256": "3eb43c693bfd69d03d07674394a55b270af51746b98185dbf77e54d6039e174b",
+    "bytes": 627,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/spell.command.json"
+  },
+  {
+    "path": "baseline/spell.stderr.log",
+    "sha256": "d6a33d8ebdca6f06e4bc403ed6d9398bb9cc907baff0f509405697f9cd08fe06",
+    "bytes": 203,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/spell.stderr.log"
+  },
+  {
+    "path": "baseline/spell.stdout.log",
+    "sha256": "e591a3217963379a28dbe0727576e30623f15055302f5dde20d805e3ccb020c1",
+    "bytes": 9068,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/spell.stdout.log"
+  },
+  {
+    "path": "baseline/sudachi-aspire-simulation-test-environment.command.json",
+    "sha256": "f2c4060e8f52ef84a52d089181f0d154b1dc53a56b4d8582fb841dd5e5487116",
+    "bytes": 734,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "baseline/sudachi-aspire-simulation-test-environment.json",
+    "sha256": "aa025a97164e0840d0dfb3c7f7ea80ea74da232cc03cc61143584c1cec10d53f",
+    "bytes": 1988,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-aspire-simulation-test-environment.json"
+  },
+  {
+    "path": "baseline/sudachi-aspire-simulation-test-environment.stderr.log",
+    "sha256": "9b211e3267d2844e2c4789603511d8be400e8f7266bb653db881c542a1edc90c",
+    "bytes": 1335,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "baseline/sudachi-aspire-simulation-test-environment.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "baseline/sudachi-tracker-comparison-debug-design.command.json",
+    "sha256": "7367ea12e80a409c5a3a82ff5c37cf2ea7da4eb44d7c58a46ffd3d3faccd2078",
+    "bytes": 728,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "baseline/sudachi-tracker-comparison-debug-design.json",
+    "sha256": "0020ceff623d68a0cb57f6bad2bf92cfd6f3f4fba9cb2974b6dacda541273c0a",
+    "bytes": 118901,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-tracker-comparison-debug-design.json"
+  },
+  {
+    "path": "baseline/sudachi-tracker-comparison-debug-design.stderr.log",
+    "sha256": "14b2f898937b4f9836fae8a73cabfd2dc825429f12369e684760f99ecf283581",
+    "bytes": 26101,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "baseline/sudachi-tracker-comparison-debug-design.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/sudachi-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "baseline/targets.command.json",
+    "sha256": "192e85489341f09ec610b7ef6bfecd1d48d656b8811ef0cfd7cd30e33b283576",
+    "bytes": 622,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/targets.command.json"
+  },
+  {
+    "path": "baseline/targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/targets.stderr.log"
+  },
+  {
+    "path": "baseline/targets.stdout.log",
+    "sha256": "1be298c9c246da0c5e72581d705762a60efeb8013b21c645d0e421a743e3c7a2",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/targets.stdout.log"
+  },
+  {
+    "path": "baseline/text.command.json",
+    "sha256": "019286169de78b0c711d8098edfdf12690d69dd1e48d37391d11a90b329f3c5b",
+    "bytes": 626,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/text.command.json"
+  },
+  {
+    "path": "baseline/text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/text.stderr.log"
+  },
+  {
+    "path": "baseline/text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/text.stdout.log"
+  },
+  {
+    "path": "baseline/yomiyasu-aspire-simulation-test-environment.command.json",
+    "sha256": "0b9a34304192fa7e182b47d0c73e628144f45d4caf8f11a6a8110bf857ef671a",
+    "bytes": 558,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/yomiyasu-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "baseline/yomiyasu-aspire-simulation-test-environment.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/yomiyasu-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "baseline/yomiyasu-aspire-simulation-test-environment.stdout.log",
+    "sha256": "3a3151c2a953828931f5fa5ea8b923093eb22a3a9f164bbb5a79d0e86e0c0ca5",
+    "bytes": 216,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/yomiyasu-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "baseline/yomiyasu-tracker-comparison-debug-design.command.json",
+    "sha256": "1105ba61813be81f94579b52aee655755310d8b9ae3bee04dc6a268622dcf301",
+    "bytes": 555,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/yomiyasu-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "baseline/yomiyasu-tracker-comparison-debug-design.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/yomiyasu-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "baseline/yomiyasu-tracker-comparison-debug-design.stdout.log",
+    "sha256": "75014982e4fa3b4cc88b828bb15fa27b72c39272811b345e6e826db105d745e9",
+    "bytes": 3881,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/baseline/yomiyasu-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "cleanup.json",
+    "sha256": "bfaa6f6c3ed530d8a56e6910e117280929771ec0a0084647a65ba47bb45bfeeb",
+    "bytes": 237,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/cleanup.json"
+  },
+  {
+    "path": "config-integrity.json",
+    "sha256": "66d01cfa31741fbe6f5e24fdba9c0ccc912e53992b9d9aea2c8f198bb9d30c22",
+    "bytes": 6816,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/config-integrity.json"
+  },
+  {
+    "path": "config-post-guard.json",
+    "sha256": "d225f6a04aefcf3e6794c68510693d712fa51198bb820696879fd8b6e87f8686",
+    "bytes": 299,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/config-post-guard.json"
+  },
+  {
+    "path": "context.json",
+    "sha256": "125ecaa7fbd4f5c8524518f14da9921160d28820c17c1696e56cc2db13515cb4",
+    "bytes": 754,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/context.json"
+  },
+  {
+    "path": "cspell-delta.json",
+    "sha256": "b9ad35335f74ddd6f2b0e247e1bc5d42cbf2f8b2ab82d6e8fa01b3a6a291df9f",
+    "bytes": 31403,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/cspell-delta.json"
+  },
+  {
+    "path": "current/source-mirror-proof.json",
+    "sha256": "83a8b86219d5c783a5e634775fe53998237df68cc64136f70a433090a2ae6292",
+    "bytes": 559,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/source-mirror-proof.json"
+  },
+  {
+    "path": "current/spell.command.json",
+    "sha256": "65537e262a46dc23753b4de921b44327a6e054d315a940de6b20a22fc576b365",
+    "bytes": 627,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/spell.command.json"
+  },
+  {
+    "path": "current/spell.stderr.log",
+    "sha256": "dde0a48098f334e5ae4280ed6ea2d5d6cb367a765c9a7253d6ef1a5e6ff0e3ef",
+    "bytes": 202,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/spell.stderr.log"
+  },
+  {
+    "path": "current/spell.stdout.log",
+    "sha256": "dcd5914a32b39a246baaa483cc273ef197399cd213f867c2812712e7ff90c7ff",
+    "bytes": 9076,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/spell.stdout.log"
+  },
+  {
+    "path": "current/sudachi-aspire-simulation-test-environment.command.json",
+    "sha256": "5b40753110621fbd62eaad88dcdc42c0ab17fde8cb2189fad7ab64f731daa23d",
+    "bytes": 733,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "current/sudachi-aspire-simulation-test-environment.json",
+    "sha256": "b68e4cf6256de2863e5a2df772d425c672663dbd399db68869a09e3706f7b867",
+    "bytes": 2932,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-aspire-simulation-test-environment.json"
+  },
+  {
+    "path": "current/sudachi-aspire-simulation-test-environment.stderr.log",
+    "sha256": "d53316f90a4f761b91797b479e839c66c3e5440096dcfd8ad178c78b4560f48b",
+    "bytes": 1995,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "current/sudachi-aspire-simulation-test-environment.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "current/sudachi-tracker-comparison-debug-design.command.json",
+    "sha256": "5fc9f87cd007455d6f6a63ffc2f06f95487107553bf627d3f33f5d654a3d4049",
+    "bytes": 727,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "current/sudachi-tracker-comparison-debug-design.json",
+    "sha256": "d1b4a2fdda7e9472a23eee291a32b48e6410d1f2a5f49649134b08ad7018784c",
+    "bytes": 119461,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-tracker-comparison-debug-design.json"
+  },
+  {
+    "path": "current/sudachi-tracker-comparison-debug-design.stderr.log",
+    "sha256": "2dccdeadfceb6d3ec498ea7686649e7c73e68d85d52191e6d01177c8c699d8aa",
+    "bytes": 26106,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "current/sudachi-tracker-comparison-debug-design.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/sudachi-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "current/targets.command.json",
+    "sha256": "3f838836896f7c15d419e2e4425f843c550d8228d26a992bdd7ffea5357f8052",
+    "bytes": 622,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/targets.command.json"
+  },
+  {
+    "path": "current/targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/targets.stderr.log"
+  },
+  {
+    "path": "current/targets.stdout.log",
+    "sha256": "1be298c9c246da0c5e72581d705762a60efeb8013b21c645d0e421a743e3c7a2",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/targets.stdout.log"
+  },
+  {
+    "path": "current/text.command.json",
+    "sha256": "6495c7d6dad220abfb49c6be781c0037e4d945f40153b9ec2652eac70a7f6ee9",
+    "bytes": 626,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/text.command.json"
+  },
+  {
+    "path": "current/text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/text.stderr.log"
+  },
+  {
+    "path": "current/text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/text.stdout.log"
+  },
+  {
+    "path": "current/yomiyasu-aspire-simulation-test-environment.command.json",
+    "sha256": "6b8bc2df1feb668f19b5df8e81a5e80e18fff2741ca3c9e32633667a0f586eb7",
+    "bytes": 558,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/yomiyasu-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "current/yomiyasu-aspire-simulation-test-environment.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/yomiyasu-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "current/yomiyasu-aspire-simulation-test-environment.stdout.log",
+    "sha256": "6ca659003fd62ee3e1ad5eb2bbb59c42415660c579625ed5d6c24a45672d4dca",
+    "bytes": 216,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/yomiyasu-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "current/yomiyasu-tracker-comparison-debug-design.command.json",
+    "sha256": "e7edb27b2ad7213d94b7a5ff6ce9aea098ba75187201197383434cf01b5971d2",
+    "bytes": 555,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/yomiyasu-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "current/yomiyasu-tracker-comparison-debug-design.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/yomiyasu-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "current/yomiyasu-tracker-comparison-debug-design.stdout.log",
+    "sha256": "9e9625dc2f42ad531ac3a7f371c9f95754364699136017f846f74fd7b8d7b5b9",
+    "bytes": 5165,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current/yomiyasu-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "current-snapshot/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "sha256": "6a164fe19b7fda39bbfb695af5120b6c4f4f6bce5b39bf6205eb82d91e817067",
+    "bytes": 34546,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current-snapshot/Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  },
+  {
+    "path": "current-snapshot/Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "sha256": "16074dca9c837b8c33cc0ec2ba6a0c4ac45de5efa3a781c4ab7c5c3077d7ca29",
+    "bytes": 31554,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/current-snapshot/Tracker/Design/Testing/tracker-comparison-debug-design.md"
+  },
+  {
+    "path": "diagram-source-semantic-review.json",
+    "sha256": "7985cc8cf52e7311f3a3963e5ebe5bc2af42e93149c3842402ee3e535a77fd3e",
+    "bytes": 1930,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/diagram-source-semantic-review.json"
+  },
+  {
+    "path": "effective-config-audit.cjs",
+    "sha256": "bc2761fe9e7ea7e80d8452b0ddcc54559fd65dc54df261843ba702baa3094103",
+    "bytes": 1420,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/effective-config-audit.cjs"
+  },
+  {
+    "path": "final/cleanup.command.json",
+    "sha256": "38191470ff3badf5739f428260886bb294c9ffca7c6278f9a80e1e4e6aa47931",
+    "bytes": 908,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/cleanup.command.json"
+  },
+  {
+    "path": "final/cleanup.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/cleanup.stderr.log"
+  },
+  {
+    "path": "final/cleanup.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/cleanup.stdout.log"
+  },
+  {
+    "path": "final/effective-config-audit-file.command.json",
+    "sha256": "6ea5968dff329c91515dd88549653b020077b23d8f3b9c67dce41c86ad665963",
+    "bytes": 478,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/effective-config-audit-file.command.json"
+  },
+  {
+    "path": "final/effective-config-audit-file.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/effective-config-audit-file.stderr.log"
+  },
+  {
+    "path": "final/effective-config-audit-file.stdout.log",
+    "sha256": "6d5c4cc05b17dfaa2b8f5915e8d6502c2aff50033a3c5fcbf3ef277ea8de35df",
+    "bytes": 22014,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/effective-config-audit-file.stdout.log"
+  },
+  {
+    "path": "final/effective-config-audit.command.json",
+    "sha256": "be402614c8dab532dff9ca4041da542b9dbabe41d772ba46726e21de11c7c903",
+    "bytes": 1837,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/effective-config-audit.command.json"
+  },
+  {
+    "path": "final/effective-config-audit.stderr.log",
+    "sha256": "54606309988b45e445d89afb565968dece8d218096b65c24a283d641e6a6614a",
+    "bytes": 1825,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/effective-config-audit.stderr.log"
+  },
+  {
+    "path": "final/effective-config-audit.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/effective-config-audit.stdout.log"
+  },
+  {
+    "path": "final/source-mirror-proof.json",
+    "sha256": "919d80f44cff44059910dbfc75cf72da46b48948d15055649b2756abafc88d23",
+    "bytes": 559,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/source-mirror-proof.json"
+  },
+  {
+    "path": "final/spell.command.json",
+    "sha256": "9ac85b3aee2e95571db559d8425df19d9cb9a80164531158dca27699d47fbaf5",
+    "bytes": 627,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/spell.command.json"
+  },
+  {
+    "path": "final/spell.stderr.log",
+    "sha256": "8e4fd63c7eb36ab6dab7f03b6543209097847ed00ad11a7e34772f88a45d8020",
+    "bytes": 203,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/spell.stderr.log"
+  },
+  {
+    "path": "final/spell.stdout.log",
+    "sha256": "dcd5914a32b39a246baaa483cc273ef197399cd213f867c2812712e7ff90c7ff",
+    "bytes": 9076,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/spell.stdout.log"
+  },
+  {
+    "path": "final/sudachi-aspire-simulation-test-environment.command.json",
+    "sha256": "51dbf8fdb1096dd6f2b7564d362b194c0c82a31c82166f76146d0cd9ea6c62fc",
+    "bytes": 731,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "final/sudachi-aspire-simulation-test-environment.json",
+    "sha256": "b492d76b88cebcf78a6ed1e9ec017e05c676e1ffe6719e7b340b21786a19a322",
+    "bytes": 1988,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.json"
+  },
+  {
+    "path": "final/sudachi-aspire-simulation-test-environment.stderr.log",
+    "sha256": "fe3239aed16753eab93aaa1530b6ad26c8ac3e01e0bae30403b43fac03fab3c8",
+    "bytes": 1335,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "final/sudachi-aspire-simulation-test-environment.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "final/sudachi-tracker-comparison-debug-design.command.json",
+    "sha256": "6202a2ea9ff2e12a300e4dcc02214134714a5d93f929e05603dff37dfe6c0d96",
+    "bytes": 725,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "final/sudachi-tracker-comparison-debug-design.json",
+    "sha256": "42d78d5d9d12a4c62f699e9a39010a265d76d10ebc536dca36146aee2dd518ce",
+    "bytes": 118916,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-tracker-comparison-debug-design.json"
+  },
+  {
+    "path": "final/sudachi-tracker-comparison-debug-design.stderr.log",
+    "sha256": "3f2b13ee77d4b137141f76193fc61216d67035140bf5b10d58a9a482135fe392",
+    "bytes": 26110,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "final/sudachi-tracker-comparison-debug-design.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/sudachi-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "final/targets.command.json",
+    "sha256": "dc4a871ec3eee4782ff280f4f85c4e5834020fe06575f89d556e47aac799cf64",
+    "bytes": 622,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/targets.command.json"
+  },
+  {
+    "path": "final/targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/targets.stderr.log"
+  },
+  {
+    "path": "final/targets.stdout.log",
+    "sha256": "1be298c9c246da0c5e72581d705762a60efeb8013b21c645d0e421a743e3c7a2",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/targets.stdout.log"
+  },
+  {
+    "path": "final/text.command.json",
+    "sha256": "83a9b7d8c007b16293b122217a189c2a2f284482dc15222f1fdfa0844186b827",
+    "bytes": 626,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/text.command.json"
+  },
+  {
+    "path": "final/text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/text.stderr.log"
+  },
+  {
+    "path": "final/text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/text.stdout.log"
+  },
+  {
+    "path": "final/yomiyasu-aspire-simulation-test-environment.command.json",
+    "sha256": "ebffc8a221eebfb94a5b31470e111c02a76fb41f2f5d5d0b7dd4a622deee4fbc",
+    "bytes": 558,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "final/yomiyasu-aspire-simulation-test-environment.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "final/yomiyasu-aspire-simulation-test-environment.stdout.log",
+    "sha256": "df8db19ff51a9d7df899105ec80567e8ee8e610b6537a9833d7c4deb82938ed7",
+    "bytes": 216,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "final/yomiyasu-tracker-comparison-debug-design.command.json",
+    "sha256": "4c6bfd4aff0b9ba8ea1081191307caf042020cb3d225e3dcb51e1a287b8f121c",
+    "bytes": 555,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "final/yomiyasu-tracker-comparison-debug-design.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "final/yomiyasu-tracker-comparison-debug-design.stdout.log",
+    "sha256": "95cffb45a9af13fb8dfd672b06103e0aa02f88132cce9ce9a26ab7cdde613a67",
+    "bytes": 3881,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final/yomiyasu-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1",
+    "bytes": 138,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff.command.json",
+    "sha256": "17df583a9694b41587f6f31a4e861e6521af01eb264b3338bd53d4ed5e8eef08",
+    "bytes": 336,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-diff.command.json"
+  },
+  {
+    "path": "final-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-diff.stderr.log"
+  },
+  {
+    "path": "final-diff.stdout.log",
+    "sha256": "b28595d9a610f657aa17bd45d5c72f745895200beae82fb569d10c6e32b9f9a1",
+    "bytes": 39890,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-diff.stdout.log"
+  },
+  {
+    "path": "final-head.command.json",
+    "sha256": "18212d85ef926da32d14c7ef7be1e9d1571cfc2edc030827a02b61a96002b0dc",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-head.command.json"
+  },
+  {
+    "path": "final-head.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-head.stderr.log"
+  },
+  {
+    "path": "final-head.stdout.log",
+    "sha256": "37641bcb92473a0018dbd0b74ebac182d651e17dafa26a1146654c74d90e7dfa",
+    "bytes": 41,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-head.stdout.log"
+  },
+  {
+    "path": "final-stat.command.json",
+    "sha256": "b29f26a1e866898418a1a41beaec38db43553e0261f920306abd1d53d099a907",
+    "bytes": 137,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-stat.command.json"
+  },
+  {
+    "path": "final-stat.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-stat.stderr.log"
+  },
+  {
+    "path": "final-stat.stdout.log",
+    "sha256": "eaaf94f7dbe3dedd5450840108b40d2521c8429577b5ee51e39a7f6708a03b90",
+    "bytes": 267,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-stat.stdout.log"
+  },
+  {
+    "path": "final-status.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-status.command.json"
+  },
+  {
+    "path": "final-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-status.stderr.log"
+  },
+  {
+    "path": "final-status.stdout.log",
+    "sha256": "f5591a0e715b6f04caf77e5b1f24f3d64975a9511d955b9dda46efb23b1e7be4",
+    "bytes": 191,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/final-status.stdout.log"
+  },
+  {
+    "path": "fragment-manifest.json",
+    "sha256": "e9684f65a0853aca48e7534ee9143cc82003b31ece8addb652b896160b3734d0",
+    "bytes": 3558,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragment-manifest.json"
+  },
+  {
+    "path": "fragments/aspire-simulation-test-environment.md",
+    "sha256": "42de5d466f1fdbcb030a9ec0d0e0d46f4565c20c89120650cf21a1bab794b121",
+    "bytes": 13286,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/aspire-simulation-test-environment.md"
+  },
+  {
+    "path": "fragments/spell.command.json",
+    "sha256": "04bd820bb6140d5dd8684be5456f86eb0840b68ebb54287d1aeb1e6b2b48787f",
+    "bytes": 627,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/spell.command.json"
+  },
+  {
+    "path": "fragments/spell.stderr.log",
+    "sha256": "a1647e949857eb602cd9df349036c8d5b465d47b7564218c1e7eca11defa3406",
+    "bytes": 196,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/spell.stderr.log"
+  },
+  {
+    "path": "fragments/spell.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/spell.stdout.log"
+  },
+  {
+    "path": "fragments/sudachi-aspire-simulation-test-environment.command.json",
+    "sha256": "736b60fff4f8627c7b926766d9b7dac2bed35b9be2a87513802b836b9133211d",
+    "bytes": 735,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-aspire-simulation-test-environment.command.json"
+  },
+  {
+    "path": "fragments/sudachi-aspire-simulation-test-environment.json",
+    "sha256": "1c60cf5e1d7503d6059d0e5a4d613f13ad0b201cf222676360896483d3c41adf",
+    "bytes": 126,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-aspire-simulation-test-environment.json"
+  },
+  {
+    "path": "fragments/sudachi-aspire-simulation-test-environment.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-aspire-simulation-test-environment.stderr.log"
+  },
+  {
+    "path": "fragments/sudachi-aspire-simulation-test-environment.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-aspire-simulation-test-environment.stdout.log"
+  },
+  {
+    "path": "fragments/sudachi-tracker-comparison-debug-design.command.json",
+    "sha256": "d8d7bb9fcf73af3c6d6a6d0150115ae056220ba0f5cf01adebe6a37bab2ccc22",
+    "bytes": 729,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-tracker-comparison-debug-design.command.json"
+  },
+  {
+    "path": "fragments/sudachi-tracker-comparison-debug-design.json",
+    "sha256": "7eb1c9a8a0a80fda86f5b096e329666d612b2a55404bdf1857e3d82bbe40b84f",
+    "bytes": 123,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-tracker-comparison-debug-design.json"
+  },
+  {
+    "path": "fragments/sudachi-tracker-comparison-debug-design.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-tracker-comparison-debug-design.stderr.log"
+  },
+  {
+    "path": "fragments/sudachi-tracker-comparison-debug-design.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/sudachi-tracker-comparison-debug-design.stdout.log"
+  },
+  {
+    "path": "fragments/targets.command.json",
+    "sha256": "5eb4536fc205a40bea8c042d80844f3cb1c98258cec318a77b1266b38abc9208",
+    "bytes": 622,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/targets.command.json"
+  },
+  {
+    "path": "fragments/targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/targets.stderr.log"
+  },
+  {
+    "path": "fragments/targets.stdout.log",
+    "sha256": "1be298c9c246da0c5e72581d705762a60efeb8013b21c645d0e421a743e3c7a2",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/targets.stdout.log"
+  },
+  {
+    "path": "fragments/text.command.json",
+    "sha256": "70d60dc9cb5d9cdef74944b351095f1ae907113e83a3b3906add05f7176586be",
+    "bytes": 626,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/text.command.json"
+  },
+  {
+    "path": "fragments/text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/text.stderr.log"
+  },
+  {
+    "path": "fragments/text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/text.stdout.log"
+  },
+  {
+    "path": "fragments/tracker-comparison-debug-design.md",
+    "sha256": "51c0f8553be8421d21c8b14f08884a1456294666284cb481b8439d0de7486df4",
+    "bytes": 4905,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/fragments/tracker-comparison-debug-design.md"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "aa89c710e317331030770882d2812288449491d7841e73ce9a2d5b6868e1cf50",
+    "bytes": 24495,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/inventory.json"
+  },
+  {
+    "path": "junction.command.json",
+    "sha256": "6b870729ebef12861eb857a63cbd54ff4ce224fd1ef29799ce071dd33d95d4a3",
+    "bytes": 540,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/junction.command.json"
+  },
+  {
+    "path": "junction.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/junction.stderr.log"
+  },
+  {
+    "path": "junction.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/junction.stdout.log"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "b2670095b9777131b477aa5248d89cf6f92ddf4c93fc245907b3250e342f3dab",
+    "bytes": 358,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/process-state.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "ec7a82820a771967c23e4ddb5c59d18fcecd2d00b63a7cbfba3ad1905ea9dc6c",
+    "bytes": 489,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/readback.json"
+  },
+  {
+    "path": "report-guard.json",
+    "sha256": "14ceca48979fc0272f0bf4eaccd4626cf799cba38b86f94fca66b4877f68504d",
+    "bytes": 222,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/report-guard.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "81e7ffc2d080a30b50538be91f5ea3282f20f14f61bb4db6bf5e74081e239170",
+    "bytes": 43087,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/report-readback.md"
+  },
+  {
+    "path": "report.after.md",
+    "sha256": "81e7ffc2d080a30b50538be91f5ea3282f20f14f61bb4db6bf5e74081e239170",
+    "bytes": 43087,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/report.after.md"
+  },
+  {
+    "path": "report.before.md",
+    "sha256": "80db612f1d556f224ed0452e6d3848f4f9bdf1e71d5366347815c98ba7b893e5",
+    "bytes": 36248,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/report.before.md"
+  },
+  {
+    "path": "run-gates.py",
+    "sha256": "4572ece58ad1d4103f0f8db902e74d7a601a9aba3d46b9ba8c806bc403e15e49",
+    "bytes": 2672,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/run-gates.py"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "c92e0d8e303fd5b422b57f603b06266a3f6dd66510b8f795f70a47c87d9f7b84",
+    "bytes": 751,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/source-manifest.json"
+  },
+  {
+    "path": "source44-guards.json",
+    "sha256": "412f075cab2c262f8229e9b0810419707954335d4eb75f0543f12236e754ce9d",
+    "bytes": 11937,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/source44-guards.json"
+  },
+  {
+    "path": "sudachi-capture.py",
+    "sha256": "1b9c1da3cd480c17f4df144891b0c3bc16ea97737a5afa96c58f1b70bacb6b2d",
+    "bytes": 875,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/sudachi-capture.py"
+  },
+  {
+    "path": "sudachi-delta.json",
+    "sha256": "946e744f9a273512ec2e741787c91b8fe02d8121ce9e251278d4d4e548804e32",
+    "bytes": 11376,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/sudachi-delta.json"
+  },
+  {
+    "path": "tool-versions.command.json",
+    "sha256": "5f8fd0a9e0bf02181c5767e3b091fe597caaa1940622b69702640d18926b0de9",
+    "bytes": 654,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/tool-versions.command.json"
+  },
+  {
+    "path": "tool-versions.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/tool-versions.stderr.log"
+  },
+  {
+    "path": "tool-versions.stdout.log",
+    "sha256": "bab8e32361bba2e3107c0986d42f3ca5455a4bf1afb9aa6e3946e52c62e28134",
+    "bytes": 49,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/tool-versions.stdout.log"
+  },
+  {
+    "path": "tracker-comparison-debug-design-diagram-1.mmd",
+    "sha256": "791d2522e99e63d691058bdc69b160681c1ee9ca3e31fa65ca10c978bac7a95d",
+    "bytes": 1198,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/tracker-comparison-debug-design-diagram-1.mmd"
+  },
+  {
+    "path": "validation-summary.json",
+    "sha256": "793acd6b7302e60af3e6291c764d7a0bc3209baa661314f826ca33d5db8c6b0d",
+    "bytes": 1306,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/validation-summary.json"
+  },
+  {
+    "path": "yomiyasu-delta.json",
+    "sha256": "d396eb734c49f88e3cea73ae1a26ce78890703a19e4656ebf281696572a95d30",
+    "bytes": 11947,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-design-sync-20261022/yomiyasu-delta.json"
+  }
+]

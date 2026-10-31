@@ -1,0 +1,177 @@
+﻿{
+  "baseline_head": "35aba879579b4c1486b4ef87b043fe0a7bcd34db",
+  "source_path": "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs",
+  "source_sha256": "c8ab5c577c83d2b535c1cca08426d9ff845bdb05180b5f2cd2c1387083c89d7d",
+  "source_git_blob_oid": "2b03b2d5d93e04d79f263e48fce20f8170c90175",
+  "compiled_test_dll_sha256": "5aa38ee2321589b4aa2d64a6c44e7d998c0abe78611e1e85b7458f9a38301a8c",
+  "finding": {
+    "id": "I81-07D-NR-007",
+    "fix_verification": "pending same normal reviewer",
+    "severity": "P2"
+  },
+  "prior_review": {
+    "report_sha256": "8e001035a5b6821c7820ac77c4bc95e393a51d56e6c9fd8720e9d4497fc22d0d",
+    "original_six_findings_closed": true,
+    "head": "35aba879579b4c1486b4ef87b043fe0a7bcd34db"
+  },
+  "red": {
+    "invalidMathOnlyRed": {
+      "manifest": "stage-a-red/manifest.json",
+      "manifestSha256": "9B0CAF1EEB82EA8F88D30EF08202B86D9038D0CB4E110D67879DCB1445489D69",
+      "classification": "retained historical math-only test; not accepted as valid behavior Red"
+    },
+    "validSharedConsumerRed": {
+      "manifest": "stage-a-shared-helper-red/manifest.json",
+      "manifestSha256": "A6EA0BC7043BD3ED41CB6A11A605EC0B2002406CDDE440E92D268DEBF86B1402",
+      "testExit": 1,
+      "failure": "Expected zero wait at exhausted deadline; shared production helper returned 250ms",
+      "productionFixNotYetPresent": true
+    }
+  },
+  "validation": {
+    "focused": {
+      "manifest": "stage-b-final/focused/manifest.json",
+      "manifestSha256": "FDCB31CF7C21B7129C6E9F93122CD8BE34E471B9934C45D38499014449C61EEA",
+      "exit": 0,
+      "passed": 54,
+      "nativeSkipped": 1,
+      "total": 55,
+      "sourceSha256BeforeAfter": "C8AB5C577C83D2B535C1CCA08426D9FF845BDB05180B5F2CD2C1387083C89D7D"
+    },
+    "related": {
+      "manifest": "stage-b-final/related/manifest.json",
+      "manifestSha256": "D1A192B950F5A57433AEA1C0B7C36EE2B2599D7909DA88ACE101995128B3E0A2",
+      "exit": 0,
+      "passed": 85,
+      "nativeSkipped": 1,
+      "total": 86,
+      "overlapsFocused": true,
+      "doNotAddCounts": true,
+      "sourceSha256BeforeAfter": "C8AB5C577C83D2B535C1CCA08426D9FF845BDB05180B5F2CD2C1387083C89D7D"
+    },
+    "appHostBuild": {
+      "manifest": "stage-b-final/build-apphost/manifest.json",
+      "manifestSha256": "AF394FA324EA886F8D82524F9B4CE05AB732189CD40F69EF94CBF4868323EFC5",
+      "exit": 0,
+      "sourceSha256BeforeAfter": "C8AB5C577C83D2B535C1CCA08426D9FF845BDB05180B5F2CD2C1387083C89D7D",
+      "configuration": "Debug; --no-restore; -m:1; /nr:false"
+    },
+    "refereeDriverHostBuild": {
+      "manifest": "stage-b-final/build-referee-host/manifest.json",
+      "manifestSha256": "808930F6B0642A16361CEC85912B28398A3B1C2F2EF0D3B8BA52AF928D1AB06A",
+      "exit": 0,
+      "sourceSha256BeforeAfter": "C8AB5C577C83D2B535C1CCA08426D9FF845BDB05180B5F2CD2C1387083C89D7D",
+      "configuration": "Debug; --no-restore; -m:1; /nr:false"
+    }
+  },
+  "behavior": "GetStopWait now uses the minimum of cleanup-start remaining, join-time remaining, and 250ms; zero or negative remaining yields zero. Native cleanup passes the stopwatch-derived join-time value at the call site.",
+  "source_summary_sha256": "7952f53049c319b6c16d71d68a672768b7089ccc89f5d062a62ae2310b5b8ea5",
+  "native_retest_performed": false,
+  "first_native_run": {
+    "result": "failed",
+    "original_processes_ended": true,
+    "later_owned_residual_count": 0,
+    "head": "89cabac2ae77cba14415ae46571a6d8e013badcb",
+    "follower_cause": "undetermined"
+  },
+  "native_scope": {
+    "prior_completion_and_residual_check_required": true,
+    "max_generations_each": 4,
+    "seconds_each": 60,
+    "necessary_repeated_runs_authorized": true,
+    "resources_each": 2
+  },
+  "documentation": {
+    "baseHead": "35aba879579b4c1486b4ef87b043fe0a7bcd34db",
+    "currentHead": "35aba879579b4c1486b4ef87b043fe0a7bcd34db",
+    "gateCount": 12,
+    "allGateExitsZero": true,
+    "targets": [
+      {
+        "slug": "tasks-nr007-35-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "sourceSha256": "35b245c179883b3d7674ea903ce61f67731dc36afe347e61922d4ec574340925",
+        "inputSha256": "4de14006252f1c9564647b2547c16877db82e794a89d4b31ed277966186073ce",
+        "cspellCopySha256": "4de14006252f1c9564647b2547c16877db82e794a89d4b31ed277966186073ce",
+        "gateExits": [
+          {
+            "name": "textlint",
+            "exit": 0
+          },
+          {
+            "name": "whitelist",
+            "exit": 0
+          },
+          {
+            "name": "cspell",
+            "exit": 0
+          },
+          {
+            "name": "yomiyasu",
+            "exit": 0
+          }
+        ]
+      },
+      {
+        "slug": "phases-nr007-35-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "sourceSha256": "900d58404393a60fb3b65ea5d1131f2238ce634c7bd71b08f0e18f8226417190",
+        "inputSha256": "a73248d4d2b27494ab8f49c35a7d348ff9dbf9c9ee99086eae930798d7fef841",
+        "cspellCopySha256": "a73248d4d2b27494ab8f49c35a7d348ff9dbf9c9ee99086eae930798d7fef841",
+        "gateExits": [
+          {
+            "name": "textlint",
+            "exit": 0
+          },
+          {
+            "name": "whitelist",
+            "exit": 0
+          },
+          {
+            "name": "cspell",
+            "exit": 0
+          },
+          {
+            "name": "yomiyasu",
+            "exit": 0
+          }
+        ]
+      },
+      {
+        "slug": "reader-budget-fix-report-full",
+        "source": "reports/issue81-namespace-native-probe-reader-budget-fix-20261029.md",
+        "kind": "full-report",
+        "sourceSha256": "10d0f72713fa93ec93dd7b4c97fc1888d487f6d2afec76e12b7766e74612564c",
+        "inputSha256": "10d0f72713fa93ec93dd7b4c97fc1888d487f6d2afec76e12b7766e74612564c",
+        "cspellCopySha256": "10d0f72713fa93ec93dd7b4c97fc1888d487f6d2afec76e12b7766e74612564c",
+        "gateExits": [
+          {
+            "name": "textlint",
+            "exit": 0
+          },
+          {
+            "name": "whitelist",
+            "exit": 0
+          },
+          {
+            "name": "cspell",
+            "exit": 0
+          },
+          {
+            "name": "yomiyasu",
+            "exit": 0
+          }
+        ]
+      }
+    ],
+    "resultsPath": "final/results.json",
+    "resultsSha256": "3BD69C0F73795F475E154EB8E4AC1DB4C54F9F5620CBC00270CB01E5D2C10AA9",
+    "runnerSha256": "B4928ADEA4A3C4B1D2B772D91DB921096ED3BCC76852D0EC19F2849857125AE2",
+    "runnerStdoutSha256": "70649EA1965E3FC4E899E3D6F880832C1EB0CFA41F2CD2D6982A8AB9FDF6E1C4",
+    "runnerStderrSha256": "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+    "sourceCodeSha256": "C8AB5C577C83D2B535C1CCA08426D9FF845BDB05180B5F2CD2C1387083C89D7D",
+    "nativeProbeRun": false
+  }
+}

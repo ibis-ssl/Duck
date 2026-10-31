@@ -1,0 +1,52 @@
+test	Run dotnet test	﻿2026-10-23T10:23:41.7432114Z ##[group]Run set +e
+test	Run dotnet test	2026-10-23T10:23:41.7432366Z ^[[36;1mset +e^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7432540Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7432811Z ^[[36;1mresults_dir="$GITHUB_WORKSPACE/artifacts/test-results"^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7433119Z ^[[36;1mmkdir -p "$results_dir"^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7433321Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7433543Z ^[[36;1mdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7433863Z ^[[36;1m  --logger "trx;LogFileName=dotnet-test.trx" \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7434143Z ^[[36;1m  --results-directory "$results_dir" \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7434418Z ^[[36;1m  --diag "$results_dir/vstest-diagnostics.log" \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7434670Z ^[[36;1m  --blame \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7434841Z ^[[36;1m  -m:1 \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7435007Z ^[[36;1m  /nr:false \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7435225Z ^[[36;1m  -bl:"$results_dir/dotnet-test.binlog" \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7435505Z ^[[36;1m  > >(tee "$results_dir/dotnet-test.stdout.log") \^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7435791Z ^[[36;1m  2> >(tee "$results_dir/dotnet-test.stderr.log" >&2)^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7436292Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7436651Z ^[[36;1mtest_exit_code=$?^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7436927Z ^[[36;1mprintf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7437226Z ^[[36;1mexit "$test_exit_code"^[[0m
+test	Run dotnet test	2026-10-23T10:23:41.7639723Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run dotnet test	2026-10-23T10:23:41.7640036Z env:
+test	Run dotnet test	2026-10-23T10:23:41.7640206Z   DOTNET_ROOT: /usr/share/dotnet
+test	Run dotnet test	2026-10-23T10:23:41.7640417Z ##[endgroup]
+test	Run dotnet test	2026-10-23T10:23:42.5937658Z   Determining projects to restore...
+test	Run dotnet test	2026-10-23T10:23:44.7565922Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 434 ms).
+test	Run dotnet test	2026-10-23T10:23:44.7573747Z   Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 434 ms).
+test	Run dotnet test	2026-10-23T10:23:44.7580289Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj (in 434 ms).
+test	Run dotnet test	2026-10-23T10:23:44.7581778Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 434 ms).
+test	Run dotnet test	2026-10-23T10:23:44.7640654Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 1 ms).
+test	Run dotnet test	2026-10-23T10:23:45.6770962Z   Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 851 ms).
+test	Run dotnet test	2026-10-23T10:23:45.8023341Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 1.02 sec).
+test	Run dotnet test	2026-10-23T10:23:45.8210378Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 3 ms).
+test	Run dotnet test	2026-10-23T10:23:45.9049376Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 109 ms).
+test	Run dotnet test	2026-10-23T10:23:47.5572244Z /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-23T10:23:47.5574870Z /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-23T10:23:47.6180630Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 2.83 sec).
+test	Run dotnet test	2026-10-23T10:23:47.6279943Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 2.86 sec).
+test	Run dotnet test	2026-10-23T10:23:47.8227288Z /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-23T10:23:55.2719227Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+test	Run dotnet test	2026-10-23T10:23:56.1186384Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+test	Run dotnet test	2026-10-23T10:23:56.6863429Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+test	Run dotnet test	2026-10-23T10:23:57.4561509Z   TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+test	Run dotnet test	2026-10-23T10:24:01.5765082Z   Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+test	Run dotnet test	2026-10-23T10:24:01.7684383Z   Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+test	Run dotnet test	2026-10-23T10:24:01.7773628Z ##[warning]/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+test	Run dotnet test	2026-10-23T10:24:01.7793868Z /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-23T10:24:01.9571125Z   Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+test	Run dotnet test	2026-10-23T10:24:02.5725283Z ##[error]/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Program.cs(254,10): error CS1061: 'IResourceBuilder<ContainerResource>' does not contain a definition for 'WithHttpEndpointCallback' and no accessible extension method 'WithHttpEndpointCallback' accepting a first argument of type 'IResourceBuilder<ContainerResource>' could be found (are you missing a using directive or an assembly reference?) [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+test	Run dotnet test	2026-10-23T10:24:02.7323727Z   Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll
+test	Run dotnet test	2026-10-23T10:24:03.0332279Z   Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+test	Run dotnet test	2026-10-23T10:24:08.0802840Z ##[error]Process completed with exit code 1.

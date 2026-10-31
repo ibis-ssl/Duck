@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/tmp/issue81-referee-receive-udp-settings-red-ci-20261022/source.tar.gz",
+    "sha256": "7ec27e518ef93e91edb7e8b2c490f410c582d8e38081d192ca11c9f1be8470f0",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-udp-settings-red-ci-20261022/dotnet-test.binlog",
+    "sha256": "df89df8c2739ce4dd138ed26ac2133cfb8887f20006e965e3620eba0443dce15",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-udp-settings-red-ci-20261022/failure-artifact.zip",
+    "sha256": "23dcfebc69e75b9a0a1933fe84baa03b68bad547fc5882c9facd1227c17b3052",
+    "reason": "container retained outside branch; individual evidence retained"
+  }
+]

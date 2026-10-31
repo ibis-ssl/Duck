@@ -1,0 +1,73 @@
+{
+  "head": "7cd1c2512872062d80b8d83312f2a19065e81b31",
+  "scope": "current-added-line fragments only; tasks 4 added lines, phases 1 content line plus blank line, design 1 paragraph plus blank line",
+  "input_hashes": {
+    "Tracker/Design/tasks-status.md": "a81f2238025bedc46ed7f7121e06c30c77165531654d50409db91e6ef163cae2",
+    "Tracker/Design/phases-status.md": "787d76747436ee2128a9d7f31b5b9f21e6259e2d2b16140720eace54bd7c9388",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "15dc21edbb5a4951225b6486b36c4c2a8aee9d3ece49465e7b19c389d9d1a7f0"
+  },
+  "tooling": {
+    "node": "v24.20.0",
+    "sudachi_python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "SudachiPy_package_metadata": "unavailable; modules imported from preexisting environment",
+    "system_dictionary_sha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+    "system_dictionary_bytes": 217374303,
+    "config_hashes_match": true,
+    "existing_node_modules_cache": "C:/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+    "mirror_support_files_copied_from_existing_repo": {
+      "list-markdown-targets.js": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "run-cspell-markdown.js": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "textlint-rules/no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+      "textlint-rules/no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+    }
+  },
+  "checks": {
+    "textlint": {
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr_bytes": 0
+    },
+    "cspell": {
+      "exit": 1,
+      "issues": 14,
+      "files": 2,
+      "stdout_sha256": "c78d9151c598161e7e4da1f2c42651ca4b64adf1c14cef230baee2bbc8d8a89d",
+      "stderr_sha256": "1b09449c06a9624f1409c559e06d4e3a1c34ec7f38f57eb12d0f1aaa1bee29c3",
+      "findings": [
+        "tasks-status.md:2 localhost",
+        "tasks-status.md:3 Draft",
+        "tasks-status.md:4 Issue",
+        "aspire-simulation-test-environment.md:1 Vision (3), base, comparison, image, command, bridge, multicast, strict, health"
+      ]
+    },
+    "sudachi": {
+      "exit": 1,
+      "issues": 28,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ba8de952819786237ea6747c676c1e1033d95b1b0633f9851d3723b7b3d0a39a",
+      "findings": [
+        "design paragraph: Vision, base, comparison, image, command, bridge, multicast, strict, health, モデル (2)",
+        "phases line 1: アクセス",
+        "tasks lines 1-4: localhost, Draft, Issue, モデル, アクセス, レシピ, コード"
+      ]
+    },
+    "yomiyasu": "not run; no full-document gate or unmodified-scope check was claimed"
+  },
+  "preparation_failures_preserved": [
+    "final-v1: wrapper dependency list-markdown-targets.js missing; textlint and cspell exited 1 before lint",
+    "final-v2: textlint-rules directory missing; textlint exited 2 before lint; CSpell/Sudachi results are actual findings"
+  ],
+  "runtimehost_observation_reference": {
+    "path": "C:/Users/donabe/Documents/Codex/2026-10-22/task-17/issue81-dcp-runtimehost-run-v2-summary.json",
+    "sha256": "93763AB7276B3B8C1C91B07C7E974179F296ACC18A7FFC8999EEF9FE3FDB142F",
+    "runId": "fed97710c9cc4b0885f6b827b98d0845",
+    "containerFullId": "f3ea729b2c0d22acdae2e6772510a67a6d155ad2218bc2fa53103c88b732e95d",
+    "observed": "same owned RuntimeHost; localhost 39108 -> 127.0.0.1:32003; exec exit 0; no UDP input; /health/vision 503; DCP-owned cleanup completed",
+    "limitations": [
+      "raw event stream/count and exact observation interval not retained",
+      "AppHost wrapper session exit 1 on Ctrl+C; separate AppHost exit not captured"
+    ]
+  }
+}

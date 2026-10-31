@@ -1,0 +1,17 @@
+{
+  "windowsCwd": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-closure-fragments-20261022",
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-03a-closure-fragments-20261022",
+  "cache": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "selectedSourceLines": {
+    "Tracker/Design/tasks-status.md": [
+      27,
+      28
+    ],
+    "Tracker/Design/phases-status.md": [
+      14
+    ]
+  },
+  "documentFragments": 2,
+  "head": "08d49cdf270ea5ab090a211c84d43190710cd3c9",
+  "status": " M Tracker/Design/phases-status.md\n M Tracker/Design/tasks-status.md\n M reports/issue81-referee-receive-normal-review-20261022.md\n?? reports/evidence/issue81-referee-receive-cache-race-green-ci-20261022/\n"
+}

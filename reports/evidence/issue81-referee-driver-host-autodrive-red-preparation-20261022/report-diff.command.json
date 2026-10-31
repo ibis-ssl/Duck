@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--",
+    "reports/issue81-referee-driver-host-implementation-20261022.md"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge"
+}

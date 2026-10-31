@@ -1,0 +1,142 @@
+{
+  "files": [
+    {
+      "path": "artifacts.command.json",
+      "bytes": 116,
+      "sha256": "edcd9034ddda760b7c60636e8a0e3042dfca3756482b24504affd24809893534"
+    },
+    {
+      "path": "artifacts.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "artifacts.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts.stdout.log",
+      "bytes": 32,
+      "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c"
+    },
+    {
+      "path": "ci-evidence.json",
+      "bytes": 2877,
+      "sha256": "c831020c297a577e67e6767f02f653e7ac7487121cbf9c99fcd0697498dfe88d"
+    },
+    {
+      "path": "ci-test-command.txt",
+      "bytes": 474,
+      "sha256": "06ac5e881559eb35e1f1b04520378868224ed3e8a9a38629564ff135d8c743b5"
+    },
+    {
+      "path": "commands-summary.json",
+      "bytes": 1387,
+      "sha256": "558f06ca6b20b0eb9d39f816767348de49e2aa1134a125e80da21355c93f6d23"
+    },
+    {
+      "path": "head-source-manifest.json",
+      "bytes": 1981,
+      "sha256": "5b32dd8271195d075f290d890767fc8a15b99889d02fa23d3ce4c728b554a17d"
+    },
+    {
+      "path": "run-list.command.json",
+      "bytes": 278,
+      "sha256": "7d10d580ac5722c43919f853d211f4563332ce618d5b6b5d18ade204b320a19e"
+    },
+    {
+      "path": "run-list.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "run-list.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run-list.stdout.log",
+      "bytes": 230,
+      "sha256": "5d15c65833fd774928b38a5880ddf7efdf9ba6d8d57cecb2e452c12fce67deff"
+    },
+    {
+      "path": "test-log.command.json",
+      "bytes": 154,
+      "sha256": "a7f944f0066a18ef3f5b02c965a20bcea196c3e7a4c65a082707cef5d6a49ee0"
+    },
+    {
+      "path": "test-log.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "test-log.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-log.stdout.log",
+      "bytes": 51545,
+      "sha256": "8eda7963261d7e4e65f8d4022530cc4c6723730a0a8ff7678d3e299cbd530972"
+    },
+    {
+      "path": "test-source-delta.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view.command.json",
+      "bytes": 172,
+      "sha256": "94ad663ebbe7da1b841f70700e0c31c40fd682d08c840fddfc7915dc50303449"
+    },
+    {
+      "path": "view.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "view.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view.stdout.log",
+      "bytes": 2436,
+      "sha256": "804921d70e6745c102632019e2b14ff10df141f3ee798e8c2ea2e449141ac67d"
+    },
+    {
+      "path": "watch.command.json",
+      "bytes": 157,
+      "sha256": "a15ff274ea2fc162820c7976f2c6e08b0375eaf1b2d1f2c5784bd81ed36b9ebf"
+    },
+    {
+      "path": "watch.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "watch.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "watch.stdout.log",
+      "bytes": 4374,
+      "sha256": "30b2ffbe88ab60d31159bb28a76f48828f87dce7441ce986e99a9da185819607"
+    }
+  ],
+  "raw_logs": [
+    "artifacts.stderr.log",
+    "artifacts.stdout.log",
+    "run-list.stderr.log",
+    "run-list.stdout.log",
+    "test-log.stderr.log",
+    "test-log.stdout.log",
+    "view.stderr.log",
+    "view.stdout.log",
+    "watch.stderr.log",
+    "watch.stdout.log"
+  ],
+  "note": "Preserve ignored logs when parent persists evidence. No success TRX/artifact uploaded."
+}

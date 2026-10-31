@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "workUnit": "Issue81 G5C1 NR001 R2",
+  "baseline": "a0d6e36139d0e8bd59befd8ae728be5bd62a1a3d",
+  "changedFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "5BBFBE99FFB00FD00B914AE23E3E30707F4AC131FDE9FB55A044F79A26E3994A"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "054A86BD70A628EFB3F0BE3E3723705BA21FBA09110FE6562D2737BD1CE7E4E9"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "97DD51DA5542F22CB669E628CE48B71BF41E4FF863593ADD03601B310721503B"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "3F83E06A65961FA5E1D493BA02FC770F64DDB4D55860126188438903478ED1BD"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "C1765AB086679E9B2B6B74D91E469D512D72260E12DC40ABF28ABFC1BD5274F5"
+    }
+  ],
+  "validation": {
+    "focused": {
+      "passed": 6,
+      "failed": 0,
+      "exit": 0,
+      "includedInRelated": true
+    },
+    "related": {
+      "passed": 60,
+      "failed": 0,
+      "exit": 0,
+      "scope": "4 readiness/reconfiguration/controller test classes"
+    },
+    "releaseBuild": {
+      "exit": 0,
+      "errors": 0
+    },
+    "documentGates": [
+      {
+        "document": "design",
+        "gate": "textlint",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "copySha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 23664,
+        "startedUtc": "2026-10-30T08:47:03.603348+00:00",
+        "endedUtc": "2026-10-30T08:47:03.993274+00:00"
+      },
+      {
+        "document": "design",
+        "gate": "whitelist",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "copySha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 8696,
+        "startedUtc": "2026-10-30T08:47:03.994306+00:00",
+        "endedUtc": "2026-10-30T08:47:04.846551+00:00"
+      },
+      {
+        "document": "design",
+        "gate": "cspell",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "copySha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "9093D9800BFF427EC6F9545538CBD0AA1A2F72C6BF8E1F16BE0003E7F4B26C7E",
+        "pid": 16976,
+        "startedUtc": "2026-10-30T08:47:04.848687+00:00",
+        "endedUtc": "2026-10-30T08:47:05.350144+00:00"
+      },
+      {
+        "document": "design",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "copySha256": "1E719B4D6C69D6E3214DE0B8AF4BCA6F7DD781D1F393C9D1335447505525064C",
+        "stdoutSha256": "D3D05E148F35F6571C23B0E36A012EB5B3DCAC23C839B676FDAF720706871774",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 11644,
+        "startedUtc": "2026-10-30T08:47:05.351021+00:00",
+        "endedUtc": "2026-10-30T08:47:05.438039+00:00"
+      },
+      {
+        "document": "tasks",
+        "gate": "textlint",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "copySha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 5260,
+        "startedUtc": "2026-10-30T08:47:05.438924+00:00",
+        "endedUtc": "2026-10-30T08:47:05.804052+00:00"
+      },
+      {
+        "document": "tasks",
+        "gate": "whitelist",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "copySha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 10824,
+        "startedUtc": "2026-10-30T08:47:05.804839+00:00",
+        "endedUtc": "2026-10-30T08:47:06.636484+00:00"
+      },
+      {
+        "document": "tasks",
+        "gate": "cspell",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "copySha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "D4C69649F85B45FF9EC698C9FF3D2F320E6A10B5C3F25134BDE3FE4FBF1BE342",
+        "pid": 27076,
+        "startedUtc": "2026-10-30T08:47:06.637091+00:00",
+        "endedUtc": "2026-10-30T08:47:07.135734+00:00"
+      },
+      {
+        "document": "tasks",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "copySha256": "7E56690B1C6AD7D610C7975CE48857F0CC40301499CBDF707F209BE54C9ABB20",
+        "stdoutSha256": "E6DDE700D7B2C43D18273A9C6EA6E10B26676DB3695C92F5E5A89FB7DEF40A6C",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 30060,
+        "startedUtc": "2026-10-30T08:47:07.136566+00:00",
+        "endedUtc": "2026-10-30T08:47:07.227771+00:00"
+      },
+      {
+        "document": "phases",
+        "gate": "textlint",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "copySha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 25084,
+        "startedUtc": "2026-10-30T08:47:07.228751+00:00",
+        "endedUtc": "2026-10-30T08:47:07.591676+00:00"
+      },
+      {
+        "document": "phases",
+        "gate": "whitelist",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "copySha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 34268,
+        "startedUtc": "2026-10-30T08:47:07.592673+00:00",
+        "endedUtc": "2026-10-30T08:47:08.439754+00:00"
+      },
+      {
+        "document": "phases",
+        "gate": "cspell",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "copySha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "9D38E0B18D958529BAC510ECAD6E54F4D9E44E609E219E39495BE1634D1A4B20",
+        "pid": 11572,
+        "startedUtc": "2026-10-30T08:47:08.440561+00:00",
+        "endedUtc": "2026-10-30T08:47:08.939360+00:00"
+      },
+      {
+        "document": "phases",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "timedOut": false,
+        "inputSha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "copySha256": "2E2B72B16DDF298E401C83E0DD12FFF91BCE15A63A749EA2EA933BE6BE4D9DC8",
+        "stdoutSha256": "63F2D5B444FB22EC324F8F82473A211D9BA4E2399C611A50C9EA3E1AA7CA7669",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "pid": 30848,
+        "startedUtc": "2026-10-30T08:47:08.940256+00:00",
+        "endedUtc": "2026-10-30T08:47:09.029503+00:00"
+      }
+    ]
+  },
+  "behaviorRed": {
+    "candidateBtoC": "not obtained",
+    "note": "Controlled fixture timed out before assertions; it is not counted as Red."
+  },
+  "limitations": [
+    "Dotnet OS PID/UTC/sourcecopy at test time were not captured; current source hashes are post-run.",
+    "No DCP/AppHost/helper runtime, deployment, or UDP acceptance.",
+    "C2/Crane resynchronization remains out of scope."
+  ],
+  "commitOrPushPerformed": false,
+  "coverageMatrix": [
+    {
+      "cell": "fast-path awaited candidate versus current CM4",
+      "production": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs:605-606",
+      "dynamicCase": "not obtained"
+    },
+    {
+      "cell": "notification wait candidate versus current CM4",
+      "production": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs:636",
+      "dynamicCase": "not obtained"
+    },
+    {
+      "cell": "same physical CM4, refreshed ownership proof",
+      "test": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs:91",
+      "focusedPassed": true
+    },
+    {
+      "cell": "Simulator full container ID replacement",
+      "test": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs:90,317-318",
+      "focusedPassed": true
+    }
+  ]
+}

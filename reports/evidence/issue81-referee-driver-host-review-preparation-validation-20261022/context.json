@@ -1,0 +1,19 @@
+{
+  "repo": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-referee-driver-host-review-preparation-20261022",
+  "windowsCwd": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-review-preparation-20261022",
+  "cache": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "actualFullTargetCount": 24,
+  "sourceAndMirrorSetsMatch": true,
+  "trackingFragments": {
+    "Tracker/Design/tasks-status.md": [
+      27,
+      30
+    ],
+    "Tracker/Design/phases-status.md": [
+      14
+    ]
+  },
+  "configurationUnchanged": 21
+}

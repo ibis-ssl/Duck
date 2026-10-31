@@ -1,0 +1,11 @@
+{
+  "files": [
+    "ci-evidence.json",
+    "head-source-manifest.json",
+    "final-view.stdout.log",
+    "artifacts.stdout.log"
+  ],
+  "success": true,
+  "utc": "2026-10-22T20:00:24.173814+00:00",
+  "allIssuedSynchronousProcessesEnded": true
+}

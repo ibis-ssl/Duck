@@ -1,0 +1,110 @@
+{
+  "preflight": {
+    "head": "7cd1c2512872062d80b8d83312f2a19065e81b31",
+    "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+    "inputs": {
+      "Tracker/Design/tasks-status.md": "a81f2238025bedc46ed7f7121e06c30c77165531654d50409db91e6ef163cae2",
+      "Tracker/Design/phases-status.md": "787d76747436ee2128a9d7f31b5b9f21e6259e2d2b16140720eace54bd7c9388",
+      "Tracker/Design/Testing/aspire-simulation-test-environment.md": "15dc21edbb5a4951225b6486b36c4c2a8aee9d3ece49465e7b19c389d9d1a7f0"
+    },
+    "expected_inputs": {
+      "Tracker/Design/tasks-status.md": "a81f2238025bedc46ed7f7121e06c30c77165531654d50409db91e6ef163cae2",
+      "Tracker/Design/phases-status.md": "787d76747436ee2128a9d7f31b5b9f21e6259e2d2b16140720eace54bd7c9388",
+      "Tracker/Design/Testing/aspire-simulation-test-environment.md": "15dc21edbb5a4951225b6486b36c4c2a8aee9d3ece49465e7b19c389d9d1a7f0"
+    },
+    "input_match": true,
+    "config_hashes": {
+      ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "tools/lint/scripts/run-markdown-targets.js": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33"
+    },
+    "expected_config_hashes": {
+      ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "tools/lint/scripts/run-markdown-targets.js": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33"
+    },
+    "config_match": true,
+    "mirror_helper_hashes": {
+      "tools/lint/scripts/list-markdown-targets.js": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "tools/lint/scripts/run-cspell-markdown.js": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307"
+    },
+    "expected_helper_hashes": {
+      "tools/lint/scripts/list-markdown-targets.js": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "tools/lint/scripts/run-cspell-markdown.js": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307"
+    },
+    "helpers_match": true,
+    "dictionary_path": "/home/donabe/venvs/duck-pr73-r04-ff50682/lib/python3.14/site-packages/sudachidict_core/resources/system.dic",
+    "dictionary_sha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+    "dictionary_size": 217374303,
+    "sudachi_python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python"
+  },
+  "checks": [
+    {
+      "name": "textlint",
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-markdown-targets.js",
+        "text",
+        "--files",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Design/phases-status.md",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+      "exit": 2,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3cbadaf2246f00cb788bffc4d104a8de515b00458eb5637b68908421220482ba",
+      "stdout_bytes": 0,
+      "stderr_bytes": 1018,
+      "elapsed_seconds": 0.48
+    },
+    {
+      "name": "cspell",
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-markdown-targets.js",
+        "spell",
+        "--files",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Design/phases-status.md",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "c78d9151c598161e7e4da1f2c42651ca4b64adf1c14cef230baee2bbc8d8a89d",
+      "stderr_sha256": "1b09449c06a9624f1409c559e06d4e3a1c34ec7f38f57eb12d0f1aaa1bee29c3",
+      "stdout_bytes": 1185,
+      "stderr_bytes": 218,
+      "elapsed_seconds": 0.639
+    },
+    {
+      "name": "sudachi",
+      "argv": [
+        "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Design/phases-status.md",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ba8de952819786237ea6747c676c1e1033d95b1b0633f9851d3723b7b3d0a39a",
+      "stdout_bytes": 0,
+      "stderr_bytes": 3576,
+      "elapsed_seconds": 0.728
+    }
+  ],
+  "all_processes_finished": true
+}

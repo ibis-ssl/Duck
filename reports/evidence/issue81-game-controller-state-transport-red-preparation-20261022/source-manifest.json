@@ -1,0 +1,25 @@
+{
+  "head": "38bb4890f988d5d42155750452cc9d23d4f86881",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+      "sha256": "1cd10b71401c41ce6bdca37cb6dc20736c49f79d885734731ee98179ba0ee9a6"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateTransportTests.cs",
+      "sha256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764"
+    }
+  ],
+  "fixedInitialTestSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+  "other25SourcesUnchanged": true,
+  "trackedTestsUnchanged": true,
+  "scaffoldOnlyProof": "scaffold-only-identity-proof.json",
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "runtimeTestRuns": 0,
+  "formalCapability": "remote_ci_only",
+  "expectedSuiteCount": 666,
+  "actualSuiteCount": "pending parent exactSHA CI",
+  "originalProfile": "gpt-6.1-sol/high",
+  "applied": null
+}

@@ -1,0 +1,5 @@
+Existing lint evidence was not rerun; original WSL /tmp files remain at the absolute paths listed in prior-lint-reference.sha256.
+Selected files=38
+Initial historical direct UNC attempt: not present in these saved source directories; handoff says it reported unsupported and was later replaced by the successful Windows Node + cache junction mirror route. Do not treat it as the definitive lint environment.
+
+Classification: all 38 listed files are 03C historical reference only. They do not establish 04A source/config/dictionary identity or 04A Yomiyasu/Sudachi results. Current 04A evidence is recorded in 04a-lint-source-context.json, 04a-lint-runtime-context.txt, 04a-lint-results-summary.json, and the current raw command/stdout/stderr/exit files (including corrected *-captured Sudachi JSON).

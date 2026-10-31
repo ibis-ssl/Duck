@@ -1,0 +1,55 @@
+{
+  "runId": 39833466268,
+  "headSha": "d384603e15e0840d67002820830e545771700228",
+  "event": "pull_request",
+  "status": "in_progress",
+  "conclusion": "",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39833466268",
+  "testJob": "completed/success",
+  "testJobCounts": {
+    "failed": 0,
+    "passed": 707,
+    "skipped": 0,
+    "total": 707
+  },
+  "jobs": [
+    {
+      "id": 120015515925,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "completedAt": "2026-10-22T18:42:27Z"
+    },
+    {
+      "id": 120015518283,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped",
+      "completedAt": "2026-10-22T18:40:43Z"
+    },
+    {
+      "id": 120016371635,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "completedAt": "2026-10-22T18:42:27Z"
+    }
+  ],
+  "runFinalization": "pending; alljobs completed does not establish run success",
+  "artifactCount": 0,
+  "individualTRX": false,
+  "sourceArchiveAvailable": false,
+  "outcomeGranularity": "707 aggregate job success; no individualTRX; sourcefixed unchanged only",
+  "sourceCount": 30,
+  "headDiskExpectedPrePostMatch": true,
+  "fixedMappingTestSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+  "monitorSession": 60043,
+  "monitorExit": "pending",
+  "scope": "mappingunit; no nextage/epoch/responseorder work",
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

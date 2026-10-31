@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "repos/TIGERs-Mannheim/Sumatra/actions/runs?head_sha=0bb4c653ef8611f9e71a880165f101209be97b3c&per_page=100"
+  ],
+  "method": "GET",
+  "metadata_only": true
+}

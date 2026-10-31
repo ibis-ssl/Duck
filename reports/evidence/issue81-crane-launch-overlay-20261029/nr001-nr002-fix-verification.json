@@ -1,0 +1,165 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07F NR001/P2 and NR002/P2 product fixes",
+  "base_head": "98e27ea3417ebb54acbaa88111e673c082d52aa1",
+  "verification_identity": "working-tree fingerprints; not native container acceptance",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/CraneLaunchOverlay.py",
+      "tested_worktree_sha256": "48b520d4e16002d59656b8edbc9b0a25e24cde704c3bba64666928389870ceb1",
+      "normalized_lf_sha256": "48b520d4e16002d59656b8edbc9b0a25e24cde704c3bba64666928389870ceb1"
+    },
+    {
+      "path": "scripts/tests/test_crane_launch_overlay.py",
+      "tested_worktree_sha256": "3353cb16511d51c820f71673f25b21433a6bc9439e4098e727bd2e16ed36dd00",
+      "normalized_lf_sha256": "3353cb16511d51c820f71673f25b21433a6bc9439e4098e727bd2e16ed36dd00"
+    },
+    {
+      "path": ".github/workflows/dotnet-test.yml",
+      "tested_worktree_sha256": "9414a1e2e9596e783a17fefc3568822ffbc2e19748623db1751ae87c1ed7c232",
+      "normalized_lf_sha256": "069c7fe081ee0c524255f7817938caa31f11c3a7d036f4942c837f823070c8d4"
+    }
+  ],
+  "python_windows": {
+    "executed": 11,
+    "passed": 10,
+    "skipped": 1,
+    "skip": "POSIX owned group and unrelated child isolation; expected in normal Ubuntu job after this change",
+    "exit": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "98a01061d84936c9d3251cb74ca5e8f79def2b12a78ab57bb4bb689e7da1aa4d"
+  },
+  "apphost_model_regression": {
+    "passed": 77,
+    "skipped": 0,
+    "exit": 0
+  },
+  "release_build": {
+    "exit": 0,
+    "warnings": [
+      "existing ASPIRE010"
+    ],
+    "source_helper_sha256": "48b520d4e16002d59656b8edbc9b0a25e24cde704c3bba64666928389870ceb1",
+    "output_helper_sha256": "48b520d4e16002d59656b8edbc9b0a25e24cde704c3bba64666928389870ceb1"
+  },
+  "documentation": {
+    "inputs": [
+      {
+        "name": "tasks-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "inputSha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270",
+        "cspellCopySha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270",
+        "addedLineCount": 1,
+        "bytes": 1137
+      },
+      {
+        "name": "phases-added",
+        "source": "Tracker/Design/phases-status.md",
+        "inputSha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d",
+        "cspellCopySha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d",
+        "addedLineCount": 2,
+        "bytes": 479
+      }
+    ],
+    "gates": [
+      {
+        "input": "tasks-added",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270"
+      },
+      {
+        "input": "tasks-added",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270"
+      },
+      {
+        "input": "tasks-added",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "4837e6a3316b0923c04b8855c18193b62ca407c942f211dca30daeed86e4c746",
+        "cspellCopySha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270"
+      },
+      {
+        "input": "tasks-added",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270",
+        "stdoutSha256": "bf2738891214de1bc9611891ac75de2539363fffc661c3a058dda056a3047546",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "42dfda8e114491bb31643308218152f608a1bc1b33ca162b434ed0dc2a5c7270"
+      },
+      {
+        "input": "phases-added",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d"
+      },
+      {
+        "input": "phases-added",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d"
+      },
+      {
+        "input": "phases-added",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e0d098f659f76f888e74c98e49351aeb63703c84050f17bb76b955a9eaa513ce",
+        "cspellCopySha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d"
+      },
+      {
+        "input": "phases-added",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d",
+        "stdoutSha256": "5c25c2c12ca0f572ab9f9b823ed5a914179142a23e438a1db4ade1462d1aa388",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspellCopySha256": "afa1a0315c6fdc90e4a83bd447c01dd520abe98552db46abede4c869795fcd1d"
+      }
+    ],
+    "private_manifest_sha256": "57bb0e19a51b6f63904991a1a9c19d1f0721f55d9792342245e36ac84639a038",
+    "design_unchanged_from_98e27": true
+  },
+  "fixes": {
+    "NR001": "parse real XML elements, exclude comments, patch validated actual byte span, handle paired tag and reject duplicate real elements",
+    "NR002": "catch SIGTERM/SIGINT, bound wait/reap for owned DNS and ROS child/group, cleanup only owned temporary prefix after reap"
+  },
+  "procedure": {
+    "NR001": "initial single-paired rejection expectation revised to supported transformation; duplicate rejection and post-hoc fixed98 actual-consumer comparisons retained; no same-expectation claim for revised case",
+    "NR002": "correct catchable cancellation reconstruction ran after Green implementation started; antecedent TDD not fulfilled; Windows forced parent termination is separate invalid-contract history"
+  },
+  "ci": {
+    "new_normal_test_step": "crane_launch_overlay",
+    "command": "python3 -B -m unittest discover -s scripts/tests -p 'test_crane_launch_overlay.py' -v",
+    "status": "pending next public HEAD",
+    "previous_discovery_was_in_skipped_acceptance_job": true,
+    "new_dependencies": false,
+    "docker_started": false
+  },
+  "normal_fix_review": "pending same reviewer",
+  "private_verification_manifest_sha256": "6a3249d6f062022da1532bcd92b876150ac6594e7d39a300a68430a15fef8639",
+  "native_runtime_executed": false,
+  "remaining": [
+    "actual fixed Crane startup/DNS/UDP unverified",
+    "normal base four-resource migration and CM4 loopback unresolved",
+    "whole Issue81 independent final review not performed"
+  ]
+}

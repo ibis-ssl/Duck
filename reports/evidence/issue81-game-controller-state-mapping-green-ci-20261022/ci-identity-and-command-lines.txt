@@ -1,0 +1,10 @@
+2026-10-22T18:40:54.4864772Z HEAD is now at 0583e14 Merge d384603e15e0840d67002820830e545771700228 into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+2026-10-22T18:40:57.5660680Z dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \
+2026-10-22T18:40:57.5660898Z   --logger "trx;LogFileName=dotnet-test.trx" \
+2026-10-22T18:40:57.5661097Z   --results-directory "$results_dir" \
+2026-10-22T18:40:57.5661284Z   --diag "$results_dir/vstest-diagnostics.log" \
+2026-10-22T18:40:57.5661453Z   --blame \
+2026-10-22T18:40:57.5661571Z   -m:1 \
+2026-10-22T18:40:57.5661679Z   /nr:false \
+2026-10-22T18:40:57.5661820Z   -bl:"$results_dir/dotnet-test.binlog" \
+2026-10-22T18:42:20.1293177Z Passed!  - Failed:     0, Passed:   707, Skipped:     0, Total:   707, Duration: 29 s - Tracker.Tests.dll (net10.0)

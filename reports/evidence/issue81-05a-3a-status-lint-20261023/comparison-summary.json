@@ -1,0 +1,74 @@
+{
+  "baseline_head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "current_head": "3a7e62e6e8b3fad156414f47be43963b835298b7",
+  "changed_task_rows": 1,
+  "task_row_line": 38,
+  "config_files": 9,
+  "config_sha256_manifest": "9f2e9f4fcc3b5d02316e99e2d813c27e5b88e218707ab2db49f64d3deef09e85",
+  "node_version": "v24.20.0",
+  "sudachi_python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "results": {
+    "baseline": {
+      "textlint": {
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input_sha256": "13caa0ca610febbc1ecf61181354ca1c298d944ff462d1c77f09133a89d6f893",
+        "input_bytes": 610
+      },
+      "cspell": {
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "a51eca1384625ece1a0c81f6cb90a76839ba6934d36cfcd66f0dbea20cf7029e",
+        "input_sha256": "13caa0ca610febbc1ecf61181354ca1c298d944ff462d1c77f09133a89d6f893",
+        "input_bytes": 610
+      },
+      "sudachi": {
+        "exit": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "02359a7c6432f46f4979922eecf17fa205df921f272a74cbcb3646956ee8ecac",
+        "input_sha256": "13caa0ca610febbc1ecf61181354ca1c298d944ff462d1c77f09133a89d6f893",
+        "input_bytes": 610
+      }
+    },
+    "current": {
+      "textlint": {
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input_sha256": "6dc2f852830eae610fc97c6a6c51914c33ffd50fec469f939258d9b85e810a73",
+        "input_bytes": 732
+      },
+      "cspell": {
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "56627681fc62c18cfc22c0b20b97f28799cab026fd68ddbfe9fa01528dfa3f6a",
+        "input_sha256": "6dc2f852830eae610fc97c6a6c51914c33ffd50fec469f939258d9b85e810a73",
+        "input_bytes": 732
+      },
+      "sudachi": {
+        "exit": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "02359a7c6432f46f4979922eecf17fa205df921f272a74cbcb3646956ee8ecac",
+        "input_sha256": "6dc2f852830eae610fc97c6a6c51914c33ffd50fec469f939258d9b85e810a73",
+        "input_bytes": 732
+      }
+    }
+  },
+  "baseline_current_sudachi_diagnostic_byte_equal": true,
+  "existing_sudachi_tokens": [
+    "TCP",
+    "モデル"
+  ],
+  "new_sudachi_findings": [],
+  "whitelist_or_dictionary_changed": false,
+  "local_first_setup_error": {
+    "exit": 1,
+    "reason": "FileNotFoundError: mirror/Tracker/Design missing while preparing scratch; no lint ran; subsequent mkdir/preflight succeeded"
+  },
+  "first_gh_watch_preparation_error": {
+    "exit": 1,
+    "reason": "gh could not infer base repo from non-git cwd; no run inspection occurred; repository-explicit watch succeeded"
+  },
+  "data_capture": "stdout/stderr bytes from subprocess; no PowerShell text conversion"
+}
