@@ -96,6 +96,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
             Assert.Null(Environment.GetEnvironmentVariable("PATH"));
+            if (OperatingSystem.IsWindows())
+            {
+                var existingDockerDesktopExecutable = NamespaceProbeDcpAcceptanceTests.GetDockerExecutablePath();
+                var (fallbackExecutable, fallbackPathScope) = ResolveAndPrepareDockerExecutable(null, null);
+                using (fallbackPathScope)
+                {
+                    Assert.Equal(existingDockerDesktopExecutable, fallbackExecutable);
+                    Assert.Equal(
+                        fallbackExecutable,
+                        ResolveDockerExecutable(null, Environment.GetEnvironmentVariable("PATH")));
+                }
+
+                Assert.Null(Environment.GetEnvironmentVariable("PATH"));
+            }
         }
         finally
         {
