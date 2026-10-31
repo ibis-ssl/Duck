@@ -62,6 +62,21 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void MovesSelectedDockerDirectoryAheadOfEarlierPathEntries()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var earlierDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "earlier-bin")).FullName;
+        var dockerDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "selected-docker-bin")).FullName;
+        var laterDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "later-bin")).FullName;
+        var dockerExecutable = CreateDockerExecutable(dockerDirectory);
+        var existingPath = string.Join(Path.PathSeparator, earlierDirectory, dockerDirectory, laterDirectory);
+
+        Assert.Equal(
+            string.Join(Path.PathSeparator, dockerDirectory, earlierDirectory, laterDirectory),
+            PrependDockerDirectoryToPath(dockerExecutable, existingPath));
+    }
+
+    [Fact]
     public void RestoresPathAfterDockerPathScopeExitsWithAnError()
     {
         using var temporaryDirectory = new TemporaryDirectory();
@@ -601,19 +616,31 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     {
         var dockerDirectory = Path.GetDirectoryName(Path.GetFullPath(dockerExecutable))
             ?? throw new InvalidOperationException($"Docker executable has no containing directory: {dockerExecutable}");
-        var existingDirectories = (path ?? string.Empty)
-            .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (existingDirectories.Any(directory => string.Equals(
-                Path.TrimEndingDirectorySeparator(Path.GetFullPath(directory)),
-                Path.TrimEndingDirectorySeparator(dockerDirectory),
-                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)))
+        if (string.IsNullOrEmpty(path))
         {
-            return path!;
+            return dockerDirectory;
         }
 
-        return string.IsNullOrEmpty(path)
-            ? dockerDirectory
-            : dockerDirectory + Path.PathSeparator + path;
+        var existingDirectories = path.Split(Path.PathSeparator, StringSplitOptions.None);
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        var normalizedDockerDirectory = Path.TrimEndingDirectorySeparator(dockerDirectory);
+        var matchingIndices = existingDirectories
+            .Select((directory, index) => (directory, index))
+            .Where(item => !string.IsNullOrWhiteSpace(item.directory) && string.Equals(
+                Path.TrimEndingDirectorySeparator(Path.GetFullPath(item.directory.Trim())),
+                normalizedDockerDirectory,
+                comparison))
+            .Select(item => item.index)
+            .ToHashSet();
+
+        if (matchingIndices.Contains(0) && matchingIndices.Count == 1)
+        {
+            return path;
+        }
+
+        var remainingDirectories = existingDirectories
+            .Where((_, index) => !matchingIndices.Contains(index));
+        return dockerDirectory + Path.PathSeparator + string.Join(Path.PathSeparator, remainingDirectories);
     }
 
     private static IDisposable AddDockerDirectoryToProcessPath(string dockerExecutable)
