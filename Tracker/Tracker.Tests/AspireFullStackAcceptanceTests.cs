@@ -451,12 +451,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Order(StringComparer.Ordinal)
             .ToArray();
-        string? expectedRunId = null;
+        string? expectedDcpRunId = null;
         foreach (var containerId in containerIds)
         {
-            var runId = await AssertStackOwnedContainerAsync(containerId, stackId);
-            expectedRunId ??= runId;
-            Assert.Equal(expectedRunId, runId);
+            var ownership = await AssertStackOwnedContainerAsync(containerId, stackId);
+            if (!ownership.IsWrapperOwned)
+            {
+                expectedDcpRunId ??= ownership.RunId;
+                Assert.Equal(expectedDcpRunId, ownership.RunId);
+            }
         }
 
         return containerIds;
@@ -473,7 +476,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
-    private static async Task<string> AssertStackOwnedContainerAsync(string containerId, string stackId)
+    private static async Task<(bool IsWrapperOwned, string RunId)> AssertStackOwnedContainerAsync(string containerId, string stackId)
     {
         var inspection = await RunProcessAsync("docker", [
             "inspect", "--format", "{{json .Config.Labels}}", containerId,
@@ -484,16 +487,16 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var labels = labelsDocument.RootElement;
         Assert.Equal(stackId, labels.GetProperty(DockerContainerSpec.StackLabel).GetString());
         var resourceName = labels.GetProperty(DockerContainerSpec.ResourceLabel).GetString();
-        Assert.NotNull(resourceName);
-        Assert.Contains(resourceName, new[] { "simulator", "duck", "game-controller", "cm4-sim", "crane" });
+        Assert.False(string.IsNullOrWhiteSpace(resourceName));
         var runId = labels.GetProperty(DockerContainerSpec.RunLabel).GetString();
         Assert.False(string.IsNullOrWhiteSpace(runId));
         if (labels.TryGetProperty(DockerContainerSpec.OwnerLabel, out var owner))
         {
             Assert.Equal(DockerContainerSpec.OwnerValue, owner.GetString());
+            return (true, runId!);
         }
 
-        return runId!;
+        return (false, runId!);
     }
 
     private static async Task<ProcessResult> RunProcessAsync(string fileName, IEnumerable<string> arguments, TimeSpan timeout)

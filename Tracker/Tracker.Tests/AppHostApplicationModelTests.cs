@@ -830,6 +830,22 @@ public sealed class AppHostApplicationModelTests
 
         var tigersLaunch = await GetLaunchOptionsAsync(tigers);
         var erForceLaunch = await GetLaunchOptionsAsync(erForce);
+        var tigersSpec = ToSpec(tigersLaunch);
+        var erForceSpec = ToSpec(erForceLaunch);
+        Assert.Equal(tigersSpec.StackId, erForceSpec.StackId);
+        Assert.NotEqual(tigersSpec.RunId, erForceSpec.RunId);
+        foreach (var (spec, resourceName) in new[]
+                 {
+                     (tigersSpec, "tracker-tigers"),
+                     (erForceSpec, "tracker-erforce"),
+                 })
+        {
+            var ownershipArguments = spec.CreateRunArguments();
+            Assert.Contains($"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}", ownershipArguments);
+            Assert.Contains($"{DockerContainerSpec.StackLabel}={spec.StackId}", ownershipArguments);
+            Assert.Contains($"{DockerContainerSpec.ResourceLabel}={resourceName}", ownershipArguments);
+            Assert.Contains($"{DockerContainerSpec.RunLabel}={spec.RunId}", ownershipArguments);
+        }
         Assert.Equal("tigersmannheim/sumatra:2025", tigersLaunch.Image);
         Assert.Equal("roboticserlangen/autoref:2025.1.0", erForceLaunch.Image);
         Assert.Contains("host", ToSpec(tigersLaunch).CreateRunArguments());
