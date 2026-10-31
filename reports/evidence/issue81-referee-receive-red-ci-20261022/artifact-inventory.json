@@ -1,0 +1,42 @@
+[
+  {
+    "name": "dotnet-test.binlog",
+    "bytes": 1507718
+  },
+  {
+    "name": "dotnet-test.exit-code",
+    "bytes": 2
+  },
+  {
+    "name": "dotnet-test.stderr.log",
+    "bytes": 150
+  },
+  {
+    "name": "dotnet-test.stdout.log",
+    "bytes": 6268
+  },
+  {
+    "name": "dotnet-test.trx",
+    "bytes": 873683
+  },
+  {
+    "name": "environment.txt",
+    "bytes": 3259
+  },
+  {
+    "name": "source.tar.gz",
+    "bytes": 9656468
+  },
+  {
+    "name": "vstest-diagnostics.datacollector.26-10-22_13-08-29_57755_5.log",
+    "bytes": 1091521
+  },
+  {
+    "name": "vstest-diagnostics.host.26-10-22_13-08-29_88858_5.log",
+    "bytes": 2427646
+  },
+  {
+    "name": "vstest-diagnostics.log",
+    "bytes": 1865717
+  }
+]

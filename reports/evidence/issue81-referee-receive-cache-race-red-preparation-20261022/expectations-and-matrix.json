@@ -1,0 +1,45 @@
+{
+  "finding": "I81-NR-002",
+  "scope": "test/scaffold only; behavior repair forbidden until parent adopts runtime Red",
+  "baseline": "95ce7801224f6d2a77fc2ab6487675fe44fcb433",
+  "governingTDD": "Tracker/Design/Testing/tracker-comparison-debug-design.md:260",
+  "actualFixture": "RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication",
+  "runtimeExpectedFailure": {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs",
+    "line": 89,
+    "assertion": "Assert.False(subscription.IsCompleted)",
+    "reason": "old A may be returned using accepted B diagnostic age before B publication",
+    "notObserved": true
+  },
+  "sequence": [
+    "same endpoint A counter7 at t0 twice: count2 ready",
+    "advance manual clock6seconds: A expired",
+    "subscriber holds commandGate before diagnostic read",
+    "same endpoint B counter8 accepted by real parser/diagnostics at t6; publication blocked outside commandGate",
+    "assert count3/statusready/age0 from B while publisher stillblocked",
+    "release subscriber: await either subscriptioncompletion or actual wait boundary; assert subscriptionnotcompleted",
+    "release publication: same subscription returns B counter8 STOP/yellow; same pump still1"
+  ],
+  "watchdog": "5seconds only to bound fixture setup/teardown; timeout is not accepted as functional Red",
+  "cleanup": "finally releases both blocking gates, cancels caller/run, awaits both tasks; service awaitDispose follows",
+  "completeness": [
+    {
+      "requiredAction": "OldA not revived by B diagnostics",
+      "productionPath": "RecordSuccess→PublishCommand→WaitForChangeAsync",
+      "actualCompositionFixture": "real RefereeReceiveService + default Referee.Parser + ServiceReceiveDiagnostics + manual clock + controlled datagramreceiver",
+      "focusedEvidence": "new runtime assertion prepared, remote CI Red pending"
+    },
+    {
+      "requiredAction": "After publish returns B",
+      "productionPath": "PublishCommand→commandChanged→WaitForChangeAsync",
+      "actualCompositionFixture": "same subscription released by real publish; counter8 STOP",
+      "focusedEvidence": "postpublication assertion prepared; unexecuted"
+    },
+    {
+      "requiredAction": "Preserve existing contracts",
+      "productionPath": "source22 unchanged; observer stripped source matches baseline",
+      "actualCompositionFixture": "existing36/fixed67 and standard suite on future exactSHA CI",
+      "focusedEvidence": "source guards pass; formal currentcandidate tests unexecuted"
+    }
+  ]
+}

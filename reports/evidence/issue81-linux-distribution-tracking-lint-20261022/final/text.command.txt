@@ -1,0 +1,1 @@
+cd C:\Users\donabe\AppData\Local\Temp\issue81-04a-lint-20261022; & 'C:\Program Files\nodejs\node.exe' tools/lint/scripts/run-markdown-targets.js text --files tracking-evidence-final/tasks-status.md tracking-evidence-final/phases-status.md

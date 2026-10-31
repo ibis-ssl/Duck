@@ -1,0 +1,106 @@
+{
+  "stage": "first_existing_implementation_bcl_only",
+  "baseline_parent_supplied": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "baseline_not_independently_inspected": true,
+  "sdk_verified": "10.0.113",
+  "restore_exit": 0,
+  "test_exit": 0,
+  "trx_counters": {
+    "total": "28",
+    "executed": "28",
+    "passed": "28",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "frozen_manifest_sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+  "all_11_frozen_files_unchanged": true,
+  "included_test_methods": 21,
+  "executed_cases": 28,
+  "passed": 28,
+  "failed": 0,
+  "skipped": 0,
+  "unexecuted_cases": 6,
+  "not_covered": [
+    "P01/P02公式tracker復号6ケース",
+    "実受信datagram→診断結線",
+    "HTTP到達・マッピング",
+    "比較resolver",
+    "後続DCP配置・Windows実機・外部tracker・全体受入"
+  ],
+  "warnings": [
+    "xUnit2031 style warnings at ServiceReceiveSpecificationTests.cs:126,163,164; source unchanged"
+  ],
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/bcl.csproj",
+      "sha256": "370886a401f2c00078473fe01c627945e082a9ff7967f21fd745487d0e68ddb1",
+      "bytes": 944
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/global.json",
+      "sha256": "f9aee4db14a75f488639f46464f49ae7a4577fd1ba3c17344fb78e2125483635",
+      "bytes": 75
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/harness-manifest.json",
+      "sha256": "7463ce87ceb4db11bebaadd798811d32a15381ac5af4c3d10cce0ef9d68865a1",
+      "bytes": 664
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/run-initial.py",
+      "sha256": "eb6177712c68dc119c7ee7b44f09200f68e50ddbef6d0703bbd1aab71314a4be",
+      "bytes": 1796
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/0.stdout.log",
+      "sha256": "cdc128a762f1e822d44b0021f59c0e2cd064e4dcbd9e0b2a628cf684d55d3c12",
+      "bytes": 9
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/1.stdout.log",
+      "sha256": "0053e81604b2b40b2f6b5a3ca1202967581671813651c61bd85e67bb020e7a10",
+      "bytes": 278
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/2.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/2.stdout.log",
+      "sha256": "c8b4f406310b5add3207de5e7d26f5d9bd41ed42a5851cf6f3c30d863261e126",
+      "bytes": 1920
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/execution.json",
+      "sha256": "ce6508a2d284557fefed1f592c0f0218f643bcdb9415c6fd2546375dced1248a",
+      "bytes": 2627
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/initial-bcl.trx",
+      "sha256": "8fb81954261ff5cd58e072ea3d568fe800102e713feb8c5b70c48e35abfd96f5",
+      "bytes": 41645
+    }
+  ]
+}

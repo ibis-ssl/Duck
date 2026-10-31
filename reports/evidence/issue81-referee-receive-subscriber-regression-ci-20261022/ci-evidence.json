@@ -1,0 +1,48 @@
+{
+  "runId": 39803325487,
+  "headSha": "b67a3a42535acc58e11625bc0a8f2731a1902d15",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39803325487",
+  "testJobId": 119909817057,
+  "testJobStatus": "completed",
+  "testJobConclusion": "success",
+  "watchExitCode": 0,
+  "dotnetCommand": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger \"trx;LogFileName=dotnet-test.trx\" --results-directory \"$results_dir\" --diag \"$results_dir/vstest-diagnostics.log\" --blame -m:1 /nr:false -bl:\"$results_dir/dotnet-test.binlog\"",
+  "dotnetExit": "0 via successful Run dotnet test step; standalone exit artifact not published",
+  "aggregate": {
+    "total": 631,
+    "passed": 631,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": {
+    "total_count": 0,
+    "artifacts": []
+  },
+  "individualTRX": "generated in CI log but not published/not obtained",
+  "individualResults": "new5/previous626/fixed67 unchanged source and all631 aggregate passed; no current individual test names/TRX verification",
+  "sourceChecks": 18,
+  "allSourceMatch": true,
+  "checkout": "PR merge ref 6c6fde7 merging exactb67a3a4 into 88cb20f; log retained; successful source archive not published",
+  "fixedManifests": [
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "head_current_equal": true
+    },
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "head_current_equal": true
+    }
+  ],
+  "skippedJobs": [
+    "ASPIRE-NET-002 Linux packet flow",
+    "ASPIRE full-stack Linux acceptance"
+  ],
+  "scope": "CI collection only; no new source/test/behavior or UDP/Dispose candidate",
+  "oldRun": "39795794024 last observed in_progress; local monitor already stopped exit255; no reread/watch/retry",
+  "processState": "watch2631 exit0 and collection89240 exit0; all commands terminated/exits collected"
+}

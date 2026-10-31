@@ -1,0 +1,32 @@
+17:  test:
+18:    runs-on: ubuntu-latest
+19:    timeout-minutes: 30
+20:
+21:    steps:
+22:      - name: Check out repository
+23:        uses: actions/checkout@v6
+24:        with:
+25:          submodules: recursive
+26:          fetch-depth: 0
+27:
+28:      - name: Set up .NET SDK
+29:        uses: actions/setup-dotnet@v5
+30:        with:
+31:          dotnet-version: 10.0.x
+32:          dotnet-quality: ga
+33:
+34:      - name: Run dotnet test
+35:        id: dotnet_test
+36:        shell: bash
+37:        run: |
+38:          set +e
+39:
+40:          results_dir="$GITHUB_WORKSPACE/artifacts/test-results"
+41:          mkdir -p "$results_dir"
+42:
+43:          dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \
+44:            --logger "trx;LogFileName=dotnet-test.trx" \
+45:            --results-directory "$results_dir" \
+46:            --diag "$results_dir/vstest-diagnostics.log" \
+47:            --blame \
+48:            -m:1 \

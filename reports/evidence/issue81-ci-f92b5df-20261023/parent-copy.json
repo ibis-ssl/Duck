@@ -1,0 +1,7 @@
+{
+  "source": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-ci-f92b5df-20261023",
+  "validated_entries": 10,
+  "final_manifest": "inventory-final-v2.sha256",
+  "sha256": "603d5b192ad2d326149a81ec19f706cecece2e0c327631fc87b1fcbfccdfb5cc",
+  "watch_exit": "unknown_after_interruption; separate run metadata completed success"
+}

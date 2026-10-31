@@ -1,0 +1,3 @@
+58e0beb075e195fcb9985a109fafe08580d1f83dbbf993945a5cc33d02465a24  scripts/tests/verify-debughost-portable-pdb.py
+a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7  scripts/tests/test-debughost-portable-pdb.py
+7c430e8daaa1ce5aa45e7490cbc7a3e6a25ab04a3144c08de48e120904635500  scripts/tests/verify-linux-publish-outputs.sh

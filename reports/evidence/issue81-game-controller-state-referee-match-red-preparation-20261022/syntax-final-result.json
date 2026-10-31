@@ -1,0 +1,55 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs",
+    "output": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/RefereeApiMatcherTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeApiMatcherTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [
+      [
+        "matchState"
+      ],
+      [
+        "command",
+        "gameState"
+      ],
+      [
+        "type",
+        "forTeam"
+      ],
+      [
+        "type"
+      ]
+    ],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

@@ -31,6 +31,171 @@ jobs:
           dotnet-version: 10.0.x
           dotnet-quality: ga
 
+      - name: Run Crane launch overlay tests
+        id: crane_launch_overlay
+        shell: bash
+        run: python3 -B -m unittest discover -s scripts/tests -p 'test_crane_launch_overlay.py' -v
+
+      - name: Report preinstalled native toolchain (read-only)
+        id: native_toolchain_readonly
+        shell: bash
+        run: |
+          python3 -B - <<'PY'
+          import json
+          import os
+          import pathlib
+          import shutil
+          import subprocess
+
+          def query(executable, *arguments):
+              try:
+                  result = subprocess.run(
+                      [executable, *arguments],
+                      capture_output=True,
+                      check=False,
+                      text=True,
+                      timeout=5,
+                  )
+              except subprocess.TimeoutExpired:
+                  return {"status": "unknown", "reason": "timeout"}
+              except OSError:
+                  return {"status": "unknown", "reason": "unavailable"}
+
+              first_line = result.stdout.splitlines()[0][:256] if result.stdout.splitlines() else ""
+              return {
+                  "status": "ok" if result.returncode == 0 else "error",
+                  "exit_code": result.returncode,
+                  "first_line": first_line,
+              }
+
+          tools = {name: shutil.which(name) is not None for name in ("cc", "gcc", "readelf")}
+          compiler_name = "gcc" if tools["gcc"] else "cc" if tools["cc"] else None
+          compiler_path = shutil.which(compiler_name) if compiler_name else None
+          compiler = {"name": compiler_name, "available": compiler_path is not None}
+          if compiler_path:
+              compiler["version"] = query(compiler_path, "--version")
+              compiler["target"] = query(compiler_path, "-dumpmachine")
+              archive = query(compiler_path, "-print-file-name=libc.a")
+              archive_path = pathlib.Path(archive.get("first_line", ""))
+              readable = False
+              if archive.get("status") == "ok" and archive_path.is_absolute() and archive_path.is_file():
+                  try:
+                      with archive_path.open("rb") as stream:
+                          stream.read(0)
+                      readable = True
+                  except OSError:
+                      pass
+              compiler["libc_archive"] = "readable" if readable else "unknown_or_unavailable"
+          else:
+              compiler["version"] = {"status": "unknown"}
+              compiler["target"] = {"status": "unknown"}
+              compiler["libc_archive"] = "unknown"
+
+          print(json.dumps({
+              "image_os": os.environ.get("ImageOS", "unknown"),
+              "image_version": os.environ.get("ImageVersion", "unknown"),
+              "tools": tools,
+              "compiler": compiler,
+          }, ensure_ascii=True, separators=(",", ":")))
+          PY
+
+      - name: Build and test CM4 transport native code
+        id: cm4_transport_native
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          output_dir="$RUNNER_TEMP/cm4-transport-native"
+          mkdir -p "$output_dir"
+
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
+            native/cm4-transport/tests/transport_core_test.c \
+            -o "$output_dir/transport_core_test"
+          "$output_dir/transport_core_test" \
+            native/cm4-transport/tests/fixtures/apply-target.json \
+            native/cm4-transport/tests/fixtures/apply-target-ack.json \
+            native/cm4-transport/tests/fixtures/invalidate-target.json \
+            native/cm4-transport/tests/fixtures/invalidate-target-ack.json
+
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
+            native/cm4-transport/transport_server_posix.c \
+            native/cm4-transport/control_main_posix.c \
+            -o "$output_dir/cm4-transport-control"
+
+          readelf --file-header "$output_dir/cm4-transport-control" \
+            | sed -n '/Class:/p; /Data:/p; /Machine:/p'
+          if readelf --program-headers "$output_dir/cm4-transport-control" | grep -q 'INTERP'; then
+            echo 'static helper unexpectedly declares an ELF interpreter' >&2
+            exit 1
+          fi
+          dynamic_entries="$(readelf --dynamic "$output_dir/cm4-transport-control" 2>&1 || true)"
+          if grep -q '(NEEDED)' <<< "$dynamic_entries"; then
+            echo 'static helper unexpectedly declares dynamic dependencies' >&2
+            exit 1
+          fi
+
+          client_test_root="$RUNNER_TEMP/cm4-transport-native/client-tests"
+          mkdir -p "$client_test_root"
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
+            -DCONTROL_DIRECTORY=\"$client_test_root/socket-dir\" \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
+            native/cm4-transport/transport_server_posix.c \
+            native/cm4-transport/control_main_posix.c \
+            -o "$client_test_root/cm4-transport-control-client-test"
+          python3 -B native/cm4-transport/tests/test_control_client_startup.py \
+            "$client_test_root/cm4-transport-control-client-test" \
+            "$client_test_root/socket-dir" \
+            native/cm4-transport/tests/fixtures/apply-target.json \
+            native/cm4-transport/tests/fixtures/apply-target-ack.json
+
+          python3 - "$output_dir/cm4-transport-control" <<'PY'
+          import signal
+          import subprocess
+          import sys
+
+          child = subprocess.Popen(
+              [sys.argv[1], "--protocol", "jsonl-v1"],
+              stdin=subprocess.PIPE,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE,
+          )
+          try:
+              try:
+                  exit_code = child.wait(timeout=6)
+              except subprocess.TimeoutExpired:
+                  child.kill()
+                  child.wait()
+                  raise SystemExit("one-shot CLI did not exit within the watchdog test limit")
+
+              stdout = child.stdout.read()
+              if exit_code != -signal.SIGALRM:
+                  raise SystemExit(f"one-shot CLI exited unexpectedly: {exit_code}")
+              if b"applied" in stdout:
+                  raise SystemExit("one-shot CLI emitted an applied acknowledgement without a request")
+          finally:
+              if child.poll() is None:
+                  child.kill()
+                  child.wait()
+              for stream in (child.stdin, child.stdout, child.stderr):
+                  if stream is not None:
+                      stream.close()
+          PY
+
+          apphost_debug_assets="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/obj/Debug/net10.0"
+          mkdir -p "$apphost_debug_assets"
+          install -m 0755 "$output_dir/cm4-transport-control" "$apphost_debug_assets/cm4-transport-control"
+
       - name: Run dotnet test
         id: dotnet_test
         shell: bash
@@ -54,6 +219,78 @@ jobs:
           test_exit_code=$?
           printf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"
           exit "$test_exit_code"
+
+      - name: Test desktop acceptance policy without Docker
+        id: acceptance_policy
+        shell: bash
+        run: |
+          set +e
+          results_dir="$GITHUB_WORKSPACE/artifacts/desktop-acceptance-policy"
+          mkdir -p "$results_dir"
+          python3 --version > "$results_dir/environment.txt" 2>&1
+          git rev-parse HEAD >> "$results_dir/environment.txt"
+          cp scripts/verify_desktop_referee_acceptance.py "$results_dir/"
+          cp scripts/tests/test_desktop_referee_acceptance.py "$results_dir/"
+          python3 -B scripts/tests/test_desktop_referee_acceptance.py \
+            > >(tee "$results_dir/tests.stdout.log") \
+            2> >(tee "$results_dir/tests.stderr.log" >&2)
+          policy_exit_code=$?
+          printf '%s\n' "$policy_exit_code" > "$results_dir/tests.exit-code"
+          exit "$policy_exit_code"
+
+      - name: Upload desktop acceptance policy failure artifact
+        if: ${{ always() && steps.acceptance_policy.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-acceptance-policy-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/desktop-acceptance-policy
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Verify Linux application publish outputs
+        id: linux_publish
+        shell: bash
+        run: scripts/tests/verify-linux-publish-outputs.sh
+
+      - name: Upload verified Issue81 runtime inputs
+        if: ${{ always() && steps.linux_publish.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: issue81-runtime-bundle-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/issue81-runtime-bundle
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Collect Linux publish failure diagnostics
+        if: ${{ always() && steps.linux_publish.outcome == 'failure' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence_dir="$GITHUB_WORKSPACE/artifacts/linux-publish"
+          mkdir -p "$evidence_dir"
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'sha=%s\n' "$GITHUB_SHA"
+            printf 'ref=%s\n' "$GITHUB_REF"
+            printf 'run_id=%s\n' "$GITHUB_RUN_ID"
+            printf 'run_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
+            printf 'runner_os=%s\n' "$RUNNER_OS"
+            printf '\n## dotnet --info\n'
+            dotnet --info
+            printf '\n## git status --short\n'
+            git status --short
+            printf '\n## git submodule status --recursive\n'
+            git submodule status --recursive
+          } > "$evidence_dir/environment.txt" 2>&1
+
+      - name: Upload Linux publish failure artifact
+        if: ${{ always() && steps.linux_publish.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-publish-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/linux-publish
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Collect failure diagnostics
         if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}

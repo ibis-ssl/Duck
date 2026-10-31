@@ -1,0 +1,16 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs",
+    "output": "/tmp/issue81-referee-receive-subscriber-regression-five-preparation-20261022/candidate.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeReceiveSubscriberRegressionTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

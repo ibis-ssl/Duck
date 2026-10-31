@@ -1,0 +1,15 @@
+{
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023",
+  "mirror_node_modules_link": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+  "existing_cache": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+  "node_executable": "C:/Program Files/nodejs/node.exe",
+  "node_version": "v24.20.0",
+  "package_versions": {
+    "textlint": "15.7.0",
+    "cspell": "9.8.0",
+    "yaml": "2.9.0"
+  },
+  "tracked_input_files": 2,
+  "changed_body_lines": 5,
+  "sudachi_input_mode": "single --files flag with two file paths"
+}

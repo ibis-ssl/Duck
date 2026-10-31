@@ -1,0 +1,33 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "/usr/bin/dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName~Tracker.Tests.AppHostApplicationModelTests",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--logger",
+    "console;verbosity=normal"
+  ],
+  "dotnet_path": "/usr/bin/dotnet",
+  "dotnet_realpath": "/usr/lib/dotnet/dotnet",
+  "exit": 0,
+  "started_unix": 1792782132.433512,
+  "finished_unix": 1792782135.9248137,
+  "source_sha256_before": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "63075593c8ab5619d0bd88ed213d9c130b6d8c1c960d58b07df89920593f4d69",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "933d3fcd60e136a7dd2352f7e52439452b175e6ace3ad39ba03fdb77093c8068",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "d259bcbd3d5722a97da2ff66f2715c7f67b3d2c38c68fc71a9be4f491d80ed1f"
+  },
+  "source_sha256_after": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "63075593c8ab5619d0bd88ed213d9c130b6d8c1c960d58b07df89920593f4d69",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "933d3fcd60e136a7dd2352f7e52439452b175e6ace3ad39ba03fdb77093c8068",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "d259bcbd3d5722a97da2ff66f2715c7f67b3d2c38c68fc71a9be4f491d80ed1f"
+  },
+  "stdout_sha256": "f2cb64cf081a30f063db8a4e60d30e8ecde4793968cb415b8e5295352c169115",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 5994,
+  "stderr_bytes": 0
+}

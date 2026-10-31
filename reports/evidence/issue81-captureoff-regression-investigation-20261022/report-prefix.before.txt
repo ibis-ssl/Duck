@@ -1,0 +1,26 @@
+# Sub-agent実行レポート
+
+## タスク
+
+I81-V追加独立仕様テスト初回のC08/C10失敗を、承認設計・凍結テスト・実装で照合し原因調査と必要な実装修正を行う。
+
+## sub-agentを使う理由
+
+本人指定の既存実装担当へ固定テストと失敗結果を戻す。独立テスト作者には製品実装を読ませない。
+
+## 対象範囲
+
+Duck Issue81/PR84、HEAD a0566cd6c49601fb28cc8d766f8afb1bcaf862a2。I81-V v2凍結manifest aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be、C08/C10各UUID null/空の4失敗。必要最小限のDuck内修正・同一テスト検証・説明コメント日本語。
+
+## 対象外
+
+期待値緩和・skip化・独立作者の凍結source変更、外部3repo変更、環境/依存/認証/network設定変更、merge、未完了Issue close。実装前Redの過去欠落を今回修正Redで補わない。
+
+親保存記録: rawログ・修正前prefix・git diff原文は元hash保持のため同一byteで保存。raw evidenceの末尾空白/末尾空行は編集せず、製品・通常report・trackingの差分checkとは分ける。後者はexit0。
+
+後続回帰調査: 修正後2ff2b1facaf8c8e4664ca6141f02944e0b74f89bのCI39776500808は固定v1/v2の67件が全て成功、標準全体は614成功/1失敗。既存CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoopの失敗原因・再現性・変更との関係を同担当が調査する。初回4failと35件補助Greenの履歴は保持する。
+
+## Dispatch profile
+
+Parent-owned. task_kind=investigation_and_fix; work_class=judgment_heavy; uncertainty=high; change_radius=cross_module; criticality=ordinary; repetition=single; decomposability=sequential_dependencies; decomposition_policy=forbidden; context_need=bounded_history. existing_executor=/root/multicast_investigation_fresh; original actual requested=gpt-6.1-sol/high; applied=null; application_status=reused_existing_agent_profile; profile_observability=final_profile_hidden; original_fork=none. normal_persistence. verification_capability=remote_ci_only for host, local supplemental focused evidence distinct. User 11:54 correction permits parent/implementer/reviewer necessary reads throughout Duck; only independent test author must not see implementation.
+

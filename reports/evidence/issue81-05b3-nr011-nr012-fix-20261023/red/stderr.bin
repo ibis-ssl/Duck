@@ -1,0 +1,2 @@
+[xUnit.net 00:00:00.32]     Tracker.Tests.AppHostApplicationModelTests.ExplicitGameControllerVisionModeUsesPinnedSimulatorRepositoryAndEntrypoint [FAIL]
+[xUnit.net 00:00:00.35]     Tracker.Tests.AppHostApplicationModelTests.ExplicitGameControllerVisionModeUsesDuckRoleForIdentityProjection [FAIL]

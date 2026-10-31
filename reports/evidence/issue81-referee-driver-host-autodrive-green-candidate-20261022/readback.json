@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-22T21:04:01.503144+00:00",
+  "reportParentPrefixUnchanged": true,
+  "oldHistoryPreserved": true,
+  "sourceManifestHashesRechecked": true,
+  "other42ByteUnchanged": true,
+  "fixed15TestSHA256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+  "syntaxExit": 0,
+  "XMLCount": 4,
+  "diffCheckExit": 0,
+  "runtimeGreen": "not observed; exact candidate parent CI pending",
+  "allIssuedProcessesTerminated": true,
+  "uncollectedExits": [],
+  "reportSHA256": "8fcfb1b6db651c39b7e221f90e311ff23a3d17cbe8d5c4f35d40fea28b9a7903"
+}

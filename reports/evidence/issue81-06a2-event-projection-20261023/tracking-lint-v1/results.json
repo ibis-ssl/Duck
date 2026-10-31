@@ -1,0 +1,64 @@
+{
+  "runs": [
+    {
+      "name": "textlint",
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "node_modules/textlint/bin/textlint.js",
+        "--config",
+        ".textlintrc.json",
+        "--rulesdir",
+        "tools/lint/scripts/textlint-rules",
+        "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md"
+      ],
+      "input": "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md",
+      "input_sha256": "59d5e6f05bac4244bd4630e93e78e51da0b2dd71097c2484f6a74e3df1913de7",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "name": "cspell",
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+      "argv": [
+        "/mnt/c/Program Files/nodejs/node.exe",
+        "tools/lint/scripts/run-cspell-markdown.js",
+        "--words-only",
+        "--unique",
+        "--no-progress",
+        "--no-summary",
+        "--no-show-suggestions",
+        "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md"
+      ],
+      "input": "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md",
+      "input_sha256": "59d5e6f05bac4244bd4630e93e78e51da0b2dd71097c2484f6a74e3df1913de7",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "name": "sudachi",
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+      "argv": [
+        "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md",
+        "--list-unknown"
+      ],
+      "input": "Tracker/Design/lint-vocabulary/closure-06a2-status-v1/tasks-status.md",
+      "input_sha256": "59d5e6f05bac4244bd4630e93e78e51da0b2dd71097c2484f6a74e3df1913de7",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr_bytes": 0
+    }
+  ],
+  "source_preflight": "single added task row byte-matched current source; 9 config hashes matched previous success; Windows junction and node resolution preflight exit 0"
+}

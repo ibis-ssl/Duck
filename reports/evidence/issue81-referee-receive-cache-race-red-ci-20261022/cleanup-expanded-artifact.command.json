@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "$taskArtifactRoot='C:\\tmp\\issue81-referee-receive-cache-race-red-ci-20261022'; $taskResolved=[System.IO.Path]::GetFullPath($taskArtifactRoot); if ($taskResolved -ne 'C:\\tmp\\issue81-referee-receive-cache-race-red-ci-20261022') { throw 'Unexpected cleanup target' }; Remove-Item -LiteralPath $taskArtifactRoot -Recurse -Force"
+  ],
+  "exit_code": 0,
+  "verifiedOwnExactTarget": true
+}

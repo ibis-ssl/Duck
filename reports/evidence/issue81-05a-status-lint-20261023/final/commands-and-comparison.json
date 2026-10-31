@@ -1,0 +1,70 @@
+{
+  "current_additions": {
+    "baseline": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+    "head": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+    "cwd": "C:/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+    "textlint": [
+      "C:/Program Files/nodejs/node.exe",
+      "tools/lint/scripts/run-markdown-targets.js",
+      "text",
+      "--files",
+      "Tracker/Design/tasks-status.md",
+      "Tracker/Design/phases-status.md"
+    ],
+    "cspell": [
+      "C:/Program Files/nodejs/node.exe",
+      "tools/lint/scripts/run-markdown-targets.js",
+      "spell",
+      "--files",
+      "Tracker/Design/tasks-status.md",
+      "Tracker/Design/phases-status.md"
+    ],
+    "sudachi": [
+      "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "Tracker/Design/tasks-status.md",
+      "Tracker/Design/phases-status.md"
+    ],
+    "capture": "Original PowerShell native-stream capture retained; direct WSL subprocess byte capture also saved for Sudachi to distinguish stream text conversion."
+  },
+  "deleted_baseline_fragments": {
+    "baseline": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+    "head": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+    "inputs": [
+      "Tracker/Design/tasks-status.md",
+      "Tracker/Design/phases-status.md"
+    ],
+    "current_added_fragment_sha256": {
+      "Tracker/Design/tasks-status.md": "2741499bf4385bcd7c5b1016220583ddf1f91e1ccc3abcef55befeda8a1c2ba8",
+      "Tracker/Design/phases-status.md": "96598da083aa32f24fceca3966785c96456d7d82545cdf2086d9af2a796640b4"
+    },
+    "deleted_fragments": {
+      "Tracker/Design/tasks-status.md": {
+        "sha256": "00e15945e745998178df55ecbc67618fc1a4455c7ed4f1a8346e5460c180e483",
+        "bytes": 1054,
+        "lines": 4
+      },
+      "Tracker/Design/phases-status.md": {
+        "sha256": "4c27a204430d07a0c81a253ddf71f974a5d9de0c94c41c4345b3153962be771d",
+        "bytes": 1476,
+        "lines": 1
+      }
+    },
+    "preflight": "git diff source deletions byte-extracted; additions SHA reverified; same v4 mirror and eight config files read; no linter invoked in this step"
+  },
+  "whitelist_resolution": "checker loads Path(\"tools/lint/markdown-whitelist.yaml\") relative to cwd; cwd was the existing v4 mirror root. Explicit --files named both canonical relative paths once. Config hashes are in preflight.json.",
+  "result_comparison": {
+    "additions": {
+      "textlint": 0,
+      "cspell": 1,
+      "sudachi": 1
+    },
+    "deleted_baseline": {
+      "textlint": 0,
+      "cspell": 1,
+      "sudachi": 1
+    },
+    "interpretation": "All current English/CSpell/Sudachi tokens also occur in deleted baseline lines; no newly introduced whitelist token established. Sudachi WSL-native bytes report モデル; PowerShell capture displayed a mojibake token, so that capture variant is retained as transport/capture discrepancy, not treated as a new source word."
+  }
+}

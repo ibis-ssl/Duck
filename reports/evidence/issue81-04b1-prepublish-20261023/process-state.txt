@@ -1,0 +1,3 @@
+['pgrep', '-ax', 'dotnet']: exit=1; stdout=<empty>
+['pgrep', '-ax', 'python3']: exit=0; stdout=1143773 python3 -
+['pgrep', '-ax', 'gh']: exit=1; stdout=<empty>

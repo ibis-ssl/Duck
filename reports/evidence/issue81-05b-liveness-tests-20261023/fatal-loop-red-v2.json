@@ -1,0 +1,27 @@
+{
+  "name": "fatal-loop-red-v2",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~HostedServiceObservesFatalAcceptLoopAndCleansOwnedSocket"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:30:20.500784+00:00",
+  "runner_pid": 1201066,
+  "child_pid": 1201067,
+  "exit": 1,
+  "sha256": {
+    "Tracker/Tracker.Tests/RuntimeIdentityControlLivenessTests.cs": "14369039684204765f007e58456cc3abd1f6de0a0af256ff1130b077bf3b2fa9",
+    "Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "5a983432fa7d860eb6421587fbfa76710d9170a2e27bb588b8fb97737f586b37",
+    "Tracker/Tracker.RuntimeHost/Program.cs": "4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b"
+  },
+  "stdout_sha256": "b780d568deb725980552750317650d46afd6bae442012e372367eabae82030d3",
+  "stderr_sha256": "3e8ef652b27e82e3ce784e123bbd0ba1ab56eefa9bb082da7bf3b06b0a8a1808",
+  "stdout_bytes": 5117,
+  "stderr_bytes": 142
+}

@@ -1,0 +1,58 @@
+{
+  "repository": "ibis-ssl/Duck",
+  "issue_or_pr": "Issue81 / PR84",
+  "task_id": "I81-V",
+  "mode": "post_implementation_independent_spec_test_authoring",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "base_ref": null,
+  "current_head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "identity_source": "parent-owned allowed report prefix; not independently inspected",
+  "verification_capability": "remote_ci_only",
+  "capability_source": "parent report contract; no local tool check",
+  "execution_environment": {
+    "kind": "connected_computer",
+    "tool": "exec_command; PowerShell login=false; wsl.exe -d Ubuntu --",
+    "os": "WSL Ubuntu via Windows",
+    "working_directory": "/tmp/issue81-independent-spec-tests-worker-20261022",
+    "source_state": "unknown",
+    "ownership": "current_task",
+    "dependencies": [
+      {
+        "name": "dotnet/net10.0/xUnit/cache",
+        "status": "not_checked"
+      }
+    ],
+    "writable_paths": [
+      "/tmp/issue81-independent-spec-tests-worker-20261022",
+      "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/issue81-independent-specification-tests-20261022.md"
+    ]
+  },
+  "scope": [
+    "I81-01 resource identity/service decode readiness",
+    "I81-02 Duck/DebugHost receive/decode diagnostics and HTTP within supplied public API"
+  ],
+  "development_policy": {
+    "method": "parent-owned; retrospective independent tests",
+    "testing_order": "freeze specification/tests before execution; historical preimplementation Red cannot be recovered"
+  },
+  "commit": "not_required",
+  "push": "unauthorized",
+  "ci_wait": "not_required",
+  "full_local_equivalence_gate": "not_started",
+  "report_mode": "normal_persistence",
+  "requested_profile": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "fork": "none"
+  },
+  "applied": null,
+  "profile_observability": "final_profile_hidden; parent records actual dispatch",
+  "independent_final_review": "separate phase; not replaced",
+  "blocked": [
+    "execution pending freeze and parent authorization",
+    "public-delta read denied by auto-review; not executed"
+  ],
+  "unknown": [
+    "actual product source fingerprint/dependency availability/current HEAD not inspected"
+  ]
+}

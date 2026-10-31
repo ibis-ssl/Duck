@@ -1,0 +1,2 @@
+[xUnit.net 00:00:01.71]     Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: "224.5.23.1", port: 11003, interfaceAddress: "::1") [FAIL]
+[xUnit.net 00:00:01.74]     Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: "127.0.0.1", port: 11003, interfaceAddress: null) [FAIL]

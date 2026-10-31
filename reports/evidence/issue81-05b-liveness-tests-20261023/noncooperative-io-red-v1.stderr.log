@@ -1,0 +1,4 @@
+[xUnit.net 00:00:01.29]     Tracker.Tests.RuntimeIdentityControlNonCooperativeLivenessTests.RelayReturnsWhenInputReadIgnoresCancellationToken [FAIL]
+[xUnit.net 00:00:02.36]     Tracker.Tests.RuntimeIdentityControlNonCooperativeLivenessTests.RelayReturnsWhenFlushIgnoresCancellationToken [FAIL]
+[xUnit.net 00:00:03.36]     Tracker.Tests.RuntimeIdentityControlNonCooperativeLivenessTests.RelayReturnsWhenOutputCallBlocksSynchronously(blockWriteLine: True) [FAIL]
+[xUnit.net 00:00:04.37]     Tracker.Tests.RuntimeIdentityControlNonCooperativeLivenessTests.RelayReturnsWhenOutputCallBlocksSynchronously(blockWriteLine: False) [FAIL]

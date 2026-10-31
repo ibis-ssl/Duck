@@ -1,0 +1,29 @@
+{
+  "unit": "I81-03B first small unit: read initial matchState HALT",
+  "head": "5dcb991795ce2ea51ed292063f2fbc85142346d1",
+  "governingTDD": "Tracker/Design/Testing/tracker-comparison-debug-design.md:260",
+  "authoritativeScope": [
+    "Tracker/Design/tasks-status.md:29",
+    "reports/issue81-referee-driver-scope-20261022.md fixed8050 API evidence and03B row"
+  ],
+  "fixedGCRef": "8050f232c3130323bbd91d1d3d56e9553506c8e4",
+  "sourceEvidence": "fixed-gc-source-references.json; cachedsource hashes verified, no new external GET",
+  "test": "Tracker.Tests.GameControllerStateClientTests.ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting",
+  "independentExpectedSequence": [
+    "injected ws://game-controller:8082/api/control",
+    "gcState → config → matchState(command.type HALT, gameState.type HALT); trailing protocol unconsumed",
+    "result nonnull; CommandKind.Halt and MatchPhase.Halt",
+    "one connection using exact injected URI, 3 Receive calls/outputnames ordered, 1 remaining frame",
+    "0 send calls, socket disposed once"
+  ],
+  "firstRuntimeAssertion": {
+    "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+    "line": 32,
+    "expression": "Assert.NotNull(observed)",
+    "scaffoldActualExpected": "null",
+    "runtimeObserved": false
+  },
+  "fixture": "BCL WebSocket fake, no real socket/server; overrides SendAsync so write0 is observed; finally disposes socket even if assertion fails",
+  "scaffoldLimit": "constructor null guards and nullable result return only; no connect/read/JSON parse/enum mapping/age/correlation/write behavior",
+  "validation": "syntax0/diffcheck0 only; compile/runtime CI pending; no Red/Green claimed"
+}

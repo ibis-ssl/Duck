@@ -1,0 +1,8 @@
+Windows GitHub CLI, PowerShell login:false, require_escalated
+- gh run list --repo ibis-ssl/Duck --commit 378aa403dafab85b46d243def3eb1a93551f8038 --limit 20 --json databaseId,headSha,event,status,conclusion,attempt,workflowName,createdAt,url (exit 0; exact run 39893485438)
+- gh run watch 39893485438 --exit-status (exit 1 locally: failed to determine base repo; no run operation executed)
+- gh run watch 39893485438 --repo ibis-ssl/Duck --exit-status (session 46976; exit 0)
+- gh run view 39893485438 --repo ibis-ssl/Duck --json databaseId,headSha,event,status,conclusion,attempt,workflowName,createdAt,updatedAt,url,jobs (exit 0)
+- gh api repos/ibis-ssl/Duck/actions/runs/39893485438 (exit 0)
+- gh run view 39893485438 --repo ibis-ssl/Duck --log (exit 0)
+- gh api repos/ibis-ssl/Duck/actions/runs/39893485438/artifacts (exit 0; total_count 0; no artifact downloaded)

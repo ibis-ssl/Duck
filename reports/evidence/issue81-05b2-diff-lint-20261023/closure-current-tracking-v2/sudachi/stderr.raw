@@ -1,0 +1,6 @@
+Markdown whitelist violations:
+- Tracker/Design/issue81-current-tracking-fragments/phases-status.md:1: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-current-tracking-fragments/phases-status.md:1: 'アクセス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-current-tracking-fragments/tasks-status.md:1: 'モデル' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-current-tracking-fragments/tasks-status.md:1: 'アクセス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-current-tracking-fragments/tasks-status.md:1: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.

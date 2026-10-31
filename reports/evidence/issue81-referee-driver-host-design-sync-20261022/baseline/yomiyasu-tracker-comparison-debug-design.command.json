@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/home/donabe/yomiyasu-v1.1.0-0df4774/scripts/yomiyasu_lint.py",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-referee-driver-host-design-sync-20261022/Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "--json",
+    "--strict"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-referee-driver-host-design-sync-20261022",
+  "exit_code": 1,
+  "startedUTC": "2026-10-22T21:18:10.921051+00:00",
+  "finishedUTC": "2026-10-22T21:18:10.970641+00:00"
+}

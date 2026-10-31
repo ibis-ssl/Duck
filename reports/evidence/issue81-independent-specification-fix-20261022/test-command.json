@@ -1,0 +1,11 @@
+[
+  "/usr/lib/dotnet/dotnet",
+  "test",
+  "/tmp/issue81-independent-specification-fix-20261022/FocusedComparison.csproj",
+  "--no-restore",
+  "--logger",
+  "trx;LogFileName=focused-comparison.trx",
+  "--results-directory",
+  "/tmp/issue81-independent-specification-fix-20261022/results",
+  "-p:EnableSourceControlManagerQueries=false"
+]

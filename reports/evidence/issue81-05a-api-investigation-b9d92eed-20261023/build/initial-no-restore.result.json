@@ -1,0 +1,15 @@
+{
+  "command": [
+    "dotnet",
+    "build",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+    "--no-restore",
+    "--verbosity",
+    "minimal"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit": 1,
+  "stdout_sha256": "3656d16e4a4910a383d8889ed1ccfae8486d4e79cfa7152f174dcbbd89d33844",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "timestamp_utc": "2026-10-23T10:30:40.852161+00:00"
+}

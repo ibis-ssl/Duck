@@ -23,6 +23,15 @@
     <None Include="..\..\scripts\tests\crane_probe_sanitizer_fixtures.json"
           Link="crane_probe_sanitizer_fixtures.json"
           CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\native\cm4-transport\tests\fixtures\apply-target.json"
+          Link="cm4-transport-apply-target.json"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\native\cm4-transport\tests\fixtures\invalidate-target.json"
+          Link="cm4-transport-invalidate-target.json"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\native\cm4-transport\tests\fixtures\invalidate-target-ack.json"
+          Link="cm4-transport-invalidate-target-ack.json"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +40,8 @@
     <ProjectReference Include="..\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
     <ProjectReference Include="..\..\Testing\Duck.Testing.AppHost\Duck.Testing.AppHost.csproj" />
     <ProjectReference Include="..\..\Testing\Duck.Testing.RefereeDriver\Duck.Testing.RefereeDriver.csproj" />
+    <ProjectReference Include="..\..\Testing\Duck.Testing.RefereeDriver.Host\Duck.Testing.RefereeDriver.Host.csproj" />
+    <ProjectReference Include="..\..\Testing\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
     <ProjectReference Include="..\Tracker.CaptureReplay\Tracker.CaptureReplay.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />

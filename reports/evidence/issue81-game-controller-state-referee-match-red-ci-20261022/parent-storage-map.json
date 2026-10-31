@@ -1,0 +1,429 @@
+[
+  {
+    "path": "all734-outcomes.json",
+    "sha256": "1b205bf5f828917d47f542e8ff631ea829809eee4978caef1f46cb1e7f2a81dd",
+    "bytes": 275373,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/all734-outcomes.json"
+  },
+  {
+    "path": "artifact-12451119742.zip",
+    "sha256": "4859c4caf0e1be345586904038ea3dfce50d3a13b0405350e03ebb490ea59a0d",
+    "bytes": 79352975,
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifact-12451119742.zip"
+  },
+  {
+    "path": "artifact-download.command.json",
+    "sha256": "7ca3a8437fd1704c35f7e9abbfcda566aa19878f1f09045cb6f8efe0c3bc9074",
+    "bytes": 308,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifact-download.command.json"
+  },
+  {
+    "path": "artifact-download.exit.json",
+    "sha256": "e25fde56a8831c705ff0e2f7daee6bcb9eefee287ea2970acc0f6a67d11cd045",
+    "bytes": 108,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifact-download.exit.json"
+  },
+  {
+    "path": "artifact-download.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifact-download.stderr.log"
+  },
+  {
+    "path": "artifact-integrity.json",
+    "sha256": "c5b73cee7529cef32d46fcf175dd9964097e8806193b99d7336277ca4db6890d",
+    "bytes": 1146,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifact-integrity.json"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.binlog",
+    "sha256": "b479f5f751dcca6e3a74fcce73d99568d100efb3075f915e55b06afa50e17ac9",
+    "bytes": 1507432,
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/dotnet-test.binlog"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.exit-code",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "bytes": 2,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/dotnet-test.exit-code"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.stderr.log",
+    "sha256": "d6b7e21b5199f941d7973305e92b12a7bc5fe534d0b84c961412d3a381c4947f",
+    "bytes": 1781,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/dotnet-test.stderr.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.stdout.log",
+    "sha256": "a79ca7ab16ab942288b163035412c1c523891aba178f0544bc3a583e0c5831a1",
+    "bytes": 14674,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/dotnet-test.stdout.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.trx",
+    "sha256": "e46be6cee6b893a68942c9045571450df4acea6f20a6aae9f6357d8e854348b8",
+    "bytes": 1060818,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/dotnet-test.trx"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/environment.txt",
+    "sha256": "18d9772469ef0b333d3697f1fb128ab35c46465bd71064c4d1adbc1b65d5516e",
+    "bytes": 3462,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/environment.txt"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/source.tar.gz",
+    "sha256": "3e40d2fb57a640e7cdcb4658eae98d58f0347f29dd831f67697c0ce735395dda",
+    "bytes": 77333476,
+    "stored": false,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/source.tar.gz"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.datacollector.26-10-22_19-22-50_82950_5.log",
+    "sha256": "aa208d0207d31ddfdfd3465565e13589e77fba58d2760ce6a6f5b50763960b2f",
+    "bytes": 1302562,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.datacollector.26-10-22_19-22-50_82950_5.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.host.26-10-22_19-22-51_11321_5.log",
+    "sha256": "f70249b8abe4c640c5f6a4e7daadb16f457830bb193302ee7ba7dc36ec69809f",
+    "bytes": 3007163,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.host.26-10-22_19-22-51_11321_5.log"
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.log",
+    "sha256": "b62500bf815dd96719ae7b7cedc7ef5e70e8e0978b5fd8919648a9a0c4170af6",
+    "bytes": 2449567,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.log"
+  },
+  {
+    "path": "artifacts.command.json",
+    "sha256": "258dd72eb74bdc4c3042ff111dc0a05492b7c8f654695e07ed1d77c21a7892ee",
+    "bytes": 277,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.exit.json",
+    "sha256": "c0f6ef05c6206e0472519aed6ca3cb4b002e0928ca84dc1bdff3088a8d0658bb",
+    "bytes": 104,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts.exit.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "2c4ba69ed75857cb41b4e5c6cbc461da6754971fd8c1101acc2099a65860db8b",
+    "bytes": 751,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "bounded-final-view.command.json",
+    "sha256": "aac4df108b0d52b3bf5390ff0ed8fd6a9ccf0febb30f67f62386a59303161852",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/bounded-final-view.command.json"
+  },
+  {
+    "path": "bounded-final-view.exit.json",
+    "sha256": "d15ae0c63072d508b1746c7d99bd70cc24918b02dd0d96607e92dc614d42a5c4",
+    "bytes": 113,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/bounded-final-view.exit.json"
+  },
+  {
+    "path": "bounded-final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/bounded-final-view.stderr.log"
+  },
+  {
+    "path": "bounded-final-view.stdout.log",
+    "sha256": "f75be3311617aa64278f24a49b8a9beba4c5fc2b95e1711a1dc04d97ccbbe53b",
+    "bytes": 2526,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/bounded-final-view.stdout.log"
+  },
+  {
+    "path": "bounded-finalization-observation.json",
+    "sha256": "80c7982313bde8c3cc0ffd4ad763bc1053212abe379a5c58161335dbedb58393",
+    "bytes": 279,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/bounded-finalization-observation.json"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "35a0e69b168dca26081afcc4285a0c28ad29db0a712dbaaff459561af051806e",
+    "bytes": 20404,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "sha256": "d5ae0fefdf7d13e00adfccf2878f8eed0fd4628e800a3660410c1566aff4ee81",
+    "bytes": 791,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/ci-identity-and-command-lines.txt"
+  },
+  {
+    "path": "collect.py",
+    "sha256": "dd55a211080835ca32c887ee4e021332445e58d5a29eab56dae9ba9b51c25238",
+    "bytes": 851,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/collect.py"
+  },
+  {
+    "path": "completed-job-log.command.json",
+    "sha256": "5f5b67a966235051307f2512a93ebec9960369b9a81e23e12f8488cac6e3e964",
+    "bytes": 305,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/completed-job-log.command.json"
+  },
+  {
+    "path": "completed-job-log.exit.json",
+    "sha256": "3d0c2ebcbec17d45ea81df11fd52dd8de7e7a5d52dee79568d99c02ef7eed33f",
+    "bytes": 112,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/completed-job-log.exit.json"
+  },
+  {
+    "path": "completed-job-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/completed-job-log.stderr.log"
+  },
+  {
+    "path": "completed-job-log.stdout.log",
+    "sha256": "84d68b8cd1500406ebc7b6b807f0b091f349212caf5a4ca23dd7543d64aedaa7",
+    "bytes": 61389,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/completed-job-log.stdout.log"
+  },
+  {
+    "path": "content-magic-inventory.json",
+    "sha256": "eaeaa60646d5ff43ff317494549281cfbe9184dbbd896723383a8e9012cb1532",
+    "bytes": 10304,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/content-magic-inventory.json"
+  },
+  {
+    "path": "git-status-before.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/git-status-before.txt"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/git-status-final.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "768f05660b8581be8980749c550d1532ae0d1f2073bf7836288ec701439bdd0d",
+    "bytes": 22951,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "7bbc7209ee8dc7e36ddff8b7220264a53e17b25d502a575df04383d5fdc47623",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.exit.json",
+    "sha256": "0fa1bdecc1011bc0862f20afe9f6bb323a4ddafad2215d608557b5851f243341",
+    "bytes": 107,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/initial-view.exit.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "3381e92c395585c1f9719af0b5fc6c686ff9f58048d988a4c60a2c69b0811747",
+    "bytes": 2046,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "e42a2b6a224720fc4f350e2d131007696dc013889f4dab3f7433905d4ec0f3fb",
+    "bytes": 9338,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/inventory.json"
+  },
+  {
+    "path": "match18-outcomes.json",
+    "sha256": "22cdacf25733ce859baf104f50919d55b7a40301157886916d72f07efffcafc3",
+    "bytes": 13479,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/match18-outcomes.json"
+  },
+  {
+    "path": "old716-and-fixed67.json",
+    "sha256": "d1c10e3f5043bc9040b081a8443721b98d7c636ea7757d90e4853ef9d298f581",
+    "bytes": 301866,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/old716-and-fixed67.json"
+  },
+  {
+    "path": "owned-monitor-stop.json",
+    "sha256": "968491ed3284236c449bdacc66c65b573c7b4c476f7aaa28eb0ccbfb89e44ea9",
+    "bytes": 668,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/owned-monitor-stop.json"
+  },
+  {
+    "path": "owned-monitor-wsl-before-stop.json",
+    "sha256": "5af53242e7451eb17b6b9e29c6fabd3b8ff3d7df22f320fb472a622e9bd3655f",
+    "bytes": 243,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/owned-monitor-wsl-before-stop.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "3f2419d0bdc1603cc66710c18357cc33aaa02bee887c8f2ae843316c7b152c11",
+    "bytes": 267,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/process-state.json"
+  },
+  {
+    "path": "progress-view.command.json",
+    "sha256": "39c1e862986c376e42c62fa5c1b775fddbdee505e5b7cbb08ef6931e6535ce59",
+    "bytes": 327,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/progress-view.command.json"
+  },
+  {
+    "path": "progress-view.exit.json",
+    "sha256": "da5748a66a49f44e3e961a94a60b7ab03d7e85cf4004df803660d1cbe3b17856",
+    "bytes": 108,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/progress-view.exit.json"
+  },
+  {
+    "path": "progress-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/progress-view.stderr.log"
+  },
+  {
+    "path": "progress-view.stdout.log",
+    "sha256": "d9ef1868f8b14d6e1eb141d87e085c457c777ce283b4772282441631c797163a",
+    "bytes": 2402,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/progress-view.stdout.log"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "b8dad9d4625cd8875bb8e15a35aa7161184333012b62e7eeb9898ae12490c51c",
+    "bytes": 1125,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/readback.json"
+  },
+  {
+    "path": "run-id.txt",
+    "sha256": "401c1abee58c13b05541469777a7715cc3021a6e7401b2577418c289f49b1cf9",
+    "bytes": 11,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/run-id.txt"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "sha256": "8371afefcb172a424a3a6bc0a65dfc26d781fea88d9a92e01c07010e7af1ae40",
+    "bytes": 440,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/runs-initial.command.json"
+  },
+  {
+    "path": "runs-initial.exit.json",
+    "sha256": "240d7683bae1d44ce3220ab7a9e469a5691f3a9da6f61a955afa08bfb7fc35c5",
+    "bytes": 107,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/runs-initial.exit.json"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/runs-initial.stderr.log"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "sha256": "6c209a8e04cbc815a02051570d3cbd89c360e1c5530a0ababc7399d32181043d",
+    "bytes": 238,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/runs-initial.stdout.log"
+  },
+  {
+    "path": "trx-counters.json",
+    "sha256": "2118187576c2c5879447ab357254c075a723e6943ffbaba436b918fb085ebe65",
+    "bytes": 327,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/trx-counters.json"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "a5f0d98aa6bd783606b2e3d6188bdc69d4e2a3938024cb28debaae0901819707",
+    "bytes": 304,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.exit.json",
+    "sha256": "1a5d51f724f27eede3611b47028a11bae2519bd2e12aaaf40b8f3b66b53a0e7f",
+    "bytes": 102,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/watch.exit.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "c157b9d8a11ecc0b9bb655e51fd72fa85b7b384410a2decf12fedc6ec038fbe9",
+    "bytes": 6058,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-ci-20261022/watch.stdout.log"
+  }
+]

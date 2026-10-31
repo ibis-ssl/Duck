@@ -1,0 +1,53 @@
+{
+  "sourceStage": "initial-parent-closure-sync",
+  "textlint": {
+    "exit": 0,
+    "issues": 0,
+    "documents": 2
+  },
+  "cspell": {
+    "exit": 1,
+    "issues": 1,
+    "path": "Tracker/Design/tasks-status.md",
+    "sourceLine": 27,
+    "fragmentLine": 1,
+    "column": 254,
+    "token": "Issue"
+  },
+  "sudachi": {
+    "tasks-status": {
+      "exit_code": 1,
+      "inputs": [
+        "Tracker/Design/tasks-status.md"
+      ],
+      "violations": [
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 1,
+          "token": "Issue",
+          "normalized": "issue",
+          "kind": "english"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 1,
+          "token": "Issue",
+          "normalized": "イシュー",
+          "kind": "katakana"
+        }
+      ]
+    },
+    "phases-status": {
+      "exit_code": 0,
+      "inputs": [
+        "Tracker/Design/phases-status.md"
+      ],
+      "violations": []
+    }
+  },
+  "wrapperExit": 1,
+  "wrapperFailure": "AssertionError on actual CSpell exit1; no later step executed in first wrapper",
+  "fullDocumentGate": "known failed; not rerun; fragments do not establish full-document pass",
+  "configFiles": 21,
+  "repositoryWrites": false
+}

@@ -1,0 +1,22 @@
+{
+  "technicalReviewedHead": "fa80b23aa362ed98c4beaf21605eeb5d1b18cbb2",
+  "verdict": "pass_with_held",
+  "I81-NR-003": "P2 closed",
+  "requiredOutstanding": 0,
+  "focusedFiles": 2,
+  "focusedBodyLines": 2,
+  "textlintExit": 0,
+  "CSpellExit": 0,
+  "CSpellIssues": 0,
+  "SudachiExit": 0,
+  "SudachiViolations": 0,
+  "SudachiSingleFilesArgument": true,
+  "actualSudachiInputs": 361,
+  "newBuildStandardTestFullGateCI": false,
+  "configurationFilesUnchanged": 21,
+  "recordContentConsistent": true,
+  "reportFullReadback": true,
+  "reportSHA256": "1799a830fa21901bd652cbce5416a27df08d14d89487da224169e2842513dc9c",
+  "applied": null,
+  "reportAttestationAllowed": false
+}

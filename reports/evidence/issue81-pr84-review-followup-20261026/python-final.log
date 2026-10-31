@@ -1,0 +1,29 @@
+test_engine_check_and_inventory_share_the_shutdown_deadline (__main__.DockerAdapterTests.test_engine_check_and_inventory_share_the_shutdown_deadline) ... ok
+test_engine_mismatch_prevents_inventory_lookup (__main__.DockerAdapterTests.test_engine_mismatch_prevents_inventory_lookup) ... ok
+test_full_id_and_both_owner_labels_are_required (__main__.DockerAdapterTests.test_full_id_and_both_owner_labels_are_required) ... ok
+test_evaluation_requires_full_duration_and_sample_count (__main__.ReadinessTests.test_evaluation_requires_full_duration_and_sample_count) ... ok
+test_evidence_must_be_fresh_at_probe_completion (__main__.ReadinessTests.test_evidence_must_be_fresh_at_probe_completion) ... ok
+test_failure_does_not_restart_evaluation_window (__main__.ReadinessTests.test_failure_does_not_restart_evaluation_window) ... ok
+test_first_ready_after_startup_deadline_fails (__main__.ReadinessTests.test_first_ready_after_startup_deadline_fails) ... ok
+test_large_gap_is_not_continuous_success (__main__.ReadinessTests.test_large_gap_is_not_continuous_success) ... ok
+test_old_packet_or_api_read_cannot_be_reused (__main__.ReadinessTests.test_old_packet_or_api_read_cannot_be_reused) ... ok
+test_owner_epoch_source_and_api_generation_cannot_change (__main__.ReadinessTests.test_owner_epoch_source_and_api_generation_cannot_change) ... ok
+test_receive_utc_is_display_only_when_monotonic_evidence_advances (__main__.ReadinessTests.test_receive_utc_is_display_only_when_monotonic_evidence_advances) ... ok
+test_single_ready_cannot_pass (__main__.ReadinessTests.test_single_ready_cannot_pass) ... ok
+test_startup_is_separate_from_fixed_evaluation_window (__main__.ReadinessTests.test_startup_is_separate_from_fixed_evaluation_window) ... ok
+test_thirty_seconds_of_fresh_matching_samples_passes (__main__.ReadinessTests.test_thirty_seconds_of_fresh_matching_samples_passes) ... ok
+test_two_ready_of_thirty_cannot_pass (__main__.ReadinessTests.test_two_ready_of_thirty_cannot_pass) ... ok
+test_unmatched_decode_failure_and_transport_error_fail (__main__.ReadinessTests.test_unmatched_decode_failure_and_transport_error_fail) ... ok
+test_abnormal_exit_or_incomplete_ownership_cannot_pass (__main__.RemovalTests.test_abnormal_exit_or_incomplete_ownership_cannot_pass) ... ok
+test_delayed_removal_within_deadline_passes (__main__.RemovalTests.test_delayed_removal_within_deadline_passes) ... ok
+test_empty_or_short_owned_id_is_not_cleanup_proof (__main__.RemovalTests.test_empty_or_short_owned_id_is_not_cleanup_proof) ... ok
+test_immediate_removal_passes (__main__.RemovalTests.test_immediate_removal_passes) ... ok
+test_list_failure_is_unknown_and_not_retried (__main__.RemovalTests.test_list_failure_is_unknown_and_not_retried) ... ok
+test_list_finishing_after_deadline_cannot_pass (__main__.RemovalTests.test_list_finishing_after_deadline_cannot_pass) ... ok
+test_residual_owned_id_times_out_with_bounded_wait (__main__.RemovalTests.test_residual_owned_id_times_out_with_bounded_wait) ... ok
+test_unrelated_container_is_recorded_but_not_owned (__main__.RemovalTests.test_unrelated_container_is_recorded_but_not_owned) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.052s
+
+OK

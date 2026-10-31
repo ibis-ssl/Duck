@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ProductRoot Condition="'$(ProductRoot)' == ''">/home/donabe/Duck-issue81-aspire-desktop-bridge</ProductRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <Using Include="Xunit" />
+    <Compile Include="../IndependentClock.cs" />
+    <Compile Include="ComparisonResolverAdditionalSpecificationTests.cs" />
+    <Compile Include="VisionStoreAdditionalSpecificationTests.cs" />
+    <Compile Include="IndependentVisionWireFixture.cs" />
+    <ProjectReference Include="$(ProductRoot)/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,202 @@
+[
+  {
+    "path": "Duck.Testing.RefereeDriver.csproj.before",
+    "bytes": 482,
+    "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c"
+  },
+  {
+    "path": "Duck.slnx.before",
+    "bytes": 734,
+    "sha256": "dbb4e933d323cd4ccf217f8e8ef1dc414b33e95f4414c886eaed57766224c244"
+  },
+  {
+    "path": "RefereeDriverHostHealthTests.api.txt",
+    "bytes": 1561,
+    "sha256": "feec36141d1074dac4d2423fab43376d67d201ebcba373ffd65283a5198c8f47"
+  },
+  {
+    "path": "Tracker.Tests.csproj.before",
+    "bytes": 1789,
+    "sha256": "b592c36563e374b83abc0a1294faf533c9753a87b6a780f0c1efbdc6bed491fe"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 138,
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "existing34-guards.json",
+    "bytes": 12746,
+    "sha256": "414b91692814215affbb85436b9452bdc83a8a15151b80c6be79af02fb234bdc"
+  },
+  {
+    "path": "expectations.json",
+    "bytes": 4654,
+    "sha256": "ef9cbe7c5b07407234c4b012fdd5a9410b65e575718f189c62a0cb8b3faca43c"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "bytes": 138,
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-git-status.command.json",
+    "bytes": 140,
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903"
+  },
+  {
+    "path": "final-git-status.stdout.log",
+    "bytes": 367,
+    "sha256": "61d4bdc2ee4711a8e32d474d2b3ba2db4a425cf3777fd4e4b4b8d586c06ecfdd"
+  },
+  {
+    "path": "git-status.command.json",
+    "bytes": 140,
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903"
+  },
+  {
+    "path": "git-status.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "git-status.stdout.log",
+    "bytes": 367,
+    "sha256": "61d4bdc2ee4711a8e32d474d2b3ba2db4a425cf3777fd4e4b4b8d586c06ecfdd"
+  },
+  {
+    "path": "guard-classification.json",
+    "bytes": 536,
+    "sha256": "ef4e5b3cca7aa4744a44f7abea7a26e2e7f0c784dc4b39c32e4207f198635132"
+  },
+  {
+    "path": "process-state.json",
+    "bytes": 195,
+    "sha256": "4823d7b45f03ccaf9200147e7f300a64d30e0e9cfefdd85b620187696965160c"
+  },
+  {
+    "path": "project-xml-validation.json",
+    "bytes": 2542,
+    "sha256": "b427f3ab2000761cca31d12de246f73e98cd8974aa62f82e39efdcb984d47e80"
+  },
+  {
+    "path": "remaining03C.json",
+    "bytes": 855,
+    "sha256": "5a914911505d1f0d5aa465b6433c90a7a4eaa403621ad73c83ee9c1b212aeefb"
+  },
+  {
+    "path": "report-before.md",
+    "bytes": 2246,
+    "sha256": "347dcec4cd827ec13dfc2f6feec6738c0e0bf966fe59cecd4fae693cefe062a0"
+  },
+  {
+    "path": "report-prefix-guard.json",
+    "bytes": 340,
+    "sha256": "7a16d0c30debff9e34822a749d981b1d22a28776cbed69f6609762566abf6187"
+  },
+  {
+    "path": "report-readback.md",
+    "bytes": 8727,
+    "sha256": "b23e46a41947597e51d34cfb8a4b846d5e8e4935b5d37673ce239603187b526f"
+  },
+  {
+    "path": "runtime-isolation-proof.json",
+    "bytes": 1505,
+    "sha256": "7e178080bef1ea319327b6e46a17ab56cd04d12423631207aeb3787d81a76f4e"
+  },
+  {
+    "path": "scaffold-boundary.json",
+    "bytes": 658,
+    "sha256": "14313ad2f37741335eb8f2ab58e3582ef5b9f57fbfdb8b30ad8ff2dab1d8af3e"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 1486,
+    "sha256": "4309a5f6e2416397eb185e37b87bdfefdeab3505354944f4b46fd4f86b733394"
+  },
+  {
+    "path": "source-snapshot/Duck.slnx",
+    "bytes": 836,
+    "sha256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "bytes": 551,
+    "sha256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "bytes": 449,
+    "sha256": "d88cff4feaa64d8838a94e592ca6e151569b488ca9c05eb6872992209e4dc894"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "bytes": 656,
+    "sha256": "428ca9e0a1ef21ec5ab925688563f40d0ee944197a17540ba2737bf7f9501e2f"
+  },
+  {
+    "path": "source-snapshot/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "bytes": 18099,
+    "sha256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13"
+  },
+  {
+    "path": "source-snapshot/Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "bytes": 1909,
+    "sha256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 493,
+    "sha256": "d3c4588e2867b170e3cd5619ab8a678d2b6d652991d41071ba43724a55d7474b"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 1371,
+    "sha256": "3bde60ffa5df9f14d02986268b93e9980a73e838fff442fd30e4ee2d6279a04d"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 387,
+    "sha256": "24764e36d078c36964c0ef06127cd3ff6f1cc75ed4080ea290fbdcbc141035e7"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "tracked.diff",
+    "bytes": 1974,
+    "sha256": "578a9fb4b19b0085632eb87c0f7089f79670e62cafb160e16965ab7ff30f09ac"
+  },
+  {
+    "path": "work-context.json",
+    "bytes": 1126,
+    "sha256": "db0cc227ac33c32a3d1543dd907c575c549d73fc960cf9889bf21b04d45b0d06"
+  }
+]

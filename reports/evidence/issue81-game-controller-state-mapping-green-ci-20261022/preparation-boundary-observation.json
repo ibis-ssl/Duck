@@ -1,0 +1,18 @@
+{
+  "observedAtUtc": "2026-10-22T18:55:37.349683+00:00",
+  "runStatus": "in_progress",
+  "runConclusion": "",
+  "updatedAt": "2026-10-22T18:40:46Z",
+  "allJobsCompleted": true,
+  "latestJobCompletedAt": "2026-10-22T18:42:27+00:00",
+  "observedFinalizationDelaySeconds": 790.349683,
+  "monitorStopped": true,
+  "ghWatchExit": 255,
+  "testJobCounts": {
+    "total": 707,
+    "passed": 707,
+    "failed": 0,
+    "skipped": 0
+  },
+  "observationCommandExitEvidence": "preparation-boundary-view.exit.json"
+}

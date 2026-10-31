@@ -1,0 +1,608 @@
+﻿{
+  "technicalHead": "24fdc17472e58d31830bb10423f745ad5d7725c3",
+  "baseHead": "6a32ff50af609a0665077d8161545a7117b136fd",
+  "repository": "ibis-ssl/Duck",
+  "pr": 84,
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "actualHost": "FA780",
+  "sourceChanged": [
+    "scripts/tests/test_desktop_referee_acceptance.py"
+  ],
+  "productionPlatformGuardChanged": false,
+  "runtimeDockerExecuted": false,
+  "runs": [
+    {
+      "argv": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/tests/test_desktop_referee_acceptance.py"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "host": "FA780",
+      "head": "6a32ff50af609a0665077d8161545a7117b136fd",
+      "diffSha256": "88ab77604493b871da2542b03d2662fd2ce66b2d21f85a539debfc825ecd722e",
+      "sourceSha256": {
+        "scripts/tests/test_desktop_referee_acceptance.py": "41f4950f738f2c4e1ea75c41c6fa64bea99cde7fa57094f392d215f65988ef14",
+        "scripts/verify_desktop_referee_acceptance.py": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+        "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+        "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d"
+      },
+      "startedUtc": "2026-10-26T11:59:50.647368+00:00",
+      "exitCode": 1,
+      "finishedUtc": "2026-10-26T11:59:51.126618+00:00",
+      "stdout.logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr.logSha256": "9efb4b32acff684e30b40952209282b45b4b6fbe0461b6a7862a8a2846f486fe",
+      "stage": "os-red"
+    },
+    {
+      "argv": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/tests/test_desktop_referee_acceptance.py"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "host": "FA780",
+      "head": "6a32ff50af609a0665077d8161545a7117b136fd",
+      "diffSha256": "4299817645ff9394c5363bf6961f37d2a16d5e23050df8955cb291058d6c04b2",
+      "sourceSha256": {
+        "scripts/tests/test_desktop_referee_acceptance.py": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+        "scripts/verify_desktop_referee_acceptance.py": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+        "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+        "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d"
+      },
+      "startedUtc": "2026-10-26T12:00:21.745776+00:00",
+      "exitCode": 0,
+      "finishedUtc": "2026-10-26T12:00:22.004470+00:00",
+      "stdout.logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr.logSha256": "40089dc602068dd6215670ba89159ae0f2aff27472a5df65e22258287f79708a",
+      "stage": "os-green"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "build",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "-m:1",
+        "/nr:false",
+        "-bl:artifacts/pr84-ci-followup-20261026/build/build.binlog"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "host": "FA780",
+      "head": "6a32ff50af609a0665077d8161545a7117b136fd",
+      "diffSha256": "4299817645ff9394c5363bf6961f37d2a16d5e23050df8955cb291058d6c04b2",
+      "sourceSha256": {
+        "scripts/tests/test_desktop_referee_acceptance.py": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+        "scripts/verify_desktop_referee_acceptance.py": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+        "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+        "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d"
+      },
+      "startedUtc": "2026-10-26T12:00:22.150149+00:00",
+      "exitCode": 0,
+      "finishedUtc": "2026-10-26T12:00:24.288246+00:00",
+      "stdout.logSha256": "bd92ae9662ee67ef7fe815a5ce33e8d0063e23628684e389a50f5980343b844a",
+      "stderr.logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "build"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "--logger",
+        "trx;LogFileName=full.trx",
+        "--results-directory",
+        "artifacts/pr84-ci-followup-20261026/full-dotnet",
+        "--diag",
+        "artifacts/pr84-ci-followup-20261026/full-dotnet/vstest.log",
+        "--blame",
+        "-m:1",
+        "/nr:false",
+        "-bl:artifacts/pr84-ci-followup-20261026/full-dotnet/build.binlog"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "host": "FA780",
+      "head": "24fdc17472e58d31830bb10423f745ad5d7725c3",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceSha256": {
+        "scripts/tests/test_desktop_referee_acceptance.py": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+        "scripts/verify_desktop_referee_acceptance.py": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+        "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+        "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d"
+      },
+      "startedUtc": "2026-10-26T12:02:10.533754+00:00",
+      "exitCode": 0,
+      "finishedUtc": "2026-10-26T12:03:08.396964+00:00",
+      "stdout.logSha256": "78e1595ca48cc8b697cdc806d888fd1ec4edc1e481c7b9537b1a78152b99f20e",
+      "stderr.logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "full-dotnet"
+    },
+    {
+      "argv": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/tests/test_desktop_referee_acceptance.py"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "host": "FA780",
+      "head": "24fdc17472e58d31830bb10423f745ad5d7725c3",
+      "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceSha256": {
+        "scripts/tests/test_desktop_referee_acceptance.py": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+        "scripts/verify_desktop_referee_acceptance.py": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+        "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+        "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+        "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d"
+      },
+      "startedUtc": "2026-10-26T12:03:08.543859+00:00",
+      "exitCode": 0,
+      "finishedUtc": "2026-10-26T12:03:08.864859+00:00",
+      "stdout.logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr.logSha256": "1ba7cb7591c28353012b3fe26ada69d4c4e1023805966453f776fb49a8899af5",
+      "stage": "final-python"
+    }
+  ],
+  "dotnetCounters": {
+    "total": "856",
+    "executed": "856",
+    "passed": "856",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "pythonTopLevelTests": 35,
+  "nestedFixtureCases": 9,
+  "nestedFixtureCasesCountedAgain": false,
+  "ciTechnicalHead": {
+    "runId": 40319328371,
+    "headSha": "24fdc17472e58d31830bb10423f745ad5d7725c3",
+    "testJob": 121559906238,
+    "testConclusion": "success",
+    "dotnetStep": "success",
+    "pythonStep": "success",
+    "linuxPublishStep": "success",
+    "packetFlowJob": "skipped",
+    "fullStackJob": "skipped"
+  },
+  "previousFailedCi": {
+    "runId": 40300989815,
+    "headSha": "6a32ff50af609a0665077d8161545a7117b136fd",
+    "cause": "WindowsRequired in 9 ImagePreflightTests on Linux"
+  },
+  "blockedOperation": {
+    "tool": "RemoteDesktopMCP.file_read",
+    "path": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+    "result": "OpenAI安全性チェックでブロック",
+    "retried": false,
+    "approvalRequestedJst": "2026-10-26T21:01+09:00"
+  },
+  "archive": {
+    "file": "diagnostics.zip",
+    "bytes": 354122,
+    "sha256": "db377238a50951b15157dc26c84a27a9b8df00ef5304025c5a4a21438c2c0d03"
+  },
+  "files": [
+    {
+      "path": "os-red/command.json",
+      "bytes": 1243,
+      "sha256": "d86947e2bd3a1b395afff6e6484279fa9554e013bf7cbb2ea69a776071b67621",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/completion.json",
+      "bytes": 1497,
+      "sha256": "c7d9c1598dc90a2b47d1caacc63d1c140c83480660d1f4dc09babbec19d77cfa",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/DiagnosticsSampleLog.cs",
+      "bytes": 12674,
+      "sha256": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/exit-code.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/source.diff",
+      "bytes": 1843,
+      "sha256": "88ab77604493b871da2542b03d2662fd2ce66b2d21f85a539debfc825ecd722e",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/stderr.log",
+      "bytes": 11723,
+      "sha256": "9efb4b32acff684e30b40952209282b45b4b6fbe0461b6a7862a8a2846f486fe",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/test_desktop_referee_acceptance.py",
+      "bytes": 19372,
+      "sha256": "41f4950f738f2c4e1ea75c41c6fa64bea99cde7fa57094f392d215f65988ef14",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/TrackerPacketSnapshotLogReader.cs",
+      "bytes": 2416,
+      "sha256": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/TrackerSnapshotAlignmentLogReader.cs",
+      "bytes": 1996,
+      "sha256": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/verify_desktop_referee_acceptance.py",
+      "bytes": 25111,
+      "sha256": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-red/VisionPacketCaptureTests.cs",
+      "bytes": 20480,
+      "sha256": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/command.json",
+      "bytes": 1243,
+      "sha256": "842d508f27a72b223cb6a0037ec4935e1fbe9c0a8fde4413691c445ffb7dafb5",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/completion.json",
+      "bytes": 1497,
+      "sha256": "228fdfd0992eb0d4b4f11bcf44a0f8a24c55726bbd745956042aa405480aef17",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/DiagnosticsSampleLog.cs",
+      "bytes": 12674,
+      "sha256": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/source.diff",
+      "bytes": 2467,
+      "sha256": "4299817645ff9394c5363bf6961f37d2a16d5e23050df8955cb291058d6c04b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/stderr.log",
+      "bytes": 4687,
+      "sha256": "40089dc602068dd6215670ba89159ae0f2aff27472a5df65e22258287f79708a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/test_desktop_referee_acceptance.py",
+      "bytes": 19658,
+      "sha256": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/TrackerPacketSnapshotLogReader.cs",
+      "bytes": 2416,
+      "sha256": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/TrackerSnapshotAlignmentLogReader.cs",
+      "bytes": 1996,
+      "sha256": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/verify_desktop_referee_acceptance.py",
+      "bytes": 25111,
+      "sha256": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "os-green/VisionPacketCaptureTests.cs",
+      "bytes": 20480,
+      "sha256": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/build.binlog",
+      "bytes": 1147598,
+      "sha256": "7a275064a26d668f8d45bb88261b62704d0327c8958264e4a3b29270eb014c18",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "build/command.json",
+      "bytes": 1335,
+      "sha256": "152450a1077b83bf02b50eae3c04e76a3b024c5f57424070d6325aab23e45bdf",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/completion.json",
+      "bytes": 1589,
+      "sha256": "620e2825c19d387c0105153d6c9236036a314dc46503f75dc01dc5c9d3743507",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/DiagnosticsSampleLog.cs",
+      "bytes": 12674,
+      "sha256": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/source.diff",
+      "bytes": 2467,
+      "sha256": "4299817645ff9394c5363bf6961f37d2a16d5e23050df8955cb291058d6c04b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/stdout.log",
+      "bytes": 2973,
+      "sha256": "bd92ae9662ee67ef7fe815a5ce33e8d0063e23628684e389a50f5980343b844a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/test_desktop_referee_acceptance.py",
+      "bytes": 19658,
+      "sha256": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/TrackerPacketSnapshotLogReader.cs",
+      "bytes": 2416,
+      "sha256": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/TrackerSnapshotAlignmentLogReader.cs",
+      "bytes": 1996,
+      "sha256": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/verify_desktop_referee_acceptance.py",
+      "bytes": 25111,
+      "sha256": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "build/VisionPacketCaptureTests.cs",
+      "bytes": 20480,
+      "sha256": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/build.binlog",
+      "bytes": 1239888,
+      "sha256": "2d14b92621aacf595bdd7de450d349d5bd923522ceba601acc49f65d3027ea1a",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "full-dotnet/command.json",
+      "bytes": 1572,
+      "sha256": "63ca2bdd8351a8df6791fb9d461bba95131118c353470c5f6472dd62b37a4a14",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/completion.json",
+      "bytes": 1826,
+      "sha256": "0fc988c3c3876c078053665a3b8701865a9683d2878e2e42595c60b877ad6044",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/DiagnosticsSampleLog.cs",
+      "bytes": 12674,
+      "sha256": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/full.trx",
+      "bytes": 1252615,
+      "sha256": "4291a72792370c03d416cb5ef1bb2aaf3b381e79ee3c89c3a191aba80ca1a88c",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/source.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/stdout.log",
+      "bytes": 5745,
+      "sha256": "78e1595ca48cc8b697cdc806d888fd1ec4edc1e481c7b9537b1a78152b99f20e",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/test_desktop_referee_acceptance.py",
+      "bytes": 19658,
+      "sha256": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/TrackerPacketSnapshotLogReader.cs",
+      "bytes": 2416,
+      "sha256": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/TrackerSnapshotAlignmentLogReader.cs",
+      "bytes": 1996,
+      "sha256": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/verify_desktop_referee_acceptance.py",
+      "bytes": 25111,
+      "sha256": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/VisionPacketCaptureTests.cs",
+      "bytes": 20480,
+      "sha256": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "full-dotnet/vstest.datacollector.26-10-26_21-02-24_39549_5.log",
+      "bytes": 1543069,
+      "sha256": "c1eea7e55edcdf27ddd9cfdc5822f690db49d8215bbd2b2107aa9b5fd7aafb3b",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "full-dotnet/vstest.host.26-10-26_21-02-24_57672_5.log",
+      "bytes": 3594514,
+      "sha256": "2022d13e679a14a933ff2d63667b6112f5cd54aa52a630cb5410e0db53311ec4",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "full-dotnet/vstest.log",
+      "bytes": 2750606,
+      "sha256": "d0e82753ea5f58575a1c34d8920c45a32d6fd36096b54c8c6b4b916a4ae7c928",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "final-python/command.json",
+      "bytes": 1243,
+      "sha256": "54cb998e7c235bcaef380898e7d78c1bd6ad9cc19ccb88a43d4fc7f08a1e8ec0",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/completion.json",
+      "bytes": 1497,
+      "sha256": "ca9eeab42ed4ba59bd8dced1511de491fa47ffc4f543e95e5ad15d15f5ac5199",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/DiagnosticsSampleLog.cs",
+      "bytes": 12674,
+      "sha256": "6271d632dc0142842f4a9bc6d65450d1169a892e17ddc40b94963b366c4b6c6b",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/source.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/stderr.log",
+      "bytes": 4687,
+      "sha256": "1ba7cb7591c28353012b3fe26ada69d4c4e1023805966453f776fb49a8899af5",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/test_desktop_referee_acceptance.py",
+      "bytes": 19658,
+      "sha256": "1130bacf13af67e73276afc5f070ac97b109a23b9ff66e11c89e24163ba30872",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/TrackerPacketSnapshotLogReader.cs",
+      "bytes": 2416,
+      "sha256": "a32812806ec4b41997041e5ed5deb4365067dbed233c14c21ee548e56f2b95b2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/TrackerSnapshotAlignmentLogReader.cs",
+      "bytes": 1996,
+      "sha256": "bb367e620a133bd84ac5ab6478cf74b998458315fcf93df18be33bdfefb4a76d",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/verify_desktop_referee_acceptance.py",
+      "bytes": 25111,
+      "sha256": "6bac80a166333b836ef995676e5127516b4ae28baa6f40c1ed8845a0e690190a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "final-python/VisionPacketCaptureTests.cs",
+      "bytes": 20480,
+      "sha256": "f4c527944e1d1a1b705758d46ef305e12879f69810d2853ab9c17054d82f9782",
+      "includedInPublicArchive": true
+    }
+  ]
+}

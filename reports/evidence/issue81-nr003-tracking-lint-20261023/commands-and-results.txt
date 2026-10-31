@@ -1,0 +1,5 @@
+textlint: C:\Program Files\nodejs\node.exe tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md (existing Windows mirror)
+cspell: C:\Program Files\nodejs\node.exe tools/lint/scripts/run-markdown-targets.js spell --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md (existing Windows mirror)
+Sudachi: /home/donabe/venvs/duck-pr73-r04-ff50682/bin/python tools/lint/scripts/check-markdown-whitelist-sudachi.py --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md (existing WSL venv; same two-file, one --files argument)
+textlint exit=0; CSpell checked 2 files, 0 issues, exit=0; Sudachi exit=0 and emitted no violations.
+Scope: exactly 2 changed body lines in 2 files, derived against f92b5df2d5ebd4a9269e97e141ca53bb451d10cc. Focused source line mapping and hashes are in focused-inputs.json.

@@ -1,0 +1,8 @@
+{
+  "baselineSHA256": "084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0",
+  "afterRemovingOnlyObserverDeclarationsAndInvocationsSHA256": "084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0",
+  "byteIdentical": true,
+  "cacheFreshnessBehaviorUnmodified": true,
+  "observerDefault": "null",
+  "publicAPIDefaultChanged": false
+}

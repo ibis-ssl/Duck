@@ -1,0 +1,7 @@
+ M Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj
+ M Tracker/Design/phases-status.md
+ M Tracker/Design/tasks-status.md
+ M reports/issue81-referee-driver-host-implementation-20261022.md
+?? Testing/Duck.Testing.RefereeDriver.Host/Program.cs
+?? Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs
+?? Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs

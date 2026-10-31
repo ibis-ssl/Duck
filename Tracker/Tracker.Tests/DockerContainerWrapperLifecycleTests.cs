@@ -9,6 +9,9 @@ namespace Tracker.Tests;
 
 public sealed class DockerContainerWrapperLifecycleTests
 {
+    private const string FullContainerId = "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789";
+    private const string AbbreviatedContainerId = "abcdef012345";
+
     [Fact]
     public async Task GracefulShutdownStopsAndRemovesOnlyTheVerifiedOwnedContainer()
     {
@@ -35,10 +38,10 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Contains("run --detach", commands);
         Assert.Contains("--network host", commands);
         Assert.Contains("--label duck.aspire.owner=duck-apphost", commands);
-        Assert.Contains("inspect --format {{json .}} container-id", commands);
-        Assert.Contains("top container-id", commands);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"inspect --format {{{{json .}}}} {FullContainerId}", commands);
+        Assert.Contains($"top {FullContainerId}", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
         Assert.DoesNotContain("rm --force -", commands);
     }
 
@@ -63,8 +66,8 @@ public sealed class DockerContainerWrapperLifecycleTests
         var commands = File.ReadAllText(fake.TracePath);
         Assert.Contains("ps --all --quiet", commands);
         Assert.Contains("label=duck.aspire.run=run-17", commands);
-        Assert.Contains("inspect --format {{json .}} container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"inspect --format {{{{json .}}}} {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Fact]
@@ -88,8 +91,9 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.True(commands.Count(command => command.StartsWith("ps --all --quiet", StringComparison.Ordinal)) >= 2);
         Assert.Contains(commands, command => command.StartsWith("ps --all --quiet", StringComparison.Ordinal) &&
             command.Contains("label=duck.aspire.run=run-17", StringComparison.Ordinal));
-        Assert.Equal(1, commands.Count(command => command == "inspect --format {{json .}} container-id"));
-        Assert.Equal(1, commands.Count(command => command == "rm --force container-id"));
+        Assert.Equal(3, commands.Count(command => command.StartsWith($"inspect --format {{{{json .}}}}", StringComparison.Ordinal)));
+        Assert.Contains($"inspect --format {{{{json .}}}} {AbbreviatedContainerId}", commands);
+        Assert.Equal(1, commands.Count(command => command == $"rm --force {FullContainerId}"));
         Assert.DoesNotContain(commands, command => command.Contains("foreign", StringComparison.Ordinal));
     }
 
@@ -112,6 +116,73 @@ public sealed class DockerContainerWrapperLifecycleTests
     }
 
     [Fact]
+    public async Task CancellationDuringCreateLeavesDiscoveredOwnershipMismatchUntouched()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        using var fake = new FakeDockerClient(slowCreate: true, foreignImage: true);
+        using var cancellation = new CancellationTokenSource();
+        var run = DockerContainerWrapper.RunAsync(fake.Options(FindOpenPort()), cancellation.Token);
+        await WaitUntilAsync(() => File.Exists(fake.TracePath) &&
+            File.ReadAllText(fake.TracePath).Contains("run --detach", StringComparison.Ordinal));
+        cancellation.Cancel();
+
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains($"inspect --format {{{{json .}}}} {AbbreviatedContainerId}", commands);
+        Assert.DoesNotContain("stop --time", commands);
+        Assert.DoesNotContain("rm --force", commands);
+    }
+
+    [Fact]
+    public async Task CancellationDuringCreateInspectFailureLeavesCandidateUntouched()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        using var fake = new FakeDockerClient(slowCreate: true, foreignImage: false, inspectFailure: true);
+        using var cancellation = new CancellationTokenSource();
+        var run = DockerContainerWrapper.RunAsync(fake.Options(FindOpenPort()), cancellation.Token);
+        await WaitUntilAsync(() => File.Exists(fake.TracePath) &&
+            File.ReadAllText(fake.TracePath).Contains("run --detach", StringComparison.Ordinal));
+        cancellation.Cancel();
+
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains($"inspect --format {{{{json .}}}} {AbbreviatedContainerId}", commands);
+        Assert.DoesNotContain("stop --time", commands);
+        Assert.DoesNotContain("rm --force", commands);
+    }
+
+    [Fact]
+    public async Task OwnershipChangeAfterStopPreventsRemoval()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        using var fake = new FakeDockerClient(
+            slowCreate: false, foreignImage: false, changeOwnerOnStop: true);
+        using var cancellation = new CancellationTokenSource();
+        var options = fake.Options(FindOpenPort());
+        var run = DockerContainerWrapper.RunAsync(options, cancellation.Token);
+        await WaitForReadyAsync(options.HealthPort);
+        cancellation.Cancel();
+
+        Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(8)));
+        var commands = File.ReadAllText(fake.TracePath);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"inspect --format {{{{json .}}}} {FullContainerId}", commands);
+        Assert.DoesNotContain($"rm --force {FullContainerId}", commands);
+    }
+
+    [Fact]
     public async Task MissingExpectedServiceProcessPreventsReadinessAndTriggersExactCleanup()
     {
         if (OperatingSystem.IsWindows())
@@ -130,13 +201,13 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.NotEqual(0, exitCode);
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("top container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"top {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Theory]
     [InlineData("crane", "ros2", "ros2 param get /world_model_publisher team_name")]
-    [InlineData("cm4-sim", "cm4_sim", "exec container-id sh -c")]
+    [InlineData("cm4-sim", "cm4_sim", "exec " + FullContainerId + " sh -c")]
     public async Task ExpectedProcessWithoutServicePredicatePreventsReadiness(
         string profile,
         string processName,
@@ -158,9 +229,9 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.NotEqual(0, exitCode);
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains($"top container-id", commands);
+        Assert.Contains($"top {FullContainerId}", commands);
         Assert.Contains(probeCommand, commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Fact]
@@ -403,8 +474,8 @@ public sealed class DockerContainerWrapperLifecycleTests
         cancellation.Cancel();
         Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(10)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Equal(3, commands.Split("exec container-id timeout --signal=TERM", StringSplitOptions.None).Length - 1);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Equal(3, commands.Split($"exec {FullContainerId} timeout --signal=TERM", StringSplitOptions.None).Length - 1);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
         Assert.True(diagnostics.Count >= 2);
         Assert.DoesNotContain("CRANE_DIAGNOSTIC_SENTINEL", string.Join('\n', diagnostics));
         using var first = System.Text.Json.JsonDocument.Parse(diagnostics.First(line => line.Contains("duck_crane_probe_progress", StringComparison.Ordinal)));
@@ -438,7 +509,7 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.NotEqual(0, await DockerContainerWrapper.RunAsync(
             options, CancellationToken.None, StopTestChildProcessAsync, diagnostics.Add).WaitAsync(TimeSpan.FromSeconds(8)));
-        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"rm --force {FullContainerId}", File.ReadAllText(fake.TracePath));
         Assert.Contains(diagnostics, line => line.Contains("duck_crane_probe_final", StringComparison.Ordinal));
         Assert.DoesNotContain("CRANE_DIAGNOSTIC_SENTINEL", string.Join('\n', diagnostics));
     }
@@ -473,7 +544,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         var exitCode = await DockerContainerWrapper.RunAsync(options).WaitAsync(TimeSpan.FromSeconds(10));
 
         Assert.NotEqual(0, exitCode);
-        Assert.Contains("top container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"top {FullContainerId}", File.ReadAllText(fake.TracePath));
     }
 
     [Fact]
@@ -494,7 +565,7 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(4)));
         Assert.True(elapsed.Elapsed < TimeSpan.FromSeconds(15), $"Timeout path exceeded the DCP stop cap: {elapsed.Elapsed}.");
-        Assert.Contains("stop --time 3 container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"stop --time 3 {FullContainerId}", File.ReadAllText(fake.TracePath));
     }
 
     [Fact]
@@ -514,8 +585,8 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Fact]
@@ -543,8 +614,8 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Fact]
@@ -563,7 +634,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         cancellation.Cancel();
 
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"rm --force {FullContainerId}", File.ReadAllText(fake.TracePath));
     }
 
     [Fact]
@@ -655,8 +726,8 @@ public sealed class DockerContainerWrapperLifecycleTests
         cancellation.Cancel();
         Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(8)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Fact]
@@ -725,8 +796,8 @@ public sealed class DockerContainerWrapperLifecycleTests
             await ((IGameControllerReadinessMonitor)monitor).GetRuntimeReadinessAsync(CancellationToken.None));
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Theory]
@@ -823,8 +894,8 @@ public sealed class DockerContainerWrapperLifecycleTests
         cancellation.Cancel();
         Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(8)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     [Fact]
@@ -852,8 +923,8 @@ public sealed class DockerContainerWrapperLifecycleTests
         await WaitForHealthStatusAsync(options.HealthPort, HttpStatusCode.ServiceUnavailable);
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(8)));
         Assert.True(elapsed.Elapsed >= TimeSpan.FromSeconds(2), $"Wrapper failed before its recovery checks: {elapsed.Elapsed}.");
-        Assert.Contains("stop --time 3 container-id", File.ReadAllText(fake.TracePath));
-        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"stop --time 3 {FullContainerId}", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"rm --force {FullContainerId}", File.ReadAllText(fake.TracePath));
     }
 
     [Fact]
@@ -876,7 +947,7 @@ public sealed class DockerContainerWrapperLifecycleTests
         fake.MarkExpectedProcessExited();
 
         Assert.Equal(1, await run.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.Contains("rm --force container-id", File.ReadAllText(fake.TracePath));
+        Assert.Contains($"rm --force {FullContainerId}", File.ReadAllText(fake.TracePath));
     }
 
     [Fact]
@@ -928,8 +999,8 @@ public sealed class DockerContainerWrapperLifecycleTests
 
         Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(8)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Contains("stop --time 3 container-id", commands);
-        Assert.Contains("rm --force container-id", commands);
+        Assert.Contains($"stop --time 3 {FullContainerId}", commands);
+        Assert.Contains($"rm --force {FullContainerId}", commands);
     }
 
     private static async Task WaitForReadyAsync(int port) =>
@@ -1057,14 +1128,16 @@ public sealed class DockerContainerWrapperLifecycleTests
             bool emptyDiscovery = false,
             bool rejectRemove = false,
             bool delayedDiscovery = false,
-            int craneProbeTimeoutResponses = 0)
+            int craneProbeTimeoutResponses = 0,
+            bool inspectFailure = false,
+            bool changeOwnerOnStop = false)
         {
             Directory.CreateDirectory(directory);
             TracePath = Path.Combine(directory, "docker-trace.log");
             var spec = CreateSpec();
             var inspection = new
             {
-                Id = "container-id",
+                Id = FullContainerId,
                 Name = $"/{spec.ContainerName}",
                 Config = new
                 {
@@ -1098,13 +1171,13 @@ public sealed class DockerContainerWrapperLifecycleTests
                 "#!/bin/sh",
                 $"printf '%s\\n' \"$*\" >> '{TracePath}'",
                 "case \"$1\" in",
-                $"  run) {createDelay}; echo container-id ;;",
-                $"  ps) {(emptyDiscovery ? ":" : delayedDiscovery ? $"if [ -f '{discoveryMarkerPath}' ]; then echo container-id; else touch '{discoveryMarkerPath}'; fi" : "echo container-id")} ;;",
-                $"  inspect) cat '{InspectionPath}' ;;",
+                $"  run) {createDelay}; echo {FullContainerId} ;;",
+                $"  ps) {(emptyDiscovery ? ":" : delayedDiscovery ? $"if [ -f '{discoveryMarkerPath}' ]; then echo {AbbreviatedContainerId}; else touch '{discoveryMarkerPath}'; fi" : $"echo {AbbreviatedContainerId}")} ;;",
+                $"  inspect) {(inspectFailure ? "echo inspect rejected >&2; exit 9" : $"cat '{InspectionPath}'")} ;;",
                 $"  top) echo 'PID USER COMMAND'; if [ -f '{ExpectedProcessExitedPath}' ]; then echo '1 root exited-process'; else echo '1 root {processName}'; fi ;;",
                 craneProbeCommand,
                 "  logs) exec sleep 120 ;;",
-                $"  stop) {(slowStop ? "sleep 20" : ":")}; exit 0 ;;",
+                $"  stop) {(slowStop ? "sleep 20" : ":")}; {(changeOwnerOnStop ? $"sed 's/run-17/foreign-run/' '{InspectionPath}' > '{InspectionPath}.tmp' && mv '{InspectionPath}.tmp' '{InspectionPath}'" : ":")}; exit 0 ;;",
                 $"  rm) {(rejectRemove ? "echo remove rejected >&2; exit 7" : "exit 0")} ;;",
                 "  *) exit 9 ;;",
                 "esac",

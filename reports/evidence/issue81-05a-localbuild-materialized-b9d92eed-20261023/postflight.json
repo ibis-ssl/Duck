@@ -1,0 +1,32 @@
+{
+  "timestamp_utc": "2026-10-23T10:52:59Z",
+  "repo": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "dotnet_sdk": "10.0.113",
+  "gitmodules_sha256": "3d493f4172bf5473b49d0bd1ec1fe564d6a0a821248aa05dfaea3e172444c3a9",
+  "gitlink_submodule_status": [
+    "-9b0765fe7a07a55124f6ee957d4559348462d227 SslProto/src/external/ssl-game-controller",
+    "-1e719a8d410cc84847ec69104da44fed13738291 SslProto/src/external/ssl-simulation-protocol"
+  ],
+  "gitconfig_mutation": "none; no git config command was run",
+  "shared_module_store_mutation": "none; only read via git cat-file, no refs/checkout/update written",
+  "fixed_test_sha256": "a63641ea949a3222fa11cf3934b4b241a137702b917e43e226a2768814fd0d16",
+  "apphost_program_sha256": "f438efe6766a72fcba8f550a5c8b13f6dd4c33b04cc738531c85bc869e59ac57",
+  "build_exit": 0,
+  "targeted_test_exit": 1,
+  "targeted_test_block": "NETSDK1004 before test execution: Testing/Duck.Testing.RefereeDriver.Host/obj/project.assets.json absent; no restore attempted",
+  "git_status_short": [
+    " M Testing/Duck.Testing.AppHost/Program.cs",
+    " M Tracker/Design/tasks-status.md",
+    " M reports/issue81-managed-resources-model-implementation-20261023.md",
+    "?? reports/evidence/issue81-04b2-supplement-20261023-v2/",
+    "?? reports/evidence/issue81-04b2-supplement-20261023-v3/",
+    "?? reports/evidence/issue81-04b2-supplement-20261023/",
+    "?? reports/evidence/issue81-05a-api-investigation-b9d92eed-20261023/",
+    "?? reports/evidence/issue81-05a-ci-b9d92eed-20261023/",
+    "?? reports/evidence/issue81-05a-localbuild-materialized-b9d92eed-20261023/",
+    "?? reports/evidence/issue81-05a-localbuild-source-readonly-b9d92eed-20261023/",
+    "?? reports/issue81-managed-resources-model-normal-review-20261023.md"
+  ],
+  "git_diff_check_exit": 0
+}

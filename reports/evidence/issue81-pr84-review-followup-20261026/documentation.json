@@ -1,0 +1,206 @@
+{
+  "commands": [
+    {
+      "name": "tool-identity",
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:46.693021+00:00",
+      "exit": 0
+    },
+    {
+      "name": "textlint",
+      "args": [
+        "node",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+        "--config",
+        ".textlintrc.json",
+        "--rulesdir",
+        "tools/lint/scripts/textlint-rules",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "Tracker/Design/tasks-status.md",
+        "reports/issue81-pr84-review-followup-20261026.md"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:46.717644+00:00",
+      "exit": 0
+    },
+    {
+      "name": "cspell",
+      "args": [
+        "node",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\docs-report-final\\cspell-existing-deps.cjs",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "Tracker/Design/tasks-status.md",
+        "reports/issue81-pr84-review-followup-20261026.md"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:47.221757+00:00",
+      "exit": 1
+    },
+    {
+      "name": "whitelist",
+      "args": [
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "Tracker/Design/tasks-status.md",
+        "reports/issue81-pr84-review-followup-20261026.md"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:47.795635+00:00",
+      "exit": 2
+    },
+    {
+      "name": "yomiyasu-aspire-simulation-test-environment",
+      "args": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "--json",
+        "--strict"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:48.638278+00:00",
+      "exit": 0
+    },
+    {
+      "name": "yomiyasu-tasks-status",
+      "args": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+        "Tracker/Design/tasks-status.md",
+        "--json",
+        "--strict"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:48.737977+00:00",
+      "exit": 1
+    },
+    {
+      "name": "yomiyasu-issue81-pr84-review-followup-20261026",
+      "args": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+        "reports/issue81-pr84-review-followup-20261026.md",
+        "--json",
+        "--strict"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:48.850804+00:00",
+      "exit": 0
+    },
+    {
+      "name": "diff-check",
+      "args": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-25T23:27:48.959308+00:00",
+      "exit": 0
+    },
+    {
+      "name": "whitelist-existing",
+      "args": [
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "Tracker/Design/tasks-status.md"
+      ],
+      "exit": 1
+    },
+    {
+      "name": "whitelist-report-stdin",
+      "args": [
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--stdin",
+        "reports/issue81-pr84-review-followup-20261026.md"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "cspell-report-stdin",
+      "args": [
+        "node",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\docs-report-final\\cspell-existing-deps.cjs",
+        "stdin://issue81-report.md"
+      ],
+      "exit": 0
+    }
+  ],
+  "baseline": {
+    "cspell": 145,
+    "whitelist": 318,
+    "trackingYomiyasuFindings": 40,
+    "trackingYomiyasuScore": 0
+  },
+  "final": {
+    "textlintExit": 0,
+    "cspellReportStdinExit": 0,
+    "whitelistReportStdinExit": 0,
+    "mainYomiyasuScore": 100,
+    "reportYomiyasuScore": 100,
+    "trackingYomiyasuFindings": 40
+  },
+  "comparison": {
+    "cspell": {
+      "added": [],
+      "removed": []
+    },
+    "whitelist": {
+      "added": [],
+      "removed": []
+    },
+    "yomiyasuTracking": {
+      "added": [
+        "{\"message\": \"箇条書きの比率（87.8%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。\", \"rule\": \"excess_list\", \"severity\": \"warn\", \"snippet\": \"リスト行: 303 / 全非空行: 345\"}"
+      ],
+      "removed": [
+        "{\"message\": \"箇条書きの比率（88.6%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。\", \"rule\": \"excess_list\", \"severity\": \"warn\", \"snippet\": \"リスト行: 303 / 全非空行: 342\"}"
+      ],
+      "interpretation": "Same pre-existing excess_list warning, ratio improved from 88.6% to 87.8% after added prose; the other 39 findings are unchanged."
+    }
+  },
+  "reportInitial": {
+    "cspellFindings": 5,
+    "whitelistFindings": 13
+  },
+  "inputSelection": {
+    "firstWhitelistExplicitReportExit": 2,
+    "reason": "Existing report path exclusions; ran the unmodified checker --stdin with the real report diagnostic path and the unchanged CSpell adapter with stdin://issue81-report.md.",
+    "repositoryConfigurationChanged": false
+  },
+  "documentHashes": {
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "b5570306a1148a16f3ad72b0dd7ee2a69ffaf7547e3eadd49009a45f47220cdd",
+    "Tracker/Design/tasks-status.md": "aa42e7a0779adea87125a73a158d49b5602bfa3e7c7506d6936c885c0ff99f3e",
+    "reports/issue81-pr84-review-followup-20261026.md": "eb7f88a33c0cf63db33c570dc36a76ff5d33c43bead01afd11a520b40f94be13"
+  }
+}

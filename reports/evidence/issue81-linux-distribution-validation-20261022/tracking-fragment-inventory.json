@@ -1,0 +1,23 @@
+{
+  "filesInspected": 2,
+  "addedLinesInspected": 2,
+  "files": [
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-lint-20261022/Tracker/Design/tasks-status-new-fragment.md",
+      "bytes": 813,
+      "lines": 1,
+      "sha256": "4801438f2f4a9a1386e9a5ae8953a62541d2b56f5db0c8ce5f439538f7f1fd58"
+    },
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-lint-20261022/Tracker/Design/phases-status-new-fragment.md",
+      "bytes": 588,
+      "lines": 1,
+      "sha256": "a350e836b82627bb51e6c7e77143dfc0fa732f4f7a10e17a2fad000ef06d134e"
+    }
+  ],
+  "finalChecks": {
+    "textlint": "exit 0 for both files",
+    "cspell": "exit 0 for both files",
+    "sudachi": "exit 0 for both files"
+  }
+}

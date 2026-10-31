@@ -1,0 +1,14 @@
+using System.Net;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveReadinessBoundaryTests
+{
+    [Fact]
+    public async Task MissingOwnerRemainsNotReadyDespiteDecodedPacketsAndProducerEndpoint();
+    [Fact]
+    public async Task PollingDoesNotExtendFreshnessAndExactBoundaryExpiresAfterOneTick();
+}

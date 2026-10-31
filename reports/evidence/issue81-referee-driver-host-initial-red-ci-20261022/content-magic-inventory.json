@@ -1,0 +1,20 @@
+[
+  {
+    "path": "artifact-12454799622.zip",
+    "magic": "ZIP",
+    "bytes": 22715483,
+    "excludeFromTextRepoPackaging": true
+  },
+  {
+    "path": "artifacts/dotnet-test.binlog",
+    "magic": "GZip",
+    "bytes": 1591086,
+    "excludeFromTextRepoPackaging": true
+  },
+  {
+    "path": "artifacts/source.tar.gz",
+    "magic": "GZip",
+    "bytes": 20636764,
+    "excludeFromTextRepoPackaging": true
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+    "sha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2"
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+    "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+    "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1"
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+    "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c"
+  }
+]

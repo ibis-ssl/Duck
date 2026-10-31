@@ -1,0 +1,41 @@
+{
+  "baseline_head": "a38422004406edba7931e023fb17b6847d61d9c2",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2",
+      "head_bytes_identical": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+      "head_bytes_identical": true
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+      "head_bytes_identical": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+      "sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+      "new_file": true
+    }
+  ],
+  "fixed_independent": [
+    {
+      "manifest": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "original_files_checked": 11,
+      "unchanged": true
+    },
+    {
+      "manifest": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "original_files_checked": 9,
+      "unchanged": true
+    }
+  ],
+  "production_edits": false,
+  "scaffold_edits": false
+}

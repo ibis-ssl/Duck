@@ -1,0 +1,20 @@
+{
+  "command": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "--filter",
+    "FullyQualifiedName~Tracker.Tests.AppHostApplicationModelTests",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "purpose": "Run the existing AppHost application-model test class, including the fixed 05A tests and regression checks; no application/container start requested",
+  "started_utc": "2026-10-23T10:55:38Z",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "program_sha256": "cb6f77516d2a2d2161ec29dba6a94da7339fb21aa5c2480755c82c134b200003",
+  "test_sha256": "a63641ea949a3222fa11cf3934b4b241a137702b917e43e226a2768814fd0d16",
+  "assets_sha256": "685cc7db56d76a7e0a4c010a9ece3d195aa8d4240519146a56d3408b464d266d"
+}

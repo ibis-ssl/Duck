@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Google.Protobuf;
+using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.DebugHost.Tracking;
@@ -17,6 +18,7 @@ public sealed class VisionReceiverService(
     VisionPacketStore store,
     TrackerCoordinator trackerCoordinator,
     VisionPacketCaptureWriter packetCaptureWriter,
+    ServiceReceiveDiagnostics diagnostics,
     ILogger<VisionReceiverService> logger) : BackgroundService
 {
     /// <summary>
@@ -28,6 +30,7 @@ public sealed class VisionReceiverService(
         {
             var snapshot = receiverOptionsStore.GetSnapshot();
             var receiverOptions = snapshot.Options;
+            var epoch = diagnostics.BeginEpoch("vision");
             var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
             UdpClient udpClient;
             MulticastJoinResult joinResult;
@@ -74,21 +77,16 @@ public sealed class VisionReceiverService(
                     try
                     {
                         var result = await udpClient.ReceiveAsync(configurationScope.Token);
+                        var attempt = diagnostics.BeginReceive(epoch);
                         var receivedAt = DateTimeOffset.UtcNow;
                         packetCaptureWriter.Capture(result.Buffer, result.RemoteEndPoint, receivedAt);
-                        SSL_WrapperPacket packet;
-                        try
+                        var packet = DecodeDatagram(result.Buffer, result.RemoteEndPoint, receivedAt,
+                            store, diagnostics, attempt);
+                        if (packet is null)
                         {
-                            packet = SSL_WrapperPacket.Parser.ParseFrom(result.Buffer);
-                        }
-                        catch (InvalidProtocolBufferException ex)
-                        {
-                            store.RecordDecodeError(ex);
-                            logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
+                            logger.LogWarning("Failed to decode SSL-Vision packet");
                             continue;
                         }
-
-                        store.StorePacket(packet, result.RemoteEndPoint, receivedAt);
                         if (trackerOptions.Value.Enabled)
                         {
                             trackerCoordinator.ProcessPacket(packet, receivedAt);
@@ -107,10 +105,31 @@ public sealed class VisionReceiverService(
                     catch (Exception ex)
                     {
                         store.RecordDecodeError(ex);
+                        diagnostics.RecordFailure(diagnostics.BeginReceive(epoch));
                         logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
                     }
                 }
             }
+        }
+    }
+
+    internal static SSL_WrapperPacket? DecodeDatagram(byte[] payload, IPEndPoint endpoint,
+        DateTimeOffset receivedAt, VisionPacketStore store, ServiceReceiveDiagnostics diagnostics,
+        ServiceReceiveDiagnostics.ReceiveAttempt attempt)
+    {
+        try
+        {
+            var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
+            store.StorePacket(packet, endpoint, receivedAt);
+            if (packet.Detection is not null)
+                diagnostics.RecordSuccess(attempt, remoteEndpoint: endpoint.ToString());
+            return packet;
+        }
+        catch (InvalidProtocolBufferException ex)
+        {
+            store.RecordDecodeError(ex);
+            diagnostics.RecordFailure(attempt);
+            return null;
         }
     }
 

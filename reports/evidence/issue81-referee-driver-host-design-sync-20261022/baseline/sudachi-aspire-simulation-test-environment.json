@@ -1,0 +1,78 @@
+{
+  "exit_code": 1,
+  "inputs": [
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  ],
+  "violations": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 25,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 89,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 154,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 158,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 166,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 221,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 236,
+      "token": "Tailscale",
+      "normalized": "tailscale",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 238,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 239,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 246,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    }
+  ]
+}

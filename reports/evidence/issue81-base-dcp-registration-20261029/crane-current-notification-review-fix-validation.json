@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "task": "Issue81 G5C2 NR001",
+  "baseline": "324adced83b8212a787350dee0ab01eaabd003de",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "F6FA2DD9369DEA6A73254FD1D0E57A40D9015B5CB2010A96424217AEDD44A092"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "BE509C4994581939124986E45B01C51F49F6C1A45A6AA11BEAE92613C6009CDA"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "DBB301ADE25FB9E6DD309E3680D103BEB6B96B0E94A1EAA6F409F89000949BAA"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "3F1D875626D332BE335033751CEC557505559E59D8F0B24B4D0C9E3B8EE93480"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "A270A85206A29BEB3EE878E95706BAD51C783DC1C92594AE9CD601A53B61723E"
+    }
+  ],
+  "outcome": "Before Crane restart dispatch, compare the live resource notification with the currently owned registration. Stop, state mismatch, or full-ID replacement now prevents all three restart callbacks.",
+  "tests": [
+    {
+      "name": "focused real adapter notification theory",
+      "result": "4/4 passed"
+    },
+    {
+      "name": "related reconfiguration test class",
+      "result": "25/25 passed"
+    },
+    {
+      "name": "Tracker.Tests Release build",
+      "result": "exit 0; 0 errors; 27 warnings"
+    }
+  ],
+  "documentGates": {
+    "historical": "The initial phases whitelist and CSpell failures remain historical and are not counted as final passes.",
+    "final": "12/12 passed",
+    "composition": "4 design + 4 tasks from unchanged initial inputs, plus 4 corrected phases gates"
+  },
+  "evidenceLimitations": [
+    "The pre-fix behavioral failure was reported from a run, but its original raw output and at-run source fingerprint were not retained.",
+    "Usage frequency is unmeasured; no threshold classification is claimed.",
+    "Runtime, UDP, and deployment acceptance were not performed."
+  ],
+  "commit": "not performed"
+}

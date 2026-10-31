@@ -1,0 +1,10 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "[System.IO.Directory]::Delete('C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-mdgate-381dcb6-20261022\\node_modules')"
+  ],
+  "exit_code": 0
+}

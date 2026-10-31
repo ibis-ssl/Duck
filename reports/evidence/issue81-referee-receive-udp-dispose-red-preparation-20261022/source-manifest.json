@@ -1,0 +1,30 @@
+{
+  "head": "b67a3a42535acc58e11625bc0a8f2731a1902d15",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "15b5484dc7029cf0c741531e096d244c4ac0aed1929c7cf750679d0e53136995"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+      "sha256": "890079a332f561a87d071d4fcf3f1c55f0b9098621d5e047badd8b6a1a512d36"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs",
+      "sha256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f"
+    }
+  ],
+  "existingServiceChange": "only optional explicit IAsyncDisposable ownedReceiver constructor parameter, ignored/no behavior; exact inverse replacement equals baseline source",
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "semanticCompile": "not executed; generated Referee missing known local constraint; exact-SHA PR CI required",
+  "runtime": "not executed/no Red observed",
+  "newTests": 2,
+  "firstAssertions": [
+    "UdpAdapterReturnsActualDatagramEndpointAndReceiveStamp payload Equals (scaffold empty)",
+    "DisposeStopsRunAndDisposesExplicitlyOwnedReceiverWithoutCallerCancellation DisposeCalls Expected1 scaffold0"
+  ],
+  "existing16CasesAndFixed67": "existing17 sources unchanged (excluding modified constructor scaffold source)",
+  "productionBehaviour": "adapter ReceiveAsync empty result; adapter and service Dispose no-op; no socketreceive/config/disposal behavior implemented",
+  "processState": "all read/edit/syntax/check commands terminated"
+}

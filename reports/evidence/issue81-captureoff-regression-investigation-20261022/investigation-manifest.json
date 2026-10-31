@@ -1,0 +1,179 @@
+{
+  "head": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "sources": [
+    {
+      "path": "Tracker/Tracker.Tests/TrackerRuntimeRegistrationTddTests.cs",
+      "sha256": "28a7087921f932e60f50a7edf5dabe601eff3a55be58c9b0b7feecf5d87387e6",
+      "unchangedFromHead": true
+    },
+    {
+      "path": "TrackerConnectionLib/src/UdpTrackerReceiver.cs",
+      "sha256": "efcedd32dae72a470ce84966e388faf1af54e368c70396f1bb2ad0dc006d7f41",
+      "unchangedFromHead": true
+    },
+    {
+      "path": "TrackerConnectionLib/src/ITrackerDeserializer.cs",
+      "sha256": "5a66495d991c56b22f7a7c133315a1e14fd0450d7e8529a8c059706ffb9c3369",
+      "unchangedFromHead": true
+    },
+    {
+      "path": "TrackerConnectionLib/src/ITrackerPacket.cs",
+      "sha256": "c4da82560925f4bc7e7b4f576f6fe7a444c8ddaf20e56d59e888c74e91245397",
+      "unchangedFromHead": true
+    },
+    {
+      "path": "TrackerConnectionLib/src/TrackerWrapperPacketDeserializer.cs",
+      "sha256": "d64a51007f44a57b7a07a1d12ae054d0c73326e930f084f6f8153646042347d8",
+      "unchangedFromHead": true
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs",
+      "sha256": "f7f51e3a918dcb5e864f4c3fa325e9d4afd0733824e2fb2f3b54e531421274d2",
+      "unchangedFromHead": true
+    }
+  ],
+  "boundedExperiment": {
+    "normalTrials": 10,
+    "backlogTrials": 1,
+    "stopCondition": "Complete these 11 trials once; no repeat or CI retry by executor.",
+    "receiver": "actual source linked; synthetic decoder/packet instead of protobuf fixture",
+    "inferenceLimit": "Reproduces timeout under controlled worker backlog, does not establish actual CI failure cause.",
+    "results": [
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 6.1359,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1811,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.137,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1268,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1428,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1228,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1179,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1166,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1086,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": false,
+        "firstWithinOneSecond": true,
+        "elapsedBeforeRelease": 1.1133,
+        "decodeCountBeforeRelease": 1,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      },
+      {
+        "backlog": true,
+        "firstWithinOneSecond": false,
+        "elapsedBeforeRelease": 998.562,
+        "decodeCountBeforeRelease": 0,
+        "firstAfterRelease": true,
+        "secondAfterRelease": true,
+        "handlerErrors": 1,
+        "handled": 2
+      }
+    ]
+  },
+  "fixedOwnTests": {
+    "executed": 67,
+    "passed": 67,
+    "failed": 0
+  },
+  "ciRemainingFailure": {
+    "executionId": "ae57f528-2d21-4018-8d46-e6fab992bbf3",
+    "testId": "c249afd3-57ef-e7a4-dc86-834660403314",
+    "testName": "Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop",
+    "computerName": "runnervmxehtw",
+    "duration": "00:00:02.2294793",
+    "startTime": "2026-10-22T12:13:38.8370285+00:00",
+    "endTime": "2026-10-22T12:13:41.1233779+00:00",
+    "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+    "outcome": "Failed",
+    "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+    "relativeResultsDirectory": "ae57f528-2d21-4018-8d46-e6fab992bbf3"
+  },
+  "ciTrxSha256": "efb4d82ae76ce9ae194e55291eabba9c8de6a0e4e8120f26a1956bfeed258904",
+  "probeProgramSha256": "e2aa78f34c8567d54396d8052b84289035ba2529bc1b8f0974657a7034dab046",
+  "probeCsprojSha256": "45f6f01243648d25f7f200d22fe351a2f4be8c20e28c08895ebf6fe148d166a2",
+  "probeOutputSha256": "941be5df4c4d47f429fea7728102ed913a61378c7d02cce63cb948291bb48239",
+  "repoProductionAndTestsChanged": false,
+  "processState": "all restore/probe subprocesses terminated; worker gate released; receiver stopped; all worker tasks joined"
+}

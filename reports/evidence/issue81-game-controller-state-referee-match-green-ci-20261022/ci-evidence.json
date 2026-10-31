@@ -1,0 +1,174 @@
+{
+  "runId": 39841590121,
+  "headSha": "51bdd74723a06cde21adf734f5b1d4a40b48b8f8",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39841590121",
+  "updatedAt": "2026-10-22T19:38:00Z",
+  "jobs": [
+    {
+      "id": 120043727276,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 120043730054,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120044463923,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "counts": {
+    "failed": 0,
+    "passed": 734,
+    "skipped": 0,
+    "total": 734
+  },
+  "sourceCount": 34,
+  "sourceExpectedHeadPrePostDiskMatch": true,
+  "fixedMatch18SHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+  "artifactCount": 0,
+  "individualTRX": false,
+  "sourceArchiveAvailable": false,
+  "outcomeGranularity": "734aggregate Green; CI log reports TRX path on runner, but success artifact0 means no downloadable individual TRX; match18/old716/fixed67/race source preserved, no individual success re-observation",
+  "ciCheckout": "91c39da PR merge containing exact51bdd747 into88cb20f",
+  "commands": [
+    {
+      "evidence": "artifacts.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39841590121/artifacts"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:38:34.242960+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:38:34.761274+00:00"
+    },
+    {
+      "evidence": "checkpoint-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39841590121",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:38:17.741076+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:38:19.082342+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39841590121",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:37:21.028893+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:37:22.340681+00:00"
+    },
+    {
+      "evidence": "run-list.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "51bdd74723a06cde21adf734f5b1d4a40b48b8f8",
+        "--event",
+        "pull_request",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,createdAt,updatedAt",
+        "--limit",
+        "10"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "exitCode": 0
+    },
+    {
+      "evidence": "run-log.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39841590121",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:38:34.243242+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:38:36.931525+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39841590121",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:37:34.018264+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:38:20.516439+00:00"
+    }
+  ],
+  "ciTestCommand": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj (full command retained in run-log.stdout.log)",
+  "acceptedRed": {
+    "head": "8b7adc131bb8717a9a8a30bb5eb75a0d4e109db9",
+    "run": 39839435897,
+    "total": 734,
+    "passed": 721,
+    "failed": 13,
+    "ciEvidenceSHA256": "35a0e69b168dca26081afcc4285a0c28ad29db0a712dbaaff459561af051806e"
+  },
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  },
+  "processState": {
+    "sessions": {
+      "27095": 0,
+      "9638": 0,
+      "84454": 0,
+      "25817": 0,
+      "34695": 0
+    },
+    "innerWatchExit": 0,
+    "allOwnedProcessesTerminated": true,
+    "uncollectedExitCodes": []
+  }
+}

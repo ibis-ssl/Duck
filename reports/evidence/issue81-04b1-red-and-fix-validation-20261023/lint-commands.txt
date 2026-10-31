@@ -1,0 +1,4 @@
+node tools/lint/scripts/list-markdown-targets.js --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md
+node tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md
+node tools/lint/scripts/run-markdown-targets.js spell --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md
+/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python tools/lint/scripts/check-markdown-whitelist-sudachi.py --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md

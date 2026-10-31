@@ -1,0 +1,62 @@
+{
+  "sourceDiffSha256": "5f44e5afad454dfdba8d889741b7647d42d97d732b4dd106ffb8cb9bb3b97303",
+  "mirror": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-04b2-status-fragments-mirror-v4",
+  "nodeVersion": "v24.20.0",
+  "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+  "nodeModulesJunction": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "resolvedNodeModules": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "sudachiDictionarySha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+  "inputs": [
+    {
+      "path": "current/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+      "bytes": 1007,
+      "sha256": "C32A94E895F3983267E951229E2163A94A7A34A6AE7B5AC7D82C2BAB6BFB7B9F"
+    },
+    {
+      "path": "current/issue81-record-diff-v1/Tracker/Design/phases-status.md",
+      "bytes": 1387,
+      "sha256": "81BFD9A3DCCE76A5E44F6BC08DEDF7C9748DF3C8BFF11BF596D38F976F11B28C"
+    },
+    {
+      "path": "current/issue81-record-diff-v1/reports/issue81-bridge-integration-implementation-20261023.md",
+      "bytes": 1018,
+      "sha256": "58040047234602978EC92FB99ADEF88C97F108692D00BCADC09C20D79F068B93"
+    },
+    {
+      "path": "current/issue81-record-diff-v1/reports/issue81-bridge-readiness-normal-review-20261023.md",
+      "bytes": 20235,
+      "sha256": "88A314D04C189A7F562C5B49BA9FD8B71F01329180C8EC16D87A1CBC8CBE2439"
+    }
+  ],
+  "configAndRules": [
+    {
+      "path": ".textlintrc.json",
+      "sha256": "A7DBC9EA76A21604851CF0128B97D16EB3708CEF3B9CA6A4E8402435F731F18F"
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sha256": "2FF9F167A77E6627720297503237F31E7675881A8FDEC7E31987D8B65BCC5642"
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sha256": "BC3DCA1EBC1713C3A6D19D4D123CF6DCC135B44B57779A91796106E3630716DA"
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sha256": "DC4DC3CDA79ADA88A07CEEAC8999718C519482F2CC7FF0098668EEC2D930B9D8"
+    },
+    {
+      "path": "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "sha256": "A4A7F85A182188F9D374C83628FCDF5204933320E528E9E09D0255170B6F0B33"
+    },
+    {
+      "path": "tools/lint/scripts/textlint-rules/no-fullwidth-space.js",
+      "sha256": "9CEA9CAE8A69B3164B0E928E35F382BF1124E37E02FDF8CDD2FE795CC06CFC92"
+    },
+    {
+      "path": "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js",
+      "sha256": "EFF1CD4A205355FB28767DD34A04B3135E61E0BF3D63A3159642F55A787C3757"
+    }
+  ]
+}

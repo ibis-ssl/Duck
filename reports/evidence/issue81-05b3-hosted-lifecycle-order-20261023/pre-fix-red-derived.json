@@ -1,0 +1,29 @@
+{
+  "captureKind": "derived-summary-from-tool-return; byte-exact stdout/stderr files were not saved",
+  "startedUtc": "2026-10-23T22:06:00Z (approximate; exact start unavailable)",
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName~ContainerIdentityHandoffLifecycleTests",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--logger",
+    "console;verbosity=minimal"
+  ],
+  "outerWslPythonExit": 0,
+  "innerDotnetExit": 1,
+  "fixtureSha256": "bcc4304f07b5d79fe04efb212822b886a7cdedfff04dafb7191cc3e6c50e93b7",
+  "preImplementationServiceSha256": "6914a48a74b357b692625bce5f265fbdc884299b8b7029e8ea6aa919d79bd8f8",
+  "compileSucceeded": true,
+  "tests": {
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "total": 1
+  },
+  "assertion": "Task.WhenAny selected the bounded delay; handoff runner had not been called while DCP-like StartAsync remained blocked.",
+  "notAnAspireRuntimeRun": true
+}

@@ -1,0 +1,327 @@
+[
+  {
+    "path": "artifact-download.command.json",
+    "bytes": 253,
+    "sha256": "4d512398f97e1815f6d70d1e69a62e1407f252103f6a0b4f9ef57c4277bb2ac9"
+  },
+  {
+    "path": "artifact-download.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "artifacts.command.json",
+    "bytes": 222,
+    "sha256": "2e8084f9ba4c61ffc81797d259936f6815f6aaa25d92a26b8b774db9a1fb7a17"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "bytes": 751,
+    "sha256": "d6cf611e16daac89e509061ad53599bc69412d3d446288336defe7e5bd57761d"
+  },
+  {
+    "path": "ci-evidence.json",
+    "bytes": 8745,
+    "sha256": "46799b34a4222ddbc6efccd0a1086dd6861485ad76a306657c236643819df0cb"
+  },
+  {
+    "path": "ci-source/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+    "bytes": 10583,
+    "sha256": "86aa44082a0945ddeac957e8fa8a1ee823223b7e6afc82c11ca132b7e8ab1223"
+  },
+  {
+    "path": "ci-source/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "bytes": 482,
+    "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c"
+  },
+  {
+    "path": "ci-source/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "bytes": 9178,
+    "sha256": "084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0"
+  },
+  {
+    "path": "ci-source/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "bytes": 1264,
+    "sha256": "95ba1286513657c4be5fa8315131f07133cd2152f94f11ebb301a6cb172f0594"
+  },
+  {
+    "path": "ci-source/Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+    "bytes": 1890,
+    "sha256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+    "bytes": 6555,
+    "sha256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/IndependentClock.cs",
+    "bytes": 1020,
+    "sha256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/IndependentVisionWireFixture.cs",
+    "bytes": 3277,
+    "sha256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs",
+    "bytes": 4739,
+    "sha256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+    "bytes": 5350,
+    "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+    "bytes": 6765,
+    "sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs",
+    "bytes": 7400,
+    "sha256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs",
+    "bytes": 7102,
+    "sha256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs",
+    "bytes": 5340,
+    "sha256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs",
+    "bytes": 16832,
+    "sha256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs",
+    "bytes": 6568,
+    "sha256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs",
+    "bytes": 6572,
+    "sha256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs",
+    "bytes": 11417,
+    "sha256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/ResourceReadinessSpecificationTests.cs",
+    "bytes": 8675,
+    "sha256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs",
+    "bytes": 8378,
+    "sha256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/TrackerDatagramSpecificationTests.cs",
+    "bytes": 2621,
+    "sha256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4"
+  },
+  {
+    "path": "ci-source/Tracker/Tracker.Tests/VisionStoreAdditionalSpecificationTests.cs",
+    "bytes": 3681,
+    "sha256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a"
+  },
+  {
+    "path": "ci-test-command.txt",
+    "bytes": 295,
+    "sha256": "472da321197141ba1836994602b086511eb2475f03b859bc9f52b6f4b7cb5728"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 69,
+    "sha256": "67748a2bcc44064a80a9404bb08708b609b6fc4c79b7ccecc155328655425417"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "dotnet-test.binlog",
+    "bytes": 1518438,
+    "sha256": "df89df8c2739ce4dd138ed26ac2133cfb8887f20006e965e3620eba0443dce15"
+  },
+  {
+    "path": "dotnet-test.exit-code",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "path": "dotnet-test.stderr.log",
+    "bytes": 334,
+    "sha256": "faec2527f306f86cd7a3313b77a3ada7b6042899f7adc6225ab315fa723e1773"
+  },
+  {
+    "path": "dotnet-test.stdout.log",
+    "bytes": 7238,
+    "sha256": "08f2f4dda0f02bba8f825383cb40730872189dc1023dd007dcbc7c5766cb92bb"
+  },
+  {
+    "path": "dotnet-test.trx",
+    "bytes": 909793,
+    "sha256": "43c61af967318ccb5fe96e634fc958378f4e7ea73ec9acb634715f2ecb683413"
+  },
+  {
+    "path": "environment.txt",
+    "bytes": 3259,
+    "sha256": "97f4d4e3b9f1bbb43119c6de34562cc65d076448dc984656fb245b93bac46f36"
+  },
+  {
+    "path": "existing633-results.json",
+    "bytes": 153990,
+    "sha256": "0b0b7e1951712354fc42c6e0c5e24bdc1b617d10528e3c3006f1b1e2be43f770"
+  },
+  {
+    "path": "factory2-results.json",
+    "bytes": 2079,
+    "sha256": "e078951cd3cc8689cc45531db64658029dbb384d79c1e832d71ceefee3f47ee9"
+  },
+  {
+    "path": "failure-artifact.zip",
+    "bytes": 15016098,
+    "sha256": "23dcfebc69e75b9a0a1933fe84baa03b68bad547fc5882c9facd1227c17b3052"
+  },
+  {
+    "path": "final-view.command.json",
+    "bytes": 272,
+    "sha256": "5a3c0f30b46564cf512a223e56dbed1f10a9fca3bc988ae5ae598d77eee5856c"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "bytes": 2461,
+    "sha256": "3f20847b3b996d919ae108536719c822c875a1878b412e756bff91a46d56e914"
+  },
+  {
+    "path": "fixed67-results.json",
+    "bytes": 17260,
+    "sha256": "96aafd08fddce92cef29fa3e2085ee20ad1041413954b825f6eb6543c4bff71b"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "bytes": 4522,
+    "sha256": "e023c97e149226ebbd4d4f8d291b019fef104458bd5c661ecee7b1be73a53bc0"
+  },
+  {
+    "path": "initial-runs.command.json",
+    "bytes": 269,
+    "sha256": "b29bb8eb658cc11407314bf37bd9ec15efe879e8ada08e7a4fb04a2e145887ec"
+  },
+  {
+    "path": "initial-runs.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "initial-runs.stdout.json",
+    "bytes": 12101,
+    "sha256": "cba1bbc3012929ad0aa7ebb132f768125055e2fc755ba5af0b9721c025ba12b2"
+  },
+  {
+    "path": "new5-regression-results.json",
+    "bytes": 1227,
+    "sha256": "dfd5b8b22e94caec05b3b8b0c7c08f6131bf4e175af87a7d166cf550fa2e2ed4"
+  },
+  {
+    "path": "progress-view.command.json",
+    "bytes": 272,
+    "sha256": "999a156a82c5bb0b28dbd3dbd47c22f1695db86ae40a539f9ceff89e2f4a7253"
+  },
+  {
+    "path": "progress-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "progress-view.stdout.json",
+    "bytes": 1976,
+    "sha256": "8d404bfb40ed1fb9ee1c6fbf2d199502193821e85ce951e97f73f8190d51622b"
+  },
+  {
+    "path": "run-log.command.json",
+    "bytes": 212,
+    "sha256": "09df51157be1c9e007ac442d0313675551cf0a429ede863c4f9464d3bda8c77e"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "bytes": 57872,
+    "sha256": "d3fcbf282791608551ebadffb8ed47b0aef018fd0ac90af437e8474785196193"
+  },
+  {
+    "path": "source-archive-check.json",
+    "bytes": 4500,
+    "sha256": "095bbc550f03b651c2d03afbd4f3dd58c1c11bfce015ac4ac14e6afcdb529a15"
+  },
+  {
+    "path": "source.tar.gz",
+    "bytes": 13089553,
+    "sha256": "7ec27e518ef93e91edb7e8b2c490f410c582d8e38081d192ca11c9f1be8470f0"
+  },
+  {
+    "path": "vstest-diagnostics.datacollector.26-10-22_15-48-13_44509_5.log",
+    "bytes": 1133171,
+    "sha256": "8c4d8963e2395da45d9e9f2bc3fefa45105ff75fdf953d28a19e55298eff1d71"
+  },
+  {
+    "path": "vstest-diagnostics.host.26-10-22_15-48-13_69132_5.log",
+    "bytes": 2544698,
+    "sha256": "5c0e8f4ca173ba6e0cd163673d064e2830b0353094acd0f169c7faa0b973d80d"
+  },
+  {
+    "path": "vstest-diagnostics.log",
+    "bytes": 1974100,
+    "sha256": "466f79471e36d9fa50cb710933352bb6831784cdde7365ef955446707273ae79"
+  },
+  {
+    "path": "watch.command.json",
+    "bytes": 236,
+    "sha256": "ebcdd5246d7369a8c9ac6252f2ad17722b1112653bcf2e86d167aa098780c0da"
+  },
+  {
+    "path": "watch.exit.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "path": "watch.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "watch.stdout.log",
+    "bytes": 2950,
+    "sha256": "7b3d7c1cd43b3518c7bb9d26ca4e453aa03865aae402bed16893dfaf15164b98"
+  }
+]

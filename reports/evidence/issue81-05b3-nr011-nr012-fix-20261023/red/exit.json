@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "timed_out": false,
+  "finished_utc": "2026-10-23T19:56:42.752025+00:00",
+  "test_source_sha256_after": "bf616f532d219872d6183f81257b01383a01edecf48dbac07713a5009c2d2e03",
+  "product_source_sha256_after": "cf6888ceba02dd2776b8ccc189c243054a1ba0ab03c24e73d57fc02d68776fcc",
+  "stdout_bytes": 6095,
+  "stderr_bytes": 297
+}

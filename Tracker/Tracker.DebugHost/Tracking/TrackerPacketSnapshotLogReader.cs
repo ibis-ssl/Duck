@@ -35,7 +35,9 @@ public sealed class TrackerPacketSnapshotLogReader
     /// </summary>
     public static IEnumerable<TrackerPacketSnapshotRecord> ReadRecords(string path)
     {
-        foreach (var line in File.ReadLines(path))
+        using var reader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
         {
             if (string.IsNullOrWhiteSpace(line))
             {

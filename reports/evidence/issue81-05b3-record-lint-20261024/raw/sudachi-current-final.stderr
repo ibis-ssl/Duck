@@ -1,0 +1,24 @@
+Markdown whitelist violations:
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'Driver' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'Driver' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'Driver' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'アプリ' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'Driver' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'localhost' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'referee' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'localhost' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'Driver' (english) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'referee' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'Driver' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'アプリ' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.

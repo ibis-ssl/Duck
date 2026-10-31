@@ -1,0 +1,414 @@
+test	Set up job	﻿2026-10-22T12:12:52.6793019Z Current runner version: '2.338.0'
+test	Set up job	2026-10-22T12:12:52.6816616Z ##[group]Runner Image Provisioner
+test	Set up job	2026-10-22T12:12:52.6817695Z Hosted Compute Agent
+test	Set up job	2026-10-22T12:12:52.6818307Z Version: 20261015.610
+test	Set up job	2026-10-22T12:12:52.6818952Z Commit: 267fdb4e8bbec4ab5ea31367f3a00d5c480c7656
+test	Set up job	2026-10-22T12:12:52.6819695Z Build Date: 2026-10-14T17:06:54Z
+test	Set up job	2026-10-22T12:12:52.6820346Z Worker ID: {e1c4bd78-ee99-49a0-be26-af751dcdb047}
+test	Set up job	2026-10-22T12:12:52.6821008Z Region: westus2
+test	Set up job	2026-10-22T12:12:52.6821563Z Cloud: Azure
+test	Set up job	2026-10-22T12:12:52.6822104Z ##[endgroup]
+test	Set up job	2026-10-22T12:12:52.6823705Z ##[group]Operating System
+test	Set up job	2026-10-22T12:12:52.6824323Z Ubuntu
+test	Set up job	2026-10-22T12:12:52.6825135Z 24.04.5
+test	Set up job	2026-10-22T12:12:52.6825918Z LTS
+test	Set up job	2026-10-22T12:12:52.6826410Z ##[endgroup]
+test	Set up job	2026-10-22T12:12:52.6826942Z ##[group]Runner Image
+test	Set up job	2026-10-22T12:12:52.6827535Z Image: ubuntu-24.04
+test	Set up job	2026-10-22T12:12:52.6828077Z Version: 20261018.339.1
+test	Set up job	2026-10-22T12:12:52.6829091Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261018.339/images/ubuntu/Ubuntu2404-Readme.md
+test	Set up job	2026-10-22T12:12:52.6830769Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261018.339
+test	Set up job	2026-10-22T12:12:52.6831689Z ##[endgroup]
+test	Set up job	2026-10-22T12:12:52.6832763Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2026-10-22T12:12:52.6834740Z Contents: read
+test	Set up job	2026-10-22T12:12:52.6835593Z Metadata: read
+test	Set up job	2026-10-22T12:12:52.6836175Z ##[endgroup]
+test	Set up job	2026-10-22T12:12:52.6838141Z Secret source: Actions
+test	Set up job	2026-10-22T12:12:52.6839104Z Cache mode: write
+test	Set up job	2026-10-22T12:12:52.6839740Z Prepare workflow directory
+test	Set up job	2026-10-22T12:12:52.7139513Z Prepare all required actions
+test	Set up job	2026-10-22T12:12:52.7209373Z Getting action download info
+test	Set up job	2026-10-22T12:12:53.1288056Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+test	Set up job	2026-10-22T12:12:53.2277876Z Download action repository 'actions/setup-dotnet@v5' (SHA:26b0ec14cb23fa6904739307f278c14f94c95bf1)
+test	Set up job	2026-10-22T12:12:53.5227411Z Download action repository 'actions/upload-artifact@v7' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+test	Set up job	2026-10-22T12:12:53.7213668Z Complete job name: test
+test	Check out repository	﻿2026-10-22T12:12:53.7943706Z ##[group]Run actions/checkout@v6
+test	Check out repository	2026-10-22T12:12:53.7944590Z with:
+test	Check out repository	2026-10-22T12:12:53.7945344Z   submodules: recursive
+test	Check out repository	2026-10-22T12:12:53.7945872Z   fetch-depth: 0
+test	Check out repository	2026-10-22T12:12:53.7946426Z   repository: ibis-ssl/Duck
+test	Check out repository	2026-10-22T12:12:53.7950350Z   token: ***
+test	Check out repository	2026-10-22T12:12:53.7950880Z   ssh-strict: true
+test	Check out repository	2026-10-22T12:12:53.7951376Z   ssh-user: git
+test	Check out repository	2026-10-22T12:12:53.7951866Z   persist-credentials: true
+test	Check out repository	2026-10-22T12:12:53.7952433Z   clean: true
+test	Check out repository	2026-10-22T12:12:53.7952947Z   sparse-checkout-cone-mode: true
+test	Check out repository	2026-10-22T12:12:53.7953546Z   fetch-tags: false
+test	Check out repository	2026-10-22T12:12:53.7954090Z   show-progress: true
+test	Check out repository	2026-10-22T12:12:53.7954577Z   lfs: false
+test	Check out repository	2026-10-22T12:12:53.7955228Z   set-safe-directory: true
+test	Check out repository	2026-10-22T12:12:53.7955795Z   allow-unsafe-pr-checkout: false
+test	Check out repository	2026-10-22T12:12:53.7956568Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:53.8928067Z Syncing repository: ibis-ssl/Duck
+test	Check out repository	2026-10-22T12:12:53.8931343Z ##[group]Getting Git version info
+test	Check out repository	2026-10-22T12:12:53.8932576Z Working directory is '/home/runner/work/Duck/Duck'
+test	Check out repository	2026-10-22T12:12:53.8934345Z [command]/usr/bin/git version
+test	Check out repository	2026-10-22T12:12:53.8984081Z git version 2.55.0
+test	Check out repository	2026-10-22T12:12:53.9003003Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:53.9015960Z Temporarily overriding HOME='/home/runner/work/_temp/4035aa69-33b1-4eae-9f41-dd33ae6f294c' before making global git config changes
+test	Check out repository	2026-10-22T12:12:53.9018167Z Adding repository directory to the temporary git global config as a safe directory
+test	Check out repository	2026-10-22T12:12:53.9020106Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Duck/Duck
+test	Check out repository	2026-10-22T12:12:53.9082408Z Deleting the contents of '/home/runner/work/Duck/Duck'
+test	Check out repository	2026-10-22T12:12:53.9084242Z ##[group]Determining repository object format
+test	Check out repository	2026-10-22T12:12:53.9086116Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:53.9088413Z ##[group]Initializing the repository
+test	Check out repository	2026-10-22T12:12:53.9089672Z [command]/usr/bin/git init /home/runner/work/Duck/Duck
+test	Check out repository	2026-10-22T12:12:53.9186245Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	Check out repository	2026-10-22T12:12:53.9187972Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test	Check out repository	2026-10-22T12:12:53.9189689Z hint: to use in all of your new repositories, which will suppress this warning,
+test	Check out repository	2026-10-22T12:12:53.9190870Z hint: call:
+test	Check out repository	2026-10-22T12:12:53.9191528Z hint:
+test	Check out repository	2026-10-22T12:12:53.9192508Z hint: 	git config --global init.defaultBranch <name>
+test	Check out repository	2026-10-22T12:12:53.9194666Z hint:
+test	Check out repository	2026-10-22T12:12:53.9195906Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	Check out repository	2026-10-22T12:12:53.9197371Z hint: 'development'. The just-created branch can be renamed via this command:
+test	Check out repository	2026-10-22T12:12:53.9198510Z hint:
+test	Check out repository	2026-10-22T12:12:53.9199242Z hint: 	git branch -m <name>
+test	Check out repository	2026-10-22T12:12:53.9200909Z hint:
+test	Check out repository	2026-10-22T12:12:53.9201959Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	Check out repository	2026-10-22T12:12:53.9203443Z Initialized empty Git repository in /home/runner/work/Duck/Duck/.git/
+test	Check out repository	2026-10-22T12:12:53.9206142Z [command]/usr/bin/git remote add origin https://github.com/ibis-ssl/Duck
+test	Check out repository	2026-10-22T12:12:53.9254157Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:53.9255526Z ##[group]Disabling automatic garbage collection
+test	Check out repository	2026-10-22T12:12:53.9266637Z [command]/usr/bin/git config --local gc.auto 0
+test	Check out repository	2026-10-22T12:12:53.9290625Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:53.9291871Z ##[group]Setting up auth
+test	Check out repository	2026-10-22T12:12:53.9292739Z Removing SSH command configuration
+test	Check out repository	2026-10-22T12:12:53.9306172Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Check out repository	2026-10-22T12:12:53.9329849Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Check out repository	2026-10-22T12:12:53.9672545Z Removing HTTP extra header
+test	Check out repository	2026-10-22T12:12:53.9680515Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Check out repository	2026-10-22T12:12:53.9711145Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Check out repository	2026-10-22T12:12:53.9908296Z Removing includeIf entries pointing to credentials config files
+test	Check out repository	2026-10-22T12:12:53.9915211Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Check out repository	2026-10-22T12:12:53.9947883Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Check out repository	2026-10-22T12:12:54.0132326Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Check out repository	2026-10-22T12:12:54.0169063Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Duck/Duck/.git.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:54.0202986Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Duck/Duck/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:54.0241132Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:54.0272043Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:54.0302220Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:54.0303422Z ##[group]Fetching the repository
+test	Check out repository	2026-10-22T12:12:54.0312005Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +681b6fa5ca6b6cc07c299eb1df3e4ad2c5398402:refs/remotes/pull/84/merge
+test	Check out repository	2026-10-22T12:12:55.7868031Z From https://github.com/ibis-ssl/Duck
+test	Check out repository	2026-10-22T12:12:55.7869526Z  * [new branch]      agent/improve-tracker-architecture-plan  -> origin/agent/improve-tracker-architecture-plan
+test	Check out repository	2026-10-22T12:12:55.7870717Z  * [new branch]      chore/markdown-lint-skill                -> origin/chore/markdown-lint-skill
+test	Check out repository	2026-10-22T12:12:55.7871646Z  * [new branch]      design/issue18-aspire-test-orchestration -> origin/design/issue18-aspire-test-orchestration
+test	Check out repository	2026-10-22T12:12:55.7872491Z  * [new branch]      docs/issue66-yomiyasu-pilot              -> origin/docs/issue66-yomiyasu-pilot
+test	Check out repository	2026-10-22T12:12:55.7873243Z  * [new branch]      feat/tracker-simulator-docker            -> origin/feat/tracker-simulator-docker
+test	Check out repository	2026-10-22T12:12:55.7874031Z  * [new branch]      fix/diagnostics-sample-runtime-issue25   -> origin/fix/diagnostics-sample-runtime-issue25
+test	Check out repository	2026-10-22T12:12:55.7875416Z  * [new branch]      fix/pr20-diagnostics-sample-runtime      -> origin/fix/pr20-diagnostics-sample-runtime
+test	Check out repository	2026-10-22T12:12:55.7876305Z  * [new branch]      main                                     -> origin/main
+test	Check out repository	2026-10-22T12:12:55.7877469Z  * [new branch]      preserve/pr73-halt-observe-ff50682-20261021 -> origin/preserve/pr73-halt-observe-ff50682-20261021
+test	Check out repository	2026-10-22T12:12:55.7878381Z  * [new branch]      report/pr61-crane-startup-20261004       -> origin/report/pr61-crane-startup-20261004
+test	Check out repository	2026-10-22T12:12:55.7879184Z  * [new branch]      review/pr-23-wheel-zoom                  -> origin/review/pr-23-wheel-zoom
+test	Check out repository	2026-10-22T12:12:55.7879921Z  * [new branch]      review/pr62-independent-20261018         -> origin/review/pr62-independent-20261018
+test	Check out repository	2026-10-22T12:12:55.7880849Z  * [new branch]      review/pr73-20261019-452d268             -> origin/review/pr73-20261019-452d268
+test	Check out repository	2026-10-22T12:12:55.7881976Z  * [new branch]      review/pr73-rereview-20261019-0285be66   -> origin/review/pr73-rereview-20261019-0285be66
+test	Check out repository	2026-10-22T12:12:55.7882955Z  * [new branch]      review/pr73-rereview-20261019-4c0c2eb    -> origin/review/pr73-rereview-20261019-4c0c2eb
+test	Check out repository	2026-10-22T12:12:55.7883740Z  * [new branch]      review/pr73-rereview-20261019-5fcf3fea   -> origin/review/pr73-rereview-20261019-5fcf3fea
+test	Check out repository	2026-10-22T12:12:55.7884654Z  * [new branch]      review/pr74-845b08b-20261019             -> origin/review/pr74-845b08b-20261019
+test	Check out repository	2026-10-22T12:12:55.7885629Z  * [new branch]      review/pr74-rereview-9ebd2d8-20261019    -> origin/review/pr74-rereview-9ebd2d8-20261019
+test	Check out repository	2026-10-22T12:12:55.7886459Z  * [new branch]      task/aspire-docker-desktop-496           -> origin/task/aspire-docker-desktop-496
+test	Check out repository	2026-10-22T12:12:55.7887229Z  * [new branch]      task/issue81-aspire-desktop-bridge       -> origin/task/issue81-aspire-desktop-bridge
+test	Check out repository	2026-10-22T12:12:55.7888048Z  * [new branch]      task/pr28-aspire-004a-adapter-red        -> origin/task/pr28-aspire-004a-adapter-red
+test	Check out repository	2026-10-22T12:12:55.7889312Z  * [new branch]      task/pr28-aspire-004a-red                -> origin/task/pr28-aspire-004a-red
+test	Check out repository	2026-10-22T12:12:55.7890396Z  * [new branch]      task/pr28-aspire-004a-referee-red        -> origin/task/pr28-aspire-004a-referee-red
+test	Check out repository	2026-10-22T12:12:55.7891268Z  * [new ref]         681b6fa5ca6b6cc07c299eb1df3e4ad2c5398402 -> pull/84/merge
+test	Check out repository	2026-10-22T12:12:55.7893146Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:55.7893814Z ##[group]Determining the checkout info
+test	Check out repository	2026-10-22T12:12:55.7894478Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:55.7895137Z [command]/usr/bin/git sparse-checkout disable
+test	Check out repository	2026-10-22T12:12:55.7939776Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Check out repository	2026-10-22T12:12:55.7972988Z ##[group]Checking out the ref
+test	Check out repository	2026-10-22T12:12:55.7976222Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/84/merge
+test	Check out repository	2026-10-22T12:12:56.0015122Z Note: switching to 'refs/remotes/pull/84/merge'.
+test	Check out repository	2026-10-22T12:12:56.0016540Z 
+test	Check out repository	2026-10-22T12:12:56.0016933Z You are in 'detached HEAD' state. You can look around, make experimental
+test	Check out repository	2026-10-22T12:12:56.0017618Z changes and commit them, and you can discard any commits you make in this
+test	Check out repository	2026-10-22T12:12:56.0018279Z state without impacting any branches by switching back to a branch.
+test	Check out repository	2026-10-22T12:12:56.0018930Z 
+test	Check out repository	2026-10-22T12:12:56.0019193Z If you want to create a new branch to retain commits you create, you may
+test	Check out repository	2026-10-22T12:12:56.0019899Z do so (now or later) by using -c with the switch command. Example:
+test	Check out repository	2026-10-22T12:12:56.0020240Z 
+test	Check out repository	2026-10-22T12:12:56.0020455Z   git switch -c <new-branch-name>
+test	Check out repository	2026-10-22T12:12:56.0020680Z 
+test	Check out repository	2026-10-22T12:12:56.0020941Z Or undo this operation with:
+test	Check out repository	2026-10-22T12:12:56.0021172Z 
+test	Check out repository	2026-10-22T12:12:56.0021358Z   git switch -
+test	Check out repository	2026-10-22T12:12:56.0021536Z 
+test	Check out repository	2026-10-22T12:12:56.0021935Z Turn off this advice by setting config variable advice.detachedHead to false
+test	Check out repository	2026-10-22T12:12:56.0022321Z 
+test	Check out repository	2026-10-22T12:12:56.0022747Z HEAD is now at 681b6fa Merge 2ff2b1facaf8c8e4664ca6141f02944e0b74f89b into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+test	Check out repository	2026-10-22T12:12:56.0041187Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:56.0041981Z ##[group]Setting up auth for fetching submodules
+test	Check out repository	2026-10-22T12:12:56.0046851Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Check out repository	2026-10-22T12:12:56.0091251Z [command]/usr/bin/git config --global include.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:56.0124961Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+test	Check out repository	2026-10-22T12:12:56.0155742Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+test	Check out repository	2026-10-22T12:12:56.0191629Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-53364605@github.com:
+test	Check out repository	2026-10-22T12:12:56.0223426Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:56.0224446Z ##[group]Fetching submodules
+test	Check out repository	2026-10-22T12:12:56.0228229Z [command]/usr/bin/git submodule sync --recursive
+test	Check out repository	2026-10-22T12:12:56.0424439Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --recursive
+test	Check out repository	2026-10-22T12:12:56.0617890Z Submodule 'SslProto/src/external/ssl-game-controller' (https://github.com/RoboCup-SSL/ssl-game-controller) registered for path 'SslProto/src/external/ssl-game-controller'
+test	Check out repository	2026-10-22T12:12:56.0627305Z Submodule 'SslProto/src/external/ssl-simulation-protocol' (https://github.com/RoboCup-SSL/ssl-simulation-protocol) registered for path 'SslProto/src/external/ssl-simulation-protocol'
+test	Check out repository	2026-10-22T12:12:56.0636137Z Submodule 'reference/specs' (https://github.com/ibis-ssl/specs.git) registered for path 'reference/specs'
+test	Check out repository	2026-10-22T12:12:56.0661103Z Cloning into '/home/runner/work/Duck/Duck/SslProto/src/external/ssl-game-controller'...
+test	Check out repository	2026-10-22T12:12:57.1204126Z Cloning into '/home/runner/work/Duck/Duck/SslProto/src/external/ssl-simulation-protocol'...
+test	Check out repository	2026-10-22T12:12:57.6233771Z Cloning into '/home/runner/work/Duck/Duck/reference/specs'...
+test	Check out repository	2026-10-22T12:12:58.1850220Z Submodule path 'SslProto/src/external/ssl-game-controller': checked out '9b0765fe7a07a55124f6ee957d4559348462d227'
+test	Check out repository	2026-10-22T12:12:58.1950915Z Submodule path 'SslProto/src/external/ssl-simulation-protocol': checked out '1e719a8d410cc84847ec69104da44fed13738291'
+test	Check out repository	2026-10-22T12:12:58.2043754Z Submodule path 'reference/specs': checked out '57910ff44a577cd2c2e055cf4d8fe31c4a4b127b'
+test	Check out repository	2026-10-22T12:12:58.2096536Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+test	Check out repository	2026-10-22T12:12:58.2268392Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Check out repository	2026-10-22T12:12:58.2402109Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Check out repository	2026-10-22T12:12:58.2438501Z Entering 'reference/specs'
+test	Check out repository	2026-10-22T12:12:58.2480311Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:58.2481136Z ##[group]Persisting credentials for submodules
+test	Check out repository	2026-10-22T12:12:58.2487699Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+test	Check out repository	2026-10-22T12:12:58.2664976Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Check out repository	2026-10-22T12:12:58.2702275Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Check out repository	2026-10-22T12:12:58.2738643Z Entering 'reference/specs'
+test	Check out repository	2026-10-22T12:12:58.2787060Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Check out repository	2026-10-22T12:12:58.2966636Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Check out repository	2026-10-22T12:12:58.2986457Z file:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config	remote.origin.url
+test	Check out repository	2026-10-22T12:12:58.3003265Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Check out repository	2026-10-22T12:12:58.3020084Z file:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config	remote.origin.url
+test	Check out repository	2026-10-22T12:12:58.3034363Z Entering 'reference/specs'
+test	Check out repository	2026-10-22T12:12:58.3051166Z file:/home/runner/work/Duck/Duck/.git/modules/reference/specs/config	remote.origin.url
+test	Check out repository	2026-10-22T12:12:58.3079473Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config includeIf.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:58.3117237Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config includeIf.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-game-controller.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:58.3153459Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config includeIf.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:58.3219738Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config includeIf.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-simulation-protocol.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:58.3252802Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config includeIf.gitdir:/home/runner/work/Duck/Duck/.git/modules/reference/specs.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:58.3285181Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config includeIf.gitdir:/github/workspace/.git/modules/reference/specs.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Check out repository	2026-10-22T12:12:58.3314978Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+test	Check out repository	2026-10-22T12:12:58.3491684Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Check out repository	2026-10-22T12:12:58.3529605Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Check out repository	2026-10-22T12:12:58.3564249Z Entering 'reference/specs'
+test	Check out repository	2026-10-22T12:12:58.3610382Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-53364605@github.com:'
+test	Check out repository	2026-10-22T12:12:58.3790929Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Check out repository	2026-10-22T12:12:58.3829524Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Check out repository	2026-10-22T12:12:58.3865576Z Entering 'reference/specs'
+test	Check out repository	2026-10-22T12:12:58.3909465Z ##[endgroup]
+test	Check out repository	2026-10-22T12:12:58.3947624Z [command]/usr/bin/git log -1 --format=%H
+test	Check out repository	2026-10-22T12:12:58.3970209Z 681b6fa5ca6b6cc07c299eb1df3e4ad2c5398402
+test	Set up .NET SDK	﻿2026-10-22T12:12:58.4204690Z ##[group]Run actions/setup-dotnet@v5
+test	Set up .NET SDK	2026-10-22T12:12:58.4205486Z with:
+test	Set up .NET SDK	2026-10-22T12:12:58.4205818Z   dotnet-version: 10.0.x
+test	Set up .NET SDK	2026-10-22T12:12:58.4206158Z   dotnet-quality: ga
+test	Set up .NET SDK	2026-10-22T12:12:58.4206481Z   cache: false
+test	Set up .NET SDK	2026-10-22T12:12:58.4206803Z ##[endgroup]
+test	Set up .NET SDK	2026-10-22T12:12:58.5500669Z [command]/home/runner/work/_actions/actions/setup-dotnet/v5/externals/install-dotnet.sh --skip-non-versioned-files --runtime dotnet --channel LTS
+test	Set up .NET SDK	2026-10-22T12:12:58.8979393Z dotnet-install: .NET Core Runtime with version '10.0.13' is already installed.
+test	Set up .NET SDK	2026-10-22T12:12:58.9014265Z [command]/home/runner/work/_actions/actions/setup-dotnet/v5/externals/install-dotnet.sh --skip-non-versioned-files --channel 10.0 --quality ga
+test	Set up .NET SDK	2026-10-22T12:12:59.1755137Z dotnet-install: .NET Core SDK with version '10.0.402' is already installed.
+test	Run dotnet test	﻿2026-10-22T12:12:59.1919957Z ##[group]Run set +e
+test	Run dotnet test	2026-10-22T12:12:59.1920409Z ^[[36;1mset +e^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1920817Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1921206Z ^[[36;1mresults_dir="$GITHUB_WORKSPACE/artifacts/test-results"^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1921663Z ^[[36;1mmkdir -p "$results_dir"^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1922007Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1922382Z ^[[36;1mdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1922904Z ^[[36;1m  --logger "trx;LogFileName=dotnet-test.trx" \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1923350Z ^[[36;1m  --results-directory "$results_dir" \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1923767Z ^[[36;1m  --diag "$results_dir/vstest-diagnostics.log" \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1924232Z ^[[36;1m  --blame \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1924538Z ^[[36;1m  -m:1 \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1925089Z ^[[36;1m  /nr:false \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1925447Z ^[[36;1m  -bl:"$results_dir/dotnet-test.binlog" \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1925860Z ^[[36;1m  > >(tee "$results_dir/dotnet-test.stdout.log") \^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1926358Z ^[[36;1m  2> >(tee "$results_dir/dotnet-test.stderr.log" >&2)^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1926833Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1927166Z ^[[36;1mtest_exit_code=$?^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1927592Z ^[[36;1mprintf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.1928051Z ^[[36;1mexit "$test_exit_code"^[[0m
+test	Run dotnet test	2026-10-22T12:12:59.2075501Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run dotnet test	2026-10-22T12:12:59.2075988Z env:
+test	Run dotnet test	2026-10-22T12:12:59.2076295Z   DOTNET_ROOT: /usr/share/dotnet
+test	Run dotnet test	2026-10-22T12:12:59.2076669Z ##[endgroup]
+test	Run dotnet test	2026-10-22T12:13:03.4973658Z   Determining projects to restore...
+test	Run dotnet test	2026-10-22T12:13:06.7931884Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 903 ms).
+test	Run dotnet test	2026-10-22T12:13:06.7950339Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 855 ms).
+test	Run dotnet test	2026-10-22T12:13:06.8359143Z   Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 897 ms).
+test	Run dotnet test	2026-10-22T12:13:07.1715221Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 312 ms).
+test	Run dotnet test	2026-10-22T12:13:07.8528793Z   Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 662 ms).
+test	Run dotnet test	2026-10-22T12:13:07.9024772Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 1 sec).
+test	Run dotnet test	2026-10-22T12:13:07.9345633Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 1 ms).
+test	Run dotnet test	2026-10-22T12:13:07.9346957Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 43 ms).
+test	Run dotnet test	2026-10-22T12:13:10.5094102Z /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-22T12:13:10.5096678Z /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-22T12:13:10.6923964Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 3.72 sec).
+test	Run dotnet test	2026-10-22T12:13:10.7310262Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 4.79 sec).
+test	Run dotnet test	2026-10-22T12:13:11.0335028Z /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-22T12:13:20.5031940Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+test	Run dotnet test	2026-10-22T12:13:21.4749690Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+test	Run dotnet test	2026-10-22T12:13:21.8457745Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+test	Run dotnet test	2026-10-22T12:13:22.2554391Z   TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+test	Run dotnet test	2026-10-22T12:13:30.4076832Z   Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+test	Run dotnet test	2026-10-22T12:13:30.6821389Z   Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+test	Run dotnet test	2026-10-22T12:13:30.6926804Z ##[warning]/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+test	Run dotnet test	2026-10-22T12:13:30.6950007Z /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-22T12:13:30.8532764Z   Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+test	Run dotnet test	2026-10-22T12:13:31.6353452Z   Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+test	Run dotnet test	2026-10-22T12:13:32.0054289Z   Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+test	Run dotnet test	2026-10-22T12:13:36.1662015Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-22T12:13:36.1668497Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-22T12:13:36.1674027Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-22T12:13:36.3938244Z   Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+test	Run dotnet test	2026-10-22T12:13:36.4486180Z Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+test	Run dotnet test	2026-10-22T12:13:37.0000659Z Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+test	Run dotnet test	2026-10-22T12:13:37.0530056Z A total of 1 test files matched the specified pattern.
+test	Run dotnet test	2026-10-22T12:13:41.1358799Z [xUnit.net 00:00:03.45]     Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop [FAIL]
+test	Run dotnet test	2026-10-22T12:13:41.1501912Z   Failed Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop [2 s]
+test	Run dotnet test	2026-10-22T12:13:41.1545652Z   Error Message:
+test	Run dotnet test	2026-10-22T12:13:41.1552425Z    test setup must deliver the first tracker packet before checking loop survival.
+test	Run dotnet test	2026-10-22T12:13:41.1605684Z   Stack Trace:
+test	Run dotnet test	2026-10-22T12:13:41.1620505Z      at Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/TrackerRuntimeRegistrationTddTests.cs:line 133
+test	Run dotnet test	2026-10-22T12:13:41.1656813Z    at Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/TrackerRuntimeRegistrationTddTests.cs:line 145
+test	Run dotnet test	2026-10-22T12:13:41.1695490Z --- End of stack trace from previous location ---
+test	Run dotnet test	2026-10-22T12:14:08.6537666Z Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+test	Run dotnet test	2026-10-22T12:14:08.6541582Z 
+test	Run dotnet test	2026-10-22T12:14:08.6587467Z Failed!  - Failed:     1, Passed:   614, Skipped:     0, Total:   615, Duration: 30 s - Tracker.Tests.dll (net10.0)
+test	Run dotnet test	2026-10-22T12:14:13.7135548Z ##[error]Process completed with exit code 1.
+test	Collect failure diagnostics	﻿2026-10-22T12:14:13.7209502Z ##[group]Run set -euo pipefail
+test	Collect failure diagnostics	2026-10-22T12:14:13.7209855Z ^[[36;1mset -euo pipefail^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7210092Z ^[[36;1m^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7210369Z ^[[36;1mresults_dir="$GITHUB_WORKSPACE/artifacts/test-results"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7210722Z ^[[36;1mmkdir -p "$results_dir"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7210966Z ^[[36;1m^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7211152Z ^[[36;1m{^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7211398Z ^[[36;1m  printf 'repository=%s\n' "$GITHUB_REPOSITORY"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7211718Z ^[[36;1m  printf 'sha=%s\n' "$GITHUB_SHA"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7212013Z ^[[36;1m  printf 'ref=%s\n' "$GITHUB_REF"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7212299Z ^[[36;1m  printf 'run_id=%s\n' "$GITHUB_RUN_ID"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7212633Z ^[[36;1m  printf 'run_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7212958Z ^[[36;1m  printf 'runner_os=%s\n' "$RUNNER_OS"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7213459Z ^[[36;1m  printf 'test_exit_code=%s\n' "$(cat "$results_dir/dotnet-test.exit-code" 2>/dev/null || printf unknown)"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7213992Z ^[[36;1m  printf '\n## dotnet --info\n'^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7214259Z ^[[36;1m  dotnet --info^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7214510Z ^[[36;1m  printf '\n## git status --short\n'^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7214787Z ^[[36;1m  git status --short^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7215209Z ^[[36;1m  printf '\n## git submodule status --recursive\n'^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7215539Z ^[[36;1m  git submodule status --recursive^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7215836Z ^[[36;1m} > "$results_dir/environment.txt" 2>&1^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7216116Z ^[[36;1m^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7216351Z ^[[36;1mgit ls-files --recurse-submodules -z \^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7216699Z ^[[36;1m  | tar --null --verbatim-files-from --files-from=- \^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7217041Z ^[[36;1m      -czf "$results_dir/source.tar.gz"^[[0m
+test	Collect failure diagnostics	2026-10-22T12:14:13.7252365Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Collect failure diagnostics	2026-10-22T12:14:13.7252708Z env:
+test	Collect failure diagnostics	2026-10-22T12:14:13.7252922Z   DOTNET_ROOT: /usr/share/dotnet
+test	Collect failure diagnostics	2026-10-22T12:14:13.7253171Z ##[endgroup]
+test	Upload test failure artifact	﻿2026-10-22T12:14:15.5405536Z ##[group]Run actions/upload-artifact@v7
+test	Upload test failure artifact	2026-10-22T12:14:15.5405864Z with:
+test	Upload test failure artifact	2026-10-22T12:14:15.5406099Z   name: dotnet-test-failure-39776500808-1
+test	Upload test failure artifact	2026-10-22T12:14:15.5406388Z   path: artifacts/test-results
+test	Upload test failure artifact	2026-10-22T12:14:15.5406645Z   if-no-files-found: error
+test	Upload test failure artifact	2026-10-22T12:14:15.5406885Z   retention-days: 14
+test	Upload test failure artifact	2026-10-22T12:14:15.5407106Z   compression-level: 6
+test	Upload test failure artifact	2026-10-22T12:14:15.5407327Z   overwrite: false
+test	Upload test failure artifact	2026-10-22T12:14:15.5407544Z   include-hidden-files: false
+test	Upload test failure artifact	2026-10-22T12:14:15.5407779Z   archive: true
+test	Upload test failure artifact	2026-10-22T12:14:15.5408140Z env:
+test	Upload test failure artifact	2026-10-22T12:14:15.5408342Z   DOTNET_ROOT: /usr/share/dotnet
+test	Upload test failure artifact	2026-10-22T12:14:15.5408592Z ##[endgroup]
+test	Upload test failure artifact	2026-10-22T12:14:15.6799145Z With the provided path, there will be 10 files uploaded
+test	Upload test failure artifact	2026-10-22T12:14:15.6803935Z Artifact name is valid!
+test	Upload test failure artifact	2026-10-22T12:14:15.6804711Z Root directory input is valid!
+test	Upload test failure artifact	2026-10-22T12:14:16.0608442Z Uploading artifact: dotnet-test-failure-39776500808-1.zip
+test	Upload test failure artifact	2026-10-22T12:14:16.0643176Z Beginning upload of artifact content to blob storage
+test	Upload test failure artifact	2026-10-22T12:14:17.2873281Z Uploaded bytes 8388608
+test	Upload test failure artifact	2026-10-22T12:14:17.4819825Z Uploaded bytes 11308481
+test	Upload test failure artifact	2026-10-22T12:14:17.5519808Z Finished uploading artifact content to blob storage!
+test	Upload test failure artifact	2026-10-22T12:14:17.5520927Z SHA256 digest of uploaded artifact is d700239a7ae6875c56b145a10823c3065e7e159de457f29b346f4d1decbbc808
+test	Upload test failure artifact	2026-10-22T12:14:17.5521840Z Finalizing artifact upload
+test	Upload test failure artifact	2026-10-22T12:14:18.1893215Z Artifact dotnet-test-failure-39776500808-1 successfully finalized. Artifact ID 12424593092
+test	Upload test failure artifact	2026-10-22T12:14:18.1894499Z Artifact dotnet-test-failure-39776500808-1 has been successfully uploaded! Final size is 11308481 bytes. Artifact ID is 12424593092
+test	Upload test failure artifact	2026-10-22T12:14:18.1896023Z Artifact download URL: https://github.com/ibis-ssl/Duck/actions/runs/39776500808/artifacts/12424593092
+test	Post Check out repository	﻿2026-10-22T12:14:18.2073414Z Post job cleanup.
+test	Post Check out repository	2026-10-22T12:14:18.2935081Z [command]/usr/bin/git version
+test	Post Check out repository	2026-10-22T12:14:18.2973864Z git version 2.55.0
+test	Post Check out repository	2026-10-22T12:14:18.3011311Z Temporarily overriding HOME='/home/runner/work/_temp/a2d57cd3-7b08-4786-b193-a13d7b30b8ce' before making global git config changes
+test	Post Check out repository	2026-10-22T12:14:18.3012716Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Check out repository	2026-10-22T12:14:18.3015376Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Duck/Duck
+test	Post Check out repository	2026-10-22T12:14:18.3047537Z Removing SSH command configuration
+test	Post Check out repository	2026-10-22T12:14:18.3053861Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Check out repository	2026-10-22T12:14:18.3087873Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Check out repository	2026-10-22T12:14:18.3319017Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Post Check out repository	2026-10-22T12:14:18.3364581Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Post Check out repository	2026-10-22T12:14:18.3405038Z Entering 'reference/specs'
+test	Post Check out repository	2026-10-22T12:14:18.3448406Z Removing HTTP extra header
+test	Post Check out repository	2026-10-22T12:14:18.3453789Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Check out repository	2026-10-22T12:14:18.3499992Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Post Check out repository	2026-10-22T12:14:18.3699865Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Post Check out repository	2026-10-22T12:14:18.3738484Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Post Check out repository	2026-10-22T12:14:18.3779986Z Entering 'reference/specs'
+test	Post Check out repository	2026-10-22T12:14:18.3824600Z Removing includeIf entries pointing to credentials config files
+test	Post Check out repository	2026-10-22T12:14:18.3832824Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Check out repository	2026-10-22T12:14:18.3865279Z includeif.gitdir:/home/runner/work/Duck/Duck/.git.path
+test	Post Check out repository	2026-10-22T12:14:18.3866333Z includeif.gitdir:/home/runner/work/Duck/Duck/.git/worktrees/*.path
+test	Post Check out repository	2026-10-22T12:14:18.3867203Z includeif.gitdir:/github/workspace/.git.path
+test	Post Check out repository	2026-10-22T12:14:18.3868009Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+test	Post Check out repository	2026-10-22T12:14:18.3877698Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Duck/Duck/.git.path
+test	Post Check out repository	2026-10-22T12:14:18.3899977Z /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.3911049Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Duck/Duck/.git.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.3957832Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Duck/Duck/.git/worktrees/*.path
+test	Post Check out repository	2026-10-22T12:14:18.3977935Z /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.3989421Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Duck/Duck/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4033797Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+test	Post Check out repository	2026-10-22T12:14:18.4056061Z /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4064146Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4099232Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+test	Post Check out repository	2026-10-22T12:14:18.4120058Z /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4134165Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4170820Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Post Check out repository	2026-10-22T12:14:18.4348903Z Entering 'SslProto/src/external/ssl-game-controller'
+test	Post Check out repository	2026-10-22T12:14:18.4366955Z file:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config	remote.origin.url
+test	Post Check out repository	2026-10-22T12:14:18.4383558Z Entering 'SslProto/src/external/ssl-simulation-protocol'
+test	Post Check out repository	2026-10-22T12:14:18.4401080Z file:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config	remote.origin.url
+test	Post Check out repository	2026-10-22T12:14:18.4416238Z Entering 'reference/specs'
+test	Post Check out repository	2026-10-22T12:14:18.4433082Z file:/home/runner/work/Duck/Duck/.git/modules/reference/specs/config	remote.origin.url
+test	Post Check out repository	2026-10-22T12:14:18.4459327Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Check out repository	2026-10-22T12:14:18.4481188Z includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller.path
+test	Post Check out repository	2026-10-22T12:14:18.4482325Z includeif.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-game-controller.path
+test	Post Check out repository	2026-10-22T12:14:18.4487370Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config --get-all includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller.path
+test	Post Check out repository	2026-10-22T12:14:18.4506570Z /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4513793Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config --unset includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4548930Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config --get-all includeif.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-game-controller.path
+test	Post Check out repository	2026-10-22T12:14:18.4570097Z /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4577296Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-game-controller/config --unset includeif.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-game-controller.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4609353Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Check out repository	2026-10-22T12:14:18.4629484Z includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol.path
+test	Post Check out repository	2026-10-22T12:14:18.4630310Z includeif.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-simulation-protocol.path
+test	Post Check out repository	2026-10-22T12:14:18.4635715Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config --get-all includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol.path
+test	Post Check out repository	2026-10-22T12:14:18.4655564Z /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4662439Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config --unset includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4697191Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config --get-all includeif.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-simulation-protocol.path
+test	Post Check out repository	2026-10-22T12:14:18.4717576Z /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4727672Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/SslProto/src/external/ssl-simulation-protocol/config --unset includeif.gitdir:/github/workspace/.git/modules/SslProto/src/external/ssl-simulation-protocol.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4762971Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Check out repository	2026-10-22T12:14:18.4783703Z includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/reference/specs.path
+test	Post Check out repository	2026-10-22T12:14:18.4785047Z includeif.gitdir:/github/workspace/.git/modules/reference/specs.path
+test	Post Check out repository	2026-10-22T12:14:18.4793230Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config --get-all includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/reference/specs.path
+test	Post Check out repository	2026-10-22T12:14:18.4818620Z /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4827219Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config --unset includeif.gitdir:/home/runner/work/Duck/Duck/.git/modules/reference/specs.path /home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4862403Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config --get-all includeif.gitdir:/github/workspace/.git/modules/reference/specs.path
+test	Post Check out repository	2026-10-22T12:14:18.4884111Z /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4891935Z [command]/usr/bin/git config --file /home/runner/work/Duck/Duck/.git/modules/reference/specs/config --unset includeif.gitdir:/github/workspace/.git/modules/reference/specs.path /github/runner_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config
+test	Post Check out repository	2026-10-22T12:14:18.4922876Z Removing credentials config '/home/runner/work/_temp/git-credentials-34a9722a-6feb-4448-ac2c-49bc527faa12.config'
+test	Complete job	﻿2026-10-22T12:14:18.5068202Z Cleaning up orphan processes
+test	Complete job	2026-10-22T12:14:18.5328864Z Terminate orphan process: pid (3008) (tee)
+test	Complete job	2026-10-22T12:14:18.5349211Z Terminate orphan process: pid (3009) (tee)
+test	Complete job	2026-10-22T12:14:18.5379442Z Terminate orphan process: pid (3099) (VBCSCompiler)

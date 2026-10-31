@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/sudachi-capture.py",
+    "/home/donabe/Duck-issue81-aspire-desktop-bridge/tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-tasks-status.json",
+    "--stdin",
+    "Tracker/Design/tasks-status.md"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 1,
+  "utc": "2026-10-22T16:26:36.207325+00:00"
+}

@@ -1,0 +1,165 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07H NR001-NR004 normal-review fix; host-side command application only",
+  "baseline": "bf1f8b83cad4cf9b7d2244d9a146d0a614b8de0a",
+  "source_fingerprints": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+      "sha256": "26e226f31bad7690a7c49a3fd5fc6c9cc9ca25fcd30359534f00d5effb713aeb",
+      "lf_sha256": "1a7b0679661e479b1cda0f069a54a242a7ffa8b7601483a8ddf43f7f1976c30a"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "sha256": "a212d142eb147a8f82f18952ca865cc8fc99bc66c81a14be477900c482360681",
+      "lf_sha256": "a212d142eb147a8f82f18952ca865cc8fc99bc66c81a14be477900c482360681"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4TransportTargetControllerTests.cs",
+      "sha256": "6345cfed256a8ecf55a95fef43e1472153d5e01fe6f9a07015c40f4f51529b18",
+      "lf_sha256": "6345cfed256a8ecf55a95fef43e1472153d5e01fe6f9a07015c40f4f51529b18"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DockerCliCommandRunnerProcessTests.cs",
+      "sha256": "5de30ff75abd9ba74fc2f5523dea516f046154ec84a51c359d1911060034d189",
+      "lf_sha256": "5de30ff75abd9ba74fc2f5523dea516f046154ec84a51c359d1911060034d189"
+    }
+  ],
+  "validation_manifest_sha256": "b646db93311ac84ceeeaaff3124cc29b9cefa41457f6ffd6522815e4e6c098e7",
+  "documentation_manifest_sha256": "c17fa96d38dc7e3411c2600eb3239e0a0f55645bfa3353d452dbaf7f04acebaf",
+  "findings": [
+    {
+      "redForNoNextStartFixture": "not acquired; this fixture was added after the recovery guard and is post-fix coverage, not a Red",
+      "severity": "P2",
+      "finalTest": "UnreapedOwnedCliProcessBlocksTheNextCommand",
+      "fix": "single original budget with reserved cleanup window, kill once, wait/drain, retain unreaped process reference and reject further starts until HasExited",
+      "validPreFixRed": "yes: cancellation/timeout/output-overflow did not wait after kill; unreap failure surfaced as TimeoutException",
+      "id": "NR001"
+    },
+    {
+      "fix": "bounded concurrent stdout/stderr readers; on overflow terminate/reap within same deadline",
+      "validPreFixRed": "yes: bounded metadata capture read both streams to end before checking limit; 2 theory cases failed",
+      "id": "NR002",
+      "finalTest": "MetadataCaptureStopsReadingWhenEitherOutputExceedsItsBound",
+      "severity": "P2"
+    },
+    {
+      "fix": "check operation token at the final state commit boundary; cancellation leaves Unknown and no active target",
+      "validPreFixRed": "yes: cancellation after final inspection still published Applied",
+      "id": "NR003",
+      "finalTest": "CancellationAtFinalInspectDoesNotPublishAppliedTarget",
+      "severity": "P2"
+    },
+    {
+      "severity": "P2",
+      "finalTest": "NonzeroRemoteExitLeavesAppliedStateUnknown plus corrected post-dispatch rejection cases",
+      "fix": "post-dispatch uncertainty uses Unknown=true while pre-dispatch validation rejection remains Unknown=false",
+      "validPreFixRed": "yes: post-dispatch nonzero exit, malformed/stale ACK, extra output, and changed simulator generation reported Unknown=false",
+      "id": "NR004",
+      "history": "Existing assertions were corrected to the reviewed uncertainty contract before the Red run; preserve that expectation correction as history."
+    }
+  ],
+  "antecedent_failure": {
+    "exit": 1,
+    "counts": "12 failed, 6 passed, 0 skipped, 18 total",
+    "stdout_sha256": "3F3AA17BD8AC5981C9D10D93D34BD136962649F045F5DA61376D435DE3CB29EB",
+    "stderr_sha256": "FAA24DC144E34B7039EF8879FC70C66FFEAB6A4B962FD59C512DBF724CEDDC59"
+  },
+  "final_regression": {
+    "exit": 0,
+    "counts": "106 passed, 2 skipped, 0 failed, 108 total",
+    "stdout_sha256": "78C0A40E462DB069C3E165974B176C2AC14C5D82D104C083D0C453C1DE705FC7",
+    "skipped_facts": [
+      "NativeNamespaceProbeRecreatesOnlyItsTwoOwnedContainersOnce",
+      "NativeBridgeProbeRecreatesOnlyItsTwoOwnedContainersOnce"
+    ]
+  },
+  "release_build": {
+    "exit": 0,
+    "compiled_projects": [
+      "Duck.Testing.AppHost",
+      "Tracker.Tests"
+    ],
+    "stdout_sha256": "A21903A73842DB07253F2F1F85B19221983B2CABE099F8BC299E27197E96C050"
+  },
+  "documents": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "source_sha256": "de709d64bec49559fc2eef6cd67311664a16cb7754bfa5f85da3d85eafcd7265",
+      "source_lf_sha256": "800bd71c57178c1c137669759e352331d6cdb9e12268e911e79d26413027348b",
+      "all_added_input_sha256": "84b9c94765adc36c38a0e8b1db7d8b190df22b1839e40eac873ff778aa15a438",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "96d7f892115d1a9bdcb55a9ba17d07186209263371c7a874a5e68b9bf1624f30"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "0b3c38ae434afe9f13b3bc90e68654875dce70624229855b68cd7d11fc0ecde0",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "source_sha256": "774801ac96ddfe62f8ab5da7f1cd5d4846db1248bce05fdc2e6e2996bb4e44ad",
+      "source_lf_sha256": "78aea90938d5c0a40cbe68e08e4b107a92ad34d57fd597d1ba9a55e462d030fa",
+      "all_added_input_sha256": "51c81e5456fe8a10c5cf1fda58bf22c42b28151a3165dc587d3326c72af361cd",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "961cc587e4137f3f8911cfa59576c0f2909d3f4d53a9358efdc738adc3721044"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "94cfb0f1f2c17b57bc54fc9823708a271cb1279748a6780646646e24aeb70575",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "unchanged_design_validation_reused": true,
+  "normal_review": "Four P2 fixes awaiting same-reviewer verification at publication",
+  "runtime": {
+    "lingeringTestSession": false,
+    "cm4HelperOrUdpExecuted": false,
+    "dockerOrContainersStarted": false
+  },
+  "limits": [
+    "No CM4 helper distribution or actual Docker exec/UDP runtime",
+    "No default base migration or fixed-application decode acceptance",
+    "No whole-Issue completion or independent-final-review claim",
+    "Unreaped-child next-start/resume fixture is post-fix coverage; no antecedent Red was acquired"
+  ]
+}

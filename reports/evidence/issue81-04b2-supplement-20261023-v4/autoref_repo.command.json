@@ -1,0 +1,17 @@
+{
+  "name": "autoref_repo",
+  "argv": [
+    "curl",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "https://hub.docker.com/v2/repositories/roboticserlangen/autoref/"
+  ],
+  "exit": 0,
+  "url": "https://hub.docker.com/v2/repositories/roboticserlangen/autoref/",
+  "stdout_bytes": 6550,
+  "stderr_bytes": 0,
+  "stdout_sha256": "80a45fe85f85b3a5c491de2b420bc4195dd4e2f5b1137225840fe6e84046e0cf",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

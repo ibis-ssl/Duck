@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "dotnet",
+    "build",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "input_hashes": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "caaaab79b24daa9a6722ccc269f050e41b518109e31de856063c2e0232bd8501",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "93e66834284a5bc27abd10df3cb9901c313aec1c0b15e4284452db04c8e21873"
+  },
+  "start_utc": "2026-10-23T11:49:40Z"
+}

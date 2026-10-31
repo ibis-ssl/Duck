@@ -1,0 +1,176 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07G Bprime consideration design and informational toolchain capability query",
+  "base_head": "431ae2cd50676670dbe837482b0d5c08995bde43",
+  "candidate_adopted": false,
+  "runtime_helper_implemented": false,
+  "production_and_tests_unchanged": true,
+  "existing_build_and_code_validation_reused": "reviewed cf98 production unchanged; Release success and source/output identity; normal P2 closed",
+  "documentation": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "working_source_sha256": "e15aff6b35e353942c2c9d02bcd05c0a2871c5ab43e59bdbaf1771cbe28f1c14",
+      "normalized_lf_source_sha256": "26ebaf472c4c888083c8bcd7bdffde92c18fa0dfb574f198eefad1c9c21ac241",
+      "input_sha256": "918fa55fa3b0cca2033946074e5cf28d8fd782836478e96bb5ed6a8212cef854",
+      "all_added_lf_sha256": "4fe42b81d1023422a05b034665316977f054d34759a2abcc4d387fc26373795d",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "33b06f0bacb8dea53ebdf0741c2304004678c3463e63ba2fe7505b5ceb2c4471",
+          "cspellCopySha256": "918fa55fa3b0cca2033946074e5cf28d8fd782836478e96bb5ed6a8212cef854"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdoutSha256": "d7d7341a0267664a3f13054a84848dea71137563ad3b51bfd3b79c72491b1211",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        }
+      ]
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "working_source_sha256": "940c99d9731763d9c8a651113fb4ef68824ec6154fb4b904324f40f790de4c7d",
+      "normalized_lf_source_sha256": "e75777c702914c60f580fa4fb2a51c08533718e35885e009c13ac7855d3d3507",
+      "input_sha256": "ac194f00934b4e64df85a2033d10b7df84e702627abe6c7a87bf76c972c03309",
+      "all_added_lf_sha256": "ac194f00934b4e64df85a2033d10b7df84e702627abe6c7a87bf76c972c03309",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "f36cf24e026b7da4b781049fd33fb6561d523bb6b946aa5cfc18e7c26e03e9f1",
+          "cspellCopySha256": "ac194f00934b4e64df85a2033d10b7df84e702627abe6c7a87bf76c972c03309"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdoutSha256": "c532d745f7bd6b2c94ee04e90c388d9194a155c3e465abac4f8ffb76ec31cc16",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        }
+      ]
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "working_source_sha256": "3813ea625c9062413c75f40bf738f38a83b98b2971fdd577114f47cf9d256d75",
+      "normalized_lf_source_sha256": "7f35076f38d91a4ebcf4e4a3564d8874d3c56c8c4ddb69c051c1fe89c23d5716",
+      "input_sha256": "b78fb9d96654fcb9d06402b80e2ec3c0441b359c2d235c882588dbe6f6544d28",
+      "all_added_lf_sha256": "b78fb9d96654fcb9d06402b80e2ec3c0441b359c2d235c882588dbe6f6544d28",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "84cb78b1581cd3a66aac04f4b073730115fb5ed5c586c53a29a4aa86a4874cf6",
+          "cspellCopySha256": "b78fb9d96654fcb9d06402b80e2ec3c0441b359c2d235c882588dbe6f6544d28"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdoutSha256": "e44b0fcb4dbd548b10c7493c677dcc5d9f1e023ffb59d824fa18bb1cc515e0ac",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cspellCopySha256": null
+        }
+      ]
+    }
+  ],
+  "document_gate_count": 12,
+  "private_validation_manifest_sha256": "62a9db26a5179251173fea2ce1712111c3003f4341f45ac84f5a3913d8552e67",
+  "workflow": {
+    "source": ".github/workflows/dotnet-test.yml",
+    "source_sha256": "3084c9168dbda3b3822a3117d723f587b1bc747ca5163afae58de35485670b9e",
+    "normalized_lf_sha256": "b4ec01931955e79a90ad332e52eb3216b49cf42ddc73d9ad19f5d06d7db6fff3",
+    "yaml_parse_succeeded": true,
+    "job_runner": "ubuntu-latest",
+    "step": {
+      "id": "native_toolchain_readonly",
+      "name": "Report preinstalled native toolchain (read-only)",
+      "shell": "bash",
+      "hasUses": false
+    },
+    "python_body_sha256": "e638cdb0d1566ac1b98a85ea1f3b281269abd0a0335ef2957a1e4114fa120943",
+    "local_windows_probe": {
+      "exit": 0,
+      "result": {
+        "image_os": "unknown",
+        "image_version": "unknown",
+        "tools": {
+          "cc": false,
+          "gcc": false,
+          "readelf": false
+        },
+        "compiler": {
+          "name": null,
+          "available": false,
+          "version": {
+            "status": "unknown"
+          },
+          "target": {
+            "status": "unknown"
+          },
+          "libc_archive": "unknown"
+        }
+      },
+      "is_ubuntu_capability_evidence": false
+    }
+  },
+  "capability_queries_only": [
+    "tool presence",
+    "compiler --version",
+    "compiler -dumpmachine",
+    "compiler -print-file-name=libc.a",
+    "archive readability"
+  ],
+  "no_install_compile_link_distribution_udp_or_container_runtime": true,
+  "ci_status_at_creation": "not pushed yet",
+  "normal_review": "pending",
+  "procedure": "informational metadata plus design reflection; no new functional production feature/TDD completion claim"
+}

@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T22:53:10.0228030Z",
+  "command": "tar -xOzf CI source.tar.gz and compare exact merged checkout source for four affected files to fdff6ec",
+  "finishedUTC": "2026-10-22T22:53:10.3029290Z"
+}

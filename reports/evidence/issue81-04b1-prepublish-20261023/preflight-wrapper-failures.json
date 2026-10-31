@@ -1,0 +1,23 @@
+[
+  {
+    "stage": "wsl tool argument parse",
+    "outcome": "tool-level error before child process",
+    "raw": "wsl.exe: The command parameter was already specified.",
+    "exit_code": null
+  },
+  {
+    "stage": "Python path construction",
+    "outcome": "wrapper error before checker process",
+    "exit_code": 1
+  },
+  {
+    "stage": "mirror layout",
+    "outcome": "missing copied tools/lint path; checker not invoked",
+    "exit_code": 1
+  },
+  {
+    "stage": "AST output script construction",
+    "outcome": "wrapper SyntaxError; checker not invoked",
+    "exit_code": 1
+  }
+]

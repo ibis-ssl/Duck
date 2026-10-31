@@ -1,0 +1,1 @@
+& 'C:\Program Files\GitHub CLI\gh.exe' api repos/ibis-ssl/Duck/actions/runs/39870778199/artifacts

@@ -1,0 +1,38 @@
+flowchart LR
+ subgraph win[Windows]
+  browser[ブラウザー]
+  host[127.0.0.1 / 動的 TCP]
+  app[AppHost / DCP]
+ end
+ subgraph bridge[Docker Desktop / 同じ DCP 管理ブリッジ]
+  sim[simulator]
+  gc[GC / 唯一の 11003 送信者]
+  duck[Duck / ibis]
+  tigers[TIGERs tracker / AI 無効]
+  erforce[ER-Force tracker]
+  debug[DebugHost / 追跡・UDP送信無効]
+  ref[RefereeDriver / 単一受信・自身診断]
+  checks[各資源内の準備確認]
+  sim -. 10020 .-> duck
+  sim -. 10020 .-> tigers
+  sim -. 10020 .-> erforce
+  sim -. 10020 .-> debug
+  sim -. 10020 .-> gc
+  gc -. 11003 .-> tigers
+  gc -. 11003 .-> erforce
+  gc -. 11003 .-> ref
+  duck -. 11010 .-> debug
+  tigers -. 11010 .-> debug
+  erforce -. 11010 .-> debug
+  duck -. 11010 .-> gc
+  tigers -. 11010 .-> gc
+  erforce -. 11010 .-> gc
+  debug -. 三者の受信・新しさ .-> checks
+  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
+  ref -. 自身の診断 / 内部39110 .-> checks
+ end
+ app -. 選択コンテナの管理 .-> bridge
+ browser -. HTTP / WebSocket .-> host
+ host -. TCP 8082 / GC UI・API .-> gc
+ host -. TCP 8080 / 比較画面 .-> debug
+ host -. TCP 39110 / RefereeDriver 診断 .-> ref

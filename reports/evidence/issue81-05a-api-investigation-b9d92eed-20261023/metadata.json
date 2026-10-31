@@ -1,0 +1,124 @@
+{
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "run_id": "39938732680",
+  "attempt": 1,
+  "test_source_sha256": "a63641ea949a3222fa11cf3934b4b241a137702b917e43e226a2768814fd0d16",
+  "program_at_head_sha256": "66a9746f16c74edf737f42502aa9fcb42d7f046ca7c2f8cac8eee33a64047387",
+  "program_after_api_fix_sha256": "f438efe6766a72fcba8f550a5c8b13f6dd4c33b04cc738531c85bc869e59ac57",
+  "project_assets_sha256": "6096aee40a1d81d76cfcb1ea790b64a0f9bcda60710bc9c71f60a710737bef92",
+  "aspire_hosting_dll_sha256": "6ddbd950a91d2916f6de527a6c113a70bf26e2e7413bac49d9162dad8f82d30a",
+  "aspire_hosting_xml_sha256": "1effcf922011c0fc03fbfd450c6c95f72c69984759a676a21859707ffa31f13b",
+  "local_build_policy": "--no-restore only; no package retrieval",
+  "files": [
+    {
+      "path": "api-reflection/probe.cs",
+      "size": 1424,
+      "sha256": "4a2bc47522a5a0d7f14fef19bd14e978ff55135ff9b48e2ac441d59e115b5974"
+    },
+    {
+      "path": "api-reflection/compile.stdout.log",
+      "size": 129,
+      "sha256": "9cb684a1a5c5dc7ab9c4def370411bcded82ee2ed9fdf6eef1c42d24b266a664"
+    },
+    {
+      "path": "api-reflection/compile.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "api-reflection/reflection.stdout.log",
+      "size": 1479,
+      "sha256": "31006cd78093e424a679eb646d0e149d2fce5d5624e2d6401faa04b0435f38b6"
+    },
+    {
+      "path": "api-reflection/reflection.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "annotation-reflection/probe.cs",
+      "size": 1215,
+      "sha256": "f3953e3a14ed6316f75663da913ca770a5d1e85dd669e27e94d20dc3ba73288b"
+    },
+    {
+      "path": "annotation-reflection/compile.stdout.log",
+      "size": 129,
+      "sha256": "9cb684a1a5c5dc7ab9c4def370411bcded82ee2ed9fdf6eef1c42d24b266a664"
+    },
+    {
+      "path": "annotation-reflection/compile.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "annotation-reflection/reflection.stdout.log",
+      "size": 1268,
+      "sha256": "55445d4023aad2da72601372d08b8d0784e9e769020160c91362d083111faf22"
+    },
+    {
+      "path": "annotation-reflection/reflection.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "api-compile/probe.cs",
+      "size": 435,
+      "sha256": "6b360b2427c9be4ca7d6aca5ea2f0c476ec13e81496c0434c682b555efc19806"
+    },
+    {
+      "path": "api-compile/stdout.log",
+      "size": 443,
+      "sha256": "5d19570d3334c61eb051da6fb3a629629ba77c532bf91ab6a450b81973633318"
+    },
+    {
+      "path": "api-compile/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/initial-no-restore.result.json",
+      "size": 469,
+      "sha256": "c725d08b428af1761dc61328858bbb0a212ababe0938f28493d9264cb7c9aad8"
+    },
+    {
+      "path": "build/initial-no-restore.stdout.log",
+      "size": 2638,
+      "sha256": "3656d16e4a4910a383d8889ed1ccfae8486d4e79cfa7152f174dcbbd89d33844"
+    },
+    {
+      "path": "build/initial-no-restore.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/scm-property-no-restore.result.json",
+      "size": 832,
+      "sha256": "b1f75472fff5795a7a8269b2baee577ab9addadd161e86c5691c0fa6422ab694"
+    },
+    {
+      "path": "build/scm-property-no-restore.stdout.log",
+      "size": 22079,
+      "sha256": "77083ebc1a79b683fe5214629e1ef9b3d3afe9ef74671ac1ff2bf3cba0cdd345"
+    },
+    {
+      "path": "build/scm-property-no-restore.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/apphost-only-no-restore.result.json",
+      "size": 611,
+      "sha256": "5079cdba58e0626240e12086b363da7c7a13dce3a18f04c05dd25db1a77eede7"
+    },
+    {
+      "path": "build/apphost-only-no-restore.stdout.log",
+      "size": 2278,
+      "sha256": "ca232aacd130cebde4efd650bd4187375494479aa7409b2e298faf3e0c2ee141"
+    },
+    {
+      "path": "build/apphost-only-no-restore.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

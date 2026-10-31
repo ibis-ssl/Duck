@@ -1,0 +1,9 @@
+[
+  "/usr/lib/dotnet/dotnet",
+  "build",
+  "Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj",
+  "--no-restore",
+  "-m:1",
+  "/nr:false",
+  "-p:EnableSourceControlManagerQueries=false"
+]

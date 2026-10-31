@@ -1,0 +1,72 @@
+[
+  {
+    "argv": [
+      "/mnt/c/Program Files/nodejs/node.exe",
+      "tools/lint/scripts/run-cspell-markdown.js",
+      "--words-only",
+      "--unique",
+      "--no-progress",
+      "--no-summary",
+      "--no-show-suggestions",
+      "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+    "exit": 1
+  },
+  {
+    "argv": [
+      "/mnt/c/Program Files/nodejs/node.exe",
+      "tools/lint/scripts/run-cspell-markdown.js",
+      "--words-only",
+      "--unique",
+      "--no-progress",
+      "--no-summary",
+      "--no-show-suggestions",
+      "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+    "exit": 1
+  },
+  {
+    "argv": [
+      "/mnt/c/Program Files/nodejs/node.exe",
+      "tools/lint/scripts/run-cspell-markdown.js",
+      "--words-only",
+      "--unique",
+      "--no-progress",
+      "--no-summary",
+      "--no-show-suggestions",
+      "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+    "exit": 1
+  },
+  {
+    "argv": [
+      "/mnt/c/Program Files/nodejs/node.exe",
+      "tools/lint/scripts/run-cspell-markdown.js",
+      "--words-only",
+      "--unique",
+      "--no-progress",
+      "--no-summary",
+      "--no-show-suggestions",
+      "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+    "exit": 1
+  },
+  {
+    "argv": [
+      "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "Tracker/Design/lint-vocabulary/baseline/aspire-simulation-test-environment.md",
+      "Tracker/Design/lint-vocabulary/baseline/tracker-comparison-debug-design.md",
+      "Tracker/Design/lint-vocabulary/current/aspire-simulation-test-environment.md",
+      "Tracker/Design/lint-vocabulary/current/tracker-comparison-debug-design.md",
+      "--list-unknown"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+    "exit": 1
+  }
+]

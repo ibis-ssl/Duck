@@ -1,0 +1,33 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "source_sha256": {
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "0ae9ce8a792dafea02959408eb24df1554e32b985035133c98d46a7ab6ac00f8",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "e72a53425f5e2faeff6f9a8cad429352b695709379e1df9ec340b27929b1fcdc",
+    "Testing/Duck.Testing.AppHost/Program.cs": "07e93b2428031a8b9154aeff68f17124b55ff9fa3f40951284b09e765b659671",
+    "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj": "2e503984d9a08d665c5e22e18563c7b307cf62e3f906f5c38864c99111b84d8b"
+  },
+  "commands": [
+    {
+      "index": 1,
+      "argv": [
+        "dotnet",
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "-p:EnableSourceControlManagerQueries=false",
+        "--filter",
+        "FullyQualifiedName~RegisteredContainerExecHandoffTests",
+        "--logger",
+        "console;verbosity=normal"
+      ],
+      "started_unix": 1792770160.3016183,
+      "capture": "subprocess.run stdout/stderr bytes",
+      "exit_code": 1,
+      "timed_out": false,
+      "ended_unix": 1792770164.9049997,
+      "stdout_sha256": "1768a019f8a0a1a9acb2d5c11d20a33618080a58b2d3bd8df062b4bd4414c445",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "complete": false
+}

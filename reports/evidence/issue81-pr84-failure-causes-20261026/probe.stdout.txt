@@ -1,0 +1,79 @@
+{
+  "processId": 6036,
+  "framework": ".NET 10.0.14",
+  "os": "Microsoft Windows 10.0.22631",
+  "productAssembly": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\Tracker\\Tracker.Tests\\bin\\Debug\\net10.0\\Tracker.DebugHost.dll",
+  "productMvid": "7a15afa9-fccf-48bd-aa56-0b18753437c0",
+  "cases": [
+    {
+      "reader": "DiagnosticsSampleLogReader",
+      "phase": "writer-open_actual-product-reader",
+      "outcome": "exception",
+      "type": "System.IO.IOException",
+      "hresult": "0x80070020",
+      "message": "The process cannot access the file \u0027C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\files\\DiagnosticsSampleLogReader.jsonl\u0027 because it is being used by another process.",
+      "expected": true
+    },
+    {
+      "reader": "DiagnosticsSampleLogReader",
+      "phase": "writer-open_explicit-readwrite-reader",
+      "outcome": "success",
+      "count": 0,
+      "expected": true
+    },
+    {
+      "reader": "DiagnosticsSampleLogReader",
+      "phase": "writer-closed_actual-product-reader",
+      "outcome": "success",
+      "count": 0,
+      "expected": true
+    },
+    {
+      "reader": "TrackerPacketSnapshotLogReader",
+      "phase": "writer-open_actual-product-reader",
+      "outcome": "exception",
+      "type": "System.IO.IOException",
+      "hresult": "0x80070020",
+      "message": "The process cannot access the file \u0027C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\files\\TrackerPacketSnapshotLogReader.jsonl\u0027 because it is being used by another process.",
+      "expected": true
+    },
+    {
+      "reader": "TrackerPacketSnapshotLogReader",
+      "phase": "writer-open_explicit-readwrite-reader",
+      "outcome": "success",
+      "count": 0,
+      "expected": true
+    },
+    {
+      "reader": "TrackerPacketSnapshotLogReader",
+      "phase": "writer-closed_actual-product-reader",
+      "outcome": "success",
+      "count": 0,
+      "expected": true
+    },
+    {
+      "reader": "TrackerSnapshotAlignmentLogReader",
+      "phase": "writer-open_actual-product-reader",
+      "outcome": "exception",
+      "type": "System.IO.IOException",
+      "hresult": "0x80070020",
+      "message": "The process cannot access the file \u0027C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\files\\TrackerSnapshotAlignmentLogReader.jsonl\u0027 because it is being used by another process.",
+      "expected": true
+    },
+    {
+      "reader": "TrackerSnapshotAlignmentLogReader",
+      "phase": "writer-open_explicit-readwrite-reader",
+      "outcome": "success",
+      "count": 0,
+      "expected": true
+    },
+    {
+      "reader": "TrackerSnapshotAlignmentLogReader",
+      "phase": "writer-closed_actual-product-reader",
+      "outcome": "success",
+      "count": 0,
+      "expected": true
+    }
+  ],
+  "unexpected": 0
+}

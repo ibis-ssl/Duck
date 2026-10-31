@@ -1,0 +1,6 @@
+{
+  "command": "gh run download 39867225445 --repo ibis-ssl/Duck --name dotnet-test-failure-39867225445-1 --dir C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-04a-evidence-20261022\\candidate-test-artifact-extract",
+  "exit_code": 0,
+  "finishedUTC": "2026-10-22T22:48:14.9041926Z",
+  "startedUTC": "2026-10-22T22:48:06.1882968Z"
+}

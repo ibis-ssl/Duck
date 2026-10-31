@@ -1,0 +1,25 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveUdpSettingsAndDisposalTests
+{
+    [Theory]
+    [InlineData(null)]
+    [InlineData("192.0.2.80")]
+    public async Task FactoryUsesAcceptedIpv4MulticastSettingsInOrder(string? interfaceAddress);
+    [Fact]
+    public async Task CancellationBeforeAnyDatagramDoesNotCaptureReceiveTime();
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task AdapterDisposesOnlyOwnedSocketAndRepeatedDisposeIsSafe(bool ownsClient);
+    [Fact]
+    public async Task ConcurrentAndRepeatedServiceDisposeShareOneOwnedCleanupAndAwaitRun();
+    [Fact]
+    public async Task DisposedServiceRejectsRestartWithoutReceivingAgain();
+}

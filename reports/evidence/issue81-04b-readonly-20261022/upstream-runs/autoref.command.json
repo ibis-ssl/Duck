@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "repos/robotics-erlangen/autoref/actions/runs?head_sha=da862ea353d877fbbb66dd73827543b78364dc6a&per_page=100"
+  ],
+  "method": "GET",
+  "metadata_only": true
+}

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "baseline": "3f52a4a4e221102f72661961da1a983e3a557d93",
+  "result": "source fixes validated; pending parent commit and same-reviewer closure",
+  "findings": [
+    "I81-07J-B3-A-NR001/P2",
+    "I81-07J-B3-A-NR002/P2"
+  ],
+  "sourceSha256": {
+    "endpoint": "5AF0E2B164F4B031C3BB76B02285460D84FE22BF8718011A00AFFFF4E4F1D9AD",
+    "ownershipConsumer": "DB2AF784472C469C202B1BAC18BCDB2ABB6625D79AB0CF9B7783ABE12A1CD22C",
+    "readinessObserver": "1C18767B8C87DB35300A0C1B5A7BC752737782C3AAF6040DD7736AD492A4EE42",
+    "tests": "28629C98765A42108226FDD9F3CD4253E85AD563612A7A259C65B757281C5343",
+    "legacyTests": "D76C59677D6099EB038A86C0ED9D73C61B5078513EF0802147BCE724BBCCDB13",
+    "observerTests": "C87A4B0AAEBBA5707180AD419014DE761BC6CF80276AFA1F0A83A2F411677426"
+  },
+  "validation": {
+    "focused": "51/51",
+    "relatedNineClassCohort": "148/148",
+    "appHostReleaseBuildExit": 0,
+    "documentGates": "12/12 exit 0",
+    "runtimeOrContainerExecuted": false
+  },
+  "networkContract": "Standard DCP requires one valid full network ID and accepts only default, the attached network name, or that same ID as network mode. The legacy referee-reconfiguration parser retains its prior name-only match contract.",
+  "readiness": "Ownership evidence is rechecked against current key, full ID, state, and generation. Service readiness remains unverified.",
+  "historical": "An intermediate compatibility regression run had 11 failures; the final current-source cohort passed. A separate compile-only run failed before test discovery and is not a behavior failure.",
+  "docGateManifestSha256": "4327E1727D3BB208463F1D59DD6EDA6A3372951A38089B518A5387173E43CE82",
+  "documentationDiffBaseline": "99f394c1ff940c15904591a7b17a45fa8c4e3671",
+  "documentationCoverage": "Document gates used a broader added-line comparison against 99f394c. The current fix added lines against 3f52a4a are included in those inputs; parent verified coverage. Older baseline labels in private worker projection refer to documentation history, not the fixed reviewed commit.",
+  "sourceFiles": [
+    {
+      "path": "Testing\\Duck.Testing.AppHost\\OwnedRefereeEndpoint.cs",
+      "sha256": "5AF0E2B164F4B031C3BB76B02285460D84FE22BF8718011A00AFFFF4E4F1D9AD"
+    },
+    {
+      "path": "Testing\\Duck.Testing.AppHost\\DcpBaseResourceOwnershipEventConsumer.cs",
+      "sha256": "DB2AF784472C469C202B1BAC18BCDB2ABB6625D79AB0CF9B7783ABE12A1CD22C"
+    },
+    {
+      "path": "Testing\\Duck.Testing.AppHost\\DcpBaseResourceReadiness.cs",
+      "sha256": "1C18767B8C87DB35300A0C1B5A7BC752737782C3AAF6040DD7736AD492A4EE42"
+    },
+    {
+      "path": "Tracker\\Tracker.Tests\\OwnedRefereeReconfigurationTests.cs",
+      "sha256": "D76C59677D6099EB038A86C0ED9D73C61B5078513EF0802147BCE724BBCCDB13"
+    },
+    {
+      "path": "Tracker\\Tracker.Tests\\DcpBaseResourceOwnershipEventConsumerTests.cs",
+      "sha256": "28629C98765A42108226FDD9F3CD4253E85AD563612A7A259C65B757281C5343"
+    },
+    {
+      "path": "Tracker\\Tracker.Tests\\DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "C87A4B0AAEBBA5707180AD419014DE761BC6CF80276AFA1F0A83A2F411677426"
+    },
+    {
+      "path": "Tracker\\Design\\Testing\\aspire-simulation-test-environment.md",
+      "sha256": "3C35A7EC6EA19205FD13C5F45684F22D86AFABBF24C9007579D95181A52FBA7E"
+    },
+    {
+      "path": "Tracker\\Design\\tasks-status.md",
+      "sha256": "D10768BB9A89E0DCEE50C0046229C40F090E74A812417C555488C4705A2BEB06"
+    },
+    {
+      "path": "Tracker\\Design\\phases-status.md",
+      "sha256": "D3BFEACFC9D083983D0A5EEBFBD6AD10887F9157D9F151C2FFE6C2986B5FF636"
+    }
+  ],
+  "documentInputs": [
+    {
+      "name": "design-b3-a",
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "inputSha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "bytes": 4866,
+      "addedLineCount": 18,
+      "cspellCopySha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0"
+    },
+    {
+      "name": "tasks-b3-a",
+      "source": "Tracker/Design/tasks-status.md",
+      "inputSha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "bytes": 2338,
+      "addedLineCount": 3,
+      "cspellCopySha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0"
+    },
+    {
+      "name": "phases-b3-a",
+      "source": "Tracker/Design/phases-status.md",
+      "inputSha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "bytes": 3351,
+      "addedLineCount": 10,
+      "cspellCopySha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce"
+    }
+  ],
+  "documentGates": [
+    {
+      "input": "design-b3-a",
+      "name": "textlint",
+      "exit": 0,
+      "inputSha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "cspellCopySha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "design-b3-a",
+      "name": "whitelist",
+      "exit": 0,
+      "inputSha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "cspellCopySha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "design-b3-a",
+      "name": "cspell",
+      "exit": 0,
+      "inputSha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "cspellCopySha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "fe6a4e701a50cfc827dbc9ecb0d5d0f5d750f2aa9c8ca63e7b6c0d5b98ad609e"
+    },
+    {
+      "input": "design-b3-a",
+      "name": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "cspellCopySha256": "a49eb2106238aab0aded408e532c23e13c1378956b03606f08b3b5e9e23bedc0",
+      "stdoutSha256": "d341727a0a7f7ac3f5d7a6da61be5d57bde4a10be608fa2858be350bb2005c88",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "tasks-b3-a",
+      "name": "textlint",
+      "exit": 0,
+      "inputSha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "cspellCopySha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "tasks-b3-a",
+      "name": "whitelist",
+      "exit": 0,
+      "inputSha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "cspellCopySha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "tasks-b3-a",
+      "name": "cspell",
+      "exit": 0,
+      "inputSha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "cspellCopySha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "df0455a1a0ddecfa70fe23002c5eb7a4553be5482cdf251c99ce4bdcb2fd2ab8"
+    },
+    {
+      "input": "tasks-b3-a",
+      "name": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "cspellCopySha256": "032b2b672af1629dfed596cd7a6429af7abe4f06a438aa9810aa2749c2beebe0",
+      "stdoutSha256": "0e3c9097ec519499e3f175870710cebc57b2442ea3e747893f5eaa667ca2c324",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "phases-b3-a",
+      "name": "textlint",
+      "exit": 0,
+      "inputSha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "cspellCopySha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "phases-b3-a",
+      "name": "whitelist",
+      "exit": 0,
+      "inputSha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "cspellCopySha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input": "phases-b3-a",
+      "name": "cspell",
+      "exit": 0,
+      "inputSha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "cspellCopySha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "321bcf4d8e0d3521aa15fa340b593f4865b2776911d249b13a62b228cac0a4c2"
+    },
+    {
+      "input": "phases-b3-a",
+      "name": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "cspellCopySha256": "727e47f88e228cd2a3b5dad847593b70068c7ab5783c9b93aa02925d94d349ce",
+      "stdoutSha256": "df105f7628a6ce3e5b23dd6e85cee44d130909c3ff4cc78a4beebd6344863120",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

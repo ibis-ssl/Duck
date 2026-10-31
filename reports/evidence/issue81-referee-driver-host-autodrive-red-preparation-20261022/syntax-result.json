@@ -1,0 +1,43 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs",
+    "output": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/RefereeDriverHostAutoDriveTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeDriverHostAutoDriveTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [
+      [
+        "matchState"
+      ],
+      [
+        "command",
+        "gameState"
+      ],
+      [
+        "type",
+        "forTeam"
+      ],
+      [
+        "type"
+      ]
+    ],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "omitted_duplicate_container": {
+    "path": "/tmp/issue81-referee-receive-red-ci-20261022/failure-artifact.zip",
+    "sha256": "7f54e0ee66b7da2b2624d4b9ff9fca77eb106eab01a5b4cb33673a0e0aefab64",
+    "reason": "individual TRX/logs/source checks retained; full zip retained outside branch"
+  }
+}

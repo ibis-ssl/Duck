@@ -1,0 +1,38 @@
+[
+  {
+    "path": "Tracker/Design/tasks-status.md",
+    "fullSourceSHA256": "d8f839d839295120bcf2a1cfa718c5b41b677b4648e43fe176368c773a8b7102",
+    "fragmentSHA256": "f2fea9062a513d921de7b8eb4b94612ae7016d1541134d7bedab9c53eb3c0f83",
+    "lines": [
+      {
+        "sourceLine": 27,
+        "fragmentLine": 27,
+        "text": "| I81-03 / 中の3単位 | I81-01・02、固定版の Game Controller 公開契約確認済み | RefereeDriverの単一常駐受信・自身診断・内部の Game Controller 状態照合・明示的な有効化と内部HTTP診断を03A→03B→03Cで実装。Game Controller を唯一の送信者とする構成と手動画面操作を保持し、外部自身診断とは分離する。 | 03A通常レビューで必須指摘 I81-NR-002 は解消済み、技術判定は条件付き合格。修正前は652件中651件成功・競合試験1件失敗、固定試験を保った修正後08d49cdのCI39821519633は652件成功。成功時の個別試験結果は未公開。文書全文検査は不合格、実機・03B/C・独立最終レビューは未完了。 |",
+        "sha256": "ac8f7ca0b242f3e15ff8c3a5edd0b32c0e826892b24564c159108c9ab2ae5c3d"
+      },
+      {
+        "sourceLine": 28,
+        "fragmentLine": 28,
+        "text": "| I81-03A / 中 | I81-01・02 | 単一常駐11003受信で復号前の単調時計・受信世代・明示所有者に結び付く正常復号を毎通信計上。同じ指令番号でも診断へ数え、変更購読だけ重複抑制し、診断と制御で受信を奪い合わない。未知・破損・所有者欠落・旧通知・再起動・取消では準備未完了とし、既存公開契約を保つ。 | 03A通常レビューで必須指摘 I81-NR-002 は解消済み、技術判定は条件付き合格。修正前は652件中651件成功・競合試験1件失敗、固定試験を保った修正後08d49cdのCI39821519633は652件成功。成功時の個別試験結果は未公開。文書全文検査は不合格、実機・03B/C・独立最終レビューは未完了。 |",
+        "sha256": "8fedeaadbdb64e0f444b481d744798f084e658d0f1682e497e59fef12e8ae819"
+      }
+    ],
+    "blankUnselectedLinesPreservePositions": true,
+    "notFullDocument": true
+  },
+  {
+    "path": "Tracker/Design/phases-status.md",
+    "fullSourceSHA256": "44aa5a1cb7872f077b96c3406055db2a8ae328af062c872ad2db3c98ff5379ec",
+    "fragmentSHA256": "c1544941f9485b2e7031815bdb64fc3bae1f04da140701e3030769afacd58081",
+    "lines": [
+      {
+        "sourceLine": 14,
+        "fragmentLine": 14,
+        "text": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューの保留付き合格を記録済み。I81-03Aは単一受信・自身診断・購読分離・所有資源破棄・IPv4マルチキャスト設定を実装し、先行試験の失敗から固定試験成功へ進めた。公開コミット `381dcb6b788ecee2aeec0bf1077069102d34bd55` のCI39812786126で36件追加を含む651/651成功。成功時の個別試験結果は未公開で集計証拠と区別する。Linux 上の隔離試験で実ソケットの組成も成功。当時の651件成功後に通常レビューの競合指摘へ対応した。03B/Cは未着手。旧CI39795794024の局所監視終了255後、後続読取で成功完了も確認。[実装・検証報告](../../reports/issue81-referee-receive-implementation-20261022.md)へ詳細を保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Docker Desktop・Windows実機は後続に残す。過去TDD不足は保持し、今回の先行失敗で補填しない。 03A通常レビューで必須指摘 I81-NR-002 は解消済み、技術判定は条件付き合格。修正前は652件中651件成功・競合試験1件失敗、固定試験を保った修正後08d49cdのCI39821519633は652件成功。成功時の個別試験結果は未公開。文書全文検査は不合格、実機・03B/C・独立最終レビューは未完了。",
+        "sha256": "4a79e072ce355fa1ac645352d527439f19d80c84aa394ff98991bd96035861c7"
+      }
+    ],
+    "blankUnselectedLinesPreservePositions": true,
+    "notFullDocument": true
+  }
+]

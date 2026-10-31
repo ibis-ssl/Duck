@@ -1,0 +1,12 @@
+{
+  "command": "Python xml.etree.ElementTree.parse for exact paths",
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "paths": [
+    "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "Duck.slnx"
+  ],
+  "parsed": 4,
+  "exit": 0
+}

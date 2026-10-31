@@ -1,0 +1,310 @@
+[
+  {
+    "path": "RefereeDriverApplication.after.cs",
+    "sha256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "bytes": 8292,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/RefereeDriverApplication.after.cs"
+  },
+  {
+    "path": "RefereeDriverApplication.before.cs",
+    "sha256": "00c86d0423024ccf8e49ffdbfe2a1319a2df700c6c920c9f078475db8b4f6db6",
+    "bytes": 1334,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/RefereeDriverApplication.before.cs"
+  },
+  {
+    "path": "baseline-status.txt",
+    "sha256": "24a4815c16f33611b1d2e309a0e4a92dbe9ae1a9b702b91cde016b71331c17f7",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/baseline-status.txt"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "a792025ebaaa8b9a9a943a5a41b6359c5509991c6403a1dbe5f1444b49356c02",
+    "bytes": 116,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff-check.exit.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "diff.command.json",
+    "sha256": "8ec5677df9ee1f089e1c26982583aeac801785a487b9a3a177e55d637c16cb5e",
+    "bytes": 186,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff.command.json"
+  },
+  {
+    "path": "diff.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff.exit.json"
+  },
+  {
+    "path": "diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff.stderr.log"
+  },
+  {
+    "path": "diff.stdout.log",
+    "sha256": "7d479bc93fb37147b0e1abe90c1773a0dbede5e36506cf3425f784eefaabecf3",
+    "bytes": 8922,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/diff.stdout.log"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "a9780208a950a524ed790f0badd4dc755dfdeefb955d9280e219e9049d825e6b",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff.command.json",
+    "sha256": "9fe3c3542966b07df29f5afb665837d5731fafcd33ade416939f0e07cc2f4357",
+    "bytes": 257,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff.command.json"
+  },
+  {
+    "path": "final-diff.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff.exit.json"
+  },
+  {
+    "path": "final-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff.stderr.log"
+  },
+  {
+    "path": "final-diff.stdout.log",
+    "sha256": "8054b5513723f017ddfaf22e8d9c2a527a63778e70fa4c8341e157405ff8787e",
+    "bytes": 19837,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-diff.stdout.log"
+  },
+  {
+    "path": "final-stat.command.json",
+    "sha256": "b0d9b5d5e7c10e8289361993ae8edd953c772e2f06af9bc8dff166103c8d7b01",
+    "bytes": 116,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-stat.command.json"
+  },
+  {
+    "path": "final-stat.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-stat.exit.json"
+  },
+  {
+    "path": "final-stat.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-stat.stderr.log"
+  },
+  {
+    "path": "final-stat.stdout.log",
+    "sha256": "b3e7946fee2005670aa53a54381a6675ca6cda316ced779effec9f25afcee65a",
+    "bytes": 195,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-stat.stdout.log"
+  },
+  {
+    "path": "final-status.command.json",
+    "sha256": "dcbdc29b487c3119acc827897d5bf75cb3df6055c84cf9d2636c9498c3572383",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-status.command.json"
+  },
+  {
+    "path": "final-status.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-status.exit.json"
+  },
+  {
+    "path": "final-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-status.stderr.log"
+  },
+  {
+    "path": "final-status.stdout.log",
+    "sha256": "cd86ac232018700e3b0ac2e0a8fee326a9ea9c1f475f064485084e256c43285b",
+    "bytes": 214,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/final-status.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "c34f4dfd24c1287c749c3afefbac0b61757f0658831910289d419b6a4097d115",
+    "bytes": 6228,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/inventory.json"
+  },
+  {
+    "path": "other41-source-guards.json",
+    "sha256": "fd2533f733e08ae17eb69898f7a2419b5307ef26d74af0dfd423358fa8940ee3",
+    "bytes": 13142,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/other41-source-guards.json"
+  },
+  {
+    "path": "production-path-composition-matrix.json",
+    "sha256": "51f39d20469933d32391c2cf5f480afbf67555993c507aba72b5c62aea66d142",
+    "bytes": 2243,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/production-path-composition-matrix.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "a992b39f6f3333c58e3d19bcb32d929359de55644e06d9db7edef3bed685347f",
+    "bytes": 537,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/readback.json"
+  },
+  {
+    "path": "remaining03C.json",
+    "sha256": "58fa79f4a724806cc8e1e0c017ae50cdb8aaa34922178284c85362afb766a845",
+    "bytes": 551,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/remaining03C.json"
+  },
+  {
+    "path": "report.after.md",
+    "sha256": "d9f13168b30bebc75d610bc5c81bd65c216783cfc96091e31b41e1d8452dfabe",
+    "bytes": 25082,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/report.after.md"
+  },
+  {
+    "path": "report.before.md",
+    "sha256": "7b828bf63f690aeb78071d496f1513d8b86c263ff2fae6ebd3706d321bd28a63",
+    "bytes": 19225,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/report.before.md"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "52dda1e5d3c8120013b0a75659ce023ee09ed6b51a20432bf71f5421ce59c8f5",
+    "bytes": 344,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "38facfc2af12d34f9a8972c5c36be1aaad7cf58b4ece3917d153b6398dd53c76",
+    "bytes": 490,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "93bc9cb344b84a75bc1e12cece2f05acaab228b2b901db715ce1542fc50906c0",
+    "bytes": 1554,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "8e324c2742570c0a5dfc8c5e48f64c97857a020bbf44f47b15c94fb0fbb44f12",
+    "bytes": 373,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax.exit.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "validation-summary.json",
+    "sha256": "45f5c6857caa9acab7d22d1dd2cb76dfa7bf2f3bddfe173e695beab2b8e84251",
+    "bytes": 555,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/validation-summary.json"
+  },
+  {
+    "path": "work-context.json",
+    "sha256": "3c6fdfdb04f82da653bc77e01f77a74fb2980c82c68fc1d612dd26988e76fd4d",
+    "bytes": 485,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/work-context.json"
+  },
+  {
+    "path": "xml-proof.json",
+    "sha256": "a3f7b4e582c94a6e84dc03eddedbc940dcb81ed2aa1ed58509c5a3f1cf39dae9",
+    "bytes": 403,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-composition-green-candidate-20261022/xml-proof.json"
+  }
+]

@@ -1,0 +1,1485 @@
+{
+  "exit_code": 1,
+  "inputs": [
+    "Tracker/Design/tasks-status.md"
+  ],
+  "violations": [
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "closedByPullRequestsReferences",
+      "normalized": "closedbypullrequestsreferences",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "closingIssuesReferences",
+      "normalized": "closingissuesreferences",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "gh",
+      "normalized": "gh",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "base",
+      "normalized": "base",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "base",
+      "normalized": "base",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "close",
+      "normalized": "close",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "home",
+      "normalized": "home",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "donabe",
+      "normalized": "donabe",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "UTC",
+      "normalized": "utc",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "merge",
+      "normalized": "merge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "tracker-comparison-debug-design.md",
+      "normalized": "tracker-comparison-debug-design.md",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Green",
+      "normalized": "green",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "test-first",
+      "normalized": "test-first",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "loopback",
+      "normalized": "loopback",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "schema",
+      "normalized": "schema",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "age",
+      "normalized": "age",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "ready",
+      "normalized": "ready",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "closed",
+      "normalized": "closed",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "library",
+      "normalized": "library",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "build",
+      "normalized": "build",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "final",
+      "normalized": "final",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "geometry",
+      "normalized": "geometry",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "skip",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "hash",
+      "normalized": "hash",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "root",
+      "normalized": "root",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "high",
+      "normalized": "high",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "fork",
+      "normalized": "fork",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "none",
+      "normalized": "none",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "applied",
+      "normalized": "applied",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "null",
+      "normalized": "null",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "manifest",
+      "normalized": "manifest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "byte",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "BCL",
+      "normalized": "bcl",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "TRX",
+      "normalized": "trx",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "read",
+      "normalized": "read",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "UTC",
+      "normalized": "utc",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "vision",
+      "normalized": "vision",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "manifest",
+      "normalized": "manifest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "byte",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "name",
+      "normalized": "name",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "resolver",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "TRX",
+      "normalized": "trx",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "CaptureOffRace",
+      "normalized": "captureoffrace",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "setup",
+      "normalized": "setup",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "timeout",
+      "normalized": "timeout",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "job",
+      "normalized": "job",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "reviewer",
+      "normalized": "reviewer",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "seam",
+      "normalized": "seam",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 31,
+      "token": "digest",
+      "normalized": "digest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "AddContainer",
+      "normalized": "addcontainer",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "host",
+      "normalized": "host",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "network",
+      "normalized": "network",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "freshness",
+      "normalized": "freshness",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "lifecycle",
+      "normalized": "lifecycle",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "run",
+      "normalized": "run",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "stop",
+      "normalized": "stop",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "rm",
+      "normalized": "rm",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "capture",
+      "normalized": "capture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "read-only",
+      "normalized": "read-only",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "PID",
+      "normalized": "pid",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "debug",
+      "normalized": "debug",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "attach",
+      "normalized": "attach",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 36,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "IF",
+      "normalized": "if",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "close",
+      "normalized": "close",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "merge",
+      "normalized": "merge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 46,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "close",
+      "normalized": "クローズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "home",
+      "normalized": "ホーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "de",
+      "normalized": "デ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "implementation",
+      "normalized": "インプリメンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "レビュアー",
+      "normalized": "レビュアー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "プロトコル",
+      "normalized": "プロトコル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "file",
+      "normalized": "ファイル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "merge",
+      "normalized": "マージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 16,
+      "token": "ドキュメント",
+      "normalized": "ドキュメント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "debug",
+      "normalized": "デバッグ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "design",
+      "normalized": "デザイン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Green",
+      "normalized": "グリーン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "readiness",
+      "normalized": "レディネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "contract",
+      "normalized": "コントラクト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "implementation",
+      "normalized": "インプリメンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "ソース",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "ゲート",
+      "normalized": "ゲート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "closed",
+      "normalized": "クローズド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "library",
+      "normalized": "ライブラリー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "build",
+      "normalized": "ビルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "harness",
+      "normalized": "ハーネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "ローカル",
+      "normalized": "ローカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "final",
+      "normalized": "ファイナル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "geometry",
+      "normalized": "ジオメトリー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "review",
+      "normalized": "レビュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "hash",
+      "normalized": "ハッシュ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pack",
+      "normalized": "パック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "file",
+      "normalized": "ファイル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "root",
+      "normalized": "ルート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "independent",
+      "normalized": "インディペンデント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "spec",
+      "normalized": "スペック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "high",
+      "normalized": "ハイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "null",
+      "normalized": "ヌル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "ケース",
+      "normalized": "ケース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "バイト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "case",
+      "normalized": "ケース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "vision",
+      "normalized": "ビジョン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "store",
+      "normalized": "ストア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "case",
+      "normalized": "ケース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "バイト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "name",
+      "normalized": "ネーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "setup",
+      "normalized": "セットアップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "setup",
+      "normalized": "セットアップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "job",
+      "normalized": "ジョブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "seam",
+      "normalized": "シーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "file",
+      "normalized": "ファイル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 31,
+      "token": "digest",
+      "normalized": "ダイジェスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "モデル",
+      "normalized": "モデル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "host",
+      "normalized": "ホスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "network",
+      "normalized": "ネットワーク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "freshness",
+      "normalized": "フレッシュネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "run",
+      "normalized": "ラン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "stop",
+      "normalized": "ストップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "only",
+      "normalized": "オンリー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "debug",
+      "normalized": "デバッグ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "close",
+      "normalized": "クローズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "merge",
+      "normalized": "マージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 46,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    }
+  ]
+}
