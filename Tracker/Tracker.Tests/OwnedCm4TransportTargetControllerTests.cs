@@ -65,6 +65,28 @@ public sealed class OwnedCm4TransportTargetControllerTests
     }
 
     [Fact]
+    public async Task AcceptsDockerCliFinalNewlineAfterInspectTemplateOutput()
+    {
+        var identities = CreatePair();
+        var runner = new FakeDockerRunner(identities, EngineId)
+        {
+            AppendInspectCommandTerminator = true,
+        };
+        var controller = new OwnedCm4TransportTargetController(
+            runner,
+            "desktop-linux",
+            EngineId,
+            RunId,
+            () => identities);
+
+        var result = await controller.ApplyCurrentTargetAsync("helper-launch-01", CancellationToken.None);
+
+        Assert.True(result.Applied, result.Error);
+        Assert.False(result.Unknown);
+        Assert.Equal("172.30.0.3", controller.Snapshot().TargetAddress);
+    }
+
+    [Fact]
     public async Task UsesLiveHelperLaunchGenerationWithFreshCurrentOwnershipProof()
     {
         var original = CreatePair();
@@ -590,6 +612,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
         internal bool ForeignCm4Owner { get; init; }
         internal bool DifferentNetworkIds { get; init; }
         internal bool InvalidSimulatorAddress { get; init; }
+        internal bool AppendInspectCommandTerminator { get; init; }
         internal Action? AfterStdio { get; set; }
         internal Action<int>? AfterInspect { get; set; }
         internal int InspectCalls { get; private set; }
@@ -618,6 +641,7 @@ public sealed class OwnedCm4TransportTargetControllerTests
             {
                 InspectCalls++;
                 AfterInspect?.Invoke(InspectCalls);
+                if (AppendInspectCommandTerminator) summary += "\n";
             }
 
             return Task.FromResult(summary);

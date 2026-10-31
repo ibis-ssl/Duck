@@ -892,7 +892,7 @@ internal sealed class OwnedCm4TransportTargetController(
         {
             if (output.Length > MaximumMessageBytes) return false;
             var lines = output.Split('\n');
-            if (lines.Length > 1 && lines[^1].Length == 0) lines = lines[..^1];
+            while (lines.Length > 1 && lines[^1].Length == 0) lines = lines[..^1];
             if (lines.Length != 6 ||
                 !string.Equals(lines[0], identity.ContainerId, StringComparison.Ordinal) ||
                 !string.Equals(lines[1], "running", StringComparison.Ordinal) ||

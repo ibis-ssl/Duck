@@ -4,6 +4,7 @@ using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text.Json;
@@ -648,6 +649,14 @@ internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadi
 }
 
 /// <summary>DCP通知で所有が確認された通常CM4資源に前景の補助処理を結び付けます。</summary>
+internal enum Cm4InitialTargetApplyDiagnosticCode
+{
+    Unknown = 0,
+    Applied = 1,
+    Rejected = 2,
+    OutcomeUnknown = 3,
+}
+
 internal sealed class OwnedCm4TransportServerSessionManager(
     DcpBaseResourceReadinessRegistry registry,
     IDockerCliForegroundSessionRunner runner,
@@ -655,7 +664,8 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     string? dockerContextName,
     string? expectedEngineId,
     string runId,
-    IOwnedCm4TransportTargetController? targetController = null)
+    IOwnedCm4TransportTargetController? targetController = null,
+    ILogger? logger = null)
 {
     private const string HelperPath = "/opt/duck/cm4-transport-control";
     private readonly SemaphoreSlim reconcileGate = new(1, 1);
@@ -939,7 +949,40 @@ internal sealed class OwnedCm4TransportServerSessionManager(
             if (applyInitialTarget && targetController is not null)
             {
                 // 初回だけ現行所有世代を補助処理へ渡し、失敗時は制御器の Unknown を維持します。
-                await targetController.ApplyCurrentTargetAsync(runId, cancellationToken).ConfigureAwait(false);
+                var result = await targetController.ApplyCurrentTargetAsync(runId, cancellationToken).ConfigureAwait(false);
+                var diagnosticCode = result.Applied
+                    ? Cm4InitialTargetApplyDiagnosticCode.Applied
+                    : result.Unknown
+                        ? Cm4InitialTargetApplyDiagnosticCode.OutcomeUnknown
+                        : Cm4InitialTargetApplyDiagnosticCode.Rejected;
+                var level = result.Applied ? LogLevel.Information : LogLevel.Warning;
+                var cm4 = registry.GetCandidates().SingleOrDefault(item =>
+                    ReferenceEquals(item.Resource, cm4Resource) && item.Role == "cm4-sim");
+                var simulator = registry.GetCandidates().SingleOrDefault(item => item.Role == "simulator");
+                var snapshot = targetController.Snapshot();
+                logger?.Log(
+                    level,
+                    new EventId((int)diagnosticCode, diagnosticCode.ToString()),
+                    "CM4 initial target apply code={Code} codeName={CodeName} stage={Stage} target={Target} runId={RunId} cm4ResourceId={Cm4ResourceId} cm4ContainerId={Cm4ContainerId} cm4Generation={Cm4Generation} simulatorResourceId={SimulatorResourceId} simulatorContainerId={SimulatorContainerId} simulatorGeneration={SimulatorGeneration} resultApplied={ResultApplied} resultUnknown={ResultUnknown} resultEpoch={ResultEpoch} resultError={ResultError} snapshotPhase={SnapshotPhase} snapshotEpoch={SnapshotEpoch} snapshotTarget={SnapshotTarget} atUtc={AtUtc}",
+                    (int)diagnosticCode,
+                    diagnosticCode.ToString(),
+                    "cm4.initial-target-apply",
+                    "cm4-sim->simulator",
+                    runId,
+                    cm4?.ResourceId,
+                    cm4?.ContainerId,
+                    cm4?.Generation,
+                    simulator?.ResourceId,
+                    simulator?.ContainerId,
+                    simulator?.Generation,
+                    result.Applied,
+                    result.Unknown,
+                    result.Epoch,
+                    result.Error,
+                    snapshot.Phase,
+                    snapshot.Epoch,
+                    snapshot.TargetAddress,
+                    DateTimeOffset.UtcNow);
             }
         }
         finally
@@ -1217,7 +1260,8 @@ internal static class DcpBaseResourceReadinessRegistration
                     dockerContextName,
                     expectedEngineId,
                     runId,
-                    services.GetService<IOwnedCm4TransportTargetController>()));
+                    services.GetService<IOwnedCm4TransportTargetController>(),
+                    services.GetService<ILogger<OwnedCm4TransportServerSessionManager>>()));
         }
         var roleMap = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in trackedResources)

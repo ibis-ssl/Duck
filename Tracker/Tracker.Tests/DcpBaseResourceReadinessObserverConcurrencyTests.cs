@@ -4,6 +4,7 @@ using Duck.Testing.AppHost;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tracker.Tests;
@@ -435,8 +436,10 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         }
     }
 
-    [Fact]
-    public async Task AppliesInitialTargetWhenSimulatorBecomesOwnedAfterCm4SessionStarts()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task AppliesInitialTargetWhenSimulatorBecomesOwnedAfterCm4SessionStarts(bool rejectApplyAcknowledgement)
     {
         using var lifetime = new TestApplicationLifetime();
         using var notifications = new ResourceNotificationService(
@@ -455,6 +458,8 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             resources.Select(item => (item.Resource, item.Role, runId)),
             stackId);
         var runner = new ObserverDockerRunner(runId, stackId);
+        runner.RejectApplyAcknowledgement = rejectApplyAcknowledgement;
+        var logger = new RecordingLogger();
         var ownershipConsumer = new DcpBaseResourceOwnershipEventConsumer(
             registry,
             runner,
@@ -474,7 +479,8 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
             "desktop-linux",
             "expected-engine",
             runId,
-            targetController);
+            targetController,
+            logger);
         var roles = new Dictionary<IResource, string>(ReferenceEqualityComparer.Instance);
         foreach (var (resource, role) in resources) roles.Add(resource, role);
         var observer = new DcpBaseResourceReadinessObserver(
@@ -526,11 +532,32 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 "simulator-key-a",
                 _ => Snapshot("Running", ContainerId("simulator")));
             await runner.TargetApplied.Task.WaitAsync(TimeSpan.FromSeconds(3));
-            await WaitUntilAsync(() => targetController.Snapshot().Phase == Cm4TransportTargetPhase.Applied);
-
-            Assert.Equal(1, runner.StdioCalls);
-            Assert.Equal(new string('3', 64), targetController.Snapshot().Cm4ContainerId);
-            Assert.Equal(new string('1', 64), targetController.Snapshot().SimulatorContainerId);
+            if (rejectApplyAcknowledgement)
+            {
+                await WaitUntilAsync(() => logger.Messages.Length == 1);
+                Assert.Equal(Cm4TransportTargetPhase.Unknown, targetController.Snapshot().Phase);
+                var message = Assert.Single(logger.Messages);
+                Assert.Contains("code=3", message, StringComparison.Ordinal);
+                Assert.Contains("codeName=OutcomeUnknown", message, StringComparison.Ordinal);
+                Assert.Contains("stage=cm4.initial-target-apply", message, StringComparison.Ordinal);
+                Assert.Contains("target=cm4-sim->simulator", message, StringComparison.Ordinal);
+                Assert.Contains("runId=observer-cm4-before-simulator-run", message, StringComparison.Ordinal);
+                Assert.Contains($"cm4ContainerId={ContainerId("cm4-sim")}", message, StringComparison.Ordinal);
+                Assert.Contains($"simulatorContainerId={ContainerId("simulator")}", message, StringComparison.Ordinal);
+                Assert.Contains("resultUnknown=True", message, StringComparison.Ordinal);
+                Assert.Contains("resultError=The control acknowledgement or current generation did not match.", message, StringComparison.Ordinal);
+                Assert.Contains("resultEpoch=1", message, StringComparison.Ordinal);
+                Assert.Contains("snapshotPhase=Unknown", message, StringComparison.Ordinal);
+            }
+            else
+            {
+                await WaitUntilAsync(() => logger.Messages.Length == 1);
+                Assert.Equal(Cm4TransportTargetPhase.Applied, targetController.Snapshot().Phase);
+                Assert.Equal(1, runner.StdioCalls);
+                Assert.Equal(new string('3', 64), targetController.Snapshot().Cm4ContainerId);
+                Assert.Equal(new string('1', 64), targetController.Snapshot().SimulatorContainerId);
+                Assert.Contains("code=1", Assert.Single(logger.Messages), StringComparison.Ordinal);
+            }
             Assert.False(registry.Get(cm4Resource)!.IsReady);
 
             await notifications.PublishUpdateAsync(
@@ -774,6 +801,33 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         }
     }
 
+    private sealed class RecordingLogger : ILogger
+    {
+        private readonly object sync = new();
+        private readonly List<string> messages = [];
+
+        internal string[] Messages
+        {
+            get
+            {
+                lock (sync) return messages.ToArray();
+            }
+        }
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            lock (sync) messages.Add(formatter(state, exception));
+        }
+    }
+
     private sealed class ObserverDockerRunner(string runId, string stackId) : IDockerStdioCommandRunner, IDockerCliForegroundSessionRunner
     {
         private int inspectCount;
@@ -794,6 +848,7 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
         internal int InspectCount => Volatile.Read(ref inspectCount);
         internal int ForegroundStartAttempts => Volatile.Read(ref foregroundStartAttempts);
         internal int FailForegroundStartAt { get; set; }
+        internal bool RejectApplyAcknowledgement { get; set; }
 
         internal Task ForegroundSessionCountReached(int count) => Task.Run(async () =>
         {
@@ -905,7 +960,8 @@ public sealed class DcpBaseResourceReadinessObserverConcurrencyTests
                 ? string.Empty
                 : JsonSerializer.Serialize(request with
                 {
-                    Type = request.Type == "invalidateTarget" ? "invalidated" : "applied",
+                    Type = request.Type == "invalidateTarget" ? "invalidated" :
+                        RejectApplyAcknowledgement ? "not-applied" : "applied",
                 }, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
