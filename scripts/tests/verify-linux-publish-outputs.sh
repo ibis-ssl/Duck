@@ -181,4 +181,68 @@ python3 "$repo_root/scripts/tests/verify-linux-distribution-definitions.py" \
   --publish-root "$publish_root" \
   --native-helper "$native_helper"
 
+bundle_root="$repo_root/artifacts/issue81-runtime-bundle"
+if [[ -e "$bundle_root" ]]; then
+  printf 'Refusing to overwrite an existing runtime bundle: %s\n' "$bundle_root" >&2
+  exit 1
+fi
+mkdir -p "$bundle_root/RuntimeHost" "$bundle_root/Duck.Testing.AppHost"
+cp -a "$publish_root/Tracker.RuntimeHost/." "$bundle_root/RuntimeHost/"
+install -m 0755 "$apphost_publish/cm4-transport-control" \
+  "$bundle_root/Duck.Testing.AppHost/cm4-transport-control"
+
+python3 - "$bundle_root" "$repo_root" <<'PY'
+import hashlib
+import json
+import os
+import pathlib
+import subprocess
+import sys
+
+bundle_root = pathlib.Path(sys.argv[1])
+repo_root = pathlib.Path(sys.argv[2])
+commit = subprocess.run(
+    ["git", "rev-parse", "HEAD"],
+    cwd=repo_root,
+    check=True,
+    capture_output=True,
+    text=True,
+).stdout.strip()
+github_sha = os.environ.get("GITHUB_SHA")
+if github_sha and github_sha != commit:
+    raise SystemExit("GitHub SHA does not match the checked-out source.")
+
+assets = []
+for path in sorted(bundle_root.rglob("*")):
+    if not path.is_file() or path.name == "asset-manifest.json":
+        continue
+    relative = path.relative_to(bundle_root).as_posix()
+    data = path.read_bytes()
+    assets.append({
+        "path": relative,
+        "size": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+    })
+if not any(item["path"] == "RuntimeHost/Tracker.RuntimeHost.dll" for item in assets):
+    raise SystemExit("RuntimeHost publish output is incomplete.")
+if not any(item["path"] == "Duck.Testing.AppHost/cm4-transport-control" for item in assets):
+    raise SystemExit("Verified CM4 helper is missing from the bundle.")
+
+manifest = {
+    "schemaVersion": 1,
+    "bundle": "issue81-runtime-bundle",
+    "repository": os.environ.get("GITHUB_REPOSITORY"),
+    "commit": commit,
+    "runId": os.environ.get("GITHUB_RUN_ID"),
+    "runAttempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+    "workflow": os.environ.get("GITHUB_WORKFLOW"),
+    "assets": assets,
+}
+(bundle_root / "asset-manifest.json").write_text(
+    json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+    encoding="utf-8",
+)
+PY
+
+printf 'Saved verified RuntimeHost and CM4 helper inputs for this workflow run.\n'
 printf 'Linux publish outputs and the AppHost CM4 helper build output passed.\n'

@@ -252,6 +252,15 @@ jobs:
         shell: bash
         run: scripts/tests/verify-linux-publish-outputs.sh
 
+      - name: Upload verified Issue81 runtime inputs
+        if: ${{ always() && steps.linux_publish.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: issue81-runtime-bundle-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/issue81-runtime-bundle
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Collect Linux publish failure diagnostics
         if: ${{ always() && steps.linux_publish.outcome == 'failure' }}
         shell: bash
