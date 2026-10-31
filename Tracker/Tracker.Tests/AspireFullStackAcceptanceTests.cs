@@ -21,10 +21,82 @@ using Xunit.Abstractions;
 
 namespace Tracker.Tests;
 
+[Collection("Process environment")]
 public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 {
     private static readonly TimeSpan StackSignalTimeout = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan MotionTimeout = TimeSpan.FromSeconds(60);
+
+    [Fact]
+    public void ResolvesConfiguredDockerExecutableWhenPathIsUnset()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var dockerExecutable = CreateDockerExecutable(temporaryDirectory.Path);
+
+        Assert.Equal(dockerExecutable, ResolveDockerExecutable(dockerExecutable, null));
+    }
+
+    [Fact]
+    public void ResolvesDockerExecutableFromConfiguredPath()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var dockerDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "docker-bin")).FullName;
+        var dockerExecutable = CreateDockerExecutable(dockerDirectory);
+
+        Assert.Equal(dockerExecutable, ResolveDockerExecutable(null, dockerDirectory));
+    }
+
+    [Fact]
+    public void PrependsDockerDirectoryAndPreservesExistingPathEntries()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var dockerDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "docker-bin")).FullName;
+        var existingDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "existing-bin")).FullName;
+        var dockerExecutable = CreateDockerExecutable(dockerDirectory);
+
+        Assert.Equal(dockerDirectory, PrependDockerDirectoryToPath(dockerExecutable, null));
+        Assert.Equal(
+            dockerDirectory + Path.PathSeparator + existingDirectory,
+            PrependDockerDirectoryToPath(dockerExecutable, existingDirectory));
+        Assert.Equal(dockerDirectory, PrependDockerDirectoryToPath(dockerExecutable, dockerDirectory));
+    }
+
+    [Fact]
+    public void RestoresPathAfterDockerPathScopeExitsWithAnError()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var dockerDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory.Path, "docker-bin")).FullName;
+        var dockerExecutable = CreateDockerExecutable(dockerDirectory);
+        var originalPath = Environment.GetEnvironmentVariable("PATH");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("PATH", null);
+            Assert.Throws<InvalidOperationException>((Action)(() =>
+            {
+                using var pathScope = AddDockerDirectoryToProcessPath(dockerExecutable);
+                Assert.Equal(dockerDirectory, Environment.GetEnvironmentVariable("PATH"));
+                throw new InvalidOperationException("simulated preflight failure");
+            }));
+
+            Assert.Null(Environment.GetEnvironmentVariable("PATH"));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("PATH", originalPath);
+        }
+    }
+
+    [Fact]
+    public void ReportsWhenDockerExecutableCannotBeResolved()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+
+        var exception = Assert.Throws<FileNotFoundException>(
+            () => ResolveDockerExecutable(null, temporaryDirectory.Path));
+
+        Assert.Contains("Docker CLI could not be resolved from PATH", exception.Message, StringComparison.Ordinal);
+    }
 
     [Fact]
     public async Task FullStack_ReachesActiveRefereeAndMovesCraneRobot()
@@ -267,7 +339,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Directory.CreateDirectory(artifactsDirectory);
         var processInfoPath = Path.Combine(artifactsDirectory, "apphost-process.txt");
         var repositoryRoot = FindRepositoryRoot();
-        var dockerExecutable = ResolveDockerExecutable();
+        var originalPath = Environment.GetEnvironmentVariable("PATH");
+        var dockerExecutable = ResolveDockerExecutable(
+            Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"), originalPath);
+        IDisposable? dockerPathScope = null;
         var stagedAppHostAssets = new List<StagedAppHostAsset>();
         DistributedApplication? managedFirstApplication = null;
         Process? firstAppHost = null;
@@ -297,6 +372,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             else
             {
+                dockerPathScope = AddDockerDirectoryToProcessPath(dockerExecutable);
                 firstStackId = $"first-owner-{Guid.NewGuid():N}";
                 lockPath = Path.Combine(artifactsDirectory, $"{firstStackId}.lock");
                 var firstRunId = $"first-run-{Guid.NewGuid():N}";
@@ -305,7 +381,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 var cm4HelperSource = ResolveCm4TransportHelperSource(repositoryRoot);
                 var craneOverlaySource = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
                 stagedAppHostAssets.AddRange(StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource));
-                var (dockerContext, expectedEngineId) = await ResolveDockerIdentityAsync(dockerExecutable);
+                var (dockerContext, expectedEngineId) = await ResolveDockerIdentityAsync();
                 var firstAppHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([
                     "--Testing:Mode=base",
                     "--Testing:Crane:Planner=visibility_graph",
@@ -426,7 +502,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             finally
             {
-                CleanupStagedAppHostAssets(stagedAppHostAssets);
+                try
+                {
+                    CleanupStagedAppHostAssets(stagedAppHostAssets);
+                }
+                finally
+                {
+                    dockerPathScope?.Dispose();
+                }
             }
         }
 
@@ -464,9 +547,34 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         throw new DirectoryNotFoundException("Could not locate the Duck repository root from the test process.");
     }
 
-    private static string ResolveDockerExecutable()
+    private static string CreateDockerExecutable(string directory)
     {
-        var configuredPath = Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable");
+        var executableName = OperatingSystem.IsWindows() ? "docker.exe" : "docker";
+        var executablePath = Path.Combine(directory, executableName);
+        File.WriteAllText(executablePath, string.Empty);
+        return Path.GetFullPath(executablePath);
+    }
+
+    private sealed class TemporaryDirectory : IDisposable
+    {
+        public string Path { get; } = Directory.CreateTempSubdirectory("duck-docker-path-tests-").FullName;
+
+        public void Dispose() => Directory.Delete(Path, recursive: true);
+    }
+
+    private sealed class DockerPathScope(string? originalPath, bool restore) : IDisposable
+    {
+        public void Dispose()
+        {
+            if (restore)
+            {
+                Environment.SetEnvironmentVariable("PATH", originalPath);
+            }
+        }
+    }
+
+    private static string ResolveDockerExecutable(string? configuredPath, string? path)
+    {
         if (!string.IsNullOrWhiteSpace(configuredPath))
         {
             var fullPath = Path.GetFullPath(configuredPath);
@@ -475,7 +583,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
 
         var executableName = OperatingSystem.IsWindows() ? "docker.exe" : "docker";
-        foreach (var directory in (Environment.GetEnvironmentVariable("PATH") ?? string.Empty)
+        foreach (var directory in (path ?? string.Empty)
                      .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             var candidate = Path.GetFullPath(Path.Combine(directory, executableName));
@@ -489,19 +597,54 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             "Docker CLI could not be resolved from PATH; configure Testing__IdentityControl__DockerExecutable or add Docker to this test process PATH.");
     }
 
-    private static async Task<(string Context, string EngineId)> ResolveDockerIdentityAsync(string dockerExecutable)
+    private static string PrependDockerDirectoryToPath(string dockerExecutable, string? path)
     {
+        var dockerDirectory = Path.GetDirectoryName(Path.GetFullPath(dockerExecutable))
+            ?? throw new InvalidOperationException($"Docker executable has no containing directory: {dockerExecutable}");
+        var existingDirectories = (path ?? string.Empty)
+            .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (existingDirectories.Any(directory => string.Equals(
+                Path.TrimEndingDirectorySeparator(Path.GetFullPath(directory)),
+                Path.TrimEndingDirectorySeparator(dockerDirectory),
+                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)))
+        {
+            return path!;
+        }
+
+        return string.IsNullOrEmpty(path)
+            ? dockerDirectory
+            : dockerDirectory + Path.PathSeparator + path;
+    }
+
+    private static IDisposable AddDockerDirectoryToProcessPath(string dockerExecutable)
+    {
+        var originalPath = Environment.GetEnvironmentVariable("PATH");
+        var pathWithDocker = PrependDockerDirectoryToPath(dockerExecutable, originalPath);
+        if (string.Equals(pathWithDocker, originalPath, StringComparison.Ordinal))
+        {
+            return new DockerPathScope(originalPath, restore: false);
+        }
+
+        Environment.SetEnvironmentVariable("PATH", pathWithDocker);
+        return new DockerPathScope(originalPath, restore: true);
+    }
+
+    private static async Task<(string Context, string EngineId)> ResolveDockerIdentityAsync()
+    {
+        var versionResult = await RunProcessAsync("docker", ["--version"], TimeSpan.FromSeconds(15));
+        Assert.True(versionResult.ExitCode == 0,
+            $"Docker CLI could not be resolved from the acceptance test process PATH. exit={versionResult.ExitCode}; stderr={versionResult.StandardError.Trim()}");
         var configuredContext = Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerContext");
         var context = configuredContext;
         if (string.IsNullOrWhiteSpace(context))
         {
-            var contextResult = await RunProcessAsync(dockerExecutable, ["context", "show"], TimeSpan.FromSeconds(15));
+            var contextResult = await RunProcessAsync("docker", ["context", "show"], TimeSpan.FromSeconds(15));
             Assert.Equal(0, contextResult.ExitCode);
             context = contextResult.StandardOutput.Trim();
         }
 
         Assert.False(string.IsNullOrWhiteSpace(context), "Docker context name is missing.");
-        var engineResult = await RunProcessAsync(dockerExecutable,
+        var engineResult = await RunProcessAsync("docker",
             ["--context", context!, "info", "--format", "{{.ID}}"], TimeSpan.FromSeconds(15));
         Assert.Equal(0, engineResult.ExitCode);
         var engineId = engineResult.StandardOutput.Trim();
