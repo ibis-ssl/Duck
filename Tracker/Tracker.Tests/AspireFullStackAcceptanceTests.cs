@@ -444,14 +444,22 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     {
         var result = await RunProcessAsync("docker", [
             "ps", "-aq", "--no-trunc",
-            "--filter", "label=duck.aspire.owner=duck-apphost",
             "--filter", $"label=duck.aspire.stack={stackId}",
         ], TimeSpan.FromSeconds(15));
         Assert.Equal(0, result.ExitCode);
-        return result.StandardOutput
+        var containerIds = result.StandardOutput
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Order(StringComparer.Ordinal)
             .ToArray();
+        string? expectedRunId = null;
+        foreach (var containerId in containerIds)
+        {
+            var runId = await AssertStackOwnedContainerAsync(containerId, stackId);
+            expectedRunId ??= runId;
+            Assert.Equal(expectedRunId, runId);
+        }
+
+        return containerIds;
     }
 
     private static async Task RemoveOnlySecondStackContainersAsync(string stackId)
@@ -459,14 +467,33 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var containerIds = await GetOwnedContainerIdsAsync(stackId);
         foreach (var containerId in containerIds)
         {
-            var inspection = await RunProcessAsync("docker", [
-                "inspect", "--format", "{{index .Config.Labels \"duck.aspire.owner\"}} {{index .Config.Labels \"duck.aspire.stack\"}}", containerId,
-            ], TimeSpan.FromSeconds(15));
-            Assert.Equal(0, inspection.ExitCode);
-            Assert.Equal($"duck-apphost {stackId}", inspection.StandardOutput.Trim());
+            await AssertStackOwnedContainerAsync(containerId, stackId);
             var removal = await RunProcessAsync("docker", ["rm", "--force", containerId], TimeSpan.FromSeconds(15));
             Assert.Equal(0, removal.ExitCode);
         }
+    }
+
+    private static async Task<string> AssertStackOwnedContainerAsync(string containerId, string stackId)
+    {
+        var inspection = await RunProcessAsync("docker", [
+            "inspect", "--format", "{{json .Config.Labels}}", containerId,
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, inspection.ExitCode);
+
+        using var labelsDocument = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput);
+        var labels = labelsDocument.RootElement;
+        Assert.Equal(stackId, labels.GetProperty(DockerContainerSpec.StackLabel).GetString());
+        var resourceName = labels.GetProperty(DockerContainerSpec.ResourceLabel).GetString();
+        Assert.NotNull(resourceName);
+        Assert.Contains(resourceName, new[] { "simulator", "duck", "game-controller", "cm4-sim", "crane" });
+        var runId = labels.GetProperty(DockerContainerSpec.RunLabel).GetString();
+        Assert.False(string.IsNullOrWhiteSpace(runId));
+        if (labels.TryGetProperty(DockerContainerSpec.OwnerLabel, out var owner))
+        {
+            Assert.Equal(DockerContainerSpec.OwnerValue, owner.GetString());
+        }
+
+        return runId!;
     }
 
     private static async Task<ProcessResult> RunProcessAsync(string fileName, IEnumerable<string> arguments, TimeSpan timeout)

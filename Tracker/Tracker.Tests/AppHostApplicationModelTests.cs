@@ -75,6 +75,9 @@ public sealed class AppHostApplicationModelTests
             Assert.Equal(sharedRunId, runLabel["com.ibis-ssl.duck.run-id=".Length..]);
             Assert.Contains($"com.ibis-ssl.duck.role={name}", runtimeArgs);
             Assert.Contains($"duck.aspire.run={sharedRunId}", runtimeArgs);
+            var resourceLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.resource=", StringComparison.Ordinal)));
+            Assert.Equal($"duck.aspire.resource={name}", resourceLabel);
+            Assert.DoesNotContain("duck.aspire.owner=duck-apphost", runtimeArgs);
             Assert.DoesNotContain("--network", runtimeArgs);
         }
 
