@@ -266,6 +266,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             ?? Path.Combine(Path.GetTempPath(), "duck-aspire-full-stack-artifacts");
         Directory.CreateDirectory(artifactsDirectory);
         var processInfoPath = Path.Combine(artifactsDirectory, "apphost-process.txt");
+        var repositoryRoot = FindRepositoryRoot();
+        var dockerExecutable = ResolveDockerExecutable();
+        var stagedAppHostAssets = new List<StagedAppHostAsset>();
         DistributedApplication? managedFirstApplication = null;
         Process? firstAppHost = null;
         string firstStackId = string.Empty;
@@ -296,10 +299,25 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             {
                 firstStackId = $"first-owner-{Guid.NewGuid():N}";
                 lockPath = Path.Combine(artifactsDirectory, $"{firstStackId}.lock");
+                var firstRunId = $"first-run-{Guid.NewGuid():N}";
+                var fixtureManifestPath = Path.Combine(artifactsDirectory, $"{firstStackId}-crane-fixture.json");
+                var craneDiagnosticsPath = Path.Combine(artifactsDirectory, $"{firstStackId}-crane-diagnostics.jsonl");
+                var cm4HelperSource = ResolveCm4TransportHelperSource(repositoryRoot);
+                var craneOverlaySource = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
+                stagedAppHostAssets.AddRange(StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource));
+                var (dockerContext, expectedEngineId) = await ResolveDockerIdentityAsync(dockerExecutable);
                 var firstAppHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([
                     "--Testing:Mode=base",
+                    "--Testing:Crane:Planner=visibility_graph",
+                    "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+                    "--Testing:IdentityControl:DockerContext=" + dockerContext,
+                    "--Testing:IdentityControl:ExpectedEngineId=" + expectedEngineId,
+                    "--Testing:IdentityControl:DockerExecutable=" + dockerExecutable,
                     "--Testing:StackOwnership:LockPath=" + lockPath,
                     "--Testing:StackOwnership:StackId=" + firstStackId,
+                    "--Testing:Diagnostics:RunId=" + firstRunId,
+                    "--Testing:Crane:FixtureManifestPath=" + fixtureManifestPath,
+                    "--Testing:Crane:DiagnosticsPath=" + craneDiagnosticsPath,
                 ]);
                 managedFirstApplication = firstAppHostBuilder.Build();
 
@@ -313,11 +331,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
             }
 
-            firstContainerIds = await GetOwnedContainerIdsAsync(firstStackId);
+            firstContainerIds = await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable);
             Assert.NotEmpty(firstContainerIds);
 
             var secondStackId = $"second-owner-{Guid.NewGuid():N}";
-            var repositoryRoot = FindRepositoryRoot();
             var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj");
             using var secondAppHost = new Process
             {
@@ -363,7 +380,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 var combinedOutput = stdout + Environment.NewLine + stderr;
                 Assert.NotEqual(0, secondAppHost.ExitCode);
                 Assert.Contains($"Another Duck Aspire stack already owns '{Path.GetFullPath(lockPath)}'.", combinedOutput, StringComparison.Ordinal);
-                Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId));
+                Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId, dockerExecutable));
             }
             finally
             {
@@ -374,36 +391,43 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     await secondAppHost.WaitForExitAsync(cleanupTimeout.Token);
                 }
 
-                await RemoveOnlySecondStackContainersAsync(secondStackId);
+                await RemoveOnlySecondStackContainersAsync(secondStackId, dockerExecutable);
                 AssertFirstAppHostRemainsActive();
-                Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId));
+                Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
             }
 
-            Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId));
+            Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId, dockerExecutable));
             AssertFirstAppHostRemainsActive();
-            Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId));
+            Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
         }
         finally
         {
-            if (managedFirstApplication is not null)
+            try
             {
-                try
+                if (managedFirstApplication is not null)
                 {
-                    if (managedFirstStartAttempted)
+                    try
                     {
-                        using var stopTimeout = new CancellationTokenSource(StackSignalTimeout);
-                        await managedFirstApplication.StopAsync(stopTimeout.Token);
+                        if (managedFirstStartAttempted)
+                        {
+                            using var stopTimeout = new CancellationTokenSource(StackSignalTimeout);
+                            await managedFirstApplication.StopAsync(stopTimeout.Token);
+                        }
                     }
-                }
-                finally
-                {
-                    await managedFirstApplication.DisposeAsync();
+                    finally
+                    {
+                        await managedFirstApplication.DisposeAsync();
+                    }
+
+                    Assert.Empty(await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
                 }
 
-                Assert.Empty(await GetOwnedContainerIdsAsync(firstStackId));
+                firstAppHost?.Dispose();
             }
-
-            firstAppHost?.Dispose();
+            finally
+            {
+                CleanupStagedAppHostAssets(stagedAppHostAssets);
+            }
         }
 
         void AssertFirstAppHostRemainsActive()
@@ -440,9 +464,157 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         throw new DirectoryNotFoundException("Could not locate the Duck repository root from the test process.");
     }
 
-    private static async Task<string[]> GetOwnedContainerIdsAsync(string stackId)
+    private static string ResolveDockerExecutable()
     {
-        var result = await RunProcessAsync("docker", [
+        var configuredPath = Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable");
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            var fullPath = Path.GetFullPath(configuredPath);
+            Assert.True(File.Exists(fullPath), $"Configured Docker executable does not exist: {fullPath}");
+            return fullPath;
+        }
+
+        var executableName = OperatingSystem.IsWindows() ? "docker.exe" : "docker";
+        foreach (var directory in (Environment.GetEnvironmentVariable("PATH") ?? string.Empty)
+                     .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var candidate = Path.GetFullPath(Path.Combine(directory, executableName));
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        throw new FileNotFoundException(
+            "Docker CLI could not be resolved from PATH; configure Testing__IdentityControl__DockerExecutable or add Docker to this test process PATH.");
+    }
+
+    private static async Task<(string Context, string EngineId)> ResolveDockerIdentityAsync(string dockerExecutable)
+    {
+        var configuredContext = Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerContext");
+        var context = configuredContext;
+        if (string.IsNullOrWhiteSpace(context))
+        {
+            var contextResult = await RunProcessAsync(dockerExecutable, ["context", "show"], TimeSpan.FromSeconds(15));
+            Assert.Equal(0, contextResult.ExitCode);
+            context = contextResult.StandardOutput.Trim();
+        }
+
+        Assert.False(string.IsNullOrWhiteSpace(context), "Docker context name is missing.");
+        var engineResult = await RunProcessAsync(dockerExecutable,
+            ["--context", context!, "info", "--format", "{{.ID}}"], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, engineResult.ExitCode);
+        var engineId = engineResult.StandardOutput.Trim();
+        Assert.False(string.IsNullOrWhiteSpace(engineId), "Docker Engine ID is missing from docker info.");
+
+        var configuredEngineId = Environment.GetEnvironmentVariable("Testing__IdentityControl__ExpectedEngineId");
+        if (!string.IsNullOrWhiteSpace(configuredEngineId))
+        {
+            Assert.Equal(configuredEngineId, engineId);
+        }
+
+        return (context!, engineId);
+    }
+
+    private static string ResolveCm4TransportHelperSource(string repositoryRoot)
+    {
+        const string helperName = BaseSimulationResourceRegistration.Cm4TransportHelperAssetName;
+        var configuredPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            var fullPath = Path.GetFullPath(configuredPath);
+            Assert.True(File.Exists(fullPath), $"Configured CM4 transport helper does not exist: {fullPath}");
+            return fullPath;
+        }
+
+        var outputDirectory = new DirectoryInfo(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
+        var targetFramework = outputDirectory.Name;
+        var configuration = outputDirectory.Parent?.Name;
+        var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost");
+        var candidateRoots = new[]
+        {
+            AppContext.BaseDirectory,
+            configuration is null ? string.Empty : Path.Combine(appHostProject, "obj", configuration, targetFramework),
+            Path.Combine(appHostProject, "obj", "Debug", targetFramework),
+            Path.Combine(appHostProject, "obj", "Release", targetFramework),
+            configuration is null ? string.Empty : Path.Combine(appHostProject, "bin", configuration, targetFramework),
+        };
+        foreach (var root in candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)))
+        {
+            var candidate = Path.Combine(root, helperName);
+            if (File.Exists(candidate))
+            {
+                return Path.GetFullPath(candidate);
+            }
+        }
+
+        throw new FileNotFoundException(
+            $"The existing CM4 transport helper was not found in AppHost outputs. Set DUCK_ASPIRE_CM4_TRANSPORT_HELPER to the locally prepared helper asset. Searched: {string.Join(Path.PathSeparator, candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)).Select(root => Path.Combine(root, helperName)))}");
+    }
+
+    private static IReadOnlyList<StagedAppHostAsset> StageLocalAppHostAssets(string cm4HelperSource, string craneOverlaySource)
+    {
+        var staged = new List<StagedAppHostAsset>();
+        try
+        {
+            Stage(cm4HelperSource, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName);
+            Stage(craneOverlaySource, "CraneLaunchOverlay.py");
+            return staged;
+        }
+        catch
+        {
+            CleanupStagedAppHostAssets(staged);
+            throw;
+        }
+
+        void Stage(string sourcePath, string assetName)
+        {
+            Assert.True(File.Exists(sourcePath), $"AppHost asset source was not found: {sourcePath}");
+            var source = Path.GetFullPath(sourcePath);
+            var destination = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, assetName));
+            if (string.Equals(source, destination, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            var sourceHash = GetSha256(source);
+            if (File.Exists(destination))
+            {
+                if (GetSha256(destination) != sourceHash)
+                {
+                    throw new InvalidOperationException($"Refusing to replace a different AppHost asset at '{destination}'.");
+                }
+
+                return;
+            }
+
+            File.Copy(source, destination, overwrite: false);
+            staged.Add(new StagedAppHostAsset(destination, sourceHash));
+        }
+    }
+
+    private static void CleanupStagedAppHostAssets(IEnumerable<StagedAppHostAsset> stagedAssets)
+    {
+        foreach (var asset in stagedAssets.Reverse())
+        {
+            if (File.Exists(asset.Path) && GetSha256(asset.Path) == asset.Sha256)
+            {
+                File.Delete(asset.Path);
+            }
+            else if (File.Exists(asset.Path))
+            {
+                Console.Error.WriteLine($"Refusing to remove a changed staged AppHost asset: {asset.Path}");
+            }
+        }
+    }
+
+    private static string GetSha256(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
+
+    private sealed record StagedAppHostAsset(string Path, string Sha256);
+
+    private static async Task<string[]> GetOwnedContainerIdsAsync(string stackId, string dockerExecutable)
+    {
+        var result = await RunProcessAsync(dockerExecutable, [
             "ps", "-aq", "--no-trunc",
             "--filter", $"label=duck.aspire.stack={stackId}",
         ], TimeSpan.FromSeconds(15));
@@ -454,7 +626,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string? expectedDcpRunId = null;
         foreach (var containerId in containerIds)
         {
-            var ownership = await AssertStackOwnedContainerAsync(containerId, stackId);
+            var ownership = await AssertStackOwnedContainerAsync(containerId, stackId, dockerExecutable);
             if (!ownership.IsWrapperOwned)
             {
                 expectedDcpRunId ??= ownership.RunId;
@@ -465,20 +637,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return containerIds;
     }
 
-    private static async Task RemoveOnlySecondStackContainersAsync(string stackId)
+    private static async Task RemoveOnlySecondStackContainersAsync(string stackId, string dockerExecutable)
     {
-        var containerIds = await GetOwnedContainerIdsAsync(stackId);
+        var containerIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable);
         foreach (var containerId in containerIds)
         {
-            await AssertStackOwnedContainerAsync(containerId, stackId);
-            var removal = await RunProcessAsync("docker", ["rm", "--force", containerId], TimeSpan.FromSeconds(15));
+            await AssertStackOwnedContainerAsync(containerId, stackId, dockerExecutable);
+            var removal = await RunProcessAsync(dockerExecutable, ["rm", "--force", containerId], TimeSpan.FromSeconds(15));
             Assert.Equal(0, removal.ExitCode);
         }
     }
 
-    private static async Task<(bool IsWrapperOwned, string RunId)> AssertStackOwnedContainerAsync(string containerId, string stackId)
+    private static async Task<(bool IsWrapperOwned, string RunId)> AssertStackOwnedContainerAsync(string containerId, string stackId, string dockerExecutable)
     {
-        var inspection = await RunProcessAsync("docker", [
+        var inspection = await RunProcessAsync(dockerExecutable, [
             "inspect", "--format", "{{json .Config.Labels}}", containerId,
         ], TimeSpan.FromSeconds(15));
         Assert.Equal(0, inspection.ExitCode);
