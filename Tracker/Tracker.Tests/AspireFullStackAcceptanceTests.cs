@@ -591,6 +591,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var acceptanceClock = Stopwatch.StartNew();
         var workBudget = TimeSpan.FromSeconds(180);
         var totalBudget = TimeSpan.FromSeconds(300);
+        using var workDeadline = new CancellationTokenSource(workBudget);
         var artifactsDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-partial-cancel-artifacts", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(artifactsDirectory);
         var repositoryRoot = FindRepositoryRoot();
@@ -600,6 +601,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         IDisposable? dockerPathScope = preparedDockerPathScope;
         var stagedAppHostAssets = new List<StagedAppHostAsset>();
         DistributedApplication? application = null;
+        IDistributedApplicationTestingBuilder? appHostBuilder = null;
         var startAttempted = false;
         string stackId = $"cancelled-owner-{Guid.NewGuid():N}";
         var runId = $"cancelled-run-{Guid.NewGuid():N}";
@@ -663,6 +665,16 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         Task<ProcessResult> RunCleanupDockerCommandAsync(IEnumerable<string> arguments) =>
             RunProcessAsync(dockerExecutable, arguments, CleanupCommandTimeout(), ProcessKillWaitTimeout());
+
+        async Task DisposeAppHostBuilderAsync()
+        {
+            var builderToDispose = appHostBuilder;
+            appHostBuilder = null;
+            if (builderToDispose is not null)
+            {
+                await builderToDispose.DisposeAsync();
+            }
+        }
 
         async Task AssertSentinelStillRunningAsync(Func<TimeSpan> commandTimeout)
         {
@@ -730,7 +742,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var craneOverlaySource = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
             stagedAppHostAssets.AddRange(StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource));
             EnsureWorkBudget();
-            var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([
+            appHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([
                 "--Testing:Mode=base",
                 "--Testing:Crane:Planner=visibility_graph",
                 "--Testing:Simulator:ImageTag=a52b6bd",
@@ -745,9 +757,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "--Testing:Diagnostics:RunId=" + runId,
                 "--Testing:Crane:FixtureManifestPath=" + fixtureManifestPath,
                 "--Testing:Crane:DiagnosticsPath=" + craneDiagnosticsPath,
-            ]).WaitAsync(Remaining(workBudget, "AppHost creation"));
+            ], workDeadline.Token);
             EnsureWorkBudget();
-            application = builder.Build();
+            application = await appHostBuilder.BuildAsync(workDeadline.Token);
             EnsureWorkBudget();
 
             using var startupTimeout = new CancellationTokenSource(Remaining(workBudget, "AppHost startup"));
@@ -793,6 +805,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         {
                             try
                             {
+                                await DisposeAppHostBuilderAsync();
                                 string[] remainingOwnedIds = [];
                                 var verificationFailures = new List<Exception>();
                                 try
@@ -880,6 +893,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 {
                     try
                     {
+                        await DisposeAppHostBuilderAsync();
                         CleanupStagedAppHostAssets(stagedAppHostAssets);
                     }
                     finally
