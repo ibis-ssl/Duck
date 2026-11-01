@@ -262,6 +262,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 httpRefereeSource,
                 refereeSnapshots,
                 message => output.WriteLine(message));
+            var gameControllerControl = new GameControllerWebSocketControlClient(
+                new UriBuilder(mappedEndpoints["game-controller"]) { Scheme = "ws", Path = "/api/control" }.Uri);
             output.WriteLine(
                 $"same-run mapped endpoints: game-controller={mappedEndpoints["game-controller"]}; " +
                 $"referee-driver={mappedEndpoints["referee-driver"]}; debug-host={mappedEndpoints["debug-host"]}");
@@ -270,12 +272,18 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             stageReached = "initial_referee_wait";
             try
             {
-                initial = await refereeSource.WaitForChangeAsync(null, timeout.Token);
+                await gameControllerControl.SendYellowTeamNameAsync(
+                    craneFixtureSettings.TeamName, timeout.Token);
+                output.WriteLine($"requested Game Controller Yellow team name={craneFixtureSettings.TeamName}");
+                initial = await WaitForInitialRefereeWithYellowIdentityAsync(
+                    httpRefereeSource, craneFixtureSettings.TeamName, timeout.Token);
+                refereeSnapshots.Enqueue(initial);
+                output.WriteLine($"referee command={initial.Command} counter={initial.CommandCounter}");
             }
             catch (OperationCanceledException exception)
             {
                 throw new InvalidOperationException(
-                    "REFEREE_FIXTURE_FAILURE: RefereeDriver did not expose a ready current referee snapshot before the deadline.",
+                    $"TEAM_IDENTITY_FAILURE: RefereeDriver did not expose a ready HALT snapshot with Yellow team name '{craneFixtureSettings.TeamName}' after the Game Controller update before the deadline.",
                     exception);
             }
 
@@ -311,10 +319,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 $"yellowRobots={initialVision.Detection.RobotsYellow.Count}");
 
             var cachedInitialSource = new InitialSnapshotRefereeCommandSource(refereeSource, initial);
-            var driver = new RefereeDriverFixture(
-                cachedInitialSource,
-                new GameControllerWebSocketControlClient(
-                    new UriBuilder(mappedEndpoints["game-controller"]) { Scheme = "ws", Path = "/api/control" }.Uri));
+            var driver = new RefereeDriverFixture(cachedInitialSource, gameControllerControl);
             try
             {
                 await driver.DriveToActiveAsync(timeout.Token);
@@ -469,6 +474,25 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task InitialRefereeWaitRejectsUnknownYellowTeamUntilExpectedIdentityIsObserved()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":0,"commandCounter":7,"yellowTeamName":"Unknown"}}""",
+            """{"isReady":true,"refereeCommand":{"command":0,"commandCounter":7,"yellowTeamName":"crane"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var initial = await WaitForInitialRefereeWithYellowIdentityAsync(
+            source, "crane", CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.Halt, initial.Command);
+        Assert.Equal(7u, initial.CommandCounter);
+        Assert.Equal("crane", initial.YellowTeamName);
+    }
+
+    [Fact]
     public void ParsesLatestVisionHealthAsYellowDetectionFrame()
     {
         using var document = System.Text.Json.JsonDocument.Parse(
@@ -576,6 +600,35 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var frame = new SSL_DetectionFrame { FrameNumber = frameNumber };
         frame.RobotsYellow.Add(new SSL_DetectionRobot { RobotId = 2, X = x, Y = 0 });
         return new LatestVisionHealthSnapshot(1, receivedAt, frameNumber, frame);
+    }
+
+    private static async Task<RefereeCommandSnapshot> WaitForInitialRefereeWithYellowIdentityAsync(
+        HttpRefereeCommandSource source,
+        string expectedYellowTeamName,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedYellowTeamName);
+
+        while (true)
+        {
+            var current = await source.ReadCurrentAsync(cancellationToken);
+            if (current.IsReady && current.Snapshot is { } snapshot)
+            {
+                if (snapshot.Command != Referee.Types.Command.Halt)
+                {
+                    throw new InvalidOperationException(
+                        $"REFEREE_FIXTURE_FAILURE: expected initial HALT while confirming Yellow team identity, observed {snapshot.Command}.");
+                }
+
+                if (string.Equals(snapshot.YellowTeamName, expectedYellowTeamName, StringComparison.Ordinal))
+                {
+                    return snapshot;
+                }
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+        }
     }
 
     private static RobotMotionDelta? FindMovementFromFreshVision(
