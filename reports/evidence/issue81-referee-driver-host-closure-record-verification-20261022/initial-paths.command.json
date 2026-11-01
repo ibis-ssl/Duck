@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--name-only"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T21:51:45.380288+00:00",
+  "finishedUTC": "2026-10-22T21:51:45.384121+00:00"
+}

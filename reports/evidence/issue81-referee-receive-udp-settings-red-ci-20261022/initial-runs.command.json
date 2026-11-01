@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "--method",
+    "GET",
+    "repos/ibis-ssl/Duck/actions/runs?head_sha=8837cccc332d55ad9573b5e217498aa61f0b65b1&event=pull_request"
+  ],
+  "exit": 0,
+  "utc": "2026-10-22T15:47:47.987051+00:00"
+}

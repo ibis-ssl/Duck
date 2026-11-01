@@ -1,0 +1,26 @@
+{
+  "head": "5dcb991795ce2ea51ed292063f2fbc85142346d1",
+  "newFiles": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+      "sha256": "0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+      "sha256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7"
+    }
+  ],
+  "existing24SourcesUnchanged": true,
+  "allTrackedTestingTrackerFilesUnchanged": true,
+  "fixedIndependent67AndRaceAndFull652": "unchanged source; no new execution",
+  "scaffoldBehavior": "returns null",
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "runtimeTestRuns": 0,
+  "formalCapability": "remote_ci_only",
+  "next": "parent commit/push exactSHA PR CI; expected total653 but actual count governs; require runtime NotNull assertion failure not compile/timeout",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

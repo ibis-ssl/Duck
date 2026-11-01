@@ -1,0 +1,15 @@
+test_receive_utc_is_display_only_when_monotonic_evidence_advances (__main__.ReadinessTests.test_receive_utc_is_display_only_when_monotonic_evidence_advances) ... FAIL
+
+======================================================================
+FAIL: test_receive_utc_is_display_only_when_monotonic_evidence_advances (__main__.ReadinessTests.test_receive_utc_is_display_only_when_monotonic_evidence_advances)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 108, in test_receive_utc_is_display_only_when_monotonic_evidence_advances
+    self.assertTrue(self.evaluate(probes))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

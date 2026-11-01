@@ -1,0 +1,91 @@
+test	Run dotnet test	﻿2026-10-23T10:06:53.9417871Z ##[group]Run set +e
+test	Run dotnet test	2026-10-23T10:06:53.9418396Z ^[[36;1mset +e^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9418831Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9419291Z ^[[36;1mresults_dir="$GITHUB_WORKSPACE/artifacts/test-results"^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9419679Z ^[[36;1mmkdir -p "$results_dir"^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9419947Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9420421Z ^[[36;1mdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9420876Z ^[[36;1m  --logger "trx;LogFileName=dotnet-test.trx" \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9421218Z ^[[36;1m  --results-directory "$results_dir" \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9421572Z ^[[36;1m  --diag "$results_dir/vstest-diagnostics.log" \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9421896Z ^[[36;1m  --blame \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9422168Z ^[[36;1m  -m:1 \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9422446Z ^[[36;1m  /nr:false \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9422724Z ^[[36;1m  -bl:"$results_dir/dotnet-test.binlog" \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9423068Z ^[[36;1m  > >(tee "$results_dir/dotnet-test.stdout.log") \^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9423441Z ^[[36;1m  2> >(tee "$results_dir/dotnet-test.stderr.log" >&2)^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9423852Z ^[[36;1m^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9424241Z ^[[36;1mtest_exit_code=$?^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9424594Z ^[[36;1mprintf '%s\n' "$test_exit_code" > "$results_dir/dotnet-test.exit-code"^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9424980Z ^[[36;1mexit "$test_exit_code"^[[0m
+test	Run dotnet test	2026-10-23T10:06:53.9588393Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run dotnet test	2026-10-23T10:06:53.9588945Z env:
+test	Run dotnet test	2026-10-23T10:06:53.9589209Z   DOTNET_ROOT: /usr/share/dotnet
+test	Run dotnet test	2026-10-23T10:06:53.9589543Z ##[endgroup]
+test	Run dotnet test	2026-10-23T10:06:54.9956260Z   Determining projects to restore...
+test	Run dotnet test	2026-10-23T10:06:57.5076183Z   Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 588 ms).
+test	Run dotnet test	2026-10-23T10:06:57.5090350Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 588 ms).
+test	Run dotnet test	2026-10-23T10:06:57.5108037Z   Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 1.06 sec).
+test	Run dotnet test	2026-10-23T10:06:57.5136168Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 2 ms).
+test	Run dotnet test	2026-10-23T10:06:57.5268713Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 5 ms).
+test	Run dotnet test	2026-10-23T10:06:57.5412996Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 6 ms).
+test	Run dotnet test	2026-10-23T10:06:57.5529053Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj (in 3 ms).
+test	Run dotnet test	2026-10-23T10:06:57.5579791Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 1 ms).
+test	Run dotnet test	2026-10-23T10:06:58.3242125Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 581 ms).
+test	Run dotnet test	2026-10-23T10:06:59.6420761Z /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-23T10:06:59.6422465Z /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-23T10:06:59.9783004Z   Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 2.19 sec).
+test	Run dotnet test	2026-10-23T10:06:59.9787715Z   Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 3.24 sec).
+test	Run dotnet test	2026-10-23T10:07:00.2533823Z /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-23T10:07:05.6832580Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+test	Run dotnet test	2026-10-23T10:07:06.3124051Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+test	Run dotnet test	2026-10-23T10:07:06.5774732Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+test	Run dotnet test	2026-10-23T10:07:06.7385904Z   TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+test	Run dotnet test	2026-10-23T10:07:10.1678286Z   Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+test	Run dotnet test	2026-10-23T10:07:10.3431336Z   Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+test	Run dotnet test	2026-10-23T10:07:10.3510655Z ##[warning]/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+test	Run dotnet test	2026-10-23T10:07:10.3523502Z /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+test	Run dotnet test	2026-10-23T10:07:10.5079743Z   Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+test	Run dotnet test	2026-10-23T10:07:11.1693679Z   Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+test	Run dotnet test	2026-10-23T10:07:11.3429923Z   Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll
+test	Run dotnet test	2026-10-23T10:07:11.6553298Z   Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+test	Run dotnet test	2026-10-23T10:07:16.2448538Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-23T10:07:16.2453942Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-23T10:07:16.2463079Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-23T10:07:16.2465827Z ##[warning]/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs(96,9): warning xUnit2012: Do not use Assert.True() to check if a value exists in a collection. Use Assert.Contains instead. (https://xunit.net/xunit.analyzers/rules/xUnit2012) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+test	Run dotnet test	2026-10-23T10:07:17.1306700Z   Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+test	Run dotnet test	2026-10-23T10:07:17.3818846Z Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+test	Run dotnet test	2026-10-23T10:07:17.4932806Z Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+test	Run dotnet test	2026-10-23T10:07:17.5205822Z A total of 1 test files matched the specified pattern.
+test	Run dotnet test	2026-10-23T10:07:19.7525982Z [xUnit.net 00:00:01.81]     Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress [FAIL]
+test	Run dotnet test	2026-10-23T10:07:19.7634158Z   Failed Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress [29 ms]
+test	Run dotnet test	2026-10-23T10:07:19.7641239Z   Error Message:
+test	Run dotnet test	2026-10-23T10:07:19.7643034Z    Assert.Single() Failure: The collection did not contain any matching items
+test	Run dotnet test	2026-10-23T10:07:19.7643831Z Expected:   (predicate expression)
+test	Run dotnet test	2026-10-23T10:07:19.7669510Z Collection: [ExecutableResource { Annotations = [ExecutableAnnotation { Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = "simulator-docker-wrapper-ready" }, ···], Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, Name = "simulator", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, ProjectResource { Annotations = [ProjectLaunchDefaultsAnnotation { }, PipelineStepAnnotation { }, ContainerBuildOptionsCallbackAnnotation { Callback = Func`2 { ··· } }, PipelineConfigurationAnnotation { Callback = Func`2 { ··· } }, Tracker_RuntimeHost { ProjectPath = "/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim"···, SuppressBuild = True }, ···], Name = "duck" }, ProjectRebuilderResource { Annotations = [ExecutableAnnotation { Command = "dotnet", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim"··· }, NameValidationPolicyAnnotation { MaxLength = null, ValidateAllowedCharacters = False, ValidateNoConsecutiveHyphens = False, ValidateNoTrailingHyphen = False, ValidateStartsWithLetter = False }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, ExplicitStartupAnnotation { }, ExcludeLifecycleCommandsAnnotation { }, ···], Command = "dotnet", Name = "duck-rebuilder", Parent = ProjectResource { Annotations = [···], Name = "duck" }, ProjectPath = "/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim"···, ··· }, ExecutableResource { Annotations = [ExecutableAnnotation { Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = "game-controller-docker-wrapper-ready" }, ···], Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, Name = "game-controller", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, ExecutableResource { Annotations = [ExecutableAnnotation { Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = "cm4-sim-docker-wrapper-ready" }, ···], Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, Name = "cm4-sim", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, ···]
+test	Run dotnet test	2026-10-23T10:07:19.7684730Z   Stack Trace:
+test	Run dotnet test	2026-10-23T10:07:19.7690462Z      at Tracker.Tests.AppHostApplicationModelTests.Find(IDistributedApplicationTestingBuilder appHost, String name) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 451
+test	Run dotnet test	2026-10-23T10:07:19.7693742Z    at Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 100
+test	Run dotnet test	2026-10-23T10:07:19.7695786Z --- End of stack trace from previous location ---
+test	Run dotnet test	2026-10-23T10:07:19.8642473Z [xUnit.net 00:00:01.92]     Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp [FAIL]
+test	Run dotnet test	2026-10-23T10:07:19.9235624Z   Failed Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp [47 ms]
+test	Run dotnet test	2026-10-23T10:07:19.9236797Z   Error Message:
+test	Run dotnet test	2026-10-23T10:07:19.9237238Z    Assert.IsType() Failure: Value is not the exact type
+test	Run dotnet test	2026-10-23T10:07:19.9237696Z Expected: typeof(Aspire.Hosting.ApplicationModel.ContainerResource)
+test	Run dotnet test	2026-10-23T10:07:19.9238181Z Actual:   typeof(Aspire.Hosting.ApplicationModel.ProjectResource)
+test	Run dotnet test	2026-10-23T10:07:19.9238587Z   Stack Trace:
+test	Run dotnet test	2026-10-23T10:07:19.9239476Z      at Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 74
+test	Run dotnet test	2026-10-23T10:07:19.9240597Z --- End of stack trace from previous location ---
+test	Run dotnet test	2026-10-23T10:07:19.9289758Z [xUnit.net 00:00:01.99]     Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp [FAIL]
+test	Run dotnet test	2026-10-23T10:07:20.0343616Z   Failed Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp [8 ms]
+test	Run dotnet test	2026-10-23T10:07:20.0371741Z   Error Message:
+test	Run dotnet test	2026-10-23T10:07:20.0391313Z    Assert.IsType() Failure: Value is not the exact type
+test	Run dotnet test	2026-10-23T10:07:20.0418847Z Expected: typeof(Aspire.Hosting.ApplicationModel.ContainerResource)
+test	Run dotnet test	2026-10-23T10:07:20.0420888Z Actual:   typeof(Aspire.Hosting.ApplicationModel.ProjectResource)
+test	Run dotnet test	2026-10-23T10:07:20.0447042Z   Stack Trace:
+test	Run dotnet test	2026-10-23T10:07:20.0449348Z      at Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 57
+test	Run dotnet test	2026-10-23T10:07:20.0451356Z --- End of stack trace from previous location ---
+test	Run dotnet test	2026-10-23T10:07:46.0251676Z Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+test	Run dotnet test	2026-10-23T10:07:46.0255056Z 
+test	Run dotnet test	2026-10-23T10:07:46.0291308Z Failed!  - Failed:     3, Passed:   776, Skipped:     0, Total:   779, Duration: 27 s - Tracker.Tests.dll (net10.0)
+test	Run dotnet test	2026-10-23T10:07:51.0752338Z ##[error]Process completed with exit code 1.

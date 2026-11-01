@@ -1,0 +1,7 @@
+{
+  "beforeSHA256": "2fd3e0c02618754a9dfcaf17594b382005c89235da800dd37ddc84d5cf99921c",
+  "afterRemovingOnlyOptionalParametersDiscardsAndOptionsTypeSHA256": "2fd3e0c02618754a9dfcaf17594b382005c89235da800dd37ddc84d5cf99921c",
+  "byteIdentical": true,
+  "readerBehaviorUnmodified": true,
+  "optionsAndTimeProviderStillIgnored": true
+}

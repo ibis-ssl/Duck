@@ -1,0 +1,63 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": [
+      {
+        "key": "RefereeDriver:Enabled",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:ContainerMode",
+        "type": "string?"
+      },
+      {
+        "key": "RefereeDriver:GameControllerUri",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:Diagnostics:ResourceId",
+        "type": "string?"
+      },
+      {
+        "key": "RefereeDriver:InterfaceAddress",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:Diagnostics:RunId",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:Diagnostics:ResourceId",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:Diagnostics:ContainerId",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:Diagnostics:Generation",
+        "type": "string?"
+      }
+    ]
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/Program.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

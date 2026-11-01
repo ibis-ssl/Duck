@@ -1,0 +1,404 @@
+{
+  "generatedUtc": "2026-10-26T12:55:02.508150+00:00",
+  "baselineHead": "3096e9afa22a1b054b0e03afc9647841e1460ecd",
+  "technicalHead": "24fdc17472e58d31830bb10423f745ad5d7725c3",
+  "sourceHashesMatch": {
+    "scripts/tests/test_desktop_referee_acceptance.py": true,
+    "scripts/verify_desktop_referee_acceptance.py": true,
+    "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs": true,
+    "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs": true,
+    "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs": true,
+    "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs": true
+  },
+  "oldVerificationFilePreservedSha256": "a070efd6fc1523f3d6773a200e3d447df4c111488032eb3dd4d9f4b13a70b951",
+  "verifiedHistoricalReferences": [
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/sharing-red.trx",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/vstest.diag.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/build.binlog",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/source-diff-hash.txt",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/sharing-green.trx",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/vstest.diag.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/build.binlog",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/source-diff-hash.txt",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/sharing-previous11.trx",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/vstest.diag.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/build.binlog",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/source-diff-hash.txt",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/source-diff-hash.txt",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/source-diff-hash.txt",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/build.binlog",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/source-diff-hash.txt",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/stdout.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/full-dotnet.trx",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/vstest.diag.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/build.binlog",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax-corrected.stderr.log",
+    "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax.stderr.log"
+  ],
+  "historicalFiles": [
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/build.binlog",
+      "bytes": 1242531,
+      "sha256": "7da5e31b4d461125c5683eb9a88253a1b153b817fda6a02a2b635a76ddfe2a29",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/exit-code.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/head.txt",
+      "bytes": 45,
+      "sha256": "2f447d0aaaaec42ef622619bc8c7493c8e964996af9c66898fd06a5f28417bbb",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/sharing-red.trx",
+      "bytes": 23452,
+      "sha256": "9aae7ebf1d99582c59e5f24eb86f3c2678fd19f578c160e003ec703845d84212",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/source-diff-hash.txt",
+      "bytes": 45,
+      "sha256": "c61577a6f208a1eebe181c0ffa986a1160a83344d1646c7bcc98835a26eef87c",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/stderr.log",
+      "bytes": 1602,
+      "sha256": "12a4b9da9217e8af2ab43961a7d4dfb738f70fe3c91dab69f586f68b88a11d21",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/stdout.log",
+      "bytes": 26304,
+      "sha256": "f995131fdaac772cbd8ef976b0c0bfb6e94d28bbc865350d09e446eeeac03294",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/vstest.diag.host.26-10-26_18-11-08_03622_5.log",
+      "bytes": 103984,
+      "sha256": "483dc711c457ccfca7ac1c6524e764b430f73481912ceab408a5453fb71f9fb2",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-red/vstest.diag.log",
+      "bytes": 246324,
+      "sha256": "b2daee3f98dfcda1a2b2a42a9d772442e1d9a82d27cad7f9382bcf4ff864b206",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/build.binlog",
+      "bytes": 1165907,
+      "sha256": "2be2db6e4c805a52f601fece59a7e3e716a20adf885df1dd0c8744cf63315220",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/head.txt",
+      "bytes": 45,
+      "sha256": "2f447d0aaaaec42ef622619bc8c7493c8e964996af9c66898fd06a5f28417bbb",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/sharing-green.trx",
+      "bytes": 6206,
+      "sha256": "7dc6a6de2d9d7f7f93987b01258dab4e897442047c997ab24ae8fbaf0894ffc7",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/source-diff-hash.txt",
+      "bytes": 45,
+      "sha256": "83bb04fa9d34df59bcaaab3bb3a54d7264cc01a821761e0822874bb8accab232",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/stdout.log",
+      "bytes": 5710,
+      "sha256": "6dc7f5ace5261fa883eaf8a646426801f3944de4535d2ce23902ab6a2a485b17",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/vstest.diag.host.26-10-26_18-17-09_01154_5.log",
+      "bytes": 44455,
+      "sha256": "b68f6da6b5291a22eb0521952532f49ac8c3e28a8cbcd78a5b59c256b1d42f75",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-green/vstest.diag.log",
+      "bytes": 110964,
+      "sha256": "7ef68a81c16bc8cb35b883fc3102615385e87e4ad517bfb6188e6e76369d2b79",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/build.binlog",
+      "bytes": 1155360,
+      "sha256": "a56cab0bccf431246681438d23a59abb302b7be363902a1acbd9eb504da6090f",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/filter.txt",
+      "bytes": 1603,
+      "sha256": "80d0f9fc2aaa475328645f9470cf097553f57222ac05bd4642d7409443ebacfa",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/sharing-previous11.trx",
+      "bytes": 18254,
+      "sha256": "6b6c611b639bf5bcadf59f7529132587731c2075d6be73a5a031e53450a40185",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/source-diff-hash.txt",
+      "bytes": 45,
+      "sha256": "83bb04fa9d34df59bcaaab3bb3a54d7264cc01a821761e0822874bb8accab232",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/stdout.log",
+      "bytes": 5742,
+      "sha256": "7dd1813110ac2696100a7b34cdfa48e0a6aa2d49ee10b26333b1ec93a70b29a6",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/vstest.diag.host.26-10-26_18-18-30_50340_5.log",
+      "bytes": 71579,
+      "sha256": "a0b9a477cb5d3ff7d4f2a3596c0747c5d760fdd19d96d98383468d80dcfaadb4",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/sharing-previous11/vstest.diag.log",
+      "bytes": 137903,
+      "sha256": "18db8e46f52e24f6ffb776ca2fef829eeb120de74cb3d2df535528fee72f9d8a",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/exit-code.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/source-diff-hash.txt",
+      "bytes": 45,
+      "sha256": "5f909586ab5374a10c5abbfb0eaea4669032058f328a05b5be0210d88395b285",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/stderr.log",
+      "bytes": 28104,
+      "sha256": "ce697288dfb751fade182b3305c2d2dbe27fe2e930e6da8a1d5ada917fe9e46e",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-red/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/source-diff-hash.txt",
+      "bytes": 45,
+      "sha256": "aece108e96898b52638bd79eab18bb8b4f2b798e31cff60d2c1eb11e5b7ecd64",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/stderr.log",
+      "bytes": 9602,
+      "sha256": "af6f7a903fc808f9bcbc397f4bed28467865b99535126db829393dfe0509443b",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-green/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/base-head.txt",
+      "bytes": 45,
+      "sha256": "54c5d63b8e0d97a5953c2588827fcd94fb6c36627e0f8374efc30f83438a490a",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/build.binlog",
+      "bytes": 1239616,
+      "sha256": "e5a2842f16f408d07a0d0b5f5721a8bbacae8fa6c45c2cac969f3c33470a8b40",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax-corrected.exit.txt",
+      "bytes": 18,
+      "sha256": "a68423142c13f1129de5db3866d9f6c53bf5494743c4cab24299a9a87df1e0af",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax-corrected.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax-corrected.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax.stderr.log",
+      "bytes": 1568,
+      "sha256": "19f299afcdab6d94b958d6a38cd908565e7c01b2ce0de9902310c026bf6a9ab2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/python-syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/source-diff-hash.txt",
+      "bytes": 45,
+      "sha256": "aece108e96898b52638bd79eab18bb8b4f2b798e31cff60d2c1eb11e5b7ecd64",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/preflight-build/stdout.log",
+      "bytes": 17658,
+      "sha256": "1ebd6500565878df6df08146dfa39019baab5097491ab6d13e18316cf18f3164",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/build.binlog",
+      "bytes": 1243467,
+      "sha256": "f2babfb4fe01fca88f6ca2c0df7e98ce56d59194dac0971e4ec0e323f85a7fec",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/exit-code.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/full-dotnet.trx",
+      "bytes": 1252470,
+      "sha256": "f68382314818aa33442f62cfe385a381dd6e47ab76ce5979e4b930e1a9200bb2",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/product-head.txt",
+      "bytes": 45,
+      "sha256": "1a37725617842fdd1747684c77e2adf0cd08792db67a3a8ef17c6672e956a344",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/status-before.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/stdout.log",
+      "bytes": 11520,
+      "sha256": "2c66e13daf8c4f4f3f44df51332dc697dc7aad0a15563d338b7b120a5579c354",
+      "includedInPublicArchive": true
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/vstest.diag.host.26-10-26_18-38-47_55714_5.log",
+      "bytes": 2879912,
+      "sha256": "7797a5e3192497e0b29d52e184a9ac134de0e750bdac4d18bee48b85c16e1965",
+      "includedInPublicArchive": false
+    },
+    {
+      "path": "artifacts/pr84-sharing-and-preflight-fix-20261026/full-dotnet/vstest.diag.log",
+      "bytes": 2820507,
+      "sha256": "7b663e57ca4d9b97adb81069950e75f0aa2d9dd09001361c2234c80ae05bce93",
+      "includedInPublicArchive": false
+    }
+  ],
+  "archives": {
+    "diagnostics.zip": {
+      "bytes": 250378,
+      "sha256": "00630776c3d1f93cd5e39f5cd23471d5dbb177564d10908902242259d9f4dab2"
+    },
+    "documentation-logs.zip": {
+      "bytes": 187772,
+      "sha256": "28280a0b78ed9e6c2eeb3ef1fdc4986cc8773aacf1d806968706621ecd8514d7"
+    }
+  },
+  "readApprovalPending": false,
+  "runtimeAcceptancePerformed": false,
+  "commitState": "commit_pending",
+  "ciState": "final_head_pending",
+  "note": "最終公開SHAとそのCIは公開後のPRコメントで確認する。詳細binlogとvstest診断は手元に保持。"
+}

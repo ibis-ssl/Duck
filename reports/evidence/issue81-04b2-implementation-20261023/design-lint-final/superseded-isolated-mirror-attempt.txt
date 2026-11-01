@@ -1,0 +1,1 @@
+追補: 初回の独立一時ミラー /mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-focused-final-20261023 では、Node依存ジャンクションの解決に失敗し、textlintは node_modules/textlint/bin/textlint.js を、CSpell runnerは yaml を見つけられなかった。これは有効な検査結果として扱わず、同一ミラー上で行った後続実行の結果だけを採用した。初回Nodeスタック全文は保存していない。

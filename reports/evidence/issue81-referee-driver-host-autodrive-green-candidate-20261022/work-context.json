@@ -1,0 +1,14 @@
+{
+  "head": "6f39d4c0b324fcdce361c1934c4f0d89b03e5370",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "mode": "minimal behavior after accepted runtimeRed8",
+  "verificationCapability": "remote_ci_only",
+  "requestedProfile": "gpt-6.1-sol/high",
+  "applied": null,
+  "writes": [
+    "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "reports/issue81-referee-driver-host-implementation-20261022.md"
+  ],
+  "parentOwnedUntrackedPreserved": "reports/evidence/issue81-referee-driver-host-autodrive-red-ci-20261022/"
+}

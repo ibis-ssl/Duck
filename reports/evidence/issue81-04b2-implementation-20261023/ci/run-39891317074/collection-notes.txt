@@ -1,0 +1,2 @@
+gh run view ... --json headSha,event,workflowName,runNumber,... was rejected before producing run data: Unknown JSON field runNumber. Corrected to supported field number; no CI action was triggered.
+wsl.exe -d Ubuntu -- bash -lc mkdir -p /home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-04b2-ci-56294aa-20261023 returned mkdir: Permission denied (exit 1); no repo files were created or changed by this attempt.

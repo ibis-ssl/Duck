@@ -1,0 +1,20 @@
+[
+  {
+    "name": "py_compile",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "unit",
+    "exit": 0,
+    "stdout": "",
+    "stderr": "test_parses_digest_copy_and_entrypoint (__main__.ParserTests.test_parses_digest_copy_and_entrypoint) ... ok\ntest_rejects_bad_entrypoint (__main__.ParserTests.test_rejects_bad_entrypoint) ... ok\ntest_rejects_unmodeled_instruction (__main__.ParserTests.test_rejects_unmodeled_instruction) ... ok\ntest_accepts_fixed_definition_and_real_publish_contract (__main__.PublishContractTests.test_accepts_fixed_definition_and_real_publish_contract) ... ok\ntest_apphost_reference_and_lock_tag_must_match (__main__.PublishContractTests.test_apphost_reference_and_lock_tag_must_match) ... ok\ntest_copy_must_use_the_actual_publish_context (__main__.PublishContractTests.test_copy_must_use_the_actual_publish_context) ... ok\ntest_digest_is_fixed (__main__.PublishContractTests.test_digest_is_fixed) ... ok\ntest_entrypoint_must_match_published_assembly (__main__.PublishContractTests.test_entrypoint_must_match_published_assembly) ... ok\ntest_floating_base_is_rejected (__main__.PublishContractTests.test_floating_base_is_rejected) ... ok\ntest_missing_dockerfile_is_reported (__main__.PublishContractTests.test_missing_dockerfile_is_reported) ... ok\ntest_publish_static_asset_is_required (__main__.PublishContractTests.test_publish_static_asset_is_required) ... ok\ntest_real_apphost_defaults_match_the_fixed_catalog (__main__.PublishContractTests.test_real_apphost_defaults_match_the_fixed_catalog) ... ok\ntest_referee_driver_requires_aspnet_base (__main__.PublishContractTests.test_referee_driver_requires_aspnet_base) ... ok\ntest_runtimeconfig_framework_matches_base (__main__.PublishContractTests.test_runtimeconfig_framework_matches_base) ... ok\ntest_unknown_attestation_is_not_a_platform (__main__.PublishContractTests.test_unknown_attestation_is_not_a_platform) ... ok\n\n----------------------------------------------------------------------\nRan 15 tests in 0.015s\n\nOK\n"
+  },
+  {
+    "name": "bash_syntax",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

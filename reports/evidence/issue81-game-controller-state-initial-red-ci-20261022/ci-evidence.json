@@ -1,0 +1,185 @@
+{
+  "runId": 39824712525,
+  "headSha": "dcf3a2f6be9f58423ea6e3f82af7cc06c6d0e9aa",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39824712525",
+  "jobs": [
+    {
+      "id": 119984841338,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 119984844157,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119985589445,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "counters": {
+    "total": "653",
+    "executed": "653",
+    "passed": "652",
+    "failed": "1",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "watchExitCode": 1,
+  "testExitCode": 1,
+  "failure": {
+    "name": "Tracker.Tests.GameControllerStateClientTests.ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting",
+    "outcome": "Failed",
+    "duration": "00:00:00.0026078",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateClientTests.ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateClientTests.cs:line 32\n--- End of stack trace from previous location ---",
+    "assertion": "Assert.NotNull(observed)",
+    "sourceLine": 32,
+    "actual": "null",
+    "classification": "runtime assertion failure; not compile error or watchdog timeout",
+    "parentRedAdoption": "pending"
+  },
+  "old652": {
+    "count": 652,
+    "allIndividuallyPassed": true,
+    "namesMatchPrevious652TRX": true
+  },
+  "fixed67": {
+    "count": 67,
+    "allIndividuallyPassed": true
+  },
+  "raceTest": "individual Passed",
+  "sourceArchive": {
+    "fileCount": 26,
+    "allArchiveExpectedHeadCurrentMatch": true,
+    "sha256": "d8643f039f4d80169a1fa30e68879db7bf826d913701339b46e7d0d63634f1ac"
+  },
+  "fixedTest": {
+    "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+    "sha256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "unchanged": true
+  },
+  "trxSHA256": "7ae6454f2f6a16fec01cdced21e9a872544a8b858fe1465d650867004e0982e1",
+  "artifactZipSHA256": "becedadc787773046041e2eed27b222df7b57350074562b3204a45cd086f2117",
+  "artifactDigestMatches": true,
+  "commands": [
+    {
+      "evidence": "artifact-12445348549.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/artifacts/12445348549/zip"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:41:56.637492+00:00"
+    },
+    {
+      "evidence": "artifacts.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39824712525/artifacts"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:41:51.559561+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39824712525",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:41:48.543387+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39824712525",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:41:01.189871+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39824712525",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:41:51.102825+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs?head_sha=dcf3a2f6be9f58423ea6e3f82af7cc06c6d0e9aa&event=pull_request&per_page=10"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:40:32.547010+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39824712525",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "exit_code": 1,
+      "utc": "2026-10-22T17:41:47.378795+00:00"
+    }
+  ],
+  "productBehaviorImplemented": false,
+  "rerunOrSourceEdit": false,
+  "processState": "all owned processes terminated; all exits reaped"
+}

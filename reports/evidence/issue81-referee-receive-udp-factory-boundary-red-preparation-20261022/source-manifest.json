@@ -1,0 +1,27 @@
+{
+  "baseline": "51e70db52c18d30aa291d046801d0ce40b3d3604",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+      "sha256": "a8c701397242ba6d02101ed77f3b0df49d968af086b110fcf57ee481b10e3689"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs",
+      "sha256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617"
+    }
+  ],
+  "caseCount": 11,
+  "invalidInput6": "no normal receiver, no preallocation0 or exceptiontype condition",
+  "partialFailure4": "captured socket closed/no normalreceiver",
+  "realComposition1": "same production nested UdpSocketSetup made internal; dynamicport/loopback actual2normalpackets/service decode+subscriber+ownedDispose; no test-side implementation copy",
+  "existingSource21": "unchanged bytes;existing25case/independent67 preserved",
+  "factoryChange": "only private -> internal class visibility; exact inverse equals baseline; no behavior changed",
+  "validation": {
+    "syntaxExit": 0,
+    "diffCheckExit": 0,
+    "semanticCompile": "not executed; known generatedReferee missing local constraint; remote_ci_only",
+    "runtimeTests": 0,
+    "redGreen": "not observed; current passing regressions need no artificialRed"
+  },
+  "processState": "all read/edit/syntax/check commands terminated"
+}

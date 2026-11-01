@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi-capture.py",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-linux-distribution-progress-sync-verification-20261022/tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.json",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-linux-distribution-progress-sync-verification-20261022",
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T23:41:08.008712+00:00",
+  "finishedUTC": "2026-10-22T23:41:08.675657+00:00"
+}

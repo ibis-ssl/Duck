@@ -1,0 +1,10 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+    "Output": "/tmp/issue81-referee-receive-cache-race-green-candidate-20261022/ServiceReceiveDiagnostics.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "Output": "/tmp/issue81-referee-receive-cache-race-green-candidate-20261022/RefereeReceiveService.api.txt"
+  }
+]

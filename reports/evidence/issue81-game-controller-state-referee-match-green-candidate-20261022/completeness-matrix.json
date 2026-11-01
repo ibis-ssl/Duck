@@ -1,0 +1,51 @@
+[
+  {
+    "required": "正常HALT/STOP/NORMAL_START/FORCE_STARTの有限窓照合",
+    "production": "RefereeApiMatcher.ReadAsync/Evaluate/IsUsable → GameControllerStateObserver.ReadAsync/GetCurrent → GameControllerStateMapping.MatchesUdpCommand",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:19 MatchesFreshActualReceiveAndApiPaths (4 cases)",
+    "red": "line26 IsReady Expected True Actual False (4 failures)",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  },
+  {
+    "required": "無入力/所有ID欠落/不明age/復号失敗/状態不一致を拒否",
+    "production": "RefereeReceiveService.GetCurrentObservation; RefereeApiMatcher.IsUsable/Evaluate",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:52 UnusableUdpDoesNotMatch (4); :79 DifferentApiCommandIsNotReady (1)",
+    "red": "5 regression Passed in scaffold; not positive implementation proof",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  },
+  {
+    "required": "API失敗/期限切れは取得を試みた上でnot-ready",
+    "production": "RefereeApiMatcher.ReadAsync → existing Observer/client; Evaluate requestedApi/currentApi null rejection",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:91 FailedOrExpiredApiReadIsNotReady (2)",
+    "red": "line98 ConnectCalls Expected1 Actual0 (2 failures)",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  },
+  {
+    "required": "pollでAPI/UDPのageや取得回数を延命しない",
+    "production": "RefereeApiMatcher.GetCurrent uses existing receiver/observer snapshots, no read/receive and no timestamp rewrite",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:105 PollingDoesNotRefreshEitherEvidence",
+    "red": "line108 initial IsReady ExpectedTrue ActualFalse",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  },
+  {
+    "required": "読取中の新packet（同counter含む）/再開epochで旧組合せを拒否",
+    "production": "RefereeApiMatcher.SamePacket: owner/source/epoch/acceptedCount/command/counter; latest ReadAsync validation",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:127 NewUdpPacketDuringApiReadInvalidatesOldPair (2); :146 RestartedReceiveEpochRejectsPendingApiPair",
+    "red": "line247 API start assertion false (3 failures)",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  },
+  {
+    "required": "URL世代/新要求を旧API完了が上書きしない",
+    "production": "RefereeApiMatcher.SameApiContext/Complete own requestSequence + existing Observer requestSequence/EndpointGeneration",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:165 ChangedApiEndpointRejectsPendingPair; :181 OlderApiCompletionCannotOverwriteNewPacketMatch",
+    "red": "line247 API start assertion false (2 failures)",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  },
+  {
+    "required": "正常commandと診断を同source/epoch/acceptedCountで取得、公開前の次packet診断と混在させない",
+    "production": "RefereeReceiveService.GetCurrentObservation under commandGate; existing diagnostics GetSnapshots and latestCommand.AcceptedCount",
+    "fixture": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:206 AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics",
+    "red": "line212 before observation Assert.NotNull null",
+    "candidateEvidence": "final syntax exit0/diff-check exit0; fixed test source unchanged; runtime Green not executed, exact-SHA PR CI required"
+  }
+]

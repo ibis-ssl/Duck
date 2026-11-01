@@ -1,0 +1,206 @@
+{
+  "runId": 39831152989,
+  "headSha": "1da5d9f9ea6570ffdace620c1617d93e62c10afc",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39831152989",
+  "jobs": [
+    {
+      "id": 120007317394,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 120007320044,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120008102900,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "counts": {
+    "failed": 0,
+    "passed": 677,
+    "skipped": 0,
+    "total": 677
+  },
+  "commands": [
+    {
+      "evidence": "artifacts.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39831152989/artifacts"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:26:48.016658+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:26:48.641684+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39831152989",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:26:48.016000+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:26:49.346995+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39831152989",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:25:23.889876+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:25:25.064760+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39831152989",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:26:48.016251+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:26:50.480182+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "1da5d9f9ea6570ffdace620c1617d93e62c10afc",
+        "--event",
+        "pull_request",
+        "--json",
+        "databaseId,headSha,status,conclusion,event,url,workflowName",
+        "--limit",
+        "10"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:25:22.976849+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:25:23.889719+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39831152989",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:25:25.064955+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:26:33.306230+00:00"
+    }
+  ],
+  "sourceCount": 28,
+  "sourceExpectedHeadPrePostDiskMatch": true,
+  "fixedTests": [
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+      "expectedSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+      "headSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+      "diskSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+      "match": true,
+      "postCIHeadSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+      "postCIDiskSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+      "postCIAllMatch": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateTransportTests.cs",
+      "expectedSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+      "headSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+      "diskSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+      "match": true,
+      "postCIHeadSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+      "postCIDiskSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+      "postCIAllMatch": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs",
+      "expectedSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+      "headSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+      "diskSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+      "match": true,
+      "postCIHeadSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+      "postCIDiskSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+      "postCIAllMatch": true
+    }
+  ],
+  "artifactCount": 0,
+  "individualTRX": false,
+  "sourceArchiveAvailable": false,
+  "outcomeGranularity": "677 aggregate Green; no individual successful test results/TRX; deadline11/transport13/initial1/old666/fixed67 source unchanged, not individually re-observed",
+  "acceptedRed": {
+    "runId": 39830103395,
+    "head": "4958ed9fa7f1f5accce59c0a783a83ffcac5d204",
+    "total": 677,
+    "passed": 673,
+    "failed": 4,
+    "errors": 0,
+    "timeouts": 0,
+    "ciEvidenceSHA256": "b616e2f65848d59a331041b40514950f6c61c741aa0f606930f62430a5499f65"
+  },
+  "ciCheckout": "de80ecf PR merge containing target1da5d9f into base88cb20f",
+  "scope": "deadline unit only; next unit untouched",
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "processState": {
+    "utc": "2026-10-22T18:27:23.770838+00:00",
+    "sessions": {
+      "2149": 0,
+      "45947": 0
+    },
+    "watchCommandExit": 0,
+    "allOwnedProcessesTerminated": true,
+    "uncollectedExitCodes": []
+  },
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "view",
+    "39830103395",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--json",
+    "databaseId,status,conclusion,jobs,updatedAt"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-22T18:19:53.864087+00:00"
+}

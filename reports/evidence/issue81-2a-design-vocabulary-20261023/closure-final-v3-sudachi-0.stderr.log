@@ -1,0 +1,18 @@
+Markdown whitelist violations:
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'Unix' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'RunId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'ResourceId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'ContainerId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'Generation' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'BootId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'ContainerId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'Generation' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'BootId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:9: 'RunId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:9: 'challenge' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:9: 'BootId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:3: 'エンジン' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'Generation' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:7: 'Generation' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:9: 'エンジン' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v3/0-aspire-simulation-test-environment.md:9: 'challenge' (katakana) is not in tools/lint/markdown-whitelist.yaml.

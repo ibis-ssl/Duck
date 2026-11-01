@@ -1,0 +1,94 @@
+[
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/vision/ssl_vision_wrapper.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/vision/ssl_vision_wrapper.proto",
+    "sourceGitBlobSha1": "a6af0b15cdfaa210bfd4509a6be86564b7f3c994",
+    "sourceSha256": "1eec99fc59fbb518e4a20633758a1109da18d30579acfbab99e035a8fdd19bab",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_wrapper.proto",
+    "outputSha256": "1eec99fc59fbb518e4a20633758a1109da18d30579acfbab99e035a8fdd19bab",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": [
+      "vision/ssl_vision_detection.proto",
+      "vision/ssl_vision_geometry.proto"
+    ]
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/tracker/ssl_vision_wrapper_tracked.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/tracker/ssl_vision_wrapper_tracked.proto",
+    "sourceGitBlobSha1": "8de931373139abee150a21518a213c3098cbefeb",
+    "sourceSha256": "0a2392f7f605343cc2d3b738d3f7859f4e5f76dffa79bea11cf125c235862ecd",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/tracker/ssl_vision_wrapper_tracked.proto",
+    "outputSha256": "6a6f515fdd476daaa127218f4b338b383d97f08cdb3a5b96240b9bf15e424053",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": [
+      "tracker/ssl_vision_detection_tracked.proto"
+    ]
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/vision/ssl_vision_detection.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/vision/ssl_vision_detection.proto",
+    "sourceGitBlobSha1": "124679181a2165c35e846e87d58ef764b452467f",
+    "sourceSha256": "8b4d93d7fe758a7d6eafe4322002e759dc26b12b80c6eb62631077771b28e765",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_detection.proto",
+    "outputSha256": "bea5198d504b1a1f57980fc8f8696c9d34022e51e375dedc46ff75937973055d",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": []
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/vision/ssl_vision_geometry.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/vision/ssl_vision_geometry.proto",
+    "sourceGitBlobSha1": "cde10fd7229e2e636f3e9387b7275a63a1c72b5e",
+    "sourceSha256": "c40f7d068fdd73734bf7a1ea358389d18f05c9dd9fa0f1e53f8c657e2cada93d",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_geometry.proto",
+    "outputSha256": "b8c9b3a9aabcf3669b34ff3f46a048ab91883cc49d24114b0a5add97ad3ccc37",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": []
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/tracker/ssl_vision_detection_tracked.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/tracker/ssl_vision_detection_tracked.proto",
+    "sourceGitBlobSha1": "641363cd52156bc4caaf52415b7416a4fbc5e1f6",
+    "sourceSha256": "6d946b7da9131d3877a786d01dd2097738f45438812556e7b22c9184b808215a",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/tracker/ssl_vision_detection_tracked.proto",
+    "outputSha256": "8b7409e8aa9c8a52751cf08535a323c13875b6bcb2ae3fad60ade086cf33662c",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": [
+      "state/ssl_gc_common.proto",
+      "geom/ssl_gc_geometry.proto"
+    ]
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/state/ssl_gc_common.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/state/ssl_gc_common.proto",
+    "sourceGitBlobSha1": "55958eadb91bf9a9e5938424e02aaddd5076bb42",
+    "sourceSha256": "4051b3efe4c15481d2ddbfc96a0cf9a65eccf47833360e451b144688925ecd82",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/state/ssl_gc_common.proto",
+    "outputSha256": "ae89e542534994ff1004b87f3b23e96b2c33bdf9572f28fb23726bb7ca6969db",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": []
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "sourcePath": "proto/geom/ssl_gc_geometry.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/geom/ssl_gc_geometry.proto",
+    "sourceGitBlobSha1": "2faa40370b684a4b27f6b7aecd19cc0be3ac5901",
+    "sourceSha256": "5a1fc46cfa89c714ddbb7535ef620f680d47f3efe00c77d416035b8df2fd379d",
+    "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/geom/ssl_gc_geometry.proto",
+    "outputSha256": "38ad536016d9222b93eeca79bbf0e1161af5f60a7de207515cace6b50c163595",
+    "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+    "imports": []
+  }
+]

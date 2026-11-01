@@ -1,0 +1,65 @@
+{
+  "ref": "5f280e33da9f0e93d7396373c9573b0f21424582",
+  "configAndCheckerFiles": [
+    {
+      "path": ".textlintrc.json",
+      "candidateSha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "mirrorSha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "matches": true
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "candidateSha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "mirrorSha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "matches": true
+    },
+    {
+      "path": "package.json",
+      "candidateSha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "mirrorSha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "matches": true
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "candidateSha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "mirrorSha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "matches": true
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "candidateSha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "mirrorSha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "matches": true
+    },
+    {
+      "path": "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "candidateSha256": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+      "mirrorSha256": null,
+      "matches": false
+    },
+    {
+      "path": "tools/lint/scripts/run-markdown-targets.js",
+      "candidateSha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "mirrorSha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "matches": true
+    },
+    {
+      "path": "tools/lint/scripts/list-markdown-targets.js",
+      "candidateSha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "mirrorSha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "matches": true
+    },
+    {
+      "path": "tools/lint/scripts/run-cspell-markdown.js",
+      "candidateSha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "mirrorSha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "matches": true
+    }
+  ],
+  "runtime": {
+    "SudachiPy": "0.6.11",
+    "SudachiDictCore": "20260428",
+    "systemDicBytes": 217374303,
+    "systemDicSha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e"
+  }
+}

@@ -1,0 +1,3 @@
+path: reports/issue81-distribution-artifacts-investigation-20261022.md:85; exact one-phrase correction of linux/amd64 sha256 bd0d621373098bbf6f27243a1c2b9a219d6402a96dd30b9825ded5258c106721 to bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721. The source metadata already confirmed the corrected value. Product source, lock and fixed tests unchanged.
+old report SHA-256: 2163f3147c21c41c92367acfbf48011458ed44f9f26b94f8a063f895b542e503
+current report SHA-256: 936511b83d8d259826de485dcb0c24a65413d771a22ce0282482a9a362d165e2

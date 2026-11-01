@@ -1,0 +1,13 @@
+diff --git a/Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml b/Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml
+index 0d20462..32f7dc6 100644
+--- a/Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml
++++ b/Tracker/Tracker.DebugHost/Properties/PublishProfiles/LinuxContainer.pubxml
+@@ -1,6 +1,8 @@
+ <Project>
+   <PropertyGroup>
+     <Configuration>Release</Configuration>
++    <!-- Linux の配布用 portable PDB を sourceFileMap の /src に対応させる。 -->
++    <PathMap>$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))))=/src</PathMap>
+     <Platform>Any CPU</Platform>
+     <PublishProtocol>FileSystem</PublishProtocol>
+     <TargetFramework>net10.0</TargetFramework>

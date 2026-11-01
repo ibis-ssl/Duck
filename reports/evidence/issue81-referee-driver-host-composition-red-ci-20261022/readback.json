@@ -1,0 +1,47 @@
+{
+  "evidenceReadbackVerified": true,
+  "run": 39850142081,
+  "head": "3bbb2a5f0b5a503d173a3da7f2eb4306e4f7d558",
+  "newTestSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+  "TRX": {
+    "path": "artifacts/dotnet-test.trx",
+    "sha256": "1db4812527ac35483bd2526ac8fecfd89d3d4de1d4797a808bcc0d42ccbe26bb"
+  },
+  "source42ArchiveHeadDiskMatch": true,
+  "runtimeRed": "6 Assert.Equal Expected1 Actual0 at lines32/132/149/167; 7 Assert.NotNull null at line106",
+  "old745Passed": true,
+  "fixed67Passed": true,
+  "racePassed": true,
+  "host11Passed": true,
+  "repositoryClean": true,
+  "processes": {
+    "checkedUtc": "2026-10-22T20:40:45.678364+00:00",
+    "ownedWatchMatches": [],
+    "sessions": {
+      "44659": {
+        "outerExit": 0,
+        "innerGhWatchExit": 1,
+        "reaped": true
+      },
+      "25603": {
+        "exit": 0,
+        "reaped": true
+      },
+      "57386": {
+        "exit": 0,
+        "reaped": true
+      },
+      "46334": {
+        "exit": 0,
+        "reaped": true
+      },
+      "52156": {
+        "exit": 0,
+        "reaped": true
+      }
+    },
+    "uncollectedExitCodes": [],
+    "uncompletedOwnedProcesses": [],
+    "note": "All issued tool sessions were reaped; no new watch/rerun/cancel was issued."
+  }
+}

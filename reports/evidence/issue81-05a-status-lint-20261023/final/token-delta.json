@@ -1,0 +1,73 @@
+{
+  "inputs": {
+    "tasks_added_lines": [
+      36,
+      37,
+      38,
+      39,
+      53,
+      58
+    ],
+    "phases_added_lines": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      26
+    ],
+    "tasks_deleted_count": 4,
+    "phases_deleted_count": 1
+  },
+  "cspell_current": [
+    "bind",
+    "Container",
+    "Draft",
+    "Issue"
+  ],
+  "cspell_deleted": [
+    "bind",
+    "Container",
+    "localhost",
+    "host",
+    "network",
+    "Draft",
+    "Issue",
+    "localhost����bind�_����m�肷��"
+  ],
+  "sudachi_current_english": [
+    "bind",
+    "TCP",
+    "AddContainer",
+    "Draft",
+    "Issue"
+  ],
+  "sudachi_deleted_english": [
+    "bind",
+    "AddContainer",
+    "localhost",
+    "TCP",
+    "host",
+    "network",
+    "Draft",
+    "Issue",
+    "localhost",
+    "bind"
+  ],
+  "sudachi_current_katakana_native_capture": [
+    "モデル",
+    "Draft",
+    "Issue"
+  ],
+  "sudachi_deleted_katakana_native_capture": [
+    "モデル",
+    "host",
+    "network",
+    "Draft",
+    "Issue"
+  ],
+  "all_current_terms_overlap_deleted_terms": true,
+  "encoding_note": "The input fragment UTF-8 is source-hash matched and contains モデル, not the mojibake string. The PowerShell-captured stderr has a corrupted rendering; WSL-native Python subprocess capture emits UTF-8 モデル. No input corruption is evidenced."
+}

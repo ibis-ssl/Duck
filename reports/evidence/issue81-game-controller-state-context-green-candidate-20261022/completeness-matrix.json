@@ -1,0 +1,61 @@
+{
+  "acceptedRed": {
+    "runId": 39836060621,
+    "head": "f5ae4401e7a62279dd93a45eb0d778de5477a228",
+    "total": 716,
+    "passed": 707,
+    "failed": 9,
+    "errors": 0,
+    "timeouts": 0,
+    "ciEvidenceSHA256": "a3121cc1e12554d5c2b94c7eaadbe29ba120333aeac519c7ac6f8aed645acd1b"
+  },
+  "cells": [
+    {
+      "requiredAction": "取得開始/完了とstart基準のage/poll非延命",
+      "productionPath": "ReadAsync capturesclock before/afterread; GetCurrent TryGetAge(ReadStartedTimestamp,now)",
+      "actualFixture": "CapturesReadContextAndExpiresFromStartWithoutPollingRenewal",
+      "focusedEvidence": "33行NotNullnull Red; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "単調request番号",
+      "productionPath": "checked requestSequence increment at readstart undergate",
+      "actualFixture": "SequentialReadsHaveIncreasingRequestSequences",
+      "focusedEvidence": "62行NotNullnull Red; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "最新要求優先/古い結果拒否",
+      "productionPath": "completion sequence+generation guard before publication; newestfailurecurrent=null",
+      "actualFixture": "OlderRequestCannotOverwriteNewerCompletedObservation / FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent",
+      "focusedEvidence": "278行reader-startfalse Red2; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "URL設定世代で旧結果を失効",
+      "productionPath": "Reconfigure checked nextGeneration+endpoint update/currentclear undergate",
+      "actualFixture": "EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult",
+      "focusedEvidence": "278行reader-startfalse Red; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "期限外/逆行/不明な時計区間failclosed",
+      "productionPath": "TryReadTimestamp highwater+clockVersion; TryGetAge finitewindow/negative/overflow rejection",
+      "actualFixture": "InvalidReadTimingDoesNotPublishAnObservation false/true",
+      "focusedEvidence": "191行readcount expected1 actual0 Red2; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "caller取消と実client期限/資源破棄を維持",
+      "productionPath": "token checks around injectedread; cleanup-onlycatch rethrows; client stillownsCTS/socket",
+      "actualFixture": "AlreadyCancelledCallerDoesNotStartARead / ExpiredRealClientDoesNotPublishContextAndDisposesSocket",
+      "focusedEvidence": "226行OCE無し/210行DisposeExpected1Actual0 Red2; candidate runtimeGreen pending"
+    }
+  ],
+  "locking": "onegate only shortlocal state operations; no await/delegate invocation while holdinggate; late stalecompletion cannot clearnewcache, cleanupcatch onlytouches itsstillcurrentrequest",
+  "age": "configuredTimeProvider used at start/completion/GetCurrent; conservativeupperbound includesconnect/read/parse; age==window valid, age>window invalid, GetCurrent cannotresetstart; expiredcachecleared",
+  "clock": "highwater retained afterinvalidation; clockversion rejects in-flight observation spanningclockrollback, no resurrection solelybyclockcatchup; unrepresentableelapsed rejected",
+  "ownership": "Observer doesnotown transport; delegates to unchangedclient that disposesWS/CTS; caller cancellation propagates; exceptioncleanup rethrows; no forcedkill of arbitrarycancellation-ignoringdelegate",
+  "configuration": "URLgenerationlocal, sequence monotonicallyincreases acrossReconfigure; pendingoldreads may finish undertheirclientdeadline but results rejected; no DCPownership claim",
+  "deferred": [
+    "UDPepoch/source/samepacket atomiccommand+acceptedcount integration",
+    "APIUDPfinitefreshnessreadiness/reasons",
+    "AutoDrive/03C",
+    "realimage/Desktop/DCP/hardware"
+  ]
+}

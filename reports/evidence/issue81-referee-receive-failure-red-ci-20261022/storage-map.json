@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/tmp/issue81-referee-receive-failure-red-ci-20261022/source.tar.gz",
+    "sha256": "bcf7b79571b7e759c2a9dbceefe6088c89e366ccf77c3c3b19c3ea0366054b09",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-failure-red-ci-20261022/dotnet-test.binlog",
+    "sha256": "7900a18e5c49fb0cfcfecfa481c3baa2e4d45f88119d7432f7b5fbeb830a41a6",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-failure-red-ci-20261022/failure-artifact.zip",
+    "sha256": "89acf6673523b083a19618d16ceb099dfb993343d9b7bd0d4ec622c676bcfb84",
+    "reason": "container retained outside branch; individual evidence retained"
+  }
+]

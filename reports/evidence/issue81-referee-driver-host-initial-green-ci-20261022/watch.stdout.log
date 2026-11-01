@@ -1,0 +1,81 @@
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39847942308
+Triggered via pull_request less than a minute ago
+
+JOBS
+* test (ID 120066132762)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow (ID 120066134854)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39847942308
+Triggered via pull_request less than a minute ago
+
+JOBS
+* test (ID 120066132762)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow (ID 120066134854)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39847942308
+Triggered via pull_request about 1 minute ago
+
+JOBS
+* test (ID 120066132762)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow (ID 120066134854)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39847942308
+Triggered via pull_request about 1 minute ago
+
+JOBS
+* test (ID 120066132762)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  ✓ Run dotnet test
+  - Collect failure diagnostics
+  - Upload test failure artifact
+  ✓ Post Set up .NET SDK
+  ✓ Post Check out repository
+  ✓ Complete job
+- ASPIRE-NET-002 Linux packet flow (ID 120066134854)
+✓ task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39847942308
+Triggered via pull_request about 1 minute ago
+
+JOBS
+✓ test in 1m25s (ID 120066132762)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  ✓ Run dotnet test
+  - Collect failure diagnostics
+  - Upload test failure artifact
+  ✓ Post Set up .NET SDK
+  ✓ Post Check out repository
+  ✓ Complete job
+- ASPIRE-NET-002 Linux packet flow (ID 120066134854)
+- ASPIRE full-stack Linux acceptance (ID 120066882316)

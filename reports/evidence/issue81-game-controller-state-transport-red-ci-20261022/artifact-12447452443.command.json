@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "--allow-escape-sequences",
+    "--method",
+    "GET",
+    "repos/ibis-ssl/Duck/actions/artifacts/12447452443/zip"
+  ],
+  "exit_code": 0,
+  "utc": "2026-10-22T18:00:50.976845+00:00"
+}

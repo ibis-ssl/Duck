@@ -1,0 +1,11 @@
+{
+  "command": "Python xml.etree.ElementTree.parse exact4 paths",
+  "paths": [
+    "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "Duck.slnx"
+  ],
+  "count": 4,
+  "exit_code": 0
+}

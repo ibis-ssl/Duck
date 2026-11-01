@@ -1,0 +1,118 @@
+{
+  "schema": "issue81-documentation-validation/v1",
+  "report_type": "verification_report",
+  "target": {
+    "technical_head": "e89bc48ae0dc356a9b3a5691784ca6b6639b0978",
+    "recorded_pr84_base": "88cb20f2b5cea46eb90bff80ba8d535639625de0",
+    "source_state": "dirty; documentation changes only",
+    "commit_state": "commit_pending",
+    "push_state": "not_requested",
+    "ci_wait_state": "unavailable"
+  },
+  "input_blobs": {
+    "Tracker/Design/phases-status.md": {
+      "worktree_blob": "6963ea14ba6381fdb9f4c6eb023a20fe068ad489",
+      "head_blob": "1c90fb556749affd48efb51a42eb70405f73c46e"
+    },
+    "Tracker/Design/tasks-status.md": {
+      "worktree_blob": "b36e8d424acb28ea9984237c644e14c515ca3db4",
+      "head_blob": "5fabcad47f759f2109340664f38a5ba12bc2e4ad"
+    },
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+      "worktree_blob": "859f19423590ea5bb1faff7885227408bb3cb2a5",
+      "head_blob": "89ea85f57829f14bf60ab6f3b9082f72e50323e5"
+    },
+    "reports/issue81-documentation-followup-20261028.md": {
+      "worktree_blob": "33ba0ee666773d6c19c01e5808dbb26203d1e068",
+      "head_blob": null
+    }
+  },
+  "validation": {
+    "whole_files": {
+      "textlint": {
+        "files": 3,
+        "exit": 0
+      },
+      "cspell": {
+        "design_added_text_findings": 0,
+        "exit": 1,
+        "files_checked": 3,
+        "issues": 120
+      },
+      "sudachi_whitelist": {
+        "per_file": {
+          "Tracker/Design/phases-status.md": 37,
+          "Tracker/Design/tasks-status.md": 153,
+          "Tracker/Design/Testing/aspire-simulation-test-environment.md": 10
+        },
+        "exit": 1
+      },
+      "yomiyasu_strict": {
+        "tasks_status": {
+          "findings": 40,
+          "score": 0,
+          "exit": 1
+        },
+        "design": {
+          "findings": 0,
+          "score": 100,
+          "exit": 0
+        },
+        "phases_status": {
+          "findings": 1,
+          "score": 95,
+          "exit": 1
+        }
+      }
+    },
+    "changed_fragments": {
+      "tasks": {
+        "sha256": "be1b412f4ae08dfbc14856807aa566bfd5e30c222da2f20bfb9e229945429248",
+        "textlint": 0,
+        "sudachi": 0,
+        "yomiyasu": 0,
+        "score": 100,
+        "cspell": 0
+      },
+      "phases": {
+        "sha256": "2cfb5fc0d5b992cb1d1691450c5d59ca9b2d8748d9a21e9befa4749a65a212ae",
+        "textlint": 0,
+        "sudachi": 0,
+        "yomiyasu": 0,
+        "score": 100,
+        "cspell": 0
+      }
+    },
+    "report_body": {
+      "textlint": 0,
+      "yomiyasu": {
+        "findings": 0,
+        "score": 100,
+        "exit": 0
+      },
+      "cspell": {
+        "exit": 1,
+        "files_checked": 1,
+        "issues": 44
+      },
+      "sudachi": {
+        "violations": 77,
+        "exit": 1
+      },
+      "note": "reports are excluded by normal markdown target rules; stdin results are additional diagnostics, not standard-gate success."
+    }
+  },
+  "scope": {
+    "documentation_only": true,
+    "code_build_or_test": "not applicable",
+    "runtime": "not run",
+    "dependency_install": "not done",
+    "push_merge_or_public_comment": "not done",
+    "full_issue81_or_issue82_acceptance": "not claimed"
+  },
+  "outputs": {
+    "report": "reports/issue81-documentation-followup-20261028.md",
+    "manifest": "reports/evidence/issue81-documentation-followup-20261028/documentation.json",
+    "detailed_sanitized_logs": "External diagnostic logs retained in task-7 area; not embedded in repository manifest."
+  }
+}

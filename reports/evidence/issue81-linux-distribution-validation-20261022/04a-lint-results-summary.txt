@@ -1,0 +1,16 @@
+04A current-source lint evidence summary
+Source: Tracker/Design/Testing/aspire-simulation-test-environment.md
+Current ref: fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9
+Baseline ref: 4e3099e75c4afab8ba1f11c67500ebe29f17fed3
+Baseline: 34,546 bytes; SHA-256 6a164fe19b7fda39bbfb695af5120b6c4f4f6bce5b39bf6205eb82d91e817067
+Current source and existing mirror: 36,178 bytes; SHA-256 98424b1de762e707f0ea20e9815d29dafc45f11e58f51594229bfae132aa3284 (exact match)
+Added lines: 12; 1,632 bytes; SHA-256 b0f4978b01d42723bf63d94a35f7e1af38d4b267d0f3d4093aee07c69f5766f5
+Existing Node v24.20.0 / npm 11.19.0; node_modules junction -> C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules. No install.
+Configs: textlint a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f; CSpell 2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642; Sudachi whitelist dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8; checker a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33. package.json SHA-256 c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28.
+SudachiPy 0.6.11; SudachiDict-core 20260428; system.dic 217,374,303 bytes SHA-256 6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e.
+textlint current exit 0 (text-current.*).
+CSpell baseline/current exit 1 with inherited Tailscale only (baseline line 284; current line 296); added-lines exit 0 (spell-baseline.*, spell-current.*, spell-added-lines.*).
+Yomiyasu strict baseline/current/added-lines all exit 0, score 100, clean=true, findings=0 (yomiyasu-04a-{baseline,current,added-lines}.*).
+Sudachi corrected stdin captures: baseline and current exit 1 with same 10 inherited findings (9 TCP, 1 Tailscale; baseline Tailscale line 284, current line 296); added-lines exit 0, findings=0 (sudachi-04a-*-captured.*). Initial no-stdin capture attempts retained as invalid; do not use them.
+prior-lint-reference.sha256's 38 files are 03C historical only; they do not represent current 04A evidence. Current 04A raw files are in this evidence root.
+

@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/usr/lib/dotnet/dotnet",
+    "/tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll",
+    "/tmp/issue81-game-controller-state-transport-red-preparation-20261022/syntax-input.json",
+    "/tmp/issue81-game-controller-state-transport-red-preparation-20261022/syntax-result.json"
+  ],
+  "exit_code": 0
+}

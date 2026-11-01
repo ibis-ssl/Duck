@@ -1,0 +1,63 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 588 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 588 ms).
+  Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 1.06 sec).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 2 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 5 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 6 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj (in 3 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 1 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 581 ms).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 2.19 sec).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 3.24 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+  Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll
+  Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs(96,9): warning xUnit2012: Do not use Assert.True() to check if a value exists in a collection. Use Assert.Contains instead. (https://xunit.net/xunit.analyzers/rules/xUnit2012) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress [29 ms]
+  Error Message:
+   Assert.Single() Failure: The collection did not contain any matching items
+Expected:   (predicate expression)
+Collection: [ExecutableResource { Annotations = [ExecutableAnnotation { Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = "simulator-docker-wrapper-ready" }, ···], Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, Name = "simulator", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, ProjectResource { Annotations = [ProjectLaunchDefaultsAnnotation { }, PipelineStepAnnotation { }, ContainerBuildOptionsCallbackAnnotation { Callback = Func`2 { ··· } }, PipelineConfigurationAnnotation { Callback = Func`2 { ··· } }, Tracker_RuntimeHost { ProjectPath = "/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim"···, SuppressBuild = True }, ···], Name = "duck" }, ProjectRebuilderResource { Annotations = [ExecutableAnnotation { Command = "dotnet", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim"··· }, NameValidationPolicyAnnotation { MaxLength = null, ValidateAllowedCharacters = False, ValidateNoConsecutiveHyphens = False, ValidateNoTrailingHyphen = False, ValidateStartsWithLetter = False }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, ExplicitStartupAnnotation { }, ExcludeLifecycleCommandsAnnotation { }, ···], Command = "dotnet", Name = "duck-rebuilder", Parent = ProjectResource { Annotations = [···], Name = "duck" }, ProjectPath = "/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim"···, ··· }, ExecutableResource { Annotations = [ExecutableAnnotation { Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = "game-controller-docker-wrapper-ready" }, ···], Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, Name = "game-controller", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, ExecutableResource { Annotations = [ExecutableAnnotation { Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = "cm4-sim-docker-wrapper-ready" }, ···], Command = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"···, Name = "cm4-sim", WorkingDirectory = "/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/"··· }, ···]
+  Stack Trace:
+     at Tracker.Tests.AppHostApplicationModelTests.Find(IDistributedApplicationTestingBuilder appHost, String name) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 451
+   at Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 100
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp [47 ms]
+  Error Message:
+   Assert.IsType() Failure: Value is not the exact type
+Expected: typeof(Aspire.Hosting.ApplicationModel.ContainerResource)
+Actual:   typeof(Aspire.Hosting.ApplicationModel.ProjectResource)
+  Stack Trace:
+     at Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 74
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp [8 ms]
+  Error Message:
+   Assert.IsType() Failure: Value is not the exact type
+Expected: typeof(Aspire.Hosting.ApplicationModel.ContainerResource)
+Actual:   typeof(Aspire.Hosting.ApplicationModel.ProjectResource)
+  Stack Trace:
+     at Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 57
+--- End of stack trace from previous location ---
+Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+
+Failed!  - Failed:     3, Passed:   776, Skipped:     0, Total:   779, Duration: 27 s - Tracker.Tests.dll (net10.0)

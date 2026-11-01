@@ -1,0 +1,40 @@
+{
+  "head": "f5ae4401e7a62279dd93a45eb0d778de5477a228",
+  "counts": {
+    "total": "716",
+    "executed": "716",
+    "passed": "707",
+    "failed": "9",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "newCases": 9,
+  "failedNew": 9,
+  "old707IndividuallyPassed": true,
+  "ciEvidenceSHA256": "a3121cc1e12554d5c2b94c7eaadbe29ba120333aeac519c7ac6f8aed645acd1b",
+  "sourceManifestSHA256": "074e3581d17533c6296b461b6adeb512313b007ffd4574452b5e72bdbadf137a",
+  "context9OutcomesSHA256": "4dd6369ca421d868b73c9d2a9bd6143018757aec795c96eb9555f19e07eb0c05",
+  "gitStatus": "",
+  "process": {
+    "utc": "2026-10-22T19:02:39.155037+00:00",
+    "sessions": {
+      "59301": 0,
+      "93444": 0,
+      "55435": 0,
+      "91175": 0
+    },
+    "innerGhWatchExit": 1,
+    "allOwnedProcessesTerminated": true,
+    "uncollectedExitCodes": []
+  }
+}

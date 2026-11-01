@@ -1,0 +1,24 @@
+﻿"""Desktop Referee受入。最初の二つの判定は従来スクリプトから抽出したもの。"""
+import time
+
+ROLES = frozenset(("simulator", "duck", "game-controller", "referee-driver"))
+POLICY = {"startupSeconds": 45, "evaluationSeconds": 30, "minimumSamples": 10,
+          "allowedFailures": 0, "maximumSampleGapSeconds": 5,
+          "udpFreshnessSeconds": 5, "apiFreshnessSeconds": 3,
+          "shutdownSeconds": 15, "overallSeconds": 120}
+
+def evaluate_readiness(probes, run_id, container_id):
+    ready = sum(p.get("httpStatus") == 200 and
+                p.get("body", {}).get("isReady") is True for p in probes)
+    return {"passed": ready > 0, "readySamples": ready}
+
+def wait_for_owned_removal(owned_ids, list_ids, deadline, clock=time.monotonic, sleep=time.sleep):
+    current = set(list_ids(max(0.01, deadline - clock())))
+    remaining = sorted(set(owned_ids) & current)
+    return {"status": "complete" if not remaining else "timeout",
+            "remainingIds": remaining, "unrelatedIds": sorted(current - set(owned_ids)),
+            "polls": [{"at": clock(), "remainingIds": remaining}]}
+
+def assess_run(readiness, removal, apphost_exit, roles, errors, ctrl_break_sent):
+    return (readiness["passed"] and removal["status"] == "complete" and
+            apphost_exit == 0 and set(roles) == ROLES and not errors and ctrl_break_sent)

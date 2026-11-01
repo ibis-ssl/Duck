@@ -1,0 +1,145 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 108 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 498 ms).
+  Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 373 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 498 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 498 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 108 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 769 ms).
+  Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 709 ms).
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 2.88 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 3.24 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+  Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair [56 ms]
+  Error Message:
+   照合は注入されたAPI観測を開始する。
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247
+   at Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 171
+   at Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 176
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics [44 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 212
+   at Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 240
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: True) [96 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 98
+   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 100
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: False) [11 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 98
+   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 100
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: True) [16 ms]
+  Error Message:
+   照合は注入されたAPI観測を開始する。
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247
+   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 133
+   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 141
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: False) [4 ms]
+  Error Message:
+   照合は注入されたAPI観測を開始する。
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247
+   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 133
+   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 141
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch [6 ms]
+  Error Message:
+   照合は注入されたAPI観測を開始する。
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247
+   at Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 187
+   at Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 201
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: "FORCE_START", apiPhase: "RUNNING", command: ForceStart) [5 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26
+   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: "HALT", apiPhase: "HALT", command: Halt) [13 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26
+   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: "NORMAL_START", apiPhase: "RUNNING", command: NormalStart) [3 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26
+   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: "STOP", apiPhase: "STOP", command: Stop) [8 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26
+   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence [9 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 108
+   at Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 120
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair [7 ms]
+  Error Message:
+   照合は注入されたAPI観測を開始する。
+  Stack Trace:
+     at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247
+   at Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 152
+   at Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 160
+--- End of stack trace from previous location ---
+Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+
+Failed!  - Failed:    13, Passed:   721, Skipped:     0, Total:   734, Duration: 29 s - Tracker.Tests.dll (net10.0)

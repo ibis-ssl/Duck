@@ -1,0 +1,17 @@
+{
+  "name": "autoref_tag",
+  "argv": [
+    "curl",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "https://hub.docker.com/v2/repositories/roboticserlangen/autoref/tags/2025.1.0/"
+  ],
+  "exit": 0,
+  "url": "https://hub.docker.com/v2/repositories/roboticserlangen/autoref/tags/2025.1.0/",
+  "stdout_bytes": 1766,
+  "stderr_bytes": 0,
+  "stdout_sha256": "ef806d136cd957ef1fcf4bf0e1b7754283bf307ae7f0a87b3727398c9a3401cd",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

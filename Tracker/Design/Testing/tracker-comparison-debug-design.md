@@ -1,5 +1,7 @@
 # トラッカー比較デバッグ 設計
 
+> 現行の移行設計。以下のコンテナ配置とWindows操作は未実装・未受入である。主設計と一緒に実装・受入を行う。
+
 ## 目的
 
 Aspire のシミュレーション試験環境で、同じ SSL-Vision 入力を Duck、TIGERs、ER-Force のトラッカーへ同時に与え、出力差を `Tracker.DebugHost` で確認できるようにする。
@@ -26,17 +28,79 @@ raw vision は共通の比較入力として扱うが、シミュレータの真
 
 ## Aspire 資源
 
-比較モードでは通常のシミュレーション資源に次を追加する。
+本節は主設計の移行後の構成を示し、現行の起動管理プログラムの実装とは区別する。Windows は AppHost、DCP、ブラウザーを動かす。以下の比較資源と通常の simulator、Game Controller、Duck、Crane、必要な cm4-sim、RefereeDriver、および UDP 準備確認機能は、すべて同じ DCP 管理の Docker Desktop ブリッジに置く。利用者管理の Ubuntu 上の別 Docker Engine、ホスト上の UDP 受信、中継、ホストネットワークは使わない。
 
 | 資源名 | 実行形態 | 役割 |
 | --- | --- | --- |
-| `tracker-tigers` | Aspire wrapper executable resource + owned Docker container | raw vision `224.5.23.2:10020` を受信し、TIGERs の tracker 出力を `224.5.23.2:11010` へ送信する。wrapper は owner labels / resource name / expected image / host network / exact container ID / Running 状態を inspect で照合し、container 内 Sumatra process / 起動診断と期待 identity の新しい tracker packet を確認するまで ready にしない。 |
-| `tracker-erforce` | Aspire wrapper executable resource + owned Docker container | raw vision `224.5.23.2:10020` を受信し、ER-Force の tracker 出力を `224.5.23.2:11010` へ送信する。wrapper は owner labels / resource name / expected image / host network / exact container ID / Running 状態を inspect で照合し、container 内 ER-Force tracker process / 起動診断と期待 identity の新しい tracker packet を確認するまで ready にしない。 |
-| `debug-host` | .NET プロセス | raw vision と `224.5.23.2:11010` の全 tracker packet を受信し、ライブ比較と CaptureOn / replay を提供する。 |
+| `duck` | DCP が管理する `Tracker.RuntimeHost` コンテナ | SSL-Vision `224.5.23.2:10020` を受信し、`sim` 設定で `224.5.23.2:11010` へ公式形式の追跡情報を送る。 |
+| `tracker-tigers` | DCP が管理する Sumatra 追跡機能コンテナ | 同じ10020と Game Controller の11003を受信し、11010へ追跡情報を送る。TIGERs AI と内蔵 Game Controller は起動しない。 |
+| `tracker-erforce` | DCP が管理する ER-Force AutoRef 追跡機能コンテナ | 同じ10020と11003を受信し、11010へ追跡情報を送る。 |
+| `debug-host` | DCP が管理する `Tracker.DebugHost` コンテナ | 自身の追跡と UDP 送信を無効にする。10020と三者の11010を受信し、比較表示・記録・再生を行う。Windows ブラウザーは限定された TCP 接続先で画面を開く。 |
 
-Duck `Tracker.RuntimeHost` も `sim` profile で `224.5.23.2:11010` へ出力する。三つの tracker source は同じ official tracker multicast endpoint を共有し、`Tracker.DebugHost` 側で source identity により分離する。
+コンテナの完全 ID、イメージのハッシュ値、実行 ID、資源 ID、ネットワーク ID を結び付ける。サービス自身の受信・復号と送信元の新しさは当該資源内で確認し、マルチキャストだけを所有者の証明には使わない。DCP が唯一のコンテナ管理者であり、外部の起動管理プログラムは併用しない。
 
-comparison mode でも referee / game-state の authoritative producer は基底構成の `game-controller` 一つだけとする。`tracker-tigers` は Sumatra の referee module を `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` に固定した外部 Game Controller 用設定を使い、`224.5.23.1:11003` を consumer として受信する。標準 `simulation_protocol.xml` のように Sumatra 内蔵 Game Controller を有効にする構成は使わない。`tracker-erforce` の `--gc-port 11003` も consumer とし、11003 を publish させない。`tracker-tigers` / `tracker-erforce` は個別 wrapper executable resource として登録し、準備完了した `simulator` と `game-controller` を health-based `WaitFor` して起動する。
+Game Controller は `224.5.23.1:11003` の唯一の送信者とする。TIGERs は `source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false` の比較用設定を使う。ER-Force の `--gc-port 11003` も受信側の指定であり、審判情報を送信させない。Game Controller の視覚検出／追跡情報の入力、RefereeDriver の11003観測、既存の準備確認機能も同じブリッジ内に置く。
+
+### RuntimeHost診断識別情報の制御経路
+
+比較モードでも、診断識別情報の宛先選択にホスト側HTTPを使わず、AppHostが照合した完全なコンテナ識別子を使う。AppHostは `ResourceNotificationService.WatchAsync` の実通知と `TryGetCurrentState` の現在状態について、登録資源参照、不透明なResourceId、役割名、完全なcontainer.idを照合する。明示opt-in時は設定されたDocker contextと期待EngineIDを確認し、完全ID・Running状態・当該RunId/roleラベルをinspectした後だけ同じ完全IDへ `exec` する。検証失敗は `exec` を行わない。これはDocker Desktop context内の当該Run資源照合であり、DCP endpointの直接比較や通知全順序の保証ではない。通常構成とRuntimeHostOnly選択はDesktop bridgeを暗黙に有効化しない。AppHostは同じコンテナ内で `dotnet Tracker.RuntimeHost.dll --identity-control` を実行し、固定Unixソケットで常駐RuntimeHostと `prepare` / `challenge` / `commit` を行う。コンテナの起動・停止・削除はDCPだけが管理し、HTTPは利用者向け診断表示に限る。RunId/ResourceId/役割名/完全ContainerId/Generationと実行プロセスのBootIdの対応を検査し、受理後に受信状態を初期化する。起動時にResourceIdが未確定の経路ではRunIdと期待役割を先に固定し、ResourceIdは未帰属のまま保持する。役割名の一致だけではResourceIdをbindせず、AppHostが対象コンテナを照合した同一UDS接続の初回commit成功で初めて確定する。ResourceIdを起動時に明示する既存経路は厳格一致を維持する。これは識別情報の受渡し契約であり、外部トラッカーが正常に復号したこと、送信UDPパケットのコンテナ起源、実Docker Desktop上での `exec` 成功を証明しない.
+
+```mermaid
+flowchart LR
+ subgraph win[Windows]
+  browser[ブラウザー]
+  host[127.0.0.1 / 動的 TCP]
+  app[AppHost / DCP]
+ end
+ subgraph bridge[Docker Desktop / 同じ DCP 管理ブリッジ]
+  sim[simulator]
+  gc[GC / 唯一の 11003 送信者]
+  duck[Duck / ibis]
+  tigers[TIGERs tracker / AI 無効]
+  erforce[ER-Force tracker]
+  debug[DebugHost / 追跡・UDP送信無効]
+  ref[RefereeDriver / 単一受信・自身診断]
+  checks[各資源内の準備確認]
+  sim -. 10020 .-> duck
+  sim -. 10020 .-> tigers
+  sim -. 10020 .-> erforce
+  sim -. 10020 .-> debug
+  sim -. 10020 .-> gc
+  gc -. 11003 .-> tigers
+  gc -. 11003 .-> erforce
+  gc -. 11003 .-> ref
+  duck -. 11010 .-> debug
+  tigers -. 11010 .-> debug
+  erforce -. 11010 .-> debug
+  duck -. 11010 .-> gc
+  tigers -. 11010 .-> gc
+  erforce -. 11010 .-> gc
+  debug -. 三者の受信・新しさ .-> checks
+  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
+  ref -. 自身の診断 / 内部39110 .-> checks
+ end
+ app -. 選択コンテナの管理 .-> bridge
+ browser -. HTTP / WebSocket .-> host
+ host -. TCP 8082 / GC UI・API .-> gc
+ host -. TCP 8080 / 比較画面 .-> debug
+ host -. TCP 39110 / RefereeDriver 診断 .-> ref
+```
+
+破線は未実装・未受入の経路を表す。Crane と cm4-sim の制御は主設計の通信契約に従う。コンテナの名前解決、数値 IP、127.0.0.1、再作成後の接続先更新と、Aspire 13.5.4 の 127.0.0.1 待受は主設計の確認契約を満たすまで阻害として残す。
+
+## RefereeDriver の共通契約
+
+比較時も[主設計の実行・内部診断](aspire-simulation-test-environment.md#refereedriver-の実行と内部診断)を使う。`Testing/Duck.Testing.RefereeDriver.Host` にHTTP依存を分離し、既存の受信・制御ライブラリと利用側の実行条件を維持する。`Program` は標準の依存登録と起動へ委譲し、単一の受信処理を観測と明示制御で共有する。比較追跡器やGame Controllerの代わりに11003を送信しない。
+
+構成は起動時に読み取る。`RefereeDriver:Enabled=true` と `Testing:ContainerMode=true` で内部HTTP39110を待ち受け、`RefereeDriver:GameControllerUri=ws://game-controller:8082/api/control` を観測と明示制御へ渡す。`RefereeDriver:InterfaceAddress` は任意のコンテナ内IPv4で、`Testing:Diagnostics:RunId`、`Testing:Diagnostics:ResourceId`、`Testing:Diagnostics:ContainerId`、`Testing:Diagnostics:Generation` を明示する。完全IDの構造検査をDCP所有証明とはみなさない。
+
+自動制御は `RefereeDriver:AutoDriveToActive=true` を追加で明示した場合だけ選ぶ。既定の観測専用は書込みを行わず、Windowsブラウザーの手動操作を保持する。自動改名設定を追加せず、既存の制御JSONと明示的なチーム名設定を維持する。無効時はUDP受信・Game Controller接続・制御・診断経路の登録を行わず、診断は404となる。HTTPサーバー自体を起動しない契約ではない。
+
+`GET /health/referee` は `isReady`、現在の `reason`、自身の `diagnostic`、有効なAPI観測の `api` を返す。正常な復号と進捗、完全ID、同じ受信世代・送信元・件数に対応する証跡、UDPの5秒以内とAPI取得開始から3秒以内の新しさ、状態一致が揃う場合だけ200とする。欠落・未知の経過時間・古入力・不一致は503で、再取得により新しさを延命しない。協定世界時の受信日時は時差を含む形式で表示し、単調時刻を異なるプロセス間で比較しない。APIの指令番号を仮定せず、異なる通信規約の原子的な同期とはしない。
+
+応答の全項目と設定の型・既定値は主設計に従う。失敗後の理由は `NoObservation` となり得て、最後の失敗履歴を保持する契約ではない。内部39110の待受、コンテナ用でない127.0.0.1待受、将来のWindows動的127.0.0.1公開を分ける。
+
+標準のUDP生成処理と要求ごとの `ClientWebSocket` 生成を本番経路へ登録する。CIの組成試験は通信口と時計を置換して実復号・依存登録・常駐処理・HTTP・停止・制御順を確認し、実ソケット設定は別の動的ポート試験で確認する。薄い入口の単独起動、すべての標準通信口を使う実行、実Game Controllerと名前の再解決、Docker Desktop／Windows／DCP所有の受入は未検証である。資源配線や配布物、名前空間共有候補の採用・適用を完了扱いにしない。
 
 ## TIGERs tracker
 
@@ -50,7 +114,7 @@ TIGERs は `tigersmannheim/sumatra` image を使用する。Sumatra の `simulat
 --headless
 --visionAddress 224.5.23.2:10020
 --refereeAddress 224.5.23.1:11003
---moduli simulation_protocol
+--moduli simulation_protocol_comparison
 ```
 
 Sumatra image は移動タグをそのまま再現試験の識別子にしない。利用できる固定 version tag がある場合はそれを使い、固定 tag が無い場合は Docker image digest を AppHost 設定と試験証跡へ保存する。
@@ -71,13 +135,16 @@ ER-Force は Crane の開発用 compose で利用実績がある `roboticserlang
 
 ## DebugHost の起動設定
 
-`debug-host` は `Tracker.DebugHost` をホスト上の .NET project resource として起動する。比較専用 observer とし、DebugHost 自身の tracker は動かさない。AppHost の依存グラフでは Duck project-start 通知と両外部 tracker wrapper の ready を待つ。project process の起動だけでは DebugHost を ready としない。comparison health が Duck / TIGERs / ER-Force の三 logical role を別 source identity へ解決し、同じ有限の確認窓で各 source の新しい tracker packet を受信した場合だけ ready とする。外部 multicast packet は Docker container の所有証拠に用いず、wrapper が別途 exact owner inspection と container 内 service readiness を確認する。
+`debug-host` はブリッジ内の `Tracker.DebugHost` コンテナとして起動する。比較専用の監視役とし、自身の追跡と UDP 送信は動かさない。受信開始後に同じ有限窓の Duck / TIGERs / ER-Force の追跡情報を調べ、三つの 比較対象の役割 が互いに別の 送信元識別子 へ一意に対応した場合だけ `Ready` とする。コンテナ開始だけでは準備完了としない。
+
+simulator の起動を Duck／DebugHost の受信待ちに依存させない。比較追跡器は simulator と Game Controller の準備を待つ。DebugHost の起動前に三者の受信完了を要求せず、起動後の 比較の準備確認 で判定する。各受信証跡と外部サービスの準備確認はブリッジ内で採取し、主設計に定めた限定 HTTP 接続先で DCP／AppHostへ伝える。旧ホスト側の `TrackerPacketReadinessMonitor` 等をそのまま残さない。
 
 AppHost から最低限、次を上書きする。
 
 - `VisionReceiver:MulticastAddress=224.5.23.2`。
 - `VisionReceiver:Port=10020`。
 - `Tracker:Enabled=false`。
+- `Tracker:PublishUdp=false`。
 - `Tracker:Receive:Enabled=true`。
 - `Tracker:Receive:MulticastAddress=224.5.23.2`。
 - `Tracker:Receive:Port=11010`。
@@ -178,14 +245,19 @@ assignment の結果は、まず候補 edge 内で対応する pair 数を最大
 
 ## デバッグ操作
 
-比較モードでは次の流れを主なデバッグ手順とする。
+比較モードでは次の手順で確認する。デバッグ接続、記録先、取り出しと再生の共通契約は[主設計](aspire-simulation-test-environment.md#debughost-のデバッグと記録)に従う。
 
-1. Aspire から Simulator、Crane、Duck、TIGERs tracker、ER-Force tracker、DebugHost を一括起動する。
-2. DebugHost の live Compare で Duck / TIGERs / ER-Force が別 source として受信されていることを確認する。
-3. Split または Overlay で視覚的なずれを確認する。
-4. `Tracker Difference` で同じ snapshot pair の位置、速度、角度、存在差を見る。
-5. 再現が必要な場合は CaptureOn を開始する。
-6. `/diagnostics` で同じ diagnostics sample tick に各 tracker を合わせ、問題が発生した時点を scrub して比較する。
+1. Windows AppHost から、同じ Docker Desktop ブリッジの simulator、Game Controller、Crane、必要な cm4-sim、Duck、TIGERs、ER-Force、DebugHost、RefereeDriver、準備確認機能を選択して起動する。
+2. Dashboard の `debug-host` の 127.0.0.1 URL を Windows ブラウザーで開く。三つの 比較対象の役割 の別 識別子 と受信時刻を確認する。Game Controller は別の 127.0.0.1 URL から操作する。
+3. Split／Overlay と `Tracker Difference` で、固定した同じ二つの追跡状態の物体差と時刻差を見る。
+4. 実行を一時停止する場合は、DCP の当該所有コンテナ完全 ID とプロセスIDを確認し、Windows のデバッグ環境から `docker.exe --context desktop-linux exec -i <完全ID> /vsdbg/vsdbg --interpreter=vscode` の標準入出力で接続する。同じ版のソースコードとデバッグ情報ファイルを対応付け、デバッグ TCP ポートは公開しない。停止中の古いパケットを受入計測へ含めない。
+5. CaptureOn／CaptureOff で記録を確定し、`%LOCALAPPDATA%\\Duck\\Aspire\\<run-id>\\captures` に raw vision、診断、三者の追跡情報と時刻・送信元の関連ファイルが残ったことを確認する。コンテナの `/data/captures` とこの保存先を割り当てる。
+6. `/diagnostics` では同じ diagnostics sample tick に三者を合わせる。取り出す場合は Windows の記録保存先全体を複製する。後日の再生専用起動は保存先を `/data/replay` へ読み取り専用で割り当てる。通常停止や再作成で元記録を削除しない。
+
+Windowsでの接続方法、デバッグ用配布物、保存先の読み書きの権限、再生時の読み取り専用動作は未実装・未検証である。操作手順を記述したことは成功の証拠ではない。
+
+再生専用の起動は主設計の `Testing:DebugHost:ReplayOnly=true` と `Testing:DebugHost:ReplayDirectoryPath` を明示し、`DebugHost` だけを起動する。`/data/replay` はホスト上の既存保存先を読み取り専用で割り当て、`CaptureOn` と実行制御による記録開始、UDP送受信・追跡データ送信を無効にする。保存元は変更・削除しない。
+通常用 `DebugHost` の基底、固定参照、発行出力の入力元は[Linux配布設計](aspire-simulation-test-environment.md#linux-向け通常コンテナの配布定義-i81-04b2)のI81-04B2に従う。`/vsdbg/vsdbg` などの追加デバッグ資材とWindowsからの接続はI81-04B3および実機受入で別に確認し、通常用コンテナイメージの定義を成功根拠にしない。
 
 ## 起動失敗と部分起動
 
@@ -195,18 +267,17 @@ TIGERs または ER-Force tracker の一方が起動できなくても Duck と 
 
 ## OS 別ネットワーク動作確認
 
-比較モードは `Tracker/Design/Testing/aspire-simulation-test-environment.md` の `ASPIRE-NET-001` から `ASPIRE-NET-009` に従って Linux、Windows Docker Desktop、macOS Docker Desktop を個別に確認する。
+主設計の `ASPIRE-NET-001`〜`ASPIRE-NET-009`、`ASPIRE-HOST-001`、`ASPIRE-DEBUG-001`、`ASPIRE-CAPTURE-001` を適用する。今回の移行受入は Windows AppHost と利用者の Docker Desktop を対象とする。Linux／macOSへの対応も、同じ配置契約で個別に実測する。
 
-特に比較モードでは次を必須とする。
+- 同じブリッジの Duck、DebugHost、TIGERs、ER-Force が、simulator の `224.5.23.2:10020` を同じ有限窓で受信する。Duck 自身は安定起動後5秒以内に新しい検出データ10件以上を復号する。
+- 三者の `224.5.23.2:11010` を DebugHost が同時に受信し、三つの比較対象の役割を別々の識別子として保持する。Game Controller等の必要受信側にも届く。
+- Game Controller が唯一生成する `224.5.23.1:11003` を両比較追跡器と必要な観測機能が受信し、Windows画面操作、API状態、内部審判情報で同じ試合遷移を確認する。
+- 同じマルチキャストの宛先／ポートの受信者を開始・停止しても、他の受信件数が止まらない。コンテナ内の `InterfaceAddress` 未指定と明示IPv4の双方を確認する。
+- 個別再作成後に新しい完全IDと接続先を取得し、応答先の更新、マルチキャストの宛先への再参加、三者の新しさに基づく準備復帰を確認する。
+- RefereeDriverの既定観測は書込み0を維持し、Windows画面の手動操作と明示自動制御を分ける。自身の `GET /health/referee` で完全ID、受信世代、件数、協定世界時の受信日時、単調経過時間、API照合を確認し、無効404／準備不足503／一致200を区別する。
+- WindowsブラウザーからGame ControllerとDebugHostへ到達し、127.0.0.1以外の待受がないことを準備確認口も含めて確認する。記録の取り出し・再生とデバッグ接続も別条件として記録する。
 
-- Simulator container の `224.5.23.2:10020` を、TIGERs container、ER-Force container、ホスト上の `Tracker.RuntimeHost`、`Tracker.DebugHost` が同時に受信できる。
-- TIGERs / ER-Force container の `224.5.23.2:11010` をホスト上の `Tracker.DebugHost` が受信できる。
-- Duck の `224.5.23.2:11010` も同じ DebugHost が同時に受信し、Duck / TIGERs / ER-Force を別 source として保持できる。
-- 同一 multicast group / port の複数受信で、一つの受信者を起動したことにより他の受信者の packet count が停止しない。
-- `InterfaceAddress` 未指定時と、明示 IPv4 address を指定した fallback の両方を確認する。
-- VPN、Tailscale、複数 NIC がある環境では interface 一覧と選択結果を証跡へ残す。
-
-Windows / macOS で multicast が成立しない場合は comparison mode を Ready とせず、relay などの別方式へ自動的に切り替えない。
+ブリッジ内の独立観測器の件数だけ、Windowsホストだけの観測、別Docker Engineや別OSでの成功は対象サービス自身とWindows Docker Desktopの受入に代用しない。通信が成立しない場合は `Ready` とせず、UDP公開、中継、ホストネットワークへ自動変更しない。
 
 ## テスト方針
 
@@ -215,15 +286,19 @@ Windows / macOS で multicast が成立しない場合は comparison mode を Re
 AppHost の application model test で次を先に固定する。
 
 - `tracker-tigers`、`tracker-erforce`、`debug-host` が比較モードに存在する。
-- `tracker-tigers` / `tracker-erforce` が wrapper executable resource として登録され、owner inspection と service readiness predicate を持つ。
+- Duck、両外部追跡器、DebugHost、RefereeDriver、準備確認機能が DCP の同じコンテナネットワークに所属する。所有ID照合とサービス自身の準備確認を分ける。
 - 両 tracker が基底構成の ready な `simulator` / `game-controller` に health-based `WaitFor` し、11003 の producer を追加しない。
 - `tracker-tigers` が `gameController=false`、`publishRefereeMessages=false` の外部 Game Controller 用設定を使う。
-- TIGERs / ER-Force tracker が host network を使う。
+- 全UDP参加者が同じブリッジを使い、ホストネットワーク、UDPホスト公開、旧Docker起動管理プログラムを使わない。
 - TIGERs が raw vision 10020 を入力し tracker 11010 を出力する設定である。
 - ER-Force が `--vision-port 10020 --tracker-port 11010` で起動する。
 - DebugHost の tracker receiver が 11010 で有効になる。
 - DebugHost 自身の tracker が無効である。
-- `debug-host` が `Tracker.DebugHost` project resource で、Duck project-start と両 tracker wrapper ready に依存する。
+- `debug-host` はコンテナ資源で、受信開始後に三者の準備を判定する。simulatorと受信側の起動に循環依存を作らない。
+- Game ControllerとDebugHostのUI、HTTP準備確認は、主設計の内部ポートから127.0.0.1の動的TCPへ対応付け、再作成後に更新する。
+- RefereeDriverの明示設定、既定観測の書込み0、内部接続先の自己宛先拒否、同じ受信処理を使う明示制御、停止と所有資源回収、診断本文と200／503／無効404を標準組成試験で固定する。
+- RefereeDriverのUDP観測と旧準備確認の受信をWindowsに残さない。記録のWindows保存先、デバッグ接続の対象IDを実行IDと結び付ける。
+- 通常の比較起動では実行ID別の新規Windows保存先だけを作成して `/data/captures` を読み書き可能で割り当てる。再生専用の明示選択では `DebugHost` だけを起動し、既存保存先を `/data/replay` に読み取り専用で割り当て、`CaptureOn` をUIと実行制御から拒否し、視覚入力と追跡データのUDP受信・送信を登録しない。保存先の指定に問題がある場合は割当て前に失敗し、既存保存元は作成・変更・削除しない。
 - DebugHost comparison health が三 source identity の個別解決と同じ確認窓の新しい packet を要求する。tracker resource ready と DebugHost source readiness を別々に model / focused test で固定する。
 
 DebugHost の focused test では次を固定する。
@@ -247,7 +322,7 @@ DebugHost の focused test では次を固定する。
 
 ## 実装単位
 
-- `ASPIRE-006A`: tracker 二資源を個別 wrapper executable resource、DebugHost を .NET project resource として追加する。owner inspection / 固有 readiness / health-based 依存辺を model / wrapper test で固定する。
+- `ASPIRE-006A`: 比較資源の役割と準備確認を維持する。#81でDuck／DebugHostを含む標準コンテナ資源へ移し、DCP所有・同じブリッジ・限定TCP接続先を構成試験で固定する。旧起動管理の実装の検証は移行後の証拠にしない。
 - `ASPIRE-006B`: source identity、三 tracker の同時 packet readiness、DebugHost comparison health の回帰 test を追加する。
 - `ASPIRE-006C`: `Tracker Difference` の物体対応付けと数値差分モデルを TDD で追加する。
 - `ASPIRE-006D`: live Split / Overlay と数値差分を同じ snapshot pair へ接続する。
@@ -264,8 +339,8 @@ DebugHost の focused test では次を固定する。
 
 ## 完了条件
 
-- 一回の Aspire 起動で Duck / TIGERs / ER-Force tracker と DebugHost を比較モードとして起動できる。tracker 二資源は owner inspection と固有 readiness を持つ wrapper container、DebugHost は project resource である。
-- tracker 二資源は ready な Simulator / Game Controller を待つ。DebugHost は Duck project-start と両 tracker ready を待ち、三 role の別 identity と新しい packet を確認する自身の comparison health を持つ。
+- 一回の Windows Aspire 起動で、Duck／TIGERs／ER-Force／DebugHostと全UDP参加者を同じDCP管理のDocker Desktopブリッジへ起動できる。DCPが唯一のコンテナ管理者である。
+- 両比較追跡器は準備完了した simulator／Game Controllerを待つ。DebugHostは起動後に三つの比較対象の役割に対応する別々の識別子と新しいパケットを確認する。受信を待つ起動循環を作らない。
 - 三 tracker が同じ raw vision stream を入力として使用する。
 - DebugHost が三 source の official tracker packet を別 source として識別できる。
 - live で Split / Overlay と数値差分を確認できる。
@@ -273,4 +348,5 @@ DebugHost の focused test では次を固定する。
 - robot の位置・速度・角度・存在差と、ball の対応・位置・速度・存在差を追跡できる。
 - 時刻差が物体差と分離して表示され、古い snapshot を同時刻の結果と誤認しない。
 - 比較機能が利用できない場合でも通常の Duck + Crane シミュレーション試験は維持される。
-- 対応対象 OS ごとに container → host / container → container の multicast と同一 group / port の複数受信を実機で確認し、未確認 OS を対応済みと扱わない。
+- Windowsの実機でブリッジ内のマルチキャストと同じマルチキャストの宛先／ポートの複数受信を示す。他OSは個別確認し、未確認OSを対応済みと扱わない。
+- WindowsからのGame Controller／比較画面操作、限定TCP待受、所有IDを確認したデバッグ接続、記録の取り出しと停止後の再生を主設計の条件で示す。

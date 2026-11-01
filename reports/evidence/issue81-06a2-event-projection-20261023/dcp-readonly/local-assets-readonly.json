@@ -1,0 +1,40 @@
+{
+  "captured_utc": "2026-10-23T14:58:57.760557+00:00",
+  "assets": [
+    {
+      "path": "Tracker/Tracker.RuntimeHost/Dockerfile",
+      "exists": true,
+      "bytes": 233,
+      "sha256": "70846d6a485e77470931e3bce193378b6b577140e9ba0b5233a168b557bf7661"
+    },
+    {
+      "path": "Tracker/Tracker.RuntimeHost/LinuxContainer.pubxml",
+      "exists": false
+    },
+    {
+      "path": "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll",
+      "exists": false
+    },
+    {
+      "path": "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.runtimeconfig.json",
+      "exists": false
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll",
+      "exists": true,
+      "bytes": 140288,
+      "sha256": "555629738522b3c40d9990b285b84d53632c7d56b4ee02cb08ff803d23d46efb"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/bin/Release/net10.0/publish/Duck.Testing.AppHost.dll",
+      "exists": false
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/linux-image-lock.json",
+      "exists": true,
+      "bytes": 6666,
+      "sha256": "91492b44d44cd95a67b50d5de2498f464acf87519213d61df000d6b9c41c51d8"
+    }
+  ],
+  "scope": "filesystem stat/hash only; no build or start"
+}

@@ -1,0 +1,177 @@
+[
+  {
+    "path": "RefereeReceiveCacheRaceTests.api.txt",
+    "sha256": "e46c6af878ba2ab6898c897bd198e149c4a0ee24d31493823a9a885e39a54782",
+    "bytes": 361,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/RefereeReceiveCacheRaceTests.api.txt"
+  },
+  {
+    "path": "RefereeReceiveCacheRaceTests.cs",
+    "sha256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "bytes": 9108,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/RefereeReceiveCacheRaceTests.cs"
+  },
+  {
+    "path": "RefereeReceiveService.after.cs",
+    "sha256": "0c045bf368621f7e3341cd4276cf401b4bb857e0666fd406fa6e7cbf6514ba5f",
+    "bytes": 9857,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/RefereeReceiveService.after.cs"
+  },
+  {
+    "path": "RefereeReceiveService.before.cs",
+    "sha256": "084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0",
+    "bytes": 9178,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/RefereeReceiveService.before.cs"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "expectations-and-matrix.json",
+    "sha256": "ba2c84b27545aadcc9b4223b9cf828d6911b468cacdce9450e4cf6263b8d32ea",
+    "bytes": 2568,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/expectations-and-matrix.json"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "git-status.txt",
+    "sha256": "4ab7380a881305e7e38a5c009b86c2170a70dc0876341809f555f97967948d0d",
+    "bytes": 243,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/git-status.txt"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "6071f20b0d7f97a116ae4875a92e870279c4316c687b92f2daf1b2cde9b96894",
+    "bytes": 3542,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "d6267e1bcc98d872e02a631bd755d239bad793390364d435762af6ba610b35e8",
+    "bytes": 133,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/process-state.json"
+  },
+  {
+    "path": "protected-report-hash.json",
+    "sha256": "27775d4dd32872b3b7acee06b72e342d7b13cef7204e3582987a360b4f7242a6",
+    "bytes": 264,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/protected-report-hash.json"
+  },
+  {
+    "path": "report-added-sections-readback.md",
+    "sha256": "7e3ec90f52179aa5496ef42ce9b5a42169b09106676bbf9690ae2c289b082c50",
+    "bytes": 4722,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/report-added-sections-readback.md"
+  },
+  {
+    "path": "seam-only-identity-proof.json",
+    "sha256": "fc4e44bd9a434ce57b106d917c59b86a14079ee912f5694b4f2cc09bcf2e464f",
+    "bytes": 355,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/seam-only-identity-proof.json"
+  },
+  {
+    "path": "seam.diff",
+    "sha256": "3b9d37b0d5bfe8feb7ad6cb8c82071dacbaa74c45d9fd3869c4b452d9ffa5236",
+    "bytes": 2765,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/seam.diff"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "e956042db61faaaf525a46979f0d293bb26072aacffa455035d3d1a38bda0d85",
+    "bytes": 708,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "e8097105a5f86072f7bfc2a6f0cab65b6cc3281b36c933e73a47313cc850807e",
+    "bytes": 493,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "f4fd43b45d33f4d8f25f5778504684aac45b7c61ecce5e1273dea998745bee78",
+    "bytes": 893,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "136d301d6f8b0078c31865fbc318313efd11fc06e98cc831308f5ff508129ac8",
+    "bytes": 384,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "unchanged22-source-checks.json",
+    "sha256": "14ccd7ed61ea096472cb5800dcb39991e786fd7217954c23da49c997094d34ef",
+    "bytes": 4122,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-red-preparation-20261022/unchanged22-source-checks.json"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "xmlParse": "success",
+    "sha256": "d88cff4feaa64d8838a94e592ca6e151569b488ca9c05eb6872992209e4dc894",
+    "frameworkReferences": [
+      {
+        "Include": "Microsoft.AspNetCore.App"
+      }
+    ]
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "xmlParse": "success",
+    "sha256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "frameworkReferences": []
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "xmlParse": "success",
+    "sha256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "frameworkReferences": []
+  },
+  {
+    "path": "Duck.slnx",
+    "xmlParse": "success",
+    "sha256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "frameworkReferences": []
+  }
+]

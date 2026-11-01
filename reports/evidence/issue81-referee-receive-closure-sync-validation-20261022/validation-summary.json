@@ -1,0 +1,85 @@
+{
+  "head": "08d49cdf270ea5ab090a211c84d43190710cd3c9",
+  "scope": "final closure tracking changed-line fragments only",
+  "documentCount": 2,
+  "sourceLineCount": 3,
+  "sourceLines": {
+    "Tracker/Design/tasks-status.md": [
+      27,
+      28
+    ],
+    "Tracker/Design/phases-status.md": [
+      14
+    ]
+  },
+  "lineMapAndHashes": "fragment-manifest.json",
+  "textlintExit": 0,
+  "cspellExit": 0,
+  "cspellIssues": 0,
+  "sudachiExitCodes": [
+    0,
+    0
+  ],
+  "sudachiViolations": 0,
+  "newVocabulary": [],
+  "dictionaryDerivedFromSameWhitelist": true,
+  "dictionaryTermCount": 255,
+  "dictionarySHA256": "d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7",
+  "baseImports": [],
+  "configRoot": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-closure-fragments-20261022",
+  "globRoot": ".",
+  "filesGlob": [
+    "**/*.md"
+  ],
+  "moduleResolution": [
+    {
+      "name": "cspell",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\package.json",
+      "version": "9.8.0",
+      "sha256": "523aa67074d62d648e69de2fef9a86a378d85bda9e1ab1b635bac5ec332d93a3"
+    },
+    {
+      "name": "textlint",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\package.json",
+      "version": "15.7.0",
+      "sha256": "b090b44e5aac9404d659be674efa80e84a4581dee6fdc62f7c5a0ed1aa645c7e"
+    },
+    {
+      "name": "yaml",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\package.json",
+      "version": "2.9.0",
+      "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+    },
+    {
+      "yamlResolved": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\dist\\index.js"
+    }
+  ],
+  "knownFullGate": "not rerun; known24 docs textlint0/CSpell1(232)/Sudachi1(890), remains failed",
+  "closure": {
+    "red": {
+      "runId": 39820168338,
+      "head": "cd7760fde7ec54d2fc69d157af61dc1a68d810ac",
+      "total": 652,
+      "passed": 651,
+      "failed": 1,
+      "assertion": "RefereeReceiveCacheRaceTests.cs:89"
+    },
+    "green": {
+      "runId": 39821519633,
+      "head": "08d49cdf270ea5ab090a211c84d43190710cd3c9",
+      "total": 652,
+      "passed": 652,
+      "failed": 0,
+      "artifactCount": 0,
+      "individualTRX": false
+    },
+    "normalReview": {
+      "finding": "I81-NR-002",
+      "disposition": "closed",
+      "verdict": "pass_with_held",
+      "requiredFindings": 0,
+      "reportSHA256": "f10f202d786e9c4279c8d9959e06418303503bbc85718de5962b52d2bbfa8355"
+    }
+  },
+  "noNewBuildTestCI": true
+}

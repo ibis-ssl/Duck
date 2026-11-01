@@ -1,0 +1,63 @@
+{
+  "head": "7cd1c2512872062d80b8d83312f2a19065e81b31",
+  "source_paths": [
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  ],
+  "source_sha256": {
+    "Tracker/Design/tasks-status.md": "0cbfaa8c5c18a2dcf3324745cb46cc80299af9ba2bd5b43043d87482b4e953cf",
+    "Tracker/Design/phases-status.md": "e2c6446ebadb87a73955703b617a13244dafc715f92bd55f750c16103a557146",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "d259bcbd3d5722a97da2ff66f2715c7f67b3d2c38c68fc71a9be4f491d80ed1f"
+  },
+  "current_added_line_counts": {
+    "Tracker/Design/tasks-status.md": 4,
+    "Tracker/Design/phases-status.md": 2,
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": 2
+  },
+  "baseline_deleted_line_counts": {
+    "Tracker/Design/tasks-status.md": 3,
+    "Tracker/Design/phases-status.md": 0,
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": 0
+  },
+  "input_paths": [
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  ],
+  "input_sha256": {
+    "Tracker/Design/tasks-status.md": "a81f2238025bedc46ed7f7121e06c30c77165531654d50409db91e6ef163cae2",
+    "Tracker/Design/phases-status.md": "787d76747436ee2128a9d7f31b5b9f21e6259e2d2b16140720eace54bd7c9388",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "15dc21edbb5a4951225b6486b36c4c2a8aee9d3ece49465e7b19c389d9d1a7f0"
+  },
+  "input_bytes": {
+    "Tracker/Design/tasks-status.md": 2492,
+    "Tracker/Design/phases-status.md": 467,
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": 1257
+  },
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "node_exe": "/mnt/c/Program Files/nodejs/node.exe",
+  "node_version_stdout": "v24.20.0\r\n",
+  "node_version_exit": 0,
+  "module_resolve_stdout": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\package.json",
+  "module_resolve_stderr": "",
+  "module_resolve_exit": 0,
+  "node_modules_junction_target": "C:/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+  "config_sha256": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/scripts/run-markdown-targets.js": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33"
+  },
+  "sudachi_python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "sudachi_python_exists": true,
+  "sudachi_package_versions": {
+    "error": "No package metadata was found for SudachiPy"
+  },
+  "current_added_lines_total": 8,
+  "baseline_deleted_lines_total": 3
+}

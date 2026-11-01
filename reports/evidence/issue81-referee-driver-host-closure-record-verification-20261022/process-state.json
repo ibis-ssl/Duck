@@ -1,0 +1,27 @@
+{
+  "observedUTC": "2026-10-22T21:53:48.043086+00:00",
+  "ownedToolSessions": [
+    {
+      "sessionId": 17944,
+      "exit": 1,
+      "state": "terminated",
+      "reason": "CSpell exit1 assertion; retained"
+    },
+    {
+      "sessionId": 65033,
+      "exit": 0,
+      "state": "terminated"
+    },
+    {
+      "sessionId": 31545,
+      "exit": 0,
+      "state": "terminated"
+    }
+  ],
+  "pendingOwnedProcesses": [],
+  "pendingOwnedSessions": [],
+  "pendingApproval": false,
+  "newBuildTest": false,
+  "mirrorRemoved": true,
+  "cachePreserved": true
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "required": "明示Enabledだけで待受/routeを追加し、ContainerMode trueの内部39110とfalseのloopbackを区別",
+    "productionPath": "RefereeDriverHost.ConfigureHttp / MapHealth bool.TryParse guards; WebHost.UseUrls",
+    "actualFixture": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:27 EnabledBindingFollowsExplicitContainerMode(2), :38 DisabledBindingPreservesExistingSettings(2), :140 DisabledHealthDoesNotExposeAReadyEndpoint(2)",
+    "acceptedRed": "CI39846734850 line32 expectedconfiguredURL actualnull (2 failed), disabled4 Passed",
+    "candidateEvidence": "syntax0/XML4/diff0; fixed11 unchanged; runtimeGreen pending"
+  },
+  {
+    "required": "実service/diagnostics/matcherからowner/epoch/count/UTC/age/APIcontextをHTTP200として射影",
+    "productionPath": "MapHealth -> RefereeApiMatcher.GetCurrent -> same-packet receive/observer snapshots -> Results.Json",
+    "actualFixture": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:48 HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput (actual parser/receive/diagnostics/client/observer/matcher DI, isolated Kestrel dynamicport)",
+    "acceptedRed": "line54 ExpectedOK ActualNotFound; newHost.dll build succeeded",
+    "candidateEvidence": "singleHostSource implementation, candidateSHA bound; runtimeGreen pending"
+  },
+  {
+    "required": "欠落/短ID/不一致/無入力を503、healthpollで入力を取得せずageを延命しない",
+    "productionPath": "MapHealth existing match.IsReady chooses200/503; diagnostic matchedsnapshot or currentledger display; no ReadAsync/Receive/clock setter",
+    "actualFixture": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs:92 owner2, :107 mismatch1, :124 noinput1; :48 exactAPIwindow3s/+tick and receive/connect/write/dispose counts",
+    "acceptedRed": "line98/115/129 ExpectedServiceUnavailable ActualNotFound (4 failures); deeperpayload/expiryassertions not reached onRed",
+    "candidateEvidence": "no newclock/transport/async/worker; immutable projection only; runtimeGreen pending"
+  },
+  {
+    "required": "旧runtime/PublicAPI/control defaultsを保つ",
+    "productionPath": "HTTP frameworkreference stays newHost project; oldcore/library/controller untouched; no Program/standardDI/worker/AutoDrive additions",
+    "actualFixture": "old734/independent67/race individuallyPassed onacceptedRed; source38 excludingonlyHosthelper unchanged",
+    "acceptedRed": "745total738pass7fail; old734allPassed; errors/timeouts0",
+    "candidateEvidence": "unchanged38-source-guards.json; allcsprojXMLparse; runtimeGreen pending"
+  }
+]

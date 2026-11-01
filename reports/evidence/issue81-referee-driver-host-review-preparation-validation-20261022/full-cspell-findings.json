@@ -1,0 +1,1394 @@
+[
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 5,
+    "column": 10,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 7,
+    "column": 23,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 8,
+    "column": 9,
+    "token": "task"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 8,
+    "column": 14,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 8,
+    "column": 29,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 8,
+    "column": 37,
+    "token": "bridge"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 10,
+    "column": 41,
+    "token": "localhost限定bindを確定する"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 12,
+    "column": 50,
+    "token": "HEAD"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 7,
+    "token": "tasks"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 13,
+    "token": "status"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 23,
+    "token": "reports"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 31,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 39,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 47,
+    "token": "bridge"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 15,
+    "column": 54,
+    "token": "implementation"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 16,
+    "column": 14,
+    "token": "Draft"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 16,
+    "column": 36,
+    "token": "lint"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 16,
+    "column": 60,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/phases-status.md",
+    "line": 16,
+    "column": 66,
+    "token": "closeやmergeは行っていない"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 7,
+    "column": 4,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 5,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 58,
+    "token": "Draft"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 110,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 117,
+    "token": "closed"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 125,
+    "token": "Pull"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 129,
+    "token": "Requests"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 137,
+    "token": "References"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 157,
+    "token": "closing"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 164,
+    "token": "Issues"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 170,
+    "token": "References"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 205,
+    "token": "baseはtask"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 229,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 10,
+    "column": 242,
+    "token": "非既定baseのため自動closeとは区別する"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 9,
+    "token": "task"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 14,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 29,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 37,
+    "token": "bridge"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 51,
+    "token": "home"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 56,
+    "token": "donabe"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 68,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 83,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 91,
+    "token": "bridge"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 150,
+    "token": "task"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 11,
+    "column": 169,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 12,
+    "column": 29,
+    "token": "pass"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 12,
+    "column": 34,
+    "token": "with"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 12,
+    "column": 39,
+    "token": "held"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 12,
+    "column": 61,
+    "token": "Draft"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 12,
+    "column": 95,
+    "token": "Issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 14,
+    "column": 19,
+    "token": "reports"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 14,
+    "column": 27,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 14,
+    "column": 35,
+    "token": "desktop"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 14,
+    "column": 43,
+    "token": "bridge"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 14,
+    "column": 50,
+    "token": "implementation"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 15,
+    "column": 143,
+    "token": "file"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 15,
+    "column": 214,
+    "token": "merge"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 14,
+    "token": "tracker"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 22,
+    "token": "comparison"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 33,
+    "token": "debug"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 39,
+    "token": "design"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 136,
+    "token": "Green"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 160,
+    "token": "test"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 17,
+    "column": 165,
+    "token": "first"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 18,
+    "column": 12,
+    "token": "reports"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 18,
+    "column": 20,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 18,
+    "column": 28,
+    "token": "readiness"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 18,
+    "column": 38,
+    "token": "contract"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 18,
+    "column": 47,
+    "token": "implementation"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 23,
+    "column": 40,
+    "token": "loopback"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 23,
+    "column": 78,
+    "token": "のlocalhost限定bindを一次ソースで確定"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 53,
+    "token": "schema"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 138,
+    "token": "ready"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 193,
+    "token": "pass"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 198,
+    "token": "with"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 203,
+    "token": "held"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 222,
+    "token": "closed"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 229,
+    "token": "library"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 237,
+    "token": "build"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 245,
+    "token": "harness"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 260,
+    "token": "HEAD"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 289,
+    "token": "Tracker"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 297,
+    "token": "Tests"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 24,
+    "column": 325,
+    "token": "final"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 72,
+    "token": "geometry"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 103,
+    "token": "pass"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 108,
+    "token": "with"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 113,
+    "token": "held"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 246,
+    "token": "reports"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 254,
+    "token": "issue"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 269,
+    "token": "normal"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 25,
+    "column": 276,
+    "token": "review"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 129,
+    "token": "skip"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 187,
+    "token": "hash"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 217,
+    "token": "pack"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 223,
+    "token": "file"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 235,
+    "token": "root"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 248,
+    "token": "independent"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 260,
+    "token": "spec"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 265,
+    "token": "tests"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 288,
+    "token": "high"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 293,
+    "token": "fork"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 298,
+    "token": "none"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 303,
+    "token": "applied"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 311,
+    "token": "null"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 349,
+    "token": "manifest"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 371,
+    "token": "sourceを同一byteで配置"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 409,
+    "token": "skip"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 416,
+    "token": "HEAD"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 458,
+    "token": "skip"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 481,
+    "token": "case"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 499,
+    "token": "pass"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 504,
+    "token": "with"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 509,
+    "token": "held"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 516,
+    "token": "finding"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 533,
+    "token": "read"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 583,
+    "token": "exit"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 603,
+    "token": "resolver"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 614,
+    "token": "vision"
+  },
+  {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 26,
+    "column": 621,
+    "token": "store"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 131,
+    "column": 256,
+    "token": "bind"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 131,
+    "column": 308,
+    "token": "bind"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 49,
+    "token": "dual"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 54,
+    "token": "stack"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 60,
+    "token": "wildcard"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 69,
+    "token": "bind"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 169,
+    "token": "wildcard"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 178,
+    "token": "bind"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 196,
+    "token": "Ibis"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 241,
+    "token": "wildcard"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 250,
+    "token": "bind"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "line": 440,
+    "column": 327,
+    "token": "probe"
+  },
+  {
+    "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "line": 284,
+    "column": 91,
+    "token": "Tailscale"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 14,
+    "column": 20,
+    "token": "world"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 14,
+    "column": 26,
+    "token": "predictor"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 14,
+    "column": 38,
+    "token": "tracker"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 15,
+    "column": 26,
+    "token": "tracker"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 15,
+    "column": 34,
+    "token": "source"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 21,
+    "column": 24,
+    "token": "official"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 21,
+    "column": 79,
+    "token": "Split"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 21,
+    "column": 87,
+    "token": "Overlay"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 25,
+    "column": 56,
+    "token": "stream"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 101,
+    "column": 11,
+    "token": "tracker"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 103,
+    "column": 35,
+    "token": "image"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 103,
+    "column": 122,
+    "token": "vision"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 103,
+    "column": 129,
+    "token": "tracking"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 103,
+    "column": 138,
+    "token": "data"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 105,
+    "column": 54,
+    "token": "world"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 105,
+    "column": 60,
+    "token": "predictor"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 105,
+    "column": 72,
+    "token": "tracker"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 116,
+    "column": 9,
+    "token": "image"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 116,
+    "column": 46,
+    "token": "version"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 116,
+    "column": 91,
+    "token": "image"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 116,
+    "column": 97,
+    "token": "digest"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 118,
+    "column": 13,
+    "token": "tracker"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 120,
+    "column": 23,
+    "token": "compose"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 120,
+    "column": 80,
+    "token": "image"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 130,
+    "column": 22,
+    "token": "image"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 130,
+    "column": 37,
+    "token": "version"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 130,
+    "column": 86,
+    "token": "version"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 150,
+    "column": 39,
+    "token": "identity"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 150,
+    "column": 119,
+    "token": "packet"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 150,
+    "column": 165,
+    "token": "remote"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 150,
+    "column": 172,
+    "token": "endpoint"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 86,
+    "token": "remote"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 93,
+    "token": "endpoint"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 112,
+    "token": "source"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 150,
+    "token": "snapshot"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 166,
+    "token": "endpoint"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 190,
+    "token": "snapshot"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 238,
+    "token": "remote"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 245,
+    "token": "endpoint"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 152,
+    "column": 260,
+    "token": "source"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 1,
+    "token": "comparison"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 12,
+    "token": "mode"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 80,
+    "token": "logical"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 88,
+    "token": "role"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 159,
+    "token": "logical"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 167,
+    "token": "role"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 154,
+    "column": 178,
+    "token": "packet"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 156,
+    "column": 3,
+    "token": "logical"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 156,
+    "column": 11,
+    "token": "role"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 156,
+    "column": 25,
+    "token": "resource"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 162,
+    "column": 83,
+    "token": "logical"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 162,
+    "column": 91,
+    "token": "role"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 162,
+    "column": 134,
+    "token": "profile"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 162,
+    "column": 175,
+    "token": "focused"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 162,
+    "column": 183,
+    "token": "test"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 162,
+    "column": 210,
+    "token": "role"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 1,
+    "token": "logical"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 14,
+    "token": "resolver"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 28,
+    "token": "snapshot"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 72,
+    "token": "packet"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 122,
+    "token": "comparison"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 173,
+    "token": "identity"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 213,
+    "token": "remote"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 164,
+    "column": 220,
+    "token": "endpoint"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 1,
+    "token": "comparison"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 12,
+    "token": "mode"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 94,
+    "token": "comparison"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 153,
+    "token": "identity"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 171,
+    "token": "identity"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 209,
+    "token": "identity"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 166,
+    "column": 393,
+    "token": "snapshot"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 1,
+    "token": "live"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 6,
+    "token": "comparison"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 24,
+    "token": "selector"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 150,
+    "token": "sensitive"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 285,
+    "token": "mode"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 292,
+    "token": "replay"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 330,
+    "token": "remote"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 363,
+    "token": "resolver"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 418,
+    "token": "live"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 425,
+    "token": "replay"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 470,
+    "token": "source"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 477,
+    "token": "label"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 168,
+    "column": 483,
+    "token": "replay"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 174,
+    "column": 54,
+    "token": "latest"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 174,
+    "column": 61,
+    "token": "snapshot"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 3,
+    "token": "source"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 23,
+    "token": "frame"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 29,
+    "token": "timestamp"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 48,
+    "token": "render"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 55,
+    "token": "tick"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 80,
+    "token": "timestamp"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 176,
+    "column": 90,
+    "token": "delta"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 180,
+    "column": 17,
+    "token": "replay"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 184,
+    "column": 1,
+    "token": "replay"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 184,
+    "column": 59,
+    "token": "alignment"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 186,
+    "column": 22,
+    "token": "timeline"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 186,
+    "column": 31,
+    "token": "cursor"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 190,
+    "column": 5,
+    "token": "Split"
+  },
+  {
+    "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "line": 190,
+    "column": 13,
+    "token": "Overlay"
+  }
+]

@@ -1,0 +1,248 @@
+﻿{
+  "baseline": "a589ebbce8ca80145df98f209246bbc34b6996d8",
+  "commitState": "pending-parent-commit",
+  "summary": {
+    "gates": 12,
+    "passed": 12,
+    "failed": 0,
+    "timedOut": 0,
+    "inputs": 3
+  },
+  "sourceSnapshots": [
+    {
+      "name": "design",
+      "sha256": "F31D4037FC131DBC265B06809F4E125DE77D569F6ACA953AC7C634986C9FD624",
+      "gitBlob": "3455b738925b749c30c7967fc036a9e0a2fbf711",
+      "bom": true,
+      "crlfCount": 31,
+      "lfOnlyCount": 526
+    },
+    {
+      "name": "tasks",
+      "sha256": "D8F5F7F25C468056C611B1DD90D4FF340E5ED94D251AAD9C26C1C09DA3F34F98",
+      "gitBlob": "cc01d7504f2ca9f5ca03bf254ada3d996528fadd",
+      "bom": true,
+      "crlfCount": 513,
+      "lfOnlyCount": 0
+    },
+    {
+      "name": "phases",
+      "sha256": "848BBD819C6EC41F16EF3A863D45F81E14972DF095F53B00A32653DCD39AD5F2",
+      "gitBlob": "4272d30555a1eb0a02232894bf6595a1fa935c02",
+      "bom": true,
+      "crlfCount": 155,
+      "lfOnlyCount": 19
+    }
+  ],
+  "gateResults": [
+    {
+      "input": "design",
+      "gate": "cspell",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "DC3C92F1056DD216EF4829D6064796983A08D271CA41F5DABBF477424B5D88D5",
+      "copySha256": "DC3C92F1056DD216EF4829D6064796983A08D271CA41F5DABBF477424B5D88D5",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "7B0891CA12E7AB047A2655E8403B4D73814ABFD2830446CA75B74306CF4065FE",
+      "record": "results-final.json"
+    },
+    {
+      "input": "design",
+      "gate": "textlint",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "DC3C92F1056DD216EF4829D6064796983A08D271CA41F5DABBF477424B5D88D5",
+      "copySha256": null,
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "record": "results-final.json"
+    },
+    {
+      "input": "design",
+      "gate": "whitelist",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "dc3c92f1056dd216ef4829d6064796983a08d271ca41f5dabbf477424b5d88d5",
+      "copySha256": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "record": "whitelist-only-20261029T230000Z.result.json"
+    },
+    {
+      "input": "design",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "DC3C92F1056DD216EF4829D6064796983A08D271CA41F5DABBF477424B5D88D5",
+      "copySha256": null,
+      "stdoutSha256": "CAE7D223D2FA4D502FC0AEB75A8D53B743115DC7672B0BB06714559335E7DA0C",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "record": "results-final.json"
+    },
+    {
+      "input": "phases",
+      "gate": "cspell",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "09266E8F0F3E23B155DE082F3F83BE3F06DE07146899037C836ACC14B24A436E",
+      "copySha256": "09266E8F0F3E23B155DE082F3F83BE3F06DE07146899037C836ACC14B24A436E",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "F16C758F2A3D341BA2452A7FBE3A88114DC6204F848EDFFDA6590192D677406F",
+      "record": "results-final.json"
+    },
+    {
+      "input": "phases",
+      "gate": "textlint",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "09266E8F0F3E23B155DE082F3F83BE3F06DE07146899037C836ACC14B24A436E",
+      "copySha256": null,
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "record": "results-final.json"
+    },
+    {
+      "input": "phases",
+      "gate": "whitelist",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "09266e8f0f3e23b155de082f3f83be3f06de07146899037c836acc14b24a436e",
+      "copySha256": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "record": "whitelist-only-20261029T230000Z.result.json"
+    },
+    {
+      "input": "phases",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "09266E8F0F3E23B155DE082F3F83BE3F06DE07146899037C836ACC14B24A436E",
+      "copySha256": null,
+      "stdoutSha256": "F79FA85B5C4B191EC74C00574EA768C7BCBA7EC5874F34D7420F94FC9BC302FF",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "record": "results-final.json"
+    },
+    {
+      "input": "tasks",
+      "gate": "cspell",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "F2F4DA118A929854D95D76B74528E657D9C08E8F79978603B930A48BEDEE3E65",
+      "copySha256": "F2F4DA118A929854D95D76B74528E657D9C08E8F79978603B930A48BEDEE3E65",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "16B4E709A0572FE6DE859B2BEFA7F74E17D73E0B67B3CE577364BF0176BE9A50",
+      "record": "results-final.json"
+    },
+    {
+      "input": "tasks",
+      "gate": "textlint",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "F2F4DA118A929854D95D76B74528E657D9C08E8F79978603B930A48BEDEE3E65",
+      "copySha256": null,
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "record": "results-final.json"
+    },
+    {
+      "input": "tasks",
+      "gate": "whitelist",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "f2f4da118a929854d95d76b74528e657d9c08e8f79978603b930a48bedee3e65",
+      "copySha256": null,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "record": "whitelist-only-20261029T230000Z.result.json"
+    },
+    {
+      "input": "tasks",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "F2F4DA118A929854D95D76B74528E657D9C08E8F79978603B930A48BEDEE3E65",
+      "copySha256": null,
+      "stdoutSha256": "D5937C07FD2C79927C4AD76CEB4AAF48296F2EBF347A432FB7782057C49F7063",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "record": "results-final.json"
+    }
+  ],
+  "notes": [
+    "Nine gate records reused from the saved results-final.json and validated per-row against the final input hashes; three whitelist gates were run separately using the established B3-B command contract.",
+    "Session 58957 could not be retrieved (Unknown process id); no rerun was performed. Individual gate records, not wrapper-session status, are authoritative.",
+    "No product/runtime execution occurred during this documentation verification."
+  ],
+  "localValidation": {
+    "focusedPassed": 14,
+    "relatedPassed": 51,
+    "identityPassed": 4,
+    "releaseBuildExit": 0,
+    "runs": [
+      {
+        "runId": "focused-green-20261029T224846991Z",
+        "startUtc": "2026-10-29T22:48:47.222873Z",
+        "endUtc": "2026-10-29T22:49:04.6873181Z",
+        "exitCode": 0,
+        "sourceSha256": {
+          "Tracker\\Tracker.Tests\\DockerCliCommandRunnerProcessTests.cs": "C20CFA6F407CC367331B62A3AB280BF8F8C3B7AADB27E0B393D8823538FB6E05",
+          "Tracker\\Tracker.Tests\\DcpBaseCraneReadinessProbeTests.cs": "78C013D37BCFB9859A59DECF025CB326794B402CEE3C51948081D13DAFAB7853",
+          "Testing\\Duck.Testing.AppHost\\DcpBaseResourceReadiness.cs": "2E8ED5D3E5003F656A8AEBFDF7E03A6E3DC7B92FEE853B76433C6AAEA162150D",
+          "Testing\\Duck.Testing.AppHost\\ContainerIdentityExecHandoff.cs": "C9B2C64763C20E1A77CACF5E776D0ED50A982FC7953E4D080B713412FC9F65E1"
+        },
+        "stdoutSha256": "108C933D290CE9547EB9036553A300DE02001361B206B9119494708A738DAD92",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "runId": "related-green-20261029T224929270Z",
+        "startUtc": "2026-10-29T22:49:29.5172779Z",
+        "endUtc": "2026-10-29T22:49:45.4879516Z",
+        "exitCode": 0,
+        "sourceSha256": {
+          "Testing\\Duck.Testing.AppHost\\ContainerIdentityExecHandoff.cs": "C9B2C64763C20E1A77CACF5E776D0ED50A982FC7953E4D080B713412FC9F65E1",
+          "Tracker\\Tracker.Tests\\OwnedCm4TransportTargetControllerTests.cs": "12609948C599EAEBD2882D3ACAE1C8F5C879D28602BB31B22FAE1EE3E5104580",
+          "Tracker\\Tracker.Tests\\DockerCliCommandRunnerProcessTests.cs": "C20CFA6F407CC367331B62A3AB280BF8F8C3B7AADB27E0B393D8823538FB6E05",
+          "Testing\\Duck.Testing.AppHost\\DcpBaseResourceReadiness.cs": "2E8ED5D3E5003F656A8AEBFDF7E03A6E3DC7B92FEE853B76433C6AAEA162150D",
+          "Tracker\\Tracker.Tests\\DcpBaseResourceOwnershipEventConsumerTests.cs": "676891EBCF82369E98442FE6E8971F5722D34EFD118C208CFE4F473B6CF7CA3C",
+          "Tracker\\Tracker.Tests\\DcpBaseCraneReadinessProbeTests.cs": "78C013D37BCFB9859A59DECF025CB326794B402CEE3C51948081D13DAFAB7853"
+        },
+        "stdoutSha256": "5C7AD64BA2E7D62D58C1BED082C802F26418F7D05D693C232802B400DC78F3E8",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "runId": "identity-regression-20261029T224959572Z",
+        "startUtc": "2026-10-29T22:49:59.8049973Z",
+        "endUtc": "2026-10-29T22:50:01.2701227Z",
+        "exitCode": 0,
+        "sourceSha256": {
+          "Tracker\\Tracker.Tests\\ContainerIdentityControlExecSessionTests.cs": "B8B4F365B812BD192B9D3505ADE83E23FF635EA5187EBADA457C540017666FB2",
+          "Tracker\\Tracker.Tests\\ContainerIdentityHandoffLifecycleTests.cs": "07E1627FA5648CF88A81951890BBDE8B8E4509F5EF5E5E57CBC665397B38E79C",
+          "Tracker\\Tracker.Tests\\ContainerIdentityCurrentResourceKeyTests.cs": "96583D1A315D37F6B5E69E953E73FD6B046EE4577E6608492FFC4DED165328A3",
+          "Testing\\Duck.Testing.AppHost\\ContainerIdentityExecHandoff.cs": "C9B2C64763C20E1A77CACF5E776D0ED50A982FC7953E4D080B713412FC9F65E1"
+        },
+        "stdoutSha256": "14647FC6250F11570EAF61ED6A1D46A48395F24D63EF5F471D145DF1581B87F4",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "runId": "apphost-release-20261029T225009484Z",
+        "startUtc": "2026-10-29T22:50:09.7189443Z",
+        "endUtc": "2026-10-29T22:50:14.437303Z",
+        "exitCode": 0,
+        "sourceSha256": {
+          "Testing\\Duck.Testing.AppHost\\DcpBaseResourceReadiness.cs": "2E8ED5D3E5003F656A8AEBFDF7E03A6E3DC7B92FEE853B76433C6AAEA162150D",
+          "Tracker\\Tracker.Tests\\DcpBaseCraneReadinessProbeTests.cs": "78C013D37BCFB9859A59DECF025CB326794B402CEE3C51948081D13DAFAB7853",
+          "Tracker\\Tracker.Tests\\DockerCliCommandRunnerProcessTests.cs": "C20CFA6F407CC367331B62A3AB280BF8F8C3B7AADB27E0B393D8823538FB6E05",
+          "Testing\\Duck.Testing.AppHost\\ContainerIdentityExecHandoff.cs": "C9B2C64763C20E1A77CACF5E776D0ED50A982FC7953E4D080B713412FC9F65E1"
+        },
+        "stdoutSha256": "97B931BE147BA150D6993588A4F9A5201AC0202E7ABB560BAF7DA70394165C46",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      }
+    ]
+  },
+  "limitations": [
+    "No runtime, container, helper placement or UDP validation.",
+    "GC/CM4 readiness and complete recreation/reapply remain incomplete.",
+    "Earlier class-name registration assertion is not unchanged-test behavior Red-to-Green.",
+    "Prior a589 design/phases worktree SHA versus Git exact EOL reconstruction remains unconfirmed; added inputs and gate outputs were verified."
+  ]
+}

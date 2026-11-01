@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "--method",
+    "GET",
+    "repos/ibis-ssl/Duck/actions/runs/39821519633/artifacts"
+  ],
+  "exit_code": 0,
+  "utc": "2026-10-22T17:20:31.779979+00:00"
+}

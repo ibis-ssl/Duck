@@ -1,0 +1,34 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "source_sha256": {
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "0ae9ce8a792dafea02959408eb24df1554e32b985035133c98d46a7ab6ac00f8",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "60da26b575e68db2eab483e487cba70928593cae59b8fcc433741a3f51605281",
+    "Testing/Duck.Testing.AppHost/Program.cs": "71a4f86cf8b5a2ff57bd54c73edba22580f39e4ff10b721b9df576afc00bba43",
+    "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj": "2e503984d9a08d665c5e22e18563c7b307cf62e3f906f5c38864c99111b84d8b",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "03907ef030935ded6edbed43ab32b0e5f3d2c23ca8c5ba4e4ca9aaa230f0a9b7"
+  },
+  "commands": [
+    {
+      "index": 1,
+      "argv": [
+        "dotnet",
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "-p:EnableSourceControlManagerQueries=false",
+        "--filter",
+        "FullyQualifiedName~RegisteredContainerExecHandoffTests",
+        "--logger",
+        "console;verbosity=normal"
+      ],
+      "started_unix": 1792770093.8327036,
+      "capture": "subprocess.run stdout/stderr bytes",
+      "exit_code": 1,
+      "timed_out": false,
+      "ended_unix": 1792770099.085361,
+      "stdout_sha256": "f6b13d8e696f004c5d795204d9bdea1dd7b64337dd3f64b7809d54279aa1ee26",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "complete": false
+}
