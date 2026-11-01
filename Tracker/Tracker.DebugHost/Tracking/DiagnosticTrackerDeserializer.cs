@@ -15,6 +15,8 @@ public sealed class DiagnosticTrackerDeserializer(ServiceReceiveDiagnostics diag
 
     public void BeginEpoch() => epoch = diagnostics.BeginEpoch("tracker");
 
+    internal void ApplyIdentityEpoch(ServiceReceiveDiagnostics.ReceiveEpoch identityEpoch) => epoch = identityEpoch;
+
     public bool TryDeserialize(ReadOnlySpan<byte> data, out TrackerPacketAdapter? packet)
     {
         var attempt = diagnostics.BeginReceive(epoch);

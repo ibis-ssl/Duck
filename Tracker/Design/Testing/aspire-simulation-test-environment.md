@@ -12,7 +12,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 課題 #80 の I80-NR-001 に対応し、Duck、DebugHost のサーバー、RefereeDriver の審判情報受信機能、準備確認の受信機能もコンテナ側へ置く。Windows のプロセスにブリッジ内のマルチキャストを直接受信させる経路は要求しない。これは配置の設計変更であり、UDP の公開、中継、ホストネットワークは使わない。Docker Desktop の公式資料は、ブリッジが 仮想環境 内にあり Windows ホストから直接到達できないことを示す（[既知制限](https://docs.docker.com/desktop/features/networking/networking-how-tos/#known-limitations)、[通信の構造](https://docs.docker.com/desktop/features/networking/)）。同じブリッジ内に配置しても、複数受信や外部イメージとの通信の実測は必要である。
 
-現行 `Testing/Duck.Testing.AppHost` の実装はこの設計と異なる。Duck と DebugHost はホスト上の `ProjectResource`、外部資源は Docker コマンド起動管理を介した `ExecutableResource` で、後者は `--network host` を使う。旧 `AddContainer` は DCP の利用者定義ネットワークと `--network host` が競合し、Docker に `cannot attach both user-defined and non-user-defined network-modes` と拒否された。移行時は標準コンテナ資源だけに所有権を集め、同じ引数を戻さない。現行実装や過去の受入証拠を、新配置の実装済み・受入済みの根拠にしない。
+移行前の `Testing/Duck.Testing.AppHost` では、Duck と DebugHost をホスト上の `ProjectResource`、外部資源を Docker コマンド起動管理を介した `ExecutableResource` とし、後者に `--network host` を指定していた。旧 `AddContainer` と `--network host` の併用は DCP のネットワークと競合し、Docker に `cannot attach both user-defined and non-user-defined network-modes` と拒否された。この記録は移行前の構成と失敗理由を示す履歴である。現在の比較モードは選択資源を標準 DCP `ContainerResource` として登録し、ホストネットワークや UDP ホスト受信へ戻さない。過去の受入証拠を現在の構成の証明に転用せず、未確認の OS、画面、デバッグ、再生範囲は個別の受入保留として扱う。
 
 ## 対象資源
 
@@ -254,6 +254,10 @@ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の�
 四資源構成などで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は RefereeDriver にも Duck と同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker Engine IDを照合し、対象コンテナだけに `dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control` を実行する。RuntimeHost 側と同じ `prepare` / `challenge` / `commit` の契約を使い、RefereeDriver 側ではコンテナ内の固定位置 `/tmp/duck-referee-identity.sock` で待ち受ける `Unix` ソケットを使う。ソケットはコンテナ外へ公開せず、既存のUDP通信・Game Controller API接続先・Docker Desktop構成を変更しない。
 
 受信開始時点ではコンテナIDと資源キーが未確定でもよいが、帰属は未成立とする。受信中に正しい識別情報が `commit` された時だけ、既存の単一受信処理の世代を切り替え、旧試行と保持中の指令を無効化する。切替後の新しい正常復号件数が増加するまで準備完了にしない。同じ識別情報の再送は冪等とし、`RunId`・資源キー不一致、世代後退、`BootId` の不一致は拒否する。RefereeDriver未選択時またはブリッジ無効時は新しい監視・制御口を起動しない。この受渡しは所有コンテナを照合した実装経路であり、実機での準備完了・Game Controller API対応成立は別途検証する。
+
+### DebugHost の診断識別子受渡し（比較 DCP）
+
+比較モードで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は登録された DebugHost の現在の資源キーと完全なコンテナIDを、当該実行の `run-id`、`debug-host` 役割ラベル、`Docker Engine ID`、および `Tracker.DebugHost.dll` の起動対象と照合してから、所有コンテナ内の既存 `--identity-control` `exec` 経路を使う。DebugHost は RuntimeHost／RefereeDriver と同じ `prepare` / `challenge` / `commit` 契約を固定位置 `/tmp/duck-debughost-identity.sock` の `Unix` ソケットで受ける。受理は検証済みの実行・資源・役割・完全コンテナID・世代に結び付け、HTTP 接続先や UDP 送信元から識別情報を推定しない。`commit` 時には追跡診断の世代を更新すると同時に視覚入力受信側へ新世代を反映し、旧世代の試行を拒否する。比較の準備判定は新世代に帰属する追跡入力の復号証跡を要求する。視覚入力の世代更新も同時に行い、新しい視覚検出は #102 全体受入で別に確認する。ソケットはホストへ公開せず、AppHost/DCP の所有・停止、UDP 構成、Docker Desktop 設定は変更しない。
 
 ### 診断ログの共有書込み
 

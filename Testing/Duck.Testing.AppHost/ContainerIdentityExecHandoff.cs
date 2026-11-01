@@ -180,7 +180,8 @@ internal static class ContainerIdentityExecHandoff
             string.IsNullOrWhiteSpace(expectedEngineId) ||
             generation <= 0 ||
             (executableAssembly != "Tracker.RuntimeHost.dll" &&
-             executableAssembly != "Duck.Testing.RefereeDriver.Host.dll"))
+             executableAssembly != "Duck.Testing.RefereeDriver.Host.dll" &&
+             executableAssembly != "Tracker.DebugHost.dll"))
         {
             return null;
         }

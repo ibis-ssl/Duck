@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
@@ -231,6 +232,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             throw new InvalidOperationException("DUCK_ASPIRE_STACK_ID must identify the AppHost stack under test.");
         }
 
+        var dockerExecutable = ResolveDockerExecutable(
+            Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"),
+            Environment.GetEnvironmentVariable("PATH"));
+        using var dockerPathScope = AddDockerDirectoryToProcessPath(dockerExecutable);
         var manifestPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_FIXTURE_MANIFEST")
             ?? CraneFixtureManifest.GetDefaultPath(stackId);
         var craneFixtureSettings = CraneFixtureManifest.ReadForStack(manifestPath, stackId);
@@ -239,43 +244,47 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Directory.CreateDirectory(artifactsDirectory);
 
         var refereeSnapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        var resultWriter = new AspireAcceptanceResultWriter(refereeSnapshots);
         var stageReached = "test_setup";
-        var refereeRawDatagramCount = 0;
-        int? visionPacketsConsumed = null;
-        int? trackerPacketsConsumed = null;
-        string? failure = null;
         RobotMotionDelta? observedMovement = null;
-        TrackerComparisonMeasurementEvidence? comparisonMeasurement = null;
-        MulticastInterface? selectedMulticastInterface = null;
-        UdpMulticastReceiver? refereeReceiver = null;
-        UdpMulticastReceiver? visionReceiver = null;
-        UdpMulticastReceiver? trackerReceiver = null;
+        object? comparisonMeasurement = null;
+        Dictionary<string, Uri>? mappedEndpoints = null;
 
         try
         {
             using var timeout = new CancellationTokenSource(StackSignalTimeout);
-            var multicastInterface = FindMulticastInterface();
-            selectedMulticastInterface = multicastInterface;
-            output.WriteLine(
-                $"multicast interface={multicastInterface.Name}; ipv4={multicastInterface.Address}");
-            refereeReceiver = new UdpMulticastReceiver("224.5.23.1", 11003, multicastInterface.Address);
+            mappedEndpoints = await ResolveComparisonEndpointsAsync(stackId, dockerExecutable);
+            using var refereeClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
+            comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
+            var httpRefereeSource = new HttpRefereeCommandSource(refereeClient);
             using var refereeSource = new RecordingRefereeCommandSource(
-                new UdpRefereeCommandSource(refereeReceiver),
+                httpRefereeSource,
                 refereeSnapshots,
-                output);
-            visionReceiver = new UdpMulticastReceiver("224.5.23.2", 10020, multicastInterface.Address);
-            trackerReceiver = new UdpMulticastReceiver("224.5.23.2", 11010, multicastInterface.Address);
+                message => output.WriteLine(message));
+            var gameControllerControl = new GameControllerWebSocketControlClient(
+                new UriBuilder(mappedEndpoints["game-controller"]) { Scheme = "ws", Path = "/api/control" }.Uri);
+            output.WriteLine(
+                $"same-run mapped endpoints: game-controller={mappedEndpoints["game-controller"]}; " +
+                $"referee-driver={mappedEndpoints["referee-driver"]}; debug-host={mappedEndpoints["debug-host"]}");
 
             RefereeCommandSnapshot initial;
             stageReached = "initial_referee_wait";
             try
             {
-                initial = await refereeSource.WaitForChangeAsync(null, timeout.Token);
+                await gameControllerControl.SendYellowTeamNameAsync(
+                    craneFixtureSettings.TeamName, timeout.Token);
+                output.WriteLine($"requested Game Controller Yellow team name={craneFixtureSettings.TeamName}");
+                initial = await WaitForInitialRefereeWithYellowIdentityAsync(
+                    httpRefereeSource, craneFixtureSettings.TeamName, timeout.Token);
+                refereeSnapshots.Enqueue(initial);
+                output.WriteLine($"referee command={initial.Command} counter={initial.CommandCounter}");
             }
             catch (OperationCanceledException exception)
             {
                 throw new InvalidOperationException(
-                    "REFEREE_FIXTURE_FAILURE: Game Controller did not publish a referee packet on UDP 11003 before the deadline.",
+                    $"TEAM_IDENTITY_FAILURE: RefereeDriver did not expose a ready HALT snapshot with Yellow team name '{craneFixtureSettings.TeamName}' after the Game Controller update before the deadline.",
                     exception);
             }
 
@@ -290,169 +299,1096 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name '{craneFixtureSettings.TeamName}' before starting motion, observed '{initial.YellowTeamName}'.");
             output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
 
-            SSL_WrapperPacket initialVision;
+            LatestVisionHealthSnapshot initialVision;
             stageReached = "initial_vision_wait";
             try
             {
-                initialVision = await ReadVisionFrameWithYellowRobotsAsync(visionReceiver, timeout.Token);
+                initialVision = await WaitForLatestYellowVisionAsync(comparisonClient, timeout.Token);
             }
             catch (OperationCanceledException exception)
             {
                 throw new InvalidOperationException(
-                    "VISION_INGRESS_FAILURE: no SSL-Vision detection frame with Yellow robots arrived on UDP 10020 before the deadline.",
+                    "VISION_INGRESS_FAILURE: DebugHost did not expose a latest SSL-Vision detection frame with Yellow robots before the deadline.",
                     exception);
             }
-            visionPacketsConsumed = visionReceiver.PacketCount;
             stageReached = "active_referee_transition";
             var motionVerifier = new RobotMotionAcceptanceVerifier(minimumDistanceMm: 100);
             motionVerifier.CaptureBaseline(initialVision.Detection);
             output.WriteLine(
                 $"baseline referee={initial.Command} counter={initial.CommandCounter}; " +
-                $"visionFrame={initialVision.Detection.FrameNumber}; " +
+                $"visionFrame={initialVision.FrameNumber}; " +
                 $"yellowRobots={initialVision.Detection.RobotsYellow.Count}");
 
-            var cachedInitialSource = new InitialSnapshotRefereeCommandSource(refereeSource, initial);
-            var driver = new RefereeDriverFixture(
-                cachedInitialSource,
-                new GameControllerWebSocketControlClient());
             try
             {
-                await driver.DriveToActiveAsync(timeout.Token);
+                await gameControllerControl.SendContinueActionAsync(
+                    GameControllerContinueAction.ForceStart, timeout.Token);
             }
             catch (Exception exception)
             {
                 throw new InvalidOperationException(
-                    $"REFEREE_FIXTURE_FAILURE: could not drive Game Controller from HALT to active: {exception.Message}",
+                    $"REFEREE_FIXTURE_FAILURE: could not send Game Controller FORCE_START from verified HALT: {exception.Message}",
                     exception);
             }
 
-            var active = refereeSnapshots.LastOrDefault(snapshot =>
-                snapshot.Command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart);
-            Assert.True(
-                active is not null,
-                "REFEREE_FIXTURE_FAILURE: Game Controller did not publish an active command on UDP 11003.");
-            output.WriteLine($"active referee={active!.Command} counter={active.CommandCounter}");
-
-            stageReached = "active_robot_motion_wait";
-            var discardedPreMotionPackets = visionReceiver.DrainPendingPackets();
-            output.WriteLine($"discarded queued vision packets before active-motion window={discardedPreMotionPackets}");
-
-            using var motionTimeout = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token);
-            motionTimeout.CancelAfter(MotionTimeout);
-            while (observedMovement is null)
-            {
-                try
-                {
-                    var datagram = await visionReceiver.ReceiveAsync(motionTimeout.Token);
-                    var packet = SSL_WrapperPacket.Parser.ParseFrom(datagram.ToArray());
-                    if (packet.Detection is null)
-                    {
-                        continue;
-                    }
-
-                    observedMovement = motionVerifier.FindMovement(packet.Detection);
-                }
-                catch (OperationCanceledException exception)
-                {
-                    throw new InvalidOperationException(
-                        "UDP_MOTION_FAILURE: no Yellow robot moved at least 100 mm after the active referee transition within 60 seconds.",
-                        exception);
-                }
-            }
-
-            output.WriteLine(
-                $"UDP motion verified: team={observedMovement.Team}; " +
-                $"robotId={observedMovement.RobotId}; distanceMm={observedMovement.DistanceMm:F1}");
-
-            TrackerWrapperPacket tracker;
-            stageReached = "duck_tracker_output_wait";
+            RefereeCommandSnapshot active;
             try
             {
-                tracker = await ReadDuckTrackerPacketAsync(trackerReceiver, timeout.Token);
+                active = await WaitForActiveRefereeAfterInitialHaltAsync(
+                    httpRefereeSource, initial, craneFixtureSettings.TeamName, timeout.Token);
             }
             catch (OperationCanceledException exception)
             {
                 throw new InvalidOperationException(
-                    "DUCK_TRACKER_OUTPUT_FAILURE: no ibis TrackerWrapperPacket was received on UDP 11010 before the deadline.",
+                    "REFEREE_FIXTURE_FAILURE: Game Controller did not expose a ready active referee snapshot after FORCE_START before the deadline.",
                     exception);
             }
-            trackerPacketsConsumed = trackerReceiver.PacketCount;
-            output.WriteLine(
-                $"Duck tracker packet verified: uuid={tracker.Uuid}; source={tracker.SourceName}; " +
-                $"frame={tracker.TrackedFrame!.FrameNumber}; robots={tracker.TrackedFrame.Robots.Count}");
-            Assert.Equal("ibis", tracker.Uuid);
-            Assert.Equal("ibis", tracker.SourceName);
-            Assert.NotNull(tracker.TrackedFrame);
+            refereeSnapshots.Enqueue(active);
 
-            stageReached = "tracker_comparison_measurement";
-            comparisonMeasurement = await MeasureLiveTrackerDifferencePathAsync(
-                trackerReceiver,
-                visionReceiver,
-                timeout.Token);
+            output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
+            if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
+            {
+                throw new InvalidOperationException(
+                    $"REFEREE_FIXTURE_FAILURE: no client observation timestamp was recorded for active command counter {active.CommandCounter}.");
+            }
+            output.WriteLine($"active referee client-observed-at={activeObservedAt:O}");
+
+            LatestVisionHealthSnapshot activeVision;
+            try
+            {
+                activeVision = await WaitForYellowVisionAfterActiveObservationAsync(
+                    comparisonClient, activeObservedAt, timeout.Token);
+            }
+            catch (OperationCanceledException exception)
+            {
+                throw new InvalidOperationException(
+                    "VISION_INGRESS_FAILURE: no fresh Yellow detection was available after the active referee transition.",
+                    exception);
+            }
+
+            motionVerifier.CaptureBaseline(activeVision.Detection);
             output.WriteLine(
-                $"live tracker comparison measurement: {System.Text.Json.JsonSerializer.Serialize(comparisonMeasurement)}");
+                $"post-active baseline referee={active.Command} counter={active.CommandCounter}; " +
+                $"activeObservedAt={activeObservedAt:O}; " +
+                $"visionFrame={activeVision.FrameNumber}; " +
+                $"yellowRobots={activeVision.Detection.RobotsYellow.Count}");
+
+            stageReached = "active_robot_motion_wait";
+            var lastVisionReceivedAt = activeVision.DetectionReceivedAt;
+
+            try
+            {
+                var accepted = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
+                    refereeSource,
+                    active!,
+                    MotionTimeout,
+                    async motionToken =>
+                    {
+                        while (true)
+                        {
+                            var vision = await WaitForNewYellowVisionAsync(
+                                comparisonClient, lastVisionReceivedAt, motionToken);
+                            lastVisionReceivedAt = vision.DetectionReceivedAt;
+                            var movement = FindMovementFromFreshVision(
+                                motionVerifier, vision, activeObservedAt);
+                            if (movement is not null)
+                            {
+                                var comparison = await WaitForLiveComparisonAsync(comparisonClient, motionToken);
+                                var finalReferee = await httpRefereeSource.ReadCurrentAsync(motionToken);
+                                ValidateFinalActiveSnapshot(finalReferee, active!);
+                                return (Movement: movement, Comparison: comparison, FinalReferee: finalReferee.Snapshot!);
+                            }
+                        }
+                    },
+                    timeout.Token);
+                observedMovement = accepted.Movement;
+                comparisonMeasurement = new
+                {
+                    transport = "same-run DCP mapped HTTP endpoints",
+                    activeRefereeObservedAt = activeObservedAt,
+                    visionFrame = accepted.Comparison.LatestVisionFrameNumber,
+                    detectionReceivedAt = accepted.Comparison.DetectionReceivedAt,
+                    visionPacketsReceived = accepted.Comparison.VisionPacketsReceived,
+                    sourceRoles = accepted.Comparison.SourceRoles,
+                    pairs = accepted.Comparison.Pairs,
+                    finalReferee = new
+                    {
+                        command = accepted.FinalReferee.Command.ToString(),
+                        accepted.FinalReferee.CommandCounter,
+                    },
+                };
+            }
+            catch (RefereeStateLostException exception)
+            {
+                var lostSnapshot = exception.StateLoss.Snapshot;
+                resultWriter.RecordRefereeHealthAtFailure(
+                    httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
+                        ? matchedEvidence
+                        : null);
+                throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
+            }
+            catch (OperationCanceledException exception)
+            {
+                throw new InvalidOperationException(
+                    "DCP_MOTION_FAILURE: no Yellow robot moved at least 100 mm while the referee stayed active and all comparison roles/pairs became live within 60 seconds.",
+                    exception);
+            }
+
+            output.WriteLine(
+                $"DCP motion verified: team={observedMovement.Team}; " +
+                $"robotId={observedMovement.RobotId}; distanceMm={observedMovement.DistanceMm:F1}");
+            output.WriteLine(
+                $"live comparison verified: {System.Text.Json.JsonSerializer.Serialize(comparisonMeasurement)}");
+            stageReached = "same_run_acceptance_complete";
         }
         catch (Exception exception)
         {
-            failure = exception.ToString();
+            resultWriter.RecordFailure(exception);
             throw;
         }
         finally
         {
-            refereeRawDatagramCount = refereeReceiver?.PacketCount ?? 0;
-            if (stageReached is "initial_vision_wait" or "active_referee_transition" or "active_robot_motion_wait" or "duck_tracker_output_wait" or "tracker_comparison_measurement")
-            {
-                visionPacketsConsumed = visionReceiver?.PacketCount ?? visionPacketsConsumed;
-            }
-
-            if (stageReached is "duck_tracker_output_wait" or "tracker_comparison_measurement")
-            {
-                trackerPacketsConsumed = trackerReceiver?.PacketCount;
-            }
-
-            var linuxMulticastMemberships = ReadLinuxMulticastMemberships();
-            refereeReceiver?.Dispose();
-            visionReceiver?.Dispose();
-            trackerReceiver?.Dispose();
-            var evidence = new
-            {
-                status = failure is null ? "passed" : "failed",
-                failure,
-                stageReached,
-                refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
-                {
-                    command = snapshot.Command.ToString(),
-                    snapshot.CommandCounter,
-                }),
-                refereeRawDatagramCount,
-                visionPacketsConsumed,
-                trackerPacketsConsumed,
-                comparisonMeasurement,
-                packetCountSemantics = "Consumed counts record datagrams read by the harness; null means that reader stage was not reached and does not imply network ingress was zero.",
-                receiverSockets = new
-                {
-                    interfaceName = selectedMulticastInterface?.Name,
-                    interfaceAddress = selectedMulticastInterface?.Address.ToString(),
-                    bindAddress = IPAddress.Any.ToString(),
-                    reuseAddress = true,
-                    referee = new { group = "224.5.23.1", port = 11003 },
-                    sslVision = new { group = "224.5.23.2", port = 10020 },
-                    duckTracker = new { group = "224.5.23.2", port = 11010 },
-                    linuxMemberships = linuxMulticastMemberships,
-                },
-                movement = observedMovement,
-                runner = Environment.GetEnvironmentVariable("RUNNER_OS"),
-                sha = Environment.GetEnvironmentVariable("GITHUB_SHA"),
-            };
             var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
-            await File.WriteAllTextAsync(
+            await resultWriter.WriteAsync(
                 path,
-                System.Text.Json.JsonSerializer.Serialize(
-                    evidence,
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                stageReached,
+                refereeRawDatagramCount: 0,
+                visionPacketsConsumed: null,
+                trackerPacketsConsumed: null,
+                comparisonMeasurement,
+                receiverSockets: new
+                {
+                    transport = "DCP mapped HTTP and WebSocket; no host UDP receiver",
+                    endpoints = mappedEndpoints?.ToDictionary(
+                        pair => pair.Key,
+                        pair => pair.Value.ToString(),
+                        StringComparer.Ordinal),
+                },
+                movement: observedMovement);
             output.WriteLine($"Acceptance evidence: {path}");
         }
     }
+
+    [Fact]
+    public async Task HttpRefereeCommandSourceFailsClosedWhenCommandCounterSkips()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"}}""",
+            """{"isReady":true,"refereeCommand":{"command":4,"commandCounter":43,"yellowTeamName":"crane"},"credential":"must-not-be-retained"}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var initial = await source.WaitForChangeAsync(null, CancellationToken.None);
+        Assert.Equal(41u, initial.CommandCounter);
+        Assert.Equal("crane", initial.YellowTeamName);
+        var failure = await Assert.ThrowsAsync<RefereeCommandCounterGapException>(async () =>
+            await source.WaitForChangeAsync(initial.CommandCounter, CancellationToken.None));
+        var currentHealth = Assert.IsType<RefereeHealthReadEvidence>(failure.CurrentHealth);
+        Assert.Equal(200, currentHealth.HttpStatusCode);
+        Assert.True(currentHealth.IsReady);
+        Assert.Equal(nameof(Referee.Types.Command.PrepareKickoffYellow), currentHealth.Command);
+        Assert.Equal(43u, currentHealth.CommandCounter);
+        Assert.Equal("crane", currentHealth.YellowTeamName);
+        Assert.NotNull(currentHealth.ReadStartedAtUtc);
+        Assert.NotNull(currentHealth.ReadCompletedAtUtc);
+        Assert.True(currentHealth.ReadElapsedMilliseconds >= 0);
+        Assert.DoesNotContain("must-not-be-retained", failure.ToString(), StringComparison.Ordinal);
+
+        var snapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        snapshots.Enqueue(initial);
+        var writer = new AspireAcceptanceResultWriter(snapshots);
+        writer.RecordFailure(failure);
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+        await writer.WriteAsync(
+            resultPath, "active_robot_motion_wait", 0, null, null, null, null, null);
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        var retainedHealth = result.RootElement.GetProperty("refereeHealthAtCounterGap");
+        Assert.Equal(43u, retainedHealth.GetProperty("commandCounter").GetUInt32());
+        Assert.Equal(nameof(Referee.Types.Command.PrepareKickoffYellow), retainedHealth.GetProperty("command").GetString());
+        Assert.True(retainedHealth.GetProperty("readElapsedMilliseconds").GetDouble() >= 0);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeStateLossRetainsMatchedHealthSourceAndApiState()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}""",
+            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"HALT","phase":"HALT"},"credential":"must-not-be-retained"}}""",
+            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var active = await source.WaitForChangeAsync(null, CancellationToken.None);
+        var halted = await source.WaitForChangeAsync(active.CommandCounter, CancellationToken.None);
+        var lateRead = await source.ReadCurrentAsync(CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.ForceStart, active.Command);
+        Assert.Equal(Referee.Types.Command.Halt, halted.Command);
+        Assert.Equal(42u, halted.CommandCounter);
+        Assert.Equal(43u, lateRead.Snapshot!.CommandCounter);
+        var stateLoss = new RefereeStateLostException(halted);
+        Assert.Same(halted, stateLoss.StateLoss.Snapshot);
+        Assert.True(source.TryGetReadEvidence(stateLoss.StateLoss.Snapshot, out var matchedEvidence));
+        var currentHealth = Assert.IsType<RefereeHealthReadEvidence>(matchedEvidence);
+        Assert.Equal(200, currentHealth.HttpStatusCode);
+        Assert.True(currentHealth.IsReady);
+        Assert.Equal("Matched", currentHealth.Reason);
+        Assert.Equal("172.18.0.2:11003", currentHealth.UdpSourceKey);
+        Assert.Equal("172.18.0.2:11003", currentHealth.UdpRemoteEndpoint);
+        Assert.Equal("HALT", currentHealth.ApiCommand);
+        Assert.Equal("HALT", currentHealth.ApiPhase);
+        Assert.Equal(42u, currentHealth.CommandCounter);
+        Assert.Equal("FORCE_START", lateRead.ReadEvidence!.ApiCommand);
+        Assert.Equal(43u, lateRead.ReadEvidence.CommandCounter);
+
+        var snapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        snapshots.Enqueue(active);
+        snapshots.Enqueue(halted);
+        var writer = new AspireAcceptanceResultWriter(snapshots);
+        writer.RecordFailure(stateLoss);
+        writer.RecordRefereeHealthAtFailure(currentHealth);
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+        await writer.WriteAsync(
+            resultPath, "active_robot_motion_wait", 0, null, null, null, null, null);
+        var json = await File.ReadAllTextAsync(resultPath);
+        Assert.DoesNotContain("must-not-be-retained", json, StringComparison.Ordinal);
+        using var result = System.Text.Json.JsonDocument.Parse(json);
+        var retainedHealth = result.RootElement.GetProperty("refereeHealthAtFailure");
+        Assert.Equal(42u, retainedHealth.GetProperty("commandCounter").GetUInt32());
+        Assert.Equal("HALT", retainedHealth.GetProperty("apiCommand").GetString());
+        Assert.Equal("Matched", retainedHealth.GetProperty("reason").GetString());
+        Assert.Equal("unavailable", result.RootElement.GetProperty("refereeHealthAtCounterGap").GetString());
+    }
+
+    [Fact]
+    public async Task InitialRefereeWaitRejectsUnknownYellowTeamUntilExpectedIdentityIsObserved()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":0,"commandCounter":7,"yellowTeamName":"Unknown"}}""",
+            """{"isReady":true,"refereeCommand":{"command":0,"commandCounter":7,"yellowTeamName":"crane"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var initial = await WaitForInitialRefereeWithYellowIdentityAsync(
+            source, "crane", CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.Halt, initial.Command);
+        Assert.Equal(7u, initial.CommandCounter);
+        Assert.Equal("crane", initial.YellowTeamName);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeWaitAcceptsCurrentCounterJumpAfterForceStartWhenIdentityMatches()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40, "crane");
+
+        var active = await WaitForActiveRefereeAfterInitialHaltAsync(
+            source, initial, "crane", CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.ForceStart, active.Command);
+        Assert.Equal(43u, active.CommandCounter);
+        Assert.Equal("crane", active.YellowTeamName);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeWaitRejectsWrongYellowIdentity()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"Unknown"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40, "crane");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            WaitForActiveRefereeAfterInitialHaltAsync(source, initial, "crane", CancellationToken.None));
+
+        Assert.Contains("TEAM_IDENTITY_FAILURE", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeWaitContinuesFromNonActiveToActiveSnapshot()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":1,"commandCounter":41,"yellowTeamName":"crane"}}""",
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40, "crane");
+
+        var active = await WaitForActiveRefereeAfterInitialHaltAsync(
+            source, initial, "crane", CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.ForceStart, active.Command);
+        Assert.Equal(43u, active.CommandCounter);
+    }
+
+    [Fact]
+    public async Task LiveComparisonWaitIncludesLastHealthResponseWhenPredicateTimesOut()
+    {
+        const string healthResponse = """
+            {"isReady":true,"missingRoles":[],"conflictingRoles":[],"sources":[{"logicalRole":"Duck","sourceName":"ibis","sourceUuid":"duck","receivedAt":"2026-11-01T13:02:30Z"},{"logicalRole":"ER-Force","sourceName":"ER-FORCE","sourceUuid":"erforce","receivedAt":"2026-11-01T13:02:31Z"},{"logicalRole":"TIGERs","sourceName":"TIGERs","sourceUuid":"tigers","receivedAt":"2026-11-01T13:02:32Z"}],"pairs":[{"referenceRole":"Duck","comparisonRole":"ER-Force","status":"Compared"},{"referenceRole":"Duck","comparisonRole":"TIGERs","status":"MissingComparisonFrame"},{"referenceRole":"ER-Force","comparisonRole":"TIGERs","status":"Compared"}],"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T13:02:33Z","frameNumber":4692,"yellowRobots":[{"robotId":2,"x":220,"y":35}]},"visionPacketsReceived":7}
+            """;
+        using var http = new HttpClient(new QueueHttpMessageHandler(healthResponse))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+
+        var failure = await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            WaitForLiveComparisonAsync(http, cancellation.Token, TimeSpan.FromHours(1)));
+
+        Assert.Contains("COMPARISON_HEALTH_WAIT_CANCELLED", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("lastResponseStatus=200", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("\"logicalRole\":\"TIGERs\"", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("\"status\":\"MissingComparisonFrame\"", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("\"detectionReceivedAt\":\"2026-11-01T13:02:33Z\"", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ParsesLatestVisionHealthAsYellowDetectionFrame()
+    {
+        using var document = System.Text.Json.JsonDocument.Parse(
+            """{"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T00:00:00+00:00","frameNumber":9,"yellowRobots":[{"robotId":2,"x":123.5,"y":-44.0}]}}""");
+
+        var snapshot = ParseLatestVisionHealth(document.RootElement);
+
+        Assert.NotNull(snapshot);
+        Assert.Equal(9u, snapshot.FrameNumber);
+        Assert.Single(snapshot.Detection.RobotsYellow);
+        Assert.Equal(2u, snapshot.Detection.RobotsYellow[0].RobotId);
+        Assert.Equal(123.5f, snapshot.Detection.RobotsYellow[0].X);
+        Assert.Equal(-44f, snapshot.Detection.RobotsYellow[0].Y);
+    }
+
+    [Fact]
+    public void PreActiveCachedYellowFrameCannotSatisfyMotionAfterActiveBaseline()
+    {
+        var activeObservedAt = DateTimeOffset.Parse("2026-11-01T00:00:01Z");
+        var intermediatePreActiveFrame = CreateYellowVision(11, activeObservedAt.AddMilliseconds(-1), 150);
+        var postActiveBaseline = CreateYellowVision(12, activeObservedAt.AddMilliseconds(1), 150);
+        var freshPostActiveMovement = CreateYellowVision(13, activeObservedAt.AddSeconds(1), 260);
+        var verifier = new RobotMotionAcceptanceVerifier(minimumDistanceMm: 100);
+        var selectedBaseline = SelectPostActiveYellowVision(
+            [intermediatePreActiveFrame, postActiveBaseline], activeObservedAt);
+        Assert.Same(postActiveBaseline, selectedBaseline);
+        verifier.CaptureBaseline(selectedBaseline!.Detection);
+
+        Assert.Null(FindMovementFromFreshVision(verifier, intermediatePreActiveFrame, activeObservedAt));
+        Assert.Null(FindMovementFromFreshVision(verifier, postActiveBaseline, activeObservedAt));
+        var freshMovement = FindMovementFromFreshVision(verifier, freshPostActiveMovement, activeObservedAt);
+        Assert.NotNull(freshMovement);
+        Assert.Equal(2u, freshMovement.RobotId);
+        Assert.Equal(110f, freshMovement.DistanceMm);
+    }
+
+    [Fact]
+    public void FinalRefereeCheckRejectsNonReadyOrChangedActiveSnapshot()
+    {
+        var active = new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 42, "crane");
+
+        var nonReady = Assert.Throws<InvalidOperationException>(() => ValidateFinalActiveSnapshot(
+            new CurrentRefereeHealthSnapshot(false, active, DateTimeOffset.UtcNow), active));
+        Assert.Contains("REFEREE_FINAL_STATE_NOT_READY", nonReady.Message, StringComparison.Ordinal);
+
+        var changedCommand = Assert.Throws<InvalidOperationException>(() => ValidateFinalActiveSnapshot(
+            new CurrentRefereeHealthSnapshot(true,
+                new RefereeCommandSnapshot(Referee.Types.Command.Stop, 43, "crane"), DateTimeOffset.UtcNow), active));
+        Assert.Contains("REFEREE_FINAL_STATE_CHANGED", changedCommand.Message, StringComparison.Ordinal);
+
+        var changedCounter = Assert.Throws<InvalidOperationException>(() => ValidateFinalActiveSnapshot(
+            new CurrentRefereeHealthSnapshot(true,
+                new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 44, "crane"), DateTimeOffset.UtcNow), active));
+        Assert.Contains("REFEREE_COUNTER_GAP", changedCounter.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HttpRefereeSourceSerializesGuardAndFinalReadAndDetectsPendingChange()
+    {
+        static string Health(Referee.Types.Command command, uint counter) =>
+            System.Text.Json.JsonSerializer.Serialize(new
+            {
+                isReady = true,
+                refereeCommand = new
+                {
+                    command = (int)command,
+                    commandCounter = counter,
+                    yellowTeamName = "crane",
+                },
+            });
+
+        var handler = new BlockingRefereeHttpMessageHandler(
+            Health(Referee.Types.Command.NormalStart, 42),
+            Health(Referee.Types.Command.Stop, 43));
+        using var http = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = await source.ReadCurrentAsync(CancellationToken.None);
+        Assert.True(initial.IsReady);
+        Assert.NotNull(initial.Snapshot);
+        Assert.True(source.TryGetObservationTime(initial.Snapshot!.CommandCounter, out _));
+
+        var guardTask = source.WaitForChangeAsync(initial.Snapshot.CommandCounter, CancellationToken.None).AsTask();
+        await handler.WaitForSecondRequestAsync(CancellationToken.None);
+        var finalReadTask = source.ReadCurrentAsync(CancellationToken.None);
+        await Task.Delay(TimeSpan.FromMilliseconds(25));
+
+        Assert.False(finalReadTask.IsCompleted);
+        Assert.Equal(2, handler.RequestCount);
+        Assert.Equal(1, handler.MaximumConcurrentRequests);
+
+        handler.ReleaseSecondRequest();
+        var guardSnapshot = await guardTask.WaitAsync(TimeSpan.FromSeconds(2));
+        var finalSnapshot = await finalReadTask.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.Equal(Referee.Types.Command.Stop, guardSnapshot.Command);
+        Assert.Equal(43u, finalSnapshot.Snapshot?.CommandCounter);
+        var changed = Assert.Throws<InvalidOperationException>(() => ValidateFinalActiveSnapshot(
+            finalSnapshot, initial.Snapshot));
+        Assert.Contains("REFEREE_FINAL_STATE_CHANGED", changed.Message, StringComparison.Ordinal);
+        Assert.Equal(3, handler.RequestCount);
+        Assert.Equal(1, handler.MaximumConcurrentRequests);
+    }
+
+    private static LatestVisionHealthSnapshot CreateYellowVision(uint frameNumber, DateTimeOffset receivedAt, float x)
+    {
+        var frame = new SSL_DetectionFrame { FrameNumber = frameNumber };
+        frame.RobotsYellow.Add(new SSL_DetectionRobot { RobotId = 2, X = x, Y = 0 });
+        return new LatestVisionHealthSnapshot(1, receivedAt, frameNumber, frame);
+    }
+
+    private static async Task<RefereeCommandSnapshot> WaitForInitialRefereeWithYellowIdentityAsync(
+        HttpRefereeCommandSource source,
+        string expectedYellowTeamName,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedYellowTeamName);
+
+        while (true)
+        {
+            var current = await source.ReadCurrentAsync(cancellationToken);
+            if (current.IsReady && current.Snapshot is { } snapshot)
+            {
+                if (snapshot.Command != Referee.Types.Command.Halt)
+                {
+                    throw new InvalidOperationException(
+                        $"REFEREE_FIXTURE_FAILURE: expected initial HALT while confirming Yellow team identity, observed {snapshot.Command}.");
+                }
+
+                if (string.Equals(snapshot.YellowTeamName, expectedYellowTeamName, StringComparison.Ordinal))
+                {
+                    return snapshot;
+                }
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+        }
+    }
+
+    private static async Task<RefereeCommandSnapshot> WaitForActiveRefereeAfterInitialHaltAsync(
+        HttpRefereeCommandSource source,
+        RefereeCommandSnapshot initial,
+        string expectedYellowTeamName,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(initial);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedYellowTeamName);
+        if (initial.Command != Referee.Types.Command.Halt ||
+            !string.Equals(initial.YellowTeamName, expectedYellowTeamName, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "REFEREE_FIXTURE_FAILURE: FORCE_START requires the verified initial HALT and expected Yellow identity.");
+        }
+
+        while (true)
+        {
+            var current = await source.ReadCurrentAsync(cancellationToken);
+            if (!current.IsReady || current.Snapshot is not { } snapshot)
+            {
+                throw new InvalidOperationException(
+                    "REFEREE_FIXTURE_FAILURE: referee health became nonready while waiting for FORCE_START reflection.");
+            }
+
+            if (!string.Equals(snapshot.YellowTeamName, expectedYellowTeamName, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"TEAM_IDENTITY_FAILURE: expected Yellow team name '{expectedYellowTeamName}' after FORCE_START, observed '{snapshot.YellowTeamName}'.");
+            }
+
+            if (snapshot.Command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart)
+            {
+                if (snapshot.CommandCounter <= initial.CommandCounter)
+                {
+                    throw new InvalidOperationException(
+                        $"REFEREE_FIXTURE_FAILURE: active counter {snapshot.CommandCounter} did not advance past verified HALT counter {initial.CommandCounter}.");
+                }
+
+                return snapshot;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+        }
+    }
+
+    private static RobotMotionDelta? FindMovementFromFreshVision(
+        RobotMotionAcceptanceVerifier verifier,
+        LatestVisionHealthSnapshot vision,
+        DateTimeOffset strictlyNewerThan) =>
+        IsAfterActiveObservation(vision, strictlyNewerThan)
+            ? verifier.FindMovement(vision.Detection)
+            : null;
+
+    private static void ValidateFinalActiveSnapshot(
+        CurrentRefereeHealthSnapshot current,
+        RefereeCommandSnapshot active)
+    {
+        if (!current.IsReady || current.Snapshot is null || current.ObservedAtUtc is null)
+        {
+            throw new InvalidOperationException(
+                "REFEREE_FINAL_STATE_NOT_READY: current referee health did not expose a ready matched snapshot after comparison became live.");
+        }
+
+        if (current.Snapshot.CommandCounter != active.CommandCounter)
+        {
+            var expected = unchecked(active.CommandCounter + 1);
+            if (current.Snapshot.CommandCounter != expected)
+            {
+                throw new InvalidOperationException(
+                    $"REFEREE_COUNTER_GAP: expected final command counter {active.CommandCounter} (or its next observed value {expected}), observed {current.Snapshot.CommandCounter}.");
+            }
+
+            throw new InvalidOperationException(
+                $"REFEREE_FINAL_STATE_CHANGED: active command counter changed from {active.CommandCounter} to {current.Snapshot.CommandCounter}.");
+        }
+
+        if (current.Snapshot.Command != active.Command)
+        {
+            throw new InvalidOperationException(
+                $"REFEREE_FINAL_STATE_CHANGED: active command changed from {active.Command} to {current.Snapshot.Command}.");
+        }
+    }
+
+    private static async Task<Dictionary<string, Uri>> ResolveComparisonEndpointsAsync(
+        string stackId,
+        string dockerExecutable)
+    {
+        var (dockerContext, _) = await ResolveDockerIdentityAsync();
+        var containers = await RunProcessAsync(dockerExecutable, [
+            "--context", dockerContext, "ps", "--quiet", "--no-trunc",
+            "--filter", $"label={DockerContainerSpec.StackLabel}={stackId}",
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, containers.ExitCode);
+        var ids = containers.StandardOutput
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        Assert.NotEmpty(ids);
+
+        var resources = new Dictionary<string, (string Id, string RunId)>(StringComparer.Ordinal);
+        foreach (var id in ids)
+        {
+            var inspection = await RunProcessAsync(dockerExecutable, [
+                "--context", dockerContext, "inspect", "--format", "{{json .Config.Labels}}", id,
+            ], TimeSpan.FromSeconds(15));
+            Assert.Equal(0, inspection.ExitCode);
+            using var document = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput);
+            var labels = document.RootElement;
+            Assert.Equal(stackId, labels.GetProperty(DockerContainerSpec.StackLabel).GetString());
+            var role = labels.GetProperty(DockerContainerSpec.ResourceLabel).GetString();
+            Assert.False(string.IsNullOrWhiteSpace(role));
+            var runId = labels.GetProperty(DockerContainerSpec.RunLabel).GetString();
+            Assert.False(string.IsNullOrWhiteSpace(runId));
+            if (labels.TryGetProperty(DockerContainerSpec.OwnerLabel, out var owner))
+            {
+                Assert.Equal(DockerContainerSpec.OwnerValue, owner.GetString());
+            }
+
+            Assert.True(resources.TryAdd(role!, (id, runId!)), $"Duplicate same-stack resource label: {role}.");
+        }
+
+        Assert.Single(resources.Values.Select(resource => resource.RunId).Distinct(StringComparer.Ordinal));
+        foreach (var requiredRole in new[]
+        {
+            "simulator", "duck", "game-controller", "cm4-sim", "crane",
+            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host",
+        })
+        {
+            Assert.Contains(requiredRole, resources.Keys);
+        }
+
+        var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
+        foreach (var (resource, targetPort) in new[]
+        {
+            ("game-controller", "8082/tcp"),
+            ("referee-driver", "39110/tcp"),
+            ("debug-host", "8080/tcp"),
+        })
+        {
+            var inspection = await RunProcessAsync(dockerExecutable, [
+                "--context", dockerContext, "inspect", "--format", "{{json .NetworkSettings.Ports}}", resources[resource].Id,
+            ], TimeSpan.FromSeconds(15));
+            Assert.Equal(0, inspection.ExitCode);
+            using var portsDocument = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput);
+            var mappings = portsDocument.RootElement.GetProperty(targetPort);
+            var mapping = Assert.Single(mappings.EnumerateArray());
+            Assert.Equal("127.0.0.1", mapping.GetProperty("HostIp").GetString());
+            var hostPort = mapping.GetProperty("HostPort").GetString();
+            Assert.True(int.TryParse(hostPort, out var parsedPort) && parsedPort is > 0 and <= 65535,
+                $"Invalid dynamic host port for {resource}:{targetPort}: {hostPort}.");
+            endpoints[resource] = new Uri($"http://127.0.0.1:{parsedPort}/");
+        }
+
+        return endpoints;
+    }
+
+    private static async Task<LatestVisionHealthSnapshot> WaitForLatestYellowVisionAsync(
+        HttpClient client,
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            using var document = await ReadComparisonHealthAsync(client, cancellationToken);
+            var vision = ParseLatestVisionHealth(document.RootElement);
+            if (vision is { Detection.RobotsYellow.Count: > 0 })
+            {
+                return vision;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+        }
+    }
+
+    private static async Task<LatestVisionHealthSnapshot> WaitForNewYellowVisionAsync(
+        HttpClient client,
+        DateTimeOffset previousDetectionReceivedAt,
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            using var document = await ReadComparisonHealthAsync(client, cancellationToken);
+            var vision = ParseLatestVisionHealth(document.RootElement);
+            if (vision is { Detection.RobotsYellow.Count: > 0 } &&
+                vision.DetectionReceivedAt > previousDetectionReceivedAt)
+            {
+                return vision;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+        }
+    }
+
+    private static async Task<LatestVisionHealthSnapshot> WaitForYellowVisionAfterActiveObservationAsync(
+        HttpClient client,
+        DateTimeOffset activeObservedAt,
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            using var document = await ReadComparisonHealthAsync(client, cancellationToken);
+            var vision = ParseLatestVisionHealth(document.RootElement);
+            var selected = vision is null
+                ? null
+                : SelectPostActiveYellowVision([vision], activeObservedAt);
+            if (selected is not null)
+            {
+                return selected;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+        }
+    }
+
+    private static LatestVisionHealthSnapshot? SelectPostActiveYellowVision(
+        IEnumerable<LatestVisionHealthSnapshot> snapshots,
+        DateTimeOffset activeObservedAt) =>
+        snapshots
+            .Where(snapshot => IsAfterActiveObservation(snapshot, activeObservedAt) &&
+                snapshot.Detection.RobotsYellow.Count > 0)
+            .OrderBy(snapshot => snapshot.DetectionReceivedAt)
+            .LastOrDefault();
+
+    private static bool IsAfterActiveObservation(
+        LatestVisionHealthSnapshot snapshot,
+        DateTimeOffset activeObservedAt) =>
+        snapshot.DetectionReceivedAt > activeObservedAt;
+
+    private static async Task<LiveComparisonHealthSnapshot> WaitForLiveComparisonAsync(
+        HttpClient client,
+        CancellationToken cancellationToken,
+        TimeSpan? pollInterval = null)
+    {
+        HttpStatusCode? lastResponseStatus = null;
+        string? lastResponseBody = null;
+        try
+        {
+            while (true)
+            {
+                var response = await ReadComparisonHealthResponseAsync(client, cancellationToken);
+                lastResponseStatus = response.StatusCode;
+                lastResponseBody = response.Body;
+                using var document = System.Text.Json.JsonDocument.Parse(response.Body);
+                var root = document.RootElement;
+                if (root.TryGetProperty("isReady", out var ready) && ready.ValueKind == System.Text.Json.JsonValueKind.True &&
+                    root.TryGetProperty("sources", out var sourcesElement) && sourcesElement.ValueKind == System.Text.Json.JsonValueKind.Array &&
+                    root.TryGetProperty("pairs", out var pairsElement) && pairsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    var sourceRoles = sourcesElement.EnumerateArray()
+                        .Select(source => source.GetProperty("logicalRole").GetString() ?? string.Empty)
+                        .Distinct(StringComparer.Ordinal)
+                        .Order(StringComparer.Ordinal)
+                        .ToArray();
+                    var requiredRoles = new[] { "Duck", "ER-Force", "TIGERs" }.Order(StringComparer.Ordinal).ToArray();
+                    var pairs = pairsElement.EnumerateArray()
+                        .Select(pair => new LiveComparisonPairEvidence(
+                            pair.GetProperty("referenceRole").GetString() ?? string.Empty,
+                            pair.GetProperty("comparisonRole").GetString() ?? string.Empty,
+                            ParseTrackerDifferencePairStatus(pair.GetProperty("status"))))
+                        .ToArray();
+                    if (sourceRoles.SequenceEqual(requiredRoles, StringComparer.Ordinal) &&
+                        pairs.Length == 3 && pairs.All(pair => pair.Status == TrackerDifferencePairStatus.Compared))
+                    {
+                        var vision = ParseLatestVisionHealth(root);
+                        Assert.NotNull(vision);
+                        return new LiveComparisonHealthSnapshot(
+                            vision.FrameNumber,
+                            vision.DetectionReceivedAt,
+                            root.GetProperty("visionPacketsReceived").GetInt32(),
+                            sourceRoles,
+                            pairs);
+                    }
+                }
+
+                await Task.Delay(pollInterval ?? TimeSpan.FromMilliseconds(200), cancellationToken);
+            }
+        }
+        catch (OperationCanceledException exception) when (cancellationToken.IsCancellationRequested)
+        {
+            var lastResponse = lastResponseStatus is { } status && lastResponseBody is { } body
+                ? $"lastResponseStatus={(int)status}; lastResponseBody={body}"
+                : "lastResponse=none";
+            throw new OperationCanceledException(
+                $"COMPARISON_HEALTH_WAIT_CANCELLED: {lastResponse}",
+                exception,
+                cancellationToken);
+        }
+    }
+
+    private static async Task<(HttpStatusCode StatusCode, string Body)> ReadComparisonHealthResponseAsync(
+        HttpClient client,
+        CancellationToken cancellationToken)
+    {
+        using var response = await client.GetAsync("health/comparison", cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        return (response.StatusCode, body);
+    }
+
+    private static async Task<System.Text.Json.JsonDocument> ReadComparisonHealthAsync(
+        HttpClient client,
+        CancellationToken cancellationToken)
+    {
+        using var response = await client.GetAsync("health/comparison", cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        return System.Text.Json.JsonDocument.Parse(body);
+    }
+
+    private static LatestVisionHealthSnapshot? ParseLatestVisionHealth(System.Text.Json.JsonElement root)
+    {
+        if (!root.TryGetProperty("latestVision", out var latestVision) || latestVision.ValueKind is System.Text.Json.JsonValueKind.Null or System.Text.Json.JsonValueKind.Undefined)
+        {
+            return null;
+        }
+
+        var frame = new SSL_DetectionFrame { FrameNumber = latestVision.GetProperty("frameNumber").GetUInt32() };
+        foreach (var robot in latestVision.GetProperty("yellowRobots").EnumerateArray())
+        {
+            frame.RobotsYellow.Add(new SSL_DetectionRobot
+            {
+                RobotId = robot.GetProperty("robotId").GetUInt32(),
+                X = robot.GetProperty("x").GetSingle(),
+                Y = robot.GetProperty("y").GetSingle(),
+            });
+        }
+
+        return new LatestVisionHealthSnapshot(
+            latestVision.GetProperty("packetCount").GetInt32(),
+            latestVision.GetProperty("detectionReceivedAt").GetDateTimeOffset(),
+            latestVision.GetProperty("frameNumber").GetUInt32(),
+            frame);
+    }
+
+    private static TrackerDifferencePairStatus ParseTrackerDifferencePairStatus(System.Text.Json.JsonElement value)
+    {
+        var parsed = value.ValueKind switch
+        {
+            System.Text.Json.JsonValueKind.String when Enum.TryParse<TrackerDifferencePairStatus>(value.GetString(), true, out var status) => status,
+            System.Text.Json.JsonValueKind.Number when Enum.IsDefined(typeof(TrackerDifferencePairStatus), value.GetInt32()) => (TrackerDifferencePairStatus)value.GetInt32(),
+            _ => (TrackerDifferencePairStatus)(-1),
+        };
+        return parsed;
+    }
+
+    private sealed class HttpRefereeCommandSource(HttpClient client, TimeSpan? pollInterval = null) : IRefereeCommandSource
+    {
+        private readonly TimeSpan pollDelay = pollInterval ?? TimeSpan.FromMilliseconds(100);
+        private readonly SemaphoreSlim readGate = new(1, 1);
+        private readonly ConcurrentDictionary<uint, DateTimeOffset> observationTimesByCounter = new();
+        private readonly ConditionalWeakTable<RefereeCommandSnapshot, RefereeHealthReadEvidence> readEvidenceBySnapshot = new();
+
+        public bool TryGetReadEvidence(
+            RefereeCommandSnapshot snapshot,
+            out RefereeHealthReadEvidence? evidence) =>
+            readEvidenceBySnapshot.TryGetValue(snapshot, out evidence);
+
+        public bool TryGetObservationTime(uint commandCounter, out DateTimeOffset observedAtUtc) =>
+            observationTimesByCounter.TryGetValue(commandCounter, out observedAtUtc);
+
+        public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
+            uint? previousCommandCounter,
+            CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                var current = await ReadCurrentAsync(cancellationToken);
+                if (current.IsReady && current.Snapshot is { } snapshot)
+                {
+                    if (previousCommandCounter is null)
+                    {
+                        return snapshot;
+                    }
+
+                    if (snapshot.CommandCounter != previousCommandCounter.Value)
+                    {
+                        var expected = unchecked(previousCommandCounter.Value + 1);
+                        if (snapshot.CommandCounter != expected)
+                        {
+                            throw new RefereeCommandCounterGapException(
+                                expected,
+                                previousCommandCounter.Value,
+                                current.ReadEvidence);
+                        }
+
+                        return snapshot;
+                    }
+                }
+
+                await Task.Delay(pollDelay, cancellationToken);
+            }
+        }
+
+        public async Task<CurrentRefereeHealthSnapshot> ReadCurrentAsync(CancellationToken cancellationToken)
+        {
+            await readGate.WaitAsync(cancellationToken);
+            try
+            {
+                var readStartedAtUtc = DateTimeOffset.UtcNow;
+                var readStartedTimestamp = Stopwatch.GetTimestamp();
+                using var response = await client.GetAsync("health/referee", cancellationToken);
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                var readCompletedAtUtc = DateTimeOffset.UtcNow;
+                var readElapsed = Stopwatch.GetElapsedTime(readStartedTimestamp);
+                using var document = System.Text.Json.JsonDocument.Parse(body);
+                var root = document.RootElement;
+                var isReady = response.IsSuccessStatusCode &&
+                    root.TryGetProperty("isReady", out var ready) && ready.ValueKind == System.Text.Json.JsonValueKind.True;
+                RefereeCommandSnapshot? snapshot = null;
+                if (root.TryGetProperty("refereeCommand", out var commandElement) &&
+                    commandElement.ValueKind == System.Text.Json.JsonValueKind.Object)
+                {
+                    snapshot = new RefereeCommandSnapshot(
+                        ParseRefereeCommand(commandElement.GetProperty("command")),
+                        commandElement.GetProperty("commandCounter").GetUInt32(),
+                        commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty);
+                }
+
+                var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
+                    ? diagnosticElement
+                    : default;
+                var apiState = root.TryGetProperty("api", out var apiElement) &&
+                    apiElement.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                    apiElement.TryGetProperty("state", out var stateElement)
+                        ? stateElement
+                        : default;
+                var readEvidence = new RefereeHealthReadEvidence(
+                    (int)response.StatusCode,
+                    isReady,
+                    snapshot?.Command.ToString(),
+                    snapshot?.CommandCounter,
+                    snapshot?.YellowTeamName,
+                    readStartedAtUtc,
+                    readCompletedAtUtc,
+                    readElapsed.TotalMilliseconds,
+                    ReadScalar(root, "reason"),
+                    ReadScalar(diagnostic, "sourceKey"),
+                    ReadScalar(diagnostic, "remoteEndpoint"),
+                    ReadScalar(apiState, "command"),
+                    ReadScalar(apiState, "phase"));
+                var result = new CurrentRefereeHealthSnapshot(
+                    isReady,
+                    snapshot,
+                    isReady && snapshot is not null ? readCompletedAtUtc : null,
+                    readEvidence);
+                if (result.ObservedAtUtc is { } readyObservedAt && snapshot is not null)
+                {
+                    observationTimesByCounter[snapshot.CommandCounter] = readyObservedAt;
+                    readEvidenceBySnapshot.Add(snapshot, readEvidence);
+                }
+
+                return result;
+            }
+            finally
+            {
+                readGate.Release();
+            }
+        }
+
+        private static string? ReadScalar(
+            System.Text.Json.JsonElement parent,
+            string propertyName)
+        {
+            if (parent.ValueKind != System.Text.Json.JsonValueKind.Object ||
+                !parent.TryGetProperty(propertyName, out var value))
+            {
+                return null;
+            }
+
+            return value.ValueKind switch
+            {
+                System.Text.Json.JsonValueKind.String => value.GetString(),
+                System.Text.Json.JsonValueKind.Number => value.GetRawText(),
+                System.Text.Json.JsonValueKind.True => "true",
+                System.Text.Json.JsonValueKind.False => "false",
+                _ => null,
+            };
+        }
+
+        private static Referee.Types.Command ParseRefereeCommand(System.Text.Json.JsonElement value)
+        {
+            if (value.ValueKind == System.Text.Json.JsonValueKind.Number)
+            {
+                var numeric = value.GetInt32();
+                Assert.True(Enum.IsDefined(typeof(Referee.Types.Command), numeric), $"Unknown referee command value {numeric}.");
+                return (Referee.Types.Command)numeric;
+            }
+
+            var text = value.GetString()?.Replace("_", string.Empty, StringComparison.Ordinal);
+            Assert.True(Enum.TryParse<Referee.Types.Command>(text, true, out var command), $"Unknown referee command value '{text}'.");
+            return command;
+        }
+    }
+
+    private sealed class QueueHttpMessageHandler(params string[] responses) : HttpMessageHandler
+    {
+        private readonly Queue<string> responseQueue = new(responses);
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            if (responseQueue.Count == 0)
+            {
+                throw new InvalidOperationException("The test HTTP response queue is empty.");
+            }
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(responseQueue.Dequeue()),
+            });
+        }
+    }
+
+    private sealed class BlockingRefereeHttpMessageHandler(
+        string initialResponse,
+        string changedResponse) : HttpMessageHandler
+    {
+        private readonly TaskCompletionSource<bool> secondRequestStarted = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource<bool> releaseSecondRequest = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private int requestCount;
+        private int activeRequests;
+        private int maximumConcurrentRequests;
+
+        public int RequestCount => Volatile.Read(ref requestCount);
+
+        public int MaximumConcurrentRequests => Volatile.Read(ref maximumConcurrentRequests);
+
+        public Task WaitForSecondRequestAsync(CancellationToken cancellationToken) =>
+            secondRequestStarted.Task.WaitAsync(cancellationToken);
+
+        public void ReleaseSecondRequest() => releaseSecondRequest.TrySetResult(true);
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var currentCount = Interlocked.Increment(ref activeRequests);
+            UpdateMaximum(currentCount);
+            var currentRequest = Interlocked.Increment(ref requestCount);
+            try
+            {
+                if (currentRequest == 2)
+                {
+                    secondRequestStarted.TrySetResult(true);
+                    await releaseSecondRequest.Task.WaitAsync(cancellationToken);
+                }
+
+                var response = currentRequest == 1 ? initialResponse : changedResponse;
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(response) };
+            }
+            finally
+            {
+                Interlocked.Decrement(ref activeRequests);
+            }
+        }
+
+        private void UpdateMaximum(int current)
+        {
+            while (true)
+            {
+                var maximum = Volatile.Read(ref maximumConcurrentRequests);
+                if (current <= maximum || Interlocked.CompareExchange(ref maximumConcurrentRequests, current, maximum) == maximum)
+                {
+                    return;
+                }
+            }
+        }
+    }
+
+    private sealed record LatestVisionHealthSnapshot(
+        int PacketCount,
+        DateTimeOffset DetectionReceivedAt,
+        uint FrameNumber,
+        SSL_DetectionFrame Detection);
+
+    private sealed record LiveComparisonPairEvidence(
+        string ReferenceRole,
+        string ComparisonRole,
+        TrackerDifferencePairStatus Status);
+
+    private sealed record LiveComparisonHealthSnapshot(
+        uint LatestVisionFrameNumber,
+        DateTimeOffset DetectionReceivedAt,
+        int VisionPacketsReceived,
+        IReadOnlyList<string> SourceRoles,
+        IReadOnlyList<LiveComparisonPairEvidence> Pairs);
+
+    private sealed record CurrentRefereeHealthSnapshot(
+        bool IsReady,
+        RefereeCommandSnapshot? Snapshot,
+        DateTimeOffset? ObservedAtUtc = null,
+        RefereeHealthReadEvidence? ReadEvidence = null);
 
     [Fact]
     public async Task SecondAppHostWithSameLockIsRejectedWithoutDisruptingFirstStack()
@@ -2410,27 +3346,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     {
         const string membershipPath = "/proc/net/igmp";
         return File.Exists(membershipPath) ? File.ReadAllText(membershipPath) : null;
-    }
-
-    private sealed class RecordingRefereeCommandSource(
-        IRefereeCommandSource inner,
-        ConcurrentQueue<RefereeCommandSnapshot> snapshots,
-        ITestOutputHelper output) : IRefereeCommandSource, IDisposable
-    {
-        public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
-            uint? previousCommandCounter,
-            CancellationToken cancellationToken)
-        {
-            var snapshot = await inner.WaitForChangeAsync(previousCommandCounter, cancellationToken);
-            snapshots.Enqueue(snapshot);
-            output.WriteLine($"referee command={snapshot.Command} counter={snapshot.CommandCounter}");
-            return snapshot;
-        }
-
-        public void Dispose()
-        {
-            (inner as IDisposable)?.Dispose();
-        }
     }
 
     private sealed class InitialSnapshotRefereeCommandSource(

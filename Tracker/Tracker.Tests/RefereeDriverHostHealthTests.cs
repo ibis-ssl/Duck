@@ -56,6 +56,10 @@ public sealed class RefereeDriverHostHealthTests
         var root = json.RootElement;
         Assert.True(root.GetProperty("isReady").GetBoolean());
         Assert.Equal("Matched", root.GetProperty("reason").GetString());
+        var refereeCommand = root.GetProperty("refereeCommand");
+        Assert.Equal((int)Referee.Types.Command.Halt, refereeCommand.GetProperty("command").GetInt32());
+        Assert.Equal(7u, refereeCommand.GetProperty("commandCounter").GetUInt32());
+        Assert.Equal("yellow", refereeCommand.GetProperty("yellowTeamName").GetString());
         var diagnostic = root.GetProperty("diagnostic");
         Assert.Equal("referee", diagnostic.GetProperty("inputId").GetString());
         Assert.Equal("host-run", diagnostic.GetProperty("identity").GetProperty("runId").GetString());

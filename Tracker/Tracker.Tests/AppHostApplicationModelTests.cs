@@ -586,6 +586,31 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ComparisonModeConfiguresDebugHostIdentityHandoffForStrictReadiness()
+    {
+        const string runId = "comparison-debug-host-owned-run";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
+            "--Testing:Diagnostics:RunId=" + runId,
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
+        var environment = await GetResourceEnvironmentAsync(debugHost);
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("debug-host", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.Equal(runId, environment["Testing__Diagnostics__RunId"].ToString());
+        var runtimeArgs = await GetContainerRuntimeArgsAsync(debugHost);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", runtimeArgs);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=debug-host", runtimeArgs);
+
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Equal(2, services.GetServices<IHostedService>()
+            .OfType<ContainerIdentityHandoffService>().Count());
+    }
+
+    [Fact]
     public async Task DebugHostReplayOnlyUsesExistingDirectoryReadOnlyWithoutStartingNetworkResources()
     {
         var replayDirectory = Path.Combine(Path.GetTempPath(), "duck-debug-host-replay-" + Guid.NewGuid().ToString("N"));
@@ -868,57 +893,60 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task ComparisonModeAddsPinnedExternalTrackersAndObserverWithoutAnotherRefereeProducer()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
+            "--RefereeDriver:Enabled=true",
+            "--Testing:ContainerMode=true");
 
-        var simulator = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, resource => resource.Name == "simulator"));
-        var gameController = Assert.IsType<ExecutableResource>(Assert.Single(appHost.Resources, resource => resource.Name == "game-controller"));
-        var tigers = Assert.IsType<ExecutableResource>(
-            Assert.Single(appHost.Resources, resource => resource.Name == "tracker-tigers"));
-        var erForce = Assert.IsType<ExecutableResource>(
-            Assert.Single(appHost.Resources, resource => resource.Name == "tracker-erforce"));
-        var debugHost = Assert.IsType<ContainerResource>(
-            Assert.Single(appHost.Resources, resource => resource.Name == "debug-host"));
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tracker-tigers"));
+        var erForce = Assert.IsType<ContainerResource>(Find(appHost, "tracker-erforce"));
+        var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
+        var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+        var refereeHttp = Assert.Single(
+            refereeDriver.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Name == "http");
+        Assert.Equal(39110, refereeHttp.TargetPort);
+        Assert.Null(refereeHttp.Port);
+        Assert.Equal("127.0.0.1", refereeHttp.TargetHost);
+        Assert.False(refereeHttp.IsProxied);
+        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver };
 
-        var tigersLaunch = await GetLaunchOptionsAsync(tigers);
-        var erForceLaunch = await GetLaunchOptionsAsync(erForce);
-        var tigersSpec = ToSpec(tigersLaunch);
-        var erForceSpec = ToSpec(erForceLaunch);
-        Assert.Equal(tigersSpec.StackId, erForceSpec.StackId);
-        Assert.NotEqual(tigersSpec.RunId, erForceSpec.RunId);
-        foreach (var (spec, resourceName) in new[]
-                 {
-                     (tigersSpec, "tracker-tigers"),
-                     (erForceSpec, "tracker-erforce"),
-                 })
+        string? sharedStackId = null;
+        string? sharedRunId = null;
+        foreach (var resource in resources)
         {
-            var ownershipArguments = spec.CreateRunArguments();
-            Assert.Contains($"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}", ownershipArguments);
-            Assert.Contains($"{DockerContainerSpec.StackLabel}={spec.StackId}", ownershipArguments);
-            Assert.Contains($"{DockerContainerSpec.ResourceLabel}={resourceName}", ownershipArguments);
-            Assert.Contains($"{DockerContainerSpec.RunLabel}={spec.RunId}", ownershipArguments);
+            var runtimeArgs = await GetContainerRuntimeArgsAsync(resource);
+            Assert.DoesNotContain("--network", runtimeArgs);
+            var stackLabel = Assert.Single(runtimeArgs, argument => argument.StartsWith("duck.aspire.stack=", StringComparison.Ordinal));
+            var runLabel = Assert.Single(runtimeArgs, argument => argument.StartsWith("duck.aspire.run=", StringComparison.Ordinal));
+            Assert.Equal(sharedStackId ??= stackLabel["duck.aspire.stack=".Length..], stackLabel["duck.aspire.stack=".Length..]);
+            Assert.Equal(sharedRunId ??= runLabel["duck.aspire.run=".Length..], runLabel["duck.aspire.run=".Length..]);
+            Assert.Contains($"duck.aspire.resource={resource.Name}", runtimeArgs);
+            Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
         }
-        Assert.Equal("tigersmannheim/sumatra:2025", tigersLaunch.Image);
-        Assert.Equal("roboticserlangen/autoref:2025.1.0", erForceLaunch.Image);
-        Assert.Contains("host", ToSpec(tigersLaunch).CreateRunArguments());
-        Assert.Contains("host", ToSpec(erForceLaunch).CreateRunArguments());
-        Assert.Equal("tracker-tigers", tigersLaunch.ReadinessProfile);
-        Assert.Equal("TIGERs", tigersLaunch.ExpectedTrackerSourceName);
-        Assert.Equal("tracker-erforce", erForceLaunch.ReadinessProfile);
-        Assert.Equal("ER-FORCE", erForceLaunch.ExpectedTrackerSourceName);
-        AssertWaits(tigers, (simulator, WaitType.WaitUntilHealthy), (gameController, WaitType.WaitUntilHealthy));
-        AssertWaits(erForce, (simulator, WaitType.WaitUntilHealthy), (gameController, WaitType.WaitUntilHealthy));
+
+        Assert.NotNull(sharedStackId);
+        Assert.NotNull(sharedRunId);
+        Assert.Equal(
+            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
+            await GetArgumentsAsync(simulator, callbackLimit: 1));
+        Assert.Equal(
+            ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
+            await GetArgumentsAsync(gameController));
+        Assert.Contains(crane.Annotations.OfType<HealthCheckAnnotation>(), annotation => annotation.Key == "dcp-crane-service-ready");
+        Assert.Contains(cm4.Annotations.OfType<HealthCheckAnnotation>(), annotation => annotation.Key == "dcp-cm4-sim-service-ready");
 
         Assert.Equal(
             ["--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--moduli", "simulation_protocol_comparison"],
-            tigersLaunch.ContainerArguments);
-        var protocolMount = Assert.Single(tigersLaunch.Mounts ?? []);
+            await GetArgumentsAsync(tigers));
+        var protocolMount = Assert.Single(tigers.Annotations.OfType<ContainerMountAnnotation>());
         Assert.Equal("/Sumatra/config/moduli/simulation_protocol_comparison.xml", protocolMount.Target);
-        Assert.True(protocolMount.ReadOnly);
-        var mountArguments = ToSpec(tigersLaunch).CreateRunArguments();
-        var volumeIndex = Array.IndexOf(mountArguments, "--volume");
-        Assert.True(volumeIndex >= 0);
-        Assert.EndsWith(":/Sumatra/config/moduli/simulation_protocol_comparison.xml:ro", mountArguments[volumeIndex + 1], StringComparison.Ordinal);
-
+        Assert.True(protocolMount.IsReadOnly);
         var protocol = XDocument.Load(protocolMount.Source);
         var refereeProperties = protocol.Descendants("module")
             .Single(module => (string?)module.Attribute("id") == "edu.tigers.sumatra.referee.AReferee")
@@ -940,7 +968,11 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("11010", (string?)trackerProperties?.Element("port"));
         Assert.Equal(
             ["--vision-port", "10020", "--tracker-port", "11010", "--gc-port", "11003"],
-            erForceLaunch.ContainerArguments);
+            await GetArgumentsAsync(erForce));
+
+        AssertWaits(tigers, (simulator, WaitType.WaitUntilHealthy), (gameController, WaitType.WaitUntilHealthy));
+        AssertWaits(erForce, (simulator, WaitType.WaitUntilHealthy), (gameController, WaitType.WaitUntilHealthy));
+        AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilHealthy));
 
         var debugHostEnvironment = await GetResourceEnvironmentAsync(debugHost);
         Assert.Equal("224.5.23.2", debugHostEnvironment["VisionReceiver__MulticastAddress"]);
@@ -962,12 +994,24 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(8080, debugHttp.TargetPort);
         Assert.Equal("127.0.0.1", debugHttp.TargetHost);
         Assert.False(debugHttp.IsProxied);
-        AssertWaits(debugHost, (simulator, WaitType.WaitUntilStarted), (Find(appHost, "duck"), WaitType.WaitUntilStarted), (tigers, WaitType.WaitUntilHealthy), (erForce, WaitType.WaitUntilHealthy));
+        AssertWaits(debugHost,
+            (simulator, WaitType.WaitUntilStarted),
+            (duck, WaitType.WaitUntilStarted),
+            (tigers, WaitType.WaitUntilStarted),
+            (erForce, WaitType.WaitUntilStarted));
 
-        var gameControllerLaunch = await GetLaunchOptionsAsync(gameController);
-        Assert.True(PublishesRefereeEndpoint(gameControllerLaunch.ContainerArguments));
-        Assert.False(PublishesRefereeEndpoint(tigersLaunch.ContainerArguments));
-        Assert.False(PublishesRefereeEndpoint(erForceLaunch.ContainerArguments));
+        var refereeProducers = new List<string>();
+        foreach (var resource in resources)
+        {
+            var resourceArgs = await GetArgumentsAsync(resource, callbackLimit: resource.Name == "simulator" ? 1 : null);
+            for (var index = 0; index + 1 < resourceArgs.Length; index++)
+            {
+                if (resourceArgs[index] == "-publishAddress" && resourceArgs[index + 1] == "224.5.23.1:11003")
+                    refereeProducers.Add(resource.Name);
+            }
+        }
+
+        Assert.Equal(["game-controller"], refereeProducers);
     }
 
     [Fact]
@@ -994,58 +1038,71 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task BaseModelKeepsPinnedSimulatorAndCraneArguments()
+    public async Task ComparisonModelKeepsPinnedSimulatorCraneAndCm4ArgumentsOnDcpContainers()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
-        var simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "simulator")));
-        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd", simulator.Image);
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var simulatorImage = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", simulatorImage.Image);
+        Assert.Equal("a52b6bd", simulatorImage.Tag);
         Assert.Equal(
             ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
-            simulator.ContainerArguments);
+            await GetArgumentsAsync(simulator, callbackLimit: 1));
 
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
-        Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", crane.Image);
-        Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
-        Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
-        Assert.Equal("visibility_graph", crane.Environment["PLANNER"]);
-        Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
-        Assert.Equal(360, crane.StartupTimeoutSeconds);
-        Assert.DoesNotContain(crane.Environment, item => item.Key == "FEEDBACK_SIM_MODE");
-        Assert.DoesNotContain(crane.Environment, item => item.Key.StartsWith("DUCK_CRANE_", StringComparison.Ordinal));
-        Assert.Empty(crane.Mounts ?? []);
-        Assert.DoesNotContain("/duck/crane-launch-overlay.py", crane.ContainerArguments[^1], StringComparison.Ordinal);
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
+        Assert.Equal("scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", craneImage.Tag);
+        var craneArgs = await GetArgumentsAsync(crane);
+        Assert.Contains("team:=crane", craneArgs[^1]);
+        Assert.Contains("team_color:=YELLOW", craneArgs[^1]);
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
+        Assert.Equal("visibility_graph", craneEnvironment["PLANNER"].ToString());
+        Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
+        Assert.DoesNotContain("FEEDBACK_SIM_MODE", craneEnvironment.Keys);
+        Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_EXPECTED_RESOURCE"].ToString());
+        var craneOverlayMount = Assert.Single(
+            crane.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
+        Assert.EndsWith("CraneLaunchOverlay.py", craneOverlayMount.Source, StringComparison.Ordinal);
+        Assert.True(craneOverlayMount.IsReadOnly);
+        Assert.True(File.Exists(craneOverlayMount.Source));
+        Assert.Contains(CraneTargetAddressSettings.ScriptMountTarget, craneArgs[^1], StringComparison.Ordinal);
 
-        var cm4Simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "cm4-sim")));
-        Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Simulator.Image);
-        Assert.Empty(cm4Simulator.Mounts ?? []);
-        AssertArgumentValue(ToSpec(cm4Simulator).CreateRunArguments(), "--network", "host");
-        AssertArgumentValue(cm4Simulator.ContainerArguments, "--in-port", "12345");
-        AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "12346");
+        var cm4Simulator = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var cm4Image = Assert.Single(cm4Simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim", cm4Image.Image);
+        Assert.Equal("d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Image.Tag);
+        var cm4Args = await GetArgumentsAsync(cm4Simulator);
+        AssertArgumentValue(cm4Args, "--in-port", "12345");
+        AssertArgumentValue(cm4Args, "--out-port", "12346");
+        Assert.DoesNotContain("--network", await GetContainerRuntimeArgsAsync(cm4Simulator));
     }
 
     [Fact]
     public async Task CraneLaunchUsesCraneTeamNameAndSeparateYellowColor()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var arguments = await GetArgumentsAsync(crane);
 
-        Assert.Contains("team:=crane", crane.ContainerArguments[^1]);
-        Assert.Contains("team_color:=YELLOW", crane.ContainerArguments[^1]);
+        Assert.Contains("team:=crane", arguments[^1]);
+        Assert.Contains("team_color:=YELLOW", arguments[^1]);
     }
 
     [Fact]
     public async Task ExplicitCraneTargetAddressUsesTheOwnedOverlayConsumer()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TargetAddress=cm4-sim");
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
 
-        Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
-        Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_EXPECTED_RESOURCE"]);
+        Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_TARGET_ADDRESS"].ToString());
+        Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_EXPECTED_RESOURCE"].ToString());
         Assert.True(
-            crane.ContainerArguments[^1].Contains("/duck/crane-launch-overlay.py", StringComparison.Ordinal),
-            string.Join(" | ", crane.ContainerArguments));
-        var overlayMount = Assert.Single(crane.Mounts!, mount => mount.Target == "/duck/crane-launch-overlay.py");
-        Assert.True(overlayMount.ReadOnly);
+            (await GetArgumentsAsync(crane))[^1].Contains("/duck/crane-launch-overlay.py", StringComparison.Ordinal));
+        var overlayMount = Assert.Single(crane.Annotations.OfType<ContainerMountAnnotation>(), mount => mount.Target == "/duck/crane-launch-overlay.py");
+        Assert.True(overlayMount.IsReadOnly);
         Assert.True(File.Exists(overlayMount.Source));
     }
 
@@ -1079,19 +1136,21 @@ public sealed class AppHostApplicationModelTests
             "--Testing:Crane:TargetAddress=simulator");
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
-        Assert.Equal("simulator", crane.Environment["DUCK_CRANE_EXPECTED_RESOURCE"]);
-        Assert.Equal("simulator", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
+        Assert.Equal("simulator", craneEnvironment["DUCK_CRANE_EXPECTED_RESOURCE"].ToString());
+        Assert.Equal("simulator", craneEnvironment["DUCK_CRANE_TARGET_ADDRESS"].ToString());
     }
 
     [Fact]
-    public async Task CraneAcceptsExplicitHostNetworkLoopbackAddress()
+    public async Task CraneRejectsHostLoopbackAddressInDcpMode()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TargetAddress=127.0.0.1");
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TargetAddress=127.0.0.1");
+        });
 
-        Assert.Equal("127.0.0.1", crane.Environment["DUCK_CRANE_TARGET_ADDRESS"]);
-        Assert.Equal("cm4-sim", crane.Environment["DUCK_CRANE_EXPECTED_RESOURCE"]);
+        Assert.Contains("Testing:Crane:TargetAddress", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -1100,11 +1159,12 @@ public sealed class AppHostApplicationModelTests
         const string teamName = "custom_crane_team";
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:TeamName=" + teamName);
 
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
-        var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneArgs = await GetArgumentsAsync(crane);
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        Assert.NotEmpty(await GetArgumentsAsync(gameController));
 
-        Assert.Contains($"team:={teamName}", crane.ContainerArguments[^1]);
-        Assert.Equal(teamName, gameController.ExpectedCraneTeamName);
+        Assert.Contains($"team:={teamName}", craneArgs[^1]);
     }
 
     [Fact]
@@ -1144,23 +1204,20 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task GameControllerIsTheOnlyRefereeProducerAndUsesPinnedHostNetworkContainerSpec()
+    public async Task GameControllerIsTheOnlyRefereeProducerOnDcpResources()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
-        var gameController = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "game-controller")));
-
-        Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameController.Image);
-        Assert.Equal("app", gameController.ExpectedProcessName);
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         Assert.Equal(
             ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
-            gameController.ContainerArguments);
+            await GetArgumentsAsync(gameController));
 
         var producers = new List<string>();
-        foreach (var resource in appHost.Resources.OfType<ExecutableResource>()
-                     .Where(resource => resource.Name is "simulator" or "game-controller" or "crane" or "cm4-sim"))
+        foreach (var resource in appHost.Resources.OfType<ContainerResource>()
+                     .Where(resource => resource.Name is "simulator" or "game-controller" or "crane" or "cm4-sim" or "tracker-tigers" or "tracker-erforce"))
         {
-            var launch = await GetLaunchOptionsAsync(resource);
-            if (launch.ContainerArguments.Contains("-publishAddress") && launch.ContainerArguments.Contains("224.5.23.1:11003"))
+            var resourceArgs = await GetArgumentsAsync(resource, callbackLimit: resource.Name == "simulator" ? 1 : null);
+            if (PublishesRefereeEndpoint(resourceArgs))
             {
                 producers.Add(resource.Name);
             }
@@ -1170,7 +1227,7 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task WrapperHealthDependenciesWaitForHealthyServicesAndDuckProjectStart()
+    public async Task ComparisonDcpDependenciesUseServiceReadinessAndStartOrdering()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var simulator = Find(appHost, "simulator");
@@ -1179,13 +1236,13 @@ public sealed class AppHostApplicationModelTests
         var gameController = Find(appHost, "game-controller");
         var crane = Find(appHost, "crane");
 
-        AssertSingleWait(duck, simulator, WaitType.WaitUntilHealthy);
-        AssertWaits(crane, (duck, WaitType.WaitUntilStarted), (gameController, WaitType.WaitUntilHealthy), (cm4, WaitType.WaitUntilHealthy));
-        AssertSingleWait(cm4, simulator, WaitType.WaitUntilHealthy);
+        AssertSingleWait(duck, simulator, WaitType.WaitUntilStarted);
+        AssertWaits(crane, (duck, WaitType.WaitUntilStarted), (gameController, WaitType.WaitUntilHealthy), (cm4, WaitType.WaitUntilStarted));
+        AssertSingleWait(simulator, cm4, WaitType.WaitUntilStarted);
     }
 
     [Fact]
-    public async Task ConfigOverridesAndNonVisibilityPlannerChangeWrapperSpecAndDependencies()
+    public async Task ConfigOverridesAndNonVisibilityPlannerChangeDcpResourceConfigurationAndDependencies()
     {
         using var appHost = await CreateAppHostAsync(
             "--Testing:Mode=comparison",
@@ -1197,23 +1254,48 @@ public sealed class AppHostApplicationModelTests
             "--Testing:Crane:Planner=rvo2");
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
-        var simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "simulator")));
-        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli:custom-tag", simulator.Image);
-        Assert.Contains("custom-geometry", simulator.ContainerArguments);
-        Assert.Contains("Custom", simulator.ContainerArguments);
-        Assert.Contains("22346", simulator.ContainerArguments);
-        Assert.Contains("blue", simulator.ContainerArguments);
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var simulatorImage = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", simulatorImage.Image);
+        Assert.Equal("custom-tag", simulatorImage.Tag);
+        var simulatorArgs = await GetArgumentsAsync(simulator, callbackLimit: 1);
+        Assert.Contains("custom-geometry", simulatorArgs);
+        Assert.Contains("Custom", simulatorArgs);
+        Assert.Contains("22346", simulatorArgs);
+        Assert.Contains("blue", simulatorArgs);
 
-        var craneResource = Assert.IsType<ExecutableResource>(Find(appHost, "crane"));
-        var crane = await GetLaunchOptionsAsync(craneResource);
-        Assert.Equal("rvo2", crane.Environment["PLANNER"]);
-        Assert.Equal("22346", crane.Environment["CRANE_TARGET_PORT"]);
-        Assert.Equal("true", crane.Environment["FEEDBACK_SIM_MODE"]);
-        AssertWaits(craneResource, (Find(appHost, "duck"), WaitType.WaitUntilStarted), (Find(appHost, "game-controller"), WaitType.WaitUntilHealthy));
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
+        Assert.Equal("rvo2", craneEnvironment["PLANNER"].ToString());
+        Assert.Equal("22346", craneEnvironment["CRANE_TARGET_PORT"].ToString());
+        Assert.Equal("true", craneEnvironment["FEEDBACK_SIM_MODE"].ToString());
+        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
+        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Contains(
+            crane.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
+        Assert.Contains(
+            CraneTargetAddressSettings.ScriptMountTarget,
+            (await GetArgumentsAsync(crane))[^1],
+            StringComparison.Ordinal);
+        AssertWaits(crane, (Find(appHost, "duck"), WaitType.WaitUntilStarted), (Find(appHost, "game-controller"), WaitType.WaitUntilHealthy));
     }
 
     [Fact]
-    public async Task ComparisonDuckUsesTheSimVisionProfileAndWaitsForSimulatorHealth()
+    public async Task ComparisonDcpDoesNotRejectAnOccupiedHostSimulatorUdpPort()
+    {
+        using var occupiedPort = new System.Net.Sockets.UdpClient(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
+        var port = ((System.Net.IPEndPoint)occupiedPort.Client.LocalEndPoint!).Port;
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
+            "--Testing:Simulator:IbisPort=" + port);
+
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        AssertArgumentValue(await GetArgumentsAsync(simulator, callbackLimit: 1), "--ibis-port", port.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    }
+
+    [Fact]
+    public async Task ComparisonDuckUsesTheSimVisionProfileAndStartsWithSimulator()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var simulator = Find(appHost, "simulator");
@@ -1231,7 +1313,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("224.5.23.2", environment["VisionReceiver__MulticastAddress"]);
         Assert.Equal("10020", environment["VisionReceiver__Port"]);
         Assert.Same(simulator, wait.Resource);
-        Assert.Equal(WaitType.WaitUntilHealthy, wait.WaitType);
+        Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
     }
 
     [Fact]
@@ -1264,9 +1346,10 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task StandardBaseDuckUsesExistingIdentityHandoffWhenContextIsConfigured()
+    public async Task StandardDcpDuckUsesExistingIdentityHandoffWhenContextIsConfigured()
     {
         using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
             "--Testing:IdentityControl:DockerContext=desktop-linux",
             "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
@@ -1281,9 +1364,10 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task StandardBaseDuckRespectsExplicitlyDisabledIdentityHandoff()
+    public async Task StandardDcpDuckRespectsExplicitlyDisabledIdentityHandoff()
     {
         using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
             "--Testing:IdentityControl:DesktopBridgeEnabled=false",
             "--Testing:IdentityControl:DockerContext=desktop-linux",
             "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
@@ -1350,35 +1434,37 @@ public sealed class AppHostApplicationModelTests
             "--Testing:Simulator:IbisPort=22346",
             "--Testing:Crane:Planner=" + planner);
 
-        var simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "simulator")));
-        AssertArgumentValue(simulator.ContainerArguments, "--ibis-port", "22346");
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        AssertArgumentValue(await GetArgumentsAsync(simulator, callbackLimit: 1), "--ibis-port", "22346");
 
-        var crane = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "crane")));
-        Assert.Equal(planner, crane.Environment["PLANNER"]);
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
+        Assert.Equal(planner, craneEnvironment["PLANNER"].ToString());
         if (planner == "visibility_graph")
         {
-            var cm4Simulator = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, "cm4-sim")));
-            AssertArgumentValue(cm4Simulator.ContainerArguments, "--out-port", "22346");
-            Assert.Equal("12345", crane.Environment["CRANE_TARGET_PORT"]);
+            var cm4Simulator = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+            AssertArgumentValue(await GetArgumentsAsync(cm4Simulator), "--out-port", "22346");
+            Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
         }
         else
         {
             Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
-            Assert.Equal("22346", crane.Environment["CRANE_TARGET_PORT"]);
+            Assert.Equal("22346", craneEnvironment["CRANE_TARGET_PORT"].ToString());
         }
     }
 
     [Fact]
-    public async Task CraneDiagnosticsPathReachesOnlyItsWrapperAndNotTheContainer()
+    public async Task DcpCraneDiagnosticsPathIsNotInjectedIntoContainers()
     {
         var path = Path.Combine(Path.GetTempPath(), "duck-crane-model-" + Guid.NewGuid().ToString("N"), "crane-probe.jsonl");
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison", "--Testing:Crane:DiagnosticsPath=" + path);
         foreach (var name in new[] { "simulator", "game-controller", "crane", "cm4-sim" })
         {
-            var launch = await GetLaunchOptionsAsync(Assert.IsType<ExecutableResource>(Find(appHost, name)));
-            Assert.Equal(name == "crane" ? Path.GetFullPath(path) : null, launch.CraneDiagnosticsPath);
-            Assert.DoesNotContain(launch.Environment, entry => entry.Key.Contains("DiagnosticsPath", StringComparison.Ordinal));
-            Assert.DoesNotContain(ToSpec(launch).CreateRunArguments(), argument => argument.Contains(path, StringComparison.Ordinal));
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            var environment = await GetResourceEnvironmentAsync(resource);
+            var runtimeArgs = await GetContainerRuntimeArgsAsync(resource);
+            Assert.DoesNotContain(environment, entry => entry.Key.Contains("DiagnosticsPath", StringComparison.Ordinal));
+            Assert.DoesNotContain(runtimeArgs, argument => argument.Contains(path, StringComparison.Ordinal));
         }
     }
 
@@ -1461,10 +1547,16 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(expectedValue, arguments[index + 1]);
     }
 
-    private static async Task<string[]> GetArgumentsAsync(IResourceWithArgs resource)
+    private static async Task<string[]> GetArgumentsAsync(IResourceWithArgs resource, int? callbackLimit = null)
     {
         var args = new List<object>();
-        foreach (var annotation in resource.Annotations.OfType<CommandLineArgsCallbackAnnotation>())
+        var callbacks = resource.Annotations.OfType<CommandLineArgsCallbackAnnotation>();
+        if (callbackLimit is not null)
+        {
+            callbacks = callbacks.Take(callbackLimit.Value);
+        }
+
+        foreach (var annotation in callbacks)
         {
             await annotation.Callback(new CommandLineArgsCallbackContext(args, resource, CancellationToken.None));
         }

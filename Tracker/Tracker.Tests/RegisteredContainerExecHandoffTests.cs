@@ -84,6 +84,23 @@ public sealed class RegisteredContainerExecHandoffTests
     }
 
     [Fact]
+    public async Task DebugHostRelayIsAllowedOnlyThroughTheExistingOwnedIdentityExec()
+    {
+        var target = ProjectTarget();
+        var runner = new FakeDockerCommandRunner(EngineId, Inspect(ContainerId, "running", RunId, Role));
+
+        var handoff = await ContainerIdentityExecHandoff.TryHandoffAsync(
+            target, RunId, 1, null, "desktop-linux", EngineId, runner, CancellationToken.None,
+            executableAssembly: "Tracker.DebugHost.dll");
+
+        Assert.NotNull(handoff);
+        Assert.Equal("boot-fake-01", handoff!.BootId);
+        Assert.Equal(
+            new[] { "--context", "desktop-linux", "exec", "-i", ContainerId, "dotnet", "Tracker.DebugHost.dll", "--identity-control" },
+            runner.RelayArguments);
+    }
+
+    [Fact]
     public async Task SafeTraceRecordsOnlyHandoffStagesAndOutcomesWhenEnabled()
     {
         var tracePath = Path.Combine(Path.GetTempPath(), $"duck-handoff-trace-{Guid.NewGuid():N}.jsonl");

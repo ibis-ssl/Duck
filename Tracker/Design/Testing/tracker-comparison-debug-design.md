@@ -135,7 +135,7 @@ ER-Force は Crane の開発用 compose で利用実績がある `roboticserlang
 
 ## DebugHost の起動設定
 
-`debug-host` はブリッジ内の `Tracker.DebugHost` コンテナとして起動する。比較専用の監視役とし、自身の追跡と UDP 送信は動かさない。受信開始後に同じ有限窓の Duck / TIGERs / ER-Force の追跡情報を調べ、三つの 比較対象の役割 が互いに別の 送信元識別子 へ一意に対応した場合だけ `Ready` とする。コンテナ開始だけでは準備完了としない。
+`debug-host` はブリッジ内の `Tracker.DebugHost` コンテナとして起動する。比較専用の監視役とし、自身の追跡と UDP 送信は動かさない。受信開始後に同じ有限窓の Duck / TIGERs / ER-Force の追跡情報を調べ、三つの 比較対象の役割 が互いに別の 送信元識別子 へ一意に対応した場合だけ `Ready` とする。コンテナ開始だけでは準備完了としない。`Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した構成では、DebugHost は共通の `prepare` / `challenge` / `commit` による識別情報受渡し契約を通じて、当該実行・資源・役割・完全コンテナIDに帰属する診断入力を受け取る。`Ready` は三つの異なる追跡役割の診断入力が現在の識別世代で新たに復号された証跡を要求する。視覚検出の鮮度はこの比較準備判定とは別に、#102 の全体受入で確認する。
 
 simulator の起動を Duck／DebugHost の受信待ちに依存させない。比較追跡器は simulator と Game Controller の準備を待つ。DebugHost の起動前に三者の受信完了を要求せず、起動後の 比較の準備確認 で判定する。各受信証跡と外部サービスの準備確認はブリッジ内で採取し、主設計に定めた限定 HTTP 接続先で DCP／AppHostへ伝える。旧ホスト側の `TrackerPacketReadinessMonitor` 等をそのまま残さない。
 

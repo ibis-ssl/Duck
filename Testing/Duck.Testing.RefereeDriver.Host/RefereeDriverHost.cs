@@ -33,6 +33,7 @@ internal static class RefereeDriverHost
             {
                 isReady = match.IsReady,
                 reason = match.Reason,
+                refereeCommand = match.Udp?.Command,
                 diagnostic,
                 api = match.Api,
             }, statusCode: match.IsReady ? StatusCodes.Status200OK : StatusCodes.Status503ServiceUnavailable);

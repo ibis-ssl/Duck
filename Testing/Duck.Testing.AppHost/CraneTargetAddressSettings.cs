@@ -22,10 +22,11 @@ internal sealed record CraneTargetAddressSettings(
         ArgumentException.ThrowIfNullOrWhiteSpace(planner);
         ArgumentException.ThrowIfNullOrWhiteSpace(appHostBaseDirectory);
 
+        var expectedResource = planner == "visibility_graph" ? "cm4-sim" : "simulator";
         var target = configuration[ConfigurationKey];
-        if (target is null && useStandardBase && planner == "visibility_graph")
+        if (target is null && useStandardBase)
         {
-            target = "cm4-sim";
+            target = expectedResource;
         }
 
         if (target is null)
@@ -38,7 +39,6 @@ internal sealed record CraneTargetAddressSettings(
             throw InvalidTarget("must not be empty when specified");
         }
 
-        var expectedResource = planner == "visibility_graph" ? "cm4-sim" : "simulator";
         if (target is "cm4-sim" or "simulator")
         {
             if (!string.Equals(target, expectedResource, StringComparison.Ordinal))
@@ -46,9 +46,9 @@ internal sealed record CraneTargetAddressSettings(
                 throw InvalidTarget($"does not match the selected planner resource '{expectedResource}'");
             }
         }
-        else if (!string.Equals(target, "127.0.0.1", StringComparison.Ordinal))
+        else
         {
-            throw InvalidTarget("must be the selected simulator resource name or the host-network loopback address 127.0.0.1");
+            throw InvalidTarget($"must be the selected simulator resource name '{expectedResource}'");
         }
 
         var scriptSource = Path.GetFullPath(Path.Combine(appHostBaseDirectory, "CraneLaunchOverlay.py"));
