@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
@@ -419,6 +420,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             catch (RefereeStateLostException exception)
             {
+                var lostSnapshot = exception.StateLoss.Snapshot;
+                resultWriter.RecordRefereeHealthAtFailure(
+                    httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
+                        ? matchedEvidence
+                        : null);
                 throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
             }
             catch (OperationCanceledException exception)
@@ -503,6 +509,60 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(43u, retainedHealth.GetProperty("commandCounter").GetUInt32());
         Assert.Equal(nameof(Referee.Types.Command.PrepareKickoffYellow), retainedHealth.GetProperty("command").GetString());
         Assert.True(retainedHealth.GetProperty("readElapsedMilliseconds").GetDouble() >= 0);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeStateLossRetainsMatchedHealthSourceAndApiState()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}""",
+            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"HALT","phase":"HALT"},"credential":"must-not-be-retained"}}""",
+            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var active = await source.WaitForChangeAsync(null, CancellationToken.None);
+        var halted = await source.WaitForChangeAsync(active.CommandCounter, CancellationToken.None);
+        var lateRead = await source.ReadCurrentAsync(CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.ForceStart, active.Command);
+        Assert.Equal(Referee.Types.Command.Halt, halted.Command);
+        Assert.Equal(42u, halted.CommandCounter);
+        Assert.Equal(43u, lateRead.Snapshot!.CommandCounter);
+        var stateLoss = new RefereeStateLostException(halted);
+        Assert.Same(halted, stateLoss.StateLoss.Snapshot);
+        Assert.True(source.TryGetReadEvidence(stateLoss.StateLoss.Snapshot, out var matchedEvidence));
+        var currentHealth = Assert.IsType<RefereeHealthReadEvidence>(matchedEvidence);
+        Assert.Equal(200, currentHealth.HttpStatusCode);
+        Assert.True(currentHealth.IsReady);
+        Assert.Equal("Matched", currentHealth.Reason);
+        Assert.Equal("172.18.0.2:11003", currentHealth.UdpSourceKey);
+        Assert.Equal("172.18.0.2:11003", currentHealth.UdpRemoteEndpoint);
+        Assert.Equal("HALT", currentHealth.ApiCommand);
+        Assert.Equal("HALT", currentHealth.ApiPhase);
+        Assert.Equal(42u, currentHealth.CommandCounter);
+        Assert.Equal("FORCE_START", lateRead.ReadEvidence!.ApiCommand);
+        Assert.Equal(43u, lateRead.ReadEvidence.CommandCounter);
+
+        var snapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        snapshots.Enqueue(active);
+        snapshots.Enqueue(halted);
+        var writer = new AspireAcceptanceResultWriter(snapshots);
+        writer.RecordFailure(stateLoss);
+        writer.RecordRefereeHealthAtFailure(currentHealth);
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+        await writer.WriteAsync(
+            resultPath, "active_robot_motion_wait", 0, null, null, null, null, null);
+        var json = await File.ReadAllTextAsync(resultPath);
+        Assert.DoesNotContain("must-not-be-retained", json, StringComparison.Ordinal);
+        using var result = System.Text.Json.JsonDocument.Parse(json);
+        var retainedHealth = result.RootElement.GetProperty("refereeHealthAtFailure");
+        Assert.Equal(42u, retainedHealth.GetProperty("commandCounter").GetUInt32());
+        Assert.Equal("HALT", retainedHealth.GetProperty("apiCommand").GetString());
+        Assert.Equal("Matched", retainedHealth.GetProperty("reason").GetString());
+        Assert.Equal("unavailable", result.RootElement.GetProperty("refereeHealthAtCounterGap").GetString());
     }
 
     [Fact]
@@ -1086,6 +1146,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         private readonly TimeSpan pollDelay = pollInterval ?? TimeSpan.FromMilliseconds(100);
         private readonly SemaphoreSlim readGate = new(1, 1);
         private readonly ConcurrentDictionary<uint, DateTimeOffset> observationTimesByCounter = new();
+        private readonly ConditionalWeakTable<RefereeCommandSnapshot, RefereeHealthReadEvidence> readEvidenceBySnapshot = new();
+
+        public bool TryGetReadEvidence(
+            RefereeCommandSnapshot snapshot,
+            out RefereeHealthReadEvidence? evidence) =>
+            readEvidenceBySnapshot.TryGetValue(snapshot, out evidence);
 
         public bool TryGetObservationTime(uint commandCounter, out DateTimeOffset observedAtUtc) =>
             observationTimesByCounter.TryGetValue(commandCounter, out observedAtUtc);
@@ -1148,6 +1214,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty);
                 }
 
+                var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
+                    ? diagnosticElement
+                    : default;
+                var apiState = root.TryGetProperty("api", out var apiElement) &&
+                    apiElement.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                    apiElement.TryGetProperty("state", out var stateElement)
+                        ? stateElement
+                        : default;
                 var readEvidence = new RefereeHealthReadEvidence(
                     (int)response.StatusCode,
                     isReady,
@@ -1156,7 +1230,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     snapshot?.YellowTeamName,
                     readStartedAtUtc,
                     readCompletedAtUtc,
-                    readElapsed.TotalMilliseconds);
+                    readElapsed.TotalMilliseconds,
+                    ReadScalar(root, "reason"),
+                    ReadScalar(diagnostic, "sourceKey"),
+                    ReadScalar(diagnostic, "remoteEndpoint"),
+                    ReadScalar(apiState, "command"),
+                    ReadScalar(apiState, "phase"));
                 var result = new CurrentRefereeHealthSnapshot(
                     isReady,
                     snapshot,
@@ -1165,6 +1244,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 if (result.ObservedAtUtc is { } readyObservedAt && snapshot is not null)
                 {
                     observationTimesByCounter[snapshot.CommandCounter] = readyObservedAt;
+                    readEvidenceBySnapshot.Add(snapshot, readEvidence);
                 }
 
                 return result;
@@ -1173,6 +1253,26 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             {
                 readGate.Release();
             }
+        }
+
+        private static string? ReadScalar(
+            System.Text.Json.JsonElement parent,
+            string propertyName)
+        {
+            if (parent.ValueKind != System.Text.Json.JsonValueKind.Object ||
+                !parent.TryGetProperty(propertyName, out var value))
+            {
+                return null;
+            }
+
+            return value.ValueKind switch
+            {
+                System.Text.Json.JsonValueKind.String => value.GetString(),
+                System.Text.Json.JsonValueKind.Number => value.GetRawText(),
+                System.Text.Json.JsonValueKind.True => "true",
+                System.Text.Json.JsonValueKind.False => "false",
+                _ => null,
+            };
         }
 
         private static Referee.Types.Command ParseRefereeCommand(System.Text.Json.JsonElement value)

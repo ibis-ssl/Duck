@@ -35,7 +35,12 @@ internal sealed record RefereeHealthReadEvidence(
     string? YellowTeamName,
     DateTimeOffset? ReadStartedAtUtc,
     DateTimeOffset? ReadCompletedAtUtc,
-    double? ReadElapsedMilliseconds);
+    double? ReadElapsedMilliseconds,
+    string? Reason = null,
+    string? UdpSourceKey = null,
+    string? UdpRemoteEndpoint = null,
+    string? ApiCommand = null,
+    string? ApiPhase = null);
 
 internal sealed class RefereeCommandCounterGapException(
     uint expectedCounter,
@@ -53,10 +58,16 @@ internal sealed class AspireAcceptanceResultWriter(
     ConcurrentQueue<RefereeCommandSnapshot> refereeSnapshots)
 {
     private Exception? failure;
+    private RefereeHealthReadEvidence? refereeHealthAtFailure;
 
     public void RecordFailure(Exception exception)
     {
         failure = exception ?? throw new ArgumentNullException(nameof(exception));
+    }
+
+    public void RecordRefereeHealthAtFailure(RefereeHealthReadEvidence? evidence)
+    {
+        refereeHealthAtFailure = evidence;
     }
 
     public static InvalidOperationException CreateMotionFailure(RefereeStateLostException exception) =>
@@ -76,7 +87,8 @@ internal sealed class AspireAcceptanceResultWriter(
         {
             status = failure is null ? "passed" : "failed",
             failure = failure?.ToString(),
-            refereeHealthAtCounterGap = FindRefereeHealthRead(failure) ?? (object)"unavailable",
+            refereeHealthAtCounterGap = FormatHealthRead(FindRefereeHealthRead(failure)),
+            refereeHealthAtFailure = FormatHealthRead(refereeHealthAtFailure),
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {
@@ -102,29 +114,38 @@ internal sealed class AspireAcceptanceResultWriter(
                 new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
     }
 
-    private static object? FindRefereeHealthRead(Exception? exception)
+    private static RefereeHealthReadEvidence? FindRefereeHealthRead(Exception? exception)
     {
         for (var current = exception; current is not null; current = current.InnerException)
         {
             if (current is RefereeCommandCounterGapException gap)
-            {
-                if (gap.CurrentHealth is not { } health)
-                    return "unavailable";
-                return new
-                {
-                    httpStatusCode = health.HttpStatusCode,
-                    isReady = health.IsReady,
-                    command = health.Command,
-                    commandCounter = health.CommandCounter,
-                    yellowTeamName = health.YellowTeamName,
-                    readStartedAtUtc = health.ReadStartedAtUtc,
-                    readCompletedAtUtc = health.ReadCompletedAtUtc,
-                    readElapsedMilliseconds = health.ReadElapsedMilliseconds,
-                };
-            }
+                return gap.CurrentHealth;
         }
 
         return null;
+    }
+
+    private static object FormatHealthRead(RefereeHealthReadEvidence? health)
+    {
+        if (health is null)
+            return "unavailable";
+
+        return new
+        {
+            httpStatusCode = health.HttpStatusCode,
+            isReady = health.IsReady,
+            command = health.Command,
+            commandCounter = health.CommandCounter,
+            yellowTeamName = health.YellowTeamName,
+            reason = health.Reason,
+            udpSourceKey = health.UdpSourceKey,
+            udpRemoteEndpoint = health.UdpRemoteEndpoint,
+            apiCommand = health.ApiCommand,
+            apiPhase = health.ApiPhase,
+            readStartedAtUtc = health.ReadStartedAtUtc,
+            readCompletedAtUtc = health.ReadCompletedAtUtc,
+            readElapsedMilliseconds = health.ReadElapsedMilliseconds,
+        };
     }
 
     private static RefereeStateLossEvent? FindRefereeStateLoss(Exception? exception)
