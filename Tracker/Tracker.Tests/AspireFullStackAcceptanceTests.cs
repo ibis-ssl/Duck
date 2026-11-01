@@ -556,6 +556,28 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task LiveComparisonWaitIncludesLastHealthResponseWhenPredicateTimesOut()
+    {
+        const string healthResponse = """
+            {"isReady":true,"missingRoles":[],"conflictingRoles":[],"sources":[{"logicalRole":"Duck","sourceName":"ibis","sourceUuid":"duck","receivedAt":"2026-11-01T13:02:30Z"},{"logicalRole":"ER-Force","sourceName":"ER-FORCE","sourceUuid":"erforce","receivedAt":"2026-11-01T13:02:31Z"},{"logicalRole":"TIGERs","sourceName":"TIGERs","sourceUuid":"tigers","receivedAt":"2026-11-01T13:02:32Z"}],"pairs":[{"referenceRole":"Duck","comparisonRole":"ER-Force","status":"Compared"},{"referenceRole":"Duck","comparisonRole":"TIGERs","status":"MissingComparisonFrame"},{"referenceRole":"ER-Force","comparisonRole":"TIGERs","status":"Compared"}],"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T13:02:33Z","frameNumber":4692,"yellowRobots":[{"robotId":2,"x":220,"y":35}]},"visionPacketsReceived":7}
+            """;
+        using var http = new HttpClient(new QueueHttpMessageHandler(healthResponse))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+
+        var failure = await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            WaitForLiveComparisonAsync(http, cancellation.Token, TimeSpan.FromHours(1)));
+
+        Assert.Contains("COMPARISON_HEALTH_WAIT_CANCELLED", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("lastResponseStatus=200", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("\"logicalRole\":\"TIGERs\"", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("\"status\":\"MissingComparisonFrame\"", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("\"detectionReceivedAt\":\"2026-11-01T13:02:33Z\"", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ParsesLatestVisionHealthAsYellowDetectionFrame()
     {
         using var document = System.Text.Json.JsonDocument.Parse(
@@ -922,44 +944,72 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
     private static async Task<LiveComparisonHealthSnapshot> WaitForLiveComparisonAsync(
         HttpClient client,
+        CancellationToken cancellationToken,
+        TimeSpan? pollInterval = null)
+    {
+        HttpStatusCode? lastResponseStatus = null;
+        string? lastResponseBody = null;
+        try
+        {
+            while (true)
+            {
+                var response = await ReadComparisonHealthResponseAsync(client, cancellationToken);
+                lastResponseStatus = response.StatusCode;
+                lastResponseBody = response.Body;
+                using var document = System.Text.Json.JsonDocument.Parse(response.Body);
+                var root = document.RootElement;
+                if (root.TryGetProperty("isReady", out var ready) && ready.ValueKind == System.Text.Json.JsonValueKind.True &&
+                    root.TryGetProperty("sources", out var sourcesElement) && sourcesElement.ValueKind == System.Text.Json.JsonValueKind.Array &&
+                    root.TryGetProperty("pairs", out var pairsElement) && pairsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    var sourceRoles = sourcesElement.EnumerateArray()
+                        .Select(source => source.GetProperty("logicalRole").GetString() ?? string.Empty)
+                        .Distinct(StringComparer.Ordinal)
+                        .Order(StringComparer.Ordinal)
+                        .ToArray();
+                    var requiredRoles = new[] { "Duck", "ER-Force", "TIGERs" }.Order(StringComparer.Ordinal).ToArray();
+                    var pairs = pairsElement.EnumerateArray()
+                        .Select(pair => new LiveComparisonPairEvidence(
+                            pair.GetProperty("referenceRole").GetString() ?? string.Empty,
+                            pair.GetProperty("comparisonRole").GetString() ?? string.Empty,
+                            ParseTrackerDifferencePairStatus(pair.GetProperty("status"))))
+                        .ToArray();
+                    if (sourceRoles.SequenceEqual(requiredRoles, StringComparer.Ordinal) &&
+                        pairs.Length == 3 && pairs.All(pair => pair.Status == TrackerDifferencePairStatus.Compared))
+                    {
+                        var vision = ParseLatestVisionHealth(root);
+                        Assert.NotNull(vision);
+                        return new LiveComparisonHealthSnapshot(
+                            vision.FrameNumber,
+                            vision.DetectionReceivedAt,
+                            root.GetProperty("visionPacketsReceived").GetInt32(),
+                            sourceRoles,
+                            pairs);
+                    }
+                }
+
+                await Task.Delay(pollInterval ?? TimeSpan.FromMilliseconds(200), cancellationToken);
+            }
+        }
+        catch (OperationCanceledException exception) when (cancellationToken.IsCancellationRequested)
+        {
+            var lastResponse = lastResponseStatus is { } status && lastResponseBody is { } body
+                ? $"lastResponseStatus={(int)status}; lastResponseBody={body}"
+                : "lastResponse=none";
+            throw new OperationCanceledException(
+                $"COMPARISON_HEALTH_WAIT_CANCELLED: {lastResponse}",
+                exception,
+                cancellationToken);
+        }
+    }
+
+    private static async Task<(HttpStatusCode StatusCode, string Body)> ReadComparisonHealthResponseAsync(
+        HttpClient client,
         CancellationToken cancellationToken)
     {
-        while (true)
-        {
-            using var document = await ReadComparisonHealthAsync(client, cancellationToken);
-            var root = document.RootElement;
-            if (root.TryGetProperty("isReady", out var ready) && ready.ValueKind == System.Text.Json.JsonValueKind.True &&
-                root.TryGetProperty("sources", out var sourcesElement) && sourcesElement.ValueKind == System.Text.Json.JsonValueKind.Array &&
-                root.TryGetProperty("pairs", out var pairsElement) && pairsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
-            {
-                var sourceRoles = sourcesElement.EnumerateArray()
-                    .Select(source => source.GetProperty("logicalRole").GetString() ?? string.Empty)
-                    .Distinct(StringComparer.Ordinal)
-                    .Order(StringComparer.Ordinal)
-                    .ToArray();
-                var requiredRoles = new[] { "Duck", "ER-Force", "TIGERs" }.Order(StringComparer.Ordinal).ToArray();
-                var pairs = pairsElement.EnumerateArray()
-                    .Select(pair => new LiveComparisonPairEvidence(
-                        pair.GetProperty("referenceRole").GetString() ?? string.Empty,
-                        pair.GetProperty("comparisonRole").GetString() ?? string.Empty,
-                        ParseTrackerDifferencePairStatus(pair.GetProperty("status"))))
-                    .ToArray();
-                if (sourceRoles.SequenceEqual(requiredRoles, StringComparer.Ordinal) &&
-                    pairs.Length == 3 && pairs.All(pair => pair.Status == TrackerDifferencePairStatus.Compared))
-                {
-                    var vision = ParseLatestVisionHealth(root);
-                    Assert.NotNull(vision);
-                    return new LiveComparisonHealthSnapshot(
-                        vision.FrameNumber,
-                        vision.DetectionReceivedAt,
-                        root.GetProperty("visionPacketsReceived").GetInt32(),
-                        sourceRoles,
-                        pairs);
-                }
-            }
-
-            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-        }
+        using var response = await client.GetAsync("health/comparison", cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        return (response.StatusCode, body);
     }
 
     private static async Task<System.Text.Json.JsonDocument> ReadComparisonHealthAsync(
