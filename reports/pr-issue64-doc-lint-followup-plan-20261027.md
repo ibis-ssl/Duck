@@ -42,6 +42,6 @@ Issue #64 は `Tracker/Design/Testing/aspire-simulation-test-environment.md` と
 
 本計画書を作成した後、PR #95 の既存ブランチで対象二文書の編集と全文検査を進めました。既存の whitelist 差分は、承認済み候補の不足語だけを登録したものです。この追補では whitelist を変更していません。AutoRef は既存 alias があるため重複登録していません。
 
-最新の二文書全体検査では、textlint と CSpell は exit 0 でした。Sudachi whitelist は exit 1 で、次の5件が残っています。ループとバック（`tasks-status.md` 51行目の「ループバックアドレスへの接続」）、`de`（同39行目のパス部分）、コンテナー（同129行目）、コンパイラー（`aspire-simulation-test-environment.md` 461行目）。この結果は成功扱いにせず、対象 Issue の完了条件は未達として扱います。Yomiyasu はシミュレーション設計書が100点で指摘なし、状態台帳が0点・40件の助言でした。後者では361非空行中306行が箇条書きです。`git diff --check` は exit 0 でした。
+最新の二文書全体検査では、textlint と CSpell は exit 0 でした。Sudachi whitelist は exit 1 で、次の4件が残っています。ループとバック（`tasks-status.md` 51行目「ループバックアドレスへの接続」）、`de`（同39行目の実パス要素。パス全体をインラインコードで記しても検査結果は変わりません）、コンパイル（`aspire-simulation-test-environment.md` 461行目の説明語）。この結果は成功扱いにせず、対象 Issue の完了条件は未達として扱います。Yomiyasu はシミュレーション設計書が100点で指摘なし、状態台帳が0点・40件の助言でした。後者では361非空行中306行が箇条書きです。`git diff --check` は exit 0 でした。
 
 前回の独立全文レビューは直前コミットまでの文書で通過しました。本追補後の差分は、同じレビュアーによる確認を依頼する時点の記録です。今回のレビュー結果を待たず、Sudachi の未解決項目を含めて Issue #64 を完了とはしません。
