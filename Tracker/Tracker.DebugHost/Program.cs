@@ -7,6 +7,26 @@ using Tracker.DebugHost.Vision;
 using Microsoft.Extensions.Options;
 using TrackerConnectionLib;
 
+if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
+{
+    using var relayCancellation = new CancellationTokenSource();
+    ConsoleCancelEventHandler cancelRelay = (_, eventArgs) =>
+    {
+        eventArgs.Cancel = true;
+        relayCancellation.Cancel();
+    };
+    Console.CancelKeyPress += cancelRelay;
+    try
+    {
+        return await DebugHostIdentityControlProtocol.RelayAsync(
+            Console.In, Console.Out, DebugHostIdentityControlProtocol.SocketPath, relayCancellation.Token);
+    }
+    finally
+    {
+        Console.CancelKeyPress -= cancelRelay;
+    }
+}
+
 var builder = WebApplication.CreateBuilder(args);
 DebugHostHealthEndpoints.ConfigureInternalHttp(builder);
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
@@ -84,6 +104,8 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 if (startupTrackerOptions.Receive.Enabled)
 {
+    if (builder.Configuration.GetValue<bool>("Testing:IdentityControl:Enabled"))
+        builder.Services.AddHostedService<DebugHostIdentityControlHostedService>();
     builder.Services.AddSingleton<DiagnosticTrackerDeserializer>();
     builder.Services.AddSingleton(serviceProvider =>
     {
@@ -104,7 +126,8 @@ if (startupTrackerOptions.Receive.Enabled)
 
 if (!replayOnly)
 {
-    builder.Services.AddHostedService<VisionReceiverService>();
+    builder.Services.AddSingleton<VisionReceiverService>();
+    builder.Services.AddHostedService(serviceProvider => serviceProvider.GetRequiredService<VisionReceiverService>());
 }
 
 var app = builder.Build();
@@ -141,3 +164,4 @@ app.MapGet("/health/vision", (ServiceReceiveDiagnostics diagnostics, IConfigurat
     DebugHostHealthEndpoints.GetVisionHealthResult(diagnostics, configuration, packets));
 
 app.Run();
+return 0;

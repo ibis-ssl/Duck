@@ -586,6 +586,31 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ComparisonModeConfiguresDebugHostIdentityHandoffForStrictReadiness()
+    {
+        const string runId = "comparison-debug-host-owned-run";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
+            "--Testing:Diagnostics:RunId=" + runId,
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
+        var environment = await GetResourceEnvironmentAsync(debugHost);
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("debug-host", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.Equal(runId, environment["Testing__Diagnostics__RunId"].ToString());
+        var runtimeArgs = await GetContainerRuntimeArgsAsync(debugHost);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", runtimeArgs);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=debug-host", runtimeArgs);
+
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Equal(2, services.GetServices<IHostedService>()
+            .OfType<ContainerIdentityHandoffService>().Count());
+    }
+
+    [Fact]
     public async Task DebugHostReplayOnlyUsesExistingDirectoryReadOnlyWithoutStartingNetworkResources()
     {
         var replayDirectory = Path.Combine(Path.GetTempPath(), "duck-debug-host-replay-" + Guid.NewGuid().ToString("N"));

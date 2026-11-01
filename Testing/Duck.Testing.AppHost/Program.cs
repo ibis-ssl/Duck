@@ -644,6 +644,13 @@ if (testingMode == "comparison")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
     captureSettings.ApplyTo(debugHost);
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        debugHost
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "debug-host");
+        EnableDesktopIdentityBridge(debugHost, duckRunId, "debug-host", "Tracker.DebugHost.dll", enabledOverride: true);
+    }
     var httpEndpoint = debugHost.Resource.Annotations
         .OfType<EndpointAnnotation>()
         .Single(endpoint => endpoint.Name == "http");

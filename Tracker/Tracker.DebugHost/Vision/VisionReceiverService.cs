@@ -21,6 +21,38 @@ public sealed class VisionReceiverService(
     ServiceReceiveDiagnostics diagnostics,
     ILogger<VisionReceiverService> logger) : BackgroundService
 {
+    private readonly object diagnosticEpochGate = new();
+    private ServiceReceiveDiagnostics.ReceiveEpoch? diagnosticEpoch;
+
+    internal ServiceReceiveDiagnostics.ReceiveEpoch ApplyIdentity(ResourceDiagnosticIdentity identity)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        lock (diagnosticEpochGate)
+        {
+            diagnosticEpoch = diagnostics.ReplaceIdentityAndBeginEpoch(identity, "vision");
+            return diagnosticEpoch;
+        }
+    }
+
+    internal ServiceReceiveDiagnostics.ReceiveAttempt BeginDiagnosticReceive()
+    {
+        lock (diagnosticEpochGate)
+        {
+            if (diagnosticEpoch is null)
+                throw new InvalidOperationException("The Vision diagnostics epoch has not started.");
+            return diagnostics.BeginReceive(diagnosticEpoch);
+        }
+    }
+
+    internal ServiceReceiveDiagnostics.ReceiveEpoch BeginDiagnosticEpoch()
+    {
+        lock (diagnosticEpochGate)
+        {
+            diagnosticEpoch = diagnostics.BeginEpoch("vision");
+            return diagnosticEpoch;
+        }
+    }
+
     /// <summary>
     /// profile-aware receiver 設定に追従しながら UDP 受信 loop を実行する。
     /// </summary>
@@ -30,7 +62,7 @@ public sealed class VisionReceiverService(
         {
             var snapshot = receiverOptionsStore.GetSnapshot();
             var receiverOptions = snapshot.Options;
-            var epoch = diagnostics.BeginEpoch("vision");
+            BeginDiagnosticEpoch();
             var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
             UdpClient udpClient;
             MulticastJoinResult joinResult;
@@ -77,7 +109,7 @@ public sealed class VisionReceiverService(
                     try
                     {
                         var result = await udpClient.ReceiveAsync(configurationScope.Token);
-                        var attempt = diagnostics.BeginReceive(epoch);
+                        var attempt = BeginDiagnosticReceive();
                         var receivedAt = DateTimeOffset.UtcNow;
                         packetCaptureWriter.Capture(result.Buffer, result.RemoteEndPoint, receivedAt);
                         var packet = DecodeDatagram(result.Buffer, result.RemoteEndPoint, receivedAt,
@@ -105,7 +137,7 @@ public sealed class VisionReceiverService(
                     catch (Exception ex)
                     {
                         store.RecordDecodeError(ex);
-                        diagnostics.RecordFailure(diagnostics.BeginReceive(epoch));
+                        diagnostics.RecordFailure(BeginDiagnosticReceive());
                         logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
                     }
                 }
