@@ -995,7 +995,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         DistributedApplication? application = null;
         Task? startTask = null;
         var startAttempted = false;
-        DateTimeOffset? appHostStartAt = null;
+        DateTimeOffset? containerEventWindowStartedAt = null;
         var sentinelCreationAttempted = false;
         string? sentinelContainerId = null;
         string[] baselineContainerIds = [];
@@ -1155,9 +1155,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.Equal("/bin/bash", craneResource.Entrypoint);
             output.WriteLine("failureInjection=test-only Crane entrypoint=/bin/bash args=-c,exit 82; image/dependencies/labels/network/health unchanged");
 
+            containerEventWindowStartedAt = DateTimeOffset.UtcNow;
             application = await appHostBuilder.BuildAsync(new CancellationTokenSource(Remaining(workBudget, "AppHost build")).Token);
             startAttempted = true;
-            appHostStartAt = DateTimeOffset.UtcNow;
             startTask = application.StartAsync(new CancellationTokenSource(Remaining(workBudget, "AppHost start")).Token);
             var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
             foreach (var resource in new[] { "simulator", "duck", "game-controller", "cm4-sim" })
@@ -1249,7 +1249,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             {
                 var eventQuery = await DockerAsync([
                     "events",
-                    "--since", appHostStartAt!.Value.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
+                    "--since", containerEventWindowStartedAt!.Value.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
                     "--until", DateTimeOffset.UtcNow.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
                     "--filter", "type=container",
                     "--filter", $"label={DockerContainerSpec.StackLabel}={stackId}",
@@ -1292,7 +1292,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.Single(craneEvents, entry => entry.Action == "start");
             var dieEvent = Assert.Single(craneEvents, entry => entry.Action == "die");
             Assert.Equal(craneId, dieEvent.ContainerId);
-            output.WriteLine($"failureObservedBeforeStop=true; stack={stackId}; appHostStartAt={appHostStartAt:O}; craneFullId={craneId}; craneDockerState={craneState.Value.Status}; craneExitCode={craneState.Value.ExitCode}; craneRunning={craneState.Value.Running}; craneAspireState={craneNotification}; craneEvents={System.Text.Json.JsonSerializer.Serialize(craneEvents.Select(entry => new { entry.Action, entry.Resource, entry.ExitCode, entry.ContainerId }))}; otherResources={System.Text.Json.JsonSerializer.Serialize(otherResources.Select(entry => new { Resource = entry.Key, entry.Value.Id, entry.Value.Status, entry.Value.Running }))}; startTaskCompleted={startTask.IsCompleted}");
+            output.WriteLine($"failureObservedBeforeStop=true; stack={stackId}; containerEventWindowStartedAt={containerEventWindowStartedAt:O}; craneFullId={craneId}; craneDockerState={craneState.Value.Status}; craneExitCode={craneState.Value.ExitCode}; craneRunning={craneState.Value.Running}; craneAspireState={craneNotification}; craneEvents={System.Text.Json.JsonSerializer.Serialize(craneEvents.Select(entry => new { entry.Action, entry.Resource, entry.ExitCode, entry.ContainerId }))}; otherResources={System.Text.Json.JsonSerializer.Serialize(otherResources.Select(entry => new { Resource = entry.Key, entry.Value.Id, entry.Value.Status, entry.Value.Running }))}; startTaskCompleted={startTask.IsCompleted}");
             Assert.Equal("82", dieEvent.ExitCode);
             Assert.Equal("exited", craneState.Value.Status);
             Assert.Equal(82, craneState.Value.ExitCode);
