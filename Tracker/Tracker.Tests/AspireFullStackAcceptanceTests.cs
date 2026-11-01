@@ -143,6 +143,30 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(0)]
+    public void Net003CommandTimeoutRejectsNonPositiveTimeBeforeDockerStart(double availableSeconds)
+    {
+        Assert.Throws<TimeoutException>(() => GetPositiveCommandTimeout(
+            TimeSpan.FromSeconds(availableSeconds),
+            TimeSpan.FromSeconds(15),
+            "NET-003 work budget expired before a Docker command could start."));
+    }
+
+    [Theory]
+    [InlineData(0.5, 0.5)]
+    [InlineData(20, 15)]
+    public void Net003CommandTimeoutPreservesPositiveBoundedTime(double availableSeconds, double expectedSeconds)
+    {
+        Assert.Equal(
+            TimeSpan.FromSeconds(expectedSeconds),
+            GetPositiveCommandTimeout(
+                TimeSpan.FromSeconds(availableSeconds),
+                TimeSpan.FromSeconds(15),
+                "NET-003 work budget expired before a Docker command could start."));
+    }
+
     [Fact]
     public void ResolvesCm4TransportHelperFromExistingRuntimeBundleWithoutEnvironmentOverride()
     {
@@ -663,13 +687,19 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         TimeSpan WorkCommandTimeout()
         {
             var available = Remaining(workBudget, "work") - TimeSpan.FromSeconds(1);
-            return available < TimeSpan.FromSeconds(15) ? available : TimeSpan.FromSeconds(15);
+            return GetPositiveCommandTimeout(
+                available,
+                TimeSpan.FromSeconds(15),
+                "NET-003 work budget expired before a Docker command could start.");
         }
 
         TimeSpan CleanupCommandTimeout()
         {
             var available = Remaining(totalBudget, "cleanup") - TimeSpan.FromSeconds(1);
-            return available < TimeSpan.FromSeconds(5) ? available : TimeSpan.FromSeconds(5);
+            return GetPositiveCommandTimeout(
+                available,
+                TimeSpan.FromSeconds(5),
+                "NET-003 cleanup budget expired before a Docker command could start.");
         }
 
         TimeSpan ProcessKillWaitTimeout() => TimeSpan.FromSeconds(1);
@@ -870,15 +900,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
             }
 
-            var remainingOwnedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
-            output.WriteLine($"NET003 pre-rescueOwnedIds={string.Join(",", remainingOwnedIds)}; debugHostImageId={debugHostImageId}");
-            foreach (var id in remainingOwnedIds)
+            string[] remainingOwnedIds = [];
+            try
             {
-                _ = await AssertStackOwnedContainerAsync(id, stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
-                var removal = await DockerAsync(["rm", "--force", id], cleanup: true);
-                Assert.Equal(0, removal.ExitCode);
+                remainingOwnedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
+                output.WriteLine($"NET003 pre-rescueOwnedIds={string.Join(",", remainingOwnedIds)}; debugHostImageId={debugHostImageId}");
+                Assert.Empty(remainingOwnedIds);
             }
-            Assert.Empty(await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout));
+            finally
+            {
+                await RemoveOnlySecondStackContainersAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
+                var remainingAfterRescue = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
+                output.WriteLine($"NET003 post-rescueOwnedIds={string.Join(",", remainingAfterRescue)}");
+                Assert.Empty(remainingAfterRescue);
+            }
             var runningAfter = (await DockerAsync(["ps", "--quiet", "--no-trunc"], cleanup: true))
                 .StandardOutput.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToHashSet(StringComparer.Ordinal);
@@ -1647,6 +1682,16 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
 
         return new ProcessResult(process.ExitCode, await stdoutTask, await stderrTask);
+    }
+
+    private static TimeSpan GetPositiveCommandTimeout(TimeSpan available, TimeSpan maximum, string expiredMessage)
+    {
+        if (available <= TimeSpan.Zero)
+        {
+            throw new TimeoutException(expiredMessage);
+        }
+
+        return available < maximum ? available : maximum;
     }
 
     private sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
