@@ -1166,29 +1166,45 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
             string[] ownedIds = [];
-            List<string> craneIds = [];
+            string? craneId = null;
+            (string Status, int ExitCode, bool Running)? craneState = null;
             var craneDependencyWait = Stopwatch.StartNew();
             var craneDependencyWaitBudget = TimeSpan.FromSeconds(45);
-            while (craneIds.Count == 0 && craneDependencyWait.Elapsed < craneDependencyWaitBudget)
+            while (craneState is null || (craneState.Value.Status != "exited" && craneState.Value.Status != "dead"))
             {
                 ownedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, WorkCommandTimeout, ProcessKillWaitTimeout);
+                var craneCandidates = new List<string>();
                 foreach (var id in ownedIds)
                 {
                     var labels = await ReadLabelsAsync(id);
                     if (labels.GetValueOrDefault(DockerContainerSpec.ResourceLabel) == "crane")
-                        craneIds.Add(id);
+                        craneCandidates.Add(id);
                 }
 
-                if (craneIds.Count == 0)
+                Assert.True(craneCandidates.Count <= 1,
+                    $"DCP produced more than one Crane container for stack {stackId}: {string.Join(',', craneCandidates)}.");
+                if (craneCandidates.Count == 1)
                 {
-                    var waitRemaining = craneDependencyWaitBudget - craneDependencyWait.Elapsed;
-                    await Task.Delay(
-                        waitRemaining < TimeSpan.FromMilliseconds(250) ? waitRemaining : TimeSpan.FromMilliseconds(250),
-                        new CancellationTokenSource(Remaining(workBudget, "Crane dependency start")).Token);
+                    var observedId = craneCandidates[0];
+                    if (craneId is not null)
+                        Assert.Equal(craneId, observedId);
+                    craneId = observedId;
+                    craneState = await InspectStateAsync(craneId);
                 }
+
+                if (craneState is { Status: "exited" or "dead" })
+                    break;
+
+                if (craneDependencyWait.Elapsed >= craneDependencyWaitBudget)
+                    break;
+
+                var waitRemaining = craneDependencyWaitBudget - craneDependencyWait.Elapsed;
+                await Task.Delay(
+                    waitRemaining < TimeSpan.FromMilliseconds(250) ? waitRemaining : TimeSpan.FromMilliseconds(250),
+                    new CancellationTokenSource(Remaining(workBudget, "Crane failure observation")).Token);
             }
 
-            if (craneIds.Count == 0)
+            if (craneId is null || craneState is null || craneState.Value.Status is not ("exited" or "dead"))
             {
                 var startOutcome = "still-pending";
                 if (startTask.IsCompleted)
@@ -1203,7 +1219,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         startOutcome = $"faulted:{exception.GetType().FullName}:{exception.Message}";
                     }
                 }
-                output.WriteLine($"failureNotObserved=true; craneContainerCount=0; appHostStartOutcome={startOutcome}; otherOwnedIds={string.Join(',', ownedIds)}");
+                output.WriteLine($"failureNotObserved=true; craneFullId={craneId}; craneState={craneState}; appHostStartOutcome={startOutcome}; ownedIds={string.Join(',', ownedIds)}");
             }
 
             var otherResources = new Dictionary<string, (string Id, string Status, bool Running)>(StringComparer.Ordinal);
@@ -1224,49 +1240,63 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
             Assert.Equal(4, otherResources.Count);
-            Assert.Single(craneIds);
-            var craneId = craneIds[0];
-            var craneState = await InspectStateAsync(craneId);
+            Assert.NotNull(craneId);
+            Assert.NotNull(craneState);
             var craneNotification = notifications.TryGetCurrentState("crane", out var craneCurrent)
                 ? craneCurrent.Snapshot.State?.Text ?? "unknown"
                 : "unavailable";
-            var eventQuery = await DockerAsync([
-                "events",
-                "--since", appHostStartAt!.Value.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture),
-                "--until", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture),
-                "--filter", "type=container",
-                "--filter", $"label={DockerContainerSpec.StackLabel}={stackId}",
-                "--format", "{{json .}}",
-            ]);
-            Assert.Equal(0, eventQuery.ExitCode);
-            var craneEvents = eventQuery.StandardOutput
-                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(line =>
-                {
-                    using var eventDocument = System.Text.Json.JsonDocument.Parse(line);
-                    var eventRoot = eventDocument.RootElement;
-                    var action = eventRoot.TryGetProperty("Action", out var actionElement)
-                        ? actionElement.GetString()
-                        : eventRoot.GetProperty("status").GetString();
-                    var attributes = eventRoot.GetProperty("Actor").GetProperty("Attributes");
-                    var resource = attributes.TryGetProperty(DockerContainerSpec.ResourceLabel, out var resourceElement)
-                        ? resourceElement.GetString()
-                        : null;
-                    var exitCode = attributes.TryGetProperty("exitCode", out var exitCodeElement)
-                        ? exitCodeElement.GetString()
-                        : null;
-                    return (Action: action, Resource: resource, ExitCode: exitCode);
-                })
-                .Where(entry => entry.Resource == "crane")
-                .ToArray();
+            async Task<(string? Action, string? Resource, string? ExitCode, string? ContainerId)[]> ReadCraneEventsAsync()
+            {
+                var eventQuery = await DockerAsync([
+                    "events",
+                    "--since", appHostStartAt!.Value.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
+                    "--until", DateTimeOffset.UtcNow.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
+                    "--filter", "type=container",
+                    "--filter", $"label={DockerContainerSpec.StackLabel}={stackId}",
+                    "--format", "{{json .}}",
+                ]);
+                Assert.Equal(0, eventQuery.ExitCode);
+                return eventQuery.StandardOutput
+                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(line =>
+                    {
+                        using var eventDocument = System.Text.Json.JsonDocument.Parse(line);
+                        var eventRoot = eventDocument.RootElement;
+                        var action = eventRoot.TryGetProperty("Action", out var actionElement)
+                            ? actionElement.GetString()
+                            : eventRoot.GetProperty("status").GetString();
+                        var actor = eventRoot.GetProperty("Actor");
+                        var attributes = actor.GetProperty("Attributes");
+                        var resource = attributes.TryGetProperty(DockerContainerSpec.ResourceLabel, out var resourceElement)
+                            ? resourceElement.GetString()
+                            : null;
+                        var exitCode = attributes.TryGetProperty("exitCode", out var exitCodeElement)
+                            ? exitCodeElement.GetString()
+                            : null;
+                        var containerId = actor.TryGetProperty("ID", out var idElement) ? idElement.GetString() : null;
+                        return (Action: action, Resource: resource, ExitCode: exitCode, ContainerId: containerId);
+                    })
+                    .Where(entry => entry.Resource == "crane")
+                    .ToArray();
+            }
+
+            var craneEvents = await ReadCraneEventsAsync();
+            while (!craneEvents.Any(entry => entry.Action == "die" && entry.ContainerId == craneId))
+            {
+                var waitRemaining = Remaining(workBudget, "Crane die event");
+                await Task.Delay(waitRemaining < TimeSpan.FromMilliseconds(250) ? waitRemaining : TimeSpan.FromMilliseconds(250));
+                craneEvents = await ReadCraneEventsAsync();
+            }
+
             Assert.Single(craneEvents, entry => entry.Action == "create");
             Assert.Single(craneEvents, entry => entry.Action == "start");
             var dieEvent = Assert.Single(craneEvents, entry => entry.Action == "die");
-            output.WriteLine($"failureObservedBeforeStop=true; stack={stackId}; appHostStartAt={appHostStartAt:O}; craneFullId={craneId}; craneDockerState={craneState.Status}; craneExitCode={craneState.ExitCode}; craneRunning={craneState.Running}; craneAspireState={craneNotification}; craneEvents={System.Text.Json.JsonSerializer.Serialize(craneEvents)}; otherResources={System.Text.Json.JsonSerializer.Serialize(otherResources)}; startTaskCompleted={startTask.IsCompleted}");
+            Assert.Equal(craneId, dieEvent.ContainerId);
+            output.WriteLine($"failureObservedBeforeStop=true; stack={stackId}; appHostStartAt={appHostStartAt:O}; craneFullId={craneId}; craneDockerState={craneState.Value.Status}; craneExitCode={craneState.Value.ExitCode}; craneRunning={craneState.Value.Running}; craneAspireState={craneNotification}; craneEvents={System.Text.Json.JsonSerializer.Serialize(craneEvents.Select(entry => new { entry.Action, entry.Resource, entry.ExitCode, entry.ContainerId }))}; otherResources={System.Text.Json.JsonSerializer.Serialize(otherResources.Select(entry => new { Resource = entry.Key, entry.Value.Id, entry.Value.Status, entry.Value.Running }))}; startTaskCompleted={startTask.IsCompleted}");
             Assert.Equal("82", dieEvent.ExitCode);
-            Assert.Equal("exited", craneState.Status);
-            Assert.Equal(82, craneState.ExitCode);
-            Assert.False(craneState.Running);
+            Assert.Equal("exited", craneState.Value.Status);
+            Assert.Equal(82, craneState.Value.ExitCode);
+            Assert.False(craneState.Value.Running);
             Assert.True(await IsSentinelRunningAsync());
 
             if (startTask.IsCompleted)
@@ -1288,89 +1318,134 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         finally
         {
+            var cleanupFailures = new List<string>();
+
+            async Task AttemptCleanupAsync(string name, Func<Task> action)
+            {
+                try
+                {
+                    await action();
+                }
+                catch (Exception exception)
+                {
+                    cleanupFailures.Add($"{name}: {exception.GetType().FullName}: {exception.Message}");
+                    output.WriteLine($"cleanupAttemptFailed={name}; exception={exception.GetType().FullName}: {exception.Message}");
+                }
+            }
+
             try
             {
                 if (application is not null)
                 {
-                    try
+                    if (startAttempted)
                     {
-                        if (startAttempted)
+                        await AttemptCleanupAsync("AppHost.StopAsync", async () =>
                         {
                             using var stopTimeout = new CancellationTokenSource(CleanupOperationTimeout(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(90)));
                             await application.StopAsync(stopTimeout.Token);
-                        }
+                        });
                     }
-                    finally
-                    {
-                        await application.DisposeAsync().AsTask().WaitAsync(CleanupOperationTimeout(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(60)));
-                    }
+
+                    await AttemptCleanupAsync("AppHost.DisposeAsync", async () =>
+                        await application.DisposeAsync().AsTask().WaitAsync(CleanupOperationTimeout(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(60))));
                 }
 
                 if (startTask is not null)
-                {
-                    try
+                    await AttemptCleanupAsync("AppHost.StartTaskJoin", async () =>
                     {
-                        await startTask.WaitAsync(CleanupOperationTimeout(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(45)));
-                    }
-                    catch (Exception exception)
-                    {
-                        output.WriteLine($"appHostStartTaskAfterStop={exception.GetType().FullName}: {exception.Message}");
-                    }
-                }
+                        try
+                        {
+                            await startTask.WaitAsync(CleanupOperationTimeout(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(45)));
+                        }
+                        catch (Exception exception)
+                        {
+                            output.WriteLine($"appHostStartTaskAfterStop={exception.GetType().FullName}: {exception.Message}");
+                        }
+                    });
 
                 if (appHostBuilder is not null)
-                    await appHostBuilder.DisposeAsync().AsTask().WaitAsync(CleanupOperationTimeout(TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(30)));
+                    await AttemptCleanupAsync("AppHostBuilder.DisposeAsync", async () =>
+                        await appHostBuilder.DisposeAsync().AsTask().WaitAsync(CleanupOperationTimeout(TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(30))));
 
                 if (dockerReady)
                 {
-                    string[] remainingOwnedIds = [];
-                    var sentinelStillRunning = false;
-                    try
+                    if (sentinelContainerId is not null)
                     {
-                        remainingOwnedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
-                        sentinelStillRunning = await IsSentinelRunningAsync(cleanup: true);
-                        output.WriteLine($"failurePostStopPreRescueOwnedIds={string.Join(',', remainingOwnedIds)}; sentinelSameFullIdRunning={sentinelStillRunning}; sentinelFullId={sentinelContainerId}");
-                        Assert.Empty(remainingOwnedIds);
-                        Assert.True(sentinelStillRunning, "The same full-ID sentinel must still be running before its own cleanup.");
+                        await AttemptCleanupAsync("Pre-rescue ownership observations", async () =>
+                        {
+                            var remainingOwnedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
+                            var sentinelStillRunning = await IsSentinelRunningAsync(cleanup: true);
+                            output.WriteLine($"failurePostStopPreRescueOwnedIds={string.Join(',', remainingOwnedIds)}; sentinelSameFullIdRunning={sentinelStillRunning}; sentinelFullId={sentinelContainerId}");
+                            Assert.Empty(remainingOwnedIds);
+                            Assert.True(sentinelStillRunning, "The same full-ID sentinel must still be running before its own cleanup.");
+                        });
                     }
-                    finally
+
+                    await AttemptCleanupAsync("Stack-owned rescue cleanup", async () =>
+                        await RemoveOnlySecondStackContainersAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout));
+                    await AttemptCleanupAsync("Stack-owned final inventory", async () =>
                     {
-                        await RemoveOnlySecondStackContainersAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
                         var remainingAfterRescue = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
                         output.WriteLine($"failurePostRescueOwnedIds={string.Join(',', remainingAfterRescue)}");
                         Assert.Empty(remainingAfterRescue);
+                    });
 
-                        if (sentinelContainerId is null && sentinelCreationAttempted)
+                    if (sentinelContainerId is null && sentinelCreationAttempted)
+                    {
+                        await AttemptCleanupAsync("Sentinel identity lookup", async () =>
                         {
                             var lookup = await DockerAsync(["inspect", "--format", "{{.Id}}", sentinelName], cleanup: true);
                             if (lookup.ExitCode == 0)
                                 sentinelContainerId = lookup.StandardOutput.Trim();
-                        }
-                        if (sentinelContainerId is not null)
+                        });
+                    }
+                    if (sentinelContainerId is not null)
+                    {
+                        await AttemptCleanupAsync("Sentinel ownership verification", async () =>
                         {
                             await AssertStackOwnedContainerAsync(sentinelContainerId, sentinelStackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
-                            await RemoveOnlySecondStackContainersAsync(sentinelStackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
-                        }
+                        });
+                    }
+
+                    if (sentinelCreationAttempted)
+                        await AttemptCleanupAsync("Sentinel-owned rescue cleanup", async () =>
+                            await RemoveOnlySecondStackContainersAsync(sentinelStackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout));
+
+                    await AttemptCleanupAsync("Sentinel final inventory", async () =>
+                    {
                         var remainingSentinelIds = await GetOwnedContainerIdsAsync(sentinelStackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
                         output.WriteLine($"failureSentinelAfterCleanup={remainingSentinelIds.Length}; finishedAt={DateTimeOffset.UtcNow:O}; elapsed={acceptanceClock.Elapsed}; totalBudget={totalBudget}");
                         Assert.Empty(remainingSentinelIds);
+                    });
 
+                    await AttemptCleanupAsync("Baseline inventory verification", async () =>
+                    {
                         var afterIds = await GetAllContainerIdsAsync(cleanup: true);
                         Assert.All(baselineContainerIds, id => Assert.Contains(id, afterIds));
-                    }
+                    });
                 }
             }
             finally
             {
                 try
                 {
-                    CleanupStagedAppHostAssets(stagedAssets);
+                    await AttemptCleanupAsync("Staged AppHost asset cleanup", () =>
+                    {
+                        CleanupStagedAppHostAssets(stagedAssets);
+                        return Task.CompletedTask;
+                    });
                 }
                 finally
                 {
-                    dockerPathScope.Dispose();
+                    await AttemptCleanupAsync("Docker process PATH restoration", () =>
+                    {
+                        dockerPathScope.Dispose();
+                        return Task.CompletedTask;
+                    });
                 }
             }
+
+            Assert.True(cleanupFailures.Count == 0, string.Join(Environment.NewLine, cleanupFailures));
         }
     }
 
