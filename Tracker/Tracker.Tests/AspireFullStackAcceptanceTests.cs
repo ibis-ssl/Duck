@@ -468,7 +468,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     {
         using var http = new HttpClient(new QueueHttpMessageHandler(
             """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"}}""",
-            """{"isReady":true,"refereeCommand":{"command":4,"commandCounter":43,"yellowTeamName":"crane"}}"""))
+            """{"isReady":true,"refereeCommand":{"command":4,"commandCounter":43,"yellowTeamName":"crane"},"credential":"must-not-be-retained"}"""))
         {
             BaseAddress = new Uri("http://localhost/"),
         };
@@ -477,8 +477,32 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var initial = await source.WaitForChangeAsync(null, CancellationToken.None);
         Assert.Equal(41u, initial.CommandCounter);
         Assert.Equal("crane", initial.YellowTeamName);
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        var failure = await Assert.ThrowsAsync<RefereeCommandCounterGapException>(async () =>
             await source.WaitForChangeAsync(initial.CommandCounter, CancellationToken.None));
+        var currentHealth = Assert.IsType<RefereeHealthReadEvidence>(failure.CurrentHealth);
+        Assert.Equal(200, currentHealth.HttpStatusCode);
+        Assert.True(currentHealth.IsReady);
+        Assert.Equal(nameof(Referee.Types.Command.PrepareKickoffYellow), currentHealth.Command);
+        Assert.Equal(43u, currentHealth.CommandCounter);
+        Assert.Equal("crane", currentHealth.YellowTeamName);
+        Assert.NotNull(currentHealth.ReadStartedAtUtc);
+        Assert.NotNull(currentHealth.ReadCompletedAtUtc);
+        Assert.True(currentHealth.ReadElapsedMilliseconds >= 0);
+        Assert.DoesNotContain("must-not-be-retained", failure.ToString(), StringComparison.Ordinal);
+
+        var snapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        snapshots.Enqueue(initial);
+        var writer = new AspireAcceptanceResultWriter(snapshots);
+        writer.RecordFailure(failure);
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+        await writer.WriteAsync(
+            resultPath, "active_robot_motion_wait", 0, null, null, null, null, null);
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        var retainedHealth = result.RootElement.GetProperty("refereeHealthAtCounterGap");
+        Assert.Equal(43u, retainedHealth.GetProperty("commandCounter").GetUInt32());
+        Assert.Equal(nameof(Referee.Types.Command.PrepareKickoffYellow), retainedHealth.GetProperty("command").GetString());
+        Assert.True(retainedHealth.GetProperty("readElapsedMilliseconds").GetDouble() >= 0);
     }
 
     [Fact]
@@ -1085,8 +1109,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         var expected = unchecked(previousCommandCounter.Value + 1);
                         if (snapshot.CommandCounter != expected)
                         {
-                            throw new InvalidOperationException(
-                                $"REFEREE_COUNTER_GAP: expected command counter {expected} after {previousCommandCounter.Value}, observed {snapshot.CommandCounter}; refusing to infer an unobserved referee state.");
+                            throw new RefereeCommandCounterGapException(
+                                expected,
+                                previousCommandCounter.Value,
+                                current.ReadEvidence);
                         }
 
                         return snapshot;
@@ -1102,9 +1128,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             await readGate.WaitAsync(cancellationToken);
             try
             {
+                var readStartedAtUtc = DateTimeOffset.UtcNow;
+                var readStartedTimestamp = Stopwatch.GetTimestamp();
                 using var response = await client.GetAsync("health/referee", cancellationToken);
                 var body = await response.Content.ReadAsStringAsync(cancellationToken);
-                var observedAtUtc = DateTimeOffset.UtcNow;
+                var readCompletedAtUtc = DateTimeOffset.UtcNow;
+                var readElapsed = Stopwatch.GetElapsedTime(readStartedTimestamp);
                 using var document = System.Text.Json.JsonDocument.Parse(body);
                 var root = document.RootElement;
                 var isReady = response.IsSuccessStatusCode &&
@@ -1119,7 +1148,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty);
                 }
 
-                var result = new CurrentRefereeHealthSnapshot(isReady, snapshot, isReady && snapshot is not null ? observedAtUtc : null);
+                var readEvidence = new RefereeHealthReadEvidence(
+                    (int)response.StatusCode,
+                    isReady,
+                    snapshot?.Command.ToString(),
+                    snapshot?.CommandCounter,
+                    snapshot?.YellowTeamName,
+                    readStartedAtUtc,
+                    readCompletedAtUtc,
+                    readElapsed.TotalMilliseconds);
+                var result = new CurrentRefereeHealthSnapshot(
+                    isReady,
+                    snapshot,
+                    isReady && snapshot is not null ? readCompletedAtUtc : null,
+                    readEvidence);
                 if (result.ObservedAtUtc is { } readyObservedAt && snapshot is not null)
                 {
                     observationTimesByCounter[snapshot.CommandCounter] = readyObservedAt;
@@ -1245,7 +1287,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     private sealed record CurrentRefereeHealthSnapshot(
         bool IsReady,
         RefereeCommandSnapshot? Snapshot,
-        DateTimeOffset? ObservedAtUtc = null);
+        DateTimeOffset? ObservedAtUtc = null,
+        RefereeHealthReadEvidence? ReadEvidence = null);
 
     [Fact]
     public async Task SecondAppHostWithSameLockIsRejectedWithoutDisruptingFirstStack()

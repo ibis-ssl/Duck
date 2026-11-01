@@ -27,6 +27,28 @@ internal sealed class RecordingRefereeCommandSource(
     }
 }
 
+internal sealed record RefereeHealthReadEvidence(
+    int? HttpStatusCode,
+    bool IsReady,
+    string? Command,
+    uint? CommandCounter,
+    string? YellowTeamName,
+    DateTimeOffset? ReadStartedAtUtc,
+    DateTimeOffset? ReadCompletedAtUtc,
+    double? ReadElapsedMilliseconds);
+
+internal sealed class RefereeCommandCounterGapException(
+    uint expectedCounter,
+    uint previousCounter,
+    RefereeHealthReadEvidence? currentHealth)
+    : InvalidOperationException(
+        $"REFEREE_COUNTER_GAP: expected command counter {expectedCounter} after {previousCounter}; " +
+        $"observed {currentHealth?.CommandCounter?.ToString() ?? "unavailable"}; refusing to infer an unobserved referee state. " +
+        $"Current health (sanitized): {System.Text.Json.JsonSerializer.Serialize((object?)currentHealth ?? "unavailable")}")
+{
+    public RefereeHealthReadEvidence? CurrentHealth { get; } = currentHealth;
+}
+
 internal sealed class AspireAcceptanceResultWriter(
     ConcurrentQueue<RefereeCommandSnapshot> refereeSnapshots)
 {
@@ -54,6 +76,7 @@ internal sealed class AspireAcceptanceResultWriter(
         {
             status = failure is null ? "passed" : "failed",
             failure = failure?.ToString(),
+            refereeHealthAtCounterGap = FindRefereeHealthRead(failure) ?? (object)"unavailable",
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {
@@ -77,6 +100,31 @@ internal sealed class AspireAcceptanceResultWriter(
             System.Text.Json.JsonSerializer.Serialize(
                 evidence,
                 new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    private static object? FindRefereeHealthRead(Exception? exception)
+    {
+        for (var current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is RefereeCommandCounterGapException gap)
+            {
+                if (gap.CurrentHealth is not { } health)
+                    return "unavailable";
+                return new
+                {
+                    httpStatusCode = health.HttpStatusCode,
+                    isReady = health.IsReady,
+                    command = health.Command,
+                    commandCounter = health.CommandCounter,
+                    yellowTeamName = health.YellowTeamName,
+                    readStartedAtUtc = health.ReadStartedAtUtc,
+                    readCompletedAtUtc = health.ReadCompletedAtUtc,
+                    readElapsedMilliseconds = health.ReadElapsedMilliseconds,
+                };
+            }
+        }
+
+        return null;
     }
 
     private static RefereeStateLossEvent? FindRefereeStateLoss(Exception? exception)
