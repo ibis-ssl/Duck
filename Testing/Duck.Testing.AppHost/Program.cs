@@ -655,5 +655,46 @@ if (testingMode == "comparison")
         .WithHttpHealthCheck("/health/comparison", endpointName: "http");
 }
 
+if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:VisionObserverEnabled"]))
+{
+    var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
+    var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
+        .WithEnvironment("Testing__Mode", "comparison")
+        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithEnvironment("Tracker__Enabled", "false")
+        .WithEnvironment("Tracker__PublishUdp", "false")
+        .WithEnvironment("Tracker__Receive__Enabled", "false")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithContainerRuntimeArgs([
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
+        ])
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    captureSettings.ApplyTo(debugHost);
+    debugHost
+        .WithEnvironment("VisionReceiver__PacketCapture__Enabled", "true")
+        .WithEnvironment("VisionReceiver__PacketCapture__FlushEachPacket", "true");
+    if (enableStandardBaseDuckIdentityBridge)
+    {
+        debugHost
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "debug-host");
+        EnableDesktopIdentityBridge(debugHost, duckRunId, "debug-host", "Tracker.DebugHost.dll", enabledOverride: true);
+    }
+    var httpEndpoint = debugHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    httpEndpoint.Port = null;
+    httpEndpoint.TargetHost = "127.0.0.1";
+    debugHost
+        .WaitForStart(simulatorDependency)
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(duck.Resource))
+        .WithHttpHealthCheck("/health/vision", endpointName: "http");
+}
 builder.Build().Run();
 return 0;

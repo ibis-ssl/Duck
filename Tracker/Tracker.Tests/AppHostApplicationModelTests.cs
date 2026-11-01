@@ -1,4 +1,4 @@
-﻿using Aspire.Hosting;
+using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
@@ -504,6 +504,57 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "referee-driver");
     }
 
+    [Fact]
+    public async Task BaseModeCanAddDebugHostVisionObserverWithoutPublishedUdp()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:DebugHost:VisionObserverEnabled=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
+        Assert.Contains(appHost.Resources, resource => resource.Name == "simulator");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "duck");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce");
+        AssertLinuxDistribution(
+            debugHost,
+            "Tracker/Tracker.DebugHost",
+            "Tracker.DebugHost.dll",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+
+        var http = Assert.Single(
+            debugHost.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Tcp && endpoint.TargetPort == 8080);
+        Assert.Null(http.Port);
+        Assert.Equal("127.0.0.1", http.TargetHost);
+        Assert.DoesNotContain(
+            debugHost.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+
+        var environment = await GetResourceEnvironmentAsync(debugHost);
+        Assert.Equal("224.5.23.2", environment["VisionReceiver__MulticastAddress"].ToString());
+        Assert.Equal("10020", environment["VisionReceiver__Port"].ToString());
+        Assert.Equal("false", environment["Tracker__Enabled"].ToString());
+        Assert.Equal("false", environment["Tracker__PublishUdp"].ToString());
+        Assert.Equal("false", environment["Tracker__Receive__Enabled"].ToString());
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("debug-host", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        var duckArgs = await GetContainerRuntimeArgsAsync(Assert.IsType<ContainerResource>(Find(appHost, "duck")));
+        var debugHostArgs = await GetContainerRuntimeArgsAsync(debugHost);
+        var duckStack = Assert.Single(duckArgs, argument => argument.StartsWith("duck.aspire.stack=", StringComparison.Ordinal));
+        var duckRun = Assert.Single(duckArgs, argument => argument.StartsWith("duck.aspire.run=", StringComparison.Ordinal));
+        Assert.Contains(duckStack, debugHostArgs);
+        Assert.Contains("duck.aspire.resource=debug-host", debugHostArgs);
+        Assert.Contains(duckRun, debugHostArgs);
+        Assert.Equal("true", environment["VisionReceiver__PacketCapture__Enabled"].ToString());
+        Assert.Equal("true", environment["VisionReceiver__PacketCapture__FlushEachPacket"].ToString());
+        var captureMount = Assert.Single(debugHost.Annotations.OfType<ContainerMountAnnotation>());
+        Assert.Contains(Path.Combine("Duck", "Aspire"), captureMount.Source, StringComparison.OrdinalIgnoreCase);
+        Assert.EndsWith("captures", captureMount.Source, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("/data/captures", captureMount.Target);
+        Assert.False(captureMount.IsReadOnly);
+    }
     [Fact]
     public async Task ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp()
     {

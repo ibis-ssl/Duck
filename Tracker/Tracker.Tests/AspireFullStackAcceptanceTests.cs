@@ -629,6 +629,315 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow()
+    {
+        var acceptanceClock = Stopwatch.StartNew();
+        var totalBudget = TimeSpan.FromSeconds(300);
+        var workBudget = TimeSpan.FromSeconds(240);
+        var runId = "issue82-net003-" + Guid.NewGuid().ToString("N");
+        var stackId = runId;
+        var artifactsDirectory = Path.Combine(Path.GetTempPath(), runId);
+        var captureRoot = artifactsDirectory;
+        Directory.CreateDirectory(artifactsDirectory);
+        var repositoryRoot = FindRepositoryRoot();
+        var (dockerExecutable, dockerPathScope) = ResolveAndPrepareDockerExecutable(
+            Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"),
+            Environment.GetEnvironmentVariable("PATH"));
+        var stagedAssets = new List<StagedAppHostAsset>();
+        IDistributedApplicationTestingBuilder? appHostBuilder = null;
+        DistributedApplication? application = null;
+        string[] baselineRunningIds = [];
+        string debugHostImageId = "";
+        var windowStartedAt = DateTimeOffset.MinValue;
+        var windowEndedAt = DateTimeOffset.MinValue;
+        var receiveWindowStarted = false;
+
+        TimeSpan Remaining(TimeSpan budget, string phase)
+        {
+            var remaining = budget - acceptanceClock.Elapsed;
+            if (remaining <= TimeSpan.Zero)
+                throw new TimeoutException($"NET-003 {phase} budget expired after {acceptanceClock.Elapsed}.");
+            return remaining;
+        }
+
+        TimeSpan WorkCommandTimeout()
+        {
+            var available = Remaining(workBudget, "work") - TimeSpan.FromSeconds(1);
+            return available < TimeSpan.FromSeconds(15) ? available : TimeSpan.FromSeconds(15);
+        }
+
+        TimeSpan CleanupCommandTimeout()
+        {
+            var available = Remaining(totalBudget, "cleanup") - TimeSpan.FromSeconds(1);
+            return available < TimeSpan.FromSeconds(5) ? available : TimeSpan.FromSeconds(5);
+        }
+
+        TimeSpan ProcessKillWaitTimeout() => TimeSpan.FromSeconds(1);
+
+        Task<ProcessResult> DockerAsync(IEnumerable<string> arguments, bool cleanup = false) =>
+            RunProcessAsync(
+                dockerExecutable,
+                arguments,
+                cleanup ? CleanupCommandTimeout() : WorkCommandTimeout(),
+                ProcessKillWaitTimeout());
+
+        async Task<(HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body)> ReadVisionObservationAsync(string baseUrl)
+        {
+            using var client = new HttpClient { Timeout = WorkCommandTimeout() };
+            using var response = await client.GetAsync(new Uri(new Uri(baseUrl), "/health/vision"));
+            var responseBody = await response.Content.ReadAsStringAsync();
+            using var document = System.Text.Json.JsonDocument.Parse(responseBody);
+            var root = document.RootElement;
+            System.Text.Json.JsonElement GetPropertyIgnoreCase(System.Text.Json.JsonElement element, string name)
+            {
+                foreach (var property in element.EnumerateObject())
+                {
+                    if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                        return property.Value;
+                }
+                throw new System.Text.Json.JsonException($"Health response is missing '{name}': {responseBody}");
+            }
+
+            var count = GetPropertyIgnoreCase(root, "VisionPacketsReceived").GetInt64();
+            var isReady = GetPropertyIgnoreCase(root, "IsReady").GetBoolean();
+            var diagnostics = GetPropertyIgnoreCase(root, "Diagnostics");
+            var decodedCount = diagnostics.ValueKind == System.Text.Json.JsonValueKind.Array
+                ? diagnostics.EnumerateArray().Sum(snapshot => GetPropertyIgnoreCase(snapshot, "SuccessfullyDecodedCount").GetInt64())
+                : GetPropertyIgnoreCase(diagnostics, "SuccessfullyDecodedCount").GetInt64();
+            return (response.StatusCode, count, decodedCount, isReady, responseBody);
+        }
+
+        try
+        {
+            var (dockerContext, engineId) = await ResolveDockerIdentityAsync(WorkCommandTimeout, ProcessKillWaitTimeout);
+            var requiredImages = new[]
+            {
+                "ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd",
+                "robocupssl/ssl-game-controller:3.20.3",
+                "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+                "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+                "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+            };
+            var imageCheck = await DockerAsync(["image", "inspect", .. requiredImages]);
+            Assert.Equal(0, imageCheck.ExitCode);
+            baselineRunningIds = (await DockerAsync(["ps", "--quiet", "--no-trunc"]))
+                .StandardOutput.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Order(StringComparer.Ordinal)
+                .ToArray();
+
+            var helper = ResolveCm4TransportHelperSource(repositoryRoot);
+            var overlay = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
+            stagedAssets.AddRange(StageLocalAppHostAssets(helper, overlay));
+            foreach (var relativePath in new[]
+            {
+                Path.Combine("Tracker", "Tracker.RuntimeHost", "bin", "Release", "net10.0", "publish", "Tracker.RuntimeHost.dll"),
+                Path.Combine("Tracker", "Tracker.DebugHost", "bin", "Release", "net10.0", "publish", "Tracker.DebugHost.dll"),
+            })
+            {
+                Assert.True(File.Exists(Path.Combine(repositoryRoot, relativePath)), $"Required local publish output was not found: {relativePath}");
+            }
+
+            var arguments = new[]
+            {
+                "--Testing:Mode=base",
+                "--Testing:DebugHost:VisionObserverEnabled=true",
+                "--Testing:DebugHost:CaptureRootPath=" + captureRoot,
+                "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+                "--Testing:IdentityControl:DockerContext=" + dockerContext,
+                "--Testing:IdentityControl:ExpectedEngineId=" + engineId,
+                "--Testing:IdentityControl:DockerExecutable=" + dockerExecutable,
+                "--Testing:StackOwnership:LockPath=" + Path.Combine(artifactsDirectory, runId + ".lock"),
+                "--Testing:StackOwnership:StackId=" + stackId,
+                "--Testing:Diagnostics:RunId=" + runId,
+                "--Testing:Crane:FixtureManifestPath=" + Path.Combine(artifactsDirectory, "crane-fixture.json"),
+                "--Testing:Crane:DiagnosticsPath=" + Path.Combine(artifactsDirectory, "crane-diagnostics.jsonl"),
+            };
+            using var appHostDeadline = new CancellationTokenSource(Remaining(workBudget, "AppHost creation"));
+            appHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                arguments, appHostDeadline.Token);
+            application = await appHostBuilder.BuildAsync(appHostDeadline.Token);
+            await application.StartAsync(appHostDeadline.Token);
+
+            var notifications = application.Services.GetRequiredService<ResourceNotificationService>();
+            foreach (var resource in new[] { "simulator", "duck", "game-controller", "cm4-sim", "crane", "debug-host" })
+            {
+                using var readinessDeadline = new CancellationTokenSource(Remaining(workBudget, "resource readiness"));
+                await notifications.WaitForResourceAsync(resource, KnownResourceStates.Running, readinessDeadline.Token);
+            }
+
+            var ownedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, WorkCommandTimeout, ProcessKillWaitTimeout);
+            Assert.Equal(6, ownedIds.Length);
+            var resourceIds = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var id in ownedIds)
+            {
+                var labels = await DockerAsync(["inspect", "--format", "{{json .Config.Labels}}", id]);
+                Assert.Equal(0, labels.ExitCode);
+                using var labelDocument = System.Text.Json.JsonDocument.Parse(labels.StandardOutput);
+                resourceIds[labelDocument.RootElement.GetProperty(DockerContainerSpec.ResourceLabel).GetString()!] = id;
+            }
+
+            var debugHostImage = await DockerAsync(["inspect", "--format", "{{.Image}}", resourceIds["debug-host"]]);
+            Assert.Equal(0, debugHostImage.ExitCode);
+            debugHostImageId = debugHostImage.StandardOutput.Trim();
+
+            var endpointPorts = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var entry in new[] { ("duck", resourceIds["duck"], "39108/tcp"), ("debug-host", resourceIds["debug-host"], "8080/tcp") })
+            {
+                var result = await DockerAsync(["inspect", "--format", "{{json .NetworkSettings.Ports}}", entry.Item2]);
+                Assert.Equal(0, result.ExitCode);
+                using var ports = System.Text.Json.JsonDocument.Parse(result.StandardOutput);
+                var mapping = ports.RootElement.GetProperty(entry.Item3)[0];
+                Assert.Equal("127.0.0.1", mapping.GetProperty("HostIp").GetString());
+                endpointPorts[entry.Item1] = int.Parse(mapping.GetProperty("HostPort").GetString()!);
+            }
+
+            var duckUrl = $"http://127.0.0.1:{endpointPorts["duck"]}";
+            var debugHostUrl = $"http://127.0.0.1:{endpointPorts["debug-host"]}";
+            var readinessDeadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(45);
+            (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) duckBefore;
+            (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) debugHostBefore;
+            while (true)
+            {
+                try
+                {
+                    duckBefore = await ReadVisionObservationAsync(duckUrl);
+                    debugHostBefore = await ReadVisionObservationAsync(debugHostUrl);
+                    if (duckBefore.Status == HttpStatusCode.OK && duckBefore.PacketCount > 0 && debugHostBefore.DecodedCount > 0)
+                        break;
+                    if (DateTimeOffset.UtcNow >= readinessDeadlineAt)
+                        throw new TimeoutException($"NET-003 receive counters did not become available. Duck={duckBefore.Body}; DebugHost={debugHostBefore.Body}");
+                }
+                catch (Exception) when (DateTimeOffset.UtcNow < readinessDeadlineAt)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(250), new CancellationTokenSource(Remaining(workBudget, "health readiness")).Token);
+                }
+            }
+
+            windowStartedAt = DateTimeOffset.UtcNow;
+            receiveWindowStarted = true;
+            await Task.Delay(TimeSpan.FromSeconds(5), new CancellationTokenSource(Remaining(workBudget, "5-second receive window")).Token);
+            windowEndedAt = DateTimeOffset.UtcNow;
+            var duckAfter = await ReadVisionObservationAsync(duckUrl);
+            var debugHostAfter = await ReadVisionObservationAsync(debugHostUrl);
+            Assert.Equal(HttpStatusCode.OK, duckAfter.Status);
+            Assert.True(duckAfter.PacketCount > duckBefore.PacketCount, $"Duck did not receive vision during the window: {duckBefore.PacketCount} -> {duckAfter.PacketCount}.");
+            Assert.True(debugHostAfter.DecodedCount > debugHostBefore.DecodedCount, $"DebugHost did not decode vision during the window: {debugHostBefore.DecodedCount} -> {debugHostAfter.DecodedCount}. Health={debugHostAfter.Body}");
+            output.WriteLine($"NET003 engine={dockerContext}/{engineId}; stack={stackId}; windowStart={windowStartedAt:O}; windowEnd={windowEndedAt:O}; duckStatus={(int)duckBefore.Status}->{(int)duckAfter.Status}; duckDecoded={duckBefore.DecodedCount}->{duckAfter.DecodedCount}; debugHostStatus={(int)debugHostBefore.Status}->{(int)debugHostAfter.Status}; debugHostReady={debugHostBefore.IsReady}->{debugHostAfter.IsReady}; debugHostDecoded={debugHostBefore.DecodedCount}->{debugHostAfter.DecodedCount}; debugHostRawCapture=await-stop.");
+
+        }
+        finally
+        {
+            try
+            {
+            Exception? shutdownFailure = null;
+            if (application is not null)
+            {
+                try
+                {
+                    using var stopDeadline = new CancellationTokenSource(
+                        Remaining(totalBudget, "AppHost stop") < TimeSpan.FromSeconds(30)
+                            ? Remaining(totalBudget, "AppHost stop")
+                            : TimeSpan.FromSeconds(30));
+                    await application.StopAsync(stopDeadline.Token);
+                }
+                catch (Exception exception)
+                {
+                    shutdownFailure = exception;
+                    output.WriteLine($"NET003 AppHost stop failed: {exception}");
+                }
+
+                try
+                {
+                    await application.DisposeAsync().AsTask().WaitAsync(Remaining(totalBudget, "AppHost dispose"));
+                }
+                catch (Exception exception)
+                {
+                    shutdownFailure ??= exception;
+                    output.WriteLine($"NET003 AppHost dispose failed: {exception}");
+                }
+            }
+            if (appHostBuilder is not null)
+            {
+                try
+                {
+                    await appHostBuilder.DisposeAsync().AsTask().WaitAsync(Remaining(totalBudget, "AppHost builder dispose"));
+                }
+                catch (Exception exception)
+                {
+                    shutdownFailure ??= exception;
+                    output.WriteLine($"NET003 AppHost builder dispose failed: {exception}");
+                }
+            }
+
+            var remainingOwnedIds = await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
+            output.WriteLine($"NET003 pre-rescueOwnedIds={string.Join(",", remainingOwnedIds)}; debugHostImageId={debugHostImageId}");
+            foreach (var id in remainingOwnedIds)
+            {
+                _ = await AssertStackOwnedContainerAsync(id, stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout);
+                var removal = await DockerAsync(["rm", "--force", id], cleanup: true);
+                Assert.Equal(0, removal.ExitCode);
+            }
+            Assert.Empty(await GetOwnedContainerIdsAsync(stackId, dockerExecutable, CleanupCommandTimeout, ProcessKillWaitTimeout));
+            var runningAfter = (await DockerAsync(["ps", "--quiet", "--no-trunc"], cleanup: true))
+                .StandardOutput.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToHashSet(StringComparer.Ordinal);
+            Assert.All(baselineRunningIds, id => Assert.Contains(id, runningAfter));
+
+            if (receiveWindowStarted)
+            {
+                var captureDirectory = Path.Combine(captureRoot, "Duck", "Aspire", runId, "captures");
+                var captureFiles = Directory.Exists(captureDirectory)
+                    ? Directory.GetFiles(captureDirectory, "*.jsonl.gz", SearchOption.AllDirectories)
+                    : [];
+                Assert.NotEmpty(captureFiles);
+                var packetCount = 0;
+                var detectionPacketCount = 0;
+                var ballCount = 0;
+                var robotCount = 0;
+                DateTimeOffset? firstPacket = null;
+                DateTimeOffset? lastPacket = null;
+                foreach (var file in captureFiles)
+                {
+                    using var compressed = File.OpenRead(file);
+                    using var gzip = new System.IO.Compression.GZipStream(compressed, System.IO.Compression.CompressionMode.Decompress);
+                    using var reader = new StreamReader(gzip);
+                    string? line;
+                    while ((line = await reader.ReadLineAsync()) is not null)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        using var record = System.Text.Json.JsonDocument.Parse(line);
+                        var timestamp = DateTimeOffset.Parse(record.RootElement.GetProperty("receivedAt").GetString()!);
+                        if (timestamp < windowStartedAt || timestamp > windowEndedAt) continue;
+                        packetCount++;
+                        firstPacket ??= timestamp;
+                        lastPacket = timestamp;
+                        var payload = Convert.FromBase64String(record.RootElement.GetProperty("payloadBase64").GetString()!);
+                        var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
+                        if (packet.Detection is not null)
+                        {
+                            detectionPacketCount++;
+                            ballCount += packet.Detection.Balls.Count;
+                            robotCount += packet.Detection.RobotsYellow.Count + packet.Detection.RobotsBlue.Count;
+                        }
+                    }
+                }
+                output.WriteLine($"NET003 debugHostRawPacketsInWindow={packetCount}; detectionPackets={detectionPacketCount}; balls={ballCount}; robots={robotCount}; first={firstPacket:O}; last={lastPacket:O}");
+                Assert.True(packetCount > 0, "DebugHost did not capture any raw vision datagrams in the same five-second window.");
+            }
+
+            if (shutdownFailure is not null)
+                throw new InvalidOperationException("NET-003 AppHost shutdown did not complete cleanly.", shutdownFailure);
+            CleanupStagedAppHostAssets(stagedAssets);
+            output.WriteLine($"NET003 elapsed={acceptanceClock.Elapsed}; completedAt={DateTimeOffset.UtcNow:O}; localCaptureRoot={captureRoot}");
+            }
+            finally
+            {
+                dockerPathScope.Dispose();
+            }
+        }
+    }
+    [Fact]
     public async Task CancellingAppHostDuringStartupCleansOnlyItsContainers()
     {
         var startedAt = DateTimeOffset.UtcNow;
