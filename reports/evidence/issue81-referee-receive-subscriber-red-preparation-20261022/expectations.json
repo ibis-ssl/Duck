@@ -1,0 +1,26 @@
+{
+  "state": "parent_adopted_existing_tmp_candidate_for_active_test_only_before_execution",
+  "baselineHead": "ba2ba820d23b372a8b34dc008b12a01b0c1394bd",
+  "governing_sources": [
+    {
+      "path": "reports/issue81-referee-driver-scope-20261022.md",
+      "line": 89,
+      "contract": "same counter counts every decoded packet; only change subscribers deduplicate; no concurrent Receive stealing"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeDriver.cs",
+      "api": "IRefereeCommandSource.WaitForChangeAsync(uint? previousCommandCounter, CancellationToken)"
+    }
+  ],
+  "minimal_candidate": "One active Run, initial two HALT/counter7 packets; subscribe previous7; supply duplicate counter7 and confirm diagnostics count3 while waiter still pending; supply STOP/counter8 and await snapshot CommandStop/Counter8 with diagnostics count4. Receiver maximum simultaneous calls remains1.",
+  "fixture": "Real Referee parser + queued raw transport + receive-call barrier + fixed clock; no sleep for ordering. Cancel/await waiter and Run in finally and retain any unexpected faults.",
+  "not_fixed": [
+    "specific second subscriber behavior",
+    "exception type for absent/new/old subscription",
+    "Task reference equality",
+    "automatic Run startup",
+    "real UDP/GC API behavior"
+  ],
+  "unknowns": "No runtime result for subscriber yet. Old regression CI39795794024 pending overall terminal/log; parent explicitly permits test-only placement without treating old625 as Green.",
+  "scope": "03A subscriber only; no active repo test/source edit during current CI wait."
+}

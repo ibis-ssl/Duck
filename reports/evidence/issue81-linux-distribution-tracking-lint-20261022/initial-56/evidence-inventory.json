@@ -1,0 +1,9 @@
+{
+  "root": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-tracking-lint-5f280e3-20261022",
+  "files": 56,
+  "bytes": 41237.0,
+  "manifestSha256": "2762e36dbba12106646edbe3044bcc105744e086a350265e4f0b811c8b21d0b8",
+  "baseline": "4e3099e75c4afab8ba1f11c67500ebe29f17fed3",
+  "initialReviewTarget": "5f280e33da9f0e93d7396373c9573b0f21424582",
+  "notes": "Separate current-tracking supplement. The prior 04A 218-file evidence bundle is frozen."
+}

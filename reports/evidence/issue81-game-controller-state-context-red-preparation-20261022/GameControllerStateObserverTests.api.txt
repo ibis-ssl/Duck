@@ -1,0 +1,26 @@
+using System.Net.WebSockets;
+using System.Text;
+using Duck.Testing.RefereeDriver;
+
+namespace Tracker.Tests;
+public sealed class GameControllerStateObserverTests
+{
+    [Fact]
+    public async Task CapturesReadContextAndExpiresFromStartWithoutPollingRenewal();
+    [Fact]
+    public async Task SequentialReadsHaveIncreasingRequestSequences();
+    [Fact]
+    public async Task OlderRequestCannotOverwriteNewerCompletedObservation();
+    [Fact]
+    public async Task EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult();
+    [Fact]
+    public async Task FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent();
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task InvalidReadTimingDoesNotPublishAnObservation(bool clockRegresses);
+    [Fact]
+    public async Task ExpiredRealClientDoesNotPublishContextAndDisposesSocket();
+    [Fact]
+    public async Task AlreadyCancelledCallerDoesNotStartARead();
+}

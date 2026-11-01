@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "task": "Issue81 runtime identity control server stop-cancel handling",
+  "baseline": "a53d7170b1996529715ba3d3f43b738067750902",
+  "productionChange": {
+    "path": "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs",
+    "sha256": "AAFC2F775A27937339662BCA8406AAA4CF7766EE402288F756812687AB3737D8",
+    "behavior": "AcceptAsync exits normally only when cancellation is requested and SocketError.OperationAborted is observed."
+  },
+  "tests": {
+    "path": "Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs",
+    "sha256": "EF86808DA192204DD12493ECE3FCA7E8A1E2E4F82DF26D85A68CC44C03D4F5F0",
+    "sourceChanged": false,
+    "targetedDisposeCases": {
+      "toolSession": 52153,
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0
+    },
+    "boundaryClass": {
+      "toolSession": 82566,
+      "exitCode": 0,
+      "passed": 11,
+      "failed": 0
+    },
+    "mixedCohort": {
+      "toolSession": 64132,
+      "exitCode": 1,
+      "passed": 12,
+      "failed": 1,
+      "failure": "Unrelated G5C2 Crane overlay argument expectation in BaseSimulationResourceRegistrationTests."
+    }
+  },
+  "builds": [
+    {
+      "project": "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj",
+      "configuration": "Debug",
+      "toolSession": 26843,
+      "exitCode": 0
+    },
+    {
+      "project": "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj",
+      "configuration": "Release",
+      "toolSession": 81731,
+      "exitCode": 0
+    },
+    {
+      "project": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+      "configuration": "Debug",
+      "toolSession": 52153,
+      "exitCode": 0,
+      "note": "Recompiled as part of the targeted test command after the separate G5C2 compile correction."
+    }
+  ],
+  "originalCiFailure": {
+    "runId": 41029301404,
+    "jobId": 123974903529,
+    "passed": 1130,
+    "failed": 1,
+    "skipped": 2,
+    "failure": "InvalidClientDoesNotStopAcceptLoop(disconnect-after-challenge): SocketException 125, Operation canceled during AcceptAsync while disposing the server."
+  },
+  "coverageLimits": [
+    "No dedicated dynamic injection test for OperationAborted before cancellation or another SocketError after cancellation; the narrow catch filter leaves these unhandled.",
+    "No matching Linux CI has run for this changed source yet; Windows pass is not evidence for Linux error 125.",
+    "OS process IDs and exact tool start/end UTC were not captured; listed identifiers are tool session IDs only.",
+    "The initial tasks/phases gate attempt had four nonzero gates on superseded wording; final input passed all eight gates.",
+    "The working-tree G5C2 compile correction and its overlay-argument test failure are separate from the CI-only production change."
+  ],
+  "separateWorkingTreeChange": {
+    "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+    "sha256": "CE9F4FF7342002ECFAA5F51E1946A6216696B406459741B29BB640A2F721F780",
+    "purpose": "One-line G5C2 test compile correction; separate from CI-only change and must not be included in CI-only commit."
+  },
+  "commitOrPushPerformed": false,
+  "documents": {
+    "baseline": "a53d7170b1996529715ba3d3f43b738067750902",
+    "validation": "tasks and phases only; 8/8 final gates passed, no timeout",
+    "sourceHashes": {
+      "Tracker/Design/tasks-status.md": "EBC328EFBC97CE68EC9E860F47E49C94E4E0E7A488811314D54DC43766421258",
+      "Tracker/Design/phases-status.md": "8FE170B80A7C73CE0BDEBD6431DFF26256B6503350AF1C7D0B3A2F44B1FD7217"
+    },
+    "addedInputSha256": {
+      "tasks": "9ABFA914BDCB474A66DC8BDE294E0C7FE2840278E62E5B3C223802440A94271E",
+      "phases": "C06DBEB4896D692278ABDD02D9FE496B74522093494CCBB9FCD8B464D544B3F0"
+    },
+    "gateExitCodes": {
+      "tasks": {
+        "textlint": 0,
+        "whitelist": 0,
+        "cspell": 0,
+        "yomiyasu": 0
+      },
+      "phases": {
+        "textlint": 0,
+        "whitelist": 0,
+        "cspell": 0,
+        "yomiyasu": 0
+      }
+    },
+    "supersededAttempt": "An earlier input revision had 4 gate failures; it is retained privately and is not counted in this final 8/8 result.",
+    "sourceHashTiming": "Full document hashes were read after the gate run; gate input and copy hashes bind the exact added-line bytes supplied to the gates."
+  }
+}

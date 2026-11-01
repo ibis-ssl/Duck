@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-22T21:25:49.847188+00:00",
+  "head": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+  "sourceManifestRechecked": true,
+  "reportSHA256": "81e7ffc2d080a30b50538be91f5ea3282f20f14f61bb4db6bf5e74081e239170",
+  "parentPrefixAndHistoryPreserved": true,
+  "finalDiffCheckExit": 0,
+  "newTextFindingDelta": 0,
+  "fullGate": "failed/held",
+  "render": "unverified/user deferred",
+  "source44Unchanged": true,
+  "configuration21Unchanged": true,
+  "allProcessesTerminated": true
+}

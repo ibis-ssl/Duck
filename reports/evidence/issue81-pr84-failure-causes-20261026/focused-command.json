@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName=Tracker.Tests.VisionPacketCaptureTests.DiagnosticsSampleCaptureLoop_WhenCaptureEnabled_WritesSamplesWithoutHomeUi|FullyQualifiedName=Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOnOffReOn_LiveTrackerConnection_WritesDifferentSessionsToDifferentFolders|FullyQualifiedName=Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesFastestSourceCadenceRecordsWithHeldRenderFrame|FullyQualifiedName=Tracker.Tests.VisionPacketCaptureTests.Capture_WhenEnabled_WritesDiagnosticsSampleSidecarMetadataAndRecords|FullyQualifiedName=Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary|FullyQualifiedName=Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata|FullyQualifiedName=Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_WritesTrackerConnectionLibPacketToSidecar|FullyQualifiedName=Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_KeepsOwnExternalAndUnknownPackets|FullyQualifiedName=Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesLatestSnapshotForEachSourceOnFastTrackerTick|FullyQualifiedName=Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOn_LiveUdpReceiver_WritesOwnExternalAndUnknownPacketsToSessionSidecar|FullyQualifiedName=Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_PassesRawPayloadForReplayComparison",
+    "--logger",
+    "trx;LogFileName=focused.trx",
+    "--results-directory",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests",
+    "--diag",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\vstest.log",
+    "--blame",
+    "-m:1",
+    "/nr:false",
+    "-bl:C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\build.binlog"
+  ],
+  "startedUtc": "2026-10-26T03:58:12.974560+00:00",
+  "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+  "exitCode": 1,
+  "stdoutSha256": "33ae1ae66e8be4153a4f207b9d3883de00bf42b97012ce14d13943e6c6aff26a",
+  "stderrSha256": "2b0e67c46001a7d1a3f74775091c822245c8a8d90ab2f5b7ef9a9f66fece825e"
+}

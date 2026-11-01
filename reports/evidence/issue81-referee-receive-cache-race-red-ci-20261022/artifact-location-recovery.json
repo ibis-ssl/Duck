@@ -1,0 +1,57 @@
+{
+  "reason": "Windows gh interpreted /tmp as C:\\tmp; preserved download exit0 and corrected final evidence location by byte-identical copy",
+  "initialRoot": "/mnt/c/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts",
+  "finalRoot": "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts",
+  "files": [
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/dotnet-test.binlog",
+      "downloadLocationSHA256": "18a0a3af4aeca650def21feca27eefdf386c997c077e47952e7360c8239bbe99",
+      "requestedLocationSHA256": "18a0a3af4aeca650def21feca27eefdf386c997c077e47952e7360c8239bbe99"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/dotnet-test.exit-code",
+      "downloadLocationSHA256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "requestedLocationSHA256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/dotnet-test.stderr.log",
+      "downloadLocationSHA256": "03a2899ff935e40734202db166821afef66d3d7ad5e35ebf64b7917510c95611",
+      "requestedLocationSHA256": "03a2899ff935e40734202db166821afef66d3d7ad5e35ebf64b7917510c95611"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/dotnet-test.stdout.log",
+      "downloadLocationSHA256": "0ef20dff36a10e9067ed10878a419d5192fb80c6d620aceb67472497e62ef290",
+      "requestedLocationSHA256": "0ef20dff36a10e9067ed10878a419d5192fb80c6d620aceb67472497e62ef290"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/dotnet-test.trx",
+      "downloadLocationSHA256": "fbad3a9a2e5552fbc0167e57dabd2ac34074352677e3ae9d2372d2e3ce6e071a",
+      "requestedLocationSHA256": "fbad3a9a2e5552fbc0167e57dabd2ac34074352677e3ae9d2372d2e3ce6e071a"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/environment.txt",
+      "downloadLocationSHA256": "1c9b5a586bb7885d1e126ff8822a30d3f81234d2ba55350188db55f23f3c0352",
+      "requestedLocationSHA256": "1c9b5a586bb7885d1e126ff8822a30d3f81234d2ba55350188db55f23f3c0352"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/source.tar.gz",
+      "downloadLocationSHA256": "f96ffbf38471ed153c8d56495a82ae519318c6f307a189cdfcd2d02a8125a836",
+      "requestedLocationSHA256": "f96ffbf38471ed153c8d56495a82ae519318c6f307a189cdfcd2d02a8125a836"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/vstest-diagnostics.datacollector.26-10-22_17-10-04_04713_5.log",
+      "downloadLocationSHA256": "58d8596b0bcb79c1f2f7fcf473023655d7ac08cd8504923ed6f8ce5e5f2963d4",
+      "requestedLocationSHA256": "58d8596b0bcb79c1f2f7fcf473023655d7ac08cd8504923ed6f8ce5e5f2963d4"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/vstest-diagnostics.host.26-10-22_17-10-04_30940_5.log",
+      "downloadLocationSHA256": "972fe3f42b95d539bce52fc0585e60bd8b8c861217d6b4159acc7c75d0702f71",
+      "requestedLocationSHA256": "972fe3f42b95d539bce52fc0585e60bd8b8c861217d6b4159acc7c75d0702f71"
+    },
+    {
+      "relativePath": "dotnet-test-failure-39820168338-1/vstest-diagnostics.log",
+      "downloadLocationSHA256": "3c5ce10a1249809769f7ff180c977c57bcbf63412da8b4da27c5f7aa4f8b4eee",
+      "requestedLocationSHA256": "3c5ce10a1249809769f7ff180c977c57bcbf63412da8b4da27c5f7aa4f8b4eee"
+    }
+  ]
+}

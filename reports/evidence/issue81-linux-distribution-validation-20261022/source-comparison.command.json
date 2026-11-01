@@ -1,0 +1,6 @@
+{
+  "finishedUTC": "2026-10-22T22:51:14.9951282Z",
+  "command": "git rev-parse HEAD; git diff --quiet 4e3099e75c4afab8ba1f11c67500ebe29f17fed3 fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9 -- Tracker/Tracker.Tests/DockerContainerWrapperLifecycleTests.cs Testing/Duck.Testing.AppHost/DockerContainerWrapper.cs Testing/Duck.Testing.AppHost/DockerWrapperLaunchOptions.cs; echo tracked_source_unchanged_exit=$?; git show <base>:<file> | sha256sum; git show <candidate>:<file> | sha256sum",
+  "startedUTC": "2026-10-22T22:51:14.6637760Z",
+  "exit_code": 0
+}

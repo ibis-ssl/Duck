@@ -1,0 +1,3 @@
+# Follow-up: Japanese status wording
+
+This follow-up preserves the earlier bundle and manifest unchanged. It records the final source-extracted status inputs after replacing the three status phrases containing standalone Driver with 審判観測, including the remaining next-work phrase. A CSpell run after the first three replacements exited 1 with Driver x1, localhost x2, referee x1. The final Driver phrase was then corrected, but the requested CSpell repeat was rejected before execution; no rerun occurred. Final textlint/Sudachi are also unverified for this final input. See final-input-status.json and the refusal transcript. No whitelist, dictionary, or lint configuration was changed.

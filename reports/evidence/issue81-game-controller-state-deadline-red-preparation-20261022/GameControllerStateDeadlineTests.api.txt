@@ -1,0 +1,25 @@
+using System.Net.WebSockets;
+using System.Text;
+using Duck.Testing.RefereeDriver;
+
+namespace Tracker.Tests;
+public sealed class GameControllerStateDeadlineTests
+{
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(int stage);
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task CallerCancellationRemainsCancellationBeforeDeadline(bool duringConnect);
+    [Theory]
+    [InlineData(0, 30000000L)]
+    [InlineData(-1, 30000000L)]
+    [InlineData(4096, 0L)]
+    [InlineData(4096, -1L)]
+    [InlineData(4096, -10000L)]
+    [InlineData(4096, long.MaxValue)]
+    public async Task InvalidOptionsReturnNoObservationWithoutConnecting(int maximumBytes, long timeoutTicks);
+}

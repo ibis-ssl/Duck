@@ -1,0 +1,218 @@
+{
+  "root": "/tmp/issue81-referee-receive-red-ci-20261022",
+  "headSha": "8b9a1cf52a6fcf99b3196a81f638264337120143",
+  "runId": 39784129851,
+  "files": [
+    {
+      "path": "artifact-inventory.json",
+      "bytes": 708,
+      "sha256": "9813116304d5ed67188a84451ac934bb3099457fa3635e525fb4248c57c2db45"
+    },
+    {
+      "path": "artifacts-command.json",
+      "bytes": 126,
+      "sha256": "32e707e5562dc39e1d38cdb7a4a301646230a4b98ae41684e956aa7dbfa3c981"
+    },
+    {
+      "path": "artifacts.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "artifacts.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts.stdout.log",
+      "bytes": 751,
+      "sha256": "4bd29958b654c2af17a6eb3eac19d2e80630a033b4295b4c8e3750b33ed9d014"
+    },
+    {
+      "path": "ci-evidence.json",
+      "bytes": 2987,
+      "sha256": "aa9ad6f8dd3bde565388126d555e2bcb1356c68ef792c4dde9939c29886113a5"
+    },
+    {
+      "path": "ci-test-command.txt",
+      "bytes": 259,
+      "sha256": "e82e19d563a2489c59230119a009ecd4e08ff3dba20150c16e70dd0b50bdc1c5"
+    },
+    {
+      "path": "commands-summary.json",
+      "bytes": 1585,
+      "sha256": "4fd0e0e7eeb36ce1a8e26c2ebe16d558ac8c22d4b869dff18b264acbdf717190"
+    },
+    {
+      "path": "dotnet-test.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "dotnet-test.stderr.log",
+      "bytes": 150,
+      "sha256": "8452bf147abc44c5b20d1684b70bf92635d8c63f4e297e5475e438cf03db3a06"
+    },
+    {
+      "path": "dotnet-test.stdout.log",
+      "bytes": 6268,
+      "sha256": "a4ae4f242fc883bbc289ab8b90849647291f14d7561a7c12a517b9a8abf8e64e"
+    },
+    {
+      "path": "dotnet-test.trx",
+      "bytes": 873683,
+      "sha256": "3f22663e4e9fd6caac65b1e61104c89b15f5b3ec364c116dacccc1095772499e"
+    },
+    {
+      "path": "download-command.json",
+      "bytes": 125,
+      "sha256": "dfde25115197eb33b0d756ba530bfbaf24e60fc7d911a9b45507861962b5ca6b"
+    },
+    {
+      "path": "download.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "download.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "environment.txt",
+      "bytes": 3259,
+      "sha256": "016bbb80c3b428db0dc27d7cb71bb2b08f75632716d20bd908e37063c4f7a4a5"
+    },
+    {
+      "path": "failure-artifact.zip",
+      "bytes": 11539702,
+      "sha256": "7f54e0ee66b7da2b2624d4b9ff9fca77eb106eab01a5b4cb33673a0e0aefab64"
+    },
+    {
+      "path": "head-source-manifest.json",
+      "bytes": 670,
+      "sha256": "96c858c54828e2deb4081c0a4982df25a4f435e9d037838f3d880928370a75af"
+    },
+    {
+      "path": "list-command.json",
+      "bytes": 267,
+      "sha256": "0a24dc42669343b0dc3eb71e08a4372a27b9a691c0eba8073858ed605793ec77"
+    },
+    {
+      "path": "list.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "list.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "list.stdout.json",
+      "bytes": 273,
+      "sha256": "83ea7c53592b67e18be508e83f94e65ffdbc482cde96a4204cc4af265da8242c"
+    },
+    {
+      "path": "report-prefix.before.txt",
+      "bytes": 1976,
+      "sha256": "b6e61e36f070e2be58989f26d5e1da52870c26c85ba3b396154933cb7d422025"
+    },
+    {
+      "path": "source-archive-check.json",
+      "bytes": 778,
+      "sha256": "6754de2c349ddbd2623dfb2e1273e5f5514961a83490662aa1d4cecf42d001d4"
+    },
+    {
+      "path": "source-from-ci/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "bytes": 482,
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c"
+    },
+    {
+      "path": "source-from-ci/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "bytes": 1923,
+      "sha256": "30cbef39a78f5befd3b466e5d6bc5123063d2e5ec07bec339b4fb3275687d019"
+    },
+    {
+      "path": "source-from-ci/Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "bytes": 5350,
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1"
+    },
+    {
+      "path": "test-log-command.json",
+      "bytes": 133,
+      "sha256": "52078f464ab7c300b6a1192be8e8b2f5ee43effd8a4cde67d9a89a2bcd16c750"
+    },
+    {
+      "path": "test-log.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "test-log.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-log.stdout.log",
+      "bytes": 56162,
+      "sha256": "3d272393b137bd13f0066864bfbff040d1649f785b4cea6d7a8c949c816bc85b"
+    },
+    {
+      "path": "view-command.json",
+      "bytes": 164,
+      "sha256": "1de29c1a0baf821dbcd747b5fbe0e3520cd2b6dbff24cb16815dc9ed25e4fbea"
+    },
+    {
+      "path": "view.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "view.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view.stdout.log",
+      "bytes": 2461,
+      "sha256": "38b3f4145038e07ef1de3d28b2cc11209af26654d7659d334bb5478a24976fa2"
+    },
+    {
+      "path": "watch-command.json",
+      "bytes": 136,
+      "sha256": "68b0c51f4ba7f5cd85fd9a79c6c83b06850a2f935efc8e5c614f85f1775a3fce"
+    },
+    {
+      "path": "watch.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+    },
+    {
+      "path": "watch.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "watch.stdout.log",
+      "bytes": 3379,
+      "sha256": "540d761b01103609ca7374a26b6622ae2523a7dc1d28ef4535c13c6fc04f1187"
+    }
+  ],
+  "rawLogsAndTestResults": [
+    "artifacts.stderr.log",
+    "artifacts.stdout.log",
+    "dotnet-test.stderr.log",
+    "dotnet-test.stdout.log",
+    "dotnet-test.trx",
+    "download.stderr.log",
+    "list.stderr.log",
+    "test-log.stderr.log",
+    "test-log.stdout.log",
+    "view.stderr.log",
+    "view.stdout.log",
+    "watch.stderr.log",
+    "watch.stdout.log"
+  ],
+  "persistenceNote": "Parent should copy listed raw logs/TRX and check ignored paths/force-add as needed. Executor did not stage, commit, or push."
+}

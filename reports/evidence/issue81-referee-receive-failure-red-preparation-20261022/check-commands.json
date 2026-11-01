@@ -1,0 +1,15 @@
+[
+  {
+    "command": "git diff --check",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": "git diff --no-index --check -- /dev/null Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "interpretation": "new untracked file differs from /dev/null; no whitespace diagnostics; not a test failure"
+  }
+]

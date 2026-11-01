@@ -1,0 +1,15 @@
+{
+  "recordedUTC": "2026-10-22T14:58:52.634909+00:00",
+  "session": 17234,
+  "pid": 24676,
+  "parent_pid": 9800,
+  "identity": "gh.exe run watch 39795794024 --repo ibis-ssl/Duck --exit-status --interval 5; exact single target, WSL Ubuntu Python parent",
+  "pre_stop_identity_rechecked": true,
+  "stop_command": "Stop-Process -Id 24676 -ErrorAction Stop after exact command/name/parent guards",
+  "stop_tool_exit": 0,
+  "actual_gh_watch_exit": 255,
+  "wrapper_exit": 0,
+  "first_process_inspection": "PowerShell parser error exit1 before any stop; corrected read exit0",
+  "gitHubAction": "none; run not canceled or rerun",
+  "GitHubLastRead": "2026-10-22T14:55:44 UTC in_progress/null conclusion; completed job625/625success"
+}

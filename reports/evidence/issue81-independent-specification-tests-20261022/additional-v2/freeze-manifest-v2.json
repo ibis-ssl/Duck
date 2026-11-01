@@ -1,0 +1,62 @@
+{
+  "version": "additional-v2",
+  "state": "frozen_before_additional_first_execution",
+  "test_methods": 15,
+  "authored_cases": 33,
+  "original_v1_manifest": {
+    "path": "/tmp/issue81-independent-spec-tests-worker-20261022/freeze-manifest.json",
+    "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+    "all_11_files_unchanged": true
+  },
+  "inherited_clock": {
+    "path": "/tmp/issue81-independent-spec-tests-worker-20261022/IndependentClock.cs",
+    "sha256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335"
+  },
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/AdditionalSpecificationTests.csproj",
+      "sha256": "92af3b6d0c7b6971abc030a88165e3d7da0d9e160b239ed157826e6194152e06",
+      "bytes": 1081
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/ComparisonResolverAdditionalSpecificationTests.cs",
+      "sha256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+      "bytes": 6555
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/IndependentVisionWireFixture.cs",
+      "sha256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+      "bytes": 3277
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/VisionStoreAdditionalSpecificationTests.cs",
+      "sha256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+      "bytes": 3681
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/authority-update.md",
+      "sha256": "e6de28243142e2cf53a90e37d269738d4c5dc644a87f5e4442ac908e21fb992c",
+      "bytes": 1336
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/expectations-v2.json",
+      "sha256": "e376a7da8536e8f28af4e45b6a4f57f88782e2ae9d1e0a2da4295f591408cdec",
+      "bytes": 7597
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/freeze-v2.md",
+      "sha256": "4f948d8b2e2edb48351e76a0c5cc647ff4b1b71152abc9f736fa471d92e3d9dc",
+      "bytes": 718
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/matrix-v2.md",
+      "sha256": "1edfa97ecd38b44f97c95bee4fea1f793c8bda5cd55f211f871459e5f1c34d9e",
+      "bytes": 6890
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/read-ledger-v2.json",
+      "sha256": "958c59c14021c04e6579459a7c60a9da20cf27ac72ff0f12f97cd36353fb6d45",
+      "bytes": 7678
+    }
+  ]
+}

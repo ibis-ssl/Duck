@@ -1,0 +1,28 @@
+[
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39770570031",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--job",
+      "119796753928",
+      "--log"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/test-job-log.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/test-job-log.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39770570031/artifacts"
+    ],
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/artifacts.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/artifacts.stderr.log"
+  }
+]

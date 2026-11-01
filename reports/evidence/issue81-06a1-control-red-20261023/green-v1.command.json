@@ -1,0 +1,19 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~RuntimeIdentityControlProtocolTests"
+  ],
+  "exit_code": 0,
+  "source_sha256": {
+    "Tracker/Tracker.Tests/RuntimeIdentityControlProtocolTests.cs": "dbf7f2b00acc039e651d30b6f0dfe6fe647874afdff2ca1aca5b1e64d19dfa29",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "ef6c07f116e19e9f5b26c8b31bd069715bcd89eb0df600f19f03684e8533a603",
+    "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs": "84200328b26c45115fb44e1a53c16cfb101b7ce576d0334fe8b5bdfb8a94a3a3",
+    "Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverService.cs": "58582bb95f4b071abd6459ef6c569577a84dca8cb636233d6a215e3ad6df2f2c"
+  }
+}

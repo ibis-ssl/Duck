@@ -1,0 +1,390 @@
+{
+  "inventory_sha256": "0290beec585f0685ac205390aa0fbcae7318121ffe306f059ac500b1777aa2a3",
+  "entries": [
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/cleanup.command.json",
+      "bytes": 1006,
+      "sha256": "04e22fdc9dcac8eeab3304d9fbc482396e9948080a2c7af8fd54117d9ba6fecf",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/cleanup.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/cleanup.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/cleanup.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/cleanup.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/cleanup.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/commands.json",
+      "bytes": 6793,
+      "sha256": "5993e020675ce23848d7710df8f5a417f27a4274922dabde66d3a8598f73d384",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/commands.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-diff-check.command.json",
+      "bytes": 188,
+      "sha256": "294b15865784f2869847b4ad1c7f120ac99ba3fd558db5ac1aaf4026b64959ec",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-diff-check.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-diff-check.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-diff-check.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-head.command.json",
+      "bytes": 190,
+      "sha256": "9020ee78689f847bcb755f0503b9db672ac78415bed0f904ece240babd17e67d",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-head.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-head.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-head.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-head.stdout.log",
+      "bytes": 41,
+      "sha256": "420003c2b7bcb9328550f16a622cc55d7c563559058286575613cdc045d53115",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-head.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-product-guard.command.json",
+      "bytes": 386,
+      "sha256": "7f9d5eb8682b98f3819ce56128913d2228a9dde86f03c25dcf0e749a55199185",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-product-guard.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-product-guard.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-product-guard.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-product-guard.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-product-guard.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-status.command.json",
+      "bytes": 194,
+      "sha256": "dbdcc12d9591c5c2a93d39aff47062f0ce33315ddae74703d0f05a0d3f22781c",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-status.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-status.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-status.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/final-status.stdout.log",
+      "bytes": 411,
+      "sha256": "bc898219d3ec8ecaf11d9d96e22d5f379027ce93cb77a837a20fc359132a8466",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/final-status.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/initial-head.command.json",
+      "bytes": 242,
+      "sha256": "1835cbbe42dccbe4ad12ad5e53267bd8243ae8d5f84f112962688b767c23716f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/initial-head.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/initial-head.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/initial-head.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/initial-head.stdout.log",
+      "bytes": 41,
+      "sha256": "420003c2b7bcb9328550f16a622cc55d7c563559058286575613cdc045d53115",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/initial-head.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/initial-status.command.json",
+      "bytes": 246,
+      "sha256": "36511f885cc1243310718d42704aa90e989a8263a9af69c3387fea0955cef887",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/initial-status.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/initial-status.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/initial-status.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/initial-status.stdout.log",
+      "bytes": 411,
+      "sha256": "bc898219d3ec8ecaf11d9d96e22d5f379027ce93cb77a837a20fc359132a8466",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/initial-status.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/inventory.json",
+      "bytes": 7791,
+      "sha256": "0290beec585f0685ac205390aa0fbcae7318121ffe306f059ac500b1777aa2a3",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/inventory.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/junction.command.json",
+      "bytes": 551,
+      "sha256": "6871dc1382ae554234607ea18346e25c7a249a9b5258d1b9b91e380e2861b13e",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/junction.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/junction.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/junction.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/junction.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/junction.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/normal-review.after.md",
+      "bytes": 19318,
+      "sha256": "b973ffd2fe6b8f08a5de37b81b4b52ad32037dc3d9923e061e3d53a087421461",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/normal-review.after.md"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/normal-review.before.md",
+      "bytes": 16003,
+      "sha256": "502afe8be872605861fc67e3fbe55bc58d103ab1c6a144b4a7fe16bb335c9db4",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/normal-review.before.md"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/phases-status.md",
+      "bytes": 226,
+      "sha256": "8886052806b52620d03ead862aca3190688e581cbc28c39f4c9c31583e554306",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/phases-status.md"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/preflight.json",
+      "bytes": 14197,
+      "sha256": "a04b00d1abb134ba3ec396d74ed4772b3826535ad49ee25bb7b2b7ca83c14873",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/preflight.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/process-state.json",
+      "bytes": 502,
+      "sha256": "a55f8bb38a5c8bfaa6a04edce9d04a4b14081d888f1fbfe6a342908e3a6e427b",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/process-state.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/product-guard.command.json",
+      "bytes": 438,
+      "sha256": "0a11081632122ffc077d44b923f08f94b721a2af763059c5c19c544921ad72dc",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/product-guard.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/product-guard.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/product-guard.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/product-guard.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/product-guard.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/report-guard.json",
+      "bytes": 437,
+      "sha256": "03db4322f2d2a2c630296d208c1ffda6fa622097c354c8053f734f2500f4c048",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/report-guard.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/report-readback.md",
+      "bytes": 19318,
+      "sha256": "b973ffd2fe6b8f08a5de37b81b4b52ad32037dc3d9923e061e3d53a087421461",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/report-readback.md"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/spell.command.json",
+      "bytes": 583,
+      "sha256": "316d1ed9a951e3b611e2ba7a9445a7a9580eabb765f10548903f06b96abf0d6f",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/spell.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/spell.stderr.log",
+      "bytes": 140,
+      "sha256": "7562d5abdd57a330d1f920d54e6f2e8aece6095fcd527bc1e0651b5900e6b144",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/spell.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/spell.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/spell.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi-capture.py",
+      "bytes": 875,
+      "sha256": "1b9c1da3cd480c17f4df144891b0c3bc16ea97737a5afa96c58f1b70bacb6b2d",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/sudachi-capture.py"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.command.json",
+      "bytes": 753,
+      "sha256": "fadf198bff3695f076bcee7724dbd585b475d59838435afc1c66764716c1c015",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.json",
+      "bytes": 29010,
+      "sha256": "23fe742b825febf734b6ece93448a3bb0bea60f48ea84450f91d6352d0c18ecf",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/targets.command.json",
+      "bytes": 578,
+      "sha256": "8ceeaedf04d47865d95516d2f52f7f7e9afc8c215fa08e6d9235048b25724d55",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/targets.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/targets.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/targets.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/targets.stdout.log",
+      "bytes": 63,
+      "sha256": "477bd42f9dbba5cc354cb92f44d4986fa458d52ae8c4b3c59a016380473b22eb",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/targets.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/tasks-status.md",
+      "bytes": 722,
+      "sha256": "2b3c8b04900c73eca38cbdd76b02477ba5441301298fbe964e27f3bae85c8550",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/tasks-status.md"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/text.command.json",
+      "bytes": 582,
+      "sha256": "c541bee81b6c987bc394cd6bec11e8c8798d50b4c64237d1fcab08d801fd0235",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/text.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/text.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/text.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/text.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/text.stdout.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/verification-result.json",
+      "bytes": 1401,
+      "sha256": "0c22727fa8c4106ce75b0b98a9963f83ae81a2d5bf7138e3746279bb5bebc056",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/verification-result.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/versions.command.json",
+      "bytes": 473,
+      "sha256": "4cca1d0a6c8adfb7fd40acb18cf14d18c72202c5fde2ab1e9f5374d6e74392f4",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/versions.command.json"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/versions.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/versions.stderr.log"
+    },
+    {
+      "source": "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/versions.stdout.log",
+      "bytes": 9,
+      "sha256": "b67d0ced059f9313d861ddbbe734d2d1f9219106a9e036ae6d88407afa0846e6",
+      "stored": true,
+      "repository_path": "reports/evidence/issue81-linux-distribution-progress-sync-verification-20261022/versions.stdout.log"
+    }
+  ]
+}

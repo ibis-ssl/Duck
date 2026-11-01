@@ -1,0 +1,1 @@
+A preliminary command was accidentally written in bash syntax but passed to PowerShell. PowerShell raised ParserError before invoking WSL/Python; this was a shell parse failure, not a Sudachi result. It was followed by a correctly invoked Sudachi command.

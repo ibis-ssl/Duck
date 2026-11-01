@@ -1,0 +1,16 @@
+{
+  "name": "ghcr_framework",
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79"
+  ],
+  "exit": 0,
+  "reference": "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+  "stdout_bytes": 6777,
+  "stderr_bytes": 0,
+  "stdout_sha256": "fa4431b6a1f07462c72409ecb4b6e1adc03453c44d33330f1e7defd463e64787",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

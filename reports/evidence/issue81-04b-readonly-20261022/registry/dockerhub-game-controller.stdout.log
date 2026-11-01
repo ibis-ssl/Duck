@@ -1,0 +1,144 @@
+[
+	{
+		"Ref": "docker.io/robocupssl/ssl-game-controller:3.20.3@sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721",
+			"size": 860,
+			"platform": {
+				"architecture": "amd64",
+				"os": "linux"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1Njo1M2Y4NWQ1ZTcyZWU3NzcyOTE2MDE0YjVhZWU2YTRiNzRhYWE2OTRlN2FkOWE4MDVjYzQ2MjljMjgxMDgwNzMzIiwKICAgICJzaXplIjogMTY4MAogIH0sCiAgImxheWVycyI6IFsKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6NTg5MDAyYmEwZWFlZDEyMWExZGJmNDJmNjY0OGYyOWU1YmU1NWQ1YzhhNmVlMGY4ZWFhMDI4NWNjMjFhYzE1MyIsCiAgICAgICJzaXplIjogMzg2MTgyMQogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6NTc2MzcxY2RjZjFkNDJmODQ0N2ZjZjY1NjVkOWI3MjBhNTZjNGZkYjU1Mjk1NDFlZmE5ZGRhZDM1NGQzMjgyMyIsCiAgICAgICJzaXplIjogNTE0ODM3MAogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZDhmNGNiNGFhOTk3ZDg3YTIxMWViMDMxZDY5MTlkMzk5MDZhYjc5NDU4OTJkNWZjZWMwOTA4YTA1ODAyMTJkZCIsCiAgICAgICJzaXplIjogOTkKICAgIH0KICBdCn0=",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:53f85d5e72ee7772916014b5aee6a4b74aaa694e7ad9a805cc4629c281080733",
+				"size": 1680
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:589002ba0eaed121a1dbf42f6648f29e5be55d5c8a6ee0f8eaa0285cc21ac153",
+					"size": 3861821
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:576371cdcf1d42f8447fcf6565d9b720a56c4fdb5529541efa9ddad354d32823",
+					"size": 5148370
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:d8f4cb4aa997d87a211eb031d6919d39906ab7945892d5fcec0908a0580212dd",
+					"size": 99
+				}
+			]
+		}
+	},
+	{
+		"Ref": "docker.io/robocupssl/ssl-game-controller:3.20.3@sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72",
+			"size": 860,
+			"platform": {
+				"architecture": "arm64",
+				"os": "linux"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1NjowMjA5NGM3MzEyZmRhYjJlY2MwMjM2YzA2YTZhM2E1ZWJlY2Y1ODg1NjdkZjkyMDg2ZjgwMjBkYTJmOTA0NWNlIiwKICAgICJzaXplIjogMTY4MQogIH0sCiAgImxheWVycyI6IFsKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZDhhZDhjZDcyNjAwZjQ2Y2MwNjhlMTZjMzkwNDZlYmM3NjUyNmU0MTA1MWY0M2E4YzI0OTg4NGIyMDA5MzZjMCIsCiAgICAgICJzaXplIjogNDE5NzA5MQogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MGFiZWZiZWYzZjczN2FmNDkxMTA1YjJlNDEzNGYxY2E1NzcxMmQxMjlkNWZjMjYzZGYwZWVjOTMwNTBlZjJiZCIsCiAgICAgICJzaXplIjogNDcyMzQwNgogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZDc5MWVkYjM5ZjFhZWZkNzY4ZDA2MGNmYTUzYWJjMDdkMWQ1ZGQxN2I2ZTVlMjQ3ZWRiYjg4MGZlMjZiODAwNyIsCiAgICAgICJzaXplIjogOTkKICAgIH0KICBdCn0=",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:02094c7312fdab2ecc0236c06a6a3a5ebecf588567df92086f8020da2f9045ce",
+				"size": 1681
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:d8ad8cd72600f46cc068e16c39046ebc76526e41051f43a8c249884b200936c0",
+					"size": 4197091
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:0abefbef3f737af491105b2e4134f1ca57712d129d5fc263df0eec93050ef2bd",
+					"size": 4723406
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:d791edb39f1aefd768d060cfa53abc07d1d5dd17b6e5e247edbb880fe26b8007",
+					"size": 99
+				}
+			]
+		}
+	},
+	{
+		"Ref": "docker.io/robocupssl/ssl-game-controller:3.20.3@sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816",
+			"size": 564,
+			"platform": {
+				"architecture": "unknown",
+				"os": "unknown"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1Njo5YTM3N2JkYTkxZmVjY2I3MGIwMWJiMDk5NzYyMDA0NGUyMmJhNWFlYzMyN2VmZmNlY2QyMDFlNTI4NjQzMTFiIiwKICAgICJzaXplIjogMTY3CiAgfSwKICAibGF5ZXJzIjogWwogICAgewogICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5pbi10b3RvK2pzb24iLAogICAgICAiZGlnZXN0IjogInNoYTI1NjpiZDdlNzkwNDJjMjIxMWM1MmFiOTg4NWI5YTdjYjBjMGIyMjcyYzI3OWFmY2U0M2E0NWQzMWI1N2YzMTliOTUwIiwKICAgICAgInNpemUiOiAxNzk1LAogICAgICAiYW5ub3RhdGlvbnMiOiB7CiAgICAgICAgImluLXRvdG8uaW8vcHJlZGljYXRlLXR5cGUiOiAiaHR0cHM6Ly9zbHNhLmRldi9wcm92ZW5hbmNlL3YxIgogICAgICB9CiAgICB9CiAgXQp9",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:9a377bda91feccb70b01bb0997620044e22ba5aec327effcecd201e52864311b",
+				"size": 167
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.in-toto+json",
+					"digest": "sha256:bd7e79042c2211c52ab9885b9a7cb0c0b2272c279afce43a45d31b57f319b950",
+					"size": 1795,
+					"annotations": {
+						"in-toto.io/predicate-type": "https://slsa.dev/provenance/v1"
+					}
+				}
+			]
+		}
+	},
+	{
+		"Ref": "docker.io/robocupssl/ssl-game-controller:3.20.3@sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849",
+			"size": 564,
+			"platform": {
+				"architecture": "unknown",
+				"os": "unknown"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1NjpkYWQ4MTI5MWQ2MjQzMzU0NGJiYTQ0YzQ4NDk5OGQ5NzhlZGM3MjM2OGIyNDEyZmE1ZGRhYjRmNmYyZTk0MDcxIiwKICAgICJzaXplIjogMTY3CiAgfSwKICAibGF5ZXJzIjogWwogICAgewogICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5pbi10b3RvK2pzb24iLAogICAgICAiZGlnZXN0IjogInNoYTI1Njo1YjViZjk3N2ExZmIxZTcwZmU0OTljNWJlZWE4M2NkZjllNzhhMDY2MjUxM2IwZTI4ZmU3ZTlhZjliMTAwYTU1IiwKICAgICAgInNpemUiOiAxNzk1LAogICAgICAiYW5ub3RhdGlvbnMiOiB7CiAgICAgICAgImluLXRvdG8uaW8vcHJlZGljYXRlLXR5cGUiOiAiaHR0cHM6Ly9zbHNhLmRldi9wcm92ZW5hbmNlL3YxIgogICAgICB9CiAgICB9CiAgXQp9",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:dad81291d62433544bba44c484998d978edc72368b2412fa5ddab4f6f2e94071",
+				"size": 167
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.in-toto+json",
+					"digest": "sha256:5b5bf977a1fb1e70fe499c5beea83cdf9e78a0662513b0e28fe7e9af9b100a55",
+					"size": 1795,
+					"annotations": {
+						"in-toto.io/predicate-type": "https://slsa.dev/provenance/v1"
+					}
+				}
+			]
+		}
+	}
+]

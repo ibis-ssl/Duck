@@ -1,0 +1,33 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "command": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~ContainerIdentityControlExecSessionTests|FullyQualifiedName~RegisteredContainerExecHandoffTests",
+    "--logger",
+    "console;verbosity=normal"
+  ],
+  "started_utc": "2026-10-23T16:12:08Z",
+  "source_sha256_before": {
+    "Testing/Duck.Testing.AppHost/ContainerIdentityControlExecSession.cs": "136f737547d4d43039444fc0c80ee4823d5fcbfd750d490d923d662770e25771",
+    "Tracker/Tracker.Tests/ContainerIdentityControlExecSessionTests.cs": "4d3bca1324f2769231843de6ee1a2481e7374f553b6dee25fd57d8395bcec467",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "e80df7533348fb96f7c7ce2a6db56bb4683a5d6f26ac54260f4cf59ba28be747",
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "3d15f0ff995fda730227b43c40e28c28f3d55d3fea59f7579d23108ced1748fb",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "5576c2214f2df15381d35a1237b2e0bd054a3fba3bda609b6710c2ee47cecddc",
+    "Testing/Duck.Testing.AppHost/Program.cs": "b5e0faef05aebc91452168e3693e2b5dd9ec2a17c3f1c672de4c85e75dd173a9"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-10-23T16:12:35Z",
+  "source_sha256_after": {
+    "Testing/Duck.Testing.AppHost/ContainerIdentityControlExecSession.cs": "136f737547d4d43039444fc0c80ee4823d5fcbfd750d490d923d662770e25771",
+    "Tracker/Tracker.Tests/ContainerIdentityControlExecSessionTests.cs": "4d3bca1324f2769231843de6ee1a2481e7374f553b6dee25fd57d8395bcec467",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "e80df7533348fb96f7c7ce2a6db56bb4683a5d6f26ac54260f4cf59ba28be747",
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "3d15f0ff995fda730227b43c40e28c28f3d55d3fea59f7579d23108ced1748fb",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "5576c2214f2df15381d35a1237b2e0bd054a3fba3bda609b6710c2ee47cecddc",
+    "Testing/Duck.Testing.AppHost/Program.cs": "b5e0faef05aebc91452168e3693e2b5dd9ec2a17c3f1c672de4c85e75dd173a9"
+  }
+}

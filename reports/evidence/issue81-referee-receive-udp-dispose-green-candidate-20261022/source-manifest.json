@@ -1,0 +1,46 @@
+{
+  "baseline": "8b2d7bb8a2903c89fd960a3c006c88b91b7d6647",
+  "acceptedRed": {
+    "runId": 39804723964,
+    "payload": "line31 Expected[34,51,68]/Actual[]",
+    "dispose": "line59 Expected1/Actual0",
+    "adoptedBy": "parent tdd-executor"
+  },
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "084d6e25a21a90a25c3cf71fbca31c64622b69df3b88a1fb61d19c7cf4c6aca0"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+      "sha256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133"
+    }
+  ],
+  "unchangedSources": 18,
+  "fixed2AndExisting631AndIndependent67": "source bytes unchanged",
+  "validation": {
+    "syntaxExit": 0,
+    "buildExit": 1,
+    "buildReason": "existing missing generated Referee CS0246x2/CS0400x2;0warnings4errors",
+    "diffCheckExit": 0,
+    "testsExecuted": 0,
+    "green": "not observed; remote_ci_only exact-SHA PR CI required"
+  },
+  "intermediateValidation": {
+    "retainedInitialLogsPrefix": "initial-",
+    "sourceHashes": {
+      "service": "bb39a87b1f88f6259bb0a7f185fe18babb3e555845d61f96d9ef290df91c3e0b",
+      "adapter": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133"
+    },
+    "syntaxExit": 0,
+    "buildExit": 1,
+    "changeAfterInitial": "publish actual Run Task before releasing async start outside lifecycle lock; final syntax/build rerun tied to final files"
+  },
+  "scope": "injected socket ReceiveAsync(token) then immediate capture, rawbytes+actual endpoint; ownsClient optional false, only owned socket disposed once. Service links caller+internal stop, keeps real Run Task, serializes Run/Dispose admission, only explicit ownedReceiver disposal, awaits actual Run and EndEpoch; repeated Dispose returns same Task; unexpected disposal/run errors propagate",
+  "nonGoals": [
+    "production group/port/bind/reuse/membership factory",
+    "new HTTP/CLI",
+    "Desktop/DCP/hardware acceptance"
+  ],
+  "processState": "all syntax/build/read/save/check terminated/exits collected"
+}

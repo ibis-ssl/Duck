@@ -1,0 +1,10 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs",
+    "Output": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/RefereeDriverHostAutoDriveTests.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "Output": "/tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/RefereeDriverWebSocketTransport.api.txt"
+  }
+]

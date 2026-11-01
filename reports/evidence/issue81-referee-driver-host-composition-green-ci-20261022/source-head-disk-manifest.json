@@ -1,0 +1,380 @@
+[
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs",
+    "expectedSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "headSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "preDiskSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "postHeadSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "postDiskSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs",
+    "expectedSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "headSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "preDiskSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "postHeadSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "postDiskSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs",
+    "expectedSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "headSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "preDiskSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "postHeadSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "postDiskSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "expectedSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "headSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "preDiskSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "postHeadSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "postDiskSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs",
+    "expectedSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "headSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "preDiskSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "postHeadSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "postDiskSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+    "expectedSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "headSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "preDiskSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "postHeadSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "postDiskSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs",
+    "expectedSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "headSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "preDiskSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "postHeadSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "postDiskSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+    "expectedSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "headSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "preDiskSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "postHeadSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "postDiskSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+    "expectedSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "headSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "preDiskSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "postHeadSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "postDiskSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "expectedSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "headSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "preDiskSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "postHeadSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "postDiskSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentClock.cs",
+    "expectedSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "headSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "preDiskSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "postHeadSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "postDiskSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ResourceReadinessSpecificationTests.cs",
+    "expectedSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "headSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "preDiskSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "postHeadSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "postDiskSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs",
+    "expectedSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "headSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "preDiskSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "postHeadSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "postDiskSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/TrackerDatagramSpecificationTests.cs",
+    "expectedSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "headSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "preDiskSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "postHeadSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "postDiskSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+    "expectedSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "headSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "preDiskSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "postHeadSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "postDiskSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentVisionWireFixture.cs",
+    "expectedSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "headSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "preDiskSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "postHeadSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "postDiskSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/VisionStoreAdditionalSpecificationTests.cs",
+    "expectedSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "headSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "preDiskSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "postHeadSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "postDiskSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs",
+    "expectedSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "headSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "preDiskSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "postHeadSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "postDiskSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+    "expectedSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "headSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "preDiskSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "postHeadSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "postDiskSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs",
+    "expectedSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "headSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "preDiskSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "postHeadSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "postDiskSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "expectedSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "headSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "preDiskSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "postHeadSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "postDiskSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs",
+    "expectedSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "headSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "preDiskSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "postHeadSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "postDiskSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs",
+    "expectedSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "headSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "preDiskSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "postHeadSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "postDiskSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs",
+    "expectedSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "headSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "preDiskSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "postHeadSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "postDiskSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "expectedSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "headSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "preDiskSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "postHeadSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "postDiskSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+    "expectedSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "headSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "preDiskSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "postHeadSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "postDiskSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateTransportTests.cs",
+    "expectedSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "headSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "preDiskSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "postHeadSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "postDiskSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs",
+    "expectedSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "headSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "preDiskSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "postHeadSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "postDiskSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+    "expectedSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "headSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "preDiskSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "postHeadSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "postDiskSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateMappingTests.cs",
+    "expectedSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "headSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "preDiskSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "postHeadSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "postDiskSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateObserver.cs",
+    "expectedSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "headSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "preDiskSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "postHeadSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "postDiskSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateObserverTests.cs",
+    "expectedSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "headSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "preDiskSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "postHeadSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "postDiskSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs",
+    "expectedSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "headSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "preDiskSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "postHeadSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "postDiskSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs",
+    "expectedSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "headSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "preDiskSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "postHeadSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "postDiskSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "allMatch": true
+  },
+  {
+    "path": "Duck.slnx",
+    "expectedSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "headSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "preDiskSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "postHeadSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "postDiskSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "expectedSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "headSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "preDiskSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "postHeadSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "postDiskSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "expectedSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "headSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "preDiskSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "postHeadSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "postDiskSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "expectedSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "headSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "preDiskSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "postHeadSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "postDiskSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "expectedSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "headSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "preDiskSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "postHeadSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "postDiskSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Program.cs",
+    "expectedSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "headSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "preDiskSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "postHeadSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "postDiskSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "allMatch": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "expectedSHA256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "headSHA256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "preDiskSHA256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "postHeadSHA256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "postDiskSHA256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "allMatch": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs",
+    "expectedSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "headSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "preDiskSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "postHeadSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "postDiskSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "allMatch": true
+  }
+]

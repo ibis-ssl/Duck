@@ -1,0 +1,22 @@
+{
+  "name": "own-socket-cleanup-green-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~ServerRemovesTheSocketPathItSuccessfullyBound"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:14:55.211373+00:00",
+  "runner_pid": 1190513,
+  "child_pid": 1190515,
+  "exit": 0,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "ebe25ffe2fcfa527141f329652532804fc4a903ddbebae09dca682624b931927",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 2478,
+  "stderr_bytes": 0
+}\n

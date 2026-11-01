@@ -1,0 +1,42 @@
+{
+  "scope": "今回の原因調査の補助操作。製品の失敗と区別する。",
+  "items": [
+    {
+      "operation": "file_read",
+      "target": "yomiyasu/skills/yomiyasu/domains/business.md",
+      "error": "TODO_OPERATION_OUTCOME_UNKNOWN / INVALID_ARGUMENT",
+      "impact": "参照先を読めなかった。製品や環境は変更していない。",
+      "resolution": "rgでreferences/domains/business.mdの実在を確認し、そのファイルを読了した。"
+    },
+    {
+      "operation": "file_patch / file_transfer_upload_begin",
+      "target": "調査報告のパス訂正とprepare-evidence.py保存",
+      "error": "TODO_STALE",
+      "impact": "Todo更新の有効期間切れで操作前に停止。権限変更は行っていない。",
+      "resolution": "実際の作業進捗に合わせTodoを更新後、同じ対象への操作が成功した。"
+    },
+    {
+      "operation": "process_status / process_output",
+      "target": "単体テストの収集処理と診断処理",
+      "error": "終了済みの処理を実行中・新規出力なしと表示",
+      "impact": "この表示だけでは処理の成否を判断できなかった。",
+      "resolution": "実プロセス一覧、完了ファイル、終了値、TRX、保存ログを照合した。表示を理由に同じ試験を再実行していない。"
+    },
+    {
+      "operation": "PowerShellによる診断JSON出力",
+      "target": "Get-Contentの結果を含む集計",
+      "error": "注釈付き文字列の属性が大量にシリアライズされた",
+      "impact": "集計表示に不要な情報が混入した。製品の実行結果には採用しなかった。",
+      "resolution": "Python標準JSONで同じ保存済み証拠を集計し直してcause-summary.jsonを作成した。"
+    },
+    {
+      "operation": "git diff --cached --check",
+      "target": "報告書と初稿証拠の冒頭メタ情報各3行",
+      "error": "exit 2 / trailing whitespace",
+      "impact": "commitとpushの前に停止。ビルド失敗ではなくMarkdown改行用の末尾2空白への指摘。",
+      "resolution": "報告は空行区切りへ変更。初稿は元バイト列をBase64とSHA256付きJSONで保持し、原本も同じWindowsフォルダへ保存。設定や検査除外は変更していない。"
+    }
+  ],
+  "permissionEscalationPerformed": false,
+  "rejectedDestructiveOperationRetried": false
+}

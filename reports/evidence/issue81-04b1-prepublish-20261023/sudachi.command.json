@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023",
+  "description": "Existing Sudachi venv/dictionary, single --files with two paths",
+  "exit_code": 1,
+  "started_epoch": 1792715256.7422705,
+  "finished_epoch": 1792715258.052239
+}

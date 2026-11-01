@@ -1,0 +1,200 @@
+{
+  "runId": 39820168338,
+  "headSha": "cd7760fde7ec54d2fc69d157af61dc1a68d810ac",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39820168338",
+  "jobs": [
+    {
+      "id": 119969045138,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 119969046867,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119969739234,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "watchExitCode": 1,
+  "testExitCode": 1,
+  "counters": {
+    "total": "652",
+    "executed": "652",
+    "passed": "651",
+    "failed": "1",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "failure": {
+    "name": "Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication",
+    "outcome": "Failed",
+    "duration": "00:00:00.3151212",
+    "message": "次packetの診断受理だけでは、期限切れcommand Aを購読へ返してはならない。",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:line 89\n   at Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:line 113\n   at Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:line 113\n--- End of stack trace from previous location ---",
+    "assertion": "Assert.False(subscription.IsCompleted)",
+    "line": 89,
+    "observed": "subscription.IsCompleted was true before B publication release",
+    "notObserved": "actual returned command value is not printed in this assertion/TRX; no fabricated Expected/Actual counter",
+    "classification": "runtime assertion failure; not compile error or watchdog timeout",
+    "parentAdoption": "pending"
+  },
+  "existing651": {
+    "count": 651,
+    "allIndividuallyPassed": true
+  },
+  "existing03A36": {
+    "count": 36,
+    "allIndividuallyPassed": true
+  },
+  "fixed67": {
+    "count": 67,
+    "allIndividuallyPassed": true,
+    "namesMatchPreviousFrozenResults": true
+  },
+  "sourceArchiveChecks": {
+    "fileCount": 24,
+    "allArchiveExpectedHeadDiskMatch": true
+  },
+  "sourceArchiveSHA256": "f96ffbf38471ed153c8d56495a82ae519318c6f307a189cdfcd2d02a8125a836",
+  "trxSHA256": "fbad3a9a2e5552fbc0167e57dabd2ac34074352677e3ae9d2372d2e3ce6e071a",
+  "artifactZip": "not retained by gh run download; extracted source.tar.gz/TRX and every artifact file hashed",
+  "commands": [
+    {
+      "evidence": "artifacts.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39820168338/artifacts"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:11:07.866818+00:00"
+    },
+    {
+      "evidence": "cleanup-expanded-artifact.command.json",
+      "command": [
+        "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+        "$taskArtifactRoot='C:\\tmp\\issue81-referee-receive-cache-race-red-ci-20261022'; $taskResolved=[System.IO.Path]::GetFullPath($taskArtifactRoot); if ($taskResolved -ne 'C:\\tmp\\issue81-referee-receive-cache-race-red-ci-20261022') { throw 'Unexpected cleanup target' }; Remove-Item -LiteralPath $taskArtifactRoot -Recurse -Force"
+      ],
+      "exit_code": 0,
+      "verifiedOwnExactTarget": true
+    },
+    {
+      "evidence": "download-12444626087.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "download",
+        "39820168338",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--name",
+        "dotnet-test-failure-39820168338-1",
+        "--dir",
+        "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:11:14.877052+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39820168338",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:11:05.126385+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39820168338",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:10:17.516090+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39820168338",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:11:07.436071+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs?head_sha=cd7760fde7ec54d2fc69d157af61dc1a68d810ac&event=pull_request&per_page=10"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:09:47.745800+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39820168338",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "exit_code": 1,
+      "utc": "2026-10-22T17:11:03.851381+00:00"
+    }
+  ],
+  "productBehaviorRepair": false,
+  "testOrExpectationEdited": false,
+  "rerun": false,
+  "processState": "all owned processes terminated; all exits reaped"
+}

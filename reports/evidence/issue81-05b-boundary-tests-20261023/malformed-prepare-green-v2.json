@@ -1,0 +1,22 @@
+{
+  "name": "malformed-prepare-green-v2",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~InvalidClientDoesNotStopAcceptLoop&DisplayName~prepare"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:17:38.812539+00:00",
+  "runner_pid": 1192648,
+  "child_pid": 1192649,
+  "exit": 1,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "5878db2894932e6d71e3b5ad0f869eff15b2d1f0bcc30c99ac053a5e438630f5",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 1966,
+  "stderr_bytes": 0
+}\n

@@ -1,0 +1,205 @@
+{
+  "run": {
+    "conclusion": "failure",
+    "createdAt": "2026-10-22T20:57:00Z",
+    "databaseId": 39853200976,
+    "event": "pull_request",
+    "headSha": "6f39d4c0b324fcdce361c1934c4f0d89b03e5370",
+    "jobs": [
+      {
+        "completedAt": "2026-10-22T20:58:35Z",
+        "conclusion": "failure",
+        "databaseId": 120084524097,
+        "name": "test",
+        "startedAt": "2026-10-22T20:57:03Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-22T20:57:06Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-22T20:57:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:57:12Z",
+            "conclusion": "success",
+            "name": "Check out repository",
+            "number": 2,
+            "startedAt": "2026-10-22T20:57:06Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:57:19Z",
+            "conclusion": "success",
+            "name": "Set up .NET SDK",
+            "number": 3,
+            "startedAt": "2026-10-22T20:57:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:58:26Z",
+            "conclusion": "failure",
+            "name": "Run dotnet test",
+            "number": 4,
+            "startedAt": "2026-10-22T20:57:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:58:29Z",
+            "conclusion": "success",
+            "name": "Collect failure diagnostics",
+            "number": 5,
+            "startedAt": "2026-10-22T20:58:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:58:32Z",
+            "conclusion": "success",
+            "name": "Upload test failure artifact",
+            "number": 6,
+            "startedAt": "2026-10-22T20:58:29Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:58:32Z",
+            "conclusion": "skipped",
+            "name": "Post Set up .NET SDK",
+            "number": 11,
+            "startedAt": "2026-10-22T20:58:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:58:33Z",
+            "conclusion": "success",
+            "name": "Post Check out repository",
+            "number": 12,
+            "startedAt": "2026-10-22T20:58:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-22T20:58:33Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-10-22T20:58:33Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/ibis-ssl/Duck/actions/runs/39853200976/job/120084524097"
+      },
+      {
+        "completedAt": "2026-10-22T20:57:01Z",
+        "conclusion": "skipped",
+        "databaseId": 120084526049,
+        "name": "ASPIRE-NET-002 Linux packet flow",
+        "startedAt": "2026-10-22T20:57:01Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/ibis-ssl/Duck/actions/runs/39853200976/job/120084526049"
+      },
+      {
+        "completedAt": "2026-10-22T20:58:35Z",
+        "conclusion": "skipped",
+        "databaseId": 120085272673,
+        "name": "ASPIRE full-stack Linux acceptance",
+        "startedAt": "2026-10-22T20:58:36Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/ibis-ssl/Duck/actions/runs/39853200976/job/120085272673"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-10-22T20:58:36Z",
+    "url": "https://github.com/ibis-ssl/Duck/actions/runs/39853200976"
+  },
+  "profile": {
+    "requested": "gpt-6.1-sol/high",
+    "applied": null
+  },
+  "actual": {
+    "total": "776",
+    "executed": "776",
+    "passed": "768",
+    "failed": "8",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "newAutoDrive15": {
+    "passed": 7,
+    "failed": 8,
+    "testSHA256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e"
+  },
+  "old761AllIndividuallyPassed": true,
+  "fixed67AllIndividuallyPassed": true,
+  "cacheRacePassed": true,
+  "hostHealth11AllIndividuallyPassed": true,
+  "composition16AllIndividuallyPassed": true,
+  "source44ArchiveHeadPrePostDiskMatch": true,
+  "hostBuildSucceeded": true,
+  "compileOrTimeoutFailure": false,
+  "TRX": {
+    "path": "artifacts/dotnet-test.trx",
+    "sha256": "67647049e65bfbe36d5a33a6519fa43c125950c719306f3d79c8a93bf21deb51"
+  },
+  "sourceArchive": {
+    "path": "artifacts/source.tar.gz",
+    "sha256": "f1f0967af9287b3ea2e569aca8f91d5953f4f011f0084b8038bbd1db87164724"
+  },
+  "testExitCode": "1",
+  "commandsAndExits": {
+    "final-diff-check.exit.json": {
+      "exit_code": 0
+    },
+    "final-status.exit.json": {
+      "exit_code": 0
+    },
+    "final-head.exit.json": {
+      "exit_code": 0
+    },
+    "artifact-download.exit.json": {
+      "exit_code": 0,
+      "finishedUtc": "2026-10-22T20:59:41.518731+00:00"
+    },
+    "run-log.exit.json": {
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T20:59:16.460576+00:00"
+    },
+    "artifacts.exit.json": {
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T20:59:14.593682+00:00"
+    },
+    "checkpoint-view.exit.json": {
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T20:58:58.090722+00:00"
+    },
+    "watch.exit.json": {
+      "exit_code": 1,
+      "ended_utc": "2026-10-22T20:58:52.340295+00:00"
+    },
+    "initial-view.exit.json": {
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T20:57:23.636400+00:00"
+    },
+    "initial-list.exit.json": {
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T20:57:22.410897+00:00"
+    }
+  },
+  "failureDetails": "functional-red-assertions.json",
+  "skips": "test cases0; packet/fullstack jobs skipped, not real Desktop acceptance",
+  "repositoryStatus": "",
+  "noProductOrTestEditsDuringCollection": true,
+  "allIssuedProcessesTerminated": true
+}

@@ -1,0 +1,108 @@
+{
+  "validation": "Issue81 G4 NR001",
+  "commit": "pending",
+  "baseline": "5f9c9726b296e3c465fb658de8e04eb6c2e8dd26",
+  "finding": {
+    "id": "I81-07J-B3-G4-NR001",
+    "severity": "P2",
+    "summary": "Initial apply eligibility was recorded before foreground session start succeeded; IOException/Win32Exception left it true."
+  },
+  "sourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "1496173D4ABE206B569666BC6718EBA29717299B38BD20A294C7BCA0906E62EA",
+      "bytes": 74627
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "069A3E08D8468A61FAA7A18CA3FA65EA4601626E1BFB3F29C7D03831A6597C65",
+      "bytes": 34134
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "sha256": "B4FEC9334D66413D403EFDDFFF0DFDEA3611ACDEE8FF3A09D1A9D9163276CC8A",
+      "bytes": 35344
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "A46BD63E5702B17E3605AC872518AA7129C37B4BB86857E83DD7753E7B4C1181",
+      "bytes": 15279
+    }
+  ],
+  "documents": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "fullSourceSha256": "B7ACEE3CD5CB176331F2CBA38C8C11195580CBCA3F8C4BFE86DF1B90E4119506",
+      "addedInputSha256": "1A69D21A755A479602E9BA313D6C3D8204285963FBA1D9DFCAF4C8DC8956F6B8",
+      "cspellCopySha256": "1A69D21A755A479602E9BA313D6C3D8204285963FBA1D9DFCAF4C8DC8956F6B8",
+      "addedLines": 1
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "fullSourceSha256": "DA9CD697EDCE22A4BE470AED5883C37CB0DD90514EAF3E04FB09A22234CA7AFA",
+      "addedInputSha256": "128114A60882F6FBE009B5BEC1A2D45443FCA17B4906F76A92510A3D464D755E",
+      "cspellCopySha256": "128114A60882F6FBE009B5BEC1A2D45443FCA17B4906F76A92510A3D464D755E",
+      "addedLines": 4
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "fullSourceSha256": "DCE2C4AFC3E99AAF89938DBA432C53E06DBF9449A1843D60F5561AC07F166523",
+      "addedInputSha256": "1A6D6982EAD98AC7880C77034685A8D2304617D54FB9E09231662CB20337C1AF",
+      "cspellCopySha256": "1A6D6982EAD98AC7880C77034685A8D2304617D54FB9E09231662CB20337C1AF",
+      "addedLines": 1
+    }
+  ],
+  "behaviorRed": {
+    "valid": true,
+    "exit": 1,
+    "runPid": 3924,
+    "startUtc": "2026-10-30T04:34:50.607952+00:00",
+    "endUtc": "2026-10-30T04:35:03.066253+00:00",
+    "timedOut": false,
+    "initialExpectedApplyCalls": 0,
+    "initialActualApplyCalls": 1,
+    "replacementExpectedApplyCalls": 1,
+    "replacementActualApplyCalls": 2,
+    "normalStartCase": "passed"
+  },
+  "checks": [
+    {
+      "name": "focused start failure/happy path cases",
+      "passed": 3,
+      "failed": 0,
+      "exit": 0
+    },
+    {
+      "name": "related observer/controller/reconfiguration cohort",
+      "passed": 30,
+      "failed": 0,
+      "exit": 0
+    },
+    {
+      "name": "AppHost Release build",
+      "exit": 0
+    },
+    {
+      "name": "document gates",
+      "passed": 12,
+      "failed": 0,
+      "exit": 0,
+      "composition": "corrected design four gates plus unchanged tasks/phases eight gates"
+    }
+  ],
+  "history": {
+    "firstDocGateAttempt": {
+      "passed": 11,
+      "failed": 1,
+      "gate": "design whitelist",
+      "correctedBy": "Natural Japanese wording; no code change."
+    }
+  },
+  "limitations": [
+    "No DCP/AppHost/container/helper runtime, deployment, or UDP execution.",
+    "CM4 service readiness and end-to-end transport acceptance remain unverified."
+  ],
+  "remaining": [
+    "Parent commit/push and same-reviewer closure."
+  ]
+}

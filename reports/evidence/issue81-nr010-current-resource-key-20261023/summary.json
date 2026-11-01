@@ -1,0 +1,58 @@
+{
+  "unit": "I81-NR-010: current resource key per notification",
+  "base_head": "a5672531162da9d398b6348746933d0321a58dc7",
+  "ci": {
+    "run_id": "39985949526",
+    "attempt": 1,
+    "status": "completed/success",
+    "standard_tests": "827 passed, 0 failed, 0 skipped",
+    "linux_publish_checks": "16/16; 3 managed applications successful",
+    "skipped": [
+      "packet flow",
+      "full-stack acceptance"
+    ],
+    "workspace_log": "C:/Users/donabe/Documents/Codex/2026-10-22/task-17/issue81-a567-39985949526-run.log",
+    "workspace_log_sha256": "87693D8D7308EDD285E537CBDBF3FDADCF5BED8D0491C578F46DF93CF31B7D34"
+  },
+  "native_materialization": {
+    "mirror": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-native-win-a567253-20261023-v3",
+    "archive_sha256": "cc263954d0a81bf5b74b4197572187b747d3e6b18334864ff96e4f8638349c10",
+    "fixed_proto_files": 31,
+    "restore_exit": 0,
+    "apphost_build_pre_fix_exit": 0,
+    "runtimehost_linux_publish_exit": 0,
+    "apphost_build_post_fix_exit": "0",
+    "offline_source": "C:/Users/donabe/.nuget/packages",
+    "publish_folder": "C:/Users/donabe/AppData/Local/Temp/issue81-native-win-a567253-20261023-v3/Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish",
+    "publish_required_files": [
+      "Tracker.RuntimeHost.dll",
+      "Tracker.RuntimeHost.runtimeconfig.json",
+      "Tracker.RuntimeHost.deps.json",
+      "SslProto.dll",
+      "appsettings.json"
+    ]
+  },
+  "nr010": {
+    "pre_fix_product_sha256": "e80df7533348fb96f7c7ce2a6db56bb4683a5d6f26ac54260f4cf59ba28be747",
+    "pre_fix_equal_to_base_head": true,
+    "test_sha256": "be11812e9dd0f8645bbde95415f38af7235940ecc5efd15e176d7c4b3a2915d8",
+    "red_command": "nr010-red.command.json",
+    "red_exit": 1,
+    "red_result": "compile succeeded; 1 focused runtime test failed because no handoff was captured after Starting key A then Running key B",
+    "first_green_product_sha256": "c3bd6b059a46e9d05a27755e05b74a80aad92e7c31052b5f5a87e5107561f329",
+    "final_product_sha256": "3efc24a224ace87f88065060ec36b467c0f695d41e324feed0bafed8678169a9",
+    "final_related_filter": "FullyQualifiedName~ContainerIdentity",
+    "final_related_result": "3 passed, 0 failed, 0 skipped; exit 0; includes NR010 fixture",
+    "final_apphost_build_exit": 0,
+    "fix": "Use observation.ResourceId for each current-state lookup and projection; remove stale first-event resourceId pin."
+  },
+  "processes": {
+    "active": false,
+    "unrecovered_exit_codes": []
+  },
+  "limits": [
+    "No Docker image pull/build/start or DCP execution.",
+    "The native RuntimeHost publish is a publish-output validation only, not image construction or runtime success.",
+    "The exact a567 CI is historical baseline, not validation of the uncommitted NR-010 fix."
+  ]
+}

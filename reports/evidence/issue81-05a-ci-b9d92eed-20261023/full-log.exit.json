@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "C:\\Program Files\\GitHub CLI\\gh.exe",
+    "run",
+    "view",
+    "39938732680",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--log"
+  ],
+  "exit_code": 0
+}

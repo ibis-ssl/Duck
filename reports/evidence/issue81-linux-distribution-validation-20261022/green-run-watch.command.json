@@ -1,0 +1,6 @@
+{
+  "command": "gh run watch 39867225445 --repo ibis-ssl/Duck --exit-status",
+  "finishedUTC": "2026-10-22T22:47:03.0675063Z",
+  "exit_code": 1,
+  "startedUTC": "2026-10-22T22:45:55.2959706Z"
+}

@@ -1,0 +1,8 @@
+Markdown whitelist violations:
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'Unix' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'RunId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'ResourceId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'ContainerId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'Generation' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'BootId' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/lint-vocabulary/closure-added-v5/1-tracker-comparison-debug-design.md:3: 'Generation' (katakana) is not in tools/lint/markdown-whitelist.yaml.

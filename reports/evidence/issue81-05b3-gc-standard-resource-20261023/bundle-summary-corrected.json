@@ -1,0 +1,33 @@
+{
+  "scope": "I81-05B3 explicit four-resource GC vision model; test, direct model regressions and AppHost build",
+  "readback": {
+    "design_path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "design_sha256": "14c84930062ba8de364ca6710b3532b7186c92abaec784296567c992c89b6df4",
+    "report_path": "reports/issue81-bridge-integration-implementation-20261023.md",
+    "report_sha256": "63dc1c6c56d397df67a0338a9062c28f964f1c0f417917ec4faf14f8c03572a1"
+  },
+  "sources": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "cf6888ceba02dd2776b8ccc189c243054a1ba0ab03c24e73d57fc02d68776fcc",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "48cf90d3cfe87cb2623e3bbca4becee7d49a1cf8eeb4a675e6414a64ad9e1e9a"
+  },
+  "validation": {
+    "valid_red": "expected resource count 4, actual 5; runtime assertion, exit 1",
+    "compile_setup_failure": "CS0136 local-name collision; not a functional result",
+    "resource_name_lookup_failure": "test expected simulator/duck; initial registrations were gcVisionSimulator/gcVisionDuck; corrected canonical names without changing test expectations",
+    "focused_test": "1/1 passed, exit 0",
+    "direct_related_model_tests": "5/5 passed, skip 0, exit 0",
+    "apphost_build": "exit 0; one existing ASPIRE010 warning"
+  },
+  "document_lint": {
+    "scope": "current changed fragments only (design, parent tasks diff, owned implementation-report section); not a full-document check",
+    "textlint_exit": 0,
+    "cspell_exit": 1,
+    "cspell_findings": 10,
+    "sudachi_exit": 1,
+    "sudachi_findings": 41,
+    "first_attempt": "document-lint-v1 included an unrelated prior reviewer cleanup line in the implementation report; its output is retained but not treated as the final scoped result",
+    "yomiyasu": "not run",
+    "metadata_correction": "manifest-v2 bundle-summary.json recorded 39; raw stderr contains 41 violation lines. Corrected summary is this file; no checker rerun."
+  },
+  "runtime_limits": "No DCP launch, GC GUI operation, RefereeDriver observation, live UDP check, or ownership cleanup was run in this unit."
+}

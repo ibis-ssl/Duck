@@ -1,0 +1,5 @@
+repo=/home/donabe/Duck-issue81-aspire-desktop-bridge
+operation=Python subprocess.run(["git","show",ref+":"+path], cwd=repo, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+refs=4e3099e75c4afab8ba1f11c67500ebe29f17fed3,fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9
+paths and sha256/byte equality are in source-git-show-comparison.stdout.log
+process exit=0; WSL wrapper invocation used PowerShell login:false require_escalated; no source files changed

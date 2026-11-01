@@ -1,545 +1,651 @@
-﻿# Aspire シミュレーション試験環境の設計
+﻿﻿# Aspire シミュレーション試験環境
 
-## 目的
+> **現行設計案・移行未完了・未受入。** Windows の AppHost と利用者ごとの Docker Desktop を使う。UDP とマルチキャストの参加者は、すべて同じ DCP 管理のブリッジネットワーク内へ配置する。Windows 上には AppHost、DCP、利用者のブラウザーを置く。利用者管理の Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop 内部の Linux 仮想環境 や WSL 2 は製品の基盤であり、その変更や削除は求めない。
+>
+> [2026-10-21 の再編前の設計記録](aspire-simulation-test-environment-history.md)は当時の内容を保持する。本書の方式への移行、Windows 上の DCP、ブリッジ内の通信、準備完了判定は未検証である。
 
-GitHub課題 #18 のAspire対応として、シミュレーション試験に必要な複数のプロセスを一度の操作で起動できるようにする。
+## 目的と設計判断
 
-初期対象は次の三つとする。
+Windows AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い、利用者自身の Docker Desktop に試験資源を登録する。DCP が資源の作成、状態監視、記録、停止、削除を管理する。別の Docker コマンド管理プログラムとコンテナの所有権を二重に持たない。
 
-- ER-Forceの`simulator-cli`を実行するシミュレータ。
-- `ibis-ssl/crane` のロボット制御プログラム。
-- Duck の `Tracker.RuntimeHost`。
+DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost は資源資源定義を DCP に渡し、Docker Engine がコンテナを実行する。DCP はネットワークの転送機能ではない。[DCP 公式リポジトリ](https://github.com/microsoft/dcp)と[Aspire 13.5.4 のコンテナ作成処理](https://github.com/microsoft/aspire/blob/v13.5.4/src/Aspire.Hosting/Dcp/ContainerCreator.cs#L109-L204)を根拠とする。当該版が作る既定の Aspire ネットワークをこの実行の専用ブリッジとする。任意の別ネットワークを追加指定できるとは仮定しない。
 
-シミュレータとCraneはDockerコンテナとして起動し、Duckは開発中のプログラムをそのままデバッグできるよう、ホスト上の.NETプロセスとして起動する。
+課題 #80 の I80-NR-001 に対応し、Duck、DebugHost のサーバー、RefereeDriver の審判情報受信機能、準備確認の受信機能もコンテナ側へ置く。Windows のプロセスにブリッジ内のマルチキャストを直接受信させる経路は要求しない。これは配置の設計変更であり、UDP の公開、中継、ホストネットワークは使わない。Docker Desktop の公式資料は、ブリッジが 仮想環境 内にあり Windows ホストから直接到達できないことを示す（[既知制限](https://docs.docker.com/desktop/features/networking/networking-how-tos/#known-limitations)、[通信の構造](https://docs.docker.com/desktop/features/networking/)）。同じブリッジ内に配置しても、複数受信や外部イメージとの通信の実測は必要である。
 
-本設計は手元での開発と手動試験を簡単に始めるためのものであり、本番の配置方法は定義しない。
+現行 `Testing/Duck.Testing.AppHost` の実装はこの設計と異なる。Duck と DebugHost はホスト上の `ProjectResource`、外部資源は Docker コマンド起動管理を介した `ExecutableResource` で、後者は `--network host` を使う。旧 `AddContainer` は DCP の利用者定義ネットワークと `--network host` が競合し、Docker に `cannot attach both user-defined and non-user-defined network-modes` と拒否された。移行時は標準コンテナ資源だけに所有権を集め、同じ引数を戻さない。現行実装や過去の受入証拠を、新配置の実装済み・受入済みの根拠にしない。
 
-## 現状
+## 対象資源
 
-`Testing/Duck.Testing.AppHost`は実装済みである。`duck`は`Tracker.RuntimeHost`の`ProjectResource`として登録し、`simulator`、`game-controller`、`crane`、必要な場合の`cm4-sim`は、Docker上で動かす各起動対象の管理プログラムとしてAspireの`ExecutableResource`に登録している。このため、旧方式の`ContainerResource`は現行実装では使っていない。「AppHostは存在しない」は設計開始時の説明である。
+すべての UDP 送受信機能を同じブリッジ内に置く。各イメージの版とハッシュ値を固定し、起動時には完全なコンテナ ID、DCP 資源 ID、実行 ID、ネットワーク ID を記録する。Duck と DebugHost の Linux 向け配布イメージ、準備確認機能を含む各起動構成は後続実装の対象である。
 
-初期のAppHost実装では`AddContainer`と`WithContainerRuntimeArgs("--network", "host")`相当の指定でホストネットワークを使っていた。当初の設計に沿った実装だったが、Aspire AppHost SDK 13.5.4 / DCP 0.25.13でGitHub Actionsを実行した際、DCPが利用者定義ネットワークを割り当てた後に、Dockerへホストネットワークの指定も渡していた。その結果、Dockerは`cannot attach both user-defined and non-user-defined network-modes`によりコンテナ作成を拒否した。この記述は初期実装の履歴であり、現在の実装や最終的な受入方式として扱わない。
-
-本書では、起動対象ごとのAspire外部実行資源（現行実装では`ExecutableResource`）から起動管理プログラムを立ち上げ、固定版のDockerコンテナを`--network host`で起動する方式を扱う。Duckは引き続き`AddProject<Projects.Tracker_RuntimeHost>`とする。旧方式の`ContainerResource`は現行実装では使っていない。現行方式の実通信による受入は未完了である。
-
-`Tracker.RuntimeHost` は `VisionReceiver` 設定から SSL-Vision の UDP 入力を受け、既定の `sim` 設定では `224.5.23.2:10020` を受信する。
-ER-Forceの`simulator-cli`はSSLの模擬通信規約による制御入力を受け、SSL-Visionの状態をUDP 10020へ送る。通常の送信先は`224.5.23.2`で、`--localhost`を指定すると`127.0.0.1`になる。
-
-SSLの模擬通信規約で使う既定のUDPポートは次のとおりである。
-
-- シミュレーション制御: UDP 10300。
-- 青チーム制御: UDP 10301。
-- 黄チーム制御: UDP 10302。
-
-
-## 基本方針
-
-Aspireは試験対象を一括起動して状態を管理するために使う。`Tracker.RuntimeHost`の実行責務は同プロジェクトに置き、AppHostへ移さない。
-
-AppHost は `Testing/Duck.Testing.AppHost` に置く。Duck は既存の `Duck.slnx` に含まれるため、C# のプロジェクト型 AppHost とし、`ProjectReference` と `AddProject<Projects.Tracker_RuntimeHost>` で起動する。
-
-`AddDotnetProject`で場所を指定する方法は、現行Aspireでは試験的なAPIのため初期実装で採用しない。
-
-シミュレータ、Game Controller、Crane、cm4-simは、サービスごとに分けたAspire外部実行資源から起動管理プログラムを立ち上げ、それぞれが固定版のDockerコンテナを所有する。CraneはDuck側でビルドせず、`ibis-ssl/crane`がGitHubで公開するコンテナイメージを、`ghcr.io/ibis-ssl/crane`の`scenario-`にコミットのハッシュ値を続けた版識別子で取得する。`scenario-develop`は動作確認に使う更新可能な識別子であり、利用者が明示した場合だけ使う。再現可能な試験では、対象コミットのハッシュ値に対応する版識別子を固定する。
-
-## 起動対象の構成
-
-AppHostでは三つの主要資源に加え、審判情報と試合状態を供給する試験資源を一つ、Craneの現在のシミュレーション経路を維持する場合は補助資源を一つ管理する。
-
-| 起動対象名 | 実行形態 | 責務 |
-| --- | --- | --- |
-| `simulator` | Aspire外部実行資源＋Dockerコンテナ | Craneの現在の模擬環境構成と同じ`ghcr.io/ibis-ssl/framework-simulatorcli:<tag>`からER-Forceの`simulator-cli`を起動し、物理シミュレーションとSSL-Visionデータの出力を行う。 |
-| `game-controller` | Aspire外部実行資源＋Dockerコンテナ | `robocupssl/ssl-game-controller:<fixed tag or digest>`をホストネットワークで起動する。各モードで`224.5.23.1:11003`の審判情報を生成する唯一の送信元とし、制御APIには`127.0.0.1:8082`を使う。 |
-| `crane` | Aspire外部実行資源＋Dockerコンテナ | `ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`からCraneを起動し、ロボット制御指令を生成する。 |
-| `cm4-sim` | Aspire外部実行資源＋Dockerコンテナ | `ghcr.io/ibis-ssl/orion-cm4-sim:<commit SHA>`を使い、Craneの`visibility_graph`が出すモード4の位置指令をモード3の速度指令へ変換する。 |
-| `duck` | .NET プロセス | `Tracker.RuntimeHost` を `sim` 設定で起動し、SSL-Vision を追跡してトラッカーパケットを出力する。 |
-
-Aspire管理画面では、AppHostが管理する各起動管理プログラムの状態と標準出力・標準エラーを確認する。DCPはDockerコンテナを直接管理しないため、コンテナの状態・ID・最終ログは起動管理プログラムの記録と受入証跡に残す。この方式ではDCPにコンテナの詳細は表示されない。
-
-## ネットワーク方針
-
-通信要件はホストネットワークを前提とする。サービスごとの起動管理プログラムがDocker CLIに`--network host`を指定してコンテナを起動する。Aspireの`AddContainer`に実行引数としてホストネットワークを加える方式は初期実装の履歴であり、AspireとDCPが利用者定義ネットワークも同時に指定してコンテナ作成に失敗したため、現行の方式では使わない。
-
-理由は、ER-Forceの`simulator-cli`がSSL-Visionの送信先を任意に指定する起動引数を持たず、通常のマルチキャスト送信か`127.0.0.1`への送信だけを選べるためである。
-
-シミュレータを通常のDockerブリッジネットワークに置いた場合、`--localhost`はコンテナ自身を指し、ホストで動くDuckには届かない。ブリッジネットワークとホスト間でマルチキャストを透過させる構成にも依存しない。
-
-そのため、`simulator`、`game-controller`、`crane`、`cm4-sim`はDockerのホストネットワークで起動し、Duckは従来どおりホスト上でSSL-Visionのマルチキャストを受信する。起動管理プログラムはサービスごとに分け、それぞれ一つのコンテナだけを所有する。Duckのプロジェクト資源とAppHostの多重起動防止ロックは維持する。
-LinuxのDocker Engineでは、ホストネットワークを使うコンテナがホストと同じネットワーク名前空間を共有するため、UDPポートの公開や変換を挟まずに通信できる。
-
-Docker Desktopを使う場合は、ホストネットワークを有効にする。初期受入環境はLinuxのDocker Engineとし、Docker Desktopでの動作は別途確認する。
-
-ホストネットワークではSSL-Visionとトラッカーマルチキャスト、および採用するシミュレータ構成の制御ポートをホスト全体で共有する。ポートは用途ごとに分ける。`10020`と`11010`は複数の受信側が`SO_REUSEADDR`を使って同時に受信する共有マルチキャストポートとする。一方、UDP 10300 / 10301 / 10302のうち構成で使う待受ポートと、Crane経路のUDP 12345 / 12346は、一つの起動構成が占有する制御ポートとする。`10020` / `11010`で単に待受を開始できるか、ポートが使用中かどうかを二重起動の判定には使わない。
-
-同じホスト上でDuckのAspire構成を二つ起動しないよう、AppHostは資源の起動前に取得し、終了まで保持するホスト内の排他ロックで二重起動を拒否する。初期実装では一意なロックファイルを`FileShare.None`で開き、そのハンドルを保持する。ファイルが存在するだけでは失敗としない。二つ目のAppHostがロックを取得できない場合は資源を起動せず、明示的に失敗する。別プロセスとの競合確認は占有型制御ポートだけを対象とし、共有マルチキャストポートは実パケットの複数受信試験で検証する。制御ポートのbind検査は資源登録前の事前診断であり、確認後に検査用ソケットを解放してから起動するため、検査と実際のbindの間に別プロセスがポートを取得する競合までは防がない。Aspireの`--isolated`を指定しても、ロックと固定UDPポートは分離されない。
-
-Craneの現行構成では、`visibility_graph`を使うと、`crane`がモード4の位置指令をUDP 12345へ送り、`cm4-sim`がその指令をモード3の速度指令に変換してUDP 12346へ転送する。既存のCraneコンテナを現在の仕様のまま使う初期構成では、この経路を汎用のSSL模擬通信規約で使う10301 / 10302への直接送信に置き換えない。
-
-ホストネットワーク使用時はDockerの`-p`によるポート公開を併用しない。ホスト上の起動管理プログラムは、引数配列を直接渡してDocker CLIを起動し、子プロセスを監視する。ホスト側ではシェルや`bash -c`を介さない。Craneの起動例にある`bash -c`は、Craneコンテナ内でROS環境を読み込んで起動するコマンドであり、ホスト側の起動管理プログラムでシェルを使う根拠にはならない。実装時はCraneイメージの起動時に実行するプログラムと引数の仕様を確認する。
-
-### 通信経路
-
-```text
-Craneコンテナ
-  │ モード4 / UDP 12345
-  ▼
-cm4-simコンテナ
-  │ モード3 / UDP 12346
-  ▼
-ER-Forceシミュレータコンテナ
-  │ SSL-Vision UDP 224.5.23.2:10020
-  ▼
-Tracker.RuntimeHost（ホスト上のプロセス）
-  │ TrackerWrapperPacket UDP
-  ▼
-試験用の確認先
-```
-
-シミュレーション制御を行う試験ツールが必要な場合はUDP 10300を使う。初期AppHost自体は自動で試験の進行手順を作らないが、`ASPIRE-005` / `ASPIRE-NET-007`の動作確認では専用の`referee-driver`設定を使う。`referee-driver`は`224.5.23.1:11003`へ審判情報を直接送らず、`game-controller`の`ws://127.0.0.1:8082/api/control`へ試合続行指令を送る。起動世代ごとに方式固有の初期指令（基本・比較方式は`HALT`、対戦方式は`STOP`）を確認した後に`NEXT_COMMAND`を送り、遷移後も`HALT` / `STOP`なら`FORCE_START`、それ以外の準備状態なら`NORMAL_START`を送る。11003で試合進行中の指令への遷移を確認してから、Craneの指令とSSL-Visionの位置変化を検査する。試合進行中へ遷移した後も、初期指令と一致しないことだけを理由に試合管理機能の準備完了が解除されず、通信とAPIの正常性が保たれることを確認する。
-
-## Duck の起動
-
-`duck`は`Tracker.RuntimeHost`のプロジェクト資源として起動する。
-試験用の既定値には既存の`sim`設定を使い、少なくとも次の値を明示する。
-
-- `Tracker:ActiveProfileName=sim`。
-- `VisionReceiver:MulticastAddress=224.5.23.2`。
-- `VisionReceiver:Port=10020`。
-
-製品用の`appsettings.json`に試験環境固有のコンテナ情報を追加しない。AppHostから環境変数で上書きする。
-
-DuckをDockerコンテナへ移行することは初期範囲に含めない。これにより、ブレークポイントを使う通常の.NETデバッグ経路を維持する。
-
-## 模擬環境の構成
-
-シミュレータには、Craneの現在の模擬環境構成ですでに使われている`ghcr.io/ibis-ssl/framework-simulatorcli:<tag>`を使う。Duck側ではER-Forceの模擬環境実装を複製してビルドしない。
-
-シミュレータのイメージの版識別子はAppHostの設定に明記し、再現可能な試験では固定した版識別子を使う。起動引数はCraneの現在の模擬環境構成に合わせる。
-
-```sh
-./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellow
-```
-
-AppHostでは少なくともイメージの版識別子、フィールド形状、物理特性、`IBIS_PORT`、`IBIS_TEAM_COLOR`を設定できるようにする。初期値はCraneの現在の模擬環境構成と同じく、フィールド形状を`2020B`、物理特性を`None`、`IBIS_PORT`を`12346`、チーム色を`yellow`とし、外部の既定値が変わっても試験結果が変わらないよう各値を明示する。
-## Crane の構成
-
-人工知能には`ibis-ssl/crane`の既存Dockerイメージを使う。Duck側でCraneのプログラム原本を複製してビルドする方式や、旧`ibis-ssl/crane_docker`のROS 2 Foxyを基盤にする構成は採用しない。
-
-`ibis-ssl/crane`の現行`docker/Dockerfile`はROS 2 Jazzyを基盤とし、`scenario`をビルド対象としてCraneを構築する。Craneの`docker build`処理では、GitHubで次の形式の識別子を付けたコンテナイメージを公開する。
-
-- `ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`: 再現可能な試験で使う固定した版識別子。
-- `ghcr.io/ibis-ssl/crane:scenario-develop`: 開発中の確認に使う更新可能な識別子。
-
-AppHostの既定設定では固定した版識別子を要求する。`scenario-develop`は利用者が明示した場合だけ使う。指定した識別子のイメージが保管先に存在しない場合、別の識別子へ暗黙に切り替えず起動を失敗させる。
-
-Crane の起動コマンドは現在の構成を基準にする。
-
-```sh
-bash -c "source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:=Yellow planner:=${PLANNER}"
-```
-
-`team`と`planner`はAppHostの設定から変更できるようにする。既定の経路計画方式はCraneの現行構成と同じ`visibility_graph`とし、その場合は`cm4-sim`も起動する。Crane、`cm4-sim`、模擬環境はROS 2 / UDP / マルチキャストの通信要件を満たすため、Dockerを動かす計算機のネットワークを共有する。
-
-## 審判情報と試合状態の送信元
-
-`224.5.23.1:11003`の審判指令は、通常方式、比較方式、対戦方式のいずれでも`game-controller`だけが生成する。11003は複数の受信側が受け取るマルチキャストのUDPポートであり、受信側がそのポートを使えるかどうかで送信元の一意性を判定しない。AppHostでは、11003への送信元を`game-controller`一つに限定する。
-
-通常方式では`game-controller`だけを審判情報の送信元とする。比較方式でも同じ送信元を使う。`tracker-tigers`はSumatraの審判機能を`source=NETWORK`、`port=11003`、`gameController=false`、`publishRefereeMessages=false`に固定し、外部の試合管理機能から審判情報を受け取る設定で起動する。標準の`simulation_protocol.xml`のように内蔵の試合管理機能を有効にする構成は使わない。`tracker-erforce`の`--gc-port 11003`も受信側として扱い、審判情報を送信させない。
-
-対戦方式も同じ`game-controller`を使う。`tigers-blue`はDuck側で固定する対戦用`simulation_protocol_fixed.xml`相当の設定により`source=NETWORK`、`port=11003`、`gameController=false`とする。`autoref-tigers`は審判情報の受信側として動作し、試合管理機能のAPIを呼び出す。対戦を進行させる`match-controller`もAPIを呼び出すだけとし、11003へ直接送信しない。
-
-この起動構成では`game-controller`が制御API`127.0.0.1:8082`を占有する。通常方式と比較方式の`referee-driver`はAPIを呼び出すだけとし、11003の送信元にはしない。これらのロボット動作試験では、初期審判指令を`HALT`に固定する。対戦方式ではCraneの現行構成を基準に、青チームを`TIGERs Mannheim`、黄チームを`ibis`、初期指令を`STOP`とする別の設定を使う。`match-controller`はAPIを呼び出して試合を進行させる。再現可能な試験で使う試合管理機能のDockerイメージは、固定した版識別子またはダイジェストで指定する。
-
-## 準備完了と起動順序
-
-現行実装の`WaitForStart`は起動対象の起動だけを示し、通信や各対象の準備完了までは示さない。移行後は各起動管理プログラムが`/health/live`と`/health/ready`を提供する。Dockerコンテナが起動しただけでは準備完了とせず、各対象の確認条件を満たした場合に限り成功とする。AppHostは、依存先の準備完了を待つ起動対象に対して、正常性確認付きの`WaitFor`を使う。`WithReference`は接続情報の参照に限る。
-
-初期の準備完了条件は次のとおり。
-
-| 起動対象名 | 準備完了条件 |
+| 資源 | 配置と役割 |
 | --- | --- |
-| `simulator` | 管理対象のDockerコンテナが稼働し、起動管理プログラムが`224.5.23.2:10020`のSSL-Vision検出パケットを受信して復号できる。継続受信とロボットの移動は一括受入試験で確認する。 |
-| `game-controller` | 起動世代ごとに方式固有の初期状態を検証する。初期化中は`base` / `comparison`の`HALT`、`match`の`STOP`を11003で確認するまで未準備とする。確認後は有効な審判指令の遷移を許容し、初期指令との一致を継続的な準備条件にしない。各正常性確認では所有者情報が一致するDockerコンテナ、試合管理機能のプロセスとAPIの応答、期限内に復号できる既知の審判指令を確かめる。通信断、API不通、未知指令、プロセスまたはコンテナの終了は未準備とする。 |
-| `tracker-tigers` | 所有者ラベル、起動対象名、期待するDockerイメージ、ホストとの共有ネットワーク、完全なコンテナID、稼働状態を確認する。コンテナ内のSumatraプロセスと起動完了診断に加え、比較実行開始後に`224.5.23.2:11010`で受信した、期待する送信元識別子を持つ復号可能なトラッカーパケットを確認する。コンテナが起動しただけでは準備完了としない。 |
-| `tracker-erforce` | 所有者ラベル、起動対象名、期待するDockerイメージ、ホストとの共有ネットワーク、完全なコンテナID、稼働状態を確認する。コンテナ内のER-Forceトラッカープロセスと起動完了診断に加え、比較実行開始後に`224.5.23.2:11010`で受信した、期待する送信元識別子を持つ復号可能なトラッカーパケットを確認する。コンテナが起動しただけでは準備完了としない。 |
-| `debug-host` | `Tracker.DebugHost`の.NETプロジェクト資源として起動する。Duckの起動通知と両外部トラッカーの準備完了を待つ。比較用正常性確認でDuck、TIGERs、ER-Forceの三つの役割がそれぞれ別の送信元識別子に対応し、同じ確認時間内に三者の新しいトラッカーパケットを受信した場合に準備完了とする。 |
-| `cm4-sim` | 所有コンテナが稼働し、UDP 12345の待受ソケットが当該コンテナ内のプロセスに属すると確認できる。ポートが使用中というだけでは準備完了にしない。 |
-| `crane` | 所有コンテナが稼働し、準備完了後に一覧取得を実行して終了値0となり、`/session_controller`の行が完全一致する。指令と移動は受入試験で別途確認する。 |
-| `tigers-blue` | 所有コンテナが稼働し、Sumatraの起動完了記録と、この実行で生成したトラッカーパケットを`224.5.23.2:11010`で復号した結果を確認する。 |
-| `autoref-tigers` | 所有コンテナが稼働し、AutoRef自身の診断が起動完了を示す。また、この実行で受信・復号したビジョン情報`10020`、審判情報`11003`、トラッカー情報`11010`の各入力数が増えたことを確認する。外部でマルチキャストパケットを観測しただけでは代用しない。イメージに受信証跡がなければ、確認用アダプターを実装するまで準備完了にしない。 |
-| `ssl-log-recorder` | 所有コンテナが稼働し、この実行で作成したログファイルがあり、後続の読み取り処理でビジョン情報、審判情報、トラッカー情報の各記録を少なくとも一件ずつ復号できる。 |
+| `simulator` | コンテナ。SSL-Vision `224.5.23.2:10020` の送信者。別の SSL-Vision プロセスは起動しない。 |
+| `duck` | `Tracker.RuntimeHost` のコンテナ。視覚検出を受信し、`sim` 設定で公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
+| `game-controller` | コンテナ。審判情報 `224.5.23.1:11003` の唯一の送信者。視覚検出と追跡情報も入力する。画面と制御 API は内部 TCP 8082。 |
+| `crane`、`cm4-sim` | コンテナ。必要なロボット制御と応答を同じブリッジ内で送受信する。`cm4-sim` は構成に応じて選ぶ。 |
+| `referee-driver` | 選択時に起動するコンテナ。新しい実行プロジェクトの単一受信処理で11003を観測し、自身の診断と内部API状態を照合する。自動制御は明示選択時だけ行う。Windows に UDP 受信部を残さない。 |
+| `tracker-tigers` | 比較時の Sumatra 追跡機能コンテナ。10020と11003を受信し、11010へ公式形式の追跡情報を送る。TIGERs AI と内蔵 Game Controller は起動しない。 |
+| `tracker-erforce` | 比較時の ER-Force AutoRef 追跡機能コンテナ。同じ入力から11010へ公式形式の追跡情報を送る。 |
+| `debug-host` | 比較時の `Tracker.DebugHost` コンテナ。自身の追跡・UDP送信を無効にし、10020と Duck / TIGERs / ER-Force の11010を受信する。表示・記録・再生をサーバー内で行い、Windows ブラウザーへ画面を返す。 |
+| 各資源の準備確認機能 | 対象コンテナ内で UDP を受信し、対象サービス自身の復号件数と新しさを確認する。ホスト上の旧起動管理プログラムの受信数は代用しない。 |
 
-固定版 `4063cd31cd5b11b1cc919003907f5f4c527b252d` の起動クラスは `session_controller` を登録する（[クラス定義](https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_session_coordinator/src/crane_session_coordinator.cpp#L21-L22)）。[起動定義](https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_bringup/launch/crane.launch.xml#L104) では名称を変更していない。一覧との照合には、パッケージ名や実行ファイル名を使わない。
+比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
-準備確認では、ROSの準備完了を示す固定行`DUCK_CRANE_ROS_SETUP_OK`と、その後に実行する`ros2 node list`の出力を分けて扱う。終了値、経過時間、試行番号、固定行の有無、対象行との一致、および秘密情報を除いた出力抜粋を記録する。抜粋は各512文字までとし、対象行との照合には切り詰める前の出力全体を使う。終了値124は期限超過、137は強制終了として記録する。ただし、137だけを根拠に期限超過が原因とは断定しない。実行中の試行には終了値を記録しない。
+視覚入力から `Tracker.RuntimeHost` の準備完了までを単独で確認する場合は、`Testing:VisionSimulationOnly=true` を明示する。この選択では `simulator` と `duck` の2資源だけを Aspire 標準 `ContainerResource` として登録し、既定の基本構成・比較構成は変更しない。既存の `RuntimeHostOnly` は Duck だけの1資源選択として維持する。simulator は `linux-image-lock.json` の `framework-simulator` 一覧ダイジェストを使い、Dockerイメージの `Entrypoint=["tini","--"]` と `Cmd=["./bin/simulator-cli"]` に対応するよう、`tini` と `-- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellow` を指定する。追加の `tini` を起動引数に重ねない。UDP は公開せず、ホストネットワークも使わない。simulator が起動した後に Duck を開始し、Duck 自身の `/health/vision` が復号済み視覚入力を確認する。これは最小の視覚入力経路の検証であり、比較資源やその他の外部サービスを含む全体構成の受入を意味しない。固定イメージの実行、同一 DCP ブリッジ内のマルチキャスト到達、厳格な準備確認の成功は実測で確認する。
 
-診断記録ファイルの保存先はAppHostの`Testing:Crane:DiagnosticsPath`設定で指定する。環境変数で指定する場合は`Testing__Crane__DiagnosticsPath`を使う。AppHostは設定値を絶対パスに解決し、`CraneDiagnosticsPath`としてCrane用Docker起動管理プログラムの起動引数へ渡す。起動管理プログラムはホスト上で診断記録ファイルを作成する。この設定をCraneコンテナの環境変数には渡さない。確認の開始、完了結果、終了時の集計を専用のJSON形式の記録ファイルへ一行ずつ追記し、各行の書き込みを完了する。書き込みに失敗した場合は固定文言のエラーを記録する。失敗しても準備判定、再試行、所有するコンテナの後始末を続ける。
+### Linux 向けアプリケーションの配布出力（I81-04A）
 
-一括試験の保存先は `artifacts/aspire-full-stack/crane-probe.jsonl` とする。標準エラーを間接的に採取する経路だけには頼らない。後始末後、記録を解析して秘密情報を除き、一行一記録の形式で保存し直す。解析または秘匿処理に失敗した場合は、成果物を外部へ送信しない。保存先がない場合、完了済み試行の記録がない場合、実行中に中断した場合を区別し、いずれも成功や受信件数0として扱わない。
+次の既存プロジェクトを、復元済み依存を使い、.NET 10 の共有実行環境で動かす配布物として発行する。各出力は .NET アセンブリから起動し、OS 固有の実行ファイルと実行基盤資材を含めない。実行時は後続の I81-04B で確定する .NET 10 実行環境を使う。コンテナイメージの基底、外部イメージ、デバッグ専用資材の版とダイジェストは I81-04B で別に確定する。
 
-確認処理の上限10秒、終了要求から強制終了までの2秒、一括開始待ち300秒、60秒以内にSSL-Visionの検出データで黄チームのCraneロボットの位置が100 mm以上変化することを確認する条件は変えない。準備完了後、審判指令の遷移を確認する。Craneの指令をcm4-sim経由でシミュレータに渡す構成で、受入試験がSSL-Visionの検出データから黄チームのCraneロボットの位置変化を観測する。続いて、Duckが出力したトラッカーパケットを受入試験が受信できることを確かめる。公式の試験手順とは審判情報の送信元が異なり、本構成では`game-controller`だけが送信する。
+| プロジェクト | 固定する配布出力 |
+| --- | --- |
+| `Tracker/Tracker.RuntimeHost` | `Tracker.RuntimeHost.dll`、対応する `.deps.json` と `.runtimeconfig.json`、`appsettings.json`。 |
+| `Tracker/Tracker.DebugHost` | `Tracker.DebugHost.dll`、対応する `.deps.json` と `.runtimeconfig.json`、`appsettings.json`、`wwwroot/app.css`、`wwwroot/favicon.png`。画面に使う静的ファイルを配布先へ含める。 |
+| `Testing/Duck.Testing.RefereeDriver.Host` | `Duck.Testing.RefereeDriver.Host.dll`、対応する `.deps.json` と `.runtimeconfig.json`。設定は環境変数で渡すため、追加の設定ファイルを要求しない。 |
 
-各確認には有限の期限を設ける。期限超過、コンテナ終了、復号失敗では準備未完了のまま失敗し、失敗条件と調査ログを記録する。起動管理プログラムは、各正常性確認でコンテナ情報を調べ、所有者ラベル、起動対象名、期待イメージ、ホストネットワーク、コンテナID、稼働状態をすべて照合する。コンテナ内のプロセスやサービス診断、新しいパケットはサービス準備の証拠とし、所有権の証拠にはこの照合を使う。外部でパケットを受信しただけでは、送信コンテナの所有証明に代えられない。マルチキャストの確認では、選択したIPv4インターフェースからマルチキャストを受信できるよう参加設定を行い、`SO_REUSEADDR`を使って受入試験側の受信を妨げない。待受ソケットの所有者を確認する方法は、初期対象のLinux上で実証する必要がある。実証できないOSでは確認条件を弱めず、未対応として明示する。
+自動検査では既存プロジェクトを実際に発行し、生成先の各ファイルと `.runtimeconfig.json` の .NET 10 の共有実行基盤を使う設定を検査する。新しい配布一覧だけの自己検査で代用しない。ここではイメージの取得・作成・起動、外部成果物の取得、実行中の依存導入、デバッグ資材の追加を行わない。
 
-試合管理機能の準備確認は、起動世代ごとに段階を設ける。初期化中は方式固有の初期指令を一度観測するまで未準備とし、確認後は「初期状態確認済み」をその起動対象の世代で保持する。起動後は有効な既知の審判指令への遷移を許容し、`HALT` / `STOP`へ戻ることは要求しない。継続的な正常性確認では、所有コンテナと試合管理機能のプロセスが稼働し、APIが応答し、期限内に11003の既知指令を復号して受信できることを確かめる。未知の指令、審判通信またはAPI通信の断絶、プロセスまたはコンテナの終了は未準備とする。コンテナIDまたは起動時刻が変わる再起動は新しい世代とみなし、初期状態の確認記録を破棄する。新世代で方式固有の初期指令を再確認するまで、試合管理機能の準備完了を待つ後続の起動対象は開始しない。
+### Linux 向け通常コンテナの配布定義（I81-04B2）
 
-既定の`visibility_graph`構成では、次の依存関係を使う。
+`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が既に参照する外部イメージ6件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。`GHCR` の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。
 
-1. `simulator`と`game-controller`は依存なしで起動し、並行して準備完了条件を満たす。
-2. `cm4-sim` と `duck` はそれぞれ準備完了した `simulator` を待つ。その後は並行して起動できる。
-3. `crane`は準備完了した`cm4-sim`と`game-controller`、およびDuckの起動通知を待つ。
-4. 比較方式の`tracker-tigers`と`tracker-erforce`は、それぞれ個別の起動管理プログラムとして登録し、準備完了した`simulator`と`game-controller`を待つ。各起動対象は所有者情報の照合と、固有のプロセス確認またはパケット確認の両方を満たす。
-5. 比較方式の`debug-host`は、Duckのプロジェクト起動通知と両トラッカーの準備完了を待つ。起動後も、DebugHostの比較用正常性確認でDuck、TIGERs、ER-Forceの三つの役割がそれぞれ異なる送信元識別子に対応し、確認時間内に新しいパケットを受信するまでは未準備とする。
+| 管理プログラム | 固定基底 | 定義ファイルと入力元 | 実行入口 |
+| --- | --- | --- | --- |
+| `Tracker.RuntimeHost` | 固定した `mcr.microsoft.com/dotnet/runtime` 参照 | `Tracker/Tracker.RuntimeHost/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Tracker.RuntimeHost.dll` |
+| `Tracker.DebugHost` | 固定した `mcr.microsoft.com/dotnet/aspnet` 参照 | `Tracker/Tracker.DebugHost/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Tracker.DebugHost.dll` |
+| `Duck.Testing.RefereeDriver.Host` | 固定した `mcr.microsoft.com/dotnet/aspnet` 参照 | `Testing/Duck.Testing.RefereeDriver.Host/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Duck.Testing.RefereeDriver.Host.dll` |
 
-`cm4-sim`を使わない経路を選んだ場合、`crane`は存在しない`cm4-sim`への依存を作らず、`duck`と`game-controller`の既定の依存関係だけを持つ。`duck`は準備完了した`simulator`を待つ。Duckの起動通知はプロジェクトの起動だけを示すため、サービス準備完了の根拠には使わない。
+3つの `Dockerfile` は `COPY . /app` でそれぞれの発行先を取り込み、実行入口のアセンブリと共有実行基盤を発行出力に合わせる。RuntimeHostは `Microsoft.NETCore.App`、画面プログラムと審判情報受信プログラムは `Microsoft.AspNetCore.App` を使う。DebugHost用の追加デバッグ資材と事前配布するデバッガーはI81-04B3、AppHostから固定参照を選択する接続はI81-05に属する。ここでの検査は固定表と同じCI実行で生成した発行出力を照合するが、コンテナイメージの取得・作成・起動や実行環境での提供成立は証明しない。
 
-移行前の`WaitForStart`と、移行後の準備完了確認付き`WaitFor`を混同しない。構成試験では依存関係と起動対象ごとの正常性確認を検証し、起動管理プログラムの試験では各条件と期限超過時の動作を検証する。試合管理機能は起動時の初期状態確認、初期化後の審判指令の正常な遷移、通信断、プロセス終了、起動対象の再起動を別々の試験で検証する。実ネットワークでの受入では、実際のパケット、審判情報、ロボットの動きを別途確認する。
+## 配置案
 
-## コンテナ所有権と停止契約
+図の破線は未実装の管理・起動経路を表す。各資源内の UDP 準備確認機能もブリッジ内で動く。別所有者のコンテナはネットワークに加えない。
 
-AppHostは起動時に起動単位を識別するIDを生成し、各起動管理プログラムに個別の実行IDを渡す。コンテナはこれらの値、資源名、使用するDockerイメージ、生成した名前がすべて一致する場合だけ、その起動管理プログラムの所有物とみなす。起動には`docker run --detach --cidfile ... --name ... --label ... --network host ...`を使う。`--rm`、イメージ名による絞り込み、`*`を使った一括削除、起動単位のIDだけを使った広範な削除は行わず、取得済みのイメージも削除しない。
-
-起動管理プログラムはDockerのコマンドとログ追跡処理を子プロセスとして直接起動し、標準出力と標準エラーを最後まで読み取る。取消時は子プロセスへの取消要求と強制終了、終了待ちを済ませてから後始末する。`docker run`がIDを返す前に取り消された場合、Dockerデーモン側で作成完了の反映が遅れる可能性を考慮し、所有者ラベルと資源ラベルを厳密に指定して期限付きで再検索する。期限までに作成状態を確定できない場合は後始末失敗として0以外の終了値を返し、残留の可能性を記録する。一度だけラベルを検索しただけで後始末完了とはしない。失敗を注入する試験には、作成完了の反映が遅れる場合も含める。
-
-通常終了、起動失敗、準備完了期限超過、コンテナの予期しない終了では、準備完了を解除し、所有コンテナを停止する。状態、終了値、最終ログを収集した後、所有者情報を再検証した完全なコンテナIDだけを削除する。停止全体の期限はDCPの実行資源停止上限15秒より短くし、子プロセスの終了、`docker stop`、`docker rm`には個別の上限を設ける。後始末の遅延や失敗は記録し、成功扱いにしない。`SIGKILL`、ホスト障害、電源断、Dockerデーモン停止時の自動後始末は保証しない。その場合もラベルで残留コンテナの所有者を識別し、無関係なコンテナには触れない。
-
-## 操作
-
-開発者が覚える起動操作は一つにする。
-
-```sh
-aspire run --apphost Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
+```mermaid
+flowchart LR
+ subgraph win[Windows]
+  browser[利用者のブラウザー]
+  app[AppHost]
+  dcp[DCP]
+  ports[127.0.0.1 / 動的 TCP 接続先]
+  app -. 資源モデル .-> dcp
+  browser -. HTTP / WebSocket .-> ports
+ end
+ subgraph desktop[Docker Desktop]
+  engine[Docker Engine]
+  subgraph bridge[当該実行の DCP 管理ブリッジ]
+   sim[simulator]
+   gc[Game Controller]
+   duck[Duck / RuntimeHost]
+   ref[RefereeDriver / 11003 受信を含む]
+   crane[Crane]
+   cm4[cm4-sim / 選択時]
+   checks[各資源内の UDP 準備確認機能]
+   subgraph optional[比較モード]
+    tigers[TIGERs tracker]
+    erforce[ER-Force tracker]
+    debug[DebugHost サーバー]
+   end
+  end
+  foreign[別所有者のコンテナ / 保護対象]
+ end
+ dcp -. 全選択コンテナの作成・監視・停止 .-> engine
+ engine -. 選択資源を同じブリッジで実行 .-> bridge
+ ports -. GC 内部 TCP 8082 .-> gc
+ ports -. DebugHost 内部 TCP 8080 .-> debug
+ ports -. RefereeDriver 内部 HTTP 39110 .-> ref
+ ports -. 用途を限定した HTTP 準備確認 .-> checks
 ```
 
-停止はAspireの通常操作に従う。`SIGINT` / `SIGTERM`による通常停止では、各起動管理プログラムが上記期限内に所有コンテナを停止・削除し、Duckの子プロセスも終了する。強制終了、ホスト障害、Dockerデーモンと通信できない場合のコンテナ後始末は保証しない。残留コンテナは所有者ラベルで後から識別する。AppHostの管理画面には起動管理プログラムの正常性と転送ログを表示し、`docker inspect`の結果と最終状態を受入証跡に残す。
+## 通信契約
 
-個別の起動対象の再起動とログ確認はAspireの管理画面から行える構成にする。
+UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資源名から接続先を解決する。マルチキャストは マルチキャストの宛先 と ポート を維持し、各受信側はコンテナ内の IPv4 インターフェースで参加する。Windows の NIC を `InterfaceAddress` に渡さない。送信側のインターフェース、同時受信、再参加の挙動は実機受入で確認する。
 
-### 実行方式の選択
+| 用途 | 送受信と接続先 |
+| --- | --- |
+| 視覚検出 | simulator → Duck / DebugHost / TIGERs / ER-Force / Game Controller。 `224.5.23.2:10020/UDP`。選択資源が同じ新しい入力を受ける。 |
+| 審判情報 | Game Controller のみ → 比較追跡器、Crane、RefereeDriver、および必要な準備確認機能。 `224.5.23.1:11003/UDP`。各受信機能の実装は確認対象とする。 |
+| 追跡情報 | Duck / TIGERs / ER-Force → DebugHost と Game Controller 等の必要受信側。 `224.5.23.2:11010/UDP`。三者は公式形式と独立した送信元識別を保持する。 |
+| シミュレーション／チーム制御 | `10300/UDP`、`10301/UDP`、`10302/UDP`。構成で使う送信者・受信者を外部契約確認で確定する。 |
+| Crane 経路 | `12345/UDP`、`12346/UDP`。報告された `12350/UDP` の使用有無も確認する。 |
+| ロボット応答 | simulator の `50100 + robot-id/UDP` と、`224.5.20.(100 + robot-id):50100 + robot-id/UDP` の使用経路を確認する。 |
+| 内部 Game Controller 制御 | RefereeDriver 等のコンテナ内利用者 → `ws://game-controller:8082/api/control`。 |
+| Windows の Game Controller 画面・制御 | `http://127.0.0.1:<GC割当ポート>/` と同じポートの `ws://127.0.0.1:<GC割当ポート>/api/control`。 |
+| Windows の比較画面 | `http://127.0.0.1:<DebugHost割当ポート>/`。DebugHost 内部は HTTP 8080 を設計値とする。既存の HTTPS 転送・待受設定の対応は実装前に確認する。 |
+| HTTP 準備確認 | 各資源の限定された検証口を127.0.0.1の動的 TCP ポートへ対応付ける。UDP をホストで受信しない。後述の確認契約が成立するまで公開しない。 |
 
-AppHost自身の設定`Testing:Mode`で起動構成を選ぶ。値は`base`、`comparison`、`match`の三つに限定し、未指定時は`base`とする。未知の値は起動対象を開始する前に設定エラーとして失敗させる。
+### 明示的な Game Controller 視覚検証モード（I81-05B3）
 
-- `base`: シミュレータ、試合管理機能、Crane、必要な`cm4-sim`、Duckを起動する。
-- `comparison`: `base`に`tracker-tigers`、`tracker-erforce`、`debug-host`を追加する。
-- `match`: 対戦用シミュレータ、試合管理機能の設定一式、Crane、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、Duckを起動する。`cm4-sim`、`tracker-tigers`、`tracker-erforce`、`debug-host`は起動しない。
+`Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的な `TCP` ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost の構成試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、この構成試験では証明しない。
 
-`match`は`comparison`への追加機能ではなく、独立した構成とする。比較用トラッカーと対戦用Sumatraの人工知能を同時に起動して、11010やチーム制御の意味が混在するのを防ぐ。
+### Game Controller と RefereeDriver の所有再構成（I81-07B）
 
-## 設定の責務
+`Testing:OwnedReconfiguration:Enabled=true` は `Testing:GameControllerVisionOnly=true` の場合だけ有効とする。既定値は `false` とし、他のAppHostモードの資源・引数・起動依存・命令を変更しない。有効化には `Testing:IdentityControl:DesktopBridgeEnabled=true`、既存の `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId`、ならびにこの構成で起動する `RefereeDriver` が必要である。前提不足または別モードとの併用は、別構成へ切り替えずAppHost起動前に明示的に失敗させる。初回起動では既存の `ws://game-controller:8082/api/control` を使い、新しい接続先の取得待ちを資源起動依存へ追加しない。
 
-AppHostが決めるのは「何を一緒に起動するか」と「試験環境でどの接続設定を使うか」だけとする。
+有効時だけGame Controllerに所有実行IDと `game-controller` 役割を示すDockerラベルを付ける。この所有ラベル追加は既存のデスクトップ識別ブリッジ補助処理から分離し、Game Controllerに `RuntimeHost` の `UDS` 識別情報受渡しを設定しない。RefereeDriverには同じ実行IDと `referee-driver` 役割を付ける。通常起動時のRefereeDriver接続先は資源名による既定値を維持する。再構成状態が有効な場合に限り、環境設定値を得る処理からその世代の検証済み接続先を渡す。
 
-追跡アルゴリズムの設定値、RuntimeHostの処理周期、正式な通信形式は、既存のDuck側設定と設計を正本とする。
+Game Controllerの資源に追加する `reconfigure-game-controller-endpoint` 所有再構成命令は、公開されたAspire資源命令APIを使い、既知のGame Controller／RefereeDriver `IResource`だけを操作する。単一の直列化制御下で、最初のDCP停止・再起動命令より前に、同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `Docker Engine ID` と、両資源のDCP登録状態・完全コンテナID・実行ID／役割ラベルを照合する。RefereeDriverがすでに停止済みの場合は、完全IDと所有ラベルを確認し、不要な `Stop` を省略して再試行できる。初期確認時にRefereeDriverが停止済みで、DCP登録から完全IDを得られない場合は、名前で補わず、いずれの命令も実行しない。再試行はDCP登録からその資源の完全IDと所有ラベルを確認できてから行う。別所有者の資源、Docker ID不一致、短縮ID、所有ラベル不一致では `Stop`／`Restart` を一つも実行しない。その後RefereeDriverを先にDCP停止命令で停止し、Game ControllerをDCP再起動命令で再作成する。`ResourceNotificationService`から新しい `Running` 状態と同じ登録資源の新しい完全コンテナIDを得る。Dockerコマンドは同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `info` と、通知から得た完全IDだけを対象にする読み取り専用 `inspect` に限る。Docker ID、DCP登録資源の現在ID、実行ID／役割ラベル、実行状態を照合し、`HostConfig.NetworkMode` と `NetworkSettings.Networks` が同じDCP管理ネットワークを示し、対象ネットワークのIPv4アドレスが一つだけであることを確認する。ネットワーク欠落・複数・不一致、自ホストアドレス、空・不正IP、所有者またはDocker ID不一致は拒否する。コンテナ名や画面表示名から任意の対象を選ばない。
 
-コンテナのイメージ版、フィールド形状、物理特性、Craneのイメージの版識別子、チーム色、経路計画方式、`cm4-sim`のイメージの版識別子など、試験環境を再現するための値だけをAppHostの設定に置く。
+状態は初期（`Initial`）、再構成中（`Reconfiguring`）、有効（`Active`）、停止（`Suspended`）を区別する。初期状態だけは既存の資源名による接続先を利用できる。再構成命令開始時に古い接続先を無効化して `Reconfiguring` へ移り、失敗、取消、時間超過、予期しないGame Controller世代変更では `Suspended` にする。`Reconfiguring` または `Suspended` 時は資源名による接続先や以前の検証済み接続先へ切り替えない。
 
-秘密情報が必要になった場合はリポジトリへ直接保存せず、Aspireのパラメーターまたは利用者の手元設定から渡す。
-## 実装単位
+`inspect` 後に資源通知の現在状態を再取得し、資源参照・資源ID・完全コンテナID・`Running` 状態が `inspect` 前の同じ世代であることを再確認する。確認成功後だけ `ws://<検証済みIPv4>:8082/api/control` を `Active` 状態の接続先として公開し、DCPの開始命令でRefereeDriverを再作成する。開始時に環境設定値を得る処理が `Active` 状態の接続先を使用する。資源開始は通信準備完了を意味せず、この命令成功もGame Controller API応答または実通信の受入証拠にしない。
 
-実装は次の順に分ける。
+別所有者・古い通知、世代交代、部分命令失敗、時間超過、取消では新しい接続先を公開せず、停止済みRefereeDriverを古い接続先で再開しない。Game Controllerの予期しない停止または新世代通知でも接続先を直ちに無効化し、DCP通知処理自体を直列化制御の解放待ちにせず、所有確認済みRefereeDriverへDCP停止を要求する。取消・時間超過・失敗で開始命令が保留中または完了結果不明の場合は、後着する `Running` 通知を監視し、停止状態へ戻ったことを確認するまで次の再構成命令を受け付けない。遅れて開始が完了した場合も、同じ実行ID／役割／完全IDの所有確認後にDCP停止し、古い接続先で復帰させない。新世代と接続先を順序付き再構成命令で確認するまで再開しない。Dockerによる直接停止・削除や、他の資源／所有者への操作は行わない。
 
-### `ASPIRE-002`: AppHost の骨格
+```mermaid
+flowchart LR
+ subgraph win[Windows]
+  browser[ブラウザー]
+  gcPort[127.0.0.1 / GC 割当 TCP]
+  debugPort[127.0.0.1 / DebugHost 割当 TCP]
+ end
+ subgraph bridge[Docker Desktop / 同じ DCP 管理ブリッジ]
+  sim[simulator]
+  gc[Game Controller / 唯一の 11003 送信者]
+  duck[Duck]
+  debug[DebugHost / 追跡無効]
+  tigers[TIGERs tracker / AI 無効]
+  erforce[ER-Force tracker]
+  ref[RefereeDriver / 単一受信・自身診断]
+  crane[Crane]
+  cm4[cm4-sim]
+  checks[各資源内の準備確認]
+  sim -. 10020 / SSL-Vision .-> duck
+  sim -. 10020 .-> debug
+  sim -. 10020 .-> tigers
+  sim -. 10020 .-> erforce
+  sim -. 10020 .-> gc
+  duck -. 11010 .-> debug
+  tigers -. 11010 .-> debug
+  erforce -. 11010 .-> debug
+  duck -. 11010 .-> gc
+  tigers -. 11010 .-> gc
+  erforce -. 11010 .-> gc
+  gc -. 11003 .-> tigers
+  gc -. 11003 .-> erforce
+  gc -. 11003 .-> ref
+  gc -. 11003 .-> crane
+  sim -. 10020 の受信証跡 .-> checks
+  gc -. 11003 の受信証跡 .-> checks
+  duck -. 11010 の受信証跡 .-> checks
+  crane -. 制御 UDP / 契約確認対象 .-> cm4
+  cm4 -. 制御 UDP / 契約確認対象 .-> sim
+  sim -. 応答 UDP / 契約確認対象 .-> cm4
+  cm4 -. 応答 UDP / 契約確認対象 .-> crane
+  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
+ end
+ browser -. HTTP / WebSocket .-> gcPort
+ gcPort -. TCP 8082 .-> gc
+ browser -. HTTP / 比較画面 .-> debugPort
+ debugPort -. TCP 8080 .-> debug
+```
 
-`Testing/Duck.Testing.AppHost` を追加し、`duck` だけを `Tracker.RuntimeHost` として起動できる状態にする。
+破線は設計上の通信で、実測済みを示さない。準備確認は対応する資源内で行い、独立観測器の受信だけでサービス自身の受信を代用しない。10300、10301、10302等の未確定の制御契約を、図の既知経路へ推測で割り当てない。
 
-### `ASPIRE-003`: ER-Forceシミュレータのイメージ
+### 外部接続先と再作成
 
-Craneの現在の模擬環境構成と同じ`ghcr.io/ibis-ssl/framework-simulatorcli:<tag>`を使う。これは初期の`ContainerResource`方式にシミュレータのイメージ参照と起動契約を追加した作業を指し、ホストネットワーク用の実行引数で動作することを受け入れた意味ではない。移行後は`simulator`の起動管理プログラムが同じイメージをホストネットワークで起動し、UDP 10020のSSL-Visionがホスト上の受信処理へ届くことを確認する。
+Crane、cm4-sim、simulator を同じブリッジへ移しても、別コンテナの `127.0.0.1` は共有しない。既存資料は、Crane の数値 IP、cm4-sim の `inet_addr` と 127.0.0.1 固定応答、simulator の数値 `QHostAddress` を報告している。固定した外部イメージで次の確認を終えることを、設計段階の検証契約とする。確認が終わるまで当該経路と全体受入を阻害として扱う。
 
-### `ASPIRE-004`: Craneイメージと制御経路
+| 対象 | 必要な確認と変更判断 |
+| --- | --- |
+| Crane → cm4-sim／simulator | 送信先を資源名で設定できるか確認する。数値 IP だけを受ける場合は、接続時の名前解決と再接続を外部実装へ加える変更を特定する。 |
+| cm4-sim → simulator と応答 | 他コンテナへの送信・応答先に127.0.0.1を使わず、simulator／Craneの資源名へ対応させる。送信先、応答先、待受 ポート、マルチキャスト用インターフェース の設定箇所を固定版で確認する。 |
+| simulator → cm4-sim | 数値宛先しか渡せない場合は資源名を再解決する変更を特定する。起動時に一度だけ解決した IP の永続利用は採らない。 |
+| 個別再作成 | DCP の資源名から現在の接続先を取得し直す。UDP は送信先と応答先を更新し、マルチキャスト は新しいコンテナのインターフェースで参加し直す。古い接続先は無効化し、通信準備を未完了へ戻す。 |
 
-初期の構成では`ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`と`cm4-sim`を`ContainerResource`として登録し、構成試験で登録内容と接続関係を確認していた。現在のAppHostでは、両者を`AddDockerWrapper`で起動管理プログラムの`ExecutableResource`として登録し、Dockerコンテナを別プロセスで管理する。`visibility_graph`を使う指令経路は維持し、Craneのモード4指令を`cm4-sim`でシミュレータ向けのモード3指令へ変換する。
+外部契約を変更できない場合は、固定 IP、暗黙の中継、同一コンテナ化へ自動変更せず、#80 の設計判断へ戻す。後続実装の開始前に、対応する版・変更先・受入条件を記録する。この文書変更では外部イメージを変更しない。
 
-### `ASPIRE-005`: 基本方式の起動試験
+### 名前空間共有候補の構成生成
 
-GitHub Actions上の`ASPIRE-005`受入試験は基本方式に限定し、シミュレータ、試合管理機能、Crane、必要な`cm4-sim`、Duckを対象とする。個別の起動管理プログラムへの移行、構成試験と起動管理プログラムの個別試験、独立した通常レビューが完了するまで実行しない。比較方式のトラッカーとDebugHostの実装・受入は、`ASPIRE-006A`以降および適用される`ASPIRE-NET-003`〜`006`の作業範囲とし、`ASPIRE-005`の成功に含めない。初期の`AddContainer`方式でのコンテナ作成失敗を再試行で回避した結果を、受入成功として記録しない。
+I81-07Cでは、明示設定 `Testing:NamespaceProbe:GenerateModel=true` だけで選ぶ診断入口を追加する。通常構成へ名前空間共有を採用する変更ではない。設定値が未指定または明示的に無効なら既存構成を保ち、不正な値で通常起動へ切り替えない。既存の単独実行、映像専用、四資源、再構成、再生専用、比較構成との併用は起動前に拒否する。設定が無効な場合は既存の資源登録と選択順序を保つ。既定の共通排他ファイルと実行名の検証も保つ。
 
-基本方式の起動対象を一括で起動し、`game-controller`が11003の唯一の審判情報送信元として動作すること、DuckがシミュレータからSSL-Visionを受信すること、Duckが`TrackerWrapperPacket`を出力することを確認する。基本方式では黄チームのCraneロボットの動作を確認し、青チームのAIは加えない。TIGERsとCraneの両チームの実動作は、対戦方式の`ASPIRE-MATCH-003`で確認する。比較方式は後続の別試験とする。
+診断入口と試験は同じ内部の構成生成処理を使う。生成するのは所有元と依存側の標準 `ContainerResource` 各1件だけである。両者に固定した既存`ASP.NET`イメージと `ImagePullPolicy.Never` を指定し、既存の審判受信プログラムの配布先を `/app` へ読み取り専用で割り当てる。配布先が不足する場合に作成・取得・代替起動を行わない。審判受信を無効にする引数と、所有元39110・依存側39111のHTTP待受設定を構成へ記録する。
 
-黄チームのCraneロボットを動かす基本方式の試験では、`referee-driver`が`game-controller`の初期`HALT`を確認し、そこから進行中の指令へ遷移させたことを11003で確かめる。その後、Craneの指令が`cm4-sim`を経由してシミュレータへ届き、黄チームのCraneロボットの位置変化がSSL-VisionとDuckの出力に反映されることまで確認する。審判指令の遷移を確認できない場合は試合状態設定の失敗として扱い、UDP 12345 / 12346の失敗と混同しない。正常な遷移後も試合管理機能の準備完了が維持されること、審判情報またはAPIの通信断で準備未完了になること、試合管理機能の再起動後に`HALT`を再確認するまで、これを依存先として準備完了を待つ後続資源を起動しないことを個別試験で確かめる。
+所有元だけに127.0.0.1の動的`TCP`公開を指定し、依存側には公開先を登録しない。安全な実行名から所有元の物理名を生成し、両資源に実行と役割の所有ラベルを付ける。依存側には `--network container:<owner>` の実行時引数と所有元の開始依存を登録する。将来の実測でも同じ生成処理を使い、試験だけの別構成で代用しない。
 
-### `ASPIRE-006`: 外部トラッカー比較デバッグ
+この入口は `builder.Resources` と実際の注釈・引数を読み、秘匿情報やホストの絶対保存先を含めないJSONを標準出力へ返す。`Build`、`Start`、`Run`へ進まず、DCP・コンテナ・HTTP待受を起動しない。ホストへの生成物の保存先や、未実装の実行切替設定は追加しない。
 
-比較方式の実装・受入は基本方式の`ASPIRE-005`には含めない。TIGERs SumatraとER-ForceのトラッカーをDuckと同じSSL-Vision検出データ`224.5.23.2:10020`で動かし、三つのトラッカー出力を正式なトラッカーマルチキャスト`224.5.23.2:11010`へ集約する。
+生成試験は標準資源型、固定イメージ、取得禁止、読み取り専用割当て、所有名・ラベル、所有元だけの公開、依存側の引数・開始依存と出力を確認する。DCPの既定ネットワーク設定はこの構成段階では注入されないため、`Networks` と `RunArgs` の実際の合成、通信、所有元再作成後の依存再結合を合格とはしない。停止・再作成の順序を表す公開APIの根拠と計画は保持し、実行した証拠とは分ける。
 
-比較方式では、`tracker-tigers`と`tracker-erforce`を個別の起動管理資源とし、所有者情報の完全な照合とサービス固有の準備確認を行う。`debug-host`は`Tracker.DebugHost`の.NETプロジェクト資源とし、Duckの起動通知と両トラッカーの準備完了に依存させる。DebugHost自身の比較用正常性確認は、Duck、TIGERs、ER-Forceの三つの役割を異なる送信元識別子に対応づけ、新しいパケットを確認するまで未準備とする。外部パケットを受信しただけでは、起動管理プログラムが所有するコンテナの証拠にはしない。
+### I81-07D: 明示許可後の名前空間共有組成確認
 
-実行中は既存の分割表示と重ね合わせ表示を使う。保存後の比較では、診断記録の時刻を全方式に共通する比較時点として揃える。物体ごとの位置・速度・角度・存在の差を数値で確認する詳細設計は、`Tracker/Design/Testing/tracker-comparison-debug-design.md`を正本とする。
+I81-07Dは `Tracker.Tests` 専用の実機組成検査とし、I81-07Cの `NamespaceProbeModelFactory` を再利用する。AppHostの製品選択肢は追加せず、検査対象の2資源と同じ生成処理を使う。試験実行側で構成を作る場合は `DistributedApplicationOptions.AssemblyName` に `typeof(Projects.Duck_Testing_AppHost).Assembly.GetName().Name` を、`ProjectDirectory` に `Projects.Duck_Testing_AppHost.ProjectPath` を指定し、`Args` も渡す。未指定時の `Assembly.GetEntryAssembly()` は `Tracker.Tests` の試験実行ホストを選ぶため、Aspire 13.5.4 AppHostの参照元型情報に埋め込まれたDCP CLI等の構成組み込み構成情報を解決できない。
 
-`ASPIRE-006A`では起動対象の構成、サービス準備条件、依存関係を固定する。`ASPIRE-006B`では三つの役割の送信元識別と同時のパケット到着を個別試験で固定する。後続の`ASPIRE-006C`〜`006E`では比較画面と再生機能を実装する。比較方式の実装・受入は基本方式の`ASPIRE-005`には含めない。
+通常のテストでは環境変数 `DUCK_I81_NAMESPACE_DCP_PROBE_ENABLED` が未指定なら未実行として記録し、成功に数えない。値が存在する場合は `true` だけを有効値とし、それ以外の値はDCP開始前に失敗させる。有効時は `DUCK_I81_NAMESPACE_DCP_EXPECTED_ENGINE_ID` と一意な `DUCK_I81_NAMESPACE_DCP_RUN_ID` を必須とする。既存のDocker 接続先は変更せず、読み取り専用の実行環境ID、実行IDラベル、固定イメージの固定版識別子/保存済み配布物、既存発行物の必要ファイルを照合する。不一致、値の欠落、既存実行ID衝突、イメージまたは発行物の欠落時は、資源を開始・取得せず失敗させる。新しいイメージ取得・ビルド・依存導入は行わない。
 
-### `ASPIRE-006F`: TIGERs対Craneの対戦用起動対象
+有効な場合だけ同じ生成処理から所有元と依存側の標準 `ContainerResource` を一つずつ登録し、AppHostを明示的に開始する。固定版識別子の既存`ASP.NET`イメージは `ImagePullPolicy.Never`、既存発行物は読み取り専用で割り当てる。所有元は `127.0.0.1` の動的`TCP`公開だけを持ち、依存側にはホスト公開を持たせず、`--network container:<owner>` と既存の開始依存を使う。初回2資源と、所有元・依存側それぞれ1回の再作成を観察し、完全ID、実行ID/役割ラベル、現在の実行環境、所有元IDに対する依存側 `HostConfig.NetworkMode`、公開`TCP`を読み取り専用確認する。最大4つのコンテナ世代を記録する。構成生成だけの検査、構成JSON、プロセス起動、作成成功を、DCPの実合成・再作成追従またはアプリケーション通信の証明に置き換えない。
 
-`ASPIRE-005`の基本構成を土台に、対戦用シミュレータ設定、試合管理機能の設定一式、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`を追加する。対戦方式では`cm4-sim`を除外し、Craneは`team:=ibis`、Sumatraは`--aiBlue`、Duckは11010への送信を無効にすることをアプリケーション構成試験で固定する。
+`StartAsync` から再作成・読み取り検査・後片付けまで、各回の上限を60秒とする。一回の実行中は自動再試行しない。ユーザーの許可により、課題81の限定範囲内で別の実行を繰り返せる。二回目以降は前回の終了、結果、所有完全IDと残存状態を確認してから開始する。前回の終了が不明なら、保存したプロセスID・開始時刻・引数と所有資源の読み取り専用照合を先に行い、重複起動しない。各回の対象コミット・目的・開始／終了・結果・所有完全ID・残存状態を記録する。期限・失敗時は追加の再作成を止め、残り時間内にDCP所有の通常停止・後片付けを試みる。後片付けが上限を超えた場合は、残存する所有IDと状態を記録し、失敗／未完了として報告する。強制終了や手動のコンテナ削除はしない。後片付けの確認は当該実行ID／役割ラベルと完全IDに限定し、他所有者の資源には操作しない。ネットワーク転送やアプリケーション通信成功はこの検査の判定対象に含めない。
+### Windows の TCP 待受
 
-実装は次の子作業項目へ分割する。
+AppHost は Game Controller の8082、DebugHost の8080、必要な HTTP 準備確認口に名前付きの接続先を定義し、動的なホストポートを Dashboard に示す。Windows ブラウザーは Dashboard の `game-controller` と `debug-host` の URL を開く。コンテナ内では対象のネットワークインターフェースで HTTP を待ち受け、ホスト側は127.0.0.1だけとする。コンテナ内の待受と Windows の待受範囲を混同しない。
 
-| ID | 作業 | 主な完了条件 |
+準備確認口は simulator=39101、Game Controller=39102、cm4-sim=39103、Crane=39104、TIGERs=39105、ER-Force=39106、Duck=39108、RefereeDriver=39110 の内部 TCP ポートを設計値とする。DebugHost は8080の `/health/vision` と `/health/comparison` を使う。各外部サービスに既存の検証口があるとは仮定せず、必要な受信・復号診断を当該コンテナ内へ実装する。検証口はデータ中継をせず、実行 ID、資源 ID、対象の完全なコンテナ ID と結び付けた件数・受信時刻・状態を返す。
+
+Aspire 13.5.4／Windows DCP の 127.0.0.1 待受は**設計段階の確認事項**である。実装前に当該版の 接続先 定義から Docker の ホスト側の待受アドレス までを追跡し、127.0.0.1の指定方法、動的 ポート、HTTP／双方向API、Dashboard表示、再起動時の再割当てを確定する。標準 `AddContainer` で限定できることを確認できなければ、接続先を有効にせず設計を阻害とする。全インターフェース公開、Docker Desktop設定変更、別の起動管理へ切り替えない。
+
+Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の設定で保証できた証拠にはしない（[Docker 公開ポート](https://docs.docker.com/engine/network/port-publishing/)、[Aspire ネットワーク概要](https://aspire.dev/fundamentals/networking-overview/)）。Game Controller の UI と `/api/control` が同じ ポート を使うことは[v3.20.3 README](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/README.md)を根拠とする。画面の URL 末尾と実到達性は固定イメージで確認する。
+
+## RefereeDriver の実行と内部診断
+
+### 実行プロジェクトと明示設定
+
+`Testing/Duck.Testing.RefereeDriver.Host` を明示選択する実行プロジェクトとする。薄い `Program` は標準構成の生成と起動へ委譲し、標準の依存登録で単一の `RefereeReceiveService`、API観測、状態照合、内部HTTPを組み合わせる。HTTPの実行時依存 `Microsoft.AspNetCore.App` はこのプロジェクトへ分離し、既存の受信・制御ライブラリと利用側の実行条件を変えない。
+
+次の構成は起動時に読み取る。設定の自動再読込みを保証しない。環境変数で渡す場合は、構成キーの区切り `:` を `__` に置き換える。
+
+| 構成キー | 型と既定動作 | 有効時の契約 |
 | --- | --- | --- |
-| `ASPIRE-006F1` | 対戦設定の版管理 | Sumatraの`simulation_protocol_fixed.xml`相当の設定、試合管理機能の初期状態、試合時間をDuck側の設定として追加する。青チーム=`TIGERs Mannheim` / 黄チーム=`ibis` / `FRIENDLY` / 初期`STOP`を個別試験で固定する。 |
-| `ASPIRE-006F2` | `match`方式と起動対象の構成 | `Testing:Mode=match`の選択、`base` / `comparison`との排他、対戦用起動対象の存在、`cm4-sim`と比較専用トラッカーが存在しないことをアプリケーション構成試験で固定する。 |
-| `ASPIRE-006F3` | 対戦用シミュレータと試合管理の起動対象 | シミュレータの起動引数、11003の単一送信元、試合管理API、設定の割当、固定イメージ参照をアプリケーション構成試験で固定する。準備完了試験では`base` / `comparison`の`HALT`と`match`の`STOP`を受理し、未知または想定外の指令では未完了とする。 |
-| `ASPIRE-006F4` | TIGERs / AutoRef / SSLログ資源 | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`をそれぞれAspireの外部実行資源として登録する。イメージ、ホストネットワーク、10020 / 11003 / 11010、`--aiBlue`、外部審判設定、各サービスの準備完了条件と`WaitFor`による依存をアプリケーション構成試験で固定する。起動管理プログラムの対象試験では条件成立・期限超過と診断根拠を検証する。 |
-| `ASPIRE-006F5` | Crane / Duckの対戦設定 | Craneの`team:=ibis`、`cm4-sim`への非依存、Duckの11010送信無効化を固定し、起動管理プログラムの準備完了を待つ依存関係をアプリケーション構成試験で確認する。 |
-| `ASPIRE-006F6` | `match-controller`と試合進行 | 試合管理API、審判情報、ビジョン情報の準備完了、`STOP` / `HALT`からの続行操作、`POST_GAME`または最大時間での終了、結果保存を対象試験で固定する。 |
+| `RefereeDriver:Enabled` | 真偽値。明示した `true` だけ有効。未指定、`false`、解釈できない値は無効。 | 無効時はUDP受信、Game Controller接続、制御を開始せず、診断経路を登録しない。 |
+| `Testing:ContainerMode` | 真偽値。明示した `true` だけコンテナ用待受を選ぶ。 | `Enabled=true` の場合、本設定が `true` なら `http://0.0.0.0:39110`、それ以外は `http://127.0.0.1:39110`。HTTPSへの転送は追加しない。 |
+| `RefereeDriver:GameControllerUri` | 有効時に必須の絶対形式の接続先アドレス。暗黙の既定接続先はない。 | `ws` または `wss` の `/api/control` を指定する。通常の内部値は `ws://game-controller:8082/api/control`。観測と明示制御に同じ検査済み接続先を渡す。 |
+| `RefereeDriver:InterfaceAddress` | 任意のIPv4アドレス。未指定なら既定の受信インターフェース。 | `224.5.23.1:11003` の受信で共有ポートを許可し、IPv4の全アドレスで待ち受け、指定したインターフェースで参加する。 |
+| `RefereeDriver:AutoDriveToActive` | 真偽値。未指定、`false`、解釈できない値は観測専用。 | `Enabled` と本設定がともに明示した `true` の場合だけ、既存の制御処理を一度実行する。 |
+| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` / `Testing:IdentityControl:ExpectedRole` | `RunId` は空白だけでない文字列。通常の固定 `ResourceId` 経路では `ResourceId` も必須。起動時に資源キーが未確定の明示制御経路では `ExpectedRole` を必須とし、`ResourceId` は未設定にする。 | `RunId` と役割を起動時に固定し、AppHost が照合した `ResourceId` だけを同一 `UDS` 上の `handoff` における初回 `commit` で確定する。送信元アドレスやホスト名から補完しない。 |
+| `Testing:Diagnostics:ContainerId` / `Testing:Diagnostics:Generation` | 完全なコンテナIDを半角16進表記64桁で指定し、起動世代は正の `Int64` で指定する。 | 未指定・不正値は帰属不明とする。正常復号件数は記録するが、準備完了にはしない。 |
 
-### `ASPIRE-006G`: TIGERs対Craneの一括対戦試験
+無効時の診断経路は404となり、既存の待受設定を保持する。無効設定は、HTTPサーバー自体を起動しないことを意味しない。コンテナ内の39110待受と、後続のDCPによるWindows 127.0.0.1の動的ポート公開は別に確認する。
 
-`ASPIRE-MATCH-001`から`ASPIRE-MATCH-005`までをLinux上で確認する。両チームの実際の動き、AutoRefとトラッカーの通信経路、試合終了、結果、SSLログ、Craneの記録データ、各起動対象のログを証跡として残す。通常対戦では勝敗や得点を合否条件にしない。
+接続先に利用者情報や断片識別子を含めない。コンテナ用構成では127.0.0.1や::1等の自身を指す接続先、既知の自身の名前、資源IDと同じホスト名、診断用39110を指す宛先を起動前に拒否する。コンテナ用でない明示構成の127.0.0.1接続と、既存の制御機能の公開既定値は維持する。
 
-一括試験は次の子作業項目に分ける。
+### デスクトップブリッジでの `RefereeDriver` 帰属確定
 
-| ID | 作業 | 主な完了条件 |
-| --- | --- | --- |
-| `ASPIRE-006G1` | 構成・チーム・審判情報の受入 | Linux上で`ASPIRE-MATCH-001` / `002`を実パケットと実際の起動対象で確認し、起動対象一覧、チーム対応、11003の送信元が一つであることを記録する。 |
-| `ASPIRE-006G2` | 両チームの動作確認 | `ASPIRE-MATCH-003`を実行し、同じ進行中の審判指令の間に黄側のCraneと青側のTIGERs双方の位置が変化することを確認する。 |
-| `ASPIRE-006G3` | AutoRef・トラッカー経路の受入 | `ASPIRE-MATCH-004`を実行し、Sumatraからの11010送信、AutoRefによる10020 / 11003 / 11010の利用、Duckが11010へ送信しないことをパケット数とログで確認する。 |
-| `ASPIRE-006G4` | 試合終了・証跡 | `ASPIRE-MATCH-005`を実行し、`POST_GAME`または最大時間での終了、対戦結果、SSLログ、Craneの記録データ、各起動対象の標準出力と標準エラーを失敗時も保存する。 |
+四資源構成などで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は RefereeDriver にも Duck と同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker Engine IDを照合し、対象コンテナだけに `dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control` を実行する。RuntimeHost 側と同じ `prepare` / `challenge` / `commit` の契約を使い、RefereeDriver 側ではコンテナ内の固定位置 `/tmp/duck-referee-identity.sock` で待ち受ける `Unix` ソケットを使う。ソケットはコンテナ外へ公開せず、既存のUDP通信・Game Controller API接続先・Docker Desktop構成を変更しない。
 
-## テスト方針
+受信開始時点ではコンテナIDと資源キーが未確定でもよいが、帰属は未成立とする。受信中に正しい識別情報が `commit` された時だけ、既存の単一受信処理の世代を切り替え、旧試行と保持中の指令を無効化する。切替後の新しい正常復号件数が増加するまで準備完了にしない。同じ識別情報の再送は冪等とし、`RunId`・資源キー不一致、世代後退、`BootId` の不一致は拒否する。RefereeDriver未選択時またはブリッジ無効時は新しい監視・制御口を起動しない。この受渡しは所有コンテナを照合した実装経路であり、実機での準備完了・Game Controller API対応成立は別途検証する。
 
-実装ではテスト駆動開発を使う。
+### 診断ログの共有書込み
 
-最初にAppHostのアプリケーション構成を検査する試験を追加し、未実装の状態では失敗することを確認する。
-少なくとも次の項目を自動で検査する。
+`Testing:IdentityControl:SafeTracePath` を指定すると、識別情報の受渡し段階と結果を改行区切りのJSONで記録する。各行の項目は `timestampUtc`、`stage`、`outcome` に限定する。実行ID、コンテナID、認証情報、制御要求の本文は記録しない。
 
-- `simulator`、`game-controller`、`crane`、`cm4-sim`、`duck`の各資源が存在する。
-- `duck`が`Tracker.RuntimeHost`を参照する.NETプロジェクト資源である。
-- `crane`が`ghcr.io/ibis-ssl/crane`の`scenario-<対象コミットのハッシュ値>`イメージを参照する。
-- `simulator`が`ghcr.io/ibis-ssl/framework-simulatorcli`、`cm4-sim`が`ghcr.io/ibis-ssl/orion-cm4-sim`の固定した版識別子を参照する。
-- `simulator`、`game-controller`、`crane`、`cm4-sim`がそれぞれ独立した起動管理資源として登録され、Duckはプロジェクト資源のままである。各資源のイメージ、起動コマンド、引数、ホストネットワーク、`-p`を使わないこと、所有者ラベルを確認する。DCPの`ContainerResource`を併用しない。
-- Duckに`sim`用の`VisionReceiver`設定が渡される。
-- シミュレータのフィールド形状と物理特性が明示される。
-- Craneの`team`、`planner`と`cm4-sim`の接続ポートが明示される。
-- `game-controller`が固定した版識別子またはダイジェスト値を参照し、11003の唯一の審判情報送信元として構成される。
-- 比較方式の`tracker-tigers`は外部の試合管理機能を使う設定とし、`gameController=false`と`publishRefereeMessages=false`によって11003を受信専用にする。
-- 比較方式の`tracker-tigers` / `tracker-erforce`を個別の起動管理プログラム資源として登録する。両資源は、想定した所有者ラベル、資源名、イメージ、ホストネットワーク、完全なコンテナID、稼働状態が一致することを`inspect`で確認する。コンテナ内の想定プロセスまたはサービスの起動診断と、送信元識別子が一致する新しいトラッカーパケットを確認するまで準備完了にしない。
-- 比較方式では両トラッカーが、準備完了したシミュレータと試合管理機能を正常性確認付きの`WaitFor`で待つ。11003の送信元は追加しない。`debug-host`はDuckの起動通知と両トラッカーの準備完了を待つ。DebugHost自身の比較用正常性確認では、Duck / TIGERs / ER-Forceの三つの送信元識別子を区別し、新しいパケットを受信するまで準備完了にしない。
-- `referee-driver`の結合試験用設定では、起動世代ごとに方式固有の初期指令（`base` / `comparison`は`HALT`、`match`は`STOP`）を確かめてから試合管理APIへ続行指令を送り、進行指令への遷移後も正常性が保たれることを確認する。
-- 試合管理機能の準備完了は、起動世代ごとに初期状態を一度確認して決める。その後は有効な審判指令への遷移を許容する。審判情報またはAPIの通信断、未知の指令、プロセスまたはコンテナの終了時は未準備とする。資源の再起動時は初期状態の確認記録を消去し、想定した初期指令を再確認するまで後続資源を待機させる。
-- 各起動管理資源に`/health/live`と、サービス固有条件を判定する`/health/ready`確認が設定される。起動だけを待つ`WaitForStart`を準備完了条件として使わない。
-- 既定の`visibility_graph`構成では、`cm4-sim`と`duck`は準備完了した`simulator`を待ち、`crane`は準備完了した`cm4-sim` / `game-controller`とDuckの起動通知を待つ。
-- `planner`の設定で`cm4-sim`を使わない場合、`crane`は`duck`と`game-controller`だけに依存し、存在しない`cm4-sim`を待たない。
-- 対戦方式では`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`を追加し、`cm4-sim`と比較専用の`tracker-tigers`は登録しない。
-- 対戦方式のシミュレータ起動引数、青チーム=`TIGERs Mannheim` / 黄チーム=`ibis`の割当、Craneの`team:=ibis`、Sumatraの`--aiBlue`を一組の設定として固定する。
-- 対戦用Sumatra設定では10020のSSL-Vision検出データ、11003の外部審判情報、`gameController=false`、11010へのトラッカー情報送信を指定する。
-- 対戦方式のDuckは11010へのトラッカー情報送信を無効にし、AutoRefのトラッカー入力にDuckのデータが混ざらないようにする。
-- `match-controller`は参加資源の起動後に起動し、試合管理APIと11003、10020の実データを確認してから試合を開始する。
-- 比較方式の`tracker-tigers` / `tracker-erforce`は、所有者ラベル、資源名、イメージ、ネットワーク、コンテナID、稼働状態を確認する。コンテナ内の想定プロセスと起動診断に加え、想定した送信元識別子を持つ新しいトラッカーパケットが揃うまで準備完了にしない。
-- 比較方式の`debug-host`はDuckの起動通知と両トラッカーの準備完了を待つ。さらにDebugHost自身の比較用正常性確認で、Duck / TIGERs / ER-Forceの三つの役割を異なる送信元識別子として識別し、新しいパケットを受信するまで準備完了にしない。
+DuckとRefereeDriverの監視が同じファイルへ追記する場合、AppHostのプロセス内で共通の排他制御を使う。一つの監視だけを対象にした排他制御では、別の監視による同時書込みを防げない。各行の追記を直列化し、複数の監視によるファイル共有違反を防ぐ。別プロセスからの書込み、保存先の権限不足、空き容量不足への対処は含まない。
 
-起動管理プログラムの単体試験では、Dockerの代替実行ファイルを使う。取消後にDocker側の作成完了通知が遅れる場合と、コンテナIDを取得できない場合の期限付き再検索を検証する。所有者ラベルの不一致、子プロセスの回収、ログ追跡処理の取消、他者所有コンテナが変更されないことも確認する。通常・対戦・比較の各方式について、準備完了、期限超過、サービス診断の根拠を検証する。
+### 自身の受信診断と状態照合
 
-試合管理機能は、起動時の初期状態の記録と継続的な正常性確認、有効な指令への正常な遷移、通信断またはプロセス終了、資源再起動後の初期状態再確認を別々に検証する。
+`GET /health/referee` は自身の受信証跡とAPI状態の現在の照合を返す。一致して準備完了の場合だけ200とし、帰属不明、入力なし、復号失敗、未知の経過時間、期限切れ、状態不一致では503とする。
 
-比較方式の構成試験では、トラッカー起動管理プログラムと`DebugHost`の資源種別、所有者情報の完全照合、固有の準備完了条件、シミュレータ・試合管理機能・Duck・各トラッカーの準備完了を待つ依存関係を固定する。`DebugHost`の対象試験では、三つの役割の送信元識別と同時刻に届くパケットを検証する。構成試験だけで実通信やロボットの実動作を確認したことにはしない。
+保持中の一致が有効なら直ちに返す。有効な一致がなければ、常駐する一つの観測処理の照合完了を最大2秒待つ。複数のHTTP要求は同じ完了通知を共有し、要求ごとのAPI取得は起動しない。通知後は同一の受理件数、帰属、受信世代、送信元、API要求と接続先世代、双方の鮮度を返却直前に再検査する。不一致なら残り時間内で次の通知を待ち、期限に達した場合は `ObservationWaitTimedOut` で503を返す。要求の取消はその待機だけを終了し、共通の観測と他の要求を取り消さない。待機やHTTP取得によって入力の受信時刻とAPI取得開始時刻を更新しない。
 
-Dockerを必要とする一括起動試験は、AppHostの構成検査と分ける。Dockerを利用できない環境でも、アプリケーション構成の回帰不具合を検出できるようにする。
+| 応答項目 | 内容 |
+| --- | --- |
+| `isReady` / `reason` | 現在の照合結果と理由。失敗後に保持値が解除されると `NoObservation` となり得る。最後の失敗履歴を保持する契約ではない。 |
+| `diagnostic.identity` | `runId`、`resourceId`、`containerId`、`generation`。帰属不明時は `null`。構造検査された入力であり、実DCP所有の証明ではない。 |
+| `diagnostic` の受信証跡 | `inputId`、`receiverEpoch`、`sourceKey`、`sourceName`、`sourceUuid`、`remoteEndpoint`、`successfullyDecodedCount`、`decodeFailureCount`、`lastReceivedAt`、`decodeAgeUpperBound`、`decodeStatus`、`isReady`、`reason`。単一の対応する受信状態を返す。 |
+| `api` | 正規化した `state.command` と `state.phase`、`endpoint`、`endpointGeneration`、`requestSequence`、`readStartedTimestamp`、`readCompletedTimestamp`、`ageUpperBound`。有効な観測がなければ `null`。 |
 
-一括起動試験では、すべての資源が`Running`になっただけで成功とはしない。SSL-Visionの受信とDuckのトラッカーパケット出力までを試験証跡に含める。
+協定世界時は最終受信日時の表示に使い、新しさは同じプロセスの単調時計で判定する。日時は時差を含む形式（例：`2026-10-22T21:00:00+00:00`）で返す。同じ受信世代・送信元で正常復号件数の増加を確認し、UDP受信から5秒以内、API取得開始から3秒以内の証跡を照合する。API取得処理にも3秒の期限を設ける。読取り開始前の古い入力や、別の受信件数で更新された入力を混ぜず、HTTPの再取得で経過時間を延命しない。
 
-起動構成の所有権を確認する個別試験では、一つ目のAppHostがロックを保持している間に二つ目を起動すると、資源起動前に失敗することを確認する。また、最初のAppHostの終了後は同じロックファイルが残っていても次の起動が成功することを確認する。`10020` / `11010`の待受可否はこの判定に使わない。占有型制御ポートの外部競合は別試験で事前検出する。
+APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。APIにUDPの `command_counter` があるとは仮定しない。同じプロセス内の観測期間の有限な新しさを照合するもので、異なる通信規約の原子的な同期や実流量での可用性を保証しない。資源の起動世代、受信世代、接続先の設定世代を区別する。
 
-`RuntimeVisionReceiverService`の個別試験では、有効なSSL-Visionパケットを復号してバッファへ渡すたびに`VisionPacketsReceivedTotal`が増加し、診断ログから接続先、インターフェース、累積値を取得できることを確認する。復号に失敗したUDPパケットは正常受信数に加算しない。
+観測処理は0.1秒間隔で順次照合し、UDPを別に受信しない。観測専用時は制御への書込みを行わない。明示した自動制御では、同じ受信処理を使う既存の制御処理が `HALT` から `NEXT_COMMAND`、必要に応じて `FORCE_START` または `NORMAL_START` へ進める。この選択と診断の200判定は独立した契約である。既存のJSON形式と明示的なチーム名設定を保持し、自動改名用の設定は追加しない。
 
-## 対応 OS の動作確認仕様
+制御の送信は初期出力全体の受信後に行い、正常・失敗・取消のいずれでも接続を破棄する。自動制御の正常完了後も観測を継続し、停止時は受信、API取得、保留制御と明示所有資源を回収する。制御の待機は既存の呼出取消に従い、新しい自前期限を追加しない。
 
-複数OSへの対応は、.NETのビルド成功だけでは完了としない。DockerのホストネットワークとUDPマルチキャストが実際の開発ホストで成立することを確認してから、そのOSを対応済みとして扱う。
+### 実装と受入の証拠範囲
 
-確認対象は次の三環境とする。
+標準登録は既存のUDP生成処理へ渡し、API接続は要求ごとに新しい `ClientWebSocket` へ接続先の絶対アドレスを渡す。固定した数値IPを別に保持しない。CIの隔離した組成試験では通信口と時計を置換し、実際の復号、標準の依存登録、常駐処理、127.0.0.1の動的ポートのHTTP、停止、明示制御を確認する。既存のUDP生成処理は別の動的ポート試験で実ソケットへの設定を確認する。
 
-- LinuxとDocker Engine。
-- Windows 上の Docker Desktop で Linux コンテナを実行し、ホストネットワークを有効にする。
-- macOS 上の Docker Desktop で Linux コンテナを実行し、ホストネットワークを有効にする。
+単体試験と実機受入の証拠は分けて記録する。[Windowsでの受入報告](../../../reports/issue81-shared-trace-and-windows-acceptance-20261026.md)には、審判情報の受信、実Game ControllerのAPI取得、識別情報の受渡し、準備完了の観測を記録した。ただし、準備完了の継続安定性と受入処理全体の成功は確認できていない。実行入口の単独起動、接続先の名前の再解決、Windowsでの全公開経路、試合全体の受入も別の確認対象である。実行プロジェクトの実装を、コンテナ配布やAppHost／DCPへの資源配線の完了に置き換えない。名前空間を共有する候補の採用や適用も、この契約の具体化には含めない。
 
-未実施のOSは「未確認」とし、他OSの成功結果を代用しない。
+### 実機受入の固定条件と終了確認
 
-### 必須確認項目
+実機受入は `scripts/verify_desktop_referee_acceptance.py` を使い、実行前に対象版の識別値、実行識別子、判定条件、Dockerの接続先と実行環境の識別子を証拠へ保存する。起動から45秒以内に最初の有効な一致を得た後、30秒の評価期間を設ける。採取間隔は最大5秒、採取数は10回以上とし、評価期間中の503や通信失敗は許容しない。一度失敗した評価期間を後の成功で開始し直さない。
 
-| ID | 経路 | 合格条件 |
-| --- | --- | --- |
-| `ASPIRE-NET-001` | AppHost起動 | シミュレータ、`game-controller`、Crane、`cm4-sim`、Duckが起動し、要求した比較資源も起動できる。 |
-| `ASPIRE-NET-002` | コンテナからホストへのSSL-Visionマルチキャスト | シミュレータが`224.5.23.2:10020`へ送信し、ホスト上の`Tracker.RuntimeHost`が継続して受信する。安定起動後5秒以内にRuntimeHost自身の`VisionPacketsReceivedTotal`が10件以上増加する。 |
-| `ASPIRE-NET-003` | 同じマルチキャストの複数受信 | 比較方式では`Tracker.RuntimeHost`と`Tracker.DebugHost`が同時に`224.5.23.2:10020`を受信し、RuntimeHostの`VisionPacketsReceivedTotal`とDebugHostの未加工入力パケット数が同じ確認時間内にともに増加する。 |
-| `ASPIRE-NET-004` | コンテナ間のSSL-Visionマルチキャスト | TIGERsとER-Forceが同じ`224.5.23.2:10020`を受信し、それぞれ追跡データを生成する。 |
-| `ASPIRE-NET-005` | コンテナからホストへの追跡データのマルチキャスト | TIGERs / ER-Forceが`224.5.23.2:11010`へ送信し、`Tracker.DebugHost`がそれぞれ別の送信元として受信する。 |
-| `ASPIRE-NET-006` | ホスト間の追跡データのマルチキャスト | Duckが`224.5.23.2:11010`へ送信し、`Tracker.DebugHost`がDuckからのデータとして受信する。 |
-| `ASPIRE-NET-007` | ホストネットワーク上の制御UDP | `referee-driver`が11003の指令を`HALT`から試合進行中の状態へ遷移させたことを確認する。その後、Craneから`cm4-sim`へのUDP 12345と、`cm4-sim`からシミュレータへのUDP 12346が通ることを確認する。別途、受入試験がSSL-Vision検出データから黄チームのCraneロボットの位置変化を確かめ、Duckの出力したトラッカーパケットを受信する。審判指令の遷移が成立しなければ、UDP経路の成功証跡とはしない。
-| `ASPIRE-NET-008` | マルチキャスト用インターフェースの選択 | `InterfaceAddress`を指定しない通常経路を確認する。複数の通信経路や仮想専用網などで自動選択できない場合は、IPv4アドレスを明示して受信できることを確認する。 |
-| `ASPIRE-NET-009` | 起動構成の所有権と固定ポートの競合 | 同じホストで二つ目の起動構成を始める場合、資源起動前にAppHostの排他ロックを取得できず、明示的に失敗する。外部プロセスとのポート競合は占有型制御ポートだけを事前確認し、共有マルチキャストポート`10020` / `11010`が使用中であることを失敗条件にしない。 |
+各応答では `Matched`、入力の準備完了、実行とコンテナの一致、復号失敗0件を確認する。評価期間を通じて受信世代、送信元、資源と世代、APIの接続先と世代が変わらないことも確認する。復号件数、APIの要求番号と単調時計による取得開始時刻は前回より進んでいなければならない。受信日時は形式確認と記録に使い、日時の補正を入力の停滞と判定しない。UDPの鮮度は5秒以内、APIの鮮度は3秒以内とし、応答の取得時間も加えて判定する。1回だけの準備完了は受入成功にしない。
 
-資源登録前の制御ポート確認は、Game ControllerのTCP `:8082`をIPv6 dual-stack wildcard bindで調べる（IPv6非対応時はIPv4へフォールバック）。`cm4-sim`のUDP `:12345`は`reference/specs/pc/simulation.md`の契約に従いIPv4 wildcard bindで調べ、Simulator Ibis入力UDPポートはシミュレータが`127.0.0.1`を送信先に使うためIPv4 wildcard bindで調べる。同一プロトコル・ポートを複数サービスが要求する構成は、ソケット検査前に両サービス名とポートを示して失敗する。この確認は一時的なbind probeであり、ソケット解放後に発生する競合を防止する予約ではない。
+明示的にブリッジを有効にした四資源構成では、標準の `simulator` と `game-controller`にも同じ実行識別子と各役割のラベルを付ける。このラベルは終了確認用であり、二つの標準資源へ識別情報の受渡し処理を追加しない。実行中にラベルを照合した四資源の完全なコンテナIDを保存し、通常停止の要求から15秒以内にAppHostの正常終了と記録した全IDの消失を確認する。終了値と削除待機の結果は別に記録する。
 
-`Tracker.RuntimeHost`にはOS受入用の運用診断値として、正常に復号して`RuntimeVisionPacketBuffer`へ渡したSSL-Visionパケットの累積値`VisionPacketsReceivedTotal`を追加する。受信サービスはこの値を単調増加させ、起動時と一定間隔の診断ログに接続先、選択したインターフェース、累積値を出力する。`ASPIRE-NET-002/003`ではログ確認前後の差をRuntimeHostの受信数として使う。独立したパケット観測器の数はネットワークの補助証跡には使えるが、RuntimeHost自身の受信数の代わりにはしない。DebugHost側では既存の未加工入力記録が持つパケット数を使う。
+終了後の一覧は期限内で繰り返し取得し、削除直後、遅延後の消失、期限時の残存、一覧取得失敗を区別する。一覧の取得に失敗した場合は再試行せず、消失は未確認とする。他の実行の資源は別に記録し、削除対象に含めない。実行全体は120秒以内とし、この受入処理から強制終了やコンテナ削除を実行しない。期限超過時は残った処理とIDを報告し、追加操作の承認を確認する。
 
-パケット数の条件は、ソケットを作成できただけでなく、実際のパケットが継続して届くことを確認するための最低条件とする。
+## AppHost から RuntimeHost への診断識別子受渡し（06A1）
 
-### OS ごとの証跡
+AppHost は `ResourceNotificationService.WatchAsync` で資源通知を受け、登録した `IResource` の参照、イベントの不透明な `ResourceId`、役割を表す `Resource.Name`、完全な `container.id` を照合する。`TryGetCurrentState(ResourceId, out ...)` で取得した現在状態にも同じ資源キーと完全IDがあることを確認し、既知の古い通知から実行先を選ばない。この照合は公開された現在状態との一致を確認するもので、通知の全順序やDCPのDocker接続先との同一性を証明するものではない。
 
-各 OS の確認では、少なくとも次を記録する。
+診断ブリッジは `Testing:IdentityControl:DesktopBridgeEnabled=true` の明示選択時だけ有効にする。その場合は `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId` を明示し、同じDocker接続先で `docker --context <context> info --format {{.ID}}` が期待IDと一致することを確認する。さらに `docker --context <context> inspect --format {{json .}} <完全ID>` で完全ID、実行中状態、当該AppHostの起動を示す `run-id` ラベルと役割ラベルを照合し、すべて一致した完全IDだけに `docker --context <context> exec -i <完全ID> dotnet Tracker.RuntimeHost.dll --identity-control` を行う。確認に失敗した場合は `exec` しない。これは明示したDocker Desktopの接続先内で通知対象と当該実行の所有コンテナを照合する境界であり、DCPが選択したDocker Engineの接続先との直接比較を行ったという主張ではない。HTTPの宛先、名前解決、ポート番号は対象選択に使わず、AppHostは利用者のDocker設定や接続設定を変更しない。既定構成はブリッジを有効化せず、`RuntimeHostOnly` 選択もブリッジの有効化とは別である。
 
-- OS名と版。
-- Docker Engine / Docker Desktopの版。
-- Docker Desktopを使う場合は、ホストネットワークが有効かどうか。
-- 使用したIPv4インターフェースの一覧と、明示した`InterfaceAddress`。
-- Aspireの起動管理資源の状態（`live` / `ready` / `failed`）とDuckのプロジェクト状態。
-- 各コンテナの確定したイメージ参照、ID、`NetworkMode=host`、所有者ラベル、終了値、診断結果、最終ログ。
-- AppHostの正常停止を始めた時刻、各起動対象の後始末にかかった時間、DCPの15秒上限内に終わったかどうか。
-- シミュレータ、`game-controller`、Crane、`cm4-sim`、TIGERs、ER-Forceの標準出力・標準エラー。
-- `referee-driver`が観測した11003の指令遷移と、試合管理APIへ送った続行指令。
-- `Tracker.RuntimeHost` / `Tracker.DebugHost` の標準出力・標準エラー。
-- RuntimeHostの`VisionPacketsReceivedTotal`とDebugHostの未加工入力パケット数の確認前後の値。トラッカーパケットは送信元ごとの受信数も併記する。
-- DebugHostが認識したトラッカーの送信元識別子。
-- 起動構成の排他ロックの取得結果と、占有制御ポートの競合検出結果。共有マルチキャストポート`10020` / `11010`は使用中かどうかの判定対象外であることも記録する。
+DCP/AppHostは資源の作成・起動・停止・削除を引き続き単独で管理する。`exec` は既に起動した対象コンテナ内でRuntimeHostの同梱アセンブリを起動し、診断識別子だけを渡す。別の起動管理者は作らず、Dockerイメージや外部資源、コンテナの起動・停止・削除は操作しない。
 
-Linuxでは自動統合試験を基本とする。Windows / macOSではDocker Desktopが必要なため、専用の実行環境または手動の受入試験を使ってもよい。ただし、実機での成功記録を残すまで対応済みとは扱わない。
+常駐RuntimeHostはコンテナ内の固定位置 `/tmp/duck-runtime-identity.sock` で待ち受ける `Unix` ソケットを使い、診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。`prepare` と `commit` には `RunId`、`ResourceId`、役割名、完全な `ContainerId`、`Generation` を含め、両者の識別情報を一致させる。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理した `BootId` と比較し、同じ `ContainerId` でもRuntimeHostプロセスが再起動していれば `Generation` を増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側は `BootId` と識別情報一式の一致を再確認してから受理する。起動時に `ResourceId` が未確定の経路では `ExpectedRole` だけを事前固定し、`ResourceId` 未設定の間は診断を未帰属として503にする。役割名が一致する `prepare` は候補確認に限り、`ResourceId` を関連付けない。同じ接続の `commit` が成功した時だけ `ResourceId` を確定する。`ResourceId` を起動時に明示する既存経路は従来どおり厳格一致させる。
 
-Windows / macOSでコンテナとホスト間のマルチキャストが成立しない場合は、別OSでの成功を代用せず失敗として記録する。UDP中継やユニキャストへの変更は後続の設計で検討し、試験中に断りなく通信経路を切り替えない。
+AppHostが新たに起動した場合は新しい `RunId` で世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDと資源キーがまだ確定していない場合があるため、その経路では役割名だけを期待値として保持し、受渡し完了まで診断識別情報を未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、`challenge` 後の `BootId` 変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
 
+このソケットはコンテナ内の制御面であり、ホストへ公開しない。認証情報や識別子をURL、Dashboard、通常ログへ出さない。単体試験ではDocker `exec`、DCPの実行環境、イメージ取得・起動を使わず、制御プロセスと同じコンテナソケットの契約まで確認する。実Docker Desktopでの `exec`、資源通知、コンテナ起動、UDP通信、ホストポート公開の確認結果は実機の報告に分けて記録する。単体試験の成功をこれらの実証へ置き換えない。RuntimeHostへの識別情報受渡しはUDPパケットの送信元コンテナを暗号学的に証明するものではない。
 
-### 自動統合試験による一括起動の受入
+## DebugHost のデバッグと記録
 
-`ASPIRE-NET-002`の手動試験では、模擬装置からDuckの実行プログラムまでの通信経路だけを検査する。`ASPIRE-NET-001`と`ASPIRE-NET-007`を確認する一括起動試験は、既存の`.github/workflows/dotnet-test.yml`に追加する。手動実行に加え、作業用ブランチ`task/pr28-aspire-005`へ更新を送った場合も、通常のテスト成功後に起動する。これにより作業中の実装を実測でき、新しい実行定義を標準の変更履歴に取り込む前から手動で試験できる。実行定義ファイルは新設しない。
+Windows の開発環境から、DCP が起動した `debug-host` に接続する。デバッグ用イメージには同じ版のソースコードから作成した実行ファイル、対応する移植可能なデバッグ情報ファイル、`/vsdbg/vsdbg` を事前に含める。実行中のコンテナへの依存追加やデバッグ用 TCP ポート公開を前提にしない。
 
-この試験では、標準の仮想計算機でDockerと同じネットワークを共有する設定を使う。標準実行環境の中央処理装置数、メモリ量、保存容量は公式資料に記載されている。Dockerを使えない軽量実行環境は対象外とする。既存の通信試験が成功しても、全起動対象の起動に十分な保存容量がある証拠にはならない。最初の一括起動試験では、Dockerイメージ取得の前後と試験終了時の空き容量を記録し、実際に起動した資源の容量も調べる。
+1. Dashboard／DCP の資源情報から、当該実行の `debug-host` の完全なコンテナ ID と イメージのハッシュ値 を取得する。期待する実行 ID・資源 ID・イメージと照合し、名前だけで対象を選ばない。
+2. Windows の .NET デバッグ環境で、Docker Desktop の明示的な `desktop-linux` 接続先を指定した `docker.exe --context desktop-linux exec -i <完全ID> /vsdbg/vsdbg --interpreter=vscode` を接続用の標準入出力として使う。コンテナ内の `dotnet Tracker.DebugHost.dll` のプロセスIDを選ぶ。デバッグ環境の `pipeTransport`、`processId`、`sourceFileMap` に、この接続と `/src` → Windows の同じ版のソースコードの絶対パスを設定する。
+3. 停止位置とソースコード／デバッグ情報ファイルの一致を確認する。停止中は受信の新しさが失われ得るため、通信受入の計測時間から除き、再開後に準備確認をやり直す。切断はデバッグ接続だけを終え、コンテナの作成・停止・削除は DCP に任せる。
+4. 再作成後は新しい完全 ID とプロセスIDを取得し直す。旧 ID へ再接続しない。Windows の開発環境、事前配布したデバッガー、同じ版のソースコード対応の成立は後続の確認対象である。
 
-CIでは検証対象の起動管理プログラムを実行する。`Testing:StackOwnership:LockPath`は`$RUNNER_TEMP`の下に置き、実行識別番号と再試行回数を含める。この試験が起動した起動対象だけを停止・削除し、Docker全体を対象とする一括削除は行わない。後始末と診断情報の収集は成功時・失敗時のどちらも実施する。
+記録は `%LOCALAPPDATA%\Duck\Aspire\<run-id>\captures` を実行ごとの Windows 保存先とし、DCP が `debug-host` の `/data/captures` へ読み書き可能で割り当てる。AppHost は所有する実行の保存先だけを作成し、記録先を Dashboard の資源説明とログへ示す。`VisionReceiver__PacketCapture__DirectoryPath=/data/captures` を渡す。現在の設定キーは存在するが、この割当てと読み書きの権限は未実装・未検証である。
 
-起動管理プログラムの出力、Dockerの情報、各起動対象の設定とログ、受入試験で観測した審判状態・操作、SSL-Vision検出データと追跡データの受信数、試験結果を成果物として保存する。各待機には有限の時間制限を設ける。空き容量が不足しても、広範囲な削除によって.NET SDKなどの開発ツールを壊さない。
+利用者はブラウザーで CaptureOn を開始し、終了時に CaptureOff とファイルの書き出し完了を確認する。raw vision、診断、三つの追跡情報、送信元情報、時刻対応、記録の一覧を同じ記録保存先に残す。Windows の保存先から保存先全体を複製して取り出し、関連ファイルを分離しない。DCP の通常停止・後始末は Windows の記録を削除しない。記録の削除は利用者の別操作とする。
 
-審判管理プログラム3.20.3のGit固定版`8050f232c3130323bbd91d1d3d56e9553506c8e4`では、新しい試合状態と指令は`HALT`で初期化される。起動時に`config/state-store.json.stream`があれば、その保存状態が復元される。このため試験では起動対象の世代ごとに新しい実行単位を作り、設定や状態を外部保存領域に永続化しない。基本方式と比較方式では空の保存先からの`HALT`、対戦方式では版管理した対戦設定の`STOP`を期待初期状態とし、いずれもUDP 11003で実測する。起動時の準備確認では方式固有の期待指令を世代ごとに一度確認する。初期化後の継続的な正常性確認では、その指令との一致を求めず、既知の審判指令を期限内に受信できること、APIが応答すること、プロセスと所有コンテナが稼働していることを確かめる。進行指令へ遷移した後、初期指令と一致しないことだけで未準備にしない。通信断、API不通、未知の指令、プロセスまたはコンテナの終了は未準備とする。起動対象の再起動では前世代の初期確認を破棄し、次世代の期待初期指令を再検証する。受入試験で期待と異なる初期指令を観測した場合は、UDP 12345 / 12346の確認へ進まず、審判状態の準備失敗として報告する。
+同じ起動中は `/diagnostics` で再生する。後日の再生専用起動では、保存した保存先を `/data/replay` へ読み取り専用で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/replay`、記録無効の設定で開く。記録と再生が相互に書き換えないこと、終了後の再読と 送信元識別子 の保持を後続実装・受入で確認する。
 
-実行環境の容量は固定されているため、利用可否や費用を確認せずに大容量環境を前提としない。Dockerイメージを展開した後に必要な容量は、圧縮時の合計からは分からない。初回の実測値、最小空き容量、実行時間を成果物に記録し、複数回測定してから実行環境を決める。Docker常駐処理の設定変更はこの試験に含めない。
+AppHost は通常の比較起動で生成した実行IDが安全な単一値であることを検証し、指定した基準から保存先までの既存要素に `FileAttributes.ReparsePoint` 属性がないことを確認する。`%LOCALAPPDATA%\Duck\Aspire\<run-id>\captures` がまだ存在しないことを確かめてから、その実行だけの保存先として作成する。既に存在する保存先は他の所有者の可能性があるため変更せず、起動前に失敗させる。起動中のDCPによるコンテナ再作成では同じAppHostが保持する割当てを再利用する。`DebugHost` の `/data/captures` へ読み書き可能で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/captures` を渡す。通常停止、再作成、`CaptureOff` はホスト保存先を削除しない。
 
-根拠: [標準実行環境の仕様](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)、[大容量実行環境の概要](https://docs.github.com/en/actions/concepts/runners/github-hosted-runners)、[審判管理プログラムの起動処理](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/cmd/ssl-game-controller/main.go)、[初期状態の定義](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/state/state.go)、[状態保存からの復元処理](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/engine/engine.go)。
+`VisionReceiver__PacketCapture__DirectoryPath=/data/replay` と記録無効を設定し、視覚入力のUDP受信、追跡データのUDP受信・送信、自動記録を開始しない。`CaptureOn` のUI操作と実行制御による有効化要求は明示的な不可結果を返し、状態を変更しない。再生元は作成・書込み・削除せず、読み取りAPIは既存契約を使う。相対パス、存在しない保存先、実行IDとして安全でない値は割当て前に拒否する。`ReplayOnly` と他のAppHost選択モードを同時に指定した場合は、別構成へ切り替えず起動前に拒否する。
 
-## トラッカー比較デバッグ
+`Testing:DebugHost:CaptureRootPath` は AppHost 構成試験で一時領域を基準にする任意設定である。指定値を基準の場所として扱い、その配下に `Duck/Aspire/<run-id>/captures` を作成する。通常起動では `%LOCALAPPDATA%` を基準にする。
 
-通常のDuckとCraneによる基本方式とは別に、比較方式を用意する。比較用トラッカーは後続の`ASPIRE-006A`で個別の起動管理資源として追加し、`Tracker.DebugHost`は.NETプロジェクト資源とする。
+## 準備完了、依存、停止
 
-比較方式では同じSSL-Vision検出データをDuck、TIGERs、ER-Forceへ与え、`Tracker.DebugHost`で三者の正式なトラッカーパケットを比較する。外部トラッカーそれぞれの所有者情報と固有の準備条件を確認し、DebugHostはDuckの起動と両トラッカーの準備完了を待つ。また、三つの送信元を区別する比較用正常性確認を行う。外部トラッカーを利用できない場合でも、通常方式のシミュレーション受入を停止させない。
+コンテナの開始は通信準備完了ではない。simulatorを先に起動可能にし、その受信者を同時に動かす。Duck／DebugHostの受信を simulator の起動条件にしない。比較追跡器は simulator と Game Controller の準備を待つ。DebugHost の起動を三つの追跡結果受信の後にせず、起動後の比較準備確認で三者の別 識別子 と同じ有限窓内の新しい パケット を要求する。
 
-比較の詳細、送信元の識別、時刻の対応付け、ボールとロボットの対応付け、数値差、CaptureOnと再生の契約は`Tracker/Design/Testing/tracker-comparison-debug-design.md`に定義する。
+RefereeDriver は内部 API に接続し、API の状態と11003の審判情報を照合する。
 
-## TIGERs対Craneの対戦方式
+`GameControllerVisionOnly` 構成で `Testing:IdentityControl:DesktopBridgeEnabled=true` を選択した場合、Game Controller は Duck の実行開始だけを待ち（`WaitForStart`）、健康状態の成立までは待たない。Duck の診断識別子が未確定な間は `/health/vision` が準備未完了となり、健康状態待ちにすると Game Controller と RefereeDriver の起動前に依存が止まるためである。RefereeDriver は Game Controller の実行開始を待って起動し、その後の Game Controller API状態と審判情報の照合によって準備判定を行う。ブリッジを有効にしない従来経路では、Game Controller の Duck 健康状態待ちは変更しない。Docker Desktop での実機受入が未成立の間、起動依存の修正を通信や準備完了の実証として扱わない。
 
-TIGERsの制御用人工知能とCraneを実際に対戦させる方式を、トラッカー比較とは独立したAppHost構成として用意する。設計の基準は、2026-09-29時点の`ibis-ssl/crane`の`develop`ブランチにあるコミット`af6e0d3dec745415ce060ff5de2042afd3ec5145`の`docker/match-vs-tigers/docker-compose.yaml`、`simulation_protocol_fixed.xml`、`match_controller_pb.py`とする。
+各資源の準備確認はブリッジ内で採取した診断を HTTP で DCP／AppHostへ伝える。ホストの旧起動管理で動く `VisionServiceReadiness`、`TrackerPacketReadinessMonitor`、`GameControllerReadinessMonitor` の マルチキャスト受信を残さない。診断の期限切れ、復号失敗、対象IDの変更では準備未完了へ戻す。`WaitFor` は開始順を定め、障害後の自動再起動を保証しない。
 
-トラッカー比較用の`tracker-tigers`は制御用人工知能を起動しないため、対戦方式には流用しない。対戦用Sumatraは別の起動対象`tigers-blue`とし、Craneの現行構成と同じく青チーム側の制御用人工知能として起動する。
+```mermaid
+sequenceDiagram
+ participant User as 利用者 / Windows ブラウザー
+ participant App as Windows AppHost
+ participant DCP as Windows DCP
+ participant Engine as Docker Desktop Engine
+ participant Sim as simulator / ブリッジ
+ participant Receivers as Duck・比較追跡器・DebugHost / ブリッジ
+ participant GC as Game Controller / ブリッジ
+ participant Ref as RefereeDriver / ブリッジ
+ Note over User,Ref: 移行後の管理・通信経路。実機未受入。
+ User-->>App: 選択資源を起動
+ App-->>DCP: 全コンテナと接続先のモデル
+ DCP-->>Engine: 同じ実行ネットワークで作成・監視
+ Engine-->>Sim: 起動
+ Engine-->>Receivers: 起動して受信を開始
+ Engine-->>GC: 起動
+ Engine-->>Ref: 起動
+ Note over Sim,Receivers: 開始と通信準備を分け、受信待ちの循環依存を作らない
+ Sim-->>Receivers: 10020 / 同じ視覚検出
+ Receivers-->>GC: 11010 / 追跡情報
+ Receivers-->>App: 各資源自身の限定 HTTP 受信・復号診断
+ Ref-->>App: 自身の GET /health/referee / 内部39110
+ App-->>User: Dashboard に GC と DebugHost の localhost URL
+ User-->>GC: 127.0.0.1 動的 TCP 経由の UI / API 操作
+ Ref-->>GC: 内部 WebSocket /api/control / 観測・明示制御
+ GC-->>Ref: API 状態と内部 11003 審判情報
+ Ref-->>App: 同じ状態遷移を確認した証跡
+ User-->>Receivers: localhost TCP 経由の比較画面・CaptureOn / Off
+ User-->>App: 停止・取消
+ App-->>DCP: 所有資源だけ停止
+ DCP-->>Engine: 所有 ID を照合して停止・削除
+ Note over DCP,Engine: 別所有者と Windows 保存記録は保護する
+ DCP-->>App: 停止結果と証跡
+```
 
-| 起動対象名 | 実行形態 | 対戦方式での責務 |
-| --- | --- | --- |
-| `simulator` | Aspire 外部実行資源＋Docker コンテナ | ER-Force `simulator-cli` をホストネットワークで起動する。対戦用引数はCraneの現行構成を基準にし、`-g 2020 --realism None --ibis-use-referee --ibis-feedback-team-name ibis --ibis-referee-port 11003`を使う。 |
-| `game-controller` | Aspire外部実行資源＋Dockerコンテナ | 11003の唯一の審判情報送信元とする。対戦用の初期状態を読み込む。 |
-| `crane` | Aspire 外部実行資源＋Docker コンテナ | 固定した`ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`を使い、`sim:=true speak:=false team:=ibis`で黄チームを制御する。 |
-| `tigers-blue` | Aspire外部実行資源＋Dockerコンテナ | 固定した版識別子またはダイジェスト値を指定した`tigersmannheim/sumatra`を`--headless --aiBlue --visionAddress 224.5.23.2:10020 --refereeAddress 224.5.23.1:11003 --matchStats --moduli simulation_protocol`で起動する。 |
-| `autoref-tigers` | Aspire外部実行資源＋Dockerコンテナ | `tigersmannheim/auto-referee:1.2.0`を起動し、SSL-Vision検出データ10020、審判情報11003、トラッカー情報11010を使って試合判定を試合管理機能へ返す。 |
-| `ssl-log-recorder` | Aspire外部実行資源＋Dockerコンテナ | 審判情報11003、ビジョン情報10020、トラッカー情報11010を対戦記録として保存する。 |
-| `match-controller` | Aspire外部実行資源＋.NET 10コンテナ | 既存の`Testing/Duck.Testing.RefereeDriver`にある審判情報の受信と制御API接続の部品、および`SslProto`を再利用する.NET 10の試験用プログラム。初期`STOP`を確かめてから試合を進行し、`POST_GAME`または最大時間で終了して結果と診断記録を保存する。実通信の受入確認には`Tracker.Tests`を使い、試合制御プログラムには含めない。実行環境イメージの基盤と固定ダイジェストは未確定であり、実装前に確定する。新しいNuGet依存は加えない。 |
-| `duck` | .NETプロセス | SSL-Visionの観測とDuck側のデバッグを続ける。ただし対戦判定に影響しないよう、対戦方式では正式なトラッカーマルチキャスト11010への送信を無効にする。 |
+図の利用者からコンテナへの TCP 線は、前述の Windows 127.0.0.1 動的接続先を経由する。製品の UDP が Windows へ出る経路を表さない。正常停止は15秒以内とし、取消、部分失敗、個別再作成、一括停止で当該実行の資源だけを後始末する。固定する SDK は13.5.4であり、過去に観測した DCP 0.25.13を現在の Windows 実行版とみなさない。
 
-対戦方式では、基本構成の`visibility_graph`用`cm4-sim`を起動しない。Craneの現行`match-vs-tigers`構成は`cm4-sim`を含まず、対戦用シミュレータとSumatraの設定を一体で使うため、基本方式の`--ibis-port 12346`およびUDP 12345 / 12346の経路を混在させない。
+## 優先受入条件
 
-Sumatraへ渡す`simulation_protocol_fixed.xml`相当の設定ファイルはDuck側で版管理し、少なくともSSL-Vision検出データ`224.5.23.2:10020`、審判情報の`source=NETWORK` / ポート`11003` / `gameController=false`、`SumatraSimBotManager`、トラッカーの送信先`224.5.23.2:11010`を指定する。AppHost起動時にCraneリポジトリを複製して設定ファイルを取得する方式にはしない。
+すべて将来の受入目標であり、実施済みの結果ではない。項目ごとに合格、失敗、未実施、阻害、未検証を記録する。Windows 上の AppHost と利用者の Docker Desktop で、対象の版と全選択資源を記録して実施する。
 
-試合管理機能の初期状態もDuck側の対戦用設定として版管理する。初期対戦はCraneの現行構成に合わせ、青チーム名を`TIGERs Mannheim`、黄チーム名を`ibis`、試合種別を`FRIENDLY`とする。Craneの`team:=ibis`とSumatraの`--aiBlue`でチーム対応を定め、片方だけの設定を変更しない。
+| ID | 必須条件 |
+| --- | --- |
+| `ASPIRE-NET-001` | 全選択資源、Duck、DebugHost、RefereeDriver、準備確認機能が同じ DCP ブリッジ内で動く。AppHost／DCPだけが所有・管理し、開始、取消、途中失敗、二重起動、個別再起動、一括停止でも別所有者を変えず、正常停止15秒以内を完全IDの前後比較で示す。 |
+| `ASPIRE-NET-002` | 安定起動後5秒以内に Duck 自身の `VisionPacketsReceivedTotal` が新しい検出データ10件以上の復号を示す。Windows上の観測器や仮想環境内の独立観測器だけでは代用しない。 |
+| `ASPIRE-NET-003` | Duck と DebugHost が同じ確認窓で同じ10020入力を受信する。受信件数、入力時刻、検出内容を記録する。 |
+| `ASPIRE-NET-004` | TIGERs と ER-Force が同じ10020と Game Controller の11003を受信し、独立した追跡結果を生成する。Game Controller以外が11003を生成しない。 |
+| `ASPIRE-NET-005` | DebugHost が TIGERs / ER-Force の11010を別 識別子 として受信し、同じ有限窓の新しさを確認する。 |
+| `ASPIRE-NET-006` | Duck の11010も同じ DebugHost が同時受信し、三つの 比較対象の役割 が互いに別の 識別子 へ一意に対応する。Game Controller等の必要受信側にも届く。 |
+| `ASPIRE-NET-007` | 観測専用のRefereeDriverを使い、Windows ブラウザーの Game Controller UI操作で `HALT` から `running` へ遷移し、API応答と内部11003受信で同じ遷移を確認する。Crane／cm4-sim／simulatorの必要UDP往復と、視覚検出データ上の100 mm以上の移動を示す。 |
+| `ASPIRE-NET-008` | コンテナ内 `InterfaceAddress` 未指定と明示IPv4の両方で受信する。一受信者の開始・停止が他の件数を止めない。VPN、Tailscale、複数NIC等のホスト条件とコンテナ内の選択結果を分けて記録する。 |
+| `ASPIRE-NET-009` | 単一AppHostの排他と制御ポート競合を確認する。共有マルチキャスト ポートの使用中判定だけで失敗にしない。個別再作成で新ID・接続先の再解決・応答先更新・マルチキャストの宛先再参加・準備復帰を示す。古いIPを使い続ける場合は失敗とする。 |
+| `ASPIRE-HOST-001` | DashboardのGame Controller／DebugHost URLから画面と双方向接続が成立する。Game Controllerの操作、DebugHostの三者比較、127.0.0.1からの到達、127.0.0.1以外での待受なしを確認する。準備確認口を含む全ホストTCP接続先の待受範囲・割当・再割当てを記録する。 |
+| `ASPIRE-DEBUG-001` | Windowsから当該所有IDのDebugHostへ標準入出力で接続し、同じ版のソースコード・デバッグ情報ファイルで停止／再開する。デバッグTCP公開なし、再作成後の対象更新、切断後のDCP管理を示す。 |
+| `ASPIRE-CAPTURE-001` | CaptureOff後にWindows保存先へ全関連ファイルが残る。停止・再作成後も取り出して再生でき、三者の識別子と時刻対応を保持する。読み取り専用再生が元記録を変えない。 |
 
-固定版Game Controller 3.20.3の`isGoalValid`は、提案に`NumRobotsByTeam`または`MaxBallHeight`が含まれる場合に、それぞれ許容人数の超過とボール高度の0.15 m超過を検査する。また、`LastTouchByTeam`が設定されている場合は、得点チームの直近2秒以内の非停止反則を検査する。選手番号そのものの照合は、この関数では行わない。
+RefereeDriverの確認では、有効・無効、帰属欠落・短いID、古い入力、API不一致、停止、明示した自動制御と既定の観測専用を分ける。`GET /health/referee` の本文と200／503を同じ対象の受信世代・件数・単調経過時間に結び付ける。無効時404、内部39110待受、将来のWindows限定公開を個別に確認し、CIの組成試験をWindows実機受入へ転用しない。
 
-Crane が現在使う構成ファイルでは、Sumatra、試合管理機能、SSLログ記録器のイメージの版識別子が更新される。そのためDuckの再現可能な試験では暗黙の`latest`を使わず、AppHostの設定でイメージの版識別子またはダイジェスト値を明示し、実行証跡に解決済みのイメージ参照を保存する。Craneのイメージは既存の`scenario-<対象コミットのハッシュ値>`を既定とし、Craneの対戦処理が同じCraneイメージに`match-<commit SHA>`という版識別子を付けて利用できる構成と整合させる。
+HTTP `GET` の400応答、ソケットの待受だけ、Linux別Docker Engineでの成功、WSL内での継続検証は Windows Docker Desktop の合格証拠ではない。Linux／macOSの対応も同じ配置契約で個別に確認し、Windowsの成功や未実施を代用しない。選択した版の外部接続契約、127.0.0.1限定待受、必要経路のいずれかが未確定なら受入を保留する。
 
-### 対戦方式の起動順序
+## 安全境界と関連課題
 
-1. `simulator`と`game-controller`を起動する。
-2. `duck`はプロジェクト起動通知を公開する。`tigers-blue`と`ssl-log-recorder`は準備完了した`simulator` / `game-controller`を待つ。
-3. `autoref-tigers` は準備完了した `simulator`、`game-controller`、`tigers-blue` を待つ。
-4. `crane` は準備完了した `simulator` と `game-controller` を待つ。対戦方式では存在しない `cm4-sim` への依存を作らない。
-5. `match-controller` は準備完了した `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder` と Duck のプロジェクト起動後に起動する。
-6. 依存関係を満たした後も`match-controller`は試合管理APIへの接続、11003の審判状態、10020のSSL-Vision、トラッカー情報11010を実測する。`HALT` / `STOP`の初期状態を確認してから試合続行指令を送り、起動対象が起動しただけでは試合を開始しない。
+UDP公開、マルチキャスト中継、ホストネットワーク、固定コンテナIPを前提にしない。TCPの公開は127.0.0.1の画面・制御・用途を確定した準備確認だけとする。利用者管理Ubuntuの別Docker Engine、別所有者のコンテナ、既存の記録を変更しない。Docker Desktop、WSL、Docker接続先、`PATH`、認証、ネットワーク、ホスト設定の恒久変更は本設計の作業に含めない。
 
-`match-controller`はCraneの現行試合制御を基準に、`HALT` / `STOP`から使える続行指令を選ぶ。必要に応じて`NEXT_COMMAND`、`NORMAL_START`、`FORCE_START`を使って試合を進める。終了条件は`POST_GAME`または設定した最大試合時間とする。結果には少なくとも両チームの得点、終了理由、`CRANE WIN` / `TIGERs WIN` / `DRAW`のいずれかを保存する。
+#80はこの配置・外部接続契約・127.0.0.1待受の設計とレビューを扱う。設計受理後の#81で標準コンテナ資源への移行を実装し、#82でWindows実機の受入を行う。この文書変更で#79〜#82を閉じない。旧Docker起動管理のレビュー、過去の環境一覧やパケット観測は当時の証拠に限り、新配置の成立を保証しない。旧履歴は変更せず、本書と比較設計を再レビューする。
 
-勝敗そのものはCIの合否条件にしない。両チームの人工知能が同じ試合に参加し、規定の終了条件まで進行し、結果と診断証跡を生成できることを対戦機能の正常条件とする。
+### I81-07E: 標準`bridge`での所有と再作成の確認
 
-AutoRef 1.2.0の調査基準はコミット`1cb2545b81f3568767139a145e3c1aa062399848`とする。この版で再現可能かつ妥当な得点提案を発生させる試験条件は未確定であり、再現試験も未実施である。実装前に具体的な再現手順を確認する。
+I81-07Dの名前空間共有方式の失敗は保持する。固定SDKが既定ネットワークを生成し、試験が追加の共有指定を渡す構成では、依存側の開始に失敗した。これは有力な静的原因候補であり、実際の作成エラーを取得したとは扱わない。3回目は所有元1世代だけを確認し、終了後の所有資源残存0と元プロセス終了を確定した。
 
-### 対戦方式の受入項目
+I81-07Eは、承認済みの標準`bridge`方式で満たせる所有管理の部分を別試験として確認する。既存の共有方式の試験を削除したり、判定を弱めたりしない。同じ資源生成処理と実行処理に明示的な試験種類を持たせ、標準`bridge`では依存側へ名前空間共有の追加引数を渡さない。製品AppHostの新しい設定項目は追加しない。
 
-| ID | 確認内容 | 合格条件 |
-| --- | --- | --- |
-| `ASPIRE-MATCH-001` | 資源構成 | `simulator`、`game-controller`、`crane`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`が存在し、各Docker資源に起動管理処理と準備完了条件がある。構成試験では準備完了を待つ`WaitFor`の依存関係を固定し、`cm4-sim`、`tracker-tigers`、`tracker-erforce`、`debug-host`を起動対象に含めない。 |
-| `ASPIRE-MATCH-002` | チームと審判情報の契約 | 青チーム=`TIGERs Mannheim`、黄チーム=`ibis`、Crane=`team:=ibis`、Sumatra=`--aiBlue`が一致し、11003の送信元は`game-controller`一つだけである。方式固有の準備確認で`match`の初期`STOP`を確かめる。 |
-| `ASPIRE-MATCH-003` | 両チームの実動作 | 同じ進行中の審判状態の確認時間内に、SSL-Vision上で黄側のCraneロボットと青側のTIGERsロボット双方の位置変化を観測できる。片側だけの移動では合格にしない。 |
-| `ASPIRE-MATCH-004` | AutoRefとトラッカーの経路 | `tigers-blue`が11010へトラッカーパケットを出力し、`autoref-tigers`が10020 / 11003 / 11010を使って動作する。Duckは11010へ送信せず、AutoRefのトラッカー入力に別の送信元を混在させない。通常対戦で得点が発生することは合格条件にしない。 |
-| `ASPIRE-MATCH-005` | 試合終了と証跡 | `POST_GAME`または最大試合時間で終了し、対戦結果、全起動対象の標準出力・標準エラー、SSLログ、Craneの記録データ、試合管理機能 / AutoRef / Sumatraの診断情報を保存できる。通常対戦で得点が発生することは合格条件にしない。 |
-Linuxの自動結合試験では`ASPIRE-MATCH-001`から`005`までを対戦方式の受入条件とする。Windows / macOSでの対応を表明する場合も、各OS上で同じ項目を実際のパケットで確認するまでは対応済みと扱わない。
+対象2資源の完全ID、所有ラベル、固定イメージ、所有元だけの127.0.0.1動的公開、依存側の非公開を照合する。両資源が同じ標準ネットワークで動き、各一回の再作成後に現在の識別情報を取り直すことを確認する。共有方式で確認すべきネットワーク所有元への結合は、標準`bridge`の成功に読み替えない。
 
-## 診断
+各回2資源・最大4世代・60秒、固定キャッシュ・読み取り専用の既存配布物という範囲を保つ。前回の終了と残存を照合し、追加取得・UDP・環境設定変更・他所有者への操作は行わない。既存の有界な収集処理と診断選別を再利用し、試験種類に対応する単一の実測入口を明示する。
 
-最初の確認にはAspire管理画面の起動対象別ログを使う。
+この試験で通常`base`の通信再接続を合格とはしない。既定の`base`にはSimulator・Game Controller・Craneと、既定`planner`でのCM4が含まれ、比較用TIGERs・ER-Forceとは区別する。既存の4資源経路は審判受信に限定した経路であり、通常`base`全体の所有移行の代替ではない。既存設定で再生成できる接続先と、固定127.0.0.1の制約を分け、通常`base`の再設定・再起動・通信と全体独立最終確認を残件として保持する。
 
-自動試験をCIへ追加する場合は、既存の`.NET`試験と同様に、失敗時の標準出力、標準エラー、試験結果、Aspireとコンテナのログを成果物として保存する。
+07Eのネットワーク識別は、単一の接続にある名前と完全IDで照合する。DCPが完全IDを作成指定へ渡し、検査情報の接続キーが名前になる形を受理する。`mode`は`default`・当該の名前・当該の完全IDに限定し、追加接続・異ID・禁止方式・不正なアドレスは拒否する。
 
-シミュレータ、`game-controller`、Crane、`cm4-sim`のコンテナのログは資源名が分かる形で分ける。`ASPIRE-NET-007`では`referee-driver`の操作ログと11003の指令遷移も同じ試験証跡に保存する。
+既存の所有・固定イメージ確認後に取得済みの情報から、対象2資源の`mode`・接続件数・先頭最大2件の名前とIDとIPv4だけを上限付きで記録する。検査情報全体や環境変数・引数・ラベルは保存しない。記録側の不正入力処理が元の検証例外を置き換えない。
 
-対戦方式では、これに加えて`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`の標準出力・標準エラー、対戦結果、SSLログ、Craneの記録データ、解決済みイメージ参照、チーム対応、試合時間設定を保存する。失敗時も途中まで生成された結果と各起動対象のログを破棄しない。
+### I81-07F: CraneのDuck所有による起動時宛先の一時検索先
 
-## 対象外と段階境界
+`Testing:Crane:TargetAddress`が未指定なら、既存のCrane起動コマンド、イメージ、資源選択、`planner`と起動依存を変更しない。明示時だけ、Duck所有の読み取り専用補助プログラムをCraneへ割り当て、固定イメージ内の`crane_bringup`共有ディレクトリから既存`crane.launch.xml`を読み取る。元ファイルの`sim=true`条件に対応する`ibis_target_address`の`let`が期待どおり一つだけあることを確認し、その値だけをコンテナ内のパッケージ検索用一時領域へ反映する。元イメージ、元ファイル、他の起動設定は変更しない。設定や固定ファイルの形が不正・不足・曖昧な場合は、既存起動へ切り替えず既存のROS 2パッケージ指定コマンドを始める前に失敗させる。
 
-初期の`ASPIRE-005`基本方式の実装・受入には、次を含めない。
+明示宛先には、現在の`planner`で選択される既存資源名（CM4が選ばれる場合は`cm4-sim`、そうでない場合は`simulator`）またはホストネットワーク互換の`127.0.0.1`だけを指定できる。任意の数値IPv4、外部ホスト名、IPv6、未指定・放送・マルチキャスト宛先は拒否する。資源名指定はCraneの各起動・再作成時に一意な`127.0.0.0/8`以外のIPv4へ解決し、解決値を永続保存しない。名前の不在、複数IPv4、不正なアドレス、または選択`planner`との不一致は起動前に拒否する。
 
-- Duck 自体の Docker 化。
-- 本番環境の配置方式。
-- Kubernetesへの配置。
-- 課題 #14の比較方式の実装と実パケット受入。構成と準備完了の契約は本設計で定義し、起動管理とDebugHostの実装は`ASPIRE-006A`以降、送信元識別・画面・再生は`ASPIRE-006B`〜`006E`、Linux上の実パケット受入は`ASPIRE-007A`で行う。
-- 自動レフェリーの実装。
-- 人工知能のアルゴリズム変更。
-- 既存の `Tracker.RuntimeHost` の通信形式変更。
-- Dockerブリッジネットワーク越しのSSL-Visionマルチキャスト対応。
+一時検索先はコンテナ内の試験所有一時領域に作り、元パッケージの設定と他の起動ファイル参照は元配置へ結び付ける。子プロセスの`AMENT_PREFIX_PATH`だけで一時検索先を優先し、既存と同じ`ros2`・`crane_bringup`・`crane.launch.xml`を使うパッケージ指定形式で起動する。対象外の設定、環境変数、外部プログラム、固定イメージは変更しない。一時検索先は起動ごとに再生成し、終了時にその一時領域だけを片付ける。
 
-## 後続段階での比較方式
+この単位はCrane送信先の起動時再設定だけを扱う。CM4の`127.0.0.1`固定受信、他方向のUDP送受信、通常`base`全資源の標準DCP所有化、依存資源の停止・再起動・再接続完了は解決済みとしない。構成検査と単体検査では元起動ファイルの保持、厳密な単一値置換、許可宛先、不正時に既存起動へ切り替えないこと、未指定時の既存コマンド不変を確認する。実コンテナ通信の証拠には代用しない。
 
-課題 #14の比較試験では、`tracker-tigers`と`tracker-erforce`をAspireの個別起動管理資源とし、それぞれが固定イメージのホストネットワークコンテナを所有する。DCPの`ContainerResource`には戻さない。各資源の準備条件には、所有者情報の完全な照合、コンテナ内の対象プロセスと起動診断、想定する送信元識別子を持つ新しいパケットの受信を含める。`debug-host`は`Tracker.DebugHost`の.NETプロジェクト資源とし、Duckの起動と両トラッカーの準備完了を待つ。比較用正常性確認も三つの役割の送信元識別とパケット到着を確認するまで未準備とする。
 
-`ASPIRE-006A`では起動対象の構成と正常性確認構成、`006B`では送信元識別と三者の同時受信、`006C`〜`006E`では差分・表示・再生、`ASPIRE-007A`ではLinux上の実パケット受入を扱う。比較用トラッカーを追加しても、基本方式の`duck`、`simulator`、`crane`、`cm4-sim`の契約は変えない。
+### I81-07G: CM4内の相互宛先更新案 `B′`（検討中）
 
-将来ブリッジネットワークへ移行する必要が生じた場合は、ER-ForceのSSL-Visionを任意の宛先へ転送する中継資源を明示的に追加するか、シミュレータに送信先指定機能を追加する。暗黙のマルチキャスト転送には依存しない。
+本節はIP更新の循環を避けるDuck所有の中継処理案を整理するものであり、採用、実装、通信受入を決めたものではない。CM4とSimulatorの固定実装およびイメージは変更しない。
 
-## 完了条件
+候補`B′`ではCM4コンテナ内にDuck所有の中継処理を一つ置き、次の二経路を扱う。
 
-この設計の移行完了条件を次に示す。初期実装の`AddContainer`方式が存在したことや、構成試験で資源が登録されたことだけでは完了としない。
+- 現世代CM4の接続IPでUDP 50100–50110を受信し、各IDのデータを`127.0.0.1`の同じポートへ転送する。
+- CM4の実行体が`127.0.0.1:12346`へ送る制御UDPを受信し、現在のSimulatorのIP:12346へ転送する。
 
-- 一度のAspire AppHost起動でシミュレータ、`game-controller`、Crane、必要な`cm4-sim`、Duckを管理できる。四つのDockerサービスは個別の起動管理資源とし、それぞれがホストネットワークコンテナを所有する。Duckは`AddProject`のままとする。
-- `ASPIRE-005`の完了は`base`方式だけを意味する。`comparison`方式の完了は`ASPIRE-006A`〜`006E`と適用される`ASPIRE-007A`の受入後に別途判定する。
-- `comparison`方式ではTIGERs / ER-Forceを個別の起動管理資源、`Tracker.DebugHost`を.NETプロジェクト資源とする。各トラッカーの所有者確認とサービス準備を行い、DebugHostはDuckの起動通知と両トラッカーの準備完了を待つ。三つの送信元識別と新しいパケットを使う比較用正常性確認を満たす。
-- 対戦方式では`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`を追加し、青チームのTIGERs制御用人工知能と黄チームのCraneを同じ試合管理機能とシミュレータで対戦させられる。
-- 対戦方式では`cm4-sim`を起動せず、Duckから11010への送信を無効にしてAutoRefのトラッカー入力に干渉しない。
-- `ASPIRE-MATCH-001`から`ASPIRE-MATCH-005`により、両チームの実動作、AutoRefとトラッカーの経路、通常対戦の終了と証跡を確認できる。通常対戦で得点が発生することは合格条件にしない。
-- `match-controller`は既存の`Testing/Duck.Testing.RefereeDriver`と`SslProto`を使う.NET 10コンテナとして設計する。新しいNuGet依存を導入しない。実行環境イメージと配布経路は未確定のため、実装前に基盤イメージ、固定ダイジェスト、導入方法を確認する。
-- シミュレータと Crane は Docker コンテナ、Duck はホスト上の .NET プロセスとして起動する。
-- Craneは`ghcr.io/ibis-ssl/crane:scenario-<対象コミットのハッシュ値>`の固定した識別子で起動し、Duck側ではビルドしない。
-- Duck は既存の `sim` 設定と SSL-Vision 契約を維持する。
-- 開発者が各資源の起動コマンドを個別に管理する必要がない。
-- すべての起動管理資源の稼働・準備完了・失敗状態と標準出力・標準エラーをAspire管理画面で確認できる。コンテナの調査結果、ID、最終ログは受入成果物で確認できる。DCPでコンテナ詳細を直接表示できない制約を文書化している。
-- Docker CLIの代替実行ファイルを使う起動管理プログラムの試験では、コンテナの作成と起動、コンテナIDを記録する`--cidfile`の作成遅延、所有者情報の不一致、予期しない終了、起動・準備完了・ログ追跡処理の取消、作成完了の遅延競合、他者所有コンテナに変更がないこと、15秒未満の正常停止と後始末を検証する。
-- 試合管理機能の個別試験では、方式固有の初期`HALT` / `STOP`を起動世代ごとに一度確認する。その後の正常な進行指令への遷移は異常とせず、通信断・API不通・未知の指令・プロセス終了では未準備とする。起動対象の再起動時には初期状態を再確認する。
-- 比較方式の構成試験、起動管理試験、DebugHost試験では、`ASPIRE-006A` / `006B`の資源種別、所有者の証拠、サービス準備、依存関係、三つの送信元識別とパケット正常性を固定する。Linux上の比較パケット受入は`ASPIRE-007A`まで未完了とし、`ASPIRE-005`をもって比較方式が完了したとはしない。
-- Linux上の受入試験で、`cm4-sim`のUDP 12345待受を正確なコンテナ内プロセスに結び付ける準備確認を実証する。実装できない場合は設計上の条件を解除せず、確認を弱めない。
-- `SIGINT` / `SIGTERM`による各停止経路で、起動管理資源がDCPの15秒停止上限内に後始末を完了する。`SIGKILL`、ホスト障害、Dockerデーモン停止は保証対象外として記録する。
-- SSL-Vision 受信と Duck のトラッカーパケット出力を含む正常経路を確認できる。
-- Linux、WindowsのDocker Desktop、macOSのDocker Desktopについて`ASPIRE-NET-001`から`ASPIRE-NET-009`の該当項目を確認し、未確認のOSを対応済みと表現しない。
-- 実装と試験の記録を報告書へ残し、PRの最新コミットと同じコミットハッシュのCI結果だけを最終確認に使う。
-## 参照
+CM4は各世代の起動時に、その世代の`multicast interface`と既存の`127.0.0.1`宛先を使う。Simulatorの接続先IPを確認するまでは中継先を未設定に保ち、確認後に現世代の宛先を設定する。Simulatorだけが再作成された場合はCM4コンテナを維持し、現CM4の接続先IPをデータ送信先に設定してSimulatorを一度起動する。その後、新Simulatorの接続先IPを中継処理へ反映する。CM4が再作成された場合は、新CM4の接続先IPをSimulatorの既存設定`--ibis-feedback-addr`へ設定してからSimulatorを一度再作成する。得られた新Simulatorの接続先IPは中継処理だけへ反映し、CM4は再作成しない。Craneは07Fの一方向の起動時設定で新CM4の接続先IPへ追従する。
 
-- GitHub課題 #18 `Aspire対応`。
-- GitHub課題 #14 `dockerでシミュレーターのケースを追加`。
-- [Game Controller 3.20.3のAutoRef提案受信処理](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/rcon/server_autoref.go)、[提案の処理](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/engine/process_proposals.go)、[試合事象への反映](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/statemachine/change_gameevent.go)、[設定と既定値](https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/config/config.go)。
-- [Craneの対戦用Docker起動設定](https://github.com/ibis-ssl/crane/blob/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/docker-compose.yaml)に記載されたAutoRefイメージと起動引数。AutoRefの調査基準はコミット`1cb2545b81f3568767139a145e3c1aa062399848`であり、その固定版での得点提案の再現試験は未実施である。
-- `Tracker/Design/RuntimeHost/runtime-host-plan.md`。
-- `Tracker/Tracker.RuntimeHost/appsettings.json`。
-- ER-Forceの`simulator-cli`実装とREADME。
-- `ibis-ssl/crane`の`docker/Dockerfile`、`.github/workflows/docker_build.yaml`、`docker/scenario/docker-compose.yaml`、`docker/dev/docker-compose.yaml`、`docker/match-vs-tigers/docker-compose.yaml`、`docker/match-vs-tigers/config/simulation_protocol_fixed.xml`、`docker/match-vs-tigers/config/state-store-initial.json.stream`、`docker/match-vs-tigers/scripts/match_controller_pb.py`、`.github/workflows/match-vs-tigers.yaml`。対戦方式設計の確認時点は`develop`ブランチのコミット`af6e0d3dec745415ce060ff5de2042afd3ec5145`。
-- `Tracker/Design/Testing/tracker-comparison-debug-design.md`。
-- RoboCup SSLのシミュレーション通信規約。
-- Aspire の AppHost、コンテナ、.NET プロジェクト資源、コンテナ実行引数の公式文書。
-- Dockerのホストネットワークドライバーの公式文書。
+この順序でIP変更の循環を避けられる可能性がある。ただし、接続先IPと所有完全識別子の照合、旧世代の準備状態の無効化、宛先更新の直列化と原子的な適用、遅着通知の拒否、失敗や取消時の安全停止と後片付けが必要である。07Bの`ResourceCommandService`例は一方向の資源再作成と依存先起動を扱い、稼働中の中継先更新や相互世代制御は行わない。`.WaitFor(...)`は初回の起動順序だけを表す。制御面は未選定であり、既存の3秒停止上限を延長しない。制御契約では各更新を実行識別子、CM4の完全識別子と世代、補助処理の起動識別子、Simulatorの完全識別子と世代、設定世代に結び付ける。更新時に旧宛先と準備状態を無効化し、相手側の宛先が確定するまで送信しない。設定反映の確認は設定適用だけを示し、実行体の準備完了を示さない。遅着通知、取消し、結果不明時に旧宛先を復元しない。停止処理は全体で一つの期限を共有し、例外時に期限を再開しない。所有子プロセスを回収できない場合は、そのプロセスが使用中の一時領域を削除せず、残存状態を記録する。通信路と通知形式は未選定であり、この論理契約は製品APIの採用を示さない。
+
+固定実装ではロボットID 0–10が対象で、Simulatorは選択した黄色チームの`128-byte`データを125Hzで`50100+ID`へ送る。CM4は`127.0.0.1`で受信・復号した後、ID別の同報先へ中継する。このUDP経路に応答`ACK`はなく、CM4の現受信処理は送信元アドレスを照合しない。中継処理の受信・転送件数はCM4の復号やCraneの受信を証明しない。実受信を直接示す既存診断口の利用可否も未確認である。
+
+検討を続ける場合の最小試験候補は、初回起動、Simulator単独の再作成、CM4再作成後のSimulatorとCraneの再作成順序、古い完全識別子と遅着通知の拒否、失敗・取消時に旧宛先を準備完了としないこと、所有プロセスだけを期限内に停止することの確認である。候補`B′`は名前空間共有を使わず、`--network container:...`も追加しない。07Dの名前空間試験の失敗は保持するが、直接原因は確定していない。標準`bridge`方式でCM4のUDP通信が成立することも未実測である。
+
+現リポジトリにCM4向けLinux補助プログラムの実装や配布物は見つかっていない。通常CIへ加える読取専用の開発工具診断は、実行時点の`C compiler`有無・対象形式・`libc.a`を読み取れるかだけを記録する。新しい実行物の生成、`static link`、`Debian`イメージとの互換性、配布方法は証明しない。診断結果を依存追加や実行許可として扱わない。
+
+### I81-07H: CM4宛先を適用するホスト側処理
+
+この段階では、CM4向け転送先の更新を要求・照合するDuck側処理を実装対象とする。通常構成の切替、CM4内補助プログラムの配置・配布、UDP実測は含めない。固定CM4イメージに補助プログラムが存在するとは仮定しない。
+
+処理は、実行ID、CM4資源名・完全コンテナID・世代、Simulator資源名・完全コンテナID・世代、補助プログラム起動ID、設定世代、および更新先IPv4を含む版番号付きJSON要求を、検証済みCM4完全IDに対するシェルを介さない`docker exec -i`標準入力で送る。呼出し前に固定Docker環境、CM4の現在の完全ID・所有する`run-id`/`role`ラベル・実行状態・ネットワークと、Simulator側の対応する現在情報を照合する。処理中と応答後にも両資源の現在世代を照合し、世代が変わっていれば要求結果を採用しない。
+
+補助プログラムの実行ファイル名は将来の所有資材配置候補`/opt/duck/cm4-transport-control`に固定し、環境変数`PATH`による探索、シェル、任意コマンド入力を使わない。要求と応答は1行JSONとし、版番号・必須項目・完全ID・世代・実行ID・起動ID・設定世代を厳密に照合する。余分な出力、欠落・未知の版、サイズ上限超過、時間制限超過、取消、プロセス終了異常、世代不一致は失敗とする。応答は対象設定の適用確認だけを表し、CM4の復号・準備完了やCraneの受信を証明しない。
+
+更新開始時に旧宛先と既存の適用状態を無効化する。適用中に新しい設定世代が発行された場合、古い要求の遅延応答を拒否し、旧宛先へ戻さない。取消・時間制限超過後は遠隔の補助プログラムが停止したと推測せず、状態を未確認として保持する。停止待ちを再開始せず単一の期限内でホスト側子プロセスを回収する。今回の単体試験は実際の宛先適用処理と標準入出力プロセス境界を通すが、固定イメージ内補助プログラムの配置・実行、UDP転送、CM4側の復号は実証しない。
+
+### I81-07I: 制御CLIと前景転送サーバー
+
+07Hの一回ごとの制御CLIと、UDP転送を担う前景サーバーを、同じ実行形式の別モードとして実装する。制御CLIは既存の `--protocol jsonl-v1` で要求を1行読み、応答を1行返す。前景サーバーは明示起動して所有し、自動で `fork` や `daemon` 化しない。CLIはCM4内の非公開 `Unix domain socket` を通じてサーバーへ接続する。サーバー不在、実行ID・CM4完全ID・CM4世代・補助起動IDの不一致では `applied` を返さない。既存の `docker exec -i` は一回の制御要求だけを実行し、転送サーバーの寿命とは分ける。
+
+設定世代の更新開始時に旧宛先を無効化して新しい世代を予約する。その後、新宛先を公開して応答する前に、受信側の古いUDP受信待ちデータを上限付きで捨てる。共通3秒期限内に空にできない場合は、その世代を無効状態に保ち、応答せず、旧宛先へ戻さない。
+
+前景サーバーの実処理は07Gの二つのデータ経路から同じ更新可能な宛先状態を参照する。`Simulator` からCM4接続先のUDP 50100–50110へ届くデータを同じポートの `127.0.0.1` へ渡し、CM4から `127.0.0.1:12346` へ届く制御データを現在の `Simulator` IPv4の12346へ渡す。対象のロボットIDは0–10である。宛先更新では旧値を先に無効化し、要求の実行ID、双方の完全ID・世代、補助起動ID、設定世代が現在値と一致する場合だけ転送状態へ適用する。古い要求、別所有者、取消、期限超過、応答不明では旧宛先へ戻さず、状態を未確認のまま保つ。
+
+`applied` は前景サーバーが要求された転送先設定を受け付けたことだけを示し、CM4プログラムの受信・復号、Craneの受信、準備完了を示さない。ホストの制御・停止と所有プロセス回収は既存の一つの3秒期限を共有し、失敗時に期限を再開しない。停止や子プロセス回収を確認できない場合は完了扱いにせず、未確認状態と所有対象を記録する。通常構成では、既存の通知と所有確認の経路から現在のCM4に前景サーバープロセスを一つだけ開始する。独立した常駐サービスや自動 `fork` は使わず、DCP停止通知とホスト側Docker CLIの終了を両方確認するまで解放しない。Docker CLIの終了だけでCM4内サーバーの停止を推定せず、未確認のプロセスがある間は重複起動を拒否する。
+
+単体検査は通信路を開かず、実際の要求解析、所有・世代照合、宛先更新とUDPパケットの転送先選択を、送受信境界を置き換えて検証する。固定CM4イメージへの配置、前景サーバーの実起動、UDP実測、CM4内受信・復号、通常 `base` の接続はこの実装単位で証明しない。
+
+同じ実行形式の制御CLIは `--protocol jsonl-v1` だけを受け付け、標準入力の要求を固定通信路 `/tmp/duck-cm4-transport/control.sock` へ渡す。前景サーバーは `--server` とし、実行ID・`Engine ID`・CM4資源ID・完全コンテナID・世代・補助起動ID・CM4側IPv4を明示して起動する。起動引数の不足、重複、未知項目、不正なIPv4は起動前に拒否する。ホストからこの前景サーバーを起動・所有する配線はまだ実装されていない。
+
+通信路用ディレクトリは `/tmp/duck-cm4-transport` に限定する。新規作成時は所有 `UID` だけが利用できる `0700` とし、通信路は `0600` とする。既存のシンボリックリンク、別 `UID` または過剰な権限のディレクトリ、稼働中通信路は拒否し、他資源のファイルを削除しない。サーバー終了時は、自ら `bind` した通信路の `inode` と所有 `UID` が一致する場合だけ削除する。ディレクトリは自分が作成し、空である場合に限って削除する。制御CLIの終了を前景サーバーの停止確認とみなさない。
+
+前景サーバーは受け取った新しい設定世代で先に旧宛先を無効化し、その後の適用確認を同じ共通状態からの応答とUDP転送の両方で使う。`Simulator` からのUDPはCM4側IPv4の50100–50110で受け、対象IDに対応する `127.0.0.1` の同一ポートだけへ渡す。CM4が `127.0.0.1:12346` へ送る制御UDPは、現在適用済みの `Simulator` IPv4:12346だけへ渡す。宛先または世代が未確認ならどちらの転送も行わない。
+
+既存Ubuntuの通常 `test job` では、追加導入なしの `cc` で同じ共通処理とLinux向けCLI・前景サーバーをビルドし、通信路を開かない共通処理の試験を実行する。`readelf` による `ELF` 形式と動的依存の確認も記録する。Windowsの `MSVC` での共通処理試験はLinux向け `adapter` のビルド・`Unix domain socket` 実装・固定CM4 Linuxとの `ABI` 互換を証明しない。CIの `ELF` 検査も固定CM4イメージへの配置や実通信を証明しない。固定イメージへの配布、前景サーバー起動、UDP実測、CM4側受信・復号、通常 `base` への接続は引き続き未実施である。
+
+07IのCM4制御UDPでは、宛先・受信ポートを`12346/UDP`に固定し、送信元ポートは自動割当を許容する。送信元アドレスは既存契約の`127.0.0.1`に限定する。固定CM4では送信ソケットに明示的なポート指定がなく、送信元ポートはOSの自動割当に委ねられる（https://github.com/ibis-ssl/Orion_CM4/blob/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a/cm4/bridge/cm4_sim.cpp#L497-L504）。`12346`は送信元ポート条件ではない。
+
+Linux向け配布候補は、既存の開発資材を使う`-static`による静的リンクを内部実装方式として選ぶ。CIでは実行形式`ELF`の`INTERP`と`DT_NEEDED`がないことを検査する。固定CM4との実行互換性、配置、実通信は別途検証する。
+### I81-07J-B1: 通常構成の共通登録処理
+
+`Program` は通常構成の `simulator`、Game Controller、Crane と、`planner` が選択した場合の `cm4-sim` を共通登録処理へ渡す。この処理は既存の Docker 実行資源の経路を使い、起動引数、読み取り専用 Crane 設定、準備確認、起動依存、所有範囲を保つ。比較構成の追加資源と `planner` による `cm4-sim` の選択は従来どおり維持する。
+
+この段階は登録処理を共有化するもので、標準 `ContainerResource` への移行、同じ DCP による所有、通知からの完全ID取得、DCP の開始・停止命令への接続を完了したものではない。通常構成の4資源は引き続き既存の実行資源とホスト側ネットワークを使う。標準資源への移行と停止前の無効化・再作成・再適用の接続は I81-07J-B の残作業とする。
+
+### I81-07J-B2: 通常構成の標準資源登録と準備確認
+
+`Program.cs` が通常構成で選んだ `simulator`、Game Controller、Crane と、`planner` が選んだ場合の `cm4-sim` を標準 `ContainerResource` として登録し、既存の比較構成は起動管理処理のまま維持する。標準資源には共通の実行IDと資源ごとの役割を付ける。UDPをホストへ公開せず、既存のGame Controller操作用 `TCP` 通信は `127.0.0.1` の動的ポートに限定する。既定の計画手法やCM4選択条件、各プログラムの起動引数は変えない。
+
+`ResourceNotificationService` の実イベントと現在状態を同じ資源・資源キーで照合し、登録済み資源に限って完全なコンテナID候補と世代を記録する。古い資源キーの遅着通知は再採用しない。置換キーを先に観測した場合は、旧キーの終了が確認されるまでIDを曖昧として公開せず、旧キーの終了後に現在状態を再取得する。曖昧な状態では資源キーとコンテナIDを空にし、準備確認を未完了に保つ。
+
+この通知はDCPから得たID候補であり、Docker実行環境、実行ID・役割ラベル、ネットワーク、またはアプリケーションの準備完了を照合した証明ではない。現段階では、これらの独立した所有・サービス確認が不足する場合は拒否し、準備完了を返さない。標準資源への移行と候補通知を、実所有確認や通信成功と読み替えない。
+
+Craneの診断ファイル設定は比較構成の起動管理処理だけに渡す。通常構成で指定されても標準コンテナの引数や環境変数へ漏らさない。通常構成のホスト側診断観測器はまだ接続されていないため、診断機能全体を維持したとはしない。実際の実行環境・所有・サービス準備の検査、通信先の再設定、補助処理の配置、通常構成の再作成順序、CM4受信確認は後続の未完了作業とする。
+
+
+初期起動時に資源名または不透明なキーで届く `Starting` 通知に完全な `container.id` がない場合、その最初のキーだけを未確定 仮登録 として扱う。完全IDを一度も観測していない間に実行時キーへ移ったときは仮登録を退役させ、実行時キーのIDを待つ。状態は元の通知通知内容から保持し、IDがない通知を `Unknown` へ置き換えない。
+
+完全IDを一度でも観測した後の `Unknown` またはID欠落は仮登録への昇格に使わない。非終端の完全ID候補Aと別キー候補Bが同時に観測された場合は、Aの再通知だけで曖昧状態を解除せず、Aの終端通知と一意なBの現在状態を再取得してからBへ移る。退役したAの遅着通知は拒否する。複数の後継候補が残る場合もIDを公開しない。
+
+この処理が記録するのはDCP通知上の候補ID・世代と未準備理由である。Docker Engineの所有関係、実行ID・役割ラベル、個別サービス準備確認はここでは検証せず、`Running`通知だけで準備完了にしない。
+
+### I81-07J-B3-A: 通常構成の所有照合と準備状態の分離
+
+通常構成の4資源では、登録した `ContainerResource` の通知から現在の完全コンテナID候補を得る。既存の `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId` を使い、同じ接続先の `docker info` と、通知に対応する完全IDだけを指定したDockerの読み取り専用検査を行う。実行状態と実行ID・役割・実行の所属を示す識別子・資源名ラベルを照合した後、同じ資源キーの最新通知、完全ID、世代を再確認してから検査結果を記録する。設定不足、曖昧なキー、所有情報の不一致、期限切れ、取消、候補変更では結果を昇格せず、資源準備状態を未完了のままにする。
+
+`HostConfig.NetworkMode` と `NetworkSettings.Networks` から得る値は観測結果として記録できるが、同じネットワーク名や有効なIPv4だけではDCP由来を証明しない。原設計は独立したネットワーク識別ラベルや別IDを要求せず、標準DCP資源が同じ既定ブリッジへ所属することを求める。この小単位は、標準 `AddContainer` 登録にネットワーク上書きがないことを前提に、DCP通知の現在の完全IDを同じDocker接続先で読み取り、各資源の実行状態・所有ラベル・単一の有効IPv4ネットワーク添付と `NetworkMode` の一致、および全登録対象の同じネットワーク所属を照合する。反映前に現在の資源キー・完全ID・世代も再確認し、全条件が一致した場合だけ `NetworkVerified` と `OwnershipVerified` を成立させる。未登録資源、ホスト・コンテナ共有など許可されない形、複数または不一致の添付、設定不足、取消、期限切れ、候補変更では成立させない。これは標準登録と実際の所属確認を合わせた照合であり、別のネットワーク識別ラベルを追加条件にしない。サービス準備状態は所有確認と分け、サービス別確認が完了するまで準備完了にしない。比較構成の既存登録、CM4・Simulator・Craneのサービス確認、補助処理の配置、宛先再設定、停止・再作成の連携はこの段階で完了したものとしない。サービス別の準備確認も所有確認から推定せず、`Running` 通知だけで準備完了にしない。比較構成の既存登録と、CM4・Simulator・Craneのサービス確認、補助処理の配置、宛先再設定、停止・再作成の連携はこの段階で完了したものとしない。
+
+標準DCP資源のネットワーク検査では、単一添付の完全な `NetworkID` があり、`NetworkMode` が `default`、その添付名、または同じ完全IDのいずれかである場合だけ照合する。従来のGame Controller再構成経路では従来どおり `NetworkMode` と唯一の添付名の一致を使い、`NetworkID` がない場合もこの条件で扱う。標準DCP用の追加許容形をこの旧経路へ広げない。
+
+所有証明を再利用するときも、現在の通知が同じ資源キー、完全ID、実行状態、世代を示すことを再確認する。状態が同じ完全IDのまま `Running` から `Starting` に変わった場合も既存証明を失効させる。通知の取込みはDocker検査の完了待ちで止めず、単一の有界検査処理が検査後に最新キーと世代を照合する。停止時はその処理を取り消して完了を待ち、古い通知や検査結果で証明を復活させない。
+
+
+### I81-07J-B3-B: 通常構成の段階起動とSimulator準備確認
+
+通常構成ではDuckにSimulatorの`WaitForStart`を設定し、Simulatorの資源が起動した後にDuckを起動する。Simulatorのサービス準備完了をDuckの起動条件にしない。比較構成の既存依存関係は維持する。これにより両サービスが互いの準備完了を待って起動できなくなる依存循環を避ける。
+
+所有確認は登録済み全資源の起動を待たず、現在実行中で一意な完全IDを持つDCP候補から段階的に行う。未起動または起動中の候補は未準備のままとし、既存の実行環境・所有ラベル・状態・標準ネットワークの照合と現在キー・世代の再確認を省かない。後続資源は起動後に同じ所有確認を受ける。
+
+Simulatorのサービス準備確認には既存Duckの`画像診断用HTTP経路`診断を使う。応答の識別情報はDuck自身の現在の受渡し識別情報と照合し、Simulatorの識別情報へ読み替えない。現在のSimulatorとDuckの所有・世代が一致し、`画像診断`入力の受信`受信側の世代値`・正常な復号数・既存の5秒鮮度条件を満たす診断を読み取った後、Simulator世代と受信識別情報ごとの基準値から復号数の増加を確認して準備完了を記録する。世代、受渡し識別情報、キーまたは完全IDが診断の取得中に変化した場合、古い応答を採用しない。
+
+Duckには既存の画像診断の正常性確認を保ち、重複するDCPの資源別サービス正常性確認を追加しない。診断不足、取得失敗、期限切れ、取消、所有失効はSimulatorの準備を未成立へ戻す。これは固定プログラムの実起動、実通信、他の通常資源のサービス準備、CM4補助処理の配置または再作成・宛先更新が完了したことを示さない。今回の構成試験はこれらの実機確認を含まない。
+
+
+通常構成のDuck登録にも、`duck.aspire.stack`、`duck.aspire.resource`、`duck.aspire.run`の既存所有ラベルを付け、DCP通知から取得した現在の完全IDを使う所有確認へ接続する。所有確認だけではサービス準備完了にしない。
+
+画像診断の鮮度判定では、診断に含まれる復号経過時間へ、HTTP要求開始から応答本文の読取と現在世代の再確認までの単調経過時間を加える。合計が既存の5秒窓を超えた応答は準備完了にしない。これは読取中に期限を超えた診断を拒否する実装契約であり、実配置や実通信の確認を意味しない。
+
+### I81-07J-B3-C: 通常構成Craneの準備確認
+
+通常構成の標準 `ContainerResource` として登録したCraneの準備確認は、既存のROS診断引数生成と結果判定をDCPの正常性確認へ接続する。現在の通知候補が曖昧でなく、`Running`、完全なコンテナID、既存の実行環境・所有ラベル・共通ネットワーク確認を満たす場合だけ、その完全IDを指定して診断する。診断成功後にも資源キー、完全ID、世代、所有確認を再照合してから準備状態を記録する。失敗、期限切れ、取消、未所有、または診断中の世代変更では準備状態を未完了に保ち、未所有資源へ診断コマンドを実行しない。
+
+この範囲はCraneのサービス確認だけを接続する。Game Controllerと選択されたCM4のサービス確認、CM4補助処理の配置、停止前の遠隔宛先無効化から再作成・新世代・再設定までの連携は未完了であり、Craneの準備確認成功から推定しない。既存の起動依存、比較構成、固定プログラムの引数、所有範囲は変更しない。実コンテナの診断、CM4配置、UDP通信は実測していない。
+
+共有するDocker命令は一度に1件だけ実行し、待機時間も元の呼出し期限に含める。期限切れまたは取消し時は子プロセスを起動せず、終了未確認の子が残る間は次の命令を拒否する。Craneの診断応答後と準備完了を反映する直前・直後に、呼出し元の取消しと既存の12秒期限を再確認する。取消し時は準備状態を解除して取消しを伝え、期限切れ時は未準備で返す。
+
+### I81-07J-A: 遠隔転送先の無効化要求
+
+既存の`applyTarget` 13項目JSONL契約は維持する。新しい`invalidateTarget`要求も同じ13項目を使い、より大きい`configEpoch`と無効化を示す`targetAddress`を含める。固定CM4内の前景サーバーは、`runId`、Docker実行環境、CM4とSimulatorの資源ID・完全な実体IDおよび世代、補助プログラム起動IDが現在の所有状態と一致する場合だけ処理する。ホスト側の状態を消すだけでは、遠隔無効化成功とみなさない。
+
+サーバーは要求された世代の転送先を先に無効化してから、旧UDP受信待ち行列を排出する。排出に成功し、要求と現在の所有世代が引き続き一致した場合だけ`invalidated`応答を返す。排出失敗、所有不一致、同じか古い世代、未知の要求では応答を成功扱いにせず、旧転送先へ戻さない。適用・再無効化・停止で以前の排出完了記録を失効させる。ホスト側は、要求に一致する応答と応答後のDocker実行環境・両資源の完全な実体ID・世代の再確認が揃った場合に限り、状態を`Invalidated`として記録する。
+
+送信後の取消し、期限切れ、不正または遅れて届いた応答、最終確認での世代変更は結果を`Unknown`として扱い、旧宛先と適用済み状態を復元しない。`Invalidated`は将来の停止処理が利用するホスト側の確認状態であり、この段階ではSimulatorの停止や通常構成の再作成へ接続しない。既存`applyTarget`の遅い応答も、新しい無効化操作の状態を再公開できない。
+
+この単位は共有通信契約とホスト側の無効化処理を実装・単体検証するものとする。固定CM4上での実行、UDP実測、通常`base`全体への停止・再作成接続、CM4アプリケーションの受信確認は含めない。
+
+### I81-07J-B3-D: 選択CM4の再設定操作
+
+標準構成でCM4を選択したときに限り、Simulatorへ `reconfigure-cm4-transport` 操作を登録する。既存の現在資源・完全コンテナID・世代と所有確認、`OwnedCm4TransportTargetController`、`ResourceCommandService`、`ResourceNotificationService` を使い、遠隔の無効化応答を確認してからSimulatorを再起動する。通知から新しいSimulatorの完全IDと世代を取得し、同じ実行環境で所有とネットワークを再確認してから新しい送信先を適用する。取消し、結果不明、所有情報の変化、無効化未確認では再起動せず、旧送信先を復活させない。
+
+標準構成で選択されたCM4の標準再起動命令は、対象Simulatorの開始前に資源単位の公開イベントで保護処理へ置き換える。全資源の作成完了イベントを待たず、依存資源の準備待ち中も未保護で露出させない。命令の表示・更新状態など公開情報を保ち、捕捉した元処理を既存の命令実行サービスへ再送せず一度だけ呼び出す。既存の再設定処理で作った同じ45秒期限と、呼出時の引数・サービス・記録先を引き継ぎ、遠隔無効化の確認後に再起動し、新しい識別情報と所有を確認してから送信先を再適用する。無効化応答不明、取消し、所有変更、補助処理の未配置では元処理を呼ばず、旧送信先を復元しない。公開APIで保持できない追加引数や進行表示を持つ命令は置換に失敗する。直接停止やほかの再作成命令はこの保護処理の対象外である。標準DCPの実起動、補助処理の配置、実通信とUDP通信は未検証であり、この単体検証は実行時の成立を示さない。
+
+審判管理資源の動的なホスト内HTTP公開はホスト向けであり、既存の審判情報受信プログラムが使う `ws://game-controller:8082/api/control` はコンテナ内名前解決経路として維持する。標準構成の審判管理資源の準備確認は、登録済みの動的なホスト内公開先を解決し、接続前後に現在の所有資源と世代を再確認したうえで、既存の2秒期限内に制御APIへの接続を確認する。命令やデータは送信しない。この確認は制御APIへの接続だけを示し、審判UDPの受信・復号や全体受入を示さない。
+
+標準構成の審判管理資源画面、他資源の準備確認、CM4以外の再作成、直接停止やほかの再作成命令の保護、補助処理の配置・起動と実通信は未完了である。コンテナ内の既存名前解決経路を維持し、ホスト向け動的公開先を他コンテナの宛先として使わない。
+
+### I81-07J-B3-G: CM4前景サーバーの所有と回収
+
+標準CM4資源の既存通知経路で、現在の所有確認済み完全IDと世代に結び付いた前景サーバープロセスを一つだけ開始する。ホスト側Docker CLIの終了は既存の所有確認を再開する通知であり、遠隔サーバー停止の証明ではない。プロセスの解放と次世代の開始には、対象資源の停止通知と所有子プロセスの終了確認の両方を要する。停止通知がなく終了も確認できない場合はプロセスを未確認のまま保持し、別プロセスを重ねて開始しない。
+
+固定CM4イメージへの補助プログラム配置、前景サーバーの実起動、UDP転送、CM4側の受信・復号はこの単位では実施も証明もしない。補助プログラム未配置による開始失敗を準備完了として扱わず、サービス準備完了も前景プロセス開始だけでは成立させない。
+
+前景サーバーの開始後、現在の所有確認済みCM4とSimulatorの組が確認でき、転送先制御器が初期状態の場合に限り、既存の適用要求を一度送る。確認応答は転送先設定の受理を示すだけで、CM4サービスの準備完了やアプリケーションによる受信・復号を証明しない。接続前に同一環境内の制御ソケットがまだ受け付けていない場合の再接続待ちは、既存の3秒期限内で送信前に限って行う。要求送信後は再送せず、結果不明は不明状態のままにする。この送信前待機と偽制御ソケット試験を実装したが、Linux CIでの実行結果は未取得である。固定CM4での実起動や実通信も確認していない。
+
+標準構成ではCraneのCM4依存を開始待ちとし、CM4のサービス準備完了待ちとは分ける。これによりCrane開始直後のUDP受信成功を意味させない。起動直後のパケット欠落や通信安定性は未測定であり、同一ブリッジ内の実通信を含む既存の最終受入は別途必要である。
+
+
+終端通知は、通知が示す完全コンテナ実体IDが所有中の前景処理のIDと一致する場合に限り、その処理の停止確認として扱う。別IDまたはID不明の通知では所有状態を解放せず、後続処理を開始しない。通知と起動処理終了の同時通知は、容量1の再検証通知にまとめ、既に待機済みの通知の重複で監視処理を失敗させない。
+
+### I81-07J-B3-G2: CM4補助実行物の供給と読み取り専用配置
+
+Linux向けの既存静的ビルドで生成した`cm4-transport-control`を、AppHostの通常の実行資材配置先へ同じ内容で供給する。標準資源として登録したCM4に限り、この資材を`/opt/duck/cm4-transport-control`へ読み取り専用で接続し、資材がない場合はCM4の開始前に失敗させる。比較構成や固定イメージの内容は変更しない。
+
+この段階で確認するのは既存ビルド出力への資材伝播、コピー内容の一致、資源登録と配置定義である。AppHostの発行成功、固定CM4上での実行互換性、別の実行環境からの資材参照、実配置および通信は確認していない。
+### I81-07J-B3-G4: CM4再作成後の初期適用
+
+前景サーバーを再作成するとき、既存転送先制御器が前のCM4を`Applied`として保持していても、その記録を新CM4に流用しない。既存通知から前の完全コンテナIDに一致する停止を確認し、前景実行物の終了と破棄が完了した後に限り、現在所有中の新CM4の完全IDとより新しい世代を再確認して制御器を初期状態へ戻す。制御器の世代を更新するため、遅れて戻った旧操作の結果は新状態に反映されない。
+
+新しい前景サーバーの開始後は、既存の適用要求を現在のCM4とSimulatorの所有組に対して一度だけ行う。前景サーバーを開始できなかった場合は適用要求を行わず、失敗した開始候補の記録を維持する。停止通知の完全ID不一致、実行物の終了・破棄未確認、所有候補の曖昧さ、現在世代の不一致では再初期化せず、適用結果を不明のまま保持する。古いSimulator識別情報との一致を追加条件にせず、現在の両資源の所有と世代確認を用いる。この処理は転送先の再適用であり、CM4の準備完了やアプリケーションの受信・復号を証明しない。実機起動、補助実行物の配置、通信は未実施である。
+
+### I81-07J-B3-G5A: 標準CM4のマルチキャスト送信インターフェース
+
+標準構成では固定CM4イメージの既存 `--multicast-if` 引数に `0.0.0.0` を指定する。固定実装はこの値をIPv4の `INADDR_ANY` として `IP_MULTICAST_IF` に渡すため、送信インターフェースの選択をOSに委ねる。引数を空にするとAppHostの資源仕様が拒否するので、引数名と値を保持する。比較構成の `127.0.0.1` は変更しない。
+
+この設定変更は送信インターフェースの選択だけを扱う。同じブリッジ内での実際のマルチキャスト送信、受信、復号は未検証であり、通信の最終受入を別途確認する。
+
+
+### I81-07J-B3-G5B: 標準構成の初期接続先
+
+標準構成では、CM4 の開始を Simulator のサービス準備完了まで待たず、Simulator は既存の開始待ちで CM4 の開始後に起動する。比較構成と既存の他の依存関係は変更しない。これにより、互いのサービス準備完了を待つ起動の循環を避ける。開始順の変更は、CM4 のサービス準備や受信・復号の確認を成立させるものではない。
+
+Simulator の既存引数生成時に、現在の CM4 通知、完全なコンテナ ID、世代、所有確認を照合し、確認した現在の数値 IPv4 アドレスを `--ibis-feedback-addr` に渡す。確認が欠落、取消し、期限切れ、または照合不一致なら引数を生成せず、既定の宛先へ置き換えない。実行時にこの値がプロセスへ渡ることや通信が成立することは、実環境では未確認である。
+
+CM4 の補助処理が先に始まり Simulator の所有確認がまだ得られない間は、既存の初期段階を保ち、未確認の宛先を適用しない。後から Simulator の現在の所有確認が得られた場合に限り、既存の処理で現在の組合せを適用する。同じ組合せへの重複適用を行わず、不明な結果を一般的に初期状態へ戻さない。所有確認だけでサービス準備完了とはしない。
+
+この変更で確認したのは登録、引数生成、所有確認、および通知後の初期適用を使う試験とビルドである。実環境の起動、通信、CM4 の受信・復号、安定性、停止後の受入は確認していない。CM4 再作成後の全体再設定も別の未接続範囲として残る。
+
+### I81-07J-G5C1: 標準 CM4 再起動時の安全な再設定
+
+標準 CM4 資源の開始前に 再起動命令を保護する。実行時は既存の45秒予算を一度だけ使い、旧 補助プログラム の無効化 確認応答 を確認してから、捕捉済みの CM4 再起動命令を一度実行する。旧 CM4 の完全な実体 ID に一致する停止通知と、ホスト側 補助プログラム の終了・回収を確認し、新しい所有確認済み CM4 と 補助プログラム の開始を待ってから、無効化状態を保ったまま捕捉済み Simulator 再起動命令を一度実行する。新しい Simulator の所有確認を終えた後に限り、新しい組合せへの適用 確認応答 を確認する。命令を再送して保護処理へ戻ることはしない。
+
+所有証明の再検証で世代番号が更新されても、実体が同じ Simulator（実行識別子、実行環境識別子、資源名、資源キー、完全なコンテナ ID）なら、古い証明を使わず現在の証明を取り直して続行できる。物理的な Simulator の入替え、所有不明、取消し、期限切れ、旧 CM4 の停止または 補助プログラム 回収を確認できない場合は処理を失敗として扱い、旧宛先を復元しない。
+
+新 補助プログラム の開始失敗は開始成功とみなさない。同じ CM4 実体に対する開始失敗を待機処理へ返し、Simulator 再起動と宛先適用を行わない。固定 補助プログラム の初期宛先が空であることと、旧 補助プログラム から得た無効化 確認応答 は別の事実であり、新 補助プログラム の 確認応答 として扱わない。
+
+所有確認の世代と補助プログラムの起動時に受け取った CM4 世代は別の情報として扱う。制御要求には、現在生存している補助プログラムが起動時に受け取った世代を使う。要求の前後では現在の CM4 と Simulator の所有確認を取り直し、実行識別子、実行環境識別子、資源名、資源キー、完全なコンテナ ID が同じ実体であることを確認する。世代だけが再検証で進んだ場合は新しい所有確認を用いて続行できるが、完全な ID など実体を識別する値が変わった場合は拒否する。補助プログラムの起動 ID と要求の応答は既存の共有要求入力例で照合し、固定実装と通信形式は変更しない。
+
+開始通知を受けた時点で所有確認や補助プログラムの開始がまだ完了していない場合は、既存の開始成功・開始失敗通知と現在状態を同じ45秒予算内で再確認する。通知の取りこぼしで待機を続けたり、開始失敗を成功扱いしたりしない。処理を取消しまたは結果不明とした場合に一般的な初期状態へ戻して再試行せず、旧宛先も復元しない。Crane の再設定（C2）、CM4 サービスの準備完了、アプリケーションによる受信・復号、実通信および実環境での停止受入はこの範囲に含まれない。
+
+この経路が確認するのは標準再起動の保護、資源の所有確認、命令順序と最終適用 確認応答 までである。Crane の再設定、CM4 サービスの準備完了、アプリケーションによる受信・復号、実通信、配置および停止後の実機受入は未確認であり、今回の成功条件に含めない。比較構成と既存の別経路は変更しない。
+
+### I81-07J-G5C1 R2: 待機した CM4 実体の再照合
+
+CM4 交換待機が開始成功を待った候補と、所有確認の再検証後に得た現在の組合せは、CM4 の実体（実行識別子、実行環境識別子、資源名、資源キー、完全なコンテナ ID）で照合する。世代番号だけが再検証で進んだ同じ実体は、新しく得た所有証明を使って続行する。別の CM4 実体が現在の候補になった場合、または待機対象の開始成功を確認できない場合は置換結果を返さず、後続の Simulator 再起動や宛先適用へ進まない。この照合を CM4 交換待機の両入口に適用する。
+
+既存の通常・比較試験とビルドは確認した。待機中の候補 B が別候補 C に替わる試験は、確認箇所に到達する前に制御用試験の期限が切れ、動的再現の成否を確認できなかった。これを動的な失敗または成功の証拠とはしない。実機起動、補助実行物の配置、通信、受信・復号も未確認である。
+### I81-07J-G5C2: Crane のCM4宛先追従
+
+標準構成で利用者設定がない場合に限り、走行計画 `visibility_graph` は既存の読取専用起動設定を使って `cm4-sim` を選ぶ。利用者が宛先を明示した場合はその値を保ち、比較構成と従来構成の選択は変更しない。
+
+標準CM4再起動処理では、CM4とSimulatorの現在の所有確認、および再起動後の新しい宛先への適用確認が成功した後、捕捉済みCrane再起動処理を同じ45秒予算内で一度実行する。いずれかの段階で失敗、取消し、期限超過、所有確認不能となった場合はCraneを再起動しない。
+
+今回確認したのは資源登録、起動引数、読取専用配置、通知後の処理順である。UDP実通信、固定アプリケーションによる受信・復号、実環境での停止後回収は未確認であり、ここでの成功条件に含めない。
+
+### I81-07J-G5C2-NR001: Crane 再起動の現在通知照合
+
+Crane の元の再起動処理を呼び出す直前に、登録済みの所有確認に加えて資源通知サービスの最新状態を照合する。資源名、通知キー、状態、完全なコンテナ ID が登録済みの所有情報と一致する場合だけ再起動を一度呼び出す。停止通知、通知キーまたは ID の不一致、所有情報の確認不能では呼び出さない。
+
+### I81-07J: 起動、初回適用、通常構成の確認結果
+
+既存の DCP 準備確認通知は `IHostedLifecycleService.StartingAsync` で、資源準備を待つサービスより前に開始する。追加の監視サービスは設けない。CM4 と Simulator の現在の所有確認が揃った後に、同じ実行内の初回宛先適用を一度行う。適用の確認応答は設定が受理されたことを示すものであり、CM4 サービスの準備完了や固定アプリケーションの受信・復号を示すものではない。
+
+`docker inspect --format` のテンプレート出力には、Docker CLI が各結果の後に改行を加える。所有情報の読取では、末尾の空行だけを複数除去してから、6項目、完全なコンテナ ID、実行ラベル、役割名、ネットワーク名とアドレスを厳密に検査する。余分な項目や異なる所有情報を許容しない。以前の拒否記録では検査対象の生出力を保存していないため、終端バイト数は未確認である。
+
+初回適用の記録番号は `Cm4InitialTargetApplyDiagnosticCode` の固定値を使う。`Unknown=0`、`Applied=1`、`Rejected=2`、`OutcomeUnknown=3` とし、記録には番号と名前、段階、宛先、実行 ID、CM4 と Simulator の完全な ID と世代、結果、理由、時刻を含める。これらは診断用であり、拒否や結果不明を成功として扱わず、別の自動再適用もしない。
+
+2026-10-31 の通常構成確認では、`simulator`、`duck`、`game-controller`、`cm4-sim`、`crane` の5資源が起動し、初回適用は現在の所有済み CM4 と Simulator に対して `Applied` となった。Duck の視覚入力診断は99件の復号成功、失敗0件を返した。Crane の `/robot_feedback` は有効受信数の最大321、無効0件、新しい受信時刻を返した。120秒の上限内に停止し、所有確認後の最終走査で残存資源はなかった。ホスト側 UDP 受信機は作成していない。
+
+この確認は上記の通常構成での一回の通信と停止回収を示す。CM4 のサービス準備完了、再作成後の通信、長時間の安定性、比較構成、および他の起動選択は未確認であり、確認応答だけからそれらを受入済みとしない。

@@ -1,0 +1,68 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "source_sha256": {
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "0ae9ce8a792dafea02959408eb24df1554e32b985035133c98d46a7ab6ac00f8",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "255fc45f4f5045247d52914c0306a30d01e6733d01d8a5c125501071817e0d67",
+    "Testing/Duck.Testing.AppHost/Program.cs": "687c7c5ad53f2dfdd63d2057ba6f5d633afebcc59ef7717b6ade873b2f2916b5",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "8e9f2d6d48b7a1a7d915af112c7e37232d5e82204208bcbdeaf99e0451002e6f",
+    "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj": "2e503984d9a08d665c5e22e18563c7b307cf62e3f906f5c38864c99111b84d8b"
+  },
+  "commands": [
+    {
+      "index": 1,
+      "argv": [
+        "dotnet",
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "-p:EnableSourceControlManagerQueries=false",
+        "--filter",
+        "FullyQualifiedName~RegisteredContainerExecHandoffTests",
+        "--logger",
+        "console;verbosity=normal"
+      ],
+      "started_unix": 1792770281.5396082,
+      "capture": "subprocess.run stdout/stderr bytes",
+      "exit_code": 0,
+      "timed_out": false,
+      "ended_unix": 1792770289.3392465,
+      "stdout_sha256": "46468a1f1a4c2cfe706c19d26b5eebd363790b789e654ef1dad39cd0c97a7353",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "index": 2,
+      "argv": [
+        "dotnet",
+        "build",
+        "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj",
+        "--no-restore",
+        "-p:EnableSourceControlManagerQueries=false"
+      ],
+      "started_unix": 1792770289.3393276,
+      "capture": "subprocess.run stdout/stderr bytes",
+      "exit_code": 0,
+      "timed_out": false,
+      "ended_unix": 1792770290.6034284,
+      "stdout_sha256": "dc9e5ad9c14a64cdf78589e76e50eaab7b15daeb3b70390aa8db0161e26ce74d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "index": 3,
+      "argv": [
+        "dotnet",
+        "build",
+        "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+        "--no-restore",
+        "-p:EnableSourceControlManagerQueries=false"
+      ],
+      "started_unix": 1792770290.603507,
+      "capture": "subprocess.run stdout/stderr bytes",
+      "exit_code": 0,
+      "timed_out": false,
+      "ended_unix": 1792770292.827754,
+      "stdout_sha256": "f2516e8f3b0df86ea917b6ef2183934971a725d66fa26d7e9b43c23f195b2836",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "complete": true
+}

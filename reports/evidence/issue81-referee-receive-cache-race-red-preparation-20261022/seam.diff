@@ -1,0 +1,50 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+index 78520d3..322ff36 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+@@ -19,6 +19,9 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+     private ReceivedCommand? latestCommand;
+     private TaskCompletionSource commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
+ 
++    /// <summary>競合試験が既存処理の境界を観測する。未指定時は処理へ介入しない。</summary>
++    internal Action<RefereeReceiveBoundary>? BoundaryObserver { get; init; }
++
+     internal RefereeReceiveService(
+         IRefereeDatagramReceiver receiver,
+         ServiceReceiveDiagnostics diagnostics,
+@@ -117,6 +120,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+                     (previousCommandCounter is null ||
+                         latest.Snapshot.CommandCounter != previousCommandCounter.Value))
+                 {
++                    BoundaryObserver?.Invoke(RefereeReceiveBoundary.BeforeCommandDiagnosticRead);
+                     var current = diagnostics.GetSnapshots(InputId).FirstOrDefault(snapshot =>
+                         snapshot.SourceKey == latest.SourceKey &&
+                         snapshot.ReceiverEpoch == latest.ReceiverEpoch);
+@@ -129,6 +133,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+                 }
+                 changed = commandChanged.Task;
+             }
++            BoundaryObserver?.Invoke(RefereeReceiveBoundary.BeforeCommandWait);
+             await changed.WaitAsync(cancellationToken).ConfigureAwait(false);
+         }
+     }
+@@ -136,6 +141,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+     /// <summary>診断に受理されたcommandを保持し、購読へ変更の再確認を通知する。</summary>
+     private void PublishCommand(RefereeCommandSnapshot snapshot, string sourceKey, long receiverEpoch)
+     {
++        BoundaryObserver?.Invoke(RefereeReceiveBoundary.BeforeCommandPublish);
+         TaskCompletionSource changed;
+         lock (commandGate)
+         {
+@@ -230,3 +236,11 @@ internal sealed record RefereeReceivedDatagram(
+     ReadOnlyMemory<byte> Payload,
+     IPEndPoint RemoteEndpoint,
+     ServiceReceiveDiagnostics.ReceiveAttempt ReceiveAttempt);
++
++/// <summary>競合試験で既存の順序を固定するための内部観測点。</summary>
++internal enum RefereeReceiveBoundary
++{
++    BeforeCommandDiagnosticRead,
++    BeforeCommandPublish,
++    BeforeCommandWait,
++}

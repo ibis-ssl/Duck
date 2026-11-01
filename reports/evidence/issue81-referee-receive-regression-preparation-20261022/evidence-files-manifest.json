@@ -1,0 +1,130 @@
+{
+  "files": [
+    {
+      "path": "RefereeReceiveReadinessBoundaryTests-diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "RefereeReceiveReadinessBoundaryTests-diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "RefereeReceiveReadinessBoundaryTests-diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "RefereeReceiveReadinessBoundaryTests.syntax-api.txt",
+      "bytes": 432,
+      "sha256": "fd4bc9e8c2162357ce568b46329bdd6b4c040074cee5d0eb8647793c7f77dd74"
+    },
+    {
+      "path": "RefereeReceiveRestartTests-diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "RefereeReceiveRestartTests-diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "RefereeReceiveRestartTests-diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "RefereeReceiveRestartTests.syntax-api.txt",
+      "bytes": 349,
+      "sha256": "6decf7f5a234738b2d298f54eae96964f39ecaa5c977d0ca778718233a0464c7"
+    },
+    {
+      "path": "check-commands.json",
+      "bytes": 669,
+      "sha256": "b2cf00b698880b7782c3cf5dbd90ba2713b8446599dec49b52f4606328b38432"
+    },
+    {
+      "path": "diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expectations.json",
+      "bytes": 2198,
+      "sha256": "dd91cc0e8b351464e9e9adc0b6ab41e277b0bd5eda94c0e32bb985dbda174691"
+    },
+    {
+      "path": "new-source/RefereeReceiveReadinessBoundaryTests.cs",
+      "bytes": 7400,
+      "sha256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924"
+    },
+    {
+      "path": "new-source/RefereeReceiveRestartTests.cs",
+      "bytes": 7102,
+      "sha256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879"
+    },
+    {
+      "path": "remaining-03A.json",
+      "bytes": 1462,
+      "sha256": "e6ba2c2eb840eb9faf55270927e9815f783f9c9f7735cde140b146e8afbb0e11"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 3354,
+      "sha256": "c7763e6e06a897f1352a1017771b3475e0b7ff07671b6e7fa790f6f7e723a7fe"
+    },
+    {
+      "path": "syntax-input.json",
+      "bytes": 483,
+      "sha256": "7e2f22873530d285afeb2b60dcbae2f15d1e80fce83b93a2b75e33fb1be944cf"
+    },
+    {
+      "path": "syntax-result.json",
+      "bytes": 1066,
+      "sha256": "f19d140e38cada377a76e67d8dc2341ebfc2e4f0e3ff36fd9f542477abcec087"
+    },
+    {
+      "path": "syntax.command.json",
+      "bytes": 272,
+      "sha256": "a1e8f9fc11d33b1bb5ea84f98443f37ac80532bede02c41ed45401e14205e04e"
+    },
+    {
+      "path": "syntax.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "syntax.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "raw_logs": [
+    "RefereeReceiveReadinessBoundaryTests-diff-check.stderr.log",
+    "RefereeReceiveReadinessBoundaryTests-diff-check.stdout.log",
+    "RefereeReceiveRestartTests-diff-check.stderr.log",
+    "RefereeReceiveRestartTests-diff-check.stdout.log",
+    "diff-check.stderr.log",
+    "diff-check.stdout.log",
+    "syntax.stderr.log",
+    "syntax.stdout.log"
+  ],
+  "note": "Keep ignored raw logs when parent persists evidence."
+}

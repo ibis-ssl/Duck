@@ -1,0 +1,139 @@
+[
+  {
+    "name": "artifacts",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39795794024/artifacts"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "job-rest-log-allow",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "--allow-escape-sequences",
+      "--method",
+      "GET",
+      "repos/ibis-ssl/Duck/actions/jobs/119882661137/logs"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "job-rest-log",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "--method",
+      "GET",
+      "repos/ibis-ssl/Duck/actions/jobs/119882661137/logs"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "run-list",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "list",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--commit",
+      "ba2ba820d23b372a8b34dc008b12a01b0c1394bd",
+      "--event",
+      "pull_request",
+      "--limit",
+      "10",
+      "--json",
+      "databaseId,headSha,event,status,conclusion,url,name"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "test-log-before-run-terminal",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39795794024",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--job",
+      "119882661137",
+      "--log"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "view-checkpoint",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39795794024",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "view-checkpoint2",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39795794024",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "view-waiting",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39795794024",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "view",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39795794024",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "watch",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "watch",
+      "39795794024",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--exit-status",
+      "--interval",
+      "5"
+    ],
+    "exit_code": null
+  }
+]

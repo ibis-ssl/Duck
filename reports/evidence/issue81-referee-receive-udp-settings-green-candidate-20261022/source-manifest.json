@@ -1,0 +1,31 @@
+{
+  "baseline": "8837cccc332d55ad9573b5e217498aa61f0b65b1",
+  "acceptedRed": {
+    "runId": 39808111037,
+    "factory2": "line30 expected5 configuration operations/Actualempty",
+    "adoptedBy": "parent tdd-executor"
+  },
+  "production": {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "beforeSha256": "95ba1286513657c4be5fa8315131f07133cd2152f94f11ebb301a6cb172f0594",
+    "afterSha256": "a94159a4ad74c40a571b746bdc8c9b6f61bdf8fd36c6c85661551b12fab1ea74"
+  },
+  "scope": "IPv4 socket creation -> exclusivefalse -> reusetrue -> Any requestedport bind -> default/explicitIF join -> ownsClienttrue adapter; setup failure after Client acquisition disposes captured client then rethrows",
+  "legacyPublicPath": {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeDriverNetworkAdapters.cs",
+    "sha256": "888d40d56f74ebd3b532d3f2cb90f280e50de3cfa65921c593acc5f1fa1b35e4",
+    "head_current_equal": true
+  },
+  "unchangedSources": 21,
+  "fixed7Existing633Independent67": "all retained source bytes unchanged",
+  "validation": {
+    "syntaxExit": 0,
+    "buildExit": 1,
+    "buildReason": "known generated Referee missing;CS0246x2/CS0400x2;0warnings4errors",
+    "diffCheckExit": 0,
+    "testsExecuted": 0,
+    "green": "not observed; exact-SHA PR CI required"
+  },
+  "remaining": "invalid options/partial setup failure cleanup/runtime real setup composition tests next; IPv4 parse/family guard follows old receiver; no extra input feature",
+  "processState": "all syntax/build/read/save/check processes terminated; build1772exit1 collected"
+}

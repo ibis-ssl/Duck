@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Protobuf_CompileOnBuild>true</Protobuf_CompileOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf"/>
+    <PackageReference Include="Grpc.Tools" PrivateAssets="All" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Protobuf
+      Include="src/external/ssl-game-controller/proto/**/*.proto"
+      ProtoRoot="src/external/ssl-game-controller/proto"
+      GrpcServices="None" />
+
+    <Protobuf
+      Include="src/external/ssl-simulation-protocol/proto/**/*.proto"
+      Exclude="
+        src/external/ssl-simulation-protocol/proto/ssl_gc_common.proto;
+        src/external/ssl-simulation-protocol/proto/ssl_vision_geometry.proto;
+        src/external/ssl-simulation-protocol/proto/ssl_vision_detection.proto
+      "
+      ProtoRoot="src/external/ssl-simulation-protocol/proto"
+      AdditionalImportDirs="
+        src/external/ssl-game-controller/proto/state;
+        src/external/ssl-game-controller/proto/vision
+      "
+      GrpcServices="None" />
+  </ItemGroup>
+</Project>

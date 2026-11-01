@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "text",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+  "input_files": [
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md"
+  ],
+  "input_hashes": {
+    "Tracker/Design/tasks-status.md": "c0225885f7c7a1f3f340ceb106ff0d6ac3d835de5ab52738da7d319a7b0e05ac",
+    "Tracker/Design/phases-status.md": "8ea3e1e0273b4cbb9a0a4b8625c14e981bd370ed4bb81760757c836f793b3598",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "94d79b7b825cc41e09d6d3f12a1b1329bf9adfb8b28902a43fb11e406609fd47",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md": "2ba6568f135d6ee51137bd9442b45be7aa81213bc2f0c6770a6d1372158c6111"
+  },
+  "elapsed_seconds": 0.555138111114502
+}

@@ -1,0 +1,13 @@
+Markdown whitelist violations:
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:1: 'path' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'path' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'exec' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'container' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'host' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'port' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'ResourceEvent' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:1: 'path' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'path' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'container' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'host' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/issue81-05b-boundary-report-baseline.md:2: 'port' (katakana) is not in tools/lint/markdown-whitelist.yaml.

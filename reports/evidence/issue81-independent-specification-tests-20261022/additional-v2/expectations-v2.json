@@ -1,0 +1,162 @@
+{
+  "version": "additional-v2",
+  "state": "frozen_before_first_additional_build_or_test",
+  "relationship_to_v1": "additive_only; v1 expectations/tests/11file manifest/results unchanged",
+  "mode": "post_implementation_independent_specification_tests; no historical Red recreation or TDD waiver",
+  "authority": "new explicit user scope correction supplied in top-level codex_delegation/input/transcript_evidence by parent",
+  "behavior_basis": "approved designs only; public declarations determine callable shapes, no implementation inspection",
+  "test_methods": 15,
+  "authored_cases": 33,
+  "contracts": [
+    {
+      "id": "C01",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "正式source name三者",
+      "expected": "Duck/TIGERs/ER-Forceへ指定どおり解決",
+      "design_basis": "designs/tracker-comparison-debug-design.md:140-146",
+      "derivation": "source nameの完全一致対応表",
+      "basis_kind": "direct",
+      "authored_cases": 3
+    },
+    {
+      "id": "C02",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "大小文字・余白・未定義・空の8名",
+      "expected": "LogicalRoleなし",
+      "design_basis": "designs/tracker-comparison-debug-design.md:146,148",
+      "derivation": "未定義名称からroleを推測しない",
+      "basis_kind": "direct",
+      "authored_cases": 8
+    },
+    {
+      "id": "C03",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "未定義nameと既知label",
+      "expected": "LogicalRoleなし",
+      "design_basis": "designs/tracker-comparison-debug-design.md:138,146,148",
+      "derivation": "roleの根拠はsource nameであり表示labelではない",
+      "basis_kind": "derived",
+      "authored_cases": 3
+    },
+    {
+      "id": "C04",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "SourceRole own/external/unknown、各三名",
+      "expected": "既存SourceRoleによらず正式logical role",
+      "design_basis": "designs/tracker-comparison-debug-design.md:138,280",
+      "derivation": "既存SourceRoleとlogical roleは別概念",
+      "basis_kind": "direct",
+      "authored_cases": 3
+    },
+    {
+      "id": "C05",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "同name/同UUID、別endpoint/label",
+      "expected": "同じ非空IdentityKey",
+      "design_basis": "designs/tracker-comparison-debug-design.md:136,148,150,282",
+      "derivation": "UUID優先、endpoint数でsourceを分裂させない",
+      "basis_kind": "direct",
+      "authored_cases": 3
+    },
+    {
+      "id": "C06",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "同name/endpoint、別UUID",
+      "expected": "別IdentityKey",
+      "design_basis": "designs/tracker-comparison-debug-design.md:148,150,281,284",
+      "derivation": "UUIDがidentityを決める",
+      "basis_kind": "direct",
+      "authored_cases": 1
+    },
+    {
+      "id": "C07",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "同UUID、別role名/endpoint",
+      "expected": "roleは各名どおり、IdentityKeyは同一",
+      "design_basis": "designs/tracker-comparison-debug-design.md:148,150,283",
+      "derivation": "競合をendpoint分裂で隠さないためのresolver前提。health判定の試験ではない",
+      "basis_kind": "direct",
+      "authored_cases": 1
+    },
+    {
+      "id": "C08",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "UUID null/空、同name/endpoint、別label",
+      "expected": "同じ非空fallback IdentityKey",
+      "design_basis": "designs/tracker-comparison-debug-design.md:136,148,285",
+      "derivation": "UUID欠落時はsource name+endpointで代用",
+      "basis_kind": "direct",
+      "authored_cases": 2
+    },
+    {
+      "id": "C09",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "UUID null/空、同name、別endpoint",
+      "expected": "別fallback IdentityKey",
+      "design_basis": "designs/tracker-comparison-debug-design.md:136,148,285",
+      "derivation": "異なるendpointの証跡を混ぜない",
+      "basis_kind": "direct",
+      "authored_cases": 2
+    },
+    {
+      "id": "C10",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "UUID null/空、同endpoint、別name",
+      "expected": "別fallback IdentityKey",
+      "design_basis": "designs/tracker-comparison-debug-design.md:136,148,285",
+      "derivation": "source nameとendpointの組で分離",
+      "basis_kind": "direct",
+      "authored_cases": 2
+    },
+    {
+      "id": "C11",
+      "test_file": "ComparisonResolverAdditionalSpecificationTests.cs",
+      "fixture": "同UUID/endpoint/name、別SourceRole",
+      "expected": "同一IdentityKey",
+      "design_basis": "designs/tracker-comparison-debug-design.md:138,148",
+      "derivation": "UUID identityを既存roleから独立させる",
+      "basis_kind": "derived",
+      "authored_cases": 1
+    },
+    {
+      "id": "V01",
+      "test_file": "VisionStoreAdditionalSpecificationTests.cs",
+      "fixture": "独立公式vision datagram10件、1msずつ進行",
+      "expected": "count10/error0/最新受信時刻/検出frame10/ball座標123,-456",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,230-231; designs/tracker-comparison-debug-design.md:249; schemas/ssl-game-controller/proto/vision/ssl_vision_detection.proto:3-18,39-57; schemas/ssl-game-controller/proto/vision/ssl_vision_wrapper.proto:15-18",
+      "derivation": "サービス公開storeで件数・入力時刻・検出内容を保持。実受信結線の代用にはしない",
+      "basis_kind": "direct_plus_fixture",
+      "authored_cases": 1
+    },
+    {
+      "id": "V02",
+      "test_file": "VisionStoreAdditionalSpecificationTests.cs",
+      "fixture": "別内容の検出2件、時刻差20ms",
+      "expected": "最新のframe/座標/受信時刻を同じsnapshotに保持",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,231; designs/tracker-comparison-debug-design.md:249",
+      "derivation": "検出内容と入力時刻の対応を記録する限定store試験",
+      "basis_kind": "derived",
+      "authored_cases": 1
+    },
+    {
+      "id": "V03",
+      "test_file": "VisionStoreAdditionalSpecificationTests.cs",
+      "fixture": "公開RecordDecodeErrorを1回呼出",
+      "expected": "success packet0/error1/失敗診断非空",
+      "design_basis": "designs/aspire-simulation-test-environment.md:158,183,230",
+      "derivation": "明示的な失敗記録を成功受信に数えない。parser異常入力結線は未検証",
+      "basis_kind": "derived",
+      "authored_cases": 1
+    },
+    {
+      "id": "V04",
+      "test_file": "VisionStoreAdditionalSpecificationTests.cs",
+      "fixture": "公式geometry-only wrapper",
+      "expected": "正常wrapper count1/error0/Geometryあり/Detectionなし",
+      "design_basis": "designs/aspire-simulation-test-environment.md:230-231; schemas/ssl-game-controller/proto/vision/ssl_vision_wrapper.proto:15-18; schemas/ssl-game-controller/proto/vision/ssl_vision_geometry.proto:47-82,135-139",
+      "derivation": "正常wrapperと新しい検出データを区別する限定fixture。readiness値は試験しない",
+      "basis_kind": "derived_from_design_and_schema",
+      "authored_cases": 1
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+    "output": "/tmp/issue81-referee-receive-cancel-green-candidate-20261022/ServiceReceiveDiagnostics.syntax-api.txt",
+    "publicTypes": [
+      "Duck.Testing.Diagnostics.ServiceReceiveDiagnostics",
+      "Duck.Testing.Diagnostics.ServiceReceiveDiagnostics.ReceiveEpoch",
+      "Duck.Testing.Diagnostics.ServiceReceiveDiagnostics.ReceiveAttempt",
+      "Duck.Testing.Diagnostics.ServiceReceiveSnapshot"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

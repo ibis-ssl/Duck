@@ -1,0 +1,415 @@
+[
+  {
+    "path": "all734-outcomes.json",
+    "first4hex": "5b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifact-12451119742.zip",
+    "first4hex": "504b0304",
+    "kind": "ZIP",
+    "isUtf8Text": false,
+    "excludeFromTextEvidencePackaging": true
+  },
+  {
+    "path": "artifact-download.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifact-download.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifact-download.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifact-integrity.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.binlog",
+    "first4hex": "1f8b0800",
+    "kind": "GZip",
+    "isUtf8Text": false,
+    "excludeFromTextEvidencePackaging": true
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.exit-code",
+    "first4hex": "310a",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.stderr.log",
+    "first4hex": "5b78556e",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.stdout.log",
+    "first4hex": "20204465",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.trx",
+    "first4hex": "efbbbf3c",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/environment.txt",
+    "first4hex": "7265706f",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/source.tar.gz",
+    "first4hex": "1f8b0800",
+    "kind": "GZip",
+    "isUtf8Text": false,
+    "excludeFromTextEvidencePackaging": true
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.datacollector.26-10-22_19-22-50_82950_5.log",
+    "first4hex": "54705472",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.host.26-10-22_19-22-51_11321_5.log",
+    "first4hex": "54705472",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/vstest-diagnostics.log",
+    "first4hex": "54705472",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "first4hex": "7b22746f",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "bounded-final-view.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "bounded-final-view.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "bounded-final-view.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "bounded-final-view.stdout.log",
+    "first4hex": "7b22636f",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "bounded-finalization-observation.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "ci-evidence.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "first4hex": "32303236",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "collect.py",
+    "first4hex": "696d706f",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "completed-job-log.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "completed-job-log.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "completed-job-log.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "completed-job-log.stdout.log",
+    "first4hex": "efbbbf32",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "git-status-before.txt",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "git-status-final.txt",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "head-source-manifest.json",
+    "first4hex": "5b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "first4hex": "7b22636f",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "match18-outcomes.json",
+    "first4hex": "5b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "old716-and-fixed67.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "owned-monitor-stop.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "owned-monitor-wsl-before-stop.json",
+    "first4hex": "5b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "process-state.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "progress-view.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "progress-view.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "progress-view.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "progress-view.stdout.log",
+    "first4hex": "7b22636f",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "readback.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "run-id.txt",
+    "first4hex": "33393833",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "first4hex": "5b7b2263",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "trx-counters.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.stdout.log",
+    "first4hex": "52656672",
+    "kind": "other",
+    "isUtf8Text": true,
+    "excludeFromTextEvidencePackaging": false
+  }
+]

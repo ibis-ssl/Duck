@@ -1,0 +1,4 @@
+## git submodule status --recursive
+ 9b0765fe7a07a55124f6ee957d4559348462d227 SslProto/src/external/ssl-game-controller (v2.7.1-762-g9b0765f)
+ 1e719a8d410cc84847ec69104da44fed13738291 SslProto/src/external/ssl-simulation-protocol (1e719a8)
+ 57910ff44a577cd2c2e055cf4d8fe31c4a4b127b reference/specs (57910ff)

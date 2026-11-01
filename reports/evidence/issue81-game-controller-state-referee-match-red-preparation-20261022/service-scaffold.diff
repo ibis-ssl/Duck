@@ -1,0 +1,23 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+index a71f29e..6c17770 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+@@ -106,6 +106,9 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+         }
+     }
+ 
++    /// <summary>同packetの指令と診断を取得する先行試験用の未実装入口。</summary>
++    internal RefereeReceiveObservation? GetCurrentObservation() => null;
++
+     /// <summary>単一pumpの新しい正常commandを待つ。同counterでは完了せず、自身では受信しない。</summary>
+     public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
+         uint? previousCommandCounter,
+@@ -247,3 +250,8 @@ internal enum RefereeReceiveBoundary
+     BeforeCommandPublish,
+     BeforeCommandWait,
+ }
++
++/// <summary>同じ受理packetに対応する指令と自身診断。外部APIとの原子的同期を意味しない。</summary>
++internal sealed record RefereeReceiveObservation(
++    RefereeCommandSnapshot Command,
++    ServiceReceiveSnapshot Diagnostic);

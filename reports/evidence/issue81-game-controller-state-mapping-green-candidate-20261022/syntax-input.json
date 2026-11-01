@@ -1,0 +1,10 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "Output": "/tmp/issue81-game-controller-state-mapping-green-candidate-20261022/GameControllerStateClient.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+    "Output": "/tmp/issue81-game-controller-state-mapping-green-candidate-20261022/GameControllerStateMapping.api.txt"
+  }
+]

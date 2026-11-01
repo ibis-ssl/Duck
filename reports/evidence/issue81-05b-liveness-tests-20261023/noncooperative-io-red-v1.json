@@ -1,0 +1,28 @@
+{
+  "name": "noncooperative-io-red-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~RuntimeIdentityControlNonCooperativeLivenessTests"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:43:27.377705+00:00",
+  "runner_pid": 1208574,
+  "child_pid": 1208575,
+  "exit": 1,
+  "sha256": {
+    "Tracker/Tracker.Tests/RuntimeIdentityControlLivenessTests.cs": "2d136c3d9ad3320c3fcf61fba38e88da56ede44bd309c637b05643b152731745",
+    "Tracker/Tracker.Tests/RuntimeIdentityControlNonCooperativeLivenessTests.cs": "c8251b75203047b8555d0c649a3d0b4b148e9778e5fc3c4a2535a83671a7c543",
+    "Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "b96d255bc7e52fd017bcc9676df994fc5c2331575b1d14cec281d27de7bf67cf",
+    "Tracker/Tracker.RuntimeHost/Program.cs": "4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b"
+  },
+  "stdout_sha256": "3869a5bc4c53f4418e39393c22d30f4520bf3ca6479da4c795b40b429a0fee0a",
+  "stderr_sha256": "1f14331d8da4b47481e1cd021c15b9c943ac4f18f8edf2b6be0f511446b00a6b",
+  "stdout_bytes": 7165,
+  "stderr_bytes": 629
+}

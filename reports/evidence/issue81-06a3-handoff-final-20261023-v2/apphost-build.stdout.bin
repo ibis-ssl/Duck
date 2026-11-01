@@ -1,0 +1,17 @@
+/home/donabe/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+  Duck.Testing.Diagnostics -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  SslProto -> /home/donabe/Duck-issue81-aspire-desktop-bridge/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  TrackerConnectionLib -> /home/donabe/Duck-issue81-aspire-desktop-bridge/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Duck.Testing.RefereeDriver -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Tracker.RuntimeHost -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+  Duck.Testing.AppHost -> /home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+
+Build succeeded.
+
+/home/donabe/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.85

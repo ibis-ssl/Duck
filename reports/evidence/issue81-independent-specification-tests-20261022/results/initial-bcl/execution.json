@@ -1,0 +1,63 @@
+{
+  "baseline_parent_supplied": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "frozen_manifest_sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+  "runs": [
+    {
+      "command": [
+        "dotnet",
+        "--version"
+      ],
+      "cwd": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness",
+      "started_utc": "2026-10-22T11:23:47.907108+00:00",
+      "exit_code": 0,
+      "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/0.stdout.log",
+      "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/0.stderr.log"
+    },
+    {
+      "command": [
+        "dotnet",
+        "restore",
+        "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/bcl.csproj",
+        "--source",
+        "/home/donabe/.nuget/packages",
+        "-p:NuGetAudit=false",
+        "-p:UseArtifactsOutput=true",
+        "-p:ArtifactsPath=/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/artifacts",
+        "-p:EnableSourceControlManagerQueries=false",
+        "-p:UseSharedCompilation=false",
+        "-m:1",
+        "--nodeReuse:false"
+      ],
+      "cwd": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness",
+      "started_utc": "2026-10-22T11:23:48.036452+00:00",
+      "exit_code": 0,
+      "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/1.stdout.log",
+      "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/1.stderr.log"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/bcl.csproj",
+        "--no-restore",
+        "--configuration",
+        "Debug",
+        "--logger",
+        "trx;LogFileName=initial-bcl.trx",
+        "--results-directory",
+        "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl",
+        "-p:UseArtifactsOutput=true",
+        "-p:ArtifactsPath=/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/artifacts",
+        "-p:EnableSourceControlManagerQueries=false",
+        "-p:UseSharedCompilation=false",
+        "-m:1",
+        "--nodeReuse:false"
+      ],
+      "cwd": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness",
+      "started_utc": "2026-10-22T11:23:48.992634+00:00",
+      "exit_code": 0,
+      "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/2.stdout.log",
+      "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-bcl/2.stderr.log"
+    }
+  ]
+}

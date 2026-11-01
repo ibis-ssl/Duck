@@ -1,0 +1,79 @@
+[
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39775288708",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "started_utc": "2026-10-22T12:04:18.767699+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/initial-view.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/initial-view.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "watch",
+      "39775288708",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--interval",
+      "30",
+      "--exit-status"
+    ],
+    "started_utc": "2026-10-22T12:04:19.987613+00:00",
+    "exit_code": 1,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/watch.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/watch.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39775288708",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "started_utc": "2026-10-22T12:04:55.246346+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/final-view.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/final-view.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39775288708",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--job",
+      "119812563633",
+      "--log"
+    ],
+    "started_utc": "2026-10-22T12:04:56.908843+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/test-job-log.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/test-job-log.stderr.log"
+  },
+  {
+    "command": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39775288708/artifacts"
+    ],
+    "started_utc": "2026-10-22T12:04:59.323706+00:00",
+    "exit_code": 0,
+    "stdout": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/artifacts.stdout.log",
+    "stderr": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-initial-ci/artifacts.stderr.log"
+  }
+]

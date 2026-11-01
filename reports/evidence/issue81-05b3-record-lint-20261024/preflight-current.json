@@ -1,0 +1,78 @@
+{
+  "source": "Tracker/Design/tasks-status.md (I81-05B3 row), Tracker/Design/phases-status.md (current value + current unit)",
+  "sourceDiffSha256": "6e61966a9d7cdad85d49b47865886dec1ca6bdb3f3a6720ce401c25be1462ac1",
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+  "nodeVersion": "v24.20.0",
+  "nodeModulesJunction": "C:/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+  "python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "sudachiDictionarySha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+  "inputRows": 3,
+  "effectiveFiles": 2,
+  "reportsExcludedByProjectTargets": true,
+  "currentInputs": [
+    {
+      "path": "inputs/current/Tracker/Design/tasks-status.md",
+      "bytes": 1248,
+      "sha256": "4bc94180b30a101be8385dcdf8313e6425c7e29a7bdbd1a8579e54b0186f15ec"
+    },
+    {
+      "path": "inputs/current/Tracker/Design/phases-status.md",
+      "bytes": 762,
+      "sha256": "77400b465d14d85f4315c624e08e6fa7b73726e7d9e89f59966651563d0c8f86"
+    }
+  ],
+  "baselineInputs": [
+    {
+      "path": "inputs/baseline/Tracker/Design/tasks-status.md",
+      "bytes": 986,
+      "sha256": "efdf5bb84edfbb51db8a3e0b7b3103085f9a89b553ed8f52125ddad66099bbdc"
+    },
+    {
+      "path": "inputs/baseline/Tracker/Design/phases-status.md",
+      "bytes": 349,
+      "sha256": "cb78afb78b50e38de696e8f8cd1d942cf5f02c7f294a7ad7e4fb4f2543c78330"
+    }
+  ],
+  "configAndRules": [
+    {
+      "path": ".textlintrc.json",
+      "sha256": "A7DBC9EA76A21604851CF0128B97D16EB3708CEF3B9CA6A4E8402435F731F18F"
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sha256": "2FF9F167A77E6627720297503237F31E7675881A8FDEC7E31987D8B65BCC5642"
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sha256": "BC3DCA1EBC1713C3A6D19D4D123CF6DCC135B44B57779A91796106E3630716DA"
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sha256": "DC4DC3CDA79ADA88A07CEEAC8999718C519482F2CC7FF0098668EEC2D930B9D8"
+    },
+    {
+      "path": "tools/lint/prh.yml",
+      "sha256": "7F2C43106364D8112FCC3060E4AB8B20F5D1A17D9CBF3C2540529663004ADFF8"
+    },
+    {
+      "path": "tools/lint/requirements.txt",
+      "sha256": "6FB38AD40BC71D75A4C2CDA467B9F176CFA07059D0398AE3059F201659A26F5A"
+    },
+    {
+      "path": "tools/lint/scripts/run-markdown-targets.js",
+      "sha256": "CBAC266681BE48451A7FE76166C2625F66E532292AE2C30E9519FFE52167D0EA"
+    },
+    {
+      "path": "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "sha256": "A4A7F85A182188F9D374C83628FCDF5204933320E528E9E09D0255170B6F0B33"
+    },
+    {
+      "path": "tools/lint/scripts/textlint-rules/no-fullwidth-space.js",
+      "sha256": "9CEA9CAE8A69B3164B0E928E35F382BF1124E37E02FDF8CDD2FE795CC06CFC92"
+    },
+    {
+      "path": "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js",
+      "sha256": "EFF1CD4A205355FB28767DD34A04B3135E61E0BF3D63A3159642F55A787C3757"
+    }
+  ]
+}

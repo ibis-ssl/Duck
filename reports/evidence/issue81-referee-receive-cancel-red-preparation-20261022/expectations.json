@@ -1,0 +1,28 @@
+{
+  "state": "fixed_before_test_source_saved_and_before_execution",
+  "baselineHead": "9791c234009091940e9dd0c95f905c063e7385e6",
+  "governing_sources": [
+    {
+      "path": "reports/issue81-referee-driver-scope-20261022.md",
+      "line": 89,
+      "contract": "03A cancel must not remain ready"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "task": "I81-03A",
+      "contract": "cancellation fail-closed"
+    }
+  ],
+  "test": "CancellationAfterSuccessfulReceivesInvalidatesReadinessWithoutClockExpiry",
+  "cases": [
+    {
+      "initial": "complete owner, two real decoded same-counter valid Referee packets, fixed clock, count2 and ready",
+      "action": "cancel active pump waiting for third packet; await terminal task without advancing clock",
+      "expected": "not-ready after terminal; success count remains2; no fourth receive/decode",
+      "stopping_condition": "one focused case; no concurrent-run/restart/subscriber behavior added"
+    }
+  ],
+  "red_candidate": "post-terminal IsReady=false assertion; current implementation may retain ready until freshness expiry; actual result must be collected from CI",
+  "validation": "syntax only locally; formal real parser test remote_ci_only; compile-error/timeout not valid functional Red",
+  "behavior_edits": false
+}

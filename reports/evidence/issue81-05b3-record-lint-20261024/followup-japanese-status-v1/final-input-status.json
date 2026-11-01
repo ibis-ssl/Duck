@@ -1,0 +1,38 @@
+{
+  "finalSourceRows": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "line": 42,
+      "sha256_utf8_line": "ce706082444f32abecdb40f883f89bed5065a77a693a9419364e96dfbba52c5e"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "sha256_utf8_line": "69e161526dcd0f59b2a7507bec7099d7516c698a94c2e86b9add18f2511da2c1"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "sha256_utf8_line": "cf5a96d713bde569e15b178472d97c09562ac83c309afa6a200c87422b232006"
+    }
+  ],
+  "finalInputFiles": {
+    "tasks-status.md": {
+      "bytes": 1245,
+      "sha256": "ce706082444f32abecdb40f883f89bed5065a77a693a9419364e96dfbba52c5e"
+    },
+    "phases-status.md": {
+      "bytes": 1902,
+      "sha256": "b7246113132e6939a3703d22e81272db2639bb6b671dfab79dc7b86d02d06b06"
+    }
+  },
+  "sourceDiffSha256": "928175da1df4b23a47b61aa498faa85cbd0fdef0630530ba827fcd4b1c8292e7",
+  "completedCspellInputBeforeFinalOneWordCorrection": {
+    "tasks-status.md": "ce706082444f32abecdb40f883f89bed5065a77a693a9419364e96dfbba52c5e",
+    "phases-status.md": "538ad976b37d271b38552144d691ac6901b38bcebd34f7f4ff218e22c51b787c"
+  },
+  "lastCspellResult": "exit 1; four findings: Driver x1, localhost x2, referee x1. It was run before the final Driver診断 -> 審判観測 wording change.",
+  "finalInputCspell": "Not run. A repeat was rejected before execution; refusal transcript is included.",
+  "finalTextlintAndSudachi": "Not run after the Japanese wording edits. Earlier results remain tied to earlier input hashes.",
+  "textlintReportsExcluded": true
+}
