@@ -156,7 +156,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         try
         {
             Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", null);
-            Assert.Equal(Path.GetFullPath(helperPath), ResolveCm4TransportHelperSource(temporaryDirectory.Path));
+            Assert.Equal(Path.GetFullPath(helperPath), ResolveCm4TransportHelperSource(temporaryDirectory.Path, Path.Combine(temporaryDirectory.Path, "test-output", "net10.0")));
         }
         finally
         {
@@ -1122,7 +1122,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return (context!, engineId);
     }
 
-    private static string ResolveCm4TransportHelperSource(string repositoryRoot)
+    private static string ResolveCm4TransportHelperSource(string repositoryRoot) =>
+        ResolveCm4TransportHelperSource(repositoryRoot, AppContext.BaseDirectory);
+
+    private static string ResolveCm4TransportHelperSource(string repositoryRoot, string appContextBaseDirectory)
     {
         const string helperName = BaseSimulationResourceRegistration.Cm4TransportHelperAssetName;
         var configuredPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
@@ -1133,7 +1136,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             return fullPath;
         }
 
-        var outputDirectory = new DirectoryInfo(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
+        var outputDirectory = new DirectoryInfo(Path.TrimEndingDirectorySeparator(appContextBaseDirectory));
         var targetFramework = outputDirectory.Name;
         var configuration = outputDirectory.Parent?.Name;
         var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost");
