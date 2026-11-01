@@ -40,8 +40,8 @@ Issue #64 は `Tracker/Design/Testing/aspire-simulation-test-environment.md` と
 
 ## 7. 実装・検証の追記（2026-11-01）
 
-本計画書を作成した後、PR #95 の既存ブランチで対象二文書の編集と全文検査を進めました。既存の whitelist 差分は、承認済み候補の不足語だけを登録したものです。この追補では whitelist を変更していません。AutoRef は既存 alias があるため重複登録していません。
+本計画書を作成した後、PR #95 の既存ブランチで対象二文書の編集と全文検査を進めました。最終追補では、ユーザー承認済みの「ループ」「バック」「コンパイル」の3語だけを既存 whitelist に追加しました。AutoRef は既存 alias があるため重複登録していません。
 
-最新の二文書全体検査では、textlint と CSpell は exit 0 でした。Sudachi whitelist は exit 1 で、次の4件が残っています。ループとバック（`tasks-status.md` 51行目「ループバックアドレスへの接続」）、`de`（同39行目の実パス要素。パス全体をインラインコードで記しても検査結果は変わりません）、コンパイル（`aspire-simulation-test-environment.md` 461行目の説明語）。この結果は成功扱いにせず、対象 Issue の完了条件は未達として扱います。Yomiyasu はシミュレーション設計書が100点で指摘なし、状態台帳が0点・40件の助言でした。後者では361非空行中306行が箇条書きです。`git diff --check` は exit 0 でした。
+修正前の全体検査では、textlint と CSpell は exit 0、Sudachi whitelist は exit 1 でした。Sudachi の4件は「ループ」「バック」（`tasks-status.md` 51行目）、`de`（同39行目の未引用起点コミットID `88cb20f2b5cea46eb90bff80ba8d535639625de0`）、コンパイル（`aspire-simulation-test-environment.md` 461行目）です。この失敗記録は修正前の履歴です。起点IDへのインラインコード追加と承認済み3語の登録後、最終の両文書全文検査は textlint、CSpell、Sudachi whitelist の全てが exit 0 となり、CSpell は2ファイル・指摘0件でした。`git diff --check` も exit 0 です。各終了値は実行時の exec_command 戻り値で取得し、一覧を `C:\Users\donabe\AppData\Local\Temp\issue64-approved3-final4-exit-codes.txt` に保存しました。個別 stdout/stderr は `C:\Users\donabe\AppData\Local\Temp\issue64-approved3-final4-{text,spell,whitelist,diffcheck}.{stdout,stderr}.log` にあります。以前の Yomiyasu 実行では、シミュレーション設計書が100点・指摘なし、状態台帳が0点・40件の助言でした（後者は361非空行中306行が箇条書き）。
 
-前回の独立全文レビューは直前コミットまでの文書で通過しました。本追補後の差分は、同じレビュアーによる確認を依頼する時点の記録です。今回のレビュー結果を待たず、Sudachi の未解決項目を含めて Issue #64 を完了とはしません。
+最終追補の文書・whitelist差分は、同じ独立レビュアーが pass と確認しました。レビュー対象差分 SHA256 は `01C0BB6E6EB5B0F1C62BC3B81F3456B29DB4402569D20C831F044CB24A7EAD80` です。コミット `98a088c40054ad68c45762282dfc34a453c6044e` を PR #95 の既存ブランチへ公開し、remote HEAD の一致を確認しました。Issue #31、Project、PRコメント、PR merge は対象外です。
