@@ -8,7 +8,7 @@
 
 Windows AppHost から Aspire 13.5.4 の標準 `AddContainer` を使い、利用者自身の Docker Desktop に試験資源を登録する。DCP が資源の作成、状態監視、記録、停止、削除を管理する。別の Docker コマンド管理プログラムとコンテナの所有権を二重に持たない。
 
-DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost は資源資源定義を DCP に渡し、Docker Engine がコンテナを実行する。DCP はネットワークの転送機能ではない。[DCP 公式リポジトリ](https://github.com/microsoft/dcp)と[Aspire 13.5.4 のコンテナ作成処理](https://github.com/microsoft/aspire/blob/v13.5.4/src/Aspire.Hosting/Dcp/ContainerCreator.cs#L109-L204)を根拠とする。当該版が作る既定の Aspire ネットワークをこの実行の専用ブリッジとする。任意の別ネットワークを追加指定できるとは仮定しない。
+DCP は Developer Control Plane の略称で、Aspire が内部で使う起動管理プログラムである。AppHost は資源定義を DCP に渡し、Docker Engine がコンテナを実行する。DCP はネットワークの転送機能ではない。[DCP 公式リポジトリ](https://github.com/microsoft/dcp)と[Aspire 13.5.4 のコンテナ作成処理](https://github.com/microsoft/aspire/blob/v13.5.4/src/Aspire.Hosting/Dcp/ContainerCreator.cs#L109-L204)を根拠とする。当該版が作る既定の Aspire ネットワークをこの実行の専用ブリッジとする。任意の別ネットワークを追加指定できるとは仮定しない。
 
 課題 #80 の I80-NR-001 に対応し、Duck、DebugHost のサーバー、RefereeDriver の審判情報受信機能、準備確認の受信機能もコンテナ側へ置く。Windows のプロセスにブリッジ内のマルチキャストを直接受信させる経路は要求しない。これは配置の設計変更であり、UDP の公開、中継、ホストネットワークは使わない。Docker Desktop の公式資料は、ブリッジが 仮想環境 内にあり Windows ホストから直接到達できないことを示す（[既知制限](https://docs.docker.com/desktop/features/networking/networking-how-tos/#known-limitations)、[通信の構造](https://docs.docker.com/desktop/features/networking/)）。同じブリッジ内に配置しても、複数受信や外部イメージとの通信の実測は必要である。
 
@@ -100,7 +100,7 @@ flowchart LR
 
 ## 通信契約
 
-UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資源名から接続先を解決する。マルチキャストは マルチキャストの宛先 と ポート を維持し、各受信側はコンテナ内の IPv4 インターフェースで参加する。Windows の NIC を `InterfaceAddress` に渡さない。送信側のインターフェース、同時受信、再参加の挙動は実機受入で確認する。
+UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資源名から接続先を解決する。マルチキャストの宛先とポートは維持し、各受信側はコンテナ内の IPv4 インターフェースで参加する。Windows の NIC を `InterfaceAddress` に渡さない。送信側のインターフェース、同時受信、再参加の挙動は実機受入で確認する。
 
 | 用途 | 送受信と接続先 |
 | --- | --- |
@@ -210,7 +210,7 @@ I81-07Cでは、明示設定 `Testing:NamespaceProbe:GenerateModel=true` だけ�
 
 ### I81-07D: 明示許可後の名前空間共有組成確認
 
-I81-07Dは `Tracker.Tests` 専用の実機組成検査とし、I81-07Cの `NamespaceProbeModelFactory` を再利用する。AppHostの製品選択肢は追加せず、検査対象の2資源と同じ生成処理を使う。試験実行側で構成を作る場合は `DistributedApplicationOptions.AssemblyName` に `typeof(Projects.Duck_Testing_AppHost).Assembly.GetName().Name` を、`ProjectDirectory` に `Projects.Duck_Testing_AppHost.ProjectPath` を指定し、`Args` も渡す。未指定時の `Assembly.GetEntryAssembly()` は `Tracker.Tests` の試験実行ホストを選ぶため、Aspire 13.5.4 AppHostの参照元型情報に埋め込まれたDCP CLI等の構成組み込み構成情報を解決できない。
+I81-07Dは `Tracker.Tests` 専用の実機組成検査とし、I81-07Cの `NamespaceProbeModelFactory` を再利用する。AppHostの製品選択肢は追加せず、検査対象の2資源と同じ生成処理を使う。試験実行側で構成を作る場合は `DistributedApplicationOptions.AssemblyName` に `typeof(Projects.Duck_Testing_AppHost).Assembly.GetName().Name` を、`ProjectDirectory` に `Projects.Duck_Testing_AppHost.ProjectPath` を指定し、`Args` も渡す。未指定時の `Assembly.GetEntryAssembly()` は `Tracker.Tests` の試験実行ホストを選ぶため、Aspire 13.5.4 AppHostの参照元型情報に埋め込まれたDCP CLI等の構成情報を解決できない。
 
 通常のテストでは環境変数 `DUCK_I81_NAMESPACE_DCP_PROBE_ENABLED` が未指定なら未実行として記録し、成功に数えない。値が存在する場合は `true` だけを有効値とし、それ以外の値はDCP開始前に失敗させる。有効時は `DUCK_I81_NAMESPACE_DCP_EXPECTED_ENGINE_ID` と一意な `DUCK_I81_NAMESPACE_DCP_RUN_ID` を必須とする。既存のDocker 接続先は変更せず、読み取り専用の実行環境ID、実行IDラベル、固定イメージの固定版識別子/保存済み配布物、既存発行物の必要ファイルを照合する。不一致、値の欠落、既存実行ID衝突、イメージまたは発行物の欠落時は、資源を開始・取得せず失敗させる。新しいイメージ取得・ビルド・依存導入は行わない。
 
@@ -329,7 +329,7 @@ Windows の開発環境から、DCP が起動した `debug-host` に接続する
 
 利用者はブラウザーで CaptureOn を開始し、終了時に CaptureOff とファイルの書き出し完了を確認する。raw vision、診断、三つの追跡情報、送信元情報、時刻対応、記録の一覧を同じ記録保存先に残す。Windows の保存先から保存先全体を複製して取り出し、関連ファイルを分離しない。DCP の通常停止・後始末は Windows の記録を削除しない。記録の削除は利用者の別操作とする。
 
-同じ起動中は `/diagnostics` で再生する。後日の再生専用起動では、保存した保存先を `/data/replay` へ読み取り専用で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/replay`、記録無効の設定で開く。記録と再生が相互に書き換えないこと、終了後の再読と 送信元識別子 の保持を後続実装・受入で確認する。
+同じ起動中は `/diagnostics` で再生する。後日の再生専用起動では、記録の保存先を `/data/replay` へ読み取り専用で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/replay`、記録無効の設定で開く。記録と再生が相互に書き換えないこと、終了後の再読と 送信元識別子 の保持を後続実装・受入で確認する。
 
 AppHost は通常の比較起動で生成した実行IDが安全な単一値であることを検証し、指定した基準から保存先までの既存要素に `FileAttributes.ReparsePoint` 属性がないことを確認する。`%LOCALAPPDATA%\Duck\Aspire\<run-id>\captures` がまだ存在しないことを確かめてから、その実行だけの保存先として作成する。既に存在する保存先は他の所有者の可能性があるため変更せず、起動前に失敗させる。起動中のDCPによるコンテナ再作成では同じAppHostが保持する割当てを再利用する。`DebugHost` の `/data/captures` へ読み書き可能で割り当て、`VisionReceiver__PacketCapture__DirectoryPath=/data/captures` を渡す。通常停止、再作成、`CaptureOff` はホスト保存先を削除しない。
 
@@ -510,7 +510,7 @@ Linux向け配布候補は、既存の開発資材を使う`-static`による静
 Craneの診断ファイル設定は比較構成の起動管理処理だけに渡す。通常構成で指定されても標準コンテナの引数や環境変数へ漏らさない。通常構成のホスト側診断観測器はまだ接続されていないため、診断機能全体を維持したとはしない。実際の実行環境・所有・サービス準備の検査、通信先の再設定、補助処理の配置、通常構成の再作成順序、CM4受信確認は後続の未完了作業とする。
 
 
-初期起動時に資源名または不透明なキーで届く `Starting` 通知に完全な `container.id` がない場合、その最初のキーだけを未確定 仮登録 として扱う。完全IDを一度も観測していない間に実行時キーへ移ったときは仮登録を退役させ、実行時キーのIDを待つ。状態は元の通知通知内容から保持し、IDがない通知を `Unknown` へ置き換えない。
+初期起動時に資源名または不透明なキーで届く `Starting` 通知に完全な `container.id` がない場合、その最初のキーだけを未確定 仮登録 として扱う。完全IDを一度も観測していない間に実行時キーへ移ったときは仮登録を退役させ、実行時キーのIDを待つ。状態は元の通知内容から保持し、IDがない通知を `Unknown` へ置き換えない。
 
 完全IDを一度でも観測した後の `Unknown` またはID欠落は仮登録への昇格に使わない。非終端の完全ID候補Aと別キー候補Bが同時に観測された場合は、Aの再通知だけで曖昧状態を解除せず、Aの終端通知と一意なBの現在状態を再取得してからBへ移る。退役したAの遅着通知は拒否する。複数の後継候補が残る場合もIDを公開しない。
 
@@ -520,7 +520,7 @@ Craneの診断ファイル設定は比較構成の起動管理処理だけに渡
 
 通常構成の4資源では、登録した `ContainerResource` の通知から現在の完全コンテナID候補を得る。既存の `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId` を使い、同じ接続先の `docker info` と、通知に対応する完全IDだけを指定したDockerの読み取り専用検査を行う。実行状態と実行ID・役割・実行の所属を示す識別子・資源名ラベルを照合した後、同じ資源キーの最新通知、完全ID、世代を再確認してから検査結果を記録する。設定不足、曖昧なキー、所有情報の不一致、期限切れ、取消、候補変更では結果を昇格せず、資源準備状態を未完了のままにする。
 
-`HostConfig.NetworkMode` と `NetworkSettings.Networks` から得る値は観測結果として記録できるが、同じネットワーク名や有効なIPv4だけではDCP由来を証明しない。原設計は独立したネットワーク識別ラベルや別IDを要求せず、標準DCP資源が同じ既定ブリッジへ所属することを求める。この小単位は、標準 `AddContainer` 登録にネットワーク上書きがないことを前提に、DCP通知の現在の完全IDを同じDocker接続先で読み取り、各資源の実行状態・所有ラベル・単一の有効IPv4ネットワーク添付と `NetworkMode` の一致、および全登録対象の同じネットワーク所属を照合する。反映前に現在の資源キー・完全ID・世代も再確認し、全条件が一致した場合だけ `NetworkVerified` と `OwnershipVerified` を成立させる。未登録資源、ホスト・コンテナ共有など許可されない形、複数または不一致の添付、設定不足、取消、期限切れ、候補変更では成立させない。これは標準登録と実際の所属確認を合わせた照合であり、別のネットワーク識別ラベルを追加条件にしない。サービス準備状態は所有確認と分け、サービス別確認が完了するまで準備完了にしない。比較構成の既存登録、CM4・Simulator・Craneのサービス確認、補助処理の配置、宛先再設定、停止・再作成の連携はこの段階で完了したものとしない。サービス別の準備確認も所有確認から推定せず、`Running` 通知だけで準備完了にしない。比較構成の既存登録と、CM4・Simulator・Craneのサービス確認、補助処理の配置、宛先再設定、停止・再作成の連携はこの段階で完了したものとしない。
+`HostConfig.NetworkMode` と `NetworkSettings.Networks` から得る値は観測結果として記録できるが、同じネットワーク名や有効なIPv4だけではDCP由来を証明しない。原設計は独立したネットワーク識別ラベルや別IDを要求せず、標準DCP資源が同じ既定ブリッジへ所属することを求める。この小単位は、標準 `AddContainer` 登録にネットワーク上書きがないことを前提に、DCP通知の現在の完全IDを同じDocker接続先で読み取り、各資源の実行状態・所有ラベル・単一の有効IPv4ネットワーク添付と `NetworkMode` の一致、および全登録対象の同じネットワーク所属を照合する。反映前に現在の資源キー・完全ID・世代も再確認し、全条件が一致した場合だけ `NetworkVerified` と `OwnershipVerified` を成立させる。未登録資源、ホスト・コンテナ共有など許可されない形、複数または不一致の添付、設定不足、取消、期限切れ、候補変更では成立させない。これは標準登録と実際の所属確認を合わせた照合であり、別のネットワーク識別ラベルを追加条件にしない。サービス準備状態は所有確認と分け、サービス別の確認が完了するまで準備完了にしない。`Running` 通知だけから準備完了を推定しない。比較構成の既存登録、CM4・Simulator・Craneのサービス確認、補助処理の配置、宛先再設定、停止・再作成の連携は、この小単位では未完了とする。
 
 標準DCP資源のネットワーク検査では、単一添付の完全な `NetworkID` があり、`NetworkMode` が `default`、その添付名、または同じ完全IDのいずれかである場合だけ照合する。従来のGame Controller再構成経路では従来どおり `NetworkMode` と唯一の添付名の一致を使い、`NetworkID` がない場合もこの条件で扱う。標準DCP用の追加許容形をこの旧経路へ広げない。
 
@@ -533,7 +533,7 @@ Craneの診断ファイル設定は比較構成の起動管理処理だけに渡
 
 所有確認は登録済み全資源の起動を待たず、現在実行中で一意な完全IDを持つDCP候補から段階的に行う。未起動または起動中の候補は未準備のままとし、既存の実行環境・所有ラベル・状態・標準ネットワークの照合と現在キー・世代の再確認を省かない。後続資源は起動後に同じ所有確認を受ける。
 
-Simulatorのサービス準備確認には既存Duckの`画像診断用HTTP経路`診断を使う。応答の識別情報はDuck自身の現在の受渡し識別情報と照合し、Simulatorの識別情報へ読み替えない。現在のSimulatorとDuckの所有・世代が一致し、`画像診断`入力の受信`受信側の世代値`・正常な復号数・既存の5秒鮮度条件を満たす診断を読み取った後、Simulator世代と受信識別情報ごとの基準値から復号数の増加を確認して準備完了を記録する。世代、受渡し識別情報、キーまたは完全IDが診断の取得中に変化した場合、古い応答を採用しない。
+Simulatorのサービス準備確認には、既存Duckの`画像診断用HTTP経路`で取得する診断を使う。応答の識別情報は、Duck自身の現在の受渡し識別情報と照合し、Simulatorの識別情報として扱わない。現在のSimulatorとDuckについて、所有情報と世代が一致していることを確認する。`画像診断`入力の受信結果では、`受信側の世代値`、正常な復号数、既存の5秒鮮度条件を確認する。Simulatorの世代と受信識別情報ごとに記録した基準値と比べ、復号数が増えた場合に準備完了を記録する。診断取得中に世代、受渡し識別情報、キー、完全IDのいずれかが変わった場合は、古い応答を採用しない。
 
 Duckには既存の画像診断の正常性確認を保ち、重複するDCPの資源別サービス正常性確認を追加しない。診断不足、取得失敗、期限切れ、取消、所有失効はSimulatorの準備を未成立へ戻す。これは固定プログラムの実起動、実通信、他の通常資源のサービス準備、CM4補助処理の配置または再作成・宛先更新が完了したことを示さない。今回の構成試験はこれらの実機確認を含まない。
 
