@@ -36,7 +36,7 @@ I81-05B3と実機受入は継続中とする。次の確認対象は、古い証
 
 - ID: ASPIRE-007D-2、規模: 中の単位に分割、段階: Duck内診断の技術レビュー済み、TDD手順未充足を記録。
 - 正式な課題: https://github.com/ibis-ssl/Duck/issues/81 。専用の下書きPR: https://github.com/ibis-ssl/Duck/pull/84 。課題側の`closedByPullRequestsReferences`=[84]とPR側の`closingIssuesReferences`=[81]を`gh`で再取得し、正式なリンクを確認済み。基準ブランチは`task/aspire-docker-desktop-496`。既定ブランチではないため、課題の自動終了とは区別する。
-- 作業ブランチ: `task/issue81-aspire-desktop-bridge`。作業場所: `/home/donabe/Duck-issue81-aspire-desktop-bridge`。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: `task/aspire-docker-desktop-496`（PR #83）。PR #76の統合コミットc72939ecを包含する。
+- 作業ブランチ: `task/issue81-aspire-desktop-bridge`。作業場所: `/home/donabe/Duck-issue81-aspire-desktop-bridge`。起点: `88cb20f2b5cea46eb90bff80ba8d535639625de0`、積み重ね先: `task/aspire-docker-desktop-496`（PR #83）。PR #76の統合コミットc72939ecを包含する。
 - #80の方式B設計は本人承認済み。通常レビューと独立レビューは`pass_with_held`、P2は解消済みで、PR #83へ公開済み。下書きPRは未統合、文書検査の未合格・図本人確認・実機未検証は保持し、課題全体の完了とは扱わない。
 - #81はI81-Gの読み取り調査を完了したが、課題全体の完了条件は満たしていない。I81-01のI81-NR-001 P2は同じ通常担当が解消確認し、限定範囲の判定は保留付き合格。G1は既存宛先設定と通信名前空間共有の非破壊候補を評価中で、外部実装の変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。[範囲と未採用条件](../../reports/issue81-referee-driver-scope-20261022.md)を参照。外部接続・#82実機受入・外部リポジトリや環境・依存・認証・ネットワーク設定の変更は未実施。
 - 計画の詳細、対象ファイル、検証結果: `reports/issue81-desktop-bridge-implementation-20261022.md`。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。

@@ -914,3 +914,9 @@ entries:
     description: .NETの基本クラスライブラリの略称。
   - term: TRX
     description: テスト実行結果を保存するファイル形式の拡張子名。
+  - term: ループ
+    description: ループバックアドレスを構成する語。
+  - term: バック
+    description: ループバックアドレスを構成する語。
+  - term: コンパイル
+    description: プログラムを指定形式へ変換する工程。
