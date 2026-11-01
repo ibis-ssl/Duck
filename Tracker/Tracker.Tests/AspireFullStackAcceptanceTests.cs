@@ -318,25 +318,33 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 $"visionFrame={initialVision.FrameNumber}; " +
                 $"yellowRobots={initialVision.Detection.RobotsYellow.Count}");
 
-            var cachedInitialSource = new InitialSnapshotRefereeCommandSource(refereeSource, initial);
-            var driver = new RefereeDriverFixture(cachedInitialSource, gameControllerControl);
             try
             {
-                await driver.DriveToActiveAsync(timeout.Token);
+                await gameControllerControl.SendContinueActionAsync(
+                    GameControllerContinueAction.ForceStart, timeout.Token);
             }
             catch (Exception exception)
             {
                 throw new InvalidOperationException(
-                    $"REFEREE_FIXTURE_FAILURE: could not drive Game Controller from HALT to active: {exception.Message}",
+                    $"REFEREE_FIXTURE_FAILURE: could not send Game Controller FORCE_START from verified HALT: {exception.Message}",
                     exception);
             }
 
-            var active = refereeSnapshots.LastOrDefault(snapshot =>
-                snapshot.Command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart);
-            Assert.True(
-                active is not null,
-                "REFEREE_FIXTURE_FAILURE: RefereeDriver did not publish an active command through /health/referee.");
-            output.WriteLine($"active referee={active!.Command} counter={active.CommandCounter}");
+            RefereeCommandSnapshot active;
+            try
+            {
+                active = await WaitForActiveRefereeAfterInitialHaltAsync(
+                    httpRefereeSource, initial, craneFixtureSettings.TeamName, timeout.Token);
+            }
+            catch (OperationCanceledException exception)
+            {
+                throw new InvalidOperationException(
+                    "REFEREE_FIXTURE_FAILURE: Game Controller did not expose a ready active referee snapshot after FORCE_START before the deadline.",
+                    exception);
+            }
+            refereeSnapshots.Enqueue(active);
+
+            output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
             if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
             {
                 throw new InvalidOperationException(
@@ -493,6 +501,61 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task ActiveRefereeWaitAcceptsCurrentCounterJumpAfterForceStartWhenIdentityMatches()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40, "crane");
+
+        var active = await WaitForActiveRefereeAfterInitialHaltAsync(
+            source, initial, "crane", CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.ForceStart, active.Command);
+        Assert.Equal(43u, active.CommandCounter);
+        Assert.Equal("crane", active.YellowTeamName);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeWaitRejectsWrongYellowIdentity()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"Unknown"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40, "crane");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            WaitForActiveRefereeAfterInitialHaltAsync(source, initial, "crane", CancellationToken.None));
+
+        Assert.Contains("TEAM_IDENTITY_FAILURE", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeWaitContinuesFromNonActiveToActiveSnapshot()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":1,"commandCounter":41,"yellowTeamName":"crane"}}""",
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+        var initial = new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40, "crane");
+
+        var active = await WaitForActiveRefereeAfterInitialHaltAsync(
+            source, initial, "crane", CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.ForceStart, active.Command);
+        Assert.Equal(43u, active.CommandCounter);
+    }
+
+    [Fact]
     public void ParsesLatestVisionHealthAsYellowDetectionFrame()
     {
         using var document = System.Text.Json.JsonDocument.Parse(
@@ -625,6 +688,52 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 {
                     return snapshot;
                 }
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+        }
+    }
+
+    private static async Task<RefereeCommandSnapshot> WaitForActiveRefereeAfterInitialHaltAsync(
+        HttpRefereeCommandSource source,
+        RefereeCommandSnapshot initial,
+        string expectedYellowTeamName,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(initial);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedYellowTeamName);
+        if (initial.Command != Referee.Types.Command.Halt ||
+            !string.Equals(initial.YellowTeamName, expectedYellowTeamName, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "REFEREE_FIXTURE_FAILURE: FORCE_START requires the verified initial HALT and expected Yellow identity.");
+        }
+
+        while (true)
+        {
+            var current = await source.ReadCurrentAsync(cancellationToken);
+            if (!current.IsReady || current.Snapshot is not { } snapshot)
+            {
+                throw new InvalidOperationException(
+                    "REFEREE_FIXTURE_FAILURE: referee health became nonready while waiting for FORCE_START reflection.");
+            }
+
+            if (!string.Equals(snapshot.YellowTeamName, expectedYellowTeamName, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"TEAM_IDENTITY_FAILURE: expected Yellow team name '{expectedYellowTeamName}' after FORCE_START, observed '{snapshot.YellowTeamName}'.");
+            }
+
+            if (snapshot.Command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart)
+            {
+                if (snapshot.CommandCounter <= initial.CommandCounter)
+                {
+                    throw new InvalidOperationException(
+                        $"REFEREE_FIXTURE_FAILURE: active counter {snapshot.CommandCounter} did not advance past verified HALT counter {initial.CommandCounter}.");
+                }
+
+                return snapshot;
             }
 
             await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
