@@ -1144,7 +1144,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             repositoryRoot, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost");
         var candidateRoots = new[]
         {
-            AppContext.BaseDirectory,
+            appContextBaseDirectory,
             configuration is null ? string.Empty : Path.Combine(appHostProject, "obj", configuration, targetFramework),
             Path.Combine(appHostProject, "obj", "Debug", targetFramework),
             Path.Combine(appHostProject, "obj", "Release", targetFramework),
