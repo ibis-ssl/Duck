@@ -48,7 +48,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 ### Linux 向け通常コンテナの配布定義（I81-04B2）
 
-`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が既に参照する外部イメージ6件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。`GHCR` の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。
+`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が既に参照する外部イメージ6件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。GHCR の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。
 
 | 管理プログラム | 固定基底 | 定義ファイルと入力元 | 実行入口 |
 | --- | --- | --- | --- |
@@ -117,15 +117,15 @@ UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資
 
 ### 明示的な Game Controller 視覚検証モード（I81-05B3）
 
-`Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的な `TCP` ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost の構成試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、この構成試験では証明しない。
+`Testing:GameControllerVisionOnly=true` は、通常の全構成や二資源の `VisionSimulationOnly` を切り替えず、simulator、Duck、Game Controller、RefereeDriver の四資源だけを同じ Aspire/DCP 管理ブリッジへ登録する明示選択である。既存の固定イメージ参照と起動引数を使い、Game Controller を `224.5.23.1:11003/UDP` の唯一の送信元とする。UDP はホストへ公開せず、Game Controller の HTTP 8082 は Windows の `127.0.0.1` に動的な TCP ポートで対応付ける。RefereeDriver は観測用の既存設定で起動し、自動運転は有効にしない。AppHost の構成試験は資源種別、固定参照、引数、依存順と公開端点を検証する。Windows 画面操作、RefereeDriver の実観測、DCP 実行と所有停止は別の実行時確認であり、この構成試験では証明しない。
 
 ### Game Controller と RefereeDriver の所有再構成（I81-07B）
 
 `Testing:OwnedReconfiguration:Enabled=true` は `Testing:GameControllerVisionOnly=true` の場合だけ有効とする。既定値は `false` とし、他のAppHostモードの資源・引数・起動依存・命令を変更しない。有効化には `Testing:IdentityControl:DesktopBridgeEnabled=true`、既存の `Testing:IdentityControl:DockerContext` と `Testing:IdentityControl:ExpectedEngineId`、ならびにこの構成で起動する `RefereeDriver` が必要である。前提不足または別モードとの併用は、別構成へ切り替えずAppHost起動前に明示的に失敗させる。初回起動では既存の `ws://game-controller:8082/api/control` を使い、新しい接続先の取得待ちを資源起動依存へ追加しない。
 
-有効時だけGame Controllerに所有実行IDと `game-controller` 役割を示すDockerラベルを付ける。この所有ラベル追加は既存のデスクトップ識別ブリッジ補助処理から分離し、Game Controllerに `RuntimeHost` の `UDS` 識別情報受渡しを設定しない。RefereeDriverには同じ実行IDと `referee-driver` 役割を付ける。通常起動時のRefereeDriver接続先は資源名による既定値を維持する。再構成状態が有効な場合に限り、環境設定値を得る処理からその世代の検証済み接続先を渡す。
+有効時だけGame Controllerに所有実行IDと `game-controller` 役割を示すDockerラベルを付ける。この所有ラベル追加は既存のデスクトップ識別ブリッジ補助処理から分離し、Game Controllerに `RuntimeHost`のUnixソケット経由の識別情報受渡しを設定しない。RefereeDriverには同じ実行IDと `referee-driver` 役割を付ける。通常起動時のRefereeDriver接続先は資源名による既定値を維持する。再構成状態が有効な場合に限り、環境設定値を得る処理からその世代の検証済み接続先を渡す。
 
-Game Controllerの資源に追加する `reconfigure-game-controller-endpoint` 所有再構成命令は、公開されたAspire資源命令APIを使い、既知のGame Controller／RefereeDriver `IResource`だけを操作する。単一の直列化制御下で、最初のDCP停止・再起動命令より前に、同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `Docker Engine ID` と、両資源のDCP登録状態・完全コンテナID・実行ID／役割ラベルを照合する。RefereeDriverがすでに停止済みの場合は、完全IDと所有ラベルを確認し、不要な `Stop` を省略して再試行できる。初期確認時にRefereeDriverが停止済みで、DCP登録から完全IDを得られない場合は、名前で補わず、いずれの命令も実行しない。再試行はDCP登録からその資源の完全IDと所有ラベルを確認できてから行う。別所有者の資源、Docker ID不一致、短縮ID、所有ラベル不一致では `Stop`／`Restart` を一つも実行しない。その後RefereeDriverを先にDCP停止命令で停止し、Game ControllerをDCP再起動命令で再作成する。`ResourceNotificationService`から新しい `Running` 状態と同じ登録資源の新しい完全コンテナIDを得る。Dockerコマンドは同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `info` と、通知から得た完全IDだけを対象にする読み取り専用 `inspect` に限る。Docker ID、DCP登録資源の現在ID、実行ID／役割ラベル、実行状態を照合し、`HostConfig.NetworkMode` と `NetworkSettings.Networks` が同じDCP管理ネットワークを示し、対象ネットワークのIPv4アドレスが一つだけであることを確認する。ネットワーク欠落・複数・不一致、自ホストアドレス、空・不正IP、所有者またはDocker ID不一致は拒否する。コンテナ名や画面表示名から任意の対象を選ばない。
+Game Controllerの資源に追加する `reconfigure-game-controller-endpoint` 所有再構成命令は、公開されたAspire資源命令APIを使い、既知のGame Controller／RefereeDriver `IResource`だけを操作する。単一の直列化制御下で、最初のDCP停止・再起動命令より前に、同じ `Testing:IdentityControl:DockerContext` で指定された接続先のDocker実行環境の識別子と、両資源のDCP登録状態・完全コンテナID・実行ID／役割ラベルを照合する。RefereeDriverがすでに停止済みの場合は、完全IDと所有ラベルを確認し、不要な `Stop` を省略して再試行できる。初期確認時にRefereeDriverが停止済みで、DCP登録から完全IDを得られない場合は、名前で補わず、いずれの命令も実行しない。再試行はDCP登録からその資源の完全IDと所有ラベルを確認できてから行う。別所有者の資源、Docker実行環境の識別子不一致、短縮ID、所有ラベル不一致では `Stop`／`Restart` を一つも実行しない。その後RefereeDriverを先にDCP停止命令で停止し、Game ControllerをDCP再起動命令で再作成する。`ResourceNotificationService`から新しい `Running` 状態と同じ登録資源の新しい完全コンテナIDを得る。Dockerコマンドは同じ `Testing:IdentityControl:DockerContext` で指定された接続先の `info` と、通知から得た完全IDだけを対象にする読み取り専用 `inspect` に限る。Docker実行環境の識別子、DCP登録資源の現在ID、実行ID／役割ラベル、実行状態を照合し、`HostConfig.NetworkMode` と `NetworkSettings.Networks` が同じDCP管理ネットワークを示し、対象ネットワークのIPv4アドレスが一つだけであることを確認する。ネットワーク欠落・複数・不一致、自ホストアドレス、空・不正IP、所有者またはDocker実行環境の識別子不一致は拒否する。コンテナ名や画面表示名から任意の対象を選ばない。
 
 状態は初期（`Initial`）、再構成中（`Reconfiguring`）、有効（`Active`）、停止（`Suspended`）を区別する。初期状態だけは既存の資源名による接続先を利用できる。再構成命令開始時に古い接続先を無効化して `Reconfiguring` へ移り、失敗、取消、時間超過、予期しないGame Controller世代変更では `Suspended` にする。`Reconfiguring` または `Suspended` 時は資源名による接続先や以前の検証済み接続先へ切り替えない。
 
@@ -200,9 +200,9 @@ Crane、cm4-sim、simulator を同じブリッジへ移しても、別コンテ�
 
 I81-07Cでは、明示設定 `Testing:NamespaceProbe:GenerateModel=true` だけで選ぶ診断入口を追加する。通常構成へ名前空間共有を採用する変更ではない。設定値が未指定または明示的に無効なら既存構成を保ち、不正な値で通常起動へ切り替えない。既存の単独実行、映像専用、四資源、再構成、再生専用、比較構成との併用は起動前に拒否する。設定が無効な場合は既存の資源登録と選択順序を保つ。既定の共通排他ファイルと実行名の検証も保つ。
 
-診断入口と試験は同じ内部の構成生成処理を使う。生成するのは所有元と依存側の標準 `ContainerResource` 各1件だけである。両者に固定した既存`ASP.NET`イメージと `ImagePullPolicy.Never` を指定し、既存の審判受信プログラムの配布先を `/app` へ読み取り専用で割り当てる。配布先が不足する場合に作成・取得・代替起動を行わない。審判受信を無効にする引数と、所有元39110・依存側39111のHTTP待受設定を構成へ記録する。
+診断入口と試験は同じ内部の構成生成処理を使う。生成するのは所有元と依存側の標準 `ContainerResource` 各1件だけである。両者に固定した既存ASP.NET Coreイメージと `ImagePullPolicy.Never` を指定し、既存の審判受信プログラムの配布先を `/app` へ読み取り専用で割り当てる。配布先が不足する場合に作成・取得・代替起動を行わない。審判受信を無効にする引数と、所有元39110・依存側39111のHTTP待受設定を構成へ記録する。
 
-所有元だけに127.0.0.1の動的`TCP`公開を指定し、依存側には公開先を登録しない。安全な実行名から所有元の物理名を生成し、両資源に実行と役割の所有ラベルを付ける。依存側には `--network container:<owner>` の実行時引数と所有元の開始依存を登録する。将来の実測でも同じ生成処理を使い、試験だけの別構成で代用しない。
+所有元だけに127.0.0.1の動的TCP公開を指定し、依存側には公開先を登録しない。安全な実行名から所有元の物理名を生成し、両資源に実行と役割の所有ラベルを付ける。依存側には `--network container:<owner>` の実行時引数と所有元の開始依存を登録する。将来の実測でも同じ生成処理を使い、試験だけの別構成で代用しない。
 
 この入口は `builder.Resources` と実際の注釈・引数を読み、秘匿情報やホストの絶対保存先を含めないJSONを標準出力へ返す。`Build`、`Start`、`Run`へ進まず、DCP・コンテナ・HTTP待受を起動しない。ホストへの生成物の保存先や、未実装の実行切替設定は追加しない。
 
@@ -214,7 +214,7 @@ I81-07Dは `Tracker.Tests` 専用の実機組成検査とし、I81-07Cの `Names
 
 通常のテストでは環境変数 `DUCK_I81_NAMESPACE_DCP_PROBE_ENABLED` が未指定なら未実行として記録し、成功に数えない。値が存在する場合は `true` だけを有効値とし、それ以外の値はDCP開始前に失敗させる。有効時は `DUCK_I81_NAMESPACE_DCP_EXPECTED_ENGINE_ID` と一意な `DUCK_I81_NAMESPACE_DCP_RUN_ID` を必須とする。既存のDocker 接続先は変更せず、読み取り専用の実行環境ID、実行IDラベル、固定イメージの固定版識別子/保存済み配布物、既存発行物の必要ファイルを照合する。不一致、値の欠落、既存実行ID衝突、イメージまたは発行物の欠落時は、資源を開始・取得せず失敗させる。新しいイメージ取得・ビルド・依存導入は行わない。
 
-有効な場合だけ同じ生成処理から所有元と依存側の標準 `ContainerResource` を一つずつ登録し、AppHostを明示的に開始する。固定版識別子の既存`ASP.NET`イメージは `ImagePullPolicy.Never`、既存発行物は読み取り専用で割り当てる。所有元は `127.0.0.1` の動的`TCP`公開だけを持ち、依存側にはホスト公開を持たせず、`--network container:<owner>` と既存の開始依存を使う。初回2資源と、所有元・依存側それぞれ1回の再作成を観察し、完全ID、実行ID/役割ラベル、現在の実行環境、所有元IDに対する依存側 `HostConfig.NetworkMode`、公開`TCP`を読み取り専用確認する。最大4つのコンテナ世代を記録する。構成生成だけの検査、構成JSON、プロセス起動、作成成功を、DCPの実合成・再作成追従またはアプリケーション通信の証明に置き換えない。
+有効な場合だけ同じ生成処理から所有元と依存側の標準 `ContainerResource` を一つずつ登録し、AppHostを明示的に開始する。固定版識別子の既存ASP.NET Coreイメージは `ImagePullPolicy.Never`、既存発行物は読み取り専用で割り当てる。所有元は `127.0.0.1` の動的TCP公開だけを持ち、依存側にはホスト公開を持たせず、`--network container:<owner>` と既存の開始依存を使う。初回2資源と、所有元・依存側それぞれ1回の再作成を観察し、完全ID、実行ID/役割ラベル、現在の実行環境、所有元IDに対する依存側 `HostConfig.NetworkMode`、公開TCPを読み取り専用確認する。最大4つのコンテナ世代を記録する。構成生成だけの検査、構成JSON、プロセス起動、作成成功を、DCPの実合成・再作成追従またはアプリケーション通信の証明に置き換えない。
 
 `StartAsync` から再作成・読み取り検査・後片付けまで、各回の上限を60秒とする。一回の実行中は自動再試行しない。ユーザーの許可により、課題81の限定範囲内で別の実行を繰り返せる。二回目以降は前回の終了、結果、所有完全IDと残存状態を確認してから開始する。前回の終了が不明なら、保存したプロセスID・開始時刻・引数と所有資源の読み取り専用照合を先に行い、重複起動しない。各回の対象コミット・目的・開始／終了・結果・所有完全ID・残存状態を記録する。期限・失敗時は追加の再作成を止め、残り時間内にDCP所有の通常停止・後片付けを試みる。後片付けが上限を超えた場合は、残存する所有IDと状態を記録し、失敗／未完了として報告する。強制終了や手動のコンテナ削除はしない。後片付けの確認は当該実行ID／役割ラベルと完全IDに限定し、他所有者の資源には操作しない。ネットワーク転送やアプリケーション通信成功はこの検査の判定対象に含めない。
 ### Windows の TCP 待受
@@ -242,7 +242,7 @@ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の�
 | `RefereeDriver:GameControllerUri` | 有効時に必須の絶対形式の接続先アドレス。暗黙の既定接続先はない。 | `ws` または `wss` の `/api/control` を指定する。通常の内部値は `ws://game-controller:8082/api/control`。観測と明示制御に同じ検査済み接続先を渡す。 |
 | `RefereeDriver:InterfaceAddress` | 任意のIPv4アドレス。未指定なら既定の受信インターフェース。 | `224.5.23.1:11003` の受信で共有ポートを許可し、IPv4の全アドレスで待ち受け、指定したインターフェースで参加する。 |
 | `RefereeDriver:AutoDriveToActive` | 真偽値。未指定、`false`、解釈できない値は観測専用。 | `Enabled` と本設定がともに明示した `true` の場合だけ、既存の制御処理を一度実行する。 |
-| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` / `Testing:IdentityControl:ExpectedRole` | `RunId` は空白だけでない文字列。通常の固定 `ResourceId` 経路では `ResourceId` も必須。起動時に資源キーが未確定の明示制御経路では `ExpectedRole` を必須とし、`ResourceId` は未設定にする。 | `RunId` と役割を起動時に固定し、AppHost が照合した `ResourceId` だけを同一 `UDS` 上の `handoff` における初回 `commit` で確定する。送信元アドレスやホスト名から補完しない。 |
+| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` / `Testing:IdentityControl:ExpectedRole` | `RunId` は空白だけでない文字列。通常の固定 `ResourceId` 経路では `ResourceId` も必須。起動時に資源キーが未確定の明示制御経路では `ExpectedRole` を必須とし、`ResourceId` は未設定にする。 | `RunId` と役割を起動時に固定し、AppHost が照合した `ResourceId` だけを同一Unixソケット上の `handoff` における初回 `commit` で確定する。送信元アドレスやホスト名から補完しない。 |
 | `Testing:Diagnostics:ContainerId` / `Testing:Diagnostics:Generation` | 完全なコンテナIDを半角16進表記64桁で指定し、起動世代は正の `Int64` で指定する。 | 未指定・不正値は帰属不明とする。正常復号件数は記録するが、準備完了にはしない。 |
 
 無効時の診断経路は404となり、既存の待受設定を保持する。無効設定は、HTTPサーバー自体を起動しないことを意味しない。コンテナ内の39110待受と、後続のDCPによるWindows 127.0.0.1の動的ポート公開は別に確認する。
@@ -251,13 +251,13 @@ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の�
 
 ### デスクトップブリッジでの `RefereeDriver` 帰属確定
 
-四資源構成などで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は RefereeDriver にも Duck と同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker Engine IDを照合し、対象コンテナだけに `dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control` を実行する。RuntimeHost 側と同じ `prepare` / `challenge` / `commit` の契約を使い、RefereeDriver 側ではコンテナ内の固定位置 `/tmp/duck-referee-identity.sock` で待ち受ける `Unix` ソケットを使う。ソケットはコンテナ外へ公開せず、既存のUDP通信・Game Controller API接続先・Docker Desktop構成を変更しない。
+四資源構成などで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は RefereeDriver にも Duck と同じ実行IDと資源役割ラベルを付け、別々の資源通知監視を登録する。各監視は現在の資源キー・完全なコンテナID・所有ラベル・Docker実行環境の識別子を照合し、対象コンテナだけに `dotnet Duck.Testing.RefereeDriver.Host.dll --identity-control` を実行する。RuntimeHost 側と同じ `prepare` / `challenge` / `commit` の契約を使い、RefereeDriver 側ではコンテナ内の固定位置 `/tmp/duck-referee-identity.sock` で待ち受ける Unixソケットを使う。ソケットはコンテナ外へ公開せず、既存のUDP通信・Game Controller API接続先・Docker Desktop構成を変更しない。
 
 受信開始時点ではコンテナIDと資源キーが未確定でもよいが、帰属は未成立とする。受信中に正しい識別情報が `commit` された時だけ、既存の単一受信処理の世代を切り替え、旧試行と保持中の指令を無効化する。切替後の新しい正常復号件数が増加するまで準備完了にしない。同じ識別情報の再送は冪等とし、`RunId`・資源キー不一致、世代後退、`BootId` の不一致は拒否する。RefereeDriver未選択時またはブリッジ無効時は新しい監視・制御口を起動しない。この受渡しは所有コンテナを照合した実装経路であり、実機での準備完了・Game Controller API対応成立は別途検証する。
 
 ### DebugHost の診断識別子受渡し（比較 DCP）
 
-比較モードで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は登録された DebugHost の現在の資源キーと完全なコンテナIDを、当該実行の `run-id`、`debug-host` 役割ラベル、`Docker Engine ID`、および `Tracker.DebugHost.dll` の起動対象と照合してから、所有コンテナ内の既存 `--identity-control` `exec` 経路を使う。DebugHost は RuntimeHost／RefereeDriver と同じ `prepare` / `challenge` / `commit` 契約を固定位置 `/tmp/duck-debughost-identity.sock` の `Unix` ソケットで受ける。受理は検証済みの実行・資源・役割・完全コンテナID・世代に結び付け、HTTP 接続先や UDP 送信元から識別情報を推定しない。`commit` 時には追跡診断の世代を更新すると同時に視覚入力受信側へ新世代を反映し、旧世代の試行を拒否する。比較の準備判定は新世代に帰属する追跡入力の復号証跡を要求する。視覚入力の世代更新も同時に行い、新しい視覚検出は #102 全体受入で別に確認する。ソケットはホストへ公開せず、AppHost/DCP の所有・停止、UDP 構成、Docker Desktop 設定は変更しない。
+比較モードで `Testing:IdentityControl:DesktopBridgeEnabled=true` を明示した場合、AppHost は登録された DebugHost の現在の資源キーと完全なコンテナIDを、当該実行の `run-id`、`debug-host` 役割ラベル、Docker実行環境の識別子、および `Tracker.DebugHost.dll` の起動対象と照合してから、所有コンテナ内の既存 `--identity-control` `exec` 経路を使う。DebugHost は RuntimeHost／RefereeDriver と同じ `prepare` / `challenge` / `commit` 契約を固定位置 `/tmp/duck-debughost-identity.sock` の Unixソケットで受ける。受理は検証済みの実行・資源・役割・完全コンテナID・世代に結び付け、HTTP 接続先や UDP 送信元から識別情報を推定しない。`commit` 時には追跡診断の世代を更新すると同時に視覚入力受信側へ新世代を反映し、旧世代の試行を拒否する。比較の準備判定は新世代に帰属する追跡入力の復号証跡を要求する。視覚入力の世代更新も同時に行い、新しい視覚検出は #102 全体受入で別に確認する。ソケットはホストへ公開せず、AppHost/DCP の所有・停止、UDP 構成、Docker Desktop 設定は変更しない。
 
 ### 診断ログの共有書込み
 
@@ -310,7 +310,7 @@ AppHost は `ResourceNotificationService.WatchAsync` で資源通知を受け、
 
 DCP/AppHostは資源の作成・起動・停止・削除を引き続き単独で管理する。`exec` は既に起動した対象コンテナ内でRuntimeHostの同梱アセンブリを起動し、診断識別子だけを渡す。別の起動管理者は作らず、Dockerイメージや外部資源、コンテナの起動・停止・削除は操作しない。
 
-常駐RuntimeHostはコンテナ内の固定位置 `/tmp/duck-runtime-identity.sock` で待ち受ける `Unix` ソケットを使い、診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。`prepare` と `commit` には `RunId`、`ResourceId`、役割名、完全な `ContainerId`、`Generation` を含め、両者の識別情報を一致させる。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理した `BootId` と比較し、同じ `ContainerId` でもRuntimeHostプロセスが再起動していれば `Generation` を増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側は `BootId` と識別情報一式の一致を再確認してから受理する。起動時に `ResourceId` が未確定の経路では `ExpectedRole` だけを事前固定し、`ResourceId` 未設定の間は診断を未帰属として503にする。役割名が一致する `prepare` は候補確認に限り、`ResourceId` を関連付けない。同じ接続の `commit` が成功した時だけ `ResourceId` を確定する。`ResourceId` を起動時に明示する既存経路は従来どおり厳格一致させる。
+常駐RuntimeHostはコンテナ内の固定位置 `/tmp/duck-runtime-identity.sock` で待ち受ける Unixソケットを使い、診断制御を受け付ける。`--identity-control` の短命プロセスは同じコンテナ内のこのソケットへ接続し、改行区切りJSONの `prepare` / `challenge` / `commit` を同じ接続で中継する。`prepare` と `commit` には `RunId`、`ResourceId`、役割名、完全な `ContainerId`、`Generation` を含め、両者の識別情報を一致させる。常駐プロセスは起動ごとに新しい `BootId` を持ち、`challenge` で返す。AppHost側は前回受理した `BootId` と比較し、同じ `ContainerId` でもRuntimeHostプロセスが再起動していれば `Generation` を増やしてから、同じ接続へ `expectedBootId` と同じ識別情報一式を `commit` する。常駐側は `BootId` と識別情報一式の一致を再確認してから受理する。起動時に `ResourceId` が未確定の経路では `ExpectedRole` だけを事前固定し、`ResourceId` 未設定の間は診断を未帰属として503にする。役割名が一致する `prepare` は候補確認に限り、`ResourceId` を関連付けない。同じ接続の `commit` が成功した時だけ `ResourceId` を確定する。`ResourceId` を起動時に明示する既存経路は従来どおり厳格一致させる。
 
 AppHostが新たに起動した場合は新しい `RunId` で世代状態を開始し、別の所有者が管理する資源へ `exec` しない。RuntimeHost起動時点ではコンテナIDと資源キーがまだ確定していない場合があるため、その経路では役割名だけを期待値として保持し、受渡し完了まで診断識別情報を未帰属とする。新しい識別情報を受理した時点で診断状態と受信時刻を原子的に初期化し、次の正常な受信が観測されるまでは厳格な準備判定を503に保つ。完全IDの欠落・不正、資源ID・役割名・実行IDの不一致、世代後退、同じ世代で異なるコンテナID、`challenge` 後の `BootId` 変化は拒否する。同じ識別情報の再送は冪等とし、既存の新鮮な証跡を不必要に消さない。
 
@@ -450,15 +450,15 @@ I81-07Eは、承認済みの標準`bridge`方式で満たせる所有管理の�
 - 現世代CM4の接続IPでUDP 50100–50110を受信し、各IDのデータを`127.0.0.1`の同じポートへ転送する。
 - CM4の実行体が`127.0.0.1:12346`へ送る制御UDPを受信し、現在のSimulatorのIP:12346へ転送する。
 
-CM4は各世代の起動時に、その世代の`multicast interface`と既存の`127.0.0.1`宛先を使う。Simulatorの接続先IPを確認するまでは中継先を未設定に保ち、確認後に現世代の宛先を設定する。Simulatorだけが再作成された場合はCM4コンテナを維持し、現CM4の接続先IPをデータ送信先に設定してSimulatorを一度起動する。その後、新Simulatorの接続先IPを中継処理へ反映する。CM4が再作成された場合は、新CM4の接続先IPをSimulatorの既存設定`--ibis-feedback-addr`へ設定してからSimulatorを一度再作成する。得られた新Simulatorの接続先IPは中継処理だけへ反映し、CM4は再作成しない。Craneは07Fの一方向の起動時設定で新CM4の接続先IPへ追従する。
+CM4は各世代の起動時に、その世代のマルチキャスト用インターフェースと既存の`127.0.0.1`宛先を使う。Simulatorの接続先IPを確認するまでは中継先を未設定に保ち、確認後に現世代の宛先を設定する。Simulatorだけが再作成された場合はCM4コンテナを維持し、現CM4の接続先IPをデータ送信先に設定してSimulatorを一度起動する。その後、新Simulatorの接続先IPを中継処理へ反映する。CM4が再作成された場合は、新CM4の接続先IPをSimulatorの既存設定`--ibis-feedback-addr`へ設定してからSimulatorを一度再作成する。得られた新Simulatorの接続先IPは中継処理だけへ反映し、CM4は再作成しない。Craneは07Fの一方向の起動時設定で新CM4の接続先IPへ追従する。
 
 この順序でIP変更の循環を避けられる可能性がある。ただし、接続先IPと所有完全識別子の照合、旧世代の準備状態の無効化、宛先更新の直列化と原子的な適用、遅着通知の拒否、失敗や取消時の安全停止と後片付けが必要である。07Bの`ResourceCommandService`例は一方向の資源再作成と依存先起動を扱い、稼働中の中継先更新や相互世代制御は行わない。`.WaitFor(...)`は初回の起動順序だけを表す。制御面は未選定であり、既存の3秒停止上限を延長しない。制御契約では各更新を実行識別子、CM4の完全識別子と世代、補助処理の起動識別子、Simulatorの完全識別子と世代、設定世代に結び付ける。更新時に旧宛先と準備状態を無効化し、相手側の宛先が確定するまで送信しない。設定反映の確認は設定適用だけを示し、実行体の準備完了を示さない。遅着通知、取消し、結果不明時に旧宛先を復元しない。停止処理は全体で一つの期限を共有し、例外時に期限を再開しない。所有子プロセスを回収できない場合は、そのプロセスが使用中の一時領域を削除せず、残存状態を記録する。通信路と通知形式は未選定であり、この論理契約は製品APIの採用を示さない。
 
-固定実装ではロボットID 0–10が対象で、Simulatorは選択した黄色チームの`128-byte`データを125Hzで`50100+ID`へ送る。CM4は`127.0.0.1`で受信・復号した後、ID別の同報先へ中継する。このUDP経路に応答`ACK`はなく、CM4の現受信処理は送信元アドレスを照合しない。中継処理の受信・転送件数はCM4の復号やCraneの受信を証明しない。実受信を直接示す既存診断口の利用可否も未確認である。
+固定実装ではロボットID 0–10が対象で、Simulatorは選択した黄色チームの128バイトデータを125Hzで`50100+ID`へ送る。CM4は`127.0.0.1`で受信・復号した後、ID別の同報先へ中継する。このUDP経路に応答`ACK`はなく、CM4の現受信処理は送信元アドレスを照合しない。中継処理の受信・転送件数はCM4の復号やCraneの受信を証明しない。実受信を直接示す既存診断口の利用可否も未確認である。
 
 検討を続ける場合の最小試験候補は、初回起動、Simulator単独の再作成、CM4再作成後のSimulatorとCraneの再作成順序、古い完全識別子と遅着通知の拒否、失敗・取消時に旧宛先を準備完了としないこと、所有プロセスだけを期限内に停止することの確認である。候補`B′`は名前空間共有を使わず、`--network container:...`も追加しない。07Dの名前空間試験の失敗は保持するが、直接原因は確定していない。標準`bridge`方式でCM4のUDP通信が成立することも未実測である。
 
-現リポジトリにCM4向けLinux補助プログラムの実装や配布物は見つかっていない。通常CIへ加える読取専用の開発工具診断は、実行時点の`C compiler`有無・対象形式・`libc.a`を読み取れるかだけを記録する。新しい実行物の生成、`static link`、`Debian`イメージとの互換性、配布方法は証明しない。診断結果を依存追加や実行許可として扱わない。
+現リポジトリにCM4向けLinux補助プログラムの実装や配布物は見つかっていない。通常CIへ加える読取専用の開発工具診断は、実行時点のC言語用コンパイラーの有無・対象形式・`libc.a`を読み取れるかだけを記録する。新しい実行物の生成、静的リンク、Debianイメージとの互換性、配布方法は証明しない。診断結果を依存追加や実行許可として扱わない。
 
 ### I81-07H: CM4宛先を適用するホスト側処理
 
@@ -472,7 +472,7 @@ CM4は各世代の起動時に、その世代の`multicast interface`と既存�
 
 ### I81-07I: 制御CLIと前景転送サーバー
 
-07Hの一回ごとの制御CLIと、UDP転送を担う前景サーバーを、同じ実行形式の別モードとして実装する。制御CLIは既存の `--protocol jsonl-v1` で要求を1行読み、応答を1行返す。前景サーバーは明示起動して所有し、自動で `fork` や `daemon` 化しない。CLIはCM4内の非公開 `Unix domain socket` を通じてサーバーへ接続する。サーバー不在、実行ID・CM4完全ID・CM4世代・補助起動IDの不一致では `applied` を返さない。既存の `docker exec -i` は一回の制御要求だけを実行し、転送サーバーの寿命とは分ける。
+07Hの一回ごとの制御CLIと、UDP転送を担う前景サーバーを、同じ実行形式の別モードとして実装する。制御CLIは既存の `--protocol jsonl-v1` で要求を1行読み、応答を1行返す。前景サーバーは明示起動して所有し、自動で `fork` やデーモン化しない。CLIはCM4内の非公開のUnixソケットを通じてサーバーへ接続する。サーバー不在、実行ID・CM4完全ID・CM4世代・補助起動IDの不一致では `applied` を返さない。既存の `docker exec -i` は一回の制御要求だけを実行し、転送サーバーの寿命とは分ける。
 
 設定世代の更新開始時に旧宛先を無効化して新しい世代を予約する。その後、新宛先を公開して応答する前に、受信側の古いUDP受信待ちデータを上限付きで捨てる。共通3秒期限内に空にできない場合は、その世代を無効状態に保ち、応答せず、旧宛先へ戻さない。
 
@@ -482,17 +482,17 @@ CM4は各世代の起動時に、その世代の`multicast interface`と既存�
 
 単体検査は通信路を開かず、実際の要求解析、所有・世代照合、宛先更新とUDPパケットの転送先選択を、送受信境界を置き換えて検証する。固定CM4イメージへの配置、前景サーバーの実起動、UDP実測、CM4内受信・復号、通常 `base` の接続はこの実装単位で証明しない。
 
-同じ実行形式の制御CLIは `--protocol jsonl-v1` だけを受け付け、標準入力の要求を固定通信路 `/tmp/duck-cm4-transport/control.sock` へ渡す。前景サーバーは `--server` とし、実行ID・`Engine ID`・CM4資源ID・完全コンテナID・世代・補助起動ID・CM4側IPv4を明示して起動する。起動引数の不足、重複、未知項目、不正なIPv4は起動前に拒否する。ホストからこの前景サーバーを起動・所有する配線はまだ実装されていない。
+同じ実行形式の制御CLIは `--protocol jsonl-v1` だけを受け付け、標準入力の要求を固定通信路 `/tmp/duck-cm4-transport/control.sock` へ渡す。前景サーバーは `--server` とし、実行ID・Docker実行環境の識別子・CM4資源ID・完全コンテナID・世代・補助起動ID・CM4側IPv4を明示して起動する。起動引数の不足、重複、未知項目、不正なIPv4は起動前に拒否する。ホストからこの前景サーバーを起動・所有する配線はまだ実装されていない。
 
-通信路用ディレクトリは `/tmp/duck-cm4-transport` に限定する。新規作成時は所有 `UID` だけが利用できる `0700` とし、通信路は `0600` とする。既存のシンボリックリンク、別 `UID` または過剰な権限のディレクトリ、稼働中通信路は拒否し、他資源のファイルを削除しない。サーバー終了時は、自ら `bind` した通信路の `inode` と所有 `UID` が一致する場合だけ削除する。ディレクトリは自分が作成し、空である場合に限って削除する。制御CLIの終了を前景サーバーの停止確認とみなさない。
+通信路用ディレクトリは `/tmp/duck-cm4-transport` に限定する。新規作成時は所有者のUIDだけが利用できる `0700` とし、通信路は `0600` とする。既存のシンボリックリンク、別のUIDまたは過剰な権限のディレクトリ、稼働中通信路は拒否し、他資源のファイルを削除しない。サーバー終了時は、自ら `bind` した通信路の inodeと所有者のUID が一致する場合だけ削除する。ディレクトリは自分が作成し、空である場合に限って削除する。制御CLIの終了を前景サーバーの停止確認とみなさない。
 
 前景サーバーは受け取った新しい設定世代で先に旧宛先を無効化し、その後の適用確認を同じ共通状態からの応答とUDP転送の両方で使う。`Simulator` からのUDPはCM4側IPv4の50100–50110で受け、対象IDに対応する `127.0.0.1` の同一ポートだけへ渡す。CM4が `127.0.0.1:12346` へ送る制御UDPは、現在適用済みの `Simulator` IPv4:12346だけへ渡す。宛先または世代が未確認ならどちらの転送も行わない。
 
-既存Ubuntuの通常 `test job` では、追加導入なしの `cc` で同じ共通処理とLinux向けCLI・前景サーバーをビルドし、通信路を開かない共通処理の試験を実行する。`readelf` による `ELF` 形式と動的依存の確認も記録する。Windowsの `MSVC` での共通処理試験はLinux向け `adapter` のビルド・`Unix domain socket` 実装・固定CM4 Linuxとの `ABI` 互換を証明しない。CIの `ELF` 検査も固定CM4イメージへの配置や実通信を証明しない。固定イメージへの配布、前景サーバー起動、UDP実測、CM4側受信・復号、通常 `base` への接続は引き続き未実施である。
+既存Ubuntu上の通常のCIテストでは、追加導入なしの `cc` で同じ共通処理とLinux向けCLI・前景サーバーをビルドし、通信路を開かない共通処理の試験を実行する。`readelf` による ELF形式と動的依存の確認も記録する。WindowsのMSVCでの共通処理試験はLinux向けアダプターのビルド・Unixソケット実装・固定CM4 LinuxとのABI互換を証明しない。CIの ELF検査も固定CM4イメージへの配置や実通信を証明しない。固定イメージへの配布、前景サーバー起動、UDP実測、CM4側受信・復号、通常 `base` への接続は引き続き未実施である。
 
 07IのCM4制御UDPでは、宛先・受信ポートを`12346/UDP`に固定し、送信元ポートは自動割当を許容する。送信元アドレスは既存契約の`127.0.0.1`に限定する。固定CM4では送信ソケットに明示的なポート指定がなく、送信元ポートはOSの自動割当に委ねられる（https://github.com/ibis-ssl/Orion_CM4/blob/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a/cm4/bridge/cm4_sim.cpp#L497-L504）。`12346`は送信元ポート条件ではない。
 
-Linux向け配布候補は、既存の開発資材を使う`-static`による静的リンクを内部実装方式として選ぶ。CIでは実行形式`ELF`の`INTERP`と`DT_NEEDED`がないことを検査する。固定CM4との実行互換性、配置、実通信は別途検証する。
+Linux向け配布候補は、既存の開発資材を使う`-static`による静的リンクを内部実装方式として選ぶ。CIでは実行形式ELFの`INTERP`と`DT_NEEDED`がないことを検査する。固定CM4との実行互換性、配置、実通信は別途検証する。
 ### I81-07J-B1: 通常構成の共通登録処理
 
 `Program` は通常構成の `simulator`、Game Controller、Crane と、`planner` が選択した場合の `cm4-sim` を共通登録処理へ渡す。この処理は既存の Docker 実行資源の経路を使い、起動引数、読み取り専用 Crane 設定、準備確認、起動依存、所有範囲を保つ。比較構成の追加資源と `planner` による `cm4-sim` の選択は従来どおり維持する。
@@ -501,7 +501,7 @@ Linux向け配布候補は、既存の開発資材を使う`-static`による静
 
 ### I81-07J-B2: 通常構成の標準資源登録と準備確認
 
-`Program.cs` が通常構成で選んだ `simulator`、Game Controller、Crane と、`planner` が選んだ場合の `cm4-sim` を標準 `ContainerResource` として登録し、既存の比較構成は起動管理処理のまま維持する。標準資源には共通の実行IDと資源ごとの役割を付ける。UDPをホストへ公開せず、既存のGame Controller操作用 `TCP` 通信は `127.0.0.1` の動的ポートに限定する。既定の計画手法やCM4選択条件、各プログラムの起動引数は変えない。
+`Program.cs` が通常構成で選んだ `simulator`、Game Controller、Crane と、`planner` が選んだ場合の `cm4-sim` を標準 `ContainerResource` として登録し、既存の比較構成は起動管理処理のまま維持する。標準資源には共通の実行IDと資源ごとの役割を付ける。UDPをホストへ公開せず、既存のGame Controller操作用 TCP 通信は `127.0.0.1` の動的ポートに限定する。既定の計画手法やCM4選択条件、各プログラムの起動引数は変えない。
 
 `ResourceNotificationService` の実イベントと現在状態を同じ資源・資源キーで照合し、登録済み資源に限って完全なコンテナID候補と世代を記録する。古い資源キーの遅着通知は再採用しない。置換キーを先に観測した場合は、旧キーの終了が確認されるまでIDを曖昧として公開せず、旧キーの終了後に現在状態を再取得する。曖昧な状態では資源キーとコンテナIDを空にし、準備確認を未完了に保つ。
 
@@ -533,7 +533,7 @@ Craneの診断ファイル設定は比較構成の起動管理処理だけに渡
 
 所有確認は登録済み全資源の起動を待たず、現在実行中で一意な完全IDを持つDCP候補から段階的に行う。未起動または起動中の候補は未準備のままとし、既存の実行環境・所有ラベル・状態・標準ネットワークの照合と現在キー・世代の再確認を省かない。後続資源は起動後に同じ所有確認を受ける。
 
-Simulatorのサービス準備確認には、既存Duckの`画像診断用HTTP経路`で取得する診断を使う。応答の識別情報は、Duck自身の現在の受渡し識別情報と照合し、Simulatorの識別情報として扱わない。現在のSimulatorとDuckについて、所有情報と世代が一致していることを確認する。`画像診断`入力の受信結果では、`受信側の世代値`、正常な復号数、既存の5秒鮮度条件を確認する。Simulatorの世代と受信識別情報ごとに記録した基準値と比べ、復号数が増えた場合に準備完了を記録する。診断取得中に世代、受渡し識別情報、キー、完全IDのいずれかが変わった場合は、古い応答を採用しない。
+Simulatorのサービス準備確認には、既存Duckの診断API `/health/vision` から取得する診断を使う。応答の識別情報は、Duck自身の現在の受渡し識別情報と照合し、Simulatorの識別情報として扱わない。現在のSimulatorとDuckについて、所有情報と世代が一致していることを確認する。画像診断入力の受信結果では、受信側の世代値、正常な復号数、既存の5秒鮮度条件を確認する。Simulatorの世代と受信識別情報ごとに記録した基準値と比べ、復号数が増えた場合に準備完了を記録する。診断取得中に世代、受渡し識別情報、キー、完全IDのいずれかが変わった場合は、古い応答を採用しない。
 
 Duckには既存の画像診断の正常性確認を保ち、重複するDCPの資源別サービス正常性確認を追加しない。診断不足、取得失敗、期限切れ、取消、所有失効はSimulatorの準備を未成立へ戻す。これは固定プログラムの実起動、実通信、他の通常資源のサービス準備、CM4補助処理の配置または再作成・宛先更新が完了したことを示さない。今回の構成試験はこれらの実機確認を含まない。
 
