@@ -42,8 +42,10 @@ public sealed class BaseSimulationResourceRegistrationTests
                     [CraneTargetAddressSettings.ConfigurationKey] = "127.0.0.1",
                 })
                 .Build();
-            Assert.Equal("127.0.0.1", CraneTargetAddressSettings.FromConfiguration(
-                explicitConfiguration, "visibility_graph", fixtureRoot, useStandardBase: true)!.TargetAddress);
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                CraneTargetAddressSettings.FromConfiguration(
+                    explicitConfiguration, "visibility_graph", fixtureRoot, useStandardBase: true));
+            Assert.Contains(CraneTargetAddressSettings.ConfigurationKey, exception.Message, StringComparison.Ordinal);
         }
         finally
         {

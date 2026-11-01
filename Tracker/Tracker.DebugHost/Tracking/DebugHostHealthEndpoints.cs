@@ -47,6 +47,7 @@ internal static class DebugHostHealthEndpoints
         var readiness = comparison.Readiness;
         var evidence = diagnostics?.GetSnapshots("tracker");
         var strict = configuration.GetValue<bool>("Testing:ContainerMode");
+        var visionSnapshot = visionPackets.GetSnapshot();
         var ready = readiness.IsReady && (!strict || (evidence is not null && readiness.Sources.All(source =>
             evidence.Any(item => item.SourceKey == DiagnosticTrackerDeserializer.SourceKey(
                 source.SourceName, source.SourceUuid, source.RemoteEndpoint) && item.IsReady))));
@@ -57,9 +58,21 @@ internal static class DebugHostHealthEndpoints
             readiness.ConflictingRoles,
             readiness.Sources,
             comparison.Pairs,
+            LatestVision = visionSnapshot.Detection is { } detection
+                ? new
+                {
+                    visionSnapshot.PacketCount,
+                    visionSnapshot.DetectionReceivedAt,
+                    detection.FrameNumber,
+                    YellowRobots = detection.RobotsYellow
+                        .Where(robot => robot.HasRobotId)
+                        .Select(robot => new { robot.RobotId, robot.X, robot.Y })
+                        .ToArray(),
+                }
+                : null,
             VisionPacketsReceived = strict
                 ? diagnostics?.GetSnapshots("vision").Sum(s => s.SuccessfullyDecodedCount) ?? 0
-                : visionPackets.GetSnapshot().PacketCount,
+                : visionSnapshot.PacketCount,
             Diagnostics = evidence,
         };
         return ready ? Results.Ok(response) : Results.Json(response, statusCode: StatusCodes.Status503ServiceUnavailable);

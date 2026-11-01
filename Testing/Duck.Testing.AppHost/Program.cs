@@ -444,13 +444,13 @@ if (testingMode is not "base" and not "comparison")
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
-var useCm4Simulator = BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner);
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
     AppContext.BaseDirectory,
-    useStandardBase: testingMode == "base");
-if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber))
+    useStandardBase: true);
+if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
+    simulatorIbisPortNumber is < 1 or > 65535)
 {
     throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
 }
@@ -458,14 +458,6 @@ var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
-if (testingMode == "comparison")
-{
-    var preflightPorts = ExclusiveControlPortPreflight
-        .CreateBaseConfigurationPorts(simulatorIbisPortNumber, useCm4Simulator)
-        .ToList();
-    ExclusiveControlPortPreflight.EnsureAvailable(preflightPorts);
-}
-
 var simulatorImageTag =
     builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
 var simulatorGeometry =
@@ -492,7 +484,7 @@ var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGu
 var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
 var enableStandardBaseDuckIdentityBridge =
     IsEnabled(desktopBridgeSetting) ||
-    testingMode == "base" &&
+    (testingMode is "base" or "comparison") &&
     desktopBridgeSetting is null &&
     !string.IsNullOrWhiteSpace(identityDockerContext) &&
     !string.IsNullOrWhiteSpace(identityExpectedEngineId);
@@ -511,7 +503,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         craneTeamName,
         craneTeamColor,
         fixtureManifestPath,
-        UseStandardDcpResources: testingMode == "base",
+        UseStandardDcpResources: true,
         DuckRunId: duckRunId,
         craneTargetAddressSettings,
         builder.Configuration["Testing:Crane:DiagnosticsPath"],
@@ -526,15 +518,12 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .WithEnvironment("Testing__ContainerMode", "true")
             .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
             .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
-        if (testingMode == "base")
-        {
-            duckBuilder.WithContainerRuntimeArgs(
-            [
-                "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
-                "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
-                "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
-            ]);
-        }
+        duckBuilder.WithContainerRuntimeArgs(
+        [
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
+        ]);
         if (enableStandardBaseDuckIdentityBridge)
         {
             duckBuilder
@@ -559,6 +548,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("RefereeDriver__Enabled", "true")
                 .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
                 .WithEnvironment("Testing__ContainerMode", "true")
+                .WithContainerRuntimeArgs(
+                    "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+                    "--label", $"{DockerContainerSpec.ResourceLabel}=referee-driver",
+                    "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
                 .WaitFor(gameController);
             if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
             {
@@ -568,6 +561,15 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                     .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
                 EnableDesktopIdentityBridge(refereeDriver, duckRunId,
                     "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
+            }
+            if (testingMode == "comparison")
+            {
+                refereeDriver.WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false);
+                var refereeHttp = refereeDriver.Resource.Annotations
+                    .OfType<EndpointAnnotation>()
+                    .Single(endpoint => endpoint.Name == "http");
+                refereeHttp.Port = null;
+                refereeHttp.TargetHost = "127.0.0.1";
             }
         }
     },
@@ -586,8 +588,7 @@ if (testingMode == "comparison")
         AppContext.BaseDirectory,
         "Fixtures",
         "simulation_protocol_comparison.xml");
-    var trackerTigers = builder.AddDockerWrapper(
-        new DockerContainerSpec(
+    var trackerTigersSpec = new DockerContainerSpec(
             "tracker-tigers",
             $"tigersmannheim/sumatra:{tigersImageTag}",
             [
@@ -598,16 +599,14 @@ if (testingMode == "comparison")
             ],
             new Dictionary<string, string>(StringComparer.Ordinal),
             stackId,
-            mounts: [new DockerContainerMount(sumatraProtocolPath, "/Sumatra/config/moduli/simulation_protocol_comparison.xml", ReadOnly: true)]),
-        39105,
-        "java",
-        "tracker-tigers",
-        expectedTrackerSourceName: "TIGERs")
+            duckRunId,
+            mounts: [new DockerContainerMount(sumatraProtocolPath, "/Sumatra/config/moduli/simulation_protocol_comparison.xml", ReadOnly: true)]);
+    var trackerTigers = BaseSimulationResourceRegistration.AddStandardContainer(
+            builder, trackerTigersSpec, duckRunId, "tracker-tigers")
         .WaitFor(simulatorDependency)
         .WaitFor(gameControllerDependency);
 
-    var trackerErForce = builder.AddDockerWrapper(
-        new DockerContainerSpec(
+    var trackerErForceSpec = new DockerContainerSpec(
             "tracker-erforce",
             $"roboticserlangen/autoref:{erForceImageTag}",
             [
@@ -616,11 +615,10 @@ if (testingMode == "comparison")
             "--gc-port", "11003",
             ],
             new Dictionary<string, string>(StringComparer.Ordinal),
-            stackId),
-        39106,
-        "autoref",
-        "tracker-erforce",
-        expectedTrackerSourceName: "ER-FORCE")
+            stackId,
+            duckRunId);
+    var trackerErForce = BaseSimulationResourceRegistration.AddStandardContainer(
+            builder, trackerErForceSpec, duckRunId, "tracker-erforce")
         .WaitFor(simulatorDependency)
         .WaitFor(gameControllerDependency);
 
@@ -628,6 +626,10 @@ if (testingMode == "comparison")
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
     var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
+        .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
         .WithEnvironment("Testing__Mode", "comparison")
         .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
         .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
@@ -650,8 +652,8 @@ if (testingMode == "comparison")
     debugHost
         .WaitForStart(simulatorDependency)
         .WaitForStart(builder.CreateResourceBuilder<IResource>(duck.Resource))
-        .WaitFor(trackerTigers)
-        .WaitFor(trackerErForce)
+        .WaitForStart(trackerTigers)
+        .WaitForStart(trackerErForce)
         .WithHttpHealthCheck("/health/comparison", endpointName: "http");
 }
 

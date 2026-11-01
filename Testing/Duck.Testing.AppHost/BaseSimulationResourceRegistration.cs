@@ -391,7 +391,7 @@ internal static class BaseSimulationResourceRegistration
         return new BaseSimulationResources(duck, simulator, gameController, cm4Simulator, crane);
     }
 
-    private static IResourceBuilder<ContainerResource> AddStandardContainer(
+    internal static IResourceBuilder<ContainerResource> AddStandardContainer(
         IDistributedApplicationBuilder builder,
         DockerContainerSpec spec,
         string runId,
