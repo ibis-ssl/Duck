@@ -1,0 +1,167 @@
+{
+  "stage": "same_frozen_v1_v2_tests_after_parent_owned_implementation_fix",
+  "run_id": 39776500808,
+  "head_sha": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b",
+  "event": "pull_request",
+  "run_conclusion": "failure",
+  "suite": {
+    "total": 615,
+    "passed": 614,
+    "failed": 1,
+    "skipped": 0
+  },
+  "own_v1": {
+    "total": 34,
+    "passed": 34,
+    "failed": 0,
+    "skipped": 0
+  },
+  "own_v2": {
+    "total": 33,
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0
+  },
+  "individual_case_evidence": "TRX directly identifies all own67 and the four initial-failure case names",
+  "initial_failure_run_id": 39775288708,
+  "initial_four_failures_preserved": true,
+  "same_case_closures": [
+    {
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: \"\")",
+      "initial_outcome": "Failed",
+      "fixed_outcome": "Passed"
+    },
+    {
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)",
+      "initial_outcome": "Failed",
+      "fixed_outcome": "Passed"
+    },
+    {
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)",
+      "initial_outcome": "Failed",
+      "fixed_outcome": "Passed"
+    },
+    {
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: \"\")",
+      "initial_outcome": "Failed",
+      "fixed_outcome": "Passed"
+    }
+  ],
+  "other_suite_failure": "outside own namespace; name available in TRX result metadata, body/cause uninspected; returned to parent",
+  "implementation_change_contents": "not read or described",
+  "v1_11_v2_9_hashes_unchanged": true,
+  "v1_manifest_sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+  "v2_manifest_sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+  "processes": [
+    {
+      "session": 63322,
+      "watch_exit": 1,
+      "runner_exit": 0,
+      "collected": true
+    },
+    {
+      "session": 8609,
+      "artifact_download_exit": 0,
+      "runner_exit": 0,
+      "collected": true
+    }
+  ],
+  "read_content_scope": "specified run metadata/logs/TRX; no product or existing-test body; other archive contents unread",
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx",
+      "sha256": "efb4d82ae76ce9ae194e55291eabba9c8de6a0e4e8120f26a1956bfeed258904",
+      "bytes": 871838
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-download-command.json",
+      "sha256": "14044cb93d23d26e4a57ea1ebb8f9d0dcecf5e98708f7dc40925b9afe274aab8",
+      "bytes": 158
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-download.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifacts.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifacts.stdout.log",
+      "sha256": "3a16cf19543f44b327338cc361cac552c26b53da81d50c3ef67522a5a04d3e4d",
+      "bytes": 751
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/ci-evidence.json",
+      "sha256": "9caf0ac1d4e4a54ff6cbb9db63d5ed05d5d5a4bd57c3c4d9c24d9efc6b2daac4",
+      "bytes": 7042
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/collect-ci.py",
+      "sha256": "388d968a2d2f3c0fb094c4e6b43c1329b25ae6fe537beee8208baad2ae363e4f",
+      "bytes": 3527
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/commands.json",
+      "sha256": "d695cba6ccd1b6733e180f4332141015cf911504ea07f3aa602b155bc9e4cb16",
+      "bytes": 2654
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/failure-artifact.zip",
+      "sha256": "d700239a7ae6875c56b145a10823c3065e7e159de457f29b346f4d1decbbc808",
+      "bytes": 11308481
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/final-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/final-view.stdout.log",
+      "sha256": "249d99d0ffd6e89d6a2db40f9f36ea2b1e9ed3dabb9db6152cfc87a4f422f044",
+      "bytes": 2436
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/initial-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/initial-view.stdout.log",
+      "sha256": "11bac6942b2c259024ac0ad9bbe5a547cf40a5231bd8f753fb870a344d5bd968",
+      "bytes": 1951
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/own-case-results.json",
+      "sha256": "c82ddb461257ea25d5f1139f5bac3a4c817c4ef4c18347527ac76a3eb681c367",
+      "bytes": 35253
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/own-test-matches.log",
+      "sha256": "a054c73a122f00a1838e5d6300cb2b24c20db73ae8cbb83d54ff2808673a4e97",
+      "bytes": 1471
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/test-job-log.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/test-job-log.stdout.log",
+      "sha256": "1e03152aaba13015d99b1ccd5fb8c8b0df04b6314115420db1c78c32def74486",
+      "bytes": 55832
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/watch.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/watch.stdout.log",
+      "sha256": "46e61241df98252d4400f72e8a296dae2c4f6c14f5d656543c00aea174e65e7d",
+      "bytes": 1485
+    }
+  ]
+}

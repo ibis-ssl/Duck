@@ -1,0 +1,37 @@
+{
+  "baseline": "0037ef0aa200cbd5d702ba17aace5b04c5f8dd2b",
+  "placement": "active new testfile; existing tests and production unchanged",
+  "cases": [
+    {
+      "test": "CallerCancellationEndsOnlyItsPendingSubscription",
+      "contract": "IRefereeCommandSource caller cancellation and single pump",
+      "expected": "pending same-counter waiter cancels; pump remains active, receive count3/max1, decoded2"
+    },
+    {
+      "test": "NullPreviousCounterReturnsFreshCacheButPollingDoesNotExtendItsAge",
+      "contract": "previous null, known receive age and freshness boundary",
+      "expected": "cached counter7 available at exact freshness; after1tick waiter pending, age unchanged by poll, count2/receive3/max1"
+    },
+    {
+      "test": "EndedRunDoesNotReturnCachedCommand",
+      "contract": "03A Run終了/同世代の所有と失敗閉鎖",
+      "expected": "正常2件後Run終端、prevnull購読pending、件数2/notready、caller取消で回収; Run終了例外型未固定"
+    },
+    {
+      "test": "InvalidPacketDoesNotReturnCachedCommandAndNextValidPacketCanCompleteWaiter",
+      "contract": "03A 不正packet失敗閉鎖/単一pump継続/正常復帰",
+      "expected": "正常2後破損0xff、旧cache返却なし/count2/notready; 次正常counter8で購読完了/count3/maxreceive1"
+    },
+    {
+      "test": "RestartAndDelayedOldEpochDoNotReturnCachedCommand",
+      "contract": "03A 再開世代/旧callback拒否/購読と診断",
+      "expected": "再開時旧cacheなし、遅延旧epochcounter8で購読pending/count2/notready; 現epochcounter9で完了/count3/maxreceive1"
+    }
+  ],
+  "not_executed": true,
+  "remaining": [
+    "Run end/invalid packet/old epoch cache notification rejection",
+    "real UDP/Dispose",
+    "03B/C"
+  ]
+}

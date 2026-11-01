@@ -1,0 +1,22 @@
+{
+  "name": "owner-socket-green-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~FailedServerDoesNotDeleteAnotherOwnersSocketPath"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:14:28.247071+00:00",
+  "runner_pid": 1189634,
+  "child_pid": 1189635,
+  "exit": 0,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "46d21189856db8f351abec0002872282d731179fa359e865d5477f1335072121",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 4094,
+  "stderr_bytes": 0
+}\n

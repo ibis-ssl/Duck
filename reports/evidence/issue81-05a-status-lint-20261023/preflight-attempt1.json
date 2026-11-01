@@ -1,0 +1,8 @@
+{
+  "command": "PowerShell here-string | wsl.exe -d Ubuntu -- python3 -",
+  "result": "failed before any linter process",
+  "cause": "manually transcribed expected markdown-targets.json SHA had a missing substring",
+  "expected_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91706e3630716da",
+  "actual_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+  "python_exit": 1
+}

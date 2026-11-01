@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/home/donabe/yomiyasu-v1.1.0-0df4774/scripts/yomiyasu_lint.py",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-06a1-yomiyasu-20261023/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "--json",
+    "--strict"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-06a1-yomiyasu-20261023",
+  "input": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+  "input_sha256": "3437732d3f830cc907ca27cc388f88460772b67c6a69ff38649cb0f0130d554b",
+  "exit_code": 0
+}

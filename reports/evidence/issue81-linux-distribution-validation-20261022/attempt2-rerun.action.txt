@@ -1,0 +1,4 @@
+command=& 'C:\Program Files\GitHub CLI\gh.exe' run rerun 39867225445 --failed -R ibis-ssl/Duck
+shell=powershell; login=false; sandbox_permissions=require_escalated
+reason=single rerun authorized after exact-source comparison and confirming attempt 1 terminal failure at head fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9
+exit_code=0; stdout=(empty); stderr=(empty)

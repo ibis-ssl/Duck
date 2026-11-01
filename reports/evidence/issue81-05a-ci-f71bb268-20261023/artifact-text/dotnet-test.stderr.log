@@ -1,0 +1,3 @@
+[xUnit.net 00:00:01.81]     Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress [FAIL]
+[xUnit.net 00:00:01.92]     Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp [FAIL]
+[xUnit.net 00:00:01.99]     Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp [FAIL]

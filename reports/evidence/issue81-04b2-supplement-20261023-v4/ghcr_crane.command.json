@@ -1,0 +1,21 @@
+{
+  "name": "ghcr_crane",
+  "argv": [
+    "curl",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--head",
+    "--max-time",
+    "30",
+    "--header",
+    "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+    "https://ghcr.io/v2/ibis-ssl/crane/manifests/scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d"
+  ],
+  "exit": 0,
+  "url": "https://ghcr.io/v2/ibis-ssl/crane/manifests/scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+  "stdout_bytes": 307,
+  "stderr_bytes": 0,
+  "stdout_sha256": "934fa1ba896127e59bb2a934aa86f52fe5e8d6136d4db396900cc125351e5430",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

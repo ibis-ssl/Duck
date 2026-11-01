@@ -1,0 +1,373 @@
+[
+  {
+    "path": "all745-outcomes.json",
+    "sha256": "95991d1a851d616466ae4b58c3a20684cea511f751db045902368d2f037f6a6c",
+    "bytes": 275664,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/all745-outcomes.json"
+  },
+  {
+    "path": "artifact-12454799622.zip",
+    "sha256": "5a2d8a488994e6571b9b2b4386f8d6acee297d48a8000b2dba1aae347bbf258d",
+    "bytes": 22715483,
+    "stored": false,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifact-12454799622.zip"
+  },
+  {
+    "path": "artifact-download.command.json",
+    "sha256": "3b9621a30eb21b823c1834fad861b2c7b4d2ebce1fc19d213e3667ec5a09fdde",
+    "bytes": 387,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifact-download.command.json"
+  },
+  {
+    "path": "artifact-download.exit.json",
+    "sha256": "20736819c481a13549143e7ded2264cfc168106cfb9ce7d01aca51a5bd8c5e9d",
+    "bytes": 67,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifact-download.exit.json"
+  },
+  {
+    "path": "artifact-download.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifact-download.stderr.log"
+  },
+  {
+    "path": "artifact-integrity.json",
+    "sha256": "e9a8f732ec145340ef91605eb4827b401d87ae5bfc4212bb1a858a814c068e04",
+    "bytes": 706,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifact-integrity.json"
+  },
+  {
+    "path": "artifacts/dotnet-test.binlog",
+    "sha256": "8039ace7388f2b9a9905889e100d7119c111cda93d71ab64f1de288dc6c1e2b1",
+    "bytes": 1591086,
+    "stored": false,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/dotnet-test.binlog"
+  },
+  {
+    "path": "artifacts/dotnet-test.exit-code",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "bytes": 2,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/dotnet-test.exit-code"
+  },
+  {
+    "path": "artifacts/dotnet-test.stderr.log",
+    "sha256": "b8d76819a2f8f61ab9d6e055aa6601bb9f9ef24e3f15cacc342c1c3145ed3f3e",
+    "bytes": 998,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/dotnet-test.stderr.log"
+  },
+  {
+    "path": "artifacts/dotnet-test.stdout.log",
+    "sha256": "abc13d987a251bec387a278d9a3acaa1dcd28d68784b2c6cfdf35fd010e34e24",
+    "bytes": 10463,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/dotnet-test.stdout.log"
+  },
+  {
+    "path": "artifacts/dotnet-test.trx",
+    "sha256": "a25140749e5fd1f15529ed4f74c96d06dc810367753186e0bf8f6bbdab592869",
+    "bytes": 1064936,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/dotnet-test.trx"
+  },
+  {
+    "path": "artifacts/environment.txt",
+    "sha256": "474c1b4cbe552244744dbd5d2f47ed3440f60a3ccfdd7204ff34713289c6b543",
+    "bytes": 3462,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/environment.txt"
+  },
+  {
+    "path": "artifacts/source.tar.gz",
+    "sha256": "8c2fb39aae5f3446edd0a5b6b30309dc3c4837ae5143272b4c151061de1518e6",
+    "bytes": 20636764,
+    "stored": false,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/source.tar.gz"
+  },
+  {
+    "path": "artifacts/vstest-diagnostics.datacollector.26-10-22_20-12-54_65524_5.log",
+    "sha256": "5d504768d9c0d3f5a9981b47a41a0c17a9747dd80bbf5a06a0ceb6b3e015f5d4",
+    "bytes": 1315621,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/vstest-diagnostics.datacollector.26-10-22_20-12-54_65524_5.log"
+  },
+  {
+    "path": "artifacts/vstest-diagnostics.host.26-10-22_20-12-54_97426_5.log",
+    "sha256": "f171a20e82b5bc0da6535bbae1d7c0223f7adaa2443df7fd6dc13c4dda9ee799",
+    "bytes": 2974993,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/vstest-diagnostics.host.26-10-22_20-12-54_97426_5.log"
+  },
+  {
+    "path": "artifacts/vstest-diagnostics.log",
+    "sha256": "8cf7ab837038996bfd396169352617a833d91b6bc4532cd0238a9155991394af",
+    "bytes": 2350298,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts/vstest-diagnostics.log"
+  },
+  {
+    "path": "artifacts.command.json",
+    "sha256": "e5423becff92b716501e8dce35e4eb42b0546651791bd0a3ea659c354f370022",
+    "bytes": 277,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.exit.json",
+    "sha256": "7ba8bf335bb68d8dbb8ca539a2ace363f6eb17f8223752480f6505f80150703e",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts.exit.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "bbc0c1f9b6135e10e24830bb1ce02a683c816388d3645cb9ad116fbe5312262d",
+    "bytes": 751,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "26487ff7f832d1de9f32c3488f01dc0a43a796809a0770635cd695054929f04e",
+    "bytes": 6635,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "collect.py",
+    "sha256": "3c3d270227684698238f7f9202e7ad932c7533c0dbf7a00f70aae2a295a5e743",
+    "bytes": 743,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/collect.py"
+  },
+  {
+    "path": "content-magic-inventory.json",
+    "sha256": "e7ac4f3b4c21fc3a57abe7c60e334850f6e867881cf56ab190af1acf989d7f63",
+    "bytes": 406,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/content-magic-inventory.json"
+  },
+  {
+    "path": "final-git-status.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/final-git-status.command.json"
+  },
+  {
+    "path": "final-git-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/final-git-status.stdout.log"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "6d0f063224fcd2de3fbabd9b9a97775c811e873cc9a4becf3937fb8cb8eb9fc4",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.exit.json",
+    "sha256": "7b0d4e3ca91a81e571195f83829fd8f5a3b04989e8d39e06d2bc032af46bf9d3",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/final-view.exit.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "8233ea03bfee6218b988e442f2379a86071ebba7448fe285ee0b26caa151b5a8",
+    "bytes": 2531,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "functional-red-assertions.json",
+    "sha256": "4cff0d3dcb60d1a09788566ebe5e369eb7da2db94d515d7e1b661c3c5db84417",
+    "bytes": 2352,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/functional-red-assertions.json"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "febb997cfc326fde141bbb062ddf1cdde02f6278434336671a3b36cbf4940a67",
+    "bytes": 25499,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "host11-outcomes.json",
+    "sha256": "7566dd2893f2554412842d348096c812e3ce939459289bb90fff13471bcf2bdd",
+    "bytes": 7579,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/host11-outcomes.json"
+  },
+  {
+    "path": "initial-list.command.json",
+    "sha256": "a6cb81e789ae92119ef30f1d1f2b630f3dba629c638bbceb171516468f49c7cf",
+    "bytes": 447,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-list.command.json"
+  },
+  {
+    "path": "initial-list.exit.json",
+    "sha256": "f35c0f2dcd8c22575cf2d2ed4d7e3f07b5c067b422d99aa9fba4377cd134ef39",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-list.exit.json"
+  },
+  {
+    "path": "initial-list.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-list.stderr.log"
+  },
+  {
+    "path": "initial-list.stdout.log",
+    "sha256": "1b3a2e0ebf7069abed8c2f38099c88d8460bd86937dee98d6b323f852eae7c1c",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-list.stdout.log"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "ff893730de7cea63cf28a480da4d1ec65931e23c462a4526640ea2d8465d0e52",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.exit.json",
+    "sha256": "808ad1d5b041014bd8e9b3f0bfd92c84325a8e1cb9d29e89f267978740dbdb11",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-view.exit.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "345b2212d648adeaed4c6a867b92e86d86b02f37056f2e3be062f19d3f1187ca",
+    "bytes": 2037,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "fa8e9311cff8fbe6bcb6c8b310182f578eaad988ee3118311cdd907f00895cbf",
+    "bytes": 7743,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/inventory.json"
+  },
+  {
+    "path": "new-host-build-proof.json",
+    "sha256": "713d5277cdf63513c6900349d1bcf88a62b48ab33a39c449cb89c22b7ebf2d07",
+    "bytes": 542,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/new-host-build-proof.json"
+  },
+  {
+    "path": "old734-and-fixed67.json",
+    "sha256": "3e28ce52d0a0f238f9f57a7e5627f85e51d588eca73cd11a33e79301472f28f4",
+    "bytes": 308647,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/old734-and-fixed67.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "f37bb15eb25be9a691c71c692594f6f98c2eeb7bd7c621822ef3f7dfdebed5ef",
+    "bytes": 273,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/readback.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "c656e98931928f0cf8cae92ff21cce5b2fd2a1e5052cecd84a91a8b80ae363ba",
+    "bytes": 267,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.exit.json",
+    "sha256": "879a59d9f72b44de3a4980ffa7b7f997582dae56f2a407f6911c3a5d84103095",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/run-log.exit.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "f568bfc17420c2e748ef028a34762b02eba4b30ea77219d73e00679e9752db65",
+    "bytes": 67175,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "trx-counters.json",
+    "sha256": "bd870e4214445d40be4831e07514fe68746f0bfc109306e8f1cd0a3f8fc89c03",
+    "bytes": 327,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/trx-counters.json"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "3929ed1ce596b2e71db2c80df1321672c7493f218b36847e5c423039e569123b",
+    "bytes": 304,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.exit.json",
+    "sha256": "50c3bb175c1f3280536df8f213213437173b4541c201d19aef3c64e7419b5f7f",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/watch.exit.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "5c436ac46c9230aab90e7350e9a72dca7661a23744061ec2c2a24677a5c291dc",
+    "bytes": 1970,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-ci-20261022/watch.stdout.log"
+  }
+]

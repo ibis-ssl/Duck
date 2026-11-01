@@ -1,0 +1,214 @@
+{
+  "runId": 39830103395,
+  "headSha": "4958ed9fa7f1f5accce59c0a783a83ffcac5d204",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39830103395",
+  "jobs": [
+    {
+      "id": 120003668340,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 120003671165,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120004430996,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "counts": {
+    "total": 677,
+    "executed": 677,
+    "passed": 673,
+    "failed": 4,
+    "error": 0,
+    "timeout": 0,
+    "notExecuted": 0
+  },
+  "deadline11": {
+    "failed": 4,
+    "passed": 7,
+    "details": "deadline11-outcomes.json",
+    "failureLocations": [
+      "GameControllerStateDeadlineTests.cs:40 stage0/1/2 Assert.True(token.IsCancellationRequested)",
+      "GameControllerStateDeadlineTests.cs:114 Assert.Null(error), MaxValue connected and threw InvalidOperationException"
+    ]
+  },
+  "old666": {
+    "namesMatchedPreviousTRX": true,
+    "allIndividuallyPassed": true,
+    "fixedIndependent67IndividuallyPassed": true,
+    "transport13AndInitialTestPassed": true,
+    "racePassed": true,
+    "details": "old666-and-fixed67.json"
+  },
+  "sourceCount": 28,
+  "ciArchiveHeadDiskExpectedMatch": true,
+  "fixedDeadlineTestSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+  "artifactCount": 1,
+  "artifactDigestVerified": true,
+  "trx": {
+    "path": "artifacts/dotnet-test-failure-39830103395-1/dotnet-test.trx",
+    "sha256": "cf80b68fb11dbcc7eb9c8b0e57af611ad5bc81da63fcd120587795cb05b6d0fd"
+  },
+  "sourceArchive": {
+    "path": "artifacts/dotnet-test-failure-39830103395-1/source.tar.gz",
+    "sha256": "0ea5acfc80866726e577097c334ee6ab0e066547683dbf2b3c0f70c1259a797a"
+  },
+  "commands": [
+    {
+      "evidence": "artifact-download.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/artifacts/12447234538/zip"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:20:34.792042+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:20:40.821495+00:00"
+    },
+    {
+      "evidence": "artifacts.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39830103395/artifacts"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:20:14.175497+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:20:14.760594+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39830103395",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:20:14.174691+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:20:15.734953+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39830103395",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:18:22.572594+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:18:23.811643+00:00"
+    },
+    {
+      "evidence": "progress-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39830103395",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,status,conclusion,jobs,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:19:53.864087+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:19:55.270019+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39830103395",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:20:14.174958+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:20:16.657824+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "4958ed9fa7f1f5accce59c0a783a83ffcac5d204",
+        "--event",
+        "pull_request",
+        "--json",
+        "databaseId,headSha,status,conclusion,event,url,workflowName",
+        "--limit",
+        "10"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:18:21.662755+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:18:22.530384+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39830103395",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:18:23.811846+00:00",
+      "exit_code": 1,
+      "ended_utc": "2026-10-22T18:19:52.903955+00:00"
+    }
+  ],
+  "classification": "4 observed runtime assertion failures; not compile error/timeout; parent owns validRed adoption",
+  "productBehaviorChanged": false,
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

@@ -1,0 +1,989 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "sha256": "8b63389037f55793d4e87fe672526d02695710a213a796e14b915d005695aff2",
+    "bytes": 222,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+    "bytes": 32,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "baseline-focused-sudachi-phases-status.command.json",
+    "sha256": "993969700a52e869fe862584da73234e74a95713d959836b2704d7f4995cf59c",
+    "bytes": 574,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-phases-status.command.json"
+  },
+  {
+    "path": "baseline-focused-sudachi-phases-status.json",
+    "sha256": "7b8d55b4163ff0045d05e6bf2dd2a39df26248c18ab0a7a48af1da19a5bc9d1a",
+    "bytes": 5016,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-phases-status.json"
+  },
+  {
+    "path": "baseline-focused-sudachi-phases-status.stderr.log",
+    "sha256": "7bdd9a8feecb84e0f24e0bf6a3a5ffe0078a1bb6887e8baf478bbccd83bba83b",
+    "bytes": 3113,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "baseline-focused-sudachi-phases-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "baseline-focused-sudachi-tasks-status.command.json",
+    "sha256": "bde5eb1a1d3e245d0b4a13e7a49b2f5005ea27c3e10dc9c55023cb12ad4a7131",
+    "bytes": 572,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "baseline-focused-sudachi-tasks-status.json",
+    "sha256": "26d18e2c8b9bbf2ecd4fe7c71d47404494eeab5b465b7da87d9af379891e8bfd",
+    "bytes": 39269,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-tasks-status.json"
+  },
+  {
+    "path": "baseline-focused-sudachi-tasks-status.stderr.log",
+    "sha256": "177ab6bb3c1f6622c1587620c0d7a931dc1ebe2022f2326b39ccd171cb2a711d",
+    "bytes": 20585,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "baseline-focused-sudachi-tasks-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-focused-sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "baseline-phases-status.md",
+    "sha256": "c1d85e85dfaa2dfd9b506e07a5b066cda02e0805a0ac7626a7b2fab04d561790",
+    "bytes": 10922,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-phases-status.md"
+  },
+  {
+    "path": "baseline-spell.command.json",
+    "sha256": "08fdb1223068cd041929742d37bc9b1efa9195e8a91d8d05769b32a2e6572fbc",
+    "bytes": 483,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-spell.command.json"
+  },
+  {
+    "path": "baseline-spell.stderr.log",
+    "sha256": "24073504da9b986a3f1e5c4d14047b98a3c3a8b99cd64c688672004c4458ee57",
+    "bytes": 147,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-spell.stderr.log"
+  },
+  {
+    "path": "baseline-spell.stdout.log",
+    "sha256": "f30c9283285fc832cc533b079c8dc86c31dfa64d827b93179e09ad334dcce3ba",
+    "bytes": 7498,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-spell.stdout.log"
+  },
+  {
+    "path": "baseline-sudachi-phases-status.command.json",
+    "sha256": "f084de88b6cf46c90e805a94ba82069b43517592cd579267ca34f7d7121b3a0b",
+    "bytes": 341,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-sudachi-phases-status.command.json"
+  },
+  {
+    "path": "baseline-sudachi-phases-status.stderr.log",
+    "sha256": "7bdd9a8feecb84e0f24e0bf6a3a5ffe0078a1bb6887e8baf478bbccd83bba83b",
+    "bytes": 3113,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "baseline-sudachi-phases-status.stdout.log",
+    "sha256": "1c776fe7a5af9b0a960298191aeeff8f31bd96027e79e99b4c99b88596de24c3",
+    "bytes": 1403,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "baseline-sudachi-tasks-status.command.json",
+    "sha256": "bc7067462ad1ed544e55b42e9b1b169e7666c124215f3deb57f2b7dda80b6c74",
+    "bytes": 340,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "baseline-sudachi-tasks-status.stderr.log",
+    "sha256": "177ab6bb3c1f6622c1587620c0d7a931dc1ebe2022f2326b39ccd171cb2a711d",
+    "bytes": 20585,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "baseline-sudachi-tasks-status.stdout.log",
+    "sha256": "3abc53ed40fbbfcb49a8db29e75df3b1e480a9ff6d46be0d70d23d5fd693cb5c",
+    "bytes": 8672,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "baseline-tasks-status.md",
+    "sha256": "983d42dbb7754b86f0b12982193a67f3b0cc6912f820d25b97788a0a0a3e87b7",
+    "bytes": 86767,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-tasks-status.md"
+  },
+  {
+    "path": "baseline-text.command.json",
+    "sha256": "2dd8df40429404a2da145ee23f6698b4cf94c91ccad3a19772a4d34929f257e8",
+    "bytes": 482,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-text.command.json"
+  },
+  {
+    "path": "baseline-text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-text.stderr.log"
+  },
+  {
+    "path": "baseline-text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/baseline-text.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "1d4fb53797ce532bd5120d09c21ec42a28d0eb7bfd5675712e77a5a04a7d50be",
+    "bytes": 15097,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-aggregate-lines.txt",
+    "sha256": "a8c94727a905683f4d79bfa826f46984b8b8289d98f7f171ac41ae0a294081dc",
+    "bytes": 457,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/ci-identity-aggregate-lines.txt"
+  },
+  {
+    "path": "cleanup-junction.command.json",
+    "sha256": "95cc443ef0f8e45dc9107f8797271665204090b4876663da5625ba75d82198f8",
+    "bytes": 296,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/cleanup-junction.command.json"
+  },
+  {
+    "path": "cleanup.json",
+    "sha256": "df4d4c8e4c1dea5f99d53f033e90a7d8547df62b944190208ae367b6a654d974",
+    "bytes": 175,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/cleanup.json"
+  },
+  {
+    "path": "cspell-baseline-final-delta.json",
+    "sha256": "cea4e660dd43551a332a3aa2cfbb90df91347f336a58f9044e94dc7475676ca5",
+    "bytes": 125389,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/cspell-baseline-final-delta.json"
+  },
+  {
+    "path": "current-phases-status.md",
+    "sha256": "2e11f2a9d90375d2bcf1cbf833ed853158cfa01deffd12b1866cb9d443d92303",
+    "bytes": 13919,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-phases-status.md"
+  },
+  {
+    "path": "current-spell.command.json",
+    "sha256": "922f123ff03e9967d9430799ca9c4b8b4ccef28d19ff400b2927320b0604742a",
+    "bytes": 483,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-spell.command.json"
+  },
+  {
+    "path": "current-spell.stderr.log",
+    "sha256": "5f52fe19186f24bbc2c9810c01c383ee392f6fbec948decf942983ea93aae26d",
+    "bytes": 147,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-spell.stderr.log"
+  },
+  {
+    "path": "current-spell.stdout.log",
+    "sha256": "a4741bdd882a998464b533fb8bc0c92a00c67909ffd54652e8478a2c974b366a",
+    "bytes": 9636,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-spell.stdout.log"
+  },
+  {
+    "path": "current-sudachi-phases-status.command.json",
+    "sha256": "69aff187ce24e07de8379c161000f02c527367712713f6ff428a4677ec885fed",
+    "bytes": 341,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-sudachi-phases-status.command.json"
+  },
+  {
+    "path": "current-sudachi-phases-status.stderr.log",
+    "sha256": "1081efa5b7dfb9de9ea8056a8daf898b39ec0482f6d03695b4a8db449ff2d9a5",
+    "bytes": 13349,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "current-sudachi-phases-status.stdout.log",
+    "sha256": "9c668ecea3e4a05876da6b8fd695a39e233e7f2d61d620638f92c959ff1104bb",
+    "bytes": 4473,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "current-sudachi-tasks-status.command.json",
+    "sha256": "4aa4cb144dafc527bb08797a565c790498c0df8a989b822ab3814655237dd19b",
+    "bytes": 340,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "current-sudachi-tasks-status.stderr.log",
+    "sha256": "b910432f612162ffec2a7c10c705c2b5f043849c726893b91b95a5c41de0e735",
+    "bytes": 20443,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "current-sudachi-tasks-status.stdout.log",
+    "sha256": "cae0b7649c37a104b63dee0b5186861fbb1f52df6b642b12957f78b82543274a",
+    "bytes": 13906,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "current-tasks-status.md",
+    "sha256": "87055f34ed430a1d255c1b4192f271416246447c2e5bc8b40cae11f899b0147a",
+    "bytes": 91430,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-tasks-status.md"
+  },
+  {
+    "path": "current-text.command.json",
+    "sha256": "9c9ef17f5d791d58858ec0c015b6760e10aa7f31cec9310a69c1138795c77544",
+    "bytes": 482,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-text.command.json"
+  },
+  {
+    "path": "current-text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-text.stderr.log"
+  },
+  {
+    "path": "current-text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/current-text.stdout.log"
+  },
+  {
+    "path": "effective-audit.cjs",
+    "sha256": "3cdf58a62c30c335613e5fa29cb083e9c670c5cf5e7827c6798be5f38654cf79",
+    "bytes": 416,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-audit.cjs"
+  },
+  {
+    "path": "effective-config-audit-file.command.json",
+    "sha256": "00d71467ba00b012bfafe3c0ed6fbbeb3bba2b8180c2fbae4d911d6549bcbccf",
+    "bytes": 383,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-config-audit-file.command.json"
+  },
+  {
+    "path": "effective-config-audit-file.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-config-audit-file.stderr.log"
+  },
+  {
+    "path": "effective-config-audit-file.stdout.log",
+    "sha256": "6751d860fed38bc42ac00fa2ec05f30af34b03d6fb86bb8d2ddbabbcd35e062e",
+    "bytes": 25789,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-config-audit-file.stdout.log"
+  },
+  {
+    "path": "effective-config-audit.command.json",
+    "sha256": "8fc30c9cfd2f8b18094830c237cee50fb9c45a28e6573931974e5816c709a846",
+    "bytes": 795,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-config-audit.command.json"
+  },
+  {
+    "path": "effective-config-audit.stderr.log",
+    "sha256": "c06a6f6800ef8d418c0785731739959634d3b9b76ba8c76ddce311d75b9ab323",
+    "bytes": 1086,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-config-audit.stderr.log"
+  },
+  {
+    "path": "effective-config-audit.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/effective-config-audit.stdout.log"
+  },
+  {
+    "path": "final-focused-spell.command.json",
+    "sha256": "b0ea4480d4442839ff95723264f20dab561ab7c5b627064fa3b67f5e37aebf52",
+    "bytes": 483,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-spell.command.json"
+  },
+  {
+    "path": "final-focused-spell.stderr.log",
+    "sha256": "a5bcd5fdf2ce31c1a7439eb0ab8baf842c6be94ac19693568d31043bd0b067f0",
+    "bytes": 147,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-spell.stderr.log"
+  },
+  {
+    "path": "final-focused-spell.stdout.log",
+    "sha256": "08476c8019233db0d53ff05c9c1354823059fb40adcefe13c2f6262334dc7dbe",
+    "bytes": 8596,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-spell.stdout.log"
+  },
+  {
+    "path": "final-focused-sudachi-phases-status.command.json",
+    "sha256": "201cff32d699f46c5d38bf9e91f6c09f9d47f896eeed9613a2c449e3eced3d5f",
+    "bytes": 571,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-phases-status.command.json"
+  },
+  {
+    "path": "final-focused-sudachi-phases-status.json",
+    "sha256": "e3551eae97a88b7e293c9b3882cd0148f3605142e5653d658de3ea7aee928b81",
+    "bytes": 9987,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-phases-status.json"
+  },
+  {
+    "path": "final-focused-sudachi-phases-status.stderr.log",
+    "sha256": "f5c05a3271c0af9d409ae193254620b5a3153fe96360fddd8993243058b2bc4b",
+    "bytes": 6223,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "final-focused-sudachi-phases-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "final-focused-sudachi-tasks-status.command.json",
+    "sha256": "ca7d5d501ea86968dd2be52b4921ef4e104eea903b63075f5d6f18bc41b517ca",
+    "bytes": 569,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "final-focused-sudachi-tasks-status.json",
+    "sha256": "319f224a356a035f3ddb36cf0c250f23ad868d2c518ad3e030c0e63ab8d0a1cb",
+    "bytes": 65216,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-tasks-status.json"
+  },
+  {
+    "path": "final-focused-sudachi-tasks-status.stderr.log",
+    "sha256": "3d3b7acee669a3d100b1eed8d5f92a6c6cc8a0de4bc122b6e9dceedb9b9128ac",
+    "bytes": 20522,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "final-focused-sudachi-tasks-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "final-focused-targets.command.json",
+    "sha256": "9a852668cd1c79314d597ede2994dbc2e812f5c93569d47e1035bc7db2dcf614",
+    "bytes": 478,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-targets.command.json"
+  },
+  {
+    "path": "final-focused-targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-targets.stderr.log"
+  },
+  {
+    "path": "final-focused-targets.stdout.log",
+    "sha256": "477bd42f9dbba5cc354cb92f44d4986fa458d52ae8c4b3c59a016380473b22eb",
+    "bytes": 63,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-targets.stdout.log"
+  },
+  {
+    "path": "final-focused-text.command.json",
+    "sha256": "9ca45eacf20507229cf7fd56ce7bdbd43daa1706c91a8ea5363c41a11306ec2c",
+    "bytes": 482,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-text.command.json"
+  },
+  {
+    "path": "final-focused-text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-text.stderr.log"
+  },
+  {
+    "path": "final-focused-text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-focused-text.stdout.log"
+  },
+  {
+    "path": "final-full-spell.command.json",
+    "sha256": "da3d3af387b317188275885e6ce75e825f20912c91544e399ac10ebe6bf708f6",
+    "bytes": 412,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-spell.command.json"
+  },
+  {
+    "path": "final-full-spell.stderr.log",
+    "sha256": "0a324b80bd21e67109d7b816b822942de9d98a6a222ed7817477baf3f50e7c34",
+    "bytes": 1543,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-spell.stderr.log"
+  },
+  {
+    "path": "final-full-spell.stdout.log",
+    "sha256": "b7f2a5ba8238c0110d7b357021291b5b2178054ee5668f4ba1b29e10a65829ae",
+    "bytes": 18862,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-spell.stdout.log"
+  },
+  {
+    "path": "final-full-sudachi.command.json",
+    "sha256": "4b15918e0e8a7c14f1c5c3652dd8f33d91bc9423930023d48fef455928304cae",
+    "bytes": 500,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-sudachi.command.json"
+  },
+  {
+    "path": "final-full-sudachi.json",
+    "sha256": "eb3687446c0744422a31bcf583e7fedec2200bd826df075cafcf72e589d476a2",
+    "bytes": 229723,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-sudachi.json"
+  },
+  {
+    "path": "final-full-sudachi.stderr.log",
+    "sha256": "41ee9509af18be132ed65baa38ac4387b1d164948e45d62f176833909552085b",
+    "bytes": 26311,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-sudachi.stderr.log"
+  },
+  {
+    "path": "final-full-sudachi.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-sudachi.stdout.log"
+  },
+  {
+    "path": "final-full-text.command.json",
+    "sha256": "ddf4415ddc0915e77222ec9a722cfaa6953cef04772945b865ad8066533e6791",
+    "bytes": 411,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-text.command.json"
+  },
+  {
+    "path": "final-full-text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-text.stderr.log"
+  },
+  {
+    "path": "final-full-text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-full-text.stdout.log"
+  },
+  {
+    "path": "final-phases-status.md",
+    "sha256": "944826a21ed56b2d3da1116c2b42471fb825a682ca84cd30e7b44e9e91ac7dd4",
+    "bytes": 11942,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-phases-status.md"
+  },
+  {
+    "path": "final-tasks-status.md",
+    "sha256": "e3e7e811974f2c19668da26779754cf00b300c6df9a9c5db11a0d77752fe4866",
+    "bytes": 90026,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-tasks-status.md"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "7b4227d5ef8828a5c956db1309014f522ad85431aa152e2dce15d0121d27e1e3",
+    "bytes": 272,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "446878e78c7aa3d6780046d0e316d2b6987d7785d47bd81283d10864f2c1d92b",
+    "bytes": 2461,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "full-spell.command.json",
+    "sha256": "0f08dc8fe958db08a23cf0a2f232f8770b11b358f1927d1c73e22ace0f0c7874",
+    "bytes": 412,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-spell.command.json"
+  },
+  {
+    "path": "full-spell.stderr.log",
+    "sha256": "556a22244336c7434f6d4e8666e00ddd2c64822cf2f6e12cfdc748db9281b1df",
+    "bytes": 1543,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-spell.stderr.log"
+  },
+  {
+    "path": "full-spell.stdout.log",
+    "sha256": "120f349b49dd16171ef526458dd54b182b3cc129118d50035f89af0470744dec",
+    "bytes": 19902,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-spell.stdout.log"
+  },
+  {
+    "path": "full-sudachi.command.json",
+    "sha256": "8c981888ffe000c6c29d5ac32c61b22ff006d1aa2109fea07f0801a8c883fe76",
+    "bytes": 265,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-sudachi.command.json"
+  },
+  {
+    "path": "full-sudachi.stderr.log",
+    "sha256": "8d36090047182c17ed26d637ae489a13f815f0fce3467b33c908ec7b24b54398",
+    "bytes": 26312,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-sudachi.stderr.log"
+  },
+  {
+    "path": "full-sudachi.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-sudachi.stdout.log"
+  },
+  {
+    "path": "full-text.command.json",
+    "sha256": "39895c842a0a403169897d9be5a8271b5ea2eaf11befad06b66350d42b4db499",
+    "bytes": 411,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-text.command.json"
+  },
+  {
+    "path": "full-text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-text.stderr.log"
+  },
+  {
+    "path": "full-text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/full-text.stdout.log"
+  },
+  {
+    "path": "git-diff-check.command.json",
+    "sha256": "684cecd0f08282dff3e225a92490f74de0b407b81d191b0f0a27f20f79d942c9",
+    "bytes": 137,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/git-diff-check.command.json"
+  },
+  {
+    "path": "git-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/git-diff-check.stderr.log"
+  },
+  {
+    "path": "git-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/git-diff-check.stdout.log"
+  },
+  {
+    "path": "git-status.txt",
+    "sha256": "1251e26ed26ff7cbde15af3e07f88ea5706e0f3b3210ace95f4cb6569db1b4b4",
+    "bytes": 131,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/git-status.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "5223e2066140a5303e24fb1366aa86219f318dfc37fa79286041c577b9e56c16",
+    "bytes": 6817,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-runs.command.json",
+    "sha256": "2f2bdc3a21b90fe9edea5d8a55fb50b17146b69a9499152987f19e14514fae32",
+    "bytes": 269,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/initial-runs.command.json"
+  },
+  {
+    "path": "initial-runs.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/initial-runs.stderr.log"
+  },
+  {
+    "path": "initial-runs.stdout.json",
+    "sha256": "a2790a384d7d281e7395679000c35d27768d89dbd7052f725b8f4688beb59915",
+    "bytes": 36,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/initial-runs.stdout.json"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "5ff493fca0599f21f54b3258386f9f232b16dd12e8d799609426151c17f9a7ff",
+    "bytes": 21399,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/inventory.json"
+  },
+  {
+    "path": "junction.command.json",
+    "sha256": "17e678462fba86324e21928ed1c8f13f3263ba27159a6c61c2658fd9daa78dec",
+    "bytes": 451,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/junction.command.json"
+  },
+  {
+    "path": "junction.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/junction.stderr.log"
+  },
+  {
+    "path": "junction.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/junction.stdout.log"
+  },
+  {
+    "path": "markdown-gate-summary.json",
+    "sha256": "a8ed9f5575100b874f479a803ac7590a0b0691e8ef32b746346828c3bf160055",
+    "bytes": 7283,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/markdown-gate-summary.json"
+  },
+  {
+    "path": "mirror-files.json",
+    "sha256": "69e71e86b4fe9eae6585b6d1cababa62668086db6a2668c648d5aeaba18dd940",
+    "bytes": 17475,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/mirror-files.json"
+  },
+  {
+    "path": "mirror-state.json",
+    "sha256": "a9d84bbc12535135497a576dd19e9ac48613bfe994e420abdfe738c9233da2ab",
+    "bytes": 563,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/mirror-state.json"
+  },
+  {
+    "path": "module-audit.cjs",
+    "sha256": "57c0f50d88ee74895851732e83dff2e7b80bf5303bdeb8919eae96314be1f4ae",
+    "bytes": 427,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-audit.cjs"
+  },
+  {
+    "path": "module-resolution-file.command.json",
+    "sha256": "1e0a91f5b8b241fc0b96da110a7e7c483952666580cc7dd5922e11fdfc90b9f1",
+    "bytes": 380,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-resolution-file.command.json"
+  },
+  {
+    "path": "module-resolution-file.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-resolution-file.stderr.log"
+  },
+  {
+    "path": "module-resolution-file.stdout.log",
+    "sha256": "ad16998880c2edf9f98bef4b8d875c06ca08b057c61073597efceef78687125b",
+    "bytes": 815,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-resolution-file.stdout.log"
+  },
+  {
+    "path": "module-resolution.command.json",
+    "sha256": "7ac68dcdcc1fba5d14e9c79ce3c1c14ab3381d3f8487990f912e96313c14dd4a",
+    "bytes": 684,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-resolution.command.json"
+  },
+  {
+    "path": "module-resolution.stderr.log",
+    "sha256": "47d1b8d23295c6caafe2234bbd3615e31075c02a23ae7755965f09415cbbeb6d",
+    "bytes": 786,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-resolution.stderr.log"
+  },
+  {
+    "path": "module-resolution.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/module-resolution.stdout.log"
+  },
+  {
+    "path": "node-version.command.json",
+    "sha256": "6b36d8120e4268ee9267ce95b28a1353fd040271cdd2668c9abc02f1597a9f70",
+    "bytes": 373,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/node-version.command.json"
+  },
+  {
+    "path": "node-version.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/node-version.stderr.log"
+  },
+  {
+    "path": "node-version.stdout.log",
+    "sha256": "a18ba454716b5449eabf6c34a4418c2678b600d8c81c01d5ca876f529ea4d626",
+    "bytes": 10,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/node-version.stdout.log"
+  },
+  {
+    "path": "old-run-latest.command.json",
+    "sha256": "8a893ab4842727cfea79cd43d7943037fd04cb66aed17b5667989c359bd07ef6",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/old-run-latest.command.json"
+  },
+  {
+    "path": "old-run-latest.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/old-run-latest.stderr.log"
+  },
+  {
+    "path": "old-run-latest.stdout.json",
+    "sha256": "f3093d237fb655a5478d39c52082b74dcb84fa5b36fd77260379a64238436a76",
+    "bytes": 12058,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/old-run-latest.stdout.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "678d45b803422fd57854fab3cdeb2a93f6f20ca44048b7efc080783fcfc6f7af",
+    "bytes": 197,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/process-state.json"
+  },
+  {
+    "path": "report-child-readback.md",
+    "sha256": "efc7581c4777459cf789b31719ff08cb0e85bdccdfb252e654453c6b865f6015",
+    "bytes": 133770,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/report-child-readback.md"
+  },
+  {
+    "path": "report-prefix-before.sha256",
+    "sha256": "a8fa35f66296072b1f29f1afcb0a3e52e989f659d01596a9c94d33ecc304ee01",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/report-prefix-before.sha256"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "9f50aa3af10ee4eb97076eb0b06c817749a7171266cbfa3f1d5066819b5225ad",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "61b1491dac9634718848c92db29f0e5703ae75ecc31ec12cf2861abaf316310b",
+    "bytes": 48707,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "runs-second.command.json",
+    "sha256": "7b00d0c5b46db5a314e50fb6a331f6a3f234a15ba71e5c97c33f7d07d3933b29",
+    "bytes": 269,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/runs-second.command.json"
+  },
+  {
+    "path": "runs-second.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/runs-second.stderr.log"
+  },
+  {
+    "path": "runs-second.stdout.json",
+    "sha256": "dd110b28e7ff57487f0202db1379a023141b00ae0c4c22079cb319f136d29a4b",
+    "bytes": 12101,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/runs-second.stdout.json"
+  },
+  {
+    "path": "sudachi-baseline-final-delta.json",
+    "sha256": "1c96533e181d6d344d0f585b38da53b7e3d5a29196c0028e2340f4ea14b1aaf9",
+    "bytes": 597410,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/sudachi-baseline-final-delta.json"
+  },
+  {
+    "path": "sudachi-capture.py",
+    "sha256": "1b9c1da3cd480c17f4df144891b0c3bc16ea97737a5afa96c58f1b70bacb6b2d",
+    "bytes": 875,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/sudachi-capture.py"
+  },
+  {
+    "path": "sudachi-versions.command.json",
+    "sha256": "f903d82c12dfb9c2be7e0ebedb155df0c2407ac1fa44664c0506e67e1825be09",
+    "bytes": 256,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/sudachi-versions.command.json"
+  },
+  {
+    "path": "sudachi-versions.stdout.log",
+    "sha256": "8a86e6a1848772fda6b26b4548e7b3d1d9b80eb747b279c97282d00d30f26646",
+    "bytes": 75,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/sudachi-versions.stdout.log"
+  },
+  {
+    "path": "target-list-python.txt",
+    "sha256": "22cdd09a0c9c6e103bfdf292b3cd0c39ca94e5a92d2d15664406fe05ea54bbc2",
+    "bytes": 1157,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/target-list-python.txt"
+  },
+  {
+    "path": "targets.command.json",
+    "sha256": "eb7ccd2287807b4ae932ae0cae2b689b566ba033066d1c85696e30387ab3d598",
+    "bytes": 407,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/targets.command.json"
+  },
+  {
+    "path": "targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/targets.stderr.log"
+  },
+  {
+    "path": "targets.stdout.log",
+    "sha256": "5b1f39223238d39407505b40aef6a463e8a647befc95524767641ec6fe7faf25",
+    "bytes": 1157,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/targets.stdout.log"
+  },
+  {
+    "path": "whitelist-audit.cjs",
+    "sha256": "37ffa0e52a06036ddd353d1ad504c298b427dc289d05e7947380c9d40ddfb23e",
+    "bytes": 596,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/whitelist-audit.cjs"
+  },
+  {
+    "path": "whitelist-audit.command.json",
+    "sha256": "783e42d746b855a230c0df1bafba2fd7b780ec2d44a381d90a1df71bd0d0436a",
+    "bytes": 338,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/whitelist-audit.command.json"
+  },
+  {
+    "path": "whitelist-audit.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/whitelist-audit.stderr.log"
+  },
+  {
+    "path": "whitelist-audit.stdout.log",
+    "sha256": "ab54a5c345768453b3d57b18b5e3439ef47eadc8aa8efd2e59dd6f3e1606d171",
+    "bytes": 3835,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/whitelist-audit.stdout.log"
+  }
+]

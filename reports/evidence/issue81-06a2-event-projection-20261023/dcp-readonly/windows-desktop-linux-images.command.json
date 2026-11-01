@@ -1,0 +1,16 @@
+{
+  "command": [
+    "C:\\Users\\donabe\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+    "--context",
+    "desktop-linux",
+    "image",
+    "ls",
+    "--digests",
+    "--format",
+    "{{json .}}"
+  ],
+  "exit": 0,
+  "stdoutFile": "windows-desktop-linux-images.stdout.raw",
+  "scope": "read-only existing Docker Desktop CLI image listing; no pull/build/create/start/exec",
+  "capturedUtc": "2026-10-23T14:58:18.5577425Z"
+}

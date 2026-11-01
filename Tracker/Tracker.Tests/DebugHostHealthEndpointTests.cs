@@ -17,12 +17,14 @@ public sealed class DebugHostHealthEndpointTests
         using var trackerSnapshots = new ExternalTrackerSnapshotStore(trackerManager);
         var visionPackets = new VisionPacketStore();
         var receivedAt = DateTimeOffset.UtcNow;
+        var detection = new SSL_DetectionFrame { FrameNumber = 77 };
+        detection.RobotsYellow.Add(new SSL_DetectionRobot { RobotId = 4, X = 1250, Y = -300 });
         visionPackets.StorePacket(
-            new SSL_WrapperPacket { Detection = new SSL_DetectionFrame() },
+            new SSL_WrapperPacket { Detection = detection },
             new IPEndPoint(IPAddress.Loopback, 10020),
             receivedAt);
         visionPackets.StorePacket(
-            new SSL_WrapperPacket { Detection = new SSL_DetectionFrame() },
+            new SSL_WrapperPacket { Geometry = new SSL_GeometryData() },
             new IPEndPoint(IPAddress.Loopback, 10020),
             receivedAt.AddMilliseconds(1));
         var configuration = new ConfigurationBuilder()
@@ -38,6 +40,17 @@ public sealed class DebugHostHealthEndpointTests
         var response = Assert.IsAssignableFrom<IValueHttpResult>(result).Value;
         Assert.NotNull(response);
         Assert.Equal(2L, response.GetType().GetProperty("VisionPacketsReceived")?.GetValue(response));
+        var latestVision = response.GetType().GetProperty("LatestVision")?.GetValue(response);
+        Assert.NotNull(latestVision);
+        Assert.Equal(2L, latestVision.GetType().GetProperty("PacketCount")?.GetValue(latestVision));
+        Assert.Equal(receivedAt, latestVision.GetType().GetProperty("DetectionReceivedAt")?.GetValue(latestVision));
+        Assert.Equal(77u, latestVision.GetType().GetProperty("FrameNumber")?.GetValue(latestVision));
+        var yellowRobots = Assert.IsAssignableFrom<IEnumerable<object>>(
+            latestVision.GetType().GetProperty("YellowRobots")?.GetValue(latestVision));
+        var yellowRobot = Assert.Single(yellowRobots);
+        Assert.Equal(4u, yellowRobot.GetType().GetProperty("RobotId")?.GetValue(yellowRobot));
+        Assert.Equal(1250f, yellowRobot.GetType().GetProperty("X")?.GetValue(yellowRobot));
+        Assert.Equal(-300f, yellowRobot.GetType().GetProperty("Y")?.GetValue(yellowRobot));
         Assert.Empty(Assert.IsAssignableFrom<IEnumerable<TrackerComparisonSourceStatus>>(
             response.GetType().GetProperty("Sources")?.GetValue(response)));
     }

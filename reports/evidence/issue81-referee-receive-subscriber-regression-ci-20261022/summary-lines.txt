@@ -1,0 +1,10 @@
+test	Check out repository	2026-10-22T15:16:58.6260627Z HEAD is now at 6c6fde7 Merge b67a3a42535acc58e11625bc0a8f2731a1902d15 into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+test	Run dotnet test	2026-10-22T15:17:11.1750047Z ^[[36;1mdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1750468Z ^[[36;1m  --logger "trx;LogFileName=dotnet-test.trx" \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1750834Z ^[[36;1m  --results-directory "$results_dir" \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1751184Z ^[[36;1m  --diag "$results_dir/vstest-diagnostics.log" \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1751494Z ^[[36;1m  --blame \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1751714Z ^[[36;1m  -m:1 \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1751926Z ^[[36;1m  /nr:false \^[[0m
+test	Run dotnet test	2026-10-22T15:17:11.1752197Z ^[[36;1m  -bl:"$results_dir/dotnet-test.binlog" \^[[0m
+test	Run dotnet test	2026-10-22T15:18:08.1430085Z Passed!  - Failed:     0, Passed:   631, Skipped:     0, Total:   631, Duration: 28 s - Tracker.Tests.dll (net10.0)

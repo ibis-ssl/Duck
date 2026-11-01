@@ -1,0 +1,66 @@
+{
+  "governingSources": [
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260",
+    "reports/issue81-referee-driver-scope-20261022.md:66,90",
+    "Tracker/Design/tasks-status.md:I81-03B",
+    "parent selected deadline TDD unit"
+  ],
+  "cases": [
+    {
+      "id": "deadline-connect",
+      "test": "DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(0)",
+      "expected": "default3sec; pending1tick before; at expiry operation token canceled, result null, caller active, no unacquired socket disposal; write0",
+      "preImplementation": "expected runtimeRed token cancellation assertionfalse"
+    },
+    {
+      "id": "deadline-receive",
+      "test": "DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(1)",
+      "expected": "explicit2sec; no inbound frames; expiry token canceled, result null, owned socket disposed1/write0",
+      "preImplementation": "expected runtimeRed token cancellation assertionfalse"
+    },
+    {
+      "id": "deadline-after-initial",
+      "test": "DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(2)",
+      "expected": "gcState notsuccess; next receive pending, explicit2sec expiry null/dispose1/write0",
+      "preImplementation": "expected runtimeRed token cancellation assertionfalse"
+    },
+    {
+      "id": "caller-cancel",
+      "test": "CallerCancellationRemainsCancellationBeforeDeadline(true/false)",
+      "cases": 2,
+      "expected": "pending connect/receive caller cancellation propagates OCE; receive socketdisposed1/write0",
+      "preImplementation": "expected regressionGreen"
+    },
+    {
+      "id": "invalid-options",
+      "test": "InvalidOptionsReturnNoObservationWithoutConnecting",
+      "cases": 6,
+      "input": "bytes0/-1, timeoutticks0/-1/-10000/long.MaxValue",
+      "expected": "null/noexception/no connection; no optionvalue silently removes finite deadline",
+      "preImplementation": "first5 expected regressionGreen; MaxValue expected runtimeRed Assert.Null(error), connection guardexception"
+    }
+  ],
+  "totalNewCases": 11,
+  "expectedRedCases": 4,
+  "expectedRegressionCases": 7,
+  "locations": {
+    "DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame": 14,
+    "Assert.True(token.IsCancellationRequested": 40,
+    "CallerCancellationRemainsCancellationBeforeDeadline": 59,
+    "InvalidOptionsReturnNoObservationWithoutConnecting": 93,
+    "Assert.Null(error);": 43
+  },
+  "timeRangeDecision": "Existing default3sec unchanged. Nonpositive including InfiniteTimeSpan invalid. TimeSpan.MaxValue cannot be scheduled by BCL timer/CTS finite dueTime; upper numeric boundary for later implementation is maximum supported finite timer dueTime (4294967294ms), not a new external performance promise.",
+  "fixtureMechanics": "manualTimeProvider invokes singleShot timers; pending cooperative transport records supplied cancellationtoken and ends when canceled; assert internal token cancellation first so timeout is not counted as Red; subsequent WaitAsync5sec is only watchdog/cleanup.",
+  "guaranteeLimit": "cooperative BCL-like connect/receive cancellation only; cannot force arbitrary injected delegate ignoring cancellation to finish or dispose a socket not handed to client; no forced kill or environmental action.",
+  "scaffold": "none required; existing optional TimeProvider/options and connect seam suffice; production bytes unchanged",
+  "formalExecution": "unexecuted; remote_ci_only parent exactSHA PR CI after commit/push",
+  "notInScope": [
+    "STOP/RUNNINGmap",
+    "snapshotepoch/sequence",
+    "APIfreshnessUDPcomparison",
+    "AutoDrive",
+    "03C",
+    "externalservice/Desktop/DCPacceptance"
+  ]
+}

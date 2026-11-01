@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
+    <ProjectReference Include="..\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tracker.Tests" />
+    <InternalsVisibleTo Include="Duck.Testing.RefereeDriver.Host" />
   </ItemGroup>
 
 </Project>

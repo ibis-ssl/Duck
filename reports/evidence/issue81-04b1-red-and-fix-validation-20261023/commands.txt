@@ -1,0 +1,6 @@
+gh run view 39878834053 --repo ibis-ssl/Duck --json databaseId,headSha,status,conclusion,event,workflowName,createdAt,updatedAt,attempt,jobs,url
+gh run view 39878834053 --repo ibis-ssl/Duck --log-failed
+gh api repos/ibis-ssl/Duck/actions/runs/39878834053/artifacts
+gh run download 39878834053 --repo ibis-ssl/Duck --name linux-publish-failure-39878834053-1 --dir <evidence-dir>
+gh pr view 84 --repo ibis-ssl/Duck --json headRefOid,baseRefOid,mergeCommit,mergeStateStatus,state,isDraft
+wsl.exe -d Ubuntu -- bash -lc <git show 1e8f624... three files | sha256sum>

@@ -1,0 +1,58 @@
+[
+  {
+    "stage": "baseline-fragments",
+    "path": "Tracker/Design/tasks-status.md",
+    "sourceLines": [
+      27,
+      30
+    ],
+    "fullSourceSHA256": "6ec23b0d1ab3b1dd0d488ec5d990a214fca08a95aec985876a45194a67dc6889",
+    "fragmentSHA256": "4bb8810a27581b5e7dc8877da87d623e24d2cd2b59326503f1d0609c098657a8",
+    "sourceLineSHA256": [
+      "ac8f7ca0b242f3e15ff8c3a5edd0b32c0e826892b24564c159108c9ab2ae5c3d",
+      "4365612699696f0e4628e737534ea767cddaecca07e10b33f1e9179a53978404"
+    ],
+    "notFullDocuments": true
+  },
+  {
+    "stage": "baseline-fragments",
+    "path": "Tracker/Design/phases-status.md",
+    "sourceLines": [
+      14
+    ],
+    "fullSourceSHA256": "1f64e5804923ab635ce34d8a3daf6d8131fd60324c188875bbccd1c80dd90889",
+    "fragmentSHA256": "59b157c2b33ca8cd6747a5f24f6758646f66e99d8a24d68b36de26f427fed9ac",
+    "sourceLineSHA256": [
+      "875b0fb3ee4ce91c42f4e098a35a175f1ad3188ed876e2969bdd1390414f493a"
+    ],
+    "notFullDocuments": true
+  },
+  {
+    "stage": "final-fragments",
+    "path": "Tracker/Design/tasks-status.md",
+    "sourceLines": [
+      27,
+      30
+    ],
+    "fullSourceSHA256": "76107ea8d88262767b37cdfd39c98d06ee21cb1da2e6d3f6fa10e1064fcc4bcd",
+    "fragmentSHA256": "80bb182c306b7ba50d719e7b44bf005e3acc9d963f026e6fbd749b7149343ff6",
+    "sourceLineSHA256": [
+      "7c6c89669c8ffcb6d9d764d73d77346e076898b03ca44c8ac29348b9a85c6b87",
+      "f60b8b2319f0673723251e2ca121a8f5a6f843f55d3febcdbd90cdf2ae2a4549"
+    ],
+    "notFullDocuments": true
+  },
+  {
+    "stage": "final-fragments",
+    "path": "Tracker/Design/phases-status.md",
+    "sourceLines": [
+      14
+    ],
+    "fullSourceSHA256": "6eef0b4910011da3531192c4dec02efbc8f19177ad33149346760ecebd1df79d",
+    "fragmentSHA256": "75da0227e2e815049bf7046ddb3f6ec04a4f83ee540284ddd31c6a610d59b929",
+    "sourceLineSHA256": [
+      "a3cfce5c4f07524a4c7fff264d7993cc02a3ff45292847b8105a89410b6003a3"
+    ],
+    "notFullDocuments": true
+  }
+]

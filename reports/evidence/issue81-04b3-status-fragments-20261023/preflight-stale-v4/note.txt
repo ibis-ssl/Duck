@@ -1,0 +1,1 @@
+Superseded preflight: the v4 fragment set contained unchanged rows at tasks-status.md:33/35 and stale phase content, not the requested changed tasks:36/phases:19. These commands exited 0 on the wrong input and are not evidence for the requested rows. Retained without overwriting.

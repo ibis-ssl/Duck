@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/usr/lib/dotnet/dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly",
+    "--logger",
+    "console;verbosity=minimal"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "03f98c986be388d23acd02417bf5b7bf6704b2fe",
+  "source_sha256": "48cf90d3cfe87cb2623e3bbca4becee7d49a1cf8eeb4a675e6414a64ad9e1e9a",
+  "assets_sha256": "488d87375bbc89e656f555ea31de13b3ae336da22cfe65de24b9015d981e1b23",
+  "started_unix": 1792784561.2832587,
+  "elapsed_seconds": 8.089505910873413,
+  "exit": 1,
+  "timeout": false
+}

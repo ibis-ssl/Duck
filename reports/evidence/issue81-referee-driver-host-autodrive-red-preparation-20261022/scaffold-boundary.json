@@ -1,0 +1,7 @@
+{
+  "newType": "RefereeDriverWebSocketTransport : IGameControllerWebSocketTransport",
+  "constructor": "only null guard; no socket/connection/receive/send/ownership behavior",
+  "SendJsonAsync": "Task.CompletedTask; no cancellation/connection/initial Output/send/dispose behavior",
+  "existingApplicationAndWorkers": "byte-identical to exact1c8c8270, no AutoDrive selection or control DI registration",
+  "implementationBeginsOnlyAfter": "parent accepts exact-SHA runtime Red"
+}

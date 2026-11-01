@@ -1,0 +1,5 @@
+command=& 'C:\Program Files\GitHub CLI\gh.exe' run view 39867225445 -R ibis-ssl/Duck --json databaseId,headSha,status,conclusion,attempt,workflowName,url,jobs
+shell=powershell; login=false; sandbox_permissions=require_escalated
+exit_code=0
+status=completed; conclusion=failure; attempt=1; headSha=fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9
+Run dotnet test=failure; Verify Linux application publish outputs=skipped; failure diagnostics upload=success

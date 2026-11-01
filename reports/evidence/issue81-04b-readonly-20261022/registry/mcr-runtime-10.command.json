@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "mcr.microsoft.com/dotnet/runtime:10.0"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "metadata_only": true
+}

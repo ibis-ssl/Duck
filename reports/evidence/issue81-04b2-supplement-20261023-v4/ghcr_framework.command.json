@@ -1,0 +1,21 @@
+{
+  "name": "ghcr_framework",
+  "argv": [
+    "curl",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--head",
+    "--max-time",
+    "30",
+    "--header",
+    "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+    "https://ghcr.io/v2/ibis-ssl/framework-simulatorcli/manifests/a52b6bd"
+  ],
+  "exit": 0,
+  "url": "https://ghcr.io/v2/ibis-ssl/framework-simulatorcli/manifests/a52b6bd",
+  "stdout_bytes": 324,
+  "stderr_bytes": 0,
+  "stdout_sha256": "019af317beb70a0700452534f4a048f6a4fd4cbaf9833485f5a65d02d20f5e31",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

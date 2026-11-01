@@ -1,0 +1,135 @@
+{
+  "files": [
+    {
+      "path": "RefereeReceiveService.after.cs",
+      "bytes": 3605,
+      "sha256": "d908ba59f7d0895f9cb6536cd2db803b6e5b214c13637a1cdc986fd50bee6920"
+    },
+    {
+      "path": "RefereeReceiveService.before.cs",
+      "bytes": 3385,
+      "sha256": "7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d"
+    },
+    {
+      "path": "ServiceReceiveDiagnostics.after.cs",
+      "bytes": 10583,
+      "sha256": "86aa44082a0945ddeac957e8fa8a1ee823223b7e6afc82c11ca132b7e8ab1223"
+    },
+    {
+      "path": "ServiceReceiveDiagnostics.before.cs",
+      "bytes": 9825,
+      "sha256": "2a4bc355600eaafa6266705a20db7c094d166bbf4a6f0a56456a6031a7a79989"
+    },
+    {
+      "path": "ServiceReceiveDiagnostics.syntax-api.txt",
+      "bytes": 1393,
+      "sha256": "c1a2ecce1d5ba04aa8a1a178854050666560e7197efe08fecfab58e5070dfb2a"
+    },
+    {
+      "path": "diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "driver-build.command.json",
+      "bytes": 207,
+      "sha256": "10db2eeb8fd21f0c7028dd5d22edec4959fb58580124234991b71be19b443ab7"
+    },
+    {
+      "path": "driver-build.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "driver-build.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "driver-build.stdout.log",
+      "bytes": 3246,
+      "sha256": "7bba73da973494845a9064a275e837f5823cc2fb72db8e7caeb490e03989489b"
+    },
+    {
+      "path": "library-build.command.json",
+      "bytes": 203,
+      "sha256": "8fad4b01ef584f0a464957046e39d7d74b9eee78d0083983510020557a7ad5c9"
+    },
+    {
+      "path": "library-build.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "library-build.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "library-build.stdout.log",
+      "bytes": 234,
+      "sha256": "6cf451ad59fa391e17829bd3972f75f59e6dc463b2164bc2f59b36da917dd583"
+    },
+    {
+      "path": "source-results-manifest.json",
+      "bytes": 3199,
+      "sha256": "e69978f44d776b6ba3ff18a7ef4d968db835687dafca6b11c0bbce6140d9b9e3"
+    },
+    {
+      "path": "source.diff",
+      "bytes": 5554,
+      "sha256": "4669aaabc96f021652cffd9380adce990bda12d96c4bb49c5ea9bb4ea52ea366"
+    },
+    {
+      "path": "syntax-input.json",
+      "bytes": 475,
+      "sha256": "0a97acef6f735f280d87b0b7a1b89e63dfc298d938af1b0a74721ad59049d8ed"
+    },
+    {
+      "path": "syntax-result.json",
+      "bytes": 1114,
+      "sha256": "e601448060cc9a995ff2886fbc40a7ebab25127776750639d06c01014b54e1b1"
+    },
+    {
+      "path": "syntax.command.json",
+      "bytes": 272,
+      "sha256": "3c8901220ef8841b3fea7b9ee470fe6a33b69200488af4d1d8813237c950f429"
+    },
+    {
+      "path": "syntax.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "syntax.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "raw_logs": [
+    "diff-check.stderr.log",
+    "diff-check.stdout.log",
+    "driver-build.stderr.log",
+    "driver-build.stdout.log",
+    "library-build.stderr.log",
+    "library-build.stdout.log",
+    "syntax.stderr.log",
+    "syntax.stdout.log"
+  ],
+  "note": "Keep ignored raw logs when parent persists evidence."
+}

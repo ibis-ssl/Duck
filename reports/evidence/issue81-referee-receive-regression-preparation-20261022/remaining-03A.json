@@ -1,0 +1,32 @@
+{
+  "prepared_pending_CI": [
+    "restart/new epoch baseline and retained old callback rejection",
+    "missing explicit owner not-ready despite normal receive and producer endpoint",
+    "freshness exact boundary/one tick expiry/poll non-extension"
+  ],
+  "remaining": [
+    {
+      "item": "command subscriber implementation and same-counter duplicate suppression",
+      "basis": "scope report89: change waits deduplicate, diagnostic count still every packet; current WaitForChangeAsync NotImplemented"
+    },
+    {
+      "item": "real UDP11003 multicast transport/options and receive lifecycle",
+      "basis": "scope report89 single resident11003; fake seam not real UDP proof"
+    },
+    {
+      "item": "Dispose/stop ownership/resource cleanup contract and regression",
+      "basis": "current IAsyncDisposable DisposeAsync is no-op; real receiver lifecycle/termination must be defined and verified before03A complete"
+    },
+    {
+      "item": "start/fault/repeated EndEpoch boundaries as needed by lifecycle contract",
+      "basis": "current static release handling is not per-boundary runtime evidence"
+    }
+  ],
+  "later_scope": [
+    "03B GC API matching",
+    "03C Program/DI/HTTP",
+    "DCP bridge/ownership discovery",
+    "Issue82 Windows/real hardware acceptance"
+  ],
+  "note": "Do not add behavior when regression passes. Any observed contract failure requires parent exact-SHA CI adoption before fix. Existing fixed7/fixed67 unchanged."
+}

@@ -1,0 +1,147 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "bytes": 230,
+    "sha256": "6b67206eb77dca78cf2690c935e8a60ecafb70febac390f5551058e7a2daa3dc"
+  },
+  {
+    "path": "artifacts.started.json",
+    "bytes": 212,
+    "sha256": "e17cab42236dcf2e6de09be174d4fcf8cbf17cd2ab38184a309691740a2cf2b9"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "bytes": 32,
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c"
+  },
+  {
+    "path": "ci-evidence.json",
+    "bytes": 3693,
+    "sha256": "07d538e172b590421335596837ecdf4bb268364c47722d230152e0d001b3b159"
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "bytes": 1006,
+    "sha256": "83ba42ad9fe09a47c0227e7e68c5161f072988bd2f8efa9ba58447ac9d0fa7e8"
+  },
+  {
+    "path": "final-view.command.json",
+    "bytes": 280,
+    "sha256": "ecbd1e741dd1d73880c0025670c756efb3d631e54c85ea1c68eb1464242e7f6a"
+  },
+  {
+    "path": "final-view.started.json",
+    "bytes": 262,
+    "sha256": "f49bac14541d946120436561753d168d56df750831da595d9dd0173adac22c04"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "bytes": 2461,
+    "sha256": "1683a4ac05848f91094a99716f49d8ae83de9fb7bc679cea7e491f66046be87d"
+  },
+  {
+    "path": "git-status-final.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "bytes": 4655,
+    "sha256": "5a8d0b64fd775b368ef18713a4786a77f72d1d6d25287bd38eaf2b1159d2d638"
+  },
+  {
+    "path": "initial-view.command.json",
+    "bytes": 280,
+    "sha256": "8e0cec8063f9229e291678e88df96ff824a6e09fd2d9648dc14c726dcc7b88c6"
+  },
+  {
+    "path": "initial-view.started.json",
+    "bytes": 262,
+    "sha256": "e17e6fc35f15fdd18cd2a2dbb2032d6de48c29c4d82fe738caed8bfb5ec528ad"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "bytes": 1976,
+    "sha256": "cf0a457f838424ca6d8a8d3786176a15640f429b6eab46b0a267afce679d065b"
+  },
+  {
+    "path": "process-state.json",
+    "bytes": 167,
+    "sha256": "f0b8eefd701f3012e37173d510562f75e422a984f6e350c7618928ae38c1d9b1"
+  },
+  {
+    "path": "run-log.command.json",
+    "bytes": 220,
+    "sha256": "b6e4d3a32e44a76511d55f97125b3fead59541f4ca6676d5d79c8f1a3d3c6a0d"
+  },
+  {
+    "path": "run-log.started.json",
+    "bytes": 202,
+    "sha256": "64989aca86fce03454c2bb994f203f27ab711dd8df293b15bad218f79a69775d"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "bytes": 48714,
+    "sha256": "0bfb2318c22eb78d28a716b5c6d2289b2c2afc7fab093bb767179efbab89a5f2"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "bytes": 289,
+    "sha256": "60c7362cc94a55da93d294e1a0762b273e165b276859857ee8a4cad2dc84cca7"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "bytes": 36,
+    "sha256": "a2790a384d7d281e7395679000c35d27768d89dbd7052f725b8f4688beb59915"
+  },
+  {
+    "path": "source-identity.json",
+    "bytes": 484,
+    "sha256": "c1fc507916f082527b11c1419f0df984411e414601114a82d426bd2dfb7451a5"
+  },
+  {
+    "path": "watch.command.json",
+    "bytes": 257,
+    "sha256": "57e141333a4efb3570d67d2ca0700d53491d1ebfd9ae7897bd4c8ea038c84715"
+  },
+  {
+    "path": "watch.started.json",
+    "bytes": 239,
+    "sha256": "b624414ff436b2264e00d9f9bb4ff7eeeda200c0ef3d769f31f30652e847155f"
+  },
+  {
+    "path": "watch.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "watch.stdout.log",
+    "bytes": 994,
+    "sha256": "515adca458587de61697a70abb38823acc5ee9f80238b9ab43fc9b655c666fc1"
+  }
+]

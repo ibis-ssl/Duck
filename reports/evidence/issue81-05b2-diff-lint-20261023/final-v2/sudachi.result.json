@@ -1,0 +1,18 @@
+{
+  "name": "sudachi",
+  "argv": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "exit": 1,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "ba8de952819786237ea6747c676c1e1033d95b1b0633f9851d3723b7b3d0a39a",
+  "stdout_bytes": 0,
+  "stderr_bytes": 3576,
+  "elapsed_seconds": 0.728
+}

@@ -1,0 +1,140 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 82 ms).
+  Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 523 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj (in 523 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 4 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 1.25 sec).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 4 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 2 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 477 ms).
+  Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 725 ms).
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 2.74 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 5.12 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+  Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll
+  Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: null) [73 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 149
+   at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 158
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: "short-id") [14 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 149
+   at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 158
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: "ws://127.0.0.1:8082/api/control") [21 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: "ws://localhost:8082/api/control") [25 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: "ws://referee-driver:39110/api/control") [10 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: null) [17 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: "ws://[::1]:8082/api/control") [33 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: "not-a-uri") [6 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: "http://game-controller:8082/api/control") [8 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106
+   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: "192.0.2.8") [13 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 32
+   at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 63
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: null) [5 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 32
+   at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 63
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable [5 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 132
+   at Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 138
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce [15 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  Stack Trace:
+     at Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 167
+   at Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 184
+--- End of stack trace from previous location ---
+Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+
+Failed!  - Failed:    13, Passed:   748, Skipped:     0, Total:   761, Duration: 27 s - Tracker.Tests.dll (net10.0)

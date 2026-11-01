@@ -1,0 +1,3 @@
+run_view_json=0
+run_view_log=0
+artifacts_api=0

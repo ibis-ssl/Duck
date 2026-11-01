@@ -1,0 +1,4 @@
+red-v3-source-sha256=a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7
+current-test-source-sha256=4c1a1924bc2833a4d16360e5e3d14ceb27af7fe7a05542eb988e9bc42decd18a
+current-test-normalized-for-reader-tuple-shape-sha256=a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7
+normalization: revert the two new real-reader assertions from (GUID, stamp, age) to the pre-fix (GUID, age) tuple and revert the four existing mock returns to the pre-fix tuple. Remaining fixture generator, expectations, and original seven test bodies are byte-identical to Red v3.

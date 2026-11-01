@@ -1,0 +1,1 @@
+Actual repo lock, AppHost references, three Dockerfiles and synthetic publish outputs pass; no actual .NET publish was run.

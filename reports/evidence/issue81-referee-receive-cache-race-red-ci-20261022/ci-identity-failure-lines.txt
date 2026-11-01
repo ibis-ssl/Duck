@@ -1,0 +1,8 @@
+test	Check out repository	2026-10-22T17:09:29.0615857Z HEAD is now at 9683625 Merge cd7760fde7ec54d2fc69d157af61dc1a68d810ac into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+test	Run dotnet test	2026-10-22T17:10:06.5527628Z [xUnit.net 00:00:01.81]     Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication [FAIL]
+test	Run dotnet test	2026-10-22T17:10:06.5910288Z   Failed Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication [315 ms]
+test	Run dotnet test	2026-10-22T17:10:06.5988136Z    次packetの診断受理だけでは、期限切れcommand Aを購読へ返してはならない。
+test	Run dotnet test	2026-10-22T17:10:06.6097809Z      at Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:line 89
+test	Run dotnet test	2026-10-22T17:10:06.6137975Z    at Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:line 113
+test	Run dotnet test	2026-10-22T17:10:06.6177657Z    at Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs:line 113
+test	Run dotnet test	2026-10-22T17:10:35.4638225Z Failed!  - Failed:     1, Passed:   651, Skipped:     0, Total:   652, Duration: 29 s - Tracker.Tests.dll (net10.0)

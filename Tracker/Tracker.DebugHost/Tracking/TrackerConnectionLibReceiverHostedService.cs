@@ -12,6 +12,7 @@ public sealed class TrackerConnectionLibReceiverHostedService : IHostedService
     private readonly MultiTrackerManager<TrackerPacketAdapter> manager;
     private readonly TrackerConnectionLibSnapshotRecorder recorder;
     private readonly ILogger<TrackerConnectionLibReceiverHostedService> logger;
+    private readonly DiagnosticTrackerDeserializer diagnostics;
 
     /// <summary>
     /// live receiver、manager、snapshot recorder を常駐接続する。
@@ -20,18 +21,21 @@ public sealed class TrackerConnectionLibReceiverHostedService : IHostedService
         UdpTrackerReceiver<TrackerPacketAdapter> receiver,
         MultiTrackerManager<TrackerPacketAdapter> manager,
         TrackerConnectionLibSnapshotRecorder recorder,
-        ILogger<TrackerConnectionLibReceiverHostedService> logger)
+        ILogger<TrackerConnectionLibReceiverHostedService> logger,
+        DiagnosticTrackerDeserializer diagnostics)
     {
         this.receiver = receiver;
         this.manager = manager;
         this.recorder = recorder;
         this.logger = logger;
+        this.diagnostics = diagnostics;
     }
 
     /// <inheritdoc />
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _ = recorder;
+        diagnostics.BeginEpoch();
         receiver.PacketReceived += ProcessPacket;
         receiver.Start();
         logger.LogInformation("Started live tracker receiver.");
@@ -50,6 +54,13 @@ public sealed class TrackerConnectionLibReceiverHostedService : IHostedService
 
     private void ProcessPacket(TrackerPacketAdapter packet, IPEndPoint remoteEndpoint)
     {
+        ProcessDecodedPacket(packet, remoteEndpoint, manager, diagnostics);
+    }
+
+    internal static void ProcessDecodedPacket(TrackerPacketAdapter packet, IPEndPoint remoteEndpoint,
+        MultiTrackerManager<TrackerPacketAdapter> manager, DiagnosticTrackerDeserializer diagnostics)
+    {
+        diagnostics.RecordPacket(packet, remoteEndpoint);
         manager.ProcessPacket(packet, remoteEndpoint, DateTimeOffset.UtcNow);
     }
 }

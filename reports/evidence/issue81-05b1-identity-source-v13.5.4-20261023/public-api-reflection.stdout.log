@@ -1,0 +1,52 @@
+TYPE Aspire.Hosting!Aspire.Hosting.ContainerResourceBuilderExtensions
+TYPE Aspire.Hosting!Aspire.Hosting.ContainerResourceExtensions
+TYPE Aspire.Hosting!Aspire.Hosting.Eventing.DistributedApplicationResourceEventSubscription
+  PROP Aspire.Hosting.ApplicationModel.IResource Resource
+TYPE Aspire.Hosting!Aspire.Hosting.Eventing.IDistributedApplicationResourceEvent
+  PROP Aspire.Hosting.ApplicationModel.IResource Resource
+  PROP System.IServiceProvider Services
+  PROP Microsoft.Extensions.Logging.ILogger Logger
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.ContainerResource
+  PROP System.String Entrypoint
+  PROP System.Nullable`1[[System.Boolean, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]] ShellExecution
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.CustomResourceSnapshot
+  PROP System.String ResourceType
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.ResourcePropertySnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] Properties
+  PROP System.Nullable`1[[System.DateTime, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]] CreationTimeStamp
+  PROP System.Nullable`1[[System.DateTime, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]] StartTimeStamp
+  PROP System.Nullable`1[[System.DateTime, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]] StopTimeStamp
+  PROP Aspire.Hosting.ApplicationModel.ResourceStateSnapshot State
+  PROP System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]] ExitCode
+  PROP System.Nullable`1[[Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus, Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions, Version=10.0.11.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]] HealthStatus
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.HealthReportSnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] HealthReports
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.EnvironmentVariableSnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] EnvironmentVariables
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.UrlSnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] Urls
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.VolumeSnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] Volumes
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.ResourceCommandSnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] Commands
+  PROP System.Collections.Immutable.ImmutableArray`1[[Aspire.Hosting.ApplicationModel.RelationshipSnapshot, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] Relationships
+  PROP System.Boolean IsHidden
+  PROP System.String IconName
+  PROP System.Nullable`1[[Aspire.Hosting.ApplicationModel.IconVariant, Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]] IconVariant
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.ResourcePropertySnapshot
+  PROP System.String Name
+  PROP System.Object Value
+  PROP System.String DisplayName
+  PROP System.Boolean IsSensitive
+  PROP System.Boolean IsHighlighted
+  PROP System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]] SortOrder
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.CustomResourceSnapshotExtensions
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.InitializeResourceEvent
+  PROP Aspire.Hosting.ApplicationModel.IResource Resource
+  PROP Aspire.Hosting.Eventing.IDistributedApplicationEventing Eventing
+  PROP Microsoft.Extensions.Logging.ILogger Logger
+  PROP Aspire.Hosting.ApplicationModel.ResourceNotificationService Notifications
+  PROP System.IServiceProvider Services
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.ResourceNotificationService
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.ResourceEvent
+  PROP Aspire.Hosting.ApplicationModel.IResource Resource
+  PROP System.String ResourceId
+  PROP Aspire.Hosting.ApplicationModel.CustomResourceSnapshot Snapshot
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.ResourceNotificationServiceOptions
+  PROP Aspire.Hosting.ApplicationModel.WaitBehavior DefaultWaitBehavior
+TYPE Aspire.Hosting!Aspire.Hosting.ApplicationModel.ResourceSnapshotAnnotation
+  PROP Aspire.Hosting.ApplicationModel.CustomResourceSnapshot InitialSnapshot

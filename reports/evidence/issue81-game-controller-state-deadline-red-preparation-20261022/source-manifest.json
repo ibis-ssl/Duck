@@ -1,0 +1,20 @@
+{
+  "head": "9d82af8f1d6a6aac1c6bf733f41b521719b27d2d",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "newTest": {
+    "path": "Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs",
+    "sha256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "cases": 11
+  },
+  "old27SourcesUnchanged": true,
+  "productScaffoldAdded": false,
+  "runtimeExecuted": 0,
+  "expectedTotal": 677,
+  "expectedRedCases": 4,
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

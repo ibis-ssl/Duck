@@ -1,0 +1,70 @@
+﻿{
+  "schemaVersion": 1,
+  "task": "I81-07J-B3-D-NR001-residual",
+  "status": "ready_for_reviewer_recheck",
+  "baseline": "d6db1e82311d60531dc22546af2276134a34f90a",
+  "changedFiles": [
+    {
+      "path": "Testing\\Duck.Testing.AppHost\\OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "a39a58054e01a0bb0f5314bee387b79d23c7407020631fe93feada0157fd17c0"
+    },
+    {
+      "path": "Tracker\\Tracker.Tests\\OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "6f4726b3041848c9d412610540d3a58f95e2867e593d87725348274430660802"
+    }
+  ],
+  "red": {
+    "actualResourceCommandCallbackCalledWhenCanceled": {
+      "exit": 1,
+      "expectedCalls": 0,
+      "observedCalls": 1,
+      "compileAndDiscoverySucceeded": true
+    }
+  },
+  "validation": {
+    "focused": {
+      "exit": 0,
+      "passed": 8,
+      "failed": 0
+    },
+    "related": {
+      "exit": 0,
+      "passed": 143,
+      "failed": 0
+    },
+    "releaseBuild": {
+      "exit": 0
+    },
+    "changedTrackingGates": {
+      "passed": 8,
+      "total": 8,
+      "allExitZero": true
+    }
+  },
+  "contract": {
+    "productionDeadlineSeconds": 45,
+    "shortDeadlineSeamTestOnly": true,
+    "cancelAfterFinalApplyAckDoesNotReturnSuccess": true,
+    "cancelBeforeRestartDoesNotDispatch": true
+  },
+  "limitations": [
+    "No Docker/DCP/AppHost runtime was started",
+    "No CM4 helper was deployed",
+    "No UDP communication was tested"
+  ],
+  "documentFingerprints": [
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "worktreeFullSha256": "427ee5d7b83daa4d66ef09efd60d563c8aac97386a823793d607ee626b1f762b",
+      "addedInputSha256": "458939e5c3fe18548dcfc7109bc5fc7386aefd7b793660c5bf84bf1531e8e6a5",
+      "cspellCopySha256": "458939e5c3fe18548dcfc7109bc5fc7386aefd7b793660c5bf84bf1531e8e6a5"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "worktreeFullSha256": "e40134d7e6562c99bf6625743a9e8eb660e3f12e0c873a92e6253d5143eca59e",
+      "addedInputSha256": "eed49bf35e7f6e65366272abfc35d5358abef1a27ff8243a34a3c9b0532f9934",
+      "cspellCopySha256": "eed49bf35e7f6e65366272abfc35d5358abef1a27ff8243a34a3c9b0532f9934"
+    }
+  ],
+  "evidenceClassification": "Actual adapter callback 1 instead of 0 is a valid pre-fix behavior failure. Final applied-state catch cleanup is post-change coverage of the existing fixture; no separate pre-fix behavior failure is claimed. Worktree full bytes and added-input hashes differ from Git normalized content; historical EOL uncertainty is retained."
+}

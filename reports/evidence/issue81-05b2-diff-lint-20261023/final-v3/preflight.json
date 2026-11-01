@@ -1,0 +1,24 @@
+{
+  "inputs": {
+    "Tracker/Design/tasks-status.md": "a81f2238025bedc46ed7f7121e06c30c77165531654d50409db91e6ef163cae2",
+    "Tracker/Design/phases-status.md": "787d76747436ee2128a9d7f31b5b9f21e6259e2d2b16140720eace54bd7c9388",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "15dc21edbb5a4951225b6486b36c4c2a8aee9d3ece49465e7b19c389d9d1a7f0"
+  },
+  "expected_inputs": {
+    "Tracker/Design/tasks-status.md": "a81f2238025bedc46ed7f7121e06c30c77165531654d50409db91e6ef163cae2",
+    "Tracker/Design/phases-status.md": "787d76747436ee2128a9d7f31b5b9f21e6259e2d2b16140720eace54bd7c9388",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "15dc21edbb5a4951225b6486b36c4c2a8aee9d3ece49465e7b19c389d9d1a7f0"
+  },
+  "input_match": true,
+  "rules_source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/tools/lint/scripts/textlint-rules",
+  "rules_hashes": {
+    "no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  },
+  "rules_mirror_hashes": {
+    "no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  },
+  "rules_match": true,
+  "node_modules_target": "C:/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules"
+}

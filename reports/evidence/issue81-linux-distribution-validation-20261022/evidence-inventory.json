@@ -1,0 +1,811 @@
+{
+  "root": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-04a-evidence-20261022",
+  "manifest": "evidence-files.sha256",
+  "manifestSha256": "8a1e01df1f6715b1e7b9bca4d67662dad3c6b8026ea55278365b5409953b134e",
+  "manifestEntries": 218,
+  "totals": {
+    "files": 218,
+    "bytes": 39625450
+  },
+  "byTopLevel": {
+    "04a-design-baseline-current.diff": {
+      "files": 1,
+      "bytes": 2043
+    },
+    "04a-lint-results-summary.txt": {
+      "files": 1,
+      "bytes": 2074
+    },
+    "04a-lint-runtime-context.txt": {
+      "files": 1,
+      "bytes": 363
+    },
+    "04a-lint-source-context.json": {
+      "files": 1,
+      "bytes": 1473
+    },
+    "attempt2-job-log.command.txt": {
+      "files": 1,
+      "bytes": 180
+    },
+    "attempt2-job-log.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "attempt2-job-log.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "attempt2-job-log.stdout.log": {
+      "files": 1,
+      "bytes": 57087
+    },
+    "attempt2-rerun.action.txt": {
+      "files": 1,
+      "bytes": 361
+    },
+    "attempt2-rerun.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "attempt2-rerun.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "attempt2-rerun.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "attempt2-state.command.txt": {
+      "files": 1,
+      "bytes": 229
+    },
+    "attempt2-state.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "attempt2-state.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "attempt2-state.stdout.json": {
+      "files": 1,
+      "bytes": 3013
+    },
+    "build-evidence-inventory.py": {
+      "files": 1,
+      "bytes": 1793
+    },
+    "candidate-artifact-download.command.json": {
+      "files": 1,
+      "bytes": 338
+    },
+    "candidate-artifact-download.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "candidate-artifacts.command.json": {
+      "files": 1,
+      "bytes": 200
+    },
+    "candidate-artifacts.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "candidate-artifacts.stdout.json": {
+      "files": 1,
+      "bytes": 752
+    },
+    "candidate-change-and-dependency-diff.command.json": {
+      "files": 1,
+      "bytes": 415
+    },
+    "candidate-change-and-dependency-diff.stdout.log": {
+      "files": 1,
+      "bytes": 627
+    },
+    "candidate-source-hashes.txt": {
+      "files": 1,
+      "bytes": 1369
+    },
+    "candidate-test-artifact-extract": {
+      "files": 9,
+      "bytes": 31535003
+    },
+    "candidate-test-artifact-text": {
+      "files": 8,
+      "bytes": 7876189
+    },
+    "ci-artifact-extracted": {
+      "files": 7,
+      "bytes": 3603
+    },
+    "ci-attempts-summary.txt": {
+      "files": 1,
+      "bytes": 1512
+    },
+    "default-gh-status-read-failure.txt": {
+      "files": 1,
+      "bytes": 860
+    },
+    "excluded-binary-duplicates.txt": {
+      "files": 1,
+      "bytes": 121
+    },
+    "green-job-log.command.json": {
+      "files": 1,
+      "bytes": 208
+    },
+    "green-job-log.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "green-job-log.stdout.log": {
+      "files": 1,
+      "bytes": 59426
+    },
+    "green-run-list.command.json": {
+      "files": 1,
+      "bytes": 285
+    },
+    "green-run-list.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "green-run-list.stdout.json": {
+      "files": 1,
+      "bytes": 4657
+    },
+    "green-run-watch.command.json": {
+      "files": 1,
+      "bytes": 198
+    },
+    "green-run-watch.log": {
+      "files": 1,
+      "bytes": 10307
+    },
+    "hash-prior-lint-evidence.py": {
+      "files": 1,
+      "bytes": 2576
+    },
+    "lint-spell.command.txt": {
+      "files": 1,
+      "bytes": 229
+    },
+    "lint-spell.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "lint-spell.stderr.log": {
+      "files": 1,
+      "bytes": 130
+    },
+    "lint-spell.stdout.log": {
+      "files": 1,
+      "bytes": 95
+    },
+    "lint-text.command.txt": {
+      "files": 1,
+      "bytes": 228
+    },
+    "lint-text.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "lint-text.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "lint-text.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "merged-source-comparison.command.json": {
+      "files": 1,
+      "bytes": 241
+    },
+    "merged-source-comparison.stdout.log": {
+      "files": 1,
+      "bytes": 842
+    },
+    "prepare-04a-lint.py": {
+      "files": 1,
+      "bytes": 2645
+    },
+    "prior-lint-reference.map.txt": {
+      "files": 1,
+      "bytes": 802
+    },
+    "prior-lint-reference.sha256": {
+      "files": 1,
+      "bytes": 5919
+    },
+    "process-check-denied.txt": {
+      "files": 1,
+      "bytes": 518
+    },
+    "run-state-before-rerun.txt": {
+      "files": 1,
+      "bytes": 449
+    },
+    "source-comparison.command.json": {
+      "files": 1,
+      "bytes": 552
+    },
+    "source-comparison.stderr.log": {
+      "files": 1,
+      "bytes": 396
+    },
+    "source-comparison.stdout.log": {
+      "files": 1,
+      "bytes": 662
+    },
+    "source-git-show-comparison.command.txt": {
+      "files": 1,
+      "bytes": 458
+    },
+    "source-git-show-comparison.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "source-git-show-comparison.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "source-git-show-comparison.stdout.log": {
+      "files": 1,
+      "bytes": 940
+    },
+    "spell-added-lines.command.txt": {
+      "files": 1,
+      "bytes": 320
+    },
+    "spell-added-lines.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-added-lines.stderr.log": {
+      "files": 1,
+      "bytes": 128
+    },
+    "spell-added-lines.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "spell-after-fix-phases-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 213
+    },
+    "spell-after-fix-phases-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-after-fix-phases-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 113
+    },
+    "spell-after-fix-phases-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "spell-after-fix-tasks-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 212
+    },
+    "spell-after-fix-tasks-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-after-fix-tasks-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 112
+    },
+    "spell-after-fix-tasks-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "spell-baseline.command.txt": {
+      "files": 1,
+      "bytes": 330
+    },
+    "spell-baseline.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-baseline.stderr.log": {
+      "files": 1,
+      "bytes": 139
+    },
+    "spell-baseline.stdout.log": {
+      "files": 1,
+      "bytes": 104
+    },
+    "spell-current.command.txt": {
+      "files": 1,
+      "bytes": 321
+    },
+    "spell-current.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-current.stderr.log": {
+      "files": 1,
+      "bytes": 130
+    },
+    "spell-current.stdout.log": {
+      "files": 1,
+      "bytes": 95
+    },
+    "spell-final-phases-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 213
+    },
+    "spell-final-phases-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-final-phases-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 113
+    },
+    "spell-final-phases-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "spell-final-tasks-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 212
+    },
+    "spell-final-tasks-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-final-tasks-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 112
+    },
+    "spell-final-tasks-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "spell-phases-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 213
+    },
+    "spell-phases-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-phases-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 113
+    },
+    "spell-phases-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "spell-tasks-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 212
+    },
+    "spell-tasks-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "spell-tasks-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 112
+    },
+    "spell-tasks-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "storage-map.txt": {
+      "files": 1,
+      "bytes": 2253
+    },
+    "sudachi-04a-added-lines-captured.command.txt": {
+      "files": 1,
+      "bytes": 715
+    },
+    "sudachi-04a-added-lines-captured.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-04a-added-lines-captured.json": {
+      "files": 1,
+      "bytes": 125
+    },
+    "sudachi-04a-added-lines-captured.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-added-lines-captured.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-added-lines.command.txt": {
+      "files": 1,
+      "bytes": 644
+    },
+    "sudachi-04a-added-lines.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-04a-added-lines.json": {
+      "files": 1,
+      "bytes": 125
+    },
+    "sudachi-04a-added-lines.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-added-lines.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-baseline-captured.command.txt": {
+      "files": 1,
+      "bytes": 732
+    },
+    "sudachi-04a-baseline-captured.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-04a-baseline-captured.json": {
+      "files": 1,
+      "bytes": 2087
+    },
+    "sudachi-04a-baseline-captured.stderr.log": {
+      "files": 1,
+      "bytes": 1436
+    },
+    "sudachi-04a-baseline-captured.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-baseline.command.txt": {
+      "files": 1,
+      "bytes": 651
+    },
+    "sudachi-04a-baseline.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-04a-baseline.json": {
+      "files": 1,
+      "bytes": 135
+    },
+    "sudachi-04a-baseline.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-baseline.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-current-captured.command.txt": {
+      "files": 1,
+      "bytes": 713
+    },
+    "sudachi-04a-current-captured.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-04a-current-captured.json": {
+      "files": 1,
+      "bytes": 1989
+    },
+    "sudachi-04a-current-captured.stderr.log": {
+      "files": 1,
+      "bytes": 1347
+    },
+    "sudachi-04a-current-captured.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-current.command.txt": {
+      "files": 1,
+      "bytes": 641
+    },
+    "sudachi-04a-current.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-04a-current.json": {
+      "files": 1,
+      "bytes": 126
+    },
+    "sudachi-04a-current.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-04a-current.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-runtime-probe.command.txt": {
+      "files": 1,
+      "bytes": 353
+    },
+    "sudachi-runtime-probe.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-runtime-probe.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-runtime-probe.stdout.log": {
+      "files": 1,
+      "bytes": 356
+    },
+    "sudachi-tracking-fragments-after-fix.command.txt": {
+      "files": 1,
+      "bytes": 510
+    },
+    "sudachi-tracking-fragments-after-fix.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-tracking-fragments-after-fix.stderr.log": {
+      "files": 1,
+      "bytes": 157
+    },
+    "sudachi-tracking-fragments-after-fix.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-tracking-fragments-corrected.command.txt": {
+      "files": 1,
+      "bytes": 510
+    },
+    "sudachi-tracking-fragments-corrected.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-tracking-fragments-corrected.stderr.log": {
+      "files": 1,
+      "bytes": 282
+    },
+    "sudachi-tracking-fragments-corrected.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-tracking-fragments-final.command.txt": {
+      "files": 1,
+      "bytes": 510
+    },
+    "sudachi-tracking-fragments-final.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-tracking-fragments-final.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-tracking-fragments-final.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "sudachi-tracking-fragments.command.txt": {
+      "files": 1,
+      "bytes": 462
+    },
+    "sudachi-tracking-fragments.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "sudachi-tracking-fragments.stderr.log": {
+      "files": 1,
+      "bytes": 229
+    },
+    "sudachi-tracking-fragments.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-after-fix-phases-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 212
+    },
+    "text-after-fix-phases-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-after-fix-phases-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-after-fix-phases-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-after-fix-tasks-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 211
+    },
+    "text-after-fix-tasks-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-after-fix-tasks-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-after-fix-tasks-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-current.command.txt": {
+      "files": 1,
+      "bytes": 320
+    },
+    "text-current.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-current.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-current.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-final-phases-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 212
+    },
+    "text-final-phases-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-final-phases-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-final-phases-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-final-tasks-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 211
+    },
+    "text-final-tasks-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-final-tasks-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-final-tasks-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-phases-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 212
+    },
+    "text-phases-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-phases-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-phases-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-tasks-status-new-fragment.command.txt": {
+      "files": 1,
+      "bytes": 211
+    },
+    "text-tasks-status-new-fragment.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "text-tasks-status-new-fragment.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "text-tasks-status-new-fragment.stdout.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "tracking-fragment-diff-after-fix.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "tracking-fragment-diff-after-fix.stdout.log": {
+      "files": 1,
+      "bytes": 2800
+    },
+    "tracking-fragment-diff.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "tracking-fragment-diff.stdout.log": {
+      "files": 1,
+      "bytes": 2758
+    },
+    "tracking-fragment-inventory.json": {
+      "files": 1,
+      "bytes": 735
+    },
+    "tracking-fragment-inventory.py": {
+      "files": 1,
+      "bytes": 867
+    },
+    "update-child-report.py": {
+      "files": 1,
+      "bytes": 6692
+    },
+    "update-report-current-lint.py": {
+      "files": 1,
+      "bytes": 5024
+    },
+    "yomiyasu-04a-added-lines.command.txt": {
+      "files": 1,
+      "bytes": 440
+    },
+    "yomiyasu-04a-added-lines.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "yomiyasu-04a-added-lines.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "yomiyasu-04a-added-lines.stdout.log": {
+      "files": 1,
+      "bytes": 212
+    },
+    "yomiyasu-04a-baseline.command.txt": {
+      "files": 1,
+      "bytes": 450
+    },
+    "yomiyasu-04a-baseline.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "yomiyasu-04a-baseline.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "yomiyasu-04a-baseline.stdout.log": {
+      "files": 1,
+      "bytes": 216
+    },
+    "yomiyasu-04a-current.command.txt": {
+      "files": 1,
+      "bytes": 441
+    },
+    "yomiyasu-04a-current.exit-code": {
+      "files": 1,
+      "bytes": 1
+    },
+    "yomiyasu-04a-current.stderr.log": {
+      "files": 1,
+      "bytes": 0
+    },
+    "yomiyasu-04a-current.stdout.log": {
+      "files": 1,
+      "bytes": 217
+    }
+  },
+  "zipExtensionFiles": [],
+  "PK0304MagicFiles": [],
+  "gzipFiles": [
+    {
+      "path": "candidate-test-artifact-extract/source.tar.gz",
+      "magic": "1f 8b 08 00",
+      "bytes": 23658814,
+      "sha256": "84512f80f556c3712a2e69dead6bf2b89e3db238ef8a5aff1b7c881101c70b0b"
+    }
+  ],
+  "notes": "Manifest excludes itself and this summary to avoid self-reference. Raw source archive is retained in Temp; duplicate extracted sources and dotnet-test.binlog were excluded per storage-map.txt."
+}

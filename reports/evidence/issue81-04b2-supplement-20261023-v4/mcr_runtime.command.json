@@ -1,0 +1,21 @@
+{
+  "name": "mcr_runtime",
+  "argv": [
+    "curl",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--head",
+    "--max-time",
+    "30",
+    "--header",
+    "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+    "https://mcr.microsoft.com/v2/dotnet/runtime/manifests/10.0"
+  ],
+  "exit": 0,
+  "url": "https://mcr.microsoft.com/v2/dotnet/runtime/manifests/10.0",
+  "stdout_bytes": 1097,
+  "stderr_bytes": 0,
+  "stdout_sha256": "0c28d8b5ec6ca6dfadb5b18443eaf258166744ef6efe82963fada2c7f4b8c319",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,10 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "$target = 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-review-preparation-20261022'; $resolved = (Get-Item -LiteralPath $target).FullName; if ($resolved -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-review-preparation-20261022') { throw 'Unexpected mirror target' }; $junction = Join-Path $resolved 'node_modules'; if ((Get-Item -LiteralPath $junction).LinkType -ne 'Junction') { throw 'Expected owned junction' }; [System.IO.Directory]::Delete($junction); Remove-Item -LiteralPath $resolved -Recurse -Force; if (Test-Path -LiteralPath $target) { throw 'Mirror still exists' }"
+  ],
+  "exit_code": 0
+}

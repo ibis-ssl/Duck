@@ -1,0 +1,3 @@
+ M reports/issue81-game-controller-state-implementation-20261022.md
+?? Testing/Duck.Testing.RefereeDriver/GameControllerStateObserver.cs
+?? Tracker/Tracker.Tests/GameControllerStateObserverTests.cs

@@ -1,0 +1,5 @@
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+  Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Release/net10.0/Duck.Testing.RefereeDriver.dll
+  Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/Duck.Testing.RefereeDriver.Host.dll
+  Duck.Testing.RefereeDriver.Host -> /tmp/duck-issue81-linux-publish.6CJjE6/Duck.Testing.RefereeDriver.Host/

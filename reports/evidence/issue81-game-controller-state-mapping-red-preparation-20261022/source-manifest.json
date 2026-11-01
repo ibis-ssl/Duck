@@ -1,0 +1,34 @@
+{
+  "head": "1da5d9f9ea6570ffdace620c1617d93e62c10afc",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+      "sha256": "38c10b2ad4eb5cbfc003964d4d1567885bcc6cf2fc58d30273bcb1a4493abc65"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+      "sha256": "b47cb2be370a49c643a2ece73eb2b038509d91d4b836e60411b03d8f6be27142"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateMappingTests.cs",
+      "sha256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb"
+    }
+  ],
+  "existing28Guard": "27wholefile byte-identical; client oldbody byte-identical after only additive enumdeclarations",
+  "existingTestsUnchanged": true,
+  "newCases": 30,
+  "expectedTotal": 707,
+  "expectedRed": 7,
+  "expectedRegression": 23,
+  "behaviorImplemented": false,
+  "runtimeExecuted": 0,
+  "syntaxInitialExit": -6,
+  "syntaxFinalExit": 0,
+  "diffCheckExit": 0,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

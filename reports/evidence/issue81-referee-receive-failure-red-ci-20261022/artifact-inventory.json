@@ -1,0 +1,52 @@
+[
+  {
+    "name": "dotnet-test.binlog",
+    "bytes": 1503965,
+    "sha256": "7900a18e5c49fb0cfcfecfa481c3baa2e4d45f88119d7432f7b5fbeb830a41a6"
+  },
+  {
+    "name": "dotnet-test.stderr.log",
+    "bytes": 726,
+    "sha256": "71ba0c67d3864f04df4cd8a854ff7db5f7c9a9ec0704f703d7381102497d4762"
+  },
+  {
+    "name": "dotnet-test.exit-code",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "dotnet-test.stdout.log",
+    "bytes": 9383,
+    "sha256": "87c70500ef8700c45ef411c4f5511da24fa7a15e46a6adc05f9813a37c0ce2a5"
+  },
+  {
+    "name": "environment.txt",
+    "bytes": 3462,
+    "sha256": "097271d144e8b9f328310c3c656a0d48cd44cc1a4617ef3ae1129b292c08a5e7"
+  },
+  {
+    "name": "dotnet-test.trx",
+    "bytes": 886731,
+    "sha256": "f10ccf4263d2e1c3c24029deacab7a082aca915d2b7d5aed4c0a278f4e613964"
+  },
+  {
+    "name": "source.tar.gz",
+    "bytes": 9869005,
+    "sha256": "bcf7b79571b7e759c2a9dbceefe6088c89e366ccf77c3c3b19c3ea0366054b09"
+  },
+  {
+    "name": "vstest-diagnostics.datacollector.26-10-22_13-30-50_17017_5.log",
+    "bytes": 1098719,
+    "sha256": "df0131cbafecf9bc062c86de352830ccba533adee780bba91df23b6795c8dd2c"
+  },
+  {
+    "name": "vstest-diagnostics.host.26-10-22_13-30-50_41314_5.log",
+    "bytes": 2479582,
+    "sha256": "bd21e2d6c7a8c69bf35a6bf16870716221e307b9cf38eb1521f9e9f1bb634901"
+  },
+  {
+    "name": "vstest-diagnostics.log",
+    "bytes": 1948871,
+    "sha256": "6c7a523cecb2cb2d87a9497989ab82777f3ecca2b34b60c635b4290ae408ac3a"
+  }
+]

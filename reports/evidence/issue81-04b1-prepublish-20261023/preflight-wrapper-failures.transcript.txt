@@ -1,0 +1,6 @@
+Wrapper/preflight output excerpts (not checker results)
+1) Initial tool submission: wsl.exe: The command parameter was already specified. Tool-level error occurred before any child command; no process exit was exposed.
+2) Python Windows-path construction failed before lint launch: SyntaxError: (unicode error) unicodeescape codec cannot decode bytes in position 2-3: truncated UXXXXXXXX escape.
+3) Mirror layout attempt failed with FileNotFoundError for /mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023/tools/lint/README.md. Checker had not started.
+4) Intermediate AST wrapper failed with SyntaxError: unexpected character after line continuation character. Corrected; the final python_ast command passed exit 0.
+5) The initial exact added-row Sudachi failure is preserved in snippet-sudachi.command.json, snippet-sudachi.stdout.log, and snippet-sudachi.stderr.log. It exited 1 with two パス findings. Parent corrected both phrases; final-sudachi is separate and exited 0.

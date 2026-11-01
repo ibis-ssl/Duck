@@ -1,0 +1,18 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+  "sources": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "7773446749b7d3b7bf1de2d222dc2eb4a25e880172d6fb59f5d740f4df00559e",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "69d8772874b8dde7306330a81cad0bf0e3dd66750b2be8b4db17bff080bfd107"
+  },
+  "command": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName~DuckPublishesDecodedVisionReadinessOnItsInternalTcpEndpoint",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "intent": "Run fixed TDD test after AppHost health integration"
+}

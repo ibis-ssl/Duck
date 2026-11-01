@@ -1,0 +1,16 @@
+{
+  "name": "ghcr_orion",
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "ghcr.io/ibis-ssl/orion-cm4-sim@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a"
+  ],
+  "exit": 0,
+  "reference": "ghcr.io/ibis-ssl/orion-cm4-sim@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+  "stdout_bytes": 5244,
+  "stderr_bytes": 0,
+  "stdout_sha256": "695ec97960467df21422d08b3163eaf2c356c5e6905159fea1c80aa46b02692c",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,9 @@
+Final four-row tracking lint result
+Input scope confirmed before execution: exactly two markdown fragments containing four changed rows, with original line numbers preserved. Baseline 4e3099e75c4afab8ba1f11c67500ebe29f17fed3; parent-corrected current working tree. Current tasks-status.md full source SHA-256 bd37100d70038da62fa70fc43e8bcb1151f6013583b8ff03f40b999465c927d7 (changed rows 31,32,33); phases-status.md full source SHA-256 3dbeb13981b2a7fa8d649816461b1d1415c2a7d8431bfb8667cb1b94698b9746 (changed row 19). Per-row and fragment hashes are in preflight.json.
+Final checks against the exact two files, from the existing mirror/cache and unchanged checker/config/dictionary:
+- textlint exit 0
+- CSpell exit 0, 2 files checked, 0 issues
+- Sudachi exit 0, 2 explicit files, 4 source rows, no findings
+Commands, raw stdout/stderr, and exits are in text.*, spell.*, sudachi.*. The Sudachi command uses one --files followed by both file paths (nargs='+').
+All compared lint configuration/checker files match the earlier 5f candidate hashes; SudachiPy 0.6.11, SudachiDict-core 20260428, and system.dic SHA-256 6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e are unchanged. No dependency, dictionary, product, test, profile, workflow, or design source changes.
+The initial 56-file bundle and its manifest hash are retained under ../initial-56. The parent-owned tracking edit is outside worker write scope; only the fragment mirror inputs were created for testing.

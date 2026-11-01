@@ -1,0 +1,20 @@
+{
+  "id": 12447234538,
+  "expectedDigest": "sha256:ceedfa6fd629298447bc853b58634ebea6136cd68e4686c3a4db6fdf3eaf6ae7",
+  "actualDigest": "sha256:ceedfa6fd629298447bc853b58634ebea6136cd68e4686c3a4db6fdf3eaf6ae7",
+  "match": true,
+  "bytes": 19001296,
+  "archive": "artifact-12447234538.zip",
+  "files": [
+    "artifacts/dotnet-test-failure-39830103395-1/vstest-diagnostics.log",
+    "artifacts/dotnet-test-failure-39830103395-1/vstest-diagnostics.host.26-10-22_18-18-47_59633_5.log",
+    "artifacts/dotnet-test-failure-39830103395-1/vstest-diagnostics.datacollector.26-10-22_18-18-47_28069_5.log",
+    "artifacts/dotnet-test-failure-39830103395-1/source.tar.gz",
+    "artifacts/dotnet-test-failure-39830103395-1/environment.txt",
+    "artifacts/dotnet-test-failure-39830103395-1/dotnet-test.trx",
+    "artifacts/dotnet-test-failure-39830103395-1/dotnet-test.stdout.log",
+    "artifacts/dotnet-test-failure-39830103395-1/dotnet-test.stderr.log",
+    "artifacts/dotnet-test-failure-39830103395-1/dotnet-test.exit-code",
+    "artifacts/dotnet-test-failure-39830103395-1/dotnet-test.binlog"
+  ]
+}

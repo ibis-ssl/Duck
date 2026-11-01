@@ -16,6 +16,15 @@ entries:
     description: ロボット制御の正式名称。
   - term: Game Controller
     description: 審判情報を送信する機能の名称。
+  - term: WSL
+    aliases: Windows Subsystem for Linux
+    description: Windows 上で Linux 環境を実行する機能名。
+  - term: simulator
+    description: AppHost が管理する資源の識別名。
+  - term: orion-cm4-sim
+    description: シミュレーション通信に使う外部資源の製品名。
+  - term: RefereeDriver
+    description: 試合制御用の API クライアント資源名。
   - term: Windows
     description: 計算機の実行環境を示す名称。
   - term: Aspire
@@ -25,6 +34,8 @@ entries:
   - term: GitHub Actions
     description: GitHub上で処理を自動実行する機能名。
   - term: DCP
+    aliases:
+      - Developer Control Plane
     description: Aspireの試験環境を起動・管理する機能の略称。
   - term: Docker Desktop
     description: 開発用計算機でDockerを利用するための製品名。
@@ -862,3 +873,7 @@ entries:
     description: Git で変更内容を履歴の一単位として保存する操作、または保存された変更。
   - term: ブランチ
     description: Gitで履歴を分けて並行して作業する系列。
+  - term: Aspire Dashboard
+    aliases:
+      - Dashboard
+    description: Aspire が表示する資源の起動状態と接続先を確認する開発用画面。

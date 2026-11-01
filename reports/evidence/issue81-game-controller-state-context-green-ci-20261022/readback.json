@@ -1,0 +1,23 @@
+{
+  "head": "5c22501f9f777db4b68cf8ec36d731e8f38dcc9f",
+  "ciEvidenceSHA256": "b0805fa98faf1d3f1334aaf2678ec48902e94475108e9eda58ddee59ba240b0d",
+  "sourceManifestSHA256": "37238212bb0258e739a77fef83141ace3f63dcdc6be4b1d15f2a0d73c07ac5a0",
+  "counts": {
+    "failed": 0,
+    "passed": 716,
+    "skipped": 0,
+    "total": 716
+  },
+  "artifacts": 0,
+  "gitStatus": " D reports/evidence/issue81-game-controller-state-context-red-ci-20261022/artifact-download.stdout.log\n M reports/evidence/issue81-game-controller-state-context-red-ci-20261022/parent-storage-map.json\n",
+  "process": {
+    "utc": "2026-10-22T19:10:32.708069+00:00",
+    "sessions": {
+      "17423": 0,
+      "98172": 0
+    },
+    "innerGhWatchExit": 0,
+    "allOwnedProcessesTerminated": true,
+    "uncollectedExitCodes": []
+  }
+}

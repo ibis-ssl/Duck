@@ -1,0 +1,3 @@
+Markdown whitelist violations:
+- Tracker/Design/phases-status.md:1: 'パス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'パス' (katakana) is not in tools/lint/markdown-whitelist.yaml.

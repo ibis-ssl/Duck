@@ -13,6 +13,7 @@ public class VisionPacketStoreTests
     public void StoreDatagram_WithDetectionOnlyPacket_UpdatesDetectionSnapshot()
     {
         var store = new VisionPacketStore();
+        var receivedAt = DateTimeOffset.UtcNow;
         var packet = new SSL_WrapperPacket
         {
             Detection = new SSL_DetectionFrame
@@ -31,7 +32,7 @@ public class VisionPacketStoreTests
             },
         };
 
-        store.StoreDatagram(packet.ToByteArray(), new IPEndPoint(IPAddress.Loopback, 10006), DateTimeOffset.UtcNow);
+        store.StoreDatagram(packet.ToByteArray(), new IPEndPoint(IPAddress.Loopback, 10006), receivedAt);
 
         var snapshot = store.GetSnapshot();
 
@@ -40,8 +41,42 @@ public class VisionPacketStoreTests
         Assert.NotNull(snapshot.LatestPacket);
         Assert.NotNull(snapshot.Detection);
         Assert.Null(snapshot.Geometry);
+        Assert.Equal(receivedAt, snapshot.DetectionReceivedAt);
         Assert.Equal((uint)42, snapshot.Detection.FrameNumber);
         Assert.Single(snapshot.Detection.Balls);
+    }
+
+    [Fact]
+    public void StorePacket_GeometryOnlyPacketDoesNotAdvanceRetainedDetectionTimestamp()
+    {
+        var store = new VisionPacketStore();
+        var detectionReceivedAt = DateTimeOffset.UtcNow;
+        var geometryReceivedAt = detectionReceivedAt.AddMilliseconds(25);
+        store.StorePacket(
+            new SSL_WrapperPacket
+            {
+                Detection = new SSL_DetectionFrame
+                {
+                    FrameNumber = 42,
+                    CameraId = 3,
+                    RobotsYellow = { new SSL_DetectionRobot { RobotId = 2, X = 400, Y = -100 } },
+                },
+            },
+            new IPEndPoint(IPAddress.Loopback, 10006),
+            detectionReceivedAt);
+
+        store.StorePacket(
+            new SSL_WrapperPacket { Geometry = new SSL_GeometryData() },
+            new IPEndPoint(IPAddress.Loopback, 10006),
+            geometryReceivedAt);
+
+        var snapshot = store.GetSnapshot();
+
+        Assert.Equal(2, snapshot.PacketCount);
+        Assert.Equal(geometryReceivedAt, snapshot.ReceivedAt);
+        Assert.Equal(detectionReceivedAt, snapshot.DetectionReceivedAt);
+        Assert.Equal((uint)42, snapshot.Detection!.FrameNumber);
+        Assert.Equal(400, Assert.Single(snapshot.Detection.RobotsYellow).X);
     }
 
     /// <summary>

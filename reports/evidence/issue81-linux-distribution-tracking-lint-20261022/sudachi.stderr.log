@@ -1,0 +1,18 @@
+Markdown whitelist violations:
+- tracking-evidence/tasks-status.md:31: 'digest' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:32: 'RefereeDriver.Host' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:32: 'job' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'base' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'digest' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'Debug' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'PDB' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'vsdbg' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'digest' (english) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:31: 'digest' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:32: 'Host' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:32: '繧｢繝励Μ' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:32: 'job' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'digest' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'Debug' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: '繧ｽ繝ｼ繧ｹ' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- tracking-evidence/tasks-status.md:33: 'digest' (katakana) is not in tools/lint/markdown-whitelist.yaml.
