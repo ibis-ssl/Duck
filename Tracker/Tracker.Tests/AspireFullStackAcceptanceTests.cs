@@ -144,6 +144,50 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ResolvesCm4TransportHelperFromExistingRuntimeBundleWithoutEnvironmentOverride()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var helperDirectory = Directory.CreateDirectory(Path.Combine(
+            temporaryDirectory.Path, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost")).FullName;
+        var helperPath = Path.Combine(helperDirectory, "cm4-transport-control");
+        File.WriteAllText(helperPath, "verified helper fixture");
+        var originalHelperPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", null);
+            Assert.Equal(Path.GetFullPath(helperPath), ResolveCm4TransportHelperSource(temporaryDirectory.Path));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", originalHelperPath);
+        }
+    }
+
+    [Fact]
+    public void RejectsInvalidConfiguredCm4TransportHelperInsteadOfUsingBundleFallback()
+    {
+        using var temporaryDirectory = new TemporaryDirectory();
+        var helperDirectory = Directory.CreateDirectory(Path.Combine(
+            temporaryDirectory.Path, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost")).FullName;
+        File.WriteAllText(Path.Combine(helperDirectory, "cm4-transport-control"), "verified helper fixture");
+        var invalidConfiguredPath = Path.Combine(temporaryDirectory.Path, "missing-helper");
+        var originalHelperPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", invalidConfiguredPath);
+            var exception = Assert.ThrowsAny<Exception>(
+                () => ResolveCm4TransportHelperSource(temporaryDirectory.Path));
+            Assert.Contains("Configured CM4 transport helper does not exist", exception.Message, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", originalHelperPath);
+        }
+    }
+
+    [Fact]
     public void ReportsWhenDockerExecutableCannotBeResolved()
     {
         using var temporaryDirectory = new TemporaryDirectory();
@@ -716,31 +760,17 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 .Order(StringComparer.Ordinal)
                 .ToArray();
 
-            sentinelCreationAttempted = true;
-            var sentinelCreate = await RunWorkDockerCommandAsync(
-            [
-                "run", "--pull=never", "--detach", "--name", sentinelName, "--network", "none",
-                "--label", $"{DockerContainerSpec.StackLabel}={sentinelStackId}",
-                "--label", $"{DockerContainerSpec.ResourceLabel}=sentinel",
-                "--label", $"{DockerContainerSpec.RunLabel}={sentinelRunId}",
-                "--entrypoint", "/bin/bash",
-                requiredImages[3], "-c", "exec sleep 600",
-            ]);
-            Assert.Equal(0, sentinelCreate.ExitCode);
-            var sentinelLookup = await RunWorkDockerCommandAsync(["inspect", "--format", "{{.Id}}", sentinelName]);
-            Assert.Equal(0, sentinelLookup.ExitCode);
-            sentinelContainerId = sentinelLookup.StandardOutput.Trim();
-            Assert.Matches("^[0-9a-f]{64}$", sentinelContainerId);
-            Assert.Equal([sentinelContainerId], await GetOwnedContainerIdsAsync(
-                sentinelStackId, dockerExecutable, WorkCommandTimeout, ProcessKillWaitTimeout));
-            output.WriteLine("sentinelNetwork=none; sentinelPublishedPorts=0; existing AppHost endpoint bindings are not asserted to be zero.");
-
             var lockPath = Path.Combine(artifactsDirectory, $"{stackId}.lock");
             var fixtureManifestPath = Path.Combine(artifactsDirectory, $"{stackId}-crane-fixture.json");
             var craneDiagnosticsPath = Path.Combine(artifactsDirectory, $"{stackId}-crane-diagnostics.jsonl");
             var cm4HelperSource = ResolveCm4TransportHelperSource(repositoryRoot);
             var craneOverlaySource = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
             stagedAppHostAssets.AddRange(StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource));
+            var runtimePublishDirectory = Path.Combine(
+                repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", "Release", "net10.0", "publish");
+            Assert.True(
+                File.Exists(Path.Combine(runtimePublishDirectory, "Tracker.RuntimeHost.dll")),
+                $"AppHost Dockerfile build context is missing the published runtime at '{runtimePublishDirectory}'.");
             EnsureWorkBudget();
             appHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([
                 "--Testing:Mode=base",
@@ -761,6 +791,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             EnsureWorkBudget();
             application = await appHostBuilder.BuildAsync(workDeadline.Token);
             EnsureWorkBudget();
+
+            output.WriteLine($"acceptancePreflight=complete; cm4HelperPath={cm4HelperSource}; cm4HelperSha256={GetSha256(cm4HelperSource)}; runtimePublishPath={runtimePublishDirectory}; engine={dockerContext}/{expectedEngineId}; imageCount={requiredImages.Length}");
+
+            sentinelCreationAttempted = true;
+            var sentinelCreate = await RunWorkDockerCommandAsync(
+            [
+                "run", "--pull=never", "--detach", "--name", sentinelName, "--network", "none",
+                "--label", $"{DockerContainerSpec.StackLabel}={sentinelStackId}",
+                "--label", $"{DockerContainerSpec.ResourceLabel}=sentinel",
+                "--label", $"{DockerContainerSpec.RunLabel}={sentinelRunId}",
+                "--entrypoint", "/bin/bash",
+                requiredImages[3], "-c", "exec sleep 600",
+            ]);
+            Assert.Equal(0, sentinelCreate.ExitCode);
+            var sentinelLookup = await RunWorkDockerCommandAsync(["inspect", "--format", "{{.Id}}", sentinelName]);
+            Assert.Equal(0, sentinelLookup.ExitCode);
+            sentinelContainerId = sentinelLookup.StandardOutput.Trim();
+            Assert.Matches("^[0-9a-f]{64}$", sentinelContainerId);
+            Assert.Equal([sentinelContainerId], await GetOwnedContainerIdsAsync(
+                sentinelStackId, dockerExecutable, WorkCommandTimeout, ProcessKillWaitTimeout));
+            output.WriteLine("sentinelNetwork=none; sentinelPublishedPorts=0; existing AppHost endpoint bindings are not asserted to be zero.");
 
             using var startupTimeout = new CancellationTokenSource(Remaining(workBudget, "AppHost startup"));
             startAttempted = true;
@@ -1086,6 +1137,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var targetFramework = outputDirectory.Name;
         var configuration = outputDirectory.Parent?.Name;
         var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost");
+        var runtimeBundleAppHostDirectory = Path.Combine(
+            repositoryRoot, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost");
         var candidateRoots = new[]
         {
             AppContext.BaseDirectory,
@@ -1093,6 +1146,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Path.Combine(appHostProject, "obj", "Debug", targetFramework),
             Path.Combine(appHostProject, "obj", "Release", targetFramework),
             configuration is null ? string.Empty : Path.Combine(appHostProject, "bin", configuration, targetFramework),
+            runtimeBundleAppHostDirectory,
         };
         foreach (var root in candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)))
         {
