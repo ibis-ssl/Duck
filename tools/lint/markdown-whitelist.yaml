@@ -877,3 +877,46 @@ entries:
     aliases:
       - Dashboard
     description: Aspire が表示する資源の起動状態と接続先を確認する開発用画面。
+
+  - term: TCP
+    description: 通信方式の名称。
+  - term: IPv4
+    description: IPの第4版を表す名称。
+  - term: IPv6
+    description: IPの第6版を表す名称。
+  - term: POSIX
+    description: Unix系OS間で共通のAPIと動作を定める標準規格名。
+  - term: Unix
+    description: Unix系OSおよび関連する仕組みを指す名称。
+  - term: UDS
+    description: 同一ホスト内で使う通信方式の略称。
+  - term: GHCR
+    description: GitHubのコンテナ保存先を表す名称。
+  - term: Debian
+    description: Linux系OSの名称。
+  - term: ELF
+    description: 実行形式やオブジェクトファイルに使われる形式名。
+  - term: MSVC
+    description: C/C++開発用ツールの名称。
+  - term: ABI
+    description: 実行形式間の呼出し規約を表す略称。
+  - term: UID
+    description: Unix系OSでユーザーを識別する数値の略称。
+  - term: inode
+    description: Unix系ファイルを識別する番号の名称。
+  - term: Tailscale
+    description: 端末間の接続に使う製品の名称。
+  - term: CodexSkill
+    description: Codex用の作業手順をまとめるリポジトリ名。
+  - term: UTC
+    description: 協定世界時を表す略称。
+  - term: BCL
+    description: .NETの基本クラスライブラリの略称。
+  - term: TRX
+    description: テスト実行結果を保存するファイル形式の拡張子名。
+  - term: ループ
+    description: ループバックアドレスを構成する語。
+  - term: バック
+    description: ループバックアドレスを構成する語。
+  - term: コンパイル
+    description: プログラムを指定形式へ変換する工程。
