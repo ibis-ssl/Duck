@@ -42,6 +42,19 @@ The evidence folder contains `command.txt`, `stdout.log`, `stderr.log`, `issue42
 - Green diff SHA-256: `C95B3165AC9AC3C674E945413BFF20F1F706FA1900426B61F8D1A0C6B797C05A`.
 - `git diff --check` passed before the implementation commit.
 
+
+### Final implementation verification at baseline `5647fb65df4b0844e83f3a777adea21624615531`
+
+- Source fingerprint SHA-256: `35ECD538444D212A0A497374D9E1845F73486AEBDE9493832650E1CF992AAC1E`; diff includes the current reader and CaptureReplay test changes, with replay integration tests at the baseline HEAD.
+- Combined focused command: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~TrackerReplayIntegrationTddTests|FullyQualifiedName~CaptureReplayTests" --no-restore -m:1 /nr:false`. Build succeeded; 20 passed, 0 failed, 0 skipped; exit code 0. Evidence and TRX: `reports/evidence/issue42-final-green-20261102T231209Z/focused/`.
+- Full project command: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --logger "trx;LogFileName=full-project.trx" --results-directory C:\Users\donabe\AppData\Local\Temp\issue42-final-green-20261102T231209Z`. Build failed with exit code 1 before test execution. MSB3491 reported access denied writing `Tracker/Tracker.Tests/bin/Debug/net10.0/.msCoverageSourceRootsMapping_Tracker.Tests` (denied temporary file `ji5mmnsy.jrl~`). No full-project TRX was produced; stdout and stderr are at `C:\Users\donabe\AppData\Local\Temp\issue42-final-green-20261102T231209Z\`.
+- Tool limitation: after the focused evidence was saved, writes to a full-project child folder and new evidence file under the repository evidence directory were denied. The full-project command and output were captured in the writable Windows Temp directory. No retry or environment change was made.
+
+### Separate authorized-user full-project rerun
+
+- The first full-project attempt at baseline `5647fb65df4b0844e83f3a777adea21624615531` plus source diff SHA-256 `35ECD538444D212A0A497374D9E1845F73486AEBDE9493832650E1CF992AAC1E` ran through the non-elevated sandbox and failed during build with exit code 1 because it was denied permission to write the Tracker.Tests coverage mapping file. It is recorded above and remains a failed attempt.
+- The same full-project command was rerun through the already authorized `require_escalated` Windows PowerShell as `fa780\donabe`. The rerun exited 0; TRX reports 1,158 passed, 0 failed, 2 skipped (1,160 total). TRX: `C:\Users\donabe\AppData\Local\Temp\issue42-final-full-green-elevated-20261102\full-project.trx`; exit record: `...\exit.txt`.
+- The authorized rerun used the same exact source identity: baseline HEAD `5647fb65df4b0844e83f3a777adea21624615531` plus source diff SHA-256 `35ECD538444D212A0A497374D9E1845F73486AEBDE9493832650E1CF992AAC1E`. Requested test-runner model was `gpt-6-luna` / high; applied runtime profile remains unverified.
 ## Execution profile
 
 - Requested test-runner profile: `gpt-6-luna`, reasoning `high`.

@@ -289,9 +289,9 @@ public class CaptureReplayTests : IClassFixture<TrackerContractFixture>
         Assert.Contains(
             "trackerSnapshot source=thirdparty-replay role=external trackedFrame=8101 trackedTs=88001000000 balls=1 robots=1 rawPayloadRestored=True",
             summary.TrackerSnapshotLines);
-        Assert.Contains(
-            "trackerComparison rule=saved-session-alignment ibisTs=88000000000 source=thirdparty-replay role=external nearestTs=88001000000 balls=1 robots=1 rawPayloadRestored=True",
-            summary.TrackerSnapshotLines);
+        Assert.DoesNotContain(
+            summary.TrackerSnapshotLines,
+            line => line.StartsWith("trackerComparison ", StringComparison.Ordinal));
     }
 
     [Fact]

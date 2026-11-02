@@ -154,14 +154,19 @@ public sealed class TrackerSnapshotReplayReader
                 continue;
             }
 
+            var savedAlignmentApplied = false;
             if (alignmentByLine.TryGetValue(lineNumber, out var alignmentRecords))
             {
-                var alignment = alignmentRecords
-                    .FirstOrDefault(record => !string.Equals(record.SourceRole, "own", StringComparison.OrdinalIgnoreCase));
-                if (alignment is not null &&
-                    alignment.TrackerSnapshotRecordIndex is not null &&
-                    inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex.Value, out var alignedInput))
+                foreach (var alignment in alignmentRecords)
                 {
+                    if (string.Equals(alignment.SourceRole, "own", StringComparison.OrdinalIgnoreCase) ||
+                        alignment.TrackerSnapshotRecordIndex is null ||
+                        !inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex.Value, out var alignedInput) ||
+                        alignedInput.TrackedFrameTimestampNs > ibisDataTimestampNs)
+                    {
+                        continue;
+                    }
+
                     var alignedSemanticSummary = alignedInput.ComparisonSource.SemanticSummary;
                     summaries.Add(new TrackerSnapshotComparisonSummary(
                         alignment.MatchingRule,
@@ -172,8 +177,13 @@ public sealed class TrackerSnapshotReplayReader
                         alignedInput.ComparisonSource.RawPayloadRestored,
                         alignedSemanticSummary.BallCount,
                         alignedSemanticSummary.RobotCount));
-                    continue;
+                    savedAlignmentApplied = true;
+                    break;
                 }
+            }
+            if (savedAlignmentApplied)
+            {
+                continue;
             }
 
             var latestBefore = FindLatestAtOrBefore(fallbackCandidates, ibisDataTimestampNs);
