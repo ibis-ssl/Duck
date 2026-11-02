@@ -32,6 +32,14 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
+### 試合開始の確認
+
+TIGERs AI 対 Crane の開始経路は別課題 #43 / #49 で実装する。`match-controller` は開始前に Game Controller API の応答、最新の審判情報パケット、SSL-Vision 入力、対戦参加資源の準備状態を照合する。入力または準備状態を確認できない場合は開始指令を送らず、理由と部分証跡を残して失敗として扱う。
+
+標準の試合開始では、審判情報パケットが `HALT` の場合に Game Controller API の `RESUME_FROM_HALT` を送り、操作前より新しいパケットで `STOP` への遷移を確認してから進める。`STOP` から `NEXT_COMMAND` を送り、さらに新しいパケットの `PREPARE_KICKOFF_BLUE` または `PREPARE_KICKOFF_YELLOW` を確認してから `NORMAL_START` を送る。すでに準備中または開始後の場合は同じ指令を重ねず、観測した状態を記録する。送信成功、固定時間の待機、または `FORCE_START` の受理だけでは試合開始の成立とはみなさない。`NORMAL_START` の後に届いた新しい審判情報パケットで開始指令を確認したとき、試合開始と判定する。#49 の対象テストではこの状態遷移と新しいパケットの観測を確認する。双方の実際の動きは `ASPIRE-MATCH-003` / #52 の別の実通信受入で確認するため、本項だけでは双方の動作や試合結果を証明しない。
+
+`POST_GAME` と制限時間到達は別の終了経路として扱う。制限時間到達は実行を止める上限であり、それだけで試合成功とはしない。最終結果または得点を読む時点で Game Controller API、審判情報パケット、SSL-Vision 入力、対戦参加資源の新しい証拠が揃わない場合は入力または実行時の失敗とし、部分的な結果と診断記録を保持する。
+
 視覚入力から `Tracker.RuntimeHost` の準備完了までを単独で確認する場合は、`Testing:VisionSimulationOnly=true` を明示する。この選択では `simulator` と `duck` の2資源だけを Aspire 標準 `ContainerResource` として登録し、既定の基本構成・比較構成は変更しない。既存の `RuntimeHostOnly` は Duck だけの1資源選択として維持する。simulator は `linux-image-lock.json` の `framework-simulator` 一覧ダイジェストを使い、Dockerイメージの `Entrypoint=["tini","--"]` と `Cmd=["./bin/simulator-cli"]` に対応するよう、`tini` と `-- ./bin/simulator-cli -g 2020B --realism None --ibis-port 12346 --ibis-team-color yellow` を指定する。追加の `tini` を起動引数に重ねない。UDP は公開せず、ホストネットワークも使わない。simulator が起動した後に Duck を開始し、Duck 自身の `/health/vision` が復号済み視覚入力を確認する。これは最小の視覚入力経路の検証であり、比較資源やその他の外部サービスを含む全体構成の受入を意味しない。固定イメージの実行、同一 DCP ブリッジ内のマルチキャスト到達、厳格な準備確認の成功は実測で確認する。
 
 ### Linux 向けアプリケーションの配布出力（I81-04A）
@@ -282,7 +290,7 @@ DuckとRefereeDriverの監視が同じファイルへ追記する場合、AppHos
 
 APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。APIにUDPの `command_counter` があるとは仮定しない。同じプロセス内の観測期間の有限な新しさを照合するもので、異なる通信規約の原子的な同期や実流量での可用性を保証しない。資源の起動世代、受信世代、接続先の設定世代を区別する。
 
-観測処理は0.1秒間隔で順次照合し、UDPを別に受信しない。観測専用時は制御への書込みを行わない。明示した自動制御では、同じ受信処理を使う既存の制御処理が `HALT` から `NEXT_COMMAND`、必要に応じて `FORCE_START` または `NORMAL_START` へ進める。この選択と診断の200判定は独立した契約である。既存のJSON形式と明示的なチーム名設定を保持し、自動改名用の設定は追加しない。
+観測処理は0.1秒間隔で順次照合し、UDPを別に受信しない。観測専用時は制御への書込みを行わない。明示した自動制御では、同じ受信処理を使う既存の制御処理が `HALT` 時は Game Controller API の `RESUME_FROM_HALT` を使い、新しい審判情報パケットで `STOP` を確認した後、必要に応じて `NEXT_COMMAND`、`FORCE_START` または `NORMAL_START` へ進める。この選択と診断の200判定は独立した契約である。既存のJSON形式と明示的なチーム名設定を保持し、自動改名用の設定は追加しない。
 
 制御の送信は初期出力全体の受信後に行い、正常・失敗・取消のいずれでも接続を破棄する。自動制御の正常完了後も観測を継続し、停止時は受信、API取得、保留制御と明示所有資源を回収する。制御の待機は既存の呼出取消に従い、新しい自前期限を追加しない。
 
