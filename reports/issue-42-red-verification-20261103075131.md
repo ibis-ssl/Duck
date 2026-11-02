@@ -39,18 +39,21 @@
 - reasons / constraints (parent): no restore or environment changes; expected Red is not a green result and must be reported as such.
 
 ## 実行コマンド
-- Exact command: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~TrackerReplayIntegrationTddTests --no-restore -m:1 /nr:false --logger "trx;LogFileName=issue42-red.trx" --results-directory reports/evidence/issue42-red-20261103-20261102T225737Z`.
-- Exit code: 1 (expected TDD Red).
-- Captured stdout, stderr, TRX, command metadata, and test-source diff: `reports/evidence/issue42-red-20261103-20261102T225737Z/`.
+- Initial pre-implementation fallback Red: focused class, 6 passed / 1 failed; evidence in `reports/evidence/issue42-red-20261103-20261102T225737Z/`.
+- Green: full focused class with build, 7 passed / 0 failed; evidence in `reports/evidence/issue42-green-20261102T230032Z/`.
+- Latest focused tick-kind Red command: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~TrackerReplayIntegrationTddTests.ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback --no-restore -m:1 /nr:false --logger "trx;LogFileName=issue42-red.trx" --results-directory reports/evidence/issue42-red-tick-kind-20261102T230155Z`.
+- Latest process exit code: 1; full command/output/TRX/source diff saved in `reports/evidence/issue42-red-tick-kind-20261102T230155Z/`.
 ## 対象ファイル
-- Repository: `ibis-ssl/Duck`; branch `task/issue42-aspire-006e-captureon-same-tick`; HEAD `92a53d305867c4cbc313a491c9d293b526a2947a`.
-- Test source: `Tracker/Tracker.Tests/TrackerReplayIntegrationTddTests.cs`; project: `Tracker/Tracker.Tests/Tracker.Tests.csproj`.
-- Current test diff SHA-256: `5108064990150801D09492D5B633722B281839AA8ABFA47F8BE74B7A6A5622A2` (hash of captured `git diff --no-ext-diff --binary -- Tracker/Tracker.Tests/TrackerReplayIntegrationTddTests.cs`; see evidence folder `test-source.diff`).
+- Repository: `ibis-ssl/Duck`; branch `task/issue42-aspire-006e-captureon-same-tick`.
+- Latest Red baseline HEAD: `4fb678bd9b24fa16ecd38ba88b9734f1d9307aee` plus working-tree implementation/test diff. Diff files: `Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotReplayReader.cs` and `Tracker/Tracker.Tests/TrackerReplayIntegrationTddTests.cs`.
+- Latest Red source diff SHA-256: `CE2CB7019F8E6AA0FB2977241FBD5E32CC8926AA74281B29D7A90E6F9701F94D` (captured as `source.diff` from `git diff --no-ext-diff --binary` over those two files). The earlier Green source diff fingerprint remains `8AE24C1B3CBD276B621AED3C67FF10F79453A594298EB7DD777BE1479FA3A4E2`.
 ## 指摘事項
-- The saved-alignment test fixture contains a ready `DiagnosticsEntryTimelineKind` alignment and a ready `RenderSnapshotTimelineKind` alignment with `DiagnosticsLineNumber = 1`. `ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback` passed and selected `saved-alignment` at `12_198_000_000`. This confirms that the competing render-snapshot record did not displace the same-diagnostics-line saved alignment in this run; this assertion passed and is not a Red failure.
-- The fallback test directly failed: expected source `latest-before`, actual source `future-nearest`. Expected timestamp is `12_199_000_000`; selected future candidate timestamp is `12_202_000_000`; diagnostics sample timestamp is `12_201_000_000`.
+- Latest test fixture puts a ready `RenderSnapshotTimelineKind` candidate at tracker record index 0 and the saved `DiagnosticsEntryTimelineKind` alignment at index 1, both sharing diagnostics line 1. The reader currently has no replay timeline kind filter.
+- The focused test failed at source-label assertion: expected `saved-alignment`, actual `render-snapshot`. This is the requested direct Red for filtering render-snapshot rows when resolving a diagnostics sample tick.
+- Prior Green evidence (7/7) was against the earlier fixture ordering; it does not supersede this strengthened direct Red.
+- Requested profile is `gpt-6-luna`, reasoning `high`; applied runtime profile is unverified because runtime profile metadata is not exposed.
 ## 結果
-- Build succeeded; TRX reports 7 tests: 6 passed, 1 failed, 0 skipped. The sole failure is `ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot`, failing source-label equality at line 191 (`latest-before` expected, `future-nearest` actual). No other test failure occurred. Build emitted dependency, analyzer, and Aspire warnings recorded in stdout.
-- Evidence: `reports/evidence/issue42-red-20261103-20261102T225737Z/stdout.log`, `stderr.log`, `issue42-red.trx`, `command.txt`, and `test-source.diff`. Earlier runs remain preserved as historical/exploratory evidence.
+- Latest run built successfully, ran exactly 1 test, and failed 1 / passed 0 / skipped 0. The only failure is `ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback`: expected `saved-alignment`, actual `render-snapshot` at line 169. Process exit code 1. Full output and TRX are in `reports/evidence/issue42-red-tick-kind-20261102T230155Z/`.
+- Earlier fallback Green was 7 passed / 0 failed / 0 skipped with process exit code 0. Earlier Red evidence remains preserved in its own folders.
 ## リスク
-- Direct Red is established for excluding future snapshots from fallback selection. The saved-alignment fixture with the competing render-snapshot alignment passes, so it does not expose a same-tick filtering failure on this implementation. No restore, dependency, environment, source, design, tracking, commit, push, or external changes were made by this runner.
+- The current Red establishes the same-diagnostics-tick kind-filter failure. Parent will commit this Red test and implement the filter. No source, dependency, environment, design, tracking, commit, push, or external changes were made by this test runner. Existing compiler/analyzer warnings are captured in the run logs.

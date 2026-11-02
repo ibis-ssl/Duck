@@ -107,7 +107,7 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         var summaries = GetEnumerableProperty(replaySession, "ComparisonSummaries").ToArray();
 
         var summary = Assert.Single(summaries);
-        Assert.Equal("nearest-timestamp", GetStringProperty(summary, "MatchingRule"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
         Assert.Equal(12_201_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
         Assert.Equal("external", GetStringProperty(summary, "NearestSnapshotSourceRole"));
         Assert.Equal("thirdparty-d", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
@@ -121,7 +121,7 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
     /// 何を確認しているか: diagnostics log 行頭の receivedAt ではなく、ibis own snapshot の data timestamp を基準に nearest summary を作ることを確認する。
     /// </summary>
     [Fact]
-    public void ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary()
+    public void ReadSession_UsesLatestBeforeIbisDataTimestampInsteadOfDiagnosticsReceivedAt()
     {
         var session = CreateSession(
             [
@@ -139,8 +139,9 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         var summary = Assert.Single(summaries);
         Assert.Equal(99_000_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
         Assert.Equal("external", GetStringProperty(summary, "NearestSnapshotSourceRole"));
-        Assert.Equal("data-nearest", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
-        Assert.Equal(99_001_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.Equal("received-clock", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(12_200_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
     }
 
     /// <summary>
@@ -151,13 +152,14 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
     {
         var session = CreateSession(
             [
+                SnapshotInput("render-uuid", "render-snapshot", "external", 7118, 12_200_000_000),
                 SnapshotInput("saved-uuid", "saved-alignment", "external", 7120, 12_198_000_000),
                 SnapshotInput("recent-uuid", "latest-before", "external", 7122, 12_199_000_000),
                 SnapshotInput("ibis-runtime", "ibis", "own", 7121, 12_201_000_000),
             ],
             diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero),
             diagnosticsTrackedFrame: 7121);
-        WriteSavedAlignment(session, recordIndex: 0, sourceLabel: "saved-alignment", snapshotTimestampNs: 12_198_000_000);
+        WriteSavedAlignment(session, recordIndex: 1, sourceLabel: "saved-alignment", snapshotTimestampNs: 12_198_000_000);
         var reader = CreateReplayReader();
 
         var replaySession = InvokeReadSession(reader, session.MetadataPath);
@@ -238,15 +240,15 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
             RenderFrameNumber = (uint?)7122,
             RenderReceivedAt = (DateTimeOffset?)receivedAt,
             RenderMatchRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
-            SourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey("external", "latest-before", "recent-uuid", "192.0.2.22:12010"),
+            SourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey("external", "render-snapshot", "render-uuid", "192.0.2.18:12010"),
             SourceRole = "external",
-            SourceLabel = "latest-before",
-            SourceUuid = "recent-uuid",
-            RemoteEndpoint = "192.0.2.22:12010",
-            TrackerSnapshotRecordIndex = (int?)1,
+            SourceLabel = "render-snapshot",
+            SourceUuid = "render-uuid",
+            RemoteEndpoint = "192.0.2.18:12010",
+            TrackerSnapshotRecordIndex = (int?)0,
             TrackerSnapshotReceivedAt = (DateTimeOffset?)receivedAt,
-            TrackerSnapshotTrackedFrameNumber = (uint?)7122,
-            TrackerSnapshotTimestampNs = (long?)12_199_000_000,
+            TrackerSnapshotTrackedFrameNumber = (uint?)7118,
+            TrackerSnapshotTimestampNs = (long?)12_200_000_000,
             MatchingRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
             ReceivedAtDeltaTicks = (long?)0,
             Status = TrackerSnapshotAlignmentRecord.ReadyStatus,
