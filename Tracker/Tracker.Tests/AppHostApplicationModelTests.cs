@@ -1015,6 +1015,30 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public void MatchFixturesKeepTigersConfigurationAndInitialFriendlyStopState()
+    {
+        var fixtureDirectory = Path.Combine(AppContext.BaseDirectory, "Fixtures", "match");
+        var protocol = XDocument.Load(Path.Combine(fixtureDirectory, "simulation_protocol_tigers.xml"));
+        var refereeProperties = protocol.Descendants("module")
+            .Single(module => (string?)module.Attribute("id") == "edu.tigers.sumatra.referee.AReferee")
+            .Element("properties");
+        Assert.Equal("NETWORK", (string?)refereeProperties?.Element("source"));
+        Assert.Equal("11003", (string?)refereeProperties?.Element("port"));
+        Assert.Equal("false", (string?)refereeProperties?.Element("gameController"));
+        var matchConfig = File.ReadAllText(Path.Combine(fixtureDirectory, "ssl-game-controller-match.yaml"));
+        Assert.Contains("state-store-file: /tmp/state-store.json.stream", matchConfig, StringComparison.Ordinal);
+
+        using var state = System.Text.Json.JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(fixtureDirectory, "state-store-initial.json.stream")));
+        var matchState = state.RootElement.GetProperty("state");
+        Assert.Equal("STOP", matchState.GetProperty("gameState").GetProperty("type").GetString());
+        var teams = matchState.GetProperty("teamState");
+        Assert.Equal("TIGERs Mannheim", teams.GetProperty("BLUE").GetProperty("name").GetString());
+        Assert.Equal("ibis", teams.GetProperty("YELLOW").GetProperty("name").GetString());
+        Assert.Equal("FRIENDLY", matchState.GetProperty("matchType").GetString());
+    }
+
+    [Fact]
     public async Task BaseModeDoesNotAddComparisonOnlyResources()
     {
         using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(

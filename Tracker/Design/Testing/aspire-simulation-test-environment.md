@@ -661,3 +661,9 @@ Crane の元の再起動処理を呼び出す直前に、登録済みの所有�
 2026-10-31 の通常構成確認では、`simulator`、`duck`、`game-controller`、`cm4-sim`、`crane` の5資源が起動し、初回適用は現在の所有済み CM4 と Simulator に対して `Applied` となった。Duck の視覚入力診断は99件の復号成功、失敗0件を返した。Crane の `/robot_feedback` は有効受信数の最大321、無効0件、新しい受信時刻を返した。120秒の上限内に停止し、所有確認後の最終走査で残存資源はなかった。ホスト側 UDP 受信機は作成していない。
 
 この確認は上記の通常構成での一回の通信と停止回収を示す。CM4 のサービス準備完了、再作成後の通信、長時間の安定性、比較構成、および他の起動選択は未確認であり、確認応答だけからそれらを受入済みとしない。
+
+## Match fixtures (ASPIRE-006F1)
+
+Keep the pinned match configuration under `Testing/Duck.Testing.AppHost/Fixtures/match` as Duck-side assets: `simulation_protocol_tigers.xml`, `ssl-game-controller-match.yaml`, and `state-store-initial.json.stream`. The initial fixture must represent a friendly match in `STOP` with Blue `TIGERs Mannheim` and Yellow `ibis`; the Sumatra referee module listens to the Game Controller stream on UDP 11003. Keep the match-time configuration alongside the initial state rather than deriving it from a live Game Controller.
+
+These fixtures are sourced from `ibis-ssl/crane` commit `af6e0d3dec745415ce060ff5de2042afd3ec5145`, under `docker/match-vs-tigers/config`. This item versions the inputs and verifies their contract only; resource registration and lifecycle behavior belong to later `ASPIRE-006F` children.
