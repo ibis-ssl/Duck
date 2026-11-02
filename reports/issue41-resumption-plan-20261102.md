@@ -16,7 +16,7 @@
 ## 検証
 
 - 実行HEAD: `08c65a923626ff42a9c1ca1eb1bbb866a973dd4d`（計画コミットのみ。製品コードは変更していない）。
-- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests" -m:1 /nr:false` は21/21成功。現在のPR HEAD `c2596dc88eb273a3df2a146a60f49661acd00997` でも、同じ対象を `--no-build --no-restore` で実行し21/21成功した。
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests" -m:1 /nr:false` は21/21成功。検証時点のPR HEAD `c2596dc88eb273a3df2a146a60f49661acd00997` でも、同じ対象を `--no-build --no-restore` で実行し21/21成功した。
 - 最初のsandbox内実行は`obj`の一時ファイル書込み拒否（MSB3491）でテスト開始前のビルド中に停止した。同じコマンドを許可済みPowerShell経路で再実行して成功した。stdout/stderrは `reports/evidence/issue41-focused-test-20261102/` に保存した。
 - 統合試験は未実施。統合失敗時のAspire/コンテナ診断ログ保存条件は未発生。
 - 旧PR #74のtest/review履歴は今回の結果に流用していない。
