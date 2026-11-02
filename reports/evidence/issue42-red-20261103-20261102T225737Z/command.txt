@@ -1,0 +1,6 @@
+UTC: 2026-11-02T22:57:37.5433896Z
+HEAD: 92a53d305867c4cbc313a491c9d293b526a2947a
+Test source diff SHA256: 5108064990150801D09492D5B633722B281839AA8ABFA47F8BE74B7A6A5622A2
+Diff artifact: reports\evidence\issue42-red-20261103-20261102T225737Z\test-source.diff
+Command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~TrackerReplayIntegrationTddTests --no-restore -m:1 /nr:false --logger "trx;LogFileName=issue42-red.trx" --results-directory reports/evidence/issue42-red-20261103-20261102T225737Z
+Working directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split
