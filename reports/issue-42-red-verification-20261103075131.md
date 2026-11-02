@@ -1,4 +1,4 @@
-﻿# Issue #42 — Red / Green verification
+# Issue #42 — Red / Green verification
 
 ## Task and scope
 
@@ -16,6 +16,13 @@
 | Fallback excludes future snapshots | `92a53d305867c4cbc313a491c9d293b526a2947a` plus test diff SHA-256 `5108064990150801D09492D5B633722B281839AA8ABFA47F8BE74B7A6A5622A2` | Build succeeded; 7 tests ran, 6 passed and 1 failed. The fallback selected `future-nearest` at `12,202,000,000` instead of `latest-before` at `12,199,000,000` for diagnostics time `12,201,000,000`. | `reports/evidence/issue42-red-20261103-20261102T225737Z/` |
 | Saved alignment is scoped to the diagnostics sample tick | `4fb678bd9b24fa16ecd38ba88b9734f1d9307aee` plus working diff SHA-256 `CE2CB7019F8E6AA0FB2977241FBD5E32CC8926AA74281B29D7A90E6F9701F94D` | Build succeeded; 1 test ran and failed as expected. A render-snapshot row sharing the diagnostics line sorted before the diagnostics-entry row and was selected (`render-snapshot` instead of `saved-alignment`). | `reports/evidence/issue42-red-tick-kind-20261102T230155Z/` |
 
+| Future saved alignment falls back to latest-before | `44e0ef03d91a5a6833edea0724ec2644b986ab69` plus working-tree source diff SHA-256 `991178A422983C85D382849A7A56618E4C65887DFDFF24A429D9383D0323FD1E` | Build succeeded; the single test failed as expected, selecting `saved-future` at `12,202,000,000` instead of `latest-before` at `12,199,000,000` for diagnostics sample `12,201,000,000`. Exit code 1. | `reports/evidence/issue42-red-futuresaved-20261102T230952Z/` |
+
+Exact command:
+
+`dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot --no-restore -m:1 /nr:false --logger "trx;LogFileName=issue42-red.trx" --results-directory reports/evidence/issue42-red-futuresaved-20261102T230952Z`
+
+The evidence folder contains `command.txt`, `stdout.log`, `stderr.log`, `issue42-red.trx`, and `source.diff`. Build emitted analyzer warnings, preserved in the logs. The fixture omits the render-snapshot row and points the ready diagnostics-entry saved alignment to a future timestamp.
 ## Implementation
 
 - Filter saved alignment records to ready `DiagnosticsEntryTimelineKind` rows before grouping by diagnostics line.

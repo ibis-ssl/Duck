@@ -170,6 +170,33 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         Assert.Equal(12_198_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
     }
 
+    [Fact]
+    public void ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("future-uuid", "saved-future", "external", 7122, 12_202_000_000),
+                SnapshotInput("latest-uuid", "latest-before", "external", 7120, 12_199_000_000),
+                SnapshotInput("ibis-runtime", "ibis", "own", 7121, 12_201_000_000),
+            ],
+            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero),
+            diagnosticsTrackedFrame: 7121);
+        WriteSavedAlignment(
+            session,
+            recordIndex: 0,
+            sourceLabel: "saved-future",
+            snapshotTimestampNs: 12_202_000_000,
+            includeRenderSnapshotAlignment: false);
+        var reader = CreateReplayReader();
+
+        var replaySession = InvokeReadSession(reader, session.MetadataPath);
+        var summary = Assert.Single(GetEnumerableProperty(replaySession, "ComparisonSummaries"));
+
+        Assert.Equal("latest-before", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(12_199_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
+    }
+
     /// <summary>
     /// 何を確認しているか: saved alignment がない場合、diagnostics sample tick 以前で最も新しい snapshot を選び、未来の snapshot を使わないことを確認する。
     /// </summary>
@@ -200,7 +227,8 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         TestSession session,
         int recordIndex,
         string sourceLabel,
-        long snapshotTimestampNs)
+        long snapshotTimestampNs,
+        bool includeRenderSnapshotAlignment = true)
     {
         var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero);
         var alignmentPath = Path.Combine(
@@ -230,33 +258,36 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
             Status = TrackerSnapshotAlignmentRecord.ReadyStatus,
         };
 
-        var renderTimelineAlignment = new
+        var alignmentLines = new List<string> { JsonSerializer.Serialize(alignment) };
+        if (includeRenderSnapshotAlignment)
         {
-            SchemaVersion = 2,
-            ReplayTimelineIndex = 1,
-            ReplayTimelineReceivedAt = receivedAt,
-            ReplayTimelineKind = TrackerSnapshotAlignmentRecord.RenderSnapshotTimelineKind,
-            DiagnosticsLineNumber = 1,
-            RenderFrameNumber = (uint?)7122,
-            RenderReceivedAt = (DateTimeOffset?)receivedAt,
-            RenderMatchRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
-            SourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey("external", "render-snapshot", "render-uuid", "192.0.2.18:12010"),
-            SourceRole = "external",
-            SourceLabel = "render-snapshot",
-            SourceUuid = "render-uuid",
-            RemoteEndpoint = "192.0.2.18:12010",
-            TrackerSnapshotRecordIndex = (int?)0,
-            TrackerSnapshotReceivedAt = (DateTimeOffset?)receivedAt,
-            TrackerSnapshotTrackedFrameNumber = (uint?)7118,
-            TrackerSnapshotTimestampNs = (long?)12_200_000_000,
-            MatchingRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
-            ReceivedAtDeltaTicks = (long?)0,
-            Status = TrackerSnapshotAlignmentRecord.ReadyStatus,
-        };
+            var renderTimelineAlignment = new
+            {
+                SchemaVersion = 2,
+                ReplayTimelineIndex = 1,
+                ReplayTimelineReceivedAt = receivedAt,
+                ReplayTimelineKind = TrackerSnapshotAlignmentRecord.RenderSnapshotTimelineKind,
+                DiagnosticsLineNumber = 1,
+                RenderFrameNumber = (uint?)7122,
+                RenderReceivedAt = (DateTimeOffset?)receivedAt,
+                RenderMatchRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
+                SourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey("external", "render-snapshot", "render-uuid", "192.0.2.18:12010"),
+                SourceRole = "external",
+                SourceLabel = "render-snapshot",
+                SourceUuid = "render-uuid",
+                RemoteEndpoint = "192.0.2.18:12010",
+                TrackerSnapshotRecordIndex = (int?)0,
+                TrackerSnapshotReceivedAt = (DateTimeOffset?)receivedAt,
+                TrackerSnapshotTrackedFrameNumber = (uint?)7118,
+                TrackerSnapshotTimestampNs = (long?)12_200_000_000,
+                MatchingRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
+                ReceivedAtDeltaTicks = (long?)0,
+                Status = TrackerSnapshotAlignmentRecord.ReadyStatus,
+            };
+            alignmentLines.Add(JsonSerializer.Serialize(renderTimelineAlignment));
+        }
 
-        File.WriteAllLines(
-            alignmentPath,
-            [JsonSerializer.Serialize(alignment), JsonSerializer.Serialize(renderTimelineAlignment)]);
+        File.WriteAllLines(alignmentPath, alignmentLines);
     }
     private object CreateReplayReader()
     {

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="d62c290f-78ff-4491-8ea2-e4ba1daad191" name="donabe@FA780 2026-11-03 08:09:58" runUser="FA780\donabe" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-03T08:09:58.7021847+09:00" queuing="2026-11-03T08:09:58.7021850+09:00" start="2026-11-03T08:09:57.4836381+09:00" finish="2026-11-03T08:09:58.7062743+09:00" />
+  <TestSettings name="default" id="1e5e1af9-3b99-4b9c-814b-1960b6312b0e">
+    <Deployment runDeploymentRoot="donabe_FA780_2026-11-03_08_09_58" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5534b825-094d-48eb-a4c1-955b624ae385" testId="77755807-4a2e-7efa-c4bb-12fd96e85c52" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot" computerName="FA780" duration="00:00:00.0994637" startTime="2026-11-03T08:09:58.5061312+09:00" endTime="2026-11-03T08:09:58.6154184+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5534b825-094d-48eb-a4c1-955b624ae385">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Strings differ&#xD;
+           ↓ (pos 0)&#xD;
+Expected: "latest-before"&#xD;
+Actual:   "saved-future"&#xD;
+           ↑ (pos 0)</Message>
+          <StackTrace>   at Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\TrackerReplayIntegrationTddTests.cs:line 195&#xD;
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="77755807-4a2e-7efa-c4bb-12fd96e85c52">
+      <Execution id="5534b825-094d-48eb-a4c1-955b624ae385" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="77755807-4a2e-7efa-c4bb-12fd96e85c52" executionId="5534b825-094d-48eb-a4c1-955b624ae385" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="一覧に存在しない結果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="読み込まれたすべての結果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)&#xD;
+[xUnit.net 00:00:00.52]   Discovering: Tracker.Tests&#xD;
+[xUnit.net 00:00:00.62]   Discovered:  Tracker.Tests&#xD;
+[xUnit.net 00:00:00.64]   Starting:    Tracker.Tests&#xD;
+[xUnit.net 00:00:00.77]       Assert.Equal() Failure: Strings differ&#xD;
+[xUnit.net 00:00:00.77]                  ↓ (pos 0)&#xD;
+[xUnit.net 00:00:00.77]       Expected: "latest-before"&#xD;
+[xUnit.net 00:00:00.77]       Actual:   "saved-future"&#xD;
+[xUnit.net 00:00:00.77]                  ↑ (pos 0)&#xD;
+[xUnit.net 00:00:00.77]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.77]         C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\TrackerReplayIntegrationTddTests.cs(195,0): at Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot()&#xD;
+[xUnit.net 00:00:00.77]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)&#xD;
+[xUnit.net 00:00:00.77]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.77]   Finished:    Tracker.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="FA780" outcome="Error" timestamp="2026-11-03T08:09:58.6175000+09:00">
+        <Text>[xUnit.net 00:00:00.76]     Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
