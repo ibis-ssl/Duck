@@ -1027,6 +1027,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("false", (string?)refereeProperties?.Element("gameController"));
         var matchConfig = File.ReadAllText(Path.Combine(fixtureDirectory, "ssl-game-controller-match.yaml"));
         Assert.Contains("state-store-file: /tmp/state-store.json.stream", matchConfig, StringComparison.Ordinal);
+        Assert.Contains("half-duration: 45s", matchConfig, StringComparison.Ordinal);
+        Assert.Contains("half-duration: 30s", matchConfig, StringComparison.Ordinal);
 
         using var state = System.Text.Json.JsonDocument.Parse(
             File.ReadAllText(Path.Combine(fixtureDirectory, "state-store-initial.json.stream")));
