@@ -84,13 +84,20 @@ internal sealed class RefereeApiMatcher
     /// <summary>単一観測の次の完了を期限付きで共有し、返却直前に現在の両証跡を再検証する。</summary>
     internal async Task<RefereeApiMatchResult> WaitForCurrentAsync(
         TimeSpan timeout, TimeProvider clock, CancellationToken cancellationToken)
+        => await WaitForCurrentAsync(timeout, clock, _ => true, cancellationToken).ConfigureAwait(false);
+
+    /// <summary>既存の観測workerが生成した結果を、必要なUDP状態まで待つ。API読取を並行起動しない。</summary>
+    internal async Task<RefereeApiMatchResult> WaitForCurrentAsync(
+        TimeSpan timeout, TimeProvider clock, Func<RefereeApiMatchResult, bool> predicate,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(predicate);
         if (timeout <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(timeout));
         cancellationToken.ThrowIfCancellationRequested();
         var immediate = GetCurrent();
-        if (immediate.IsReady)
+        if (immediate.IsReady && predicate(immediate))
             return immediate;
 
         using var deadline = new CancellationTokenSource(timeout, clock);
@@ -106,7 +113,7 @@ internal sealed class RefereeApiMatcher
                     completed = observationCompleted.Task;
                 var result = GetCurrent();
                 waiting.Token.ThrowIfCancellationRequested();
-                if (result.IsReady)
+                if (result.IsReady && predicate(result))
                     return result;
                 await completed.WaitAsync(waiting.Token).ConfigureAwait(false);
             }

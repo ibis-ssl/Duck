@@ -7,6 +7,39 @@ namespace Tracker.Tests;
 public sealed class MatchControllerWorkerTests
 {
     [Fact]
+    public void ParticipantReadinessRequiresFreshCurrentRunningEvidenceForEveryExpectedResource()
+    {
+        var expected = new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder" };
+        var now = DateTimeOffset.UtcNow;
+        var current = CompleteReadiness().ParticipantEvidence!;
+
+        Assert.True(MatchControllerReadinessProbe.IsParticipantEvidenceReady(current, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with { ObservedAtUtc = now - TimeSpan.FromSeconds(3) }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with { Resources = current.Resources.Where(resource => resource.ResourceId != "tigers-blue").ToArray() }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "autoref-tigers"
+                    ? resource with { HealthStatus = "Unhealthy" }
+                    : resource).ToArray(),
+            }, expected, now));
+    }
+
+    [Fact]
+    public void VisionReadinessUsesTheRuntimeHealthResponseContract()
+    {
+        using var response = System.Text.Json.JsonDocument.Parse("{\"IsReady\":true}");
+        using var wrongCase = System.Text.Json.JsonDocument.Parse("{\"isReady\":true}");
+        using var notReady = System.Text.Json.JsonDocument.Parse("{\"IsReady\":false}");
+
+        Assert.True(MatchControllerReadinessProbe.IsVisionResponseReady(response.RootElement));
+        Assert.False(MatchControllerReadinessProbe.IsVisionResponseReady(wrongCase.RootElement));
+        Assert.False(MatchControllerReadinessProbe.IsVisionResponseReady(notReady.RootElement));
+    }
+
+    [Fact]
     public async Task RunMatchPersistsCompletePostGameResultAfterInitialStop()
     {
         using var artifacts = new TemporaryDirectory();
@@ -84,6 +117,40 @@ public sealed class MatchControllerWorkerTests
         Assert.False(json.RootElement.GetProperty("finalReadiness").GetProperty("visionReady").GetBoolean());
     }
 
+    [Fact]
+    public async Task RunMatchPersistsPartialResultWhenFinalParticipantEvidenceIsMissing()
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var source = new SequenceRefereeCommandSource(
+            Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.PrepareKickoffBlue, 2, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.NormalStart, 3, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.Stop, 4, Referee.Types.Stage.PostGame));
+        var incomplete = CompleteReadiness() with
+        {
+            ParticipantResourcesReady = false,
+            FailureReason = "participantResourcesReady=False",
+            ParticipantEvidence = CompleteReadiness().ParticipantEvidence! with
+            {
+                Resources = CompleteReadiness().ParticipantEvidence!.Resources
+                    .Where(resource => resource.ResourceId != "tigers-blue").ToArray(),
+            },
+        };
+        var readiness = new RecordingReadinessProbe(CompleteReadiness(), incomplete);
+        var worker = CreateWorker(source, new RecordingControlClient(), readiness, resultPath, TimeSpan.FromSeconds(1));
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal("failed", result.Status);
+        Assert.Equal("post_game", result.StageReached);
+        Assert.Contains("participantResourcesReady=False", result.Failure, StringComparison.Ordinal);
+        using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
+        var resources = json.RootElement.GetProperty("finalReadiness").GetProperty("participantEvidence").GetProperty("resources");
+        Assert.DoesNotContain(resources.EnumerateArray(), resource => resource.GetProperty("resourceId").GetString() == "tigers-blue");
+    }
+
     private static MatchControllerWorker CreateWorker(
         IRefereeCommandSource source,
         RecordingControlClient control,
@@ -101,7 +168,14 @@ public sealed class MatchControllerWorkerTests
 
     private static MatchControllerReadiness CompleteReadiness() =>
         new(["simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder"],
-            GameControllerApiAndRefereeReady: true, VisionReady: true);
+            ParticipantResourcesReady: true, GameControllerApiAndRefereeReady: true, VisionReady: true,
+            ParticipantEvidence: new(DateTimeOffset.UtcNow,
+            [
+                new("simulator", "Running", null), new("game-controller", "Running", null),
+                new("crane", "Running", null), new("duck", "Running", null),
+                new("tigers-blue", "Running", null), new("autoref-tigers", "Running", null),
+                new("ssl-log-recorder", "Running", null),
+            ]));
 
     private static RefereeCommandSnapshot Snapshot(
         Referee.Types.Command command, uint counter, Referee.Types.Stage stage) =>
@@ -120,7 +194,8 @@ public sealed class MatchControllerWorkerTests
             return Task.FromResult(results[index++]);
         }
 
-        public Task<MatchControllerReadiness> ReadFinalReadinessAsync(CancellationToken cancellationToken)
+        public Task<MatchControllerReadiness> ReadFinalReadinessAsync(
+            RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken)
         {
             FinalCalls++;
             return Task.FromResult(results[index++]);

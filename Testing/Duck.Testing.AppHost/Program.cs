@@ -488,7 +488,7 @@ var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGu
 var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
 var enableStandardBaseDuckIdentityBridge =
     IsEnabled(desktopBridgeSetting) ||
-    (testingMode is "base" or "comparison") &&
+    (testingMode is "base" or "comparison" or "match") &&
     desktopBridgeSetting is null &&
     !string.IsNullOrWhiteSpace(identityDockerContext) &&
     !string.IsNullOrWhiteSpace(identityExpectedEngineId);
@@ -601,6 +601,17 @@ if (testingMode == "match")
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
+    var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
+    var participantResources = new IResource[]
+    {
+        simulator.Resource, gameController.Resource, crane.Resource, duck.Resource,
+        tigersBlue.Resource, autoRefTigers.Resource, sslLogRecorder.Resource,
+    };
+    builder.Services.AddSingleton<IHostedService>(services => new MatchParticipantStatusProjection(
+        services.GetRequiredService<ResourceNotificationService>(),
+        participantResources,
+        participantStatusPath,
+        TimeProvider.System));
 
     var matchController = AddPublishedContainer(
             "match-controller", "duck-match-controller", "Testing/Duck.Testing.RefereeDriver.Host")
@@ -610,6 +621,7 @@ if (testingMode == "match")
         .WithEnvironment("MatchController__Enabled", "true")
         .WithEnvironment("MatchController__VisionHealthUri", "http://duck:39108/health/vision")
         .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
+        .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
         .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
         .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:02:00")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
@@ -620,6 +632,15 @@ if (testingMode == "match")
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
         .WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false)
         .WithHttpHealthCheck("/health/referee", endpointName: "http");
+    if (enableStandardBaseDuckIdentityBridge)
+    {
+        matchController
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "match-controller")
+            .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+        EnableDesktopIdentityBridge(matchController, duckRunId,
+            "match-controller", "Duck.Testing.RefereeDriver.Host.dll", enabledOverride: true);
+    }
     var controllerEndpoint = matchController.Resource.Annotations
         .OfType<EndpointAnnotation>()
         .Single(endpoint => endpoint.Name == "http");

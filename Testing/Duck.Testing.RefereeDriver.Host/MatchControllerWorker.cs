@@ -6,19 +6,34 @@ using Microsoft.Extensions.Hosting;
 namespace Duck.Testing.RefereeDriver.Hosting;
 
 internal sealed record MatchControllerReadiness(
-    IReadOnlyList<string> ParticipantResources,
+    IReadOnlyList<string> ExpectedParticipantResources,
+    bool ParticipantResourcesReady,
     bool GameControllerApiAndRefereeReady,
     bool VisionReady,
-    string? FailureReason = null)
+    string? FailureReason = null,
+    MatchParticipantStatusEvidence? ParticipantEvidence = null)
 {
-    public bool IsComplete => ParticipantResources.Count > 0 &&
-        GameControllerApiAndRefereeReady && VisionReady;
+    public bool IsComplete => ParticipantResourcesReady && GameControllerApiAndRefereeReady && VisionReady;
+}
+
+internal sealed record MatchParticipantStatusEvidence(
+    DateTimeOffset ObservedAtUtc,
+    IReadOnlyList<MatchParticipantResourceEvidence> Resources);
+
+internal sealed record MatchParticipantResourceEvidence(
+    string ResourceId,
+    string? State,
+    string? HealthStatus)
+{
+    public bool IsReady => string.Equals(State, "Running", StringComparison.Ordinal) &&
+        !string.Equals(HealthStatus, "Unhealthy", StringComparison.OrdinalIgnoreCase);
 }
 
 internal interface IMatchControllerReadinessProbe
 {
     Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken);
-    Task<MatchControllerReadiness> ReadFinalReadinessAsync(CancellationToken cancellationToken);
+    Task<MatchControllerReadiness> ReadFinalReadinessAsync(
+        RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken);
 }
 
 internal sealed class MatchControllerReadinessProbe(
@@ -29,23 +44,102 @@ internal sealed class MatchControllerReadinessProbe(
 {
     private readonly Uri visionHealthUri = ReadRequiredUri(configuration["MatchController:VisionHealthUri"]);
     private readonly string[] participantResources = ReadParticipantResources(configuration["MatchController:ParticipantResources"]);
+    private readonly string participantStatusPath = ReadParticipantStatusPath(configuration["MatchController:ParticipantStatusPath"]);
     private readonly TimeSpan readinessTimeout = ReadTimeout(configuration["MatchController:ReadinessTimeout"]);
 
     public async Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken)
     {
+        var participantEvidence = await WaitForParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
+        await WaitForVisionAsync(cancellationToken).ConfigureAwait(false);
+        // Vision can take time to become healthy. Re-read the observation produced by
+        // RefereeObservationWorker afterwards so start is gated on current API/referee input.
         var match = await matcher.WaitForCurrentAsync(readinessTimeout, clock, cancellationToken)
             .ConfigureAwait(false);
-        var visionReady = await WaitForVisionAsync(cancellationToken).ConfigureAwait(false);
-        return new(participantResources, match.IsReady, visionReady,
-            match.IsReady && visionReady ? null : $"apiReferee={match.Reason}, visionReady={visionReady}");
+        var visionReady = await IsVisionReadyAsync(cancellationToken).ConfigureAwait(false);
+        participantEvidence = await ReadParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
+        // Revalidate the matcher after both probes at the actual start boundary.
+        match = matcher.GetCurrent();
+        var participantsReady = IsParticipantEvidenceReady(participantEvidence, participantResources, clock.GetUtcNow());
+        var reason = match.IsReady && visionReady && participantsReady
+            ? null
+            : $"apiReferee={match.Reason}, visionReady={visionReady}, participantResourcesReady={participantsReady}";
+        return new(participantResources, participantsReady, match.IsReady, visionReady, reason, participantEvidence);
     }
 
-    public async Task<MatchControllerReadiness> ReadFinalReadinessAsync(CancellationToken cancellationToken)
+    public async Task<MatchControllerReadiness> ReadFinalReadinessAsync(
+        RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken)
     {
-        var match = await matcher.ReadAsync(cancellationToken).ConfigureAwait(false);
+        bool MatchesFinalSnapshot(RefereeApiMatchResult current) =>
+            current.Udp?.Command.CommandCounter == finalSnapshot.CommandCounter &&
+            current.Udp.Command.Stage == finalSnapshot.Stage;
+
+        // RefereeObservationWorker owns API reads; consume its latest observation instead
+        // of starting a competing request that could supersede it.
+        var match = await matcher.WaitForCurrentAsync(readinessTimeout, clock,
+                MatchesFinalSnapshot,
+                cancellationToken)
+            .ConfigureAwait(false);
         var visionReady = await IsVisionReadyAsync(cancellationToken).ConfigureAwait(false);
-        return new(participantResources, match.IsReady, visionReady,
-            match.IsReady && visionReady ? null : $"apiReferee={match.Reason}, visionReady={visionReady}");
+        var participantEvidence = await ReadParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
+        // Recheck the matcher after HTTP so the persisted result uses current input evidence.
+        match = matcher.GetCurrent();
+        if (!MatchesFinalSnapshot(match))
+            match = match with { IsReady = false, Reason = "FinalRefereeSnapshotChanged" };
+        var participantsReady = IsParticipantEvidenceReady(participantEvidence, participantResources, clock.GetUtcNow());
+        var reason = match.IsReady && visionReady && participantsReady
+            ? null
+            : $"apiReferee={match.Reason}, visionReady={visionReady}, participantResourcesReady={participantsReady}";
+        return new(participantResources, participantsReady, match.IsReady, visionReady, reason, participantEvidence);
+    }
+
+    private async Task<MatchParticipantStatusEvidence?> ReadParticipantEvidenceAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var json = await File.ReadAllTextAsync(participantStatusPath, cancellationToken).ConfigureAwait(false);
+            return JsonSerializer.Deserialize<MatchParticipantStatusEvidence>(json,
+                new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        }
+        catch (Exception exception) when (exception is IOException or JsonException)
+        {
+            return null;
+        }
+    }
+
+    private async Task<MatchParticipantStatusEvidence?> WaitForParticipantEvidenceAsync(CancellationToken cancellationToken)
+    {
+        using var deadline = new CancellationTokenSource(readinessTimeout, clock);
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
+        MatchParticipantStatusEvidence? latest = null;
+        try
+        {
+            while (true)
+            {
+                latest = await ReadParticipantEvidenceAsync(linked.Token).ConfigureAwait(false);
+                if (IsParticipantEvidenceReady(latest, participantResources, clock.GetUtcNow()))
+                    return latest;
+                await Task.Delay(TimeSpan.FromMilliseconds(250), clock, linked.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (
+            deadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            return latest;
+        }
+    }
+
+    internal static bool IsParticipantEvidenceReady(
+        MatchParticipantStatusEvidence? evidence,
+        IReadOnlyList<string> expectedResources,
+        DateTimeOffset now)
+    {
+        if (evidence is null || now - evidence.ObservedAtUtc > TimeSpan.FromSeconds(2) ||
+            evidence.ObservedAtUtc > now + TimeSpan.FromSeconds(1))
+            return false;
+        if (evidence.Resources.Count != expectedResources.Count || evidence.Resources.Any(resource => !resource.IsReady))
+            return false;
+        return expectedResources.All(expected => evidence.Resources.Any(resource =>
+            string.Equals(resource.ResourceId, expected, StringComparison.Ordinal)));
     }
 
     private async Task<bool> WaitForVisionAsync(CancellationToken cancellationToken)
@@ -72,14 +166,21 @@ internal sealed class MatchControllerReadinessProbe(
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            return document.RootElement.TryGetProperty("isReady", out var ready) &&
-                ready.ValueKind == JsonValueKind.True;
+            return IsVisionResponseReady(document.RootElement);
         }
         catch (HttpRequestException)
         {
             return false;
         }
     }
+
+    internal static bool IsVisionResponseReady(JsonElement response) =>
+        response.TryGetProperty("IsReady", out var ready) && ready.ValueKind == JsonValueKind.True;
+
+    private static string ReadParticipantStatusPath(string? value) =>
+        string.IsNullOrWhiteSpace(value)
+            ? throw new InvalidOperationException("MatchController:ParticipantStatusPath must point to the AppHost participant status projection.")
+            : Path.GetFullPath(value);
 
     private static Uri ReadRequiredUri(string? value) =>
         Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttp
@@ -148,7 +249,8 @@ internal sealed class MatchControllerWorker(
             terminationKind = termination.Kind.ToString();
 
             stage = termination.Kind == RefereeMatchTerminationKind.PostGame ? "post_game" : "maximum_time";
-            finalReadiness = await readinessProbe.ReadFinalReadinessAsync(cancellationToken).ConfigureAwait(false);
+            finalReadiness = await readinessProbe.ReadFinalReadinessAsync(finalSnapshot, cancellationToken)
+                .ConfigureAwait(false);
             if (!termination.IsSuccess)
                 failure = "MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME.";
             else if (!finalReadiness.IsComplete)

@@ -1177,6 +1177,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("true", environment["MatchController__Enabled"].ToString());
         Assert.Equal("http://duck:39108/health/vision", environment["MatchController__VisionHealthUri"].ToString());
         Assert.Equal("/match-results/match-result.json", environment["MatchController__ResultPath"].ToString());
+        Assert.Equal("/match-results/participant-status.json", environment["MatchController__ParticipantStatusPath"].ToString());
         Assert.Contains("tigers-blue", environment["MatchController__ParticipantResources"].ToString());
 
         var resultMount = Assert.Single(controller.Annotations.OfType<ContainerMountAnnotation>(),
@@ -1192,6 +1193,23 @@ public sealed class AppHostApplicationModelTests
             (Find(appHost, "tigers-blue"), WaitType.WaitUntilStarted),
             (Find(appHost, "autoref-tigers"), WaitType.WaitUntilStarted),
             (Find(appHost, "ssl-log-recorder"), WaitType.WaitUntilStarted));
+    }
+
+    [Fact]
+    public async Task MatchModeHandsOffTheControllerContainerIdentityWhenDesktopBridgeIsConfigured()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match",
+            "--Testing:Diagnostics:RunId=issue49-identity-model-test",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var controller = Assert.IsType<ContainerResource>(Find(appHost, "match-controller"));
+        var environment = await GetResourceEnvironmentAsync(controller);
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("match-controller", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.Equal("issue49-identity-model-test", environment["Testing__Diagnostics__RunId"].ToString());
     }
 
     [Fact]
