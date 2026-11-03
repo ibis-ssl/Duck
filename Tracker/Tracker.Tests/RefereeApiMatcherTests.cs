@@ -2,14 +2,108 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading.Channels;
+using System.Text;
 using Duck.Testing.Diagnostics;
 using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
 using Google.Protobuf;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Http;
 
 namespace Tracker.Tests;
 
 public sealed class RefereeApiMatcherTests
 {
+    [Fact]
+    public async Task WaitForCurrentCanRequireTheFinalRefereeCommandWithoutStartingAnotherRead()
+    {
+        await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Halt);
+        fixture.Api.Queue(new ApiSocket("HALT", "HALT"));
+        var initial = await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5));
+
+        var final = await fixture.Matcher.WaitForCurrentAsync(
+            TimeSpan.FromSeconds(1), TimeProvider.System,
+            result => result.Udp?.Command.CommandCounter == initial.Udp?.Command.CommandCounter,
+            CancellationToken.None);
+
+        Assert.True(final.IsReady);
+        Assert.Equal(1, fixture.Api.ConnectCalls);
+        Assert.Equal(0, fixture.Api.SendCalls);
+    }
+
+    [Fact]
+    public async Task InitialReadinessRechecksRefereeEvidenceAfterVisionProbe()
+    {
+        await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Stop);
+        fixture.Api.Queue(new ApiSocket("STOP", "STOP"));
+        Assert.True((await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5))).IsReady);
+        var requests = 0;
+        using var clients = new CallbackHttpClientFactory(async cancellationToken =>
+        {
+            if (Interlocked.Increment(ref requests) == 2)
+            {
+                fixture.Api.Queue(new ApiSocket("HALT", "HALT"));
+                await fixture.SupplyAsync(global::Referee.Types.Command.Stop, 8);
+                await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            }
+            return VisionResponse();
+        });
+        var probe = CreateReadinessProbe(fixture.Matcher, clients);
+
+        var readiness = await probe.WaitForInitialReadinessAsync(CancellationToken.None);
+
+        Assert.False(readiness.GameControllerApiAndRefereeReady);
+        Assert.False(readiness.IsComplete);
+    }
+
+    [Fact]
+    public async Task InitialVisionTimeoutReturnsIncompleteReadinessWithParticipantEvidence()
+    {
+        await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Stop);
+        fixture.Api.Queue(new ApiSocket("STOP", "STOP"));
+        Assert.True((await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5))).IsReady);
+        var statusPath = Path.Combine(Path.GetTempPath(), $"issue49-participants-{Guid.NewGuid():N}.json");
+        var expected = new[] { "tigers-blue", "autoref-tigers", "ssl-log-recorder", "crane" };
+        var evidence = new MatchParticipantStatusEvidence(DateTimeOffset.UtcNow,
+            expected.Select(resource => new MatchParticipantResourceEvidence(resource, "Running", null)).ToArray());
+        await File.WriteAllTextAsync(statusPath, System.Text.Json.JsonSerializer.Serialize(evidence,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)));
+        using var clients = new CallbackHttpClientFactory(_ => Task.FromResult(
+            new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)));
+        var probe = CreateReadinessProbe(fixture.Matcher, clients, statusPath, readinessTimeout: "00:00:01");
+
+        var readiness = await probe.WaitForInitialReadinessAsync(CancellationToken.None);
+
+        Assert.False(readiness.IsComplete);
+        Assert.False(readiness.VisionReady);
+        Assert.NotNull(readiness.ParticipantEvidence);
+        Assert.Equal(expected, readiness.ParticipantEvidence!.Resources.Select(resource => resource.ResourceId));
+    }
+
+    [Fact]
+    public async Task FinalReadinessRejectsAHealthyReplacementCommandDuringVisionProbe()
+    {
+        await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Stop);
+        fixture.Api.Queue(new ApiSocket("STOP", "STOP"));
+        var original = await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(original.IsReady);
+        var finalSnapshot = original.Udp!.Command;
+        using var clients = new CallbackHttpClientFactory(async cancellationToken =>
+        {
+            fixture.Api.Queue(new ApiSocket("STOP", "STOP"));
+            await fixture.SupplyAsync(global::Referee.Types.Command.Stop, 8);
+            await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            return VisionResponse();
+        });
+        var probe = CreateReadinessProbe(fixture.Matcher, clients);
+
+        var readiness = await probe.ReadFinalReadinessAsync(finalSnapshot, CancellationToken.None);
+
+        Assert.False(readiness.GameControllerApiAndRefereeReady);
+        Assert.False(readiness.IsComplete);
+        Assert.Contains("FinalRefereeSnapshotChanged", readiness.FailureReason, StringComparison.Ordinal);
+    }
+
     /// <summary>実serviceの復号と実client/Observerを通り、同packetの証跡と明示状態対応だけで一致する。</summary>
     [Theory]
     [InlineData("HALT", "HALT", global::Referee.Types.Command.Halt)]
@@ -447,6 +541,41 @@ public sealed class RefereeApiMatcherTests
         TimeoutTime = 0,
         Goalkeeper = 0,
     };
+
+    private static MatchControllerReadinessProbe CreateReadinessProbe(
+        RefereeApiMatcher matcher, IHttpClientFactory httpClientFactory,
+        string? participantStatusPath = null, string readinessTimeout = "00:00:01")
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["MatchController:VisionHealthUri"] = "http://vision.test/health/vision",
+            ["MatchController:ParticipantResources"] = "tigers-blue,autoref-tigers,ssl-log-recorder,crane",
+            ["MatchController:ParticipantStatusPath"] = participantStatusPath ?? Path.Combine(Path.GetTempPath(), "issue49-participant-status-test.json"),
+            ["MatchController:ReadinessTimeout"] = readinessTimeout,
+        }).Build();
+        return new(matcher, httpClientFactory, configuration, TimeProvider.System);
+    }
+
+    private static HttpResponseMessage VisionResponse() => new(HttpStatusCode.OK)
+    {
+        Content = new StringContent("{\"IsReady\":true}", Encoding.UTF8, "application/json"),
+    };
+
+    private sealed class CallbackHttpClientFactory(
+        Func<CancellationToken, Task<HttpResponseMessage>> callback) : IHttpClientFactory, IDisposable
+    {
+        private readonly HttpClient client = new(new CallbackHttpMessageHandler(callback));
+
+        public HttpClient CreateClient(string name) => client;
+        public void Dispose() => client.Dispose();
+    }
+
+    private sealed class CallbackHttpMessageHandler(
+        Func<CancellationToken, Task<HttpResponseMessage>> callback) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) => callback(cancellationToken);
+    }
 
     private sealed class MatchReceiver : IRefereeDatagramReceiver
     {

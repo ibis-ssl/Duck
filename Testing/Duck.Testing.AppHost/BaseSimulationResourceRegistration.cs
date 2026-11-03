@@ -32,7 +32,10 @@ internal sealed record BaseSimulationResources(
     IResourceBuilder<IResourceWithWaitSupport> Simulator,
     IResourceBuilder<IResourceWithWaitSupport> GameController,
     IResourceBuilder<IResourceWithWaitSupport>? Cm4Simulator,
-    IResourceBuilder<IResourceWithWaitSupport> Crane);
+    IResourceBuilder<IResourceWithWaitSupport> Crane,
+    IResourceBuilder<IResourceWithWaitSupport>? TigersBlue,
+    IResourceBuilder<IResourceWithWaitSupport>? AutoRefTigers,
+    IResourceBuilder<IResourceWithWaitSupport>? SslLogRecorder);
 
 /// <summary>通常構成で選択された資源を、AppHostの実登録経路から登録する。</summary>
 internal static class BaseSimulationResourceRegistration
@@ -188,6 +191,9 @@ internal static class BaseSimulationResourceRegistration
 
         addGameControllerDependentResource(builder.CreateResourceBuilder<IResource>(gameController.Resource));
 
+        IResourceBuilder<IResourceWithWaitSupport>? tigersBlue = null;
+        IResourceBuilder<IResourceWithWaitSupport>? autoRefTigers = null;
+        IResourceBuilder<IResourceWithWaitSupport>? sslLogRecorder = null;
         if (options.MatchMode)
         {
             var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
@@ -213,6 +219,7 @@ internal static class BaseSimulationResourceRegistration
                 options.DuckRunId,
                 "tigers-blue");
             tigers.WithImageSHA256("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1");
+            tigersBlue = AsResourceBuilder(builder, tigers);
 
             var autoRef = AddStandardContainer(
                 builder,
@@ -231,6 +238,7 @@ internal static class BaseSimulationResourceRegistration
                 options.DuckRunId,
                 "autoref-tigers");
             autoRef.WithImageSHA256("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7");
+            autoRefTigers = AsResourceBuilder(builder, autoRef);
 
             var recorder = AddStandardContainer(
                 builder,
@@ -249,6 +257,7 @@ internal static class BaseSimulationResourceRegistration
                 options.DuckRunId,
                 "ssl-log-recorder");
             recorder.WithImageSHA256("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046");
+            sslLogRecorder = AsResourceBuilder(builder, recorder);
         }
 
         IResourceBuilder<IResourceWithWaitSupport>? cm4Simulator = null;
@@ -486,7 +495,9 @@ internal static class BaseSimulationResourceRegistration
             }
         }
 
-        return new BaseSimulationResources(duck, simulator, gameController, cm4Simulator, crane);
+        return new BaseSimulationResources(
+            duck, simulator, gameController, cm4Simulator, crane,
+            tigersBlue, autoRefTigers, sslLogRecorder);
     }
 
     internal static IResourceBuilder<ContainerResource> AddStandardContainer(

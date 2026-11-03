@@ -75,24 +75,27 @@ public sealed class RefereeDriverFixture
     public async Task<RefereeCommandSnapshot> DriveToActiveAsync(CancellationToken cancellationToken)
     {
         var initial = await commandSource.WaitForChangeAsync(null, cancellationToken);
-        if (initial.Command != Referee.Types.Command.Halt)
+        var stop = initial;
+        if (initial.Command == Referee.Types.Command.Halt)
         {
-            throw new InvalidOperationException(
-                $"Expected initial referee command HALT, but observed {initial.Command}.");
+            await controlClient.SendContinueActionAsync(
+                GameControllerContinueAction.ResumeFromHalt,
+                cancellationToken);
+
+            stop = await commandSource.WaitForChangeAsync(
+                initial.CommandCounter,
+                cancellationToken);
+            EnsureNewerSnapshot(initial, stop, "RESUME_FROM_HALT");
+            if (stop.Command != Referee.Types.Command.Stop)
+            {
+                throw new InvalidOperationException(
+                    $"Game Controller did not reach STOP after RESUME_FROM_HALT; observed {stop.Command}.");
+            }
         }
-
-        await controlClient.SendContinueActionAsync(
-            GameControllerContinueAction.ResumeFromHalt,
-            cancellationToken);
-
-        var afterResume = await commandSource.WaitForChangeAsync(
-            initial.CommandCounter,
-            cancellationToken);
-        EnsureNewerSnapshot(initial, afterResume, "RESUME_FROM_HALT");
-        if (afterResume.Command != Referee.Types.Command.Stop)
+        else if (initial.Command != Referee.Types.Command.Stop)
         {
             throw new InvalidOperationException(
-                $"Game Controller did not reach STOP after RESUME_FROM_HALT; observed {afterResume.Command}.");
+                $"Expected initial referee command HALT or STOP, but observed {initial.Command}.");
         }
 
         await controlClient.SendContinueActionAsync(
@@ -100,9 +103,9 @@ public sealed class RefereeDriverFixture
             cancellationToken);
 
         var preparation = await commandSource.WaitForChangeAsync(
-            afterResume.CommandCounter,
+            stop.CommandCounter,
             cancellationToken);
-        EnsureNewerSnapshot(afterResume, preparation, "NEXT_COMMAND");
+        EnsureNewerSnapshot(stop, preparation, "NEXT_COMMAND");
         if (!IsPreparation(preparation.Command))
         {
             throw new InvalidOperationException(

@@ -488,7 +488,7 @@ var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGu
 var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
 var enableStandardBaseDuckIdentityBridge =
     IsEnabled(desktopBridgeSetting) ||
-    (testingMode is "base" or "comparison") &&
+    (testingMode is "base" or "comparison" or "match") &&
     desktopBridgeSetting is null &&
     !string.IsNullOrWhiteSpace(identityDockerContext) &&
     !string.IsNullOrWhiteSpace(identityExpectedEngineId);
@@ -552,7 +552,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
     },
     gameController =>
     {
-        if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+        if (testingMode != "match" &&
+            IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
             IsEnabled(builder.Configuration["Testing:ContainerMode"]))
         {
             var refereeDriver = AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
@@ -592,6 +593,69 @@ var cm4Simulator = baseResources.Cm4Simulator;
 var crane = baseResources.Crane;
 var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
 var gameControllerDependency = builder.CreateResourceBuilder<IResource>(gameController.Resource);
+
+if (testingMode == "match")
+{
+    var tigersBlue = baseResources.TigersBlue ?? throw new InvalidOperationException("Match mode requires tigers-blue.");
+    var autoRefTigers = baseResources.AutoRefTigers ?? throw new InvalidOperationException("Match mode requires autoref-tigers.");
+    var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
+    var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
+    Directory.CreateDirectory(resultDirectory);
+    var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
+    var participantResources = new IResource[]
+    {
+        simulator.Resource, gameController.Resource, crane.Resource, duck.Resource,
+        tigersBlue.Resource, autoRefTigers.Resource, sslLogRecorder.Resource,
+    };
+    builder.Services.AddSingleton<IHostedService>(services => new MatchParticipantStatusProjection(
+        services.GetRequiredService<ResourceNotificationService>(),
+        participantResources,
+        participantStatusPath,
+        TimeProvider.System));
+
+    var matchController = AddPublishedContainer(
+            "match-controller", "duck-match-controller", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("MatchController__Enabled", "true")
+        .WithEnvironment("MatchController__VisionHealthUri", "http://duck:39108/health/vision")
+        .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
+        .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
+        .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
+        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:02:00")
+        .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
+        .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
+        .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=match-controller",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
+        .WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false)
+        .WithHttpHealthCheck("/health/referee", endpointName: "http");
+    if (enableStandardBaseDuckIdentityBridge)
+    {
+        matchController
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "match-controller")
+            .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+        EnableDesktopIdentityBridge(matchController, duckRunId,
+            "match-controller", "Duck.Testing.RefereeDriver.Host.dll", enabledOverride: true);
+    }
+    var controllerEndpoint = matchController.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    controllerEndpoint.Port = null;
+    controllerEndpoint.TargetHost = "127.0.0.1";
+
+    matchController
+        .WaitFor(simulatorDependency)
+        .WaitFor(gameControllerDependency)
+        .WaitFor(builder.CreateResourceBuilder<IResource>(duck.Resource))
+        .WaitFor(builder.CreateResourceBuilder<IResource>(crane.Resource))
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(tigersBlue.Resource))
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(autoRefTigers.Resource))
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(sslLogRecorder.Resource));
+}
 
 if (testingMode == "comparison")
 {

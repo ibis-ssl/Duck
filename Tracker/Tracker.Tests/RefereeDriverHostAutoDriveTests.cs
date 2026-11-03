@@ -21,6 +21,29 @@ namespace Tracker.Tests;
 /// <summary>明示制御だけを既存Driver・制御adapterへ接続し、既定観測と受信所有を保つ。</summary>
 public sealed class RefereeDriverHostAutoDriveTests
 {
+    [Fact]
+    public async Task MatchControllerConfigurationRegistersLifecycleWorkerInsteadOfStartOnlyWorker()
+    {
+        var transports = new Transports();
+        var builder = Fixture.CreateBuilder(transports, enabled: "true", autoDrive: null);
+        var resultPath = Path.Combine(Path.GetTempPath(), "issue49-match-controller-result.json");
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["MatchController:Enabled"] = "true",
+            ["MatchController:VisionHealthUri"] = "http://duck:39108/health/vision",
+            ["MatchController:ParticipantResources"] = "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder",
+            ["MatchController:ParticipantStatusPath"] = Path.Combine(Path.GetTempPath(), "issue49-match-controller-participants.json"),
+            ["MatchController:ResultPath"] = resultPath,
+        });
+        await using var app = RefereeDriverApplication.Build(builder);
+
+        var workers = app.Services.GetServices<IHostedService>().ToArray();
+
+        Assert.Contains(workers, worker => worker is MatchControllerWorker);
+        Assert.DoesNotContain(workers, worker => worker is RefereeAutoDriveWorker);
+        transports.Dispose();
+    }
+
     [Theory]
     [InlineData(global::Referee.Types.Command.PrepareKickoffBlue)]
     [InlineData(global::Referee.Types.Command.PrepareKickoffYellow)]
