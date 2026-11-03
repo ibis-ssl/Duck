@@ -510,7 +510,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         identityDockerContext,
         identityExpectedEngineId,
         identityDockerExecutable,
-        IncludeCm4Simulator: testingMode != "match"),
+        IncludeCm4Simulator: testingMode != "match",
+        MatchMode: testingMode == "match"),
     simulatorResource =>
     {
         var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")

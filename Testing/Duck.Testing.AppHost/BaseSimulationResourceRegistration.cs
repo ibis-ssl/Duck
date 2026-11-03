@@ -24,7 +24,8 @@ internal sealed record BaseSimulationRegistrationOptions(
     string? DockerContextName,
     string? ExpectedEngineId,
     string DockerExecutable,
-    bool IncludeCm4Simulator = true);
+    bool IncludeCm4Simulator = true,
+    bool MatchMode = false);
 
 internal sealed record BaseSimulationResources(
     IResourceBuilder<ContainerResource> Duck,
@@ -41,6 +42,20 @@ internal static class BaseSimulationResourceRegistration
 
     internal static bool UsesCm4Simulator(string planner) =>
         string.Equals(planner, "visibility_graph", StringComparison.Ordinal);
+
+    private static string CreateMatchStateStoreCopy(string appHostAssetRoot, string duckRunId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(duckRunId);
+        var fixturePath = Path.Combine(appHostAssetRoot, "Fixtures", "match", "state-store-initial.json.stream");
+        var runKey = Convert.ToHexString(
+            System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(duckRunId)))
+            .ToLowerInvariant();
+        var stateStorePath = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.json.stream");
+        Directory.CreateDirectory(Path.GetDirectoryName(stateStorePath)!);
+        File.Copy(fixturePath, stateStorePath, overwrite: true);
+        return stateStorePath;
+    }
 
     internal static BaseSimulationResources Add(
         IDistributedApplicationBuilder builder,
@@ -105,6 +120,23 @@ internal static class BaseSimulationResourceRegistration
             ? duck.WaitForStart(simulatorDependency)
             : duck.WaitFor(simulatorDependency);
 
+        IEnumerable<DockerContainerMount>? gameControllerMounts = null;
+        if (options.MatchMode)
+        {
+            var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
+            var matchFixtureRoot = Path.Combine(assetRoot, "Fixtures", "match");
+            gameControllerMounts =
+            [
+                new DockerContainerMount(
+                    Path.Combine(matchFixtureRoot, "ssl-game-controller-match.yaml"),
+                    "/config/ssl-game-controller.yaml",
+                    ReadOnly: true),
+                new DockerContainerMount(
+                    CreateMatchStateStoreCopy(assetRoot, options.DuckRunId),
+                    "/tmp/state-store.json.stream"),
+            ];
+        }
+
         IResourceBuilder<IResourceWithWaitSupport> gameController;
         if (options.UseStandardDcpResources)
         {
@@ -120,7 +152,8 @@ internal static class BaseSimulationResourceRegistration
                         "-address", ":8082",
                     ],
                     new Dictionary<string, string>(StringComparer.Ordinal),
-                    options.StackId),
+                    options.StackId,
+                    mounts: gameControllerMounts),
                 options.DuckRunId,
                 "game-controller");
             var controlEndpoint = gameControllerContainer
@@ -145,7 +178,8 @@ internal static class BaseSimulationResourceRegistration
                         "-address", ":8082",
                     ],
                     new Dictionary<string, string>(StringComparer.Ordinal),
-                    options.StackId),
+                    options.StackId,
+                    mounts: gameControllerMounts),
                 39102,
                 "app",
                 "game-controller",
