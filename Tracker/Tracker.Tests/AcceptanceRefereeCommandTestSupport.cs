@@ -114,6 +114,12 @@ internal sealed class AspireAcceptanceResultWriter(
         object? receiverSockets,
         object? movement)
     {
+        if (matchTermination is null && (stageReached is "post_game" or "maximum_time"))
+        {
+            failure ??= new InvalidOperationException(
+                "MATCH_TERMINATION_MISSING: final match results require an observed POST_GAME stage or an explicit maximum-time outcome.");
+        }
+
         var evidence = new
         {
             status = failure is null ? "passed" : "failed",

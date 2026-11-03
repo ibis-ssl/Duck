@@ -74,6 +74,22 @@ public sealed class RefereeDriverFixtureTests
     }
 
     [Fact]
+    public async Task DriveToActiveAsyncRejectsRegressingRefereeCounter()
+    {
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 30),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 29));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => fixture.DriveToActiveAsync(CancellationToken.None));
+
+        Assert.Contains("was not newer", failure.Message, StringComparison.Ordinal);
+        Assert.Equal([GameControllerContinueAction.ResumeFromHalt], client.Actions);
+    }
+
+    [Fact]
     public async Task DriveToActiveAsyncFailsWhenSecondContinueActionDoesNotReachActiveCommand()
     {
         var source = new FakeRefereeCommandSource(

@@ -42,7 +42,7 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
             var packet = await receiver.ReceiveAsync(cancellationToken);
             var referee = Referee.Parser.ParseFrom(packet.ToArray());
             if (previousCommandCounter is null ||
-                referee.CommandCounter != previousCommandCounter ||
+                referee.CommandCounter > previousCommandCounter ||
                 referee.Stage == Referee.Types.Stage.PostGame)
             {
                 return new RefereeCommandSnapshot(

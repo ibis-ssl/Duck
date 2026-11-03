@@ -12,6 +12,7 @@ public sealed class GameControllerStateMappingTests
     [InlineData("STOP", "STOP", "Stop", "Stop")]
     [InlineData("NORMAL_START", "RUNNING", "NormalStart", "Running")]
     [InlineData("FORCE_START", "RUNNING", "ForceStart", "Running")]
+    [InlineData("KICKOFF", "STOP", "Kickoff", "Stop")]
     public async Task NormalizesSupportedApiNames(
         string command, string phase, string expectedCommand, string expectedPhase)
     {
@@ -66,6 +67,9 @@ public sealed class GameControllerStateMappingTests
     [InlineData("Stop", "Stop", Referee.Types.Command.Halt, false)]
     [InlineData("NormalStart", "Running", Referee.Types.Command.ForceStart, false)]
     [InlineData("ForceStart", "Running", Referee.Types.Command.NormalStart, false)]
+    [InlineData("Kickoff", "Stop", Referee.Types.Command.PrepareKickoffBlue, true)]
+    [InlineData("Kickoff", "Stop", Referee.Types.Command.PrepareKickoffYellow, true)]
+    [InlineData("Kickoff", "Running", Referee.Types.Command.PrepareKickoffBlue, false)]
     [InlineData("Halt", "Running", Referee.Types.Command.Halt, false)]
     [InlineData("NormalStart", "Stop", Referee.Types.Command.NormalStart, false)]
     [InlineData("Unknown", "Halt", Referee.Types.Command.Halt, false)]

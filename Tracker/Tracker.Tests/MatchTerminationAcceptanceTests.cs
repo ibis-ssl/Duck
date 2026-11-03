@@ -89,6 +89,36 @@ public sealed class MatchTerminationAcceptanceTests
         Assert.Equal(2, result.RootElement.GetProperty("refereeCommands").GetArrayLength());
     }
 
+    [Fact]
+    public async Task PostGameWithUnchangedPacketTimestampIsRejectedAsStale()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 40, Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 400);
+        var source = new SequenceRefereeCommandSource(
+            new RefereeCommandSnapshot(
+                Referee.Types.Command.Stop, 40, Stage: Referee.Types.Stage.PostGame, PacketTimestamp: 400));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            RefereeDriverFixture.WaitForMatchTerminationAsync(
+                source, initial, TimeSpan.FromSeconds(1), CancellationToken.None));
+
+        Assert.Contains("was not newer", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task FinalStageCannotBePersistedAsPassedWithoutTerminationEvidence()
+    {
+        var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        using var artifacts = new TemporaryDirectory();
+        var path = Path.Combine(artifacts.Path, "acceptance-result.json");
+
+        await writer.WriteAsync(path, "post_game", 0, null, null, null, null, null);
+
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path));
+        Assert.Equal("failed", result.RootElement.GetProperty("status").GetString());
+        Assert.Contains("MATCH_TERMINATION_MISSING", result.RootElement.GetProperty("failure").GetString());
+    }
+
     private sealed class SequenceRefereeCommandSource(params RefereeCommandSnapshot[] snapshots)
         : IRefereeCommandSource
     {

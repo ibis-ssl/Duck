@@ -303,21 +303,21 @@ public sealed class RefereeDriverHostAutoDriveTests
         private byte[] Output()
         {
             var command = (global::Referee.Types.Command)Volatile.Read(ref currentCommand);
-            var type = command switch
+            var (commandType, gameStateType) = command switch
             {
-                global::Referee.Types.Command.Stop => "STOP",
-                global::Referee.Types.Command.PrepareKickoffBlue => "PREPARE_KICKOFF_BLUE",
-                global::Referee.Types.Command.PrepareKickoffYellow => "PREPARE_KICKOFF_YELLOW",
-                global::Referee.Types.Command.ForceStart => "FORCE_START",
-                global::Referee.Types.Command.NormalStart => "NORMAL_START",
-                _ => "HALT",
+                global::Referee.Types.Command.Stop => ("STOP", "STOP"),
+                global::Referee.Types.Command.PrepareKickoffBlue or
+                    global::Referee.Types.Command.PrepareKickoffYellow => ("KICKOFF", "STOP"),
+                global::Referee.Types.Command.ForceStart => ("FORCE_START", "RUNNING"),
+                global::Referee.Types.Command.NormalStart => ("NORMAL_START", "RUNNING"),
+                _ => ("HALT", "HALT"),
             };
             return JsonSerializer.SerializeToUtf8Bytes(new
             {
                 matchState = new
                 {
-                    command = new { type, forTeam = "UNKNOWN" },
-                    gameState = new { type = type is "FORCE_START" or "NORMAL_START" ? "RUNNING" : type },
+                    command = new { type = commandType, forTeam = "UNKNOWN" },
+                    gameState = new { type = gameStateType },
                 },
             });
         }
@@ -335,7 +335,7 @@ public sealed class RefereeDriverHostAutoDriveTests
                 _ => throw new InvalidOperationException("未知の制御JSON。"),
             };
             Interlocked.Exchange(ref currentCommand, (int)command);
-            Receiver.Supply(Packet(command, Messages.Count == 1 ? 11u : 12u));
+            Receiver.Supply(Packet(command, (uint)(10 + Messages.Count)));
         }
         internal void CancelPending()
         {
@@ -460,8 +460,8 @@ public sealed class RefereeDriverHostAutoDriveTests
     private static ReadOnlyMemory<byte> Packet(global::Referee.Types.Command command, uint counter) =>
         new global::Referee
         {
-            PacketTimestamp = 1, Stage = global::Referee.Types.Stage.NormalFirstHalf,
-            Command = command, CommandCounter = counter, CommandTimestamp = 1,
+            PacketTimestamp = counter, Stage = global::Referee.Types.Stage.NormalFirstHalf,
+            Command = command, CommandCounter = counter, CommandTimestamp = counter,
             Yellow = Team("yellow"), Blue = Team("blue"),
         }.ToByteArray();
     private static global::Referee.Types.TeamInfo Team(string name) => new()

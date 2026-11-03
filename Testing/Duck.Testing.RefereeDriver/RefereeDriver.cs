@@ -88,6 +88,7 @@ public sealed class RefereeDriverFixture
         var afterResume = await commandSource.WaitForChangeAsync(
             initial.CommandCounter,
             cancellationToken);
+        EnsureNewerSnapshot(initial, afterResume, "RESUME_FROM_HALT");
         if (afterResume.Command != Referee.Types.Command.Stop)
         {
             throw new InvalidOperationException(
@@ -101,6 +102,7 @@ public sealed class RefereeDriverFixture
         var preparation = await commandSource.WaitForChangeAsync(
             afterResume.CommandCounter,
             cancellationToken);
+        EnsureNewerSnapshot(afterResume, preparation, "NEXT_COMMAND");
         if (!IsPreparation(preparation.Command))
         {
             throw new InvalidOperationException(
@@ -114,6 +116,7 @@ public sealed class RefereeDriverFixture
         var active = await commandSource.WaitForChangeAsync(
             preparation.CommandCounter,
             cancellationToken);
+        EnsureNewerSnapshot(preparation, active, "NORMAL_START");
         if (active.Command != Referee.Types.Command.NormalStart)
         {
             throw new InvalidOperationException(
@@ -206,17 +209,7 @@ public sealed class RefereeDriverFixture
                 return new(RefereeMatchTerminationKind.MaximumTimeReached, lastSnapshot);
             }
 
-            var packetAdvanced = next.PacketTimestamp is { } nextTimestamp &&
-                lastSnapshot.PacketTimestamp is { } previousTimestamp &&
-                nextTimestamp > previousTimestamp;
-            var counterAdvanced = next.CommandCounter > lastSnapshot.CommandCounter;
-            if (!packetAdvanced && !counterAdvanced)
-            {
-                throw new InvalidOperationException(
-                    $"Referee packet timestamp and command counter did not advance while waiting for match termination; " +
-                    $"observed timestamp {next.PacketTimestamp?.ToString() ?? "unavailable"}, counter {next.CommandCounter} after " +
-                    $"timestamp {lastSnapshot.PacketTimestamp?.ToString() ?? "unavailable"}, counter {lastSnapshot.CommandCounter}.");
-            }
+            EnsureNewerSnapshot(lastSnapshot, next, "match termination");
 
             lastSnapshot = next;
             if (next.Stage == Referee.Types.Stage.PostGame)
@@ -270,4 +263,22 @@ public sealed class RefereeDriverFixture
     private static bool IsPreparation(Referee.Types.Command command) =>
         command is Referee.Types.Command.PrepareKickoffYellow or
             Referee.Types.Command.PrepareKickoffBlue;
+
+    private static void EnsureNewerSnapshot(
+        RefereeCommandSnapshot previous,
+        RefereeCommandSnapshot current,
+        string transition)
+    {
+        var newer = previous.PacketTimestamp is { } previousTimestamp &&
+            current.PacketTimestamp is { } currentTimestamp
+                ? currentTimestamp > previousTimestamp
+                : current.CommandCounter > previous.CommandCounter;
+        if (!newer)
+        {
+            throw new InvalidOperationException(
+                $"Referee evidence for {transition} was not newer; observed timestamp " +
+                $"{current.PacketTimestamp?.ToString() ?? "unavailable"}, counter {current.CommandCounter} after " +
+                $"timestamp {previous.PacketTimestamp?.ToString() ?? "unavailable"}, counter {previous.CommandCounter}.");
+        }
+    }
 }

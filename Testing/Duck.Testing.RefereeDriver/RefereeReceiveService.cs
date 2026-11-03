@@ -172,7 +172,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
             {
                 if (latestCommand is { } latest &&
                     (previousCommandCounter is null ||
-                        latest.Snapshot.CommandCounter != previousCommandCounter.Value ||
+                        latest.Snapshot.CommandCounter > previousCommandCounter.Value ||
                         latest.Snapshot.Stage == global::Referee.Types.Stage.PostGame))
                 {
                     BoundaryObserver?.Invoke(RefereeReceiveBoundary.BeforeCommandDiagnosticRead);
