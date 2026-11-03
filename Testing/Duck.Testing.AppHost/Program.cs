@@ -470,7 +470,9 @@ var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
-var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(builder.Configuration);
+var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
+    builder.Configuration,
+    testingMode == "match" ? "ibis" : CraneFixtureSettings.DefaultTeamName);
 var craneTeamName = craneFixtureSettings.TeamName;
 var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =

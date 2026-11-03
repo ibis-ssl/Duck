@@ -1140,6 +1140,21 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("match", environment["Testing__Mode"].ToString());
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "cm4-sim" or "tracker-tigers" or "tracker-erforce");
+
+        var simulator = Find(appHost, "simulator");
+        var gameController = Find(appHost, "game-controller");
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneArguments = await GetArgumentsAsync(crane);
+        Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp && endpoint.TargetPort == 11010);
+
+        AssertSingleWait(duck, simulator, WaitType.WaitUntilStarted);
+        AssertWaits(
+            crane,
+            (duck, WaitType.WaitUntilStarted),
+            (gameController, WaitType.WaitUntilHealthy));
     }
 
     [Fact]
