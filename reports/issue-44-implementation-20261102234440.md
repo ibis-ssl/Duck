@@ -39,7 +39,11 @@ At readback after the latest push, PR #106 is still Draft at head `5489cda6af13f
 
 ## Review
 
-Normal review on `7e4fa41` found NR44-001 (P2): the test checked `gameState.type == STOP` but did not lock `command.type == STOP`. The assertion was added in `5489cda`; the same reviewer rechecked the finding and confirmed closure with focused test 1/1 passing. Requested review profile was `gpt-6.1-sol/high`; exact applied runtime profile is unverified (`applied: null`). Independent final review is reserved at code/report-freeze candidate HEAD `5489cda6af13ff182a747cdfc0c3a6950abe87e6`; no independent findings are claimed yet.
+Normal review on `7e4fa41` found NR44-001 (P2): the test checked `gameState.type == STOP` but did not lock `command.type == STOP`. The assertion was added in `5489cda`; the same reviewer rechecked the finding and confirmed closure with focused test 1/1 passing. Requested review profile was `gpt-6.1-sol/high`; exact applied runtime profile is unverified (`applied: null`). The independent reviewer was interrupted before its technical pass when a reservation artifact was found in the candidate; no independent findings are claimed yet.
+
+## Independent review reservation correction
+
+The single deferred-attestation reservation remains owned by `review-enforcer`, identity `duck-44-independent-final-20261103-01`, exact path `reports/issue-44-independent-review-20261103.md`. Reservation evidence is this issue's completed normal review and finding closure, focused Red/Green/fix results, implementation report, and the explicit reservation-only workflow. State is metadata-only; the reviewer was interrupted before technical review, and the mistakenly committed artifact was removed before the corrected review target is frozen. The path must remain absent until a passing independent verdict; materialize it only in the single post-review attestation commit.
 
 ## Requested profile and evidence limits
 
