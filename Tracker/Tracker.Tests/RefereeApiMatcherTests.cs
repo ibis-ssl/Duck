@@ -57,6 +57,30 @@ public sealed class RefereeApiMatcherTests
     }
 
     [Fact]
+    public async Task InitialVisionTimeoutReturnsIncompleteReadinessWithParticipantEvidence()
+    {
+        await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Stop);
+        fixture.Api.Queue(new ApiSocket("STOP", "STOP"));
+        Assert.True((await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5))).IsReady);
+        var statusPath = Path.Combine(Path.GetTempPath(), $"issue49-participants-{Guid.NewGuid():N}.json");
+        var expected = new[] { "tigers-blue", "autoref-tigers", "ssl-log-recorder", "crane" };
+        var evidence = new MatchParticipantStatusEvidence(DateTimeOffset.UtcNow,
+            expected.Select(resource => new MatchParticipantResourceEvidence(resource, "Running", null)).ToArray());
+        await File.WriteAllTextAsync(statusPath, System.Text.Json.JsonSerializer.Serialize(evidence,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)));
+        using var clients = new CallbackHttpClientFactory(_ => Task.FromResult(
+            new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)));
+        var probe = CreateReadinessProbe(fixture.Matcher, clients, statusPath, readinessTimeout: "00:00:01");
+
+        var readiness = await probe.WaitForInitialReadinessAsync(CancellationToken.None);
+
+        Assert.False(readiness.IsComplete);
+        Assert.False(readiness.VisionReady);
+        Assert.NotNull(readiness.ParticipantEvidence);
+        Assert.Equal(expected, readiness.ParticipantEvidence!.Resources.Select(resource => resource.ResourceId));
+    }
+
+    [Fact]
     public async Task FinalReadinessRejectsAHealthyReplacementCommandDuringVisionProbe()
     {
         await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Stop);
@@ -519,14 +543,15 @@ public sealed class RefereeApiMatcherTests
     };
 
     private static MatchControllerReadinessProbe CreateReadinessProbe(
-        RefereeApiMatcher matcher, IHttpClientFactory httpClientFactory)
+        RefereeApiMatcher matcher, IHttpClientFactory httpClientFactory,
+        string? participantStatusPath = null, string readinessTimeout = "00:00:01")
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["MatchController:VisionHealthUri"] = "http://vision.test/health/vision",
             ["MatchController:ParticipantResources"] = "tigers-blue,autoref-tigers,ssl-log-recorder,crane",
-            ["MatchController:ParticipantStatusPath"] = Path.Combine(Path.GetTempPath(), "issue49-participant-status-test.json"),
-            ["MatchController:ReadinessTimeout"] = "00:00:01",
+            ["MatchController:ParticipantStatusPath"] = participantStatusPath ?? Path.Combine(Path.GetTempPath(), "issue49-participant-status-test.json"),
+            ["MatchController:ReadinessTimeout"] = readinessTimeout,
         }).Build();
         return new(matcher, httpClientFactory, configuration, TimeProvider.System);
     }

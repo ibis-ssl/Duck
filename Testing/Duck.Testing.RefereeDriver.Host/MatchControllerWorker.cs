@@ -50,12 +50,12 @@ internal sealed class MatchControllerReadinessProbe(
     public async Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken)
     {
         var participantEvidence = await WaitForParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
-        await WaitForVisionAsync(cancellationToken).ConfigureAwait(false);
+        var visionWasReady = await WaitForVisionAsync(cancellationToken).ConfigureAwait(false);
         // Vision can take time to become healthy. Re-read the observation produced by
         // RefereeObservationWorker afterwards so start is gated on current API/referee input.
         var match = await matcher.WaitForCurrentAsync(readinessTimeout, clock, cancellationToken)
             .ConfigureAwait(false);
-        var visionReady = await IsVisionReadyAsync(cancellationToken).ConfigureAwait(false);
+        var visionReady = visionWasReady && await IsVisionReadyAsync(cancellationToken).ConfigureAwait(false);
         participantEvidence = await ReadParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
         // Revalidate the matcher after both probes at the actual start boundary.
         match = matcher.GetCurrent();
@@ -146,12 +146,20 @@ internal sealed class MatchControllerReadinessProbe(
     {
         using var deadline = new CancellationTokenSource(readinessTimeout, clock);
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
-        while (true)
+        try
         {
-            linked.Token.ThrowIfCancellationRequested();
-            if (await IsVisionReadyAsync(linked.Token).ConfigureAwait(false))
-                return true;
-            await Task.Delay(TimeSpan.FromMilliseconds(250), clock, linked.Token).ConfigureAwait(false);
+            while (true)
+            {
+                linked.Token.ThrowIfCancellationRequested();
+                if (await IsVisionReadyAsync(linked.Token).ConfigureAwait(false))
+                    return true;
+                await Task.Delay(TimeSpan.FromMilliseconds(250), clock, linked.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (
+            deadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            return false;
         }
     }
 
