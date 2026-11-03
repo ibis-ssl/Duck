@@ -192,11 +192,11 @@ internal static class BaseSimulationResourceRegistration
         {
             var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
             var sumatraProtocolPath = Path.Combine(assetRoot, "Fixtures", "match", "simulation_protocol_tigers.xml");
-            AddStandardContainer(
+            var tigers = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
                     "tigers-blue",
-                    "tigersmannheim/sumatra:latest",
+                    "tigersmannheim/sumatra:2025",
                     [
                         "--headless", "--aiBlue",
                         "--visionAddress", "224.5.23.2:10020",
@@ -212,8 +212,9 @@ internal static class BaseSimulationResourceRegistration
                         ReadOnly: true)]),
                 options.DuckRunId,
                 "tigers-blue");
+            tigers.WithImageSHA256("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1");
 
-            AddStandardContainer(
+            var autoRef = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
                     "autoref-tigers",
@@ -229,8 +230,9 @@ internal static class BaseSimulationResourceRegistration
                     options.DuckRunId),
                 options.DuckRunId,
                 "autoref-tigers");
+            autoRef.WithImageSHA256("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7");
 
-            AddStandardContainer(
+            var recorder = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
                     "ssl-log-recorder",
@@ -246,6 +248,7 @@ internal static class BaseSimulationResourceRegistration
                     options.DuckRunId),
                 options.DuckRunId,
                 "ssl-log-recorder");
+            recorder.WithImageSHA256("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046");
         }
 
         IResourceBuilder<IResourceWithWaitSupport>? cm4Simulator = null;

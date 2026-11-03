@@ -1150,7 +1150,8 @@ public sealed class AppHostApplicationModelTests
         var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tigers-blue"));
         var tigersImage = Assert.Single(tigers.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("tigersmannheim/sumatra", tigersImage.Image);
-        Assert.Equal("latest", tigersImage.Tag);
+        Assert.Null(tigersImage.Tag);
+        Assert.Equal("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1", tigersImage.SHA256);
         Assert.Equal(
             ["--headless", "--aiBlue", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--matchStats", "--moduli", "simulation_protocol"],
             await GetArgumentsAsync(tigers));
@@ -1165,7 +1166,8 @@ public sealed class AppHostApplicationModelTests
         var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
         var autoRefImage = Assert.Single(autoRef.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("tigersmannheim/auto-referee", autoRefImage.Image);
-        Assert.Equal("1.2.0", autoRefImage.Tag);
+        Assert.Null(autoRefImage.Tag);
+        Assert.Equal("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7", autoRefImage.SHA256);
         Assert.Equal(
             ["--active", "--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--trackerAddress", "224.5.23.2:11010"],
             await GetArgumentsAsync(autoRef));
@@ -1173,7 +1175,8 @@ public sealed class AppHostApplicationModelTests
         var recorder = Assert.IsType<ContainerResource>(Find(appHost, "ssl-log-recorder"));
         var recorderImage = Assert.Single(recorder.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("robocupssl/ssl-log-recorder", recorderImage.Image);
-        Assert.Equal("latest", recorderImage.Tag);
+        Assert.Null(recorderImage.Tag);
+        Assert.Equal("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046", recorderImage.SHA256);
         Assert.Equal(
             ["-referee-address", "224.5.23.1:11003", "-vision-address", "224.5.23.2:10020", "-vision-tracker-address", "224.5.23.2:11010", "-vision-legacy-enabled=false"],
             await GetArgumentsAsync(recorder));
@@ -1185,6 +1188,16 @@ public sealed class AppHostApplicationModelTests
                 endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
             Assert.DoesNotContain("--network", await GetContainerRuntimeArgsAsync(resource));
         }
+
+        using var imageLock = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(), "Testing", "Duck.Testing.AppHost", "linux-image-lock.json")));
+        var lockedImages = imageLock.RootElement.GetProperty("images");
+        Assert.Equal("tigersmannheim/sumatra:2025", lockedImages.GetProperty("sumatra").GetProperty("reference").GetString());
+        Assert.Equal("sha256:" + tigersImage.SHA256, lockedImages.GetProperty("sumatra").GetProperty("digest").GetString());
+        Assert.Equal("tigersmannheim/auto-referee:1.2.0", lockedImages.GetProperty("tigers-auto-referee").GetProperty("reference").GetString());
+        Assert.Equal("sha256:" + autoRefImage.SHA256, lockedImages.GetProperty("tigers-auto-referee").GetProperty("digest").GetString());
+        Assert.Equal("robocupssl/ssl-log-recorder:latest", lockedImages.GetProperty("ssl-log-recorder").GetProperty("reference").GetString());
+        Assert.Equal("sha256:" + recorderImage.SHA256, lockedImages.GetProperty("ssl-log-recorder").GetProperty("digest").GetString());
     }
     [Theory]
     [InlineData("comparision")]

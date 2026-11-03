@@ -61,7 +61,7 @@ TIGERs AI 対 Crane の開始経路は別課題 #43 / #49 で実装する。`mat
 
 ### Linux 向け通常コンテナの配布定義（I81-04B2）
 
-`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が既に参照する外部イメージ6件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。GHCR の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。
+`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が参照する外部イメージ8件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。GHCR の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。
 
 | 管理プログラム | 固定基底 | 定義ファイルと入力元 | 実行入口 |
 | --- | --- | --- | --- |
