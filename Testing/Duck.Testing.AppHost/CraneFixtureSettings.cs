@@ -9,11 +9,13 @@ public sealed record CraneFixtureSettings(string TeamName, string TeamColor)
     public const string DefaultTeamName = "crane";
     public const string YellowTeamColor = "YELLOW";
 
-    public static CraneFixtureSettings FromConfiguration(IConfiguration configuration)
+    public static CraneFixtureSettings FromConfiguration(
+        IConfiguration configuration,
+        string defaultTeamName = DefaultTeamName)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         return FromValues(
-            configuration[TeamNameConfigurationKey] ?? DefaultTeamName,
+            configuration[TeamNameConfigurationKey] ?? defaultTeamName,
             configuration[TeamColorConfigurationKey] ?? YellowTeamColor);
     }
 

@@ -444,11 +444,13 @@ if (testingMode is not "base" and not "comparison" and not "match")
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
-var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
-    builder.Configuration,
-    cranePlanner,
-    AppContext.BaseDirectory,
-    useStandardBase: true);
+var craneTargetAddressSettings = testingMode == "match"
+    ? null
+    : CraneTargetAddressSettings.FromConfiguration(
+        builder.Configuration,
+        cranePlanner,
+        AppContext.BaseDirectory,
+        useStandardBase: true);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {
@@ -470,7 +472,9 @@ var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
-var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(builder.Configuration);
+var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
+    builder.Configuration,
+    testingMode == "match" ? "ibis" : CraneFixtureSettings.DefaultTeamName);
 var craneTeamName = craneFixtureSettings.TeamName;
 var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =
@@ -526,6 +530,11 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
         ]);
+        if (testingMode == "match")
+        {
+            duckBuilder.WithEnvironment("Tracker__PublishUdp", "false");
+        }
+
         if (enableStandardBaseDuckIdentityBridge)
         {
             duckBuilder

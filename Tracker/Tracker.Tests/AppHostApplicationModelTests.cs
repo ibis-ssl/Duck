@@ -1140,6 +1140,30 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("match", environment["Testing__Mode"].ToString());
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "cm4-sim" or "tracker-tigers" or "tracker-erforce");
+
+        var simulator = Find(appHost, "simulator");
+        var gameController = Find(appHost, "game-controller");
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneArguments = await GetArgumentsAsync(crane);
+        Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
+        Assert.DoesNotContain(CraneTargetAddressSettings.TargetAddressEnvironmentKey, craneEnvironment.Keys);
+        Assert.DoesNotContain(CraneTargetAddressSettings.ExpectedResourceEnvironmentKey, craneEnvironment.Keys);
+        Assert.DoesNotContain(
+            crane.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
+        Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneArguments[^1], StringComparison.Ordinal);
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
+        Assert.DoesNotContain(
+            duck.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp && endpoint.TargetPort == 11010);
+
+        AssertSingleWait(duck, simulator, WaitType.WaitUntilStarted);
+        AssertWaits(
+            crane,
+            (duck, WaitType.WaitUntilStarted),
+            (gameController, WaitType.WaitUntilHealthy));
     }
 
     [Fact]
@@ -1259,10 +1283,13 @@ public sealed class AppHostApplicationModelTests
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
         var arguments = await GetArgumentsAsync(crane);
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
 
         Assert.Contains("team:=crane", arguments[^1]);
         Assert.Contains("team_color:=YELLOW", arguments[^1]);
+        Assert.DoesNotContain("Tracker__PublishUdp", duckEnvironment.Keys);
     }
 
     [Fact]
