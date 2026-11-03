@@ -32,6 +32,10 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 比較モードは任意選択であり、選択した全資源を同じ AppHost 実行で管理する。三つの追跡器の識別と比較契約は[比較デバッグ設計](tracker-comparison-debug-design.md)に従う。Crane は追跡器ではない。TIGERs AI 対 Crane の対戦経路は別課題 #43 / #50 とし、この比較モードでは起動しない。
 
+### AppHost の起動モード
+
+`Testing:Mode` は `base`、`comparison`、`match` のいずれかを選び、モードを混在させない。省略時は `base` を選ぶ。`base` は基本資源を登録し、`comparison` は比較専用資源を加える。`match` は対戦用の共通資源 `simulator`、`game-controller`、`crane`、`duck` を登録し、基本構成専用の `cm4-sim` と比較専用の `tracker-tigers`、`tracker-erforce` を登録しない。対戦用のSimulator・Game Controller設定、TIGERs・AutoRef・記録資源、Crane・Duckの対戦設定は、それぞれ #46〜#48 の範囲で追加する。
+
 ### 試合開始の確認
 
 TIGERs AI 対 Crane の開始経路は別課題 #43 / #49 で実装する。`match-controller` は開始前に Game Controller API の応答、最新の審判情報パケット、SSL-Vision 入力、対戦参加資源の準備状態を照合する。入力または準備状態を確認できない場合は開始指令を送らず、理由と部分証跡を残して失敗として扱う。
