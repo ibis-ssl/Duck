@@ -2,7 +2,7 @@
 
 ## State
 
-Work is on `task/issue49-aspire-006f6`, created from integration HEAD `fdef8f22249e6bdaab1f5dc998a1045f42d8dcb1` after fetching `origin`. Draft PR #111 is open against `design/issue18-aspire-test-orchestration`; the PR has a formal closing reference to #49 and Project 16 lists PR #111 under Linked pull requests. The first implementation slice is published at `8e0bfc558ca236493ff8b9abf3f127e848fa5567`; the current review-fix slice is local and not yet committed or pushed.
+Work is on `task/issue49-aspire-006f6`, created from integration HEAD `fdef8f22249e6bdaab1f5dc998a1045f42d8dcb1` after fetching `origin`. Draft PR #111 is open against `design/issue18-aspire-test-orchestration`; the PR has a formal closing reference to #49 and Project 16 lists PR #111 under Linked pull requests. The corrected implementation is published at `bb86892dd8c510f8586af6d5b6cd66788ab8438f` on branch `task/issue49-aspire-006f6`.
 
 ## Accepted scope
 
@@ -22,10 +22,10 @@ Red: `DriveToActiveAsyncResumesFromHaltThenAdvancesFromStop` failed on the origi
 
 Green: initial focused Windows validation passed 22 tests. Review Red checks reproduced missing API KICKOFF mapping and loss of a same-counter POST_GAME update. After the corrections, `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --verbosity minimal -p:RunAspireFullStackAcceptance=true --filter "FullyQualifiedName~RefereeDriverHostAutoDriveTests|FullyQualifiedName~GameControllerStateMappingTests|FullyQualifiedName~RefereeDriverNetworkAdapterTests|FullyQualifiedName~RefereeDriverFixtureTests|FullyQualifiedName~MatchTerminationAcceptanceTests|FullyQualifiedName~HttpRefereeSourceCarriesPostGameStageIntoTheTerminationSnapshot" -m:1 /nr:false` passed 66 tests, 0 failed, 0 skipped (1 second). `git diff --check` passed. Existing NU1902 MessagePack and ASPIRE010 warnings remain. The full-stack Docker acceptance was not run.
 
-The published initial-slice CI run [41646168452](https://github.com/ibis-ssl/Duck/actions/runs/41646168452) completed successfully for `8e0bfc5`; it does not cover the local review fixes. Exact-head CI for the corrected slice has not run yet. Normal review initially found five in-scope issues; the fixes are now in the local diff and await same-reviewer re-review, then independent review.
+The initial-slice CI run [41646168452](https://github.com/ibis-ssl/Duck/actions/runs/41646168452) succeeded for `8e0bfc5`, before the review fixes. Exact-head CI [41648274253](https://github.com/ibis-ssl/Duck/actions/runs/41648274253) succeeded for corrected HEAD `bb86892`. The same normal reviewer re-reviewed the fixes and closed NR001–NR005 with no new findings (`pass_with_held` while exact-head CI was pending). An independent reviewer then passed the complete 13-file diff with no required findings.
 
 The container-backed full-stack acceptance test was not run; this local result does not claim live Game Controller, Docker, or match communication. Requested model profiles are gpt-6-luna/high for implementation and gpt-6.1-sol/high for review; actual applied runtime profiles have not been independently verified.
 
 ## Remaining workflow
 
-Commit and push the corrected Green slice, inspect exact-HEAD CI, complete normal and independent review, update and read back the Japanese six-section PR comment, and squash merge PR #111 only into `design/issue18-aspire-test-orchestration`. Do not merge #43 or #18.
+The Japanese six-section PR comment is posted and read back at https://github.com/ibis-ssl/Duck/pull/111#issuecomment-6605669046. A report-only follow-up commit updates this record after review; after its automatic CI completes, squash merge PR #111 only into `design/issue18-aspire-test-orchestration`. Do not merge #43 or #18.
