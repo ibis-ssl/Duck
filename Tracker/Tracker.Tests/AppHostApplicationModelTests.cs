@@ -1053,7 +1053,7 @@ public sealed class AppHostApplicationModelTests
     [Fact]
     public async Task MatchModePinsSimulatorGameControllerAndFixtureConfiguration()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Diagnostics:RunId=issue46-model-test");
 
         var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
         var simulatorImage = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
@@ -1085,14 +1085,22 @@ public sealed class AppHostApplicationModelTests
         var mounts = gameController.Annotations.OfType<ContainerMountAnnotation>().ToArray();
         Assert.Equal(2, mounts.Length);
         var matchConfig = Assert.Single(mounts, mount => mount.Target == "/config/ssl-game-controller.yaml");
+        Assert.NotNull(matchConfig.Source);
         Assert.Equal(
             Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "ssl-game-controller-match.yaml")),
-            Path.GetFullPath(matchConfig.Source));
+            Path.GetFullPath(matchConfig.Source!));
         Assert.True(matchConfig.IsReadOnly);
         var initialState = Assert.Single(mounts, mount => mount.Target == "/tmp/state-store.json.stream");
+        Assert.NotNull(initialState.Source);
+        var stateStoreKey = Convert.ToHexString(
+            System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes("issue46-model-test")))
+            .ToLowerInvariant();
+        var expectedStateStorePath = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-state", $"{stateStoreKey}.json.stream");
+        Assert.Equal(Path.GetFullPath(expectedStateStorePath), Path.GetFullPath(initialState.Source!));
         Assert.Equal(
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "state-store-initial.json.stream")),
-            Path.GetFullPath(initialState.Source));
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "state-store-initial.json.stream")),
+            File.ReadAllText(initialState.Source!));
         Assert.False(initialState.IsReadOnly);
 
         var producerResources = new List<string>();
