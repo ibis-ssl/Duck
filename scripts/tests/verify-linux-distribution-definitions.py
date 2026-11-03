@@ -24,6 +24,7 @@ LOCK = {
 "framework-simulator":("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd","sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554")],[("unknown","unknown","sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d")]),
 "crane":("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d","sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac")],[("unknown","unknown","sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697")]),
 "orion-cm4-sim":("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a","sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b")],[("unknown","unknown","sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba")]),
+"tigers-auto-referee":("tigersmannheim/auto-referee:1.2.0","sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7","application/vnd.docker.distribution.manifest.v2+json",[],[]),
 }
 APPHOST_PROGRAM_FRAGMENTS = [
     # 比較専用の参照と既定値はProgram.csに残る。
@@ -74,7 +75,7 @@ def parse_dockerfile(text: str) -> dict[str, list[list[str]]]:
     return result
 
 def _check_lock(root: pathlib.Path, errors: list[str]) -> None:
-    """固定9参照のtag、digest、媒体種別、platform descriptorを照合する。"""
+    """固定10参照のtag、digest、媒体種別、platform descriptorを照合する。"""
     path=root/"Testing/Duck.Testing.AppHost/linux-image-lock.json"
     if not path.is_file(): errors.append(f"固定参照表がありません: {path}"); return
     try: data=json.loads(path.read_text(encoding="utf-8"))

@@ -1166,8 +1166,8 @@ public sealed class AppHostApplicationModelTests
         var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
         var autoRefImage = Assert.Single(autoRef.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("tigersmannheim/auto-referee", autoRefImage.Image);
-        Assert.Equal("1.2.0", autoRefImage.Tag);
-        Assert.Null(autoRefImage.SHA256);
+        Assert.Null(autoRefImage.Tag);
+        Assert.Equal("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7", autoRefImage.SHA256);
         Assert.Equal(
             ["--active", "--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--trackerAddress", "224.5.23.2:11010"],
             await GetArgumentsAsync(autoRef));
@@ -1196,10 +1196,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("sha256:" + tigersImage.SHA256, lockedImages.GetProperty("sumatra").GetProperty("digest").GetString());
         Assert.Equal("robocupssl/ssl-log-recorder:latest", lockedImages.GetProperty("ssl-log-recorder").GetProperty("reference").GetString());
         Assert.Equal("sha256:" + recorderImage.SHA256, lockedImages.GetProperty("ssl-log-recorder").GetProperty("digest").GetString());
-        var unverifiedAutoRef = imageLock.RootElement.GetProperty("unverifiedImages").GetProperty("tigers-auto-referee");
-        Assert.Equal("tigersmannheim/auto-referee:1.2.0", unverifiedAutoRef.GetProperty("reference").GetString());
-        Assert.Equal("sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7", unverifiedAutoRef.GetProperty("reportedDigest").GetString());
-        Assert.Equal(401, unverifiedAutoRef.GetProperty("manifestHttpStatus").GetInt32());
+        Assert.Equal("tigersmannheim/auto-referee:1.2.0", lockedImages.GetProperty("tigers-auto-referee").GetProperty("reference").GetString());
+        Assert.Equal("sha256:" + autoRefImage.SHA256, lockedImages.GetProperty("tigers-auto-referee").GetProperty("digest").GetString());
     }
     [Theory]
     [InlineData("comparision")]

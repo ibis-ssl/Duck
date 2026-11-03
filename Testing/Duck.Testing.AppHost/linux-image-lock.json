@@ -200,18 +200,13 @@
         }
       ],
       "sourceCommit": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"
-    }
-  },
-  "unverifiedImages": {
+    },
     "tigers-auto-referee": {
       "reference": "tigersmannheim/auto-referee:1.2.0",
-      "tagMetadataUrl": "https://hub.docker.com/v2/repositories/tigersmannheim/auto-referee/tags/1.2.0/",
-      "tagMetadataHttpStatus": 200,
-      "reportedMediaType": "application/vnd.docker.container.image.v1+json",
-      "reportedDigest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7",
-      "manifestUrl": "https://registry-1.docker.io/v2/tigersmannheim/auto-referee/manifests/1.2.0",
-      "manifestHttpStatus": 401,
-      "manifestWwwAuthenticate": "Bearer realm=\"https://auth.docker.io/token\",service=\"registry.docker.io\",scope=\"repository:tigersmannheim/auto-referee:pull\""
+      "digest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7",
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "platforms": [],
+      "otherDescriptors": []
     }
   }
 }
