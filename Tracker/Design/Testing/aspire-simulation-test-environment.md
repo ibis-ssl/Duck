@@ -35,6 +35,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 ### AppHost の起動モード
 
 `Testing:Mode` は `base`、`comparison`、`match` のいずれかを選び、モードを混在させない。省略時は `base` を選ぶ。`base` は基本資源を登録し、`comparison` は比較専用資源を加える。`match` は対戦用の共通資源 `simulator`、`game-controller`、`crane`、`duck` を登録し、基本構成専用の `cm4-sim` と比較専用の `tracker-tigers`、`tracker-erforce` を登録しない。対戦用のSimulator・Game Controller設定、TIGERs・AutoRef・記録資源、Crane・Duckの対戦設定は、それぞれ #46〜#48 の範囲で追加する。
+#46 では、`simulator` の固定引数、Game Controller の固定イメージ・制御 API、同コンテナへの試合時間設定と初期状態の割り当てを構成試験で固定する。TIGERs 資源への Sumatra 設定の割り当ては #47 の範囲とする。
 
 ### 試合開始の確認
 
@@ -672,4 +673,4 @@ Crane の元の再起動処理を呼び出す直前に、登録済みの所有�
 
 初期状態では青と黄のチーム名、親善試合の種別を固定し、操作指令と試合状態を停止にする。Sumatra はネットワークから審判情報を受け取り、11003 番ポートを使う。通常試合と延長試合の時間は試合時間設定に記載し、実行時に生成しない。
 
-設定内容は[参照元の版](https://github.com/ibis-ssl/crane/tree/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/config)に合わせる。この作業では三つの設定とその内容を確認する試験だけを追加する。起動対象への登録と起動・停止処理は後続の対戦作業で扱う。
+設定内容は[参照元の版](https://github.com/ibis-ssl/crane/tree/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/config)に合わせる。#46 では `simulator` の固定引数と Game Controller の固定イメージ・APIを構成試験で固定し、`ssl-game-controller-match.yaml` を `/config/ssl-game-controller.yaml` に読み取り専用で、`state-store-initial.json.stream` の内容から AppHost が実行 ID ごとの書き込み可能な複製を作り、`/tmp/state-store.json.stream` に割り当てる。元の初期状態ファイルは変更しない。構成試験ではコンテナを起動せず、割り当て先と初期内容を確認する。Sumatra 設定 `simulation_protocol_tigers.xml` は内容を確認し、TIGERs が追加される #47 で同資源へ読み取り専用で割り当てする。TIGERs・AutoRef・記録資源の登録は #47、Crane・Duck の対戦設定は #48 で扱う。
