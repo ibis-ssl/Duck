@@ -20,6 +20,10 @@ The build succeeded; the focused test exited 1 at the expected missing fixture p
 
 After adding the fixtures and AppHost copy metadata, the same focused command exited 0: 1 passed, 0 failed, 0 skipped. After normal review requested a missing assertion for `state.command.type == STOP`, the assertion was added and the same focused command again exited 0: 1 passed, 0 failed, 0 skipped. The command emitted existing NU1902 MessagePack and Aspire/analyzer warnings; no build/test failure remained.
 
+The same three focused Markdown checks were run after the independent review's documentation finding was corrected: textlint exit 0, cspell exit 0 with 0 issues, and whitelist exit 0. Before the correction, textlint passed but cspell and whitelist failed on newly added English prose; no whitelist/configuration change was made.
+
+The independent review observed the required `.NET tests/test` CI workflow completed successfully for reviewed HEAD `cd59acf`. Its Linux packet-flow and full-stack acceptance stages were explicitly skipped. This is CI evidence for that earlier HEAD; it does not claim the later design-only correction has matching CI. Full local Linux equivalence remains unavailable on the Windows route.
+
 ## Files and commits
 
 - `Tracker/Design/Testing/aspire-simulation-test-environment.md`
@@ -29,23 +33,31 @@ After adding the fixtures and AppHost copy metadata, the same focused command ex
 - `Testing/Duck.Testing.AppHost/Fixtures/match/ssl-game-controller-match.yaml`
 - `Testing/Duck.Testing.AppHost/Fixtures/match/state-store-initial.json.stream`
 
-Commits: `f81a804` (design and Red test), `7e4fa41` (fixtures and copy metadata), `5489cda` (review-requested command assertion). All were pushed to `task/issue44-aspire-006f1`.
+Commits: `f81a804` (design and Red test), `7e4fa41` (fixtures and copy metadata), `5489cda` (review-requested command assertion). Subsequent report/reservation commits are `d39852c` and `bc115b9` (the latter removes the premature reserved artifact); `cd59acf` records the normal review's no-finding correction check. The Japanese design-gate correction is pending its own commit. All committed work is on `task/issue44-aspire-006f1`.
 
 ## PR and formal linkage
 
 PR: https://github.com/ibis-ssl/Duck/pull/106
 
-At readback after the latest push, PR #106 is still Draft at head `5489cda6af13ff182a747cdfc0c3a6950abe87e6`. Its `closingIssuesReferences` contains #44 only. Project 16 item #44 has `Linked pull requests` set to PR #106 and status `In progress`. #43 and #18 are not closing references. The issue/PR relationship was created through `addCloseIssueReferences` for #44 only.
+At the latest readback before the design-gate correction, PR #106 was still Draft at head `cd59acfb4c424e78e196c9c0c738cc8e295ff207`. Its `closingIssuesReferences` contains #44 only. Project 16 item #44 has `Linked pull requests` set to PR #106 and status `In progress`. #43 and #18 are not closing references. The issue/PR relationship was created through `addCloseIssueReferences` for #44 only.
 
 ## Review
 
-Normal review on `7e4fa41` found NR44-001 (P2): the test checked `gameState.type == STOP` but did not lock `command.type == STOP`. The assertion was added in `5489cda`; the same reviewer rechecked the finding and confirmed closure with focused test 1/1 passing. Requested review profile was `gpt-6.1-sol/high`; exact applied runtime profile is unverified (`applied: null`). The independent reviewer was interrupted before its technical pass when a reservation artifact was found in the candidate; no independent findings are claimed yet.
+Normal review on `7e4fa41` found NR44-001 (P2): the test checked `gameState.type == STOP` but did not lock `command.type == STOP`. The assertion was added in `5489cda`; the same reviewer rechecked the finding and confirmed closure with focused test 1/1 passing. A later bounded correction check found no issue with the reservation-path correction. Requested review profile was `gpt-6.1-sol/high`; exact applied runtime profile is unverified (`applied: null`).
+
+Independent review on `cd59acf` found IF44-001 (P2): the newly added English design prose failed focused cspell and whitelist checks, while textlint passed. The reviewer found no product/fixture/test issue, confirmed exact fixture blob fidelity and the focused test, and observed `.NET tests/test` CI success at that head with Linux packet-flow and full-stack acceptance skipped. The Japanese terminology correction now passes all three focused Markdown checks; bounded normal review and independent finding closure remain pending.
 
 ## Independent review reservation correction
 
-The single deferred-attestation reservation remains owned by `review-enforcer`, identity `duck-44-independent-final-20261103-01`, exact path `reports/issue-44-independent-review-20261103.md`. Reservation evidence is this issue's completed normal review and finding closure, focused Red/Green/fix results, implementation report, and the explicit reservation-only workflow. State is metadata-only; the reviewer was interrupted before technical review, and the mistakenly committed artifact was removed before the corrected review target is frozen. The path must remain absent until a passing independent verdict; materialize it only in the single post-review attestation commit.
+The single deferred-attestation reservation remains owned by `review-enforcer`, identity `duck-44-independent-final-20261103-01`, exact path `reports/issue-44-independent-review-20261103.md`. Reservation evidence is this issue's completed normal review and finding closure, focused Red/Green/fix results, implementation report, and the explicit reservation-only workflow. State is metadata-only. The path was accidentally committed in `d39852c`, removed in `bc115b9`, and verified absent before the independent technical pass. It must remain absent until a passing independent verdict; materialize it only in the single post-review attestation commit.
 
 The same normal reviewer performed a bounded correction review on `bc115b90c6a6a785c025a99bcd5afa70b4ee0e50` and reported no finding: product source is unchanged since `5489cda`, the reserved path is absent, and the metadata-only correction is accurate. The reviewer identity was reused with the original requested `gpt-6.1-sol/high` profile; applied runtime metadata remains unverified (`applied: null`, `application_status: reused_existing_agent_profile`).
+
+## 30-minute progress record
+
+The focused implementation phase took about 4 minutes 53 seconds from the Red/design commit at 23:56:41 UTC to the review-fix commit at 00:01:34 UTC, excluding intake and upstream-source research. Review elapsed/wait time from the first normal review dispatch after Green until the 00:09 UTC status was about 11 minutes; reviewer active time was not separately measured. The final documentation finding is now locally corrected; its normal verification and same-reviewer independent closure are the remaining review steps.
+
+The original #44 scope is implemented; only final review closure, the required Japanese six-section PR comment and full readback, and the passing-only independent report attestation remain. Full live Docker/network behavior remains out of this issue's scope. Parent owns aggregate #43/#18 status; #45 is the next child after #44. No merge is authorized or performed.
 
 ## Requested profile and evidence limits
 
@@ -66,4 +78,4 @@ No missing or conflicting Skill instruction was discovered during this bounded l
 
 ## Remaining
 
-Complete the independent final review against the frozen candidate, post the Japanese six-section PR report comment, and read it back. Do not merge; leave PR #106 Draft and report final evidence to the parent.
+Complete normal verification and independent closure of IF44-001 against the corrected candidate, post the Japanese six-section PR report comment and read it back, then persist the independent report through one passing-only attestation commit. Do not merge; leave PR #106 Draft and report final evidence to the parent.
