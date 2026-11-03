@@ -22,7 +22,7 @@ After adding the fixtures and AppHost copy metadata, the same focused command ex
 
 The same three focused Markdown checks were run after the independent review's documentation finding was corrected: textlint exit 0, cspell exit 0 with 0 issues, and whitelist exit 0. Before the correction, textlint passed but cspell and whitelist failed on newly added English prose; no whitelist/configuration change was made.
 
-The independent review observed the required `.NET tests/test` CI workflow completed successfully for reviewed HEAD `cd59acf`. Its Linux packet-flow and full-stack acceptance stages were explicitly skipped. This is CI evidence for that earlier HEAD; it does not claim the later design-only correction has matching CI. Full local Linux equivalence remains unavailable on the Windows route.
+The independent review observed the required `.NET tests/test` CI workflow completed successfully for reviewed HEAD `cd59acf`; its Linux packet-flow and full-stack acceptance stages were explicitly skipped. A pull-request CI run for the design-corrected HEAD `70eabd2` was in progress at parent readback (run `41551158645`). No outcome is claimed for that run here; the workflow requires one final exact-head CI wait after the report attestation. Full local Linux equivalence remains unavailable on the Windows route.
 
 ## Files and commits
 
@@ -33,7 +33,7 @@ The independent review observed the required `.NET tests/test` CI workflow compl
 - `Testing/Duck.Testing.AppHost/Fixtures/match/ssl-game-controller-match.yaml`
 - `Testing/Duck.Testing.AppHost/Fixtures/match/state-store-initial.json.stream`
 
-Commits: `f81a804` (design and Red test), `7e4fa41` (fixtures and copy metadata), `5489cda` (review-requested command assertion). Subsequent report/reservation commits are `d39852c` and `bc115b9` (the latter removes the premature reserved artifact); `cd59acf` records the normal review's no-finding correction check. The Japanese design-gate correction is pending its own commit. All committed work is on `task/issue44-aspire-006f1`.
+Commits: `f81a804` (design and Red test), `7e4fa41` (fixtures and copy metadata), `5489cda` (review-requested command assertion). Subsequent report/reservation commits are `d39852c` and `bc115b9` (the latter removes the premature reserved artifact); `cd59acf` records the normal review's no-finding correction check; `70eabd2` contains the Japanese design-gate correction. All are on `task/issue44-aspire-006f1`.
 
 ## PR and formal linkage
 
@@ -45,7 +45,7 @@ At the latest readback before the design-gate correction, PR #106 was still Draf
 
 Normal review on `7e4fa41` found NR44-001 (P2): the test checked `gameState.type == STOP` but did not lock `command.type == STOP`. The assertion was added in `5489cda`; the same reviewer rechecked the finding and confirmed closure with focused test 1/1 passing. A later bounded correction check found no issue with the reservation-path correction. Requested review profile was `gpt-6.1-sol/high`; exact applied runtime profile is unverified (`applied: null`).
 
-Independent review on `cd59acf` found IF44-001 (P2): the newly added English design prose failed focused cspell and whitelist checks, while textlint passed. The reviewer found no product/fixture/test issue, confirmed exact fixture blob fidelity and the focused test, and observed `.NET tests/test` CI success at that head with Linux packet-flow and full-stack acceptance skipped. The Japanese terminology correction now passes all three focused Markdown checks; bounded normal review and independent finding closure remain pending.
+Independent review on `cd59acf` found IF44-001 (P2): the newly added English design prose failed focused cspell and whitelist checks, while textlint passed. The reviewer found no product/fixture/test issue, confirmed exact fixture blob fidelity and the focused test, and observed `.NET tests/test` CI success at that head with Linux packet-flow and full-stack acceptance skipped. The Japanese terminology correction in `70eabd2` passes all three focused Markdown checks; the same normal reviewer returned no finding for that correction. Same-independent-reviewer bounded closure is pending.
 
 ## Independent review reservation correction
 
@@ -57,7 +57,7 @@ The same normal reviewer performed a bounded correction review on `bc115b90c6a6a
 
 The focused implementation phase took about 4 minutes 53 seconds from the Red/design commit at 23:56:41 UTC to the review-fix commit at 00:01:34 UTC, excluding intake and upstream-source research. Review elapsed/wait time from the first normal review dispatch after Green until the 00:09 UTC status was about 11 minutes; reviewer active time was not separately measured. The final documentation finding is now locally corrected; its normal verification and same-reviewer independent closure are the remaining review steps.
 
-The original #44 scope is implemented; only final review closure, the required Japanese six-section PR comment and full readback, and the passing-only independent report attestation remain. Full live Docker/network behavior remains out of this issue's scope. Parent owns aggregate #43/#18 status; #45 is the next child after #44. No merge is authorized or performed.
+At status readback, the published head is `70eabd26c0dba391f9d1edf225b99d0d545657c1`; focused test is 1/1 green and focused textlint/cspell/whitelist all pass. Normal review and the IF44-001 fix check pass; independent bounded closure is pending. The original #44 scope is implemented; remaining work is independent closure, the required Japanese six-section PR comment and full readback, and passing-only independent report attestation. Full live Docker/network behavior remains outside this issue. Parent owns aggregate #43/#18 status; #45 is next after #44. No merge is authorized or performed.
 
 ## Requested profile and evidence limits
 
@@ -78,4 +78,4 @@ No missing or conflicting Skill instruction was discovered during this bounded l
 
 ## Remaining
 
-Complete normal verification and independent closure of IF44-001 against the corrected candidate, post the Japanese six-section PR report comment and read it back, then persist the independent report through one passing-only attestation commit. Do not merge; leave PR #106 Draft and report final evidence to the parent.
+Complete bounded independent closure of IF44-001 against the corrected candidate, post the Japanese six-section PR report comment and read it back, then persist the independent report through one passing-only attestation commit and complete its exact-head CI wait. Do not merge; leave PR #106 Draft and report final evidence to the parent.
