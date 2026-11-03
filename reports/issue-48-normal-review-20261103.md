@@ -1,6 +1,6 @@
 # Issue #48 normal review
 
-> Current normal-review result: **pass_with_held** at `acb4b358fe6d65985a431d2a8c3159e483a44905`. I48-NR-001 is closed. Exact-head CI `41638797927` has since completed successfully; the packet-flow and full-stack acceptance jobs were skipped. The initial review below is historical; see the fix-verification section for the current matrix and evidence.
+> Latest normal-review result: **pass** for the match-only Crane target-address fix at `7038f2d6cf8d1e4507ca3a001631837277154abe`. `I48-NR-001` and independent finding `I48-IFR-001` are closed by the changes described in the final delta section. Exact-head CI `41640384043` is pending; packet-flow is skipped. Earlier review/fix sections below remain the historical record.
 
 ## Task and scope
 
@@ -177,3 +177,15 @@ The new environment setting reaches the same RuntimeTrackerOptions configuration
 - Applied runtime profile remains unverified. Actual simulator/container/UDP acceptance is outside scope, and base preservation has source/default plus comparison model evidence rather than a newly executed base-specific publication test.
 - Parent should persist this normal review record before independent-final review and continue the established lifecycle. This is not an independent-final verdict or merge authorization.
 - `report_attestation_allowed: false`; normal review report only. Independent reviewed HEAD and report-attestation HEAD remain null.
+
+## Follow-up review: independent finding I48-IFR-001
+
+- Reviewer identity: `/root/issue48_orchestrator/issue48_normal_reviewer`, same normal reviewer as the earlier review. Requested profile `gpt-6.1-sol/high`; actual runtime profile unverified.
+- Reviewed tree: source delta committed as `7038f2d6cf8d1e4507ca3a001631837277154abe`, based on `a069ef26ecc961ed28d7f417487a88844add97c8`.
+- Finding addressed: independent reviewer found that default match mode still resolved `CraneTargetAddressSettings` to `cm4-sim` and invoked the Crane overlay despite the resource being excluded. The normal reviewer confirmed the launch behavior was operationally relevant and required no extra changes beyond the user-approved #48 scope.
+- Change: `Program.cs` now sets target-address settings to `null` only in `Testing:Mode=match`. The match model test asserts absence of both target environment keys, the overlay mount, and the overlay launch argument. Base/comparison still call the original settings resolver.
+- Red/Green: the new assertion failed before the fix because `DUCK_CRANE_TARGET_ADDRESS` was present. After the fix, the match model test passed 1/1 (115 ms); the existing comparison model test passed 1/1 (117 ms). The reviewer ran no tests.
+- Follow-up verdict: **pass**, no additional required finding. `I48-IFR-001` resolved. This review covers only the delta and relies on the earlier full review for unchanged areas; it is not a fresh independent-final review.
+- Exact-head CI run `41640384043` is pending at `7038f2d6cf8d1e4507ca3a001631837277154abe`; the ASPIRE-NET-002 packet-flow job is skipped. No run is treated as success until terminal readback.
+- Overall runtime acceptance remains unverified: no simulator/container/UDP end-to-end test was run.
+- Reviewer identity and execution: same normal reviewer; no source/report/Git mutations, test execution, approval, or merge by reviewer. No new security, error-handling, readiness, or sibling-mode findings.
