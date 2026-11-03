@@ -5,17 +5,19 @@ namespace Tracker.Tests;
 public sealed class RefereeDriverFixtureTests
 {
     [Fact]
-    public async Task DriveToActiveAsyncRejectsNonHaltInitialCommand()
+    public async Task DriveToActiveAsyncContinuesDirectlyFromInitialStop()
     {
         var source = new FakeRefereeCommandSource(
-            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1));
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2),
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 3));
         var client = new RecordingGameControllerControlClient();
         var fixture = new RefereeDriverFixture(source, client);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => fixture.DriveToActiveAsync(CancellationToken.None));
+        var active = await fixture.DriveToActiveAsync(CancellationToken.None);
 
-        Assert.Empty(client.Actions);
+        Assert.Equal(Referee.Types.Command.NormalStart, active.Command);
+        Assert.Equal([GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart], client.Actions);
     }
 
     [Fact]

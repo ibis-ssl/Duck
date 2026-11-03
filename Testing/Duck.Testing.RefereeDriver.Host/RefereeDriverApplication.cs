@@ -63,7 +63,9 @@ internal static class RefereeDriverApplication
         if (bool.TryParse(configuration["Testing:IdentityControl:Enabled"], out var identityEnabled) && identityEnabled)
             builder.Services.AddHostedService<RefereeIdentityControlHostedService>();
         builder.Services.AddHostedService<RefereeObservationWorker>();
-        if (bool.TryParse(configuration["RefereeDriver:AutoDriveToActive"], out var autoDrive) && autoDrive)
+        var autoDrive = bool.TryParse(configuration["RefereeDriver:AutoDriveToActive"], out var autoDriveEnabled) && autoDriveEnabled;
+        var matchControllerEnabled = bool.TryParse(configuration["MatchController:Enabled"], out var matchEnabled) && matchEnabled;
+        if (autoDrive || matchControllerEnabled)
         {
             builder.Services.TryAddSingleton<IGameControllerWebSocketTransport>(provider =>
                 new RefereeDriverWebSocketTransport(
@@ -75,7 +77,16 @@ internal static class RefereeDriverApplication
             builder.Services.AddSingleton(provider => new RefereeDriverFixture(
                 provider.GetRequiredService<IRefereeCommandSource>(),
                 provider.GetRequiredService<IGameControllerControlClient>()));
-            builder.Services.AddHostedService<RefereeAutoDriveWorker>();
+            if (matchControllerEnabled)
+            {
+                builder.Services.AddHttpClient();
+                builder.Services.AddSingleton<IMatchControllerReadinessProbe, MatchControllerReadinessProbe>();
+                builder.Services.AddHostedService<MatchControllerWorker>();
+            }
+            else
+            {
+                builder.Services.AddHostedService<RefereeAutoDriveWorker>();
+            }
         }
         RefereeDriverHost.ConfigureHttp(builder);
         var app = builder.Build();
