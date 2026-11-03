@@ -436,9 +436,9 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
 }
 
 var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
-if (testingMode is not "base" and not "comparison")
+if (testingMode is not "base" and not "comparison" and not "match")
 {
-    throw new InvalidOperationException($"Unsupported Testing:Mode '{testingMode}'. Supported modes are 'base' and 'comparison'.");
+    throw new InvalidOperationException($"Unsupported Testing:Mode '{testingMode}'. Supported modes are 'base', 'comparison', and 'match'.");
 }
 
 var simulatorIbisPort =
@@ -509,7 +509,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         builder.Configuration["Testing:Crane:DiagnosticsPath"],
         identityDockerContext,
         identityExpectedEngineId,
-        identityDockerExecutable),
+        identityDockerExecutable,
+        IncludeCm4Simulator: testingMode != "match"),
     simulatorResource =>
     {
         var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
