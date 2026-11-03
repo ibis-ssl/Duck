@@ -230,7 +230,6 @@ internal static class BaseSimulationResourceRegistration
                     options.DuckRunId),
                 options.DuckRunId,
                 "autoref-tigers");
-            autoRef.WithImageSHA256("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7");
 
             var recorder = AddStandardContainer(
                 builder,

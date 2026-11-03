@@ -94,19 +94,6 @@
       ],
       "otherDescriptors": []
     },
-    "tigers-auto-referee": {
-      "reference": "tigersmannheim/auto-referee:1.2.0",
-      "digest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7",
-      "mediaType": "application/vnd.docker.container.image.v1+json",
-      "platforms": [
-        {
-          "os": "linux",
-          "architecture": "amd64",
-          "digest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7"
-        }
-      ],
-      "otherDescriptors": []
-    },
     "ssl-log-recorder": {
       "reference": "robocupssl/ssl-log-recorder:latest",
       "digest": "sha256:907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046",
@@ -213,6 +200,18 @@
         }
       ],
       "sourceCommit": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"
+    }
+  },
+  "unverifiedImages": {
+    "tigers-auto-referee": {
+      "reference": "tigersmannheim/auto-referee:1.2.0",
+      "tagMetadataUrl": "https://hub.docker.com/v2/repositories/tigersmannheim/auto-referee/tags/1.2.0/",
+      "tagMetadataHttpStatus": 200,
+      "reportedMediaType": "application/vnd.docker.container.image.v1+json",
+      "reportedDigest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7",
+      "manifestUrl": "https://registry-1.docker.io/v2/tigersmannheim/auto-referee/manifests/1.2.0",
+      "manifestHttpStatus": 401,
+      "manifestWwwAuthenticate": "Bearer realm=\"https://auth.docker.io/token\",service=\"registry.docker.io\",scope=\"repository:tigersmannheim/auto-referee:pull\""
     }
   }
 }
