@@ -3,10 +3,13 @@ namespace Duck.Testing.RefereeDriver;
 public sealed record RefereeCommandSnapshot(
     Referee.Types.Command Command,
     uint CommandCounter,
-    string YellowTeamName = "");
+    string YellowTeamName = "",
+    Referee.Types.Stage? Stage = null,
+    ulong? PacketTimestamp = null);
 
 public enum GameControllerContinueAction
 {
+    ResumeFromHalt,
     NextCommand,
     ForceStart,
     NormalStart,
@@ -28,6 +31,19 @@ public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot)
     public string ToFailureMessage() =>
         $"{FailureReason}: active referee command was lost during Yellow motion; " +
         $"observed {Snapshot.Command} at counter {Snapshot.CommandCounter}.";
+}
+
+public enum RefereeMatchTerminationKind
+{
+    PostGame,
+    MaximumTimeReached,
+}
+
+public sealed record RefereeMatchTerminationResult(
+    RefereeMatchTerminationKind Kind,
+    RefereeCommandSnapshot LastSnapshot)
+{
+    public bool IsSuccess => Kind == RefereeMatchTerminationKind.PostGame;
 }
 
 public sealed class RefereeStateLostException(RefereeCommandSnapshot snapshot)
@@ -56,7 +72,7 @@ public sealed class RefereeDriverFixture
         this.controlClient = controlClient;
     }
 
-    public async Task DriveToActiveAsync(CancellationToken cancellationToken)
+    public async Task<RefereeCommandSnapshot> DriveToActiveAsync(CancellationToken cancellationToken)
     {
         var initial = await commandSource.WaitForChangeAsync(null, cancellationToken);
         if (initial.Command != Referee.Types.Command.Halt)
@@ -66,40 +82,48 @@ public sealed class RefereeDriverFixture
         }
 
         await controlClient.SendContinueActionAsync(
+            GameControllerContinueAction.ResumeFromHalt,
+            cancellationToken);
+
+        var afterResume = await commandSource.WaitForChangeAsync(
+            initial.CommandCounter,
+            cancellationToken);
+        EnsureNewerSnapshot(initial, afterResume, "RESUME_FROM_HALT");
+        if (afterResume.Command != Referee.Types.Command.Stop)
+        {
+            throw new InvalidOperationException(
+                $"Game Controller did not reach STOP after RESUME_FROM_HALT; observed {afterResume.Command}.");
+        }
+
+        await controlClient.SendContinueActionAsync(
             GameControllerContinueAction.NextCommand,
             cancellationToken);
 
-        var afterNext = await commandSource.WaitForChangeAsync(
-            initial.CommandCounter,
+        var preparation = await commandSource.WaitForChangeAsync(
+            afterResume.CommandCounter,
             cancellationToken);
-        if (IsActive(afterNext.Command))
-        {
-            return;
-        }
-
-        var continueAction = afterNext.Command switch
-        {
-            Referee.Types.Command.Halt or Referee.Types.Command.Stop =>
-                GameControllerContinueAction.ForceStart,
-            Referee.Types.Command.PrepareKickoffYellow or
-            Referee.Types.Command.PrepareKickoffBlue or
-            Referee.Types.Command.PreparePenaltyYellow or
-            Referee.Types.Command.PreparePenaltyBlue =>
-                GameControllerContinueAction.NormalStart,
-            _ => throw new InvalidOperationException(
-                $"Referee command {afterNext.Command} cannot be continued by this fixture."),
-        };
-
-        await controlClient.SendContinueActionAsync(continueAction, cancellationToken);
-
-        var active = await commandSource.WaitForChangeAsync(
-            afterNext.CommandCounter,
-            cancellationToken);
-        if (!IsActive(active.Command))
+        EnsureNewerSnapshot(afterResume, preparation, "NEXT_COMMAND");
+        if (!IsPreparation(preparation.Command))
         {
             throw new InvalidOperationException(
-                $"Game Controller did not reach an active referee command; observed {active.Command}.");
+                $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {preparation.Command}.");
         }
+
+        await controlClient.SendContinueActionAsync(
+            GameControllerContinueAction.NormalStart,
+            cancellationToken);
+
+        var active = await commandSource.WaitForChangeAsync(
+            preparation.CommandCounter,
+            cancellationToken);
+        EnsureNewerSnapshot(preparation, active, "NORMAL_START");
+        if (active.Command != Referee.Types.Command.NormalStart)
+        {
+            throw new InvalidOperationException(
+                $"Game Controller did not reach NORMAL_START after NORMAL_START; observed {active.Command}.");
+        }
+
+        return active;
     }
 
     public static async Task<T> WaitForMotionWhileActiveAsync<T>(
@@ -148,6 +172,53 @@ public sealed class RefereeDriverFixture
         }
     }
 
+    public static async Task<RefereeMatchTerminationResult> WaitForMatchTerminationAsync(
+        IRefereeCommandSource commandSource,
+        RefereeCommandSnapshot latestSnapshot,
+        TimeSpan maximumDuration,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(commandSource);
+        ArgumentNullException.ThrowIfNull(latestSnapshot);
+        if (maximumDuration <= TimeSpan.Zero || maximumDuration == Timeout.InfiniteTimeSpan)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maximumDuration));
+        }
+
+        var lastSnapshot = latestSnapshot;
+        if (lastSnapshot.Stage == Referee.Types.Stage.PostGame)
+        {
+            return new(RefereeMatchTerminationKind.PostGame, lastSnapshot);
+        }
+
+        using var maximumDurationCancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        maximumDurationCancellation.CancelAfter(maximumDuration);
+
+        while (true)
+        {
+            RefereeCommandSnapshot next;
+            try
+            {
+                next = await commandSource.WaitForChangeAsync(
+                    lastSnapshot.CommandCounter,
+                    maximumDurationCancellation.Token);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                return new(RefereeMatchTerminationKind.MaximumTimeReached, lastSnapshot);
+            }
+
+            EnsureNewerSnapshot(lastSnapshot, next, "match termination");
+
+            lastSnapshot = next;
+            if (next.Stage == Referee.Types.Stage.PostGame)
+            {
+                return new(RefereeMatchTerminationKind.PostGame, next);
+            }
+        }
+    }
+
     private static async Task<T> RunMotionWaitAsync<T>(
         Func<CancellationToken, Task<T>> waitForMotionAsync,
         CancellationToken cancellationToken)
@@ -187,5 +258,27 @@ public sealed class RefereeDriverFixture
     private static bool IsActive(Referee.Types.Command command)
     {
         return command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart;
+    }
+
+    private static bool IsPreparation(Referee.Types.Command command) =>
+        command is Referee.Types.Command.PrepareKickoffYellow or
+            Referee.Types.Command.PrepareKickoffBlue;
+
+    private static void EnsureNewerSnapshot(
+        RefereeCommandSnapshot previous,
+        RefereeCommandSnapshot current,
+        string transition)
+    {
+        var newer = previous.PacketTimestamp is { } previousTimestamp &&
+            current.PacketTimestamp is { } currentTimestamp
+                ? currentTimestamp > previousTimestamp
+                : current.CommandCounter > previous.CommandCounter;
+        if (!newer)
+        {
+            throw new InvalidOperationException(
+                $"Referee evidence for {transition} was not newer; observed timestamp " +
+                $"{current.PacketTimestamp?.ToString() ?? "unavailable"}, counter {current.CommandCounter} after " +
+                $"timestamp {previous.PacketTimestamp?.ToString() ?? "unavailable"}, counter {previous.CommandCounter}.");
+        }
     }
 }

@@ -22,11 +22,10 @@ namespace Tracker.Tests;
 public sealed class RefereeDriverHostAutoDriveTests
 {
     [Theory]
-    [InlineData(global::Referee.Types.Command.Stop, "FORCE_START", 4)]
-    [InlineData(global::Referee.Types.Command.PrepareKickoffBlue, "NORMAL_START", 4)]
-    [InlineData(global::Referee.Types.Command.ForceStart, null, 3)]
+    [InlineData(global::Referee.Types.Command.PrepareKickoffBlue)]
+    [InlineData(global::Referee.Types.Command.PrepareKickoffYellow)]
     public async Task ExplicitAutoDriveUsesExistingDriverAndControlAdapter(
-        global::Referee.Types.Command afterNext, string? secondAction, int decodedCount)
+        global::Referee.Types.Command afterNext)
     {
         await using var fixture = Fixture.Build(autoDrive: "true", afterNext: afterNext);
         await fixture.App.StartAsync();
@@ -34,15 +33,14 @@ public sealed class RefereeDriverHostAutoDriveTests
         Assert.IsType<GameControllerWebSocketControlClient>(
             fixture.App.Services.GetService<IGameControllerControlClient>());
         Assert.NotNull(fixture.App.Services.GetService<RefereeDriverFixture>());
-        await fixture.Transports.Receiver.AtCall(decodedCount + 1).WaitAsync(TimeSpan.FromSeconds(5));
+        await fixture.Transports.Receiver.AtCall(6).WaitAsync(TimeSpan.FromSeconds(5));
         using var response = await fixture.WaitForHealthyAsync();
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal(decodedCount, document.RootElement.GetProperty("diagnostic")
+        Assert.Equal(5, document.RootElement.GetProperty("diagnostic")
             .GetProperty("successfullyDecodedCount").GetInt64());
-        Assert.Equal(secondAction is null ? 1 : 2, fixture.Transports.Messages.Count);
+        Assert.Equal(3, fixture.Transports.Messages.Count);
         var types = fixture.Transports.Messages.Select(message => ReadAction(message.Json)).ToArray();
-        var expectedTypes = secondAction is null ? new[] { "NEXT_COMMAND" } : new[] { "NEXT_COMMAND", secondAction };
-        Assert.Equal(expectedTypes, types);
+        Assert.Equal(new[] { "RESUME_FROM_HALT", "NEXT_COMMAND", "NORMAL_START" }, types);
         Assert.All(fixture.Transports.Messages, message => Assert.Equal(Fixture.InternalUri, message.Endpoint));
         Assert.All(fixture.Transports.Sockets, socket => Assert.True(socket.SentOnlyAfterInitialOutput));
         Assert.Equal(1, fixture.Transports.CreateCalls);
@@ -305,19 +303,21 @@ public sealed class RefereeDriverHostAutoDriveTests
         private byte[] Output()
         {
             var command = (global::Referee.Types.Command)Volatile.Read(ref currentCommand);
-            var type = command switch
+            var (commandType, gameStateType) = command switch
             {
-                global::Referee.Types.Command.Stop => "STOP",
-                global::Referee.Types.Command.ForceStart => "FORCE_START",
-                global::Referee.Types.Command.NormalStart => "NORMAL_START",
-                _ => "HALT",
+                global::Referee.Types.Command.Stop => ("STOP", "STOP"),
+                global::Referee.Types.Command.PrepareKickoffBlue or
+                    global::Referee.Types.Command.PrepareKickoffYellow => ("KICKOFF", "STOP"),
+                global::Referee.Types.Command.ForceStart => ("FORCE_START", "RUNNING"),
+                global::Referee.Types.Command.NormalStart => ("NORMAL_START", "RUNNING"),
+                _ => ("HALT", "HALT"),
             };
             return JsonSerializer.SerializeToUtf8Bytes(new
             {
                 matchState = new
                 {
-                    command = new { type, forTeam = "UNKNOWN" },
-                    gameState = new { type = type is "FORCE_START" or "NORMAL_START" ? "RUNNING" : type },
+                    command = new { type = commandType, forTeam = "UNKNOWN" },
+                    gameState = new { type = gameStateType },
                 },
             });
         }
@@ -328,13 +328,14 @@ public sealed class RefereeDriverHostAutoDriveTests
             if (!document.RootElement.TryGetProperty("continue_action", out var action)) return;
             var command = action.GetProperty("type").GetString() switch
             {
+                "RESUME_FROM_HALT" => global::Referee.Types.Command.Stop,
                 "NEXT_COMMAND" => afterNext,
                 "FORCE_START" => global::Referee.Types.Command.ForceStart,
                 "NORMAL_START" => global::Referee.Types.Command.NormalStart,
                 _ => throw new InvalidOperationException("未知の制御JSON。"),
             };
             Interlocked.Exchange(ref currentCommand, (int)command);
-            Receiver.Supply(Packet(command, Messages.Count == 1 ? 11u : 12u));
+            Receiver.Supply(Packet(command, (uint)(10 + Messages.Count)));
         }
         internal void CancelPending()
         {
@@ -459,8 +460,8 @@ public sealed class RefereeDriverHostAutoDriveTests
     private static ReadOnlyMemory<byte> Packet(global::Referee.Types.Command command, uint counter) =>
         new global::Referee
         {
-            PacketTimestamp = 1, Stage = global::Referee.Types.Stage.NormalFirstHalf,
-            Command = command, CommandCounter = counter, CommandTimestamp = 1,
+            PacketTimestamp = counter, Stage = global::Referee.Types.Stage.NormalFirstHalf,
+            Command = command, CommandCounter = counter, CommandTimestamp = counter,
             Yellow = Team("yellow"), Blue = Team("blue"),
         }.ToByteArray();
     private static global::Referee.Types.TeamInfo Team(string name) => new()

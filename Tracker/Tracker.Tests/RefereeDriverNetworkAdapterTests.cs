@@ -6,10 +6,10 @@ namespace Tracker.Tests;
 public sealed class RefereeDriverNetworkAdapterTests
 {
     [Fact]
-    public async Task UdpSourceSkipsPacketsWithUnchangedCommandCounter()
+    public async Task UdpSourceSkipsPacketsWithNonAdvancingCommandCounter()
     {
         var receiver = new RecordingPacketReceiver(
-            CreatePacket(Referee.Types.Command.Stop, 7),
+            CreatePacket(Referee.Types.Command.Stop, 6),
             CreatePacket(Referee.Types.Command.ForceStart, 8));
         var source = new UdpRefereeCommandSource(receiver);
 
@@ -22,6 +22,7 @@ public sealed class RefereeDriverNetworkAdapterTests
     }
 
     [Theory]
+    [InlineData(GameControllerContinueAction.ResumeFromHalt, "RESUME_FROM_HALT")]
     [InlineData(GameControllerContinueAction.NextCommand, "NEXT_COMMAND")]
     [InlineData(GameControllerContinueAction.ForceStart, "FORCE_START")]
     [InlineData(GameControllerContinueAction.NormalStart, "NORMAL_START")]

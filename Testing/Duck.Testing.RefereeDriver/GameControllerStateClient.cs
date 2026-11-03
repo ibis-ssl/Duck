@@ -104,6 +104,7 @@ internal enum GameControllerCommandKind
     Unknown,
     Halt,
     Stop,
+    Kickoff,
     NormalStart,
     ForceStart,
 }
