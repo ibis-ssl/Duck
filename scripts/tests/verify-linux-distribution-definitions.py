@@ -13,16 +13,18 @@ APPS = {
  "DebugHost": {"dockerfile":"Tracker/Tracker.DebugHost/Dockerfile","output":"Tracker.DebugHost","assembly":"Tracker.DebugHost.dll","framework":"Microsoft.AspNetCore.App","base":ASPNET,"static":["appsettings.json","wwwroot/app.css","wwwroot/favicon.png"]},
  "RefereeDriver.Host": {"dockerfile":"Testing/Duck.Testing.RefereeDriver.Host/Dockerfile","output":"Duck.Testing.RefereeDriver.Host","assembly":"Duck.Testing.RefereeDriver.Host.dll","framework":"Microsoft.AspNetCore.App","base":ASPNET,"static":[]},
 }
-# tag/index root values and descriptors are sourced from the preserved 04B2 metadata bundle.
+# tag/index root values and descriptors are sourced from the preserved 04B2 metadata bundle and current verified pin evidence.
 LOCK = {
 "dotnet-runtime":("mcr.microsoft.com/dotnet/runtime:10.0","sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:1bac183f0f5e1b7dd58cf1083fa79e6310d47afe3ca5c9130c910ebba7720929"),("linux","arm/v7","sha256:0e7e2b03b5f3c3d0546c7d6141f1b75f682b0bac02d11a508a438991ee322b2d"),("linux","arm64","sha256:9aaf1ab716a4e15a7c8cf773bcf7638ae1b5114bccee5611ce371e1a043d2033")],[]),
 "dotnet-aspnet":("mcr.microsoft.com/dotnet/aspnet:10.0","sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b"),("linux","arm/v7","sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546"),("linux","arm64","sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55")],[]),
 "game-controller":("robocupssl/ssl-game-controller:3.20.3","sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721"),("linux","arm64","sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72")],[("unknown","unknown","sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816"),("unknown","unknown","sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849")]),
 "sumatra":("tigersmannheim/sumatra:2025","sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c"),("linux","arm64","sha256:e07efb360effb09dc716f37943f46f0ae9eb3569f0c5f9bf4c6be88599c0b5d0")],[]),
+"ssl-log-recorder":("robocupssl/ssl-log-recorder:latest","sha256:907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b"),("linux","arm64","sha256:713143edc82f5cb9e1d9f3cc06442bfc671efd766cc1ab2efa34c5c5f2a3c700")],[]),
 "autoref":("roboticserlangen/autoref:2025.1.0","sha256:de4f06a9bcfad524b3bae2015f92bb3fc3a209295eb668a34d5a0b329616bf68","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:04067106660f5ff31d1ebe4db9b19b1078a2124db3adabae79f6c9d23fa99317"),("linux","arm64","sha256:3453c128d3242e5a6eabfae53ed5c9a6b9c5a384a8aa9e69e2e4e5d932420373")],[("unknown","unknown","sha256:223a37d53f2eaeac74c2d4d044175e9a496854f2936042d5b98495f8e69f0100"),("unknown","unknown","sha256:216845b29c6318850983b182fa12b25f53fba383f7452e0833dc4631f7b6a2b0")]),
 "framework-simulator":("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd","sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554")],[("unknown","unknown","sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d")]),
 "crane":("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d","sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac")],[("unknown","unknown","sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697")]),
 "orion-cm4-sim":("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a","sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b")],[("unknown","unknown","sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba")]),
+"tigers-auto-referee":("tigersmannheim/auto-referee:1.2.0","sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7","application/vnd.docker.distribution.manifest.v2+json",[],[]),
 }
 APPHOST_PROGRAM_FRAGMENTS = [
     # 比較専用の参照と既定値はProgram.csに残る。
@@ -73,7 +75,7 @@ def parse_dockerfile(text: str) -> dict[str, list[list[str]]]:
     return result
 
 def _check_lock(root: pathlib.Path, errors: list[str]) -> None:
-    """固定8参照のtag、digest、媒体種別、platform descriptorを照合する。"""
+    """固定10参照のtag、digest、媒体種別、platform descriptorを照合する。"""
     path=root/"Testing/Duck.Testing.AppHost/linux-image-lock.json"
     if not path.is_file(): errors.append(f"固定参照表がありません: {path}"); return
     try: data=json.loads(path.read_text(encoding="utf-8"))
