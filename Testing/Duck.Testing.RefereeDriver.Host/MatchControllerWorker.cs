@@ -26,7 +26,7 @@ internal sealed record MatchParticipantResourceEvidence(
     string? HealthStatus)
 {
     public bool IsReady => string.Equals(State, "Running", StringComparison.Ordinal) &&
-        !string.Equals(HealthStatus, "Unhealthy", StringComparison.OrdinalIgnoreCase);
+        string.Equals(HealthStatus, "Healthy", StringComparison.OrdinalIgnoreCase);
 }
 
 internal interface IMatchControllerReadinessProbe

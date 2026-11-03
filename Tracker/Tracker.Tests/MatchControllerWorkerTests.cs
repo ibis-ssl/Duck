@@ -15,6 +15,20 @@ public sealed class MatchControllerWorkerTests
 
         Assert.True(MatchControllerReadinessProbe.IsParticipantEvidenceReady(current, expected, now));
         Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "tigers-blue"
+                    ? resource with { HealthStatus = null }
+                    : resource).ToArray(),
+            }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "tigers-blue"
+                    ? resource with { HealthStatus = "Unknown" }
+                    : resource).ToArray(),
+            }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
             current with { ObservedAtUtc = now - TimeSpan.FromSeconds(3) }, expected, now));
         Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
             current with { Resources = current.Resources.Where(resource => resource.ResourceId != "tigers-blue").ToArray() }, expected, now));
@@ -203,10 +217,10 @@ public sealed class MatchControllerWorkerTests
             ParticipantResourcesReady: true, GameControllerApiAndRefereeReady: true, VisionReady: true,
             ParticipantEvidence: new(DateTimeOffset.UtcNow,
             [
-                new("simulator", "Running", null), new("game-controller", "Running", null),
-                new("crane", "Running", null), new("duck", "Running", null),
-                new("tigers-blue", "Running", null), new("autoref-tigers", "Running", null),
-                new("ssl-log-recorder", "Running", null),
+                new("simulator", "Running", "Healthy"), new("game-controller", "Running", "Healthy"),
+                new("crane", "Running", "Healthy"), new("duck", "Running", "Healthy"),
+                new("tigers-blue", "Running", "Healthy"), new("autoref-tigers", "Running", "Healthy"),
+                new("ssl-log-recorder", "Running", "Healthy"),
             ]));
 
     private static RefereeCommandSnapshot Snapshot(
