@@ -1033,6 +1033,7 @@ public sealed class AppHostApplicationModelTests
         using var state = System.Text.Json.JsonDocument.Parse(
             File.ReadAllText(Path.Combine(fixtureDirectory, "state-store-initial.json.stream")));
         var matchState = state.RootElement.GetProperty("state");
+        Assert.Equal("STOP", matchState.GetProperty("command").GetProperty("type").GetString());
         Assert.Equal("STOP", matchState.GetProperty("gameState").GetProperty("type").GetString());
         var teams = matchState.GetProperty("teamState");
         Assert.Equal("TIGERs Mannheim", teams.GetProperty("BLUE").GetProperty("name").GetString());
