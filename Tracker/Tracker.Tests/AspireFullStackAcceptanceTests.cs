@@ -278,7 +278,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 output.WriteLine($"requested Game Controller Yellow team name={craneFixtureSettings.TeamName}");
                 initial = await WaitForInitialRefereeWithYellowIdentityAsync(
                     httpRefereeSource, craneFixtureSettings.TeamName, timeout.Token);
-                refereeSnapshots.Enqueue(initial);
                 output.WriteLine($"referee command={initial.Command} counter={initial.CommandCounter}");
             }
             catch (OperationCanceledException exception)
@@ -319,31 +318,19 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 $"visionFrame={initialVision.FrameNumber}; " +
                 $"yellowRobots={initialVision.Detection.RobotsYellow.Count}");
 
+            RefereeCommandSnapshot active;
             try
             {
-                await gameControllerControl.SendContinueActionAsync(
-                    GameControllerContinueAction.ForceStart, timeout.Token);
+                active = await new RefereeDriverFixture(
+                    new InitialSnapshotRefereeCommandSource(refereeSource, initial),
+                    gameControllerControl).DriveToActiveAsync(timeout.Token);
             }
             catch (Exception exception)
             {
                 throw new InvalidOperationException(
-                    $"REFEREE_FIXTURE_FAILURE: could not send Game Controller FORCE_START from verified HALT: {exception.Message}",
+                    $"REFEREE_FIXTURE_FAILURE: Game Controller did not complete HALT/STOP/PREPARE/NORMAL_START: {exception.Message}",
                     exception);
             }
-
-            RefereeCommandSnapshot active;
-            try
-            {
-                active = await WaitForActiveRefereeAfterInitialHaltAsync(
-                    httpRefereeSource, initial, craneFixtureSettings.TeamName, timeout.Token);
-            }
-            catch (OperationCanceledException exception)
-            {
-                throw new InvalidOperationException(
-                    "REFEREE_FIXTURE_FAILURE: Game Controller did not expose a ready active referee snapshot after FORCE_START before the deadline.",
-                    exception);
-            }
-            refereeSnapshots.Enqueue(active);
 
             output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
             if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
@@ -762,6 +749,24 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains("REFEREE_FINAL_STATE_CHANGED", changed.Message, StringComparison.Ordinal);
         Assert.Equal(3, handler.RequestCount);
         Assert.Equal(1, handler.MaximumConcurrentRequests);
+    }
+
+    [Fact]
+    public async Task HttpRefereeSourceCarriesPostGameStageIntoTheTerminationSnapshot()
+    {
+        using var http = new HttpClient(new QueueHttpMessageHandler(
+            """{"isReady":true,"refereeCommand":{"command":2,"commandCounter":44,"yellowTeamName":"crane","stage":13,"packetTimestamp":104}}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var postGame = await source.WaitForChangeAsync(null, CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.NormalStart, postGame.Command);
+        Assert.Equal(Referee.Types.Stage.PostGame, postGame.Stage);
+        Assert.Equal(44u, postGame.CommandCounter);
+        Assert.Equal(104ul, postGame.PacketTimestamp);
     }
 
     private static LatestVisionHealthSnapshot CreateYellowVision(uint frameNumber, DateTimeOffset receivedAt, float x)
@@ -1211,7 +1216,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     snapshot = new RefereeCommandSnapshot(
                         ParseRefereeCommand(commandElement.GetProperty("command")),
                         commandElement.GetProperty("commandCounter").GetUInt32(),
-                        commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty);
+                        commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty,
+                        TryParseRefereeStage(commandElement),
+                        commandElement.TryGetProperty("packetTimestamp", out var packetTimestamp)
+                            ? packetTimestamp.GetUInt64()
+                            : null);
                 }
 
                 var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
@@ -1287,6 +1296,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var text = value.GetString()?.Replace("_", string.Empty, StringComparison.Ordinal);
             Assert.True(Enum.TryParse<Referee.Types.Command>(text, true, out var command), $"Unknown referee command value '{text}'.");
             return command;
+        }
+
+        private static Referee.Types.Stage? TryParseRefereeStage(System.Text.Json.JsonElement commandElement)
+        {
+            if (!commandElement.TryGetProperty("stage", out var value))
+            {
+                return null;
+            }
+
+            if (value.ValueKind == System.Text.Json.JsonValueKind.Number)
+            {
+                var numeric = value.GetInt32();
+                return Enum.IsDefined(typeof(Referee.Types.Stage), numeric)
+                    ? (Referee.Types.Stage)numeric
+                    : null;
+            }
+
+            return value.ValueKind == System.Text.Json.JsonValueKind.String &&
+                Enum.TryParse<Referee.Types.Stage>(value.GetString(), ignoreCase: true, out var stage)
+                ? stage
+                : null;
         }
     }
 

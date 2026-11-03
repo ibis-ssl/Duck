@@ -1,35 +1,28 @@
-# Issue #49 — implementation and verification
+# Issue #49 implementation and verification record
 
 ## State
 
-Pre-implementation context record for ASPIRE-006F6. No product or test code has been changed, and no tests have been run. The dedicated branch is `task/issue49-aspire-006f6`, created from integration HEAD `fdef8f22249e6bdaab1f5dc998a1045f42d8dcb1` after fetching `origin`.
+Work is on `task/issue49-aspire-006f6`, created from integration HEAD `fdef8f22249e6bdaab1f5dc998a1045f42d8dcb1` after fetching `origin`. Draft PR #111 is open against `design/issue18-aspire-test-orchestration`; the PR has a formal closing reference to #49 and Project 16 lists PR #111 under Linked pull requests. Current code changes are local and not yet committed or pushed.
 
 ## Accepted scope
 
-Issue #49, `[ASPIRE-006F6] match-controllerで試合の開始・継続・終了を管理する`, is OPEN. Dependencies #46, #47, and #48 are complete. The formal issue acceptance condition is focused coverage for Game Controller API/referee/vision readiness, STOP/HALT continuation, POST_GAME/max-time termination, and result persistence.
+Issue #49 acceptance requires focused checks for Game Controller API/referee/vision readiness, STOP/HALT continuation, POST_GAME versus maximum-time termination, and result persistence. `Tracker/Design/tasks-status.md` row 206 further requires RESUME_FROM_HALT from initial HALT, a newer STOP packet, NEXT_COMMAND, a newer PREPARE_KICKOFF_BLUE/YELLOW packet, NORMAL_START, and a still newer packet confirming NORMAL_START. It also requires maximum time to remain a failure and final results to fail when fresh API/referee/SSL-Vision/participant-resource evidence is incomplete.
 
-`Tracker/Design/tasks-status.md` row 206 further specifies the detailed task contract to preserve:
+## Changes
 
-- Verify Game Controller API, referee packets, SSL-Vision input, and participant-resource readiness.
-- On initial HALT, send API `RESUME_FROM_HALT`; observe a newer packet with STOP; then send `NEXT_COMMAND`; observe a newer PREPARE_KICKOFF_BLUE/YELLOW packet before NORMAL_START; prove start only from a newer referee packet, not a successful send, a fixed delay, or FORCE_START acceptance.
-- Distinguish POST_GAME from maximum-time termination. The time limit stops execution but is not success. Missing fresh API/referee/vision/participant evidence at final result must produce failure while retaining partial evidence.
-- Keep readiness during valid command transitions after initial STOP; after restart, verify initial STOP again.
+- `RefereeCommandSnapshot` now carries the referee Stage and packet timestamp. The UDP receive adapter, hosted receive service, and HTTP health source preserve those fields.
+- The focused driver now performs HALT -> RESUME_FROM_HALT -> STOP -> NEXT_COMMAND -> PREPARE_KICKOFF_BLUE/YELLOW -> NORMAL_START -> newer NORMAL_START. It does not use FORCE_START to declare the match active.
+- The WebSocket adapter serializes RESUME_FROM_HALT. The existing full-stack acceptance path now uses this same evidence-driven driver sequence.
+- The test result writer records termination kind and last referee command/stage/counter. POST_GAME is successful only when fresh final evidence for all four required inputs is present; maximum-time expiry and missing final evidence are failures that retain partial evidence.
 
-Approved design: `Tracker/Design/Testing/aspire-simulation-test-environment.md`, especially sections around lines 42–46 and 296–298. Real two-team behavior remains separate ASPIRE-MATCH-003 / #52 runtime acceptance; this issue's focused tests must not claim real match communication.
+## Verification
 
-## Current implementation and test surfaces (read-only discovery)
+Red: `DriveToActiveAsyncResumesFromHaltThenAdvancesFromStop` failed on the original code with `Game Controller did not reach an active referee command; observed PrepareKickoffBlue.` This showed that the previous driver sent NEXT_COMMAND and FORCE_START without observing the required STOP/PREPARE transitions.
 
-- Match AppHost composition is exercised by `Tracker/Tracker.Tests/AppHostApplicationModelTests.cs` (`MatchModePinsSimulatorGameControllerAndFixtureConfiguration`, `MatchModeRegistersMatchResourcesWithoutCm4OrComparisonTrackers`, and match fixture checks).
-- `Tracker/Tracker.Tests/AspireFullStackAcceptanceTests.cs` contains existing referee/readiness helpers and runtime acceptance paths. Existing tests are not evidence of #49 acceptance until the relevant scenarios are checked against the complete requirements above.
-- Candidate implementation surfaces include `Testing/Duck.Testing.AppHost/GameControllerReadinessMonitor.cs`, match configuration/fixture paths, and existing referee/vision readiness components. Exact product changes remain unselected pending post-link focused gap analysis.
+Green: focused Windows validation used `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --verbosity quiet --filter "FullyQualifiedName~RefereeDriverFixtureTests|FullyQualifiedName~RefereeDriverHostAutoDriveTests|FullyQualifiedName~MatchTerminationAcceptanceTests|FullyQualifiedName~InitialRefereeWaitRejectsUnknownYellowTeamUntilExpectedIdentityIsObserved|FullyQualifiedName~HttpRefereeSourceCarriesPostGameStageIntoTheTerminationSnapshot|FullyQualifiedName~ActiveRefereeStateLossRetainsMatchedHealthSourceAndApiState|FullyQualifiedName~ParsesLatestVisionHealthAsYellowDetectionFrame|FullyQualifiedName~PreActiveCachedYellowFrameCannotSatisfyMotionAfterActiveBaseline" -m:1 /nr:false`. Result: 22 passed, 0 failed, 0 skipped (1 second). `git diff --check` passed. Build output included existing NU1902 MessagePack, ASPIRE010, obsolete API, and analyzer warnings.
 
-## Validation and workflow
+The container-backed full-stack acceptance test was not run; this local result does not claim live Game Controller, Docker, or match communication. Requested model profiles are gpt-6-luna/high for implementation and gpt-6.1-sol/high for review; actual applied runtime profiles have not been independently verified.
 
-The Issue requires test-first focused failure then the minimal implementation. Before any test or product edit, create the Draft PR and read back the formal closing reference to #49 and Project 16 Linked PR field. Then add or adjust only coverage needed for the accepted scope, run focused tests, preserve diagnostics and exact commands, and record skipped/unverified runtime acceptance explicitly.
+## Remaining workflow
 
-## Non-goals and write boundary
-
-- No implementation of the separate ASPIRE-MATCH-* real-network acceptance work; no live Game Controller, container, or match execution unless the Issue's accepted environment and authorization explicitly permit it.
-- No unrelated refactor, duplicated full-stack suite, or review-only optional enhancement.
-- Parent #43 and upper #18 remain unmerged. Only this child PR may be merged into `design/issue18-aspire-test-orchestration` after exact-head CI and both reviews pass.
-- Preserve existing shared untracked `reports/evidence` and other reports.
+Commit and push the meaningful Green slice, inspect exact-HEAD CI, complete normal and independent review, update and read back the Japanese six-section PR comment, and squash merge PR #111 only into `design/issue18-aspire-test-orchestration`. Do not merge #43 or #18.

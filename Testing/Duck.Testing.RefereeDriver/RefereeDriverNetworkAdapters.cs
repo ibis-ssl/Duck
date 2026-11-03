@@ -41,12 +41,16 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
         {
             var packet = await receiver.ReceiveAsync(cancellationToken);
             var referee = Referee.Parser.ParseFrom(packet.ToArray());
-            if (previousCommandCounter is null || referee.CommandCounter != previousCommandCounter)
+            if (previousCommandCounter is null ||
+                referee.CommandCounter != previousCommandCounter ||
+                referee.Stage == Referee.Types.Stage.PostGame)
             {
                 return new RefereeCommandSnapshot(
                     referee.Command,
                     referee.CommandCounter,
-                    referee.Yellow?.Name ?? string.Empty);
+                    referee.Yellow?.Name ?? string.Empty,
+                    referee.Stage,
+                    referee.PacketTimestamp);
             }
         }
     }
@@ -170,6 +174,7 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
     {
         var actionName = action switch
         {
+            GameControllerContinueAction.ResumeFromHalt => "RESUME_FROM_HALT",
             GameControllerContinueAction.NextCommand => "NEXT_COMMAND",
             GameControllerContinueAction.ForceStart => "FORCE_START",
             GameControllerContinueAction.NormalStart => "NORMAL_START",

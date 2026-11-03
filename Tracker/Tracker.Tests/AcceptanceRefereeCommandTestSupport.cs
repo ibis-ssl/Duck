@@ -42,6 +42,16 @@ internal sealed record RefereeHealthReadEvidence(
     string? ApiCommand = null,
     string? ApiPhase = null);
 
+internal sealed record MatchFinalInputEvidence(
+    bool GameControllerApiFresh,
+    bool RefereePacketFresh,
+    bool SslVisionInputFresh,
+    bool ParticipantResourcesFresh)
+{
+    public bool IsComplete => GameControllerApiFresh && RefereePacketFresh &&
+        SslVisionInputFresh && ParticipantResourcesFresh;
+}
+
 internal sealed class RefereeCommandCounterGapException(
     uint expectedCounter,
     uint previousCounter,
@@ -59,6 +69,8 @@ internal sealed class AspireAcceptanceResultWriter(
 {
     private Exception? failure;
     private RefereeHealthReadEvidence? refereeHealthAtFailure;
+    private RefereeMatchTerminationResult? matchTermination;
+    private MatchFinalInputEvidence? finalInputEvidence;
 
     public void RecordFailure(Exception exception)
     {
@@ -68,6 +80,25 @@ internal sealed class AspireAcceptanceResultWriter(
     public void RecordRefereeHealthAtFailure(RefereeHealthReadEvidence? evidence)
     {
         refereeHealthAtFailure = evidence;
+    }
+
+    public void RecordMatchTermination(
+        RefereeMatchTerminationResult result,
+        MatchFinalInputEvidence? finalInputEvidence)
+    {
+        matchTermination = result ?? throw new ArgumentNullException(nameof(result));
+        this.finalInputEvidence = finalInputEvidence;
+        if (!result.IsSuccess)
+        {
+            failure ??= new TimeoutException(
+                $"MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME; " +
+                $"last referee command was {result.LastSnapshot.Command} at counter {result.LastSnapshot.CommandCounter}.");
+        }
+        else if (finalInputEvidence?.IsComplete != true)
+        {
+            failure ??= new InvalidOperationException(
+                "MATCH_FINAL_EVIDENCE_MISSING: POST_GAME was observed without fresh Game Controller API, referee, SSL-Vision, and participant-resource evidence.");
+        }
     }
 
     public static InvalidOperationException CreateMotionFailure(RefereeStateLostException exception) =>
@@ -94,9 +125,22 @@ internal sealed class AspireAcceptanceResultWriter(
             {
                 command = snapshot.Command.ToString(),
                 snapshot.CommandCounter,
+                stage = snapshot.Stage?.ToString(),
+                snapshot.PacketTimestamp,
             }),
             refereeRawDatagramCount,
             refereeStateLoss = FindRefereeStateLoss(failure),
+            matchTermination = matchTermination is null
+                ? null
+                : new
+                {
+                    kind = matchTermination.Kind.ToString(),
+                    command = matchTermination.LastSnapshot.Command.ToString(),
+                    stage = matchTermination.LastSnapshot.Stage?.ToString(),
+                    matchTermination.LastSnapshot.CommandCounter,
+                    matchTermination.LastSnapshot.PacketTimestamp,
+                    finalInputEvidence,
+                },
             visionPacketsConsumed,
             trackerPacketsConsumed,
             comparisonMeasurement,
@@ -177,12 +221,15 @@ internal sealed class LoopbackUdpRefereePacketReceiver : IRefereePacketReceiver,
         endpoint = (IPEndPoint)client.Client.LocalEndPoint!;
     }
 
-    public async Task PublishAsync(Referee.Types.Command command, uint commandCounter)
+    public async Task PublishAsync(
+        Referee.Types.Command command,
+        uint commandCounter,
+        Referee.Types.Stage stage = Referee.Types.Stage.NormalFirstHalf)
     {
         var packet = new Referee
         {
             PacketTimestamp = commandCounter,
-            Stage = Referee.Types.Stage.NormalFirstHalf,
+            Stage = stage,
             Command = command,
             CommandCounter = commandCounter,
             CommandTimestamp = commandCounter,

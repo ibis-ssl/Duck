@@ -116,7 +116,12 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                     sourceKey: endpoint,
                     remoteEndpoint: endpoint))
                 {
-                    PublishCommand(new(packet.Command, packet.CommandCounter, packet.Yellow?.Name ?? ""),
+                    PublishCommand(new(
+                            packet.Command,
+                            packet.CommandCounter,
+                            packet.Yellow?.Name ?? "",
+                            packet.Stage,
+                            packet.PacketTimestamp),
                         endpoint, receiveEpoch.Number, acceptedCount);
                 }
             }
@@ -167,7 +172,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
             {
                 if (latestCommand is { } latest &&
                     (previousCommandCounter is null ||
-                        latest.Snapshot.CommandCounter != previousCommandCounter.Value))
+                        latest.Snapshot.CommandCounter != previousCommandCounter.Value ||
+                        latest.Snapshot.Stage == global::Referee.Types.Stage.PostGame))
                 {
                     BoundaryObserver?.Invoke(RefereeReceiveBoundary.BeforeCommandDiagnosticRead);
                     var current = diagnostics.GetSnapshots(InputId).FirstOrDefault(snapshot =>

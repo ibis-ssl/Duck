@@ -22,11 +22,10 @@ namespace Tracker.Tests;
 public sealed class RefereeDriverHostAutoDriveTests
 {
     [Theory]
-    [InlineData(global::Referee.Types.Command.Stop, "FORCE_START", 4)]
-    [InlineData(global::Referee.Types.Command.PrepareKickoffBlue, "NORMAL_START", 4)]
-    [InlineData(global::Referee.Types.Command.ForceStart, null, 3)]
+    [InlineData(global::Referee.Types.Command.PrepareKickoffBlue)]
+    [InlineData(global::Referee.Types.Command.PrepareKickoffYellow)]
     public async Task ExplicitAutoDriveUsesExistingDriverAndControlAdapter(
-        global::Referee.Types.Command afterNext, string? secondAction, int decodedCount)
+        global::Referee.Types.Command afterNext)
     {
         await using var fixture = Fixture.Build(autoDrive: "true", afterNext: afterNext);
         await fixture.App.StartAsync();
@@ -34,15 +33,14 @@ public sealed class RefereeDriverHostAutoDriveTests
         Assert.IsType<GameControllerWebSocketControlClient>(
             fixture.App.Services.GetService<IGameControllerControlClient>());
         Assert.NotNull(fixture.App.Services.GetService<RefereeDriverFixture>());
-        await fixture.Transports.Receiver.AtCall(decodedCount + 1).WaitAsync(TimeSpan.FromSeconds(5));
+        await fixture.Transports.Receiver.AtCall(6).WaitAsync(TimeSpan.FromSeconds(5));
         using var response = await fixture.WaitForHealthyAsync();
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal(decodedCount, document.RootElement.GetProperty("diagnostic")
+        Assert.Equal(5, document.RootElement.GetProperty("diagnostic")
             .GetProperty("successfullyDecodedCount").GetInt64());
-        Assert.Equal(secondAction is null ? 1 : 2, fixture.Transports.Messages.Count);
+        Assert.Equal(3, fixture.Transports.Messages.Count);
         var types = fixture.Transports.Messages.Select(message => ReadAction(message.Json)).ToArray();
-        var expectedTypes = secondAction is null ? new[] { "NEXT_COMMAND" } : new[] { "NEXT_COMMAND", secondAction };
-        Assert.Equal(expectedTypes, types);
+        Assert.Equal(new[] { "RESUME_FROM_HALT", "NEXT_COMMAND", "NORMAL_START" }, types);
         Assert.All(fixture.Transports.Messages, message => Assert.Equal(Fixture.InternalUri, message.Endpoint));
         Assert.All(fixture.Transports.Sockets, socket => Assert.True(socket.SentOnlyAfterInitialOutput));
         Assert.Equal(1, fixture.Transports.CreateCalls);
@@ -308,6 +306,8 @@ public sealed class RefereeDriverHostAutoDriveTests
             var type = command switch
             {
                 global::Referee.Types.Command.Stop => "STOP",
+                global::Referee.Types.Command.PrepareKickoffBlue => "PREPARE_KICKOFF_BLUE",
+                global::Referee.Types.Command.PrepareKickoffYellow => "PREPARE_KICKOFF_YELLOW",
                 global::Referee.Types.Command.ForceStart => "FORCE_START",
                 global::Referee.Types.Command.NormalStart => "NORMAL_START",
                 _ => "HALT",
@@ -328,6 +328,7 @@ public sealed class RefereeDriverHostAutoDriveTests
             if (!document.RootElement.TryGetProperty("continue_action", out var action)) return;
             var command = action.GetProperty("type").GetString() switch
             {
+                "RESUME_FROM_HALT" => global::Referee.Types.Command.Stop,
                 "NEXT_COMMAND" => afterNext,
                 "FORCE_START" => global::Referee.Types.Command.ForceStart,
                 "NORMAL_START" => global::Referee.Types.Command.NormalStart,
