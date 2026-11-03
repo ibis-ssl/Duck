@@ -1051,6 +1051,73 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task MatchModePinsSimulatorGameControllerAndFixtureConfiguration()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        var simulatorImage = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", simulatorImage.Image);
+        Assert.Equal("a52b6bd", simulatorImage.Tag);
+        Assert.Equal(
+            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
+            await GetArgumentsAsync(simulator, callbackLimit: 1));
+
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        var gameControllerImage = Assert.Single(gameController.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("robocupssl/ssl-game-controller", gameControllerImage.Image);
+        Assert.Equal("3.20.3", gameControllerImage.Tag);
+        Assert.Equal(
+            ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
+            await GetArgumentsAsync(gameController));
+
+        var controlEndpoint = Assert.Single(
+            gameController.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Name == "game-controller-control");
+        Assert.Null(controlEndpoint.Port);
+        Assert.Equal(8082, controlEndpoint.TargetPort);
+        Assert.Equal("127.0.0.1", controlEndpoint.TargetHost);
+        Assert.False(controlEndpoint.IsProxied);
+        Assert.DoesNotContain(
+            gameController.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+
+        var mounts = gameController.Annotations.OfType<ContainerMountAnnotation>().ToArray();
+        Assert.Equal(2, mounts.Length);
+        var matchConfig = Assert.Single(mounts, mount => mount.Target == "/config/ssl-game-controller.yaml");
+        Assert.Equal(
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "ssl-game-controller-match.yaml")),
+            Path.GetFullPath(matchConfig.Source));
+        Assert.True(matchConfig.IsReadOnly);
+        var initialState = Assert.Single(mounts, mount => mount.Target == "/tmp/state-store.json.stream");
+        Assert.Equal(
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "state-store-initial.json.stream")),
+            Path.GetFullPath(initialState.Source));
+        Assert.False(initialState.IsReadOnly);
+
+        var producerResources = new List<string>();
+        foreach (var resource in new IResourceWithArgs[]
+        {
+            simulator,
+            gameController,
+            Assert.IsType<ContainerResource>(Find(appHost, "crane")),
+            Assert.IsType<ContainerResource>(Find(appHost, "duck")),
+        })
+        {
+            var arguments = await GetArgumentsAsync(resource, callbackLimit: resource.Name == "simulator" ? 1 : null);
+            for (var index = 0; index + 1 < arguments.Length; index++)
+            {
+                if (arguments[index] == "-publishAddress" && arguments[index + 1] == "224.5.23.1:11003")
+                {
+                    producerResources.Add(resource.Name);
+                }
+            }
+        }
+
+        Assert.Equal(["game-controller"], producerResources);
+    }
+
+    [Fact]
     public async Task MatchModeRegistersMatchResourcesWithoutCm4OrComparisonTrackers()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
