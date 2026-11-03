@@ -23,7 +23,8 @@ internal sealed record BaseSimulationRegistrationOptions(
     string? CraneDiagnosticsPath,
     string? DockerContextName,
     string? ExpectedEngineId,
-    string DockerExecutable);
+    string DockerExecutable,
+    bool IncludeCm4Simulator = true);
 
 internal sealed record BaseSimulationResources(
     IResourceBuilder<ContainerResource> Duck,
@@ -55,7 +56,7 @@ internal static class BaseSimulationResourceRegistration
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(addDuck);
         ArgumentNullException.ThrowIfNull(addGameControllerDependentResource);
-        var useCm4Simulator = UsesCm4Simulator(options.CranePlanner);
+        var useCm4Simulator = options.IncludeCm4Simulator && UsesCm4Simulator(options.CranePlanner);
 
         CraneFixtureManifest.WriteAtomically(options.FixtureManifestPath, options.StackId,
             new CraneFixtureSettings(options.CraneTeamName, options.CraneTeamColor));

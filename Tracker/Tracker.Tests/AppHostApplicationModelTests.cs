@@ -1050,9 +1050,25 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce" or "debug-host");
     }
 
+    [Fact]
+    public async Task MatchModeRegistersMatchResourcesWithoutCm4OrComparisonTrackers()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        foreach (var name in new[] { "simulator", "game-controller", "crane", "duck" })
+        {
+            Assert.IsType<ContainerResource>(Find(appHost, name));
+        }
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var environment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("match", environment["Testing__Mode"].ToString());
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "cm4-sim" or "tracker-tigers" or "tracker-erforce");
+    }
+
     [Theory]
     [InlineData("comparision")]
-    [InlineData("match")]
     public async Task UnsupportedModeFailsDuringAppHostCreation(string mode)
     {
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
