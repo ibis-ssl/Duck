@@ -528,6 +528,11 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
         ]);
+        if (testingMode == "match")
+        {
+            duckBuilder.WithEnvironment("Tracker__PublishUdp", "false");
+        }
+
         if (enableStandardBaseDuckIdentityBridge)
         {
             duckBuilder

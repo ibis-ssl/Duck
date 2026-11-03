@@ -1146,6 +1146,8 @@ public sealed class AppHostApplicationModelTests
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(
             duck.Annotations.OfType<EndpointAnnotation>(),
             endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp && endpoint.TargetPort == 11010);
@@ -1274,10 +1276,13 @@ public sealed class AppHostApplicationModelTests
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
         var arguments = await GetArgumentsAsync(crane);
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
 
         Assert.Contains("team:=crane", arguments[^1]);
         Assert.Contains("team_color:=YELLOW", arguments[^1]);
+        Assert.DoesNotContain("Tracker__PublishUdp", duckEnvironment.Keys);
     }
 
     [Fact]
