@@ -661,3 +661,11 @@ Crane の元の再起動処理を呼び出す直前に、登録済みの所有�
 2026-10-31 の通常構成確認では、`simulator`、`duck`、`game-controller`、`cm4-sim`、`crane` の5資源が起動し、初回適用は現在の所有済み CM4 と Simulator に対して `Applied` となった。Duck の視覚入力診断は99件の復号成功、失敗0件を返した。Crane の `/robot_feedback` は有効受信数の最大321、無効0件、新しい受信時刻を返した。120秒の上限内に停止し、所有確認後の最終走査で残存資源はなかった。ホスト側 UDP 受信機は作成していない。
 
 この確認は上記の通常構成での一回の通信と停止回収を示す。CM4 のサービス準備完了、再作成後の通信、長時間の安定性、比較構成、および他の起動選択は未確認であり、確認応答だけからそれらを受入済みとしない。
+
+## 対戦用設定ファイル
+
+対戦で使う設定を三つのファイルで管理する。Sumatra の審判情報受信設定、試合管理の設定、初期状態をそれぞれ[受信設定](../../../Testing/Duck.Testing.AppHost/Fixtures/match/simulation_protocol_tigers.xml)、[試合時間設定](../../../Testing/Duck.Testing.AppHost/Fixtures/match/ssl-game-controller-match.yaml)、[初期状態](../../../Testing/Duck.Testing.AppHost/Fixtures/match/state-store-initial.json.stream)に置く。
+
+初期状態では青と黄のチーム名、親善試合の種別を固定し、操作指令と試合状態を停止にする。Sumatra はネットワークから審判情報を受け取り、11003 番ポートを使う。通常試合と延長試合の時間は試合時間設定に記載し、実行時に生成しない。
+
+設定内容は[参照元の版](https://github.com/ibis-ssl/crane/tree/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/config)に合わせる。この作業では三つの設定とその内容を確認する試験だけを追加する。起動対象への登録と起動・停止処理は後続の対戦作業で扱う。
