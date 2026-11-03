@@ -1142,6 +1142,50 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "cm4-sim" or "tracker-tigers" or "tracker-erforce");
     }
 
+    [Fact]
+    public async Task MatchModeRegistersTigersAutoRefAndLogRecorderOnSharedDcpBridge()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tigers-blue"));
+        var tigersImage = Assert.Single(tigers.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("tigersmannheim/sumatra", tigersImage.Image);
+        Assert.Equal("latest", tigersImage.Tag);
+        Assert.Equal(
+            ["--headless", "--aiBlue", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--matchStats", "--moduli", "simulation_protocol"],
+            await GetArgumentsAsync(tigers));
+        var sumatraConfig = Assert.Single(
+            tigers.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/Sumatra/config/moduli/simulation_protocol.xml");
+        Assert.Equal(
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "simulation_protocol_tigers.xml")),
+            Path.GetFullPath(sumatraConfig.Source!));
+        Assert.True(sumatraConfig.IsReadOnly);
+
+        var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
+        var autoRefImage = Assert.Single(autoRef.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("tigersmannheim/auto-referee", autoRefImage.Image);
+        Assert.Equal("1.2.0", autoRefImage.Tag);
+        Assert.Equal(
+            ["--active", "--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--trackerAddress", "224.5.23.2:11010"],
+            await GetArgumentsAsync(autoRef));
+
+        var recorder = Assert.IsType<ContainerResource>(Find(appHost, "ssl-log-recorder"));
+        var recorderImage = Assert.Single(recorder.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("robocupssl/ssl-log-recorder", recorderImage.Image);
+        Assert.Equal("latest", recorderImage.Tag);
+        Assert.Equal(
+            ["-referee-address", "224.5.23.1:11003", "-vision-address", "224.5.23.2:10020", "-vision-tracker-address", "224.5.23.2:11010", "-vision-legacy-enabled=false"],
+            await GetArgumentsAsync(recorder));
+
+        foreach (var resource in new[] { tigers, autoRef, recorder })
+        {
+            Assert.DoesNotContain(
+                resource.Annotations.OfType<EndpointAnnotation>(),
+                endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+            Assert.DoesNotContain("--network", await GetContainerRuntimeArgsAsync(resource));
+        }
+    }
     [Theory]
     [InlineData("comparision")]
     public async Task UnsupportedModeFailsDuringAppHostCreation(string mode)
