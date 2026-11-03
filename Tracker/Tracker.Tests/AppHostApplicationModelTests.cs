@@ -1146,6 +1146,13 @@ public sealed class AppHostApplicationModelTests
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
+        var craneEnvironment = await GetResourceEnvironmentAsync(crane);
+        Assert.DoesNotContain(CraneTargetAddressSettings.TargetAddressEnvironmentKey, craneEnvironment.Keys);
+        Assert.DoesNotContain(CraneTargetAddressSettings.ExpectedResourceEnvironmentKey, craneEnvironment.Keys);
+        Assert.DoesNotContain(
+            crane.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
+        Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneArguments[^1], StringComparison.Ordinal);
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(

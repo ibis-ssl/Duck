@@ -444,11 +444,13 @@ if (testingMode is not "base" and not "comparison" and not "match")
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
-var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
-    builder.Configuration,
-    cranePlanner,
-    AppContext.BaseDirectory,
-    useStandardBase: true);
+var craneTargetAddressSettings = testingMode == "match"
+    ? null
+    : CraneTargetAddressSettings.FromConfiguration(
+        builder.Configuration,
+        cranePlanner,
+        AppContext.BaseDirectory,
+        useStandardBase: true);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {
