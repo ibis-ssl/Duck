@@ -70,6 +70,38 @@ public sealed class MatchControllerWorkerTests
     }
 
     [Fact]
+    public async Task RunMatchPersistsInitialReadinessEvidenceAndDoesNotStartWhenIncomplete()
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var incomplete = CompleteReadiness() with
+        {
+            ParticipantResourcesReady = false,
+            FailureReason = "participantResourcesReady=False",
+            ParticipantEvidence = CompleteReadiness().ParticipantEvidence! with
+            {
+                Resources = CompleteReadiness().ParticipantEvidence!.Resources
+                    .Where(resource => resource.ResourceId != "tigers-blue").ToArray(),
+            },
+        };
+        var control = new RecordingControlClient();
+        var readiness = new RecordingReadinessProbe(incomplete);
+        var worker = CreateWorker(new SequenceRefereeCommandSource(), control, readiness, resultPath, TimeSpan.FromSeconds(1));
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal("failed", result.Status);
+        Assert.Empty(control.Actions);
+        Assert.Equal(incomplete, result.InitialReadiness);
+        using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.False(json.RootElement.GetProperty("initialReadiness").GetProperty("participantResourcesReady").GetBoolean());
+        Assert.Contains(json.RootElement.GetProperty("initialReadiness").GetProperty("participantEvidence")
+            .GetProperty("resources").EnumerateArray(), resource => resource.GetProperty("resourceId").GetString() == "simulator");
+        Assert.DoesNotContain(json.RootElement.GetProperty("initialReadiness").GetProperty("participantEvidence")
+            .GetProperty("resources").EnumerateArray(), resource => resource.GetProperty("resourceId").GetString() == "tigers-blue");
+    }
+
+    [Fact]
     public async Task RunMatchPersistsMaximumTimeAsFailure()
     {
         using var artifacts = new TemporaryDirectory();

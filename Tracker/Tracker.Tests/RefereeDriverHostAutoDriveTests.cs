@@ -32,6 +32,7 @@ public sealed class RefereeDriverHostAutoDriveTests
             ["MatchController:Enabled"] = "true",
             ["MatchController:VisionHealthUri"] = "http://duck:39108/health/vision",
             ["MatchController:ParticipantResources"] = "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder",
+            ["MatchController:ParticipantStatusPath"] = Path.Combine(Path.GetTempPath(), "issue49-match-controller-participants.json"),
             ["MatchController:ResultPath"] = resultPath,
         });
         await using var app = RefereeDriverApplication.Build(builder);

@@ -207,6 +207,7 @@ internal sealed record MatchControllerResult(
     string? TerminationKind,
     uint? FinalCommandCounter,
     ulong? FinalPacketTimestamp,
+    MatchControllerReadiness? InitialReadiness,
     MatchControllerReadiness? FinalReadiness,
     string? Failure);
 
@@ -231,11 +232,12 @@ internal sealed class MatchControllerWorker(
         var stage = "readiness";
         RefereeCommandSnapshot? finalSnapshot = null;
         string? terminationKind = null;
+        MatchControllerReadiness? initialReadiness = null;
         MatchControllerReadiness? finalReadiness = null;
         string? failure = null;
         try
         {
-            var initialReadiness = await readinessProbe.WaitForInitialReadinessAsync(cancellationToken)
+            initialReadiness = await readinessProbe.WaitForInitialReadinessAsync(cancellationToken)
                 .ConfigureAwait(false);
             if (!initialReadiness.IsComplete)
                 throw new InvalidOperationException(initialReadiness.FailureReason ?? "Initial match readiness is incomplete.");
@@ -258,14 +260,14 @@ internal sealed class MatchControllerWorker(
 
             return await PersistAsync(new(
                 failure is null ? "passed" : "failed", stage, terminationKind,
-                finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, finalReadiness, failure)).ConfigureAwait(false);
+                finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness, failure)).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
             failure = exception.ToString();
             return await PersistAsync(new(
                 "failed", stage, terminationKind,
-                finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, finalReadiness, failure)).ConfigureAwait(false);
+                finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness, failure)).ConfigureAwait(false);
         }
     }
 
