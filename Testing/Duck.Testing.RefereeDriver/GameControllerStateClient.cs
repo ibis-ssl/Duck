@@ -115,6 +115,7 @@ internal enum GameControllerMatchPhase
     Unknown,
     Halt,
     Stop,
+    Kickoff,
     Running,
 }
 

@@ -23,6 +23,7 @@ internal static class GameControllerStateMapping
         {
             "HALT" => GameControllerMatchPhase.Halt,
             "STOP" => GameControllerMatchPhase.Stop,
+            "KICKOFF" => GameControllerMatchPhase.Kickoff,
             "RUNNING" => GameControllerMatchPhase.Running,
             _ => GameControllerMatchPhase.Unknown,
         };
@@ -44,7 +45,11 @@ internal static class GameControllerStateMapping
             (GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, Referee.Types.Command.Stop) => true,
             (GameControllerCommandKind.Kickoff, GameControllerMatchPhase.Stop,
                 Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow) => true,
-            (GameControllerCommandKind.NormalStart, GameControllerMatchPhase.Running, Referee.Types.Command.NormalStart) => true,
+            (GameControllerCommandKind.Kickoff, GameControllerMatchPhase.Kickoff,
+                Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow) => true,
+            (GameControllerCommandKind.NormalStart,
+                GameControllerMatchPhase.Kickoff or GameControllerMatchPhase.Running,
+                Referee.Types.Command.NormalStart) => true,
             (GameControllerCommandKind.ForceStart, GameControllerMatchPhase.Running, Referee.Types.Command.ForceStart) => true,
             _ => false,
         };
