@@ -25,6 +25,47 @@ public sealed class MatchControllerWorkerTests
                     ? resource with { HealthStatus = "Unhealthy" }
                     : resource).ToArray(),
             }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "tigers-blue"
+                    ? resource with { ContainerId = null }
+                    : resource).ToArray(),
+            }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "autoref-tigers"
+                    ? resource with { ServiceEvidenceObservedAtUtc = now - TimeSpan.FromMinutes(3) }
+                    : resource).ToArray(),
+            }, expected, now));
+    }
+
+    [Fact]
+    public void UnsupportedTargetSignalFailsClosedAndPreservesItsReason()
+    {
+        var expected = new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder" };
+        var now = DateTimeOffset.UtcNow;
+        var current = CompleteReadiness().ParticipantEvidence! with
+        {
+            Resources = CompleteReadiness().ParticipantEvidence!.Resources.Select(resource =>
+                resource.ResourceId == "tigers-blue"
+                    ? resource with
+                    {
+                        ServiceEvidenceReady = false,
+                        ServiceEvidenceReason = "Target-side receive/decode diagnostics unavailable.",
+                    }
+                    : resource).ToArray(),
+        };
+
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(current, expected, now));
+        var json = System.Text.Json.JsonSerializer.Serialize(current,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
+        var restored = System.Text.Json.JsonSerializer.Deserialize<MatchParticipantStatusEvidence>(json,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
+
+        Assert.Equal("Target-side receive/decode diagnostics unavailable.",
+            Assert.Single(restored!.Resources, resource => resource.ResourceId == "tigers-blue").ServiceEvidenceReason);
     }
 
     [Fact]
@@ -198,16 +239,29 @@ public sealed class MatchControllerWorkerTests
         return new(new RefereeDriverFixture(source, control), source, readiness, configuration);
     }
 
-    private static MatchControllerReadiness CompleteReadiness() =>
+    private static MatchControllerReadiness CompleteReadiness()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var fullContainerId = new string('a', 64);
+        MatchParticipantResourceEvidence Evidence(string resourceId) => new(
+            resourceId,
+            "Running",
+            "Healthy",
+            $"current-{resourceId}",
+            fullContainerId,
+            "test-run",
+            resourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder",
+            resourceId is "tigers-blue" or "autoref-tigers" ? now : null,
+            resourceId == "ssl-log-recorder" ? 1 : null,
+            resourceId == "ssl-log-recorder" ? now : null);
+
+        return
         new(["simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder"],
             ParticipantResourcesReady: true, GameControllerApiAndRefereeReady: true, VisionReady: true,
             ParticipantEvidence: new(DateTimeOffset.UtcNow,
-            [
-                new("simulator", "Running", null), new("game-controller", "Running", null),
-                new("crane", "Running", null), new("duck", "Running", null),
-                new("tigers-blue", "Running", null), new("autoref-tigers", "Running", null),
-                new("ssl-log-recorder", "Running", null),
-            ]));
+            new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder" }
+                .Select(Evidence).ToArray()));
+    }
 
     private static RefereeCommandSnapshot Snapshot(
         Referee.Types.Command command, uint counter, Referee.Types.Stage stage) =>

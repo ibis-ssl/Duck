@@ -257,6 +257,7 @@ internal static class BaseSimulationResourceRegistration
                 options.DuckRunId,
                 "ssl-log-recorder");
             recorder.WithImageSHA256("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046");
+            recorder.WithContainerRuntimeArgs("--stop-signal", "SIGINT", "--stop-timeout", "30");
             sslLogRecorder = AsResourceBuilder(builder, recorder);
         }
 
