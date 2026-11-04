@@ -38,6 +38,9 @@ internal sealed record MatchParticipantResourceStatus(
                 "tigers-blue" or "autoref-tigers" => ServiceEvidenceReady &&
                     ServiceEvidenceObservedAtUtc is not null && ServiceEvidenceObservedAtUtc <= DateTimeOffset.UtcNow + TimeSpan.FromSeconds(1),
                 "ssl-log-recorder" => ServiceEvidenceReady &&
+                    ServiceEvidenceObservedAtUtc is { } recorderObservedAt &&
+                    DateTimeOffset.UtcNow - recorderObservedAt <= TimeSpan.FromSeconds(15) &&
+                    recorderObservedAt <= DateTimeOffset.UtcNow + TimeSpan.FromSeconds(1) &&
                     RecorderArchiveBytes is > 0 &&
                     RecorderArchiveLastWriteUtc is { } lastWrite &&
                     DateTimeOffset.UtcNow - lastWrite <= TimeSpan.FromSeconds(15) &&
@@ -190,54 +193,6 @@ internal sealed record MatchParticipantServiceEvidence(
     IReadOnlySet<string> MatchedMarkers,
     bool IsReady,
     string Reason);
-
-internal sealed class RecorderOutputGrowthTracker
-{
-    private string? containerId;
-    private string? currentRunId;
-    private long previousBytes;
-    private bool hasPreviousObservation;
-
-    internal bool Observe(
-        MatchParticipantCurrentTarget? target,
-        string runId,
-        long? bytes,
-        DateTimeOffset? lastWriteUtc,
-        DateTimeOffset now)
-    {
-        if (target is not { State: "Running" } ||
-            !RegisteredContainerEventProjection.HasFullContainerId(target.ContainerId) ||
-            string.IsNullOrWhiteSpace(runId))
-        {
-            Reset();
-            return false;
-        }
-
-        if (!string.Equals(containerId, target.ContainerId, StringComparison.Ordinal) ||
-            !string.Equals(currentRunId, runId, StringComparison.Ordinal))
-        {
-            containerId = target.ContainerId;
-            currentRunId = runId;
-            previousBytes = 0;
-            hasPreviousObservation = false;
-        }
-
-        var isFresh = lastWriteUtc is { } modified &&
-            now - modified <= TimeSpan.FromSeconds(15) && modified <= now + TimeSpan.FromSeconds(1);
-        var grew = bytes is > 0 && hasPreviousObservation && bytes.Value > previousBytes;
-        previousBytes = bytes.GetValueOrDefault();
-        hasPreviousObservation = bytes.HasValue;
-        return isFresh && grew;
-    }
-
-    private void Reset()
-    {
-        containerId = null;
-        currentRunId = null;
-        previousBytes = 0;
-        hasPreviousObservation = false;
-    }
-}
 
 internal sealed class MatchParticipantLogEvidenceTracker
 {
@@ -424,9 +379,13 @@ internal sealed class MatchParticipantStatusProjection(
     TimeProvider clock) : BackgroundService, IHostedLifecycleService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly TimeSpan RecorderIdentityValidationInterval = TimeSpan.FromSeconds(1);
     private readonly MatchParticipantResourceIdMap resourceIds = new(resources);
-    private readonly RecorderOutputGrowthTracker recorderOutputGrowth = new();
     private readonly DockerCliCommandRunner docker = new(dockerExecutable);
+    private readonly object recorderSessionGate = new();
+    private readonly SemaphoreSlim recorderSessionTransition = new(1, 1);
+    private RecorderReaderSession? recorderSession;
+    private int recorderSessionsStopping;
     private readonly ConcurrentDictionary<IResource, (VerifiedContainerLogEvidence Identity, DateTimeOffset Cursor)> logCursors =
         new(ReferenceEqualityComparer.Instance);
     private readonly MatchParticipantLogEvidenceTracker logEvidence = new(
@@ -435,11 +394,102 @@ internal sealed class MatchParticipantStatusProjection(
         clock);
     private int observerStarted;
 
+    private sealed record RecorderArchiveCollection(
+        VerifiedContainerLogEvidence Identity,
+        FileInfo Archive,
+        SslLogDecodedInputSummary Summary,
+        string? Failure);
+
+    private sealed class RecorderReaderSession(
+        string runId,
+        VerifiedContainerLogEvidence identity,
+        string archivePath,
+        CancellationToken stoppingToken)
+    {
+        private readonly CancellationTokenSource cancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        private Task? readerTask;
+        private SslLogDecodedInputSummary latest = SslLogDecodedInputSummary.Empty;
+        private string? failure;
+
+        internal string RunId { get; } = runId;
+        internal VerifiedContainerLogEvidence Identity { get; } = identity;
+        internal string ArchivePath { get; } = archivePath;
+        internal DateTimeOffset LastIdentityValidationUtc { get; set; }
+        internal SslLogDecodedInputSummary Latest => Volatile.Read(ref latest);
+        internal string? Failure => Volatile.Read(ref failure);
+
+        internal bool Matches(
+            string expectedRunId,
+            VerifiedContainerLogEvidence expectedIdentity,
+            string expectedPath) =>
+            string.Equals(RunId, expectedRunId, StringComparison.Ordinal) &&
+            RecorderGenerationMatches(Identity, expectedIdentity) &&
+            string.Equals(ArchivePath, expectedPath, StringComparison.OrdinalIgnoreCase);
+
+        internal void Start()
+        {
+            readerTask = Task.Run(Run, CancellationToken.None);
+        }
+
+        internal Task Completion => readerTask ?? Task.CompletedTask;
+
+        internal void Cancel()
+        {
+            try
+            {
+                cancellation.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // The reader exited before the owning projection observed the identity change.
+            }
+        }
+
+        private void Run()
+        {
+            var token = cancellation.Token;
+            try
+            {
+                using var file = new FileStream(ArchivePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var appendStream = new AppendWaitFileReadStream(file, ArchivePath, token);
+                var result = SslLogRecordReader.ReadAppending(
+                    appendStream,
+                    progress => Volatile.Write(ref latest, progress),
+                    token);
+                Volatile.Write(ref latest, result);
+                Volatile.Write(ref failure, result.ReadFailure ?? "Recorder input stream ended unexpectedly.");
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                // Expected on resource replacement or AppHost shutdown.
+            }
+            catch (Exception exception)
+            {
+                Volatile.Write(ref failure, exception.Message);
+            }
+            finally
+            {
+                cancellation.Dispose();
+            }
+        }
+    }
+
     public Task StartingAsync(CancellationToken cancellationToken) => StartObserverAsync(cancellationToken);
     public override Task StartAsync(CancellationToken cancellationToken) => StartObserverAsync(cancellationToken);
     public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public async Task StoppingAsync(CancellationToken cancellationToken)
+    {
+        Interlocked.Exchange(ref recorderSessionsStopping, 1);
+        await ResetRecorderSessionAsync().ConfigureAwait(false);
+    }
     public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        Interlocked.Exchange(ref recorderSessionsStopping, 1);
+        await ResetRecorderSessionAsync().ConfigureAwait(false);
+        await base.StopAsync(cancellationToken).ConfigureAwait(false);
+    }
 
     private Task StartObserverAsync(CancellationToken cancellationToken)
     {
@@ -519,19 +569,28 @@ internal sealed class MatchParticipantStatusProjection(
                 }
                 else if (resource.Name == "ssl-log-recorder" && target is { State: "Running" })
                 {
-                    var archive = GetFreshRecorderArchive(recorderOutputDirectory, clock.GetUtcNow());
-                    if (archive is not null)
+                    var collection = await CollectCurrentRecorderRecordsAsync(resource, target, stoppingToken)
+                        .ConfigureAwait(false);
+                    if (collection is not null)
                     {
-                        archiveBytes = archive.Value.Bytes;
-                        archiveLastWrite = archive.Value.LastWriteUtc;
+                        archiveBytes = collection.Archive.Length;
+                        archiveLastWrite = new DateTimeOffset(collection.Archive.LastWriteTimeUtc, TimeSpan.Zero);
+                        var observedAtUtc = default(DateTimeOffset);
+                        serviceEvidenceReady = collection.Failure is null && collection.Summary.TryGetFreshEvidenceTime(
+                            collection.Identity.StartedAtUtc, clock.GetUtcNow(), TimeSpan.FromSeconds(15), out observedAtUtc);
+                        serviceEvidenceObservedAtUtc = serviceEvidenceReady ? observedAtUtc : null;
+                        serviceEvidenceReason = DescribeRecorderEvidence(
+                            collection.Summary, serviceEvidenceReady, collection.Failure);
                     }
-                    _ = recorderOutputGrowth.Observe(target, runId, archiveBytes, archiveLastWrite, clock.GetUtcNow());
-                    serviceEvidenceReady = false;
-                    serviceEvidenceReason = "Complete live recorder records could not be decoded; archive growth is supplemental only.";
+                    else
+                    {
+                        await ResetRecorderSessionAsync().ConfigureAwait(false);
+                        serviceEvidenceReason = "Recorder identity, current-run archive, or complete input records could not be verified.";
+                    }
                 }
                 else if (resource.Name == "ssl-log-recorder")
                 {
-                    recorderOutputGrowth.Observe(target, runId, null, null, clock.GetUtcNow());
+                    await ResetRecorderSessionAsync().ConfigureAwait(false);
                     serviceEvidenceReason = "Recorder container identity is unavailable; no decoded record evidence was collected.";
                 }
 
@@ -564,6 +623,11 @@ internal sealed class MatchParticipantStatusProjection(
             var previous = resourceIds.GetCurrent(observation.Resource);
             resourceIds.Observe(observation, notifications);
             var current = resourceIds.GetCurrent(observation.Resource);
+            if (observation.Resource.Name == "ssl-log-recorder" &&
+                (previous?.ResourceId != current?.ResourceId ||
+                 previous?.ContainerId != current?.ContainerId ||
+                 current?.State != "Running"))
+                await ResetRecorderSessionAsync().ConfigureAwait(false);
             if (previous?.ResourceId != current?.ResourceId || previous?.ContainerId != current?.ContainerId)
             {
                 if (current is null)
@@ -573,6 +637,159 @@ internal sealed class MatchParticipantStatusProjection(
                 }
             }
         }
+    }
+
+    private async Task<RecorderArchiveCollection?> CollectCurrentRecorderRecordsAsync(
+        IResource resource,
+        MatchParticipantCurrentTarget target,
+        CancellationToken cancellationToken)
+    {
+        if (!RegisteredContainerEventProjection.HasFullContainerId(target.ContainerId))
+        {
+            await ResetRecorderSessionAsync().ConfigureAwait(false);
+            return null;
+        }
+
+        try
+        {
+            var now = clock.GetUtcNow();
+            var archive = GetFreshRecorderArchive(recorderOutputDirectory, now);
+            if (archive is null)
+            {
+                await ResetRecorderSessionAsync().ConfigureAwait(false);
+                return null;
+            }
+
+            var session = GetRecorderSession();
+            var needsValidation = session is null ||
+                now - session.LastIdentityValidationUtc >= RecorderIdentityValidationInterval;
+            VerifiedContainerLogEvidence identity;
+            if (needsValidation)
+            {
+                var beforeJson = await docker.CaptureAsync(
+                    DockerContainerSpec.CreateInspectArguments(target.ContainerId), cancellationToken).ConfigureAwait(false);
+                if (!VerifiedContainerLogEvidence.TryParse(
+                        beforeJson, target, runId, stackId, resource.Name, out var before) || before is null)
+                {
+                    await ResetRecorderSessionAsync().ConfigureAwait(false);
+                    return null;
+                }
+
+                if (session is null || !session.Matches(runId, before, archive.FullName))
+                {
+                    await ResetRecorderSessionAsync().ConfigureAwait(false);
+                    session = await StartRecorderSessionAsync(before, archive.FullName, cancellationToken)
+                        .ConfigureAwait(false);
+                    if (session is null)
+                        return null;
+                }
+
+                var afterJson = await docker.CaptureAsync(
+                    DockerContainerSpec.CreateInspectArguments(target.ContainerId), cancellationToken).ConfigureAwait(false);
+                if (!VerifiedContainerLogEvidence.TryParse(
+                        afterJson, target, runId, stackId, resource.Name, out var after) ||
+                    after is null || !RecorderGenerationMatches(before, after))
+                {
+                    await ResetRecorderSessionAsync().ConfigureAwait(false);
+                    return null;
+                }
+
+                identity = after;
+                session.LastIdentityValidationUtc = now;
+            }
+            else
+            {
+                identity = session!.Identity;
+            }
+
+            var currentTarget = resourceIds.GetCurrent(resource);
+            if (currentTarget is null || currentTarget.ResourceId != target.ResourceId ||
+                currentTarget.ContainerId != target.ContainerId || currentTarget.State != "Running")
+            {
+                await ResetRecorderSessionAsync().ConfigureAwait(false);
+                return null;
+            }
+
+            if (session is null || !session.Matches(runId, identity, archive.FullName))
+            {
+                await ResetRecorderSessionAsync().ConfigureAwait(false);
+                return null;
+            }
+
+            return new(identity, archive, session.Latest, session.Failure);
+        }
+        catch (Exception exception) when (exception is IOException or InvalidOperationException or
+                                          JsonException or FormatException or UnauthorizedAccessException)
+        {
+            await ResetRecorderSessionAsync().ConfigureAwait(false);
+            return null;
+        }
+    }
+
+    private static bool RecorderGenerationMatches(
+        VerifiedContainerLogEvidence left,
+        VerifiedContainerLogEvidence right) =>
+        left.ContainerId == right.ContainerId && left.CreatedAtUtc == right.CreatedAtUtc &&
+        left.StartedAtUtc == right.StartedAtUtc && left.RestartCount == right.RestartCount;
+
+    private RecorderReaderSession? GetRecorderSession()
+    {
+        lock (recorderSessionGate)
+            return recorderSession;
+    }
+
+    private async Task<RecorderReaderSession?> StartRecorderSessionAsync(
+        VerifiedContainerLogEvidence identity,
+        string archivePath,
+        CancellationToken stoppingToken)
+    {
+        await recorderSessionTransition.WaitAsync(stoppingToken).ConfigureAwait(false);
+        try
+        {
+            await ResetRecorderSessionCoreAsync().ConfigureAwait(false);
+            if (Volatile.Read(ref recorderSessionsStopping) != 0)
+                return null;
+
+            var session = new RecorderReaderSession(runId, identity, archivePath, stoppingToken);
+            lock (recorderSessionGate)
+            {
+                session.Start();
+                recorderSession = session;
+            }
+            return session;
+        }
+        finally
+        {
+            recorderSessionTransition.Release();
+        }
+    }
+
+    private async Task ResetRecorderSessionAsync()
+    {
+        await recorderSessionTransition.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            await ResetRecorderSessionCoreAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            recorderSessionTransition.Release();
+        }
+    }
+
+    private async Task ResetRecorderSessionCoreAsync()
+    {
+        RecorderReaderSession? previous;
+        lock (recorderSessionGate)
+        {
+            previous = recorderSession;
+            recorderSession = null;
+        }
+        if (previous is null)
+            return;
+
+        previous.Cancel();
+        await previous.Completion.ConfigureAwait(false);
     }
 
     private async Task<ContainerLogCollection?> CollectCurrentContainerLogsAsync(
@@ -632,7 +849,7 @@ internal sealed class MatchParticipantStatusProjection(
 
     private sealed record ContainerLogCollection(VerifiedContainerLogEvidence Identity, DateTimeOffset Cursor);
 
-    private static (long Bytes, DateTimeOffset LastWriteUtc)? GetFreshRecorderArchive(
+    private static FileInfo? GetFreshRecorderArchive(
         string directory,
         DateTimeOffset now)
     {
@@ -647,7 +864,20 @@ internal sealed class MatchParticipantStatusProjection(
             return null;
         var lastWrite = new DateTimeOffset(latest.LastWriteTimeUtc, TimeSpan.Zero);
         return now - lastWrite <= TimeSpan.FromSeconds(15) && lastWrite <= now + TimeSpan.FromSeconds(1)
-            ? (latest.Length, lastWrite)
+            ? latest
             : null;
+    }
+
+    private static string DescribeRecorderEvidence(
+        SslLogDecodedInputSummary summary,
+        bool ready,
+        string? sessionFailure)
+    {
+        var status = ready ? "fresh" : "missing or stale";
+        var failure = summary.ReadFailure is null ? string.Empty : $" tail={summary.ReadFailure}";
+        var readerFailure = sessionFailure is null ? string.Empty : $" reader={sessionFailure}";
+        return $"Recorder decoded {status} records for current run: referee={summary.RefereeRecords}, " +
+            $"vision-detection={summary.VisionDetectionRecords}, tracker={summary.VisionTrackerRecords}; " +
+            $"decompressed-eof={summary.ReachedDecompressedEof}.{failure}{readerFailure}";
     }
 }

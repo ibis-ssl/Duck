@@ -173,24 +173,18 @@ public sealed class MatchParticipantStatusProjectionTests
     }
 
     [Fact]
-    public void RecorderRequiresFreshGrowthForCurrentContainer()
+    public void RecorderRequiresFreshDecodedRecordsAndCurrentArchive()
     {
-        var tracker = new RecorderOutputGrowthTracker();
-        var now = DateTimeOffset.Parse("2026-11-04T12:00:00Z");
-        var first = new MatchParticipantCurrentTarget("id-1", new string('e', 64), "Running");
-        var recent = now.AddSeconds(-1);
+        var now = DateTimeOffset.UtcNow;
+        var fresh = new MatchParticipantResourceStatus(
+            "ssl-log-recorder", "Running", "Healthy", "resource-1", new string('e', 64), "run-1",
+            true, now.AddSeconds(-1), 100, now.AddSeconds(-1));
 
-        Assert.False(tracker.Observe(first, "run-1", 100, recent, now));
-        Assert.True(tracker.Observe(first, "run-1", 101, recent, now));
-        Assert.False(tracker.Observe(first, "run-1", 101, recent, now));
-        Assert.False(tracker.Observe(first, "run-1", 102, now.AddSeconds(-16), now));
-
-        var replacement = first with { ContainerId = new string('f', 64) };
-        Assert.False(tracker.Observe(replacement, "run-1", 500, recent, now));
-        Assert.True(tracker.Observe(replacement, "run-1", 501, recent, now));
-        Assert.False(tracker.Observe(replacement, "run-2", 700, recent, now));
-        Assert.True(tracker.Observe(replacement, "run-2", 701, recent, now));
-        Assert.False(tracker.Observe(null, "run-1", 600, recent, now));
+        Assert.True(fresh.IsReady);
+        Assert.False((fresh with { ServiceEvidenceReady = false }).IsReady);
+        Assert.False((fresh with { ServiceEvidenceObservedAtUtc = now.AddSeconds(-16) }).IsReady);
+        Assert.False((fresh with { RecorderArchiveBytes = null }).IsReady);
+        Assert.False((fresh with { RecorderArchiveLastWriteUtc = now.AddSeconds(-16) }).IsReady);
     }
 
     private sealed class TestTimeProvider(DateTimeOffset now) : TimeProvider
