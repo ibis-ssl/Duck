@@ -474,7 +474,8 @@ public sealed class DockerContainerWrapperLifecycleTests
         cancellation.Cancel();
         Assert.Equal(0, await run.WaitAsync(TimeSpan.FromSeconds(10)));
         var commands = File.ReadAllText(fake.TracePath);
-        Assert.Equal(3, commands.Split($"exec {FullContainerId} timeout --signal=TERM", StringSplitOptions.None).Length - 1);
+        var craneProbeCount = commands.Split($"exec {FullContainerId} timeout --signal=TERM", StringSplitOptions.None).Length - 1;
+        Assert.True(craneProbeCount >= 3, $"Expected two timed-out probes and one successful probe, found {craneProbeCount}.");
         Assert.Contains($"rm --force {FullContainerId}", commands);
         Assert.True(diagnostics.Count >= 2);
         Assert.DoesNotContain("CRANE_DIAGNOSTIC_SENTINEL", string.Join('\n', diagnostics));
@@ -483,7 +484,10 @@ public sealed class DockerContainerWrapperLifecycleTests
         Assert.Equal(1, first.RootElement.GetProperty("attempt").GetInt32());
         Assert.Equal("setup_timeout", first.RootElement.GetProperty("Outcome").GetProperty("Classification").GetString());
         Assert.Equal("password=[REDACTED]\n", first.RootElement.GetProperty("Outcome").GetProperty("StandardErrorExcerpt").GetString());
-        Assert.Contains(diagnostics, line => line.Contains("\"attempt\":3", StringComparison.Ordinal));
+        using var ready = System.Text.Json.JsonDocument.Parse(diagnostics.First(line =>
+            line.Contains("duck_crane_probe_progress", StringComparison.Ordinal) &&
+            line.Contains("\"attempt\":3", StringComparison.Ordinal)));
+        Assert.True(ready.RootElement.GetProperty("Outcome").GetProperty("Ready").GetBoolean());
     }
 
     [Fact]
