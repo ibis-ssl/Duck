@@ -60,8 +60,7 @@ public sealed class SimulatorBallPlacementFixtureTests
                 BlueScore: 1, YellowScore: 0));
         var secondHalfPre = new RefereeLifecycleObservation(21,
             new(Referee.Types.Command.Stop, 20, Stage: Referee.Types.Stage.NormalSecondHalfPre,
-                PacketTimestamp: 210, BlueScore: 1, YellowScore: 0,
-                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+                PacketTimestamp: 210, BlueScore: 1, YellowScore: 0),
             "Stop", "Stop", "NORMAL_SECOND_HALF_PRE", null,
             BlueSecondHalfKickoffApi());
 
@@ -69,13 +68,21 @@ public sealed class SimulatorBallPlacementFixtureTests
         Assert.Equal(0, sender.SendCalls);
 
         await fixture.ObserveAsync(secondHalfPre, CancellationToken.None);
+        Assert.Equal(0, sender.SendCalls);
+
+        var blockedKickoff = secondHalfPre with
+        {
+            RequestSequence = 22,
+            Udp = secondHalfPre.Udp with { PacketTimestamp = 220, NextCommand = Referee.Types.Command.PrepareKickoffBlue },
+        };
+        await fixture.ObserveAsync(blockedKickoff, CancellationToken.None);
         Assert.Equal(1, sender.SendCalls);
         Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
 
-        await fixture.ObserveAsync(secondHalfPre with
+        await fixture.ObserveAsync(blockedKickoff with
         {
-            RequestSequence = 22,
-            ApiSnapshot = BlueSecondHalfKickoffApi(),
+            RequestSequence = 23,
+            Udp = blockedKickoff.Udp with { PacketTimestamp = 230 },
         }, CancellationToken.None);
         Assert.Equal(1, sender.SendCalls);
         Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
@@ -99,14 +106,28 @@ public sealed class SimulatorBallPlacementFixtureTests
             BlueSecondHalfKickoffApi());
 
         Assert.True(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(previous, current));
+        var stageOnly = current with
+        {
+            Udp = current.Udp with { NextCommand = null },
+        };
+        Assert.True(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(previous, stageOnly));
+        Assert.False(SimulatorBallPlacementFixture.IsEligiblePlacement(
+            stageOnly.Udp, stageOnly.ApiSnapshot, BlockedBlueSecondHalfKickoff(), 1, 0,
+            observedSecondHalfKickoff: true, out _));
         Assert.True(SimulatorBallPlacementFixture.IsEligiblePlacement(
             current.Udp, current.ApiSnapshot, BlockedBlueSecondHalfKickoff(), 1, 0,
             observedSecondHalfKickoff: true, out _));
         Assert.False(SimulatorBallPlacementFixture.IsEligiblePlacement(
             current.Udp, current.ApiSnapshot, BlockedBlueSecondHalfKickoff(), 1, 0,
             observedSecondHalfKickoff: false, out _));
-        Assert.False(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(
-            previous, current with { Udp = current.Udp with { NextCommand = Referee.Types.Command.PrepareKickoffYellow } }));
+        var wrongTeam = current with
+        {
+            Udp = current.Udp with { NextCommand = Referee.Types.Command.PrepareKickoffYellow },
+        };
+        Assert.True(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(previous, wrongTeam));
+        Assert.False(SimulatorBallPlacementFixture.IsEligiblePlacement(
+            wrongTeam.Udp, wrongTeam.ApiSnapshot, BlockedBlueSecondHalfKickoff(), 1, 0,
+            observedSecondHalfKickoff: true, out _));
         Assert.False(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(
             previous, current with { Udp = current.Udp with { BlueScore = 2 } }));
         Assert.False(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(

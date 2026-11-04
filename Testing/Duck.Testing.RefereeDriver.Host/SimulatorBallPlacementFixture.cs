@@ -80,12 +80,13 @@ internal sealed class SimulatorBallPlacementFixture(
         if (previous is not null && IsObservedSecondHalfKickoff(previous, observation))
             pendingSecondHalfKickoff = (observation.Udp.BlueScore, observation.Udp.YellowScore);
 
-        var isPendingSecondHalfKickoff = pendingSecondHalfKickoff is { } kickoffScore &&
+        var secondHalfEpisodeStillActive = pendingSecondHalfKickoff is { } kickoffScore &&
             observation.Udp.Stage == Referee.Types.Stage.NormalSecondHalfPre &&
-            observation.Udp.BlueScore == kickoffScore.Blue && observation.Udp.YellowScore == kickoffScore.Yellow &&
-            observation.Udp.NextCommand == Referee.Types.Command.PrepareKickoffBlue;
-        if (pendingSecondHalfKickoff is not null && !isPendingSecondHalfKickoff)
+            observation.Udp.BlueScore == kickoffScore.Blue && observation.Udp.YellowScore == kickoffScore.Yellow;
+        if (pendingSecondHalfKickoff is not null && !secondHalfEpisodeStillActive)
             pendingSecondHalfKickoff = null;
+        var isPendingSecondHalfKickoff = secondHalfEpisodeStillActive &&
+            observation.Udp.NextCommand == Referee.Types.Command.PrepareKickoffBlue;
 
         if (pending is { } outstanding)
         {
@@ -240,8 +241,7 @@ internal sealed class SimulatorBallPlacementFixture(
         previousApi.BlueScore == previous.Udp.BlueScore &&
         previousApi.YellowScore == previous.Udp.YellowScore &&
         currentApi.BlueScore == current.Udp.BlueScore &&
-        currentApi.YellowScore == current.Udp.YellowScore &&
-        current.Udp.NextCommand == Referee.Types.Command.PrepareKickoffBlue;
+        currentApi.YellowScore == current.Udp.YellowScore;
 
     private async Task ConfirmPlacementAsync(
         RefereeLifecycleObservation observation,
