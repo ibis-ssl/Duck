@@ -18,6 +18,7 @@ public sealed class GameControllerStateMappingTests
     [InlineData("BALL_PLACEMENT", "BALL_PLACEMENT", "BallPlacement", "BallPlacement")]
     [InlineData("DIRECT", "FREE_KICK", "Direct", "FreeKick")]
     [InlineData("DIRECT", "RUNNING", "Direct", "Running")]
+    [InlineData("PENALTY", "PENALTY", "Penalty", "Penalty")]
     public async Task NormalizesSupportedApiNames(
         string command, string phase, string expectedCommand, string expectedPhase)
     {
@@ -139,6 +140,9 @@ public sealed class GameControllerStateMappingTests
     [InlineData("Kickoff", "Kickoff", Referee.Types.Command.PrepareKickoffBlue, true)]
     [InlineData("Kickoff", "Kickoff", Referee.Types.Command.PrepareKickoffYellow, true)]
     [InlineData("NormalStart", "Kickoff", Referee.Types.Command.NormalStart, true)]
+    [InlineData("Penalty", "Penalty", Referee.Types.Command.PreparePenaltyBlue, true)]
+    [InlineData("Penalty", "Penalty", Referee.Types.Command.PreparePenaltyYellow, true)]
+    [InlineData("NormalStart", "Penalty", Referee.Types.Command.NormalStart, true)]
     [InlineData("Kickoff", "Running", Referee.Types.Command.PrepareKickoffBlue, false)]
     [InlineData("Kickoff", "Kickoff", Referee.Types.Command.NormalStart, false)]
     [InlineData("NormalStart", "Kickoff", Referee.Types.Command.ForceStart, false)]
@@ -180,6 +184,29 @@ public sealed class GameControllerStateMappingTests
 
         Assert.True(GameControllerStateMapping.MatchesUdpCommand(
             directApi with { Phase = GameControllerMatchPhase.Running, PhaseForTeam = null }, directUdp));
+    }
+
+    [Fact]
+    public void MatchesPenaltyCommandsOnlyWhenApiTeamMatchesUdpTeam()
+    {
+        var blueUdp = new RefereeCommandSnapshot(Referee.Types.Command.PreparePenaltyBlue, 6);
+        var blueApi = new GameControllerMatchSnapshot(GameControllerCommandKind.Penalty,
+            GameControllerMatchPhase.Penalty, CommandForTeam: "BLUE", PhaseForTeam: "BLUE");
+        Assert.True(GameControllerStateMapping.MatchesUdpCommand(blueApi, blueUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            blueApi with { CommandForTeam = "YELLOW" }, blueUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            blueApi with { PhaseForTeam = "YELLOW" }, blueUdp));
+
+        var yellowUdp = new RefereeCommandSnapshot(Referee.Types.Command.PreparePenaltyYellow, 7);
+        var yellowApi = blueApi with
+        {
+            CommandForTeam = "YELLOW",
+            PhaseForTeam = "YELLOW",
+        };
+        Assert.True(GameControllerStateMapping.MatchesUdpCommand(yellowApi, yellowUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            yellowApi with { CommandForTeam = "BLUE" }, yellowUdp));
     }
 
     private static GameControllerStateClient CreateClient(WebSocket socket) =>

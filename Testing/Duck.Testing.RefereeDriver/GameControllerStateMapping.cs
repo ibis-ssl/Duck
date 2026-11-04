@@ -39,6 +39,7 @@ internal static class GameControllerStateMapping
             "FORCE_START" => GameControllerCommandKind.ForceStart,
             "BALL_PLACEMENT" => GameControllerCommandKind.BallPlacement,
             "DIRECT" => GameControllerCommandKind.Direct,
+            "PENALTY" => GameControllerCommandKind.Penalty,
             _ => GameControllerCommandKind.Unknown,
         };
         var phase = ReadTypeName(matchState, "gameState") switch
@@ -49,6 +50,7 @@ internal static class GameControllerStateMapping
             "RUNNING" => GameControllerMatchPhase.Running,
             "BALL_PLACEMENT" => GameControllerMatchPhase.BallPlacement,
             "FREE_KICK" => GameControllerMatchPhase.FreeKick,
+            "PENALTY" => GameControllerMatchPhase.Penalty,
             _ => GameControllerMatchPhase.Unknown,
         };
         return command == GameControllerCommandKind.Unknown || phase == GameControllerMatchPhase.Unknown
@@ -85,6 +87,10 @@ internal static class GameControllerStateMapping
                 Referee.Types.Command.DirectFreeBlue or Referee.Types.Command.DirectFreeYellow) => true,
             (GameControllerCommandKind.Direct, GameControllerMatchPhase.Running,
                 Referee.Types.Command.DirectFreeBlue or Referee.Types.Command.DirectFreeYellow) => true,
+            (GameControllerCommandKind.Penalty, GameControllerMatchPhase.Penalty,
+                Referee.Types.Command.PreparePenaltyBlue or Referee.Types.Command.PreparePenaltyYellow) => true,
+            (GameControllerCommandKind.NormalStart, GameControllerMatchPhase.Penalty,
+                Referee.Types.Command.NormalStart) => true,
             _ => false,
         };
     }
@@ -99,7 +105,9 @@ internal static class GameControllerStateMapping
         var expectedTeam = udp.Command switch
         {
             Referee.Types.Command.BallPlacementBlue or Referee.Types.Command.DirectFreeBlue => "BLUE",
-            Referee.Types.Command.BallPlacementYellow or Referee.Types.Command.DirectFreeYellow => "YELLOW",
+            Referee.Types.Command.BallPlacementYellow or Referee.Types.Command.DirectFreeYellow or
+                Referee.Types.Command.PreparePenaltyYellow => "YELLOW",
+            Referee.Types.Command.PreparePenaltyBlue => "BLUE",
             _ => null,
         };
         if (expectedTeam is null)

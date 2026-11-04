@@ -438,6 +438,194 @@ public sealed class SimulatorBallPlacementFixtureTests
             udp, api with { PlacementX = 2.4f }, continuation, "YELLOW", out _, out _, out _, out _));
     }
 
+    [Fact]
+    public async Task PlacesPenaltyBallAtMatchedOfficialTargetAndConfirmsNativeNextCommandReady()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient(
+            BlockedBluePenalty(), ReadyBluePenalty()));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 6,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0));
+        var udp = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 7,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 700,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PreparePenaltyBlue,
+            DesignatedPositionX: -3500, DesignatedPositionY: 0);
+        var api = new GameControllerMatchSnapshot(GameControllerCommandKind.Stop,
+            GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF", NextCommand: "PENALTY",
+            NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: -3.5f, PlacementY: 0);
+
+        await fixture.ObserveAsync(new(10, udp, "Stop", "Stop", "NORMAL_FIRST_HALF", null, api),
+            CancellationToken.None);
+        Assert.Equal([(-3.5f, 0f)], sender.Placements);
+        Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
+
+        await fixture.ObserveAsync(new(11, udp with { PacketTimestamp = 701 }, "Stop", "Stop",
+            "NORMAL_FIRST_HALF", null, api), CancellationToken.None);
+        Assert.Equal(1, sender.SendCalls);
+        Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+        Assert.Contains("NEXT_COMMAND ready", Assert.Single(fixture.Events).Reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ConfirmsPenaltyBallWhenAutoContinueAdvancesPastPrepareBeforeObservation()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient(
+            BlockedBluePenalty(), ProgressedBluePenalty()));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 6,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0));
+        var stoppedUdp = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 7,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 700,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PreparePenaltyBlue,
+            DesignatedPositionX: -3500, DesignatedPositionY: 0);
+        var stoppedApi = new GameControllerMatchSnapshot(GameControllerCommandKind.Stop,
+            GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF", NextCommand: "PENALTY",
+            NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: -3.5f, PlacementY: 0);
+
+        await fixture.ObserveAsync(new(10, stoppedUdp, "Stop", "Stop", "NORMAL_FIRST_HALF", null, stoppedApi),
+            CancellationToken.None);
+        var penaltyUdp = new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 8,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 701,
+            BlueScore: 0, YellowScore: 0);
+        var penaltyApi = new GameControllerMatchSnapshot(GameControllerCommandKind.NormalStart,
+            GameControllerMatchPhase.Penalty, "NORMAL_FIRST_HALF", NextCommand: "NORMAL_START",
+            NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: -3.5f, PlacementY: 0, CommandForTeam: "UNKNOWN", PhaseForTeam: "BLUE");
+
+        await fixture.ObserveAsync(new(11, penaltyUdp, "NormalStart", "Penalty", "NORMAL_FIRST_HALF", null, penaltyApi),
+            CancellationToken.None);
+
+        Assert.Equal(1, sender.SendCalls);
+        Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+        Assert.Contains("advanced through the captured team's penalty restart", Assert.Single(fixture.Events).Reason,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task DoesNotConfirmPenaltyPlacementWhenFreshUdpTargetIsMissing()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient(
+            BlockedBluePenalty(), ReadyBluePenalty()));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 6,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0));
+        var udp = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 7,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 700,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PreparePenaltyBlue,
+            DesignatedPositionX: -3500, DesignatedPositionY: 0);
+        var api = new GameControllerMatchSnapshot(GameControllerCommandKind.Stop,
+            GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF", NextCommand: "PENALTY",
+            NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: -3.5f, PlacementY: 0);
+
+        await fixture.ObserveAsync(new(10, udp, "Stop", "Stop", "NORMAL_FIRST_HALF", null, api),
+            CancellationToken.None);
+        await fixture.ObserveAsync(new(11, udp with
+        {
+            PacketTimestamp = 701,
+            DesignatedPositionX = null,
+            DesignatedPositionY = null,
+        }, "Stop", "Stop", "NORMAL_FIRST_HALF", null, api), CancellationToken.None);
+
+        Assert.Equal(1, sender.SendCalls);
+        Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
+    }
+
+    [Fact]
+    public async Task DoesNotPlacePenaltyBallWhenApiTargetDoesNotMatchUdpDesignatedTarget()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient(
+            BlockedBluePenalty() with { PlacementX = -3.4f, PlacementY = 0 },
+            BlockedBluePenalty() with
+            {
+                ContinueActions = [new("NEXT_COMMAND", "BLUE", "BLOCKED", true, ["Ball is outside of field"])],
+            }));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 6,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0));
+        var udp = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 7,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 700,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PreparePenaltyBlue,
+            DesignatedPositionX: -3500, DesignatedPositionY: 0);
+        var api = new GameControllerMatchSnapshot(GameControllerCommandKind.Stop,
+            GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF", NextCommand: "PENALTY",
+            NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: -3.5f, PlacementY: 0);
+
+        await fixture.ObserveAsync(new(10, udp, "Stop", "Stop", "NORMAL_FIRST_HALF", null, api),
+            CancellationToken.None);
+        Assert.Empty(sender.Placements);
+        Assert.Equal("not_sent", Assert.Single(fixture.Events).Status);
+    }
+
+    [Fact]
+    public async Task DoesNotPlacePenaltyBallWhenNextCommandIsBlockedForAnotherReason()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var wrongBlocker = BlockedBluePenalty() with
+        {
+            ContinueActions = [new("NEXT_COMMAND", "BLUE", "BLOCKED", true, ["Ball is outside of field"])],
+        };
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient(wrongBlocker));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 6,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0));
+        var udp = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 7,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 700,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PreparePenaltyBlue,
+            DesignatedPositionX: -3500, DesignatedPositionY: 0);
+        var api = new GameControllerMatchSnapshot(GameControllerCommandKind.Stop,
+            GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF", NextCommand: "PENALTY",
+            NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: -3.5f, PlacementY: 0);
+
+        await fixture.ObserveAsync(new(10, udp, "Stop", "Stop", "NORMAL_FIRST_HALF", null, api),
+            CancellationToken.None);
+
+        Assert.Empty(sender.Placements);
+        Assert.Equal("not_sent", Assert.Single(fixture.Events).Status);
+    }
+
+    private static GameControllerContinuationState BlockedBluePenalty() => new(
+        "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(24),
+        [new("NEXT_COMMAND", "BLUE", "BLOCKED", true,
+            ["Ball is 3.96 m (>1.00 m) away from placement pos", "Ball is outside of field: x: -1.28 m, y: -3.28 m"])],
+        "PENALTY", "BLUE", 0, 0, -3.5f, 0);
+
+    private static GameControllerContinuationState ReadyBluePenalty() => new(
+        "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(24),
+        [new("NEXT_COMMAND", "BLUE", "READY_AUTO", false, [])],
+        "PENALTY", "BLUE", 0, 0, -3.5f, 0);
+
+    private static GameControllerContinuationState ProgressedBluePenalty() => new(
+        "NormalStart", "Penalty", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(22), [],
+        "NORMAL_START", "BLUE", 0, 0, -3.5f, 0);
     private static RefereeCommandSnapshot ScoreSnapshot() => new(
         Referee.Types.Command.Stop, 11, Stage: Referee.Types.Stage.NormalFirstHalf,
         PacketTimestamp: 110, BlueScore: 1, YellowScore: 0,
