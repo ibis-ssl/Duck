@@ -1196,6 +1196,24 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task MatchReadinessOnlyModeRegistersParticipantsWithoutControlWorker()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match",
+            "--Testing:MatchReadinessOnly=true",
+            "--Testing:Diagnostics:RunId=issue114-readiness-only-model-test");
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "match-controller");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "tigers-blue");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "autoref-tigers");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "ssl-log-recorder");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "simulator");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "game-controller");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "crane");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "duck");
+    }
+
+    [Fact]
     public async Task MatchModeHandsOffTheControllerContainerIdentityWhenDesktopBridgeIsConfigured()
     {
         using var appHost = await CreateAppHostAsync(

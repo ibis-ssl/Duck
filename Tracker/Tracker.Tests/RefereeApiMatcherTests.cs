@@ -15,6 +15,27 @@ namespace Tracker.Tests;
 public sealed class RefereeApiMatcherTests
 {
     [Fact]
+    public void ParticipantReadinessRequiresPositiveIdentityAndServiceEvidence()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var expected = new[] { "tigers-blue", "autoref-tigers", "ssl-log-recorder", "crane" };
+        var valid = expected.Select(resource => new MatchParticipantResourceEvidence(
+            resource, "Running", "Healthy", $"instance-{resource}", new string('a', 64), "run-1",
+            resource is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder",
+            resource is "tigers-blue" or "autoref-tigers" ? now : null,
+            resource == "ssl-log-recorder" ? 1234 : null,
+            resource == "ssl-log-recorder" ? now : null)).ToArray();
+
+        Assert.False(new MatchParticipantResourceEvidence("tigers-blue", "Running", "Healthy").IsReady);
+        Assert.True(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            new MatchParticipantStatusEvidence(now, valid), expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            new MatchParticipantStatusEvidence(now, valid.Select(resource =>
+                resource with { RunId = resource.ResourceId == "crane" ? "other-run" : "run-1" }).ToArray()),
+            expected, now));
+    }
+
+    [Fact]
     public async Task WaitForCurrentCanRequireTheFinalRefereeCommandWithoutStartingAnotherRead()
     {
         await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Halt);

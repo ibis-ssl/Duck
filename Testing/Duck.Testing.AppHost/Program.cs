@@ -440,6 +440,12 @@ if (testingMode is not "base" and not "comparison" and not "match")
 {
     throw new InvalidOperationException($"Unsupported Testing:Mode '{testingMode}'. Supported modes are 'base', 'comparison', and 'match'.");
 }
+var matchReadinessOnly = string.Equals(
+    builder.Configuration["Testing:MatchReadinessOnly"], "true", StringComparison.OrdinalIgnoreCase);
+if (matchReadinessOnly && testingMode != "match")
+{
+    throw new InvalidOperationException("Testing:MatchReadinessOnly can only be used with Testing:Mode=match.");
+}
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
@@ -601,6 +607,10 @@ if (testingMode == "match")
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
+    var recorderOutputDirectory = Path.Combine(resultDirectory, "recorder");
+    Directory.CreateDirectory(recorderOutputDirectory);
+    builder.CreateResourceBuilder<ContainerResource>((ContainerResource)sslLogRecorder.Resource)
+        .WithBindMount(recorderOutputDirectory, "/data", isReadOnly: false);
     var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
     var participantResources = new IResource[]
     {
@@ -611,8 +621,14 @@ if (testingMode == "match")
         services.GetRequiredService<ResourceNotificationService>(),
         participantResources,
         participantStatusPath,
+        recorderOutputDirectory,
+        duckRunId,
+        identityDockerExecutable,
+        stackId,
         TimeProvider.System));
 
+    if (!matchReadinessOnly)
+    {
     var matchController = AddPublishedContainer(
             "match-controller", "duck-match-controller", "Testing/Duck.Testing.RefereeDriver.Host")
         .WithEnvironment("RefereeDriver__Enabled", "true")
@@ -655,6 +671,7 @@ if (testingMode == "match")
         .WaitForStart(builder.CreateResourceBuilder<IResource>(tigersBlue.Resource))
         .WaitForStart(builder.CreateResourceBuilder<IResource>(autoRefTigers.Resource))
         .WaitForStart(builder.CreateResourceBuilder<IResource>(sslLogRecorder.Resource));
+    }
 }
 
 if (testingMode == "comparison")
