@@ -263,6 +263,29 @@ public sealed class RefereeDriverFixtureTests
         Assert.Empty(control.Actions);
     }
 
+    [Fact]
+    public async Task ContinueMatchUsesOfferedNextStageAtRoundedZeroAndDoesNotChooseLaterKickoff()
+    {
+        var stopped = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 80, Stage: Referee.Types.Stage.NormalFirstHalf,
+            PacketTimestamp: 800);
+        var observations = new SequenceLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 80, Referee.Types.Stage.NormalFirstHalf, 800,
+                "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.Zero));
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.Zero,
+            [new("NEXT_STAGE", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false),
+             new("NEXT_COMMAND", "YELLOW", "READY_AUTO", HasContinuationIssues: false)]));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(
+            new(Referee.Types.Command.NormalStart, 79, Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 790),
+            TimeSpan.FromMilliseconds(40), CancellationToken.None);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Equal([GameControllerContinueAction.NextStage], control.Actions);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

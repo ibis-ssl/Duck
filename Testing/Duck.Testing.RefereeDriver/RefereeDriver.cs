@@ -520,7 +520,7 @@ public sealed class RefereeDriverFixture
         if (stage == Referee.Types.Stage.NormalHalfTime)
         {
             return udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt &&
-                observation.ApiStageTimeLeft is { } halfTimeRemaining && halfTimeRemaining < TimeSpan.Zero
+                observation.ApiStageTimeLeft is { } halfTimeRemaining && halfTimeRemaining <= TimeSpan.Zero
                     ? GameControllerContinueAction.NextStage
                     : null;
         }
@@ -528,15 +528,18 @@ public sealed class RefereeDriverFixture
         if (udp.Command == Referee.Types.Command.Halt && observation.ApiPhase == nameof(GameControllerMatchPhase.Halt))
             return GameControllerContinueAction.ResumeFromHalt;
 
-        if (observation.ApiStageTimeLeft is not { } remaining || remaining >= TimeSpan.Zero)
+        if (observation.ApiStageTimeLeft is not { } remaining)
             return null;
 
         var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
         if (stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf &&
-            observation.ApiPhase == nameof(GameControllerMatchPhase.Running))
+            observation.ApiPhase == nameof(GameControllerMatchPhase.Running) && remaining < TimeSpan.Zero)
             return GameControllerContinueAction.StopGame;
 
         if (!stopped)
+            return null;
+
+        if (remaining > TimeSpan.Zero)
             return null;
 
         return stage switch
