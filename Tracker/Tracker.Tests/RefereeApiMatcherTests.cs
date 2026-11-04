@@ -22,7 +22,7 @@ public sealed class RefereeApiMatcherTests
         var valid = expected.Select(resource => new MatchParticipantResourceEvidence(
             resource, "Running", "Healthy", $"instance-{resource}", new string('a', 64), "run-1",
             resource is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder",
-            resource is "tigers-blue" or "autoref-tigers" ? now : null,
+            resource is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder" ? now : null,
             resource == "ssl-log-recorder" ? 1234 : null,
             resource == "ssl-log-recorder" ? now : null)).ToArray();
 
