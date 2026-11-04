@@ -329,6 +329,7 @@ public sealed class RuntimeVisionReceiverDiagnostics
     private readonly ServiceReceiveDiagnostics diagnostics;
     private readonly object epochGate = new();
     private ServiceReceiveDiagnostics.ReceiveEpoch epoch;
+    private ServiceReceiveDiagnostics.ReceiveEpoch trackerEpoch;
     private long decodedWrapperPacketsReceivedTotal;
 
     public RuntimeVisionReceiverDiagnostics() : this(new ServiceReceiveDiagnostics()) { }
@@ -337,6 +338,7 @@ public sealed class RuntimeVisionReceiverDiagnostics
     {
         this.diagnostics = diagnostics;
         epoch = diagnostics.BeginEpoch("vision");
+        trackerEpoch = diagnostics.BeginEpoch("tracker");
     }
 
     /// <summary>正常に復号した Detection 付きパケットの件数。geometry だけの入力は除く。</summary>
@@ -354,10 +356,36 @@ public sealed class RuntimeVisionReceiverDiagnostics
     {
         ArgumentNullException.ThrowIfNull(identity);
         lock (epochGate)
+        {
             epoch = diagnostics.ReplaceIdentityAndBeginEpoch(identity, "vision");
+            trackerEpoch = diagnostics.BeginEpoch("tracker");
+        }
     }
 
     public ServiceReceiveSnapshot Snapshot => diagnostics.GetSnapshots("vision").Single();
+    public IReadOnlyList<ServiceReceiveSnapshot> TrackerSnapshots => diagnostics.GetSnapshots("tracker");
+
+    internal ServiceReceiveDiagnostics.ReceiveAttempt BeginTrackerReceive()
+    {
+        lock (epochGate) return diagnostics.BeginReceive(trackerEpoch);
+    }
+
+    internal void RecordTrackerPacket(
+        ServiceReceiveDiagnostics.ReceiveAttempt attempt,
+        TrackerConnectionLib.TrackerPacketAdapter packet,
+        IPEndPoint remoteEndpoint)
+    {
+        if (packet.Packet.TrackedFrame is null) return;
+        diagnostics.RecordSuccess(
+            attempt,
+            string.Join('\u001f', packet.SourceName, packet.Uuid, remoteEndpoint.ToString()),
+            packet.SourceName,
+            packet.Uuid,
+            remoteEndpoint.ToString());
+    }
+
+    internal void RecordTrackerDecodeFailure(ServiceReceiveDiagnostics.ReceiveAttempt attempt) =>
+        diagnostics.RecordFailure(attempt);
 
     internal void RecordPacketReceived(ServiceReceiveDiagnostics.ReceiveAttempt attempt, bool hasDetection, string? remoteEndpoint)
     {

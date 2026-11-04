@@ -1235,6 +1235,12 @@ public sealed class AppHostApplicationModelTests
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
 
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("true", duckEnvironment["Tracker__Receive__Enabled"].ToString());
+        Assert.Equal("224.5.23.2", duckEnvironment["Tracker__Receive__MulticastAddress"].ToString());
+        Assert.Equal("11010", duckEnvironment["Tracker__Receive__Port"].ToString());
+
         var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tigers-blue"));
         var tigersImage = Assert.Single(tigers.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("tigersmannheim/sumatra", tigersImage.Image);

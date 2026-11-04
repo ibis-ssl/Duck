@@ -29,7 +29,8 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
         var statusReady = !configuration.GetValue<bool>("Testing:ContainerMode") || snapshot.IsReady;
         var count = configuration.GetValue<bool>("Testing:ContainerMode")
             ? snapshot.SuccessfullyDecodedCount : diagnostics.DecodedWrapperPacketsReceivedTotal;
-        return (statusReady ? 200 : 503, new(count, snapshot.IsReady, snapshot));
+        return (statusReady ? 200 : 503,
+            new(count, snapshot.IsReady, snapshot, diagnostics.TrackerSnapshots));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -68,4 +69,8 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
     }
 }
 
-public sealed record RuntimeVisionHealthResponse(long VisionPacketsReceived, bool IsReady, ServiceReceiveSnapshot Diagnostics);
+public sealed record RuntimeVisionHealthResponse(
+    long VisionPacketsReceived,
+    bool IsReady,
+    ServiceReceiveSnapshot Diagnostics,
+    IReadOnlyList<ServiceReceiveSnapshot> TrackerDiagnostics);

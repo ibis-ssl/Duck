@@ -539,6 +539,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         if (testingMode == "match")
         {
             duckBuilder.WithEnvironment("Tracker__PublishUdp", "false");
+            duckBuilder
+                .WithEnvironment("Tracker__Receive__Enabled", "true")
+                .WithEnvironment("Tracker__Receive__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("Tracker__Receive__Port", "11010");
         }
 
         if (enableStandardBaseDuckIdentityBridge)
@@ -620,6 +624,8 @@ if (testingMode == "match")
     builder.Services.AddSingleton<IHostedService>(services => new MatchParticipantStatusProjection(
         services.GetRequiredService<ResourceNotificationService>(),
         participantResources,
+        duck.Resource,
+        duck.Resource.GetEndpoint("vision-health"),
         participantStatusPath,
         recorderOutputDirectory,
         duckRunId,

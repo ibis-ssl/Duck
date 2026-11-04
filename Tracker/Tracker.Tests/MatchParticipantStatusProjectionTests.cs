@@ -1,11 +1,47 @@
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
+using Duck.Testing.Diagnostics;
+using System.Net;
 using System.Text.Json;
 
 namespace Tracker.Tests;
 
 public sealed class MatchParticipantStatusProjectionTests
 {
+    [Fact]
+    public void TigersTrackerOutputRequiresFreshCountedDecodeFromCurrentDuckAndNetworkSource()
+    {
+        var containerId = new string('a', 64);
+        var endpoint = new IPEndPoint(IPAddress.Parse("172.20.0.4"), 11010).ToString();
+        var observedAt = DateTimeOffset.UtcNow;
+        var valid = TrackerSnapshot(containerId, endpoint) with { LastReceivedAt = observedAt };
+
+        Assert.True(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid], "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
+            TimeSpan.FromMilliseconds(100), observedAt, out var selected, out _));
+        Assert.Same(valid, selected);
+
+        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid with { RemoteEndpoint = "172.20.0.9:11010" }], "run-1", "duck-instance", containerId,
+            IPAddress.Parse("172.20.0.4"), TimeSpan.Zero, observedAt, out _, out _));
+        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid with { Identity = new ResourceDiagnosticIdentity("other-run", "duck-instance", containerId, 2) }],
+            "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
+            TimeSpan.Zero, observedAt, out _, out _));
+        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid with { DecodeAgeUpperBound = TimeSpan.FromSeconds(4.95) }],
+            "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
+            TimeSpan.FromMilliseconds(100), observedAt, out _, out _));
+        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid, valid with { SourceUuid = "duplicate" }],
+            "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
+            TimeSpan.Zero, observedAt, out _, out _));
+        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid with { LastReceivedAt = observedAt.AddSeconds(2) }],
+            "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
+            TimeSpan.Zero, observedAt, out _, out _));
+    }
+
     [Fact]
     public void DockerInspectEvidenceRequiresCurrentFullIdLabelsAndNetwork()
     {
@@ -223,4 +259,10 @@ public sealed class MatchParticipantStatusProjectionTests
             },
         },
     });
+
+    private static ServiceReceiveSnapshot TrackerSnapshot(string containerId, string endpoint) =>
+        new(new ResourceDiagnosticIdentity("run-1", "duck-instance", containerId, 2),
+            "tracker", 5, "tigers-key", "TIGERs", "tigers-uuid", endpoint,
+            100, 0, DateTimeOffset.UtcNow, TimeSpan.FromMilliseconds(150),
+            DiagnosticDecodeStatus.Succeeded, true, "Fresh");
 }

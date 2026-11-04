@@ -1,8 +1,10 @@
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Hosting;
 
 namespace Duck.Testing.AppHost;
@@ -371,6 +373,8 @@ internal sealed class MatchParticipantLogEvidenceTracker
 internal sealed class MatchParticipantStatusProjection(
     ResourceNotificationService notifications,
     IReadOnlyList<IResource> resources,
+    IResource duckResource,
+    EndpointReference duckVisionEndpoint,
     string path,
     string recorderOutputDirectory,
     string runId,
@@ -379,9 +383,14 @@ internal sealed class MatchParticipantStatusProjection(
     TimeProvider clock) : BackgroundService, IHostedLifecycleService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly HttpClient VisionHealthClient = new(new SocketsHttpHandler
+    {
+        ConnectTimeout = TimeSpan.FromSeconds(2),
+    }) { Timeout = TimeSpan.FromSeconds(2) };
     private static readonly TimeSpan RecorderIdentityValidationInterval = TimeSpan.FromSeconds(1);
     private readonly MatchParticipantResourceIdMap resourceIds = new(resources);
     private readonly DockerCliCommandRunner docker = new(dockerExecutable);
+    private readonly Dictionary<string, (string Key, long Count)> trackerBaselines = new(StringComparer.Ordinal);
     private readonly object recorderSessionGate = new();
     private readonly SemaphoreSlim recorderSessionTransition = new(1, 1);
     private RecorderReaderSession? recorderSession;
@@ -553,19 +562,28 @@ internal sealed class MatchParticipantStatusProjection(
                         logCursors[resource] = (evidence.Identity, evidence.Cursor);
                     }
                     var currentEvidence = logEvidence.GetEvidence(resource);
-                    serviceEvidenceReady = false;
-                    serviceEvidenceObservedAtUtc = currentEvidence.MatchedMarkers.Count > 0
-                        ? currentEvidence.ObservedAtUtc
-                        : null;
-                    var partial = string.Join(",", currentEvidence.MatchedMarkers.Order(StringComparer.Ordinal));
-                    serviceEvidenceReason = resource.Name switch
+                    if (resource.Name == "tigers-blue" && target is not null)
                     {
-                        "tigers-blue" when evidence is null => "Full-ID inspect/log collection failed or generation/network changed; supplemental evidence was rejected.",
-                        "autoref-tigers" when evidence is null => "Full-ID inspect/log collection failed or generation/network changed; supplemental evidence was rejected.",
-                        "tigers-blue" => $"Target-side receive/decode diagnostics are unavailable; supplemental startup markers observed: {(partial.Length == 0 ? "none" : partial)}.",
-                        "autoref-tigers" => $"Target-side decoded processing evidence is unavailable; supplemental startup markers observed: {(partial.Length == 0 ? "none" : partial)}.",
-                        _ => "Participant diagnostics unavailable.",
-                    };
+                        var trackerEvidence = await CollectTigersTrackerOutputAsync(
+                            resource, target, stoppingToken).ConfigureAwait(false);
+                        serviceEvidenceReady = trackerEvidence.Ready;
+                        serviceEvidenceObservedAtUtc = trackerEvidence.ObservedAtUtc;
+                        serviceEvidenceReason = trackerEvidence.Reason;
+                    }
+                    else
+                    {
+                        serviceEvidenceReady = false;
+                        serviceEvidenceObservedAtUtc = currentEvidence.MatchedMarkers.Count > 0
+                            ? currentEvidence.ObservedAtUtc
+                            : null;
+                        var partial = string.Join(",", currentEvidence.MatchedMarkers.Order(StringComparer.Ordinal));
+                        serviceEvidenceReason = resource.Name switch
+                        {
+                            "autoref-tigers" when evidence is null => "Full-ID inspect/log collection failed or generation/network changed; supplemental evidence was rejected.",
+                            "autoref-tigers" => $"Target-side decoded processing evidence is unavailable; supplemental startup markers observed: {(partial.Length == 0 ? "none" : partial)}.",
+                            _ => "Participant diagnostics unavailable.",
+                        };
+                    }
                 }
                 else if (resource.Name == "ssl-log-recorder" && target is { State: "Running" })
                 {
@@ -790,6 +808,130 @@ internal sealed class MatchParticipantStatusProjection(
 
         previous.Cancel();
         await previous.Completion.ConfigureAwait(false);
+    }
+
+    private async Task<TigersTrackerOutputResult> CollectTigersTrackerOutputAsync(
+        IResource tigersResource,
+        MatchParticipantCurrentTarget tigersTarget,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await CollectTigersTrackerOutputCoreAsync(tigersResource, tigersTarget, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            return TigersTrackerOutputResult.NotReady("Duck vision-health request exceeded its 2-second observation budget.");
+        }
+        catch (Exception exception) when (exception is HttpRequestException or IOException or InvalidOperationException or
+                                          JsonException or FormatException or UnauthorizedAccessException)
+        {
+            return TigersTrackerOutputResult.NotReady($"Current Duck tracker-output observation failed: {exception.Message}");
+        }
+    }
+
+    private async Task<TigersTrackerOutputResult> CollectTigersTrackerOutputCoreAsync(
+        IResource tigersResource,
+        MatchParticipantCurrentTarget tigersTarget,
+        CancellationToken cancellationToken)
+    {
+        var tigersBeforeJson = await docker.CaptureAsync(
+            DockerContainerSpec.CreateInspectArguments(tigersTarget.ContainerId), cancellationToken).ConfigureAwait(false);
+        if (!VerifiedContainerLogEvidence.TryParse(
+                tigersBeforeJson, tigersTarget, runId, stackId, tigersResource.Name, out var tigersBefore) || tigersBefore is null)
+            return TigersTrackerOutputResult.NotReady("TIGERs current full-ID/run/network inspection failed.");
+
+        var duckTarget = resourceIds.GetCurrent(duckResource);
+        if (duckTarget is null || duckTarget.State != "Running")
+            return TigersTrackerOutputResult.NotReady("Duck current container identity is unavailable.");
+        var duckBeforeJson = await docker.CaptureAsync(
+            DockerContainerSpec.CreateInspectArguments(duckTarget.ContainerId), cancellationToken).ConfigureAwait(false);
+        if (!VerifiedContainerLogEvidence.TryParse(
+                duckBeforeJson, duckTarget, runId, stackId, duckResource.Name, out var duckBefore) || duckBefore is null)
+            return TigersTrackerOutputResult.NotReady("Duck current full-ID/run/network inspection failed.");
+        if (!string.Equals(tigersBefore.NetworkId, duckBefore.NetworkId, StringComparison.Ordinal) ||
+            !IPAddress.TryParse(tigersBefore.NetworkAddress, out var tigersAddress))
+            return TigersTrackerOutputResult.NotReady("TIGERs and Duck are not verified on one current network.");
+
+        var endpointValue = await duckVisionEndpoint.GetValueAsync(cancellationToken).ConfigureAwait(false);
+        if (!Uri.TryCreate(endpointValue?.ToString(), UriKind.Absolute, out var healthUri))
+            return TigersTrackerOutputResult.NotReady("Duck vision-health endpoint is not allocated.");
+        healthUri = new Uri(healthUri, "/health/vision");
+
+        var requestStarted = clock.GetUtcNow();
+        using var response = await VisionHealthClient.GetAsync(healthUri, cancellationToken).ConfigureAwait(false);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var tigersAfterJson = await docker.CaptureAsync(
+            DockerContainerSpec.CreateInspectArguments(tigersTarget.ContainerId), cancellationToken).ConfigureAwait(false);
+        var duckAfterJson = await docker.CaptureAsync(
+            DockerContainerSpec.CreateInspectArguments(duckTarget.ContainerId), cancellationToken).ConfigureAwait(false);
+        if (!VerifiedContainerLogEvidence.TryParse(
+                tigersAfterJson, tigersTarget, runId, stackId, tigersResource.Name, out var tigersAfter) ||
+            tigersAfter is null || !tigersBefore.IsSameGeneration(tigersAfter) ||
+            !VerifiedContainerLogEvidence.TryParse(
+                duckAfterJson, duckTarget, runId, stackId, duckResource.Name, out var duckAfter) ||
+            duckAfter is null || !duckBefore.IsSameGeneration(duckAfter))
+            return TigersTrackerOutputResult.NotReady("TIGERs or Duck generation/network changed during tracker-output observation.");
+
+        var currentTigers = resourceIds.GetCurrent(tigersResource);
+        var currentDuck = resourceIds.GetCurrent(duckResource);
+        if (currentTigers is null || currentTigers.ResourceId != tigersTarget.ResourceId ||
+            currentTigers.ContainerId != tigersTarget.ContainerId || currentTigers.State != "Running" ||
+            currentDuck is null || currentDuck.ResourceId != duckTarget.ResourceId ||
+            currentDuck.ContainerId != duckTarget.ContainerId || currentDuck.State != "Running")
+            return TigersTrackerOutputResult.NotReady("AppHost resource identities changed during tracker-output observation.");
+
+        var decisionTime = clock.GetUtcNow();
+
+        VisionHealthTrackerResponse? trackerResponse;
+        try
+        {
+            trackerResponse = JsonSerializer.Deserialize<VisionHealthTrackerResponse>(body, JsonOptions);
+        }
+        catch (JsonException)
+        {
+            return TigersTrackerOutputResult.NotReady("Duck vision-health response did not contain tracker diagnostics.");
+        }
+
+        if (!TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+                trackerResponse?.TrackerDiagnostics ?? [],
+                runId,
+                duckTarget.ResourceId,
+                duckTarget.ContainerId,
+                tigersAddress,
+                decisionTime - requestStarted,
+                decisionTime,
+                out var snapshot,
+                out var trackerReason) || snapshot is null)
+            return TigersTrackerOutputResult.NotReady(trackerReason);
+        var baselineKey = string.Join('\u001f', runId, tigersBefore.ContainerId, tigersBefore.StartedAtUtc,
+            tigersBefore.RestartCount, tigersBefore.NetworkId, tigersBefore.NetworkAddress,
+            duckBefore.ContainerId, duckBefore.StartedAtUtc, duckBefore.RestartCount, duckBefore.NetworkId,
+            snapshot.Identity!.Generation, snapshot.ReceiverEpoch, snapshot.SourceKey, snapshot.SourceUuid,
+            snapshot.RemoteEndpoint);
+        if (trackerBaselines.TryGetValue(tigersResource.Name, out var previous) &&
+            string.Equals(previous.Key, baselineKey, StringComparison.Ordinal) &&
+            snapshot.SuccessfullyDecodedCount > previous.Count)
+        {
+            trackerBaselines[tigersResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
+            return new(true, snapshot.LastReceivedAt,
+                "Duck observed fresh, newly decoded TIGERs tracker output from the current full-ID/run/network generation; this establishes tracker-output preparation only.");
+        }
+
+        trackerBaselines[tigersResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
+        return TigersTrackerOutputResult.NotReady("A fresh current TIGERs tracker count baseline is recorded; waiting for a new decoded packet.");
+    }
+
+    private sealed record VisionHealthTrackerResponse(IReadOnlyList<ServiceReceiveSnapshot>? TrackerDiagnostics);
+
+    private sealed record TigersTrackerOutputResult(bool Ready, DateTimeOffset? ObservedAtUtc, string Reason)
+    {
+        internal static TigersTrackerOutputResult NotReady(string reason) => new(false, null, reason);
     }
 
     private async Task<ContainerLogCollection?> CollectCurrentContainerLogsAsync(
