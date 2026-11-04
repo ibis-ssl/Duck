@@ -97,7 +97,7 @@ internal sealed class RefereeApiMatcher : IRefereeLifecycleObservationSource
                 api.RequestSequence > previousRequestSequence)
             {
                 return new(api.RequestSequence, udp.Command, api.State.Command.ToString(),
-                    api.State.Phase.ToString(), api.State.Stage, api.State.StageTimeLeft);
+                    api.State.Phase.ToString(), api.State.Stage, api.State.StageTimeLeft, api.State);
             }
 
             await completed.WaitAsync(cancellationToken).ConfigureAwait(false);

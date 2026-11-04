@@ -298,7 +298,7 @@ public sealed class MatchControllerWorkerTests
             ["MatchController:ResultPath"] = resultPath,
         }).Build();
         return new(new RefereeDriverFixture(source, control,
-            source as IRefereeLifecycleObservationSource), readiness, configuration);
+            source as IRefereeLifecycleObservationSource), readiness, new RecordingSimulatorBallControlClient(), configuration);
     }
 
     private static MatchControllerReadiness CompleteReadiness()
@@ -348,6 +348,12 @@ public sealed class MatchControllerWorkerTests
             FinalCalls++;
             return Task.FromResult(results[index++]);
         }
+
+        public Task<MatchParticipantStatusEvidence?> ReadCurrentParticipantEvidenceAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(results.FirstOrDefault()?.ParticipantEvidence);
+        }
     }
 
     private sealed class RecordingControlClient : IGameControllerControlClient
@@ -375,6 +381,18 @@ public sealed class MatchControllerWorkerTests
         public Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken cancellationToken)
         {
             Actions.Add(action);
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingSimulatorBallControlClient : ISimulatorBallControlClient
+    {
+        public int SendCalls { get; private set; }
+
+        public Task SendBallToCenterAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            SendCalls++;
             return Task.CompletedTask;
         }
     }

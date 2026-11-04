@@ -5,7 +5,12 @@ public sealed record RefereeCommandSnapshot(
     uint CommandCounter,
     string YellowTeamName = "",
     Referee.Types.Stage? Stage = null,
-    ulong? PacketTimestamp = null);
+    ulong? PacketTimestamp = null,
+    uint BlueScore = 0,
+    uint YellowScore = 0,
+    Referee.Types.Command? NextCommand = null,
+    float? DesignatedPositionX = null,
+    float? DesignatedPositionY = null);
 
 public enum GameControllerContinueAction
 {
@@ -31,7 +36,8 @@ public sealed record RefereeLifecycleObservation(
     string ApiCommand,
     string ApiPhase,
     string? ApiStage,
-    TimeSpan? ApiStageTimeLeft);
+    TimeSpan? ApiStageTimeLeft,
+    GameControllerMatchSnapshot? ApiSnapshot = null);
 
 /// <summary>Waits on the existing RefereeObservationWorker updates; it does not start another poller.</summary>
 public interface IRefereeLifecycleObservationSource
@@ -45,14 +51,21 @@ public sealed record GameControllerContinueActionStatus(
     string Type,
     string ForTeam,
     string State,
-    bool HasContinuationIssues);
+    bool HasContinuationIssues,
+    IReadOnlyList<string>? ContinuationIssues = null);
 
 public sealed record GameControllerContinuationState(
     string Command,
     string Phase,
     string? Stage,
     TimeSpan? StageTimeLeft,
-    IReadOnlyList<GameControllerContinueActionStatus> ContinueActions);
+    IReadOnlyList<GameControllerContinueActionStatus> ContinueActions,
+    string? NextCommand = null,
+    string? NextCommandForTeam = null,
+    uint? BlueScore = null,
+    uint? YellowScore = null,
+    float? PlacementX = null,
+    float? PlacementY = null);
 
 public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot)
 {
@@ -120,6 +133,9 @@ public sealed class RefereeDriverFixture
 
     public Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken) =>
         controlClient.SetAutoContinueAsync(enabled, cancellationToken);
+
+    public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken) =>
+        controlClient.ReadContinuationStateAsync(cancellationToken);
 
     public async Task<RefereeCommandSnapshot> DriveToActiveAsync(CancellationToken cancellationToken)
     {
@@ -278,7 +294,8 @@ public sealed class RefereeDriverFixture
     public async Task<RefereeMatchTerminationResult> ContinueMatchUntilPostGameAsync(
         RefereeCommandSnapshot latestSnapshot,
         TimeSpan maximumDuration,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Func<RefereeLifecycleObservation, CancellationToken, Task>? onObservation = null)
     {
         ArgumentNullException.ThrowIfNull(latestSnapshot);
         if (lifecycleObservations is null)
@@ -308,6 +325,8 @@ public sealed class RefereeDriverFixture
                 throw new InvalidOperationException("Game Controller lifecycle observation sequence did not advance.");
             requestSequence = observation.RequestSequence;
             EnsureNonRegressingSnapshot(lastSnapshot, observation.Udp);
+            if (onObservation is not null)
+                await onObservation(observation, maximumDurationCancellation.Token).ConfigureAwait(false);
             if (pendingAction is { } pending)
             {
                 if (IsExpectedContinueActionEffect(pending.Action, pending.Before, observation.Udp))

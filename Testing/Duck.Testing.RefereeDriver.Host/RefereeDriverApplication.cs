@@ -84,6 +84,8 @@ internal static class RefereeDriverApplication
             {
                 builder.Services.AddHttpClient();
                 builder.Services.AddSingleton<IMatchControllerReadinessProbe, MatchControllerReadinessProbe>();
+                builder.Services.TryAddSingleton<ISimulatorBallControlClient>(
+                    _ => new SimulatorBallControlClient());
                 builder.Services.AddHostedService<MatchControllerWorker>();
             }
             else

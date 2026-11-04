@@ -50,7 +50,12 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
                     referee.CommandCounter,
                     referee.Yellow?.Name ?? string.Empty,
                     referee.Stage,
-                    referee.PacketTimestamp);
+                    referee.PacketTimestamp,
+                    referee.Blue?.Score ?? 0,
+                    referee.Yellow?.Score ?? 0,
+                    referee.HasNextCommand ? referee.NextCommand : null,
+                    referee.DesignatedPosition is not null ? referee.DesignatedPosition.X : null,
+                    referee.DesignatedPosition is not null ? referee.DesignatedPosition.Y : null);
             }
         }
     }

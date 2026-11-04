@@ -121,7 +121,12 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                             packet.CommandCounter,
                             packet.Yellow?.Name ?? "",
                             packet.Stage,
-                            packet.PacketTimestamp),
+                            packet.PacketTimestamp,
+                            packet.Blue?.Score ?? 0,
+                            packet.Yellow?.Score ?? 0,
+                            packet.HasNextCommand ? packet.NextCommand : null,
+                            packet.DesignatedPosition is not null ? packet.DesignatedPosition.X : null,
+                            packet.DesignatedPosition is not null ? packet.DesignatedPosition.Y : null),
                         endpoint, receiveEpoch.Number, acceptedCount);
                 }
             }

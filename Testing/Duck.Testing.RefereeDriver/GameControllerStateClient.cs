@@ -147,7 +147,8 @@ internal sealed class GameControllerStateClient
                     if (ReadWindowExpired(started))
                         return null;
                     return new(match.Command.ToString(), match.Phase.ToString(), match.Stage,
-                        match.StageTimeLeft, actions);
+                        match.StageTimeLeft, actions, match.NextCommand, match.NextCommandForTeam,
+                        match.BlueScore, match.YellowScore, match.PlacementX, match.PlacementY);
                 }
             }
         }
@@ -184,9 +185,12 @@ internal sealed class GameControllerStateClient
             var state = ReadString(action, "state");
             if (type is null || forTeam is null || state is null)
                 return null;
-            var hasIssues = !action.TryGetProperty("continuationIssues", out var issues) ||
-                issues.ValueKind != JsonValueKind.Array || issues.GetArrayLength() != 0;
-            result.Add(new(type, forTeam, state, hasIssues));
+            var issueTexts = new List<string>();
+            if (!action.TryGetProperty("continuationIssues", out var issues) || issues.ValueKind != JsonValueKind.Array)
+                return null;
+            foreach (var issue in issues.EnumerateArray())
+                issueTexts.Add(issue.ValueKind == JsonValueKind.String ? issue.GetString() ?? string.Empty : issue.GetRawText());
+            result.Add(new(type, forTeam, state, issueTexts.Count != 0, issueTexts));
         }
         return result;
     }
@@ -229,7 +233,15 @@ public sealed record GameControllerMatchSnapshot(
     GameControllerCommandKind Command,
     GameControllerMatchPhase Phase,
     string? Stage = null,
-    TimeSpan? StageTimeLeft = null);
+    TimeSpan? StageTimeLeft = null,
+    string? NextCommand = null,
+    string? NextCommandForTeam = null,
+    uint? BlueScore = null,
+    uint? YellowScore = null,
+    float? PlacementX = null,
+    float? PlacementY = null,
+    string? CommandForTeam = null,
+    string? PhaseForTeam = null);
 
 /// <summary>一回の状態読取に明示注入する有限窓と、完成message全体のbyte上限。</summary>
 internal sealed record GameControllerStateReadOptions

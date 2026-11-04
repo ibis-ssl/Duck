@@ -70,6 +70,7 @@ internal interface IMatchControllerReadinessProbe
     Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken);
     Task<MatchControllerReadiness> ReadFinalReadinessAsync(
         RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken);
+    Task<MatchParticipantStatusEvidence?> ReadCurrentParticipantEvidenceAsync(CancellationToken cancellationToken);
 }
 
 internal sealed class MatchControllerReadinessProbe(
@@ -127,6 +128,9 @@ internal sealed class MatchControllerReadinessProbe(
             : $"apiReferee={match.Reason}, visionReady={visionReady}, participantResourcesReady={participantsReady}";
         return new(participantResources, participantsReady, match.IsReady, visionReady, reason, participantEvidence);
     }
+
+    public Task<MatchParticipantStatusEvidence?> ReadCurrentParticipantEvidenceAsync(CancellationToken cancellationToken) =>
+        ReadParticipantEvidenceAsync(cancellationToken);
 
     private async Task<MatchParticipantStatusEvidence?> ReadParticipantEvidenceAsync(CancellationToken cancellationToken)
     {
@@ -256,11 +260,13 @@ internal sealed record MatchControllerResult(
     ulong? FinalPacketTimestamp,
     MatchControllerReadiness? InitialReadiness,
     MatchControllerReadiness? FinalReadiness,
-    string? Failure);
+    string? Failure,
+    IReadOnlyList<BallPlacementFixtureEvent>? BallPlacementFixtureEvents = null);
 
 internal sealed class MatchControllerWorker(
     RefereeDriverFixture driver,
     IMatchControllerReadinessProbe readinessProbe,
+    ISimulatorBallControlClient simulatorBallControl,
     IConfiguration configuration) : BackgroundService
 {
     private readonly TimeSpan maximumMatchDuration = ReadDuration(configuration["MatchController:MaximumDuration"]);
@@ -280,6 +286,8 @@ internal sealed class MatchControllerWorker(
         string? terminationKind = null;
         MatchControllerReadiness? initialReadiness = null;
         MatchControllerReadiness? finalReadiness = null;
+        SimulatorBallPlacementFixture? ballPlacementFixture = null;
+        var ballPlacementEvents = new List<BallPlacementFixtureEvent>();
         string? failure = null;
         try
         {
@@ -299,8 +307,16 @@ internal sealed class MatchControllerWorker(
                 throw new InvalidOperationException(
                     "The Game Controller did not confirm autoContinue=true after observing NORMAL_START.");
 
+            var initialSimulator = initialReadiness.ParticipantEvidence?.Resources.SingleOrDefault(
+                resource => resource.ResourceId == "simulator")
+                ?? throw new InvalidOperationException("Initial readiness did not retain the current Simulator identity.");
+            ballPlacementFixture = new SimulatorBallPlacementFixture(
+                driver, readinessProbe, simulatorBallControl, initialSimulator, finalSnapshot);
+            ballPlacementEvents = ballPlacementFixture.Events;
+
             var termination = await driver.ContinueMatchUntilPostGameAsync(
-                finalSnapshot, maximumMatchDuration, cancellationToken).ConfigureAwait(false);
+                finalSnapshot, maximumMatchDuration, cancellationToken,
+                ballPlacementFixture.ObserveAsync).ConfigureAwait(false);
             finalSnapshot = termination.LastSnapshot;
             terminationKind = termination.Kind.ToString();
 
@@ -309,19 +325,23 @@ internal sealed class MatchControllerWorker(
                 .ConfigureAwait(false);
             if (!termination.IsSuccess)
                 failure = "MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME.";
+            else if (ballPlacementFixture.HasUnconfirmedPlacement)
+                failure = "MATCH_BALL_PLACEMENT_UNCONFIRMED: a sent ball-only fixture did not receive a fresh matched GC readiness confirmation.";
             else if (!finalReadiness.IsComplete)
                 failure = finalReadiness.FailureReason ?? "MATCH_FINAL_EVIDENCE_MISSING: final inputs were not ready.";
 
             return await PersistAsync(new(
                 failure is null ? "passed" : "failed", stage, terminationKind,
-                finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness, failure)).ConfigureAwait(false);
+                finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
+                failure, ballPlacementEvents)).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
             failure = exception.ToString();
             return await PersistAsync(new(
                 "failed", stage, terminationKind,
-                finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness, failure)).ConfigureAwait(false);
+                finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
+                failure, ballPlacementEvents)).ConfigureAwait(false);
         }
     }
 

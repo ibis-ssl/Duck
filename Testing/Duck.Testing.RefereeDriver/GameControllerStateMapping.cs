@@ -49,7 +49,11 @@ internal static class GameControllerStateMapping
         };
         return command == GameControllerCommandKind.Unknown || phase == GameControllerMatchPhase.Unknown
             ? null
-            : new(command, phase, ReadStageName(matchState), ReadDuration(matchState));
+            : new(command, phase, ReadStageName(matchState), ReadDuration(matchState),
+                ReadTypeName(matchState, "nextCommand"), ReadTeamName(matchState, "nextCommand"),
+                ReadTeamScore(matchState, "BLUE"), ReadTeamScore(matchState, "YELLOW"),
+                ReadPlacementCoordinate(matchState, "x"), ReadPlacementCoordinate(matchState, "y"),
+                ReadTeamName(matchState, "command"), ReadTeamName(matchState, "gameState"));
     }
 
     /// <summary>指令と試合状態がともに対応する組だけを一致とし、列挙値の数値を相互変換しない。</summary>
@@ -94,6 +98,33 @@ internal static class GameControllerStateMapping
                 type.ValueKind == JsonValueKind.String
                     ? type.GetString()
                     : null;
+    }
+
+    private static string? ReadTeamName(JsonElement matchState, string propertyName)
+    {
+        if (!matchState.TryGetProperty(propertyName, out var team) || team.ValueKind != JsonValueKind.Object)
+            return null;
+        return team.TryGetProperty("forTeam", out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+    }
+
+    private static uint? ReadTeamScore(JsonElement matchState, string teamName)
+    {
+        if (!matchState.TryGetProperty("teamState", out var teams) || teams.ValueKind != JsonValueKind.Object ||
+            !teams.TryGetProperty(teamName, out var team) || team.ValueKind != JsonValueKind.Object ||
+            !team.TryGetProperty("goals", out var score) || !score.TryGetUInt32(out var value))
+            return null;
+        return value;
+    }
+
+    private static float? ReadPlacementCoordinate(JsonElement matchState, string coordinate)
+    {
+        if (!matchState.TryGetProperty("placementPos", out var placement) || placement.ValueKind != JsonValueKind.Object ||
+            !placement.TryGetProperty(coordinate, out var value) || !value.TryGetSingle(out var number) ||
+            !float.IsFinite(number))
+            return null;
+        return number;
     }
 
     private static TimeSpan? ReadDuration(JsonElement matchState)

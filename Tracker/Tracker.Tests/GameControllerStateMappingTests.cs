@@ -21,7 +21,7 @@ public sealed class GameControllerStateMappingTests
         var json = System.Text.Json.JsonSerializer.Serialize(new
         {
             matchState = new { command = new { type = command, forTeam = "UNKNOWN" },
-                gameState = new { type = phase } },
+                gameState = new { type = phase, forTeam = "YELLOW" } },
         });
         using var socket = new OneOutputSocket(json);
         var observed = await CreateClient(socket).ReadMatchStateAsync(CancellationToken.None)
@@ -30,6 +30,8 @@ public sealed class GameControllerStateMappingTests
         Assert.NotNull(observed);
         Assert.Equal(expectedCommand, observed.Command.ToString());
         Assert.Equal(expectedPhase, observed.Phase.ToString());
+        Assert.Equal("UNKNOWN", observed.CommandForTeam);
+        Assert.Equal("YELLOW", observed.PhaseForTeam);
         Assert.Equal(0, socket.SendCalls);
         Assert.Equal(1, socket.DisposeCalls);
     }
@@ -38,24 +40,32 @@ public sealed class GameControllerStateMappingTests
     public async Task ReadsContinuationActionsAcrossSeparateCurrentOutputMessages()
     {
         using var socket = new OneOutputSocket(
-            """{"matchState":{"command":{"type":"HALT","forTeam":"UNKNOWN"},"gameState":{"type":"HALT"},"stage":"NORMAL_FIRST_HALF","stageTimeLeft":"-1s"}}""",
-            """{"gcState":{"continueActions":[{"type":"RESUME_FROM_HALT","forTeam":"UNKNOWN","state":"READY_MANUAL","continuationIssues":[]}]}}""");
+            """{"matchState":{"command":{"type":"STOP","forTeam":"UNKNOWN"},"gameState":{"type":"STOP"},"stage":"NORMAL_FIRST_HALF","stageTimeLeft":"-1s","teamState":{"BLUE":{"goals":1},"YELLOW":{"goals":0}},"placementPos":{"x":0,"y":0},"nextCommand":{"type":"KICKOFF","forTeam":"YELLOW"}}}""",
+            """{"gcState":{"continueActions":[{"type":"NEXT_COMMAND","forTeam":"YELLOW","state":"BLOCKED","continuationIssues":["Ball is 3.72 m (>1.00 m) away from placement pos"]}]}}""");
 
         var observed = await CreateClient(socket).ReadContinuationStateAsync(CancellationToken.None)
             .WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.NotNull(observed);
-        Assert.Equal("Halt", observed.Command);
-        Assert.Equal("Halt", observed.Phase);
+        Assert.Equal("Stop", observed.Command);
+        Assert.Equal("Stop", observed.Phase);
         Assert.Equal("NORMAL_FIRST_HALF", observed.Stage);
         Assert.Equal(TimeSpan.FromSeconds(-1), observed.StageTimeLeft);
+        Assert.Equal("KICKOFF", observed.NextCommand);
+        Assert.Equal("YELLOW", observed.NextCommandForTeam);
+        Assert.Equal((uint)1, observed.BlueScore);
+        Assert.Equal((uint)0, observed.YellowScore);
+        Assert.Equal(0, observed.PlacementX);
+        Assert.Equal(0, observed.PlacementY);
         Assert.Collection(observed.ContinueActions,
             action =>
             {
-                Assert.Equal("RESUME_FROM_HALT", action.Type);
-                Assert.Equal("UNKNOWN", action.ForTeam);
-                Assert.Equal("READY_MANUAL", action.State);
-                Assert.False(action.HasContinuationIssues);
+                Assert.Equal("NEXT_COMMAND", action.Type);
+                Assert.Equal("YELLOW", action.ForTeam);
+                Assert.Equal("BLOCKED", action.State);
+                Assert.True(action.HasContinuationIssues);
+                Assert.Equal("Ball is 3.72 m (>1.00 m) away from placement pos",
+                    Assert.Single(action.ContinuationIssues!));
             });
     }
 
