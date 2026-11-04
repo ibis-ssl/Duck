@@ -1284,6 +1284,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("sha256:" + tigersImage.SHA256, lockedImages.GetProperty("sumatra").GetProperty("digest").GetString());
         Assert.Equal("robocupssl/ssl-log-recorder:latest", lockedImages.GetProperty("ssl-log-recorder").GetProperty("reference").GetString());
         Assert.Equal("sha256:" + recorderImage.SHA256, lockedImages.GetProperty("ssl-log-recorder").GetProperty("digest").GetString());
+        var recorderRuntimeArgs = await GetContainerRuntimeArgsAsync(recorder);
+        Assert.Equal(["--stop-signal", "SIGINT", "--stop-timeout", "30"], recorderRuntimeArgs.TakeLast(4));
         Assert.Equal("tigersmannheim/auto-referee:1.2.0", lockedImages.GetProperty("tigers-auto-referee").GetProperty("reference").GetString());
         Assert.Equal("sha256:" + autoRefImage.SHA256, lockedImages.GetProperty("tigers-auto-referee").GetProperty("digest").GetString());
     }
