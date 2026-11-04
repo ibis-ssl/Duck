@@ -1060,7 +1060,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", simulatorImage.Image);
         Assert.Equal("a52b6bd", simulatorImage.Tag);
         Assert.Equal(
-            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
+            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12345", "--ibis-team-color", "yellow"],
             await GetArgumentsAsync(simulator, callbackLimit: 1));
 
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));

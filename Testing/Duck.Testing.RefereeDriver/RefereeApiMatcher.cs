@@ -178,9 +178,11 @@ internal sealed class RefereeApiMatcher
         expected.Diagnostic.Identity == actual.Diagnostic.Identity &&
         expected.Diagnostic.SourceKey == actual.Diagnostic.SourceKey &&
         expected.Diagnostic.ReceiverEpoch == actual.Diagnostic.ReceiverEpoch &&
-        expected.Diagnostic.SuccessfullyDecodedCount == actual.Diagnostic.SuccessfullyDecodedCount &&
+        actual.Diagnostic.SuccessfullyDecodedCount >= expected.Diagnostic.SuccessfullyDecodedCount &&
         expected.Command.Command == actual.Command.Command &&
-        expected.Command.CommandCounter == actual.Command.CommandCounter;
+        expected.Command.CommandCounter == actual.Command.CommandCounter &&
+        expected.Command.YellowTeamName == actual.Command.YellowTeamName &&
+        expected.Command.Stage == actual.Command.Stage;
 
     /// <summary>新しいAPI要求やURL設定世代の証跡を、別の要求の結果へ流用しない。</summary>
     private static bool SameApiContext(GameControllerApiObservation expected, GameControllerApiObservation actual) =>

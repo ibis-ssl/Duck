@@ -285,20 +285,29 @@ public sealed class RefereeApiMatcherTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task NewUdpPacketDuringApiReadInvalidatesOldPair(bool changesCommand)
+    public async Task UdpHeartbeatDuringApiReadKeepsSameCommandPairButCommandChangeInvalidatesIt(bool changesCommand)
     {
         await using var fixture = await MatchFixture.CreateAsync();
         var socket = new ApiSocket("HALT", "HALT", pending: true);
         fixture.Api.Queue(socket);
         var read = fixture.ReadAsync();
         await RequireApiEntryAsync(socket, read);
-        await fixture.SupplyAsync(changesCommand ? global::Referee.Types.Command.Stop : global::Referee.Types.Command.Halt,
-            changesCommand ? 8u : 7u);
+        var packet = CreatePacket(
+            changesCommand ? 8u : 7u,
+            changesCommand ? global::Referee.Types.Command.Stop : global::Referee.Types.Command.Halt);
+        packet.PacketTimestamp = 2;
+        await fixture.SupplyBytesAsync(packet.ToByteArray());
         Assert.Equal(3, Assert.Single(fixture.Diagnostics.GetSnapshots(RefereeReceiveService.InputId)).SuccessfullyDecodedCount);
         socket.Release.TrySetResult();
 
-        Assert.False((await read.WaitAsync(TimeSpan.FromSeconds(5))).IsReady);
-        Assert.False(fixture.Matcher.GetCurrent().IsReady);
+        var result = await read.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(!changesCommand, result.IsReady);
+        Assert.Equal(!changesCommand, fixture.Matcher.GetCurrent().IsReady);
+        if (!changesCommand)
+        {
+            Assert.Equal(2UL, result.Udp!.Command.PacketTimestamp);
+            Assert.Equal(7U, result.Udp.Command.CommandCounter);
+        }
         Assert.Equal(1, fixture.Receiver.MaxActiveReceives);
     }
 
