@@ -435,6 +435,11 @@ public sealed class RefereeDriverHostCompositionTests
     private sealed class RecordingControl : IGameControllerControlClient
     {
         internal ConcurrentBag<GameControllerContinueAction> Actions { get; } = [];
+        public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return Task.FromResult<GameControllerContinuationState?>(null);
+        }
         public Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();

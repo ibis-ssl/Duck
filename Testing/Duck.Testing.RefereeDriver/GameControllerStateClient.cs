@@ -1,11 +1,16 @@
 using System.Net.WebSockets;
+using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Duck.Testing.RefereeDriver;
 
 /// <summary>注入された内部接続先から試合状態だけを読む観測専用clientの境界。</summary>
 internal sealed class GameControllerStateClient
 {
+    private static readonly Regex GoDurationPart = new(
+        @"(?<value>\d+(?:\.\d+)?)(?<unit>ns|us|µs|ms|s|m|h)",
+        RegexOptions.CultureInvariant | RegexOptions.Compiled);
     private readonly Uri endpoint;
     private readonly Func<Uri, CancellationToken, Task<WebSocket>> connect;
     private readonly GameControllerStateReadOptions options;
@@ -91,6 +96,106 @@ internal sealed class GameControllerStateClient
     }
 
     /// <summary>読取開始からの単調経過で期限到達と時計逆行を拒否し、遅い正常応答も成功にしない。</summary>
+    /// <summary>Reads current match state and the controller's explicitly offered continue actions.</summary>
+    internal async Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (options.MaximumMessageBytes <= 0 || options.Timeout <= TimeSpan.Zero ||
+            options.Timeout > TimeSpan.FromMilliseconds(uint.MaxValue - 1))
+            return null;
+
+        var started = clock.GetTimestamp();
+        using var deadline = new CancellationTokenSource(options.Timeout, clock);
+        using var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
+        try
+        {
+            using var socket = await connect(endpoint, operation.Token).ConfigureAwait(false);
+            GameControllerMatchSnapshot? match = null;
+            IReadOnlyList<GameControllerContinueActionStatus>? actions = null;
+            var buffer = new byte[4096];
+            while (true)
+            {
+                operation.Token.ThrowIfCancellationRequested();
+                if (ReadWindowExpired(started))
+                    return null;
+                using var message = new MemoryStream();
+                while (true)
+                {
+                    var received = await socket.ReceiveAsync(buffer.AsMemory(), operation.Token).ConfigureAwait(false);
+                    operation.Token.ThrowIfCancellationRequested();
+                    if (ReadWindowExpired(started) || received.MessageType != WebSocketMessageType.Text ||
+                        message.Length + received.Count > options.MaximumMessageBytes)
+                        return null;
+                    message.Write(buffer, 0, received.Count);
+                    if (received.EndOfMessage)
+                        break;
+                }
+
+                using var output = JsonDocument.Parse(message.GetBuffer().AsMemory(0, checked((int)message.Length)));
+                if (output.RootElement.ValueKind != JsonValueKind.Object)
+                    return null;
+                if (output.RootElement.TryGetProperty("matchState", out var matchState) &&
+                    matchState.ValueKind == JsonValueKind.Object)
+                    match = GameControllerStateMapping.Normalize(matchState);
+                if (output.RootElement.TryGetProperty("gcState", out var gcState) &&
+                    gcState.ValueKind == JsonValueKind.Object)
+                    actions = ReadContinueActions(gcState);
+
+                if (match is not null && actions is not null)
+                {
+                    operation.Token.ThrowIfCancellationRequested();
+                    if (ReadWindowExpired(started))
+                        return null;
+                    return new(match.Command.ToString(), match.Phase.ToString(), match.Stage,
+                        match.StageTimeLeft, actions);
+                }
+            }
+        }
+        catch (OperationCanceledException) when (deadline.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+        catch (JsonException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+        catch (WebSocketException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+    }
+
+    private static IReadOnlyList<GameControllerContinueActionStatus>? ReadContinueActions(JsonElement gcState)
+    {
+        if (!gcState.TryGetProperty("continueActions", out var actions) ||
+            actions.ValueKind != JsonValueKind.Array)
+            return null;
+
+        var result = new List<GameControllerContinueActionStatus>();
+        foreach (var action in actions.EnumerateArray())
+        {
+            if (action.ValueKind != JsonValueKind.Object)
+                return null;
+            var type = ReadString(action, "type");
+            var forTeam = ReadString(action, "forTeam");
+            var state = ReadString(action, "state");
+            if (type is null || forTeam is null || state is null)
+                return null;
+            var hasIssues = !action.TryGetProperty("continuationIssues", out var issues) ||
+                issues.ValueKind != JsonValueKind.Array || issues.GetArrayLength() != 0;
+            result.Add(new(type, forTeam, state, hasIssues));
+        }
+        return result;
+    }
+
+    private static string? ReadString(JsonElement element, string property) =>
+        element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+
     private bool ReadWindowExpired(long started)
     {
         var elapsed = clock.GetElapsedTime(started, clock.GetTimestamp());
@@ -99,7 +204,7 @@ internal sealed class GameControllerStateClient
 }
 
 /// <summary>APIの数値列挙やUDPの整数値を直接使わない、明示的な指令区分。</summary>
-internal enum GameControllerCommandKind
+public enum GameControllerCommandKind
 {
     Unknown,
     Halt,
@@ -110,7 +215,7 @@ internal enum GameControllerCommandKind
 }
 
 /// <summary>公開matchStateから正規化する試合状態。未確認は成功状態にしない。</summary>
-internal enum GameControllerMatchPhase
+public enum GameControllerMatchPhase
 {
     Unknown,
     Halt,
@@ -120,9 +225,11 @@ internal enum GameControllerMatchPhase
 }
 
 /// <summary>API公開状態の正規化結果。UDP件数・受信時刻・所有証明は含めない。</summary>
-internal sealed record GameControllerMatchSnapshot(
+public sealed record GameControllerMatchSnapshot(
     GameControllerCommandKind Command,
-    GameControllerMatchPhase Phase);
+    GameControllerMatchPhase Phase,
+    string? Stage = null,
+    TimeSpan? StageTimeLeft = null);
 
 /// <summary>一回の状態読取に明示注入する有限窓と、完成message全体のbyte上限。</summary>
 internal sealed record GameControllerStateReadOptions

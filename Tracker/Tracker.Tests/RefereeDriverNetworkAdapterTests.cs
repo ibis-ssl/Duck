@@ -157,6 +157,13 @@ public sealed class RefereeDriverNetworkAdapterTests
             return Task.CompletedTask;
         }
 
+        public Task<GameControllerContinuationState?> ReadContinuationStateAsync(
+            Uri endpoint, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<GameControllerContinuationState?>(null);
+        }
+
         public Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

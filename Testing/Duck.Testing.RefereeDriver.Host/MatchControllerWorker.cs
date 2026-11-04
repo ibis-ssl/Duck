@@ -260,7 +260,6 @@ internal sealed record MatchControllerResult(
 
 internal sealed class MatchControllerWorker(
     RefereeDriverFixture driver,
-    IRefereeCommandSource commandSource,
     IMatchControllerReadinessProbe readinessProbe,
     IConfiguration configuration) : BackgroundService
 {
@@ -300,8 +299,8 @@ internal sealed class MatchControllerWorker(
                 throw new InvalidOperationException(
                     "The Game Controller did not confirm autoContinue=true after observing NORMAL_START.");
 
-            var termination = await RefereeDriverFixture.WaitForMatchTerminationAsync(
-                commandSource, finalSnapshot, maximumMatchDuration, cancellationToken).ConfigureAwait(false);
+            var termination = await driver.ContinueMatchUntilPostGameAsync(
+                finalSnapshot, maximumMatchDuration, cancellationToken).ConfigureAwait(false);
             finalSnapshot = termination.LastSnapshot;
             terminationKind = termination.Kind.ToString();
 

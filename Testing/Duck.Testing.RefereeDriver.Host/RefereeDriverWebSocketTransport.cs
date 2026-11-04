@@ -24,6 +24,12 @@ internal sealed class RefereeDriverWebSocketTransport : IGameControllerWebSocket
     public Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken) =>
         GameControllerWebSocketTransportOperations.ReadAutoContinueAsync(connect, endpoint, cancellationToken);
 
+    public Task<GameControllerContinuationState?> ReadContinuationStateAsync(
+        Uri endpoint,
+        CancellationToken cancellationToken) =>
+        GameControllerWebSocketTransportOperations.ReadContinuationStateAsync(
+            connect, endpoint, cancellationToken);
+
     public Task<bool> SendConfigDeltaAndWaitForAutoContinueAsync(
         Uri endpoint,
         string json,

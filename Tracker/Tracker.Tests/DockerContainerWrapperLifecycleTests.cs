@@ -1092,6 +1092,13 @@ public sealed class DockerContainerWrapperLifecycleTests
     {
         public List<string> Messages { get; } = [];
 
+        public Task<Duck.Testing.RefereeDriver.GameControllerContinuationState?> ReadContinuationStateAsync(
+            Uri endpoint, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<Duck.Testing.RefereeDriver.GameControllerContinuationState?>(null);
+        }
+
         public Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken)
         {
             Messages.Add(json);

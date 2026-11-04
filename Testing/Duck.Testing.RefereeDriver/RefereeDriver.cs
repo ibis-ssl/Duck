@@ -13,6 +13,9 @@ public enum GameControllerContinueAction
     NextCommand,
     ForceStart,
     NormalStart,
+    StopGame,
+    NextStage,
+    EndGame,
 }
 
 public interface IRefereeCommandSource
@@ -21,6 +24,35 @@ public interface IRefereeCommandSource
         uint? previousCommandCounter,
         CancellationToken cancellationToken);
 }
+
+public sealed record RefereeLifecycleObservation(
+    long RequestSequence,
+    RefereeCommandSnapshot Udp,
+    string ApiCommand,
+    string ApiPhase,
+    string? ApiStage,
+    TimeSpan? ApiStageTimeLeft);
+
+/// <summary>Waits on the existing RefereeObservationWorker updates; it does not start another poller.</summary>
+public interface IRefereeLifecycleObservationSource
+{
+    Task<RefereeLifecycleObservation> WaitForNextAsync(
+        long previousRequestSequence,
+        CancellationToken cancellationToken);
+}
+
+public sealed record GameControllerContinueActionStatus(
+    string Type,
+    string ForTeam,
+    string State,
+    bool HasContinuationIssues);
+
+public sealed record GameControllerContinuationState(
+    string Command,
+    string Phase,
+    string? Stage,
+    TimeSpan? StageTimeLeft,
+    IReadOnlyList<GameControllerContinueActionStatus> ContinueActions);
 
 public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot)
 {
@@ -60,6 +92,8 @@ public interface IGameControllerControlClient
     Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken) =>
         Task.FromResult(false);
 
+    Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken);
+
     Task SendContinueActionAsync(
         GameControllerContinueAction action,
         CancellationToken cancellationToken);
@@ -69,13 +103,16 @@ public sealed class RefereeDriverFixture
 {
     private readonly IRefereeCommandSource commandSource;
     private readonly IGameControllerControlClient controlClient;
+    private readonly IRefereeLifecycleObservationSource? lifecycleObservations;
 
     public RefereeDriverFixture(
         IRefereeCommandSource commandSource,
-        IGameControllerControlClient controlClient)
+        IGameControllerControlClient controlClient,
+        IRefereeLifecycleObservationSource? lifecycleObservations = null)
     {
         this.commandSource = commandSource;
         this.controlClient = controlClient;
+        this.lifecycleObservations = lifecycleObservations;
     }
 
     public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
@@ -232,6 +269,212 @@ public sealed class RefereeDriverFixture
                 return new(RefereeMatchTerminationKind.PostGame, next);
             }
         }
+    }
+
+    /// <summary>
+    /// Continues only the READY_MANUAL actions required by a normal two-half match, using updates from the
+    /// existing referee observation worker and the match's existing maximum-duration budget.
+    /// </summary>
+    public async Task<RefereeMatchTerminationResult> ContinueMatchUntilPostGameAsync(
+        RefereeCommandSnapshot latestSnapshot,
+        TimeSpan maximumDuration,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(latestSnapshot);
+        if (lifecycleObservations is null)
+            throw new InvalidOperationException("A current Game Controller lifecycle observer is required to continue a match.");
+        if (maximumDuration <= TimeSpan.Zero || maximumDuration == Timeout.InfiniteTimeSpan)
+            throw new ArgumentOutOfRangeException(nameof(maximumDuration));
+
+        var lastSnapshot = latestSnapshot;
+        if (lastSnapshot.Stage == Referee.Types.Stage.PostGame)
+            return new(RefereeMatchTerminationKind.PostGame, lastSnapshot);
+
+        using var maximumDurationCancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        maximumDurationCancellation.CancelAfter(maximumDuration);
+        var attemptedActions = new HashSet<string>(StringComparer.Ordinal);
+        long requestSequence = 0;
+        (GameControllerContinueAction Action, RefereeCommandSnapshot Before, string? Stage)? pendingAction = null;
+
+        try
+        {
+            while (true)
+            {
+                var observation = await lifecycleObservations.WaitForNextAsync(
+                    requestSequence, maximumDurationCancellation.Token).ConfigureAwait(false);
+
+            if (observation.RequestSequence <= requestSequence)
+                throw new InvalidOperationException("Game Controller lifecycle observation sequence did not advance.");
+            requestSequence = observation.RequestSequence;
+            EnsureNonRegressingSnapshot(lastSnapshot, observation.Udp);
+            if (pendingAction is { } pending)
+            {
+                if (IsExpectedContinueActionEffect(pending.Action, pending.Before, observation.Udp))
+                {
+                    pendingAction = null;
+                }
+                else if (HasNewerRefereeState(pending.Before, observation.Udp))
+                {
+                    throw new InvalidOperationException(
+                        $"Game Controller action {pending.Action} did not produce its required fresh state; " +
+                        $"observed {observation.Udp.Command}/{observation.Udp.Stage} after {pending.Before.Command}/{pending.Stage}.");
+                }
+                else
+                {
+                    lastSnapshot = observation.Udp;
+                    continue;
+                }
+            }
+
+            if (observation.Udp.Stage == Referee.Types.Stage.PostGame)
+            {
+                EnsureNewerSnapshot(lastSnapshot, observation.Udp, "POST_GAME");
+                return new(RefereeMatchTerminationKind.PostGame, observation.Udp);
+            }
+
+            lastSnapshot = observation.Udp;
+
+            if (!IsAlignedLifecycleObservation(observation))
+                continue;
+
+            var candidate = SelectNormalMatchContinueAction(observation);
+            if (candidate is null)
+                continue;
+
+            var actionContext = await controlClient.ReadContinuationStateAsync(
+                maximumDurationCancellation.Token).ConfigureAwait(false);
+            if (!IsCurrentContinuationContext(actionContext, observation))
+                continue;
+
+            candidate = SelectNormalMatchContinueAction(
+                observation with { ApiStageTimeLeft = actionContext!.StageTimeLeft });
+            if (candidate is null)
+                continue;
+
+            var actionName = ToGameControllerActionName(candidate.Value);
+            if (!actionContext!.ContinueActions.Any(action =>
+                    string.Equals(action.Type, actionName, StringComparison.Ordinal) &&
+                    string.Equals(action.ForTeam, "UNKNOWN", StringComparison.Ordinal) &&
+                    string.Equals(action.State, "READY_MANUAL", StringComparison.Ordinal) &&
+                    !action.HasContinuationIssues))
+                continue;
+
+            var attemptKey = $"{candidate}:{observation.Udp.CommandCounter}:{observation.ApiStage}";
+            if (!attemptedActions.Add(attemptKey))
+                continue;
+
+            await controlClient.SendContinueActionAsync(candidate.Value,
+                maximumDurationCancellation.Token).ConfigureAwait(false);
+                pendingAction = (candidate.Value, observation.Udp, observation.ApiStage);
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return new(RefereeMatchTerminationKind.MaximumTimeReached, lastSnapshot);
+        }
+    }
+
+    private static bool IsAlignedLifecycleObservation(RefereeLifecycleObservation observation)
+    {
+        if (!GameControllerStateMapping.TryParseStage(observation.ApiStage, out var apiStage) ||
+            apiStage != observation.Udp.Stage ||
+            !Enum.TryParse<GameControllerCommandKind>(observation.ApiCommand, out var apiCommand) ||
+            !Enum.TryParse<GameControllerMatchPhase>(observation.ApiPhase, out var apiPhase))
+            return false;
+
+        return GameControllerStateMapping.MatchesUdpCommand(
+            new(apiCommand, apiPhase), observation.Udp.Command);
+    }
+
+    private static bool IsCurrentContinuationContext(
+        GameControllerContinuationState? context,
+        RefereeLifecycleObservation observation)
+    {
+        if (context is null || context.Stage != observation.ApiStage ||
+            context.Command != observation.ApiCommand || context.Phase != observation.ApiPhase)
+            return false;
+
+        return Enum.TryParse<GameControllerCommandKind>(context.Command, out var command) &&
+            Enum.TryParse<GameControllerMatchPhase>(context.Phase, out var phase) &&
+            GameControllerStateMapping.MatchesUdpCommand(new(command, phase), observation.Udp.Command);
+    }
+
+    private static GameControllerContinueAction? SelectNormalMatchContinueAction(
+        RefereeLifecycleObservation observation)
+    {
+        var udp = observation.Udp;
+        var stage = udp.Stage;
+        if (udp.Command == Referee.Types.Command.Halt && observation.ApiPhase == nameof(GameControllerMatchPhase.Halt))
+            return GameControllerContinueAction.ResumeFromHalt;
+
+        if (observation.ApiStageTimeLeft is not { } remaining || remaining >= TimeSpan.Zero)
+            return null;
+
+        var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
+        if (stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf &&
+            observation.ApiPhase == nameof(GameControllerMatchPhase.Running))
+            return GameControllerContinueAction.StopGame;
+
+        if (!stopped)
+            return null;
+
+        return stage switch
+        {
+            Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalHalfTime =>
+                GameControllerContinueAction.NextStage,
+            Referee.Types.Stage.NormalSecondHalf => GameControllerContinueAction.EndGame,
+            _ => null,
+        };
+    }
+
+    private static string ToGameControllerActionName(GameControllerContinueAction action) => action switch
+    {
+        GameControllerContinueAction.ResumeFromHalt => "RESUME_FROM_HALT",
+        GameControllerContinueAction.StopGame => "STOP_GAME",
+        GameControllerContinueAction.NextStage => "NEXT_STAGE",
+        GameControllerContinueAction.EndGame => "END_GAME",
+        _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
+    };
+
+    private static void EnsureNonRegressingSnapshot(
+        RefereeCommandSnapshot previous,
+        RefereeCommandSnapshot current)
+    {
+        var timestampRegressed = previous.PacketTimestamp is { } previousTimestamp &&
+            current.PacketTimestamp is { } currentTimestamp && currentTimestamp < previousTimestamp;
+        if (current.CommandCounter < previous.CommandCounter || timestampRegressed)
+            throw new InvalidOperationException("Current referee lifecycle observation regressed in counter or packet timestamp.");
+    }
+
+    private static bool HasNewerRefereeState(
+        RefereeCommandSnapshot previous,
+        RefereeCommandSnapshot current) =>
+        current.Command != previous.Command ||
+        current.Stage != previous.Stage;
+
+    private static bool IsExpectedContinueActionEffect(
+        GameControllerContinueAction action,
+        RefereeCommandSnapshot previous,
+        RefereeCommandSnapshot current)
+    {
+        try { EnsureNewerSnapshot(previous, current, action.ToString()); }
+        catch (InvalidOperationException) { return false; }
+        return action switch
+        {
+            GameControllerContinueAction.ResumeFromHalt =>
+                current.Command == Referee.Types.Command.Stop && current.Stage == previous.Stage,
+            GameControllerContinueAction.StopGame =>
+                current.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt && current.Stage == previous.Stage,
+            GameControllerContinueAction.NextStage => previous.Stage switch
+            {
+                Referee.Types.Stage.NormalFirstHalf => current.Stage == Referee.Types.Stage.NormalHalfTime,
+                Referee.Types.Stage.NormalHalfTime => current.Stage == Referee.Types.Stage.NormalSecondHalfPre,
+                _ => false,
+            },
+            GameControllerContinueAction.EndGame => current.Stage == Referee.Types.Stage.PostGame,
+            _ => false,
+        };
     }
 
     private static async Task<T> RunMotionWaitAsync<T>(

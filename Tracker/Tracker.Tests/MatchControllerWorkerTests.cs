@@ -297,7 +297,8 @@ public sealed class MatchControllerWorkerTests
             ["MatchController:MaximumDuration"] = maximumDuration.ToString("c"),
             ["MatchController:ResultPath"] = resultPath,
         }).Build();
-        return new(new RefereeDriverFixture(source, control), source, readiness, configuration);
+        return new(new RefereeDriverFixture(source, control,
+            source as IRefereeLifecycleObservationSource), readiness, configuration);
     }
 
     private static MatchControllerReadiness CompleteReadiness()
@@ -355,6 +356,12 @@ public sealed class MatchControllerWorkerTests
         public List<bool> AutoContinueChanges { get; } = [];
         public bool AutoContinueEnabled { get; set; }
 
+        public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<GameControllerContinuationState?>(null);
+        }
+
         public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
             Task.FromResult<bool?>(AutoContinueEnabled);
 
@@ -373,15 +380,42 @@ public sealed class MatchControllerWorkerTests
     }
 
     private sealed class SequenceRefereeCommandSource(params RefereeCommandSnapshot[] snapshots)
-        : IRefereeCommandSource
+        : IRefereeCommandSource, IRefereeLifecycleObservationSource
     {
         private readonly Queue<RefereeCommandSnapshot> remaining = new(snapshots);
+        private long sequence;
         public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(uint? previousCommandCounter, CancellationToken cancellationToken)
         {
             if (remaining.TryDequeue(out var snapshot))
                 return snapshot;
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             throw new InvalidOperationException("Unreachable");
+        }
+
+        public async Task<RefereeLifecycleObservation> WaitForNextAsync(
+            long previousRequestSequence,
+            CancellationToken cancellationToken)
+        {
+            var snapshot = await WaitForChangeAsync(null, cancellationToken);
+            sequence = Math.Max(sequence, previousRequestSequence) + 1;
+            var (command, phase) = snapshot.Command switch
+            {
+                Referee.Types.Command.Halt => ("Halt", "Halt"),
+                Referee.Types.Command.Stop => ("Stop", "Stop"),
+                Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow => ("Kickoff", "Kickoff"),
+                Referee.Types.Command.NormalStart => ("NormalStart", "Running"),
+                _ => ("Unknown", "Unknown"),
+            };
+            var stage = snapshot.Stage switch
+            {
+                Referee.Types.Stage.NormalFirstHalf => "NORMAL_FIRST_HALF",
+                Referee.Types.Stage.NormalHalfTime => "NORMAL_HALF_TIME",
+                Referee.Types.Stage.NormalSecondHalfPre => "NORMAL_SECOND_HALF_PRE",
+                Referee.Types.Stage.NormalSecondHalf => "NORMAL_SECOND_HALF",
+                Referee.Types.Stage.PostGame => "POST_GAME",
+                _ => "UNSUPPORTED",
+            };
+            return new(sequence, snapshot, command, phase, stage, null);
         }
     }
 

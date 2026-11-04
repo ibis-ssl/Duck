@@ -114,6 +114,9 @@ public interface IGameControllerWebSocketTransport
 {
     Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken);
 
+    Task<GameControllerContinuationState?> ReadContinuationStateAsync(
+        Uri endpoint, CancellationToken cancellationToken);
+
     Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken) =>
         Task.FromResult<bool?>(null);
 
@@ -127,6 +130,12 @@ public interface IGameControllerWebSocketTransport
 public static class GameControllerWebSocketTransportOperations
 {
     private static readonly TimeSpan ConfigConfirmationTimeout = TimeSpan.FromSeconds(3);
+
+    public static Task<GameControllerContinuationState?> ReadContinuationStateAsync(
+        Func<Uri, CancellationToken, Task<WebSocket>> connect,
+        Uri endpoint,
+        CancellationToken cancellationToken) =>
+        new GameControllerStateClient(endpoint, connect).ReadContinuationStateAsync(cancellationToken);
 
     public static async Task SendJsonAsync(
         Func<Uri, CancellationToken, Task<WebSocket>> connect,
@@ -279,6 +288,9 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
             enabled,
             cancellationToken);
 
+    public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken) =>
+        transport.ReadContinuationStateAsync(endpoint, cancellationToken);
+
     public Task SendYellowTeamNameAsync(string teamName, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(teamName);
@@ -312,6 +324,9 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
             GameControllerContinueAction.NextCommand => "NEXT_COMMAND",
             GameControllerContinueAction.ForceStart => "FORCE_START",
             GameControllerContinueAction.NormalStart => "NORMAL_START",
+            GameControllerContinueAction.StopGame => "STOP_GAME",
+            GameControllerContinueAction.NextStage => "NEXT_STAGE",
+            GameControllerContinueAction.EndGame => "END_GAME",
             _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
         };
 
@@ -334,6 +349,11 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
 
         public Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken) =>
             GameControllerWebSocketTransportOperations.ReadAutoContinueAsync(ConnectAsync, endpoint, cancellationToken);
+
+        public Task<GameControllerContinuationState?> ReadContinuationStateAsync(
+            Uri endpoint, CancellationToken cancellationToken) =>
+            GameControllerWebSocketTransportOperations.ReadContinuationStateAsync(
+                ConnectAsync, endpoint, cancellationToken);
 
         public Task<bool> SendConfigDeltaAndWaitForAutoContinueAsync(
             Uri endpoint, string json, bool expectedAutoContinue, CancellationToken cancellationToken) =>

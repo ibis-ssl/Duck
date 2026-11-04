@@ -158,6 +158,27 @@ public sealed class RefereeDriverHostAutoDriveTests
     }
 
     [Fact]
+    public async Task HostControlTransportReadsCurrentManualContinuationState()
+    {
+        using var transports = new Transports();
+        var adapter = new RefereeDriverWebSocketTransport(transports.ConnectAsync);
+        var client = new GameControllerWebSocketControlClient(adapter, Fixture.InternalUri);
+
+        var state = await client.ReadContinuationStateAsync(CancellationToken.None);
+
+        Assert.NotNull(state);
+        Assert.Equal("Halt", state.Command);
+        Assert.Equal("Halt", state.Phase);
+        Assert.Equal("NORMAL_FIRST_HALF", state.Stage);
+        Assert.Contains(state.ContinueActions, action =>
+            action.Type == "RESUME_FROM_HALT" && action.ForTeam == "UNKNOWN" &&
+            action.State == "READY_MANUAL" && !action.HasContinuationIssues);
+        Assert.Equal(Fixture.InternalUri, Assert.Single(transports.ConnectedUris));
+        Assert.Empty(transports.Messages);
+        Assert.Equal(1, Assert.Single(transports.Sockets).DisposeCalls);
+    }
+
+    [Fact]
     public async Task ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges()
     {
         using var transports = new Transports();
@@ -341,6 +362,21 @@ public sealed class RefereeDriverHostAutoDriveTests
                 {
                     command = new { type = commandType, forTeam = "UNKNOWN" },
                     gameState = new { type = gameStateType },
+                    stage = "NORMAL_FIRST_HALF",
+                    stageTimeLeft = "25s",
+                },
+                gcState = new
+                {
+                    continueActions = new[]
+                    {
+                        new
+                        {
+                            type = "RESUME_FROM_HALT",
+                            forTeam = "UNKNOWN",
+                            state = "READY_MANUAL",
+                            continuationIssues = Array.Empty<string>(),
+                        },
+                    },
                 },
             });
         }

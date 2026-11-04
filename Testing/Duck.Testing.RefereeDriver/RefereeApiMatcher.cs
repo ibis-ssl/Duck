@@ -3,7 +3,7 @@ using Duck.Testing.Diagnostics;
 namespace Duck.Testing.RefereeDriver;
 
 /// <summary>同じローカル観測contextのUDP指令とAPI状態を、有限窓で照合する境界。</summary>
-internal sealed class RefereeApiMatcher
+internal sealed class RefereeApiMatcher : IRefereeLifecycleObservationSource
 {
     private readonly object gate = new();
     private readonly RefereeReceiveService receiver;
@@ -78,6 +78,29 @@ internal sealed class RefereeApiMatcher
             if (!result.IsReady)
                 current = null;
             return result;
+        }
+    }
+
+    public async Task<RefereeLifecycleObservation> WaitForNextAsync(
+        long previousRequestSequence,
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Task completed;
+            lock (gate)
+                completed = observationCompleted.Task;
+
+            var latest = GetCurrent();
+            if (latest.IsReady && latest.Udp is { } udp && latest.Api is { } api &&
+                api.RequestSequence > previousRequestSequence)
+            {
+                return new(api.RequestSequence, udp.Command, api.State.Command.ToString(),
+                    api.State.Phase.ToString(), api.State.Stage, api.State.StageTimeLeft);
+            }
+
+            await completed.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 

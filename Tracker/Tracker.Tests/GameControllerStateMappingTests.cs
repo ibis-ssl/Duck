@@ -34,6 +34,51 @@ public sealed class GameControllerStateMappingTests
         Assert.Equal(1, socket.DisposeCalls);
     }
 
+    [Fact]
+    public async Task ReadsContinuationActionsAcrossSeparateCurrentOutputMessages()
+    {
+        using var socket = new OneOutputSocket(
+            """{"matchState":{"command":{"type":"HALT","forTeam":"UNKNOWN"},"gameState":{"type":"HALT"},"stage":"NORMAL_FIRST_HALF","stageTimeLeft":"-1s"}}""",
+            """{"gcState":{"continueActions":[{"type":"RESUME_FROM_HALT","forTeam":"UNKNOWN","state":"READY_MANUAL","continuationIssues":[]}]}}""");
+
+        var observed = await CreateClient(socket).ReadContinuationStateAsync(CancellationToken.None)
+            .WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.NotNull(observed);
+        Assert.Equal("Halt", observed.Command);
+        Assert.Equal("Halt", observed.Phase);
+        Assert.Equal("NORMAL_FIRST_HALF", observed.Stage);
+        Assert.Equal(TimeSpan.FromSeconds(-1), observed.StageTimeLeft);
+        Assert.Collection(observed.ContinueActions,
+            action =>
+            {
+                Assert.Equal("RESUME_FROM_HALT", action.Type);
+                Assert.Equal("UNKNOWN", action.ForTeam);
+                Assert.Equal("READY_MANUAL", action.State);
+                Assert.False(action.HasContinuationIssues);
+            });
+    }
+
+    [Theory]
+    [InlineData("NORMAL_FIRST_HALF_PRE", Referee.Types.Stage.NormalFirstHalfPre)]
+    [InlineData("NORMAL_FIRST_HALF", Referee.Types.Stage.NormalFirstHalf)]
+    [InlineData("NORMAL_HALF_TIME", Referee.Types.Stage.NormalHalfTime)]
+    [InlineData("NORMAL_SECOND_HALF_PRE", Referee.Types.Stage.NormalSecondHalfPre)]
+    [InlineData("NORMAL_SECOND_HALF", Referee.Types.Stage.NormalSecondHalf)]
+    [InlineData("POST_GAME", Referee.Types.Stage.PostGame)]
+    public void ParsesWireStageNames(string wireName, Referee.Types.Stage expected)
+    {
+        Assert.True(GameControllerStateMapping.TryParseStage(wireName, out var actual));
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void RejectsUnsupportedWireStageNames()
+    {
+        Assert.False(GameControllerStateMapping.TryParseStage("EXTRA_FIRST_HALF", out _));
+        Assert.False(GameControllerStateMapping.TryParseStage(null, out _));
+    }
+
     /// <summary>未取得、欠落、未知、未対応、型不正の状態を正常な指令へ補完しない。</summary>
     [Theory]
     [InlineData("""{}""")]
@@ -100,10 +145,10 @@ public sealed class GameControllerStateMappingTests
         });
 
     /// <summary>一つの公開Outputの後はCloseを返し、状態欠落時も試験を有限に終端する。</summary>
-    private sealed class OneOutputSocket(string json) : WebSocket
+    private sealed class OneOutputSocket(params string[] json) : WebSocket
     {
-        private readonly byte[] payload = Encoding.UTF8.GetBytes(json);
-        private bool delivered;
+        private readonly byte[][] payloads = json.Select(Encoding.UTF8.GetBytes).ToArray();
+        private int nextPayload;
         private bool disposed;
         public int SendCalls { get; private set; }
         public int DisposeCalls { get; private set; }
@@ -116,9 +161,9 @@ public sealed class GameControllerStateMappingTests
             ArraySegment<byte> buffer, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (delivered)
+            if (nextPayload >= payloads.Length)
                 return Task.FromResult(new WebSocketReceiveResult(0, WebSocketMessageType.Close, true));
-            delivered = true;
+            var payload = payloads[nextPayload++];
             payload.AsSpan().CopyTo(buffer.AsSpan());
             return Task.FromResult(new WebSocketReceiveResult(payload.Length, WebSocketMessageType.Text, true));
         }
