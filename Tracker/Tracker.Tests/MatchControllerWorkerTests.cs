@@ -39,6 +39,45 @@ public sealed class MatchControllerWorkerTests
                     ? resource with { ServiceEvidenceObservedAtUtc = now - TimeSpan.FromMinutes(3) }
                     : resource).ToArray(),
             }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "ssl-log-recorder"
+                    ? resource with { ServiceEvidenceObservedAtUtc = null }
+                    : resource).ToArray(),
+            }, expected, now));
+        Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(
+            current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "ssl-log-recorder"
+                    ? resource with { ServiceEvidenceObservedAtUtc = now - TimeSpan.FromSeconds(16) }
+                    : resource).ToArray(),
+            }, expected, now));
+    }
+
+    [Fact]
+    public void UnknownHealthWithoutPositiveServiceEvidenceDoesNotPassForTargetContainers()
+    {
+        var expected = new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder" };
+        var now = DateTimeOffset.UtcNow;
+        var current = CompleteReadiness().ParticipantEvidence!;
+
+        foreach (var healthStatus in new string?[] { null, "Unknown" })
+        {
+            var noPositiveEvidence = current with
+            {
+                Resources = current.Resources.Select(resource => resource.ResourceId == "tigers-blue"
+                    ? resource with
+                    {
+                        HealthStatus = healthStatus,
+                        ServiceEvidenceReady = false,
+                        ServiceEvidenceObservedAtUtc = null,
+                    }
+                    : resource).ToArray(),
+            };
+
+            Assert.False(MatchControllerReadinessProbe.IsParticipantEvidenceReady(noPositiveEvidence, expected, now));
+        }
     }
 
     [Fact]
@@ -251,7 +290,7 @@ public sealed class MatchControllerWorkerTests
             fullContainerId,
             "test-run",
             resourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder",
-            resourceId is "tigers-blue" or "autoref-tigers" ? now : null,
+            resourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder" ? now : null,
             resourceId == "ssl-log-recorder" ? 1 : null,
             resourceId == "ssl-log-recorder" ? now : null);
 

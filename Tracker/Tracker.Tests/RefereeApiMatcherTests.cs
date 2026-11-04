@@ -22,7 +22,7 @@ public sealed class RefereeApiMatcherTests
         var valid = expected.Select(resource => new MatchParticipantResourceEvidence(
             resource, "Running", "Healthy", $"instance-{resource}", new string('a', 64), "run-1",
             resource is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder",
-            resource is "tigers-blue" or "autoref-tigers" ? now : null,
+            resource is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder" ? now : null,
             resource == "ssl-log-recorder" ? 1234 : null,
             resource == "ssl-log-recorder" ? now : null)).ToArray();
 
@@ -33,6 +33,52 @@ public sealed class RefereeApiMatcherTests
             new MatchParticipantStatusEvidence(now, valid.Select(resource =>
                 resource with { RunId = resource.ResourceId == "crane" ? "other-run" : "run-1" }).ToArray()),
             expected, now));
+    }
+
+    [Fact]
+    public async Task InitialReadinessConsumesPositiveAppHostServiceEvidenceFromParticipantStatusJson()
+    {
+        await using var fixture = await MatchFixture.CreateAsync(global::Referee.Types.Command.Stop);
+        fixture.Api.Queue(new ApiSocket("STOP", "STOP"));
+        Assert.True((await fixture.ReadAsync().WaitAsync(TimeSpan.FromSeconds(5))).IsReady);
+
+        var now = DateTimeOffset.UtcNow;
+        var fullContainerId = new string('a', 64);
+        MatchParticipantResourceEvidence Evidence(string resourceId) => new(
+            resourceId,
+            "Running",
+            resourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder" ? null : "Healthy",
+            $"current-{resourceId}",
+            fullContainerId,
+            "run-114",
+            resourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder",
+            resourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder" ? now : null,
+            resourceId == "ssl-log-recorder" ? 1234 : null,
+            resourceId == "ssl-log-recorder" ? now : null);
+        var expected = new[] { "tigers-blue", "autoref-tigers", "ssl-log-recorder", "crane" };
+        var evidence = new MatchParticipantStatusEvidence(now, expected.Select(Evidence).ToArray());
+        var statusPath = Path.Combine(Path.GetTempPath(), $"issue49-participant-status-{Guid.NewGuid():N}.json");
+        await File.WriteAllTextAsync(statusPath, System.Text.Json.JsonSerializer.Serialize(evidence,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)));
+
+        try
+        {
+            using var clients = new CallbackHttpClientFactory(_ => Task.FromResult(VisionResponse()));
+            var probe = CreateReadinessProbe(fixture.Matcher, clients, statusPath);
+
+            var readiness = await probe.WaitForInitialReadinessAsync(CancellationToken.None);
+
+            Assert.True(readiness.ParticipantResourcesReady);
+            Assert.True(readiness.IsComplete);
+            Assert.Equal(expected, readiness.ParticipantEvidence!.Resources.Select(resource => resource.ResourceId));
+            Assert.All(readiness.ParticipantEvidence.Resources.Where(resource =>
+                resource.ResourceId is "tigers-blue" or "autoref-tigers" or "ssl-log-recorder"),
+                resource => Assert.Null(resource.HealthStatus));
+        }
+        finally
+        {
+            File.Delete(statusPath);
+        }
     }
 
     [Fact]

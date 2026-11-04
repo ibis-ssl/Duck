@@ -50,7 +50,10 @@ internal sealed record MatchParticipantResourceEvidence(
                 now - serviceObserved <= TimeSpan.FromMinutes(2) && serviceObserved <= now + TimeSpan.FromSeconds(1);
 
         if (ResourceId == "ssl-log-recorder")
-            return ServiceEvidenceReady && RecorderArchiveBytes is > 0 &&
+            return ServiceEvidenceReady && ServiceEvidenceObservedAtUtc is { } recorderObserved &&
+                now - recorderObserved <= TimeSpan.FromSeconds(15) &&
+                recorderObserved <= now + TimeSpan.FromSeconds(1) &&
+                RecorderArchiveBytes is > 0 &&
                 RecorderArchiveLastWriteUtc is { } lastWrite &&
                 now - lastWrite <= TimeSpan.FromSeconds(15) &&
                 lastWrite <= now + TimeSpan.FromSeconds(1);
