@@ -21,6 +21,7 @@ public sealed class RuntimeIdentityControlProtocolTests
         RecordValidDetection(serviceDiagnostics, receiverDiagnostics);
         Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(receiverDiagnostics, ContainerConfiguration()).StatusCode);
         var inFlightBeforeHandoff = receiverDiagnostics.BeginReceive();
+        var trackerAttemptBeforeHandoff = receiverDiagnostics.BeginTrackerReceive();
 
         var socketPath = Path.Combine(Path.GetTempPath(), $"duck-identity-{Guid.NewGuid():N}.sock");
         await using var controlServer = new RuntimeIdentityControlServer(
@@ -64,6 +65,10 @@ public sealed class RuntimeIdentityControlProtocolTests
         Assert.False(afterHandoff.IsReady);
         Assert.Equal(0, afterHandoff.SuccessfullyDecodedCount);
         Assert.False(serviceDiagnostics.RecordSuccess(inFlightBeforeHandoff));
+        Assert.False(serviceDiagnostics.RecordSuccess(trackerAttemptBeforeHandoff, "tigers", "TIGERs", "tigers-id", "172.20.0.4:11010"));
+        var trackerAfterHandoff = Assert.Single(serviceDiagnostics.GetSnapshots("tracker"));
+        Assert.Equal(newIdentity, trackerAfterHandoff.Identity);
+        Assert.Equal(0, trackerAfterHandoff.SuccessfullyDecodedCount);
         Assert.Equal(503, RuntimeVisionDiagnosticsHttpService.GetHealth(receiverDiagnostics, ContainerConfiguration()).StatusCode);
 
         RecordValidDetection(serviceDiagnostics, receiverDiagnostics);

@@ -40,6 +40,12 @@ public static class RuntimeHostServiceCollectionExtensions
             .AddOptions<RuntimeTrackerOptions>()
             .Bind(configuration.GetSection(RuntimeTrackerOptions.SectionName))
             .ValidateOnStart();
+        services
+            .AddOptions<RuntimeTrackerReceiveOptions>()
+            .Bind(configuration.GetSection(RuntimeTrackerReceiveOptions.SectionName))
+            .Validate(options => !options.Enabled || (options.Port > 0 && options.Port <= 65535),
+                "Tracker:Receive:Port must be a valid UDP port.")
+            .ValidateOnStart();
 
         services.AddSingleton(serviceProvider =>
             RuntimeTrackerConfigurationResolver.Resolve(
@@ -74,6 +80,7 @@ public static class RuntimeHostServiceCollectionExtensions
         services.AddSingleton<RuntimeHostOperationLoop>();
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
         services.AddHostedService<RuntimeVisionReceiverService>();
+        services.AddHostedService<RuntimeTrackerReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();
         services.AddHostedService<RuntimeIdentityControlHostedService>();
 

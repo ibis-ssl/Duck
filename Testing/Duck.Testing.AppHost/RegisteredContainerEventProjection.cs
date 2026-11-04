@@ -71,7 +71,7 @@ internal static class RegisteredContainerEventProjection
                 continue;
             }
 
-            if (found is not null || property.Value is not string value || !IsFullContainerId(value))
+            if (found is not null || property.Value is not string value || !HasFullContainerId(value))
             {
                 return false;
             }
@@ -88,9 +88,9 @@ internal static class RegisteredContainerEventProjection
         return true;
     }
 
-    private static bool IsFullContainerId(string value)
+    internal static bool HasFullContainerId(string? value)
     {
-        if (value.Length != 64)
+        if (value is null || value.Length != 64)
         {
             return false;
         }

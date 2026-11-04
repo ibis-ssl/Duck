@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +30,8 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
         var statusReady = !configuration.GetValue<bool>("Testing:ContainerMode") || snapshot.IsReady;
         var count = configuration.GetValue<bool>("Testing:ContainerMode")
             ? snapshot.SuccessfullyDecodedCount : diagnostics.DecodedWrapperPacketsReceivedTotal;
-        return (statusReady ? 200 : 503, new(count, snapshot.IsReady, snapshot));
+        return (statusReady ? 200 : 503,
+            new(count, snapshot.IsReady, snapshot, diagnostics.TrackerSnapshots));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -68,4 +70,9 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
     }
 }
 
-public sealed record RuntimeVisionHealthResponse(long VisionPacketsReceived, bool IsReady, ServiceReceiveSnapshot Diagnostics);
+public sealed record RuntimeVisionHealthResponse(
+    long VisionPacketsReceived,
+    bool IsReady,
+    ServiceReceiveSnapshot Diagnostics,
+    [property: JsonPropertyName("trackerDiagnostics")]
+    IReadOnlyList<ServiceReceiveSnapshot> TrackerReceiveSources);

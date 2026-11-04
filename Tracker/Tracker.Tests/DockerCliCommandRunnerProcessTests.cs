@@ -67,7 +67,7 @@ public sealed class DockerCliCommandRunnerProcessTests
             ["exec", "-i", "owned-container-id"],
             "request\n",
             64,
-            TimeSpan.FromMilliseconds(120),
+            TimeSpan.FromSeconds(1),
             CancellationToken.None));
 
         Assert.Equal(1, child.KillCalls);

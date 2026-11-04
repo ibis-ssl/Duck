@@ -260,7 +260,7 @@ public sealed class DcpBaseSimulatorVisionReadinessProbeTests
                     DiagnosticDecodeStatus.Succeeded,
                     true,
                     "ready");
-                var response = new RuntimeVisionHealthResponse(fixture.DecodedCount, true, diagnostics);
+                var response = new RuntimeVisionHealthResponse(fixture.DecodedCount, true, diagnostics, []);
                 var content = new StringContent(JsonSerializer.Serialize(response), Encoding.UTF8, "application/json");
                 return new HttpResponseMessage(StatusCode) { Content = content };
             }

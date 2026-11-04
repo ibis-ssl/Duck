@@ -23,10 +23,46 @@ internal sealed record MatchParticipantStatusEvidence(
 internal sealed record MatchParticipantResourceEvidence(
     string ResourceId,
     string? State,
-    string? HealthStatus)
+    string? HealthStatus,
+    string? CurrentResourceId = null,
+    string? ContainerId = null,
+    string? RunId = null,
+    bool ServiceEvidenceReady = false,
+    DateTimeOffset? ServiceEvidenceObservedAtUtc = null,
+    long? RecorderArchiveBytes = null,
+    DateTimeOffset? RecorderArchiveLastWriteUtc = null,
+    string? ServiceEvidenceReason = null)
 {
-    public bool IsReady => string.Equals(State, "Running", StringComparison.Ordinal) &&
-        string.Equals(HealthStatus, "Healthy", StringComparison.OrdinalIgnoreCase);
+    public bool IsReady
+        => IsReadyAt(DateTimeOffset.UtcNow);
+
+    internal bool IsReadyAt(DateTimeOffset now)
+    {
+        if (!string.Equals(State, "Running", StringComparison.Ordinal) ||
+            string.IsNullOrWhiteSpace(CurrentResourceId) ||
+            string.IsNullOrWhiteSpace(RunId) ||
+            !IsFullContainerId(ContainerId) ||
+            string.Equals(HealthStatus, "Unhealthy", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (ResourceId is "tigers-blue" or "autoref-tigers")
+            return ServiceEvidenceReady && ServiceEvidenceObservedAtUtc is { } serviceObserved &&
+                now - serviceObserved <= TimeSpan.FromMinutes(2) && serviceObserved <= now + TimeSpan.FromSeconds(1);
+
+        if (ResourceId == "ssl-log-recorder")
+            return ServiceEvidenceReady && ServiceEvidenceObservedAtUtc is { } recorderObserved &&
+                now - recorderObserved <= TimeSpan.FromSeconds(15) &&
+                recorderObserved <= now + TimeSpan.FromSeconds(1) &&
+                RecorderArchiveBytes is > 0 &&
+                RecorderArchiveLastWriteUtc is { } lastWrite &&
+                now - lastWrite <= TimeSpan.FromSeconds(15) &&
+                lastWrite <= now + TimeSpan.FromSeconds(1);
+
+        return string.Equals(HealthStatus, "Healthy", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsFullContainerId(string? value) => value is { Length: 64 } &&
+        value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');
 }
 
 internal interface IMatchControllerReadinessProbe
@@ -136,7 +172,10 @@ internal sealed class MatchControllerReadinessProbe(
         if (evidence is null || now - evidence.ObservedAtUtc > TimeSpan.FromSeconds(2) ||
             evidence.ObservedAtUtc > now + TimeSpan.FromSeconds(1))
             return false;
-        if (evidence.Resources.Count != expectedResources.Count || evidence.Resources.Any(resource => !resource.IsReady))
+        if (evidence.Resources.Count != expectedResources.Count || evidence.Resources.Any(resource => !resource.IsReadyAt(now)))
+            return false;
+        var runIds = evidence.Resources.Select(resource => resource.RunId).Distinct(StringComparer.Ordinal).ToArray();
+        if (runIds.Length != 1)
             return false;
         return expectedResources.All(expected => evidence.Resources.Any(resource =>
             string.Equals(resource.ResourceId, expected, StringComparison.Ordinal)));

@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
     <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
     <ProjectReference Include="..\..\Testing\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
+    <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

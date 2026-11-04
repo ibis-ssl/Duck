@@ -1196,6 +1196,24 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task MatchReadinessOnlyModeRegistersParticipantsWithoutControlWorker()
+    {
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match",
+            "--Testing:MatchReadinessOnly=true",
+            "--Testing:Diagnostics:RunId=issue114-readiness-only-model-test");
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "match-controller");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "tigers-blue");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "autoref-tigers");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "ssl-log-recorder");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "simulator");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "game-controller");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "crane");
+        Assert.Contains(appHost.Resources, resource => resource.Name == "duck");
+    }
+
+    [Fact]
     public async Task MatchModeHandsOffTheControllerContainerIdentityWhenDesktopBridgeIsConfigured()
     {
         using var appHost = await CreateAppHostAsync(
@@ -1216,6 +1234,12 @@ public sealed class AppHostApplicationModelTests
     public async Task MatchModeRegistersTigersAutoRefAndLogRecorderOnSharedDcpBridge()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("true", duckEnvironment["Tracker__Receive__Enabled"].ToString());
+        Assert.Equal("224.5.23.2", duckEnvironment["Tracker__Receive__MulticastAddress"].ToString());
+        Assert.Equal("11010", duckEnvironment["Tracker__Receive__Port"].ToString());
 
         var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tigers-blue"));
         var tigersImage = Assert.Single(tigers.Annotations.OfType<ContainerImageAnnotation>());
@@ -1266,6 +1290,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("sha256:" + tigersImage.SHA256, lockedImages.GetProperty("sumatra").GetProperty("digest").GetString());
         Assert.Equal("robocupssl/ssl-log-recorder:latest", lockedImages.GetProperty("ssl-log-recorder").GetProperty("reference").GetString());
         Assert.Equal("sha256:" + recorderImage.SHA256, lockedImages.GetProperty("ssl-log-recorder").GetProperty("digest").GetString());
+        var recorderRuntimeArgs = await GetContainerRuntimeArgsAsync(recorder);
+        Assert.Equal(["--stop-signal", "SIGINT", "--stop-timeout", "30"], recorderRuntimeArgs.TakeLast(4));
         Assert.Equal("tigersmannheim/auto-referee:1.2.0", lockedImages.GetProperty("tigers-auto-referee").GetProperty("reference").GetString());
         Assert.Equal("sha256:" + autoRefImage.SHA256, lockedImages.GetProperty("tigers-auto-referee").GetProperty("digest").GetString());
     }

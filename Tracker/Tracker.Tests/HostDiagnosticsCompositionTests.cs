@@ -41,6 +41,27 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(200, health.StatusCode);
         Assert.Equal(2, health.Response.VisionPacketsReceived);
         Assert.Equal(ledger.Identity, health.Response.Diagnostics.Identity);
+
+        var trackedPacket = new TrackerWrapperPacket
+        {
+            SourceName = "TIGERs",
+            Uuid = "tigers-uuid",
+            TrackedFrame = new TrackedFrame { FrameNumber = 9 },
+        };
+        diagnostics.RecordTrackerPacket(
+            diagnostics.BeginTrackerReceive(),
+            new TrackerPacketAdapter(trackedPacket),
+            new IPEndPoint(IPAddress.Parse("172.20.0.4"), 11010));
+        var trackerSnapshot = Assert.Single(RuntimeVisionDiagnosticsHttpService.GetHealth(
+            diagnostics, configuration).Response.TrackerReceiveSources);
+        Assert.Equal(ledger.Identity, trackerSnapshot.Identity);
+        Assert.Equal("TIGERs", trackerSnapshot.SourceName);
+        Assert.Equal("172.20.0.4:11010", trackerSnapshot.RemoteEndpoint);
+        Assert.Equal(1, trackerSnapshot.SuccessfullyDecodedCount);
+        using var healthJson = JsonDocument.Parse(JsonSerializer.Serialize(
+            RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).Response,
+            new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+        Assert.True(healthJson.RootElement.TryGetProperty("trackerDiagnostics", out _));
     }
 
     [Fact]
@@ -65,6 +86,54 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
             buffer, diagnostics, NullLogger.Instance));
         Assert.Equal(1, diagnostics.Snapshot.DecodeFailureCount);
+    }
+
+    [Fact]
+    public void TrackerPacketDecodedBeforeIdentityHandoffCannotCountInNewGeneration()
+    {
+        var oldIdentity = new ResourceDiagnosticIdentity("run-1", "duck", new string('a', 64), 1);
+        var newIdentity = new ResourceDiagnosticIdentity("run-1", "duck", new string('b', 64), 2);
+        var ledger = new ServiceReceiveDiagnostics(oldIdentity);
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
+        var deserializer = new RuntimeTrackerPacketDeserializer(diagnostics);
+        var packetBytes = new TrackerWrapperPacket
+        {
+            SourceName = "TIGERs",
+            Uuid = "tigers-uuid",
+            TrackedFrame = new TrackedFrame { FrameNumber = 1 },
+        }.ToByteArray();
+
+        Assert.True(deserializer.TryDeserialize(packetBytes, out var decoded));
+        Assert.NotNull(decoded);
+        diagnostics.ReplaceIdentity(newIdentity);
+        deserializer.RecordPacket(decoded, new IPEndPoint(IPAddress.Parse("172.20.0.4"), 11010));
+
+        var snapshot = Assert.Single(ledger.GetSnapshots("tracker"));
+        Assert.Equal(newIdentity, snapshot.Identity);
+        Assert.Equal(0, snapshot.SuccessfullyDecodedCount);
+    }
+
+    [Fact]
+    public void TrackerPacketDecodeFailureIsVisibleInTheCurrentReceiveEpoch()
+    {
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(new ServiceReceiveDiagnostics(
+            new ResourceDiagnosticIdentity("run-1", "duck", new string('c', 64), 1)));
+        var deserializer = new RuntimeTrackerPacketDeserializer(diagnostics);
+        var packetBytes = new TrackerWrapperPacket
+        {
+            SourceName = "TIGERs",
+            Uuid = "tigers-uuid",
+            TrackedFrame = new TrackedFrame { FrameNumber = 1 },
+        }.ToByteArray();
+
+        Assert.True(deserializer.TryDeserialize(packetBytes, out var packet));
+        deserializer.RecordPacket(packet!, new IPEndPoint(IPAddress.Parse("172.20.0.4"), 11010));
+        Assert.False(deserializer.TryDeserialize([0xff, 0xff], out _));
+
+        var snapshot = Assert.Single(diagnostics.TrackerSnapshots);
+        Assert.Equal(1, snapshot.DecodeFailureCount);
+        Assert.Equal(1, snapshot.SuccessfullyDecodedCount);
+        Assert.Equal(DiagnosticDecodeStatus.Failed, snapshot.DecodeStatus);
     }
 
     [Fact]

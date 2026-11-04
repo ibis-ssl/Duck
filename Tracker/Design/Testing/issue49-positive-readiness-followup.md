@@ -8,13 +8,13 @@ Repository inspection found existing positive health checks for simulator, Game 
 
 The accepted design also says not to assume every container has a verification endpoint and to implement the required receive/decode diagnostics in the corresponding container (line 237). That implementation is not present for Sumatra, AutoRef, or recorder in this repository.
 
-The implementation now requires `HealthStatus == Healthy` in addition to `Running`; null, unknown, and unhealthy health status cannot pass participant readiness. A focused regression first failed against the previous behavior (Running plus null was accepted), then passed after this fail-closed change (7/7 focused controller tests).
+PR #115 merged the accepted resource-specific evidence contract into the design branch at merge SHA `845eee0a554f652c418dc19536faf8e0243d772e`. The AppHost projection publishes current resource/container/run identity, service evidence, and freshness. The match-controller deserializes that participant-status JSON and accepts unknown Docker health only when the resource-specific positive evidence is present; unknown health without positive service evidence remains false. Other participant resources still require `Healthy`.
 
-Positive readiness for all configured participants remains blocked until an accepted readiness interface is established for the three resources above. This PR must not invent probes or claim the full acceptance condition is met.
+A focused integration test writes the AppHost-shaped JSON to the configured participant-status path and exercises `WaitForInitialReadinessAsync`. The live readiness-only run confirmed separate advancing TIGERs and AutoRef tracker-output evidence and Recorder record decoding/finalization; each service became not-ready after its own stop. This proves pre-start readiness preparation only, not the full post-start match lifecycle. The latter E2E acceptance belongs to #50 and is not an additional #49/#114 gate.
 
 References:
 
 - `Tracker/Design/Testing/aspire-simulation-test-environment.md`, match lifecycle requirements (current design lines 42 and 355).
 - Aggregate review finding IFR-002 on integration commit `440353ee1128ecb816b711532f4fe6d5f8c42312`.
 
-The dedicated Draft PR is formally linked to #49 and Project16. The fail-closed readiness predicate and focused regression are implemented; a positive readiness interface for all participants remains unresolved.
+The integration test and its focused fail-closed case verify the #114-to-match-controller connection. Exact-head CI and normal/independent review are still required for this PR branch before it can be merged. The existing #114 issue state is tracked separately; this note does not claim that it was closed automatically by merging into the design branch.
