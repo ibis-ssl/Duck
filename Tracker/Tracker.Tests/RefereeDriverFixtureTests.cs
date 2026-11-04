@@ -8,11 +8,19 @@ public sealed class RefereeDriverFixtureTests
     public async Task DriveToActiveAsyncContinuesDirectlyFromInitialStop()
     {
         var source = new FakeRefereeCommandSource(
-            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1),
-            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2),
-            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 3));
-        var client = new RecordingGameControllerControlClient();
-        var fixture = new RefereeDriverFixture(source, client);
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 3,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+            NextCommand: Referee.Types.Command.PrepareKickoffBlue);
+        var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
+        var fixture = new RefereeDriverFixture(source, client,
+            new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
 
         var active = await fixture.DriveToActiveAsync(CancellationToken.None);
 
@@ -24,12 +32,21 @@ public sealed class RefereeDriverFixtureTests
     public async Task DriveToActiveAsyncResumesFromHaltThenAdvancesFromStop()
     {
         var source = new FakeRefereeCommandSource(
-            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 10),
-            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 11),
-            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 12),
-            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 13));
-        var client = new RecordingGameControllerControlClient();
-        var fixture = new RefereeDriverFixture(source, client);
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 10,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 11,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 110),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 12,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 13,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 12,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+            NextCommand: Referee.Types.Command.PrepareKickoffBlue);
+        var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
+        var fixture = new RefereeDriverFixture(source, client,
+            new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
 
         await fixture.DriveToActiveAsync(CancellationToken.None);
 
@@ -42,17 +59,57 @@ public sealed class RefereeDriverFixtureTests
     public async Task DriveToActiveAsyncUsesNormalStartAfterPreparationCommand()
     {
         var source = new FakeRefereeCommandSource(
-            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 20),
-            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 21),
-            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 22),
-            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 23));
-        var client = new RecordingGameControllerControlClient();
-        var fixture = new RefereeDriverFixture(source, client);
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 20,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 21,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 110),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 22,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+                NextCommand: Referee.Types.Command.PrepareKickoffYellow),
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 23,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 22,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+            NextCommand: Referee.Types.Command.PrepareKickoffYellow);
+        var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
+        var fixture = new RefereeDriverFixture(source, client,
+            new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
 
         await fixture.DriveToActiveAsync(CancellationToken.None);
 
         Assert.Equal(
             [GameControllerContinueAction.ResumeFromHalt, GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart],
+            client.Actions);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncWaitsForCurrentNormalStartReadyAutoAction()
+    {
+        var stop = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1,
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100);
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PrepareKickoffBlue);
+        var active = preparation with
+        {
+            Command = Referee.Types.Command.NormalStart,
+            CommandCounter = 3,
+            PacketTimestamp = 300,
+        };
+        var source = new FakeRefereeCommandSource(stop, preparation, active);
+        var observations = new SequenceLifecycleObservationSource(
+            KickoffObservation(1, preparation with { PacketTimestamp = 201 }),
+            KickoffObservation(2, preparation with { PacketTimestamp = 202 }));
+        var client = new LifecycleControlClient(
+            KickoffContinuation(preparation, "READY_MANUAL"),
+            KickoffContinuation(preparation, "READY_AUTO"));
+        var fixture = new RefereeDriverFixture(source, client, observations);
+
+        var result = await fixture.DriveToActiveAsync(CancellationToken.None);
+
+        Assert.Equal(Referee.Types.Command.NormalStart, result.Command);
+        Assert.Equal(2, client.ReadCount);
+        Assert.Equal([GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart],
             client.Actions);
     }
 
@@ -95,16 +152,27 @@ public sealed class RefereeDriverFixtureTests
     public async Task DriveToActiveAsyncFailsWhenSecondContinueActionDoesNotReachActiveCommand()
     {
         var source = new FakeRefereeCommandSource(
-            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40),
-            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 41),
-            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 42),
-            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 43));
-        var client = new RecordingGameControllerControlClient();
-        var fixture = new RefereeDriverFixture(source, client);
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 41,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 110),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 42,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+                NextCommand: Referee.Types.Command.PrepareKickoffYellow),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 43,
+                YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 42,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+            NextCommand: Referee.Types.Command.PrepareKickoffYellow);
+        var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
+        var fixture = new RefereeDriverFixture(source, client,
+            new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(
             () => fixture.DriveToActiveAsync(CancellationToken.None));
 
+        Assert.Equal(1, client.ReadCount);
+        Assert.Contains("NORMAL_START", failure.Message, StringComparison.Ordinal);
         Assert.Equal(
             [GameControllerContinueAction.ResumeFromHalt, GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart],
             client.Actions);
@@ -249,6 +317,37 @@ public sealed class RefereeDriverFixtureTests
         new(sequence, new(command, counter, Stage: stage, PacketTimestamp: packetTimestamp),
             apiCommand, apiPhase, apiStage, stageTimeLeft);
 
+    private static RefereeLifecycleObservation KickoffObservation(
+        long sequence,
+        RefereeCommandSnapshot udp)
+    {
+        const string stage = "NORMAL_FIRST_HALF_PRE";
+        var expectedTeam = udp.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
+        var api = new GameControllerMatchSnapshot(
+            GameControllerCommandKind.Kickoff,
+            GameControllerMatchPhase.Kickoff,
+            stage,
+            TimeSpan.FromSeconds(8),
+            "KICKOFF",
+            expectedTeam,
+            udp.BlueScore,
+            udp.YellowScore,
+            CommandForTeam: expectedTeam,
+            PhaseForTeam: expectedTeam);
+        return new(sequence, udp, "Kickoff", "Kickoff", stage, TimeSpan.FromSeconds(8), api);
+    }
+
+    private static GameControllerContinuationState KickoffContinuation(
+        RefereeCommandSnapshot udp,
+        string actionState)
+    {
+        const string stage = "NORMAL_FIRST_HALF_PRE";
+        var expectedTeam = udp.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
+        return new("Kickoff", "Kickoff", stage, TimeSpan.FromSeconds(8),
+            [new("NORMAL_START", "UNKNOWN", actionState, HasContinuationIssues: false)],
+            "KICKOFF", expectedTeam, udp.BlueScore, udp.YellowScore);
+    }
+
     private static GameControllerContinuationState ContinueState(
         string command,
         string phase,
@@ -279,10 +378,12 @@ public sealed class RefereeDriverFixtureTests
     {
         private readonly Queue<GameControllerContinuationState> remaining = new(states);
         public List<GameControllerContinueAction> Actions { get; } = [];
+        public int ReadCount { get; private set; }
 
         public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ReadCount++;
             return Task.FromResult<GameControllerContinuationState?>(
                 remaining.TryDequeue(out var state) ? state : null);
         }

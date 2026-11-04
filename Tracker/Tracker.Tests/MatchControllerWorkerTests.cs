@@ -212,7 +212,7 @@ public sealed class MatchControllerWorkerTests
             Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
             Snapshot(Referee.Types.Command.PrepareKickoffYellow, 2, Referee.Types.Stage.NormalFirstHalf),
             Snapshot(Referee.Types.Command.NormalStart, 3, Referee.Types.Stage.NormalFirstHalf));
-        var control = new RecordingControlClient();
+        var control = new RecordingControlClient { KickoffTeam = "YELLOW" };
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
         var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMilliseconds(30));
 
@@ -224,6 +224,29 @@ public sealed class MatchControllerWorkerTests
         Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
+    }
+
+    [Fact]
+    public async Task RunMatchUsesOneConfiguredReadinessBudgetForInitialNormalStart()
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var source = new SequenceRefereeCommandSource(
+            Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.PrepareKickoffYellow, 2, Referee.Types.Stage.NormalFirstHalf));
+        var control = new RecordingControlClient { KickoffTeam = "YELLOW", NormalStartState = "WAITING" };
+        var readiness = new RecordingReadinessProbe(CompleteReadiness())
+        {
+            ReadinessTimeout = TimeSpan.FromMilliseconds(100),
+        };
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMinutes(2));
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal("failed", result.Status);
+        Assert.Equal("start", result.StageReached);
+        Assert.Contains("configured readiness timeout", result.Failure, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal([GameControllerContinueAction.NextCommand], control.Actions);
     }
 
     [Fact]
@@ -326,13 +349,26 @@ public sealed class MatchControllerWorkerTests
     }
 
     private static RefereeCommandSnapshot Snapshot(
-        Referee.Types.Command command, uint counter, Referee.Types.Stage stage) =>
-        new(command, counter, Stage: stage, PacketTimestamp: counter);
+        Referee.Types.Command command, uint counter, Referee.Types.Stage stage)
+    {
+        if ((command is Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow) &&
+            stage == Referee.Types.Stage.NormalFirstHalf)
+            stage = Referee.Types.Stage.NormalFirstHalfPre;
+        var nextCommand = command switch
+        {
+            Referee.Types.Command.PrepareKickoffBlue => Referee.Types.Command.PrepareKickoffBlue,
+            Referee.Types.Command.PrepareKickoffYellow => Referee.Types.Command.PrepareKickoffYellow,
+            _ => (Referee.Types.Command?)null,
+        };
+        return new(command, counter, YellowTeamName: "ibis", Stage: stage, PacketTimestamp: counter,
+            NextCommand: nextCommand);
+    }
 
     private sealed class RecordingReadinessProbe(params MatchControllerReadiness[] results)
         : IMatchControllerReadinessProbe
     {
         private int index;
+        public TimeSpan ReadinessTimeout { get; set; } = TimeSpan.FromSeconds(30);
         public int InitialCalls { get; private set; }
         public int FinalCalls { get; private set; }
 
@@ -361,11 +397,16 @@ public sealed class MatchControllerWorkerTests
         public List<GameControllerContinueAction> Actions { get; } = [];
         public List<bool> AutoContinueChanges { get; } = [];
         public bool AutoContinueEnabled { get; set; }
+        public string KickoffTeam { get; set; } = "BLUE";
+        public string NormalStartState { get; set; } = "READY_AUTO";
 
         public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult<GameControllerContinuationState?>(null);
+            return Task.FromResult<GameControllerContinuationState?>(new(
+                "Kickoff", "Kickoff", "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(8),
+                [new("NORMAL_START", "UNKNOWN", NormalStartState, HasContinuationIssues: false)],
+                "KICKOFF", KickoffTeam, 0, 0));
         }
 
         public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
@@ -405,7 +446,10 @@ public sealed class MatchControllerWorkerTests
         public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(uint? previousCommandCounter, CancellationToken cancellationToken)
         {
             if (remaining.TryDequeue(out var snapshot))
+            {
+                latestSnapshot = snapshot;
                 return snapshot;
+            }
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             throw new InvalidOperationException("Unreachable");
         }
@@ -414,7 +458,12 @@ public sealed class MatchControllerWorkerTests
             long previousRequestSequence,
             CancellationToken cancellationToken)
         {
-            var snapshot = await WaitForChangeAsync(null, cancellationToken);
+            RefereeCommandSnapshot snapshot;
+            if (latestSnapshot is { } current && current != lastLifecycleSnapshot)
+                snapshot = current;
+            else
+                snapshot = await WaitForChangeAsync(null, cancellationToken);
+            lastLifecycleSnapshot = snapshot;
             sequence = Math.Max(sequence, previousRequestSequence) + 1;
             var (command, phase) = snapshot.Command switch
             {
@@ -426,6 +475,7 @@ public sealed class MatchControllerWorkerTests
             };
             var stage = snapshot.Stage switch
             {
+                Referee.Types.Stage.NormalFirstHalfPre => "NORMAL_FIRST_HALF_PRE",
                 Referee.Types.Stage.NormalFirstHalf => "NORMAL_FIRST_HALF",
                 Referee.Types.Stage.NormalHalfTime => "NORMAL_HALF_TIME",
                 Referee.Types.Stage.NormalSecondHalfPre => "NORMAL_SECOND_HALF_PRE",
@@ -433,8 +483,38 @@ public sealed class MatchControllerWorkerTests
                 Referee.Types.Stage.PostGame => "POST_GAME",
                 _ => "UNSUPPORTED",
             };
-            return new(sequence, snapshot, command, phase, stage, null);
+            var expectedTeam = snapshot.Command switch
+            {
+                Referee.Types.Command.PrepareKickoffBlue => "BLUE",
+                Referee.Types.Command.PrepareKickoffYellow => "YELLOW",
+                _ => "UNKNOWN",
+            };
+            var api = new GameControllerMatchSnapshot(
+                snapshot.Command is Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow
+                    ? GameControllerCommandKind.Kickoff
+                    : command == "NormalStart" ? GameControllerCommandKind.NormalStart
+                    : command == "Halt" ? GameControllerCommandKind.Halt
+                    : command == "Stop" ? GameControllerCommandKind.Stop
+                    : GameControllerCommandKind.Unknown,
+                snapshot.Command is Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow
+                    ? GameControllerMatchPhase.Kickoff
+                    : phase == "Running" ? GameControllerMatchPhase.Running
+                    : phase == "Halt" ? GameControllerMatchPhase.Halt
+                    : phase == "Stop" ? GameControllerMatchPhase.Stop
+                    : GameControllerMatchPhase.Unknown,
+                stage,
+                null,
+                expectedTeam == "UNKNOWN" ? null : "KICKOFF",
+                expectedTeam == "UNKNOWN" ? null : expectedTeam,
+                snapshot.BlueScore,
+                snapshot.YellowScore,
+                CommandForTeam: expectedTeam,
+                PhaseForTeam: expectedTeam);
+            return new(sequence, snapshot, command, phase, stage, null, api);
         }
+
+        private RefereeCommandSnapshot? latestSnapshot;
+        private RefereeCommandSnapshot? lastLifecycleSnapshot;
     }
 
     private sealed class TemporaryDirectory : IDisposable

@@ -478,6 +478,8 @@ public sealed class SimulatorBallPlacementFixtureTests
     private sealed class CurrentSimulatorReadinessProbe(MatchParticipantStatusEvidence evidence)
         : IMatchControllerReadinessProbe
     {
+        public TimeSpan ReadinessTimeout { get; } = TimeSpan.FromSeconds(30);
+
         public Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken) =>
             throw new NotSupportedException();
 

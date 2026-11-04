@@ -177,6 +177,8 @@ public sealed class RefereeDriverFixture
                 $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {preparation.Command}.");
         }
 
+        await WaitForNormalStartReadinessAsync(preparation, cancellationToken).ConfigureAwait(false);
+
         await controlClient.SendContinueActionAsync(
             GameControllerContinueAction.NormalStart,
             cancellationToken);
@@ -192,6 +194,94 @@ public sealed class RefereeDriverFixture
         }
 
         return active;
+    }
+
+    private async Task WaitForNormalStartReadinessAsync(
+        RefereeCommandSnapshot preparation,
+        CancellationToken cancellationToken)
+    {
+        if (lifecycleObservations is null)
+            throw new InvalidOperationException(
+                "A current Game Controller lifecycle observer is required before NORMAL_START.");
+
+        long requestSequence = 0;
+        while (true)
+        {
+            var observation = await lifecycleObservations.WaitForNextAsync(
+                requestSequence, cancellationToken).ConfigureAwait(false);
+            if (observation.RequestSequence <= requestSequence)
+                throw new InvalidOperationException(
+                    "Game Controller lifecycle observation sequence did not advance before NORMAL_START.");
+            requestSequence = observation.RequestSequence;
+
+            EnsurePreparationContext(preparation, observation.Udp);
+            if (!IsAlignedLifecycleObservation(observation) ||
+                !IsKickoffLifecycleContext(preparation, observation))
+                continue;
+
+            var current = await controlClient.ReadContinuationStateAsync(cancellationToken).ConfigureAwait(false);
+            if (!IsCurrentKickoffContinuationContext(preparation, observation, current))
+                continue;
+
+            if (current!.ContinueActions.Any(action =>
+                    string.Equals(action.Type, "NORMAL_START", StringComparison.Ordinal) &&
+                    string.Equals(action.ForTeam, "UNKNOWN", StringComparison.Ordinal) &&
+                    string.Equals(action.State, "READY_AUTO", StringComparison.Ordinal) &&
+                    !action.HasContinuationIssues))
+                return;
+        }
+    }
+
+    private static void EnsurePreparationContext(
+        RefereeCommandSnapshot preparation,
+        RefereeCommandSnapshot current)
+    {
+        if (current.Command != preparation.Command || current.CommandCounter != preparation.CommandCounter ||
+            current.Stage != preparation.Stage || current.YellowTeamName != preparation.YellowTeamName ||
+            current.BlueScore != preparation.BlueScore || current.YellowScore != preparation.YellowScore ||
+            current.NextCommand != preparation.NextCommand ||
+            preparation.PacketTimestamp is { } previousTimestamp &&
+                current.PacketTimestamp is { } currentTimestamp && currentTimestamp < previousTimestamp)
+            throw new InvalidOperationException(
+                "The referee preparation context changed before the Game Controller offered NORMAL_START.");
+    }
+
+    private static bool IsKickoffLifecycleContext(
+        RefereeCommandSnapshot preparation,
+        RefereeLifecycleObservation observation)
+    {
+        if (observation.ApiSnapshot is not { } api ||
+            preparation.Command is not (Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow))
+            return false;
+
+        if (preparation.Stage is not (Referee.Types.Stage.NormalFirstHalfPre or Referee.Types.Stage.NormalSecondHalfPre))
+            return false;
+
+        var expectedTeam = preparation.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
+        var expectedUdpNextCommand = preparation.Command == Referee.Types.Command.PrepareKickoffBlue
+            ? Referee.Types.Command.PrepareKickoffBlue
+            : Referee.Types.Command.PrepareKickoffYellow;
+        return api.Command == GameControllerCommandKind.Kickoff &&
+            api.Phase == GameControllerMatchPhase.Kickoff &&
+            api.Stage == observation.ApiStage &&
+            observation.Udp.NextCommand == expectedUdpNextCommand &&
+            api.NextCommand == "KICKOFF" && api.NextCommandForTeam == expectedTeam &&
+            api.CommandForTeam == expectedTeam && api.PhaseForTeam == expectedTeam &&
+            api.BlueScore == preparation.BlueScore && api.YellowScore == preparation.YellowScore;
+    }
+
+    private static bool IsCurrentKickoffContinuationContext(
+        RefereeCommandSnapshot preparation,
+        RefereeLifecycleObservation observation,
+        GameControllerContinuationState? context)
+    {
+        if (context is null || !IsCurrentContinuationContext(context, observation) ||
+            !IsKickoffLifecycleContext(preparation, observation))
+            return false;
+
+        var expectedTeam = preparation.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
+        return context.NextCommand == "KICKOFF" && context.NextCommandForTeam == expectedTeam &&
+            context.BlueScore == preparation.BlueScore && context.YellowScore == preparation.YellowScore;
     }
 
     public static async Task<T> WaitForMotionWhileActiveAsync<T>(

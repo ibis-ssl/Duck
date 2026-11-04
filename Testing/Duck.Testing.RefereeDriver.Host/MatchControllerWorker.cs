@@ -67,6 +67,7 @@ internal sealed record MatchParticipantResourceEvidence(
 
 internal interface IMatchControllerReadinessProbe
 {
+    TimeSpan ReadinessTimeout { get; }
     Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken);
     Task<MatchControllerReadiness> ReadFinalReadinessAsync(
         RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken);
@@ -83,6 +84,7 @@ internal sealed class MatchControllerReadinessProbe(
     private readonly string[] participantResources = ReadParticipantResources(configuration["MatchController:ParticipantResources"]);
     private readonly string participantStatusPath = ReadParticipantStatusPath(configuration["MatchController:ParticipantStatusPath"]);
     private readonly TimeSpan readinessTimeout = ReadTimeout(configuration["MatchController:ReadinessTimeout"]);
+    public TimeSpan ReadinessTimeout => readinessTimeout;
 
     public async Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken)
     {
@@ -297,11 +299,26 @@ internal sealed class MatchControllerWorker(
                 throw new InvalidOperationException(initialReadiness.FailureReason ?? "Initial match readiness is incomplete.");
 
             stage = "start";
-            if (await driver.ReadAutoContinueAsync(cancellationToken).ConfigureAwait(false) != false)
-                throw new InvalidOperationException(
-                    "The Game Controller did not confirm autoContinue=false before the initial STOP/HALT continuation.");
+            using (var startDeadline = new CancellationTokenSource(readinessProbe.ReadinessTimeout))
+            using (var startCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                       cancellationToken, startDeadline.Token))
+            {
+                try
+                {
+                    if (await driver.ReadAutoContinueAsync(startCancellation.Token).ConfigureAwait(false) != false)
+                        throw new InvalidOperationException(
+                            "The Game Controller did not confirm autoContinue=false before the initial STOP/HALT continuation.");
 
-            finalSnapshot = await driver.DriveToActiveAsync(cancellationToken).ConfigureAwait(false);
+                    finalSnapshot = await driver.DriveToActiveAsync(startCancellation.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (
+                    startDeadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                {
+                    throw new TimeoutException(
+                        "The match did not complete the initial STOP/HALT/PREPARE/NORMAL_START sequence within the configured readiness timeout.");
+                }
+            }
+
             stage = "match";
             if (!await driver.SetAutoContinueAsync(true, cancellationToken).ConfigureAwait(false))
                 throw new InvalidOperationException(
