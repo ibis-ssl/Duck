@@ -122,10 +122,10 @@ public sealed class RefereeDriverFixtureTests
                 "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(25)),
             Observation(3, Referee.Types.Command.Stop, 13, Referee.Types.Stage.NormalFirstHalf, 103,
                 "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(-1)),
-            Observation(4, Referee.Types.Command.Stop, 14, Referee.Types.Stage.NormalHalfTime, 104,
-                "Stop", "Stop", "NORMAL_HALF_TIME", TimeSpan.FromSeconds(5)),
-            Observation(5, Referee.Types.Command.Stop, 15, Referee.Types.Stage.NormalHalfTime, 105,
-                "Stop", "Stop", "NORMAL_HALF_TIME", TimeSpan.FromSeconds(-1)),
+            Observation(4, Referee.Types.Command.Halt, 14, Referee.Types.Stage.NormalHalfTime, 104,
+                "Halt", "Halt", "NORMAL_HALF_TIME", TimeSpan.FromSeconds(5)),
+            Observation(5, Referee.Types.Command.Halt, 15, Referee.Types.Stage.NormalHalfTime, 105,
+                "Halt", "Halt", "NORMAL_HALF_TIME", TimeSpan.FromSeconds(-1)),
             Observation(6, Referee.Types.Command.Stop, 16, Referee.Types.Stage.NormalSecondHalfPre, 106,
                 "Stop", "Stop", "NORMAL_SECOND_HALF_PRE", TimeSpan.FromSeconds(45)),
             Observation(7, Referee.Types.Command.NormalStart, 17, Referee.Types.Stage.NormalSecondHalf, 107,
@@ -137,7 +137,7 @@ public sealed class RefereeDriverFixtureTests
         var control = new LifecycleControlClient(
             ContinueState("Halt", "Halt", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(25), "RESUME_FROM_HALT"),
             ContinueState("Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(-1), "NEXT_STAGE"),
-            ContinueState("Stop", "Stop", "NORMAL_HALF_TIME", TimeSpan.FromSeconds(-1), "NEXT_STAGE"),
+            ContinueState("Halt", "Halt", "NORMAL_HALF_TIME", TimeSpan.FromSeconds(-1), "NEXT_STAGE"),
             ContinueState("NormalStart", "Running", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(-1), "STOP_GAME"),
             ContinueState("Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(-1), "END_GAME"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);

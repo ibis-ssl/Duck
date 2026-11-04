@@ -405,6 +405,17 @@ public sealed class RefereeDriverFixture
     {
         var udp = observation.Udp;
         var stage = udp.Stage;
+
+        // The pinned controller exposes NEXT_STAGE, not RESUME_FROM_HALT, during the
+        // paused half-time stage. Wait for its clock to expire before advancing.
+        if (stage == Referee.Types.Stage.NormalHalfTime)
+        {
+            return udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt &&
+                observation.ApiStageTimeLeft is { } halfTimeRemaining && halfTimeRemaining < TimeSpan.Zero
+                    ? GameControllerContinueAction.NextStage
+                    : null;
+        }
+
         if (udp.Command == Referee.Types.Command.Halt && observation.ApiPhase == nameof(GameControllerMatchPhase.Halt))
             return GameControllerContinueAction.ResumeFromHalt;
 
@@ -421,8 +432,7 @@ public sealed class RefereeDriverFixture
 
         return stage switch
         {
-            Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalHalfTime =>
-                GameControllerContinueAction.NextStage,
+            Referee.Types.Stage.NormalFirstHalf => GameControllerContinueAction.NextStage,
             Referee.Types.Stage.NormalSecondHalf => GameControllerContinueAction.EndGame,
             _ => null,
         };
