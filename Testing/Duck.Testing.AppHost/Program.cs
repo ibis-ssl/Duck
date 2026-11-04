@@ -448,15 +448,13 @@ if (matchReadinessOnly && testingMode != "match")
 }
 
 var simulatorIbisPort =
-    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
-var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
-var craneTargetAddressSettings = testingMode == "match"
-    ? null
-    : CraneTargetAddressSettings.FromConfiguration(
-        builder.Configuration,
-        cranePlanner,
-        AppContext.BaseDirectory,
-        useStandardBase: true);
+    builder.Configuration["Testing:Simulator:IbisPort"] ?? (testingMode == "match" ? "12345" : "12346");
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? (testingMode == "match" ? "rvo2" : "visibility_graph");
+var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
+    builder.Configuration,
+    cranePlanner,
+    AppContext.BaseDirectory,
+    useStandardBase: true);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {

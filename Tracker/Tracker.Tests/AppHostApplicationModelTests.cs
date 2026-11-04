@@ -1147,12 +1147,19 @@ public sealed class AppHostApplicationModelTests
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
-        Assert.DoesNotContain(CraneTargetAddressSettings.TargetAddressEnvironmentKey, craneEnvironment.Keys);
-        Assert.DoesNotContain(CraneTargetAddressSettings.ExpectedResourceEnvironmentKey, craneEnvironment.Keys);
-        Assert.DoesNotContain(
+        Assert.Equal("rvo2", craneEnvironment["PLANNER"].ToString());
+        Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
+        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
+        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
-            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
-        Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneArguments[^1], StringComparison.Ordinal);
+            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
+        Assert.Contains(CraneTargetAddressSettings.ScriptMountTarget, craneArguments[^1], StringComparison.Ordinal);
+        Assert.Contains("sim:=true", craneArguments[^1], StringComparison.Ordinal);
+        AssertArgumentValue(
+            await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
+            "--ibis-port",
+            "12345");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(

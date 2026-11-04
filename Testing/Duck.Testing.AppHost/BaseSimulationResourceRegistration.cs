@@ -329,7 +329,7 @@ internal static class BaseSimulationResourceRegistration
             craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] =
                 options.CraneTargetAddressSettings.ExpectedResourceName;
             craneCommand =
-                $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
+                $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
             craneMounts =
             [
                 new DockerContainerMount(
