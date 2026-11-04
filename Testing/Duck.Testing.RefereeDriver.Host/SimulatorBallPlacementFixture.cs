@@ -65,13 +65,28 @@ internal sealed class SimulatorBallPlacementFixture(
     private uint handledBlueScore = baselineSnapshot.BlueScore;
     private uint handledYellowScore = baselineSnapshot.YellowScore;
     private PendingPlacement? pending;
-    private readonly HashSet<(uint Blue, uint Yellow)> reportedNotSent = [];
+    private RefereeLifecycleObservation? previousObservation;
+    private (uint Blue, uint Yellow)? pendingSecondHalfKickoff;
+    private readonly HashSet<(uint Blue, uint Yellow, Referee.Types.Stage? Stage)> reportedNotSent = [];
 
     internal List<BallPlacementFixtureEvent> Events { get; } = [];
     internal bool HasUnconfirmedPlacement => pending is not null;
 
     internal async Task ObserveAsync(RefereeLifecycleObservation observation, CancellationToken cancellationToken)
     {
+        var previous = previousObservation;
+        previousObservation = observation;
+
+        if (previous is not null && IsObservedSecondHalfKickoff(previous, observation))
+            pendingSecondHalfKickoff = (observation.Udp.BlueScore, observation.Udp.YellowScore);
+
+        var isPendingSecondHalfKickoff = pendingSecondHalfKickoff is { } kickoffScore &&
+            observation.Udp.Stage == Referee.Types.Stage.NormalSecondHalfPre &&
+            observation.Udp.BlueScore == kickoffScore.Blue && observation.Udp.YellowScore == kickoffScore.Yellow &&
+            observation.Udp.NextCommand == Referee.Types.Command.PrepareKickoffBlue;
+        if (pendingSecondHalfKickoff is not null && !isPendingSecondHalfKickoff)
+            pendingSecondHalfKickoff = null;
+
         if (pending is { } outstanding)
         {
             await ConfirmPlacementAsync(observation, outstanding, cancellationToken).ConfigureAwait(false);
@@ -86,15 +101,17 @@ internal sealed class SimulatorBallPlacementFixture(
             return;
         }
 
-        if (udp.BlueScore <= handledBlueScore && udp.YellowScore <= handledYellowScore)
+        var hasScoreIncrease = udp.BlueScore > handledBlueScore || udp.YellowScore > handledYellowScore;
+        if (!hasScoreIncrease && !isPendingSecondHalfKickoff)
             return;
 
         // Keep looking at the same score while the controller settles into its stopped kickoff context.
         var api = observation.ApiSnapshot;
         var action = await driver.ReadContinuationStateAsync(cancellationToken).ConfigureAwait(false);
-        if (!IsEligibleGoalPlacement(udp, api, action, handledBlueScore, handledYellowScore, out var reason))
+        if (!IsEligiblePlacement(udp, api, action, handledBlueScore, handledYellowScore,
+                isPendingSecondHalfKickoff, out var reason))
         {
-            if (reportedNotSent.Add((udp.BlueScore, udp.YellowScore)))
+            if (reportedNotSent.Add((udp.BlueScore, udp.YellowScore, udp.Stage)))
                 Events.Add(new("not_sent", udp.BlueScore, udp.YellowScore, udp.CommandCounter,
                     observation.RequestSequence, expectedSimulator.ContainerId, expectedSimulator.RunId, reason));
             return;
@@ -102,7 +119,7 @@ internal sealed class SimulatorBallPlacementFixture(
 
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
         {
-            if (reportedNotSent.Add((udp.BlueScore, udp.YellowScore)))
+            if (reportedNotSent.Add((udp.BlueScore, udp.YellowScore, udp.Stage)))
                 Events.Add(new("not_sent", udp.BlueScore, udp.YellowScore, udp.CommandCounter,
                     observation.RequestSequence, expectedSimulator.ContainerId, expectedSimulator.RunId,
                     "Simulator identity changed or is no longer Running."));
@@ -111,6 +128,7 @@ internal sealed class SimulatorBallPlacementFixture(
 
         handledBlueScore = udp.BlueScore;
         handledYellowScore = udp.YellowScore;
+        pendingSecondHalfKickoff = null;
         await simulator.SendBallToCenterAsync(cancellationToken).ConfigureAwait(false);
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the official ball-placement fixture.");
@@ -128,14 +146,36 @@ internal sealed class SimulatorBallPlacementFixture(
         GameControllerContinuationState? continuation,
         uint previousBlueScore,
         uint previousYellowScore,
+        out string reason) =>
+        IsEligiblePlacement(udp, api, continuation, previousBlueScore, previousYellowScore,
+            observedSecondHalfKickoff: false, out reason);
+
+    internal static bool IsEligiblePlacement(
+        RefereeCommandSnapshot udp,
+        GameControllerMatchSnapshot? api,
+        GameControllerContinuationState? continuation,
+        uint previousBlueScore,
+        uint previousYellowScore,
+        bool observedSecondHalfKickoff,
         out string reason)
     {
-        reason = "No accepted score increase is present.";
         var blueIncreased = udp.BlueScore > previousBlueScore;
         var yellowIncreased = udp.YellowScore > previousYellowScore;
-        if ((!blueIncreased && !yellowIncreased) || (blueIncreased && yellowIncreased) ||
-            udp.BlueScore < previousBlueScore || udp.YellowScore < previousYellowScore)
+        var unchangedScore = udp.BlueScore == previousBlueScore && udp.YellowScore == previousYellowScore;
+        if ((!blueIncreased && !yellowIncreased && !(observedSecondHalfKickoff && unchangedScore)) ||
+            (blueIncreased && yellowIncreased) || udp.BlueScore < previousBlueScore || udp.YellowScore < previousYellowScore)
+        {
+            reason = "No accepted score increase or observed score-invariant second-half kickoff is present.";
             return false;
+        }
+
+        if (observedSecondHalfKickoff &&
+            (udp.Stage != Referee.Types.Stage.NormalSecondHalfPre ||
+             udp.NextCommand != Referee.Types.Command.PrepareKickoffBlue))
+        {
+            reason = "The score-invariant placement is not the observed normal second-half BLUE kickoff.";
+            return false;
+        }
 
         if (udp.Command is not (Referee.Types.Command.Stop or Referee.Types.Command.Halt) ||
             udp.NextCommand is not (Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow))
@@ -148,6 +188,7 @@ internal sealed class SimulatorBallPlacementFixture(
         if (api is null || api.Command != GameControllerCommandKind.Stop || api.Phase != GameControllerMatchPhase.Stop ||
             api.NextCommand != "KICKOFF" || api.NextCommandForTeam != expectedTeam ||
             !GameControllerStateMapping.TryParseStage(api.Stage, out var apiStage) || udp.Stage != apiStage ||
+            (observedSecondHalfKickoff && api.Stage != "NORMAL_SECOND_HALF_PRE") ||
             api.BlueScore != udp.BlueScore || api.YellowScore != udp.YellowScore ||
             api.PlacementX is not { } x || api.PlacementY is not { } y || Math.Abs(x) > 0.001f || Math.Abs(y) > 0.001f)
         {
@@ -177,9 +218,30 @@ internal sealed class SimulatorBallPlacementFixture(
             return false;
         }
 
-        reason = "Accepted score increment; current STOP/KICKOFF state is blocked by ball-placement distance.";
+        reason = observedSecondHalfKickoff
+            ? "Observed NORMAL_HALF_TIME to NORMAL_SECOND_HALF_PRE transition; current BLUE kickoff is blocked by ball-placement distance."
+            : "Accepted score increment; current STOP/KICKOFF state is blocked by ball-placement distance.";
         return true;
     }
+
+    internal static bool IsObservedSecondHalfKickoff(
+        RefereeLifecycleObservation previous,
+        RefereeLifecycleObservation current) =>
+        current.RequestSequence > previous.RequestSequence &&
+        previous.Udp.PacketTimestamp is { } previousPacketTimestamp &&
+        current.Udp.PacketTimestamp is { } currentPacketTimestamp &&
+        currentPacketTimestamp > previousPacketTimestamp &&
+        previous.ApiSnapshot is { Stage: "NORMAL_HALF_TIME" } previousApi &&
+        current.ApiSnapshot is { Stage: "NORMAL_SECOND_HALF_PRE" } currentApi &&
+        previous.Udp.Stage == Referee.Types.Stage.NormalHalfTime &&
+        current.Udp.Stage == Referee.Types.Stage.NormalSecondHalfPre &&
+        previous.Udp.BlueScore == current.Udp.BlueScore &&
+        previous.Udp.YellowScore == current.Udp.YellowScore &&
+        previousApi.BlueScore == previous.Udp.BlueScore &&
+        previousApi.YellowScore == previous.Udp.YellowScore &&
+        currentApi.BlueScore == current.Udp.BlueScore &&
+        currentApi.YellowScore == current.Udp.YellowScore &&
+        current.Udp.NextCommand == Referee.Types.Command.PrepareKickoffBlue;
 
     private async Task ConfirmPlacementAsync(
         RefereeLifecycleObservation observation,
@@ -251,7 +313,9 @@ internal sealed class SimulatorBallPlacementFixture(
                 Status = "confirmed",
                 ObservationSequence = observation.RequestSequence,
                 Reason = stoppedPlacement
-                    ? "Fresh matched UDP/API observation reports the same kickoff NEXT_COMMAND ready after ball-only placement."
+                    ? outstanding.ApiSnapshot?.Stage == "NORMAL_SECOND_HALF_PRE"
+                        ? "Observed NORMAL_HALF_TIME to NORMAL_SECOND_HALF_PRE transition; fresh matched observation reports BLUE kickoff NEXT_COMMAND ready after ball-only placement."
+                        : "Fresh matched UDP/API observation reports the same kickoff NEXT_COMMAND ready after ball-only placement."
                     : "Fresh matched UDP/API observation progressed through the same scored kickoff after ball-only placement.",
             };
         pending = null;

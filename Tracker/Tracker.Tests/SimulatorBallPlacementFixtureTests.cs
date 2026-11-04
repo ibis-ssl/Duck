@@ -39,6 +39,81 @@ public sealed class SimulatorBallPlacementFixtureTests
     }
 
     [Fact]
+    public async Task SendsBallOnlyForObservedScoreInvariantHalfTimeToSecondHalfKickoff()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient(
+            BlockedBlueSecondHalfKickoff(), ReadyBlueSecondHalfKickoff()));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 19,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 1, YellowScore: 0));
+
+        var halfTime = new RefereeLifecycleObservation(20,
+            new(Referee.Types.Command.Halt, 20, Stage: Referee.Types.Stage.NormalHalfTime,
+                PacketTimestamp: 200, BlueScore: 1, YellowScore: 0),
+            "Stop", "Stop", "NORMAL_HALF_TIME", null,
+            new(GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, "NORMAL_HALF_TIME",
+                BlueScore: 1, YellowScore: 0));
+        var secondHalfPre = new RefereeLifecycleObservation(21,
+            new(Referee.Types.Command.Stop, 20, Stage: Referee.Types.Stage.NormalSecondHalfPre,
+                PacketTimestamp: 210, BlueScore: 1, YellowScore: 0,
+                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+            "Stop", "Stop", "NORMAL_SECOND_HALF_PRE", null,
+            BlueSecondHalfKickoffApi());
+
+        await fixture.ObserveAsync(halfTime, CancellationToken.None);
+        Assert.Equal(0, sender.SendCalls);
+
+        await fixture.ObserveAsync(secondHalfPre, CancellationToken.None);
+        Assert.Equal(1, sender.SendCalls);
+        Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
+
+        await fixture.ObserveAsync(secondHalfPre with
+        {
+            RequestSequence = 22,
+            ApiSnapshot = BlueSecondHalfKickoffApi(),
+        }, CancellationToken.None);
+        Assert.Equal(1, sender.SendCalls);
+        Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+        Assert.Contains("NORMAL_HALF_TIME to NORMAL_SECOND_HALF_PRE", fixture.Events[0].Reason);
+    }
+
+    [Fact]
+    public void ScoreInvariantPlacementRequiresObservedHalfTimeTransitionAndNormalSecondHalfKickoff()
+    {
+        var previous = new RefereeLifecycleObservation(20,
+            new(Referee.Types.Command.Halt, 20, Stage: Referee.Types.Stage.NormalHalfTime,
+                PacketTimestamp: 200, BlueScore: 1, YellowScore: 0),
+            "Stop", "Stop", "NORMAL_HALF_TIME", null,
+            new(GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, "NORMAL_HALF_TIME",
+                BlueScore: 1, YellowScore: 0));
+        var current = new RefereeLifecycleObservation(21,
+            new(Referee.Types.Command.Stop, 20, Stage: Referee.Types.Stage.NormalSecondHalfPre,
+                PacketTimestamp: 210, BlueScore: 1, YellowScore: 0,
+                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+            "Stop", "Stop", "NORMAL_SECOND_HALF_PRE", null,
+            BlueSecondHalfKickoffApi());
+
+        Assert.True(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(previous, current));
+        Assert.True(SimulatorBallPlacementFixture.IsEligiblePlacement(
+            current.Udp, current.ApiSnapshot, BlockedBlueSecondHalfKickoff(), 1, 0,
+            observedSecondHalfKickoff: true, out _));
+        Assert.False(SimulatorBallPlacementFixture.IsEligiblePlacement(
+            current.Udp, current.ApiSnapshot, BlockedBlueSecondHalfKickoff(), 1, 0,
+            observedSecondHalfKickoff: false, out _));
+        Assert.False(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(
+            previous, current with { Udp = current.Udp with { NextCommand = Referee.Types.Command.PrepareKickoffYellow } }));
+        Assert.False(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(
+            previous, current with { Udp = current.Udp with { BlueScore = 2 } }));
+        Assert.False(SimulatorBallPlacementFixture.IsObservedSecondHalfKickoff(
+            previous, current with { Udp = current.Udp with { PacketTimestamp = 200 } }));
+    }
+
+    [Fact]
     public async Task ConfirmsPlacementWhenFreshMatchedObservationAlreadyAdvancedToExpectedKickoff()
     {
         var now = DateTimeOffset.UtcNow;
@@ -265,6 +340,22 @@ public sealed class SimulatorBallPlacementFixtureTests
         "Stop", "Stop", "NORMAL_FIRST_HALF", null,
         [new("NEXT_COMMAND", "YELLOW", "READY_AUTO", false, [])],
         "KICKOFF", "YELLOW", 1, 0, 0, 0);
+
+    private static GameControllerMatchSnapshot BlueSecondHalfKickoffApi() => new(
+        GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, "NORMAL_SECOND_HALF_PRE",
+        NextCommand: "KICKOFF", NextCommandForTeam: "BLUE", BlueScore: 1, YellowScore: 0,
+        PlacementX: 0, PlacementY: 0);
+
+    private static GameControllerContinuationState BlockedBlueSecondHalfKickoff() => new(
+        "Stop", "Stop", "NORMAL_SECOND_HALF_PRE", null,
+        [new("NEXT_COMMAND", "BLUE", "BLOCKED", true,
+            ["Ball is 2.55 m (>1.00 m) away from placement pos"])],
+        "KICKOFF", "BLUE", 1, 0, 0, 0);
+
+    private static GameControllerContinuationState ReadyBlueSecondHalfKickoff() => new(
+        "Stop", "Stop", "NORMAL_SECOND_HALF_PRE", null,
+        [new("NEXT_COMMAND", "BLUE", "READY_AUTO", false, [])],
+        "KICKOFF", "BLUE", 1, 0, 0, 0);
 
     private sealed class CurrentSimulatorReadinessProbe(MatchParticipantStatusEvidence evidence)
         : IMatchControllerReadinessProbe
