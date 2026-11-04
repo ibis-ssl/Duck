@@ -16,27 +16,39 @@ public sealed class MatchParticipantStatusProjectionTests
         var observedAt = DateTimeOffset.UtcNow;
         var valid = TrackerSnapshot(containerId, endpoint) with { LastReceivedAt = observedAt };
 
-        Assert.True(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        Assert.True(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
             [valid], "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
             TimeSpan.FromMilliseconds(100), observedAt, out var selected, out _));
         Assert.Same(valid, selected);
 
-        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        var otherTigersPublisher = valid with
+        {
+            SourceKey = "autoref-tigers",
+            SourceUuid = "autoref-uuid",
+            RemoteEndpoint = "172.20.0.5:11010",
+        };
+        Assert.True(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
+            [valid, otherTigersPublisher], "run-1", "duck-instance", containerId,
+            IPAddress.Parse("172.20.0.4"), TimeSpan.FromMilliseconds(100), observedAt,
+            out selected, out _));
+        Assert.Same(valid, selected);
+
+        Assert.False(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
             [valid with { RemoteEndpoint = "172.20.0.9:11010" }], "run-1", "duck-instance", containerId,
             IPAddress.Parse("172.20.0.4"), TimeSpan.Zero, observedAt, out _, out _));
-        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        Assert.False(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
             [valid with { Identity = new ResourceDiagnosticIdentity("other-run", "duck-instance", containerId, 2) }],
             "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
             TimeSpan.Zero, observedAt, out _, out _));
-        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        Assert.False(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
             [valid with { DecodeAgeUpperBound = TimeSpan.FromSeconds(4.95) }],
             "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
             TimeSpan.FromMilliseconds(100), observedAt, out _, out _));
-        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        Assert.False(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
             [valid, valid with { SourceUuid = "duplicate" }],
             "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
             TimeSpan.Zero, observedAt, out _, out _));
-        Assert.False(TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        Assert.False(NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
             [valid with { LastReceivedAt = observedAt.AddSeconds(2) }],
             "run-1", "duck-instance", containerId, IPAddress.Parse("172.20.0.4"),
             TimeSpan.Zero, observedAt, out _, out _));

@@ -562,9 +562,9 @@ internal sealed class MatchParticipantStatusProjection(
                         logCursors[resource] = (evidence.Identity, evidence.Cursor);
                     }
                     var currentEvidence = logEvidence.GetEvidence(resource);
-                    if (resource.Name == "tigers-blue" && target is not null)
+                    if (resource.Name is "tigers-blue" or "autoref-tigers" && target is not null)
                     {
-                        var trackerEvidence = await CollectTigersTrackerOutputAsync(
+                        var trackerEvidence = await CollectNativeTrackerOutputAsync(
                             resource, target, stoppingToken).ConfigureAwait(false);
                         serviceEvidenceReady = trackerEvidence.Ready;
                         serviceEvidenceObservedAtUtc = trackerEvidence.ObservedAtUtc;
@@ -810,14 +810,14 @@ internal sealed class MatchParticipantStatusProjection(
         await previous.Completion.ConfigureAwait(false);
     }
 
-    private async Task<TigersTrackerOutputResult> CollectTigersTrackerOutputAsync(
-        IResource tigersResource,
-        MatchParticipantCurrentTarget tigersTarget,
+    private async Task<TigersTrackerOutputResult> CollectNativeTrackerOutputAsync(
+        IResource participantResource,
+        MatchParticipantCurrentTarget participantTarget,
         CancellationToken cancellationToken)
     {
         try
         {
-            return await CollectTigersTrackerOutputCoreAsync(tigersResource, tigersTarget, cancellationToken)
+            return await CollectNativeTrackerOutputCoreAsync(participantResource, participantTarget, cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -835,16 +835,16 @@ internal sealed class MatchParticipantStatusProjection(
         }
     }
 
-    private async Task<TigersTrackerOutputResult> CollectTigersTrackerOutputCoreAsync(
-        IResource tigersResource,
-        MatchParticipantCurrentTarget tigersTarget,
+    private async Task<TigersTrackerOutputResult> CollectNativeTrackerOutputCoreAsync(
+        IResource participantResource,
+        MatchParticipantCurrentTarget participantTarget,
         CancellationToken cancellationToken)
     {
-        var tigersBeforeJson = await docker.CaptureAsync(
-            DockerContainerSpec.CreateInspectArguments(tigersTarget.ContainerId), cancellationToken).ConfigureAwait(false);
+        var participantBeforeJson = await docker.CaptureAsync(
+            DockerContainerSpec.CreateInspectArguments(participantTarget.ContainerId), cancellationToken).ConfigureAwait(false);
         if (!VerifiedContainerLogEvidence.TryParse(
-                tigersBeforeJson, tigersTarget, runId, stackId, tigersResource.Name, out var tigersBefore) || tigersBefore is null)
-            return TigersTrackerOutputResult.NotReady("TIGERs current full-ID/run/network inspection failed.");
+                participantBeforeJson, participantTarget, runId, stackId, participantResource.Name, out var participantBefore) || participantBefore is null)
+            return TigersTrackerOutputResult.NotReady($"{participantResource.Name} current full-ID/run/network inspection failed.");
 
         var duckTarget = resourceIds.GetCurrent(duckResource);
         if (duckTarget is null || duckTarget.State != "Running")
@@ -854,9 +854,9 @@ internal sealed class MatchParticipantStatusProjection(
         if (!VerifiedContainerLogEvidence.TryParse(
                 duckBeforeJson, duckTarget, runId, stackId, duckResource.Name, out var duckBefore) || duckBefore is null)
             return TigersTrackerOutputResult.NotReady("Duck current full-ID/run/network inspection failed.");
-        if (!string.Equals(tigersBefore.NetworkId, duckBefore.NetworkId, StringComparison.Ordinal) ||
-            !IPAddress.TryParse(tigersBefore.NetworkAddress, out var tigersAddress))
-            return TigersTrackerOutputResult.NotReady("TIGERs and Duck are not verified on one current network.");
+        if (!string.Equals(participantBefore.NetworkId, duckBefore.NetworkId, StringComparison.Ordinal) ||
+            !IPAddress.TryParse(participantBefore.NetworkAddress, out var participantAddress))
+            return TigersTrackerOutputResult.NotReady($"{participantResource.Name} and Duck are not verified on one current network.");
 
         var endpointValue = await duckVisionEndpoint.GetValueAsync(cancellationToken).ConfigureAwait(false);
         if (!Uri.TryCreate(endpointValue?.ToString(), UriKind.Absolute, out var healthUri))
@@ -866,22 +866,22 @@ internal sealed class MatchParticipantStatusProjection(
         var requestStarted = clock.GetUtcNow();
         using var response = await VisionHealthClient.GetAsync(healthUri, cancellationToken).ConfigureAwait(false);
         var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var tigersAfterJson = await docker.CaptureAsync(
-            DockerContainerSpec.CreateInspectArguments(tigersTarget.ContainerId), cancellationToken).ConfigureAwait(false);
+        var participantAfterJson = await docker.CaptureAsync(
+            DockerContainerSpec.CreateInspectArguments(participantTarget.ContainerId), cancellationToken).ConfigureAwait(false);
         var duckAfterJson = await docker.CaptureAsync(
             DockerContainerSpec.CreateInspectArguments(duckTarget.ContainerId), cancellationToken).ConfigureAwait(false);
         if (!VerifiedContainerLogEvidence.TryParse(
-                tigersAfterJson, tigersTarget, runId, stackId, tigersResource.Name, out var tigersAfter) ||
-            tigersAfter is null || !tigersBefore.IsSameGeneration(tigersAfter) ||
+                participantAfterJson, participantTarget, runId, stackId, participantResource.Name, out var participantAfter) ||
+            participantAfter is null || !participantBefore.IsSameGeneration(participantAfter) ||
             !VerifiedContainerLogEvidence.TryParse(
                 duckAfterJson, duckTarget, runId, stackId, duckResource.Name, out var duckAfter) ||
             duckAfter is null || !duckBefore.IsSameGeneration(duckAfter))
-            return TigersTrackerOutputResult.NotReady("TIGERs or Duck generation/network changed during tracker-output observation.");
+            return TigersTrackerOutputResult.NotReady($"{participantResource.Name} or Duck generation/network changed during tracker-output observation.");
 
-        var currentTigers = resourceIds.GetCurrent(tigersResource);
+        var currentParticipant = resourceIds.GetCurrent(participantResource);
         var currentDuck = resourceIds.GetCurrent(duckResource);
-        if (currentTigers is null || currentTigers.ResourceId != tigersTarget.ResourceId ||
-            currentTigers.ContainerId != tigersTarget.ContainerId || currentTigers.State != "Running" ||
+        if (currentParticipant is null || currentParticipant.ResourceId != participantTarget.ResourceId ||
+            currentParticipant.ContainerId != participantTarget.ContainerId || currentParticipant.State != "Running" ||
             currentDuck is null || currentDuck.ResourceId != duckTarget.ResourceId ||
             currentDuck.ContainerId != duckTarget.ContainerId || currentDuck.State != "Running")
             return TigersTrackerOutputResult.NotReady("AppHost resource identities changed during tracker-output observation.");
@@ -898,33 +898,33 @@ internal sealed class MatchParticipantStatusProjection(
             return TigersTrackerOutputResult.NotReady("Duck vision-health response did not contain tracker diagnostics.");
         }
 
-        if (!TigersTrackerOutputReadiness.TrySelectFreshCurrentSource(
+        if (!NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
                 trackerResponse?.TrackerDiagnostics ?? [],
                 runId,
                 duckTarget.ResourceId,
                 duckTarget.ContainerId,
-                tigersAddress,
+                participantAddress,
                 decisionTime - requestStarted,
                 decisionTime,
                 out var snapshot,
                 out var trackerReason) || snapshot is null)
             return TigersTrackerOutputResult.NotReady(trackerReason);
-        var baselineKey = string.Join('\u001f', runId, tigersBefore.ContainerId, tigersBefore.StartedAtUtc,
-            tigersBefore.RestartCount, tigersBefore.NetworkId, tigersBefore.NetworkAddress,
+        var baselineKey = string.Join('\u001f', runId, participantBefore.ContainerId, participantBefore.StartedAtUtc,
+            participantBefore.RestartCount, participantBefore.NetworkId, participantBefore.NetworkAddress,
             duckBefore.ContainerId, duckBefore.StartedAtUtc, duckBefore.RestartCount, duckBefore.NetworkId,
             snapshot.Identity!.Generation, snapshot.ReceiverEpoch, snapshot.SourceKey, snapshot.SourceUuid,
             snapshot.RemoteEndpoint);
-        if (trackerBaselines.TryGetValue(tigersResource.Name, out var previous) &&
+        if (trackerBaselines.TryGetValue(participantResource.Name, out var previous) &&
             string.Equals(previous.Key, baselineKey, StringComparison.Ordinal) &&
             snapshot.SuccessfullyDecodedCount > previous.Count)
         {
-            trackerBaselines[tigersResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
+            trackerBaselines[participantResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
             return new(true, snapshot.LastReceivedAt,
-                "Duck observed fresh, newly decoded TIGERs tracker output from the current full-ID/run/network generation; this establishes tracker-output preparation only.");
+                $"Duck observed fresh TIGERs tracker output from the current {participantResource.Name} full-ID/run/network generation; this establishes tracker-output preparation only.");
         }
 
-        trackerBaselines[tigersResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
-        return TigersTrackerOutputResult.NotReady("A fresh current TIGERs tracker count baseline is recorded; waiting for a new decoded packet.");
+        trackerBaselines[participantResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
+        return TigersTrackerOutputResult.NotReady($"A fresh current {participantResource.Name} tracker count baseline is recorded; waiting for a new decoded packet.");
     }
 
     private sealed record VisionHealthTrackerResponse(IReadOnlyList<ServiceReceiveSnapshot>? TrackerDiagnostics);

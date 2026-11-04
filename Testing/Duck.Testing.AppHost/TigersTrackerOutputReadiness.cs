@@ -3,7 +3,7 @@ using Duck.Testing.Diagnostics;
 
 namespace Duck.Testing.AppHost;
 
-internal static class TigersTrackerOutputReadiness
+internal static class NativeTrackerOutputReadiness
 {
     internal static bool TrySelectFreshCurrentSource(
         IReadOnlyList<ServiceReceiveSnapshot> snapshots,
@@ -46,12 +46,12 @@ internal static class TigersTrackerOutputReadiness
 
         if (matches.Length != 1)
         {
-            reason = "No unique fresh decoded TIGERs tracker source matched the current network sender and Duck run/container identity.";
+            reason = "No unique fresh decoded TIGERs tracker source matched the expected participant IP and Duck run/container identity.";
             return false;
         }
 
         selected = matches[0];
-        reason = "Fresh decoded TIGERs tracker source matches the current Duck and shared-network identities.";
+        reason = "Fresh decoded TIGERs tracker source matches the expected participant and current Duck shared-network identities.";
         return true;
     }
 
