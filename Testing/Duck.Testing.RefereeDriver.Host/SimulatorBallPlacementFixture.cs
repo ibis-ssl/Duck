@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Globalization;
 using Google.Protobuf;
 using Duck.Testing.RefereeDriver;
 
@@ -17,7 +18,7 @@ internal sealed record BallPlacementFixtureEvent(
 
 internal interface ISimulatorBallControlClient
 {
-    Task SendBallToCenterAsync(CancellationToken cancellationToken);
+    Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken);
 }
 
 internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
@@ -25,35 +26,40 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
     internal const string SimulatorResourceHost = "simulator";
     internal const int DefaultControlPort = 10300;
 
-    internal static byte[] CreateBallToCenterCommand() => new SimulatorCommand
+    internal static byte[] CreateBallPlacementCommand(float x, float y)
     {
-        Control = new SimulatorControl
+        if (!float.IsFinite(x) || !float.IsFinite(y))
+            throw new ArgumentOutOfRangeException(nameof(x), "Ball placement coordinates must be finite.");
+        return new SimulatorCommand
         {
-            TeleportBall = new TeleportBall
+            Control = new SimulatorControl
             {
-                X = 0,
-                Y = 0,
-                Vx = 0,
-                Vy = 0,
+                TeleportBall = new TeleportBall
+                {
+                    X = x,
+                    Y = y,
+                    Vx = 0,
+                    Vy = 0,
+                },
             },
-        },
-    }.ToByteArray();
+        }.ToByteArray();
+    }
 
-    public async Task SendBallToCenterAsync(CancellationToken cancellationToken)
+    public async Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var addresses = await Dns.GetHostAddressesAsync(SimulatorResourceHost, cancellationToken).ConfigureAwait(false);
         var address = addresses.FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork)
             ?? throw new InvalidOperationException($"Simulator resource '{SimulatorResourceHost}' did not resolve to IPv4.");
         using var client = new UdpClient(AddressFamily.InterNetwork);
-        await client.SendAsync(CreateBallToCenterCommand(), new IPEndPoint(address, DefaultControlPort), cancellationToken)
+        await client.SendAsync(CreateBallPlacementCommand(x, y), new IPEndPoint(address, DefaultControlPort), cancellationToken)
             .ConfigureAwait(false);
     }
 }
 
 /// <summary>
-/// Reuses the pinned Crane match fixture: after a fresh accepted score increment, put only the ball at the
-/// official center through SSL simulation-control UDP 10300. Port 12345 is the separate Ibis robot input.
+/// Reuses the pinned Crane match fixture: place only the ball at a fresh official designated position
+/// through SSL simulation-control UDP 10300. Port 12345 is the separate Ibis robot input.
 /// </summary>
 internal sealed class SimulatorBallPlacementFixture(
     RefereeDriverFixture driver,
@@ -68,6 +74,7 @@ internal sealed class SimulatorBallPlacementFixture(
     private RefereeLifecycleObservation? previousObservation;
     private (uint Blue, uint Yellow)? pendingSecondHalfKickoff;
     private readonly HashSet<(uint Blue, uint Yellow, Referee.Types.Stage? Stage)> reportedNotSent = [];
+    private readonly HashSet<(uint Counter, Referee.Types.Command Command)> handledOfficialPlacements = [];
 
     internal List<BallPlacementFixtureEvent> Events { get; } = [];
     internal bool HasUnconfirmedPlacement => pending is not null;
@@ -103,14 +110,25 @@ internal sealed class SimulatorBallPlacementFixture(
         }
 
         var hasScoreIncrease = udp.BlueScore > handledBlueScore || udp.YellowScore > handledYellowScore;
-        if (!hasScoreIncrease && !isPendingSecondHalfKickoff)
+        var isOfficialPlacement = TryGetPlacementTeam(udp.Command, out var placementTeam);
+        if (!hasScoreIncrease && !isPendingSecondHalfKickoff && !isOfficialPlacement)
+            return;
+        if (isOfficialPlacement && handledOfficialPlacements.Contains((udp.CommandCounter, udp.Command)))
             return;
 
         // Keep looking at the same score while the controller settles into its stopped kickoff context.
         var api = observation.ApiSnapshot;
         var action = await driver.ReadContinuationStateAsync(cancellationToken).ConfigureAwait(false);
-        if (!IsEligiblePlacement(udp, api, action, handledBlueScore, handledYellowScore,
-                isPendingSecondHalfKickoff, out var reason))
+        float placementX;
+        float placementY;
+        string reason;
+        string? restartTeam = null;
+        var eligible = isOfficialPlacement
+            ? IsEligibleOfficialPlacement(udp, api, action, placementTeam!, out placementX, out placementY,
+                out restartTeam, out reason)
+            : IsEligiblePlacement(udp, api, action, handledBlueScore, handledYellowScore,
+                isPendingSecondHalfKickoff, out placementX, out placementY, out reason);
+        if (!eligible)
         {
             if (reportedNotSent.Add((udp.BlueScore, udp.YellowScore, udp.Stage)))
                 Events.Add(new("not_sent", udp.BlueScore, udp.YellowScore, udp.CommandCounter,
@@ -130,15 +148,19 @@ internal sealed class SimulatorBallPlacementFixture(
         handledBlueScore = udp.BlueScore;
         handledYellowScore = udp.YellowScore;
         pendingSecondHalfKickoff = null;
-        await simulator.SendBallToCenterAsync(cancellationToken).ConfigureAwait(false);
+        if (isOfficialPlacement)
+            handledOfficialPlacements.Add((udp.CommandCounter, udp.Command));
+        await simulator.SendBallToPositionAsync(placementX, placementY, cancellationToken).ConfigureAwait(false);
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the official ball-placement fixture.");
 
         var sent = new BallPlacementFixtureEvent("sent_unconfirmed", udp.BlueScore, udp.YellowScore,
             udp.CommandCounter, observation.RequestSequence, expectedSimulator.ContainerId,
-            expectedSimulator.RunId, "Sent ball-only TeleportBall(0,0) on simulator SSL control port 10300.");
+            expectedSimulator.RunId,
+            $"Sent ball-only TeleportBall({placementX.ToString(CultureInfo.InvariantCulture)},{placementY.ToString(CultureInfo.InvariantCulture)}) on simulator SSL control port 10300.");
         Events.Add(sent);
-        pending = new(sent, observation.ApiSnapshot, observation.RequestSequence);
+        pending = new(sent, observation.ApiSnapshot, observation.RequestSequence, placementX, placementY,
+            isOfficialPlacement ? placementTeam : null, restartTeam, udp.PacketTimestamp);
     }
 
     internal static bool IsEligibleGoalPlacement(
@@ -158,8 +180,23 @@ internal sealed class SimulatorBallPlacementFixture(
         uint previousBlueScore,
         uint previousYellowScore,
         bool observedSecondHalfKickoff,
+        out string reason) =>
+        IsEligiblePlacement(udp, api, continuation, previousBlueScore, previousYellowScore,
+            observedSecondHalfKickoff, out _, out _, out reason);
+
+    internal static bool IsEligiblePlacement(
+        RefereeCommandSnapshot udp,
+        GameControllerMatchSnapshot? api,
+        GameControllerContinuationState? continuation,
+        uint previousBlueScore,
+        uint previousYellowScore,
+        bool observedSecondHalfKickoff,
+        out float placementX,
+        out float placementY,
         out string reason)
     {
+        placementX = 0;
+        placementY = 0;
         var blueIncreased = udp.BlueScore > previousBlueScore;
         var yellowIncreased = udp.YellowScore > previousYellowScore;
         var unchangedScore = udp.BlueScore == previousBlueScore && udp.YellowScore == previousYellowScore;
@@ -225,6 +262,69 @@ internal sealed class SimulatorBallPlacementFixture(
         return true;
     }
 
+    internal static bool IsEligibleOfficialPlacement(
+        RefereeCommandSnapshot udp,
+        GameControllerMatchSnapshot? api,
+        GameControllerContinuationState? continuation,
+        string expectedTeam,
+        out float placementX,
+        out float placementY,
+        out string? expectedRestartTeam,
+        out string reason)
+    {
+        placementX = 0;
+        placementY = 0;
+        expectedRestartTeam = null;
+        if (!TryGetPlacementTeam(udp.Command, out var udpTeam) || udpTeam != expectedTeam ||
+            api is null || api.Command != GameControllerCommandKind.BallPlacement ||
+            api.Phase != GameControllerMatchPhase.BallPlacement || api.CommandForTeam != expectedTeam ||
+            api.PhaseForTeam != expectedTeam ||
+            !GameControllerStateMapping.MatchesUdpCommand(api, udp) ||
+            !GameControllerStateMapping.TryParseStage(api.Stage, out var apiStage) || udp.Stage != apiStage ||
+            api.BlueScore != udp.BlueScore || api.YellowScore != udp.YellowScore ||
+            api.NextCommand != "DIRECT" || api.NextCommandForTeam is not ("BLUE" or "YELLOW") ||
+            udp.NextCommand != (api.NextCommandForTeam == "BLUE"
+                ? Referee.Types.Command.DirectFreeBlue
+                : Referee.Types.Command.DirectFreeYellow) ||
+            udp.DesignatedPositionX is not { } udpX || udp.DesignatedPositionY is not { } udpY ||
+            api.PlacementX is not { } apiX || api.PlacementY is not { } apiY ||
+            !float.IsFinite(udpX) || !float.IsFinite(udpY) || !float.IsFinite(apiX) || !float.IsFinite(apiY) ||
+            Math.Abs(apiX - udpX / 1000f) > 0.001f || Math.Abs(apiY - udpY / 1000f) > 0.001f)
+        {
+            reason = "Fresh UDP and Game Controller API do not agree on the official team and designated ball-placement position.";
+            return false;
+        }
+
+        if (continuation is null || continuation.Command != nameof(GameControllerCommandKind.BallPlacement) ||
+            continuation.Phase != nameof(GameControllerMatchPhase.BallPlacement) ||
+            continuation.Stage != api.Stage || continuation.NextCommand != api.NextCommand ||
+            continuation.NextCommandForTeam != api.NextCommandForTeam ||
+            continuation.BlueScore != udp.BlueScore || continuation.YellowScore != udp.YellowScore ||
+            continuation.PlacementX is not { } continuationX || continuation.PlacementY is not { } continuationY ||
+            Math.Abs(continuationX - apiX) > 0.001f || Math.Abs(continuationY - apiY) > 0.001f)
+        {
+            reason = "A fresh control API read did not match the current UDP/API designated placement.";
+            return false;
+        }
+
+        placementX = apiX;
+        placementY = apiY;
+        expectedRestartTeam = api.NextCommandForTeam;
+        reason = $"Fresh official {expectedTeam} BALL_PLACEMENT designated position matches the current GC state.";
+        return true;
+    }
+
+    private static bool TryGetPlacementTeam(Referee.Types.Command command, out string? team)
+    {
+        team = command switch
+        {
+            Referee.Types.Command.BallPlacementBlue => "BLUE",
+            Referee.Types.Command.BallPlacementYellow => "YELLOW",
+            _ => null,
+        };
+        return team is not null;
+    }
+
     internal static bool IsObservedSecondHalfKickoff(
         RefereeLifecycleObservation previous,
         RefereeLifecycleObservation current) =>
@@ -252,10 +352,10 @@ internal sealed class SimulatorBallPlacementFixture(
             observation.ApiSnapshot is not { } api ||
             api.BlueScore != outstanding.Event.BlueScore || api.YellowScore != outstanding.Event.YellowScore ||
             api.Stage != outstanding.ApiSnapshot?.Stage ||
-            !GameControllerStateMapping.MatchesUdpCommand(api, observation.Udp.Command))
+            !GameControllerStateMapping.MatchesUdpCommand(api, observation.Udp))
             return;
 
-        var expectedTeam = outstanding.ApiSnapshot?.NextCommandForTeam;
+        var expectedTeam = outstanding.RestartTeam ?? outstanding.ApiSnapshot?.NextCommandForTeam;
         if (expectedTeam is not ("BLUE" or "YELLOW") ||
             observation.Udp.BlueScore != outstanding.Event.BlueScore ||
             observation.Udp.YellowScore != outstanding.Event.YellowScore ||
@@ -263,7 +363,8 @@ internal sealed class SimulatorBallPlacementFixture(
             observation.Udp.Stage != expectedStage)
             return;
 
-        var stoppedPlacement = api.Command == GameControllerCommandKind.Stop &&
+        var legacyKickoffPlacement = outstanding.RestartTeam is null;
+        var stoppedPlacement = legacyKickoffPlacement && api.Command == GameControllerCommandKind.Stop &&
             api.Phase == GameControllerMatchPhase.Stop &&
             api.NextCommand == outstanding.ApiSnapshot?.NextCommand &&
             api.NextCommandForTeam == expectedTeam &&
@@ -274,8 +375,13 @@ internal sealed class SimulatorBallPlacementFixture(
                 ? Referee.Types.Command.PrepareKickoffYellow
                 : Referee.Types.Command.PrepareKickoffBlue);
 
-        var progressedKickoff = IsExpectedKickoffProgression(api, observation.Udp, expectedTeam);
-        if (!stoppedPlacement && !progressedKickoff)
+        var progressedKickoff = legacyKickoffPlacement &&
+            IsExpectedKickoffProgression(api, observation.Udp, expectedTeam);
+        var progressedOfficialPlacement = outstanding.RestartTeam is { } restartTeam &&
+            outstanding.Event.CommandCounter < observation.Udp.CommandCounter &&
+            outstanding.PacketTimestamp is { } priorTimestamp && observation.Udp.PacketTimestamp is { } newTimestamp &&
+            newTimestamp > priorTimestamp && IsExpectedOfficialPlacementProgression(api, observation.Udp, restartTeam);
+        if (!stoppedPlacement && !progressedKickoff && !progressedOfficialPlacement)
             return;
 
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
@@ -316,7 +422,9 @@ internal sealed class SimulatorBallPlacementFixture(
                     ? outstanding.ApiSnapshot?.Stage == "NORMAL_SECOND_HALF_PRE"
                         ? "Observed NORMAL_HALF_TIME to NORMAL_SECOND_HALF_PRE transition; fresh matched observation reports BLUE kickoff NEXT_COMMAND ready after ball-only placement."
                         : "Fresh matched UDP/API observation reports the same kickoff NEXT_COMMAND ready after ball-only placement."
-                    : "Fresh matched UDP/API observation progressed through the same scored kickoff after ball-only placement.",
+                    : progressedOfficialPlacement
+                        ? "Fresh matched UDP/API observation advanced from the same-team BALL_PLACEMENT to DIRECT/FREE_KICK after ball-only designated-position placement."
+                        : "Fresh matched UDP/API observation progressed through the same scored kickoff after ball-only placement.",
             };
         pending = null;
     }
@@ -342,6 +450,21 @@ internal sealed class SimulatorBallPlacementFixture(
             udp.Command == Referee.Types.Command.NormalStart;
     }
 
+    private static bool IsExpectedOfficialPlacementProgression(
+        GameControllerMatchSnapshot api,
+        RefereeCommandSnapshot udp,
+        string expectedTeam)
+    {
+        var expectedUdp = expectedTeam == "YELLOW"
+            ? Referee.Types.Command.DirectFreeYellow
+            : Referee.Types.Command.DirectFreeBlue;
+        return api.Command == GameControllerCommandKind.Direct &&
+            api.Phase is GameControllerMatchPhase.FreeKick or GameControllerMatchPhase.Running &&
+            api.CommandForTeam == expectedTeam && udp.Command == expectedUdp &&
+            api.BlueScore == udp.BlueScore && api.YellowScore == udp.YellowScore &&
+            GameControllerStateMapping.TryParseStage(api.Stage, out var apiStage) && udp.Stage == apiStage;
+    }
+
     private async Task<bool> IsCurrentSimulatorAsync(CancellationToken cancellationToken)
     {
         var evidence = await readinessProbe.ReadCurrentParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
@@ -360,5 +483,10 @@ internal sealed class SimulatorBallPlacementFixture(
     private sealed record PendingPlacement(
         BallPlacementFixtureEvent Event,
         GameControllerMatchSnapshot? ApiSnapshot,
-        long RequestSequence);
+        long RequestSequence,
+        float PlacementX,
+        float PlacementY,
+        string? PlacementTeam,
+        string? RestartTeam,
+        ulong? PacketTimestamp);
 }

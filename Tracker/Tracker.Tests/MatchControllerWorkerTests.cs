@@ -389,7 +389,7 @@ public sealed class MatchControllerWorkerTests
     {
         public int SendCalls { get; private set; }
 
-        public Task SendBallToCenterAsync(CancellationToken cancellationToken)
+        public Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             SendCalls++;

@@ -216,6 +216,8 @@ public enum GameControllerCommandKind
     Kickoff,
     NormalStart,
     ForceStart,
+    BallPlacement,
+    Direct,
 }
 
 /// <summary>公開matchStateから正規化する試合状態。未確認は成功状態にしない。</summary>
@@ -226,6 +228,8 @@ public enum GameControllerMatchPhase
     Stop,
     Kickoff,
     Running,
+    BallPlacement,
+    FreeKick,
 }
 
 /// <summary>API公開状態の正規化結果。UDP件数・受信時刻・所有証明は含めない。</summary>

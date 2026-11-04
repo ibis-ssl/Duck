@@ -15,6 +15,9 @@ public sealed class GameControllerStateMappingTests
     [InlineData("NORMAL_START", "KICKOFF", "NormalStart", "Kickoff")]
     [InlineData("FORCE_START", "RUNNING", "ForceStart", "Running")]
     [InlineData("KICKOFF", "STOP", "Kickoff", "Stop")]
+    [InlineData("BALL_PLACEMENT", "BALL_PLACEMENT", "BallPlacement", "BallPlacement")]
+    [InlineData("DIRECT", "FREE_KICK", "Direct", "FreeKick")]
+    [InlineData("DIRECT", "RUNNING", "Direct", "Running")]
     public async Task NormalizesSupportedApiNames(
         string command, string phase, string expectedCommand, string expectedPhase)
     {
@@ -99,7 +102,7 @@ public sealed class GameControllerStateMappingTests
     [InlineData("""{"matchState":{"command":{},"gameState":{"type":"HALT"}}}""")]
     [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":{}}}""")]
     [InlineData("""{"matchState":{"command":{"type":"UNKNOWN"},"gameState":{"type":"HALT"}}}""")]
-    [InlineData("""{"matchState":{"command":{"type":"DIRECT"},"gameState":{"type":"FREE_KICK"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"INDIRECT"},"gameState":{"type":"FREE_KICK"}}}""")]
     [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":{"type":"UNKNOWN"}}}""")]
     [InlineData("""{"matchState":{"command":{"type":999},"gameState":{"type":"HALT"}}}""")]
     [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":{"type":true}}}""")]
@@ -124,6 +127,13 @@ public sealed class GameControllerStateMappingTests
     [InlineData("Stop", "Stop", Referee.Types.Command.Halt, false)]
     [InlineData("NormalStart", "Running", Referee.Types.Command.ForceStart, false)]
     [InlineData("ForceStart", "Running", Referee.Types.Command.NormalStart, false)]
+    [InlineData("BallPlacement", "BallPlacement", Referee.Types.Command.BallPlacementBlue, true)]
+    [InlineData("BallPlacement", "BallPlacement", Referee.Types.Command.BallPlacementYellow, true)]
+    [InlineData("Direct", "FreeKick", Referee.Types.Command.DirectFreeBlue, true)]
+    [InlineData("Direct", "FreeKick", Referee.Types.Command.DirectFreeYellow, true)]
+    [InlineData("BallPlacement", "BallPlacement", Referee.Types.Command.DirectFreeBlue, false)]
+    [InlineData("Direct", "FreeKick", Referee.Types.Command.BallPlacementYellow, false)]
+    [InlineData("Direct", "Running", Referee.Types.Command.DirectFreeBlue, true)]
     [InlineData("Kickoff", "Stop", Referee.Types.Command.PrepareKickoffBlue, true)]
     [InlineData("Kickoff", "Stop", Referee.Types.Command.PrepareKickoffYellow, true)]
     [InlineData("Kickoff", "Kickoff", Referee.Types.Command.PrepareKickoffBlue, true)]
@@ -145,6 +155,31 @@ public sealed class GameControllerStateMappingTests
             Enum.Parse<GameControllerCommandKind>(command), Enum.Parse<GameControllerMatchPhase>(phase));
 
         Assert.Equal(expected, GameControllerStateMapping.MatchesUdpCommand(api, udp));
+    }
+
+    [Fact]
+    public void MatchesBallPlacementAndDirectCommandsOnlyWhenApiTeamMatchesUdpTeam()
+    {
+        var placementUdp = new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementYellow, 4);
+        var placementApi = new GameControllerMatchSnapshot(GameControllerCommandKind.BallPlacement,
+            GameControllerMatchPhase.BallPlacement, CommandForTeam: "YELLOW", PhaseForTeam: "YELLOW");
+        Assert.True(GameControllerStateMapping.MatchesUdpCommand(placementApi, placementUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            placementApi with { PhaseForTeam = "BLUE" }, placementUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            placementApi with { CommandForTeam = "UNKNOWN" }, placementUdp));
+
+        var directUdp = new RefereeCommandSnapshot(Referee.Types.Command.DirectFreeYellow, 5);
+        var directApi = new GameControllerMatchSnapshot(GameControllerCommandKind.Direct,
+            GameControllerMatchPhase.FreeKick, CommandForTeam: "YELLOW", PhaseForTeam: "YELLOW");
+        Assert.True(GameControllerStateMapping.MatchesUdpCommand(directApi, directUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            directApi with { PhaseForTeam = "BLUE" }, directUdp));
+        Assert.False(GameControllerStateMapping.MatchesUdpCommand(
+            directApi with { CommandForTeam = "BLUE" }, directUdp));
+
+        Assert.True(GameControllerStateMapping.MatchesUdpCommand(
+            directApi with { Phase = GameControllerMatchPhase.Running, PhaseForTeam = null }, directUdp));
     }
 
     private static GameControllerStateClient CreateClient(WebSocket socket) =>

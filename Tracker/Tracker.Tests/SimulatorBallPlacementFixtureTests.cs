@@ -328,7 +328,7 @@ public sealed class SimulatorBallPlacementFixtureTests
     [Fact]
     public void SimulatorControlCommandTeleportsOnlyTheBallToCenterOnOfficialControlPort()
     {
-        var command = SimulatorCommand.Parser.ParseFrom(SimulatorBallControlClient.CreateBallToCenterCommand());
+        var command = SimulatorCommand.Parser.ParseFrom(SimulatorBallControlClient.CreateBallPlacementCommand(0, 0));
 
         Assert.Equal(SimulatorBallControlClient.DefaultControlPort, 10300);
         Assert.Equal("simulator", SimulatorBallControlClient.SimulatorResourceHost);
@@ -339,6 +339,103 @@ public sealed class SimulatorBallPlacementFixtureTests
         Assert.Equal(0, command.Control.TeleportBall.Vx);
         Assert.Equal(0, command.Control.TeleportBall.Vy);
         Assert.Empty(command.Control.TeleportRobot);
+
+        var designated = SimulatorCommand.Parser.ParseFrom(
+            SimulatorBallControlClient.CreateBallPlacementCommand(2.5f, -1.25f));
+        Assert.Equal(2.5f, designated.Control.TeleportBall.X);
+        Assert.Equal(-1.25f, designated.Control.TeleportBall.Y);
+        Assert.Equal(0, designated.Control.TeleportBall.Vx);
+        Assert.Equal(0, designated.Control.TeleportBall.Vy);
+        Assert.Empty(designated.Control.TeleportRobot);
+    }
+
+    [Fact]
+    public async Task SendsOfficialBallPlacementToMatchedDesignatedPositionOnceAndConfirmsDirectRestart()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var actionState = new GameControllerContinuationState(
+            "BallPlacement", "BallPlacement", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(-1),
+            [new("BALL_PLACEMENT_CANCEL", "UNKNOWN", "READY_MANUAL", false),
+             new("BALL_PLACEMENT_COMPLETE", "UNKNOWN", "READY_MANUAL", false),
+             new("BALL_PLACEMENT_FAIL", "UNKNOWN", "READY_MANUAL", false)],
+            "DIRECT", "BLUE", 0, 0, 2.5f, -1.25f);
+        var directState = new GameControllerContinuationState(
+            "Direct", "FreeKick", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(-1), [],
+            "NORMAL_START", "UNKNOWN", 0, 0, 2.5f, -1.25f);
+        var driver = new RefereeDriverFixture(new EmptyRefereeSource(),
+            new SequenceControlClient(actionState, directState));
+        var fixture = new SimulatorBallPlacementFixture(driver, readiness, sender, simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 3,
+                Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0));
+        var udp = new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementYellow, 4,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 400,
+            NextCommand: Referee.Types.Command.DirectFreeBlue,
+            DesignatedPositionX: 2500, DesignatedPositionY: -1250);
+        var api = new GameControllerMatchSnapshot(GameControllerCommandKind.BallPlacement,
+            GameControllerMatchPhase.BallPlacement, "NORMAL_FIRST_HALF",
+            NextCommand: "DIRECT", NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: 2.5f, PlacementY: -1.25f, CommandForTeam: "YELLOW", PhaseForTeam: "YELLOW");
+
+        var observation = new RefereeLifecycleObservation(10, udp, "BallPlacement", "BallPlacement",
+            "NORMAL_FIRST_HALF", null, api);
+        await fixture.ObserveAsync(observation, CancellationToken.None);
+
+        var placement = Assert.Single(sender.Placements);
+        Assert.Equal(2.5f, placement.X);
+        Assert.Equal(-1.25f, placement.Y);
+        Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
+
+        var prematureKickoffUdp = new RefereeCommandSnapshot(
+            Referee.Types.Command.PrepareKickoffBlue, 5,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 450,
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.NormalStart);
+        var prematureKickoffApi = new GameControllerMatchSnapshot(GameControllerCommandKind.Kickoff,
+            GameControllerMatchPhase.Kickoff, "NORMAL_FIRST_HALF", NextCommand: "NORMAL_START",
+            NextCommandForTeam: "UNKNOWN", BlueScore: 0, YellowScore: 0,
+            CommandForTeam: "BLUE", PhaseForTeam: "BLUE");
+        await fixture.ObserveAsync(new(11, prematureKickoffUdp, "Kickoff", "Kickoff",
+            "NORMAL_FIRST_HALF", null, prematureKickoffApi), CancellationToken.None);
+        Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
+
+        var directUdp = new RefereeCommandSnapshot(Referee.Types.Command.DirectFreeBlue, 6,
+            Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 500, BlueScore: 0, YellowScore: 0);
+        var directApi = new GameControllerMatchSnapshot(GameControllerCommandKind.Direct,
+            GameControllerMatchPhase.FreeKick, "NORMAL_FIRST_HALF", NextCommand: "NORMAL_START",
+            NextCommandForTeam: "UNKNOWN", BlueScore: 0, YellowScore: 0,
+            CommandForTeam: "BLUE", PhaseForTeam: "BLUE");
+        await fixture.ObserveAsync(new(12, directUdp, "Direct", "FreeKick", "NORMAL_FIRST_HALF", null,
+            directApi), CancellationToken.None);
+        Assert.Single(sender.Placements);
+        Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+    }
+
+    [Fact]
+    public void RejectsOfficialPlacementWhenUdpTeamOrDesignatedPositionDiffers()
+    {
+        var udp = new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementYellow, 4,
+            Stage: Referee.Types.Stage.NormalFirstHalf, BlueScore: 0, YellowScore: 0,
+            DesignatedPositionX: 2500, DesignatedPositionY: -1250);
+        var api = new GameControllerMatchSnapshot(GameControllerCommandKind.BallPlacement,
+            GameControllerMatchPhase.BallPlacement, "NORMAL_FIRST_HALF",
+            NextCommand: "DIRECT", NextCommandForTeam: "BLUE", BlueScore: 0, YellowScore: 0,
+            PlacementX: 2.5f, PlacementY: -1.25f,
+            CommandForTeam: "YELLOW");
+        var continuation = new GameControllerContinuationState(
+            "BallPlacement", "BallPlacement", "NORMAL_FIRST_HALF", null,
+            [new("BALL_PLACEMENT_CANCEL", "UNKNOWN", "READY_MANUAL", false)],
+            "DIRECT", "BLUE",
+            BlueScore: 0, YellowScore: 0, PlacementX: 2.5f, PlacementY: -1.25f);
+        udp = udp with { NextCommand = Referee.Types.Command.DirectFreeBlue };
+
+        Assert.False(SimulatorBallPlacementFixture.IsEligibleOfficialPlacement(
+            udp with { Command = Referee.Types.Command.BallPlacementBlue }, api, continuation,
+            "YELLOW", out _, out _, out _, out _));
+        Assert.False(SimulatorBallPlacementFixture.IsEligibleOfficialPlacement(
+            udp, api with { PlacementX = 2.4f }, continuation, "YELLOW", out _, out _, out _, out _));
     }
 
     private static RefereeCommandSnapshot ScoreSnapshot() => new(
@@ -397,12 +494,13 @@ public sealed class SimulatorBallPlacementFixtureTests
 
     private sealed class RecordingSimulatorControlClient : ISimulatorBallControlClient
     {
-        public int SendCalls { get; private set; }
+        public List<(float X, float Y)> Placements { get; } = [];
+        public int SendCalls => Placements.Count;
 
-        public Task SendBallToCenterAsync(CancellationToken cancellationToken)
+        public Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            SendCalls++;
+            Placements.Add((x, y));
             return Task.CompletedTask;
         }
     }

@@ -37,6 +37,8 @@ internal static class GameControllerStateMapping
             "KICKOFF" => GameControllerCommandKind.Kickoff,
             "NORMAL_START" => GameControllerCommandKind.NormalStart,
             "FORCE_START" => GameControllerCommandKind.ForceStart,
+            "BALL_PLACEMENT" => GameControllerCommandKind.BallPlacement,
+            "DIRECT" => GameControllerCommandKind.Direct,
             _ => GameControllerCommandKind.Unknown,
         };
         var phase = ReadTypeName(matchState, "gameState") switch
@@ -45,6 +47,8 @@ internal static class GameControllerStateMapping
             "STOP" => GameControllerMatchPhase.Stop,
             "KICKOFF" => GameControllerMatchPhase.Kickoff,
             "RUNNING" => GameControllerMatchPhase.Running,
+            "BALL_PLACEMENT" => GameControllerMatchPhase.BallPlacement,
+            "FREE_KICK" => GameControllerMatchPhase.FreeKick,
             _ => GameControllerMatchPhase.Unknown,
         };
         return command == GameControllerCommandKind.Unknown || phase == GameControllerMatchPhase.Unknown
@@ -75,8 +79,40 @@ internal static class GameControllerStateMapping
                 GameControllerMatchPhase.Kickoff or GameControllerMatchPhase.Running,
                 Referee.Types.Command.NormalStart) => true,
             (GameControllerCommandKind.ForceStart, GameControllerMatchPhase.Running, Referee.Types.Command.ForceStart) => true,
+            (GameControllerCommandKind.BallPlacement, GameControllerMatchPhase.BallPlacement,
+                Referee.Types.Command.BallPlacementBlue or Referee.Types.Command.BallPlacementYellow) => true,
+            (GameControllerCommandKind.Direct, GameControllerMatchPhase.FreeKick,
+                Referee.Types.Command.DirectFreeBlue or Referee.Types.Command.DirectFreeYellow) => true,
+            (GameControllerCommandKind.Direct, GameControllerMatchPhase.Running,
+                Referee.Types.Command.DirectFreeBlue or Referee.Types.Command.DirectFreeYellow) => true,
             _ => false,
         };
+    }
+
+    internal static bool MatchesUdpCommand(
+        GameControllerMatchSnapshot? api,
+        RefereeCommandSnapshot udp)
+    {
+        if (!MatchesUdpCommand(api, udp.Command))
+            return false;
+
+        var expectedTeam = udp.Command switch
+        {
+            Referee.Types.Command.BallPlacementBlue or Referee.Types.Command.DirectFreeBlue => "BLUE",
+            Referee.Types.Command.BallPlacementYellow or Referee.Types.Command.DirectFreeYellow => "YELLOW",
+            _ => null,
+        };
+        if (expectedTeam is null)
+            return true;
+
+        if (api!.CommandForTeam != expectedTeam)
+            return false;
+
+        // A DIRECT command keeps its command team after the game state advances from FREE_KICK to RUNNING.
+        // The neutral RUNNING game state may no longer carry a team.
+        return api.Phase == GameControllerMatchPhase.Running
+            ? api.PhaseForTeam is null || api.PhaseForTeam == "UNKNOWN" || api.PhaseForTeam == expectedTeam
+            : api.PhaseForTeam == expectedTeam;
     }
 
     /// <summary>対象の状態オブジェクトに文字列のtypeが明示された場合だけ名前を読む。</summary>

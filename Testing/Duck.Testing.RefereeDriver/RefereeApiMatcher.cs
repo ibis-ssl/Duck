@@ -178,7 +178,7 @@ internal sealed class RefereeApiMatcher : IRefereeLifecycleObservationSource
             return new(false, "NoFreshApi", latestUdp, latestApi);
         if (!SameApiContext(requestedApi, latestApi))
             return new(false, "ApiContextChanged", latestUdp, latestApi);
-        if (!GameControllerStateMapping.MatchesUdpCommand(latestApi.State, latestUdp!.Command.Command))
+        if (!GameControllerStateMapping.MatchesUdpCommand(latestApi.State, latestUdp!.Command))
             return new(false, "CommandMismatch", latestUdp, latestApi);
         return new(true, "Matched", latestUdp, latestApi);
     }
