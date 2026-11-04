@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -73,4 +74,5 @@ public sealed record RuntimeVisionHealthResponse(
     long VisionPacketsReceived,
     bool IsReady,
     ServiceReceiveSnapshot Diagnostics,
-    IReadOnlyList<ServiceReceiveSnapshot> TrackerDiagnostics);
+    [property: JsonPropertyName("trackerDiagnostics")]
+    IReadOnlyList<ServiceReceiveSnapshot> TrackerReceiveSources);

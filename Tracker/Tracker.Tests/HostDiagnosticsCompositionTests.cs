@@ -53,11 +53,15 @@ public sealed class HostDiagnosticsCompositionTests
             new TrackerPacketAdapter(trackedPacket),
             new IPEndPoint(IPAddress.Parse("172.20.0.4"), 11010));
         var trackerSnapshot = Assert.Single(RuntimeVisionDiagnosticsHttpService.GetHealth(
-            diagnostics, configuration).Response.TrackerDiagnostics);
+            diagnostics, configuration).Response.TrackerReceiveSources);
         Assert.Equal(ledger.Identity, trackerSnapshot.Identity);
         Assert.Equal("TIGERs", trackerSnapshot.SourceName);
         Assert.Equal("172.20.0.4:11010", trackerSnapshot.RemoteEndpoint);
         Assert.Equal(1, trackerSnapshot.SuccessfullyDecodedCount);
+        using var healthJson = JsonDocument.Parse(JsonSerializer.Serialize(
+            RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).Response,
+            new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+        Assert.True(healthJson.RootElement.TryGetProperty("trackerDiagnostics", out _));
     }
 
     [Fact]
