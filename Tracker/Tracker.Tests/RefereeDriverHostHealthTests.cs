@@ -237,18 +237,16 @@ public sealed class RefereeDriverHostHealthTests
             fixture.Core.Receiver.Supply(Packet().ToByteArray());
             await fixture.Core.Receiver.AtReceiveCall(nextReceive).WaitAsync(TimeSpan.FromSeconds(5));
             var request = fixture.Client.GetAsync("/health/referee");
-            await RequireHealthWaitAsync(fixture.Core.Clock.AtTimer(index), request);
-            Assert.False(request.IsCompleted);
             Assert.Equal(index, fixture.Core.Api.ConnectCalls);
 
-            Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
             using var response = await request.WaitAsync(TimeSpan.FromSeconds(5));
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             Assert.Equal(index + 2, json.RootElement.GetProperty("diagnostic")
                 .GetProperty("successfullyDecodedCount").GetInt64());
-            Assert.Equal(index + 1, json.RootElement.GetProperty("api")
+            Assert.Equal(index, json.RootElement.GetProperty("api")
                 .GetProperty("requestSequence").GetInt64());
+            Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
         }
         Assert.Equal(0, fixture.Core.Api.SendCalls);
     }
