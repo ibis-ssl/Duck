@@ -1083,7 +1083,7 @@ public sealed class AppHostApplicationModelTests
             endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
 
         var mounts = gameController.Annotations.OfType<ContainerMountAnnotation>().ToArray();
-        Assert.Equal(2, mounts.Length);
+        Assert.Equal(3, mounts.Length);
         var matchConfig = Assert.Single(mounts, mount => mount.Target == "/config/ssl-game-controller.yaml");
         Assert.NotNull(matchConfig.Source);
         Assert.Equal(
@@ -1102,6 +1102,16 @@ public sealed class AppHostApplicationModelTests
             File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "state-store-initial.json.stream")),
             File.ReadAllText(initialState.Source!));
         Assert.False(initialState.IsReadOnly);
+        var engineConfig = Assert.Single(mounts, mount => mount.Target == "/tmp/match-engine.json");
+        var expectedEngineConfigPath = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-state", $"{stateStoreKey}.engine.json");
+        Assert.Equal(Path.GetFullPath(expectedEngineConfigPath), Path.GetFullPath(engineConfig.Source!));
+        Assert.Equal("{\"autoContinue\":false}", File.ReadAllText(engineConfig.Source!).Trim());
+        Assert.False(engineConfig.IsReadOnly);
+        Assert.Contains(
+            "config-filename: /tmp/match-engine.json",
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "ssl-game-controller-match.yaml")),
+            StringComparison.Ordinal);
 
         var producerResources = new List<string>();
         foreach (var resource in new IResourceWithArgs[]

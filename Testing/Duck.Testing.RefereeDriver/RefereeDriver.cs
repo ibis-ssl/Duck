@@ -54,6 +54,12 @@ public sealed class RefereeStateLostException(RefereeCommandSnapshot snapshot)
 
 public interface IGameControllerControlClient
 {
+    Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<bool?>(null);
+
+    Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken) =>
+        Task.FromResult(false);
+
     Task SendContinueActionAsync(
         GameControllerContinueAction action,
         CancellationToken cancellationToken);
@@ -71,6 +77,12 @@ public sealed class RefereeDriverFixture
         this.commandSource = commandSource;
         this.controlClient = controlClient;
     }
+
+    public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
+        controlClient.ReadAutoContinueAsync(cancellationToken);
+
+    public Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken) =>
+        controlClient.SetAutoContinueAsync(enabled, cancellationToken);
 
     public async Task<RefereeCommandSnapshot> DriveToActiveAsync(CancellationToken cancellationToken)
     {

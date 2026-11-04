@@ -113,6 +113,130 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
 public interface IGameControllerWebSocketTransport
 {
     Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken);
+
+    Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken) =>
+        Task.FromResult<bool?>(null);
+
+    Task<bool> SendConfigDeltaAndWaitForAutoContinueAsync(
+        Uri endpoint,
+        string json,
+        bool expectedAutoContinue,
+        CancellationToken cancellationToken) => Task.FromResult(false);
+}
+
+public static class GameControllerWebSocketTransportOperations
+{
+    private static readonly TimeSpan ConfigConfirmationTimeout = TimeSpan.FromSeconds(3);
+
+    public static async Task SendJsonAsync(
+        Func<Uri, CancellationToken, Task<WebSocket>> connect,
+        Uri endpoint,
+        string json,
+        CancellationToken cancellationToken)
+    {
+        using var socket = await connect(endpoint, cancellationToken).ConfigureAwait(false);
+        _ = await ReceiveTextMessageAsync(socket, cancellationToken).ConfigureAwait(false);
+        await SendTextMessageAsync(socket, json, cancellationToken).ConfigureAwait(false);
+    }
+
+    public static async Task<bool?> ReadAutoContinueAsync(
+        Func<Uri, CancellationToken, Task<WebSocket>> connect,
+        Uri endpoint,
+        CancellationToken cancellationToken)
+    {
+        using var timeout = CreateConfigTimeout(cancellationToken);
+        try
+        {
+            using var socket = await connect(endpoint, timeout.Token).ConfigureAwait(false);
+            while (true)
+            {
+                var message = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
+                if (TryReadAutoContinue(message, out var enabled))
+                    return enabled;
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException("Game Controller did not publish its autoContinue config within three seconds.");
+        }
+    }
+
+    public static async Task<bool> SendConfigDeltaAndWaitForAutoContinueAsync(
+        Func<Uri, CancellationToken, Task<WebSocket>> connect,
+        Uri endpoint,
+        string json,
+        bool expectedAutoContinue,
+        CancellationToken cancellationToken)
+    {
+        using var timeout = CreateConfigTimeout(cancellationToken);
+        try
+        {
+            using var socket = await connect(endpoint, timeout.Token).ConfigureAwait(false);
+            _ = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
+            await SendTextMessageAsync(socket, json, timeout.Token).ConfigureAwait(false);
+            while (true)
+            {
+                var message = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
+                if (TryReadAutoContinue(message, out var enabled) && enabled == expectedAutoContinue)
+                    return true;
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException(
+                $"Game Controller did not confirm autoContinue={expectedAutoContinue} within three seconds.");
+        }
+    }
+
+    public static bool TryReadAutoContinue(string outputJson, out bool enabled)
+    {
+        enabled = false;
+        using var document = System.Text.Json.JsonDocument.Parse(outputJson);
+        if (document.RootElement.ValueKind != System.Text.Json.JsonValueKind.Object ||
+            !document.RootElement.TryGetProperty("config", out var config) ||
+            config.ValueKind != System.Text.Json.JsonValueKind.Object)
+            return false;
+
+        if (!config.TryGetProperty("autoContinue", out var value) &&
+            !config.TryGetProperty("auto_continue", out value))
+            return false;
+
+        if (value.ValueKind is not (System.Text.Json.JsonValueKind.True or System.Text.Json.JsonValueKind.False))
+            return false;
+        enabled = value.GetBoolean();
+        return true;
+    }
+
+    private static CancellationTokenSource CreateConfigTimeout(CancellationToken cancellationToken)
+    {
+        var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(ConfigConfirmationTimeout);
+        return timeout;
+    }
+
+    private static async Task SendTextMessageAsync(WebSocket socket, string json, CancellationToken cancellationToken)
+    {
+        await socket.SendAsync(Encoding.UTF8.GetBytes(json).AsMemory(), WebSocketMessageType.Text,
+            endOfMessage: true, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task<string> ReceiveTextMessageAsync(WebSocket socket, CancellationToken cancellationToken)
+    {
+        using var message = new MemoryStream();
+        var buffer = new byte[4096];
+        while (true)
+        {
+            var result = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken).ConfigureAwait(false);
+            if (result.MessageType == WebSocketMessageType.Close)
+                throw new InvalidOperationException("Game Controller closed the control WebSocket before Output.config was received.");
+            if (result.MessageType != WebSocketMessageType.Text)
+                throw new InvalidOperationException($"Game Controller control WebSocket returned {result.MessageType} instead of text Output.");
+
+            message.Write(buffer, 0, result.Count);
+            if (result.EndOfMessage)
+                return Encoding.UTF8.GetString(message.GetBuffer(), 0, checked((int)message.Length));
+        }
+    }
 }
 
 public sealed class GameControllerWebSocketControlClient : IGameControllerControlClient
@@ -144,6 +268,16 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
             CreateContinueActionMessage(action),
             cancellationToken);
     }
+
+    public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
+        transport.ReadAutoContinueAsync(endpoint, cancellationToken);
+
+    public Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken) =>
+        transport.SendConfigDeltaAndWaitForAutoContinueAsync(
+            endpoint,
+            CreateAutoContinueConfigMessage(enabled),
+            enabled,
+            cancellationToken);
 
     public Task SendYellowTeamNameAsync(string teamName, CancellationToken cancellationToken)
     {
@@ -184,49 +318,40 @@ public sealed class GameControllerWebSocketControlClient : IGameControllerContro
         return $"{{\"continue_action\":{{\"type\":\"{actionName}\",\"for_team\":\"UNKNOWN\"}}}}";
     }
 
+    public static string CreateAutoContinueConfigMessage(bool enabled) =>
+        System.Text.Json.JsonSerializer.Serialize(new
+        {
+            config_delta = new { auto_continue = enabled },
+        });
+
     private sealed class ClientWebSocketJsonTransport : IGameControllerWebSocketTransport
     {
-        public async Task SendJsonAsync(
+        public Task SendJsonAsync(
             Uri endpoint,
             string json,
-            CancellationToken cancellationToken)
-        {
-            using var socket = new ClientWebSocket();
-            await socket.ConnectAsync(endpoint, cancellationToken);
-            await ReceiveInitialOutputAsync(socket, cancellationToken);
+            CancellationToken cancellationToken) =>
+            GameControllerWebSocketTransportOperations.SendJsonAsync(ConnectAsync, endpoint, json, cancellationToken);
 
-            var payload = Encoding.UTF8.GetBytes(json);
-            await socket.SendAsync(
-                payload.AsMemory(),
-                WebSocketMessageType.Text,
-                endOfMessage: true,
-                cancellationToken);
-        }
+        public Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken) =>
+            GameControllerWebSocketTransportOperations.ReadAutoContinueAsync(ConnectAsync, endpoint, cancellationToken);
 
-        private static async Task ReceiveInitialOutputAsync(
-            ClientWebSocket socket,
-            CancellationToken cancellationToken)
+        public Task<bool> SendConfigDeltaAndWaitForAutoContinueAsync(
+            Uri endpoint, string json, bool expectedAutoContinue, CancellationToken cancellationToken) =>
+            GameControllerWebSocketTransportOperations.SendConfigDeltaAndWaitForAutoContinueAsync(
+                ConnectAsync, endpoint, json, expectedAutoContinue, cancellationToken);
+
+        private static async Task<WebSocket> ConnectAsync(Uri endpoint, CancellationToken cancellationToken)
         {
-            var buffer = new byte[4096];
-            while (true)
+            var socket = new ClientWebSocket();
+            try
             {
-                var result = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken);
-                if (result.MessageType == WebSocketMessageType.Close)
-                {
-                    throw new InvalidOperationException(
-                        "Game Controller closed the control WebSocket before the initial Output was received.");
-                }
-
-                if (result.MessageType != WebSocketMessageType.Text)
-                {
-                    throw new InvalidOperationException(
-                        $"Game Controller control WebSocket returned {result.MessageType} instead of text Output.");
-                }
-
-                if (result.EndOfMessage)
-                {
-                    return;
-                }
+                await socket.ConnectAsync(endpoint, cancellationToken).ConfigureAwait(false);
+                return socket;
+            }
+            catch
+            {
+                socket.Dispose();
+                throw;
             }
         }
     }

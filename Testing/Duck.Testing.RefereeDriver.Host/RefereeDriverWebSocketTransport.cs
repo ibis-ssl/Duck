@@ -1,5 +1,4 @@
 using System.Net.WebSockets;
-using System.Text;
 
 namespace Duck.Testing.RefereeDriver.Hosting;
 
@@ -18,20 +17,18 @@ internal sealed class RefereeDriverWebSocketTransport : IGameControllerWebSocket
     public async Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        using var socket = await connect(endpoint, cancellationToken).ConfigureAwait(false);
-        var buffer = new byte[4096];
-        while (true)
-        {
-            var received = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken).ConfigureAwait(false);
-            cancellationToken.ThrowIfCancellationRequested();
-            if (received.MessageType != WebSocketMessageType.Text)
-                throw new InvalidOperationException("制御WebSocketの初期Outputがtextでないか、受信前に切断された。");
-            if (received.EndOfMessage)
-                break;
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-        await socket.SendAsync(Encoding.UTF8.GetBytes(json).AsMemory(),
-            WebSocketMessageType.Text, endOfMessage: true, cancellationToken).ConfigureAwait(false);
+        await GameControllerWebSocketTransportOperations.SendJsonAsync(
+            connect, endpoint, json, cancellationToken).ConfigureAwait(false);
     }
+
+    public Task<bool?> ReadAutoContinueAsync(Uri endpoint, CancellationToken cancellationToken) =>
+        GameControllerWebSocketTransportOperations.ReadAutoContinueAsync(connect, endpoint, cancellationToken);
+
+    public Task<bool> SendConfigDeltaAndWaitForAutoContinueAsync(
+        Uri endpoint,
+        string json,
+        bool expectedAutoContinue,
+        CancellationToken cancellationToken) =>
+        GameControllerWebSocketTransportOperations.SendConfigDeltaAndWaitForAutoContinueAsync(
+            connect, endpoint, json, expectedAutoContinue, cancellationToken);
 }

@@ -60,6 +60,20 @@ internal static class BaseSimulationResourceRegistration
         return stateStorePath;
     }
 
+    private static string CreateMatchEngineConfigCopy(string appHostAssetRoot, string duckRunId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(duckRunId);
+        var fixturePath = Path.Combine(appHostAssetRoot, "Fixtures", "match", "engine-config-initial.json");
+        var runKey = Convert.ToHexString(
+            System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(duckRunId)))
+            .ToLowerInvariant();
+        var engineConfigPath = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.engine.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(engineConfigPath)!);
+        File.Copy(fixturePath, engineConfigPath, overwrite: true);
+        return engineConfigPath;
+    }
+
     internal static BaseSimulationResources Add(
         IDistributedApplicationBuilder builder,
         BaseSimulationRegistrationOptions options,
@@ -137,6 +151,9 @@ internal static class BaseSimulationResourceRegistration
                 new DockerContainerMount(
                     CreateMatchStateStoreCopy(assetRoot, options.DuckRunId),
                     "/tmp/state-store.json.stream"),
+                new DockerContainerMount(
+                    CreateMatchEngineConfigCopy(assetRoot, options.DuckRunId),
+                    "/tmp/match-engine.json"),
             ];
         }
 

@@ -144,9 +144,31 @@ public sealed class MatchControllerWorkerTests
             control.Actions);
         Assert.Equal(1, readiness.InitialCalls);
         Assert.Equal(1, readiness.FinalCalls);
+        Assert.Equal([true], control.AutoContinueChanges);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
+    }
+
+    [Fact]
+    public async Task RunMatchFailsClosedWhenAutoContinueWasNotDisabledBeforeStart()
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var source = new SequenceRefereeCommandSource(
+            Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.PrepareKickoffBlue, 2, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.NormalStart, 3, Referee.Types.Stage.NormalFirstHalf));
+        var control = new RecordingControlClient { AutoContinueEnabled = true };
+        var readiness = new RecordingReadinessProbe(CompleteReadiness());
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1));
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal("failed", result.Status);
+        Assert.Equal("start", result.StageReached);
+        Assert.Empty(control.Actions);
+        Assert.Contains("autoContinue=false", result.Failure, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -330,6 +352,19 @@ public sealed class MatchControllerWorkerTests
     private sealed class RecordingControlClient : IGameControllerControlClient
     {
         public List<GameControllerContinueAction> Actions { get; } = [];
+        public List<bool> AutoContinueChanges { get; } = [];
+        public bool AutoContinueEnabled { get; set; }
+
+        public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<bool?>(AutoContinueEnabled);
+
+        public Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken)
+        {
+            AutoContinueEnabled = enabled;
+            AutoContinueChanges.Add(enabled);
+            return Task.FromResult(true);
+        }
+
         public Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken cancellationToken)
         {
             Actions.Add(action);

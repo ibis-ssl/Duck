@@ -22,6 +22,7 @@
     <Content Include="Fixtures\match\simulation_protocol_tigers.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\ssl-game-controller-match.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\state-store-initial.json.stream" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Fixtures\match\engine-config-initial.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="CraneLaunchOverlay.py" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control')">

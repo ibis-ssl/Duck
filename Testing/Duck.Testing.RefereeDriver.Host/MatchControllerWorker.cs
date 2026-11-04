@@ -290,8 +290,16 @@ internal sealed class MatchControllerWorker(
                 throw new InvalidOperationException(initialReadiness.FailureReason ?? "Initial match readiness is incomplete.");
 
             stage = "start";
+            if (await driver.ReadAutoContinueAsync(cancellationToken).ConfigureAwait(false) != false)
+                throw new InvalidOperationException(
+                    "The Game Controller did not confirm autoContinue=false before the initial STOP/HALT continuation.");
+
             finalSnapshot = await driver.DriveToActiveAsync(cancellationToken).ConfigureAwait(false);
             stage = "match";
+            if (!await driver.SetAutoContinueAsync(true, cancellationToken).ConfigureAwait(false))
+                throw new InvalidOperationException(
+                    "The Game Controller did not confirm autoContinue=true after observing NORMAL_START.");
+
             var termination = await RefereeDriverFixture.WaitForMatchTerminationAsync(
                 commandSource, finalSnapshot, maximumMatchDuration, cancellationToken).ConfigureAwait(false);
             finalSnapshot = termination.LastSnapshot;
