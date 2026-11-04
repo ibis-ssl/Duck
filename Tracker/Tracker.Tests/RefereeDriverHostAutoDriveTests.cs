@@ -56,7 +56,19 @@ public sealed class RefereeDriverHostAutoDriveTests
         Assert.IsType<GameControllerWebSocketControlClient>(
             fixture.App.Services.GetService<IGameControllerControlClient>());
         Assert.NotNull(fixture.App.Services.GetService<RefereeDriverFixture>());
-        await fixture.Transports.Receiver.AtCall(6).WaitAsync(TimeSpan.FromSeconds(5));
+        try
+        {
+            await fixture.Transports.Receiver.AtCall(6).WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        catch (TimeoutException)
+        {
+            using var diagnostic = await fixture.Client.GetAsync("/health/referee").WaitAsync(TimeSpan.FromSeconds(3));
+            var diagnosticBody = await diagnostic.Content.ReadAsStringAsync();
+            Assert.Fail($"Expected sixth referee packet; received={fixture.Transports.Receiver.Received}, " +
+                $"sentActions={string.Join(',', fixture.Transports.Messages.Select(message => ReadAction(message.Json)))}, " +
+                $"apiReads={fixture.Transports.ApiReads}, lastApi={fixture.Transports.LastApiOutput}, " +
+                $"health={diagnostic.StatusCode}:{diagnosticBody}.");
+        }
         using var response = await fixture.WaitForHealthyAsync();
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.Equal(5, document.RootElement.GetProperty("diagnostic")
@@ -169,7 +181,7 @@ public sealed class RefereeDriverHostAutoDriveTests
         Assert.NotNull(state);
         Assert.Equal("Halt", state.Command);
         Assert.Equal("Halt", state.Phase);
-        Assert.Equal("NORMAL_FIRST_HALF", state.Stage);
+        Assert.Equal("NORMAL_FIRST_HALF_PRE", state.Stage);
         Assert.Contains(state.ContinueActions, action =>
             action.Type == "RESUME_FROM_HALT" && action.ForTeam == "UNKNOWN" &&
             action.State == "READY_MANUAL" && !action.HasContinuationIssues);
@@ -312,10 +324,14 @@ public sealed class RefereeDriverHostAutoDriveTests
         internal TaskCompletionSource PendingInitialEntered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal RefereeDriverTransportFactories Factories { get; }
         internal int CreateCalls => Volatile.Read(ref createCalls);
+        internal global::Referee.Types.Command CurrentCommand => (global::Referee.Types.Command)Volatile.Read(ref currentCommand);
         private int createCalls, connections, currentCommand = (int)global::Referee.Types.Command.Halt;
         private readonly ConcurrentDictionary<int, TaskCompletionSource> connected = new();
         private readonly global::Referee.Types.Command afterNext;
         private readonly bool pendingSend, fragmented, pendingInitial;
+        private int apiReads;
+        internal int ApiReads => Volatile.Read(ref apiReads);
+        internal string? LastApiOutput { get; private set; }
 
         internal Transports(global::Referee.Types.Command afterNext = global::Referee.Types.Command.Stop,
             bool pendingSend = false, bool fragmented = false, bool pendingInitial = false)
@@ -347,38 +363,53 @@ public sealed class RefereeDriverHostAutoDriveTests
         private byte[] Output()
         {
             var command = (global::Referee.Types.Command)Volatile.Read(ref currentCommand);
-            var (commandType, gameStateType) = command switch
+            var kickoffTeam = command switch
             {
-                global::Referee.Types.Command.Stop => ("STOP", "STOP"),
-                global::Referee.Types.Command.PrepareKickoffBlue or
-                    global::Referee.Types.Command.PrepareKickoffYellow => ("KICKOFF", "STOP"),
-                global::Referee.Types.Command.ForceStart => ("FORCE_START", "RUNNING"),
-                global::Referee.Types.Command.NormalStart => ("NORMAL_START", "RUNNING"),
-                _ => ("HALT", "HALT"),
+                global::Referee.Types.Command.PrepareKickoffBlue => "BLUE",
+                global::Referee.Types.Command.PrepareKickoffYellow => "YELLOW",
+                _ => "UNKNOWN",
             };
-            return JsonSerializer.SerializeToUtf8Bytes(new
+            var (commandType, gameStateType, stage, nextCommand, nextCommandTeam, actionType, actionState) = command switch
+            {
+                global::Referee.Types.Command.Stop => ("STOP", "STOP", "NORMAL_FIRST_HALF_PRE", (string?)null, (string?)null, "NEXT_COMMAND", "READY_MANUAL"),
+                global::Referee.Types.Command.PrepareKickoffBlue or
+                    global::Referee.Types.Command.PrepareKickoffYellow => ("KICKOFF", "KICKOFF", "NORMAL_FIRST_HALF_PRE", "KICKOFF", kickoffTeam, "NORMAL_START", "READY_AUTO"),
+                global::Referee.Types.Command.ForceStart => ("FORCE_START", "RUNNING", "NORMAL_FIRST_HALF", (string?)null, (string?)null, "", ""),
+                global::Referee.Types.Command.NormalStart => ("NORMAL_START", "RUNNING", "NORMAL_FIRST_HALF", (string?)null, (string?)null, "", ""),
+                _ => ("HALT", "HALT", "NORMAL_FIRST_HALF_PRE", (string?)null, (string?)null, "RESUME_FROM_HALT", "READY_MANUAL"),
+            };
+            var output = JsonSerializer.Serialize(new
             {
                 matchState = new
                 {
-                    command = new { type = commandType, forTeam = "UNKNOWN" },
-                    gameState = new { type = gameStateType },
-                    stage = "NORMAL_FIRST_HALF",
+                    command = new { type = commandType, forTeam = kickoffTeam },
+                    gameState = new { type = gameStateType, forTeam = kickoffTeam },
+                    teamState = new
+                    {
+                        BLUE = new { goals = 0 },
+                        YELLOW = new { goals = 0 },
+                    },
+                    stage,
+                    nextCommand = nextCommand is null ? null : new { type = nextCommand, forTeam = nextCommandTeam },
                     stageTimeLeft = "25s",
                 },
                 gcState = new
                 {
-                    continueActions = new[]
+                    continueActions = string.IsNullOrEmpty(actionType) ? Array.Empty<object>() : new object[]
                     {
                         new
                         {
-                            type = "RESUME_FROM_HALT",
+                            type = actionType,
                             forTeam = "UNKNOWN",
-                            state = "READY_MANUAL",
+                            state = actionState,
                             continuationIssues = Array.Empty<string>(),
                         },
                     },
                 },
             });
+            LastApiOutput = output;
+            Interlocked.Increment(ref apiReads);
+            return Encoding.UTF8.GetBytes(output);
         }
         private void RecordSend(Uri endpoint, string json)
         {
@@ -484,6 +515,7 @@ public sealed class RefereeDriverHostAutoDriveTests
         private readonly CancellationTokenSource emergency = new();
         private int received, active, maximum, disposed;
         internal int Active => Volatile.Read(ref active);
+        internal int Received => Volatile.Read(ref received);
         internal int MaxActive => Volatile.Read(ref maximum);
         internal int DisposeCalls => Volatile.Read(ref disposed);
         internal void Supply(ReadOnlyMemory<byte> packet) => Assert.True(packets.Writer.TryWrite(packet));
@@ -516,13 +548,21 @@ public sealed class RefereeDriverHostAutoDriveTests
         public override DateTimeOffset GetUtcNow() => new(2026, 10, 22, 22, 0, 0, TimeSpan.Zero);
     }
 
-    private static ReadOnlyMemory<byte> Packet(global::Referee.Types.Command command, uint counter) =>
-        new global::Referee
+    private static ReadOnlyMemory<byte> Packet(global::Referee.Types.Command command, uint counter)
+    {
+        var packet = new global::Referee
         {
-            PacketTimestamp = counter, Stage = global::Referee.Types.Stage.NormalFirstHalf,
+            PacketTimestamp = counter,
+            Stage = command is global::Referee.Types.Command.PrepareKickoffBlue or global::Referee.Types.Command.PrepareKickoffYellow
+                ? global::Referee.Types.Stage.NormalFirstHalfPre
+                : global::Referee.Types.Stage.NormalFirstHalf,
             Command = command, CommandCounter = counter, CommandTimestamp = counter,
             Yellow = Team("yellow"), Blue = Team("blue"),
-        }.ToByteArray();
+        };
+        if (command is global::Referee.Types.Command.PrepareKickoffBlue or global::Referee.Types.Command.PrepareKickoffYellow)
+            packet.NextCommand = command;
+        return packet.ToByteArray();
+    }
     private static global::Referee.Types.TeamInfo Team(string name) => new()
     {
         Name = name, Score = 0, RedCards = 0, YellowCards = 0,
