@@ -29,6 +29,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     private static readonly TimeSpan MotionTimeout = TimeSpan.FromSeconds(60);
 
     [Fact]
+    public void HttpRefereeAcceptanceSourceExposesLifecycleObservations()
+    {
+        using var client = new HttpClient();
+        var source = new HttpRefereeCommandSource(client);
+
+        Assert.IsAssignableFrom<IRefereeLifecycleObservationSource>(source);
+    }
+
+    [Fact]
     public void ResolvesConfiguredDockerExecutableWhenPathIsUnset()
     {
         using var temporaryDirectory = new TemporaryDirectory();
