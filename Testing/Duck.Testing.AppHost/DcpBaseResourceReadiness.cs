@@ -1371,35 +1371,58 @@ internal sealed class DcpBaseCraneReadinessProbe(
     IResource crane,
     IDockerStdioCommandRunner runner,
     string? dockerContextName,
-    string expectedTeamName)
+    string expectedTeamName,
+    Action<string>? diagnosticWriter = null)
 {
     private static readonly TimeSpan ProbeBudget = TimeSpan.FromSeconds(12);
     private const int MaximumOutputCharacters = 16 * 1024;
+    private int attemptCount;
 
     internal async Task<HealthCheckResult> CheckAsync(CancellationToken cancellationToken)
     {
         var candidate = GetCurrentCandidate();
+        var attempt = Interlocked.Increment(ref attemptCount);
+        var startedAtUtc = DateTimeOffset.UtcNow;
+        WriteDiagnostic(new
+        {
+            event_name = "duck_dcp_crane_probe_started",
+            recorded_at_utc = startedAtUtc,
+            attempt,
+            expected_team = expectedTeamName,
+            docker_context = dockerContextName,
+            resource_id = candidate?.ResourceId,
+            container_id = candidate?.ContainerId,
+            run_id = candidate?.RunId,
+            generation = candidate?.Generation,
+            role = candidate?.Role,
+        });
         if (cancellationToken.IsCancellationRequested)
         {
             if (candidate is not null)
             {
                 registry.SetCraneServiceReadiness(candidate, false, "The Crane readiness check was canceled; service readiness is unverified.");
             }
+            WriteTerminal(candidate, attempt, startedAtUtc, TimeSpan.Zero, null, "canceled", "The Crane readiness check was canceled before the probe started.", null, null);
             cancellationToken.ThrowIfCancellationRequested();
         }
         if (!IsOwnedRunning(candidate))
         {
-            return HealthCheckResult.Unhealthy("Crane has no current owned running container identity.");
+            const string reason = "Crane has no current owned running container identity.";
+            WriteTerminal(candidate, attempt, startedAtUtc, TimeSpan.Zero, null, "identity_unavailable", reason, null, null);
+            return HealthCheckResult.Unhealthy(reason);
         }
 
         if (string.IsNullOrWhiteSpace(dockerContextName))
         {
-            registry.SetCraneServiceReadiness(candidate!, false, "The Docker context is not configured for the Crane readiness probe.");
-            return HealthCheckResult.Unhealthy("The Docker context is not configured for the Crane readiness probe.");
+            const string reason = "The Docker context is not configured for the Crane readiness probe.";
+            registry.SetCraneServiceReadiness(candidate!, false, reason);
+            WriteTerminal(candidate, attempt, startedAtUtc, TimeSpan.Zero, null, "docker_context_missing", reason, null, candidate);
+            return HealthCheckResult.Unhealthy(reason);
         }
 
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(ProbeBudget);
+        // Keep the health-check stopwatch at its original boundary: immediately before the bounded Docker exec.
         var timer = System.Diagnostics.Stopwatch.StartNew();
         try
         {
@@ -1416,22 +1439,29 @@ internal sealed class DcpBaseCraneReadinessProbe(
             }
             if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
             {
-                registry.SetCraneServiceReadiness(candidate, false, "The bounded Crane readiness probe expired.");
-                return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+                const string reason = "The bounded Crane readiness probe expired.";
+                registry.SetCraneServiceReadiness(candidate, false, reason);
+                var expired = CraneProbeDiagnostics.Evaluate(result.ExitCode, result.StandardOutput, result.StandardError, timer.Elapsed);
+                WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, "bounded_probe_expired", reason, expired, null);
+                return HealthCheckResult.Unhealthy(reason);
             }
 
             var outcome = CraneProbeDiagnostics.Evaluate(
                 result.ExitCode, result.StandardOutput, result.StandardError, timer.Elapsed);
             if (!outcome.Ready)
             {
-                registry.SetCraneServiceReadiness(candidate, false, "The current Crane ROS diagnostic did not confirm the coordinator and expected team.");
-                return HealthCheckResult.Unhealthy("The current Crane ROS diagnostic did not confirm the coordinator and expected team.");
+                const string reason = "The current Crane ROS diagnostic did not confirm the coordinator and expected team.";
+                registry.SetCraneServiceReadiness(candidate, false, reason);
+                WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, outcome.Classification, reason, outcome, null);
+                return HealthCheckResult.Unhealthy(reason);
             }
 
             var current = GetCurrentCandidate();
             if (current is null || !SameIdentity(candidate, current) || !IsOwnedRunning(current))
             {
-                return HealthCheckResult.Unhealthy("The Crane identity or generation changed while its ROS diagnostic was running.");
+                const string reason = "The Crane identity or generation changed while its ROS diagnostic was running.";
+                WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, "identity_changed", reason, outcome, current);
+                return HealthCheckResult.Unhealthy(reason);
             }
 
             if (cancellationToken.IsCancellationRequested)
@@ -1441,12 +1471,17 @@ internal sealed class DcpBaseCraneReadinessProbe(
             }
             if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
             {
-                registry.SetCraneServiceReadiness(candidate, false, "The bounded Crane readiness probe expired.");
-                return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+                const string reason = "The bounded Crane readiness probe expired.";
+                registry.SetCraneServiceReadiness(candidate, false, reason);
+                WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, "bounded_probe_expired", reason, outcome, current);
+                return HealthCheckResult.Unhealthy(reason);
             }
-            if (!registry.SetCraneServiceReadiness(candidate, true, "The current owned Crane container passed its ROS coordinator and team diagnostic."))
+            const string readyReason = "The current owned Crane container passed its ROS coordinator and team diagnostic.";
+            if (!registry.SetCraneServiceReadiness(candidate, true, readyReason))
             {
-                return HealthCheckResult.Unhealthy("The Crane identity or generation changed while its ROS diagnostic was running.");
+                const string reason = "The Crane identity or generation changed while its ROS diagnostic was running.";
+                WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, "identity_changed", reason, outcome, current);
+                return HealthCheckResult.Unhealthy(reason);
             }
             if (cancellationToken.IsCancellationRequested)
             {
@@ -1455,26 +1490,86 @@ internal sealed class DcpBaseCraneReadinessProbe(
             }
             if (budget.IsCancellationRequested || timer.Elapsed >= ProbeBudget)
             {
-                registry.SetCraneServiceReadiness(candidate, false, "The bounded Crane readiness probe expired.");
-                return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+                const string reason = "The bounded Crane readiness probe expired.";
+                registry.SetCraneServiceReadiness(candidate, false, reason);
+                WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, "bounded_probe_expired", reason, outcome, current);
+                return HealthCheckResult.Unhealthy(reason);
             }
 
+            WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, result.ExitCode, outcome.Classification, readyReason, outcome, current);
             return HealthCheckResult.Healthy("The current owned Crane container passed its ROS coordinator and team diagnostic.");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             registry.SetCraneServiceReadiness(candidate!, false, "The Crane readiness check was canceled; service readiness is unverified.");
+            WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, null, "canceled", "The Crane readiness check was canceled; service readiness is unverified.", null, null);
             throw;
         }
         catch (OperationCanceledException)
         {
-            registry.SetCraneServiceReadiness(candidate!, false, "The bounded Crane readiness probe expired.");
-            return HealthCheckResult.Unhealthy("The bounded Crane readiness probe expired.");
+            const string reason = "The bounded Crane readiness probe expired.";
+            registry.SetCraneServiceReadiness(candidate!, false, reason);
+            WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, null, "bounded_probe_expired", reason, null, null);
+            return HealthCheckResult.Unhealthy(reason);
         }
         catch (Exception exception) when (exception is IOException or TimeoutException or InvalidOperationException)
         {
-            registry.SetCraneServiceReadiness(candidate!, false, "The current Crane ROS diagnostic could not be completed safely.");
-            return HealthCheckResult.Unhealthy("The current Crane ROS diagnostic could not be completed safely.");
+            const string reason = "The current Crane ROS diagnostic could not be completed safely.";
+            registry.SetCraneServiceReadiness(candidate!, false, reason);
+            WriteTerminal(candidate, attempt, startedAtUtc, timer.Elapsed, null, "probe_exception", reason, null, null, exception.GetType().Name);
+            return HealthCheckResult.Unhealthy(reason);
+        }
+    }
+
+    private void WriteTerminal(
+        DcpBaseResourceIdentityCandidate? startedCandidate,
+        int attempt,
+        DateTimeOffset startedAtUtc,
+        TimeSpan elapsed,
+        int? exitCode,
+        string classification,
+        string reason,
+        CraneProbeOutcome? outcome,
+        DcpBaseResourceIdentityCandidate? terminalCandidate,
+        string? exceptionType = null)
+    {
+        WriteDiagnostic(new
+        {
+            event_name = "duck_dcp_crane_probe_terminal",
+            recorded_at_utc = DateTimeOffset.UtcNow,
+            attempt,
+            started_at_utc = startedAtUtc,
+            elapsed_ms = Math.Max(0, (long)elapsed.TotalMilliseconds),
+            expected_team = expectedTeamName,
+            resource_id = startedCandidate?.ResourceId,
+            container_id = startedCandidate?.ContainerId,
+            run_id = startedCandidate?.RunId,
+            generation = startedCandidate?.Generation,
+            terminal_resource_id = terminalCandidate?.ResourceId,
+            terminal_container_id = terminalCandidate?.ContainerId,
+            terminal_run_id = terminalCandidate?.RunId,
+            terminal_generation = terminalCandidate?.Generation,
+            identity_unchanged = startedCandidate is null || terminalCandidate is null
+                ? (bool?)null
+                : SameIdentity(startedCandidate, terminalCandidate),
+            exit_code = exitCode,
+            classification,
+            health_reason = reason,
+            exception_type = exceptionType,
+            outcome,
+        });
+    }
+
+    private void WriteDiagnostic<T>(T diagnostic)
+    {
+        try
+        {
+            var writer = diagnosticWriter ?? Console.Error.WriteLine;
+            CraneProbeDiagnostics.WriteRecord(null, System.Text.Json.JsonSerializer.Serialize(diagnostic), writer);
+        }
+        catch (Exception)
+        {
+            // Probe diagnostics must never alter readiness, retries, or cleanup.
         }
     }
 
